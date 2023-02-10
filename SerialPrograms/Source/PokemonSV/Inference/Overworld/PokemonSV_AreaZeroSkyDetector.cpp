@@ -102,6 +102,7 @@ enum class OverworldState{
 void find_and_center_on_sky(
     ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context
 ){
+    context.wait_for_all_requests();
     console.log("Looking for the sky...");
 
     AreaZeroSkyTracker sky_tracker(console);
@@ -147,7 +148,7 @@ void find_and_center_on_sky(
 
         if (sky_x < 0.45){
             if (state != OverworldState::TurningLeft){
-                console.log("Centering the sky... Moving left.", COLOR_BLUE);
+                console.log("Centering the sky... Moving left.");
                 uint8_t magnitude = (uint8_t)((0.5 - sky_x) * 96 + 31);
                 uint16_t duration = (uint16_t)((0.5 - sky_x) * 125 + 20);
                 session.dispatch([=](BotBaseContext& context){
@@ -159,7 +160,7 @@ void find_and_center_on_sky(
         }
         if (sky_x > 0.55){
             if (state != OverworldState::TurningRight){
-                console.log("Centering the sky... Moving Right.", COLOR_BLUE);
+                console.log("Centering the sky... Moving Right.");
                 uint8_t magnitude = (uint8_t)((sky_x - 0.5) * 96 + 31);
                 uint16_t duration = (uint16_t)((sky_x - 0.5) * 125 + 20);
                 session.dispatch([=](BotBaseContext& context){
@@ -170,6 +171,7 @@ void find_and_center_on_sky(
             continue;
         }
 
+        console.log("Found the sky!", COLOR_ORANGE);
         break;
     }
 

@@ -72,7 +72,7 @@ private:
         PATH1,
         PATH2,
     };
-    EnumDropdownOption<Path> PATH;
+    EnumDropdownOption<Path> PATH0;
 
     BooleanCheckBoxOption VIDEO_ON_SHINY;
 

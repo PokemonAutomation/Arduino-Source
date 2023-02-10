@@ -199,12 +199,18 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 //    throw ProgramFinishedException(env.logger(), "", std::make_shared<ImageRGB32>("TeraCode-S-chi-original.png"));
 
 
+    ImageRGB32 image("Screenshots/screenshot-20230209-061452037331.png");
 
+    ImageRGB32 filtered = filter_rgb32_range(image, 0xff000040, 0xff8080ff, Color(0xffff0000), true);
+    filtered.save("test.png");
+
+
+#if 0
     ImageRGB32 image("Screenshots/screenshot-20230208-012850704172.png");
 
     OverworldDetector detector;
     cout << detector.detect(image) << endl;
-
+#endif
 
 
 #if 0

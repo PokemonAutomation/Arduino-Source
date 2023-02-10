@@ -4,6 +4,12 @@
  *
  */
 
+#include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
+#include "CommonFramework/Exceptions/OperationFailedException.h"
+//#include "CommonFramework/ImageTools/ImageFilter.h"
+#include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/Tools/ConsoleHandle.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_ScalarButtons.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
@@ -114,6 +120,46 @@ void zero_gate_to_platform(
 //    context.wait_for_all_requests();
     pbf_press_button(context, BUTTON_PLUS, 20, 105);
     pbf_move_left_joystick(context, 128, 0, 5 * TICKS_PER_SECOND, 0);
+}
+
+
+void read_platform_center(
+    double& x, double& y,
+    const ProgramInfo& info, ConsoleHandle& console
+){
+    using namespace Kernels::Waterfill;
+
+    VideoSnapshot screen = console.video().snapshot();
+    if (!screen){
+        throw OperationFailedException(console, "Unable to find center of platform. Video is null.", false);
+    }
+
+    PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(screen, 0xff000040, 0xff8080ff);
+
+//    size_t min_width = screen.width() / 4;
+//    size_t min_height = screen.height() / 4;
+
+    WaterfillObject biggest;
+    WaterfillObject object;
+
+    std::unique_ptr<WaterfillSession> session = make_WaterfillSession(matrix);
+    size_t min_area = screen->width() * screen->height() / 10;
+    auto iter = session->make_iterator(min_area);
+    while (iter->find_next(object, false)){
+//        if (object.min_y != 0){
+//            continue;
+//        }
+        if (biggest.area < object.area){
+            biggest = std::move(object);
+        }
+    }
+
+    if (biggest.area == 0){
+        throw OperationFailedException(console, "Unable to find center of platform.", screen);
+    }
+
+    x = biggest.center_of_gravity_x() / screen->width();
+    y = biggest.center_of_gravity_y() / screen->height();
 }
 
 

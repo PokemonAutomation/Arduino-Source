@@ -22,7 +22,7 @@ namespace PokemonSV{
 
 class LetsGoKillDetector : public StaticScreenDetector{
 public:
-    LetsGoKillDetector(Color color, const ImageFloatBox& box = {0.71, 0.15, 0.04, 0.30});
+    LetsGoKillDetector(Color color, const ImageFloatBox& box = {0.71, 0.15, 0.04, 0.08});
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) const override;

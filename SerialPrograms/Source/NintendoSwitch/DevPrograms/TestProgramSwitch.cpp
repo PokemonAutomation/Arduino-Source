@@ -189,7 +189,33 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
+    auto image = feed.snapshot();
 
+    ImageRGB32 filtered = filter_rgb32_range(image, 0xff000040, 0xff8080ff, Color(0xffff0000), true);
+    filtered.save("test.png");
+
+    using namespace Kernels::Waterfill;
+
+    PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(image, 0xff000040, 0xff8080ff);
+
+//    size_t min_width = screen.width() / 4;
+//    size_t min_height = screen.height() / 4;
+
+    WaterfillObject biggest;
+    WaterfillObject object;
+
+    std::unique_ptr<WaterfillSession> session = make_WaterfillSession(matrix);
+    auto iter = session->make_iterator(10000);
+    while (iter->find_next(object, false)){
+//        if (object.min_y != 0){
+//            continue;
+//        }
+        if (biggest.area < object.area){
+            biggest = std::move(object);
+        }
+    }
+
+    cout << biggest.center_of_gravity_x() / image->width() << ", " << biggest.center_of_gravity_y() / image->height() << endl;
 
 
 

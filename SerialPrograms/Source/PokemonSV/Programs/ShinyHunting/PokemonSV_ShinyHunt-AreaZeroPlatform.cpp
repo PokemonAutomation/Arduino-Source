@@ -4,6 +4,7 @@
  *
  */
 
+#include <cmath>
 #include <atomic>
 #include <sstream>
 #include "Common/Cpp/PrettyPrint.h"
@@ -28,10 +29,9 @@
 //#include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSV_ShinyHunt-AreaZeroPlatform.h"
 
-
-//#include <iostream>
-//using std::cout;
-//using std::endl;
+#include <iostream>
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -97,15 +97,15 @@ ShinyHuntAreaZeroPlatform::ShinyHuntAreaZeroPlatform()
         LockWhileRunning::UNLOCKED,
         180
     )
-    , PATH(
+    , PATH0(
         "<b>Path:</b><br>Traversal path on the platform to trigger encounters.",
         {
             {Path::PATH0, "path0", "Path 0"},
             {Path::PATH1, "path1", "Path 1"},
-//            {Path::PATH2, "path2", "Path 2"},
+            {Path::PATH2, "path2", "Path 2"},
         },
         LockWhileRunning::UNLOCKED,
-        Path::PATH0
+        Path::PATH2
     )
     , VIDEO_ON_SHINY(
         "<b>Video Capture:</b><br>Take a video of the encounter if it is shiny.",
@@ -131,7 +131,7 @@ ShinyHuntAreaZeroPlatform::ShinyHuntAreaZeroPlatform()
         PA_ADD_OPTION(MODE);
         PA_ADD_OPTION(RESET_DURATION_MINUTES);
     }
-    PA_ADD_OPTION(PATH);
+    PA_ADD_OPTION(PATH0);
     PA_ADD_OPTION(VIDEO_ON_SHINY);
     if (PreloadSettings::instance().DEVELOPER_MODE){
         PA_ADD_OPTION(NAVIGATE_TO_PLATFORM);
@@ -247,7 +247,7 @@ void ShinyHuntAreaZeroPlatform::run_path0(ProgramEnvironment& env, ConsoleHandle
 void ShinyHuntAreaZeroPlatform::run_path1(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){
     //  Go back to the wall.
     console.log("Go back to wall...");
-    pbf_press_button(context, BUTTON_L, 20, 50);
+    pbf_press_button(context, BUTTON_L, 20, 105);
     clear_in_front(env, console, context, [&](BotBaseContext& context){
         find_and_center_on_sky(env, console, context);
         pbf_move_right_joystick(context, 128, 255, 80, 0);
@@ -307,17 +307,140 @@ void ShinyHuntAreaZeroPlatform::run_path1(ProgramEnvironment& env, ConsoleHandle
 //        pbf_controller_state(context, 0, DPAD_NONE, 255, 255, 120, 128, 3 * TICKS_PER_SECOND);
     });
 }
+
+
+
+void direction_to_stick(
+    uint8_t& joystick_x, uint8_t& joystick_y,
+    double direction_x, double direction_y
+){
+//    cout << "direction = " << direction_x << ", " << direction_y << endl;
+
+    double scale = std::max(std::abs(direction_x), std::abs(direction_y));
+    direction_x = 128 / scale * direction_x + 128;
+    direction_y = 128 / scale * direction_y + 128;
+
+//    cout << "joystick = " << direction_x << ", " << direction_y << endl;
+
+    direction_x = std::min(direction_x, 255.);
+    direction_x = std::max(direction_x, 0.);
+    direction_y = std::min(direction_y, 255.);
+    direction_y = std::max(direction_y, 0.);
+
+    joystick_x = (double)direction_x;
+    joystick_y = (double)direction_y;
+}
+void choose_path(
+    Logger& logger,
+    uint8_t& x, uint8_t& y, uint16_t& duration,
+    double platform_x, double platform_y
+){
+    double diff_x = platform_x - 0.65;
+    double diff_y = platform_y - 0.70;
+
+    logger.log("Move Direction: x = " + tostr_default(diff_x) + ", y = " + tostr_default(diff_y), COLOR_BLUE);
+
+    direction_to_stick(x, y, diff_x, diff_y);
+    duration = (uint16_t)std::min<double>(std::sqrt(diff_x*diff_x + diff_y*diff_y) * 125 * 12, 400);
+}
+void turn_angle(BotBaseContext& context, double angle_radians){
+    uint8_t turn_x, turn_y;
+    direction_to_stick(turn_x, turn_y, -std::sin(angle_radians), std::cos(angle_radians));
+    pbf_move_left_joystick(context, turn_x, turn_y, 40, 20);
+    pbf_mash_button(context, BUTTON_L, 60);
+}
+
 void ShinyHuntAreaZeroPlatform::run_path2(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){
-    pbf_press_button(context, BUTTON_L, 20, 50);
+
+    console.log("Look forward and fire...");
+    pbf_mash_button(context, BUTTON_L, 60);
+
+    double platform_x, platform_y;
+    uint16_t duration;
+    uint8_t move_x, move_y;
     clear_in_front(env, console, context, [&](BotBaseContext& context){
+
+        console.log("Find the sky, turn around and fire.");
+        pbf_move_right_joystick(context, 128, 0, 60, 0);
+        find_and_center_on_sky(env, console, context);
+        context.wait_for(std::chrono::seconds(1));
+        pbf_move_left_joystick(context, 128, 255, 40, 85);
+        pbf_mash_button(context, BUTTON_L, 60);
+
+        pbf_move_right_joystick(context, 128, 255, 250, 0);
+        context.wait_for_all_requests();
+
+        console.log("Finding center of platform...");
+        read_platform_center(platform_x, platform_y, env.program_info(), console);
+        console.log("Platform center at: x = " + tostr_default(platform_x) + ", y = " + tostr_default(platform_y), COLOR_BLUE);
+
+        choose_path(console, move_x, move_y, duration, platform_x, platform_y);
+
+        pbf_move_left_joystick(context, move_x, move_y, 40, 20);
+        pbf_mash_button(context, BUTTON_L, 60);
+//        pbf_wait(context, 1250);
+    });
+    clear_in_front(env, console, context, [&](BotBaseContext& context){
+        context.wait_for(std::chrono::milliseconds(1000));
+
+        console.log("Making location correction...");
+        pbf_move_left_joystick(context, 128, 0, duration, 0);
+
+        //  Optimization, calculate angle to aim you back at the sky.
+        //  This speeds up the "find_and_center_on_sky()" call.
+        double angle0 = std::atan2(move_x - 128., 128. - move_y);
+        double angle1 = angle0 >= 0 ? 6.2831853071795864769 - angle0 : -6.2831853071795864769 - angle0;
+        turn_angle(context, angle1);
+
         find_and_center_on_sky(env, console, context);
     });
 
+    //  One in every 4 iterations: Clear wall of spawns.
+    if (m_iterations % 4 == 0){
+        console.log("Turning along wall...");
+        pbf_move_left_joystick(context, 0, 255, 20, 20);
+        pbf_mash_button(context, BUTTON_L, 60);
+        clear_in_front(env, console, context, [&](BotBaseContext& context){
+            context.wait_for(std::chrono::milliseconds(1000));
+
+            console.log("Turning back to sky.");
+            pbf_move_left_joystick(context, 255, 255, 20, 20);
+            pbf_mash_button(context, BUTTON_L, 60);
+            find_and_center_on_sky(env, console, context);
+//            pbf_mash_button(context, BUTTON_L, 60);
+        });
+
+//        clear_in_front(env, console, context, nullptr);
+    }
+
+#if 1
+    pbf_move_left_joystick(context, 64, 0, 40, 0);
+    pbf_mash_button(context, BUTTON_L, 60);
+    clear_in_front(env, console, context, [&](BotBaseContext& context){
+        context.wait_for(std::chrono::milliseconds(1000));
+
+        console.log("Move forward, turn-around, and fire.");
+        switch (m_iterations % 2){
+        case 0:
+            pbf_move_left_joystick(context, 108, 0, 250, 0);
+            break;
+        case 1:
+            pbf_move_left_joystick(context, 128, 0, 250, 0);
+            break;
+        }
+
+    });
+    clear_in_front(env, console, context, [&](BotBaseContext& context){
+        pbf_move_left_joystick(context, 128, 255, 4 * TICKS_PER_SECOND, 0);
+    });
+#endif
+
+//    context.wait_for(std::chrono::seconds(60));
 }
 void ShinyHuntAreaZeroPlatform::run_iteration(
     ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context
 ){
-    switch (PATH){
+    switch (PATH0){
     case Path::PATH0:
         run_path0(env, console, context);
         break;
