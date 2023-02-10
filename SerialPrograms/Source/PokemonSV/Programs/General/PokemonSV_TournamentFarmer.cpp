@@ -4,7 +4,6 @@
  *
  */
 
-#include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
@@ -14,10 +13,7 @@
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Tools/VideoResolutionCheck.h"
 #include "CommonFramework/OCR/OCR_NumberReader.h"
-#include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_ScalarButtons.h"
-#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_BattleMenuDetector.h"
@@ -28,6 +24,7 @@
 #include "PokemonSV/Inference/PokemonSV_TournamentPrizeNameReader.h"
 #include "PokemonSV/Resources/PokemonSV_TournamentPrizeNames.h"
 #include "PokemonSV_TournamentFarmer.h"
+
 
 namespace PokemonAutomation {
 namespace NintendoSwitch {
@@ -125,15 +122,32 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, BotBaseCo
         context.wait_for_all_requests();
 
         pbf_press_button(context, BUTTON_R, 20, 50);
+        pbf_press_button(context, BUTTON_A, 10, 50);
     }
 
     //Mash A until battle finished
-    BlackScreenWatcher end_of_battle(COLOR_RED, { 0.2, 0.2, 0.6, 0.6 });
+    AdvanceDialogWatcher end_of_battle(COLOR_YELLOW);
     int ret_black = run_until(
         env.console, context,
-        [](BotBaseContext& context) {
-            pbf_mash_button(context, BUTTON_A, 30000);
-            pbf_mash_button(context, BUTTON_A, 7500); //5 minutes should be more than enough for one battle
+        [&](BotBaseContext& context) {
+            for(size_t c = 0; c < 30; c++) { //Sylveon build has 16 PP at max, and Chi-Yu build has 24.
+                NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
+                int ret = wait_until(
+                    env.console, context,
+                    std::chrono::seconds(45), //Tera takes ~25 to 30 seconds for player/opponent
+                    { battle_menu }
+                );
+                if (ret == 0) {
+                    pbf_mash_button(context, BUTTON_A, 300);
+                    context.wait_for_all_requests();
+                } else {
+                    env.log("Timed out during battle. Stuck, crashed, or took more than 45 seconds for a turn.", COLOR_RED);
+                    stats.errors++;
+                    env.update_stats();
+                    send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
+                    throw OperationFailedException(env.console, "Timed out during battle. Stuck, crashed, or took more than 45 seconds for a turn.", true);
+                }
+            }
         },
         { end_of_battle }
         );
@@ -142,13 +156,16 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, BotBaseCo
         stats.battles++;
         env.update_stats();
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
-    }
-    else {
-        env.log("Timed out during battle after 5 minutes.", COLOR_RED);
+
+        //Clear remaining dialog
+        pbf_mash_button(context, BUTTON_B, 300);
+        context.wait_for_all_requests();
+    } else {
+        env.log("Timed out during battle. Stuck, crashed, or took over 30 turns.", COLOR_RED);
         stats.errors++;
         env.update_stats();
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
-        throw OperationFailedException(env.console, "Timed out after 5 minutes.", true);
+        throw OperationFailedException(env.console, "Timed out during battle. Stuck, crashed, or took over 30 turns.", true);
     }
     context.wait_for_all_requests();
 }
@@ -191,7 +208,7 @@ void TournamentFarmer::check_prize(SingleSwitchProgramEnvironment& env, BotBaseC
                 env, NOTIFICATION_PRIZE_MATCH,
                 COLOR_GREEN, "Prize matched",
                 {
-                    { "Item:", r.second.token },
+                    { "Item:", get_tournament_prize_name(r.second.token).display_name() },
                 }
             , "", screen);
             break;
@@ -358,7 +375,7 @@ void TournamentFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseConte
             int ret_battle2 = run_until(
                 env.console, context,
                 [](BotBaseContext& context) {
-                    pbf_mash_button(context, BUTTON_B, 4000);
+                    pbf_mash_button(context, BUTTON_B, 4500);
                 },
                 { battle_menu2, overworld }
                 );
@@ -396,7 +413,8 @@ void TournamentFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseConte
         }
 
         //Save the game if option is set
-        if (SAVE_NUM_ROUNDS != 0 && ((c + 1) % SAVE_NUM_ROUNDS) == 0) {
+        uint16_t num_rounds_temp = SAVE_NUM_ROUNDS;
+        if (num_rounds_temp != 0 && ((c + 1) % num_rounds_temp) == 0) {
             env.log("Saving game.");
             save_game_from_overworld(env.program_info(), env.console, context);
         }
