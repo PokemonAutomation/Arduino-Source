@@ -412,18 +412,22 @@ void ShinyHuntAreaZeroPlatform::run_path2(BotBaseContext& context){
         context.wait_for(std::chrono::milliseconds(1000));
 
         console.log("Move forward, turn-around, and fire.");
-        switch (m_iterations % 2){
+        switch (m_iterations % 3){
         case 0:
-            pbf_move_left_joystick(context, 108, 0, 250, 0);
+            pbf_move_left_joystick(context, 108, 0, 275, 0);
             break;
         case 1:
-            pbf_move_left_joystick(context, 128, 0, 250, 0);
+            pbf_move_left_joystick(context, 128, 0, 275, 0);
+            break;
+        case 2:
+            pbf_move_left_joystick(context, 144, 0, 275, 0);
             break;
         }
 
     });
     clear_in_front(context, [&](BotBaseContext& context){
         pbf_move_left_joystick(context, 128, 255, 4 * TICKS_PER_SECOND, 0);
+        pbf_move_right_joystick(context, 128, 0, 60, 0);
     });
 #endif
 
