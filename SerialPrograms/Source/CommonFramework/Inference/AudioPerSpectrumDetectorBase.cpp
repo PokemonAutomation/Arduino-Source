@@ -57,7 +57,7 @@ void AudioPerSpectrumDetectorBase::log_results(){
         m_console.log(m_audio_name + " not detected. Error Coefficient = " + tostr_default(m_lowest_error), COLOR_PURPLE);
     }
 
-#if 0
+#if 1
     if (m_lowest_error >= 1){
         std::stringstream ss;
         ss << "AudioPerSpectrumDetectorBase ended with error of 1.0: " << endl;
@@ -66,7 +66,8 @@ void AudioPerSpectrumDetectorBase::log_results(){
         for (const auto& error : m_errors){
             ss << "[" << error.first << ":" << error.second << "]";
         }
-        m_console.log(ss.str(), COLOR_RED);
+//        m_console.log(ss.str(), COLOR_RED);
+        cout << ss.str() << endl;
     }
  #endif
 }
@@ -75,6 +76,7 @@ bool AudioPerSpectrumDetectorBase::process_spectrums(
     const std::vector<AudioSpectrum>& new_spectrums,
     AudioFeed& audio_feed
 ){
+//    cout << m_audio_name << ": " << new_spectrums.size() << endl;
     if (new_spectrums.empty()){
 //        cout << "No new spectrums" << endl;
         return false;
@@ -90,11 +92,11 @@ bool AudioPerSpectrumDetectorBase::process_spectrums(
         m_last_reported = false;
     }
 
-    const size_t sampleRate = new_spectrums[0].sample_rate;
+    const size_t sample_rate = new_spectrums[0].sample_rate;
     // Lazy intialization of the spectrogram matcher.
-    if (m_matcher == nullptr || m_matcher->sampleRate() != sampleRate){
+    if (m_matcher == nullptr || m_matcher->sample_rate() != sample_rate){
         m_console.log("Loading spectrogram...");
-        m_matcher = build_spectrogram_matcher(sampleRate);
+        m_matcher = build_spectrogram_matcher(sample_rate);
     }
 
     // Feed spectrum one by one to the matcher:
@@ -117,7 +119,11 @@ bool AudioPerSpectrumDetectorBase::process_spectrums(
         const float matcher_score = m_matcher->match(single_spectrum);
         // std::cout << "error: " << matcherScore << std::endl;
 
-//        m_errors.emplace_back(matcher_score, now_to_filestring());
+        if (m_lowest_error < 1.0){
+            m_errors.clear();
+        }else{
+            m_errors.emplace_back(matcher_score, now_to_filestring());
+        }
 
         if (matcher_score == FLT_MAX){
 //            cout << "Not enough history: " << m_lowest_error << endl;

@@ -25,13 +25,14 @@ float AlphaMusicDetector::get_score_threshold() const{
     return (float)GameSettings::instance().ALPHA_MUSIC_THRESHOLD;
 }
 
-std::unique_ptr<SpectrogramMatcher> AlphaMusicDetector::build_spectrogram_matcher(size_t sampleRate){
-    const double lowFrequencyFilter = 50.0; // we don't match frequencies under 50.0 Hz
+std::unique_ptr<SpectrogramMatcher> AlphaMusicDetector::build_spectrogram_matcher(size_t sample_rate){
+    const double low_frequency_filter = 50.0; // we don't match frequencies under 50.0 Hz
     const size_t templateSubdivision = 12;
     return std::make_unique<SpectrogramMatcher>(
-        AudioTemplateCache::instance().get_throw("PokemonLA/AlphaMusic", sampleRate),
-        SpectrogramMatcher::Mode::RAW, sampleRate,
-        lowFrequencyFilter, templateSubdivision
+        "Alpha Music",
+        AudioTemplateCache::instance().get_throw("PokemonLA/AlphaMusic", sample_rate),
+        SpectrogramMatcher::Mode::RAW, sample_rate,
+        low_frequency_filter, templateSubdivision
     );
 }
 

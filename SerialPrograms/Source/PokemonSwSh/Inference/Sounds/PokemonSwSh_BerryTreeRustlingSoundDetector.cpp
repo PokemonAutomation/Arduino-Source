@@ -29,10 +29,11 @@ float BerryTreeRustlingSoundDetector::get_score_threshold() const{
     return m_threshold;
 }
 
-std::unique_ptr<SpectrogramMatcher> BerryTreeRustlingSoundDetector::build_spectrogram_matcher(size_t sampleRate){
+std::unique_ptr<SpectrogramMatcher> BerryTreeRustlingSoundDetector::build_spectrogram_matcher(size_t sample_rate){
     return std::make_unique<SpectrogramMatcher>(
-        AudioTemplateCache::instance().get_throw("PokemonSwSh/BerryTreeRustlingSound", sampleRate),
-        SpectrogramMatcher::Mode::RAW, sampleRate,
+        "Berry Rustle",
+        AudioTemplateCache::instance().get_throw("PokemonSwSh/BerryTreeRustlingSound", sample_rate),
+        SpectrogramMatcher::Mode::RAW, sample_rate,
         2000,
         1
     );

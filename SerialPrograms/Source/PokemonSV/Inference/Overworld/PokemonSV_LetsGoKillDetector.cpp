@@ -10,6 +10,9 @@
 #include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "CommonFramework/ImageMatch/ExactImageMatcher.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "CommonFramework/Inference/SpectrogramMatcher.h"
+#include "CommonFramework/Inference/AudioTemplateCache.h"
+#include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSV_LetsGoKillDetector.h"
 
 //#include <iostream>
@@ -184,6 +187,36 @@ bool LetsGoKillWatcher::process_frame(const ImageViewRGB32& frame, WallClock tim
     m_last_detection = true;
     return m_trigger_if_detected;
 }
+
+
+
+
+LetsGoKillSoundDetector::LetsGoKillSoundDetector(ConsoleHandle& console, DetectedCallback detected_callback)
+    : AudioPerSpectrumDetectorBase(
+        "LetsGoKillSoundDetector",
+        "Let's Go Kill Sound",
+        COLOR_RED, console,
+        [this, callback = std::move(detected_callback)](float error_coefficient){
+            m_last_detected = current_time();
+            return callback != nullptr ? callback(error_coefficient) : false;
+        }
+    )
+    , m_last_detected(WallClock::min())
+{}
+float LetsGoKillSoundDetector::get_score_threshold() const{
+    return (float)GameSettings::instance().LETS_GO_KILL_SOUND_THRESHOLD;
+}
+std::unique_ptr<SpectrogramMatcher> LetsGoKillSoundDetector::build_spectrogram_matcher(size_t sample_rate){
+    return std::make_unique<SpectrogramMatcher>(
+        "Let's Go Kill",
+        AudioTemplateCache::instance().get_throw("PokemonSV/LetsGoKill", sample_rate),
+        SpectrogramMatcher::Mode::SPIKE_CONV, sample_rate,
+        GameSettings::instance().LETS_GO_KILL_SOUND_LOW_FREQUENCY
+    );
+}
+
+
+
 
 
 

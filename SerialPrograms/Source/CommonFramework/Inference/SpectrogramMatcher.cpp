@@ -47,11 +47,13 @@ std::vector<float> buildSpikeKernel(size_t numFrequencies, size_t halfSampleRate
 
 
 SpectrogramMatcher::SpectrogramMatcher(
-    AudioTemplate audioTemplate, Mode mode, size_t sampleRate,
-    double lowFrequencyFilter, size_t templateSubdivision
+    std::string name,
+    AudioTemplate audioTemplate, Mode mode, size_t sample_rate,
+    double low_frequency_filter, size_t templateSubdivision
 )
-    : m_template(std::move(audioTemplate))
-    , m_sampleRate(sampleRate)
+    : m_name(std::move(name))
+    , m_template(std::move(audioTemplate))
+    , m_sample_rate(sample_rate)
     , m_mode(mode)
 {
     const size_t numTemplateWindows = m_template.numWindows();
@@ -63,7 +65,7 @@ SpectrogramMatcher::SpectrogramMatcher(
 //        throw FileException(nullptr, PA_CURRENT_FUNCTION, "Unable to load audio template file.", templateFilename.toStdString());
     }
 
-    const size_t halfSampleRate = sampleRate / 2;
+    const size_t halfSampleRate = sample_rate / 2;
 
     // The frquency range from [0.0, halfSampleRate / numFrequencies, 2.0 halfSampleRate / numFrequencies, ... (numFrequencies-1) halfSampleRate / numFrequencies]
     // Since human can only hear as high as 20KHz sound, matching on frequencies >= 20KHz is meaningless.
@@ -74,7 +76,7 @@ SpectrogramMatcher::SpectrogramMatcher(
     // So 5.0 24K / 2048 = 58.59375Hz. For other sample rate and numFrequencies combinations,
     // j * halfSampleRate/numFrequencies >= 58.59375 -> j >= 58.59375 * numFrequnecies / halfSampleRate
 
-    m_originalFreqStart = int(lowFrequencyFilter * m_numOriginalFrequencies / halfSampleRate + 0.5);
+    m_originalFreqStart = int(low_frequency_filter * m_numOriginalFrequencies / halfSampleRate + 0.5);
     m_originalFreqEnd = 20000 * m_numOriginalFrequencies / halfSampleRate + 1;
 
     // Initialize the spike convolution kernel:
@@ -344,7 +346,7 @@ float SpectrogramMatcher::match(const std::vector<AudioSpectrum>& new_spectrums)
     size_t lastStamp = curStamp + 1;
     for (const auto& s : m_spectrums){
         if (s.stamp != lastStamp - 1){
-            std::cout << "Error: SpectrogramMatcher's spectrum timestamps are not continuous:" << std::endl;
+            std::cout << "Error: SpectrogramMatcher (" + m_name + ") spectrum timestamps are not continuous:" << std::endl;
 
             for(const auto& sp : m_spectrums){
                 std::cout << sp.stamp << ", ";

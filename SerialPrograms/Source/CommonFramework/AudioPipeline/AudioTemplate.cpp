@@ -36,13 +36,13 @@ AudioTemplate::AudioTemplate(size_t frequencies, size_t windows)
 {}
 
 
-AudioTemplate loadAudioTemplate(const std::string& filename, size_t sampleRate){
+AudioTemplate loadAudioTemplate(const std::string& filename, size_t sample_rate){
     QAudioFormat outputAudioFormat;
     outputAudioFormat.setChannelCount(1);
 #if QT_VERSION_MAJOR == 5
     outputAudioFormat.setCodec("audio/pcm");
 #endif
-    outputAudioFormat.setSampleRate((int)sampleRate);
+    outputAudioFormat.setSampleRate((int)sample_rate);
     setSampleFormatToFloat(outputAudioFormat);
     
     AudioFileLoader loader(nullptr, filename, outputAudioFormat);
@@ -87,7 +87,7 @@ AudioTemplate loadAudioTemplate(const std::string& filename, size_t sampleRate){
 
 
     std::stringstream ss;
-    ss << "Built audio template with sample rate " << sampleRate << ", " << numWindows << " windows and " << numFrequencies <<
+    ss << "Built audio template with sample rate " << sample_rate << ", " << numWindows << " windows and " << numFrequencies <<
         " frequencies from " << filename;
     global_logger_tagged().log(ss.str());
 

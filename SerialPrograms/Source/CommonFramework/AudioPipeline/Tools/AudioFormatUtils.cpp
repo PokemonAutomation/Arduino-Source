@@ -36,7 +36,7 @@ std::string dumpAudioFormat(const QAudioFormat& format){
     ss <<
         ", bytes per sample " << format.bytesPerFrame() / format.channelCount() << 
         ", num channels " << format.channelCount() << 
-        ", sample rate " << format.sampleRate() << 
+        ", sample rate " << format.sample_rate() << 
         ", codec " << format.codec().toStdString() << std::endl;
 
     return ss.str();

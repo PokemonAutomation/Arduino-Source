@@ -43,7 +43,7 @@ class SpectrogramMatcher;
 // spectrum in the audio stream.
 // The derived classes need to implement two functions:
 // - float get_score_threshold() const
-// - std::unique_ptr<SpectrogramMatcher> build_spectrogram_matcher(size_t sampleRate)
+// - std::unique_ptr<SpectrogramMatcher> build_spectrogram_matcher(size_t sample_rate)
 class AudioPerSpectrumDetectorBase : public AudioInferenceCallback{
 public:
     using DetectedCallback = std::function<bool(float error_coefficient)>;
@@ -86,7 +86,7 @@ public:
 protected:
     // To be implemented by derived classes:
     // build the actual spectrogram matcher for the target audio.
-    virtual std::unique_ptr<SpectrogramMatcher> build_spectrogram_matcher(size_t sampleRate) = 0;
+    virtual std::unique_ptr<SpectrogramMatcher> build_spectrogram_matcher(size_t sample_rate) = 0;
 
     // Name of the target audio to be detected. Used for logging.
     std::string m_audio_name;
@@ -115,7 +115,7 @@ protected:
     
     std::unique_ptr<SpectrogramMatcher> m_matcher;
 
-//    std::vector<std::pair<float, std::string>> m_errors;
+    std::vector<std::pair<float, std::string>> m_errors;
 };
 
 

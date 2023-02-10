@@ -36,6 +36,8 @@ public:
     TimeExpressionOption<uint16_t> RAID_SPAWN_DELAY;
     FloatingPointOption SHINY_SOUND_THRESHOLD2;
     FloatingPointOption SHINY_SOUND_LOW_FREQUENCY;
+    FloatingPointOption LETS_GO_KILL_SOUND_THRESHOLD;
+    FloatingPointOption LETS_GO_KILL_SOUND_LOW_FREQUENCY;
 };
 
 

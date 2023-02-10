@@ -25,10 +25,11 @@ float ShinySoundDetector::get_score_threshold() const{
     return (float)GameSettings::instance().SHINY_SOUND_THRESHOLD;
 }
 
-std::unique_ptr<SpectrogramMatcher> ShinySoundDetector::build_spectrogram_matcher(size_t sampleRate){
+std::unique_ptr<SpectrogramMatcher> ShinySoundDetector::build_spectrogram_matcher(size_t sample_rate){
     return std::make_unique<SpectrogramMatcher>(
-        AudioTemplateCache::instance().get_throw("PokemonLA/ShinySound", sampleRate),
-        SpectrogramMatcher::Mode::SPIKE_CONV, sampleRate,
+        "Shiny Sound",
+        AudioTemplateCache::instance().get_throw("PokemonLA/ShinySound", sample_rate),
+        SpectrogramMatcher::Mode::SPIKE_CONV, sample_rate,
         GameSettings::instance().SHINY_SOUND_LOW_FREQUENCY
     );
 }

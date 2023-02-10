@@ -12,6 +12,7 @@
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/Inference/VisualDetector.h"
+#include "CommonFramework/Inference/AudioPerSpectrumDetectorBase.h"
 
 namespace PokemonAutomation{
     class Logger;
@@ -55,6 +56,25 @@ private:
     std::atomic<WallClock> m_last_detected;
 };
 
+
+
+
+class LetsGoKillSoundDetector : public AudioPerSpectrumDetectorBase{
+public:
+    LetsGoKillSoundDetector(ConsoleHandle& console, DetectedCallback detected_callback);
+
+    virtual float get_score_threshold() const override;
+
+    WallClock last_kill() const{
+        return m_last_detected.load(std::memory_order_relaxed);
+    }
+
+private:
+    virtual std::unique_ptr<SpectrogramMatcher> build_spectrogram_matcher(size_t sample_rate) override;
+
+private:
+    std::atomic<WallClock> m_last_detected;
+};
 
 
 

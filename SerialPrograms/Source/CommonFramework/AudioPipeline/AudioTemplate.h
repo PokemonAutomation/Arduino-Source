@@ -54,7 +54,7 @@ private:
 
 // Load AudioTemplate from disk. Accept .wav format on any OS.
 // Loading .mp3 format however is dependent on Qt's platform-dependent backend.
-AudioTemplate loadAudioTemplate(const std::string& filename, size_t sampleRate = 48000);
+AudioTemplate loadAudioTemplate(const std::string& filename, size_t sample_rate = 48000);
 
 
 

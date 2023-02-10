@@ -74,6 +74,16 @@ GameSettings::GameSettings()
         LockWhileRunning::LOCKED,
         1000, 0, 48000
     )
+    , LETS_GO_KILL_SOUND_THRESHOLD(
+        "<b>Let's Go Kill Sound Threshold:</b><br>Maximum error coefficient to trigger a Let's Go Kill detection.",
+        LockWhileRunning::LOCKED,
+        0.93, 0, 1.0
+    )
+    , LETS_GO_KILL_SOUND_LOW_FREQUENCY(
+        "<b>Let's Go Kill Sound Low Frequency (Hz):</b><br>High pass filter frequency for Let's Go Kill sound.",
+        LockWhileRunning::LOCKED,
+        1000, 0, 48000
+    )
 {
     PA_ADD_STATIC(m_start_game_timings);
     PA_ADD_OPTION(START_GAME_MASH);
@@ -84,6 +94,8 @@ GameSettings::GameSettings()
     PA_ADD_OPTION(RAID_SPAWN_DELAY);
     PA_ADD_OPTION(SHINY_SOUND_THRESHOLD2);
     PA_ADD_OPTION(SHINY_SOUND_LOW_FREQUENCY);
+    PA_ADD_OPTION(LETS_GO_KILL_SOUND_THRESHOLD);
+    PA_ADD_OPTION(LETS_GO_KILL_SOUND_LOW_FREQUENCY);
 }
 
 

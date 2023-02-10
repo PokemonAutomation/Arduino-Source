@@ -21,6 +21,7 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 class EncounterWatcher;
+class LetsGoKillSoundDetector;
 
 
 
@@ -40,20 +41,14 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
-    void on_shiny_encounter(
-        ProgramEnvironment& env, BotBaseContext& context,
-        const EncounterWatcher& encounter_watcher
-    );
+    void on_shiny_encounter(BotBaseContext& context, EncounterWatcher& encounter_watcher);
 
-    void run_iteration(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context);
-    bool clear_in_front(
-        ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
-        std::function<void(BotBaseContext& context)>&& command
-    );
+    void run_iteration(BotBaseContext& context);
+    bool clear_in_front(BotBaseContext& context, std::function<void(BotBaseContext& context)>&& command);
 
-    void run_path0(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context);
-    void run_path1(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context);
-    void run_path2(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context);
+    void run_path0(BotBaseContext& context);
+    void run_path1(BotBaseContext& context);
+    void run_path2(BotBaseContext& context);
 
 
 
@@ -83,6 +78,9 @@ private:
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationOption NOTIFICATION_SHINY;
     EventNotificationsOption NOTIFICATIONS;
+
+    SingleSwitchProgramEnvironment* m_env;
+    LetsGoKillSoundDetector* m_kill_watcher;
 
     uint64_t m_iterations = 0;
 };

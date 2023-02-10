@@ -25,10 +25,11 @@ float ItemDropSoundDetector::get_score_threshold() const{
     return (float)GameSettings::instance().ITEM_DROP_SOUND_THRESHOLD;
 }
 
-std::unique_ptr<SpectrogramMatcher> ItemDropSoundDetector::build_spectrogram_matcher(size_t sampleRate){
+std::unique_ptr<SpectrogramMatcher> ItemDropSoundDetector::build_spectrogram_matcher(size_t sample_rate){
     return std::make_unique<SpectrogramMatcher>(
-        AudioTemplateCache::instance().get_throw("PokemonLA/ItemDropSound", sampleRate),
-        SpectrogramMatcher::Mode::SPIKE_CONV, sampleRate,
+        "Item Drop",
+        AudioTemplateCache::instance().get_throw("PokemonLA/ItemDropSound", sample_rate),
+        SpectrogramMatcher::Mode::SPIKE_CONV, sample_rate,
         GameSettings::instance().ITEM_DROP_SOUND_LOW_FREQUENCY
     );
 }

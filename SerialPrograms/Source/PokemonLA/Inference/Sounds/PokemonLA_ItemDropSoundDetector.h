@@ -27,7 +27,7 @@ public:
 
 protected:
     // Implement AudioPerSpectrumDetectorBase::build_spectrogram_matcher()
-    virtual std::unique_ptr<SpectrogramMatcher> build_spectrogram_matcher(size_t sampleRate) override;
+    virtual std::unique_ptr<SpectrogramMatcher> build_spectrogram_matcher(size_t sample_rate) override;
 };
 
 

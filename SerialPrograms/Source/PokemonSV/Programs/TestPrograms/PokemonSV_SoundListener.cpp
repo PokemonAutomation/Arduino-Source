@@ -14,8 +14,9 @@
 #include "ClientSource/Connection/BotBase.h"
 #include "CommonFramework/InferenceInfra/InferenceSession.h"
 #include "Pokemon/Pokemon_Strings.h"
-#include "PokemonLA/PokemonLA_Settings.h"
+//#include "PokemonLA/PokemonLA_Settings.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_ShinySoundDetector.h"
+#include "PokemonSV/Inference/Overworld/PokemonSV_LetsGoKillDetector.h"
 #include "PokemonSV_SoundListener.h"
 
 namespace PokemonAutomation{
@@ -41,7 +42,8 @@ SoundListener_Descriptor::SoundListener_Descriptor()
 SoundListener::SoundListener()
     : SOUND_TYPE("<b>Which Sound to Detect</b>",
         {
-            {SoundType::Shiny,      "shiny",        "Shiny Sound"},
+            {SoundType::Shiny,          "shiny",        "Shiny Sound"},
+            {SoundType::LetsGoKill,     "lets-go-kill", "Let's Go Kill"},
         },
         LockWhileRunning::LOCKED,
         SoundType::Shiny
@@ -57,13 +59,13 @@ SoundListener::SoundListener()
 }
 
 
-// void searchAlphaRoarFromAudioDump();
+// void search_alpha_roar_from_audio_dump();
 
 void SoundListener::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     //  Connect the controller.
     // pbf_move_right_joystick(context, 0, 255, 10, 0);
 
-    // searchAlphaRoarFromAudioDump();
+    // search_alpha_roar_from_audio_dump();
     // return;
 
     std::cout << "Running audio test program." << std::endl;
@@ -80,6 +82,9 @@ void SoundListener::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
     case SoundType::Shiny:
         detector = std::make_unique<ShinySoundDetector>(env.console, action);
         break;
+    case SoundType::LetsGoKill:
+        detector = std::make_unique<LetsGoKillSoundDetector>(env.console, action);
+        break;
     default:
         throw InternalProgramError(
             &env.logger(), PA_CURRENT_FUNCTION,
@@ -87,10 +92,19 @@ void SoundListener::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         );
     }
 
+#if 0
+    ShinySoundDetector detector0(env.console, action);
+    LetsGoKillSoundDetector detector1(env.console, action);
     InferenceSession session(
         context, env.console,
-        {{*detector, std::chrono::milliseconds(20)}}
+        {detector0, detector1}
     );
+#else
+    InferenceSession session(
+        context, env.console,
+        {*detector}
+    );
+#endif
     context.wait_until_cancel();
 
     std::cout << "Audio test program Sound listener finished." << std::endl;

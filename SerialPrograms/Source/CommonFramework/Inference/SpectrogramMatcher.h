@@ -36,17 +36,18 @@ public:
 
     // audioTemplate: the audio template for the audio stream to match against.
     //  Use AudioTemplate::loadAudioTemplate() to load a template from disk, or
-    //  use AudioTemplateCache::instance().get_throw(audioResourceRelativePath, sampleRate) to get one from cache.
+    //  use AudioTemplateCache::instance().get_throw(audioResourceRelativePath, sample_rate) to get one from cache.
     // mode: which type of spectrogram filtering to use before the actual match.
-    // sampleRate: audio sample rate.
-    // lowFrequencyFilter: only match the frequencies above this threshold.
+    // sample_rate: audio sample rate.
+    // low_frequency_filter: only match the frequencies above this threshold.
     // templateSubdivision: divide the template into how many sub-templates to match. <= 1 means no subdivision.
     SpectrogramMatcher(
-        AudioTemplate audioTemplate, Mode mode, size_t sampleRate,
-        double lowFrequencyFilter, size_t templateSubdivision = 0
+        std::string name,
+        AudioTemplate audioTemplate, Mode mode, size_t sample_rate,
+        double low_frequency_filter, size_t templateSubdivision = 0
     );
 
-    size_t sampleRate() const{ return m_sampleRate; }
+    size_t sample_rate() const{ return m_sample_rate; }
 
     // Match the newest spectrums and return a match score.
     // Newer (larger timestamp) spectrums at beginning of `new_spectrums` while older (smaller
@@ -96,9 +97,10 @@ private:
 
 
 private:
+    std::string m_name;
     AudioTemplate m_template;
 
-    size_t m_sampleRate;
+    size_t m_sample_rate;
 
     size_t m_numOriginalFrequencies = 0;
     size_t m_originalFreqStart = 0;

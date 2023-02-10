@@ -69,13 +69,13 @@ SoundListener::SoundListener()
 }
 
 
-// void searchAlphaRoarFromAudioDump();
+// void search_alpha_roar_from_audio_dump();
 
 void SoundListener::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     //  Connect the controller.
     // pbf_move_right_joystick(context, 0, 255, 10, 0);
 
-    // searchAlphaRoarFromAudioDump();
+    // search_alpha_roar_from_audio_dump();
     // return;
 
     std::cout << "Running audio test program." << std::endl;
@@ -120,40 +120,41 @@ void SoundListener::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
 
 // A function used to search for the alpha roar on LA audio dump.
 // But we didn't find the shound sound :P
-void searchAlphaRoarFromAudioDump(){
+void search_alpha_roar_from_audio_dump(){
 
     const size_t SAMPLE_RATE = 48000;
 
     SpectrogramMatcher matcher(
+        "Alpha Roar",
         AudioTemplateCache::instance().get_throw("PokemonLA/AlphaRoar", SAMPLE_RATE),
         SpectrogramMatcher::Mode::RAW, SAMPLE_RATE,
         100.0
     );
 
-    // std::string fileListFile = "./scripts/short_audio_files.txt";
-    std::string fileListFile = "1.txt";
-    // std::string fileListFile = "./scripts/all_audio_files.txt";
-    std::ifstream fin(fileListFile.c_str());
-    std::vector<std::string> fileList;
+    // std::string file_listFile = "./scripts/short_audio_files.txt";
+    std::string file_listFile = "1.txt";
+    // std::string file_listFile = "./scripts/all_audio_files.txt";
+    std::ifstream fin(file_listFile.c_str());
+    std::vector<std::string> file_list;
     while(!fin.eof()){
         std::string line;
         std::getline(fin, line);
-        fileList.push_back(line);
+        file_list.push_back(line);
         fin >> std::ws;
     }
-    std::cout << "File num " << fileList.size() << std::endl;
+    std::cout << "File num " << file_list.size() << std::endl;
 
-    std::map<float, std::string> closestFiles;
+    std::map<float, std::string> closest_files;
 
     std::ofstream fout("file_check_output.txt");
 
-    for(size_t fileIdx = 0; fileIdx < fileList.size(); fileIdx++){
+    for(size_t fileIdx = 0; fileIdx < file_list.size(); fileIdx++){
         matcher.clear();
 
 
-        const auto& path = fileList[fileIdx];
+        const auto& path = file_list[fileIdx];
         std::ostringstream os;
-        os << "File " << fileIdx << "/" << fileList.size() << " " << path << " ";
+        os << "File " << fileIdx << "/" << file_list.size() << " " << path << " ";
         AudioTemplate audio = loadAudioTemplate(path);
         if (audio.numWindows() == 0){
             os << "Fail" << std::endl;
@@ -191,15 +192,15 @@ void searchAlphaRoarFromAudioDump(){
         fout << os.str();
         std::cout << os.str() << std::flush;
 
-        closestFiles.emplace(minScore, path);
+        closest_files.emplace(minScore, path);
     }
 
     fout.close();
 
-    auto it = closestFiles.begin();
+    auto it = closest_files.begin();
     std::cout << "--------------" << std::endl;
     fout.open("file_check_output_sorted.txt");
-    for(int i = 0; it != closestFiles.end(); i++, it++){
+    for(int i = 0; it != closest_files.end(); i++, it++){
         if (i < 40)
             std::cout << it->first << ", " << it->second << std::endl;
         fout << it->first << ", " << it->second << std::endl;

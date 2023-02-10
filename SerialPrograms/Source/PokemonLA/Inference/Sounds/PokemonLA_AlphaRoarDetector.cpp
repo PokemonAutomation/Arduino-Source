@@ -26,12 +26,13 @@ float AlphaRoarDetector::get_score_threshold() const{
     return (float)GameSettings::instance().ALPHA_ROAR_THRESHOLD;
 }
 
-std::unique_ptr<SpectrogramMatcher> AlphaRoarDetector::build_spectrogram_matcher(size_t sampleRate){
-    const double lowFrequencyFilter = 100.0; // we don't match frequencies under 100.0 Hz
+std::unique_ptr<SpectrogramMatcher> AlphaRoarDetector::build_spectrogram_matcher(size_t sample_rate){
+    const double low_frequency_filter = 100.0; // we don't match frequencies under 100.0 Hz
     return std::make_unique<SpectrogramMatcher>(
-        AudioTemplateCache::instance().get_throw("PokemonLA/AlphaRoar", sampleRate),
-        SpectrogramMatcher::Mode::RAW, sampleRate,
-        lowFrequencyFilter
+        "Alpha Roar",
+        AudioTemplateCache::instance().get_throw("PokemonLA/AlphaRoar", sample_rate),
+        SpectrogramMatcher::Mode::RAW, sample_rate,
+        low_frequency_filter
     );
 }
 

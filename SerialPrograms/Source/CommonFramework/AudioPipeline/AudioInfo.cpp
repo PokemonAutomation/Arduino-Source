@@ -124,7 +124,7 @@ std::vector<AudioChannelFormat> supported_input_formats(int& preferred_index, co
     int preferred_rate = preferred_format.sampleRate();
 //    cout << "display_name = " << display_name << endl;
 //    cout << "channelCount = " << preferred_format.channelCount() << endl;
-//    cout << "sampleRate = " << preferred_format.sampleRate() << endl;
+//    cout << "sample_rate = " << preferred_format.sample_rate() << endl;
 //    cout << "sampleSize = " << preferred_format.sampleSize() << endl;
 //    cout << "sampleFormat = " << preferred_format.sampleType() << endl;
 //    cout << "preferred_format = " << info.isFormatSupported(preferred_format) << endl;

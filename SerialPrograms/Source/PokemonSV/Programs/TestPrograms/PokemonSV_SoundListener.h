@@ -32,6 +32,7 @@ public:
 private:
     enum class SoundType{
         Shiny,
+        LetsGoKill,
     };
     EnumDropdownOption<SoundType> SOUND_TYPE;
     BooleanCheckBoxOption STOP_ON_DETECTED_SOUND;
