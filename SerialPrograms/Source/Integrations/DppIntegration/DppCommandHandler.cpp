@@ -71,12 +71,23 @@ void Handler::initialize(cluster& bot, commandhandler& handler) {
     });
 
     bot.on_message_create([&handler](const message_create_t& event) {
-        handler.route(event);
+        std::string content = event.msg.content;
+        if (!event.msg.author.is_bot() && handler.string_has_prefix(content)) {
+            auto channels = GlobalSettings::instance().DISCORD.integration.channels.command_channels();
+            auto channel = std::find(channels.begin(), channels.end(), std::to_string(event.msg.channel_id));
+            if (channel != channels.end()) {
+                handler.route(event);
+            }
+        }
     });
 
     bot.on_slashcommand([&handler](const slashcommand_t& event) {
-        if (handler.slash_commands_enabled) {
-            handler.route(event);
+        if (!event.command.usr.is_bot() && handler.slash_commands_enabled) {
+            auto channels = GlobalSettings::instance().DISCORD.integration.channels.command_channels();
+            auto channel = std::find(channels.begin(), channels.end(), std::to_string(event.command.channel_id));
+            if (channel != channels.end()) {
+                handler.route(event);
+            }
         }
     });
 }
