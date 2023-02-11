@@ -43,11 +43,11 @@ NavigatePlatformSettings::NavigatePlatformSettings()
 }
 
 
-void zero_gate_to_platform(
+void inside_zero_gate_to_platform(
     const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
     NavigatePlatformSettings& settings
 ){
-    zero_gate_to_station(info, console, context, 2);
+    inside_zero_gate_to_station(info, console, context, 2);
 
     context.wait_for(std::chrono::seconds(settings.STATION_ARRIVE_PAUSE_SECONDS));
 

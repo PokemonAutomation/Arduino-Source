@@ -41,10 +41,17 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
-    void find_encounter(BotBaseContext& context);
+    enum class State{
+        TRAVERSAL,
+        INSIDE_GATE_AND_RETURN,
+        LEAVE_AND_RETURN,
+        RESET_AND_RETURN,
+    };
+
+    void run_state(BotBaseContext& context);
     void on_shiny_encounter(BotBaseContext& context, EncounterWatcher& encounter_watcher);
 
-    void run_iteration(BotBaseContext& context);
+    void run_traversal(BotBaseContext& context);
     bool clear_in_front(BotBaseContext& context, std::function<void(BotBaseContext& context)>&& command);
 
     void run_path0(BotBaseContext& context);
@@ -82,7 +89,8 @@ private:
 
     SingleSwitchProgramEnvironment* m_env;
     LetsGoKillSoundDetector* m_kill_watcher;
-    WallClock m_last_reset;
+    State m_state;
+    WallClock m_last_platform_reset;
     uint64_t m_iterations = 0;
 };
 

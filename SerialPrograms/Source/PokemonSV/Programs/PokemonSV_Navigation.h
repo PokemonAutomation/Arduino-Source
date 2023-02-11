@@ -45,11 +45,21 @@ void enter_box_system_from_overworld(const ProgramInfo& info, ConsoleHandle& con
 //  From box system go to overworld.
 void leave_box_system_to_overworld(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
 
+
 //  After just entering the Zero Gate, go to the specified station.
-void zero_gate_to_station(
+void inside_zero_gate_to_station(
     const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
     int station //  1 - 4
 );
+
+//  You are inside Area Zero having traveled there via the Zero Gate. Return to
+//  the zero gate fly spot.
+void return_to_outside_zero_gate(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
+
+//  You are inside Area Zero having traveled there via the Zero Gate. Return to
+//  inside the zero gate to setup for a subsequent call to "inside_zero_gate_to_station()".
+void return_to_inside_zero_gate(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
+
 
 
 

@@ -88,6 +88,7 @@
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
 #include "PokemonSV/Inference/PokemonSV_ZeroGateWarpPromptDetector.h"
+#include "PokemonSV/Programs/ShinyHunting/PokemonSV_AreaZeroPlatform.h"
 
 
 #include <QPixmap>
@@ -189,6 +190,13 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
+    NavigatePlatformSettings settings;
+
+    return_to_inside_zero_gate(env.program_info(), console, context);
+    inside_zero_gate_to_platform(env.program_info(), console, context, settings);
+
+
+#if 0
     auto image = feed.snapshot();
 
     ImageRGB32 filtered = filter_rgb32_range(image, 0xff000040, 0xff8080ff, Color(0xffff0000), true);
@@ -216,7 +224,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     }
 
     cout << biggest.center_of_gravity_x() / image->width() << ", " << biggest.center_of_gravity_y() / image->height() << endl;
-
+#endif
 
 
 #if 0

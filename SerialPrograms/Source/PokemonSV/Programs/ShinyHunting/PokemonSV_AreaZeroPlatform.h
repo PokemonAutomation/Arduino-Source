@@ -30,7 +30,7 @@ public:
 };
 
 
-void zero_gate_to_platform(
+void inside_zero_gate_to_platform(
     const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
     NavigatePlatformSettings& settings
 );

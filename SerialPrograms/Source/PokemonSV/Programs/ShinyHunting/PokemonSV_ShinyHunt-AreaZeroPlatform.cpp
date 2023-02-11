@@ -22,11 +22,13 @@
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Pokemon_Notification.h"
 #include "PokemonSV/PokemonSV_Settings.h"
+#include "PokemonSV/Inference/PokemonSV_MapDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_AreaZeroSkyDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_LetsGoKillDetector.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_EncounterWatcher.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
+#include "PokemonSV/Programs/PokemonSV_Navigation.h"
 //#include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSV_ShinyHunt-AreaZeroPlatform.h"
 
@@ -434,7 +436,7 @@ void ShinyHuntAreaZeroPlatform::run_path2(BotBaseContext& context){
 
 //    context.wait_for(std::chrono::seconds(60));
 }
-void ShinyHuntAreaZeroPlatform::run_iteration(BotBaseContext& context){
+void ShinyHuntAreaZeroPlatform::run_traversal(BotBaseContext& context){
     switch (PATH0){
     case Path::PATH0:
         run_path0(context);
@@ -448,25 +450,6 @@ void ShinyHuntAreaZeroPlatform::run_iteration(BotBaseContext& context){
     }
 }
 
-
-void ShinyHuntAreaZeroPlatform::find_encounter(BotBaseContext& context){
-    ConsoleHandle& console = m_env->console;
-    while (true){
-        send_program_status_notification(*m_env, NOTIFICATION_STATUS_UPDATE);
-        m_iterations++;
-
-        WallClock now = current_time();
-        if (MODE == Mode::START_IN_ZERO_GATE_PERIODIC_RESET && now - m_last_reset > std::chrono::minutes(RESET_DURATION_MINUTES)){
-            m_last_reset = now;
-            pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
-            reset_game_from_home(m_env->program_info(), console, context, 5 * TICKS_PER_SECOND);
-            pbf_press_button(context, BUTTON_RCLICK, 20, 105);
-            zero_gate_to_platform(m_env->program_info(), console, context, NAVIGATE_TO_PLATFORM);
-        }
-
-        run_iteration(context);
-    }
-}
 
 void ShinyHuntAreaZeroPlatform::on_shiny_encounter(
     BotBaseContext& context, EncounterWatcher& encounter_watcher
@@ -497,7 +480,49 @@ void ShinyHuntAreaZeroPlatform::on_shiny_encounter(
 //    throw ProgramFinishedException();
 }
 
+void ShinyHuntAreaZeroPlatform::run_state(BotBaseContext& context){
+    const ProgramInfo& info = m_env->program_info();
+    ConsoleHandle& console = m_env->console;
+    WallClock now = current_time();
 
+    switch (m_state){
+    case State::TRAVERSAL:
+        console.log("Run traversal...", COLOR_PURPLE);
+        if (MODE == Mode::START_IN_ZERO_GATE_PERIODIC_RESET && now - m_last_platform_reset > std::chrono::minutes(RESET_DURATION_MINUTES)){
+            m_state = State::RESET_AND_RETURN;
+            break;
+        }
+        run_traversal(context);
+        break;
+
+    case State::INSIDE_GATE_AND_RETURN:
+        console.log("Going from inside gate to platform...", COLOR_PURPLE);
+        m_state = State::LEAVE_AND_RETURN;
+        inside_zero_gate_to_platform(info, console, context, NAVIGATE_TO_PLATFORM);
+        m_last_platform_reset = now;
+        m_state = State::TRAVERSAL;
+        break;
+
+    case State::LEAVE_AND_RETURN:
+        console.log("Leaving and returning to platform...", COLOR_PURPLE);
+        return_to_inside_zero_gate(info, console, context);
+        inside_zero_gate_to_platform(info, console, context, NAVIGATE_TO_PLATFORM);
+        m_last_platform_reset = now;
+        m_state = State::TRAVERSAL;
+        break;
+
+    case State::RESET_AND_RETURN:
+        console.log("Resetting game and returning to platform...", COLOR_PURPLE);
+        m_last_platform_reset = current_time();
+        pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+        reset_game_from_home(info, console, context, 5 * TICKS_PER_SECOND);
+        pbf_press_button(context, BUTTON_RCLICK, 20, 105);
+        inside_zero_gate_to_platform(info, console, context, NAVIGATE_TO_PLATFORM);
+        m_last_platform_reset = now;
+        m_state = State::TRAVERSAL;
+        break;
+    }
+}
 
 void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     m_env = &env;
@@ -525,20 +550,26 @@ void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, Bot
         {lets_go_kill_sound}
     );
 
-    if (MODE == Mode::START_IN_ZERO_GATE_NO_RESET || MODE == Mode::START_IN_ZERO_GATE_PERIODIC_RESET){
-        zero_gate_to_platform(env.program_info(), env.console, context, NAVIGATE_TO_PLATFORM);
+    switch (MODE){
+    case Mode::START_ON_PLATFORM_NO_RESET:
+        m_state = State::TRAVERSAL;
+        break;
+    case Mode::START_IN_ZERO_GATE_NO_RESET:
+    case Mode::START_IN_ZERO_GATE_PERIODIC_RESET:
+        m_state = State::INSIDE_GATE_AND_RETURN;
+        break;
     }
 
-    m_last_reset = current_time();
-//    std::unique_ptr<EncounterWatcher> encounter_watcher;
-//    encounter_watcher.reset(new EncounterWatcher(env.console, COLOR_RED));
+    m_last_platform_reset = current_time();
     while (true){
-        context.wait_for_all_requests();
+        env.console.log("Starting encounter loop...", COLOR_PURPLE);
         EncounterWatcher encounter_watcher(env.console, COLOR_RED);
-        int ret = run_until(
+        run_until(
             env.console, context,
             [&](BotBaseContext& context){
-                find_encounter(context);
+                while (true){
+                    run_state(context);
+                }
             },
             {
                 static_cast<VisualInferenceCallback&>(encounter_watcher),
@@ -546,22 +577,15 @@ void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, Bot
             }
         );
         encounter_watcher.throw_if_no_sound();
-        if (ret != 0){
-            continue;
-        }
 
         env.console.log("Detected battle.", COLOR_PURPLE);
         stats.m_encounters++;
-        env.update_stats();
+        m_env->update_stats();
 
         if (encounter_watcher.shiny_screenshot()){
             on_shiny_encounter(context, encounter_watcher);
             break;
         }
-
-//        //  Clear the detection history to prepare next encounter.
-//        encounter_watcher.reset();
-//        encounter_watcher.reset(new EncounterWatcher(env.console, COLOR_RED));
 
         OverworldWatcher overworld(COLOR_GREEN);
         run_until(

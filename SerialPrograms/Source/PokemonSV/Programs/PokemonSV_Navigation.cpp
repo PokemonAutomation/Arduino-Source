@@ -393,7 +393,7 @@ void leave_box_system_to_overworld(const ProgramInfo& info, ConsoleHandle& conso
 
 
 
-void zero_gate_to_station(
+void inside_zero_gate_to_station(
     const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
     int station //  1 - 4
 ){
@@ -479,8 +479,37 @@ void zero_gate_to_station(
     }
 }
 
+void return_to_outside_zero_gate(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+    open_map_from_overworld(info, console, context);
+    pbf_move_left_joystick(context, 0, 0, 5, 50);
+    fly_to_overworld_from_map(info, console, context);
+}
+void return_to_inside_zero_gate(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+    return_to_outside_zero_gate(info, console, context);
 
+    BlackScreenOverWatcher black_screen;
+    int ret = run_until(
+        console, context,
+        [](BotBaseContext& context){
+            pbf_move_left_joystick(context, 255, 32, 20, 105);
+            pbf_mash_button(context, BUTTON_L, 60);
+            pbf_move_left_joystick(context, 128, 0, 10 * TICKS_PER_SECOND, 0);
+        },
+        {black_screen}
+    );
+    if (ret < 0){
+        throw OperationFailedException(console, "Unable to enter Zero Gate.", true);
+    }
 
+    OverworldWatcher overworld;
+    ret = wait_until(
+        console, context, std::chrono::seconds(10),
+        {overworld}
+    );
+    if (ret < 0){
+        throw OperationFailedException(console, "Unable to detect overworld inside Zero Gate.", true);
+    }
+}
 
 
 
