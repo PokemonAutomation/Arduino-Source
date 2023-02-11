@@ -453,6 +453,7 @@ void ShinyHuntAreaZeroPlatform::run_traversal(BotBaseContext& context){
         run_path2(context);
         break;
     }
+    m_iterations++;
 }
 
 
@@ -490,9 +491,11 @@ void ShinyHuntAreaZeroPlatform::run_state(BotBaseContext& context){
     ConsoleHandle& console = m_env->console;
     WallClock now = current_time();
 
+    send_program_status_notification(*m_env, NOTIFICATION_STATUS_UPDATE);
+
     switch (m_state){
     case State::TRAVERSAL:
-        console.log("Run traversal...", COLOR_PURPLE);
+        console.log("Run Traversal Iteration: " + tostr_u_commas(m_iterations), COLOR_PURPLE);
         if (MODE == Mode::START_IN_ZERO_GATE_PERIODIC_RESET && now - m_last_platform_reset > std::chrono::minutes(RESET_DURATION_MINUTES)){
             m_state = State::RESET_AND_RETURN;
             break;

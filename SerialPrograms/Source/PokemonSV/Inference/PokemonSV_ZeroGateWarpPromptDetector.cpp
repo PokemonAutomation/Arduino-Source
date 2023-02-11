@@ -46,6 +46,9 @@ bool ZeroGateWarpPromptDetector::move_cursor(
     const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
     int row
 ) const{
+    VideoOverlaySet overlays(console.overlay());
+    make_overlays(overlays);
+
     size_t consecutive_detection_fails = 0;
     size_t moves = 0;
     bool target_reached = false;
