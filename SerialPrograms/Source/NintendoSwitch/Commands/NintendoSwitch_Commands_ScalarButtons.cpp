@@ -44,14 +44,22 @@ void ssf_press_dpad(
         DeviceRequest_ssf_press_dpad(position, delay, hold, cool)
     );
 }
-void ssf_press_joystick(
+void ssf_press_left_joystick(
     BotBaseContext& context,
-    bool left,
     uint8_t x, uint8_t y,
     uint16_t delay, uint16_t hold, uint8_t cool
 ){
     context.issue_request(
-        DeviceRequest_ssf_press_joystick(left, x, y, delay, hold, cool)
+        DeviceRequest_ssf_press_joystick(true, x, y, delay, hold, cool)
+    );
+}
+void ssf_press_right_joystick(
+    BotBaseContext& context,
+    uint8_t x, uint8_t y,
+    uint16_t delay, uint16_t hold, uint8_t cool
+){
+    context.issue_request(
+        DeviceRequest_ssf_press_joystick(false, x, y, delay, hold, cool)
     );
 }
 

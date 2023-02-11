@@ -34,20 +34,16 @@ void ssf_press_dpad(
 );
 
 
-void ssf_press_joystick(
+void ssf_press_left_joystick(
     BotBaseContext& context,
-    bool left,          //  true = left joystick, false = right joystick
     uint8_t x, uint8_t y,
     uint16_t delay, uint16_t hold, uint8_t cool = 0
 );
-inline void ssf_press_joystick(
+void ssf_press_right_joystick(
     BotBaseContext& context,
-    bool left,          //  true = left joystick, false = right joystick
     uint8_t x, uint8_t y,
-    uint16_t hold
-){
-    ssf_press_joystick(context, left, x, y, hold, hold);
-}
+    uint16_t delay, uint16_t hold, uint8_t cool = 0
+);
 
 
 void ssf_mash1_button   (BotBaseContext& context, Button button, uint16_t ticks);

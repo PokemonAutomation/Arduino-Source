@@ -643,6 +643,7 @@ SOURCES += \
     Source/PokemonSV/Inference/PokemonSV_MapDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_PokePortalDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_PokemonSummaryReader.cpp \
+    Source/PokemonSV/Inference/PokemonSV_TournamentPrizeNameReader.cpp \
     Source/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_ZeroGateWarpPromptDetector.cpp \
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraCardDetector.cpp \
@@ -657,6 +658,8 @@ SOURCES += \
     Source/PokemonSV/Options/PokemonSV_PlayerList.cpp \
     Source/PokemonSV/Options/PokemonSV_TeraAIOption.cpp \
     Source/PokemonSV/Options/PokemonSV_TeraMoveTable.cpp \
+    Source/PokemonSV/Options/PokemonSV_TournamentPrizeSelectOption.cpp \
+    Source/PokemonSV/Options/PokemonSV_TournamentPrizeTable.cpp \
     Source/PokemonSV/PokemonSV_Panels.cpp \
     Source/PokemonSV/PokemonSV_Settings.cpp \
     Source/PokemonSV/Programs/Boxes/PokemonSV_BoxRoutines.cpp \
@@ -677,6 +680,7 @@ SOURCES += \
     Source/PokemonSV/Programs/General/PokemonSV_MassPurchase.cpp \
     Source/PokemonSV/Programs/General/PokemonSV_MassRelease.cpp \
     Source/PokemonSV/Programs/General/PokemonSV_StatsReset.cpp \
+    Source/PokemonSV/Programs/General/PokemonSV_TournamentFarmer.cpp \
     Source/PokemonSV/Programs/Glitches/PokemonSV_CloneItems-1.0.1.cpp \
     Source/PokemonSV/Programs/Glitches/PokemonSV_RideCloner-1.0.1.cpp \
     Source/PokemonSV/Programs/PokemonSV_BasicCatcher.cpp \
@@ -701,6 +705,7 @@ SOURCES += \
     Source/PokemonSV/Resources/PokemonSV_AuctionItemNames.cpp \
     Source/PokemonSV/Resources/PokemonSV_ItemSprites.cpp \
     Source/PokemonSV/Resources/PokemonSV_PokemonSprites.cpp \
+    Source/PokemonSV/Resources/PokemonSV_TournamentPrizeNames.cpp \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.cpp \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.cpp \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DaySkippers.cpp \
@@ -1634,6 +1639,7 @@ HEADERS += \
     Source/PokemonSV/Inference/PokemonSV_MapDetector.h \
     Source/PokemonSV/Inference/PokemonSV_PokePortalDetector.h \
     Source/PokemonSV/Inference/PokemonSV_PokemonSummaryReader.h \
+    Source/PokemonSV/Inference/PokemonSV_TournamentPrizeNameReader.h \
     Source/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h \
     Source/PokemonSV/Inference/PokemonSV_ZeroGateWarpPromptDetector.h \
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraCardDetector.h \
@@ -1649,6 +1655,8 @@ HEADERS += \
     Source/PokemonSV/Options/PokemonSV_PlayerList.h \
     Source/PokemonSV/Options/PokemonSV_TeraAIOption.h \
     Source/PokemonSV/Options/PokemonSV_TeraMoveTable.h \
+    Source/PokemonSV/Options/PokemonSV_TournamentPrizeSelectOption.h \
+    Source/PokemonSV/Options/PokemonSV_TournamentPrizeTable.h \
     Source/PokemonSV/PokemonSV_Panels.h \
     Source/PokemonSV/PokemonSV_Settings.h \
     Source/PokemonSV/Programs/Boxes/PokemonSV_BoxRoutines.h \
@@ -1669,6 +1677,7 @@ HEADERS += \
     Source/PokemonSV/Programs/General/PokemonSV_MassPurchase.h \
     Source/PokemonSV/Programs/General/PokemonSV_MassRelease.h \
     Source/PokemonSV/Programs/General/PokemonSV_StatsReset.h \
+    Source/PokemonSV/Programs/General/PokemonSV_TournamentFarmer.h \
     Source/PokemonSV/Programs/Glitches/PokemonSV_CloneItems-1.0.1.h \
     Source/PokemonSV/Programs/Glitches/PokemonSV_RideCloner-1.0.1.h \
     Source/PokemonSV/Programs/PokemonSV_BasicCatcher.h \
@@ -1693,6 +1702,7 @@ HEADERS += \
     Source/PokemonSV/Resources/PokemonSV_AuctionItemNames.h \
     Source/PokemonSV/Resources/PokemonSV_ItemSprites.h \
     Source/PokemonSV/Resources/PokemonSV_PokemonSprites.h \
+    Source/PokemonSV/Resources/PokemonSV_TournamentPrizeNames.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DaySkippers.h \

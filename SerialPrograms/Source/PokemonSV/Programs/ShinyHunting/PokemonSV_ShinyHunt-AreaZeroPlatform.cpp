@@ -510,10 +510,6 @@ void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, Bot
 
     m_iterations = 0;
 
-    if (MODE == Mode::START_IN_ZERO_GATE_NO_RESET || MODE == Mode::START_IN_ZERO_GATE_PERIODIC_RESET){
-        zero_gate_to_platform(env.program_info(), env.console, context, NAVIGATE_TO_PLATFORM);
-    }
-
     LetsGoKillSoundDetector lets_go_kill_sound(
         env.console,
         [&](float){
@@ -528,6 +524,10 @@ void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, Bot
         context, env.console,
         {lets_go_kill_sound}
     );
+
+    if (MODE == Mode::START_IN_ZERO_GATE_NO_RESET || MODE == Mode::START_IN_ZERO_GATE_PERIODIC_RESET){
+        zero_gate_to_platform(env.program_info(), env.console, context, NAVIGATE_TO_PLATFORM);
+    }
 
     m_last_reset = current_time();
 //    std::unique_ptr<EncounterWatcher> encounter_watcher;

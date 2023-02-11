@@ -104,7 +104,7 @@ void zero_gate_to_platform(
     pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
     ssf_press_button(context, BUTTON_LCLICK, 0, 500);
-    ssf_press_joystick(context, true, 128, 0, 125, 1250);
+    ssf_press_left_joystick(context, 128, 0, 125, 1250);
 
     //  Jump
     ssf_press_button(context, BUTTON_B, 125, 100);
@@ -119,7 +119,9 @@ void zero_gate_to_platform(
 
 //    context.wait_for_all_requests();
     pbf_press_button(context, BUTTON_PLUS, 20, 105);
-    pbf_move_left_joystick(context, 128, 0, 5 * TICKS_PER_SECOND, 0);
+    ssf_press_left_joystick(context, 128, 0, 1 * TICKS_PER_SECOND, 4 * TICKS_PER_SECOND);
+    pbf_press_button(context, BUTTON_R, 20, 355);
+    pbf_press_button(context, BUTTON_R, 20, 105);
 }
 
 
