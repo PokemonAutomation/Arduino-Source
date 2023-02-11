@@ -389,6 +389,8 @@ void ShinyHuntAreaZeroPlatform::run_path2(BotBaseContext& context){
         turn_angle(context, angle1);
 
         find_and_center_on_sky(*m_env, console, context);
+        pbf_move_left_joystick(context, 96, 0, 40, 0);
+        pbf_mash_button(context, BUTTON_L, 60);
     });
 
     //  One in every 4 iterations: Clear wall of spawns.
@@ -403,14 +405,11 @@ void ShinyHuntAreaZeroPlatform::run_path2(BotBaseContext& context){
             pbf_move_left_joystick(context, 255, 255, 20, 20);
             pbf_mash_button(context, BUTTON_L, 60);
             find_and_center_on_sky(*m_env, console, context);
-//            pbf_mash_button(context, BUTTON_L, 60);
+            pbf_move_left_joystick(context, 96, 0, 40, 0);
+            pbf_mash_button(context, BUTTON_L, 60);
         });
-
-//        clear_in_front(env, console, context, nullptr);
     }
 
-    pbf_move_left_joystick(context, 96, 0, 40, 0);
-    pbf_mash_button(context, BUTTON_L, 60);
     clear_in_front(context, [&](BotBaseContext& context){
         context.wait_for(std::chrono::milliseconds(1000));
 

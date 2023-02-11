@@ -44,9 +44,13 @@ AsyncCommandSession::AsyncCommandSession(
 )
     : m_logger(logger)
     , m_botbase(botbase)
-    , m_thread(dispatcher.dispatch([this]{ thread_loop(); }))
 {
+    //  Attach first. If scope is already cancelled, we exit here with nothing
+    //  to clean up.
     attach(scope);
+
+    //  Now start the thread. Destructor is guaranteed to run if this succeeds.
+    m_thread = dispatcher.dispatch([this]{ thread_loop(); });
 }
 AsyncCommandSession::~AsyncCommandSession(){
 //    cout << "~AsyncCommandSession()" << endl;
