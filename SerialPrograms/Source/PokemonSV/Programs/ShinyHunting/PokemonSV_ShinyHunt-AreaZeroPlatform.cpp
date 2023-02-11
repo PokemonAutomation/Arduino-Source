@@ -412,6 +412,11 @@ void ShinyHuntAreaZeroPlatform::run_path2(BotBaseContext& context){
         });
     }
 
+    if (platform_x < 0.5 || platform_y < 0.5){
+        console.log("Not close enough to desired spot. Skipping forward attack...");
+        return;
+    }
+
     clear_in_front(context, [&](BotBaseContext& context){
         context.wait_for(std::chrono::milliseconds(1000));
 

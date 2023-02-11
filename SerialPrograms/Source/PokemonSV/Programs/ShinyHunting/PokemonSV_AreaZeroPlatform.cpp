@@ -110,7 +110,8 @@ void inside_zero_gate_to_platform(
     ssf_press_button(context, BUTTON_B, 125, 100);
 
     //  Fly
-    ssf_press_button(context, BUTTON_B, 0, 50);
+    ssf_press_button(context, BUTTON_B, 0, 20, 10); //  Double up this press in
+    ssf_press_button(context, BUTTON_B, 0, 20);     //  case one is dropped.
 
     pbf_move_left_joystick(context, 144, 0, 700, 0);
     pbf_move_left_joystick(context, 128, 0, 125, settings.MIDAIR_PAUSE_TIME);
