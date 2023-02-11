@@ -163,6 +163,7 @@ bool ShinyHuntAreaZeroPlatform::clear_in_front(
         if (command){
 //            cout << "running command..." << endl;
             command(context);
+            context.wait_for_all_requests();
             command = nullptr;
         }else{
 //            cout << "Waiting out... " << timeout.count() << " seconds" << endl;
@@ -408,16 +409,15 @@ void ShinyHuntAreaZeroPlatform::run_path2(BotBaseContext& context){
 //        clear_in_front(env, console, context, nullptr);
     }
 
-#if 1
     pbf_move_left_joystick(context, 96, 0, 40, 0);
     pbf_mash_button(context, BUTTON_L, 60);
     clear_in_front(context, [&](BotBaseContext& context){
         context.wait_for(std::chrono::milliseconds(1000));
 
-        console.log("Move forward, turn-around, and fire.");
+        console.log("Move forward, fire, and retreat.");
         switch (m_iterations % 3){
         case 0:
-            pbf_move_left_joystick(context, 108, 0, 275, 0);
+            pbf_move_left_joystick(context, 108, 0, 300, 0);
             break;
         case 1:
             pbf_move_left_joystick(context, 128, 0, 275, 0);
@@ -430,9 +430,8 @@ void ShinyHuntAreaZeroPlatform::run_path2(BotBaseContext& context){
     });
     clear_in_front(context, [&](BotBaseContext& context){
         pbf_move_left_joystick(context, 128, 255, 4 * TICKS_PER_SECOND, 0);
-        pbf_move_left_joystick(context, 128, 0, 60, 3 * TICKS_PER_SECOND);
+        pbf_move_left_joystick(context, 128, 0, 60, 4 * TICKS_PER_SECOND);
     });
-#endif
 
 //    context.wait_for(std::chrono::seconds(60));
 }
