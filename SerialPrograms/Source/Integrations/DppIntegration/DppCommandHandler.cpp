@@ -34,18 +34,12 @@ void Handler::initialize(cluster& bot, commandhandler& handler) {
     if (cmd_type == DiscordIntegrationSettingsOption::CommandType::MessageCommands && !prefix.empty()) {
         handler.add_prefix(prefix);
     } else {
-        handler.add_prefix("/");
+        handler.add_prefix("/").add_prefix("_cmd ");
     }
 
     bot.on_ready([&bot, &handler, this](const ready_t&) {
         log_dpp("Logged in as: " + bot.current_user_get_sync().format_username() + ".", "Ready", ll_info);
         Handler::create_unified_commands(handler);
-        if (run_once<struct register_bot_commands>() || !handler.slash_commands_enabled) {
-            /*Overwrite because we can both add and remove commands. Takes an hour for removed commands to be updated.
-              Slash commands will be deleted if switching to prefix commands. Best not to do too often.*/
-            log_dpp("Registering commands.", "Ready", ll_info);
-            handler.register_commands();
-        }
     });
 
     bot.on_guild_create([&bot, this](const guild_create_t& event) {
@@ -73,6 +67,16 @@ void Handler::initialize(cluster& bot, commandhandler& handler) {
         if (!user_counts.empty() && user_counts.count(id)) {
             log_dpp("Member left " + event.removing_guild->name + ". Decrementing member count.", "Guild Member Remove", ll_info);
             user_counts.at(id)--;
+        }
+    });
+
+    bot.on_message_create([&handler](const message_create_t& event) {
+        handler.route(event);
+    });
+
+    bot.on_slashcommand([&handler](const slashcommand_t& event) {
+        if (handler.slash_commands_enabled) {
+            handler.route(event);
         }
     });
 }
@@ -578,7 +582,32 @@ void Handler::create_unified_commands(commandhandler& handler) {
             message.add_embed(embed);
             handler.reply(message, src);
         },
-        "View the command list.");
+        "View the command list.")
+            
+    .add_command(
+        "register",
+        {},
+        [&handler, this](const std::string& command, const parameter_list_t&, command_source src) {
+            log_dpp("Executing " + command + "...", "Unified Command Handler", ll_info);
+            if (src.issuer.id != owner.id) {
+                handler.reply(message("You do not have permission to use this command."), src);
+                return;
+            }
+
+            if (handler.slash_commands_enabled) {
+                handler.thinking(src);
+                log_dpp("Registering commands.", "Command Registration", ll_info);
+                handler.register_commands();
+
+                embed embed;
+                std::string desc = "Slash commands registered! Restart your Discord client or wait a few minutes for them to show up!";
+                embed.set_color((uint32_t)color).set_description(desc).set_title("Slash Command Registration");
+                Handler::update_response(src, embed, "", nullptr);
+            } else {
+                handler.reply(message("Enable slash commands before registering them."), src);
+            }
+        },
+        "Register global slash commands. For first-time slash command use and for updating commands.");
 }
 
 

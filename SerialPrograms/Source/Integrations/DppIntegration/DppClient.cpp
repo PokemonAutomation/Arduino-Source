@@ -41,7 +41,7 @@ void Client::connect() {
         uint32_t intents = intents::i_default_intents | intents::i_guild_members | intents::i_message_content;
         try {
             m_bot = std::make_unique<cluster>(token, intents);
-            m_handler = std::make_unique<commandhandler>(m_bot.get());
+            m_handler = std::make_unique<commandhandler>(m_bot.get(), false);
             m_bot->cache_policy = { cache_policy_setting_t::cp_lazy, cache_policy_setting_t::cp_lazy, cache_policy_setting_t::cp_aggressive };
             std::thread(&Client::run, this, token).detach();
         }
