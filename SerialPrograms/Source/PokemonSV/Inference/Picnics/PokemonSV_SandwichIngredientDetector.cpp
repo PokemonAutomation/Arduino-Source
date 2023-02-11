@@ -8,7 +8,9 @@
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/WaterfillUtilities.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
+#include "CommonFramework/OCR/OCR_Routines.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "PokemonSV/Resources/PokemonSV_SandwichSprites.h"
 #include "PokemonSV_SandwichIngredientDetector.h"
 
 // #include <iostream>
@@ -150,6 +152,118 @@ bool SandwichPicksPageDetector::detect(const ImageViewRGB32& screen) const{
         70,
         [&](Kernels::Waterfill::WaterfillObject& object) -> bool { return true; }
     );
+}
+
+ImageMatch::SilhouetteDictionaryMatcher make_SANDWICH_FILLING_MATCHER(){
+    ImageMatch::SilhouetteDictionaryMatcher matcher;
+    for (const auto& item : ALL_SANDWICH_FILLINGS()){
+        matcher.add(item.first, item.second.icon.copy());
+    }
+    return matcher;
+}
+const ImageMatch::SilhouetteDictionaryMatcher& SANDWICH_FILLING_MATCHER() {
+    static ImageMatch::SilhouetteDictionaryMatcher matcher = make_SANDWICH_FILLING_MATCHER();
+    return matcher;
+}
+
+ImageMatch::SilhouetteDictionaryMatcher make_SANDWICH_CONDIMENT_MATCHER() {
+    ImageMatch::SilhouetteDictionaryMatcher matcher;
+    for (const auto& item : ALL_SANDWICH_CONDIMENTS()) {
+        matcher.add(item.first, item.second.icon.copy());
+    }
+    return matcher;
+}
+const ImageMatch::SilhouetteDictionaryMatcher& SANDWICH_CONDIMENT_MATCHER() {
+    static ImageMatch::SilhouetteDictionaryMatcher matcher = make_SANDWICH_CONDIMENT_MATCHER();
+    return matcher;
+}
+
+const SandwichFillingOCR& SandwichFillingOCR::instance(){
+    static SandwichFillingOCR reader;
+    return reader;
+}
+
+SandwichFillingOCR::SandwichFillingOCR()
+    : SmallDictionaryMatcher("PokemonSV/PicNic/SandwichFillingOCR.json")
+{}
+
+
+OCR::StringMatchResult SandwichFillingOCR::read_substring(
+    Logger& logger,
+    Language language,
+    const ImageViewRGB32& image,
+    const std::vector<OCR::TextColorRange>& text_color_ranges,
+    double min_text_ratio, double max_text_ratio
+) const{
+    return match_substring_from_image_multifiltered(
+        &logger, language, image, text_color_ranges,
+        MAX_LOG10P, MAX_LOG10P_SPREAD,
+        min_text_ratio, max_text_ratio
+    );
+}
+
+const SandwichCondimentOCR& SandwichCondimentOCR::instance() {
+    static SandwichCondimentOCR reader;
+    return reader;
+}
+
+SandwichCondimentOCR::SandwichCondimentOCR()
+    : SmallDictionaryMatcher("PokemonSV/PicNic/SandwichCondimentOCR.json")
+{}
+
+
+OCR::StringMatchResult SandwichCondimentOCR::read_substring(
+    Logger& logger,
+    Language language,
+    const ImageViewRGB32& image,
+    const std::vector<OCR::TextColorRange>& text_color_ranges,
+    double min_text_ratio, double max_text_ratio
+) const{
+    return match_substring_from_image_multifiltered(
+        &logger, language, image, text_color_ranges,
+        MAX_LOG10P, MAX_LOG10P_SPREAD,
+        min_text_ratio, max_text_ratio
+    );
+}
+
+SandwichIngredientReader::SandwichIngredientReader(SandwichIngredientType ingredient_type, size_t index, Color color)
+    : m_color(color)
+    , m_icon_box(0.061, 0.179 + 0.074 * index, 0.032, 0.057)
+    , m_text_box(0.100, 0.179 + 0.074 * index, 0.273, 0.057)
+    , m_ingredient_type(ingredient_type)
+{}
+
+void SandwichIngredientReader::make_overlays(VideoOverlaySet& items) const{
+    items.add(m_color, m_icon_box);
+    items.add(m_color, m_text_box);
+}
+
+SandwichIngredientReader::Results SandwichIngredientReader::read(const ImageViewRGB32& screen, Logger& logger,Language language) const{
+    static constexpr double MAX_ALPHA = 100;
+    static constexpr double ALPHA_SPREAD = 20;
+
+    // Get a crop of the sandwich ingredient icon
+    ImageViewRGB32 icon_image = extract_box_reference(screen, m_icon_box);
+    //cropped_image.save("icon_image.png");
+
+    // Get a crop of the sandwich ingredient text
+    ImageViewRGB32 text_image = extract_box_reference(screen, m_text_box);
+    //cropped_image.save("text_image.png");
+
+    Results results;
+    switch (m_ingredient_type){
+    case SandwichIngredientType::FILLING:
+        results.image_results = SANDWICH_FILLING_MATCHER().match(icon_image, ALPHA_SPREAD);
+        results.ocr_results = SandwichFillingOCR::instance().read_substring(logger, language, text_image, OCR::BLACK_TEXT_FILTERS());
+        break;
+    case SandwichIngredientType::CONDIMENT:
+        results.image_results = SANDWICH_CONDIMENT_MATCHER().match(icon_image, ALPHA_SPREAD);
+        results.ocr_results = SandwichCondimentOCR::instance().read_substring(logger, language, text_image, OCR::BLACK_TEXT_FILTERS());
+        break;
+    }
+    results.image_results.clear_beyond_alpha(MAX_ALPHA);
+
+    return results;
 }
 
 }

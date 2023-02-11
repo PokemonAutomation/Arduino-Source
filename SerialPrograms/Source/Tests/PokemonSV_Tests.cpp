@@ -370,4 +370,53 @@ int test_pokemonSV_SandwichIngredientsDetector(const ImageViewRGB32& image, cons
     return 0;
 }
 
+int test_pokemonSV_SandwichIngredientReader(const ImageViewRGB32& image, const std::vector<std::string>& words){
+    // four words: <current ingredient page "Fillings" or "Condiments"> <index of the highlighted ingredient 0 to 9> <language> <highlighted ingredient>
+    if (words.size() < 4) {
+        cerr << "Error: not enough number of words in the filename. Found only " << words.size() << "." << endl;
+        return 1;
+    }
+    std::string target_type = words[words.size() - 4];
+    SandwichIngredientType sandwich_type;
+    if (target_type == "Fillings"){
+        sandwich_type = SandwichIngredientType::FILLING;
+    }
+    else if (target_type == "Condiments"){
+        sandwich_type = SandwichIngredientType::CONDIMENT;
+    }
+    else{
+        return 1;
+    }
+
+    size_t index = 0;
+    if (parse_size_t(words[words.size() - 3], index) == false){
+        cerr << "Error: word " << words[words.size() - 3] << " is wrong. Must be size_t of range [0, 9]. " << endl;
+        return 1;
+    }
+    SandwichIngredientReader reader(sandwich_type, index);
+
+    Language language = language_code_to_enum(words[words.size() - 2]);
+    if (language == Language::None || language == Language::EndOfList) {
+        cerr << "Error: language words " << words[words.size() - 2] << " is wrong." << endl;
+        return 1;
+    }
+    SandwichIngredientReader::Results results = reader.read(image, global_logger_command_line(), language);
+
+    if (results.image_results.results.empty()){
+        cerr << "No ingredient detected via image" << endl;
+        return 1;
+    }
+    std::string best_match_image = results.image_results.results.begin()->second;
+    TEST_RESULT_EQUAL(best_match_image, words[words.size() - 1]);
+
+    if (results.ocr_results.results.empty()) {
+        cerr << "No ingredient detected via text" << endl;
+        return 1;
+    }
+    std::string best_match_ocr = results.ocr_results.results.begin()->second.token;
+    TEST_RESULT_EQUAL(best_match_ocr, words[words.size() - 1]);
+
+    return 0;
+}
+
 }

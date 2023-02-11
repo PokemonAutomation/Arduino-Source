@@ -28,6 +28,11 @@ std::vector<std::string> parse_words(const std::string& filename_base){
     return words;
 }
 
+bool parse_size_t(const std::string& word, size_t& number) {
+    std::istringstream iss(word);
+    iss >> number;
+    return iss.eof() && !iss.fail();
+}
 
 bool parse_int(const std::string& word, int& number){
     std::istringstream iss(word);
