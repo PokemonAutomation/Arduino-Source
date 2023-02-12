@@ -9,7 +9,7 @@
 
 #include <functional>
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
-#include "Common/Cpp/Options/SimpleIntegerOption.h"
+//#include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
@@ -22,6 +22,7 @@ namespace PokemonSV{
 
 class EncounterWatcher;
 class LetsGoKillSoundDetector;
+
 
 
 
@@ -66,13 +67,11 @@ private:
 
 private:
     enum class Mode{
-        START_ON_PLATFORM_NO_RESET,
-        START_IN_ZERO_GATE_NO_RESET,
-        START_IN_ZERO_GATE_PERIODIC_RESET,
+        START_ON_PLATFORM,
+        START_IN_ZERO_GATE,
+        MAKE_SANDWICH,
     };
     EnumDropdownOption<Mode> MODE;
-
-    SimpleIntegerOption<uint16_t> RESET_DURATION_MINUTES;
 
     enum class Path{
         PATH0,
@@ -82,10 +81,10 @@ private:
     EnumDropdownOption<Path> PATH0;
 
     BooleanCheckBoxOption VIDEO_ON_SHINY;
-
-    NavigatePlatformSettings NAVIGATE_TO_PLATFORM;
-
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
+
+    PlatformResetSettings PLATFORM_RESET;
+    NavigatePlatformSettings NAVIGATE_TO_PLATFORM;
 
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationOption NOTIFICATION_SHINY;

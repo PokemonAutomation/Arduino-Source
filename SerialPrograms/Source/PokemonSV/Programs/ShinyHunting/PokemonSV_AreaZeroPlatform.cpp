@@ -5,13 +5,14 @@
  */
 
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+//#include "CommonFramework/Exceptions/OperationFailedException.h"
 //#include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_ScalarButtons.h"
+#include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSV_AreaZeroPlatform.h"
 
@@ -19,25 +20,57 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
 
+using namespace Pokemon;
+
+
+
+PlatformResetSettings::PlatformResetSettings()
+    : GroupOption("Platform Reset Conditions", LockWhileRunning::UNLOCKED, true, false)
+    , m_description(
+        "A \"Platform Reset\" is when you fly to Zero Gate, then return to the "
+        "platform. This is usually done to recover from falling off the "
+        "platform or to reset the spawns on the platform.<br><br>"
+        "The reason for resetting spawns is that over time, the " + STRING_POKEMON +
+        " can spawn in inaccessible places. When there are too few spawns, the "
+        "kill and encounter rates will drop to very inefficient levels. "
+        "Resetting the spawns will fix this, at the cost of also despawning any "
+        "shinies that have not yet been encountered."
+    )
+    , RESET_DURATION_MINUTES(
+        "<b>Reset Duration (minutes):</b><br>If you are resetting, reset the game every "
+        "this many minutes.",
+        LockWhileRunning::UNLOCKED,
+        180
+    )
+{
+    PA_ADD_STATIC(m_description);
+    PA_ADD_STATIC(RESET_DURATION_MINUTES);
+}
+
 
 
 NavigatePlatformSettings::NavigatePlatformSettings()
     : GroupOption("Navigate to Platform Settings", LockWhileRunning::UNLOCKED)
+    , m_description(
+        "These settings are used when traveling from Zero Gate to the platform. "
+        "This can happen either at program start or during a platform reset."
+    )
     , STATION_ARRIVE_PAUSE_SECONDS(
-        "<b>Station Arrive Pause</b><br>Pause for this many seconds after leaving the station. "
+        "<b>Station Arrive Pause Time:</b><br>Pause for this many seconds after leaving the station. "
         "This allows stuff to load to reduce the chance of lag affecting the fly to platform.",
         LockWhileRunning::UNLOCKED,
         1
     )
     , MIDAIR_PAUSE_TIME(
         "<b>Mid-Air Pause Time:</b><br>Pause for this long before final approach to the platform. "
-        "Too small and you may crash into the wall or have reduced spawns. "
+        "Too small and you may crash into the wall above the platform or have reduced spawns. "
         "Too large and you may undershoot the platform.",
         LockWhileRunning::UNLOCKED,
         TICKS_PER_SECOND,
         "50"
     )
 {
+    PA_ADD_STATIC(m_description);
     PA_ADD_OPTION(STATION_ARRIVE_PAUSE_SECONDS);
     PA_ADD_OPTION(MIDAIR_PAUSE_TIME);
 }

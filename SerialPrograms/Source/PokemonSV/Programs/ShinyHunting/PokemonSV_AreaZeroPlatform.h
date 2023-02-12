@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonSV_AreaZeroPlatform_H
 
 #include "Common/Cpp/Options/GroupOption.h"
+#include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/TimeExpressionOption.h"
 
@@ -20,11 +21,25 @@ namespace PokemonSV{
 
 
 
+
+class PlatformResetSettings : public GroupOption{
+public:
+    PlatformResetSettings();
+
+public:
+    StaticTextOption m_description;
+    SimpleIntegerOption<uint16_t> RESET_DURATION_MINUTES;
+};
+
+
+
+
 class NavigatePlatformSettings : public GroupOption{
 public:
     NavigatePlatformSettings();
 
 public:
+    StaticTextOption m_description;
     SimpleIntegerOption<uint16_t> STATION_ARRIVE_PAUSE_SECONDS;
     TimeExpressionOption<uint16_t> MIDAIR_PAUSE_TIME;
 };

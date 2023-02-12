@@ -10,7 +10,7 @@
 #include <dpp/DPP_SilenceWarnings.h>
 #include "Common/Qt/StringToolsQt.h"
 #include "CommonFramework/Globals.h"
-//#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "DppIntegration/DppClient.h"
 #include "SleepyDiscordRunner.h"
 #include "DiscordIntegrationSettings.h"
@@ -96,7 +96,7 @@ DiscordIntegrationSettingsOption::DiscordIntegrationSettingsOption()
     )
 {
     PA_ADD_OPTION(run_on_start);
-    if (IS_BETA_VERSION){
+    if (IS_BETA_VERSION || PreloadSettings::instance().DEVELOPER_MODE){
         PA_ADD_OPTION(library);
         PA_ADD_OPTION(command_type);
     }

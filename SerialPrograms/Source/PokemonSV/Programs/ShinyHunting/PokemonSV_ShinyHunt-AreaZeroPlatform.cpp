@@ -23,7 +23,7 @@
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Pokemon_Notification.h"
 #include "PokemonSV/PokemonSV_Settings.h"
-#include "PokemonSV/Inference/PokemonSV_MapDetector.h"
+//#include "PokemonSV/Inference/PokemonSV_MapDetector.h"
 #include "PokemonSV/Inference/PokemonSV_SweatBubbleDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_AreaZeroSkyDetector.h"
@@ -93,26 +93,16 @@ std::unique_ptr<StatsTracker> ShinyHuntAreaZeroPlatform_Descriptor::make_stats()
 ShinyHuntAreaZeroPlatform::ShinyHuntAreaZeroPlatform()
     : MODE(
         "<b>Mode:</b><br>"
-        "If the mode requires starting on the platform, you should stand near the center of the platform facing any direction.<br><br>"
-        "If the mode requires starting in the Zero Gate, you should be just inside the building as if you just entered.<br><br>"
-        "If the mode periodically resets, you must have saved in your starting position.<br><br>"
-        "Over time, the number of spawns decreases as they get stuck in unknown places. "
-        "This option lets you periodically reset the game to refresh everything. "
-        "However, resetting means you lose any shinies that have spawned, but "
-        "not yet encountered.",
+        "If starting on the platform, you should stand near the center of the platform facing any direction.<br>"
+        "If starting in the Zero Gate, you should be just inside the building as if you just entered.<br>"
+        "If making a sandwich, you should be at the Zero Gate fly spot as if you just flew there.",
         {
-            {Mode::START_ON_PLATFORM_NO_RESET,          "platform-no-reset",        "Start on platform. Do not reset."},
-            {Mode::START_IN_ZERO_GATE_NO_RESET,         "zerogate-no-reset",        "Start inside Zero Gate. Do not reset."},
-            {Mode::START_IN_ZERO_GATE_PERIODIC_RESET,   "zerogate-periodic-reset",  "Start inside Zero Gate. Periodically reset."},
+            {Mode::START_ON_PLATFORM,   "platform", "Start on platform."},
+            {Mode::START_IN_ZERO_GATE,  "zerogate", "Start inside Zero Gate."},
+//            {Mode::MAKE_SANDWICH,       "sandwich", "Make a sandwich."},
         },
         LockWhileRunning::LOCKED,
-        Mode::START_ON_PLATFORM_NO_RESET
-    )
-    , RESET_DURATION_MINUTES(
-        "<b>Reset Duration (minutes):</b><br>If you are resetting, reset the game every "
-        "this many minutes.",
-        LockWhileRunning::UNLOCKED,
-        180
+        Mode::START_ON_PLATFORM
     )
     , PATH0(
         "<b>Path:</b><br>Traversal path on the platform to trigger encounters.",
@@ -146,14 +136,14 @@ ShinyHuntAreaZeroPlatform::ShinyHuntAreaZeroPlatform()
 {
     if (PreloadSettings::instance().DEVELOPER_MODE){
         PA_ADD_OPTION(MODE);
-        PA_ADD_OPTION(RESET_DURATION_MINUTES);
+        PA_ADD_OPTION(PATH0);
     }
-    PA_ADD_OPTION(PATH0);
     PA_ADD_OPTION(VIDEO_ON_SHINY);
+    PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     if (PreloadSettings::instance().DEVELOPER_MODE){
+        PA_ADD_OPTION(PLATFORM_RESET);
         PA_ADD_OPTION(NAVIGATE_TO_PLATFORM);
     }
-    PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
@@ -528,10 +518,11 @@ void ShinyHuntAreaZeroPlatform::run_state(BotBaseContext& context){
     State recovery_state = State::LEAVE_AND_RETURN;
     try{
         switch (m_state){
-        case State::TRAVERSAL:
+        case State::TRAVERSAL:{
             console.log("Run Traversal Iteration: " + tostr_u_commas(m_iterations));
-            if (MODE == Mode::START_IN_ZERO_GATE_PERIODIC_RESET && now - m_last_platform_reset > std::chrono::minutes(RESET_DURATION_MINUTES)){
-                m_state = State::RESET_AND_RETURN;
+
+            if (PLATFORM_RESET.enabled() && now - m_last_platform_reset > std::chrono::minutes(PLATFORM_RESET.RESET_DURATION_MINUTES)){
+                m_state = State::LEAVE_AND_RETURN;
                 return;
             }
 
@@ -541,7 +532,7 @@ void ShinyHuntAreaZeroPlatform::run_state(BotBaseContext& context){
             run_traversal(context);
 
             break;
-
+        }
         case State::INSIDE_GATE_AND_RETURN:
             console.log("Going from inside gate to platform...");
 
@@ -630,13 +621,14 @@ void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, Bot
     );
 
     switch (MODE){
-    case Mode::START_ON_PLATFORM_NO_RESET:
+    case Mode::START_ON_PLATFORM:
         m_state = State::TRAVERSAL;
         break;
-    case Mode::START_IN_ZERO_GATE_NO_RESET:
-    case Mode::START_IN_ZERO_GATE_PERIODIC_RESET:
+    case Mode::START_IN_ZERO_GATE:
         m_state = State::INSIDE_GATE_AND_RETURN;
         break;
+    case Mode::MAKE_SANDWICH:
+        throw UserSetupError(env.logger(), "Sandwich mode has not been implemented yet.");
     }
 
     m_last_platform_reset = current_time();
