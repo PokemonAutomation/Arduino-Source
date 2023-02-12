@@ -247,7 +247,7 @@ bool TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, BotBaseContex
     }
 
     if (!CATCH_ON_WIN.enabled()){
-        exit_tera_win_without_catching(env.program_info(), env.console, context, 0);
+        exit_tera_win_without_catching(env.program_info(), env.console, context, STOP_CONDITIONS.STOP_ON_RARE_ITEMS);
         return true;
     }
 
