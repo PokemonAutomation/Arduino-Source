@@ -184,7 +184,7 @@ const SandwichFillingOCR& SandwichFillingOCR::instance(){
 }
 
 SandwichFillingOCR::SandwichFillingOCR()
-    : SmallDictionaryMatcher("PokemonSV/PicNic/SandwichFillingOCR.json")
+    : SmallDictionaryMatcher("PokemonSV/Picnic/SandwichFillingOCR.json")
 {}
 
 
@@ -208,7 +208,7 @@ const SandwichCondimentOCR& SandwichCondimentOCR::instance() {
 }
 
 SandwichCondimentOCR::SandwichCondimentOCR()
-    : SmallDictionaryMatcher("PokemonSV/PicNic/SandwichCondimentOCR.json")
+    : SmallDictionaryMatcher("PokemonSV/Picnic/SandwichCondimentOCR.json")
 {}
 
 
