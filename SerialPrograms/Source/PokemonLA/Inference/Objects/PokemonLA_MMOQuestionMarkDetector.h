@@ -43,10 +43,6 @@ private:
     Logger& m_logger;
 };
 
-// Detect the presense of MM question mark on an image
-bool detect_MMO_question_mark(const PokemonAutomation::ImageViewRGB32 &image);
-
-
 // Show output of `MMOQuestionMarkDetector::detect_MMO_on_hisui_map()` to video overlay.
 void add_hisui_MMO_detection_to_overlay(const std::array<bool, 5>& detection_result, VideoOverlaySet& items);
 

@@ -19,8 +19,6 @@
 using std::cout;
 using std::endl;
 
-// #define DEBUG_MMO_QUESTION_MARK
-
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
@@ -89,113 +87,42 @@ const std::array<ImageFloatBox, 5> hisui_map_boxes{{
     {0.393, 0.144, 0.050, 0.084}
 }};
 
-} // anonymous namespace
 
+bool detect_MMO_question_mark(const PokemonAutomation::ImageViewRGB32 &frame, const ImageFloatBox& box){
+    auto image = extract_box_reference(frame, box);
 
-struct WaterfillTemplateDetectionDebugParams{
-    std::string base_filename = "WaterfillTemplateDebug";
-    uint32_t filter_color = (uint32_t)255 << 16; // default red color
-    uint32_t match_color = (uint32_t)255 << 8; // default green color
-};
+    const double screen_rel_size = (frame.height() / 1080.0);
+    const double rel_scale = screen_rel_size * screen_rel_size;
 
-bool detect_template_by_single_pass_waterfill(
-    const ImageViewRGB32 &image,
-    const ImageMatch::WaterfillTemplateMatcher &matcher,
-    const std::vector<std::pair<uint32_t, uint32_t>> &filters,
-    const std::pair<size_t, size_t> &area_thresholds,
-    double rmsd_threshold,
-    std::function<bool(WaterfillObject& object)> check_object,
-    const WaterfillTemplateDetectionDebugParams* debug_params)
-{
-    auto matrix = compress_rgb32_to_binary_multirange(image, filters);
+    const size_t min_bg_size = 1300;
+    const size_t max_bg_size = 1600;
 
-    ImageRGB32 debug_image;
-    if (debug_params){
-        debug_image = image.copy();
-        draw_matrix_on_image(matrix, debug_params->filter_color, debug_image, 0, 0);
-    }
+    auto scale = [&](size_t size) -> size_t{
+        return size_t(size * rel_scale);
+    };
 
-    std::unique_ptr<WaterfillSession> session = make_WaterfillSession();
-    WaterfillObject object;
-
-    const size_t min_area = area_thresholds.first;
-    bool detected = false;
-    session->set_source(matrix);
-    auto finder = session->make_iterator(min_area);
-    const bool keep_object_matrix = (debug_params != nullptr);
-    while (finder->find_next(object, keep_object_matrix)){
-        if (object.area > area_thresholds.second){
-            continue;
-        }
-        double rmsd = matcher.rmsd_original(image, object);
-        if (debug_params){
-            cout << debug_params->base_filename << ": rmsd " << rmsd << " area " << object.area << endl;
-        }
-        
-        if (rmsd < rmsd_threshold){
-            if (debug_params){
-                draw_object_on_image(object, debug_params->match_color, debug_image, 0, 0);
-            }
-            detected = true;
-            
-            if (check_object(object)){
-                break;
-            }
-        }
-    }
-
-    if (debug_params){
-        static int debug_count = 0;
-        std::ostringstream os;
-        os << debug_params->base_filename << std::setfill('0') << std::setw(3) << debug_count << ".png";
-        debug_image.save(os.str());
-        debug_count++;
-    }
-
-    return detected;
-}
-
-
-bool detect_MMO_question_mark(const PokemonAutomation::ImageViewRGB32 &image){
-
-    std::unique_ptr<WaterfillTemplateDetectionDebugParams> debug_params = nullptr;
-
-#ifdef DEBUG_MMO_QUESTION_MARK
-    debug_params = std::make_unique<WaterfillTemplateDetectionDebugParams>();
-    debug_params->base_filename = "test_MMO_background_";
-#endif
-    bool detected = detect_template_by_single_pass_waterfill(
-        image,
-        MMOQuestionMarkBackgroundMatcher::instance(),
+    bool detected = match_template_by_waterfill(
+        image, MMOQuestionMarkBackgroundMatcher::instance(),
         {{combine_rgb(0, 10, 30), combine_rgb(60, 90, 130)}},
-        // The dark blue background is about 1400-1500 pixels on 1080P.
-        // Should be at least 550 pixels on 720P image.
-        {550, 1500},
-        90,
-        [](WaterfillObject&) { return true; },
-        debug_params.get()
+        {scale(min_bg_size), scale(max_bg_size)}, 90,
+        [](WaterfillObject&) { return true; }
     );
 
     if (detected){
-#ifdef DEBUG_MMO_QUESTION_MARK
-        debug_params->base_filename = "test_MMO_curve_";
-#endif
-        detected = detect_template_by_single_pass_waterfill(
-            image,
-            MMOQuestionMarkCurveMatcher::instance(),
+        const size_t min_curve_size = 250;
+        const size_t max_curve_size = 450;
+        detected = match_template_by_waterfill(
+            image, MMOQuestionMarkCurveMatcher::instance(),
             {{combine_rgb(180, 180, 180), combine_rgb(255, 255, 255)}},
-            // The main curve of the question mark is about 310 pixels on 1080P.
-            // Should be about 130 pixels on 720P image.
-            {100, 450},
-            100,
-            [](WaterfillObject&) { return true; },
-            debug_params.get()
+            {scale(min_curve_size), scale(max_curve_size)}, 100,
+            [](WaterfillObject&) { return true; }
         );
     }
 
     return detected;
 }
 
+} // anonymous namespace
 
 
 MMOQuestionMarkDetector::MMOQuestionMarkDetector(Logger& logger)
@@ -212,8 +139,7 @@ void MMOQuestionMarkDetector::make_overlays(VideoOverlaySet& items) const{
 std::array<bool, 5> MMOQuestionMarkDetector::detect_MMO_on_hisui_map(const ImageViewRGB32& frame){
     std::array<bool, 5> detected{false};
     for(size_t i = 0; i < hisui_map_boxes.size(); i++){
-        auto cropped_frame = extract_box_reference(frame, hisui_map_boxes[i]);
-        detected[i] = detect_MMO_question_mark(cropped_frame);
+        detected[i] = detect_MMO_question_mark(frame, hisui_map_boxes[i]);
     }
     
     if (std::find(detected.begin(), detected.end(), true) != detected.end()){
@@ -238,24 +164,22 @@ std::vector<ImagePixelBox> MMOQuestionMarkDetector::detect_MMOs_on_region_map(co
     size_t map_height = (size_t)(frame.height() * map_view.height + 0.5);
     ImageViewRGB32 map_image(frame.sub_image(map_min_x, map_min_y, map_width, map_height));
 
-    std::unique_ptr<WaterfillTemplateDetectionDebugParams> debug_params = nullptr;
-
-#ifdef DEBUG_MMO_QUESTION_MARK
-    debug_params = std::make_unique<WaterfillTemplateDetectionDebugParams>();
-    debug_params->base_filename = "test_region_MMO_";
-#endif
-
     std::vector<ImagePixelBox> results;
 
-    detect_template_by_single_pass_waterfill(
-        map_image,
-        MMOQuestionMarkBackgroundMatcher::instance(),
-        // {{combine_rgb(0, 10, 30), combine_rgb(60, 90, 130)}},
+    const double screen_rel_size = (frame.height() / 1080.0);
+    const double rel_scale = screen_rel_size * screen_rel_size;
+
+    const size_t min_bg_size = 1300;
+    const size_t max_bg_size = 1800;
+
+    auto scale = [&](size_t size) -> size_t{
+        return size_t(size * rel_scale);
+    };
+
+    match_template_by_waterfill(
+        map_image, MMOQuestionMarkBackgroundMatcher::instance(),
         {{combine_rgb(0, 5, 30), combine_rgb(100, 130, 130)}},
-        // The dark blue background is about 1400-1500 pixels on 1080P.
-        // Should be at least 550 pixels on 720P image.
-        {550, 1800},
-        110,
+        {scale(min_bg_size), scale(max_bg_size)}, 110,
         [&](WaterfillObject& object){
             size_t min_x = object.min_x + map_min_x;
             size_t min_y = object.min_y + map_min_y;
@@ -263,8 +187,7 @@ std::vector<ImagePixelBox> MMOQuestionMarkDetector::detect_MMOs_on_region_map(co
             size_t max_y = object.max_y + map_min_y;
             results.emplace_back(min_x, min_y, max_x, max_y);
             return false;
-        },
-        debug_params.get()
+        }
     );
 
     return results;

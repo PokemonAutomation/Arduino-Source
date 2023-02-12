@@ -36,6 +36,7 @@
 
 #include <QFileInfo>
 #include <QDir>
+#include <algorithm>
 #include <cmath>
 #include <iostream>
 #include <iomanip>
@@ -564,7 +565,17 @@ int test_pokemonLA_MMOSpriteMatcher(const std::string& filepath){
 
     MMOQuestionMarkDetector detector(logger);
 
-    const auto quest_results = detector.detect_MMOs_on_region_map(question_mark_image);
+    std::vector<ImagePixelBox> quest_results = detector.detect_MMOs_on_region_map(question_mark_image);
+    std::sort(quest_results.begin(), quest_results.end(), [](const ImagePixelBox& a, const ImagePixelBox& b) -> bool {
+        if (a.center_y() < b.center_y()) {
+            return true;
+        }
+        if (a.center_y() > b.center_y()) {
+            return false;
+        }
+        return a.center_x() < b.center_x();
+    });
+
     cout << "Detect MMO question marks:" << endl;
     for(const auto& box : quest_results){
         cout << "- " << box.center_x() << ", " << box.center_y() << " " << box.width() << " x " << box.height() << endl;
