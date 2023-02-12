@@ -11,7 +11,7 @@
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "PokemonSV_SandwichIngredientDetector.h"
 
-//#include <iostream>
+// #include <iostream>
 //using std::cout;
 //using std::endl;
 
@@ -92,7 +92,7 @@ bool DeterminedSandwichIngredientDetector::detect(const ImageViewRGB32& screen) 
     int yellow_count = 0;
     for(int i = 0; i < 4; i++){
         FloatPixel avg = image_stats(extract_box_reference(screen, m_edges[i])).average;
-        if (avg.r > avg.b * 1.25 && avg.g > avg.b * 1.25){
+        if (avg.r > avg.b * 1.25 && avg.g > avg.b * 1.15){
             yellow_count++;
         }
     }

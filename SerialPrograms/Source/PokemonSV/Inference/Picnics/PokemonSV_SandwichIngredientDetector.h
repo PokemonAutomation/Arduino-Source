@@ -70,7 +70,7 @@ private:
 class DeterminedSandwichIngredientWatcher : public DetectorToFinder<DeterminedSandwichIngredientDetector>{
 public:
     DeterminedSandwichIngredientWatcher(SandwichIngredientType ingredient_type, size_t index, Color color = COLOR_RED)
-         : DetectorToFinder("DeterminedSandwichIngredientWatcher", std::chrono::milliseconds(250), ingredient_type, index, color)
+         : DetectorToFinder("DeterminedSandwichIngredientWatcher", std::chrono::milliseconds(100), ingredient_type, index, color)
     {}
 };
 
