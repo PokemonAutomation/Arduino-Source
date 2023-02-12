@@ -643,6 +643,7 @@ SOURCES += \
     Source/PokemonSV/Inference/PokemonSV_MapDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_PokePortalDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_PokemonSummaryReader.cpp \
+    Source/PokemonSV/Inference/PokemonSV_SweatBubbleDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_TournamentPrizeNameReader.cpp \
     Source/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_ZeroGateWarpPromptDetector.cpp \
@@ -1639,6 +1640,7 @@ HEADERS += \
     Source/PokemonSV/Inference/PokemonSV_MapDetector.h \
     Source/PokemonSV/Inference/PokemonSV_PokePortalDetector.h \
     Source/PokemonSV/Inference/PokemonSV_PokemonSummaryReader.h \
+    Source/PokemonSV/Inference/PokemonSV_SweatBubbleDetector.h \
     Source/PokemonSV/Inference/PokemonSV_TournamentPrizeNameReader.h \
     Source/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h \
     Source/PokemonSV/Inference/PokemonSV_ZeroGateWarpPromptDetector.h \

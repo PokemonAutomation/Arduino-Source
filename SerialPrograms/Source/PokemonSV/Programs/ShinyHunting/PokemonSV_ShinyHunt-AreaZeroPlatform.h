@@ -52,7 +52,11 @@ private:
     void on_shiny_encounter(BotBaseContext& context, EncounterWatcher& encounter_watcher);
 
     void run_traversal(BotBaseContext& context);
-    bool clear_in_front(BotBaseContext& context, std::function<void(BotBaseContext& context)>&& command);
+    bool clear_in_front(
+        BotBaseContext& context,
+        bool throw_ball_if_bubble,
+        std::function<void(BotBaseContext& context)>&& command
+    );
 
     void run_path0(BotBaseContext& context);
     void run_path1(BotBaseContext& context);

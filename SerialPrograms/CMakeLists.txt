@@ -1288,6 +1288,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Inference/PokemonSV_PokemonSummaryReader.h
     Source/PokemonSV/Inference/PokemonSV_PokePortalDetector.cpp
     Source/PokemonSV/Inference/PokemonSV_PokePortalDetector.h
+    Source/PokemonSV/Inference/PokemonSV_SweatBubbleDetector.cpp
+    Source/PokemonSV/Inference/PokemonSV_SweatBubbleDetector.h
     Source/PokemonSV/Inference/PokemonSV_TournamentPrizeNameReader.cpp
     Source/PokemonSV/Inference/PokemonSV_TournamentPrizeNameReader.h
     Source/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.cpp

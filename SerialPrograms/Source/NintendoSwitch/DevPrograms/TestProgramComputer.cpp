@@ -105,6 +105,7 @@
 #include "ClientSource/Connection/BotBase.h"
 #include "CommonFramework/Environment/Environment.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_LetsGoKillDetector.h"
+#include "PokemonSV/Inference/PokemonSV_SweatBubbleDetector.h"
 
 #ifdef PA_ARCH_x86
 //#include "Kernels/Kernels_x64_SSE41.h"
@@ -199,11 +200,57 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 //    throw ProgramFinishedException(env.logger(), "", std::make_shared<ImageRGB32>("TeraCode-S-chi-original.png"));
 
 
+#if 0
+    ImageRGB32 image("screenshot-20230211-223602354229.png");
+    SweatBubbleDetector detector(COLOR_RED, {0, 0, 1, 1});
+    cout << detector.detect(image) << endl;
+#endif
+
+
+#if 0
+    ImageRGB32 image("test-0.png");
+//    ImageRGB32 filtered = filter_rgb32_range(image, 0xff000000, 0xffffff90, Color(0x00000000), true);
+//    filtered.save("filtered.png");
+
+    for (size_t r = 0; r < image.height(); r++){
+        for (size_t c = 0; c < image.width(); c++){
+            if (9 < r && r < 50 && 19 < c && c < 57){
+                continue;
+            }
+            uint32_t pixel = image.pixel(c, r);
+            uint32_t red = (pixel >> 16) & 0xff;
+            uint32_t green = (pixel >> 8) & 0xff;
+            uint32_t blue = (pixel >> 0) & 0xff;
+            uint32_t total = red + green + blue;
+            if (total < 720){
+                image.pixel(c, r) = 0;
+            }else{
+                image.pixel(c, r) = 0xffffffff;
+            }
+        }
+    }
+    image.save("filtered.png");
+#endif
+
+#if 0
+    ImageRGB32 image("screenshot-20230211-223602354229.png");
+    auto matrix = compress_rgb32_to_binary_range(image, 0xffc0c0c0, 0xffffffff);
+
+    std::vector<WaterfillObject> objects = Waterfill::find_objects_inplace(matrix, 100);
+    cout << objects.size() << endl;
+
+    for (size_t c = 0; c < objects.size(); c++){
+        extract_box_reference(image, objects[c]).save("test-" + std::to_string(c) + ".png");
+    }
+#endif
+
+
+#if 0
     ImageRGB32 image("Screenshots/screenshot-20230209-061452037331.png");
 
     ImageRGB32 filtered = filter_rgb32_range(image, 0xff000040, 0xff8080ff, Color(0xffff0000), true);
     filtered.save("test.png");
-
+#endif
 
 #if 0
     ImageRGB32 image("Screenshots/screenshot-20230208-012850704172.png");

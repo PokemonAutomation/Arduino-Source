@@ -24,6 +24,7 @@
 #include "Pokemon/Pokemon_Notification.h"
 #include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSV/Inference/PokemonSV_MapDetector.h"
+#include "PokemonSV/Inference/PokemonSV_SweatBubbleDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_AreaZeroSkyDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_LetsGoKillDetector.h"
@@ -161,7 +162,9 @@ ShinyHuntAreaZeroPlatform::ShinyHuntAreaZeroPlatform()
 
 
 bool ShinyHuntAreaZeroPlatform::clear_in_front(
-    BotBaseContext& context, std::function<void(BotBaseContext& context)>&& command
+    BotBaseContext& context,
+    bool throw_ball_if_bubble,
+    std::function<void(BotBaseContext& context)>&& command
 ){
 //    ShinyHuntAreaZeroPlatform_Descriptor::Stats& stats = env.current_stats<ShinyHuntAreaZeroPlatform_Descriptor::Stats>();
     ConsoleHandle& console = m_env->console;
@@ -169,7 +172,24 @@ bool ShinyHuntAreaZeroPlatform::clear_in_front(
 //    static int calls = 0;
     console.log("Clearing what's in front with Let's Go...");
 //    cout << calls++ << endl;
-    pbf_press_button(context, BUTTON_R, 20, 0);
+
+    SweatBubbleWatcher bubble(COLOR_GREEN);
+    int ret = run_until(
+        console, context,
+        [](BotBaseContext& context){
+            pbf_press_button(context, BUTTON_R, 20, 105);
+        },
+        {bubble}
+    );
+//    cout << "asdf" << endl;
+    if (ret == 0){
+        if (throw_ball_if_bubble){
+            console.log("Detected sweat bubble. Throwing ball...");
+            pbf_mash_button(context, BUTTON_ZR, 4 * TICKS_PER_SECOND);
+        }else{
+            console.log("Detected sweat bubble. Will not throw ball...");
+        }
+    }
 
     WallClock last_kill = m_kill_watcher->last_kill();
     context.wait_for_all_requests();
@@ -201,14 +221,14 @@ void ShinyHuntAreaZeroPlatform::run_path0(BotBaseContext& context){
 
     //  Go back to the wall.
     console.log("Go back to wall...");
-    clear_in_front(context, [&](BotBaseContext& context){
+    clear_in_front(context, false, [&](BotBaseContext& context){
         find_and_center_on_sky(*m_env, console, context);
         pbf_move_right_joystick(context, 128, 255, 80, 0);
         pbf_move_left_joystick(context, 176, 255, 30, 0);
         pbf_press_button(context, BUTTON_L, 20, 50);
     });
 
-    clear_in_front(context, [&](BotBaseContext& context){
+    clear_in_front(context, false, [&](BotBaseContext& context){
         //  Move to wall.
         pbf_move_left_joystick(context, 128, 0, 4 * TICKS_PER_SECOND, 0);
 
@@ -221,7 +241,7 @@ void ShinyHuntAreaZeroPlatform::run_path0(BotBaseContext& context){
     //  Move forward and kill everything in your path.
     console.log("Moving towards sky and killing everything...");
     uint16_t duration = 325;
-    clear_in_front(context, [&](BotBaseContext& context){
+    clear_in_front(context, true, [&](BotBaseContext& context){
         find_and_center_on_sky(*m_env, console, context);
         pbf_move_right_joystick(context, 128, 255, 70, 0);
 
@@ -245,7 +265,7 @@ void ShinyHuntAreaZeroPlatform::run_path0(BotBaseContext& context){
         ssf_press_button(context, BUTTON_L, 0, 20);
         pbf_move_left_joystick(context, x, 0, duration, 0);
     });
-    clear_in_front(context, [&](BotBaseContext& context){
+    clear_in_front(context, true, [&](BotBaseContext& context){
         pbf_move_left_joystick(context, 128, 255, duration, 4 * TICKS_PER_SECOND);
     });
 }
@@ -255,7 +275,7 @@ void ShinyHuntAreaZeroPlatform::run_path1(BotBaseContext& context){
     //  Go back to the wall.
     console.log("Go back to wall...");
     pbf_press_button(context, BUTTON_L, 20, 105);
-    clear_in_front(context, [&](BotBaseContext& context){
+    clear_in_front(context, true, [&](BotBaseContext& context){
         find_and_center_on_sky(*m_env, console, context);
         pbf_move_right_joystick(context, 128, 255, 80, 0);
         pbf_move_left_joystick(context, 192, 255, 60, 0);
@@ -264,7 +284,7 @@ void ShinyHuntAreaZeroPlatform::run_path1(BotBaseContext& context){
     //  Clear path to the wall.
     console.log("Clear path to the wall...");
     pbf_press_button(context, BUTTON_L, 20, 50);
-    clear_in_front(context, [&](BotBaseContext& context){
+    clear_in_front(context, false, [&](BotBaseContext& context){
         pbf_move_left_joystick(context, 128, 0, 5 * TICKS_PER_SECOND, 0);
 
         //  Turn right.
@@ -275,7 +295,7 @@ void ShinyHuntAreaZeroPlatform::run_path1(BotBaseContext& context){
     //  Clear the wall.
     console.log("Clear the wall...");
     uint16_t duration = 325;
-    clear_in_front(context, [&](BotBaseContext& context){
+    clear_in_front(context, true, [&](BotBaseContext& context){
         pbf_move_left_joystick(context, 255, 128, 125, 0);
         pbf_press_button(context, BUTTON_L, 20, 50);
         context.wait_for_all_requests();
@@ -307,7 +327,7 @@ void ShinyHuntAreaZeroPlatform::run_path1(BotBaseContext& context){
     });
 
     console.log("Run backwards and wait...");
-    clear_in_front(context, [&](BotBaseContext& context){
+    clear_in_front(context, true, [&](BotBaseContext& context){
 //        pbf_move_left_joystick(context, 64, 0, 125, 0);
 //        pbf_press_button(context, BUTTON_L, 20, 105);
         pbf_move_left_joystick(context, 128, 255, duration, 4 * TICKS_PER_SECOND);
@@ -366,7 +386,7 @@ void ShinyHuntAreaZeroPlatform::run_path2(BotBaseContext& context){
     double platform_x, platform_y;
     uint16_t duration;
     uint8_t move_x, move_y;
-    clear_in_front(context, [&](BotBaseContext& context){
+    clear_in_front(context, true, [&](BotBaseContext& context){
 
         console.log("Find the sky, turn around and fire.");
         pbf_move_right_joystick(context, 128, 0, 60, 0);
@@ -391,7 +411,7 @@ void ShinyHuntAreaZeroPlatform::run_path2(BotBaseContext& context){
         pbf_mash_button(context, BUTTON_L, 60);
 //        pbf_wait(context, 1250);
     });
-    clear_in_front(context, [&](BotBaseContext& context){
+    clear_in_front(context, duration > 100, [&](BotBaseContext& context){
         context.wait_for(std::chrono::milliseconds(1000));
 
         console.log("Making location correction...");
@@ -413,7 +433,7 @@ void ShinyHuntAreaZeroPlatform::run_path2(BotBaseContext& context){
         console.log("Turning along wall...");
         pbf_move_left_joystick(context, 0, 255, 20, 20);
         pbf_mash_button(context, BUTTON_L, 60);
-        clear_in_front(context, [&](BotBaseContext& context){
+        clear_in_front(context, true, [&](BotBaseContext& context){
             context.wait_for(std::chrono::milliseconds(1000));
 
             console.log("Turning back to sky.");
@@ -430,7 +450,7 @@ void ShinyHuntAreaZeroPlatform::run_path2(BotBaseContext& context){
         return;
     }
 
-    clear_in_front(context, [&](BotBaseContext& context){
+    clear_in_front(context, true, [&](BotBaseContext& context){
         context.wait_for(std::chrono::milliseconds(1000));
 
         console.log("Move forward, fire, and retreat.");
@@ -447,7 +467,7 @@ void ShinyHuntAreaZeroPlatform::run_path2(BotBaseContext& context){
         }
 
     });
-    clear_in_front(context, [&](BotBaseContext& context){
+    clear_in_front(context, true, [&](BotBaseContext& context){
         pbf_move_left_joystick(context, 128, 255, 4 * TICKS_PER_SECOND, 0);
         pbf_move_left_joystick(context, 128, 0, 60, 4 * TICKS_PER_SECOND);
     });

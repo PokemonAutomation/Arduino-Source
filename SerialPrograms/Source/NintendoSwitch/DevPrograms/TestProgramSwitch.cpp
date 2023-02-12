@@ -89,6 +89,7 @@
 #include "CommonFramework/Inference/BlackScreenDetector.h"
 #include "PokemonSV/Inference/PokemonSV_ZeroGateWarpPromptDetector.h"
 #include "PokemonSV/Programs/ShinyHunting/PokemonSV_AreaZeroPlatform.h"
+#include "PokemonSV/Inference/PokemonSV_SweatBubbleDetector.h"
 
 
 #include <QPixmap>
@@ -190,11 +191,21 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
+//    pbf_mash_button(context, BUTTON_ZR, 3 * TICKS_PER_SECOND);
+
+#if 0
+    auto image = feed.snapshot();
+    SweatBubbleDetector detector(COLOR_RED, {0.11, 0.81, 0.06, 0.10});
+    cout << detector.detect(image) << endl;
+#endif
+
+
+#if 0
     NavigatePlatformSettings settings;
 
     return_to_inside_zero_gate(env.program_info(), console, context);
     inside_zero_gate_to_platform(env.program_info(), console, context, settings);
-
+#endif
 
 #if 0
     auto image = feed.snapshot();
