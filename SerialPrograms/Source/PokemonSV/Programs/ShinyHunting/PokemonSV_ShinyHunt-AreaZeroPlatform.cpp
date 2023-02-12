@@ -177,7 +177,7 @@ bool ShinyHuntAreaZeroPlatform::clear_in_front(
     int ret = run_until(
         console, context,
         [](BotBaseContext& context){
-            pbf_press_button(context, BUTTON_R, 20, 105);
+            pbf_press_button(context, BUTTON_R, 20, 200);
         },
         {bubble}
     );
@@ -185,10 +185,12 @@ bool ShinyHuntAreaZeroPlatform::clear_in_front(
     if (ret == 0){
         if (throw_ball_if_bubble){
             console.log("Detected sweat bubble. Throwing ball...");
-            pbf_mash_button(context, BUTTON_ZR, 4 * TICKS_PER_SECOND);
+            pbf_mash_button(context, BUTTON_ZR, 5 * TICKS_PER_SECOND);
         }else{
-            console.log("Detected sweat bubble. Will not throw ball...");
+            console.log("Detected sweat bubble. Will not throw ball.");
         }
+    }else{
+        console.log("Did not detect sweat bubble.");
     }
 
     WallClock last_kill = m_kill_watcher->last_kill();
@@ -412,8 +414,6 @@ void ShinyHuntAreaZeroPlatform::run_path2(BotBaseContext& context){
 //        pbf_wait(context, 1250);
     });
     clear_in_front(context, duration > 100, [&](BotBaseContext& context){
-        context.wait_for(std::chrono::milliseconds(1000));
-
         console.log("Making location correction...");
         pbf_move_left_joystick(context, 128, 0, duration, 0);
 
@@ -451,8 +451,6 @@ void ShinyHuntAreaZeroPlatform::run_path2(BotBaseContext& context){
     }
 
     clear_in_front(context, true, [&](BotBaseContext& context){
-        context.wait_for(std::chrono::milliseconds(1000));
-
         console.log("Move forward, fire, and retreat.");
         switch (m_iterations % 3){
         case 0:
