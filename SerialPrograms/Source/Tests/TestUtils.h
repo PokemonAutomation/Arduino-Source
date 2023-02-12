@@ -28,6 +28,9 @@ namespace PokemonAutomation{
 // Words are separated by '_'.
 std::vector<std::string> parse_words(const std::string& filename_base);
 
+// Convert string to size_t. Return true if succeed.
+bool parse_size_t(const std::string& word, size_t& number);
+
 // Convert string to int. Return true if succeed.
 bool parse_int(const std::string& word, int& number);
 

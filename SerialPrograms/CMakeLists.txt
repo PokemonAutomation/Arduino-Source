@@ -1417,6 +1417,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Resources/PokemonSV_PokemonSprites.h
     Source/PokemonSV/Resources/PokemonSV_TournamentPrizeNames.cpp
     Source/PokemonSV/Resources/PokemonSV_TournamentPrizeNames.h
+    Source/PokemonSV/Resources/PokemonSV_SandwichSprites.cpp
+    Source/PokemonSV/Resources/PokemonSV_SandwichSprites.h
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.cpp
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.h
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.cpp

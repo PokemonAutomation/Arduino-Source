@@ -8,9 +8,11 @@
 #define PokemonAutomation_PokemonSV_SandwichIngredientDetector_H
 
 #include "Common/Cpp/Color.h"
+#include "CommonFramework/ImageMatch/SilhouetteDictionaryMatcher.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 #include "CommonFramework/Inference/VisualDetector.h"
+#include "CommonFramework/OCR/OCR_SmallDictionaryMatcher.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.h"
 
 #include <array>
@@ -113,6 +115,63 @@ public:
 };
 
 
+
+class SandwichFillingOCR : public OCR::SmallDictionaryMatcher {
+public:
+    static constexpr double MAX_LOG10P = -8.0;
+    static constexpr double MAX_LOG10P_SPREAD = 4.0;
+
+public:
+    static const SandwichFillingOCR& instance();
+
+    OCR::StringMatchResult read_substring(
+        Logger& logger,
+        Language language,
+        const ImageViewRGB32& image,
+        const std::vector<OCR::TextColorRange>& text_color_ranges,
+        double min_text_ratio = 0.01, double max_text_ratio = 0.50
+    ) const;
+
+private:
+    SandwichFillingOCR();
+};
+class SandwichCondimentOCR : public OCR::SmallDictionaryMatcher {
+public:
+    static constexpr double MAX_LOG10P = -8.0;
+    static constexpr double MAX_LOG10P_SPREAD = 4.0;
+
+public:
+    static const SandwichCondimentOCR& instance();
+
+    OCR::StringMatchResult read_substring(
+        Logger& logger,
+        Language language,
+        const ImageViewRGB32& image,
+        const std::vector<OCR::TextColorRange>& text_color_ranges,
+        double min_text_ratio = 0.01, double max_text_ratio = 0.50
+    ) const;
+
+private:
+    SandwichCondimentOCR();
+};
+
+class SandwichIngredientReader{
+public:
+    struct Results{
+        ImageMatch::ImageMatchResult image_results;
+        OCR::StringMatchResult ocr_results;
+    };
+    SandwichIngredientReader(SandwichIngredientType ingredient_type, size_t index, Color color = COLOR_RED);
+
+    void make_overlays(VideoOverlaySet& items) const;
+    Results read(const ImageViewRGB32& screen, Logger& logger, Language language) const;
+
+private:
+    Color m_color;
+    ImageFloatBox m_icon_box;
+    ImageFloatBox m_text_box;
+    SandwichIngredientType m_ingredient_type;
+};
 
 }
 }
