@@ -9,7 +9,8 @@
 #include <sstream>
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
-//#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 //#include "CommonFramework/InferenceInfra/InferenceSession.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
@@ -59,14 +60,26 @@ struct ShinyHuntAreaZeroPlatform_Descriptor::Stats : public StatsTracker{
     Stats()
         : m_kills(m_stats["Kills"])
         , m_encounters(m_stats["Encounters"])
+        , m_sandwiches(m_stats["Sandwiches"])
+        , m_platform_resets(m_stats["Platform Resets"])
+        , m_game_resets(m_stats["Game Resets"])
+        , m_errors(m_stats["Errors"])
         , m_shinies(m_stats["Shinies"])
     {
         m_display_order.emplace_back("Kills");
         m_display_order.emplace_back("Encounters");
+        m_display_order.emplace_back("Sandwiches", true);
+        m_display_order.emplace_back("Platform Resets", true);
+        m_display_order.emplace_back("Game Resets", true);
+        m_display_order.emplace_back("Errors", true);
         m_display_order.emplace_back("Shinies");
     }
     std::atomic<uint64_t>& m_kills;
     std::atomic<uint64_t>& m_encounters;
+    std::atomic<uint64_t>& m_sandwiches;
+    std::atomic<uint64_t>& m_platform_resets;
+    std::atomic<uint64_t>& m_game_resets;
+    std::atomic<uint64_t>& m_errors;
     std::atomic<uint64_t>& m_shinies;
 };
 std::unique_ptr<StatsTracker> ShinyHuntAreaZeroPlatform_Descriptor::make_stats() const{
@@ -413,7 +426,7 @@ void ShinyHuntAreaZeroPlatform::run_path2(BotBaseContext& context){
     }
 
     if (platform_x < 0.5 || platform_y < 0.5){
-        console.log("Not close enough to desired spot. Skipping forward attack...");
+        console.log("Not close enough to desired spot. Skipping forward attack...", COLOR_ORANGE);
         return;
     }
 
@@ -487,48 +500,88 @@ void ShinyHuntAreaZeroPlatform::on_shiny_encounter(
 }
 
 void ShinyHuntAreaZeroPlatform::run_state(BotBaseContext& context){
+    ShinyHuntAreaZeroPlatform_Descriptor::Stats& stats = m_env->current_stats<ShinyHuntAreaZeroPlatform_Descriptor::Stats>();
     const ProgramInfo& info = m_env->program_info();
     ConsoleHandle& console = m_env->console;
     WallClock now = current_time();
 
     send_program_status_notification(*m_env, NOTIFICATION_STATUS_UPDATE);
 
-    switch (m_state){
-    case State::TRAVERSAL:
-        console.log("Run Traversal Iteration: " + tostr_u_commas(m_iterations), COLOR_PURPLE);
-        if (MODE == Mode::START_IN_ZERO_GATE_PERIODIC_RESET && now - m_last_platform_reset > std::chrono::minutes(RESET_DURATION_MINUTES)){
-            m_state = State::RESET_AND_RETURN;
+    State recovery_state = State::LEAVE_AND_RETURN;
+    try{
+        switch (m_state){
+        case State::TRAVERSAL:
+            console.log("Run Traversal Iteration: " + tostr_u_commas(m_iterations));
+            if (MODE == Mode::START_IN_ZERO_GATE_PERIODIC_RESET && now - m_last_platform_reset > std::chrono::minutes(RESET_DURATION_MINUTES)){
+                m_state = State::RESET_AND_RETURN;
+                return;
+            }
+
+            //  If we error out, recover using LEAVE_AND_RETURN.
+            recovery_state = State::LEAVE_AND_RETURN;
+
+            run_traversal(context);
+
+            break;
+
+        case State::INSIDE_GATE_AND_RETURN:
+            console.log("Going from inside gate to platform...");
+
+            //  If we error out, recover using LEAVE_AND_RETURN.
+            recovery_state = State::LEAVE_AND_RETURN;
+
+            inside_zero_gate_to_platform(info, console, context, NAVIGATE_TO_PLATFORM);
+            m_last_platform_reset = now;
+
+            break;
+
+        case State::LEAVE_AND_RETURN:
+            console.log("Leaving and returning to platform...");
+
+            //  If we error out, return to this state.
+            recovery_state = State::LEAVE_AND_RETURN;
+
+            return_to_inside_zero_gate(info, console, context);
+            inside_zero_gate_to_platform(info, console, context, NAVIGATE_TO_PLATFORM);
+
+            m_last_platform_reset = now;
+            stats.m_platform_resets++;
+            m_env->update_stats();
+
+            break;
+
+        case State::RESET_AND_RETURN:
+            console.log("Resetting game and returning to platform...");
+
+            //  If we error out, return to this state.
+            recovery_state = State::RESET_AND_RETURN;
+
+            m_last_platform_reset = current_time();
+            pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+            reset_game_from_home(info, console, context, 5 * TICKS_PER_SECOND);
+            pbf_press_button(context, BUTTON_RCLICK, 20, 105);
+            inside_zero_gate_to_platform(info, console, context, NAVIGATE_TO_PLATFORM);
+
+            m_last_platform_reset = now;
+            stats.m_game_resets++;
+            m_env->update_stats();
+
             break;
         }
-        run_traversal(context);
-        break;
 
-    case State::INSIDE_GATE_AND_RETURN:
-        console.log("Going from inside gate to platform...", COLOR_PURPLE);
-        m_state = State::LEAVE_AND_RETURN;
-        inside_zero_gate_to_platform(info, console, context, NAVIGATE_TO_PLATFORM);
-        m_last_platform_reset = now;
+        //  No problems. Go back to traversals.
         m_state = State::TRAVERSAL;
-        break;
+        m_consecutive_failures = 0;
 
-    case State::LEAVE_AND_RETURN:
-        console.log("Leaving and returning to platform...", COLOR_PURPLE);
-        return_to_inside_zero_gate(info, console, context);
-        inside_zero_gate_to_platform(info, console, context, NAVIGATE_TO_PLATFORM);
-        m_last_platform_reset = now;
-        m_state = State::TRAVERSAL;
-        break;
-
-    case State::RESET_AND_RETURN:
-        console.log("Resetting game and returning to platform...", COLOR_PURPLE);
-        m_last_platform_reset = current_time();
-        pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
-        reset_game_from_home(info, console, context, 5 * TICKS_PER_SECOND);
-        pbf_press_button(context, BUTTON_RCLICK, 20, 105);
-        inside_zero_gate_to_platform(info, console, context, NAVIGATE_TO_PLATFORM);
-        m_last_platform_reset = now;
-        m_state = State::TRAVERSAL;
-        break;
+    }catch (OperationFailedException& e){
+        stats.m_errors++;
+        m_env->update_stats();
+        m_consecutive_failures++;
+        m_state = recovery_state;
+        e.send_notification(*m_env, NOTIFICATION_ERROR_RECOVERABLE);
+        if (m_consecutive_failures >= 3){
+            throw FatalProgramException(console, "Failed 3 times consecutively.");
+        }
     }
 }
 
@@ -569,6 +622,7 @@ void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, Bot
     }
 
     m_last_platform_reset = current_time();
+    m_consecutive_failures = 0;
     while (true){
         env.console.log("Starting encounter loop...", COLOR_PURPLE);
         EncounterWatcher encounter_watcher(env.console, COLOR_RED);

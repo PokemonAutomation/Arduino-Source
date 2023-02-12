@@ -96,13 +96,15 @@ void open_map_from_overworld(const ProgramInfo& info, ConsoleHandle& console, Bo
         }
 
         OverworldWatcher overworld(COLOR_CYAN);
+        AdvanceDialogWatcher advance_dialog(COLOR_YELLOW);
+        PromptDialogWatcher prompt_dialog(COLOR_GREEN);
         MapWatcher map(COLOR_RED);
 
         context.wait_for_all_requests();
         int ret = wait_until(
             console, context,
             std::chrono::seconds(30),
-            {overworld, map}
+            {overworld, advance_dialog, prompt_dialog, map}
         );
         context.wait_for(std::chrono::milliseconds(100));
         switch (ret){
@@ -111,6 +113,14 @@ void open_map_from_overworld(const ProgramInfo& info, ConsoleHandle& console, Bo
             pbf_press_button(context, BUTTON_Y, 20, 105); // open map
             continue;
         case 1:
+            console.log("Detected dialog. Did you fall down?", COLOR_RED);
+            pbf_press_button(context, BUTTON_B, 20, 105);
+            continue;
+        case 2:
+            console.log("Detected dialog. Did you fall down?", COLOR_RED);
+            pbf_press_button(context, BUTTON_A, 20, 105);
+            continue;
+        case 3:
             console.log("Detected map.");
             console.overlay().add_log("Map opened", COLOR_WHITE);
             if (map.map_in_fixed_view()){

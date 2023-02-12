@@ -31,7 +31,7 @@ DiscordIntegrationSettingsOption::DiscordIntegrationSettingsOption()
     : GroupOption("Discord Integration Settings", LockWhileRunning::LOCKED, true, false)
 //    , m_integration_enabled(integration_enabled)
     , run_on_start(
-        "<b>Run Discord Integration On Launch:</b><br>Automatically connect to Discord as soon as the program is launched.",
+        "<b>Run Discord Integration on Launch:</b><br>Automatically connect to Discord as soon as the program is launched.",
         LockWhileRunning::LOCKED,
         false
     )

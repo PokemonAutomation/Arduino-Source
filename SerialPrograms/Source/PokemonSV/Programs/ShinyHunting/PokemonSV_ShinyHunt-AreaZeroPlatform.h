@@ -89,9 +89,10 @@ private:
 
     SingleSwitchProgramEnvironment* m_env;
     LetsGoKillSoundDetector* m_kill_watcher;
+    uint64_t m_iterations = 0;
     State m_state;
     WallClock m_last_platform_reset;
-    uint64_t m_iterations = 0;
+    size_t m_consecutive_failures;
 };
 
 
