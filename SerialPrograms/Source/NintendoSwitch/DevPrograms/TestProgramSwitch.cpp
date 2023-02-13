@@ -79,7 +79,7 @@
 #include "PokemonSV/Inference/Tera/PokemonSV_TeraRaidSearchDetector.h"
 #include "PokemonSV/Programs/TeraRaids/PokemonSV_TeraRoutines.h"
 #include "PokemonSV/Programs/FastCodeEntry/PokemonSV_CodeEntry.h"
-#include "PokemonSV/Inference/Overworld/PokemonSV_AreaZeroSkyDetector.h"
+#include "PokemonSV/Inference/Overworld/PokemonSV_AreaZyroSkyDetector.h"
 #include "CommonFramework/Inference/AudioPerSpectrumDetectorBase.h"
 #include "CommonFramework/Inference/SpectrogramMatcher.h"
 #include "CommonFramework/Inference/AudioTemplateCache.h"
@@ -88,7 +88,7 @@
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
 #include "PokemonSV/Inference/PokemonSV_ZeroGateWarpPromptDetector.h"
-#include "PokemonSV/Programs/ShinyHunting/PokemonSV_AreaZeroPlatform.h"
+#include "PokemonSV/Programs/ShinyHunting/PokemonSV_AreaZyroPlatform.h"
 #include "PokemonSV/Inference/PokemonSV_SweatBubbleDetector.h"
 
 
@@ -348,7 +348,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     size_t count = 0;
     while (true){
         NormalBattleMenuWatcher battle_menu(COLOR_RED);
-        AreaZeroSkyTracker sky_tracker(overlay);
+        AreaZyroSkyTracker sky_tracker(overlay);
         context.wait_for_all_requests();
         int ret = run_until(
             console, context,

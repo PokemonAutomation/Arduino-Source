@@ -1262,8 +1262,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h
     Source/PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.cpp
     Source/PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.h
-    Source/PokemonSV/Inference/Overworld/PokemonSV_AreaZeroSkyDetector.cpp
-    Source/PokemonSV/Inference/Overworld/PokemonSV_AreaZeroSkyDetector.h
+    Source/PokemonSV/Inference/Overworld/PokemonSV_AreaZyroSkyDetector.cpp
+    Source/PokemonSV/Inference/Overworld/PokemonSV_AreaZyroSkyDetector.h
     Source/PokemonSV/Inference/Overworld/PokemonSV_LetsGoKillDetector.cpp
     Source/PokemonSV/Inference/Overworld/PokemonSV_LetsGoKillDetector.h
     Source/PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.cpp
@@ -1383,10 +1383,10 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Programs/PokemonSV_SaveGame.h
     Source/PokemonSV/Programs/Sandwiches/PokemonSV_SandwichRoutines.cpp
     Source/PokemonSV/Programs/Sandwiches/PokemonSV_SandwichRoutines.h
-    Source/PokemonSV/Programs/ShinyHunting/PokemonSV_AreaZeroPlatform.cpp
-    Source/PokemonSV/Programs/ShinyHunting/PokemonSV_AreaZeroPlatform.h
-    Source/PokemonSV/Programs/ShinyHunting/PokemonSV_ShinyHunt-AreaZeroPlatform.cpp
-    Source/PokemonSV/Programs/ShinyHunting/PokemonSV_ShinyHunt-AreaZeroPlatform.h
+    Source/PokemonSV/Programs/ShinyHunting/PokemonSV_AreaZyroPlatform.cpp
+    Source/PokemonSV/Programs/ShinyHunting/PokemonSV_AreaZyroPlatform.h
+    Source/PokemonSV/Programs/ShinyHunting/PokemonSV_ShinyHunt-AreaZyroPlatform.cpp
+    Source/PokemonSV/Programs/ShinyHunting/PokemonSV_ShinyHunt-AreaZyroPlatform.h
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_AutoHost.cpp
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_AutoHost.h
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_AutoHostLobbyWaiter.cpp
