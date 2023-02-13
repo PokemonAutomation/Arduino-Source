@@ -45,17 +45,17 @@ PlatformResetSettings::PlatformResetSettings()
     , WINDOW_IN_MINUTES(
         "<b>Time Window (in minutes):</b><br>The sliding time window for which to watch for kills and encounters.",
         LockWhileRunning::UNLOCKED,
-        5
+        10
     )
     , KILLS_IN_WINDOW(
         "<b>Kills in Window:</b><br>If the number of kills in the last X seconds has drops below this value, consider resetting.",
         LockWhileRunning::UNLOCKED,
-        15
+        30
     )
     , ENCOUNTERS_IN_WINDOW(
         "<b>Encounters in Window:</b><br>If the number of encounters in the last X seconds has drops below this value, consider resetting.",
         LockWhileRunning::UNLOCKED,
-        2
+        5
     )
 #if 0
     , RESET_DURATION_MINUTES(

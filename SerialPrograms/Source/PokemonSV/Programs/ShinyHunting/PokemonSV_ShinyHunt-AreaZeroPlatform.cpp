@@ -299,8 +299,8 @@ void choose_path(
     uint8_t& x, uint8_t& y, uint16_t& duration,
     double platform_x, double platform_y
 ){
-    double diff_x = platform_x - 0.65;
-    double diff_y = platform_y - 0.70;
+    double diff_x = platform_x - 0.62;
+    double diff_y = platform_y - 0.71;
 
     logger.log("Move Direction: x = " + tostr_default(diff_x) + ", y = " + tostr_default(diff_y), COLOR_BLUE);
 
@@ -392,10 +392,10 @@ void ShinyHuntAreaZeroPlatform::run_path2(BotBaseContext& context){
             pbf_move_left_joystick(context, 108, 0, 300, 0);
             break;
         case 1:
-            pbf_move_left_joystick(context, 128, 0, 275, 0);
+            pbf_move_left_joystick(context, 128, 0, 300, 0);
             break;
         case 2:
-            pbf_move_left_joystick(context, 144, 0, 275, 0);
+            pbf_move_left_joystick(context, 144, 0, 300, 0);
             break;
         }
     });
@@ -520,7 +520,6 @@ void ShinyHuntAreaZeroPlatform::run_state(BotBaseContext& context){
 
         case State::LEAVE_AND_RETURN:
             console.log("Leaving and returning to platform...");
-            stats.m_platform_resets++;
 
             //  If we error out, return to this state.
             recovery_state = State::LEAVE_AND_RETURN;
@@ -528,6 +527,7 @@ void ShinyHuntAreaZeroPlatform::run_state(BotBaseContext& context){
             return_to_inside_zero_gate(info, console, context);
             inside_zero_gate_to_platform(info, console, context, NAVIGATE_TO_PLATFORM);
 
+            stats.m_platform_resets++;
             m_encounter_rate_tracker->report_start();
 //            m_last_platform_reset = now;
             m_env->update_stats();
@@ -536,7 +536,6 @@ void ShinyHuntAreaZeroPlatform::run_state(BotBaseContext& context){
 
         case State::RESET_AND_RETURN:
             console.log("Resetting game and returning to platform...");
-            stats.m_game_resets++;
 
             //  If we error out, return to this state.
             recovery_state = State::RESET_AND_RETURN;
@@ -548,6 +547,7 @@ void ShinyHuntAreaZeroPlatform::run_state(BotBaseContext& context){
             pbf_press_button(context, BUTTON_RCLICK, 20, 105);
             inside_zero_gate_to_platform(info, console, context, NAVIGATE_TO_PLATFORM);
 
+            stats.m_game_resets++;
             m_encounter_rate_tracker->report_start();
 //            m_last_platform_reset = now;
             m_env->update_stats();
