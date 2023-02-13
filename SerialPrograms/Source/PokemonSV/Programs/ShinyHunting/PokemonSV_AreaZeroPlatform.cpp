@@ -94,7 +94,7 @@ void PlatformResetSettings::value_changed(){
     m_sliding_window.set_text(
         "<font color=\"red\">Perform a platform reset if there are fewer than " + int_to_text(KILLS_IN_WINDOW, "kill") +
         " and " + int_to_text(ENCOUNTERS_IN_WINDOW, "encounter") +
-        " in the last " + int_to_text(WINDOW_IN_MINUTES, "second") + ".</font>"
+        " in the last " + int_to_text(WINDOW_IN_MINUTES, "minute") + ".</font>"
     );
 }
 
