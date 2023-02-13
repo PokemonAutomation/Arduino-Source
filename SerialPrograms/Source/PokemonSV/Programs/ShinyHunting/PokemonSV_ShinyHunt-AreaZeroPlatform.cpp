@@ -95,7 +95,8 @@ ShinyHuntAreaZeroPlatform::ShinyHuntAreaZeroPlatform()
         "<b>Mode:</b><br>"
         "If starting on the platform, you should stand near the center of the platform facing any direction.<br>"
         "If starting in the Zero Gate, you should be just inside the building as if you just entered.<br>"
-        "If making a sandwich, you should be at the Zero Gate fly spot as if you just flew there.",
+//        "If making a sandwich, you should be at the Zero Gate fly spot as if you just flew there."
+        ,
         {
             {Mode::START_ON_PLATFORM,   "platform", "Start on platform."},
             {Mode::START_IN_ZERO_GATE,  "zerogate", "Start inside Zero Gate."},

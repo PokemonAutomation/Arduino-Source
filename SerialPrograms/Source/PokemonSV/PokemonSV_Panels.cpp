@@ -77,7 +77,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<GimmighoulChestFarmer_Descriptor, GimmighoulChestFarmer>());
     ret.emplace_back(make_single_switch_program<AuctionFarmer_Descriptor, AuctionFarmer>());
     ret.emplace_back(make_single_switch_program<ESPTraining_Descriptor, ESPTraining>());
-    if (PreloadSettings::instance().DEVELOPER_MODE) {
+    if (IS_BETA_VERSION) {
         ret.emplace_back(make_single_switch_program<TournamentFarmer_Descriptor, TournamentFarmer>());
     }
 

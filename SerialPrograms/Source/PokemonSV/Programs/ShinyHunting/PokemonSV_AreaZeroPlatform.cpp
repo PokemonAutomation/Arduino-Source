@@ -57,7 +57,7 @@ NavigatePlatformSettings::NavigatePlatformSettings()
     )
     , STATION_ARRIVE_PAUSE_SECONDS(
         "<b>Station Arrive Pause Time:</b><br>Pause for this many seconds after leaving the station. "
-        "This allows stuff to load to reduce the chance of lag affecting the fly to platform.",
+        "This gives the game time to load and thus reduce the chance of lag affecting the flight path.",
         LockWhileRunning::UNLOCKED,
         1
     )
