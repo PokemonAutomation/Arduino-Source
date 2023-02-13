@@ -32,6 +32,7 @@
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
 //#include "PokemonSV/Programs/PokemonSV_Navigation.h"
+#include "PokemonSV_LetsGoTools.h"
 #include "PokemonSV_ShinyHunt-AreaZeroPlatform.h"
 
 #include <iostream>
@@ -152,76 +153,19 @@ ShinyHuntAreaZeroPlatform::ShinyHuntAreaZeroPlatform()
 
 
 
-bool ShinyHuntAreaZeroPlatform::clear_in_front(
-    BotBaseContext& context,
-    bool throw_ball_if_bubble,
-    std::function<void(BotBaseContext& context)>&& command
-){
-//    ShinyHuntAreaZeroPlatform_Descriptor::Stats& stats = env.current_stats<ShinyHuntAreaZeroPlatform_Descriptor::Stats>();
-    ConsoleHandle& console = m_env->console;
-
-//    static int calls = 0;
-    console.log("Clearing what's in front with Let's Go...");
-//    cout << calls++ << endl;
-
-    SweatBubbleWatcher bubble(COLOR_GREEN);
-    int ret = run_until(
-        console, context,
-        [](BotBaseContext& context){
-            pbf_press_button(context, BUTTON_R, 20, 200);
-        },
-        {bubble}
-    );
-//    cout << "asdf" << endl;
-    if (ret == 0){
-        if (throw_ball_if_bubble){
-            console.log("Detected sweat bubble. Throwing ball...");
-            pbf_mash_button(context, BUTTON_ZR, 5 * TICKS_PER_SECOND);
-        }else{
-            console.log("Detected sweat bubble. Will not throw ball.");
-        }
-    }else{
-        console.log("Did not detect sweat bubble.");
-    }
-
-    WallClock last_kill = m_kill_watcher->last_kill();
-    context.wait_for_all_requests();
-    std::chrono::seconds timeout(6);
-    while (true){
-        if (command){
-//            cout << "running command..." << endl;
-            command(context);
-            context.wait_for_all_requests();
-            command = nullptr;
-        }else{
-//            cout << "Waiting out... " << timeout.count() << " seconds" << endl;
-            context.wait_until(last_kill + timeout);
-        }
-//        timeout = std::chrono::seconds(3);
-        if (last_kill == m_kill_watcher->last_kill()){
-//            cout << "no kill" << endl;
-            break;
-        }
-//        cout << "found kill" << endl;
-        last_kill = m_kill_watcher->last_kill();
-    }
-    console.log("Nothing left to clear...");
-    return m_kill_watcher->last_kill() != WallClock::min();
-}
-
 void ShinyHuntAreaZeroPlatform::run_path0(BotBaseContext& context){
     ConsoleHandle& console = m_env->console;
 
     //  Go back to the wall.
     console.log("Go back to wall...");
-    clear_in_front(context, false, [&](BotBaseContext& context){
+    clear_in_front(console, context, *m_kill_watcher, false, [&](BotBaseContext& context){
         find_and_center_on_sky(*m_env, console, context);
         pbf_move_right_joystick(context, 128, 255, 80, 0);
         pbf_move_left_joystick(context, 176, 255, 30, 0);
         pbf_press_button(context, BUTTON_L, 20, 50);
     });
 
-    clear_in_front(context, false, [&](BotBaseContext& context){
+    clear_in_front(console, context, *m_kill_watcher, false, [&](BotBaseContext& context){
         //  Move to wall.
         pbf_move_left_joystick(context, 128, 0, 4 * TICKS_PER_SECOND, 0);
 
@@ -234,7 +178,7 @@ void ShinyHuntAreaZeroPlatform::run_path0(BotBaseContext& context){
     //  Move forward and kill everything in your path.
     console.log("Moving towards sky and killing everything...");
     uint16_t duration = 325;
-    clear_in_front(context, true, [&](BotBaseContext& context){
+    clear_in_front(console, context, *m_kill_watcher, true, [&](BotBaseContext& context){
         find_and_center_on_sky(*m_env, console, context);
         pbf_move_right_joystick(context, 128, 255, 70, 0);
 
@@ -258,7 +202,7 @@ void ShinyHuntAreaZeroPlatform::run_path0(BotBaseContext& context){
         ssf_press_button(context, BUTTON_L, 0, 20);
         pbf_move_left_joystick(context, x, 0, duration, 0);
     });
-    clear_in_front(context, true, [&](BotBaseContext& context){
+    clear_in_front(console, context, *m_kill_watcher, true, [&](BotBaseContext& context){
         pbf_move_left_joystick(context, 128, 255, duration, 4 * TICKS_PER_SECOND);
     });
 }
@@ -268,7 +212,7 @@ void ShinyHuntAreaZeroPlatform::run_path1(BotBaseContext& context){
     //  Go back to the wall.
     console.log("Go back to wall...");
     pbf_press_button(context, BUTTON_L, 20, 105);
-    clear_in_front(context, true, [&](BotBaseContext& context){
+    clear_in_front(console, context, *m_kill_watcher, true, [&](BotBaseContext& context){
         find_and_center_on_sky(*m_env, console, context);
         pbf_move_right_joystick(context, 128, 255, 80, 0);
         pbf_move_left_joystick(context, 192, 255, 60, 0);
@@ -277,7 +221,7 @@ void ShinyHuntAreaZeroPlatform::run_path1(BotBaseContext& context){
     //  Clear path to the wall.
     console.log("Clear path to the wall...");
     pbf_press_button(context, BUTTON_L, 20, 50);
-    clear_in_front(context, false, [&](BotBaseContext& context){
+    clear_in_front(console, context, *m_kill_watcher, false, [&](BotBaseContext& context){
         pbf_move_left_joystick(context, 128, 0, 5 * TICKS_PER_SECOND, 0);
 
         //  Turn right.
@@ -288,7 +232,7 @@ void ShinyHuntAreaZeroPlatform::run_path1(BotBaseContext& context){
     //  Clear the wall.
     console.log("Clear the wall...");
     uint16_t duration = 325;
-    clear_in_front(context, true, [&](BotBaseContext& context){
+    clear_in_front(console, context, *m_kill_watcher, true, [&](BotBaseContext& context){
         pbf_move_left_joystick(context, 255, 128, 125, 0);
         pbf_press_button(context, BUTTON_L, 20, 50);
         context.wait_for_all_requests();
@@ -320,7 +264,7 @@ void ShinyHuntAreaZeroPlatform::run_path1(BotBaseContext& context){
     });
 
     console.log("Run backwards and wait...");
-    clear_in_front(context, true, [&](BotBaseContext& context){
+    clear_in_front(console, context, *m_kill_watcher, true, [&](BotBaseContext& context){
 //        pbf_move_left_joystick(context, 64, 0, 125, 0);
 //        pbf_press_button(context, BUTTON_L, 20, 105);
         pbf_move_left_joystick(context, 128, 255, duration, 4 * TICKS_PER_SECOND);
@@ -379,7 +323,7 @@ void ShinyHuntAreaZeroPlatform::run_path2(BotBaseContext& context){
     double platform_x, platform_y;
     uint16_t duration;
     uint8_t move_x, move_y;
-    clear_in_front(context, true, [&](BotBaseContext& context){
+    clear_in_front(console, context, *m_kill_watcher, true, [&](BotBaseContext& context){
 
         console.log("Find the sky, turn around and fire.");
         pbf_move_right_joystick(context, 128, 0, 60, 0);
@@ -404,7 +348,7 @@ void ShinyHuntAreaZeroPlatform::run_path2(BotBaseContext& context){
         pbf_mash_button(context, BUTTON_L, 60);
 //        pbf_wait(context, 1250);
     });
-    clear_in_front(context, duration > 100, [&](BotBaseContext& context){
+    clear_in_front(console, context, *m_kill_watcher, duration > 100, [&](BotBaseContext& context){
         console.log("Making location correction...");
         pbf_move_left_joystick(context, 128, 0, duration, 0);
 
@@ -424,7 +368,7 @@ void ShinyHuntAreaZeroPlatform::run_path2(BotBaseContext& context){
         console.log("Turning along wall...");
         pbf_move_left_joystick(context, 0, 255, 20, 20);
         pbf_mash_button(context, BUTTON_L, 60);
-        clear_in_front(context, true, [&](BotBaseContext& context){
+        clear_in_front(console, context, *m_kill_watcher, true, [&](BotBaseContext& context){
             context.wait_for(std::chrono::milliseconds(1000));
 
             console.log("Turning back to sky.");
@@ -441,7 +385,7 @@ void ShinyHuntAreaZeroPlatform::run_path2(BotBaseContext& context){
         return;
     }
 
-    clear_in_front(context, true, [&](BotBaseContext& context){
+    clear_in_front(console, context, *m_kill_watcher, true, [&](BotBaseContext& context){
         console.log("Move forward, fire, and retreat.");
         switch (m_iterations % 3){
         case 0:
@@ -454,9 +398,9 @@ void ShinyHuntAreaZeroPlatform::run_path2(BotBaseContext& context){
             pbf_move_left_joystick(context, 144, 0, 275, 0);
             break;
         }
-
     });
-    clear_in_front(context, true, [&](BotBaseContext& context){
+
+    clear_in_front(console, context, *m_kill_watcher, true, [&](BotBaseContext& context){
         pbf_move_left_joystick(context, 128, 255, 4 * TICKS_PER_SECOND, 0);
         pbf_move_left_joystick(context, 128, 0, 60, 4 * TICKS_PER_SECOND);
     });
@@ -512,7 +456,7 @@ void ShinyHuntAreaZeroPlatform::run_state(BotBaseContext& context){
     ShinyHuntAreaZeroPlatform_Descriptor::Stats& stats = m_env->current_stats<ShinyHuntAreaZeroPlatform_Descriptor::Stats>();
     const ProgramInfo& info = m_env->program_info();
     ConsoleHandle& console = m_env->console;
-    WallClock now = current_time();
+//    WallClock now = current_time();
 
     send_program_status_notification(*m_env, NOTIFICATION_STATUS_UPDATE);
 
@@ -520,12 +464,40 @@ void ShinyHuntAreaZeroPlatform::run_state(BotBaseContext& context){
     try{
         switch (m_state){
         case State::TRAVERSAL:{
-            console.log("Run Traversal Iteration: " + tostr_u_commas(m_iterations));
+            size_t kills, encounters;
+            std::chrono::minutes window(PLATFORM_RESET.WINDOW_IN_MINUTES);
+            bool enough_time = m_encounter_rate_tracker->get_encounters_in_window(
+                kills, encounters, window
+            );
+            console.log(
+                "Starting Traversal Iteration: " + tostr_u_commas(m_iterations) +
+                "\n    Time Window (Minutes): " + std::to_string(window.count()) +
+                "\n    Kills: " + std::to_string(kills) +
+                "\n    Encounters: " + std::to_string(encounters)
+            );
 
-            if (PLATFORM_RESET.enabled() && now - m_last_platform_reset > std::chrono::minutes(PLATFORM_RESET.RESET_DURATION_MINUTES)){
+            do{
+                if (!PLATFORM_RESET.enabled()){
+                    console.log("Platform Reset: Disabled", COLOR_ORANGE);
+                    break;
+                }
+                if (!enough_time){
+                    console.log("Platform Reset: Not enough time has elapsed.", COLOR_ORANGE);
+                    break;
+                }
+                if (kills >= PLATFORM_RESET.KILLS_IN_WINDOW){
+                    console.log("Platform Reset: Enough kills in window.", COLOR_ORANGE);
+                    break;
+                }
+                if (encounters >= PLATFORM_RESET.ENCOUNTERS_IN_WINDOW){
+                    console.log("Platform Reset: Enough encounters in window.", COLOR_ORANGE);
+                    break;
+                }
+
+                console.log("Conditions met for platform reset.");
                 m_state = State::LEAVE_AND_RETURN;
                 return;
-            }
+            }while (false);
 
             //  If we error out, recover using LEAVE_AND_RETURN.
             recovery_state = State::LEAVE_AND_RETURN;
@@ -541,12 +513,14 @@ void ShinyHuntAreaZeroPlatform::run_state(BotBaseContext& context){
             recovery_state = State::LEAVE_AND_RETURN;
 
             inside_zero_gate_to_platform(info, console, context, NAVIGATE_TO_PLATFORM);
-            m_last_platform_reset = now;
+            m_encounter_rate_tracker->report_start();
+//            m_last_platform_reset = now;
 
             break;
 
         case State::LEAVE_AND_RETURN:
             console.log("Leaving and returning to platform...");
+            stats.m_platform_resets++;
 
             //  If we error out, return to this state.
             recovery_state = State::LEAVE_AND_RETURN;
@@ -554,26 +528,28 @@ void ShinyHuntAreaZeroPlatform::run_state(BotBaseContext& context){
             return_to_inside_zero_gate(info, console, context);
             inside_zero_gate_to_platform(info, console, context, NAVIGATE_TO_PLATFORM);
 
-            m_last_platform_reset = now;
-            stats.m_platform_resets++;
+            m_encounter_rate_tracker->report_start();
+//            m_last_platform_reset = now;
             m_env->update_stats();
 
             break;
 
         case State::RESET_AND_RETURN:
             console.log("Resetting game and returning to platform...");
+            stats.m_game_resets++;
 
             //  If we error out, return to this state.
             recovery_state = State::RESET_AND_RETURN;
 
-            m_last_platform_reset = current_time();
+            m_encounter_rate_tracker->report_start();
+//            m_last_platform_reset = current_time();
             pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
             reset_game_from_home(info, console, context, 5 * TICKS_PER_SECOND);
             pbf_press_button(context, BUTTON_RCLICK, 20, 105);
             inside_zero_gate_to_platform(info, console, context, NAVIGATE_TO_PLATFORM);
 
-            m_last_platform_reset = now;
-            stats.m_game_resets++;
+            m_encounter_rate_tracker->report_start();
+//            m_last_platform_reset = now;
             m_env->update_stats();
 
             break;
@@ -606,10 +582,14 @@ void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, Bot
 
     m_iterations = 0;
 
+    EncounterRateTracker encounter_rate_tracker;
+    m_encounter_rate_tracker = &encounter_rate_tracker;
+
     LetsGoKillSoundDetector lets_go_kill_sound(
         env.console,
         [&](float){
             env.console.log("Detected kill.");
+            encounter_rate_tracker.report_kill();
             stats.m_kills++;
             env.update_stats();
             return false;
@@ -632,7 +612,7 @@ void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, Bot
         throw UserSetupError(env.logger(), "Sandwich mode has not been implemented yet.");
     }
 
-    m_last_platform_reset = current_time();
+//    m_last_platform_reset = current_time();
     m_consecutive_failures = 0;
     while (true){
         env.console.log("Starting encounter loop...", COLOR_PURPLE);
@@ -652,6 +632,7 @@ void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, Bot
         encounter_watcher.throw_if_no_sound();
 
         env.console.log("Detected battle.", COLOR_PURPLE);
+        encounter_rate_tracker.report_encounter();
         stats.m_encounters++;
         m_env->update_stats();
 

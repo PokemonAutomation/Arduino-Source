@@ -22,6 +22,7 @@ namespace PokemonSV{
 
 class EncounterWatcher;
 class LetsGoKillSoundDetector;
+class EncounterRateTracker;
 
 
 
@@ -53,16 +54,10 @@ private:
     void on_shiny_encounter(BotBaseContext& context, EncounterWatcher& encounter_watcher);
 
     void run_traversal(BotBaseContext& context);
-    bool clear_in_front(
-        BotBaseContext& context,
-        bool throw_ball_if_bubble,
-        std::function<void(BotBaseContext& context)>&& command
-    );
 
     void run_path0(BotBaseContext& context);
     void run_path1(BotBaseContext& context);
     void run_path2(BotBaseContext& context);
-
 
 
 private:
@@ -91,10 +86,12 @@ private:
     EventNotificationsOption NOTIFICATIONS;
 
     SingleSwitchProgramEnvironment* m_env;
+    EncounterRateTracker* m_encounter_rate_tracker;
     LetsGoKillSoundDetector* m_kill_watcher;
+
     uint64_t m_iterations = 0;
     State m_state;
-    WallClock m_last_platform_reset;
+//    WallClock m_last_platform_reset;
     size_t m_consecutive_failures;
 };
 

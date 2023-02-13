@@ -24,6 +24,11 @@ using namespace Pokemon;
 
 
 
+PlatformResetSettings::~PlatformResetSettings(){
+    ENCOUNTERS_IN_WINDOW.remove_listener(*this);
+    KILLS_IN_WINDOW.remove_listener(*this);
+    WINDOW_IN_MINUTES.remove_listener(*this);
+}
 PlatformResetSettings::PlatformResetSettings()
     : GroupOption("Platform Reset Conditions", LockWhileRunning::UNLOCKED, true, false)
     , m_description(
@@ -36,17 +41,62 @@ PlatformResetSettings::PlatformResetSettings()
         "Resetting the spawns will fix this, at the cost of also despawning any "
         "shinies that have not yet been encountered."
     )
+    , m_sliding_window("")
+    , WINDOW_IN_MINUTES(
+        "<b>Time Window (in minutes):</b><br>The sliding time window for which to watch for kills and encounters.",
+        LockWhileRunning::UNLOCKED,
+        3
+    )
+    , KILLS_IN_WINDOW(
+        "<b>Kills in Window:</b><br>If the number of kills in the last X seconds has drops below this value, consider resetting.",
+        LockWhileRunning::UNLOCKED,
+        3
+    )
+    , ENCOUNTERS_IN_WINDOW(
+        "<b>Encounters in Window:</b><br>If the number of encounters in the last X seconds has drops below this value, consider resetting.",
+        LockWhileRunning::UNLOCKED,
+        1
+    )
+#if 0
     , RESET_DURATION_MINUTES(
         "<b>Reset Duration (minutes):</b><br>If you are resetting, reset the game every "
         "this many minutes.",
         LockWhileRunning::UNLOCKED,
         180
     )
+#endif
 {
     PA_ADD_STATIC(m_description);
-    PA_ADD_STATIC(RESET_DURATION_MINUTES);
+
+    PA_ADD_STATIC(m_sliding_window);
+    PA_ADD_OPTION(WINDOW_IN_MINUTES);
+    PA_ADD_OPTION(KILLS_IN_WINDOW);
+    PA_ADD_OPTION(ENCOUNTERS_IN_WINDOW);
+
+//    PA_ADD_OPTION(RESET_DURATION_MINUTES);
+
+    PlatformResetSettings::value_changed();
+
+    WINDOW_IN_MINUTES.add_listener(*this);
+    KILLS_IN_WINDOW.add_listener(*this);
+    ENCOUNTERS_IN_WINDOW.add_listener(*this);
 }
 
+std::string int_to_text(size_t value, const std::string& unit){
+    std::string str = "<b><em>" + std::to_string(value) + "</em></b> ";
+    str += unit;
+    if (value != 1){
+        str += "s";
+    }
+    return str;
+}
+void PlatformResetSettings::value_changed(){
+    m_sliding_window.set_text(
+        "<font color=\"red\">Perform a platform reset if there are fewer than " + int_to_text(KILLS_IN_WINDOW, "kill") +
+        " and " + int_to_text(ENCOUNTERS_IN_WINDOW, "encounter") +
+        " in the last " + int_to_text(WINDOW_IN_MINUTES, "second") + ".</font>"
+    );
+}
 
 
 NavigatePlatformSettings::NavigatePlatformSettings()

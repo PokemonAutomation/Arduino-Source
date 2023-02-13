@@ -21,14 +21,21 @@ namespace PokemonSV{
 
 
 
-
-class PlatformResetSettings : public GroupOption{
+class PlatformResetSettings : public GroupOption, private ConfigOption::Listener{
 public:
+    ~PlatformResetSettings();
     PlatformResetSettings();
+
+private:
+    virtual void value_changed() override;
 
 public:
     StaticTextOption m_description;
-    SimpleIntegerOption<uint16_t> RESET_DURATION_MINUTES;
+    StaticTextOption m_sliding_window;
+    SimpleIntegerOption<uint16_t> WINDOW_IN_MINUTES;
+    SimpleIntegerOption<uint16_t> KILLS_IN_WINDOW;
+    SimpleIntegerOption<uint16_t> ENCOUNTERS_IN_WINDOW;
+//    SimpleIntegerOption<uint16_t> RESET_DURATION_MINUTES;
 };
 
 
@@ -55,6 +62,8 @@ bool read_platform_center(
     double& x, double& y,
     const ProgramInfo& info, ConsoleHandle& console
 );
+
+
 
 
 }
