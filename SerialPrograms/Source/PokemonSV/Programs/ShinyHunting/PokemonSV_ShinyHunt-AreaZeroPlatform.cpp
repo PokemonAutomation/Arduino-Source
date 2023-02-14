@@ -23,8 +23,7 @@
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Pokemon_Notification.h"
 #include "PokemonSV/PokemonSV_Settings.h"
-//#include "PokemonSV/Inference/PokemonSV_MapDetector.h"
-#include "PokemonSV/Inference/PokemonSV_SweatBubbleDetector.h"
+#include "PokemonSV/Inference/Boxes/PokemonSV_IVCheckerReader.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_AreaZeroSkyDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_LetsGoKillDetector.h"
@@ -58,31 +57,22 @@ ShinyHuntAreaZeroPlatform_Descriptor::ShinyHuntAreaZeroPlatform_Descriptor()
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
-struct ShinyHuntAreaZeroPlatform_Descriptor::Stats : public StatsTracker{
+struct ShinyHuntAreaZeroPlatform_Descriptor::Stats : public LetsGoEncounterBotStats{
     Stats()
-        : m_kills(m_stats["Kills"])
-        , m_encounters(m_stats["Encounters"])
-        , m_sandwiches(m_stats["Sandwiches"])
+        : m_sandwiches(m_stats["Sandwiches"])
         , m_platform_resets(m_stats["Platform Resets"])
         , m_game_resets(m_stats["Game Resets"])
         , m_errors(m_stats["Errors"])
-        , m_shinies(m_stats["Shinies"])
     {
-        m_display_order.emplace_back("Kills");
-        m_display_order.emplace_back("Encounters");
-        m_display_order.emplace_back("Sandwiches", true);
-        m_display_order.emplace_back("Platform Resets", true);
-        m_display_order.emplace_back("Game Resets", true);
-        m_display_order.emplace_back("Errors", true);
-        m_display_order.emplace_back("Shinies");
+        m_display_order.insert(m_display_order.begin() + 2, {"Sandwiches", true});
+        m_display_order.insert(m_display_order.begin() + 3, {"Platform Resets", true});
+        m_display_order.insert(m_display_order.begin() + 4, {"Game Resets", true});
+        m_display_order.insert(m_display_order.begin() + 5, {"Errors", true});
     }
-    std::atomic<uint64_t>& m_kills;
-    std::atomic<uint64_t>& m_encounters;
     std::atomic<uint64_t>& m_sandwiches;
     std::atomic<uint64_t>& m_platform_resets;
     std::atomic<uint64_t>& m_game_resets;
     std::atomic<uint64_t>& m_errors;
-    std::atomic<uint64_t>& m_shinies;
 };
 std::unique_ptr<StatsTracker> ShinyHuntAreaZeroPlatform_Descriptor::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
@@ -92,7 +82,13 @@ std::unique_ptr<StatsTracker> ShinyHuntAreaZeroPlatform_Descriptor::make_stats()
 
 
 ShinyHuntAreaZeroPlatform::ShinyHuntAreaZeroPlatform()
-    : MODE(
+    : LANGUAGE(
+        "<b>Game Language:</b><br>Required to read " + STRING_POKEMON + " names.",
+        IV_READER().languages(),
+        LockWhileRunning::LOCKED,
+        false
+    )
+    , MODE(
         "<b>Mode:</b><br>"
         "If starting on the platform, you should stand near the center of the platform facing any direction.<br>"
         "If starting in the Zero Gate, you should be just inside the building as if you just entered.<br>"
@@ -123,6 +119,12 @@ ShinyHuntAreaZeroPlatform::ShinyHuntAreaZeroPlatform()
     )
     , GO_HOME_WHEN_DONE(true)
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
+    , NOTIFICATION_NONSHINY(
+        "Non-Shiny Encounter",
+        false, false,
+        {"Notifs"},
+        std::chrono::seconds(3600)
+    )
     , NOTIFICATION_SHINY(
         "Shiny Encounter",
         true, true, ImageAttachmentMode::JPG,
@@ -130,12 +132,14 @@ ShinyHuntAreaZeroPlatform::ShinyHuntAreaZeroPlatform()
     )
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS_UPDATE,
+        &NOTIFICATION_NONSHINY,
         &NOTIFICATION_SHINY,
         &NOTIFICATION_PROGRAM_FINISH,
         &NOTIFICATION_ERROR_RECOVERABLE,
         &NOTIFICATION_ERROR_FATAL,
     })
 {
+    PA_ADD_OPTION(LANGUAGE);
     if (PreloadSettings::instance().DEVELOPER_MODE){
         PA_ADD_OPTION(MODE);
         PA_ADD_OPTION(PATH0);
@@ -158,14 +162,14 @@ void ShinyHuntAreaZeroPlatform::run_path0(BotBaseContext& context){
 
     //  Go back to the wall.
     console.log("Go back to wall...");
-    clear_in_front(console, context, *m_kill_watcher, false, [&](BotBaseContext& context){
+    clear_in_front(console, context, *m_tracker, false, [&](BotBaseContext& context){
         find_and_center_on_sky(*m_env, console, context);
         pbf_move_right_joystick(context, 128, 255, 80, 0);
         pbf_move_left_joystick(context, 176, 255, 30, 0);
         pbf_press_button(context, BUTTON_L, 20, 50);
     });
 
-    clear_in_front(console, context, *m_kill_watcher, false, [&](BotBaseContext& context){
+    clear_in_front(console, context, *m_tracker, false, [&](BotBaseContext& context){
         //  Move to wall.
         pbf_move_left_joystick(context, 128, 0, 4 * TICKS_PER_SECOND, 0);
 
@@ -178,7 +182,7 @@ void ShinyHuntAreaZeroPlatform::run_path0(BotBaseContext& context){
     //  Move forward and kill everything in your path.
     console.log("Moving towards sky and killing everything...");
     uint16_t duration = 325;
-    clear_in_front(console, context, *m_kill_watcher, true, [&](BotBaseContext& context){
+    clear_in_front(console, context, *m_tracker, true, [&](BotBaseContext& context){
         find_and_center_on_sky(*m_env, console, context);
         pbf_move_right_joystick(context, 128, 255, 70, 0);
 
@@ -202,7 +206,7 @@ void ShinyHuntAreaZeroPlatform::run_path0(BotBaseContext& context){
         ssf_press_button(context, BUTTON_L, 0, 20);
         pbf_move_left_joystick(context, x, 0, duration, 0);
     });
-    clear_in_front(console, context, *m_kill_watcher, true, [&](BotBaseContext& context){
+    clear_in_front(console, context, *m_tracker, true, [&](BotBaseContext& context){
         pbf_move_left_joystick(context, 128, 255, duration, 4 * TICKS_PER_SECOND);
     });
 }
@@ -212,7 +216,7 @@ void ShinyHuntAreaZeroPlatform::run_path1(BotBaseContext& context){
     //  Go back to the wall.
     console.log("Go back to wall...");
     pbf_press_button(context, BUTTON_L, 20, 105);
-    clear_in_front(console, context, *m_kill_watcher, true, [&](BotBaseContext& context){
+    clear_in_front(console, context, *m_tracker, true, [&](BotBaseContext& context){
         find_and_center_on_sky(*m_env, console, context);
         pbf_move_right_joystick(context, 128, 255, 80, 0);
         pbf_move_left_joystick(context, 192, 255, 60, 0);
@@ -221,7 +225,7 @@ void ShinyHuntAreaZeroPlatform::run_path1(BotBaseContext& context){
     //  Clear path to the wall.
     console.log("Clear path to the wall...");
     pbf_press_button(context, BUTTON_L, 20, 50);
-    clear_in_front(console, context, *m_kill_watcher, false, [&](BotBaseContext& context){
+    clear_in_front(console, context, *m_tracker, false, [&](BotBaseContext& context){
         pbf_move_left_joystick(context, 128, 0, 5 * TICKS_PER_SECOND, 0);
 
         //  Turn right.
@@ -232,7 +236,7 @@ void ShinyHuntAreaZeroPlatform::run_path1(BotBaseContext& context){
     //  Clear the wall.
     console.log("Clear the wall...");
     uint16_t duration = 325;
-    clear_in_front(console, context, *m_kill_watcher, true, [&](BotBaseContext& context){
+    clear_in_front(console, context, *m_tracker, true, [&](BotBaseContext& context){
         pbf_move_left_joystick(context, 255, 128, 125, 0);
         pbf_press_button(context, BUTTON_L, 20, 50);
         context.wait_for_all_requests();
@@ -264,7 +268,7 @@ void ShinyHuntAreaZeroPlatform::run_path1(BotBaseContext& context){
     });
 
     console.log("Run backwards and wait...");
-    clear_in_front(console, context, *m_kill_watcher, true, [&](BotBaseContext& context){
+    clear_in_front(console, context, *m_tracker, true, [&](BotBaseContext& context){
 //        pbf_move_left_joystick(context, 64, 0, 125, 0);
 //        pbf_press_button(context, BUTTON_L, 20, 105);
         pbf_move_left_joystick(context, 128, 255, duration, 4 * TICKS_PER_SECOND);
@@ -323,7 +327,7 @@ void ShinyHuntAreaZeroPlatform::run_path2(BotBaseContext& context){
     double platform_x, platform_y;
     uint16_t duration;
     uint8_t move_x, move_y;
-    clear_in_front(console, context, *m_kill_watcher, true, [&](BotBaseContext& context){
+    clear_in_front(console, context, *m_tracker, true, [&](BotBaseContext& context){
 
         console.log("Find the sky, turn around and fire.");
         pbf_move_right_joystick(context, 128, 0, 60, 0);
@@ -348,7 +352,7 @@ void ShinyHuntAreaZeroPlatform::run_path2(BotBaseContext& context){
         pbf_mash_button(context, BUTTON_L, 60);
 //        pbf_wait(context, 1250);
     });
-    clear_in_front(console, context, *m_kill_watcher, duration > 100, [&](BotBaseContext& context){
+    clear_in_front(console, context, *m_tracker, duration > 100, [&](BotBaseContext& context){
         console.log("Making location correction...");
         pbf_move_left_joystick(context, 128, 0, duration, 0);
 
@@ -368,7 +372,7 @@ void ShinyHuntAreaZeroPlatform::run_path2(BotBaseContext& context){
         console.log("Turning along wall...");
         pbf_move_left_joystick(context, 0, 255, 20, 20);
         pbf_mash_button(context, BUTTON_L, 60);
-        clear_in_front(console, context, *m_kill_watcher, true, [&](BotBaseContext& context){
+        clear_in_front(console, context, *m_tracker, true, [&](BotBaseContext& context){
             context.wait_for(std::chrono::milliseconds(1000));
 
             console.log("Turning back to sky.");
@@ -385,7 +389,7 @@ void ShinyHuntAreaZeroPlatform::run_path2(BotBaseContext& context){
         return;
     }
 
-    clear_in_front(console, context, *m_kill_watcher, true, [&](BotBaseContext& context){
+    clear_in_front(console, context, *m_tracker, true, [&](BotBaseContext& context){
         console.log("Move forward, fire, and retreat.");
         switch (m_iterations % 3){
         case 0:
@@ -400,7 +404,7 @@ void ShinyHuntAreaZeroPlatform::run_path2(BotBaseContext& context){
         }
     });
 
-    clear_in_front(console, context, *m_kill_watcher, true, [&](BotBaseContext& context){
+    clear_in_front(console, context, *m_tracker, true, [&](BotBaseContext& context){
         pbf_move_left_joystick(context, 128, 255, 4 * TICKS_PER_SECOND, 0);
         pbf_move_left_joystick(context, 128, 0, 60, 4 * TICKS_PER_SECOND);
     });
@@ -423,34 +427,6 @@ void ShinyHuntAreaZeroPlatform::run_traversal(BotBaseContext& context){
 }
 
 
-void ShinyHuntAreaZeroPlatform::on_shiny_encounter(
-    BotBaseContext& context, EncounterWatcher& encounter_watcher
-){
-    ShinyHuntAreaZeroPlatform_Descriptor::Stats& stats = m_env->current_stats<ShinyHuntAreaZeroPlatform_Descriptor::Stats>();
-
-    stats.m_shinies++;
-    m_env->update_stats();
-
-    if (VIDEO_ON_SHINY){
-        context.wait_for(std::chrono::seconds(3));
-        pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 0);
-    }
-
-    std::vector<std::pair<std::string, std::string>> embeds;
-    embeds.emplace_back(
-        "Detection Method:",
-        "Shiny Sound (Error Coefficient = " + tostr_default(encounter_watcher.lowest_error_coefficient()) + ")"
-    );
-    send_program_notification(
-        *m_env, NOTIFICATION_SHINY,
-        COLOR_STAR_SHINY,
-        "Found a Shiny!",
-        std::move(embeds), "",
-        encounter_watcher.shiny_screenshot(), true
-    );
-
-//    throw ProgramFinishedException();
-}
 
 void ShinyHuntAreaZeroPlatform::run_state(BotBaseContext& context){
     ShinyHuntAreaZeroPlatform_Descriptor::Stats& stats = m_env->current_stats<ShinyHuntAreaZeroPlatform_Descriptor::Stats>();
@@ -458,7 +434,12 @@ void ShinyHuntAreaZeroPlatform::run_state(BotBaseContext& context){
     ConsoleHandle& console = m_env->console;
 //    WallClock now = current_time();
 
-    send_program_status_notification(*m_env, NOTIFICATION_STATUS_UPDATE);
+    send_program_notification(
+        *m_env, NOTIFICATION_STATUS_UPDATE,
+        Color(0),
+        "Program Status",
+        {}, m_tracker->encounter_frequencies().dump_sorted_map("")
+    );
 
     State recovery_state = State::LEAVE_AND_RETURN;
     try{
@@ -466,7 +447,7 @@ void ShinyHuntAreaZeroPlatform::run_state(BotBaseContext& context){
         case State::TRAVERSAL:{
             size_t kills, encounters;
             std::chrono::minutes window(PLATFORM_RESET.WINDOW_IN_MINUTES);
-            bool enough_time = m_encounter_rate_tracker->get_encounters_in_window(
+            bool enough_time = m_tracker->get_encounters_in_window(
                 kills, encounters, window
             );
             console.log(
@@ -513,7 +494,7 @@ void ShinyHuntAreaZeroPlatform::run_state(BotBaseContext& context){
             recovery_state = State::LEAVE_AND_RETURN;
 
             inside_zero_gate_to_platform(info, console, context, NAVIGATE_TO_PLATFORM);
-            m_encounter_rate_tracker->report_start();
+            m_tracker->reset_rate_tracker_start_time();
 //            m_last_platform_reset = now;
 
             break;
@@ -528,7 +509,7 @@ void ShinyHuntAreaZeroPlatform::run_state(BotBaseContext& context){
             inside_zero_gate_to_platform(info, console, context, NAVIGATE_TO_PLATFORM);
 
             stats.m_platform_resets++;
-            m_encounter_rate_tracker->report_start();
+            m_tracker->reset_rate_tracker_start_time();
 //            m_last_platform_reset = now;
             m_env->update_stats();
 
@@ -540,7 +521,6 @@ void ShinyHuntAreaZeroPlatform::run_state(BotBaseContext& context){
             //  If we error out, return to this state.
             recovery_state = State::RESET_AND_RETURN;
 
-            m_encounter_rate_tracker->report_start();
 //            m_last_platform_reset = current_time();
             pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
             reset_game_from_home(info, console, context, 5 * TICKS_PER_SECOND);
@@ -548,7 +528,7 @@ void ShinyHuntAreaZeroPlatform::run_state(BotBaseContext& context){
             inside_zero_gate_to_platform(info, console, context, NAVIGATE_TO_PLATFORM);
 
             stats.m_game_resets++;
-            m_encounter_rate_tracker->report_start();
+            m_tracker->reset_rate_tracker_start_time();
 //            m_last_platform_reset = now;
             m_env->update_stats();
 
@@ -582,24 +562,15 @@ void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, Bot
 
     m_iterations = 0;
 
-    EncounterRateTracker encounter_rate_tracker;
-    m_encounter_rate_tracker = &encounter_rate_tracker;
-
-    LetsGoKillSoundDetector lets_go_kill_sound(
-        env.console,
-        [&](float){
-            env.console.log("Detected kill.");
-            encounter_rate_tracker.report_kill();
-            stats.m_kills++;
-            env.update_stats();
-            return false;
-        }
+    LetsGoEncounterBotTracker tracker(
+        env, env.console, context,
+        stats,
+        LANGUAGE,
+        VIDEO_ON_SHINY,
+        NOTIFICATION_NONSHINY,
+        NOTIFICATION_SHINY
     );
-    m_kill_watcher = &lets_go_kill_sound;
-    InferenceSession session(
-        context, env.console,
-        {lets_go_kill_sound}
-    );
+    m_tracker = &tracker;
 
     switch (MODE){
     case Mode::START_ON_PLATFORM:
@@ -632,12 +603,9 @@ void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, Bot
         encounter_watcher.throw_if_no_sound();
 
         env.console.log("Detected battle.", COLOR_PURPLE);
-        encounter_rate_tracker.report_encounter();
-        stats.m_encounters++;
-        m_env->update_stats();
+        tracker.process_battle(encounter_watcher);
 
         if (encounter_watcher.shiny_screenshot()){
-            on_shiny_encounter(context, encounter_watcher);
             break;
         }
 

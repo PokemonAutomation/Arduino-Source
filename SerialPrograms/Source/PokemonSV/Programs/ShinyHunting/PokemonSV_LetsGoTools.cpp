@@ -7,7 +7,9 @@
 #include <algorithm>
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
+#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "Pokemon/Pokemon_Notification.h"
 #include "PokemonSV/Inference/PokemonSV_SweatBubbleDetector.h"
 #include "PokemonSV_LetsGoTools.h"
 
@@ -18,7 +20,6 @@ using std::endl;
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
-
 
 
 EncounterRateTracker::EncounterRateTracker()
@@ -85,9 +86,76 @@ void EncounterRateTracker::report_encounter(){
 
 
 
+LetsGoEncounterBotTracker::LetsGoEncounterBotTracker(
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    LetsGoEncounterBotStats& stats,
+    OCR::LanguageOCROption& language,
+    BooleanCheckBoxOption& video_on_shiny,
+    EventNotificationOption& notification_nonshiny,
+    EventNotificationOption& notification_shiny
+)
+    : m_env(env)
+    , m_console(console)
+    , m_context(context)
+    , m_stats(stats)
+    , m_language(language)
+    , m_video_on_shiny(video_on_shiny)
+    , m_notification_nonshiny(notification_nonshiny)
+    , m_notification_shiny(notification_shiny)
+    , m_kill_sound(console, [&](float){
+        console.log("Detected kill.");
+        m_encounter_rate.report_kill();
+        stats.m_kills++;
+        env.update_stats();
+        return false;
+    })
+    , m_session(context, console, {m_kill_sound})
+{}
+void LetsGoEncounterBotTracker::process_battle(EncounterWatcher& watcher){
+    m_encounter_rate.report_encounter();
+    m_stats.m_encounters++;
+
+    Language language = m_language;
+
+    std::set<std::string> slugs;
+    if (language != Language::None){
+        slugs = read_singles_opponent(m_console, m_context, language);
+        m_encounter_frequencies += slugs;
+        m_env.log(m_encounter_frequencies.dump_sorted_map("Encounter Stats:\n"));
+    }
+
+    bool is_shiny = (bool)watcher.shiny_screenshot();
+    if (is_shiny){
+        m_stats.m_shinies++;
+        if (m_video_on_shiny){
+            m_context.wait_for(std::chrono::seconds(3));
+            pbf_press_button(m_context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 0);
+        }
+    }
+    m_env.update_stats();
+
+    send_encounter_notification(
+        m_env,
+        m_notification_nonshiny,
+        m_notification_shiny,
+        language != Language::None,
+        is_shiny,
+        {{slugs, is_shiny ? ShinyType::UNKNOWN_SHINY : ShinyType::NOT_SHINY}},
+        watcher.lowest_error_coefficient(),
+        watcher.shiny_screenshot(),
+        &m_encounter_frequencies
+    );
+}
+
+
+
+
+
+
+
 bool clear_in_front(
     ConsoleHandle& console, BotBaseContext& context,
-    LetsGoKillSoundDetector& kill_tracker,
+    LetsGoEncounterBotTracker& tracker,
     bool throw_ball_if_bubble,
     std::function<void(BotBaseContext& context)>&& command
 ){
@@ -117,7 +185,7 @@ bool clear_in_front(
         console.log("Did not detect sweat bubble.");
     }
 
-    WallClock last_kill = kill_tracker.last_kill();
+    WallClock last_kill = tracker.last_kill();
     context.wait_for_all_requests();
     std::chrono::seconds timeout(6);
     while (true){
@@ -131,16 +199,28 @@ bool clear_in_front(
             context.wait_until(last_kill + timeout);
         }
 //        timeout = std::chrono::seconds(3);
-        if (last_kill == kill_tracker.last_kill()){
+        if (last_kill == tracker.last_kill()){
 //            cout << "no kill" << endl;
             break;
         }
 //        cout << "found kill" << endl;
-        last_kill = kill_tracker.last_kill();
+        last_kill = tracker.last_kill();
     }
     console.log("Nothing left to clear...");
-    return kill_tracker.last_kill() != WallClock::min();
+    return tracker.last_kill() != WallClock::min();
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

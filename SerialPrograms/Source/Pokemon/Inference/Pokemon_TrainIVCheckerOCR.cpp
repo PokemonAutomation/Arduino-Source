@@ -53,7 +53,7 @@ void TrainIVCheckerOCR::program(ProgramEnvironment& env, CancellableScope& scope
     session.generate_small_dictionary(
         "Pokemon/IVCheckerOCR.json",
         "IVCheckerOCR.json",
-        MODE == TrainOCRMode::Incremental, THREADS,
+        MODE == TrainOCRMode::INCREMENTAL, THREADS,
         OCR::BLACK_TEXT_FILTERS(),
         IVCheckerReader::MAX_LOG10P,
         IVCheckerReader::MAX_LOG10P_SPREAD

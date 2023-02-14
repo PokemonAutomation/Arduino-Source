@@ -4,12 +4,13 @@
  *
  */
 
-#include "CommonFramework/Globals.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
+//#include "CommonFramework/Globals.h"
+//#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "Pokemon/Resources/Pokemon_PokemonNames.h"
+#include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Pokemon_Notification.h"
+#include "Pokemon/Resources/Pokemon_PokemonNames.h"
 #include "PokemonSwSh/Resources/PokemonSwSh_MaxLairDatabase.h"
 #include "PokemonSwSh_MaxLair_Notifications.h"
 

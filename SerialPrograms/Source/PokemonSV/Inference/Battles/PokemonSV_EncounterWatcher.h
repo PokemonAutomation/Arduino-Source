@@ -24,6 +24,8 @@ class EncounterWatcher : public VisualInferenceCallback, public AudioInferenceCa
 public:
     EncounterWatcher(ConsoleHandle& console, Color color = COLOR_RED);
 
+    const NormalBattleMenuDetector& battle_menu_detector() const{ return m_battle_menu; }
+
     const VideoSnapshot& shiny_screenshot() const{
         return m_best_snapshot;
     }

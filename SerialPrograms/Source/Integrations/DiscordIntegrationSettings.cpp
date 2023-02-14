@@ -96,10 +96,8 @@ DiscordIntegrationSettingsOption::DiscordIntegrationSettingsOption()
     )
 {
     PA_ADD_OPTION(run_on_start);
-    if (IS_BETA_VERSION || PreloadSettings::instance().DEVELOPER_MODE){
-        PA_ADD_OPTION(library);
-        PA_ADD_OPTION(command_type);
-    }
+    PA_ADD_OPTION(library);
+    PA_ADD_OPTION(command_type);
     PA_ADD_OPTION(token);
     PA_ADD_OPTION(command_prefix);
     PA_ADD_OPTION(use_suffix);

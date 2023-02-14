@@ -12,8 +12,9 @@
 namespace PokemonAutomation{
 
 enum class TrainOCRMode{
-    StartFresh,
-    Incremental,
+    GENERATE_BASELINE,
+    START_FRESH,
+    INCREMENTAL,
 };
 
 class TrainOCRModeOption : public EnumDropdownOption<TrainOCRMode>{
@@ -22,11 +23,12 @@ public:
         : EnumDropdownOption<TrainOCRMode>(
             "<b>Mode:</b>",
             {
-                {TrainOCRMode::StartFresh, "start-fresh", "Start Fresh: Use only baseline strings. (1st candidate of each entry in above path)"},
-                {TrainOCRMode::Incremental, "incremental", "Incremental: Build off of the existing training data in the above path."},
+                {TrainOCRMode::GENERATE_BASELINE,   "baseline",     "Generate Baseline: Generate baseline data using display names."},
+                {TrainOCRMode::START_FRESH,         "start-fresh",  "Start Fresh: Use only baseline strings. (1st candidate of each entry in above path)"},
+                {TrainOCRMode::INCREMENTAL,         "incremental",  "Incremental: Build off of the existing training data in the above path."},
             },
             LockWhileRunning::LOCKED,
-            TrainOCRMode::StartFresh
+            TrainOCRMode::GENERATE_BASELINE
         )
     {}
 };

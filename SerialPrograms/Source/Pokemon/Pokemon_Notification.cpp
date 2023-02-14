@@ -8,6 +8,7 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
+#include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Resources/Pokemon_PokeballNames.h"
 #include "Pokemon/Resources/Pokemon_PokemonNames.h"
 #include "Pokemon_Notification.h"

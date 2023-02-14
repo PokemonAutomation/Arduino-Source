@@ -106,6 +106,8 @@
 #include "CommonFramework/Environment/Environment.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_LetsGoKillDetector.h"
 #include "PokemonSV/Inference/PokemonSV_SweatBubbleDetector.h"
+#include "Pokemon/Resources/Pokemon_PokemonSlugs.h"
+#include "Pokemon/Resources/Pokemon_PokemonNames.h"
 
 #ifdef PA_ARCH_x86
 //#include "Kernels/Kernels_x64_SSE41.h"
@@ -198,6 +200,36 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 //    send_program_telemetry(env.logger(), true, COLOR_RED, env.program_info(), "Test", {}, "");
 
 //    throw ProgramFinishedException(env.logger(), "", std::make_shared<ImageRGB32>("TeraCode-S-chi-original.png"));
+
+
+//    load_pokemon_slug_json_list();
+
+    OCR::StringMatchResult result = PokemonNameReader::instance().read_substring(
+        env.logger(), Language::Korean,
+        ImageRGB32("../../TrainingData/PokemonNameOCR/PokemonNameOCR (Kim-SwShPokedex-1)/kor/joltik-20210618-212232.png"),
+        OCR::BLACK_OR_WHITE_TEXT_FILTERS()
+    );
+
+    for (auto& item : result.results){
+        cout << item.first << ": " << item.second.token << endl;
+    }
+
+
+#if 0
+    for (int c = (int)Language::English; c < (int)Language::EndOfList; c++){
+        Language language = (Language)c;
+
+        JsonObject json;
+
+        for (const std::string& slug : NATIONAL_DEX_SLUGS()){
+            JsonArray array;
+            array.push_back(get_pokemon_name(slug).display_name(language));
+            json[slug] = std::move(array);
+        }
+
+        json.dump("PokemonOCR-" + language_data(language).code + ".json");
+    }
+#endif
 
 
 #if 0

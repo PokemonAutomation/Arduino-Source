@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonSV_BattleMenuDetector_H
 #define PokemonAutomation_PokemonSV_BattleMenuDetector_H
 
+#include "CommonFramework/Language.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/Inference/VisualDetector.h"
 #include "PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h"
@@ -41,6 +42,9 @@ public:
         : DetectorToFinder("NormalBattleMenuWatcher", std::chrono::milliseconds(250), color)
     {}
 };
+
+std::set<std::string> read_singles_opponent(ConsoleHandle& console, BotBaseContext& context, Language language);
+
 
 
 

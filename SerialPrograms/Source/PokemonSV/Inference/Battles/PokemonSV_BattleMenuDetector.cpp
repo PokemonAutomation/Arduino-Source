@@ -6,11 +6,14 @@
 
 //#include "Common/Cpp/Exceptions.h"
 #include "ClientSource/Connection/BotBase.h"
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 //#include "CommonFramework/VideoPipeline/VideoOverlay.h"
+#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonSV_BattleMenuDetector.h"
 
 //#include <iostream>
@@ -39,6 +42,66 @@ bool NormalBattleMenuDetector::detect(const ImageViewRGB32& screen) const{
         return false;
     }
     return true;
+}
+
+
+
+std::set<std::string> read_singles_opponent(ConsoleHandle& console, BotBaseContext& context, Language language){
+    VideoOverlaySet overlay(console);
+
+    ImageFloatBox name(0.422, 0.131, 0.120, 0.050);
+    overlay.add(COLOR_RED, name);
+
+    std::set<std::string> slugs;
+
+    bool status_opened = false;
+    for (size_t c = 0; c < 10; c++){
+        NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
+        GradientArrowWatcher arrow(COLOR_BLUE, GradientArrowType::DOWN, {0.4, 0.1, 0.2, 0.5});
+        context.wait_for_all_requests();
+        int ret = wait_until(
+            console, context, std::chrono::seconds(5),
+            {battle_menu, arrow}
+        );
+        context.wait_for(std::chrono::milliseconds(500));
+
+        switch (ret){
+        case 0:
+            if (status_opened){
+                console.log("Detected battle menu...");
+                return slugs;
+            }
+            console.log("Detected battle menu. Opening status...");
+            pbf_press_button(context, BUTTON_Y, 20, 105);
+            continue;
+
+        case 1:
+            if (status_opened){
+                console.log("Detected status menu (again)...", COLOR_RED);
+            }else{
+                console.log("Detected status menu. Reading name...");
+                status_opened = true;
+                VideoSnapshot screen = console.video().snapshot();
+                OCR::StringMatchResult result = Pokemon::PokemonNameReader::instance().read_substring(
+                    console, language,
+                    extract_box_reference(screen, name),
+                    OCR::WHITE_TEXT_FILTERS()
+                );
+                for (auto& item : result.results){
+                    slugs.insert(std::move(item.second.token));
+                }
+            }
+
+            pbf_mash_button(context, BUTTON_B, 125);
+            continue;
+
+        default:
+            console.log("No recognized state. Mashing B...", COLOR_RED);
+            pbf_mash_button(context, BUTTON_B, 250);
+        }
+    }
+
+    throw OperationFailedException(console, "Unable to open status menu to read opponent name.", true);
 }
 
 

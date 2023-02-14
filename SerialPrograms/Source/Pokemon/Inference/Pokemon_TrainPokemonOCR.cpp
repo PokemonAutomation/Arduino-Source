@@ -4,11 +4,15 @@
  *
  */
 
+#include "Common/Cpp/Json/JsonArray.h"
+#include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Cpp/Concurrency/ParallelTaskRunner.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/OCR/OCR_TrainingTools.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "Pokemon/Pokemon_Strings.h"
+#include "Pokemon/Resources/Pokemon_PokemonNames.h"
+#include "Pokemon/Resources/Pokemon_PokemonSlugs.h"
 #include "Pokemon_NameReader.h"
 #include "Pokemon_TrainPokemonOCR.h"
 
@@ -48,11 +52,28 @@ TrainPokemonOCR::TrainPokemonOCR()
 
 
 void TrainPokemonOCR::program(ProgramEnvironment& env, CancellableScope& scope){
+    if (MODE == TrainOCRMode::GENERATE_BASELINE){
+        for (int c = (int)Language::English; c < (int)Language::EndOfList; c++){
+            Language language = (Language)c;
+
+            JsonObject json;
+
+            for (const std::string& slug : NATIONAL_DEX_SLUGS()){
+                JsonArray array;
+                array.push_back(get_pokemon_name(slug).display_name(language));
+                json[slug] = std::move(array);
+            }
+
+            json.dump("PokemonOCR-" + language_data(language).code + ".json");
+        }
+        return;
+    }
+
     OCR::TrainingSession session(env.logger(), scope, DIRECTORY);
     session.generate_large_dictionary(
         "Pokemon/PokemonNameOCR/",
         "PokemonOCR-",
-        MODE == TrainOCRMode::Incremental,
+        MODE == TrainOCRMode::INCREMENTAL,
         THREADS,
         OCR::BLACK_OR_WHITE_TEXT_FILTERS(),
         PokemonNameReader::MAX_LOG10P + 1.0,
