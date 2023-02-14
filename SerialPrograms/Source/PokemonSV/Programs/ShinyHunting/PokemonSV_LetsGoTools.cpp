@@ -140,7 +140,7 @@ void LetsGoEncounterBotTracker::process_battle(EncounterWatcher& watcher){
         m_notification_shiny,
         language != Language::None,
         is_shiny,
-        {{slugs, is_shiny ? ShinyType::UNKNOWN_SHINY : ShinyType::NOT_SHINY}},
+        {{std::move(slugs), is_shiny ? ShinyType::UNKNOWN_SHINY : ShinyType::NOT_SHINY}},
         watcher.lowest_error_coefficient(),
         watcher.shiny_screenshot(),
         &m_encounter_frequencies
