@@ -220,9 +220,16 @@ GradientArrowWatcher::GradientArrowWatcher(
 void GradientArrowWatcher::make_overlays(VideoOverlaySet& items) const{
     m_detector.make_overlays(items);
 }
-bool GradientArrowWatcher::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
-    return m_detector.detect(frame);
+bool GradientArrowWatcher::process_frame(const VideoSnapshot& frame){
+    bool detected = m_detector.detect(frame);
+    if (detected){
+        m_last_detected = frame;
+    }
+    return detected;
 }
+//bool GradientArrowWatcher::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
+//    return m_detector.detect(frame);
+//}
 
 
 

@@ -11,6 +11,7 @@
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 //#include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
+#include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
@@ -46,7 +47,10 @@ bool NormalBattleMenuDetector::detect(const ImageViewRGB32& screen) const{
 
 
 
-std::set<std::string> read_singles_opponent(ConsoleHandle& console, BotBaseContext& context, Language language){
+std::set<std::string> read_singles_opponent(
+    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    Language language
+){
     VideoOverlaySet overlay(console);
 
     ImageFloatBox name(0.422, 0.131, 0.120, 0.050);
@@ -55,6 +59,7 @@ std::set<std::string> read_singles_opponent(ConsoleHandle& console, BotBaseConte
     std::set<std::string> slugs;
 
     bool status_opened = false;
+    bool battle_menu_seen = false;
     for (size_t c = 0; c < 10; c++){
         NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
         GradientArrowWatcher arrow(COLOR_BLUE, GradientArrowType::DOWN, {0.4, 0.1, 0.2, 0.5});
@@ -72,10 +77,16 @@ std::set<std::string> read_singles_opponent(ConsoleHandle& console, BotBaseConte
                 return slugs;
             }
             console.log("Detected battle menu. Opening status...");
+            battle_menu_seen = true;
             pbf_press_button(context, BUTTON_Y, 20, 105);
             continue;
 
         case 1:
+            if (!battle_menu_seen){
+                console.log("Detected status menu before pressing Y...", COLOR_RED);
+//                dump_image(console, info, "BattleMenuNotSeen", arrow.last_detected());
+                continue;
+            }
             if (status_opened){
                 console.log("Detected status menu (again)...", COLOR_RED);
             }else{
@@ -90,6 +101,9 @@ std::set<std::string> read_singles_opponent(ConsoleHandle& console, BotBaseConte
                 for (auto& item : result.results){
                     slugs.insert(std::move(item.second.token));
                 }
+                if (slugs.empty()){
+                    dump_image(console, info, "UnableToReadName", screen);
+                }
             }
 
             pbf_mash_button(context, BUTTON_B, 125);
@@ -101,7 +115,7 @@ std::set<std::string> read_singles_opponent(ConsoleHandle& console, BotBaseConte
         }
     }
 
-    throw OperationFailedException(console, "Unable to open status menu to read opponent name.", true);
+    throw OperationFailedException(true, console, "Unable to open status menu to read opponent name.", true);
 }
 
 

@@ -119,7 +119,7 @@ void LetsGoEncounterBotTracker::process_battle(EncounterWatcher& watcher){
 
     std::set<std::string> slugs;
     if (language != Language::None){
-        slugs = read_singles_opponent(m_console, m_context, language);
+        slugs = read_singles_opponent(m_env.program_info(), m_console, m_context, language);
         m_encounter_frequencies += slugs;
         m_env.log(m_encounter_frequencies.dump_sorted_map("Encounter Stats:\n"));
     }

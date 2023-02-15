@@ -177,7 +177,7 @@ int test_pokemonSV_SandwichRecipeDetector(const ImageViewRGB32& image, const std
         cerr << "Error: word " << words[words.size()-1] << " is wrong. Must be an integer in range [0, 6). " << endl;
     }
     SandwichRecipeSelectionWatcher selection_watcher;
-    bool result = selection_watcher.process_frame(image, current_time());
+    bool result = selection_watcher.process_frame({image.copy(), current_time()});
 
     TEST_RESULT_COMPONENT_EQUAL(result, true, "SandwichRecipeSelectionWatcher::process_frame() result");
 

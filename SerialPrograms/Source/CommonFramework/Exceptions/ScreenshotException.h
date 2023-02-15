@@ -26,9 +26,9 @@ class ConsoleHandle;
 class ScreenshotException : public Exception{
 public:
     ScreenshotException() = default;
-    explicit ScreenshotException(std::string message);
-    explicit ScreenshotException(std::string message, std::shared_ptr<const ImageRGB32> screenshot);
-    explicit ScreenshotException(ConsoleHandle& console, std::string message, bool take_screenshot);
+    explicit ScreenshotException(bool send_error_report, std::string message);
+    explicit ScreenshotException(bool send_error_report, std::string message, std::shared_ptr<const ImageRGB32> screenshot);
+    explicit ScreenshotException(bool send_error_report, ConsoleHandle& console, std::string message, bool take_screenshot);
 
 public:
 //    virtual const char* name() const override{ return "ScreenshotException"; }
@@ -38,6 +38,7 @@ public:
     virtual void send_notification(ProgramEnvironment& env, EventNotificationOption& notification) const = 0;
 
 public:
+    bool m_send_error_report;
     std::string m_message;
     std::shared_ptr<const ImageRGB32> m_screenshot;
 };

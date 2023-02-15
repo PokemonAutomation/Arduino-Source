@@ -79,7 +79,7 @@ void dump_image_and_throw_recoverable_exception(
     );
     throw OperationFailedException(console, message);
 #else
-    throw OperationFailedException(console, message, true);
+    throw OperationFailedException(true, console, message, true);
 #endif
 }
 
@@ -108,7 +108,7 @@ void dump_image_and_throw_recoverable_exception(
     }
     throw OperationFailedException(console, error_message);
 #else
-    throw OperationFailedException(console, error_message, true);
+    throw OperationFailedException(true, console, error_message, true);
 #endif
 }
 

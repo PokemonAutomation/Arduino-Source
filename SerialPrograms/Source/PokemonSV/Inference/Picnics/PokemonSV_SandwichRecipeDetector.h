@@ -54,8 +54,7 @@ public:
     SandwichRecipeSelectionWatcher(Color color = COLOR_RED);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
-
-    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
+    virtual bool process_frame(const VideoSnapshot& frame) override;
 
     // Return which recipe cell is currented selected.
     // For cell order, see `SandwichRecipeNumberDetector`.

@@ -15,20 +15,20 @@ namespace PokemonAutomation{
 
 
 FatalProgramException::FatalProgramException(ScreenshotException&& e)
-    : ScreenshotException(std::move(e.m_message), std::move(e.m_screenshot))
+    : ScreenshotException(e.m_send_error_report, std::move(e.m_message), std::move(e.m_screenshot))
 {}
-FatalProgramException::FatalProgramException(Logger& logger, std::string message)
-    : ScreenshotException(std::move(message))
+FatalProgramException::FatalProgramException(bool send_error_report, Logger& logger, std::string message)
+    : ScreenshotException(send_error_report, std::move(message))
 {
     logger.log(std::string(FatalProgramException::name()) + ": " + m_message, COLOR_RED);
 }
-FatalProgramException::FatalProgramException(Logger& logger, std::string message, std::shared_ptr<const ImageRGB32> screenshot)
-    : ScreenshotException(std::move(message), std::move(screenshot))
+FatalProgramException::FatalProgramException(bool send_error_report, Logger& logger, std::string message, std::shared_ptr<const ImageRGB32> screenshot)
+    : ScreenshotException(send_error_report, std::move(message), std::move(screenshot))
 {
     logger.log(std::string(FatalProgramException::name()) + ": " + m_message, COLOR_RED);
 }
-FatalProgramException::FatalProgramException(ConsoleHandle& console, std::string message, bool take_screenshot)
-    : ScreenshotException(console, std::move(message), take_screenshot)
+FatalProgramException::FatalProgramException(bool send_error_report, ConsoleHandle& console, std::string message, bool take_screenshot)
+    : ScreenshotException(send_error_report, console, std::move(message), take_screenshot)
 {
     console.log(std::string(FatalProgramException::name()) + ": " + m_message, COLOR_RED);
 }
@@ -39,6 +39,17 @@ void FatalProgramException::send_notification(ProgramEnvironment& env, EventNoti
     if (!m_message.empty()){
         embeds.emplace_back(std::pair<std::string, std::string>("Message:", m_message));
     }
+    if (m_send_error_report && m_screenshot){
+        std::string label = name();
+        std::string filename = dump_image_alone(env.logger(), env.program_info(), label, *m_screenshot);
+        send_program_telemetry(
+            env.logger(), true, COLOR_RED,
+            env.program_info(),
+            label,
+            embeds,
+            filename
+        );
+    }
     send_program_notification(
         env, notification,
         COLOR_RED,
@@ -46,17 +57,6 @@ void FatalProgramException::send_notification(ProgramEnvironment& env, EventNoti
         std::move(embeds), "",
         screenshot()
     );
-    if (m_screenshot){
-        std::string label = name();
-        std::string filename = dump_image_alone(env.logger(), env.program_info(), label, *m_screenshot);
-        send_program_telemetry(
-            env.logger(), true, COLOR_RED,
-            env.program_info(),
-            label,
-            std::move(embeds),
-            filename
-        );
-    }
 }
 
 

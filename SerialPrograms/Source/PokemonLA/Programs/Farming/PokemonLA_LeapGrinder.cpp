@@ -152,7 +152,7 @@ bool LeapGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
             break;
         }
         if (c >= 5){
-            throw OperationFailedException(env.console, "Failed to switch to Pokemon selection after 5 attempts.");
+            throw OperationFailedException(true, env.console, "Failed to switch to Pokemon selection after 5 attempts.");
         }
         env.console.log("Not on Pokemon selection. Attempting to switch to it...", COLOR_ORANGE);
         pbf_press_button(context, BUTTON_X, 20, 230);

@@ -345,7 +345,7 @@ StateMachineAction throw_balls(
     if (balls != 0){
         pbf_press_button(context, BUTTON_A, 10, 125);
     }else{
-        throw OperationFailedException(console, "Unable to find appropriate ball. Did you run out?", true);
+        throw OperationFailedException(false, console, "Unable to find appropriate ball. Did you run out?", true);
     }
 
     ReadableQuantity999& stat = boss

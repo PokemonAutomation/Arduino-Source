@@ -115,10 +115,10 @@ void SandwichRecipeSelectionWatcher::make_overlays(VideoOverlaySet& items) const
     }
 }
 
-bool SandwichRecipeSelectionWatcher::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
+bool SandwichRecipeSelectionWatcher::process_frame(const VideoSnapshot& frame){
     int num_arrows_found = 0;
     for(int i = 0; i < 6; i++){
-        const bool found_arrow = m_arrow_watchers[i].process_frame(frame, timestamp);
+        const bool found_arrow = m_arrow_watchers[i].process_frame(frame);
         if (found_arrow){
             m_selected_recipe = i;
             num_arrows_found++;

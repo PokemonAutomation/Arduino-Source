@@ -143,7 +143,7 @@ void DateReader::set_hours(
     {
         auto snapshot = console.video().snapshot();
         if (!detect(snapshot)){
-            throw FatalProgramException(console, "Expected date change menu.", true);
+            throw FatalProgramException(true, console, "Expected date change menu.", true);
         }
     }
 
@@ -159,7 +159,7 @@ void DateReader::set_hours(
         VideoSnapshot snapshot = console.video().snapshot();
         int8_t current_hour = read_hours(console.logger(), snapshot);
         if (current_hour < 0){
-            throw FatalProgramException(console, "Unable to read the hour.", true);
+            throw FatalProgramException(true, console, "Unable to read the hour.", true);
         }
 
         //  We're done.
@@ -210,7 +210,7 @@ void DateReader::set_hours(
     }
 
     auto snapshot = console.video().snapshot();
-    throw FatalProgramException(console, "Failed to set the hour after 10 attempts.", true);
+    throw FatalProgramException(true, console, "Failed to set the hour after 10 attempts.", true);
 }
 
 

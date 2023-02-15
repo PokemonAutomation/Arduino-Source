@@ -68,6 +68,7 @@ void SingleSwitchProgramSession::run_program_instance(SingleSwitchProgramEnviron
     try{
         BotBaseContext context(scope, env.console.botbase());
         m_option.instance().program(env, context);
+        context.wait_for_all_requests();
     }catch (...){
         m_scope.store(nullptr, std::memory_order_release);
         throw;

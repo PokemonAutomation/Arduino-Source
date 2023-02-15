@@ -11,6 +11,7 @@
 #include "Common/Cpp/Color.h"
 //#include "Common/Cpp/Containers/FixedLimitVector.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 #include "CommonFramework/Inference/VisualDetector.h"
@@ -57,11 +58,17 @@ public:
         const ImageFloatBox& box
     );
 
+    VideoSnapshot last_detected() const{ return m_last_detected; }
+
     virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
+    virtual bool process_frame(const VideoSnapshot& frame) override;
+//    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
 
 protected:
     GradientArrowDetector m_detector;
+
+    //  REMOVE
+    VideoSnapshot m_last_detected;
 };
 
 

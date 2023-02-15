@@ -546,7 +546,7 @@ void ShinyHuntAreaZeroPlatform::run_state(BotBaseContext& context){
         m_state = recovery_state;
         e.send_notification(*m_env, NOTIFICATION_ERROR_RECOVERABLE);
         if (m_consecutive_failures >= 3){
-            throw FatalProgramException(console, "Failed 3 times consecutively.");
+            throw FatalProgramException(true, console, "Failed 3 times consecutively.");
         }
     }
 }
@@ -622,6 +622,7 @@ void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, Bot
     }
 
     GO_HOME_WHEN_DONE.run_end_of_program(context);
+    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 }
 
 

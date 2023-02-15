@@ -300,7 +300,7 @@ void CloneItems101::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         );
         context.wait_for(std::chrono::milliseconds(50));
         if (ret < 0){
-            throw FatalProgramException(env.console, "Unable to recover from error state.", true);
+            throw FatalProgramException(true, env.console, "Unable to recover from error state.", true);
         }
     }
 

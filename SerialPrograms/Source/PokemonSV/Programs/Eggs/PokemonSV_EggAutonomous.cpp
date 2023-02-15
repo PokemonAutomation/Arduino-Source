@@ -729,7 +729,7 @@ void EggAutonomous::handle_recoverable_error(
 
     consecutive_failures++;
     if (consecutive_failures >= 3){
-        throw OperationFailedException(env.console, "Failed 3 times in the row.", true);
+        throw OperationFailedException(true, env.console, "Failed 3 times in the row.", true);
     }
 
     env.log("Reset game to handle recoverable error");

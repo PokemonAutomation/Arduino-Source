@@ -78,7 +78,7 @@ void open_map_from_overworld(const ProgramInfo& info, ConsoleHandle& console, Bo
         }
         else{
             throw OperationFailedException(
-                console,
+                true, console,
                 "open_map_from_overworld(): No overworld state found after 10 seconds.",
                 true
             );
@@ -89,7 +89,7 @@ void open_map_from_overworld(const ProgramInfo& info, ConsoleHandle& console, Bo
     while (true){
         if (current_time() - start > std::chrono::minutes(1)){
             throw OperationFailedException(
-                console,
+                true, console,
                 "open_map_from_overworld(): Failed to open map after 1 minute.",
                 true
             );
@@ -134,7 +134,7 @@ void open_map_from_overworld(const ProgramInfo& info, ConsoleHandle& console, Bo
             }
         default:
             throw OperationFailedException(
-                console,
+                true, console,
                 "open_map_from_overworld(): No recognized state after 30 seconds.",
                 true
             );
@@ -151,7 +151,7 @@ void fly_to_overworld_from_map(const ProgramInfo& info, ConsoleHandle& console, 
     while (true){
         if (current_time() - start > std::chrono::minutes(1)){
             throw OperationFailedException(
-                console,
+                true, console,
                 "fly_to_overworld_from_map(): Failed to open map after 1 minute.",
                 true
             );
@@ -193,7 +193,7 @@ void fly_to_overworld_from_map(const ProgramInfo& info, ConsoleHandle& console, 
             
         default:
             throw OperationFailedException(
-                console,
+                true, console,
                 "fly_to_overworld_from_map(): No recognized state after 30 seconds.",
                 true
             );
@@ -210,7 +210,7 @@ void picnic_from_overworld(const ProgramInfo& info, ConsoleHandle& console, BotB
     while (true){
         if (current_time() - start > std::chrono::minutes(3)){
             throw OperationFailedException(
-                console,
+                true, console,
                 "picnic_from_overworld(): Failed to start picnic after 3 minutes.",
                 true
             );
@@ -237,7 +237,7 @@ void picnic_from_overworld(const ProgramInfo& info, ConsoleHandle& console, BotB
             success = main_menu.move_cursor(info, console, context, MenuSide::RIGHT, 2, fast_mode);
             if (success == false){
                 throw OperationFailedException(
-                    console,
+                    true, console,
                     "picnic_from_overworld(): Cannot move menu cursor to picnic.",
                     true
                 );
@@ -254,7 +254,7 @@ void picnic_from_overworld(const ProgramInfo& info, ConsoleHandle& console, BotB
             return;
         default:
             throw OperationFailedException(
-                console,
+                true, console,
                 "picnic_from_overworld(): No recognized state after 30 seconds.",
                 true
             );
@@ -284,7 +284,7 @@ void leave_picnic(const ProgramInfo& info, ConsoleHandle& console, BotBaseContex
 
         if (i == 4){
             throw OperationFailedException(
-                console,
+                true, console,
                 "leave_picnic(): Failed to leave picnic after 5 tries.",
                 true
             );
@@ -308,7 +308,7 @@ void leave_picnic(const ProgramInfo& info, ConsoleHandle& console, BotBaseContex
     );
     if (ret < 0){
         throw OperationFailedException(
-            console,
+            true, console,
             "leave_picnic(): Failed to detecxt overworld after 20 seconds.",
             true
         );
@@ -326,7 +326,7 @@ void enter_box_system_from_overworld(const ProgramInfo& info, ConsoleHandle& con
     while (true){
         if (current_time() - start > std::chrono::minutes(3)){
             throw OperationFailedException(
-                console,
+                true, console,
                 "enter_box_system_from_overworld(): Failed to enter box system after 3 minutes.",
                 true
             );
@@ -354,7 +354,7 @@ void enter_box_system_from_overworld(const ProgramInfo& info, ConsoleHandle& con
             success = main_menu.move_cursor(info, console, context, MenuSide::RIGHT, 1, fast_mode);
             if (success == false){
                 throw OperationFailedException(
-                    console,
+                    true, console,
                     "enter_box_system_from_overworld(): Cannot move menu cursor to Boxes.",
                     true
                 );
@@ -367,7 +367,7 @@ void enter_box_system_from_overworld(const ProgramInfo& info, ConsoleHandle& con
             return;
         default:
             throw OperationFailedException(
-                console,
+                true, console,
                 "enter_box_system_from_overworld(): No recognized state after 30 seconds.",
                 true
             );
@@ -392,7 +392,7 @@ void leave_box_system_to_overworld(const ProgramInfo& info, ConsoleHandle& conso
     );
     if (ret < 0){
         throw OperationFailedException(
-            console,
+            true, console,
             "leave_box_system_to_overworld(): Unknown state after 10 button B presses.",
             true
         );
@@ -417,7 +417,7 @@ void inside_zero_gate_to_station(
             {dialog}
         );
         if (ret < 0){
-            throw OperationFailedException(console, "Unable to find warp circle.", true);
+            throw OperationFailedException(true, console, "Unable to find warp circle.", true);
         }
     }
 
@@ -426,7 +426,7 @@ void inside_zero_gate_to_station(
     WallClock start = current_time();
     while (true){
         if (current_time() - start > std::chrono::seconds(60)){
-            throw OperationFailedException(console, "Unable to warp to station 2 after 60 seconds.", true);
+            throw OperationFailedException(true, console, "Unable to warp to station 2 after 60 seconds.", true);
         }
 
         ZeroGateWarpPromptWatcher prompt(COLOR_YELLOW);
@@ -453,7 +453,7 @@ void inside_zero_gate_to_station(
 
             break;
         default:
-            throw OperationFailedException(console, "Unable to find warp to station 2.", true);
+            throw OperationFailedException(true, console, "Unable to find warp to station 2.", true);
         }
 
         break;
@@ -472,7 +472,7 @@ void inside_zero_gate_to_station(
             {black_screen}
         );
         if (ret < 0){
-            throw OperationFailedException(console, "Unable to exit station after 60 seconds.", true);
+            throw OperationFailedException(true, console, "Unable to exit station after 60 seconds.", true);
         }
     }
 
@@ -484,7 +484,7 @@ void inside_zero_gate_to_station(
             {overworld}
         );
         if (ret < 0){
-            throw OperationFailedException(console, "Unable to load overworld after exiting station for 30 seconds.", true);
+            throw OperationFailedException(true, console, "Unable to load overworld after exiting station for 30 seconds.", true);
         }
     }
 }
@@ -508,7 +508,7 @@ void return_to_inside_zero_gate(const ProgramInfo& info, ConsoleHandle& console,
         {black_screen}
     );
     if (ret < 0){
-        throw OperationFailedException(console, "Unable to enter Zero Gate.", true);
+        throw OperationFailedException(true, console, "Unable to enter Zero Gate.", true);
     }
 
     OverworldWatcher overworld;
@@ -517,7 +517,7 @@ void return_to_inside_zero_gate(const ProgramInfo& info, ConsoleHandle& console,
         {overworld}
     );
     if (ret < 0){
-        throw OperationFailedException(console, "Unable to detect overworld inside Zero Gate.", true);
+        throw OperationFailedException(true, console, "Unable to detect overworld inside Zero Gate.", true);
     }
 }
 

@@ -14,18 +14,18 @@
 namespace PokemonAutomation{
 
 
-OperationFailedException::OperationFailedException(Logger& logger, std::string message)
-    : ScreenshotException(std::move(message))
+OperationFailedException::OperationFailedException(bool send_error_report, Logger& logger, std::string message)
+    : ScreenshotException(send_error_report, std::move(message))
 {
     logger.log(std::string(OperationFailedException::name()) + ": " + m_message, COLOR_RED);
 }
-OperationFailedException::OperationFailedException(Logger& logger, std::string message, std::shared_ptr<const ImageRGB32> screenshot)
-    : ScreenshotException(std::move(message), std::move(screenshot))
+OperationFailedException::OperationFailedException(bool send_error_report, Logger& logger, std::string message, std::shared_ptr<const ImageRGB32> screenshot)
+    : ScreenshotException(send_error_report, std::move(message), std::move(screenshot))
 {
     logger.log(std::string(OperationFailedException::name()) + ": " + m_message, COLOR_RED);
 }
-OperationFailedException::OperationFailedException(ConsoleHandle& console, std::string message, bool take_screenshot)
-    : ScreenshotException(console, std::move(message), take_screenshot)
+OperationFailedException::OperationFailedException(bool send_error_report, ConsoleHandle& console, std::string message, bool take_screenshot)
+    : ScreenshotException(send_error_report, console, std::move(message), take_screenshot)
 {
     console.log(std::string(OperationFailedException::name()) + ": " + m_message, COLOR_RED);
 }
@@ -36,24 +36,24 @@ void OperationFailedException::send_notification(ProgramEnvironment& env, EventN
     if (!m_message.empty()){
         embeds.emplace_back(std::pair<std::string, std::string>("Message:", m_message));
     }
-    send_program_notification(
-        env, notification,
-        COLOR_RED,
-        "Program Error",
-        embeds, "",
-        screenshot()
-    );
-    if (m_screenshot){
+    if (m_send_error_report && m_screenshot){
         std::string label = name();
         std::string filename = dump_image_alone(env.logger(), env.program_info(), label, *m_screenshot);
         send_program_telemetry(
             env.logger(), true, COLOR_RED,
             env.program_info(),
             label,
-            std::move(embeds),
+            embeds,
             filename
         );
     }
+    send_program_notification(
+        env, notification,
+        COLOR_RED,
+        "Program Error",
+        std::move(embeds), "",
+        screenshot()
+    );
 }
 
 

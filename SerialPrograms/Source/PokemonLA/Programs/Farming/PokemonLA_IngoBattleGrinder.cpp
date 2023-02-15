@@ -122,7 +122,7 @@ bool IngoBattleGrinder::start_dialog(ConsoleHandle& console, BotBaseContext& con
             //  Version 1.1 with new options unlocked.
             break;
         default:
-            throw OperationFailedException(console, "Unable to detect options after 10 A presses.", true);
+            throw OperationFailedException(true, console, "Unable to detect options after 10 A presses.", true);
         }
     }
 
@@ -143,7 +143,7 @@ bool IngoBattleGrinder::start_dialog(ConsoleHandle& console, BotBaseContext& con
     case 0:
         return false;
     default:
-        throw OperationFailedException(console, "Unable to find opponent list options after 5 A presses.", true);
+        throw OperationFailedException(true, console, "Unable to find opponent list options after 5 A presses.", true);
     }
 }
 
@@ -238,7 +238,7 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBa
         if (ret < 0){
             env.console.log("Error: Failed to find battle menu after 2 minutes.");
             dump_image(env.logger(), env.program_info(), "BattleMenuNotFound", env.console.video().snapshot());
-            throw OperationFailedException(env.console, "Failed to find battle menu after 2 minutes.", true);
+            throw OperationFailedException(true, env.console, "Failed to find battle menu after 2 minutes.", true);
         }
 
         if (ret == 0){
@@ -281,7 +281,7 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBa
                         // Pokemon has zero PP on all moves. This should not happen as it will just use
                         // Struggle.
                         env.console.log("No PP on all moves. Abort program.", COLOR_RED);
-                        throw OperationFailedException(env.console, "No PP on all moves.", true);
+                        throw OperationFailedException(true, env.console, "No PP on all moves.", true);
                     }
                     
                     // Go to the next move.

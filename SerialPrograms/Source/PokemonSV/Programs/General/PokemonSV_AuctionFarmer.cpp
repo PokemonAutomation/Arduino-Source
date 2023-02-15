@@ -266,7 +266,7 @@ void AuctionFarmer::move_to_auctioneer(SingleSwitchProgramEnvironment& env, BotB
         }
         tries++;
     }
-    throw OperationFailedException(env.console, "Too many attempts to talk to the NPC.", true);
+    throw OperationFailedException(true, env.console, "Too many attempts to talk to the NPC.", true);
 }
 
 // Dialog is the only piece of orientation we have, so the goal is to put it into the center of the screen so we know in which direction the character walks.
@@ -306,7 +306,7 @@ void AuctionFarmer::move_dialog_to_center(SingleSwitchProgramEnvironment& env, B
         }
 
         if (!offer_visible) {
-            throw OperationFailedException(env.console, "Lost offer dialog for wanted item.", true);
+            throw OperationFailedException(true, env.console, "Lost offer dialog for wanted item.", true);
         }
     }
 }
@@ -461,7 +461,7 @@ void AuctionFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
                             send_program_recoverable_error_notification(env, NOTIFICATION_ERROR_RECOVERABLE, e.message(), screen);
                         }
                         else {
-                            throw OperationFailedException(env.console, "Failed to talk to the NPC!", true);
+                            throw OperationFailedException(true, env.console, "Failed to talk to the NPC!", true);
                         }
                         break;
                     }

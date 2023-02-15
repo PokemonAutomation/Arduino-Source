@@ -168,7 +168,7 @@ void loop_adventures(
                     {{"Message:", "Failed to start adventure 3 times in the row."}},
                     ""
                 );
-                throw OperationFailedException(env.logger(), "Failed to start adventure 3 times in the row.");
+                throw OperationFailedException(true, env.logger(), "Failed to start adventure 3 times in the row.");
             }
             env.log("Failed to start adventure. Resetting all Switches...", COLOR_RED);
             env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){

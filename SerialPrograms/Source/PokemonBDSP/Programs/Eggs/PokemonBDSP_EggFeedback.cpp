@@ -48,9 +48,9 @@ void hatch_egg(ConsoleHandle& console, BotBaseContext& context){
             console.log("Egg is hatching!");
             break;
         case 1:
-            throw OperationFailedException(console, "Frozen screen detected!", true);
+            throw OperationFailedException(true, console, "Frozen screen detected!", true);
         default:
-            throw OperationFailedException(console, "No hatch detected after 8 minutes of spinning.", true);
+            throw OperationFailedException(true, console, "No hatch detected after 8 minutes of spinning.", true);
         }
     }while (false);
 
@@ -68,7 +68,7 @@ void hatch_egg(ConsoleHandle& console, BotBaseContext& context){
             {{dialog}}
         );
         if (ret < 0){
-            throw OperationFailedException(console, "End of hatch not detected after 30 seconds.", true);
+            throw OperationFailedException(true, console, "End of hatch not detected after 30 seconds.", true);
         }
         console.log("Egg finished hatching.");
         pbf_mash_button(context, BUTTON_B, 1 * TICKS_PER_SECOND);
@@ -138,7 +138,7 @@ void release(ConsoleHandle& console, BotBaseContext& context){
         }
         pbf_press_button(context, BUTTON_ZL, 20, 105);
     }
-    throw OperationFailedException(console, "Unexpected dialogs when releasing.", true);
+    throw OperationFailedException(true, console, "Unexpected dialogs when releasing.", true);
 }
 
 

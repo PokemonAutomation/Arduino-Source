@@ -16,6 +16,7 @@
 namespace PokemonAutomation{
     class ConsoleHandle;
     class BotBaseContext;
+    struct ProgramInfo;
 namespace NintendoSwitch{
 namespace PokemonSV{
 
@@ -43,7 +44,10 @@ public:
     {}
 };
 
-std::set<std::string> read_singles_opponent(ConsoleHandle& console, BotBaseContext& context, Language language);
+std::set<std::string> read_singles_opponent(
+    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    Language language
+);
 
 
 

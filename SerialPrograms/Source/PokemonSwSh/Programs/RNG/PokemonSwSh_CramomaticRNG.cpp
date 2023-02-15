@@ -304,7 +304,7 @@ void CramomaticRNG::choose_apricorn(SingleSwitchProgramEnvironment& env, BotBase
 
     int ret = wait_until(env.console, context, Milliseconds(5000), { bag_arrow_detector });
     if (ret < 0) {
-        throw OperationFailedException(env.console, "Could not detect bag.", true);
+        throw OperationFailedException(true, env.console, "Could not detect bag.", true);
     }
 
     // select the apricorn(s)
@@ -468,7 +468,7 @@ void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
 
             state_errors++;
             if (state_errors >= 3) {
-                throw OperationFailedException(env.console, "Detected invalid RNG state three times in a row.");
+                throw OperationFailedException(true, env.console, "Detected invalid RNG state three times in a row.");
             }
             VideoSnapshot screen = env.console.video().snapshot();
             send_program_recoverable_error_notification(env, NOTIFICATION_ERROR_RECOVERABLE, "Detected invalid RNG state.", screen);
@@ -496,7 +496,7 @@ void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
 
             apricorn_selection_errors++;
             if (apricorn_selection_errors >= 3) {
-                throw OperationFailedException(env.console, "Could not detect the bag three times on a row.", true);
+                throw OperationFailedException(true, env.console, "Could not detect the bag three times on a row.", true);
             }
             VideoSnapshot screen = env.console.video().snapshot();
             send_program_recoverable_error_notification(env, NOTIFICATION_ERROR_RECOVERABLE, "Could not detect the bag.", screen);

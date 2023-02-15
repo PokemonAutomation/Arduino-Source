@@ -100,7 +100,7 @@ void start_game_from_home_with_inference(
             console.log("Detected Home screen.");
         }else{
             throw OperationFailedException(
-                console,
+                true, console,
                 "start_game_from_home_with_inference(): Failed to detect Home screen after 10 seconds.",
                 true
             );
@@ -153,7 +153,7 @@ void start_game_from_home_with_inference(
             return;
         default:
             throw OperationFailedException(
-                console,
+                true, console,
                 "start_game_from_home_with_inference(): No recognizable state after 10 seconds.",
                 true
             );

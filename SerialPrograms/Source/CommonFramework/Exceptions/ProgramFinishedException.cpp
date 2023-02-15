@@ -14,17 +14,17 @@ namespace PokemonAutomation{
 
 ProgramFinishedException::ProgramFinishedException(){}
 ProgramFinishedException::ProgramFinishedException(Logger& logger, std::string message)
-    : ScreenshotException(std::move(message))
+    : ScreenshotException(false, std::move(message))
 {
     logger.log(std::string(ProgramFinishedException::name()) + ": " + m_message, COLOR_BLUE);
 }
 ProgramFinishedException::ProgramFinishedException(Logger& logger, std::string message, std::shared_ptr<const ImageRGB32> screenshot)
-    : ScreenshotException(std::move(message), std::move(screenshot))
+    : ScreenshotException(false, std::move(message), std::move(screenshot))
 {
     logger.log(std::string(ProgramFinishedException::name()) + " (with screenshot): " + m_message, COLOR_BLUE);
 }
 ProgramFinishedException::ProgramFinishedException(ConsoleHandle& console, std::string message, bool take_screenshot)
-    : ScreenshotException(console, std::move(message), take_screenshot)
+    : ScreenshotException(false, console, std::move(message), take_screenshot)
 {
     if (take_screenshot){
         console.log(std::string(ProgramFinishedException::name()) + " (take screenshot): " + m_message, COLOR_BLUE);
