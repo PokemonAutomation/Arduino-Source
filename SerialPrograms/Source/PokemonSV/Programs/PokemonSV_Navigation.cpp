@@ -432,7 +432,7 @@ void inside_zero_gate_to_station(
         if (current_time() - start > std::chrono::seconds(60)){
             throw OperationFailedException(
                 ErrorReport::SEND_ERROR_REPORT, console,
-                "Unable to warp to station 2 after 60 seconds.",
+                "Unable to warp to station after 60 seconds.",
                 true
             );
         }
@@ -453,7 +453,7 @@ void inside_zero_gate_to_station(
             continue;
         case 1:
             console.log("Detected prompt.");
-            prompt.move_cursor(info, console, context, 1);
+            prompt.move_cursor(info, console, context, station - 1);
             pbf_mash_button(context, BUTTON_A, 3 * TICKS_PER_SECOND);
             continue;
         case 2:
@@ -549,6 +549,67 @@ void return_to_inside_zero_gate(const ProgramInfo& info, ConsoleHandle& console,
     }
 }
 
+
+
+
+void inside_zero_gate_to_secret_cave_entrance(
+    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context
+){
+    inside_zero_gate_to_station(info, console, context, 1);
+
+    context.wait_for(std::chrono::seconds(3));
+
+    pbf_move_left_joystick(context, 0, 208, 30, 50);
+    pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
+
+
+    //  Leg 1
+    ssf_press_button(context, BUTTON_LCLICK, 0, 500);
+    ssf_press_left_joystick(context, 128, 0, 60, 1250);
+
+    //  Jump
+    ssf_press_button(context, BUTTON_B, 125, 100);
+
+    //  Fly
+    ssf_press_button(context, BUTTON_B, 0, 20, 10); //  Double up this press in
+    ssf_press_button(context, BUTTON_B, 0, 20);     //  case one is dropped.
+
+    pbf_move_left_joystick(context, 128, 0, 1125, 300);
+
+
+    //  Leg 2
+    ssf_press_button(context, BUTTON_LCLICK, 0, 500);
+    ssf_press_left_joystick(context, 128, 0, 60, 250);
+
+    //  Jump
+    ssf_press_button(context, BUTTON_B, 125, 100);
+
+    //  Fly
+    ssf_press_button(context, BUTTON_B, 0, 20, 10); //  Double up this press in
+    ssf_press_button(context, BUTTON_B, 0, 20);     //  case one is dropped.
+
+    pbf_move_left_joystick(context, 128, 0, 250, 0);
+    pbf_move_left_joystick(context, 112, 0, 250, 0);
+    pbf_move_left_joystick(context, 128, 0, 752, 0);
+    pbf_move_left_joystick(context, 96, 0, 300, 0);
+    pbf_move_left_joystick(context, 128, 0, 630, 250);
+
+//    context.wait_for_all_requests();
+
+
+    //  Leg 3
+    ssf_press_button(context, BUTTON_LCLICK, 0, 500);
+    ssf_press_left_joystick(context, 128, 0, 180, 550);
+
+    //  Fly
+    ssf_press_button(context, BUTTON_B, 0, 20, 10); //  Double up this press in
+    ssf_press_button(context, BUTTON_B, 0, 20);     //  case one is dropped.
+
+    pbf_move_left_joystick(context, 48, 0, 200, 0);
+    pbf_move_left_joystick(context, 128, 0, 250, 0);
+
+
+}
 
 
 

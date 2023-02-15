@@ -191,6 +191,13 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
+    return_to_inside_zero_gate(env.program_info(), console, context);
+    inside_zero_gate_to_secret_cave_entrance(env.program_info(), console, context);
+
+
+
+
+
 //    pbf_mash_button(context, BUTTON_ZR, 3 * TICKS_PER_SECOND);
 
 #if 0

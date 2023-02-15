@@ -62,6 +62,11 @@ void return_to_inside_zero_gate(const ProgramInfo& info, ConsoleHandle& console,
 
 
 
+void inside_zero_gate_to_secret_cave_entrance(
+    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context
+);
+
+
 
 }
 }

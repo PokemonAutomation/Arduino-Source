@@ -6,6 +6,7 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Concurrency/AsyncDispatcher.h"
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
@@ -420,8 +421,11 @@ void build_great_peanut_butter_sandwich(const ProgramInfo& info, AsyncDispatcher
     SandwichHandWatcher grabbing_hand(SandwichHandType::FREE, {0, 0, 1.0, 1.0});
     int ret = wait_until(console, context, std::chrono::seconds(30), {grabbing_hand});
     if (ret < 0){
-        dump_image_and_throw_recoverable_exception(info, console, "GrabbingHandNotDetected",
-            "make_great_peanut_butter_sandwich(): Cannot detect grabing hand when waiting for upper bread.");
+        throw OperationFailedException(
+            ErrorReport::SEND_ERROR_REPORT, console,
+            "make_great_peanut_butter_sandwich(): Cannot detect grabing hand when waiting for upper bread.",
+            grabbing_hand.last_snapshot()
+        );
     }
 
     auto hand_box = hand_location_to_box(grabbing_hand.location());

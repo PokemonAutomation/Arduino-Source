@@ -323,7 +323,7 @@ void exit_tera_win_without_catching(
         case 0:
             console.log("Detected catch prompt.");
             pbf_press_dpad(context, DPAD_DOWN, 20, 30);
-            pbf_press_button(context, BUTTON_A, 20, 10);
+            pbf_mash_button(context, BUTTON_A, 30);
             pbf_mash_button(context, BUTTON_B, 125);
             continue;
         case 1:
