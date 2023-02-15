@@ -20,15 +20,20 @@ class ProgramEnvironment;
 class ConsoleHandle;
 
 
+enum class ErrorReport{
+    NO_ERROR_REPORT,
+    SEND_ERROR_REPORT,
+};
+
 
 //  Do not use this class directly. It is just to reuse the screenshot holding
 //  logic that's shared by multiple exception types.
 class ScreenshotException : public Exception{
 public:
     ScreenshotException() = default;
-    explicit ScreenshotException(bool send_error_report, std::string message);
-    explicit ScreenshotException(bool send_error_report, std::string message, std::shared_ptr<const ImageRGB32> screenshot);
-    explicit ScreenshotException(bool send_error_report, ConsoleHandle& console, std::string message, bool take_screenshot);
+    explicit ScreenshotException(ErrorReport error_report, std::string message);
+    explicit ScreenshotException(ErrorReport error_report, std::string message, std::shared_ptr<const ImageRGB32> screenshot);
+    explicit ScreenshotException(ErrorReport error_report, ConsoleHandle& console, std::string message, bool take_screenshot);
 
 public:
 //    virtual const char* name() const override{ return "ScreenshotException"; }
@@ -38,7 +43,7 @@ public:
     virtual void send_notification(ProgramEnvironment& env, EventNotificationOption& notification) const = 0;
 
 public:
-    bool m_send_error_report;
+    ErrorReport m_send_error_report;
     std::string m_message;
     std::shared_ptr<const ImageRGB32> m_screenshot;
 };

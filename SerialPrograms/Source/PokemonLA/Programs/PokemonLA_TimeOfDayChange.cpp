@@ -84,7 +84,11 @@ void change_time_of_day_at_tent(ConsoleHandle& console, BotBaseContext& context,
         console, context, std::chrono::seconds(5), {{yellow_arrow_detector}}
     );
     if (ret < 0){
-        throw OperationFailedException(true, console, "Did not interact with a tent", true);
+        throw OperationFailedException(
+            ErrorReport::SEND_ERROR_REPORT, console,
+            "Did not interact with a tent.",
+            true
+        );
     }
 
     // Press A to clear the dialog box, and show the time menu
@@ -113,7 +117,11 @@ void change_time_of_day_at_tent(ConsoleHandle& console, BotBaseContext& context,
         console, context, std::chrono::seconds(30), {{yellow_arrow_detector}}
     );
     if (ret < 0){
-        throw OperationFailedException(true, console, "Failed to stand up after resting in a tent", true);
+        throw OperationFailedException(
+            ErrorReport::SEND_ERROR_REPORT, console,
+            "Failed to stand up after resting in a tent.",
+            true
+        );
     }
 
     // Press A again to clear the dialog box

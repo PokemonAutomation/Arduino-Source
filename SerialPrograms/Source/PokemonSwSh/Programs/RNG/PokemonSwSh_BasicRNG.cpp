@@ -33,8 +33,11 @@ Xoroshiro128PlusState find_rng_state(
         uint64_t last_bit = 0;
         switch (detection) {
         case OrbeetleAttackAnimationDetector::NO_DETECTION:
-            throw OperationFailedException(true, console, "Attack animation could not be detected.", true);
-            break;
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, console,
+                "Attack animation could not be detected.",
+                true
+            );
         case OrbeetleAttackAnimationDetector::SPECIAL:
             text += " : Special";
             last_bit = 1;
@@ -92,8 +95,11 @@ Xoroshiro128PlusState refind_rng_state(
         OrbeetleAttackAnimationDetector::Detection detection = detector.run(save_screenshots, log_image_values);
         switch (detection) {
         case OrbeetleAttackAnimationDetector::NO_DETECTION:
-            throw OperationFailedException(true, console, "Attack animation could not be detected.", true);
-            break;
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, console,
+                "Attack animation could not be detected.",
+                true
+            );
         case OrbeetleAttackAnimationDetector::SPECIAL:
             text += " : Special";
             sequence.emplace_back(true);
@@ -118,7 +124,10 @@ Xoroshiro128PlusState refind_rng_state(
         }
     }
     if (possible_indices == 0) {
-        throw OperationFailedException(true, console, "Detected sequence of attack motions does not exist in expected range.");
+        throw OperationFailedException(
+            ErrorReport::SEND_ERROR_REPORT, console,
+            "Detected sequence of attack motions does not exist in expected range."
+        );
     }
 
     distance += sequence.size();

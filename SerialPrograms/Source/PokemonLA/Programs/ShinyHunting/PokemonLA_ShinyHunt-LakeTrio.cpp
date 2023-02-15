@@ -173,7 +173,11 @@ void ShinyHuntLakeTrio::program(SingleSwitchProgramEnvironment& env, BotBaseCont
                 );
                 consecutive_errors++;
                 if (consecutive_errors >= 3){
-                    throw OperationFailedException(true, env.console, "Failed to detect an encounter 3 times in the row.", true);
+                    throw OperationFailedException(
+                        ErrorReport::SEND_ERROR_REPORT, env.console,
+                        "Failed to detect an encounter 3 times in the row.",
+                        true
+                    );
                 }
                 continue;
             }

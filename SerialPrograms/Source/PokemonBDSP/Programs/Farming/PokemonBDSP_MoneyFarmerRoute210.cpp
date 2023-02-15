@@ -174,7 +174,11 @@ bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, BotBaseCon
                     }
                 }
                 if (slot == 4){
-                    throw OperationFailedException(true, env.console, "Ran out of PP in a battle.", true);
+                    throw OperationFailedException(
+                        ErrorReport::SEND_ERROR_REPORT, env.console,
+                        "Ran out of PP in a battle.",
+                        true
+                    );
                 }
 
                 for (uint8_t move_slot = 0; move_slot < slot; move_slot++){
@@ -194,7 +198,11 @@ bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, BotBaseCon
                     }
                 }
                 if (slot == 4){
-                    throw OperationFailedException(true, env.console, "Ran out of PP in a battle.", true);
+                    throw OperationFailedException(
+                        ErrorReport::SEND_ERROR_REPORT, env.console,
+                        "Ran out of PP in a battle.",
+                        true
+                    );
                 }
 
                 for (uint8_t move_slot = 0; move_slot < slot; move_slot++){
@@ -220,11 +228,19 @@ bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, BotBaseCon
             return true;
         default:
             stats.m_errors++;
-            throw OperationFailedException(true, env.console, "Timed out after 2 minutes.", true);
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, env.console,
+                "Timed out after 2 minutes.",
+                true
+            );
         }
     }
 
-    throw OperationFailedException(true, env.console, "No progress detected after 5 battle menus. Are you out of PP?", true);
+    throw OperationFailedException(
+        ErrorReport::SEND_ERROR_REPORT, env.console,
+        "No progress detected after 5 battle menus. Are you out of PP?",
+        true
+    );
 }
 
 void MoneyFarmerRoute210::heal_at_center_and_return(Logger& logger, BotBaseContext& context, uint8_t pp0[4], uint8_t pp1[4]){

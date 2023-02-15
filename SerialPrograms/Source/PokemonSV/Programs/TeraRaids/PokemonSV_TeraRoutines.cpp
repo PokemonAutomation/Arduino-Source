@@ -157,7 +157,11 @@ void open_hosting_lobby(
             console.log("Detected overworld.");
             recovery_mode = false;
             if (!open_raid(console, context)){
-                throw OperationFailedException(true, console, "No Tera raid found.", true);
+                throw OperationFailedException(
+                    ErrorReport::SEND_ERROR_REPORT, console,
+                    "No Tera raid found.",
+                    true
+                );
             }
             continue;
         case 1:
@@ -403,7 +407,11 @@ void exit_tera_win_by_catching(
             BattleBallReader reader(console, language);
             int quantity = move_to_ball(reader, console, context, ball_slug);
             if (quantity == 0){
-                throw FatalProgramException(false, console, "Unable to find appropriate ball. Did you run out?", true);
+                throw FatalProgramException(
+                    ErrorReport::NO_ERROR_REPORT, console,
+                    "Unable to find appropriate ball. Did you run out?",
+                    true
+                );
             }
             if (quantity < 0){
                 console.log("Unable to read ball quantity.", COLOR_RED);
@@ -514,7 +522,11 @@ TeraResult exit_tera_win_by_catching(
             BattleBallReader reader(console, language);
             int quantity = move_to_ball(reader, console, context, ball_slug);
             if (quantity == 0){
-                throw FatalProgramException(false, console, "Unable to find appropriate ball. Did you run out?", true);
+                throw FatalProgramException(
+                    ErrorReport::NO_ERROR_REPORT, console,
+                    "Unable to find appropriate ball. Did you run out?",
+                    true
+                );
             }
             if (quantity < 0){
                 console.log("Unable to read ball quantity.", COLOR_RED);

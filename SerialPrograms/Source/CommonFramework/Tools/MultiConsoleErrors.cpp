@@ -17,12 +17,12 @@ void MultiConsoleErrorState::report_unrecoverable_error(Logger& logger, std::str
     if (m_unrecoverable_error.compare_exchange_strong(expected, true)){
         m_message = msg;
     }
-    throw OperationFailedException(false, logger, std::move(msg));
+    throw OperationFailedException(ErrorReport::NO_ERROR_REPORT, logger, std::move(msg));
 }
 void MultiConsoleErrorState::check_unrecoverable_error(Logger& logger){
     if (m_unrecoverable_error.load(std::memory_order_acquire)){
         logger.log("Unrecoverable error reported from a different console. Breaking out.", COLOR_RED);
-        throw OperationFailedException(false, logger, m_message);
+        throw OperationFailedException(ErrorReport::NO_ERROR_REPORT, logger, m_message);
     }
 }
 

@@ -115,7 +115,11 @@ std::set<std::string> read_singles_opponent(
         }
     }
 
-    throw OperationFailedException(true, console, "Unable to open status menu to read opponent name.", true);
+    throw OperationFailedException(
+        ErrorReport::SEND_ERROR_REPORT, console,
+        "Unable to open status menu to read opponent name.",
+        true
+    );
 }
 
 

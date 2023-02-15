@@ -332,7 +332,11 @@ void TeraMultiFarmer::join_lobby(
 
     for (size_t attempts = 0;; attempts++){
         if (attempts >= 3){
-            throw OperationFailedException(true, console, "Failed to join lobby 3 times.", true);
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, console,
+                "Failed to join lobby 3 times.",
+                true
+            );
         }
 
         enter_code(console, context, FastCodeEntrySettings(), normalized_code, false);
@@ -368,7 +372,11 @@ void TeraMultiFarmer::join_lobby(
             enter_tera_search(env.program_info(), console, context, HOSTING_MODE == Mode::HOST_ONLINE);
             continue;
         default:
-            throw OperationFailedException(true, console, "Unable to join lobby.", true);
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, console,
+                "Unable to join lobby.",
+                true
+            );
         }
         break;
     }

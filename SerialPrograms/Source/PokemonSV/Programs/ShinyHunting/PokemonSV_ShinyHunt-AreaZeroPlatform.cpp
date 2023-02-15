@@ -546,7 +546,10 @@ void ShinyHuntAreaZeroPlatform::run_state(BotBaseContext& context){
         m_state = recovery_state;
         e.send_notification(*m_env, NOTIFICATION_ERROR_RECOVERABLE);
         if (m_consecutive_failures >= 3){
-            throw FatalProgramException(true, console, "Failed 3 times consecutively.");
+            throw FatalProgramException(
+                ErrorReport::SEND_ERROR_REPORT, console,
+                "Failed 3 times consecutively."
+            );
         }
     }
 }

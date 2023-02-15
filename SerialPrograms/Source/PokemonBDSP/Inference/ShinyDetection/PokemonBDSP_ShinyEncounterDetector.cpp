@@ -192,7 +192,10 @@ void determine_shiny_status(
         }else if (dist_to_own < dist_to_wild){
             own_shiny_sound_detected = true;
         }else{
-            throw OperationFailedException(true, env.logger(), "Wrong shiny sound timing found.");
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, env.logger(),
+                "Wrong shiny sound timing found."
+            );
         }
     }
     alpha_wild_overall += wild_shiny_sound_detected ? SOUND_ALPHA : 0.0;

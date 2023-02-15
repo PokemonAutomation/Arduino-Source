@@ -119,7 +119,7 @@ std::shared_ptr<const ImageRGB32> enter_lobby(
 
             if (ore.quantity < 20){
                 throw OperationFailedException(
-                    false, console,
+                    ErrorReport::NO_ERROR_REPORT, console,
                     "You have less than 20 ore. Program stopped. (Quantity: " + ore.to_str() + ")",
                     true
                 );
@@ -128,7 +128,7 @@ std::shared_ptr<const ImageRGB32> enter_lobby(
             ore_dialog_count++;
             if (ore_dialog_count >= 2){
                 throw OperationFailedException(
-                    true, console,
+                    ErrorReport::NO_ERROR_REPORT, console,
                     "Unable to start adventure. Are you out of ore? (Quantity: " + ore.to_str() + ")",
                     true
                 );

@@ -287,16 +287,32 @@ void FlagNavigationAir::set_distance_callback(std::function<void(double distance
 
 bool FlagNavigationAir::run_state(AsyncCommandSession& commands, WallClock timestamp){
     if (last_state_change() + std::chrono::seconds(60) < timestamp){
-        throw OperationFailedException(true, m_console, "No state change detected after 60 seconds.", true);
+        throw OperationFailedException(
+            ErrorReport::SEND_ERROR_REPORT, m_console,
+            "No state change detected after 60 seconds.",
+            true
+        );
     }
     if (start_time() + m_navigate_timeout < timestamp){
-        throw OperationFailedException(true, m_console, "Unable to reach flag after timeout period.", true);
+        throw OperationFailedException(
+            ErrorReport::SEND_ERROR_REPORT, m_console,
+            "Unable to reach flag after timeout period.",
+            true
+        );
     }
     if (m_dialog_detector.detected()){
-        throw OperationFailedException(true, m_console, "Potential ambush by Miss Fortune sister.", true);
+        throw OperationFailedException(
+            ErrorReport::SEND_ERROR_REPORT, m_console,
+            "Potential ambush by Miss Fortune sister.",
+            true
+        );
     }
     if (m_find_flag_failed.load(std::memory_order_acquire)){
-        throw OperationFailedException(true, m_console, "Unable to find flag.", true);
+        throw OperationFailedException(
+            ErrorReport::SEND_ERROR_REPORT, m_console,
+            "Unable to find flag.",
+            true
+        );
     }
 
     //  Read flag.

@@ -57,7 +57,11 @@ void SkipToFullMoon::program(SingleSwitchProgramEnvironment& env, BotBaseContext
         const auto compatibility = detect_item_compatibility(env.console.video().snapshot());
 
         if (compatibility == ItemCompatibility::NONE){
-            throw OperationFailedException(true, env.console, "Unable to detect item compatibility.", true);
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, env.console,
+                "Unable to detect item compatibility.",
+                true
+            );
         }
 
         if (compatibility == ItemCompatibility::COMPATIBLE){

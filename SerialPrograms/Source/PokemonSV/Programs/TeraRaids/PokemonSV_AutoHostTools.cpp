@@ -72,14 +72,17 @@ void TeraFailTracker::on_raid_start(){
     m_current_raid_error.store(false, std::memory_order_relaxed);
 
     if (m_consecutive_failures > 0 && !m_completed_one){
-        throw FatalProgramException(true, m_env.logger(), "Failed 1st raid attempt. Will not retry due to risk of ban.");
+        throw FatalProgramException(
+            ErrorReport::SEND_ERROR_REPORT, m_env.logger(),
+            "Failed 1st raid attempt. Will not retry due to risk of ban."
+        );
     }
     size_t fail_threshold = m_consecutive_failure_pause;
     if (m_consecutive_failures >= fail_threshold){
         uint16_t minutes = m_failure_pause_minutes;
         if (minutes == 0){
             throw FatalProgramException(
-                true, m_env.logger(),
+                ErrorReport::SEND_ERROR_REPORT, m_env.logger(),
                 "Failed " + std::to_string(fail_threshold) +  " raid(s) in the row. "
                 "Stopping to prevent possible ban."
             );
@@ -170,9 +173,15 @@ void KillSwitchTracker::check_kill_switch(const std::string& kill_switch_url){
     );
     if (start_time < m_killswitch_time && now > m_killswitch_time){
         if (m_killswitch_reason.empty()){
-            throw FatalProgramException(false, m_env.logger(), "Stopped by remote kill switch. No reason specified.");
+            throw FatalProgramException(
+                ErrorReport::NO_ERROR_REPORT, m_env.logger(),
+                "Stopped by remote kill switch. No reason specified."
+            );
         }else{
-            throw FatalProgramException(false, m_env.logger(), "Stopped by remote kill switch. Reason: " + m_killswitch_reason);
+            throw FatalProgramException(
+                ErrorReport::NO_ERROR_REPORT, m_env.logger(),
+                "Stopped by remote kill switch. Reason: " + m_killswitch_reason
+            );
         }
     }
 }

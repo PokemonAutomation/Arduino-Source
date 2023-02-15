@@ -80,7 +80,11 @@ void AutonomousBallThrower::throw_ball(ConsoleHandle& console, BotBaseContext& c
     BattleBallReader reader(console, LANGUAGE);
     int quantity = move_to_ball(reader, console, context, BALL_SELECT.slug());
     if (quantity == 0) {
-        throw FatalProgramException(false, console, "Unable to find appropriate ball. Did you run out?", true);
+        throw FatalProgramException(
+            ErrorReport::NO_ERROR_REPORT, console,
+            "Unable to find appropriate ball. Did you run out?",
+            true
+        );
     }
     if (quantity < 0) {
         console.log("Unable to read ball quantity.", COLOR_RED);
@@ -116,7 +120,11 @@ void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, BotBase
             env.update_stats();
             break;
         default:
-            throw FatalProgramException(true, env.console, "Failed to detect battle menu after 60 seconds, did you catch or fail?", true);
+            throw FatalProgramException(
+                ErrorReport::SEND_ERROR_REPORT, env.console,
+                "Failed to detect battle menu after 60 seconds, did you catch or fail?",
+                true
+            );
         }
 
     }

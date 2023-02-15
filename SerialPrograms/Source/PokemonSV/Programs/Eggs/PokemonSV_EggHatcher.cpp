@@ -102,7 +102,11 @@ void EggHatcher::hatch_one_box(SingleSwitchProgramEnvironment& env, BotBaseConte
         {
             const uint8_t expected_empty_slots_in_party = HAS_CLONE_RIDE_POKEMON ? 4 : 5;
             if (check_empty_slots_in_party(env.program_info(), env.console, context) != expected_empty_slots_in_party){
-                throw FatalProgramException(true, env.console, "Party not empty when loading one column for hatching.", true);
+                throw FatalProgramException(
+                    ErrorReport::SEND_ERROR_REPORT, env.console,
+                    "Party not empty when loading one column for hatching.",
+                    true
+                );
             }
         }
 
@@ -156,7 +160,11 @@ void EggHatcher::hatch_one_box(SingleSwitchProgramEnvironment& env, BotBaseConte
 
         num_eggs = check_egg_party_column(env.program_info(), env.console, context).first;
         if (num_eggs > 0){
-            throw FatalProgramException(true, env.console, "Detected egg in party after hatching.", true);
+            throw FatalProgramException(
+                ErrorReport::SEND_ERROR_REPORT, env.console,
+                "Detected egg in party after hatching.",
+                true
+            );
         }
 
         unload_one_column_from_party(env, env.console, context, NOTIFICATION_ERROR_RECOVERABLE, column_index, HAS_CLONE_RIDE_POKEMON);

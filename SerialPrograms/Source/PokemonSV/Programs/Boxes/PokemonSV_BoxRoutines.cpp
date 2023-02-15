@@ -39,7 +39,11 @@ bool change_view_to_stats_or_judge(
     for (size_t attempts = 0;; attempts++){
         if (throw_exception){
             if (attempts == 10){
-                throw OperationFailedException(true, console, "Unable to change Pokemon view after 10 tries.", true);
+                throw OperationFailedException(
+                    ErrorReport::SEND_ERROR_REPORT, console,
+                    "Unable to change Pokemon view after 10 tries.",
+                    true
+                );
             }
         }else{
             if (attempts == 3){
@@ -87,7 +91,7 @@ void change_view_to_judge(
     for (size_t attempts = 0;; attempts++){
         if (attempts == 5){
             throw OperationFailedException(
-                true, console,
+                ErrorReport::SEND_ERROR_REPORT, console,
                 "Unable to change Pokemon view to judge after 10 tries. Have you unlocked it?",
                 true
             );

@@ -73,7 +73,11 @@ void overworld_to_menu(ConsoleHandle& console, BotBaseContext& context){
             {{detector}}
         );
         if (ret < 0){
-            throw OperationFailedException(true, console, "Menu not detected after 10 seconds.", true);
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, console,
+                "Menu not detected after 10 seconds.",
+                true
+            );
         }
         console.log("Detected menu.");
     }
@@ -111,7 +115,11 @@ void overworld_to_box(ConsoleHandle& console, BotBaseContext& context){
             {{detector}}
         );
         if (ret < 0){
-            throw OperationFailedException(true, console, "Box system not detected after 10 seconds.", true);
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, console,
+                "Box system not detected after 10 seconds.",
+                true
+            );
         }
         console.log("Detected box system.");
     }
@@ -142,7 +150,11 @@ void box_to_overworld(ConsoleHandle& console, BotBaseContext& context){
             {{detector}}
         );
         if (ret < 0){
-            throw OperationFailedException(true, console, "Menu not detected after 10 seconds.", true);
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, console,
+                "Menu not detected after 10 seconds.",
+                true
+            );
         }
         console.log("Detected menu.");
     }

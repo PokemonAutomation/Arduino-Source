@@ -113,7 +113,11 @@ void DistortionWaiter::program(SingleSwitchProgramEnvironment& env, BotBaseConte
         );
         if (ret < 0){
             stats.errors++;
-            throw OperationFailedException(true, env.console, "No distortion found after one hour.", true);
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, env.console,
+                "No distortion found after one hour.",
+                true
+            );
         }
 
         auto elapsed = current_time() - start;

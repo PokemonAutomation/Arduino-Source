@@ -85,7 +85,11 @@ bool save_game_from_overworld(ProgramEnvironment& env, ConsoleHandle& console, B
     }
 
     console.log("Unable to find save menu.", COLOR_RED);
-    throw OperationFailedException(true, console, "Unable to find save menu.", true);
+    throw OperationFailedException(
+        ErrorReport::SEND_ERROR_REPORT, console,
+        "Unable to find save menu.",
+        true
+    );
 }
 
 

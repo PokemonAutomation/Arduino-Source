@@ -180,7 +180,7 @@ bool StandardEncounterDetection::run_overrides(
         if (shiny == ShinyType::MAYBE_SHINY){
 //            actions.emplace_back(EncounterAction::StopProgram, "");
             throw FatalProgramException(
-                true, m_console,
+                ErrorReport::SEND_ERROR_REPORT, m_console,
                 "Cannot run encounter actions due to low confidence shiny detection.",
                 false
             );
@@ -239,7 +239,7 @@ EncounterActionFull StandardEncounterDetection::get_action_doubles(){
 
     if (action_left != action_right){
         throw FatalProgramException(
-            false, m_console,
+            ErrorReport::NO_ERROR_REPORT, m_console,
             "Conflicting actions requested.\n" + str_left + "\n" + str_right,
             false
         );
@@ -253,7 +253,11 @@ EncounterActionFull StandardEncounterDetection::get_action_doubles(){
 
     //  Double battle and someone is set to auto-catch.
     if (auto_catch && m_double_battle){
-        throw FatalProgramException(false, m_console, "Cannot auto-catch in a double battle.", false);
+        throw FatalProgramException(
+            ErrorReport::NO_ERROR_REPORT, m_console,
+            "Cannot auto-catch in a double battle.",
+            false
+        );
     }
 
     //  Otherwise, return the matching action.

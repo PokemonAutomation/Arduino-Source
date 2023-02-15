@@ -143,7 +143,11 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
         if(ret != 0) {
             stats.errors++;
             env.update_stats();
-            throw OperationFailedException(true, env.console, "Failed to enter battle. Are you facing the Pokemon or in a menu?", true);
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, env.console,
+                "Failed to enter battle. Are you facing the Pokemon or in a menu?",
+                true
+            );
         }
         bool battle_ended = false;
         bool goldfish_loop = false;
@@ -248,7 +252,11 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
                 env.console.log("Invalid state.");
                 stats.errors++;
                 env.update_stats();
-                throw OperationFailedException(true, env.console, "Invalid state.", true);
+                throw OperationFailedException(
+                    ErrorReport::SEND_ERROR_REPORT, env.console,
+                    "Invalid state.",
+                    true
+                );
             }
         }
         if (!battle_ended){

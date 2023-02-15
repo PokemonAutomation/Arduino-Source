@@ -17,9 +17,9 @@ namespace PokemonAutomation{
 class FatalProgramException : public ScreenshotException{
 public:
     FatalProgramException(ScreenshotException&& e);
-    explicit FatalProgramException(bool send_error_report, Logger& logger, std::string message);
-    explicit FatalProgramException(bool send_error_report, Logger& logger, std::string message, std::shared_ptr<const ImageRGB32> screenshot);
-    explicit FatalProgramException(bool send_error_report, ConsoleHandle& console, std::string message, bool take_screenshot);
+    explicit FatalProgramException(ErrorReport error_report, Logger& logger, std::string message);
+    explicit FatalProgramException(ErrorReport error_report, Logger& logger, std::string message, std::shared_ptr<const ImageRGB32> screenshot);
+    explicit FatalProgramException(ErrorReport error_report, ConsoleHandle& console, std::string message, bool take_screenshot);
 
     virtual const char* name() const override{ return "FatalProgramException"; }
     virtual std::string message() const override{ return m_message; }

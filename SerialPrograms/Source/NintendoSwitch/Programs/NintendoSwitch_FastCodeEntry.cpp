@@ -319,7 +319,10 @@ std::vector<DigitPath> get_codeboard_path(
     for (char ch : code){
         auto iter = POSITION_MAP.find(ch);
         if (iter == POSITION_MAP.end()){
-            throw OperationFailedException(false, logger, "Invalid code character.");
+            throw OperationFailedException(
+                ErrorReport::NO_ERROR_REPORT, logger,
+                "Invalid code character."
+            );
         }
         positions.emplace_back(iter->second);
     }

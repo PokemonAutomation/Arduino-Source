@@ -12,17 +12,17 @@
 namespace PokemonAutomation{
 
 
-ScreenshotException::ScreenshotException(bool send_error_report, std::string message)
-    : m_send_error_report(send_error_report)
+ScreenshotException::ScreenshotException(ErrorReport error_report, std::string message)
+    : m_send_error_report(error_report)
     , m_message(std::move(message))
 {}
-ScreenshotException::ScreenshotException(bool send_error_report, std::string message, std::shared_ptr<const ImageRGB32> screenshot)
-    : m_send_error_report(send_error_report)
+ScreenshotException::ScreenshotException(ErrorReport error_report, std::string message, std::shared_ptr<const ImageRGB32> screenshot)
+    : m_send_error_report(error_report)
     , m_message(std::move(message))
     , m_screenshot(std::move(screenshot))
 {}
-ScreenshotException::ScreenshotException(bool send_error_report, ConsoleHandle& console, std::string message, bool take_screenshot)
-    : m_send_error_report(send_error_report)
+ScreenshotException::ScreenshotException(ErrorReport error_report, ConsoleHandle& console, std::string message, bool take_screenshot)
+    : m_send_error_report(error_report)
     , m_message(std::move(message))
 {
     if (take_screenshot){

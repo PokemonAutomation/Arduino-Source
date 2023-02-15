@@ -137,7 +137,11 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, BotBaseCo
                     stats.errors++;
                     env.update_stats();
                     send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
-                    throw OperationFailedException(true, env.console, "Timed out during battle after 5 minutes.", true);
+                    throw OperationFailedException(
+                        ErrorReport::SEND_ERROR_REPORT, env.console,
+                        "Timed out during battle after 5 minutes.",
+                        true
+                    );
                 }
 
                 NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
@@ -154,7 +158,11 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, BotBaseCo
                     stats.errors++;
                     env.update_stats();
                     send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
-                    throw OperationFailedException(true, env.console, "Timed out during battle. Stuck, crashed, or took more than 60 seconds for a turn.", true);
+                    throw OperationFailedException(
+                        ErrorReport::SEND_ERROR_REPORT, env.console,
+                        "Timed out during battle. Stuck, crashed, or took more than 60 seconds for a turn.",
+                        true
+                    );
                 }
             }
         },
@@ -174,7 +182,11 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, BotBaseCo
         stats.errors++;
         env.update_stats();
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
-        throw OperationFailedException(true, env.console, "Timed out during battle. Stuck, crashed, or took over 30 turns.", true);
+        throw OperationFailedException(
+            ErrorReport::SEND_ERROR_REPORT, env.console,
+            "Timed out during battle. Stuck, crashed, or took over 30 turns.",
+            true
+        );
     }
     context.wait_for_all_requests();
 }

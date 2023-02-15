@@ -116,7 +116,11 @@ bool IngoMoveGrinder::start_dialog(ConsoleHandle& console, BotBaseContext& conte
             //  Version 1.1 with new options unlocked.
             break;
         default:
-            throw OperationFailedException(true, console, "Unable to detect options after 10 A presses.", true);
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, console,
+                "Unable to detect options after 10 A presses.",
+                true
+            );
         }
     }
 
@@ -137,7 +141,11 @@ bool IngoMoveGrinder::start_dialog(ConsoleHandle& console, BotBaseContext& conte
     case 0:
         return false;
     default:
-        throw OperationFailedException(true, console, "Unable to find opponent list options after 5 A presses.", true);
+        throw OperationFailedException(
+            ErrorReport::SEND_ERROR_REPORT, console,
+            "Unable to find opponent list options after 5 A presses.",
+            true
+        );
     }
 }
 
@@ -204,7 +212,11 @@ bool IngoMoveGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBase
         if (ret < 0){
             env.console.log("Error: Failed to find battle menu after 2 minutes.");
             dump_image(env.logger(), env.program_info(), "BattleMenuNotFound", env.console.video().snapshot());
-            throw OperationFailedException(true, env.console, "Failed to find battle menu after 2 minutes.", true);
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, env.console,
+                "Failed to find battle menu after 2 minutes.",
+                true
+            );
         }
 
         if (ret == 0){
@@ -355,7 +367,7 @@ void IngoMoveGrinder::go_to_next_pokemon(SingleSwitchProgramEnvironment& env, Bo
     if (cur_pokemon == 4)
     {
         throw OperationFailedException(
-            true, env.console,
+            ErrorReport::SEND_ERROR_REPORT, env.console,
             "Abort program. Your 4 first pokemons are done grinding moves, dead or without PP. "
             "Your fifth pokemon (Arceus) died so no other choice than stopping the program.",
             true
