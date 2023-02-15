@@ -42,6 +42,7 @@ private:
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;
 
+    void check_money(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
     void run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
     void check_prize(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
     void handle_end_of_tournament(SingleSwitchProgramEnvironment& env, BotBaseContext& context);

@@ -5,14 +5,18 @@
  */
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
+#include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Tools/VideoResolutionCheck.h"
+#include "CommonFramework/OCR/OCR_NumberReader.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
-#include "PokemonSV/Inference/Battles/PokemonSV_NormalBattleMenus.h"
+#include "PokemonSV/PokemonSV_Settings.h"
+#include "PokemonSV/Inference/Battles/PokemonSV_BattleMenuDetector.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV/Programs/PokemonSV_SaveGame.h"
@@ -20,6 +24,7 @@
 #include "PokemonSV/Inference/PokemonSV_TournamentPrizeNameReader.h"
 #include "PokemonSV/Resources/PokemonSV_TournamentPrizeNames.h"
 #include "PokemonSV_TournamentFarmer.h"
+#include "CommonFramework/Tools/ErrorDumper.h"
 
 namespace PokemonAutomation {
 namespace NintendoSwitch {
@@ -105,6 +110,45 @@ TournamentFarmer::TournamentFarmer()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
+//Check and process the amount of money earned at the end of a battle
+void TournamentFarmer::check_money(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
+    //TournamentFarmer_Descriptor::Stats& stats = env.current_stats<TournamentFarmer_Descriptor::Stats>();
+
+    int top_money = -1;
+    //int bottom_money = -1;
+
+    //There must be a value for top money
+    //Bottom money only appear after 1st battle and should clear out
+    while (top_money == -1) {
+        VideoSnapshot screen = env.console.video().snapshot();
+        ImageFloatBox top_notif(0.745, 0.152, 0.206, 0.083);
+        //ImageFloatBox bottom_notif(0.745, 0.261, 0.220, 0.083);
+
+        ImageViewRGB32 image_top = extract_box_reference(screen, top_notif);
+        //ImageViewRGB32 image_bottom = extract_box_reference(screen, bottom_notif);
+
+        top_money = OCR::read_number(env.console, image_top);
+        //bottom_money = OCR::read_number(env.console, image_bottom);
+
+        //dump_image(
+        //    env.console, env.program_info(),
+        //    "battledone",
+        //    screen
+        //);
+
+        //Filter out low and high numbers
+        //Nemona is lowest at 8640
+        //Penny and Geeta are 16800
+        if (top_money < 8000 || top_money > 100000 ) {
+            top_money = -1;
+        }
+        //if (bottom_money < 8000 || bottom_money > 100000) {
+        //    bottom_money = -1;
+        //}
+    }
+
+}
+
 
 //Handle a single battle by mashing A until AdvanceDialog (end of battle) is detected
 void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
@@ -169,7 +213,14 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, BotBaseCo
         env.update_stats();
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
 
-        //Clear remaining dialog
+        //Close dialog and then check money
+        pbf_press_button(context, BUTTON_B, 10, 50);
+        pbf_wait(context, 150);
+        context.wait_for_all_requests();
+
+        check_money(env, context);
+
+        //Clear any remaining dialog
         pbf_mash_button(context, BUTTON_B, 300);
         context.wait_for_all_requests();
     } else {
@@ -353,7 +404,6 @@ void TournamentFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseConte
     Ride legendary is not the solo pokemon (in case of loss)
 
     Possible improvements to make:
-    money tracking? notifs tend to backlog.
     find prize sprites - some code is there, just disabled
     find translations for tera shards
     other languages: make sure "bottle cap" isn't misread as "bottle of PP Up"
@@ -363,12 +413,11 @@ void TournamentFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseConte
         //Initiate dialog then mash until first battle starts
         AdvanceDialogWatcher advance_detector(COLOR_YELLOW);
         pbf_press_button(context, BUTTON_A, 10, 50);
-        pbf_press_button(context, BUTTON_A, 10, 50);
         int ret = wait_until(env.console, context, Milliseconds(7000), { advance_detector });
         if (ret < 0) {
             env.log("Dialog detected.");
         }
-        pbf_mash_button(context, BUTTON_A, 400);
+        pbf_mash_button(context, BUTTON_A, 300);
         context.wait_for_all_requests();
 
         NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
