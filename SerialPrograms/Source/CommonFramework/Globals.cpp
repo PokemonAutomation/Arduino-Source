@@ -10,6 +10,16 @@
 
 namespace PokemonAutomation{
 
+
+//
+//  ATTENTION!!!
+//
+//  If you are building from source, do not change any of these version numbers
+//  or tags. When filing reports or asking for support, we (the developers) need
+//  to know exactly what you are running. Changing these values can lead to
+//  misleading version information.
+//
+
 const bool IS_BETA_VERSION = true;
 const int PROGRAM_VERSION_MAJOR = 0;
 const int PROGRAM_VERSION_MINOR = 31;
@@ -27,6 +37,9 @@ const std::string PROGRAM_VERSION = IS_BETA_VERSION
 #else
 const std::string PROGRAM_VERSION = PROGRAM_VERSION_BASE + "-user";
 #endif
+
+
+
 
 const std::string PROGRAM_NAME = "Pok\u00e9mon Automation";
 
