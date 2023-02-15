@@ -28,6 +28,8 @@ namespace PokemonSV{
 
 using namespace Pokemon;
 
+class EncounterActionsTable;
+
 
 
 class EncounterRateTracker{
@@ -102,7 +104,7 @@ public:
         m_encounter_rate.report_start();
     }
 
-    void process_battle(EncounterWatcher& watcher);
+    void process_battle(EncounterWatcher& watcher, EncounterActionsTable* actions_table);
 
 
 private:

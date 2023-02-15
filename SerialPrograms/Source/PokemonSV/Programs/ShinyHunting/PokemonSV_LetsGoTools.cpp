@@ -6,10 +6,13 @@
 
 #include <algorithm>
 #include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Exceptions/ProgramFinishedException.h"
+#include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Notification.h"
+#include "PokemonSV/Options/PokemonSV_EncounterActionsTable.h"
 #include "PokemonSV/Inference/PokemonSV_SweatBubbleDetector.h"
 #include "PokemonSV_LetsGoTools.h"
 
@@ -111,7 +114,7 @@ LetsGoEncounterBotTracker::LetsGoEncounterBotTracker(
     })
     , m_session(context, console, {m_kill_sound})
 {}
-void LetsGoEncounterBotTracker::process_battle(EncounterWatcher& watcher){
+void LetsGoEncounterBotTracker::process_battle(EncounterWatcher& watcher, EncounterActionsTable* actions_table){
     m_encounter_rate.report_encounter();
     m_stats.m_encounters++;
 
@@ -140,11 +143,53 @@ void LetsGoEncounterBotTracker::process_battle(EncounterWatcher& watcher){
         m_notification_shiny,
         language != Language::None,
         is_shiny,
-        {{std::move(slugs), is_shiny ? ShinyType::UNKNOWN_SHINY : ShinyType::NOT_SHINY}},
+        {{slugs, is_shiny ? ShinyType::UNKNOWN_SHINY : ShinyType::NOT_SHINY}},
         watcher.lowest_error_coefficient(),
         watcher.shiny_screenshot(),
         &m_encounter_frequencies
     );
+
+    //  Iterate the actions table.
+    EncounterActionsEntry action;
+    action.action = is_shiny
+        ? EncounterActionsAction::STOP_PROGRAM
+        : EncounterActionsAction::RUN_AWAY;
+
+    if (actions_table != nullptr){
+        for (EncounterActionsEntry& entry : actions_table->snapshot()){
+            //  See if Pokemon name matches.
+            auto iter = slugs.find(entry.pokemon);
+            if (iter == slugs.end()){
+                continue;
+            }
+
+            switch (entry.shininess){
+            case EncounterActionsShininess::ANYTHING:
+                break;
+            case EncounterActionsShininess::NOT_SHINY:
+                if (is_shiny){
+                    continue;
+                }
+                break;
+            case EncounterActionsShininess::SHINY:
+                if (!is_shiny){
+                    continue;
+                }
+                break;
+            }
+
+            action = std::move(entry);
+        }
+    }
+
+    switch (action.action){
+    case EncounterActionsAction::RUN_AWAY:
+        return;
+    case EncounterActionsAction::STOP_PROGRAM:
+        throw ProgramFinishedException(m_console, "", true);
+    case EncounterActionsAction::THROW_BALLS:
+        throw FatalProgramException(ErrorReport::NO_ERROR_REPORT, m_console, "Auto-catch has not been implemented yet.");
+    }
 }
 
 

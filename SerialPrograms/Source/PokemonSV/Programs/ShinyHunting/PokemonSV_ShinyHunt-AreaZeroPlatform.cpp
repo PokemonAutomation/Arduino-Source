@@ -9,6 +9,7 @@
 #include <sstream>
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
@@ -149,6 +150,7 @@ ShinyHuntAreaZeroPlatform::ShinyHuntAreaZeroPlatform()
     if (PreloadSettings::instance().DEVELOPER_MODE){
         PA_ADD_OPTION(PLATFORM_RESET);
         PA_ADD_OPTION(NAVIGATE_TO_PLATFORM);
+        PA_ADD_OPTION(ACTIONS_TABLE);
     }
     PA_ADD_OPTION(NOTIFICATIONS);
 }
@@ -606,7 +608,12 @@ void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, Bot
         encounter_watcher.throw_if_no_sound();
 
         env.console.log("Detected battle.", COLOR_PURPLE);
-        tracker.process_battle(encounter_watcher);
+        try{
+            tracker.process_battle(encounter_watcher, &ACTIONS_TABLE);
+        }catch (ProgramFinishedException&){
+            GO_HOME_WHEN_DONE.run_end_of_program(context);
+            throw;
+        }
 
         if (encounter_watcher.shiny_screenshot()){
             break;
@@ -624,8 +631,8 @@ void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, Bot
         );
     }
 
-    GO_HOME_WHEN_DONE.run_end_of_program(context);
-    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
+//    GO_HOME_WHEN_DONE.run_end_of_program(context);
+//    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 }
 
 

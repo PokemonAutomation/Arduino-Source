@@ -656,6 +656,7 @@ SOURCES += \
     Source/PokemonSV/Options/PokemonSV_AuctionItemSelectOption.cpp \
     Source/PokemonSV/Options/PokemonSV_AuctionItemTable.cpp \
     Source/PokemonSV/Options/PokemonSV_EggPowerSandwichOption.cpp \
+    Source/PokemonSV/Options/PokemonSV_EncounterActionsTable.cpp \
     Source/PokemonSV/Options/PokemonSV_PlayerList.cpp \
     Source/PokemonSV/Options/PokemonSV_TeraAIOption.cpp \
     Source/PokemonSV/Options/PokemonSV_TeraMoveTable.cpp \
@@ -706,6 +707,7 @@ SOURCES += \
     Source/PokemonSV/Programs/Trading/PokemonSV_TradeRoutines.cpp \
     Source/PokemonSV/Resources/PokemonSV_AuctionItemNames.cpp \
     Source/PokemonSV/Resources/PokemonSV_ItemSprites.cpp \
+    Source/PokemonSV/Resources/PokemonSV_NameDatabase.cpp \
     Source/PokemonSV/Resources/PokemonSV_PokemonSprites.cpp \
     Source/PokemonSV/Resources/PokemonSV_TournamentPrizeNames.cpp \
     Source/PokemonSV/Resources/PokemonSV_SandwichSprites.cpp \
@@ -1656,6 +1658,7 @@ HEADERS += \
     Source/PokemonSV/Options/PokemonSV_AuctionItemTable.h \
     Source/PokemonSV/Options/PokemonSV_AutoHostOptions.h \
     Source/PokemonSV/Options/PokemonSV_EggPowerSandwichOption.h \
+    Source/PokemonSV/Options/PokemonSV_EncounterActionsTable.h \
     Source/PokemonSV/Options/PokemonSV_PlayerList.h \
     Source/PokemonSV/Options/PokemonSV_TeraAIOption.h \
     Source/PokemonSV/Options/PokemonSV_TeraMoveTable.h \
@@ -1706,6 +1709,7 @@ HEADERS += \
     Source/PokemonSV/Programs/Trading/PokemonSV_TradeRoutines.h \
     Source/PokemonSV/Resources/PokemonSV_AuctionItemNames.h \
     Source/PokemonSV/Resources/PokemonSV_ItemSprites.h \
+    Source/PokemonSV/Resources/PokemonSV_NameDatabase.h \
     Source/PokemonSV/Resources/PokemonSV_PokemonSprites.h \
     Source/PokemonSV/Resources/PokemonSV_TournamentPrizeNames.h \
     Source/PokemonSV/Resources/PokemonSV_SandwichSprites.h \

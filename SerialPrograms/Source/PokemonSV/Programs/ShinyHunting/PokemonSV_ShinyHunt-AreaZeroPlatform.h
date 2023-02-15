@@ -15,6 +15,7 @@
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
+#include "PokemonSV/Options/PokemonSV_EncounterActionsTable.h"
 #include "PokemonSV_AreaZeroPlatform.h"
 
 namespace PokemonAutomation{
@@ -80,6 +81,8 @@ private:
 
     PlatformResetSettings PLATFORM_RESET;
     NavigatePlatformSettings NAVIGATE_TO_PLATFORM;
+
+    EncounterActionsTable ACTIONS_TABLE;
 
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationOption NOTIFICATION_NONSHINY;

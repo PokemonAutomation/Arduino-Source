@@ -1315,6 +1315,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Options/PokemonSV_AutoHostOptions.h
     Source/PokemonSV/Options/PokemonSV_EggPowerSandwichOption.cpp
     Source/PokemonSV/Options/PokemonSV_EggPowerSandwichOption.h
+    Source/PokemonSV/Options/PokemonSV_EncounterActionsTable.cpp
+    Source/PokemonSV/Options/PokemonSV_EncounterActionsTable.h
     Source/PokemonSV/Options/PokemonSV_PlayerList.cpp
     Source/PokemonSV/Options/PokemonSV_PlayerList.h
     Source/PokemonSV/Options/PokemonSV_TeraAIOption.cpp
@@ -1415,6 +1417,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Resources/PokemonSV_AuctionItemNames.h
     Source/PokemonSV/Resources/PokemonSV_ItemSprites.cpp
     Source/PokemonSV/Resources/PokemonSV_ItemSprites.h
+    Source/PokemonSV/Resources/PokemonSV_NameDatabase.cpp
+    Source/PokemonSV/Resources/PokemonSV_NameDatabase.h
     Source/PokemonSV/Resources/PokemonSV_PokemonSprites.cpp
     Source/PokemonSV/Resources/PokemonSV_PokemonSprites.h
     Source/PokemonSV/Resources/PokemonSV_TournamentPrizeNames.cpp
