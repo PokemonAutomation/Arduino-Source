@@ -82,7 +82,7 @@ int main(void){
     pbf_press_button(BUTTON_A, 5, 5);
 
     for(int curBox = 0; curBox < BOXES_TO_HATCH; curBox++) {
-        // ########## Intial setup ##########
+        // ########## Intial loop setup ##########
         open_box();
         pbf_press_dpad(DPAD_LEFT, 1, 200);
         if (HAS_CLONED_RIDER) {
@@ -98,8 +98,12 @@ int main(void){
             open_box();
             deposit_pokemon(boxCol);
         };
+
+        // ########## End loop setup ##########
+        pbf_press_button(BUTTON_RCLICK, 5, 100);
+        pbf_press_button(BUTTON_B, 1, 200);
+        pbf_press_button(BUTTON_B, 1, 800);
     };
-    
     
     // ########## End idling in home ##########
     pbf_press_button(BUTTON_HOME, 10, 125);
