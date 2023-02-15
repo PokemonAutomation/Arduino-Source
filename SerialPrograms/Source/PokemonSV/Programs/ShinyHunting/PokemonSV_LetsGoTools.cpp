@@ -186,7 +186,8 @@ void LetsGoEncounterBotTracker::process_battle(EncounterWatcher& watcher, Encoun
     case EncounterActionsAction::RUN_AWAY:
         return;
     case EncounterActionsAction::STOP_PROGRAM:
-        throw ProgramFinishedException(m_console, "", true);
+        throw ProgramFinishedException();
+//        throw ProgramFinishedException(m_console, "", true);
     case EncounterActionsAction::THROW_BALLS:
         throw FatalProgramException(ErrorReport::NO_ERROR_REPORT, m_console, "Auto-catch has not been implemented yet.");
     }
