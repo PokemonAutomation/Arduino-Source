@@ -254,11 +254,11 @@ SandwichIngredientReader::Results SandwichIngredientReader::read(const ImageView
     switch (m_ingredient_type){
     case SandwichIngredientType::FILLING:
         results.image_results = SANDWICH_FILLING_MATCHER().match(icon_image, ALPHA_SPREAD);
-        results.ocr_results = SandwichFillingOCR::instance().read_substring(logger, language, text_image, OCR::BLACK_TEXT_FILTERS());
+        results.ocr_results = SandwichFillingOCR::instance().read_substring(logger, language, text_image, OCR::BLACK_OR_WHITE_TEXT_FILTERS());
         break;
     case SandwichIngredientType::CONDIMENT:
         results.image_results = SANDWICH_CONDIMENT_MATCHER().match(icon_image, ALPHA_SPREAD);
-        results.ocr_results = SandwichCondimentOCR::instance().read_substring(logger, language, text_image, OCR::BLACK_TEXT_FILTERS());
+        results.ocr_results = SandwichCondimentOCR::instance().read_substring(logger, language, text_image, OCR::BLACK_OR_WHITE_TEXT_FILTERS());
         break;
     }
     results.image_results.clear_beyond_alpha(MAX_ALPHA);
