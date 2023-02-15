@@ -148,9 +148,9 @@ ShinyHuntAreaZeroPlatform::ShinyHuntAreaZeroPlatform()
     PA_ADD_OPTION(VIDEO_ON_SHINY);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     if (PreloadSettings::instance().DEVELOPER_MODE){
+        PA_ADD_OPTION(ACTIONS_TABLE);
         PA_ADD_OPTION(PLATFORM_RESET);
         PA_ADD_OPTION(NAVIGATE_TO_PLATFORM);
-        PA_ADD_OPTION(ACTIONS_TABLE);
     }
     PA_ADD_OPTION(NOTIFICATIONS);
 }

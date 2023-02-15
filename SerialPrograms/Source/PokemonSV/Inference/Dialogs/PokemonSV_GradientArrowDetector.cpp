@@ -50,6 +50,7 @@ bool is_gradient_arrow(
     }
 
     ImageViewRGB32 cropped = extract_box_reference(image, object);
+//    cropped.save("test.png");
 
     const double THRESHOLD = 80;
 
@@ -120,14 +121,19 @@ bool GradientArrowDetector::detect(ImageFloatBox& box, const ImageViewRGB32& scr
             {
                 {0xff808000, 0xffffff7f},
                 {0xff808000, 0xffffff3f},
+
                 {0xffa0a000, 0xffffff7f},
                 {0xffa0a000, 0xffffff3f},
+
                 {0xffc0c000, 0xffffff7f},
                 {0xffc0c000, 0xffffff3f},
+
                 {0xffe0e000, 0xffffff7f},
                 {0xffe0e000, 0xffffff3f},
+
                 {0xfff0f000, 0xffffff7f},
                 {0xfff0f000, 0xffffff3f},
+
                 {0xfff8f800, 0xffffff7f},
                 {0xfff8f800, 0xffffff3f},
             }
@@ -154,21 +160,29 @@ bool GradientArrowDetector::detect(ImageFloatBox& box, const ImageViewRGB32& scr
                 {0xff004080, 0xff5fffff},
                 {0xff004080, 0xff3fffff},
                 {0xff004080, 0xff0fffff},
+
+                {0xff008080, 0xff7fffff},
+                {0xff008080, 0xff5fffff},
+                {0xff008080, 0xff3fffff},
+                {0xff008080, 0xff0fffff},
+
                 {0xff0080c0, 0xff7fffff},
                 {0xff0080c0, 0xff5fffff},
                 {0xff0080c0, 0xff3fffff},
                 {0xff0080c0, 0xff0fffff},
+
                 {0xff00c0c0, 0xff7fffff},
                 {0xff00c0c0, 0xff5fffff},
                 {0xff00c0c0, 0xff3fffff},
                 {0xff00c0c0, 0xff0fffff},
+
                 {0xff00c0e0, 0xff7fffff},
                 {0xff00c0e0, 0xff5fffff},
                 {0xff00c0e0, 0xff3fffff},
                 {0xff00c0e0, 0xff0fffff},
             }
         );
-//        PackedBinaryMatrix blue_matrix = compress_rgb32_to_binary_range(region, 0xff00c0c0, 0xff0fffff);
+//        PackedBinaryMatrix blue_matrix = compress_rgb32_to_binary_range(region, 0xff0080c0, 0xff7fffff);
 //        cout << blue_matrix.dump() << endl;
 //        size_t c = 0;
         for (PackedBinaryMatrix& matrix : matrices){

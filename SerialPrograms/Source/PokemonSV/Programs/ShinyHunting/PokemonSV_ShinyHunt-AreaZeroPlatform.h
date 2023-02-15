@@ -79,10 +79,9 @@ private:
     BooleanCheckBoxOption VIDEO_ON_SHINY;
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
+    EncounterActionsTable ACTIONS_TABLE;
     PlatformResetSettings PLATFORM_RESET;
     NavigatePlatformSettings NAVIGATE_TO_PLATFORM;
-
-    EncounterActionsTable ACTIONS_TABLE;
 
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationOption NOTIFICATION_NONSHINY;

@@ -140,6 +140,7 @@ bool TeraBattleMenuDetector::detect(const ImageViewRGB32& screen) const{
         return false;
     }
     if (!m_arrow.detect(screen)){
+//        cout << "arrow" << endl;
         return false;
     }
     return true;

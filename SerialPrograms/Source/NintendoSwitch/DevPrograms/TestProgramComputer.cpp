@@ -204,6 +204,13 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 
 //    load_pokemon_slug_json_list();
 
+    ImageRGB32 image("screenshot-20230215-031848496858.png");
+    MoveSelectDetector detector(COLOR_RED);
+    cout << detector.detect(image) << endl;
+
+
+
+#if 0
     OCR::StringMatchResult result = PokemonNameReader::instance().read_substring(
         env.logger(), Language::Korean,
         ImageRGB32("../../TrainingData/PokemonNameOCR/PokemonNameOCR (Kim-SwShPokedex-1)/kor/joltik-20210618-212232.png"),
@@ -213,7 +220,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     for (auto& item : result.results){
         cout << item.first << ": " << item.second.token << endl;
     }
-
+#endif
 
 #if 0
     for (int c = (int)Language::English; c < (int)Language::EndOfList; c++){
