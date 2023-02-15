@@ -118,7 +118,7 @@ public:
 
 class SandwichFillingOCR : public OCR::SmallDictionaryMatcher {
 public:
-    static constexpr double MAX_LOG10P = -8.0;
+    static constexpr double MAX_LOG10P = -1.5;//JSon are broken right now and in order to be able to detect salt in french Sels in the json, Sel in game, it needs to be super low
     static constexpr double MAX_LOG10P_SPREAD = 4.0;
 
 public:
@@ -137,7 +137,7 @@ private:
 };
 class SandwichCondimentOCR : public OCR::SmallDictionaryMatcher {
 public:
-    static constexpr double MAX_LOG10P = -8.0;
+    static constexpr double MAX_LOG10P = -1.5;//JSon are broken right now and in order to be able to detect salt in french Sels in the json, Sel in game, it needs to be super low
     static constexpr double MAX_LOG10P_SPREAD = 4.0;
 
 public:
