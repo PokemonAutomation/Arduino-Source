@@ -100,7 +100,7 @@ int main(void){
         };
 
         // ########## End loop setup ##########
-        pbf_press_button(BUTTON_RCLICK, 5, 100);
+        pbf_press_button(BUTTON_R, 5, 200);
         pbf_press_button(BUTTON_B, 1, 200);
         pbf_press_button(BUTTON_B, 1, 800);
     };
