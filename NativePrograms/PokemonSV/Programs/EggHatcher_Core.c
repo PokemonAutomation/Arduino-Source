@@ -3,8 +3,7 @@
 #include "NativePrograms/NintendoSwitch/Libraries/FrameworkSettings.h"
 #include "NativePrograms/NintendoSwitch/Libraries/NintendoSwitch_Device.h"
 #include "NativePrograms/NintendoSwitch/Libraries/NintendoSwitch_PushButtons.h"
-#include "NativePrograms/PokemonSwSh/Libraries/PokemonSwSh_Settings.h"
-#include "EggFetcher.h"
+#include "EggHatcher.h"
 
 void fly_to_gate(void) {
     pbf_press_button(BUTTON_A, 1, 500);
@@ -103,7 +102,7 @@ int main(void){
     
     
     // ########## End idling in home ##########
-    pbf_press_button(BUTTON_HOME, 10, PokemonSwSh_GAME_TO_HOME_DELAY_SAFE);
+    pbf_press_button(BUTTON_HOME, 10, 125);
     end_program_callback();
     end_program_loop();
 };

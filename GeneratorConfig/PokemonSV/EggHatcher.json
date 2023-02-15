@@ -1,6 +1,6 @@
 {
     "0-ProgramName": "EggHatcher",
-    "1-Documentation": "Microcontroller/blob/master/Wiki/Programs/PokemonSV/EggHatcher.md",
+    "1-Documentation": "Microcontroller/blob/master/Wiki/Programs/Pokemon/EggHatcher.md",
     "2-Description": "Hatch eggs from boxes.",
     "3-Parameters": [
         {
@@ -9,8 +9,8 @@
             "02-Declaration": "const uint8_t BOXES_TO_HATCH",
             "03-MinValue": 0,
             "04-MaxValue": 32,
-            "98-Default": 2,
-            "99-Current": 2
+            "98-Default": 3,
+            "99-Current": 1
         },
         {
             "00-Type": "EnumDropdown",
@@ -62,14 +62,14 @@
         },
         {
             "00-Type": "Divider",
-            "01-Label": "<font size=4><b>Additional Safety Options:</b></font>"
+            "01-Label": "<font size=4><b>Additional Safety Options:</b> You should not need to touch anything below here.</font>"
         },
         {
-            "00-Type": "TimeExpression",
-            "01-Label": "<b>Safety Coefficient:</b><br>Hatching time multiplier, increase if hatching ended prematurely.",
-            "02-Declaration": "const uint16_t SAFETY_COEFF",
-            "03-MinValue": 1,
-            "04-MaxValue": 2,
+            "00-Type": "FloatingPoint",
+            "01-Label": "<b>Safety Time:</b><br>Additional time added to the spinning.",
+            "02-Declaration": "const float SAFETY_COEFF",
+            "03-MinValue": 0.0,
+            "04-MaxValue": 2.0,
             "98-Default": 1.1,
             "99-Current": 1.1
         }
