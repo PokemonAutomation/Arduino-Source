@@ -32,6 +32,7 @@ std::string dump_image(
     const ImageViewRGB32& image
 );
 
+#if 0
 // dump a screenshot to ./ErrorDumps/ folder and throw an OperationFailedException.
 // Also send image as telemetry if user allows.
 // notification_error: the notification option used to set whether user wants to receive notifiction for
@@ -46,6 +47,7 @@ std::string dump_image(
     const std::string& error_name,
     const std::string& error_message
 );
+#endif
 
 // dump a screenshot to ./ErrorDumps/ folder and throw an OperationFailedException.
 // error_name: the error name, used as the image name and show up on video overlay log. Typical format example:

@@ -148,10 +148,10 @@ WallClock AutoHost::wait_for_lobby_open(
         {{lobby, std::chrono::milliseconds(500)}}
     );
     if (ret < 0){
-        dump_image_and_throw_recoverable_exception(
-            env, env.console,
-            NOTIFICATION_ERROR_RECOVERABLE,
-            "NoLobby", "Unable to detect Tera lobby after 60 seconds."
+        throw OperationFailedException(
+            ErrorReport::SEND_ERROR_REPORT, env.console,
+            "Unable to detect Tera lobby after 60 seconds.",
+            true
         );
     }
     WallClock start_time = current_time();
@@ -227,10 +227,10 @@ bool AutoHost::start_raid(
             update_stats_on_raid_start(env, player_count);
             return true;
         default:
-            dump_image_and_throw_recoverable_exception(
-                env, env.console,
-                NOTIFICATION_ERROR_RECOVERABLE,
-                "StuckLobby", "Stuck in lobby for 4 minutes."
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, env.console,
+                "Stuck in lobby for 4 minutes.",
+                true
             );
         }
     }
@@ -362,11 +362,7 @@ void AutoHost::program(SingleSwitchProgramEnvironment& env, BotBaseContext& cont
             env.update_stats();
 
             stats.m_raids++;
-            bool win = run_tera_battle(
-                env, env.console, context,
-                NOTIFICATION_ERROR_RECOVERABLE,
-                BATTLE_AI
-            );
+            bool win = run_tera_battle(env, env.console, context, BATTLE_AI);
             env.update_stats();
             if (win){
                 stats.m_wins++;

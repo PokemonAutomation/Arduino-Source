@@ -22,6 +22,7 @@
 
 namespace PokemonAutomation{
 
+
 class AsyncTask{
 public:
     //  Wait for the task to finish before destructing. Doesn't rethrow exceptions.
@@ -56,6 +57,8 @@ private:
     std::mutex m_lock;
     std::condition_variable m_cv;
 };
+
+
 
 class AsyncDispatcher{
 public:

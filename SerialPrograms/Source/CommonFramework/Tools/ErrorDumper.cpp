@@ -55,6 +55,7 @@ std::string dump_image(
     return name;
 }
 
+#if 0
 void dump_image_and_throw_recoverable_exception(
     ProgramEnvironment& env,
     ConsoleHandle& console,
@@ -86,6 +87,7 @@ void dump_image_and_throw_recoverable_exception(
     );
 #endif
 }
+#endif
 
 void dump_image_and_throw_recoverable_exception(
     const ProgramInfo& program_info,

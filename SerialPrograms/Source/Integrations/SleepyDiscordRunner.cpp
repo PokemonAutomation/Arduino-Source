@@ -554,11 +554,13 @@ void send_embed_sleepy(
         }
 
         sleepy_logger().log("send_message_sleepy(): Sending...", COLOR_PURPLE);
+        std::chrono::seconds delay(channel.delay);
         m_sleepy_client->send(
             embed.dump(),
             channel.channel_id,
-            std::chrono::seconds(channel.delay),
+            std::chrono::seconds(delay),
             builder.build_message(
+                std::chrono::seconds(delay),
                 should_ping && channel.ping,
                 settings.message.user_id,
                 settings.message.message

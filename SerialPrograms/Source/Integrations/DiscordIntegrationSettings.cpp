@@ -9,8 +9,8 @@
 #include <QPushButton>
 #include <dpp/DPP_SilenceWarnings.h>
 #include "Common/Qt/StringToolsQt.h"
-#include "CommonFramework/Globals.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
+//#include "CommonFramework/Globals.h"
+//#include "CommonFramework/GlobalSettingsPanel.h"
 #include "DppIntegration/DppClient.h"
 #include "SleepyDiscordRunner.h"
 #include "DiscordIntegrationSettings.h"
@@ -273,7 +273,11 @@ bool MessageBuilder::should_send(const std::vector<std::string>& channel_tags) c
     }
     return false;
 }
-std::string MessageBuilder::build_message(bool ping, const std::string& user_id, const std::string& message) const{
+std::string MessageBuilder::build_message(
+    std::chrono::seconds delay,
+    bool ping, const std::string& user_id,
+    const std::string& message
+) const{
     if (std::atoll(user_id.c_str()) == 0){
         ping = false;
     }
@@ -289,6 +293,22 @@ std::string MessageBuilder::build_message(bool ping, const std::string& user_id,
             str += " ";
         }
         str += convert(message);
+    }
+
+    auto delay_seconds = delay.count();
+    if (delay_seconds != 0){
+        if (!str.empty()){
+            str += "\n";
+        }
+        str += "*(";
+        str += "Message ";
+        str += "delay";
+        str += "ed ";
+        str += "by " + std::to_string(delay_seconds);
+        str += delay_seconds == 1
+            ? " second"
+            : " seconds";
+        str += ".)*";
     }
 
     return str;

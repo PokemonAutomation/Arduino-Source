@@ -491,11 +491,7 @@ void RideCloner101::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
             pbf_press_dpad(context, DPAD_DOWN, 10, 10);
             pbf_mash_button(context, BUTTON_A, 250);
 
-            bool win = run_tera_battle(
-                env, env.console, context,
-                NOTIFICATION_ERROR_RECOVERABLE,
-                BATTLE_AI
-            );
+            bool win = run_tera_battle(env, env.console, context, BATTLE_AI);
 
             if (win){
                 stats.m_wins++;

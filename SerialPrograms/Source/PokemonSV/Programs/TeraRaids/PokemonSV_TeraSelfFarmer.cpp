@@ -232,11 +232,7 @@ bool TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, BotBaseContex
 
     TeraSelfFarmer_Descriptor::Stats& stats = env.current_stats<TeraSelfFarmer_Descriptor::Stats>();
 
-    bool win = run_tera_battle(
-        env, env.console, context,
-        NOTIFICATION_ERROR_RECOVERABLE,
-        BATTLE_AI
-    );
+    bool win = run_tera_battle(env, env.console, context, BATTLE_AI);
 
     if (win){
         stats.m_wins++;

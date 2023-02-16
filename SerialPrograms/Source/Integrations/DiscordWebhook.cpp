@@ -267,8 +267,11 @@ void send_embed(
             continue;
         }
 
+        std::chrono::seconds delay(url.delay);
+
         JsonObject json;
         json["content"] = builder.build_message(
+            delay,
             should_ping && url.ping,
             settings.message.user_id,
             settings.message.message
@@ -280,7 +283,7 @@ void send_embed(
         DiscordWebhookSender::instance().send_json(
             logger,
             QString::fromStdString(url.url),
-            std::chrono::seconds(url.delay),
+            delay,
             std::move(json),
             file
         );

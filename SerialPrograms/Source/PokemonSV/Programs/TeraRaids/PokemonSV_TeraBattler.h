@@ -22,7 +22,6 @@ namespace PokemonSV{
 bool run_tera_battle(
     ProgramEnvironment& env,
     ConsoleHandle& console, BotBaseContext& context,
-    EventNotificationOption& error_notification,
     TeraAIOption& battle_AI
 );
 

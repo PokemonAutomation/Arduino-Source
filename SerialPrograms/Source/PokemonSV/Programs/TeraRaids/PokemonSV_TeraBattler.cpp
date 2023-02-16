@@ -5,6 +5,7 @@
  */
 
 #include <mutex>
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
@@ -179,7 +180,6 @@ bool run_target_select(
 bool run_tera_battle(
     ProgramEnvironment& env,
     ConsoleHandle& console, BotBaseContext& context,
-    EventNotificationOption& error_notification,
     TeraAIOption& battle_AI
 ){
     size_t turn = 0;
@@ -320,10 +320,10 @@ bool run_tera_battle(
         default:
             consecutive_timeouts++;
             if (consecutive_timeouts == 3){
-                dump_image_and_throw_recoverable_exception(
-                    env, console, error_notification,
-                    "NoStateFound",
-                    "No state detected after 6 minutes."
+                throw OperationFailedException(
+                    ErrorReport::SEND_ERROR_REPORT, console,
+                    "No state detected after 6 minutes.",
+                    true
                 );
             }
             console.log("Unable to detect any state for 2 minutes. Mashing B...", COLOR_RED);

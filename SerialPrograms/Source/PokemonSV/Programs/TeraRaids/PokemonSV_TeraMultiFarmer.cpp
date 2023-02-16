@@ -271,11 +271,7 @@ bool TeraMultiFarmer::run_raid_host(ProgramEnvironment& env, ConsoleHandle& cons
 
     stats.m_raids++;
     env.update_stats();
-    bool win = run_tera_battle(
-        env, console, context,
-        NOTIFICATION_ERROR_RECOVERABLE,
-        option.battle_ai
-    );
+    bool win = run_tera_battle(env, console, context, option.battle_ai);
 
     if (win){
         stats.m_wins++;
@@ -299,11 +295,7 @@ bool TeraMultiFarmer::run_raid_host(ProgramEnvironment& env, ConsoleHandle& cons
 void TeraMultiFarmer::run_raid_joiner(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){
     PerConsoleTeraFarmerOptions& option = *PLAYERS[console.index()];
 
-    bool win = run_tera_battle(
-        env, console, context,
-        NOTIFICATION_ERROR_RECOVERABLE,
-        option.battle_ai
-    );
+    bool win = run_tera_battle(env, console, context, option.battle_ai);
 
     if (win){
         if (option.catch_on_win){
@@ -430,11 +422,10 @@ bool TeraMultiFarmer::run_raid(
         std::string code = lobby_reader.raid_code(env.logger(), env.realtime_dispatcher(), host_console.video().snapshot());
         const char* error = normalize_code(lobby_code, code);
         if (error){
-            dump_image_and_throw_recoverable_exception(
-                env, host_console,
-                NOTIFICATION_ERROR_RECOVERABLE,
-                "UnableToReadCode",
-                "Unable to read raid code."
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, host_console,
+                "Unable to read raid code.",
+                true
             );
         }
     }catch (OperationFailedException&){

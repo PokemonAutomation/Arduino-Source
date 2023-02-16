@@ -7,6 +7,7 @@
 #include <cmath>
 #include "Common/Compiler.h"
 #include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
@@ -19,14 +20,11 @@
 #include "Pokemon/Pokemon_Notification.h"
 #include "PokemonBDSP/PokemonBDSP_Settings.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_DialogDetector.h"
-#include "PokemonBDSP/Inference/PokemonBDSP_SelectionArrow.h"
 #include "PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxGenderDetector.h"
 #include "PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxNatureDetector.h"
 #include "PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxShinyDetector.h"
 #include "PokemonBDSP/Inference/BoxSystem/PokemonBDSP_IVCheckerReader.h"
 #include "PokemonBDSP/Programs/PokemonBDSP_GameNavigation.h"
-#include "PokemonBDSP/Programs/PokemonBDSP_BoxRelease.h"
-#include "PokemonBDSP/Programs/PokemonBDSP_EncounterHandler.h"
 #include "PokemonBDSP_EggRoutines.h"
 #include "PokemonBDSP_EggFeedback.h"
 #include "PokemonBDSP_EggAutonomousState.h"
@@ -143,7 +141,11 @@ void EggAutonomousState::set(const EggAutonomousState& state){
 
 void EggAutonomousState::process_error(const std::string& name, const char* message){
     m_stats.m_errors++;
-    dump_image_and_throw_recoverable_exception(m_env, m_console, m_notification_error, name, message);
+    throw OperationFailedException(
+        ErrorReport::SEND_ERROR_REPORT, m_console,
+        message,
+        true
+    );
 }
 
 void EggAutonomousState::process_shiny(const ImageViewRGB32& screen){

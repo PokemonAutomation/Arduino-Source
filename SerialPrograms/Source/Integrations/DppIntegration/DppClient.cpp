@@ -113,10 +113,13 @@ void Client::send_embed_dpp(
             continue;
         }
 
+        std::chrono::seconds delay(channel.delay);
         Handler::send_message(
             *m_bot.get(), embed,
-            channel.channel_id, std::chrono::seconds(channel.delay),
+            channel.channel_id,
+            delay,
             builder.build_message(
+                delay,
                 should_ping && channel.ping,
                 settings.message.user_id,
                 settings.message.message

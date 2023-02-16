@@ -58,7 +58,11 @@ public:
     MessageBuilder(const std::vector<std::string>& message_tags);
 
     bool should_send(const std::vector<std::string>& channel_tags) const;
-    std::string build_message(bool ping, const std::string& user_id, const std::string& message) const;
+    std::string build_message(
+        std::chrono::seconds delay,
+        bool ping, const std::string& user_id,
+        const std::string& message
+    ) const;
 
 private:
     std::set<std::string> m_message_tags;
