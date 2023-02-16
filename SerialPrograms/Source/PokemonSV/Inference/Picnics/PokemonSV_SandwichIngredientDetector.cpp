@@ -5,6 +5,7 @@
  */
 
 #include "CommonFramework/ImageMatch/WaterfillTemplateMatcher.h"
+#include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/WaterfillUtilities.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
@@ -161,19 +162,19 @@ ImageMatch::SilhouetteDictionaryMatcher make_SANDWICH_FILLING_MATCHER(){
     }
     return matcher;
 }
-const ImageMatch::SilhouetteDictionaryMatcher& SANDWICH_FILLING_MATCHER() {
+const ImageMatch::SilhouetteDictionaryMatcher& SANDWICH_FILLING_MATCHER(){
     static ImageMatch::SilhouetteDictionaryMatcher matcher = make_SANDWICH_FILLING_MATCHER();
     return matcher;
 }
 
-ImageMatch::SilhouetteDictionaryMatcher make_SANDWICH_CONDIMENT_MATCHER() {
+ImageMatch::SilhouetteDictionaryMatcher make_SANDWICH_CONDIMENT_MATCHER(){
     ImageMatch::SilhouetteDictionaryMatcher matcher;
     for (const auto& item : ALL_SANDWICH_CONDIMENTS()) {
         matcher.add(item.first, item.second.icon.copy());
     }
     return matcher;
 }
-const ImageMatch::SilhouetteDictionaryMatcher& SANDWICH_CONDIMENT_MATCHER() {
+const ImageMatch::SilhouetteDictionaryMatcher& SANDWICH_CONDIMENT_MATCHER(){
     static ImageMatch::SilhouetteDictionaryMatcher matcher = make_SANDWICH_CONDIMENT_MATCHER();
     return matcher;
 }
@@ -202,7 +203,7 @@ OCR::StringMatchResult SandwichFillingOCR::read_substring(
     );
 }
 
-const SandwichCondimentOCR& SandwichCondimentOCR::instance() {
+const SandwichCondimentOCR& SandwichCondimentOCR::instance(){
     static SandwichCondimentOCR reader;
     return reader;
 }
@@ -238,30 +239,46 @@ void SandwichIngredientReader::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_text_box);
 }
 
-SandwichIngredientReader::Results SandwichIngredientReader::read(const ImageViewRGB32& screen, Logger& logger,Language language) const{
-    static constexpr double MAX_ALPHA = 100;
+ImageMatch::ImageMatchResult SandwichIngredientReader::read_with_icon_matcher(const ImageViewRGB32& screen) const{
+    static constexpr double MAX_ALPHA = 350;
     static constexpr double ALPHA_SPREAD = 20;
 
     // Get a crop of the sandwich ingredient icon
-    ImageViewRGB32 icon_image = extract_box_reference(screen, m_icon_box);
-    //cropped_image.save("icon_image.png");
+    ImageViewRGB32 image = extract_box_reference(screen, m_icon_box);
+    //image.save("image.png");
 
-    // Get a crop of the sandwich ingredient text
-    ImageViewRGB32 text_image = extract_box_reference(screen, m_text_box);
-    //cropped_image.save("text_image.png");
+    // Remove the orange / yellow background when the ingredient is selected
+    ImageRGB32 filtered_image = filter_rgb32_range(image, 0xffdfaf00, 0xffffef20, Color(0x00000000), true);
+    //filtered_image.save("filtered_image.png");
 
-    Results results;
+    ImageMatch::ImageMatchResult results;
     switch (m_ingredient_type){
     case SandwichIngredientType::FILLING:
-        results.image_results = SANDWICH_FILLING_MATCHER().match(icon_image, ALPHA_SPREAD);
-        results.ocr_results = SandwichFillingOCR::instance().read_substring(logger, language, text_image, OCR::BLACK_OR_WHITE_TEXT_FILTERS());
+        results = SANDWICH_FILLING_MATCHER().match(filtered_image, ALPHA_SPREAD);
         break;
     case SandwichIngredientType::CONDIMENT:
-        results.image_results = SANDWICH_CONDIMENT_MATCHER().match(icon_image, ALPHA_SPREAD);
-        results.ocr_results = SandwichCondimentOCR::instance().read_substring(logger, language, text_image, OCR::BLACK_OR_WHITE_TEXT_FILTERS());
+        results = SANDWICH_CONDIMENT_MATCHER().match(filtered_image, ALPHA_SPREAD);
         break;
     }
-    results.image_results.clear_beyond_alpha(MAX_ALPHA);
+    results.clear_beyond_alpha(MAX_ALPHA);
+
+    return results;
+}
+
+OCR::StringMatchResult SandwichIngredientReader::read_with_ocr(const ImageViewRGB32& screen, Logger& logger, Language language) const{
+    // Get a crop of the sandwich ingredient text
+    ImageViewRGB32 image = extract_box_reference(screen, m_text_box);
+    //image.save("image.png");
+
+    OCR::StringMatchResult results;
+    switch (m_ingredient_type){
+    case SandwichIngredientType::FILLING:
+        results = SandwichFillingOCR::instance().read_substring(logger, language, image, OCR::BLACK_OR_WHITE_TEXT_FILTERS());
+        break;
+    case SandwichIngredientType::CONDIMENT:
+        results = SandwichCondimentOCR::instance().read_substring(logger, language, image, OCR::BLACK_OR_WHITE_TEXT_FILTERS());
+        break;
+    }
 
     return results;
 }

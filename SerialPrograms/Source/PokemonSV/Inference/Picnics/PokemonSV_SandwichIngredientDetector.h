@@ -157,14 +157,15 @@ private:
 
 class SandwichIngredientReader{
 public:
-    struct Results{
-        ImageMatch::ImageMatchResult image_results;
-        OCR::StringMatchResult ocr_results;
-    };
     SandwichIngredientReader(SandwichIngredientType ingredient_type, size_t index, Color color = COLOR_RED);
 
     void make_overlays(VideoOverlaySet& items) const;
-    Results read(const ImageViewRGB32& screen, Logger& logger, Language language) const;
+
+    // The icon matcher only works on the selected item, because we want to remove the yellow / orange background
+    ImageMatch::ImageMatchResult read_with_icon_matcher(const ImageViewRGB32& screen) const;
+
+    // The OCR works on any ingredient, selected or not
+    OCR::StringMatchResult read_with_ocr(const ImageViewRGB32& screen, Logger& logger, Language language) const;
 
 private:
     Color m_color;
