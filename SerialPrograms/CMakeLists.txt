@@ -1315,6 +1315,7 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Options/PokemonSV_AutoHostOptions.h
     Source/PokemonSV/Options/PokemonSV_EggPowerSandwichOption.cpp
     Source/PokemonSV/Options/PokemonSV_EggPowerSandwichOption.h
+    Source/PokemonSV/Options/PokemonSV_EncounterBotCommon.h
     Source/PokemonSV/Options/PokemonSV_EncounterActionsTable.cpp
     Source/PokemonSV/Options/PokemonSV_EncounterActionsTable.h
     Source/PokemonSV/Options/PokemonSV_PlayerList.cpp

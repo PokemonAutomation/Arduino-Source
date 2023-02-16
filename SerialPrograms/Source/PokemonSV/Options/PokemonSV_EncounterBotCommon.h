@@ -4,28 +4,27 @@
  *
  */
 
-#ifndef PokemonAutomation_PokemonSwSh_EncounterBotCommon_H
-#define PokemonAutomation_PokemonSwSh_EncounterBotCommon_H
+#ifndef PokemonAutomation_PokemonSV_EncounterBotCommon_H
+#define PokemonAutomation_PokemonSV_EncounterBotCommon_H
 
 #include "Common/Cpp/Options/BatchOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "CommonFramework/Notifications/EventNotificationOption.h"
-#include "EncounterFilter/PokemonSwSh_EncounterFilterOption.h"
+#include "PokemonSV_EncounterActionsTable.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
-namespace PokemonSwSh{
+namespace PokemonSV{
 
 
 
 class EncounterBotCommonOptions : public BatchOption{
 public:
-    EncounterBotCommonOptions(bool rare_stars, bool enable_overrides)
-        : BatchOption(LockWhileRunning::LOCKED)
-        , FILTER(rare_stars, enable_overrides)
+    EncounterBotCommonOptions()
+        : BatchOption(LockWhileRunning::UNLOCKED)
         , VIDEO_ON_SHINY(
             "<b>Video Capture:</b><br>Take a video of the encounter if it is shiny.",
-            LockWhileRunning::LOCKED,
+            LockWhileRunning::UNLOCKED,
             true
         )
         , NOTIFICATION_NONSHINY(
@@ -50,11 +49,11 @@ public:
             {"Notifs"}
         )
     {
-        PA_ADD_OPTION(FILTER);
+        PA_ADD_OPTION(ACTIONS_TABLE);
         PA_ADD_OPTION(VIDEO_ON_SHINY);
     }
 
-    EncounterFilterOption FILTER;
+    EncounterActionsTable ACTIONS_TABLE;
     BooleanCheckBoxOption VIDEO_ON_SHINY;
 
     EventNotificationOption NOTIFICATION_NONSHINY;

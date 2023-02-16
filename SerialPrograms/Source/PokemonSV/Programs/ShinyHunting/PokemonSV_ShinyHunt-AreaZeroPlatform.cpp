@@ -113,28 +113,14 @@ ShinyHuntAreaZeroPlatform::ShinyHuntAreaZeroPlatform()
         LockWhileRunning::UNLOCKED,
         Path::PATH2
     )
-    , VIDEO_ON_SHINY(
-        "<b>Video Capture:</b><br>Take a video of the encounter if it is shiny.",
-        LockWhileRunning::UNLOCKED,
-        true
-    )
     , GO_HOME_WHEN_DONE(true)
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
-    , NOTIFICATION_NONSHINY(
-        "Non-Shiny Encounter",
-        false, false,
-        {"Notifs"},
-        std::chrono::seconds(3600)
-    )
-    , NOTIFICATION_SHINY(
-        "Shiny Encounter",
-        true, true, ImageAttachmentMode::JPG,
-        {"Notifs", "Showcase"}
-    )
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS_UPDATE,
-        &NOTIFICATION_NONSHINY,
-        &NOTIFICATION_SHINY,
+        &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_NONSHINY,
+        &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_SHINY,
+        &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_CATCH_SUCCESS,
+        &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_CATCH_FAILED,
         &NOTIFICATION_PROGRAM_FINISH,
         &NOTIFICATION_ERROR_RECOVERABLE,
         &NOTIFICATION_ERROR_FATAL,
@@ -145,10 +131,11 @@ ShinyHuntAreaZeroPlatform::ShinyHuntAreaZeroPlatform()
         PA_ADD_OPTION(MODE);
         PA_ADD_OPTION(PATH0);
     }
-    PA_ADD_OPTION(VIDEO_ON_SHINY);
+    if (PreloadSettings::instance().DEVELOPER_MODE){
+        PA_ADD_OPTION(ENCOUNTER_BOT_OPTIONS);
+    }
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     if (PreloadSettings::instance().DEVELOPER_MODE){
-        PA_ADD_OPTION(ACTIONS_TABLE);
         PA_ADD_OPTION(PLATFORM_RESET);
         PA_ADD_OPTION(NAVIGATE_TO_PLATFORM);
     }
@@ -570,10 +557,7 @@ void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, Bot
     LetsGoEncounterBotTracker tracker(
         env, env.console, context,
         stats,
-        LANGUAGE,
-        VIDEO_ON_SHINY,
-        NOTIFICATION_NONSHINY,
-        NOTIFICATION_SHINY
+        LANGUAGE
     );
     m_tracker = &tracker;
 
@@ -609,26 +593,11 @@ void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, Bot
 
         env.console.log("Detected battle.", COLOR_PURPLE);
         try{
-            tracker.process_battle(encounter_watcher, &ACTIONS_TABLE);
+            tracker.process_battle(encounter_watcher, ENCOUNTER_BOT_OPTIONS);
         }catch (ProgramFinishedException&){
             GO_HOME_WHEN_DONE.run_end_of_program(context);
             throw;
         }
-
-        if (encounter_watcher.shiny_screenshot()){
-            break;
-        }
-
-        OverworldWatcher overworld(COLOR_GREEN);
-        run_until(
-            env.console, context,
-            [&](BotBaseContext& context){
-                pbf_press_dpad(context, DPAD_DOWN, 250, 0);
-                pbf_press_button(context, BUTTON_A, 20, 105);
-                pbf_press_button(context, BUTTON_B, 20, 5 * TICKS_PER_SECOND);
-            },
-            {overworld}
-        );
     }
 
 //    GO_HOME_WHEN_DONE.run_end_of_program(context);

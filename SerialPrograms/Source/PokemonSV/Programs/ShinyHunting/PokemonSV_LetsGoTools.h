@@ -28,7 +28,7 @@ namespace PokemonSV{
 
 using namespace Pokemon;
 
-class EncounterActionsTable;
+class EncounterBotCommonOptions;
 
 
 
@@ -74,15 +74,16 @@ public:
 };
 
 
+
+
+
+
 class LetsGoEncounterBotTracker{
 public:
     LetsGoEncounterBotTracker(
         ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
         LetsGoEncounterBotStats& stats,
-        OCR::LanguageOCROption& language,
-        BooleanCheckBoxOption& video_on_shiny,
-        EventNotificationOption& notification_nonshiny,
-        EventNotificationOption& notification_shiny
+        OCR::LanguageOCROption& language
     );
 
     WallClock last_kill() const{
@@ -104,7 +105,7 @@ public:
         m_encounter_rate.report_start();
     }
 
-    void process_battle(EncounterWatcher& watcher, EncounterActionsTable* actions_table);
+    void process_battle(EncounterWatcher& watcher, EncounterBotCommonOptions& settings);
 
 
 private:
@@ -114,9 +115,6 @@ private:
     LetsGoEncounterBotStats& m_stats;
 
     OCR::LanguageOCROption& m_language;
-    BooleanCheckBoxOption& m_video_on_shiny;
-    EventNotificationOption& m_notification_nonshiny;
-    EventNotificationOption& m_notification_shiny;
 
     EncounterRateTracker m_encounter_rate;
     EncounterFrequencies m_encounter_frequencies;

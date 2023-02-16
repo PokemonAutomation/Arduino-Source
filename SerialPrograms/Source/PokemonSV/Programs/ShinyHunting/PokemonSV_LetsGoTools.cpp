@@ -11,9 +11,12 @@
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Pokemon_Notification.h"
-#include "PokemonSV/Options/PokemonSV_EncounterActionsTable.h"
+#include "PokemonSV/Options/PokemonSV_EncounterBotCommon.h"
 #include "PokemonSV/Inference/PokemonSV_SweatBubbleDetector.h"
+#include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
+#include "PokemonSV/Programs/PokemonSV_BasicCatcher.h"
 #include "PokemonSV_LetsGoTools.h"
 
 #include <iostream>
@@ -23,6 +26,8 @@ using std::endl;
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
+
+using namespace Pokemon;
 
 
 EncounterRateTracker::EncounterRateTracker()
@@ -92,19 +97,13 @@ void EncounterRateTracker::report_encounter(){
 LetsGoEncounterBotTracker::LetsGoEncounterBotTracker(
     ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     LetsGoEncounterBotStats& stats,
-    OCR::LanguageOCROption& language,
-    BooleanCheckBoxOption& video_on_shiny,
-    EventNotificationOption& notification_nonshiny,
-    EventNotificationOption& notification_shiny
+    OCR::LanguageOCROption& language
 )
     : m_env(env)
     , m_console(console)
     , m_context(context)
     , m_stats(stats)
     , m_language(language)
-    , m_video_on_shiny(video_on_shiny)
-    , m_notification_nonshiny(notification_nonshiny)
-    , m_notification_shiny(notification_shiny)
     , m_kill_sound(console, [&](float){
         console.log("Detected kill.");
         m_encounter_rate.report_kill();
@@ -114,7 +113,7 @@ LetsGoEncounterBotTracker::LetsGoEncounterBotTracker(
     })
     , m_session(context, console, {m_kill_sound})
 {}
-void LetsGoEncounterBotTracker::process_battle(EncounterWatcher& watcher, EncounterActionsTable* actions_table){
+void LetsGoEncounterBotTracker::process_battle(EncounterWatcher& watcher, EncounterBotCommonOptions& settings){
     m_encounter_rate.report_encounter();
     m_stats.m_encounters++;
 
@@ -130,7 +129,7 @@ void LetsGoEncounterBotTracker::process_battle(EncounterWatcher& watcher, Encoun
     bool is_shiny = (bool)watcher.shiny_screenshot();
     if (is_shiny){
         m_stats.m_shinies++;
-        if (m_video_on_shiny){
+        if (settings.VIDEO_ON_SHINY){
             m_context.wait_for(std::chrono::seconds(3));
             pbf_press_button(m_context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 0);
         }
@@ -139,8 +138,8 @@ void LetsGoEncounterBotTracker::process_battle(EncounterWatcher& watcher, Encoun
 
     send_encounter_notification(
         m_env,
-        m_notification_nonshiny,
-        m_notification_shiny,
+        settings.NOTIFICATION_NONSHINY,
+        settings.NOTIFICATION_SHINY,
         language != Language::None,
         is_shiny,
         {{slugs, is_shiny ? ShinyType::UNKNOWN_SHINY : ShinyType::NOT_SHINY}},
@@ -155,41 +154,89 @@ void LetsGoEncounterBotTracker::process_battle(EncounterWatcher& watcher, Encoun
         ? EncounterActionsAction::STOP_PROGRAM
         : EncounterActionsAction::RUN_AWAY;
 
-    if (actions_table != nullptr){
-        for (EncounterActionsEntry& entry : actions_table->snapshot()){
-            //  See if Pokemon name matches.
-            auto iter = slugs.find(entry.pokemon);
-            if (iter == slugs.end()){
+    for (EncounterActionsEntry& entry : settings.ACTIONS_TABLE.snapshot()){
+        //  See if Pokemon name matches.
+        auto iter = slugs.find(entry.pokemon);
+        if (iter == slugs.end()){
+            continue;
+        }
+
+        switch (entry.shininess){
+        case EncounterActionsShininess::ANYTHING:
+            break;
+        case EncounterActionsShininess::NOT_SHINY:
+            if (is_shiny){
                 continue;
             }
-
-            switch (entry.shininess){
-            case EncounterActionsShininess::ANYTHING:
-                break;
-            case EncounterActionsShininess::NOT_SHINY:
-                if (is_shiny){
-                    continue;
-                }
-                break;
-            case EncounterActionsShininess::SHINY:
-                if (!is_shiny){
-                    continue;
-                }
-                break;
+            break;
+        case EncounterActionsShininess::SHINY:
+            if (!is_shiny){
+                continue;
             }
-
-            action = std::move(entry);
+            break;
         }
+
+        action = std::move(entry);
     }
 
     switch (action.action){
-    case EncounterActionsAction::RUN_AWAY:
+    case EncounterActionsAction::RUN_AWAY:{
+        OverworldWatcher overworld(COLOR_GREEN);
+        run_until(
+            m_console, m_context,
+            [&](BotBaseContext& context){
+                pbf_press_dpad(context, DPAD_DOWN, 250, 0);
+                pbf_press_button(context, BUTTON_A, 20, 105);
+                pbf_press_button(context, BUTTON_B, 20, 5 * TICKS_PER_SECOND);
+            },
+            {overworld}
+        );
         return;
+    }
     case EncounterActionsAction::STOP_PROGRAM:
         throw ProgramFinishedException();
 //        throw ProgramFinishedException(m_console, "", true);
     case EncounterActionsAction::THROW_BALLS:
-        throw FatalProgramException(ErrorReport::NO_ERROR_REPORT, m_console, "Auto-catch has not been implemented yet.");
+//        throw FatalProgramException(ErrorReport::NO_ERROR_REPORT, m_console, "Auto-catch has not been implemented yet.");
+        if (language == Language::None){
+            throw InternalProgramError(&m_console.logger(), PA_CURRENT_FUNCTION, "Language is not set.");
+        }
+        CatchResults result = basic_catcher(m_console, m_context, language, action.ball);
+        switch (result.result){
+        case CatchResult::POKEMON_CAUGHT:
+            m_console.log(STRING_POKEMON + " caught!", COLOR_BLUE);
+            break;
+        case CatchResult::POKEMON_FAINTED:
+            m_console.log(STRING_POKEMON + " fainted!", COLOR_ORANGE);
+            break;
+        case CatchResult::OWN_FAINTED:
+            throw FatalProgramException(
+                ErrorReport::NO_ERROR_REPORT, m_console,
+                "Your own " + STRING_POKEMON + " fainted!",
+                true
+            );
+        case CatchResult::OUT_OF_BALLS:
+            throw FatalProgramException(
+                ErrorReport::NO_ERROR_REPORT, m_console,
+                "Unable to find the desired ball. Did you run out?",
+                true
+            );
+        case CatchResult::CANNOT_THROW_BALL:
+            throw FatalProgramException(
+                ErrorReport::NO_ERROR_REPORT, m_console,
+                "Unable to throw ball. Is the " + STRING_POKEMON + " semi-invulnerable?",
+                true
+            );
+        }
+        send_catch_notification(
+            m_env,
+            settings.NOTIFICATION_CATCH_SUCCESS,
+            settings.NOTIFICATION_CATCH_FAILED,
+            &slugs,
+            action.ball,
+            result.balls_used,
+            result.result == CatchResult::POKEMON_CAUGHT
+        );
     }
 }
 

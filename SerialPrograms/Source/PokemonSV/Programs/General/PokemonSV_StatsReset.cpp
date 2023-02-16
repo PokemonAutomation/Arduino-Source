@@ -93,7 +93,7 @@ StatsReset::StatsReset()
         &NOTIFICATION_STATUS_UPDATE,
         & NOTIFICATION_PROGRAM_FINISH,
         & NOTIFICATION_ERROR_FATAL,
-        })
+    })
 {
     PA_ADD_OPTION(TARGET);
     PA_ADD_OPTION(LANGUAGE); //This is required

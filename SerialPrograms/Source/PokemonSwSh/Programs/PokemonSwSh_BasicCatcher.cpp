@@ -130,7 +130,7 @@ CatchResults throw_balls(
         case 1:
             console.log("BasicCatcher: End of battle detected.", COLOR_PURPLE);
             return {CatchResult::POKEMON_FAINTED, balls_used};
-         default:
+        default:
             console.log("BasicCatcher: Timed out.", COLOR_RED);
             return {CatchResult::TIMEOUT, balls_used};
         }

@@ -15,7 +15,7 @@
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
-#include "PokemonSV/Options/PokemonSV_EncounterActionsTable.h"
+#include "PokemonSV/Options/PokemonSV_EncounterBotCommon.h"
 #include "PokemonSV_AreaZeroPlatform.h"
 
 namespace PokemonAutomation{
@@ -76,16 +76,13 @@ private:
     };
     EnumDropdownOption<Path> PATH0;
 
-    BooleanCheckBoxOption VIDEO_ON_SHINY;
+    EncounterBotCommonOptions ENCOUNTER_BOT_OPTIONS;
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
-    EncounterActionsTable ACTIONS_TABLE;
     PlatformResetSettings PLATFORM_RESET;
     NavigatePlatformSettings NAVIGATE_TO_PLATFORM;
 
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
-    EventNotificationOption NOTIFICATION_NONSHINY;
-    EventNotificationOption NOTIFICATION_SHINY;
     EventNotificationsOption NOTIFICATIONS;
 
     SingleSwitchProgramEnvironment* m_env;

@@ -4,9 +4,15 @@
  *
  */
 
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "Pokemon/Pokemon_Strings.h"
+#include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
+#include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
+#include "PokemonSV/Inference/Battles/PokemonSV_BattleMenuDetector.h"
 #include "PokemonSV_BasicCatcher.h"
 
 namespace PokemonAutomation{
@@ -81,6 +87,129 @@ int16_t move_to_ball(
     uint16_t quantity = reader.read_quantity(console.video().snapshot());
     return quantity == 0 ? -1 : quantity;
 }
+
+
+
+
+
+
+
+
+
+
+CatchResults basic_catcher(
+    ConsoleHandle& console, BotBaseContext& context,
+    Language language,
+    const std::string& ball_slug
+){
+    uint16_t balls_used = 0;
+
+    bool caught = false;
+    bool overworld_seen = false;
+    int last_state = -1;
+    while (true){
+        NormalBattleMenuWatcher battle_menu(COLOR_RED);
+        OverworldWatcher overworld(COLOR_YELLOW);
+        GradientArrowWatcher next_pokemon(COLOR_GREEN, GradientArrowType::RIGHT, {0.50, 0.50, 0.30, 0.20});
+        GradientArrowWatcher add_to_party(COLOR_BLUE, GradientArrowType::RIGHT, {0.50, 0.39, 0.30, 0.10});
+        AdvanceDialogWatcher dialog(COLOR_PURPLE);
+        context.wait_for_all_requests();
+        auto start = current_time();
+        int ret = wait_until(
+            console, context, std::chrono::seconds(120),
+            {
+                battle_menu,
+                overworld,
+                next_pokemon,
+                add_to_party,
+                dialog,
+            }
+        );
+        switch (ret){
+        case 0:{
+            console.log("Detected Battle Menu...");
+            if (overworld_seen){
+                console.log("Detected battle after overworld. Did you get chain attacked?", COLOR_RED);
+                return CatchResults{CatchResult::POKEMON_FAINTED, balls_used};
+            }
+            if (last_state == 0 && current_time() < start + std::chrono::seconds(5)){
+                console.log("BasicCatcher: Unable to throw ball.", COLOR_RED);
+                return {CatchResult::CANNOT_THROW_BALL, balls_used};
+            }
+            pbf_press_button(context, BUTTON_X, 20, 105);
+            context.wait_for_all_requests();
+            BattleBallReader reader(console, language, COLOR_RED);
+            int16_t qty = move_to_ball(reader, console, context, ball_slug);
+            if (qty <= 0){
+                return CatchResults{CatchResult::OUT_OF_BALLS, balls_used};
+            }
+            pbf_mash_button(context, BUTTON_A, 30);
+            pbf_mash_button(context, BUTTON_B, 500);
+            balls_used++;
+            break;
+        }
+        case 1:
+            if (!overworld_seen && !caught){
+                console.log("Detected Overworld... Waiting 5 seconds to confirm.");
+                context.wait_for(std::chrono::seconds(5));
+                overworld_seen = true;
+                break;
+            }
+            console.log("Detected Overworld...");
+            if (caught){
+                return CatchResults{CatchResult::POKEMON_CAUGHT, balls_used};
+            }else{
+                return CatchResults{CatchResult::POKEMON_FAINTED, balls_used};
+            }
+        case 2:
+            console.log("Detected own " + STRING_POKEMON + " fainted...");
+            return CatchResults{CatchResult::OWN_FAINTED, balls_used};
+        case 3:
+            console.log("Detected add to party...");
+            caught = true;
+            pbf_press_button(context, BUTTON_B, 20, 230);
+            break;
+        case 4:
+            console.log("Detected dialog...");
+            caught = true;
+            pbf_press_button(context, BUTTON_B, 20, 230);
+            break;
+        default:
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, console,
+                "basic_catcher(): No state detected after 2 minutes."
+            );
+        }
+
+        last_state = ret;
+    }
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
