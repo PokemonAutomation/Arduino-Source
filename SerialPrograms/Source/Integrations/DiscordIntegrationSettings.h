@@ -33,7 +33,7 @@ public:
         SleepyDiscord,
         DPP,
     };
-    EnumDropdownOption<Library> library;
+    EnumDropdownOption<Library> library0;
 
     enum class CommandType {
         SlashCommands,

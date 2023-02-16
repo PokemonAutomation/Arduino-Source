@@ -24,7 +24,7 @@ namespace Integration{
 
 
 DiscordIntegrationSettingsOption::~DiscordIntegrationSettingsOption(){
-    library.remove_listener(*this);
+    library0.remove_listener(*this);
     this->remove_listener(*this);
 }
 DiscordIntegrationSettingsOption::DiscordIntegrationSettingsOption()
@@ -35,14 +35,14 @@ DiscordIntegrationSettingsOption::DiscordIntegrationSettingsOption()
         LockWhileRunning::LOCKED,
         false
     )
-    , library(
+    , library0(
         "<b>Discord Integration Library:</b><br>Restart the program for this to take effect.",
         {
             {Library::SleepyDiscord, "sleepy", "Sleepy Discord (normal commands, deprecated)"},
             {Library::DPP, "dpp", "D++ (slash commands and normal commands)"},
         },
         LockWhileRunning::LOCKED,
-        Library::SleepyDiscord
+        Library::DPP
     )
     , command_type(
         "<b>Discord Integration Command Type:</b><br>Restart the program for this to take effect.",
@@ -96,7 +96,7 @@ DiscordIntegrationSettingsOption::DiscordIntegrationSettingsOption()
     )
 {
     PA_ADD_OPTION(run_on_start);
-    PA_ADD_OPTION(library);
+    PA_ADD_OPTION(library0);
     PA_ADD_OPTION(command_type);
     PA_ADD_OPTION(token);
     PA_ADD_OPTION(command_prefix);
@@ -110,19 +110,19 @@ DiscordIntegrationSettingsOption::DiscordIntegrationSettingsOption()
     DiscordIntegrationSettingsOption::value_changed();
 
     this->add_listener(*this);
-    library.add_listener(*this);
+    library0.add_listener(*this);
 }
 void DiscordIntegrationSettingsOption::value_changed(){
 //    cout << this->enabled() << endl;
 #if (defined PA_SLEEPY || defined PA_DPP)
     bool options_enabled = this->enabled();
-    switch (library){
+    switch (library0){
 #ifdef PA_SLEEPY
     case Library::SleepyDiscord:{
         options_enabled &= !SleepyDiscordRunner::is_running();
         ConfigOptionState state = options_enabled ? ConfigOptionState::ENABLED : ConfigOptionState::DISABLED;
 
-        library.set_visibility(state);
+        library0.set_visibility(state);
         command_type.set_visibility(ConfigOptionState::HIDDEN);
         token.set_visibility(state);
         game_status.set_visibility(state);
@@ -140,7 +140,7 @@ void DiscordIntegrationSettingsOption::value_changed(){
         options_enabled &= !DppClient::Client::instance().is_initialized();
         ConfigOptionState state = options_enabled ? ConfigOptionState::ENABLED : ConfigOptionState::DISABLED;
 
-        library.set_visibility(state);
+        library0.set_visibility(state);
         command_type.set_visibility(state);
         token.set_visibility(state);
         game_status.set_visibility(state);
@@ -195,7 +195,7 @@ DiscordIntegrationSettingsWidget::DiscordIntegrationSettingsWidget(QWidget& pare
     connect(
         button_start, &QPushButton::clicked,
         this, [&value](bool) {
-            switch (value.library){
+            switch (value.library0){
 #ifdef PA_SLEEPY
             case DiscordIntegrationSettingsOption::Library::SleepyDiscord:
                 SleepyDiscordRunner::sleepy_connect();
@@ -213,7 +213,7 @@ DiscordIntegrationSettingsWidget::DiscordIntegrationSettingsWidget(QWidget& pare
     connect(
         button_stop, &QPushButton::clicked,
         this, [&value](bool) {
-            switch (value.library){
+            switch (value.library0){
 #ifdef PA_SLEEPY
             case DiscordIntegrationSettingsOption::Library::SleepyDiscord:
                 SleepyDiscordRunner::sleepy_terminate();

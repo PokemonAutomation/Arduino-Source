@@ -86,12 +86,12 @@ int main(int argc, char *argv[]){
     Integration::DiscordIntegrationSettingsOption& discord_settings = GlobalSettings::instance().DISCORD.integration;
     if (discord_settings.run_on_start){
 #ifdef PA_SLEEPY
-        if (discord_settings.library == Integration::DiscordIntegrationSettingsOption::Library::SleepyDiscord){
+        if (discord_settings.library0 == Integration::DiscordIntegrationSettingsOption::Library::SleepyDiscord){
             Integration::SleepyDiscordRunner::sleepy_connect();
         }
 #endif
 #ifdef PA_DPP
-        if (discord_settings.library == Integration::DiscordIntegrationSettingsOption::Library::DPP){
+        if (discord_settings.library0 == Integration::DiscordIntegrationSettingsOption::Library::DPP){
             Integration::DppClient::Client::instance().connect();
         }
 #endif

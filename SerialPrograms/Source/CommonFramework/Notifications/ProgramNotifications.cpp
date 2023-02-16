@@ -126,7 +126,7 @@ void send_raw_notification(
     );
 
 #ifdef PA_SLEEPY
-    if (GlobalSettings::instance().DISCORD.integration.library == Integration::DiscordIntegrationSettingsOption::Library::SleepyDiscord){
+    if (GlobalSettings::instance().DISCORD.integration.library0 == Integration::DiscordIntegrationSettingsOption::Library::SleepyDiscord){
         Integration::SleepyDiscordRunner::send_embed_sleepy(
             should_ping, tags, std::move(embed),
             hasFile ? file : nullptr
@@ -135,7 +135,7 @@ void send_raw_notification(
 #endif
 
 #ifdef PA_DPP
-    if (GlobalSettings::instance().DISCORD.integration.library == Integration::DiscordIntegrationSettingsOption::Library::DPP){
+    if (GlobalSettings::instance().DISCORD.integration.library0 == Integration::DiscordIntegrationSettingsOption::Library::DPP){
         Integration::DppClient::Client::instance().send_embed_dpp(
             should_ping, color, tags, std::move(embed),
             hasFile ? file : nullptr
@@ -179,7 +179,7 @@ void send_raw_notification(
     );
 
 #ifdef PA_SLEEPY
-    if (GlobalSettings::instance().DISCORD.integration.library == Integration::DiscordIntegrationSettingsOption::Library::SleepyDiscord){
+    if (GlobalSettings::instance().DISCORD.integration.library0 == Integration::DiscordIntegrationSettingsOption::Library::SleepyDiscord){
         Integration::SleepyDiscordRunner::send_embed_sleepy(
             should_ping, tags, std::move(embed),
             hasFile ? file : nullptr
@@ -188,7 +188,7 @@ void send_raw_notification(
 #endif
 
 #ifdef PA_DPP
-    if (GlobalSettings::instance().DISCORD.integration.library == Integration::DiscordIntegrationSettingsOption::Library::DPP){
+    if (GlobalSettings::instance().DISCORD.integration.library0 == Integration::DiscordIntegrationSettingsOption::Library::DPP){
         Integration::DppClient::Client::instance().send_embed_dpp(
             should_ping, color, tags, std::move(embed),
             hasFile ? file : nullptr

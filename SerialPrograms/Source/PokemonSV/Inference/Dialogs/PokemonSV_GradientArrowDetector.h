@@ -58,7 +58,7 @@ public:
         const ImageFloatBox& box
     );
 
-    VideoSnapshot last_detected() const{ return m_last_detected; }
+//    VideoSnapshot last_detected() const{ return m_last_detected; }
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool process_frame(const VideoSnapshot& frame) override;
@@ -67,8 +67,7 @@ public:
 protected:
     GradientArrowDetector m_detector;
 
-    //  REMOVE
-    VideoSnapshot m_last_detected;
+//    VideoSnapshot m_last_detected;
 };
 
 
