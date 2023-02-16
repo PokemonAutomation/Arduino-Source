@@ -81,7 +81,7 @@ int main(void){
     start_program_flash(CONNECT_CONTROLLER_DELAY);
     pbf_press_button(BUTTON_A, 5, 5);
 
-    for(int curBox = 0; curBox < BOXES_TO_HATCH; curBox++) {
+    for (int curBox = 0; curBox < BOXES_TO_HATCH; curBox++) {
         // ########## Intial loop setup ##########
         open_box();
         pbf_press_dpad(DPAD_LEFT, 1, 200);
@@ -90,7 +90,7 @@ int main(void){
         };
 
         // ########## Main hatching loop ##########
-        for(int boxCol = 0; boxCol < 6; boxCol++) {
+        for (int boxCol = 0; boxCol < 6; boxCol++) {
             get_egg(boxCol);
             move_to_location();
             ride_hatch();

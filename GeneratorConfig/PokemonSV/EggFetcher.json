@@ -12,39 +12,12 @@
         },
         {
             "00-Type": "SimpleInteger",
-            "01-Label": "<b>Position of Butter from Top of Menu:</b>",
-            "02-Declaration": "const uint16_t BUTTER_POS",
-            "03-MinValue": 0,
-            "04-MaxValue": 99,
-            "98-Default": 6,
-            "99-Current": 6
-        },
-        {
-            "00-Type": "SimpleInteger",
-            "01-Label": "<b>Position of Sweet HM from Bottom of Menu:</b><br>Leave empty if Use Herba Mystica is set to false",
-            "02-Declaration": "const uint16_t HERBA_POS",
-            "03-MinValue": 0,
-            "04-MaxValue": 5,
-            "98-Default": 2,
-            "99-Current": 2
-        },
-        {
-            "00-Type": "SimpleInteger",
-            "01-Label": "<b>Position of Strawberry from Bottom of Menu:</b><br>Leave empty if Use Herba Mystica is set to true",
-            "02-Declaration": "const uint16_t STB_POS",
-            "03-MinValue": 0,
-            "04-MaxValue": 99,
-            "98-Default": 6,
-            "99-Current": 6
-        },
-        {
-            "00-Type": "SimpleInteger",
             "01-Label": "<b>Maximum amount of sandwiches to make:</b>",
             "02-Declaration": "const uint16_t MAX_SAND",
             "03-MinValue": 1,
             "04-MaxValue": 999,
-            "98-Default": 100,
-            "99-Current": 100
+            "98-Default": 5,
+            "99-Current": 5
         }
     ]
 }
