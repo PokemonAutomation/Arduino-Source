@@ -19,9 +19,10 @@ using namespace Pokemon;
 
 const EnumDatabase<EncounterActionsAction>& EncounterFilterAction_database(){
     static EnumDatabase<EncounterActionsAction> database{
-        {EncounterActionsAction::RUN_AWAY,      "run-away",     "Run Away"},
-        {EncounterActionsAction::STOP_PROGRAM,  "stop-program", "Stop Program"},
-        {EncounterActionsAction::THROW_BALLS,   "throw-balls",  "Throw Balls"},
+        {EncounterActionsAction::RUN_AWAY,              "run-away",     "Run Away"},
+        {EncounterActionsAction::STOP_PROGRAM,          "stop-program", "Stop Program"},
+        {EncounterActionsAction::THROW_BALLS,           "throw-balls",  "Throw Balls"},
+        {EncounterActionsAction::THROW_BALLS_AND_SAVE,  "throw-balls-and-save",  "Throw Balls. Save if caught."},
     };
     return database;
 }
@@ -84,11 +85,16 @@ EncounterActionsEntry EncounterActionsRow::snapshot() const{
     };
 }
 void EncounterActionsRow::value_changed(){
-    pokeball.set_visibility(
-        action == EncounterActionsAction::THROW_BALLS
-            ? ConfigOptionState::ENABLED
-            : ConfigOptionState::DISABLED
-    );
+    switch (action){
+    case EncounterActionsAction::STOP_PROGRAM:
+    case EncounterActionsAction::RUN_AWAY:
+        pokeball.set_visibility(ConfigOptionState::DISABLED);
+        break;
+    case EncounterActionsAction::THROW_BALLS:
+    case EncounterActionsAction::THROW_BALLS_AND_SAVE:
+        pokeball.set_visibility(ConfigOptionState::ENABLED);
+        break;
+    }
 }
 
 

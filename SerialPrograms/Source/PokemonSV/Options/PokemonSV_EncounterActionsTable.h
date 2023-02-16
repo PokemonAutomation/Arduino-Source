@@ -21,6 +21,7 @@ enum class EncounterActionsAction{
     STOP_PROGRAM,
     RUN_AWAY,
     THROW_BALLS,
+    THROW_BALLS_AND_SAVE,
 };
 
 enum class EncounterActionsShininess{

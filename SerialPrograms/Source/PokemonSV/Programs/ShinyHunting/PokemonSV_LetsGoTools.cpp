@@ -113,7 +113,7 @@ LetsGoEncounterBotTracker::LetsGoEncounterBotTracker(
     })
     , m_session(context, console, {m_kill_sound})
 {}
-void LetsGoEncounterBotTracker::process_battle(EncounterWatcher& watcher, EncounterBotCommonOptions& settings){
+bool LetsGoEncounterBotTracker::process_battle(EncounterWatcher& watcher, EncounterBotCommonOptions& settings){
     m_encounter_rate.report_encounter();
     m_stats.m_encounters++;
 
@@ -179,6 +179,7 @@ void LetsGoEncounterBotTracker::process_battle(EncounterWatcher& watcher, Encoun
         action = std::move(entry);
     }
 
+    //  Run the chosen action.
     switch (action.action){
     case EncounterActionsAction::RUN_AWAY:{
         OverworldWatcher overworld(COLOR_GREEN);
@@ -191,20 +192,23 @@ void LetsGoEncounterBotTracker::process_battle(EncounterWatcher& watcher, Encoun
             },
             {overworld}
         );
-        return;
+        return false;
     }
     case EncounterActionsAction::STOP_PROGRAM:
         throw ProgramFinishedException();
 //        throw ProgramFinishedException(m_console, "", true);
     case EncounterActionsAction::THROW_BALLS:
+    case EncounterActionsAction::THROW_BALLS_AND_SAVE:
 //        throw FatalProgramException(ErrorReport::NO_ERROR_REPORT, m_console, "Auto-catch has not been implemented yet.");
         if (language == Language::None){
             throw InternalProgramError(&m_console.logger(), PA_CURRENT_FUNCTION, "Language is not set.");
         }
         CatchResults result = basic_catcher(m_console, m_context, language, action.ball);
+        bool caught = false;
         switch (result.result){
         case CatchResult::POKEMON_CAUGHT:
             m_console.log(STRING_POKEMON + " caught!", COLOR_BLUE);
+            caught = true;
             break;
         case CatchResult::POKEMON_FAINTED:
             m_console.log(STRING_POKEMON + " fainted!", COLOR_ORANGE);
@@ -237,7 +241,11 @@ void LetsGoEncounterBotTracker::process_battle(EncounterWatcher& watcher, Encoun
             result.balls_used,
             result.result == CatchResult::POKEMON_CAUGHT
         );
+
+        return caught && action.action == EncounterActionsAction::THROW_BALLS_AND_SAVE;
     }
+
+    return false;
 }
 
 

@@ -25,11 +25,12 @@
 //#include "Pokemon/Pokemon_Notification.h"
 #include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_IVCheckerReader.h"
-#include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
+//#include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_AreaZeroSkyDetector.h"
 //#include "PokemonSV/Inference/Overworld/PokemonSV_LetsGoKillDetector.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_EncounterWatcher.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
+#include "PokemonSV/Programs/PokemonSV_SaveGame.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
 //#include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSV_LetsGoTools.h"
@@ -421,7 +422,6 @@ void ShinyHuntAreaZeroPlatform::run_state(BotBaseContext& context){
     ShinyHuntAreaZeroPlatform_Descriptor::Stats& stats = m_env->current_stats<ShinyHuntAreaZeroPlatform_Descriptor::Stats>();
     const ProgramInfo& info = m_env->program_info();
     ConsoleHandle& console = m_env->console;
-//    WallClock now = current_time();
 
     send_program_notification(
         *m_env, NOTIFICATION_STATUS_UPDATE,
@@ -430,10 +430,23 @@ void ShinyHuntAreaZeroPlatform::run_state(BotBaseContext& context){
         {}, m_tracker->encounter_frequencies().dump_sorted_map("")
     );
 
+#if 0
+    WallClock now = current_time();
+    if (m_last_sandwich + std::chrono::minutes() < now){
+        m_state = State::RESET_SANDWICH;
+    }
+#endif
+
     State recovery_state = State::LEAVE_AND_RETURN;
     try{
         switch (m_state){
         case State::TRAVERSAL:{
+            if (m_pending_save){
+                save_game_from_overworld(info, console, context);
+                m_pending_save = false;
+                m_last_save = SavedLocation::AREA_ZERO;
+            }
+
             size_t kills, encounters;
             std::chrono::minutes window(PLATFORM_RESET.WINDOW_IN_MINUTES);
             bool enough_time = m_tracker->get_encounters_in_window(
@@ -514,6 +527,19 @@ void ShinyHuntAreaZeroPlatform::run_state(BotBaseContext& context){
             pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
             reset_game_from_home(info, console, context, 5 * TICKS_PER_SECOND);
             pbf_press_button(context, BUTTON_RCLICK, 20, 105);
+
+            switch (m_last_save){
+            case SavedLocation::NONE:
+                throw InternalProgramError(&console.logger(), PA_CURRENT_FUNCTION, "Cannot reset with no previous save.");
+            case SavedLocation::ZERO_GATE_FLY_SPOT:
+                return_to_inside_zero_gate(info, console, context);
+                inside_zero_gate_to_platform(info, console, context, NAVIGATE_TO_PLATFORM);
+                break;
+            case SavedLocation::AREA_ZERO:
+                //  No further action needed as you're already on the platform.
+                break;
+            }
+
             inside_zero_gate_to_platform(info, console, context, NAVIGATE_TO_PLATFORM);
 
             stats.m_game_resets++;
@@ -522,6 +548,13 @@ void ShinyHuntAreaZeroPlatform::run_state(BotBaseContext& context){
             m_env->update_stats();
 
             break;
+
+        case State::RESET_SANDWICH:
+            console.log("Resetting sandwich...");
+
+            throw InternalProgramError(&console.logger(), PA_CURRENT_FUNCTION, "Sandwiches have not been implemented yet.");
+
+//            break;
         }
 
         //  No problems. Go back to traversals.
@@ -572,6 +605,10 @@ void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, Bot
         throw UserSetupError(env.logger(), "Sandwich mode has not been implemented yet.");
     }
 
+    m_pending_save = false;
+    m_last_save = SavedLocation::NONE;
+    m_last_sandwich = WallClock::min();
+
 //    m_last_platform_reset = current_time();
     m_consecutive_failures = 0;
     while (true){
@@ -593,7 +630,10 @@ void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, Bot
 
         env.console.log("Detected battle.", COLOR_PURPLE);
         try{
-            tracker.process_battle(encounter_watcher, ENCOUNTER_BOT_OPTIONS);
+            bool should_save = tracker.process_battle(encounter_watcher, ENCOUNTER_BOT_OPTIONS);
+            if (should_save){
+                m_pending_save = should_save;
+            }
         }catch (ProgramFinishedException&){
             GO_HOME_WHEN_DONE.run_end_of_program(context);
             throw;

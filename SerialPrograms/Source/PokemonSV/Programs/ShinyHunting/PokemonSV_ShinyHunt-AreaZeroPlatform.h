@@ -48,6 +48,7 @@ private:
         INSIDE_GATE_AND_RETURN,
         LEAVE_AND_RETURN,
         RESET_AND_RETURN,
+        RESET_SANDWICH,
     };
 
     void run_state(BotBaseContext& context);
@@ -91,6 +92,18 @@ private:
 
     uint64_t m_iterations = 0;
     State m_state;
+
+    //  Set to true if we should save on the first available opportunity.
+    bool m_pending_save;
+    enum class SavedLocation{
+        NONE,
+        ZERO_GATE_FLY_SPOT,
+        AREA_ZERO,
+    };
+    SavedLocation m_last_save;
+
+    WallClock m_last_sandwich;
+
     size_t m_consecutive_failures;
 };
 

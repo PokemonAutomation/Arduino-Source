@@ -105,7 +105,8 @@ public:
         m_encounter_rate.report_start();
     }
 
-    void process_battle(EncounterWatcher& watcher, EncounterBotCommonOptions& settings);
+    //  Returns true if you should save the game.
+    bool process_battle(EncounterWatcher& watcher, EncounterBotCommonOptions& settings);
 
 
 private:
