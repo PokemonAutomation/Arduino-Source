@@ -203,35 +203,8 @@ bool LetsGoEncounterBotTracker::process_battle(EncounterWatcher& watcher, Encoun
         if (language == Language::None){
             throw InternalProgramError(&m_console.logger(), PA_CURRENT_FUNCTION, "Language is not set.");
         }
+
         CatchResults result = basic_catcher(m_console, m_context, language, action.ball);
-        bool caught = false;
-        switch (result.result){
-        case CatchResult::POKEMON_CAUGHT:
-            m_console.log(STRING_POKEMON + " caught!", COLOR_BLUE);
-            caught = true;
-            break;
-        case CatchResult::POKEMON_FAINTED:
-            m_console.log(STRING_POKEMON + " fainted!", COLOR_ORANGE);
-            break;
-        case CatchResult::OWN_FAINTED:
-            throw FatalProgramException(
-                ErrorReport::NO_ERROR_REPORT, m_console,
-                "Your own " + STRING_POKEMON + " fainted!",
-                true
-            );
-        case CatchResult::OUT_OF_BALLS:
-            throw FatalProgramException(
-                ErrorReport::NO_ERROR_REPORT, m_console,
-                "Unable to find the desired ball. Did you run out?",
-                true
-            );
-        case CatchResult::CANNOT_THROW_BALL:
-            throw FatalProgramException(
-                ErrorReport::NO_ERROR_REPORT, m_console,
-                "Unable to throw ball. Is the " + STRING_POKEMON + " semi-invulnerable?",
-                true
-            );
-        }
         send_catch_notification(
             m_env,
             settings.NOTIFICATION_CATCH_SUCCESS,
@@ -239,10 +212,22 @@ bool LetsGoEncounterBotTracker::process_battle(EncounterWatcher& watcher, Encoun
             &slugs,
             action.ball,
             result.balls_used,
-            result.result == CatchResult::POKEMON_CAUGHT
+            result.result
         );
 
-        return caught && action.action == EncounterActionsAction::THROW_BALLS_AND_SAVE;
+        switch (result.result){
+        case CatchResult::POKEMON_CAUGHT:
+        case CatchResult::POKEMON_FAINTED:
+            break;
+        default:
+            throw FatalProgramException(
+                ErrorReport::NO_ERROR_REPORT, m_console,
+                "Unable to recover from failed catch.",
+                true
+            );
+        }
+
+        return result.result == CatchResult::POKEMON_CAUGHT && action.action == EncounterActionsAction::THROW_BALLS_AND_SAVE;
     }
 
     return false;

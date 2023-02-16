@@ -186,9 +186,9 @@ void send_catch_notification(
     EventNotificationOption& settings_catch_failed,
     const std::set<std::string>* pokemon_slugs,
     const std::string& ball_slug, int balls_used,
-    bool success
+    CatchResult result
 ){
-    Color color = success ? COLOR_GREEN : COLOR_ORANGE;
+    Color color = result == CatchResult::POKEMON_CAUGHT ? COLOR_GREEN : COLOR_ORANGE;
 
     std::vector<std::pair<std::string, std::string>> embeds;
 
@@ -211,6 +211,25 @@ void send_catch_notification(
         }
         embeds.emplace_back("Species:", std::move(str));
     }
+    switch (result){
+    case CatchResult::POKEMON_CAUGHT:
+        break;
+    case CatchResult::POKEMON_FAINTED:
+        embeds.emplace_back("Fail Reason:", "The " + STRING_POKEMON + " fainted.");
+        break;
+    case CatchResult::OWN_FAINTED:
+        embeds.emplace_back("Fail Reason:", "Your own " + STRING_POKEMON + " fainted.");
+        break;
+    case CatchResult::OUT_OF_BALLS:
+        embeds.emplace_back("Fail Reason:", "Unable to find the desired ball. Did you run out?");
+        break;
+    case CatchResult::CANNOT_THROW_BALL:
+        embeds.emplace_back("Fail Reason:", "Unable to throw ball. Is the " + STRING_POKEMON + " semi-invulnerable?");
+        break;
+    case CatchResult::TIMED_OUT:
+        embeds.emplace_back("Fail Reason:", "Timed out.");
+        break;
+    }
     {
         std::string str;
         if (balls_used >= 0){
@@ -227,7 +246,7 @@ void send_catch_notification(
         }
     }
 
-    if (success){
+    if (result == CatchResult::POKEMON_CAUGHT){
         send_program_notification(
             env, settings_catch_success,
             color,

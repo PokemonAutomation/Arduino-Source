@@ -162,7 +162,7 @@ void StatsResetRegi::program(SingleSwitchProgramEnvironment& env, BotBaseContext
                 stats.out_of_balls++;
                 break;
             case CatchResult::CANNOT_THROW_BALL:
-            case CatchResult::TIMEOUT:
+            case CatchResult::TIMED_OUT:
                 stats.errors++;
                 break;
             }

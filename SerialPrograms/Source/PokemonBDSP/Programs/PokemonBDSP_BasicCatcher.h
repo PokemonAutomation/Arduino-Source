@@ -9,6 +9,7 @@
 
 #include "CommonFramework/Language.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
+#include "Pokemon/Pokemon_Notification.h"
 #include "PokemonBDSP/Inference/Battles/PokemonBDSP_BattleBallReader.h"
 
 namespace PokemonAutomation{
@@ -17,23 +18,8 @@ namespace NintendoSwitch{
 namespace PokemonBDSP{
     
 
-//  Throws the specified ball until:
-//      1.  The Pokemon is caught. Returns # of balls used.
-//      2.  The Pokemon faints. Returns -# of balls used.
-//      3.  Your Pokemon faints. Throws an error. (will change in the future)
-//      4.  You run of the ball. Throws an error.
-enum class CatchResult{
-    POKEMON_CAUGHT,
-    POKEMON_FAINTED,
-    OWN_FAINTED,    //  Not implemented yet. Will show up as TIMEOUT for now.
-    OUT_OF_BALLS,
-    CANNOT_THROW_BALL,  // The Pokemon is in Fly or Underground, or it's a story pokemon
-                        // that cannot be caught.
-    TIMEOUT,
-};
-
 struct CatchResults{
-    CatchResult result = CatchResult::TIMEOUT;
+    CatchResult result = CatchResult::TIMED_OUT;
     uint16_t balls_used = 0;
 };
 

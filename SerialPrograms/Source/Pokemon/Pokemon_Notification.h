@@ -44,13 +44,22 @@ void send_encounter_notification(
     const EncounterFrequencies* frequencies = nullptr
 );
 
+
+enum class CatchResult{
+    POKEMON_CAUGHT,
+    POKEMON_FAINTED,
+    OWN_FAINTED,
+    OUT_OF_BALLS,
+    CANNOT_THROW_BALL,
+    TIMED_OUT,
+};
 void send_catch_notification(
     ProgramEnvironment& env,
     EventNotificationOption& settings_catch_success,
     EventNotificationOption& settings_catch_failed,
     const std::set<std::string>* pokemon_slugs,
     const std::string& ball_slug, int balls_used,
-    bool success
+    CatchResult result
 );
 
 

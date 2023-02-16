@@ -189,7 +189,7 @@ void StatsResetCalyrex::program(SingleSwitchProgramEnvironment& env, BotBaseCont
                 stats.out_of_balls++;
                 break;
             case CatchResult::CANNOT_THROW_BALL:
-            case CatchResult::TIMEOUT:
+            case CatchResult::TIMED_OUT:
                 stats.errors++;
                 break;
             }

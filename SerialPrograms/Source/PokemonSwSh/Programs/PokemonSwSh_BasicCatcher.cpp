@@ -132,7 +132,7 @@ CatchResults throw_balls(
             return {CatchResult::POKEMON_FAINTED, balls_used};
         default:
             console.log("BasicCatcher: Timed out.", COLOR_RED);
-            return {CatchResult::TIMEOUT, balls_used};
+            return {CatchResult::TIMED_OUT, balls_used};
         }
     }
 }
@@ -153,7 +153,7 @@ CatchResults basic_catcher(
     if (results.result == CatchResult::CANNOT_THROW_BALL){
         return results;
     }
-    if (results.result == CatchResult::TIMEOUT){
+    if (results.result == CatchResult::TIMED_OUT){
         return results;
     }
 

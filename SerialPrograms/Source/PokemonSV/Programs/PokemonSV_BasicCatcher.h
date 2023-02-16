@@ -8,11 +8,14 @@
 #define PokemonAutomation_PokemonSV_BasicCatcher_H
 
 #include "ClientSource/Connection/BotBase.h"
+#include "Pokemon/Pokemon_Notification.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_BattleBallReader.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
+
+using namespace Pokemon;
 
 
 //  Returns the quantity of the ball.
@@ -24,14 +27,6 @@ int16_t move_to_ball(
 
 
 
-enum class CatchResult{
-    POKEMON_CAUGHT,
-    POKEMON_FAINTED,
-    OWN_FAINTED,    //  Not implemented yet. Will show up as TIMEOUT for now.
-    OUT_OF_BALLS,
-    CANNOT_THROW_BALL,
-//    TIMEOUT,
-};
 struct CatchResults{
     CatchResult result;
     uint16_t balls_used;

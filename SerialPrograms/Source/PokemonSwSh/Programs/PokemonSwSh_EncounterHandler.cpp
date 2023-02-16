@@ -5,6 +5,7 @@
  */
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
@@ -233,35 +234,6 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
         return false;
     case EncounterAction::ThrowBalls:{
         CatchResults results = basic_catcher(m_console, m_context, m_language, action.second);
-        switch (results.result){
-        case CatchResult::POKEMON_CAUGHT:
-        case CatchResult::POKEMON_FAINTED:
-            break;
-        case CatchResult::OWN_FAINTED:
-            throw OperationFailedException(
-                ErrorReport::NO_ERROR_REPORT, m_console,
-                "Your " + STRING_POKEMON + " fainted after " + std::to_string(results.balls_used) + " balls.",
-                true
-            );
-        case CatchResult::OUT_OF_BALLS:
-            throw OperationFailedException(
-                ErrorReport::NO_ERROR_REPORT, m_console,
-                "Unable to find the desired ball after throwing " + std::to_string(results.balls_used) + " of them. Did you run out?",
-                true
-            );
-        case CatchResult::CANNOT_THROW_BALL:
-            throw OperationFailedException(
-                ErrorReport::NO_ERROR_REPORT, m_console,
-                "Unable to throw ball. Is the " + STRING_POKEMON + " semi-invulnerable?",
-                true
-            );
-        case CatchResult::TIMEOUT:
-            throw OperationFailedException(
-                ErrorReport::NO_ERROR_REPORT, m_console,
-                "Program has timed out. Did your lead " + STRING_POKEMON + " faint?",
-                true
-            );
-        }
         send_catch_notification(
             m_env,
             m_settings.NOTIFICATION_CATCH_SUCCESS,
@@ -269,12 +241,32 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
             encounter.candidates(),
             action.second,
             results.balls_used,
-            results.result == CatchResult::POKEMON_CAUGHT
+            results.result
         );
+        switch (results.result){
+        case CatchResult::POKEMON_CAUGHT:
+        case CatchResult::POKEMON_FAINTED:
+            break;
+        default:
+            throw FatalProgramException(
+                ErrorReport::NO_ERROR_REPORT, m_console,
+                "Unable to recover from failed catch.",
+                true
+            );
+        }
         return false;
     }
     case EncounterAction::ThrowBallsAndSave:{
         CatchResults results = basic_catcher(m_console, m_context, m_language, action.second);
+        send_catch_notification(
+            m_env,
+            m_settings.NOTIFICATION_CATCH_SUCCESS,
+            m_settings.NOTIFICATION_CATCH_FAILED,
+            encounter.candidates(),
+            action.second,
+            results.balls_used,
+            results.result
+        );
         switch (results.result){
         case CatchResult::POKEMON_CAUGHT:
             pbf_mash_button(m_context, BUTTON_B, 2 * TICKS_PER_SECOND);
@@ -285,40 +277,13 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
         case CatchResult::POKEMON_FAINTED:
             pbf_mash_button(m_context, BUTTON_B, 2 * TICKS_PER_SECOND);
             break;
-        case CatchResult::OWN_FAINTED:
-            throw OperationFailedException(
+        default:
+            throw FatalProgramException(
                 ErrorReport::NO_ERROR_REPORT, m_console,
-                "Your " + STRING_POKEMON + " fainted after " + std::to_string(results.balls_used) + " balls.",
-                true
-            );
-        case CatchResult::OUT_OF_BALLS:
-            throw OperationFailedException(
-                ErrorReport::NO_ERROR_REPORT, m_console,
-                "Unable to find the desired ball after throwing " + std::to_string(results.balls_used) + " of them. Did you run out?",
-                true
-            );
-        case CatchResult::CANNOT_THROW_BALL:
-            throw OperationFailedException(
-                ErrorReport::NO_ERROR_REPORT, m_console,
-                "Unable to throw ball. Is the " + STRING_POKEMON + " semi-invulnerable?",
-                true
-            );
-        case CatchResult::TIMEOUT:
-            throw OperationFailedException(
-                ErrorReport::NO_ERROR_REPORT, m_console,
-                "Program has timed out. Did your lead " + STRING_POKEMON + " faint?",
+                "Unable to recover from failed catch.",
                 true
             );
         }
-        send_catch_notification(
-            m_env,
-            m_settings.NOTIFICATION_CATCH_SUCCESS,
-            m_settings.NOTIFICATION_CATCH_FAILED,
-            encounter.candidates(),
-            action.second,
-            results.balls_used,
-            results.result == CatchResult::POKEMON_CAUGHT
-        );
         return false;
     }
     }

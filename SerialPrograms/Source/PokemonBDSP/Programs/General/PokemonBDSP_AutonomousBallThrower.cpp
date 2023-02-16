@@ -152,7 +152,7 @@ void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, BotBase
             stats.out_of_balls++;
             break;
         case CatchResult::CANNOT_THROW_BALL:
-        case CatchResult::TIMEOUT:
+        case CatchResult::TIMED_OUT:
             stats.errors++;
             break;
         }

@@ -153,7 +153,7 @@ CatchResults throw_balls(
         case 2:
             return {CatchResult::OWN_FAINTED, balls_used};
         default:
-            return {CatchResult::TIMEOUT, balls_used};
+            return {CatchResult::TIMED_OUT, balls_used};
         }
     }
 }
@@ -181,7 +181,7 @@ CatchResults basic_catcher(
     case CatchResult::OWN_FAINTED:
         console.log("BasicCatcher: own pokemon fainted after throwing " + pokeball_str, COLOR_RED);
         return results;
-    case CatchResult::TIMEOUT:
+    case CatchResult::TIMED_OUT:
         console.log("BasicCatcher: time out.", COLOR_RED);
         return results;
     default:;
@@ -259,7 +259,7 @@ CatchResults basic_catcher(
 
         default:
             console.log("BasicCatcher: Timed out.", COLOR_RED);
-            results.result = CatchResult::TIMEOUT;
+            results.result = CatchResult::TIMED_OUT;
             return results;
         }
     }
