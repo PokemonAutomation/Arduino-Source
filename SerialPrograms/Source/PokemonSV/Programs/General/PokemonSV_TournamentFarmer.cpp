@@ -49,18 +49,21 @@ struct TournamentFarmer_Descriptor::Stats : public StatsTracker {
         : tournaments(m_stats["Tournaments won"])
         , battles(m_stats["Battles fought"])
         , losses(m_stats["Losses"])
+        , money(m_stats["Money made"])
         , matches(m_stats["Items matched"])
         , errors(m_stats["Errors"])
     {
         m_display_order.emplace_back("Tournaments won");
         m_display_order.emplace_back("Battles fought");
         m_display_order.emplace_back("Losses");
+        m_display_order.emplace_back("Money made");
         m_display_order.emplace_back("Items matched");
         m_display_order.emplace_back("Errors", true);
     }
     std::atomic<uint64_t>& tournaments;
     std::atomic<uint64_t>& battles;
     std::atomic<uint64_t>& losses;
+    std::atomic<uint64_t>& money;
     std::atomic<uint64_t>& matches;
     std::atomic<uint64_t>& errors;
 };
@@ -112,14 +115,14 @@ TournamentFarmer::TournamentFarmer()
 
 //Check and process the amount of money earned at the end of a battle
 void TournamentFarmer::check_money(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
-    //TournamentFarmer_Descriptor::Stats& stats = env.current_stats<TournamentFarmer_Descriptor::Stats>();
+    TournamentFarmer_Descriptor::Stats& stats = env.current_stats<TournamentFarmer_Descriptor::Stats>();
 
     int top_money = -1;
     //int bottom_money = -1;
 
     //There must be a value for top money
     //Bottom money only appear after 1st battle and should clear out
-    while (top_money == -1) {
+    for (uint16_t c = 0; c < 5 && top_money == -1; c++) {
         VideoSnapshot screen = env.console.video().snapshot();
         ImageFloatBox top_notif(0.745, 0.152, 0.206, 0.083);
         //ImageFloatBox bottom_notif(0.745, 0.261, 0.220, 0.083);
@@ -130,13 +133,13 @@ void TournamentFarmer::check_money(SingleSwitchProgramEnvironment& env, BotBaseC
         top_money = OCR::read_number(env.console, image_top);
         //bottom_money = OCR::read_number(env.console, image_bottom);
 
-        //dump_image(
-        //    env.console, env.program_info(),
-        //    "battledone",
-        //    screen
-        //);
+        dump_image(
+            env.console, env.program_info(),
+            "battledone",
+            screen
+        );
 
-        //Filter out low and high numbers
+        //Filter out low and high numbers as misreads tend to be 44
         //Nemona is lowest at 8640
         //Penny and Geeta are 16800
         if (top_money < 8000 || top_money > 100000 ) {
@@ -145,6 +148,14 @@ void TournamentFarmer::check_money(SingleSwitchProgramEnvironment& env, BotBaseC
         //if (bottom_money < 8000 || bottom_money > 100000) {
         //    bottom_money = -1;
         //}
+    }
+
+    if (top_money != -1) {
+        stats.money += top_money;
+        env.update_stats();
+    }
+    else {
+        env.log("Unable to read money.");
     }
 
 }
@@ -402,6 +413,7 @@ void TournamentFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseConte
     Sylveon only farming build - ideally with fairy tera
     stand in front of tournament entry man
     Ride legendary is not the solo pokemon (in case of loss)
+    Do not have other notifications on screen for money reading (ex. new outbreak)
 
     Possible improvements to make:
     find prize sprites - some code is there, just disabled
