@@ -4,16 +4,22 @@
  *
  */
 
+#include <algorithm>
+#include <cmath>
+#include "Common/Cpp/PrettyPrint.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 //#include "CommonFramework/Exceptions/OperationFailedException.h"
 //#include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_ScalarButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
+#include "PokemonSV/Inference/Overworld/PokemonSV_AreaZeroSkyDetector.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
+#include "PokemonSV_LetsGoTools.h"
 #include "PokemonSV_AreaZeroPlatform.h"
 
 namespace PokemonAutomation{
@@ -249,6 +255,267 @@ bool read_platform_center(
 
     return true;
 }
+
+
+
+void area_zero_platform_run_path0(
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    LetsGoEncounterBotTracker& tracker,
+    uint64_t iteration_count
+){
+    //  Go back to the wall.
+    console.log("Go back to wall...");
+    clear_in_front(console, context, tracker, false, [&](BotBaseContext& context){
+        find_and_center_on_sky(env, console, context);
+        pbf_move_right_joystick(context, 128, 255, 80, 0);
+        pbf_move_left_joystick(context, 176, 255, 30, 0);
+        pbf_press_button(context, BUTTON_L, 20, 50);
+    });
+
+    clear_in_front(console, context, tracker, false, [&](BotBaseContext& context){
+        //  Move to wall.
+        pbf_move_left_joystick(context, 128, 0, 4 * TICKS_PER_SECOND, 0);
+
+        //  Turn around.
+        console.log("Turning towards sky...");
+        pbf_move_left_joystick(context, 128, 255, 30, 95);
+        pbf_press_button(context, BUTTON_L, 20, 50);
+    });
+
+    //  Move forward and kill everything in your path.
+    console.log("Moving towards sky and killing everything...");
+    uint16_t duration = 325;
+    clear_in_front(console, context, tracker, true, [&](BotBaseContext& context){
+        find_and_center_on_sky(env, console, context);
+        pbf_move_right_joystick(context, 128, 255, 70, 0);
+
+        uint8_t x = 128;
+        switch (iteration_count % 4){
+        case 0:
+            x = 96;
+            duration = 250;
+            break;
+        case 1:
+            x = 112;
+            break;
+        case 2:
+            x = 128;
+            break;
+        case 3:
+            x = 112;
+            break;
+        }
+
+        ssf_press_button(context, BUTTON_L, 0, 20);
+        pbf_move_left_joystick(context, x, 0, duration, 0);
+    });
+    clear_in_front(console, context, tracker, true, [&](BotBaseContext& context){
+        pbf_move_left_joystick(context, 128, 255, duration, 4 * TICKS_PER_SECOND);
+    });
+}
+void area_zero_platform_run_path1(
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    LetsGoEncounterBotTracker& tracker,
+    uint64_t iteration_count
+){
+    //  Go back to the wall.
+    console.log("Go back to wall...");
+    pbf_press_button(context, BUTTON_L, 20, 105);
+    clear_in_front(console, context, tracker, true, [&](BotBaseContext& context){
+        find_and_center_on_sky(env, console, context);
+        pbf_move_right_joystick(context, 128, 255, 80, 0);
+        pbf_move_left_joystick(context, 192, 255, 60, 0);
+    });
+
+    //  Clear path to the wall.
+    console.log("Clear path to the wall...");
+    pbf_press_button(context, BUTTON_L, 20, 50);
+    clear_in_front(console, context, tracker, false, [&](BotBaseContext& context){
+        pbf_move_left_joystick(context, 128, 0, 5 * TICKS_PER_SECOND, 0);
+
+        //  Turn right.
+        pbf_move_left_joystick(context, 255, 128, 30, 0);
+        pbf_press_button(context, BUTTON_L, 20, 50);
+    });
+
+    //  Clear the wall.
+    console.log("Clear the wall...");
+    uint16_t duration = 325;
+    clear_in_front(console, context, tracker, true, [&](BotBaseContext& context){
+        pbf_move_left_joystick(context, 255, 128, 125, 0);
+        pbf_press_button(context, BUTTON_L, 20, 50);
+        context.wait_for_all_requests();
+
+        find_and_center_on_sky(env, console, context);
+        pbf_move_left_joystick(context, 128, 0, 50, 0);
+        pbf_press_button(context, BUTTON_L, 20, 30);
+
+        //  Move forward.
+
+        uint8_t x = 128;
+        switch (iteration_count % 4){
+        case 0:
+            x = 96;
+            duration = 250;
+            break;
+        case 1:
+            x = 112;
+            break;
+        case 2:
+            x = 128;
+            break;
+        case 3:
+            x = 112;
+            break;
+        }
+
+        pbf_move_left_joystick(context, x, 0, duration, 0);
+    });
+
+    console.log("Run backwards and wait...");
+    clear_in_front(console, context, tracker, true, [&](BotBaseContext& context){
+//        pbf_move_left_joystick(context, 64, 0, 125, 0);
+//        pbf_press_button(context, BUTTON_L, 20, 105);
+        pbf_move_left_joystick(context, 128, 255, duration, 4 * TICKS_PER_SECOND);
+//        pbf_controller_state(context, 0, DPAD_NONE, 255, 255, 120, 128, 3 * TICKS_PER_SECOND);
+    });
+}
+
+
+void direction_to_stick(
+    uint8_t& joystick_x, uint8_t& joystick_y,
+    double direction_x, double direction_y
+){
+//    cout << "direction = " << direction_x << ", " << direction_y << endl;
+
+    double scale = std::max(std::abs(direction_x), std::abs(direction_y));
+    direction_x = 128 / scale * direction_x + 128;
+    direction_y = 128 / scale * direction_y + 128;
+
+//    cout << "joystick = " << direction_x << ", " << direction_y << endl;
+
+    direction_x = std::min(direction_x, 255.);
+    direction_x = std::max(direction_x, 0.);
+    direction_y = std::min(direction_y, 255.);
+    direction_y = std::max(direction_y, 0.);
+
+    joystick_x = (uint8_t)direction_x;
+    joystick_y = (uint8_t)direction_y;
+}
+void choose_path(
+    Logger& logger,
+    uint8_t& x, uint8_t& y, uint16_t& duration,
+    double platform_x, double platform_y
+){
+    double diff_x = platform_x - 0.62;
+    double diff_y = platform_y - 0.71;
+
+    logger.log("Move Direction: x = " + tostr_default(diff_x) + ", y = " + tostr_default(diff_y), COLOR_BLUE);
+
+    direction_to_stick(x, y, diff_x, diff_y);
+    duration = (uint16_t)std::min<double>(std::sqrt(diff_x*diff_x + diff_y*diff_y) * 125 * 12, 400);
+}
+void turn_angle(BotBaseContext& context, double angle_radians){
+    uint8_t turn_x, turn_y;
+    direction_to_stick(turn_x, turn_y, -std::sin(angle_radians), std::cos(angle_radians));
+    pbf_move_left_joystick(context, turn_x, turn_y, 40, 20);
+    pbf_mash_button(context, BUTTON_L, 60);
+}
+
+void area_zero_platform_run_path2(
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    LetsGoEncounterBotTracker& tracker,
+    uint64_t iteration_count
+){
+    console.log("Look forward and fire...");
+    pbf_mash_button(context, BUTTON_L, 60);
+
+    double platform_x, platform_y;
+    uint16_t duration;
+    uint8_t move_x, move_y;
+    clear_in_front(console, context, tracker, true, [&](BotBaseContext& context){
+
+        console.log("Find the sky, turn around and fire.");
+        pbf_move_right_joystick(context, 128, 0, 60, 0);
+        find_and_center_on_sky(env, console, context);
+        context.wait_for(std::chrono::seconds(1));
+        pbf_move_left_joystick(context, 128, 255, 40, 85);
+        pbf_mash_button(context, BUTTON_L, 60);
+
+        pbf_move_right_joystick(context, 128, 255, 250, 0);
+        context.wait_for_all_requests();
+
+        console.log("Finding center of platform...");
+        if (!read_platform_center(platform_x, platform_y, env.program_info(), console)){
+            console.log("Unable to find center of platform.", COLOR_RED);
+            return;
+        }
+        console.log("Platform center at: x = " + tostr_default(platform_x) + ", y = " + tostr_default(platform_y), COLOR_BLUE);
+
+        choose_path(console, move_x, move_y, duration, platform_x, platform_y);
+
+        pbf_move_left_joystick(context, move_x, move_y, 40, 20);
+        pbf_mash_button(context, BUTTON_L, 60);
+//        pbf_wait(context, 1250);
+    });
+    clear_in_front(console, context, tracker, duration > 100, [&](BotBaseContext& context){
+        console.log("Making location correction...");
+        pbf_move_left_joystick(context, 128, 0, duration, 0);
+
+        //  Optimization, calculate angle to aim you back at the sky.
+        //  This speeds up the "find_and_center_on_sky()" call.
+        double angle0 = std::atan2(move_x - 128., 128. - move_y);
+        double angle1 = angle0 >= 0 ? 6.2831853071795864769 - angle0 : -6.2831853071795864769 - angle0;
+        turn_angle(context, angle1);
+
+        find_and_center_on_sky(env, console, context);
+        pbf_move_left_joystick(context, 96, 0, 40, 0);
+        pbf_mash_button(context, BUTTON_L, 60);
+    });
+
+    //  One in every 4 iterations: Clear wall of spawns.
+    if (iteration_count % 4 == 0){
+        console.log("Turning along wall...");
+        pbf_move_left_joystick(context, 0, 255, 20, 20);
+        pbf_mash_button(context, BUTTON_L, 60);
+        clear_in_front(console, context, tracker, true, [&](BotBaseContext& context){
+            context.wait_for(std::chrono::milliseconds(1000));
+
+            console.log("Turning back to sky.");
+            pbf_move_left_joystick(context, 255, 255, 20, 20);
+            pbf_mash_button(context, BUTTON_L, 60);
+            find_and_center_on_sky(env, console, context);
+            pbf_move_left_joystick(context, 96, 0, 40, 0);
+            pbf_mash_button(context, BUTTON_L, 60);
+        });
+    }
+
+    if (platform_x < 0.5 || platform_y < 0.5){
+        console.log("Not close enough to desired spot. Skipping forward attack...", COLOR_ORANGE);
+        return;
+    }
+
+    clear_in_front(console, context, tracker, true, [&](BotBaseContext& context){
+        console.log("Move forward, fire, and retreat.");
+        switch (iteration_count % 3){
+        case 0:
+            pbf_move_left_joystick(context, 108, 0, 300, 0);
+            break;
+        case 1:
+            pbf_move_left_joystick(context, 128, 0, 300, 0);
+            break;
+        case 2:
+            pbf_move_left_joystick(context, 144, 0, 300, 0);
+            break;
+        }
+    });
+
+    clear_in_front(console, context, tracker, true, [&](BotBaseContext& context){
+        pbf_move_left_joystick(context, 128, 255, 4 * TICKS_PER_SECOND, 0);
+        pbf_move_left_joystick(context, 128, 0, 60, 4 * TICKS_PER_SECOND);
+    });
+}
+
 
 
 

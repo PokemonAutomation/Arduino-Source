@@ -14,11 +14,13 @@
 
 namespace PokemonAutomation{
     struct ProgramInfo;
-    class ConsoleHandle;
     class BotBaseContext;
+    class ConsoleHandle;
+    class ProgramEnvironment;
 namespace NintendoSwitch{
 namespace PokemonSV{
 
+class LetsGoEncounterBotTracker;
 
 
 class PlatformResetSettings : public GroupOption, private ConfigOption::Listener{
@@ -51,17 +53,38 @@ public:
     TimeExpressionOption<uint16_t> MIDAIR_PAUSE_TIME;
 };
 
-
 void inside_zero_gate_to_platform(
     const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
     NavigatePlatformSettings& settings
 );
 
 
+
+
 bool read_platform_center(
     double& x, double& y,
     const ProgramInfo& info, ConsoleHandle& console
 );
+
+
+
+
+void area_zero_platform_run_path0(
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    LetsGoEncounterBotTracker& tracker,
+    uint64_t iteration_count
+);
+void area_zero_platform_run_path1(
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    LetsGoEncounterBotTracker& tracker,
+    uint64_t iteration_count
+);
+void area_zero_platform_run_path2(
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    LetsGoEncounterBotTracker& tracker,
+    uint64_t iteration_count
+);
+
 
 
 

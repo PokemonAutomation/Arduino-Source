@@ -56,7 +56,7 @@ inline int wait_until(
 //
 //  Returns:
 //      -   The index of the trigger if that's what stopped it.
-//      -   -1 if nothing triggered before command fimished.
+//      -   -1 if nothing triggered before command finished.
 //
 //  Exceptions thrown in either the commands or the callbacks will stop
 //  everything and will be propagated out of this function.
@@ -67,6 +67,27 @@ int run_until(
     std::chrono::milliseconds default_video_period = std::chrono::milliseconds(50),
     std::chrono::milliseconds default_audio_period = std::chrono::milliseconds(20)
 );
+
+
+//  Same as "run_until()", but will cancel the commands and return if a timeout
+//  is reached.
+//
+//  Returns:
+//      -   The index of the trigger if that's what stopped it.
+//      -   -1 if nothing triggered before command finished.
+//      -   -2 if timed out. Nothing triggered, and command did not finish.
+//
+int run_until_with_time_limit(
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    WallClock deadline,
+    std::function<void(BotBaseContext& context)>&& command,
+    const std::vector<PeriodicInferenceCallback>& callbacks,
+    std::chrono::milliseconds default_video_period,
+    std::chrono::milliseconds default_audio_period
+);
+
+
+
 
 
 

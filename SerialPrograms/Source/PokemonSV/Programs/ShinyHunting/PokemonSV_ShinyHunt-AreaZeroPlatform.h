@@ -52,12 +52,7 @@ private:
     };
 
     void run_state(BotBaseContext& context);
-
     void run_traversal(BotBaseContext& context);
-
-    void run_path0(BotBaseContext& context);
-    void run_path1(BotBaseContext& context);
-    void run_path2(BotBaseContext& context);
 
 
 private:

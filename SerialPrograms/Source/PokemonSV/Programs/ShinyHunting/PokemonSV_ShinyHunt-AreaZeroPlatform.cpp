@@ -4,7 +4,6 @@
  *
  */
 
-#include <cmath>
 #include <atomic>
 #include <sstream>
 #include "Common/Cpp/PrettyPrint.h"
@@ -13,32 +12,23 @@
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-//#include "CommonFramework/InferenceInfra/InferenceSession.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
-//#include "CommonFramework/InferenceInfra/InferenceSession.h"
-//#include "CommonFramework/Tools/InterruptableCommands.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Tools/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_ScalarButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
-//#include "Pokemon/Pokemon_Notification.h"
 #include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_IVCheckerReader.h"
-//#include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
-#include "PokemonSV/Inference/Overworld/PokemonSV_AreaZeroSkyDetector.h"
-//#include "PokemonSV/Inference/Overworld/PokemonSV_LetsGoKillDetector.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_EncounterWatcher.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_SaveGame.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
-//#include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSV_LetsGoTools.h"
 #include "PokemonSV_ShinyHunt-AreaZeroPlatform.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -147,270 +137,61 @@ ShinyHuntAreaZeroPlatform::ShinyHuntAreaZeroPlatform()
 
 
 
-void ShinyHuntAreaZeroPlatform::run_path0(BotBaseContext& context){
-    ConsoleHandle& console = m_env->console;
-
-    //  Go back to the wall.
-    console.log("Go back to wall...");
-    clear_in_front(console, context, *m_tracker, false, [&](BotBaseContext& context){
-        find_and_center_on_sky(*m_env, console, context);
-        pbf_move_right_joystick(context, 128, 255, 80, 0);
-        pbf_move_left_joystick(context, 176, 255, 30, 0);
-        pbf_press_button(context, BUTTON_L, 20, 50);
-    });
-
-    clear_in_front(console, context, *m_tracker, false, [&](BotBaseContext& context){
-        //  Move to wall.
-        pbf_move_left_joystick(context, 128, 0, 4 * TICKS_PER_SECOND, 0);
-
-        //  Turn around.
-        console.log("Turning towards sky...");
-        pbf_move_left_joystick(context, 128, 255, 30, 95);
-        pbf_press_button(context, BUTTON_L, 20, 50);
-    });
-
-    //  Move forward and kill everything in your path.
-    console.log("Moving towards sky and killing everything...");
-    uint16_t duration = 325;
-    clear_in_front(console, context, *m_tracker, true, [&](BotBaseContext& context){
-        find_and_center_on_sky(*m_env, console, context);
-        pbf_move_right_joystick(context, 128, 255, 70, 0);
-
-        uint8_t x = 128;
-        switch (m_iterations % 4){
-        case 0:
-            x = 96;
-            duration = 250;
-            break;
-        case 1:
-            x = 112;
-            break;
-        case 2:
-            x = 128;
-            break;
-        case 3:
-            x = 112;
-            break;
-        }
-
-        ssf_press_button(context, BUTTON_L, 0, 20);
-        pbf_move_left_joystick(context, x, 0, duration, 0);
-    });
-    clear_in_front(console, context, *m_tracker, true, [&](BotBaseContext& context){
-        pbf_move_left_joystick(context, 128, 255, duration, 4 * TICKS_PER_SECOND);
-    });
-}
-void ShinyHuntAreaZeroPlatform::run_path1(BotBaseContext& context){
-    ConsoleHandle& console = m_env->console;
-
-    //  Go back to the wall.
-    console.log("Go back to wall...");
-    pbf_press_button(context, BUTTON_L, 20, 105);
-    clear_in_front(console, context, *m_tracker, true, [&](BotBaseContext& context){
-        find_and_center_on_sky(*m_env, console, context);
-        pbf_move_right_joystick(context, 128, 255, 80, 0);
-        pbf_move_left_joystick(context, 192, 255, 60, 0);
-    });
-
-    //  Clear path to the wall.
-    console.log("Clear path to the wall...");
-    pbf_press_button(context, BUTTON_L, 20, 50);
-    clear_in_front(console, context, *m_tracker, false, [&](BotBaseContext& context){
-        pbf_move_left_joystick(context, 128, 0, 5 * TICKS_PER_SECOND, 0);
-
-        //  Turn right.
-        pbf_move_left_joystick(context, 255, 128, 30, 0);
-        pbf_press_button(context, BUTTON_L, 20, 50);
-    });
-
-    //  Clear the wall.
-    console.log("Clear the wall...");
-    uint16_t duration = 325;
-    clear_in_front(console, context, *m_tracker, true, [&](BotBaseContext& context){
-        pbf_move_left_joystick(context, 255, 128, 125, 0);
-        pbf_press_button(context, BUTTON_L, 20, 50);
-        context.wait_for_all_requests();
-
-        find_and_center_on_sky(*m_env, console, context);
-        pbf_move_left_joystick(context, 128, 0, 50, 0);
-        pbf_press_button(context, BUTTON_L, 20, 30);
-
-        //  Move forward.
-
-        uint8_t x = 128;
-        switch (m_iterations % 4){
-        case 0:
-            x = 96;
-            duration = 250;
-            break;
-        case 1:
-            x = 112;
-            break;
-        case 2:
-            x = 128;
-            break;
-        case 3:
-            x = 112;
-            break;
-        }
-
-        pbf_move_left_joystick(context, x, 0, duration, 0);
-    });
-
-    console.log("Run backwards and wait...");
-    clear_in_front(console, context, *m_tracker, true, [&](BotBaseContext& context){
-//        pbf_move_left_joystick(context, 64, 0, 125, 0);
-//        pbf_press_button(context, BUTTON_L, 20, 105);
-        pbf_move_left_joystick(context, 128, 255, duration, 4 * TICKS_PER_SECOND);
-//        pbf_controller_state(context, 0, DPAD_NONE, 255, 255, 120, 128, 3 * TICKS_PER_SECOND);
-    });
-}
-
-
-
-void direction_to_stick(
-    uint8_t& joystick_x, uint8_t& joystick_y,
-    double direction_x, double direction_y
-){
-//    cout << "direction = " << direction_x << ", " << direction_y << endl;
-
-    double scale = std::max(std::abs(direction_x), std::abs(direction_y));
-    direction_x = 128 / scale * direction_x + 128;
-    direction_y = 128 / scale * direction_y + 128;
-
-//    cout << "joystick = " << direction_x << ", " << direction_y << endl;
-
-    direction_x = std::min(direction_x, 255.);
-    direction_x = std::max(direction_x, 0.);
-    direction_y = std::min(direction_y, 255.);
-    direction_y = std::max(direction_y, 0.);
-
-    joystick_x = (double)direction_x;
-    joystick_y = (double)direction_y;
-}
-void choose_path(
-    Logger& logger,
-    uint8_t& x, uint8_t& y, uint16_t& duration,
-    double platform_x, double platform_y
-){
-    double diff_x = platform_x - 0.62;
-    double diff_y = platform_y - 0.71;
-
-    logger.log("Move Direction: x = " + tostr_default(diff_x) + ", y = " + tostr_default(diff_y), COLOR_BLUE);
-
-    direction_to_stick(x, y, diff_x, diff_y);
-    duration = (uint16_t)std::min<double>(std::sqrt(diff_x*diff_x + diff_y*diff_y) * 125 * 12, 400);
-}
-void turn_angle(BotBaseContext& context, double angle_radians){
-    uint8_t turn_x, turn_y;
-    direction_to_stick(turn_x, turn_y, -std::sin(angle_radians), std::cos(angle_radians));
-    pbf_move_left_joystick(context, turn_x, turn_y, 40, 20);
-    pbf_mash_button(context, BUTTON_L, 60);
-}
-
-void ShinyHuntAreaZeroPlatform::run_path2(BotBaseContext& context){
-    ConsoleHandle& console = m_env->console;
-
-    console.log("Look forward and fire...");
-    pbf_mash_button(context, BUTTON_L, 60);
-
-    double platform_x, platform_y;
-    uint16_t duration;
-    uint8_t move_x, move_y;
-    clear_in_front(console, context, *m_tracker, true, [&](BotBaseContext& context){
-
-        console.log("Find the sky, turn around and fire.");
-        pbf_move_right_joystick(context, 128, 0, 60, 0);
-        find_and_center_on_sky(*m_env, console, context);
-        context.wait_for(std::chrono::seconds(1));
-        pbf_move_left_joystick(context, 128, 255, 40, 85);
-        pbf_mash_button(context, BUTTON_L, 60);
-
-        pbf_move_right_joystick(context, 128, 255, 250, 0);
-        context.wait_for_all_requests();
-
-        console.log("Finding center of platform...");
-        if (!read_platform_center(platform_x, platform_y, m_env->program_info(), console)){
-            console.log("Unable to find center of platform.", COLOR_RED);
-            return;
-        }
-        console.log("Platform center at: x = " + tostr_default(platform_x) + ", y = " + tostr_default(platform_y), COLOR_BLUE);
-
-        choose_path(console, move_x, move_y, duration, platform_x, platform_y);
-
-        pbf_move_left_joystick(context, move_x, move_y, 40, 20);
-        pbf_mash_button(context, BUTTON_L, 60);
-//        pbf_wait(context, 1250);
-    });
-    clear_in_front(console, context, *m_tracker, duration > 100, [&](BotBaseContext& context){
-        console.log("Making location correction...");
-        pbf_move_left_joystick(context, 128, 0, duration, 0);
-
-        //  Optimization, calculate angle to aim you back at the sky.
-        //  This speeds up the "find_and_center_on_sky()" call.
-        double angle0 = std::atan2(move_x - 128., 128. - move_y);
-        double angle1 = angle0 >= 0 ? 6.2831853071795864769 - angle0 : -6.2831853071795864769 - angle0;
-        turn_angle(context, angle1);
-
-        find_and_center_on_sky(*m_env, console, context);
-        pbf_move_left_joystick(context, 96, 0, 40, 0);
-        pbf_mash_button(context, BUTTON_L, 60);
-    });
-
-    //  One in every 4 iterations: Clear wall of spawns.
-    if (m_iterations % 4 == 0){
-        console.log("Turning along wall...");
-        pbf_move_left_joystick(context, 0, 255, 20, 20);
-        pbf_mash_button(context, BUTTON_L, 60);
-        clear_in_front(console, context, *m_tracker, true, [&](BotBaseContext& context){
-            context.wait_for(std::chrono::milliseconds(1000));
-
-            console.log("Turning back to sky.");
-            pbf_move_left_joystick(context, 255, 255, 20, 20);
-            pbf_mash_button(context, BUTTON_L, 60);
-            find_and_center_on_sky(*m_env, console, context);
-            pbf_move_left_joystick(context, 96, 0, 40, 0);
-            pbf_mash_button(context, BUTTON_L, 60);
-        });
-    }
-
-    if (platform_x < 0.5 || platform_y < 0.5){
-        console.log("Not close enough to desired spot. Skipping forward attack...", COLOR_ORANGE);
-        return;
-    }
-
-    clear_in_front(console, context, *m_tracker, true, [&](BotBaseContext& context){
-        console.log("Move forward, fire, and retreat.");
-        switch (m_iterations % 3){
-        case 0:
-            pbf_move_left_joystick(context, 108, 0, 300, 0);
-            break;
-        case 1:
-            pbf_move_left_joystick(context, 128, 0, 300, 0);
-            break;
-        case 2:
-            pbf_move_left_joystick(context, 144, 0, 300, 0);
-            break;
-        }
-    });
-
-    clear_in_front(console, context, *m_tracker, true, [&](BotBaseContext& context){
-        pbf_move_left_joystick(context, 128, 255, 4 * TICKS_PER_SECOND, 0);
-        pbf_move_left_joystick(context, 128, 0, 60, 4 * TICKS_PER_SECOND);
-    });
-
-//    context.wait_for(std::chrono::seconds(60));
-}
 void ShinyHuntAreaZeroPlatform::run_traversal(BotBaseContext& context){
+    const ProgramInfo& info = m_env->program_info();
+    ConsoleHandle& console = m_env->console;
+
+    if (m_pending_save){
+        save_game_from_overworld(info, console, context);
+        m_pending_save = false;
+        m_last_save = SavedLocation::AREA_ZERO;
+    }
+
+    size_t kills, encounters;
+    std::chrono::minutes window(PLATFORM_RESET.WINDOW_IN_MINUTES);
+    bool enough_time = m_tracker->get_encounters_in_window(
+        kills, encounters, window
+    );
+    console.log(
+        "Starting Traversal Iteration: " + tostr_u_commas(m_iterations) +
+        "\n    Time Window (Minutes): " + std::to_string(window.count()) +
+        "\n    Kills: " + std::to_string(kills) +
+        "\n    Encounters: " + std::to_string(encounters)
+    );
+
+    do{
+        if (!PLATFORM_RESET.enabled()){
+            console.log("Platform Reset: Disabled", COLOR_ORANGE);
+            break;
+        }
+        if (!enough_time){
+            console.log("Platform Reset: Not enough time has elapsed.", COLOR_ORANGE);
+            break;
+        }
+        if (kills >= PLATFORM_RESET.KILLS_IN_WINDOW){
+            console.log("Platform Reset: Enough kills in window.", COLOR_ORANGE);
+            break;
+        }
+        if (encounters >= PLATFORM_RESET.ENCOUNTERS_IN_WINDOW){
+            console.log("Platform Reset: Enough encounters in window.", COLOR_ORANGE);
+            break;
+        }
+
+        console.log("Conditions met for platform reset.");
+        m_state = State::LEAVE_AND_RETURN;
+        return;
+    }while (false);
+
+
     switch (PATH0){
     case Path::PATH0:
-        run_path0(context);
+        area_zero_platform_run_path0(*m_env, console, context, *m_tracker, m_iterations);
         break;
     case Path::PATH1:
-        run_path1(context);
+        area_zero_platform_run_path1(*m_env, console, context, *m_tracker, m_iterations);
         break;
     case Path::PATH2:
-        run_path2(context);
+        area_zero_platform_run_path2(*m_env, console, context, *m_tracker, m_iterations);
         break;
     }
     m_iterations++;
@@ -441,50 +222,10 @@ void ShinyHuntAreaZeroPlatform::run_state(BotBaseContext& context){
     try{
         switch (m_state){
         case State::TRAVERSAL:{
-            if (m_pending_save){
-                save_game_from_overworld(info, console, context);
-                m_pending_save = false;
-                m_last_save = SavedLocation::AREA_ZERO;
-            }
-
-            size_t kills, encounters;
-            std::chrono::minutes window(PLATFORM_RESET.WINDOW_IN_MINUTES);
-            bool enough_time = m_tracker->get_encounters_in_window(
-                kills, encounters, window
-            );
-            console.log(
-                "Starting Traversal Iteration: " + tostr_u_commas(m_iterations) +
-                "\n    Time Window (Minutes): " + std::to_string(window.count()) +
-                "\n    Kills: " + std::to_string(kills) +
-                "\n    Encounters: " + std::to_string(encounters)
-            );
-
-            do{
-                if (!PLATFORM_RESET.enabled()){
-                    console.log("Platform Reset: Disabled", COLOR_ORANGE);
-                    break;
-                }
-                if (!enough_time){
-                    console.log("Platform Reset: Not enough time has elapsed.", COLOR_ORANGE);
-                    break;
-                }
-                if (kills >= PLATFORM_RESET.KILLS_IN_WINDOW){
-                    console.log("Platform Reset: Enough kills in window.", COLOR_ORANGE);
-                    break;
-                }
-                if (encounters >= PLATFORM_RESET.ENCOUNTERS_IN_WINDOW){
-                    console.log("Platform Reset: Enough encounters in window.", COLOR_ORANGE);
-                    break;
-                }
-
-                console.log("Conditions met for platform reset.");
-                m_state = State::LEAVE_AND_RETURN;
-                return;
-            }while (false);
-
             //  If we error out, recover using LEAVE_AND_RETURN.
             recovery_state = State::LEAVE_AND_RETURN;
 
+            //  TODO: Wrap this with the sandwich timer cancel.
             run_traversal(context);
 
             break;
@@ -609,7 +350,10 @@ void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, Bot
     m_last_save = SavedLocation::NONE;
     m_last_sandwich = WallClock::min();
 
-//    m_last_platform_reset = current_time();
+    //  This is the outer-most program loop that wraps all logic with the
+    //  battle menu detector. If at any time you detect a battle menu, you break
+    //  all the way out here to handle the encounter. This is needed because you
+    //  can get attacked at almost any time while in Area Zero.
     m_consecutive_failures = 0;
     while (true){
         env.console.log("Starting encounter loop...", COLOR_PURPLE);
@@ -617,6 +361,7 @@ void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, Bot
         run_until(
             env.console, context,
             [&](BotBaseContext& context){
+                //  Inner program loop that runs the state machine.
                 while (true){
                     run_state(context);
                 }
