@@ -36,6 +36,7 @@ MainWindow::MainWindow(QWidget* parent)
     if (objectName().isEmpty()){
         setObjectName(QString::fromUtf8("MainWindow"));
     }
+    this->setWindowIcon(QIcon(QString::fromStdString(RESOURCE_PATH() + "icon.png")));
 //    QSize window_size = PERSISTENT_SETTINGS().window_size;
     resize(GlobalSettings::instance().WINDOW_SIZE.WIDTH, GlobalSettings::instance().WINDOW_SIZE.HEIGHT);
     centralwidget = new QWidget(this);

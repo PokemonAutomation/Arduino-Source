@@ -12,9 +12,9 @@
 #include "Common/Microcontroller/DeviceRoutines.h"
 #include "PABotBase.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 // #define DEBUG_STACK_TRACE
 

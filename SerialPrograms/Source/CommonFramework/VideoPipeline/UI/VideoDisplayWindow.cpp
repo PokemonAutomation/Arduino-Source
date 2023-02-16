@@ -7,13 +7,14 @@
 #include <QLayout>
 #include <QMainWindow>
 #include <QResizeEvent>
+#include "CommonFramework/Globals.h"
 #include "CommonFramework/Windows/WindowTracker.h"
 #include "VideoDisplayWidget.h"
 #include "VideoDisplayWindow.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 
@@ -23,6 +24,7 @@ VideoDisplayWindow::VideoDisplayWindow(VideoDisplayWidget* display_widget)
 {
 //    m_display_widget->setParent(this);
     setWindowTitle("Console: " + QString::number(m_display_widget->id()));
+    this->setWindowIcon(QIcon(QString::fromStdString(RESOURCE_PATH() + "icon.png")));
 
 //    this->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     this->setCentralWidget(m_display_widget);

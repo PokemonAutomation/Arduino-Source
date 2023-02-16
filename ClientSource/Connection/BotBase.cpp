@@ -7,6 +7,10 @@
 #include "BotBaseMessage.h"
 #include "BotBase.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 
 
