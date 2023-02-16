@@ -52,7 +52,9 @@ private:
     };
 
     void run_state(BotBaseContext& context);
-    void run_traversal(BotBaseContext& context);
+
+    //  Returns true on success.
+    bool run_traversal(BotBaseContext& context);
 
 
 private:

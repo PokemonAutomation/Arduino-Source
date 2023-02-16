@@ -137,7 +137,7 @@ ShinyHuntAreaZeroPlatform::ShinyHuntAreaZeroPlatform()
 
 
 
-void ShinyHuntAreaZeroPlatform::run_traversal(BotBaseContext& context){
+bool ShinyHuntAreaZeroPlatform::run_traversal(BotBaseContext& context){
     const ProgramInfo& info = m_env->program_info();
     ConsoleHandle& console = m_env->console;
 
@@ -179,7 +179,7 @@ void ShinyHuntAreaZeroPlatform::run_traversal(BotBaseContext& context){
 
         console.log("Conditions met for platform reset.");
         m_state = State::LEAVE_AND_RETURN;
-        return;
+        return false;
     }while (false);
 
 
@@ -195,6 +195,8 @@ void ShinyHuntAreaZeroPlatform::run_traversal(BotBaseContext& context){
         break;
     }
     m_iterations++;
+
+    return true;
 }
 
 
@@ -226,9 +228,11 @@ void ShinyHuntAreaZeroPlatform::run_state(BotBaseContext& context){
             recovery_state = State::LEAVE_AND_RETURN;
 
             //  TODO: Wrap this with the sandwich timer cancel.
-            run_traversal(context);
-
-            break;
+            if (run_traversal(context)){
+                break;
+            }else{
+                return;
+            }
         }
         case State::INSIDE_GATE_AND_RETURN:
             console.log("Going from inside gate to platform...");
