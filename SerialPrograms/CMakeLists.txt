@@ -1234,14 +1234,16 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Resources/PokemonLA_WeatherAndTimeIcons.h
     Source/PokemonSV/Inference/Battles/PokemonSV_BattleBallReader.cpp
     Source/PokemonSV/Inference/Battles/PokemonSV_BattleBallReader.h
-    Source/PokemonSV/Inference/Battles/PokemonSV_BattleMenuDetector.cpp
-    Source/PokemonSV/Inference/Battles/PokemonSV_BattleMenuDetector.h
     Source/PokemonSV/Inference/Battles/PokemonSV_EncounterWatcher.cpp
     Source/PokemonSV/Inference/Battles/PokemonSV_EncounterWatcher.h
+    Source/PokemonSV/Inference/Battles/PokemonSV_NormalBattleMenus.cpp
+    Source/PokemonSV/Inference/Battles/PokemonSV_NormalBattleMenus.h
     Source/PokemonSV/Inference/Battles/PokemonSV_PostCatchDetector.cpp
     Source/PokemonSV/Inference/Battles/PokemonSV_PostCatchDetector.h
     Source/PokemonSV/Inference/Battles/PokemonSV_ShinySoundDetector.cpp
     Source/PokemonSV/Inference/Battles/PokemonSV_ShinySoundDetector.h
+    Source/PokemonSV/Inference/Battles/PokemonSV_TeraBattleMenus.cpp
+    Source/PokemonSV/Inference/Battles/PokemonSV_TeraBattleMenus.h
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.cpp
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.h
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxEggDetector.cpp
@@ -1374,8 +1376,12 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Programs/Glitches/PokemonSV_CloneItems-1.0.1.h
     Source/PokemonSV/Programs/Glitches/PokemonSV_RideCloner-1.0.1.cpp
     Source/PokemonSV/Programs/Glitches/PokemonSV_RideCloner-1.0.1.h
+    Source/PokemonSV/Programs/PokemonSV_AreaZero.cpp
+    Source/PokemonSV/Programs/PokemonSV_AreaZero.h
     Source/PokemonSV/Programs/PokemonSV_BasicCatcher.cpp
     Source/PokemonSV/Programs/PokemonSV_BasicCatcher.h
+    Source/PokemonSV/Programs/PokemonSV_Battles.cpp
+    Source/PokemonSV/Programs/PokemonSV_Battles.h
     Source/PokemonSV/Programs/PokemonSV_ConnectToInternet.cpp
     Source/PokemonSV/Programs/PokemonSV_ConnectToInternet.h
     Source/PokemonSV/Programs/PokemonSV_GameEntry.cpp

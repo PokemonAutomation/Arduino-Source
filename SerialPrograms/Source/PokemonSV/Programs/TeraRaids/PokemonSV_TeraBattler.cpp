@@ -6,11 +6,11 @@
 
 #include <mutex>
 #include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "PokemonSV/Inference/Battles/PokemonSV_BattleMenuDetector.h"
+#include "PokemonSV/Inference/Battles/PokemonSV_NormalBattleMenus.h"
+#include "PokemonSV/Inference/Battles/PokemonSV_TeraBattleMenus.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV_TeraBattler.h"
 
@@ -154,7 +154,7 @@ bool run_move_select(
 }
 bool run_target_select(
     ConsoleHandle& console, BotBaseContext& context,
-    TargetSelectDetector& target_select_menu,
+    TeraTargetSelectDetector& target_select_menu,
     TeraMoveEntry& move
 ){
     switch (move.type){

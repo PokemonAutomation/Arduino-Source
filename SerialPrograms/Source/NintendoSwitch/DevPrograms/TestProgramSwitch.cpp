@@ -48,7 +48,6 @@
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogArrowDetector.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.h"
-#include "PokemonSV/Inference/Battles/PokemonSV_BattleMenuDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_MarkFinder.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_ScalarButtons.h"
@@ -191,8 +190,8 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
-    return_to_inside_zero_gate(env.program_info(), console, context);
-    inside_zero_gate_to_secret_cave_entrance(env.program_info(), console, context);
+//    return_to_inside_zero_gate(env.program_info(), console, context);
+//    inside_zero_gate_to_secret_cave_entrance(env.program_info(), console, context);
 
 
 

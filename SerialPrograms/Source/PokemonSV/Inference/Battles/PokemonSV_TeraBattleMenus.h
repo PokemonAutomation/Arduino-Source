@@ -1,14 +1,12 @@
-/*  Battle Menu Detector
+/*  Tera Battle Menus
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
  */
 
-#ifndef PokemonAutomation_PokemonSV_BattleMenuDetector_H
-#define PokemonAutomation_PokemonSV_BattleMenuDetector_H
+#ifndef PokemonAutomation_PokemonSV_TeraBattleMenus_H
+#define PokemonAutomation_PokemonSV_TeraBattleMenus_H
 
-#include "CommonFramework/Language.h"
-#include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/Inference/VisualDetector.h"
 #include "PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.h"
@@ -19,36 +17,6 @@ namespace PokemonAutomation{
     struct ProgramInfo;
 namespace NintendoSwitch{
 namespace PokemonSV{
-
-
-
-class NormalBattleMenuDetector : public StaticScreenDetector{
-public:
-    NormalBattleMenuDetector(Color color);
-
-    virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool detect(const ImageViewRGB32& screen) const override;
-
-//    //  Returns -1 if not found.
-//    int8_t detect_slot(const ImageViewRGB32& screen) const;
-//    bool move_to_slot(ConsoleHandle& console, BotBaseContext& context, uint8_t slot) const;
-
-private:
-    WhiteButtonDetector m_status_button;
-    GradientArrowDetector m_arrow;
-};
-class NormalBattleMenuWatcher : public DetectorToFinder<NormalBattleMenuDetector>{
-public:
-    NormalBattleMenuWatcher(Color color)
-        : DetectorToFinder("NormalBattleMenuWatcher", std::chrono::milliseconds(250), color)
-    {}
-};
-
-std::set<std::string> read_singles_opponent(
-    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
-    Language language
-);
-
 
 
 
@@ -76,6 +44,7 @@ public:
 
 
 
+
 class CheerSelectDetector : public StaticScreenDetector{
 public:
     CheerSelectDetector(Color color);
@@ -100,47 +69,9 @@ public:
 
 
 
-class MoveSelectDetector : public StaticScreenDetector{
+class TeraTargetSelectDetector : public StaticScreenDetector{
 public:
-    MoveSelectDetector(Color color);
-
-    virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool detect(const ImageViewRGB32& screen) const override;
-
-    //  Returns -1 if not found.
-    int8_t detect_slot(const ImageViewRGB32& screen) const;
-    bool move_to_slot(ConsoleHandle& console, BotBaseContext& context, uint8_t slot) const;
-
-private:
-    WhiteButtonDetector m_info_button;
-    GradientArrowDetector m_arrow;
-};
-class MoveSelectWatcher : public DetectorToFinder<MoveSelectDetector>{
-public:
-    MoveSelectWatcher(Color color)
-        : DetectorToFinder("MoveSelectWatcher", std::chrono::milliseconds(250), color)
-    {}
-};
-
-
-
-class TerastallizingDetector : public StaticScreenDetector{
-public:
-    TerastallizingDetector(Color color);
-
-    virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool detect(const ImageViewRGB32& screen) const override;
-
-private:
-    Color m_color;
-    ImageFloatBox m_box;
-};
-
-
-
-class TargetSelectDetector : public StaticScreenDetector{
-public:
-    TargetSelectDetector(Color color);
+    TeraTargetSelectDetector(Color color);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) const override;
@@ -159,7 +90,7 @@ private:
     GradientArrowDetector m_player2;
     GradientArrowDetector m_player3;
 };
-class TargetSelectWatcher : public DetectorToFinder<TargetSelectDetector>{
+class TargetSelectWatcher : public DetectorToFinder<TeraTargetSelectDetector>{
 public:
     TargetSelectWatcher(Color color)
         : DetectorToFinder("TargetSelectWatcher", std::chrono::milliseconds(250), color)

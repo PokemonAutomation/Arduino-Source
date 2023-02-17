@@ -7,6 +7,7 @@
 #include <algorithm>
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
@@ -16,6 +17,7 @@
 #include "PokemonSV/Options/PokemonSV_EncounterBotCommon.h"
 #include "PokemonSV/Inference/PokemonSV_SweatBubbleDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
+#include "PokemonSV/Programs/PokemonSV_Battles.h"
 #include "PokemonSV/Programs/PokemonSV_BasicCatcher.h"
 #include "PokemonSV_LetsGoTools.h"
 
@@ -232,25 +234,18 @@ bool LetsGoEncounterBotTracker::process_battle(EncounterWatcher& watcher, Encoun
 
     //  Run the chosen action.
     switch (action.action){
-    case EncounterActionsAction::RUN_AWAY:{
-        OverworldWatcher overworld(COLOR_GREEN);
-        run_until(
-            m_console, m_context,
-            [&](BotBaseContext& context){
-                pbf_press_dpad(context, DPAD_DOWN, 250, 0);
-                pbf_press_button(context, BUTTON_A, 20, 105);
-                pbf_press_button(context, BUTTON_B, 20, 5 * TICKS_PER_SECOND);
-            },
-            {overworld}
-        );
+    case EncounterActionsAction::RUN_AWAY:
+        try{
+            run_from_battle(m_env.program_info(), m_console, m_context);
+        }catch (OperationFailedException& e){
+            throw FatalProgramException(std::move(e));
+        }
         return false;
-    }
     case EncounterActionsAction::STOP_PROGRAM:
         throw ProgramFinishedException();
 //        throw ProgramFinishedException(m_console, "", true);
     case EncounterActionsAction::THROW_BALLS:
     case EncounterActionsAction::THROW_BALLS_AND_SAVE:
-//        throw FatalProgramException(ErrorReport::NO_ERROR_REPORT, m_console, "Auto-catch has not been implemented yet.");
         if (language == Language::None){
             throw InternalProgramError(&m_console.logger(), PA_CURRENT_FUNCTION, "Language is not set.");
         }

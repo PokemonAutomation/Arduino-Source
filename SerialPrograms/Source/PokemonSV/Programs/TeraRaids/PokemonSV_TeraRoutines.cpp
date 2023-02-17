@@ -18,7 +18,7 @@
 #include "Pokemon/Pokemon_Notification.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 //#include "PokemonSV/Inference/PokemonSV_GradientArrowDetector.h"
-#include "PokemonSV/Inference/Battles/PokemonSV_BattleMenuDetector.h"
+#include "PokemonSV/Inference/Battles/PokemonSV_TeraBattleMenus.h"
 #include "PokemonSV/Inference/PokemonSV_PokemonSummaryReader.h"
 #include "PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
 #include "PokemonSV/Inference/PokemonSV_PokePortalDetector.h"

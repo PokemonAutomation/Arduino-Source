@@ -11,7 +11,7 @@
 #include <mutex>
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "PokemonSV_BattleMenuDetector.h"
+#include "PokemonSV_NormalBattleMenus.h"
 #include "PokemonSV_ShinySoundDetector.h"
 
 namespace PokemonAutomation{

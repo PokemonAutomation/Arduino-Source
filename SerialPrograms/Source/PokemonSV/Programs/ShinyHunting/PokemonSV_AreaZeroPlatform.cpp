@@ -18,7 +18,7 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_ScalarButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_AreaZeroSkyDetector.h"
-#include "PokemonSV/Programs/PokemonSV_Navigation.h"
+#include "PokemonSV/Programs/PokemonSV_AreaZero.h"
 #include "PokemonSV_LetsGoTools.h"
 #include "PokemonSV_AreaZeroPlatform.h"
 

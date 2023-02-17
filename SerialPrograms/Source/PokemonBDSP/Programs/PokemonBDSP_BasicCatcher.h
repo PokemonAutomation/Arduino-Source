@@ -10,12 +10,13 @@
 #include "CommonFramework/Language.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "Pokemon/Pokemon_Notification.h"
-#include "PokemonBDSP/Inference/Battles/PokemonBDSP_BattleBallReader.h"
 
 namespace PokemonAutomation{
     class BotBaseContext;
 namespace NintendoSwitch{
 namespace PokemonBDSP{
+
+using namespace Pokemon;
     
 
 struct CatchResults{

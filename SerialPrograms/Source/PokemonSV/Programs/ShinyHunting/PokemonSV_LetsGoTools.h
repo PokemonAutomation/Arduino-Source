@@ -60,7 +60,7 @@ private:
 
 
 //
-//  Consider a virtual timeline that is starts and stops relative to the wall clock.
+//  Consider a virtual timeline that starts and stops relative to the wall clock.
 //  Now you want to get the last X seconds of the virtual timeline, but on the
 //  wall clock instead. Because of the starts and stops, the last X seconds
 //  of virtual time will be less than the last X seconds of real time.

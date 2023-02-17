@@ -1,129 +1,17 @@
-/*  Battle Menu Detector
+/*  Tera Battle Menus
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
  */
 
-//#include "Common/Cpp/Exceptions.h"
-#include "ClientSource/Connection/BotBase.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
-#include "CommonFramework/VideoPipeline/VideoFeed.h"
-//#include "CommonFramework/VideoPipeline/VideoOverlay.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
-#include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "Pokemon/Inference/Pokemon_NameReader.h"
-#include "PokemonSV_BattleMenuDetector.h"
-
-//#include <iostream>
-//using std::cout;
-//using std::endl;
+#include "PokemonSV_TeraBattleMenus.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
-
-
-NormalBattleMenuDetector::NormalBattleMenuDetector(Color color)
-    : m_status_button(color, WhiteButton::ButtonY, {0.35, 0.90, 0.30, 0.08})
-    , m_arrow(color, GradientArrowType::RIGHT, {0.75, 0.62, 0.05, 0.35})
-{}
-void NormalBattleMenuDetector::make_overlays(VideoOverlaySet& items) const{
-    m_status_button.make_overlays(items);
-    m_arrow.make_overlays(items);
-}
-bool NormalBattleMenuDetector::detect(const ImageViewRGB32& screen) const{
-    if (!m_status_button.detect(screen)){
-//        cout << "status button" << endl;
-        return false;
-    }
-    if (!m_arrow.detect(screen)){
-        return false;
-    }
-    return true;
-}
-
-
-
-std::set<std::string> read_singles_opponent(
-    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
-    Language language
-){
-    VideoOverlaySet overlay(console);
-
-    ImageFloatBox name(0.422, 0.131, 0.120, 0.050);
-    overlay.add(COLOR_RED, name);
-
-    std::set<std::string> slugs;
-
-    bool status_opened = false;
-    bool battle_menu_seen = false;
-    for (size_t c = 0; c < 10; c++){
-        NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
-        GradientArrowWatcher arrow(COLOR_BLUE, GradientArrowType::DOWN, {0.4, 0.1, 0.2, 0.5});
-        context.wait_for_all_requests();
-        int ret = wait_until(
-            console, context, std::chrono::seconds(5),
-            {battle_menu, arrow}
-        );
-        context.wait_for(std::chrono::milliseconds(500));
-
-        switch (ret){
-        case 0:
-            if (status_opened){
-                console.log("Detected battle menu...");
-                return slugs;
-            }
-            console.log("Detected battle menu. Opening status...");
-            battle_menu_seen = true;
-            pbf_press_button(context, BUTTON_Y, 20, 105);
-            continue;
-
-        case 1:
-            if (!battle_menu_seen){
-                console.log("Detected status menu before pressing Y...", COLOR_RED);
-//                dump_image(console, info, "BattleMenuNotSeen", arrow.last_detected());
-                continue;
-            }
-            if (status_opened){
-                console.log("Detected status menu (again)...", COLOR_RED);
-            }else{
-                console.log("Detected status menu. Reading name...");
-                status_opened = true;
-                VideoSnapshot screen = console.video().snapshot();
-                OCR::StringMatchResult result = Pokemon::PokemonNameReader::instance().read_substring(
-                    console, language,
-                    extract_box_reference(screen, name),
-                    OCR::WHITE_TEXT_FILTERS()
-                );
-                for (auto& item : result.results){
-                    slugs.insert(std::move(item.second.token));
-                }
-                if (slugs.empty()){
-                    dump_image(console, info, "UnableToReadName", screen);
-                }
-            }
-
-            pbf_mash_button(context, BUTTON_B, 125);
-            continue;
-
-        default:
-            console.log("No recognized state. Mashing B...", COLOR_RED);
-            pbf_mash_button(context, BUTTON_B, 250);
-        }
-    }
-
-    throw OperationFailedException(
-        ErrorReport::SEND_ERROR_REPORT, console,
-        "Unable to open status menu to read opponent name.",
-        true
-    );
-}
-
-
-
 
 
 TeraBattleMenuDetector::TeraBattleMenuDetector(Color color)
@@ -192,6 +80,7 @@ bool TeraBattleMenuDetector::move_to_slot(ConsoleHandle& console, BotBaseContext
         }
     }
 }
+
 
 
 
@@ -267,111 +156,22 @@ bool CheerSelectDetector::move_to_slot(ConsoleHandle& console, BotBaseContext& c
 
 
 
-MoveSelectDetector::MoveSelectDetector(Color color)
-    : m_info_button(color, WhiteButton::ButtonY, {0.35, 0.90, 0.30, 0.08})
-    , m_arrow(color, GradientArrowType::RIGHT, {0.705, 0.550, 0.050, 0.410})
-{}
-void MoveSelectDetector::make_overlays(VideoOverlaySet& items) const{
-    m_info_button.make_overlays(items);
-    m_arrow.make_overlays(items);
-}
-bool MoveSelectDetector::detect(const ImageViewRGB32& screen) const{
-    if (!m_info_button.detect(screen)){
-//        cout << "status" << endl;
-        return false;
-    }
-    if (!m_arrow.detect(screen)){
-//        cout << "arrow" << endl;
-        return false;
-    }
-    return true;
-}
-int8_t MoveSelectDetector::detect_slot(const ImageViewRGB32& screen) const{
-    if (!m_info_button.detect(screen)){
-//        cout << "status" << endl;
-        return false;
-    }
 
-    ImageFloatBox box;
-    if (!m_arrow.detect(box, screen)){
-//        cout << "arrow" << endl;
-        return false;
-    }
-
-    double y = box.y + box.height * 0.5;
-    y = (y - 0.602778) / 0.103549;
-//    cout << "y = " << y << endl;
-
-    return (int8_t)(y + 0.5);
-}
-bool MoveSelectDetector::move_to_slot(ConsoleHandle& console, BotBaseContext& context, uint8_t slot) const{
-    if (slot > 3){
-        return false;
-    }
-    for (size_t attempts = 0;; attempts++){
-        context.wait_for_all_requests();
-        VideoSnapshot screen = console.video().snapshot();
-        int8_t current_slot = detect_slot(screen);
-        if (current_slot < 0 || current_slot > 3){
-            console.log("MoveSelectDetector::move_to_slot(): Unable to detect slot.", COLOR_RED);
-            return false;
-        }
-        if (attempts > 10){
-            console.log("MoveSelectDetector::move_to_slot(): Failed to move slot after 10 attempts.", COLOR_RED);
-            return false;
-        }
-
-        uint8_t diff = (4 + slot - (uint8_t)current_slot) % 4;
-        switch (diff){
-        case 0:
-            return true;
-        case 1:
-            pbf_press_dpad(context, DPAD_DOWN, 20, 30);
-            continue;
-        case 2:
-            pbf_press_dpad(context, DPAD_DOWN, 20, 30);
-            pbf_press_dpad(context, DPAD_DOWN, 20, 30);
-            continue;
-        case 3:
-            pbf_press_dpad(context, DPAD_UP, 20, 30);
-            continue;
-        }
-    }
-}
-
-
-
-
-
-
-TerastallizingDetector::TerastallizingDetector(Color color)
-    : m_color(color)
-    , m_box(0.6, 0.7, 0.06, 0.14)
-{}
-void TerastallizingDetector::make_overlays(VideoOverlaySet& items) const{
-    items.add(m_color, m_box);
-}
-bool TerastallizingDetector::detect(const ImageViewRGB32& screen) const{
-    ImageStats box = image_stats(extract_box_reference(screen, m_box));
-    return box.stddev.sum() > 240;
-}
-
-
-TargetSelectDetector::TargetSelectDetector(Color color)
+TeraTargetSelectDetector::TeraTargetSelectDetector(Color color)
     : m_opponent(color, GradientArrowType::DOWN, {0.45, 0.07, 0.10, 0.10})
     , m_player0(color, GradientArrowType::DOWN, {0.20, 0.46, 0.10, 0.10})
     , m_player1(color, GradientArrowType::DOWN, {0.37, 0.46, 0.10, 0.10})
     , m_player2(color, GradientArrowType::DOWN, {0.53, 0.46, 0.10, 0.10})
     , m_player3(color, GradientArrowType::DOWN, {0.70, 0.46, 0.10, 0.10})
 {}
-void TargetSelectDetector::make_overlays(VideoOverlaySet& items) const{
+void TeraTargetSelectDetector::make_overlays(VideoOverlaySet& items) const{
     m_opponent.make_overlays(items);
     m_player0.make_overlays(items);
     m_player1.make_overlays(items);
     m_player2.make_overlays(items);
     m_player3.make_overlays(items);
 }
-bool TargetSelectDetector::detect(const ImageViewRGB32& screen) const{
+bool TeraTargetSelectDetector::detect(const ImageViewRGB32& screen) const{
     if (m_opponent.detect(screen)){
         return true;
     }
@@ -389,7 +189,7 @@ bool TargetSelectDetector::detect(const ImageViewRGB32& screen) const{
     }
     return false;
 }
-int8_t TargetSelectDetector::detect_slot(const ImageViewRGB32& screen) const{
+int8_t TeraTargetSelectDetector::detect_slot(const ImageViewRGB32& screen) const{
     if (m_opponent.detect(screen)){
         return 0;
     }
@@ -407,7 +207,7 @@ int8_t TargetSelectDetector::detect_slot(const ImageViewRGB32& screen) const{
     }
     return -1;
 }
-bool TargetSelectDetector::move_to_slot(ConsoleHandle& console, BotBaseContext& context, uint8_t slot) const{
+bool TeraTargetSelectDetector::move_to_slot(ConsoleHandle& console, BotBaseContext& context, uint8_t slot) const{
     if (slot > 4){
         return false;
     }
@@ -492,10 +292,6 @@ bool TeraCatchDetector::detect(const ImageViewRGB32& screen) const{
 
     return true;
 }
-
-
-
-
 
 
 
