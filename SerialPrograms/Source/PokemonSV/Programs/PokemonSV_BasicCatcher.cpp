@@ -128,6 +128,10 @@ CatchResults basic_catcher(
         switch (ret){
         case 0:{
             console.log("Detected Battle Menu...");
+            if (caught){
+                console.log("Detected battle menu after catch. Did you get chain attacked?", COLOR_RED);
+                return CatchResults{CatchResult::POKEMON_CAUGHT, balls_used};
+            }
             if (overworld_seen){
                 console.log("Detected battle after overworld. Did you get chain attacked?", COLOR_RED);
                 return CatchResults{CatchResult::POKEMON_FAINTED, balls_used};
