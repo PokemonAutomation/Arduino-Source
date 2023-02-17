@@ -12,6 +12,7 @@
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_ScalarButtons.h"
 #include "Pokemon/Options/Pokemon_EggHatchFilter.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h"
@@ -87,6 +88,7 @@ void handle_egg_hatching(const ProgramInfo& info, ConsoleHandle& console, BotBas
     int ret = run_until(
         console, context,
         [](BotBaseContext& context){
+            ssf_press_right_joystick(context, 0, 128, 0, 95);
             for(int i = 0; i < 60; i++){
                 pbf_mash_button(context, BUTTON_A, 125);
             }
