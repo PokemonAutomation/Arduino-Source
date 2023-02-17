@@ -184,6 +184,7 @@ void print(const Type* ptr, size_t len){
 
 
 
+
 void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& scope){
     using namespace Kernels;
 //    using namespace NintendoSwitch::PokemonSwSh;
@@ -204,10 +205,27 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 
 //    load_pokemon_slug_json_list();
 
+
+
+#if 0
+    WallClock now = current_time();
+
+
+    DiscontiguousTimeTracker tracker;
+    tracker.add_block(now - Seconds(30), now - Seconds(19));
+    tracker.add_block(now - Seconds(10), now - Seconds(5));
+
+    auto duration = tracker.last_window_in_realtime(now, Seconds(10));
+
+    cout << std::chrono::duration_cast<Seconds>(duration).count() << endl;
+#endif
+
+
+#if 0
     ImageRGB32 image("screenshot-20230215-031848496858.png");
     MoveSelectDetector detector(COLOR_RED);
     cout << detector.detect(image) << endl;
-
+#endif
 
 
 #if 0

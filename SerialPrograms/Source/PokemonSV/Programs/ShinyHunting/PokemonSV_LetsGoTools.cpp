@@ -11,7 +11,7 @@
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "Pokemon/Pokemon_Strings.h"
+//#include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Pokemon_Notification.h"
 #include "PokemonSV/Options/PokemonSV_EncounterBotCommon.h"
 #include "PokemonSV/Inference/PokemonSV_SweatBubbleDetector.h"
@@ -19,9 +19,9 @@
 #include "PokemonSV/Programs/PokemonSV_BasicCatcher.h"
 #include "PokemonSV_LetsGoTools.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -89,6 +89,57 @@ void EncounterRateTracker::report_encounter(){
 
     m_encounter_history.push_back(now);
 }
+
+
+
+WallDuration DiscontiguousTimeTracker::last_window_in_realtime(
+    WallClock realtime_end,
+    WallDuration last_window_in_virtual_time
+){
+    if (m_blocks.empty()){
+        return last_window_in_virtual_time;
+    }
+
+    WallDuration remaining(last_window_in_virtual_time);
+
+    auto iter = m_blocks.rbegin();
+    WallClock start;
+
+    do{
+        WallDuration block = iter->second - iter->first;
+        if (remaining > block){
+            remaining -= block;
+            start = iter->first;
+        }else{
+            start = iter->second - remaining;
+            break;
+        }
+        ++iter;
+    }while (iter != m_blocks.rend());
+
+    return std::max(realtime_end - start, last_window_in_virtual_time);
+}
+
+void DiscontiguousTimeTracker::add_block(WallClock start, WallClock end){
+    if (end <= start){
+        global_logger_tagged().log(
+            "DiscontiguousTimeTracker: Dropping invalid time block.",
+            COLOR_RED
+        );
+        return;
+    }
+    if (m_blocks.empty() || start >= m_blocks.back().second){
+        m_blocks.emplace_back(start, end);
+        return;
+    }
+    global_logger_tagged().log(
+        "DiscontiguousTimeTracker: Detected that time has travelled backwards. Clearing history.",
+        COLOR_RED
+    );
+    m_blocks.clear();
+    return;
+}
+
 
 
 

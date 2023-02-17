@@ -22,6 +22,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
 
+class DiscontiguousTimeTracker;
 class LetsGoEncounterBotTracker;
 
 
@@ -85,7 +86,8 @@ private:
 
     SingleSwitchProgramEnvironment* m_env;
 
-    LetsGoEncounterBotTracker* m_tracker;
+    DiscontiguousTimeTracker* m_time_tracker;
+    LetsGoEncounterBotTracker* m_encounter_tracker;
 
     uint64_t m_iterations = 0;
     State m_state;

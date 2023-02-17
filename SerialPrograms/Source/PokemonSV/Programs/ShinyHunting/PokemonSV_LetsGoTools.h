@@ -10,9 +10,9 @@
 #include <deque>
 #include <atomic>
 #include "Common/Cpp/Time.h"
-#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
+//#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "CommonFramework/Options/LanguageOCROption.h"
-#include "CommonFramework/Notifications/EventNotificationOption.h"
+//#include "CommonFramework/Notifications/EventNotificationOption.h"
 #include "CommonFramework/InferenceInfra/InferenceSession.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "Pokemon/Pokemon_EncounterStats.h"
@@ -49,9 +49,41 @@ public:
 
 private:
     WallClock m_start_time;
+
+    //  Note that this keeps the entire history. Nothing is dropped. This is
+    //  fine since it's unlikely we'll have enough encounters in one run to
+    //  cause memory issues.
     std::deque<WallClock> m_kill_history;
     std::deque<WallClock> m_encounter_history;
 };
+
+
+
+//
+//  Consider a virtual timeline that is starts and stops relative to the wall clock.
+//  Now you want to get the last X seconds of the virtual timeline, but on the
+//  wall clock instead. Because of the starts and stops, the last X seconds
+//  of virtual time will be less than the last X seconds of real time.
+//
+//  The use case here is the platform reset conditions. Resets are performed if
+//  the # of encounters in the last X time drops below Y. But only the time
+//  spent hunting for encounters should count. Time spent in battles or resets
+//  does not.
+//
+class DiscontiguousTimeTracker{
+public:
+    WallDuration last_window_in_realtime(
+        WallClock realtime_end,
+        WallDuration last_window_in_virtual_time
+    );
+
+    void add_block(WallClock start, WallClock end);
+
+private:
+    std::deque<std::pair<WallClock, WallClock>> m_blocks;
+};
+
+
 
 
 

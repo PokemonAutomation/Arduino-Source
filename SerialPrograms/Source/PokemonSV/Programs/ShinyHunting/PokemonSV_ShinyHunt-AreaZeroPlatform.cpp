@@ -147,14 +147,19 @@ bool ShinyHuntAreaZeroPlatform::run_traversal(BotBaseContext& context){
         m_last_save = SavedLocation::AREA_ZERO;
     }
 
+    WallClock start = current_time();
+
     size_t kills, encounters;
-    std::chrono::minutes window(PLATFORM_RESET.WINDOW_IN_MINUTES);
-    bool enough_time = m_tracker->get_encounters_in_window(
-        kills, encounters, window
+    std::chrono::minutes window_minutes(PLATFORM_RESET.WINDOW_IN_MINUTES);
+    WallDuration window = m_time_tracker->last_window_in_realtime(start, window_minutes);
+    std::chrono::seconds window_seconds = std::chrono::duration_cast<Seconds>(window);
+
+    bool enough_time = m_encounter_tracker->get_encounters_in_window(
+        kills, encounters, window_seconds
     );
     console.log(
         "Starting Traversal Iteration: " + tostr_u_commas(m_iterations) +
-        "\n    Time Window (Minutes): " + std::to_string(window.count()) +
+        "\n    Time Window (Seconds): " + std::to_string(window_seconds.count()) +
         "\n    Kills: " + std::to_string(kills) +
         "\n    Encounters: " + std::to_string(encounters)
     );
@@ -164,7 +169,7 @@ bool ShinyHuntAreaZeroPlatform::run_traversal(BotBaseContext& context){
             console.log("Platform Reset: Disabled", COLOR_ORANGE);
             break;
         }
-        if (!enough_time){
+        if (!enough_time || window_seconds.count() == 0){
             console.log("Platform Reset: Not enough time has elapsed.", COLOR_ORANGE);
             break;
         }
@@ -183,18 +188,25 @@ bool ShinyHuntAreaZeroPlatform::run_traversal(BotBaseContext& context){
     }while (false);
 
 
-    switch (PATH0){
-    case Path::PATH0:
-        area_zero_platform_run_path0(*m_env, console, context, *m_tracker, m_iterations);
-        break;
-    case Path::PATH1:
-        area_zero_platform_run_path1(*m_env, console, context, *m_tracker, m_iterations);
-        break;
-    case Path::PATH2:
-        area_zero_platform_run_path2(*m_env, console, context, *m_tracker, m_iterations);
-        break;
+    try{
+        switch (PATH0){
+        case Path::PATH0:
+            area_zero_platform_run_path0(*m_env, console, context, *m_encounter_tracker, m_iterations);
+            break;
+        case Path::PATH1:
+            area_zero_platform_run_path1(*m_env, console, context, *m_encounter_tracker, m_iterations);
+            break;
+        case Path::PATH2:
+            area_zero_platform_run_path2(*m_env, console, context, *m_encounter_tracker, m_iterations);
+            break;
+        }
+        m_iterations++;
+    }catch (...){
+        m_time_tracker->add_block(start, current_time());
+        throw;
     }
-    m_iterations++;
+
+    m_time_tracker->add_block(start, current_time());
 
     return true;
 }
@@ -210,7 +222,7 @@ void ShinyHuntAreaZeroPlatform::run_state(BotBaseContext& context){
         *m_env, NOTIFICATION_STATUS_UPDATE,
         Color(0),
         "Program Status",
-        {}, m_tracker->encounter_frequencies().dump_sorted_map("")
+        {}, m_encounter_tracker->encounter_frequencies().dump_sorted_map("")
     );
 
 #if 0
@@ -241,7 +253,7 @@ void ShinyHuntAreaZeroPlatform::run_state(BotBaseContext& context){
             recovery_state = State::LEAVE_AND_RETURN;
 
             inside_zero_gate_to_platform(info, console, context, NAVIGATE_TO_PLATFORM);
-            m_tracker->reset_rate_tracker_start_time();
+            m_encounter_tracker->reset_rate_tracker_start_time();
 //            m_last_platform_reset = now;
 
             break;
@@ -256,7 +268,7 @@ void ShinyHuntAreaZeroPlatform::run_state(BotBaseContext& context){
             inside_zero_gate_to_platform(info, console, context, NAVIGATE_TO_PLATFORM);
 
             stats.m_platform_resets++;
-            m_tracker->reset_rate_tracker_start_time();
+            m_encounter_tracker->reset_rate_tracker_start_time();
 //            m_last_platform_reset = now;
             m_env->update_stats();
 
@@ -288,7 +300,7 @@ void ShinyHuntAreaZeroPlatform::run_state(BotBaseContext& context){
             inside_zero_gate_to_platform(info, console, context, NAVIGATE_TO_PLATFORM);
 
             stats.m_game_resets++;
-            m_tracker->reset_rate_tracker_start_time();
+            m_encounter_tracker->reset_rate_tracker_start_time();
 //            m_last_platform_reset = now;
             m_env->update_stats();
 
@@ -332,12 +344,15 @@ void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, Bot
 
     m_iterations = 0;
 
-    LetsGoEncounterBotTracker tracker(
+    DiscontiguousTimeTracker time_tracker;
+    m_time_tracker = &time_tracker;
+
+    LetsGoEncounterBotTracker encounter_tracker(
         env, env.console, context,
         stats,
         LANGUAGE
     );
-    m_tracker = &tracker;
+    m_encounter_tracker = &encounter_tracker;
 
     switch (MODE){
     case Mode::START_ON_PLATFORM:
@@ -379,7 +394,7 @@ void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, Bot
 
         env.console.log("Detected battle.", COLOR_PURPLE);
         try{
-            bool should_save = tracker.process_battle(encounter_watcher, ENCOUNTER_BOT_OPTIONS);
+            bool should_save = encounter_tracker.process_battle(encounter_watcher, ENCOUNTER_BOT_OPTIONS);
             if (should_save){
                 m_pending_save = should_save;
             }
