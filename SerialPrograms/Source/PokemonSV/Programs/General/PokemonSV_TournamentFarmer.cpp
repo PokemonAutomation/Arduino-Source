@@ -87,6 +87,11 @@ TournamentFarmer::TournamentFarmer()
           LockWhileRunning::UNLOCKED,
           0, 0
           )
+    , MONEY_LIMIT(
+        "<b>Stop after earning this amount of money:</b><br>Zero disables this check. Does not count losses. Max is 999,999,999.",
+        LockWhileRunning::UNLOCKED,
+        999999999, 0, 999999999
+    )
     , GO_HOME_WHEN_DONE(false)
     , LANGUAGE(
           "<b>Game Language:</b><br>The language is needed to read the prizes.",
@@ -107,6 +112,7 @@ TournamentFarmer::TournamentFarmer()
     PA_ADD_OPTION(NUM_ROUNDS);
     PA_ADD_OPTION(TRY_TO_TERASTILLIZE);
     PA_ADD_OPTION(SAVE_NUM_ROUNDS);
+    PA_ADD_OPTION(MONEY_LIMIT);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(TARGET_ITEMS);
@@ -495,6 +501,13 @@ void TournamentFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseConte
         if (num_rounds_temp != 0 && ((c + 1) % num_rounds_temp) == 0) {
             env.log("Saving game.");
             save_game_from_overworld(env.program_info(), env.console, context);
+        }
+
+        //Break loop and finish program if money limit is hit
+        uint32_t earnings_temp = MONEY_LIMIT;
+        if (earnings_temp != 0 && stats.money >= earnings_temp) {
+            env.log("Money limit hit. Ending program.");
+            break;
         }
     }
 

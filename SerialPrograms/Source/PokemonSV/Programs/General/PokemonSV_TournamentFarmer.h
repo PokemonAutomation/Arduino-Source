@@ -35,6 +35,7 @@ private:
     SimpleIntegerOption<uint32_t> NUM_ROUNDS;
     BooleanCheckBoxOption TRY_TO_TERASTILLIZE;
     SimpleIntegerOption<uint16_t> SAVE_NUM_ROUNDS;
+    SimpleIntegerOption<uint32_t> MONEY_LIMIT;
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
     OCR::LanguageOCROption LANGUAGE;
     TournamentPrizeTable TARGET_ITEMS;
