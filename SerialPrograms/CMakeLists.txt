@@ -429,6 +429,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/OCR/OCR_DictionaryOCR.h
     Source/CommonFramework/OCR/OCR_LargeDictionaryMatcher.cpp
     Source/CommonFramework/OCR/OCR_LargeDictionaryMatcher.h
+    Source/CommonFramework/OCR/OCR_MoneyReader.cpp
+    Source/CommonFramework/OCR/OCR_MoneyReader.h
     Source/CommonFramework/OCR/OCR_NumberReader.cpp
     Source/CommonFramework/OCR/OCR_NumberReader.h
     Source/CommonFramework/OCR/OCR_RawOCR.cpp

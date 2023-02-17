@@ -12,11 +12,11 @@
 #include "CommonFramework/Inference/BlackScreenDetector.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Tools/VideoResolutionCheck.h"
-#include "CommonFramework/OCR/OCR_NumberReader.h"
+#include "CommonFramework/OCR/OCR_MoneyReader.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/PokemonSV_Settings.h"
-#include "PokemonSV/Inference/Battles/PokemonSV_BattleMenuDetector.h"
+#include "PokemonSV/Inference/Battles/PokemonSV_NormalBattleMenus.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV/Programs/PokemonSV_SaveGame.h"
@@ -124,41 +124,57 @@ void TournamentFarmer::check_money(SingleSwitchProgramEnvironment& env, BotBaseC
     TournamentFarmer_Descriptor::Stats& stats = env.current_stats<TournamentFarmer_Descriptor::Stats>();
 
     int top_money = -1;
-    //int bottom_money = -1;
+    int bottom_money = -1;
 
     //There must be a value for top money
     //Bottom money only appear after 1st battle and should clear out
-    for (uint16_t c = 0; c < 5 && top_money == -1; c++) {
+    for (uint16_t c = 0; c < 3 && top_money == -1; c++) {
         VideoSnapshot screen = env.console.video().snapshot();
         ImageFloatBox top_notif(0.745, 0.152, 0.206, 0.083);
-        //ImageFloatBox bottom_notif(0.745, 0.261, 0.220, 0.083);
+        ImageFloatBox bottom_notif(0.745, 0.261, 0.220, 0.083);
 
-        ImageViewRGB32 image_top = extract_box_reference(screen, top_notif);
-        //ImageViewRGB32 image_bottom = extract_box_reference(screen, bottom_notif);
-
-        top_money = OCR::read_number(env.console, image_top);
-        //bottom_money = OCR::read_number(env.console, image_bottom);
-
-        dump_image(
-            env.console, env.program_info(),
-            "battledone",
-            screen
+        ImageRGB32 image_top = to_blackwhite_rgb32_range(
+            extract_box_reference(screen, top_notif),
+            combine_rgb(215, 215, 215), combine_rgb(255, 255, 255), true
         );
+        //image_top.save("./image_top.png");
 
-        //Filter out low and high numbers as misreads tend to be 44
-        //Nemona is lowest at 8640
-        //Penny and Geeta are 16800
-        if (top_money < 8000 || top_money > 100000 ) {
+        //Different color range on the bottom notif ~B0B5B8
+        ImageRGB32 image_bottom = to_blackwhite_rgb32_range(
+            extract_box_reference(screen, bottom_notif),
+            combine_rgb(130, 130, 130), combine_rgb(240, 240, 240), true
+        );
+        //image_bottom.save("./image_bottom.png");
+        
+        top_money = OCR::read_money(env.console, image_top);
+        bottom_money = OCR::read_money(env.console, image_bottom);
+
+        //dump_image(
+        //    env.console, env.program_info(),
+        //    "battledone",
+        //    screen
+        //);
+
+        //Filter out low and high numbers in case of misreads
+        //From bulbapedia: Nemona is lowest at 8640,  Penny and Geeta are highest at 16800
+        //Max earnings? in one battle: amulet coin * (base winnings + (8 * make it rain lv100))
+        if (top_money < 8000 || top_money > 50000 ) {
             top_money = -1;
         }
-        //if (bottom_money < 8000 || bottom_money > 100000) {
-        //    bottom_money = -1;
-        //}
+        if (bottom_money < 8000 || bottom_money > 50000) {
+            bottom_money = -1;
+        }
     }
 
     if (top_money != -1) {
-        stats.money += top_money;
-        env.update_stats();
+        //If both notification boxes appear take the newer one.
+        if (bottom_money != -1) {
+            stats.money += bottom_money;
+            env.update_stats();
+        } else {
+            stats.money += top_money;
+            env.update_stats();
+        }
     }
     else {
         env.log("Unable to read money.");
@@ -232,7 +248,7 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, BotBaseCo
 
         //Close dialog and then check money
         pbf_press_button(context, BUTTON_B, 10, 50);
-        pbf_wait(context, 150);
+        pbf_wait(context, 100);
         context.wait_for_all_requests();
 
         check_money(env, context);
@@ -431,11 +447,12 @@ void TournamentFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseConte
         //Initiate dialog then mash until first battle starts
         AdvanceDialogWatcher advance_detector(COLOR_YELLOW);
         pbf_press_button(context, BUTTON_A, 10, 50);
+        pbf_press_button(context, BUTTON_A, 10, 50);
         int ret = wait_until(env.console, context, Milliseconds(7000), { advance_detector });
         if (ret < 0) {
             env.log("Dialog detected.");
         }
-        pbf_mash_button(context, BUTTON_A, 300);
+        pbf_mash_button(context, BUTTON_A, 400);
         context.wait_for_all_requests();
 
         NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
