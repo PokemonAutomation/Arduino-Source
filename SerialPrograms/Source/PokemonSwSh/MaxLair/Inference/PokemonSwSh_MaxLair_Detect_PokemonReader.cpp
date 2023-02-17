@@ -9,11 +9,12 @@
 #include "CommonFramework/Notifications/ProgramInfo.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
+#include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
-#include "PokemonSwSh/Resources/PokemonSwSh_PokemonSprites.h"
 #include "PokemonSwSh/Resources/PokemonSwSh_MaxLairDatabase.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_PokemonSpriteReader.h"
 #include "PokemonSwSh/Inference/Dens/PokemonSwSh_DenMonReader.h"
+#include "PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Pokemon.h"
 #include "PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options.h"
 #include "PokemonSwSh_MaxLair_Detect_PokemonReader.h"
 
@@ -147,7 +148,10 @@ ImageMatch::ImageMatchResult read_pokemon_sprite_set(
     const ImageFloatBox& box,
     bool allow_exact_match_fallback
 ){
+    using namespace papkmnlib;
+
     const SpeciesReadDatabase& database = SpeciesReadDatabase::instance();
+    const std::map<std::string, Pokemon>& RENTALS = all_rental_pokemon();
 
     //  Try with cropped matcher.
     ImageFloatBox large_box = box;
@@ -177,6 +181,7 @@ ImageMatch::ImageMatchResult read_pokemon_sprite_set(
     }
 
     //  Convert slugs to MaxLair slugs.
+    std::multimap<double, std::string> filtered;
     for (auto& item : result.results){
         auto iter = database.sprite_map.find(item.second);
         if (iter == database.sprite_map.end()){
@@ -191,8 +196,15 @@ ImageMatch::ImageMatchResult read_pokemon_sprite_set(
                 "Sprite map is empty for slug: " + item.second
             );
         }
-        item.second = *iter->second.begin();
+//        item.second = *iter->second.begin();
+
+        //  Include it only if it's a valid rental Pokemon.
+        const std::string& slug = *iter->second.begin();
+        if (RENTALS.find(slug) != RENTALS.end()){
+            filtered.emplace(item.first, slug);
+        }
     }
+    result.results = std::move(filtered);
 
     result.log(logger, max_alpha);
     result.clear_beyond_alpha(max_alpha);
@@ -258,6 +270,8 @@ std::string read_pokemon_sprite_with_item(
     Logger& logger,
     const ImageViewRGB32& screen, const ImageFloatBox& box
 ){
+    using namespace papkmnlib;
+
     ImageMatch::ImageMatchResult result = read_pokemon_sprite_set_with_item(logger, screen, box);
     auto iter = result.results.begin();
     if (iter == result.results.end()){
@@ -271,6 +285,13 @@ std::string read_pokemon_sprite_with_item(
         logger.log("Multiple \"ok\" sprite matches with no clear winner.", COLOR_RED);
         return "";
     }
+
+    const std::map<std::string, Pokemon>& RENTALS = all_rental_pokemon();
+    if (RENTALS.find(iter->second) == RENTALS.end()){
+        logger.log("Read " + STRING_POKEMON + " sprite is not a valid rental.", COLOR_RED);
+        return "";
+    }
+
     return std::move(iter->second);
 }
 
@@ -282,9 +303,20 @@ std::string read_pokemon_name_sprite(
     const ImageFloatBox& name_box, Language language,
     bool allow_exact_match_fallback
 ){
+    using namespace papkmnlib;
+
+    const std::map<std::string, Pokemon>& RENTALS = all_rental_pokemon();
+
     ImageViewRGB32 image = extract_box_reference(screen, name_box);
 
-    std::set<std::string> ocr_slugs = read_pokemon_name(logger, language, image);
+    std::set<std::string> ocr_slugs;
+    for (const std::string& slug : read_pokemon_name(logger, language, image)){
+        //  Only include candidates that are valid rental Pokemon.
+        auto iter = RENTALS.find(slug);
+        if (iter != RENTALS.end()){
+            ocr_slugs.insert(slug);
+        }
+    }
     bool ocr_hit = !ocr_slugs.empty();
     bool ocr_unique = ocr_hit && ocr_slugs.size() == 1;
     if (!ocr_hit){
