@@ -159,7 +159,7 @@ bool ShinyHuntAreaZeroPlatform::run_traversal(BotBaseContext& context){
     );
     console.log(
         "Starting Traversal Iteration: " + tostr_u_commas(m_iterations) +
-        "\n    Time Window (Seconds): " + std::to_string(window_seconds.count()) +
+        "\n    Time Window (Seconds): " + (window_seconds.count() == 0 ? "infinite" : std::to_string(window_seconds.count())) +
         "\n    Kills: " + std::to_string(kills) +
         "\n    Encounters: " + std::to_string(encounters)
     );

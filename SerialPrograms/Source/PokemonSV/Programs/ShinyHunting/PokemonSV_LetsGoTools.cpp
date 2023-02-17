@@ -97,7 +97,7 @@ WallDuration DiscontiguousTimeTracker::last_window_in_realtime(
     WallDuration last_window_in_virtual_time
 ){
     if (m_blocks.empty()){
-        return last_window_in_virtual_time;
+        return WallDuration(0);
     }
 
     WallDuration remaining(last_window_in_virtual_time);
@@ -112,12 +112,12 @@ WallDuration DiscontiguousTimeTracker::last_window_in_realtime(
             start = iter->first;
         }else{
             start = iter->second - remaining;
-            break;
+            return realtime_end - start;
         }
         ++iter;
     }while (iter != m_blocks.rend());
 
-    return std::max(realtime_end - start, last_window_in_virtual_time);
+    return WallDuration(0);
 }
 
 void DiscontiguousTimeTracker::add_block(WallClock start, WallClock end){

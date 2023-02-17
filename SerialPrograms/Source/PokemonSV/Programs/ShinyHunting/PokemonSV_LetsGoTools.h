@@ -72,6 +72,7 @@ private:
 //
 class DiscontiguousTimeTracker{
 public:
+    //  Returns zero if there is insufficient virtual time.
     WallDuration last_window_in_realtime(
         WallClock realtime_end,
         WallDuration last_window_in_virtual_time
