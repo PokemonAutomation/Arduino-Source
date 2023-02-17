@@ -13,6 +13,8 @@ namespace PokemonAutomation{
 
 
 using WallClock = std::chrono::system_clock::time_point;
+using WallDuration = std::chrono::system_clock::duration;
+
 using Milliseconds = std::chrono::milliseconds;
 using Seconds = std::chrono::seconds;
 
