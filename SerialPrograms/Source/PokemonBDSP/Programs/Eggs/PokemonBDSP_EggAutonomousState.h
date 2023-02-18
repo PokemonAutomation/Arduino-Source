@@ -40,7 +40,6 @@ public:
         EggAutonomousStats& stats,
         EventNotificationOption& notification_nonshiny_keep,
         EventNotificationOption& notification_shiny,
-        EventNotificationOption& notification_error,
         uint16_t scroll_to_read_delay,
         Language language,
         ShortcutDirectionOption& shortcut,
@@ -86,7 +85,6 @@ private:
     static EventNotificationOption m_notification_noop;
     EventNotificationOption& m_notification_nonshiny_keep;
     EventNotificationOption& m_notification_shiny;
-    EventNotificationOption& m_notification_error;
     uint16_t m_scroll_to_read_delay;
     Language m_language;
     ShortcutDirectionOption& m_shortcut;

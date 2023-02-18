@@ -100,7 +100,6 @@ EggAutonomousState::EggAutonomousState(
     EggAutonomousStats& stats,
     EventNotificationOption& notification_nonshiny_keep,
     EventNotificationOption& notification_shiny,
-    EventNotificationOption& notification_error,
     uint16_t scroll_to_read_delay,
     Language language,
     ShortcutDirectionOption& shortcut,
@@ -113,7 +112,6 @@ EggAutonomousState::EggAutonomousState(
     , m_stats(stats)
     , m_notification_nonshiny_keep(notification_nonshiny_keep)
     , m_notification_shiny(notification_shiny)
-    , m_notification_error(notification_error)
     , m_scroll_to_read_delay(scroll_to_read_delay)
     , m_language(language)
     , m_shortcut(shortcut)

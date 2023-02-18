@@ -183,7 +183,6 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         stats,
         NOTIFICATION_NONSHINY_KEEP,
         NOTIFICATION_SHINY,
-        NOTIFICATION_ERROR_RECOVERABLE,
         SCROLL_TO_READ_DELAY,
         LANGUAGE,
         SHORTCUT,
