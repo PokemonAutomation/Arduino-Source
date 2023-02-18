@@ -23,6 +23,7 @@
 #include "PokemonSV/Inference/Picnics/PokemonSV_SandwichHandDetector.h"
 #include "PokemonSV/Inference/Picnics/PokemonSV_SandwichIngredientDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
+#include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 
 #include <iostream>
 using std::cout;
@@ -425,6 +426,13 @@ int test_pokemonSV_SandwichIngredientReader(const ImageViewRGB32& image, const s
         }
     }
 
+    return 0;
+}
+
+int test_pokemonSV_AdvanceDialogDetector(const ImageViewRGB32& image, bool target) {
+    AdvanceDialogDetector detector(COLOR_RED);
+    bool result = detector.detect(image);
+    TEST_RESULT_EQUAL(result, target);
     return 0;
 }
 

@@ -59,7 +59,7 @@ bool DialogBoxDetector::detect(const ImageViewRGB32& screen) const{
 
     ImageStats stats_border_top = image_stats(extract_box_reference(screen, m_border_top));
 //    cout << stats_border_top.average << stats_border_top.stddev << endl;
-    if (stats_border_top.stddev.sum() < 100){
+    if (stats_border_top.stddev.sum() < 85){
         return !m_true_if_detected;
     }
 
