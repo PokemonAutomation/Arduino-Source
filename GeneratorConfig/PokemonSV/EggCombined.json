@@ -1,8 +1,24 @@
 {
-    "0-ProgramName": "EggHatcher",
-    "1-Documentation": "Microcontroller/blob/master/Wiki/Programs/PokemonSV/EggHatcher.md",
-    "2-Description": "Hatch eggs from boxes.",
+    "0-ProgramName": "EggCombined",
+    "1-Documentation": "Microcontroller/blob/master/Wiki/Programs/PokemonSV/EggCombined.md",
+    "2-Description": "Make sandwiches, collect and hatch eggs.",
     "3-Parameters": [
+        {
+            "00-Type": "BooleanCheckBox",
+            "01-Label": "<b>Use Sweet Herba Mystica:</b>",
+            "02-Declaration": "const bool USE_HM",
+            "98-Default": true,
+            "99-Current": false
+        },
+        {
+            "00-Type": "SimpleInteger",
+            "01-Label": "<b>Maximum amount of sandwiches to make:</b>",
+            "02-Declaration": "const uint16_t MAX_SAND",
+            "03-MinValue": 1,
+            "04-MaxValue": 999,
+            "98-Default": 100,
+            "99-Current": 1
+        },
         {
             "00-Type": "SimpleInteger",
             "01-Label": "<b>Boxes to Hatch:</b>",
@@ -10,7 +26,7 @@
             "03-MinValue": 1,
             "04-MaxValue": 32,
             "98-Default": 2,
-            "99-Current": 2
+            "99-Current": 1
         },
         {
             "00-Type": "EnumDropdown",
