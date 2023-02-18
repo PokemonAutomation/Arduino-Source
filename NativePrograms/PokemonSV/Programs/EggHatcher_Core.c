@@ -18,7 +18,7 @@ void move_to_location(void) {
     pbf_move_left_joystick(STICK_CENTER, STICK_MIN, 150, 100);
     pbf_move_left_joystick(STICK_CENTER, STICK_MAX, 1, 0);
     pbf_press_button(BUTTON_L, 5, 300);
-}
+};
 
 void open_box(void) {
     pbf_press_button(BUTTON_A, 1, 500);
@@ -73,7 +73,7 @@ void ride_hatch(void) {
     };
 };
 
-int main(void){
+int main(void) {
     start_program_callback();
     initialize_framework(0);
 

@@ -10,7 +10,7 @@ void open_picnic(void) {
     pbf_press_button(BUTTON_L, 5, 100);
     pbf_press_button(BUTTON_X, 1, 200);
     pbf_press_button(BUTTON_A, 1, 1000);
-}
+};
 
 void move_to_basket(void) {
     pbf_press_button(BUTTON_L, 5, 100);
@@ -21,7 +21,7 @@ void move_to_basket(void) {
     pbf_move_left_joystick(STICK_CENTER, STICK_MAX, 100, 50);
     pbf_press_button(BUTTON_L, 5, 100);
     pbf_press_button(BUTTON_PLUS, 5, 200);
-}
+};
 
 void fly_to_gate(void) {
     pbf_press_button(BUTTON_A, 1, 500);
@@ -36,7 +36,7 @@ void move_to_location(void) {
     pbf_move_left_joystick(STICK_CENTER, STICK_MIN, 150, 100);
     pbf_move_left_joystick(STICK_CENTER, STICK_MAX, 1, 0);
     pbf_press_button(BUTTON_L, 5, 300);
-}
+};
 
 void open_box(void) {
     pbf_press_button(BUTTON_A, 1, 500);
@@ -114,7 +114,7 @@ void deposit_parent(void) {
     pbf_press_button(BUTTON_B, 1, 800);
 };
 
-int main(void){
+int main(void) {
     start_program_callback();
     initialize_framework(0);
 

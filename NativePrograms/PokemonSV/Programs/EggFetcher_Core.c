@@ -20,7 +20,7 @@ void open_picnic(void) {
     pbf_press_button(BUTTON_L, 5, 100);
     pbf_press_button(BUTTON_X, 1, 200);
     pbf_press_button(BUTTON_A, 1, 1000);
-}
+};
 
 void move_to_basket(void) {
     pbf_press_button(BUTTON_L, 5, 100);
@@ -31,9 +31,9 @@ void move_to_basket(void) {
     pbf_move_left_joystick(STICK_CENTER, STICK_MAX, 100, 50);
     pbf_press_button(BUTTON_L, 5, 100);
     pbf_press_button(BUTTON_PLUS, 5, 200);
-}
+};
 
-int main(void){
+int main(void) {
     // START PROGRAM ON MICROCONTROLLER
     start_program_callback();
     initialize_framework(0);
@@ -58,7 +58,7 @@ int main(void){
         // SELECT RECIPE
         if (USE_HM) {
             pbf_press_dpad(DPAD_DOWN, 5, 100);
-        }
+        };
         pbf_press_button(BUTTON_A, 5, 250);
         // SELECT PICK
         pbf_press_button(BUTTON_A, 5, 1250);
