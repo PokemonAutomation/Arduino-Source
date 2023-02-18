@@ -19,9 +19,10 @@ namespace PokemonSV{
 using namespace Pokemon;
 
 
-void run_from_battle(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+int run_from_battle(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
     console.log("Attempting to run away...");
 
+    int attempts = 0;
     for (size_t c = 0; c < 10; c++){
         OverworldWatcher overworld(COLOR_RED);
         NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
@@ -39,12 +40,13 @@ void run_from_battle(const ProgramInfo& info, ConsoleHandle& console, BotBaseCon
         switch (ret){
         case 0:
             console.log("Detected overworld...");
-            return;
+            return attempts;
         case 1:
             console.log("Detected battle menu...");
             pbf_press_dpad(context, DPAD_DOWN, 250, 0);
             pbf_press_button(context, BUTTON_A, 20, 105);
             pbf_press_button(context, BUTTON_B, 20, 1 * TICKS_PER_SECOND);
+            attempts++;
             continue;
         case 2:
             console.log("Detected own " + STRING_POKEMON + " fainted...");

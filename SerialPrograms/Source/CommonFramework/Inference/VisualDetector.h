@@ -70,6 +70,7 @@ public:
     //  If m_finder_type is PRESENT, return true only when it is consecutively detected.
     //  If m_finder_type is GONE, return true only when it is consecutively not detected.
     //  if m_finder_type is CONSISTENT, return true when it is consecutively detected, or consecutively not detected.
+    using VisualInferenceCallback::process_frame;
     virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override{
         switch (m_finder_type){
         case FinderType::PRESENT:

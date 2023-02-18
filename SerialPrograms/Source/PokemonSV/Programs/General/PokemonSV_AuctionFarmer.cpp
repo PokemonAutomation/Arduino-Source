@@ -449,7 +449,7 @@ void AuctionFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
             }
 
             std::vector<std::pair<AuctionOffer, ImageFloatBox>> offers = check_offers(env, context);
-            for (std::pair<AuctionOffer, ImageFloatBox> offer_pair : offers){
+            for (std::pair<AuctionOffer, ImageFloatBox>& offer_pair : offers){
                 AuctionOffer offer = offer_pair.first;
                 if (is_good_offer(offer)) {
                     try {

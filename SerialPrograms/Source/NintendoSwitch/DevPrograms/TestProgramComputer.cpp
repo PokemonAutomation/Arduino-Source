@@ -106,6 +106,7 @@
 #include "PokemonSV/Inference/Overworld/PokemonSV_LetsGoKillDetector.h"
 #include "PokemonSV/Inference/PokemonSV_SweatBubbleDetector.h"
 #include "Pokemon/Resources/Pokemon_PokemonSlugs.h"
+#include "PokemonSV/Inference/Battles/PokemonSV_NormalBattleMenus.h"
 #include "Pokemon/Resources/Pokemon_PokemonNames.h"
 
 #ifdef PA_ARCH_x86
@@ -220,8 +221,8 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 #endif
 
 
-#if 0
-    ImageRGB32 image("screenshot-20230215-031848496858.png");
+#if 1
+    ImageRGB32 image("screenshot-20230217-182945740433.png");
     MoveSelectDetector detector(COLOR_RED);
     cout << detector.detect(image) << endl;
 #endif

@@ -5,6 +5,7 @@
  */
 
 #include "CommonFramework/ImageTools/SolidColorTest.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSV_TeraBattleMenus.h"

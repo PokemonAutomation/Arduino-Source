@@ -12,6 +12,10 @@
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonSV_NormalBattleMenus.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{

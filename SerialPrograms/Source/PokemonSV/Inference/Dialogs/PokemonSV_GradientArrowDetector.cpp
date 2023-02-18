@@ -153,8 +153,28 @@ bool GradientArrowDetector::detect(ImageFloatBox& box, const ImageViewRGB32& scr
         }
     }
     {
+        std::vector<std::pair<uint32_t, uint32_t>> filters;
+        const std::array<uint8_t, 3> LG{0x40, 0x80, 0xc0};
+        const std::array<uint8_t, 3> LB{0x80, 0xc0, 0xe0};
+        const std::array<uint8_t, 4> HR{0x0f, 0x3f, 0x5f, 0x7f};
+        const std::array<uint8_t, 2> HG{0xdf, 0xff};
+        for (uint32_t lg : LG){
+            for (uint32_t lb : LB){
+                for (uint32_t hr : HR){
+                    for (uint32_t hg : HG){
+                        filters.emplace_back(
+                            0xff000000 | (lg << 8) | (lb << 0),
+                            0xff0000ff | (hr << 16) | (hg << 8)
+                        );
+                    }
+                }
+            }
+        }
         std::vector<PackedBinaryMatrix> matrices = compress_rgb32_to_binary_range(
             region,
+#if 1
+            filters
+#else
             {
                 {0xff004080, 0xff7fffff},
                 {0xff004080, 0xff5fffff},
@@ -181,8 +201,9 @@ bool GradientArrowDetector::detect(ImageFloatBox& box, const ImageViewRGB32& scr
                 {0xff00c0e0, 0xff3fffff},
                 {0xff00c0e0, 0xff0fffff},
             }
+#endif
         );
-//        PackedBinaryMatrix blue_matrix = compress_rgb32_to_binary_range(region, 0xff0080c0, 0xff7fffff);
+//        PackedBinaryMatrix blue_matrix = compress_rgb32_to_binary_range(region, 0xff00c0c0, 0xff3fdfff);
 //        cout << blue_matrix.dump() << endl;
 //        size_t c = 0;
         for (PackedBinaryMatrix& matrix : matrices){
@@ -221,6 +242,7 @@ bool GradientArrowDetector::detect(ImageFloatBox& box, const ImageViewRGB32& scr
 
 
 
+#if 0
 GradientArrowWatcher::~GradientArrowWatcher() = default;
 GradientArrowWatcher::GradientArrowWatcher(
     Color color,
@@ -244,6 +266,7 @@ bool GradientArrowWatcher::process_frame(const VideoSnapshot& frame){
 //bool GradientArrowWatcher::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
 //    return m_detector.detect(frame);
 //}
+#endif
 
 
 

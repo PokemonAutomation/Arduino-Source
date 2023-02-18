@@ -29,6 +29,21 @@ void assert_16_9_720p_min(Logger& logger, ConsoleHandle& console){
     assert_16_9_720p_min(logger, console.video().snapshot());
 }
 
+void assert_16_9_1080p_min(Logger& logger, const ImageViewRGB32& frame){
+    if (!frame){
+        throw UserSetupError(logger, "No video detected.");
+    }
+    if (frame.height() < 1080){
+        throw UserSetupError(logger, "Video resolution must be at least 1080p.");
+    }
+    double aspect_ratio = (double)frame.width() / frame.height();
+    if (aspect_ratio < 1.77 || aspect_ratio > 1.78){
+        throw UserSetupError(logger, "Video aspect ratio must be 16:9.");
+    }
+}
+void assert_16_9_1080p_min(Logger& logger, ConsoleHandle& console){
+    assert_16_9_1080p_min(logger, console.video().snapshot());
+}
 
 
 

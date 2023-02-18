@@ -17,7 +17,8 @@ namespace PokemonSV{
 
 
 
-void run_from_battle(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
+//  Returns the # of attempts it took to run.
+int run_from_battle(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
 
 
 

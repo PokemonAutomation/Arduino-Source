@@ -11,9 +11,9 @@
 #include "Common/Cpp/Color.h"
 //#include "Common/Cpp/Containers/FixedLimitVector.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonFramework/VideoPipeline/VideoFeed.h"
+//#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
+//#include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 #include "CommonFramework/Inference/VisualDetector.h"
 
 namespace PokemonAutomation{
@@ -48,7 +48,20 @@ protected:
 };
 
 
+class GradientArrowWatcher : public DetectorToFinder<GradientArrowDetector>{
+public:
+    GradientArrowWatcher(
+        Color color,
+        GradientArrowType type,
+        const ImageFloatBox& box,
+        std::chrono::milliseconds hold_duration = std::chrono::milliseconds(250)
+    )
+        : DetectorToFinder("GradientArrowWatcher", hold_duration, color, type, box)
+    {}
+};
 
+
+#if 0
 class GradientArrowWatcher : public VisualInferenceCallback{
 public:
     ~GradientArrowWatcher();
@@ -69,7 +82,7 @@ protected:
 
 //    VideoSnapshot m_last_detected;
 };
-
+#endif
 
 
 }
