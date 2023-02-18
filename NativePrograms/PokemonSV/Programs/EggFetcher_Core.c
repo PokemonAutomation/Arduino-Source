@@ -13,9 +13,15 @@ int main(void){
     start_program_callback();
     initialize_framework(0);
 
-    // START IN GAME
+    // START IN GRIP MENU
     start_program_flash(CONNECT_CONTROLLER_DELAY);
-    pbf_press_button(BUTTON_ZL, 5, 20);
+    grip_menu_connect_go_home();
+
+    if (TOLERATE_SYSTEM_UPDATE_MENU_FAST) {
+        pbf_press_button(BUTTON_A, 5, 180);
+        pbf_move_right_joystick(STICK_CENTER, STICK_MIN, 5, 0);
+    };
+    pbf_press_button(BUTTON_A, 5, 500);
 
     for (int rounds = 0; rounds < MAX_SAND; rounds++) {
         // MOVE TO TABLE
