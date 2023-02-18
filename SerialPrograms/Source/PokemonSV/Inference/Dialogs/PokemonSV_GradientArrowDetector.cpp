@@ -4,6 +4,7 @@
  *
  */
 
+#include <array>
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/Globals.h"
