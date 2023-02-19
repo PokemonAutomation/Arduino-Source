@@ -18,6 +18,7 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/PokemonSV_Settings.h"
+#include "PokemonSV/Inference/Overworld/PokemonSV_LetsGoHpReader.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_IVCheckerReader.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_EncounterWatcher.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
@@ -154,17 +155,14 @@ bool ShinyHuntAreaZeroPlatform::run_traversal(BotBaseContext& context){
         m_last_save = SavedLocation::AREA_ZERO;
     }
 
-    double hp = read_hp(console, console.video().snapshot());
+    double hp = m_hp_watcher->last_known_value() * 100;
     if (0 < hp){
-        m_last_known_hp = hp;
+        console.log("Last Known HP: " + tostr_default(hp) + "%", COLOR_BLUE);
+    }else{
+        console.log("Last Known HP: ?", COLOR_RED);
     }
-    hp = m_last_known_hp;
-    if (0 < hp){
-        console.log("Last Known HP: " + tostr_default(hp) + "%");
-    }
-    if (0 < hp && hp < AUTO_HEAL_PERCENT * 0.01){
+    if (0 < hp && hp < AUTO_HEAL_PERCENT){
         auto_heal_from_menu_or_overworld(info, console, context, 0, true);
-        m_last_known_hp = 100;
     }
 
     WallClock start = current_time();
@@ -172,14 +170,26 @@ bool ShinyHuntAreaZeroPlatform::run_traversal(BotBaseContext& context){
     size_t kills, encounters;
     std::chrono::minutes window_minutes(PLATFORM_RESET.WINDOW_IN_MINUTES);
     WallDuration window = m_time_tracker->last_window_in_realtime(start, window_minutes);
-    std::chrono::seconds window_seconds = std::chrono::duration_cast<Seconds>(window);
 
-    bool enough_time = m_encounter_tracker->get_encounters_in_window(
-        kills, encounters, window_seconds
-    );
+    std::chrono::seconds window_seconds;
+    bool enough_time;
+    if (window == WallDuration::zero()){
+        //  Not enough history.
+        enough_time = false;
+        window = start - m_encounter_tracker->encounter_rate_tracker_start_time();
+        window_seconds = std::chrono::duration_cast<Seconds>(window);
+        m_encounter_tracker->get_encounters_in_window(
+            kills, encounters, window_seconds
+        );
+    }else{
+        window_seconds = std::chrono::duration_cast<Seconds>(window);
+        enough_time = m_encounter_tracker->get_encounters_in_window(
+            kills, encounters, window_seconds
+        );
+    }
     console.log(
         "Starting Traversal Iteration: " + tostr_u_commas(m_iterations) +
-        "\n    Time Window (Seconds): " + (window_seconds.count() == 0 ? "infinite" : std::to_string(window_seconds.count())) +
+        "\n    Time Window (Seconds): " + std::to_string(window_seconds.count()) +
         "\n    Kills: " + std::to_string(kills) +
         "\n    Encounters: " + std::to_string(encounters)
     );
@@ -189,7 +199,7 @@ bool ShinyHuntAreaZeroPlatform::run_traversal(BotBaseContext& context){
             console.log("Platform Reset: Disabled", COLOR_ORANGE);
             break;
         }
-        if (!enough_time || window_seconds.count() == 0){
+        if (!enough_time){
             console.log("Platform Reset: Not enough time has elapsed.", COLOR_ORANGE);
             break;
         }
@@ -364,6 +374,9 @@ void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, Bot
 
     m_iterations = 0;
 
+    LetsGoHpWatcher hp_watcher(COLOR_RED);
+    m_hp_watcher = &hp_watcher;
+
     DiscontiguousTimeTracker time_tracker;
     m_time_tracker = &time_tracker;
 
@@ -387,7 +400,6 @@ void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, Bot
 
     m_pending_save = false;
     m_last_save = SavedLocation::NONE;
-    m_last_known_hp = -1;
     m_last_sandwich = WallClock::min();
 
     //  This is the outer-most program loop that wraps all logic with the
@@ -409,6 +421,7 @@ void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, Bot
             {
                 static_cast<VisualInferenceCallback&>(encounter_watcher),
                 static_cast<AudioInferenceCallback&>(encounter_watcher),
+                hp_watcher,
             }
         );
         encounter_watcher.throw_if_no_sound();

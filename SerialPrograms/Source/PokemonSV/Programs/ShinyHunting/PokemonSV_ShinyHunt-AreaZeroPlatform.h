@@ -23,6 +23,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
 
+class LetsGoHpWatcher;
 class DiscontiguousTimeTracker;
 class LetsGoEncounterBotTracker;
 
@@ -88,6 +89,7 @@ private:
 
     SingleSwitchProgramEnvironment* m_env;
 
+    LetsGoHpWatcher* m_hp_watcher;
     DiscontiguousTimeTracker* m_time_tracker;
     LetsGoEncounterBotTracker* m_encounter_tracker;
 
@@ -103,7 +105,6 @@ private:
     };
     SavedLocation m_last_save;
 
-    double m_last_known_hp;
     WallClock m_last_sandwich;
 
     size_t m_consecutive_failures;

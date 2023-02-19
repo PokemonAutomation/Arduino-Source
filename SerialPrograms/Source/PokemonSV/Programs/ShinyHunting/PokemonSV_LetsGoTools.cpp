@@ -14,7 +14,6 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 //#include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Pokemon_Notification.h"
-#include "Pokemon/Inference/Pokemon_ReadHpBar.h"
 #include "PokemonSV/Options/PokemonSV_EncounterBotCommon.h"
 #include "PokemonSV/Inference/PokemonSV_SweatBubbleDetector.h"
 //#include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
@@ -31,15 +30,6 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 using namespace Pokemon;
-
-
-
-double read_hp(Logger& logger, const ImageViewRGB32& image){
-    return read_hp_bar(
-        logger,
-        extract_box_reference(image, ImageFloatBox(0.055, 0.928, 0.067, 0.012))
-    );
-}
 
 
 
@@ -105,12 +95,13 @@ void EncounterRateTracker::report_encounter(){
 
 
 
+
 WallDuration DiscontiguousTimeTracker::last_window_in_realtime(
     WallClock realtime_end,
     WallDuration last_window_in_virtual_time
 ){
     if (m_blocks.empty()){
-        return WallDuration(0);
+        return WallDuration::zero();
     }
 
     WallDuration remaining(last_window_in_virtual_time);
@@ -130,7 +121,7 @@ WallDuration DiscontiguousTimeTracker::last_window_in_realtime(
         ++iter;
     }while (iter != m_blocks.rend());
 
-    return WallDuration(0);
+    return WallDuration::zero();
 }
 
 void DiscontiguousTimeTracker::add_block(WallClock start, WallClock end){

@@ -32,13 +32,13 @@ class EncounterBotCommonOptions;
 
 
 
-double read_hp(Logger& logger, const ImageViewRGB32& image);
-
-
-
 class EncounterRateTracker{
 public:
     EncounterRateTracker();
+
+    WallClock start_time() const{
+        return m_start_time;
+    }
 
     //  Get the # of encounters in the last specified time window.
     //  Returns false if the history is less than the window.
@@ -123,6 +123,9 @@ public:
         OCR::LanguageOCROption& language
     );
 
+    WallClock encounter_rate_tracker_start_time() const{
+        return m_encounter_rate.start_time();
+    }
     WallClock last_kill() const{
         return m_kill_sound.last_kill();
     }
