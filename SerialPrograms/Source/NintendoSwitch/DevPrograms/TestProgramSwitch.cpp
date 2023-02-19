@@ -90,6 +90,8 @@
 #include "PokemonSV/Programs/ShinyHunting/PokemonSV_AreaZeroPlatform.h"
 #include "PokemonSV/Inference/PokemonSV_SweatBubbleDetector.h"
 #include "PokemonSV/Programs/PokemonSV_AreaZero.h"
+#include "PokemonSV/Programs/PokemonSV_Battles.h"
+#include "PokemonSV/Programs/PokemonSV_SaveGame.h"
 
 
 #include <QPixmap>
@@ -189,11 +191,19 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
+    save_game_from_menu_or_overworld(env.program_info(), console, context, true);
+
+
+
+//    auto_heal_from_menu(env.program_info(), console, context, 0, true);
+
+
+
 //    return_to_inside_zero_gate(env.program_info(), console, context);
 //    inside_zero_gate_to_secret_cave_entrance(env.program_info(), console, context);
 
 
-    inside_zero_gate_to_station(env.program_info(), console, context, 1, false);
+//    inside_zero_gate_to_station(env.program_info(), console, context, 1, false);
 //    ssf_press_left_joystick(context, 144, 0, 0, 5 * TICKS_PER_SECOND);
 //    pbf_mash_button(context, BUTTON_A, 5 * TICKS_PER_SECOND);
 

@@ -14,9 +14,10 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 //#include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Pokemon_Notification.h"
+#include "Pokemon/Inference/Pokemon_ReadHpBar.h"
 #include "PokemonSV/Options/PokemonSV_EncounterBotCommon.h"
 #include "PokemonSV/Inference/PokemonSV_SweatBubbleDetector.h"
-#include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
+//#include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV/Programs/PokemonSV_Battles.h"
 #include "PokemonSV/Programs/PokemonSV_BasicCatcher.h"
 #include "PokemonSV_LetsGoTools.h"
@@ -30,6 +31,16 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 using namespace Pokemon;
+
+
+
+double read_hp(Logger& logger, const ImageViewRGB32& image){
+    return read_hp_bar(
+        logger,
+        extract_box_reference(image, ImageFloatBox(0.055, 0.928, 0.067, 0.012))
+    );
+}
+
 
 
 EncounterRateTracker::EncounterRateTracker()

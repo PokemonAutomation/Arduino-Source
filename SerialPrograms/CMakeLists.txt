@@ -840,6 +840,8 @@ file(GLOB MAIN_SOURCES
     Source/Pokemon/Inference/Pokemon_NatureReader.h
     Source/Pokemon/Inference/Pokemon_PokeballNameReader.cpp
     Source/Pokemon/Inference/Pokemon_PokeballNameReader.h
+    Source/Pokemon/Inference/Pokemon_ReadHpBar.cpp
+    Source/Pokemon/Inference/Pokemon_ReadHpBar.h
     Source/Pokemon/Inference/Pokemon_TrainIVCheckerOCR.cpp
     Source/Pokemon/Inference/Pokemon_TrainIVCheckerOCR.h
     Source/Pokemon/Inference/Pokemon_TrainPokemonOCR.cpp

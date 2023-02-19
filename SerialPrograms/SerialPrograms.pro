@@ -424,6 +424,7 @@ SOURCES += \
     Source/Pokemon/Inference/Pokemon_NameReader.cpp \
     Source/Pokemon/Inference/Pokemon_NatureReader.cpp \
     Source/Pokemon/Inference/Pokemon_PokeballNameReader.cpp \
+    Source/Pokemon/Inference/Pokemon_ReadHpBar.cpp \
     Source/Pokemon/Inference/Pokemon_TrainIVCheckerOCR.cpp \
     Source/Pokemon/Inference/Pokemon_TrainPokemonOCR.cpp \
     Source/Pokemon/Options/Pokemon_EggHatchFilter.cpp \
@@ -688,6 +689,7 @@ SOURCES += \
     Source/PokemonSV/Programs/Glitches/PokemonSV_RideCloner-1.0.1.cpp \
     Source/PokemonSV/Programs/PokemonSV_AreaZero.cpp \
     Source/PokemonSV/Programs/PokemonSV_BasicCatcher.cpp \
+    Source/PokemonSV/Programs/PokemonSV_Battles.cpp \
     Source/PokemonSV/Programs/PokemonSV_ConnectToInternet.cpp \
     Source/PokemonSV/Programs/PokemonSV_GameEntry.cpp \
     Source/PokemonSV/Programs/PokemonSV_Navigation.cpp \
@@ -1423,6 +1425,7 @@ HEADERS += \
     Source/Pokemon/Inference/Pokemon_NameReader.h \
     Source/Pokemon/Inference/Pokemon_NatureReader.h \
     Source/Pokemon/Inference/Pokemon_PokeballNameReader.h \
+    Source/Pokemon/Inference/Pokemon_ReadHpBar.h \
     Source/Pokemon/Inference/Pokemon_TrainIVCheckerOCR.h \
     Source/Pokemon/Inference/Pokemon_TrainPokemonOCR.h \
     Source/Pokemon/Options/Pokemon_EggHatchFilter.h \
@@ -1693,6 +1696,7 @@ HEADERS += \
     Source/PokemonSV/Programs/Glitches/PokemonSV_RideCloner-1.0.1.h \
     Source/PokemonSV/Programs/PokemonSV_AreaZero.h \
     Source/PokemonSV/Programs/PokemonSV_BasicCatcher.h \
+    Source/PokemonSV/Programs/PokemonSV_Battles.h \
     Source/PokemonSV/Programs/PokemonSV_ConnectToInternet.h \
     Source/PokemonSV/Programs/PokemonSV_GameEntry.h \
     Source/PokemonSV/Programs/PokemonSV_Navigation.h \

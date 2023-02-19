@@ -32,6 +32,10 @@ class EncounterBotCommonOptions;
 
 
 
+double read_hp(Logger& logger, const ImageViewRGB32& image);
+
+
+
 class EncounterRateTracker{
 public:
     EncounterRateTracker();

@@ -22,7 +22,7 @@
 #include "PokemonSV/Inference/Battles/PokemonSV_EncounterWatcher.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_SaveGame.h"
-#include "PokemonSV/Programs/PokemonSV_Navigation.h"
+#include "PokemonSV/Programs/PokemonSV_Battles.h"
 #include "PokemonSV/Programs/PokemonSV_AreaZero.h"
 #include "PokemonSV_LetsGoTools.h"
 #include "PokemonSV_ShinyHunt-AreaZeroPlatform.h"
@@ -106,6 +106,11 @@ ShinyHuntAreaZeroPlatform::ShinyHuntAreaZeroPlatform()
         Path::PATH2
     )
     , GO_HOME_WHEN_DONE(true)
+    , AUTO_HEAL_PERCENT(
+        "<b>Auto-Heal %</b><br>Auto-heal if your HP drops below this percentage.",
+        LockWhileRunning::UNLOCKED,
+        75, 0, 100
+    )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS_UPDATE,
@@ -127,6 +132,7 @@ ShinyHuntAreaZeroPlatform::ShinyHuntAreaZeroPlatform()
         PA_ADD_OPTION(ENCOUNTER_BOT_OPTIONS);
     }
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
+    PA_ADD_OPTION(AUTO_HEAL_PERCENT);
     if (PreloadSettings::instance().DEVELOPER_MODE){
         PA_ADD_OPTION(PLATFORM_RESET);
         PA_ADD_OPTION(NAVIGATE_TO_PLATFORM);
@@ -146,6 +152,15 @@ bool ShinyHuntAreaZeroPlatform::run_traversal(BotBaseContext& context){
         save_game_from_overworld(info, console, context);
         m_pending_save = false;
         m_last_save = SavedLocation::AREA_ZERO;
+    }
+
+    double hp = read_hp(console, console.video().snapshot());
+    if (0 < hp){
+        m_last_known_hp = hp;
+    }
+    hp = m_last_known_hp;
+    if (0 < hp && hp < AUTO_HEAL_PERCENT * 0.01){
+        auto_heal_from_menu_or_overworld(info, console, context, 0, true);
     }
 
     WallClock start = current_time();
@@ -368,6 +383,7 @@ void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, Bot
 
     m_pending_save = false;
     m_last_save = SavedLocation::NONE;
+    m_last_known_hp = -1;
     m_last_sandwich = WallClock::min();
 
     //  This is the outer-most program loop that wraps all logic with the

@@ -8,8 +8,9 @@
 #define PokemonAutomation_PokemonSV_ShinyHuntAreaZeroPlatform_H
 
 #include <functional>
-#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
+//#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 //#include "Common/Cpp/Options/SimpleIntegerOption.h"
+#include "Common/Cpp/Options/FloatingPointOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "CommonFramework/Options/LanguageOCROption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
@@ -80,6 +81,7 @@ private:
 
     PlatformResetSettings PLATFORM_RESET;
     NavigatePlatformSettings NAVIGATE_TO_PLATFORM;
+    FloatingPointOption AUTO_HEAL_PERCENT;
 
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;
@@ -101,6 +103,7 @@ private:
     };
     SavedLocation m_last_save;
 
+    double m_last_known_hp;
     WallClock m_last_sandwich;
 
     size_t m_consecutive_failures;

@@ -23,9 +23,10 @@ void save_game_from_menu(const ProgramInfo& info, ConsoleHandle& console, BotBas
 //  Save game from overworld.
 void save_game_from_overworld(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
 
-void auto_heal(
+//  Save game from either menu or overworld.
+void save_game_from_menu_or_overworld(
     const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
-    uint8_t party_slot  //  0 - 5
+    bool return_to_overworld
 );
 
 
