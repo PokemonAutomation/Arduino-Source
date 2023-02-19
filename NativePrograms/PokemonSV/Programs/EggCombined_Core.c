@@ -100,6 +100,9 @@ void deposit_parent(void) {
     pbf_press_dpad(DPAD_LEFT, 5, 100);
     pbf_press_button(BUTTON_Y, 1, 500);
     pbf_press_dpad(DPAD_DOWN, 1, 100);
+    if (HAS_CLONED_RIDER) {
+        pbf_press_dpad(DPAD_DOWN, 1, 100);
+    };
     pbf_press_button(BUTTON_MINUS, 1, 100);
     for (int i = 0; i < 40; i++) {
         pbf_press_dpad(DPAD_DOWN, 1, 0);
