@@ -89,6 +89,7 @@
 #include "PokemonSV/Inference/PokemonSV_ZeroGateWarpPromptDetector.h"
 #include "PokemonSV/Programs/ShinyHunting/PokemonSV_AreaZeroPlatform.h"
 #include "PokemonSV/Inference/PokemonSV_SweatBubbleDetector.h"
+#include "PokemonSV/Programs/PokemonSV_AreaZero.h"
 
 
 #include <QPixmap>
@@ -192,6 +193,11 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 //    inside_zero_gate_to_secret_cave_entrance(env.program_info(), console, context);
 
 
+    inside_zero_gate_to_station(env.program_info(), console, context, 1, false);
+//    ssf_press_left_joystick(context, 144, 0, 0, 5 * TICKS_PER_SECOND);
+//    pbf_mash_button(context, BUTTON_A, 5 * TICKS_PER_SECOND);
+
+//    pbf_move_left_joystick(context, 96, 255, 5 * TICKS_PER_SECOND, 0);
 
 
 #if 0

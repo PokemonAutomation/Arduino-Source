@@ -23,10 +23,11 @@ namespace PokemonSV{
 
 void inside_zero_gate_to_station(
     const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
-    int station //  1 - 4
+    int station,    //  1 - 4
+    bool heal_at_station
 ){
-    AdvanceDialogWatcher dialog(COLOR_BLUE);
     {
+        AdvanceDialogWatcher dialog(COLOR_GREEN);
         int ret = run_until(
             console, context,
             [](BotBaseContext& context){
@@ -55,7 +56,8 @@ void inside_zero_gate_to_station(
             );
         }
 
-        ZeroGateWarpPromptWatcher prompt(COLOR_YELLOW);
+        AdvanceDialogWatcher dialog(COLOR_GREEN);
+        ZeroGateWarpPromptWatcher prompt(COLOR_GREEN);
         BlackScreenOverWatcher black_screen(COLOR_RED);
         context.wait_for_all_requests();
         int ret = wait_until(
@@ -75,8 +77,7 @@ void inside_zero_gate_to_station(
             pbf_mash_button(context, BUTTON_A, 3 * TICKS_PER_SECOND);
             continue;
         case 2:
-            console.log("Detected black screen.");
-
+            console.log("Black screen is over. Arrive at station.");
             break;
         default:
             throw OperationFailedException(
@@ -89,15 +90,67 @@ void inside_zero_gate_to_station(
         break;
     }
     context.wait_for_all_requests();
-    context.wait_for(std::chrono::milliseconds(100));
+    context.wait_for(std::chrono::seconds(3));
+
+    if (heal_at_station){
+        console.log("Moving to bed to heal.");
+        pbf_move_left_joystick(context, 144, 0, 4 * TICKS_PER_SECOND, 0);
+        ssf_press_left_joystick(context, 255, 128, 0, 125);
+        bool healed = false;
+        while (true){
+            AdvanceDialogWatcher dialog(COLOR_GREEN);
+            PromptDialogWatcher confirm(COLOR_GREEN);
+            BlackScreenOverWatcher black_screen(COLOR_RED);
+            OverworldWatcher overworld(COLOR_BLUE);
+            context.wait_for_all_requests();
+            int ret = wait_until(
+                console, context, std::chrono::seconds(30),
+                {dialog, confirm, black_screen, overworld}
+            );
+            context.wait_for(std::chrono::milliseconds(100));
+            switch (ret){
+            case 0:
+                console.log("Detected dialog.");
+                pbf_press_button(context, BUTTON_B, 20, 105);
+                continue;
+            case 1:
+                console.log("Detected rest prompt.");
+                pbf_press_button(context, BUTTON_A, 20, 105);
+                continue;
+            case 2:
+                console.log("Done healing!");
+                healed = true;
+                continue;
+            case 3:
+                console.log("Detected overworld.");
+                if (healed){
+                    break;
+                }else{
+                    pbf_press_button(context, BUTTON_A, 20, 105);
+                    continue;
+                }
+            default:
+                throw OperationFailedException(
+                    ErrorReport::SEND_ERROR_REPORT, console,
+                    "Heal at station: No state detected after 30 seconds.",
+                    true
+                );
+            }
+            break;
+        }
+    }
 
     console.log("Exiting station. Waiting for black screen...");
     {
         BlackScreenOverWatcher black_screen(COLOR_RED);
         int ret = run_until(
             console, context,
-            [](BotBaseContext& context){
-                pbf_move_left_joystick(context, 0, 255, 60 * TICKS_PER_SECOND, 0);
+            [=](BotBaseContext& context){
+                if (heal_at_station){
+                    pbf_move_left_joystick(context, 96, 255, 60 * TICKS_PER_SECOND, 0);
+                }else{
+                    pbf_move_left_joystick(context, 0, 255, 60 * TICKS_PER_SECOND, 0);
+                }
             },
             {black_screen}
         );
@@ -112,7 +165,7 @@ void inside_zero_gate_to_station(
 
     console.log("Exiting station. Waiting for overworld...");
     {
-        OverworldWatcher overworld(COLOR_RED);
+        OverworldWatcher overworld(COLOR_BLUE);
         int ret = wait_until(
             console, context, std::chrono::seconds(30),
             {overworld}
@@ -171,9 +224,10 @@ void return_to_inside_zero_gate(const ProgramInfo& info, ConsoleHandle& console,
 
 
 void inside_zero_gate_to_secret_cave_entrance(
-    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context
+    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    bool heal_at_station
 ){
-    inside_zero_gate_to_station(info, console, context, 1);
+    inside_zero_gate_to_station(info, console, context, 1, heal_at_station);
 
     context.wait_for(std::chrono::seconds(3));
 

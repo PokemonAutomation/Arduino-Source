@@ -111,6 +111,11 @@ NavigatePlatformSettings::NavigatePlatformSettings()
         "These settings are used when traveling from Zero Gate to the platform. "
         "This can happen either at program start or during a platform reset."
     )
+    , HEAL_AT_STATION(
+        "<b>Heal at Station:</b><br>If you're passing through the station, take the opportunity to heal up.",
+        LockWhileRunning::UNLOCKED,
+        true
+    )
     , STATION_ARRIVE_PAUSE_SECONDS(
         "<b>Station Arrive Pause Time:</b><br>Pause for this many seconds after leaving the station. "
         "This gives the game time to load and thus reduce the chance of lag affecting the flight path.",
@@ -127,6 +132,7 @@ NavigatePlatformSettings::NavigatePlatformSettings()
     )
 {
     PA_ADD_STATIC(m_description);
+    PA_ADD_OPTION(HEAL_AT_STATION);
     PA_ADD_OPTION(STATION_ARRIVE_PAUSE_SECONDS);
     PA_ADD_OPTION(MIDAIR_PAUSE_TIME);
 }
@@ -136,7 +142,7 @@ void inside_zero_gate_to_platform(
     const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
     NavigatePlatformSettings& settings
 ){
-    inside_zero_gate_to_station(info, console, context, 2);
+    inside_zero_gate_to_station(info, console, context, 2, settings.HEAL_AT_STATION);
 
     context.wait_for(std::chrono::seconds(settings.STATION_ARRIVE_PAUSE_SECONDS));
 

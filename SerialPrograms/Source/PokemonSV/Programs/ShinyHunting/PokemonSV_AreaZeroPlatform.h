@@ -9,6 +9,7 @@
 
 #include "Common/Cpp/Options/GroupOption.h"
 #include "Common/Cpp/Options/StaticTextOption.h"
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/TimeExpressionOption.h"
 
@@ -49,6 +50,7 @@ public:
 
 public:
     StaticTextOption m_description;
+    BooleanCheckBoxOption HEAL_AT_STATION;
     SimpleIntegerOption<uint16_t> STATION_ARRIVE_PAUSE_SECONDS;
     TimeExpressionOption<uint16_t> MIDAIR_PAUSE_TIME;
 };

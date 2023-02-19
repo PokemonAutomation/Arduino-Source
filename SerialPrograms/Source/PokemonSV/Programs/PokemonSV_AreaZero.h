@@ -20,7 +20,8 @@ namespace PokemonSV{
 //  After just entering the Zero Gate, go to the specified station.
 void inside_zero_gate_to_station(
     const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
-    int station //  1 - 4
+    int station,    //  1 - 4
+    bool heal_at_station
 );
 
 //  You are inside Area Zero having traveled there via the Zero Gate. Return to
@@ -34,7 +35,8 @@ void return_to_inside_zero_gate(const ProgramInfo& info, ConsoleHandle& console,
 
 
 void inside_zero_gate_to_secret_cave_entrance(
-    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context
+    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    bool heal_at_station
 );
 
 
