@@ -108,7 +108,8 @@ bool OverworldDetector::detect_ball(const ImageViewRGB32& screen) const{
                 continue;
             }
             double area_ratio = object.area_ratio();
-            if (!(0.4 < area_ratio && area_ratio < 0.9)){
+            if (area_ratio > 0.9){
+//                cout << c << " : bad area ratio = " << area_ratio << endl;
                 continue;
             }
 

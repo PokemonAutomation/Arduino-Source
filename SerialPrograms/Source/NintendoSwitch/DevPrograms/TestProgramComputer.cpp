@@ -222,8 +222,8 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 
 
 #if 1
-    ImageRGB32 image("screenshot-20230217-182945740433.png");
-    MoveSelectDetector detector(COLOR_RED);
+    ImageRGB32 image("20230219-200200879508-OperationFailedException.png");
+    OverworldDetector detector(COLOR_RED);
     cout << detector.detect(image) << endl;
 #endif
 
