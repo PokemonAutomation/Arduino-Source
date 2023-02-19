@@ -168,8 +168,6 @@ using namespace PokemonSV;
 
 
 
-
-
 void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
     using namespace Kernels;
     using namespace Kernels::Waterfill;
@@ -194,6 +192,14 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 //    inside_zero_gate_to_secret_cave_entrance(env.program_info(), console, context);
 
 
+
+
+#if 0
+    auto image = feed.snapshot();
+
+    NewsDetector detector;
+    cout << detector.detect(image) << endl;
+#endif
 
 
 
