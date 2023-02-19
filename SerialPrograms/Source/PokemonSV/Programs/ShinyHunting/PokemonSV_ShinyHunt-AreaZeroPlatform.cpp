@@ -54,16 +54,19 @@ ShinyHuntAreaZeroPlatform_Descriptor::ShinyHuntAreaZeroPlatform_Descriptor()
 struct ShinyHuntAreaZeroPlatform_Descriptor::Stats : public LetsGoEncounterBotStats{
     Stats()
         : m_sandwiches(m_stats["Sandwiches"])
+        , m_autoheals(m_stats["Auto Heals"])
         , m_platform_resets(m_stats["Platform Resets"])
         , m_game_resets(m_stats["Game Resets"])
         , m_errors(m_stats["Errors"])
     {
         m_display_order.insert(m_display_order.begin() + 2, {"Sandwiches", true});
-        m_display_order.insert(m_display_order.begin() + 3, {"Platform Resets", true});
-        m_display_order.insert(m_display_order.begin() + 4, {"Game Resets", true});
-        m_display_order.insert(m_display_order.begin() + 5, {"Errors", true});
+        m_display_order.insert(m_display_order.begin() + 3, {"Auto Heals", true});
+        m_display_order.insert(m_display_order.begin() + 4, {"Platform Resets", true});
+        m_display_order.insert(m_display_order.begin() + 5, {"Game Resets", true});
+        m_display_order.insert(m_display_order.begin() + 6, {"Errors", true});
     }
     std::atomic<uint64_t>& m_sandwiches;
+    std::atomic<uint64_t>& m_autoheals;
     std::atomic<uint64_t>& m_platform_resets;
     std::atomic<uint64_t>& m_game_resets;
     std::atomic<uint64_t>& m_errors;
@@ -146,6 +149,8 @@ ShinyHuntAreaZeroPlatform::ShinyHuntAreaZeroPlatform()
 
 
 bool ShinyHuntAreaZeroPlatform::run_traversal(BotBaseContext& context){
+    ShinyHuntAreaZeroPlatform_Descriptor::Stats& stats = m_env->current_stats<ShinyHuntAreaZeroPlatform_Descriptor::Stats>();
+
     const ProgramInfo& info = m_env->program_info();
     ConsoleHandle& console = m_env->console;
 
@@ -163,6 +168,8 @@ bool ShinyHuntAreaZeroPlatform::run_traversal(BotBaseContext& context){
     }
     if (0 < hp && hp < AUTO_HEAL_PERCENT){
         auto_heal_from_menu_or_overworld(info, console, context, 0, true);
+        stats.m_autoheals++;
+        m_env->update_stats();
     }
 
     WallClock start = current_time();

@@ -7,8 +7,9 @@
 #ifndef PokemonAutomation_PokemonSV_LetsGoHpReader_H
 #define PokemonAutomation_PokemonSV_LetsGoHpReader_H
 
-#include <atomic>
+#include <deque>
 #include "Common/Cpp/Color.h"
+#include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 
@@ -22,12 +23,8 @@ class LetsGoHpWatcher : public VisualInferenceCallback{
 public:
     LetsGoHpWatcher(Color color);
 
-    void clear(){
-        m_last_known_value.store(-1, std::memory_order_relaxed);
-    }
-    double last_known_value() const{
-        return m_last_known_value.load(std::memory_order_relaxed);
-    }
+    void clear();
+    double last_known_value() const;
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
@@ -35,7 +32,10 @@ public:
 private:
     Color m_color;
     ImageFloatBox m_box;
-    std::atomic<double> m_last_known_value;
+//    std::atomic<double> m_last_known_value;
+
+    mutable SpinLock m_lock;
+    std::deque<std::pair<WallClock, double>> m_history;
 };
 
 
