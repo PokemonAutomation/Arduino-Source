@@ -159,8 +159,12 @@ bool ShinyHuntAreaZeroPlatform::run_traversal(BotBaseContext& context){
         m_last_known_hp = hp;
     }
     hp = m_last_known_hp;
+    if (0 < hp){
+        console.log("Last Known HP: " + tostr_default(hp) + "%");
+    }
     if (0 < hp && hp < AUTO_HEAL_PERCENT * 0.01){
         auto_heal_from_menu_or_overworld(info, console, context, 0, true);
+        m_last_known_hp = 100;
     }
 
     WallClock start = current_time();
