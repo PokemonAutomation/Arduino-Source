@@ -10,6 +10,10 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSV_TeraBattleMenus.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
@@ -48,8 +52,9 @@ int8_t TeraBattleMenuDetector::detect_slot(const ImageViewRGB32& screen) const{
     }
 
     double y = box.y + box.height * 0.5;
-
-    return (int8_t)((y - 0.761111) / 0.0814815 + 0.5);
+    double slot = (y - 0.761111) / 0.0814815;
+//    cout << "slot = " << slot << endl;
+    return (int8_t)(slot + 0.5);
 }
 bool TeraBattleMenuDetector::move_to_slot(ConsoleHandle& console, BotBaseContext& context, uint8_t slot) const{
     if (slot > 2){
@@ -60,11 +65,11 @@ bool TeraBattleMenuDetector::move_to_slot(ConsoleHandle& console, BotBaseContext
         VideoSnapshot screen = console.video().snapshot();
         int8_t current_slot = detect_slot(screen);
         if (current_slot < 0 || current_slot > 2){
-            console.log("BattleMenuDetector::move_to_slot(): Unable to detect slot.", COLOR_RED);
+            console.log("TeraBattleMenuDetector::move_to_slot(): Unable to detect slot.", COLOR_RED);
             return false;
         }
         if (attempts > 10){
-            console.log("BattleMenuDetector::move_to_slot(): Failed to move slot after 10 attempts.", COLOR_RED);
+            console.log("TeraBattleMenuDetector::move_to_slot(): Failed to move slot after 10 attempts.", COLOR_RED);
             return false;
         }
 

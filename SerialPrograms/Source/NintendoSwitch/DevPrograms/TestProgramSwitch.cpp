@@ -92,6 +92,8 @@
 #include "PokemonSV/Programs/PokemonSV_AreaZero.h"
 #include "PokemonSV/Programs/PokemonSV_Battles.h"
 #include "PokemonSV/Programs/PokemonSV_SaveGame.h"
+#include "PokemonSV/Inference/Battles/PokemonSV_NormalBattleMenus.h"
+#include "PokemonSV/Inference/Battles/PokemonSV_TeraBattleMenus.h"
 
 
 #include <QPixmap>
@@ -191,7 +193,20 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
-    save_game_from_menu_or_overworld(env.program_info(), console, context, true);
+    basic_catcher(console, context, Language::English, "poke-ball", true);
+
+
+#if 0
+    auto image = feed.snapshot();
+
+    NormalBattleMenuDetector detector(COLOR_RED);
+    detector.detect_slot(image);
+    detector.move_to_slot(console, context, 0);
+#endif
+
+
+
+//    save_game_from_menu_or_overworld(env.program_info(), console, context, true);
 
 
 

@@ -40,6 +40,55 @@ bool NormalBattleMenuDetector::detect(const ImageViewRGB32& screen) const{
     }
     return true;
 }
+int8_t NormalBattleMenuDetector::detect_slot(const ImageViewRGB32& screen) const{
+    if (!m_status_button.detect(screen)){
+//        cout << "status button" << endl;
+        return -1;
+    }
+
+    ImageFloatBox box;
+    if (!m_arrow.detect(box, screen)){
+        return -1;
+    }
+
+    double y = box.y + box.height * 0.5;
+    double slot = (y - 0.67963) / 0.0814815;
+//    cout << "slot = " << slot << endl;
+    return (int8_t)(slot + 0.5);
+}
+bool NormalBattleMenuDetector::move_to_slot(ConsoleHandle& console, BotBaseContext& context, uint8_t slot) const{
+    if (slot > 3){
+        return false;
+    }
+    for (size_t attempts = 0;; attempts++){
+        context.wait_for_all_requests();
+        VideoSnapshot screen = console.video().snapshot();
+        int8_t current_slot = detect_slot(screen);
+        if (current_slot < 0 || current_slot > 3){
+            console.log("NormalBattleMenuDetector::move_to_slot(): Unable to detect slot.", COLOR_RED);
+            return false;
+        }
+        if (attempts > 10){
+            console.log("NormalBattleMenuDetector::move_to_slot(): Failed to move slot after 10 attempts.", COLOR_RED);
+            return false;
+        }
+
+        uint8_t diff = (4 + slot - (uint8_t)current_slot) % 4;
+        switch (diff){
+        case 0:
+            return true;
+        case 1:
+            pbf_press_dpad(context, DPAD_DOWN, 20, 30);
+            continue;
+        case 2:
+            pbf_press_dpad(context, DPAD_DOWN, 20, 30);
+            continue;
+        case 3:
+            pbf_press_dpad(context, DPAD_UP, 20, 30);
+            continue;
+        }
+    }
+}
 
 
 

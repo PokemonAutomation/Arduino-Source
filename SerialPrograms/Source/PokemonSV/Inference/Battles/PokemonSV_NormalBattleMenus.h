@@ -28,9 +28,9 @@ public:
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) const override;
 
-//    //  Returns -1 if not found.
-//    int8_t detect_slot(const ImageViewRGB32& screen) const;
-//    bool move_to_slot(ConsoleHandle& console, BotBaseContext& context, uint8_t slot) const;
+    //  Returns -1 if not found.
+    int8_t detect_slot(const ImageViewRGB32& screen) const;
+    bool move_to_slot(ConsoleHandle& console, BotBaseContext& context, uint8_t slot) const;
 
 private:
     WhiteButtonDetector m_status_button;

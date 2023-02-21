@@ -252,7 +252,11 @@ bool LetsGoEncounterBotTracker::process_battle(EncounterWatcher& watcher, Encoun
             throw InternalProgramError(&m_console.logger(), PA_CURRENT_FUNCTION, "Language is not set.");
         }
 
-        CatchResults result = basic_catcher(m_console, m_context, language, action.ball);
+        CatchResults result = basic_catcher(
+            m_console, m_context,
+            language, action.ball,
+            settings.USE_FIRST_MOVE_IF_CANNOT_THROW_BALL
+        );
         send_catch_notification(
             m_env,
             settings.NOTIFICATION_CATCH_SUCCESS,

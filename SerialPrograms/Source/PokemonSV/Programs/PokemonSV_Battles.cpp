@@ -90,7 +90,6 @@ int run_from_battle(const ProgramInfo& info, ConsoleHandle& console, BotBaseCont
 
     int attempts = 0;
     for (size_t c = 0; c < 10; c++){
-
         OverworldWatcher overworld(COLOR_RED);
         NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
         GradientArrowWatcher next_pokemon(COLOR_GREEN, GradientArrowType::RIGHT, {0.50, 0.51, 0.30, 0.10});
@@ -110,7 +109,8 @@ int run_from_battle(const ProgramInfo& info, ConsoleHandle& console, BotBaseCont
             return attempts;
         case 1:
             console.log("Detected battle menu...");
-            pbf_press_dpad(context, DPAD_DOWN, 250, 0);
+            battle_menu.move_to_slot(console, context, 3);
+//            pbf_press_dpad(context, DPAD_DOWN, 250, 0);
             pbf_press_button(context, BUTTON_A, 20, 105);
             pbf_press_button(context, BUTTON_B, 20, 1 * TICKS_PER_SECOND);
             attempts++;

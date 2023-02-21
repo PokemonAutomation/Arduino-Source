@@ -100,7 +100,8 @@ int16_t move_to_ball(
 CatchResults basic_catcher(
     ConsoleHandle& console, BotBaseContext& context,
     Language language,
-    const std::string& ball_slug
+    const std::string& ball_slug,
+    bool use_first_move_if_cant_throw
 ){
     uint16_t balls_used = 0;
 
@@ -138,7 +139,16 @@ CatchResults basic_catcher(
             }
             if (last_state == 0 && current_time() < start + std::chrono::seconds(5)){
                 console.log("BasicCatcher: Unable to throw ball.", COLOR_RED);
-                return {CatchResult::CANNOT_THROW_BALL, balls_used};
+                if (!use_first_move_if_cant_throw){
+                    console.log("BasicCatcher: Unable to throw ball.", COLOR_RED);
+                    return {CatchResult::CANNOT_THROW_BALL, balls_used};
+                }
+
+                console.log("BasicCatcher: Unable to throw ball. Attempting to use first move instead...", COLOR_RED);
+                battle_menu.move_to_slot(console, context, 0);
+                pbf_mash_button(context, BUTTON_A, 3 * TICKS_PER_SECOND);
+                pbf_mash_button(context, BUTTON_B, 3 * TICKS_PER_SECOND);
+                break;
             }
             pbf_press_button(context, BUTTON_X, 20, 105);
             context.wait_for_all_requests();
