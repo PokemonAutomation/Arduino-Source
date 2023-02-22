@@ -6,70 +6,70 @@
 #include "EggHatcher.h"
 
 void fly_to_gate(void) {
-    pbf_press_button(BUTTON_A, 1, 500);
-    pbf_press_button(BUTTON_Y, 1, 800);
+    pbf_press_button(BUTTON_A, 20, 500);
+    pbf_press_button(BUTTON_Y, 20, 800);
     pbf_move_left_joystick(STICK_MAX, STICK_MAX, 6, 500);
     pbf_mash_button(BUTTON_A, 1000);
 };
 
 void move_to_location(void) {
     pbf_move_left_joystick(STICK_MIN, STICK_CENTER, 190, 0);
-    pbf_press_button(BUTTON_L, 5, 0);
+    pbf_press_button(BUTTON_L, 20, 0);
     pbf_move_left_joystick(STICK_CENTER, STICK_MIN, 150, 100);
-    pbf_move_left_joystick(STICK_CENTER, STICK_MAX, 1, 0);
-    pbf_press_button(BUTTON_L, 5, 300);
+    pbf_move_left_joystick(STICK_CENTER, STICK_MAX, 20, 0);
+    pbf_press_button(BUTTON_L, 20, 300);
 };
 
 void open_box(void) {
-    pbf_press_button(BUTTON_A, 1, 500);
-    pbf_press_button(BUTTON_X, 1, 200);
-    pbf_press_button(BUTTON_A, 1, 500);
+    pbf_press_button(BUTTON_A, 20, 500);
+    pbf_press_button(BUTTON_X, 20, 200);
+    pbf_press_button(BUTTON_A, 20, 500);
 };
 
 void get_egg(int boxCol) {
-    pbf_press_dpad(DPAD_RIGHT, 1, 100);
-    pbf_press_button(BUTTON_MINUS, 1, 100);
+    pbf_press_dpad(DPAD_RIGHT, 20, 100);
+    pbf_press_button(BUTTON_MINUS, 20, 100);
     for (int i = 0; i < 40; i++) {
-        pbf_press_dpad(DPAD_DOWN, 1, 0);
+        pbf_press_dpad(DPAD_DOWN, 5, 0);
     };
-    pbf_press_button(BUTTON_A, 1, 100);
+    pbf_press_button(BUTTON_A, 20, 100);
     for (int curCol = 0; curCol < boxCol + 1; curCol++) {
-        pbf_press_dpad(DPAD_LEFT, 1, 100);
+        pbf_press_dpad(DPAD_LEFT, 20, 100);
     };
-    pbf_press_dpad(DPAD_DOWN, 1, 100);
-    pbf_press_button(BUTTON_A, 1, 100);
-    pbf_press_button(BUTTON_B, 1, 200);
-    pbf_press_button(BUTTON_B, 1, 800);
+    pbf_press_dpad(DPAD_DOWN, 20, 100);
+    pbf_press_button(BUTTON_A, 20, 100);
+    pbf_press_button(BUTTON_B, 20, 200);
+    pbf_press_button(BUTTON_B, 20, 800);
 };
 
 void deposit_pokemon(int boxCol) {
-    pbf_press_dpad(DPAD_LEFT, 1, 100);
-    pbf_press_dpad(DPAD_DOWN, 1, 100);
+    pbf_press_dpad(DPAD_LEFT, 20, 100);
+    pbf_press_dpad(DPAD_DOWN, 20, 100);
     if (HAS_CLONED_RIDER) {
-        pbf_press_dpad(DPAD_DOWN, 1, 100);
+        pbf_press_dpad(DPAD_DOWN, 20, 100);
     };
-    pbf_press_button(BUTTON_MINUS, 1, 100);
+    pbf_press_button(BUTTON_MINUS, 20, 100);
     for (int i = 0; i < 40; i++) {
-        pbf_press_dpad(DPAD_DOWN, 1, 0);
+        pbf_press_dpad(DPAD_DOWN, 5, 0);
     };
-    pbf_press_button(BUTTON_A, 1, 100);
+    pbf_press_button(BUTTON_A, 20, 100);
     for (int curCol = 0; curCol < boxCol + 1; curCol++) {
-        pbf_press_dpad(DPAD_RIGHT, 1, 100);
+        pbf_press_dpad(DPAD_RIGHT, 20, 100);
     };
-    pbf_press_dpad(DPAD_UP, 1, 100);
-    pbf_press_button(BUTTON_A, 1, 100);
+    pbf_press_dpad(DPAD_UP, 20, 100);
+    pbf_press_button(BUTTON_A, 20, 100);
 };
 
 void ride_hatch(void) {
-    pbf_press_button(BUTTON_PLUS, 5, 400);
+    pbf_press_button(BUTTON_PLUS, 20, 400);
     // hatch the first egg at full speed, sometimes the speed boost can fail %point for optimizing%
     pbf_move_left_joystick(STICK_MAX, STICK_CENTER, 50, 0);
-    pbf_press_button(BUTTON_LCLICK, 1, 0);
+    pbf_press_button(BUTTON_LCLICK, 5, 0);
     pbf_move_left_joystick(STICK_MAX, STICK_CENTER, STEPS_TO_HATCH * SAFETY_COEFF, 0);
     // hatch the remaining 4 eggs, not speed boosted to reduce error due to random positioning
     for (int checkEggLoop = 0; checkEggLoop < 80; checkEggLoop++) {
         pbf_move_left_joystick(STICK_MAX, STICK_CENTER, 220, 0);
-        pbf_press_button(BUTTON_A, 1, 0);
+        pbf_press_button(BUTTON_A, 5, 0);
     };
 };
 
@@ -89,9 +89,9 @@ int main(void) {
     for(int curBox = 0; curBox < BOXES_TO_HATCH; curBox++) {
         // ########## Intial loop setup ##########
         open_box();
-        pbf_press_dpad(DPAD_LEFT, 1, 200);
+        pbf_press_dpad(DPAD_LEFT, 20, 200);
         if (HAS_CLONED_RIDER) {
-            pbf_press_dpad(DPAD_DOWN, 1, 100);
+            pbf_press_dpad(DPAD_DOWN, 20, 100);
         };
 
         // ########## Main hatching loop ##########
@@ -106,13 +106,13 @@ int main(void) {
 
         // ########## End loop setup ##########
         pbf_wait(200);
-        pbf_press_button(BUTTON_R, 5, 200);
-        pbf_press_button(BUTTON_B, 1, 200);
-        pbf_press_button(BUTTON_B, 1, 800);
+        pbf_press_button(BUTTON_R, 20, 200);
+        pbf_press_button(BUTTON_B, 20, 200);
+        pbf_press_button(BUTTON_B, 20, 800);
     };
     
     // ########## End idling in home ##########
-    pbf_press_button(BUTTON_HOME, 10, 125);
+    pbf_press_button(BUTTON_HOME, 20, 100);
     end_program_callback();
     end_program_loop();
 };
