@@ -51,7 +51,7 @@ int main(void) {
     move_to_basket();
 
     for (int curSand = 0; curSand < MAX_SAND; curSand++) {
-        pbf_move_left_joystick(STICK_CENTER, STICK_MIN, 250, 100);
+        pbf_move_left_joystick(STICK_CENTER, STICK_MIN, 20, 100);
         // START SANDWICH
         pbf_press_button(BUTTON_A, 20, 250);
         pbf_press_button(BUTTON_A, 20, 750);
