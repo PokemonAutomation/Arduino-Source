@@ -32,6 +32,7 @@ void get_egg(int boxCol) {
     for (int i = 0; i < 40; i++) {
         pbf_press_dpad(DPAD_DOWN, 5, 0);
     };
+    pbf_wait(100);
     pbf_press_button(BUTTON_A, 20, 100);
     for (int curCol = 0; curCol < boxCol + 1; curCol++) {
         pbf_press_dpad(DPAD_LEFT, 20, 100);
@@ -52,6 +53,7 @@ void deposit_pokemon(int boxCol) {
     for (int i = 0; i < 40; i++) {
         pbf_press_dpad(DPAD_DOWN, 5, 0);
     };
+    pbf_wait(100);
     pbf_press_button(BUTTON_A, 20, 100);
     for (int curCol = 0; curCol < boxCol + 1; curCol++) {
         pbf_press_dpad(DPAD_RIGHT, 20, 100);
