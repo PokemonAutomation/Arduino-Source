@@ -5,6 +5,7 @@
  */
 
 #include "CommonFramework/ImageMatch/WaterfillTemplateMatcher.h"
+#include "CommonFramework/ImageMatch/SilhouetteDictionaryMatcher.h"
 #include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/WaterfillUtilities.h"

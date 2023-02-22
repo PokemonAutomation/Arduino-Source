@@ -108,6 +108,7 @@ CatchResults basic_catcher(
     bool caught = false;
     bool overworld_seen = false;
     int last_state = -1;
+    WallClock last_battle_menu = WallClock::min();
     while (true){
         NormalBattleMenuWatcher battle_menu(COLOR_RED);
         OverworldWatcher overworld(COLOR_YELLOW);
@@ -115,7 +116,6 @@ CatchResults basic_catcher(
         GradientArrowWatcher add_to_party(COLOR_BLUE, GradientArrowType::RIGHT, {0.50, 0.39, 0.30, 0.10});
         AdvanceDialogWatcher dialog(COLOR_PURPLE);
         context.wait_for_all_requests();
-        auto start = current_time();
         int ret = wait_until(
             console, context, std::chrono::seconds(120),
             {
@@ -137,8 +137,10 @@ CatchResults basic_catcher(
                 console.log("Detected battle after overworld. Did you get chain attacked?", COLOR_RED);
                 return CatchResults{CatchResult::POKEMON_FAINTED, balls_used};
             }
-            if (last_state == 0 && current_time() < start + std::chrono::seconds(5)){
-                console.log("BasicCatcher: Unable to throw ball.", COLOR_RED);
+            WallClock now = current_time();
+            WallClock previous = last_battle_menu;
+            last_battle_menu = now;
+            if (last_state == 0 && now < previous + std::chrono::seconds(5)){
                 if (!use_first_move_if_cant_throw){
                     console.log("BasicCatcher: Unable to throw ball.", COLOR_RED);
                     return {CatchResult::CANNOT_THROW_BALL, balls_used};

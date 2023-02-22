@@ -8,9 +8,9 @@
 #define PokemonAutomation_PokemonSV_SandwichIngredientDetector_H
 
 #include "Common/Cpp/Color.h"
-#include "CommonFramework/ImageMatch/SilhouetteDictionaryMatcher.h"
+#include "CommonFramework/ImageMatch/ImageMatchResult.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
+//#include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 #include "CommonFramework/Inference/VisualDetector.h"
 #include "CommonFramework/OCR/OCR_SmallDictionaryMatcher.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.h"
