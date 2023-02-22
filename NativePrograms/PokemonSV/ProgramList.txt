@@ -9,3 +9,5 @@ ItemDupe
 
 ---- Eggs ----
 EggFetcher
+EggHatcher
+EggCombined
