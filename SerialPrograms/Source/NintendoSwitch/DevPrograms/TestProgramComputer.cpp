@@ -108,6 +108,8 @@
 #include "Pokemon/Resources/Pokemon_PokemonSlugs.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_NormalBattleMenus.h"
 #include "Pokemon/Resources/Pokemon_PokemonNames.h"
+#include "CommonFramework/OCR/OCR_NumberReader.h"
+#include "CommonFramework/ImageTools/ImageManip.h"
 
 #ifdef PA_ARCH_x86
 //#include "Kernels/Kernels_x64_SSE41.h"
@@ -192,6 +194,22 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     using namespace Pokemon;
 //    using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
 
+
+    ImageFloatBox ore_quantity(0.945, 0.010, 0.0525, 0.050);
+
+    ImageRGB32 image("screenshot-20230220-232711115537.png");
+    ImageRGB32 filtered = to_blackwhite_rgb32_range(
+        extract_box_reference(image, ore_quantity),
+        0xff808080, 0xffffffff, true
+    );
+
+    filtered = pad_image(filtered, 10, 0xffffffff);
+
+    filtered.save("test.png");
+
+    OCR::read_number(env.logger(), filtered);
+
+
 //    throw OperationFailedException(env.logger(), "asdf");
 //    throw OperationFailedException(env.logger(), "asdf", std::make_shared<ImageRGB32>("20221118-024539201323.jpg"));
 //    throw ProgramFinishedException();
@@ -221,7 +239,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 #endif
 
 
-#if 1
+#if 0
     ImageRGB32 image("20230219-200200879508-OperationFailedException.png");
     OverworldDetector detector(COLOR_RED);
     cout << detector.detect(image) << endl;

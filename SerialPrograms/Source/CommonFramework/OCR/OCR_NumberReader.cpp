@@ -4,6 +4,7 @@
  *
  */
 
+#include <map>
 #include "CommonFramework/Language.h"
 #include "OCR_RawOCR.h"
 #include "OCR_NumberReader.h"
@@ -18,19 +19,35 @@ namespace OCR{
 
 
 int read_number(Logger& logger, const ImageViewRGB32& image){
+    static const std::map<char, char> SUBSTITUTION_TABLE{
+        {'0', '0'},
+        {'1', '1'},
+        {'2', '2'},
+        {'3', '3'},
+        {'4', '4'},
+        {'5', '5'},
+        {'6', '6'},
+        {'7', '7'},
+        {'8', '8'},
+        {'9', '9'},
+
+        //  Common misreads.
+        {'A', '4'},
+        {'a', '4'},
+        {'S', '5'},
+        {'s', '5'},
+    };
+
     std::string ocr_text = OCR::ocr_read(Language::English, image);
     std::string normalized;
     bool has_digit = false;
     for (char ch : ocr_text){
-        //  4 is commonly misread as A.
-        if (ch == 'a' || ch == 'A'){
-            normalized += '4';
-            has_digit = true;
+        auto iter = SUBSTITUTION_TABLE.find(ch);
+        if (iter == SUBSTITUTION_TABLE.end()){
+            continue;
         }
-        if ('0' <= ch && ch <= '9'){
-            normalized += ch;
-            has_digit = true;
-        }
+        normalized += iter->second;
+        has_digit = true;
     }
 
     if (!has_digit){

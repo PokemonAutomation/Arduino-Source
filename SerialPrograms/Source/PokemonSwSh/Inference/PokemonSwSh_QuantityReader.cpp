@@ -4,7 +4,6 @@
  *
  */
 
-#include "CommonFramework/Language.h"
 #include "CommonFramework/OCR/OCR_NumberReader.h"
 #include "PokemonSwSh_QuantityReader.h"
 
