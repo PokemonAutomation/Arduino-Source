@@ -10,6 +10,7 @@
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
+#include "PokemonSV/Resources/PokemonSV_Ingredients.h"
 #include "PokemonSV/Inference/Picnics/PokemonSV_SandwichIngredientDetector.h"
 #include "PokemonSV_IngredientSession.h"
 
@@ -201,6 +202,67 @@ std::string IngredientSession::move_to_ingredient(const std::set<std::string>& i
     }
     return "";
 }
+
+
+void IngredientSession::add_ingredients(
+    ConsoleHandle& console, BotBaseContext& context,
+    std::map<std::string, uint8_t>&& ingredients
+) const{
+    //  "ingredients" will be what we still need.
+    //  Each time we add an ingredient, it will be removed from the map.
+    //  Loop until there's nothing left.
+    while (!ingredients.empty()){
+        std::set<std::string> remaining;
+        for (const auto& item : ingredients){
+            remaining.insert(item.first);
+        }
+
+        std::string found = this->move_to_ingredient(remaining);
+        if (found.empty()){
+            const SandwichIngredientNames& name = get_ingredient_name(*remaining.begin());
+            throw OperationFailedException(
+                ErrorReport::NO_ERROR_REPORT, console,
+                "Unable to find ingredient: \"" + name.display_name() + "\" - Did you run out?"
+            );
+        }
+
+        const SandwichIngredientNames& name = get_ingredient_name(found);
+        console.log("Found: " + name.display_name(), COLOR_BLUE);
+
+        //  Add the item. But don't loop the quantity. Instead, we add one and
+        //  loop again in case we run out.
+        pbf_press_button(context, BUTTON_A, 20, 105);
+        context.wait_for_all_requests();
+
+        auto iter = ingredients.find(found);
+        if (--iter->second == 0){
+            ingredients.erase(iter);
+        }
+    }
+}
+
+
+
+void add_sandwich_ingredients(
+    AsyncDispatcher& dispatcher,
+    ConsoleHandle& console, BotBaseContext& context,
+    Language language,
+    std::map<std::string, uint8_t>&& fillings,
+    std::map<std::string, uint8_t>&& condiments
+){
+    IngredientSession session(dispatcher, console, context, Language::English);
+
+    session.add_ingredients(console, context, std::move(fillings));
+    pbf_press_button(context, BUTTON_PLUS, 20, 230);
+
+    pbf_press_dpad(context, DPAD_UP, 20, 105);
+    session.add_ingredients(console, context, std::move(condiments));
+    pbf_press_button(context, BUTTON_PLUS, 20, 230);
+
+    pbf_mash_button(context, BUTTON_A, 125);
+}
+
+
 
 
 

@@ -695,6 +695,7 @@ SOURCES += \
     Source/PokemonSV/Programs/PokemonSV_GameEntry.cpp \
     Source/PokemonSV/Programs/PokemonSV_Navigation.cpp \
     Source/PokemonSV/Programs/PokemonSV_SaveGame.cpp \
+    Source/PokemonSV/Programs/Sandwiches/PokemonSV_IngredientSession.cpp \
     Source/PokemonSV/Programs/Sandwiches/PokemonSV_SandwichRoutines.cpp \
     Source/PokemonSV/Programs/ShinyHunting/PokemonSV_AreaZeroPlatform.cpp \
     Source/PokemonSV/Programs/ShinyHunting/PokemonSV_LetsGoTools.cpp \
@@ -711,11 +712,11 @@ SOURCES += \
     Source/PokemonSV/Programs/Trading/PokemonSV_SelfBoxTrade.cpp \
     Source/PokemonSV/Programs/Trading/PokemonSV_TradeRoutines.cpp \
     Source/PokemonSV/Resources/PokemonSV_AuctionItemNames.cpp \
+    Source/PokemonSV/Resources/PokemonSV_Ingredients.cpp \
     Source/PokemonSV/Resources/PokemonSV_ItemSprites.cpp \
     Source/PokemonSV/Resources/PokemonSV_NameDatabase.cpp \
     Source/PokemonSV/Resources/PokemonSV_PokemonSprites.cpp \
     Source/PokemonSV/Resources/PokemonSV_TournamentPrizeNames.cpp \
-    Source/PokemonSV/Resources/PokemonSV_SandwichSprites.cpp \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.cpp \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.cpp \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DaySkippers.cpp \
@@ -1703,6 +1704,7 @@ HEADERS += \
     Source/PokemonSV/Programs/PokemonSV_GameEntry.h \
     Source/PokemonSV/Programs/PokemonSV_Navigation.h \
     Source/PokemonSV/Programs/PokemonSV_SaveGame.h \
+    Source/PokemonSV/Programs/Sandwiches/PokemonSV_IngredientSession.h \
     Source/PokemonSV/Programs/Sandwiches/PokemonSV_SandwichRoutines.h \
     Source/PokemonSV/Programs/ShinyHunting/PokemonSV_AreaZeroPlatform.h \
     Source/PokemonSV/Programs/ShinyHunting/PokemonSV_LetsGoTools.h \
@@ -1719,11 +1721,11 @@ HEADERS += \
     Source/PokemonSV/Programs/Trading/PokemonSV_SelfBoxTrade.h \
     Source/PokemonSV/Programs/Trading/PokemonSV_TradeRoutines.h \
     Source/PokemonSV/Resources/PokemonSV_AuctionItemNames.h \
+    Source/PokemonSV/Resources/PokemonSV_Ingredients.h \
     Source/PokemonSV/Resources/PokemonSV_ItemSprites.h \
     Source/PokemonSV/Resources/PokemonSV_NameDatabase.h \
     Source/PokemonSV/Resources/PokemonSV_PokemonSprites.h \
     Source/PokemonSV/Resources/PokemonSV_TournamentPrizeNames.h \
-    Source/PokemonSV/Resources/PokemonSV_SandwichSprites.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DaySkippers.h \

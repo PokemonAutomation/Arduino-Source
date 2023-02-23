@@ -12,7 +12,7 @@
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/OCR/OCR_Routines.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "PokemonSV/Resources/PokemonSV_SandwichSprites.h"
+#include "PokemonSV/Resources/PokemonSV_Ingredients.h"
 #include "PokemonSV_SandwichIngredientDetector.h"
 
 // #include <iostream>
@@ -158,7 +158,7 @@ bool SandwichPicksPageDetector::detect(const ImageViewRGB32& screen) const{
 
 ImageMatch::SilhouetteDictionaryMatcher make_SANDWICH_FILLING_MATCHER(){
     ImageMatch::SilhouetteDictionaryMatcher matcher;
-    for (const auto& item : ALL_SANDWICH_FILLINGS()){
+    for (const auto& item : SANDWICH_FILLING_DATABASE()){
         matcher.add(item.first, item.second.icon.copy());
     }
     return matcher;
@@ -170,7 +170,7 @@ const ImageMatch::SilhouetteDictionaryMatcher& SANDWICH_FILLING_MATCHER(){
 
 ImageMatch::SilhouetteDictionaryMatcher make_SANDWICH_CONDIMENT_MATCHER(){
     ImageMatch::SilhouetteDictionaryMatcher matcher;
-    for (const auto& item : ALL_SANDWICH_CONDIMENTS()) {
+    for (const auto& item : SANDWICH_CONDIMENTS_DATABASE()) {
         matcher.add(item.first, item.second.icon.copy());
     }
     return matcher;

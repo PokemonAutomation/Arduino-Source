@@ -1428,6 +1428,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Programs/Trading/PokemonSV_TradeRoutines.h
     Source/PokemonSV/Resources/PokemonSV_AuctionItemNames.cpp
     Source/PokemonSV/Resources/PokemonSV_AuctionItemNames.h
+    Source/PokemonSV/Resources/PokemonSV_Ingredients.cpp
+    Source/PokemonSV/Resources/PokemonSV_Ingredients.h
     Source/PokemonSV/Resources/PokemonSV_ItemSprites.cpp
     Source/PokemonSV/Resources/PokemonSV_ItemSprites.h
     Source/PokemonSV/Resources/PokemonSV_NameDatabase.cpp
@@ -1436,8 +1438,6 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Resources/PokemonSV_PokemonSprites.h
     Source/PokemonSV/Resources/PokemonSV_TournamentPrizeNames.cpp
     Source/PokemonSV/Resources/PokemonSV_TournamentPrizeNames.h
-    Source/PokemonSV/Resources/PokemonSV_SandwichSprites.cpp
-    Source/PokemonSV/Resources/PokemonSV_SandwichSprites.h
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.cpp
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.h
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.cpp

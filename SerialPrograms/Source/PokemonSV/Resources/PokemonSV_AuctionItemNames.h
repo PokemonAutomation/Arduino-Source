@@ -10,14 +10,14 @@
 #include <string>
 #include <vector>
 
-namespace PokemonAutomation {
-namespace NintendoSwitch {
-namespace PokemonSV {
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace PokemonSV{
 
 
-class AuctionItemNames {
+class AuctionItemNames{
 public:
-    const std::string& display_name() const { return m_display_name; }
+    const std::string& display_name() const{ return m_display_name; }
 
 private:
     friend struct AuctionItemNameDatabase;

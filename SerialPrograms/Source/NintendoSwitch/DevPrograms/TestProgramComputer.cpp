@@ -110,6 +110,7 @@
 #include "Pokemon/Resources/Pokemon_PokemonNames.h"
 #include "CommonFramework/OCR/OCR_NumberReader.h"
 #include "CommonFramework/ImageTools/ImageManip.h"
+#include "PokemonSV/Resources/PokemonSV_Ingredients.h"
 
 #ifdef PA_ARCH_x86
 //#include "Kernels/Kernels_x64_SSE41.h"
@@ -195,6 +196,9 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 //    using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
 
 
+    cout << get_ingredient_name("green-bell-pepper").display_name() << endl;
+
+#if 0
     ImageFloatBox ore_quantity(0.945, 0.010, 0.0525, 0.050);
 
     ImageRGB32 image("screenshot-20230220-232711115537.png");
@@ -208,7 +212,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     filtered.save("test.png");
 
     OCR::read_number(env.logger(), filtered);
-
+#endif
 
 //    throw OperationFailedException(env.logger(), "asdf");
 //    throw OperationFailedException(env.logger(), "asdf", std::make_shared<ImageRGB32>("20221118-024539201323.jpg"));

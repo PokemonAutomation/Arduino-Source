@@ -97,6 +97,7 @@
 #include "PokemonSV/Inference/Battles/PokemonSV_TeraBattleMenus.h"
 #include "PokemonSV/Inference/Picnics/PokemonSV_SandwichIngredientDetector.h"
 #include "PokemonSV/Programs/Sandwiches/PokemonSV_IngredientSession.h"
+#include "PokemonSV/Resources/PokemonSV_Ingredients.h"
 
 
 #include <QPixmap>
@@ -179,8 +180,6 @@ using namespace PokemonSV;
 
 
 
-
-
 void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
     using namespace Kernels;
     using namespace Kernels::Waterfill;
@@ -201,18 +200,48 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
+    add_sandwich_ingredients(
+        env.inference_dispatcher(), console, context, Language::English,
+        {
+            {"pickle", 1},
+            {"cucumber", 1},
+            {"tomato", 3},
+        },
+        {
+            {"sour-herba-mystica", 1},
+            {"spicy-herba-mystica", 1},
+        }
+    );
+
+
+
+#if 0
     IngredientSession session(env.inference_dispatcher(), console, context, Language::English);
 //    basic_catcher(console, context, Language::English, "poke-ball", true);
 
 
-#if 1
+#if 0
     PageIngredients page = session.read_current_page();
     for (size_t c = 0; c < 10; c++){
         cout << set_to_str(page.item[c]) << endl;
     }
 #endif
 
-    cout << "Found: " << session.move_to_ingredient({"tomato"}) << endl;
+//    cout << "Found: " << session.move_to_ingredient({"tomato"}) << endl;
+    session.add_ingredients(console, context, {
+        {"pickle", 1},
+        {"cucumber", 1},
+        {"tomato", 3},
+    });
+    pbf_press_button(context, BUTTON_PLUS, 20, 230);
+
+    pbf_press_dpad(context, DPAD_UP, 20, 105);
+    session.add_ingredients(console, context, {
+        {"sour-herba-mystica", 1},
+        {"spicy-herba-mystica", 1},
+    });
+    pbf_press_button(context, BUTTON_PLUS, 20, 230);
+#endif
 
 
 #if 0
