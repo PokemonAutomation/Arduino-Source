@@ -170,6 +170,7 @@ std::string IngredientSession::move_to_ingredient(const std::set<std::string>& i
         return "";
     }
 
+    size_t not_found_count = 0;
     while (true){
         m_context.wait_for_all_requests();
         PageIngredients page = read_current_page();
@@ -185,8 +186,14 @@ std::string IngredientSession::move_to_ingredient(const std::set<std::string>& i
 
         size_t current = page.selected;
         if (current == INGREDIENT_PAGE_LINES - 1){
-            m_console.log("Ingredient not found anywhere.", COLOR_RED);
-            return "";
+            not_found_count++;
+            if (not_found_count >= 2){
+                m_console.log("Ingredient not found anywhere.", COLOR_RED);
+                return "";
+            }else{
+                m_console.log("End of page reached without finding ingredient. Wrapping back to beginning.", COLOR_ORANGE);
+                pbf_press_dpad(m_context, DPAD_DOWN, 20, 105);
+            }
         }
 
         m_console.log("Ingredient not found on current page. Scrolling down.", COLOR_ORANGE);
