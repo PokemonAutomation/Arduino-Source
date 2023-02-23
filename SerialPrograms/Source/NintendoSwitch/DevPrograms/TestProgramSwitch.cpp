@@ -11,6 +11,7 @@
 #include <QClipboard>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PrettyPrint.h"
+#include "Common/Cpp/Containers/FixedLimitVector.tpp"
 #include "Common/Cpp/Concurrency/AsyncDispatcher.h"
 #include "Common/Cpp/Concurrency/PeriodicScheduler.h"
 #include "ClientSource/Connection/BotBase.h"
@@ -94,6 +95,8 @@
 #include "PokemonSV/Programs/PokemonSV_SaveGame.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_NormalBattleMenus.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_TeraBattleMenus.h"
+#include "PokemonSV/Inference/Picnics/PokemonSV_SandwichIngredientDetector.h"
+#include "PokemonSV/Programs/Sandwiches/PokemonSV_IngredientSession.h"
 
 
 #include <QPixmap>
@@ -173,6 +176,11 @@ using namespace PokemonSV;
 
 
 
+
+
+
+
+
 void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
     using namespace Kernels;
     using namespace Kernels::Waterfill;
@@ -193,7 +201,18 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
-    basic_catcher(console, context, Language::English, "poke-ball", true);
+    IngredientSession session(env.inference_dispatcher(), console, context, Language::English);
+//    basic_catcher(console, context, Language::English, "poke-ball", true);
+
+
+#if 1
+    PageIngredients page = session.read_current_page();
+    for (size_t c = 0; c < 10; c++){
+        cout << set_to_str(page.item[c]) << endl;
+    }
+#endif
+
+    cout << "Found: " << session.move_to_ingredient({"tomato"}) << endl;
 
 
 #if 0

@@ -241,9 +241,6 @@ void SandwichIngredientReader::make_overlays(VideoOverlaySet& items) const{
 }
 
 ImageMatch::ImageMatchResult SandwichIngredientReader::read_with_icon_matcher(const ImageViewRGB32& screen) const{
-    static constexpr double MAX_ALPHA = 350;
-    static constexpr double ALPHA_SPREAD = 20;
-
     // Get a crop of the sandwich ingredient icon
     ImageViewRGB32 image = extract_box_reference(screen, m_icon_box);
     //image.save("image.png");

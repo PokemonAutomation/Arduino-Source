@@ -119,7 +119,7 @@ public:
 class SandwichFillingOCR : public OCR::SmallDictionaryMatcher {
 public:
     static constexpr double MAX_LOG10P = -2.0;
-    static constexpr double MAX_LOG10P_SPREAD = 4.0;
+    static constexpr double MAX_LOG10P_SPREAD = 0.5;
 
 public:
     static const SandwichFillingOCR& instance();
@@ -138,7 +138,7 @@ private:
 class SandwichCondimentOCR : public OCR::SmallDictionaryMatcher {
 public:
     static constexpr double MAX_LOG10P = -2.0;
-    static constexpr double MAX_LOG10P_SPREAD = 4.0;
+    static constexpr double MAX_LOG10P_SPREAD = 0.5;
 
 public:
     static const SandwichCondimentOCR& instance();
@@ -156,6 +156,11 @@ private:
 };
 
 class SandwichIngredientReader{
+public:
+    static constexpr double MAX_ALPHA = 350;
+    static constexpr double ALPHA_SPREAD = 20;
+
+
 public:
     SandwichIngredientReader(SandwichIngredientType ingredient_type, size_t index, Color color = COLOR_RED);
 
