@@ -50,18 +50,19 @@ int read_number(Logger& logger, const ImageViewRGB32& image){
         has_digit = true;
     }
 
-    if (!has_digit){
-        return -1;
-    }
-
-    int number = std::atoi(normalized.c_str());
-
     std::string str;
     for (char ch : ocr_text){
         if (ch != '\r' && ch != '\n'){
             str += ch;
         }
     }
+
+    if (!has_digit){
+        logger.log("OCR Text: \"" + str + "\" -> \"" + normalized + "\" -> Unable to read.", COLOR_RED);
+        return -1;
+    }
+
+    int number = std::atoi(normalized.c_str());
     logger.log("OCR Text: \"" + str + "\" -> \"" + normalized + "\" -> " + std::to_string(number));
 
     return number;
