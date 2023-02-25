@@ -10,12 +10,13 @@
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
+//#include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Tools/VideoResolutionCheck.h"
-#include "CommonFramework/OCR/OCR_MoneyReader.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
-#include "PokemonSV/PokemonSV_Settings.h"
+//#include "PokemonSV/PokemonSV_Settings.h"
+#include "PokemonSV/Inference/PokemonSV_MoneyReader.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_NormalBattleMenus.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
@@ -24,7 +25,6 @@
 #include "PokemonSV/Inference/PokemonSV_TournamentPrizeNameReader.h"
 #include "PokemonSV/Resources/PokemonSV_TournamentPrizeNames.h"
 #include "PokemonSV_TournamentFarmer.h"
-#include "CommonFramework/Tools/ErrorDumper.h"
 
 namespace PokemonAutomation {
 namespace NintendoSwitch {

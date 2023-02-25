@@ -429,8 +429,6 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/OCR/OCR_DictionaryOCR.h
     Source/CommonFramework/OCR/OCR_LargeDictionaryMatcher.cpp
     Source/CommonFramework/OCR/OCR_LargeDictionaryMatcher.h
-    Source/CommonFramework/OCR/OCR_MoneyReader.cpp
-    Source/CommonFramework/OCR/OCR_MoneyReader.h
     Source/CommonFramework/OCR/OCR_NumberReader.cpp
     Source/CommonFramework/OCR/OCR_NumberReader.h
     Source/CommonFramework/OCR/OCR_RawOCR.cpp
@@ -1292,6 +1290,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Inference/PokemonSV_MainMenuDetector.h
     Source/PokemonSV/Inference/PokemonSV_MapDetector.cpp
     Source/PokemonSV/Inference/PokemonSV_MapDetector.h
+    Source/PokemonSV/Inference/PokemonSV_MoneyReader.cpp
+    Source/PokemonSV/Inference/PokemonSV_MoneyReader.h
     Source/PokemonSV/Inference/PokemonSV_PokemonSummaryReader.cpp
     Source/PokemonSV/Inference/PokemonSV_PokemonSummaryReader.h
     Source/PokemonSV/Inference/PokemonSV_PokePortalDetector.cpp

@@ -1,17 +1,18 @@
-/*  OCR Money Reader
+/*  Money Reader
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
  */
 
+#include <regex>
+#include "Common/Cpp/AbstractLogger.h"
 #include "CommonFramework/Language.h"
-#include "OCR_RawOCR.h"
-#include "OCR_MoneyReader.h"
+#include "CommonFramework/OCR/OCR_RawOCR.h"
+#include "PokemonSV_MoneyReader.h"
 
 //#include <iostream>
 //using std::cout;
 //using std::endl;
-#include <regex>
 
 namespace PokemonAutomation{
 namespace OCR{

@@ -1,15 +1,14 @@
-/*  OCR Money Reader
+/*  Money Reader
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
  */
 
-#ifndef PokemonAutomation_OCR_MoneyReader_H
-#define PokemonAutomation_OCR_MoneyReader_H
-
-#include "CommonFramework/Logging/Logger.h"
+#ifndef PokemonAutomation_PokemonSV_MoneyReader_H
+#define PokemonAutomation_PokemonSV_MoneyReader_H
 
 namespace PokemonAutomation{
+    class Logger;
     class ImageViewRGB32;
 namespace OCR{
 
