@@ -15,6 +15,10 @@
 #include "PokemonSV/Inference/Battles/PokemonSV_NormalBattleMenus.h"
 #include "PokemonSV_BasicCatcher.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
@@ -142,7 +146,10 @@ CatchResults basic_catcher(
             WallClock now = current_time();
             WallClock previous = last_battle_menu;
             last_battle_menu = now;
-            if (last_state == 0 && !last_move_attack && now < previous + std::chrono::seconds(5)){
+//            cout << "last_state = " << last_state << endl;
+//            cout << "last_move_attack = " << last_move_attack << endl;
+//            cout << "last_move_attack = " << std::chrono::duration_cast<std::chrono::milliseconds>(now - previous).count() << endl;
+            if (last_state == 0 && !last_move_attack && now < previous + std::chrono::seconds(8)){
                 if (!use_first_move_if_cant_throw){
                     console.log("BasicCatcher: Unable to throw ball.", COLOR_RED);
                     return {CatchResult::CANNOT_THROW_BALL, balls_used};

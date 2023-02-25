@@ -200,6 +200,11 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
+    basic_catcher(console, context, Language::English, "beast-ball", true);
+
+
+
+#if 0
     add_sandwich_ingredients(
         env.inference_dispatcher(), console, context, Language::English,
         {
@@ -212,7 +217,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
             {"spicy-herba-mystica", 1},
         }
     );
-
+#endif
 
 
 #if 0
