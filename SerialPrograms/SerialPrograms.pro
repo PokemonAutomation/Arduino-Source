@@ -10,6 +10,7 @@ INCLUDEPATH += ../../Internal/
 INCLUDEPATH += Source/
 INCLUDEPATH += ../3rdParty/
 RESOURCES += ../3rdParty/qdarkstyle/dark/darkstyle.qrc
+RC_FILE = ../IconResource/IconResource.rc
 
 CONFIG += force_debug_info
 
@@ -912,7 +913,7 @@ SOURCES += \
     Source/Tests/PokemonSV_Tests.cpp \
     Source/Tests/PokemonSwSh_Tests.cpp \
     Source/Tests/TestMap.cpp \
-    Source/Tests/TestUtils.cpp
+    Source/Tests/TestUtils.cpp \
 
 HEADERS += \
     ../3rdParty/QtWavFile/WavFile.h \
