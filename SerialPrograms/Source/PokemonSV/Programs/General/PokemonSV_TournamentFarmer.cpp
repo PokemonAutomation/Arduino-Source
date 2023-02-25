@@ -449,8 +449,11 @@ void TournamentFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseConte
         pbf_press_button(context, BUTTON_A, 10, 50);
         pbf_press_button(context, BUTTON_A, 10, 50);
         int ret = wait_until(env.console, context, Milliseconds(7000), { advance_detector });
-        if (ret < 0) {
+        if (ret == 0) {
             env.log("Dialog detected.");
+        }
+        else {
+            env.log("Dialog not detected.");
         }
         pbf_mash_button(context, BUTTON_A, 400);
         context.wait_for_all_requests();
