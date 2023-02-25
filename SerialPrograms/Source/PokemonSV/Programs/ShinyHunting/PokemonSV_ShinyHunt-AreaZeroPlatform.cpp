@@ -88,8 +88,8 @@ ShinyHuntAreaZeroPlatform::ShinyHuntAreaZeroPlatform()
     , MODE(
         "<b>Mode:</b><br>"
         "If starting on the platform, you should stand near the center of the platform facing any direction.<br>"
-        "If starting in the Zero Gate, you should be just inside the building as if you just entered.<br>"
-//        "If making a sandwich, you should be at the Zero Gate fly spot as if you just flew there."
+        "If starting in the Zero Gate, you should be just inside the building as if you just entered."
+//        "<br>If making a sandwich, you should be at the Zero Gate fly spot as if you just flew there."
         ,
         {
             {Mode::START_ON_PLATFORM,   "platform", "Start on platform."},
@@ -128,19 +128,15 @@ ShinyHuntAreaZeroPlatform::ShinyHuntAreaZeroPlatform()
     })
 {
     PA_ADD_OPTION(LANGUAGE);
+    PA_ADD_OPTION(MODE);
     if (PreloadSettings::instance().DEVELOPER_MODE){
-        PA_ADD_OPTION(MODE);
         PA_ADD_OPTION(PATH0);
     }
-    if (PreloadSettings::instance().DEVELOPER_MODE){
-        PA_ADD_OPTION(ENCOUNTER_BOT_OPTIONS);
-    }
+    PA_ADD_OPTION(ENCOUNTER_BOT_OPTIONS);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(AUTO_HEAL_PERCENT);
-    if (PreloadSettings::instance().DEVELOPER_MODE){
-        PA_ADD_OPTION(PLATFORM_RESET);
-        PA_ADD_OPTION(NAVIGATE_TO_PLATFORM);
-    }
+    PA_ADD_OPTION(PLATFORM_RESET);
+    PA_ADD_OPTION(NAVIGATE_TO_PLATFORM);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 

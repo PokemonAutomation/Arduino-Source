@@ -107,6 +107,7 @@ CatchResults basic_catcher(
 
     bool caught = false;
     bool overworld_seen = false;
+    bool last_move_attack = false;
     int last_state = -1;
     WallClock last_battle_menu = WallClock::min();
     while (true){
@@ -137,10 +138,11 @@ CatchResults basic_catcher(
                 console.log("Detected battle after overworld. Did you get chain attacked?", COLOR_RED);
                 return CatchResults{CatchResult::POKEMON_FAINTED, balls_used};
             }
+
             WallClock now = current_time();
             WallClock previous = last_battle_menu;
             last_battle_menu = now;
-            if (last_state == 0 && now < previous + std::chrono::seconds(5)){
+            if (last_state == 0 && !last_move_attack && now < previous + std::chrono::seconds(5)){
                 if (!use_first_move_if_cant_throw){
                     console.log("BasicCatcher: Unable to throw ball.", COLOR_RED);
                     return {CatchResult::CANNOT_THROW_BALL, balls_used};
@@ -150,8 +152,11 @@ CatchResults basic_catcher(
                 battle_menu.move_to_slot(console, context, 0);
                 pbf_mash_button(context, BUTTON_A, 3 * TICKS_PER_SECOND);
                 pbf_mash_button(context, BUTTON_B, 3 * TICKS_PER_SECOND);
+                last_move_attack = true;
                 break;
             }
+
+            last_move_attack = false;
             pbf_press_button(context, BUTTON_X, 20, 105);
             context.wait_for_all_requests();
             BattleBallReader reader(console, language, COLOR_RED);
