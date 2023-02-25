@@ -5,13 +5,17 @@
  */
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
+#include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Tools/VideoResolutionCheck.h"
+#include "CommonFramework/OCR/OCR_MoneyReader.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
+#include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_NormalBattleMenus.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
@@ -20,6 +24,7 @@
 #include "PokemonSV/Inference/PokemonSV_TournamentPrizeNameReader.h"
 #include "PokemonSV/Resources/PokemonSV_TournamentPrizeNames.h"
 #include "PokemonSV_TournamentFarmer.h"
+#include "CommonFramework/Tools/ErrorDumper.h"
 
 namespace PokemonAutomation {
 namespace NintendoSwitch {
@@ -44,18 +49,21 @@ struct TournamentFarmer_Descriptor::Stats : public StatsTracker {
         : tournaments(m_stats["Tournaments won"])
         , battles(m_stats["Battles fought"])
         , losses(m_stats["Losses"])
+        , money(m_stats["Money made"])
         , matches(m_stats["Items matched"])
         , errors(m_stats["Errors"])
     {
         m_display_order.emplace_back("Tournaments won");
         m_display_order.emplace_back("Battles fought");
         m_display_order.emplace_back("Losses");
+        m_display_order.emplace_back("Money made");
         m_display_order.emplace_back("Items matched");
         m_display_order.emplace_back("Errors", true);
     }
     std::atomic<uint64_t>& tournaments;
     std::atomic<uint64_t>& battles;
     std::atomic<uint64_t>& losses;
+    std::atomic<uint64_t>& money;
     std::atomic<uint64_t>& matches;
     std::atomic<uint64_t>& errors;
 };
@@ -79,6 +87,11 @@ TournamentFarmer::TournamentFarmer()
           LockWhileRunning::UNLOCKED,
           0, 0
           )
+    , MONEY_LIMIT(
+        "<b>Stop after earning this amount of money:</b><br>Zero disables this check. Does not count losses. Max is 999,999,999.",
+        LockWhileRunning::UNLOCKED,
+        999999999, 0, 999999999
+    )
     , GO_HOME_WHEN_DONE(false)
     , LANGUAGE(
           "<b>Game Language:</b><br>The language is needed to read the prizes.",
@@ -99,10 +112,74 @@ TournamentFarmer::TournamentFarmer()
     PA_ADD_OPTION(NUM_ROUNDS);
     PA_ADD_OPTION(TRY_TO_TERASTILLIZE);
     PA_ADD_OPTION(SAVE_NUM_ROUNDS);
+    PA_ADD_OPTION(MONEY_LIMIT);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(TARGET_ITEMS);
     PA_ADD_OPTION(NOTIFICATIONS);
+}
+
+//Check and process the amount of money earned at the end of a battle
+void TournamentFarmer::check_money(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
+    TournamentFarmer_Descriptor::Stats& stats = env.current_stats<TournamentFarmer_Descriptor::Stats>();
+
+    int top_money = -1;
+    int bottom_money = -1;
+
+    //There must be a value for top money
+    //Bottom money only appear after 1st battle and should clear out
+    for (uint16_t c = 0; c < 3 && top_money == -1; c++) {
+        VideoSnapshot screen = env.console.video().snapshot();
+        ImageFloatBox top_notif(0.745, 0.152, 0.206, 0.083);
+        ImageFloatBox bottom_notif(0.745, 0.261, 0.220, 0.083);
+
+        ImageRGB32 image_top = to_blackwhite_rgb32_range(
+            extract_box_reference(screen, top_notif),
+            combine_rgb(215, 215, 215), combine_rgb(255, 255, 255), true
+        );
+        //image_top.save("./image_top.png");
+
+        //Different color range on the bottom notif ~B0B5B8
+        ImageRGB32 image_bottom = to_blackwhite_rgb32_range(
+            extract_box_reference(screen, bottom_notif),
+            combine_rgb(130, 130, 130), combine_rgb(240, 240, 240), true
+        );
+        //image_bottom.save("./image_bottom.png");
+        
+        top_money = OCR::read_money(env.console, image_top);
+        bottom_money = OCR::read_money(env.console, image_bottom);
+
+        //dump_image(
+        //    env.console, env.program_info(),
+        //    "battledone",
+        //    screen
+        //);
+
+        //Filter out low and high numbers in case of misreads
+        //From bulbapedia: Nemona is lowest at 8640,  Penny and Geeta are highest at 16800
+        //Max earnings? in one battle: amulet coin * (base winnings + (8 * make it rain lv100))
+        if (top_money < 8000 || top_money > 50000 ) {
+            top_money = -1;
+        }
+        if (bottom_money < 8000 || bottom_money > 50000) {
+            bottom_money = -1;
+        }
+    }
+
+    if (top_money != -1) {
+        //If both notification boxes appear take the newer one.
+        if (bottom_money != -1) {
+            stats.money += bottom_money;
+            env.update_stats();
+        } else {
+            stats.money += top_money;
+            env.update_stats();
+        }
+    }
+    else {
+        env.log("Unable to read money.");
+    }
+
 }
 
 
@@ -169,7 +246,14 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, BotBaseCo
         env.update_stats();
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
 
-        //Clear remaining dialog
+        //Close dialog and then check money
+        pbf_press_button(context, BUTTON_B, 10, 50);
+        pbf_wait(context, 100);
+        context.wait_for_all_requests();
+
+        check_money(env, context);
+
+        //Clear any remaining dialog
         pbf_mash_button(context, BUTTON_B, 300);
         context.wait_for_all_requests();
     } else {
@@ -351,9 +435,9 @@ void TournamentFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseConte
     Sylveon only farming build - ideally with fairy tera
     stand in front of tournament entry man
     Ride legendary is not the solo pokemon (in case of loss)
+    Do not have other notifications on screen for money reading (ex. new outbreak)
 
     Possible improvements to make:
-    money tracking? notifs tend to backlog.
     find prize sprites - some code is there, just disabled
     find translations for tera shards
     other languages: make sure "bottle cap" isn't misread as "bottle of PP Up"
@@ -365,8 +449,11 @@ void TournamentFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseConte
         pbf_press_button(context, BUTTON_A, 10, 50);
         pbf_press_button(context, BUTTON_A, 10, 50);
         int ret = wait_until(env.console, context, Milliseconds(7000), { advance_detector });
-        if (ret < 0) {
+        if (ret == 0) {
             env.log("Dialog detected.");
+        }
+        else {
+            env.log("Dialog not detected.");
         }
         pbf_mash_button(context, BUTTON_A, 400);
         context.wait_for_all_requests();
@@ -434,6 +521,13 @@ void TournamentFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseConte
         if (num_rounds_temp != 0 && ((c + 1) % num_rounds_temp) == 0) {
             env.log("Saving game.");
             save_game_from_overworld(env.program_info(), env.console, context);
+        }
+
+        //Break loop and finish program if money limit is hit
+        uint32_t earnings_temp = MONEY_LIMIT;
+        if (earnings_temp != 0 && stats.money >= earnings_temp) {
+            env.log("Money limit hit. Ending program.");
+            break;
         }
     }
 

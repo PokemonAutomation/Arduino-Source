@@ -35,6 +35,7 @@ private:
     SimpleIntegerOption<uint32_t> NUM_ROUNDS;
     BooleanCheckBoxOption TRY_TO_TERASTILLIZE;
     SimpleIntegerOption<uint16_t> SAVE_NUM_ROUNDS;
+    SimpleIntegerOption<uint32_t> MONEY_LIMIT;
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
     OCR::LanguageOCROption LANGUAGE;
     TournamentPrizeTable TARGET_ITEMS;
@@ -42,6 +43,7 @@ private:
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;
 
+    void check_money(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
     void run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
     void check_prize(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
     void handle_end_of_tournament(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
