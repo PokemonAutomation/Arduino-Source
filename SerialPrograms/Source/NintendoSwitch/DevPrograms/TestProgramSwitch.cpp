@@ -98,6 +98,7 @@
 #include "PokemonSV/Inference/Picnics/PokemonSV_SandwichIngredientDetector.h"
 #include "PokemonSV/Programs/Sandwiches/PokemonSV_IngredientSession.h"
 #include "PokemonSV/Resources/PokemonSV_Ingredients.h"
+#include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleBallReader.h"
 
 
 #include <QPixmap>
@@ -200,7 +201,15 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
-    basic_catcher(console, context, Language::English, "beast-ball", true);
+
+    ImageRGB32 image("20230226-041737392940-BattleBallReader-Sprite.png");
+
+    NintendoSwitch::PokemonSwSh::BattleBallReader reader(console, Language::English);
+    reader.read_ball(image);
+
+
+
+//    basic_catcher(console, context, Language::English, "beast-ball", true);
 
 
 

@@ -196,7 +196,9 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 //    using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
 
 
-    cout << get_ingredient_name("green-bell-pepper").display_name() << endl;
+
+
+//    cout << get_ingredient_name("green-bell-pepper").display_name() << endl;
 
 #if 0
     ImageFloatBox ore_quantity(0.945, 0.010, 0.0525, 0.050);

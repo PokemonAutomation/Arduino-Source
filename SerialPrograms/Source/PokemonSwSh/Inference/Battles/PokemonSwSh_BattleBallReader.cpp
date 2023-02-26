@@ -8,7 +8,7 @@
 #include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
 #include "CommonFramework/OCR/OCR_NumberReader.h"
-#include "CommonFramework/OCR/OCR_StringNormalization.h"
+//#include "CommonFramework/OCR/OCR_StringNormalization.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "PokemonSwSh/Resources/PokemonSwSh_PokeballSprites.h"
 #include "PokemonSwSh_BattleBallReader.h"
@@ -18,7 +18,7 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-const double BattleBallReader::MAX_ALPHA = 0.25;
+const double BattleBallReader::MAX_ALPHA = 0.28;
 const double BattleBallReader::ALPHA_SPREAD = 0.02;
 
 
