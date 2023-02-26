@@ -17,7 +17,7 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 
-const std::vector<std::string>& ALL_SANDWICH_FILLING_SLUGS();
+const std::vector<std::string>& ALL_SANDWICH_FILLINGS_SLUGS();
 const std::vector<std::string>& ALL_SANDWICH_CONDIMENTS_SLUGS();
 
 class SandwichIngredientNames{
@@ -36,7 +36,7 @@ const std::string& parse_ingredient_name(const std::string& display_name);
 
 
 
-const SpriteDatabase& SANDWICH_FILLING_DATABASE();
+const SpriteDatabase& SANDWICH_FILLINGS_DATABASE();
 const SpriteDatabase& SANDWICH_CONDIMENTS_DATABASE();
 
 
