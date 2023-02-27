@@ -9,9 +9,9 @@
 #include "ImageDiff.h"
 #include "ExactImageMatcher.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace ImageMatch{
@@ -34,10 +34,11 @@ ImageRGB32 ExactImageMatcher::scale_template_brightness(const ImageViewRGB32& im
     if (std::isnan(scale.r)) scale.r = 1.0;
     if (std::isnan(scale.g)) scale.g = 1.0;
     if (std::isnan(scale.b)) scale.b = 1.0;
-    scale.bound(0.8, 1.2);
+    scale.bound(0.85, 1.15);
 
     ImageRGB32 ret = m_image.copy();
     scale_brightness(ret, scale);
+//    ret.save("test.png");
     return ret;
 }
 
@@ -71,6 +72,14 @@ double ExactImageMatcher::rmsd(const ImageViewRGB32& image, Color background) co
     }
     ImageRGB32 scaled = image.scale_to(m_image.width(), m_image.height());
     ImageRGB32 reference = scale_template_brightness(scaled);
+
+#if 0
+    static int c = 0;
+    scaled.save("test-" + std::to_string(c) + "-image.png");
+    reference.save("test-" + std::to_string(c) + "-sprite.png");
+    c++;
+#endif
+
     return pixel_RMSD(reference, scaled, background);
 }
 double ExactImageMatcher::rmsd_masked(const ImageViewRGB32& image) const{

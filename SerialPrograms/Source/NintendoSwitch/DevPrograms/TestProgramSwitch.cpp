@@ -99,6 +99,7 @@
 #include "PokemonSV/Programs/Sandwiches/PokemonSV_IngredientSession.h"
 #include "PokemonSV/Resources/PokemonSV_Ingredients.h"
 #include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleBallReader.h"
+#include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PathSelect.h"
 
 
 #include <QPixmap>
@@ -201,19 +202,28 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
+#if 0
+    ImageRGB32 image("20230226-042613391191-PathPartyReader-ReadSprites.png");
 
-    ImageRGB32 image("20230226-041737392940-BattleBallReader-Sprite.png");
+    PokemonSwSh::MaxLairInternal::GlobalState state;
+    PokemonSwSh::MaxLairInternal::PathReader reader(overlay, 0);
+    reader.read_sprites(logger, state, image);
+#endif
 
-    NintendoSwitch::PokemonSwSh::BattleBallReader reader(console, Language::English);
-    reader.read_ball(image);
+//    NintendoSwitch::PokemonSwSh::BattleBallReader reader(console, Language::English);
+//    reader.read_ball(image);
 
 
 
 //    basic_catcher(console, context, Language::English, "beast-ball", true);
 
+//    VideoSnapshot image = feed.snapshot();
+//    IngredientSession session(env.inference_dispatcher(), console, context, Language::English);
+//    session.read_current_page();
 
 
-#if 0
+
+#if 1
     add_sandwich_ingredients(
         env.inference_dispatcher(), console, context, Language::English,
         {

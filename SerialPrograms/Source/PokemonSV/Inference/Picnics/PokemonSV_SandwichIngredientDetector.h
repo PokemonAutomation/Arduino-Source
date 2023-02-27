@@ -176,8 +176,8 @@ private:
 
 class SandwichIngredientReader{
 public:
-    static constexpr double MAX_ALPHA = 0.60;
-    static constexpr double ALPHA_SPREAD = 0.02;
+    static constexpr double MAX_ALPHA = 0.50;
+    static constexpr double ALPHA_SPREAD = 0.6;
 
 
 public:

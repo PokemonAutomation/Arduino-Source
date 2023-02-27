@@ -18,8 +18,8 @@ namespace ImageMatch{
 
 //  Shrink image so that it perfectly fits the object.
 //  The alpha channel is used to determine what is object vs. background.
-//  background is defined as alpha == 0.
-ImageViewRGB32 trim_image_alpha(const ImageViewRGB32& image);
+//  background is defined as alpha < alpha_threshold.
+ImageViewRGB32 trim_image_alpha(const ImageViewRGB32& image, uint8_t alpha_threshold = 128);
 
 
 //  Filter out object from background.

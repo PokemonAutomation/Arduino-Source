@@ -81,15 +81,7 @@ PageIngredients IngredientSession::read_current_page() const{
         }
     });
 
-#if 0
-    //  Now read the sprite for the selected line.
-    ImageMatch::ImageMatchResult image_result = m_lines[ret.selected].read_with_icon_matcher(snapshot);
-    image_result.clear_beyond_alpha(SandwichIngredientReader::MAX_ALPHA);
-    image_result.clear_beyond_spread(SandwichIngredientReader::ALPHA_SPREAD);
-    image_result.log(m_console, SandwichIngredientReader::MAX_ALPHA);
-#endif
-
-#if 0
+#if 1
     std::set<std::string>& ocr_result = ret.item[ret.selected];
     //  Find the items in common between the two detection methods.
     std::set<std::string> common;

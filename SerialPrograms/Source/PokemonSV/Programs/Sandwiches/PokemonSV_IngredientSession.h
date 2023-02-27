@@ -50,7 +50,7 @@ public:
     ) const;
 
 
-private:
+public:
     PageIngredients read_current_page() const;
     bool run_move_iteration(
         std::string& slug, const std::set<std::string>& ingredients,

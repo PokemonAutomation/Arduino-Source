@@ -15,9 +15,9 @@
 #include "PokemonSV/Resources/PokemonSV_Ingredients.h"
 #include "PokemonSV_SandwichIngredientDetector.h"
 
-// #include <iostream>
-//using std::cout;
-//using std::endl;
+#include <iostream>
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -165,13 +165,15 @@ const SandwichFillingMatcher& SANDWICH_FILLING_MATCHER(){
 }
 SandwichFillingMatcher::SandwichFillingMatcher(double min_euclidean_distance)
     : CroppedImageDictionaryMatcher({1, 128})
-    , m_min_euclidean_distance_squared(min_euclidean_distance* min_euclidean_distance){
+    , m_min_euclidean_distance_squared(min_euclidean_distance * min_euclidean_distance){
     for (const auto& item : SANDWICH_FILLINGS_DATABASE()){
         add(item.first, item.second.sprite);
     }
 }
 ImageRGB32 SandwichFillingMatcher::process_image(const ImageViewRGB32& image, Color& background) const{
     ImageStats border = image_border_stats(image);
+//    cout << "border = " << border.average << endl;
+//    image.save("image.png");
     ImagePixelBox box = ImageMatch::enclosing_rectangle_with_pixel_filter(
         image,
         [&](Color pixel){
@@ -258,7 +260,7 @@ OCR::StringMatchResult SandwichCondimentOCR::read_substring(
 
 SandwichIngredientReader::SandwichIngredientReader(SandwichIngredientType ingredient_type, size_t index, Color color)
     : m_color(color)
-    , m_icon_box(0.061, 0.179 + 0.074 * index, 0.032, 0.057)
+    , m_icon_box(0.064, 0.179 + 0.074 * index, 0.032, 0.057)
     , m_text_box(0.100, 0.179 + 0.074 * index, 0.273, 0.057)
     , m_ingredient_type(ingredient_type)
 {}
@@ -271,19 +273,21 @@ void SandwichIngredientReader::make_overlays(VideoOverlaySet& items) const{
 ImageMatch::ImageMatchResult SandwichIngredientReader::read_with_icon_matcher(const ImageViewRGB32& screen) const{
     // Get a crop of the sandwich ingredient icon
     ImageViewRGB32 image = extract_box_reference(screen, m_icon_box);
-    //image.save("image.png");
+//    image.save("image.png");
 
-    // Remove the orange / yellow background when the ingredient is selected
-    ImageRGB32 filtered_image = filter_rgb32_range(image, 0xffdfaf00, 0xffffef20, Color(0x00000000), true);
-    //filtered_image.save("filtered_image.png");
+//    // Remove the orange / yellow background when the ingredient is selected
+//    ImageRGB32 filtered_image = filter_rgb32_range(image, 0xffdfaf00, 0xffffef20, Color(0x00000000), true);
+//    filtered_image.save("filtered_image.png");
 
     ImageMatch::ImageMatchResult results;
     switch (m_ingredient_type){
     case SandwichIngredientType::FILLING:
-        results = SANDWICH_FILLING_MATCHER().match(filtered_image, ALPHA_SPREAD);
+//        cout << "Filling" << endl;
+        results = SANDWICH_FILLING_MATCHER().match(image, ALPHA_SPREAD);
         break;
     case SandwichIngredientType::CONDIMENT:
-        results = SANDWICH_CONDIMENT_MATCHER().match(filtered_image, ALPHA_SPREAD);
+//        cout << "Condiment" << endl;
+        results = SANDWICH_CONDIMENT_MATCHER().match(image, ALPHA_SPREAD);
         break;
     }
     results.clear_beyond_alpha(MAX_ALPHA);

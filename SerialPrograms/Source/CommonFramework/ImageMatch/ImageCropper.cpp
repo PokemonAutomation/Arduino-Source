@@ -38,9 +38,9 @@ bool is_background_col(const ImageViewRGB32& image, size_t col, const std::funct
     return true;
 }
 
-ImageViewRGB32 trim_image_alpha(const ImageViewRGB32& image){
-    auto is_foreground = [](Color pixel){
-        return (pixel.alpha()) != 0;
+ImageViewRGB32 trim_image_alpha(const ImageViewRGB32& image, uint8_t alpha_threshold){
+    auto is_foreground = [=](Color pixel){
+        return pixel.alpha() >= alpha_threshold;
     };
     const auto box = enclosing_rectangle_with_pixel_filter(image, is_foreground);
 

@@ -8,12 +8,12 @@
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "ImageCropper.h"
-#include "ImageDiff.h"
+//#include "ImageDiff.h"
 #include "CroppedImageDictionaryMatcher.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace ImageMatch{
@@ -32,10 +32,19 @@ void CroppedImageDictionaryMatcher::add(const std::string& slug, const ImageView
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Duplicate slug: " + slug);
     }
 
+    ImageViewRGB32 cropped = trim_image_alpha(image);
+
+#if 0
+    if (slug == "hamburger"){
+        image.save("matcher-original.png");
+        cropped.save("matcher-cropped.png");
+    }
+#endif
+
     m_database.emplace(
         std::piecewise_construct,
         std::forward_as_tuple(slug),
-        std::forward_as_tuple(trim_image_alpha(image).copy(), m_weight)
+        std::forward_as_tuple(cropped.copy(), m_weight)
     );
 }
 
@@ -54,6 +63,11 @@ ImageMatchResult CroppedImageDictionaryMatcher::match(
     ImageRGB32 processed = process_image(image, background);
 
     for (const auto& item : m_database){
+#if 0
+        if (item.first != "green-bell-pepper" && item.first != "yellow-bell-pepper"){
+            continue;
+        }
+#endif
         double alpha = item.second.diff(processed, background);
         results.add(alpha, item.first);
         results.clear_beyond_spread(alpha_spread);
