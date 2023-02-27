@@ -202,6 +202,11 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
+    MainMenuDetector detector;
+    detector.make_overlays(overlays);
+    detector.move_cursor(env.program_info(), console, context, MenuSide::RIGHT, 6, true);
+
+
 #if 0
     ImageRGB32 image("20230226-042613391191-PathPartyReader-ReadSprites.png");
 
@@ -225,7 +230,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 
 
-#if 1
+#if 0
     add_sandwich_ingredients(
         env.inference_dispatcher(), console, context, Language::English,
         {

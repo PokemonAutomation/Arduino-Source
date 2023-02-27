@@ -57,6 +57,7 @@ protected:
     ImageFloatBox m_bottom;
     GradientArrowDetector m_arrow_left;
     GradientArrowDetector m_arrow_right;
+    GradientArrowDetector m_dlc_icon;
 };
 class MainMenuWatcher : public DetectorToFinder<MainMenuDetector>{
 public:

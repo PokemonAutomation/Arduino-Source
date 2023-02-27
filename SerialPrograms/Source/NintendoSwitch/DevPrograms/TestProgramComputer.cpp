@@ -187,6 +187,41 @@ void print(const Type* ptr, size_t len){
 
 
 
+class NewsDetector : public StaticScreenDetector{
+public:
+    NewsDetector(Color color = COLOR_RED);
+
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+    virtual bool detect(const ImageViewRGB32& screen) const override;
+
+private:
+    Color m_color;
+    ImageFloatBox m_bottom_white;
+    ImageFloatBox m_bottom_buttons;
+};
+NewsDetector::NewsDetector(Color color)
+    : m_color(color)
+    , m_bottom_white(0.15, 0.92, 0.20, 0.06)
+    , m_bottom_buttons(0.40, 0.92, 0.58, 0.06)
+{}
+void NewsDetector::make_overlays(VideoOverlaySet& items) const{
+    items.add(m_color, m_bottom_white);
+    items.add(m_color, m_bottom_buttons);
+}
+bool NewsDetector::detect(const ImageViewRGB32& screen) const{
+    ImageStats bottom_white = image_stats(extract_box_reference(screen, m_bottom_white));
+    if (!is_white(bottom_white)){
+        return false;
+    }
+
+    ImageStats bottom_buttons = image_stats(extract_box_reference(screen, m_bottom_buttons));
+//    cout << bottom_buttons.average << bottom_buttons.stddev << endl;
+    if (bottom_buttons.stddev.sum() < 100){
+        return false;
+    }
+
+    return true;
+}
 
 
 
@@ -197,6 +232,20 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     using namespace Pokemon;
 //    using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
 
+
+
+
+#if 0
+    ImageRGB32 image("screenshot-20230227-103751134685.png");
+
+    NewsDetector detector;
+    cout << detector.detect(image) << endl;
+#endif
+
+
+
+
+#if 0
     ImageRGB32 image("test-0-image.png");
 
     Color background(4294954240);
@@ -212,7 +261,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
         cout << sums.count << endl;
         cout << ImageMatch::pixel_RMSD(sprite, image, background) << endl;
     }
-
+#endif
 
 
 

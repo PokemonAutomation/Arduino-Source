@@ -94,7 +94,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_multi_switch_program<ClipboardFastCodeEntry_Descriptor, ClipboardFastCodeEntry>());
     ret.emplace_back(make_multi_switch_program<VideoFastCodeEntry_Descriptor, VideoFastCodeEntry>());
 
-    if (IS_BETA_VERSION){
+    if (IS_BETA_VERSION || PreloadSettings::instance().DEVELOPER_MODE){
         ret.emplace_back("---- Shiny Hunting ----");
         ret.emplace_back(make_single_switch_program<ShinyHuntAreaZeroPlatform_Descriptor, ShinyHuntAreaZeroPlatform>());
     }

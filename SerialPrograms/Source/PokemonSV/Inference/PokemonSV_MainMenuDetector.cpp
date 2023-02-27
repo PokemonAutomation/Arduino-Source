@@ -26,11 +26,13 @@ MainMenuDetector::MainMenuDetector(Color color)
     , m_bottom(0.10, 0.94, 0.40, 0.05)
     , m_arrow_left(color, GradientArrowType::RIGHT, {0.02, 0.10, 0.05, 0.90})
     , m_arrow_right(color, GradientArrowType::RIGHT, {0.67, 0.20, 0.05, 0.50})
+    , m_dlc_icon(color, GradientArrowType::RIGHT, {0.67, 0.76, 0.05, 0.10})
 {}
 void MainMenuDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_bottom);
     m_arrow_left.make_overlays(items);
     m_arrow_right.make_overlays(items);
+    m_dlc_icon.make_overlays(items);
 }
 bool MainMenuDetector::detect(const ImageViewRGB32& screen) const{
     //  Disambiguate against the Poke Portal.
@@ -45,6 +47,9 @@ bool MainMenuDetector::detect(const ImageViewRGB32& screen) const{
         return true;
     }
     if (m_arrow_right.detect(screen)){
+        return true;
+    }
+    if (m_dlc_icon.detect(screen)){
         return true;
     }
 
@@ -77,6 +82,9 @@ std::pair<MenuSide, int> MainMenuDetector::detect_location(const ImageViewRGB32&
             return {MenuSide::NONE, 0};
         }
         return {MenuSide::RIGHT, slot};
+    }
+    if (m_dlc_icon.detect(screen)){
+        return {MenuSide::RIGHT, 6};
     }
 
     return {MenuSide::NONE, 0};

@@ -151,7 +151,7 @@ void connect_to_internet_from_overworld(const ProgramInfo& info, ConsoleHandle& 
         int ret = wait_until(
             console, context,
             std::chrono::seconds(60),
-            {overworld, main_menu, dialog, prompt}
+            {overworld, main_menu, dialog, prompt, news}
         );
         context.wait_for(std::chrono::milliseconds(100));
         switch (ret){
