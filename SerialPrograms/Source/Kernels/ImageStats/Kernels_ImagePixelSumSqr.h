@@ -25,6 +25,8 @@ struct PixelSums{
 };
 
 
+//  Alpha on "image" is ignored. All pixels are considered active.
+//  Pixels on "alpha" are considered active if the alpha is >= 128.
 void pixel_sum_sqr(
     PixelSums& sums,
     size_t width, size_t height,

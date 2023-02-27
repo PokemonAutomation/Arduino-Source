@@ -41,11 +41,12 @@ void CroppedImageDictionaryMatcher::add(const std::string& slug, const ImageView
     }
 #endif
 
-    m_database.emplace(
+    iter = m_database.emplace(
         std::piecewise_construct,
         std::forward_as_tuple(slug),
         std::forward_as_tuple(cropped.copy(), m_weight)
-    );
+    ).first;
+//    cout << iter->first << ": " << iter->second.stats().stddev.sum() << endl;
 }
 
 
@@ -61,10 +62,11 @@ ImageMatchResult CroppedImageDictionaryMatcher::match(
 
     Color background;
     ImageRGB32 processed = process_image(image, background);
+//    cout << (uint32_t)background << endl;
 
     for (const auto& item : m_database){
 #if 0
-        if (item.first != "green-bell-pepper" && item.first != "yellow-bell-pepper"){
+        if (item.first != "onion"){
             continue;
         }
 #endif

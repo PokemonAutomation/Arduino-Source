@@ -59,12 +59,11 @@ PA_FORCE_INLINE void pixel_sum_sqr_x64_SSE41(
 //        __m128i r2 = _mm_and_si128(_mm_srli_epi32(p, 16), _mm_set1_epi32(0x000000ff));
         __m128i r1 = _mm_shuffle_epi8(p, _mm_setr_epi8(1, -1, -1, -1, 5, -1, -1, -1, 9, -1, -1, -1, 13, -1, -1, -1));
         __m128i r2 = _mm_shuffle_epi8(p, _mm_setr_epi8(2, -1, -1, -1, 6, -1, -1, -1, 10, -1, -1, -1, 14, -1, -1, -1));
-        __m128i r3 = _mm_srli_epi32(p, 31);
 
         sumB = _mm_add_epi32(sumB, r0);
         sumG = _mm_add_epi32(sumG, r1);
         sumR = _mm_add_epi32(sumR, r2);
-        sumA = _mm_add_epi32(sumA, r3);
+        sumA = _mm_sub_epi32(sumA, m);
 
         r0 = _mm_mullo_epi16(r0, r0);
         r1 = _mm_mullo_epi16(r1, r1);
@@ -92,12 +91,11 @@ PA_FORCE_INLINE void pixel_sum_sqr_x64_SSE41(
 //        __m128i r2 = _mm_and_si128(_mm_srli_epi32(p, 16), _mm_set1_epi32(0x000000ff));
         __m128i r1 = _mm_shuffle_epi8(p, _mm_setr_epi8(1, -1, -1, -1, 5, -1, -1, -1, 9, -1, -1, -1, 13, -1, -1, -1));
         __m128i r2 = _mm_shuffle_epi8(p, _mm_setr_epi8(2, -1, -1, -1, 6, -1, -1, -1, 10, -1, -1, -1, 14, -1, -1, -1));
-        __m128i r3 = _mm_srli_epi32(p, 31);
 
         sumB = _mm_add_epi32(sumB, r0);
         sumG = _mm_add_epi32(sumG, r1);
         sumR = _mm_add_epi32(sumR, r2);
-        sumA = _mm_add_epi32(sumA, r3);
+        sumA = _mm_sub_epi32(sumA, m);
 
         r0 = _mm_mullo_epi16(r0, r0);
         r1 = _mm_mullo_epi16(r1, r1);

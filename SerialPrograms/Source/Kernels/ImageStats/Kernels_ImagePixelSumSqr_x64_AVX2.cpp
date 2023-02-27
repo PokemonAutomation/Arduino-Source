@@ -65,12 +65,11 @@ PA_FORCE_INLINE void pixel_sum_sqr_x64_AVX2(
             2, -1, -1, -1, 6, -1, -1, -1, 10, -1, -1, -1, 14, -1, -1, -1,
             2, -1, -1, -1, 6, -1, -1, -1, 10, -1, -1, -1, 14, -1, -1, -1
         ));
-        __m256i r3 = _mm256_srli_epi32(p, 31);
 
         sumB = _mm256_add_epi32(sumB, r0);
         sumG = _mm256_add_epi32(sumG, r1);
         sumR = _mm256_add_epi32(sumR, r2);
-        sumA = _mm256_add_epi32(sumA, r3);
+        sumA = _mm256_sub_epi32(sumA, m);
 
         r0 = _mm256_mullo_epi16(r0, r0);
         r1 = _mm256_mullo_epi16(r1, r1);
@@ -104,12 +103,11 @@ PA_FORCE_INLINE void pixel_sum_sqr_x64_AVX2(
             2, -1, -1, -1, 6, -1, -1, -1, 10, -1, -1, -1, 14, -1, -1, -1,
             2, -1, -1, -1, 6, -1, -1, -1, 10, -1, -1, -1, 14, -1, -1, -1
         ));
-        __m256i r3 = _mm256_srli_epi32(p, 31);
 
         sumB = _mm256_add_epi32(sumB, r0);
         sumG = _mm256_add_epi32(sumG, r1);
         sumR = _mm256_add_epi32(sumR, r2);
-        sumA = _mm256_add_epi32(sumA, r3);
+        sumA = _mm256_sub_epi32(sumA, m);
 
         r0 = _mm256_mullo_epi16(r0, r0);
         r1 = _mm256_mullo_epi16(r1, r1);

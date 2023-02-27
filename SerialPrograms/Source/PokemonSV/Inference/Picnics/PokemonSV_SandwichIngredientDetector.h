@@ -119,7 +119,7 @@ public:
 
 class SandwichFillingMatcher : public ImageMatch::CroppedImageDictionaryMatcher{
 public:
-    SandwichFillingMatcher(double min_euclidean_distance = 100);
+    SandwichFillingMatcher(double min_euclidean_distance = 200);
 
 private:
     virtual ImageRGB32 process_image(const ImageViewRGB32& image, Color& background) const override;
@@ -128,7 +128,7 @@ private:
 
 class SandwichCondimentMatcher : public ImageMatch::CroppedImageDictionaryMatcher{
 public:
-    SandwichCondimentMatcher(double min_euclidean_distance = 100);
+    SandwichCondimentMatcher(double min_euclidean_distance = 200);
 
 private:
     virtual ImageRGB32 process_image(const ImageViewRGB32& image, Color& background) const override;
@@ -176,8 +176,8 @@ private:
 
 class SandwichIngredientReader{
 public:
-    static constexpr double MAX_ALPHA = 0.50;
-    static constexpr double ALPHA_SPREAD = 0.6;
+    static constexpr double MAX_ALPHA = 180;
+    static constexpr double ALPHA_SPREAD = 10;
 
 
 public:

@@ -18,7 +18,9 @@ namespace ImageMatch{
 
 class CroppedImageDictionaryMatcher{
 public:
-    CroppedImageDictionaryMatcher(const WeightedExactImageMatcher::InverseStddevWeight& weight);
+    CroppedImageDictionaryMatcher(
+        const WeightedExactImageMatcher::InverseStddevWeight& weight = WeightedExactImageMatcher::InverseStddevWeight()
+    );
     virtual ~CroppedImageDictionaryMatcher() = default;
 
     void add(const std::string& slug, const ImageViewRGB32& image);

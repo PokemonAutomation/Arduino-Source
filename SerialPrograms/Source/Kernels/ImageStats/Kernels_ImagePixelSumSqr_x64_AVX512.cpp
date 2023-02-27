@@ -68,12 +68,11 @@ PA_FORCE_INLINE void pixel_sum_sqr_x64_AVX512(
             2, -1, -1, -1, 6, -1, -1, -1, 10, -1, -1, -1, 14, -1, -1, -1,
             2, -1, -1, -1, 6, -1, -1, -1, 10, -1, -1, -1, 14, -1, -1, -1
         ));
-        __m512i r3 = _mm512_srli_epi32(p, 31);
 
         sumB = _mm512_add_epi32(sumB, r0);
         sumG = _mm512_add_epi32(sumG, r1);
         sumR = _mm512_add_epi32(sumR, r2);
-        sumA = _mm512_add_epi32(sumA, r3);
+        sumA = _mm512_sub_epi32(sumA, m);
 
         r0 = _mm512_mullo_epi16(r0, r0);
         r1 = _mm512_mullo_epi16(r1, r1);
@@ -110,12 +109,11 @@ PA_FORCE_INLINE void pixel_sum_sqr_x64_AVX512(
             2, -1, -1, -1, 6, -1, -1, -1, 10, -1, -1, -1, 14, -1, -1, -1,
             2, -1, -1, -1, 6, -1, -1, -1, 10, -1, -1, -1, 14, -1, -1, -1
         ));
-        __m512i r3 = _mm512_srli_epi32(p, 31);
 
         sumB = _mm512_add_epi32(sumB, r0);
         sumG = _mm512_add_epi32(sumG, r1);
         sumR = _mm512_add_epi32(sumR, r2);
-        sumA = _mm512_add_epi32(sumA, r3);
+        sumA = _mm512_sub_epi32(sumA, m);
 
         r0 = _mm512_mullo_epi16(r0, r0);
         r1 = _mm512_mullo_epi16(r1, r1);

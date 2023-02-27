@@ -35,17 +35,15 @@ PA_FORCE_INLINE void pixel_sum_sqr_Default(
         uint32_t r0 = p & 0x000000ff;
         uint32_t r1 = (p >>  8) & 0x000000ff;
         uint32_t r2 = (p >> 16) & 0x000000ff;
-        uint32_t r3 = p >> 31;
 
         sumB += r0;
         sumG += r1;
         sumR += r2;
-        sumA += r3;
+        sumA -= m;
 
         r0 *= r0;
         r1 *= r1;
         r2 *= r2;
-        r3 *= r3;
 
         sqrB += r0;
         sqrG += r1;

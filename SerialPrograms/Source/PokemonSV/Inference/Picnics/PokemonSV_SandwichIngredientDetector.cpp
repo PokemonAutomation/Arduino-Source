@@ -164,7 +164,7 @@ const SandwichFillingMatcher& SANDWICH_FILLING_MATCHER(){
     return matcher;
 }
 SandwichFillingMatcher::SandwichFillingMatcher(double min_euclidean_distance)
-    : CroppedImageDictionaryMatcher({1, 128})
+    : CroppedImageDictionaryMatcher({0, 1})
     , m_min_euclidean_distance_squared(min_euclidean_distance * min_euclidean_distance){
     for (const auto& item : SANDWICH_FILLINGS_DATABASE()){
         add(item.first, item.second.sprite);
@@ -194,8 +194,8 @@ const SandwichCondimentMatcher& SANDWICH_CONDIMENT_MATCHER(){
     return matcher;
 }
 SandwichCondimentMatcher::SandwichCondimentMatcher(double min_euclidean_distance)
-    : CroppedImageDictionaryMatcher({1, 128})
-    , m_min_euclidean_distance_squared(min_euclidean_distance* min_euclidean_distance){
+    : CroppedImageDictionaryMatcher({0, 1})
+    , m_min_euclidean_distance_squared(min_euclidean_distance * min_euclidean_distance){
     for (const auto& item : SANDWICH_CONDIMENTS_DATABASE()){
         add(item.first, item.second.sprite);
     }
@@ -290,7 +290,7 @@ ImageMatch::ImageMatchResult SandwichIngredientReader::read_with_icon_matcher(co
         results = SANDWICH_CONDIMENT_MATCHER().match(image, ALPHA_SPREAD);
         break;
     }
-    results.clear_beyond_alpha(MAX_ALPHA);
+//    results.clear_beyond_alpha(MAX_ALPHA);
 
     return results;
 }

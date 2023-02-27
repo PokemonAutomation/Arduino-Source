@@ -75,9 +75,9 @@ PageIngredients IngredientSession::read_current_page() const{
             }
         }else{
             image_result = m_lines[ret.selected].read_with_icon_matcher(snapshot);
-            image_result.clear_beyond_alpha(SandwichIngredientReader::MAX_ALPHA);
             image_result.clear_beyond_spread(SandwichIngredientReader::ALPHA_SPREAD);
             image_result.log(m_console, SandwichIngredientReader::MAX_ALPHA);
+            image_result.clear_beyond_alpha(SandwichIngredientReader::MAX_ALPHA);
         }
     });
 

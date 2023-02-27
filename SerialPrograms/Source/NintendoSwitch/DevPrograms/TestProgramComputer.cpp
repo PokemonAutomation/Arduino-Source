@@ -111,6 +111,8 @@
 #include "CommonFramework/OCR/OCR_NumberReader.h"
 #include "CommonFramework/ImageTools/ImageManip.h"
 #include "PokemonSV/Resources/PokemonSV_Ingredients.h"
+#include "Kernels/ImageStats/Kernels_ImagePixelSumSqr.h"
+#include "CommonFramework/ImageMatch/ImageDiff.h"
 
 #ifdef PA_ARCH_x86
 //#include "Kernels/Kernels_x64_SSE41.h"
@@ -194,6 +196,23 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     using namespace NintendoSwitch::PokemonSV;
     using namespace Pokemon;
 //    using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
+
+    ImageRGB32 image("test-0-image.png");
+
+    Color background(4294954240);
+
+    for (size_t c = 0; c < 5; c++){
+        ImageRGB32 sprite("test-" + std::to_string(c) + "-sprite.png");
+        PixelSums sums;
+        pixel_sum_sqr(
+            sums, image.width(), image.height(),
+            image.data(), image.bytes_per_row(),
+            sprite.data(), sprite.bytes_per_row()
+        );
+        cout << sums.count << endl;
+        cout << ImageMatch::pixel_RMSD(sprite, image, background) << endl;
+    }
+
 
 
 
