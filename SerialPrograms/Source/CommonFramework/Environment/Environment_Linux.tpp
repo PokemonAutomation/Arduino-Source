@@ -10,6 +10,7 @@
 #include <set>
 #include <iostream>
 #include <thread>
+#include <sys/resource.h>
 #include <sys/types.h>
 #include <unistd.h>
 #include <sched.h>
@@ -108,7 +109,7 @@ WallClock::duration thread_cpu_time(const ThreadHandle& handle){
 
 
 std::chrono::microseconds SystemCpuTime::operator-(const SystemCpuTime& x) const{
-    return std::chrono::microseconds(0);
+    return std::chrono::microseconds((m_sec - x.m_sec) * 1000000ull + (m_usec - x.m_usec));
 }
 SystemCpuTime SystemCpuTime::now(){
     SystemCpuTime ret;
@@ -120,7 +121,14 @@ size_t SystemCpuTime::vcores(){
     return cores;
 }
 void SystemCpuTime::set_to_now(){
-    //  TODO
+    struct rusage ru;
+    if (getrusage(RUSAGE_SELF, &ru) == -1){
+        m_sec = 0;
+        m_usec = 0;
+    }else{
+        m_sec = ru.ru_utime.tv_sec + ru.ru_stime.tv_sec;
+        m_usec = ru.ru_utime.tv_usec + ru.ru_stime.tv_usec;
+    }
 }
 size_t SystemCpuTime::read_cores(){
     return std::thread::hardware_concurrency();
