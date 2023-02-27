@@ -188,6 +188,7 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, BotBaseCo
     TournamentFarmer_Descriptor::Stats& stats = env.current_stats<TournamentFarmer_Descriptor::Stats>();
     //Assuming the player has a charged orb
     if (TRY_TO_TERASTILLIZE) {
+        env.log("Attempting to terastillize.");
         //Open move menu
         pbf_press_button(context, BUTTON_A, 10, 50);
         pbf_wait(context, 100);
@@ -223,6 +224,7 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, BotBaseCo
                     { battle_menu } //End of battle from tera'd ace takes longer, 45 seconds was not enough
                 );
                 if (ret == 0) {
+                    env.log("Battle menu detected. Pressing A to attack.");
                     pbf_mash_button(context, BUTTON_A, 300);
                     context.wait_for_all_requests();
                 } else {
@@ -241,7 +243,7 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, BotBaseCo
         { end_of_battle }
         );
     if (ret_black == 0) {
-        env.log("Battle finished.");
+        env.log("Battle finished."); //Cannot tell if win or loss.
         stats.battles++;
         env.update_stats();
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
@@ -330,7 +332,7 @@ void TournamentFarmer::handle_end_of_tournament(SingleSwitchProgramEnvironment& 
     int ret_black_won = run_until(
         env.console, context,
         [](BotBaseContext& context) {
-            pbf_mash_button(context, BUTTON_A, 10000);
+            pbf_mash_button(context, BUTTON_B, 10000);
         },
         { black_screen }
         );
@@ -444,6 +446,7 @@ void TournamentFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseConte
     */
 
     for(uint32_t c = 0; c < NUM_ROUNDS; c++) {
+        env.log("Tournament loop started.");
         //Initiate dialog then mash until first battle starts
         AdvanceDialogWatcher advance_detector(COLOR_YELLOW);
         pbf_press_button(context, BUTTON_A, 10, 50);
@@ -505,6 +508,34 @@ void TournamentFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseConte
                 break;
             }
 
+            //If this is the last battle in the tournament check for overworld in case player lost
+            if (battles == 3) {
+                env.log("Final battle of the tournament complete, checking for overworld/loss.");
+
+                //Clear dialog, mash B
+                pbf_mash_button(context, BUTTON_B, 400);
+                context.wait_for_all_requests();
+
+                OverworldWatcher overworld2(COLOR_RED);
+                int ret_lost_final = wait_until(
+                    env.console, context,
+                    std::chrono::seconds(3),
+                    { overworld2 }
+                );
+                switch (ret_lost_final) {
+                case 0:
+                    env.log("Final battle of the tournament lost.");
+                    battle_lost = true;
+                    stats.losses++;
+                    env.update_stats();
+                    send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
+                    break;
+                default:
+                    env.log("Final battle of the tournament won.");
+                    break;
+                }
+            }
+
             if (battle_lost) {
                 return_to_academy_after_loss(env, context);
                 break;
@@ -515,6 +546,8 @@ void TournamentFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseConte
         if (!battle_lost) {
             handle_end_of_tournament(env, context);
         }
+
+        env.log("Tournament loop complete.");
 
         //Save the game if option is set
         uint16_t num_rounds_temp = SAVE_NUM_ROUNDS;
