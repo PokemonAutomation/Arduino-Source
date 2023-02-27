@@ -54,29 +54,53 @@ struct IngredientNameDatabase{
     std::map<std::string, std::string> m_display_name_to_slug;
 };
 IngredientNameDatabase::IngredientNameDatabase(){
-    std::string path = RESOURCE_PATH() + "PokemonSV/Picnic/SandwichFillingOCR.json";
-    JsonValue json = load_json_file(path);
-    JsonObject& object = json.get_object_throw(path);
-
-    for (const auto& language_block : object){
-        Language language = language_code_to_enum(language_block.first);
-        const JsonObject& per_language = language_block.second.get_object_throw(path);
-        for (const auto& slug : per_language){
-            const JsonArray& names = slug.second.get_array_throw(path);
-            if (names.empty()){
-                throw JsonParseException(path, "Expected at least one name for: " + language_block.first + " : " + slug.first);
+    {
+        std::string path = RESOURCE_PATH() + "PokemonSV/Picnic/SandwichFillingOCR.json";
+        JsonValue json = load_json_file(path);
+        JsonObject& object = json.get_object_throw(path);
+        for (const auto& language_block : object){
+            Language language = language_code_to_enum(language_block.first);
+            const JsonObject& per_language = language_block.second.get_object_throw(path);
+            for (const auto& slug : per_language){
+                const JsonArray& names = slug.second.get_array_throw(path);
+                if (names.empty()){
+                    throw JsonParseException(path, "Expected at least one name for: " + language_block.first + " : " + slug.first);
+                }
+                database[slug.first].m_display_names[language] = names[0].get_string_throw();
             }
-            database[slug.first].m_display_names[language] = names[0].get_string_throw();
+        }
+        for (auto& item : database){
+            auto iter = item.second.m_display_names.find(Language::English);
+            if (iter == item.second.m_display_names.end()){
+                throw JsonParseException(path, "English not found for: " + item.first);
+            }
+            item.second.m_display_name = iter->second;
+            m_display_name_to_slug[iter->second] = item.first;
         }
     }
-
-    for (auto& item : database){
-        auto iter = item.second.m_display_names.find(Language::English);
-        if (iter == item.second.m_display_names.end()){
-            throw JsonParseException(path, "English not found for: " + item.first);
+    {
+        std::string path = RESOURCE_PATH() + "PokemonSV/Picnic/SandwichCondimentOCR.json";
+        JsonValue json = load_json_file(path);
+        JsonObject& object = json.get_object_throw(path);
+        for (const auto& language_block : object){
+            Language language = language_code_to_enum(language_block.first);
+            const JsonObject& per_language = language_block.second.get_object_throw(path);
+            for (const auto& slug : per_language){
+                const JsonArray& names = slug.second.get_array_throw(path);
+                if (names.empty()){
+                    throw JsonParseException(path, "Expected at least one name for: " + language_block.first + " : " + slug.first);
+                }
+                database[slug.first].m_display_names[language] = names[0].get_string_throw();
+            }
         }
-        item.second.m_display_name = iter->second;
-        m_display_name_to_slug[iter->second] = item.first;
+        for (auto& item : database){
+            auto iter = item.second.m_display_names.find(Language::English);
+            if (iter == item.second.m_display_names.end()){
+                throw JsonParseException(path, "English not found for: " + item.first);
+            }
+            item.second.m_display_name = iter->second;
+            m_display_name_to_slug[iter->second] = item.first;
+        }
     }
 }
 

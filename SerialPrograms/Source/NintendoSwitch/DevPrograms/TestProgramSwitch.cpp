@@ -217,7 +217,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 //    basic_catcher(console, context, Language::English, "beast-ball", true);
 
-#if 1
+#if 0
     VideoSnapshot image = feed.snapshot();
     IngredientSession session(env.inference_dispatcher(), console, context, Language::English);
     session.read_current_page();
@@ -225,7 +225,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 
 
-#if 0
+#if 1
     add_sandwich_ingredients(
         env.inference_dispatcher(), console, context, Language::English,
         {

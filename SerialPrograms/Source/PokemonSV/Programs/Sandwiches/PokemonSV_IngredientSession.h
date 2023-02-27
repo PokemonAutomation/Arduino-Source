@@ -12,6 +12,7 @@
 #include "CommonFramework/Language.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.h"
+#include "PokemonSV/Inference/Picnics/PokemonSV_SandwichIngredientDetector.h"
 
 namespace PokemonAutomation{
     class AsyncDispatcher;
@@ -37,7 +38,7 @@ public:
     IngredientSession(
         AsyncDispatcher& dispatcher,
         ConsoleHandle& console, BotBaseContext& context,
-        Language language
+        Language language, SandwichIngredientType type
     );
 
     //  Move to any ingredient in the set. Returns the ingredient it moved to.
@@ -64,7 +65,7 @@ private:
     BotBaseContext& m_context;
     Language m_language;
     VideoOverlaySet m_overlays;
-    FixedLimitVector<SandwichIngredientReader> m_lines;
+    FixedLimitVector<SandwichIngredientReader> m_fillings;
     GradientArrowDetector m_arrow;
 };
 

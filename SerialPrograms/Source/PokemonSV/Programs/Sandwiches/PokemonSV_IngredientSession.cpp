@@ -11,7 +11,6 @@
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "PokemonSV/Resources/PokemonSV_Ingredients.h"
-#include "PokemonSV/Inference/Picnics/PokemonSV_SandwichIngredientDetector.h"
 #include "PokemonSV_IngredientSession.h"
 
 namespace PokemonAutomation{
@@ -23,19 +22,19 @@ IngredientSession::~IngredientSession() = default;
 IngredientSession::IngredientSession(
     AsyncDispatcher& dispatcher,
     ConsoleHandle& console, BotBaseContext& context,
-    Language language
+    Language language, SandwichIngredientType type
 )
     : m_dispatcher(dispatcher)
     , m_console(console)
     , m_context(context)
     , m_language(language)
     , m_overlays(console.overlay())
-    , m_lines(10)
+    , m_fillings(10)
     , m_arrow(COLOR_CYAN, GradientArrowType::RIGHT, {0.02, 0.15, 0.05, 0.80})
 {
     for (size_t c = 0; c < INGREDIENT_PAGE_LINES; c++){
-        m_lines.emplace_back(SandwichIngredientType::FILLING, c, COLOR_CYAN);
-        m_lines.back().make_overlays(m_overlays);
+        m_fillings.emplace_back(type, c, COLOR_CYAN);
+        m_fillings.back().make_overlays(m_overlays);
     }
 }
 PageIngredients IngredientSession::read_current_page() const{
@@ -67,14 +66,14 @@ PageIngredients IngredientSession::read_current_page() const{
     ImageMatch::ImageMatchResult image_result;
     m_dispatcher.run_in_parallel(0, INGREDIENT_PAGE_LINES + 1, [&](size_t index){
         if (index < INGREDIENT_PAGE_LINES){
-            OCR::StringMatchResult result = m_lines[index].read_with_ocr(snapshot, m_console, m_language);
+            OCR::StringMatchResult result = m_fillings[index].read_with_ocr(snapshot, m_console, m_language);
             result.clear_beyond_log10p(SandwichFillingOCR::MAX_LOG10P);
             result.clear_beyond_spread(SandwichFillingOCR::MAX_LOG10P_SPREAD);
             for (auto& item : result.results){
                 ret.item[index].insert(item.second.token);
             }
         }else{
-            image_result = m_lines[ret.selected].read_with_icon_matcher(snapshot);
+            image_result = m_fillings[ret.selected].read_with_icon_matcher(snapshot);
             image_result.clear_beyond_spread(SandwichIngredientReader::ALPHA_SPREAD);
             image_result.log(m_console, SandwichIngredientReader::MAX_ALPHA);
             image_result.clear_beyond_alpha(SandwichIngredientReader::MAX_ALPHA);
@@ -249,14 +248,18 @@ void add_sandwich_ingredients(
     std::map<std::string, uint8_t>&& fillings,
     std::map<std::string, uint8_t>&& condiments
 ){
-    IngredientSession session(dispatcher, console, context, Language::English);
+    {
+        IngredientSession session(dispatcher, console, context, Language::English, SandwichIngredientType::FILLING);
+        session.add_ingredients(console, context, std::move(fillings));
+        pbf_press_button(context, BUTTON_PLUS, 20, 230);
+    }
 
-    session.add_ingredients(console, context, std::move(fillings));
-    pbf_press_button(context, BUTTON_PLUS, 20, 230);
-
-    pbf_press_dpad(context, DPAD_UP, 20, 105);
-    session.add_ingredients(console, context, std::move(condiments));
-    pbf_press_button(context, BUTTON_PLUS, 20, 230);
+    {
+        IngredientSession session(dispatcher, console, context, Language::English, SandwichIngredientType::CONDIMENT);
+        pbf_press_dpad(context, DPAD_UP, 20, 105);
+        session.add_ingredients(console, context, std::move(condiments));
+        pbf_press_button(context, BUTTON_PLUS, 20, 230);
+    }
 
     pbf_mash_button(context, BUTTON_A, 125);
 }
