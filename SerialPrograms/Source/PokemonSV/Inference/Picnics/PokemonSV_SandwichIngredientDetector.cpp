@@ -4,8 +4,8 @@
  *
  */
 
+#include "CommonFramework/ImageMatch/ImageCropper.h"
 #include "CommonFramework/ImageMatch/WaterfillTemplateMatcher.h"
-#include "CommonFramework/ImageMatch/SilhouetteDictionaryMatcher.h"
 #include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/WaterfillUtilities.h"
@@ -156,40 +156,71 @@ bool SandwichPicksPageDetector::detect(const ImageViewRGB32& screen) const{
     );
 }
 
-ImageMatch::SilhouetteDictionaryMatcher make_SANDWICH_FILLING_MATCHER(){
-    ImageMatch::SilhouetteDictionaryMatcher matcher;
-    for (const auto& item : SANDWICH_FILLING_DATABASE()){
-        matcher.add(item.first, item.second.icon.copy());
-    }
+
+
+
+const SandwichFillingMatcher& SANDWICH_FILLING_MATCHER(){
+    static SandwichFillingMatcher matcher;
     return matcher;
 }
-const ImageMatch::SilhouetteDictionaryMatcher& SANDWICH_FILLING_MATCHER(){
-    static ImageMatch::SilhouetteDictionaryMatcher matcher = make_SANDWICH_FILLING_MATCHER();
-    return matcher;
+SandwichFillingMatcher::SandwichFillingMatcher(double min_euclidean_distance)
+    : CroppedImageDictionaryMatcher({1, 128})
+    , m_min_euclidean_distance_squared(min_euclidean_distance* min_euclidean_distance){
+    for (const auto& item : SANDWICH_FILLINGS_DATABASE()){
+        add(item.first, item.second.sprite);
+    }
+}
+ImageRGB32 SandwichFillingMatcher::process_image(const ImageViewRGB32& image, Color& background) const{
+    ImageStats border = image_border_stats(image);
+    ImagePixelBox box = ImageMatch::enclosing_rectangle_with_pixel_filter(
+        image,
+        [&](Color pixel){
+            double r = (double)pixel.red() - border.average.r;
+            double g = (double)pixel.green() - border.average.g;
+            double b = (double)pixel.blue() - border.average.b;
+            bool stop = r * r + g * g + b * b >= m_min_euclidean_distance_squared;
+            return stop;
+        }
+    );
+    background = border.average.round();
+    return extract_box_reference(image, box).copy();
 }
 
-ImageMatch::SilhouetteDictionaryMatcher make_SANDWICH_CONDIMENT_MATCHER(){
-    ImageMatch::SilhouetteDictionaryMatcher matcher;
-    for (const auto& item : SANDWICH_CONDIMENTS_DATABASE()) {
-        matcher.add(item.first, item.second.icon.copy());
-    }
+
+const SandwichCondimentMatcher& SANDWICH_CONDIMENT_MATCHER(){
+    static SandwichCondimentMatcher matcher;
     return matcher;
 }
-const ImageMatch::SilhouetteDictionaryMatcher& SANDWICH_CONDIMENT_MATCHER(){
-    static ImageMatch::SilhouetteDictionaryMatcher matcher = make_SANDWICH_CONDIMENT_MATCHER();
-    return matcher;
+SandwichCondimentMatcher::SandwichCondimentMatcher(double min_euclidean_distance)
+    : CroppedImageDictionaryMatcher({1, 128})
+    , m_min_euclidean_distance_squared(min_euclidean_distance* min_euclidean_distance){
+    for (const auto& item : SANDWICH_CONDIMENTS_DATABASE()){
+        add(item.first, item.second.sprite);
+    }
+}
+ImageRGB32 SandwichCondimentMatcher::process_image(const ImageViewRGB32& image, Color& background) const{
+    ImageStats border = image_border_stats(image);
+    ImagePixelBox box = ImageMatch::enclosing_rectangle_with_pixel_filter(
+        image,
+        [&](Color pixel){
+            double r = (double)pixel.red() - border.average.r;
+            double g = (double)pixel.green() - border.average.g;
+            double b = (double)pixel.blue() - border.average.b;
+            bool stop = r * r + g * g + b * b >= m_min_euclidean_distance_squared;
+            return stop;
+        }
+    );
+    background = border.average.round();
+    return extract_box_reference(image, box).copy();
 }
 
 const SandwichFillingOCR& SandwichFillingOCR::instance(){
     static SandwichFillingOCR reader;
     return reader;
 }
-
 SandwichFillingOCR::SandwichFillingOCR()
     : SmallDictionaryMatcher("PokemonSV/Picnic/SandwichFillingOCR.json")
 {}
-
-
 OCR::StringMatchResult SandwichFillingOCR::read_substring(
     Logger& logger,
     Language language,
@@ -208,12 +239,9 @@ const SandwichCondimentOCR& SandwichCondimentOCR::instance(){
     static SandwichCondimentOCR reader;
     return reader;
 }
-
 SandwichCondimentOCR::SandwichCondimentOCR()
     : SmallDictionaryMatcher("PokemonSV/Picnic/SandwichCondimentOCR.json")
 {}
-
-
 OCR::StringMatchResult SandwichCondimentOCR::read_substring(
     Logger& logger,
     Language language,

@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonSV_SandwichIngredientDetector_H
 
 #include "Common/Cpp/Color.h"
+#include "CommonFramework/ImageMatch/CroppedImageDictionaryMatcher.h"
 #include "CommonFramework/ImageMatch/ImageMatchResult.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 //#include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
@@ -116,7 +117,25 @@ public:
 
 
 
-class SandwichFillingOCR : public OCR::SmallDictionaryMatcher {
+class SandwichFillingMatcher : public ImageMatch::CroppedImageDictionaryMatcher{
+public:
+    SandwichFillingMatcher(double min_euclidean_distance = 100);
+
+private:
+    virtual ImageRGB32 process_image(const ImageViewRGB32& image, Color& background) const override;
+    double m_min_euclidean_distance_squared;
+};
+
+class SandwichCondimentMatcher : public ImageMatch::CroppedImageDictionaryMatcher{
+public:
+    SandwichCondimentMatcher(double min_euclidean_distance = 100);
+
+private:
+    virtual ImageRGB32 process_image(const ImageViewRGB32& image, Color& background) const override;
+    double m_min_euclidean_distance_squared;
+};
+
+class SandwichFillingOCR : public OCR::SmallDictionaryMatcher{
 public:
     static constexpr double MAX_LOG10P = -2.0;
     static constexpr double MAX_LOG10P_SPREAD = 0.5;
@@ -135,7 +154,7 @@ public:
 private:
     SandwichFillingOCR();
 };
-class SandwichCondimentOCR : public OCR::SmallDictionaryMatcher {
+class SandwichCondimentOCR : public OCR::SmallDictionaryMatcher{
 public:
     static constexpr double MAX_LOG10P = -2.0;
     static constexpr double MAX_LOG10P_SPREAD = 0.5;
@@ -157,8 +176,8 @@ private:
 
 class SandwichIngredientReader{
 public:
-    static constexpr double MAX_ALPHA = 350;
-    static constexpr double ALPHA_SPREAD = 20;
+    static constexpr double MAX_ALPHA = 0.60;
+    static constexpr double ALPHA_SPREAD = 0.02;
 
 
 public:

@@ -16,15 +16,15 @@ namespace PokemonSV{
 
 
 
-std::vector<std::string> make_ALL_SANDWICH_FILLING_SLUGS(){
+std::vector<std::string> make_ALL_SANDWICH_FILLINGS_SLUGS(){
     std::vector<std::string> ret;
-    for (const auto& item : SANDWICH_FILLING_DATABASE()){
+    for (const auto& item : SANDWICH_FILLINGS_DATABASE()){
         ret.emplace_back(item.first);
     }
     return ret;
 }
-const std::vector<std::string>& ALL_SANDWICH_FILLING_SLUGS(){
-    static std::vector<std::string> database = make_ALL_SANDWICH_FILLING_SLUGS();
+const std::vector<std::string>& ALL_SANDWICH_FILLINGS_SLUGS(){
+    static std::vector<std::string> database = make_ALL_SANDWICH_FILLINGS_SLUGS();
     return database;
 }
 
@@ -108,7 +108,7 @@ const std::string& parse_ingredient_name(const std::string& display_name){
 
 
 
-const SpriteDatabase& SANDWICH_FILLING_DATABASE(){
+const SpriteDatabase& SANDWICH_FILLINGS_DATABASE(){
     static const SpriteDatabase database("PokemonSV/Picnic/SandwichFillingSprites.png", "PokemonSV/Picnic/SandwichFillingSprites.json");
     return database;
 }
