@@ -100,6 +100,7 @@
 #include "PokemonSV/Resources/PokemonSV_Ingredients.h"
 #include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleBallReader.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PathSelect.h"
+#include "PokemonSV/Programs/PokemonSV_ConnectToInternet.h"
 
 
 #include <QPixmap>
@@ -202,10 +203,16 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
+
+    connect_to_internet_from_overworld(env.program_info(), console, context);
+
+
+
+#if 0
     MainMenuDetector detector;
     detector.make_overlays(overlays);
     detector.move_cursor(env.program_info(), console, context, MenuSide::RIGHT, 6, true);
-
+#endif
 
 #if 0
     ImageRGB32 image("20230226-042613391191-PathPartyReader-ReadSprites.png");

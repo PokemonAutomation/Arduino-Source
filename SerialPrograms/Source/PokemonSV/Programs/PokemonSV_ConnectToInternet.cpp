@@ -59,7 +59,7 @@ bool NewsDetector::detect(const ImageViewRGB32& screen) const{
 
     return true;
 }
-class NewsWatcher : public DetectorToFinder<MainMenuDetector>{
+class NewsWatcher : public DetectorToFinder<NewsDetector>{
 public:
     NewsWatcher(Color color = COLOR_RED)
          : DetectorToFinder("NewsWatcher", std::chrono::milliseconds(250), color)

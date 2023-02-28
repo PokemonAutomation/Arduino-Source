@@ -235,8 +235,8 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 
 
 
-#if 0
-    ImageRGB32 image("screenshot-20230227-103751134685.png");
+#if 1
+    ImageRGB32 image("Screenshots/screenshot-20230228-050626316922.png");
 
     NewsDetector detector;
     cout << detector.detect(image) << endl;
