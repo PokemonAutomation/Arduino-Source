@@ -411,22 +411,27 @@ void send_program_telemetry(
         return;
     }
 
-
     //  Rate limit the telemetry to 10/hour.
+    static std::mutex lock;
     static std::set<WallClock> sends;
-    WallClock now = current_time();
-    WallClock threshold = now - std::chrono::minutes(1);
-    while (!sends.empty()){
-        auto iter = sends.begin();
-        if (*iter > threshold){
-            break;
+    {
+        std::lock_guard<std::mutex> lg(lock);
+
+        WallClock now = current_time();
+        WallClock threshold = now - std::chrono::minutes(1);
+        while (!sends.empty()){
+            auto iter = sends.begin();
+            if (*iter > threshold){
+                break;
+            }
+            sends.erase(iter);
         }
-        sends.erase(iter);
+        if (sends.size() >= 10){
+            logger.log("Error report suppressed due to rate limit.", COLOR_RED);
+            return;
+        }
+        sends.insert(now);
     }
-    if (sends.size() >= 10){
-        return;
-    }
-    sends.insert(now);
 
 
     bool hasFile = !file.empty();

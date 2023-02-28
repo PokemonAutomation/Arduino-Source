@@ -233,14 +233,20 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 //    using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
 
 
+    send_program_telemetry(env.logger(), true, COLOR_RED, env.program_info(), "test", {}, "");
 
 
-#if 1
+
+
+
+#if 0
     ImageRGB32 image("Screenshots/screenshot-20230228-050626316922.png");
 
     NewsDetector detector;
     cout << detector.detect(image) << endl;
 #endif
+
+
 
 
 
