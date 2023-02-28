@@ -9,6 +9,7 @@
 
 #include <chrono>
 #include <pthread.h>
+#include <sys/time.h>
 #include "Common/Cpp/Time.h"
 
 namespace PokemonAutomation{
@@ -42,7 +43,7 @@ public:
     static size_t vcores();
 
     bool is_valid() const{
-        return false;
+        return m_usec != 0 || m_sec != 0;
     }
 
     std::chrono::microseconds operator-(const SystemCpuTime& x) const;
@@ -52,7 +53,8 @@ private:
     static size_t read_cores();
 
 private:
-//    uint64_t m_time = 0;
+    time_t m_sec = 0;
+    suseconds_t m_usec = 0;
 };
 
 
