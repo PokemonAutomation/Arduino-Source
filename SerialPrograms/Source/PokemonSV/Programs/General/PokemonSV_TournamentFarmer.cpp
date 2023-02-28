@@ -79,7 +79,7 @@ TournamentFarmer::TournamentFarmer()
           )
     , TRY_TO_TERASTILLIZE(
           "<b>Use Terastillization:</b><br>Tera at the start of battle. Will take longer but may be worth the attack boost.",
-          LockWhileRunning::UNLOCKED,
+          LockWhileRunning::LOCKED,
           false
           )
     , SAVE_NUM_ROUNDS(
@@ -91,6 +91,11 @@ TournamentFarmer::TournamentFarmer()
         "<b>Stop after earning this amount of money:</b><br>Zero disables this check. Does not count losses. Max is 999,999,999.",
         LockWhileRunning::UNLOCKED,
         999999999, 0, 999999999
+    )
+    , HHH_ZOROARK(
+        "<b>Happy Hour H-Zoroark:</b><br>Check this if you have an event Hisuian Zoroark with Happy Hour and Memento as your lead.<br>Happy Hour must be in its first move slot and Memento must be in its second.<br>",
+        LockWhileRunning::LOCKED,
+        false
     )
     , GO_HOME_WHEN_DONE(false)
     , LANGUAGE(
@@ -113,6 +118,7 @@ TournamentFarmer::TournamentFarmer()
     PA_ADD_OPTION(TRY_TO_TERASTILLIZE);
     PA_ADD_OPTION(SAVE_NUM_ROUNDS);
     PA_ADD_OPTION(MONEY_LIMIT);
+    PA_ADD_OPTION(HHH_ZOROARK);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(TARGET_ITEMS);
@@ -157,11 +163,11 @@ void TournamentFarmer::check_money(SingleSwitchProgramEnvironment& env, BotBaseC
 
         //Filter out low and high numbers in case of misreads
         //From bulbapedia: Nemona is lowest at 8640,  Penny and Geeta are highest at 16800
-        //Max earnings? in one battle: amulet coin * (base winnings + (8 * make it rain lv100))
-        if (top_money < 8000 || top_money > 50000 ) {
+        //Max earnings? in one battle: happy hour * amulet coin * (base winnings + (8 * make it rain lv100))
+        if (top_money < 8000 || top_money > 80000 ) {
             top_money = -1;
         }
-        if (bottom_money < 8000 || bottom_money > 50000) {
+        if (bottom_money < 8000 || bottom_money > 80000) {
             bottom_money = -1;
         }
     }
@@ -186,6 +192,13 @@ void TournamentFarmer::check_money(SingleSwitchProgramEnvironment& env, BotBaseC
 //Handle a single battle by mashing A until AdvanceDialog (end of battle) is detected
 void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
     TournamentFarmer_Descriptor::Stats& stats = env.current_stats<TournamentFarmer_Descriptor::Stats>();
+
+    //Only applies if the player has The Hidden Treasure of Area Zero Hisuian Zoroark
+    if (HHH_ZOROARK) {
+        env.log("Zoroark option checked.");
+        //TODO
+    }
+
     //Assuming the player has a charged orb
     if (TRY_TO_TERASTILLIZE) {
         env.log("Attempting to terastillize.");
