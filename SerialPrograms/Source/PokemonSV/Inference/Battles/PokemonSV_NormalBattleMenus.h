@@ -102,9 +102,9 @@ public:
 private:
     GradientArrowDetector m_arrow;
 };
-class SwapMenutWatcher : public DetectorToFinder<SwapMenuDetector> {
+class SwapMenuWatcher : public DetectorToFinder<SwapMenuDetector> {
 public:
-    SwapMenutWatcher(Color color)
+    SwapMenuWatcher(Color color)
         : DetectorToFinder("SwapMenuWatcher", std::chrono::milliseconds(250), color)
     {}
 };

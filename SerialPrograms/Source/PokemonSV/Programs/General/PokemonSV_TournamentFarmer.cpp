@@ -204,7 +204,7 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, BotBaseCo
 
         //If not already dead, use memento and die
         NormalBattleMenuWatcher memento(COLOR_RED);
-        SwapMenutWatcher fainted(COLOR_YELLOW);
+        SwapMenuWatcher fainted(COLOR_YELLOW);
         int retZ = wait_until(
             env.console, context,
             std::chrono::seconds(60),
