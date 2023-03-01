@@ -196,7 +196,90 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, BotBaseCo
     //Only applies if the player has The Hidden Treasure of Area Zero Hisuian Zoroark
     if (HHH_ZOROARK) {
         env.log("Zoroark option checked.");
-        //TODO
+        
+        //Use happy hour
+        env.log("Using Happy Hour.");
+        pbf_mash_button(context, BUTTON_A, 300);
+        context.wait_for_all_requests();
+
+        //If not already dead, use memento and die
+        NormalBattleMenuWatcher memento(COLOR_RED);
+        SwapMenutWatcher fainted(COLOR_YELLOW);
+        int retZ = wait_until(
+            env.console, context,
+            std::chrono::seconds(60),
+            { memento, fainted }
+        );
+        if (retZ == 0) {
+            env.log("Using Memento to faint.");
+            pbf_press_button(context, BUTTON_A, 10, 50);
+            pbf_wait(context, 100);
+            context.wait_for_all_requests();
+
+            pbf_press_dpad(context, DPAD_DOWN, 10, 50);
+            pbf_press_button(context, BUTTON_A, 10, 50);
+            context.wait_for_all_requests();
+
+            int retF = wait_until(
+                env.console, context,
+                std::chrono::seconds(60),
+                { fainted }
+            );
+            if (retF == 0) {
+                env.log("Swap menu detected.");
+            }
+            else {
+                env.log("Timed out after Memento. Was Zoroark able to faint?", COLOR_RED);
+                stats.errors++;
+                env.update_stats();
+                send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
+                throw OperationFailedException(
+                    ErrorReport::SEND_ERROR_REPORT, env.console,
+                    "Timed out after Memento. Was Zoroark able to faint?",
+                    true
+                );
+            }
+        }
+        else if (retZ == 1) {
+            env.log("Detected swap menu. Assuming Zoroark fainted turn one.");
+        } else {
+            env.log("Timed out after Happy Hour.", COLOR_RED);
+            stats.errors++;
+            env.update_stats();
+            send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, env.console,
+                "Timed out after Happy Hour.",
+                true
+            );
+        }
+
+        //Select 2nd pokemon from swap menu and send it out
+        pbf_press_dpad(context, DPAD_DOWN, 10, 50);
+        pbf_mash_button(context, BUTTON_A, 300);
+        context.wait_for_all_requests();
+
+        //Check for battle menu to ensure it's sent out
+        NormalBattleMenuWatcher resume_battle(COLOR_RED);
+        int retRes = wait_until(
+            env.console, context,
+            std::chrono::seconds(60),
+            { resume_battle }
+        );
+        if (retRes == 0) {
+            env.log("Battle menu detected. Second Pokemon has been sent out. Resuming usual battle sequence.");
+        } else {
+            env.log("Could not find battle menu.", COLOR_RED);
+            stats.errors++;
+            env.update_stats();
+            send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, env.console,
+                "Could not find battle menu.",
+                true
+            );
+        }
+
     }
 
     //Assuming the player has a charged orb
@@ -337,8 +420,8 @@ void TournamentFarmer::handle_end_of_tournament(SingleSwitchProgramEnvironment& 
     TournamentFarmer_Descriptor::Stats& stats = env.current_stats<TournamentFarmer_Descriptor::Stats>();
 
     //Space out the black screen detection after the "champion" battle
-    pbf_wait(context, 700);
-    context.wait_for_all_requests();
+    //pbf_wait(context, 700);
+    //context.wait_for_all_requests();
 
     //One more black screen when done to load the academy
     BlackScreenOverWatcher black_screen(COLOR_RED, { 0.2, 0.2, 0.6, 0.6 });
