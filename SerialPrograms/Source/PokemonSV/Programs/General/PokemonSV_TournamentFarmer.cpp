@@ -220,25 +220,41 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, BotBaseCo
             pbf_press_button(context, BUTTON_A, 10, 50);
             context.wait_for_all_requests();
 
-            int retF = wait_until(
+            //Try six times, in case of paralysis (only applies to Pachirisu's Nuzzle) preventing use of Memento.
+            int retF = run_until(
                 env.console, context,
-                std::chrono::seconds(60),
+                [&](BotBaseContext& context) {
+                    for (size_t c = 0; c < 6; c++) {
+                        NormalBattleMenuWatcher battle_memento(COLOR_RED);
+                        int ret_memento = wait_until(
+                            env.console, context,
+                            std::chrono::seconds(60),
+                            { battle_memento }
+                        );
+                        if (ret_memento == 0) {
+                            env.log("Attempting to use Memento.");
+                            pbf_mash_button(context, BUTTON_A, 300);
+                            context.wait_for_all_requests();
+                        }
+                    }
+                },
                 { fainted }
             );
+
             if (retF == 0) {
                 env.log("Swap menu detected.");
-            }
-            else {
-                env.log("Timed out after Memento. Was Zoroark able to faint?", COLOR_RED);
+            } else {
+                env.log("Took more than 6 turns to use Memento. Was Zoroark able to faint?", COLOR_RED);
                 stats.errors++;
                 env.update_stats();
                 send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
                 throw OperationFailedException(
                     ErrorReport::SEND_ERROR_REPORT, env.console,
-                    "Timed out after Memento. Was Zoroark able to faint?",
+                    "Took more than 6 turns to use Memento. Was Zoroark able to faint?",
                     true
                 );
             }
+
         }
         else if (retZ == 1) {
             env.log("Detected swap menu. Assuming Zoroark fainted turn one.");
