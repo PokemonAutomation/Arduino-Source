@@ -78,8 +78,8 @@ TournamentFarmer::TournamentFarmer()
           100, 0
           )
     , TRY_TO_TERASTILLIZE(
-          "<b>Use Terastillization:</b><br>Tera at the start of battle. Will take longer but may be worth the attack boost.",
-          LockWhileRunning::LOCKED,
+          "<b>Use Terastillization:</b><br>Tera at the start of battle. Will take longer to complete each tournament but may be worth the attack boost.<br>This setting is not necessary if you are running a set specifically made to farm the tournament.",
+          LockWhileRunning::UNLOCKED,
           false
           )
     , SAVE_NUM_ROUNDS(
@@ -332,7 +332,7 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, BotBaseCo
                 NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
                 int ret = wait_until(
                     env.console, context,
-                    std::chrono::seconds(60), //Tera takes ~25 to 30 seconds for player/opponent
+                    std::chrono::seconds(90), //Tera takes ~25 to 30 seconds for player/opponent
                     { battle_menu } //End of battle from tera'd ace takes longer, 45 seconds was not enough
                 );
                 if (ret == 0) {
@@ -340,13 +340,13 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, BotBaseCo
                     pbf_mash_button(context, BUTTON_A, 300);
                     context.wait_for_all_requests();
                 } else {
-                    env.log("Timed out during battle. Stuck, crashed, or took more than 60 seconds for a turn.", COLOR_RED);
+                    env.log("Timed out during battle. Stuck, crashed, or took more than 90 seconds for a turn.", COLOR_RED);
                     stats.errors++;
                     env.update_stats();
                     send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
                     throw OperationFailedException(
                         ErrorReport::SEND_ERROR_REPORT, env.console,
-                        "Timed out during battle. Stuck, crashed, or took more than 60 seconds for a turn.",
+                        "Timed out during battle. Stuck, crashed, or took more than 90 seconds for a turn.",
                         true
                     );
                 }

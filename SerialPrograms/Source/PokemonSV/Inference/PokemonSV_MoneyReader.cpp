@@ -27,7 +27,7 @@ int read_money(Logger& logger, const ImageViewRGB32& image){
     //OCR Text: "Al IRt 1N} . !You got 27,200 in prize money!" -> "4127200" -> 4127200
     //OCR Text: "You got 26,400 in prize money!AR -" -> "264004" -> 264004
     //OCR Text: "v N r 1 .You got 26,400 in prize money!" -> "126400" -> 126400
-    std::regex reg{ "\xA3[a-zA-Z0-9,.]+" };
+    std::regex reg{ "\xA3[a-zA-Z0-9,.]+|[0-9,. ]+\xA3" };
     std::smatch match;
     std::regex_search(ocr_text, match, reg);
     std::ssub_match sub_match = match[0];
