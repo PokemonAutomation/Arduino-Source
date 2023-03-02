@@ -332,7 +332,7 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, BotBaseCo
                 NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
                 int ret = wait_until(
                     env.console, context,
-                    std::chrono::seconds(90), //Tera takes ~25 to 30 seconds for player/opponent
+                    std::chrono::seconds(90), //Tera takes ~25 to 30 seconds each, slightly over 60 seconds if both player and opponent uses in the same turn
                     { battle_menu } //End of battle from tera'd ace takes longer, 45 seconds was not enough
                 );
                 if (ret == 0) {
