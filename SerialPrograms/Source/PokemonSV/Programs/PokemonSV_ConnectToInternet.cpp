@@ -62,7 +62,7 @@ bool NewsDetector::detect(const ImageViewRGB32& screen) const{
 class NewsWatcher : public DetectorToFinder<NewsDetector>{
 public:
     NewsWatcher(Color color = COLOR_RED)
-         : DetectorToFinder("NewsWatcher", std::chrono::milliseconds(250), color)
+         : DetectorToFinder("NewsWatcher", std::chrono::milliseconds(1000), color)
     {}
 };
 
