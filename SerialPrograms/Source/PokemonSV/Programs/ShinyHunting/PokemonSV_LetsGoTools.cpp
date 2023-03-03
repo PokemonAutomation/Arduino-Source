@@ -210,6 +210,10 @@ bool LetsGoEncounterBotTracker::process_battle(EncounterWatcher& watcher, Encoun
         : EncounterActionsAction::RUN_AWAY;
 
     for (EncounterActionsEntry& entry : settings.ACTIONS_TABLE.snapshot()){
+        if (language == Language::None){
+            throw UserSetupError(m_console, "You must set the game language to use the actions table.");
+        }
+
         //  See if Pokemon name matches.
         auto iter = slugs.find(entry.pokemon);
         if (iter == slugs.end()){
