@@ -84,15 +84,20 @@ std::string EventNotificationOption::tags_to_str(const std::vector<std::string>&
 }
 std::vector<std::string> EventNotificationOption::parse_tags(const std::string& str){
     std::vector<std::string> tags;
-
-    //  TODO: Don't use Qt here.
-    for (QString token : QString::fromStdString(str).split(",")){
-        std::string cstr = token.toStdString();
-        cstr = sanitize_tag(cstr);
-        if (!cstr.empty()){
-            tags.emplace_back(std::move(cstr));
+    size_t start = 0;
+    
+    for (size_t end; (end = str.find(",", start)) != std::string::npos; start = end+1) {
+        std::string token = str.substr(start, end - start);
+        token = sanitize_tag(token);
+        if (!token.empty()){
+            tags.emplace_back(std::move(token));
         }
     }
+    std::string token = sanitize_tag(str.substr(start));
+     if (!token.empty()){
+        tags.emplace_back(std::move(token));
+    }
+
     return tags;
 }
 
