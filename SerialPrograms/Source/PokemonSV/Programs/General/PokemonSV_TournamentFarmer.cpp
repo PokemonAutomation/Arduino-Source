@@ -78,7 +78,7 @@ TournamentFarmer::TournamentFarmer()
           100, 0
           )
     , TRY_TO_TERASTILLIZE(
-          "<b>Use Terastillization:</b><br>Tera at the start of battle. Will take longer but may be worth the attack boost.",
+          "<b>Use Terastillization:</b><br>Tera at the start of battle. Will take longer to complete each tournament but may be worth the attack boost.<br>This setting is not necessary if you are running a set specifically made to farm the tournament.",
           LockWhileRunning::UNLOCKED,
           false
           )
@@ -91,6 +91,11 @@ TournamentFarmer::TournamentFarmer()
         "<b>Stop after earning this amount of money:</b><br>Zero disables this check. Does not count losses. Max is 999,999,999.",
         LockWhileRunning::UNLOCKED,
         999999999, 0, 999999999
+    )
+    , HHH_ZOROARK(
+        "<b>Happy Hour H-Zoroark:</b><br>Check this if you have an event Hisuian Zoroark with Happy Hour and Memento as your lead.<br>Happy Hour must be in its first move slot and Memento must be in its second.<br>",
+        LockWhileRunning::LOCKED,
+        false
     )
     , GO_HOME_WHEN_DONE(false)
     , LANGUAGE(
@@ -113,6 +118,7 @@ TournamentFarmer::TournamentFarmer()
     PA_ADD_OPTION(TRY_TO_TERASTILLIZE);
     PA_ADD_OPTION(SAVE_NUM_ROUNDS);
     PA_ADD_OPTION(MONEY_LIMIT);
+    PA_ADD_OPTION(HHH_ZOROARK);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(TARGET_ITEMS);
@@ -157,11 +163,11 @@ void TournamentFarmer::check_money(SingleSwitchProgramEnvironment& env, BotBaseC
 
         //Filter out low and high numbers in case of misreads
         //From bulbapedia: Nemona is lowest at 8640,  Penny and Geeta are highest at 16800
-        //Max earnings? in one battle: amulet coin * (base winnings + (8 * make it rain lv100))
-        if (top_money < 8000 || top_money > 50000 ) {
+        //Max earnings? in one battle: happy hour * amulet coin * (base winnings + (8 * make it rain lv100))
+        if (top_money < 8000 || top_money > 80000 ) {
             top_money = -1;
         }
-        if (bottom_money < 8000 || bottom_money > 50000) {
+        if (bottom_money < 8000 || bottom_money > 80000) {
             bottom_money = -1;
         }
     }
@@ -186,6 +192,112 @@ void TournamentFarmer::check_money(SingleSwitchProgramEnvironment& env, BotBaseC
 //Handle a single battle by mashing A until AdvanceDialog (end of battle) is detected
 void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
     TournamentFarmer_Descriptor::Stats& stats = env.current_stats<TournamentFarmer_Descriptor::Stats>();
+
+    //Only applies if the player has The Hidden Treasure of Area Zero Hisuian Zoroark
+    if (HHH_ZOROARK) {
+        env.log("Zoroark option checked.");
+        
+        //Use happy hour
+        env.log("Using Happy Hour.");
+        pbf_mash_button(context, BUTTON_A, 300);
+        context.wait_for_all_requests();
+
+        //If not already dead, use memento and die
+        NormalBattleMenuWatcher memento(COLOR_RED);
+        SwapMenuWatcher fainted(COLOR_YELLOW);
+        int retZ = wait_until(
+            env.console, context,
+            std::chrono::seconds(60),
+            { memento, fainted }
+        );
+        if (retZ == 0) {
+            env.log("Using Memento to faint.");
+            pbf_press_button(context, BUTTON_A, 10, 50);
+            pbf_wait(context, 100);
+            context.wait_for_all_requests();
+
+            pbf_press_dpad(context, DPAD_DOWN, 10, 50);
+            pbf_press_button(context, BUTTON_A, 10, 50);
+            context.wait_for_all_requests();
+
+            //Try six times, in case of paralysis (only applies to Pachirisu's Nuzzle) preventing use of Memento.
+            int retF = run_until(
+                env.console, context,
+                [&](BotBaseContext& context) {
+                    for (size_t c = 0; c < 6; c++) {
+                        NormalBattleMenuWatcher battle_memento(COLOR_RED);
+                        int ret_memento = wait_until(
+                            env.console, context,
+                            std::chrono::seconds(60),
+                            { battle_memento }
+                        );
+                        if (ret_memento == 0) {
+                            env.log("Attempting to use Memento.");
+                            pbf_mash_button(context, BUTTON_A, 300);
+                            context.wait_for_all_requests();
+                        }
+                    }
+                },
+                { fainted }
+            );
+
+            if (retF == 0) {
+                env.log("Swap menu detected.");
+            } else {
+                env.log("Took more than 6 turns to use Memento. Was Zoroark able to faint?", COLOR_RED);
+                stats.errors++;
+                env.update_stats();
+                send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
+                throw OperationFailedException(
+                    ErrorReport::SEND_ERROR_REPORT, env.console,
+                    "Took more than 6 turns to use Memento. Was Zoroark able to faint?",
+                    true
+                );
+            }
+
+        }
+        else if (retZ == 1) {
+            env.log("Detected swap menu. Assuming Zoroark fainted turn one.");
+        } else {
+            env.log("Timed out after Happy Hour.", COLOR_RED);
+            stats.errors++;
+            env.update_stats();
+            send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, env.console,
+                "Timed out after Happy Hour.",
+                true
+            );
+        }
+
+        //Select 2nd pokemon from swap menu and send it out
+        pbf_press_dpad(context, DPAD_DOWN, 10, 50);
+        pbf_mash_button(context, BUTTON_A, 300);
+        context.wait_for_all_requests();
+
+        //Check for battle menu to ensure it's sent out
+        NormalBattleMenuWatcher resume_battle(COLOR_RED);
+        int retRes = wait_until(
+            env.console, context,
+            std::chrono::seconds(60),
+            { resume_battle }
+        );
+        if (retRes == 0) {
+            env.log("Battle menu detected. Second Pokemon has been sent out. Resuming usual battle sequence.");
+        } else {
+            env.log("Could not find battle menu.", COLOR_RED);
+            stats.errors++;
+            env.update_stats();
+            send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, env.console,
+                "Could not find battle menu.",
+                true
+            );
+        }
+
+    }
+
     //Assuming the player has a charged orb
     if (TRY_TO_TERASTILLIZE) {
         env.log("Attempting to terastillize.");
@@ -220,7 +332,7 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, BotBaseCo
                 NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
                 int ret = wait_until(
                     env.console, context,
-                    std::chrono::seconds(60), //Tera takes ~25 to 30 seconds for player/opponent
+                    std::chrono::seconds(90), //Tera takes ~25 to 30 seconds each, slightly over 60 seconds if both player and opponent uses in the same turn
                     { battle_menu } //End of battle from tera'd ace takes longer, 45 seconds was not enough
                 );
                 if (ret == 0) {
@@ -228,13 +340,13 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, BotBaseCo
                     pbf_mash_button(context, BUTTON_A, 300);
                     context.wait_for_all_requests();
                 } else {
-                    env.log("Timed out during battle. Stuck, crashed, or took more than 60 seconds for a turn.", COLOR_RED);
+                    env.log("Timed out during battle. Stuck, crashed, or took more than 90 seconds for a turn.", COLOR_RED);
                     stats.errors++;
                     env.update_stats();
                     send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
                     throw OperationFailedException(
                         ErrorReport::SEND_ERROR_REPORT, env.console,
-                        "Timed out during battle. Stuck, crashed, or took more than 60 seconds for a turn.",
+                        "Timed out during battle. Stuck, crashed, or took more than 90 seconds for a turn.",
                         true
                     );
                 }
@@ -324,8 +436,8 @@ void TournamentFarmer::handle_end_of_tournament(SingleSwitchProgramEnvironment& 
     TournamentFarmer_Descriptor::Stats& stats = env.current_stats<TournamentFarmer_Descriptor::Stats>();
 
     //Space out the black screen detection after the "champion" battle
-    pbf_wait(context, 700);
-    context.wait_for_all_requests();
+    //pbf_wait(context, 700);
+    //context.wait_for_all_requests();
 
     //One more black screen when done to load the academy
     BlackScreenOverWatcher black_screen(COLOR_RED, { 0.2, 0.2, 0.6, 0.6 });

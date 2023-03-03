@@ -261,6 +261,20 @@ bool TerastallizingDetector::detect(const ImageViewRGB32& screen) const{
 
 
 
+SwapMenuDetector::SwapMenuDetector(Color color)
+    : m_arrow(color, GradientArrowType::RIGHT, { 0.019, 0.127, 0.298, 0.755 })
+{}
+void SwapMenuDetector::make_overlays(VideoOverlaySet& items) const {
+    m_arrow.make_overlays(items);
+}
+bool SwapMenuDetector::detect(const ImageViewRGB32& screen) const {
+    if (!m_arrow.detect(screen)) {
+        return false;
+    }
+    return true;
+}
+
+
 
 }
 }

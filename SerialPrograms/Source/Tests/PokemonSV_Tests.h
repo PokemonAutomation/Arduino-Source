@@ -50,6 +50,8 @@ int test_pokemonSV_SandwichIngredientReader(const ImageViewRGB32& image, const s
 
 int test_pokemonSV_AdvanceDialogDetector(const ImageViewRGB32& image, bool target);
 
+int test_pokemonSV_SwapMenuDetector(const ImageViewRGB32& image, bool target);
+
 }
 
 #endif

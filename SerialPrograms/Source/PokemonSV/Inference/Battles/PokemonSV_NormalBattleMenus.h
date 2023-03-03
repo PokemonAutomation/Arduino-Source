@@ -88,6 +88,23 @@ private:
 
 
 
+class SwapMenuDetector : public StaticScreenDetector {
+public:
+    SwapMenuDetector(Color color);
+
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+    virtual bool detect(const ImageViewRGB32& screen) const override;
+
+private:
+    GradientArrowDetector m_arrow;
+};
+class SwapMenuWatcher : public DetectorToFinder<SwapMenuDetector> {
+public:
+    SwapMenuWatcher(Color color)
+        : DetectorToFinder("SwapMenuWatcher", std::chrono::milliseconds(250), color)
+    {}
+};
+
 
 
 
