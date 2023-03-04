@@ -113,6 +113,8 @@
 #include "PokemonSV/Resources/PokemonSV_Ingredients.h"
 #include "Kernels/ImageStats/Kernels_ImagePixelSumSqr.h"
 #include "CommonFramework/ImageMatch/ImageDiff.h"
+#include "CommonFramework/Inference/BlackBorderDetector.h"
+#include "PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.h"
 
 #ifdef PA_ARCH_x86
 //#include "Kernels/Kernels_x64_SSE41.h"
@@ -233,7 +235,18 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 //    using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
 
 
-    send_program_telemetry(env.logger(), true, COLOR_RED, env.program_info(), "test", {}, "");
+
+
+
+#if 0
+    ImageRGB32 image("screenshot-20230303-225044564794.png");
+
+    BlackBorderDetector detector;
+    cout << detector.detect(image) << endl;
+#endif
+
+
+//    send_program_telemetry(env.logger(), true, COLOR_RED, env.program_info(), "test", {}, "");
 
 
 

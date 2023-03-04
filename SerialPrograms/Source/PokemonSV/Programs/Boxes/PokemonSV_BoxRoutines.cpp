@@ -141,7 +141,7 @@ void move_to_right_box(BotBaseContext& context){
 }
 
 namespace {
-    
+
 // In box system, when using button Minus or button Y, it will enter a mode for box selection and holding pokemon.
 // The function detects the existence of button symbol in the bottom row of the screen to make
 // sure the mode is entered or left.
