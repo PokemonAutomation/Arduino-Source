@@ -203,8 +203,12 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
+    VideoSnapshot image = feed.snapshot();
 
-    connect_to_internet_from_overworld(env.program_info(), console, context);
+    BoxSelectionBoxModeWatcher watcher;
+    watcher.process_frame(image, image.timestamp);
+
+//    connect_to_internet_from_overworld(env.program_info(), console, context);
 
 
 

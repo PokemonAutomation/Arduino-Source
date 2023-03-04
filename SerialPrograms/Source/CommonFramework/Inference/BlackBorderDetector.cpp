@@ -32,25 +32,28 @@ void BlackBorderDetector::make_overlays(VideoOverlaySet& items) const{
 //        items.add(COLOR_RED, m_body);
 }
 bool BlackBorderDetector::detect(const ImageViewRGB32& screen) const{
+    const double MAX_SUM = 50;
+    const double MAX_STDDEV = 20;
+
     ImageStats top = image_stats(extract_box_reference(screen, m_top));
-//    cout << "top = " << top.average << top.stddev << endl;
+    cout << "top = " << top.average << top.stddev << endl;
 //    extract_box(screen, m_top).save("top.png");
-    if (!is_black(top, 30, 30)){
+    if (!is_black(top, MAX_SUM, MAX_STDDEV)){
         return false;
     }
     ImageStats bottom = image_stats(extract_box_reference(screen, m_bottom));
-//    cout << "bottom = " << bottom.average << bottom.stddev << endl;
-    if (!is_black(bottom, 30, 30)){
+    cout << "bottom = " << bottom.average << bottom.stddev << endl;
+    if (!is_black(bottom, MAX_SUM, MAX_STDDEV)){
         return false;
     }
     ImageStats left = image_stats(extract_box_reference(screen, m_left));
-//    cout << "left = " << left.average << left.stddev << endl;
-    if (!is_black(left, 30, 30)){
+    cout << "left = " << left.average << left.stddev << endl;
+    if (!is_black(left, MAX_SUM, MAX_STDDEV)){
         return false;
     }
     ImageStats right = image_stats(extract_box_reference(screen, m_right));
-//    cout << "right = " << right.average << right.stddev << endl;
-    if (!is_black(right, 30, 30)){
+    cout << "right = " << right.average << right.stddev << endl;
+    if (!is_black(right, MAX_SUM, MAX_STDDEV)){
         return false;
     }
 //    ImageStats body = image_stats(extract_box_reference(screen, m_body));
