@@ -128,7 +128,7 @@ void open_hosting_lobby(
             int ret = run_until(
                 console, context,
                 [](BotBaseContext& context){
-                    pbf_press_button(context, BUTTON_B, 20, 355);
+                    pbf_press_button(context, BUTTON_B, 20, 980);
                 },
                 {overworld}
             );
