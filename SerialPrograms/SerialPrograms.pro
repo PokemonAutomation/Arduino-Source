@@ -87,6 +87,7 @@ SOURCES += \
     ../Common/Cpp/Concurrency/PeriodicScheduler.cpp \
     ../Common/Cpp/Concurrency/ScheduledTaskRunner.cpp \
     ../Common/Cpp/Concurrency/SpinLock.cpp \
+    ../Common/Cpp/Concurrency/Watchdog.cpp \
     ../Common/Cpp/Containers/AlignedMalloc.cpp \
     ../Common/Cpp/CpuId/CpuId.cpp \
     ../Common/Cpp/EnumDatabase.cpp \
@@ -174,6 +175,7 @@ SOURCES += \
     Source/CommonFramework/Exceptions/OperationFailedException.cpp \
     Source/CommonFramework/Exceptions/ProgramFinishedException.cpp \
     Source/CommonFramework/Exceptions/ScreenshotException.cpp \
+    Source/CommonFramework/GlobalServices.cpp \
     Source/CommonFramework/GlobalSettingsPanel.cpp \
     Source/CommonFramework/Globals.cpp \
     Source/CommonFramework/ImageMatch/CroppedImageDictionaryMatcher.cpp \
@@ -1007,6 +1009,7 @@ HEADERS += \
     ../Common/Cpp/Concurrency/ScheduledTaskRunner.h \
     ../Common/Cpp/Concurrency/SpinLock.h \
     ../Common/Cpp/Concurrency/SpinPause.h \
+    ../Common/Cpp/Concurrency/Watchdog.h \
     ../Common/Cpp/Containers/AlignedMalloc.h \
     ../Common/Cpp/Containers/AlignedVector.h \
     ../Common/Cpp/Containers/AlignedVector.tpp \
@@ -1144,6 +1147,7 @@ HEADERS += \
     Source/CommonFramework/Exceptions/OperationFailedException.h \
     Source/CommonFramework/Exceptions/ProgramFinishedException.h \
     Source/CommonFramework/Exceptions/ScreenshotException.h \
+    Source/CommonFramework/GlobalServices.h \
     Source/CommonFramework/GlobalSettingsPanel.h \
     Source/CommonFramework/Globals.h \
     Source/CommonFramework/ImageMatch/CroppedImageDictionaryMatcher.h \

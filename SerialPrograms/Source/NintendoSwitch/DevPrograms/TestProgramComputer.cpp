@@ -115,6 +115,7 @@
 #include "CommonFramework/ImageMatch/ImageDiff.h"
 #include "CommonFramework/Inference/BlackBorderDetector.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.h"
+#include "Common/Cpp/Concurrency/Watchdog.h"
 
 #ifdef PA_ARCH_x86
 //#include "Kernels/Kernels_x64_SSE41.h"
@@ -189,41 +190,13 @@ void print(const Type* ptr, size_t len){
 
 
 
-class NewsDetector : public StaticScreenDetector{
-public:
-    NewsDetector(Color color = COLOR_RED);
 
-    virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool detect(const ImageViewRGB32& screen) const override;
-
-private:
-    Color m_color;
-    ImageFloatBox m_bottom_white;
-    ImageFloatBox m_bottom_buttons;
+class WatchdogTest : public WatchdogCallback{
+    virtual void on_watchdog_timeout(){
+        cout << "run()" << endl;
+    }
 };
-NewsDetector::NewsDetector(Color color)
-    : m_color(color)
-    , m_bottom_white(0.15, 0.92, 0.20, 0.06)
-    , m_bottom_buttons(0.40, 0.92, 0.58, 0.06)
-{}
-void NewsDetector::make_overlays(VideoOverlaySet& items) const{
-    items.add(m_color, m_bottom_white);
-    items.add(m_color, m_bottom_buttons);
-}
-bool NewsDetector::detect(const ImageViewRGB32& screen) const{
-    ImageStats bottom_white = image_stats(extract_box_reference(screen, m_bottom_white));
-    if (!is_white(bottom_white)){
-        return false;
-    }
 
-    ImageStats bottom_buttons = image_stats(extract_box_reference(screen, m_bottom_buttons));
-//    cout << bottom_buttons.average << bottom_buttons.stddev << endl;
-    if (bottom_buttons.stddev.sum() < 100){
-        return false;
-    }
-
-    return true;
-}
 
 
 
@@ -234,9 +207,22 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     using namespace Pokemon;
 //    using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
 
+    WatchdogTest callback;
 
+    Watchdog watchdog;
+    watchdog.add(callback, std::chrono::seconds(1));
 
+    for (size_t c = 0; c < 5; c++){
+        cout << "Delaying..." << endl;
+        watchdog.delay(callback);
+        scope.wait_for(std::chrono::milliseconds(500));
+    }
 
+    scope.wait_for(std::chrono::seconds(5));
+    watchdog.remove(callback);
+    cout << "Waiting out..." << endl;
+
+    scope.wait_for(std::chrono::seconds(60));
 
 #if 0
     ImageRGB32 image("screenshot-20230303-225044564794.png");

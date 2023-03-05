@@ -10,13 +10,14 @@
 #include <map>
 #include <QWidget>
 #include "Common/Cpp/Concurrency/SpinLock.h"
+#include "Common/Cpp/Concurrency/Watchdog.h"
 #include "CommonFramework/VideoPipeline/VideoOverlaySession.h"
 
 namespace PokemonAutomation{
 
 struct OverlayText;
 
-class VideoOverlayWidget : public QWidget, private VideoOverlaySession::Listener{
+class VideoOverlayWidget : public QWidget, private VideoOverlaySession::Listener, private WatchdogCallback{
 public:
     static constexpr bool DEFAULT_ENABLE_BOXES  = true;
     static constexpr bool DEFAULT_ENABLE_TEXT   = true;
@@ -28,6 +29,8 @@ public:
     VideoOverlayWidget(QWidget& parent, VideoOverlaySession& session);
 
 private:
+    void detach();
+
     //  Asynchronous changes to the overlays.
 
     virtual void enabled_boxes(bool enabled) override;
@@ -39,6 +42,8 @@ private:
     virtual void update_text (const std::shared_ptr<const std::vector<OverlayText>>& texts) override;
     virtual void update_log  (const std::shared_ptr<const std::vector<OverlayLogLine>>& texts) override;
     virtual void update_stats(const std::list<OverlayStat*>* stats) override;
+
+    virtual void on_watchdog_timeout() override;
 
     virtual void resizeEvent(QResizeEvent* event) override;
     virtual void paintEvent(QPaintEvent*) override;

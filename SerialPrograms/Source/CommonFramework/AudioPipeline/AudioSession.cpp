@@ -5,12 +5,13 @@
  */
 
 #include "Common/Cpp/AbstractLogger.h"
+#include "CommonFramework/GlobalServices.h"
 #include "Backends/AudioPassthroughPairQtThread.h"
 #include "AudioSession.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 
@@ -43,8 +44,10 @@ AudioSession::AudioSession(Logger& logger, AudioOption& option)
 {
     AudioSession::reset();
     m_devices->add_listener(*this);
+    global_watchdog().add(*this, std::chrono::seconds(5));
 }
 AudioSession::~AudioSession(){
+    global_watchdog().remove(*this);
     m_devices->remove_listener(*this);
 }
 
@@ -251,6 +254,10 @@ void AudioSession::add_overlay(uint64_t starting_seqnum, size_t end_seqnum, Colo
 
 void AudioSession::on_fft(size_t sample_rate, std::shared_ptr<AlignedVector<float>> fft_output){
     m_spectrum_holder.push_spectrum(sample_rate, std::move(fft_output));
+    global_watchdog().delay(*this);
+}
+void AudioSession::on_watchdog_timeout(){
+    m_logger.log("No audio detected for 5 seconds...", COLOR_RED);
 }
 
 

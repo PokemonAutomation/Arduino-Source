@@ -11,13 +11,13 @@
 
 #include <map>
 #include "Common/Cpp/Time.h"
-#include "Common/Cpp/CancellableScope.h"
+//#include "Common/Cpp/CancellableScope.h"
 #include "Common/Cpp/Concurrency/AsyncDispatcher.h"
 
 namespace PokemonAutomation{
 
 
-class ScheduledTaskRunner final : public Cancellable{
+class ScheduledTaskRunner{
 public:
     ~ScheduledTaskRunner();
     ScheduledTaskRunner(AsyncDispatcher& dispatcher);
@@ -32,7 +32,7 @@ public:
     void add_event(WallClock time, std::function<void()> callback);
     void add_event(std::chrono::milliseconds time_from_now, std::function<void()> callback);
 
-    virtual bool cancel(std::exception_ptr exception) noexcept override;
+//    virtual bool cancel(std::exception_ptr exception) noexcept override;
 
 private:
     void thread_loop();
@@ -40,6 +40,7 @@ private:
 private:
     mutable std::mutex m_lock;
     std::condition_variable m_cv;
+    bool m_stopped;
 
     std::multimap<WallClock, std::function<void()>> m_schedule;
 

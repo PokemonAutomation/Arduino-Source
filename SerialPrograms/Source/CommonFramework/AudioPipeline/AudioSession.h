@@ -16,6 +16,7 @@
 #ifndef PokemonAutomation_AudioPipeline_AudioSession_H
 #define PokemonAutomation_AudioPipeline_AudioSession_H
 
+#include "Common/Cpp/Concurrency/Watchdog.h"
 #include "AudioFeed.h"
 #include "AudioPassthroughPair.h"
 #include "Spectrum/FFTStreamer.h"
@@ -27,7 +28,7 @@ namespace PokemonAutomation{
 class Logger;
 
 
-class AudioSession final : public AudioFeed, private FFTListener{
+class AudioSession final : public AudioFeed, private FFTListener, private WatchdogCallback{
 public:
     struct Listener{
         virtual void input_changed(const std::string& file, const AudioDeviceInfo& device, AudioChannelFormat format){}
@@ -77,6 +78,7 @@ public:
 
 private:
     virtual void on_fft(size_t sample_rate, std::shared_ptr<AlignedVector<float>> fft_output) override;
+    virtual void on_watchdog_timeout() override;
 
     bool sanitize_format();
     void push_input_changed();

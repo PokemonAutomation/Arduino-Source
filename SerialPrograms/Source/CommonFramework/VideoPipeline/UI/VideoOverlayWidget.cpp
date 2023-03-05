@@ -6,6 +6,7 @@
 
 #include <QPainter>
 #include <QResizeEvent>
+#include "CommonFramework/GlobalServices.h"
 #include "VideoOverlayWidget.h"
 
 //#include <iostream>
@@ -20,8 +21,12 @@ namespace PokemonAutomation{
 
 
 
-VideoOverlayWidget::~VideoOverlayWidget(){
+void VideoOverlayWidget::detach(){
     m_session.remove_listener(*this);
+    global_watchdog().remove(*this);
+}
+VideoOverlayWidget::~VideoOverlayWidget(){
+    detach();
 }
 VideoOverlayWidget::VideoOverlayWidget(QWidget& parent, VideoOverlaySession& session)
     : QWidget(&parent)
@@ -35,7 +40,13 @@ VideoOverlayWidget::VideoOverlayWidget(QWidget& parent, VideoOverlaySession& ses
     setAttribute(Qt::WA_TransparentForMouseEvents);
 
 //    m_boxes.insert(&ENTIRE_VIDEO);
-    m_session.add_listener(*this);
+    try{
+        global_watchdog().add(*this, std::chrono::milliseconds(50));
+        m_session.add_listener(*this);
+    }catch (...){
+        detach();
+        throw;
+    }
 }
 
 void VideoOverlayWidget::enabled_boxes(bool enabled){
@@ -74,24 +85,34 @@ void VideoOverlayWidget::update_stats(const std::list<OverlayStat*>* stats){
     m_stats = stats;
 }
 
+void VideoOverlayWidget::on_watchdog_timeout(){
+    QMetaObject::invokeMethod(this, [this]{ this->update(); });
+//    static int c = 0;
+//    cout << c++ << endl;
+}
+
 void VideoOverlayWidget::resizeEvent(QResizeEvent* event){}
 void VideoOverlayWidget::paintEvent(QPaintEvent*){
     QPainter painter(this);
 
-    SpinLockGuard lg(m_lock, "VideoOverlay::paintEvent()");
+    {
+        SpinLockGuard lg(m_lock, "VideoOverlay::paintEvent()");
 
-    if (m_session.enabled_boxes()){
-        update_boxes(painter);
+        if (m_session.enabled_boxes()){
+            update_boxes(painter);
+        }
+        if (m_session.enabled_text()){
+            update_text(painter);
+        }
+        if (m_session.enabled_log()){
+            update_log(painter);
+        }
+        if (m_session.enabled_stats() && m_stats){
+            update_stats(painter);
+        }
     }
-    if (m_session.enabled_text()){
-        update_text(painter);
-    }
-    if (m_session.enabled_log()){
-        update_log(painter);
-    }
-    if (m_session.enabled_stats() && m_stats){
-        update_stats(painter);
-    }
+
+    global_watchdog().delay(*this);
 }
 
 

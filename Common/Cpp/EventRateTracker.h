@@ -42,6 +42,9 @@ public:
         if (m_history.size() < 2){
             return 0;
         }
+        if (current_time() > m_history.back() + m_window){
+            return 0;
+        }
         auto delta = m_history.back() - m_history.front();
         return (double)(m_history.size() - 1) / std::chrono::duration_cast<std::chrono::microseconds>(delta).count() * 1000000;
     }

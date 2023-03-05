@@ -17,11 +17,17 @@ namespace PokemonAutomation{
 
 
 ScheduledTaskRunner::~ScheduledTaskRunner(){
-    ScheduledTaskRunner::cancel(nullptr);
+//    ScheduledTaskRunner::cancel(nullptr);
+    {
+        std::lock_guard<std::mutex> lg(m_lock);
+        m_stopped = true;
+        m_cv.notify_all();
+    }
     m_runner.reset();
 }
 ScheduledTaskRunner::ScheduledTaskRunner(AsyncDispatcher& dispatcher)
-    : m_runner(dispatcher.dispatch([this]{ thread_loop(); }))
+    : m_stopped(false)
+    , m_runner(dispatcher.dispatch([this]{ thread_loop(); }))
 {}
 size_t ScheduledTaskRunner::size() const{
     std::lock_guard<std::mutex> lg(m_lock);
@@ -44,6 +50,7 @@ void ScheduledTaskRunner::add_event(std::chrono::milliseconds time_from_now, std
     m_schedule.emplace(current_time() + time_from_now, std::move(callback));
     m_cv.notify_all();
 }
+#if 0
 bool ScheduledTaskRunner::cancel(std::exception_ptr exception) noexcept{
     if (Cancellable::cancel(std::move(exception))){
         return true;
@@ -52,13 +59,16 @@ bool ScheduledTaskRunner::cancel(std::exception_ptr exception) noexcept{
     m_cv.notify_all();
     return false;
 }
+#endif
 void ScheduledTaskRunner::thread_loop(){
     std::unique_lock<std::mutex> lg(m_lock);
 //    WallClock last_check_timestamp = current_time();
-    while (true){
+    while (!m_stopped){
+#if 0
         if (cancelled()){
             return;
         }
+#endif
 
         if (m_schedule.empty()){
             m_cv.wait(lg);

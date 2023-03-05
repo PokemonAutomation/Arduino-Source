@@ -78,6 +78,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/Concurrency/SpinLock.cpp
     ../Common/Cpp/Concurrency/SpinLock.h
     ../Common/Cpp/Concurrency/SpinPause.h
+    ../Common/Cpp/Concurrency/Watchdog.cpp
+    ../Common/Cpp/Concurrency/Watchdog.h
     ../Common/Cpp/Containers/AlignedMalloc.cpp
     ../Common/Cpp/Containers/AlignedMalloc.h
     ../Common/Cpp/Containers/AlignedVector.h
@@ -302,6 +304,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Environment/HardwareValidation.h
     Source/CommonFramework/Environment/HardwareValidation_arm64.tpp
     Source/CommonFramework/Environment/HardwareValidation_x86.tpp
+    Source/CommonFramework/GlobalServices.cpp
+    Source/CommonFramework/GlobalServices.h
     Source/CommonFramework/GlobalSettingsPanel.cpp
     Source/CommonFramework/GlobalSettingsPanel.h
     Source/CommonFramework/Globals.cpp
