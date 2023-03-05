@@ -16,6 +16,7 @@
 
 #include <map>
 #include <mutex>
+#include <thread>
 #include <condition_variable>
 #include "Common/Cpp/Time.h"
 
