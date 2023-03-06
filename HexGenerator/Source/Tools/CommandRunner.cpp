@@ -83,6 +83,7 @@ int build_hexfile(
 #include <unistd.h>
 #include <limits.h>
 namespace PokemonAutomation{
+namespace HexGenerator{
 
 int build_hexfile(
     const std::string& board,
@@ -98,9 +99,9 @@ int build_hexfile(
     // Since most macs will have the avr tools installed in /usr/local/bin, add it to the path now
     std::string path = "/usr/local/bin:";
     path.append(getenv("PATH"));
-    setenv("PATH", path.toUtf8(), 1);
+    setenv("PATH", path.c_str(), 1);
 
-    QFile file(hex_file);
+    QFile file(QString::fromStdString(hex_file));
     file.remove();
 
     // Saving our CWD to return to it later
@@ -111,11 +112,11 @@ int build_hexfile(
     int cd_mod_dir = chdir(module_dir.c_str());
     if (cd_mod_dir !=0) {
         char msg[50];
-        sprintf(msg, "chdir() to %s failed with code %d", module_dir.c_str() cd_mod_dir);
+        sprintf(msg, "chdir() to %s failed with code %d", module_dir.c_str(), cd_mod_dir);
         std::cout << msg;
         run_on_main_thread([=]{
             QMessageBox box;
-            box.critical(nullptr, "Error", "Failed to change working directory to: " + module_dir);
+            box.critical(nullptr, "Error", QString::fromStdString("Failed to change working directory to: " + module_dir));
         });
         return 1;
     }
