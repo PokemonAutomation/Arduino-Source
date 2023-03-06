@@ -27,4 +27,14 @@ Depending on what you are building (Debug or Release), the binary will be create
  
 
 **Mac:**
- - Not supported yet.
+
+1. Install Qt 5
+    1. `brew install qt@5`
+2. Build from source
+    1. `cd` to this source directory
+    2. run `qmake` from `qt@5`: `/opt/homebrew/Cellar/qt@5/5.15.8_2/bin/qmake` to generate `Makefile`
+    3. run `make -j 10`
+    4. the resulted binary `HexGenerator` would be in current directory
+3. Cleanup
+    1. run `make clean` to cleanup compiled files
+    2. run `make distclean` to cleanup everything including `Makefile` itself
