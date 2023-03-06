@@ -16,7 +16,7 @@
 namespace PokemonAutomation{
 namespace HexGenerator{
 
-std::unique_ptr<QApplication> application;
+QApplication* application = nullptr;
 
 }
 }
@@ -27,7 +27,8 @@ using namespace HexGenerator;
 int main(int argc, char *argv[])
 {
     QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-    application.reset(new QApplication(argc, argv));
+    auto app = std::make_unique<QApplication>(argc, argv);
+    application = app.get();
 
     settings.load();
 
@@ -57,7 +58,7 @@ int main(int argc, char *argv[])
 
     MainWindow w;
     w.show();
-    int ret = application->exec();
+    int ret = app->exec();
     settings.write();
     return ret;
 }

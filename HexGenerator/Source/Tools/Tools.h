@@ -37,11 +37,11 @@ int build_hexfile(
 
 
 
-extern std::unique_ptr<QApplication> application;
+extern QApplication* application;
 
 template <typename Lambda>
 void run_on_main_thread(Lambda&& lambda){
-    QMetaObject::invokeMethod(application.get(), std::move(lambda));
+    QMetaObject::invokeMethod(application, std::move(lambda));
 }
 
 
