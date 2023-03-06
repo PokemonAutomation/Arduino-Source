@@ -83,6 +83,7 @@ int build_hexfile(
 #include <unistd.h>
 #include <limits.h>
 namespace PokemonAutomation{
+namespace HexGenerator{
 
 int build_hexfile(
     const std::string& board,
@@ -98,9 +99,9 @@ int build_hexfile(
     // Since most macs will have the avr tools installed in /usr/local/bin, add it to the path now
     std::string path = "/usr/local/bin:";
     path.append(getenv("PATH"));
-    setenv("PATH", path.toUtf8(), 1);
+    setenv("PATH", path.c_str(), 1);
 
-    QFile file(hex_file);
+    QFile file(QString::fromStdString(hex_file));
     file.remove();
 
     // Saving our CWD to return to it later
@@ -110,19 +111,17 @@ int build_hexfile(
     // Move to our Device Source directory
     int cd_mod_dir = chdir(module_dir.c_str());
     if (cd_mod_dir !=0) {
-        char msg[50];
-        sprintf(msg, "chdir() to %s failed with code %d", module_dir.c_str() cd_mod_dir);
-        std::cout << msg;
+        std::cout << "chdir() to " << module_dir << " failed with code " << cd_mod_dir << std::endl;
         run_on_main_thread([=]{
             QMessageBox box;
-            box.critical(nullptr, "Error", "Failed to change working directory to: " + module_dir);
+            box.critical(nullptr, "Error", QString::fromStdString("Failed to change working directory to: " + module_dir));
         });
         return 1;
     }
 
     FILE* pipe = popen(command.c_str(), "r");
     if (!pipe) {
-        std::cout << "Failed to create process with command " + command;
+        std::cout << "Failed to create process with command " << command << std::endl;
         run_on_main_thread([=]{
             QMessageBox box;
             box.critical(nullptr, "Error", QString::fromStdString("Failed to create process for " + module));
@@ -145,23 +144,21 @@ int build_hexfile(
     //TIME_PRINT_
     int ret = pclose(pipe)/256;
     if (ret != 0) {
-        std::cout << "error = " << data << std::endl;
-        char msg[50];
-        sprintf(msg, "Build process exited with code: %d", ret);
+        std::string msg = "Build process exited with code: " + std::to_string(ret);
+        std::cout << msg << std::endl;
         run_on_main_thread([=]{
             QMessageBox box;
-            box.critical(nullptr, "Error", msg);
+            box.critical(nullptr, "Error",  QString::fromStdString(msg));
         });
     }
 
     int cd_back = chdir(cwd);
     if ( cd_back !=0) {
-        char msg[50];
-        sprintf(msg, "Failed to change back to original working directory: code %d", cd_back);
-        std::cout << msg;
+        std::string msg = "Failed to change back to original working directory: code " + std::to_string(cd_back);
+        std::cout << msg << std::endl;
         run_on_main_thread([=]{
             QMessageBox box;
-            box.critical(nullptr, "Error", msg);
+            box.critical(nullptr, "Error", QString::fromStdString(msg));
         });
     }
     return ret;
