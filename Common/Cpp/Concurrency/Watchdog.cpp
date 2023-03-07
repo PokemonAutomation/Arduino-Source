@@ -119,20 +119,22 @@ void Watchdog::thread_body(){
             m_cv.wait(lg);
             continue;
         }
+        
+        while (!m_schedule.empty()){
+            auto iter_s = m_schedule.begin();
+            auto iter_c = m_callbacks.find(iter_s->second);
 
-        auto iter_s = m_schedule.begin();
-        auto iter_c = m_callbacks.find(iter_s->second);
+            WallClock now = current_time();
+            if (now < iter_s->first){
+                //  Next scheduled callback isn't ready yet.
+                m_cv.wait_until(lg, iter_s->first);
+                continue;
+            }
 
-        WallClock now = current_time();
-        if (now < iter_s->first){
-            //  Next scheduled callback isn't ready yet.
-            m_cv.wait_until(lg, iter_s->first);
-            continue;
+            iter_s->second->on_watchdog_timeout();
+
+            update_unprotected(iter_c, current_time() + iter_c->second.period);
         }
-
-        iter_s->second->on_watchdog_timeout();
-
-        update_unprotected(iter_c, current_time() + iter_c->second.period);
     }
 }
 
