@@ -6,6 +6,10 @@
 
 #include "Watchdog.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 
 
@@ -126,7 +130,12 @@ void Watchdog::thread_body(){
         WallClock now = current_time();
         if (now < iter_s->first){
             //  Next scheduled callback isn't ready yet.
-            m_cv.wait_until(lg, iter_s->first);
+
+            //  Need to copy the value out since "m_cv.wait_until()" takes the
+            //  time parameter by reference and "iter_s->first" can be invalidated.
+            WallClock wakeup = iter_s->first;
+            m_cv.wait_until(lg, wakeup);
+
             continue;
         }
 
