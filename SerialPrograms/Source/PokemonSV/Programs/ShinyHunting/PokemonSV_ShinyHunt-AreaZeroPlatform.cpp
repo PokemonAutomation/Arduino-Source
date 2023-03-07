@@ -206,7 +206,7 @@ bool ShinyHuntAreaZeroPlatform::run_traversal(BotBaseContext& context){
             console.log("Platform Reset: Not enough time has elapsed.", COLOR_ORANGE);
             break;
         }
-        if (kills >= PLATFORM_RESET.KILLS_IN_WINDOW){
+        if (kills >= PLATFORM_RESET.KILLS_IN_WINDOW0){
             console.log("Platform Reset: Enough kills in window.", COLOR_ORANGE);
             break;
         }

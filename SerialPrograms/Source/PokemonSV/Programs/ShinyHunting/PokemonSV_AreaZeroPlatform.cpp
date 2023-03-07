@@ -32,7 +32,7 @@ using namespace Pokemon;
 
 PlatformResetSettings::~PlatformResetSettings(){
     ENCOUNTERS_IN_WINDOW.remove_listener(*this);
-    KILLS_IN_WINDOW.remove_listener(*this);
+    KILLS_IN_WINDOW0.remove_listener(*this);
     WINDOW_IN_MINUTES.remove_listener(*this);
 }
 PlatformResetSettings::PlatformResetSettings()
@@ -53,10 +53,10 @@ PlatformResetSettings::PlatformResetSettings()
         LockWhileRunning::UNLOCKED,
         10
     )
-    , KILLS_IN_WINDOW(
+    , KILLS_IN_WINDOW0(
         "<b>Kills in Window:</b><br>If the number of kills in the last X seconds has drops below this value, consider resetting.",
         LockWhileRunning::UNLOCKED,
-        30
+        20
     )
     , ENCOUNTERS_IN_WINDOW(
         "<b>Encounters in Window:</b><br>If the number of encounters in the last X seconds has drops below this value, consider resetting.",
@@ -76,7 +76,7 @@ PlatformResetSettings::PlatformResetSettings()
 
     PA_ADD_STATIC(m_sliding_window);
     PA_ADD_OPTION(WINDOW_IN_MINUTES);
-    PA_ADD_OPTION(KILLS_IN_WINDOW);
+    PA_ADD_OPTION(KILLS_IN_WINDOW0);
     PA_ADD_OPTION(ENCOUNTERS_IN_WINDOW);
 
 //    PA_ADD_OPTION(RESET_DURATION_MINUTES);
@@ -84,7 +84,7 @@ PlatformResetSettings::PlatformResetSettings()
     PlatformResetSettings::value_changed();
 
     WINDOW_IN_MINUTES.add_listener(*this);
-    KILLS_IN_WINDOW.add_listener(*this);
+    KILLS_IN_WINDOW0.add_listener(*this);
     ENCOUNTERS_IN_WINDOW.add_listener(*this);
 }
 
@@ -98,7 +98,7 @@ std::string int_to_text(size_t value, const std::string& unit){
 }
 void PlatformResetSettings::value_changed(){
     m_sliding_window.set_text(
-        "<font color=\"red\">Perform a platform reset if there are fewer than " + int_to_text(KILLS_IN_WINDOW, "kill") +
+        "<font color=\"red\">Perform a platform reset if there are fewer than " + int_to_text(KILLS_IN_WINDOW0, "kill") +
         " and " + int_to_text(ENCOUNTERS_IN_WINDOW, "encounter") +
         " in the last " + int_to_text(WINDOW_IN_MINUTES, "minute") + ".</font>"
     );

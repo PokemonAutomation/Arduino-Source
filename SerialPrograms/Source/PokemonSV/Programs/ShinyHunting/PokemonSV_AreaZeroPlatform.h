@@ -36,7 +36,7 @@ public:
     StaticTextOption m_description;
     StaticTextOption m_sliding_window;
     SimpleIntegerOption<uint16_t> WINDOW_IN_MINUTES;
-    SimpleIntegerOption<uint16_t> KILLS_IN_WINDOW;
+    SimpleIntegerOption<uint16_t> KILLS_IN_WINDOW0;
     SimpleIntegerOption<uint16_t> ENCOUNTERS_IN_WINDOW;
 //    SimpleIntegerOption<uint16_t> RESET_DURATION_MINUTES;
 };

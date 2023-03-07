@@ -88,7 +88,7 @@ void VideoOverlayWidget::update_stats(const std::list<OverlayStat*>* stats){
 void VideoOverlayWidget::on_watchdog_timeout(){
     QMetaObject::invokeMethod(this, [this]{ this->update(); });
 //    static int c = 0;
-//    cout << c++ << endl;
+//    cout << "VideoOverlayWidget::on_watchdog_timeout(): " << c++ << endl;
 }
 
 void VideoOverlayWidget::resizeEvent(QResizeEvent* event){}
