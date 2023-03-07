@@ -6,6 +6,7 @@
 
 #include "Common/Cpp/AbstractLogger.h"
 #include "CommonFramework/GlobalServices.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "Backends/AudioPassthroughPairQtThread.h"
 #include "AudioSession.h"
 
@@ -257,7 +258,16 @@ void AudioSession::on_fft(size_t sample_rate, std::shared_ptr<AlignedVector<floa
     global_watchdog().delay(*this);
 }
 void AudioSession::on_watchdog_timeout(){
+    if (!m_option.m_input_device){
+        return;
+    }
     m_logger.log("No audio detected for 5 seconds...", COLOR_RED);
+
+    if (!GlobalSettings::instance().ENABLE_AUTO_RESET_AUDIO){
+        return;
+    }
+    m_logger.log("Resetting the audio...", COLOR_GREEN);
+    reset();
 }
 
 
