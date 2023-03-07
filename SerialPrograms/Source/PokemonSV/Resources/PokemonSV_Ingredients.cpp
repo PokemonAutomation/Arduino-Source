@@ -115,6 +115,7 @@ const SandwichIngredientNames& get_ingredient_name(const std::string& slug){
     }
     return iter->second;
 }
+
 const std::string& parse_ingredient_name(const std::string& display_name){
     const std::map<std::string, std::string>& database = IngredientNameDatabase::instance().m_display_name_to_slug;
     auto iter = database.find(display_name);

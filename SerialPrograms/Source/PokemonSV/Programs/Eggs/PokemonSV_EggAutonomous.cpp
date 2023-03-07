@@ -286,20 +286,8 @@ int EggAutonomous::fetch_eggs_full_routine(SingleSwitchProgramEnvironment& env, 
 
     picnic_at_zero_gate(env.program_info(), env.console, context);
     // Now we are at picnic. We are at one end of picnic table while the egg basket is at the other end
-
-    // Check user herb index input validity:
-    const size_t sweet_index_last = EGG_SANDWICH.SWEET_HERB_INDEX_BACKWARDS.current_value();
-    const size_t salty_index_last = EGG_SANDWICH.SALTY_HERB_INDEX_BACKWARDS.current_value();
-    const size_t bitter_index_last = EGG_SANDWICH.BITTER_HERB_INDEX_BACKWARDS.current_value();
-    if (EGG_SANDWICH.EGG_SANDWICH_TYPE == EggSandwichType::SALTY_SWEET_HERBS && salty_index_last >= sweet_index_last){
-        throw UserSetupError(env.console, "Salty Herb index cannot be the same or before Sweet Herb.");
-    }
-    else if (EGG_SANDWICH.EGG_SANDWICH_TYPE == EggSandwichType::BITTER_SWEET_HERBS && bitter_index_last >= sweet_index_last){
-        throw UserSetupError(env.console, "Bitter Herb index cannot be the same or before Sweet Herb.");
-    }
-
     bool can_make_sandwich = eat_egg_sandwich_at_picnic(env.program_info(), env.realtime_dispatcher(), env.console, context,
-        EGG_SANDWICH.EGG_SANDWICH_TYPE, sweet_index_last, salty_index_last, bitter_index_last);
+        EGG_SANDWICH.EGG_SANDWICH_TYPE, LANGUAGE);
     if (can_make_sandwich == false){
         throw UserSetupError(env.console, "No sandwich recipe or ingredients. Cannot open and select the sandwich recipe.");
     }

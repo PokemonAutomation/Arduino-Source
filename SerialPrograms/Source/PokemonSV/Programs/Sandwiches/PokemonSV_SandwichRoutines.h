@@ -9,6 +9,7 @@
 #ifndef PokemonAutomation_PokemonSV_SandwichRoutines_H
 #define PokemonAutomation_PokemonSV_SandwichRoutines_H
 
+#include "CommonFramework/Language.h"
 #include <cstddef>
 
 namespace PokemonAutomation{
@@ -63,6 +64,14 @@ enum class EggSandwichType{
 void make_two_herbs_sandwich(
     const ProgramInfo& info, AsyncDispatcher& dispatcher, ConsoleHandle& console, BotBaseContext& context,
     EggSandwichType sandwich_type, size_t sweet_herb_index_last, size_t salty_herb_index_last, size_t bitter_herb_index_last
+);
+// Assuming starting at the custom sandwich mode,
+// select lettuce and two herbs (two sweets, bitter sweet or salty sweet according to `sandwich_type`).
+// It will use the first sandwich pick in the sandwich pick selection list.
+// After entering sandiwich mini game, it will drop the filling to quickly make a two-herb only sandwich to gain egg power lv 3.
+void make_two_herbs_sandwich(
+    const ProgramInfo& info, AsyncDispatcher& dispatcher, ConsoleHandle& console, BotBaseContext& context,
+    EggSandwichType sandwich_type, Language language
 );
 
 }

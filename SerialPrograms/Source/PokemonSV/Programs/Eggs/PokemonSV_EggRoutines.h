@@ -43,11 +43,10 @@ void picnic_at_zero_gate(const ProgramInfo& info, ConsoleHandle& console, BotBas
 // - Great Peanut Butter Sandwich to gain egg power Lv 2, must have unlocked its recipe and have enough ingredients to make all
 //   the sandwiches for all the unlocked recipes.
 // - Two-sweet-herbs, bitter-sweet-herbs or salty-sweet-herbs custom sandwich to gain egg power Lv 3, must have enough ingredinets and
-//   provide the locations of the herbs as the last `xxx_herb_index_last`-th (0-indexed) condiment on the list.
+//   provide game language for OCR ingredient lists.
 // Return false if no needed sandwich ingredients or recipe.
 bool eat_egg_sandwich_at_picnic(const ProgramInfo& info, AsyncDispatcher& dispatcher, ConsoleHandle& console,
-    BotBaseContext& context, EggSandwichType sandwich_type = EggSandwichType::GREAT_PEANUT_BUTTER,
-    size_t sweet_herb_index_last = 4, size_t salty_herb_index_last = 3, size_t bitter_herb_index_last = 1);
+    BotBaseContext& context, EggSandwichType sandwich_type, Language language);
 
 // After eating a sandwich, go around picnic table to wait at basket and collect eggs.
 // `num_eggs_collected` will be updated to add newly collected eggs.

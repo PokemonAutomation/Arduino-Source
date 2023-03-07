@@ -10,6 +10,7 @@
 #include "CommonFramework/Tools/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
+#include "PokemonSV/Inference/Boxes/PokemonSV_IVCheckerReader.h"
 #include "PokemonSV/Programs/Eggs/PokemonSV_EggRoutines.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSV_EggFetcher.h"
@@ -57,6 +58,12 @@ std::unique_ptr<StatsTracker> EggFetcher_Descriptor::make_stats() const{
 
 EggFetcher::EggFetcher()
     : GO_HOME_WHEN_DONE(false)
+    , LANGUAGE(
+        "<b>Game Language:</b><br>Required to read IVs.",
+        IV_READER().languages(),
+        LockWhileRunning::LOCKED,
+        false
+    )
     , EGGS_TO_FETCH(
         "<b>Fetch this many eggs:</b>",
         LockWhileRunning::LOCKED,
@@ -70,6 +77,7 @@ EggFetcher::EggFetcher()
     })
 {
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
+    PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(EGGS_TO_FETCH);
     PA_ADD_OPTION(EGG_SANDWICH);
     PA_ADD_OPTION(NOTIFICATIONS);
@@ -92,20 +100,9 @@ void EggFetcher::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
 
             picnic_at_zero_gate(env.program_info(), env.console, context);
             // Now we are at picnic. We are at one end of picnic table while the egg basket is at the other end
-    
-            // Check user herb index input validity:
-            const size_t sweet_index_last = EGG_SANDWICH.SWEET_HERB_INDEX_BACKWARDS.current_value();
-            const size_t salty_index_last = EGG_SANDWICH.SALTY_HERB_INDEX_BACKWARDS.current_value();
-            const size_t bitter_index_last = EGG_SANDWICH.BITTER_HERB_INDEX_BACKWARDS.current_value();
-            if (EGG_SANDWICH.EGG_SANDWICH_TYPE == EggSandwichType::SALTY_SWEET_HERBS && salty_index_last >= sweet_index_last){
-                throw UserSetupError(env.console, "Salty Herb index cannot be the same or before Sweet Herb.");
-            }
-            else if (EGG_SANDWICH.EGG_SANDWICH_TYPE == EggSandwichType::BITTER_SWEET_HERBS && bitter_index_last >= sweet_index_last){
-                throw UserSetupError(env.console, "Bitter Herb index cannot be the same or before Sweet Herb.");
-            }
 
             bool can_make_sandwich = eat_egg_sandwich_at_picnic(env.program_info(), env.realtime_dispatcher(), env.console, context,
-                EGG_SANDWICH.EGG_SANDWICH_TYPE, sweet_index_last, salty_index_last, bitter_index_last);
+                EGG_SANDWICH.EGG_SANDWICH_TYPE, LANGUAGE);
             if (can_make_sandwich == false){
                 throw UserSetupError(env.console, "No sandwich recipe or ingredients. Cannot open and select the sandwich recipe.");
             }

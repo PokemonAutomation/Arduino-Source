@@ -28,9 +28,6 @@ public:
 public:
     SimpleIntegerOption<uint64_t> MAX_NUM_SANDWICHES;
     EnumDropdownOption<EggSandwichType> EGG_SANDWICH_TYPE;
-    IntegerEnumDropdownOption SWEET_HERB_INDEX_BACKWARDS;
-    IntegerEnumDropdownOption SALTY_HERB_INDEX_BACKWARDS;
-    IntegerEnumDropdownOption BITTER_HERB_INDEX_BACKWARDS;
 };
 
 

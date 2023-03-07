@@ -10,6 +10,7 @@
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/TimeExpressionOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
+#include "CommonFramework/Options/LanguageOCROption.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonSV/Options/PokemonSV_EggPowerSandwichOption.h"
@@ -39,6 +40,8 @@ public:
 
 private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
+
+    OCR::LanguageOCROption LANGUAGE;
 
     SimpleIntegerOption<uint16_t> EGGS_TO_FETCH;
     EggPowerSandwichOption EGG_SANDWICH;

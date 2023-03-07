@@ -22,6 +22,7 @@
 #include "PokemonSV/Inference/Picnics/PokemonSV_SandwichIngredientDetector.h"
 #include "PokemonSV/Inference/Picnics/PokemonSV_SandwichRecipeDetector.h"
 #include "PokemonSV_SandwichRoutines.h"
+#include "PokemonSV/Programs/Sandwiches/PokemonSV_IngredientSession.h"
 
 #include <cmath>
 #include <algorithm>
@@ -537,6 +538,27 @@ void enter_custom_sandwich_mode(const ProgramInfo& info, ConsoleHandle& console,
     );
 }
 
+namespace {
+
+void finish_two_herbs_sandwich(
+    const ProgramInfo& info, AsyncDispatcher& dispatcher, ConsoleHandle& console, BotBaseContext& context
+){
+    console.log("Finish determining ingredients for two-sweet-herb sandwich.");
+    console.overlay().add_log("Finish picking ingredients", COLOR_WHITE);
+
+    wait_for_initial_hand(info, console, context);
+
+    console.overlay().add_log("Start making sandwich", COLOR_WHITE);
+    move_sandwich_hand(info, dispatcher, console, context, SandwichHandType::FREE, false, HAND_INITIAL_BOX, INGREDIENT_BOX);
+    // Mash button A to pick and drop ingredients, upper bread and pick.
+    // Egg Power 3 is applied with only two sweet herb condiments!
+    pbf_mash_button(context, BUTTON_A, 8 * TICKS_PER_SECOND);
+    context.wait_for_all_requests();
+    console.overlay().add_log("Built sandwich", COLOR_WHITE);
+}
+
+} // anonymous namesapce
+
 void make_two_herbs_sandwich(
     const ProgramInfo& info, AsyncDispatcher& dispatcher, ConsoleHandle& console, BotBaseContext& context,
     EggSandwichType sandwich_type, size_t sweet_herb_index_last, size_t salty_herb_index_last, size_t bitter_herb_index_last
@@ -638,20 +660,33 @@ void make_two_herbs_sandwich(
     pbf_mash_button(context, BUTTON_A, 80);
     context.wait_for_all_requests();
 
-    console.log("Finish determining ingredients for two-sweet-herb sandwich.");
-    console.overlay().add_log("Finish picking ingredients", COLOR_WHITE);
-
-    wait_for_initial_hand(info, console, context);
-
-    console.overlay().add_log("Start making sandwich", COLOR_WHITE);
-    move_sandwich_hand(info, dispatcher, console, context, SandwichHandType::FREE, false, HAND_INITIAL_BOX, INGREDIENT_BOX);
-    // Mash button A to pick and drop ingredients, upper bread and pick.
-    // Egg Power 3 is applied with only two sweet herb condiments!
-    pbf_mash_button(context, BUTTON_A, 8 * TICKS_PER_SECOND);
-    context.wait_for_all_requests();
-    console.overlay().add_log("Built sandwich", COLOR_WHITE);
+    finish_two_herbs_sandwich(info, dispatcher, console, context);
 }
 
+void make_two_herbs_sandwich(
+    const ProgramInfo& info, AsyncDispatcher& dispatcher, ConsoleHandle& console, BotBaseContext& context,
+    EggSandwichType sandwich_type, Language language
+){
+    std::map<std::string, uint8_t> fillings = {{"lettuce", (uint8_t)1}};
+    std::map<std::string, uint8_t> condiments = {{"sweet-herba-mystica", (uint8_t)1}};
+    switch(sandwich_type){
+    case EggSandwichType::TWO_SWEET_HERBS:
+        condiments["sweet-herba-mystica"] = 2;
+        break;
+    case EggSandwichType::SALTY_SWEET_HERBS:
+        condiments["salty-herba-mystica"] = 1;
+        break;
+    case EggSandwichType::BITTER_SWEET_HERBS:
+        condiments["bitter-herba-mystica"] = 1;
+        break;
+    default:
+        throw InternalProgramError(&console.logger(), PA_CURRENT_FUNCTION,
+            "Invalid EggSandwichType for make_two_herbs_sandwich()");
+    }
+    add_sandwich_ingredients(dispatcher, console, context, language, std::move(fillings), std::move(condiments));
+
+    finish_two_herbs_sandwich(info, dispatcher, console, context);
+}
 
 
 

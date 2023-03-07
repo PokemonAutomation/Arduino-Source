@@ -12,6 +12,7 @@
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "PokemonSV/Resources/PokemonSV_Ingredients.h"
 #include "PokemonSV_IngredientSession.h"
+#include "Common/Cpp/PrettyPrint.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -29,14 +30,16 @@ IngredientSession::IngredientSession(
     , m_context(context)
     , m_language(language)
     , m_overlays(console.overlay())
-    , m_fillings(10)
+    , m_ingredients(10)
     , m_arrow(COLOR_CYAN, GradientArrowType::RIGHT, {0.02, 0.15, 0.05, 0.80})
 {
     for (size_t c = 0; c < INGREDIENT_PAGE_LINES; c++){
-        m_fillings.emplace_back(type, c, COLOR_CYAN);
-        m_fillings.back().make_overlays(m_overlays);
+        m_ingredients.emplace_back(type, c, COLOR_CYAN);
+        m_ingredients.back().make_overlays(m_overlays);
     }
 }
+
+
 PageIngredients IngredientSession::read_current_page() const{
     VideoSnapshot snapshot = m_console.video().snapshot();
 
@@ -66,14 +69,16 @@ PageIngredients IngredientSession::read_current_page() const{
     ImageMatch::ImageMatchResult image_result;
     m_dispatcher.run_in_parallel(0, INGREDIENT_PAGE_LINES + 1, [&](size_t index){
         if (index < INGREDIENT_PAGE_LINES){
-            OCR::StringMatchResult result = m_fillings[index].read_with_ocr(snapshot, m_console, m_language);
+            // Read text at line `index`
+            OCR::StringMatchResult result = m_ingredients[index].read_with_ocr(snapshot, m_console, m_language);
             result.clear_beyond_log10p(SandwichFillingOCR::MAX_LOG10P);
             result.clear_beyond_spread(SandwichFillingOCR::MAX_LOG10P_SPREAD);
             for (auto& item : result.results){
                 ret.item[index].insert(item.second.token);
             }
         }else{
-            image_result = m_fillings[ret.selected].read_with_icon_matcher(snapshot);
+            // Read current selected icon
+            image_result = m_ingredients[ret.selected].read_with_icon_matcher(snapshot);
             image_result.clear_beyond_spread(SandwichIngredientReader::ALPHA_SPREAD);
             image_result.log(m_console, SandwichIngredientReader::MAX_ALPHA);
             image_result.clear_beyond_alpha(SandwichIngredientReader::MAX_ALPHA);
@@ -92,16 +97,26 @@ PageIngredients IngredientSession::read_current_page() const{
     }
 
     if (common.empty()){
+        std::set<std::string> sprite_result;
+        for(const auto& p : image_result.results){
+            sprite_result.insert(p.second);
+        }
         throw OperationFailedException(
             ErrorReport::SEND_ERROR_REPORT, m_console,
-            "IngredientSession::read_current_page(): Unable to read selected item. OCR and sprite do not agree on any match.",
+            "IngredientSession::read_current_page(): Unable to read selected item. OCR and sprite do not agree on any match: "
+            + set_to_str(ocr_result) + ", " + set_to_str(sprite_result),
             snapshot
         );
     }
     if (common.size() > 1){
+        std::set<std::string> sprite_result;
+        for(const auto& p : image_result.results){
+            sprite_result.insert(p.second);
+        }
         throw OperationFailedException(
             ErrorReport::SEND_ERROR_REPORT, m_console,
-            "IngredientSession::read_current_page(): Unable to read selected item. Ambiguous result.",
+            "IngredientSession::read_current_page(): Unable to read selected item. Ambiguous result: "
+            + set_to_str(ocr_result) + ", " + set_to_str(sprite_result),
             snapshot
         );
     }
@@ -111,50 +126,64 @@ PageIngredients IngredientSession::read_current_page() const{
 
     return ret;
 }
+
+//  Returns true if a desired ingredient is found somewhere on the page.
+//  "slug" is set the desired ingredient if the cursor is already on it.
 bool IngredientSession::run_move_iteration(
     std::string& slug, const std::set<std::string>& ingredients,
     const PageIngredients& page
 ) const{
-    //  Returns true if a desired ingredient is found somewhere on the page.
-    //  "slug" is set the desired ingredient if the cursor is already on it.
-
+    size_t current_index = page.selected;
+    std::map<size_t, std::string> found_ingredients;
     for (size_t c = 0; c < INGREDIENT_PAGE_LINES; c++){
         for (const std::string& item : page.item[c]){
             auto iter = ingredients.find(item);
-            if (iter == ingredients.end()){
-                continue;
+            if (iter != ingredients.end()){
+                found_ingredients[c] = item;
             }
-
-            size_t current = page.selected;
-            size_t desired = c;
-
-            //  Cursor is already on matching ingredient.
-            if (current == desired){
-                m_console.log("Desired ingredient is selected!", COLOR_BLUE);
-                slug = *iter;
-                return true;
-            }
-
-            m_console.log("Found desired ingredient. Moving towards it...", COLOR_BLUE);
-
-            //  Move to it.
-            while (current < desired){
-                pbf_press_dpad(m_context, DPAD_DOWN, 10, 30);
-                current++;
-            }
-            while (current > desired){
-                pbf_press_dpad(m_context, DPAD_UP, 10, 30);
-                current--;
-            }
-            m_context.wait_for_all_requests();
-            m_context.wait_for(std::chrono::seconds(1));
-
-            return true;
         }
     }
 
-    return false;
+    if (found_ingredients.size() == 0){
+        return false;
+    }
+
+    size_t target_line_index = 0;
+    if (std::all_of(found_ingredients.begin(), found_ingredients.end(), [&](const auto& p){return p.first <= current_index;})){
+        // If the current cursor is below all the found ingredients,
+        // we should move to the closest ingredient, which is also at the lowest line among found ingredients.
+        target_line_index = found_ingredients.rbegin()->first;
+    } else {
+        target_line_index = found_ingredients.begin()->first;
+    }
+
+    const std::string& item = found_ingredients[target_line_index];
+
+    //  Cursor is already on matching ingredient.
+    if (current_index == target_line_index){
+        m_console.log("Desired ingredient " + item + " is selected!", COLOR_BLUE);
+        slug = item;
+        return true;
+    }
+
+    m_console.log("Found desired ingredient " + item + " on current page. Moving towards it...", COLOR_BLUE);
+
+    //  Move to it.
+    while (current_index < target_line_index){
+        pbf_press_dpad(m_context, DPAD_DOWN, 10, 30);
+        current_index++;
+    }
+    while (current_index > target_line_index){
+        pbf_press_dpad(m_context, DPAD_UP, 10, 30);
+        current_index--;
+    }
+    m_context.wait_for_all_requests();
+    m_context.wait_for(std::chrono::seconds(1));
+
+    return true;
 }
+
+
 std::string IngredientSession::move_to_ingredient(const std::set<std::string>& ingredients) const{
     if (ingredients.empty()){
         m_console.log("No desired ingredients.", COLOR_RED);
@@ -231,6 +260,7 @@ void IngredientSession::add_ingredients(
         //  loop again in case we run out.
         pbf_press_button(context, BUTTON_A, 20, 105);
         context.wait_for_all_requests();
+        // TODO add visual confirmation of ingredients added to avoid button drops
 
         auto iter = ingredients.find(found);
         if (--iter->second == 0){
@@ -256,7 +286,10 @@ void add_sandwich_ingredients(
 
     {
         IngredientSession session(dispatcher, console, context, Language::English, SandwichIngredientType::CONDIMENT);
-        pbf_press_dpad(context, DPAD_UP, 20, 105);
+        // If there are herbs, we search first from bottom
+        if (std::any_of(condiments.begin(), condiments.end(), [&](const auto& p){return p.first.find("herba") != std::string::npos;})){
+            pbf_press_dpad(context, DPAD_UP, 20, 105);
+        }
         session.add_ingredients(console, context, std::move(condiments));
         pbf_press_button(context, BUTTON_PLUS, 20, 230);
     }
