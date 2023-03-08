@@ -53,6 +53,7 @@ rm $program.sym > /dev/null 2>&1
 rm $program.elf > /dev/null 2>&1
 
 # Also putting this behind the gui-wall
-if [[ $gui == "gui" ]]; then 
-      mv "$program.hex" "../$program-$board.hex"
+if [[ $gui == "gui" ]]; then
+      CATEGORY="$(basename ${PWD})" # hex_file = settings.path + m_category + "-" + m_name + ("-" + board + ".hex").c_str();
+      mv "$program.hex" "../../${CATEGORY}-$program-$board.hex"
 fi
