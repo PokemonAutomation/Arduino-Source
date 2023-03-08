@@ -19,6 +19,7 @@
 #include <thread>
 #include <condition_variable>
 #include "Common/Cpp/Time.h"
+#include "Common/Cpp/Concurrency/SpinLock.h"
 
 namespace PokemonAutomation{
 
@@ -40,27 +41,56 @@ public:
     void add(WatchdogCallback& callback, std::chrono::milliseconds period);
     void remove(WatchdogCallback& callback);
 
-    //  Delay the specified callback.
+    //  Delay the specified callback. If the callback is current running, this
+    //  function does nothing.
     void delay(WatchdogCallback& callback);                                     //  Delay by the set period.
     void delay(WatchdogCallback& callback, WallClock next_call);                //  Delay to timestamp.
     void delay(WatchdogCallback& callback, std::chrono::milliseconds delay);    //  Delay by specific duration.
 
+    //
+    //  All public methods are fully thread-safe with each other. (except the destructor)
+    //
+    //  The above methods add() and delay(), are fast and will return quickly.
+    //  So it is safe to call them in semi-performance critical places.
+    //  (The critical section involves one spin-lock acquisition and 3 map lookups.)
+    //
+    //  remove() is will also return quickly unless the callback being removed
+    //  is currently running. In that case, it will block until it is done
+    //  running.
+    //
+
 private:
+    using Schedule = std::multimap<WallClock, WatchdogCallback&>;
+
     struct Entry{
+        WatchdogCallback& callback;
         std::chrono::milliseconds period;
-        std::multimap<WallClock, WatchdogCallback*>::iterator iter;
+        Schedule::iterator iter;
+        std::mutex lock;
+
+        Entry(
+            WatchdogCallback& p_callback,
+            std::chrono::milliseconds p_period,
+            Schedule::iterator p_iter
+        )
+            : callback(p_callback), period(p_period), iter(p_iter)
+        {}
     };
+    using CallbackMap = std::map<WatchdogCallback*, Entry>;
 
-    void update_unprotected(std::map<WatchdogCallback*, Entry>::iterator iter, WallClock next_call);
-
+    //  Return true if the next call has moved up and we should signal.
+    bool update_unprotected(CallbackMap::iterator iter, WallClock next_call);
     void thread_body();
 
 private:
     bool m_stopped = false;
-    std::map<WatchdogCallback*, Entry> m_callbacks;
-    std::multimap<WallClock, WatchdogCallback*> m_schedule;
+    CallbackMap m_callbacks;
+    Schedule m_schedule;
 
-    std::mutex m_lock;
+    //  Nothing should ever acquire both locks at once.
+    SpinLock m_state_lock;
+    std::mutex m_sleep_lock;
+
     std::condition_variable m_cv;
     std::thread m_thread;
 };
