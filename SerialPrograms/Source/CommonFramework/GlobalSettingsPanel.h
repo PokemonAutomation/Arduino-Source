@@ -109,6 +109,7 @@ public:
     FloatingPointOption AUDIO_DEVICE_VOLUME_SCALE;
     BooleanCheckBoxOption SHOW_ALL_AUDIO_DEVICES;
     BooleanCheckBoxOption SHOW_RECORD_FREQUENCIES;
+    BooleanCheckBoxOption ENABLE_AUTO_RESET_AUDIO;
     VideoBackendOption VIDEO_BACKEND;
     BooleanCheckBoxOption ENABLE_FRAME_SCREENSHOTS;
     BooleanCheckBoxOption ENABLE_LIFETIME_SANITIZER;
