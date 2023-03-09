@@ -161,7 +161,7 @@ TestProgramComputer::TestProgramComputer()
     , SCREEN_WATCHER("Capture Box", 0, 0, 1, 1)
 {
     PA_ADD_OPTION(STATIC_TEXT);
-    PA_ADD_OPTION(SCREEN_WATCHER);
+//    PA_ADD_OPTION(SCREEN_WATCHER);
 }
 
 WallClock REFERENCE = current_time();
@@ -191,7 +191,14 @@ void print(const Type* ptr, size_t len){
 
 
 
-class WatchdogTest : public WatchdogCallback{
+class WatchdogTest0 : public WatchdogCallback{
+    virtual void on_watchdog_timeout(){
+        cout << "run() - start" << endl;
+        Sleep(10000);
+        cout << "run() - end" << endl;
+    }
+};
+class WatchdogTest1 : public WatchdogCallback{
     virtual void on_watchdog_timeout(){
         cout << "run()" << endl;
     }
@@ -207,20 +214,27 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     using namespace Pokemon;
 //    using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
 
-    WatchdogTest callback;
+    WatchdogTest0 callback0;
+    WatchdogTest1 callback1;
 
     Watchdog watchdog;
-    watchdog.add(callback, std::chrono::seconds(1));
+    watchdog.add(callback0, std::chrono::seconds(20));
+    watchdog.add(callback1, std::chrono::seconds(2));
 
+    watchdog.delay(callback0, current_time());
     for (size_t c = 0; c < 5; c++){
-        cout << "Delaying..." << endl;
-        watchdog.delay(callback);
-        scope.wait_for(std::chrono::milliseconds(500));
+        scope.wait_for(std::chrono::seconds(1));
+        cout << "delaying..." << endl;
+        watchdog.delay(callback0);
     }
 
-    scope.wait_for(std::chrono::seconds(5));
-    watchdog.remove(callback);
-    cout << "Waiting out..." << endl;
+    cout << "removing 0 start" << endl;
+    watchdog.remove(callback1);
+    cout << "removing 0... end" << endl;
+
+    cout << "removing 1... start" << endl;
+    watchdog.remove(callback0);
+    cout << "removing 1... end" << endl;
 
     scope.wait_for(std::chrono::seconds(60));
 

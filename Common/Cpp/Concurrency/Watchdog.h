@@ -54,7 +54,7 @@ public:
     //  So it is safe to call them in semi-performance critical places.
     //  (The critical section involves one spin-lock acquisition and 3 map lookups.)
     //
-    //  remove() is will also return quickly unless the callback being removed
+    //  remove() will also return quickly unless the callback being removed
     //  is currently running. In that case, it will block until it is done
     //  running.
     //

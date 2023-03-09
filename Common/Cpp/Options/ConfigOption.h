@@ -9,6 +9,7 @@
 
 #include <string>
 #include "Common/Compiler.h"
+#include "Common/Cpp/LifetimeSanitizer.h"
 #include "Common/Cpp/Containers/Pimpl.h"
 
 class QWidget;
@@ -103,6 +104,8 @@ public:
 private:
     struct Data;
     Pimpl<Data> m_data;
+
+    LifetimeSanitizer m_lifetime_sanitizer;
 };
 
 

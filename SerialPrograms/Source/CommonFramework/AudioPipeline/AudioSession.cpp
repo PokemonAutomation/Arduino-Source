@@ -258,7 +258,8 @@ void AudioSession::on_fft(size_t sample_rate, std::shared_ptr<AlignedVector<floa
     global_watchdog().delay(*this);
 }
 void AudioSession::on_watchdog_timeout(){
-    if (!m_option.m_input_device){
+//    m_logger.log("AudioSession::on_watchdog_timeout()", COLOR_RED);
+    if (m_option.m_input_file.empty() && !m_option.m_input_device){
         return;
     }
     m_logger.log("No audio detected for 5 seconds...", COLOR_RED);

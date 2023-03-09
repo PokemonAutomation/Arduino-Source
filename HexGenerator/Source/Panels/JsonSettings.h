@@ -17,6 +17,7 @@ namespace HexGenerator{
 
 class Settings_JsonFile : public ConfigSet{
 public:
+    ~Settings_JsonFile();
     Settings_JsonFile(std::string category, const std::string& filepath);
     Settings_JsonFile(std::string category, const JsonObject& obj);
 
@@ -30,6 +31,7 @@ public:
 
 private:
     std::vector<std::unique_ptr<ConfigItem>> m_options;
+    std::vector<QWidget*> m_widgets;
 };
 
 

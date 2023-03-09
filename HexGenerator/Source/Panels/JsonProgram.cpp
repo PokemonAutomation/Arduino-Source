@@ -17,6 +17,11 @@ namespace PokemonAutomation{
 namespace HexGenerator{
 
 
+Program_JsonFile::~Program_JsonFile(){
+    for (QWidget* widget : m_widgets){
+        delete widget;
+    }
+}
 Program_JsonFile::Program_JsonFile(std::string category, const std::string& filepath)
     : Program_JsonFile(std::move(category), load_json_file(filepath).get_object_throw())
 {}
@@ -79,7 +84,9 @@ QWidget* Program_JsonFile::make_options_body(QWidget& parent){
     scroll->setWidget(box);
 
     for (const auto& item : m_options){
-        layout->addWidget(item->make_ui(*box));
+        QWidget* widget = item->make_ui(*box);
+        m_widgets.emplace_back(widget);
+        layout->addWidget(widget);
     }
     return scroll;
 }

@@ -15,6 +15,7 @@ namespace HexGenerator{
 
 class Program_JsonFile : public Program{
 public:
+    ~Program_JsonFile();
     Program_JsonFile(std::string category, const std::string& filepath);
     Program_JsonFile(std::string category, const JsonObject& obj);
 
@@ -28,6 +29,7 @@ public:
 
 private:
     std::vector<std::unique_ptr<ConfigItem>> m_options;
+    std::vector<QWidget*> m_widgets;
 };
 
 

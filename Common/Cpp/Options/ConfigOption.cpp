@@ -63,16 +63,19 @@ ConfigOption::ConfigOption(ConfigOptionState visibility)
 {}
 
 void ConfigOption::add_listener(Listener& listener){
+    m_lifetime_sanitizer.check_usage();
     Data& data = *m_data;
     SpinLockGuard lg(data.lock);
     data.listeners.insert(&listener);
 }
 void ConfigOption::remove_listener(Listener& listener){
+    m_lifetime_sanitizer.check_usage();
     Data& data = *m_data;
     SpinLockGuard lg(data.lock);
     data.listeners.erase(&listener);
 }
 size_t ConfigOption::total_listeners() const{
+    m_lifetime_sanitizer.check_usage();
     const Data& data = *m_data;
     SpinLockGuard lg(data.lock);
     return data.listeners.size();
@@ -82,21 +85,30 @@ size_t ConfigOption::total_listeners() const{
 
 
 
-void ConfigOption::load_json(const JsonValue& json){}
+void ConfigOption::load_json(const JsonValue& json){
+    m_lifetime_sanitizer.check_usage();
+}
 JsonValue ConfigOption::to_json() const{
+    m_lifetime_sanitizer.check_usage();
     return JsonValue();
 }
 bool ConfigOption::lock_while_program_is_running() const{
+    m_lifetime_sanitizer.check_usage();
     return m_data->lock_while_program_is_running;
 }
 std::string ConfigOption::check_validity() const{
+    m_lifetime_sanitizer.check_usage();
     return std::string();
 }
-void ConfigOption::restore_defaults(){}
+void ConfigOption::restore_defaults(){
+    m_lifetime_sanitizer.check_usage();
+}
 ConfigOptionState ConfigOption::visibility() const{
+    m_lifetime_sanitizer.check_usage();
     return m_data->visibility.load(std::memory_order_relaxed);
 }
 void ConfigOption::set_visibility(ConfigOptionState visibility){
+    m_lifetime_sanitizer.check_usage();
     if (m_data->set_visibility(visibility)){
         report_visibility_changed();
     }
@@ -104,6 +116,7 @@ void ConfigOption::set_visibility(ConfigOptionState visibility){
 
 
 void ConfigOption::report_visibility_changed(){
+    m_lifetime_sanitizer.check_usage();
     Data& data = *m_data;
     SpinLockGuard lg(data.lock);
     for (Listener* listener : data.listeners){
@@ -111,6 +124,7 @@ void ConfigOption::report_visibility_changed(){
     }
 }
 void ConfigOption::report_program_state(bool program_is_running){
+    m_lifetime_sanitizer.check_usage();
     Data& data = *m_data;
     SpinLockGuard lg(data.lock);
     for (Listener* listener : data.listeners){
@@ -118,6 +132,7 @@ void ConfigOption::report_program_state(bool program_is_running){
     }
 }
 void ConfigOption::report_value_changed(){
+    m_lifetime_sanitizer.check_usage();
     Data& data = *m_data;
     SpinLockGuard lg(data.lock);
 //    cout << "listeners = " << data.listeners.size() << endl;
