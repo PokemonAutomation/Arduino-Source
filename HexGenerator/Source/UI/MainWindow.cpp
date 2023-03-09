@@ -28,6 +28,10 @@ namespace PokemonAutomation{
 namespace HexGenerator{
 
 
+MainWindow::~MainWindow(){
+    //  Close the panel first since it has listeners attached to the panels.
+    close_panel();
+}
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
     , m_right_panel_widget(nullptr)
@@ -167,13 +171,17 @@ const std::string& MainWindow::current_board() const{
     return m_mcu_list->get_board();
 }
 void MainWindow::change_panel(RightPanel& panel){
+    close_panel();
+    m_right_panel_widget = panel.make_ui(*this);
+    m_right_panel_layout->addWidget(m_right_panel_widget);
+}
+
+void MainWindow::close_panel(){
     if (m_right_panel_widget != nullptr){
         m_right_panel_layout->removeWidget(m_right_panel_widget);
         delete m_right_panel_widget;
         m_right_panel_widget = nullptr;
     }
-    m_right_panel_widget = panel.make_ui(*this);
-    m_right_panel_layout->addWidget(m_right_panel_widget);
 }
 
 
