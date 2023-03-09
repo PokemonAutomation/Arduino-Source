@@ -128,20 +128,7 @@ int build_hexfile(
         });
         return 1;
     };
-    char buffer[262144];
-    std::string data;
-    std::string result;
-    int dist=0;
-    int size;
 
-    //TIME_START
-    while(!feof(pipe)) {
-        size=(int)fread(buffer,1,262144, pipe); //cout<<buffer<<" size="<<size<<endl;
-        data.resize(data.size()+size);
-        memcpy(&data[dist],buffer,size);
-        dist+=size;
-    }
-    //TIME_PRINT_
     int ret = pclose(pipe)/256;
     if (ret != 0) {
         std::string msg = "Build process exited with code: " + std::to_string(ret);
