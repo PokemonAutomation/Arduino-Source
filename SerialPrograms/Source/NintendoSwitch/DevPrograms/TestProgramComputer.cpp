@@ -6,6 +6,8 @@
 
 #ifdef _WIN64
 #include <Windows.h>
+#elif defined(__linux) || defined(__APPLE__)
+#include <unistd.h>
 #endif
 
 #include <set>
@@ -194,7 +196,11 @@ void print(const Type* ptr, size_t len){
 class WatchdogTest0 : public WatchdogCallback{
     virtual void on_watchdog_timeout(){
         cout << "run() - start" << endl;
+#if defined(__linux) || defined(__APPLE__)
+        sleep(10);
+#else
         Sleep(10000);
+#endif
         cout << "run() - end" << endl;
     }
 };
