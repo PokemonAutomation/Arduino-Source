@@ -203,12 +203,14 @@ bool LetsGoEncounterBotTracker::process_battle(EncounterWatcher& watcher, Encoun
         &m_encounter_frequencies
     );
 
-    //  Iterate the actions table.
+    //  Set default action: stop program if shiny, otherwise run away.
     EncounterActionsEntry action;
     action.action = is_shiny
         ? EncounterActionsAction::STOP_PROGRAM
         : EncounterActionsAction::RUN_AWAY;
 
+    //  Iterate the actions table. If found an entry matches the pokemon species,
+    //  set the action to be what specified in the entry.
     for (EncounterActionsEntry& entry : settings.ACTIONS_TABLE.snapshot()){
         if (language == Language::None){
             throw UserSetupError(m_console, "You must set the game language to use the actions table.");

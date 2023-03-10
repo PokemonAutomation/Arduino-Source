@@ -231,6 +231,7 @@ file(GLOB MAIN_SOURCES
     ../Common/Qt/TimeQt.h
     ../Common/Qt/WidgetStackFixedAspectRatio.cpp
     ../Common/Qt/WidgetStackFixedAspectRatio.h
+    ../IconResource/IconResource.rc
     Source/CommonFramework/AudioPipeline/AudioConstants.h
     Source/CommonFramework/AudioPipeline/AudioFeed.h
     Source/CommonFramework/AudioPipeline/AudioInfo.cpp
@@ -282,14 +283,6 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/ControllerDevices/SerialPortWidget.h
     Source/CommonFramework/CrashDump.cpp
     Source/CommonFramework/CrashDump.h
-    Source/CommonFramework/Exceptions/FatalProgramException.cpp
-    Source/CommonFramework/Exceptions/FatalProgramException.h
-    Source/CommonFramework/Exceptions/OperationFailedException.cpp
-    Source/CommonFramework/Exceptions/OperationFailedException.h
-    Source/CommonFramework/Exceptions/ProgramFinishedException.cpp
-    Source/CommonFramework/Exceptions/ProgramFinishedException.h
-    Source/CommonFramework/Exceptions/ScreenshotException.cpp
-    Source/CommonFramework/Exceptions/ScreenshotException.h
     Source/CommonFramework/Environment/Environment.cpp
     Source/CommonFramework/Environment/Environment.h
     Source/CommonFramework/Environment/Environment_Linux.h
@@ -304,6 +297,14 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Environment/HardwareValidation.h
     Source/CommonFramework/Environment/HardwareValidation_arm64.tpp
     Source/CommonFramework/Environment/HardwareValidation_x86.tpp
+    Source/CommonFramework/Exceptions/FatalProgramException.cpp
+    Source/CommonFramework/Exceptions/FatalProgramException.h
+    Source/CommonFramework/Exceptions/OperationFailedException.cpp
+    Source/CommonFramework/Exceptions/OperationFailedException.h
+    Source/CommonFramework/Exceptions/ProgramFinishedException.cpp
+    Source/CommonFramework/Exceptions/ProgramFinishedException.h
+    Source/CommonFramework/Exceptions/ScreenshotException.cpp
+    Source/CommonFramework/Exceptions/ScreenshotException.h
     Source/CommonFramework/GlobalServices.cpp
     Source/CommonFramework/GlobalServices.h
     Source/CommonFramework/GlobalSettingsPanel.cpp
@@ -414,8 +415,6 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Main.cpp
     Source/CommonFramework/NewVersionCheck.cpp
     Source/CommonFramework/NewVersionCheck.h
-    Source/CommonFramework/SetupSettings.cpp
-    Source/CommonFramework/SetupSettings.h
     Source/CommonFramework/Notifications/EventNotificationOption.cpp
     Source/CommonFramework/Notifications/EventNotificationOption.h
     Source/CommonFramework/Notifications/EventNotificationsTable.cpp
@@ -498,6 +497,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/ProgramSession.h
     Source/CommonFramework/Resources/SpriteDatabase.cpp
     Source/CommonFramework/Resources/SpriteDatabase.h
+    Source/CommonFramework/SetupSettings.cpp
+    Source/CommonFramework/SetupSettings.h
     Source/CommonFramework/Tools/BlackBorderCheck.cpp
     Source/CommonFramework/Tools/BlackBorderCheck.h
     Source/CommonFramework/Tools/BotBaseHandle.cpp
@@ -583,18 +584,18 @@ file(GLOB MAIN_SOURCES
     Source/Integrations/DiscordWebhook.h
     Source/Integrations/DiscordWebhookSettings.cpp
     Source/Integrations/DiscordWebhookSettings.h
+    Source/Integrations/DppIntegration/DppClient.cpp
+    Source/Integrations/DppIntegration/DppClient.h
+    Source/Integrations/DppIntegration/DppCommandHandler.cpp
+    Source/Integrations/DppIntegration/DppCommandHandler.h
+    Source/Integrations/DppIntegration/DppUtility.cpp
+    Source/Integrations/DppIntegration/DppUtility.h
     Source/Integrations/IntegrationsAPI.cpp
     Source/Integrations/IntegrationsAPI.h
     Source/Integrations/ProgramTracker.cpp
     Source/Integrations/ProgramTracker.h
     Source/Integrations/SleepyDiscordRunner.cpp
     Source/Integrations/SleepyDiscordRunner.h
-    Source/Integrations/DppIntegration/DppClient.cpp
-    Source/Integrations/DppIntegration/DppClient.h
-    Source/Integrations/DppIntegration/DppUtility.cpp
-    Source/Integrations/DppIntegration/DppUtility.h
-    Source/Integrations/DppIntegration/DppCommandHandler.cpp
-    Source/Integrations/DppIntegration/DppCommandHandler.h
     Source/Kernels/AbsFFT/Kernels_AbsFFT.cpp
     Source/Kernels/AbsFFT/Kernels_AbsFFT.h
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Arch.h
@@ -1296,10 +1297,10 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Inference/PokemonSV_MapDetector.h
     Source/PokemonSV/Inference/PokemonSV_MoneyReader.cpp
     Source/PokemonSV/Inference/PokemonSV_MoneyReader.h
-    Source/PokemonSV/Inference/PokemonSV_PokemonSummaryReader.cpp
-    Source/PokemonSV/Inference/PokemonSV_PokemonSummaryReader.h
     Source/PokemonSV/Inference/PokemonSV_PokePortalDetector.cpp
     Source/PokemonSV/Inference/PokemonSV_PokePortalDetector.h
+    Source/PokemonSV/Inference/PokemonSV_PokemonSummaryReader.cpp
+    Source/PokemonSV/Inference/PokemonSV_PokemonSummaryReader.h
     Source/PokemonSV/Inference/PokemonSV_SweatBubbleDetector.cpp
     Source/PokemonSV/Inference/PokemonSV_SweatBubbleDetector.h
     Source/PokemonSV/Inference/PokemonSV_TournamentPrizeNameReader.cpp
@@ -1327,9 +1328,9 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Options/PokemonSV_AutoHostOptions.h
     Source/PokemonSV/Options/PokemonSV_EggPowerSandwichOption.cpp
     Source/PokemonSV/Options/PokemonSV_EggPowerSandwichOption.h
-    Source/PokemonSV/Options/PokemonSV_EncounterBotCommon.h
     Source/PokemonSV/Options/PokemonSV_EncounterActionsTable.cpp
     Source/PokemonSV/Options/PokemonSV_EncounterActionsTable.h
+    Source/PokemonSV/Options/PokemonSV_EncounterBotCommon.h
     Source/PokemonSV/Options/PokemonSV_PlayerList.cpp
     Source/PokemonSV/Options/PokemonSV_PlayerList.h
     Source/PokemonSV/Options/PokemonSV_TeraAIOption.cpp
@@ -1354,10 +1355,10 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggHatcher.h
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggRoutines.cpp
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggRoutines.h
-    Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_CodeEntry.cpp
-    Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_CodeEntry.h
     Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_ClipboardFastCodeEntry.cpp
     Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_ClipboardFastCodeEntry.h
+    Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_CodeEntry.cpp
+    Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_CodeEntry.h
     Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_FastCodeEntry.cpp
     Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_FastCodeEntry.h
     Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_VideoFastCodeEntry.cpp
@@ -1846,7 +1847,6 @@ file(GLOB MAIN_SOURCES
     Source/Tests/TestMap.h
     Source/Tests/TestUtils.cpp
     Source/Tests/TestUtils.h
-    ../IconResource/IconResource.rc
 )
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}../../ FILES ${MAIN_SOURCES})
 add_executable(SerialPrograms WIN32 ${MAIN_SOURCES})

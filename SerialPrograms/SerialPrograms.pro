@@ -227,7 +227,6 @@ SOURCES += \
     Source/CommonFramework/Logging/QueuedLogger.cpp \
     Source/CommonFramework/Main.cpp \
     Source/CommonFramework/NewVersionCheck.cpp \
-    Source/CommonFramework/SetupSettings.cpp \
     Source/CommonFramework/Notifications/EventNotificationOption.cpp \
     Source/CommonFramework/Notifications/EventNotificationsTable.cpp \
     Source/CommonFramework/Notifications/MessageAttachment.cpp \
@@ -266,6 +265,7 @@ SOURCES += \
     Source/CommonFramework/PersistentSettings.cpp \
     Source/CommonFramework/ProgramSession.cpp \
     Source/CommonFramework/Resources/SpriteDatabase.cpp \
+    Source/CommonFramework/SetupSettings.cpp \
     Source/CommonFramework/Tools/BlackBorderCheck.cpp \
     Source/CommonFramework/Tools/BotBaseHandle.cpp \
     Source/CommonFramework/Tools/ConsoleHandle.cpp \
@@ -305,12 +305,12 @@ SOURCES += \
     Source/Integrations/DiscordSettingsOption.cpp \
     Source/Integrations/DiscordWebhook.cpp \
     Source/Integrations/DiscordWebhookSettings.cpp \
+    Source/Integrations/DppIntegration/DppClient.cpp \
+    Source/Integrations/DppIntegration/DppCommandHandler.cpp \
+    Source/Integrations/DppIntegration/DppUtility.cpp \
     Source/Integrations/IntegrationsAPI.cpp \
     Source/Integrations/ProgramTracker.cpp \
     Source/Integrations/SleepyDiscordRunner.cpp \
-    Source/Integrations/DppIntegration/DppClient.cpp \
-    Source/Integrations/DppIntegration/DppUtility.cpp \
-    Source/Integrations/DppIntegration/DppCommandHandler.cpp \
     Source/Kernels/AbsFFT/Kernels_AbsFFT.cpp \
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Core_Default.cpp \
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Core_x86_AVX2.cpp \
@@ -915,12 +915,11 @@ SOURCES += \
     Source/Tests/PokemonSV_Tests.cpp \
     Source/Tests/PokemonSwSh_Tests.cpp \
     Source/Tests/TestMap.cpp \
-    Source/Tests/TestUtils.cpp \
+    Source/Tests/TestUtils.cpp
 
 HEADERS += \
     ../3rdParty/QtWavFile/WavFile.h \
     ../3rdParty/TesseractPA/TesseractPA.h \
-    ../3rdParty/nlohmann/json.hpp \
     ../3rdParty/dpp/appcommand.h \
     ../3rdParty/dpp/application.h \
     ../3rdParty/dpp/auditlog.h \
@@ -957,6 +956,8 @@ HEADERS += \
     ../3rdParty/dpp/managed.h \
     ../3rdParty/dpp/message.h \
     ../3rdParty/dpp/misc-enum.h \
+    ../3rdParty/dpp/nlohmann/json.hpp \
+    ../3rdParty/dpp/nlohmann/json_fwd.hpp \
     ../3rdParty/dpp/once.h \
     ../3rdParty/dpp/permissions.h \
     ../3rdParty/dpp/presence.h \
@@ -983,8 +984,7 @@ HEADERS += \
     ../3rdParty/dpp/webhook.h \
     ../3rdParty/dpp/win32_safe_warnings.h \
     ../3rdParty/dpp/wsclient.h \
-    ../3rdParty/dpp/nlohmann/json.hpp \
-    ../3rdParty/dpp/nlohmann/json_fwd.hpp \
+    ../3rdParty/nlohmann/json.hpp \
     ../ClientSource/Connection/BotBase.h \
     ../ClientSource/Connection/BotBaseMessage.h \
     ../ClientSource/Connection/MessageLogger.h \
@@ -1205,7 +1205,6 @@ HEADERS += \
     Source/CommonFramework/Logging/OutputRedirector.h \
     Source/CommonFramework/Logging/QueuedLogger.h \
     Source/CommonFramework/NewVersionCheck.h \
-    Source/CommonFramework/SetupSettings.h \
     Source/CommonFramework/Notifications/EventNotificationOption.h \
     Source/CommonFramework/Notifications/EventNotificationsTable.h \
     Source/CommonFramework/Notifications/MessageAttachment.h \
@@ -1247,6 +1246,7 @@ HEADERS += \
     Source/CommonFramework/PersistentSettings.h \
     Source/CommonFramework/ProgramSession.h \
     Source/CommonFramework/Resources/SpriteDatabase.h \
+    Source/CommonFramework/SetupSettings.h \
     Source/CommonFramework/Tools/BlackBorderCheck.h \
     Source/CommonFramework/Tools/BotBaseHandle.h \
     Source/CommonFramework/Tools/ConsoleHandle.h \
@@ -1293,13 +1293,13 @@ HEADERS += \
     Source/Integrations/DiscordSettingsOption.h \
     Source/Integrations/DiscordWebhook.h \
     Source/Integrations/DiscordWebhookSettings.h \
+    Source/Integrations/DppIntegration/DppClient.h \
+    Source/Integrations/DppIntegration/DppCommandHandler.h \
+    Source/Integrations/DppIntegration/DppUtility.h \
     Source/Integrations/IntegrationsAPI.h \
     Source/Integrations/ProgramTracker.h \
     Source/Integrations/ProgramTrackerInterfaces.h \
     Source/Integrations/SleepyDiscordRunner.h \
-    Source/Integrations/DppIntegration/DppClient.h \
-    Source/Integrations/DppIntegration/DppUtility.h \
-    Source/Integrations/DppIntegration/DppCommandHandler.h \
     Source/Kernels/AbsFFT/Kernels_AbsFFT.h \
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Arch.h \
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Arch_Default.h \
@@ -1937,7 +1937,7 @@ HEADERS += \
     Source/Tests/PokemonSV_Tests.h \
     Source/Tests/PokemonSwSh_Tests.h \
     Source/Tests/TestMap.h \
-    Source/Tests/TestUtils.h \
+    Source/Tests/TestUtils.h
 
 
 

@@ -114,7 +114,9 @@ public:
 
 
 
-
+//  Used to track Let's Go kill chain progress, stats.
+//  It can also run `process_battle()` to handle pokemon battle encounters (turn-based battles)
+//  according to user options.
 class LetsGoEncounterBotTracker{
 public:
     LetsGoEncounterBotTracker(
@@ -170,6 +172,8 @@ private:
 //  Send your Pokemon out in front in Let's Go. Then run the specified command.
 //  Don't return until both the command has finished, and it appears the kill
 //  chain has ended.
+//  The function tracks kill chain by sound detection from `tracker`. The function
+//  does not handle any pokemon battle encounters (turn-based battles).
 bool clear_in_front(
     ConsoleHandle& console, BotBaseContext& context,
     LetsGoEncounterBotTracker& tracker,
