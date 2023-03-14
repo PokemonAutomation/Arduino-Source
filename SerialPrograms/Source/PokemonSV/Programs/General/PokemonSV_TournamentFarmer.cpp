@@ -204,6 +204,7 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, BotBaseCo
 
         //If not already dead, use memento and die
         NormalBattleMenuWatcher memento(COLOR_RED);
+        MoveSelectDetector move_select(COLOR_BLUE);
         SwapMenuWatcher fainted(COLOR_YELLOW);
         int retZ = wait_until(
             env.console, context,
@@ -212,6 +213,8 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, BotBaseCo
         );
         if (retZ == 0) {
             env.log("Using Memento to faint.");
+            pbf_press_button(context, BUTTON_A, 10, 50);
+            move_select.move_to_slot(env.console, context, 1);
             pbf_press_button(context, BUTTON_A, 10, 50);
             pbf_wait(context, 100);
             context.wait_for_all_requests();
@@ -271,7 +274,7 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, BotBaseCo
         }
 
         //Select 2nd pokemon from swap menu and send it out
-        pbf_press_dpad(context, DPAD_DOWN, 10, 50);
+        fainted.move_to_slot(env.console, context, 1);
         pbf_mash_button(context, BUTTON_A, 300);
         context.wait_for_all_requests();
 
