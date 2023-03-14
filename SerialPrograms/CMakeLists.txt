@@ -1333,6 +1333,12 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Options/PokemonSV_EncounterBotCommon.h
     Source/PokemonSV/Options/PokemonSV_PlayerList.cpp
     Source/PokemonSV/Options/PokemonSV_PlayerList.h
+    Source/PokemonSV/Options/PokemonSV_SandwichIngredientsOption.cpp
+    Source/PokemonSV/Options/PokemonSV_SandwichIngredientsOption.h
+    Source/PokemonSV/Options/PokemonSV_SandwichIngredientsTable.cpp
+    Source/PokemonSV/Options/PokemonSV_SandwichIngredientsTable.h
+    Source/PokemonSV/Options/PokemonSV_SandwichMakerOption.cpp
+    Source/PokemonSV/Options/PokemonSV_SandwichMakerOption.h
     Source/PokemonSV/Options/PokemonSV_TeraAIOption.cpp
     Source/PokemonSV/Options/PokemonSV_TeraAIOption.h
     Source/PokemonSV/Options/PokemonSV_TeraMoveTable.cpp
@@ -1403,6 +1409,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Programs/PokemonSV_SaveGame.h
     Source/PokemonSV/Programs/Sandwiches/PokemonSV_IngredientSession.cpp
     Source/PokemonSV/Programs/Sandwiches/PokemonSV_IngredientSession.h
+    Source/PokemonSV/Programs/Sandwiches/PokemonSV_SandwichMaker.cpp
+    Source/PokemonSV/Programs/Sandwiches/PokemonSV_SandwichMaker.h
     Source/PokemonSV/Programs/Sandwiches/PokemonSV_SandwichRoutines.cpp
     Source/PokemonSV/Programs/Sandwiches/PokemonSV_SandwichRoutines.h
     Source/PokemonSV/Programs/ShinyHunting/PokemonSV_AreaZeroPlatform.cpp

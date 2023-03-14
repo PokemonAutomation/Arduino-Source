@@ -22,6 +22,7 @@
 #include "Programs/Trading/PokemonSV_SelfBoxTrade.h"
 #include "Programs/General/PokemonSV_StatsReset.h"
 #include "Programs/General/PokemonSV_TournamentFarmer.h"
+#include "Programs/Sandwiches/PokemonSV_SandwichMaker.h"
 
 #include "Programs/Eggs/PokemonSV_EggFetcher.h"
 #include "Programs/Eggs/PokemonSV_EggHatcher.h"
@@ -70,6 +71,9 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
 
 //    ret.emplace_back("---- Trading ----");
     ret.emplace_back(make_multi_switch_program<SelfBoxTrade_Descriptor, SelfBoxTrade>());
+
+//    ret.emplace_back("---- Sandwiches ----");
+    ret.emplace_back(make_single_switch_program<SandwichMaker_Descriptor, SandwichMaker>());
 
     ret.emplace_back("---- Farming ----");
     ret.emplace_back(make_single_switch_program<LPFarmer_Descriptor, LPFarmer>());
