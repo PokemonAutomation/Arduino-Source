@@ -279,13 +279,13 @@ void add_sandwich_ingredients(
     std::map<std::string, uint8_t>&& condiments
 ){
     {
-        IngredientSession session(dispatcher, console, context, Language::English, SandwichIngredientType::FILLING);
+        IngredientSession session(dispatcher, console, context, language, SandwichIngredientType::FILLING);
         session.add_ingredients(console, context, std::move(fillings));
         pbf_press_button(context, BUTTON_PLUS, 20, 230);
     }
 
     {
-        IngredientSession session(dispatcher, console, context, Language::English, SandwichIngredientType::CONDIMENT);
+        IngredientSession session(dispatcher, console, context, language, SandwichIngredientType::CONDIMENT);
         // If there are herbs, we search first from bottom
         if (std::any_of(condiments.begin(), condiments.end(), [&](const auto& p){return p.first.find("herba") != std::string::npos;})){
             pbf_press_dpad(context, DPAD_UP, 20, 105);
