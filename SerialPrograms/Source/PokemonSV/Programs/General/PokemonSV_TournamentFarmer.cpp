@@ -597,7 +597,7 @@ void TournamentFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseConte
             int ret_battle2 = run_until(
                 env.console, context,
                 [](BotBaseContext& context) {
-                    pbf_mash_button(context, BUTTON_B, 4500);
+                    pbf_mash_button(context, BUTTON_B, 5000);
                 },
                 { battle_menu2, overworld }
                 );
@@ -620,6 +620,11 @@ void TournamentFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseConte
                 stats.errors++;
                 env.update_stats();
                 send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
+                throw OperationFailedException(
+                    ErrorReport::SEND_ERROR_REPORT, env.console,
+                    "Failed to detect battle menu or dialog prompt!",
+                    true
+                );
                 break;
             }
 
