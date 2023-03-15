@@ -55,7 +55,7 @@ SandwichMakerOption::SandwichMakerOption()
         LockWhileRunning::LOCKED,
         SandwichRecipe::shiny_normal
     )
-    , SANDWICH_INGREDIENTS("<b>Custom Sandwich:</b><br>Make a sandwich from the selected ingredients.<br>The limits are 6 ingredients and 4 condiments.")
+    , SANDWICH_INGREDIENTS("<b>Custom Sandwich:</b><br>Make a sandwich from the selected ingredients.<br>The limits are 6 ingredients and 4 condiments. You must have at least 1 ingredient and 1 condiment.")
 {
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(SANDWICH_RECIPE);

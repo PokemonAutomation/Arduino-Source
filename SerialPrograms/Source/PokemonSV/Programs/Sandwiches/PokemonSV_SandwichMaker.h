@@ -15,6 +15,11 @@
 #include "PokemonSV/Options/PokemonSV_SandwichMakerOption.h"
 
 namespace PokemonAutomation {
+    struct ProgramInfo;
+    class AsyncDispatcher;
+    class ProgramEnvironment;
+    class ConsoleHandle;
+    class BotBaseContext;
 namespace NintendoSwitch {
 namespace PokemonSV {
 
@@ -28,6 +33,7 @@ class SandwichMaker : public SingleSwitchProgramInstance {
 public:
     SandwichMaker();
 
+    void execute_action(ConsoleHandle& console, BotBaseContext& context, const SandwichIngredientsTableRow& row);
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
