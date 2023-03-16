@@ -14,6 +14,11 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
 
+std::vector<std::string> SandwichMakerOption::get_premade_ingredients(SandwichRecipe token) {
+    auto iter = PremadeSandwichIngredients.find(token);
+    return iter->second;
+}
+
 SandwichMakerOption::SandwichMakerOption()
     : GroupOption(
         "Sandwich Maker",
@@ -27,9 +32,9 @@ SandwichMakerOption::SandwichMakerOption()
         false
     )
     , SANDWICH_RECIPE(
-        "<b>Sandwich Recipe:</b><br>Which sandwich to make.<br>"
-        "Sparkling/Title/Encounter: Cucumber + Pickle + 3x ingredient + 2x Herba Mystica<br>"
-        "Sparkling/Title/Humungo: ???",
+        "<b>Sandwich Recipe:</b><br>Select a recipe to make a sandwich with preset ingredients, or select Custom Sandwich to make a sandwich using the table below.<br>"
+        "Sparkling/Title/Encounter: Cucumber + Pickle + 3x Ingredient + 2x Herba Mystica<br>",
+        //"Sparkling/Title/Humungo: ???",
         {
             {SandwichRecipe::shiny_normal,      "shiny_normal",     "Sparkling + Title + Encounter: Normal"},
             {SandwichRecipe::shiny_fire,        "shiny_fire",       "Sparkling + Title + Encounter: Fire"},
@@ -55,7 +60,7 @@ SandwichMakerOption::SandwichMakerOption()
         LockWhileRunning::LOCKED,
         SandwichRecipe::shiny_normal
     )
-    , SANDWICH_INGREDIENTS("<b>Custom Sandwich:</b><br>Make a sandwich from the selected ingredients.<br>The limits are 6 ingredients and 4 condiments. You must have at least 1 ingredient and 1 condiment.")
+    , SANDWICH_INGREDIENTS("<b>Custom Sandwich:</b><br>Make a sandwich from the selected ingredients.<br>You must have at least one ingredient and one condiment, and no more than six ingredients and four condiments.")
 {
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(SANDWICH_RECIPE);
