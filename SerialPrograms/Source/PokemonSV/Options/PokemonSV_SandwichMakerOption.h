@@ -18,9 +18,10 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
 
-class SandwichMakerOption : public GroupOption {
+class SandwichMakerOption : public GroupOption, private ConfigOption::Listener {
 
 public:
+    ~SandwichMakerOption();
     SandwichMakerOption();
 
     enum class SandwichRecipe {
@@ -74,6 +75,9 @@ public:
     OCR::LanguageOCROption LANGUAGE;
     EnumDropdownOption<SandwichRecipe> SANDWICH_RECIPE;
     SandwichIngredientsTable SANDWICH_INGREDIENTS;
+
+private:
+    virtual void value_changed();
 
 };
 

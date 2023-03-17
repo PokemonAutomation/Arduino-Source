@@ -17,9 +17,9 @@
 #include "PokemonSV/Programs/Sandwiches/PokemonSV_IngredientSession.h"
 #include "PokemonSV_SandwichMaker.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -51,10 +51,6 @@ SandwichMaker::SandwichMaker()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void SandwichMaker::execute_action(ConsoleHandle& console, BotBaseContext& context, const SandwichIngredientsTableRow& row) {
-   
-}
-
 void SandwichMaker::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
     assert_16_9_720p_min(env.logger(), env.console);
 
@@ -64,22 +60,29 @@ void SandwichMaker::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
 
     int num_fillings = 0;
     int num_condiments = 0;
-    std::vector<std::string> fillings;
-    std::vector<std::string> condiments;
+    std::map<std::string, uint8_t> fillings;
+    std::map<std::string, uint8_t> condiments;
 
-    //Build maps of the selected ingredients if set to custom
+    //Add the selected ingredients to the maps if set to custom
     if (SANDWICH_OPTIONS.SANDWICH_RECIPE == SandwichMakerOption::SandwichRecipe::custom) {
         env.log("Custom sandwich selected. Validating ingredients.", COLOR_BLACK);
 
         std::vector<std::unique_ptr<SandwichIngredientsTableRow>> table = SANDWICH_OPTIONS.SANDWICH_INGREDIENTS.copy_snapshot();
 
         for (const std::unique_ptr<SandwichIngredientsTableRow>& row : table) {
-            if (std::find(ALL_SANDWICH_FILLINGS_SLUGS().begin(), ALL_SANDWICH_FILLINGS_SLUGS().end(), row->item.slug()) != ALL_SANDWICH_FILLINGS_SLUGS().end()) {
-                fillings.push_back(row->item.slug());
+            std::string table_item = row->item.slug();
+            if (std::find(ALL_SANDWICH_FILLINGS_SLUGS().begin(), ALL_SANDWICH_FILLINGS_SLUGS().end(), table_item) != ALL_SANDWICH_FILLINGS_SLUGS().end()) {
+                if (fillings.find(table_item) == fillings.end()) {
+                    fillings.insert(make_pair(table_item, 0));
+                }
+                fillings[table_item]++;
                 num_fillings++;
             }
             else {
-                condiments.push_back(row->item.slug());
+                if (condiments.find(table_item) == condiments.end()) {
+                    condiments.insert(make_pair(table_item, 0));
+                }
+                condiments[table_item]++;
                 num_condiments++;
             }
         }
@@ -93,7 +96,7 @@ void SandwichMaker::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         }
         env.log("Ingredients validated.", COLOR_BLACK);
     }
-    //Otherwise get the ingredients from the map
+    //Otherwise get the preset ingredients
     else {
         env.log("Preset sandwich selected.", COLOR_BLACK);
 
@@ -101,29 +104,37 @@ void SandwichMaker::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
 
         for (auto&& s : table) {
             if (std::find(ALL_SANDWICH_FILLINGS_SLUGS().begin(), ALL_SANDWICH_FILLINGS_SLUGS().end(), s) != ALL_SANDWICH_FILLINGS_SLUGS().end()) {
-                fillings.push_back(s);
+                if (fillings.find(s) == fillings.end()) {
+                    fillings.insert(make_pair(s, 0));
+                }
+                fillings[s]++;
                 num_fillings++;
             }
             else {
-                condiments.push_back(s);
+                if (condiments.find(s) == condiments.end()) {
+                    condiments.insert(make_pair(s, 0));
+                }
+                condiments[s]++;
                 num_condiments++;
             }
         }
     }
 
+    /*
     //Print ingredients
     cout << "Fillings:" << endl;
-    for (auto i : fillings) {
-        cout << i << endl;
+    for (const auto& [key, value] : fillings) {
+        std::cout << key << ": " << (int)value << endl;
     }
     cout << "Condiments:" << endl;
-    for (auto i : condiments) {
-        cout << i << endl;
+    for (const auto& [key, value] : condiments) {
+        std::cout << key << ": " << (int)value << endl;
     }
+    */
 
     //Player must be on default sandwich menu
-    //enter_custom_sandwich_mode(env.program_info(), env.console, context);
-    //add_sandwich_ingredients(dispatcher, console, context, SANDWICH_OPTIONS.LANGUAGE, std::move(fillings), std::move(condiments));
+    enter_custom_sandwich_mode(env.program_info(), env.console, context);
+    add_sandwich_ingredients(env.realtime_dispatcher(), env.console, context, SANDWICH_OPTIONS.LANGUAGE, std::move(fillings), std::move(condiments));
 
 
     GO_HOME_WHEN_DONE.run_end_of_program(context);

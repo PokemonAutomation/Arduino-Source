@@ -19,6 +19,10 @@ std::vector<std::string> SandwichMakerOption::get_premade_ingredients(SandwichRe
     return iter->second;
 }
 
+SandwichMakerOption::~SandwichMakerOption() {
+    SANDWICH_RECIPE.remove_listener(*this);
+}
+
 SandwichMakerOption::SandwichMakerOption()
     : GroupOption(
         "Sandwich Maker",
@@ -65,7 +69,21 @@ SandwichMakerOption::SandwichMakerOption()
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(SANDWICH_RECIPE);
     PA_ADD_OPTION(SANDWICH_INGREDIENTS);
+
+    SandwichMakerOption::value_changed();
+    SANDWICH_RECIPE.add_listener(*this);
+
 }
+
+void SandwichMakerOption::value_changed() {
+    if (SANDWICH_RECIPE == SandwichRecipe::custom) {
+        SANDWICH_INGREDIENTS.set_visibility(ConfigOptionState::ENABLED);
+    }
+    else {
+        SANDWICH_INGREDIENTS.set_visibility(ConfigOptionState::DISABLED);
+    }
+}
+
 
 }
 }

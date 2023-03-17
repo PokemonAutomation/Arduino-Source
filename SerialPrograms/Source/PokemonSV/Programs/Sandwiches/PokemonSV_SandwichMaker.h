@@ -33,7 +33,6 @@ class SandwichMaker : public SingleSwitchProgramInstance {
 public:
     SandwichMaker();
 
-    void execute_action(ConsoleHandle& console, BotBaseContext& context, const SandwichIngredientsTableRow& row);
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
