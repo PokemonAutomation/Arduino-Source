@@ -214,7 +214,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
         }
         if (battle_ended){
             //Close all the dex entry and caught menus
-            pbf_mash_button(context, BUTTON_B, 100);
+            pbf_mash_button(context, BUTTON_B, 170);
             context.wait_for_all_requests();
 
             //Open box and navigate to last party slot

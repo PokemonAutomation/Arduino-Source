@@ -262,7 +262,7 @@ bool TerastallizingDetector::detect(const ImageViewRGB32& screen) const{
 
 
 SwapMenuDetector::SwapMenuDetector(Color color)
-    : m_arrow(color, GradientArrowType::RIGHT, { 0.019, 0.127, 0.298, 0.755 })
+    : m_arrow(color, GradientArrowType::RIGHT, { 0.02, 0.10, 0.05, 0.90 })
 {}
 void SwapMenuDetector::make_overlays(VideoOverlaySet& items) const {
     m_arrow.make_overlays(items);
@@ -273,7 +273,55 @@ bool SwapMenuDetector::detect(const ImageViewRGB32& screen) const {
     }
     return true;
 }
+int8_t SwapMenuDetector::detect_slot(const ImageViewRGB32& screen) const {
+    ImageFloatBox box;
+    if (!m_arrow.detect(box, screen)) {
+        return -1;
+    }
 
+    double slot = (box.y - 0.172222) / 0.116482 + 0.5;
+    //cout << "slot = " << slot << endl;
+    return (int8_t)(slot + 0.5);
+}
+bool SwapMenuDetector::move_to_slot(ConsoleHandle& console, BotBaseContext& context, uint8_t slot) const {
+    if (slot > 5) {
+        return false;
+    }
+    for (size_t attempts = 0;; attempts++) {
+        context.wait_for_all_requests();
+        VideoSnapshot screen = console.video().snapshot();
+        int8_t current_slot = detect_slot(screen);
+        if (current_slot < 0 || current_slot > 5) {
+            console.log("SwapMenuDetector::move_to_slot(): Unable to detect slot.", COLOR_RED);
+            return false;
+        }
+        if (attempts > 20) {
+            console.log("SwapMenuDetector::move_to_slot(): Failed to move slot after 20 attempts.", COLOR_RED);
+            return false;
+        }
+
+        uint8_t diff = (6 + slot - (uint8_t)current_slot) % 6;
+        switch (diff) {
+        case 0:
+            return true;
+        case 1:
+            pbf_press_dpad(context, DPAD_DOWN, 20, 30);
+            continue;
+        case 2:
+            pbf_press_dpad(context, DPAD_DOWN, 20, 30);
+            continue;
+        case 3:
+            pbf_press_dpad(context, DPAD_DOWN, 20, 30);
+            continue;
+        case 4:
+            pbf_press_dpad(context, DPAD_DOWN, 20, 30);
+            continue;
+        case 5:
+            pbf_press_dpad(context, DPAD_DOWN, 20, 30);
+            continue;
+        }
+    }
+}
 
 
 }
