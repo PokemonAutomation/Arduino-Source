@@ -84,6 +84,7 @@ void SwitchViewer_Widget::construct(){
 
     m_switches = new MultiSwitchSystemWidget(*this, m_session, 0);
     scroll_layout->addWidget(m_switches);
+    scroll_layout->addStretch(1);
 }
 
 
