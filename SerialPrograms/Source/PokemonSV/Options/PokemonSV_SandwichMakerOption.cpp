@@ -14,8 +14,8 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
 
-std::vector<std::string> SandwichMakerOption::get_premade_ingredients(SandwichRecipe token) {
-    auto iter = PremadeSandwichIngredients.find(token);
+std::vector<std::string> SandwichMakerOption::get_premade_ingredients(SandwichRecipe value) {
+    auto iter = PremadeSandwichIngredients.find(value);
     return iter->second;
 }
 

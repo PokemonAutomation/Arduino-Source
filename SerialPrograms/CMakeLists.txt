@@ -1443,6 +1443,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Programs/Trading/PokemonSV_TradeRoutines.h
     Source/PokemonSV/Resources/PokemonSV_AuctionItemNames.cpp
     Source/PokemonSV/Resources/PokemonSV_AuctionItemNames.h
+    Source/PokemonSV/Resources/PokemonSV_FillingsCoordinates.cpp
+    Source/PokemonSV/Resources/PokemonSV_FillingsCoordinates.h
     Source/PokemonSV/Resources/PokemonSV_Ingredients.cpp
     Source/PokemonSV/Resources/PokemonSV_Ingredients.h
     Source/PokemonSV/Resources/PokemonSV_ItemSprites.cpp

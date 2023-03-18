@@ -32,7 +32,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
 
-namespace {
+//namespace {
     const ImageFloatBox HAND_INITIAL_BOX{0.440, 0.455, 0.112, 0.179};
     const ImageFloatBox INGREDIENT_BOX{0.455, 0.130, 0.090, 0.030};
 
@@ -45,7 +45,7 @@ void wait_for_initial_hand(const ProgramInfo& info, ConsoleHandle& console, BotB
     }
 }
 
-} // anonymous namespace
+//} // anonymous namespace
 
 bool enter_sandwich_recipe_list(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
     context.wait_for_all_requests();
@@ -232,7 +232,7 @@ bool select_sandwich_recipe(const ProgramInfo& info, ConsoleHandle& console, Bot
     return false;
 }
 
-namespace {
+//namespace {
 
 // expand the hand bounding box so that the hand watcher can pick the hand in the next iteration
 ImageFloatBox expand_box(const ImageFloatBox& box){
@@ -377,7 +377,7 @@ ImageFloatBox move_sandwich_hand(
     }
 }
 
-} // end anonymous namesapce
+//} // end anonymous namesapce
 
 void build_great_peanut_butter_sandwich(const ProgramInfo& info, AsyncDispatcher& dispatcher, ConsoleHandle& console, BotBaseContext& context){
     const ImageFloatBox sandwich_target_box_left  {0.386, 0.507, 0.060, 0.055};
