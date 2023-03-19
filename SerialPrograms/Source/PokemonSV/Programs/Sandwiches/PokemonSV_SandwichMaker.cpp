@@ -6,11 +6,14 @@
 
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Tools/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Common/Cpp/Exceptions.h"
 #include "PokemonSV/Programs/PokemonSV_SaveGame.h"
+#include "CommonFramework/ImageTools/ImageFilter.h"
 #include "PokemonSV/Programs/Sandwiches/PokemonSV_SandwichRoutines.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV/Resources/PokemonSV_Ingredients.h"
@@ -131,6 +134,7 @@ void SandwichMaker::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
     }
 
     //Print ingredients
+    /*
     cout << "Fillings:" << endl;
     for (const auto& [key, value] : fillings) {
         std::cout << key << ": " << (int)value << endl;
@@ -139,14 +143,9 @@ void SandwichMaker::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
     for (const auto& [key, value] : condiments) {
         std::cout << key << ": " << (int)value << endl;
     }
+    */
 
-    //Sort the fillings to keep the bowls on the build screen in a consistent order
-    //Ex. Adding ingredients in the order of lettuce, tomato, cherry tomato, cucumber will result in their respective positions being center, left, right, far left
-    //But adding the ingredients in the order of tomato, cucumber, lettuce, cherry tomato will result in their respective positions being left, far left, center, right
-    //So lettuce will always be center, tomato will always be left, etc.
-    //This is so when we are placing the filling we will know which bowl to go to and how many ingredients to expect
-
-    //Is this supposed to be alphabetical? the order is off when selecting in the minigame
+    //Sort the fillings in list order to speed up selection
     std::vector<std::string> fillings_game_order = {"lettuce", "tomato", "cherry-tomatoes", "cucumber", "pickle", "onion", "red-onion", "green-bell-pepper", "red-bell-pepper",
         "yellow-bell-pepper", "avocado", "bacon", "ham", "prosciutto", "chorizo", "herbed-sausage", "hamburger", "klawf-stick", "smoked-fillet", "fried-fillet", "egg", "potato-tortilla",
         "tofu", "rice", "noodles", "potato-salad", "cheese", "banana", "strawberry", "apple", "kiwi", "pineapple", "jalapeno", "watercress", "basil"};
@@ -165,13 +164,15 @@ void SandwichMaker::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
     std::sort(fillings_sorted.begin(), fillings_sorted.end(), compare);
 
     //Print sorted fillings
+    /*
     cout << "Sorted fillings:" << endl;
     for (auto i : fillings_sorted) {
         cout << i << endl;
     }
+    */
 
     //Calculate number of bowls there will be on the build screen
-    //Get each ingredient in order, then get the number of times it appears from the map
+    //Get each ingredient in list order, then get the number of times it appears from the map
     //Also store how many of each ingredient is in each bowl (ex. 6 onion in first bowl and then 3 onion in the next)
     int bowls = 0;
     std::vector<int> bowl_amounts;
@@ -200,32 +201,126 @@ void SandwichMaker::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
     //We can finally start making the sandwich
     //Player must be on default sandwich menu
     enter_custom_sandwich_mode(env.program_info(), env.console, context);
-
-    //Use the maps here when adding, as the maps already exist. Order does not matter when adding so we will use fillings_sorted when actually making the sandwich.
     add_sandwich_ingredients(env.realtime_dispatcher(), env.console, context, SANDWICH_OPTIONS.LANGUAGE, std::move(fillings), std::move(condiments));
-
-    //calculate number of bowls
-    //get filling from class
-    //read the number of servings
-    //determine bowls
-    // servings/servings per bowl
-    //then run loop for first bowl with coordinates from class?
-
-    //for number of fillings
-    //filling[i] coordinate sets?
-    //use to prevent stacking all in one area
-    //so set 1 coordinates would put them down the center
-    //set 2 would try to go top, etc.
-
-    //do a for loop?
-    //need to define boxes/locations for fillings
-    //also need to define how many fillings stack per bowl
-    //ex. 1 serving of lettuce has 3 pieces in a single bowl
-    // 2 servings of lettuce has 6 pieces in a single bowl
-    // 3 servings of hamburger is 1 piece per bowl for a total of 3 bowls
-    // 6 servings of cherry tomatoes is 9 pieces in two bowls
-    
     wait_for_initial_hand(env.program_info(), env.console, context);
+
+    //Wait for labels to appear
+    pbf_wait(context, 300);
+    context.wait_for_all_requests();
+
+    //Now read in bowl labels and store which bowl has what
+    //TODO: Clean this up - this is a mess
+    env.log("Reading bowl labels.", COLOR_BLACK);
+
+    VideoSnapshot screen = env.console.video().snapshot();
+    ImageFloatBox left_bowl_label(0.099, 0.270, 0.205, 0.041);
+    ImageFloatBox center_bowl_label(0.397, 0.268, 0.203, 0.044);
+    ImageFloatBox right_bowl_label(0.699, 0.269, 0.201, 0.044);
+
+    //VideoOverlaySet label_set(env.console);
+    //label_set.add(COLOR_BLUE, center_bowl_label);
+    std::vector<std::string> bowl_order;
+
+    //Get 3 default labels
+    ImageRGB32 image_center_label = to_blackwhite_rgb32_range(
+        extract_box_reference(screen, center_bowl_label),
+        combine_rgb(215, 215, 215), combine_rgb(255, 255, 255), true
+    );
+    ImageRGB32 image_left_label = to_blackwhite_rgb32_range(
+        extract_box_reference(screen, left_bowl_label),
+        combine_rgb(215, 215, 215), combine_rgb(255, 255, 255), true
+    );
+    ImageRGB32 image_right_label = to_blackwhite_rgb32_range(
+        extract_box_reference(screen, right_bowl_label),
+        combine_rgb(215, 215, 215), combine_rgb(255, 255, 255), true
+    );
+
+    OCR::StringMatchResult result = PokemonSV::SandwichFillingOCR::instance().read_substring(
+        env.console, SANDWICH_OPTIONS.LANGUAGE, image_center_label,
+        OCR::BLACK_TEXT_FILTERS()
+    );
+    result.clear_beyond_log10p(SandwichFillingOCR::MAX_LOG10P);
+    result.clear_beyond_spread(SandwichFillingOCR::MAX_LOG10P_SPREAD);
+    if (result.results.empty()) {
+        throw OperationFailedException(
+            ErrorReport::SEND_ERROR_REPORT, env.console,
+            "No ingredient found on center label.",
+            true
+        );
+    }
+    for (auto& r : result.results) {
+        env.console.log("Ingredient found on center label: " + r.second.token);
+        bowl_order.push_back(r.second.token);
+    }
+    //Get left (2nd) ingredient
+    result = PokemonSV::SandwichFillingOCR::instance().read_substring(
+        env.console, SANDWICH_OPTIONS.LANGUAGE, image_left_label,
+        OCR::BLACK_TEXT_FILTERS()
+    );
+    result.clear_beyond_log10p(SandwichFillingOCR::MAX_LOG10P);
+    result.clear_beyond_spread(SandwichFillingOCR::MAX_LOG10P_SPREAD);
+    if (result.results.empty()) {
+        env.log("No ingredient found on left lable.", COLOR_BLACK);
+    }
+    for (auto& r : result.results) {
+        env.console.log("Ingredient found on left label: " + r.second.token);
+        bowl_order.push_back(r.second.token);
+    }
+    //Get right (3rd) ingredient
+    result = PokemonSV::SandwichFillingOCR::instance().read_substring(
+        env.console, SANDWICH_OPTIONS.LANGUAGE, image_right_label,
+        OCR::BLACK_TEXT_FILTERS()
+    );
+    result.clear_beyond_log10p(SandwichFillingOCR::MAX_LOG10P);
+    result.clear_beyond_spread(SandwichFillingOCR::MAX_LOG10P_SPREAD);
+    if (result.results.empty()) {
+        env.log("No ingredient found on right lable.", COLOR_BLACK);
+    }
+    for (auto& r : result.results) {
+        env.console.log("Ingredient found on right label: " + r.second.token);
+        bowl_order.push_back(r.second.token);
+    }
+    //Get remaining ingredients if any
+    //center 1, left 2, right 3, far left 4, far far left/right 5, right 6
+    //this differs from the game layout: far right is 5 and far far left/right is 6 in game
+    //however as long as we stay internally consistent with this numbering it will work
+    for (int i = 0; i < (bowls - 3); i++) {
+        pbf_press_button(context, BUTTON_R, 20, 80);
+        pbf_wait(context, 100);
+        context.wait_for_all_requests();
+
+        VideoSnapshot screen2 = env.console.video().snapshot();
+        ImageRGB32 image_side_label = to_blackwhite_rgb32_range(
+            extract_box_reference(screen2, left_bowl_label),
+            combine_rgb(215, 215, 215), combine_rgb(255, 255, 255), true
+        );
+        image_side_label.save("./image_side_label.png");
+
+        result = PokemonSV::SandwichFillingOCR::instance().read_substring(
+            env.console, SANDWICH_OPTIONS.LANGUAGE, image_side_label,
+            OCR::BLACK_TEXT_FILTERS()
+        );
+        result.clear_beyond_log10p(SandwichFillingOCR::MAX_LOG10P);
+        result.clear_beyond_spread(SandwichFillingOCR::MAX_LOG10P_SPREAD);
+        if (result.results.empty()) {
+            env.log("No ingredient found on side label.", COLOR_BLACK);
+        }
+        for (auto& r : result.results) {
+            env.console.log("Ingredient found on side label: " + r.second.token);
+            bowl_order.push_back(r.second.token);
+        }
+    }
+
+    //Now re-center bowls
+    for (int i = 0; i < (bowls - 3); i++) {
+        pbf_press_button(context, BUTTON_L, 20, 80);
+    }
+
+    cout << "Labels:" << endl;
+    for (auto i : bowl_order) {
+        cout << i << endl;
+    }
+
     env.log("Start making sandwich", COLOR_BLACK);
 
     const ImageFloatBox HAND_INITIAL_BOX{ 0.440, 0.455, 0.112, 0.179 };
@@ -254,12 +349,7 @@ void SandwichMaker::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         case 2:
             target_bowl = right_bowl;
             break;
-        case 3:
-            //Press R
-            pbf_press_button(context, BUTTON_R, 20, 80);
-            target_bowl = left_bowl;
-            break;
-        case 4:
+        case 3: case 4: case 5: case 6:
             //Press R
             pbf_press_button(context, BUTTON_R, 20, 80);
             target_bowl = left_bowl;
@@ -311,10 +401,9 @@ void SandwichMaker::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
     end_box = move_sandwich_hand(info, dispatcher, console, context, SandwichHandType::GRABBING, true, expand_box(end_box), sandwich_target_box_right);
     */
 
-    /*
     // Drop upper bread and pick
     // console.overlay().add_log("Drop upper bread and pick", COLOR_WHITE);
-    SandwichHandWatcher grabbing_hand(SandwichHandType::FREE, { 0, 0, 1.0, 1.0 });
+    SandwichHandWatcher grabbing_hand(SandwichHandType::FREE, {0, 0, 1.0, 1.0});
     int ret = wait_until(env.console, context, std::chrono::seconds(30), { grabbing_hand });
     if (ret < 0) {
         throw OperationFailedException(
@@ -331,8 +420,6 @@ void SandwichMaker::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
 
     env.log("Hand end box " + box_to_string(end_box));
     env.log("Built sandwich", COLOR_BLACK);
-    */
-
     context.wait_for_all_requests();
 
     finish_sandwich_eating(env.program_info(), env.console, context);
