@@ -15,11 +15,6 @@
 #include "PokemonSV/Options/PokemonSV_SandwichMakerOption.h"
 
 namespace PokemonAutomation {
-    struct ProgramInfo;
-    class AsyncDispatcher;
-    class ProgramEnvironment;
-    class ConsoleHandle;
-    class BotBaseContext;
 namespace NintendoSwitch {
 namespace PokemonSV {
 

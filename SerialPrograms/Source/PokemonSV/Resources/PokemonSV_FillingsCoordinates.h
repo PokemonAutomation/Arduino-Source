@@ -39,7 +39,7 @@ class FillingsCoordinates {
         {"klawf-stick",         {3, 1}},
         {"smoked-fillet",       {3, 2}},
         {"fried-fillet",        {1, 1}},
-        {"egg",                 {3, 2}},
+        {"egg",                 {3, 1}},
         {"potato-tortilla",     {1, 1}},
         {"tofu",                {3, 1}},
         {"rice",                {1, 1}},
@@ -51,7 +51,7 @@ class FillingsCoordinates {
         {"apple",               {3, 2}},
         {"kiwi",                {3, 2}},
         {"pineapple",           {3, 2}},
-        {"jalapeno",            {3, 2}},
+        {"jalape\xF1o",         {3, 2}},
         {"watercress",          {3, 2}},
         {"basil",               {4, 2}},
     };

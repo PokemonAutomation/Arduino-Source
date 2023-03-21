@@ -4,7 +4,6 @@
  *
  */
 
-#include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Tools/VideoResolutionCheck.h"
@@ -12,7 +11,6 @@
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Common/Cpp/Exceptions.h"
-#include "PokemonSV/Programs/PokemonSV_SaveGame.h"
 #include "CommonFramework/ImageTools/ImageFilter.h"
 #include "PokemonSV/Programs/Sandwiches/PokemonSV_SandwichRoutines.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
@@ -160,7 +158,7 @@ void SandwichMaker::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         fillings_sorted.push_back(i->first);
     }
     std::unordered_map<std::string, int> temp_map;
-    for (auto i = 0; i < fillings_game_order.size(); i++) {
+    for (auto i = 0; i < (int)fillings_game_order.size(); i++) {
         temp_map[fillings_game_order[i]] = i;
     }
     auto compare = [&temp_map](const std::string& s, const std::string& s1) {
@@ -201,7 +199,7 @@ void SandwichMaker::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
             bowl_amounts.push_back(bowl_remaining * (int)(ingreed.get_filling_information(i).piecesPerServing));
         }
     }
-    //cout << "Number of bowls: " << bowls << endl;
+    cout << "Number of bowls: " << bowls << endl;
 
     //Player must be on default sandwich menu
     std::map<std::string, uint8_t> fillings_copy(fillings); //Making a copy as we need the map for later
@@ -323,15 +321,13 @@ void SandwichMaker::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         pbf_press_button(context, BUTTON_L, 20, 80);
     }
 
-    /*
     cout << "Labels:" << endl;
     for (auto i : bowl_order) {
         cout << i << endl;
     }
-    */
 
     //If a label fails to read it'll cause issues down the line
-    if (bowl_order.size() != bowls) {
+    if ((int)bowl_order.size() != bowls) {
         throw OperationFailedException(
             ErrorReport::SEND_ERROR_REPORT, env.console,
             "Number of bowl labels did not match number of bowls.",
@@ -349,10 +345,8 @@ void SandwichMaker::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
     const ImageFloatBox sandwich_target_box_left{ 0.386, 0.507, 0.060, 0.055 }; //where to place the ingredients
     const ImageFloatBox sandwich_target_box_middle{ 0.470, 0.507, 0.060, 0.055 };
     const ImageFloatBox sandwich_target_box_right{ 0.554, 0.507, 0.060, 0.055 };
-    const ImageFloatBox upper_bread_drop_box{ 0.482, 0.400, 0.036, 0.030 };
 
     ImageFloatBox target_bowl = center_bowl;
-    ImageFloatBox target_sandwich = sandwich_target_box_left;
     //Initial position handling
     auto end_box = move_sandwich_hand(env.program_info(), env.realtime_dispatcher(), env.console, context, SandwichHandType::FREE, false, HAND_INITIAL_BOX, HAND_INITIAL_BOX);
     move_sandwich_hand(env.program_info(), env.realtime_dispatcher(), env.console, context, SandwichHandType::GRABBING, true, { 0, 0, 1.0, 1.0 }, HAND_INITIAL_BOX);
@@ -363,24 +357,26 @@ void SandwichMaker::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         FillingsCoordinates ingreed;
         cout << "Placing " << i << endl;
 
-        //int times_to_place = (int)(ingreed.get_filling_information(i).piecesPerServing) * fillings.find(i)->second;
-        //int placement_number = 0;
+        int times_to_place = (int)(ingreed.get_filling_information(i).piecesPerServing) * (fillings.find(i)->second);
+        int placement_number = 0;
+
+        cout << "Times to place: " << times_to_place << endl;
 
         std::vector<int> bowl_index;
         //Get the bowls we want to go to
-        for (int j = 0; j < bowl_order.size(); j++) {
+        for (int j = 0; j < (int)bowl_order.size(); j++) {
             if (i == bowl_order.at(j)) {
                 bowl_index.push_back(j);
             }
         }
 
         //Target the correct filling bowl and place until it is empty
-        for (int j = 0; j < bowl_index.size(); j++) {
+        for (int j = 0; j < (int)bowl_index.size(); j++) {
             //Navigate to bowl and set target bowl
             cout << "Target bowl: " << bowl_index.at(j) << endl;
             switch (bowl_index.at(j)) {
             case 0:
-                //First ingredient is center - this has already been set
+                target_bowl = center_bowl;
                 break;
             case 1:
                 target_bowl = left_bowl;
@@ -399,16 +395,20 @@ void SandwichMaker::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
                 break;
             }
 
-            //Place the fillings until label does not light up yellow on grab
-            bool bowl_empty = false;
-            while (!bowl_empty) {
+            //Place the fillings until label does not light up yellow on grab/the piece count is not hit
+            while (true) {
+                //Break out after placing all pieces of the filling
+                if (placement_number == times_to_place) {
+                    break;
+                }
+
                 end_box = move_sandwich_hand(env.program_info(), env.realtime_dispatcher(), env.console, context, SandwichHandType::FREE, false, { 0, 0, 1.0, 1.0 }, target_bowl);
                 context.wait_for_all_requests();
 
                 end_box = move_sandwich_hand(env.program_info(), env.realtime_dispatcher(), env.console, context, SandwichHandType::GRABBING, true, expand_box(end_box), sandwich_target_box_left);//coordinates successplace target_location: ingreed.get_filling_information(i).placementmap[fillings]
                 context.wait_for_all_requests();
 
-                //If any of the labels are yellow continue. Otherwise assume bowl is empty and exit the loop.
+                //If any of the labels are yellow continue. Otherwise assume bowl is empty move on to the next.
                 VideoSnapshot label_color_check = env.console.video().snapshot();
                 ImageRGB32 left_check = filter_rgb32_range(
                     extract_box_reference(label_color_check, left_bowl_label),
@@ -426,10 +426,16 @@ void SandwichMaker::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
                 ImageStats right_stats = image_stats(right_check);
                 ImageStats center_stats = image_stats(center_check);
 
-                if (left_stats.count < 6000 && right_stats.count < 6000 && center_stats.count < 6000) {
+                cout << "Left stats: " << left_stats.count << endl;
+                cout << "Right stats: " << right_stats.count << endl;
+                cout << "Center stats: " << center_stats.count << endl;
+
+                //The label check is needed for ingredients with multiple bowls as we don't know which bowl has what amount
+                if (left_stats.count < 100 && right_stats.count < 100 && center_stats.count < 100) {
                     context.wait_for_all_requests();
-                    bowl_empty = true;
+                    break;
                 }
+                placement_number++;
             }
 
             //Reset bowl position
@@ -437,101 +443,8 @@ void SandwichMaker::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
                 pbf_press_button(context, BUTTON_L, 20, 80);
             }
         }
-
-        //Keep placing until bowl(s) are empty - use calculed times_to_place to determine pattern
-
-        /*
-        for (int successful_placements = 0; successful_placements < times_to_place; successful_placements++) {
-            //Set target bowl
-
-            //write navigate_to_bowl function
-            end_box = move_sandwich_hand(env.program_info(), env.realtime_dispatcher(), env.console, context, SandwichHandType::GRABBING, true, expand_box(end_box), sandwich_target_box_left);//coordinates successplace target_location: ingreed.get_filling_information(i).placementmap[fillings]
-            end_box = move_sandwich_hand(env.program_info(), env.realtime_dispatcher(), env.console, context, SandwichHandType::FREE, false, { 0, 0, 1.0, 1.0 }, target_bowl);
-        }*/
-
-        //int times_to_place =
-
-        //int placements = 0;
-        //placements = fillings.at(fillings_sorted.at(i));
-        //int successful_placements = 0;
-        //ingreed.get_filling_information(fillings_sorted[i]).piecesPerServing
-
-        //Handle # of times each ingredient needs to be picked
-        //for (auto j = 0; j < fillings[fillings_sorted[i]]; j++) {
-
-        //}
-
     }
-
-    
-    /*
-    for (auto i = 0; i < bowls; i++) {
-        //Handle bowl locations
-        switch (i) {
-        case 0:
-            //First ingredient is center - this has already been set
-            break;
-        case 1:
-            target_bowl = left_bowl;
-            break;
-        case 2:
-            target_bowl = right_bowl;
-            break;
-        case 3: case 4: case 5: case 6:
-            //Press R
-            pbf_press_button(context, BUTTON_R, 20, 80);
-            target_bowl = left_bowl;
-            break;
-        default:
-            break;
-        }
-        
-        //Handle # of ingredients in the target bowl
-        //Handle placement locations of the ingredient
-        cout << "Num of ingredients in bowl: " << bowl_amounts.at(i) << endl;
-        for (auto j = 0; j < bowl_amounts.at(i); j++) {
-
-            end_box = move_sandwich_hand(env.program_info(), env.realtime_dispatcher(), env.console, context, SandwichHandType::GRABBING, true, expand_box(end_box), sandwich_target_box_left);
-            end_box = move_sandwich_hand(env.program_info(), env.realtime_dispatcher(), env.console, context, SandwichHandType::FREE, false, { 0, 0, 1.0, 1.0 }, target_bowl);
-            context.wait_for_all_requests();
-        }
-        end_box = move_sandwich_hand(env.program_info(), env.realtime_dispatcher(), env.console, context, SandwichHandType::GRABBING, true, expand_box(end_box), sandwich_target_box_left);
-        context.wait_for_all_requests();
-
-    }
-    */
-
-
-
-
-
-    //Most of the below is From make great peanut butter sandwich (for now)
-
-
-
-
-    /*
-    // console.overlay().add_log("Drop first banana", COLOR_WHITE);
-    // visual feedback grabbing is not reliable. Switch to blind grabbing:
-    
-
-
-    // console.overlay().add_log("Pick second banana", COLOR_WHITE);
-    end_box = move_sandwich_hand(info, dispatcher, console, context, SandwichHandType::FREE, false, { 0, 0, 1.0, 1.0 }, INGREDIENT_BOX);
-
-    // console.overlay().add_log("Drop second banana", COLOR_WHITE);
-    end_box = move_sandwich_hand(info, dispatcher, console, context, SandwichHandType::GRABBING, true, expand_box(end_box), sandwich_target_box_middle);
-
-    // console.overlay().add_log("Pick third banana", COLOR_WHITE);
-    end_box = move_sandwich_hand(info, dispatcher, console, context, SandwichHandType::FREE, false, { 0, 0, 1.0, 1.0 }, INGREDIENT_BOX);
-
-    // console.overlay().add_log("Drop third banana", COLOR_WHITE);
-    end_box = move_sandwich_hand(info, dispatcher, console, context, SandwichHandType::GRABBING, true, expand_box(end_box), sandwich_target_box_right);
-    */
-
-    /*
-    // Drop upper bread and pick
-    // console.overlay().add_log("Drop upper bread and pick", COLOR_WHITE);
+    // Handle top slice by tossing it away
     SandwichHandWatcher grabbing_hand(SandwichHandType::FREE, {0, 0, 1.0, 1.0});
     int ret = wait_until(env.console, context, std::chrono::seconds(30), { grabbing_hand });
     if (ret < 0) {
@@ -544,13 +457,13 @@ void SandwichMaker::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
 
     auto hand_box = hand_location_to_box(grabbing_hand.location());
 
-    end_box = move_sandwich_hand(env.program_info(), env.realtime_dispatcher(), env.console, context, SandwichHandType::GRABBING, false, expand_box(hand_box), upper_bread_drop_box);
+    end_box = move_sandwich_hand(env.program_info(), env.realtime_dispatcher(), env.console, context, SandwichHandType::GRABBING, false, expand_box(hand_box), center_bowl);
     pbf_mash_button(context, BUTTON_A, 125 * 5);
 
     env.log("Hand end box " + box_to_string(end_box));
     env.log("Built sandwich", COLOR_BLACK);
     context.wait_for_all_requests();
-    */
+
     finish_sandwich_eating(env.program_info(), env.console, context);
 
     GO_HOME_WHEN_DONE.run_end_of_program(context);
