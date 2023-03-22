@@ -13,7 +13,6 @@
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/ImageTools/ImageFilter.h"
 #include "PokemonSV/Programs/Sandwiches/PokemonSV_SandwichRoutines.h"
-#include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV/Resources/PokemonSV_Ingredients.h"
 #include "PokemonSV/Resources/PokemonSV_FillingsCoordinates.h"
 #include "PokemonSV/Programs/Sandwiches/PokemonSV_IngredientSession.h"
@@ -22,9 +21,9 @@
 #include "PokemonSV/Inference/Picnics/PokemonSV_SandwichRecipeDetector.h"
 #include "PokemonSV_SandwichMaker.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 #include <unordered_map>
 #include <algorithm>
 
@@ -73,6 +72,7 @@ void SandwichMaker::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
     //Add the selected ingredients to the maps if set to custom
     if (SANDWICH_OPTIONS.SANDWICH_RECIPE == SandwichMakerOption::SandwichRecipe::custom) {
         env.log("Custom sandwich selected. Validating ingredients.", COLOR_BLACK);
+        env.console.overlay().add_log("Custom sandwich selected. Validating ingredients.", COLOR_WHITE);
 
         std::vector<std::unique_ptr<SandwichIngredientsTableRow>> table = SANDWICH_OPTIONS.SANDWICH_INGREDIENTS.copy_snapshot();
 
@@ -96,6 +96,7 @@ void SandwichMaker::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
             }
             else {
                 env.log("Skipping baguette as it is unobtainable.");
+                env.console.overlay().add_log("Skipping baguette as it is unobtainable.", COLOR_WHITE);
             }
         }
 
@@ -107,10 +108,12 @@ void SandwichMaker::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
             throw UserSetupError(env.console.logger(), "Number of fillings exceed 6 and/or number of condiments exceed 4.");
         }
         env.log("Ingredients validated.", COLOR_BLACK);
+        env.console.overlay().add_log("Ingredients validated.", COLOR_WHITE);
     }
     //Otherwise get the preset ingredients
     else {
         env.log("Preset sandwich selected.", COLOR_BLACK);
+        env.console.overlay().add_log("Preset sandwich selected.", COLOR_WHITE);
 
         std::vector<std::string> table = SANDWICH_OPTIONS.get_premade_ingredients(SANDWICH_OPTIONS.SANDWICH_RECIPE);
 
@@ -150,7 +153,7 @@ void SandwichMaker::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
     //    "tofu", "rice", "noodles", "potato-salad", "cheese", "banana", "strawberry", "apple", "kiwi", "pineapple", "jalapeno", "watercress", "basil"};
     std::vector<std::string> fillings_game_order = { "hamburger", "rice", "noodles", "potato-salad", "smoked-fillet", "fried-fillet", "tofu", "chorizo", "herbed-sausage",
         "potato-tortilla", "klawf-stick", "lettuce", "tomato", "cucumber", "pickle", "onion", "red-onion", "green-bell-pepper", "red-bell-pepper", "yellow-bell-pepper", "avocado",
-        "bacon", "ham", "prosciutto", "egg", "cheese", "banana", "strawberry", "apple", "kiwi", "pineapple", "jalape\xc3\xb1o", "watercress", "basil", "cherry-tomatoes" };
+        "bacon", "ham", "prosciutto", "cheese", "banana", "strawberry", "apple", "kiwi", "pineapple", "jalape\xc3\xb1o", "watercress", "egg", "basil", "cherry-tomatoes" };
 
     //Add keys to new vector and sort
     std::vector<std::string> fillings_sorted;
@@ -199,7 +202,9 @@ void SandwichMaker::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
             bowl_amounts.push_back(bowl_remaining * (int)(ingreed.get_filling_information(i).piecesPerServing));
         }
     }
-    cout << "Number of bowls: " << bowls << endl;
+    //cout << "Number of bowls: " << bowls << endl;
+    env.log("Number of bowls: " + std::to_string(bowls), COLOR_BLACK);
+    env.console.overlay().add_log("Number of bowls: " + std::to_string(bowls), COLOR_WHITE);
 
     //Player must be on default sandwich menu
     std::map<std::string, uint8_t> fillings_copy(fillings); //Making a copy as we need the map for later
@@ -209,12 +214,14 @@ void SandwichMaker::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
 
     //Wait for labels to appear
     env.log("Waiting for labels to appear.", COLOR_BLACK);
+    env.console.overlay().add_log("Waiting for labels to appear.", COLOR_WHITE);
     pbf_wait(context, 300);
     context.wait_for_all_requests();
 
     //Now read in bowl labels and store which bowl has what
     //TODO: Clean this up - this is a mess
     env.log("Reading bowl labels.", COLOR_BLACK);
+    env.console.overlay().add_log("Reading bowl labels.", COLOR_WHITE);
 
     VideoSnapshot screen = env.console.video().snapshot();
     ImageFloatBox left_bowl_label(0.099, 0.270, 0.205, 0.041);
@@ -254,6 +261,7 @@ void SandwichMaker::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
     }
     for (auto& r : result.results) {
         env.console.log("Ingredient found on center label: " + r.second.token);
+        env.console.overlay().add_log("Ingredient found on center label : " + r.second.token, COLOR_WHITE);
         bowl_order.push_back(r.second.token);
     }
     //Get left (2nd) ingredient
@@ -265,9 +273,11 @@ void SandwichMaker::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
     result.clear_beyond_spread(SandwichFillingOCR::MAX_LOG10P_SPREAD);
     if (result.results.empty()) {
         env.log("No ingredient found on left label.", COLOR_BLACK);
+        env.console.overlay().add_log("No ingredient found on left label.", COLOR_WHITE);
     }
     for (auto& r : result.results) {
         env.console.log("Ingredient found on left label: " + r.second.token);
+        env.console.overlay().add_log("Ingredient found on left label: " + r.second.token, COLOR_WHITE);
         bowl_order.push_back(r.second.token);
     }
     //Get right (3rd) ingredient
@@ -279,9 +289,11 @@ void SandwichMaker::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
     result.clear_beyond_spread(SandwichFillingOCR::MAX_LOG10P_SPREAD);
     if (result.results.empty()) {
         env.log("No ingredient found on right label.", COLOR_BLACK);
+        env.console.overlay().add_log("No ingredient found on right label.", COLOR_WHITE);
     }
     for (auto& r : result.results) {
         env.console.log("Ingredient found on right label: " + r.second.token);
+        env.console.overlay().add_log("Ingredient found on right label: " + r.second.token, COLOR_WHITE);
         bowl_order.push_back(r.second.token);
     }
     //Get remaining ingredients if any
@@ -308,23 +320,28 @@ void SandwichMaker::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         result.clear_beyond_spread(SandwichFillingOCR::MAX_LOG10P_SPREAD);
         if (result.results.empty()) {
             env.log("No ingredient found on side label.", COLOR_BLACK);
+            env.console.overlay().add_log("No ingredient found on side label.", COLOR_WHITE);
         }
         for (auto& r : result.results) {
             env.console.log("Ingredient found on side label: " + r.second.token);
+            env.console.overlay().add_log("Ingredient found on side label: " + r.second.token, COLOR_WHITE);
             bowl_order.push_back(r.second.token);
         }
     }
 
     //Now re-center bowls
     env.log("Re-centering bowls if needed.", COLOR_BLACK);
+    env.console.overlay().add_log("Re-centering bowls if needed.", COLOR_WHITE);
     for (int i = 0; i < (bowls - 3); i++) {
         pbf_press_button(context, BUTTON_L, 20, 80);
     }
 
+    /*
     cout << "Labels:" << endl;
     for (auto i : bowl_order) {
         cout << i << endl;
     }
+    */
 
     //If a label fails to read it'll cause issues down the line
     if ((int)bowl_order.size() != bowls) {
@@ -337,14 +354,12 @@ void SandwichMaker::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
 
     //Finally.
     env.log("Start making sandwich", COLOR_BLACK);
+    env.console.overlay().add_log("Start making sandwich.", COLOR_WHITE);
 
     const ImageFloatBox HAND_INITIAL_BOX{ 0.440, 0.455, 0.112, 0.179 };
     const ImageFloatBox center_bowl{ 0.455, 0.130, 0.090, 0.030 };
     const ImageFloatBox left_bowl{ 0.190, 0.136, 0.096, 0.031 };
     const ImageFloatBox right_bowl{ 0.715, 0.140, 0.108, 0.033 };
-    const ImageFloatBox sandwich_target_box_left{ 0.386, 0.507, 0.060, 0.055 }; //where to place the ingredients
-    const ImageFloatBox sandwich_target_box_middle{ 0.470, 0.507, 0.060, 0.055 };
-    const ImageFloatBox sandwich_target_box_right{ 0.554, 0.507, 0.060, 0.055 };
 
     ImageFloatBox target_bowl = center_bowl;
     //Initial position handling
@@ -355,12 +370,14 @@ void SandwichMaker::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
     //Find fillings and add them in order
     for (auto i : fillings_sorted) {
         FillingsCoordinates ingreed;
-        cout << "Placing " << i << endl;
+        //cout << "Placing " << i << endl;
+        env.console.overlay().add_log("Placing " + i, COLOR_WHITE);
 
         int times_to_place = (int)(ingreed.get_filling_information(i).piecesPerServing) * (fillings.find(i)->second);
         int placement_number = 0;
 
-        cout << "Times to place: " << times_to_place << endl;
+        //cout << "Times to place: " << times_to_place << endl;
+        env.console.overlay().add_log("Times to place: " + std::to_string(times_to_place), COLOR_WHITE);
 
         std::vector<int> bowl_index;
         //Get the bowls we want to go to
@@ -373,7 +390,8 @@ void SandwichMaker::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         //Target the correct filling bowl and place until it is empty
         for (int j = 0; j < (int)bowl_index.size(); j++) {
             //Navigate to bowl and set target bowl
-            cout << "Target bowl: " << bowl_index.at(j) << endl;
+            //cout << "Target bowl: " << bowl_index.at(j) << endl;
+            env.console.overlay().add_log("Target bowl: " + std::to_string(bowl_index.at(j)), COLOR_WHITE);
             switch (bowl_index.at(j)) {
             case 0:
                 target_bowl = center_bowl;
@@ -429,9 +447,9 @@ void SandwichMaker::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
                 ImageStats right_stats = image_stats(right_check);
                 ImageStats center_stats = image_stats(center_check);
 
-                cout << "Left stats: " << left_stats.count << endl;
-                cout << "Right stats: " << right_stats.count << endl;
-                cout << "Center stats: " << center_stats.count << endl;
+                //cout << "Left stats: " << left_stats.count << endl;
+                //cout << "Right stats: " << right_stats.count << endl;
+                //cout << "Center stats: " << center_stats.count << endl;
 
                 //The label check is needed for ingredients with multiple bowls as we don't know which bowl has what amount
                 if (left_stats.count < 100 && right_stats.count < 100 && center_stats.count < 100) {
@@ -467,6 +485,8 @@ void SandwichMaker::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
 
     env.log("Hand end box " + box_to_string(end_box));
     env.log("Built sandwich", COLOR_BLACK);
+    env.console.overlay().add_log("Hand end box " + box_to_string(end_box), COLOR_WHITE);
+    env.console.overlay().add_log("Built sandwich.", COLOR_WHITE);
     context.wait_for_all_requests();
 
     finish_sandwich_eating(env.program_info(), env.console, context);

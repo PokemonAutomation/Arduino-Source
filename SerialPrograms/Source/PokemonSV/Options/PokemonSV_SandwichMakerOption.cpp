@@ -37,7 +37,7 @@ SandwichMakerOption::SandwichMakerOption()
     )
     , SANDWICH_RECIPE(
         "<b>Sandwich Recipe:</b><br>Select a recipe to make a sandwich with preset ingredients, or select Custom Sandwich to make a sandwich using the table below.<br>"
-        "Sparkling/Title/Encounter: Cucumber + Pickle + 3x Ingredient + 2x Herba Mystica<br>",
+        "Sparkling/Title/Encounter: Cucumber + Pickle + 3x Ingredient + 2x Curry Powder + 2x Herba Mystica<br>",
         //"Sparkling/Title/Humungo: ???",
         {
             {SandwichRecipe::shiny_normal,      "shiny_normal",     "Sparkling + Title + Encounter: Normal"},
