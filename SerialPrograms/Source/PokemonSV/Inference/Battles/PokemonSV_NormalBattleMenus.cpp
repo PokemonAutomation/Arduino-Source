@@ -279,9 +279,12 @@ int8_t SwapMenuDetector::detect_slot(const ImageViewRGB32& screen) const {
         return -1;
     }
 
-    double slot = (box.y - 0.172222) / 0.116482 + 0.5;
+    int slot = (int)((box.y - 0.172222) / 0.116482 + 0.5);
+    if (slot < 0) {
+        slot = 0;
+    }
     //cout << "slot = " << slot << endl;
-    return (int8_t)(slot + 0.5);
+    return (int8_t)slot;
 }
 bool SwapMenuDetector::move_to_slot(ConsoleHandle& console, BotBaseContext& context, uint8_t slot) const {
     if (slot > 5) {
