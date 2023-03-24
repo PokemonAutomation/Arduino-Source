@@ -118,6 +118,7 @@
 #include "CommonFramework/Inference/BlackBorderDetector.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.h"
 #include "Common/Cpp/Concurrency/Watchdog.h"
+#include "PokemonSV/Inference/Battles/PokemonSV_TeraBattleMenus.h"
 
 #ifdef PA_ARCH_x86
 //#include "Kernels/Kernels_x64_SSE41.h"
@@ -220,6 +221,18 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     using namespace Pokemon;
 //    using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
 
+
+
+#if 1
+    ImageRGB32 image("20230323-082240823181-OperationFailedException.png");
+
+    TeraCatchDetector detector(COLOR_RED);
+    cout << detector.detect(image) << endl;
+#endif
+
+
+
+#if 0
     WatchdogTest0 callback0;
     WatchdogTest1 callback1;
 
@@ -243,7 +256,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     cout << "removing 1... end" << endl;
 
     scope.wait_for(std::chrono::seconds(60));
-
+#endif
 #if 0
     ImageRGB32 image("screenshot-20230303-225044564794.png");
 

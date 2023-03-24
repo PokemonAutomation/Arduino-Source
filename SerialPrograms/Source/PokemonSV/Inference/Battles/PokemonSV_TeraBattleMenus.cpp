@@ -275,12 +275,13 @@ void TeraCatchDetector::make_overlays(VideoOverlaySet& items) const{
 bool TeraCatchDetector::detect(const ImageViewRGB32& screen) const{
     ImageStats button = image_stats(extract_box_reference(screen, m_button));
 //    cout << button.average << button.stddev << endl;
-//    extract_box_reference(screen, m_button).save("temp.png");
+//    extract_box_reference(screen, m_button).save("button.png");
 
     ImageStats yellow = image_stats(extract_box_reference(screen, m_box_right));
-//    cout << box.average << box.stddev << endl;
+//    cout << yellow.average << yellow.stddev << endl;
+//    extract_box_reference(screen, m_box_right).save("yellow.png");
 
-    bool button_ok = is_solid(button, {0.117281, 0.311767, 0.570951}, 0.20, 20) || is_black(button, 100, 15);
+    bool button_ok = is_solid(button, {0.117281, 0.311767, 0.570951}, 0.20, 20) || is_black(button, 100, 20);
     bool yellow_ok = is_solid(yellow, {0.554348, 0.445652, 0.}, 0.15, 20);
     if (!button_ok && !yellow_ok){
 //        cout << "button and yellow bad" << endl;
