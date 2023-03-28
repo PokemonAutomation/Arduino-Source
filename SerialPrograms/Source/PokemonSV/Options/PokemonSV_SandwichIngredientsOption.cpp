@@ -18,7 +18,7 @@ StringSelectDatabase make_sandwich_ingredient_database() {
         const SandwichIngredientNames& data = get_ingredient_name(slug);
         const SpriteDatabase::Sprite* sprite = SANDWICH_FILLINGS_DATABASE().get_nothrow(slug);
         if (sprite == nullptr){
-        ret.add_entry(StringSelectEntry(slug, data.display_name()));
+            ret.add_entry(StringSelectEntry(slug, data.display_name()));
             global_logger_tagged().log("Missing sprite for: " + slug, COLOR_RED);
         }else{
             ret.add_entry(StringSelectEntry(slug, data.display_name(), sprite->icon));
@@ -28,7 +28,7 @@ StringSelectDatabase make_sandwich_ingredient_database() {
         const SandwichIngredientNames& data = get_ingredient_name(slug);
         const SpriteDatabase::Sprite* sprite = SANDWICH_CONDIMENTS_DATABASE().get_nothrow(slug);
         if (sprite == nullptr){
-        ret.add_entry(StringSelectEntry(slug, data.display_name()));
+            ret.add_entry(StringSelectEntry(slug, data.display_name()));
             global_logger_tagged().log("Missing sprite for: " + slug, COLOR_RED);
         }else{
             ret.add_entry(StringSelectEntry(slug, data.display_name(), sprite->icon));

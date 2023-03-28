@@ -79,7 +79,7 @@ SandwichMakerOption::SandwichMakerOption()
         },
         LockWhileRunning::LOCKED,
         SandwichRecipe::shiny_normal
-        )
+    )
     , HERBA_ONE(
         "<b>Herba Mystica:</b><br>Select the Herba Mystica to use in the preset recipe. Keep in mind invalid herb combinations.",
         {
@@ -103,7 +103,7 @@ SandwichMakerOption::SandwichMakerOption()
         },
         LockWhileRunning::LOCKED,
         HerbaSelection::salty_herba_mystica
-        )
+    )
     , SANDWICH_INGREDIENTS("<b>Custom Sandwich:</b><br>Make a sandwich from the selected ingredients.<br>You must have at least one ingredient and one condiment, and no more than six ingredients and four condiments.")
 {
     PA_ADD_OPTION(LANGUAGE);
