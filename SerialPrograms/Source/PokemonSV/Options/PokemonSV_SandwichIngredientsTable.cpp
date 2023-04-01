@@ -33,26 +33,6 @@ SandwichIngredientsTable::SandwichIngredientsTable(std::string label)
 {}
 
 
-bool SandwichIngredientsTable::find_item(const std::string& item_slug) const {
-    std::vector<std::unique_ptr<SandwichIngredientsTableRow>> table = copy_snapshot();
-    for (const std::unique_ptr<SandwichIngredientsTableRow>& row : table) {
-        if (row->item.slug() == item_slug) {
-            return true;
-        }
-    }
-    return false;
-}
-
-std::vector<std::string> SandwichIngredientsTable::selected_items() const {
-    std::vector<std::unique_ptr<SandwichIngredientsTableRow>> table = copy_snapshot();
-    std::vector<std::string> slugs;
-    for (const std::unique_ptr<SandwichIngredientsTableRow>& row : table) {
-        slugs.emplace_back(row->item.slug());
-    }
-    return slugs;
-}
-
-
 std::vector<std::string> SandwichIngredientsTable::make_header() const {
     return std::vector<std::string>{
         "Ingredient/Condiment",

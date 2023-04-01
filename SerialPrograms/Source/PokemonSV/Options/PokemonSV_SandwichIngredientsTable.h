@@ -28,10 +28,6 @@ class SandwichIngredientsTable : public EditableTableOption_t<SandwichIngredient
 public:
     SandwichIngredientsTable(std::string label);
 
-    bool find_item(const std::string& item_slug) const;
-
-    std::vector<std::string> selected_items() const;
-
     virtual std::vector<std::string> make_header() const override;
 
     static std::vector<std::unique_ptr<EditableTableRow>> make_defaults();

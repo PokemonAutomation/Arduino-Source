@@ -57,9 +57,7 @@ SandwichMaker::SandwichMaker()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void SandwichMaker::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
-    assert_16_9_720p_min(env.logger(), env.console);
-
+void SandwichMaker::run_sandwich_maker(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
     if (SANDWICH_OPTIONS.LANGUAGE == Language::None) {
         throw UserSetupError(env.console.logger(), "Must set game langauge option to read ingredient lists.");
     }
@@ -189,22 +187,21 @@ void SandwichMaker::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
     std::vector<int> bowl_amounts;
 
     for (auto i : fillings_sorted) {
-        FillingsCoordinates ingreed;
 
         //Add "full" bowls
-        int bowl_calcs = (int)(fillings[i] / ingreed.get_filling_information(i).servingsPerBowl);
+        int bowl_calcs = (int)(fillings[i] / FillingsCoordinates::instance().get_filling_information(i).servingsPerBowl);
         if (bowl_calcs != 0) {
             bowls += bowl_calcs;
             for (int j = 0; j < bowl_calcs; j++) {
-                bowl_amounts.push_back((int)(ingreed.get_filling_information(i).servingsPerBowl)* (int)(ingreed.get_filling_information(i).piecesPerServing));
+                bowl_amounts.push_back((int)(FillingsCoordinates::instance().get_filling_information(i).servingsPerBowl) * (int)(FillingsCoordinates::instance().get_filling_information(i).piecesPerServing));
             }
         }
 
         //Add bowls for remaining servings
-        int bowl_remaining = ((int)(fillings[i] % ingreed.get_filling_information(i).servingsPerBowl));
+        int bowl_remaining = ((int)(fillings[i] % FillingsCoordinates::instance().get_filling_information(i).servingsPerBowl));
         if (bowl_remaining != 0) {
             bowls++;
-            bowl_amounts.push_back(bowl_remaining * (int)(ingreed.get_filling_information(i).piecesPerServing));
+            bowl_amounts.push_back(bowl_remaining * (int)(FillingsCoordinates::instance().get_filling_information(i).piecesPerServing));
         }
     }
     //cout << "Number of bowls: " << bowls << endl;
@@ -374,11 +371,10 @@ void SandwichMaker::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
 
     //Find fillings and add them in order
     for (auto i : fillings_sorted) {
-        FillingsCoordinates ingreed;
         //cout << "Placing " << i << endl;
         env.console.overlay().add_log("Placing " + i, COLOR_WHITE);
 
-        int times_to_place = (int)(ingreed.get_filling_information(i).piecesPerServing) * (fillings.find(i)->second);
+        int times_to_place = (int)(FillingsCoordinates::instance().get_filling_information(i).piecesPerServing) * (fillings.find(i)->second);
         int placement_number = 0;
 
         //cout << "Times to place: " << times_to_place << endl;
@@ -429,7 +425,7 @@ void SandwichMaker::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
                 context.wait_for_all_requests();
 
                 //Get placement location
-                ImageFloatBox placement_target = ingreed.get_filling_information(i).placementCoordinates.at((int)fillings.find(i)->second).at(placement_number);
+                ImageFloatBox placement_target = FillingsCoordinates::instance().get_filling_information(i).placementCoordinates.at((int)fillings.find(i)->second).at(placement_number);
 
                 end_box = move_sandwich_hand(env.program_info(), env.realtime_dispatcher(), env.console, context, SandwichHandType::GRABBING, true, expand_box(end_box), placement_target);
                 context.wait_for_all_requests();
@@ -473,7 +469,7 @@ void SandwichMaker::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         }
     }
     // Handle top slice by tossing it away
-    SandwichHandWatcher grabbing_hand(SandwichHandType::FREE, {0, 0, 1.0, 1.0});
+    SandwichHandWatcher grabbing_hand(SandwichHandType::FREE, { 0, 0, 1.0, 1.0 });
     int ret = wait_until(env.console, context, std::chrono::seconds(30), { grabbing_hand });
     if (ret < 0) {
         throw OperationFailedException(
@@ -495,6 +491,12 @@ void SandwichMaker::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
     context.wait_for_all_requests();
 
     finish_sandwich_eating(env.program_info(), env.console, context);
+}
+
+void SandwichMaker::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
+    assert_16_9_720p_min(env.logger(), env.console);
+
+    run_sandwich_maker(env, context);
 
     GO_HOME_WHEN_DONE.run_end_of_program(context);
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);

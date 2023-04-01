@@ -28,6 +28,8 @@ class SandwichMaker : public SingleSwitchProgramInstance {
 public:
     SandwichMaker();
 
+    void run_sandwich_maker(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:

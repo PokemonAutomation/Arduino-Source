@@ -16,6 +16,7 @@ namespace NintendoSwitch {
 namespace PokemonSV {
 
 class FillingsCoordinates {
+
     struct FillingInfo {
         uint8_t piecesPerServing;
         uint8_t servingsPerBowl;
@@ -132,6 +133,11 @@ public:
     FillingInfo get_filling_information(std::string filling) {
         auto iter = SandwichFillingsData.find(filling);
         return iter->second;
+    }
+
+    static FillingsCoordinates& instance() {
+        static FillingsCoordinates self;
+        return self;
     }
 
 
