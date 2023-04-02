@@ -11,7 +11,9 @@
 
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/Language.h"
+#include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonSV/Inference/Picnics/PokemonSV_SandwichHandDetector.h"
+#include "PokemonSV/Options/PokemonSV_SandwichMakerOption.h"
 #include <cstddef>
 
 namespace PokemonAutomation{
@@ -24,8 +26,6 @@ namespace PokemonAutomation{
 
 namespace NintendoSwitch{
 namespace PokemonSV{
-
-void wait_for_initial_hand(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
 
 // Assuming at picnic table, press A to start making sandwich.
 // The function returns when the game shows the sandwich recipe menu.
@@ -40,21 +40,6 @@ bool enter_sandwich_recipe_list(const ProgramInfo& info, ConsoleHandle& console,
 // Return false if the function fails to find the recipe. This could be that ingredients are not enough, and therefore
 // the recipe cell is semi-transparent, failed to be detected.
 bool select_sandwich_recipe(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, size_t sandwich_index);
-
-ImageFloatBox expand_box(const ImageFloatBox& box);
-ImageFloatBox hand_location_to_box(const std::pair<double, double>& loc);
-std::string box_to_string(const ImageFloatBox& box);
-
-ImageFloatBox move_sandwich_hand(
-    const ProgramInfo& info,
-    AsyncDispatcher& dispatcher,
-    ConsoleHandle& console,
-    BotBaseContext& context,
-    SandwichHandType hand_type,
-    bool pressing_A,
-    const ImageFloatBox& start_box,
-    const ImageFloatBox& end_box
-);
 
 // Starting at the sandwich minigame of dropping ingredients, assume the selected recipe is Great Peanut Butter Sandwich,
 // make the sandwich.
@@ -92,6 +77,10 @@ void make_two_herbs_sandwich(
     const ProgramInfo& info, AsyncDispatcher& dispatcher, ConsoleHandle& console, BotBaseContext& context,
     EggSandwichType sandwich_type, Language language
 );
+
+// Assuming starting at the sandwich recipe list,
+// Make a custom sandwich as set in the sandwich maker options
+void run_sandwich_maker(SingleSwitchProgramEnvironment& env, BotBaseContext& context, SandwichMakerOption& SANDWICH_OPTIONS);
 
 }
 }

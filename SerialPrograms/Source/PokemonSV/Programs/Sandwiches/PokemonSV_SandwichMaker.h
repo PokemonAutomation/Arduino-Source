@@ -11,7 +11,6 @@
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
-#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "PokemonSV/Options/PokemonSV_SandwichMakerOption.h"
 
 namespace PokemonAutomation {
@@ -27,8 +26,6 @@ public:
 class SandwichMaker : public SingleSwitchProgramInstance {
 public:
     SandwichMaker();
-
-    void run_sandwich_maker(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
