@@ -30,6 +30,7 @@
 #include <cmath>
 #include <algorithm>
 #include <sstream>
+#include <unordered_map>
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
