@@ -49,7 +49,7 @@ SandwichMakerOption::SandwichMakerOption()
         "<b>Game Language:</b><br>Required to read ingredients.",
         IV_READER().languages(),
         LockWhileRunning::LOCKED,
-        false
+        true
     )
     , SANDWICH_RECIPE(
         "<b>Sandwich Recipe:</b><br>Select a recipe to make a sandwich with preset ingredients, or select Custom Sandwich to make a sandwich using the table below.<br>"
