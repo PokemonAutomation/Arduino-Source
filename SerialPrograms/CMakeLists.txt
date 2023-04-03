@@ -749,8 +749,6 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_ScalarButtons.h
     Source/NintendoSwitch/DevPrograms/BoxDraw.cpp
     Source/NintendoSwitch/DevPrograms/BoxDraw.h
-    Source/NintendoSwitch/DevPrograms/PathMaker.cpp
-    Source/NintendoSwitch/DevPrograms/PathMaker.h
     Source/NintendoSwitch/DevPrograms/TestProgramComputer.cpp
     Source/NintendoSwitch/DevPrograms/TestProgramComputer.h
     Source/NintendoSwitch/DevPrograms/TestProgramSwitch.cpp
@@ -805,8 +803,8 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.cpp
     Source/NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h
     Source/NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h
-    Source/NintendoSwitch/Options/TestPathMakerTable.cpp
-    Source/NintendoSwitch/Options/TestPathMakerTable.h
+    Source/NintendoSwitch/Options/TurboMacroTable.cpp
+    Source/NintendoSwitch/Options/TurboMacroTable.h
     Source/NintendoSwitch/Options/UI/NintendoSwitch_FriendCodeListWidget.cpp
     Source/NintendoSwitch/Options/UI/NintendoSwitch_FriendCodeListWidget.h
     Source/NintendoSwitch/Programs/NintendoSwitch_FastCodeEntry.cpp
@@ -829,6 +827,8 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Programs/NintendoSwitch_TurboA.h
     Source/NintendoSwitch/Programs/NintendoSwitch_TurboButton.cpp
     Source/NintendoSwitch/Programs/NintendoSwitch_TurboButton.h
+    Source/NintendoSwitch/Programs/NintendoSwitch_TurboMacro.cpp
+    Source/NintendoSwitch/Programs/NintendoSwitch_TurboMacro.h
     Source/NintendoSwitch/Programs/NintendoSwitch_VirtualConsole.cpp
     Source/NintendoSwitch/Programs/NintendoSwitch_VirtualConsole.h
     Source/PanelLists.cpp

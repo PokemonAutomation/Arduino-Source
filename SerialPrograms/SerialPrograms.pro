@@ -380,7 +380,6 @@ SOURCES += \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Routines.cpp \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_ScalarButtons.cpp \
     Source/NintendoSwitch/DevPrograms/BoxDraw.cpp \
-    Source/NintendoSwitch/DevPrograms/PathMaker.cpp \
     Source/NintendoSwitch/DevPrograms/TestProgramComputer.cpp \
     Source/NintendoSwitch/DevPrograms/TestProgramSwitch.cpp \
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramOption.cpp \
@@ -407,7 +406,7 @@ SOURCES += \
     Source/NintendoSwitch/NintendoSwitch_SingleSwitchProgram.cpp \
     Source/NintendoSwitch/Options/NintendoSwitch_FriendCodeListOption.cpp \
     Source/NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.cpp \
-    Source/NintendoSwitch/Options/TestPathMakerTable.cpp \
+    Source/NintendoSwitch/Options/TurboMacroTable.cpp \
     Source/NintendoSwitch/Options/UI/NintendoSwitch_FriendCodeListWidget.cpp \
     Source/NintendoSwitch/Programs/NintendoSwitch_FastCodeEntry.cpp \
     Source/NintendoSwitch/Programs/NintendoSwitch_FriendCodeAdder.cpp \
@@ -419,6 +418,7 @@ SOURCES += \
     Source/NintendoSwitch/Programs/NintendoSwitch_SwitchViewer.cpp \
     Source/NintendoSwitch/Programs/NintendoSwitch_TurboA.cpp \
     Source/NintendoSwitch/Programs/NintendoSwitch_TurboButton.cpp \
+    Source/NintendoSwitch/Programs/NintendoSwitch_TurboMacro.cpp \
     Source/NintendoSwitch/Programs/NintendoSwitch_VirtualConsole.cpp \
     Source/PanelLists.cpp \
     Source/Pokemon/Inference/Pokemon_BerryNameReader.cpp \
@@ -1388,7 +1388,6 @@ HEADERS += \
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_Routines.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_ScalarButtons.h \
     Source/NintendoSwitch/DevPrograms/BoxDraw.h \
-    Source/NintendoSwitch/DevPrograms/PathMaker.h \
     Source/NintendoSwitch/DevPrograms/TestProgramComputer.h \
     Source/NintendoSwitch/DevPrograms/TestProgramSwitch.h \
     Source/NintendoSwitch/FixedInterval.h \
@@ -1417,7 +1416,7 @@ HEADERS += \
     Source/NintendoSwitch/Options/NintendoSwitch_FriendCodeListOption.h \
     Source/NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h \
     Source/NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h \
-    Source/NintendoSwitch/Options/TestPathMakerTable.h \
+    Source/NintendoSwitch/Options/TurboMacroTable.h \
     Source/NintendoSwitch/Options/UI/NintendoSwitch_FriendCodeListWidget.h \
     Source/NintendoSwitch/Programs/NintendoSwitch_FastCodeEntry.h \
     Source/NintendoSwitch/Programs/NintendoSwitch_FriendCodeAdder.h \
@@ -1429,6 +1428,7 @@ HEADERS += \
     Source/NintendoSwitch/Programs/NintendoSwitch_SwitchViewer.h \
     Source/NintendoSwitch/Programs/NintendoSwitch_TurboA.h \
     Source/NintendoSwitch/Programs/NintendoSwitch_TurboButton.h \
+    Source/NintendoSwitch/Programs/NintendoSwitch_TurboMacro.h \
     Source/NintendoSwitch/Programs/NintendoSwitch_VirtualConsole.h \
     Source/PanelLists.h \
     Source/Pokemon/Inference/Pokemon_BerryNameReader.h \
