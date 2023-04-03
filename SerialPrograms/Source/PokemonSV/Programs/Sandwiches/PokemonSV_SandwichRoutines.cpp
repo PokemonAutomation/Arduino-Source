@@ -710,19 +710,13 @@ void run_sandwich_maker(SingleSwitchProgramEnvironment& env, BotBaseContext& con
         std::vector<std::unique_ptr<SandwichIngredientsTableRow>> table = SANDWICH_OPTIONS.SANDWICH_INGREDIENTS.copy_snapshot();
 
         for (const std::unique_ptr<SandwichIngredientsTableRow>& row : table) {
-            std::string table_item = row->item.slug();
+            const std::string& table_item = row->item.slug();
             if (!(table_item == "baguette")) { //ignore baguette
                 if (std::find(ALL_SANDWICH_FILLINGS_SLUGS().begin(), ALL_SANDWICH_FILLINGS_SLUGS().end(), table_item) != ALL_SANDWICH_FILLINGS_SLUGS().end()) {
-                    if (fillings.find(table_item) == fillings.end()) {
-                        fillings.insert(make_pair(table_item, 0));
-                    }
                     fillings[table_item]++;
                     num_fillings++;
                 }
                 else {
-                    if (condiments.find(table_item) == condiments.end()) {
-                        condiments.insert(make_pair(table_item, 0));
-                    }
                     condiments[table_item]++;
                     num_condiments++;
                 }
@@ -752,23 +746,17 @@ void run_sandwich_maker(SingleSwitchProgramEnvironment& env, BotBaseContext& con
 
         for (auto&& s : table) {
             if (std::find(ALL_SANDWICH_FILLINGS_SLUGS().begin(), ALL_SANDWICH_FILLINGS_SLUGS().end(), s) != ALL_SANDWICH_FILLINGS_SLUGS().end()) {
-                if (fillings.find(s) == fillings.end()) {
-                    fillings.insert(make_pair(s, 0));
-                }
                 fillings[s]++;
                 num_fillings++;
             }
             else {
-                if (condiments.find(s) == condiments.end()) {
-                    condiments.insert(make_pair(s, 0));
-                }
                 condiments[s]++;
                 num_condiments++;
             }
         }
         //Insert Herba Mystica
-        condiments.insert(std::make_pair(SANDWICH_OPTIONS.herba_to_string(SANDWICH_OPTIONS.HERBA_ONE), 1));
-        condiments.insert(std::make_pair(SANDWICH_OPTIONS.herba_to_string(SANDWICH_OPTIONS.HERBA_TWO), 1));
+        condiments.insert(std::make_pair(SANDWICH_OPTIONS.herba_to_string(SANDWICH_OPTIONS.HERBA_ONE), (uint8_t)1));
+        condiments.insert(std::make_pair(SANDWICH_OPTIONS.herba_to_string(SANDWICH_OPTIONS.HERBA_TWO), (uint8_t)1));
         num_condiments++;
         num_condiments++;
     }
