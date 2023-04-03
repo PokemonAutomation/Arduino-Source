@@ -92,7 +92,7 @@ class FillingsCoordinates {
 
     const std::map<std::string, FillingInfo> SandwichFillingsData{
         {"baguette",            {0, 0, flatCircleFilling}},
-        {"lettuce",             {3, 2, flatCircleFilling}},
+        {"lettuce",             {3, 1, flatCircleFilling}},
         {"tomato",              {3, 2, flatCircleFilling}},
         {"cherry-tomatoes",     {3, 3, cherryTomatoCustom}},
         {"cucumber",            {3, 2, flatCircleFilling}},
