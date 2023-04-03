@@ -755,8 +755,12 @@ void run_sandwich_maker(SingleSwitchProgramEnvironment& env, BotBaseContext& con
             }
         }
         //Insert Herba Mystica
-        condiments.insert(std::make_pair(SANDWICH_OPTIONS.herba_to_string(SANDWICH_OPTIONS.HERBA_ONE), (uint8_t)1));
-        condiments.insert(std::make_pair(SANDWICH_OPTIONS.herba_to_string(SANDWICH_OPTIONS.HERBA_TWO), (uint8_t)1));
+        if (SANDWICH_OPTIONS.HERBA_ONE == SANDWICH_OPTIONS.HERBA_TWO) {
+            condiments.insert(std::make_pair(SANDWICH_OPTIONS.herba_to_string(SANDWICH_OPTIONS.HERBA_ONE), (uint8_t)2));
+        } else {
+            condiments.insert(std::make_pair(SANDWICH_OPTIONS.herba_to_string(SANDWICH_OPTIONS.HERBA_ONE), (uint8_t)1));
+            condiments.insert(std::make_pair(SANDWICH_OPTIONS.herba_to_string(SANDWICH_OPTIONS.HERBA_TWO), (uint8_t)1));
+        }
         num_condiments++;
         num_condiments++;
     }

@@ -53,8 +53,10 @@ SandwichMakerOption::SandwichMakerOption()
     )
     , SANDWICH_RECIPE(
         "<b>Sandwich Recipe:</b><br>Select a recipe to make a sandwich with preset ingredients, or select Custom Sandwich to make a sandwich using the table below.<br>"
-        "Sparkling/Title/Encounter: Cucumber + Pickle + 3x Ingredient + 2x Curry Powder + 2x Herba Mystica<br>",
-        //"Sparkling/Title/Humungo: ???",
+        "Sparkling/Title/Encounter: Cucumber + Pickle + 3x Type Ingredient + 2x Curry Powder + 2x Herba Mystica.<br>"
+        "Refer to the documentation for valid Herba Mystica combinations and ingredients all other recipes.",
+        //"Sparkling/Title/Humungo: 1x Type Ingredient + 2x Mustard + Spicy Herba + 1x Herba Mystica.<br>"
+        //"Sparkling/Title/Teensy: 1x Type Ingredient + 2x Mayonnaise + Sour Herba + 1x Herba Mystica.<br>",
         {
             {SandwichRecipe::shiny_normal,      "shiny_normal",     "Sparkling + Title + Encounter: Normal"},
             {SandwichRecipe::shiny_fire,        "shiny_fire",       "Sparkling + Title + Encounter: Fire"},
@@ -75,13 +77,48 @@ SandwichMakerOption::SandwichMakerOption()
             {SandwichRecipe::shiny_steel,       "shiny_steel",      "Sparkling + Title + Encounter: Steel"},
             {SandwichRecipe::shiny_fairy,       "shiny_fairy",      "Sparkling + Title + Encounter: Fairy"},
             {SandwichRecipe::huge_normal,       "huge_normal",      "Sparkling + Title + Humungo: Normal"},
+            {SandwichRecipe::huge_fire,         "huge_fire",        "Sparkling + Title + Humungo: Fire"},
+            {SandwichRecipe::huge_water,        "huge_water",       "Sparkling + Title + Humungo: Water"},
+            {SandwichRecipe::huge_electric,     "huge_electric",    "Sparkling + Title + Humungo: Electric"},
+            {SandwichRecipe::huge_grass,        "huge_grass",       "Sparkling + Title + Humungo: Grass"},
+            {SandwichRecipe::huge_ice,          "huge_ice",         "Sparkling + Title + Humungo: Ice"},
+            {SandwichRecipe::huge_fighting,     "huge_fighting",    "Sparkling + Title + Humungo: Fighting"},
+            {SandwichRecipe::huge_poison,       "huge_poison",      "Sparkling + Title + Humungo: Poison"},
+            {SandwichRecipe::huge_ground,       "huge_ground",      "Sparkling + Title + Humungo: Ground"},
+            {SandwichRecipe::huge_flying,       "huge_flying",      "Sparkling + Title + Humungo: Flying"},
+            {SandwichRecipe::huge_psychic,      "huge_psychic",     "Sparkling + Title + Humungo: Psychic"},
+            {SandwichRecipe::huge_bug,          "huge_bug",         "Sparkling + Title + Humungo: Bug"},
+            {SandwichRecipe::huge_rock,         "huge_rock",        "Sparkling + Title + Humungo: Rock"},
+            {SandwichRecipe::huge_ghost,        "huge_ghost",       "Sparkling + Title + Humungo: Ghost"},
+            {SandwichRecipe::huge_dragon,       "huge_dragon",      "Sparkling + Title + Humungo: Dragon"},
+            {SandwichRecipe::huge_dark,         "huge_dark",        "Sparkling + Title + Humungo: Dark"},
+            {SandwichRecipe::huge_steel,        "huge_steel",       "Sparkling + Title + Humungo: Steel"},
+            {SandwichRecipe::huge_fairy,        "huge_fairy",       "Sparkling + Title + Humungo: Fairy"},
+            {SandwichRecipe::tiny_normal,       "tiny_normal",      "Sparkling + Title + Teensy: Normal"},
+            {SandwichRecipe::tiny_fire,         "tiny_fire",        "Sparkling + Title + Teensy: Fire"},
+            {SandwichRecipe::tiny_water,        "tiny_water",       "Sparkling + Title + Teensy: Water"},
+            {SandwichRecipe::tiny_electric,     "tiny_electric",    "Sparkling + Title + Teensy: Electric"},
+            {SandwichRecipe::tiny_grass,        "tiny_grass",       "Sparkling + Title + Teensy: Grass"},
+            {SandwichRecipe::tiny_ice,          "tiny_ice",         "Sparkling + Title + Teensy: Ice"},
+            {SandwichRecipe::tiny_fighting,     "tiny_fighting",    "Sparkling + Title + Teensy: Fighting"},
+            {SandwichRecipe::tiny_poison,       "tiny_poison",      "Sparkling + Title + Teensy: Poison"},
+            {SandwichRecipe::tiny_ground,       "tiny_ground",      "Sparkling + Title + Teensy: Ground"},
+            {SandwichRecipe::tiny_flying,       "tiny_flying",      "Sparkling + Title + Teensy: Flying"},
+            {SandwichRecipe::tiny_psychic,      "tiny_psychic",     "Sparkling + Title + Teensy: Psychic"},
+            {SandwichRecipe::tiny_bug,          "tiny_bug",         "Sparkling + Title + Teensy: Bug"},
+            {SandwichRecipe::tiny_rock,         "tiny_rock",        "Sparkling + Title + Teensy: Rock"},
+            {SandwichRecipe::tiny_ghost,        "tiny_ghost",       "Sparkling + Title + Teensy: Ghost"},
+            {SandwichRecipe::tiny_dragon,       "tiny_dragon",      "Sparkling + Title + Teensy: Dragon"},
+            {SandwichRecipe::tiny_dark,         "tiny_dark",        "Sparkling + Title + Teensy: Dark"},
+            {SandwichRecipe::tiny_steel,        "tiny_steel",       "Sparkling + Title + Teensy: Steel"},
+            {SandwichRecipe::tiny_fairy,        "tiny_fairy",       "Sparkling + Title + Teensy: Fairy"},
             {SandwichRecipe::custom,            "custom",           "Custom Sandwich"},
         },
         LockWhileRunning::LOCKED,
         SandwichRecipe::shiny_normal
     )
     , HERBA_ONE(
-        "<b>Herba Mystica:</b><br>Select the Herba Mystica to use in the preset recipe. Keep in mind invalid herb combinations.",
+        "<b>Herba Mystica:</b><br>Select the Herba Mystica to use in the preset recipe. Keep in mind which herb combinations are valid for the selected recipe.",
         {
             {HerbaSelection::sweet_herba_mystica,   "sweet-herba-mystica",  "Sweet Herba Mystica"},
             {HerbaSelection::salty_herba_mystica,   "salty-herba-mystica",  "Salty Herba Mystica"},
