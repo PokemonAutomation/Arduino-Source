@@ -9,7 +9,11 @@
 #ifndef PokemonAutomation_PokemonSV_SandwichRoutines_H
 #define PokemonAutomation_PokemonSV_SandwichRoutines_H
 
+#include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/Language.h"
+#include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
+#include "PokemonSV/Inference/Picnics/PokemonSV_SandwichHandDetector.h"
+#include "PokemonSV/Options/PokemonSV_SandwichMakerOption.h"
 #include <cstddef>
 
 namespace PokemonAutomation{
@@ -73,6 +77,10 @@ void make_two_herbs_sandwich(
     const ProgramInfo& info, AsyncDispatcher& dispatcher, ConsoleHandle& console, BotBaseContext& context,
     EggSandwichType sandwich_type, Language language
 );
+
+// Assuming starting at the sandwich recipe list,
+// Make a custom sandwich as set in the sandwich maker options
+void run_sandwich_maker(SingleSwitchProgramEnvironment& env, BotBaseContext& context, SandwichMakerOption& SANDWICH_OPTIONS);
 
 }
 }
