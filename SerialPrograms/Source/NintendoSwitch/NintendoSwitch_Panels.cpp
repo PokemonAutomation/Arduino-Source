@@ -14,6 +14,7 @@
 
 #include "Programs/NintendoSwitch_TurboA.h"
 #include "Programs/NintendoSwitch_TurboButton.h"
+#include "Programs/NintendoSwitch_TurboMacro.h"
 #include "Programs/NintendoSwitch_PushJoySticks.h"
 #include "Programs/NintendoSwitch_PreventSleep.h"
 #include "Programs/NintendoSwitch_FriendCodeAdder.h"
@@ -21,7 +22,6 @@
 
 #include "DevPrograms/BoxDraw.h"
 #include "Programs/NintendoSwitch_SnapshotDumper.h"
-#include "DevPrograms/PathMaker.h"
 #include "DevPrograms/TestProgramComputer.h"
 #include "DevPrograms/TestProgramSwitch.h"
 #include "Pokemon/Inference/Pokemon_TrainIVCheckerOCR.h"
@@ -53,6 +53,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back("---- Programs ----");
     ret.emplace_back(make_single_switch_program<TurboA_Descriptor, TurboA>());
     ret.emplace_back(make_single_switch_program<TurboButton_Descriptor, TurboButton>());
+    ret.emplace_back(make_single_switch_program<TurboMacro_Descriptor, TurboMacro>());
     ret.emplace_back(make_single_switch_program<PushJoySticks_Descriptor, PushJoySticks>());
     ret.emplace_back(make_single_switch_program<PreventSleep_Descriptor, PreventSleep>());
     ret.emplace_back(make_single_switch_program<FriendCodeAdder_Descriptor, FriendCodeAdder>());
@@ -64,7 +65,6 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
         ret.emplace_back("---- Developer Tools ----");
         ret.emplace_back(make_single_switch_program<BoxDraw_Descriptor, BoxDraw>());
         ret.emplace_back(make_single_switch_program<SnapshotDumper_Descriptor, SnapshotDumper>());
-        ret.emplace_back(make_single_switch_program<TestPathMaker_Descriptor, TestPathMaker>());
         ret.emplace_back(make_computer_program<TestProgramComputer_Descriptor, TestProgramComputer>());
         ret.emplace_back(make_multi_switch_program<TestProgram_Descriptor, TestProgram>());
         ret.emplace_back(make_computer_program<Pokemon::TrainIVCheckerOCR_Descriptor, Pokemon::TrainIVCheckerOCR>());
