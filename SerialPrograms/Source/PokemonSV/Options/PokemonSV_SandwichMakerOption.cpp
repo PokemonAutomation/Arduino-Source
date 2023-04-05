@@ -35,8 +35,27 @@ std::vector<std::string> SandwichMakerOption::get_premade_ingredients(SandwichRe
     return iter->second;
 }
 
+bool SandwichMakerOption::two_herba_required(BaseRecipe value) {
+    if (value == BaseRecipe::shiny || value == BaseRecipe::huge || value == BaseRecipe::tiny) {
+        return true;
+    }
+    return false;
+}
+
+SandwichMakerOption::SandwichRecipe SandwichMakerOption::get_premade_sandwich_recipe(BaseRecipe base, PokemonType type, ParadoxRecipe paradox) {
+    if (base == BaseRecipe::paradox)
+    {
+        auto iter = PremadeSandwichOther.find(paradox);
+        return iter->second;
+    }
+    else {
+        auto iter = PremadeSandwichType.find(std::make_pair(base, type));
+        return iter->second;
+    }
+}
+
 SandwichMakerOption::~SandwichMakerOption() {
-    SANDWICH_RECIPE.remove_listener(*this);
+    BASE_RECIPE.remove_listener(*this);
 }
 
 SandwichMakerOption::SandwichMakerOption()
@@ -51,71 +70,97 @@ SandwichMakerOption::SandwichMakerOption()
         LockWhileRunning::LOCKED,
         true
     )
-    , SANDWICH_RECIPE(
-        "<b>Sandwich Recipe:</b><br>Select a recipe to make a sandwich with preset ingredients, or select Custom Sandwich to make a sandwich using the table below.<br>"
-        "Sparkling/Title/Encounter: Cucumber + Pickle + 3x Type Ingredient + 2x Curry Powder + 2x Herba Mystica.<br>"
-        "Refer to the documentation for valid Herba Mystica combinations and ingredients all other recipes.",
-        //"Sparkling/Title/Humungo: 1x Type Ingredient + 2x Mustard + Spicy Herba + 1x Herba Mystica.<br>"
-        //"Sparkling/Title/Teensy: 1x Type Ingredient + 2x Mayonnaise + Sour Herba + 1x Herba Mystica.<br>",
+    , BASE_RECIPE(
+        "<b>Sandwich Recipe:</b><br>Select a recipe to make a sandwich with preset ingredients, or select Custom Sandwich to make a sandwich using the table below. "
+        "Refer to the documentation for recipe ingredients and valid Herba Mystica combinations.",
         {
-            {SandwichRecipe::shiny_normal,      "shiny_normal",     "Sparkling + Title + Encounter: Normal"},
-            {SandwichRecipe::shiny_fire,        "shiny_fire",       "Sparkling + Title + Encounter: Fire"},
-            {SandwichRecipe::shiny_water,       "shiny_water",      "Sparkling + Title + Encounter: Water"},
-            {SandwichRecipe::shiny_electric,    "shiny_electric",   "Sparkling + Title + Encounter: Electric"},
-            {SandwichRecipe::shiny_grass,       "shiny_grass",      "Sparkling + Title + Encounter: Grass"},
-            {SandwichRecipe::shiny_ice,         "shiny_ice",        "Sparkling + Title + Encounter: Ice"},
-            {SandwichRecipe::shiny_fighting,    "shiny_fighting",   "Sparkling + Title + Encounter: Fighting"},
-            {SandwichRecipe::shiny_poison,      "shiny_poison",     "Sparkling + Title + Encounter: Poison"},
-            {SandwichRecipe::shiny_ground,      "shiny_ground",     "Sparkling + Title + Encounter: Ground"},
-            {SandwichRecipe::shiny_flying,      "shiny_flying",     "Sparkling + Title + Encounter: Flying"},
-            {SandwichRecipe::shiny_psychic,     "shiny_psychic",    "Sparkling + Title + Encounter: Psychic"},
-            {SandwichRecipe::shiny_bug,         "shiny_bug",        "Sparkling + Title + Encounter: Bug"},
-            {SandwichRecipe::shiny_rock,        "shiny_rock",       "Sparkling + Title + Encounter: Rock"},
-            {SandwichRecipe::shiny_ghost,       "shiny_ghost",      "Sparkling + Title + Encounter: Ghost"},
-            {SandwichRecipe::shiny_dragon,      "shiny_dragon",     "Sparkling + Title + Encounter: Dragon"},
-            {SandwichRecipe::shiny_dark,        "shiny_dark",       "Sparkling + Title + Encounter: Dark"},
-            {SandwichRecipe::shiny_steel,       "shiny_steel",      "Sparkling + Title + Encounter: Steel"},
-            {SandwichRecipe::shiny_fairy,       "shiny_fairy",      "Sparkling + Title + Encounter: Fairy"},
-            {SandwichRecipe::huge_normal,       "huge_normal",      "Sparkling + Title + Humungo: Normal"},
-            {SandwichRecipe::huge_fire,         "huge_fire",        "Sparkling + Title + Humungo: Fire"},
-            {SandwichRecipe::huge_water,        "huge_water",       "Sparkling + Title + Humungo: Water"},
-            {SandwichRecipe::huge_electric,     "huge_electric",    "Sparkling + Title + Humungo: Electric"},
-            {SandwichRecipe::huge_grass,        "huge_grass",       "Sparkling + Title + Humungo: Grass"},
-            {SandwichRecipe::huge_ice,          "huge_ice",         "Sparkling + Title + Humungo: Ice"},
-            {SandwichRecipe::huge_fighting,     "huge_fighting",    "Sparkling + Title + Humungo: Fighting"},
-            {SandwichRecipe::huge_poison,       "huge_poison",      "Sparkling + Title + Humungo: Poison"},
-            {SandwichRecipe::huge_ground,       "huge_ground",      "Sparkling + Title + Humungo: Ground"},
-            {SandwichRecipe::huge_flying,       "huge_flying",      "Sparkling + Title + Humungo: Flying"},
-            {SandwichRecipe::huge_psychic,      "huge_psychic",     "Sparkling + Title + Humungo: Psychic"},
-            {SandwichRecipe::huge_bug,          "huge_bug",         "Sparkling + Title + Humungo: Bug"},
-            {SandwichRecipe::huge_rock,         "huge_rock",        "Sparkling + Title + Humungo: Rock"},
-            {SandwichRecipe::huge_ghost,        "huge_ghost",       "Sparkling + Title + Humungo: Ghost"},
-            {SandwichRecipe::huge_dragon,       "huge_dragon",      "Sparkling + Title + Humungo: Dragon"},
-            {SandwichRecipe::huge_dark,         "huge_dark",        "Sparkling + Title + Humungo: Dark"},
-            {SandwichRecipe::huge_steel,        "huge_steel",       "Sparkling + Title + Humungo: Steel"},
-            {SandwichRecipe::huge_fairy,        "huge_fairy",       "Sparkling + Title + Humungo: Fairy"},
-            {SandwichRecipe::tiny_normal,       "tiny_normal",      "Sparkling + Title + Teensy: Normal"},
-            {SandwichRecipe::tiny_fire,         "tiny_fire",        "Sparkling + Title + Teensy: Fire"},
-            {SandwichRecipe::tiny_water,        "tiny_water",       "Sparkling + Title + Teensy: Water"},
-            {SandwichRecipe::tiny_electric,     "tiny_electric",    "Sparkling + Title + Teensy: Electric"},
-            {SandwichRecipe::tiny_grass,        "tiny_grass",       "Sparkling + Title + Teensy: Grass"},
-            {SandwichRecipe::tiny_ice,          "tiny_ice",         "Sparkling + Title + Teensy: Ice"},
-            {SandwichRecipe::tiny_fighting,     "tiny_fighting",    "Sparkling + Title + Teensy: Fighting"},
-            {SandwichRecipe::tiny_poison,       "tiny_poison",      "Sparkling + Title + Teensy: Poison"},
-            {SandwichRecipe::tiny_ground,       "tiny_ground",      "Sparkling + Title + Teensy: Ground"},
-            {SandwichRecipe::tiny_flying,       "tiny_flying",      "Sparkling + Title + Teensy: Flying"},
-            {SandwichRecipe::tiny_psychic,      "tiny_psychic",     "Sparkling + Title + Teensy: Psychic"},
-            {SandwichRecipe::tiny_bug,          "tiny_bug",         "Sparkling + Title + Teensy: Bug"},
-            {SandwichRecipe::tiny_rock,         "tiny_rock",        "Sparkling + Title + Teensy: Rock"},
-            {SandwichRecipe::tiny_ghost,        "tiny_ghost",       "Sparkling + Title + Teensy: Ghost"},
-            {SandwichRecipe::tiny_dragon,       "tiny_dragon",      "Sparkling + Title + Teensy: Dragon"},
-            {SandwichRecipe::tiny_dark,         "tiny_dark",        "Sparkling + Title + Teensy: Dark"},
-            {SandwichRecipe::tiny_steel,        "tiny_steel",       "Sparkling + Title + Teensy: Steel"},
-            {SandwichRecipe::tiny_fairy,        "tiny_fairy",       "Sparkling + Title + Teensy: Fairy"},
-            {SandwichRecipe::custom,            "custom",           "Custom Sandwich"},
+            {BaseRecipe::shiny,     "shiny",    "Sparkling + Title + Encounter"},
+            {BaseRecipe::huge,      "huge",     "Sparkling + Title + Humungo"},
+            {BaseRecipe::tiny,      "tiny",     "Sparkling + Title + Teensy"},
+            {BaseRecipe::paradox,   "paradox",  "Title + Encounter + Humungo/Teensy: Paradox-specific"},
+            {BaseRecipe::custom,    "custom",   "Custom Sandwich"},
         },
         LockWhileRunning::LOCKED,
-        SandwichRecipe::shiny_normal
+        BaseRecipe::shiny
+        )
+    , TYPE(
+        "",
+        {
+            {PokemonType::normal,   "normal",   "Normal"},
+            {PokemonType::fire,     "fire",     "Fire"},
+            {PokemonType::water,    "water",    "Water"},
+            {PokemonType::electric, "electric", "Electric"},
+            {PokemonType::grass,    "grass",    "Grass"},
+            {PokemonType::ice,      "ice",      "Ice"},
+            {PokemonType::fighting, "fighting", "Fighting"},
+            {PokemonType::poison,   "poison",   "Poison"},
+            {PokemonType::ground,   "ground",   "Ground"},
+            {PokemonType::flying,   "flying",   "Flying"},
+            {PokemonType::psychic,  "psychic",  "Psychic"},
+            {PokemonType::bug,      "bug",      "Bug"},
+            {PokemonType::rock,     "rock",     "Rock"},
+            {PokemonType::ghost,    "ghost",    "Ghost"},
+            {PokemonType::dragon,   "dragon",   "Dragon"},
+            {PokemonType::dark,     "dark",     "Dark"},
+            {PokemonType::steel,    "steel",    "Steel"},
+            {PokemonType::fairy,    "fairy",    "Fairy"},
+        },
+        LockWhileRunning::LOCKED,
+        PokemonType::normal
+    )
+    , PARADOX(
+        "",
+        {
+            {ParadoxRecipe::humungo3_greattusk_1,     "humungo3_greattusk_1",     "Great Tusk - Humungo #1"},
+            {ParadoxRecipe::humungo2_screamtail_1,    "humungo2_screamtail_1",    "Scream Tail - Humungo #1"},
+            {ParadoxRecipe::humungo2_screamtail_2,    "humungo2_screamtail_2",    "Scream Tail - Humungo #2"},
+            {ParadoxRecipe::humungo2_brutebonnet_1,   "humungo2_brutebonnet_1",   "Brute Bonnet - Humungo #1"},
+            {ParadoxRecipe::humungo2_brutebonnet_2,   "humungo2_brutebonnet_2",   "Brute Bonnet - Humungo #2"},
+            {ParadoxRecipe::humungo3_fluttermane_1,   "humungo3_fluttermane_1",   "Flutter Mane - Humungo #1"},
+            {ParadoxRecipe::humungo3_fluttermane_2,   "humungo3_fluttermane_2",   "Flutter Mane - Humungo #2"},
+            {ParadoxRecipe::humungo2_slitherwing_1,   "humungo2_slitherwing_1",   "Slither Wing - Humungo #1"},
+            {ParadoxRecipe::humungo2_slitherwing_2,   "humungo2_slitherwing_2",   "Slither Wing - Humungo #2"},
+            {ParadoxRecipe::humungo3_sandyshocks_1,   "humungo3_sandyshocks_1",   "Sandy Shocks - Humungo #1"},
+            {ParadoxRecipe::humungo3_sandyshocks_2,   "humungo3_sandyshocks_2",   "Sandy Shocks - Humungo #2"},
+            {ParadoxRecipe::humungo3_roaringmoon_1,   "humungo3_roaringmoon_1",   "Roaring Moon - Humungo #1"},
+            {ParadoxRecipe::humungo3_roaringmoon_2,   "humungo3_roaringmoon_2",   "Roaring Moon - Humungo #2"},
+            {ParadoxRecipe::humungo2_irontreads_1,    "humungo2_irontreads_1",    "Iron Treads - Humungo #1"},
+            {ParadoxRecipe::humungo2_irontreads_2,    "humungo2_irontreads_2",    "Iron Treads - Humungo #2"},
+            {ParadoxRecipe::humungo2_ironbundle_1,    "humungo2_ironbundle_1",    "Iron Bundle - Humungo #1"},
+            {ParadoxRecipe::humungo2_ironbundle_2,    "humungo2_ironbundle_2",    "Iron Bundle - Humungo #2"},
+            {ParadoxRecipe::humungo2_ironhands_1,     "humungo2_ironhands_1",     "Iron Hands - Humungo #1"},
+            {ParadoxRecipe::humungo2_ironhands_2,     "humungo2_ironhands_2",     "Iron Hands - Humungo #2"},
+            {ParadoxRecipe::humungo2_ironjugulis_1,   "humungo2_ironjugulis_1",   "Iron Jugulis - Humungo #1"},
+            {ParadoxRecipe::humungo2_ironjugulis_2,   "humungo2_ironjugulis_2",   "Iron Jugulis - Humungo #2"},
+            {ParadoxRecipe::humungo3_ironmoth_1,      "humungo3_ironmoth_1",      "Iron Moth - Humungo #1"},
+            {ParadoxRecipe::humungo3_ironmoth_2,      "humungo3_ironmoth_2",      "Iron Moth - Humungo #2"},
+            {ParadoxRecipe::humungo3_ironthorns_1,    "humungo3_ironthorns_1",    "Iron Thorns - Humungo #1"},
+            {ParadoxRecipe::humungo3_ironthorns_2,    "humungo3_ironthorns_2",    "Iron Thorns - Humungo #2"},
+            {ParadoxRecipe::humungo2_ironvaliant_1,   "humungo2_ironvaliant_1",   "Iron Valiant - Humungo #1"},
+            {ParadoxRecipe::humungo2_ironvaliant_2,   "humungo2_ironvaliant_2",   "Iron Valiant - Humungo #2"},
+            {ParadoxRecipe::teensy3_greattusk_1,      "teensy3_greattusk_1",      "Great Tusk - Teensy #1"},
+            {ParadoxRecipe::teensy2_screamtail_1,     "teensy2_screamtail_1",     "Scream Tail - Teensy #1"},
+            {ParadoxRecipe::teensy2_screamtail_2,     "teensy2_screamtail_2",     "Scream Tail - Teensy #2"},
+            {ParadoxRecipe::teensy2_brutebonnet_1,    "teensy2_brutebonnet_1",    "Brute Bonnet - Teensy #1"},
+            {ParadoxRecipe::teensy3_fluttermane_1,    "teensy3_fluttermane_1",    "Flutter Mane - Teensy #1"},
+            {ParadoxRecipe::teensy2_sliterwing_1,     "teensy2_sliterwing_1",     "Slither Wing - Teensy #1"},
+            {ParadoxRecipe::teensy2_sliterwing_2,     "teensy2_sliterwing_2",     "Slither Wing - Teensy #2"},
+            {ParadoxRecipe::teensy3_sandyshocks_1,    "teensy3_sandyshocks_1",    "Sandy Shocks - Teensy #1"},
+            {ParadoxRecipe::teensy3_sandyshocks_2,    "teensy3_sandyshocks_2",    "Sandy Shocks - Teensy #2"},
+            {ParadoxRecipe::teensy3_roaringmoon_1,    "teensy3_roaringmoon_1",    "Roaring Moon - Teensy #1"},
+            {ParadoxRecipe::teensy2_irontreads_1,     "teensy2_irontreads_1",     "Iron Treads - Teensy #1"},
+            {ParadoxRecipe::teensy2_irontreads_2,     "teensy2_irontreads_2",     "Iron Treads - Teensy #2"},
+            {ParadoxRecipe::teensy2_ironbundle_1,     "teensy2_ironbundle_1",     "Iron Bundle - Teensy #1"},
+            {ParadoxRecipe::teensy2_ironbundle_2,     "teensy2_ironbundle_2",     "Iron Bundle - Teensy #2"},
+            {ParadoxRecipe::teensy2_ironhands_1,      "teensy2_ironhands_1",      "Iron Hands - Teensy #1"},
+            {ParadoxRecipe::teensy2_ironjugulis_1,    "teensy2_ironjugulis_1",    "Iron Jugulis - Teensy #1"},
+            {ParadoxRecipe::teensy3_ironmoth_1,       "teensy3_ironmoth_1",       "Iron Moth - Teensy #1"},
+            {ParadoxRecipe::teensy3_ironthorns_1,     "teensy3_ironthorns_1",     "Iron Thorns - Teensy #1"},
+            {ParadoxRecipe::teensy2_ironvaliant_1,    "teensy2_ironvaliant_1",    "Iron Valiant - Teensy #1"},
+            {ParadoxRecipe::teensy2_ironvaliant_2,    "teensy2_ironvaliant_2",    "Iron Vailant - Teensy #2"},
+        },
+        LockWhileRunning::LOCKED,
+        ParadoxRecipe::humungo3_greattusk_1
     )
     , HERBA_ONE(
         "<b>Herba Mystica:</b><br>Select the Herba Mystica to use in the preset recipe. Keep in mind which herb combinations are valid for the selected recipe.",
@@ -144,26 +189,39 @@ SandwichMakerOption::SandwichMakerOption()
     , SANDWICH_INGREDIENTS("<b>Custom Sandwich:</b><br>Make a sandwich from the selected ingredients.<br>You must have at least one ingredient and one condiment, and no more than six ingredients and four condiments.")
 {
     PA_ADD_OPTION(LANGUAGE);
-    PA_ADD_OPTION(SANDWICH_RECIPE);
+    PA_ADD_OPTION(BASE_RECIPE);
+    PA_ADD_OPTION(TYPE);
+    PA_ADD_OPTION(PARADOX);
     PA_ADD_OPTION(HERBA_ONE);
     PA_ADD_OPTION(HERBA_TWO);
     PA_ADD_OPTION(SANDWICH_INGREDIENTS);
 
     SandwichMakerOption::value_changed();
-    SANDWICH_RECIPE.add_listener(*this);
+    BASE_RECIPE.add_listener(*this);
 
 }
 
 void SandwichMakerOption::value_changed() {
-    if (SANDWICH_RECIPE == SandwichRecipe::custom) {
+    if (BASE_RECIPE == BaseRecipe::custom) {
         SANDWICH_INGREDIENTS.set_visibility(ConfigOptionState::ENABLED);
         HERBA_ONE.set_visibility(ConfigOptionState::DISABLED);
         HERBA_TWO.set_visibility(ConfigOptionState::DISABLED);
+        TYPE.set_visibility(ConfigOptionState::DISABLED); //to prevent the options moving around
+        PARADOX.set_visibility(ConfigOptionState::HIDDEN);
     }
-    else {
+    else if (two_herba_required(BASE_RECIPE)) { //shiny, huge, tiny
         SANDWICH_INGREDIENTS.set_visibility(ConfigOptionState::DISABLED);
         HERBA_ONE.set_visibility(ConfigOptionState::ENABLED);
         HERBA_TWO.set_visibility(ConfigOptionState::ENABLED);
+        TYPE.set_visibility(ConfigOptionState::ENABLED);
+        PARADOX.set_visibility(ConfigOptionState::HIDDEN);
+    }
+    else { //other
+        SANDWICH_INGREDIENTS.set_visibility(ConfigOptionState::DISABLED);
+        HERBA_ONE.set_visibility(ConfigOptionState::DISABLED);
+        HERBA_TWO.set_visibility(ConfigOptionState::DISABLED);
+        TYPE.set_visibility(ConfigOptionState::HIDDEN);
+        PARADOX.set_visibility(ConfigOptionState::ENABLED);
     }
 }
 

@@ -703,7 +703,7 @@ void run_sandwich_maker(SingleSwitchProgramEnvironment& env, BotBaseContext& con
     std::map<std::string, uint8_t> condiments;
 
     //Add the selected ingredients to the maps if set to custom
-    if (SANDWICH_OPTIONS.SANDWICH_RECIPE == SandwichMakerOption::SandwichRecipe::custom) {
+    if (SANDWICH_OPTIONS.BASE_RECIPE == SandwichMakerOption::BaseRecipe::custom) {
         env.log("Custom sandwich selected. Validating ingredients.", COLOR_BLACK);
         env.console.overlay().add_log("Custom sandwich selected. Validating ingredients.", COLOR_WHITE);
 
@@ -742,7 +742,7 @@ void run_sandwich_maker(SingleSwitchProgramEnvironment& env, BotBaseContext& con
         env.log("Preset sandwich selected.", COLOR_BLACK);
         env.console.overlay().add_log("Preset sandwich selected.", COLOR_WHITE);
 
-        std::vector<std::string> table = SANDWICH_OPTIONS.get_premade_ingredients(SANDWICH_OPTIONS.SANDWICH_RECIPE);
+        std::vector<std::string> table = SANDWICH_OPTIONS.get_premade_ingredients(SANDWICH_OPTIONS.get_premade_sandwich_recipe(SANDWICH_OPTIONS.BASE_RECIPE, SANDWICH_OPTIONS.TYPE, SANDWICH_OPTIONS.PARADOX));
 
         for (auto&& s : table) {
             if (std::find(ALL_SANDWICH_FILLINGS_SLUGS().begin(), ALL_SANDWICH_FILLINGS_SLUGS().end(), s) != ALL_SANDWICH_FILLINGS_SLUGS().end()) {
@@ -754,15 +754,18 @@ void run_sandwich_maker(SingleSwitchProgramEnvironment& env, BotBaseContext& con
                 num_condiments++;
             }
         }
-        //Insert Herba Mystica
-        if (SANDWICH_OPTIONS.HERBA_ONE == SANDWICH_OPTIONS.HERBA_TWO) {
-            condiments.insert(std::make_pair(SANDWICH_OPTIONS.herba_to_string(SANDWICH_OPTIONS.HERBA_ONE), (uint8_t)2));
-        } else {
-            condiments.insert(std::make_pair(SANDWICH_OPTIONS.herba_to_string(SANDWICH_OPTIONS.HERBA_ONE), (uint8_t)1));
-            condiments.insert(std::make_pair(SANDWICH_OPTIONS.herba_to_string(SANDWICH_OPTIONS.HERBA_TWO), (uint8_t)1));
+        //Insert Herba Mystica if required
+        if (SandwichMakerOption::two_herba_required(SANDWICH_OPTIONS.BASE_RECIPE)) {
+            if (SANDWICH_OPTIONS.HERBA_ONE == SANDWICH_OPTIONS.HERBA_TWO) {
+                condiments.insert(std::make_pair(SANDWICH_OPTIONS.herba_to_string(SANDWICH_OPTIONS.HERBA_ONE), (uint8_t)2));
+            }
+            else {
+                condiments.insert(std::make_pair(SANDWICH_OPTIONS.herba_to_string(SANDWICH_OPTIONS.HERBA_ONE), (uint8_t)1));
+                condiments.insert(std::make_pair(SANDWICH_OPTIONS.herba_to_string(SANDWICH_OPTIONS.HERBA_TWO), (uint8_t)1));
+            }
+            num_condiments++;
+            num_condiments++;
         }
-        num_condiments++;
-        num_condiments++;
     }
 
     /*
