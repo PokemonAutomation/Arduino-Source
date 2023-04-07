@@ -165,7 +165,7 @@ void fly_to_overworld_from_map(const ProgramInfo& info, ConsoleHandle& console, 
             context.wait_for_all_requests();
             ret = wait_until(
                 console, context,
-                std::chrono::seconds(30),
+                std::chrono::seconds(60),
                 {overworld, map, spot_dialog_watcher, confirm_watcher}
             );
         }
@@ -192,7 +192,7 @@ void fly_to_overworld_from_map(const ProgramInfo& info, ConsoleHandle& console, 
         default:
             throw OperationFailedException(
                 ErrorReport::SEND_ERROR_REPORT, console,
-                "fly_to_overworld_from_map(): No recognized state after 30 seconds.",
+                "fly_to_overworld_from_map(): No recognized state after 60 seconds.",
                 true
             );
         }
