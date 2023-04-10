@@ -784,9 +784,9 @@ void run_sandwich_maker(SingleSwitchProgramEnvironment& env, BotBaseContext& con
     //std::vector<std::string> fillings_game_order = {"lettuce", "tomato", "cherry-tomatoes", "cucumber", "pickle", "onion", "red-onion", "green-bell-pepper", "red-bell-pepper",
     //    "yellow-bell-pepper", "avocado", "bacon", "ham", "prosciutto", "chorizo", "herbed-sausage", "hamburger", "klawf-stick", "smoked-fillet", "fried-fillet", "egg", "potato-tortilla",
     //    "tofu", "rice", "noodles", "potato-salad", "cheese", "banana", "strawberry", "apple", "kiwi", "pineapple", "jalapeno", "watercress", "basil"};
-    std::vector<std::string> fillings_game_order = { "hamburger", "rice", "noodles", "potato-salad", "smoked-fillet", "fried-fillet", "cucumber", "pickle", "tofu",
+    std::vector<std::string> fillings_game_order = { "hamburger", "rice", "noodles", "smoked-fillet", "fried-fillet", "cucumber", "pickle", "tofu",
         "chorizo", "herbed-sausage", "potato-tortilla", "klawf-stick", "lettuce", "tomato", "onion", "red-onion", "green-bell-pepper", "red-bell-pepper", "yellow-bell-pepper", "avocado",
-        "bacon", "ham", "prosciutto", "cheese", "banana", "strawberry", "apple", "kiwi", "pineapple", "jalape\xc3\xb1o", "watercress", "egg", "basil", "cherry-tomatoes" };
+        "bacon", "ham", "prosciutto", "cheese", "banana", "strawberry", "apple", "kiwi", "pineapple", "jalape\xc3\xb1o", "watercress", "potato-salad", "egg", "basil", "cherry-tomatoes" };
 
     //Add keys to new vector and sort
     std::vector<std::string> fillings_sorted;
