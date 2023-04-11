@@ -46,7 +46,7 @@ static void fly_home(BotBaseContext& context, char from_overworld){
     if (from_overworld){
         ssf_press_button2(context, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY, 20);
     }
-    ssf_press_button2(context, BUTTON_A, 350, 10);
+    ssf_press_button2(context, BUTTON_A, 400, 10);
     ssf_press_dpad2(context, DPAD_UP_RIGHT, 25, 5);
     pbf_mash_button(context, BUTTON_A, 480);
 }
