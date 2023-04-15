@@ -221,9 +221,13 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     using namespace Pokemon;
 //    using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
 
+    ImageRGB32 image("screenshot-20230411-105824879287.png");
+
+    AdvanceDialogDetector detector;
+    cout << detector.detect(image) << endl;
 
 
-#if 1
+#if 0
     ImageRGB32 image("20230323-082240823181-OperationFailedException.png");
 
     TeraCatchDetector detector(COLOR_RED);

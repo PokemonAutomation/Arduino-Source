@@ -147,10 +147,10 @@ void fly_to_overworld_from_map(const ProgramInfo& info, ConsoleHandle& console, 
 
     WallClock start = current_time();
     while (true){
-        if (current_time() - start > std::chrono::minutes(1)){
+        if (current_time() - start > std::chrono::minutes(2)){
             throw OperationFailedException(
                 ErrorReport::SEND_ERROR_REPORT, console,
-                "fly_to_overworld_from_map(): Failed to open map after 1 minute.",
+                "fly_to_overworld_from_map(): Failed to open map after 2 minutes.",
                 true
             );
         }
@@ -165,7 +165,7 @@ void fly_to_overworld_from_map(const ProgramInfo& info, ConsoleHandle& console, 
             context.wait_for_all_requests();
             ret = wait_until(
                 console, context,
-                std::chrono::seconds(60),
+                std::chrono::minutes(2),
                 {overworld, map, spot_dialog_watcher, confirm_watcher}
             );
         }
@@ -192,7 +192,7 @@ void fly_to_overworld_from_map(const ProgramInfo& info, ConsoleHandle& console, 
         default:
             throw OperationFailedException(
                 ErrorReport::SEND_ERROR_REPORT, console,
-                "fly_to_overworld_from_map(): No recognized state after 60 seconds.",
+                "fly_to_overworld_from_map(): No recognized state after 2 minutes.",
                 true
             );
         }

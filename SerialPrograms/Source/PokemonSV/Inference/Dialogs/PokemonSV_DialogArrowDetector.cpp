@@ -39,7 +39,7 @@ const ImageMatch::ExactImageMatcher& DIALOG_ARROW_WHITE(){
 bool is_dialog_arrow(const ImageViewRGB32& image, const WaterfillObject& object, bool black_arrow){
     double aspect_ratio = object.aspect_ratio();
 //    cout << "aspect_ratio = " << aspect_ratio << endl;
-    if (aspect_ratio < 1.0 || aspect_ratio > 1.3){
+    if (aspect_ratio < 1.1 || aspect_ratio > 1.4){
         return false;
     }
 //    double area = (double)object.area_ratio();

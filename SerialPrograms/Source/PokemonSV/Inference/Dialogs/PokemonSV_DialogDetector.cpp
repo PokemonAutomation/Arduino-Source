@@ -47,6 +47,7 @@ bool DialogBoxDetector::detect(const ImageViewRGB32& screen) const{
 //    cout << "white = " << white << endl;
 
     ImageStats stats_box_bot = image_stats(extract_box_reference(screen, m_box_bot));
+//    cout << stats_box_bot.average << stats_box_bot.stddev << endl;
     if (white){
         if (!is_white(stats_box_bot)){
             return !m_true_if_detected;
