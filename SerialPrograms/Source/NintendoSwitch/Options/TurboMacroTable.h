@@ -20,6 +20,8 @@ enum class TurboMacroAction{
     NO_ACTION,
     LEFT_JOYSTICK,
     RIGHT_JOYSTICK,
+    LEFT_JOY_CLICK,
+    RIGHT_JOY_CLICK,
     B,
     A,
     Y,

@@ -8,6 +8,7 @@
 #define PokemonAutomation_NintendoSwitch_TurboMacro_H
 
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
+#include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "NintendoSwitch/Options/TurboMacroTable.h"
 
 namespace PokemonAutomation{
@@ -32,6 +33,7 @@ private:
     void execute_action(ConsoleHandle& console, BotBaseContext& context, const TurboMacroRow& row);
 
 private:
+    SimpleIntegerOption<uint32_t> LOOP;
     TurboMacroTable MACRO;
 };
 
