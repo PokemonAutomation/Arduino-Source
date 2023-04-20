@@ -32,6 +32,8 @@ const EnumDatabase<TurboMacroAction>& TurboMacroAction_Database(){
         {TurboMacroAction::NO_ACTION,         "no-action",        "No Action"},
         {TurboMacroAction::LEFT_JOYSTICK,     "left-joystick",    "Left Joystick"},
         {TurboMacroAction::RIGHT_JOYSTICK,    "right-joystick",   "Right Joystick"},
+        {TurboMacroAction::LEFT_JOY_CLICK,    "left-joy-click",   "Press Left Joystick (L3)"},
+        {TurboMacroAction::RIGHT_JOY_CLICK,   "right-joy-click",  "Press Right Joystick (R3)"},
         {TurboMacroAction::B,                 "button-B",         "Press B"},
         {TurboMacroAction::A,                 "button-A",         "Press A"},
         {TurboMacroAction::Y,                 "button-Y",         "Press Y"},
@@ -92,6 +94,8 @@ void TurboMacroCell::value_changed(){
     switch (m_action){
     case TurboMacroAction::LEFT_JOYSTICK:
     case TurboMacroAction::RIGHT_JOYSTICK:
+    case TurboMacroAction::LEFT_JOY_CLICK:
+    case TurboMacroAction::RIGHT_JOY_CLICK:
     case TurboMacroAction::B:
     case TurboMacroAction::A:
     case TurboMacroAction::Y:
@@ -242,7 +246,8 @@ JsonValue TurboMacroRow::to_json() const{
 TurboMacroTable::TurboMacroTable()
     : EditableTableOption_t<TurboMacroRow>(
         "<b>Custom Macro Table:</b><br>"
-        "Set a list of button press to create a macro.",
+        "Set a list of button press to create a macro. 125 ticks = 1 second. Joystick direction is specified by (x, y).<br>"
+        "x = 0 is left, x = 255 is right. y = 0 is up, y = 255 is down. 128 is neutral for both. Ex. Move joystick fully left would be (0, 128). Move joystick up-right would be (255, 0).",
         LockWhileRunning::LOCKED
     )
 {}

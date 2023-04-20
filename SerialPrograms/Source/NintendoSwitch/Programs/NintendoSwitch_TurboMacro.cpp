@@ -24,7 +24,14 @@ TurboMacro_Descriptor::TurboMacro_Descriptor()
     )
 {}
 
-TurboMacro::TurboMacro(){
+TurboMacro::TurboMacro()
+    : LOOP(
+        "<b>Number of times to loop:</b>",
+        LockWhileRunning::UNLOCKED,
+        100, 0
+        )
+{
+    PA_ADD_OPTION(LOOP);
     PA_ADD_OPTION(MACRO);
 }
 
@@ -45,6 +52,12 @@ void TurboMacro::execute_action(ConsoleHandle& console, BotBaseContext& context,
         break;
     case TurboMacroAction::RIGHT_JOYSTICK:
         pbf_move_right_joystick(context, cell.x_axis, cell.y_axis, cell.button_hold_ticks, cell.button_release_ticks);
+        break;
+    case TurboMacroAction::LEFT_JOY_CLICK:
+        pbf_press_button(context, BUTTON_LCLICK, cell.button_hold_ticks, cell.button_release_ticks);
+        break;
+    case TurboMacroAction::RIGHT_JOY_CLICK:
+        pbf_press_button(context, BUTTON_RCLICK, cell.button_hold_ticks, cell.button_release_ticks);
         break;
     case TurboMacroAction::B:
         pbf_press_button(context, BUTTON_B, cell.button_hold_ticks, cell.button_release_ticks);
@@ -99,9 +112,11 @@ void TurboMacro::execute_action(ConsoleHandle& console, BotBaseContext& context,
 void TurboMacro::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_LCLICK, 5, 5);
+    //pbf_press_button(context, BUTTON_LCLICK, 5, 5);
 
-    run_macro(env, context);
+    for (uint32_t c = 0; c < LOOP; c++) {
+        run_macro(env, context);
+    }
 }
 
 
