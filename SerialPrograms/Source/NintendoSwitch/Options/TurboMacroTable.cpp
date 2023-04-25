@@ -94,9 +94,11 @@ void TurboMacroCell::value_changed(){
     switch (m_action){
     case TurboMacroAction::LEFT_JOYSTICK:
     case TurboMacroAction::RIGHT_JOYSTICK:
+        x_axis.set_visibility(ConfigOptionState::ENABLED);
+        y_axis.set_visibility(ConfigOptionState::ENABLED);
+    case TurboMacroAction::B:
     case TurboMacroAction::LEFT_JOY_CLICK:
     case TurboMacroAction::RIGHT_JOY_CLICK:
-    case TurboMacroAction::B:
     case TurboMacroAction::A:
     case TurboMacroAction::Y:
     case TurboMacroAction::X:
@@ -110,8 +112,6 @@ void TurboMacroCell::value_changed(){
     case TurboMacroAction::DPADRIGHT:
     case TurboMacroAction::DPADUP:
     case TurboMacroAction::DPADDOWN:
-        x_axis.set_visibility(ConfigOptionState::ENABLED);
-        y_axis.set_visibility(ConfigOptionState::ENABLED);
         button_hold_ticks.set_visibility(ConfigOptionState::ENABLED);
         button_release_ticks.set_visibility(ConfigOptionState::ENABLED);
         break;

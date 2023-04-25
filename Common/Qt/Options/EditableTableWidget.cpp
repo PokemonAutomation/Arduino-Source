@@ -196,6 +196,9 @@ void EditableTableWidget::update_value(){
                 layout->addWidget(widget);
 //                cell_widgets.emplace_back(widget);
                 m_table->setCellWidget((int)index_new, c, cell_widget);
+//                cell_widget->update();
+//                cout << "cell_widget->width() = " << cell_widget->width() << endl;
+//                cout << "cell_widget->sizeHint().width() = " << cell_widget->sizeHint().width() << endl;
             }
             m_table->setCellWidget((int)index_new, c++, make_clone_button(row));
             m_table->setCellWidget((int)index_new, c++, make_insert_button(row));
@@ -232,9 +235,14 @@ void EditableTableWidget::value_changed(){
     }, Qt::QueuedConnection);
 }
 void EditableTableWidget::update_sizes(){
-    m_table->resizeColumnsToContents();
-    m_table->resizeRowsToContents();
-    m_table->update_height();
+//    cout << "update_sizes()" << endl;
+    QMetaObject::invokeMethod(m_table, [this]{
+//        cout << "before = " << m_table->cellWidget(0, 1)->width() << endl;
+        m_table->resizeColumnsToContents();
+        m_table->resizeRowsToContents();
+        m_table->update_height();
+//        cout << "after = " << m_table->cellWidget(0, 1)->width() << endl;
+    }, Qt::QueuedConnection);
 }
 
 
