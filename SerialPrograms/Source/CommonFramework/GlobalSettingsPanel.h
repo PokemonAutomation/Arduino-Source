@@ -112,7 +112,7 @@ public:
     BooleanCheckBoxOption ENABLE_AUTO_RESET_AUDIO;
     VideoBackendOption VIDEO_BACKEND;
     BooleanCheckBoxOption ENABLE_FRAME_SCREENSHOTS;
-    BooleanCheckBoxOption ENABLE_LIFETIME_SANITIZER;
+//    BooleanCheckBoxOption ENABLE_LIFETIME_SANITIZER;
 
     ProcessorLevelOption PROCESSOR_LEVEL0;
 

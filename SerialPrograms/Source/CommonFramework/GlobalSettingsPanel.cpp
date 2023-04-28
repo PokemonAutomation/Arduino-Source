@@ -94,7 +94,7 @@ GlobalSettings& GlobalSettings::instance(){
     return settings;
 }
 GlobalSettings::~GlobalSettings(){
-    ENABLE_LIFETIME_SANITIZER.remove_listener(*this);
+//    ENABLE_LIFETIME_SANITIZER.remove_listener(*this);
 }
 GlobalSettings::GlobalSettings()
     : BatchOption(LockWhileRunning::LOCKED)
@@ -209,12 +209,14 @@ GlobalSettings::GlobalSettings()
         LockWhileRunning::UNLOCKED,
         true
     )
+#if 0
     , ENABLE_LIFETIME_SANITIZER(
         "<b>Enable Lifetime Sanitizer: (for debugging)</b><br>"
         "Check for C++ object lifetime violations. Terminate program with stack dump if violations are found.",
         LockWhileRunning::UNLOCKED,
         IS_BETA_VERSION
     )
+#endif
     , DEVELOPER_TOKEN(
         true,
         "<b>Developer Token:</b><br>Restart application to take full effect after changing this.",
@@ -253,14 +255,14 @@ GlobalSettings::GlobalSettings()
 #if QT_VERSION_MAJOR == 5
     PA_ADD_OPTION(ENABLE_FRAME_SCREENSHOTS);
 #endif
-    PA_ADD_OPTION(ENABLE_LIFETIME_SANITIZER);
+//    PA_ADD_OPTION(ENABLE_LIFETIME_SANITIZER);
 
     PA_ADD_OPTION(PROCESSOR_LEVEL0);
 
     PA_ADD_OPTION(DEVELOPER_TOKEN);
 
     GlobalSettings::value_changed();
-    ENABLE_LIFETIME_SANITIZER.add_listener(*this);
+//    ENABLE_LIFETIME_SANITIZER.add_listener(*this);
 }
 
 void GlobalSettings::load_json(const JsonValue& json){
@@ -372,6 +374,7 @@ JsonValue GlobalSettings::to_json() const{
 }
 
 void GlobalSettings::value_changed(){
+#if 0
     bool enabled = ENABLE_LIFETIME_SANITIZER;
     LifetimeSanitizer::set_enabled(enabled);
     if (enabled){
@@ -379,6 +382,7 @@ void GlobalSettings::value_changed(){
     }else{
         global_logger_tagged().log("LifeTime Sanitizer: Disabled", COLOR_BLUE);
     }
+#endif
 }
 
 
