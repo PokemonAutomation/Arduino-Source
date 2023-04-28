@@ -66,6 +66,11 @@ public:
     virtual void load_json(const JsonValue& json);
     virtual JsonValue to_json() const;
 
+    //  Lifetime sanitizer
+    void check_usage() const{
+        m_lifetime_sanitizer.check_usage();
+    }
+
 public:
     bool lock_while_program_is_running() const;
 

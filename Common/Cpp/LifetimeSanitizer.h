@@ -7,6 +7,8 @@
 #ifndef PokemonAutomation_LifetimeSanitizer_H
 #define PokemonAutomation_LifetimeSanitizer_H
 
+#include <stdint.h>
+
 #define PA_SANITIZER_ENABLE
 
 namespace PokemonAutomation{
@@ -33,6 +35,9 @@ public:
     static void set_enabled(bool enabled){}
 #endif
 
+private:
+    uint64_t m_token;
+    void* m_self;
 };
 
 

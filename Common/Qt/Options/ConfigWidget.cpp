@@ -27,10 +27,12 @@ ConfigWidget::ConfigWidget(ConfigOption& m_value, QWidget& widget)
     , m_widget(&widget)
 {
 //    cout << "ConfigWidget::ConfigWidget(): " << (int)m_value.visibility() << endl;
-    ConfigWidget::update_visibility(false);
+    m_program_is_running = false;
+    ConfigWidget::update_visibility();
     m_value.add_listener(*this);
 }
 void ConfigWidget::update_visibility(){
+    m_value.check_usage();
     if (m_widget == nullptr){
         return;
     }
@@ -57,20 +59,24 @@ void ConfigWidget::update_visibility(){
     }
 }
 void ConfigWidget::update_visibility(bool program_is_running){
+    m_value.check_usage();
     m_program_is_running = program_is_running;
     update_visibility();
 }
 void ConfigWidget::update_all(bool program_is_running){
+    m_value.check_usage();
     update_value();
     update_visibility(program_is_running);
 }
 
 void ConfigWidget::visibility_changed(){
+    m_value.check_usage();
     QMetaObject::invokeMethod(m_widget, [this]{
         update_visibility();
     }, Qt::QueuedConnection);
 }
 void ConfigWidget::program_state_changed(bool program_is_running){
+    m_value.check_usage();
     QMetaObject::invokeMethod(m_widget, [this, program_is_running]{
         update_visibility(program_is_running);
     }, Qt::QueuedConnection);

@@ -17,6 +17,8 @@ namespace PokemonAutomation{
 
 #ifdef PA_SANITIZER_ENABLE
 
+constexpr uint64_t SANITIZER_TOKEN = 0x7db76f7a6a834ef0;
+
 SpinLock sanitizer_lock;
 std::set<const LifetimeSanitizer*> sanitizer_map;
 
@@ -38,7 +40,10 @@ void LifetimeSanitizer::set_enabled(bool enabled){
 
 
 
-LifetimeSanitizer::LifetimeSanitizer(){
+LifetimeSanitizer::LifetimeSanitizer()
+    : m_token(SANITIZER_TOKEN)
+    , m_self(this)
+{
     if (!LifetimeSanitizer_enabled.load(std::memory_order_relaxed)){
         return;
     }
@@ -56,8 +61,14 @@ LifetimeSanitizer::LifetimeSanitizer(){
     std::terminate();
 }
 LifetimeSanitizer::~LifetimeSanitizer(){
+    void* self = m_self;
+    m_self = nullptr;
     if (!LifetimeSanitizer_enabled.load(std::memory_order_relaxed)){
         return;
+    }
+    if (m_token != SANITIZER_TOKEN || self != this){
+        std::cerr << "LifetimeSanitizer - Free non-existant: " << this << std::endl;
+        std::terminate();
     }
 
     SpinLockGuard lg(sanitizer_lock);
@@ -82,12 +93,15 @@ LifetimeSanitizer::~LifetimeSanitizer(){
 
 
 
-LifetimeSanitizer::LifetimeSanitizer(LifetimeSanitizer&& x){
+LifetimeSanitizer::LifetimeSanitizer(LifetimeSanitizer&& x)
+    : m_token(SANITIZER_TOKEN)
+    , m_self(this)
+{
     if (!LifetimeSanitizer_enabled.load(std::memory_order_relaxed)){
         return;
     }
-
     x.check_usage();
+
     SpinLockGuard lg(sanitizer_lock);
 #ifdef PA_SANITIZER_PRINT_ALL
     std::cout << "LifetimeSanitizer - Allocating (move-construct): " << this << std::endl;
@@ -104,7 +118,6 @@ void LifetimeSanitizer::operator=(LifetimeSanitizer&& x){
     if (!LifetimeSanitizer_enabled.load(std::memory_order_relaxed)){
         return;
     }
-
     check_usage();
     x.check_usage();
 }
@@ -115,8 +128,8 @@ LifetimeSanitizer::LifetimeSanitizer(const LifetimeSanitizer& x){
     if (!LifetimeSanitizer_enabled.load(std::memory_order_relaxed)){
         return;
     }
-
     x.check_usage();
+
     SpinLockGuard lg(sanitizer_lock);
 #ifdef PA_SANITIZER_PRINT_ALL
     std::cout << "LifetimeSanitizer - Allocating (copy-construct): " << this << std::endl;
@@ -130,18 +143,21 @@ LifetimeSanitizer::LifetimeSanitizer(const LifetimeSanitizer& x){
     std::terminate();
 }
 void LifetimeSanitizer::operator=(const LifetimeSanitizer& x){
-    if (!LifetimeSanitizer_enabled.load(std::memory_order_relaxed)){
-        return;
-    }
-
     check_usage();
     x.check_usage();
 }
 
-
-
 void LifetimeSanitizer::check_usage() const{
     if (!LifetimeSanitizer_enabled.load(std::memory_order_relaxed)){
+        return;
+    }
+
+    if (m_token != SANITIZER_TOKEN || m_self != this){
+        std::cerr << "Use non-existant: " << this << std::endl;
+        std::terminate();
+    }
+
+    if (LifetimeSanitizer_has_been_disabled){
         return;
     }
 
