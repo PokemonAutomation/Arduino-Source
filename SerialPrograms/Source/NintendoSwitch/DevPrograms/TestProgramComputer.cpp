@@ -119,6 +119,8 @@
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.h"
 #include "Common/Cpp/Concurrency/Watchdog.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_TeraBattleMenus.h"
+//#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
+#include "NintendoSwitch/Inference/NintendoSwitch_DetectHome.h"
 
 #ifdef PA_ARCH_x86
 //#include "Kernels/Kernels_x64_SSE41.h"
@@ -221,9 +223,9 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     using namespace Pokemon;
 //    using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
 
-    ImageRGB32 image("screenshot-20230411-105824879287.png");
+    ImageRGB32 image("20230427-200550386826-OperationFailedException.png");
 
-    AdvanceDialogDetector detector;
+    NintendoSwitch::HomeDetector detector;
     cout << detector.detect(image) << endl;
 
 

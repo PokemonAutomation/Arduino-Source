@@ -8,9 +8,10 @@
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "NintendoSwitch_DetectHome.h"
 
-//#include <iostream>
-//using std::cout;
-//using std::endl;
+//  REMOVE
+#include <iostream>
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -86,7 +87,7 @@ bool HomeDetector::detect(const ImageViewRGB32& screen) const{
 
     ImageStats stats_user_icons = image_stats(extract_box_reference(screen, m_user_icons));
 //    cout << stats_user_icons.stddev << endl;
-    if (stats_user_icons.stddev.sum() < 50){
+    if (stats_user_icons.stddev.sum() < 40){
         return false;
     }
     ImageStats stats_game_slot = image_stats(extract_box_reference(screen, m_game_slot));
