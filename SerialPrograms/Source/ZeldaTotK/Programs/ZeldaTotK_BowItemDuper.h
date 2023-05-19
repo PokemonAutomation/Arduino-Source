@@ -32,10 +32,8 @@ public:
 
 private:
     SimpleIntegerOption<uint32_t> ATTEMPTS;
-    SimpleIntegerOption<uint32_t> TICK_DELAY;
+    SimpleIntegerOption<uint16_t> TICK_DELAY;
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
-
-    BooleanCheckBoxOption FIX_TIME_WHEN_DONE;
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;
 };

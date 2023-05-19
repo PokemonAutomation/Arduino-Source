@@ -17,12 +17,12 @@
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
-namespace PokemonSV{
+namespace ZeldaTotK{
 
 
 
 PanelListFactory::PanelListFactory()
-    : PanelListDescriptor(Pokemon::STRING_POKEMON + " Scarlet and Violet")
+    : PanelListDescriptor("Zelda: Tears of the Kingdom")
 {}
 
 std::vector<PanelEntry> PanelListFactory::make_panels() const{

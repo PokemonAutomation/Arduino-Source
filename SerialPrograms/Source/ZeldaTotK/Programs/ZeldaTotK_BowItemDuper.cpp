@@ -24,7 +24,7 @@ namespace PokemonAutomation {
 namespace NintendoSwitch {
 namespace ZeldaTotK {
 
-using namespace Pokemon;
+// using namespace Pokemon;
 
 BowItemDuper_Descriptor::BowItemDuper_Descriptor()
     : SingleSwitchProgramDescriptor(
@@ -83,6 +83,7 @@ void BowItemDuper::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
 
     // just do a forever loop where we have to do stuff
     uint32_t c = 0;
+    BowItemDuper_Descriptor::Stats& stats = env.current_stats<BowItemDuper_Descriptor::Stats>();
 
     while (c < ATTEMPTS) {
 
@@ -106,8 +107,8 @@ void BowItemDuper::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         pbf_press_button(context, BUTTON_A, 20, 20);
 
         // NOW WE HAVE TO PRESS PLUS AS FAST AS POSSIBLE
-        pbf_press_button(context, BUTTON_PLUS, 5, TICK_DELAY);
-        pbf_press_button(context, BUTTON_PLUS, 5, 5);
+        pbf_press_button(context, BUTTON_PLUS, 3, TICK_DELAY);
+        pbf_press_button(context, BUTTON_PLUS, 3, 3);
 
         // navigate back to the "current" bow, then drop it
         pbf_press_dpad(context, DPAD_LEFT, 10, 10);
@@ -119,18 +120,18 @@ void BowItemDuper::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         pbf_press_button(context, BUTTON_PLUS, 20, 20);
 
         // turn around
-        pbf_move_left_joystick(context, 128, 0, 10, 10);
+        pbf_move_left_joystick(context, 128, 0, 3, 10);
         // wait half a second
-        pbf_wait(context, (0.5 * TICKS_PER_SECOND));
+        pbf_wait(context, (uint16_t)(0.7 * TICKS_PER_SECOND));
 
         // pick up both bows
         pbf_press_button(context, BUTTON_A, 20, 20);
         pbf_press_button(context, BUTTON_A, 20, 20);
 
         // turn back around and wait before reopening menu
-        pbf_move_left_joystick(context, 128, 255, 10, 10);
+        pbf_move_left_joystick(context, 128, 255, 3, 10);
         // wait half a second
-        pbf_wait(context, (0.5 * TICKS_PER_SECOND));
+        pbf_wait(context, (uint16_t)(0.7 * TICKS_PER_SECOND));
 
         // now go back into the menu
         pbf_press_button(context, BUTTON_PLUS, 20, 50);
