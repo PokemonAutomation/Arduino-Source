@@ -1856,6 +1856,12 @@ file(GLOB MAIN_SOURCES
     Source/Tests/TestMap.h
     Source/Tests/TestUtils.cpp
     Source/Tests/TestUtils.h
+    Source/ZeldaTotK/ZeldaTotK_Panels.cpp
+    Source/ZeldaTotK/ZeldaTotK_Panels.h
+    Source/ZeldaTotK/ZeldaTotK_Settings.cpp
+    Source/ZeldaTotK/ZeldaTotK_Settings.h
+    Source/ZeldaTotK/Programs/ZeldaTotK_BowItemDuper.cpp
+    Source/ZeldaTotK/Programs/ZeldaTotK_BowItemDuper.h
 )
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}../../ FILES ${MAIN_SOURCES})
 add_executable(SerialPrograms WIN32 ${MAIN_SOURCES})

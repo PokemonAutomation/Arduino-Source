@@ -18,6 +18,7 @@
 #include "PokemonBDSP/PokemonBDSP_Panels.h"
 #include "PokemonLA/PokemonLA_Panels.h"
 #include "PokemonSV/PokemonSV_Panels.h"
+#include "ZeldaTotK/ZeldaTotK_Panels.h"
 #include "PanelLists.h"
 
 //#include <iostream>
@@ -46,6 +47,7 @@ ProgramSelect::ProgramSelect(QWidget& parent, PanelHolder& holder)
     add(std::make_unique<NintendoSwitch::PokemonBDSP::PanelListFactory>());
     add(std::make_unique<NintendoSwitch::PokemonLA::PanelListFactory>());
     add(std::make_unique<NintendoSwitch::PokemonSV::PanelListFactory>());
+    add(std::make_unique<NintendoSwitch::ZeldaTotK::PanelListFactory>());
 
 
 
