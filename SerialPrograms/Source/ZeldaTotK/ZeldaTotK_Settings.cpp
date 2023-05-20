@@ -6,14 +6,12 @@
 
 #include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
 #include "CommonFramework/Globals.h"
-#include "Pokemon/Pokemon_Strings.h"
+
 #include "ZeldaTotK_Settings.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace ZeldaTotK{
-
-using namespace Pokemon;
 
 
 

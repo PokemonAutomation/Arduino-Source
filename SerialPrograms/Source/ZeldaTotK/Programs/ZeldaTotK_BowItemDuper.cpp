@@ -79,7 +79,7 @@ BowItemDuper::BowItemDuper()
 }
 
 void BowItemDuper::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
-    assert_16_9_720p_min(env.logger(), env.console);
+    // assert_16_9_720p_min(env.logger(), env.console);
 
     // just do a forever loop where we have to do stuff
     uint32_t c = 0;
