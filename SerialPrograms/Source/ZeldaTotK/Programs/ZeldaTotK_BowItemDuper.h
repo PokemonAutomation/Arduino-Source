@@ -7,9 +7,8 @@
 #ifndef PokemonAutomation_ZeldaTotK_BowItemDuper_H
 #define PokemonAutomation_ZeldaTotK_BowItemDuper_H
 
-#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
-#include "Common/Cpp/Options/EnumDropdownOption.h"
+#include "Common/Cpp/Options/TimeExpressionOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
@@ -32,7 +31,7 @@ public:
 
 private:
     SimpleIntegerOption<uint32_t> ATTEMPTS;
-    SimpleIntegerOption<uint16_t> TICK_DELAY;
+    TimeExpressionOption<uint16_t> TICK_DELAY;
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;

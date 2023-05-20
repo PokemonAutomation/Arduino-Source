@@ -4,10 +4,10 @@
  *
  */
 
-#include "CommonFramework/GlobalSettingsPanel.h"
+//#include "CommonFramework/GlobalSettingsPanel.h"
 #include "ZeldaTotK_Panels.h"
 
-#include "ZeldaTotK_Settings.h"
+//#include "ZeldaTotK_Settings.h"
 
 #include "Programs/ZeldaTotK_BowItemDuper.h"
 

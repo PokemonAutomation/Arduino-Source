@@ -85,7 +85,7 @@ struct WAVEHeader
     chunk       descriptor;
     quint16     audioFormat;
     quint16     numChannels;
-    quint32     sampleRate;
+    quint32     sample_rate;
     quint32     byteRate;
     quint16     blockAlign;
     quint16     bitsPerSample;
@@ -171,7 +171,7 @@ bool WavFile::readHeader()
 #endif
             int bps = qFromLittleEndian<quint16>(header.wave.bitsPerSample);
             m_fileFormat.setChannelCount(qFromLittleEndian<quint16>(header.wave.numChannels));
-            m_fileFormat.setSampleRate(qFromLittleEndian<quint32>(header.wave.sampleRate));
+            m_fileFormat.setSampleRate(qFromLittleEndian<quint32>(header.wave.sample_rate));
 #if QT_VERSION_MAJOR == 5            
             m_fileFormat.setCodec("audio/pcm");
             m_fileFormat.setSampleSize(qFromLittleEndian<quint16>(header.wave.bitsPerSample));

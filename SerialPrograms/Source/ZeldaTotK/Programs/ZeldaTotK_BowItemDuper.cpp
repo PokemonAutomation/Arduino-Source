@@ -5,19 +5,9 @@
  */
 
 #include "Common/Cpp/PrettyPrint.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Tools/StatsTracking.h"
-#include "CommonFramework/Tools/VideoResolutionCheck.h"
-#include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_ScalarButtons.h"
-#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
-
-
-#include "ZeldaTotK/ZeldaTotK_Settings.h"
-
 #include "ZeldaTotK_BowItemDuper.h"
 
 namespace PokemonAutomation {
@@ -60,9 +50,13 @@ BowItemDuper::BowItemDuper()
         100
     )
     , TICK_DELAY(
-        "<b>Menu Delay:</b><br>Adjustable delay for exiting and reentering the menu. This should not typically be lower than 5 nor exceed 25 for successful results. Too low and the game will eat inputs and put the program in an irrecoverable state. Too high and the dupes will not be successful.",
+        "<b>Menu Delay:</b><br>Adjustable delay for exiting and reentering the menu. "
+        "This should not typically be lower than 5 nor exceed 25 for successful results. "
+        "Too low and the game will eat inputs and put the program in an irrecoverable state."
+        "Too high and the dupes will not be successful.",
         LockWhileRunning::UNLOCKED,
-        15
+        TICKS_PER_SECOND,
+        "15"
     )
     , GO_HOME_WHEN_DONE(false)
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
