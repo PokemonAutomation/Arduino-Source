@@ -60,7 +60,7 @@ BowItemDuper::BowItemDuper()
         100
     )
     , TICK_DELAY(
-        "<b>Delay Between Menu Mashing:</b><br>Adjustable delay for exiting and reentering the menu. This should not typically be lower than 5 nor exceed 15 for successful results.",
+        "<b>Menu Delay:</b><br>Adjustable delay for exiting and reentering the menu. This should not typically be lower than 5 nor exceed 25 for successful results. Too low and the game will eat inputs and put the program in an irrecoverable state. Too high and the dupes will not be successful.",
         LockWhileRunning::UNLOCKED,
         15
     )
