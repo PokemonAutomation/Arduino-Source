@@ -89,6 +89,9 @@ void BowItemDuper::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
 
         env.log("Current Attempts: " + tostr_u_commas(c));
 
+        // this routine is thanks to koboldtime#2248 on the PA discord server
+        // it has been adjusted and modified by denvoros#0001
+
         // zr to pull out bow
         pbf_press_button(context, BUTTON_ZR, 12, 12);
         // dpad up to try to fuse the item, release for a while to make sure fused
