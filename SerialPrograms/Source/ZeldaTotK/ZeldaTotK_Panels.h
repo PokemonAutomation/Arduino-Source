@@ -1,4 +1,4 @@
-/*  Pokemon Scarlet/Violet Panels
+/*  Zelda: TotK Panels
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *

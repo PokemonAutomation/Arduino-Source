@@ -1,4 +1,4 @@
-/*  Pokemon SV Settings
+/*  Zelda: TotK Settings
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *

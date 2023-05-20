@@ -1,4 +1,4 @@
-/*  Gimmighoul Chest Farmer
+/*  TotK Bow Item Duper
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
