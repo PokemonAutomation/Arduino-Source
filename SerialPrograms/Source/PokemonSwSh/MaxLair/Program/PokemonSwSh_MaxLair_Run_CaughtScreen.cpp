@@ -5,17 +5,19 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
-#include "CommonFramework/Tools/InterruptableCommands.h"
+//#include "CommonFramework/Tools/InterruptableCommands.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
-#include "PokemonSwSh/Inference/PokemonSwSh_SummaryShinySymbolDetector.h"
+//#include "PokemonSwSh/Inference/PokemonSwSh_SummaryShinySymbolDetector.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_GameEntry.h"
-#include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_EndBattle.h"
+//#include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_EndBattle.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_Entrance.h"
 #include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_Notifications.h"
 #include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_CatchScreenTracker.h"
@@ -50,7 +52,7 @@ StateMachineAction mash_A_to_entrance(
     if (result < 0){
         console.log("Failed to detect entrance.", COLOR_RED);
         runtime.session_stats.add_error();
-        dump_image(console, MODULE_NAME, "ResetRecovery", console.video().snapshot());
+        dump_image(console, MODULE_NAME, "FailedToDetectEntrance", console.video().snapshot());
         return StateMachineAction::RESET_RECOVER;
     }
     return StateMachineAction::KEEP_GOING;
@@ -166,7 +168,15 @@ StateMachineAction run_caught_screen(
             tracker.enter_summary();    //  Enter summary to verify you're on the right mon.
             tracker.leave_summary();
             synchronize_caught_screen(console, context, state_tracker);
-            return mash_A_to_entrance(runtime, console, context, entrance);
+            StateMachineAction state = mash_A_to_entrance(runtime, console, context, entrance);
+            if (state == StateMachineAction::RESET_RECOVER){
+                throw FatalProgramException(
+                    ErrorReport::SEND_ERROR_REPORT,
+                    console,
+                    "Unable to take " + Pokemon::STRING_POKEMON + ". Did you forget to disable nicknames?"
+               );
+            }
+            return state;
         }
 
     case CaughtScreenAction::RESET:
