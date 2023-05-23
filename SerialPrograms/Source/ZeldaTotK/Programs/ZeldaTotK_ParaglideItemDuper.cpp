@@ -78,10 +78,11 @@ void ParaglideItemDuper::program(SingleSwitchProgramEnvironment& env, BotBaseCon
     Item you wish to dupe is selected in menu
     Now close the menu
 
-    You are at the shrine near link's (new) house
+    Warp point placed directly opposite the ladder in Lookout Landing
+    
     Map tab is selected and is on the second to last zoom level
     
-    Put the sages away since they can interfere with pickup
+    Sages being out doesn't matter as they don't appear inside town
     */
 
     uint32_t c = 0;
