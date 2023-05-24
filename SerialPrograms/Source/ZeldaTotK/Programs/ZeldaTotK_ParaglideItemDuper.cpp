@@ -50,10 +50,10 @@ ParaglideItemDuper::ParaglideItemDuper()
     )
     , LOAD_DELAY(
         "<b>Loading time:</b><br>Adjustable delay for the load screen after warping. "
-        "The default of 3750 ticks is 30 seconds.",
+        "Adjust this to match the loading time of your game.",
         LockWhileRunning::UNLOCKED,
         TICKS_PER_SECOND,
-        "3750"
+        "3125"
     )
     , GO_HOME_WHEN_DONE(false)
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
@@ -74,15 +74,31 @@ void ParaglideItemDuper::program(SingleSwitchProgramEnvironment& env, BotBaseCon
 
     /*
     Setup:
-    Menu has been opened to materials tab and sorted by type
+    Menu has been opened to materials tab
     Item you wish to dupe is selected in menu
     Now close the menu
 
-    Warp point placed directly opposite the ladder in Lookout Landing
+    Warp point placed directly opposite the ladder (face slightly to the left of the ladder) in Lookout Landing
+    angle away from the guard if possible to prevent talking to them.
+    can always readjust if needed - sometimes the map places a stamp instead of warping if position is off
     
-    Map tab is selected and is on the second to last zoom level
+    Map tab is selected and is on the second to last zoom level (zoom all the way in and the go back one)
     
     Sages being out doesn't matter as they don't appear inside town
+
+    Some items may bounce more, so all 5 dupes are not always picked up (ex large batteries may roll away)
+    Works with less than 5 of an item but tends to be less consistent
+
+    Don't try this with bombs or anything explosive
+    Don't have any other stamps on the map in the area
+    Unequip anything metal in case of thunderstorm
+    again, do not try this with bombs
+
+    Travel Medallion required.
+
+    In theory this program can be modified to work with a shrine near a cliff. Needs to be in a safe location and sages need to be disabled.
+
+    Works on 1.1 and 1.1.1
     */
 
     uint32_t c = 0;
@@ -94,13 +110,13 @@ void ParaglideItemDuper::program(SingleSwitchProgramEnvironment& env, BotBaseCon
         pbf_move_left_joystick(context, 128, 0, 10, 5);
 
         //Jump and open paraglider
-        pbf_press_button(context, BUTTON_X, 20, 20);
+        pbf_press_button(context, BUTTON_X, 20, 80);
         pbf_press_button(context, BUTTON_X, 20, 20);
 
         //Open menu
         pbf_press_button(context, BUTTON_PLUS, 20, 100);
 
-        //Select 5 of the item to dupe
+        //Select 5 of the item to dupe - if less than 5 this still works
         pbf_press_button(context, BUTTON_A, 20, 20);
         pbf_press_dpad(context, DPAD_DOWN, 20, 20);
         pbf_press_button(context, BUTTON_A, 20, 20);
@@ -109,18 +125,24 @@ void ParaglideItemDuper::program(SingleSwitchProgramEnvironment& env, BotBaseCon
         pbf_press_button(context, BUTTON_A, 20, 20);
         pbf_press_button(context, BUTTON_A, 20, 20);
 
-        //Now press SORT and B at the same time, or as close as possible
+        //Now press Y (sort) and B (exit) at the same time
         ssf_press_button(context, BUTTON_B, 0, 10);
-        ssf_press_button(context, BUTTON_Y, 0, 10);
-
-        pbf_wait(context, 50);
-        context.wait_for_all_requests();
+        pbf_press_button(context, BUTTON_Y, 10, 40);
 
         //Close paraglider and drop to the ground
         pbf_press_button(context, BUTTON_B, 20, 50);
 
-        //Pick up duped items
+        //Pick up duped items - extra presses just in case
         pbf_press_button(context, BUTTON_A, 20, 10);
+        pbf_press_button(context, BUTTON_A, 20, 10);
+        pbf_press_button(context, BUTTON_A, 20, 10);
+        pbf_press_button(context, BUTTON_A, 20, 10);
+        pbf_press_button(context, BUTTON_A, 20, 10);
+        pbf_press_button(context, BUTTON_A, 20, 10);
+        pbf_press_button(context, BUTTON_A, 20, 10);
+
+        //Turn around and try to pick up items as well
+        pbf_move_left_joystick(context, 128, 255, 10, 5);
         pbf_press_button(context, BUTTON_A, 20, 10);
         pbf_press_button(context, BUTTON_A, 20, 10);
         pbf_press_button(context, BUTTON_A, 20, 10);
