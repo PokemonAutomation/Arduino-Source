@@ -10,7 +10,7 @@
 //#include "ZeldaTotK_Settings.h"
 
 #include "Programs/ZeldaTotK_BowItemDuper.h"
-
+#include "Programs/ZeldaTotK_ParaglideItemDuper.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -30,6 +30,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
 
     ret.emplace_back("---- General ----");
     ret.emplace_back(make_single_switch_program<BowItemDuper_Descriptor, BowItemDuper>());
+    ret.emplace_back(make_single_switch_program<ParaglideItemDuper_Descriptor, ParaglideItemDuper>());
 
     return ret;
 }
