@@ -17,6 +17,7 @@
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "PokemonSV/Options/PokemonSV_EncounterBotCommon.h"
+#include "PokemonSV/Options/PokemonSV_SandwichMakerOption.h"
 #include "PokemonSV_AreaZeroPlatform.h"
 
 namespace PokemonAutomation{
@@ -54,7 +55,7 @@ private:
         RESET_SANDWICH,
     };
 
-    void run_state(BotBaseContext& context);
+    void run_state(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
     //  Returns true on success.
     bool run_traversal(BotBaseContext& context);
@@ -69,6 +70,8 @@ private:
         MAKE_SANDWICH,
     };
     EnumDropdownOption<Mode> MODE;
+
+    SandwichMakerOption SANDWICH_OPTIONS;
 
     enum class Path{
         PATH0,
