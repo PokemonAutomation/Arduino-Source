@@ -920,6 +920,8 @@ SOURCES += \
     Source/Tests/PokemonSwSh_Tests.cpp \
     Source/Tests/TestMap.cpp \
     Source/Tests/TestUtils.cpp \
+    Source/ZeldaTotK/Programs/ZeldaTotK_ParaglideItemDuper.cpp \
+    Source/ZeldaTotK/Programs/ZeldaTotK_SurfItemDuper.cpp \
     Source/ZeldaTotK/ZeldaTotK_Panels.cpp \
     Source/ZeldaTotK/ZeldaTotK_Panels.h \
     Source/ZeldaTotK/ZeldaTotK_Settings.cpp \
@@ -1952,7 +1954,9 @@ HEADERS += \
     Source/Tests/PokemonSV_Tests.h \
     Source/Tests/PokemonSwSh_Tests.h \
     Source/Tests/TestMap.h \
-    Source/Tests/TestUtils.h
+    Source/Tests/TestUtils.h \
+    Source/ZeldaTotK/Programs/ZeldaTotK_ParaglideItemDuper.h \
+    Source/ZeldaTotK/Programs/ZeldaTotK_SurfItemDuper.h
 
 
 
