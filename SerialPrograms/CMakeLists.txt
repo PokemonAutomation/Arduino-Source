@@ -1864,6 +1864,8 @@ file(GLOB MAIN_SOURCES
     Source/ZeldaTotK/Programs/ZeldaTotK_BowItemDuper.h
     Source/ZeldaTotK/Programs/ZeldaTotK_ParaglideItemDuper.cpp
     Source/ZeldaTotK/Programs/ZeldaTotK_ParaglideItemDuper.h
+    Source/ZeldaTotK/Programs/ZeldaTotK_MineruItemDuper.cpp
+    Source/ZeldaTotK/Programs/ZeldaTotK_MineruItemDuper.h
     Source/ZeldaTotK/Programs/ZeldaTotK_SurfItemDuper.cpp
     Source/ZeldaTotK/Programs/ZeldaTotK_SurfItemDuper.h
 )
