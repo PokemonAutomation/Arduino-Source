@@ -81,6 +81,9 @@ void MineruItemDuper::program(SingleSwitchProgramEnvironment& env, BotBaseContex
 
     Mount Mineru. Ideally, avoid having other Sages near you to prevent interacting with them.
 
+    If you are duping Zonai devices, you will need to be right next to a wall. Otherwise, try to stay in a
+    flat, open area.
+
     ITEMS_PER_ATTEMPT will be 5 for normal materials and 10 for Zonai devices.
 
     Works on 1.1 and 1.1.1
