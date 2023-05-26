@@ -1,0 +1,150 @@
+/*  TotK Surf Item Duper
+ *
+ *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *
+ */
+
+#include "Common/Cpp/PrettyPrint.h"
+#include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/Tools/StatsTracking.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_ScalarButtons.h"
+#include "ZeldaTotK_SurfItemDuper.h"
+
+namespace PokemonAutomation {
+namespace NintendoSwitch {
+namespace ZeldaTotK {
+
+SurfItemDuper_Descriptor::SurfItemDuper_Descriptor()
+    : SingleSwitchProgramDescriptor(
+        "ZeldaTotK:SurfItemDuper",
+        "Zelda: TotK", "Shield Surf Item Duper",
+        "ComputerControl/blob/master/Wiki/Programs/ZeldaTotK/SurfItemDuper.md",
+        "Use the Shield Surfing Menu Sort glitch to duplicate items.",
+        FeedbackType::NONE,
+        AllowCommandsWhenRunning::DISABLE_COMMANDS,
+        PABotBaseLevel::PABOTBASE_12KB
+    )
+{}
+
+struct SurfItemDuper_Descriptor::Stats : public StatsTracker {
+    Stats()
+        : dupe_attempts(m_stats["Dupe Attempts"])
+        , errors(m_stats["Errors"])
+    {
+        m_display_order.emplace_back("Dupe Attempts");
+        m_display_order.emplace_back("Errors", true);
+    }
+    std::atomic<uint64_t>& dupe_attempts;
+    std::atomic<uint64_t>& errors;
+};
+std::unique_ptr<StatsTracker> SurfItemDuper_Descriptor::make_stats() const {
+    return std::unique_ptr<StatsTracker>(new Stats());
+}
+
+SurfItemDuper::SurfItemDuper()
+    : ATTEMPTS(
+        "<b>Duplication Attempts:</b><br>The number of times you wish to run this routine.",
+        LockWhileRunning::UNLOCKED,
+        100
+    )
+    , GO_HOME_WHEN_DONE(false)
+    , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
+    , NOTIFICATIONS({
+        &NOTIFICATION_STATUS_UPDATE,
+        &NOTIFICATION_PROGRAM_FINISH,
+        // &NOTIFICATION_ERROR_FATAL,
+        })
+{
+    PA_ADD_OPTION(ATTEMPTS);
+    PA_ADD_OPTION(GO_HOME_WHEN_DONE);
+    PA_ADD_OPTION(NOTIFICATIONS);
+}
+
+void SurfItemDuper::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
+    SurfItemDuper_Descriptor::Stats& stats = env.current_stats<SurfItemDuper_Descriptor::Stats>();
+
+    /*
+    Setup:
+    Stand on a patch of sand in a shrine or in the depths (under a lightroot)
+
+    Menu has been opened to materials tab
+    Item you wish to dupe is selected in menu
+    Now close the menu
+
+    Durability should not matter when on sand or snow
+    
+    Sages being out doesn't matter as they don't appear inside shrines
+    Blood moons don't matter inside shrines
+    Heat/Cold don't matter inside shrines
+
+    Some items may bounce more, so all 5 dupes are not always picked up (ex large batteries may roll away)
+    Works with less than 5 of an item but tends to be less consistent
+
+    Don't try this with bombs or anything explosive
+
+    Works on 1.1 and 1.1.1
+    */
+
+    uint32_t c = 0;
+
+    while (c < ATTEMPTS) {
+        env.log("Current Attempts: " + tostr_u_commas(c));
+
+        //Initiate Shield Surf
+        ssf_press_button(context, BUTTON_ZL, 0, 80);
+        ssf_press_button(context, BUTTON_X, 5, 30);
+        ssf_press_button(context, BUTTON_A, 10, 80);
+
+        //Open menu
+        pbf_press_button(context, BUTTON_PLUS, 20, 100);
+
+        //Select 5 of the item to dupe - if less than 5 this still works
+        pbf_press_button(context, BUTTON_A, 20, 20);
+        pbf_press_dpad(context, DPAD_DOWN, 20, 20);
+        pbf_press_button(context, BUTTON_A, 20, 20);
+        pbf_press_button(context, BUTTON_A, 20, 20);
+        pbf_press_button(context, BUTTON_A, 20, 20);
+        pbf_press_button(context, BUTTON_A, 20, 20);
+        pbf_press_button(context, BUTTON_A, 20, 20);
+
+        //Now press Y (sort) and B (exit) at the same time
+        pbf_press_button(context, BUTTON_B | BUTTON_Y, 10, 40);
+
+        //Drop to the ground
+        pbf_press_button(context, BUTTON_B, 20, 50);
+
+        //Pick up duped items - extra presses just in case
+        pbf_press_button(context, BUTTON_A, 20, 10);
+        pbf_press_button(context, BUTTON_A, 20, 10);
+        pbf_press_button(context, BUTTON_A, 20, 10);
+        pbf_press_button(context, BUTTON_A, 20, 10);
+        pbf_press_button(context, BUTTON_A, 20, 10);
+        pbf_press_button(context, BUTTON_A, 20, 10);
+        pbf_press_button(context, BUTTON_A, 20, 10);
+
+        //Turn around and try to pick up items as well
+        pbf_move_left_joystick(context, 128, 255, 10, 5);
+        pbf_press_button(context, BUTTON_A, 20, 10);
+        pbf_press_button(context, BUTTON_A, 20, 10);
+        pbf_press_button(context, BUTTON_A, 20, 10);
+        pbf_press_button(context, BUTTON_A, 20, 10);
+        pbf_press_button(context, BUTTON_A, 20, 10);
+        pbf_press_button(context, BUTTON_A, 20, 10);
+
+        // increment counter, increment stats
+        c++;
+        stats.dupe_attempts++;
+        env.update_stats();
+        send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
+
+    }
+
+    GO_HOME_WHEN_DONE.run_end_of_program(context);
+    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
+}
+
+}
+}
+}
+
