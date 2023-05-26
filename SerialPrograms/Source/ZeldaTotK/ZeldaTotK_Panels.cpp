@@ -10,6 +10,7 @@
 //#include "ZeldaTotK_Settings.h"
 
 #include "Programs/ZeldaTotK_BowItemDuper.h"
+#include "Programs/ZeldaTotK_MineruItemDuper.h"
 #include "Programs/ZeldaTotK_ParaglideItemDuper.h"
 #include "Programs/ZeldaTotK_SurfItemDuper.h"
 
@@ -33,6 +34,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
 
     ret.emplace_back("---- Glitches (v1.1.1) ----");
     ret.emplace_back(make_single_switch_program<BowItemDuper_Descriptor, BowItemDuper>());
+    ret.emplace_back(make_single_switch_program<MineruItemDuper_Descriptor, MineruItemDuper>());
     ret.emplace_back(make_single_switch_program<ParaglideItemDuper_Descriptor, ParaglideItemDuper>());
     ret.emplace_back(make_single_switch_program<SurfItemDuper_Descriptor, SurfItemDuper>());
 
