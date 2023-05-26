@@ -125,7 +125,7 @@ void MineruItemDuper::program(SingleSwitchProgramEnvironment& env, BotBaseContex
                 pbf_press_button(context, BUTTON_A, 10, 10);
             }
         } else {
-            pbf_wait(context, 100);
+            pbf_wait(context, 250);
         }
 
         // increment stats
