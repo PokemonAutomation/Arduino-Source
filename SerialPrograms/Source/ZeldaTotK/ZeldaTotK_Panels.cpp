@@ -29,7 +29,9 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     // ret.emplace_back("---- Settings ----");
     // ret.emplace_back(make_settings<GameSettings_Descriptor, GameSettingsPanel>());
 
-    ret.emplace_back("---- General ----");
+    //ret.emplace_back("---- General ----");
+
+    ret.emplace_back("---- Glitches (v1.1.1) ----");
     ret.emplace_back(make_single_switch_program<BowItemDuper_Descriptor, BowItemDuper>());
     ret.emplace_back(make_single_switch_program<ParaglideItemDuper_Descriptor, ParaglideItemDuper>());
     ret.emplace_back(make_single_switch_program<SurfItemDuper_Descriptor, SurfItemDuper>());
