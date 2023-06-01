@@ -45,42 +45,6 @@ namespace PokemonSV{
 
 using namespace Pokemon;
 
-void clear_mons_in_front(
-    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context
-){
-    console.log("Waiting for all " + STRING_POKEMON + " in front of you to get out of the way...");
-    WhiteButtonWatcher button(
-        COLOR_YELLOW, WhiteButton::ButtonA,
-        {0.020, 0.590, 0.035, 0.060},
-        WhiteButtonWatcher::FinderType::GONE
-    );
-    int ret = run_until(
-        console, context,
-        [&](BotBaseContext& context){
-            for (size_t c = 0; c < 40; c++){
-                context.wait_for_all_requests();
-                context.wait_for(std::chrono::seconds(30));
-                console.log("A " + Pokemon::STRING_POKEMON + " is standing in the way. Whistling and waiting 30 seconds...", COLOR_RED);
-                pbf_press_button(context, BUTTON_R, 20, 0);
-            }
-        },
-        {button}
-    );
-    if (ret < 0){
-        dump_image_and_throw_recoverable_exception(
-            info, console, "UnableToClearObstacle",
-            "Unable to clear " + STRING_POKEMON + " in front of you after 20 min."
-        );
-    }
-#if 0
-    WhiteButtonDetector detector(COLOR_RED, WhiteButton::ButtonA, {0.020, 0.590, 0.035, 0.060});
-    while (detector.detect(console.video().snapshot())){
-        pbf_press_button(context, BUTTON_R, 20, 30 * TICKS_PER_SECOND);
-        context.wait_for_all_requests();
-    }
-#endif
-}
-
 ShinyHuntAreaZeroPlatform_Descriptor::ShinyHuntAreaZeroPlatform_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonSV:ShinyHuntAreaZeroPlatform",
