@@ -380,11 +380,9 @@ void ShinyHuntAreaZeroPlatform::run_state(SingleSwitchProgramEnvironment& env, B
             return_to_outside_zero_gate(info, console, context);
 
             // Open picnic and make sandwich
-            picnic_at_zero_gate(info, console, context); // need to include from egg routine
-            picnic_from_overworld(info, console, context); // need to include from navigation
+            picnic_at_zero_gate(info, console, context);
+            picnic_from_overworld(info, console, context);
             pbf_move_left_joystick(context, 128, 0, 30, 40);
-//            context.wait_for_all_requests();
-//            clear_mons_in_front(info, console, context);
             enter_sandwich_recipe_list(info, console, context);
 
             run_sandwich_maker(env, context, SANDWICH_OPTIONS);
@@ -392,6 +390,7 @@ void ShinyHuntAreaZeroPlatform::run_state(SingleSwitchProgramEnvironment& env, B
             leave_picnic(info, console, context);
             pbf_move_left_joystick(context, 128, 255, 30, 40);
 
+            // Return to platform
             return_to_inside_zero_gate(info, console, context);
             inside_zero_gate_to_platform(info, console, context, NAVIGATE_TO_PLATFORM);
 
