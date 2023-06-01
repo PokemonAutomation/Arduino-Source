@@ -45,7 +45,6 @@ namespace PokemonSV{
 
 using namespace Pokemon;
 
-// To do: move clear_mons_in_front to header so it's not redefined here
 void clear_mons_in_front(
     const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context
 ){
@@ -141,6 +140,11 @@ ShinyHuntAreaZeroPlatform::ShinyHuntAreaZeroPlatform()
         LockWhileRunning::LOCKED,
         Mode::START_ON_PLATFORM
     )
+    , SANDWICH_RESET_IN_MINUTES(
+          "<b>Sandwich Reset Time (in minutes):</b><br>The time to reset game to make a new sandwich.",
+          LockWhileRunning::UNLOCKED,
+          30
+    )
     , PATH0(
         "<b>Path:</b><br>Traversal path on the platform to trigger encounters.",
         {
@@ -171,10 +175,11 @@ ShinyHuntAreaZeroPlatform::ShinyHuntAreaZeroPlatform()
 {
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(MODE);
+    PA_ADD_OPTION(SANDWICH_RESET_IN_MINUTES);
     if (PreloadSettings::instance().DEVELOPER_MODE){
         PA_ADD_OPTION(PATH0);
     }
-    PA_ADD_OPTION(SANDWICH_OPTIONS); // To do: repeated language options
+    PA_ADD_OPTION(SANDWICH_OPTIONS);
     PA_ADD_OPTION(ENCOUNTER_BOT_OPTIONS);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(AUTO_HEAL_PERCENT);
@@ -212,6 +217,17 @@ bool ShinyHuntAreaZeroPlatform::run_traversal(BotBaseContext& context){
     }
 
     WallClock start = current_time();
+
+    do{
+        if (start - m_last_sandwich < std::chrono::minutes(SANDWICH_RESET_IN_MINUTES)){
+            console.log("Sandwich Reset: Not enough time since last sandwich.", COLOR_ORANGE);
+            break;
+        }
+
+        console.log("Conditions met for sandwich reset.", COLOR_ORANGE);
+        m_state = State::RESET_SANDWICH;
+        return false;
+    }while (false);
 
     size_t kills, encounters;
     std::chrono::minutes window_minutes(PLATFORM_RESET.WINDOW_IN_MINUTES);
@@ -262,7 +278,6 @@ bool ShinyHuntAreaZeroPlatform::run_traversal(BotBaseContext& context){
         m_state = State::LEAVE_AND_RETURN;
         return false;
     }while (false);
-
 
     try{
         switch (PATH0){
@@ -385,40 +400,44 @@ void ShinyHuntAreaZeroPlatform::run_state(SingleSwitchProgramEnvironment& env, B
         case State::RESET_SANDWICH:
             console.log("Resetting sandwich...");
 
-            recovery_state = State::RESET_SANDWICH;
+            recovery_state = State::LEAVE_AND_RETURN;
 
-            // assume user has already saved near Zero Gate
-            // connect controller
-            pbf_press_button(context, BUTTON_L, 20, 105);
+//            // connect controller
+//            pbf_press_button(context, BUTTON_L, 20, 105);
 
-            pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
-            reset_game_from_home(info, console, context, 5 * TICKS_PER_SECOND);
-            pbf_press_button(context, BUTTON_RCLICK, 20, 105);
-
-            stats.m_game_resets++;
-            m_env->update_stats();
+            if (stats.m_sandwiches > 0) {
+                pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+                reset_game_from_home(info, console, context, 5 * TICKS_PER_SECOND);
+                pbf_press_button(context, BUTTON_RCLICK, 20, 105);
+                stats.m_game_resets++;
+                m_env->update_stats();
+            };
 
             return_to_outside_zero_gate(info, console, context);
 
             // Open picnic and make sandwich
-            picnic_at_zero_gate(info, console, context);
-            picnic_from_overworld(info, console, context);
+            picnic_at_zero_gate(info, console, context); // need to include from egg routine
+            picnic_from_overworld(info, console, context); // need to include from navigation
             pbf_move_left_joystick(context, 128, 0, 30, 40);
-            context.wait_for_all_requests();
-            clear_mons_in_front(info, console, context);
+//            context.wait_for_all_requests();
+//            clear_mons_in_front(info, console, context);
             enter_sandwich_recipe_list(info, console, context);
+
             run_sandwich_maker(env, context, SANDWICH_OPTIONS);
 
             leave_picnic(info, console, context);
+            pbf_move_left_joystick(context, 128, 255, 30, 40);
 
             return_to_inside_zero_gate(info, console, context);
             inside_zero_gate_to_platform(info, console, context, NAVIGATE_TO_PLATFORM);
 
-            stats.m_game_resets++;
+            console.log("Sandwich Reset: Starting new sandwich timer...");
+            m_last_sandwich = current_time();
+
             stats.m_sandwiches++;
             m_env->update_stats();
 
-//            break;
+            break;
         }
 
         //  No problems. Go back to traversals.
