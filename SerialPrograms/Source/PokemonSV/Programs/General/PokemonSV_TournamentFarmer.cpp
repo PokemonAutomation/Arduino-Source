@@ -583,7 +583,7 @@ void TournamentFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseConte
                 pbf_mash_button(context, BUTTON_B, 10000); //it takes a while to load and start
             },
             { battle_menu }
-            );
+        );
         if (ret_battle != 0) {
             env.console.log("Failed to detect battle start!", COLOR_RED);
         }
@@ -597,10 +597,10 @@ void TournamentFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseConte
             int ret_battle2 = run_until(
                 env.console, context,
                 [](BotBaseContext& context) {
-                    pbf_mash_button(context, BUTTON_B, 5000);
+                    pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
                 },
                 { battle_menu2, overworld }
-                );
+            );
             context.wait_for_all_requests();
 
             switch (ret_battle2) {
