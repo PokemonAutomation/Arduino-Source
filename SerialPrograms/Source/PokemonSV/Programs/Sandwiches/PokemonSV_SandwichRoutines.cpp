@@ -703,7 +703,7 @@ void run_sandwich_maker(SingleSwitchProgramEnvironment& env, BotBaseContext& con
     std::map<std::string, uint8_t> condiments;
 
     //Add the selected ingredients to the maps if set to custom
-    if (SANDWICH_OPTIONS.BASE_RECIPE == SandwichMakerOption::BaseRecipe::custom) {
+    if (SANDWICH_OPTIONS.BASE_RECIPE == BaseRecipe::custom) {
         env.log("Custom sandwich selected. Validating ingredients.", COLOR_BLACK);
         env.console.overlay().add_log("Custom sandwich selected. Validating ingredients.", COLOR_WHITE);
 

@@ -110,11 +110,6 @@ ShinyHuntAreaZeroPlatform::ShinyHuntAreaZeroPlatform()
         LockWhileRunning::LOCKED,
         Mode::START_ON_PLATFORM
     )
-    , SANDWICH_RESET_IN_MINUTES(
-          "<b>Sandwich Reset Time (in minutes):</b><br>The time to reset game to make a new sandwich.",
-          LockWhileRunning::UNLOCKED,
-          30
-    )
     , PATH0(
         "<b>Path:</b><br>Traversal path on the platform to trigger encounters.",
         {
@@ -125,6 +120,12 @@ ShinyHuntAreaZeroPlatform::ShinyHuntAreaZeroPlatform()
         LockWhileRunning::UNLOCKED,
         Path::PATH2
     )
+    , SANDWICH_RESET_IN_MINUTES(
+        "<b>Sandwich Reset Time (in minutes):</b><br>The time to reset game to make a new sandwich.",
+        LockWhileRunning::UNLOCKED,
+        30
+    )
+    , SANDWICH_OPTIONS(LANGUAGE)
     , GO_HOME_WHEN_DONE(true)
     , AUTO_HEAL_PERCENT(
         "<b>Auto-Heal %</b><br>Auto-heal if your HP drops below this percentage.",

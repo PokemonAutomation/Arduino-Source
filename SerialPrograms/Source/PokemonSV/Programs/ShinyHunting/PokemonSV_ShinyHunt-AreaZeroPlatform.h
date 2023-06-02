@@ -71,16 +71,15 @@ private:
     };
     EnumDropdownOption<Mode> MODE;
 
-    SimpleIntegerOption<uint16_t> SANDWICH_RESET_IN_MINUTES;
-
-    SandwichMakerOption SANDWICH_OPTIONS;
-
     enum class Path{
         PATH0,
         PATH1,
         PATH2,
     };
     EnumDropdownOption<Path> PATH0;
+
+    SimpleIntegerOption<uint16_t> SANDWICH_RESET_IN_MINUTES;
+    SandwichMakerOption SANDWICH_OPTIONS;
 
     EncounterBotCommonOptions ENCOUNTER_BOT_OPTIONS;
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
