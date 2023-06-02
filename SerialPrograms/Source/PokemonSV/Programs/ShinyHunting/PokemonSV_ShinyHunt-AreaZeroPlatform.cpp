@@ -83,6 +83,8 @@ std::unique_ptr<StatsTracker> ShinyHuntAreaZeroPlatform_Descriptor::make_stats()
 
 
 
+
+
 ShinyHuntAreaZeroPlatform::ShinyHuntAreaZeroPlatform()
     : LANGUAGE(
         "<b>Game Language:</b><br>Required to read " + STRING_POKEMON + " names.",
@@ -94,13 +96,17 @@ ShinyHuntAreaZeroPlatform::ShinyHuntAreaZeroPlatform()
         "<b>Mode:</b><br>"
         "If starting on the platform, you should stand near the center of the platform facing any direction.<br>"
         "If starting in the Zero Gate, you should be just inside the building as if you just entered."
-        "<br>If making a sandwich, you should be at the Zero Gate fly spot as if you just flew there."
-        ,
-        {
-            {Mode::START_ON_PLATFORM,   "platform", "Start on platform."},
-            {Mode::START_IN_ZERO_GATE,  "zerogate", "Start inside Zero Gate."},
-            {Mode::MAKE_SANDWICH,       "sandwich", "Make a sandwich."},
-        },
+        "<br>If making a sandwich, you should be at the Zero Gate fly spot as if you just flew there.",
+        PreloadSettings::instance().DEVELOPER_MODE
+            ? EnumDatabase<Mode>({
+                    {Mode::START_ON_PLATFORM,   "platform", "Start on platform."},
+                    {Mode::START_IN_ZERO_GATE,  "zerogate", "Start inside Zero Gate."},
+                    {Mode::MAKE_SANDWICH,       "sandwich", "Make a sandwich."},
+            })
+            : EnumDatabase<Mode>({
+                    {Mode::START_ON_PLATFORM,   "platform", "Start on platform."},
+                    {Mode::START_IN_ZERO_GATE,  "zerogate", "Start inside Zero Gate."},
+            }),
         LockWhileRunning::LOCKED,
         Mode::START_ON_PLATFORM
     )
@@ -139,11 +145,11 @@ ShinyHuntAreaZeroPlatform::ShinyHuntAreaZeroPlatform()
 {
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(MODE);
-    PA_ADD_OPTION(SANDWICH_RESET_IN_MINUTES);
     if (PreloadSettings::instance().DEVELOPER_MODE){
         PA_ADD_OPTION(PATH0);
+        PA_ADD_OPTION(SANDWICH_RESET_IN_MINUTES);
+        PA_ADD_OPTION(SANDWICH_OPTIONS);
     }
-    PA_ADD_OPTION(SANDWICH_OPTIONS);
     PA_ADD_OPTION(ENCOUNTER_BOT_OPTIONS);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(AUTO_HEAL_PERCENT);
