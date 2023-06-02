@@ -40,13 +40,16 @@ public:
 
 
 
-class ShinyHuntAreaZeroPlatform : public SingleSwitchProgramInstance{
+class ShinyHuntAreaZeroPlatform : public SingleSwitchProgramInstance, public ConfigOption::Listener{
 public:
+    ~ShinyHuntAreaZeroPlatform();
     ShinyHuntAreaZeroPlatform();
 
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
+    virtual void value_changed() override;
+
     enum class State{
         TRAVERSAL,
         INSIDE_GATE_AND_RETURN,

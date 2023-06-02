@@ -83,7 +83,9 @@ std::unique_ptr<StatsTracker> ShinyHuntAreaZeroPlatform_Descriptor::make_stats()
 
 
 
-
+ShinyHuntAreaZeroPlatform::~ShinyHuntAreaZeroPlatform(){
+    MODE.remove_listener(*this);
+}
 
 ShinyHuntAreaZeroPlatform::ShinyHuntAreaZeroPlatform()
     : LANGUAGE(
@@ -157,9 +159,17 @@ ShinyHuntAreaZeroPlatform::ShinyHuntAreaZeroPlatform()
     PA_ADD_OPTION(PLATFORM_RESET);
     PA_ADD_OPTION(NAVIGATE_TO_PLATFORM);
     PA_ADD_OPTION(NOTIFICATIONS);
+
+    MODE.add_listener(*this);
 }
 
-
+void ShinyHuntAreaZeroPlatform::value_changed(){
+    ConfigOptionState state = MODE == Mode::MAKE_SANDWICH
+        ? ConfigOptionState::ENABLED
+        : ConfigOptionState::HIDDEN;
+    SANDWICH_RESET_IN_MINUTES.set_visibility(state);
+    SANDWICH_OPTIONS.set_visibility(state);
+}
 
 
 
