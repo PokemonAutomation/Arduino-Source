@@ -91,7 +91,7 @@ ShinyHuntAreaZeroPlatform::ShinyHuntAreaZeroPlatform()
     : LANGUAGE(
         "<b>Game Language:</b><br>Required to read " + STRING_POKEMON + " names.",
         IV_READER().languages(),
-        LockWhileRunning::UNLOCKED,
+        LockWhileRunning::LOCKED,
         false
     )
     , MODE(
@@ -163,6 +163,16 @@ ShinyHuntAreaZeroPlatform::ShinyHuntAreaZeroPlatform()
     MODE.add_listener(*this);
 }
 
+std::string ShinyHuntAreaZeroPlatform::check_validity() const{
+    std::string error = SingleSwitchProgramInstance::check_validity();
+    if (!error.empty()){
+        return error;
+    }
+    if (LANGUAGE == Language::None && MODE == Mode::MAKE_SANDWICH){
+        return "Sandwich mode requires selecting a language.";
+    }
+    return "";
+}
 void ShinyHuntAreaZeroPlatform::value_changed(){
     ConfigOptionState state = MODE == Mode::MAKE_SANDWICH
         ? ConfigOptionState::ENABLED

@@ -48,6 +48,7 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
+    virtual std::string check_validity() const override;
     virtual void value_changed() override;
 
     enum class State{
