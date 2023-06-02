@@ -13,6 +13,7 @@
 #include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
+#include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Tools/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -21,24 +22,28 @@
 #include "PokemonSV/Inference/Overworld/PokemonSV_LetsGoHpReader.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_IVCheckerReader.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_EncounterWatcher.h"
+#include "PokemonSV/Programs/Eggs/PokemonSV_EggRoutines.h"
+#include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_SaveGame.h"
 #include "PokemonSV/Programs/PokemonSV_Battles.h"
 #include "PokemonSV/Programs/PokemonSV_AreaZero.h"
+#include "PokemonSV/Programs/Sandwiches/PokemonSV_SandwichMaker.h"
+#include "PokemonSV/Programs/Sandwiches/PokemonSV_SandwichRoutines.h"
 #include "PokemonSV_LetsGoTools.h"
 #include "PokemonSV_ShinyHunt-AreaZeroPlatform.h"
 
 //#include <iostream>
 //using std::cout;
 //using std::endl;
+#include <unordered_map>
+#include <algorithm>
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
 
 using namespace Pokemon;
-
-
 
 ShinyHuntAreaZeroPlatform_Descriptor::ShinyHuntAreaZeroPlatform_Descriptor()
     : SingleSwitchProgramDescriptor(
@@ -89,15 +94,20 @@ ShinyHuntAreaZeroPlatform::ShinyHuntAreaZeroPlatform()
         "<b>Mode:</b><br>"
         "If starting on the platform, you should stand near the center of the platform facing any direction.<br>"
         "If starting in the Zero Gate, you should be just inside the building as if you just entered."
-//        "<br>If making a sandwich, you should be at the Zero Gate fly spot as if you just flew there."
+        "<br>If making a sandwich, you should be at the Zero Gate fly spot as if you just flew there."
         ,
         {
             {Mode::START_ON_PLATFORM,   "platform", "Start on platform."},
             {Mode::START_IN_ZERO_GATE,  "zerogate", "Start inside Zero Gate."},
-//            {Mode::MAKE_SANDWICH,       "sandwich", "Make a sandwich."},
+            {Mode::MAKE_SANDWICH,       "sandwich", "Make a sandwich."},
         },
         LockWhileRunning::LOCKED,
         Mode::START_ON_PLATFORM
+    )
+    , SANDWICH_RESET_IN_MINUTES(
+          "<b>Sandwich Reset Time (in minutes):</b><br>The time to reset game to make a new sandwich.",
+          LockWhileRunning::UNLOCKED,
+          30
     )
     , PATH0(
         "<b>Path:</b><br>Traversal path on the platform to trigger encounters.",
@@ -129,9 +139,11 @@ ShinyHuntAreaZeroPlatform::ShinyHuntAreaZeroPlatform()
 {
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(MODE);
+    PA_ADD_OPTION(SANDWICH_RESET_IN_MINUTES);
     if (PreloadSettings::instance().DEVELOPER_MODE){
         PA_ADD_OPTION(PATH0);
     }
+    PA_ADD_OPTION(SANDWICH_OPTIONS);
     PA_ADD_OPTION(ENCOUNTER_BOT_OPTIONS);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(AUTO_HEAL_PERCENT);
@@ -169,6 +181,17 @@ bool ShinyHuntAreaZeroPlatform::run_traversal(BotBaseContext& context){
     }
 
     WallClock start = current_time();
+
+    do{
+        if (start - m_last_sandwich < std::chrono::minutes(SANDWICH_RESET_IN_MINUTES)){
+            console.log("Sandwich Reset: Not enough time since last sandwich.", COLOR_ORANGE);
+            break;
+        }
+
+        console.log("Conditions met for sandwich reset.", COLOR_ORANGE);
+        m_state = State::RESET_SANDWICH;
+        return false;
+    }while (false);
 
     size_t kills, encounters;
     std::chrono::minutes window_minutes(PLATFORM_RESET.WINDOW_IN_MINUTES);
@@ -220,7 +243,6 @@ bool ShinyHuntAreaZeroPlatform::run_traversal(BotBaseContext& context){
         return false;
     }while (false);
 
-
     try{
         switch (PATH0){
         case Path::PATH0:
@@ -246,7 +268,7 @@ bool ShinyHuntAreaZeroPlatform::run_traversal(BotBaseContext& context){
 
 
 
-void ShinyHuntAreaZeroPlatform::run_state(BotBaseContext& context){
+void ShinyHuntAreaZeroPlatform::run_state(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     ShinyHuntAreaZeroPlatform_Descriptor::Stats& stats = m_env->current_stats<ShinyHuntAreaZeroPlatform_Descriptor::Stats>();
     const ProgramInfo& info = m_env->program_info();
     ConsoleHandle& console = m_env->console;
@@ -342,9 +364,43 @@ void ShinyHuntAreaZeroPlatform::run_state(BotBaseContext& context){
         case State::RESET_SANDWICH:
             console.log("Resetting sandwich...");
 
-            throw InternalProgramError(&console.logger(), PA_CURRENT_FUNCTION, "Sandwiches have not been implemented yet.");
+            recovery_state = State::LEAVE_AND_RETURN;
 
-//            break;
+//            // connect controller
+//            pbf_press_button(context, BUTTON_L, 20, 105);
+
+            if (stats.m_sandwiches > 0) {
+                pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+                reset_game_from_home(info, console, context, 5 * TICKS_PER_SECOND);
+                pbf_press_button(context, BUTTON_RCLICK, 20, 105);
+                stats.m_game_resets++;
+                m_env->update_stats();
+            };
+
+            return_to_outside_zero_gate(info, console, context);
+
+            // Open picnic and make sandwich
+            picnic_at_zero_gate(info, console, context);
+            picnic_from_overworld(info, console, context);
+            pbf_move_left_joystick(context, 128, 0, 30, 40);
+            enter_sandwich_recipe_list(info, console, context);
+
+            run_sandwich_maker(env, context, SANDWICH_OPTIONS);
+
+            leave_picnic(info, console, context);
+            pbf_move_left_joystick(context, 128, 255, 30, 40);
+
+            // Return to platform
+            return_to_inside_zero_gate(info, console, context);
+            inside_zero_gate_to_platform(info, console, context, NAVIGATE_TO_PLATFORM);
+
+            console.log("Sandwich Reset: Starting new sandwich timer...");
+            m_last_sandwich = current_time();
+
+            stats.m_sandwiches++;
+            m_env->update_stats();
+
+            break;
         }
 
         //  No problems. Go back to traversals.
@@ -398,7 +454,8 @@ void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, Bot
         m_state = State::INSIDE_GATE_AND_RETURN;
         break;
     case Mode::MAKE_SANDWICH:
-        throw UserSetupError(env.logger(), "Sandwich mode has not been implemented yet.");
+        m_state = State::RESET_SANDWICH;
+        break;
     }
 
     m_pending_save = false;
@@ -418,7 +475,7 @@ void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, Bot
             [&](BotBaseContext& context){
                 //  Inner program loop that runs the state machine.
                 while (true){
-                    run_state(context);
+                    run_state(env, context);
                 }
             },
             {
