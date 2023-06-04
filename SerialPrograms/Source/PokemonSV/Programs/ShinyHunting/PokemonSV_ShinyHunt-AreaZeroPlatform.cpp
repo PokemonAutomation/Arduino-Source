@@ -99,7 +99,7 @@ ShinyHuntAreaZeroPlatform::ShinyHuntAreaZeroPlatform()
         "If starting on the platform, you should stand near the center of the platform facing any direction.<br>"
         "If starting in the Zero Gate, you should be just inside the building as if you just entered."
         "<br>If making a sandwich, you should be at the Zero Gate fly spot as if you just flew there.",
-        PreloadSettings::instance().DEVELOPER_MODE
+        IS_BETA_VERSION
             ? EnumDatabase<Mode>({
                     {Mode::START_ON_PLATFORM,   "platform", "Start on platform."},
                     {Mode::START_IN_ZERO_GATE,  "zerogate", "Start inside Zero Gate."},
@@ -150,6 +150,8 @@ ShinyHuntAreaZeroPlatform::ShinyHuntAreaZeroPlatform()
     PA_ADD_OPTION(MODE);
     if (PreloadSettings::instance().DEVELOPER_MODE){
         PA_ADD_OPTION(PATH0);
+    }
+    if (IS_BETA_VERSION){
         PA_ADD_OPTION(SANDWICH_RESET_IN_MINUTES);
         PA_ADD_OPTION(SANDWICH_OPTIONS);
     }
@@ -159,6 +161,8 @@ ShinyHuntAreaZeroPlatform::ShinyHuntAreaZeroPlatform()
     PA_ADD_OPTION(PLATFORM_RESET);
     PA_ADD_OPTION(NAVIGATE_TO_PLATFORM);
     PA_ADD_OPTION(NOTIFICATIONS);
+
+    ShinyHuntAreaZeroPlatform::value_changed();
 
     MODE.add_listener(*this);
 }
