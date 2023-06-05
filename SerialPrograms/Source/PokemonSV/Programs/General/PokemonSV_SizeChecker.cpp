@@ -80,7 +80,7 @@ SizeChecker::SizeChecker()
 
 
 
-void enter_check_mode(ConsoleHandle& console, BotBaseContext& context){
+void SizeChecker::enter_check_mode(ConsoleHandle& console, BotBaseContext& context){
     WallClock start = current_time();
 
     while (true){
@@ -135,7 +135,7 @@ void enter_check_mode(ConsoleHandle& console, BotBaseContext& context){
 
 
 
-void exit_check_mode(ConsoleHandle& console, BotBaseContext& context){
+void SizeChecker::exit_check_mode(ConsoleHandle& console, BotBaseContext& context){
     WallClock start = current_time();
 
     while (true){
