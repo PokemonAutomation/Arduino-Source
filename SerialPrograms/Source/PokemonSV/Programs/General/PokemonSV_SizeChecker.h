@@ -37,8 +37,8 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
-    void size_check_one(BoxDetector& box_detector, SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-    void size_check_box(BoxDetector& box_detector, SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    void enter_check_mode(ConsoleHandle& console, BotBaseContext& context);
+    void exit_check_mode(ConsoleHandle& console, BotBaseContext& context);
 
 private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
