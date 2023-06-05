@@ -65,7 +65,7 @@ SizeChecker::SizeChecker()
     , BOXES_TO_CHECK(
         "<b>Number of Boxes to Check:</b>",
         LockWhileRunning::LOCKED,
-        2, 0, 32
+        2, 1, 32
     )
     , NOTIFICATIONS({
         &NOTIFICATION_PROGRAM_FINISH,
@@ -87,7 +87,7 @@ void enter_check_mode(ConsoleHandle& console, BotBaseContext& context){
         if (current_time() - start > std::chrono::minutes(5)){
             throw OperationFailedException(
                 ErrorReport::SEND_ERROR_REPORT, console,
-                "exit_check_mode(): Failed to enter box mode after 5 minutes.",
+                "enter_check_mode(): Failed to enter box mode after 5 minutes.",
                 true
             );
         }
@@ -113,7 +113,7 @@ void enter_check_mode(ConsoleHandle& console, BotBaseContext& context){
             console.log("Detected dialog box.");
             pbf_press_button(context, BUTTON_A, 20, 5);
             continue;
-            // TODO: Detect if mark was given.
+            // TODO: Detect if mark was given and update stats.
         case 2:
             console.log("Detected prompt.");
             pbf_press_button(context, BUTTON_A, 20, 5);
@@ -230,10 +230,10 @@ void SizeChecker::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
                     continue;
                 }
 
-                // Initiate prompt.
+                // Initiate size checking prompt.
                 pbf_press_button(context, BUTTON_A, 20, 20);
 
-                // Last cell not empty.
+                // If last cell not empty.
                 if (row == 4 && col == 5){
                     exit_check_mode(env.console, context);
                 } else {
