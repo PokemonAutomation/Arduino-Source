@@ -1,4 +1,4 @@
-/*  Mass Release
+/*  Size Checker
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
