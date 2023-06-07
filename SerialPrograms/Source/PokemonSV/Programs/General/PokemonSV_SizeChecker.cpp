@@ -241,6 +241,7 @@ void SizeChecker::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
         env.update_stats();
     }
 
+    pbf_press_button(context, BUTTON_B, 20, 20);
     exit_check_mode(env.console, context);
 
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
