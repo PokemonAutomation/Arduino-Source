@@ -84,10 +84,10 @@ void SizeChecker::enter_check_mode(ConsoleHandle& console, BotBaseContext& conte
     WallClock start = current_time();
 
     while (true){
-        if (current_time() - start > std::chrono::minutes(5)){
+        if (current_time() - start > std::chrono::minutes(2)){
             throw OperationFailedException(
                 ErrorReport::SEND_ERROR_REPORT, console,
-                "enter_check_mode(): Failed to enter box mode after 5 minutes.",
+                "enter_check_mode(): Failed to enter box mode after 2 minutes.",
                 true
             );
         }
@@ -139,10 +139,10 @@ void SizeChecker::exit_check_mode(ConsoleHandle& console, BotBaseContext& contex
     WallClock start = current_time();
 
     while (true){
-        if (current_time() - start > std::chrono::minutes(5)){
+        if (current_time() - start > std::chrono::minutes(2)){
             throw OperationFailedException(
                 ErrorReport::SEND_ERROR_REPORT, console,
-                "exit_check_mode(): Failed to exit box mode after 5 minutes.",
+                "exit_check_mode(): Failed to exit box mode after 2 minutes.",
                 true
             );
         }
