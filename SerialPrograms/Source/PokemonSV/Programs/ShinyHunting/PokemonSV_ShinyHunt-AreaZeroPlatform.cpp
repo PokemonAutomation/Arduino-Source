@@ -13,7 +13,6 @@
 #include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
-#include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Tools/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -28,7 +27,6 @@
 #include "PokemonSV/Programs/PokemonSV_SaveGame.h"
 #include "PokemonSV/Programs/PokemonSV_Battles.h"
 #include "PokemonSV/Programs/PokemonSV_AreaZero.h"
-#include "PokemonSV/Programs/Sandwiches/PokemonSV_SandwichMaker.h"
 #include "PokemonSV/Programs/Sandwiches/PokemonSV_SandwichRoutines.h"
 #include "PokemonSV_LetsGoTools.h"
 #include "PokemonSV_ShinyHunt-AreaZeroPlatform.h"
@@ -395,10 +393,22 @@ void ShinyHuntAreaZeroPlatform::run_state(SingleSwitchProgramEnvironment& env, B
         case State::RESET_SANDWICH:
             console.log("Resetting sandwich...");
 
-            recovery_state = State::LEAVE_AND_RETURN;
+            switch (m_last_save){
+            case SavedLocation::NONE:
+                return_to_outside_zero_gate(info, console, context);
+                save_game_from_overworld(info, console, context);
+                m_last_save = SavedLocation::ZERO_GATE_FLY_SPOT;
+                break;
+            case SavedLocation::ZERO_GATE_FLY_SPOT:
+                break;
+            case SavedLocation::AREA_ZERO:
+                return_to_outside_zero_gate(info, console, context);
+                save_game_from_overworld(info, console, context);
+                m_last_save = SavedLocation::ZERO_GATE_FLY_SPOT;
+                break;
+            }
 
-//            // connect controller
-//            pbf_press_button(context, BUTTON_L, 20, 105);
+            recovery_state = State::LEAVE_AND_RETURN;
 
             if (stats.m_sandwiches > 0) {
                 pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
