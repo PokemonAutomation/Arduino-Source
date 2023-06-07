@@ -385,6 +385,7 @@ void ShinyHuntAreaZeroPlatform::run_state(SingleSwitchProgramEnvironment& env, B
             case SavedLocation::AREA_ZERO:
                 return_to_outside_zero_gate(info, console, context);
                 save_game_from_overworld(info, console, context);
+                console.log("Saving at Zero Gate...");
                 m_last_save = SavedLocation::ZERO_GATE_FLY_SPOT;
                 break;
             case SavedLocation::ZERO_GATE_FLY_SPOT:
