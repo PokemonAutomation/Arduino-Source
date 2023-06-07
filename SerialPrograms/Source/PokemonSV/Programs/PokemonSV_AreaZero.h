@@ -31,6 +31,7 @@ void return_to_outside_zero_gate(const ProgramInfo& info, ConsoleHandle& console
 //  You are inside Area Zero having traveled there via the Zero Gate. Return to
 //  inside the zero gate to setup for a subsequent call to "inside_zero_gate_to_station()".
 void return_to_inside_zero_gate(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
+void return_to_inside_zero_gate_from_picnic(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
 
 
 

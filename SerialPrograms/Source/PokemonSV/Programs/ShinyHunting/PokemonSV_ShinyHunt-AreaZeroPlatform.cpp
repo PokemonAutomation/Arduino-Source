@@ -411,10 +411,9 @@ void ShinyHuntAreaZeroPlatform::run_state(SingleSwitchProgramEnvironment& env, B
             run_sandwich_maker(env, context, SANDWICH_OPTIONS);
 
             leave_picnic(info, console, context);
-            pbf_move_left_joystick(context, 128, 255, 30, 40);
 
             // Return to platform
-            return_to_inside_zero_gate(info, console, context);
+            return_to_inside_zero_gate_from_picnic(info, console, context);
             inside_zero_gate_to_platform(info, console, context, NAVIGATE_TO_PLATFORM);
 
             console.log("Sandwich Reset: Starting new sandwich timer...");
