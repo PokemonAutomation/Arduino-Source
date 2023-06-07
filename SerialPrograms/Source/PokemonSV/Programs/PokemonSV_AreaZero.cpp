@@ -224,7 +224,7 @@ void return_to_inside_zero_gate_from_picnic(const ProgramInfo& info, ConsoleHand
     int ret = run_until(
         console, context,
         [](BotBaseContext& context){
-            pbf_move_left_joystick(context, 128, 255, 30, 40);
+            pbf_move_left_joystick(context, 128, 255, 100, 40);
             pbf_mash_button(context, BUTTON_L, 60);
             pbf_move_left_joystick(context, 128, 0, 10 * TICKS_PER_SECOND, 0);
         },
