@@ -211,17 +211,6 @@ bool ShinyHuntAreaZeroPlatform::run_traversal(BotBaseContext& context){
 
     WallClock start = current_time();
 
-    do{
-        if (start - m_last_sandwich < std::chrono::minutes(SANDWICH_RESET_IN_MINUTES)){
-            console.log("Sandwich Reset: Not enough time since last sandwich.", COLOR_ORANGE);
-            break;
-        }
-
-        console.log("Conditions met for sandwich reset.", COLOR_ORANGE);
-        m_state = State::RESET_SANDWICH;
-        return false;
-    }while (false);
-
     size_t kills, encounters;
     std::chrono::minutes window_minutes(PLATFORM_RESET.WINDOW_IN_MINUTES);
     WallDuration window = m_time_tracker->last_window_in_realtime(start, window_minutes);
@@ -309,12 +298,10 @@ void ShinyHuntAreaZeroPlatform::run_state(SingleSwitchProgramEnvironment& env, B
         {}, m_encounter_tracker->encounter_frequencies().dump_sorted_map("")
     );
 
-#if 0
     WallClock now = current_time();
-    if (m_last_sandwich + std::chrono::minutes() < now){
+    if (m_last_sandwich + std::chrono::minutes(SANDWICH_RESET_IN_MINUTES) < now){
         m_state = State::RESET_SANDWICH;
     }
-#endif
 
     State recovery_state = State::LEAVE_AND_RETURN;
     try{
