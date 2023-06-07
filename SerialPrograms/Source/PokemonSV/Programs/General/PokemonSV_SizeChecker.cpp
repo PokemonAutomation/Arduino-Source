@@ -29,7 +29,7 @@ using namespace Pokemon;
 SizeChecker_Descriptor::SizeChecker_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonSV:SizeChecker",
-        STRING_POKEMON + " SV", "SizeChecker",
+        STRING_POKEMON + " SV", "Size Checker",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSV/SizeChecker.md",
         "Check boxes of Pokémon for size marks.",
         FeedbackType::REQUIRED,
@@ -81,6 +81,7 @@ SizeChecker::SizeChecker()
 
 
 void SizeChecker::enter_check_mode(ConsoleHandle& console, BotBaseContext& context){
+    console.log("Enter box mode to check size...");
     WallClock start = current_time();
 
     while (true){
@@ -91,35 +92,29 @@ void SizeChecker::enter_check_mode(ConsoleHandle& console, BotBaseContext& conte
                 true
             );
         }
-        OverworldWatcher overworld(COLOR_CYAN);
+        
         AdvanceDialogWatcher dialog(COLOR_GREEN);
+        OverworldWatcher overworld(COLOR_CYAN);
         GradientArrowWatcher prompt(COLOR_YELLOW, GradientArrowType::RIGHT, {0.72, 0.55, 0.05, 0.08});
         BoxWatcher box(COLOR_BLUE);
+        
         context.wait_for_all_requests();
 
         int ret = wait_until(
             console, context,
             std::chrono::seconds(60),
-            {overworld, dialog, prompt, box}
+            {dialog, overworld, prompt, box}
         );
         context.wait_for(std::chrono::milliseconds(100));
 
         switch (ret){
-        case 0:
-            console.log("Detected overworld.");
+
+        case 0: // dialog
+        case 1: // overworld
+        case 2: // prompt
             pbf_press_button(context, BUTTON_A, 20, 5);
             continue;
-        case 1:
-            console.log("Detected dialog box.");
-            pbf_press_button(context, BUTTON_A, 20, 5);
-            continue;
-            // TODO: Detect if mark was given and update stats.
-        case 2:
-            console.log("Detected prompt.");
-            pbf_press_button(context, BUTTON_A, 20, 5);
-            continue;
-        case 3:
-            console.log("Detected box mode.", COLOR_ORANGE);
+        case 3: // box
             return;
 
         default:
@@ -136,6 +131,7 @@ void SizeChecker::enter_check_mode(ConsoleHandle& console, BotBaseContext& conte
 
 
 void SizeChecker::exit_check_mode(ConsoleHandle& console, BotBaseContext& context){
+    console.log("Check size and exit box mode...");
     WallClock start = current_time();
 
     while (true){
@@ -147,25 +143,26 @@ void SizeChecker::exit_check_mode(ConsoleHandle& console, BotBaseContext& contex
             );
         }
 
-        OverworldWatcher overworld(COLOR_CYAN);
         AdvanceDialogWatcher dialog(COLOR_GREEN);
+        OverworldWatcher overworld(COLOR_CYAN);
+        
         context.wait_for_all_requests();
 
         int ret = wait_until(
             console, context,
             std::chrono::seconds(60),
-            {overworld, dialog}
+            {dialog, overworld}
         );
         context.wait_for(std::chrono::milliseconds(100));
 
         switch (ret){
-        case 0:
-            console.log("Detected overworld.");
-            return;
-        case 1:
-            console.log("Detected dialog box.");
+
+        case 0: // dialog
+            // TODO: Detect if mark was given and update stats.
             pbf_press_button(context, BUTTON_A, 20, 5);
             continue;
+        case 1: // overworld
+            return;
 
         default:
             throw OperationFailedException(
@@ -192,8 +189,6 @@ void SizeChecker::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
     // Loop through boxes.
     for (uint8_t box = 0; box < BOXES_TO_CHECK; box++){
         enter_check_mode(env.console, context);
-        // Default state on box entry does not highlight selection, move cursor so it does.
-        pbf_press_dpad(context, DPAD_LEFT, 5, 100);
         context.wait_for_all_requests();
 
         if (box > 0){
@@ -204,7 +199,8 @@ void SizeChecker::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
         // Loop through the rows and columns.
         for (uint8_t row = 0; row < 5; row++){
             for (uint8_t col = 0; col < 6; col++){
-
+                enter_check_mode(env.console, context);
+                context.wait_for_all_requests();
                 move_box_cursor(env.program_info(), env.console, context, BoxCursorLocation::SLOTS, row, col);
 
                 SomethingInBoxSlotDetector sth_in_box_detector(COLOR_RED);
@@ -233,15 +229,7 @@ void SizeChecker::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
                 // Initiate size checking prompt.
                 pbf_press_button(context, BUTTON_A, 20, 20);
 
-                // If last cell not empty.
-                if (row == 4 && col == 5){
-                    exit_check_mode(env.console, context);
-                } else {
-                    enter_check_mode(env.console, context);
-                    // Default state on box entry does not highlight selection, move cursor so it does.
-                    pbf_press_dpad(context, DPAD_LEFT, 5, 100);
-                }
-
+                exit_check_mode(env.console, context);
                 context.wait_for_all_requests();
 
                 stats.m_checked++;
