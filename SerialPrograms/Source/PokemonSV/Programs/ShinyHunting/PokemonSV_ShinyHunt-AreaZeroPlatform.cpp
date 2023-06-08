@@ -13,7 +13,6 @@
 #include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
-#include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Tools/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -28,7 +27,6 @@
 #include "PokemonSV/Programs/PokemonSV_SaveGame.h"
 #include "PokemonSV/Programs/PokemonSV_Battles.h"
 #include "PokemonSV/Programs/PokemonSV_AreaZero.h"
-#include "PokemonSV/Programs/Sandwiches/PokemonSV_SandwichMaker.h"
 #include "PokemonSV/Programs/Sandwiches/PokemonSV_SandwichRoutines.h"
 #include "PokemonSV_LetsGoTools.h"
 #include "PokemonSV_ShinyHunt-AreaZeroPlatform.h"
@@ -213,17 +211,6 @@ bool ShinyHuntAreaZeroPlatform::run_traversal(BotBaseContext& context){
 
     WallClock start = current_time();
 
-    do{
-        if (start - m_last_sandwich < std::chrono::minutes(SANDWICH_RESET_IN_MINUTES)){
-            console.log("Sandwich Reset: Not enough time since last sandwich.", COLOR_ORANGE);
-            break;
-        }
-
-        console.log("Conditions met for sandwich reset.", COLOR_ORANGE);
-        m_state = State::RESET_SANDWICH;
-        return false;
-    }while (false);
-
     size_t kills, encounters;
     std::chrono::minutes window_minutes(PLATFORM_RESET.WINDOW_IN_MINUTES);
     WallDuration window = m_time_tracker->last_window_in_realtime(start, window_minutes);
@@ -311,12 +298,10 @@ void ShinyHuntAreaZeroPlatform::run_state(SingleSwitchProgramEnvironment& env, B
         {}, m_encounter_tracker->encounter_frequencies().dump_sorted_map("")
     );
 
-#if 0
     WallClock now = current_time();
-    if (m_last_sandwich + std::chrono::minutes() < now){
+    if (m_last_sandwich + std::chrono::minutes(SANDWICH_RESET_IN_MINUTES) < now){
         m_state = State::RESET_SANDWICH;
     }
-#endif
 
     State recovery_state = State::LEAVE_AND_RETURN;
     try{
@@ -395,10 +380,19 @@ void ShinyHuntAreaZeroPlatform::run_state(SingleSwitchProgramEnvironment& env, B
         case State::RESET_SANDWICH:
             console.log("Resetting sandwich...");
 
-            recovery_state = State::LEAVE_AND_RETURN;
+            switch (m_last_save){
+            case SavedLocation::NONE:
+            case SavedLocation::AREA_ZERO:
+                return_to_outside_zero_gate(info, console, context);
+                save_game_from_overworld(info, console, context);
+                console.log("Saving at Zero Gate...");
+                m_last_save = SavedLocation::ZERO_GATE_FLY_SPOT;
+                break;
+            case SavedLocation::ZERO_GATE_FLY_SPOT:
+                break;
+            }
 
-//            // connect controller
-//            pbf_press_button(context, BUTTON_L, 20, 105);
+            recovery_state = State::LEAVE_AND_RETURN;
 
             if (stats.m_sandwiches > 0) {
                 pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
@@ -407,8 +401,6 @@ void ShinyHuntAreaZeroPlatform::run_state(SingleSwitchProgramEnvironment& env, B
                 stats.m_game_resets++;
                 m_env->update_stats();
             };
-
-            return_to_outside_zero_gate(info, console, context);
 
             // Open picnic and make sandwich
             picnic_at_zero_gate(info, console, context);
@@ -419,10 +411,9 @@ void ShinyHuntAreaZeroPlatform::run_state(SingleSwitchProgramEnvironment& env, B
             run_sandwich_maker(env, context, SANDWICH_OPTIONS);
 
             leave_picnic(info, console, context);
-            pbf_move_left_joystick(context, 128, 255, 30, 40);
 
             // Return to platform
-            return_to_inside_zero_gate(info, console, context);
+            return_to_inside_zero_gate_from_picnic(info, console, context);
             inside_zero_gate_to_platform(info, console, context, NAVIGATE_TO_PLATFORM);
 
             console.log("Sandwich Reset: Starting new sandwich timer...");

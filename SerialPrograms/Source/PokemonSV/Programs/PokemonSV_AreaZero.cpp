@@ -219,6 +219,38 @@ void return_to_inside_zero_gate(const ProgramInfo& info, ConsoleHandle& console,
         );
     }
 }
+void return_to_inside_zero_gate_from_picnic(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+    BlackScreenOverWatcher black_screen;
+    int ret = run_until(
+        console, context,
+        [](BotBaseContext& context){
+            pbf_move_left_joystick(context, 128, 255, 100, 40);
+            pbf_mash_button(context, BUTTON_L, 60);
+            pbf_move_left_joystick(context, 128, 0, 10 * TICKS_PER_SECOND, 0);
+        },
+        {black_screen}
+    );
+    if (ret < 0){
+        throw OperationFailedException(
+            ErrorReport::SEND_ERROR_REPORT, console,
+            "Unable to enter Zero Gate.",
+            true
+        );
+    }
+
+    OverworldWatcher overworld;
+    ret = wait_until(
+        console, context, std::chrono::seconds(10),
+        {overworld}
+    );
+    if (ret < 0){
+        throw OperationFailedException(
+            ErrorReport::SEND_ERROR_REPORT, console,
+            "Unable to detect overworld inside Zero Gate.",
+            true
+        );
+    }
+}
 
 
 
