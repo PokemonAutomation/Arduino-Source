@@ -1385,6 +1385,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Programs/General/PokemonSV_MassPurchase.h
     Source/PokemonSV/Programs/General/PokemonSV_MassRelease.cpp
     Source/PokemonSV/Programs/General/PokemonSV_MassRelease.h
+    Source/PokemonSV/Programs/General/PokemonSV_SizeChecker.cpp
+    Source/PokemonSV/Programs/General/PokemonSV_SizeChecker.h
     Source/PokemonSV/Programs/General/PokemonSV_StatsReset.cpp
     Source/PokemonSV/Programs/General/PokemonSV_StatsReset.h
     Source/PokemonSV/Programs/General/PokemonSV_TournamentFarmer.cpp
