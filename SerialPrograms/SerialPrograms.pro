@@ -691,6 +691,7 @@ SOURCES += \
     Source/PokemonSV/Programs/General/PokemonSV_LPFarmer.cpp \
     Source/PokemonSV/Programs/General/PokemonSV_MassPurchase.cpp \
     Source/PokemonSV/Programs/General/PokemonSV_MassRelease.cpp \
+    Source/PokemonSV/Programs/General/PokemonSV_SizeChecker.cpp \
     Source/PokemonSV/Programs/General/PokemonSV_StatsReset.cpp \
     Source/PokemonSV/Programs/General/PokemonSV_TournamentFarmer.cpp \
     Source/PokemonSV/Programs/Glitches/PokemonSV_CloneItems-1.0.1.cpp \
@@ -1715,6 +1716,7 @@ HEADERS += \
     Source/PokemonSV/Programs/General/PokemonSV_LPFarmer.h \
     Source/PokemonSV/Programs/General/PokemonSV_MassPurchase.h \
     Source/PokemonSV/Programs/General/PokemonSV_MassRelease.h \
+    Source/PokemonSV/Programs/General/PokemonSV_SizeChecker.h \
     Source/PokemonSV/Programs/General/PokemonSV_StatsReset.h \
     Source/PokemonSV/Programs/General/PokemonSV_TournamentFarmer.h \
     Source/PokemonSV/Programs/Glitches/PokemonSV_CloneItems-1.0.1.h \
