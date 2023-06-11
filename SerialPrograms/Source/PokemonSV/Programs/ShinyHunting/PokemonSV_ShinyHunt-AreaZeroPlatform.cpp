@@ -299,7 +299,7 @@ void ShinyHuntAreaZeroPlatform::run_state(SingleSwitchProgramEnvironment& env, B
     );
 
     WallClock now = current_time();
-    if (m_last_sandwich + std::chrono::minutes(SANDWICH_RESET_IN_MINUTES) < now){
+    if (MODE == Mode::MAKE_SANDWICH && m_last_sandwich + std::chrono::minutes(SANDWICH_RESET_IN_MINUTES) < now){
         m_state = State::RESET_SANDWICH;
     }
 
