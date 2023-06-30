@@ -317,7 +317,7 @@ std::array<std::map<Language, std::string>, 4> TeraLobbyReader::read_names(
 
             std::string raw;
             for (char ch : OCR::ocr_read(language, filtered)){
-                if (ch < 32){
+                if ((unsigned)ch < 32){
                     continue;
                 }
                 raw += ch;

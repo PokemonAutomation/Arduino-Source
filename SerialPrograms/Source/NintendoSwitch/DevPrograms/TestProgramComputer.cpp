@@ -223,10 +223,22 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     using namespace Pokemon;
 //    using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
 
-    ImageRGB32 image("20230427-200550386826-OperationFailedException.png");
+    {
+        ImageRGB32 image("20230630-084354220241.jpg");
+        TeraLobbyReader reader(env.logger(), env.inference_dispatcher());
+        reader.read_names(env.logger(), {Language::Japanese}, image);
+    }
+    {
+        ImageRGB32 image("name1.png");
+        cout << OCR::ocr_read(Language::Japanese, image) << endl;
+    }
 
-    NintendoSwitch::HomeDetector detector;
-    cout << detector.detect(image) << endl;
+
+
+//    ImageRGB32 image("20230427-200550386826-OperationFailedException.png");
+
+//    NintendoSwitch::HomeDetector detector;
+//    cout << detector.detect(image) << endl;
 
 
 #if 0
