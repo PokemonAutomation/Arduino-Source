@@ -18,6 +18,7 @@
 #include "PokemonSV/Inference/Boxes/PokemonSV_StatsResetChecker.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_IVCheckerReader.h"
+#include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSV/Programs/PokemonSV_BasicCatcher.h"
@@ -173,6 +174,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
             }
             //Throw ball
             pbf_mash_button(context, BUTTON_A, 150);
+            context.wait_for_all_requests();
 
             //Check for battle menu - if found after a second then assume caught in a goldfish bounce loop
             ret = wait_until(
@@ -195,18 +197,52 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
                 context.wait_for_all_requests();
 
                 AdvanceDialogWatcher summary(COLOR_MAGENTA);
+                OverworldWatcher overworld(COLOR_BLUE);
+                SwapMenuWatcher swap_menu(COLOR_YELLOW);
                 int ret2 = wait_until(
                     env.console, context,
                     std::chrono::seconds(25),
-                    { summary, battle_menu }
+                    { summary, overworld, battle_menu, swap_menu }
                 );
-                if (ret2 == 0) {
-                    env.log("Dialog detected, assuming caught.");
+                switch (ret2) {
+                case 0:
+                    env.log("Dialog detected, assuming target Pokemon caught.");
                     stats.catches++;
                     env.update_stats();
                     battle_ended = true;
+                    break;
+                case 1:
+                    env.log("Overworld detected, target Pokemon fainted.");
+                    send_program_status_notification(
+                        env, NOTIFICATION_STATUS_UPDATE,
+                        "Overworld detected, target Pokemon fainted."
+                    );
+                    battle_ended = true;
+                    goldfish_loop = true;
+                    break;
+                case 2:
+                    env.log("Battle menu detected, continuing.");
+                    break;
+                case 3:
+                    env.log("Swap menu detected, your Pokemon fainted.");
+                    send_program_status_notification(
+                        env, NOTIFICATION_STATUS_UPDATE,
+                        "Swap menu detected, your Pokemon fainted."
+                    );
+                    //Set to true and set goldfish loop to true to skip to the reset.
+                    battle_ended = true;
+                    goldfish_loop = true;
+                    break;
+                default:
+                    env.console.log("Invalid state ret2.");
+                    stats.errors++;
+                    env.update_stats();
+                    throw OperationFailedException(
+                        ErrorReport::SEND_ERROR_REPORT, env.console,
+                        "Invalid state ret2.",
+                        true
+                    );
                 }
-                //ret2 == 1 battle menu, continue
             }
         }
         if (goldfish_loop) {
@@ -217,49 +253,66 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
             pbf_mash_button(context, BUTTON_B, 170);
             context.wait_for_all_requests();
 
-            //Open box and navigate to last party slot
+            //Open box
             enter_box_system_from_overworld(env.program_info(), env.console, context);
             context.wait_for(std::chrono::milliseconds(400));
-            move_box_cursor(env.program_info(), env.console, context, BoxCursorLocation::PARTY, 5, 0);
 
-            //Check the IVs of the newly caught Pokemon - *must be on IV panel*
-            EggHatchAction action = EggHatchAction::Keep;
-            //This is an edited version of check_baby_info
-            check_stats_reset_info(env.console, context, LANGUAGE, FILTERS, action);
-
-            switch (action){
-            case EggHatchAction::StopProgram:
-                //Correct stats found, end program
-                stats_matched = true;
-                env.console.log("Match found!");
-                stats.matches++;
-                env.update_stats();
-                send_program_status_notification(
-                    env, NOTIFICATION_PROGRAM_FINISH,
-                    "Match found!"
-                );
-                break;
-            case EggHatchAction::Release:
-                stats_matched = false;
-                battle_ended = false; //Set this back and use the reset below
-                env.console.log("Stats did not match table settings.");
+            //Check that the target pokemon was caught
+            if (check_empty_slots_in_party(env.program_info(), env.console, context) != 0) {
+                battle_ended = false;
+                env.console.log("One or more empty slots in party. Target was not caught or user setup error.");
                 send_program_status_notification(
                     env, NOTIFICATION_STATUS_UPDATE,
-                    "Stats did not match table settings."
+                    "One or more empty slots in party. Target was not caught."
                 );
-                break;
-            default:
-                env.console.log("Invalid state.");
-                stats.errors++;
-                env.update_stats();
-                throw OperationFailedException(
-                    ErrorReport::SEND_ERROR_REPORT, env.console,
-                    "Invalid state.",
-                    true
-                );
+            }
+            else {
+                //Navigate to last party slot
+                move_box_cursor(env.program_info(), env.console, context, BoxCursorLocation::PARTY, 5, 0);
+
+                //Check the IVs of the newly caught Pokemon - *must be on IV panel*
+                EggHatchAction action = EggHatchAction::Keep;
+                //This is an edited version of check_baby_info
+                check_stats_reset_info(env.console, context, LANGUAGE, FILTERS, action);
+
+                switch (action) {
+                case EggHatchAction::StopProgram:
+                    //Correct stats found, end program
+                    stats_matched = true;
+                    env.console.log("Match found!");
+                    stats.matches++;
+                    env.update_stats();
+                    send_program_status_notification(
+                        env, NOTIFICATION_PROGRAM_FINISH,
+                        "Match found!"
+                    );
+                    break;
+                case EggHatchAction::Release:
+                    stats_matched = false;
+                    battle_ended = false; //Set this back and use the reset below
+                    env.console.log("Stats did not match table settings.");
+                    send_program_status_notification(
+                        env, NOTIFICATION_STATUS_UPDATE,
+                        "Stats did not match table settings."
+                    );
+                    break;
+                default:
+                    env.console.log("Invalid state.");
+                    stats.errors++;
+                    env.update_stats();
+                    throw OperationFailedException(
+                        ErrorReport::SEND_ERROR_REPORT, env.console,
+                        "Invalid state.",
+                        true
+                    );
+                }
             }
         }
         if (!battle_ended){
+            send_program_status_notification(
+                env, NOTIFICATION_STATUS_UPDATE,
+                "Resetting game."
+            );
             //Reset game
             stats.resets++;
             env.update_stats();
