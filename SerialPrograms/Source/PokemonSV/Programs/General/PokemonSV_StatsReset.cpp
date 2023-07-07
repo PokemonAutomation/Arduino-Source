@@ -204,31 +204,45 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
                     std::chrono::seconds(25),
                     { summary, overworld, battle_menu, swap_menu }
                 );
-                if (ret2 == 0) {
+                switch (ret2) {
+                case 0:
                     env.log("Dialog detected, assuming target Pokemon caught.");
                     stats.catches++;
                     env.update_stats();
                     battle_ended = true;
-                }
-                else if (ret2 == 1) {
+                    break;
+                case 1:
                     env.log("Overworld detected, target Pokemon fainted.");
                     send_program_status_notification(
                         env, NOTIFICATION_STATUS_UPDATE,
                         "Overworld detected, target Pokemon fainted."
                     );
                     battle_ended = true;
-                }
-                else if (ret2 == 3) {
+                    goldfish_loop = true;
+                    break;
+                case 2:
+                    env.log("Battle menu detected, continuing.");
+                    break;
+                case 3:
                     env.log("Swap menu detected, your Pokemon fainted.");
                     send_program_status_notification(
                         env, NOTIFICATION_STATUS_UPDATE,
                         "Swap menu detected, your Pokemon fainted."
                     );
-                    //Set to false and break to skip to the reset.
-                    battle_ended = false;
+                    //Set to true and set goldfish loop to true to skip to the reset.
+                    battle_ended = true;
+                    goldfish_loop = true;
                     break;
+                default:
+                    env.console.log("Invalid state ret2.");
+                    stats.errors++;
+                    env.update_stats();
+                    throw OperationFailedException(
+                        ErrorReport::SEND_ERROR_REPORT, env.console,
+                        "Invalid state ret2.",
+                        true
+                    );
                 }
-                //ret2 == 4 battle menu, continue
             }
         }
         if (goldfish_loop) {
@@ -246,7 +260,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
             //Check that the target pokemon was caught
             if (check_empty_slots_in_party(env.program_info(), env.console, context) != 0) {
                 battle_ended = false;
-                env.console.log("One or more empty slots in party. Target was not caught.");
+                env.console.log("One or more empty slots in party. Target was not caught or user setup error.");
                 send_program_status_notification(
                     env, NOTIFICATION_STATUS_UPDATE,
                     "One or more empty slots in party. Target was not caught."
