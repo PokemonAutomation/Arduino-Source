@@ -36,6 +36,7 @@ public:
 private:
     StartInGripOrGameOption START_LOCATION;
     TimeExpressionOption<uint16_t> WALK_UP_DELAY;
+    TimeExpressionOption<uint16_t> SMALL_POKEMON;
     BooleanCheckBoxOption TAKE_VIDEO;
     SimpleIntegerOption<uint32_t> ITERATIONS;
 };
