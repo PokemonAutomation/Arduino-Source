@@ -97,16 +97,11 @@ ShinyHuntAreaZeroPlatform::ShinyHuntAreaZeroPlatform()
         "If starting on the platform, you should stand near the center of the platform facing any direction.<br>"
         "If starting in the Zero Gate, you should be just inside the building as if you just entered."
         "<br>If making a sandwich, you should be at the Zero Gate fly spot as if you just flew there.",
-        IS_BETA_VERSION
-            ? EnumDatabase<Mode>({
-                    {Mode::START_ON_PLATFORM,   "platform", "Start on platform."},
-                    {Mode::START_IN_ZERO_GATE,  "zerogate", "Start inside Zero Gate."},
-                    {Mode::MAKE_SANDWICH,       "sandwich", "Make a sandwich."},
-            })
-            : EnumDatabase<Mode>({
-                    {Mode::START_ON_PLATFORM,   "platform", "Start on platform."},
-                    {Mode::START_IN_ZERO_GATE,  "zerogate", "Start inside Zero Gate."},
-            }),
+        {
+            {Mode::START_ON_PLATFORM,   "platform", "Start on platform."},
+            {Mode::START_IN_ZERO_GATE,  "zerogate", "Start inside Zero Gate."},
+            {Mode::MAKE_SANDWICH,       "sandwich", "Make a sandwich."},
+        },
         LockWhileRunning::LOCKED,
         Mode::START_ON_PLATFORM
     )
@@ -149,10 +144,8 @@ ShinyHuntAreaZeroPlatform::ShinyHuntAreaZeroPlatform()
     if (PreloadSettings::instance().DEVELOPER_MODE){
         PA_ADD_OPTION(PATH0);
     }
-    if (IS_BETA_VERSION){
-        PA_ADD_OPTION(SANDWICH_RESET_IN_MINUTES);
-        PA_ADD_OPTION(SANDWICH_OPTIONS);
-    }
+    PA_ADD_OPTION(SANDWICH_RESET_IN_MINUTES);
+    PA_ADD_OPTION(SANDWICH_OPTIONS);
     PA_ADD_OPTION(ENCOUNTER_BOT_OPTIONS);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(AUTO_HEAL_PERCENT);

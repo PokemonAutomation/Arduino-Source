@@ -36,7 +36,7 @@ bool BlackBorderDetector::detect(const ImageViewRGB32& screen) const{
     const double MAX_STDDEV = 20;
 
     ImageStats top = image_stats(extract_box_reference(screen, m_top));
-    cout << "top = " << top.average << top.stddev << endl;
+//    cout << "top = " << top.average << top.stddev << endl;
 //    extract_box(screen, m_top).save("top.png");
     if (!is_black(top, MAX_SUM, MAX_STDDEV)){
         return false;
