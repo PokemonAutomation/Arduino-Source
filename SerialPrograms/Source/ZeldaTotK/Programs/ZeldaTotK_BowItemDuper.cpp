@@ -31,13 +31,10 @@ BowItemDuper_Descriptor::BowItemDuper_Descriptor()
 struct BowItemDuper_Descriptor::Stats : public StatsTracker {
     Stats()
         : dupe_attempts(m_stats["Dupe Attempts"])
-        , errors(m_stats["Errors"])
     {
         m_display_order.emplace_back("Dupe Attempts");
-        m_display_order.emplace_back("Errors", true);
     }
     std::atomic<uint64_t>& dupe_attempts;
-    std::atomic<uint64_t>& errors;
 };
 std::unique_ptr<StatsTracker> BowItemDuper_Descriptor::make_stats() const {
     return std::unique_ptr<StatsTracker>(new Stats());
