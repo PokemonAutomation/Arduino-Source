@@ -24,7 +24,7 @@ bool is_white(
     if (stats.average.sum() < min_rgb_sum){
         return false;
     }
-    return is_solid(stats, {0.333333, 0.333333, 0.333333}, 0.1, max_stddev_sum);
+    return is_solid(stats, {0.333333, 0.333333, 0.333333}, 0.08, max_stddev_sum);
 }
 bool is_black(
     const ImageStats& stats,

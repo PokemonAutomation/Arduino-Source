@@ -103,6 +103,7 @@
 #include "PokemonSV/Programs/PokemonSV_ConnectToInternet.h"
 
 
+
 #include <QPixmap>
 #include <QVideoFrame>
 
@@ -180,6 +181,41 @@ using namespace PokemonSV;
 
 
 
+class NewsDetector : public StaticScreenDetector{
+public:
+    NewsDetector(Color color = COLOR_RED);
+
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+    virtual bool detect(const ImageViewRGB32& screen) const override;
+
+private:
+    Color m_color;
+    ImageFloatBox m_bottom_white;
+    ImageFloatBox m_bottom_buttons;
+};
+NewsDetector::NewsDetector(Color color)
+    : m_color(color)
+    , m_bottom_white(0.15, 0.92, 0.20, 0.06)
+    , m_bottom_buttons(0.40, 0.92, 0.58, 0.06)
+{}
+void NewsDetector::make_overlays(VideoOverlaySet& items) const{
+    items.add(m_color, m_bottom_white);
+    items.add(m_color, m_bottom_buttons);
+}
+bool NewsDetector::detect(const ImageViewRGB32& screen) const{
+    ImageStats bottom_white = image_stats(extract_box_reference(screen, m_bottom_white));
+    if (!is_white(bottom_white)){
+        return false;
+    }
+
+    ImageStats bottom_buttons = image_stats(extract_box_reference(screen, m_bottom_buttons));
+//    cout << bottom_buttons.average << bottom_buttons.stddev << endl;
+    if (bottom_buttons.stddev.sum() < 100){
+        return false;
+    }
+
+    return true;
+}
 
 
 
@@ -202,11 +238,15 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     BotBaseContext context(scope, console.botbase());
     VideoOverlaySet overlays(overlay);
 
+    NewsDetector detector;
+    detector.make_overlays(overlays);
 
-    VideoSnapshot image = feed.snapshot();
 
-    BoxSelectionBoxModeWatcher watcher;
-    watcher.process_frame(image, image.timestamp);
+
+//    VideoSnapshot image = feed.snapshot();
+
+//    BoxSelectionBoxModeWatcher watcher;
+//    watcher.process_frame(image, image.timestamp);
 
 //    connect_to_internet_from_overworld(env.program_info(), console, context);
 
