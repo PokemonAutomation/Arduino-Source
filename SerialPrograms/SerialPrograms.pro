@@ -925,6 +925,7 @@ SOURCES += \
     Source/ZeldaTotK/Programs/ZeldaTotK_MineruItemDuper.cpp \
     Source/ZeldaTotK/Programs/ZeldaTotK_ParaglideItemDuper.cpp \
     Source/ZeldaTotK/Programs/ZeldaTotK_SurfItemDuper.cpp \
+    Source/ZeldaTotK/Programs/ZeldaTotK_WeaponDuper.cpp \
     Source/ZeldaTotK/ZeldaTotK_Panels.cpp \
     Source/ZeldaTotK/ZeldaTotK_Panels.h \
     Source/ZeldaTotK/ZeldaTotK_Settings.cpp \
@@ -1964,6 +1965,7 @@ HEADERS += \
     Source/ZeldaTotK/Programs/ZeldaTotK_MineruItemDuper.h \
     Source/ZeldaTotK/Programs/ZeldaTotK_ParaglideItemDuper.h \
     Source/ZeldaTotK/Programs/ZeldaTotK_SurfItemDuper.h
+    Source/ZeldaTotK/Programs/ZeldaTotK_WeaponDuper.h
 
 
 
