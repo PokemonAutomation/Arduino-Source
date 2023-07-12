@@ -710,6 +710,7 @@ SOURCES += \
     Source/PokemonSV/Programs/ShinyHunting/PokemonSV_LetsGoTools.cpp \
     Source/PokemonSV/Programs/ShinyHunting/PokemonSV_ShinyHunt-AreaZeroPlatform.cpp \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_AutoHost.cpp \
+    Source/PokemonSV/Programs/TeraRaids/PokemonSV_AutoHost-MultiGame.cpp \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_AutoHostLobbyWaiter.cpp \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_AutoHostTools.cpp \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_JoinTracker.cpp \
@@ -924,7 +925,6 @@ SOURCES += \
     Source/ZeldaTotK/Programs/ZeldaTotK_MineruItemDuper.cpp \
     Source/ZeldaTotK/Programs/ZeldaTotK_ParaglideItemDuper.cpp \
     Source/ZeldaTotK/Programs/ZeldaTotK_SurfItemDuper.cpp \
-    Source/ZeldaTotK/Programs/ZeldaTotK_WeaponDuper.cpp \
     Source/ZeldaTotK/ZeldaTotK_Panels.cpp \
     Source/ZeldaTotK/ZeldaTotK_Panels.h \
     Source/ZeldaTotK/ZeldaTotK_Settings.cpp \
@@ -1090,6 +1090,7 @@ HEADERS += \
     ../Common/PokemonSwSh/PokemonSwSh_Protocol_EggRoutines.h \
     ../Common/PokemonSwSh/PokemonSwSh_Protocol_GameEntry.h \
     ../Common/PokemonSwSh/PokemonSwSh_Protocol_Misc.h \
+    ../Common/PokemonSV/PokemonSV_MultiHostTable.h \
     ../Common/Qt/AutoHeightTable.h \
     ../Common/Qt/AutoWidthLineEdit.h \
     ../Common/Qt/CodeValidator.h \
@@ -1736,6 +1737,7 @@ HEADERS += \
     Source/PokemonSV/Programs/ShinyHunting/PokemonSV_LetsGoTools.h \
     Source/PokemonSV/Programs/ShinyHunting/PokemonSV_ShinyHunt-AreaZeroPlatform.h \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_AutoHost.h \
+    Source/PokemonSV/Programs/TeraRaids/PokemonSV_AutoHost-MultiGame.h \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_AutoHostLobbyWaiter.h \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_AutoHostTools.h \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_JoinTracker.h \
@@ -1961,8 +1963,7 @@ HEADERS += \
     Source/ZeldaTotK/Programs/ZeldaTotK_BowItemDuper.h \
     Source/ZeldaTotK/Programs/ZeldaTotK_MineruItemDuper.h \
     Source/ZeldaTotK/Programs/ZeldaTotK_ParaglideItemDuper.h \
-    Source/ZeldaTotK/Programs/ZeldaTotK_SurfItemDuper.h \
-    Source/ZeldaTotK/Programs/ZeldaTotK_WeaponDuper.h
+    Source/ZeldaTotK/Programs/ZeldaTotK_SurfItemDuper.h
 
 
 
