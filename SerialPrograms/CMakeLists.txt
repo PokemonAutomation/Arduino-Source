@@ -1870,6 +1870,8 @@ file(GLOB MAIN_SOURCES
     Source/ZeldaTotK/Programs/ZeldaTotK_ParaglideItemDuper.h
     Source/ZeldaTotK/Programs/ZeldaTotK_SurfItemDuper.cpp
     Source/ZeldaTotK/Programs/ZeldaTotK_SurfItemDuper.h
+    Source/ZeldaTotK/Programs/ZeldaTotK_WeaponDuper.cpp
+    Source/ZeldaTotK/Programs/ZeldaTotK_WeaponDuper.h
 )
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}../../ FILES ${MAIN_SOURCES})
 add_executable(SerialPrograms WIN32 ${MAIN_SOURCES})

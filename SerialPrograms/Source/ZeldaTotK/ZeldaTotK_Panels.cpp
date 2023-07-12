@@ -13,6 +13,7 @@
 #include "Programs/ZeldaTotK_MineruItemDuper.h"
 #include "Programs/ZeldaTotK_ParaglideItemDuper.h"
 #include "Programs/ZeldaTotK_SurfItemDuper.h"
+#include "Programs/ZeldaTotK_WeaponDuper.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -37,6 +38,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<MineruItemDuper_Descriptor, MineruItemDuper>());
     ret.emplace_back(make_single_switch_program<ParaglideItemDuper_Descriptor, ParaglideItemDuper>());
     ret.emplace_back(make_single_switch_program<SurfItemDuper_Descriptor, SurfItemDuper>());
+    ret.emplace_back(make_single_switch_program<WeaponDuper_Descriptor, WeaponDuper>());
 
     return ret;
 }
