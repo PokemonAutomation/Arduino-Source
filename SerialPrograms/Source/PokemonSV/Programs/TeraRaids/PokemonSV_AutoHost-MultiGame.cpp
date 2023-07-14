@@ -305,6 +305,7 @@ void AutoHostMultiGame::program(SingleSwitchProgramEnvironment& env, BotBaseCont
           
             uint8_t game_slot = (uint8_t)game.game_slot.current_value();
             uint8_t game_user = (uint8_t)game.user_slot.current_value();
+            uint8_t skips = (uint8_t)game.skips.current_value();
           
             if (!skip_reset) {
                 pbf_press_button(context, BUTTON_HOME, 10, 125);
@@ -312,6 +313,20 @@ void AutoHostMultiGame::program(SingleSwitchProgramEnvironment& env, BotBaseCont
                 pbf_press_button(context, BUTTON_A, 10, 1250);
             }
             skip_reset=false;
+            
+            if (skips != 0) {
+                home_to_date_time(context, true, true);
+                pbf_press_button(context, BUTTON_A, 20, 80);
+                pbf_press_button(context, DPAD_LEFT, 500, 10);
+                pbf_press_button(context, DPAD_RIGHT, 20, 10);
+                while (skips != 0) {
+                    pbf_press_button(context, DPAD_UP, 20, 10);
+                    skips--;
+                }
+                pbf_press_button(context, DPAD_RIGHT, 250, 10);
+                pbf_press_button(context, BUTTON_A, 20, 80);
+                pbf_press_button(context, BUTTON_HOME, 20, 250);
+            }
           
             if (game_slot == g) {
                 pbf_press_button(context, BUTTON_A, 10, 250);
