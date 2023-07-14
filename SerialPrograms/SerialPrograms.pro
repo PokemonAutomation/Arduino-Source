@@ -1964,8 +1964,8 @@ HEADERS += \
     Source/ZeldaTotK/Programs/ZeldaTotK_BowItemDuper.h \
     Source/ZeldaTotK/Programs/ZeldaTotK_MineruItemDuper.h \
     Source/ZeldaTotK/Programs/ZeldaTotK_ParaglideItemDuper.h \
-    Source/ZeldaTotK/Programs/ZeldaTotK_SurfItemDuper.h
-    Source/ZeldaTotK/Programs/ZeldaTotK_WeaponDuper.h
+    Source/ZeldaTotK/Programs/ZeldaTotK_SurfItemDuper.h \
+    Source/ZeldaTotK/Programs/ZeldaTotK_WeaponDuper.h 
 
 
 
