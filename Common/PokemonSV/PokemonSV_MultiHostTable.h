@@ -25,10 +25,12 @@ public:
     MultiHostSlot()
         : game_slot(GameSlot_Database(), LockWhileRunning::LOCKED, 1)
         , user_slot(UserSlot_Database(), LockWhileRunning::LOCKED, 1)
+        , skips(LockWhileRunning::LOCKED, 3, 0, 7)
         , post_raid_delay(LockWhileRunning::LOCKED, TICKS_PER_SECOND, "0 * TICKS_PER_SECOND")
     {
         PA_ADD_OPTION(game_slot);
         PA_ADD_OPTION(user_slot);
+        PA_ADD_OPTION(skips);
         PA_ADD_OPTION(post_raid_delay);
     }
 
@@ -38,6 +40,7 @@ public:
         std::unique_ptr<MultiHostSlot> ret(new MultiHostSlot());
         ret->game_slot.set_value(game_slot.current_value());
         ret->user_slot.set_value(user_slot.current_value());
+        ret->skips.set(skips);
         ret->post_raid_delay.set(post_raid_delay.current_text());
         return ret;
     }
@@ -45,6 +48,7 @@ public:
 public:
     IntegerEnumDropdownCell game_slot;
     IntegerEnumDropdownCell user_slot;
+    SimpleIntegerCell<uint8_t> skips;
     TimeExpressionCell<uint16_t> post_raid_delay;
 };
 
@@ -62,6 +66,7 @@ public:
         return std::vector<std::string>{
             "Game",
             "User",
+            "Skips",
             "Post Raid Delay",
         };
     }
