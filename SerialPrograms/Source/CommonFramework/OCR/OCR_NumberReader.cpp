@@ -32,6 +32,8 @@ int read_number(Logger& logger, const ImageViewRGB32& image){
         {'9', '9'},
 
         //  Common misreads.
+        {'l', '1'},
+        {'i', '1'},
         {'A', '4'},
         {'a', '4'},
         {'S', '5'},

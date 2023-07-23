@@ -125,7 +125,8 @@ bool select_sandwich_recipe(const ProgramInfo& info, ConsoleHandle& console, Bot
 
     bool found_recipe = false;
     int max_move_down_list_attempts = 100; // There are 151 total recipes, so 76 rows.
-    for(int move_down_list_attempt = 0; move_down_list_attempt < max_move_down_list_attempts; move_down_list_attempt++) {
+    for (int move_down_list_attempt = 0; move_down_list_attempt < max_move_down_list_attempts; move_down_list_attempt++){
+        context.wait_for(std::chrono::milliseconds(200));
         context.wait_for_all_requests();
 
         auto snapshot = console.video().snapshot();
