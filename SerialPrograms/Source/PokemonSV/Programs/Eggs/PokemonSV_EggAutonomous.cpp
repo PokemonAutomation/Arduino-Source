@@ -104,6 +104,7 @@ EggAutonomous::EggAutonomous()
             {AutoSave::NoAutoSave, "none", "No auto-saving."},
             {AutoSave::AfterStartAndKeep, "start-and-keep", "Save at beginning and after keeping a baby."},
             {AutoSave::EveryBatch, "every-batch", "Save before every batch of 4 or 5 eggs."},
+            {AutoSave::AfterFetchComplete, "after-fetch", "Save after all eggs have been fetched from picnic."}
         },
         LockWhileRunning::LOCKED,
         AutoSave::AfterStartAndKeep
@@ -388,7 +389,9 @@ void EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
     }
 
     auto save_game_if_needed = [&](){
-        if (AUTO_SAVING == AutoSave::EveryBatch || (AUTO_SAVING == AutoSave::AfterStartAndKeep && m_in_critical_to_save_stage)){
+        if (AUTO_SAVING == AutoSave::EveryBatch ||
+            (AUTO_SAVING == AutoSave::AfterFetchComplete && m_saved_after_fetched_eggs == false) ||
+            (AUTO_SAVING == AutoSave::AfterStartAndKeep && m_in_critical_to_save_stage)){
             env.log("Saving game during egg hatching routine.");
             save_game(env, context, true);
             m_saved_after_fetched_eggs = true;
