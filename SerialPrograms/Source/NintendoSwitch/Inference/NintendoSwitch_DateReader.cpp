@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Cpp/Exceptions.h"
+//#include "Common/Cpp/Exceptions.h"
 #include "Common/Qt/StringToolsQt.h"
 #include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
@@ -217,7 +217,7 @@ void DateReader::set_hours(
         }
     }
 
-    auto snapshot = console.video().snapshot();
+//    auto snapshot = console.video().snapshot();
     throw FatalProgramException(
         ErrorReport::SEND_ERROR_REPORT, console,
         "Failed to set the hour after 10 attempts.",

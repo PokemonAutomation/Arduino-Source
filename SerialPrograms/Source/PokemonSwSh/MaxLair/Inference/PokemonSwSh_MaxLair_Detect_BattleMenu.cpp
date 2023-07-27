@@ -139,7 +139,8 @@ bool BattleMenuDetector::detect(const ImageViewRGB32& screen){
         fight = cluster_fit_2(   //  Cheer
             extract_box_reference(screen, m_icon_cheer),
             Color(0, 0, 0), 1.0,
-            Color(9, 162, 218), 1.0
+            Color(9, 162, 218), 1.0,
+            0.2, 60
         );
 //        cout << "fight = " << fight << endl;
         m_cheer = fight;
