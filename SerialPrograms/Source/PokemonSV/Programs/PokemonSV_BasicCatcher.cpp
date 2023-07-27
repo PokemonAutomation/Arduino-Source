@@ -105,7 +105,8 @@ CatchResults basic_catcher(
     ConsoleHandle& console, BotBaseContext& context,
     Language language,
     const std::string& ball_slug,
-    bool use_first_move_if_cant_throw
+    bool use_first_move_if_cant_throw,
+    std::function<void()> on_throw_lambda
 ){
     uint16_t balls_used = 0;
 
@@ -174,6 +175,9 @@ CatchResults basic_catcher(
             pbf_mash_button(context, BUTTON_A, 30);
             pbf_mash_button(context, BUTTON_B, 500);
             balls_used++;
+            if (on_throw_lambda){
+                on_throw_lambda();
+            }
             break;
         }
         case 1:

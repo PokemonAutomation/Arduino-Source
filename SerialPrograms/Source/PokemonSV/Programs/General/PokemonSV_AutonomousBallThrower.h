@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonSV_AutonomousBallThrower_H
 #define PokemonAutomation_PokemonSV_AutonomousBallThrower_H
 
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "CommonFramework/Options/LanguageOCROption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
@@ -39,8 +40,10 @@ private:
 
     OCR::LanguageOCROption LANGUAGE;
     PokemonSwSh::PokemonBallSelectOption BALL_SELECT;
+    BooleanCheckBoxOption USE_FIRST_MOVE_IF_CANNOT_THROW_BALL;
 
-    EventNotificationOption NOTIFICATION_STATUS_UPDATE;
+    EventNotificationOption NOTIFICATION_CATCH_SUCCESS;
+    EventNotificationOption NOTIFICATION_CATCH_FAILED;
     EventNotificationsOption NOTIFICATIONS;
 };
 

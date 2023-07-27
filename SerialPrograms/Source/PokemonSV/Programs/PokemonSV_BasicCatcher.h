@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonSV_BasicCatcher_H
 #define PokemonAutomation_PokemonSV_BasicCatcher_H
 
+#include <functional>
 #include "ClientSource/Connection/BotBase.h"
 #include "Pokemon/Pokemon_Notification.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_BattleBallReader.h"
@@ -35,7 +36,8 @@ CatchResults basic_catcher(
     ConsoleHandle& console, BotBaseContext& context,
     Language language,
     const std::string& ball_slug,
-    bool use_first_move_if_cant_throw
+    bool use_first_move_if_cant_throw,
+    std::function<void()> on_throw_lambda = nullptr
 );
 
 
