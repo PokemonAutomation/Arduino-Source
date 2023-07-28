@@ -121,7 +121,7 @@ bool TeraFarmerOpponentFilter::should_battle(size_t stars, const std::string& po
     }
 
     static const std::set<std::string> fivestar{
-        "gengar", "glalie", "amoonguss", "dondozo", "palafin", "finizen", "blissey", "eelektross", "driftblim", "cetitan"
+        "gengar", "glalie", "amoonguss", "dondozo", "palafin", "finizen", "blissey", "eelektross", "drifblim", "cetitan"
     };
     static const std::set<std::string> sixstar{
         "blissey", "vaporeon", "amoonguss", "farigiraf", "cetitan", "dondozo"
