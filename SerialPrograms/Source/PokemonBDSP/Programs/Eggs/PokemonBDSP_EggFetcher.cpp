@@ -95,8 +95,8 @@ void EggFetcher::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
         pbf_move_left_joystick(context, 255, 128, 60, 0);
 
         //  Fetch egg.
-        pbf_mash_button(context, BUTTON_ZL, 500);
-        pbf_mash_button(context, BUTTON_B, 500);
+        pbf_mash_button(context, BUTTON_ZL, 600);
+        pbf_mash_button(context, BUTTON_B, 520);
         pbf_move_left_joystick(context, 0, 255, 125, 0);
         SHORTCUT.run(context, 100);
 
