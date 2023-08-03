@@ -1,4 +1,4 @@
-/*  Tera Farmer
+/*  Tera Roller
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *

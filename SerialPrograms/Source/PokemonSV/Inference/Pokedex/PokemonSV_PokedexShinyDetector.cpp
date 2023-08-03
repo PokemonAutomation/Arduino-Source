@@ -27,9 +27,6 @@ void PokedexShinyDetector::make_overlays(VideoOverlaySet& items) const{
 
 bool PokedexShinyDetector::detect(const ImageViewRGB32& frame) const{
     const auto stats = image_stats(extract_box_reference(frame, m_box));
-    // cout << "stats.stddev.sum() " << stats.stddev.sum() << endl;
-    // On screenshots collected from macOS-Mirabox, non-shiny has stddev of at most 3.0, while
-    // shiny has stdddev of 160.
     return stats.stddev.sum() > 100;
 }
 

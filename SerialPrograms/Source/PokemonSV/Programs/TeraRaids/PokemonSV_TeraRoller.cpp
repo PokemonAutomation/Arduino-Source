@@ -296,6 +296,8 @@ void TeraRoller::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
                     save_game_from_overworld(env.program_info(), env.console, context);
 
                     throw ProgramFinishedException();
+                } else {
+                    env.console.log("Not shiny...");
                 }
 
                 if (i < 4){
@@ -306,7 +308,7 @@ void TeraRoller::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
 
             pbf_wait(context, 50);
         } else {
-            env.console.log("Error: Did not enter tera raid");
+            env.console.log("Failed to enter tera raid after 100 seconds.");
         }
 
         {

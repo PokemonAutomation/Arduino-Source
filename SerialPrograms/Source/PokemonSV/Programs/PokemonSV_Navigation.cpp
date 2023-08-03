@@ -502,12 +502,14 @@ void leave_phone_to_overworld(const ProgramInfo& info, ConsoleHandle& console, B
 
         int ret = wait_until(
             console, context,
-            std::chrono::seconds(10),
+            std::chrono::seconds(100),
             {overworld}
         );
 
         if (ret == 0){
             return;
+        } else {
+            env.console.log("leave_phone_to_overworld(): Failed to return to overworld after 100 seconds.");
         }
     }
 }

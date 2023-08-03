@@ -666,7 +666,7 @@ void run_from_tera_battle(const ProgramInfo& info, ConsoleHandle& console, BotBa
     if (ret == 0){
         return;
     } else {
-        console.log("Error");
+        console.log("run_from_tera_battle(): Failed to run away from tera battle after 100 seconds.");
     }
 }
 
