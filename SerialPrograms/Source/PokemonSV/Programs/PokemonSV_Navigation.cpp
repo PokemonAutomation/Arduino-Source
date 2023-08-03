@@ -11,6 +11,7 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_ScalarButtons.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_DateReader.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
+#include "PokemonSV/Inference/Pokedex/PokemonSV_PokedexMenuDetector.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
@@ -398,6 +399,118 @@ void leave_box_system_to_overworld(const ProgramInfo& info, ConsoleHandle& conso
 }
 
 
+void open_pokedex_from_overworld(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+    {
+        OverworldWatcher overworld(COLOR_CYAN);
+        context.wait_for_all_requests();
+        int ret = wait_until(
+            console, context,
+            std::chrono::seconds(10),
+            {overworld}
+        );
+        context.wait_for(std::chrono::milliseconds(100));
+        if (ret == 0){
+            console.log("Detected overworld.");
+            pbf_press_button(context, BUTTON_MINUS, 20, 105); // open pokedex
+        }
+        else{
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, console,
+                "open_pokedex_from_overworld(): No overworld state found after 10 seconds.",
+                true
+            );
+        }
+    }
+
+    WallClock start = current_time();
+    while (true){
+        if (current_time() - start > std::chrono::minutes(1)){
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, console,
+                "open_pokedex_from_overworld(): Failed to open map after 1 minute.",
+                true
+            );
+        }
+
+        OverworldWatcher overworld(COLOR_CYAN);
+        MapExitWatcher pokedex(COLOR_RED);
+
+        context.wait_for_all_requests();
+        int ret = wait_until(
+            console, context,
+            std::chrono::seconds(30),
+            {overworld, pokedex}
+        );
+        context.wait_for(std::chrono::milliseconds(100));
+        switch (ret){
+        case 0:
+            console.log("Detected overworld.");
+            pbf_press_button(context, BUTTON_MINUS, 20, 100); // open pokedex
+            continue;
+        case 1:
+            console.log("Detected pokedex.");
+            return;
+        default:
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, console,
+                "open_pokedex_from_overworld(): No recognized state after 30 seconds.",
+                true
+            );
+        }
+    }
+}
+
+
+void open_recently_battled_from_pokedex(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+    WallClock start = current_time();
+    while (true){
+        if (current_time() - start > std::chrono::minutes(1)){
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, console,
+                "open_recently_battled_from_pokedex(): Failed to open recently battled after 1 minute.",
+                true
+            );
+        }
+
+        while(true){
+            PokedexMenuWatcher menu(console.logger(), COLOR_RED, true);
+            context.wait_for_all_requests();
+
+            int ret = wait_until(
+                console, context,
+                std::chrono::seconds(1),
+                {menu}
+            );
+
+            if (ret == 0){
+                pbf_mash_button(context, BUTTON_A, 150);
+                return;
+            }
+
+            pbf_press_dpad(context, DPAD_DOWN, 20, 5);
+        }
+    }
+}
+
+
+void leave_phone_to_overworld(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+    while(true){
+        pbf_press_button(context, BUTTON_Y, 20, 250);
+
+        OverworldWatcher overworld(COLOR_CYAN);
+        context.wait_for_all_requests();
+
+        int ret = wait_until(
+            console, context,
+            std::chrono::seconds(10),
+            {overworld}
+        );
+
+        if (ret == 0){
+            return;
+        }
+    }
+}
 
 
 

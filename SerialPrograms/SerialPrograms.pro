@@ -643,6 +643,8 @@ SOURCES += \
     Source/PokemonSV/Inference/Picnics/PokemonSV_SandwichHandDetector.cpp \
     Source/PokemonSV/Inference/Picnics/PokemonSV_SandwichIngredientDetector.cpp \
     Source/PokemonSV/Inference/Picnics/PokemonSV_SandwichRecipeDetector.cpp \
+    Source/PokemonSV/Inference/Pokedex/PokemonSV_PokedexMenuDetector.cpp \
+    Source/PokemonSV/Inference/Pokedex/PokemonSV_PokedexShinyDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_AuctionItemNameReader.cpp \
     Source/PokemonSV/Inference/PokemonSV_ESPEmotionDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_MainMenuDetector.cpp \
@@ -715,6 +717,7 @@ SOURCES += \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_JoinTracker.cpp \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraBattler.cpp \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraMultiFarmer.cpp \
+    Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraRoller.cpp \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraRoutines.cpp \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraSelfFarmer.cpp \
     Source/PokemonSV/Programs/TestPrograms/PokemonSV_SoundListener.cpp \
@@ -1667,6 +1670,8 @@ HEADERS += \
     Source/PokemonSV/Inference/Picnics/PokemonSV_SandwichHandDetector.h \
     Source/PokemonSV/Inference/Picnics/PokemonSV_SandwichIngredientDetector.h \
     Source/PokemonSV/Inference/Picnics/PokemonSV_SandwichRecipeDetector.h \
+    Source/PokemonSV/Inference/Pokedex/PokemonSV_PokedexMenuDetector.h \
+    Source/PokemonSV/Inference/Pokedex/PokemonSV_PokedexShinyDetector.h \
     Source/PokemonSV/Inference/PokemonSV_AuctionItemNameReader.h \
     Source/PokemonSV/Inference/PokemonSV_ESPEmotionDetector.h \
     Source/PokemonSV/Inference/PokemonSV_MainMenuDetector.h \
@@ -1741,6 +1746,7 @@ HEADERS += \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_JoinTracker.h \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraBattler.h \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraMultiFarmer.h \
+    Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraRoller.h \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraRoutines.h \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraSelfFarmer.h \
     Source/PokemonSV/Programs/TestPrograms/PokemonSV_SoundListener.h \

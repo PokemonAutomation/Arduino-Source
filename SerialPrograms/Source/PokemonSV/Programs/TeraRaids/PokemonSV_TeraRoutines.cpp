@@ -651,6 +651,24 @@ TeraResult run_tera_summary(
 }
 
 
+void run_from_tera_battle(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+    pbf_mash_button(context, BUTTON_A, 800);
+
+    OverworldWatcher overworld(COLOR_RED);
+    context.wait_for_all_requests();
+
+    int ret = wait_until(
+        console, context,
+        std::chrono::seconds(100),
+        {overworld}
+    );
+
+    if (ret == 0){
+        return;
+    } else {
+        console.log("Error");
+    }
+}
 
 
 
