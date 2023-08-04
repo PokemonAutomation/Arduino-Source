@@ -229,7 +229,7 @@ void picnic_from_overworld(const ProgramInfo& info, ConsoleHandle& console, BotB
         switch (ret){
         case 0:
             console.log("Detected overworld.");
-            pbf_press_button(context, BUTTON_X, 20, 105); // open menu
+            pbf_press_button(context, BUTTON_X, 20, 105); // open menu 
             continue;
         case 1:
             console.log("Detected main menu.");
@@ -345,7 +345,7 @@ void enter_box_system_from_overworld(const ProgramInfo& info, ConsoleHandle& con
         switch (ret){
         case 0:
             console.log("Detected overworld.");
-            pbf_press_button(context, BUTTON_X, 20, 105); // open menu
+            pbf_press_button(context, BUTTON_X, 20, 105); // open menu 
             continue;
         case 1:
             console.log("Detected main menu.");
