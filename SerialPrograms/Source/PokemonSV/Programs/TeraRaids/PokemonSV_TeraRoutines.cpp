@@ -652,22 +652,33 @@ TeraResult run_tera_summary(
 
 
 void run_from_tera_battle(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+    console.log("Running away from tera raid battle...");
     pbf_mash_button(context, BUTTON_A, 800);
 
-    OverworldWatcher overworld(COLOR_RED);
-    context.wait_for_all_requests();
+    WallClock start = current_time();
+    while (true){
+        if (current_time() - start > std::chrono::minutes(2)){
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, console,
+                "run_from_tera_battle(): Failed to run away from tera raid battle after 2 minutes.",
+                true
+            );
+        }
 
-    int ret = wait_until(
-        console, context,
-        std::chrono::seconds(100),
-        {overworld}
-    );
+        OverworldWatcher overworld(COLOR_CYAN);
+        context.wait_for_all_requests();
 
-    if (ret == 0){
-        return;
-    } else {
-        console.log("run_from_tera_battle(): Failed to run away from tera battle after 100 seconds.");
+        int ret = wait_until(
+            console, context,
+            std::chrono::seconds(100),
+            {overworld}
+        );
+
+        if (ret == 0){
+            return;
+        }
     }
+        
 }
 
 

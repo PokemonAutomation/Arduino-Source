@@ -189,7 +189,7 @@ void fly_to_overworld_from_map(const ProgramInfo& info, ConsoleHandle& console, 
             console.log("Detected fly confirmation prompt.");
             pbf_press_button(context, BUTTON_A, 20, 130);
             continue;
-            
+
         default:
             throw OperationFailedException(
                 ErrorReport::SEND_ERROR_REPORT, console,
@@ -229,7 +229,7 @@ void picnic_from_overworld(const ProgramInfo& info, ConsoleHandle& console, BotB
         switch (ret){
         case 0:
             console.log("Detected overworld.");
-            pbf_press_button(context, BUTTON_X, 20, 105); // open menu 
+            pbf_press_button(context, BUTTON_X, 20, 105); // open menu
             continue;
         case 1:
             console.log("Detected main menu.");
@@ -297,7 +297,7 @@ void leave_picnic(const ProgramInfo& info, ConsoleHandle& console, BotBaseContex
     // Mash A to confirm
     pbf_mash_button(context, BUTTON_A, 150);
     context.wait_for_all_requests();
-    
+
     // Wait for overworld:
     OverworldWatcher overworld(COLOR_CYAN);
     int ret = wait_until(
@@ -345,7 +345,7 @@ void enter_box_system_from_overworld(const ProgramInfo& info, ConsoleHandle& con
         switch (ret){
         case 0:
             console.log("Detected overworld.");
-            pbf_press_button(context, BUTTON_X, 20, 105); // open menu 
+            pbf_press_button(context, BUTTON_X, 20, 105); // open menu
             continue;
         case 1:
             console.log("Detected main menu.");
@@ -400,34 +400,13 @@ void leave_box_system_to_overworld(const ProgramInfo& info, ConsoleHandle& conso
 
 
 void open_pokedex_from_overworld(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
-    {
-        OverworldWatcher overworld(COLOR_CYAN);
-        context.wait_for_all_requests();
-        int ret = wait_until(
-            console, context,
-            std::chrono::seconds(10),
-            {overworld}
-        );
-        context.wait_for(std::chrono::milliseconds(100));
-        if (ret == 0){
-            console.log("Detected overworld.");
-            pbf_press_button(context, BUTTON_MINUS, 20, 105); // open pokedex
-        }
-        else{
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
-                "open_pokedex_from_overworld(): No overworld state found after 10 seconds.",
-                true
-            );
-        }
-    }
-
+    console.log("Opening Pokédex...");
     WallClock start = current_time();
     while (true){
-        if (current_time() - start > std::chrono::minutes(1)){
+        if (current_time() - start > std::chrono::seconds(30)){
             throw OperationFailedException(
                 ErrorReport::SEND_ERROR_REPORT, console,
-                "open_pokedex_from_overworld(): Failed to open map after 1 minute.",
+                "open_pokedex_from_overworld(): Failed to open Pokédex after 30 seconds.",
                 true
             );
         }
@@ -462,31 +441,32 @@ void open_pokedex_from_overworld(const ProgramInfo& info, ConsoleHandle& console
 
 
 void open_recently_battled_from_pokedex(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+    console.log("Opening recently battled...");
     WallClock start = current_time();
-    while (true){
-        if (current_time() - start > std::chrono::minutes(1)){
+    while(true){
+        if (current_time() - start > std::chrono::seconds(30)){
             throw OperationFailedException(
                 ErrorReport::SEND_ERROR_REPORT, console,
-                "open_recently_battled_from_pokedex(): Failed to open recently battled after 1 minute.",
+                "open_recently_battled_from_pokedex(): Failed to open recently battled after 30 seconds.",
                 true
             );
         }
 
-        while(true){
-            PokedexMenuWatcher menu(console.logger(), COLOR_RED, true);
-            context.wait_for_all_requests();
+        PokedexMenuWatcher menu(console.logger(), COLOR_RED, true);
+        context.wait_for_all_requests();
 
-            int ret = wait_until(
-                console, context,
-                std::chrono::seconds(1),
-                {menu}
-            );
+        int ret = wait_until(
+            console, context,
+            std::chrono::seconds(1),
+            {menu}
+        );
 
-            if (ret == 0){
-                pbf_mash_button(context, BUTTON_A, 150);
-                return;
-            }
-
+        if (ret == 0){
+            console.log("Detected recently battled menu icon.");
+            pbf_mash_button(context, BUTTON_A, 150);
+            return;
+        } else {
+            console.log("Did not detect recently battled menu icon, moving down one space.");
             pbf_press_dpad(context, DPAD_DOWN, 20, 5);
         }
     }
@@ -494,22 +474,34 @@ void open_recently_battled_from_pokedex(const ProgramInfo& info, ConsoleHandle& 
 
 
 void leave_phone_to_overworld(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+    console.log("Exiting to overworld...");
+    pbf_press_button(context, BUTTON_Y, 20, 250);
+
+    WallClock start = current_time();
     while(true){
-        pbf_press_button(context, BUTTON_Y, 20, 250);
+        if (current_time() - start > std::chrono::seconds(30)){
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, console,
+                "leave_phone_to_overworld(): Failed to open return to overworld after 30 seconds.",
+                true
+            );
+        }
 
         OverworldWatcher overworld(COLOR_CYAN);
         context.wait_for_all_requests();
 
         int ret = wait_until(
             console, context,
-            std::chrono::seconds(100),
+            std::chrono::seconds(10),
             {overworld}
         );
 
         if (ret == 0){
+            console.log("Detected overworld.");
             return;
         } else {
-            env.console.log("leave_phone_to_overworld(): Failed to return to overworld after 100 seconds.");
+            console.log("Did not detect overworld, attempt to exit again.");
+            pbf_press_button(context, BUTTON_Y, 20, 250);
         }
     }
 }
