@@ -297,7 +297,7 @@ void leave_picnic(const ProgramInfo& info, ConsoleHandle& console, BotBaseContex
     // Mash A to confirm
     pbf_mash_button(context, BUTTON_A, 150);
     context.wait_for_all_requests();
-
+    
     // Wait for overworld:
     OverworldWatcher overworld(COLOR_CYAN);
     int ret = wait_until(
