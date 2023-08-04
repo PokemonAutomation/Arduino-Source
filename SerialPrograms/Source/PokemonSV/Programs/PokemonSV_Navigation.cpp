@@ -297,7 +297,7 @@ void leave_picnic(const ProgramInfo& info, ConsoleHandle& console, BotBaseContex
     // Mash A to confirm
     pbf_mash_button(context, BUTTON_A, 150);
     context.wait_for_all_requests();
-
+    
     // Wait for overworld:
     OverworldWatcher overworld(COLOR_CYAN);
     int ret = wait_until(
@@ -443,7 +443,7 @@ void open_pokedex_from_overworld(const ProgramInfo& info, ConsoleHandle& console
 void open_recently_battled_from_pokedex(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
     console.log("Opening recently battled...");
     WallClock start = current_time();
-    while(true){
+    while (true){
         if (current_time() - start > std::chrono::seconds(30)){
             throw OperationFailedException(
                 ErrorReport::SEND_ERROR_REPORT, console,
@@ -478,7 +478,7 @@ void leave_phone_to_overworld(const ProgramInfo& info, ConsoleHandle& console, B
     pbf_press_button(context, BUTTON_Y, 20, 250);
 
     WallClock start = current_time();
-    while(true){
+    while (true){
         if (current_time() - start > std::chrono::seconds(30)){
             throw OperationFailedException(
                 ErrorReport::SEND_ERROR_REPORT, console,
