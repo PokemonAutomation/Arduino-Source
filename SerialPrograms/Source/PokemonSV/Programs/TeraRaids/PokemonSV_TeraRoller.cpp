@@ -196,6 +196,7 @@ void TeraRoller::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
 
         if (open_raid(env.console, context)){
             stats.m_raids++;
+            env.update_stats();
         }else{
             continue;
         }
@@ -262,9 +263,6 @@ void TeraRoller::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
 
         if (ret == 0){
             env.console.log("Detected tera battle menu...");
-
-            stats.m_raids += 1;
-            env.update_stats();
 
             battle_menu.move_to_slot(env.console, context, 2);
             run_from_tera_battle(env.program_info(), env.console, context);
