@@ -9,7 +9,6 @@
 
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
-//#include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "CommonFramework/Options/LanguageOCROption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
@@ -65,16 +64,12 @@ private:
 
     //  Notifications
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
-    EventNotificationOption NOTIFICATION_NONSHINY;
     EventNotificationOption NOTIFICATION_SHINY;
+    EventNotificationOption m_notification_noop;
     EventNotificationsOption NOTIFICATIONS;
 
     uint16_t m_number_caught;
 
-    //  Per iteration flags.
-//    bool m_battle_finished;
-//    bool m_caught;
-//    bool m_summary_read;
 };
 
 

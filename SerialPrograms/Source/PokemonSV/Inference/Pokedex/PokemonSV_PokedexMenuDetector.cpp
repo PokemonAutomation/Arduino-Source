@@ -174,7 +174,7 @@ bool PokedexMenuWatcher::process_frame(const ImageViewRGB32& frame, WallClock ti
     }
 
     if (m_last_detected.load(std::memory_order_relaxed) == WallClock::min()){
-        m_logger.log("Detected Let's Go kill icon.");
+        m_logger.log("Detected Recently Battled menu icon.");
     }
     m_last_detected.store(timestamp, std::memory_order_release);
 

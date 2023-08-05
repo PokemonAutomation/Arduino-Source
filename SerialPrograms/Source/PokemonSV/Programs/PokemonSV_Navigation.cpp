@@ -424,10 +424,10 @@ void open_pokedex_from_overworld(const ProgramInfo& info, ConsoleHandle& console
         switch (ret){
         case 0:
             console.log("Detected overworld.");
-            pbf_press_button(context, BUTTON_MINUS, 20, 100); // open pokedex
+            pbf_press_button(context, BUTTON_MINUS, 20, 100); // Open Pokédex
             continue;
         case 1:
-            console.log("Detected pokedex.");
+            console.log("Detected Pokédex.");
             return;
         default:
             throw OperationFailedException(
@@ -447,7 +447,7 @@ void open_recently_battled_from_pokedex(const ProgramInfo& info, ConsoleHandle& 
         if (current_time() - start > std::chrono::seconds(30)){
             throw OperationFailedException(
                 ErrorReport::SEND_ERROR_REPORT, console,
-                "open_recently_battled_from_pokedex(): Failed to open recently battled after 30 seconds.",
+                "open_recently_battled_from_pokedex(): Failed to open Recently Battled after 30 seconds.",
                 true
             );
         }
@@ -462,11 +462,11 @@ void open_recently_battled_from_pokedex(const ProgramInfo& info, ConsoleHandle& 
         );
 
         if (ret == 0){
-            console.log("Detected recently battled menu icon.");
+            console.log("Detected Recently Battled menu icon.");
             pbf_mash_button(context, BUTTON_A, 150);
             return;
         } else {
-            console.log("Did not detect recently battled menu icon, moving down one space.");
+            console.log("Did not detect Recently Battled menu icon, moving down one...");
             pbf_press_dpad(context, DPAD_DOWN, 20, 5);
         }
     }

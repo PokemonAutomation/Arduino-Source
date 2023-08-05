@@ -19,7 +19,7 @@
 #include "CommonFramework/Tools/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
-//#include "Pokemon/Pokemon_Notification.h"
+#include "Pokemon/Pokemon_Notification.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_TeraBattleMenus.h"
 #include "PokemonSV/Inference/Pokedex/PokemonSV_PokedexShinyDetector.h"
@@ -27,7 +27,6 @@
 #include "PokemonSV/Inference/Tera/PokemonSV_TeraCardDetector.h"
 #include "PokemonSV/Inference/Tera/PokemonSV_TeraSilhouetteReader.h"
 #include "PokemonSV/Inference/Tera/PokemonSV_TeraTypeReader.h"
-//#include "PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
 #include "PokemonSV/Programs/PokemonSV_SaveGame.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSV/Programs/TeraRaids/PokemonSV_TeraRoutines.h"
@@ -138,20 +137,14 @@ TeraRoller::TeraRoller()
         LockWhileRunning::UNLOCKED
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
-    , NOTIFICATION_NONSHINY(
-        "Non-Shiny Encounter",
-        true, false,
-        {"Notifs"},
-        std::chrono::seconds(3600)
-    )
     , NOTIFICATION_SHINY(
         "Shiny Encounter",
         true, true, ImageAttachmentMode::JPG,
         {"Notifs", "Showcase"}
     )
+    , m_notification_noop("", false, false)
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS_UPDATE,
-        &NOTIFICATION_NONSHINY,
         &NOTIFICATION_SHINY,
         &NOTIFICATION_PROGRAM_FINISH,
         &NOTIFICATION_ERROR_RECOVERABLE,
@@ -247,9 +240,12 @@ void TeraRoller::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
             continue;
         }
 
+        // Enter tera raid battle alone
         pbf_press_dpad(context, DPAD_DOWN, 10, 10);
-        pbf_mash_button(context, BUTTON_A, 250); // Enter raid alone
+        pbf_mash_button(context, BUTTON_A, 250);
         overlay_set.clear();
+        env.console.log("Entering tera raid...");
+        env.console.overlay().add_log("Entering tera raid...", COLOR_WHITE);
 
         TeraBattleMenuWatcher battle_menu(COLOR_CYAN);
         context.wait_for_all_requests();
@@ -261,18 +257,22 @@ void TeraRoller::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
         );
 
         if (ret == 0){
-            env.console.log("Detected tera battle menu...");
+            env.console.log("Detected tera raid battle menu, running away...");
+            env.console.overlay().add_log("Running away...", COLOR_WHITE);
 
             battle_menu.move_to_slot(env.console, context, 2);
             run_from_tera_battle(env.program_info(), env.console, context);
             context.wait_for_all_requests();
 
+            env.console.log("Checking if tera raid is shiny...");
+            env.console.overlay().add_log("Checking Pokédex", COLOR_WHITE);
             open_pokedex_from_overworld(env.program_info(), env.console, context);
             open_recently_battled_from_pokedex(env.program_info(), env.console, context);
 
             pbf_wait(context, 200);
 
-            // Loop through all 5 candidates of recently battled pokemon for shinies
+            // Since when encountering the same species within 5 encounters is possible,
+            // loop through all 5 candidates of recently battled pokemon for shinies
             for(int i = 0; i < 5; i++){
                 PokedexShinyWatcher shiny_detector;
                 context.wait_for_all_requests();
@@ -284,35 +284,38 @@ void TeraRoller::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
                 );
 
                 if (ret2 == 0){
-                    env.console.log("Detected shiny!");
-
+                    env.console.log("Found a shiny tera raid!", COLOR_GREEN);
+                    env.console.overlay().add_log("Shiny!", COLOR_GREEN);
                     stats.m_shinies += 1;
 
+                    pbf_wait(context, 500); // Wait enough time for the Pokémon sprite to load
+                    context.wait_for_all_requests();
+                    send_encounter_notification(
+                        env,
+                        m_notification_noop,
+                        NOTIFICATION_SHINY,
+                        false, true, {{{}, ShinyType::UNKNOWN_SHINY}}, std::nan(""),
+                        env.console.video().snapshot()
+                    );
+
                     leave_phone_to_overworld(env.program_info(), env.console, context);
-                    env.console.log("Saving game...");
                     save_game_from_overworld(env.program_info(), env.console, context);
 
                     throw ProgramFinishedException();
-                } else {
-                    env.console.log("Not shiny...");
                 }
 
                 if (i < 4){
                     pbf_press_dpad(context, DPAD_RIGHT, 10, 20);
                 }
             }
+
+            env.console.log("Not a shiny tera raid...");
+            env.console.overlay().add_log("Not shiny", COLOR_WHITE);
             leave_phone_to_overworld(env.program_info(), env.console, context);
 
             pbf_wait(context, 50);
         } else {
             env.console.log("Failed to enter tera raid after 100 seconds.");
-        }
-
-        {
-            std::stringstream ss;
-            ss << "You encountered a " << stars << "* " << best_type << " " << best_silhouette << " raid";
-            env.log(ss.str());
-            env.console.overlay().add_log(ss.str(), COLOR_GREEN);
         }
     }
 
