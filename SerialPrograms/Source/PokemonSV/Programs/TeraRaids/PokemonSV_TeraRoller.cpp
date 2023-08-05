@@ -82,47 +82,23 @@ std::unique_ptr<StatsTracker> TeraRoller_Descriptor::make_stats() const{
 
 TeraRollerOpponentFilter::TeraRollerOpponentFilter()
     : GroupOption("Opponent Filter", LockWhileRunning::UNLOCKED)
-    , SKIP_HERBA(
-        "<b>Skip Non-Herba Raids:</b><br>"
-        "Skip raids that don't have the possibility to reward all types of Herba Mystica. This won't stop the program when Herba Mystica is found, it will only increase your chances to find it.",
-        LockWhileRunning::UNLOCKED,
-        false
-    )
     , MIN_STARS(
         "<b>Min Stars:</b><br>Skip raids with less than this many stars.",
         LockWhileRunning::UNLOCKED,
         1, 1, 7
     )
     , MAX_STARS(
-        "<b>Max Stars:</b><br>Skip raids with more than this many stars to save time since you're likely to lose.",
+        "<b>Max Stars:</b><br>Skip raids with more than this many stars.",
         LockWhileRunning::UNLOCKED,
         4, 1, 7
     )
 {
-    PA_ADD_OPTION(SKIP_HERBA);
     PA_ADD_OPTION(MIN_STARS);
     PA_ADD_OPTION(MAX_STARS);
 }
 
 bool TeraRollerOpponentFilter::should_battle(size_t stars, const std::string& pokemon) const{
     if (stars < MIN_STARS || stars > MAX_STARS){
-        return false;
-    }
-
-    static const std::set<std::string> fivestar{
-        "gengar", "glalie", "amoonguss", "dondozo", "palafin", "finizen", "blissey", "eelektross", "driftblim", "cetitan"
-    };
-    static const std::set<std::string> sixstar{
-        "blissey", "vaporeon", "amoonguss", "farigiraf", "cetitan", "dondozo"
-    };
-
-    if (SKIP_HERBA){
-        if (fivestar.find(pokemon) != fivestar.end()){
-            return true;
-        }
-        if (sixstar.find(pokemon) != sixstar.end()){
-            return true;
-        }
         return false;
     }
 
@@ -164,10 +140,6 @@ void TeraRoller::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
 
     if (FILTER.MIN_STARS > FILTER.MAX_STARS){
         throw UserSetupError(env.console, "Error in the settings, \"Min Stars\" is bigger than \"Max Stars\".");
-    }
-
-    if (FILTER.SKIP_HERBA && FILTER.MAX_STARS < 5){
-        throw UserSetupError(env.console, "Error in the settings, Skip Non-Herba Raids is checked but Max Stars is less than 5.");
     }
 
     //  Connect the controller.
