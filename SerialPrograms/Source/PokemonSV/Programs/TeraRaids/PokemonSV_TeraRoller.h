@@ -7,10 +7,8 @@
 #ifndef PokemonAutomation_PokemonSV_TeraRoller_H
 #define PokemonAutomation_PokemonSV_TeraRoller_H
 
-#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
-#include "CommonFramework/Options/LanguageOCROption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonSV/Options/PokemonSV_TeraAIOption.h"
 
@@ -56,8 +54,6 @@ private:
     bool run_raid(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
 private:
-    OCR::LanguageOCROption LANGUAGE;
-
     TeraRollerOpponentFilter FILTER;
     TeraAIOption BATTLE_AI;
 
@@ -66,8 +62,6 @@ private:
     EventNotificationOption NOTIFICATION_SHINY;
     EventNotificationOption m_notification_noop;
     EventNotificationsOption NOTIFICATIONS;
-
-    uint16_t m_number_caught;
 
 };
 

@@ -20,7 +20,6 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Pokemon_Notification.h"
-#include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_TeraBattleMenus.h"
 #include "PokemonSV/Inference/Pokedex/PokemonSV_PokedexShinyDetector.h"
 #include "PokemonSV/PokemonSV_Settings.h"
@@ -107,12 +106,7 @@ bool TeraRollerOpponentFilter::should_battle(size_t stars, const std::string& po
 
 
 TeraRoller::TeraRoller()
-    : LANGUAGE(
-        "<b>Game Language:</b>",
-        PokemonNameReader::instance().languages(),
-        LockWhileRunning::UNLOCKED
-    )
-    , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
+    : NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATION_SHINY(
         "Shiny Encounter",
         true, true, ImageAttachmentMode::JPG,
@@ -127,7 +121,6 @@ TeraRoller::TeraRoller()
         &NOTIFICATION_ERROR_FATAL,
     })
 {
-    PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(FILTER);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
