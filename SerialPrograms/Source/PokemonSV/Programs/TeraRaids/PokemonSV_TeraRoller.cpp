@@ -196,7 +196,6 @@ void TeraRoller::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
 
         if (open_raid(env.console, context)){
             stats.m_raids++;
-            env.update_stats();
         }else{
             continue;
         }
@@ -288,9 +287,9 @@ void TeraRoller::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
                     env.console.log("Detected shiny!");
 
                     stats.m_shinies += 1;
-                    env.update_stats();
 
                     leave_phone_to_overworld(env.program_info(), env.console, context);
+                    env.console.log("Saving game...");
                     save_game_from_overworld(env.program_info(), env.console, context);
 
                     throw ProgramFinishedException();
