@@ -265,7 +265,7 @@ void TeraRoller::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
             context.wait_for_all_requests();
 
             env.console.log("Checking if tera raid is shiny...");
-            env.console.overlay().add_log("Checking Pokédex", COLOR_WHITE);
+            env.console.overlay().add_log("Checking Pokédex...", COLOR_WHITE);
             open_pokedex_from_overworld(env.program_info(), env.console, context);
             open_recently_battled_from_pokedex(env.program_info(), env.console, context);
 
