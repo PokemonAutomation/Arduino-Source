@@ -423,7 +423,6 @@ void open_pokedex_from_overworld(const ProgramInfo& info, ConsoleHandle& console
         context.wait_for(std::chrono::milliseconds(100));
         switch (ret){
         case 0:
-            console.log("Detected overworld.");
             pbf_press_button(context, BUTTON_MINUS, 20, 100); // Open Pokédex
             continue;
         case 1:
@@ -452,7 +451,7 @@ void open_recently_battled_from_pokedex(const ProgramInfo& info, ConsoleHandle& 
             );
         }
 
-        PokedexMenuWatcher menu(console.logger(), COLOR_RED, true);
+        RecentlyBattledMenuWatcher menu;
         context.wait_for_all_requests();
 
         int ret = wait_until(

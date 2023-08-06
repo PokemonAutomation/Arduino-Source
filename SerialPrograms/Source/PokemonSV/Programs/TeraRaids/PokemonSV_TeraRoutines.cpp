@@ -653,7 +653,6 @@ TeraResult run_tera_summary(
 
 void run_from_tera_battle(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
     console.log("Running away from tera raid battle...");
-    pbf_mash_button(context, BUTTON_A, 800);
 
     WallClock start = current_time();
     while (true){
@@ -665,20 +664,35 @@ void run_from_tera_battle(const ProgramInfo& info, ConsoleHandle& console, BotBa
             );
         }
 
+        TeraBattleMenuWatcher battle_menu(COLOR_GREEN);
         OverworldWatcher overworld(COLOR_CYAN);
         context.wait_for_all_requests();
 
         int ret = wait_until(
             console, context,
-            std::chrono::seconds(100),
-            {overworld}
+            std::chrono::minutes(2),
+            {battle_menu, overworld}
         );
 
-        if (ret == 0){
+        context.wait_for(std::chrono::milliseconds(100));
+        switch (ret){
+        case 0:
+            console.log("Detected tera raid battle menu, running away...");
+            console.overlay().add_log("Running away...", COLOR_WHITE);
+            battle_menu.move_to_slot(console, context, 2);
+            pbf_mash_button(context, BUTTON_A, 800);
+            continue;
+        case 1:
+            console.log("Detected overworld.");
             return;
+        default:
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, console,
+                "run_from_tera_battle(): No recognized state after 2 minutes.",
+                true
+            );
         }
     }
-        
 }
 
 
