@@ -670,7 +670,7 @@ void run_from_tera_battle(const ProgramInfo& info, ConsoleHandle& console, BotBa
 
         int ret = wait_until(
             console, context,
-            std::chrono::minutes(2),
+            std::chrono::minutes(1),
             {battle_menu, overworld}
         );
 
@@ -688,7 +688,7 @@ void run_from_tera_battle(const ProgramInfo& info, ConsoleHandle& console, BotBa
         default:
             throw OperationFailedException(
                 ErrorReport::SEND_ERROR_REPORT, console,
-                "run_from_tera_battle(): No recognized state after 2 minutes.",
+                "run_from_tera_battle(): No recognized state after 1 minutes.",
                 true
             );
         }
