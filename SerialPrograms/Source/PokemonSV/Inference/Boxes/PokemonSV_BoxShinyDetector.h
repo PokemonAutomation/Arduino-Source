@@ -20,7 +20,7 @@ namespace PokemonSV{
 // Detect the shiny symbol on a pokemon in box system
 class BoxShinyDetector : public StaticScreenDetector{
 public:
-    BoxShinyDetector(Color color = COLOR_YELLOW);
+    BoxShinyDetector(Color color = COLOR_YELLOW, const ImageFloatBox& box = {0.878, 0.081, 0.028, 0.046});
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) const override;
@@ -34,10 +34,10 @@ class BoxShinyWatcher : public DetectorToFinder<BoxShinyDetector>{
 public:
     BoxShinyWatcher(
             Color color = COLOR_YELLOW,
-            const ImageFloatBox& shiny_box = {0.878, 0.081, 0.028, 0.046},
+            const ImageFloatBox& box = {0.878, 0.081, 0.028, 0.046},
             FinderType finder_type = FinderType::PRESENT
         )
-            : DetectorToFinder("BoxShinyWatcher", finder_type, std::chrono::milliseconds(100), color, shiny_box)
+            : DetectorToFinder("BoxShinyWatcher", finder_type, std::chrono::milliseconds(100), color, box)
     {}
 };
 
