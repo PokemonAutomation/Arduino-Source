@@ -36,7 +36,8 @@ class LetsGoKillWatcher : public DetectorToFinder<LetsGoKillDetector>{
 public:
     LetsGoKillWatcher(
         Logger& logger,
-        Color color, bool trigger_if_detected,
+        Color color, bool trigger_if_detected = true,
+        const ImageFloatBox& box = {0.71, 0.15, 0.04, 0.08},
         std::function<void()> on_kill_callback = nullptr,
         std::chrono::milliseconds duration = std::chrono::milliseconds(250)
     );

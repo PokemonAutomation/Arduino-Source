@@ -10,6 +10,7 @@
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
+#include "CommonFramework/Inference/VisualDetector.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
@@ -20,8 +21,8 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Pokemon_Notification.h"
-#include "PokemonSV/Inference/Pokedex/PokemonSV_PokedexShinyDetector.h"
 #include "PokemonSV/PokemonSV_Settings.h"
+#include "PokemonSV/Inference/Boxes/PokemonSV_BoxShinyDetector.h"
 #include "PokemonSV/Inference/Tera/PokemonSV_TeraCardDetector.h"
 #include "PokemonSV/Inference/Tera/PokemonSV_TeraSilhouetteReader.h"
 #include "PokemonSV/Inference/Tera/PokemonSV_TeraTypeReader.h"
@@ -226,7 +227,7 @@ void TeraRoller::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
         // Since encountering the same species within 5 encounters is possible,
         // loop through all 5 candidates of recently battled pokemon for shinies
         for(int i = 0; i < 5; i++){
-            PokedexShinyWatcher shiny_detector;
+            BoxShinyWatcher shiny_detector(COLOR_YELLOW, {0.187, 0.196, 0.028, 0.046});
             context.wait_for_all_requests();
 
             int ret2 = wait_until(

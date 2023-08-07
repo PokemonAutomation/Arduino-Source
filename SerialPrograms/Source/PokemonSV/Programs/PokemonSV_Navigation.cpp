@@ -11,10 +11,10 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_ScalarButtons.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_DateReader.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
-#include "PokemonSV/Inference/Pokedex/PokemonSV_PokedexMenuDetector.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
+#include "PokemonSV/Inference/Overworld/PokemonSV_LetsGoKillDetector.h"
 #include "PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
 #include "PokemonSV/Inference/PokemonSV_MapDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
@@ -451,7 +451,7 @@ void open_recently_battled_from_pokedex(const ProgramInfo& info, ConsoleHandle& 
             );
         }
 
-        RecentlyBattledMenuWatcher menu;
+        LetsGoKillWatcher menu(console.logger(), COLOR_RED, true, {0.23, 0.23, 0.04, 0.08});
         context.wait_for_all_requests();
 
         int ret = wait_until(
