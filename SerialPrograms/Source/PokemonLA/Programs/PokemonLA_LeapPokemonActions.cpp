@@ -25,10 +25,11 @@ void route(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& cont
     switch (pokemon) {
     case LeapPokemon::Aipom:
         goto_camp_from_jubilife(env, console, context, TravelLocations::instance().Coastlands_Beachside);
-        pbf_move_left_joystick(context, 240, 255, 30, 30);
+        pbf_move_left_joystick(context, 238, 255, 30, 30);
         pbf_press_button(context, BUTTON_ZL, 20, (uint16_t)(0.5 * TICKS_PER_SECOND));
         change_mount(console, context, MountState::BRAVIARY_ON);
-        pbf_press_button(context, BUTTON_B, (21 * TICKS_PER_SECOND), (1 * TICKS_PER_SECOND));
+        pbf_press_button(context, BUTTON_B, (20 * TICKS_PER_SECOND), (1 * TICKS_PER_SECOND));
+        pbf_press_button(context, BUTTON_PLUS, (1 * TICKS_PER_SECOND), (uint16_t)(0.5 * TICKS_PER_SECOND));
         pbf_move_left_joystick(context, 255, 160, 30, (uint16_t)(0.5 * TICKS_PER_SECOND));
         pbf_press_button(context, BUTTON_ZL, 20, (uint16_t)(0.5 * TICKS_PER_SECOND));
         pbf_move_left_joystick(context, 127, 0, (3 * TICKS_PER_SECOND), (1 * TICKS_PER_SECOND));
