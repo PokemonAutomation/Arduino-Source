@@ -222,21 +222,19 @@ void TeraRoller::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
         open_pokedex_from_overworld(env.program_info(), env.console, context);
         open_recently_battled_from_pokedex(env.program_info(), env.console, context);
 
-        pbf_wait(context, 200);
-
         // Since encountering the same species within 5 encounters is possible,
         // loop through all 5 candidates of recently battled pokemon for shinies
         for(int i = 0; i < 5; i++){
             BoxShinyWatcher shiny_detector(COLOR_YELLOW, {0.187, 0.196, 0.028, 0.046});
             context.wait_for_all_requests();
 
-            int ret2 = wait_until(
+            int ret = wait_until(
                 env.console, context,
                 std::chrono::seconds(1),
                 {shiny_detector}
             );
 
-            if (ret2 == 0){
+            if (ret == 0){
                 env.console.log("Found a shiny tera raid!", COLOR_GREEN);
                 env.console.overlay().add_log("Shiny!", COLOR_GREEN);
                 stats.m_shinies += 1;

@@ -463,6 +463,7 @@ void open_recently_battled_from_pokedex(const ProgramInfo& info, ConsoleHandle& 
         if (ret == 0){
             console.log("Detected Recently Battled menu icon.");
             pbf_mash_button(context, BUTTON_A, 150);
+            pbf_wait(context, 200);
             return;
         } else {
             console.log("Did not detect Recently Battled menu icon, moving down one...");
