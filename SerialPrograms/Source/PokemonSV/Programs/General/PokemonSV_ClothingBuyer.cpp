@@ -14,6 +14,7 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
+#include "PokemonSV/Inference/PokemonSV_ClothingTopDetector.h"
 #include "PokemonSV_ClothingBuyer.h"
 
 namespace PokemonAutomation{
@@ -40,13 +41,13 @@ ClothingBuyer::ClothingBuyer()
         LockWhileRunning::UNLOCKED, false
     )
     , WEAR_NEW_CLOTHES(
-        "<b>Put on new clothing after purchase:</b>",
+        "<b>Wear new clothing after purchase:</b>",
         LockWhileRunning::UNLOCKED, false
     )
-    , CATEGORY_ROTATION(
-        "<b>Rotate Categories:</b><br>This slows down the program, but ensures it will cover all categories.",
-        LockWhileRunning::UNLOCKED,
-        false
+    , NUM_CATEGORY(
+        "<b>Number of Categories:</b><br>The number of categories of clothing the shop has.",
+        LockWhileRunning::LOCKED,
+        1, 1, 5
     )
     , GO_HOME_WHEN_DONE(false)
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
@@ -58,7 +59,7 @@ ClothingBuyer::ClothingBuyer()
 {
     PA_ADD_OPTION(USE_LP);
     PA_ADD_OPTION(WEAR_NEW_CLOTHES);
-    PA_ADD_OPTION(CATEGORY_ROTATION);
+    PA_ADD_OPTION(NUM_CATEGORY);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
@@ -67,12 +68,16 @@ void ClothingBuyer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
     assert_16_9_720p_min(env.logger(), env.console);
 
     /*
-    * Start anywhere in clothing shop menu.
-    * Program will buy everything.
-    * Must be manually stopped unless you run out of money/LP.
+    * Start at the top of the first category in clothing shop menu.
+    * Program will buy everything in num of categories.
+    * Can set num category higher or lower and will still work.
+    * Lower - can buy only one category by setting to one and starting program on desired clothes type
+    * Higher - will take longer to finish as it will repeat an already purchased category
+    * Stop conditions: Out of money/lp, hit catogory count
     */
 
-    while (true) {
+    uint8_t category_rotation_count = 0;
+    while (category_rotation_count < NUM_CATEGORY) {
         pbf_press_button(context, BUTTON_A, 20, 100);
 
         AdvanceDialogWatcher already_purchased(COLOR_RED);
@@ -156,13 +161,30 @@ void ClothingBuyer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         pbf_wait(context, 100);
         context.wait_for_all_requests();
 
-        if (CATEGORY_ROTATION) {
-            pbf_press_dpad(context, DPAD_RIGHT, 10, 100);
-            pbf_wait(context, 100);
-            context.wait_for_all_requests();
+        ClothingTopWatcher top_item(COLOR_YELLOW);
+
+        int retTop = wait_until(
+            env.console, context,
+            std::chrono::seconds(1),
+            { top_item }
+        );
+        if (retTop == 0) {
+            env.log("Reached top of category.");
+            if (NUM_CATEGORY > 1) {
+                env.log("Category rotation set. Moving to next category.");
+                pbf_press_dpad(context, DPAD_RIGHT, 10, 100);
+                pbf_wait(context, 100);
+                context.wait_for_all_requests();
+                category_rotation_count++;
+            }
+            else {
+                env.log("No category rotation. Ending program.");
+                break;
+            }
         }
 
     }
+    env.log("Category num hit. Ending program.");
     GO_HOME_WHEN_DONE.run_end_of_program(context);
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 }

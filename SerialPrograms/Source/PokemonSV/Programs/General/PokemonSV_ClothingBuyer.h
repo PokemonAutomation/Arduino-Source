@@ -12,6 +12,7 @@
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
+#include "Common/Cpp/Options/SimpleIntegerOption.h"
 
 namespace PokemonAutomation {
 namespace NintendoSwitch {
@@ -32,7 +33,7 @@ public:
 private:
     BooleanCheckBoxOption USE_LP;
     BooleanCheckBoxOption WEAR_NEW_CLOTHES;
-    BooleanCheckBoxOption CATEGORY_ROTATION;
+    SimpleIntegerOption<uint8_t> NUM_CATEGORY;
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;
