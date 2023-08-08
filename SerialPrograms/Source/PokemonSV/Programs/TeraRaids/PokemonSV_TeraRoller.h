@@ -7,10 +7,10 @@
 #ifndef PokemonAutomation_PokemonSV_TeraRoller_H
 #define PokemonAutomation_PokemonSV_TeraRoller_H
 
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
-#include "PokemonSV/Options/PokemonSV_TeraAIOption.h"
 
 namespace PokemonAutomation{
    struct VideoSnapshot;
@@ -51,11 +51,8 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
-    bool run_raid(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-
-private:
+    BooleanCheckBoxOption CHECK_ONLY_FIRST;
     TeraRollerOpponentFilter FILTER;
-    TeraAIOption BATTLE_AI;
 
     //  Notifications
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;

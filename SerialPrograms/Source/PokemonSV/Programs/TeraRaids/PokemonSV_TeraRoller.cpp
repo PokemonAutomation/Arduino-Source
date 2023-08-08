@@ -101,12 +101,19 @@ bool TeraRollerOpponentFilter::should_battle(size_t stars, const std::string& po
         return false;
     }
 
+    // TODO: Add species filter
+
     return true;
 }
 
 
 TeraRoller::TeraRoller()
-    : NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
+    : CHECK_ONLY_FIRST(
+          "<b>Check Only the First Pokédex Page:</b><br>Reduce time per reset at the expense of not checking repeated encounters.",
+          LockWhileRunning::UNLOCKED,
+          false
+    )
+    , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATION_SHINY(
         "Shiny Encounter",
         true, true, ImageAttachmentMode::JPG,
@@ -121,6 +128,7 @@ TeraRoller::TeraRoller()
         &NOTIFICATION_ERROR_FATAL,
     })
 {
+    PA_ADD_OPTION(CHECK_ONLY_FIRST);
     PA_ADD_OPTION(FILTER);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
@@ -135,7 +143,7 @@ void TeraRoller::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
         throw UserSetupError(env.console, "Error in the settings, \"Min Stars\" is bigger than \"Max Stars\".");
     }
 
-    //  Connect the controller.
+    //  Connect the controller
     pbf_press_button(context, BUTTON_LCLICK, 10, 10);
 
     bool first = true;
@@ -255,7 +263,9 @@ void TeraRoller::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
                 throw ProgramFinishedException();
             }
 
-            if (i < 4){
+            if (CHECK_ONLY_FIRST) { // Check only the first Pokédex page
+                break;
+            } else if (i < 4){ // Check the remaining four Pokédex pages
                 pbf_press_dpad(context, DPAD_RIGHT, 10, 20);
             }
         }

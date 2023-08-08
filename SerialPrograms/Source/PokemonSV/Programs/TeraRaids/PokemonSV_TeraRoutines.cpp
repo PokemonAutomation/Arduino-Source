@@ -656,10 +656,11 @@ void run_from_tera_battle(const ProgramInfo& info, ConsoleHandle& console, BotBa
 
     WallClock start = current_time();
     while (true){
-        if (current_time() - start > std::chrono::minutes(2)){
+        // Having a lot of Abilities activating can take a while, setting 3 minutes to be safe
+        if (current_time() - start > std::chrono::minutes(3)){
             throw OperationFailedException(
                 ErrorReport::SEND_ERROR_REPORT, console,
-                "run_from_tera_battle(): Failed to run away from tera raid battle after 2 minutes.",
+                "run_from_tera_battle(): Failed to run away from tera raid battle after 3 minutes.",
                 true
             );
         }
