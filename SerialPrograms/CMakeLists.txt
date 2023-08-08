@@ -1373,6 +1373,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Programs/General/PokemonSV_AuctionFarmer.h
     Source/PokemonSV/Programs/General/PokemonSV_AutonomousBallThrower.cpp
     Source/PokemonSV/Programs/General/PokemonSV_AutonomousBallThrower.h
+    Source/PokemonSV/Programs/General/PokemonSV_ClothingBuyer.cpp
+    Source/PokemonSV/Programs/General/PokemonSV_ClothingBuyer.h
     Source/PokemonSV/Programs/General/PokemonSV_ESPTraining.cpp
     Source/PokemonSV/Programs/General/PokemonSV_ESPTraining.h
     Source/PokemonSV/Programs/General/PokemonSV_GimmighoulChestFarmer.cpp
