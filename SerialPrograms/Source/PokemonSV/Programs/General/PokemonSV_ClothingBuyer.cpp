@@ -77,28 +77,32 @@ void ClothingBuyer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
     */
 
     uint8_t category_rotation_count = 0;
+    bool finish_program = false;
     while (category_rotation_count < NUM_CATEGORY) {
         pbf_press_button(context, BUTTON_A, 20, 100);
 
         AdvanceDialogWatcher already_purchased(COLOR_RED);
         PromptDialogWatcher buy_yes_no(COLOR_CYAN);
-        PromptDialogWatcher wear_yes_no(COLOR_CYAN);
-        AdvanceDialogWatcher afford_yes_no(COLOR_RED);
 
         int ret = wait_until(
             env.console, context,
             std::chrono::seconds(10),
             { already_purchased, buy_yes_no }
         );
-        if (ret == 0) {
-            env.log("Item already purchased.");
-            pbf_press_button(context, BUTTON_A, 10, 100);
-            send_program_status_notification(
-                env, NOTIFICATION_STATUS_UPDATE,
-                "Item already purchased."
-            );
-        }
-        else if (ret == 1) {
+        switch (ret) {
+        case 0:
+                env.log("Item already purchased.");
+                pbf_press_button(context, BUTTON_A, 10, 100);
+                send_program_status_notification(
+                    env, NOTIFICATION_STATUS_UPDATE,
+                    "Item already purchased."
+                );
+                break;
+        case 1:
+        {
+            PromptDialogWatcher wear_yes_no(COLOR_CYAN);
+            AdvanceDialogWatcher afford_yes_no(COLOR_RED);
+
             env.log("Detected purchase prompt.");
 
             if (USE_LP) {
@@ -116,7 +120,8 @@ void ClothingBuyer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
                 std::chrono::seconds(10),
                 { wear_yes_no, afford_yes_no }
             );
-            if (retWear == 0) {
+            switch (retWear) {
+            case 0:
                 if (!WEAR_NEW_CLOTHES) {
                     env.log("Do not wear new clothes.");
                     pbf_press_dpad(context, DPAD_DOWN, 10, 100);
@@ -130,32 +135,40 @@ void ClothingBuyer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
                     env, NOTIFICATION_STATUS_UPDATE,
                     "Clothing purchased. Selecting next item."
                 );
-            }
-            else if (retWear == 1) {
+                break;
+            case 1:
                 env.log("Out of Cash/LP.");
                 send_program_status_notification(
                     env, NOTIFICATION_STATUS_UPDATE,
                     "Out of Cash/LP."
                 );
+                finish_program = true;
                 break;
-            }
-            else {
+            default:
                 env.log("Error looking for wear prompt.");
                 throw OperationFailedException(
                     ErrorReport::SEND_ERROR_REPORT, env.console,
                     "Error looking for wear prompt.",
                     true
                 );
+                break;
             }
+            break;
         }
-        else {
-            env.log("Error looking for purchase prompt.");
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
-                "Error looking for purchase prompt.",
-                true
-            );
+        default:
+                env.log("Error looking for purchase prompt.");
+                throw OperationFailedException(
+                    ErrorReport::SEND_ERROR_REPORT, env.console,
+                    "Error looking for purchase prompt.",
+                    true
+                );
+                break;
         }
+        //Out of cash/LP, stop.
+        if (finish_program) {
+            break;
+        }
+
         pbf_press_dpad(context, DPAD_DOWN, 10, 100);
         //Wait to load a bit for next item
         pbf_wait(context, 100);
