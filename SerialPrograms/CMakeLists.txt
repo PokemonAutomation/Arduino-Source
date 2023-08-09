@@ -1433,6 +1433,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraBattler.h
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraMultiFarmer.cpp
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraMultiFarmer.h
+    Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraRoller.cpp
+    Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraRoller.h
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraRoutines.cpp
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraRoutines.h
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraSelfFarmer.cpp

@@ -715,6 +715,7 @@ SOURCES += \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_JoinTracker.cpp \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraBattler.cpp \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraMultiFarmer.cpp \
+    Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraRoller.cpp \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraRoutines.cpp \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraSelfFarmer.cpp \
     Source/PokemonSV/Programs/TestPrograms/PokemonSV_SoundListener.cpp \
@@ -1741,6 +1742,7 @@ HEADERS += \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_JoinTracker.h \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraBattler.h \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraMultiFarmer.h \
+    Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraRoller.h \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraRoutines.h \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraSelfFarmer.h \
     Source/PokemonSV/Programs/TestPrograms/PokemonSV_SoundListener.h \

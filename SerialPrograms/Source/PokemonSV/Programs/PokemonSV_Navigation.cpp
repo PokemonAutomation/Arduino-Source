@@ -14,6 +14,7 @@
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
+#include "PokemonSV/Inference/Overworld/PokemonSV_LetsGoKillDetector.h"
 #include "PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
 #include "PokemonSV/Inference/PokemonSV_MapDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
@@ -398,6 +399,112 @@ void leave_box_system_to_overworld(const ProgramInfo& info, ConsoleHandle& conso
 }
 
 
+void open_pokedex_from_overworld(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+    console.log("Opening Pokédex...");
+    WallClock start = current_time();
+    while (true){
+        if (current_time() - start > std::chrono::seconds(30)){
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, console,
+                "open_pokedex_from_overworld(): Failed to open Pokédex after 30 seconds.",
+                true
+            );
+        }
+
+        OverworldWatcher overworld(COLOR_CYAN);
+        MapExitWatcher pokedex(COLOR_RED);
+
+        context.wait_for_all_requests();
+        int ret = wait_until(
+            console, context,
+            std::chrono::seconds(30),
+            {overworld, pokedex}
+        );
+        context.wait_for(std::chrono::milliseconds(100));
+        switch (ret){
+        case 0:
+            pbf_press_button(context, BUTTON_MINUS, 20, 100); // Open Pokédex
+            continue;
+        case 1:
+            console.log("Detected Pokédex.");
+            return;
+        default:
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, console,
+                "open_pokedex_from_overworld(): No recognized state after 30 seconds.",
+                true
+            );
+        }
+    }
+}
+
+
+void open_recently_battled_from_pokedex(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+    console.log("Opening recently battled...");
+    WallClock start = current_time();
+    while (true){
+        if (current_time() - start > std::chrono::seconds(30)){
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, console,
+                "open_recently_battled_from_pokedex(): Failed to open Recently Battled after 30 seconds.",
+                true
+            );
+        }
+
+        LetsGoKillWatcher menu(console.logger(), COLOR_RED, true, {0.23, 0.23, 0.04, 0.08});
+        context.wait_for_all_requests();
+
+        int ret = wait_until(
+            console, context,
+            std::chrono::seconds(1),
+            {menu}
+        );
+
+        if (ret == 0){
+            console.log("Detected Recently Battled menu icon.");
+            pbf_mash_button(context, BUTTON_A, 150);
+            pbf_wait(context, 200);
+            return;
+        } else {
+            console.log("Did not detect Recently Battled menu icon, moving down one...");
+            pbf_press_dpad(context, DPAD_DOWN, 20, 5);
+        }
+    }
+}
+
+
+void leave_phone_to_overworld(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+    console.log("Exiting to overworld...");
+    pbf_press_button(context, BUTTON_Y, 20, 250);
+
+    WallClock start = current_time();
+    while (true){
+        if (current_time() - start > std::chrono::seconds(30)){
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, console,
+                "leave_phone_to_overworld(): Failed to return to overworld after 30 seconds.",
+                true
+            );
+        }
+
+        OverworldWatcher overworld(COLOR_CYAN);
+        context.wait_for_all_requests();
+
+        int ret = wait_until(
+            console, context,
+            std::chrono::seconds(10),
+            {overworld}
+        );
+
+        if (ret == 0){
+            console.log("Detected overworld.");
+            return;
+        } else {
+            console.log("Did not detect overworld, attempt to exit again.");
+            pbf_press_button(context, BUTTON_Y, 20, 250);
+        }
+    }
+}
 
 
 

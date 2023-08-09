@@ -45,6 +45,14 @@ void enter_box_system_from_overworld(const ProgramInfo& info, ConsoleHandle& con
 //  From box system go to overworld.
 void leave_box_system_to_overworld(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
 
+//  From overworld, open Pokédex.
+void open_pokedex_from_overworld(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
+
+//  From Pokédex, open Recently Battled.
+void open_recently_battled_from_pokedex(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
+
+//  From any of the rotom phone apps (Map/Pokédex/Profile) go to overworld.
+void leave_phone_to_overworld(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
 
 
 }
