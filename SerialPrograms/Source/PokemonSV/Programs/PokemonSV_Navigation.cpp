@@ -482,7 +482,7 @@ void leave_phone_to_overworld(const ProgramInfo& info, ConsoleHandle& console, B
         if (current_time() - start > std::chrono::seconds(30)){
             throw OperationFailedException(
                 ErrorReport::SEND_ERROR_REPORT, console,
-                "leave_phone_to_overworld(): Failed to open return to overworld after 30 seconds.",
+                "leave_phone_to_overworld(): Failed to return to overworld after 30 seconds.",
                 true
             );
         }
