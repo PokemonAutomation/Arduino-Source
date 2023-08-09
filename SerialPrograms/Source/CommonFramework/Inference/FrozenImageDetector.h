@@ -9,8 +9,9 @@
 #define PokemonAutomation_CommonFramework_FrozenImageDetector_H
 
 #include "Common/Cpp/Color.h"
-#include "CommonFramework/ImageTypes/ImageRGB32.h"
+//#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 
 namespace PokemonAutomation{
@@ -25,6 +26,7 @@ public:
     );
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
+    virtual bool process_frame(const VideoSnapshot& frame) override;
     virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
 
 private:
@@ -32,8 +34,7 @@ private:
     ImageFloatBox m_box;
     std::chrono::milliseconds m_timeout;
     double m_rmsd_threshold;
-    WallClock m_timestamp;
-    ImageRGB32 m_previous;
+    VideoSnapshot m_previous;
 };
 
 
