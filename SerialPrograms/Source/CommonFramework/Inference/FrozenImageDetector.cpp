@@ -9,9 +9,9 @@
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "FrozenImageDetector.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 
