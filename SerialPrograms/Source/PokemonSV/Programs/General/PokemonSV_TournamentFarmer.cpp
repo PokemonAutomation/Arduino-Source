@@ -88,9 +88,9 @@ TournamentFarmer::TournamentFarmer()
           0, 0
           )
     , MONEY_LIMIT(
-        "<b>Stop after earning this amount of money:</b><br>Zero disables this check. Does not count losses. Max is 999,999,999.",
+        "<b>Stop after earning this amount of money:</b><br>Zero disables this check. Does not count losses. In-game maximum is 9,999,999. This can be set up to 999,999,999.",
         LockWhileRunning::UNLOCKED,
-        999999999, 0, 999999999
+        9999999, 0, 999999999
     )
     , HHH_ZOROARK(
         "<b>Happy Hour H-Zoroark:</b><br>Check this if you have an event Hisuian Zoroark with Happy Hour and Memento as your lead.<br>Happy Hour must be in its first move slot and Memento must be in its second.<br>",
