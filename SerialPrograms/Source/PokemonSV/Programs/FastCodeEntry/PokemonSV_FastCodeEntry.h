@@ -34,6 +34,7 @@ private:
     enum class Mode{
         NORMAL,
         ENTER_ON_PASTE,
+        MYSTERY_GIFT
     };
     EnumDropdownOption<Mode> MODE;
 
