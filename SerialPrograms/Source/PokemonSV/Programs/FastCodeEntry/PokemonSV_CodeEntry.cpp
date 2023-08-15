@@ -72,14 +72,14 @@ const char* normalize_code(std::string& normalized_code, const std::string& code
 
     switch (normalized_code.size()){
     case 4:
-        if (!digits_only){
+        if (!digits_only && !override_mode){
             return "4-digit codes must be only digits.";
         }
         break;
     case 6:
         break;
     case 8:
-        if (!digits_only){
+        if (!digits_only && !override_mode){
             return "8-digit codes must be only digits.";
         }
         break;
