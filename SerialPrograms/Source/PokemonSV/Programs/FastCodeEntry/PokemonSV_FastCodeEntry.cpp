@@ -118,17 +118,9 @@ private:
 void FastCodeEntry::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
     FastCodeEntrySettings settings(SETTINGS);
 
-    if (MODE == Mode::NORMAL){
+    if (MODE == Mode::NORMAL || MODE == Mode::MYSTERY_GIFT){
         const char* error = enter_code(env, scope, settings, CODE, true);
-        if (error){
-            throw UserSetupError(env.logger(), error);
-        }
-        return;
-    }
-
-    if (MODE == Mode::MYSTERY_GIFT){
-        const char* error = enter_code(env, scope, settings, CODE, true, true);
-        if (error){
+        if (MODE == Mode::NORMAL && error){
             throw UserSetupError(env.logger(), error);
         }
         return;

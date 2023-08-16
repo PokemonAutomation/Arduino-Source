@@ -70,24 +70,25 @@ const char* normalize_code(std::string& normalized_code, const std::string& code
         normalized_code += ch;
     }
 
+    if (override_mode){
+        return nullptr;
+    }
+
     switch (normalized_code.size()){
     case 4:
-        if (!digits_only && !override_mode){
+        if (!digits_only){
             return "4-digit codes must be only digits.";
         }
         break;
     case 6:
         break;
     case 8:
-        if (!digits_only && !override_mode){
+        if (!digits_only){
             return "8-digit codes must be only digits.";
         }
         break;
     default:
-        if (!override_mode){
-            return "Invalid code length. Must be 4, 6, or 8 characters long.";
-        }
-        break;
+        return "Invalid code length. Must be 4, 6, or 8 characters long.";
     }
 
     return nullptr;
