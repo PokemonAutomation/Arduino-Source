@@ -16,7 +16,7 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 
-const char* normalize_code(std::string& normalized_code, const std::string& code){
+const char* normalize_code(std::string& normalized_code, const std::string& code, bool override_mode){
     static const std::map<char, char> MAP{
         {'1', '1'}, {'I', '1'}, {'i', '1'},
         {'2', '2'},
@@ -70,6 +70,10 @@ const char* normalize_code(std::string& normalized_code, const std::string& code
         normalized_code += ch;
     }
 
+    if (override_mode){
+        return nullptr;
+    }
+
     switch (normalized_code.size()){
     case 4:
         if (!digits_only){
@@ -93,11 +97,21 @@ const char* normalize_code(std::string& normalized_code, const std::string& code
 void enter_code(
     ConsoleHandle& console, BotBaseContext& context,
     const FastCodeEntrySettings& settings, const std::string& normalized_code,
-    bool connect_controller_press
+    bool connect_controller_press,
+    bool override_mode
 ){
     if (connect_controller_press){
         //  Connect the controller.
         pbf_press_button(context, BUTTON_R | BUTTON_L, 5, 3);
+    }
+
+    if (override_mode){
+        enter_alphanumeric_code(
+            console.logger(), context,
+            settings,
+            normalized_code
+        );
+        return;
     }
 
     switch (normalized_code.size()){
@@ -119,10 +133,11 @@ void enter_code(
 const char* enter_code(
     MultiSwitchProgramEnvironment& env, CancellableScope& scope,
     const FastCodeEntrySettings& settings, const std::string& code,
-    bool connect_controller_press
+    bool connect_controller_press,
+    bool override_mode
 ){
     std::string normalized_code;
-    const char* error = normalize_code(normalized_code, code);
+    const char* error = normalize_code(normalized_code, code, override_mode);
     if (error){
         return error;
     }
@@ -131,6 +146,15 @@ const char* enter_code(
         if (connect_controller_press){
             //  Connect the controller.
             pbf_press_button(context, BUTTON_R | BUTTON_L, 5, 3);
+        }
+
+        if (override_mode){
+            enter_alphanumeric_code(
+                console.logger(), context,
+                settings,
+                normalized_code
+            );
+            return;
         }
 
         switch (normalized_code.size()){
