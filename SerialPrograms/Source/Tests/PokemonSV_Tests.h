@@ -52,6 +52,8 @@ int test_pokemonSV_AdvanceDialogDetector(const ImageViewRGB32& image, bool targe
 
 int test_pokemonSV_SwapMenuDetector(const ImageViewRGB32& image, bool target);
 
+int test_pokemonSV_DialogBoxDetector(const ImageViewRGB32& image, bool target);
+
 }
 
 #endif
