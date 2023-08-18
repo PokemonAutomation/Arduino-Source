@@ -83,6 +83,7 @@ private:
         NoAutoSave,
         AfterStartAndKeep,
         EveryBatch,
+        AfterFetchComplete,
     };
     EnumDropdownOption<AutoSave> AUTO_SAVING;
 

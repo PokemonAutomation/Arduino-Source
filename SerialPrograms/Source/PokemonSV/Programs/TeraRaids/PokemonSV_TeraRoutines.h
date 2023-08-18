@@ -113,6 +113,8 @@ TeraResult run_tera_summary(
     std::atomic<uint64_t>* stat_shinies
 );
 
+//  Run away from tera battle.
+void run_from_tera_battle(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
 
 
 

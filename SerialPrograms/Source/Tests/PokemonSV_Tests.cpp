@@ -443,4 +443,11 @@ int test_pokemonSV_SwapMenuDetector(const ImageViewRGB32& image, bool target) {
     return 0;
 }
 
+int test_pokemonSV_DialogBoxDetector(const ImageViewRGB32& image, bool target) {
+    DialogBoxDetector detector(COLOR_RED);
+    bool result = detector.detect(image);
+    TEST_RESULT_EQUAL(result, target);
+    return 0;
+}
+
 }

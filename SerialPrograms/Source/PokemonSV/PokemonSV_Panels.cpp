@@ -24,6 +24,7 @@
 #include "Programs/General/PokemonSV_TournamentFarmer.h"
 #include "Programs/Sandwiches/PokemonSV_SandwichMaker.h"
 #include "Programs/General/PokemonSV_SizeChecker.h"
+#include "Programs/General/PokemonSV_ClothingBuyer.h"
 
 #include "Programs/Eggs/PokemonSV_EggFetcher.h"
 #include "Programs/Eggs/PokemonSV_EggHatcher.h"
@@ -32,6 +33,7 @@
 #include "Programs/TeraRaids/PokemonSV_AutoHost.h"
 #include "Programs/TeraRaids/PokemonSV_TeraSelfFarmer.h"
 #include "Programs/TeraRaids/PokemonSV_TeraMultiFarmer.h"
+#include "Programs/TeraRaids/PokemonSV_TeraRoller.h"
 
 #include "Programs/FastCodeEntry/PokemonSV_FastCodeEntry.h"
 #include "Programs/FastCodeEntry/PokemonSV_ClipboardFastCodeEntry.h"
@@ -70,6 +72,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<AutonomousBallThrower_Descriptor, AutonomousBallThrower>());
     ret.emplace_back(make_single_switch_program<StatsReset_Descriptor, StatsReset>());
     ret.emplace_back(make_single_switch_program<SizeChecker_Descriptor, SizeChecker>());
+    ret.emplace_back(make_single_switch_program<ClothingBuyer_Descriptor, ClothingBuyer>());
 
 //    ret.emplace_back("---- Trading ----");
     ret.emplace_back(make_multi_switch_program<SelfBoxTrade_Descriptor, SelfBoxTrade>());
@@ -96,6 +99,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<AutoHost_Descriptor, AutoHost>());
     ret.emplace_back(make_single_switch_program<TeraSelfFarmer_Descriptor, TeraSelfFarmer>());
     ret.emplace_back(make_multi_switch_program<TeraMultiFarmer_Descriptor, TeraMultiFarmer>());
+    ret.emplace_back(make_single_switch_program<TeraRoller_Descriptor, TeraRoller>());
 
     ret.emplace_back("---- Fast Code Entry ----");
     ret.emplace_back(make_multi_switch_program<FastCodeEntry_Descriptor, FastCodeEntry>());

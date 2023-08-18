@@ -1289,6 +1289,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Inference/Picnics/PokemonSV_SandwichRecipeDetector.h
     Source/PokemonSV/Inference/PokemonSV_AuctionItemNameReader.cpp
     Source/PokemonSV/Inference/PokemonSV_AuctionItemNameReader.h
+    Source/PokemonSV/Inference/PokemonSV_ClothingTopDetector.cpp
+    Source/PokemonSV/Inference/PokemonSV_ClothingTopDetector.h
     Source/PokemonSV/Inference/PokemonSV_ESPEmotionDetector.cpp
     Source/PokemonSV/Inference/PokemonSV_ESPEmotionDetector.h
     Source/PokemonSV/Inference/PokemonSV_MainMenuDetector.cpp
@@ -1373,6 +1375,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Programs/General/PokemonSV_AuctionFarmer.h
     Source/PokemonSV/Programs/General/PokemonSV_AutonomousBallThrower.cpp
     Source/PokemonSV/Programs/General/PokemonSV_AutonomousBallThrower.h
+    Source/PokemonSV/Programs/General/PokemonSV_ClothingBuyer.cpp
+    Source/PokemonSV/Programs/General/PokemonSV_ClothingBuyer.h
     Source/PokemonSV/Programs/General/PokemonSV_ESPTraining.cpp
     Source/PokemonSV/Programs/General/PokemonSV_ESPTraining.h
     Source/PokemonSV/Programs/General/PokemonSV_GimmighoulChestFarmer.cpp
@@ -1433,6 +1437,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraBattler.h
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraMultiFarmer.cpp
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraMultiFarmer.h
+    Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraRoller.cpp
+    Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraRoller.h
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraRoutines.cpp
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraRoutines.h
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraSelfFarmer.cpp

@@ -121,6 +121,8 @@
 #include "PokemonSV/Inference/Battles/PokemonSV_TeraBattleMenus.h"
 //#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_DetectHome.h"
+#include "PokemonSV/Inference/Picnics/PokemonSV_SandwichRecipeDetector.h"
+#include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_BattleMenu.h"
 
 #ifdef PA_ARCH_x86
 //#include "Kernels/Kernels_x64_SSE41.h"
@@ -223,6 +225,16 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     using namespace Pokemon;
 //    using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
 
+
+    ImageRGB32 image("20230726-213101330270-ProgramHang.png");
+    NintendoSwitch::PokemonSwSh::MaxLairInternal::BattleMenuDetector detector;
+    cout << detector.detect(image) << endl;
+
+//    SandwichRecipeNumberDetector detector(env.logger());
+//    size_t recipe_IDs[6];
+//    detector.detect_recipes(image, recipe_IDs);
+
+#if 0
     {
         ImageRGB32 image("20230630-084354220241.jpg");
         TeraLobbyReader reader(env.logger(), env.inference_dispatcher());
@@ -232,7 +244,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
         ImageRGB32 image("name1.png");
         cout << OCR::ocr_read(Language::Japanese, image) << endl;
     }
-
+#endif
 
 
 //    ImageRGB32 image("20230427-200550386826-OperationFailedException.png");
