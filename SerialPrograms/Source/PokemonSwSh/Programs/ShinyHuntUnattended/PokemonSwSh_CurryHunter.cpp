@@ -60,8 +60,7 @@ CurryHunter::CurryHunter()
     , SMALL_POKEMON(
         "<b>Walk up Delay:</b><br>Wait this long for the " + STRING_POKEMON + " to walk up to you.",
         LockWhileRunning::LOCKED,
-        TICKS_PER_SECOND,
-        "2 * TICKS_PER_SECOND"
+        50
     )
     , TAKE_VIDEO(
         "<b>Take Videos:</b><br>Take a video after each cooking iteration. This will spam your album with videos.",
