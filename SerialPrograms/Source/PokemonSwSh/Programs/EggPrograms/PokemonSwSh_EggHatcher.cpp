@@ -114,7 +114,7 @@ EggHatcher::EggHatcher()
 }
 void EggHatcher::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     //  Calculate upper bounds for incubation time.
-    uint16_t INCUBATION_DELAY_UPPER = (uint16_t)((uint32_t)STEPS_TO_HATCH * (uint32_t)103180 >> 16);
+    uint16_t INCUBATION_DELAY_UPPER = (uint16_t)((uint32_t)STEPS_TO_HATCH * 2 * (uint32_t)103180 >> 16);
     uint16_t TOTAL_DELAY = INCUBATION_DELAY_UPPER + HATCH_DELAY + SAFETY_TIME0 - TRAVEL_RIGHT_DURATION;
 
     if (START_LOCATION.start_in_grip_menu()){

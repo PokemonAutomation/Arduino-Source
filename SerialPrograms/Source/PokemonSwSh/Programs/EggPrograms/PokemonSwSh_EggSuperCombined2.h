@@ -14,7 +14,7 @@
 #include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonSwSh/Options/PokemonSwSh_DateToucher.h"
-#include "PokemonSwSh/Options/PokemonSwSh_EggStepCount.h"
+#include "PokemonSwSh/Options/PokemonSwSh_EggStepOption.h"
 #include "PokemonSwSh_EggHelpers.h"
 
 namespace PokemonAutomation{

@@ -881,6 +881,8 @@ file(GLOB MAIN_SOURCES
     Source/Pokemon/Resources/Pokemon_BerryNames.h
     Source/Pokemon/Resources/Pokemon_BerrySprites.cpp
     Source/Pokemon/Resources/Pokemon_BerrySprites.h
+    Source/Pokemon/Resources/Pokemon_EggSteps.cpp
+    Source/Pokemon/Resources/Pokemon_EggSteps.h
     Source/Pokemon/Resources/Pokemon_PokeballNames.cpp
     Source/Pokemon/Resources/Pokemon_PokeballNames.h
     Source/Pokemon/Resources/Pokemon_PokemonNames.cpp
@@ -941,6 +943,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonBDSP/Options/PokemonBDSP_BerrySelectOption.h
     Source/PokemonBDSP/Options/PokemonBDSP_BerryTable.cpp
     Source/PokemonBDSP/Options/PokemonBDSP_BerryTable.h
+    Source/PokemonBDSP/Options/PokemonBDSP_EggStepOption.cpp
+    Source/PokemonBDSP/Options/PokemonBDSP_EggStepOption.h
     Source/PokemonBDSP/Options/PokemonBDSP_EncounterBotCommon.h
     Source/PokemonBDSP/Options/PokemonBDSP_LearnMove.h
     Source/PokemonBDSP/Options/PokemonBDSP_ShortcutDirection.cpp
@@ -1652,7 +1656,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSwSh/Options/PokemonSwSh_CramomaticTable.h
     Source/PokemonSwSh/Options/PokemonSwSh_DateToucher.cpp
     Source/PokemonSwSh/Options/PokemonSwSh_DateToucher.h
-    Source/PokemonSwSh/Options/PokemonSwSh_EggStepCount.h
+    Source/PokemonSwSh/Options/PokemonSwSh_EggStepOption.cpp
+    Source/PokemonSwSh/Options/PokemonSwSh_EggStepOption.h
     Source/PokemonSwSh/Options/PokemonSwSh_EncounterBotCommon.h
     Source/PokemonSwSh/Options/PokemonSwSh_RegiSelector.h
     Source/PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Battle.cpp
