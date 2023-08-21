@@ -14,7 +14,7 @@
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
-#include "PokemonSwSh/Options/PokemonSwSh_EggStepCount.h"
+#include "PokemonBDSP/Options/PokemonBDSP_EggStepOption.h"
 //#include "PokemonBDSP/Options/PokemonBDSP_ShortcutDirection.h"
 
 namespace PokemonAutomation{
