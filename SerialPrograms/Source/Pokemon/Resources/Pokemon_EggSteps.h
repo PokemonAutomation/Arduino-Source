@@ -11,12 +11,15 @@
 #include "CommonFramework/Options/StringSelectOption.h"
 
 namespace PokemonAutomation{
+
+class SpriteDatabase;
+
 namespace Pokemon{
 
 
 class EggStepDatabase{
 public:
-    EggStepDatabase(const char* resource_path);
+    EggStepDatabase(const char* resource_path, const SpriteDatabase* sprites);
 
     size_t step_count(const std::string& slug) const;
     const StringSelectDatabase& database() const{

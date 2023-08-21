@@ -5,6 +5,7 @@
  */
 
 #include "Pokemon/Resources/Pokemon_EggSteps.h"
+#include "PokemonSwSh/Resources/PokemonSwSh_PokemonSprites.h"
 #include "PokemonBDSP_EggStepOption.h"
 
 namespace PokemonAutomation{
@@ -16,7 +17,7 @@ namespace PokemonBDSP{
 
 
 const Pokemon::EggStepDatabase& EGGSTEP_DATABASE(){
-    static Pokemon::EggStepDatabase database("PokemonBDSP/EggSteps.json");
+    static Pokemon::EggStepDatabase database("PokemonBDSP/EggSteps.json", &PokemonSwSh::ALL_POKEMON_SPRITES());
     return database;
 }
 

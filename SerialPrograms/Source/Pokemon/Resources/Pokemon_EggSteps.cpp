@@ -9,10 +9,10 @@
 #include "Common/Cpp/Json/JsonObject.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Resources/SpriteDatabase.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Resources/Pokemon_PokemonSlugs.h"
 #include "Pokemon/Resources/Pokemon_PokemonNames.h"
-#include "PokemonSwSh/Resources/PokemonSwSh_PokemonSprites.h"
 #include "Pokemon_EggSteps.h"
 
 namespace PokemonAutomation{
@@ -20,13 +20,12 @@ namespace Pokemon{
 
 
 
-EggStepDatabase::EggStepDatabase(const char* resource_path){
+EggStepDatabase::EggStepDatabase(const char* resource_path, const SpriteDatabase* sprites){
     std::string path_slugs = RESOURCE_PATH() + resource_path;
     JsonValue json_slugs = load_json_file(path_slugs);
     JsonObject& slugs = json_slugs.get_object_throw(path_slugs);
 
     const std::map<std::string, size_t>& SLUGS_TO_NATIONAL_DEX = Pokemon::SLUGS_TO_NATIONAL_DEX();
-    const SpriteDatabase& ALL_POKEMON_SPRITES = NintendoSwitch::PokemonSwSh::ALL_POKEMON_SPRITES();
 
     std::map<size_t, std::pair<std::string, uint16_t>> nat_id_to_steps;
     for (const auto& slug : slugs){
@@ -52,7 +51,11 @@ EggStepDatabase::EggStepDatabase(const char* resource_path){
         const std::string& slug = item.second.first;
         std::string display_name = Pokemon::get_pokemon_name(slug).display_name();
         display_name += " (" + tostr_u_commas(item.second.second) + " steps)";
-        const SpriteDatabase::Sprite* sprite = ALL_POKEMON_SPRITES.get_nothrow(slug);
+
+        const SpriteDatabase::Sprite* sprite = sprites == nullptr
+            ? nullptr
+            : sprites->get_nothrow(slug);
+
         if (sprite == nullptr){
             m_stringselect_database.add_entry(StringSelectEntry(slug, display_name));
             global_logger_tagged().log("Missing sprite for: " + slug, COLOR_RED);
