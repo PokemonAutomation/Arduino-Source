@@ -242,6 +242,12 @@ raw_image = image.copy()
 # add_infer_box_to_image(raw_image, 0.157, 0.783, 0.212, 0.042, image) # Nature box
 # add_infer_box_to_image(raw_image, 0.158, 0.838, 0.213, 0.042, image) # Ability box
 
+# ==================================================================
+# Pokemon BDSP Poffin Cooking
+
+# add_infer_box_to_image(raw_image, 0.56, 0.724, 0.012, 0.024, image) # green & blue arrow pos
+
+
 viewer = ImageViewer(image)
 viewer.run()
 

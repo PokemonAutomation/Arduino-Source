@@ -19,6 +19,7 @@
 #include "Programs/Farming/PokemonBDSP_MoneyFarmerRoute212.h"
 #include "Programs/Farming/PokemonBDSP_DoublesLeveling.h"
 #include "Programs/Farming/PokemonBDSP_AmitySquarePickUpFarmer.h"
+#include "Programs/Farming/PokemonBDSP_PoffinCooker.h"
 #include "Programs/Farming/PokemonBDSP_GiftBerryReset.h"
 
 #include "Programs/ShinyHunting/PokemonBDSP_StarterReset.h"
@@ -69,6 +70,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<MoneyFarmerRoute210_Descriptor, MoneyFarmerRoute210>());
     ret.emplace_back(make_single_switch_program<DoublesLeveling_Descriptor, DoublesLeveling>());
     ret.emplace_back(make_single_switch_program<AmitySquarePickUpFarmer_Descriptor, AmitySquarePickUpFarmer>());
+    ret.emplace_back(make_single_switch_program<PoffinCooker_Descriptor, PoffinCooker>());
     ret.emplace_back(make_single_switch_program<GiftBerryReset_Descriptor, GiftBerryReset>());
 
     ret.emplace_back("---- Shiny Hunting ----");
