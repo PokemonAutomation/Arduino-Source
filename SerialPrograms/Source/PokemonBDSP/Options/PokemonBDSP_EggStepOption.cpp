@@ -28,7 +28,7 @@ EggStepCountOption::EggStepCountOption()
         "<b>Step Count:</b>",
         EGGSTEP_DATABASE().database(),
         LockWhileRunning::LOCKED,
-        "grookey"
+        "turtwig"
     )
 {}
 

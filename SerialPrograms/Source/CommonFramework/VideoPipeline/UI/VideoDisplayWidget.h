@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_VideoPipeline_VideoDisplayWidget_H
 #define PokemonAutomation_VideoPipeline_VideoDisplayWidget_H
 
-#include "Common/Cpp/ValueDebouncer.h"
+//#include "Common/Cpp/ValueDebouncer.h"
 #include "Common/Qt/WidgetStackFixedAspectRatio.h"
 #include "VideoWidget.h"
 #include "VideoOverlayWidget.h"

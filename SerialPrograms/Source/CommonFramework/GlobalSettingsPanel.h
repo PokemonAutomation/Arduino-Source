@@ -110,7 +110,7 @@ public:
     BooleanCheckBoxOption SHOW_ALL_AUDIO_DEVICES;
     BooleanCheckBoxOption SHOW_RECORD_FREQUENCIES;
     BooleanCheckBoxOption ENABLE_AUTO_RESET_AUDIO;
-    VideoBackendOption VIDEO_BACKEND;
+    VideoBackendOption VIDEO_BACKEND0;
     BooleanCheckBoxOption ENABLE_FRAME_SCREENSHOTS;
     BooleanCheckBoxOption ENABLE_LIFETIME_SANITIZER;
 
