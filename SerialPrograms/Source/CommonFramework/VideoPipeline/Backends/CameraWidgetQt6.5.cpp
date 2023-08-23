@@ -1,28 +1,31 @@
-﻿/*  Video Widget (Qt6)
+﻿/*  Video Widget (Qt6.5)
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
  */
 
 #include <QtGlobal>
-#if QT_VERSION_MAJOR == 6
+#if QT_VERSION_MAJOR == 6 && QT_VERSION_MINOR >= 5
 
 #include <chrono>
 #include <iostream>
 #include <QCamera>
 #include <QPainter>
 #include <QMediaDevices>
+#include <QVBoxLayout>
 #include <QVideoSink>
+#include <QImageCapture>
 //#include "Common/Cpp/Exceptions.h"
 //#include "Common/Cpp/Time.h"
+//#include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/VideoPipeline/CameraOption.h"
-#include "CameraWidgetQt6.h"
+#include "CameraWidgetQt6.5.h"
 
 //using std::cout;
 //using std::endl;
 
 namespace PokemonAutomation{
-namespace CameraQt6QVideoSink{
+namespace CameraQt65QMediaCaptureSession{
 
 
 
@@ -120,7 +123,7 @@ void CameraSession::set_source(CameraInfo device){
 void CameraSession::set_resolution(Resolution resolution){
     QMetaObject::invokeMethod(this, [this, resolution]{
         std::lock_guard<std::mutex> lg(m_lock);
-        if (!m_capture){
+        if (!m_capture_session){
             m_resolution = resolution;
             return;
         }
@@ -217,9 +220,53 @@ double CameraSession::fps_display(){
     return m_fps_tracker_display.events_per_second();
 }
 
+void CameraSession::connect_video_sink(QVideoSink* sink){
+    connect(
+        sink, &QVideoSink::videoFrameChanged,
+        this, [&](const QVideoFrame& frame){
+            {
+                WallClock now = current_time();
+                SpinLockGuard lg(m_frame_lock);
+                m_last_frame = frame;
+                m_last_frame_timestamp = now;
+                m_last_frame_seqnum++;
+                m_fps_tracker_source.push_event(now);
+            }
+//            cout << now_to_filestring() << endl;
+            std::lock_guard<std::mutex> lg(m_lock);
+            for (FrameListener* listener : m_frame_listeners){
+                listener->new_frame_available();
+            }
+        }
+    );
+}
+void CameraSession::clear_video_output(){
+    m_video_sink.reset(new QVideoSink());
+    connect_video_sink(m_video_sink.get());
+}
+void CameraSession::set_video_output(QVideoWidget& widget){
+    if (m_capture_session == nullptr){
+        return;
+    }
+    if (m_capture_session->videoSink() == widget.videoSink()){
+        return;
+    }
+    m_capture_session->setVideoOutput(&widget);
+    connect_video_sink(widget.videoSink());
+}
+void CameraSession::set_video_output(QGraphicsVideoItem& item){
+    if (m_capture_session == nullptr){
+        return;
+    }
+    if (m_capture_session->videoSink() == item.videoSink()){
+        return;
+    }
+    m_capture_session->setVideoOutput(&item);
+    connect_video_sink(item.videoSink());
+}
 
 void CameraSession::shutdown(){
-    if (!m_capture){
+    if (!m_capture_session){
         return;
     }
     m_logger.log("Stopping Camera...");
@@ -228,8 +275,8 @@ void CameraSession::shutdown(){
     for (Listener* listener : m_ui_listeners){
         listener->shutdown();
     }
-    m_capture.reset();
-    m_video_sink.reset();
+    m_capture_session.reset();
+//    m_video_sink.reset();
     m_camera.reset();
     m_resolution_map.clear();
     m_formats.clear();
@@ -305,36 +352,20 @@ void CameraSession::startup(){
 
     m_camera.reset(new QCamera(*device));
     m_camera->setCameraFormat(*desired_format);
-    m_video_sink.reset(new QVideoSink());
-    m_capture.reset(new QMediaCaptureSession());
-    m_capture->setCamera(m_camera.get());
-    m_capture->setVideoSink(m_video_sink.get());
+//    m_video_sink.reset(new QVideoSink());
+    m_capture_session.reset(new QMediaCaptureSession());
+    m_capture_session->setCamera(m_camera.get());
+//    m_capture_session->setVideoSink(m_video_sink.get());
+
+//    QImageCapture* capture = new QImageCapture(this);
+//    capture-
 
     connect(m_camera.get(), &QCamera::errorOccurred, this, [&](){
         if (m_camera->error() != QCamera::NoError){
             m_logger.log("QCamera error: " + m_camera->errorString().toStdString());
         }
     });
-    connect(
-        m_video_sink.get(), &QVideoSink::videoFrameChanged,
-        this, [&](const QVideoFrame& frame){
-            {
-                WallClock now = current_time();
-                SpinLockGuard lg(m_frame_lock);
-//                WallClock start = current_time();
-                m_last_frame = frame;
-//                cout << std::chrono::duration_cast<std::chrono::microseconds>(current_time() - start).count() << endl;
-                m_last_frame_timestamp = now;
-                m_last_frame_seqnum++;
-                m_fps_tracker_source.push_event(now);
-            }
-//            cout << now_to_filestring() << endl;
-            std::lock_guard<std::mutex> lg(m_lock);
-            for (FrameListener* listener : m_frame_listeners){
-                listener->new_frame_available();
-            }
-        }
-    );
+    clear_video_output();
 
     m_camera->start();
 
@@ -344,30 +375,79 @@ void CameraSession::startup(){
 }
 
 PokemonAutomation::VideoWidget* CameraSession::make_QtWidget(QWidget* parent){
-    return new VideoWidget(parent, *this);
+    return new VideoDisplayWidget(parent, *this);
 }
 
 
 
 
-VideoWidget::VideoWidget(QWidget* parent, CameraSession& camera)
+VideoDisplayWidget::VideoDisplayWidget(QWidget* parent, CameraSession& camera)
     : PokemonAutomation::VideoWidget(parent)
     , m_session(camera)
+//    , m_widget(new QVideoWidget(this))
+    , m_view(new StaticQGraphicsView(this))
 {
     this->setMinimumSize(80, 45);
+//    m_widget->setFixedSize(this->size());
+
+    m_view->setFixedSize(this->size());
+    m_view->setScene(&m_scene);
+    m_video.setSize(this->size());
+    m_scene.setSceneRect(QRectF(QPointF(0, 0), this->size()));
+    m_scene.addItem(&m_video);
+
+    camera.set_video_output(m_video);
+
+    connect(
+        &m_scene, &QGraphicsScene::changed,
+        this, [&](const QList<QRectF>&){
+            m_session.report_rendered_frame(current_time());
+        }
+    );
+
     m_session.add_listener(*this);
 }
-VideoWidget::~VideoWidget(){
+VideoDisplayWidget::~VideoDisplayWidget(){
     m_session.remove_listener(*this);
 }
 
-void VideoWidget::new_frame_available(){
-    this->update();
+//void VideoDisplayWidget::new_frame_available(){
+//    this->update();
+//}
+
+void VideoDisplayWidget::shutdown(){
+    m_session.clear_video_output();
 }
-void VideoWidget::paintEvent(QPaintEvent* event){
+void VideoDisplayWidget::new_source(const CameraInfo& device, Resolution resolution){
+//    m_session.set_video_output(*m_widget);
+    m_session.set_video_output(m_video);
+}
+void VideoDisplayWidget::resolution_change(Resolution resolution){
+
+}
+
+void VideoDisplayWidget::resizeEvent(QResizeEvent* event){
+//    m_widget->setFixedSize(this->size());
+    m_view->setFixedSize(this->size());
+    m_scene.setSceneRect(QRectF(QPointF(0, 0), this->size()));
+    m_video.setSize(this->size());
+}
+
+
+#if 0
+void VideoDisplayWidget::paintEvent(QPaintEvent* event){
     // std::cout << "paintEvent start" << std::endl;
     QWidget::paintEvent(event);
 
+//    cout << m_camera->isActive() << endl;
+//    cout << m_widget->videoSink() << endl;
+//    cout << m_widget->width() << " x " << m_widget->height() << endl;
+
+    QPainter painter(this);
+    painter.setPen(QColor((uint32_t)COLOR_RED));
+    painter.drawRect(0, 0, 500, 500);
+
+#if 0
     //  Lock should not be needed since it's only updated on this UI thread.
 //    std::lock_guard<std::mutex> lg(m_lock);
 
@@ -382,16 +462,16 @@ void VideoWidget::paintEvent(QPaintEvent* event){
     QVideoFrame::PaintOptions options;
     QPainter painter(this);
 
-//    WallClock start = current_time();
     frame.first.paint(&painter, rect, options);
     // std::cout << "paintEvent end" << std::endl;
-//    cout << "paint = " << std::chrono::duration_cast<std::chrono::microseconds>(current_time() - start).count() << endl;
 
     if (m_last_seqnum != frame.second){
         m_last_seqnum = frame.second;
         m_session.report_rendered_frame(current_time());
     }
+#endif
 }
+#endif
 
 
 
