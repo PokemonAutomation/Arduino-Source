@@ -26,7 +26,7 @@ CurryHunter_Descriptor::CurryHunter_Descriptor()
         "PokemonSwSh:CurryHunter",
         STRING_POKEMON + " SwSh", "Curry Hunter",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/CurryHunter.md",
-        "Cooks curry to attract " + STRING_POKEMON + " to your camp. This is a beta version. "
+        "Cooks curry to attract " + STRING_POKEMON + " to your camp. "
         "<font color=\"red\">(This program cannot detect shinies. You must check manually or with " + STRING_POKEMON + " HOME.)</font>",
         FeedbackType::OPTIONAL_,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
@@ -58,9 +58,9 @@ CurryHunter::CurryHunter()
         "2 * TICKS_PER_SECOND"
     )
     , SMALL_POKEMON(
-        "<b>Walk up Delay:</b><br>Wait this long for the " + STRING_POKEMON + " to walk up to you.",
+        "<b>Small " + STRING_POKEMON + ":</b><br>If there are small " + STRING_POKEMON + ", increase this number by 30. You may have to adjust the number and check what works best for your area.",
         LockWhileRunning::LOCKED,
-        50
+        0
     )
     , TAKE_VIDEO(
         "<b>Take Videos:</b><br>Take a video after each cooking iteration. This will spam your album with videos.",
