@@ -297,7 +297,7 @@ bool LetsGoEncounterBotTracker::process_battle(EncounterWatcher& watcher, Encoun
 
 
 
-bool clear_in_front(
+bool use_lets_go_to_clear_in_front(
     ConsoleHandle& console, BotBaseContext& context,
     LetsGoEncounterBotTracker& tracker,
     bool throw_ball_if_bubble,

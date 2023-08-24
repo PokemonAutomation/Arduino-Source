@@ -62,11 +62,11 @@ struct ShinyHuntAreaZeroPlatform_Descriptor::Stats : public LetsGoEncounterBotSt
         , m_game_resets(m_stats["Game Resets"])
         , m_errors(m_stats["Errors"])
     {
-        m_display_order.insert(m_display_order.begin() + 2, {"Sandwiches", true});
-        m_display_order.insert(m_display_order.begin() + 3, {"Auto Heals", true});
-        m_display_order.insert(m_display_order.begin() + 4, {"Platform Resets", true});
-        m_display_order.insert(m_display_order.begin() + 5, {"Game Resets", true});
-        m_display_order.insert(m_display_order.begin() + 6, {"Errors", true});
+        m_display_order.insert(m_display_order.begin() + 2, {"Sandwiches", HIDDEN_IF_ZERO});
+        m_display_order.insert(m_display_order.begin() + 3, {"Auto Heals", HIDDEN_IF_ZERO});
+        m_display_order.insert(m_display_order.begin() + 4, {"Platform Resets", HIDDEN_IF_ZERO});
+        m_display_order.insert(m_display_order.begin() + 5, {"Game Resets", HIDDEN_IF_ZERO});
+        m_display_order.insert(m_display_order.begin() + 6, {"Errors", HIDDEN_IF_ZERO});
     }
     std::atomic<uint64_t>& m_sandwiches;
     std::atomic<uint64_t>& m_autoheals;
@@ -204,7 +204,7 @@ bool ShinyHuntAreaZeroPlatform::run_traversal(BotBaseContext& context){
 
     WallClock start = current_time();
 
-    size_t kills, encounters;
+    size_t kills = 0, encounters = 0;
     std::chrono::minutes window_minutes(PLATFORM_RESET.WINDOW_IN_MINUTES);
     WallDuration window = m_time_tracker->last_window_in_realtime(start, window_minutes);
 
@@ -231,6 +231,7 @@ bool ShinyHuntAreaZeroPlatform::run_traversal(BotBaseContext& context){
         "\n    Encounters: " + std::to_string(encounters)
     );
 
+    // Check we want to do a platform reset first:
     do{
         if (!PLATFORM_RESET.enabled()){
             console.log("Platform Reset: Disabled", COLOR_ORANGE);
@@ -254,6 +255,8 @@ bool ShinyHuntAreaZeroPlatform::run_traversal(BotBaseContext& context){
         return false;
     }while (false);
 
+    // Send Let's Go pokemon to beat wild pokemon while moving on the platform following one path.
+    // It tracks the kill chain by sound detection from `m_encounter_tracker`.
     try{
         switch (PATH0){
         case Path::PATH0:
