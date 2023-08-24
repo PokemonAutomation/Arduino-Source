@@ -13,7 +13,6 @@
 #include "PokemonSV/Resources/PokemonSV_Ingredients.h"
 #include "PokemonSV_IngredientSession.h"
 #include "Common/Cpp/PrettyPrint.h"
-#include <algorithm>
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

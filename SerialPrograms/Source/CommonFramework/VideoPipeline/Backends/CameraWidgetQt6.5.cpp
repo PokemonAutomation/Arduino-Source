@@ -221,6 +221,7 @@ double CameraSession::fps_display(){
 }
 
 void CameraSession::connect_video_sink(QVideoSink* sink){
+#if 1
     connect(
         sink, &QVideoSink::videoFrameChanged,
         this, [&](const QVideoFrame& frame){
@@ -239,6 +240,7 @@ void CameraSession::connect_video_sink(QVideoSink* sink){
             }
         }
     );
+#endif
 }
 void CameraSession::clear_video_output(){
     m_video_sink.reset(new QVideoSink());
@@ -384,18 +386,23 @@ PokemonAutomation::VideoWidget* CameraSession::make_QtWidget(QWidget* parent){
 VideoDisplayWidget::VideoDisplayWidget(QWidget* parent, CameraSession& camera)
     : PokemonAutomation::VideoWidget(parent)
     , m_session(camera)
-//    , m_widget(new QVideoWidget(this))
+#ifdef PA_USE_QVideoWidget
+    , m_widget(new QVideoWidget(this))
+#else
     , m_view(new StaticQGraphicsView(this))
+#endif
 {
     this->setMinimumSize(80, 45);
-//    m_widget->setFixedSize(this->size());
 
+#ifdef PA_USE_QVideoWidget
+    m_widget->setFixedSize(this->size());
+    camera.set_video_output(*m_widget);
+#else
     m_view->setFixedSize(this->size());
     m_view->setScene(&m_scene);
     m_video.setSize(this->size());
     m_scene.setSceneRect(QRectF(QPointF(0, 0), this->size()));
     m_scene.addItem(&m_video);
-
     camera.set_video_output(m_video);
 
     connect(
@@ -404,6 +411,8 @@ VideoDisplayWidget::VideoDisplayWidget(QWidget* parent, CameraSession& camera)
             m_session.report_rendered_frame(current_time());
         }
     );
+#endif
+
 
     m_session.add_listener(*this);
 }
@@ -419,18 +428,24 @@ void VideoDisplayWidget::shutdown(){
     m_session.clear_video_output();
 }
 void VideoDisplayWidget::new_source(const CameraInfo& device, Resolution resolution){
-//    m_session.set_video_output(*m_widget);
+#ifdef PA_USE_QVideoWidget
+    m_session.set_video_output(*m_widget);
+#else
     m_session.set_video_output(m_video);
+#endif
 }
 void VideoDisplayWidget::resolution_change(Resolution resolution){
 
 }
 
 void VideoDisplayWidget::resizeEvent(QResizeEvent* event){
-//    m_widget->setFixedSize(this->size());
+#ifdef PA_USE_QVideoWidget
+    m_widget->setFixedSize(this->size());
+#else
     m_view->setFixedSize(this->size());
     m_scene.setSceneRect(QRectF(QPointF(0, 0), this->size()));
     m_video.setSize(this->size());
+#endif
 }
 
 

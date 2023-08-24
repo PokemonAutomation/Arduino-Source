@@ -171,6 +171,8 @@ public:
 
 
 
+//#define PA_USE_QVideoWidget
+
 
 class VideoDisplayWidget : public PokemonAutomation::VideoWidget, public CameraSession::Listener{
 public:
@@ -191,11 +193,14 @@ private:
 
 private:
     CameraSession& m_session;
-//    QVideoWidget* m_widget;
 
+#ifdef PA_USE_QVideoWidget
+    QVideoWidget* m_widget;
+#else
     StaticQGraphicsView* m_view;
     QGraphicsScene m_scene;
     QGraphicsVideoItem m_video;
+    #endif
 };
 
 
