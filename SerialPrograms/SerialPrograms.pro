@@ -927,6 +927,7 @@ SOURCES += \
     Source/Tests/PokemonSwSh_Tests.cpp \
     Source/Tests/TestMap.cpp \
     Source/Tests/TestUtils.cpp \
+    Source/ZeldaTotK/Programs/ZeldaTotK_BowItemDuper.cpp \
     Source/ZeldaTotK/Programs/ZeldaTotK_MineruItemDuper.cpp \
     Source/ZeldaTotK/Programs/ZeldaTotK_ParaglideItemDuper.cpp \
     Source/ZeldaTotK/Programs/ZeldaTotK_SurfItemDuper.cpp \
@@ -934,8 +935,7 @@ SOURCES += \
     Source/ZeldaTotK/ZeldaTotK_Panels.cpp \
     Source/ZeldaTotK/ZeldaTotK_Panels.h \
     Source/ZeldaTotK/ZeldaTotK_Settings.cpp \
-    Source/ZeldaTotK/ZeldaTotK_Settings.h \
-    Source/ZeldaTotK/Programs/ZeldaTotK_BowItemDuper.cpp
+    Source/ZeldaTotK/ZeldaTotK_Settings.h
 
 HEADERS += \
     ../3rdParty/QtWavFile/WavFile.h \

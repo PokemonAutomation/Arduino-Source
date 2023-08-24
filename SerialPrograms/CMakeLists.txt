@@ -529,10 +529,10 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/VideoPipeline/Backends/CameraImplementations.h
     Source/CommonFramework/VideoPipeline/Backends/CameraWidgetQt5.cpp
     Source/CommonFramework/VideoPipeline/Backends/CameraWidgetQt5.h
-    Source/CommonFramework/VideoPipeline/Backends/CameraWidgetQt6.cpp
-    Source/CommonFramework/VideoPipeline/Backends/CameraWidgetQt6.h
     Source/CommonFramework/VideoPipeline/Backends/CameraWidgetQt6.5.cpp
     Source/CommonFramework/VideoPipeline/Backends/CameraWidgetQt6.5.h
+    Source/CommonFramework/VideoPipeline/Backends/CameraWidgetQt6.cpp
+    Source/CommonFramework/VideoPipeline/Backends/CameraWidgetQt6.h
     Source/CommonFramework/VideoPipeline/Backends/VideoToolsQt5.cpp
     Source/CommonFramework/VideoPipeline/Backends/VideoToolsQt5.h
     Source/CommonFramework/VideoPipeline/CameraInfo.h
@@ -1871,10 +1871,6 @@ file(GLOB MAIN_SOURCES
     Source/Tests/TestMap.h
     Source/Tests/TestUtils.cpp
     Source/Tests/TestUtils.h
-    Source/ZeldaTotK/ZeldaTotK_Panels.cpp
-    Source/ZeldaTotK/ZeldaTotK_Panels.h
-    Source/ZeldaTotK/ZeldaTotK_Settings.cpp
-    Source/ZeldaTotK/ZeldaTotK_Settings.h
     Source/ZeldaTotK/Programs/ZeldaTotK_BowItemDuper.cpp
     Source/ZeldaTotK/Programs/ZeldaTotK_BowItemDuper.h
     Source/ZeldaTotK/Programs/ZeldaTotK_MineruItemDuper.cpp
@@ -1885,6 +1881,10 @@ file(GLOB MAIN_SOURCES
     Source/ZeldaTotK/Programs/ZeldaTotK_SurfItemDuper.h
     Source/ZeldaTotK/Programs/ZeldaTotK_WeaponDuper.cpp
     Source/ZeldaTotK/Programs/ZeldaTotK_WeaponDuper.h
+    Source/ZeldaTotK/ZeldaTotK_Panels.cpp
+    Source/ZeldaTotK/ZeldaTotK_Panels.h
+    Source/ZeldaTotK/ZeldaTotK_Settings.cpp
+    Source/ZeldaTotK/ZeldaTotK_Settings.h
 )
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}../../ FILES ${MAIN_SOURCES})
 add_executable(SerialPrograms WIN32 ${MAIN_SOURCES})
