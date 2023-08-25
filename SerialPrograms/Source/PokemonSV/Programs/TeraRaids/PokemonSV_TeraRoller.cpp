@@ -117,7 +117,7 @@ TeraRoller::TeraRoller()
     , EVENT_CHECK_MODE(
         "<b>Event Tera Raid Action:</b><br>Choose how to interact with event/non-event raids.",
         {
-            {EventCheckMode::CHECK_ALL,             "check_all",        "Check all raids"},
+            {EventCheckMode::CHECK_ALL,             "check_all",        "Check both event & non-event raids"},
             {EventCheckMode::CHECK_ONLY_EVENT,      "check_event",      "Check only event raids"},
             {EventCheckMode::CHECK_ONLY_NONEVENT,   "check_nonevent",   "Check only non-event raids"},
         },

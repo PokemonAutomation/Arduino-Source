@@ -163,7 +163,7 @@ bool OverworldWatcher::process_frame(const VideoSnapshot& frame){
     }
 
     //  Ball held for long enough.
-    if (!m_detect_event && frame.timestamp - m_last_ball >= m_ball_hold_duration){
+    if (!m_detect_event && (frame.timestamp - m_last_ball >= m_ball_hold_duration)){
         return true;
     }
 
