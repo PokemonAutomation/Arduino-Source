@@ -61,6 +61,9 @@ TimeExpressionOptionWidget<Type>::TimeExpressionOptionWidget(QWidget& parent, Ti
     layout->setContentsMargins(0, 0, 0, 0);
     QLabel* text = new QLabel(QString::fromStdString(m_value.label()), this);
     text->setWordWrap(true);
+    text->setTextFormat(Qt::RichText);
+    text->setTextInteractionFlags(Qt::TextBrowserInteraction);
+    text->setOpenExternalLinks(true);
     layout->addWidget(text, 1);
     QVBoxLayout* rows = new QVBoxLayout();
     layout->addLayout(rows, 1);

@@ -108,6 +108,9 @@ EnumDropdownUI::EnumDropdownUI(QWidget& parent, EnumDropdown& value, const std::
     QLabel* text = new QLabel(QString::fromStdString(label), this);
     layout->addWidget(text);
     text->setWordWrap(true);
+    text->setTextFormat(Qt::RichText);
+    text->setTextInteractionFlags(Qt::TextBrowserInteraction);
+    text->setOpenExternalLinks(true);
     QComboBox* box = new QComboBox(this);
     layout->addWidget(box);
     for (const auto& item : m_value.m_options){

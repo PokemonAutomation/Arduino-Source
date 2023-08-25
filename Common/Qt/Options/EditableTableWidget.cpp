@@ -42,6 +42,9 @@ EditableTableWidget::EditableTableWidget(QWidget& parent, EditableTableOption& v
 
     QLabel* label = new QLabel(QString::fromStdString(value.label()), this);
     label->setWordWrap(true);
+    label->setTextFormat(Qt::RichText);
+    label->setTextInteractionFlags(Qt::TextBrowserInteraction);
+    label->setOpenExternalLinks(true);
     layout->addWidget(label);
 
     m_table = new AutoHeightTableWidget(this);
