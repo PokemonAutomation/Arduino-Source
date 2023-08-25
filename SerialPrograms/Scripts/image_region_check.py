@@ -157,3 +157,19 @@ def check_image(filename: str, regions: List[RegionCheck]) -> None:
 			print("====== Failed ======")
 			return
 	print("====== Passed ======")
+
+
+def set_black_out_of_rect(image: np.ndarray, x: float, y: float, w: float, h: float):
+	"""Set regions outside of the rect on `image` to be black."""
+	height = image.shape[0]
+	width = image.shape[1]
+	start_x = int(x * width + 0.5)
+	start_y = int(y * height + 0.5)
+	rect_width = int(w * width + 0.5)
+	rect_height = int(h * height + 0.5)
+	end_x = start_x + rect_width
+	end_y = start_y + rect_height
+	
+	new_image = np.zeros(image.shape, dtype=image.dtype)
+	new_image[start_y:end_y, start_x:end_x] = image[start_y:end_y, start_x:end_x]
+	image[...] = new_image[...]
