@@ -54,6 +54,13 @@ private:
     BooleanCheckBoxOption CHECK_ONLY_FIRST;
     TeraRollerOpponentFilter FILTER;
 
+    enum class EventCheckMode{
+        CHECK_ALL,
+        CHECK_ONLY_EVENT,
+        CHECK_ONLY_NONEVENT,
+    };
+    EnumDropdownOption<EventCheckMode> EVENT_CHECK_MODE;
+
     //  Notifications
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationOption NOTIFICATION_SHINY;

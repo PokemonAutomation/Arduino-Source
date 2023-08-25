@@ -14,6 +14,7 @@
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Pokemon_Notification.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
@@ -697,7 +698,23 @@ void run_from_tera_battle(const ProgramInfo& info, ConsoleHandle& console, BotBa
 }
 
 
+bool is_sparkling_raid(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    OverworldWatcher static_map(COLOR_CYAN, true);
+    context.wait_for_all_requests();
 
+    int ret = wait_until(
+        env.console, context,
+        std::chrono::seconds(2),
+        {static_map}
+    );
+
+    if (ret == 0){
+        env.console.log("Did not detect sparkling raid", COLOR_ORANGE);
+        return false;
+    }
+    env.console.log("Detected sparkling raid", COLOR_ORANGE);
+    return true;
+}
 
 
 
