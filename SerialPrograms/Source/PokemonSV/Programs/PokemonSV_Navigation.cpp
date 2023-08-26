@@ -423,7 +423,8 @@ void open_pokedex_from_overworld(const ProgramInfo& info, ConsoleHandle& console
         context.wait_for(std::chrono::milliseconds(100));
         switch (ret){
         case 0:
-            pbf_press_button(context, BUTTON_MINUS, 20, 100); // Open Pokédex
+            // Try opening the Pokédex if overworld is detected
+            pbf_press_button(context, BUTTON_MINUS, 20, 100);
             continue;
         case 1:
             console.log("Detected Pokédex.");
@@ -460,7 +461,7 @@ void open_recently_battled_from_pokedex(const ProgramInfo& info, ConsoleHandle& 
     } else {
         throw OperationFailedException(
             ErrorReport::SEND_ERROR_REPORT, console,
-            "open_recently_battled_from_pokedex(): Unknown state after 10 button dpad down presses.",
+            "open_recently_battled_from_pokedex(): Unknown state after 10 dpad down presses.",
             true
         );
     }
