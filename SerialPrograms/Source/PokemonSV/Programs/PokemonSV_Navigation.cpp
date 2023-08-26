@@ -189,7 +189,7 @@ void fly_to_overworld_from_map(const ProgramInfo& info, ConsoleHandle& console, 
             console.log("Detected fly confirmation prompt.");
             pbf_press_button(context, BUTTON_A, 20, 130);
             continue;
-            
+
         default:
             throw OperationFailedException(
                 ErrorReport::SEND_ERROR_REPORT, console,
@@ -229,7 +229,7 @@ void picnic_from_overworld(const ProgramInfo& info, ConsoleHandle& console, BotB
         switch (ret){
         case 0:
             console.log("Detected overworld.");
-            pbf_press_button(context, BUTTON_X, 20, 105); // open menu 
+            pbf_press_button(context, BUTTON_X, 20, 105); // open menu
             continue;
         case 1:
             console.log("Detected main menu.");
@@ -297,7 +297,7 @@ void leave_picnic(const ProgramInfo& info, ConsoleHandle& console, BotBaseContex
     // Mash A to confirm
     pbf_mash_button(context, BUTTON_A, 150);
     context.wait_for_all_requests();
-    
+
     // Wait for overworld:
     OverworldWatcher overworld(COLOR_CYAN);
     int ret = wait_until(
@@ -345,7 +345,7 @@ void enter_box_system_from_overworld(const ProgramInfo& info, ConsoleHandle& con
         switch (ret){
         case 0:
             console.log("Detected overworld.");
-            pbf_press_button(context, BUTTON_X, 20, 105); // open menu 
+            pbf_press_button(context, BUTTON_X, 20, 105); // open menu
             continue;
         case 1:
             console.log("Detected main menu.");
@@ -477,7 +477,7 @@ void leave_phone_to_overworld(const ProgramInfo& info, ConsoleHandle& console, B
         console, context,
         [](BotBaseContext& context){
             for (size_t i = 0; i < 10; i++){
-                pbf_press_button(context, BUTTON_Y, 20, 355);
+                pbf_press_button(context, BUTTON_Y, 20, 1000);
             }
         },
         {overworld}
