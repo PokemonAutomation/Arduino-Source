@@ -24,6 +24,7 @@
 #include "PokemonSV/Inference/Picnics/PokemonSV_SandwichIngredientDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
+#include "PokemonSV/Inference/Map/PokemonSV_MapPokeCenterIconDetector.h"
 
 #include <iostream>
 using std::cout;
@@ -447,6 +448,13 @@ int test_pokemonSV_DialogBoxDetector(const ImageViewRGB32& image, bool target) {
     DialogBoxDetector detector(COLOR_RED);
     bool result = detector.detect(image);
     TEST_RESULT_EQUAL(result, target);
+    return 0;
+}
+
+int test_pokemonSV_MapPokeCenterIconDetector(const ImageViewRGB32& image, int target) {
+    MapPokeCenterIconDetector detector(COLOR_RED, MAP_READABLE_AREA);
+    auto result = detector.detect_all(image);
+    TEST_RESULT_EQUAL(int(result.size()), target);
     return 0;
 }
 

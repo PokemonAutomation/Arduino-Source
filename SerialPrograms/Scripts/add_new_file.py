@@ -40,8 +40,6 @@ code_root_pos = split_path.index('Arduino-Source')
 code_root_path = os.sep.join(split_path[0:code_root_pos+1])
 # print(code_root_path)
 
-# My local code root path is /Users/<username>/games/pokemon/git/Arduino-Source
-
 
 def read_lines(file_path: str) -> List[str]:
 	with open(file_path, "r") as f:
