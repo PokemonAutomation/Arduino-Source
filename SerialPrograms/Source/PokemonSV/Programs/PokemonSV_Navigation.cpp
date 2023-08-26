@@ -460,7 +460,7 @@ void open_recently_battled_from_pokedex(const ProgramInfo& info, ConsoleHandle& 
     } else {
         throw OperationFailedException(
             ErrorReport::SEND_ERROR_REPORT, console,
-            "leave_phone_to_overworld(): Unknown state after 10 button Y presses.",
+            "open_recently_battled_from_pokedex(): Unknown state after 10 button dpad down presses.",
             true
         );
     }
