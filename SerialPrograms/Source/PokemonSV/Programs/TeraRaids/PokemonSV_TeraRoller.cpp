@@ -115,11 +115,12 @@ TeraRoller::TeraRoller()
           false
     )
     , EVENT_CHECK_MODE(
-        "<b>Event Tera Raid Action:</b><br>Choose how to interact with event/non-event raids.",
+        "<b>Event Tera Raid Action:</b><br>Choose how the program interacts with event/non-event raids."
+        "<br>Check only non-event can be further sped up if you exclude 6 star from your filters.",
         {
-            {EventCheckMode::CHECK_ALL,             "check_all",        "Check all raids / No ongoing tera raid event"},
-            {EventCheckMode::CHECK_ONLY_EVENT,      "check_event",      "Check only event raids"},
-            {EventCheckMode::CHECK_ONLY_NONEVENT,   "check_nonevent",   "Check only non-event raids"},
+            {EventCheckMode::CHECK_ALL,             "check_all",        "Ongoing event, check all raids / No ongoing event"},
+            {EventCheckMode::CHECK_ONLY_EVENT,      "check_event",      "Ongoing event, check only event raids"},
+            {EventCheckMode::CHECK_ONLY_NONEVENT,   "check_nonevent",   "Ongoing event, check only non-event raids"},
         },
         LockWhileRunning::LOCKED,
         EventCheckMode::CHECK_ALL
