@@ -555,11 +555,11 @@ void fly_to_closest_pokecenter_on_map(const ProgramInfo& info, ConsoleHandle& co
     // 0.5 is too large, 0.25 a little too small
     const double scale = 0.30;
 
-    const int move_x = std::max(std::min(int(round(push_x + 128) + 0.5), 255), 0);
-    const int move_y = std::max(std::min(int(round(push_y + 128) + 0.5), 255), 0);
+    const uint8_t move_x = uint8_t(std::max(std::min(int(round(push_x + 128) + 0.5), 255), 0));
+    const uint8_t move_y = uint8_t(std::max(std::min(int(round(push_y + 128) + 0.5), 255), 0));
 
     console.overlay().add_log("Move Cursor to PokeCenter", COLOR_WHITE);
-    pbf_move_left_joystick(context, move_x, move_y, magnitude * scale, 30);
+    pbf_move_left_joystick(context, move_x, move_y, uint16_t(magnitude * scale), 30);
     fly_to_overworld_from_map(info, console, context);
 }
 
