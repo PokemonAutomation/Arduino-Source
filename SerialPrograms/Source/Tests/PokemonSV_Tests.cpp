@@ -453,8 +453,15 @@ int test_pokemonSV_DialogBoxDetector(const ImageViewRGB32& image, bool target) {
 
 int test_pokemonSV_MapPokeCenterIconDetector(const ImageViewRGB32& image, int target) {
     MapPokeCenterIconDetector detector(COLOR_RED, MAP_READABLE_AREA);
-    auto result = detector.detect_all(image);
+    const auto result = detector.detect_all(image);
     TEST_RESULT_EQUAL(int(result.size()), target);
+
+    // auto new_image = image.copy();
+    // for (const auto& box : result){
+    //     auto p_box = floatbox_to_pixelbox(image.width(), image.height(), box);
+    //     draw_box(new_image, p_box, uint32_t(COLOR_BLUE));
+    // }
+    // new_image.save("./test_pokecenter.png");
     return 0;
 }
 
