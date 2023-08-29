@@ -5,7 +5,6 @@
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
-//#include "CommonFramework/Tools/ErrorDumper.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_ScalarButtons.h"
@@ -20,8 +19,11 @@
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV/Inference/Picnics/PokemonSV_PicnicDetector.h"
 #include "PokemonSV/Inference/PokemonSV_ZeroGateWarpPromptDetector.h"
+#include "PokemonSV/Inference/Map/PokemonSV_MapPokeCenterIconDetector.h"
 #include "PokemonSV_ConnectToInternet.h"
 #include "PokemonSV_Navigation.h"
+
+#include <cmath>
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -507,7 +509,59 @@ void leave_phone_to_overworld(const ProgramInfo& info, ConsoleHandle& console, B
 }
 
 
+void fly_to_closest_pokecenter_on_map(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+    // Zoom in one level onto the map.
+    // If the player character icon or any wild pokemon icon overlaps with the PokeCenter icon, the code cannot
+    // detect it. So we zoom in as much as we can to prevent any icon overlap.
+    pbf_press_button(context, BUTTON_ZR, 20, 100);
+    context.wait_for_all_requests();
+    const auto snapshot_frame = console.video().snapshot().frame;
+    const size_t screen_width = snapshot_frame->width();
+    const size_t screen_height = snapshot_frame->height();
 
+    double closest_icon_x = 0., closest_icon_y = 0.;
+    double max_dist = 0.0;
+    const double center_x = 0.5 * screen_width, center_y = 0.5 * screen_height;
+    {
+        MapPokeCenterIconWatcher pokecenter_watcher(COLOR_RED, console.overlay(), MAP_READABLE_AREA);
+        int ret = wait_until(console, context, std::chrono::seconds(10), {pokecenter_watcher});
+        if (ret != 0){
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, console,
+                "fly_to_closest_pokecenter_on_map(): Cannot detect PokeCenter icon after 10 seconds",
+                true
+            );
+        }
+        // Find the detected PokeCenter icon closest to the screen center (where player character is on the map).
+        for(const auto& box: pokecenter_watcher.found_locations()){
+            const double loc_x = (box.x + box.width/2) * screen_width;
+            const double loc_y = (box.y + box.height/2) * screen_height;
+            const double x_diff = loc_x - center_x, y_diff = loc_y - center_y;
+            const double dist = x_diff * x_diff + y_diff * y_diff;
+            if (max_dist < dist){
+                max_dist = dist;
+                closest_icon_x = loc_x; closest_icon_y = loc_y;
+            }
+        }
+        console.log("Found closest pokecenter icon on map: (" + std::to_string(closest_icon_x) + ", " + std::to_string(closest_icon_y) + ").");
+    }
+
+    // Convert the vector from center to the PokeCenter icon into a left joystick movement
+    const double dif_x = closest_icon_x - center_x;
+    const double dif_y = closest_icon_y - center_y;
+    const double magnitude = std::max(std::sqrt(max_dist), 1.0);
+    const double push_x = dif_x * 64 / magnitude, push_y = dif_y * 64 / magnitude;
+
+    // 0.5 is too large, 0.25 a little too small
+    const double scale = 0.30;
+
+    const int move_x = std::max(std::min(int(round(push_x + 128) + 0.5), 255), 0);
+    const int move_y = std::max(std::min(int(round(push_y + 128) + 0.5), 255), 0);
+
+    console.overlay().add_log("Move Cursor to PokeCenter", COLOR_WHITE);
+    pbf_move_left_joystick(context, move_x, move_y, magnitude * scale, 30);
+    fly_to_overworld_from_map(info, console, context);
+}
 
 
 }

@@ -61,8 +61,8 @@ std::vector<ImageFloatBox> MapPokeCenterIconDetector::detect_all(const ImageView
         {combine_rgb(180, 0, 0), combine_rgb(255, 100, 100)}
     };
 
-    const double min_object_size = 400.0;
-    const double rmsd_threshold = 80.0;
+    const double min_object_size = 350.0;
+    const double rmsd_threshold = 100.0;
 
     const double screen_rel_size = (screen.height() / 1080.0);
     const size_t min_size = size_t(screen_rel_size * screen_rel_size * min_object_size);

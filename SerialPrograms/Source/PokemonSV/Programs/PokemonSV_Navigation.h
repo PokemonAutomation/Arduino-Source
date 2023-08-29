@@ -54,6 +54,11 @@ void open_recently_battled_from_pokedex(const ProgramInfo& info, ConsoleHandle& 
 //  From any of the rotom phone apps (Map/Pokédex/Profile) go to overworld.
 void leave_phone_to_overworld(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
 
+//  While on map (default zoom), move to the closest PokeCenter and fly there.
+//  The PokeCenter must be already visited before (so having the little wing icon with it) and not occluded
+//  by other map icons on the most zoomed-in level of the map.
+void fly_to_closest_pokecenter_on_map(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
+
 
 }
 }
