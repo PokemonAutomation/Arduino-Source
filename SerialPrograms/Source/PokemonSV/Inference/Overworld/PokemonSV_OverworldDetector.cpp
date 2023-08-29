@@ -126,12 +126,13 @@ bool OverworldDetector::detect_ball(const ImageViewRGB32& screen) const{
 
 
 
-OverworldWatcher::OverworldWatcher(Color color)
+OverworldWatcher::OverworldWatcher(Color color, bool detect_event)
      : OverworldDetector(color)
      , VisualInferenceCallback("OverworldWatcher")
      , m_ball_hold_duration(std::chrono::milliseconds(5000))
      , m_map_hold_duration(std::chrono::milliseconds(1000))
      , m_last_ball(WallClock::min())
+     , m_detect_event(detect_event)
 {}
 
 void OverworldWatcher::make_overlays(VideoOverlaySet& items) const{
@@ -162,13 +163,13 @@ bool OverworldWatcher::process_frame(const VideoSnapshot& frame){
     }
 
     //  Ball held for long enough.
-    if (frame.timestamp - m_last_ball >= m_ball_hold_duration){
+    if (!m_detect_event && (frame.timestamp - m_last_ball >= m_ball_hold_duration)){
         return true;
     }
 
     //  Mismatching image sizes.
-    ImageViewRGB32 start = extract_box_reference(m_start_of_detection, m_radar_inside);
-    ImageViewRGB32 current = extract_box_reference(frame, m_radar_inside);
+    ImageViewRGB32 start = extract_box_reference(m_start_of_detection, m_detect_event ? m_ball : m_radar_inside);
+    ImageViewRGB32 current = extract_box_reference(frame, m_detect_event ? m_ball : m_radar_inside);
     if (start.width() != current.width() || start.height() != current.height()){
         m_start_of_detection = frame;
         return false;

@@ -347,7 +347,7 @@ void enter_box_system_from_overworld(const ProgramInfo& info, ConsoleHandle& con
         switch (ret){
         case 0:
             console.log("Detected overworld.");
-            pbf_press_button(context, BUTTON_X, 20, 105); // open menu 
+            pbf_press_button(context, BUTTON_X, 20, 105); // open menu
             continue;
         case 1:
             console.log("Detected main menu.");
@@ -425,7 +425,8 @@ void open_pokedex_from_overworld(const ProgramInfo& info, ConsoleHandle& console
         context.wait_for(std::chrono::milliseconds(100));
         switch (ret){
         case 0:
-            pbf_press_button(context, BUTTON_MINUS, 20, 100); // Open Pokédex
+            // Try opening the Pokédex if overworld is detected
+            pbf_press_button(context, BUTTON_MINUS, 20, 100);
             continue;
         case 1:
             console.log("Detected Pokédex.");
@@ -443,68 +444,52 @@ void open_pokedex_from_overworld(const ProgramInfo& info, ConsoleHandle& console
 
 void open_recently_battled_from_pokedex(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
     console.log("Opening recently battled...");
-    WallClock start = current_time();
-    while (true){
-        if (current_time() - start > std::chrono::seconds(30)){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
-                "open_recently_battled_from_pokedex(): Failed to open Recently Battled after 30 seconds.",
-                true
-            );
-        }
+    LetsGoKillWatcher menu(console.logger(), COLOR_RED, true, {0.23, 0.23, 0.04, 0.08});
+    context.wait_for_all_requests();
 
-        LetsGoKillWatcher menu(console.logger(), COLOR_RED, true, {0.23, 0.23, 0.04, 0.08});
-        context.wait_for_all_requests();
-
-        int ret = wait_until(
-            console, context,
-            std::chrono::seconds(1),
-            {menu}
+    int ret = run_until(
+        console, context,
+        [](BotBaseContext& context){
+            for (size_t i = 0; i < 10; i++){
+                pbf_press_dpad(context, DPAD_DOWN, 20, 105);
+            }
+        },
+        {menu}
+    );
+    if (ret == 0){
+        console.log("Detected Recently Battled menu icon.");
+        pbf_mash_button(context, BUTTON_A, 150);
+        pbf_wait(context, 200);
+    } else {
+        throw OperationFailedException(
+            ErrorReport::SEND_ERROR_REPORT, console,
+            "open_recently_battled_from_pokedex(): Unknown state after 10 dpad down presses.",
+            true
         );
-
-        if (ret == 0){
-            console.log("Detected Recently Battled menu icon.");
-            pbf_mash_button(context, BUTTON_A, 150);
-            pbf_wait(context, 200);
-            return;
-        } else {
-            console.log("Did not detect Recently Battled menu icon, moving down one...");
-            pbf_press_dpad(context, DPAD_DOWN, 20, 5);
-        }
     }
 }
 
 
 void leave_phone_to_overworld(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
-    console.log("Exiting to overworld...");
-    pbf_press_button(context, BUTTON_Y, 20, 250);
+    console.log("Exiting to overworld from Rotom Phone...");
+    OverworldWatcher overworld(COLOR_CYAN);
+    context.wait_for_all_requests();
 
-    WallClock start = current_time();
-    while (true){
-        if (current_time() - start > std::chrono::seconds(30)){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
-                "leave_phone_to_overworld(): Failed to return to overworld after 30 seconds.",
-                true
-            );
-        }
-
-        OverworldWatcher overworld(COLOR_CYAN);
-        context.wait_for_all_requests();
-
-        int ret = wait_until(
-            console, context,
-            std::chrono::seconds(10),
-            {overworld}
+    int ret = run_until(
+        console, context,
+        [](BotBaseContext& context){
+            for (size_t i = 0; i < 10; i++){
+                pbf_press_button(context, BUTTON_Y, 20, 1000);
+            }
+        },
+        {overworld}
+    );
+    if (ret < 0){
+        throw OperationFailedException(
+            ErrorReport::SEND_ERROR_REPORT, console,
+            "leave_phone_to_overworld(): Unknown state after 10 button Y presses.",
+            true
         );
-
-        if (ret == 0){
-            console.log("Detected overworld.");
-            return;
-        } else {
-            console.log("Did not detect overworld, attempt to exit again.");
-            pbf_press_button(context, BUTTON_Y, 20, 250);
-        }
     }
 }
 

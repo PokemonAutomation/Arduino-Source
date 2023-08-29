@@ -114,6 +114,17 @@ TeraRoller::TeraRoller()
           LockWhileRunning::UNLOCKED,
           false
     )
+    , EVENT_CHECK_MODE(
+        "<b>Event Tera Raid Action:</b><br>Choose how the program interacts with event/non-event raids."
+        "<br>Check only non-event can be further sped up if you exclude 6 star from your filters.",
+        {
+            {EventCheckMode::CHECK_ALL,             "check_all",        "Ongoing event, check all raids / No ongoing event"},
+            {EventCheckMode::CHECK_ONLY_EVENT,      "check_event",      "Ongoing event, check only event raids"},
+            {EventCheckMode::CHECK_ONLY_NONEVENT,   "check_nonevent",   "Ongoing event, check only non-event raids"},
+        },
+        LockWhileRunning::LOCKED,
+        EventCheckMode::CHECK_ALL
+    )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATION_SHINY(
         "Shiny Encounter",
@@ -130,6 +141,7 @@ TeraRoller::TeraRoller()
     })
 {
     PA_ADD_OPTION(CHECK_ONLY_FIRST);
+    PA_ADD_OPTION(EVENT_CHECK_MODE);
     PA_ADD_OPTION(FILTER);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
@@ -161,6 +173,33 @@ void TeraRoller::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
         }
         first = false;
 
+        bool sparkling_raid = false;
+
+        switch (EVENT_CHECK_MODE){
+        case EventCheckMode::CHECK_ALL:
+            break;
+        case EventCheckMode::CHECK_ONLY_EVENT:
+            // this makes sure that we only check sparkling raids
+            // and that includes event & 6 star raids
+            // a later star check will be performed to exclude 6 star raids
+            if (!is_sparkling_raid(env, context)){
+                env.log("No sparkling raid detected, skipping...", COLOR_ORANGE);
+                continue;
+            }
+            break;
+        case EventCheckMode::CHECK_ONLY_NONEVENT:
+            if (is_sparkling_raid(env, context)){
+                // if the user excluded 6 star raids, skip sparkling raids
+                if (FILTER.MIN_STARS > 6 || FILTER.MAX_STARS < 6){
+                    env.log("Sparkling raid detected, skipping...", COLOR_ORANGE);
+                    continue;
+                }
+                // if the user included 6 star raids, defer skip decision
+                sparkling_raid = true;
+            }
+            break;
+        }
+
         if (open_raid(env.console, context)){
             stats.m_raids++;
         }else{
@@ -174,6 +213,31 @@ void TeraRoller::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
         if (stars == 0){
             dump_image(env.logger(), env.program_info(), "ReadStarsFailed", *screen.frame);
         }
+
+        switch (EVENT_CHECK_MODE){
+        case EventCheckMode::CHECK_ALL:
+            break;
+        case EventCheckMode::CHECK_ONLY_EVENT:
+            // only sparkling raids at this point
+            // skip 6 star raids
+            if (stars == 6){
+                env.log("Detected non-event 6 star raid, skipping...", COLOR_ORANGE);
+                stats.m_skipped++;
+                close_raid(env.program_info(), env.console, context);
+                continue;
+            }
+            break;
+        case EventCheckMode::CHECK_ONLY_NONEVENT:
+            // skip sparkling raids unless 6 stars
+            if (sparkling_raid && stars != 6){
+                env.log("Detected event raid, skipping...", COLOR_ORANGE);
+                stats.m_skipped++;
+                close_raid(env.program_info(), env.console, context);
+                continue;
+            }
+            break;
+        }
+        context.wait_for_all_requests();
 
         VideoOverlaySet overlay_set(env.console);
 
