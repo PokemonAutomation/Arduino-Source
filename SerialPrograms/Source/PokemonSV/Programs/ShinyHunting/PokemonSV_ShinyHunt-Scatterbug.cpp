@@ -134,8 +134,10 @@ void ShinyHuntScatterbug::program(SingleSwitchProgramEnvironment& env, BotBaseCo
 
     m_iterations = 0;
     m_consecutive_failures = 0;
-    m_pending_save = true; // We will save before making the sandwich to save rare herbs
+    m_pending_save = false;
     m_last_sandwich = WallClock::min();
+
+    save_game_from_overworld(env.program_info(), env.console, context);
 
     while(true){
         try{
@@ -181,11 +183,6 @@ void ShinyHuntScatterbug::program(SingleSwitchProgramEnvironment& env, BotBaseCo
 // If 
 void ShinyHuntScatterbug::run_one_sandwich_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     ShinyHuntScatterbug_Descriptor::Stats& stats = env.current_stats<ShinyHuntScatterbug_Descriptor::Stats>();
-
-    if (m_pending_save){
-        save_game_from_overworld(env.program_info(), env.console, context);
-        m_pending_save = false;
-    }
 
     // Orient camera to look at same direction as player character
     // This is needed because when save-load the game, the camera is reset
