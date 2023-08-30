@@ -35,6 +35,11 @@ bool reset_game_from_home(
     uint16_t post_wait_time = 125
 );
 
+// From within the game, reset the game.
+// Will throw FatalProgramException if it fails to enter the game.
+void reset_game(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
+
+
 
 
 

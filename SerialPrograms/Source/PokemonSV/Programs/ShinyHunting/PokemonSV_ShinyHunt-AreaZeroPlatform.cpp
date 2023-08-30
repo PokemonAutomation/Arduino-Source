@@ -400,7 +400,6 @@ void ShinyHuntAreaZeroPlatform::run_state(SingleSwitchProgramEnvironment& env, B
 
             // Open picnic and make sandwich
             picnic_at_zero_gate(info, console, context);
-            picnic_from_overworld(info, console, context);
             pbf_move_left_joystick(context, 128, 0, 30, 40);
             enter_sandwich_recipe_list(info, console, context);
 

@@ -263,7 +263,7 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         } else if (game_already_resetted == false){
             // Nothing found in this iteration
             env.log("Resetting game since nothing found, saving sandwich ingredients.");
-            reset_game(env, context, "reset to start new meal");
+            reset_game(env.program_info(), env.console, context);
         } else { // game_already_resetted == true
             env.log("Game resetted back to egg fetching routine.");
         }
@@ -675,17 +675,6 @@ void EggAutonomous::save_game(SingleSwitchProgramEnvironment& env, BotBaseContex
     }
 }
 
-void EggAutonomous::reset_game(SingleSwitchProgramEnvironment& env, BotBaseContext& context, const std::string& error_msg){
-    try{
-        pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
-        context.wait_for_all_requests();
-        reset_game_from_home(env.program_info(), env.console, context, 5 * TICKS_PER_SECOND);
-    }catch (OperationFailedException& e){
-        // To be safe: avoid doing anything outside of game on Switch,
-        // make game resetting non error recoverable
-        throw FatalProgramException(std::move(e));
-    }
-}
 
 void EggAutonomous::handle_recoverable_error(
     SingleSwitchProgramEnvironment& env, BotBaseContext& context,
@@ -728,7 +717,7 @@ void EggAutonomous::handle_recoverable_error(
     }
 
     env.log("Reset game to handle recoverable error");
-    reset_game(env, context, "handling recoverable error");
+    reset_game(env.program_info(), env.console, context);
 }
 
 

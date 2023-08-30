@@ -26,6 +26,7 @@
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSV/Programs/PokemonSV_SaveGame.h"
+#include "PokemonSV/Programs/Sandwiches/PokemonSV_SandwichRoutines.h"
 #include "PokemonSV_LetsGoTools.h"
 #include "PokemonSV_ShinyHunt-Scatterbug.h"
 
@@ -86,11 +87,18 @@ ShinyHuntScatterbug::ShinyHuntScatterbug()
         LockWhileRunning::UNLOCKED,
         false
     )
+    , SANDWICH_OPTIONS(LANGUAGE)
     , GO_HOME_WHEN_DONE(true)
     , AUTO_HEAL_PERCENT(
         "<b>Auto-Heal %</b><br>Auto-heal if your HP drops below this percentage.",
         LockWhileRunning::UNLOCKED,
         75, 0, 100
+    )
+    , SAVE_DEBUG_VIDEO(
+        "<b>Save debug videos to Switch:</b><br>"
+        "Set this on to save a Switch video everytime an error occurs. You can send the video to developers to help them debug later.",
+        LockWhileRunning::LOCKED,
+        false
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
@@ -104,7 +112,11 @@ ShinyHuntScatterbug::ShinyHuntScatterbug()
         &NOTIFICATION_ERROR_FATAL,
     })
 {
+    if (PreloadSettings::instance().DEVELOPER_MODE){
+        PA_ADD_OPTION(SAVE_DEBUG_VIDEO);
+    }
     PA_ADD_OPTION(LANGUAGE);
+    PA_ADD_OPTION(SANDWICH_OPTIONS);
     PA_ADD_OPTION(ENCOUNTER_BOT_OPTIONS);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(AUTO_HEAL_PERCENT);
@@ -121,6 +133,73 @@ void ShinyHuntScatterbug::program(SingleSwitchProgramEnvironment& env, BotBaseCo
     assert_16_9_720p_min(env.logger(), env.console);
 
     m_iterations = 0;
+    m_consecutive_failures = 0;
+    m_pending_save = true; // We will save before making the sandwich to save rare herbs
+    m_last_sandwich = WallClock::min();
+
+    while(true){
+        try{
+            run_one_sandwich_iteration(env, context);
+        }catch(OperationFailedException& e){
+            stats.m_errors++;
+            env.update_stats();
+            e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
+
+            if (SAVE_DEBUG_VIDEO){
+                // Take a video to give more context for debugging
+                pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
+                context.wait_for_all_requests();
+            }
+
+            if (m_pending_save){
+                // We have found a pokemon to keep, but before we can save the game to protect the pokemon, an error occurred.
+                // To not lose the pokemon, don't reset.
+                env.log("Found an error before we can save the game to protect the newly kept pokemon.", COLOR_RED);
+                env.log("Don't reset game to protect it.", COLOR_RED);
+                throw std::move(e);
+            }
+
+            m_consecutive_failures++;
+            if (m_consecutive_failures >= 3){
+                throw OperationFailedException(
+                    ErrorReport::SEND_ERROR_REPORT, env.console,
+                    "Failed 3 times in the row.",
+                    true
+                );
+            }
+
+            env.log("Reset game to handle recoverable error");
+            reset_game(env.program_info(), env.console, context);
+        }catch(ProgramFinishedException&){
+            GO_HOME_WHEN_DONE.run_end_of_program(context);
+            return;
+        }
+    }
+}
+
+// Start at Mesagoza South Gate pokecenter, make a sandwich, then use let's go repeatedly until 30 min passes.
+// If 
+void ShinyHuntScatterbug::run_one_sandwich_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    ShinyHuntScatterbug_Descriptor::Stats& stats = env.current_stats<ShinyHuntScatterbug_Descriptor::Stats>();
+
+    if (m_pending_save){
+        save_game_from_overworld(env.program_info(), env.console, context);
+        m_pending_save = false;
+    }
+
+    // Orient camera to look at same direction as player character
+    // This is needed because when save-load the game, the camera is reset
+    // to this location.
+    pbf_press_button(context, BUTTON_L, 50, 40);
+    // Move forward
+    pbf_move_left_joystick(context, 128, 0, 125, 0);
+    picnic_from_overworld(env.program_info(), env.console, context);
+
+    pbf_move_left_joystick(context, 128, 0, 30, 40);
+    enter_sandwich_recipe_list(env.program_info(), env.console, context);
+    run_sandwich_maker(env, context, SANDWICH_OPTIONS);
+    m_last_sandwich = current_time();
+    leave_picnic(env.program_info(), env.console, context);
 
     LetsGoHpWatcher hp_watcher(COLOR_RED);
     m_hp_watcher = &hp_watcher;
@@ -135,24 +214,23 @@ void ShinyHuntScatterbug::program(SingleSwitchProgramEnvironment& env, BotBaseCo
     );
     m_encounter_tracker = &encounter_tracker;
 
-    m_pending_save = false;
-
     // Which path to choose starting at the PokeCenter.
     size_t path_id = 0;
     const size_t num_paths = 3;
+
+    bool saved_after_this_sandwich = false;
 
     //  This is the outer-most program loop that wraps all logic with the
     //  battle menu detector. If at any time you detect a battle menu, you break
     //  all the way out here to handle the encounter. This is needed because you
     //  can run into pokemon while moving around.
-    m_consecutive_failures = 0;
     while (true){
-        env.console.log("Starting encounter loop...", COLOR_PURPLE);
+        env.console.log("Starting Let's Go hunting loop...", COLOR_PURPLE);
         EncounterWatcher encounter_watcher(env.console, COLOR_RED);
         run_until(
             env.console, context,
             [&](BotBaseContext& context){
-                run_iteration(env, context, path_id);
+                run_lets_go_iteration(env, context, path_id);
             },
             {
                 static_cast<VisualInferenceCallback&>(encounter_watcher),
@@ -175,13 +253,30 @@ void ShinyHuntScatterbug::program(SingleSwitchProgramEnvironment& env, BotBaseCo
         // Use map to fly back to the pokecenter
         reset_to_pokecenter(env, context);
 
+        if (m_pending_save){
+            save_game_from_overworld(env.program_info(), env.console, context);
+            m_pending_save = false;
+            saved_after_this_sandwich = true;
+        }
+
+        if (m_last_sandwich + std::chrono::minutes(30) < current_time()){
+            env.log("Sandwich expires.");
+            env.console.overlay().add_log("Sandwich expires", COLOR_WHITE);
+            break;
+        }
+
         path_id = (path_id + 1) % num_paths;
+    }
+
+    if (!saved_after_this_sandwich){
+        // Reset game to save rare herbs
+        reset_game(env.program_info(), env.console, context);
     }
 }
 
 // One iteration of the hunt: 
 // start at Mesagoza South Gate pokecenter, go out and use Let's Go to battle Scatterbug, 
-void ShinyHuntScatterbug::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context, size_t path_id){
+void ShinyHuntScatterbug::run_lets_go_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context, size_t path_id){
     auto& console = env.console;
     // Orient camera to look at same direction as player character
     // This is needed because when save-load the game, the camera is reset

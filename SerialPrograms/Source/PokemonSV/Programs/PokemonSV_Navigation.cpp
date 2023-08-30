@@ -544,7 +544,8 @@ void fly_to_closest_pokecenter_on_map(const ProgramInfo& info, ConsoleHandle& co
     const uint8_t move_y = uint8_t(std::max(std::min(int(round(push_y + 128) + 0.5), 255), 0));
 
     console.overlay().add_log("Move Cursor to PokeCenter", COLOR_WHITE);
-    pbf_move_left_joystick(context, move_x, move_y, uint16_t(magnitude * scale), 30);
+    const uint16_t push_time = std::max(uint16_t(magnitude * scale + 0.5), uint16_t(3));
+    pbf_move_left_joystick(context, move_x, move_y, push_time, 30);
     fly_to_overworld_from_map(info, console, context);
 }
 

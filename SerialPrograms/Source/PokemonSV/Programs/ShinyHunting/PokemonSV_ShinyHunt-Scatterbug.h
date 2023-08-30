@@ -8,8 +8,6 @@
 #define PokemonAutomation_PokemonSV_ShinyHuntScatterbug_H
 
 #include <functional>
-//#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
-//#include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/FloatingPointOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "CommonFramework/Options/LanguageOCROption.h"
@@ -17,6 +15,7 @@
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "PokemonSV/Options/PokemonSV_EncounterBotCommon.h"
+#include "PokemonSV/Options/PokemonSV_SandwichMakerOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -45,16 +44,22 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
+    void run_one_sandwich_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    
     void reset_to_pokecenter(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
     
-    void run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context, size_t path_id);
+    void run_lets_go_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context, size_t path_id);
 
     OCR::LanguageOCROption LANGUAGE;
+
+    SandwichMakerOption SANDWICH_OPTIONS;
 
     EncounterBotCommonOptions ENCOUNTER_BOT_OPTIONS;
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
     FloatingPointOption AUTO_HEAL_PERCENT;
+
+    BooleanCheckBoxOption SAVE_DEBUG_VIDEO;
 
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;
@@ -69,6 +74,8 @@ private:
     bool m_pending_save;
 
     size_t m_consecutive_failures;
+
+    WallClock m_last_sandwich;
 };
 
 

@@ -59,8 +59,6 @@ private:
 
     void save_game(SingleSwitchProgramEnvironment& env, BotBaseContext& context, bool from_overworld);
 
-    void reset_game(SingleSwitchProgramEnvironment& env, BotBaseContext& context, const std::string& error_msg);
-
     void handle_recoverable_error(
         SingleSwitchProgramEnvironment& env, BotBaseContext& context,
         EventNotificationOption& notification,
