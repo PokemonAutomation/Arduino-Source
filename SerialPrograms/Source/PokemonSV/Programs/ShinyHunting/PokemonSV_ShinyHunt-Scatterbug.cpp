@@ -217,10 +217,8 @@ void ShinyHuntScatterbug::run_one_sandwich_iteration(SingleSwitchProgramEnvironm
 
     bool saved_after_this_sandwich = false;
 
-    //  This is the outer-most program loop that wraps all logic with the
-    //  battle menu detector. If at any time you detect a battle menu, you break
-    //  all the way out here to handle the encounter. This is needed because you
-    //  can run into pokemon while moving around.
+    // In each iteration of this while-loop, it picks a path starting from the pokecenter or the
+    // last sandwich making spot, use Let's Go along the path, then fly back to pokecenter.
     while (true){
         env.console.log("Starting Let's Go hunting loop...", COLOR_PURPLE);
         EncounterWatcher encounter_watcher(env.console, COLOR_RED);
@@ -249,6 +247,8 @@ void ShinyHuntScatterbug::run_one_sandwich_iteration(SingleSwitchProgramEnvironm
         }
         // Use map to fly back to the pokecenter
         reset_to_pokecenter(env, context);
+
+        // TODO: what happened if the player is too close to pokecenter that it cannot detect it on map!?
 
         if (m_pending_save){
             save_game_from_overworld(env.program_info(), env.console, context);
