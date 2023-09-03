@@ -26,7 +26,7 @@ CurryHunter_Descriptor::CurryHunter_Descriptor()
         "PokemonSwSh:CurryHunter",
         STRING_POKEMON + " SwSh", "Curry Hunter",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/CurryHunter.md",
-        "Cooks curry to attract " + STRING_POKEMON + " to your camp. This is a beta version. "
+        "Cooks curry to attract " + STRING_POKEMON + " to your camp. "
         "<font color=\"red\">(This program cannot detect shinies. You must check manually or with " + STRING_POKEMON + " HOME.)</font>",
         FeedbackType::OPTIONAL_,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
@@ -57,6 +57,11 @@ CurryHunter::CurryHunter()
         TICKS_PER_SECOND,
         "2 * TICKS_PER_SECOND"
     )
+    , SMALL_POKEMON(
+        "<b>Small " + STRING_POKEMON + ":</b><br>If there are small " + STRING_POKEMON + ", increase this number by 30. You may have to adjust the number and check what works best for your area.",
+        LockWhileRunning::LOCKED,
+        0
+    )
     , TAKE_VIDEO(
         "<b>Take Videos:</b><br>Take a video after each cooking iteration. This will spam your album with videos.",
         LockWhileRunning::LOCKED,
@@ -69,6 +74,7 @@ CurryHunter::CurryHunter()
     )
 {
     PA_ADD_OPTION(WALK_UP_DELAY);
+    PA_ADD_OPTION(SMALL_POKEMON);
     PA_ADD_OPTION(START_LOCATION);
     PA_ADD_OPTION(TAKE_VIDEO);
     PA_ADD_OPTION(ITERATIONS);
@@ -163,7 +169,7 @@ void CurryHunter::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
                 }
             );
 
-            //  Different implementation of the "attract curry Pokemon" routine. DEFAULT
+            //  Default implementation of the "attract curry Pokemon" routine. 
             pbf_move_left_joystick(context, 0x80, 0x00, 40, 5);     //  Move up a bit to avoid talking to your pokemon.
             pbf_press_button(context, BUTTON_A, 5, 5);
             pbf_move_left_joystick(context, 0xff, 0x80, 55, 0);     //  Right
@@ -186,6 +192,27 @@ void CurryHunter::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
                 pbf_press_button(context, BUTTON_A, 5, 5);
             }
 
+
+            //This routine gives better odds of attracting a low Pokémon if the option is enabled.
+            if (SMALL_POKEMON>0){
+                pbf_move_left_joystick(context, 0x80, 0xff, SMALL_POKEMON, 0);
+
+                for (uint16_t i = 0; i<2; i++){
+                    pbf_move_left_joystick(context, 0x00, 0x80, 30, 0); // Left
+                    pbf_press_button(context, BUTTON_A, 5, 5);
+                    pbf_move_left_joystick(context, 0x00, 0x80, 30, 0); // Left
+                    pbf_press_button(context, BUTTON_A, 5, 5);
+                    pbf_move_left_joystick(context, 0x00, 0x80, 30, 0); // Left
+                    pbf_press_button(context, BUTTON_A, 5, 5);
+                    pbf_move_left_joystick(context, 0xff, 0x80, 30, 0); // Right
+                    pbf_press_button(context, BUTTON_A, 5, 5);
+                    pbf_move_left_joystick(context, 0xff, 0x80, 30, 0); // Right
+                    pbf_press_button(context, BUTTON_A, 5, 5);
+                    pbf_move_left_joystick(context, 0xff, 0x80, 30, 0); // Right
+                    pbf_press_button(context, BUTTON_A, 5, 5);
+                }
+            
+            }
 
             //  Give the pokemon the time to come to us.
             pbf_wait(context, WALK_UP_DELAY);
