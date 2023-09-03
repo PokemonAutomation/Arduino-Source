@@ -49,7 +49,9 @@ PoffinCooker::PoffinCooker()
     , MAX_COOK_ATTEMPTS(
         "<b>Cook this many times:</b><br>This puts a limit on how many poffins you get. Don't forget that each cooking session gets you 4 poffins, and your bag cannot have more than 100 poffins. Thus you should never input more than 25 here.",
         LockWhileRunning::LOCKED,
-        5
+        1,
+        1,
+        25
     )
 
 {
@@ -128,7 +130,7 @@ void PoffinCooker::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
 
     for (uint16_t c = 0; c < MAX_COOK_ATTEMPTS; c++) {
 
-        env.log("Select the 4 berrie to use");
+        env.log("Select the 4 berries to use");
         // Select the first four berries to cook and confirm the selection.
         pbf_press_button(context, BUTTON_A, 5, 50);
         pbf_press_dpad(context, DPAD_DOWN, 5, 50);
