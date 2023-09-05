@@ -102,6 +102,8 @@
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PathSelect.h"
 #include "PokemonSV/Programs/PokemonSV_ConnectToInternet.h"
 #include "CommonFramework/Inference/FrozenImageDetector.h"
+#include "PokemonLA/Inference/PokemonLA_DialogDetector.h"
+#include "PokemonLA/Programs/PokemonLA_GameSave.h"
 
 
 
@@ -192,8 +194,8 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     using namespace Pokemon;
 //    using namespace PokemonSwSh;
 //    using namespace PokemonBDSP;
-//    using namespace PokemonLA;
-    using namespace PokemonSV;
+    using namespace PokemonLA;
+//    using namespace PokemonSV;
 
     [[maybe_unused]] Logger& logger = env.logger();
     [[maybe_unused]] ConsoleHandle& console = env.consoles[0];
@@ -204,6 +206,25 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
+    PokemonLA::save_game_from_overworld(env, console, context);
+
+#if 0
+    NormalDialogDetector detector(logger, overlay, true);
+
+    detector.make_overlays(overlays);
+
+    auto snapshot = console.video().snapshot();
+    cout << detector.process_frame(snapshot, snapshot.timestamp) << endl;
+#endif
+
+//    PokemonLA::open_travel_map_from_jubilife(env, console, context);
+
+
+
+
+
+
+#if 0
     FrozenImageDetector detector(std::chrono::seconds(5), 10);
 
     int ret = wait_until(
@@ -215,6 +236,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     }else{
         console.log("timed out");
     }
+#endif
 
 //    NewsDetector detector;
 //    detector.make_overlays(overlays);
