@@ -316,6 +316,7 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, BotBaseCo
     //Mash A until battle finished
     AdvanceDialogWatcher end_of_battle(COLOR_YELLOW);
     WallClock start = current_time();
+    uint8_t switch_index = HHH_ZOROARK ? 2: 1;
     int ret_black = run_until(
         env.console, context,
         [&](BotBaseContext& context) {
@@ -332,21 +333,36 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, BotBaseCo
                     );
                 }
 
+                GradientArrowWatcher switch_pokemon(COLOR_BLUE, GradientArrowType::RIGHT, {0.50, 0.40, 0.20, 0.30});
                 NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
+                SwapMenuWatcher fainted(COLOR_RED);
+                context.wait_for_all_requests();
+
                 int ret = wait_until(
                     env.console, context,
                     std::chrono::seconds(90), //Tera takes ~25 to 30 seconds each, slightly over 60 seconds if both player and opponent uses in the same turn
-                    { battle_menu } //End of battle from tera'd ace takes longer, 45 seconds was not enough
+                    { switch_pokemon, battle_menu, fainted } //End of battle from tera'd ace takes longer, 45 seconds was not enough
                 );
-                if (ret == 0) {
-                    env.log("Battle menu detected. Pressing A to attack.");
-                    pbf_mash_button(context, BUTTON_A, 300);
-                    context.wait_for_all_requests();
-                } else {
+                switch (ret){
+                case 0:
+                    env.log("Detected switch Pokémon prompt. Pressing B to not switch...");
+                    pbf_mash_button(context, BUTTON_B, 3 * TICKS_PER_SECOND);
+                    break;
+                case 1:
+                    env.log("Detected battle menu. Pressing A to attack...");
+                    pbf_mash_button(context, BUTTON_A, 3 * TICKS_PER_SECOND);
+                    break;
+                case 2:
+                    env.log("Detected Pokémon fainting. Switching to next living Pokémon...");
+                    if (fainted.move_to_slot(env.console, context, switch_index)){
+                        pbf_mash_button(context, BUTTON_A, 3 * TICKS_PER_SECOND);
+                        switch_index++;
+                    }
+                    break;
+                default:
                     env.log("Timed out during battle. Stuck, crashed, or took more than 90 seconds for a turn.", COLOR_RED);
                     stats.errors++;
                     env.update_stats();
-                    send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
                     throw OperationFailedException(
                         ErrorReport::SEND_ERROR_REPORT, env.console,
                         "Timed out during battle. Stuck, crashed, or took more than 90 seconds for a turn.",
