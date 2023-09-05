@@ -316,7 +316,7 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, BotBaseCo
     //Mash A until battle finished
     AdvanceDialogWatcher end_of_battle(COLOR_YELLOW);
     WallClock start = current_time();
-    uint8_t switch_index = HHH_ZOROARK ? 2: 1;
+    uint8_t switch_party_slot = HHH_ZOROARK ? 2: 1;
     int ret_black = run_until(
         env.console, context,
         [&](BotBaseContext& context) {
@@ -354,9 +354,9 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, BotBaseCo
                     break;
                 case 2:
                     env.log("Detected Pokémon fainting. Switching to next living Pokémon...");
-                    if (fainted.move_to_slot(env.console, context, switch_index)){
+                    if (fainted.move_to_slot(env.console, context, switch_party_slot)){
                         pbf_mash_button(context, BUTTON_A, 3 * TICKS_PER_SECOND);
-                        switch_index++;
+                        switch_party_slot++;
                     }
                     break;
                 default:
