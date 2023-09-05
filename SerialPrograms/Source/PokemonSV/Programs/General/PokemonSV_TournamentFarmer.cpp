@@ -353,7 +353,8 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, BotBaseCo
                     pbf_mash_button(context, BUTTON_A, 3 * TICKS_PER_SECOND);
                     break;
                 case 2:
-                    env.log("Detected Pokémon fainting. Switching to next living Pokémon...");
+                    // Since we can't run from the tournament, loop through all party Pokémon spamming their first move.
+                    env.log("Detected fainted Pokémon. Switching to next living Pokémon...");
                     if (fainted.move_to_slot(env.console, context, switch_party_slot)){
                         pbf_mash_button(context, BUTTON_A, 3 * TICKS_PER_SECOND);
                         switch_party_slot++;
