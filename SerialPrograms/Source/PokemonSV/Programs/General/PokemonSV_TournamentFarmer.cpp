@@ -71,22 +71,47 @@ std::unique_ptr<StatsTracker> TournamentFarmer_Descriptor::make_stats() const {
     return std::unique_ptr<StatsTracker>(new Stats());
 }
 
+
+TournamentFarmer::StopButton::StopButton()
+    : ButtonOption(
+      "<b>Stop after Current Tournament:",
+      "Stop after current Tournament",
+      0, 16
+    )
+{}
+void TournamentFarmer::StopButton::set_idle(){
+    this->set_enabled(false);
+    this->set_text("Stop after current Tournament");
+}
+void TournamentFarmer::StopButton::set_ready(){
+    this->set_enabled(true);
+    this->set_text("Stop after current Tournament");
+}
+void TournamentFarmer::StopButton::set_pressed(){
+    this->set_enabled(false);
+    this->set_text("Program will stop after current tournament...");
+}
+
+
+TournamentFarmer::~TournamentFarmer(){
+    STOP_AFTER_CURRENT.remove_listener(*this);
+}
 TournamentFarmer::TournamentFarmer()
     : NUM_ROUNDS(
-          "<b>Number of Tournaments to run:",
-          LockWhileRunning::UNLOCKED,
-          100, 0
-          )
+        "<b>Number of Tournaments to run:",
+        LockWhileRunning::UNLOCKED,
+        100, 0
+    )
     , TRY_TO_TERASTILLIZE(
-          "<b>Use Terastillization:</b><br>Tera at the start of battle. Will take longer to complete each tournament but may be worth the attack boost.<br>This setting is not necessary if you are running a set specifically made to farm the tournament.",
-          LockWhileRunning::UNLOCKED,
-          false
-          )
+        "<b>Use Terastillization:</b><br>Tera at the start of battle. Will take longer to complete each tournament but may be worth the attack boost.<br>This setting is not necessary if you are running a set specifically made to farm the tournament.",
+        LockWhileRunning::UNLOCKED,
+        false
+    )
     , SAVE_NUM_ROUNDS(
-          "<b>Save every this many tournaments:</b><br>Zero disables saving. Will save win or lose.",
-          LockWhileRunning::UNLOCKED,
-          0, 0
-          )
+        "<b>Save every this many tournaments:</b><br>Zero disables saving. Will save win or lose.",
+        LockWhileRunning::UNLOCKED,
+        0, 0
+    )
     , MONEY_LIMIT(
         "<b>Stop after earning this amount of money:</b><br>Zero disables this check. Does not count losses. In-game maximum is 9,999,999. This can be set up to 999,999,999.",
         LockWhileRunning::UNLOCKED,
@@ -103,7 +128,7 @@ TournamentFarmer::TournamentFarmer()
           TournamentPrizeNameReader::instance().languages(),
           LockWhileRunning::LOCKED,
           true
-          )
+    )
     , TARGET_ITEMS("<b>Items:</b>")
     , NOTIFICATION_PRIZE_MATCH("Matching Prize", true, false, ImageAttachmentMode::JPG, { "Notifs" })
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
@@ -112,8 +137,10 @@ TournamentFarmer::TournamentFarmer()
         &NOTIFICATION_STATUS_UPDATE,
         &NOTIFICATION_PROGRAM_FINISH,
         &NOTIFICATION_ERROR_FATAL,
-        })
+    })
+    , m_stop_after_current(false)
 {
+    PA_ADD_OPTION(STOP_AFTER_CURRENT);
     PA_ADD_OPTION(NUM_ROUNDS);
     PA_ADD_OPTION(TRY_TO_TERASTILLIZE);
     PA_ADD_OPTION(SAVE_NUM_ROUNDS);
@@ -123,6 +150,15 @@ TournamentFarmer::TournamentFarmer()
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(TARGET_ITEMS);
     PA_ADD_OPTION(NOTIFICATIONS);
+
+    STOP_AFTER_CURRENT.set_idle();
+    STOP_AFTER_CURRENT.add_listener(*this);
+}
+
+void TournamentFarmer::on_press(){
+    global_logger_tagged().log("Stop after current requested...");
+    m_stop_after_current.store(true, std::memory_order_relaxed);
+    STOP_AFTER_CURRENT.set_pressed();
 }
 
 //Check and process the amount of money earned at the end of a battle
@@ -559,9 +595,29 @@ void TournamentFarmer::return_to_academy_after_loss(SingleSwitchProgramEnvironme
 }
 
 
+
+class TournamentFarmer::ResetOnExit{
+public:
+    ResetOnExit(StopButton& button)
+        : m_button(button)
+    {}
+    ~ResetOnExit(){
+        m_button.set_idle();
+    }
+
+private:
+    StopButton& m_button;
+};
+
+
+
 void TournamentFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
     assert_16_9_720p_min(env.logger(), env.console);
     TournamentFarmer_Descriptor::Stats& stats = env.current_stats<TournamentFarmer_Descriptor::Stats>();
+
+    m_stop_after_current.store(false, std::memory_order_relaxed);
+    STOP_AFTER_CURRENT.set_ready();
+    ResetOnExit reset_button_on_exit(STOP_AFTER_CURRENT);
 
     /*
     Preconditions:
@@ -577,9 +633,14 @@ void TournamentFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseConte
     other languages: make sure "bottle cap" isn't misread as "bottle of PP Up"
     */
 
-    for(uint32_t c = 0; c < NUM_ROUNDS; c++) {
+    for (uint32_t c = 0; c < NUM_ROUNDS; c++){
+        if (m_stop_after_current.load(std::memory_order_relaxed)){
+            break;
+        }
+
         env.log("Tournament loop started.");
-        //Initiate dialog then mash until first battle starts
+
+        //  Initiate dialog then mash until first battle starts
         AdvanceDialogWatcher advance_detector(COLOR_YELLOW);
         pbf_press_button(context, BUTTON_A, 10, 50);
         pbf_press_button(context, BUTTON_A, 10, 50);
@@ -607,10 +668,9 @@ void TournamentFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseConte
         context.wait_for_all_requests();
 
         bool battle_lost = false;
-        for (uint16_t battles = 0; battles < 4; battles++) {
+        for (uint16_t battles = 0; battles < 4; battles++){
             NormalBattleMenuWatcher battle_menu2(COLOR_YELLOW); //Next battle started
             OverworldWatcher overworld(COLOR_CYAN); //Previous battle was lost
-            
             int ret_battle2 = run_until(
                 env.console, context,
                 [](BotBaseContext& context) {
@@ -646,7 +706,7 @@ void TournamentFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseConte
             }
 
             //If this is the last battle in the tournament check for overworld in case player lost
-            if (battles == 3) {
+            if (battles == 3){
                 env.log("Final battle of the tournament complete, checking for overworld/loss.");
 
                 //Clear dialog, mash B
@@ -659,7 +719,7 @@ void TournamentFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseConte
                     std::chrono::seconds(3),
                     { overworld2 }
                 );
-                switch (ret_lost_final) {
+                switch (ret_lost_final){
                 case 0:
                     env.log("Final battle of the tournament lost.");
                     battle_lost = true;
@@ -673,14 +733,14 @@ void TournamentFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseConte
                 }
             }
 
-            if (battle_lost) {
+            if (battle_lost){
                 return_to_academy_after_loss(env, context);
                 break;
             }
         }
 
         //Tournament won
-        if (!battle_lost) {
+        if (!battle_lost){
             handle_end_of_tournament(env, context);
         }
 
@@ -688,14 +748,14 @@ void TournamentFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseConte
 
         //Save the game if option is set
         uint16_t num_rounds_temp = SAVE_NUM_ROUNDS;
-        if (num_rounds_temp != 0 && ((c + 1) % num_rounds_temp) == 0) {
+        if (num_rounds_temp != 0 && ((c + 1) % num_rounds_temp) == 0){
             env.log("Saving game.");
             save_game_from_overworld(env.program_info(), env.console, context);
         }
 
         //Break loop and finish program if money limit is hit
         uint32_t earnings_temp = MONEY_LIMIT;
-        if (earnings_temp != 0 && stats.money >= earnings_temp) {
+        if (earnings_temp != 0 && stats.money >= earnings_temp){
             env.log("Money limit hit. Ending program.");
             break;
         }
