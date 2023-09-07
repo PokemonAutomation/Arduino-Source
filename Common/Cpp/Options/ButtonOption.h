@@ -75,6 +75,7 @@ protected:
 
 class ButtonOption : public ButtonCell{
 public:
+    ~ButtonOption();
     ButtonOption(const ButtonOption& x) = delete;
     ButtonOption(
         std::string label,

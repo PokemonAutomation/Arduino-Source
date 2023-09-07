@@ -137,6 +137,7 @@ struct ButtonOption::Data{
 };
 
 
+ButtonOption::~ButtonOption() = default;
 ButtonOption::ButtonOption(
     std::string label,
     std::string text,
