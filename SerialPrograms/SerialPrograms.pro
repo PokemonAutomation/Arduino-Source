@@ -100,6 +100,7 @@ SOURCES += \
     ../Common/Cpp/LifetimeSanitizer.cpp \
     ../Common/Cpp/Options/BatchOption.cpp \
     ../Common/Cpp/Options/BooleanCheckBoxOption.cpp \
+    ../Common/Cpp/Options/ButtonOption.cpp \
     ../Common/Cpp/Options/ConfigOption.cpp \
     ../Common/Cpp/Options/DateOption.cpp \
     ../Common/Cpp/Options/EditableTableOption.cpp \
@@ -128,6 +129,7 @@ SOURCES += \
     ../Common/Qt/ExpressionEvaluator.cpp \
     ../Common/Qt/Options/BatchWidget.cpp \
     ../Common/Qt/Options/BooleanCheckBoxWidget.cpp \
+    ../Common/Qt/Options/ButtonWidget.cpp \
     ../Common/Qt/Options/ConfigWidget.cpp \
     ../Common/Qt/Options/DateWidget.cpp \
     ../Common/Qt/Options/EditableTableWidget.cpp \
@@ -1058,6 +1060,7 @@ HEADERS += \
     ../Common/Cpp/LifetimeSanitizer.h \
     ../Common/Cpp/Options/BatchOption.h \
     ../Common/Cpp/Options/BooleanCheckBoxOption.h \
+    ../Common/Cpp/Options/ButtonOption.h \
     ../Common/Cpp/Options/ConfigOption.h \
     ../Common/Cpp/Options/DateOption.h \
     ../Common/Cpp/Options/EditableTableOption.h \
@@ -1107,6 +1110,7 @@ HEADERS += \
     ../Common/Qt/NoWheelComboBox.h \
     ../Common/Qt/Options/BatchWidget.h \
     ../Common/Qt/Options/BooleanCheckBoxWidget.h \
+    ../Common/Qt/Options/ButtonWidget.h \
     ../Common/Qt/Options/ConfigWidget.h \
     ../Common/Qt/Options/DateWidget.h \
     ../Common/Qt/Options/EditableTableWidget.h \

@@ -42,17 +42,17 @@ bool BlackBorderDetector::detect(const ImageViewRGB32& screen) const{
         return false;
     }
     ImageStats bottom = image_stats(extract_box_reference(screen, m_bottom));
-    cout << "bottom = " << bottom.average << bottom.stddev << endl;
+//    cout << "bottom = " << bottom.average << bottom.stddev << endl;
     if (!is_black(bottom, MAX_SUM, MAX_STDDEV)){
         return false;
     }
     ImageStats left = image_stats(extract_box_reference(screen, m_left));
-    cout << "left = " << left.average << left.stddev << endl;
+//    cout << "left = " << left.average << left.stddev << endl;
     if (!is_black(left, MAX_SUM, MAX_STDDEV)){
         return false;
     }
     ImageStats right = image_stats(extract_box_reference(screen, m_right));
-    cout << "right = " << right.average << right.stddev << endl;
+//    cout << "right = " << right.average << right.stddev << endl;
     if (!is_black(right, MAX_SUM, MAX_STDDEV)){
         return false;
     }

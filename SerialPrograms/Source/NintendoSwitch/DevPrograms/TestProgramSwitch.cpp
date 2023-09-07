@@ -152,8 +152,19 @@ TestProgram_Descriptor::TestProgram_Descriptor()
 {}
 
 
+TestProgram::~TestProgram(){
+    BUTTON1.remove_listener(*this);
+    BUTTON0.remove_listener(*this);
+}
 TestProgram::TestProgram()
-    : LANGUAGE(
+    : BUTTON0(
+        "Button Text 0", 0, 16
+    )
+    , BUTTON1(
+        "<b>Button Label:</b><br><font color=\"red\">asdfasdfasdf</font>",
+        "Button Text 1", 0, 16
+    )
+    , LANGUAGE(
         "<b>OCR Language:</b>",
         { Language::English },
         LockWhileRunning::LOCKED,
@@ -169,11 +180,15 @@ TestProgram::TestProgram()
         &NOTIFICATION_ERROR_FATAL,
     })
 {
+    PA_ADD_OPTION(BUTTON0);
+    PA_ADD_OPTION(BUTTON1);
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(STATIC_TEXT);
     PA_ADD_OPTION(SELECT);
     PA_ADD_OPTION(PLAYER_LIST);
     PA_ADD_OPTION(NOTIFICATIONS);
+    BUTTON0.add_listener(*this);
+    BUTTON1.add_listener(*this);
 }
 
 
@@ -183,6 +198,12 @@ using namespace Kernels::Waterfill;
 using namespace PokemonSV;
 
 
+void TestProgram::on_press(){
+    global_logger_tagged().log("Button Pressed");
+//    BUTTON.set_enabled(false);
+    BUTTON0.set_text("Button Pressed");
+    BUTTON1.set_text("Button Pressed");
+}
 
 
 
@@ -206,7 +227,8 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
-    PokemonLA::save_game_from_overworld(env, console, context);
+
+//    PokemonLA::save_game_from_overworld(env, console, context);
 
 #if 0
     NormalDialogDetector detector(logger, overlay, true);

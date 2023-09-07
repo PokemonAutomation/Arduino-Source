@@ -117,6 +117,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/Options/BatchOption.h
     ../Common/Cpp/Options/BooleanCheckBoxOption.cpp
     ../Common/Cpp/Options/BooleanCheckBoxOption.h
+    ../Common/Cpp/Options/ButtonOption.cpp
+    ../Common/Cpp/Options/ButtonOption.h
     ../Common/Cpp/Options/ConfigOption.cpp
     ../Common/Cpp/Options/ConfigOption.h
     ../Common/Cpp/Options/DateOption.cpp
@@ -195,6 +197,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Qt/Options/BatchWidget.h
     ../Common/Qt/Options/BooleanCheckBoxWidget.cpp
     ../Common/Qt/Options/BooleanCheckBoxWidget.h
+    ../Common/Qt/Options/ButtonWidget.cpp
+    ../Common/Qt/Options/ButtonWidget.h
     ../Common/Qt/Options/ConfigWidget.cpp
     ../Common/Qt/Options/ConfigWidget.h
     ../Common/Qt/Options/DateWidget.cpp
