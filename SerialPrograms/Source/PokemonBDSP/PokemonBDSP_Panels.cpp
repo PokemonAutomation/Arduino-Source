@@ -70,7 +70,6 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<MoneyFarmerRoute210_Descriptor, MoneyFarmerRoute210>());
     ret.emplace_back(make_single_switch_program<DoublesLeveling_Descriptor, DoublesLeveling>());
     ret.emplace_back(make_single_switch_program<AmitySquarePickUpFarmer_Descriptor, AmitySquarePickUpFarmer>());
-    ret.emplace_back(make_single_switch_program<PoffinCooker_Descriptor, PoffinCooker>());
     ret.emplace_back(make_single_switch_program<GiftBerryReset_Descriptor, GiftBerryReset>());
 
     ret.emplace_back("---- Shiny Hunting ----");
@@ -92,6 +91,10 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back("---- Glitches (v1.1.2) ----");
     ret.emplace_back(make_single_switch_program<ActivateMenuGlitch112_Descriptor, ActivateMenuGlitch112>());
 
+    if (PreloadSettings::instance().DEVELOPER_MODE){
+        ret.emplace_back("---- Untested/Beta/WIP ----");
+        ret.emplace_back(make_single_switch_program<PoffinCooker_Descriptor, PoffinCooker>());
+    }
     if (PreloadSettings::instance().DEVELOPER_MODE){
         ret.emplace_back("---- Developer Tools ----");
         ret.emplace_back(make_single_switch_program<ShinyEncounterTester_Descriptor, ShinyEncounterTester>());

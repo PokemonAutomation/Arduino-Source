@@ -78,10 +78,8 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
 //    ret.emplace_back("---- Trading ----");
     ret.emplace_back(make_multi_switch_program<SelfBoxTrade_Descriptor, SelfBoxTrade>());
 
-//    if (PreloadSettings::instance().DEVELOPER_MODE) {
-//        ret.emplace_back("---- Sandwiches ----");
-        ret.emplace_back(make_single_switch_program<SandwichMaker_Descriptor, SandwichMaker>());
-//    }
+//    ret.emplace_back("---- Sandwiches ----");
+    ret.emplace_back(make_single_switch_program<SandwichMaker_Descriptor, SandwichMaker>());
 
     ret.emplace_back("---- Farming ----");
     ret.emplace_back(make_single_switch_program<LPFarmer_Descriptor, LPFarmer>());
@@ -109,14 +107,15 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
 
     ret.emplace_back("---- Shiny Hunting ----");
     ret.emplace_back(make_single_switch_program<ShinyHuntAreaZeroPlatform_Descriptor, ShinyHuntAreaZeroPlatform>());
-    if (PreloadSettings::instance().DEVELOPER_MODE){
-        ret.emplace_back(make_single_switch_program<ShinyHuntScatterbug_Descriptor, ShinyHuntScatterbug>());
-    }
 
     ret.emplace_back("---- Glitches ----");
     ret.emplace_back(make_single_switch_program<RideCloner101_Descriptor, RideCloner101>());
     ret.emplace_back(make_single_switch_program<CloneItems101_Descriptor, CloneItems101>());
 
+    if (PreloadSettings::instance().DEVELOPER_MODE){
+        ret.emplace_back("---- Untested/Beta/WIP ----");
+        ret.emplace_back(make_single_switch_program<ShinyHuntScatterbug_Descriptor, ShinyHuntScatterbug>());
+    }
     if (PreloadSettings::instance().DEVELOPER_MODE){
         ret.emplace_back("---- Developer Tools ----");
         ret.emplace_back(make_single_switch_program<SoundListener_Descriptor, SoundListener>());

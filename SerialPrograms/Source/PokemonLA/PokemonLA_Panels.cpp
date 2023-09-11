@@ -93,10 +93,11 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<ShinyHuntFlagPin_Descriptor, ShinyHuntFlagPin>());
     ret.emplace_back(make_single_switch_program<PostMMOSpawnReset_Descriptor, PostMMOSpawnReset>());
     ret.emplace_back(make_single_switch_program<ShinyHuntCustomPath_Descriptor, ShinyHuntCustomPath>());
+
     if (PreloadSettings::instance().DEVELOPER_MODE){
+        ret.emplace_back("---- Untested/Beta/WIP ----");
         ret.emplace_back(make_single_switch_program<AutoMultiSpawn_Descriptor, AutoMultiSpawn>());
     }
-
     if (PreloadSettings::instance().DEVELOPER_MODE){
         ret.emplace_back("---- Developer Tools ----");
         ret.emplace_back(make_single_switch_program<MountDetectionTest_Descriptor, MountDetectionTest>());

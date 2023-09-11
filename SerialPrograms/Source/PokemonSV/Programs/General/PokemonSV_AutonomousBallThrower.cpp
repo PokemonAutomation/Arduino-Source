@@ -117,6 +117,7 @@ void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, BotBase
         USE_FIRST_MOVE_IF_CANNOT_THROW_BALL,
         [&]{
             stats.m_balls++;
+            env.update_stats();
         }
     );
     env.update_stats();
