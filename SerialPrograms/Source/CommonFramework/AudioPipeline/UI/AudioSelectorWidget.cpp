@@ -162,6 +162,12 @@ AudioSelectorWidget::AudioSelectorWidget(
     );
 
     connect(
+        m_volume_slider, &QSlider::valueChanged, this, [this](int value){
+            m_session.set_volume(value / 100.);
+        }
+    );
+#if 0
+    connect(
         m_volume_slider, &QSlider::sliderMoved, this, [this](){
             m_session.set_volume(m_volume_slider->value() / 100.);
         }
@@ -176,6 +182,7 @@ AudioSelectorWidget::AudioSelectorWidget(
             m_slider_active.store(false, std::memory_order_release);
         }
     );
+#endif
 
     // only in developer mode:
     // record audio
