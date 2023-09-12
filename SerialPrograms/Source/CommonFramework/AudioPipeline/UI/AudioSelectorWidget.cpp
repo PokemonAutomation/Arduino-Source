@@ -35,7 +35,7 @@ AudioSelectorWidget::AudioSelectorWidget(
 )
     : QWidget(&parent)
     , m_session(session)
-    , m_slider_active(false)
+//    , m_slider_active(false)
 {
     QVBoxLayout* vbox = new QVBoxLayout(this);
     vbox->setContentsMargins(0, 0, 0, 0);
@@ -331,9 +331,9 @@ void AudioSelectorWidget::output_changed(const AudioDeviceInfo& device){
     });
 }
 void AudioSelectorWidget::volume_changed(double volume){
-    if (m_slider_active.load(std::memory_order_acquire)){
-        return;
-    }
+//    if (m_slider_active.load(std::memory_order_acquire)){
+//        return;
+//    }
     QMetaObject::invokeMethod(this, [this, volume]{
         refresh_volume(volume);
     }, Qt::QueuedConnection);   //  Queued due to potential recursive call to the same lock.

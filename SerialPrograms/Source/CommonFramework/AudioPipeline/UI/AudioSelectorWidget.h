@@ -69,7 +69,7 @@ private:
     std::vector<AudioDeviceInfo> m_output_audios;
 
     std::mutex m_audio_lock;
-    std::atomic<bool> m_slider_active;
+//    std::atomic<bool> m_slider_active;
 };
 
 
