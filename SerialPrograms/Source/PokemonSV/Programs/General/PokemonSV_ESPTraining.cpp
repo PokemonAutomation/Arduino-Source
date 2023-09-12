@@ -10,6 +10,7 @@
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Tools/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_ScalarButtons.h"
 #include "PokemonSV/Programs/PokemonSV_SaveGame.h"
 //#include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "Pokemon/Pokemon_Strings.h"
@@ -151,46 +152,65 @@ void ESPTraining::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
                 if (ret2 < 0) {
                     env.log("Timeout waiting for emotion.");
                 }
+
+                Button emotion_button = BUTTON_X;
+
                 switch (detector.result()) {
                 case Detection::RED:
                     env.log("ESPEmotionDetector: Angry - Red - Press X", COLOR_BLACK);
-                    pbf_press_button(context, BUTTON_X, 10, 50);
+                    emotion_button = BUTTON_X;
                     stats.m_emotions++;
                     stats.m_anger++;
-                    env.update_stats();
                     break;
                 case Detection::YELLOW:
                     env.log("ESPEmotionDetector: Joy - Yellow - Press A", COLOR_BLACK);
-                    pbf_press_button(context, BUTTON_A, 10, 50);
+                    emotion_button = BUTTON_A;
                     stats.m_emotions++;
                     stats.m_joy++;
-                    env.update_stats();
                     break;
                 case Detection::BLUE:
                     env.log("ESPEmotionDetector: Surprised - Blue - Press B", COLOR_BLACK);
-                    pbf_press_button(context, BUTTON_B, 10, 50);
+                    emotion_button = BUTTON_B;
                     stats.m_emotions++;
                     stats.m_surprise++;
-                    env.update_stats();
                     break;
                 case Detection::GREEN:
                     env.log("ESPEmotionDetector: Excited - Green - Press Y", COLOR_BLACK);
-                    pbf_press_button(context, BUTTON_Y, 10, 50);
+                    emotion_button = BUTTON_Y;
                     stats.m_emotions++;
                     stats.m_excitement++;
-                    env.update_stats();
                     break;
                 case Detection::GREY:
                     //Press any button to start next round
                     //Pressing A tends to make Dendra :D two extra times during the transistion so press B instead
                     //Sometimes this is detected as blue, the B press there also works
                     env.log("ESPEmotionDetector: Grey - Mash though dialog", COLOR_BLACK);
-                    pbf_press_button(context, BUTTON_B, 10, 50);
+                    emotion_button = BUTTON_B;
                     break;
                 default:
                     endflag = false;
                     break;
                 }
+
+                // Press button and check it did not drop input. Press again if it did.
+                // This will result in a duplicate press between phases, but the press will do nothing.
+                pbf_press_button(context, emotion_button, 10, 50);
+                env.update_stats();
+
+                ESPPressedEmotionDetector emotion_press_detected;
+                int check = wait_until(
+                    env.console, context,
+                    std::chrono::seconds(1),
+                    { { emotion_press_detected } }
+                );
+                if (check < 0) {
+                    env.log("Emotion press not detected in bottom right. Pressing button again.");
+                    pbf_press_button(context, emotion_button, 10, 50);
+                }
+                else {
+                    env.log("Emotion press detected.");
+                }
+
                 //Look for the brief moment the dialog bubble vanishes
                 ret = wait_until(
                     env.console, context,
