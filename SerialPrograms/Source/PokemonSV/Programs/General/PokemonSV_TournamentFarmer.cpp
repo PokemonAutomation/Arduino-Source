@@ -141,9 +141,7 @@ TournamentFarmer::TournamentFarmer()
     })
     , m_stop_after_current(false)
 {
-    if (PreloadSettings::instance().DEVELOPER_MODE){
-        PA_ADD_OPTION(STOP_AFTER_CURRENT);
-    }
+    PA_ADD_OPTION(STOP_AFTER_CURRENT);
     PA_ADD_OPTION(NUM_ROUNDS);
     PA_ADD_OPTION(TRY_TO_TERASTILLIZE);
     PA_ADD_OPTION(SAVE_NUM_ROUNDS);
