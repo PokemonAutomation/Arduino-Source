@@ -23,15 +23,17 @@ int read_money(Logger& logger, const ImageViewRGB32& image){
     std::string ocr_text = OCR::ocr_read(Language::English, image);
     std::string normalized;
 
+    //logger.log("OCR Text: " + ocr_text);
+
     //Clean up the string because regex search does not like accented characters
-    std::regex regg("[^a-zA-Z0-9\xA3, .]+");
+    std::regex regg("[^a-zA-Z0-9\xA3, .#]+");
     ocr_text = std::regex_replace(ocr_text, regg, "");
 
     //Find pound sign and amount, we want to prevent cases like the following:
     //OCR Text: "Al IRt 1N} . !You got 27,200 in prize money!" -> "4127200" -> 4127200
     //OCR Text: "You got 26,400 in prize money!AR -" -> "264004" -> 264004
     //OCR Text: "v N r 1 .You got 26,400 in prize money!" -> "126400" -> 126400
-    std::regex reg{ "\xA3[a-zA-Z0-9,.]+| [0-9,. ]+\xA3" };
+    std::regex reg{ "\xA3[a-zA-Z0-9,.]+| [0-9,. ]+(\xA3|#)" };
     std::smatch match;
     std::regex_search(ocr_text, match, reg);
     std::ssub_match sub_match = match[0];
