@@ -25,6 +25,7 @@
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/Map/PokemonSV_MapPokeCenterIconDetector.h"
+#include "PokemonSV/Inference/PokemonSV_ESPEmotionDetector.h"
 
 #include <iostream>
 using std::cout;
@@ -462,6 +463,12 @@ int test_pokemonSV_MapPokeCenterIconDetector(const ImageViewRGB32& image, int ta
     //     draw_box(new_image, p_box, uint32_t(COLOR_BLUE));
     // }
     // new_image.save("./test_pokecenter.png");
+    return 0;
+}
+int test_pokemonSV_ESPPressedEmotionDetector(const ImageViewRGB32& image, bool target) {
+    ESPPressedEmotionDetector detector;
+    bool result = detector.detect(image);
+    TEST_RESULT_EQUAL(result, target);
     return 0;
 }
 
