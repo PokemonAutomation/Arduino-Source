@@ -123,6 +123,7 @@
 #include "NintendoSwitch/Inference/NintendoSwitch_DetectHome.h"
 #include "PokemonSV/Inference/Picnics/PokemonSV_SandwichRecipeDetector.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_BattleMenu.h"
+#include "PokemonSV/Inference/PokemonSV_PokemonSummaryReader.h"
 
 #ifdef PA_ARCH_x86
 //#include "Kernels/Kernels_x64_SSE41.h"
@@ -226,9 +227,16 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 //    using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
 
 
+    ImageRGB32 image("screenshot-20230912-194941389243.png");
+    NintendoSwitch::PokemonSV::PokemonSummaryDetector detector;
+    cout << detector.detect(image) << endl;
+
+
+#if 0
     ImageRGB32 image("20230726-213101330270-ProgramHang.png");
     NintendoSwitch::PokemonSwSh::MaxLairInternal::BattleMenuDetector detector;
     cout << detector.detect(image) << endl;
+#endif
 
 //    SandwichRecipeNumberDetector detector(env.logger());
 //    size_t recipe_IDs[6];

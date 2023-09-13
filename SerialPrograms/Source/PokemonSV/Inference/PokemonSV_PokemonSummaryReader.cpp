@@ -52,7 +52,8 @@ bool PokemonSummaryDetector::detect(const ImageViewRGB32& screen) const{
     }
 #else
     if (!is_solid(bottom, {0.648549, 0.286158, 0.0652928}, 0.15, 20) && //  Scarlet
-        !is_solid(bottom, {0.367816, 0.0746615, 0.557523}, 0.15, 20)    //  Violet
+        !is_solid(bottom, {0.367816, 0.0746615, 0.557523}, 0.15, 20) && //  Violet
+        !is_solid(bottom, {0.137949, 0.708023, 0.154028}, 0.15, 20)     //  DLC Green
     ){
         return false;
     }
