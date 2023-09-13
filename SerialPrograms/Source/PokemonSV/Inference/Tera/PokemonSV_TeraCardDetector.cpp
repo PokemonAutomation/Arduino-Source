@@ -36,12 +36,15 @@ namespace PokemonSV{
 
 
 
+
+
+
 TeraCardReader::TeraCardReader(Color color)
     : m_color(color)
     , m_top(0.15, 0.13, 0.40, 0.03)
     , m_bottom_left(0.15, 0.80, 0.10, 0.06)
     , m_bottom_right(0.73, 0.85, 0.12, 0.02)
-    , m_label(0.75, 0.67, 0.10, 0.05)
+    , m_label(CARD_LABEL_BOX())
     , m_cursor(0.135, 0.25, 0.05, 0.25)
     , m_stars(0.500, 0.555, 0.310, 0.070)
 {}
@@ -53,6 +56,17 @@ void TeraCardReader::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_cursor);
     items.add(m_color, m_stars);
 }
+
+const ImageFloatBox& TeraCardReader::CARD_LABEL_BOX(){
+    static ImageFloatBox box(0.75, 0.67, 0.10, 0.05);
+    return box;
+}
+bool TeraCardReader::is_card_label(const ImageViewRGB32& screen){
+    ImageStats label = image_stats(extract_box_reference(screen, CARD_LABEL_BOX()));
+    return is_solid(label, {0.370075, 0.369063, 0.260862})              //  Paldea Card
+        || is_solid(label, {0.258888, 0.369491, 0.371621}, 0.15, 15);   //  Kitakami Card
+}
+
 bool TeraCardReader::detect(const ImageViewRGB32& screen) const{
     ImageStats top = image_stats(extract_box_reference(screen, m_top));
 //    cout << top.average << top.stddev << endl;
@@ -87,12 +101,10 @@ bool TeraCardReader::detect(const ImageViewRGB32& screen) const{
         return false;
     }
 
-    ImageStats label = image_stats(extract_box_reference(screen, m_label));
+//    ImageStats label = image_stats(extract_box_reference(screen, m_label));
 //    extract_box_reference(screen, m_label).save("test.png");
 //    cout << label.average << label.stddev << endl;
-    if (!is_solid(label, {0.370075, 0.369063, 0.260862}) &&         //  Paldea Card
-        !is_solid(label, {0.258888, 0.369491, 0.371621}, 0.15, 15)  //  Kitakami Card
-    ){
+    if (!is_card_label(screen)){
         return false;
     }
 
@@ -163,7 +175,7 @@ TeraLobbyReader::TeraLobbyReader(Logger& logger, AsyncDispatcher& dispatcher, Co
     , m_dispatcher(dispatcher)
     , m_color(color)
     , m_bottom_right(0.73, 0.85, 0.12, 0.02)
-    , m_label(0.75, 0.67, 0.10, 0.05)
+    , m_label(TeraCardReader::CARD_LABEL_BOX())
     , m_cursor(0.135, 0.25, 0.05, 0.25)
 //    , m_stars(0.500, 0.555, 0.310, 0.070)
     , m_timer(0.175, 0.180, 0.100, 0.080)
@@ -196,9 +208,9 @@ bool TeraLobbyReader::detect(const ImageViewRGB32& screen) const{
         return false;
     }
 
-    ImageStats label = image_stats(extract_box_reference(screen, m_label));
+//    ImageStats label = image_stats(extract_box_reference(screen, m_label));
 //    cout << label.average << label.stddev << endl;
-    if (!is_solid(label, {0.370075, 0.369063, 0.260862})){
+    if (!TeraCardReader::is_card_label(screen)){
         return false;
     }
 

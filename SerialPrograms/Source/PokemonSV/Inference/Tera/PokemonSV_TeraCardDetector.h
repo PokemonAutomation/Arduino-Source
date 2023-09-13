@@ -36,6 +36,9 @@ public:
 
     size_t stars(const ImageViewRGB32& screen) const;
 
+    static const ImageFloatBox& CARD_LABEL_BOX();
+    static bool is_card_label(const ImageViewRGB32& screen);
+
 private:
     Color m_color;
     ImageFloatBox m_top;
