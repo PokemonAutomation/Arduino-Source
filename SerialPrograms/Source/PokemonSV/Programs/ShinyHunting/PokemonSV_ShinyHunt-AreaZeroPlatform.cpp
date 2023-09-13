@@ -505,6 +505,9 @@ void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, Bot
             if (should_save){
                 m_pending_save = should_save;
             }
+            if (m_state != State::TRAVERSAL){
+                m_state = State::LEAVE_AND_RETURN;
+            }
         }catch (ProgramFinishedException&){
             GO_HOME_WHEN_DONE.run_end_of_program(context);
             throw;
