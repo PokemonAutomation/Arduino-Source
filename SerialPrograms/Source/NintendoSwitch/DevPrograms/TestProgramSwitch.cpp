@@ -230,6 +230,12 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 //    PokemonLA::save_game_from_overworld(env, console, context);
 
+    TeraCardReader reader;
+
+    auto snapshot = console.video().snapshot();
+    cout << reader.detect(snapshot) << endl;
+
+
 #if 0
     NormalDialogDetector detector(logger, overlay, true);
 

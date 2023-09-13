@@ -15,20 +15,20 @@
 #include "CommonFramework/ImageTypes/BinaryImage.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
-#include "CommonFramework/ImageTools/ImageManip.h"
+//#include "CommonFramework/ImageTools/ImageManip.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "CommonFramework/ImageTools/ImageFilter.h"
+//#include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/OCR/OCR_RawOCR.h"
 //#include "CommonFramework/OCR/OCR_NumberReader.h"
-#include "CommonFramework/Tools/ErrorDumper.h"
+//#include "CommonFramework/Tools/ErrorDumper.h"
 //#include "CommonFramework/OCR/OCR_Routines.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.h"
 #include "PokemonSV_TeraCodeReader.h"
 #include "PokemonSV_TeraCardDetector.h"
 
-//#include <iostream>
-//using std::cout;
-//using std::endl;
+#include <iostream>
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -57,33 +57,42 @@ bool TeraCardReader::detect(const ImageViewRGB32& screen) const{
     ImageStats top = image_stats(extract_box_reference(screen, m_top));
 //    cout << top.average << top.stddev << endl;
     if (!is_solid(top, {0.354167, 0.345833, 0.3})){
+//        cout << "bad 1" << endl;
         return false;
     }
 
     ImageStats bottom_left = image_stats(extract_box_reference(screen, m_bottom_left));
 //    cout << bottom_left.average << bottom_left.stddev << endl;
     if (!is_solid(bottom_left, {0.354167, 0.345833, 0.3})){
+//        cout << "bad 2" << endl;
         return false;
     }
     ImageStats bottom_right = image_stats(extract_box_reference(screen, m_bottom_right));
 //    cout << bottom_right.average << bottom_right.stddev << endl;
     if (!is_solid(bottom_right, {0.354167, 0.345833, 0.3})){
+//        cout << "bad 3" << endl;
         return false;
     }
 
     if (euclidean_distance(top.average, bottom_left.average) > 20){
+//        cout << "euclidean_distance 0" << endl;
         return false;
     }
     if (euclidean_distance(top.average, bottom_right.average) > 20){
+//        cout << "euclidean_distance 1" << endl;
         return false;
     }
     if (euclidean_distance(bottom_left.average, bottom_right.average) > 20){
+//        cout << "euclidean_distance 2" << endl;
         return false;
     }
 
     ImageStats label = image_stats(extract_box_reference(screen, m_label));
+//    extract_box_reference(screen, m_label).save("test.png");
 //    cout << label.average << label.stddev << endl;
-    if (!is_solid(label, {0.370075, 0.369063, 0.260862})){
+    if (!is_solid(label, {0.370075, 0.369063, 0.260862}) &&         //  Paldea Card
+        !is_solid(label, {0.258888, 0.369491, 0.371621}, 0.15, 15)  //  Kitakami Card
+    ){
         return false;
     }
 

@@ -341,6 +341,7 @@ void ShinyHuntAreaZeroPlatform::run_state(SingleSwitchProgramEnvironment& env, B
 
             break;
 
+#if 0
         case State::RESET_AND_RETURN:
             console.log("Resetting game and returning to platform...");
 
@@ -371,9 +372,16 @@ void ShinyHuntAreaZeroPlatform::run_state(SingleSwitchProgramEnvironment& env, B
             m_env->update_stats();
 
             break;
+#endif
 
         case State::RESET_SANDWICH:
             console.log("Resetting sandwich...");
+
+            if (m_pending_save){
+                save_game_from_overworld(info, console, context);
+                m_pending_save = false;
+                m_last_save = SavedLocation::NONE;
+            }
 
             switch (m_last_save){
             case SavedLocation::NONE:
