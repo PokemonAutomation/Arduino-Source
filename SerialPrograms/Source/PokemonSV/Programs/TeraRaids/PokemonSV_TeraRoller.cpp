@@ -157,7 +157,7 @@ void TeraRoller::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
     }
 
     //  Connect the controller
-    pbf_press_button(context, BUTTON_LCLICK, 10, 10);
+    pbf_press_button(context, BUTTON_L, 10, 10);
 
     bool first = true;
 

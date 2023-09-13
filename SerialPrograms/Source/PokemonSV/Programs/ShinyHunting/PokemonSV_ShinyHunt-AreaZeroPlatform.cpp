@@ -296,6 +296,7 @@ void ShinyHuntAreaZeroPlatform::run_state(SingleSwitchProgramEnvironment& env, B
 
     WallClock now = current_time();
     if (MODE == Mode::MAKE_SANDWICH && m_last_sandwich + std::chrono::minutes(SANDWICH_RESET_IN_MINUTES) < now){
+        console.log("Enough time has elapsed. Time to rest sandwich...");
         m_state = State::RESET_SANDWICH;
     }
 
