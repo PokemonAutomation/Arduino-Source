@@ -120,11 +120,12 @@ void MassRelease::release_one(BoxDetector& box_detector, SingleSwitchProgramEnvi
         const bool throw_exception = false;
         if (change_view_to_stats_or_judge(env.console, context, throw_exception)){
             m_in_judge_view = true;
-        } else{
+        }else{
             // it is an egg
             stats.m_eggs++;
             return;
         }
+        screen = env.console.video().snapshot();
     }
 
     if (egg_detector.detect(screen)){
