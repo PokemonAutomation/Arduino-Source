@@ -292,7 +292,7 @@ void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
     m_number_caught = 0;
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_LCLICK, 10, 10);
+    pbf_press_button(context, BUTTON_L, 10, 10);
 
     bool first = true;
 
