@@ -275,7 +275,7 @@ void AutoHost::program(SingleSwitchProgramEnvironment& env, BotBaseContext& cont
     AutoHost_Descriptor::Stats& stats = env.current_stats<AutoHost_Descriptor::Stats>();
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_LCLICK, 10, 10);
+    pbf_press_button(context, BUTTON_L, 10, 10);
 
     m_killswitch_time = WallClock::max();
 
