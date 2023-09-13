@@ -111,7 +111,7 @@ bool MapExitDetector::detect(const ImageViewRGB32& frame) const{
 
 MapFixedViewDetector::MapFixedViewDetector(Color color)
     : m_color(color)
-    , m_arrow_box(0.165, 0.724, 0.014, 0.028)
+    , m_arrow_box(0.165, 0.712, 0.014, 0.040)
 {}
 void MapFixedViewDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_arrow_box);
@@ -139,7 +139,7 @@ bool MapFixedViewDetector::detect(const ImageViewRGB32& frame) const{
 
 MapRotatedViewDetector::MapRotatedViewDetector(Color color)
     : m_color(color)
-    , m_arrow_box(0.157, 0.732, 0.029, 0.027)
+    , m_arrow_box(0.157, 0.720, 0.029, 0.039)
 {}
 void MapRotatedViewDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_arrow_box);
