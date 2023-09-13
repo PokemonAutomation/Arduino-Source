@@ -349,8 +349,7 @@ void ShinyHuntAreaZeroPlatform::run_state(SingleSwitchProgramEnvironment& env, B
 
 //            m_last_platform_reset = current_time();
             pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
-            reset_game_from_home(info, console, context, 5 * TICKS_PER_SECOND);
-            pbf_press_button(context, BUTTON_RCLICK, 20, 105);
+            reset_game_from_home_zoom_out(info, console, context, 5 * TICKS_PER_SECOND);
 
             switch (m_last_save){
             case SavedLocation::NONE:
@@ -392,8 +391,7 @@ void ShinyHuntAreaZeroPlatform::run_state(SingleSwitchProgramEnvironment& env, B
 
             if (stats.m_sandwiches > 0) {
                 pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
-                reset_game_from_home(info, console, context, 5 * TICKS_PER_SECOND);
-                pbf_press_button(context, BUTTON_RCLICK, 20, 105);
+                reset_game_from_home_zoom_out(info, console, context, 5 * TICKS_PER_SECOND);
                 stats.m_game_resets++;
                 m_env->update_stats();
             };
@@ -445,8 +443,6 @@ void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, Bot
     ShinyHuntAreaZeroPlatform_Descriptor::Stats& stats = env.current_stats<ShinyHuntAreaZeroPlatform_Descriptor::Stats>();
 
     assert_16_9_720p_min(env.logger(), env.console);
-
-//    pbf_press_button(context, BUTTON_RCLICK, 20, 105);
 
     m_iterations = 0;
 

@@ -34,6 +34,10 @@ bool reset_game_from_home(
     const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
     uint16_t post_wait_time = 125
 );
+bool reset_game_from_home_zoom_out(
+    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    uint16_t post_wait_time = 125
+);
 
 // From within the game, reset the game.
 // Will throw FatalProgramException if it fails to enter the game.

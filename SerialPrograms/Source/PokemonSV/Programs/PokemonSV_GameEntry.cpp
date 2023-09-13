@@ -144,6 +144,22 @@ bool reset_game_from_home(
     context.wait_for_all_requests();
     return ok;
 }
+bool reset_game_from_home_zoom_out(
+    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    uint16_t post_wait_time
+){
+    bool ret = reset_game_from_home(info, console, context, post_wait_time);
+
+    //  5 zooms will guarantee that are fully zoomed out regardless of whether
+    //  we are on the DLC update.
+    pbf_press_button(context, BUTTON_RCLICK, 20, 105);
+    pbf_press_button(context, BUTTON_RCLICK, 20, 105);
+    pbf_press_button(context, BUTTON_RCLICK, 20, 105);
+    pbf_press_button(context, BUTTON_RCLICK, 20, 105);
+    pbf_press_button(context, BUTTON_RCLICK, 20, 105);
+
+    return ret;
+}
 
 void reset_game(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
     try{
