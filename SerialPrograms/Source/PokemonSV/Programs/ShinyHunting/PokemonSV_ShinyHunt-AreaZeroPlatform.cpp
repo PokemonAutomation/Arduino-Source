@@ -307,7 +307,6 @@ void ShinyHuntAreaZeroPlatform::run_state(SingleSwitchProgramEnvironment& env, B
             //  If we error out, recover using LEAVE_AND_RETURN.
             recovery_state = State::LEAVE_AND_RETURN;
 
-            //  TODO: Wrap this with the sandwich timer cancel.
             if (run_traversal(context)){
                 break;
             }else{
