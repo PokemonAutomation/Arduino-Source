@@ -267,10 +267,13 @@ bool StatsResetBloodmoon::run_battle(SingleSwitchProgramEnvironment& env, BotBas
         }
         pbf_mash_button(context, BUTTON_A, 125);
         context.wait_for_all_requests();
+
+        stats.catches++;
+        env.update_stats();
+        env.log("Ursaluna caught.", COLOR_RED);
     }
     else {
         env.log("Battle against Ursaluna lost.", COLOR_RED);
-        //stats.losses++;
         env.update_stats();
         send_program_status_notification(
             env, NOTIFICATION_STATUS_UPDATE,
