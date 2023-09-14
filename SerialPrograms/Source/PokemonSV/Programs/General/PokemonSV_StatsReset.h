@@ -35,6 +35,7 @@ private:
     //Can expand targets assuming there's anything else not locked in the DLC
     enum class Target {
         TreasuresOfRuin,
+        LoyalThree,
         Generic,
     };
     EnumDropdownOption<Target> TARGET;

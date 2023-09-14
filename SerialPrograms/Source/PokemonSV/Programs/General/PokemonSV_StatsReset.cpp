@@ -69,9 +69,11 @@ StatsReset::StatsReset()
     : TARGET(
         "<b>Target:</b><br>The Pokemon you are resetting for.<br>"
         "Treasures of Ruin: Stand in front of the unsealed vaults of one of the Ruinous Quartet.<br>"
+        "Loyal Three: Stand in front of Okidogi/Munkidori/Fezandipiti.<br>"
         "Generic: You are standing in front of a Pokemon that requires an A press to initiate battle.<br>",
         {
             {Target::TreasuresOfRuin, "treasures-of-ruin", "Treasures of Ruin"},
+            {Target::LoyalThree, "loyal-three", "Loyal Three"},
             {Target::Generic, "generic", "Generic"},
         },
         LockWhileRunning::LOCKED,
@@ -125,6 +127,11 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
         case Target::TreasuresOfRuin:
             //~30 seconds to start battle?
             pbf_mash_button(context, BUTTON_A, 3250);
+            context.wait_for_all_requests();
+            break;
+        case Target::LoyalThree:
+            //Mash through dialog box
+            pbf_mash_button(context, BUTTON_B, 1300);
             context.wait_for_all_requests();
             break;
         case Target::Generic:
