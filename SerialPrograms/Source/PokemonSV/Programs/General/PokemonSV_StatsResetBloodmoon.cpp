@@ -201,7 +201,6 @@ bool StatsResetBloodmoon::run_battle(SingleSwitchProgramEnvironment& env, BotBas
                     env.log("Timed out during battle after 5 minutes.", COLOR_RED);
                     stats.errors++;
                     env.update_stats();
-                    send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
                     throw OperationFailedException(
                         ErrorReport::SEND_ERROR_REPORT, env.console,
                         "Timed out during battle after 5 minutes.",
@@ -248,7 +247,6 @@ bool StatsResetBloodmoon::run_battle(SingleSwitchProgramEnvironment& env, BotBas
         );
     if (ret == 0) {
         env.log("Catch prompt detected.");
-        send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
 
         pbf_press_button(context, BUTTON_A, 20, 150);
         context.wait_for_all_requests();
@@ -274,7 +272,10 @@ bool StatsResetBloodmoon::run_battle(SingleSwitchProgramEnvironment& env, BotBas
         env.log("Battle against Ursaluna lost.", COLOR_RED);
         //stats.losses++;
         env.update_stats();
-        send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
+        send_program_status_notification(
+            env, NOTIFICATION_STATUS_UPDATE,
+            "Battle against Ursaluna lost."
+        );
 
         return false;
     }
@@ -357,7 +358,7 @@ void StatsResetBloodmoon::program(SingleSwitchProgramEnvironment& env, BotBaseCo
         bool battle_won = run_battle(env, context);
         if (battle_won) {
             //Clear out dialog until we're free
-            OverworldWatcher overworld(COLOR_BLUE);
+            OverworldWatcher overworld(COLOR_YELLOW);
             int retOverworld = run_until(
                 env.console, context,
                 [](BotBaseContext& context) {
@@ -377,12 +378,12 @@ void StatsResetBloodmoon::program(SingleSwitchProgramEnvironment& env, BotBaseCo
 
         if (!battle_won || !stats_matched) {
             //Reset
+            stats.resets++;
+            env.update_stats();
             send_program_status_notification(
                 env, NOTIFICATION_STATUS_UPDATE,
                 "Resetting game."
             );
-            stats.resets++;
-            env.update_stats();
             pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
             reset_game_from_home(env.program_info(), env.console, context, 5 * TICKS_PER_SECOND);
         }
