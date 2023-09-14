@@ -21,6 +21,7 @@
 #include "Programs/General/PokemonSV_ESPTraining.h"
 #include "Programs/Trading/PokemonSV_SelfBoxTrade.h"
 #include "Programs/General/PokemonSV_StatsReset.h"
+#include "Programs/General/PokemonSV_StatsResetBloodmoon.h"
 #include "Programs/General/PokemonSV_TournamentFarmer.h"
 #include "Programs/Sandwiches/PokemonSV_SandwichMaker.h"
 #include "Programs/General/PokemonSV_SizeChecker.h"
@@ -72,6 +73,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<MassRelease_Descriptor, MassRelease>());
     ret.emplace_back(make_single_switch_program<AutonomousBallThrower_Descriptor, AutonomousBallThrower>());
     ret.emplace_back(make_single_switch_program<StatsReset_Descriptor, StatsReset>());
+    ret.emplace_back(make_single_switch_program<StatsResetBloodmoon_Descriptor, StatsResetBloodmoon>());
     ret.emplace_back(make_single_switch_program<SizeChecker_Descriptor, SizeChecker>());
     ret.emplace_back(make_single_switch_program<ClothingBuyer_Descriptor, ClothingBuyer>());
 
