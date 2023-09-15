@@ -334,14 +334,15 @@ void AudioSelectorWidget::volume_changed(double volume){
 //    if (m_slider_active.load(std::memory_order_acquire)){
 //        return;
 //    }
-    QMetaObject::invokeMethod(this, [this, volume]{
-        refresh_volume(volume);
+    QMetaObject::invokeMethod(this, [this]{
+//        refresh_volume(volume);
+        refresh_volume(m_session.output_volume());
     }, Qt::QueuedConnection);   //  Queued due to potential recursive call to the same lock.
 }
 void AudioSelectorWidget::display_changed(AudioOption::AudioDisplayType display){
-    QMetaObject::invokeMethod(this, [this, display]{
-        refresh_display(display);
-    });
+    QMetaObject::invokeMethod(this, [this]{
+        refresh_display(m_session.display_type());
+    }, Qt::QueuedConnection);   //  Queued due to potential recursive call to the same lock.
 }
 
 
