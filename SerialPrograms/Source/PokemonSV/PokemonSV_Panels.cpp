@@ -32,9 +32,9 @@
 #include "Programs/Eggs/PokemonSV_EggAutonomous.h"
 
 #include "Programs/TeraRaids/PokemonSV_AutoHost.h"
+#include "Programs/TeraRaids/PokemonSV_TeraRoller.h"
 #include "Programs/TeraRaids/PokemonSV_TeraSelfFarmer.h"
 #include "Programs/TeraRaids/PokemonSV_TeraMultiFarmer.h"
-#include "Programs/TeraRaids/PokemonSV_TeraRoller.h"
 
 #include "Programs/FastCodeEntry/PokemonSV_FastCodeEntry.h"
 #include "Programs/FastCodeEntry/PokemonSV_ClipboardFastCodeEntry.h"
@@ -73,7 +73,6 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<MassRelease_Descriptor, MassRelease>());
     ret.emplace_back(make_single_switch_program<AutonomousBallThrower_Descriptor, AutonomousBallThrower>());
     ret.emplace_back(make_single_switch_program<StatsReset_Descriptor, StatsReset>());
-    ret.emplace_back(make_single_switch_program<StatsResetBloodmoon_Descriptor, StatsResetBloodmoon>());
     ret.emplace_back(make_single_switch_program<SizeChecker_Descriptor, SizeChecker>());
     ret.emplace_back(make_single_switch_program<ClothingBuyer_Descriptor, ClothingBuyer>());
 
@@ -98,9 +97,9 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
 
     ret.emplace_back("---- Tera Raids ----");
     ret.emplace_back(make_single_switch_program<AutoHost_Descriptor, AutoHost>());
+    ret.emplace_back(make_single_switch_program<TeraRoller_Descriptor, TeraRoller>());
     ret.emplace_back(make_single_switch_program<TeraSelfFarmer_Descriptor, TeraSelfFarmer>());
     ret.emplace_back(make_multi_switch_program<TeraMultiFarmer_Descriptor, TeraMultiFarmer>());
-    ret.emplace_back(make_single_switch_program<TeraRoller_Descriptor, TeraRoller>());
 
     ret.emplace_back("---- Fast Code Entry ----");
     ret.emplace_back(make_multi_switch_program<FastCodeEntry_Descriptor, FastCodeEntry>());
@@ -114,8 +113,9 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<RideCloner101_Descriptor, RideCloner101>());
     ret.emplace_back(make_single_switch_program<CloneItems101_Descriptor, CloneItems101>());
 
+    ret.emplace_back("---- Untested/Beta/WIP ----");
+    ret.emplace_back(make_single_switch_program<StatsResetBloodmoon_Descriptor, StatsResetBloodmoon>());
     if (PreloadSettings::instance().DEVELOPER_MODE){
-        ret.emplace_back("---- Untested/Beta/WIP ----");
         ret.emplace_back(make_single_switch_program<ShinyHuntScatterbug_Descriptor, ShinyHuntScatterbug>());
     }
     if (PreloadSettings::instance().DEVELOPER_MODE){
