@@ -160,7 +160,7 @@ bool SandwichPicksPageDetector::detect(const ImageViewRGB32& screen) const{
 
 
 const SandwichFillingMatcher& SANDWICH_FILLING_MATCHER(){
-    static SandwichFillingMatcher matcher(100);
+    static SandwichFillingMatcher matcher;
     return matcher;
 }
 SandwichFillingMatcher::SandwichFillingMatcher(double min_euclidean_distance)
@@ -190,7 +190,7 @@ ImageRGB32 SandwichFillingMatcher::process_image(const ImageViewRGB32& image, Co
 
 
 const SandwichCondimentMatcher& SANDWICH_CONDIMENT_MATCHER(){
-    static SandwichCondimentMatcher matcher(100);
+    static SandwichCondimentMatcher matcher;
     return matcher;
 }
 SandwichCondimentMatcher::SandwichCondimentMatcher(double min_euclidean_distance)
