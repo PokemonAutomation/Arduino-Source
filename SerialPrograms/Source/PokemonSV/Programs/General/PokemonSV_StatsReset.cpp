@@ -106,221 +106,300 @@ StatsReset::StatsReset()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
+void StatsReset::enter_battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
+    StatsReset_Descriptor::Stats& stats = env.current_stats<StatsReset_Descriptor::Stats>();
+
+    //Press A to talk to target
+    AdvanceDialogWatcher advance_detector(COLOR_YELLOW);
+    pbf_press_button(context, BUTTON_A, 10, 50);
+    int retD = wait_until(env.console, context, Milliseconds(4000), { advance_detector });
+    if (retD < 0) {
+        env.log("Dialog not detected.");
+    }
+
+    switch (TARGET) {
+    case Target::TreasuresOfRuin:
+        //~30 seconds to start battle?
+        pbf_mash_button(context, BUTTON_A, 3250);
+        context.wait_for_all_requests();
+        break;
+    case Target::LoyalThree:
+        //Mash through dialog box
+        pbf_mash_button(context, BUTTON_B, 1300);
+        context.wait_for_all_requests();
+        break;
+    case Target::Generic:
+        //Mash A to initiate battle
+        pbf_mash_button(context, BUTTON_A, 90);
+        context.wait_for_all_requests();
+        break;
+    default:
+        throw InternalProgramError(&env.logger(), PA_CURRENT_FUNCTION, "Unknown Target");
+    }
+
+    NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
+    int ret = wait_until(
+        env.console, context,
+        std::chrono::seconds(15),
+        { battle_menu }
+    );
+    if (ret != 0) {
+        stats.errors++;
+        env.update_stats();
+        throw OperationFailedException(
+            ErrorReport::SEND_ERROR_REPORT, env.console,
+            "Failed to enter battle. Are you facing the Pokemon or in a menu?",
+            true
+        );
+    }
+}
+
+//Returns target_fainted. If overworld is detected then the target fainted.
+//Otherwise if AdvanceDialog is detected the Pokemon was caught or the player lost.
+bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
+    StatsReset_Descriptor::Stats& stats = env.current_stats<StatsReset_Descriptor::Stats>();
+
+    AdvanceDialogWatcher advance_dialog(COLOR_MAGENTA);
+    OverworldWatcher overworld(COLOR_BLUE);
+
+    uint8_t switch_party_slot = 1;
+
+    bool target_fainted = false;
+
+    int ret = run_until(
+        env.console, context,
+        [&](BotBaseContext& context) {
+            while (true) {
+                //Check that battle menu appears - this is in case of swapping pokemon
+                NormalBattleMenuWatcher menu_before_throw(COLOR_YELLOW);
+                int bMenu = wait_until(
+                    env.console, context,
+                    std::chrono::seconds(15),
+                    { menu_before_throw }
+                );
+                if (bMenu < 0) {
+                    env.console.log("Unable to find menu_before_throw.");
+                    stats.errors++;
+                    env.update_stats();
+                    throw OperationFailedException(
+                        ErrorReport::SEND_ERROR_REPORT, env.console,
+                        "Unable to find menu_before_throw.",
+                        true
+                    );
+                }
+
+                //Navigate to correct ball and repeatedly throw it until caught
+                pbf_press_button(context, BUTTON_X, 20, 100);
+                context.wait_for_all_requests();
+
+                BattleBallReader reader(env.console, LANGUAGE);
+                int quantity = move_to_ball(reader, env.console, context, BALL_SELECT.slug());
+                if (quantity == 0) {
+                    env.console.log("Unable to find appropriate ball, out of balls, or either Pokemon fainted.");
+                    send_program_status_notification(
+                        env, NOTIFICATION_STATUS_UPDATE,
+                        "Unable to find appropriate ball, out of balls, or either Pokemon fainted."
+                    );
+                    break;
+                }
+                if (quantity < 0) {
+                    stats.errors++;
+                    env.update_stats();
+                    env.console.log("Unable to read ball quantity.", COLOR_RED);
+                }
+                //Throw ball
+                pbf_mash_button(context, BUTTON_A, 150);
+                context.wait_for_all_requests();
+
+                //Check for battle menu
+                //If found after a second then assume Chi-Yu used Bounce and is invulnerable
+                //Use first attack this turn!
+                NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
+                int ret = wait_until(
+                    env.console, context,
+                    std::chrono::seconds(4),
+                    { battle_menu }
+                );
+                if (ret == 0) {
+                    env.console.log("Battle menu detected early. Using first attack.");
+                    pbf_mash_button(context, BUTTON_A, 250);
+                    context.wait_for_all_requests();
+                }
+                else {
+                    //Wild pokemon's turn/wait for catch animation
+                    stats.balls++;
+                    env.update_stats();
+                    pbf_mash_button(context, BUTTON_B, 900);
+                    context.wait_for_all_requests();
+                }
+
+                OverworldWatcher overworld(COLOR_BLUE);
+                SwapMenuWatcher fainted(COLOR_YELLOW);
+                int ret2 = wait_until(
+                    env.console, context,
+                    std::chrono::seconds(25),
+                    { battle_menu, fainted }
+                );
+                switch (ret2) {
+                case 0:
+                    env.log("Battle menu detected, continuing.");
+                    break;
+                case 1:
+                    env.log("Detected fainted Pokemon. Switching to next living Pokemon...");
+                    if (fainted.move_to_slot(env.console, context, switch_party_slot)) {
+                        pbf_mash_button(context, BUTTON_A, 3 * TICKS_PER_SECOND);
+                        context.wait_for_all_requests();
+                        switch_party_slot++;
+                    }
+                    break;
+                default:
+                    env.console.log("Invalid state ret2 run_battle.");
+                    stats.errors++;
+                    env.update_stats();
+                    throw OperationFailedException(
+                        ErrorReport::SEND_ERROR_REPORT, env.console,
+                        "Invalid state ret2 run_battle.",
+                        true
+                    );
+                }
+
+            }
+        },
+        { advance_dialog, overworld }
+        );
+
+    switch (ret) {
+    case 0:
+        env.log("Advance Dialog detected. Either caught target or lost battle.");
+        target_fainted = false;
+        break;
+    case 1:
+        env.log("Overworld detected, target Pokemon fainted.");
+        send_program_status_notification(
+            env, NOTIFICATION_STATUS_UPDATE,
+            "Overworld detected, target Pokemon fainted."
+        );
+        target_fainted = true;
+        break;
+    default:
+        env.console.log("Invalid state in run_battle().");
+        stats.errors++;
+        env.update_stats();
+        throw OperationFailedException(
+            ErrorReport::SEND_ERROR_REPORT, env.console,
+            "Invalid state in run_battle().",
+            true
+        );
+    }
+
+    return target_fainted;
+}
+
+bool StatsReset::check_stats(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
+    StatsReset_Descriptor::Stats& stats = env.current_stats<StatsReset_Descriptor::Stats>();
+    bool match = false;
+
+    //Open box
+    enter_box_system_from_overworld(env.program_info(), env.console, context);
+    context.wait_for(std::chrono::milliseconds(400));
+
+    //Check that the target pokemon was caught
+    if (check_empty_slots_in_party(env.program_info(), env.console, context) != 0) {
+        env.console.log("One or more empty slots in party. Target was not caught or user setup error.");
+        send_program_status_notification(
+            env, NOTIFICATION_STATUS_UPDATE,
+            "One or more empty slots in party. Target was not caught."
+        );
+    }
+    else {
+        stats.catches++;
+        env.update_stats();
+
+        //Navigate to last party slot
+        move_box_cursor(env.program_info(), env.console, context, BoxCursorLocation::PARTY, 5, 0);
+
+        //Check the IVs of the newly caught Pokemon - *must be on IV panel*
+        EggHatchAction action = EggHatchAction::Keep;
+        check_stats_reset_info(env.console, context, LANGUAGE, FILTERS, action);
+
+        switch (action) {
+        case EggHatchAction::StopProgram:
+            match = true;
+            env.console.log("Match found!");
+            stats.matches++;
+            env.update_stats();
+            send_program_status_notification(
+                env, NOTIFICATION_PROGRAM_FINISH,
+                "Match found!"
+            );
+            break;
+        case EggHatchAction::Release:
+            match = false;
+            env.console.log("Stats did not match table settings.");
+            send_program_status_notification(
+                env, NOTIFICATION_STATUS_UPDATE,
+                "Stats did not match table settings."
+            );
+            break;
+        default:
+            env.console.log("Invalid state.");
+            stats.errors++;
+            env.update_stats();
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, env.console,
+                "Invalid state.",
+                true
+            );
+        }
+    }
+
+    return match;
+}
+
 void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
     //This will only work for Pokemon that you press A to talk to.
     //Regular static spawns will have the same stats, resetting won't work.
-    //Won't apply to the former titan pokemon or the box legend either, as their IVs are locked.
-    //So this really only applies to the ruinous quartet.
+    //Won't apply to the former titan pokemon or the box legends + ogrepon either, as their IVs are locked.
+    //So this really only applies to the ruinous quartet and loyal three
+    //Use first attack if target pokemon is invulnerable (Chi-Yu used Bounce)
+
     assert_16_9_720p_min(env.logger(), env.console);
     StatsReset_Descriptor::Stats& stats = env.current_stats<StatsReset_Descriptor::Stats>();
 
     //Autosave must be off, settings like Tera farmer.
     bool stats_matched = false;
     while (!stats_matched){
-        AdvanceDialogWatcher advance_detector(COLOR_YELLOW);
-        pbf_press_button(context, BUTTON_A, 10, 50);
-        int retD = wait_until(env.console, context, Milliseconds(4000), { advance_detector });
-        if (retD < 0){
-            env.log("Dialog detected.");
-        }
-        switch (TARGET){
-        case Target::TreasuresOfRuin:
-            //~30 seconds to start battle?
-            pbf_mash_button(context, BUTTON_A, 3250);
-            context.wait_for_all_requests();
-            break;
-        case Target::LoyalThree:
-            //Mash through dialog box
-            pbf_mash_button(context, BUTTON_B, 1300);
-            context.wait_for_all_requests();
-            break;
-        case Target::Generic:
-            //Mash A to initiate battle
-            pbf_mash_button(context, BUTTON_A, 90);
-            context.wait_for_all_requests();
-            break;
-        default:
-            throw InternalProgramError(&env.logger(), PA_CURRENT_FUNCTION, "Unknown Target");
-        }
-        NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
-        int ret = wait_until(
-            env.console, context,
-            std::chrono::seconds(15),
-            { battle_menu }
-        );
-        if(ret != 0) {
-            stats.errors++;
-            env.update_stats();
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
-                "Failed to enter battle. Are you facing the Pokemon or in a menu?",
-                true
-            );
-        }
-        bool battle_ended = false;
-        bool goldfish_loop = false;
-        while (!battle_ended){
-            //Navigate to correct ball and repeatedly throw it until caught
-            pbf_press_button(context, BUTTON_X, 20, 100);
-            context.wait_for_all_requests();
+        enter_battle(env, context);
+        bool target_fainted = run_battle(env, context);
 
-            BattleBallReader reader(env.console, LANGUAGE);
-            int quantity = move_to_ball(reader, env.console, context, BALL_SELECT.slug());
-            if (quantity == 0) {
-                env.console.log("Unable to find appropriate ball, out of balls, or either Pokemon fainted.");
-                send_program_status_notification(
-                    env, NOTIFICATION_STATUS_UPDATE,
-                    "Unable to find appropriate ball, out of balls, or either Pokemon fainted."
-                );
-                break;
-            }
-            if (quantity < 0){
-                stats.errors++;
-                env.update_stats();
-                env.console.log("Unable to read ball quantity.", COLOR_RED);
-            }
-            //Throw ball
-            pbf_mash_button(context, BUTTON_A, 150);
-            context.wait_for_all_requests();
-
-            //Check for battle menu - if found after a second then assume caught in a goldfish bounce loop
-            ret = wait_until(
-                env.console, context,
-                std::chrono::seconds(4),
-                { battle_menu }
-            );
-            if (ret == 0) {
-                env.console.log("Battle menu detected, assuming caught in a loop. Resetting.", COLOR_RED);
-                battle_ended = true; //Leave the loop
-                goldfish_loop = true;
-            }
-            else {
-                //Wild pokemon's turn/wait for catch animation
-                //pbf_mash_button(context, BUTTON_A, 150);
-                stats.balls++;
-                env.update_stats();
-                //pbf_wait(context, 4000);
-                pbf_mash_button(context, BUTTON_B, 900);
-                context.wait_for_all_requests();
-
-                AdvanceDialogWatcher summary(COLOR_MAGENTA);
-                OverworldWatcher overworld(COLOR_BLUE);
-                SwapMenuWatcher swap_menu(COLOR_YELLOW);
-                int ret2 = wait_until(
-                    env.console, context,
-                    std::chrono::seconds(25),
-                    { summary, overworld, battle_menu, swap_menu }
-                );
-                switch (ret2) {
-                case 0:
-                    env.log("Dialog detected, assuming target Pokemon caught.");
-                    stats.catches++;
-                    env.update_stats();
-                    battle_ended = true;
-                    break;
-                case 1:
-                    env.log("Overworld detected, target Pokemon fainted.");
-                    send_program_status_notification(
-                        env, NOTIFICATION_STATUS_UPDATE,
-                        "Overworld detected, target Pokemon fainted."
-                    );
-                    battle_ended = true;
-                    goldfish_loop = true;
-                    break;
-                case 2:
-                    env.log("Battle menu detected, continuing.");
-                    break;
-                case 3:
-                    env.log("Swap menu detected, your Pokemon fainted.");
-                    send_program_status_notification(
-                        env, NOTIFICATION_STATUS_UPDATE,
-                        "Swap menu detected, your Pokemon fainted."
-                    );
-                    //Set to true and set goldfish loop to true to skip to the reset.
-                    battle_ended = true;
-                    goldfish_loop = true;
-                    break;
-                default:
-                    env.console.log("Invalid state ret2.");
-                    stats.errors++;
-                    env.update_stats();
-                    throw OperationFailedException(
-                        ErrorReport::SEND_ERROR_REPORT, env.console,
-                        "Invalid state ret2.",
-                        true
-                    );
-                }
-            }
-        }
-        if (goldfish_loop) {
-            battle_ended = false; //Set this back and use the reset below
-        }
-        if (battle_ended){
+        if (!target_fainted) {
             //Close all the dex entry and caught menus
-            pbf_mash_button(context, BUTTON_B, 170);
-            context.wait_for_all_requests();
-
-            //Open box
-            enter_box_system_from_overworld(env.program_info(), env.console, context);
-            context.wait_for(std::chrono::milliseconds(400));
-
-            //Check that the target pokemon was caught
-            if (check_empty_slots_in_party(env.program_info(), env.console, context) != 0) {
-                battle_ended = false;
-                env.console.log("One or more empty slots in party. Target was not caught or user setup error.");
-                send_program_status_notification(
-                    env, NOTIFICATION_STATUS_UPDATE,
-                    "One or more empty slots in party. Target was not caught."
+            //If the player lost, this closes all dialog from Joy
+            OverworldWatcher overworld;
+            int retOver = run_until(
+                env.console, context,
+                [](BotBaseContext& context) {
+                    pbf_mash_button(context, BUTTON_B, 10000);
+                },
+                { overworld }
                 );
+            if (retOver != 0) {
+                env.log("Failed to detect overworld.", COLOR_RED);
             }
             else {
-                //Navigate to last party slot
-                move_box_cursor(env.program_info(), env.console, context, BoxCursorLocation::PARTY, 5, 0);
-
-                //Check the IVs of the newly caught Pokemon - *must be on IV panel*
-                EggHatchAction action = EggHatchAction::Keep;
-                //This is an edited version of check_baby_info
-                check_stats_reset_info(env.console, context, LANGUAGE, FILTERS, action);
-
-                switch (action) {
-                case EggHatchAction::StopProgram:
-                    //Correct stats found, end program
-                    stats_matched = true;
-                    env.console.log("Match found!");
-                    stats.matches++;
-                    env.update_stats();
-                    send_program_status_notification(
-                        env, NOTIFICATION_PROGRAM_FINISH,
-                        "Match found!"
-                    );
-                    break;
-                case EggHatchAction::Release:
-                    stats_matched = false;
-                    battle_ended = false; //Set this back and use the reset below
-                    env.console.log("Stats did not match table settings.");
-                    send_program_status_notification(
-                        env, NOTIFICATION_STATUS_UPDATE,
-                        "Stats did not match table settings."
-                    );
-                    break;
-                default:
-                    env.console.log("Invalid state.");
-                    stats.errors++;
-                    env.update_stats();
-                    throw OperationFailedException(
-                        ErrorReport::SEND_ERROR_REPORT, env.console,
-                        "Invalid state.",
-                        true
-                    );
-                }
+                env.log("Detected overworld.");
             }
+            context.wait_for_all_requests();
+
+            stats_matched = check_stats(env, context);
         }
-        if (!battle_ended){
+
+        if (target_fainted || !stats_matched) {
+            //Reset game
             send_program_status_notification(
                 env, NOTIFICATION_STATUS_UPDATE,
                 "Resetting game."
             );
-            //Reset game
             stats.resets++;
             env.update_stats();
             pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
