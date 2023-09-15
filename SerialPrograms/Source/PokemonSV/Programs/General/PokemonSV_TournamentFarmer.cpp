@@ -382,7 +382,7 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, BotBaseCo
                 );
                 switch (ret){
                 case 0:
-                    env.log("Detected switch Pokémon prompt. Pressing B to not switch...");
+                    env.log("Detected switch " + STRING_POKEMON + " prompt. Pressing B to not switch...");
                     pbf_mash_button(context, BUTTON_B, 3 * TICKS_PER_SECOND);
                     break;
                 case 1:
@@ -390,8 +390,8 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, BotBaseCo
                     pbf_mash_button(context, BUTTON_A, 3 * TICKS_PER_SECOND);
                     break;
                 case 2:
-                    // Since we can't run from the tournament, loop through all party Pokémon spamming their first move.
-                    env.log("Detected fainted Pokémon. Switching to next living Pokémon...");
+                    // Since we can't run from the tournament, loop through all party Pokemon spamming their first move.
+                    env.log("Detected fainted " + STRING_POKEMON + ". Switching to next living " + STRING_POKEMON + "...");
                     if (fainted.move_to_slot(env.console, context, switch_party_slot)){
                         pbf_mash_button(context, BUTTON_A, 3 * TICKS_PER_SECOND);
                         switch_party_slot++;

@@ -31,7 +31,7 @@ SizeChecker_Descriptor::SizeChecker_Descriptor()
         "PokemonSV:SizeChecker",
         STRING_POKEMON + " SV", "Size Checker",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSV/SizeChecker.md",
-        "Check boxes of Pokémon for size marks.",
+        "Check boxes of " + STRING_POKEMON + " for size marks.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB

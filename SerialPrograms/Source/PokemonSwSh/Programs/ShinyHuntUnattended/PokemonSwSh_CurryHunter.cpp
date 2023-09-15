@@ -193,7 +193,7 @@ void CurryHunter::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
             }
 
 
-            //This routine gives better odds of attracting a low Pokémon if the option is enabled.
+            //  This routine gives better odds of attracting a low Pokemon if the option is enabled.
             if (SMALL_POKEMON>0){
                 pbf_move_left_joystick(context, 0x80, 0xff, SMALL_POKEMON, 0);
 
