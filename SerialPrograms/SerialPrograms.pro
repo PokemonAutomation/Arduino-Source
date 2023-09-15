@@ -640,6 +640,7 @@ SOURCES += \
     Source/PokemonSV/Inference/Dialogs/PokemonSV_DialogArrowDetector.cpp \
     Source/PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.cpp \
     Source/PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.cpp \
+    Source/PokemonSV/Inference/Map/PokemonSV_MapDetector.cpp \
     Source/PokemonSV/Inference/Map/PokemonSV_MapPokeCenterIconDetector.cpp \
     Source/PokemonSV/Inference/Overworld/PokemonSV_AreaZeroSkyDetector.cpp \
     Source/PokemonSV/Inference/Overworld/PokemonSV_LetsGoHpReader.cpp \
@@ -653,7 +654,6 @@ SOURCES += \
     Source/PokemonSV/Inference/PokemonSV_ClothingTopDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_ESPEmotionDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_MainMenuDetector.cpp \
-    Source/PokemonSV/Inference/PokemonSV_MapDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_MoneyReader.cpp \
     Source/PokemonSV/Inference/PokemonSV_PokePortalDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_PokemonSummaryReader.cpp \
@@ -1675,6 +1675,7 @@ HEADERS += \
     Source/PokemonSV/Inference/Dialogs/PokemonSV_DialogArrowDetector.h \
     Source/PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h \
     Source/PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.h \
+    Source/PokemonSV/Inference/Map/PokemonSV_MapDetector.h \
     Source/PokemonSV/Inference/Map/PokemonSV_MapPokeCenterIconDetector.h \
     Source/PokemonSV/Inference/Overworld/PokemonSV_AreaZeroSkyDetector.h \
     Source/PokemonSV/Inference/Overworld/PokemonSV_LetsGoHpReader.h \
@@ -1688,7 +1689,6 @@ HEADERS += \
     Source/PokemonSV/Inference/PokemonSV_ClothingTopDetector.h \
     Source/PokemonSV/Inference/PokemonSV_ESPEmotionDetector.h \
     Source/PokemonSV/Inference/PokemonSV_MainMenuDetector.h \
-    Source/PokemonSV/Inference/PokemonSV_MapDetector.h \
     Source/PokemonSV/Inference/PokemonSV_MoneyReader.h \
     Source/PokemonSV/Inference/PokemonSV_PokePortalDetector.h \
     Source/PokemonSV/Inference/PokemonSV_PokemonSummaryReader.h \

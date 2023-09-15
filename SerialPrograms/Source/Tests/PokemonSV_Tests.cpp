@@ -14,7 +14,7 @@
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxEggDetector.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxGenderDetector.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxShinyDetector.h"
-#include "PokemonSV/Inference/PokemonSV_MapDetector.h"
+#include "PokemonSV/Inference/Map/PokemonSV_MapDetector.h"
 #include "PokemonSV/Inference/Tera/PokemonSV_TeraCardDetector.h"
 #include "PokemonSV/Inference/Tera/PokemonSV_TeraSilhouetteReader.h"
 #include "PokemonSV/Inference/Tera/PokemonSV_TeraTypeReader.h"
