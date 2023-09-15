@@ -83,6 +83,7 @@ void PreloadSettings::load(const JsonValue& json){
     if (debug_obj){
         debug_obj->read_boolean(DEBUG.COLOR_CHECK, "COLOR_CHECK");
         debug_obj->read_boolean(DEBUG.IMAGE_TEMPLATE_MATCHING, "IMAGE_TEMPLATE_MATCHING");
+        debug_obj->read_boolean(DEBUG.IMAGE_DICTIONARY_MATCHING, "IMAGE_DICTIONARY_MATCHING");
     }
 }
 
@@ -366,6 +367,7 @@ JsonValue GlobalSettings::to_json() const{
     const auto& debug_settings = PreloadSettings::instance().DEBUG;
     debug_obj["COLOR_CHECK"] = debug_settings.COLOR_CHECK;
     debug_obj["IMAGE_TEMPLATE_MATCHING"] = debug_settings.IMAGE_TEMPLATE_MATCHING;
+    debug_obj["IMAGE_DICTIONARY_MATCHING"] = debug_settings.IMAGE_DICTIONARY_MATCHING;
     obj["DEBUG"] = std::move(debug_obj);
 
     return obj;

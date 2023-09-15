@@ -64,6 +64,7 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/AbstractLogger.h
     ../Common/Cpp/CancellableScope.cpp
     ../Common/Cpp/CancellableScope.h
+    ../Common/Cpp/Color.cpp
     ../Common/Cpp/Color.h
     ../Common/Cpp/Concurrency/AsyncDispatcher.cpp
     ../Common/Cpp/Concurrency/AsyncDispatcher.h

@@ -81,6 +81,7 @@ SOURCES += \
     ../ClientSource/Libraries/MessageConverter.cpp \
     ../Common/CRC32.cpp \
     ../Common/Cpp/CancellableScope.cpp \
+    ../Common/Cpp/Color.cpp \
     ../Common/Cpp/Concurrency/AsyncDispatcher.cpp \
     ../Common/Cpp/Concurrency/FireForgetDispatcher.cpp \
     ../Common/Cpp/Concurrency/ParallelTaskRunner.cpp \

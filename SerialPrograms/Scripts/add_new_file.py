@@ -13,6 +13,7 @@ and SerialPrograms.pro.
 
 Example usage:
 python3 add_new_file.py Source/PokemonSV/Inference/Map/PokemonSV_MapFlyMenuDetectorDetector.h
+python3 add_new_file.py ../Common/Cpp/Color.cpp
 """
 
 import sys
