@@ -238,7 +238,7 @@ void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
     if (FILTER.MIN_STARS > FILTER.MAX_STARS){
         throw UserSetupError(env.console, "Error in the settings, \"Min Stars\" is bigger than \"Max Stars\".");
     }
-    
+
     if (FILTER.SKIP_HERBA && FILTER.MAX_STARS < 5){
         throw UserSetupError(env.console, "Error in the settings, Skip Non-Herba Raids is checked but Max Stars is less than 5.");
     }
@@ -269,60 +269,14 @@ void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
         }
         first = false;
 
-#if 0
-        if (open_raid(env.console, context)){
-            stats.m_raids++;
-        }else{
-            continue;
+        uint8_t reset_period = PERIODIC_RESET;
+        if (reset_period != 0 && skip_counter >= reset_period){
+            env.log("Resetting game to clear framerate.");
+            save_game_from_overworld(env.program_info(), env.console, context);
+            reset_game(env.program_info(), env.console, context);
+            skip_counter = 0;
+//            stats.m_resets++;
         }
-        context.wait_for(std::chrono::milliseconds(500));
-
-        VideoSnapshot screen = env.console.video().snapshot();
-        TeraCardReader reader(COLOR_RED);
-        uint8_t stars = reader.stars(env.logger(), env.program_info(), screen);
-//        if (stars == 0){
-//            dump_image(env.logger(), env.program_info(), "ReadStarsFailed", *screen.frame);
-//        }
-
-        VideoOverlaySet overlay_set(env.console);
-
-        TeraSilhouetteReader silhouette_reader;
-        silhouette_reader.make_overlays(overlay_set);
-        ImageMatch::ImageMatchResult silhouette = silhouette_reader.read(screen);
-        silhouette.log(env.logger(), 100);
-        std::string best_silhouette = silhouette.results.empty() ? "UnknownSilhouette" : silhouette.results.begin()->second;
-        if (silhouette.results.empty()){
-            dump_image(env.logger(), env.program_info(), "ReadSilhouetteFailed", *screen.frame);
-        }
-        else if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
-            dump_debug_image(env.logger(), "PokemonSV/TeraSelfFarmer/" + best_silhouette, "", screen);
-        }
-
-        TeraTypeReader type_reader;
-        type_reader.make_overlays(overlay_set);
-        ImageMatch::ImageMatchResult type = type_reader.read(screen);
-        type.log(env.logger(), 100);
-        std::string best_type = type.results.empty() ? "UnknownType" : type.results.begin()->second;
-        if (type.results.empty()){
-            dump_image(env.logger(), env.program_info(), "ReadTypeFailed", *screen.frame);
-        }
-        else if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
-            dump_debug_image(env.logger(), "PokemonSV/TeraSelfFarmer/" + best_type, "", screen);
-        }
-
-        {
-            std::string log = "Detected a " + std::to_string(stars) + "* " + best_type + " " + best_silhouette;
-            env.console.overlay().add_log(log, COLOR_GREEN);
-            env.log(log);
-        }
-
-        if (!FILTER.should_battle(stars, best_silhouette)) {
-            env.log("Skipping raid...", COLOR_ORANGE);
-            stats.m_skipped++;
-            close_raid(env.program_info(), env.console, context);
-            continue;
-        }
-#endif
 
         TeraRaidData raid_data;
         TeraRollFilter::FilterResult result = FILTER.run_filter(
@@ -344,13 +298,6 @@ void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
 
         close_raid(env.program_info(), env.console, context);
         save_game_from_overworld(env.program_info(), env.console, context);
-
-        uint8_t reset_period = PERIODIC_RESET;
-        if (reset_period != 0 && skip_counter >= reset_period){
-            env.log("Resetting game to clear framerate.");
-            reset_game(env.program_info(), env.console, context);
-            skip_counter = 0;
-        }
 
         context.wait_for_all_requests();
         if (open_raid(env.console, context)){
