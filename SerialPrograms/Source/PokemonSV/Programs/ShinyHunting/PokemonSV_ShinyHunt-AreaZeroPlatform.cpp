@@ -118,7 +118,7 @@ ShinyHuntAreaZeroPlatform::ShinyHuntAreaZeroPlatform()
     , SANDWICH_RESET_IN_MINUTES(
         "<b>Sandwich Reset Time (in minutes):</b><br>The time to reset game to make a new sandwich.",
         LockWhileRunning::UNLOCKED,
-        30
+        35
     )
     , SANDWICH_OPTIONS(LANGUAGE)
     , GO_HOME_WHEN_DONE(true)
