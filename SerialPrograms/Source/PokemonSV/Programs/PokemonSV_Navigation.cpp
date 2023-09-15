@@ -493,12 +493,9 @@ void leave_phone_to_overworld(const ProgramInfo& info, ConsoleHandle& console, B
     }
 }
 
-
-void fly_to_closest_pokecenter_on_map(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
-    // Zoom in one level onto the map.
-    // If the player character icon or any wild pokemon icon overlaps with the PokeCenter icon, the code cannot
-    // detect it. So we zoom in as much as we can to prevent any icon overlap.
-    pbf_press_button(context, BUTTON_ZR, 20, 100);
+// While in the current map zoom level, detect pokecenter icons and fly to the closest one.
+// Return true if succeed. Return false if no visible pokcenter on map
+bool fly_to_visible_closest_pokecenter_cur_zoom_level(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
     context.wait_for_all_requests();
     const auto snapshot_frame = console.video().snapshot().frame;
     const size_t screen_width = snapshot_frame->width();
@@ -509,13 +506,11 @@ void fly_to_closest_pokecenter_on_map(const ProgramInfo& info, ConsoleHandle& co
     const double center_x = 0.5 * screen_width, center_y = 0.5 * screen_height;
     {
         MapPokeCenterIconWatcher pokecenter_watcher(COLOR_RED, console.overlay(), MAP_READABLE_AREA);
-        int ret = wait_until(console, context, std::chrono::seconds(10), {pokecenter_watcher});
+        int ret = wait_until(console, context, std::chrono::seconds(2), {pokecenter_watcher});
         if (ret != 0){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
-                "fly_to_closest_pokecenter_on_map(): Cannot detect PokeCenter icon after 10 seconds",
-                true
-            );
+            console.log("No visible pokecetner found on map");
+            console.overlay().add_log("No whole PokeCenter icon");
+            return false;
         }
         // Find the detected PokeCenter icon closest to the screen center (where player character is on the map).
         for(const auto& box: pokecenter_watcher.found_locations()){
@@ -529,6 +524,7 @@ void fly_to_closest_pokecenter_on_map(const ProgramInfo& info, ConsoleHandle& co
             }
         }
         console.log("Found closest pokecenter icon on map: (" + std::to_string(closest_icon_x) + ", " + std::to_string(closest_icon_y) + ").");
+        console.overlay().add_log("Detected PokeCenter icon");
     }
 
     // Convert the vector from center to the PokeCenter icon into a left joystick movement
@@ -547,6 +543,26 @@ void fly_to_closest_pokecenter_on_map(const ProgramInfo& info, ConsoleHandle& co
     const uint16_t push_time = std::max(uint16_t(magnitude * scale + 0.5), uint16_t(3));
     pbf_move_left_joystick(context, move_x, move_y, push_time, 30);
     fly_to_overworld_from_map(info, console, context);
+    return true;
+}
+
+
+void fly_to_closest_pokecenter_on_map(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+    // Zoom in one level onto the map.
+    // If the player character icon or any wild pokemon icon overlaps with the PokeCenter icon, the code cannot
+    // detect it. So we zoom in as much as we can to prevent any icon overlap.
+    pbf_press_button(context, BUTTON_ZR, 40, 100);
+    
+    if (fly_to_visible_closest_pokecenter_cur_zoom_level(info, console, context) == false){
+        // Does not find any visible pokecenter. Probably the player character icon overlaps with the pokecenter.
+        // Zoom out to the max warpable level and try pressing on the player character.
+        console.log("Zoom to max level to fly without moving joystick");
+        console.overlay().add_log("Assume too close");
+        pbf_press_button(context, BUTTON_ZL, 40, 100);
+        pbf_press_button(context, BUTTON_ZL, 40, 100);
+
+        fly_to_overworld_from_map(info, console, context);
+    }
 }
 
 

@@ -100,6 +100,12 @@ ShinyHuntScatterbug::ShinyHuntScatterbug()
         LockWhileRunning::LOCKED,
         false
     )
+    , DEBUG_WARP_TO_POKECENTER(
+        "<b>Whether to change the program to just warping to closest PokeCenter and stopping:</b><br>"
+        "This is for debugging the PokeCenter warping function.",
+        LockWhileRunning::LOCKED,
+        false
+    )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS_UPDATE,
@@ -114,6 +120,7 @@ ShinyHuntScatterbug::ShinyHuntScatterbug()
 {
     if (PreloadSettings::instance().DEVELOPER_MODE){
         PA_ADD_OPTION(SAVE_DEBUG_VIDEO);
+        PA_ADD_OPTION(DEBUG_WARP_TO_POKECENTER);
     }
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(SANDWICH_OPTIONS);
@@ -128,9 +135,14 @@ void ShinyHuntScatterbug::program(SingleSwitchProgramEnvironment& env, BotBaseCo
     ShinyHuntScatterbug_Descriptor::Stats& stats = env.current_stats<ShinyHuntScatterbug_Descriptor::Stats>();
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_LCLICK, 10, 0);
+    pbf_press_button(context, BUTTON_L, 10, 0);
 
     assert_16_9_720p_min(env.logger(), env.console);
+
+    if (DEBUG_WARP_TO_POKECENTER){
+        reset_to_pokecenter(env, context);
+        return;
+    }
 
     m_iterations = 0;
     m_consecutive_failures = 0;
@@ -189,7 +201,7 @@ void ShinyHuntScatterbug::run_one_sandwich_iteration(SingleSwitchProgramEnvironm
     // to this location.
     pbf_press_button(context, BUTTON_L, 50, 40);
     // Move forward
-    pbf_move_left_joystick(context, 128, 0, 125, 0);
+    pbf_move_left_joystick(context, 128, 0, 180, 0);
     picnic_from_overworld(env.program_info(), env.console, context);
 
     pbf_move_left_joystick(context, 128, 0, 30, 40);
