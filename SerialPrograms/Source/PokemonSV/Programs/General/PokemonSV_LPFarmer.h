@@ -33,6 +33,7 @@ public:
 private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
     SimpleIntegerOption<uint32_t> FETCHES;
+    SimpleIntegerOption<uint8_t> PERIODIC_RESET;
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;
 };

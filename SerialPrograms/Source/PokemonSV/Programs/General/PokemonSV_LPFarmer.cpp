@@ -10,6 +10,8 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/PokemonSV_Settings.h"
+#include "PokemonSV/Programs/PokemonSV_GameEntry.h"
+#include "PokemonSV/Programs/PokemonSV_SaveGame.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSV/Programs/TeraRaids/PokemonSV_TeraRoutines.h"
 #include "PokemonSV_LPFarmer.h"
@@ -59,6 +61,11 @@ LPFarmer::LPFarmer()
         LockWhileRunning::UNLOCKED,
         10000, 1
     )
+    , PERIODIC_RESET(
+        "<b>Periodic Game Reset:</b><br>Reset the game after this many skips. This clears up the framerate bug.",
+        LockWhileRunning::UNLOCKED,
+        20
+    )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS_UPDATE,
@@ -69,6 +76,7 @@ LPFarmer::LPFarmer()
 {
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(FETCHES);
+    PA_ADD_OPTION(PERIODIC_RESET);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
@@ -80,9 +88,11 @@ void LPFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext& cont
     LPFarmer_Descriptor::Stats& stats = env.current_stats<LPFarmer_Descriptor::Stats>();
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_LCLICK, 10, 10);
+    pbf_press_button(context, BUTTON_L, 10, 10);
 
     bool first = true;
+    uint32_t skip_counter = 0;
+
     for (size_t fetches = 0; fetches < FETCHES;){
         env.update_stats();
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
@@ -92,8 +102,18 @@ void LPFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext& cont
             pbf_wait(context, GameSettings::instance().RAID_SPAWN_DELAY);
             context.wait_for_all_requests();
             stats.m_skips++;
+            skip_counter++;
+            env.update_stats();
         }
         first = false;
+
+        uint8_t reset_period = PERIODIC_RESET;
+        if (reset_period != 0 && skip_counter >= reset_period){
+            env.log("Resetting game to clear framerate.");
+            save_game_from_overworld(env.program_info(), env.console, context);
+            reset_game(env.program_info(), env.console, context);
+            skip_counter = 0;
+        }
 
         if (!open_raid(env.console, context)){
             continue;
