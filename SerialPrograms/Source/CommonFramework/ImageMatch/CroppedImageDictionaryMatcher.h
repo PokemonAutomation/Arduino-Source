@@ -15,7 +15,7 @@
 namespace PokemonAutomation{
 namespace ImageMatch{
 
-
+// Similar to `ExactImageDictionaryMatcher` but will crop the image based on background pixel colors before matching.
 class CroppedImageDictionaryMatcher{
 public:
     CroppedImageDictionaryMatcher(
@@ -29,6 +29,7 @@ public:
 
 
 protected:
+    // return the cropped the image based on background colors. Also return the background color.
     virtual ImageRGB32 process_image(const ImageViewRGB32& image, Color& background) const = 0;
 
 

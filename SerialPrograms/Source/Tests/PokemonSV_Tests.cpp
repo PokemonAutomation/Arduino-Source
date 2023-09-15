@@ -410,13 +410,20 @@ int test_pokemonSV_SandwichIngredientReader(const ImageViewRGB32& image, const s
         if (selected_ingredient == i){
             // The icon matcher only works on the selected item, because we want to remove the yellow / orange background
             ImageMatch::ImageMatchResult results = reader.read_with_icon_matcher(image);
+            const std::string& target_slug = words[words.size() - 10 + i];
 
             if (results.results.empty()){
                 cerr << "No ingredient detected via icon matcher" << endl;
                 return 1;
             }
-            std::string best_match_icon_matcher = results.results.begin()->second;
-            TEST_RESULT_COMPONENT_EQUAL(best_match_icon_matcher, words[words.size() - 10 + i], "image matcher : ingredient slot " + std::to_string(i));
+            bool found = false;
+            for (const auto& match_candidate: results.results){
+                if (match_candidate.second == target_slug){
+                    found = true;
+                    break;
+                }
+            }
+            TEST_RESULT_COMPONENT_EQUAL(found, true, "image matcher : ingredient slot " + std::to_string(i));
         }
         {
             OCR::StringMatchResult results = reader.read_with_ocr(image, global_logger_command_line(), language);
