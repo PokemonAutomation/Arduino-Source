@@ -1359,6 +1359,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Options/PokemonSV_TeraAIOption.h
     Source/PokemonSV/Options/PokemonSV_TeraMoveTable.cpp
     Source/PokemonSV/Options/PokemonSV_TeraMoveTable.h
+    Source/PokemonSV/Options/PokemonSV_TeraRollFilter.cpp
+    Source/PokemonSV/Options/PokemonSV_TeraRollFilter.h
     Source/PokemonSV/Options/PokemonSV_TournamentPrizeSelectOption.cpp
     Source/PokemonSV/Options/PokemonSV_TournamentPrizeSelectOption.h
     Source/PokemonSV/Options/PokemonSV_TournamentPrizeTable.cpp

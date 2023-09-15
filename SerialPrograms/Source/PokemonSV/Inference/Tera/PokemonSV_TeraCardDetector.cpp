@@ -8,9 +8,9 @@
 #include <array>
 #include <map>
 #include "Common/Cpp/PrettyPrint.h"
-#include "Common/Qt/StringToolsQt.h"
 //#include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTypes/BinaryImage.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
@@ -20,7 +20,8 @@
 //#include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/OCR/OCR_RawOCR.h"
 //#include "CommonFramework/OCR/OCR_NumberReader.h"
-//#include "CommonFramework/Tools/ErrorDumper.h"
+#include "CommonFramework/Tools/DebugDumper.h"
+#include "CommonFramework/Tools/ErrorDumper.h"
 //#include "CommonFramework/OCR/OCR_Routines.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.h"
 #include "PokemonSV_TeraCodeReader.h"
@@ -47,6 +48,8 @@ TeraCardReader::TeraCardReader(Color color)
     , m_label(CARD_LABEL_BOX())
     , m_cursor(0.135, 0.25, 0.05, 0.25)
     , m_stars(0.500, 0.555, 0.310, 0.070)
+    , m_tera_type(color)
+    , m_silhouette(color)
 {}
 void TeraCardReader::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_top);
@@ -55,6 +58,8 @@ void TeraCardReader::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_label);
     items.add(m_color, m_cursor);
     items.add(m_color, m_stars);
+    m_tera_type.make_overlays(items);
+    m_silhouette.make_overlays(items);
 }
 
 const ImageFloatBox& TeraCardReader::CARD_LABEL_BOX(){
@@ -142,6 +147,40 @@ size_t TeraCardReader::stars(const ImageViewRGB32& screen) const{
     }
 
     return 0;
+}
+std::string TeraCardReader::tera_type(
+    Logger& logger, const ProgramInfo& info, const ImageViewRGB32& screen
+) const{
+    ImageMatch::ImageMatchResult type = m_tera_type.read(screen);
+    type.log(logger, 100);
+    std::string best_type;
+    if (!type.results.empty()){
+        best_type = type.results.begin()->second;
+    }
+    if (best_type.empty()){
+        dump_image(logger, info, "ReadTypeFailed", screen);
+    }else if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
+        dump_debug_image(logger, "PokemonSV/TeraRoller/" + best_type, "", screen);
+    }
+
+    return best_type;
+}
+std::string TeraCardReader::pokemon_slug(
+    Logger& logger, const ProgramInfo& info, const ImageViewRGB32& screen
+) const{
+    ImageMatch::ImageMatchResult silhouette = m_silhouette.read(screen);
+    silhouette.log(logger, 100);
+    std::string best_silhouette;
+    if (!silhouette.results.empty()){
+        best_silhouette = silhouette.results.begin()->second;
+    }
+    if (silhouette.results.empty()){
+        dump_image(logger, info, "ReadSilhouetteFailed", screen);
+    }else if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
+        dump_debug_image(logger, "PokemonSV/TeraRoller/" + best_silhouette, "", screen);
+    }
+
+    return best_silhouette;
 }
 
 

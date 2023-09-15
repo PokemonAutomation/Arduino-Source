@@ -698,21 +698,21 @@ void run_from_tera_battle(const ProgramInfo& info, ConsoleHandle& console, BotBa
 }
 
 
-bool is_sparkling_raid(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+bool is_sparkling_raid(ConsoleHandle& console, BotBaseContext& context){
     OverworldWatcher static_map(COLOR_CYAN, true);
     context.wait_for_all_requests();
 
     int ret = wait_until(
-        env.console, context,
+        console, context,
         std::chrono::seconds(2),
         {static_map}
     );
 
     if (ret == 0){
-        env.console.log("Did not detect sparkling raid", COLOR_ORANGE);
+        console.log("Did not detect sparkling raid", COLOR_ORANGE);
         return false;
     }
-    env.console.log("Detected sparkling raid", COLOR_ORANGE);
+    console.log("Detected sparkling raid", COLOR_ORANGE);
     return true;
 }
 

@@ -11,13 +11,12 @@
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
+#include "PokemonSV/Options/PokemonSV_TeraRollFilter.h"
 
 namespace PokemonAutomation{
    struct VideoSnapshot;
 namespace NintendoSwitch{
 namespace PokemonSV{
-
-class TeraRoller;
 
 
 class TeraRoller_Descriptor : public SingleSwitchProgramDescriptor{
@@ -32,34 +31,16 @@ public:
 
 
 
-class TeraRollerOpponentFilter : public GroupOption{
-public:
-    TeraRollerOpponentFilter();
-
-    bool should_battle(size_t stars, const std::string& pokemon) const;
-
-    SimpleIntegerOption<uint8_t> MIN_STARS;
-    SimpleIntegerOption<uint8_t> MAX_STARS;
-
-};
-
-
-
 class TeraRoller : public SingleSwitchProgramInstance{
 public:
     TeraRoller();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
-    BooleanCheckBoxOption CHECK_ONLY_FIRST;
-    TeraRollerOpponentFilter FILTER;
+    TeraRollFilter FILTER;
 
-    enum class EventCheckMode{
-        CHECK_ALL,
-        CHECK_ONLY_EVENT,
-        CHECK_ONLY_NONEVENT,
-    };
-    EnumDropdownOption<EventCheckMode> EVENT_CHECK_MODE;
+    BooleanCheckBoxOption CHECK_ONLY_FIRST;
+    SimpleIntegerOption<uint8_t> PERIODIC_RESET;
 
     //  Notifications
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;

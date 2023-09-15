@@ -11,7 +11,7 @@
 #include <string>
 #include <atomic>
 #include "CommonFramework/Language.h"
-#include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
+//#include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 //#include "CommonFramework/Tools/StatsTracking.h"
 
 namespace PokemonAutomation{
@@ -117,7 +117,7 @@ TeraResult run_tera_summary(
 //  Run away from tera battle.
 void run_from_tera_battle(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
 
-bool is_sparkling_raid(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+bool is_sparkling_raid(ConsoleHandle& console, BotBaseContext& context);
 
 
 }

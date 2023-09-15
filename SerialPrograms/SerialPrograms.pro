@@ -677,6 +677,7 @@ SOURCES += \
     Source/PokemonSV/Options/PokemonSV_SandwichMakerOption.cpp \
     Source/PokemonSV/Options/PokemonSV_TeraAIOption.cpp \
     Source/PokemonSV/Options/PokemonSV_TeraMoveTable.cpp \
+    Source/PokemonSV/Options/PokemonSV_TeraRollFilter.cpp \
     Source/PokemonSV/Options/PokemonSV_TournamentPrizeSelectOption.cpp \
     Source/PokemonSV/Options/PokemonSV_TournamentPrizeTable.cpp \
     Source/PokemonSV/PokemonSV_Panels.cpp \
@@ -701,6 +702,7 @@ SOURCES += \
     Source/PokemonSV/Programs/General/PokemonSV_MassRelease.cpp \
     Source/PokemonSV/Programs/General/PokemonSV_SizeChecker.cpp \
     Source/PokemonSV/Programs/General/PokemonSV_StatsReset.cpp \
+    Source/PokemonSV/Programs/General/PokemonSV_StatsResetBloodmoon.cpp \
     Source/PokemonSV/Programs/General/PokemonSV_TournamentFarmer.cpp \
     Source/PokemonSV/Programs/Glitches/PokemonSV_CloneItems-1.0.1.cpp \
     Source/PokemonSV/Programs/Glitches/PokemonSV_RideCloner-1.0.1.cpp \
@@ -1714,6 +1716,7 @@ HEADERS += \
     Source/PokemonSV/Options/PokemonSV_SandwichMakerOption.h \
     Source/PokemonSV/Options/PokemonSV_TeraAIOption.h \
     Source/PokemonSV/Options/PokemonSV_TeraMoveTable.h \
+    Source/PokemonSV/Options/PokemonSV_TeraRollFilter.h \
     Source/PokemonSV/Options/PokemonSV_TournamentPrizeSelectOption.h \
     Source/PokemonSV/Options/PokemonSV_TournamentPrizeTable.h \
     Source/PokemonSV/PokemonSV_Panels.h \
@@ -1738,6 +1741,7 @@ HEADERS += \
     Source/PokemonSV/Programs/General/PokemonSV_MassRelease.h \
     Source/PokemonSV/Programs/General/PokemonSV_SizeChecker.h \
     Source/PokemonSV/Programs/General/PokemonSV_StatsReset.h \
+    Source/PokemonSV/Programs/General/PokemonSV_StatsResetBloodmoon.h \
     Source/PokemonSV/Programs/General/PokemonSV_TournamentFarmer.h \
     Source/PokemonSV/Programs/Glitches/PokemonSV_CloneItems-1.0.1.h \
     Source/PokemonSV/Programs/Glitches/PokemonSV_RideCloner-1.0.1.h \
