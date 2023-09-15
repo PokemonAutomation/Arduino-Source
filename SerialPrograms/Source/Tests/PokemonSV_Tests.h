@@ -58,6 +58,8 @@ int test_pokemonSV_MapPokeCenterIconDetector(const ImageViewRGB32& image, int ta
 
 int test_pokemonSV_ESPPressedEmotionDetector(const ImageViewRGB32& image, bool target);
 
+int test_pokemon_MapFlyMenuDetector(const ImageViewRGB32& image, bool target);
+
 }
 
 #endif

@@ -10,6 +10,9 @@ where this script is executed.
 
 Then it will add the new file path (as the input parameter of this program) to proper places in CMakeList.txt
 and SerialPrograms.pro.
+
+Example usage:
+python3 add_new_file.py Source/PokemonSV/Inference/Map/PokemonSV_MapFlyMenuDetectorDetector.h
 """
 
 import sys

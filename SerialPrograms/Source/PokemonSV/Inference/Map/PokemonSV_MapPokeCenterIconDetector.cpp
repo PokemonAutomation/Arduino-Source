@@ -21,8 +21,6 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 
-ImageFloatBox MAP_READABLE_AREA{0.197, 0.182, 0.678, 0.632};
-
 class MapPokeCenterIconMatcher : public ImageMatch::WaterfillTemplateMatcher{
 public:
     MapPokeCenterIconMatcher() : WaterfillTemplateMatcher(

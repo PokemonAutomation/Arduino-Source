@@ -15,6 +15,8 @@
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxGenderDetector.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxShinyDetector.h"
 #include "PokemonSV/Inference/Map/PokemonSV_MapDetector.h"
+#include "PokemonSV/Inference/Map/PokemonSV_MapMenuDetector.h"
+#include "PokemonSV/Inference/Map/PokemonSV_MapPokeCenterIconDetector.h"
 #include "PokemonSV/Inference/Tera/PokemonSV_TeraCardDetector.h"
 #include "PokemonSV/Inference/Tera/PokemonSV_TeraSilhouetteReader.h"
 #include "PokemonSV/Inference/Tera/PokemonSV_TeraTypeReader.h"
@@ -24,7 +26,6 @@
 #include "PokemonSV/Inference/Picnics/PokemonSV_SandwichIngredientDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
-#include "PokemonSV/Inference/Map/PokemonSV_MapPokeCenterIconDetector.h"
 #include "PokemonSV/Inference/PokemonSV_ESPEmotionDetector.h"
 
 #include <iostream>
@@ -469,6 +470,17 @@ int test_pokemonSV_ESPPressedEmotionDetector(const ImageViewRGB32& image, bool t
     ESPPressedEmotionDetector detector;
     bool result = detector.detect(image);
     TEST_RESULT_EQUAL(result, target);
+    return 0;
+}
+
+int test_pokemon_MapFlyMenuDetector(const ImageViewRGB32& image, bool target)
+{
+    MapFlyMenuDetector fly_menu(COLOR_RED);
+    MapDestinationMenuDetector dest_menu(COLOR_RED);
+    bool result = fly_menu.detect(image);
+    TEST_RESULT_EQUAL(result, target);
+    result = dest_menu.detect(image);
+    TEST_RESULT_EQUAL(result, !target);
     return 0;
 }
 

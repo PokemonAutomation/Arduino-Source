@@ -23,10 +23,7 @@ class OverlayBoxScope;
 namespace NintendoSwitch{
 namespace PokemonSV{
 
-// The area on the screen that the program can clearly read map info, when the map is opened.
-extern ImageFloatBox MAP_READABLE_AREA;
-
-
+// Detect one or more pokecenter icons on map
 class MapPokeCenterIconDetector : public StaticScreenDetector{
 public:
     MapPokeCenterIconDetector(Color color, const ImageFloatBox& box);
@@ -42,7 +39,7 @@ protected:
 };
 
 
-
+// Watch for at least one pokecenter icon appearing on map
 class MapPokeCenterIconWatcher : public VisualInferenceCallback{
 public:
     ~MapPokeCenterIconWatcher();

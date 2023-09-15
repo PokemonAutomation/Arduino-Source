@@ -1285,6 +1285,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.h
     Source/PokemonSV/Inference/Map/PokemonSV_MapDetector.cpp
     Source/PokemonSV/Inference/Map/PokemonSV_MapDetector.h
+    Source/PokemonSV/Inference/Map/PokemonSV_MapMenuDetector.cpp
+    Source/PokemonSV/Inference/Map/PokemonSV_MapMenuDetector.h
     Source/PokemonSV/Inference/Map/PokemonSV_MapPokeCenterIconDetector.cpp
     Source/PokemonSV/Inference/Map/PokemonSV_MapPokeCenterIconDetector.h
     Source/PokemonSV/Inference/Overworld/PokemonSV_AreaZeroSkyDetector.cpp

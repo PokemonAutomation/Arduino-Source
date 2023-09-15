@@ -80,6 +80,9 @@ public:
 } // end anonymous namespace
 
 
+ImageFloatBox MAP_READABLE_AREA{0.197, 0.182, 0.678, 0.632};
+
+
 MapExitDetector::MapExitDetector(Color color)
     : m_color(color)
     , m_orange_exit_box(0.800, 0.118, 0.067, 0.062)

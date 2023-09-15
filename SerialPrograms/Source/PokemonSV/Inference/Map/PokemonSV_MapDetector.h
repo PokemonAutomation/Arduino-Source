@@ -16,6 +16,11 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
 
+
+// The area on the screen that the program can clearly read map info, when the map is opened.
+extern ImageFloatBox MAP_READABLE_AREA;
+
+
 // Detect the player character is on map.
 
 
