@@ -375,7 +375,8 @@ int test_pokemonSV_SandwichIngredientsDetector(const ImageViewRGB32& image, cons
 }
 
 int test_pokemonSV_SandwichIngredientReader(const ImageViewRGB32& image, const std::vector<std::string>& words){
-    // four words: <current ingredient page "Fillings" or "Condiments"> <language> <current selected ingredient index 0 to 9> <first ingredient> <second ingredient> ...
+    // four words: <current ingredient page "Fillings" or "Condiments"> <language> <current selected ingredient index 0 to 9>
+    //   <first ingredient> <second ingredient> ...
     if (words.size() < 13){
         cerr << "Error: not enough number of words in the filename. Found only " << words.size() << "." << endl;
         return 1;
@@ -473,7 +474,7 @@ int test_pokemonSV_ESPPressedEmotionDetector(const ImageViewRGB32& image, bool t
     return 0;
 }
 
-int test_pokemon_MapFlyMenuDetector(const ImageViewRGB32& image, bool target)
+int test_pokemonSV_MapFlyMenuDetector(const ImageViewRGB32& image, bool target)
 {
     MapFlyMenuDetector fly_menu(COLOR_RED);
     MapDestinationMenuDetector dest_menu(COLOR_RED);

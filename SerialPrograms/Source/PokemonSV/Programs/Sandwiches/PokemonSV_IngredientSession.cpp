@@ -103,8 +103,8 @@ PageIngredients IngredientSession::read_current_page() const{
         }
         throw OperationFailedException(
             ErrorReport::SEND_ERROR_REPORT, m_console,
-            "IngredientSession::read_current_page(): Unable to read selected item. OCR and sprite do not agree on any match: "
-            + set_to_str(ocr_result) + ", " + set_to_str(sprite_result),
+            "IngredientSession::read_current_page(): Unable to read selected item. OCR and sprite do not agree on any match: ocr "
+            + set_to_str(ocr_result) + ", sprite " + set_to_str(sprite_result),
             snapshot
         );
     }
