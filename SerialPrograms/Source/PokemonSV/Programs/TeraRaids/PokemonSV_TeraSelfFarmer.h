@@ -85,6 +85,7 @@ private:
 
     TeraFarmerOpponentFilter FILTER;
     TeraAIOption BATTLE_AI;
+    SimpleIntegerOption<uint8_t> PERIODIC_RESET;
     TeraFarmerCatchOnWin CATCH_ON_WIN;
     TeraFarmerStopConditions STOP_CONDITIONS;
 

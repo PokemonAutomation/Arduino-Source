@@ -6,7 +6,7 @@
 
 #include <set>
 #include <sstream>
-#include "Common/Compiler.h"
+//#include "Common/Compiler.h"
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
@@ -28,6 +28,7 @@
 #include "PokemonSV/Inference/Tera/PokemonSV_TeraSilhouetteReader.h"
 #include "PokemonSV/Inference/Tera/PokemonSV_TeraTypeReader.h"
 //#include "PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
+#include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_SaveGame.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSV/Programs/TeraRaids/PokemonSV_TeraRoutines.h"
@@ -195,6 +196,11 @@ TeraSelfFarmer::TeraSelfFarmer()
         PokemonNameReader::instance().languages(),
         LockWhileRunning::UNLOCKED
     )
+    , PERIODIC_RESET(
+        "<b>Periodic Game Reset:</b><br>Reset the game after this many skips. This clears up the framerate bug.",
+        LockWhileRunning::UNLOCKED,
+        20
+    )
     , CATCH_ON_WIN(*this)
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATION_NONSHINY(
@@ -220,6 +226,7 @@ TeraSelfFarmer::TeraSelfFarmer()
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(FILTER);
     PA_ADD_OPTION(BATTLE_AI);
+    PA_ADD_OPTION(PERIODIC_RESET);
     PA_ADD_OPTION(CATCH_ON_WIN);
     PA_ADD_OPTION(STOP_CONDITIONS);
     PA_ADD_OPTION(NOTIFICATIONS);
@@ -295,6 +302,7 @@ void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
     pbf_press_button(context, BUTTON_L, 10, 10);
 
     bool first = true;
+    uint32_t skip_counter = 0;
 
     while (true){
         if (m_number_caught >= STOP_CONDITIONS.MAX_CATCHES){
@@ -309,6 +317,7 @@ void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
             pbf_wait(context, GameSettings::instance().RAID_SPAWN_DELAY);
             context.wait_for_all_requests();
             stats.m_skips++;
+            skip_counter++;
         }
         first = false;
 
@@ -365,11 +374,17 @@ void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
             continue;
         }
         
-        
-        
 
         close_raid(env.program_info(), env.console, context);
         save_game_from_overworld(env.program_info(), env.console, context);
+
+        uint8_t reset_period = PERIODIC_RESET;
+        if (reset_period != 0 && skip_counter >= reset_period){
+            env.log("Resetting game to clear framerate.");
+            reset_game(env.program_info(), env.console, context);
+            skip_counter = 0;
+        }
+
         context.wait_for_all_requests();
         if (open_raid(env.console, context)){
             env.log("Tera raid found!", COLOR_BLUE);
