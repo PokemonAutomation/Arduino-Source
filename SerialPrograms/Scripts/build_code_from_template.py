@@ -7,7 +7,7 @@ This is used to remove the manual work of creating boilerplate code like visual 
 
 Example usage:
 
-- python3 build_code_from_template.py PokemonSV Map PokeCenter Icon
+- python3 build_code_from_template.py VisualDetector PokemonSV Map PokeCenter Icon
   Generates PokemonSV_MapPokeCenterIconDetector.h and PokemonSV_MapPokeCenterIconDetector.cpp.
 """
 
