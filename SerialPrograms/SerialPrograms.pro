@@ -488,11 +488,11 @@ SOURCES += \
     Source/PokemonBDSP/Programs/Eggs/PokemonBDSP_EggHatcher.cpp \
     Source/PokemonBDSP/Programs/Eggs/PokemonBDSP_EggRoutines.cpp \
     Source/PokemonBDSP/Programs/Farming/PokemonBDSP_AmitySquarePickUpFarmer.cpp \
-    Source/PokemonBDSP/Programs/Farming/PokemonBDSP_PoffinCooker.cpp \
     Source/PokemonBDSP/Programs/Farming/PokemonBDSP_DoublesLeveling.cpp \
     Source/PokemonBDSP/Programs/Farming/PokemonBDSP_GiftBerryReset.cpp \
     Source/PokemonBDSP/Programs/Farming/PokemonBDSP_MoneyFarmerRoute210.cpp \
     Source/PokemonBDSP/Programs/Farming/PokemonBDSP_MoneyFarmerRoute212.cpp \
+    Source/PokemonBDSP/Programs/Farming/PokemonBDSP_PoffinCooker.cpp \
     Source/PokemonBDSP/Programs/General/PokemonBDSP_AutonomousBallThrower.cpp \
     Source/PokemonBDSP/Programs/General/PokemonBDSP_MassRelease.cpp \
     Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_ActivateMenuGlitch-1.1.2.cpp \
@@ -1523,11 +1523,11 @@ HEADERS += \
     Source/PokemonBDSP/Programs/Eggs/PokemonBDSP_EggHatcher.h \
     Source/PokemonBDSP/Programs/Eggs/PokemonBDSP_EggRoutines.h \
     Source/PokemonBDSP/Programs/Farming/PokemonBDSP_AmitySquarePickUpFarmer.h \
-    Source/PokemonBDSP/Programs/Farming/PokemonBDSP_PoffinCooker.h \
     Source/PokemonBDSP/Programs/Farming/PokemonBDSP_DoublesLeveling.h \
     Source/PokemonBDSP/Programs/Farming/PokemonBDSP_GiftBerryReset.h \
     Source/PokemonBDSP/Programs/Farming/PokemonBDSP_MoneyFarmerRoute210.h \
     Source/PokemonBDSP/Programs/Farming/PokemonBDSP_MoneyFarmerRoute212.h \
+    Source/PokemonBDSP/Programs/Farming/PokemonBDSP_PoffinCooker.h \
     Source/PokemonBDSP/Programs/General/PokemonBDSP_AutonomousBallThrower.h \
     Source/PokemonBDSP/Programs/General/PokemonBDSP_MassRelease.h \
     Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_ActivateMenuGlitch-1.1.2.h \
