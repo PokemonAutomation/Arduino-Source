@@ -8,12 +8,9 @@
 #include <sstream>
 //#include "Common/Compiler.h"
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
-#include "CommonFramework/Tools/DebugDumper.h"
-#include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Tools/VideoResolutionCheck.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
@@ -25,8 +22,6 @@
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSV/Inference/Tera/PokemonSV_TeraCardDetector.h"
-#include "PokemonSV/Inference/Tera/PokemonSV_TeraSilhouetteReader.h"
-#include "PokemonSV/Inference/Tera/PokemonSV_TeraTypeReader.h"
 //#include "PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_SaveGame.h"
@@ -92,54 +87,6 @@ std::unique_ptr<StatsTracker> TeraSelfFarmer_Descriptor::make_stats() const{
 
 
 
-TeraFarmerOpponentFilter::TeraFarmerOpponentFilter()
-    : GroupOption("Opponent Filter", LockWhileRunning::UNLOCKED)
-    , SKIP_HERBA(
-        "<b>Skip Non-Herba Raids:</b><br>"
-        "Skip raids that don't have the possibility to reward all types of Herba Mystica. This won't stop the program when Herba Mystica is found, it will only increase your chances to find it.",
-        LockWhileRunning::UNLOCKED,
-        false
-    )
-    , MIN_STARS(
-        "<b>Min Stars:</b><br>Skip raids with less than this many stars.",
-        LockWhileRunning::UNLOCKED,
-        1, 1, 7
-    )
-    , MAX_STARS(
-        "<b>Max Stars:</b><br>Skip raids with more than this many stars to save time since you're likely to lose.",
-        LockWhileRunning::UNLOCKED,
-        4, 1, 7
-    )
-{
-    PA_ADD_OPTION(SKIP_HERBA);
-    PA_ADD_OPTION(MIN_STARS);
-    PA_ADD_OPTION(MAX_STARS);
-}
-
-bool TeraFarmerOpponentFilter::should_battle(size_t stars, const std::string& pokemon) const{
-    if (stars < MIN_STARS || stars > MAX_STARS){
-        return false;
-    }
-
-    static const std::set<std::string> fivestar{
-        "gengar", "glalie", "amoonguss", "dondozo", "palafin", "finizen", "blissey", "eelektross", "drifblim", "cetitan"
-    };
-    static const std::set<std::string> sixstar{
-        "blissey", "vaporeon", "amoonguss", "farigiraf", "cetitan", "dondozo"
-    };
-
-    if (SKIP_HERBA){
-        if (fivestar.find(pokemon) != fivestar.end()){
-            return true;
-        }
-        if (sixstar.find(pokemon) != sixstar.end()){
-            return true;
-        }
-        return false;
-    }
-
-    return true;
-}
 
 TeraFarmerCatchOnWin::TeraFarmerCatchOnWin(TeraSelfFarmer& program)
     : GroupOption("Catch on Win - Required for shiny checking.", LockWhileRunning::UNLOCKED, true)
@@ -318,9 +265,11 @@ void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
             context.wait_for_all_requests();
             stats.m_skips++;
             skip_counter++;
+            env.update_stats();
         }
         first = false;
 
+#if 0
         if (open_raid(env.console, context)){
             stats.m_raids++;
         }else{
@@ -373,6 +322,24 @@ void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
             close_raid(env.program_info(), env.console, context);
             continue;
         }
+#endif
+
+        TeraRaidData raid_data;
+        TeraRollFilter::FilterResult result = FILTER.run_filter(
+            env.program_info(), env.console, context,
+            raid_data
+        );
+        switch (result){
+        case TeraRollFilter::FilterResult::NO_RAID:
+            continue;
+        case TeraRollFilter::FilterResult::FAILED:
+            stats.m_raids++;
+            stats.m_skipped++;
+            continue;
+        case TeraRollFilter::FilterResult::PASSED:
+            stats.m_raids++;
+            break;
+        }
         
 
         close_raid(env.program_info(), env.console, context);
@@ -401,11 +368,21 @@ void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
             ss << "You ";
             if (raid_won){
                 ss << "won";
-            }
-            else{
+            }else{
                 ss << "lost";
             }
-            ss << " a " << stars << "* " << best_type << " " << best_silhouette << " raid";
+
+            std::string stars = raid_data.stars == 0
+                ? "?"
+                : std::to_string(raid_data.stars);
+            std::string tera_type = raid_data.tera_type.empty()
+                ? "unknown tera type"
+                : raid_data.tera_type;
+            std::string pokemon = raid_data.species.empty()
+                ? "unknown " + Pokemon::STRING_POKEMON
+                : raid_data.species;
+
+            ss << " a " << stars << "* " << tera_type << " " << pokemon << " raid";
             env.log(ss.str());
             env.console.overlay().add_log(ss.str(), COLOR_GREEN);
         }
