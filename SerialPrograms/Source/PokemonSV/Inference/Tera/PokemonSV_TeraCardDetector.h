@@ -36,7 +36,9 @@ public:
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) const override;
 
-    size_t stars(const ImageViewRGB32& screen) const;
+    uint8_t stars(
+        Logger& logger, const ProgramInfo& info, const ImageViewRGB32& screen
+    ) const;
     std::string tera_type(
         Logger& logger, const ProgramInfo& info, const ImageViewRGB32& screen
     ) const;

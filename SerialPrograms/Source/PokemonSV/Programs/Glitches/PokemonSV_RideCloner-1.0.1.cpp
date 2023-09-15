@@ -448,10 +448,8 @@ void RideCloner101::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
 
             VideoSnapshot screen = env.console.video().snapshot();
             TeraCardReader reader(COLOR_RED);
-            size_t stars = reader.stars(screen);
-            if (stars == 0){
-                dump_image(env.logger(), env.program_info(), "ReadStarsFailed", *screen.frame);
-            }else{
+            size_t stars = reader.stars(env.logger(),env.program_info(), screen);
+            if (stars != 0){
                 env.log("Detected " + std::to_string(stars) + " star raid.", COLOR_PURPLE);
             }
 

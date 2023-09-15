@@ -158,7 +158,11 @@ void TeraRoller::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
             stats.m_resets++;
         }
 
-        TeraRollFilter::FilterResult result = FILTER.run_filter(env.program_info(), env.console, context);
+        TeraRaidData raid_data;
+        TeraRollFilter::FilterResult result = FILTER.run_filter(
+            env.program_info(), env.console, context,
+            raid_data
+        );
         switch (result){
         case TeraRollFilter::FilterResult::NO_RAID:
             continue;

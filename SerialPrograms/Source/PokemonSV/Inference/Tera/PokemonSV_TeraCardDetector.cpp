@@ -120,7 +120,9 @@ bool TeraCardReader::detect(const ImageViewRGB32& screen) const{
 
     return true;
 }
-size_t TeraCardReader::stars(const ImageViewRGB32& screen) const{
+uint8_t TeraCardReader::stars(
+    Logger& logger, const ProgramInfo& info, const ImageViewRGB32& screen
+) const{
     using namespace Kernels::Waterfill;
 
     ImageViewRGB32 cropped = extract_box_reference(screen, m_stars);
@@ -142,10 +144,11 @@ size_t TeraCardReader::stars(const ImageViewRGB32& screen) const{
             count++;
         }
         if (1 <= count && count <= 7){
-            return count;
+            return (uint8_t)count;
         }
     }
 
+    dump_image(logger, info, "ReadStarsFailed", screen);
     return 0;
 }
 std::string TeraCardReader::tera_type(
