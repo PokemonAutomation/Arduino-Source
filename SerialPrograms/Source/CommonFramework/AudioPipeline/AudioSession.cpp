@@ -170,6 +170,9 @@ void AudioSession::set_audio_output(AudioDeviceInfo info){
 }
 void AudioSession::set_volume(double volume){
     std::lock_guard<std::mutex> lg(m_lock);
+    if (m_option.m_volume == volume){
+        return;
+    }
     m_devices->set_sink_volume(volume);
     m_option.m_volume = volume;
     for (Listener* listener : m_listeners){
@@ -178,6 +181,9 @@ void AudioSession::set_volume(double volume){
 }
 void AudioSession::set_display(AudioOption::AudioDisplayType display){
     std::lock_guard<std::mutex> lg(m_lock);
+    if (m_option.m_display_type == display){
+        return;
+    }
     m_option.m_display_type = display;
     for (Listener* listener : m_listeners){
         listener->display_changed(m_option.m_display_type);
