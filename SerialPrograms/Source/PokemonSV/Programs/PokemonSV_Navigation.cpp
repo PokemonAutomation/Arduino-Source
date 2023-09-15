@@ -444,7 +444,7 @@ void open_pokedex_from_overworld(const ProgramInfo& info, ConsoleHandle& console
 
 void open_recently_battled_from_pokedex(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
     console.log("Opening recently battled...");
-    LetsGoKillWatcher menu(console.logger(), COLOR_RED, true, {0.23, 0.23, 0.04, 0.08});
+    LetsGoKillWatcher menu(console.logger(), COLOR_RED, true, {0.23, 0.23, 0.04, 0.20});
     context.wait_for_all_requests();
 
     int ret = run_until(
