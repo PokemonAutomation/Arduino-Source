@@ -19,7 +19,7 @@ class FillingsCoordinates {
 
     struct FillingInfo {
         uint8_t piecesPerServing;
-        uint8_t servingsPerBowl;
+        uint8_t servingsPerPlate;
         std::map<int, std::vector<ImageFloatBox>> placementCoordinates;
     };
 

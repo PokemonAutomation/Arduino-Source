@@ -812,34 +812,34 @@ void run_sandwich_maker(SingleSwitchProgramEnvironment& env, BotBaseContext& con
     }
     */
 
-    //Calculate number of bowls there will be on the build screen
+    //Calculate number of plates there will be on the build screen
     //Get each ingredient in list order, then get the number of times it appears from the map
-    //Also store how many of each ingredient is in each bowl (ex. 6 onion in first bowl and then 3 onion in the next)
-    int bowls = 0;
-    std::vector<int> bowl_amounts;
+    //Also store how many of each ingredient is in each plate (ex. 6 onion in first plate and then 3 onion in the next)
+    int plates = 0;
+    std::vector<int> plate_amounts;
 
     for (auto i : fillings_sorted) {
-        //Add "full" bowls
-        int bowl_calcs = (int)(fillings[i] / FillingsCoordinates::instance().get_filling_information(i).servingsPerBowl);
-        if (bowl_calcs != 0) {
-            bowls += bowl_calcs;
-            for (int j = 0; j < bowl_calcs; j++) {
-                bowl_amounts.push_back(
-                    (int)(FillingsCoordinates::instance().get_filling_information(i).servingsPerBowl)
+        //Add "full" plates
+        int plate_calcs = (int)(fillings[i] / FillingsCoordinates::instance().get_filling_information(i).servingsPerPlate);
+        if (plate_calcs != 0) {
+            plates += plate_calcs;
+            for (int j = 0; j < plate_calcs; j++) {
+                plate_amounts.push_back(
+                    (int)(FillingsCoordinates::instance().get_filling_information(i).servingsPerPlate)
                     * (int)(FillingsCoordinates::instance().get_filling_information(i).piecesPerServing));
             }
         }
 
-        //Add bowls for remaining servings
-        int bowl_remaining = ((int)(fillings[i] % FillingsCoordinates::instance().get_filling_information(i).servingsPerBowl));
-        if (bowl_remaining != 0) {
-            bowls++;
-            bowl_amounts.push_back(bowl_remaining * (int)(FillingsCoordinates::instance().get_filling_information(i).piecesPerServing));
+        //Add plates for remaining servings
+        int plate_remaining = ((int)(fillings[i] % FillingsCoordinates::instance().get_filling_information(i).servingsPerPlate));
+        if (plate_remaining != 0) {
+            plates++;
+            plate_amounts.push_back(plate_remaining * (int)(FillingsCoordinates::instance().get_filling_information(i).piecesPerServing));
         }
     }
-    //cout << "Number of bowls: " << bowls << endl;
-    env.log("Number of bowls: " + std::to_string(bowls), COLOR_BLACK);
-    env.console.overlay().add_log("Number of bowls: " + std::to_string(bowls), COLOR_WHITE);
+    //cout << "Number of plates: " << plates << endl;
+    env.log("Number of plates: " + std::to_string(plates), COLOR_BLACK);
+    env.console.overlay().add_log("Number of plates: " + std::to_string(plates), COLOR_WHITE);
     for (const auto& filling: fillings){
         env.log("Require filling " + filling.first + " x" + std::to_string(int(filling.second)));
     }
@@ -860,31 +860,31 @@ void run_sandwich_maker(SingleSwitchProgramEnvironment& env, BotBaseContext& con
     pbf_wait(context, 300);
     context.wait_for_all_requests();
 
-    //Now read in bowl labels and store which bowl has what
+    //Now read in plate labels and store which plate has what
     //TODO: Clean this up - this is a mess
-    env.log("Reading bowl labels.", COLOR_BLACK);
-    env.console.overlay().add_log("Reading bowl labels.", COLOR_WHITE);
+    env.log("Reading plate labels.", COLOR_BLACK);
+    env.console.overlay().add_log("Reading plate labels.", COLOR_WHITE);
 
     VideoSnapshot screen = env.console.video().snapshot();
-    ImageFloatBox left_bowl_label(0.099, 0.270, 0.205, 0.041);
-    ImageFloatBox center_bowl_label(0.397, 0.268, 0.203, 0.044);
-    ImageFloatBox right_bowl_label(0.699, 0.269, 0.201, 0.044);
+    ImageFloatBox left_plate_label(0.099, 0.270, 0.205, 0.041);
+    ImageFloatBox center_plate_label(0.397, 0.268, 0.203, 0.044);
+    ImageFloatBox right_plate_label(0.699, 0.269, 0.201, 0.044);
 
     //VideoOverlaySet label_set(env.console);
-    //label_set.add(COLOR_BLUE, center_bowl_label);
-    std::vector<std::string> bowl_order;
+    //label_set.add(COLOR_BLUE, center_plate_label);
+    std::vector<std::string> plate_order;
 
     //Get 3 default labels
     ImageRGB32 image_center_label = to_blackwhite_rgb32_range(
-        extract_box_reference(screen, center_bowl_label),
+        extract_box_reference(screen, center_plate_label),
         combine_rgb(215, 215, 215), combine_rgb(255, 255, 255), true
     );
     ImageRGB32 image_left_label = to_blackwhite_rgb32_range(
-        extract_box_reference(screen, left_bowl_label),
+        extract_box_reference(screen, left_plate_label),
         combine_rgb(215, 215, 215), combine_rgb(255, 255, 255), true
     );
     ImageRGB32 image_right_label = to_blackwhite_rgb32_range(
-        extract_box_reference(screen, right_bowl_label),
+        extract_box_reference(screen, right_plate_label),
         combine_rgb(215, 215, 215), combine_rgb(255, 255, 255), true
     );
 
@@ -904,7 +904,7 @@ void run_sandwich_maker(SingleSwitchProgramEnvironment& env, BotBaseContext& con
     for (auto& r : result.results) {
         env.console.log("Ingredient found on center label: " + r.second.token);
         env.console.overlay().add_log("Ingredient found on center label : " + r.second.token, COLOR_WHITE);
-        bowl_order.push_back(r.second.token);
+        plate_order.push_back(r.second.token);
     }
     //Get left (2nd) ingredient
     result = PokemonSV::SandwichFillingOCR::instance().read_substring(
@@ -920,7 +920,7 @@ void run_sandwich_maker(SingleSwitchProgramEnvironment& env, BotBaseContext& con
     for (auto& r : result.results) {
         env.console.log("Ingredient found on left label: " + r.second.token);
         env.console.overlay().add_log("Ingredient found on left label: " + r.second.token, COLOR_WHITE);
-        bowl_order.push_back(r.second.token);
+        plate_order.push_back(r.second.token);
     }
     //Get right (3rd) ingredient
     result = PokemonSV::SandwichFillingOCR::instance().read_substring(
@@ -936,20 +936,20 @@ void run_sandwich_maker(SingleSwitchProgramEnvironment& env, BotBaseContext& con
     for (auto& r : result.results) {
         env.console.log("Ingredient found on right label: " + r.second.token);
         env.console.overlay().add_log("Ingredient found on right label: " + r.second.token, COLOR_WHITE);
-        bowl_order.push_back(r.second.token);
+        plate_order.push_back(r.second.token);
     }
     //Get remaining ingredients if any
     //center 1, left 2, right 3, far left 4, far far left/right 5, right 6
     //this differs from the game layout: far right is 5 and far far left/right is 6 in game
     //however as long as we stay internally consistent with this numbering it will work
-    for (int i = 0; i < (bowls - 3); i++) {
+    for (int i = 0; i < (plates - 3); i++) {
         pbf_press_button(context, BUTTON_R, 20, 80);
         pbf_wait(context, 100);
         context.wait_for_all_requests();
 
         VideoSnapshot screen2 = env.console.video().snapshot();
         ImageRGB32 image_side_label = to_blackwhite_rgb32_range(
-            extract_box_reference(screen2, left_bowl_label),
+            extract_box_reference(screen2, left_plate_label),
             combine_rgb(215, 215, 215), combine_rgb(255, 255, 255), true
         );
         //image_side_label.save("./image_side_label.png");
@@ -967,29 +967,29 @@ void run_sandwich_maker(SingleSwitchProgramEnvironment& env, BotBaseContext& con
         for (auto& r : result.results) {
             env.console.log("Ingredient found on side label: " + r.second.token);
             env.console.overlay().add_log("Ingredient found on side label: " + r.second.token, COLOR_WHITE);
-            bowl_order.push_back(r.second.token);
+            plate_order.push_back(r.second.token);
         }
     }
 
-    //Now re-center bowls
-    env.log("Re-centering bowls if needed.", COLOR_BLACK);
-    env.console.overlay().add_log("Re-centering bowls if needed.", COLOR_WHITE);
-    for (int i = 0; i < (bowls - 3); i++) {
+    //Now re-center plates
+    env.log("Re-centering plates if needed.", COLOR_BLACK);
+    env.console.overlay().add_log("Re-centering plates if needed.", COLOR_WHITE);
+    for (int i = 0; i < (plates - 3); i++) {
         pbf_press_button(context, BUTTON_L, 20, 80);
     }
 
     /*
     cout << "Labels:" << endl;
-    for (auto i : bowl_order) {
+    for (auto i : plate_order) {
         cout << i << endl;
     }
     */
 
     //If a label fails to read it'll cause issues down the line
-    if ((int)bowl_order.size() != bowls) {
+    if ((int)plate_order.size() != plates) {
         throw OperationFailedException(
             ErrorReport::SEND_ERROR_REPORT, env.console,
-            "Number of bowl labels did not match number of bowls.",
+            "Number of plate labels did not match number of plates.",
             true
         );
     }
@@ -998,11 +998,11 @@ void run_sandwich_maker(SingleSwitchProgramEnvironment& env, BotBaseContext& con
     env.log("Start making sandwich", COLOR_BLACK);
     env.console.overlay().add_log("Start making sandwich.", COLOR_WHITE);
 
-    const ImageFloatBox center_bowl{ 0.455, 0.130, 0.090, 0.030 };
-    const ImageFloatBox left_bowl{ 0.190, 0.136, 0.096, 0.031 };
-    const ImageFloatBox right_bowl{ 0.715, 0.140, 0.108, 0.033 };
+    const ImageFloatBox center_plate{ 0.455, 0.130, 0.090, 0.030 };
+    const ImageFloatBox left_plate{ 0.190, 0.136, 0.096, 0.031 };
+    const ImageFloatBox right_plate{ 0.715, 0.140, 0.108, 0.033 };
 
-    ImageFloatBox target_bowl = center_bowl;
+    ImageFloatBox target_plate = center_plate;
     //Initial position handling
     auto end_box = move_sandwich_hand(env.program_info(), env.realtime_dispatcher(), env.console, context, SandwichHandType::FREE, false, HAND_INITIAL_BOX, HAND_INITIAL_BOX);
     move_sandwich_hand(env.program_info(), env.realtime_dispatcher(), env.console, context, SandwichHandType::GRABBING, true, { 0, 0, 1.0, 1.0 }, HAND_INITIAL_BOX);
@@ -1019,35 +1019,35 @@ void run_sandwich_maker(SingleSwitchProgramEnvironment& env, BotBaseContext& con
         //cout << "Times to place: " << times_to_place << endl;
         env.console.overlay().add_log("Times to place: " + std::to_string(times_to_place), COLOR_WHITE);
 
-        std::vector<int> bowl_index;
-        //Get the bowls we want to go to
-        for (int j = 0; j < (int)bowl_order.size(); j++) {
-            if (i == bowl_order.at(j)) {
-                bowl_index.push_back(j);
+        std::vector<int> plate_index;
+        //Get the plates we want to go to
+        for (int j = 0; j < (int)plate_order.size(); j++) {
+            if (i == plate_order.at(j)) {
+                plate_index.push_back(j);
             }
         }
 
-        //Target the correct filling bowl and place until it is empty
-        for (int j = 0; j < (int)bowl_index.size(); j++) {
-            //Navigate to bowl and set target bowl
-            //cout << "Target bowl: " << bowl_index.at(j) << endl;
-            env.console.overlay().add_log("Target bowl: " + std::to_string(bowl_index.at(j)), COLOR_WHITE);
-            switch (bowl_index.at(j)) {
+        //Target the correct filling plate and place until it is empty
+        for (int j = 0; j < (int)plate_index.size(); j++) {
+            //Navigate to plate and set target plate
+            //cout << "Target plate: " << plate_index.at(j) << endl;
+            env.console.overlay().add_log("Target plate: " + std::to_string(plate_index.at(j)), COLOR_WHITE);
+            switch (plate_index.at(j)) {
             case 0:
-                target_bowl = center_bowl;
+                target_plate = center_plate;
                 break;
             case 1:
-                target_bowl = left_bowl;
+                target_plate = left_plate;
                 break;
             case 2:
-                target_bowl = right_bowl;
+                target_plate = right_plate;
                 break;
             case 3: case 4: case 5: case 6:
                 //Press R the appropriate number of times
-                for (int k = 2; k < bowl_index.at(j); k++) {
+                for (int k = 2; k < plate_index.at(j); k++) {
                     pbf_press_button(context, BUTTON_R, 20, 80);
                 }
-                target_bowl = left_bowl;
+                target_plate = left_plate;
                 break;
             default:
                 break;
@@ -1060,7 +1060,7 @@ void run_sandwich_maker(SingleSwitchProgramEnvironment& env, BotBaseContext& con
                     break;
                 }
 
-                end_box = move_sandwich_hand(env.program_info(), env.realtime_dispatcher(), env.console, context, SandwichHandType::FREE, false, { 0, 0, 1.0, 1.0 }, target_bowl);
+                end_box = move_sandwich_hand(env.program_info(), env.realtime_dispatcher(), env.console, context, SandwichHandType::FREE, false, { 0, 0, 1.0, 1.0 }, target_plate);
                 context.wait_for_all_requests();
 
                 //Get placement location
@@ -1069,18 +1069,18 @@ void run_sandwich_maker(SingleSwitchProgramEnvironment& env, BotBaseContext& con
                 end_box = move_sandwich_hand(env.program_info(), env.realtime_dispatcher(), env.console, context, SandwichHandType::GRABBING, true, expand_box(end_box), placement_target);
                 context.wait_for_all_requests();
 
-                //If any of the labels are yellow continue. Otherwise assume bowl is empty move on to the next.
+                //If any of the labels are yellow continue. Otherwise assume plate is empty move on to the next.
                 VideoSnapshot label_color_check = env.console.video().snapshot();
                 ImageRGB32 left_check = filter_rgb32_range(
-                    extract_box_reference(label_color_check, left_bowl_label),
+                    extract_box_reference(label_color_check, left_plate_label),
                     combine_rgb(180, 161, 0), combine_rgb(255, 255, 100), Color(0), false
                 );
                 ImageRGB32 right_check = filter_rgb32_range(
-                    extract_box_reference(label_color_check, right_bowl_label),
+                    extract_box_reference(label_color_check, right_plate_label),
                     combine_rgb(180, 161, 0), combine_rgb(255, 255, 100), Color(0), false
                 );
                 ImageRGB32 center_check = filter_rgb32_range(
-                    extract_box_reference(label_color_check, center_bowl_label),
+                    extract_box_reference(label_color_check, center_plate_label),
                     combine_rgb(180, 161, 0), combine_rgb(255, 255, 100), Color(0), false
                 );
                 ImageStats left_stats = image_stats(left_check);
@@ -1091,18 +1091,18 @@ void run_sandwich_maker(SingleSwitchProgramEnvironment& env, BotBaseContext& con
                 //cout << "Right stats: " << right_stats.count << endl;
                 //cout << "Center stats: " << center_stats.count << endl;
 
-                //The label check is needed for ingredients with multiple bowls as we don't know which bowl has what amount
+                //The label check is needed for ingredients with multiple plates as we don't know which plate has what amount
                 if (left_stats.count < 100 && right_stats.count < 100 && center_stats.count < 100) {
                     context.wait_for_all_requests();
                     break;
                 }
 
-                //If the bowl is empty the increment is skipped using the above break
+                //If the plate is empty the increment is skipped using the above break
                 placement_number++;
             }
 
-            //Reset bowl positions
-            for (int k = 2; k < bowl_index.at(j); k++) {
+            //Reset plate positions
+            for (int k = 2; k < plate_index.at(j); k++) {
                 pbf_press_button(context, BUTTON_L, 20, 80);
             }
         }
@@ -1120,7 +1120,7 @@ void run_sandwich_maker(SingleSwitchProgramEnvironment& env, BotBaseContext& con
 
     auto hand_box = hand_location_to_box(grabbing_hand.location());
 
-    end_box = move_sandwich_hand(env.program_info(), env.realtime_dispatcher(), env.console, context, SandwichHandType::GRABBING, false, expand_box(hand_box), center_bowl);
+    end_box = move_sandwich_hand(env.program_info(), env.realtime_dispatcher(), env.console, context, SandwichHandType::GRABBING, false, expand_box(hand_box), center_plate);
     pbf_mash_button(context, BUTTON_A, 125 * 5);
 
     env.log("Hand end box " + box_to_string(end_box));
