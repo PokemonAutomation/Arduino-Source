@@ -92,7 +92,6 @@ bool SandwichPlateDetector::is_label_yellow(const ImageViewRGB32& screen) const{
         combine_rgb(180, 161, 0), combine_rgb(255, 255, 100), Color(0), false
     );
     ImageStats stats = image_stats(yellow_region);
-    std::cout << "label yellow: " << stats.count << std::endl;
 
     const double screen_rel_size = (screen.height() / 1080.0);
     const size_t min_size = size_t(screen_rel_size * screen_rel_size * 200);

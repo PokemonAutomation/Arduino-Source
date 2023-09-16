@@ -26,6 +26,7 @@
 #include "PokemonSV/Resources/PokemonSV_Ingredients.h"
 #include "PokemonSV_SandwichRoutines.h"
 #include "PokemonSV/Programs/Sandwiches/PokemonSV_IngredientSession.h"
+#include "PokemonSV/Inference/Picnics/PokemonSV_SandwichPlateDetector.h"
 
 #include <cmath>
 #include <algorithm>
@@ -694,7 +695,8 @@ void make_two_herbs_sandwich(
 }
 
 void run_sandwich_maker(SingleSwitchProgramEnvironment& env, BotBaseContext& context, SandwichMakerOption& SANDWICH_OPTIONS) {
-    if (SANDWICH_OPTIONS.LANGUAGE == Language::None) {
+    const Language language = SANDWICH_OPTIONS.LANGUAGE;
+    if (language == Language::None) {
         throw UserSetupError(env.console.logger(), "Must set game langauge option to read ingredient lists.");
     }
 
@@ -850,7 +852,7 @@ void run_sandwich_maker(SingleSwitchProgramEnvironment& env, BotBaseContext& con
     //Player must be on default sandwich menu
     std::map<std::string, uint8_t> fillings_copy(fillings); //Making a copy as we need the map for later
     enter_custom_sandwich_mode(env.program_info(), env.console, context);
-    add_sandwich_ingredients(env.realtime_dispatcher(), env.console, context, SANDWICH_OPTIONS.LANGUAGE,
+    add_sandwich_ingredients(env.realtime_dispatcher(), env.console, context, language,
         std::move(fillings_copy), std::move(condiments));
     wait_for_initial_hand(env.program_info(), env.console, context);
 
@@ -865,112 +867,67 @@ void run_sandwich_maker(SingleSwitchProgramEnvironment& env, BotBaseContext& con
     env.log("Reading plate labels.", COLOR_BLACK);
     env.console.overlay().add_log("Reading plate labels.", COLOR_WHITE);
 
-    VideoSnapshot screen = env.console.video().snapshot();
-    ImageFloatBox left_plate_label(0.099, 0.270, 0.205, 0.041);
-    ImageFloatBox center_plate_label(0.397, 0.268, 0.203, 0.044);
-    ImageFloatBox right_plate_label(0.699, 0.269, 0.201, 0.044);
-
-    //VideoOverlaySet label_set(env.console);
-    //label_set.add(COLOR_BLUE, center_plate_label);
     std::vector<std::string> plate_order;
 
-    //Get 3 default labels
-    ImageRGB32 image_center_label = to_blackwhite_rgb32_range(
-        extract_box_reference(screen, center_plate_label),
-        combine_rgb(215, 215, 215), combine_rgb(255, 255, 255), true
-    );
-    ImageRGB32 image_left_label = to_blackwhite_rgb32_range(
-        extract_box_reference(screen, left_plate_label),
-        combine_rgb(215, 215, 215), combine_rgb(255, 255, 255), true
-    );
-    ImageRGB32 image_right_label = to_blackwhite_rgb32_range(
-        extract_box_reference(screen, right_plate_label),
-        combine_rgb(215, 215, 215), combine_rgb(255, 255, 255), true
-    );
-
-    OCR::StringMatchResult result = PokemonSV::SandwichFillingOCR::instance().read_substring(
-        env.console, SANDWICH_OPTIONS.LANGUAGE, image_center_label,
-        OCR::BLACK_TEXT_FILTERS()
-    );
-    result.clear_beyond_log10p(SandwichFillingOCR::MAX_LOG10P);
-    result.clear_beyond_spread(SandwichFillingOCR::MAX_LOG10P_SPREAD);
-    if (result.results.empty()) {
+    VideoSnapshot screen = env.console.video().snapshot();
+    SandwichPlateDetector left_plate_detector(env.console.logger(), COLOR_RED, language, SandwichPlateDetector::Side::LEFT);
+    SandwichPlateDetector middle_plate_detector(env.console.logger(), COLOR_RED, language, SandwichPlateDetector::Side::MIDDLE);
+    SandwichPlateDetector right_plate_detector(env.console.logger(), COLOR_RED, language, SandwichPlateDetector::Side::RIGHT);
+    
+    std::string center_filling = middle_plate_detector.detect_filling_name(screen);
+    if (center_filling.empty()) {
         throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, env.console,
-            "No ingredient found on center label.",
-            true
+            ErrorReport::SEND_ERROR_REPORT, env.console, "No ingredient found on center plate label.", true
         );
     }
-    for (auto& r : result.results) {
-        env.console.log("Ingredient found on center label: " + r.second.token);
-        env.console.overlay().add_log("Ingredient found on center label : " + r.second.token, COLOR_WHITE);
-        plate_order.push_back(r.second.token);
-    }
 
+    env.console.log("Read center plate label: " + center_filling);
+    env.console.overlay().add_log("Center plate: " + center_filling);
+    plate_order.push_back(center_filling);
     
     //Get left (2nd) ingredient
-    result = PokemonSV::SandwichFillingOCR::instance().read_substring(
-        env.console, SANDWICH_OPTIONS.LANGUAGE, image_left_label,
-        OCR::BLACK_TEXT_FILTERS()
-    );
-    result.clear_beyond_log10p(SandwichFillingOCR::MAX_LOG10P);
-    result.clear_beyond_spread(SandwichFillingOCR::MAX_LOG10P_SPREAD);
-    if (result.results.empty()) {
-        env.log("No ingredient found on left label.", COLOR_BLACK);
-        env.console.overlay().add_log("No ingredient found on left label.", COLOR_WHITE);
+    std::string left_filling = left_plate_detector.detect_filling_name(screen);
+    if (left_filling.empty()) {
+        env.log("No ingredient found on left label.");
+        env.console.overlay().add_log("No left plate");
     }
-    for (auto& r : result.results) {
-        env.console.log("Ingredient found on left label: " + r.second.token);
-        env.console.overlay().add_log("Ingredient found on left label: " + r.second.token, COLOR_WHITE);
-        plate_order.push_back(r.second.token);
+    else{
+        env.console.log("Read left plate label: " + left_filling);
+        env.console.overlay().add_log("Left plate: " + left_filling);
+        plate_order.push_back(left_filling);
     }
+
     //Get right (3rd) ingredient
-    result = PokemonSV::SandwichFillingOCR::instance().read_substring(
-        env.console, SANDWICH_OPTIONS.LANGUAGE, image_right_label,
-        OCR::BLACK_TEXT_FILTERS()
-    );
-    result.clear_beyond_log10p(SandwichFillingOCR::MAX_LOG10P);
-    result.clear_beyond_spread(SandwichFillingOCR::MAX_LOG10P_SPREAD);
-    if (result.results.empty()) {
-        env.log("No ingredient found on right label.", COLOR_BLACK);
-        env.console.overlay().add_log("No ingredient found on right label.", COLOR_WHITE);
+    std::string right_filling = right_plate_detector.detect_filling_name(screen);
+    if (right_filling.empty()) {
+        env.log("No ingredient found on right label.");
+        env.console.overlay().add_log("No right plate");
     }
-    for (auto& r : result.results) {
-        env.console.log("Ingredient found on right label: " + r.second.token);
-        env.console.overlay().add_log("Ingredient found on right label: " + r.second.token, COLOR_WHITE);
-        plate_order.push_back(r.second.token);
+    else{
+        env.console.log("Read right plate label: " + right_filling);
+        env.console.overlay().add_log("Right plate: " + right_filling);
+        plate_order.push_back(right_filling);
     }
+
     //Get remaining ingredients if any
     //center 1, left 2, right 3, far left 4, far far left/right 5, right 6
     //this differs from the game layout: far right is 5 and far far left/right is 6 in game
     //however as long as we stay internally consistent with this numbering it will work
     for (int i = 0; i < (plates - 3); i++) {
-        pbf_press_button(context, BUTTON_R, 20, 80);
-        pbf_wait(context, 100);
+        pbf_press_button(context, BUTTON_R, 20, 180);
         context.wait_for_all_requests();
 
-        VideoSnapshot screen2 = env.console.video().snapshot();
-        ImageRGB32 image_side_label = to_blackwhite_rgb32_range(
-            extract_box_reference(screen2, left_plate_label),
-            combine_rgb(215, 215, 215), combine_rgb(255, 255, 255), true
-        );
-        //image_side_label.save("./image_side_label.png");
-
-        result = PokemonSV::SandwichFillingOCR::instance().read_substring(
-            env.console, SANDWICH_OPTIONS.LANGUAGE, image_side_label,
-            OCR::BLACK_TEXT_FILTERS()
-        );
-        result.clear_beyond_log10p(SandwichFillingOCR::MAX_LOG10P);
-        result.clear_beyond_spread(SandwichFillingOCR::MAX_LOG10P_SPREAD);
-        if (result.results.empty()) {
-            env.log("No ingredient found on side label.", COLOR_BLACK);
-            env.console.overlay().add_log("No ingredient found on side label.", COLOR_WHITE);
+        screen = env.console.video().snapshot();
+        left_filling = left_plate_detector.detect_filling_name(screen);
+        
+        if (left_filling.empty()) {
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, env.console, "No ingredient label found on remaining plate " + std::to_string(i) + ".", true
+            );
         }
-        for (auto& r : result.results) {
-            env.console.log("Ingredient found on side label: " + r.second.token);
-            env.console.overlay().add_log("Ingredient found on side label: " + r.second.token, COLOR_WHITE);
-            plate_order.push_back(r.second.token);
-        }
+        env.console.log("Read remaining plate " + std::to_string(i) + " label: " + left_filling);
+        env.console.overlay().add_log("Remaining plate " + std::to_string(i) + ": " + left_filling);
+        plate_order.push_back(left_filling);
     }
 
     //Now re-center plates
@@ -980,15 +937,9 @@ void run_sandwich_maker(SingleSwitchProgramEnvironment& env, BotBaseContext& con
         pbf_press_button(context, BUTTON_L, 20, 80);
     }
 
-    /*
-    cout << "Labels:" << endl;
-    for (auto i : plate_order) {
-        cout << i << endl;
-    }
-    */
-
     //If a label fails to read it'll cause issues down the line
     if ((int)plate_order.size() != plates) {
+
         throw OperationFailedException(
             ErrorReport::SEND_ERROR_REPORT, env.console,
             "Number of plate labels did not match number of plates.",
@@ -1062,39 +1013,24 @@ void run_sandwich_maker(SingleSwitchProgramEnvironment& env, BotBaseContext& con
                     break;
                 }
 
-                end_box = move_sandwich_hand(env.program_info(), env.realtime_dispatcher(), env.console, context, SandwichHandType::FREE, false, { 0, 0, 1.0, 1.0 }, target_plate);
+                end_box = move_sandwich_hand(env.program_info(), env.realtime_dispatcher(), env.console, context, SandwichHandType::FREE,
+                    false, { 0, 0, 1.0, 1.0 }, target_plate);
                 context.wait_for_all_requests();
 
                 //Get placement location
-                ImageFloatBox placement_target = FillingsCoordinates::instance().get_filling_information(i).placementCoordinates.at((int)fillings.find(i)->second).at(placement_number);
+                ImageFloatBox placement_target = FillingsCoordinates::instance().get_filling_information(i).placementCoordinates.at(
+                    (int)fillings.find(i)->second).at(placement_number);
 
-                end_box = move_sandwich_hand(env.program_info(), env.realtime_dispatcher(), env.console, context, SandwichHandType::GRABBING, true, expand_box(end_box), placement_target);
+                end_box = move_sandwich_hand(env.program_info(), env.realtime_dispatcher(), env.console, context, SandwichHandType::GRABBING,
+                    true, expand_box(end_box), placement_target);
                 context.wait_for_all_requests();
 
                 //If any of the labels are yellow continue. Otherwise assume plate is empty move on to the next.
-                VideoSnapshot label_color_check = env.console.video().snapshot();
-                ImageRGB32 left_check = filter_rgb32_range(
-                    extract_box_reference(label_color_check, left_plate_label),
-                    combine_rgb(180, 161, 0), combine_rgb(255, 255, 100), Color(0), false
-                );
-                ImageRGB32 right_check = filter_rgb32_range(
-                    extract_box_reference(label_color_check, right_plate_label),
-                    combine_rgb(180, 161, 0), combine_rgb(255, 255, 100), Color(0), false
-                );
-                ImageRGB32 center_check = filter_rgb32_range(
-                    extract_box_reference(label_color_check, center_plate_label),
-                    combine_rgb(180, 161, 0), combine_rgb(255, 255, 100), Color(0), false
-                );
-                ImageStats left_stats = image_stats(left_check);
-                ImageStats right_stats = image_stats(right_check);
-                ImageStats center_stats = image_stats(center_check);
-
-                //cout << "Left stats: " << left_stats.count << endl;
-                //cout << "Right stats: " << right_stats.count << endl;
-                //cout << "Center stats: " << center_stats.count << endl;
+                auto screen = env.console.video().snapshot();
 
                 //The label check is needed for ingredients with multiple plates as we don't know which plate has what amount
-                if (left_stats.count < 100 && right_stats.count < 100 && center_stats.count < 100) {
+                if (!left_plate_detector.is_label_yellow(screen) && !middle_plate_detector.is_label_yellow(screen)
+                    && !right_plate_detector.is_label_yellow(screen)) {
                     context.wait_for_all_requests();
                     break;
                 }
@@ -1127,7 +1063,7 @@ void run_sandwich_maker(SingleSwitchProgramEnvironment& env, BotBaseContext& con
 
     env.log("Hand end box " + box_to_string(end_box));
     env.log("Built sandwich", COLOR_BLACK);
-    env.console.overlay().add_log("Hand end box " + box_to_string(end_box), COLOR_WHITE);
+    // env.console.overlay().add_log("Hand end box " + box_to_string(end_box), COLOR_WHITE);
     env.console.overlay().add_log("Built sandwich.", COLOR_WHITE);
     context.wait_for_all_requests();
 
