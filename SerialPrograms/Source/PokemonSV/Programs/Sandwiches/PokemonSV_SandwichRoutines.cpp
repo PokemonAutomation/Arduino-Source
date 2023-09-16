@@ -820,7 +820,7 @@ void run_sandwich_maker(SingleSwitchProgramEnvironment& env, BotBaseContext& con
     int plates = 0;
     std::vector<int> plate_amounts;
 
-    for (auto i : fillings_sorted) {
+    for (const std::string& i : fillings_sorted) {
         //Add "full" plates
         int plate_calcs = (int)(fillings[i] / FillingsCoordinates::instance().get_filling_information(i).servingsPerPlate);
         if (plate_calcs != 0) {
@@ -869,11 +869,12 @@ void run_sandwich_maker(SingleSwitchProgramEnvironment& env, BotBaseContext& con
 
     std::vector<std::string> plate_order;
 
-    VideoSnapshot screen = env.console.video().snapshot();
     SandwichPlateDetector left_plate_detector(env.console.logger(), COLOR_RED, language, SandwichPlateDetector::Side::LEFT);
     SandwichPlateDetector middle_plate_detector(env.console.logger(), COLOR_RED, language, SandwichPlateDetector::Side::MIDDLE);
     SandwichPlateDetector right_plate_detector(env.console.logger(), COLOR_RED, language, SandwichPlateDetector::Side::RIGHT);
-    
+
+    VideoSnapshot screen = env.console.video().snapshot();
+
     std::string center_filling = middle_plate_detector.detect_filling_name(screen);
     if (center_filling.empty()) {
         throw OperationFailedException(
@@ -962,7 +963,7 @@ void run_sandwich_maker(SingleSwitchProgramEnvironment& env, BotBaseContext& con
     context.wait_for_all_requests();
 
     //Find fillings and add them in order
-    for (auto i : fillings_sorted) {
+    for (const std::string& i : fillings_sorted) {
         //cout << "Placing " << i << endl;
         env.console.overlay().add_log("Placing " + i, COLOR_WHITE);
 
