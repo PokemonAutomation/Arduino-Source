@@ -873,79 +873,82 @@ void run_sandwich_maker(SingleSwitchProgramEnvironment& env, BotBaseContext& con
     SandwichPlateDetector middle_plate_detector(env.console.logger(), COLOR_RED, language, SandwichPlateDetector::Side::MIDDLE);
     SandwichPlateDetector right_plate_detector(env.console.logger(), COLOR_RED, language, SandwichPlateDetector::Side::RIGHT);
 
-    VideoSnapshot screen = env.console.video().snapshot();
+    {
+        VideoSnapshot screen = env.console.video().snapshot();
 
-    std::string center_filling = middle_plate_detector.detect_filling_name(screen);
-    if (center_filling.empty()) {
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, env.console, "No ingredient found on center plate label.", true
-        );
-    }
-
-    env.console.log("Read center plate label: " + center_filling);
-    env.console.overlay().add_log("Center plate: " + center_filling);
-    plate_order.push_back(center_filling);
-    
-    //Get left (2nd) ingredient
-    std::string left_filling = left_plate_detector.detect_filling_name(screen);
-    if (left_filling.empty()) {
-        env.log("No ingredient found on left label.");
-        env.console.overlay().add_log("No left plate");
-    }
-    else{
-        env.console.log("Read left plate label: " + left_filling);
-        env.console.overlay().add_log("Left plate: " + left_filling);
-        plate_order.push_back(left_filling);
-    }
-
-    //Get right (3rd) ingredient
-    std::string right_filling = right_plate_detector.detect_filling_name(screen);
-    if (right_filling.empty()) {
-        env.log("No ingredient found on right label.");
-        env.console.overlay().add_log("No right plate");
-    }
-    else{
-        env.console.log("Read right plate label: " + right_filling);
-        env.console.overlay().add_log("Right plate: " + right_filling);
-        plate_order.push_back(right_filling);
-    }
-
-    //Get remaining ingredients if any
-    //center 1, left 2, right 3, far left 4, far far left/right 5, right 6
-    //this differs from the game layout: far right is 5 and far far left/right is 6 in game
-    //however as long as we stay internally consistent with this numbering it will work
-    for (int i = 0; i < (plates - 3); i++) {
-        pbf_press_button(context, BUTTON_R, 20, 180);
-        context.wait_for_all_requests();
-
-        screen = env.console.video().snapshot();
-        left_filling = left_plate_detector.detect_filling_name(screen);
-        
-        if (left_filling.empty()) {
+        std::string center_filling = middle_plate_detector.detect_filling_name(screen);
+        if (center_filling.empty()) {
             throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console, "No ingredient label found on remaining plate " + std::to_string(i) + ".", true
+                ErrorReport::SEND_ERROR_REPORT, env.console, "No ingredient found on center plate label.", true
             );
         }
-        env.console.log("Read remaining plate " + std::to_string(i) + " label: " + left_filling);
-        env.console.overlay().add_log("Remaining plate " + std::to_string(i) + ": " + left_filling);
-        plate_order.push_back(left_filling);
-    }
 
-    //Now re-center plates
-    env.log("Re-centering plates if needed.", COLOR_BLACK);
-    env.console.overlay().add_log("Re-centering plates if needed.", COLOR_WHITE);
-    for (int i = 0; i < (plates - 3); i++) {
-        pbf_press_button(context, BUTTON_L, 20, 80);
-    }
+        env.console.log("Read center plate label: " + center_filling);
+        env.console.overlay().add_log("Center plate: " + center_filling);
+        plate_order.push_back(center_filling);
 
-    //If a label fails to read it'll cause issues down the line
-    if ((int)plate_order.size() != plates) {
+        //Get left (2nd) ingredient
+        std::string left_filling = left_plate_detector.detect_filling_name(screen);
+        if (left_filling.empty()) {
+            env.log("No ingredient found on left label.");
+            env.console.overlay().add_log("No left plate");
+        }
+        else{
+            env.console.log("Read left plate label: " + left_filling);
+            env.console.overlay().add_log("Left plate: " + left_filling);
+            plate_order.push_back(left_filling);
+        }
 
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, env.console,
-            "Number of plate labels did not match number of plates.",
-            true
-        );
+        //Get right (3rd) ingredient
+        std::string right_filling = right_plate_detector.detect_filling_name(screen);
+        if (right_filling.empty()) {
+            env.log("No ingredient found on right label.");
+            env.console.overlay().add_log("No right plate");
+        }
+        else{
+            env.console.log("Read right plate label: " + right_filling);
+            env.console.overlay().add_log("Right plate: " + right_filling);
+            plate_order.push_back(right_filling);
+        }
+
+        //Get remaining ingredients if any
+        //center 1, left 2, right 3, far left 4, far far left/right 5, right 6
+        //this differs from the game layout: far right is 5 and far far left/right is 6 in game
+        //however as long as we stay internally consistent with this numbering it will work
+        for (int i = 0; i < (plates - 3); i++) {
+            pbf_press_button(context, BUTTON_R, 20, 180);
+            context.wait_for_all_requests();
+
+            screen = env.console.video().snapshot();
+            left_filling = left_plate_detector.detect_filling_name(screen);
+
+            if (left_filling.empty()) {
+                throw OperationFailedException(
+                    ErrorReport::SEND_ERROR_REPORT, env.console, "No ingredient label found on remaining plate " + std::to_string(i) + ".", true
+                );
+            }
+            env.console.log("Read remaining plate " + std::to_string(i) + " label: " + left_filling);
+            env.console.overlay().add_log("Remaining plate " + std::to_string(i) + ": " + left_filling);
+            plate_order.push_back(left_filling);
+        }
+
+        //Now re-center plates
+        env.log("Re-centering plates if needed.", COLOR_BLACK);
+        env.console.overlay().add_log("Re-centering plates if needed.", COLOR_WHITE);
+        for (int i = 0; i < (plates - 3); i++) {
+            pbf_press_button(context, BUTTON_L, 20, 80);
+        }
+
+        //If a label fails to read it'll cause issues down the line
+        if ((int)plate_order.size() != plates) {
+
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, env.console,
+                "Number of plate labels did not match number of plates.",
+                true
+            );
+        }
+
     }
 
     //Finally.
