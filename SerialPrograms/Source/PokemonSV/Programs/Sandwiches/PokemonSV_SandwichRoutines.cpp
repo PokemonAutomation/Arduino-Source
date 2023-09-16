@@ -706,7 +706,7 @@ void run_sandwich_maker(SingleSwitchProgramEnvironment& env, BotBaseContext& con
     //Add the selected ingredients to the maps if set to custom
     if (SANDWICH_OPTIONS.BASE_RECIPE == BaseRecipe::custom) {
         env.log("Custom sandwich selected. Validating ingredients.", COLOR_BLACK);
-        env.console.overlay().add_log("Custom sandwich selected. Validating ingredients.", COLOR_WHITE);
+        env.console.overlay().add_log("Custom sandwich selected.");
 
         std::vector<std::unique_ptr<SandwichIngredientsTableRow>> table = SANDWICH_OPTIONS.SANDWICH_INGREDIENTS.copy_snapshot();
 
@@ -741,9 +741,10 @@ void run_sandwich_maker(SingleSwitchProgramEnvironment& env, BotBaseContext& con
     //Otherwise get the preset ingredients
     else {
         env.log("Preset sandwich selected.", COLOR_BLACK);
-        env.console.overlay().add_log("Preset sandwich selected.", COLOR_WHITE);
+        env.console.overlay().add_log("Preset sandwich selected.");
 
-        std::vector<std::string> table = SANDWICH_OPTIONS.get_premade_ingredients(SANDWICH_OPTIONS.get_premade_sandwich_recipe(SANDWICH_OPTIONS.BASE_RECIPE, SANDWICH_OPTIONS.TYPE, SANDWICH_OPTIONS.PARADOX));
+        std::vector<std::string> table = SANDWICH_OPTIONS.get_premade_ingredients(
+            SANDWICH_OPTIONS.get_premade_sandwich_recipe(SANDWICH_OPTIONS.BASE_RECIPE, SANDWICH_OPTIONS.TYPE, SANDWICH_OPTIONS.PARADOX));
 
         for (auto&& s : table) {
             if (std::find(ALL_SANDWICH_FILLINGS_SLUGS().begin(), ALL_SANDWICH_FILLINGS_SLUGS().end(), s) != ALL_SANDWICH_FILLINGS_SLUGS().end()) {
@@ -818,13 +819,14 @@ void run_sandwich_maker(SingleSwitchProgramEnvironment& env, BotBaseContext& con
     std::vector<int> bowl_amounts;
 
     for (auto i : fillings_sorted) {
-
         //Add "full" bowls
         int bowl_calcs = (int)(fillings[i] / FillingsCoordinates::instance().get_filling_information(i).servingsPerBowl);
         if (bowl_calcs != 0) {
             bowls += bowl_calcs;
             for (int j = 0; j < bowl_calcs; j++) {
-                bowl_amounts.push_back((int)(FillingsCoordinates::instance().get_filling_information(i).servingsPerBowl) * (int)(FillingsCoordinates::instance().get_filling_information(i).piecesPerServing));
+                bowl_amounts.push_back(
+                    (int)(FillingsCoordinates::instance().get_filling_information(i).servingsPerBowl)
+                    * (int)(FillingsCoordinates::instance().get_filling_information(i).piecesPerServing));
             }
         }
 
@@ -838,11 +840,18 @@ void run_sandwich_maker(SingleSwitchProgramEnvironment& env, BotBaseContext& con
     //cout << "Number of bowls: " << bowls << endl;
     env.log("Number of bowls: " + std::to_string(bowls), COLOR_BLACK);
     env.console.overlay().add_log("Number of bowls: " + std::to_string(bowls), COLOR_WHITE);
+    for (const auto& filling: fillings){
+        env.log("Require filling " + filling.first + " x" + std::to_string(int(filling.second)));
+    }
+    for (const auto& condiment: condiments){
+        env.log("Require condiment " + condiment.first + " x" + std::to_string(int(condiment.second)));
+    }
 
     //Player must be on default sandwich menu
     std::map<std::string, uint8_t> fillings_copy(fillings); //Making a copy as we need the map for later
     enter_custom_sandwich_mode(env.program_info(), env.console, context);
-    add_sandwich_ingredients(env.realtime_dispatcher(), env.console, context, SANDWICH_OPTIONS.LANGUAGE, std::move(fillings_copy), std::move(condiments));
+    add_sandwich_ingredients(env.realtime_dispatcher(), env.console, context, SANDWICH_OPTIONS.LANGUAGE,
+        std::move(fillings_copy), std::move(condiments));
     wait_for_initial_hand(env.program_info(), env.console, context);
 
     //Wait for labels to appear

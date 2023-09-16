@@ -254,12 +254,13 @@ void IngredientSession::add_ingredients(
         }
 
         const SandwichIngredientNames& name = get_ingredient_name(found);
-        console.log("Found: " + name.display_name(), COLOR_BLUE);
+        console.log("Add " + name.display_name() + " as ingredient", COLOR_BLUE);
 
         //  Add the item. But don't loop the quantity. Instead, we add one and
         //  loop again in case we run out.
         pbf_press_button(context, BUTTON_A, 20, 105);
         context.wait_for_all_requests();
+        console.overlay().add_log("Added " + name.display_name());
         // TODO add visual confirmation of ingredients added to avoid button drops
 
         auto iter = ingredients.find(found);
