@@ -95,7 +95,7 @@ bool run_cheer_select(
     }
     if (cheer_select_menu.move_to_slot(console, context, index)){
         std::lock_guard<std::mutex> lg(tera_battle_throttle_lock);
-        pbf_press_button(context, BUTTON_A, 20, 10);
+        pbf_press_button(context, BUTTON_A, 20, 40);
         context.wait_for_all_requests();
     }
     return true;
@@ -164,7 +164,7 @@ bool run_target_select(
     case TeraMoveType::Move4:{
         target_select_menu.move_to_slot(console, context, (uint8_t)move.target);
         std::lock_guard<std::mutex> lg(tera_battle_throttle_lock);
-        pbf_press_button(context, BUTTON_A, 20, 10);
+        pbf_press_button(context, BUTTON_A, 20, 40);
         context.wait_for_all_requests();
         return true;
     }
