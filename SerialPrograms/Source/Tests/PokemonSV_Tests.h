@@ -60,6 +60,8 @@ int test_pokemonSV_ESPPressedEmotionDetector(const ImageViewRGB32& image, bool t
 
 int test_pokemonSV_MapFlyMenuDetector(const ImageViewRGB32& image, bool target);
 
+int test_pokemonSV_SandwichPlateDetector(const ImageViewRGB32& image, const std::vector<std::string>& words);
+
 }
 
 #endif

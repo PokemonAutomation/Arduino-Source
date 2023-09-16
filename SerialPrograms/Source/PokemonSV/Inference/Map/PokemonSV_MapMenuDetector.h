@@ -29,6 +29,7 @@ namespace PokemonSV{
 class MapFlyMenuDetector : public StaticScreenDetector{
 public:
     MapFlyMenuDetector(Color color);
+    virtual ~MapFlyMenuDetector();
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) const override;
@@ -42,8 +43,8 @@ protected:
 // Watch for the "Fly here" menu to open on map
 class MapFlyMenuWatcher : public VisualInferenceCallback{
 public:
-    ~MapFlyMenuWatcher();
     MapFlyMenuWatcher(Color color, VideoOverlay& overlay);
+    virtual ~MapFlyMenuWatcher();
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;

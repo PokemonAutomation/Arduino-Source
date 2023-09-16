@@ -28,6 +28,7 @@ namespace GameName{
 class ObjectNameDetector : public StaticScreenDetector{
 public:
     ObjectNameDetector(Color color, const ImageFloatBox& box);
+    virtual ~ObjectNameDetector();
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) const override;
@@ -43,8 +44,8 @@ protected:
 
 class ObjectNameWatcher : public VisualInferenceCallback{
 public:
-    ~ObjectNameWatcher();
     ObjectNameWatcher(Color color, VideoOverlay& overlay, const ImageFloatBox& box);
+    virtual ~ObjectNameWatcher();
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;

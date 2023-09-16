@@ -9,6 +9,7 @@
 #include "PokemonSV_Tests.h"
 #include "TestUtils.h"
 
+#include "Common/Cpp/Containers/FixedLimitVector.tpp"
 #include "PokemonSV/Inference/Battles/PokemonSV_NormalBattleMenus.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxEggDetector.h"
@@ -24,6 +25,7 @@
 #include "PokemonSV/Inference/Picnics/PokemonSV_SandwichRecipeDetector.h"
 #include "PokemonSV/Inference/Picnics/PokemonSV_SandwichHandDetector.h"
 #include "PokemonSV/Inference/Picnics/PokemonSV_SandwichIngredientDetector.h"
+#include "PokemonSV/Inference/Picnics/PokemonSV_SandwichPlateDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/PokemonSV_ESPEmotionDetector.h"
@@ -395,7 +397,7 @@ int test_pokemonSV_SandwichIngredientReader(const ImageViewRGB32& image, const s
 
     Language language = language_code_to_enum(words[words.size() - 12]);
     if (language == Language::None || language == Language::EndOfList){
-        cerr << "Error: language words " << words[words.size() - 2] << " is wrong." << endl;
+        cerr << "Error: language word " << words[words.size() - 2] << " is wrong." << endl;
         return 1;
     }
 
@@ -467,21 +469,64 @@ int test_pokemonSV_MapPokeCenterIconDetector(const ImageViewRGB32& image, int ta
     // new_image.save("./test_pokecenter.png");
     return 0;
 }
-int test_pokemonSV_ESPPressedEmotionDetector(const ImageViewRGB32& image, bool target) {
+
+int test_pokemonSV_ESPPressedEmotionDetector(const ImageViewRGB32& image, bool target){
     ESPPressedEmotionDetector detector;
     bool result = detector.detect(image);
     TEST_RESULT_EQUAL(result, target);
     return 0;
 }
 
-int test_pokemonSV_MapFlyMenuDetector(const ImageViewRGB32& image, bool target)
-{
+int test_pokemonSV_MapFlyMenuDetector(const ImageViewRGB32& image, bool target){
     MapFlyMenuDetector fly_menu(COLOR_RED);
     MapDestinationMenuDetector dest_menu(COLOR_RED);
     bool result = fly_menu.detect(image);
     TEST_RESULT_EQUAL(result, target);
     result = dest_menu.detect(image);
     TEST_RESULT_EQUAL(result, !target);
+    return 0;
+}
+
+int test_pokemonSV_SandwichPlateDetector(const ImageViewRGB32& image, const std::vector<std::string>& words){
+    // four words: <language> <left plate filling slug> <middle plate filling slug> <right plate filling slug>
+    // if any plate is not present, its word is "none"
+    // if any plate label is highlighted as yellow, its word is "Yellow".
+    if (words.size() < 4){
+        cerr << "Error: not enough number of words in the filename. Found only " << words.size() << "." << endl;
+        return 1;
+    }
+
+    Language language = language_code_to_enum(words[words.size() - 4]);
+    if (language == Language::None || language == Language::EndOfList){
+        cerr << "Error: language word " << words[words.size() - 4] << " is wrong." << endl;
+        return 1;
+    }
+
+    auto& logger = global_logger_command_line();
+
+    FixedLimitVector<SandwichPlateDetector> detectors(3);
+    detectors.emplace_back(logger, COLOR_RED, language, SandwichPlateDetector::Side::LEFT);
+    detectors.emplace_back(logger, COLOR_RED, language, SandwichPlateDetector::Side::MIDDLE);
+    detectors.emplace_back(logger, COLOR_RED, language, SandwichPlateDetector::Side::RIGHT);
+    
+    std::string sides[3] = {"left", "middle", "right"};
+    for(int i = 0; i < 3; i++){
+        bool is_yellow = detectors[i].is_label_yellow(image);
+
+        std::string target = words[words.size()-3 + i];
+        
+        if (target == "Yellow"){
+            TEST_RESULT_COMPONENT_EQUAL(is_yellow, true, "yellow label detection at side: " + sides[i]);
+        }
+        else{
+            std::string filling = detectors[i].detect_filling_name(image);   
+            if (target == "none"){
+                target = "";
+            }
+            TEST_RESULT_COMPONENT_EQUAL(filling, target, "side: " + sides[i]);
+        }
+    }
+    
     return 0;
 }
 

@@ -651,6 +651,7 @@ SOURCES += \
     Source/PokemonSV/Inference/Picnics/PokemonSV_PicnicDetector.cpp \
     Source/PokemonSV/Inference/Picnics/PokemonSV_SandwichHandDetector.cpp \
     Source/PokemonSV/Inference/Picnics/PokemonSV_SandwichIngredientDetector.cpp \
+    Source/PokemonSV/Inference/Picnics/PokemonSV_SandwichPlateDetector.cpp \
     Source/PokemonSV/Inference/Picnics/PokemonSV_SandwichRecipeDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_AuctionItemNameReader.cpp \
     Source/PokemonSV/Inference/PokemonSV_ClothingTopDetector.cpp \
@@ -1689,6 +1690,7 @@ HEADERS += \
     Source/PokemonSV/Inference/Picnics/PokemonSV_PicnicDetector.h \
     Source/PokemonSV/Inference/Picnics/PokemonSV_SandwichHandDetector.h \
     Source/PokemonSV/Inference/Picnics/PokemonSV_SandwichIngredientDetector.h \
+    Source/PokemonSV/Inference/Picnics/PokemonSV_SandwichPlateDetector.h \
     Source/PokemonSV/Inference/Picnics/PokemonSV_SandwichRecipeDetector.h \
     Source/PokemonSV/Inference/PokemonSV_AuctionItemNameReader.h \
     Source/PokemonSV/Inference/PokemonSV_ClothingTopDetector.h \

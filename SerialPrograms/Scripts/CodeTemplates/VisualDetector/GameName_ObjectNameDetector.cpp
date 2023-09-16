@@ -39,6 +39,7 @@ public:
 };
 
 
+ObjectNameDetector::~ObjectNameDetector() = default;
 
 ObjectNameDetector::ObjectNameDetector(Color color, const ImageFloatBox& box)
     : m_color(color)

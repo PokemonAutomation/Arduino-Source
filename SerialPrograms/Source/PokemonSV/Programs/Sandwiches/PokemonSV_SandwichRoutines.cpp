@@ -906,6 +906,8 @@ void run_sandwich_maker(SingleSwitchProgramEnvironment& env, BotBaseContext& con
         env.console.overlay().add_log("Ingredient found on center label : " + r.second.token, COLOR_WHITE);
         plate_order.push_back(r.second.token);
     }
+
+    
     //Get left (2nd) ingredient
     result = PokemonSV::SandwichFillingOCR::instance().read_substring(
         env.console, SANDWICH_OPTIONS.LANGUAGE, image_left_label,

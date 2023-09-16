@@ -18,6 +18,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
 
+MapFlyMenuDetector::~MapFlyMenuDetector() = default;
 
 MapFlyMenuDetector::MapFlyMenuDetector(Color color)
     : m_color(color)
