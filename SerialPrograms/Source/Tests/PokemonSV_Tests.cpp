@@ -40,6 +40,12 @@ namespace PokemonAutomation{
 using namespace NintendoSwitch::PokemonSV;
 
 int test_pokemonSV_MapDetector(const ImageViewRGB32& image, const std::vector<std::string>& words){
+    // two words: <Map ready to exit> <In fixed view (instead of the rotated view)>
+    if (words.size() < 2){
+        cerr << "Error: not enough number of words in the filename. Found only " << words.size() << "." << endl;
+        return 1;
+    }
+
     bool target_map_existence = false;
     if (parse_bool(words[words.size()-2], target_map_existence) == false){
         cerr << "Error: True/False word " << words[words.size()-2] << " is wrong. Must be \"True\" or \"False\"." << endl;
@@ -52,14 +58,22 @@ int test_pokemonSV_MapDetector(const ImageViewRGB32& image, const std::vector<st
         return 1;
     }
 
-    MapFixedViewDetector map_fixed_view_detector;
-    MapRotatedViewDetector map_rotated_view_detected;
+    WhiteButtonDetector map_exit_detector(COLOR_RED, WhiteButton::ButtonY, {0.800, 0.118, 0.030, 0.060});
+    bool result_map = map_exit_detector.detect(image);
 
-    bool result_fixed = map_fixed_view_detector.detect(image);
-    bool result_rotated = map_rotated_view_detected.detect(image);
+    TEST_RESULT_EQUAL(result_map, target_map_existence);
 
-    TEST_RESULT_EQUAL(result_fixed, target_is_fixed_view);
-    TEST_RESULT_EQUAL(result_rotated, !target_is_fixed_view);
+    if (result_map) {
+
+        MapFixedViewDetector map_fixed_view_detector;
+        MapRotatedViewDetector map_rotated_view_detected;
+
+        bool result_fixed = map_fixed_view_detector.detect(image);
+        bool result_rotated = map_rotated_view_detected.detect(image);
+
+        TEST_RESULT_EQUAL(result_fixed, target_is_fixed_view);
+        TEST_RESULT_EQUAL(result_rotated, !target_is_fixed_view);
+    }
 
     return 0;
 }
