@@ -1571,6 +1571,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSwSh/InferenceTraining/PokemonSwSh_GenerateIVCheckerOCR.h
     Source/PokemonSwSh/InferenceTraining/PokemonSwSh_GenerateNameOCRPokedex.cpp
     Source/PokemonSwSh/InferenceTraining/PokemonSwSh_GenerateNameOCRPokedex.h
+    Source/PokemonSwSh/InferenceTraining/PokemonSwSh_GeneratePokedexSprites.cpp
+    Source/PokemonSwSh/InferenceTraining/PokemonSwSh_GeneratePokedexSprites.h
     Source/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI.cpp
     Source/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI.h
     Source/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI_PathMatchup.cpp

@@ -20,6 +20,7 @@
 #include "CommonFramework/OCR/OCR_RawOCR.h"
 #include "PokemonLA/Inference/PokemonLA_MountDetector.h"
 #include "CommonFramework/InferenceInfra/VisualInferencePivot.h"
+#include "Pokemon/Pokemon_Strings.h"
 #include "PokemonBDSP/Inference/BoxSystem/PokemonBDSP_IVCheckerReader.h"
 #include "PokemonBDSP/Inference/Battles/PokemonBDSP_BattleBallReader.h"
 #include "PokemonLA/Programs/PokemonLA_LeapPokemonActions.h"
@@ -104,6 +105,8 @@
 #include "CommonFramework/Inference/FrozenImageDetector.h"
 #include "PokemonLA/Inference/PokemonLA_DialogDetector.h"
 #include "PokemonLA/Programs/PokemonLA_GameSave.h"
+#include "Pokemon/Resources/Pokemon_PokemonSlugs.h"
+#include <filesystem>
 
 
 
@@ -207,6 +210,10 @@ void TestProgram::on_press(){
 
 
 
+
+
+
+
 void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
     using namespace Kernels;
     using namespace Kernels::Waterfill;
@@ -227,14 +234,24 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
+//    pbf_press_dpad(context, DPAD_RIGHT, 160, 0);
+//    pbf_press_dpad(context, DPAD_DOWN, 40, 0);
+
+
+
 
 //    PokemonLA::save_game_from_overworld(env, console, context);
 
+
+
+
+
+#if 0
     TeraCardReader reader;
 
     auto snapshot = console.video().snapshot();
     cout << reader.detect(snapshot) << endl;
-
+#endif
 
 #if 0
     NormalDialogDetector detector(logger, overlay, true);

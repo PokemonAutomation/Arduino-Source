@@ -779,6 +779,7 @@ SOURCES += \
     Source/PokemonSwSh/Inference/Sounds/PokemonSwSh_BerryTreeRustlingSoundDetector.cpp \
     Source/PokemonSwSh/InferenceTraining/PokemonSwSh_GenerateIVCheckerOCR.cpp \
     Source/PokemonSwSh/InferenceTraining/PokemonSwSh_GenerateNameOCRPokedex.cpp \
+    Source/PokemonSwSh/InferenceTraining/PokemonSwSh_GeneratePokedexSprites.cpp \
     Source/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI.cpp \
     Source/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI_PathMatchup.cpp \
     Source/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI_RentalBossMatchup.cpp \
@@ -1827,6 +1828,7 @@ HEADERS += \
     Source/PokemonSwSh/Inference/Sounds/PokemonSwSh_BerryTreeRustlingSoundDetector.h \
     Source/PokemonSwSh/InferenceTraining/PokemonSwSh_GenerateIVCheckerOCR.h \
     Source/PokemonSwSh/InferenceTraining/PokemonSwSh_GenerateNameOCRPokedex.h \
+    Source/PokemonSwSh/InferenceTraining/PokemonSwSh_GeneratePokedexSprites.h \
     Source/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI.h \
     Source/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI_PathMatchup.h \
     Source/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI_RentalBossMatchup.h \

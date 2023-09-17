@@ -28,8 +28,6 @@ public:
 
 class GenerateNameOCRDataPokedex : public SingleSwitchProgramInstance{
 public:
-
-public:
     GenerateNameOCRDataPokedex();
 
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;

@@ -86,6 +86,7 @@
 #include "Programs/TestPrograms/PokemonSwSh_ShinyEncounterTester.h"
 #include "InferenceTraining/PokemonSwSh_GenerateIVCheckerOCR.h"
 #include "InferenceTraining/PokemonSwSh_GenerateNameOCRPokedex.h"
+#include "InferenceTraining/PokemonSwSh_GeneratePokedexSprites.h"
 
 
 namespace PokemonAutomation{
@@ -200,6 +201,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
         ret.emplace_back(make_single_switch_program<ShinyEncounterTester_Descriptor, ShinyEncounterTester>());
         ret.emplace_back(make_single_switch_program<GenerateIVCheckerOCR_Descriptor, GenerateIVCheckerOCR>());
         ret.emplace_back(make_single_switch_program<GenerateNameOCRDataPokedex_Descriptor, GenerateNameOCRDataPokedex>());
+        ret.emplace_back(make_single_switch_program<GeneratePokedexSprites_Descriptor, GeneratePokedexSprites>());
     }
 
     return ret;
