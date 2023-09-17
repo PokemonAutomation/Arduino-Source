@@ -161,7 +161,7 @@ void fly_to_overworld_from_map(const ProgramInfo& info, ConsoleHandle& console, 
         int ret = 0;
         {
             OverworldWatcher overworld(COLOR_CYAN);
-            MapExitWatcher map(COLOR_RED);
+            WhiteButtonWatcher map(COLOR_RED, WhiteButton::ButtonY, {0.800, 0.118, 0.030, 0.060});
             GradientArrowWatcher spot_dialog_watcher(COLOR_YELLOW, GradientArrowType::RIGHT, {0.469, 0.500, 0.215, 0.150});
             PromptDialogWatcher confirm_watcher(COLOR_BLUE, {0.686, 0.494, 0.171, 0.163});
 
@@ -414,7 +414,7 @@ void open_pokedex_from_overworld(const ProgramInfo& info, ConsoleHandle& console
         }
 
         OverworldWatcher overworld(COLOR_CYAN);
-        MapExitWatcher pokedex(COLOR_RED);
+        WhiteButtonWatcher pokedex(COLOR_RED, WhiteButton::ButtonY, {0.800, 0.118, 0.030, 0.060});
 
         context.wait_for_all_requests();
         int ret = wait_until(

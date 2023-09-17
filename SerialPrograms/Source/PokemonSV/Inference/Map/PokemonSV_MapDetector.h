@@ -11,6 +11,7 @@
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 #include "CommonFramework/Inference/VisualDetector.h"
+#include "PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -19,30 +20,6 @@ namespace PokemonSV{
 
 // The area on the screen that the program can clearly read map info, when the map is opened.
 extern ImageFloatBox MAP_READABLE_AREA;
-
-
-// Detect the player character is on map.
-
-
-// It detects the orange exit map button background on upper right corner of the map.
-// Note: if the map is during zooming or having a menu opened, thise area becomes gray and will not be detected.
-class MapExitDetector : public StaticScreenDetector{
-public:
-    MapExitDetector(Color color = COLOR_RED);
-
-    virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool detect(const ImageViewRGB32& screen) const override;
-
-private:
-    Color m_color;
-    ImageFloatBox m_orange_exit_box;
-};
-class MapExitWatcher : public DetectorToFinder<MapExitDetector>{
-public:
-    MapExitWatcher(Color color = COLOR_RED)
-         : DetectorToFinder("MapExitWatcher", std::chrono::milliseconds(1000), color)
-    {}
-};
 
 // Detect the orange arrow pointing up on the lower left corner of the map, when the map is in the fixed view mode.
 // This arrow is used to differentate the rotation view mode.
@@ -99,7 +76,7 @@ public:
     bool map_in_fixed_view() const { return m_in_fixed_view; }
 
 private:
-    MapExitWatcher m_exit_watcher;
+    WhiteButtonWatcher  m_exit_watcher;
     MapFixedViewWatcher m_fixed_view_watcher;
     MapRotatedViewWatcher m_rotated_view_watcher;
 
