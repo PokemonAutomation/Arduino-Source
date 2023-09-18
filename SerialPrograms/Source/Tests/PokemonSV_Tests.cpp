@@ -58,7 +58,7 @@ int test_pokemonSV_MapDetector(const ImageViewRGB32& image, const std::vector<st
         return 1;
     }
 
-    MapExitDetector map_exit_detector;
+    WhiteButtonDetector map_exit_detector(COLOR_RED, WhiteButton::ButtonY, {0.800, 0.118, 0.030, 0.060});
     bool result_map = map_exit_detector.detect(image);
 
     TEST_RESULT_EQUAL(result_map, target_map_existence);
@@ -67,7 +67,7 @@ int test_pokemonSV_MapDetector(const ImageViewRGB32& image, const std::vector<st
 
         MapFixedViewDetector map_fixed_view_detector;
         MapRotatedViewDetector map_rotated_view_detected;
-        
+
         bool result_fixed = map_fixed_view_detector.detect(image);
         bool result_rotated = map_rotated_view_detected.detect(image);
 

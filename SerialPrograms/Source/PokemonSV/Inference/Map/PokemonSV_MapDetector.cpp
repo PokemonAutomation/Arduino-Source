@@ -23,24 +23,6 @@ namespace PokemonSV{
 
 namespace {
 
-class MapOrangleExitMatcher : public ImageMatch::WaterfillTemplateMatcher{
-public:
-    MapOrangleExitMatcher() : WaterfillTemplateMatcher(
-        "PokemonSV/Map/OrangeExit-Template.png", Color(50,50,0), Color(255, 255, 255), 50
-    ) {
-        m_aspect_ratio_lower = 0.9;
-        m_aspect_ratio_upper = 1.1;
-        m_area_ratio_lower = 0.9;
-        m_area_ratio_upper = 1.1;
-    }
-
-    static const MapOrangleExitMatcher& instance() {
-        static MapOrangleExitMatcher matcher;
-        return matcher;
-    }
-};
-
-
 class MapOrangleFixedViewArrowMatcher : public ImageMatch::WaterfillTemplateMatcher{
 public:
     MapOrangleFixedViewArrowMatcher() : WaterfillTemplateMatcher(
@@ -81,36 +63,6 @@ public:
 
 
 ImageFloatBox MAP_READABLE_AREA{0.197, 0.182, 0.678, 0.632};
-
-
-MapExitDetector::MapExitDetector(Color color)
-    : m_color(color)
-    , m_orange_exit_box(0.800, 0.118, 0.067, 0.062)
-{}
-void MapExitDetector::make_overlays(VideoOverlaySet& items) const{
-    items.add(m_color, m_orange_exit_box);
-}
-bool MapExitDetector::detect(const ImageViewRGB32& frame) const{
-    const std::vector<std::pair<uint32_t, uint32_t>> filters = {
-        {combine_rgb(100, 0, 0), combine_rgb(255, 200, 100)}
-    };
-
-    const double screen_rel_size = (frame.height() / 1080.0);
-    const size_t min_size = size_t(screen_rel_size * screen_rel_size * 400.0);
-    
-    const bool detected = match_template_by_waterfill(
-        extract_box_reference(frame, m_orange_exit_box), 
-        MapOrangleExitMatcher::instance(),
-        filters,
-        {min_size, SIZE_MAX},
-        60,
-        [](Kernels::Waterfill::WaterfillObject& object) -> bool { return true; }
-    );
-    
-    return detected;
-}
-
-
 
 MapFixedViewDetector::MapFixedViewDetector(Color color)
     : m_color(color)
@@ -170,7 +122,7 @@ bool MapRotatedViewDetector::detect(const ImageViewRGB32& frame) const{
 
 MapWatcher::MapWatcher(Color color)
 : VisualInferenceCallback("MapWatcher")
-, m_exit_watcher(color), m_fixed_view_watcher(color), m_rotated_view_watcher(color){}
+, m_exit_watcher(COLOR_RED, WhiteButton::ButtonY, {0.800, 0.118, 0.030, 0.060}), m_fixed_view_watcher(color), m_rotated_view_watcher(color){}
 
 void MapWatcher::make_overlays(VideoOverlaySet& items) const{
     m_exit_watcher.make_overlays(items);
