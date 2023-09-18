@@ -213,9 +213,6 @@ void ShinyHuntScatterbug::run_one_sandwich_iteration(SingleSwitchProgramEnvironm
     LetsGoHpWatcher hp_watcher(COLOR_RED);
     m_hp_watcher = &hp_watcher;
 
-    DiscontiguousTimeTracker time_tracker;
-    m_time_tracker = &time_tracker;
-
     LetsGoEncounterBotTracker encounter_tracker(
         env, env.console, context,
         stats,
@@ -231,10 +228,23 @@ void ShinyHuntScatterbug::run_one_sandwich_iteration(SingleSwitchProgramEnvironm
 
     // In each iteration of this while-loop, it picks a path starting from the pokecenter or the
     // last sandwich making spot, use Let's Go along the path, then fly back to pokecenter.
-    while (true){
-        env.console.log("Starting Let's Go hunting loop...", COLOR_PURPLE);
+    for (;;path_id = (path_id + 1) % num_paths){
+        env.console.log("Starting Let's Go hunting path...", COLOR_PURPLE);
+
+        double hp = m_hp_watcher->last_known_value() * 100;
+        if (0 < hp){
+            env.console.log("Last Known HP: " + tostr_default(hp) + "%", COLOR_BLUE);
+        }else{
+            env.console.log("Last Known HP: ?", COLOR_RED);
+        }
+        if (0 < hp && hp < AUTO_HEAL_PERCENT){
+            auto_heal_from_menu_or_overworld(env.program_info(), env.console, context, 0, true);
+            stats.m_autoheals++;
+            env.update_stats();
+        }
+        
         EncounterWatcher encounter_watcher(env.console, COLOR_RED);
-        run_until(
+        int ret = run_until(
             env.console, context,
             [&](BotBaseContext& context){
                 run_lets_go_iteration(env, context, path_id);
@@ -246,21 +256,20 @@ void ShinyHuntScatterbug::run_one_sandwich_iteration(SingleSwitchProgramEnvironm
             }
         );
         encounter_watcher.throw_if_no_sound();
-
-        env.console.log("Detected battle.", COLOR_PURPLE);
-        try{
-            bool should_save = encounter_tracker.process_battle(encounter_watcher, ENCOUNTER_BOT_OPTIONS);
-            if (should_save){
-                m_pending_save = should_save;
+        if (ret >= 0){
+            env.console.log("Detected battle.", COLOR_PURPLE);
+            try{
+                bool should_save = encounter_tracker.process_battle(encounter_watcher, ENCOUNTER_BOT_OPTIONS);
+                if (should_save){
+                    m_pending_save = should_save;
+                }
+            }catch (ProgramFinishedException&){
+                GO_HOME_WHEN_DONE.run_end_of_program(context);
+                throw;
             }
-        }catch (ProgramFinishedException&){
-            GO_HOME_WHEN_DONE.run_end_of_program(context);
-            throw;
         }
         // Use map to fly back to the pokecenter
         reset_to_pokecenter(env, context);
-
-        // TODO: what happened if the player is too close to pokecenter that it cannot detect it on map!?
 
         if (m_pending_save){
             save_game_from_overworld(env.program_info(), env.console, context);
@@ -273,8 +282,6 @@ void ShinyHuntScatterbug::run_one_sandwich_iteration(SingleSwitchProgramEnvironm
             env.console.overlay().add_log("Sandwich expires", COLOR_WHITE);
             break;
         }
-
-        path_id = (path_id + 1) % num_paths;
     }
 
     if (!saved_after_this_sandwich){

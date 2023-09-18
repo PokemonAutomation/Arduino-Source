@@ -67,7 +67,6 @@ private:
     EventNotificationsOption NOTIFICATIONS;
 
     LetsGoHpWatcher* m_hp_watcher;
-    DiscontiguousTimeTracker* m_time_tracker;
     LetsGoEncounterBotTracker* m_encounter_tracker;
 
     uint64_t m_iterations = 0;
