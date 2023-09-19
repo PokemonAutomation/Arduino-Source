@@ -19,7 +19,7 @@ namespace PokemonSV{
 
 class TeraFarmerCatchOnWin : public GroupOption{
 public:
-    TeraFarmerCatchOnWin();
+    TeraFarmerCatchOnWin(bool enabled);
 
 public:
     PokemonSwSh::PokemonBallSelectOption BALL_SELECT;

@@ -128,6 +128,7 @@ TeraSelfFarmer::TeraSelfFarmer()
         LockWhileRunning::UNLOCKED,
         20
     )
+    , CATCH_ON_WIN(true)
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATION_NONSHINY(
         "Non-Shiny Encounter",

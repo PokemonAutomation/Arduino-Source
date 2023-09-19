@@ -213,7 +213,7 @@ void enter_tera_search(
         context.wait_for_all_requests();
         int ret = wait_until(
             console, context,
-            std::chrono::seconds(60),
+            std::chrono::seconds(30),
             {
                 overworld,
                 main_menu,
@@ -262,7 +262,7 @@ void enter_tera_search(
         default:
             dump_image_and_throw_recoverable_exception(
                 info, console, "EnterTeraSearchFailed",
-                "enter_tera_search(): No recognized state after 60 seconds."
+                "enter_tera_search(): No recognized state after 30 seconds."
             );
         }
     }
