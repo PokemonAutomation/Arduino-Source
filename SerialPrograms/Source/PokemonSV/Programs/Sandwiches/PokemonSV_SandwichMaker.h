@@ -7,7 +7,6 @@
 #ifndef PokemonAutomation_PokemonSwSh_SandwichMaker_H
 #define PokemonAutomation_PokemonSwSh_SandwichMaker_H
 
-#include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"

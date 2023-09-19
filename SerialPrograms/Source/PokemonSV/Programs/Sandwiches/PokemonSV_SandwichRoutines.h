@@ -9,12 +9,11 @@
 #ifndef PokemonAutomation_PokemonSV_SandwichRoutines_H
 #define PokemonAutomation_PokemonSV_SandwichRoutines_H
 
+#include <cstddef>
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/Language.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
-#include "PokemonSV/Inference/Picnics/PokemonSV_SandwichHandDetector.h"
 #include "PokemonSV/Options/PokemonSV_SandwichMakerOption.h"
-#include <cstddef>
 
 namespace PokemonAutomation{
     
