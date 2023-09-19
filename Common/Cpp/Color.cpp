@@ -6,9 +6,9 @@
  *
  */
 
-#include "Color.h"
 #include <sstream>
 #include <iomanip>
+#include "Color.h"
 
 namespace PokemonAutomation{
 

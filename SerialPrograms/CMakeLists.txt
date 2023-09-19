@@ -1362,6 +1362,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Options/PokemonSV_SandwichMakerOption.h
     Source/PokemonSV/Options/PokemonSV_TeraAIOption.cpp
     Source/PokemonSV/Options/PokemonSV_TeraAIOption.h
+    Source/PokemonSV/Options/PokemonSV_TeraCatchOnWinOption.cpp
+    Source/PokemonSV/Options/PokemonSV_TeraCatchOnWinOption.h
     Source/PokemonSV/Options/PokemonSV_TeraMoveTable.cpp
     Source/PokemonSV/Options/PokemonSV_TeraMoveTable.h
     Source/PokemonSV/Options/PokemonSV_TeraRollFilter.cpp

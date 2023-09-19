@@ -23,8 +23,8 @@ namespace NintendoSwitch{
 
 
 
-FastCodeEntrySettingsOption::FastCodeEntrySettingsOption()
-    : BatchOption(LockWhileRunning::LOCKED)
+FastCodeEntrySettingsOption::FastCodeEntrySettingsOption(LockWhileRunning lock_while_program_is_running)
+    : GroupOption("Fast Code Entry", lock_while_program_is_running)
     , KEYBOARD_LAYOUT(
         "<b>Keyboard Layout:</b>",
         {
@@ -44,19 +44,19 @@ FastCodeEntrySettingsOption::FastCodeEntrySettingsOption()
     )
     , DIGIT_REORDERING(
         "<b>Digit Reordering:</b><br>Allow digits to be entered out of order.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::UNLOCKED,
         PreloadSettings::instance().DEVELOPER_MODE
     )
     , SCROLL_DELAY(
         "<b>Scroll Delay:</b><br>Delay to scroll between adjacent keys.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::UNLOCKED,
         TICKS_PER_SECOND,
         3, 15,
         PreloadSettings::instance().DEVELOPER_MODE ? "5" : "6"
     )
     , WRAP_DELAY(
         "<b>Wrap Delay:</b><br>Delay to wrap between left/right edges.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::UNLOCKED,
         TICKS_PER_SECOND,
         3, 15,
         "6"
@@ -369,7 +369,7 @@ void run_codeboard_path(BotBaseContext& context, const std::vector<DigitPath>& p
 
 
 
-FastCodeEntrySettings::FastCodeEntrySettings(FastCodeEntrySettingsOption& option)
+FastCodeEntrySettings::FastCodeEntrySettings(const FastCodeEntrySettingsOption& option)
     : keyboard_layout(option.KEYBOARD_LAYOUT)
     , include_plus(!option.SKIP_PLUS)
     , scroll_delay(option.SCROLL_DELAY)

@@ -56,6 +56,7 @@ FastCodeEntry::FastCodeEntry()
         "0123", "0123",
         true
     )
+    , SETTINGS(LockWhileRunning::LOCKED)
 {
     PA_ADD_OPTION(MODE);
     PA_ADD_OPTION(CODE);

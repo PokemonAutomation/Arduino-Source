@@ -44,10 +44,10 @@ public:
 
 
 
-class PerConsoleTeraFarmerOptions : public GroupOption, public ConfigOption::Listener{
+class TeraFarmerPerConsoleOptions : public GroupOption, public ConfigOption::Listener{
 public:
-    ~PerConsoleTeraFarmerOptions();
-    PerConsoleTeraFarmerOptions(std::string label, const LanguageSet& languages, bool host);
+    ~TeraFarmerPerConsoleOptions();
+    TeraFarmerPerConsoleOptions(std::string label, const LanguageSet& languages, bool host);
 
     void set_host(bool is_host);
     virtual void value_changed() override;
@@ -114,7 +114,7 @@ private:
     GeneralHostingOptions HOSTING_OPTIONS;
 
     //  Per-console Options
-    std::unique_ptr<PerConsoleTeraFarmerOptions> PLAYERS[4];
+    std::unique_ptr<TeraFarmerPerConsoleOptions> PLAYERS[4];
 
     enum class RecoveryMode{
         STOP_ON_ERROR,

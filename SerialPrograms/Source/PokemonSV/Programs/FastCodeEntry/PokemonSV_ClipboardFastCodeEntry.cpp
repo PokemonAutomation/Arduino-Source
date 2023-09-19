@@ -34,7 +34,9 @@ ClipboardFastCodeEntry_Descriptor::ClipboardFastCodeEntry_Descriptor()
     )
 {}
 
-ClipboardFastCodeEntry::ClipboardFastCodeEntry(){
+ClipboardFastCodeEntry::ClipboardFastCodeEntry()
+    : SETTINGS(LockWhileRunning::LOCKED)
+{
     PA_ADD_OPTION(SETTINGS);
 }
 

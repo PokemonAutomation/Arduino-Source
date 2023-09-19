@@ -13,9 +13,9 @@
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "CommonFramework/Options/LanguageOCROption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
-#include "PokemonSwSh/Options/PokemonSwSh_BallSelectOption.h"
 #include "PokemonSV/Options/PokemonSV_TeraRollFilter.h"
 #include "PokemonSV/Options/PokemonSV_TeraAIOption.h"
+#include "PokemonSV/Options/PokemonSV_TeraCatchOnWinOption.h"
 
 namespace PokemonAutomation{
     struct VideoSnapshot;
@@ -37,18 +37,6 @@ public:
 
 
 
-class TeraFarmerCatchOnWin : public GroupOption{
-public:
-    TeraFarmerCatchOnWin(TeraSelfFarmer& program);
-    virtual void on_set_enabled(bool enabled) override;
-
-private:
-    TeraSelfFarmer& m_program;
-
-public:
-    PokemonSwSh::PokemonBallSelectOption BALL_SELECT;
-    BooleanCheckBoxOption FIX_TIME_ON_CATCH;
-};
 class TeraFarmerStopConditions : public GroupOption{
 public:
     TeraFarmerStopConditions();
@@ -60,12 +48,14 @@ public:
 
 
 
-class TeraSelfFarmer : public SingleSwitchProgramInstance{
+class TeraSelfFarmer : public SingleSwitchProgramInstance, public ConfigOption::Listener{
 public:
+    ~TeraSelfFarmer();
     TeraSelfFarmer();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
+    virtual void value_changed() override;
     bool run_raid(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
 private:

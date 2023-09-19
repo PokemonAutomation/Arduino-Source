@@ -95,7 +95,7 @@ const char* normalize_code(std::string& normalized_code, const std::string& code
 }
 
 void enter_code(
-    ConsoleHandle& console, BotBaseContext& context,
+    Logger& logger, BotBaseContext& context,
     const FastCodeEntrySettings& settings, const std::string& normalized_code,
     bool connect_controller_press,
     bool override_mode
@@ -107,7 +107,7 @@ void enter_code(
 
     if (override_mode){
         enter_alphanumeric_code(
-            console.logger(), context,
+            logger, context,
             settings,
             normalized_code
         );
@@ -120,7 +120,7 @@ void enter_code(
         break;
     case 6:
         enter_alphanumeric_code(
-            console.logger(), context,
+            logger, context,
             settings,
             normalized_code
         );

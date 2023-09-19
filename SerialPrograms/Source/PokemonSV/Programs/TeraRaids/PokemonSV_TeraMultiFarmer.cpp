@@ -9,7 +9,7 @@
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
-#include "CommonFramework/Tools/ErrorDumper.h"
+//#include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Tools/VideoResolutionCheck.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
@@ -54,10 +54,10 @@ GeneralHostingOptions::GeneralHostingOptions()
 
 
 
-PerConsoleTeraFarmerOptions::~PerConsoleTeraFarmerOptions(){
+TeraFarmerPerConsoleOptions::~TeraFarmerPerConsoleOptions(){
     catch_on_win.remove_listener(*this);
 }
-PerConsoleTeraFarmerOptions::PerConsoleTeraFarmerOptions(std::string label, const LanguageSet& languages, bool host)
+TeraFarmerPerConsoleOptions::TeraFarmerPerConsoleOptions(std::string label, const LanguageSet& languages, bool host)
     : GroupOption(std::move(label), LockWhileRunning::UNLOCKED)
     , is_host_label("<font color=\"blue\" size=4><b>This is the host Switch.</b></font>")
     , language("<b>Game Language:</b>", languages, LockWhileRunning::LOCKED, true)
@@ -82,11 +82,11 @@ PerConsoleTeraFarmerOptions::PerConsoleTeraFarmerOptions(std::string label, cons
 
     catch_on_win.add_listener(*this);
 }
-void PerConsoleTeraFarmerOptions::set_host(bool is_host){
+void TeraFarmerPerConsoleOptions::set_host(bool is_host){
     this->is_host = is_host;
-    PerConsoleTeraFarmerOptions::value_changed();
+    TeraFarmerPerConsoleOptions::value_changed();
 }
-void PerConsoleTeraFarmerOptions::value_changed(){
+void TeraFarmerPerConsoleOptions::value_changed(){
     if (this->is_host){
         is_host_label.set_visibility(ConfigOptionState::ENABLED);
         catch_on_win.set_visibility(ConfigOptionState::DISABLED);
@@ -105,7 +105,7 @@ TeraMultiFarmer_Descriptor::TeraMultiFarmer_Descriptor()
         "PokemonSV:TeraMultiFarmer",
         STRING_POKEMON + " SV", "Tera Multi-Farmer",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSV/TeraMultiFarmer.md",
-        "Farm items and " + STRING_POKEMON + " from a Tera raid using multiple Switches.",
+        "Farm items and " + STRING_POKEMON + " from your own Tera raid using multiple Switches.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB,
@@ -199,10 +199,10 @@ TeraMultiFarmer::TeraMultiFarmer()
 {
     const LanguageSet& languages = PokemonNameReader::instance().languages();
     size_t host = HOSTING_SWITCH.current_value();
-    PLAYERS[0].reset(new PerConsoleTeraFarmerOptions("Switch 0 (Top Left)", languages, host == 0));
-    PLAYERS[1].reset(new PerConsoleTeraFarmerOptions("Switch 1 (Top Right)", languages, host == 1));
-    PLAYERS[2].reset(new PerConsoleTeraFarmerOptions("Switch 2 (Bottom Left)", languages, host == 2));
-    PLAYERS[3].reset(new PerConsoleTeraFarmerOptions("Switch 3 (Bottom Right)", languages, host == 3));
+    PLAYERS[0].reset(new TeraFarmerPerConsoleOptions("Switch 0 (Top Left)", languages, host == 0));
+    PLAYERS[1].reset(new TeraFarmerPerConsoleOptions("Switch 1 (Top Right)", languages, host == 1));
+    PLAYERS[2].reset(new TeraFarmerPerConsoleOptions("Switch 2 (Bottom Left)", languages, host == 2));
+    PLAYERS[3].reset(new TeraFarmerPerConsoleOptions("Switch 3 (Bottom Right)", languages, host == 3));
 
     PA_ADD_OPTION(HOSTING_SWITCH);
     PA_ADD_OPTION(MAX_WINS);
@@ -267,7 +267,7 @@ void TeraMultiFarmer::reset_joiner(const ProgramInfo& info, ConsoleHandle& conso
 }
 bool TeraMultiFarmer::run_raid_host(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){
     TeraMultiFarmer_Descriptor::Stats& stats = env.current_stats<TeraMultiFarmer_Descriptor::Stats>();
-    PerConsoleTeraFarmerOptions& option = *PLAYERS[console.index()];
+    TeraFarmerPerConsoleOptions& option = *PLAYERS[console.index()];
 
     stats.m_raids++;
     env.update_stats();
@@ -293,7 +293,7 @@ bool TeraMultiFarmer::run_raid_host(ProgramEnvironment& env, ConsoleHandle& cons
     return win;
 }
 void TeraMultiFarmer::run_raid_joiner(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){
-    PerConsoleTeraFarmerOptions& option = *PLAYERS[console.index()];
+    TeraFarmerPerConsoleOptions& option = *PLAYERS[console.index()];
 
     bool win = run_tera_battle(env, console, context, option.battle_ai);
 
@@ -542,7 +542,6 @@ void TeraMultiFarmer::program(MultiSwitchProgramEnvironment& env, CancellableSco
     m_reset_required[2] = false;
     m_reset_required[3] = false;
 
-#if 1
     if (RECOVERY_MODE == RecoveryMode::SAVE_AND_RESET){
         env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
             if (console.index() != host_index){
@@ -556,7 +555,6 @@ void TeraMultiFarmer::program(MultiSwitchProgramEnvironment& env, CancellableSco
             }
         });
     }
-#endif
 
     TeraFailTracker fail_tracker(
         env, scope,

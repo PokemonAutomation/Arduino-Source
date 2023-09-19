@@ -679,6 +679,7 @@ SOURCES += \
     Source/PokemonSV/Options/PokemonSV_SandwichIngredientsTable.cpp \
     Source/PokemonSV/Options/PokemonSV_SandwichMakerOption.cpp \
     Source/PokemonSV/Options/PokemonSV_TeraAIOption.cpp \
+    Source/PokemonSV/Options/PokemonSV_TeraCatchOnWinOption.cpp \
     Source/PokemonSV/Options/PokemonSV_TeraMoveTable.cpp \
     Source/PokemonSV/Options/PokemonSV_TeraRollFilter.cpp \
     Source/PokemonSV/Options/PokemonSV_TournamentPrizeSelectOption.cpp \
@@ -1721,6 +1722,7 @@ HEADERS += \
     Source/PokemonSV/Options/PokemonSV_SandwichIngredientsTable.h \
     Source/PokemonSV/Options/PokemonSV_SandwichMakerOption.h \
     Source/PokemonSV/Options/PokemonSV_TeraAIOption.h \
+    Source/PokemonSV/Options/PokemonSV_TeraCatchOnWinOption.h \
     Source/PokemonSV/Options/PokemonSV_TeraMoveTable.h \
     Source/PokemonSV/Options/PokemonSV_TeraRollFilter.h \
     Source/PokemonSV/Options/PokemonSV_TournamentPrizeSelectOption.h \

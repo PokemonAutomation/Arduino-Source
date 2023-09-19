@@ -8,7 +8,7 @@
 #define PokemonAutomation_NintendoSwitch_MultiSwitchProgram_H
 
 #include <functional>
-#include "Common/Compiler.h"
+//#include "Common/Compiler.h"
 #include "Common/Cpp/Containers/FixedLimitVector.h"
 #include "Common/Cpp/Options/BatchOption.h"
 #include "CommonFramework/Globals.h"

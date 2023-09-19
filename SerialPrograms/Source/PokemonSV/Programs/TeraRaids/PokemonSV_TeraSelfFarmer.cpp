@@ -87,29 +87,6 @@ std::unique_ptr<StatsTracker> TeraSelfFarmer_Descriptor::make_stats() const{
 
 
 
-
-TeraFarmerCatchOnWin::TeraFarmerCatchOnWin(TeraSelfFarmer& program)
-    : GroupOption("Catch on Win - Required for shiny checking.", LockWhileRunning::UNLOCKED, true)
-    , m_program(program)
-    , BALL_SELECT(
-        "<b>Ball Select:</b>",
-        LockWhileRunning::UNLOCKED,
-        "poke-ball"
-    )
-    , FIX_TIME_ON_CATCH(
-        "<b>Fix Clock:</b><br>Fix the time when catching so the caught date will be correct.",
-        LockWhileRunning::UNLOCKED, false
-    )
-{
-    PA_ADD_OPTION(BALL_SELECT);
-    PA_ADD_OPTION(FIX_TIME_ON_CATCH);
-}
-void TeraFarmerCatchOnWin::on_set_enabled(bool enabled){
-    m_program.STOP_CONDITIONS.STOP_ON_SHINY.set_visibility(
-        enabled ? ConfigOptionState::ENABLED : ConfigOptionState::DISABLED
-    );
-}
-
 TeraFarmerStopConditions::TeraFarmerStopConditions()
     : GroupOption("Stop Conditions", LockWhileRunning::UNLOCKED)
     , MAX_CATCHES(
@@ -137,6 +114,9 @@ TeraFarmerStopConditions::TeraFarmerStopConditions()
 }
 
 
+TeraSelfFarmer::~TeraSelfFarmer(){
+    CATCH_ON_WIN.remove_listener(*this);
+}
 TeraSelfFarmer::TeraSelfFarmer()
     : LANGUAGE(
         "<b>Game Language:</b>",
@@ -148,7 +128,6 @@ TeraSelfFarmer::TeraSelfFarmer()
         LockWhileRunning::UNLOCKED,
         20
     )
-    , CATCH_ON_WIN(*this)
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATION_NONSHINY(
         "Non-Shiny Encounter",
@@ -177,8 +156,14 @@ TeraSelfFarmer::TeraSelfFarmer()
     PA_ADD_OPTION(CATCH_ON_WIN);
     PA_ADD_OPTION(STOP_CONDITIONS);
     PA_ADD_OPTION(NOTIFICATIONS);
-}
 
+    CATCH_ON_WIN.add_listener(*this);
+}
+void TeraSelfFarmer::value_changed(){
+    STOP_CONDITIONS.STOP_ON_SHINY.set_visibility(
+        CATCH_ON_WIN.enabled() ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN
+    );
+}
 
 
 bool TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, BotBaseContext& context){

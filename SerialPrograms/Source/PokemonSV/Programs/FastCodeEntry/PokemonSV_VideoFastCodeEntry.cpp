@@ -67,6 +67,7 @@ VideoFastCodeEntry::VideoFastCodeEntry()
         LockWhileRunning::LOCKED,
         OcrMethod::TERA_CARD
     )
+    , SETTINGS(LockWhileRunning::LOCKED)
     , NOTIFICATIONS({
         &NOTIFICATION_PROGRAM_FINISH,
     })

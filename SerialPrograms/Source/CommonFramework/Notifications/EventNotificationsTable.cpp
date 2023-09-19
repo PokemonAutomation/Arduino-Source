@@ -4,10 +4,6 @@
  *
  */
 
-#include "Common/Cpp/Exceptions.h"
-#include "Common/Cpp/Json/JsonValue.h"
-#include "Common/Cpp/Json/JsonObject.h"
-#include "ProgramNotifications.h"
 #include "EventNotificationsTable.h"
 
 namespace PokemonAutomation{
