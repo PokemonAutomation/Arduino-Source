@@ -11,6 +11,7 @@
 #include "PokemonSV_Settings.h"
 
 #include "Programs/General/PokemonSV_MassPurchase.h"
+#include "Programs/General/PokemonSV_ClothingBuyer.h"
 #include "Programs/General/PokemonSV_MassRelease.h"
 #include "Programs/General/PokemonSV_AutonomousBallThrower.h"
 
@@ -20,12 +21,9 @@
 #include "Programs/General/PokemonSV_AuctionFarmer.h"
 #include "Programs/General/PokemonSV_ESPTraining.h"
 #include "Programs/Trading/PokemonSV_SelfBoxTrade.h"
-#include "Programs/General/PokemonSV_StatsReset.h"
-#include "Programs/General/PokemonSV_StatsResetBloodmoon.h"
 #include "Programs/General/PokemonSV_TournamentFarmer.h"
 #include "Programs/Sandwiches/PokemonSV_SandwichMaker.h"
 #include "Programs/General/PokemonSV_SizeChecker.h"
-#include "Programs/General/PokemonSV_ClothingBuyer.h"
 
 #include "Programs/Eggs/PokemonSV_EggFetcher.h"
 #include "Programs/Eggs/PokemonSV_EggHatcher.h"
@@ -39,6 +37,9 @@
 #include "Programs/FastCodeEntry/PokemonSV_FastCodeEntry.h"
 #include "Programs/FastCodeEntry/PokemonSV_ClipboardFastCodeEntry.h"
 #include "Programs/FastCodeEntry/PokemonSV_VideoFastCodeEntry.h"
+
+#include "Programs/General/PokemonSV_StatsReset.h"
+#include "Programs/General/PokemonSV_StatsResetBloodmoon.h"
 
 #include "Programs/ShinyHunting/PokemonSV_ShinyHunt-AreaZeroPlatform.h"
 #include "Programs/ShinyHunting/PokemonSV_ShinyHunt-Scatterbug.h"
@@ -70,11 +71,10 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
 
     ret.emplace_back("---- General ----");
     ret.emplace_back(make_single_switch_program<MassPurchase_Descriptor, MassPurchase>());
+    ret.emplace_back(make_single_switch_program<ClothingBuyer_Descriptor, ClothingBuyer>());
     ret.emplace_back(make_single_switch_program<MassRelease_Descriptor, MassRelease>());
     ret.emplace_back(make_single_switch_program<AutonomousBallThrower_Descriptor, AutonomousBallThrower>());
-    ret.emplace_back(make_single_switch_program<StatsReset_Descriptor, StatsReset>());
     ret.emplace_back(make_single_switch_program<SizeChecker_Descriptor, SizeChecker>());
-    ret.emplace_back(make_single_switch_program<ClothingBuyer_Descriptor, ClothingBuyer>());
 
 //    ret.emplace_back("---- Trading ----");
     ret.emplace_back(make_multi_switch_program<SelfBoxTrade_Descriptor, SelfBoxTrade>());
@@ -106,6 +106,10 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_multi_switch_program<ClipboardFastCodeEntry_Descriptor, ClipboardFastCodeEntry>());
     ret.emplace_back(make_multi_switch_program<VideoFastCodeEntry_Descriptor, VideoFastCodeEntry>());
 
+    ret.emplace_back("---- Stats Hunting ----");
+    ret.emplace_back(make_single_switch_program<StatsReset_Descriptor, StatsReset>());
+    ret.emplace_back(make_single_switch_program<StatsResetBloodmoon_Descriptor, StatsResetBloodmoon>());
+
     ret.emplace_back("---- Shiny Hunting ----");
     ret.emplace_back(make_single_switch_program<ShinyHuntAreaZeroPlatform_Descriptor, ShinyHuntAreaZeroPlatform>());
 
@@ -113,9 +117,8 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<RideCloner101_Descriptor, RideCloner101>());
     ret.emplace_back(make_single_switch_program<CloneItems101_Descriptor, CloneItems101>());
 
-    ret.emplace_back("---- Untested/Beta/WIP ----");
-    ret.emplace_back(make_single_switch_program<StatsResetBloodmoon_Descriptor, StatsResetBloodmoon>());
     if (PreloadSettings::instance().DEVELOPER_MODE){
+        ret.emplace_back("---- Untested/Beta/WIP ----");
         ret.emplace_back(make_single_switch_program<ShinyHuntScatterbug_Descriptor, ShinyHuntScatterbug>());
     }
     if (PreloadSettings::instance().DEVELOPER_MODE){

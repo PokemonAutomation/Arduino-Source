@@ -38,21 +38,32 @@ void resume_game_from_home(
     context.wait_for_all_requests();
 
     while (true){
-        UpdateMenuWatcher detector(false);
-        int ret = wait_until(
-            console, context,
-            std::chrono::milliseconds(1000),
-            { detector }
-        );
-        if (ret < 0){
-            return;
+        {
+            UpdateMenuWatcher update_detector(false);
+            int ret = wait_until(
+                console, context,
+                std::chrono::milliseconds(1000),
+                { update_detector }
+            );
+            if (ret == 0){
+                console.log("Detected update window.", COLOR_RED);
+
+                pbf_press_dpad(context, DPAD_UP, 5, 0);
+                pbf_press_button(context, BUTTON_A, 10, 500);
+                context.wait_for_all_requests();
+                continue;
+            }
         }
 
-        console.log("Detected update window.", COLOR_RED);
-
-        pbf_press_dpad(context, DPAD_UP, 5, 0);
-        pbf_press_button(context, BUTTON_A, 10, 500);
-        context.wait_for_all_requests();
+        //  In case we failed to enter the game.
+        HomeWatcher home_detector;
+        if (home_detector.detect(console.video().snapshot())){
+            console.log("Failed to re-enter game. Trying again...", COLOR_RED);
+            pbf_press_button(context, BUTTON_HOME, 10, 10);
+            continue;
+        }else{
+            break;
+        }
     }
 }
 
