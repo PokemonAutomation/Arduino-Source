@@ -130,7 +130,7 @@ bool run_move_select(
     //  probably disabled. Select a different move.
     if (consecutive_move_select > 3){
         console.log("Failed to select a move 3 times. Choosing a different move.", COLOR_RED);
-//                pbf_press_dpad(context, DPAD_DOWN, 20, 40);
+//        pbf_press_dpad(context, DPAD_DOWN, 20, 40);
         index++;
         if (index >= 4){
             index = 0;
@@ -138,14 +138,23 @@ bool run_move_select(
         move.type = (TeraMoveType)((uint8_t)TeraMoveType::Move1 + index);
     }
 
-    if (terastallizing.detect(console.video().snapshot())){
-        console.log("Terastallization: Available");
-        if (battle_AI.TRY_TO_TERASTILLIZE){
-            pbf_press_button(context, BUTTON_R, 20, 4 * TICKS_PER_SECOND);
+    do{
+        if (!battle_AI.TRY_TO_TERASTILLIZE){
+            console.log("Skipping Terastallization. Reason: Disabled by settings.");
+            break;
         }
-    }else{
-        console.log("Terastallization: Not Available");
-    }
+        if (consecutive_move_select > 1){
+            console.log("Skipping Terastallization. Reason: Previously failed move select.");
+            break;
+        }
+        if (!terastallizing.detect(console.video().snapshot())){
+            console.log("Skipping Terastallization. Reason: Not ready.");
+            break;
+        }
+
+        console.log("Attempting to Terastallize...");
+        pbf_press_button(context, BUTTON_R, 20, 4 * TICKS_PER_SECOND);
+    }while (false);
 
     if (move_select_menu.move_to_slot(console, context, index)){
         pbf_press_button(context, BUTTON_A, 20, 10);
