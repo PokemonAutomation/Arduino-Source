@@ -126,7 +126,7 @@ TeraSelfFarmer::TeraSelfFarmer()
     , PERIODIC_RESET(
         "<b>Periodic Game Reset:</b><br>Reset the game after this many skips. This clears up the framerate bug.",
         LockWhileRunning::UNLOCKED,
-        20
+        20, 0, 100
     )
     , CATCH_ON_WIN(true)
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
