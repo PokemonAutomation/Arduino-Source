@@ -295,8 +295,11 @@ void ShinyHuntAreaZeroPlatform::run_state(SingleSwitchProgramEnvironment& env, B
     );
 
     WallClock now = current_time();
-    if (MODE == Mode::MAKE_SANDWICH && m_last_sandwich + std::chrono::minutes(SANDWICH_RESET_IN_MINUTES) < now){
-        console.log("Enough time has elapsed. Time to rest sandwich...");
+    if (m_state != State::RESET_AND_RETURN &&
+        MODE == Mode::MAKE_SANDWICH &&
+        m_last_sandwich + std::chrono::minutes(SANDWICH_RESET_IN_MINUTES) < now
+    ){
+        console.log("Enough time has elapsed. Time to reset sandwich...");
         m_state = State::RESET_SANDWICH;
     }
 
@@ -356,15 +359,17 @@ void ShinyHuntAreaZeroPlatform::run_state(SingleSwitchProgramEnvironment& env, B
             case SavedLocation::NONE:
                 throw InternalProgramError(&console.logger(), PA_CURRENT_FUNCTION, "Cannot reset with no previous save.");
             case SavedLocation::ZERO_GATE_FLY_SPOT:
+                console.log("Last saved at Zero Gate fly spot.");
                 return_to_inside_zero_gate(info, console, context);
                 inside_zero_gate_to_platform(info, console, context, NAVIGATE_TO_PLATFORM);
                 break;
             case SavedLocation::AREA_ZERO:
                 //  No further action needed as you're already on the platform.
+                console.log("Last saved inside Area Zero.");
                 break;
             }
 
-            inside_zero_gate_to_platform(info, console, context, NAVIGATE_TO_PLATFORM);
+//            inside_zero_gate_to_platform(info, console, context, NAVIGATE_TO_PLATFORM);
 
             stats.m_game_resets++;
             m_encounter_tracker->reset_rate_tracker_start_time();
