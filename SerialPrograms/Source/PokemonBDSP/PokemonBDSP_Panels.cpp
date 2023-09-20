@@ -91,7 +91,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back("---- Glitches (v1.1.2) ----");
     ret.emplace_back(make_single_switch_program<ActivateMenuGlitch112_Descriptor, ActivateMenuGlitch112>());
 
-    if (PreloadSettings::instance().DEVELOPER_MODE){
+    if (IS_BETA_VERSION || PreloadSettings::instance().DEVELOPER_MODE){
         ret.emplace_back("---- Untested/Beta/WIP ----");
         ret.emplace_back(make_single_switch_program<PoffinCooker_Descriptor, PoffinCooker>());
     }

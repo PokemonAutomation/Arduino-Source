@@ -341,7 +341,7 @@ void ShinyHuntAreaZeroPlatform::run_state(SingleSwitchProgramEnvironment& env, B
 
             break;
 
-#if 0
+#if 1
         case State::RESET_AND_RETURN:
             console.log("Resetting game and returning to platform...");
 
@@ -395,7 +395,7 @@ void ShinyHuntAreaZeroPlatform::run_state(SingleSwitchProgramEnvironment& env, B
                 break;
             }
 
-            recovery_state = State::LEAVE_AND_RETURN;
+            recovery_state = State::RESET_AND_RETURN;
 
             if (stats.m_sandwiches > 0) {
                 pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);

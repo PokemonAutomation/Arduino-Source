@@ -55,7 +55,7 @@ private:
         TRAVERSAL,
         INSIDE_GATE_AND_RETURN,
         LEAVE_AND_RETURN,
-//        RESET_AND_RETURN,
+        RESET_AND_RETURN,
         RESET_SANDWICH,
     };
 
