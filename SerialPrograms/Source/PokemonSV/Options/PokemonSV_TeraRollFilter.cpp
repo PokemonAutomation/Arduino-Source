@@ -177,10 +177,12 @@ bool TeraRollFilter::check_herba(const std::string& pokemon_slug) const{
     }
 
     static const std::set<std::string> fivestar{
-        "gengar", "glalie", "amoonguss", "dondozo", "palafin", "finizen", "blissey", "eelektross", "drifblim", "cetitan"
+        "gengar", "glalie", "amoonguss", "dondozo", "palafin", "finizen", "blissey", "eelektross", "drifblim", "cetitan",
+        "snorlax", "dusknoir", "mandibuzz", "basculegion"
     };
     static const std::set<std::string> sixstar{
-        "blissey", "vaporeon", "amoonguss", "farigiraf", "cetitan", "dondozo"
+        "blissey", "vaporeon", "amoonguss", "farigiraf", "cetitan", "dondozo",
+        "poliwrath", "snorlax", "basculegion"
     };
 
     if (fivestar.find(pokemon_slug) != fivestar.end()){
