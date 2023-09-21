@@ -302,6 +302,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Environment/HardwareValidation.h
     Source/CommonFramework/Environment/HardwareValidation_arm64.tpp
     Source/CommonFramework/Environment/HardwareValidation_x86.tpp
+    Source/CommonFramework/Environment/SystemSleep.cpp
+    Source/CommonFramework/Environment/SystemSleep.h
     Source/CommonFramework/Exceptions/FatalProgramException.cpp
     Source/CommonFramework/Exceptions/FatalProgramException.h
     Source/CommonFramework/Exceptions/OperationFailedException.cpp
