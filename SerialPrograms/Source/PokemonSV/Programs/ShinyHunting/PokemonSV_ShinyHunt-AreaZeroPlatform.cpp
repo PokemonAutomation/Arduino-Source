@@ -372,11 +372,11 @@ void ShinyHuntAreaZeroPlatform::run_state(SingleSwitchProgramEnvironment& env, B
             return_to_inside_zero_gate(info, console, context);
             inside_zero_gate_to_platform(info, console, context, NAVIGATE_TO_PLATFORM);
             m_current_location = Location::AREA_ZERO;
-            m_pending_platform_reset = false;
 
             stats.m_platform_resets++;
             m_env->update_stats();
 
+            m_pending_platform_reset = false;
             m_encounter_tracker->reset_rate_tracker_start_time();
             m_consecutive_failures = 0;
             return;
@@ -390,23 +390,22 @@ void ShinyHuntAreaZeroPlatform::run_state(SingleSwitchProgramEnvironment& env, B
             return_to_inside_zero_gate(info, console, context);
             inside_zero_gate_to_platform(info, console, context, NAVIGATE_TO_PLATFORM);
             m_current_location = Location::AREA_ZERO;
+            m_pending_platform_reset = false;
             m_encounter_tracker->reset_rate_tracker_start_time();
             m_consecutive_failures = 0;
             return;
         case Location::ZERO_GATE_INSIDE:
             console.log("Executing: Zero Gate -> Platform...");
-            m_pending_platform_reset = true;
             inside_zero_gate_to_platform(info, console, context, NAVIGATE_TO_PLATFORM);
-            m_pending_platform_reset = false;
             m_current_location = Location::AREA_ZERO;
+            m_pending_platform_reset = false;
             m_encounter_tracker->reset_rate_tracker_start_time();
             m_consecutive_failures = 0;
             return;
         case Location::AREA_ZERO:
             console.log("Executing: Traversal...");
-            m_pending_platform_reset = true;
             run_traversal(context);
-            m_pending_platform_reset = false;
+            m_encounter_tracker->reset_rate_tracker_start_time();
             m_consecutive_failures = 0;
             return;
         }
