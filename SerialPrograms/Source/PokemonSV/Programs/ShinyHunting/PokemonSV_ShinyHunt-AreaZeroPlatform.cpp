@@ -341,10 +341,13 @@ void ShinyHuntAreaZeroPlatform::run_state(SingleSwitchProgramEnvironment& env, B
                 save_game_from_overworld(info, console, context);
                 m_saved_location = m_current_location;
             }
+            m_pending_platform_reset = false;
+
             picnic_at_zero_gate(info, console, context);
             pbf_move_left_joystick(context, 128, 0, 70, 0);
             enter_sandwich_recipe_list(info, console, context);
             run_sandwich_maker(env, context, SANDWICH_OPTIONS);
+            m_pending_sandwich = false;
 
             console.log("Sandwich Reset: Starting new sandwich timer...");
             m_last_sandwich = current_time();
@@ -355,7 +358,11 @@ void ShinyHuntAreaZeroPlatform::run_state(SingleSwitchProgramEnvironment& env, B
             leave_picnic(info, console, context);
             return_to_inside_zero_gate_from_picnic(info, console, context);
             m_current_location = Location::ZERO_GATE_INSIDE;
-            m_pending_sandwich = false;
+
+            inside_zero_gate_to_platform(info, console, context, NAVIGATE_TO_PLATFORM);
+            m_current_location = Location::AREA_ZERO;
+
+            m_encounter_tracker->reset_rate_tracker_start_time();
             m_consecutive_failures = 0;
             return;
         }
