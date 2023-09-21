@@ -1,6 +1,14 @@
-# How to Build (Qt 6.3) - Windows
+# How to Build (Qt 6.3.2) - Windows
+
+We recommend that you install everything here in the exact order listed and the exact versions mentioned. Failing either will likely result in a broken Qt Creator installation that must be fixed by manually configuring it (which is not fun if you don't know what you're doing).
+
+Required Versions:
+- **Visual Studio 2019** - You must install VS2019. If you install VS2022 instead, your Qt Creator installation will be broken. It is ok to have both VS2019 and VS2022 installed. But you must have VS2019 as that is the version that Qt Creator will look for.
+- **Qt 6.3.2** - Do not install a later version of Qt. All Qt versions 6.4.x - 6.5.2 are broken for this project.
 
 ## Build Tools:
+
+The installation order here is important. While other orderings may work, this is the specific order that we have tested. And the Qt installation must be the last thing installed.
 
 1. Install Visual Studio 2019:
     1. [Download Page](https://docs.microsoft.com/en-us/visualstudio/releases/2019/release-notes)
@@ -11,7 +19,7 @@
     1. [Download Page](https://cmake.org/download/)
     2. When prompted select, "Add CMake to the system PATH for all users".
 
-## Install Qt 6.3:
+## Install Qt 6.3.2:
 
 Unlike with Qt 5.12, there is no offline installer for it. So you have two options here, use the online installer, or use a copy of an installation.
 
