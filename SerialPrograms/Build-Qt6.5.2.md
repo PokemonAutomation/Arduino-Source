@@ -1,6 +1,14 @@
 # How to Build (Qt 6.5.2) - Windows
 
+***Qt 6.5.2 is broken for this project. Please use [Qt 6.3.2](Build-Qt6.3.2.md) instead.***
+
+Required Versions:
+- **Visual Studio 2019** - You must install VS2019. If you install VS2022 instead, your Qt Creator installation will be broken. It is ok to have both VS2019 and VS2022 installed. But you must have VS2019 as that is the version that Qt Creator will look for.
+- **Qt 6.5.2** - N/A. This version is broken.
+
 ## Build Tools:
+
+The installation order here is important. While other orderings may work, this is the specific order that we have tested. And the Qt installation must be the last thing installed.
 
 1. Install Visual Studio 2019:
     1. [Download Page](https://docs.microsoft.com/en-us/visualstudio/releases/2019/release-notes)
