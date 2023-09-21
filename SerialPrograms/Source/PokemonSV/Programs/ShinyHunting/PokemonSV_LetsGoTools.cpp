@@ -168,7 +168,10 @@ LetsGoEncounterBotTracker::LetsGoEncounterBotTracker(
     })
     , m_session(context, console, {m_kill_sound})
 {}
-bool LetsGoEncounterBotTracker::process_battle(EncounterWatcher& watcher, EncounterBotCommonOptions& settings){
+void LetsGoEncounterBotTracker::process_battle(
+    bool& caught, bool& should_save,
+    EncounterWatcher& watcher, EncounterBotCommonOptions& settings
+){
     m_encounter_rate.report_encounter();
     m_stats.m_encounters++;
 
@@ -248,7 +251,9 @@ bool LetsGoEncounterBotTracker::process_battle(EncounterWatcher& watcher, Encoun
         }catch (OperationFailedException& e){
             throw FatalProgramException(std::move(e));
         }
-        return false;
+        caught = false;
+        should_save = false;
+        return;
     case EncounterActionsAction::STOP_PROGRAM:
         throw ProgramFinishedException();
 //        throw ProgramFinishedException(m_console, "", true);
@@ -285,10 +290,13 @@ bool LetsGoEncounterBotTracker::process_battle(EncounterWatcher& watcher, Encoun
             );
         }
 
-        return result.result == CatchResult::POKEMON_CAUGHT && action.action == EncounterActionsAction::THROW_BALLS_AND_SAVE;
+        caught = result.result == CatchResult::POKEMON_CAUGHT;
+        should_save = caught && action.action == EncounterActionsAction::THROW_BALLS_AND_SAVE;
+        return;
     }
 
-    return false;
+    caught = false;
+    should_save = false;
 }
 
 

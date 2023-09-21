@@ -51,13 +51,20 @@ private:
     virtual std::string check_validity() const override;
     virtual void value_changed() override;
 
-    enum class State{
-        TRAVERSAL,
-        INSIDE_GATE_AND_RETURN,
-        LEAVE_AND_RETURN,
-        RESET_AND_RETURN,
-        RESET_SANDWICH,
+    enum class Location{
+        UNKNOWN,
+        ZERO_GATE_FLY_SPOT,
+        ZERO_GATE_INSIDE,
+        TRAVELING_TO_PLATFORM,
+        AREA_ZERO,
     };
+//    enum class State{
+//        TRAVERSAL,
+//        INSIDE_GATE_AND_RETURN,
+//        LEAVE_AND_RETURN,
+//        RESET_AND_RETURN,
+//        RESET_SANDWICH,
+//    };
 
     void run_state(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
@@ -102,16 +109,22 @@ private:
     LetsGoEncounterBotTracker* m_encounter_tracker;
 
     uint64_t m_iterations = 0;
-    State m_state;
+    Location m_current_location;
+    Location m_saved_location;
+//    State m_state;
 
     //  Set to true if we should save on the first available opportunity.
     bool m_pending_save;
-    enum class SavedLocation{
-        NONE,
-        ZERO_GATE_FLY_SPOT,
-        AREA_ZERO,
-    };
-    SavedLocation m_last_save;
+    bool m_pending_platform_reset;
+    bool m_pending_sandwich;
+    bool m_reset_after_sandwich_ends;
+
+//    enum class SavedLocation{
+//        NONE,
+//        ZERO_GATE_FLY_SPOT,
+//        AREA_ZERO,
+//    };
+//    SavedLocation m_last_save;
 
     WallClock m_last_sandwich;
 

@@ -259,7 +259,11 @@ void ShinyHuntScatterbug::run_one_sandwich_iteration(SingleSwitchProgramEnvironm
         if (ret >= 0){
             env.console.log("Detected battle.", COLOR_PURPLE);
             try{
-                bool should_save = encounter_tracker.process_battle(encounter_watcher, ENCOUNTER_BOT_OPTIONS);
+                bool caught, should_save;
+                encounter_tracker.process_battle(
+                    caught, should_save,
+                    encounter_watcher, ENCOUNTER_BOT_OPTIONS
+                );
                 if (should_save){
                     m_pending_save = should_save;
                 }

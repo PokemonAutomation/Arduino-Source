@@ -141,7 +141,10 @@ public:
     }
 
     //  Returns true if you should save the game.
-    bool process_battle(EncounterWatcher& watcher, EncounterBotCommonOptions& settings);
+    void process_battle(
+        bool& caught, bool& should_save,
+        EncounterWatcher& watcher, EncounterBotCommonOptions& settings
+    );
 
 private:
     ProgramEnvironment& m_env;
