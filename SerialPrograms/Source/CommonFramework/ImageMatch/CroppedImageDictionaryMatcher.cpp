@@ -67,12 +67,41 @@ ImageMatchResult CroppedImageDictionaryMatcher::match(
         dump_debug_image(global_logger_command_line(), "CommonFramework/CroppedImageDictionaryMatcher", "match_input", image);
     }
 
+    std::vector<ImageViewRGB32> crops = get_crop_candidates(image);
+
+    if (PreloadSettings::debug().IMAGE_DICTIONARY_MATCHING){
+        size_t c = 0;
+        for (const ImageViewRGB32& crop : crops){
+//            std::cout << "CroppedImageDictionaryMatcher: process input" << c << "image with background " << crop.background.to_string() << std::endl;
+            dump_debug_image(global_logger_command_line(), "CommonFramework/CroppedImageDictionaryMatcher", "match_input_processed", crop);
+            c++;
+        }
+    }
+
+
+
+    for (const auto& item : m_database){
+        for (const ImageViewRGB32& crop : crops){
+            double alpha = item.second.diff(crop);
+            results.add(alpha, item.first);
+            results.clear_beyond_spread(alpha_spread);
+        }
+    }
+
+
+
+#if 0
     Color background;
-    ImageRGB32 processed = process_image(image, background);
+    ImageViewRGB32 processed = cropped[0].image;
+    background = cropped[0].background;
+
+//    ImageRGB32 processed = process_image(image, background);
     if (PreloadSettings::debug().IMAGE_DICTIONARY_MATCHING){
         std::cout << "CroppedImageDictionaryMatcher: process input image with background " << background.to_string() << std::endl;
         dump_debug_image(global_logger_command_line(), "CommonFramework/CroppedImageDictionaryMatcher", "match_input_processed", processed);
     }
+
+    processed.save("processed.png");
 
     for (const auto& item : m_database){
 #if 0
@@ -84,6 +113,7 @@ ImageMatchResult CroppedImageDictionaryMatcher::match(
         results.add(alpha, item.first);
         results.clear_beyond_spread(alpha_spread);
     }
+#endif
 
     if (PreloadSettings::debug().IMAGE_DICTIONARY_MATCHING){
         std::cout << "CroppedImageDictionaryMatcher: results: " << std::endl;

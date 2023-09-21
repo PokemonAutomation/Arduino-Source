@@ -233,6 +233,12 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     BotBaseContext context(scope, console.botbase());
     VideoOverlaySet overlays(overlay);
 
+    std::shared_ptr<const ImageRGB32> screen(new ImageRGB32("20230920-123043559137-OperationFailedException.png"));
+
+    IngredientSession session(env.inference_dispatcher(), console, context, Language::English, SandwichIngredientType::FILLING);
+    session.read_screen(screen);
+
+
 
 //    pbf_press_dpad(context, DPAD_RIGHT, 160, 0);
 //    pbf_press_dpad(context, DPAD_DOWN, 40, 0);

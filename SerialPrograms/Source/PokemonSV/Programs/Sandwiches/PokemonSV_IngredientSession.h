@@ -53,6 +53,7 @@ public:
 
 
 public:
+    PageIngredients read_screen(std::shared_ptr<const ImageRGB32> screenshot) const;
     PageIngredients read_current_page() const;
     bool run_move_iteration(
         std::string& slug, const std::set<std::string>& ingredients,

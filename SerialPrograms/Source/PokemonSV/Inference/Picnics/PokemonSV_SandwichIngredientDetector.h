@@ -118,20 +118,20 @@ public:
 
 class SandwichFillingMatcher : public ImageMatch::CroppedImageDictionaryMatcher{
 public:
-    SandwichFillingMatcher(double min_euclidean_distance = 100);
+    SandwichFillingMatcher(const std::vector<double>& min_euclidean_distance = {100, 150, 200});
 
 private:
-    virtual ImageRGB32 process_image(const ImageViewRGB32& image, Color& background) const override;
-    double m_min_euclidean_distance_squared;
+    virtual std::vector<ImageViewRGB32> get_crop_candidates(const ImageViewRGB32& image) const override;
+    std::vector<double> m_min_euclidean_distance_squared;
 };
 
 class SandwichCondimentMatcher : public ImageMatch::CroppedImageDictionaryMatcher{
 public:
-    SandwichCondimentMatcher(double min_euclidean_distance = 100);
+    SandwichCondimentMatcher(const std::vector<double>& min_euclidean_distance = {100, 150, 200});
 
 private:
-    virtual ImageRGB32 process_image(const ImageViewRGB32& image, Color& background) const override;
-    double m_min_euclidean_distance_squared;
+    virtual std::vector<ImageViewRGB32> get_crop_candidates(const ImageViewRGB32& image) const override;
+    std::vector<double> m_min_euclidean_distance_squared;
 };
 
 class SandwichFillingOCR : public OCR::SmallDictionaryMatcher{

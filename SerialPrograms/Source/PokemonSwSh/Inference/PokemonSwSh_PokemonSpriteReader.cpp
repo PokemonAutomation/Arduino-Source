@@ -60,7 +60,7 @@ PokemonSpriteMatcherCropped::PokemonSpriteMatcherCropped(const std::set<std::str
     }
 }
 
-ImageRGB32 PokemonSpriteMatcherCropped::process_image(const ImageViewRGB32& image, Color& background) const{
+auto PokemonSpriteMatcherCropped::get_crop_candidates(const ImageViewRGB32& image) const -> std::vector<ImageViewRGB32>{
     ImageStats border = image_border_stats(image);
 //    cout << border.average << border.stddev << endl;
 //    image.save("image1.png");
@@ -83,9 +83,9 @@ ImageRGB32 PokemonSpriteMatcherCropped::process_image(const ImageViewRGB32& imag
             return stop;
         }
     );
-
-    background = border.average.round();
-    return extract_box_reference(image, box).copy();
+    std::vector<ImageViewRGB32> ret;
+    ret.emplace_back(extract_box_reference(image, box));
+    return ret;
 }
 
 

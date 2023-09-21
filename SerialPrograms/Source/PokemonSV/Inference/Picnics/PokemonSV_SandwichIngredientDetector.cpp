@@ -6,7 +6,7 @@
 
 #include "CommonFramework/ImageMatch/ImageCropper.h"
 #include "CommonFramework/ImageMatch/WaterfillTemplateMatcher.h"
-#include "CommonFramework/ImageTools/ImageFilter.h"
+//#include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/WaterfillUtilities.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
@@ -163,29 +163,35 @@ const SandwichFillingMatcher& SANDWICH_FILLING_MATCHER(){
     static SandwichFillingMatcher matcher;
     return matcher;
 }
-SandwichFillingMatcher::SandwichFillingMatcher(double min_euclidean_distance)
+SandwichFillingMatcher::SandwichFillingMatcher(const std::vector<double>& min_euclidean_distance)
     : CroppedImageDictionaryMatcher({0, 1})
-    , m_min_euclidean_distance_squared(min_euclidean_distance * min_euclidean_distance){
+{
+    for (double x : min_euclidean_distance){
+        m_min_euclidean_distance_squared.emplace_back(x * x);
+    }
     for (const auto& item : SANDWICH_FILLINGS_DATABASE()){
         add(item.first, item.second.sprite);
     }
 }
-ImageRGB32 SandwichFillingMatcher::process_image(const ImageViewRGB32& image, Color& background) const{
+auto SandwichFillingMatcher::get_crop_candidates(const ImageViewRGB32& image) const -> std::vector<ImageViewRGB32>{
     ImageStats border = image_border_stats(image);
 //    cout << "border = " << border.average << endl;
 //    image.save("image.png");
-    ImagePixelBox box = ImageMatch::enclosing_rectangle_with_pixel_filter(
-        image,
-        [&](Color pixel){
-            double r = (double)pixel.red() - border.average.r;
-            double g = (double)pixel.green() - border.average.g;
-            double b = (double)pixel.blue() - border.average.b;
-            bool stop = r * r + g * g + b * b >= m_min_euclidean_distance_squared;
-            return stop;
-        }
-    );
-    background = border.average.round();
-    return extract_box_reference(image, box).copy();
+    std::vector<ImageViewRGB32> ret;
+    for (double min_euclidean_distance_squared : m_min_euclidean_distance_squared){
+        ImagePixelBox box = ImageMatch::enclosing_rectangle_with_pixel_filter(
+            image,
+            [&](Color pixel){
+                double r = (double)pixel.red() - border.average.r;
+                double g = (double)pixel.green() - border.average.g;
+                double b = (double)pixel.blue() - border.average.b;
+                bool stop = r * r + g * g + b * b >= min_euclidean_distance_squared;
+                return stop;
+            }
+        );
+        ret.emplace_back(extract_box_reference(image, box));
+    }
+    return ret;
 }
 
 
@@ -193,27 +199,33 @@ const SandwichCondimentMatcher& SANDWICH_CONDIMENT_MATCHER(){
     static SandwichCondimentMatcher matcher;
     return matcher;
 }
-SandwichCondimentMatcher::SandwichCondimentMatcher(double min_euclidean_distance)
+SandwichCondimentMatcher::SandwichCondimentMatcher(const std::vector<double>& min_euclidean_distance)
     : CroppedImageDictionaryMatcher({0, 1})
-    , m_min_euclidean_distance_squared(min_euclidean_distance * min_euclidean_distance){
+{
+    for (double x : min_euclidean_distance){
+        m_min_euclidean_distance_squared.emplace_back(x * x);
+    }
     for (const auto& item : SANDWICH_CONDIMENTS_DATABASE()){
         add(item.first, item.second.sprite);
     }
 }
-ImageRGB32 SandwichCondimentMatcher::process_image(const ImageViewRGB32& image, Color& background) const{
+auto SandwichCondimentMatcher::get_crop_candidates(const ImageViewRGB32& image) const -> std::vector<ImageViewRGB32>{
     ImageStats border = image_border_stats(image);
-    ImagePixelBox box = ImageMatch::enclosing_rectangle_with_pixel_filter(
-        image,
-        [&](Color pixel){
-            double r = (double)pixel.red() - border.average.r;
-            double g = (double)pixel.green() - border.average.g;
-            double b = (double)pixel.blue() - border.average.b;
-            bool stop = r * r + g * g + b * b >= m_min_euclidean_distance_squared;
-            return stop;
-        }
-    );
-    background = border.average.round();
-    return extract_box_reference(image, box).copy();
+    std::vector<ImageViewRGB32> ret;
+    for (double min_euclidean_distance_squared : m_min_euclidean_distance_squared){
+        ImagePixelBox box = ImageMatch::enclosing_rectangle_with_pixel_filter(
+            image,
+            [&](Color pixel){
+                double r = (double)pixel.red() - border.average.r;
+                double g = (double)pixel.green() - border.average.g;
+                double b = (double)pixel.blue() - border.average.b;
+                bool stop = r * r + g * g + b * b >= min_euclidean_distance_squared;
+                return stop;
+            }
+        );
+        ret.emplace_back(extract_box_reference(image, box));
+    }
+    return ret;
 }
 
 const SandwichFillingOCR& SandwichFillingOCR::instance(){
