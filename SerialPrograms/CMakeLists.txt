@@ -2017,6 +2017,14 @@ else()
     # when compiling OpenCV
     target_compile_options(SerialPrograms PRIVATE -Wall -Wextra -Wpedantic -Werror -Wno-c11-extensions)
 
+    # Set OS-specific flags
+    if (WIN32)
+    elseif (APPLE)
+        # on macOS, need this framework to query OS API to control display sleep and system sleep behavior
+        target_link_libraries(SerialPrograms "-framework IOKit")
+    elseif(UNIX)
+    endif()
+
     IF(${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm")
     # Arm CPU
 
