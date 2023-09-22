@@ -270,7 +270,7 @@ bool StatsResetBloodmoon::run_battle(SingleSwitchProgramEnvironment& env, BotBas
 
         stats.catches++;
         env.update_stats();
-        env.log("Ursaluna caught.", COLOR_RED);
+        env.log("Ursaluna caught.");
     }
     else {
         env.log("Battle against Ursaluna lost.", COLOR_RED);
