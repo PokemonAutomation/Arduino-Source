@@ -70,11 +70,12 @@ StatsReset::StatsReset()
         "<b>Target:</b><br>The Pokemon you are resetting for.<br>"
         "Treasures of Ruin: Stand in front of the unsealed vaults of one of the Ruinous Quartet.<br>"
         "Loyal Three: Stand in front of Okidogi/Munkidori/Fezandipiti.<br>"
-        "Generic: You are standing in front of a Pokemon that requires an A press to initiate battle.<br>",
+        //"Generic: You are standing in front of a Pokemon that requires an A press to initiate battle.<br>",
+        "Gimmighoul: Stand in front of a Gimmighoul chest.<br>",
         {
             {Target::TreasuresOfRuin, "treasures-of-ruin", "Treasures of Ruin"},
             {Target::LoyalThree, "loyal-three", "Loyal Three"},
-            {Target::Generic, "generic", "Generic"},
+            {Target::Generic, "generic", "Gimmighoul"},
         },
         LockWhileRunning::LOCKED,
         Target::TreasuresOfRuin
@@ -165,6 +166,7 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext&
     uint8_t switch_party_slot = 1;
 
     bool target_fainted = false;
+    bool out_of_balls = false;
 
     int ret = run_until(
         env.console, context,
@@ -195,10 +197,11 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext&
                 BattleBallReader reader(env.console, LANGUAGE);
                 int quantity = move_to_ball(reader, env.console, context, BALL_SELECT.slug());
                 if (quantity == 0) {
-                    env.console.log("Unable to find appropriate ball, out of balls, or either Pokemon fainted.");
+                    out_of_balls = true;
+                    env.console.log("Unable to find appropriate ball/out of balls.");
                     send_program_status_notification(
                         env, NOTIFICATION_STATUS_UPDATE,
-                        "Unable to find appropriate ball, out of balls, or either Pokemon fainted."
+                        "Unable to find appropriate ball/out of balls."
                     );
                     break;
                 }
@@ -282,6 +285,11 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext&
         target_fainted = true;
         break;
     default:
+        if (out_of_balls) {
+            target_fainted = true; //Resets game.
+            env.log("Ran out of selected Pokeball. Resetting.");
+            break;
+        }
         env.console.log("Invalid state in run_battle().");
         stats.errors++;
         env.update_stats();
