@@ -66,7 +66,9 @@ private:
 //        RESET_SANDWICH,
 //    };
 
+    void set_flags(SingleSwitchProgramEnvironment& env);
     void run_state(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    void set_flags_and_run_state(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
     //  Returns true on success.
     bool run_traversal(BotBaseContext& context);
@@ -117,7 +119,7 @@ private:
     bool m_pending_save;
     bool m_pending_platform_reset;
     bool m_pending_sandwich;
-    bool m_reset_after_sandwich_ends;
+    bool m_reset_on_next_sandwich;
 
 //    enum class SavedLocation{
 //        NONE,
