@@ -404,7 +404,12 @@ void ShinyHuntAreaZeroPlatform::run_state(SingleSwitchProgramEnvironment& env, B
             return;
         case Location::AREA_ZERO:
             console.log("Executing: Traversal...");
-            run_traversal(context);
+            try{
+                run_traversal(context);
+            }catch (OperationFailedException&){
+                m_pending_platform_reset = true;
+                throw;
+            }
             m_encounter_tracker->reset_rate_tracker_start_time();
             m_consecutive_failures = 0;
             return;
