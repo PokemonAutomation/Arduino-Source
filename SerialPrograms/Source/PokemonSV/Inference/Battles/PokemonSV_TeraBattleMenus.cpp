@@ -264,22 +264,30 @@ bool TeraTargetSelectDetector::move_to_slot(ConsoleHandle& console, BotBaseConte
 TeraCatchDetector::TeraCatchDetector(Color color)
     : m_color(color)
     , m_callouts_button(color, WhiteButton::ButtonMinus, {0.35, 0.87, 0.30, 0.05})
-    , m_button(0.801, 0.818, 0.005, 0.047)
-    , m_box_right(0.95, 0.81, 0.02, 0.06)
-    , m_arrow(color, GradientArrowType::RIGHT, {0.75, 0.80, 0.08, 0.09})
-{}
-void TeraCatchDetector::make_overlays(VideoOverlaySet& items) const{
-    items.add(m_color, m_box_right);
-    m_arrow.make_overlays(items);
+{
+    m_button[0] = {0.801, 0.818, 0.005, 0.047};
+    m_button[1] = {0.801, 0.900, 0.005, 0.047};
+    m_box_right[0] = {0.95, 0.810, 0.02, 0.06};
+    m_box_right[1] = {0.95, 0.892, 0.02, 0.06};
+    m_arrow.emplace_back(color, GradientArrowType::RIGHT, ImageFloatBox(0.75, 0.800, 0.08, 0.09));
+    m_arrow.emplace_back(color, GradientArrowType::RIGHT, ImageFloatBox(0.75, 0.878, 0.08, 0.09));
 }
-bool TeraCatchDetector::detect(const ImageViewRGB32& screen) const{
-    ImageStats button = image_stats(extract_box_reference(screen, m_button));
+void TeraCatchDetector::make_overlays(VideoOverlaySet& items) const{
+    for (int c = 0; c < 2; c++){
+        items.add(m_color, m_button[c]);
+        items.add(m_color, m_box_right[c]);
+        m_arrow[c].make_overlays(items);
+    }
+}
+
+bool TeraCatchDetector::detect_slot(const ImageViewRGB32& screen, size_t index) const{
+    ImageStats button = image_stats(extract_box_reference(screen, m_button[index]));
 //    cout << button.average << button.stddev << endl;
 //    extract_box_reference(screen, m_button).save("button.png");
 
-    ImageStats yellow = image_stats(extract_box_reference(screen, m_box_right));
+    ImageStats yellow = image_stats(extract_box_reference(screen, m_box_right[index]));
 //    cout << yellow.average << yellow.stddev << endl;
-//    extract_box_reference(screen, m_box_right).save("yellow.png");
+//    extract_box_reference(screen, m_slot0_box_right).save("yellow.png");
 
     bool button_ok = is_solid(button, {0.117281, 0.311767, 0.570951}, 0.20, 20) || is_black(button, 100, 20);
     bool yellow_ok = is_solid(yellow, {0.554348, 0.445652, 0.}, 0.15, 20);
@@ -288,17 +296,55 @@ bool TeraCatchDetector::detect(const ImageViewRGB32& screen) const{
         return false;
     }
 
-    if (!m_arrow.detect(screen)){
+    if (!m_arrow[index].detect(screen)){
 //        cout << "arrow bad" << endl;
-        return false;
-    }
-
-    if (m_callouts_button.detect(screen)){
         return false;
     }
 
     return true;
 }
+bool TeraCatchDetector::detect(const ImageViewRGB32& screen) const{
+    if (m_callouts_button.detect(screen)){
+        return false;
+    }
+
+    return detect_slot(screen, 0) || detect_slot(screen, 1);
+}
+
+bool TeraCatchDetector::move_to_slot(ConsoleHandle& console, BotBaseContext& context, uint8_t slot) const{
+    if (slot > 1){
+        return false;
+    }
+
+    for (size_t attempts = 0; attempts < 10; attempts++){
+        context.wait_for_all_requests();
+        VideoSnapshot screen = console.video().snapshot();
+
+        if (m_callouts_button.detect(screen)){
+            console.log("TeraCatchDetector::move_to_slot(): Unable to detect catch buttons.", COLOR_RED);
+            return false;
+        }
+
+        bool slot0 = detect_slot(screen, 0);
+        bool slot1 = detect_slot(screen, 1);
+        if (slot0 == slot1){
+            console.log("TeraCatchDetector::move_to_slot(): Unable to detect catch buttons.", COLOR_RED);
+            return false;
+        }
+
+        uint8_t current_slot = slot1 ? 1 : 0;
+
+        if (current_slot == slot){
+            return true;
+        }
+
+        pbf_press_dpad(context, DPAD_DOWN, 20, 30);
+    }
+
+    console.log("TeraCatchDetector::move_to_slot(): Failed to move slot after 10 attempts.", COLOR_RED);
+    return false;
+}
+
 
 
 

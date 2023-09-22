@@ -233,10 +233,20 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     BotBaseContext context(scope, console.botbase());
     VideoOverlaySet overlays(overlay);
 
-    std::shared_ptr<const ImageRGB32> screen(new ImageRGB32("20230920-123043559137-OperationFailedException.png"));
 
-    IngredientSession session(env.inference_dispatcher(), console, context, Language::English, SandwichIngredientType::FILLING);
-    session.read_screen(screen);
+    TeraCatchDetector detector(COLOR_RED);
+    detector.make_overlays(overlays);
+
+    auto snapshot = console.video().snapshot();
+    cout << detector.detect(snapshot) << endl;
+
+    detector.move_to_slot(console, context, 1);
+
+//    std::shared_ptr<const ImageRGB32> screen(new ImageRGB32("20230920-123043559137-OperationFailedException.png"));
+
+//    IngredientSession session(env.inference_dispatcher(), console, context, Language::English, SandwichIngredientType::FILLING);
+//    session.read_screen(screen);
+
 
 
 

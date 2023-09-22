@@ -323,7 +323,8 @@ void exit_tera_win_without_catching(
         switch (ret){
         case 0:
             console.log("Detected catch prompt.");
-            pbf_press_dpad(context, DPAD_DOWN, 20, 30);
+            catch_menu.move_to_slot(console, context, 1);
+//            pbf_press_dpad(context, DPAD_DOWN, 20, 30);
             pbf_mash_button(context, BUTTON_A, 30);
             pbf_mash_button(context, BUTTON_B, 125);
             continue;
@@ -402,6 +403,7 @@ void exit_tera_win_by_catching(
             console.log("Detected catch prompt.");
             screenshot = console.video().snapshot();
 
+            catch_menu.move_to_slot(console, context, 0);
             pbf_press_button(context, BUTTON_A, 20, 150);
             context.wait_for_all_requests();
 
@@ -517,6 +519,7 @@ TeraResult exit_tera_win_by_catching(
             console.log("Detected catch prompt.");
             screenshot = console.video().snapshot();
 
+            catch_menu.move_to_slot(console, context, 0);
             pbf_press_button(context, BUTTON_A, 20, 150);
             context.wait_for_all_requests();
 
