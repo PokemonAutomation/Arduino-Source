@@ -144,10 +144,8 @@ void ShinyHuntScatterbug::program(SingleSwitchProgramEnvironment& env, BotBaseCo
         return;
     }
 
-    m_iterations = 0;
-    m_consecutive_failures = 0;
+    size_t consecutive_failures = 0;
     m_pending_save = false;
-    m_last_sandwich = WallClock::min();
 
     save_game_from_overworld(env.program_info(), env.console, context);
 
@@ -173,8 +171,8 @@ void ShinyHuntScatterbug::program(SingleSwitchProgramEnvironment& env, BotBaseCo
                 throw std::move(e);
             }
 
-            m_consecutive_failures++;
-            if (m_consecutive_failures >= 3){
+            consecutive_failures++;
+            if (consecutive_failures >= 3){
                 throw OperationFailedException(
                     ErrorReport::SEND_ERROR_REPORT, env.console,
                     "Failed 3 times in the row.",
@@ -191,28 +189,80 @@ void ShinyHuntScatterbug::program(SingleSwitchProgramEnvironment& env, BotBaseCo
     }
 }
 
+
+// This function wraps around an action (e.g. go out of PokeCenter to make a sandwich) so that
+// we can handle pokemon wild encounters when executing the action.
+// Whenever a battle happens, we check shinies and handle battle according to user setting. After battle ends, move
+// back to PokeCenter to start the `action` again.
+// `action` must be an action starting at the PokeCenter
+void ShinyHuntScatterbug::handle_battles_and_back_to_pokecenter(SingleSwitchProgramEnvironment& env, BotBaseContext& context, 
+    std::function<void(SingleSwitchProgramEnvironment& env, BotBaseContext& context)>&& action)
+{
+    assert(m_encounter_tracker != nullptr);
+    assert(m_encounter_watcher != nullptr);
+
+    bool action_finished = false;
+    bool first_iteration = true;
+    // a flag for the case that the action has finished but not yet returned to pokecenter
+    bool returned_to_pokecenter = false;
+    while(action_finished == false && returned_to_pokecenter == false){
+        int ret = run_until(
+            env.console, context,
+            [&](BotBaseContext& context){
+                if (action_finished){
+                    // `action` is already finished. Now we just try to get back to pokecenter:
+                    reset_to_pokecenter(env, context);
+                    context.wait_for_all_requests();
+                    returned_to_pokecenter = true;
+                    return;
+                }
+                // We still need to carry out `action`
+                if (first_iteration){
+                    first_iteration = false;
+                }
+                else{
+                    // This is at least the second iteration in the while-loop.
+                    // So a previous round of action failed.
+                    // We need to first re-initialize our position to the PokeCenter
+                    // Use map to fly back to the pokecenter
+                    reset_to_pokecenter(env, context);
+                }
+                context.wait_for_all_requests();
+                action(env, context);
+                context.wait_for_all_requests();
+                action_finished = true;
+            },
+            {
+                static_cast<VisualInferenceCallback&>(*m_encounter_watcher),
+                static_cast<AudioInferenceCallback&>(*m_encounter_watcher),
+            }
+        );
+        m_encounter_watcher->throw_if_no_sound();
+        if (ret >= 0){
+            env.console.log("Detected battle.", COLOR_PURPLE);
+            try{
+                bool caught, should_save;
+                m_encounter_tracker->process_battle(
+                    caught, should_save,
+                    *m_encounter_watcher, ENCOUNTER_BOT_OPTIONS
+                );
+                if (should_save){
+                    m_pending_save = should_save;
+                }
+            }catch (ProgramFinishedException&){
+                GO_HOME_WHEN_DONE.run_end_of_program(context);
+                throw;
+            }
+        }
+        // Back on the overworld.
+    } // end while(action_finished == false)
+}
+
 // Start at Mesagoza South Gate pokecenter, make a sandwich, then use let's go repeatedly until 30 min passes.
 // If 
 void ShinyHuntScatterbug::run_one_sandwich_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     ShinyHuntScatterbug_Descriptor::Stats& stats = env.current_stats<ShinyHuntScatterbug_Descriptor::Stats>();
-
-    // Orient camera to look at same direction as player character
-    // This is needed because when save-load the game, the camera is reset
-    // to this location.
-    pbf_press_button(context, BUTTON_L, 50, 40);
-    // Move forward
-    pbf_move_left_joystick(context, 128, 0, 180, 0);
-    picnic_from_overworld(env.program_info(), env.console, context);
-
-    pbf_move_left_joystick(context, 128, 0, 30, 40);
-    enter_sandwich_recipe_list(env.program_info(), env.console, context);
-    run_sandwich_maker(env, context, SANDWICH_OPTIONS);
-    m_last_sandwich = current_time();
-    leave_picnic(env.program_info(), env.console, context);
-
-    LetsGoHpWatcher hp_watcher(COLOR_RED);
-    m_hp_watcher = &hp_watcher;
-
+    
     LetsGoEncounterBotTracker encounter_tracker(
         env, env.console, context,
         stats,
@@ -220,18 +270,57 @@ void ShinyHuntScatterbug::run_one_sandwich_iteration(SingleSwitchProgramEnvironm
     );
     m_encounter_tracker = &encounter_tracker;
 
+    EncounterWatcher encounter_watcher(env.console, COLOR_RED);
+    m_encounter_watcher = &encounter_watcher;
+
+    bool saved_after_this_sandwich = false;
+
+    WallClock last_sandwich_time = WallClock::min();
+
+    auto save_if_needed = [&](){
+        if (m_pending_save){
+            save_game_from_overworld(env.program_info(), env.console, context);
+            m_pending_save = false;
+            saved_after_this_sandwich = true;
+        }
+    };
+
+    handle_battles_and_back_to_pokecenter(env, context, 
+        [this, &last_sandwich_time](SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+            // Orient camera to look at same direction as player character
+            // This is needed because when save-load the game, the camera is reset
+            // to this location.
+            pbf_press_button(context, BUTTON_L, 50, 40);
+            // Move forward
+            pbf_move_left_joystick(context, 128, 0, 180, 0);
+            picnic_from_overworld(env.program_info(), env.console, context);
+
+            pbf_move_left_joystick(context, 128, 0, 30, 40);
+            enter_sandwich_recipe_list(env.program_info(), env.console, context);
+            run_sandwich_maker(env, context, SANDWICH_OPTIONS);
+            last_sandwich_time = current_time();
+            leave_picnic(env.program_info(), env.console, context);
+        }
+    );
+    save_if_needed();
+
     // Which path to choose starting at the PokeCenter.
     size_t path_id = 0;
     const size_t num_paths = 3;
 
-    bool saved_after_this_sandwich = false;
-
+    LetsGoHpWatcher hp_watcher(COLOR_RED);
     // In each iteration of this while-loop, it picks a path starting from the pokecenter or the
     // last sandwich making spot, use Let's Go along the path, then fly back to pokecenter.
     for (;;path_id = (path_id + 1) % num_paths){
+        if (last_sandwich_time + std::chrono::minutes(30) < current_time()){
+            env.log("Sandwich expires.");
+            env.console.overlay().add_log("Sandwich expires", COLOR_WHITE);
+            return;
+        }
+
         env.console.log("Starting Let's Go hunting path...", COLOR_PURPLE);
 
-        double hp = m_hp_watcher->last_known_value() * 100;
+        double hp = hp_watcher.last_known_value() * 100;
         if (0 < hp){
             env.console.log("Last Known HP: " + tostr_default(hp) + "%", COLOR_BLUE);
         }else{
@@ -242,51 +331,21 @@ void ShinyHuntScatterbug::run_one_sandwich_iteration(SingleSwitchProgramEnvironm
             stats.m_autoheals++;
             env.update_stats();
         }
-        
-        EncounterWatcher encounter_watcher(env.console, COLOR_RED);
-        int ret = run_until(
-            env.console, context,
-            [&](BotBaseContext& context){
-                run_lets_go_iteration(env, context, path_id);
-            },
-            {
-                static_cast<VisualInferenceCallback&>(encounter_watcher),
-                static_cast<AudioInferenceCallback&>(encounter_watcher),
-                hp_watcher,
-            }
-        );
-        encounter_watcher.throw_if_no_sound();
-        if (ret >= 0){
-            env.console.log("Detected battle.", COLOR_PURPLE);
-            try{
-                bool caught, should_save;
-                encounter_tracker.process_battle(
-                    caught, should_save,
-                    encounter_watcher, ENCOUNTER_BOT_OPTIONS
+
+        handle_battles_and_back_to_pokecenter(env, context, 
+            [this, &path_id, &hp_watcher](SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+                run_until(
+                    env.console, context,
+                    [&](BotBaseContext& context){
+                        run_lets_go_iteration(env, context, path_id);
+                    },
+                    {hp_watcher}
                 );
-                if (should_save){
-                    m_pending_save = should_save;
-                }
-            }catch (ProgramFinishedException&){
-                GO_HOME_WHEN_DONE.run_end_of_program(context);
-                throw;
-            }
-        }
-        // Use map to fly back to the pokecenter
-        reset_to_pokecenter(env, context);
-
-        if (m_pending_save){
-            save_game_from_overworld(env.program_info(), env.console, context);
-            m_pending_save = false;
-            saved_after_this_sandwich = true;
-        }
-
-        if (m_last_sandwich + std::chrono::minutes(30) < current_time()){
-            env.log("Sandwich expires.");
-            env.console.overlay().add_log("Sandwich expires", COLOR_WHITE);
-            break;
-        }
-    }
+                m_encounter_watcher->throw_if_no_sound();
+            } // end [](...)
+        ); // end handle_battles_and_back_to_pokecenter()
+        save_if_needed();
+    } // end for (;;path_id = (path_id + 1) % num_paths)
 
     if (!saved_after_this_sandwich){
         // Reset game to save rare herbs

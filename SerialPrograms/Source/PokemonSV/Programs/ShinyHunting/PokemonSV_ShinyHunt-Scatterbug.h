@@ -21,9 +21,9 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
 
-class LetsGoHpWatcher;
 class DiscontiguousTimeTracker;
 class LetsGoEncounterBotTracker;
+class EncounterWatcher;
 
 
 
@@ -50,6 +50,9 @@ private:
     
     void run_lets_go_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context, size_t path_id);
 
+    void handle_battles_and_back_to_pokecenter(SingleSwitchProgramEnvironment& env, BotBaseContext& context, 
+        std::function<void(SingleSwitchProgramEnvironment& env, BotBaseContext& context)>&& action);
+
     OCR::LanguageOCROption LANGUAGE;
 
     SandwichMakerOption SANDWICH_OPTIONS;
@@ -66,17 +69,12 @@ private:
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;
 
-    LetsGoHpWatcher* m_hp_watcher;
     LetsGoEncounterBotTracker* m_encounter_tracker;
 
-    uint64_t m_iterations = 0;
+    EncounterWatcher* m_encounter_watcher;
 
     //  Set to true if we should save on the first available opportunity.
     bool m_pending_save;
-
-    size_t m_consecutive_failures;
-
-    WallClock m_last_sandwich;
 };
 
 
