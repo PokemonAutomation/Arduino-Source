@@ -244,7 +244,7 @@ void picnic_at_zero_gate(const ProgramInfo& info, ConsoleHandle& console, BotBas
     pbf_press_button(context, BUTTON_L, 50, 40);
 
     // Move right to make player character facing away from Aera Zero observation station
-    pbf_move_left_joystick(context, 255, 0, 50, 50);
+    pbf_move_left_joystick(context, 255, 32, 50, 50);
     // Press L to move camera to face the same direction as the player character
     pbf_press_button(context, BUTTON_L, 50, 40);
     // Move forward
