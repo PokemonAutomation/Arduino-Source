@@ -2021,7 +2021,7 @@ else()
     if (WIN32)
     elseif (APPLE)
         # on macOS, need this framework to query OS API to control display sleep and system sleep behavior
-        target_link_libraries(SerialPrograms "-framework IOKit")
+        target_link_libraries(SerialPrograms "-framework IOKit -framework CoreFoundation")
     elseif(UNIX)
     endif()
 
