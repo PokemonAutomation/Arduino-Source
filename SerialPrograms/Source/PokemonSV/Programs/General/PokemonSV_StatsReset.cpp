@@ -240,7 +240,7 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext&
                 SwapMenuWatcher fainted(COLOR_YELLOW);
                 int ret2 = wait_until(
                     env.console, context,
-                    std::chrono::seconds(25),
+                    std::chrono::seconds(60),
                     { battle_menu, fainted }
                 );
                 switch (ret2) {
