@@ -516,8 +516,8 @@ std::string SandwichMakerOption::check_herb_compatibility(HerbaSelection herb1, 
             PokemonType::rock,
             PokemonType::ice,
         };
-        if (TYPES.contains(type)){
-            return "1x Salty and 1x Sour herb are incompatible with flying, ground, rock, and ice.";
+        if (!TYPES.contains(type)){
+            return "1x Salty and 1x Sour herb are only compatible with flying, ground, rock, and ice.";
         }
     }
     if ((herb1 == HerbaSelection::bitter_herba_mystica && herb2 == HerbaSelection::sour_herba_mystica) ||
