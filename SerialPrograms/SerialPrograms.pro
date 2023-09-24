@@ -655,6 +655,7 @@ SOURCES += \
     Source/PokemonSV/Inference/Picnics/PokemonSV_SandwichPlateDetector.cpp \
     Source/PokemonSV/Inference/Picnics/PokemonSV_SandwichRecipeDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_AuctionItemNameReader.cpp \
+    Source/PokemonSV/Inference/PokemonSV_BagDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_ClothingTopDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_ESPEmotionDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_MainMenuDetector.cpp \
@@ -687,28 +688,31 @@ SOURCES += \
     Source/PokemonSV/Options/PokemonSV_TournamentPrizeTable.cpp \
     Source/PokemonSV/PokemonSV_Panels.cpp \
     Source/PokemonSV/PokemonSV_Settings.cpp \
+    Source/PokemonSV/Programs/Boxes/PokemonSV_BoxAttach.cpp \
+    Source/PokemonSV/Programs/Boxes/PokemonSV_BoxRelease.cpp \
     Source/PokemonSV/Programs/Boxes/PokemonSV_BoxRoutines.cpp \
+    Source/PokemonSV/Programs/Boxes/PokemonSV_MassAttachItems.cpp \
+    Source/PokemonSV/Programs/Boxes/PokemonSV_MassRelease.cpp \
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggAutonomous.cpp \
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggFetcher.cpp \
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggHatcher.cpp \
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggRoutines.cpp \
+    Source/PokemonSV/Programs/Farming/PokemonSV_AuctionFarmer.cpp \
+    Source/PokemonSV/Programs/Farming/PokemonSV_ESPTraining.cpp \
+    Source/PokemonSV/Programs/Farming/PokemonSV_GimmighoulChestFarmer.cpp \
+    Source/PokemonSV/Programs/Farming/PokemonSV_GimmighoulRoamingFarmer.cpp \
+    Source/PokemonSV/Programs/Farming/PokemonSV_LPFarmer.cpp \
+    Source/PokemonSV/Programs/Farming/PokemonSV_TournamentFarmer.cpp \
     Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_ClipboardFastCodeEntry.cpp \
     Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_CodeEntry.cpp \
     Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_FastCodeEntry.cpp \
     Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_VideoFastCodeEntry.cpp \
-    Source/PokemonSV/Programs/General/PokemonSV_AuctionFarmer.cpp \
     Source/PokemonSV/Programs/General/PokemonSV_AutonomousBallThrower.cpp \
     Source/PokemonSV/Programs/General/PokemonSV_ClothingBuyer.cpp \
-    Source/PokemonSV/Programs/General/PokemonSV_ESPTraining.cpp \
-    Source/PokemonSV/Programs/General/PokemonSV_GimmighoulChestFarmer.cpp \
-    Source/PokemonSV/Programs/General/PokemonSV_GimmighoulRoamingFarmer.cpp \
-    Source/PokemonSV/Programs/General/PokemonSV_LPFarmer.cpp \
     Source/PokemonSV/Programs/General/PokemonSV_MassPurchase.cpp \
-    Source/PokemonSV/Programs/General/PokemonSV_MassRelease.cpp \
     Source/PokemonSV/Programs/General/PokemonSV_SizeChecker.cpp \
     Source/PokemonSV/Programs/General/PokemonSV_StatsReset.cpp \
     Source/PokemonSV/Programs/General/PokemonSV_StatsResetBloodmoon.cpp \
-    Source/PokemonSV/Programs/General/PokemonSV_TournamentFarmer.cpp \
     Source/PokemonSV/Programs/Glitches/PokemonSV_CloneItems-1.0.1.cpp \
     Source/PokemonSV/Programs/Glitches/PokemonSV_RideCloner-1.0.1.cpp \
     Source/PokemonSV/Programs/PokemonSV_AreaZero.cpp \
@@ -1697,6 +1701,7 @@ HEADERS += \
     Source/PokemonSV/Inference/Picnics/PokemonSV_SandwichPlateDetector.h \
     Source/PokemonSV/Inference/Picnics/PokemonSV_SandwichRecipeDetector.h \
     Source/PokemonSV/Inference/PokemonSV_AuctionItemNameReader.h \
+    Source/PokemonSV/Inference/PokemonSV_BagDetector.h \
     Source/PokemonSV/Inference/PokemonSV_ClothingTopDetector.h \
     Source/PokemonSV/Inference/PokemonSV_ESPEmotionDetector.h \
     Source/PokemonSV/Inference/PokemonSV_MainMenuDetector.h \
@@ -1731,28 +1736,31 @@ HEADERS += \
     Source/PokemonSV/Options/PokemonSV_TournamentPrizeTable.h \
     Source/PokemonSV/PokemonSV_Panels.h \
     Source/PokemonSV/PokemonSV_Settings.h \
+    Source/PokemonSV/Programs/Boxes/PokemonSV_BoxAttach.h \
+    Source/PokemonSV/Programs/Boxes/PokemonSV_BoxRelease.h \
     Source/PokemonSV/Programs/Boxes/PokemonSV_BoxRoutines.h \
+    Source/PokemonSV/Programs/Boxes/PokemonSV_MassAttachItems.h \
+    Source/PokemonSV/Programs/Boxes/PokemonSV_MassRelease.h \
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggAutonomous.h \
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggFetcher.h \
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggHatcher.h \
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggRoutines.h \
+    Source/PokemonSV/Programs/Farming/PokemonSV_AuctionFarmer.h \
+    Source/PokemonSV/Programs/Farming/PokemonSV_ESPTraining.h \
+    Source/PokemonSV/Programs/Farming/PokemonSV_GimmighoulChestFarmer.h \
+    Source/PokemonSV/Programs/Farming/PokemonSV_GimmighoulRoamingFarmer.h \
+    Source/PokemonSV/Programs/Farming/PokemonSV_LPFarmer.h \
+    Source/PokemonSV/Programs/Farming/PokemonSV_TournamentFarmer.h \
     Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_ClipboardFastCodeEntry.h \
     Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_CodeEntry.h \
     Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_FastCodeEntry.h \
     Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_VideoFastCodeEntry.h \
-    Source/PokemonSV/Programs/General/PokemonSV_AuctionFarmer.h \
     Source/PokemonSV/Programs/General/PokemonSV_AutonomousBallThrower.h \
     Source/PokemonSV/Programs/General/PokemonSV_ClothingBuyer.h \
-    Source/PokemonSV/Programs/General/PokemonSV_ESPTraining.h \
-    Source/PokemonSV/Programs/General/PokemonSV_GimmighoulChestFarmer.h \
-    Source/PokemonSV/Programs/General/PokemonSV_GimmighoulRoamingFarmer.h \
-    Source/PokemonSV/Programs/General/PokemonSV_LPFarmer.h \
     Source/PokemonSV/Programs/General/PokemonSV_MassPurchase.h \
-    Source/PokemonSV/Programs/General/PokemonSV_MassRelease.h \
     Source/PokemonSV/Programs/General/PokemonSV_SizeChecker.h \
     Source/PokemonSV/Programs/General/PokemonSV_StatsReset.h \
     Source/PokemonSV/Programs/General/PokemonSV_StatsResetBloodmoon.h \
-    Source/PokemonSV/Programs/General/PokemonSV_TournamentFarmer.h \
     Source/PokemonSV/Programs/Glitches/PokemonSV_CloneItems-1.0.1.h \
     Source/PokemonSV/Programs/Glitches/PokemonSV_RideCloner-1.0.1.h \
     Source/PokemonSV/Programs/PokemonSV_AreaZero.h \
