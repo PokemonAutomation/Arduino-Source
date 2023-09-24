@@ -106,6 +106,7 @@
 #include "PokemonLA/Inference/PokemonLA_DialogDetector.h"
 #include "PokemonLA/Programs/PokemonLA_GameSave.h"
 #include "Pokemon/Resources/Pokemon_PokemonSlugs.h"
+#include "PokemonSV/Inference/PokemonSV_BagDetector.h"
 #include <filesystem>
 
 
@@ -233,7 +234,17 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     BotBaseContext context(scope, console.botbase());
     VideoOverlaySet overlays(overlay);
 
+//    size_t errors = 0;
+//    attach_item_from_bag(env.program_info(), console, context, errors);
+//    attach_item_from_box(env.program_info(), console, context, 1, errors);
 
+//    BagDetector detector;
+//    detector.make_overlays(overlays);
+//    auto snapshot = console.video().snapshot();
+//    cout << detector.detect(snapshot) << endl;
+
+
+#if 0
     TeraCatchDetector detector(COLOR_RED);
     detector.make_overlays(overlays);
 
@@ -241,6 +252,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     cout << detector.detect(snapshot) << endl;
 
     detector.move_to_slot(console, context, 1);
+#endif
 
 //    std::shared_ptr<const ImageRGB32> screen(new ImageRGB32("20230920-123043559137-OperationFailedException.png"));
 

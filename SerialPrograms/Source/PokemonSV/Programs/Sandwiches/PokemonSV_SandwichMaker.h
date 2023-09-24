@@ -4,25 +4,25 @@
  *
  */
 
-#ifndef PokemonAutomation_PokemonSwSh_SandwichMaker_H
-#define PokemonAutomation_PokemonSwSh_SandwichMaker_H
+#ifndef PokemonAutomation_PokemonSV_SandwichMaker_H
+#define PokemonAutomation_PokemonSV_SandwichMaker_H
 
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "PokemonSV/Options/PokemonSV_SandwichMakerOption.h"
 
-namespace PokemonAutomation {
-namespace NintendoSwitch {
-namespace PokemonSV {
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace PokemonSV{
 
 
-class SandwichMaker_Descriptor : public SingleSwitchProgramDescriptor {
+class SandwichMaker_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     SandwichMaker_Descriptor();
 };
 
-class SandwichMaker : public SingleSwitchProgramInstance {
+class SandwichMaker : public SingleSwitchProgramInstance{
 public:
     SandwichMaker();
 
