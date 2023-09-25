@@ -205,11 +205,38 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext&
                 if (QUICKBALL && !quickball_thrown) {
                     env.log("Quick Ball option checked. Throwing Quick Ball.");
 
-                    pbf_press_button(context, BUTTON_X, 20, 100);
-                    context.wait_for_all_requests();
-
                     BattleBallReader reader(env.console, LANGUAGE);
-                    int quantity = move_to_ball(reader, env.console, context, "quick-ball");
+                    std::string ball_reader = "";
+                    WallClock start = current_time();
+
+                    env.log("Opening ball menu...");
+                    while (ball_reader == "") {
+                        if (current_time() - start > std::chrono::minutes(2)) {
+                            env.log("Timed out trying to read ball after 2 minutes.", COLOR_RED);
+                            stats.errors++;
+                            env.update_stats();
+                            send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
+                            throw OperationFailedException(
+                                ErrorReport::SEND_ERROR_REPORT, env.console,
+                                "Timed out trying to read ball after 2 minutes.",
+                                true
+                            );
+                        }
+
+                        //Mash B to exit anything else
+                        pbf_mash_button(context, BUTTON_B, 125);
+                        context.wait_for_all_requests();
+
+                        //Press X to open Ball menu
+                        pbf_press_button(context, BUTTON_X, 20, 100);
+                        context.wait_for_all_requests();
+
+                        VideoSnapshot screen = env.console.video().snapshot();
+                        ball_reader = reader.read_ball(screen);
+                    }
+
+                    env.log("Selecting ball.");
+                    int quantity = move_to_ball(reader, env.console, context, BALL_SELECT.slug());
                     if (quantity == 0) {
                         //Stop so user can check they have quick balls.
                         env.console.log("Unable to find Quick Ball on turn 1.");
@@ -226,6 +253,7 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext&
                         env.update_stats();
                         env.console.log("Unable to read ball quantity.", COLOR_RED);
                     }
+
                     //Throw ball
                     pbf_mash_button(context, BUTTON_A, 150);
                     context.wait_for_all_requests();
@@ -242,6 +270,7 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext&
                     //Run through moves in table
                     env.log("Lead has not fainted, using move.");
 
+                    MoveSelectWatcher move_watcher(COLOR_BLUE);
                     MoveSelectDetector move_select(COLOR_BLUE);
                     BattleMoveType move = move_table.at(table_turn)->type;
                     uint8_t move_slot = 0;
@@ -263,9 +292,25 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext&
                     }
 
                     //Select and use move
-                    pbf_press_button(context, BUTTON_A, 10, 50);
+                    int ret_move_select = run_until(
+                    env.console, context,
+                    [&](BotBaseContext& context) {
+                        pbf_press_button(context, BUTTON_A, 10, 50);
+                        pbf_wait(context, 100);
+                        context.wait_for_all_requests();
+                    },
+                    { move_watcher }
+                    );
+                    if (ret_move_select != 0) {
+                        env.log("Could not find move select.");
+                    }
+                    else {
+                        env.log("Move select found!");
+                    }
+
+                    context.wait_for_all_requests();
                     move_select.move_to_slot(env.console, context, move_slot);
-                    pbf_press_button(context, BUTTON_A, 10, 50);
+                    pbf_mash_button(context, BUTTON_A, 150);
                     pbf_wait(context, 100);
                     context.wait_for_all_requests();
                     table_turn++;
@@ -297,11 +342,37 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext&
                     }
                 }
                 else {
-                    //Navigate to correct ball and repeatedly throw it until caught
-                    pbf_press_button(context, BUTTON_X, 20, 100);
-                    context.wait_for_all_requests();
-
                     BattleBallReader reader(env.console, LANGUAGE);
+                    std::string ball_reader = "";
+                    WallClock start = current_time();
+
+                    env.log("Opening ball menu...");
+                    while (ball_reader == "") {
+                        if (current_time() - start > std::chrono::minutes(2)) {
+                            env.log("Timed out trying to read ball after 2 minutes.", COLOR_RED);
+                            stats.errors++;
+                            env.update_stats();
+                            send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
+                            throw OperationFailedException(
+                                ErrorReport::SEND_ERROR_REPORT, env.console,
+                                "Timed out trying to read ball after 2 minutes.",
+                                true
+                            );
+                        }
+
+                        //Mash B to exit anything else
+                        pbf_mash_button(context, BUTTON_B, 125);
+                        context.wait_for_all_requests();
+
+                        //Press X to open Ball menu
+                        pbf_press_button(context, BUTTON_X, 20, 100);
+                        context.wait_for_all_requests();
+
+                        VideoSnapshot screen = env.console.video().snapshot();
+                        ball_reader = reader.read_ball(screen);
+                    }
+
+                    env.log("Selecting ball.");
                     int quantity = move_to_ball(reader, env.console, context, BALL_SELECT.slug());
                     if (quantity == 0) {
                         out_of_balls = true;
@@ -317,7 +388,9 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext&
                         env.update_stats();
                         env.console.log("Unable to read ball quantity.", COLOR_RED);
                     }
+
                     //Throw ball
+                    env.log("Throwing selected ball.");
                     pbf_mash_button(context, BUTTON_A, 150);
                     context.wait_for_all_requests();
 
