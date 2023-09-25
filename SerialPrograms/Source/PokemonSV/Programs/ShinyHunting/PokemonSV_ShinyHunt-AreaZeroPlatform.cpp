@@ -343,14 +343,14 @@ void ShinyHuntAreaZeroPlatform::run_state(SingleSwitchProgramEnvironment& env, B
             throw ResetException();
         }
 
-        m_reset_on_next_sandwich = true;
-
         //  If we're not at Zero Gate, go there now.
         if (m_current_location != Location::ZERO_GATE_FLY_SPOT){
             return_to_outside_zero_gate(info, console, context);
             m_current_location = Location::ZERO_GATE_FLY_SPOT;
             m_pending_platform_reset = false;
         }
+
+        m_reset_on_next_sandwich = true;
 
         //  If we're not saved at Zero Gate, do it now.
         if (m_saved_location != Location::ZERO_GATE_FLY_SPOT){
