@@ -162,6 +162,40 @@ void StatsReset::enter_battle(SingleSwitchProgramEnvironment& env, BotBaseContex
     }
 }
 
+void StatsReset::open_ball_menu(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
+    StatsReset_Descriptor::Stats& stats = env.current_stats<StatsReset_Descriptor::Stats>();
+
+    BattleBallReader reader(env.console, LANGUAGE);
+    std::string ball_reader = "";
+    WallClock start = current_time();
+
+    env.log("Opening ball menu...");
+    while (ball_reader == "") {
+        if (current_time() - start > std::chrono::minutes(2)) {
+            env.log("Timed out trying to read ball after 2 minutes.", COLOR_RED);
+            stats.errors++;
+            env.update_stats();
+            send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, env.console,
+                "Timed out trying to read ball after 2 minutes.",
+                true
+            );
+        }
+
+        //Mash B to exit anything else
+        pbf_mash_button(context, BUTTON_B, 125);
+        context.wait_for_all_requests();
+
+        //Press X to open Ball menu
+        pbf_press_button(context, BUTTON_X, 20, 100);
+        context.wait_for_all_requests();
+
+        VideoSnapshot screen = env.console.video().snapshot();
+        ball_reader = reader.read_ball(screen);
+    }
+}
+
 //Returns target_fainted. If overworld is detected then the target fainted.
 //Otherwise if AdvanceDialog is detected the Pokemon was caught or the player lost.
 bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
@@ -206,37 +240,10 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext&
                     env.log("Quick Ball option checked. Throwing Quick Ball.");
 
                     BattleBallReader reader(env.console, LANGUAGE);
-                    std::string ball_reader = "";
-                    WallClock start = current_time();
+                    open_ball_menu(env, context);
 
-                    env.log("Opening ball menu...");
-                    while (ball_reader == "") {
-                        if (current_time() - start > std::chrono::minutes(2)) {
-                            env.log("Timed out trying to read ball after 2 minutes.", COLOR_RED);
-                            stats.errors++;
-                            env.update_stats();
-                            send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
-                            throw OperationFailedException(
-                                ErrorReport::SEND_ERROR_REPORT, env.console,
-                                "Timed out trying to read ball after 2 minutes.",
-                                true
-                            );
-                        }
-
-                        //Mash B to exit anything else
-                        pbf_mash_button(context, BUTTON_B, 125);
-                        context.wait_for_all_requests();
-
-                        //Press X to open Ball menu
-                        pbf_press_button(context, BUTTON_X, 20, 100);
-                        context.wait_for_all_requests();
-
-                        VideoSnapshot screen = env.console.video().snapshot();
-                        ball_reader = reader.read_ball(screen);
-                    }
-
-                    env.log("Selecting ball.");
-                    int quantity = move_to_ball(reader, env.console, context, BALL_SELECT.slug());
+                    env.log("Selecting Quick Ball.");
+                    int quantity = move_to_ball(reader, env.console, context, "quick-ball");
                     if (quantity == 0) {
                         //Stop so user can check they have quick balls.
                         env.console.log("Unable to find Quick Ball on turn 1.");
@@ -255,6 +262,7 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext&
                     }
 
                     //Throw ball
+                    env.log("Throwing Quick Ball.");
                     pbf_mash_button(context, BUTTON_A, 150);
                     context.wait_for_all_requests();
 
@@ -343,34 +351,7 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext&
                 }
                 else {
                     BattleBallReader reader(env.console, LANGUAGE);
-                    std::string ball_reader = "";
-                    WallClock start = current_time();
-
-                    env.log("Opening ball menu...");
-                    while (ball_reader == "") {
-                        if (current_time() - start > std::chrono::minutes(2)) {
-                            env.log("Timed out trying to read ball after 2 minutes.", COLOR_RED);
-                            stats.errors++;
-                            env.update_stats();
-                            send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
-                            throw OperationFailedException(
-                                ErrorReport::SEND_ERROR_REPORT, env.console,
-                                "Timed out trying to read ball after 2 minutes.",
-                                true
-                            );
-                        }
-
-                        //Mash B to exit anything else
-                        pbf_mash_button(context, BUTTON_B, 125);
-                        context.wait_for_all_requests();
-
-                        //Press X to open Ball menu
-                        pbf_press_button(context, BUTTON_X, 20, 100);
-                        context.wait_for_all_requests();
-
-                        VideoSnapshot screen = env.console.video().snapshot();
-                        ball_reader = reader.read_ball(screen);
-                    }
+                    open_ball_menu(env, context);
 
                     env.log("Selecting ball.");
                     int quantity = move_to_ball(reader, env.console, context, BALL_SELECT.slug());
