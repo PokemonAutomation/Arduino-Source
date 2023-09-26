@@ -13,6 +13,7 @@
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_NormalBattleMenus.h"
+#include "PokemonSV/Inference/Battles/PokemonSV_TeraBattleMenus.h"
 #include "PokemonSV_BasicCatcher.h"
 
 //#include <iostream>
@@ -93,6 +94,65 @@ int16_t move_to_ball(
 }
 
 
+//  Throw a ball. If error or not found, throw an exception.
+//  Returns the quantity prior to throwing the ball.
+int16_t throw_ball(
+    ConsoleHandle& console, BotBaseContext& context,
+    Language language, const std::string& ball_slug
+){
+    BattleBallReader reader(console, language, COLOR_RED);
+    size_t attempts = 0;
+    while (true){
+        context.wait_for_all_requests();
+
+        NormalBattleMenuWatcher normal_battle_menu(COLOR_GREEN);
+        MoveSelectWatcher move_select_menu(COLOR_BLUE);
+        TeraCatchWatcher tera_catch_detector(COLOR_GREEN);
+        int16_t quantity = 0;
+        int ret = run_until(
+            console, context, [&](BotBaseContext& context){
+                quantity = move_to_ball(reader, console, context, ball_slug);
+            },
+            {normal_battle_menu, tera_catch_detector}
+        );
+        switch (ret){
+        case 0:
+            console.log("Detected battle menu. Opening up ball selection...");
+            pbf_press_button(context, BUTTON_X, 20, 30);
+            break;
+        case 1:
+            console.log("Detected move select. Backing out...");
+            pbf_mash_button(context, BUTTON_B, 125);
+            break;
+        case 2:
+            console.log("Tera catch menu. Opening up ball selection...");
+            tera_catch_detector.move_to_slot(console, context, 0);
+            pbf_press_button(context, BUTTON_A, 20, 30);
+            break;
+        default:
+            if (quantity > 0){
+                console.log("Throwing ball...", COLOR_BLUE);
+                pbf_mash_button(context, BUTTON_A, 30);
+                return quantity;
+            }
+            if (quantity == 0){
+                console.log("Ball not found...", COLOR_RED);
+                //  This is dead code for now.
+                return 0;
+            }
+            if (attempts >= 3){
+                throw OperationFailedException(
+                    ErrorReport::SEND_ERROR_REPORT, console,
+                    "Unable to find desired ball after multiple attempts. Did you run out?"
+                );
+            }
+            attempts++;
+            pbf_mash_button(context, BUTTON_B, 3 * TICKS_PER_SECOND);
+        }
+    }
+}
+
+
 
 
 
@@ -122,8 +182,10 @@ CatchResults basic_catcher(
         GradientArrowWatcher add_to_party(COLOR_BLUE, GradientArrowType::RIGHT, {0.50, 0.39, 0.30, 0.10});
         AdvanceDialogWatcher dialog(COLOR_PURPLE);
         context.wait_for_all_requests();
-        int ret = wait_until(
-            console, context, std::chrono::seconds(120),
+        int ret = run_until(
+            console, context, [](BotBaseContext& context){
+                pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
+            },
             {
                 battle_menu,
                 overworld,
@@ -165,6 +227,7 @@ CatchResults basic_catcher(
             }
 
             last_move_attack = false;
+#if 0
             pbf_press_button(context, BUTTON_X, 20, 105);
             context.wait_for_all_requests();
             BattleBallReader reader(console, language, COLOR_RED);
@@ -173,6 +236,12 @@ CatchResults basic_catcher(
                 return CatchResults{CatchResult::OUT_OF_BALLS, balls_used};
             }
             pbf_mash_button(context, BUTTON_A, 30);
+#else
+            int16_t qty = throw_ball(console, context, language, ball_slug);
+            if (qty <= 0){
+                return CatchResults{CatchResult::OUT_OF_BALLS, balls_used};
+            }
+#endif
             pbf_mash_button(context, BUTTON_B, 500);
             balls_used++;
             if (on_throw_lambda){

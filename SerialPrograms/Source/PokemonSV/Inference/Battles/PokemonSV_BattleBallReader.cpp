@@ -47,7 +47,7 @@ std::string BattleBallReader::read_ball(const ImageViewRGB32& screen) const{
         );
     }
     if (name_result.results.size() != 1){
-        dump_image(m_console, ProgramInfo(), "BattleBallReader-Name", screen);
+//        dump_image(m_console, ProgramInfo(), "BattleBallReader-Name", screen);
         return "";
     }
 

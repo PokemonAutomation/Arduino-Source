@@ -26,6 +26,14 @@ int16_t move_to_ball(
     const std::string& ball_slug
 );
 
+//  Throw a ball. If error, throw an exception.
+//  Returns the quantity prior to throwing the ball.
+//  If ball is not found, returns zero.
+int16_t throw_ball(
+    ConsoleHandle& console, BotBaseContext& context,
+    Language language, const std::string& ball_slug
+);
+
 
 
 struct CatchResults{
