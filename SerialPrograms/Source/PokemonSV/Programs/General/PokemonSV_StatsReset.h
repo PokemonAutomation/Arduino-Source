@@ -12,6 +12,7 @@
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "PokemonSwSh/Options/PokemonSwSh_BallSelectOption.h"
+#include "PokemonSV/Options/PokemonSV_BattleMoveTable.h"
 #include "Pokemon/Options/Pokemon_StatsResetFilter.h"
 
 namespace PokemonAutomation {
@@ -42,6 +43,8 @@ private:
 
     OCR::LanguageOCROption LANGUAGE;
     PokemonSwSh::PokemonBallSelectOption BALL_SELECT;
+    BooleanCheckBoxOption QUICKBALL;
+    BattleMoveTable BATTLE_MOVES;
     Pokemon::StatsResetFilterTable FILTERS;
 
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
@@ -49,6 +52,7 @@ private:
     EventNotificationsOption NOTIFICATIONS;
 
     void enter_battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    void open_ball_menu(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
     bool run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
     bool check_stats(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 };

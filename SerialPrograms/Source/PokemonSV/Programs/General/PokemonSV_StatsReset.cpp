@@ -91,6 +91,11 @@ StatsReset::StatsReset()
         LockWhileRunning::UNLOCKED,
         "poke-ball"
     )
+    , QUICKBALL(
+        "<b>Throw Quick Ball:</b><br>Use a Quick Ball on the first turn. If there are moves in the Move Table, they will run <i>after</i> the Quick Ball is thrown.",
+        LockWhileRunning::LOCKED,
+        false
+    )
     , GO_HOME_WHEN_DONE(false)
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
@@ -102,6 +107,8 @@ StatsReset::StatsReset()
     PA_ADD_OPTION(TARGET);
     PA_ADD_OPTION(LANGUAGE); //This is required
     PA_ADD_OPTION(BALL_SELECT);
+    PA_ADD_OPTION(QUICKBALL);
+    PA_ADD_OPTION(BATTLE_MOVES);
     PA_ADD_OPTION(FILTERS); //Note: None of these can be shiny, and the quartet will have some perfect IVs.
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
@@ -155,6 +162,40 @@ void StatsReset::enter_battle(SingleSwitchProgramEnvironment& env, BotBaseContex
     }
 }
 
+void StatsReset::open_ball_menu(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
+    StatsReset_Descriptor::Stats& stats = env.current_stats<StatsReset_Descriptor::Stats>();
+
+    BattleBallReader reader(env.console, LANGUAGE);
+    std::string ball_reader = "";
+    WallClock start = current_time();
+
+    env.log("Opening ball menu...");
+    while (ball_reader == "") {
+        if (current_time() - start > std::chrono::minutes(2)) {
+            env.log("Timed out trying to read ball after 2 minutes.", COLOR_RED);
+            stats.errors++;
+            env.update_stats();
+            send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, env.console,
+                "Timed out trying to read ball after 2 minutes.",
+                true
+            );
+        }
+
+        //Mash B to exit anything else
+        pbf_mash_button(context, BUTTON_B, 125);
+        context.wait_for_all_requests();
+
+        //Press X to open Ball menu
+        pbf_press_button(context, BUTTON_X, 20, 100);
+        context.wait_for_all_requests();
+
+        VideoSnapshot screen = env.console.video().snapshot();
+        ball_reader = reader.read_ball(screen);
+    }
+}
+
 //Returns target_fainted. If overworld is detected then the target fainted.
 //Otherwise if AdvanceDialog is detected the Pokemon was caught or the player lost.
 bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
@@ -165,8 +206,12 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext&
 
     uint8_t switch_party_slot = 1;
 
+    size_t table_turn = 0;
+    std::vector<std::unique_ptr<BattleMoveTableRow>> move_table = BATTLE_MOVES.copy_snapshot();
+
     bool target_fainted = false;
     bool out_of_balls = false;
+    bool quickball_thrown = false;
 
     int ret = run_until(
         env.console, context,
@@ -190,52 +235,170 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext&
                     );
                 }
 
-                //Navigate to correct ball and repeatedly throw it until caught
-                pbf_press_button(context, BUTTON_X, 20, 100);
-                context.wait_for_all_requests();
+                //Quick ball occurs before anything else in battle, so we can throw the ball without worrying about bounce/fainted/etc.
+                if (QUICKBALL && !quickball_thrown) {
+                    env.log("Quick Ball option checked. Throwing Quick Ball.");
 
-                BattleBallReader reader(env.console, LANGUAGE);
-                int quantity = move_to_ball(reader, env.console, context, BALL_SELECT.slug());
-                if (quantity == 0) {
-                    out_of_balls = true;
-                    env.console.log("Unable to find appropriate ball/out of balls.");
-                    send_program_status_notification(
-                        env, NOTIFICATION_STATUS_UPDATE,
-                        "Unable to find appropriate ball/out of balls."
-                    );
-                    break;
-                }
-                if (quantity < 0) {
-                    stats.errors++;
-                    env.update_stats();
-                    env.console.log("Unable to read ball quantity.", COLOR_RED);
-                }
-                //Throw ball
-                pbf_mash_button(context, BUTTON_A, 150);
-                context.wait_for_all_requests();
+                    BattleBallReader reader(env.console, LANGUAGE);
+                    open_ball_menu(env, context);
 
-                //Check for battle menu
-                //If found after a second then assume Chi-Yu used Bounce and is invulnerable
-                //Use first attack this turn!
-                NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
-                int ret = wait_until(
-                    env.console, context,
-                    std::chrono::seconds(4),
-                    { battle_menu }
-                );
-                if (ret == 0) {
-                    env.console.log("Battle menu detected early. Using first attack.");
-                    pbf_mash_button(context, BUTTON_A, 250);
+                    env.log("Selecting Quick Ball.");
+                    int quantity = move_to_ball(reader, env.console, context, "quick-ball");
+                    if (quantity == 0) {
+                        //Stop so user can check they have quick balls.
+                        env.console.log("Unable to find Quick Ball on turn 1.");
+                        stats.errors++;
+                        env.update_stats();
+                        throw OperationFailedException(
+                            ErrorReport::SEND_ERROR_REPORT, env.console,
+                            "Unable to find Quick Ball on turn 1.",
+                            true
+                        );
+                    }
+                    if (quantity < 0) {
+                        stats.errors++;
+                        env.update_stats();
+                        env.console.log("Unable to read ball quantity.", COLOR_RED);
+                    }
+
+                    //Throw ball
+                    env.log("Throwing Quick Ball.");
+                    pbf_mash_button(context, BUTTON_A, 150);
                     context.wait_for_all_requests();
-                }
-                else {
-                    //Wild pokemon's turn/wait for catch animation
+
+                    quickball_thrown = true;
+
                     stats.balls++;
                     env.update_stats();
                     pbf_mash_button(context, BUTTON_B, 900);
                     context.wait_for_all_requests();
                 }
+                else if (switch_party_slot == 1 && !move_table.empty() && table_turn < move_table.size()) {
+                    //Lead pokemon not fainted and table has not been completed
+                    //Run through moves in table
+                    env.log("Lead has not fainted, using move.");
 
+                    MoveSelectWatcher move_watcher(COLOR_BLUE);
+                    MoveSelectDetector move_select(COLOR_BLUE);
+                    BattleMoveType move = move_table.at(table_turn)->type;
+                    uint8_t move_slot = 0;
+
+                    //Leaving room to expand to other battle actions later
+                    switch (move) {
+                    case BattleMoveType::Move1:
+                        move_slot = 0;
+                        break;
+                    case BattleMoveType::Move2:
+                        move_slot = 1;
+                        break;
+                    case BattleMoveType::Move3:
+                        move_slot = 2;
+                        break;
+                    case BattleMoveType::Move4:
+                        move_slot = 3;
+                        break;
+                    }
+
+                    //Select and use move
+                    int ret_move_select = run_until(
+                    env.console, context,
+                    [&](BotBaseContext& context) {
+                        pbf_press_button(context, BUTTON_A, 10, 50);
+                        pbf_wait(context, 100);
+                        context.wait_for_all_requests();
+                    },
+                    { move_watcher }
+                    );
+                    if (ret_move_select != 0) {
+                        env.log("Could not find move select.");
+                    }
+                    else {
+                        env.log("Move select found!");
+                    }
+
+                    context.wait_for_all_requests();
+                    move_select.move_to_slot(env.console, context, move_slot);
+                    pbf_mash_button(context, BUTTON_A, 150);
+                    pbf_wait(context, 100);
+                    context.wait_for_all_requests();
+                    table_turn++;
+
+                    //Check for battle menu
+                    //If found after a second, assume out of PP and stop as this is a setup issue
+                    //None of the target pokemon for this program have disable, taunt, etc.
+                    NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
+                    int ret = wait_until(
+                        env.console, context,
+                        std::chrono::seconds(4),
+                        { battle_menu }
+                    );
+                    if (ret == 0) {
+                        env.console.log("Battle menu detected early. Out of PP, please check your setup.");
+                        stats.errors++;
+                        env.update_stats();
+                        throw OperationFailedException(
+                            ErrorReport::SEND_ERROR_REPORT, env.console,
+                            "Battle menu detected early. Out of PP, please check your setup.",
+                            true
+                        );
+                    }
+                    else {
+                        env.log("Move successfully used.");
+                        if (table_turn == move_table.size()) {
+                            env.log("End of table reached. Switch to throwing balls.");
+                        }
+                    }
+                }
+                else {
+                    BattleBallReader reader(env.console, LANGUAGE);
+                    open_ball_menu(env, context);
+
+                    env.log("Selecting ball.");
+                    int quantity = move_to_ball(reader, env.console, context, BALL_SELECT.slug());
+                    if (quantity == 0) {
+                        out_of_balls = true;
+                        env.console.log("Unable to find appropriate ball/out of balls.");
+                        send_program_status_notification(
+                            env, NOTIFICATION_STATUS_UPDATE,
+                            "Unable to find appropriate ball/out of balls."
+                        );
+                        break;
+                    }
+                    if (quantity < 0) {
+                        stats.errors++;
+                        env.update_stats();
+                        env.console.log("Unable to read ball quantity.", COLOR_RED);
+                    }
+
+                    //Throw ball
+                    env.log("Throwing selected ball.");
+                    pbf_mash_button(context, BUTTON_A, 150);
+                    context.wait_for_all_requests();
+
+                    //Check for battle menu
+                    //If found after a second then assume Chi-Yu used Bounce and is invulnerable
+                    //Use first attack this turn!
+                    NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
+                    int ret = wait_until(
+                        env.console, context,
+                        std::chrono::seconds(4),
+                        { battle_menu }
+                    );
+                    if (ret == 0) {
+                        env.console.log("Battle menu detected early. Using first attack.");
+                        pbf_mash_button(context, BUTTON_A, 250);
+                        context.wait_for_all_requests();
+                    }
+                    else {
+                        //Wild pokemon's turn/wait for catch animation
+                        stats.balls++;
+                        env.update_stats();
+                        pbf_mash_button(context, BUTTON_B, 900);
+                        context.wait_for_all_requests();
+                    }
+                }
+
+                NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
                 OverworldWatcher overworld(COLOR_BLUE);
                 SwapMenuWatcher fainted(COLOR_YELLOW);
                 int ret2 = wait_until(
