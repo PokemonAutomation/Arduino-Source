@@ -674,6 +674,7 @@ SOURCES += \
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraTypeReader.cpp \
     Source/PokemonSV/Options/PokemonSV_AuctionItemSelectOption.cpp \
     Source/PokemonSV/Options/PokemonSV_AuctionItemTable.cpp \
+    Source/PokemonSV/Options/PokemonSV_BattleMoveTable.cpp \
     Source/PokemonSV/Options/PokemonSV_EggPowerSandwichOption.cpp \
     Source/PokemonSV/Options/PokemonSV_EncounterActionsTable.cpp \
     Source/PokemonSV/Options/PokemonSV_PlayerList.cpp \
@@ -1721,6 +1722,7 @@ HEADERS += \
     Source/PokemonSV/Options/PokemonSV_AuctionItemSelectOption.h \
     Source/PokemonSV/Options/PokemonSV_AuctionItemTable.h \
     Source/PokemonSV/Options/PokemonSV_AutoHostOptions.h \
+    Source/PokemonSV/Options/PokemonSV_BattleMoveTable.h \
     Source/PokemonSV/Options/PokemonSV_EggPowerSandwichOption.h \
     Source/PokemonSV/Options/PokemonSV_EncounterActionsTable.h \
     Source/PokemonSV/Options/PokemonSV_EncounterBotCommon.h \
