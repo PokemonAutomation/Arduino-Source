@@ -52,7 +52,7 @@ int move_to_ball(
         }
         if (current_ball == first_ball){
             repeat_counter++;
-            if (repeat_counter == 3){
+            if (repeat_counter == 10){
                 return -1;
             }
         }
@@ -113,7 +113,7 @@ int16_t throw_ball(
             console, context, [&](BotBaseContext& context){
                 quantity = move_to_ball(reader, console, context, ball_slug);
             },
-            {normal_battle_menu, tera_catch_detector}
+            {normal_battle_menu, move_select_menu, tera_catch_detector}
         );
         switch (ret){
         case 0:
