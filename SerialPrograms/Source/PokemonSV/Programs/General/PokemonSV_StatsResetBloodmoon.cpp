@@ -355,6 +355,9 @@ void StatsResetBloodmoon::program(SingleSwitchProgramEnvironment& env, BotBaseCo
     * Tested using Walking Wake w/Hydro Stream, two turn kill.
     */
 
+    //  Connect the controller.
+    pbf_press_button(context, BUTTON_L, 10, 10);
+
     bool stats_matched = false;
     while (!stats_matched){
         enter_battle(env, context);

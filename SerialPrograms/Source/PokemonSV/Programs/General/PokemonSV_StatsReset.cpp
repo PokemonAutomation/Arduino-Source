@@ -537,6 +537,9 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
     assert_16_9_720p_min(env.logger(), env.console);
     StatsReset_Descriptor::Stats& stats = env.current_stats<StatsReset_Descriptor::Stats>();
 
+    //  Connect the controller.
+    pbf_press_button(context, BUTTON_L, 10, 10);
+
     //Autosave must be off, settings like Tera farmer.
     bool stats_matched = false;
     while (!stats_matched){
