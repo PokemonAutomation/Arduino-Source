@@ -108,6 +108,7 @@
 #include "Pokemon/Resources/Pokemon_PokemonSlugs.h"
 #include "PokemonSV/Inference/PokemonSV_BagDetector.h"
 #include <filesystem>
+#include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_Lobby.h"
 
 
 
@@ -233,6 +234,14 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     [[maybe_unused]] VideoOverlay& overlay = env.consoles[0];
     BotBaseContext context(scope, console.botbase());
     VideoOverlaySet overlays(overlay);
+
+
+    PokemonSwSh::MaxLairInternal::LobbyJoinedDetector detector(2, false);
+
+    auto snapshot = console.video().snapshot();
+//    detector.VisualInferenceCallback::process_frame(snapshot);
+    detector.joined(snapshot, snapshot.timestamp);
+
 
 //    size_t errors = 0;
 //    attach_item_from_bag(env.program_info(), console, context, errors);

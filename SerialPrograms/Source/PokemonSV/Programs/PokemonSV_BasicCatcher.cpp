@@ -182,10 +182,8 @@ CatchResults basic_catcher(
         GradientArrowWatcher add_to_party(COLOR_BLUE, GradientArrowType::RIGHT, {0.50, 0.39, 0.30, 0.10});
         AdvanceDialogWatcher dialog(COLOR_PURPLE);
         context.wait_for_all_requests();
-        int ret = run_until(
-            console, context, [](BotBaseContext& context){
-                pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
-            },
+        int ret = wait_until(
+            console, context, std::chrono::seconds(120),
             {
                 battle_menu,
                 overworld,
