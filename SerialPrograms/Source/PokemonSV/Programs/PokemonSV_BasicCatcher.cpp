@@ -225,8 +225,8 @@ CatchResults basic_catcher(
             }
 
             last_move_attack = false;
-#if 0
             pbf_press_button(context, BUTTON_X, 20, 105);
+#if 0
             context.wait_for_all_requests();
             BattleBallReader reader(console, language, COLOR_RED);
             int16_t qty = move_to_ball(reader, console, context, ball_slug);
