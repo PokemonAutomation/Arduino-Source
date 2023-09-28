@@ -71,8 +71,8 @@ struct AutoHost_Descriptor::Stats : public StatsTracker{
         m_display_order.emplace_back("Total Raiders");
         m_display_order.emplace_back("Wins");
         m_display_order.emplace_back("Losses");
-        m_display_order.emplace_back("Banned", true);
-        m_display_order.emplace_back("Errors", true);
+        m_display_order.emplace_back("Banned", HIDDEN_IF_ZERO);
+        m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
     }
     std::atomic<uint64_t>& m_raids;
     std::atomic<uint64_t>& m_empty;

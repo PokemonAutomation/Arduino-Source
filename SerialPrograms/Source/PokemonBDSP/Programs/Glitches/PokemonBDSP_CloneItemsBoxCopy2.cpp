@@ -42,7 +42,7 @@ struct CloneItemsBoxCopy2_Descriptor::Stats : public StatsTracker{
 //        , m_resets(m_stats["Resets"])
     {
         m_display_order.emplace_back("Boxes Cloned");
-        m_display_order.emplace_back("Errors", true);
+        m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
 //        m_display_order.emplace_back("Resets");
     }
     std::atomic<uint64_t>& m_boxes;

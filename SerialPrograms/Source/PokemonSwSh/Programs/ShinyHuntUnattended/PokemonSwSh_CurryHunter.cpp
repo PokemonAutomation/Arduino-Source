@@ -39,7 +39,7 @@ struct CurryHunter_Descriptor::Stats : public ShinyHuntTracker{
         , m_attempts(m_stats["Attempts"])
     {
         for (auto& item : m_display_order){
-            item.omit_if_zero = true;
+            item.display_mode = HIDDEN_IF_ZERO;
         }
         m_display_order.insert(m_display_order.begin(), Stat("Attempts"));
     }

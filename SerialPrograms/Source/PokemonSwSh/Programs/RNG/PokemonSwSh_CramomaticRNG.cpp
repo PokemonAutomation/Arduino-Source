@@ -65,11 +65,11 @@ public:
     {
         m_display_order.emplace_back("Iterations");
         m_display_order.emplace_back("Seed Reads");
-        m_display_order.emplace_back("Errors", true);
+        m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
         m_display_order.emplace_back("Balls");
         m_display_order.emplace_back("Apriballs");
         m_display_order.emplace_back("Safari/Sport Balls");
-        m_display_order.emplace_back("Bonus", true);
+        m_display_order.emplace_back("Bonus", HIDDEN_IF_ZERO);
     }
 
 public:

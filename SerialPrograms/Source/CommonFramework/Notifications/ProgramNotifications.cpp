@@ -74,7 +74,7 @@ std::pair<std::string, std::string> make_session_field(
     }
     if (current_stats){
         text += "\n";
-        text += current_stats->to_str();
+        text += current_stats->to_str(StatsTracker::DISPLAY_ON_SCREEN);
         if (!current_stats_addendum.empty()){
             text += "\n";
             text += current_stats_addendum;
@@ -274,7 +274,10 @@ void send_program_notification_with_file(
 #endif
     const StatsTracker* historical_stats = env.historical_stats();
     if (GlobalSettings::instance().ALL_STATS && historical_stats){
-        messages.emplace_back("Historical Stats:", env.historical_stats()->to_str());
+        messages.emplace_back(
+            "Historical Stats:",
+            env.historical_stats()->to_str(StatsTracker::DISPLAY_ON_SCREEN)
+        );
     }
     send_raw_notification(
         env.logger(),
@@ -318,7 +321,10 @@ void send_program_notification(
 #endif
     const StatsTracker* historical_stats = env.historical_stats();
     if (GlobalSettings::instance().ALL_STATS && historical_stats){
-        messages.emplace_back("Historical Stats:", env.historical_stats()->to_str());
+        messages.emplace_back(
+            "Historical Stats:",
+            env.historical_stats()->to_str(StatsTracker::DISPLAY_ON_SCREEN)
+        );
     }
     send_raw_notification(
         env.logger(),

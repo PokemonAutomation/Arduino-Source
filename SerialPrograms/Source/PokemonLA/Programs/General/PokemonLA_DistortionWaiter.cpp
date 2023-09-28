@@ -43,8 +43,8 @@ public:
     {
         m_display_order.emplace_back("Minutes Waited");
         m_display_order.emplace_back("Distortions");
-        m_display_order.emplace_back("Other Notifications", true);
-        m_display_order.emplace_back("Errors", true);
+        m_display_order.emplace_back("Other Notifications", HIDDEN_IF_ZERO);
+        m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
     }
 
     std::atomic<uint64_t>& minutes_waited;

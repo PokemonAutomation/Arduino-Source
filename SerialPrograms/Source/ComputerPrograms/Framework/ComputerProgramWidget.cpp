@@ -116,8 +116,8 @@ void ComputerProgramWidget::state_change(ProgramState state){
 void ComputerProgramWidget::stats_update(const StatsTracker* current_stats, const StatsTracker* historical_stats){
     QMetaObject::invokeMethod(this, [this, current_stats, historical_stats]{
         m_stats_bar->set_stats(
-            current_stats == nullptr ? "" : current_stats->to_str(),
-            historical_stats == nullptr ? "" : historical_stats->to_str()
+            current_stats == nullptr ? "" : current_stats->to_str(StatsTracker::DISPLAY_ON_SCREEN),
+            historical_stats == nullptr ? "" : historical_stats->to_str(StatsTracker::DISPLAY_ON_SCREEN)
         );
     });
 }

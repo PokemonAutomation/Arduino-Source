@@ -68,9 +68,9 @@ struct TeraSelfFarmer_Descriptor::Stats : public StatsTracker{
         m_display_order.emplace_back("Wins");
         m_display_order.emplace_back("Losses");
         m_display_order.emplace_back("Skipped");
-        m_display_order.emplace_back("Errors", true);
-        m_display_order.emplace_back("Caught", true);
-        m_display_order.emplace_back("Shinies", true);
+        m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
+        m_display_order.emplace_back("Caught", HIDDEN_IF_ZERO);
+        m_display_order.emplace_back("Shinies", HIDDEN_IF_ZERO);
     }
     std::atomic<uint64_t>& m_skips;
     std::atomic<uint64_t>& m_raids;

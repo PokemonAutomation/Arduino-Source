@@ -41,7 +41,7 @@ void send_status_notification(
         embeds.emplace_back("Last Boss:", std::move(str));
     }
     {
-        std::string str = runtime.path_stats.to_str();
+        std::string str = runtime.path_stats.to_str(StatsTracker::DISPLAY_ON_SCREEN);
         status_str += "Current Path: " + str + "\n";
         embeds.emplace_back("Current Path:", std::move(str));
     }
@@ -111,7 +111,7 @@ void send_raid_notification(
     }
 
     if (path_stats.runs() > 0){
-        embeds.emplace_back("Current Path:", path_stats.to_str());
+        embeds.emplace_back("Current Path:", path_stats.to_str(StatsTracker::DISPLAY_ON_SCREEN));
     }
 
     send_program_notification(
@@ -173,7 +173,7 @@ void send_shiny_notification(
         embeds.emplace_back(STRING_POKEMON + ":", std::move(str));
     }
     if (path_stats.runs() > 0){
-        embeds.emplace_back("Current Path:", path_stats.to_str());
+        embeds.emplace_back("Current Path:", path_stats.to_str(StatsTracker::DISPLAY_ON_SCREEN));
     }
 
     send_program_notification(

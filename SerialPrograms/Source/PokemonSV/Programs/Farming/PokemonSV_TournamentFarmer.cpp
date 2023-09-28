@@ -59,7 +59,7 @@ struct TournamentFarmer_Descriptor::Stats : public StatsTracker {
         m_display_order.emplace_back("Losses");
         m_display_order.emplace_back("Money made");
         m_display_order.emplace_back("Items matched");
-        m_display_order.emplace_back("Errors", true);
+        m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
     }
     std::atomic<uint64_t>& tournaments;
     std::atomic<uint64_t>& battles;

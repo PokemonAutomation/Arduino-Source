@@ -56,8 +56,8 @@ public:
     {
         m_display_order.emplace_back("Attempts");
         m_display_order.emplace_back("Trees");
-        m_display_order.emplace_back("Errors", true);
-        m_display_order.emplace_back("Blackouts", true);
+        m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
+        m_display_order.emplace_back("Blackouts", HIDDEN_IF_ZERO);
         m_display_order.emplace_back("Found");
         m_display_order.emplace_back("Enroute Shinies");
         m_aliases["Shinies"] = "Enroute Shinies";

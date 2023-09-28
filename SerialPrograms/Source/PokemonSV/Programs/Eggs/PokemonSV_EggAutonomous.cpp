@@ -62,7 +62,7 @@ struct EggAutonomous_Descriptor::Stats : public StatsTracker{
         m_display_order.emplace_back("Hatched");
         m_display_order.emplace_back("Shinies");
         m_display_order.emplace_back("Kept");
-        m_display_order.emplace_back("Errors", true);
+        m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
 
         m_aliases.emplace(STRING_POKEMON + " Kept", "Kept");
     }

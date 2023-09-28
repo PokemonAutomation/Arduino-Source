@@ -41,7 +41,7 @@ struct EggHatcher_Descriptor::Stats : public StatsTracker{
         , m_errors(m_stats["Errors"])
     {
         m_display_order.emplace_back("Hatched");
-        m_display_order.emplace_back("Errors", true);
+        m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
     }
     std::atomic<uint64_t>& m_hatched;
     std::atomic<uint64_t>& m_errors;

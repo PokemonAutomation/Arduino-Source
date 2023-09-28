@@ -54,7 +54,7 @@ struct StatsReset_Descriptor::Stats : public StatsTracker {
         m_display_order.emplace_back("Balls Thrown");
         m_display_order.emplace_back("Catches");
         m_display_order.emplace_back("Matches");
-        m_display_order.emplace_back("Errors", true);
+        m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
     }
     std::atomic<uint64_t>& resets;
     std::atomic<uint64_t>& balls;

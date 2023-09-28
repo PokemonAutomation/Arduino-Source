@@ -51,7 +51,7 @@ struct MassAttachItems_Descriptor::Stats : public StatsTracker{
 //        m_display_order.emplace_back("Replaced");
         m_display_order.emplace_back("Empty Slots");
         m_display_order.emplace_back("Eggs");
-        m_display_order.emplace_back("Errors", true);
+        m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
     }
     std::atomic<uint64_t>& m_boxes;
     std::atomic<uint64_t>& m_attached;

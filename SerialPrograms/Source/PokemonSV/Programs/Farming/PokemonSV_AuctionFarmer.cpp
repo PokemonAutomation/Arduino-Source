@@ -63,7 +63,7 @@ struct AuctionFarmer_Descriptor::Stats : public StatsTracker {
         m_display_order.emplace_back("Resets");
         m_display_order.emplace_back("Auctions");
         m_display_order.emplace_back("Spent Money");
-        m_display_order.emplace_back("Errors", true);
+        m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
     }
     std::atomic<uint64_t>& m_resets;
     std::atomic<uint64_t>& m_auctions;

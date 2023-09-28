@@ -45,7 +45,7 @@ struct MoneyFarmerRoute212_Descriptor::Stats : public StatsTracker{
         , m_both(m_stats["Both"])
     {
         m_display_order.emplace_back("Searches");
-        m_display_order.emplace_back("Errors", true);
+        m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
         m_display_order.emplace_back("No React");
         m_display_order.emplace_back("Man Only");
         m_display_order.emplace_back("Woman Only");

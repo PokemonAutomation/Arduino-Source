@@ -25,11 +25,11 @@ struct Stats : public StatsTracker{
         , m_shiny_legendary(m_stats["Shiny Legendary"])
     {
         m_display_order.emplace_back("Runs");
-        m_display_order.emplace_back("Errors", true);
+        m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
         m_display_order.emplace_back("Wins");
         m_display_order.emplace_back("Catches");
         m_display_order.emplace_back("Shinies");
-        m_display_order.emplace_back("Shiny Legendary", true);
+        m_display_order.emplace_back("Shiny Legendary", HIDDEN_IF_ZERO);
     }
 
     void add_run(size_t catches){

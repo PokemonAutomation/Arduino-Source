@@ -65,7 +65,7 @@ struct ShinyHuntAreaZeroPlatform_Descriptor::Stats : public LetsGoEncounterBotSt
         m_display_order.insert(m_display_order.begin() + 2, {"Sandwiches", HIDDEN_IF_ZERO});
         m_display_order.insert(m_display_order.begin() + 3, {"Auto Heals", HIDDEN_IF_ZERO});
         m_display_order.insert(m_display_order.begin() + 4, {"Platform Resets", HIDDEN_IF_ZERO});
-        m_display_order.insert(m_display_order.begin() + 5, {"Game Resets", HIDDEN_IF_ZERO});
+        m_display_order.insert(m_display_order.begin() + 5, {"Game Resets", ALWAYS_HIDDEN});
         m_display_order.insert(m_display_order.begin() + 6, {"Errors", HIDDEN_IF_ZERO});
     }
     std::atomic<uint64_t>& m_sandwiches;

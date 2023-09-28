@@ -57,14 +57,14 @@ const std::string& ProgramSession::identifier() const{
 std::string ProgramSession::current_stats() const{
     std::lock_guard<std::mutex> lg(m_lock);
     if (m_current_stats){
-        return m_current_stats->to_str();
+        return m_current_stats->to_str(StatsTracker::DISPLAY_ON_SCREEN);
     }
     return "";
 }
 std::string ProgramSession::historical_stats() const{
     std::lock_guard<std::mutex> lg(m_lock);
     if (m_historical_stats){
-        return m_historical_stats->to_str();
+        return m_historical_stats->to_str(StatsTracker::DISPLAY_ON_SCREEN);
     }
     return "";
 }

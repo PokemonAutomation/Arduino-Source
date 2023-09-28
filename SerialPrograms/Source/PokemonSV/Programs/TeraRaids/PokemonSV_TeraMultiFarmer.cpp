@@ -124,13 +124,13 @@ struct TeraMultiFarmer_Descriptor::Stats : public StatsTracker{
         , m_errors(m_stats["Errors"])
     {
         m_display_order.emplace_back("Raids");
-        m_display_order.emplace_back("Empty Raids", true);
-        m_display_order.emplace_back("Full Raids", true);
-        m_display_order.emplace_back("Total Joiners", true);
+        m_display_order.emplace_back("Empty Raids", HIDDEN_IF_ZERO);
+        m_display_order.emplace_back("Full Raids", HIDDEN_IF_ZERO);
+        m_display_order.emplace_back("Total Joiners", HIDDEN_IF_ZERO);
         m_display_order.emplace_back("Wins");
         m_display_order.emplace_back("Losses");
-        m_display_order.emplace_back("Banned", true);
-        m_display_order.emplace_back("Errors", true);
+        m_display_order.emplace_back("Banned", HIDDEN_IF_ZERO);
+        m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
     }
     std::atomic<uint64_t>& m_raids;
     std::atomic<uint64_t>& m_empty;

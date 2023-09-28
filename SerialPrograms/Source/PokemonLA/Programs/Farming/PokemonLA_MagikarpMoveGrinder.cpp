@@ -47,7 +47,7 @@ public:
     {
         m_display_order.emplace_back("Magikarp");
         m_display_order.emplace_back("Move Attempts");
-        m_display_order.emplace_back("Errors", true);
+        m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
     }
 
     std::atomic<uint64_t>& magikarp;

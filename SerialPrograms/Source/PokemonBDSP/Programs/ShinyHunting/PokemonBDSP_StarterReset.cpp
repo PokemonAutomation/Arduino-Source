@@ -42,7 +42,7 @@ struct StarterReset_Descriptor::Stats : public PokemonSwSh::ShinyHuntTracker{
         : ShinyHuntTracker(false)
         , m_shiny_starly(m_stats["Shiny Starly"])
     {
-        m_display_order.emplace_back("Shiny Starly", true);
+        m_display_order.emplace_back("Shiny Starly", HIDDEN_IF_ZERO);
     }
     std::atomic<uint64_t>& m_shiny_starly;
 };

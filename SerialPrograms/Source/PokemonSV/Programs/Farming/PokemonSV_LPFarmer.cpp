@@ -44,7 +44,7 @@ struct LPFarmer_Descriptor::Stats : public StatsTracker{
         m_display_order.emplace_back("Day Skips");
         m_display_order.emplace_back("Resets");
         m_display_order.emplace_back("Fetches");
-        m_display_order.emplace_back("Errors", true);
+        m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
     }
     std::atomic<uint64_t>& m_skips;
     std::atomic<uint64_t>& m_resets;
