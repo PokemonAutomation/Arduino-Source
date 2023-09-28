@@ -8,6 +8,10 @@
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CameraImplementations.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 #if QT_VERSION_MAJOR == 5
 #include "VideoToolsQt5.h"
 #include "CameraWidgetQt5.h"
@@ -105,7 +109,10 @@ VideoBackendOption::VideoBackendOption()
 std::vector<CameraInfo> get_all_cameras(){
     size_t index = GlobalSettings::instance().VIDEO_BACKEND.current_value();
     const CameraBackend& backend = *CameraBackends::instance().m_backends[index].backend;
-    return backend.get_all_cameras();
+//    cout << "Querying camera list..." << endl;
+    std::vector<CameraInfo> ret = backend.get_all_cameras();
+//    cout << "Done querying camera list..." << endl;
+    return ret;
 }
 std::string get_camera_name(const CameraInfo& info){
     size_t index = GlobalSettings::instance().VIDEO_BACKEND.current_value();
