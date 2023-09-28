@@ -13,6 +13,7 @@
 #include "CommonFramework/NewVersionCheck.h"
 #include "CommonFramework/Panels/PanelTools.h"
 #include "CommonFramework/Panels/UI/PanelElements.h"
+#include "CommonFramework/VideoPipeline/Backends/CameraImplementations.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgramOption.h"
 #include "NintendoSwitch_SingleSwitchProgramWidget.h"
@@ -68,7 +69,12 @@ SingleSwitchProgramWidget2::SingleSwitchProgramWidget2(
         QVBoxLayout* scroll_layout = new QVBoxLayout(scroll_inner);
         scroll_layout->setAlignment(Qt::AlignTop);
 
-        m_system = new SwitchSystemWidget(*this, m_session.system(), m_session.instance_id());
+        m_system = new SwitchSystemWidget(
+            *this,
+            m_session.system(),
+            m_session.instance_id(),
+            get_all_cameras()
+        );
         scroll_layout->addWidget(m_system);
 
         m_options = option.options().make_QtWidget(*this);

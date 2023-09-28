@@ -8,6 +8,7 @@
 #include <QScrollArea>
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Qt/CollapsibleGroupBox.h"
+#include "CommonFramework/VideoPipeline/Backends/CameraImplementations.h"
 #include "NintendoSwitch/Framework/UI/NintendoSwitch_SwitchSystemWidget.h"
 #include "NintendoSwitch_VirtualConsole.h"
 
@@ -76,7 +77,7 @@ void VirtualConsole_Widget::construct(){
     QVBoxLayout* scroll_layout = new QVBoxLayout(scroll_inner);
     scroll_layout->setAlignment(Qt::AlignTop);
 
-    m_switch = new SwitchSystemWidget(*this, m_session, 0);
+    m_switch = new SwitchSystemWidget(*this, m_session, 0, get_all_cameras());
     scroll_layout->addWidget(m_switch);
 }
 

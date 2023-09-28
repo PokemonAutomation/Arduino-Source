@@ -40,7 +40,8 @@ public:
     SwitchSystemWidget(
         QWidget& parent,
         SwitchSystemSession& session,
-        uint64_t program_id
+        uint64_t program_id,
+        std::vector<CameraInfo> starting_camera_list
     );
 
 public:

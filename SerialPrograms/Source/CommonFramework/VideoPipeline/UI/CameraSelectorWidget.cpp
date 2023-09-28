@@ -29,7 +29,8 @@ CameraSelectorWidget::~CameraSelectorWidget(){
 CameraSelectorWidget::CameraSelectorWidget(
     CameraSession& session,
     Logger& logger,
-    VideoDisplayWidget& holder
+    VideoDisplayWidget& holder,
+    std::vector<CameraInfo> starting_camera_list
 )
     : m_logger(logger)
     , m_session(session)
@@ -45,7 +46,6 @@ CameraSelectorWidget::CameraSelectorWidget(
 
     m_camera_box = new NoWheelComboBox(this);
     camera_row->addWidget(m_camera_box, 5);
-//    update_camera_list();
     camera_row->addSpacing(5);
 
     m_resolution_box = new NoWheelComboBox(this);
@@ -55,7 +55,7 @@ CameraSelectorWidget::CameraSelectorWidget(
     m_reset_button = new QPushButton("Reset Camera", this);
     camera_row->addWidget(m_reset_button, 1);
 
-    update_camera_list();
+    update_camera_list(std::move(starting_camera_list));
     update_resolution_list();
 
     connect(
@@ -94,10 +94,13 @@ CameraSelectorWidget::CameraSelectorWidget(
     m_session.add_listener(*this);
 }
 void CameraSelectorWidget::update_camera_list(){
+    update_camera_list(get_all_cameras());
+}
+void CameraSelectorWidget::update_camera_list(std::vector<CameraInfo> cameras){
     m_camera_box->clear();
     m_camera_box->addItem("(none)");
 
-    m_cameras = get_all_cameras();
+    m_cameras = std::move(cameras);
     CameraInfo info = m_session.current_device();
 
     size_t index = 0;
