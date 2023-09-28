@@ -103,17 +103,17 @@ VideoBackendOption::VideoBackendOption()
 
 
 std::vector<CameraInfo> get_all_cameras(){
-    size_t index = GlobalSettings::instance().VIDEO_BACKEND0.current_value();
+    size_t index = GlobalSettings::instance().VIDEO_BACKEND.current_value();
     const CameraBackend& backend = *CameraBackends::instance().m_backends[index].backend;
     return backend.get_all_cameras();
 }
 std::string get_camera_name(const CameraInfo& info){
-    size_t index = GlobalSettings::instance().VIDEO_BACKEND0.current_value();
+    size_t index = GlobalSettings::instance().VIDEO_BACKEND.current_value();
     const CameraBackend& backend = *CameraBackends::instance().m_backends[index].backend;
     return backend.get_camera_name(info);
 }
 const CameraBackend& get_camera_backend(){
-    size_t index = GlobalSettings::instance().VIDEO_BACKEND0.current_value();
+    size_t index = GlobalSettings::instance().VIDEO_BACKEND.current_value();
     return *CameraBackends::instance().m_backends[index].backend;
 }
 
