@@ -5,7 +5,7 @@
  */
 
 #include <QtGlobal>
-#include "Common/Cpp/PrettyPrint.h"
+//#include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CameraImplementations.h"
 
@@ -105,29 +105,33 @@ VideoBackendOption::VideoBackendOption()
 
 
 
-
-
-std::vector<CameraInfo> get_all_cameras(){
-    size_t index = GlobalSettings::instance().VIDEO_BACKEND.current_value();
-    const CameraBackend& backend = *CameraBackends::instance().m_backends[index].backend;
-    global_logger_tagged().log("Start loading camera list...");
-    WallClock start = current_time();
-    std::vector<CameraInfo> ret = backend.get_all_cameras();
-    WallClock end = current_time();
-    double seconds = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() / 1000.;
-    global_logger_tagged().log("Done loading camera list... " + tostr_fixed(seconds, 3) + " seconds");
-    return ret;
-}
-std::string get_camera_name(const CameraInfo& info){
-    size_t index = GlobalSettings::instance().VIDEO_BACKEND.current_value();
-    const CameraBackend& backend = *CameraBackends::instance().m_backends[index].backend;
-    return backend.get_camera_name(info);
-}
 const CameraBackend& get_camera_backend(){
     size_t index = GlobalSettings::instance().VIDEO_BACKEND.current_value();
     return *CameraBackends::instance().m_backends[index].backend;
 }
 
+
+
+std::vector<CameraInfo> get_all_cameras(){
+    const CameraBackend& backend = get_camera_backend();
+//    global_logger_tagged().log("Start loading camera list...");
+//    WallClock start = current_time();
+    std::vector<CameraInfo> ret = backend.get_all_cameras();
+//    WallClock end = current_time();
+//    double seconds = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() / 1000.;
+//    global_logger_tagged().log("Done loading camera list... " + tostr_fixed(seconds, 3) + " seconds");
+    return ret;
+}
+std::string get_camera_name(const CameraInfo& info){
+    const CameraBackend& backend = get_camera_backend();
+//    global_logger_tagged().log("Start reading camera name...");
+//    WallClock start = current_time();
+    std::string ret = backend.get_camera_name(info);
+//    WallClock end = current_time();
+//    double seconds = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() / 1000.;
+//    global_logger_tagged().log("Done reading camera name... " + tostr_fixed(seconds, 3) + " seconds");
+    return ret;
+}
 
 
 }
