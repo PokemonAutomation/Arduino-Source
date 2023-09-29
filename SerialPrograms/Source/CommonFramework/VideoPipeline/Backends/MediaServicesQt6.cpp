@@ -5,12 +5,12 @@
  */
 
 #include <QtGlobal>
-#if QT_VERSION_MAJOR == 6 && QT_VERSION_MINOR >= 5
+#if QT_VERSION_MAJOR == 6
 
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Time.h"
 #include "CommonFramework/Logging/Logger.h"
-#include "MediaServicesQt6.5.h"
+#include "MediaServicesQt6.h"
 
 namespace PokemonAutomation{
 

@@ -19,7 +19,7 @@
 //#include "Common/Cpp/Time.h"
 //#include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/VideoPipeline/CameraOption.h"
-#include "MediaServicesQt6.5.h"
+#include "MediaServicesQt6.h"
 #include "CameraWidgetQt6.5.h"
 
 //using std::cout;

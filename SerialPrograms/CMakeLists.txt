@@ -540,8 +540,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/VideoPipeline/Backends/CameraWidgetQt6.5.h
     Source/CommonFramework/VideoPipeline/Backends/CameraWidgetQt6.cpp
     Source/CommonFramework/VideoPipeline/Backends/CameraWidgetQt6.h
-    Source/CommonFramework/VideoPipeline/Backends/MediaServicesQt6.5.cpp
-    Source/CommonFramework/VideoPipeline/Backends/MediaServicesQt6.5.h
+    Source/CommonFramework/VideoPipeline/Backends/MediaServicesQt6.cpp
+    Source/CommonFramework/VideoPipeline/Backends/MediaServicesQt6.h
     Source/CommonFramework/VideoPipeline/Backends/VideoToolsQt5.cpp
     Source/CommonFramework/VideoPipeline/Backends/VideoToolsQt5.h
     Source/CommonFramework/VideoPipeline/CameraInfo.h
