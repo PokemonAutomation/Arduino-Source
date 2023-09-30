@@ -444,6 +444,7 @@ SOURCES += \
     Source/Pokemon/Pokemon_NatureChecker.cpp \
     Source/Pokemon/Pokemon_Notification.cpp \
     Source/Pokemon/Pokemon_ShinySparkleSet.cpp \
+    Source/Pokemon/Pokemon_StatsCalculation.cpp \
     Source/Pokemon/Pokemon_Strings.cpp \
     Source/Pokemon/Pokemon_Types.cpp \
     Source/Pokemon/Resources/Pokemon_BerryNames.cpp \
@@ -1489,6 +1490,7 @@ HEADERS += \
     Source/Pokemon/Pokemon_NatureChecker.h \
     Source/Pokemon/Pokemon_Notification.h \
     Source/Pokemon/Pokemon_ShinySparkleSet.h \
+    Source/Pokemon/Pokemon_StatsCalculation.h \
     Source/Pokemon/Pokemon_Strings.h \
     Source/Pokemon/Pokemon_Types.h \
     Source/Pokemon/Resources/Pokemon_BerryNames.h \

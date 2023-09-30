@@ -124,6 +124,7 @@
 #include "PokemonSV/Inference/Picnics/PokemonSV_SandwichRecipeDetector.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_BattleMenu.h"
 #include "PokemonSV/Inference/PokemonSV_PokemonSummaryReader.h"
+#include "Pokemon/Pokemon_StatsCalculation.h"
 
 #ifdef PA_ARCH_x86
 //#include "Kernels/Kernels_x64_SSE41.h"
@@ -219,6 +220,13 @@ class WatchdogTest1 : public WatchdogCallback{
 
 
 
+
+
+
+
+
+
+
 void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& scope){
     using namespace Kernels;
 //    using namespace NintendoSwitch::PokemonSwSh;
@@ -227,9 +235,26 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 //    using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
 
 
-    ImageRGB32 image("screenshot-20230912-194941389243.png");
-    NintendoSwitch::PokemonSV::PokemonSummaryDetector detector;
-    cout << detector.detect(image) << endl;
+    uint8_t low_iv;
+    uint8_t high_iv;
+
+    bool ok = calc_iv_range(
+        low_iv, high_iv,
+        false, 55, 100, 0,
+        126, NatureAdjustment::NEGATIVE
+    );
+
+    cout << "ok   = " << ok << endl;
+    cout << "low  = " << (int)low_iv << endl;
+    cout << "high = " << (int)high_iv << endl;
+
+
+
+
+
+//    ImageRGB32 image("screenshot-20230912-194941389243.png");
+//    NintendoSwitch::PokemonSV::PokemonSummaryDetector detector;
+//    cout << detector.detect(image) << endl;
 
 
 #if 0
