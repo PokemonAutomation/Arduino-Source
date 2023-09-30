@@ -80,6 +80,7 @@ void wait_for_video_code_and_join(
 //        env.log("done new frame check");
 
         if (skip_initial){
+            env.log("Waiting for next screen change...");
             skip_initial = false;
             continue;
         }
