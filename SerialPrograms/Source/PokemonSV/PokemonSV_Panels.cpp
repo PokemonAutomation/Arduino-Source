@@ -84,8 +84,9 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
 //    ret.emplace_back("---- Sandwiches ----");
     ret.emplace_back(make_single_switch_program<SandwichMaker_Descriptor, SandwichMaker>());
 
-//    ret.emplace_back("---- Boxes ----");
+    ret.emplace_back("---- Boxes ----");
     ret.emplace_back(make_single_switch_program<MassRelease_Descriptor, MassRelease>());
+    ret.emplace_back(make_single_switch_program<MassAttachItems_Descriptor, MassAttachItems>());
 
     ret.emplace_back("---- Farming ----");
     ret.emplace_back(make_single_switch_program<LPFarmer_Descriptor, LPFarmer>());
@@ -122,11 +123,12 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<RideCloner101_Descriptor, RideCloner101>());
     ret.emplace_back(make_single_switch_program<CloneItems101_Descriptor, CloneItems101>());
 
-    if (PreloadSettings::instance().DEVELOPER_MODE || IS_BETA_VERSION){
+    if (PreloadSettings::instance().DEVELOPER_MODE
+        // || IS_BETA_VERSION
+    ){
         ret.emplace_back("---- Untested/Beta/WIP ----");
     }
     if (IS_BETA_VERSION){
-        ret.emplace_back(make_single_switch_program<MassAttachItems_Descriptor, MassAttachItems>());
     }
     if (PreloadSettings::instance().DEVELOPER_MODE){
         ret.emplace_back(make_single_switch_program<ShinyHuntScatterbug_Descriptor, ShinyHuntScatterbug>());
