@@ -17,7 +17,7 @@
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Pokemon_Notification.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxEggDetector.h"
-#include "PokemonSV/Inference/Boxes/PokemonSV_IVCheckerReader.h"
+#include "PokemonSV/Inference/Boxes/PokemonSV_IvJudgeReader.h"
 //#include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSV/Programs/Boxes/PokemonSV_BoxRoutines.h"
 #include "PokemonSV/Programs/PokemonSV_SaveGame.h"
@@ -507,7 +507,7 @@ void EggAutonomous::process_one_baby(SingleSwitchProgramEnvironment& env, BotBas
     env.log("Check hatched pokemon at party slot " + std::to_string(party_row));
 
     bool found_shiny = false;
-    EggHatchAction action = EggHatchAction::Release;
+    StatsHuntAction action = StatsHuntAction::Discard;
     if (check_baby_info(env.program_info(), env.console, context, LANGUAGE, FILTERS, action)){
         found_shiny = true;
         env.console.log("Shiny found!");
@@ -538,12 +538,12 @@ void EggAutonomous::process_one_baby(SingleSwitchProgramEnvironment& env, BotBas
     };
 
     switch (action){
-        case EggHatchAction::StopProgram:
+    case StatsHuntAction::StopProgram:
             env.log("Program stop requested...");
             env.console.overlay().add_log("Request program stop", COLOR_WHITE);
             send_keep_notification();
             throw ProgramFinishedException();
-        case EggHatchAction::Keep:
+    case StatsHuntAction::Keep:
             m_in_critical_to_save_stage = true;
             env.log("Moving Pokemon to keep box...", COLOR_BLUE);
             stats.m_kept++;
@@ -565,7 +565,7 @@ void EggAutonomous::process_one_baby(SingleSwitchProgramEnvironment& env, BotBas
             }
             break;
 
-        case EggHatchAction::Release:
+    case StatsHuntAction::Discard:
         default:
             // If the auto save mode is AfterStartAndKeep, which allows resetting the game in case no eggs in the box are kept,
             // then we can save the time of releasing hatched pokemon in case we will reset the game later.

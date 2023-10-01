@@ -19,7 +19,7 @@
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_LetsGoHpReader.h"
-#include "PokemonSV/Inference/Boxes/PokemonSV_IVCheckerReader.h"
+#include "PokemonSV/Inference/Boxes/PokemonSV_IvJudgeReader.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_EncounterWatcher.h"
 #include "PokemonSV/Programs/PokemonSV_AreaZero.h"
 #include "PokemonSV/Programs/PokemonSV_Battles.h"
@@ -106,6 +106,12 @@ ShinyHuntScatterbug::ShinyHuntScatterbug()
         LockWhileRunning::LOCKED,
         false
     )
+    , SKIP_SANDWICH(
+        "<b>Whether to skip making sandwich:</b><br>"
+        "This is for debugging the program without waiting for sandwich making.",
+        LockWhileRunning::UNLOCKED,
+        false
+    )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS_UPDATE,
@@ -121,6 +127,7 @@ ShinyHuntScatterbug::ShinyHuntScatterbug()
     if (PreloadSettings::instance().DEVELOPER_MODE){
         PA_ADD_OPTION(SAVE_DEBUG_VIDEO);
         PA_ADD_OPTION(DEBUG_WARP_TO_POKECENTER);
+        PA_ADD_OPTION(SKIP_SANDWICH);
     }
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(SANDWICH_OPTIONS);
@@ -205,7 +212,8 @@ void ShinyHuntScatterbug::handle_battles_and_back_to_pokecenter(SingleSwitchProg
     bool first_iteration = true;
     // a flag for the case that the action has finished but not yet returned to pokecenter
     bool returned_to_pokecenter = false;
-    while(action_finished == false && returned_to_pokecenter == false){
+    while(action_finished == false || returned_to_pokecenter == false){
+        // env.console.overlay().add_log("Calculate what to do next");
         int ret = run_until(
             env.console, context,
             [&](BotBaseContext& context){
@@ -240,6 +248,7 @@ void ShinyHuntScatterbug::handle_battles_and_back_to_pokecenter(SingleSwitchProg
         m_encounter_watcher->throw_if_no_sound();
         if (ret >= 0){
             env.console.log("Detected battle.", COLOR_PURPLE);
+            env.console.overlay().add_log("Detected battle");
             try{
                 bool caught, should_save;
                 m_encounter_tracker->process_battle(
@@ -255,7 +264,7 @@ void ShinyHuntScatterbug::handle_battles_and_back_to_pokecenter(SingleSwitchProg
             }
         }
         // Back on the overworld.
-    } // end while(action_finished == false)
+    } // end while(action_finished == false || returned_to_pokecenter == false)
 }
 
 // Start at Mesagoza South Gate pokecenter, make a sandwich, then use let's go repeatedly until 30 min passes.
@@ -293,15 +302,20 @@ void ShinyHuntScatterbug::run_one_sandwich_iteration(SingleSwitchProgramEnvironm
             pbf_press_button(context, BUTTON_L, 50, 40);
             // Move forward
             pbf_move_left_joystick(context, 128, 0, 180, 0);
-            picnic_from_overworld(env.program_info(), env.console, context);
+            if (!SKIP_SANDWICH){
+                picnic_from_overworld(env.program_info(), env.console, context);
 
-            pbf_move_left_joystick(context, 128, 0, 30, 40);
-            enter_sandwich_recipe_list(env.program_info(), env.console, context);
-            run_sandwich_maker(env, context, SANDWICH_OPTIONS);
-            last_sandwich_time = current_time();
-            leave_picnic(env.program_info(), env.console, context);
+                pbf_move_left_joystick(context, 128, 0, 30, 40);
+                enter_sandwich_recipe_list(env.program_info(), env.console, context);
+                run_sandwich_maker(env, context, SANDWICH_OPTIONS);
+                last_sandwich_time = current_time();
+                leave_picnic(env.program_info(), env.console, context);
+            } else {
+                last_sandwich_time = current_time();
+            }
         }
     );
+    env.console.overlay().add_log("Started Let's Go Paths");
     save_if_needed();
 
     // Which path to choose starting at the PokeCenter.
@@ -314,11 +328,12 @@ void ShinyHuntScatterbug::run_one_sandwich_iteration(SingleSwitchProgramEnvironm
     for (;;path_id = (path_id + 1) % num_paths){
         if (last_sandwich_time + std::chrono::minutes(30) < current_time()){
             env.log("Sandwich expires.");
-            env.console.overlay().add_log("Sandwich expires", COLOR_WHITE);
+            env.console.overlay().add_log("Sandwich expires");
             return;
         }
 
         env.console.log("Starting Let's Go hunting path...", COLOR_PURPLE);
+        env.console.overlay().add_log("Let's Go on Path " + std::to_string(path_id));
 
         double hp = hp_watcher.last_known_value() * 100;
         if (0 < hp){

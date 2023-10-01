@@ -13,7 +13,7 @@
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
-#include "Pokemon/Options/Pokemon_IVCheckerOption.h"
+#include "Pokemon/Options/Pokemon_IvJudgeOption.h"
 #include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleBallReader.h"
 
 namespace PokemonAutomation{
@@ -41,12 +41,12 @@ private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
     OCR::LanguageOCROption LANGUAGE;
-    IVCheckerFilterOption HP;
-    IVCheckerFilterOption ATTACK;
-    IVCheckerFilterOption DEFENSE;
-    IVCheckerFilterOption SPATK;
-    IVCheckerFilterOption SPDEF;
-    IVCheckerFilterOption SPEED;
+    IVJudgeFilterOption HP;
+    IVJudgeFilterOption ATTACK;
+    IVJudgeFilterOption DEFENSE;
+    IVJudgeFilterOption SPATK;
+    IVJudgeFilterOption SPDEF;
+    IVJudgeFilterOption SPEED;
 
     EventNotificationsOption NOTIFICATIONS;
 };

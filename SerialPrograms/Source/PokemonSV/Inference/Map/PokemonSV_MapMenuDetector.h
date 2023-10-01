@@ -43,14 +43,13 @@ protected:
 // Watch for the "Fly here" menu to open on map
 class MapFlyMenuWatcher : public VisualInferenceCallback{
 public:
-    MapFlyMenuWatcher(Color color, VideoOverlay& overlay);
+    MapFlyMenuWatcher(Color color);
     virtual ~MapFlyMenuWatcher();
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
 
 protected:
-    VideoOverlay& m_overlay;
     MapFlyMenuDetector m_detector;
 };
 
@@ -77,13 +76,12 @@ protected:
 class MapDestinationMenuWatcher : public VisualInferenceCallback{
 public:
     ~MapDestinationMenuWatcher();
-    MapDestinationMenuWatcher(Color color, VideoOverlay& overlay);
+    MapDestinationMenuWatcher(Color color);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
 
 protected:
-    VideoOverlay& m_overlay;
     MapDestinationMenuDetector m_detector;
 };
 

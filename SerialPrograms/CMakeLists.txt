@@ -540,6 +540,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/VideoPipeline/Backends/CameraWidgetQt6.5.h
     Source/CommonFramework/VideoPipeline/Backends/CameraWidgetQt6.cpp
     Source/CommonFramework/VideoPipeline/Backends/CameraWidgetQt6.h
+    Source/CommonFramework/VideoPipeline/Backends/MediaServicesQt6.cpp
+    Source/CommonFramework/VideoPipeline/Backends/MediaServicesQt6.h
     Source/CommonFramework/VideoPipeline/Backends/VideoToolsQt5.cpp
     Source/CommonFramework/VideoPipeline/Backends/VideoToolsQt5.h
     Source/CommonFramework/VideoPipeline/CameraInfo.h
@@ -846,8 +848,8 @@ file(GLOB MAIN_SOURCES
     Source/Pokemon/Inference/Pokemon_BerryNameReader.h
     Source/Pokemon/Inference/Pokemon_BoxGenderDetector.cpp
     Source/Pokemon/Inference/Pokemon_BoxGenderDetector.h
-    Source/Pokemon/Inference/Pokemon_IVCheckerReader.cpp
-    Source/Pokemon/Inference/Pokemon_IVCheckerReader.h
+    Source/Pokemon/Inference/Pokemon_IvJudgeReader.cpp
+    Source/Pokemon/Inference/Pokemon_IvJudgeReader.h
     Source/Pokemon/Inference/Pokemon_NameReader.cpp
     Source/Pokemon/Inference/Pokemon_NameReader.h
     Source/Pokemon/Inference/Pokemon_NatureReader.cpp
@@ -860,28 +862,30 @@ file(GLOB MAIN_SOURCES
     Source/Pokemon/Inference/Pokemon_TrainIVCheckerOCR.h
     Source/Pokemon/Inference/Pokemon_TrainPokemonOCR.cpp
     Source/Pokemon/Inference/Pokemon_TrainPokemonOCR.h
-    Source/Pokemon/Options/Pokemon_EggHatchFilter.cpp
-    Source/Pokemon/Options/Pokemon_EggHatchFilter.h
     Source/Pokemon/Options/Pokemon_EncounterBotOptions.h
-    Source/Pokemon/Options/Pokemon_IVCheckerOption.cpp
-    Source/Pokemon/Options/Pokemon_IVCheckerOption.h
+    Source/Pokemon/Options/Pokemon_IvJudgeOption.cpp
+    Source/Pokemon/Options/Pokemon_IvJudgeOption.h
     Source/Pokemon/Options/Pokemon_NameSelectOption.cpp
     Source/Pokemon/Options/Pokemon_NameSelectOption.h
     Source/Pokemon/Options/Pokemon_NameSelectWidget.cpp
     Source/Pokemon/Options/Pokemon_NameSelectWidget.h
+    Source/Pokemon/Options/Pokemon_StatsHuntFilter.cpp
+    Source/Pokemon/Options/Pokemon_StatsHuntFilter.h
     Source/Pokemon/Options/Pokemon_StatsResetFilter.cpp
     Source/Pokemon/Options/Pokemon_StatsResetFilter.h
     Source/Pokemon/Pokemon_DataTypes.h
     Source/Pokemon/Pokemon_EncounterStats.cpp
     Source/Pokemon/Pokemon_EncounterStats.h
-    Source/Pokemon/Pokemon_IVChecker.cpp
-    Source/Pokemon/Pokemon_IVChecker.h
+    Source/Pokemon/Pokemon_IvJudge.cpp
+    Source/Pokemon/Pokemon_IvJudge.h
     Source/Pokemon/Pokemon_NatureChecker.cpp
     Source/Pokemon/Pokemon_NatureChecker.h
     Source/Pokemon/Pokemon_Notification.cpp
     Source/Pokemon/Pokemon_Notification.h
     Source/Pokemon/Pokemon_ShinySparkleSet.cpp
     Source/Pokemon/Pokemon_ShinySparkleSet.h
+    Source/Pokemon/Pokemon_StatsCalculation.cpp
+    Source/Pokemon/Pokemon_StatsCalculation.h
     Source/Pokemon/Pokemon_Strings.cpp
     Source/Pokemon/Pokemon_Strings.h
     Source/Pokemon/Pokemon_Types.cpp
@@ -916,8 +920,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxNatureDetector.h
     Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxShinyDetector.cpp
     Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxShinyDetector.h
-    Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_IVCheckerReader.cpp
-    Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_IVCheckerReader.h
+    Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_IvJudgeReader.cpp
+    Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_IvJudgeReader.h
     Source/PokemonBDSP/Inference/PokemonBDSP_DialogDetector.cpp
     Source/PokemonBDSP/Inference/PokemonBDSP_DialogDetector.h
     Source/PokemonBDSP/Inference/PokemonBDSP_MapDetector.cpp
@@ -1276,8 +1280,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxNatureDetector.h
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxShinyDetector.cpp
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxShinyDetector.h
-    Source/PokemonSV/Inference/Boxes/PokemonSV_IVCheckerReader.cpp
-    Source/PokemonSV/Inference/Boxes/PokemonSV_IVCheckerReader.h
+    Source/PokemonSV/Inference/Boxes/PokemonSV_IvJudgeReader.cpp
+    Source/PokemonSV/Inference/Boxes/PokemonSV_IvJudgeReader.h
     Source/PokemonSV/Inference/Boxes/PokemonSV_StatsResetChecker.cpp
     Source/PokemonSV/Inference/Boxes/PokemonSV_StatsResetChecker.h
     Source/PokemonSV/Inference/Dialogs/PokemonSV_DialogArrowDetector.cpp
@@ -1334,6 +1338,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h
     Source/PokemonSV/Inference/PokemonSV_ZeroGateWarpPromptDetector.cpp
     Source/PokemonSV/Inference/PokemonSV_ZeroGateWarpPromptDetector.h
+    Source/PokemonSV/Inference/PokemonSV_StatHexagonReader.cpp
+    Source/PokemonSV/Inference/PokemonSV_StatHexagonReader.h
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraCardDetector.cpp
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraCardDetector.h
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraCodeReader.cpp
@@ -1551,8 +1557,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSwSh/Inference/PokemonSwSh_DialogTriangleDetector.h
     Source/PokemonSwSh/Inference/PokemonSwSh_FishingDetector.cpp
     Source/PokemonSwSh/Inference/PokemonSwSh_FishingDetector.h
-    Source/PokemonSwSh/Inference/PokemonSwSh_IVCheckerReader.cpp
-    Source/PokemonSwSh/Inference/PokemonSwSh_IVCheckerReader.h
+    Source/PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.cpp
+    Source/PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h
     Source/PokemonSwSh/Inference/PokemonSwSh_MarkFinder.cpp
     Source/PokemonSwSh/Inference/PokemonSwSh_MarkFinder.h
     Source/PokemonSwSh/Inference/PokemonSwSh_PokemonSpriteReader.cpp

@@ -9,7 +9,7 @@
 
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "Pokemon/Options/Pokemon_EggHatchFilter.h"
+#include "Pokemon/Options/Pokemon_StatsHuntFilter.h"
 
 namespace PokemonAutomation{
 
@@ -27,7 +27,7 @@ public:
     BoxGenderDetector(const ImageFloatBox& box, double area_ratio_threshold, Color color = COLOR_RED);
 
     void make_overlays(VideoOverlaySet& items) const;
-    EggHatchGenderFilter detect(const ImageViewRGB32& screen) const;
+    StatsHuntGenderFilter detect(const ImageViewRGB32& screen) const;
 
 private:
     ImageFloatBox m_box;

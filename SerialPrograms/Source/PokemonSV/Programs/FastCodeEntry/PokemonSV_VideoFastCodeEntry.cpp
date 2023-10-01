@@ -25,6 +25,100 @@ namespace PokemonSV{
 using namespace Pokemon;
 
 
+VideoFceSettings::VideoFceSettings()
+    : GroupOption("Join Settings (V-FCE)", LockWhileRunning::UNLOCKED)
+    , OCR_METHOD(
+        "<b>Text Recognition Method:</b><br>"
+        "Each text recognition method has its own strengths and weaknesses. This option lets you choose which method to use.",
+        {
+            {VideoFceOcrMethod::RAW_OCR,    "raw-ocr",          "Raw OCR. No image pre-processing."},
+            {VideoFceOcrMethod::BLACK_TEXT, "black-on-white",   "Filter: Black Text on White Background"},
+            {VideoFceOcrMethod::WHITE_TEXT, "white-on-black",   "Filter: White Text on Black Background"},
+            {VideoFceOcrMethod::TERA_CARD,  "tera-card",        "Tera Card"},
+        },
+        LockWhileRunning::UNLOCKED,
+        VideoFceOcrMethod::TERA_CARD
+    )
+    , SKIP_INITIAL_CODE(
+        "<b>Skip Initial Code:</b><br>"
+        "If there is already a code up when you start the program, skip it since it's from the last raid.",
+        LockWhileRunning::UNLOCKED,
+        true
+    )
+{
+    PA_ADD_OPTION(OCR_METHOD);
+    PA_ADD_OPTION(SKIP_INITIAL_CODE);
+}
+
+
+
+void wait_for_video_code_and_join(
+    MultiSwitchProgramEnvironment& env, CancellableScope& scope,
+    ScreenWatchOption& screen_watcher,
+    VideoFceSettings& join_method,
+    FastCodeEntrySettingsOption& fce_settings
+){
+    bool skip_initial = join_method.SKIP_INITIAL_CODE;
+    VideoSnapshot snapshot;
+    while (true){
+        scope.throw_if_cancelled();
+        VideoSnapshot current = screen_watcher.screenshot();
+
+//        env.log("start");
+
+        if (snapshot && current &&
+            snapshot->width() == current->width() &&
+            snapshot->height() == current->height()
+        ){
+            double rmsd = ImageMatch::pixel_RMSD(snapshot, current);
+            if (rmsd < 2){
+                scope.wait_for(std::chrono::milliseconds(1));
+                continue;
+            }
+        }
+        snapshot = std::move(current);
+//        env.log("done new frame check");
+
+        if (skip_initial){
+            env.log("Waiting for next screen change...");
+            skip_initial = false;
+            continue;
+        }
+
+        std::string code;
+        switch (join_method.OCR_METHOD){
+        case VideoFceOcrMethod::RAW_OCR:
+            code = OCR::ocr_read(Language::English, snapshot);
+            env.log("OCR: " + code);
+            break;
+        case VideoFceOcrMethod::BLACK_TEXT:{
+            ImageRGB32 filtered = to_blackwhite_rgb32_range(snapshot, 0xff000000, 0xff7f7f7f, true);
+            code = OCR::ocr_read(Language::English, filtered);
+            env.log("OCR: " + code);
+            break;
+        }
+        case VideoFceOcrMethod::WHITE_TEXT:{
+            ImageRGB32 filtered = to_blackwhite_rgb32_range(snapshot, 0xffc0c0c0, 0xffffffff, true);
+            code = OCR::ocr_read(Language::English, filtered);
+            env.log("OCR: " + code);
+            break;
+        }
+        case VideoFceOcrMethod::TERA_CARD:
+            code = read_raid_code(env.logger(), env.realtime_dispatcher(), snapshot);
+        }
+        const char* error = enter_code(env, scope, fce_settings, code, false);
+        if (error == nullptr){
+            break;
+        }else{
+            env.log(std::string("Invalid Code: ") + error, COLOR_RED);
+        }
+    }
+}
+
+
+
+
+
 VideoFastCodeEntry_Descriptor::VideoFastCodeEntry_Descriptor()
     : MultiSwitchProgramDescriptor(
         "PokemonSV:VideoFastCodeEntry",
@@ -55,19 +149,7 @@ VideoFastCodeEntry::VideoFastCodeEntry()
         LockWhileRunning::LOCKED,
         false
     )
-    , OCR_METHOD(
-        "<b>Text Recognition Method:</b><br>"
-        "Each text recognition method has its own strengths and weaknesses. This option lets you choose which method to use.",
-        {
-            {OcrMethod::RAW_OCR,     "raw-ocr",          "Raw OCR. No image pre-processing."},
-            {OcrMethod::BLACK_TEXT,  "black-on-white",   "Filter: Black Text on White Background"},
-            {OcrMethod::WHITE_TEXT,  "white-on-black",   "Filter: White Text on Black Background"},
-            {OcrMethod::TERA_CARD,   "tera-card",        "Tera Card"},
-        },
-        LockWhileRunning::LOCKED,
-        OcrMethod::TERA_CARD
-    )
-    , SETTINGS(LockWhileRunning::LOCKED)
+    , FCE_SETTINGS(LockWhileRunning::LOCKED)
     , NOTIFICATIONS({
         &NOTIFICATION_PROGRAM_FINISH,
     })
@@ -75,8 +157,8 @@ VideoFastCodeEntry::VideoFastCodeEntry()
     PA_ADD_OPTION(SCREEN_WATCHER);
     PA_ADD_OPTION(MODE);
     PA_ADD_OPTION(SKIP_CONNECT_TO_CONTROLLER);
-    PA_ADD_OPTION(OCR_METHOD);
-    PA_ADD_OPTION(SETTINGS);
+    PA_ADD_OPTION(JOIN_METHOD);
+    PA_ADD_OPTION(FCE_SETTINGS);
     PA_ADD_OPTION(NOTIFICATIONS);
 
     //  Preload the OCR data.
@@ -86,7 +168,7 @@ VideoFastCodeEntry::VideoFastCodeEntry()
 
 
 void VideoFastCodeEntry::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
-    FastCodeEntrySettings settings(SETTINGS);
+    FastCodeEntrySettings settings(FCE_SETTINGS);
 
     if (MODE == Mode::MANUAL){
         std::string code = read_raid_code(env.logger(), env.realtime_dispatcher(), SCREEN_WATCHER.screenshot());
@@ -105,55 +187,7 @@ void VideoFastCodeEntry::program(MultiSwitchProgramEnvironment& env, Cancellable
     //  Preload 6 threads to OCR the code.
     env.realtime_dispatcher().ensure_threads(6);
 
-
-    VideoSnapshot snapshot;
-    while (true){
-        scope.throw_if_cancelled();
-        VideoSnapshot current = SCREEN_WATCHER.screenshot();
-
-//        env.log("start");
-
-        if (snapshot && current &&
-            snapshot->width() == current->width() &&
-            snapshot->height() == current->height()
-        ){
-            double rmsd = ImageMatch::pixel_RMSD(snapshot, current);
-            if (rmsd < 2){
-                scope.wait_for(std::chrono::milliseconds(1));
-                continue;
-            }
-        }
-        snapshot = std::move(current);
-//        env.log("done new frame check");
-
-        std::string code;
-        switch (OCR_METHOD){
-        case OcrMethod::RAW_OCR:
-            code = OCR::ocr_read(Language::English, snapshot);
-            env.log("OCR: " + code);
-            break;
-        case OcrMethod::BLACK_TEXT:{
-            ImageRGB32 filtered = to_blackwhite_rgb32_range(snapshot, 0xff000000, 0xff7f7f7f, true);
-            code = OCR::ocr_read(Language::English, filtered);
-            env.log("OCR: " + code);
-            break;
-        }
-        case OcrMethod::WHITE_TEXT:{
-            ImageRGB32 filtered = to_blackwhite_rgb32_range(snapshot, 0xffc0c0c0, 0xffffffff, true);
-            code = OCR::ocr_read(Language::English, filtered);
-            env.log("OCR: " + code);
-            break;
-        }
-        case OcrMethod::TERA_CARD:
-            code = read_raid_code(env.logger(), env.realtime_dispatcher(), snapshot);
-        }
-        const char* error = enter_code(env, scope, settings, code, false);
-        if (error == nullptr){
-            break;
-        }else{
-            env.log(std::string("Invalid Code: ") + error, COLOR_RED);
-        }
-    }
+    wait_for_video_code_and_join(env, scope, SCREEN_WATCHER, JOIN_METHOD, FCE_SETTINGS);
 
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 }

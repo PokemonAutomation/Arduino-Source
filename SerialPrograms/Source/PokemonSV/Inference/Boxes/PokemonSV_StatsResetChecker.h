@@ -19,8 +19,8 @@ namespace OCR{
     class LanguageOCROption;
 }
 namespace Pokemon{
-    enum class EggHatchAction;
-    class EggHatchFilterTable;
+enum class StatsHuntAction;
+class StatsHuntFilterTable;
     class StatsResetFilterTable;
 }
 
@@ -33,7 +33,7 @@ namespace PokemonSV{
 bool check_stats_reset_info(
     ConsoleHandle& console, BotBaseContext& context,
     OCR::LanguageOCROption& LANGUAGE, Pokemon::StatsResetFilterTable& FILTERS,
-    Pokemon::EggHatchAction& action
+    Pokemon::StatsHuntAction& action
 );
 
 

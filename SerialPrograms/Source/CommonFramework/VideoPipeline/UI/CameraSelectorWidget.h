@@ -38,14 +38,12 @@ public:
     CameraSelectorWidget(
         CameraSession& session,
         Logger& logger,
-        VideoDisplayWidget& holder,
-        std::vector<CameraInfo> starting_camera_list
+        VideoDisplayWidget& holder
     );
     ~CameraSelectorWidget();
 
 private:
     void update_camera_list();
-    void update_camera_list(std::vector<CameraInfo> cameras);
     void update_resolution_list();
 
     virtual void shutdown() override;

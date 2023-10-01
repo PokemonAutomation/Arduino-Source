@@ -7,6 +7,7 @@
 #include <map>
 #include <QtGlobal>
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "AudioInfo.h"
@@ -279,6 +280,8 @@ std::vector<AudioDeviceInfo> AudioDeviceInfo::all_input_devices(){
 
     std::vector<AudioDeviceInfo> list;
 
+    WallClock start = current_time();
+
 #if QT_VERSION_MAJOR == 5
     for (NativeAudioInfo& device : QAudioDeviceInfo::availableDevices(QAudio::AudioInput)){
         list.emplace_back();
@@ -304,6 +307,10 @@ std::vector<AudioDeviceInfo> AudioDeviceInfo::all_input_devices(){
         data.supported_formats = supported_input_formats(data.preferred_format_index, data.info, data.display_name);
     }
 #endif
+
+    WallClock end = current_time();
+    double seconds = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() / 1000.;
+    global_logger_tagged().log("Done querying audio inputs... " + tostr_fixed(seconds, 3) + " seconds", COLOR_CYAN);
 
     if (GlobalSettings::instance().SHOW_ALL_AUDIO_DEVICES){
         return list;

@@ -40,8 +40,7 @@ SwitchSystemWidget::~SwitchSystemWidget(){
 SwitchSystemWidget::SwitchSystemWidget(
     QWidget& parent,
     SwitchSystemSession& session,
-    uint64_t program_id,
-    std::vector<CameraInfo> starting_camera_list
+    uint64_t program_id
 )
     : QWidget(&parent)
     , m_session(session)
@@ -81,8 +80,7 @@ SwitchSystemWidget::SwitchSystemWidget(
         m_camera_widget = new CameraSelectorWidget(
             m_session.camera_session(),
             m_session.logger(),
-            *m_video_display,
-            std::move(starting_camera_list)
+            *m_video_display
         );
         group_layout->addWidget(m_camera_widget);
 

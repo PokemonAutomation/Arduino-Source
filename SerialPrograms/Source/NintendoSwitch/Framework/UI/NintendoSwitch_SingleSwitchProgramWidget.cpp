@@ -13,7 +13,6 @@
 #include "CommonFramework/NewVersionCheck.h"
 #include "CommonFramework/Panels/PanelTools.h"
 #include "CommonFramework/Panels/UI/PanelElements.h"
-#include "CommonFramework/VideoPipeline/Backends/CameraImplementations.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgramOption.h"
 #include "NintendoSwitch_SingleSwitchProgramWidget.h"
@@ -72,8 +71,7 @@ SingleSwitchProgramWidget2::SingleSwitchProgramWidget2(
         m_system = new SwitchSystemWidget(
             *this,
             m_session.system(),
-            m_session.instance_id(),
-            get_all_cameras()
+            m_session.instance_id()
         );
         scroll_layout->addWidget(m_system);
 

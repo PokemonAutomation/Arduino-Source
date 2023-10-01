@@ -1,14 +1,14 @@
-/*  IV Checker Reader
+/*  IV Judge Reader
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
  */
 
-#ifndef PokemonAutomation_PokemonSwSh_IVCheckerReader_H
-#define PokemonAutomation_PokemonSwSh_IVCheckerReader_H
+#ifndef PokemonAutomation_PokemonSwSh_IvJudgeReader_H
+#define PokemonAutomation_PokemonSwSh_IvJudgeReader_H
 
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "Pokemon/Inference/Pokemon_IVCheckerReader.h"
+#include "Pokemon/Inference/Pokemon_IvJudgeReader.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -16,19 +16,19 @@ namespace PokemonSwSh{
 using namespace Pokemon;
 
 
-const IVCheckerReader& IV_READER();
+const IvJudgeReader& IV_READER();
 
 
-class IVCheckerReaderScope{
+class IvJudgeReaderScope{
 public:
-    IVCheckerReaderScope(VideoOverlay& overlay, Language language);
-
-    IVCheckerReader::Results read(Logger& logger, const ImageViewRGB32& frame);
+    IvJudgeReaderScope(VideoOverlay& overlay, Language language);
+    
+    IvJudgeReader::Results read(Logger& logger, const ImageViewRGB32& frame);
 
     std::vector<ImageViewRGB32> dump_images(const ImageViewRGB32& frame);
 
 private:
-    IVCheckerValue read(Logger& logger, const ImageViewRGB32& frame, const OverlayBoxScope& box);
+    IvJudgeValue read(Logger& logger, const ImageViewRGB32& frame, const OverlayBoxScope& box);
 
 private:
     Language m_language;

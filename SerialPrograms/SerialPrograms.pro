@@ -427,23 +427,24 @@ SOURCES += \
     Source/PanelLists.cpp \
     Source/Pokemon/Inference/Pokemon_BerryNameReader.cpp \
     Source/Pokemon/Inference/Pokemon_BoxGenderDetector.cpp \
-    Source/Pokemon/Inference/Pokemon_IVCheckerReader.cpp \
+    Source/Pokemon/Inference/Pokemon_IvJudgeReader.cpp \
     Source/Pokemon/Inference/Pokemon_NameReader.cpp \
     Source/Pokemon/Inference/Pokemon_NatureReader.cpp \
     Source/Pokemon/Inference/Pokemon_PokeballNameReader.cpp \
     Source/Pokemon/Inference/Pokemon_ReadHpBar.cpp \
     Source/Pokemon/Inference/Pokemon_TrainIVCheckerOCR.cpp \
     Source/Pokemon/Inference/Pokemon_TrainPokemonOCR.cpp \
-    Source/Pokemon/Options/Pokemon_EggHatchFilter.cpp \
-    Source/Pokemon/Options/Pokemon_IVCheckerOption.cpp \
+    Source/Pokemon/Options/Pokemon_IvJudgeOption.cpp \
     Source/Pokemon/Options/Pokemon_NameSelectOption.cpp \
     Source/Pokemon/Options/Pokemon_NameSelectWidget.cpp \
+    Source/Pokemon/Options/Pokemon_StatsHuntFilter.cpp \
     Source/Pokemon/Options/Pokemon_StatsResetFilter.cpp \
     Source/Pokemon/Pokemon_EncounterStats.cpp \
-    Source/Pokemon/Pokemon_IVChecker.cpp \
+    Source/Pokemon/Pokemon_IvJudge.cpp \
     Source/Pokemon/Pokemon_NatureChecker.cpp \
     Source/Pokemon/Pokemon_Notification.cpp \
     Source/Pokemon/Pokemon_ShinySparkleSet.cpp \
+    Source/Pokemon/Pokemon_StatsCalculation.cpp \
     Source/Pokemon/Pokemon_Strings.cpp \
     Source/Pokemon/Pokemon_Types.cpp \
     Source/Pokemon/Resources/Pokemon_BerryNames.cpp \
@@ -461,7 +462,7 @@ SOURCES += \
     Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxGenderDetector.cpp \
     Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxNatureDetector.cpp \
     Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxShinyDetector.cpp \
-    Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_IVCheckerReader.cpp \
+    Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_IvJudgeReader.cpp \
     Source/PokemonBDSP/Inference/PokemonBDSP_DialogDetector.cpp \
     Source/PokemonBDSP/Inference/PokemonBDSP_MapDetector.cpp \
     Source/PokemonBDSP/Inference/PokemonBDSP_MarkFinder.cpp \
@@ -637,7 +638,7 @@ SOURCES += \
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxGenderDetector.cpp \
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxNatureDetector.cpp \
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxShinyDetector.cpp \
-    Source/PokemonSV/Inference/Boxes/PokemonSV_IVCheckerReader.cpp \
+    Source/PokemonSV/Inference/Boxes/PokemonSV_IvJudgeReader.cpp \
     Source/PokemonSV/Inference/Boxes/PokemonSV_StatsResetChecker.cpp \
     Source/PokemonSV/Inference/Dialogs/PokemonSV_DialogArrowDetector.cpp \
     Source/PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.cpp \
@@ -662,6 +663,7 @@ SOURCES += \
     Source/PokemonSV/Inference/PokemonSV_MoneyReader.cpp \
     Source/PokemonSV/Inference/PokemonSV_PokePortalDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_PokemonSummaryReader.cpp \
+    Source/PokemonSV/Inference/PokemonSV_StatHexagonReader.cpp \
     Source/PokemonSV/Inference/PokemonSV_SweatBubbleDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_TournamentPrizeNameReader.cpp \
     Source/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.cpp \
@@ -769,7 +771,7 @@ SOURCES += \
     Source/PokemonSwSh/Inference/PokemonSwSh_BoxShinySymbolDetector.cpp \
     Source/PokemonSwSh/Inference/PokemonSwSh_DialogBoxDetector.cpp \
     Source/PokemonSwSh/Inference/PokemonSwSh_FishingDetector.cpp \
-    Source/PokemonSwSh/Inference/PokemonSwSh_IVCheckerReader.cpp \
+    Source/PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.cpp \
     Source/PokemonSwSh/Inference/PokemonSwSh_MarkFinder.cpp \
     Source/PokemonSwSh/Inference/PokemonSwSh_PokemonSpriteReader.cpp \
     Source/PokemonSwSh/Inference/PokemonSwSh_QuantityReader.cpp \
@@ -1470,25 +1472,26 @@ HEADERS += \
     Source/PanelLists.h \
     Source/Pokemon/Inference/Pokemon_BerryNameReader.h \
     Source/Pokemon/Inference/Pokemon_BoxGenderDetector.h \
-    Source/Pokemon/Inference/Pokemon_IVCheckerReader.h \
+    Source/Pokemon/Inference/Pokemon_IvJudgeReader.h \
     Source/Pokemon/Inference/Pokemon_NameReader.h \
     Source/Pokemon/Inference/Pokemon_NatureReader.h \
     Source/Pokemon/Inference/Pokemon_PokeballNameReader.h \
     Source/Pokemon/Inference/Pokemon_ReadHpBar.h \
     Source/Pokemon/Inference/Pokemon_TrainIVCheckerOCR.h \
     Source/Pokemon/Inference/Pokemon_TrainPokemonOCR.h \
-    Source/Pokemon/Options/Pokemon_EggHatchFilter.h \
     Source/Pokemon/Options/Pokemon_EncounterBotOptions.h \
-    Source/Pokemon/Options/Pokemon_IVCheckerOption.h \
+    Source/Pokemon/Options/Pokemon_IvJudgeOption.h \
     Source/Pokemon/Options/Pokemon_NameSelectOption.h \
     Source/Pokemon/Options/Pokemon_NameSelectWidget.h \
+    Source/Pokemon/Options/Pokemon_StatsHuntFilter.h \
     Source/Pokemon/Options/Pokemon_StatsResetFilter.h \
     Source/Pokemon/Pokemon_DataTypes.h \
     Source/Pokemon/Pokemon_EncounterStats.h \
-    Source/Pokemon/Pokemon_IVChecker.h \
+    Source/Pokemon/Pokemon_IvJudge.h \
     Source/Pokemon/Pokemon_NatureChecker.h \
     Source/Pokemon/Pokemon_Notification.h \
     Source/Pokemon/Pokemon_ShinySparkleSet.h \
+    Source/Pokemon/Pokemon_StatsCalculation.h \
     Source/Pokemon/Pokemon_Strings.h \
     Source/Pokemon/Pokemon_Types.h \
     Source/Pokemon/Resources/Pokemon_BerryNames.h \
@@ -1506,7 +1509,7 @@ HEADERS += \
     Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxGenderDetector.h \
     Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxNatureDetector.h \
     Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxShinyDetector.h \
-    Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_IVCheckerReader.h \
+    Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_IvJudgeReader.h \
     Source/PokemonBDSP/Inference/PokemonBDSP_DialogDetector.h \
     Source/PokemonBDSP/Inference/PokemonBDSP_MapDetector.h \
     Source/PokemonBDSP/Inference/PokemonBDSP_MarkFinder.h \
@@ -1684,7 +1687,7 @@ HEADERS += \
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxGenderDetector.h \
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxNatureDetector.h \
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxShinyDetector.h \
-    Source/PokemonSV/Inference/Boxes/PokemonSV_IVCheckerReader.h \
+    Source/PokemonSV/Inference/Boxes/PokemonSV_IvJudgeReader.h \
     Source/PokemonSV/Inference/Boxes/PokemonSV_StatsResetChecker.h \
     Source/PokemonSV/Inference/Dialogs/PokemonSV_DialogArrowDetector.h \
     Source/PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h \
@@ -1709,6 +1712,7 @@ HEADERS += \
     Source/PokemonSV/Inference/PokemonSV_MoneyReader.h \
     Source/PokemonSV/Inference/PokemonSV_PokePortalDetector.h \
     Source/PokemonSV/Inference/PokemonSV_PokemonSummaryReader.h \
+    Source/PokemonSV/Inference/PokemonSV_StatHexagonReader.h \
     Source/PokemonSV/Inference/PokemonSV_SweatBubbleDetector.h \
     Source/PokemonSV/Inference/PokemonSV_TournamentPrizeNameReader.h \
     Source/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h \
@@ -1825,7 +1829,7 @@ HEADERS += \
     Source/PokemonSwSh/Inference/PokemonSwSh_BoxShinySymbolDetector.h \
     Source/PokemonSwSh/Inference/PokemonSwSh_DialogBoxDetector.h \
     Source/PokemonSwSh/Inference/PokemonSwSh_FishingDetector.h \
-    Source/PokemonSwSh/Inference/PokemonSwSh_IVCheckerReader.h \
+    Source/PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h \
     Source/PokemonSwSh/Inference/PokemonSwSh_MarkFinder.h \
     Source/PokemonSwSh/Inference/PokemonSwSh_PokemonSpriteReader.h \
     Source/PokemonSwSh/Inference/PokemonSwSh_QuantityReader.h \

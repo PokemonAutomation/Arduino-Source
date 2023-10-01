@@ -16,6 +16,7 @@
 //#include "Common/Cpp/Exceptions.h"
 //#include "Common/Cpp/Time.h"
 #include "CommonFramework/VideoPipeline/CameraOption.h"
+#include "MediaServicesQt6.h"
 #include "CameraWidgetQt6.h"
 
 //using std::cout;
@@ -27,15 +28,23 @@ namespace CameraQt6QVideoSink{
 
 
 std::vector<CameraInfo> CameraBackend::get_all_cameras() const{
-    std::vector<CameraInfo> ret;
+#if 1
+    const auto cameras = GlobalMediaServices::instance().get_all_cameras();
+#else
     const auto cameras = QMediaDevices::videoInputs();
+#endif
+    std::vector<CameraInfo> ret;
     for (const auto& info : cameras){
         ret.emplace_back(info.id().toStdString());
     }
     return ret;
 }
 std::string CameraBackend::get_camera_name(const CameraInfo& info) const{
+#if 1
+    const auto cameras = GlobalMediaServices::instance().get_all_cameras();
+#else
     const auto cameras = QMediaDevices::videoInputs();
+#endif
     for (const auto& camera : cameras){
         if (camera.id().toStdString() == info.device_name()){
             return camera.description().toStdString();

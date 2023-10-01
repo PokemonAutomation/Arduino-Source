@@ -191,6 +191,8 @@ bool run_tera_battle(
     ConsoleHandle& console, BotBaseContext& context,
     TeraAIOption& battle_AI
 ){
+    console.log("Starting tera battle routine...");
+
     size_t turn = 0;
     std::vector<TeraMoveEntry> move_table = battle_AI.MOVE_TABLE.snapshot();
     TeraMoveEntry current_move{TeraMoveType::Move1, 0, TeraTarget::Opponent};
@@ -222,7 +224,7 @@ bool run_tera_battle(
             //  At the same time, there's a possibility that we miss the battle
             //  menu if the raid is won before it even loads. And this can only
             //  happen if the raid was uncatchable to begin with.
-            std::chrono::seconds(battle_menu_seen ? 5 : 60)
+            std::chrono::seconds(battle_menu_seen ? 5 : 180)
         );
         TeraCatchWatcher catch_menu(COLOR_BLUE);
         OverworldWatcher overworld(COLOR_GREEN);
@@ -319,8 +321,11 @@ bool run_tera_battle(
             }
             continue;
         case 4:
+            console.log("Detected item rewards menu!", COLOR_BLUE);
+            pbf_mash_button(context, BUTTON_B, 30);
+            return true;
         case 5:
-            console.log("Detected a win!", COLOR_BLUE);
+            console.log("Detected catch menu!", COLOR_BLUE);
             pbf_mash_button(context, BUTTON_B, 30);
             return true;
         case 6:

@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonHome_BoxGenderDetector_H
 #define PokemonAutomation_PokemonHome_BoxGenderDetector_H
 
-#include "Pokemon/Options/Pokemon_EggHatchFilter.h"
+#include "Pokemon/Options/Pokemon_StatsHuntFilter.h"
 
 namespace PokemonAutomation{
 
@@ -21,8 +21,8 @@ namespace PokemonHome{
 class BoxGenderDetector{
 public:
     static void make_overlays(VideoOverlaySet& items);
-
-    static Pokemon::EggHatchGenderFilter detect(const ImageViewRGB32& screen);
+    
+    static Pokemon::StatsHuntGenderFilter detect(const ImageViewRGB32& screen);
 };
 
 

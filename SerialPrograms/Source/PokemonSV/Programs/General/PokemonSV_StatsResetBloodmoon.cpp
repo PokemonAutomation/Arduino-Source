@@ -17,7 +17,7 @@
 #include "PokemonSV/Inference/Battles/PokemonSV_NormalBattleMenus.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_StatsResetChecker.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.h"
-#include "PokemonSV/Inference/Boxes/PokemonSV_IVCheckerReader.h"
+#include "PokemonSV/Inference/Boxes/PokemonSV_IvJudgeReader.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_TeraBattleMenus.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
@@ -95,7 +95,7 @@ StatsResetBloodmoon::StatsResetBloodmoon()
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
-void StatsResetBloodmoon::enter_battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
+void StatsResetBloodmoon::enter_battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
 
     AdvanceDialogWatcher advance_detector(COLOR_YELLOW);
     PromptDialogWatcher prompt_detector(COLOR_YELLOW);
@@ -104,7 +104,7 @@ void StatsResetBloodmoon::enter_battle(SingleSwitchProgramEnvironment& env, BotB
     //Initiate dialog with Perrin
     pbf_press_button(context, BUTTON_A, 10, 50);
     int ret = wait_until(env.console, context, Milliseconds(4000), { advance_detector });
-    if (ret == 0) {
+    if (ret == 0){
         env.log("Dialog detected.");
     }
     else {
@@ -117,12 +117,12 @@ void StatsResetBloodmoon::enter_battle(SingleSwitchProgramEnvironment& env, BotB
     //Mash B until next dialog select
     int retPrompt = run_until(
         env.console, context,
-        [](BotBaseContext& context) {
+        [](BotBaseContext& context){
             pbf_mash_button(context, BUTTON_B, 10000);
         },
         { prompt_detector }
         );
-    if (retPrompt != 0) {
+    if (retPrompt != 0){
         env.log("Failed to detect prompt dialog!", COLOR_RED);
     }
     else {
@@ -138,12 +138,12 @@ void StatsResetBloodmoon::enter_battle(SingleSwitchProgramEnvironment& env, BotB
     //PromptDialogWatcher prompt_detector2(COLOR_YELLOW);
     int retPrompt2 = run_until(
         env.console, context,
-        [](BotBaseContext& context) {
+        [](BotBaseContext& context){
             pbf_mash_button(context, BUTTON_B, 10000);
         },
         { prompt_detector }
         );
-    if (retPrompt2 != 0) {
+    if (retPrompt2 != 0){
         env.log("Failed to detect prompt (again) dialog!", COLOR_RED);
     }
     else {
@@ -158,12 +158,12 @@ void StatsResetBloodmoon::enter_battle(SingleSwitchProgramEnvironment& env, BotB
     //Now keep going until the battle starts
     int ret_battle = run_until(
         env.console, context,
-        [](BotBaseContext& context) {
+        [](BotBaseContext& context){
             pbf_mash_button(context, BUTTON_B, 10000);
         },
         { battle_menu }
         );
-    if (ret_battle != 0) {
+    if (ret_battle != 0){
         env.log("Failed to detect battle start!", COLOR_RED);
     }
     else {
@@ -172,11 +172,11 @@ void StatsResetBloodmoon::enter_battle(SingleSwitchProgramEnvironment& env, BotB
     context.wait_for_all_requests();
 }
 
-bool StatsResetBloodmoon::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
+bool StatsResetBloodmoon::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     StatsResetBloodmoon_Descriptor::Stats& stats = env.current_stats<StatsResetBloodmoon_Descriptor::Stats>();
 
     //Assuming the player has a charged orb
-    if (TRY_TO_TERASTILLIZE) {
+    if (TRY_TO_TERASTILLIZE){
         env.log("Attempting to terastillize.");
         //Open move menu
         pbf_press_button(context, BUTTON_A, 10, 50);
@@ -195,9 +195,9 @@ bool StatsResetBloodmoon::run_battle(SingleSwitchProgramEnvironment& env, BotBas
 
     int ret = run_until(
         env.console, context,
-        [&](BotBaseContext& context) {
-            while(true) {
-                if (current_time() - start > std::chrono::minutes(5)) {
+        [&](BotBaseContext& context){
+            while(true){
+                if (current_time() - start > std::chrono::minutes(5)){
                     env.log("Timed out during battle after 5 minutes.", COLOR_RED);
                     stats.errors++;
                     env.update_stats();
@@ -217,7 +217,7 @@ bool StatsResetBloodmoon::run_battle(SingleSwitchProgramEnvironment& env, BotBas
                     std::chrono::seconds(90),
                     { battle_menu, fainted }
                 );
-                switch (ret) {
+                switch (ret){
                 case 0:
                     env.log("Detected battle menu. Pressing A to attack...");
                     pbf_mash_button(context, BUTTON_A, 3 * TICKS_PER_SECOND);
@@ -225,7 +225,7 @@ bool StatsResetBloodmoon::run_battle(SingleSwitchProgramEnvironment& env, BotBas
                     break;
                 case 1:
                     env.log("Detected fainted Pokemon. Switching to next living Pokemon...");
-                    if (fainted.move_to_slot(env.console, context, switch_party_slot)) {
+                    if (fainted.move_to_slot(env.console, context, switch_party_slot)){
                         pbf_mash_button(context, BUTTON_A, 3 * TICKS_PER_SECOND);
                         context.wait_for_all_requests();
                         switch_party_slot++;
@@ -244,8 +244,8 @@ bool StatsResetBloodmoon::run_battle(SingleSwitchProgramEnvironment& env, BotBas
             }
         },
         { catch_menu, lost }
-        );
-    if (ret == 0) {
+    );
+    if (ret == 0){
         env.log("Catch prompt detected.");
 
         pbf_press_button(context, BUTTON_A, 20, 150);
@@ -253,14 +253,14 @@ bool StatsResetBloodmoon::run_battle(SingleSwitchProgramEnvironment& env, BotBas
 
         BattleBallReader reader(env.console, LANGUAGE);
         int quantity = move_to_ball(reader, env.console, context, BALL_SELECT.slug());
-        if (quantity == 0) {
+        if (quantity == 0){
             throw OperationFailedException(
                 ErrorReport::SEND_ERROR_REPORT, env.console,
                 "Unable to find appropriate ball. Did you run out?",
                 true
             );
         }
-        if (quantity < 0) {
+        if (quantity < 0){
             stats.errors++;
             env.update_stats();
             env.log("Unable to read ball quantity.", COLOR_RED);
@@ -285,7 +285,7 @@ bool StatsResetBloodmoon::run_battle(SingleSwitchProgramEnvironment& env, BotBas
     return true;
 }
 
-bool StatsResetBloodmoon::check_stats(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
+bool StatsResetBloodmoon::check_stats(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     StatsResetBloodmoon_Descriptor::Stats& stats = env.current_stats<StatsResetBloodmoon_Descriptor::Stats>();
     bool match = false;
 
@@ -293,7 +293,7 @@ bool StatsResetBloodmoon::check_stats(SingleSwitchProgramEnvironment& env, BotBa
     enter_box_system_from_overworld(env.program_info(), env.console, context);
     context.wait_for(std::chrono::milliseconds(400));
 
-    if (check_empty_slots_in_party(env.program_info(), env.console, context) != 0) {
+    if (check_empty_slots_in_party(env.program_info(), env.console, context) != 0){
         //Is this even possible for Ursaluna?
         env.console.log("One or more empty slots in party. Ursaluna was not caught.");
         send_program_status_notification(
@@ -306,11 +306,11 @@ bool StatsResetBloodmoon::check_stats(SingleSwitchProgramEnvironment& env, BotBa
         move_box_cursor(env.program_info(), env.console, context, BoxCursorLocation::PARTY, 5, 0);
 
         //Check the IVs of the newly caught Pokemon - *must be on IV panel*
-        EggHatchAction action = EggHatchAction::Keep;
+        StatsHuntAction action = StatsHuntAction::Keep;
         check_stats_reset_info(env.console, context, LANGUAGE, FILTERS, action);
 
-        switch (action) {
-        case EggHatchAction::StopProgram:
+        switch (action){
+        case StatsHuntAction::StopProgram:
             match = true;
             env.console.log("Match found!");
             stats.matches++;
@@ -320,7 +320,7 @@ bool StatsResetBloodmoon::check_stats(SingleSwitchProgramEnvironment& env, BotBa
                 "Match found!"
             );
             break;
-        case EggHatchAction::Release:
+        case StatsHuntAction::Discard:
             match = false;
             env.console.log("Stats did not match table settings.");
             send_program_status_notification(
@@ -343,7 +343,7 @@ bool StatsResetBloodmoon::check_stats(SingleSwitchProgramEnvironment& env, BotBa
     return match;
 }
 
-void StatsResetBloodmoon::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
+void StatsResetBloodmoon::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
     StatsResetBloodmoon_Descriptor::Stats& stats = env.current_stats<StatsResetBloodmoon_Descriptor::Stats>();
 
@@ -362,17 +362,17 @@ void StatsResetBloodmoon::program(SingleSwitchProgramEnvironment& env, BotBaseCo
     while (!stats_matched){
         enter_battle(env, context);
         bool battle_won = run_battle(env, context);
-        if (battle_won) {
+        if (battle_won){
             //Clear out dialog until we're free
             OverworldWatcher overworld(COLOR_YELLOW);
             int retOverworld = run_until(
                 env.console, context,
-                [](BotBaseContext& context) {
+                [](BotBaseContext& context){
                     pbf_mash_button(context, BUTTON_B, 10000);
                 },
                 { overworld }
                 );
-            if (retOverworld != 0) {
+            if (retOverworld != 0){
                 env.log("Failed to detect overworld after catching.", COLOR_RED);
             }
             else {
@@ -382,7 +382,7 @@ void StatsResetBloodmoon::program(SingleSwitchProgramEnvironment& env, BotBaseCo
             stats_matched = check_stats(env, context);
         }
 
-        if (!battle_won || !stats_matched) {
+        if (!battle_won || !stats_matched){
             //Reset
             stats.resets++;
             env.update_stats();

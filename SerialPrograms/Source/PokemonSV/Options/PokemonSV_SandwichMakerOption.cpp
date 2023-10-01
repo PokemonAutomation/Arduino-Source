@@ -6,7 +6,7 @@
 
 #include <map>
 //#include "PokemonSV/Resources/PokemonSV_Ingredients.h"
-#include "PokemonSV/Inference/Boxes/PokemonSV_IVCheckerReader.h"
+#include "PokemonSV/Inference/Boxes/PokemonSV_IvJudgeReader.h"
 #include "PokemonSV_SandwichMakerOption.h"
 //#include "PokemonSV_SandwichIngredientsOption.h"
 

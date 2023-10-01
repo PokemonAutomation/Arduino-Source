@@ -111,7 +111,7 @@ TournamentFarmer::TournamentFarmer()
     , SAVE_NUM_ROUNDS(
         "<b>Save every this many tournaments:</b><br>Zero disables saving. Will save win or lose.",
         LockWhileRunning::UNLOCKED,
-        0, 0
+        1, 0
     )
     , MONEY_LIMIT(
         "<b>Stop after earning this amount of money:</b><br>Zero disables this check. Does not count losses. In-game maximum is 9,999,999. This can be set up to 999,999,999.",

@@ -21,7 +21,7 @@
 #include "PokemonLA/Inference/PokemonLA_MountDetector.h"
 #include "CommonFramework/InferenceInfra/VisualInferencePivot.h"
 #include "Pokemon/Pokemon_Strings.h"
-#include "PokemonBDSP/Inference/BoxSystem/PokemonBDSP_IVCheckerReader.h"
+#include "PokemonBDSP/Inference/BoxSystem/PokemonBDSP_IvJudgeReader.h"
 #include "PokemonBDSP/Inference/Battles/PokemonBDSP_BattleBallReader.h"
 #include "PokemonLA/Programs/PokemonLA_LeapPokemonActions.h"
 #include "PokemonLA/Inference/PokemonLA_OverworldDetector.h"
@@ -109,6 +109,7 @@
 #include "PokemonSV/Inference/PokemonSV_BagDetector.h"
 #include <filesystem>
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_Lobby.h"
+#include "PokemonSV/Inference/PokemonSV_StatHexagonReader.h"
 
 
 
@@ -236,12 +237,74 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
+    SummaryStatsReader reader;
+    reader.make_overlays(overlays);
+
+    auto snapshot = console.video().snapshot();
+
+#if 1
+    NatureAdjustments nature = reader.read_nature(logger, snapshot);
+    cout << "attack     = " << (int)nature.attack << endl;
+    cout << "defense    = " << (int)nature.defense << endl;
+    cout << "spatk      = " << (int)nature.spatk << endl;
+    cout << "spdef      = " << (int)nature.spdef << endl;
+    cout << "speed      = " << (int)nature.speed << endl;
+
+    StatReads stats = reader.read_stats(logger, snapshot);
+    cout << "hp         = " << stats.hp << endl;
+    cout << "attack     = " << stats.attack << endl;
+    cout << "defense    = " << stats.defense << endl;
+    cout << "spatk      = " << stats.spatk << endl;
+    cout << "spdef      = " << stats.spdef << endl;
+    cout << "speed      = " << stats.speed << endl;
+
+    BaseStats base_stats{113, 70, 120, 135, 65, 52};
+    EVs evs{0, 0, 0, 0, 0, 0};
+    IvRanges ivs = reader.calc_ivs(logger, snapshot, base_stats, evs);
+    cout << "hp         = " << (int)ivs.hp.low << " - " << (int)ivs.hp.high << endl;
+    cout << "attack     = " << (int)ivs.attack.low << " - " << (int)ivs.attack.high << endl;
+    cout << "defense    = " << (int)ivs.defense.low << " - " << (int)ivs.defense.high << endl;
+    cout << "spatk      = " << (int)ivs.spatk.low << " - " << (int)ivs.spatk.high << endl;
+    cout << "spdef      = " << (int)ivs.spdef.low << " - " << (int)ivs.spdef.high << endl;
+    cout << "speed      = " << (int)ivs.speed.low << " - " << (int)ivs.speed.high << endl;
+#endif
+
+
+#if 0
+    cout << "attack: ";
+    reader.read_stat_adjustment({0.874, 0.293, 0.014, 0.024}, snapshot);
+    cout << "spatk: ";
+    reader.read_stat_adjustment({0.770, 0.293, 0.014, 0.024}, snapshot);
+    cout << "speed: ";
+    reader.read_stat_adjustment({0.822, 0.452, 0.014, 0.024}, snapshot);
+#endif
+
+
+#if 0
+    ImageFloatBox hp    (0.823, 0.244, 0.012, 0.022);
+    ImageFloatBox atk   (0.875, 0.294, 0.012, 0.022);
+    ImageFloatBox def   (0.875, 0.402, 0.012, 0.022);
+    ImageFloatBox spatk (0.771, 0.294, 0.012, 0.022);
+    ImageFloatBox spdef (0.771, 0.402, 0.012, 0.022);
+    ImageFloatBox spd   (0.823, 0.453, 0.012, 0.022);
+
+    overlays.add(COLOR_RED, hp);
+    overlays.add(COLOR_RED, atk);
+    overlays.add(COLOR_RED, def);
+    overlays.add(COLOR_RED, spatk);
+    overlays.add(COLOR_RED, spdef);
+    overlays.add(COLOR_RED, spd);
+#endif
+
+
+
+#if 0
     PokemonSwSh::MaxLairInternal::LobbyJoinedDetector detector(2, false);
 
     auto snapshot = console.video().snapshot();
 //    detector.VisualInferenceCallback::process_frame(snapshot);
     detector.joined(snapshot, snapshot.timestamp);
-
+#endif
 
 //    size_t errors = 0;
 //    attach_item_from_bag(env.program_info(), console, context, errors);
