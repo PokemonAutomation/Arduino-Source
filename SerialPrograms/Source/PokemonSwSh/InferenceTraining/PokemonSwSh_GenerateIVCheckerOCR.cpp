@@ -47,12 +47,12 @@ GenerateIVCheckerOCR::GenerateIVCheckerOCR()
         IV_READER().languages(),
         LockWhileRunning::LOCKED
     )
-    , HP("<b>HP:</b>", IVCheckerValue::Best)
-    , ATTACK("<b>Attack:</b>", IVCheckerValue::Best)
-    , DEFENSE("<b>Defense:</b>", IVCheckerValue::Best)
-    , SPATK("<b>Sp. Atk:</b>", IVCheckerValue::Best)
-    , SPDEF("<b>Sp. Def:</b>", IVCheckerValue::Best)
-    , SPEED("<b>Speed:</b>", IVCheckerValue::Best)
+    , HP("<b>HP:</b>", IvJudgeValue::Best)
+    , ATTACK("<b>Attack:</b>", IvJudgeValue::Best)
+    , DEFENSE("<b>Defense:</b>", IvJudgeValue::Best)
+    , SPATK("<b>Sp. Atk:</b>", IvJudgeValue::Best)
+    , SPDEF("<b>Sp. Def:</b>", IvJudgeValue::Best)
+    , SPEED("<b>Speed:</b>", IvJudgeValue::Best)
 {
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(HP);
@@ -65,7 +65,7 @@ GenerateIVCheckerOCR::GenerateIVCheckerOCR()
 
 
 void GenerateIVCheckerOCR::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    IVCheckerReaderScope reader(env.console, LANGUAGE);
+    IvJudgeReaderScope reader(env.console, LANGUAGE);
 
     std::string path = "IVCheckerOCR/";
     path += language_data(LANGUAGE).code;
@@ -80,8 +80,8 @@ void GenerateIVCheckerOCR::program(SingleSwitchProgramEnvironment& env, BotBaseC
     std::vector<ImageViewRGB32> images = reader.dump_images(screen);
 
     std::string now = now_to_filestring();
-
-    const EnumDatabase<IVCheckerValue>& database = IVCheckerValue_Database();
+    
+    const EnumDatabase<IvJudgeValue>& database = IvJudgeValue_Database();
     images[0].save(path + database.find(HP)->display + "-" + now + "a.png");
     images[1].save(path + database.find(ATTACK)->display + "-" + now + "b.png");
     images[2].save(path + database.find(DEFENSE)->display + "-" + now + "c.png");

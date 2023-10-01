@@ -17,7 +17,7 @@
 #include "PokemonSV/Inference/Battles/PokemonSV_NormalBattleMenus.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_StatsResetChecker.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.h"
-#include "PokemonSV/Inference/Boxes/PokemonSV_IVCheckerReader.h"
+#include "PokemonSV/Inference/Boxes/PokemonSV_IvJudgeReader.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_TeraBattleMenus.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"

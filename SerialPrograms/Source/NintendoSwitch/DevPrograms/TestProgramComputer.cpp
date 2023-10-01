@@ -60,7 +60,7 @@
 #include "PokemonLA/Inference/PokemonLA_MountDetector.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_ArcPhoneDetector.h"
 #include "Common/Cpp/Concurrency/PeriodicScheduler.h"
-#include "Pokemon/Inference/Pokemon_IVCheckerReader.h"
+#include "Pokemon/Inference/Pokemon_IvJudgeReader.h"
 #include "Kernels/Kernels_Alignment.h"
 #include "Kernels/ScaleInvariantMatrixMatch/Kernels_ScaleInvariantMatrixMatch.h"
 #include "Kernels/SpikeConvolution/Kernels_SpikeConvolution.h"

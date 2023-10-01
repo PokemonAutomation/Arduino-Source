@@ -18,7 +18,7 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 //#include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.h"
-#include "PokemonSV/Inference/Boxes/PokemonSV_IVCheckerReader.h"
+#include "PokemonSV/Inference/Boxes/PokemonSV_IvJudgeReader.h"
 #include "PokemonSV_BoxRoutines.h"
 
 //#include <iostream>
@@ -86,7 +86,7 @@ void change_view_to_judge(
     }
 
     ImageFloatBox name_bar(0.66, 0.08, 0.52, 0.04);
-    IVCheckerReaderScope iv_checker(console, language);
+    IvJudgeReaderScope iv_checker(console, language);
     OverlayBoxScope name_bar_overlay(console.overlay(), name_bar);
     for (size_t attempts = 0;; attempts++){
         if (attempts == 5){
@@ -110,15 +110,15 @@ void change_view_to_judge(
         }
 
         //  See if we're on the judge screen.
-        IVCheckerReader::Results ivs = iv_checker.read(console, screen);
+        IvJudgeReader::Results ivs = iv_checker.read(console, screen);
 
         size_t detected = 0;
-        if (ivs.hp      != IVCheckerValue::UnableToDetect) detected++;
-        if (ivs.attack  != IVCheckerValue::UnableToDetect) detected++;
-        if (ivs.defense != IVCheckerValue::UnableToDetect) detected++;
-        if (ivs.spatk   != IVCheckerValue::UnableToDetect) detected++;
-        if (ivs.spdef   != IVCheckerValue::UnableToDetect) detected++;
-        if (ivs.speed   != IVCheckerValue::UnableToDetect) detected++;
+        if (ivs.hp      != IvJudgeValue::UnableToDetect) detected++;
+        if (ivs.attack  != IvJudgeValue::UnableToDetect) detected++;
+        if (ivs.defense != IvJudgeValue::UnableToDetect) detected++;
+        if (ivs.spatk   != IvJudgeValue::UnableToDetect) detected++;
+        if (ivs.spdef   != IvJudgeValue::UnableToDetect) detected++;
+        if (ivs.speed   != IvJudgeValue::UnableToDetect) detected++;
 
         //  If less than 4 of the IVs are read, assume we're not on the judge screen.
         if (detected < 4){

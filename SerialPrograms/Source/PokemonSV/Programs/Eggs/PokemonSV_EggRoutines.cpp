@@ -19,7 +19,7 @@
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxEggDetector.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxGenderDetector.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxShinyDetector.h"
-#include "PokemonSV/Inference/Boxes/PokemonSV_IVCheckerReader.h"
+#include "PokemonSV/Inference/Boxes/PokemonSV_IvJudgeReader.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxNatureDetector.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.h"
@@ -618,8 +618,8 @@ bool check_baby_info(
     BoxShinyWatcher shiny_detector;
     // BoxShinyDetector shiny_detector;
     shiny_detector.make_overlays(overlay_set);
-
-    IVCheckerReaderScope iv_reader_scope(console.overlay(), LANGUAGE);
+    
+    IvJudgeReaderScope iv_reader_scope(console.overlay(), LANGUAGE);
     BoxGenderDetector gender_detector;
     gender_detector.make_overlays(overlay_set);
     BoxNatureDetector nature_detector(console.overlay(), LANGUAGE);
@@ -627,8 +627,8 @@ bool check_baby_info(
     const int shiny_ret = wait_until(console, context, std::chrono::milliseconds(200), {shiny_detector});
     const bool shiny = (shiny_ret == 0);
     VideoSnapshot screen = console.video().snapshot();
-
-    IVCheckerReader::Results IVs = iv_reader_scope.read(console.logger(), screen);
+    
+    IvJudgeReader::Results IVs = iv_reader_scope.read(console.logger(), screen);
     EggHatchGenderFilter gender = gender_detector.detect(screen);
     NatureReader::Results nature = nature_detector.read(console.logger(), screen);
 

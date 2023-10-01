@@ -20,7 +20,7 @@
 #include "PokemonSwSh/Inference/PokemonSwSh_BoxGenderDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_BoxShinySymbolDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_DialogBoxDetector.h"
-#include "PokemonSwSh/Inference/PokemonSwSh_IVCheckerReader.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_BoxNatureDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_SelectionArrowFinder.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_YCommDetector.h"
@@ -587,7 +587,7 @@ bool EggAutonomous::process_hatched_pokemon(SingleSwitchProgramEnvironment& env,
         BoxShinySymbolDetector::make_overlays(overlay_set);
         BoxGenderDetector gender_detector;
         gender_detector.make_overlays(overlay_set);
-        IVCheckerReaderScope iv_reader(env.console.overlay(), LANGUAGE);
+        IvJudgeReaderScope iv_reader(env.console.overlay(), LANGUAGE);
         BoxNatureDetector nature_detector(env.console.overlay());
 
         for (size_t i_hatched = 0; i_hatched < 5; i_hatched++){
@@ -614,8 +614,8 @@ bool EggAutonomous::process_hatched_pokemon(SingleSwitchProgramEnvironment& env,
             }
             // Note: we assume the pokemon storage UI is in the state of judging pokemon stats.
             //   In this way we can detect pokemon stats.
-
-            IVCheckerReader::Results IVs = iv_reader.read(env.console, screen);
+            
+            IvJudgeReader::Results IVs = iv_reader.read(env.console, screen);
             EggHatchGenderFilter gender = gender_detector.detect(screen);
             env.log(IVs.to_string(), COLOR_GREEN);
             env.log("Gender: " + gender_to_string(gender), COLOR_GREEN);

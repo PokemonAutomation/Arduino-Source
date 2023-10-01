@@ -1,11 +1,11 @@
-/*  Pokemon IV Checker
+/*  Pokemon Iv Judge
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
  */
 
-#ifndef PokemonAutomation_Pokemon_IVChecker_H
-#define PokemonAutomation_Pokemon_IVChecker_H
+#ifndef PokemonAutomation_Pokemon_IvJudge_H
+#define PokemonAutomation_Pokemon_IvJudge_H
 
 #include <string>
 #include <vector>
@@ -15,7 +15,7 @@ namespace PokemonAutomation{
 namespace Pokemon{
 
 
-enum class IVCheckerValue{
+enum class IvJudgeValue{
     UnableToDetect,
     NoGood,
     Decent,
@@ -25,11 +25,11 @@ enum class IVCheckerValue{
     Best,
     HyperTrained,
 };
-const EnumDatabase<IVCheckerValue>& IVCheckerValue_Database();
-IVCheckerValue IVCheckerValue_string_to_enum(const std::string& token);
+const EnumDatabase<IvJudgeValue>& IvJudgeValue_Database();
+IvJudgeValue IvJudgeValue_string_to_enum(const std::string& token);
 
 
-enum class IVCheckerFilter{
+enum class IvJudgeFilter{
     Anything,
     NoGood,
     Decent,
@@ -38,8 +38,8 @@ enum class IVCheckerFilter{
     Fantastic,
     Best,
 };
-const EnumDatabase<IVCheckerFilter>& IVCheckerFilter_Database();
-bool IVChecker_filter_match(IVCheckerFilter filter, IVCheckerValue value);
+const EnumDatabase<IvJudgeFilter>& IvJudgeFilter_Database();
+bool IvJudge_filter_match(IvJudgeFilter filter, IvJudgeValue value);
 
 
 

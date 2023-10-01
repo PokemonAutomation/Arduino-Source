@@ -14,8 +14,8 @@
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
-#include "Pokemon/Options/Pokemon_IVCheckerOption.h"
-#include "PokemonSwSh/Inference/PokemonSwSh_IVCheckerReader.h"
+#include "Pokemon/Options/Pokemon_IvJudgeOption.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -49,13 +49,13 @@ private:
         Poipole,
     };
     EnumDropdownOption<GiftPokemon> POKEMON;
-
-    IVCheckerFilterOption HP;
-    IVCheckerFilterOption ATTACK;
-    IVCheckerFilterOption DEFENSE;
-    IVCheckerFilterOption SPATK;
-    IVCheckerFilterOption SPDEF;
-    IVCheckerFilterOption SPEED;
+    
+    IVJudgeFilterOption HP;
+    IVJudgeFilterOption ATTACK;
+    IVJudgeFilterOption DEFENSE;
+    IVJudgeFilterOption SPATK;
+    IVJudgeFilterOption SPDEF;
+    IVJudgeFilterOption SPEED;
 
     EventNotificationOption NOTIFICATION_PROGRAM_FINISH;
     EventNotificationsOption NOTIFICATIONS;

@@ -21,7 +21,7 @@
 #include "PokemonLA/Inference/PokemonLA_MountDetector.h"
 #include "CommonFramework/InferenceInfra/VisualInferencePivot.h"
 #include "Pokemon/Pokemon_Strings.h"
-#include "PokemonBDSP/Inference/BoxSystem/PokemonBDSP_IVCheckerReader.h"
+#include "PokemonBDSP/Inference/BoxSystem/PokemonBDSP_IvJudgeReader.h"
 #include "PokemonBDSP/Inference/Battles/PokemonBDSP_BattleBallReader.h"
 #include "PokemonLA/Programs/PokemonLA_LeapPokemonActions.h"
 #include "PokemonLA/Inference/PokemonLA_OverworldDetector.h"

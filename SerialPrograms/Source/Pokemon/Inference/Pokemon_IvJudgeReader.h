@@ -1,38 +1,38 @@
-/*  IV Checker Reader
+/*  IV Judge Reader
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
  */
 
-#ifndef PokemonAutomation_Pokemon_IVCheckerReader_H
-#define PokemonAutomation_Pokemon_IVCheckerReader_H
+#ifndef PokemonAutomation_Pokemon_IvJudgeReader_H
+#define PokemonAutomation_Pokemon_IvJudgeReader_H
 
 #include "CommonFramework/OCR/OCR_SmallDictionaryMatcher.h"
-#include "Pokemon/Pokemon_IVChecker.h"
+#include "Pokemon/Pokemon_IvJudge.h"
 
 namespace PokemonAutomation{
 namespace Pokemon{
 
 
 
-class IVCheckerReader : public OCR::SmallDictionaryMatcher{
+class IvJudgeReader : public OCR::SmallDictionaryMatcher{
 public:
     static constexpr double MAX_LOG10P = -1.40;
     static constexpr double MAX_LOG10P_SPREAD = 0.50;
 
 public:
     struct Results{
-        IVCheckerValue hp       = IVCheckerValue::UnableToDetect;
-        IVCheckerValue attack   = IVCheckerValue::UnableToDetect;
-        IVCheckerValue defense  = IVCheckerValue::UnableToDetect;
-        IVCheckerValue spatk    = IVCheckerValue::UnableToDetect;
-        IVCheckerValue spdef    = IVCheckerValue::UnableToDetect;
-        IVCheckerValue speed    = IVCheckerValue::UnableToDetect;
+        IvJudgeValue hp       = IvJudgeValue::UnableToDetect;
+        IvJudgeValue attack   = IvJudgeValue::UnableToDetect;
+        IvJudgeValue defense  = IvJudgeValue::UnableToDetect;
+        IvJudgeValue spatk    = IvJudgeValue::UnableToDetect;
+        IvJudgeValue spdef    = IvJudgeValue::UnableToDetect;
+        IvJudgeValue speed    = IvJudgeValue::UnableToDetect;
 
         std::string to_string() const;
     };
 
-    IVCheckerReader(const std::string& json_path);
+    IvJudgeReader(const std::string& json_path);
 
     OCR::StringMatchResult read_substring(
         Logger& logger,

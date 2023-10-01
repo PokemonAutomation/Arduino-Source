@@ -1,19 +1,19 @@
-/*  IV Checker Reader
+/*  IV Judge Reader
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
  */
 
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
-#include "PokemonSwSh/Inference/PokemonSwSh_IVCheckerReader.h"
-#include "PokemonBDSP_IVCheckerReader.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h"
+#include "PokemonBDSP_IvJudgeReader.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 
-IVCheckerReaderScope::IVCheckerReaderScope(VideoOverlay& overlay, Language language)
+IvJudgeReaderScope::IvJudgeReaderScope(VideoOverlay& overlay, Language language)
     : m_language(language)
     , m_box0(overlay, {0.785, 0.196 + 0 * 0.0529, 0.2, 0.0515})
     , m_box1(overlay, {0.785, 0.196 + 1 * 0.0529, 0.2, 0.0515})
@@ -24,20 +24,20 @@ IVCheckerReaderScope::IVCheckerReaderScope(VideoOverlay& overlay, Language langu
 {}
 
 
-IVCheckerValue IVCheckerReaderScope::read(Logger& logger, const ImageViewRGB32& frame, const OverlayBoxScope& box){
+IvJudgeValue IvJudgeReaderScope::read(Logger& logger, const ImageViewRGB32& frame, const OverlayBoxScope& box){
     ImageViewRGB32 image = extract_box_reference(frame, box);
     OCR::StringMatchResult result = PokemonSwSh::IV_READER().read_substring(
         logger, m_language, image,
         OCR::BLACK_TEXT_FILTERS()
     );
-    result.clear_beyond_log10p(IVCheckerReader::MAX_LOG10P);
+    result.clear_beyond_log10p(IvJudgeReader::MAX_LOG10P);
     if (result.results.size() != 1){
-        return IVCheckerValue::UnableToDetect;
+        return IvJudgeValue::UnableToDetect;
     }
-    return IVCheckerValue_string_to_enum(result.results.begin()->second.token);
+    return IvJudgeValue_string_to_enum(result.results.begin()->second.token);
 }
-IVCheckerReader::Results IVCheckerReaderScope::read(Logger& logger, const ImageViewRGB32& frame){
-    IVCheckerReader::Results results;
+IvJudgeReader::Results IvJudgeReaderScope::read(Logger& logger, const ImageViewRGB32& frame){
+    IvJudgeReader::Results results;
     if (m_language != Language::None){
         results.hp      = read(logger, frame, m_box0);
         results.attack  = read(logger, frame, m_box1);
@@ -49,7 +49,7 @@ IVCheckerReader::Results IVCheckerReaderScope::read(Logger& logger, const ImageV
     return results;
 }
 
-std::vector<ImageViewRGB32> IVCheckerReaderScope::dump_images(const ImageViewRGB32& frame){
+std::vector<ImageViewRGB32> IvJudgeReaderScope::dump_images(const ImageViewRGB32& frame){
     std::vector<ImageViewRGB32> images;
     images.emplace_back(extract_box_reference(frame, m_box0));
     images.emplace_back(extract_box_reference(frame, m_box1));

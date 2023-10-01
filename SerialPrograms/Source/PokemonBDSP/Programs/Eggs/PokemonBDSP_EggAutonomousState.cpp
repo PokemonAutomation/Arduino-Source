@@ -23,7 +23,7 @@
 #include "PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxGenderDetector.h"
 #include "PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxNatureDetector.h"
 #include "PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxShinyDetector.h"
-#include "PokemonBDSP/Inference/BoxSystem/PokemonBDSP_IVCheckerReader.h"
+#include "PokemonBDSP/Inference/BoxSystem/PokemonBDSP_IvJudgeReader.h"
 #include "PokemonBDSP/Programs/PokemonBDSP_GameNavigation.h"
 #include "PokemonBDSP_EggRoutines.h"
 #include "PokemonBDSP_EggFeedback.h"
@@ -189,7 +189,7 @@ bool EggAutonomousState::process_party(){
 //    m_env.wait_for(SCROLL_TO_READ_DELAY);
 
     BoxShinyDetector shiny_reader;
-    IVCheckerReaderScope iv_reader(m_console, m_language);
+    IvJudgeReaderScope iv_reader(m_console, m_language);
     BoxNatureDetector nature_detector(m_console.overlay(), m_language);
 
     VideoOverlaySet set(m_console);
@@ -224,7 +224,7 @@ bool EggAutonomousState::process_party(){
         }else{
             m_console.log("Pokemon " + std::to_string(c) + " is not shiny.", COLOR_PURPLE);
         }
-        IVCheckerReader::Results IVs = iv_reader.read(m_console, screen);
+        IvJudgeReader::Results IVs = iv_reader.read(m_console, screen);
         EggHatchGenderFilter gender = read_gender_from_box(m_console, m_console, screen);
         NatureReader::Results nature = nature_detector.read(m_console.logger(), screen);
 

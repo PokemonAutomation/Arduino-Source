@@ -4,14 +4,14 @@
  *
  */
 
-#include "Pokemon_IVCheckerReader.h"
+#include "Pokemon_IvJudgeReader.h"
 
 namespace PokemonAutomation{
 namespace Pokemon{
 
 namespace {
 
-std::string iv_checker_value_to_string(IVCheckerValue value){
+std::string iv_checker_value_to_string(IvJudgeValue value){
     const char* names[] = {
         "UnableToDetect",
         "NoGood",
@@ -28,11 +28,11 @@ std::string iv_checker_value_to_string(IVCheckerValue value){
 
 }
 
-IVCheckerReader::IVCheckerReader(const std::string& json_path)
+IvJudgeReader::IvJudgeReader(const std::string& json_path)
     : SmallDictionaryMatcher(json_path)
 {}
 
-OCR::StringMatchResult IVCheckerReader::read_substring(
+OCR::StringMatchResult IvJudgeReader::read_substring(
     Logger& logger,
     Language language,
     const ImageViewRGB32& image,
@@ -48,7 +48,7 @@ OCR::StringMatchResult IVCheckerReader::read_substring(
 
 
 
-std::string IVCheckerReader::Results::to_string() const{
+std::string IvJudgeReader::Results::to_string() const{
     return  "HP: " + iv_checker_value_to_string(hp)
          + ", Att: " + iv_checker_value_to_string(attack)
          + ", Def: " + iv_checker_value_to_string(defense)
