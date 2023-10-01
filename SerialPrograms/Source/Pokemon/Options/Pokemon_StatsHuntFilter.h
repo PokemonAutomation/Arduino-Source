@@ -72,13 +72,17 @@ enum class StatsHuntNatureFilter{
 std::string gender_to_string(StatsHuntGenderFilter gender);
 
 
+class StatsHuntFilterTable;
+
 class StatsHuntFilterRow : public EditableTableRow{
 public:
-    StatsHuntFilterRow();
-    StatsHuntFilterRow(StatsHuntShinyFilter p_shiny);
+    StatsHuntFilterRow(const EditableTableOption* table);
+    StatsHuntFilterRow(const StatsHuntFilterTable* table, StatsHuntShinyFilter p_shiny);
     virtual std::unique_ptr<EditableTableRow> clone() const override;
 
 public:
+    const StatsHuntFilterTable& m_table;
+
     EnumDropdownCell<StatsHuntAction> action;
     EnumDropdownCell<StatsHuntShinyFilter> shiny;
     EnumDropdownCell<StatsHuntGenderFilter> gender;
@@ -91,11 +95,34 @@ public:
     IVJudgeFilterCell iv_speed;
 };
 
+
+
 class StatsHuntFilterTable : public EditableTableOption_t<StatsHuntFilterRow>{
 public:
-    StatsHuntFilterTable();
+    enum EnableAction{
+        DISABLE_ACTION,
+        ENABLE_ACTION,
+    };
+    enum EnableShiny{
+        DISABLE_SHINY,
+        ENABLE_SHINY,
+    };
+    enum EnableGender{
+        DISABLE_GENDER,
+        ENABLE_GENDER,
+    };
+    enum EnableNature{
+        DISABLE_NATURE,
+        ENABLE_NATURE,
+    };
+    StatsHuntFilterTable(
+        EnableAction enable_action = ENABLE_ACTION,
+        EnableShiny enable_shiny = ENABLE_SHINY,
+        EnableGender enable_gender = ENABLE_GENDER,
+        EnableNature enable_nature = ENABLE_NATURE
+    );
     virtual std::vector<std::string> make_header() const override;
-    static std::vector<std::unique_ptr<EditableTableRow>> make_defaults();
+    std::vector<std::unique_ptr<EditableTableRow>> make_defaults() const;
     
     StatsHuntAction get_action(
         bool shiny,
@@ -103,6 +130,12 @@ public:
         StatsHuntGenderFilter gender,
         NatureReader::Results nature
     ) const;
+
+public:
+    const bool m_enable_action;
+    const bool m_enable_shiny;
+    const bool m_enable_gender;
+    const bool m_enable_nature;
 };
 
 

@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Compiler.h"
+//#include "Common/Compiler.h"
 // #include "PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxGenderDetector.h"
 #include "Pokemon_StatsHuntFilter.h"
 
@@ -52,8 +52,9 @@ const EnumDatabase<StatsHuntGenderFilter>& EggHatchGenderFilter_Database(){
     return database;
 }
 
-StatsHuntFilterRow::StatsHuntFilterRow()
-    : action(EggHatchAction_Database(), LockWhileRunning::LOCKED, StatsHuntAction::Keep)
+StatsHuntFilterRow::StatsHuntFilterRow(const EditableTableOption* table)
+    : m_table(static_cast<const StatsHuntFilterTable&>(*table))
+    , action(EggHatchAction_Database(), LockWhileRunning::LOCKED, StatsHuntAction::Keep)
     , shiny(EggHatchShinyFilter_Database(), LockWhileRunning::LOCKED, StatsHuntShinyFilter::Anything)
     , gender(EggHatchGenderFilter_Database(), LockWhileRunning::LOCKED, StatsHuntGenderFilter::Any)
     , nature(NatureCheckerFilter_Database(), LockWhileRunning::LOCKED, NatureCheckerFilter::Any)
@@ -64,10 +65,18 @@ StatsHuntFilterRow::StatsHuntFilterRow()
     , iv_spdef(IvJudgeFilter::Anything)
     , iv_speed(IvJudgeFilter::Anything)
 {
-    PA_ADD_OPTION(action);
-    PA_ADD_OPTION(shiny);
-    PA_ADD_OPTION(gender);
-    PA_ADD_OPTION(nature);
+    if (m_table.m_enable_action){
+        PA_ADD_OPTION(action);
+    }
+    if (m_table.m_enable_shiny){
+        PA_ADD_OPTION(shiny);
+    }
+    if (m_table.m_enable_gender){
+        PA_ADD_OPTION(gender);
+    }
+    if (m_table.m_enable_nature){
+        PA_ADD_OPTION(nature);
+    }
     PA_ADD_OPTION(iv_hp);
     PA_ADD_OPTION(iv_atk);
     PA_ADD_OPTION(iv_def);
@@ -75,13 +84,13 @@ StatsHuntFilterRow::StatsHuntFilterRow()
     PA_ADD_OPTION(iv_spdef);
     PA_ADD_OPTION(iv_speed);
 }
-StatsHuntFilterRow::StatsHuntFilterRow(StatsHuntShinyFilter p_shiny)
-    : StatsHuntFilterRow()
+StatsHuntFilterRow::StatsHuntFilterRow(const StatsHuntFilterTable* table, StatsHuntShinyFilter p_shiny)
+    : StatsHuntFilterRow(table)
 {
     shiny.set(p_shiny);
 }
 std::unique_ptr<EditableTableRow> StatsHuntFilterRow::clone() const{
-    std::unique_ptr<StatsHuntFilterRow> ret(new StatsHuntFilterRow());
+    std::unique_ptr<StatsHuntFilterRow> ret(new StatsHuntFilterRow(&m_table));
     ret->action.set(action);
     ret->shiny.set(shiny);
     ret->gender.set(gender);
@@ -99,34 +108,56 @@ std::unique_ptr<EditableTableRow> StatsHuntFilterRow::clone() const{
 
 
 
-StatsHuntFilterTable::StatsHuntFilterTable()
+StatsHuntFilterTable::StatsHuntFilterTable(
+    EnableAction enable_action,
+    EnableShiny enable_shiny,
+    EnableGender enable_gender,
+    EnableNature enable_nature
+)
     : EditableTableOption_t<StatsHuntFilterRow>(
         "<b>Actions Table:</b><br>"
         "If a hatchling matches one of these filters, the specified action will be performed. "
         "Otherwise, it will be released. "
         "If multiple entries apply and have conflicting actions, the program will stop.<br>"
         "IV checking requires that your right panel be set to the IV Judge and that you have selected the correct game language above.",
-        LockWhileRunning::LOCKED,
-        make_defaults()
+        LockWhileRunning::LOCKED
     )
-{}
-std::vector<std::string> StatsHuntFilterTable::make_header() const{
-    return std::vector<std::string>{
-        "Action",
-        "Shininess",
-        "Gender",
-        "Nature",
-        "HP",
-        "Attack",
-        "Defense",
-        "Sp. Attack",
-        "Sp. Defense",
-        "Speed",
-    };
+    , m_enable_action(enable_action == EnableAction::ENABLE_ACTION)
+    , m_enable_shiny(enable_shiny == EnableShiny::ENABLE_SHINY)
+    , m_enable_gender(enable_gender == EnableGender::ENABLE_GENDER)
+    , m_enable_nature(enable_nature == EnableNature::ENABLE_NATURE)
+{
+    set_default(make_defaults());
 }
-std::vector<std::unique_ptr<EditableTableRow>> StatsHuntFilterTable::make_defaults(){
+std::vector<std::string> StatsHuntFilterTable::make_header() const{
+    std::vector<std::string> ret;
+    if (m_enable_action){
+        ret.emplace_back("Action");
+    }
+    if (m_enable_shiny){
+        ret.emplace_back("Shininess");
+    }
+    if (m_enable_gender){
+        ret.emplace_back("Gender");
+    }
+    if (m_enable_nature){
+        ret.emplace_back("Nature");
+    }
+
+    ret.emplace_back("HP");
+    ret.emplace_back("Attack");
+    ret.emplace_back("Defense");
+    ret.emplace_back("Sp. Attack");
+    ret.emplace_back("Sp. Defense");
+    ret.emplace_back("Speed");
+
+    return ret;
+}
+std::vector<std::unique_ptr<EditableTableRow>> StatsHuntFilterTable::make_defaults() const{
     std::vector<std::unique_ptr<EditableTableRow>> ret;
-    ret.emplace_back(new StatsHuntFilterRow(StatsHuntShinyFilter::Shiny));
+    if (m_enable_shiny){
+        ret.emplace_back(new StatsHuntFilterRow(this));
+    }
     return ret;
 }
 

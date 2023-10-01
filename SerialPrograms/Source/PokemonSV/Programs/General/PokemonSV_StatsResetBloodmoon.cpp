@@ -80,6 +80,12 @@ StatsResetBloodmoon::StatsResetBloodmoon()
         LockWhileRunning::UNLOCKED,
         false
     )
+    , FILTERS(
+        StatsHuntFilterTable::DISABLE_ACTION,
+        StatsHuntFilterTable::DISABLE_SHINY,
+        StatsHuntFilterTable::DISABLE_GENDER,
+        StatsHuntFilterTable::DISABLE_NATURE
+    )
     , GO_HOME_WHEN_DONE(false)
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({

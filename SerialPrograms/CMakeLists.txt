@@ -871,8 +871,6 @@ file(GLOB MAIN_SOURCES
     Source/Pokemon/Options/Pokemon_NameSelectWidget.h
     Source/Pokemon/Options/Pokemon_StatsHuntFilter.cpp
     Source/Pokemon/Options/Pokemon_StatsHuntFilter.h
-    Source/Pokemon/Options/Pokemon_StatsResetFilter.cpp
-    Source/Pokemon/Options/Pokemon_StatsResetFilter.h
     Source/Pokemon/Pokemon_DataTypes.h
     Source/Pokemon/Pokemon_EncounterStats.cpp
     Source/Pokemon/Pokemon_EncounterStats.h

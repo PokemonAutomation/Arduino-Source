@@ -11,9 +11,9 @@
 #include "CommonFramework/Options/LanguageOCROption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
+#include "Pokemon/Options/Pokemon_StatsHuntFilter.h"
 #include "PokemonSwSh/Options/PokemonSwSh_BallSelectOption.h"
 #include "PokemonSV/Options/PokemonSV_BattleMoveTable.h"
-#include "Pokemon/Options/Pokemon_StatsResetFilter.h"
 
 namespace PokemonAutomation {
 namespace NintendoSwitch {
@@ -45,7 +45,7 @@ private:
     PokemonSwSh::PokemonBallSelectOption BALL_SELECT;
     BooleanCheckBoxOption QUICKBALL;
     BattleMoveTable BATTLE_MOVES;
-    Pokemon::StatsResetFilterTable FILTERS;
+    Pokemon::StatsHuntFilterTable FILTERS;
 
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
