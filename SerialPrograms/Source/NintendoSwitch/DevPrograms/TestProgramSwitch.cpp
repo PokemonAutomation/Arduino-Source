@@ -258,8 +258,8 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     cout << "spdef      = " << stats.spdef << endl;
     cout << "speed      = " << stats.speed << endl;
 
-    BaseStats base_stats{68, 65, 65, 125, 115, 80};
-    EVs evs{252, 0, 6, 252, 0, 0};
+    BaseStats base_stats{113, 70, 120, 135, 65, 52};
+    EVs evs{0, 0, 0, 0, 0, 0};
     IvRanges ivs = reader.calc_ivs(logger, snapshot, base_stats, evs);
     cout << "hp         = " << (int)ivs.hp.low << " - " << (int)ivs.hp.high << endl;
     cout << "attack     = " << (int)ivs.attack.low << " - " << (int)ivs.attack.high << endl;

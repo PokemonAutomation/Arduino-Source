@@ -11,6 +11,7 @@
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/ImageFilter.h"
+#include "CommonFramework/ImageTools/ImageManip.h"
 #include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "CommonFramework/OCR/OCR_NumberReader.h"
 #include "PokemonSV_StatHexagonReader.h"
@@ -54,6 +55,7 @@ StatHexagonReader::StatHexagonReader(
     , m_stat_speed(stat_speed)
 {}
 void StatHexagonReader::make_overlays(VideoOverlaySet& items) const{
+    items.add(m_color, m_level);
     items.add(m_color, m_ball_attack);
     items.add(m_color, m_ball_defense);
     items.add(m_color, m_ball_spatk);
@@ -167,9 +169,14 @@ NatureAdjustments StatHexagonReader::read_nature(Logger& logger, const ImageView
 
 int8_t StatHexagonReader::read_level(Logger& logger, const ImageViewRGB32& screen) const{
     ImageViewRGB32 region = extract_box_reference(screen, m_level);
+#if 0
     ImageRGB32 filtered = to_blackwhite_rgb32_range(region, 0xff808080, 0xffffffff, true);
+    filtered = pad_image(filtered, filtered.height() / 2, 0xffffffff);
 
     int number = OCR::read_number(logger, filtered);
+#else
+    int number = OCR::read_number_waterfill(logger, region, 0xff808080, 0xffffffff);
+#endif
     if (number < 0 || number > 100){
         number = -1;
     }
@@ -177,9 +184,17 @@ int8_t StatHexagonReader::read_level(Logger& logger, const ImageViewRGB32& scree
 }
 int16_t StatHexagonReader::read_stat(Logger& logger, const ImageFloatBox& box, const ImageViewRGB32& screen) const{
     ImageViewRGB32 region = extract_box_reference(screen, box);
+#if 0
     ImageRGB32 filtered = to_blackwhite_rgb32_range(region, 0xff808080, 0xffffffff, true);
+    filtered = pad_image(filtered, filtered.height() / 2, 0xffffffff);
 
-    int number = OCR::read_number(logger, filtered);
+//    static int c = 0;
+//    filtered.save("test-" + std::to_string(c++) + ".png");
+
+    int number = OCR::read_number_waterfill(logger, filtered);
+#else
+    int number = OCR::read_number_waterfill(logger, region, 0xff808080, 0xffffffff);
+#endif
     if (number < 5 || number > 999){
         number = -1;
     }
@@ -203,7 +218,6 @@ IvRanges StatHexagonReader::calc_ivs(
     const BaseStats& base_stats, const EVs& evs
 ) const{
     int16_t level = read_level(logger, screen);
-
     NatureAdjustments nature = read_nature(logger, screen);
     StatReads stats = read_stats(logger, screen);
     return calc_iv_ranges(base_stats, (uint8_t)level, evs, stats, nature);
