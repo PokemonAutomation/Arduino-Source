@@ -235,6 +235,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 //    using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
 
 
+#if 0
     uint8_t low_iv;
     uint8_t high_iv;
 
@@ -247,7 +248,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     cout << "ok   = " << ok << endl;
     cout << "low  = " << (int)low_iv << endl;
     cout << "high = " << (int)high_iv << endl;
-
+#endif
 
 
 

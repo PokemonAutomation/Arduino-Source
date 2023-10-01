@@ -6,6 +6,7 @@
 
 #include <map>
 #include "CommonFramework/Language.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "OCR_RawOCR.h"
 #include "OCR_NumberReader.h"
 

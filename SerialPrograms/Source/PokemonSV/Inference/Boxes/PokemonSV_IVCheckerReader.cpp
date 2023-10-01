@@ -21,12 +21,12 @@ const IVCheckerReader& IV_READER(){
 
 IVCheckerReaderScope::IVCheckerReaderScope(VideoOverlay& overlay, Language language)
     : m_language(language)
-    , m_box_hp(overlay, {0.825, 0.192, 0.110, 0.052})
-    , m_box_attack(overlay, {0.886, 0.302, 0.110, 0.052})
-    , m_box_defense(overlay, {0.886, 0.406, 0.110, 0.052})
-    , m_box_spatk(overlay, {0.660, 0.302, 0.110, 0.052})
-    , m_box_spdef(overlay, {0.660, 0.406, 0.110, 0.052})
-    , m_box_speed(overlay, {0.825, 0.470, 0.110, 0.052})
+    , m_box_hp      (overlay, {0.825, 0.192, 0.110, 0.052})
+    , m_box_attack  (overlay, {0.886, 0.302, 0.110, 0.052})
+    , m_box_defense (overlay, {0.886, 0.406, 0.110, 0.052})
+    , m_box_spatk   (overlay, {0.660, 0.302, 0.110, 0.052})
+    , m_box_spdef   (overlay, {0.660, 0.406, 0.110, 0.052})
+    , m_box_speed   (overlay, {0.825, 0.470, 0.110, 0.052})
 {}
 
 

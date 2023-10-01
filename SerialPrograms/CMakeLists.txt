@@ -1338,6 +1338,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h
     Source/PokemonSV/Inference/PokemonSV_ZeroGateWarpPromptDetector.cpp
     Source/PokemonSV/Inference/PokemonSV_ZeroGateWarpPromptDetector.h
+    Source/PokemonSV/Inference/PokemonSV_StatHexagonReader.cpp
+    Source/PokemonSV/Inference/PokemonSV_StatHexagonReader.h
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraCardDetector.cpp
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraCardDetector.h
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraCodeReader.cpp
