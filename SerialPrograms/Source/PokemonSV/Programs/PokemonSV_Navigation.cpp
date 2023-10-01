@@ -14,6 +14,7 @@
 #include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/Map/PokemonSV_MapDetector.h"
+#include "PokemonSV/Inference/Map/PokemonSV_MapMenuDetector.h"
 #include "PokemonSV/Inference/Map/PokemonSV_MapPokeCenterIconDetector.h"
 #include "PokemonSV/Inference/Picnics/PokemonSV_PicnicDetector.h"
 #include "PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
@@ -28,8 +29,6 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
-
-
 
 
 void set_time_to_12am_from_home(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
@@ -61,6 +60,27 @@ void day_skip_from_overworld(ConsoleHandle& console, BotBaseContext& context){
     ssf_press_button(context, BUTTON_A, 20, 10);
     pbf_press_button(context, BUTTON_HOME, 20, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
     resume_game_from_home(console, context);
+}
+
+void press_Bs_to_back_to_overworld(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+    context.wait_for_all_requests();
+    OverworldWatcher overworld(COLOR_RED);
+    int ret = run_until(
+        console, context,
+        [](BotBaseContext& context){
+            for (size_t c = 0; c < 10; c++){
+                pbf_press_button(context, BUTTON_B, 20, 230);
+            }
+        },
+        {overworld}
+    );
+    if (ret < 0){
+        throw OperationFailedException(
+            ErrorReport::SEND_ERROR_REPORT, console,
+            "press_Bs_to_back_to_overworld(): Unable to detect overworld after 10 button B presses.",
+            true
+        );
+    }
 }
 
 void open_map_from_overworld(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
@@ -143,7 +163,7 @@ void open_map_from_overworld(const ProgramInfo& info, ConsoleHandle& console, Bo
     }
 }
 
-void fly_to_overworld_from_map(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+bool fly_to_overworld_from_map(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, bool check_fly_menuitem){
     context.wait_for_all_requests();
     // Press A to bring up the promp dialog on choosing "Fly here", "Set as destination", "Never mind".
     pbf_press_button(context, BUTTON_A, 20, 130);
@@ -153,45 +173,51 @@ void fly_to_overworld_from_map(const ProgramInfo& info, ConsoleHandle& console, 
         if (current_time() - start > std::chrono::minutes(2)){
             throw OperationFailedException(
                 ErrorReport::SEND_ERROR_REPORT, console,
-                "fly_to_overworld_from_map(): Failed to open map after 2 minutes.",
+                "fly_to_overworld_from_map(): Failed to fly from map after 2 minutes.",
                 true
             );
         }
 
         int ret = 0;
-        {
-            OverworldWatcher overworld(COLOR_CYAN);
-            WhiteButtonWatcher map(COLOR_RED, WhiteButton::ButtonY, {0.800, 0.118, 0.030, 0.060});
-            GradientArrowWatcher spot_dialog_watcher(COLOR_YELLOW, GradientArrowType::RIGHT, {0.469, 0.500, 0.215, 0.150});
-            PromptDialogWatcher confirm_watcher(COLOR_BLUE, {0.686, 0.494, 0.171, 0.163});
+        OverworldWatcher overworld(COLOR_CYAN);
+        WhiteButtonWatcher map(COLOR_RED, WhiteButton::ButtonY, {0.800, 0.118, 0.030, 0.060});
+        GradientArrowWatcher spot_dialog_watcher(COLOR_YELLOW, GradientArrowType::RIGHT, {0.469, 0.500, 0.215, 0.150});
+        PromptDialogWatcher confirm_watcher(COLOR_BLUE, {0.686, 0.494, 0.171, 0.163});
+        MapFlyMenuWatcher flyMenuItemWatcher(COLOR_BLACK);
+        MapDestinationMenuWatcher destinationMenuItemWatcher(COLOR_BLACK);
 
-            context.wait_for_all_requests();
-            ret = wait_until(
-                console, context,
-                std::chrono::minutes(2),
-                {overworld, map, spot_dialog_watcher, confirm_watcher}
-            );
+        context.wait_for_all_requests();
+
+        std::vector<PeriodicInferenceCallback> callbacks{overworld, map, spot_dialog_watcher, confirm_watcher};
+        if (check_fly_menuitem){
+            callbacks[2] = flyMenuItemWatcher;
+            callbacks.push_back(destinationMenuItemWatcher);
         }
+
+        ret = wait_until(console, context, std::chrono::minutes(2), callbacks);
         context.wait_for(std::chrono::milliseconds(100));
         switch (ret){
         case 0:
-            console.log("Detected overworld.");
-            return;
+            console.log("Detected overworld. Fly successful.");
+            return true;
         case 1:
-            console.log("Detected map.");
+            console.log("Detected map. Pressing A to open map menu.");
             // Press A to bring up the promp dialog on choosing "Fly here", "Set as destination", "Never mind".
             pbf_press_button(context, BUTTON_A, 20, 130);
             continue;
         case 2:
             console.log("Detected fly here prompt dialog.");
-            console.overlay().add_log("Fly", COLOR_WHITE);
+            console.overlay().add_log("Fly");
             pbf_press_button(context, BUTTON_A, 20, 130);
             continue;
         case 3:
             console.log("Detected fly confirmation prompt.");
             pbf_press_button(context, BUTTON_A, 20, 130);
             continue;
-            
+        case 4:
+            console.log("Detected no fly spot here.");
+            console.overlay().add_log("No fly spot", COLOR_RED);
+            return false;
         default:
             throw OperationFailedException(
                 ErrorReport::SEND_ERROR_REPORT, console,
@@ -380,24 +406,7 @@ void enter_box_system_from_overworld(const ProgramInfo& info, ConsoleHandle& con
 void leave_box_system_to_overworld(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
     context.wait_for_all_requests();
     console.log("Leave box system to overworld...");
-    OverworldWatcher overworld(COLOR_RED);
-    context.wait_for_all_requests();
-    int ret = run_until(
-        console, context,
-        [](BotBaseContext& context){
-            for (size_t c = 0; c < 10; c++){
-                pbf_press_button(context, BUTTON_B, 20, 230);
-            }
-        },
-        {overworld}
-    );
-    if (ret < 0){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, console,
-            "leave_box_system_to_overworld(): Unknown state after 10 button B presses.",
-            true
-        );
-    }
+    press_Bs_to_back_to_overworld(info, console, context);
 }
 
 
@@ -493,9 +502,9 @@ void leave_phone_to_overworld(const ProgramInfo& info, ConsoleHandle& console, B
     }
 }
 
-// While in the current map zoom level, detect pokecenter icons and fly to the closest one.
+// While in the current map zoom level, detect pokecenter icons and move the map cursor there.
 // Return true if succeed. Return false if no visible pokcenter on map
-bool fly_to_visible_closest_pokecenter_cur_zoom_level(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+bool detect_closest_pokecenter_and_move_map_cursor_there(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
     context.wait_for_all_requests();
     const auto snapshot_frame = console.video().snapshot().frame;
     const size_t screen_width = snapshot_frame->width();
@@ -542,8 +551,35 @@ bool fly_to_visible_closest_pokecenter_cur_zoom_level(const ProgramInfo& info, C
     console.overlay().add_log("Move Cursor to PokeCenter", COLOR_WHITE);
     const uint16_t push_time = std::max(uint16_t(magnitude * scale + 0.5), uint16_t(3));
     pbf_move_left_joystick(context, move_x, move_y, push_time, 30);
-    fly_to_overworld_from_map(info, console, context);
+    context.wait_for_all_requests();
     return true;
+}
+
+// While in the current map zoom level, detect pokecenter icons and fly to the closest one.
+// Return true if succeed. Return false if no visible pokcenter on map
+bool fly_to_visible_closest_pokecenter_cur_zoom_level(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+    const int max_try_count = 3;
+    for(int try_count = 0; try_count < max_try_count; ++try_count){
+        if (!detect_closest_pokecenter_and_move_map_cursor_there(info, console, context)){
+            return false;
+        }
+        bool check_fly_menuitem = true;
+        const bool success = fly_to_overworld_from_map(info, console, context, check_fly_menuitem);
+        if (success){
+            return true;
+        }
+        if (try_count + 1 < max_try_count){ // if this is not the last try:
+            console.log("Failed to find the fly menuitem. Restart the closest Pokecenter travel process.");
+            press_Bs_to_back_to_overworld(info, console, context);
+            open_map_from_overworld(info, console, context);
+        }
+    }
+    // last try failed:
+    throw OperationFailedException(
+        ErrorReport::SEND_ERROR_REPORT, console,
+        "fly_to_visible_closest_pokecenter_cur_zoom_level(): tried three times to fly to pokecenter, but no \"Fly\" menuitem.",
+        true
+    );
 }
 
 

@@ -65,6 +65,7 @@ private:
     // Debug options
     BooleanCheckBoxOption SAVE_DEBUG_VIDEO;
     BooleanCheckBoxOption DEBUG_WARP_TO_POKECENTER;
+    BooleanCheckBoxOption SKIP_SANDWICH;
 
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;

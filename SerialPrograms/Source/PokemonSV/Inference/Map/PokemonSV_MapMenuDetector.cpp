@@ -43,9 +43,8 @@ bool MapFlyMenuDetector::detect(const ImageViewRGB32& screen) const{
 
 MapFlyMenuWatcher::~MapFlyMenuWatcher() = default;
 
-MapFlyMenuWatcher::MapFlyMenuWatcher(Color color, VideoOverlay& overlay)
+MapFlyMenuWatcher::MapFlyMenuWatcher(Color color)
     : VisualInferenceCallback("MapFlyMenuWatcher")
-    , m_overlay(overlay)
     , m_detector(color)
 {}
 
@@ -81,9 +80,8 @@ bool MapDestinationMenuDetector::detect(const ImageViewRGB32& screen) const{
 
 MapDestinationMenuWatcher::~MapDestinationMenuWatcher() = default;
 
-MapDestinationMenuWatcher::MapDestinationMenuWatcher(Color color, VideoOverlay& overlay)
+MapDestinationMenuWatcher::MapDestinationMenuWatcher(Color color)
     : VisualInferenceCallback("MapDestinationMenuWatcher")
-    , m_overlay(overlay)
     , m_detector(color)
 {}
 
