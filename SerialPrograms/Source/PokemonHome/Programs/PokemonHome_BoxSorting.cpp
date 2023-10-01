@@ -175,7 +175,7 @@ struct Pokemon{
     bool shiny = false;
     bool gmax = false;
     std::string ball_slug = "";
-    EggHatchGenderFilter gender = EggHatchGenderFilter::Genderless;
+    StatsHuntGenderFilter gender = StatsHuntGenderFilter::Genderless;
     uint16_t ot_id = 0;
 };
 
@@ -643,7 +643,7 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
                     boxes_data[get_index(box_nb, row, column)]->ball_slug = ball_reader.read_ball(screen);
 
                     BoxGenderDetector::make_overlays(box_render);
-                    EggHatchGenderFilter gender = BoxGenderDetector::detect(screen);
+                    StatsHuntGenderFilter gender = BoxGenderDetector::detect(screen);
                     env.console.log("Gender: " + gender_to_string(gender), COLOR_GREEN);
                     boxes_data[get_index(box_nb, row, column)]->gender = gender;
 

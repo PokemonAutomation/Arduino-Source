@@ -8,7 +8,7 @@
 #include "CommonFramework/Options/LanguageOCROption.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "Pokemon/Options/Pokemon_EggHatchFilter.h"
+#include "Pokemon/Options/Pokemon_StatsHuntFilter.h"
 #include "Pokemon/Options/Pokemon_StatsResetFilter.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_IvJudgeReader.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxNatureDetector.h"
@@ -23,7 +23,7 @@ namespace PokemonSV{
 bool check_stats_reset_info(
     ConsoleHandle& console, BotBaseContext& context,
     OCR::LanguageOCROption& LANGUAGE, Pokemon::StatsResetFilterTable& FILTERS,
-    Pokemon::EggHatchAction& action
+    Pokemon::StatsHuntAction& action
 ){
     context.wait_for_all_requests();
 

@@ -616,12 +616,12 @@ bool EggAutonomous::process_hatched_pokemon(SingleSwitchProgramEnvironment& env,
             //   In this way we can detect pokemon stats.
             
             IvJudgeReader::Results IVs = iv_reader.read(env.console, screen);
-            EggHatchGenderFilter gender = gender_detector.detect(screen);
+            StatsHuntGenderFilter gender = gender_detector.detect(screen);
             env.log(IVs.to_string(), COLOR_GREEN);
             env.log("Gender: " + gender_to_string(gender), COLOR_GREEN);
             NatureReader::Results nature = nature_detector.read(env.console.logger(), screen);
 
-            EggHatchAction action = FILTERS.get_action(shiny, IVs, gender, nature);
+            StatsHuntAction action = FILTERS.get_action(shiny, IVs, gender, nature);
 
             auto send_keep_notification = [&](){
                 if (!shiny){
@@ -635,12 +635,12 @@ bool EggAutonomous::process_hatched_pokemon(SingleSwitchProgramEnvironment& env,
                 }
             };
             switch (action){
-            case EggHatchAction::StopProgram:
+            case StatsHuntAction::StopProgram:
                 env.log("Program stop requested...");
                 env.console.overlay().add_log("Request program stop", COLOR_WHITE);
                 send_keep_notification();
                 return true;
-            case EggHatchAction::Keep:
+            case StatsHuntAction::Keep:
                 env.log("Moving Pokemon to keep box...", COLOR_BLUE);
                 m_num_pokemon_kept++;
                 env.console.overlay().add_log("Keep pokemon " + std::to_string(m_num_pokemon_kept) + "/" + std::to_string(MAX_KEEPERS), COLOR_YELLOW);
@@ -685,7 +685,7 @@ bool EggAutonomous::process_hatched_pokemon(SingleSwitchProgramEnvironment& env,
                     return true;
                 }
                 break;
-            case EggHatchAction::Release:
+            case StatsHuntAction::Discard:
                 env.log("Releasing Pokemon...", COLOR_PURPLE);
                 env.console.overlay().add_log("Release Pokemon", COLOR_WHITE);
 

@@ -490,11 +490,11 @@ bool StatsReset::check_stats(SingleSwitchProgramEnvironment& env, BotBaseContext
         move_box_cursor(env.program_info(), env.console, context, BoxCursorLocation::PARTY, 5, 0);
 
         //Check the IVs of the newly caught Pokemon - *must be on IV panel*
-        EggHatchAction action = EggHatchAction::Keep;
+        StatsHuntAction action = StatsHuntAction::Keep;
         check_stats_reset_info(env.console, context, LANGUAGE, FILTERS, action);
 
         switch (action) {
-        case EggHatchAction::StopProgram:
+        case StatsHuntAction::StopProgram:
             match = true;
             env.console.log("Match found!");
             stats.matches++;
@@ -504,7 +504,7 @@ bool StatsReset::check_stats(SingleSwitchProgramEnvironment& env, BotBaseContext
                 "Match found!"
             );
             break;
-        case EggHatchAction::Release:
+        case StatsHuntAction::Discard:
             match = false;
             env.console.log("Stats did not match table settings.");
             send_program_status_notification(

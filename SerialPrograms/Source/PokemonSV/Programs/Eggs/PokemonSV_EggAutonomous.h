@@ -13,7 +13,7 @@
 #include "CommonFramework/Options/LanguageOCROption.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
-#include "Pokemon/Options/Pokemon_EggHatchFilter.h"
+#include "Pokemon/Options/Pokemon_StatsHuntFilter.h"
 #include "PokemonSV/Options/PokemonSV_EggPowerSandwichOption.h"
 
 // #include <functional>
@@ -90,8 +90,8 @@ private:
     BooleanCheckBoxOption HAS_CLONE_RIDE_POKEMON;
 
     IntegerEnumDropdownOption KEEP_BOX_LOCATION;
-
-    Pokemon::EggHatchFilterTable FILTERS;
+    
+    Pokemon::StatsHuntFilterTable FILTERS;
 
     BooleanCheckBoxOption SAVE_DEBUG_VIDEO;
 

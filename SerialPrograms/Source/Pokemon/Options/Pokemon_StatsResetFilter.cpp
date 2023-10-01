@@ -6,13 +6,13 @@
 
 #include "Common/Compiler.h"
 #include "Pokemon_StatsResetFilter.h"
-#include "Pokemon_EggHatchFilter.h"
+#include "Pokemon_StatsHuntFilter.h"
 
 namespace PokemonAutomation{
 namespace Pokemon{
 
 StatsResetFilterRow::StatsResetFilterRow()
-    : action(EggHatchAction::StopProgram)
+    : action(StatsHuntAction::StopProgram)
     , nature(NatureCheckerFilter_Database(), LockWhileRunning::LOCKED, NatureCheckerFilter::Any)
     , iv_hp(IvJudgeFilter::Anything)
     , iv_atk(IvJudgeFilter::Anything)
@@ -68,8 +68,8 @@ std::vector<std::unique_ptr<EditableTableRow>> StatsResetFilterTable::make_defau
     return ret;
 }
 
-EggHatchAction StatsResetFilterTable::get_action(bool shiny, const IvJudgeReader::Results& IVs, NatureReader::Results nature) const{
-    EggHatchAction action = EggHatchAction::Release;
+StatsHuntAction StatsResetFilterTable::get_action(bool shiny, const IvJudgeReader::Results& IVs, NatureReader::Results nature) const{
+    StatsHuntAction action = StatsHuntAction::Discard;
     std::vector<std::unique_ptr<StatsResetFilterRow>> list = copy_snapshot();
     for (size_t c = 0; c < list.size(); c++){
         const StatsResetFilterRow& filter = *list[c];
@@ -86,10 +86,10 @@ EggHatchAction StatsResetFilterTable::get_action(bool shiny, const IvJudgeReader
             continue;
         }
 
-        EggHatchAction filter_action = filter.action;
+        StatsHuntAction filter_action = filter.action;
 
         //  No action matched so far. Take the current action and continue.
-        if (action == EggHatchAction::Release){
+        if (action == StatsHuntAction::Discard){
             action = filter_action;
             continue;
         }
@@ -97,7 +97,7 @@ EggHatchAction StatsResetFilterTable::get_action(bool shiny, const IvJudgeReader
         //  Conflicting actions.
         if (action != filter_action){
             global_logger_tagged().log("Multiple filters matched with conflicting actions. Stopping program...", COLOR_RED);
-            return EggHatchAction::StopProgram;
+            return StatsHuntAction::StopProgram;
         }
     }
     return action;

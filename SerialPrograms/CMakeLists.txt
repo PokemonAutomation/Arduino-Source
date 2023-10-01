@@ -862,8 +862,6 @@ file(GLOB MAIN_SOURCES
     Source/Pokemon/Inference/Pokemon_TrainIVCheckerOCR.h
     Source/Pokemon/Inference/Pokemon_TrainPokemonOCR.cpp
     Source/Pokemon/Inference/Pokemon_TrainPokemonOCR.h
-    Source/Pokemon/Options/Pokemon_EggHatchFilter.cpp
-    Source/Pokemon/Options/Pokemon_EggHatchFilter.h
     Source/Pokemon/Options/Pokemon_EncounterBotOptions.h
     Source/Pokemon/Options/Pokemon_IvJudgeOption.cpp
     Source/Pokemon/Options/Pokemon_IvJudgeOption.h
@@ -871,6 +869,8 @@ file(GLOB MAIN_SOURCES
     Source/Pokemon/Options/Pokemon_NameSelectOption.h
     Source/Pokemon/Options/Pokemon_NameSelectWidget.cpp
     Source/Pokemon/Options/Pokemon_NameSelectWidget.h
+    Source/Pokemon/Options/Pokemon_StatsHuntFilter.cpp
+    Source/Pokemon/Options/Pokemon_StatsHuntFilter.h
     Source/Pokemon/Options/Pokemon_StatsResetFilter.cpp
     Source/Pokemon/Options/Pokemon_StatsResetFilter.h
     Source/Pokemon/Pokemon_DataTypes.h

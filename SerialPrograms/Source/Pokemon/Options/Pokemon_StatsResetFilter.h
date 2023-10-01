@@ -9,10 +9,10 @@
 
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/EditableTableOption.h"
-#include "Pokemon/Pokemon_IvJudge.h"
+//#include "Pokemon/Pokemon_IvJudge.h"
 #include "Pokemon/Options/Pokemon_IvJudgeOption.h"
 #include "Pokemon/Inference/Pokemon_IvJudgeReader.h"
-#include "Pokemon_EggHatchFilter.h"
+#include "Pokemon_StatsHuntFilter.h"
 #include "Pokemon/Inference/Pokemon_NatureReader.h"
 
 namespace PokemonAutomation{
@@ -24,7 +24,7 @@ public:
     virtual std::unique_ptr<EditableTableRow> clone() const override;
 
 public:
-    EggHatchAction action;
+    StatsHuntAction action;
     EnumDropdownCell<NatureCheckerFilter> nature;
     IVJudgeFilterCell iv_hp;
     IVJudgeFilterCell iv_atk;
@@ -40,7 +40,7 @@ public:
     virtual std::vector<std::string> make_header() const override;
     static std::vector<std::unique_ptr<EditableTableRow>> make_defaults();
     
-    EggHatchAction get_action(bool shiny, const IvJudgeReader::Results& IVs, NatureReader::Results nature) const;
+    StatsHuntAction get_action(bool shiny, const IvJudgeReader::Results& IVs, NatureReader::Results nature) const;
 };
 
 }

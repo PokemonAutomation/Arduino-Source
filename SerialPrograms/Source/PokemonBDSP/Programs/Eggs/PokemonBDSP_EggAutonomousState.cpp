@@ -104,7 +104,7 @@ EggAutonomousState::EggAutonomousState(
     Language language,
     ShortcutDirectionOption& shortcut,
     uint16_t travel_time_per_fetch,
-    const EggHatchFilterTable& filters,
+    const StatsHuntFilterTable& filters,
     uint8_t max_keepers,
     uint8_t existing_eggs_in_columns
 )
@@ -225,13 +225,13 @@ bool EggAutonomousState::process_party(){
             m_console.log("Pokemon " + std::to_string(c) + " is not shiny.", COLOR_PURPLE);
         }
         IvJudgeReader::Results IVs = iv_reader.read(m_console, screen);
-        EggHatchGenderFilter gender = read_gender_from_box(m_console, m_console, screen);
+        StatsHuntGenderFilter gender = read_gender_from_box(m_console, m_console, screen);
         NatureReader::Results nature = nature_detector.read(m_console.logger(), screen);
 
-        EggHatchAction action = m_filters.get_action(shiny, IVs, gender, nature);
+        StatsHuntAction action = m_filters.get_action(shiny, IVs, gender, nature);
 
         switch (action){
-        case EggHatchAction::StopProgram:
+        case StatsHuntAction::StopProgram:
             m_console.log("Program stop requested...");
             if (!shiny){
                 send_encounter_notification(
@@ -243,7 +243,7 @@ bool EggAutonomousState::process_party(){
                 );
             }
             return true;
-        case EggHatchAction::Keep:
+        case StatsHuntAction::Keep:
             m_console.log("Moving Pokemon to keep box...", COLOR_BLUE);
             if (!shiny){
                 send_encounter_notification(
@@ -277,7 +277,7 @@ bool EggAutonomousState::process_party(){
                 return true;
             }
             break;
-        case EggHatchAction::Release:
+        case StatsHuntAction::Discard:
             m_console.log("Releasing Pokemon...", COLOR_PURPLE);
             release(m_console, m_context);
         }

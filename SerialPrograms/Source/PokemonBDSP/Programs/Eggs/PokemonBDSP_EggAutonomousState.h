@@ -12,7 +12,7 @@
 #include "CommonFramework/Notifications/EventNotificationOption.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
-#include "Pokemon/Options/Pokemon_EggHatchFilter.h"
+#include "Pokemon/Options/Pokemon_StatsHuntFilter.h"
 #include "PokemonBDSP/Options/PokemonBDSP_ShortcutDirection.h"
 
 namespace PokemonAutomation{
@@ -44,7 +44,7 @@ public:
         Language language,
         ShortcutDirectionOption& shortcut,
         uint16_t travel_time_per_fetch,
-        const Pokemon::EggHatchFilterTable& filters,
+        const Pokemon::StatsHuntFilterTable& filters,
         uint8_t max_keepers,
         uint8_t existing_eggs_in_columns
     );
@@ -89,7 +89,7 @@ private:
     Language m_language;
     ShortcutDirectionOption& m_shortcut;
     uint16_t m_travel_time_per_fetch;
-    const Pokemon::EggHatchFilterTable& m_filters;
+    const Pokemon::StatsHuntFilterTable& m_filters;
     uint8_t m_max_keepers;
 
     bool m_on_bike = true;

@@ -13,7 +13,7 @@
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_ScalarButtons.h"
-#include "Pokemon/Options/Pokemon_EggHatchFilter.h"
+#include "Pokemon/Options/Pokemon_StatsHuntFilter.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxEggDetector.h"
@@ -601,8 +601,8 @@ void reset_position_at_zero_gate(const ProgramInfo& info, ConsoleHandle& console
 
 bool check_baby_info(
     const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
-    OCR::LanguageOCROption& LANGUAGE, Pokemon::EggHatchFilterTable& FILTERS,
-    Pokemon::EggHatchAction& action
+    OCR::LanguageOCROption& LANGUAGE, Pokemon::StatsHuntFilterTable& FILTERS,
+    Pokemon::StatsHuntAction& action
 ){
     context.wait_for_all_requests();
 
@@ -629,7 +629,7 @@ bool check_baby_info(
     VideoSnapshot screen = console.video().snapshot();
     
     IvJudgeReader::Results IVs = iv_reader_scope.read(console.logger(), screen);
-    EggHatchGenderFilter gender = gender_detector.detect(screen);
+    StatsHuntGenderFilter gender = gender_detector.detect(screen);
     NatureReader::Results nature = nature_detector.read(console.logger(), screen);
 
     console.log(IVs.to_string(), COLOR_GREEN);
