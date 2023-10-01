@@ -329,7 +329,7 @@ void ShinyHuntScatterbug::run_one_sandwich_iteration(SingleSwitchProgramEnvironm
         if (last_sandwich_time + std::chrono::minutes(30) < current_time()){
             env.log("Sandwich expires.");
             env.console.overlay().add_log("Sandwich expires");
-            return;
+            break;
         }
 
         env.console.log("Starting Let's Go hunting path...", COLOR_PURPLE);
