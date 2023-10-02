@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Options/LanguageOCROption.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
@@ -31,7 +32,7 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 using namespace Pokemon;
- 
+
 StatsResetBloodmoon_Descriptor::StatsResetBloodmoon_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonSV:StatsResetBloodmoon",
@@ -43,7 +44,7 @@ StatsResetBloodmoon_Descriptor::StatsResetBloodmoon_Descriptor()
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
-struct StatsResetBloodmoon_Descriptor::Stats : public StatsTracker {
+struct StatsResetBloodmoon_Descriptor::Stats : public StatsTracker{
     Stats()
         : resets(m_stats["Resets"])
         , catches(m_stats["Catches"])
@@ -60,7 +61,7 @@ struct StatsResetBloodmoon_Descriptor::Stats : public StatsTracker {
     std::atomic<uint64_t>& matches;
     std::atomic<uint64_t>& errors;
 };
-std::unique_ptr<StatsTracker> StatsResetBloodmoon_Descriptor::make_stats() const {
+std::unique_ptr<StatsTracker> StatsResetBloodmoon_Descriptor::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
 }
 StatsResetBloodmoon::StatsResetBloodmoon()
@@ -138,7 +139,9 @@ StatsResetBloodmoon::StatsResetBloodmoon()
     PA_ADD_OPTION(BALL_SELECT);
     PA_ADD_OPTION(TRY_TO_TERASTILLIZE);
     PA_ADD_OPTION(FILTERS);
-    PA_ADD_OPTION(FILTERS0);
+    if (PreloadSettings::instance().DEVELOPER_MODE){
+        PA_ADD_OPTION(FILTERS0);
+    }
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
