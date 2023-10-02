@@ -25,7 +25,7 @@ class PokemonBallSelectOption : public StringSelectOption{
 public:
     PokemonBallSelectOption(
         std::string label,
-        LockWhileRunning lock_while_running,
+        LockMode lock_while_running,
         const std::string& default_slug = ""
     );
 };

@@ -67,17 +67,17 @@ StatsResetBloodmoon::StatsResetBloodmoon()
     : LANGUAGE(
         "<b>Game Language:</b><br>This field is required so we can read IVs.",
         IV_READER().languages(),
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         true
     )
     , BALL_SELECT(
         "<b>Ball Select:</b>",
-        LockWhileRunning::UNLOCK_WHILE_RUNNING,
+        LockMode::UNLOCK_WHILE_RUNNING,
         "poke-ball"
     )
     , TRY_TO_TERASTILLIZE(
         "<b>Use Terastillization:</b><br>Tera at the start of battle.",
-        LockWhileRunning::UNLOCK_WHILE_RUNNING,
+        LockMode::UNLOCK_WHILE_RUNNING,
         false
     )
     , FILTERS(

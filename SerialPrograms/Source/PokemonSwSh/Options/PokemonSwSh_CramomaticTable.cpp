@@ -27,9 +27,9 @@ const EnumDatabase<CramomaticBallType>& BallType_Database() {
 
 
 CramomaticRow::CramomaticRow()
-    : ball_type(BallType_Database(), LockWhileRunning::LOCK_WHILE_RUNNING, CramomaticBallType::Apricorn)
-    , is_bonus(LockWhileRunning::LOCK_WHILE_RUNNING, false)
-    , priority(LockWhileRunning::LOCK_WHILE_RUNNING, 0)
+    : ball_type(BallType_Database(), LockMode::LOCK_WHILE_RUNNING, CramomaticBallType::Apricorn)
+    , is_bonus(LockMode::LOCK_WHILE_RUNNING, false)
+    , priority(LockMode::LOCK_WHILE_RUNNING, 0)
 {
     PA_ADD_OPTION(ball_type);
     PA_ADD_OPTION(is_bonus);
@@ -47,7 +47,7 @@ std::unique_ptr<EditableTableRow> CramomaticRow::clone() const{
 CramomaticTable::CramomaticTable(std::string label)
     : EditableTableOption_t<CramomaticRow>(
         std::move(label),
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         make_defaults()
     )
 {}

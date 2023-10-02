@@ -89,7 +89,7 @@ ShinyHuntAreaZeroPlatform::ShinyHuntAreaZeroPlatform()
     : LANGUAGE(
         "<b>Game Language:</b><br>Required to read " + STRING_POKEMON + " names.",
         IV_READER().languages(),
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         false
     )
     , MODE(
@@ -102,7 +102,7 @@ ShinyHuntAreaZeroPlatform::ShinyHuntAreaZeroPlatform()
             {Mode::START_IN_ZERO_GATE,  "zerogate", "Start inside Zero Gate."},
             {Mode::MAKE_SANDWICH,       "sandwich", "Make a sandwich."},
         },
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         Mode::START_ON_PLATFORM
     )
     , PATH0(
@@ -112,19 +112,19 @@ ShinyHuntAreaZeroPlatform::ShinyHuntAreaZeroPlatform()
             {Path::PATH1, "path1", "Path 1"},
             {Path::PATH2, "path2", "Path 2"},
         },
-        LockWhileRunning::UNLOCK_WHILE_RUNNING,
+        LockMode::UNLOCK_WHILE_RUNNING,
         Path::PATH2
     )
     , SANDWICH_RESET_IN_MINUTES(
         "<b>Sandwich Reset Time (in minutes):</b><br>The time to reset game to make a new sandwich.",
-        LockWhileRunning::UNLOCK_WHILE_RUNNING,
+        LockMode::UNLOCK_WHILE_RUNNING,
         35
     )
     , SANDWICH_OPTIONS(LANGUAGE)
     , GO_HOME_WHEN_DONE(true)
     , AUTO_HEAL_PERCENT(
         "<b>Auto-Heal %</b><br>Auto-heal if your HP drops below this percentage.",
-        LockWhileRunning::UNLOCK_WHILE_RUNNING,
+        LockMode::UNLOCK_WHILE_RUNNING,
         75, 0, 100
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))

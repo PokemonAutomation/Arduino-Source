@@ -94,7 +94,7 @@ RideCloner101::RideCloner101()
     , LANGUAGE(
         "<b>Game Language:</b>",
         PokemonNameReader::instance().languages(),
-        LockWhileRunning::UNLOCK_WHILE_RUNNING
+        LockMode::UNLOCK_WHILE_RUNNING
     )
     , MODE(
         "<b>Mode:</b>",
@@ -102,31 +102,31 @@ RideCloner101::RideCloner101()
             {Mode::CLONE_ONLY,  "clone-only",   "Clone only. Don't stop on a shiny raid."},
             {Mode::SHINY_HUNT,  "shiny-hunt",   "Shiny Hunt: Save before each raid and catch. Stop if shiny."},
         },
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         Mode::SHINY_HUNT
     )
     , RIDES_TO_CLONE(
         "<b>Rides to Clone:</b><br>Stop program after cloning this many times. Make sure you have enough box space for twice this amount.",
-        LockWhileRunning::UNLOCK_WHILE_RUNNING,
+        LockMode::UNLOCK_WHILE_RUNNING,
         100, 1, 100
     )
     , MAX_STARS(
         "<b>Max Stars:</b><br>Skip raids with more than this many stars to save time since you're likely to lose.",
-        LockWhileRunning::UNLOCK_WHILE_RUNNING,
+        LockMode::UNLOCK_WHILE_RUNNING,
         4, 1, 7
     )
     , BALL_SELECT(
         "<b>Ball Select:</b>",
-        LockWhileRunning::UNLOCK_WHILE_RUNNING,
+        LockMode::UNLOCK_WHILE_RUNNING,
         "poke-ball"
     )
     , FIX_TIME_ON_CATCH(
         "<b>Fix Clock on Catch:</b><br>Fix the time when catching so the caught date will be correct.",
-        LockWhileRunning::UNLOCK_WHILE_RUNNING, false
+        LockMode::UNLOCK_WHILE_RUNNING, false
     )
     , A_TO_B_DELAY(
         "<b>A-to-B Delay:</b><br>The delay between the critical A-to-B press that activates the glitch.",
-        LockWhileRunning::UNLOCK_WHILE_RUNNING,
+        LockMode::UNLOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "8"
     )

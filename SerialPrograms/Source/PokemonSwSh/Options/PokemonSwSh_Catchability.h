@@ -33,7 +33,7 @@ public:
                 {Catchability::MAYBE_UNCATCHABLE,   "maybe", "Maybe Uncatchable"},
                 {Catchability::ALWAYS_UNCATCHABLE,  "never", "Never Catchable"},
             },
-            LockWhileRunning::LOCK_WHILE_RUNNING,
+            LockMode::LOCK_WHILE_RUNNING,
             Catchability::ALWAYS_CATCHABLE
         )
     {}

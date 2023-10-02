@@ -45,24 +45,24 @@ TurboButton::TurboButton()
             {BUTTON_HOME,       "HOME", "Home"},
             {BUTTON_CAPTURE,    "CAPTURE", "Capture"},
         },
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         BUTTON_A
     )
     , PRESS_DURATION(
         "<b>Press Duration:</b><br>Hold the button down for this long.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         5, "5"
     )
     , RELEASE_DURATION(
         "<b>Release Duration:</b><br>After releasing the button, wait this long before pressing it again.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         3, "3"
     )
     , TOTAL_PRESSES(
         "<b>Total Presses:</b><br>Stop the program after this many presses. If zero, run forever.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         0
     )
 {

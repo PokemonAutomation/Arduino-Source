@@ -74,10 +74,10 @@ const char* StatsHuntIvJudgeFilterTable_Label_Regular =
 
 StatsHuntRowMisc::StatsHuntRowMisc(const StatsHuntMiscFeatureFlags& p_feature_flags)
     : feature_flags(p_feature_flags)
-    , action(EggHatchAction_Database(), LockWhileRunning::LOCK_WHILE_RUNNING, StatsHuntAction::Keep)
-    , shiny(EggHatchShinyFilter_Database(), LockWhileRunning::LOCK_WHILE_RUNNING, StatsHuntShinyFilter::Anything)
-    , gender(EggHatchGenderFilter_Database(), LockWhileRunning::LOCK_WHILE_RUNNING, StatsHuntGenderFilter::Any)
-    , nature(NatureCheckerFilter_Database(), LockWhileRunning::LOCK_WHILE_RUNNING, NatureCheckerFilter::Any)
+    , action(EggHatchAction_Database(), LockMode::LOCK_WHILE_RUNNING, StatsHuntAction::Keep)
+    , shiny(EggHatchShinyFilter_Database(), LockMode::LOCK_WHILE_RUNNING, StatsHuntShinyFilter::Anything)
+    , gender(EggHatchGenderFilter_Database(), LockMode::LOCK_WHILE_RUNNING, StatsHuntGenderFilter::Any)
+    , nature(NatureCheckerFilter_Database(), LockMode::LOCK_WHILE_RUNNING, NatureCheckerFilter::Any)
 {}
 void StatsHuntRowMisc::set(const StatsHuntRowMisc& x){
     action.set(x.action);
@@ -172,7 +172,7 @@ StatsHuntIvJudgeFilterTable::StatsHuntIvJudgeFilterTable(
     const std::string& label,
     const StatsHuntMiscFeatureFlags& p_feature_flags
 )
-    : EditableTableOption_t<StatsHuntIvJudgeFilterRow>(label, LockWhileRunning::LOCK_WHILE_RUNNING)
+    : EditableTableOption_t<StatsHuntIvJudgeFilterRow>(label, LockMode::LOCK_WHILE_RUNNING)
     , feature_flags(p_feature_flags)
 {
     set_default(make_defaults());
@@ -245,12 +245,12 @@ StatsHuntAction StatsHuntIvJudgeFilterTable::get_action(
 
 StatsHuntIvRangeFilterRow::StatsHuntIvRangeFilterRow(const StatsHuntMiscFeatureFlags& feature_flags)
     : misc(feature_flags)
-    , iv_hp(LockWhileRunning::UNLOCK_WHILE_RUNNING, 0, 31, 0, 0, 0, 31, 31, 31)
-    , iv_atk(LockWhileRunning::UNLOCK_WHILE_RUNNING, 0, 31, 0, 0, 0, 31, 31, 31)
-    , iv_def(LockWhileRunning::UNLOCK_WHILE_RUNNING, 0, 31, 0, 0, 0, 31, 31, 31)
-    , iv_spatk(LockWhileRunning::UNLOCK_WHILE_RUNNING, 0, 31, 0, 0, 0, 31, 31, 31)
-    , iv_spdef(LockWhileRunning::UNLOCK_WHILE_RUNNING, 0, 31, 0, 0, 0, 31, 31, 31)
-    , iv_speed(LockWhileRunning::UNLOCK_WHILE_RUNNING, 0, 31, 0, 0, 0, 31, 31, 31)
+    , iv_hp(LockMode::UNLOCK_WHILE_RUNNING, 0, 31, 0, 0, 0, 31, 31, 31)
+    , iv_atk(LockMode::UNLOCK_WHILE_RUNNING, 0, 31, 0, 0, 0, 31, 31, 31)
+    , iv_def(LockMode::UNLOCK_WHILE_RUNNING, 0, 31, 0, 0, 0, 31, 31, 31)
+    , iv_spatk(LockMode::UNLOCK_WHILE_RUNNING, 0, 31, 0, 0, 0, 31, 31, 31)
+    , iv_spdef(LockMode::UNLOCK_WHILE_RUNNING, 0, 31, 0, 0, 0, 31, 31, 31)
+    , iv_speed(LockMode::UNLOCK_WHILE_RUNNING, 0, 31, 0, 0, 0, 31, 31, 31)
 {
     if (misc.feature_flags.action)  PA_ADD_OPTION(misc.action);
     if (misc.feature_flags.shiny)   PA_ADD_OPTION(misc.shiny);
@@ -282,7 +282,7 @@ StatsHuntIvRangeFilterTable::StatsHuntIvRangeFilterTable(
     const std::string& label,
     const StatsHuntMiscFeatureFlags& p_feature_flags
 )
-    : EditableTableOption_t<StatsHuntIvRangeFilterRow>(label, LockWhileRunning::LOCK_WHILE_RUNNING)
+    : EditableTableOption_t<StatsHuntIvRangeFilterRow>(label, LockMode::LOCK_WHILE_RUNNING)
     , feature_flags(p_feature_flags)
 {
 //    set_default(make_defaults());

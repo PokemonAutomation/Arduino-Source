@@ -43,7 +43,7 @@ std::unique_ptr<StatsTracker> BowItemDuper_Descriptor::make_stats() const {
 BowItemDuper::BowItemDuper()
     : ATTEMPTS(
         "<b>Duplication Attempts:</b><br>The number of times you wish to run this routine.",
-        LockWhileRunning::UNLOCK_WHILE_RUNNING,
+        LockMode::UNLOCK_WHILE_RUNNING,
         100
     )
     , TICK_DELAY(
@@ -51,7 +51,7 @@ BowItemDuper::BowItemDuper()
         "This should not typically be lower than 5 nor exceed 25 for successful results. "
         "Too low and the game will eat inputs and put the program in an irrecoverable state."
         "Too high and the dupes will not be successful.",
-        LockWhileRunning::UNLOCK_WHILE_RUNNING,
+        LockMode::UNLOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "15"
     )

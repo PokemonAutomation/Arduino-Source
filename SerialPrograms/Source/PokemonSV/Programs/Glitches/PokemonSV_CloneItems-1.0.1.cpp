@@ -104,7 +104,7 @@ CloneItems101::CloneItems101()
     : GO_HOME_WHEN_DONE(false)
     , ITEMS_TO_CLONE(
         "<b>Items to Clone:</b><br>Clone this many time.",
-        LockWhileRunning::UNLOCK_WHILE_RUNNING,
+        LockMode::UNLOCK_WHILE_RUNNING,
         999, 1, 999
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))

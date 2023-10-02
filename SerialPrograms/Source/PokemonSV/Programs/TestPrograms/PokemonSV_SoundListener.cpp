@@ -45,12 +45,12 @@ SoundListener::SoundListener()
             {SoundType::Shiny,          "shiny",        "Shiny Sound"},
             {SoundType::LetsGoKill,     "lets-go-kill", "Let's Go Kill"},
         },
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         SoundType::Shiny
     )
     , STOP_ON_DETECTED_SOUND(
         "<b>Stop on the detected sound</b><br>Stop program when the sound is detected.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         false
     )
 {

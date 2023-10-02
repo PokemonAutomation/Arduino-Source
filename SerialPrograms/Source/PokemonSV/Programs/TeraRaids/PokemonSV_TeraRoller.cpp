@@ -89,12 +89,12 @@ std::unique_ptr<StatsTracker> TeraRoller_Descriptor::make_stats() const{
 TeraRoller::TeraRoller()
     : CHECK_ONLY_FIRST(
           "<b>Check Only the First Pokédex Page:</b><br>Reduce time per reset at the expense of not checking repeated encounters.",
-          LockWhileRunning::UNLOCK_WHILE_RUNNING,
+        LockMode::UNLOCK_WHILE_RUNNING,
           false
     )
     , PERIODIC_RESET(
         "<b>Periodic Game Reset:</b><br>Reset the game after this many skips. This clears up the framerate bug.",
-        LockWhileRunning::UNLOCK_WHILE_RUNNING,
+        LockMode::UNLOCK_WHILE_RUNNING,
         20, 0, 100
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))

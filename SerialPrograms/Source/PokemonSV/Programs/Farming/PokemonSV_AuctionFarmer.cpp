@@ -79,7 +79,7 @@ AuctionFarmer::AuctionFarmer()
     : LANGUAGE(
         "<b>Game Language:</b><br>The language is needed to read which items are offered.",
         AuctionItemNameReader::instance().languages(),
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         true
     )
     , TARGET_ITEMS("<b>Items:</b><br>Multiple Items can be selected. The program will bid on any selected item which is offered.")
@@ -93,7 +93,7 @@ AuctionFarmer::AuctionFarmer()
         &NOTIFICATION_ERROR_FATAL,
     })
     , m_advanced_options("<font size=4><b>Advanced Options: (developer only)</b></font>")
-    , ONE_NPC("<b>One NPC:</b><br>Check only the NPC you're standing in front of. (Multiple NPCs in development)", LockWhileRunning::LOCK_WHILE_RUNNING, true)
+    , ONE_NPC("<b>One NPC:</b><br>Check only the NPC you're standing in front of. (Multiple NPCs in development)", LockMode::LOCK_WHILE_RUNNING, true)
 {
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(TARGET_ITEMS);

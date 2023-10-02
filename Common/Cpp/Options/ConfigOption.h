@@ -20,7 +20,7 @@ class JsonValue;
 class ConfigWidget;
 
 
-enum class LockWhileRunning{
+enum class LockMode{
     UNLOCK_WHILE_RUNNING,
     LOCK_WHILE_RUNNING,
     READ_ONLY,
@@ -57,7 +57,7 @@ protected:
 
 public:
     ConfigOption();
-    ConfigOption(LockWhileRunning lock_mode);
+    ConfigOption(LockMode lock_mode);
     ConfigOption(ConfigOptionState visibility);
 
 //    //  Deep copy this entire config. This will not copy listeners.
@@ -73,7 +73,7 @@ public:
     }
 
 public:
-    LockWhileRunning lock_mode() const;
+    LockMode lock_mode() const;
 
     //  Returns error message if invalid. Otherwise returns empty string.
     virtual std::string check_validity() const;

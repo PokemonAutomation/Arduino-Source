@@ -56,19 +56,19 @@ ShinyHuntAutonomousRegi::ShinyHuntAutonomousRegi()
     )
     , EXIT_BATTLE_TIMEOUT(
         "<b>Exit Battle Timeout:</b><br>After running, wait this long to return to overworld.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "10 * TICKS_PER_SECOND"
     )
     , POST_BATTLE_MASH_TIME(
         "<b>Post-Battle Mash:</b><br>After each battle, mash B for this long to clear the dialogs.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "1 * TICKS_PER_SECOND"
     )
     , TRANSITION_DELAY(
         "<b>Transition Delay:</b><br>Time to enter/exit the building.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "5 * TICKS_PER_SECOND"
     )

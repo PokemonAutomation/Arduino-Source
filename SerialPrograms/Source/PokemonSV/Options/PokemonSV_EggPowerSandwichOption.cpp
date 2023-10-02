@@ -15,12 +15,12 @@ namespace PokemonSV{
 EggPowerSandwichOption::EggPowerSandwichOption()
     : GroupOption(
         "Egg Power Sandwich",
-        LockWhileRunning::UNLOCK_WHILE_RUNNING,
+        LockMode::UNLOCK_WHILE_RUNNING,
         false, true
     )
     , MAX_NUM_SANDWICHES(
         "<b>Max Sandwiches:</b><br>How many sandwiches you can make before running out of ingredients.",
-        LockWhileRunning::UNLOCK_WHILE_RUNNING,
+        LockMode::UNLOCK_WHILE_RUNNING,
         100, 0, 999
     )
     , EGG_SANDWICH_TYPE(
@@ -33,13 +33,16 @@ EggPowerSandwichOption::EggPowerSandwichOption()
             {EggSandwichType::SALTY_SWEET_HERBS, "salty-sweet-herbs", "Sweet and Salty Herbs and Lettuce"},
             {EggSandwichType::BITTER_SWEET_HERBS, "bitter-sweet-herbs", "Sweet and Bitter Herbs and Lettuce"},
         },
-        LockWhileRunning::UNLOCK_WHILE_RUNNING,
+        LockMode::UNLOCK_WHILE_RUNNING,
         EggSandwichType::GREAT_PEANUT_BUTTER
     )
 {
     PA_ADD_OPTION(MAX_NUM_SANDWICHES);
     PA_ADD_OPTION(EGG_SANDWICH_TYPE);
 }
+
+
+
 
 
 }

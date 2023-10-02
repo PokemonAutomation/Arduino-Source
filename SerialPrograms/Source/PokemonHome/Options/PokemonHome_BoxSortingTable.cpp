@@ -25,8 +25,8 @@ const EnumDatabase<BoxSortingSortType>& BallType_Database() {
 
 
 BoxSortingRow::BoxSortingRow()
-    : sort_type(BallType_Database(), LockWhileRunning::LOCK_WHILE_RUNNING, BoxSortingSortType::NationalDexNo)
-    , reverse(LockWhileRunning::LOCK_WHILE_RUNNING, false)
+    : sort_type(BallType_Database(), LockMode::LOCK_WHILE_RUNNING, BoxSortingSortType::NationalDexNo)
+    , reverse(LockMode::LOCK_WHILE_RUNNING, false)
 {
     PA_ADD_OPTION(sort_type);
     PA_ADD_OPTION(reverse);
@@ -42,7 +42,7 @@ std::unique_ptr<EditableTableRow> BoxSortingRow::clone() const{
 BoxSortingTable::BoxSortingTable(std::string label)
     : EditableTableOption_t<BoxSortingRow>(
         std::move(label),
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         make_defaults()
     )
 {}

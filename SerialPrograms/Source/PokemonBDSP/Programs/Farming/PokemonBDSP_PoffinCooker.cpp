@@ -48,7 +48,7 @@ PoffinCooker::PoffinCooker()
     : GO_HOME_WHEN_DONE(false)
     , MAX_COOK_ATTEMPTS(
         "<b>Cook this many times:</b><br>This puts a limit on how many poffins you get. Don't forget that each cooking session gets you 4 poffins, and your bag cannot have more than 100 poffins. Thus you should never input more than 25 here.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         1,
         1,
         25

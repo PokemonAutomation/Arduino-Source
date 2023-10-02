@@ -15,7 +15,7 @@ namespace PokemonSV{
 TeraAIOption::TeraAIOption()
     : GroupOption(
         "Battle AI",
-        LockWhileRunning::UNLOCK_WHILE_RUNNING,
+        LockMode::UNLOCK_WHILE_RUNNING,
         false, true
     )
     , description(
@@ -23,7 +23,7 @@ TeraAIOption::TeraAIOption()
     )
     , TRY_TO_TERASTILLIZE(
         "<b>Try to Terastillize:</b><br>Try to terastillize if available. Add 4s per try but greatly increase win rate.",
-        LockWhileRunning::UNLOCK_WHILE_RUNNING, true
+        LockMode::UNLOCK_WHILE_RUNNING, true
     )
 {
 //    PA_ADD_STATIC(description);

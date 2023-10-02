@@ -65,7 +65,7 @@ MagikarpMoveGrinder::MagikarpMoveGrinder()
         "<b>Special Case, Mimic:</b><br>Grind Mimic move usages by switching between first two " + STRING_POKEMON + ". Set the first move as Mimic on the first two " + STRING_POKEMON + ".<br>"
         "After switching, the retreated " + STRING_POKEMON + " will forget the move learned by Mimic, allowing efficient Mimic grinding.<br>"
         "Choosing this will ignore the content in " + STRING_POKEMON + " Action Table.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         false
     )
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))

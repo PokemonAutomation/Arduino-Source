@@ -36,30 +36,30 @@ SeedFinder::SeedFinder()
     : STATE_0(
         false,
         "<b>state[0]:</b>",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         "",
         ""
     )
     , STATE_1(
         false,
         "<b>state[1]:</b>",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         "",
         ""
     )
     , UPDATE_STATE(
         "<b>Update State</b>:<br>Use the last known state to update the rng state.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         false
     )
     , MIN_ADVANCES(
         "<b>Min Advances:</b>",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         0
     )
     , MAX_ADVANCES(
         "<b>Max Advances:</b>",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         10000
     )
     , m_advanced_options(
@@ -67,12 +67,12 @@ SeedFinder::SeedFinder()
     )
     , SAVE_SCREENSHOTS(
         "<b>Save Debug Screenshots:</b>",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         false
     )
     , LOG_VALUES(
         "<b>Log Animation Values:</br>",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         false
     )
 

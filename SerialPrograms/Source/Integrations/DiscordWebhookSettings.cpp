@@ -16,12 +16,12 @@ namespace Integration{
 
 
 DiscordWebhookUrl::DiscordWebhookUrl()
-    : enabled(LockWhileRunning::LOCK_WHILE_RUNNING, true)
-    , label(false, LockWhileRunning::LOCK_WHILE_RUNNING, "", "My test server")
-    , ping(LockWhileRunning::LOCK_WHILE_RUNNING, true)
-    , tags_text(false, LockWhileRunning::LOCK_WHILE_RUNNING, "Notifs, Showcase, LiveHost", "")
-    , delay(LockWhileRunning::LOCK_WHILE_RUNNING, 0, 0, 10)
-    , url(true, LockWhileRunning::LOCK_WHILE_RUNNING, "", "https://discord.com/api/webhooks/123456789012345678/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+    : enabled(LockMode::LOCK_WHILE_RUNNING, true)
+    , label(false, LockMode::LOCK_WHILE_RUNNING, "", "My test server")
+    , ping(LockMode::LOCK_WHILE_RUNNING, true)
+    , tags_text(false, LockMode::LOCK_WHILE_RUNNING, "Notifs, Showcase, LiveHost", "")
+    , delay(LockMode::LOCK_WHILE_RUNNING, 0, 0, 10)
+    , url(true, LockMode::LOCK_WHILE_RUNNING, "", "https://discord.com/api/webhooks/123456789012345678/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
 {
     //  Keep the old JSON tags for backwards compatibility.
     add_option(enabled, "Enabled");
@@ -74,7 +74,7 @@ void DiscordWebhookUrl::load_json(const JsonValue& json){
 DiscordWebhookSettingsTable::DiscordWebhookSettingsTable()
     : EditableTableOption_t<DiscordWebhookUrl>(
         "<b>Discord Webhook URLs:</b> Notifications are sent to all enabled URLs that share a tag with the event.",
-        LockWhileRunning::LOCK_WHILE_RUNNING
+        LockMode::LOCK_WHILE_RUNNING
     )
 {}
 std::vector<std::string> DiscordWebhookSettingsTable::make_header() const{
@@ -92,10 +92,10 @@ std::vector<std::string> DiscordWebhookSettingsTable::make_header() const{
 
 
 DiscordWebhookSettingsOption::DiscordWebhookSettingsOption()
-    : GroupOption("Discord Webhook Settings", LockWhileRunning::LOCK_WHILE_RUNNING, true, false)
+    : GroupOption("Discord Webhook Settings", LockMode::LOCK_WHILE_RUNNING, true, false)
     , sends_per_second(
         "<b>Rate Limit:</b><br>Maximum number of sends per second.",
-        LockWhileRunning::LOCK_WHILE_RUNNING, 2
+        LockMode::LOCK_WHILE_RUNNING, 2
     )
 {
     PA_ADD_OPTION(urls);

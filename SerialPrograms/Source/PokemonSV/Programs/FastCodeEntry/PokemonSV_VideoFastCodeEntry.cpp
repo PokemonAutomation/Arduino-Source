@@ -26,7 +26,7 @@ using namespace Pokemon;
 
 
 VideoFceSettings::VideoFceSettings()
-    : GroupOption("Join Settings (V-FCE)", LockWhileRunning::UNLOCK_WHILE_RUNNING)
+    : GroupOption("Join Settings (V-FCE)", LockMode::UNLOCK_WHILE_RUNNING)
     , OCR_METHOD(
         "<b>Text Recognition Method:</b><br>"
         "Each text recognition method has its own strengths and weaknesses. This option lets you choose which method to use.",
@@ -36,13 +36,13 @@ VideoFceSettings::VideoFceSettings()
             {VideoFceOcrMethod::WHITE_TEXT, "white-on-black",   "Filter: White Text on Black Background"},
             {VideoFceOcrMethod::TERA_CARD,  "tera-card",        "Tera Card"},
         },
-        LockWhileRunning::UNLOCK_WHILE_RUNNING,
+        LockMode::UNLOCK_WHILE_RUNNING,
         VideoFceOcrMethod::TERA_CARD
     )
     , SKIP_INITIAL_CODE(
         "<b>Skip Initial Code:</b><br>"
         "If there is already a code up when you start the program, skip it since it's from the last raid.",
-        LockWhileRunning::UNLOCK_WHILE_RUNNING,
+        LockMode::UNLOCK_WHILE_RUNNING,
         true
     )
 {
@@ -140,16 +140,16 @@ VideoFastCodeEntry::VideoFastCodeEntry()
             {Mode::MANUAL,      "manual",   "Manual - Enter code when you start the program."},
             {Mode::AUTOMATIC,   "auto",     "Automatic - Monitor the region. Automatically enter code when it appears."},
         },
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         Mode::MANUAL
     )
     , SKIP_CONNECT_TO_CONTROLLER(
         "<b>Skip Connect to Controller:</b><br>"
         "If you know your controllers are already connected, you can skip this to save 64 milliseconds. (only applies to manual mode)",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         false
     )
-    , FCE_SETTINGS(LockWhileRunning::LOCK_WHILE_RUNNING)
+    , FCE_SETTINGS(LockMode::LOCK_WHILE_RUNNING)
     , NOTIFICATIONS({
         &NOTIFICATION_PROGRAM_FINISH,
     })

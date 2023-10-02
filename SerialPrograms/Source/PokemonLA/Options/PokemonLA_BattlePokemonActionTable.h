@@ -33,7 +33,7 @@ public:
     MoveStyleCell()
         : EnumDropdownCell<MoveStyle>(
             MoveStyle_Database(),
-            LockWhileRunning::LOCK_WHILE_RUNNING,
+            LockMode::LOCK_WHILE_RUNNING,
             MoveStyle::NoStyle
         )
     {}

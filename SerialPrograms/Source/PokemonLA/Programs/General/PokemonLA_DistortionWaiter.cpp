@@ -61,7 +61,7 @@ DistortionWaiter::DistortionWaiter()
     : LANGUAGE(
         "<b>Game Language:</b>",
         Pokemon::PokemonNameReader::instance().languages(),
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         true
     )
     , NOTIFICATION_DISTORTION(

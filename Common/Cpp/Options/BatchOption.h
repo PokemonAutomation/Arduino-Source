@@ -17,7 +17,7 @@ namespace PokemonAutomation{
 class BatchOption : public ConfigOption{
 public:
     ~BatchOption();
-    BatchOption(LockWhileRunning lock_while_program_is_running, bool horizontal = false);
+    BatchOption(LockMode lock_while_program_is_running, bool horizontal = false);
 
 public:
     //  This is not thread-safe with the rest of this class. You must

@@ -45,7 +45,7 @@ GenerateNameOCRDataPokedex::GenerateNameOCRDataPokedex()
     : LANGUAGE(
         "<b>Game Language:</b>",
         PokemonNameReader::instance().languages(),
-        LockWhileRunning::LOCK_WHILE_RUNNING
+        LockMode::LOCK_WHILE_RUNNING
     )
     , POKEDEX(
         "<b>" + STRING_POKEDEX + ":</b>",
@@ -54,7 +54,7 @@ GenerateNameOCRDataPokedex::GenerateNameOCRDataPokedex()
             {Pokedex::IsleOfArmor, "isle-of-armor", "Isle of Armor"},
             {Pokedex::CrownTundra, "crown-tundra", "Crown Tundra"},
         },
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         Pokedex::Galar
     )
     , MODE(
@@ -63,7 +63,7 @@ GenerateNameOCRDataPokedex::GenerateNameOCRDataPokedex()
             {Mode::SaveToJson, "save-to-json", "Read names and save to JSON."},
             {Mode::GenerateTrainingData, "generate-training-data", "Generate training data."},
         },
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         Mode::GenerateTrainingData
     )
 {

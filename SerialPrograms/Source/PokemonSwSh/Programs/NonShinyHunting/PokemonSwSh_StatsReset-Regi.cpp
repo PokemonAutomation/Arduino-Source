@@ -70,13 +70,13 @@ StatsResetRegi::StatsResetRegi()
     : GO_HOME_WHEN_DONE(false)
     , BALL_SELECT(
         "<b>Ball Select:</b>",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         "master-ball"
     )
     , LANGUAGE(
         "<b>Game Language:</b>",
         IV_READER().languages(),
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         true
     )
     , HP("<b>HP:</b>")

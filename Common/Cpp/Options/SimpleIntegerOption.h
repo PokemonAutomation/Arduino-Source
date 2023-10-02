@@ -22,22 +22,22 @@ public:
     ~SimpleIntegerCell();
     SimpleIntegerCell(const SimpleIntegerCell& x);
     SimpleIntegerCell(
-        LockWhileRunning lock_while_running,
+        LockMode lock_while_running,
         Type min_value, Type max_value,
         Type default_value, Type current_value
     );
 
 public:
     SimpleIntegerCell(
-        LockWhileRunning lock_while_running,
+        LockMode lock_while_running,
         Type default_value
     );
     SimpleIntegerCell(
-        LockWhileRunning lock_while_running,
+        LockMode lock_while_running,
         Type default_value, Type min_value
     );
     SimpleIntegerCell(
-        LockWhileRunning lock_while_running,
+        LockMode lock_while_running,
         Type default_value, Type min_value, Type max_value
     );
 
@@ -74,22 +74,22 @@ public:
     SimpleIntegerOption(const SimpleIntegerOption& x) = delete;
     SimpleIntegerOption(
         std::string label,
-        LockWhileRunning lock_while_running,
+        LockMode lock_while_running,
         Type min_value, Type max_value,
         Type default_value, Type current_value
     );
 
 public:
     SimpleIntegerOption(std::string label,
-        LockWhileRunning lock_while_running,
+                        LockMode lock_while_running,
         Type default_value
     );
     SimpleIntegerOption(std::string label,
-        LockWhileRunning lock_while_running,
+                        LockMode lock_while_running,
         Type default_value, Type min_value
     );
     SimpleIntegerOption(std::string label,
-        LockWhileRunning lock_while_running,
+                        LockMode lock_while_running,
         Type default_value, Type min_value, Type max_value
     );
 

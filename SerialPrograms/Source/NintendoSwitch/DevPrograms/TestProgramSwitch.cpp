@@ -173,12 +173,12 @@ TestProgram::TestProgram()
     , LANGUAGE(
         "<b>OCR Language:</b>",
         { Language::English },
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         false
     )
     , STATIC_TEXT("Test text...")
-    , SELECT("String Select", test_database(), LockWhileRunning::LOCK_WHILE_RUNNING, 0)
-    , PLAYER_LIST("Test Table", LockWhileRunning::UNLOCK_WHILE_RUNNING, "Notes")
+    , SELECT("String Select", test_database(), LockMode::LOCK_WHILE_RUNNING, 0)
+    , PLAYER_LIST("Test Table", LockMode::UNLOCK_WHILE_RUNNING, "Notes")
     , NOTIFICATION_TEST("Test", true, true, ImageAttachmentMode::JPG)
     , NOTIFICATIONS({
         &NOTIFICATION_TEST,

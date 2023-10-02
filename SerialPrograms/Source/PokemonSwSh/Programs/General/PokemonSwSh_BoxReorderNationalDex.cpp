@@ -142,17 +142,17 @@ BoxReorderNationalDex::BoxReorderNationalDex()
     : LANGUAGE(
         "<b>Game Language:</b><br>This needs to be set correctly for " + STRING_POKEMON + " to be identified correctly.",
         PokemonNameReader::instance().languages(),
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         true
     )
     , POKEMON_COUNT(
         "<b>Number of " + STRING_POKEMON + " to order:</b>",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         30
     )
     , DODGE_SYSTEM_UPDATE_WINDOW(
         "<b>Dodge System Update Window:</b>",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         false
     )
 {

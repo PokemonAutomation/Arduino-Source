@@ -27,7 +27,7 @@ std::unique_ptr<EditableTableRow> SandwichIngredientsTableRow::clone() const {
 SandwichIngredientsTable::SandwichIngredientsTable(std::string label)
     : EditableTableOption_t<SandwichIngredientsTableRow>(
         std::move(label),
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         make_defaults()
         )
 {}

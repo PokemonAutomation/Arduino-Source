@@ -34,12 +34,12 @@ SurpriseTrade_Descriptor::SurpriseTrade_Descriptor()
 SurpriseTrade::SurpriseTrade()
     : BOXES_TO_TRADE(
         "<b>Number of Boxes to Trade:</b>",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         2
     )
     , INITIAL_WAIT(
         "<b>Time to wait for a Trade Partner:</b>",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "30 * TICKS_PER_SECOND"
     )
@@ -48,13 +48,13 @@ SurpriseTrade::SurpriseTrade()
     )
     , TRADE_ANIMATION(
         "<b>Trade Animation Time:</b>",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "23 * TICKS_PER_SECOND"
     )
     , EVOLVE_DELAY(
         "<b>Evolve Delay:</b>",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "30 * TICKS_PER_SECOND"
     )

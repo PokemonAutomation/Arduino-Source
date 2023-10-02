@@ -21,7 +21,7 @@ public:
     ~IntegerRangeCell();
     IntegerRangeCell(const IntegerRangeCell& x);
     IntegerRangeCell(
-        LockWhileRunning lock_while_running,
+        LockMode lock_while_running,
         Type lo_min_value, Type lo_max_value, Type lo_default_value, Type lo_current_value,
         Type hi_min_value, Type hi_max_value, Type hi_default_value, Type hi_current_value
     );

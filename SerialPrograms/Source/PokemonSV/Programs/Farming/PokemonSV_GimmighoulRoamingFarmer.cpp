@@ -38,13 +38,13 @@ GimmighoulRoamingFarmer_Descriptor::GimmighoulRoamingFarmer_Descriptor()
 GimmighoulRoamingFarmer::GimmighoulRoamingFarmer()
     : SKIPS(
         "<b>Number of Attempts:</b>",
-        LockWhileRunning::UNLOCK_WHILE_RUNNING,
+        LockMode::UNLOCK_WHILE_RUNNING,
         1500
     )
     , GO_HOME_WHEN_DONE(false)
     , FIX_TIME_WHEN_DONE(
         "<b>Fix time when done:</b><br>Fix the time after the program finishes.",
-        LockWhileRunning::UNLOCK_WHILE_RUNNING, false
+        LockMode::UNLOCK_WHILE_RUNNING, false
     )
     , NOTIFICATIONS({
         &NOTIFICATION_PROGRAM_FINISH,

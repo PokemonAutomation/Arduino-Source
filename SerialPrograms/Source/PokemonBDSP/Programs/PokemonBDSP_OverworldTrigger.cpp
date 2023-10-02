@@ -22,7 +22,7 @@ namespace PokemonBDSP{
 
 
 OverworldTrigger::OverworldTrigger()
-    : GroupOption("Trigger Method", LockWhileRunning::LOCK_WHILE_RUNNING)
+    : GroupOption("Trigger Method", LockMode::LOCK_WHILE_RUNNING)
     , TRIGGER_METHOD(
         "<b>Maneuver:</b><br>How to trigger an encounter",
         {
@@ -34,12 +34,12 @@ OverworldTrigger::OverworldTrigger()
             {TriggerMethod::VERTICAL_BIAS_DOWN,     "vertical-down",    "Move up/down. (bias down)"},
             {TriggerMethod::SWEET_SCENT,            "sweet-scent",      "Sweet scent"},
         },
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         TriggerMethod::HORIZONTAL_NO_BIAS
     )
     , MOVE_DURATION(
         "<b>Move Duration:</b><br>Move in each direction for this long before turning around.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "1 * TICKS_PER_SECOND"
     )
@@ -53,7 +53,7 @@ OverworldTrigger::OverworldTrigger()
             {4, "slot5", "2nd last"},
             {5, "slot6", "Last"},
         },
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         0
     )
 {

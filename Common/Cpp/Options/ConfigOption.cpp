@@ -19,11 +19,11 @@ namespace PokemonAutomation{
 
 struct ConfigOption::Data{
     mutable SpinLock lock;
-    LockWhileRunning lock_mode;
+    LockMode lock_mode;
     std::atomic<ConfigOptionState> visibility;
     std::set<Listener*> listeners;
-
-    Data(LockWhileRunning p_lock_mode, ConfigOptionState p_visibility)
+    
+    Data(LockMode p_lock_mode, ConfigOptionState p_visibility)
         : lock_mode(p_lock_mode)
         , visibility(p_visibility)
     {}
@@ -53,13 +53,13 @@ ConfigOption::ConfigOption(const ConfigOption& x)
 {}
 
 ConfigOption::ConfigOption()
-    : m_data(CONSTRUCT_TOKEN, LockWhileRunning::LOCK_WHILE_RUNNING, ConfigOptionState::ENABLED)
+    : m_data(CONSTRUCT_TOKEN, LockMode::LOCK_WHILE_RUNNING, ConfigOptionState::ENABLED)
 {}
-ConfigOption::ConfigOption(LockWhileRunning lock_mode)
+ConfigOption::ConfigOption(LockMode lock_mode)
     : m_data(CONSTRUCT_TOKEN, lock_mode, ConfigOptionState::ENABLED)
 {}
 ConfigOption::ConfigOption(ConfigOptionState visibility)
-    : m_data(CONSTRUCT_TOKEN, LockWhileRunning::LOCK_WHILE_RUNNING, visibility)
+    : m_data(CONSTRUCT_TOKEN, LockMode::LOCK_WHILE_RUNNING, visibility)
 {}
 
 void ConfigOption::add_listener(Listener& listener){
@@ -92,7 +92,7 @@ JsonValue ConfigOption::to_json() const{
     m_lifetime_sanitizer.check_usage();
     return JsonValue();
 }
-LockWhileRunning ConfigOption::lock_mode() const{
+LockMode ConfigOption::lock_mode() const{
     m_lifetime_sanitizer.check_usage();
     return m_data->lock_mode;
 }

@@ -180,7 +180,7 @@ StringSelectCell::~StringSelectCell() = default;
 
 StringSelectCell::StringSelectCell(
     const StringSelectDatabase& database,
-    LockWhileRunning lock_while_running,
+    LockMode lock_while_running,
     size_t default_index
 )
     : ConfigOption(lock_while_running)
@@ -188,7 +188,7 @@ StringSelectCell::StringSelectCell(
 {}
 StringSelectCell::StringSelectCell(
     const StringSelectDatabase& database,
-    LockWhileRunning lock_while_running,
+    LockMode lock_while_running,
     const std::string& default_slug
 )
     : ConfigOption(lock_while_running)

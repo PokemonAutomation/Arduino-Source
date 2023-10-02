@@ -77,7 +77,7 @@ LeapGrinder::LeapGrinder()
     : LANGUAGE(
         "<b>Game Language</b>",
         Pokemon::PokemonNameReader::instance().languages(),
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         true
     )
     , POKEMON_DATABASE(make_name_database({
@@ -100,12 +100,12 @@ LeapGrinder::LeapGrinder()
     , POKEMON(
         "<b>Pokemon Species</b>",
         POKEMON_DATABASE,
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         "cherubi"
     )
     , LEAPS(
         "<b>Leaps</b> <br>How many leaps before stopping the program</br>",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         1, 1, 100
     )
     , SHINY_DETECTED_ENROUTE(

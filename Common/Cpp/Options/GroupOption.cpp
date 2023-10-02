@@ -40,7 +40,7 @@ struct GroupOption::Data{
 GroupOption::~GroupOption() = default;
 GroupOption::GroupOption(
     std::string label,
-    LockWhileRunning lock_while_program_is_running,
+    LockMode lock_while_program_is_running,
     bool toggleable,
     bool enabled
 )

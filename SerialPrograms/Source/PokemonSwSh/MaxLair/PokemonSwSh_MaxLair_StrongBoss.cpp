@@ -50,12 +50,12 @@ public:
         : ConsoleSpecificOptions(std::move(label), languages, host)
         , normal_ball(
             "<b>Normal Ball:</b> Ball for catching non-boss " + STRING_POKEMON + ".",
-            LockWhileRunning::LOCK_WHILE_RUNNING,
+            LockMode::LOCK_WHILE_RUNNING,
             "poke-ball"
         )
         , boss_ball(
             "<b>Boss Ball:</b> Ball for catching the boss/legendary " + STRING_POKEMON + ".",
-            LockWhileRunning::LOCK_WHILE_RUNNING,
+            LockMode::LOCK_WHILE_RUNNING,
             "poke-ball"
         )
         , actions_non_host(false, false)
@@ -110,7 +110,7 @@ MaxLairStrongBoss::MaxLairStrongBoss()
     , MIN_WIN_RATE(
         "<b>Minimum Win Rate:</b><br>"
         "Keep the path if the win rate stays above this ratio. This is done by resetting the host.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         0.75, 0, 1.0
     )
     , CONSOLES(MaxLairStrongBoss_ConsoleFactory())

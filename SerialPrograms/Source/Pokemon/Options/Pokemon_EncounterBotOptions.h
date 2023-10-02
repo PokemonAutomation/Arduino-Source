@@ -21,7 +21,7 @@ public:
         : LanguageOCROption(
             "<b>Game Language:</b><br>Attempt to read and log the encountered " + STRING_POKEMON + " in this language.<br>Set to \"None\" to disable this feature.",
             PokemonNameReader::instance().languages(),
-            LockWhileRunning::LOCK_WHILE_RUNNING,
+            LockMode::LOCK_WHILE_RUNNING,
             required
         )
     {}

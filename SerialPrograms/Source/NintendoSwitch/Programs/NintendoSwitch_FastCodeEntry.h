@@ -30,7 +30,7 @@ enum class KeyboardLayout{
 
 class FastCodeEntrySettingsOption : public GroupOption{
 public:
-    FastCodeEntrySettingsOption(LockWhileRunning lock_while_program_is_running);
+    FastCodeEntrySettingsOption(LockMode lock_while_program_is_running);
 
 public:
     EnumDropdownOption<KeyboardLayout> KEYBOARD_LAYOUT;

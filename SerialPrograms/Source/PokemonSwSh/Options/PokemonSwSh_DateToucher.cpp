@@ -17,7 +17,7 @@ namespace PokemonSwSh{
 TimeRollbackHoursOption::TimeRollbackHoursOption()
     : SimpleIntegerOption<uint8_t>(
         "<b>Time Rollback (in hours):</b><br>Periodically roll back the time to keep the weather the same. If set to zero, this feature is disabled.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         1, 0, 11
     )
 {}
@@ -29,7 +29,7 @@ TimeRollbackHoursOption::TimeRollbackHoursOption()
 TouchDateIntervalOption::TouchDateIntervalOption()
     : m_hours(
         "<b>Rollover Prevention:</b><br>Prevent a date-skip by touching the date every this many hours. If set to zero, this feature is disabled.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         4, 0, 11
     )
 {

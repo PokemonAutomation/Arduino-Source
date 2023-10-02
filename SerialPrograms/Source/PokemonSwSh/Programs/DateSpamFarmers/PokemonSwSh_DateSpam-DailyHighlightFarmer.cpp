@@ -35,12 +35,12 @@ DailyHighlightFarmer_Descriptor::DailyHighlightFarmer_Descriptor()
 DailyHighlightFarmer::DailyHighlightFarmer()
     : SKIPS(
         "<b>Number of Purchase Attempts:</b>",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         100000
     )
     , SAVE_ITERATIONS(
         "<b>Save Every this Many Fetches:</b><br>(zero disables saving): ",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         0
     )
 {

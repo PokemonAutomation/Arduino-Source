@@ -62,7 +62,7 @@ public:
     ~StaticTableOption();
     StaticTableOption(
         std::string label,
-        LockWhileRunning lock_while_program_is_running,
+        LockMode lock_while_program_is_running,
         bool enable_saveload = true
     );
 protected:

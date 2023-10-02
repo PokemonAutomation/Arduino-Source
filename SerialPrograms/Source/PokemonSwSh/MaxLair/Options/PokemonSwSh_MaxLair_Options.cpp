@@ -28,7 +28,7 @@ HostingSwitch::HostingSwitch()
             {2, "switch2", "Switch 2 (Bottom Left)"},
             {3, "switch3", "Switch 3 (Bottom Right)"},
         },
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         0
     )
 {}
@@ -49,7 +49,7 @@ BossSlotOption::BossSlotOption()
             {2, "slot2", "Slot 2"},
             {3, "slot3", "Slot 3"},
         },
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         0
     )
 {}

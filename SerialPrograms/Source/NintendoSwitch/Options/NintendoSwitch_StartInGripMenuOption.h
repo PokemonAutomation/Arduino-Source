@@ -23,7 +23,7 @@ public:
                 {0, "in-game", "Start in game."},
                 {1, "grip-menu", "Start in grip menu."},
             },
-            LockWhileRunning::LOCK_WHILE_RUNNING,
+            LockMode::LOCK_WHILE_RUNNING,
             grip_menu ? 1 : 0
         )
     {}
@@ -44,7 +44,7 @@ public:
                 {0, "home", "Start in Switch Home with game closed."},
                 {1, "grip-menu", "Start in grip menu."},
             },
-            LockWhileRunning::LOCK_WHILE_RUNNING,
+            LockMode::LOCK_WHILE_RUNNING,
             grip_menu ? 1 : 0
         )
     {}

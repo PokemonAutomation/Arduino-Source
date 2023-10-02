@@ -86,13 +86,13 @@ EggAutonomous::EggAutonomous()
     , LANGUAGE(
         "<b>Game Language:</b><br>Required to read IVs.",
         IV_READER().languages(),
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         false
     )
     , MAX_KEEPERS(
         "<b>Max Keepers:</b><br>Stop the program after keeping this many " + STRING_POKEMON + ". "
         "The program will put them into a box neighboring the current box.",
-        LockWhileRunning::UNLOCK_WHILE_RUNNING,
+        LockMode::UNLOCK_WHILE_RUNNING,
         10, 1, 30
     )
     , AUTO_SAVING(
@@ -107,7 +107,7 @@ EggAutonomous::EggAutonomous()
             {AutoSave::EveryBatch, "every-batch", "Save before every batch of 4 or 5 eggs."},
             {AutoSave::AfterFetchComplete, "after-fetch", "Save after all eggs have been fetched from picnic."}
         },
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         AutoSave::AfterStartAndKeep
     )
     , HAS_CLONE_RIDE_POKEMON(
@@ -116,7 +116,7 @@ EggAutonomous::EggAutonomous()
         "place it as second in party before starting the program.</b>"
         "The program will skip the first row of the current box when storing and hatching eggs, so you will need "
         "to fill the first row with " + STRING_POKEMON + " before running this program.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         false)
     , KEEP_BOX_LOCATION(
         "<b>Location of the Keep Box:</b><br>Which box to keep the shiny " + STRING_POKEMON + " and others that match the filters.",
@@ -124,7 +124,7 @@ EggAutonomous::EggAutonomous()
             {0, "left", "Left Box"},
             {1, "right", "Right Box"},
         },
-        LockWhileRunning::UNLOCK_WHILE_RUNNING,
+        LockMode::UNLOCK_WHILE_RUNNING,
         1
     )
     , FILTERS(
@@ -139,7 +139,7 @@ EggAutonomous::EggAutonomous()
     , SAVE_DEBUG_VIDEO(
         "<b>Save debug videos to Switch:</b><br>"
         "Set this on to save a Switch video everytime an error occurs. You can send the video to developers to help them debug later.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         false
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))

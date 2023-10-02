@@ -214,7 +214,7 @@ struct StaticTableOption::Data{
 StaticTableOption::~StaticTableOption() = default;
 StaticTableOption::StaticTableOption(
     std::string label,
-    LockWhileRunning lock_while_program_is_running,
+    LockMode lock_while_program_is_running,
     bool enable_saveload
 )
     : ConfigOption(lock_while_program_is_running)

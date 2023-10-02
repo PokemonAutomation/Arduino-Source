@@ -63,7 +63,7 @@ std::unique_ptr<StatsTracker> DenRoller_Descriptor::make_stats() const{
 DenRoller::DenRoller()
     : SKIPS(
         "<b>Number of Skips:</b>",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         3, 0, 60
     )
     , FILTER(
@@ -73,7 +73,7 @@ DenRoller::DenRoller()
     , VIEW_TIME(
         "<b>View Time:</b><br>Wait this long before restting. This wait is skipped if the desired " +
         STRING_POKEMON + " is set since the program will be watching it for you.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "5 * TICKS_PER_SECOND"
     )
@@ -88,7 +88,7 @@ DenRoller::DenRoller()
     , READ_DELAY(
         "<b>Read Delay:</b><br>Wait this long before attempting to " +
         STRING_POKEMON + ". This needs to be long enough for the silhouette to load.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "1 * TICKS_PER_SECOND"
     )

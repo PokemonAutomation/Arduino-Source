@@ -37,18 +37,18 @@ WattFarmer::WattFarmer()
     : GRIP_MENU_WAIT(
         "<b>Exit Grip Menu Delay:</b> "
         "Wait this long after leaving the grip menu to allow for the Switch to reestablish local connection.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "5 * TICKS_PER_SECOND"
     )
     , SKIPS(
         "<b>Number of Fetch Attempts:</b>",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         33334
     )
     , SAVE_ITERATIONS(
         "<b>Save Every this Many Fetches:</b><br>(zero disables saving): ",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         0, 0
     )
 {

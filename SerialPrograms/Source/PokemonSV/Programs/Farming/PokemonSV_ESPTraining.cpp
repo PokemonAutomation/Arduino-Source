@@ -68,12 +68,12 @@ std::unique_ptr<StatsTracker> ESPTraining_Descriptor::make_stats() const {
 ESPTraining::ESPTraining()
     : ROUNDS(
         "<b>Number of times to run:</b>",
-        LockWhileRunning::UNLOCK_WHILE_RUNNING,
+        LockMode::UNLOCK_WHILE_RUNNING,
         10
     )
     , SAVE(
         "<b>Save game between rounds:</b><br>Save the game between ESP runs in case of crashes.",
-        LockWhileRunning::UNLOCK_WHILE_RUNNING, false
+        LockMode::UNLOCK_WHILE_RUNNING, false
     )
     , GO_HOME_WHEN_DONE(false)
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))

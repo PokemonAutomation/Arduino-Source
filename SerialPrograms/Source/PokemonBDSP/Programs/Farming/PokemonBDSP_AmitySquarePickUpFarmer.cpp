@@ -45,23 +45,23 @@ AmitySquarePickUpFarmer::AmitySquarePickUpFarmer()
     : GO_HOME_WHEN_DONE(false)
     , MAX_FETCH_ATTEMPTS(
         "<b>Fetch this many times:</b><br>This puts a limit on how many items you can get.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         100
     )
     , ONE_WAY_MOVING_TIME(
         "<b>One Way walking Time:</b><br>Walk this amount of time in one direction before going back to finish one round of walking.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "5 * TICKS_PER_SECOND"
     )
     , ROUNDS_PER_FETCH(
         "<b>Rounds per fetch:</b><br>How many rounds of walking before doing a berry fetch attempt.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         3
     )
     , WAIT_TIME_FOR_POKEMON(
         "<b>Wait Time for Pokemon:</b><br>Wait this time for pokemon to catch up to you before you ask for a berry.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "3 * TICKS_PER_SECOND"
     )

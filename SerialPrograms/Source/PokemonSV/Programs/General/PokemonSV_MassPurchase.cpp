@@ -55,18 +55,18 @@ std::unique_ptr<StatsTracker> MassPurchase_Descriptor::make_stats() const {
 MassPurchase::MassPurchase()
     : ITEMS(
         "<b>Items to Buy:</b><br>The amount of Items to buy from the postion of the cursor.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         50
     )
     , QUANTITY(
         "<b>Quantity to Buy:</b><br>The amount of each item to buy. If a clothing store, set to 1.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         1, 1, 999
     )
     , GO_HOME_WHEN_DONE(false)
     , PAY_LP(
         "<b>Pay with LP:</b>",
-        LockWhileRunning::UNLOCK_WHILE_RUNNING, false
+        LockMode::UNLOCK_WHILE_RUNNING, false
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({

@@ -31,13 +31,13 @@ TrainIVCheckerOCR::TrainIVCheckerOCR()
     : DIRECTORY(
         false,
         "<b>Training Data Directory:</b> (Relative to \"TrainingData/\")",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         "IVCheckerOCR/",
         "IVCheckerOCR/"
     )
     , THREADS(
         "<b>Worker Threads:</b>",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         std::thread::hardware_concurrency()
     )
 {

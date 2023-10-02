@@ -70,12 +70,12 @@ public:
 public:
     StringSelectCell(
         const StringSelectDatabase& database,
-        LockWhileRunning lock_while_running,
+        LockMode lock_while_running,
         size_t default_index
     );
     StringSelectCell(
         const StringSelectDatabase& database,
-        LockWhileRunning lock_while_running,
+        LockMode lock_while_running,
         const std::string& default_slug
     );
 
@@ -118,7 +118,7 @@ public:
     StringSelectOption(
         std::string label,
         const StringSelectDatabase& database,
-        LockWhileRunning lock_while_running,
+        LockMode lock_while_running,
         size_t default_index
     )
         : StringSelectCell(database, lock_while_running, default_index)
@@ -127,7 +127,7 @@ public:
     StringSelectOption(
         std::string label,
         const StringSelectDatabase& database,
-        LockWhileRunning lock_while_running,
+        LockMode lock_while_running,
         const std::string& default_slug
     )
         : StringSelectCell(database, lock_while_running, default_slug)

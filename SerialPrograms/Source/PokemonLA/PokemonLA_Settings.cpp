@@ -21,11 +21,11 @@ GameSettings& GameSettings::instance(){
     return settings;
 }
 GameSettings::GameSettings()
-    : BatchOption(LockWhileRunning::LOCK_WHILE_RUNNING)
+    : BatchOption(LockMode::LOCK_WHILE_RUNNING)
     , m_general("<font size=4><b>General Settings:</b></font>")
     , POST_WARP_DELAY(
         "<b>Post-Warp Delay:</b><br>After warping, wait this many seconds before continuing.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         1.0, 0, 100
     )
     , m_menu_navigation("<font size=4><b>Menu Navigation Timings:</b></font>")
@@ -39,38 +39,38 @@ GameSettings::GameSettings()
 //    )
     , GAME_TO_HOME_DELAY(
         "<b>Game to Home Delay:</b><br>Delay from pressing home to entering the the Switch home menu.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "125"
     )
     , LOAD_REGION_TIMEOUT(
         "<b>Load Region Timeout:</b><br>Wait at most this long to enter a region before giving up.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "30 * TICKS_PER_SECOND"
     )
     , m_start_game_timings("<font size=4><b>Start Game Timings:</b></font>")
     , START_GAME_MASH(
         "<b>1. Start Game Mash:</b><br>Mash A for this long to start the game.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "2 * TICKS_PER_SECOND"
     )
     , START_GAME_WAIT0(
         "<b>2. Start Game Wait:</b><br>Wait this long for the game to load.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "40 * TICKS_PER_SECOND"
     )
     , ENTER_GAME_MASH(
         "<b>3. Enter Game Mash:</b><br>Mash A for this long to enter the game.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "5 * TICKS_PER_SECOND"
     )
     , ENTER_GAME_WAIT(
         "<b>4. Enter Game Wait:</b><br>Wait this long for the game to enter the overworld.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "15 * TICKS_PER_SECOND"
     )
@@ -79,32 +79,32 @@ GameSettings::GameSettings()
     )
     , SHINY_SOUND_THRESHOLD(
         "<b>Shiny Sound Threshold:</b><br>Maximum error coefficient to trigger a shiny detection.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         0.87, 0, 1.0
     )
     , SHINY_SOUND_LOW_FREQUENCY(
         "<b>Shiny Sound Low Frequency (Hz):</b><br>High pass filter frequency for shiny sound.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         5000, 0, 48000
     )
     , ALPHA_ROAR_THRESHOLD(
         "<b>Alpha Roar Threshold:</b><br>Maximum error coefficient to trigger an alpha roar detection.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         0.65, 0, 1.0
     )
     , ALPHA_MUSIC_THRESHOLD(
         "<b>Alpha Music Threshold:</b><br>Maximum error coefficient to trigger an alpha music detection.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         0.81, 0, 1.0
     )
     , ITEM_DROP_SOUND_THRESHOLD(
         "<b>Item Drop Sound Threshold:</b><br>Maximum error coefficient to trigger an item drop sound detection.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         0.9, 0, 1.0
     )
     , ITEM_DROP_SOUND_LOW_FREQUENCY(
         "<b>Item Drop Sound Low Frequency (Hz):</b><br>High pass filter frequency for item drop sound.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         5000, 0, 48000
     )
 {

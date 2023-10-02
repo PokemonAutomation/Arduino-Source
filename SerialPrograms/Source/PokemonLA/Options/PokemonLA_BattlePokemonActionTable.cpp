@@ -36,10 +36,10 @@ const EnumDatabase<MoveStyle>& MoveStyle_Database(){
 
 
 BattlePokemonActionRow::BattlePokemonActionRow()
-    : switch_pokemon(LockWhileRunning::LOCK_WHILE_RUNNING, false)
-    , num_turns_to_switch(LockWhileRunning::LOCK_WHILE_RUNNING, 1)
-    , stop_after_num_moves(LockWhileRunning::LOCK_WHILE_RUNNING, false)
-    , num_moves_to_stop(LockWhileRunning::LOCK_WHILE_RUNNING, 25, 0)
+    : switch_pokemon(LockMode::LOCK_WHILE_RUNNING, false)
+    , num_turns_to_switch(LockMode::LOCK_WHILE_RUNNING, 1)
+    , stop_after_num_moves(LockMode::LOCK_WHILE_RUNNING, false)
+    , num_moves_to_stop(LockMode::LOCK_WHILE_RUNNING, 25, 0)
 {
     PA_ADD_OPTION(style[0]);
     PA_ADD_OPTION(style[1]);
@@ -79,7 +79,7 @@ BattlePokemonActionTable::BattlePokemonActionTable()
         "Note: if your second last " + STRING_POKEMON + " faints, the game will send your last " + STRING_POKEMON + " automatically for you.<br>"
         "The program cannot detect this switch as there is no switch selection screen. "
         "Therefore the program will treat it as the same " + STRING_POKEMON + ".",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         make_defaults()
     )
 {}
@@ -153,7 +153,7 @@ OneMoveBattlePokemonActionTable::OneMoveBattlePokemonActionTable()
         "Set what move style to use for each " + STRING_POKEMON + " to grind against a Magikarp. "
         "Each row is the action for one " + STRING_POKEMON + ". "
         "The table follows the order that " + STRING_POKEMON + " are sent to battle.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         make_defaults()
     )
 {}
@@ -199,9 +199,9 @@ const IntegerEnumDatabase& MoveIndex_Database(){
 
 
 MoveGrinderActionRow::MoveGrinderActionRow()
-    : pokemon_index(PokemonIndex_Database(), LockWhileRunning::LOCK_WHILE_RUNNING, 0)
-    , move_index(MoveIndex_Database(), LockWhileRunning::LOCK_WHILE_RUNNING, 0)
-    , attempts(LockWhileRunning::LOCK_WHILE_RUNNING, 1, 1)
+    : pokemon_index(PokemonIndex_Database(), LockMode::LOCK_WHILE_RUNNING, 0)
+    , move_index(MoveIndex_Database(), LockMode::LOCK_WHILE_RUNNING, 0)
+    , attempts(LockMode::LOCK_WHILE_RUNNING, 1, 1)
 {
     PA_ADD_OPTION(pokemon_index);
     PA_ADD_OPTION(move_index);
@@ -220,7 +220,7 @@ std::unique_ptr<EditableTableRow> MoveGrinderActionRow::clone() const{
 MoveGrinderActionTable::MoveGrinderActionTable()
     : EditableTableOption_t<MoveGrinderActionRow>(
         "For every move you want to perform, input the style and the number of attemps you want to achieve.",
-        LockWhileRunning::LOCK_WHILE_RUNNING
+        LockMode::LOCK_WHILE_RUNNING
     )
 {}
 Move MoveGrinderActionTable::get_move(size_t pokemon, size_t move) const{

@@ -40,7 +40,7 @@ using namespace Pokemon;
 
 
 GeneralHostingOptions::GeneralHostingOptions()
-    : GroupOption("Hosting Options", LockWhileRunning::UNLOCK_WHILE_RUNNING)
+    : GroupOption("Hosting Options", LockMode::UNLOCK_WHILE_RUNNING)
 {
     PA_ADD_OPTION(LOBBY_WAIT_DELAY);
     PA_ADD_OPTION(START_RAID_PLAYERS);
@@ -58,17 +58,17 @@ TeraFarmerPerConsoleOptions::~TeraFarmerPerConsoleOptions(){
     catch_on_win.remove_listener(*this);
 }
 TeraFarmerPerConsoleOptions::TeraFarmerPerConsoleOptions(std::string label, const LanguageSet& languages, bool host)
-    : GroupOption(std::move(label), LockWhileRunning::UNLOCK_WHILE_RUNNING)
+    : GroupOption(std::move(label), LockMode::UNLOCK_WHILE_RUNNING)
     , is_host_label("<font color=\"blue\" size=4><b>This is the host Switch.</b></font>")
-    , language("<b>Game Language:</b>", languages, LockWhileRunning::LOCK_WHILE_RUNNING, true)
+    , language("<b>Game Language:</b>", languages, LockMode::LOCK_WHILE_RUNNING, true)
     , catch_on_win(
         "<b>Catch the " + STRING_POKEMON + ":</b>",
-        LockWhileRunning::UNLOCK_WHILE_RUNNING,
+        LockMode::UNLOCK_WHILE_RUNNING,
         false
     )
     , ball_select(
         "<b>Ball Select:</b>",
-        LockWhileRunning::UNLOCK_WHILE_RUNNING,
+        LockMode::UNLOCK_WHILE_RUNNING,
         "poke-ball"
     )
 {
@@ -159,12 +159,12 @@ TeraMultiFarmer::TeraMultiFarmer()
             {2, "switch2", "Switch 2 (Bottom Left)"},
             {3, "switch3", "Switch 3 (Bottom Right)"},
         },
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         0
     )
     , MAX_WINS(
         "<b>Max Wins:</b><br>Stop program after winning this many times.",
-        LockWhileRunning::UNLOCK_WHILE_RUNNING,
+          LockMode::UNLOCK_WHILE_RUNNING,
         999, 1, 999
     )
     , HOSTING_MODE(
@@ -174,7 +174,7 @@ TeraMultiFarmer::TeraMultiFarmer()
             {Mode::HOST_LOCALLY,    "host-locally", "Host remaining slots locally."},
             {Mode::HOST_ONLINE,     "host-online",  "Host remaining slots online."},
         },
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         Mode::FARM_ALONE
     )
     , RECOVERY_MODE(
@@ -183,7 +183,7 @@ TeraMultiFarmer::TeraMultiFarmer()
             {RecoveryMode::STOP_ON_ERROR,   "stop-on-error",    "Stop on any error."},
             {RecoveryMode::SAVE_AND_RESET,  "save-and-reset",   "Save before each raid. Reset on errors."},
         },
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         RecoveryMode::SAVE_AND_RESET
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))

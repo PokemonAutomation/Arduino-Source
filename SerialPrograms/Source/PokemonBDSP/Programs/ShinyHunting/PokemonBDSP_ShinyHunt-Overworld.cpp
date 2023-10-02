@@ -54,7 +54,7 @@ ShinyHuntOverworld::ShinyHuntOverworld()
         "<b>Reset Game in Case of Error:</b><br>"
         "When the program encounters an error, whether to reset the game to fix it.<br>"
         "<b>Make sure you have set \"Throw balls. Save if caught.\" in Option Overrides if you don't stop when finding a shiny.</b>",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         false
     )
     , NOTIFICATIONS({
@@ -71,7 +71,7 @@ ShinyHuntOverworld::ShinyHuntOverworld()
     )
     , EXIT_BATTLE_TIMEOUT(
         "<b>Exit Battle Timeout:</b><br>After running, wait this long to return to overworld.",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "10 * TICKS_PER_SECOND"
     )

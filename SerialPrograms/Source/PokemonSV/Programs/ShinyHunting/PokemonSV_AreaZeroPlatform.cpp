@@ -36,7 +36,7 @@ PlatformResetSettings::~PlatformResetSettings(){
     WINDOW_IN_MINUTES.remove_listener(*this);
 }
 PlatformResetSettings::PlatformResetSettings()
-    : GroupOption("Platform Reset Conditions", LockWhileRunning::UNLOCK_WHILE_RUNNING, true, false)
+    : GroupOption("Platform Reset Conditions", LockMode::UNLOCK_WHILE_RUNNING, true, false)
     , m_description(
         "A \"Platform Reset\" is when you fly to Zero Gate, then return to the "
         "platform. This is usually done to recover from falling off the "
@@ -50,17 +50,17 @@ PlatformResetSettings::PlatformResetSettings()
     , m_sliding_window("")
     , WINDOW_IN_MINUTES(
         "<b>Time Window (in minutes):</b><br>The sliding time window for which to watch for kills and encounters.",
-        LockWhileRunning::UNLOCK_WHILE_RUNNING,
+        LockMode::UNLOCK_WHILE_RUNNING,
         10
     )
     , KILLS_IN_WINDOW0(
         "<b>Kills in Window:</b><br>If the number of kills in the last X seconds has drops below this value, consider resetting.",
-        LockWhileRunning::UNLOCK_WHILE_RUNNING,
+        LockMode::UNLOCK_WHILE_RUNNING,
         20
     )
     , ENCOUNTERS_IN_WINDOW(
         "<b>Encounters in Window:</b><br>If the number of encounters in the last X seconds has drops below this value, consider resetting.",
-        LockWhileRunning::UNLOCK_WHILE_RUNNING,
+        LockMode::UNLOCK_WHILE_RUNNING,
         5
     )
 #if 0
@@ -106,27 +106,27 @@ void PlatformResetSettings::value_changed(){
 
 
 NavigatePlatformSettings::NavigatePlatformSettings()
-    : GroupOption("Navigate to Platform Settings", LockWhileRunning::UNLOCK_WHILE_RUNNING)
+    : GroupOption("Navigate to Platform Settings", LockMode::UNLOCK_WHILE_RUNNING)
     , m_description(
         "These settings are used when traveling from Zero Gate to the platform. "
         "This can happen either at program start or during a platform reset."
     )
     , HEAL_AT_STATION(
         "<b>Heal at Station:</b><br>If you're passing through the station, take the opportunity to heal up.",
-        LockWhileRunning::UNLOCK_WHILE_RUNNING,
+        LockMode::UNLOCK_WHILE_RUNNING,
         true
     )
     , STATION_ARRIVE_PAUSE_SECONDS(
         "<b>Station Arrive Pause Time:</b><br>Pause for this many seconds after leaving the station. "
         "This gives the game time to load and thus reduce the chance of lag affecting the flight path.",
-        LockWhileRunning::UNLOCK_WHILE_RUNNING,
+        LockMode::UNLOCK_WHILE_RUNNING,
         1
     )
     , MIDAIR_PAUSE_TIME(
         "<b>Mid-Air Pause Time:</b><br>Pause for this long before final approach to the platform. "
         "Too small and you may crash into the wall above the platform or have reduced spawns. "
         "Too large and you may undershoot the platform.",
-        LockWhileRunning::UNLOCK_WHILE_RUNNING,
+        LockMode::UNLOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "50"
     )

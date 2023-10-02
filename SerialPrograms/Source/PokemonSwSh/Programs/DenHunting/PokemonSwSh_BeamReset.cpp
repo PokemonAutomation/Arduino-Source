@@ -34,13 +34,13 @@ BeamReset_Descriptor::BeamReset_Descriptor()
 BeamReset::BeamReset()
     : DELAY_BEFORE_RESET(
         "<b>Delay before Reset:</b>",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "5 * TICKS_PER_SECOND"
     )
     , EXTRA_LINE(
         "<b>Extra Line:</b><br>(German has an extra line of text.)",
-        LockWhileRunning::LOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         false
     )
 {

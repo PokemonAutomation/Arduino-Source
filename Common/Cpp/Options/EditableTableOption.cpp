@@ -76,7 +76,7 @@ std::vector<ConfigOption*> EditableTableRow::make_cells(){
 
 EditableTableOption::EditableTableOption(
     std::string label,
-    LockWhileRunning lock_while_running,
+    LockMode lock_while_running,
     std::vector<std::unique_ptr<EditableTableRow>> default_value
 )
     : ConfigOption(lock_while_running)
@@ -88,7 +88,7 @@ EditableTableOption::EditableTableOption(
 }
 EditableTableOption::EditableTableOption(
     std::string label,
-    LockWhileRunning lock_while_running,
+    LockMode lock_while_running,
     bool enable_saveload,
     std::vector<std::unique_ptr<EditableTableRow>> default_value
 )

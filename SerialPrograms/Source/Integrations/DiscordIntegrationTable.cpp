@@ -16,13 +16,13 @@ namespace Integration{
 
 
 DiscordIntegrationChannel::DiscordIntegrationChannel()
-    : enabled(LockWhileRunning::UNLOCK_WHILE_RUNNING, true)
-    , label(false, LockWhileRunning::UNLOCK_WHILE_RUNNING, "", "My test server")
-    , ping(LockWhileRunning::UNLOCK_WHILE_RUNNING, true)
-    , tags_text(false, LockWhileRunning::UNLOCK_WHILE_RUNNING, "Notifs, Showcase, LiveHost", "")
-    , allow_commands(LockWhileRunning::UNLOCK_WHILE_RUNNING, true)
-    , delay(LockWhileRunning::UNLOCK_WHILE_RUNNING, 0, 0, 10)
-    , channel_id(false, LockWhileRunning::UNLOCK_WHILE_RUNNING, "", "123456789012345678")
+    : enabled(LockMode::UNLOCK_WHILE_RUNNING, true)
+    , label(false, LockMode::UNLOCK_WHILE_RUNNING, "", "My test server")
+    , ping(LockMode::UNLOCK_WHILE_RUNNING, true)
+    , tags_text(false, LockMode::UNLOCK_WHILE_RUNNING, "Notifs, Showcase, LiveHost", "")
+    , allow_commands(LockMode::UNLOCK_WHILE_RUNNING, true)
+    , delay(LockMode::UNLOCK_WHILE_RUNNING, 0, 0, 10)
+    , channel_id(false, LockMode::UNLOCK_WHILE_RUNNING, "", "123456789012345678")
 {
     //  Keep the old JSON tags for backwards compatibility.
     add_option(enabled, "Enabled");
@@ -77,7 +77,7 @@ void DiscordIntegrationChannel::load_json(const JsonValue& json){
 DiscordIntegrationTable::DiscordIntegrationTable()
     : EditableTableOption_t<DiscordIntegrationChannel>(
         "<b>Discord Channels:</b> Configure which channels to send notifications and accept commands in.",
-        LockWhileRunning::UNLOCK_WHILE_RUNNING
+        LockMode::UNLOCK_WHILE_RUNNING
     )
 {}
 std::vector<std::string> DiscordIntegrationTable::make_header() const{
