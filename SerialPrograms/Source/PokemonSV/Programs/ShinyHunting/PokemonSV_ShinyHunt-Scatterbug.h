@@ -72,8 +72,6 @@ private:
 
     LetsGoEncounterBotTracker* m_encounter_tracker;
 
-    EncounterWatcher* m_encounter_watcher;
-
     //  Set to true if we should save on the first available opportunity.
     bool m_pending_save;
 };

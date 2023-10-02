@@ -206,7 +206,6 @@ void ShinyHuntScatterbug::handle_battles_and_back_to_pokecenter(SingleSwitchProg
     std::function<void(SingleSwitchProgramEnvironment& env, BotBaseContext& context)>&& action)
 {
     assert(m_encounter_tracker != nullptr);
-    assert(m_encounter_watcher != nullptr);
 
     bool action_finished = false;
     bool first_iteration = true;
@@ -214,6 +213,7 @@ void ShinyHuntScatterbug::handle_battles_and_back_to_pokecenter(SingleSwitchProg
     bool returned_to_pokecenter = false;
     while(action_finished == false || returned_to_pokecenter == false){
         // env.console.overlay().add_log("Calculate what to do next");
+        EncounterWatcher encounter_watcher(env.console, COLOR_RED);
         int ret = run_until(
             env.console, context,
             [&](BotBaseContext& context){
@@ -241,11 +241,11 @@ void ShinyHuntScatterbug::handle_battles_and_back_to_pokecenter(SingleSwitchProg
                 action_finished = true;
             },
             {
-                static_cast<VisualInferenceCallback&>(*m_encounter_watcher),
-                static_cast<AudioInferenceCallback&>(*m_encounter_watcher),
+                static_cast<VisualInferenceCallback&>(encounter_watcher),
+                static_cast<AudioInferenceCallback&>(encounter_watcher),
             }
         );
-        m_encounter_watcher->throw_if_no_sound();
+        encounter_watcher.throw_if_no_sound();
         if (ret >= 0){
             env.console.log("Detected battle.", COLOR_PURPLE);
             env.console.overlay().add_log("Detected battle");
@@ -253,7 +253,7 @@ void ShinyHuntScatterbug::handle_battles_and_back_to_pokecenter(SingleSwitchProg
                 bool caught, should_save;
                 m_encounter_tracker->process_battle(
                     caught, should_save,
-                    *m_encounter_watcher, ENCOUNTER_BOT_OPTIONS
+                    encounter_watcher, ENCOUNTER_BOT_OPTIONS
                 );
                 if (should_save){
                     m_pending_save = should_save;
@@ -278,9 +278,6 @@ void ShinyHuntScatterbug::run_one_sandwich_iteration(SingleSwitchProgramEnvironm
         LANGUAGE
     );
     m_encounter_tracker = &encounter_tracker;
-
-    EncounterWatcher encounter_watcher(env.console, COLOR_RED);
-    m_encounter_watcher = &encounter_watcher;
 
     bool saved_after_this_sandwich = false;
 
@@ -356,7 +353,6 @@ void ShinyHuntScatterbug::run_one_sandwich_iteration(SingleSwitchProgramEnvironm
                     },
                     {hp_watcher}
                 );
-                m_encounter_watcher->throw_if_no_sound();
             } // end [](...)
         ); // end handle_battles_and_back_to_pokecenter()
         save_if_needed();
