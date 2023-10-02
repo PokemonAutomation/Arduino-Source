@@ -239,7 +239,7 @@ JsonValue IntegerRangeCell<Type>::to_json() const{
     JsonArray array;
     array.push_back(lo);
     array.push_back(hi);
-    return std::move(array);
+    return array;
 }
 template <typename Type>
 void IntegerRangeCell<Type>::restore_defaults(){
