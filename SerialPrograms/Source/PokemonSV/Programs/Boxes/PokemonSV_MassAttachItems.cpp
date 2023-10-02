@@ -84,7 +84,7 @@ MassAttachItems::MassAttachItems()
     )
     , BOXES(
         "<b>Number of Boxes to Attach:</b>",
-        LockWhileRunning::UNLOCKED,
+        LockWhileRunning::UNLOCK_WHILE_RUNNING,
         1, 0, 32
     )
     , NOTIFICATIONS({

@@ -94,7 +94,7 @@ RideCloner101::RideCloner101()
     , LANGUAGE(
         "<b>Game Language:</b>",
         PokemonNameReader::instance().languages(),
-        LockWhileRunning::UNLOCKED
+        LockWhileRunning::UNLOCK_WHILE_RUNNING
     )
     , MODE(
         "<b>Mode:</b>",
@@ -107,26 +107,26 @@ RideCloner101::RideCloner101()
     )
     , RIDES_TO_CLONE(
         "<b>Rides to Clone:</b><br>Stop program after cloning this many times. Make sure you have enough box space for twice this amount.",
-        LockWhileRunning::UNLOCKED,
+        LockWhileRunning::UNLOCK_WHILE_RUNNING,
         100, 1, 100
     )
     , MAX_STARS(
         "<b>Max Stars:</b><br>Skip raids with more than this many stars to save time since you're likely to lose.",
-        LockWhileRunning::UNLOCKED,
+        LockWhileRunning::UNLOCK_WHILE_RUNNING,
         4, 1, 7
     )
     , BALL_SELECT(
         "<b>Ball Select:</b>",
-        LockWhileRunning::UNLOCKED,
+        LockWhileRunning::UNLOCK_WHILE_RUNNING,
         "poke-ball"
     )
     , FIX_TIME_ON_CATCH(
         "<b>Fix Clock on Catch:</b><br>Fix the time when catching so the caught date will be correct.",
-        LockWhileRunning::UNLOCKED, false
+        LockWhileRunning::UNLOCK_WHILE_RUNNING, false
     )
     , A_TO_B_DELAY(
         "<b>A-to-B Delay:</b><br>The delay between the critical A-to-B press that activates the glitch.",
-        LockWhileRunning::UNLOCKED,
+        LockWhileRunning::UNLOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "8"
     )

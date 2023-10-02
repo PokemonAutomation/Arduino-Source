@@ -60,7 +60,7 @@ GameSettings::GameSettings()
     )
     , RAID_SPAWN_DELAY(
         "<b>Raid Spawn Delay</b>",
-        LockWhileRunning::UNLOCKED,
+        LockWhileRunning::UNLOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "3 * TICKS_PER_SECOND"
     )

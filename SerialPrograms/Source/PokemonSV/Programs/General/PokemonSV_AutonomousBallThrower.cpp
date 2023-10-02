@@ -53,18 +53,18 @@ AutonomousBallThrower::AutonomousBallThrower()
     : LANGUAGE(
         "<b>Game Language:</b>",
         PokemonNameReader::instance().languages(),
-        LockWhileRunning::UNLOCKED
+        LockWhileRunning::UNLOCK_WHILE_RUNNING
     )
     , BALL_SELECT(
         "<b>Ball Select:</b>",
-        LockWhileRunning::UNLOCKED,
+        LockWhileRunning::UNLOCK_WHILE_RUNNING,
         "poke-ball"
     )
     , USE_FIRST_MOVE_IF_CANNOT_THROW_BALL(
         "<b>Use 1st Move if Cannot Throw Ball:</b><br>"
         "If you can't throw a ball because the opponent is semi-invulnerable, use the 1st move instead. "
         "Therefore, your first move should be non-damaging to avoid killing the wild " + STRING_POKEMON + ".",
-        LockWhileRunning::UNLOCKED,
+        LockWhileRunning::UNLOCK_WHILE_RUNNING,
         true
     )
     , NOTIFICATION_CATCH_SUCCESS("Catch Success", true, true)

@@ -51,7 +51,7 @@ public:
     }
 };
 TestMessageButton::TestMessageButton(EventNotificationOption& p_option)
-    : ConfigOption(LockWhileRunning::UNLOCKED)
+    : ConfigOption(LockWhileRunning::UNLOCK_WHILE_RUNNING)
     , option(p_option)
 {}
 ConfigWidget* TestMessageButton::make_QtWidget(QWidget& parent){
@@ -109,13 +109,13 @@ struct EventNotificationOption::Data{
         std::chrono::seconds rate_limit
     )
         : screenshot_supported(false)
-        , m_enabled(LockWhileRunning::UNLOCKED, enabled)
-        , m_label(LockWhileRunning::UNLOCKED, std::move(label))
-        , m_ping(LockWhileRunning::UNLOCKED, ping)
-        , m_null_screenshot(LockWhileRunning::UNLOCKED, "---")
+        , m_enabled(LockWhileRunning::UNLOCK_WHILE_RUNNING, enabled)
+        , m_label(LockWhileRunning::UNLOCK_WHILE_RUNNING, std::move(label))
+        , m_ping(LockWhileRunning::UNLOCK_WHILE_RUNNING, ping)
+        , m_null_screenshot(LockWhileRunning::UNLOCK_WHILE_RUNNING, "---")
         , m_screenshot(ImageAttachmentMode::NO_SCREENSHOT)
-        , m_tags(false, LockWhileRunning::UNLOCKED, "Notifs", "")
-        , m_rate_limit_seconds(LockWhileRunning::UNLOCKED, rate_limit.count())
+        , m_tags(false, LockWhileRunning::UNLOCK_WHILE_RUNNING, "Notifs", "")
+        , m_rate_limit_seconds(LockWhileRunning::UNLOCK_WHILE_RUNNING, rate_limit.count())
         , m_last_sent(WallClock::min())
         , m_global_enable(true)
     {}
@@ -126,13 +126,13 @@ struct EventNotificationOption::Data{
         std::chrono::seconds rate_limit
     )
         : screenshot_supported(false)
-        , m_enabled(LockWhileRunning::UNLOCKED, enabled)
-        , m_label(LockWhileRunning::UNLOCKED, std::move(label))
-        , m_ping(LockWhileRunning::UNLOCKED, ping)
-        , m_null_screenshot(LockWhileRunning::UNLOCKED, "---")
+        , m_enabled(LockWhileRunning::UNLOCK_WHILE_RUNNING, enabled)
+        , m_label(LockWhileRunning::UNLOCK_WHILE_RUNNING, std::move(label))
+        , m_ping(LockWhileRunning::UNLOCK_WHILE_RUNNING, ping)
+        , m_null_screenshot(LockWhileRunning::UNLOCK_WHILE_RUNNING, "---")
         , m_screenshot(ImageAttachmentMode::NO_SCREENSHOT)
-        , m_tags(false, LockWhileRunning::UNLOCKED, tags_to_str(tags), "")
-        , m_rate_limit_seconds(LockWhileRunning::UNLOCKED, rate_limit.count())
+        , m_tags(false, LockWhileRunning::UNLOCK_WHILE_RUNNING, tags_to_str(tags), "")
+        , m_rate_limit_seconds(LockWhileRunning::UNLOCK_WHILE_RUNNING, rate_limit.count())
         , m_last_sent(WallClock::min())
         , m_global_enable(true)
     {}
@@ -144,13 +144,13 @@ struct EventNotificationOption::Data{
         std::chrono::seconds rate_limit
     )
         : screenshot_supported(true)
-        , m_enabled(LockWhileRunning::UNLOCKED, enabled)
-        , m_label(LockWhileRunning::UNLOCKED, std::move(label))
-        , m_ping(LockWhileRunning::UNLOCKED, ping)
-        , m_null_screenshot(LockWhileRunning::UNLOCKED, "---")
+        , m_enabled(LockWhileRunning::UNLOCK_WHILE_RUNNING, enabled)
+        , m_label(LockWhileRunning::UNLOCK_WHILE_RUNNING, std::move(label))
+        , m_ping(LockWhileRunning::UNLOCK_WHILE_RUNNING, ping)
+        , m_null_screenshot(LockWhileRunning::UNLOCK_WHILE_RUNNING, "---")
         , m_screenshot(screenshot)
-        , m_tags(false, LockWhileRunning::UNLOCKED, tags_to_str(tags), "")
-        , m_rate_limit_seconds(LockWhileRunning::UNLOCKED, rate_limit.count())
+        , m_tags(false, LockWhileRunning::UNLOCK_WHILE_RUNNING, tags_to_str(tags), "")
+        , m_rate_limit_seconds(LockWhileRunning::UNLOCK_WHILE_RUNNING, rate_limit.count())
         , m_last_sent(WallClock::min())
         , m_global_enable(true)
     {}

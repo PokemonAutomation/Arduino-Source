@@ -22,8 +22,8 @@ const EnumDatabase<BattleMoveType>& Battle_move_enum_database(){
 }
 
 BattleMoveTableRow::BattleMoveTableRow()
-    : type(Battle_move_enum_database(), LockWhileRunning::UNLOCKED, BattleMoveType::Move1)
-    , notes(false, LockWhileRunning::UNLOCKED, "", "(e.g. False Swipe, Thunder Wave)")
+    : type(Battle_move_enum_database(), LockWhileRunning::UNLOCK_WHILE_RUNNING, BattleMoveType::Move1)
+    , notes(false, LockWhileRunning::UNLOCK_WHILE_RUNNING, "", "(e.g. False Swipe, Thunder Wave)")
 {
     PA_ADD_OPTION(type);
     PA_ADD_OPTION(notes);

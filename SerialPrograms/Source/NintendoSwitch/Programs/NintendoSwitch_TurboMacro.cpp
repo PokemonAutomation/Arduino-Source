@@ -27,7 +27,7 @@ TurboMacro_Descriptor::TurboMacro_Descriptor()
 TurboMacro::TurboMacro()
     : LOOP(
         "<b>Number of times to loop:</b>",
-        LockWhileRunning::UNLOCKED,
+        LockWhileRunning::UNLOCK_WHILE_RUNNING,
         100, 0
         )
 {

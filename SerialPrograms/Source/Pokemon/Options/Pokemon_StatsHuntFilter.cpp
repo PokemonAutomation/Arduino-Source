@@ -245,12 +245,12 @@ StatsHuntAction StatsHuntIvJudgeFilterTable::get_action(
 
 StatsHuntIvRangeFilterRow::StatsHuntIvRangeFilterRow(const StatsHuntMiscFeatureFlags& feature_flags)
     : misc(feature_flags)
-    , iv_hp(LockWhileRunning::UNLOCKED, 0, 31, 0, 0, 0, 31, 31, 31)
-    , iv_atk(LockWhileRunning::UNLOCKED, 0, 31, 0, 0, 0, 31, 31, 31)
-    , iv_def(LockWhileRunning::UNLOCKED, 0, 31, 0, 0, 0, 31, 31, 31)
-    , iv_spatk(LockWhileRunning::UNLOCKED, 0, 31, 0, 0, 0, 31, 31, 31)
-    , iv_spdef(LockWhileRunning::UNLOCKED, 0, 31, 0, 0, 0, 31, 31, 31)
-    , iv_speed(LockWhileRunning::UNLOCKED, 0, 31, 0, 0, 0, 31, 31, 31)
+    , iv_hp(LockWhileRunning::UNLOCK_WHILE_RUNNING, 0, 31, 0, 0, 0, 31, 31, 31)
+    , iv_atk(LockWhileRunning::UNLOCK_WHILE_RUNNING, 0, 31, 0, 0, 0, 31, 31, 31)
+    , iv_def(LockWhileRunning::UNLOCK_WHILE_RUNNING, 0, 31, 0, 0, 0, 31, 31, 31)
+    , iv_spatk(LockWhileRunning::UNLOCK_WHILE_RUNNING, 0, 31, 0, 0, 0, 31, 31, 31)
+    , iv_spdef(LockWhileRunning::UNLOCK_WHILE_RUNNING, 0, 31, 0, 0, 0, 31, 31, 31)
+    , iv_speed(LockWhileRunning::UNLOCK_WHILE_RUNNING, 0, 31, 0, 0, 0, 31, 31, 31)
 {
     if (misc.feature_flags.action)  PA_ADD_OPTION(misc.action);
     if (misc.feature_flags.shiny)   PA_ADD_OPTION(misc.shiny);

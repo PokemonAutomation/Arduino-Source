@@ -178,7 +178,7 @@ TestProgram::TestProgram()
     )
     , STATIC_TEXT("Test text...")
     , SELECT("String Select", test_database(), LockWhileRunning::LOCK_WHILE_RUNNING, 0)
-    , PLAYER_LIST("Test Table", LockWhileRunning::UNLOCKED, "Notes")
+    , PLAYER_LIST("Test Table", LockWhileRunning::UNLOCK_WHILE_RUNNING, "Notes")
     , NOTIFICATION_TEST("Test", true, true, ImageAttachmentMode::JPG)
     , NOTIFICATIONS({
         &NOTIFICATION_TEST,

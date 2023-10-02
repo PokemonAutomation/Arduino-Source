@@ -88,7 +88,7 @@ StatsReset::StatsReset()
     )
     , BALL_SELECT(
         "<b>Ball Select:</b>",
-        LockWhileRunning::UNLOCKED,
+        LockWhileRunning::UNLOCK_WHILE_RUNNING,
         "poke-ball"
     )
     , QUICKBALL(

@@ -100,22 +100,22 @@ TournamentFarmer::~TournamentFarmer(){
 TournamentFarmer::TournamentFarmer()
     : NUM_ROUNDS(
         "<b>Number of Tournaments to run:",
-        LockWhileRunning::UNLOCKED,
+        LockWhileRunning::UNLOCK_WHILE_RUNNING,
         100, 0
     )
     , TRY_TO_TERASTILLIZE(
         "<b>Use Terastillization:</b><br>Tera at the start of battle. Will take longer to complete each tournament but may be worth the attack boost.<br>This setting is not necessary if you are running a set specifically made to farm the tournament.",
-        LockWhileRunning::UNLOCKED,
+        LockWhileRunning::UNLOCK_WHILE_RUNNING,
         false
     )
     , SAVE_NUM_ROUNDS(
         "<b>Save every this many tournaments:</b><br>Zero disables saving. Will save win or lose.",
-        LockWhileRunning::UNLOCKED,
+        LockWhileRunning::UNLOCK_WHILE_RUNNING,
         1, 0
     )
     , MONEY_LIMIT(
         "<b>Stop after earning this amount of money:</b><br>Zero disables this check. Does not count losses. In-game maximum is 9,999,999. This can be set up to 999,999,999.",
-        LockWhileRunning::UNLOCKED,
+        LockWhileRunning::UNLOCK_WHILE_RUNNING,
         9999999, 0, 999999999
     )
     , HHH_ZOROARK(

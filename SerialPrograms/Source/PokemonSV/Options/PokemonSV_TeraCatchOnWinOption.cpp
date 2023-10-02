@@ -13,15 +13,15 @@ namespace PokemonSV{
 
 
 TeraFarmerCatchOnWin::TeraFarmerCatchOnWin(bool enabled)
-    : GroupOption("Catch on Win", LockWhileRunning::UNLOCKED, true, enabled)
+    : GroupOption("Catch on Win", LockWhileRunning::UNLOCK_WHILE_RUNNING, true, enabled)
     , BALL_SELECT(
         "<b>Ball Select:</b>",
-        LockWhileRunning::UNLOCKED,
+        LockWhileRunning::UNLOCK_WHILE_RUNNING,
         "poke-ball"
     )
     , FIX_TIME_ON_CATCH(
         "<b>Fix Clock:</b><br>Fix the time when catching so the caught date will be correct.",
-        LockWhileRunning::UNLOCKED, false
+        LockWhileRunning::UNLOCK_WHILE_RUNNING, false
     )
 {
     PA_ADD_OPTION(BALL_SELECT);

@@ -60,7 +60,7 @@ ButtonCell::ButtonCell(
     int button_height,
     int text_size
 )
-    : ConfigOption(LockWhileRunning::UNLOCKED)
+    : ConfigOption(LockWhileRunning::UNLOCK_WHILE_RUNNING)
     , m_data(CONSTRUCT_TOKEN, ButtonCell::ENABLED, std::move(text), button_height, text_size)
 {}
 ButtonCell::ButtonCell(
@@ -69,7 +69,7 @@ ButtonCell::ButtonCell(
     int button_height,
     int text_size
 )
-    : ConfigOption(LockWhileRunning::UNLOCKED)
+    : ConfigOption(LockWhileRunning::UNLOCK_WHILE_RUNNING)
     , m_data(CONSTRUCT_TOKEN, state, std::move(text), button_height, text_size)
 {}
 

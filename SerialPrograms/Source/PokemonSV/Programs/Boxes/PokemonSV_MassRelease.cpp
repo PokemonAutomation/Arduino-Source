@@ -69,12 +69,12 @@ MassRelease::MassRelease()
     : GO_HOME_WHEN_DONE(false)
     , BOXES_TO_RELEASE(
         "<b>Number of Boxes to Release:</b>",
-        LockWhileRunning::UNLOCKED,
+        LockWhileRunning::UNLOCK_WHILE_RUNNING,
         2, 0, 32
     )
     , SKIP_SHINIES(
         "<b>Skip Shinies:</b><br>Do not release shiny " + STRING_POKEMON + ".",
-        LockWhileRunning::UNLOCKED,
+        LockWhileRunning::UNLOCK_WHILE_RUNNING,
         true
     )
     , NOTIFICATIONS({

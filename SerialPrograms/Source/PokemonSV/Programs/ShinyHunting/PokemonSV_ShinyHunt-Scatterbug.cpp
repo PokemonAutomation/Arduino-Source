@@ -84,14 +84,14 @@ ShinyHuntScatterbug::ShinyHuntScatterbug()
     : LANGUAGE(
         "<b>Game Language:</b><br>Required to read " + STRING_POKEMON + " names.",
         IV_READER().languages(),
-        LockWhileRunning::UNLOCKED,
+        LockWhileRunning::UNLOCK_WHILE_RUNNING,
         false
     )
     , SANDWICH_OPTIONS(LANGUAGE)
     , GO_HOME_WHEN_DONE(true)
     , AUTO_HEAL_PERCENT(
         "<b>Auto-Heal %</b><br>Auto-heal if your HP drops below this percentage.",
-        LockWhileRunning::UNLOCKED,
+        LockWhileRunning::UNLOCK_WHILE_RUNNING,
         75, 0, 100
     )
     , SAVE_DEBUG_VIDEO(
@@ -109,7 +109,7 @@ ShinyHuntScatterbug::ShinyHuntScatterbug()
     , SKIP_SANDWICH(
         "<b>Whether to skip making sandwich:</b><br>"
         "This is for debugging the program without waiting for sandwich making.",
-        LockWhileRunning::UNLOCKED,
+        LockWhileRunning::UNLOCK_WHILE_RUNNING,
         false
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))

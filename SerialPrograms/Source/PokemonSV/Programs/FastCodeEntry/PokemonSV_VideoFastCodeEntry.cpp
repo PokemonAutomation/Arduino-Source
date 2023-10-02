@@ -26,7 +26,7 @@ using namespace Pokemon;
 
 
 VideoFceSettings::VideoFceSettings()
-    : GroupOption("Join Settings (V-FCE)", LockWhileRunning::UNLOCKED)
+    : GroupOption("Join Settings (V-FCE)", LockWhileRunning::UNLOCK_WHILE_RUNNING)
     , OCR_METHOD(
         "<b>Text Recognition Method:</b><br>"
         "Each text recognition method has its own strengths and weaknesses. This option lets you choose which method to use.",
@@ -36,13 +36,13 @@ VideoFceSettings::VideoFceSettings()
             {VideoFceOcrMethod::WHITE_TEXT, "white-on-black",   "Filter: White Text on Black Background"},
             {VideoFceOcrMethod::TERA_CARD,  "tera-card",        "Tera Card"},
         },
-        LockWhileRunning::UNLOCKED,
+        LockWhileRunning::UNLOCK_WHILE_RUNNING,
         VideoFceOcrMethod::TERA_CARD
     )
     , SKIP_INITIAL_CODE(
         "<b>Skip Initial Code:</b><br>"
         "If there is already a code up when you start the program, skip it since it's from the last raid.",
-        LockWhileRunning::UNLOCKED,
+        LockWhileRunning::UNLOCK_WHILE_RUNNING,
         true
     )
 {

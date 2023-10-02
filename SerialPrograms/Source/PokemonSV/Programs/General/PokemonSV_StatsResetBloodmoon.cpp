@@ -72,12 +72,12 @@ StatsResetBloodmoon::StatsResetBloodmoon()
     )
     , BALL_SELECT(
         "<b>Ball Select:</b>",
-        LockWhileRunning::UNLOCKED,
+        LockWhileRunning::UNLOCK_WHILE_RUNNING,
         "poke-ball"
     )
     , TRY_TO_TERASTILLIZE(
         "<b>Use Terastillization:</b><br>Tera at the start of battle.",
-        LockWhileRunning::UNLOCKED,
+        LockWhileRunning::UNLOCK_WHILE_RUNNING,
         false
     )
     , FILTERS(

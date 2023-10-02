@@ -21,7 +21,7 @@ class ConfigWidget;
 
 
 enum class LockWhileRunning{
-    UNLOCKED,
+    UNLOCK_WHILE_RUNNING,
     LOCK_WHILE_RUNNING,
     READ_ONLY,
 };

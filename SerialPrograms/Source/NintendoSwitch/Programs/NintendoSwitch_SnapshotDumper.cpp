@@ -32,7 +32,7 @@ SnapshotDumper_Descriptor::SnapshotDumper_Descriptor()
 SnapshotDumper::SnapshotDumper()
     : PERIOD_MILLISECONDS(
         "<b>Snapshot Period (milliseconds):</b><br>Take screenshot every this many milliseconds.",
-        LockWhileRunning::UNLOCKED,
+        LockWhileRunning::UNLOCK_WHILE_RUNNING,
         1000
     )
     , FORMAT(
@@ -41,7 +41,7 @@ SnapshotDumper::SnapshotDumper()
             {Format::PNG, "png", ".png"},
             {Format::JPG, "jpg", ".jpg"},
         },
-        LockWhileRunning::UNLOCKED,
+        LockWhileRunning::UNLOCK_WHILE_RUNNING,
         Format::JPG
     )
 {

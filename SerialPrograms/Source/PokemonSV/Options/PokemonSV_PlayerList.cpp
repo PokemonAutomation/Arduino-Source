@@ -18,14 +18,14 @@ namespace PokemonSV{
 
 
 PlayerListRow::PlayerListRow()
-    : enabled(LockWhileRunning::UNLOCKED, true)
+    : enabled(LockWhileRunning::UNLOCK_WHILE_RUNNING, true)
     , language(
         Pokemon::PokemonNameReader::instance().languages(),
-        LockWhileRunning::UNLOCKED
+        LockWhileRunning::UNLOCK_WHILE_RUNNING
     )
-    , name(false, LockWhileRunning::UNLOCKED, "", "Ash")
-    , log10p(LockWhileRunning::UNLOCKED, -2.5, -10, 0)
-    , notes(false, LockWhileRunning::UNLOCKED, "", "")
+    , name(false, LockWhileRunning::UNLOCK_WHILE_RUNNING, "", "Ash")
+    , log10p(LockWhileRunning::UNLOCK_WHILE_RUNNING, -2.5, -10, 0)
+    , notes(false, LockWhileRunning::UNLOCK_WHILE_RUNNING, "", "")
 {
     PA_ADD_OPTION(enabled);
     PA_ADD_OPTION(language);
@@ -89,7 +89,7 @@ std::vector<PlayerListRowSnapshot> PlayerListTable::snapshot() const{
 
 
 RaidPlayerBanList::RaidPlayerBanList()
-    : GroupOption("Bans:", LockWhileRunning::UNLOCKED, true, true)
+    : GroupOption("Bans:", LockWhileRunning::UNLOCK_WHILE_RUNNING, true, true)
     , text("Ban users from this raid. If a banned person tries to join, the raid will be reset.")
     , local_table(
         "<b>Ban Table:</b><br>A table of users to ban by IGN. "
@@ -99,7 +99,7 @@ RaidPlayerBanList::RaidPlayerBanList()
         "It is always negative. Lower value means the match needs to be more perfect to be a match.<br><br>"
         "If you are getting false positive hits, decrease this value. (make it more negative)<br>"
         "If it is failing to match, increase this value. (make it less negative)",
-        LockWhileRunning::UNLOCKED,
+        LockWhileRunning::UNLOCK_WHILE_RUNNING,
         "Ban Reason (shown publicly)"
     )
     , online_table_url(
@@ -107,16 +107,16 @@ RaidPlayerBanList::RaidPlayerBanList()
         "<b>Online Ban Table:</b><br> In addition to the above table, download a ban list from this URL.<br>"
         "Thus the list of banned players is the combination of both your local table above and the downloaded one.<br>"
         "This online ban list is automatically refreshed every raid - thus allowing the maintainer of the online list to manage bans for you.",
-        LockWhileRunning::UNLOCKED,
+        LockWhileRunning::UNLOCK_WHILE_RUNNING,
         "https://raw.githubusercontent.com/PokemonAutomation/ServerConfigs-PA-SHA/main/PokemonScarletViolet/TeraAutoHost-BanList.json",
         "https://raw.githubusercontent.com/PokemonAutomation/ServerConfigs-PA-SHA/main/PokemonScarletViolet/TeraAutoHost-BanList.json"
     )
     , ignore_whitelist(
         "<b>Ignore Whitelist:</b><br>Ignore the developer whitelist.",
-        LockWhileRunning::UNLOCKED,
+        LockWhileRunning::UNLOCK_WHILE_RUNNING,
         false
     )
-    , online_table("", LockWhileRunning::UNLOCKED, "")
+    , online_table("", LockWhileRunning::UNLOCK_WHILE_RUNNING, "")
 {
     PA_ADD_OPTION(text);
     PA_ADD_OPTION(local_table);

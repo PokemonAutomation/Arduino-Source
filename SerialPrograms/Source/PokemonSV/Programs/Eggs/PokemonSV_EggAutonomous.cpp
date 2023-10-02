@@ -92,7 +92,7 @@ EggAutonomous::EggAutonomous()
     , MAX_KEEPERS(
         "<b>Max Keepers:</b><br>Stop the program after keeping this many " + STRING_POKEMON + ". "
         "The program will put them into a box neighboring the current box.",
-        LockWhileRunning::UNLOCKED,
+        LockWhileRunning::UNLOCK_WHILE_RUNNING,
         10, 1, 30
     )
     , AUTO_SAVING(
@@ -124,7 +124,7 @@ EggAutonomous::EggAutonomous()
             {0, "left", "Left Box"},
             {1, "right", "Right Box"},
         },
-        LockWhileRunning::UNLOCKED,
+        LockWhileRunning::UNLOCK_WHILE_RUNNING,
         1
     )
     , FILTERS(

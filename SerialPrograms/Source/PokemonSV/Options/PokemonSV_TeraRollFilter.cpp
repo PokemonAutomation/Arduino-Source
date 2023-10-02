@@ -22,7 +22,7 @@ namespace PokemonSV{
 
 
 TeraRollFilter::TeraRollFilter()
-    : GroupOption("Opponent Filter", LockWhileRunning::UNLOCKED)
+    : GroupOption("Opponent Filter", LockWhileRunning::UNLOCK_WHILE_RUNNING)
     , EVENT_CHECK_MODE(
         "<b>Event Tera Raid Action:</b><br>Choose how the program interacts with event/non-event raids."
         "<br>Check only non-event can be further sped up if you exclude 6 star from your filters.",
@@ -31,23 +31,23 @@ TeraRollFilter::TeraRollFilter()
             {EventCheckMode::CHECK_ONLY_EVENT,      "check_event",      "Check only event raids."},
             {EventCheckMode::CHECK_ONLY_NONEVENT,   "check_nonevent",   "Check only non-event raids."},
         },
-        LockWhileRunning::UNLOCKED,
+        LockWhileRunning::UNLOCK_WHILE_RUNNING,
         EventCheckMode::CHECK_ALL
     )
     , MIN_STARS(
         "<b>Min Stars:</b><br>Skip raids with less than this many stars.",
-        LockWhileRunning::UNLOCKED,
+        LockWhileRunning::UNLOCK_WHILE_RUNNING,
         1, 1, 7
     )
     , MAX_STARS(
         "<b>Max Stars:</b><br>Skip raids with more than this many stars.",
-        LockWhileRunning::UNLOCKED,
+        LockWhileRunning::UNLOCK_WHILE_RUNNING,
         4, 1, 7
     )
     , SKIP_HERBA(
         "<b>Skip Non-Herba Raids:</b><br>"
         "Skip raids that don't have the possibility to reward all types of Herba Mystica. Enable this if you are searching for an herba raid.",
-        LockWhileRunning::UNLOCKED,
+        LockWhileRunning::UNLOCK_WHILE_RUNNING,
         false
     )
 {

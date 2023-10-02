@@ -66,7 +66,7 @@ MassPurchase::MassPurchase()
     , GO_HOME_WHEN_DONE(false)
     , PAY_LP(
         "<b>Pay with LP:</b>",
-        LockWhileRunning::UNLOCKED, false
+        LockWhileRunning::UNLOCK_WHILE_RUNNING, false
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({

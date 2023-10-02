@@ -52,7 +52,7 @@ FastCodeEntry::FastCodeEntry()
     , CODE(
         "<b>Link Code:</b><br>Unless in Mystery Gift mode, code must be 4-digit numeric or 6-digit alphanumeric. (not case sensitive)<br>"
         "(Box is big so it's easy to land your mouse on.)",
-        LockWhileRunning::UNLOCKED,
+        LockWhileRunning::UNLOCK_WHILE_RUNNING,
         "0123", "0123",
         true
     )
