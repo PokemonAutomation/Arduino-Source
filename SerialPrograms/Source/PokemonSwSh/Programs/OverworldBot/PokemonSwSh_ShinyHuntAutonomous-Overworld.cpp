@@ -59,13 +59,13 @@ ShinyHuntAutonomousOverworld::ShinyHuntAutonomousOverworld()
     : GO_HOME_WHEN_DONE(false)
     , TIME_ROLLBACK_HOURS(
         "<b>Time Rollback (in hours):</b><br>Periodically roll back the time to keep the weather the same. If set to zero, this feature is disabled.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         1, 0, 11
     )
     , MARK_OFFSET(
         "<b>Mark Offset:</b><br>Aim this far below the bottom of the exclamation/question mark. 1.0 is the height of the mark. "
         "Increase this value when the " + STRING_POKEMON + " are large.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         0.5, 0, 20
     )
     , MARK_PRIORITY(
@@ -77,7 +77,7 @@ ShinyHuntAutonomousOverworld::ShinyHuntAutonomousOverworld()
             {MarkPriority::PRIORITIZE_QUESTION,     "prioritize-question",      "Prioritize Question Marks"},
             {MarkPriority::QUESTION_ONLY,           "question-only",            "Question Marks Only (Ignore Exclamation Marks)"},
         },
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         MarkPriority::PRIORITIZE_EXCLAMATION
     )
     , TRIGGER_METHOD(
@@ -94,19 +94,19 @@ ShinyHuntAutonomousOverworld::ShinyHuntAutonomousOverworld()
             {TriggerMethod::Whistle3Vertical1,      "whistle3-vertical1",   "Whistle 3 times, then do vertical line once."},
             {TriggerMethod::Vertical3Whistle3,      "vertical3-whistle3",   "Do vertical line 3 times, then whistle 3 times."},
         },
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         TriggerMethod::Whistle3Circle1
     )
     , MAX_MOVE_DURATION(
         "<b>Maximum Move Duration:</b><br>Do not move in the same direction for more than this long."
         " If you set this too high, you may wander too far from the grassy area.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "200"
     )
     , MAX_TARGET_ALPHA(
         "<b>Max Target Alpha:</b><br>Ignore all targets with alpha larger than this. Set to zero to ignore all marks.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         70000, 0
     )
     , ENCOUNTER_BOT_OPTIONS(true, true)
@@ -123,20 +123,20 @@ ShinyHuntAutonomousOverworld::ShinyHuntAutonomousOverworld()
     )
     , WATCHDOG_TIMER(
         "<b>Watchdog Timer:</b><br>Reset the game if you go this long without any encounters.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "60 * TICKS_PER_SECOND"
     )
     , EXIT_BATTLE_TIMEOUT(
         "<b>Exit Battle Timeout:</b><br>After running, wait this long to return to overworld.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "10 * TICKS_PER_SECOND"
     )
     , TARGET_CIRCLING(
         "<b>Target Circling:</b><br>After moving towards a " + STRING_POKEMON + ", make a circle."
         " This increases the chance of encountering the " + STRING_POKEMON + " if it has moved or if the trajectory missed.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         true
     )
 {

@@ -33,7 +33,7 @@ PageSwap_Descriptor::PageSwap_Descriptor()
 PageSwap::PageSwap()
     : DODGE_SYSTEM_UPDATE_WINDOW(
         "<b>Dodge System Update Window:</b>",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         false
     )
 {

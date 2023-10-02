@@ -72,12 +72,12 @@ TenacityCandyFarmer::TenacityCandyFarmer()
             {FourthMoveOn::Mamoswine,   "mamoswine", "Mamoswine (fourth move needs to be set to Flamethrower)"},
             {FourthMoveOn::Avalugg,     "avalugg", "Avalugg (fourth move needs to be set to Rock Smash)"},
         },
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         FourthMoveOn::None
     )
     , SAVE_EVERY_FEW_BATTLES(
         "<b>Save every few battles:</b><br>After every this number of battles, save the game. Enter zero to never save the game.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         0
     )
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))

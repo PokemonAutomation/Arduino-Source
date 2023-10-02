@@ -61,12 +61,12 @@ EggFetcher::EggFetcher()
     , LANGUAGE(
         "<b>Game Language:</b><br>Required to read IVs.",
         IV_READER().languages(),
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         false
     )
     , EGGS_TO_FETCH(
         "<b>Fetch this many eggs:</b>",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         900
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))

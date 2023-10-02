@@ -44,18 +44,18 @@ SelfBoxTrade::SelfBoxTrade()
     : LANGUAGE_LEFT(
         "<b>Game Language of Left Switch:</b>",
         Pokemon::PokemonNameReader::instance().languages(),
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         true
     )
     , LANGUAGE_RIGHT(
         "<b>Game Language of Right Switch:</b>",
         Pokemon::PokemonNameReader::instance().languages(),
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         true
     )
     , BOXES_TO_TRADE(
         "<b>Number of Boxes to Trade:</b>",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         2, 0, 32
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))

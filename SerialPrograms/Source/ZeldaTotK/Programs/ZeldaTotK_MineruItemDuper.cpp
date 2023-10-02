@@ -42,12 +42,12 @@ std::unique_ptr<StatsTracker> MineruItemDuper_Descriptor::make_stats() const {
 MineruItemDuper::MineruItemDuper()
     : AMOUNT(
         "<b>Duplication Amount:</b><br>The number of items you wish to duplicate.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         900
     )
     , IS_ZONAI_DEVICE(
         "<b>Is Zonai Device:</b><br>Whether or not you are duplicating a Zonai device, or just a normal material.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         false
     )
     , GO_HOME_WHEN_DONE(false)

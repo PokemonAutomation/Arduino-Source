@@ -31,7 +31,7 @@ FastCodeEntrySettingsOption::FastCodeEntrySettingsOption(LockWhileRunning lock_w
             {KeyboardLayout::QWERTY, "qwerty", "QWERTY"},
             {KeyboardLayout::AZERTY, "azerty", "AZERTY"},
         },
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         KeyboardLayout::QWERTY
     )
     , SKIP_PLUS(

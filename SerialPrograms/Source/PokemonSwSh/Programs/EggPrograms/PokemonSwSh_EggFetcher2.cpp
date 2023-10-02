@@ -35,7 +35,7 @@ EggFetcher2_Descriptor::EggFetcher2_Descriptor()
 EggFetcher2::EggFetcher2()
     : MAX_FETCH_ATTEMPTS(
         "<b>Fetch this many times:</b><br>This puts a limit on how many eggs you can get so you don't make a mess of your boxes for fetching too many.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         2000
     )
 {

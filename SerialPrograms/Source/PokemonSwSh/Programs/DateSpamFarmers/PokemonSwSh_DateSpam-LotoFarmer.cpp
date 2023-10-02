@@ -35,12 +35,12 @@ LotoFarmer_Descriptor::LotoFarmer_Descriptor()
 LotoFarmer::LotoFarmer()
     : SKIPS(
         "<b>Number of Loto Attempts:</b>",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         100000
     )
     , MASH_B_DURATION(
         "<b>Mash B for this long to exit the dialog:</b><br>(Some languages like German need to increase this.)",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "9 * TICKS_PER_SECOND"
     )

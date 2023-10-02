@@ -25,7 +25,7 @@ std::unique_ptr<EditableTableRow> TournamentPrizeSelectorRow::clone() const{
 TournamentPrizeTable::TournamentPrizeTable(std::string label)
     : EditableTableOption_t<TournamentPrizeSelectorRow>(
         std::move(label),
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         make_defaults()
     )
 {}

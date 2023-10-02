@@ -16,7 +16,7 @@ namespace Pokemon{
 IVJudgeFilterCell::IVJudgeFilterCell(IvJudgeFilter default_value)
     : EnumDropdownCell<IvJudgeFilter>(
         IvJudgeFilter_Database(),
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         default_value
     )
 {}
@@ -28,7 +28,7 @@ IVJudgeFilterOption::IVJudgeFilterOption(std::string label, IvJudgeFilter defaul
     : EnumDropdownOption<IvJudgeFilter>(
         std::move(label),
         IvJudgeFilter_Database(),
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         default_value
     )
 {}

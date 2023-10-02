@@ -34,12 +34,12 @@ GodEggDuplication_Descriptor::GodEggDuplication_Descriptor()
 GodEggDuplication::GodEggDuplication()
     : MAX_FETCH_ATTEMPTS(
         "<b>Fetch this many times:</b><br>This puts a limit on how many eggs you can get so you don't make a mess of your boxes for fetching too many.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         2000
     )
     , PARTY_ROUND_ROBIN(
         "<b>Party Round Robin:</b><br>Cycle through this many party members.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         6, 1, 6
     )
 {

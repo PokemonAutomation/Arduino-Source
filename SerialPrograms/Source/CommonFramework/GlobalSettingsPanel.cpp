@@ -40,10 +40,10 @@ ResolutionOption::ResolutionOption(
     std::string label, std::string description,
     int default_width, int default_height
 )
-    : GroupOption(std::move(label), LockWhileRunning::LOCKED)
+    : GroupOption(std::move(label), LockWhileRunning::LOCK_WHILE_RUNNING)
     , DESCRIPTION(std::move(description))
-    , WIDTH("<b>Width:</b>", LockWhileRunning::LOCKED, scale_dpi_width(default_width))
-    , HEIGHT("<b>Height:</b>", LockWhileRunning::LOCKED, scale_dpi_height(default_height))
+    , WIDTH("<b>Width:</b>", LockWhileRunning::LOCK_WHILE_RUNNING, scale_dpi_width(default_width))
+    , HEIGHT("<b>Height:</b>", LockWhileRunning::LOCK_WHILE_RUNNING, scale_dpi_height(default_height))
 {
     PA_ADD_STATIC(DESCRIPTION);
     PA_ADD_OPTION(WIDTH);
@@ -98,17 +98,17 @@ GlobalSettings::~GlobalSettings(){
     ENABLE_LIFETIME_SANITIZER.remove_listener(*this);
 }
 GlobalSettings::GlobalSettings()
-    : BatchOption(LockWhileRunning::LOCKED)
+    : BatchOption(LockWhileRunning::LOCK_WHILE_RUNNING)
     , SEND_ERROR_REPORTS(
         "<b>Send Error Reports:</b><br>"
         "Send error reports to the " + PROGRAM_NAME + " server to help them resolve issues and improve the program.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         IS_BETA_VERSION
     )
     , STATS_FILE(
         false,
         "<b>Stats File:</b><br>Use the stats file here. Multiple instances of the program can use the same file.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         "UserSettings/PA-Stats.txt",
         "UserSettings/PA-Stats.txt"
     )
@@ -146,7 +146,7 @@ GlobalSettings::GlobalSettings()
     , SAVE_DEBUG_IMAGES(
         "<b>Save Debug Images:</b><br>"
         "If the program fails to read something when it should succeed, save the image for debugging purposes.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         true
     )
 //    , NAUGHTY_MODE_OPTION("<b>Naughty Mode:</b>", false)
@@ -219,7 +219,7 @@ GlobalSettings::GlobalSettings()
     , DEVELOPER_TOKEN(
         true,
         "<b>Developer Token:</b><br>Restart application to take full effect after changing this.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         "", ""
     )
 {

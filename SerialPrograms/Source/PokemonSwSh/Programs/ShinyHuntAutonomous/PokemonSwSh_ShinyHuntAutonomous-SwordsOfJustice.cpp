@@ -50,7 +50,7 @@ ShinyHuntAutonomousSwordsOfJustice::ShinyHuntAutonomousSwordsOfJustice()
     : GO_HOME_WHEN_DONE(false)
     , AIRPLANE_MODE(
         "<b>Airplane Mode:</b><br>Enable if airplane mode is on.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         false
     )
     , ENCOUNTER_BOT_OPTIONS(true, false)
@@ -65,19 +65,19 @@ ShinyHuntAutonomousSwordsOfJustice::ShinyHuntAutonomousSwordsOfJustice()
     )
     , EXIT_BATTLE_TIMEOUT(
         "<b>Exit Battle Timeout:</b><br>After running, wait this long to return to overworld.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "10 * TICKS_PER_SECOND"
     )
     , POST_BATTLE_MASH_TIME(
         "<b>Post-Battle Mash:</b><br>After each battle, mash B for this long before entering the camp.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "1 * TICKS_PER_SECOND"
     )
     , ENTER_CAMP_DELAY(
         "<b>Enter Camp Delay:</b>",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "8 * TICKS_PER_SECOND"
     )

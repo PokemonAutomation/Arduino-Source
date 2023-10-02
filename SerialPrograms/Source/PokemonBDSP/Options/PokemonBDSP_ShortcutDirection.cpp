@@ -39,7 +39,7 @@ ShortcutDirectionOption::ShortcutDirectionOption(std::string label)
     : EnumDropdownOption<ShortcutDirection>(
         std::move(label),
         ShortcutDirection_Nullable(),
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         ShortcutDirection::NONE
     )
 {}

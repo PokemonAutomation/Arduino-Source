@@ -35,13 +35,13 @@ TrainPokemonOCR::TrainPokemonOCR()
     : DIRECTORY(
         false,
         "<b>Training Data Directory:</b> (Relative to \"TrainingData/\")",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         "PokemonNameOCR/",
         "PokemonNameOCR/"
     )
     , THREADS(
         "<b>Worker Threads:</b>",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         std::thread::hardware_concurrency()
     )
 {

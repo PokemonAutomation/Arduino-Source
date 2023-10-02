@@ -50,12 +50,12 @@ SoundListener::SoundListener()
         {
             {SoundType::SHINY, "shiny", "Shiny Sound"},
         },
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         SoundType::SHINY
     )
     , STOP_ON_DETECTED_SOUND(
         "<b>Stop on the detected sound</b><br>Stop program when the sound is detected.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         false
     )
 {

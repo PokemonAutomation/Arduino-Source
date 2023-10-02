@@ -88,7 +88,7 @@ BurmyFinder::BurmyFinder()
     : LANGUAGE(
         "<b>Game Language</b>",
         Pokemon::PokemonNameReader::instance().languages(),
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         true
     )
     , SHINY_DETECTED_ENROUTE(
@@ -111,7 +111,7 @@ BurmyFinder::BurmyFinder()
     })
     , SAVE_DEBUG_VIDEO(
         "<b>Save debug videos to Switch:</b>",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         false
     )
 {

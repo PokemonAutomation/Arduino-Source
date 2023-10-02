@@ -45,17 +45,17 @@ std::unique_ptr<StatsTracker> AutoHostMultiGame_Descriptor::make_stats() const{
 AutoHostMultiGame::AutoHostMultiGame()
     : SingleSwitchProgramInstance({"Notifs", "LiveHost"})
     , RAID_CODE(8)
-    , HOST_ONLINE("<b>Host Online:</b>", LockWhileRunning::LOCKED, true)
+    , HOST_ONLINE("<b>Host Online:</b>", LockWhileRunning::LOCK_WHILE_RUNNING, true)
     , LOBBY_WAIT_DELAY(
         "<b>Lobby Wait Delay:</b><br>Wait this long before starting raid. Start time is 3 minutes minus this number.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "60 * TICKS_PER_SECOND"
     )
     , GAME_LIST(true)
     , FR_FORWARD_ACCEPT(
         "<b>Forward Friend Accept:</b><br>Accept FRs this many raids in the future.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         1
     )
     , HOSTING_NOTIFICATIONS("Live-Hosting Announcements", false)
@@ -68,31 +68,31 @@ AutoHostMultiGame::AutoHostMultiGame()
     )
     , CONNECT_TO_INTERNET_DELAY(
         "<b>Connect to Internet Delay:</b><br>Time from \"Connect to Internet\" to when you're ready to enter den.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "20 * TICKS_PER_SECOND"
     )
     , ENTER_ONLINE_DEN_DELAY(
         "<b>Enter Online Den Delay:</b><br>\"Communicating\" when entering den while online.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "8 * TICKS_PER_SECOND"
     )
     , OPEN_ONLINE_DEN_LOBBY_DELAY(
         "<b>Open Online Den Delay:</b><br>Delay from \"Invite Others\" to when the clock starts ticking.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "8 * TICKS_PER_SECOND"
     )
     , RAID_START_TO_EXIT_DELAY(
         "<b>Raid Start to Exit Delay:</b><br>Time from start raid to reset. (when not selecting move)",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "15 * TICKS_PER_SECOND"
     )
     , DELAY_TO_SELECT_MOVE(
         "<b>Delay to Select Move:</b><br>This + above = time from start raid to select move.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "32 * TICKS_PER_SECOND"
     )

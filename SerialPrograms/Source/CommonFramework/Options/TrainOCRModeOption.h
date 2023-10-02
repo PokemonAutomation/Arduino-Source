@@ -27,7 +27,7 @@ public:
                 {TrainOCRMode::START_FRESH,         "start-fresh",  "Start Fresh: Use only baseline strings. (1st candidate of each entry in above path)"},
                 {TrainOCRMode::INCREMENTAL,         "incremental",  "Incremental: Build off of the existing training data in the above path."},
             },
-            LockWhileRunning::LOCKED,
+            LockWhileRunning::LOCK_WHILE_RUNNING,
             TrainOCRMode::GENERATE_BASELINE
         )
     {}

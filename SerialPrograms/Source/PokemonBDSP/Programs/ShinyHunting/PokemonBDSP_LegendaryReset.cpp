@@ -43,7 +43,7 @@ LegendaryReset::LegendaryReset()
     : GO_HOME_WHEN_DONE(false)
     , WALK_UP(
         "<b>Walk Up:</b><br>Walk up while mashing A to trigger encounter.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         false
     )
     , ENCOUNTER_BOT_OPTIONS(false)

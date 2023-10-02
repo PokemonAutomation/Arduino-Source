@@ -28,7 +28,7 @@ public:
                 {OnLearnMove::DONT_LEARN, "skip", "Don't learn moves."},
                 {OnLearnMove::STOP_PROGRAM, "stop-program", "Stop Program"},
             },
-            LockWhileRunning::LOCKED,
+            LockWhileRunning::LOCK_WHILE_RUNNING,
             OnLearnMove::DONT_LEARN
         )
     {}

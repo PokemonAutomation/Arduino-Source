@@ -88,7 +88,7 @@ VideoBackendOption::VideoBackendOption()
     : IntegerEnumDropdownOption(
         "<b>Video Pipeline Backend:</b>",
         CameraBackends::instance().m_database,
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
 #if QT_VERSION_MAJOR == 5
         0
 #elif QT_VERSION_MAJOR == 6

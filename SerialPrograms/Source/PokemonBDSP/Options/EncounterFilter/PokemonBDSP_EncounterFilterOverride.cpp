@@ -56,7 +56,7 @@ EncounterFilterOverride::~EncounterFilterOverride(){
     action.remove_listener(*this);
 }
 EncounterFilterOverride::EncounterFilterOverride()
-    : pokemon(ALL_POKEMON_NAMES(), LockWhileRunning::LOCKED, "starly")
+    : pokemon(ALL_POKEMON_NAMES(), LockWhileRunning::LOCK_WHILE_RUNNING, "starly")
 {
     PA_ADD_OPTION(action);
     PA_ADD_OPTION(pokeball);
@@ -122,7 +122,7 @@ EncounterFilterTable::EncounterFilterTable()
         "The game language must be properly set to read " + STRING_POKEMON + " names. "
         "If multiple overrides apply and are conflicting, the program will stop." +
         "<br>Auto-catching only applies in single battles. The program will stop if asked to auto-catch in a double-battle.",
-        LockWhileRunning::LOCKED
+        LockWhileRunning::LOCK_WHILE_RUNNING
     )
 {}
 std::vector<std::string> EncounterFilterTable::make_header() const{

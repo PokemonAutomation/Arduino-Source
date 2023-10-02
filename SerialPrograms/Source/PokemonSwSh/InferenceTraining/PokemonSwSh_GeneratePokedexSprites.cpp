@@ -41,16 +41,16 @@ GeneratePokedexSprites::GeneratePokedexSprites()
     : LANGUAGE(
         "<b>Game Language:</b>",
         PokemonNameReader::instance().languages(),
-        LockWhileRunning::LOCKED
+        LockWhileRunning::LOCK_WHILE_RUNNING
     )
     , HORIZONTAL_FRAMES(
         "<b>Frames per 360 Degree Horizontal Rotation:</b>",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         10
     )
     , ANIMATION_FRAMES(
         "<b>Animation Frames per Camera Angle:</b>",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         2
     )
 {

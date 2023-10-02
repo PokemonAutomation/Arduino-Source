@@ -46,7 +46,7 @@ SelfTouchTrade::SelfTouchTrade()
     : LANGUAGE(
         "<b>Game Language of the Hosting Switch:</b>",
         Pokemon::PokemonNameReader::instance().languages(),
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         true
     )
     , HOSTING_SWITCH(
@@ -55,12 +55,12 @@ SelfTouchTrade::SelfTouchTrade()
             {HostingSwitch::Switch0, "switch0", "Switch 0 (Left)"},
             {HostingSwitch::Switch1, "switch1", "Switch 1 (Right)"},
         },
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         HostingSwitch::Switch0
     )
     , BOXES_TO_TRADE(
         "<b>Number of Boxes to Touch-Trade:</b>",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         2, 0, 32
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))

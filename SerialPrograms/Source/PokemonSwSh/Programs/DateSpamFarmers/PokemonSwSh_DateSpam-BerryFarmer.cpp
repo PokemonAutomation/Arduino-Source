@@ -35,12 +35,12 @@ BerryFarmer_Descriptor::BerryFarmer_Descriptor()
 BerryFarmer::BerryFarmer()
     : SKIPS(
         "<b>Number of Fetch Attempts:</b>",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         100000
     )
     , SAVE_ITERATIONS(
         "<b>Save Every this Many Fetches:</b><br>(zero disables saving): ",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         0
     )
 {

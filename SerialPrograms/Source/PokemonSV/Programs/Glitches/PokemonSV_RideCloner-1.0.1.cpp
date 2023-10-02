@@ -102,7 +102,7 @@ RideCloner101::RideCloner101()
             {Mode::CLONE_ONLY,  "clone-only",   "Clone only. Don't stop on a shiny raid."},
             {Mode::SHINY_HUNT,  "shiny-hunt",   "Shiny Hunt: Save before each raid and catch. Stop if shiny."},
         },
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         Mode::SHINY_HUNT
     )
     , RIDES_TO_CLONE(

@@ -60,17 +60,17 @@ std::unique_ptr<StatsTracker> DexRecFinder_Descriptor::make_stats() const{
 
 
 DexRecFilters::DexRecFilters()
-    : GroupOption("Stop Automatically (requires video feedback)", LockWhileRunning::LOCKED, true, true)
+    : GroupOption("Stop Automatically (requires video feedback)", LockWhileRunning::LOCK_WHILE_RUNNING, true, true)
     , LANGUAGE(
         "<b>Game Language:</b><br>This needs to be set correctly for stop filters to work correctly.",
         PokemonNameReader::instance().languages(),
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         true
     )
     , DESIRED(
         "<b>Desired " + STRING_POKEMON + ":</b><br>Stop when it finds this " + STRING_POKEMON + ". Requires the language be set.",
         COMBINED_DEX_NAMES(),
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         "ralts"
     )
     , EXCLUSIONS(
@@ -90,7 +90,7 @@ DexRecFinder::DexRecFinder()
     : GO_HOME_WHEN_DONE(false)
     , VIEW_TIME(
         "<b>View Time:</b><br>View the " + STRING_POKEDEX + " for this long before continuing.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "2 * TICKS_PER_SECOND"
     )
@@ -104,13 +104,13 @@ DexRecFinder::DexRecFinder()
     )
     , ENTER_POKEDEX_TIME(
         "<b>Enter " + STRING_POKEDEX + " Time:</b><br>Wait this long for the " + STRING_POKEDEX + " to open.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "3 * TICKS_PER_SECOND"
     )
     , BACK_OUT_TIME(
         "<b>Back Out Time:</b><br>Mash B for this long to return to the overworld.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "3 * TICKS_PER_SECOND"
     )

@@ -66,7 +66,7 @@ AutonomousBallThrower::AutonomousBallThrower()
     : GO_HOME_WHEN_DONE(false)
     , BALL_SELECT(
         "<b>Ball Select:</b>",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         "master-ball"
     )
     , LANGUAGE(
@@ -82,7 +82,7 @@ AutonomousBallThrower::AutonomousBallThrower()
             Language::ChineseSimplified,
             Language::ChineseTraditional,
         },
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         true
     )
     , NOTIFICATION_CATCH_SUCCESS("Catch Success", true, false, std::chrono::seconds(3600))

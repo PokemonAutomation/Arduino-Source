@@ -94,17 +94,17 @@ std::unique_ptr<StatsTracker> BoxSorting_Descriptor::make_stats() const{
 BoxSorting::BoxSorting()
     : BOX_NUMBER(
         "<b>Number of boxes to order:</b>",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         1, 1, MAX_BOXES
     )
     , VIDEO_DELAY(
         "<b>Delay of your capture card (you probably have to increase this):</b>",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         20
     )
     , GAME_DELAY(
         "<b>Delay of your Pokemon Home app (default value should be fine):</b>",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         10
     )
     , SORT_TABLE(
@@ -113,13 +113,13 @@ BoxSorting::BoxSorting()
     , OUTPUT_FILE(
           false,
           "<b>Output File:</b><br>JSON file for output of storage boxes.",
-          LockWhileRunning::LOCKED,
+          LockWhileRunning::LOCK_WHILE_RUNNING,
           "box_order",
           "box_order"
       )
     , DRY_RUN(
           "<b>Dry Run:</b><br>Catalogue and make sort plan without executing. (Will output to OUTPUT_FILE and OUTPUT_FILE.sortplan)",
-          LockWhileRunning::LOCKED,
+          LockWhileRunning::LOCK_WHILE_RUNNING,
           false
       )
     , NOTIFICATIONS({

@@ -34,7 +34,7 @@ ShinyEncounterTester::ShinyEncounterTester()
             {EncounterType::Wild, "wild", "Wild Encounter"},
             {EncounterType::Raid, "raid", "Raid Den"},
         },
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         EncounterType::Wild
     )
 {

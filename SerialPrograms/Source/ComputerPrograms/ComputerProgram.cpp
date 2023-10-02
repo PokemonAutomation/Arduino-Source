@@ -34,7 +34,7 @@ std::unique_ptr<PanelInstance> ComputerProgramDescriptor::make_panel() const{
 
 
 ComputerProgramInstance::ComputerProgramInstance()
-    : m_options(LockWhileRunning::LOCKED)
+    : m_options(LockWhileRunning::LOCK_WHILE_RUNNING)
     , NOTIFICATION_PROGRAM_FINISH(
         "Program Finished",
         true, true,

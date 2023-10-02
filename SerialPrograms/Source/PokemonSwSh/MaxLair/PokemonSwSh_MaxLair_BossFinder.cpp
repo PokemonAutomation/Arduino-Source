@@ -46,7 +46,7 @@ public:
         : ConsoleSpecificOptions(std::move(label), languages, host)
         , normal_ball(
             "<b>Normal Ball:</b> Ball for catching non-boss " + STRING_POKEMON + ".",
-            LockWhileRunning::LOCKED,
+            LockWhileRunning::LOCK_WHILE_RUNNING,
             "poke-ball"
         )
     {

@@ -140,16 +140,16 @@ VideoFastCodeEntry::VideoFastCodeEntry()
             {Mode::MANUAL,      "manual",   "Manual - Enter code when you start the program."},
             {Mode::AUTOMATIC,   "auto",     "Automatic - Monitor the region. Automatically enter code when it appears."},
         },
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         Mode::MANUAL
     )
     , SKIP_CONNECT_TO_CONTROLLER(
         "<b>Skip Connect to Controller:</b><br>"
         "If you know your controllers are already connected, you can skip this to save 64 milliseconds. (only applies to manual mode)",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         false
     )
-    , FCE_SETTINGS(LockWhileRunning::LOCKED)
+    , FCE_SETTINGS(LockWhileRunning::LOCK_WHILE_RUNNING)
     , NOTIFICATIONS({
         &NOTIFICATION_PROGRAM_FINISH,
     })

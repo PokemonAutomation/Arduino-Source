@@ -79,7 +79,7 @@ MassAttachItems::MassAttachItems()
             {ItemCategory::TMs,         "tms",          "TMs"},
             {ItemCategory::Treasures,   "treasures",    "Treasures"},
         },
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         ItemCategory::PokeBalls
     )
     , BOXES(

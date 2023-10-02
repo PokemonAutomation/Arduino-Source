@@ -37,7 +37,7 @@ ShinyHuntUnattendedIoATrade_Descriptor::ShinyHuntUnattendedIoATrade_Descriptor()
 ShinyHuntUnattendedIoATrade::ShinyHuntUnattendedIoATrade()
     : START_TO_RUN_DELAY(
         "<b>Start to Run Delay:</b><br>This needs to be carefully calibrated.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "1260"
     )
@@ -46,19 +46,19 @@ ShinyHuntUnattendedIoATrade::ShinyHuntUnattendedIoATrade()
     )
     , FLY_DURATION(
         "<b>Fly Duration:</b>",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "800"
     )
     , MOVE_DURATION(
         "<b>Move to Beartic Duration:</b>",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "300"
     )
     , MASH_TO_TRADE_DELAY(
         "<b>Mash to Trade Delay:</b><br>Time to perform the trade.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "30 * TICKS_PER_SECOND"
     )

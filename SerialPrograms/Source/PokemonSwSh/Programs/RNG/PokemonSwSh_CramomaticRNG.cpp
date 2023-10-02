@@ -89,22 +89,22 @@ CramomaticRNG::CramomaticRNG()
     : LANGUAGE(
         "<b>Game Language:</b><br>Required to read the ball received.",
         PokemonNameReader::instance().languages(),
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         true
     )
     , NUM_APRICORN_ONE(
         "<b>Primary Apricorns:</b><br>Number of Apricorns in the selected slot.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         0
     )
     , NUM_APRICORN_TWO(
         "<b>Secondary Apricorns:</b><br>Number of Apricorns in the slot below the selected one.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         0
     )
     , NUM_NPCS(
         "<b>NPCs:</b><br>Number of NPCs in the dojo, including " + STRING_POKEMON + ".",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         21
     )
     , BALL_TABLE(
@@ -122,32 +122,32 @@ CramomaticRNG::CramomaticRNG()
     )
     , MAX_PRIORITY_ADVANCES(
         "<b>Priority Advances:</b><br>How many advances to check when checking for higher priority selections.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         300
     )
     , MAX_UNKNOWN_ADVANCES(
         "<b>Max Unknown advances:</b><br>How many advances to check when updating the rng state.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         300
     )
     , ADVANCE_PRESS_DURATION(
         "<b>Advance Press Duration:</b><br>Hold the button down for this long to advance once.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         10
     )
     , ADVANCE_RELEASE_DURATION(
         "<b>Advance Release Duration:</b><br>After releasing the button, wait this long before pressing it again.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         10
     )
     , SAVE_SCREENSHOTS(
         "<b>Save Debug Screenshots:</b>",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         false
     )
     , LOG_VALUES(
         "<b>Log Animation Values:</br>",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         false
     )
 {

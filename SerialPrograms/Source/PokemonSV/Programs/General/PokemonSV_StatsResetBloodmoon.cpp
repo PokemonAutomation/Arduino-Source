@@ -67,7 +67,7 @@ StatsResetBloodmoon::StatsResetBloodmoon()
     : LANGUAGE(
         "<b>Game Language:</b><br>This field is required so we can read IVs.",
         IV_READER().languages(),
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         true
     )
     , BALL_SELECT(
@@ -138,7 +138,7 @@ StatsResetBloodmoon::StatsResetBloodmoon()
     PA_ADD_OPTION(BALL_SELECT);
     PA_ADD_OPTION(TRY_TO_TERASTILLIZE);
     PA_ADD_OPTION(FILTERS);
-//    PA_ADD_OPTION(FILTERS0);
+    PA_ADD_OPTION(FILTERS0);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
 }

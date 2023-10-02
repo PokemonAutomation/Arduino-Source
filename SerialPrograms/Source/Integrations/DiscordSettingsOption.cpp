@@ -20,25 +20,25 @@ namespace Integration{
 
 
 DiscordMessageSettingsOption::DiscordMessageSettingsOption()
-    : BatchOption(LockWhileRunning::LOCKED)
+    : BatchOption(LockWhileRunning::LOCK_WHILE_RUNNING)
     , instance_name(
         false,
         "<b>Instance Name:</b><br>If you are running multiple instances of this program, give it a name to distinguish them in notifications.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         "",
         "(e.g. Living Room Switch)"
     )
     , user_id(
         false,
         "<b>Discord User ID:</b><br>Set this to your discord user ID to receive pings. Your ID is a number.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         "",
         "123456789012345678"
     )
     , message(
         false,
         "<b>Discord Message:</b><br>Message to put on every discord notification.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         "",
         "(e.g. Kim's Shiny Hunt)"
     )
@@ -66,7 +66,7 @@ ConfigWidget* DiscordMessageSettingsOption::make_QtWidget(QWidget& parent){
 
 
 DiscordSettingsOption::DiscordSettingsOption()
-    : BatchOption(LockWhileRunning::LOCKED)
+    : BatchOption(LockWhileRunning::LOCK_WHILE_RUNNING)
 {
     PA_ADD_OPTION(message);
     PA_ADD_OPTION(webhooks);

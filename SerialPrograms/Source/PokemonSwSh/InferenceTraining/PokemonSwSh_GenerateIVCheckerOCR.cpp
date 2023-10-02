@@ -45,7 +45,7 @@ GenerateIVCheckerOCR::GenerateIVCheckerOCR()
     : LANGUAGE(
         "<b>Game Language:</b>",
         IV_READER().languages(),
-        LockWhileRunning::LOCKED
+        LockWhileRunning::LOCK_WHILE_RUNNING
     )
     , HP("<b>HP:</b>", IvJudgeValue::Best)
     , ATTACK("<b>Attack:</b>", IvJudgeValue::Best)

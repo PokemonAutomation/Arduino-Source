@@ -40,12 +40,12 @@ std::unique_ptr<StatsTracker> DaySkipperUS_Descriptor::make_stats() const{
 DaySkipperUS::DaySkipperUS()
     : SKIPS(
         "<b>Number of Frame Skips:</b>",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         10
     )
     , REAL_LIFE_YEAR(
         "<b>Real Life Year:</b>",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         2023, 2000, 2060
     )
     , NOTIFICATION_PROGRESS_UPDATE("Progress Update", true, false, std::chrono::seconds(3600))
@@ -59,7 +59,7 @@ DaySkipperUS::DaySkipperUS()
     )
     , CORRECTION_SKIPS(
         "<b>Auto-Correct Interval:</b><br>Run auto-recovery every this # of skips. Zero disables the auto-corrections.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         1000
     )
 {

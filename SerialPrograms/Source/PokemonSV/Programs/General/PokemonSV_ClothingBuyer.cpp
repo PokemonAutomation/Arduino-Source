@@ -46,7 +46,7 @@ ClothingBuyer::ClothingBuyer()
     )
     , NUM_CATEGORY(
         "<b>Number of Categories:</b><br>The number of categories of clothing the shop has.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         1, 1, 5
     )
     , GO_HOME_WHEN_DONE(false)

@@ -27,7 +27,7 @@ EggStepCountOption::EggStepCountOption()
     : StringSelectOption(
         "<b>Step Count:</b>",
         EGGSTEP_DATABASE().database(),
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         "turtwig"
     )
 {}

@@ -120,14 +120,14 @@ TournamentFarmer::TournamentFarmer()
     )
     , HHH_ZOROARK(
         "<b>Happy Hour H-Zoroark:</b><br>Check this if you have an event Hisuian Zoroark with Happy Hour and Memento as your lead.<br>Happy Hour must be in its first move slot and Memento must be in its second.<br>",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         false
     )
     , GO_HOME_WHEN_DONE(false)
     , LANGUAGE(
           "<b>Game Language:</b><br>The language is needed to read the prizes.",
           TournamentPrizeNameReader::instance().languages(),
-          LockWhileRunning::LOCKED,
+          LockWhileRunning::LOCK_WHILE_RUNNING,
           true
     )
     , TARGET_ITEMS("<b>Items:</b>")

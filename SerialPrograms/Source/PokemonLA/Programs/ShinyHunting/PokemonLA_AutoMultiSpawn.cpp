@@ -211,7 +211,7 @@ AutoMultiSpawn::AutoMultiSpawn()
     : LANGUAGE(
         "<b>Game Language</b>",
         Pokemon::PokemonNameReader::instance().languages(),
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         true
     )
     , SPAWN(
@@ -219,13 +219,13 @@ AutoMultiSpawn::AutoMultiSpawn()
         {
             {MultiSpawn::MirelandsHippopotas, "mirelands-hippopotas", "Mirelands - Hippopotas"},
         },
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         MultiSpawn::MirelandsHippopotas
     )
     , PATH(
         false,
         "<b>Multi-Spawn Path<b>:<br>e.g. \"A1|A1|A2|A2|A1|A1|A1|A2\".",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         "", ""
     )
     , NOTIFICATIONS({

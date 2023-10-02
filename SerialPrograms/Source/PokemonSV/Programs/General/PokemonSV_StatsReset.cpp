@@ -77,13 +77,13 @@ StatsReset::StatsReset()
             {Target::LoyalThree, "loyal-three", "Loyal Three"},
             {Target::Generic, "generic", "Gimmighoul"},
         },
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         Target::TreasuresOfRuin
     )
     , LANGUAGE(
         "<b>Game Language:</b><br>This field is required so we can read IVs.",
         IV_READER().languages(),
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         true
     )
     , BALL_SELECT(
@@ -93,7 +93,7 @@ StatsReset::StatsReset()
     )
     , QUICKBALL(
         "<b>Throw Quick Ball:</b><br>Use a Quick Ball on the first turn. If there are moves in the Move Table, they will run <i>after</i> the Quick Ball is thrown.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         false
     )
     , FILTERS(

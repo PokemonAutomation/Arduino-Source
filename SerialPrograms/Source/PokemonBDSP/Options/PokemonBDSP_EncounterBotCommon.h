@@ -22,17 +22,17 @@ namespace PokemonBDSP{
 class EncounterBotCommonOptions : public BatchOption{
 public:
     EncounterBotCommonOptions(bool enable_overrides)
-        : BatchOption(LockWhileRunning::LOCKED)
+        : BatchOption(LockWhileRunning::LOCK_WHILE_RUNNING)
         , USE_SOUND_DETECTION(
             "<b>Use Sound Detection:</b><br>Use sound to improve shiny detection.<br>"
             "<b>Make sure you have correct audio input set.</b>",
-            LockWhileRunning::LOCKED,
+            LockWhileRunning::LOCK_WHILE_RUNNING,
             true
         )
         , FILTER(enable_overrides)
         , VIDEO_ON_SHINY(
             "<b>Video Capture:</b><br>Take a video of the encounter if it is shiny.",
-            LockWhileRunning::LOCKED,
+            LockWhileRunning::LOCK_WHILE_RUNNING,
             true
         )
         , NOTIFICATION_NONSHINY(

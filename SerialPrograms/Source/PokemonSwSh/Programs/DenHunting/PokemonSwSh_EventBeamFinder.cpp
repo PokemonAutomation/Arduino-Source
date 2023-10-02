@@ -34,7 +34,7 @@ EventBeamFinder_Descriptor::EventBeamFinder_Descriptor()
 EventBeamFinder::EventBeamFinder()
     : WAIT_TIME_IN_DEN(
         "<b>Wait time in Den:</b>",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "5 * TICKS_PER_SECOND"
     )

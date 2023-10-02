@@ -12,10 +12,10 @@ namespace PokemonSwSh{
 
 
 AutoHostNotificationOption::AutoHostNotificationOption(std::string label, bool max_lair)
-    : GroupOption(std::move(label), LockWhileRunning::LOCKED, true, false)
+    : GroupOption(std::move(label), LockWhileRunning::LOCK_WHILE_RUNNING, true, false)
     , DESCRIPTION(
         "<b>Description:</b>",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         "",
         max_lair
             ? "Auto-Hosting Lugia\nCode: Random"
@@ -23,7 +23,7 @@ AutoHostNotificationOption::AutoHostNotificationOption(std::string label, bool m
     )
     , SHOW_STATS(
         "<b>Show Stats:</b> Show program stats for this session.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         true
     )
 //    , SCREENSHOT("<b>Notification Screenshot:</b><br>Attach screenshot of the den to notifications.")

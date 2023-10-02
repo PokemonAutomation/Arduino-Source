@@ -40,11 +40,11 @@ GenerateNameOCRData::GenerateNameOCRData()
     : LANGUAGE(
         "<b>Game Language:</b>",
         PokemonNameReader::instance().languages(),
-        LockWhileRunning::LOCKED
+        LockWhileRunning::LOCK_WHILE_RUNNING
     )
     , DELAY(
         "<b>Delay Between Each Iteration:</b>",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "30"
     )

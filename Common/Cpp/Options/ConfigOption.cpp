@@ -53,13 +53,13 @@ ConfigOption::ConfigOption(const ConfigOption& x)
 {}
 
 ConfigOption::ConfigOption()
-    : m_data(CONSTRUCT_TOKEN, LockWhileRunning::LOCKED, ConfigOptionState::ENABLED)
+    : m_data(CONSTRUCT_TOKEN, LockWhileRunning::LOCK_WHILE_RUNNING, ConfigOptionState::ENABLED)
 {}
 ConfigOption::ConfigOption(LockWhileRunning lock_mode)
     : m_data(CONSTRUCT_TOKEN, lock_mode, ConfigOptionState::ENABLED)
 {}
 ConfigOption::ConfigOption(ConfigOptionState visibility)
-    : m_data(CONSTRUCT_TOKEN, LockWhileRunning::LOCKED, visibility)
+    : m_data(CONSTRUCT_TOKEN, LockWhileRunning::LOCK_WHILE_RUNNING, visibility)
 {}
 
 void ConfigOption::add_listener(Listener& listener){

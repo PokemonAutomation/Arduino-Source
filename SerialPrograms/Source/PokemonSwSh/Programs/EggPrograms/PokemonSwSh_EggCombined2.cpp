@@ -32,12 +32,12 @@ EggCombined2_Descriptor::EggCombined2_Descriptor()
 EggCombined2::EggCombined2()
     : BOXES_TO_HATCH(
         "<b>Boxes to Hatch:</b>",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         32, 0, 32
     )
     , FETCHES_PER_BATCH(
         "<b>Fetches per Batch:</b><br>For each batch of eggs, attempt this many egg fetches.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         6.0, 0, 7
     )
     , m_advanced_options(
@@ -45,19 +45,19 @@ EggCombined2::EggCombined2()
     )
     , SAFETY_TIME(
         "<b>Safety Time:</b><br>Additional time added to the spinning.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "12 * TICKS_PER_SECOND"
     )
     , EARLY_HATCH_SAFETY(
         "<b>Early Hatch Safety:</b><br>Eggs will not hatch early by more than this period.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "5 * TICKS_PER_SECOND"
     )
     , HATCH_DELAY(
         "<b>Hatch Delay:</b><br>Total animation time for hatching 5 eggs when there are no shinies.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "88 * TICKS_PER_SECOND"
     )

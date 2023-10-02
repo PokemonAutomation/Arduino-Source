@@ -89,7 +89,7 @@ ShinyHuntAreaZeroPlatform::ShinyHuntAreaZeroPlatform()
     : LANGUAGE(
         "<b>Game Language:</b><br>Required to read " + STRING_POKEMON + " names.",
         IV_READER().languages(),
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         false
     )
     , MODE(
@@ -102,7 +102,7 @@ ShinyHuntAreaZeroPlatform::ShinyHuntAreaZeroPlatform()
             {Mode::START_IN_ZERO_GATE,  "zerogate", "Start inside Zero Gate."},
             {Mode::MAKE_SANDWICH,       "sandwich", "Make a sandwich."},
         },
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         Mode::START_ON_PLATFORM
     )
     , PATH0(

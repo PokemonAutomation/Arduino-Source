@@ -51,7 +51,7 @@ ThemeSelectorOption::ThemeSelectorOption()
             {0, "default", "Default"},
             {1, "dark", "Dark Mode"},
         },
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         0
     )
 {}

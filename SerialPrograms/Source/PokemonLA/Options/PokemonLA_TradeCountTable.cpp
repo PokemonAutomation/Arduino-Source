@@ -48,9 +48,9 @@ uint8_t research_catch_count(const std::string& slug){
 TradeCountTableRow::TradeCountTableRow(const std::string& slug, const ImageViewRGB32& icon)
     : StaticTableRow(slug)
     , default_value(research_catch_count(slug))
-    , pokemon(LockWhileRunning::LOCKED, Pokemon::get_pokemon_name(slug).display_name(), icon, 40)
-    , count(LockWhileRunning::LOCKED, default_value, 0, default_value)
-    , default_label(LockWhileRunning::LOCKED, std::to_string(default_value), ImageViewRGB32())
+    , pokemon(LockWhileRunning::LOCK_WHILE_RUNNING, Pokemon::get_pokemon_name(slug).display_name(), icon, 40)
+    , count(LockWhileRunning::LOCK_WHILE_RUNNING, default_value, 0, default_value)
+    , default_label(LockWhileRunning::LOCK_WHILE_RUNNING, std::to_string(default_value), ImageViewRGB32())
 {
     PA_ADD_STATIC(pokemon);
     add_option(count, "Count");
@@ -64,7 +64,7 @@ TradeCountTable::TradeCountTable()
         "The defaults here are the # of catches needed to max out research. "
         "Maxing out catches is sufficient to reach level 10 for everything except Unown, Spritomb, and legendaries. "
         "Note that gen1 trade evolutions cannot be touch traded. The program will skip them. This applies to Kadabra, Haunter, Graveler, and Machoke.",
-        LockWhileRunning::LOCKED
+        LockWhileRunning::LOCK_WHILE_RUNNING
     )
 {
     for (const std::string& slug : HISUI_DEX_SLUGS()){

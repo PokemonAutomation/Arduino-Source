@@ -46,7 +46,7 @@ EggAutonomous::EggAutonomous()
     , LANGUAGE(
         "<b>Game Language:</b><br>Required to read IVs.",
         PokemonSwSh::IV_READER().languages(),
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         false
     )
     , SHORTCUT("<b>Bike Shortcut:</b>")
@@ -54,12 +54,12 @@ EggAutonomous::EggAutonomous()
         "<b>Max Keepers:</b><br>Stop the program after keeping this many " + STRING_POKEMON + ". "
         "This number plus the number of " + STRING_POKEMON + " in your last box must not exceed 30. "
         "Otherwise, the program will break when that box is full.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         10, 1, 30
     )
     , TRAVEL_TIME_PER_FETCH(
         "<b>Travel Time per Fetch:</b><br>Fetch an egg after traveling for this long.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "20 * TICKS_PER_SECOND"
     )
@@ -73,7 +73,7 @@ EggAutonomous::EggAutonomous()
             {4, "4", "4"},
             {5, "5", "5"},
         },
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         0
     )
     , AUTO_SAVING(
@@ -87,7 +87,7 @@ EggAutonomous::EggAutonomous()
             {AutoSave::AfterStartAndKeep, "start-and-keep", "Save at beginning and after obtaining each baby that is kept. (Allows for error/crash recovery.)"},
             {AutoSave::EveryBatch, "every-batch", "Save before every batch. (Allows you to unhatch eggs.)"},
         },
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         AutoSave::AfterStartAndKeep
     )
     , FILTERS(
@@ -124,7 +124,7 @@ EggAutonomous::EggAutonomous()
     , SCROLL_TO_READ_DELAY(
         "<b>Scroll to Read Delay:</b><br>Wait this long after scrolling in the box to read the " + STRING_POKEMON + "'s stats. "
         "Increase this if your video has high latency.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "125"
     )

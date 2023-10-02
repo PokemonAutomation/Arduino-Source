@@ -24,16 +24,16 @@ class MultiHostSlot : public EditableTableRow{
 public:
     MultiHostSlot(bool raid_code_option)
         : m_raid_code_option(raid_code_option)
-        , game_slot(GameSlot_Database(), LockWhileRunning::LOCKED, 1)
-        , user_slot(UserSlot_Database(), LockWhileRunning::LOCKED, 1)
-        , skips(LockWhileRunning::LOCKED, 3, 0, 7)
-        , backup_save(LockWhileRunning::LOCKED, false)
-        , always_catchable(LockWhileRunning::LOCKED, true)
-        , use_raid_code(LockWhileRunning::LOCKED, true)
-        , accept_FRs(LockWhileRunning::LOCKED, true)
-        , move_slot(LockWhileRunning::LOCKED, 0, 0, 4)
-        , dynamax(LockWhileRunning::LOCKED, true)
-        , post_raid_delay(LockWhileRunning::LOCKED, TICKS_PER_SECOND, "0 * TICKS_PER_SECOND")
+        , game_slot(GameSlot_Database(), LockWhileRunning::LOCK_WHILE_RUNNING, 1)
+        , user_slot(UserSlot_Database(), LockWhileRunning::LOCK_WHILE_RUNNING, 1)
+        , skips(LockWhileRunning::LOCK_WHILE_RUNNING, 3, 0, 7)
+        , backup_save(LockWhileRunning::LOCK_WHILE_RUNNING, false)
+        , always_catchable(LockWhileRunning::LOCK_WHILE_RUNNING, true)
+        , use_raid_code(LockWhileRunning::LOCK_WHILE_RUNNING, true)
+        , accept_FRs(LockWhileRunning::LOCK_WHILE_RUNNING, true)
+        , move_slot(LockWhileRunning::LOCK_WHILE_RUNNING, 0, 0, 4)
+        , dynamax(LockWhileRunning::LOCK_WHILE_RUNNING, true)
+        , post_raid_delay(LockWhileRunning::LOCK_WHILE_RUNNING, TICKS_PER_SECOND, "0 * TICKS_PER_SECOND")
     {
         PA_ADD_OPTION(game_slot);
         PA_ADD_OPTION(user_slot);
@@ -86,7 +86,7 @@ public:
 class MultiHostTable : public EditableTableOption{
 public:
     MultiHostTable(bool raid_code_option)
-        : EditableTableOption("<b>Game List:</b>", LockWhileRunning::LOCKED)
+        : EditableTableOption("<b>Game List:</b>", LockWhileRunning::LOCK_WHILE_RUNNING)
         , m_raid_code_option(raid_code_option)
     {}
     std::vector<std::unique_ptr<MultiHostSlot>> copy_snapshot() const{

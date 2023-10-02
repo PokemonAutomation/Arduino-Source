@@ -18,7 +18,7 @@ namespace PokemonAutomation{
 class StringSelectTableRow : public EditableTableRow{
 public:
     StringSelectTableRow(const StringSelectDatabase& database, const std::string& default_slug)
-        : cell(database, LockWhileRunning::LOCKED, default_slug)
+        : cell(database, LockWhileRunning::LOCK_WHILE_RUNNING, default_slug)
     {
         PA_ADD_OPTION(cell);
     }
@@ -39,7 +39,7 @@ public:
         std::string label,
         std::string header, const StringSelectDatabase& database, std::string default_slug
     )
-        : EditableTableOption(std::move(label), LockWhileRunning::LOCKED)
+        : EditableTableOption(std::move(label), LockWhileRunning::LOCK_WHILE_RUNNING)
         , m_header(std::move(header))
         , m_database(database)
         , m_default_slug(std::move(default_slug))

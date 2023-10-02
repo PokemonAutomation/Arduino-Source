@@ -35,22 +35,22 @@ PushJoySticks_Descriptor::PushJoySticks_Descriptor()
 PushJoySticks::PushJoySticks()
     : LEFT_X(
         "<b>Left Joy Stick X direction:</b><br>Range: 0-255. 0: left, 128: neutral, 255: right.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         128, 0, 255
     )
     , LEFT_Y(
         "<b>Left Joy Stick Y direction:</b><br>Range: 0-255. 0: up, 128: neutral, 255: down.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         128, 0, 255
     )
     , RIGHT_X(
         "<b>Right Joy Stick X direction:</b><br>Range: 0-255. 0: left, 128: neutral, 255: right.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         128, 0, 255
     )
     , RIGHT_Y(
         "<b>Right Joy Stick Y direction:</b><br>Range: 0-255. 0: up, 128: neutral, 255: down.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         128, 0, 255
     )
 {

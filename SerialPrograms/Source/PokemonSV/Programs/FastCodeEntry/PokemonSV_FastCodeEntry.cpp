@@ -46,7 +46,7 @@ FastCodeEntry::FastCodeEntry()
             {Mode::ENTER_ON_PASTE, "on-paste", "Start the program first. Code is entered when you paste into the code box."},
             {Mode::MYSTERY_GIFT, "mystery", "Enter Mystery Gift Code when clicking Start Program."},
         },
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         Mode::NORMAL
     )
     , CODE(
@@ -56,7 +56,7 @@ FastCodeEntry::FastCodeEntry()
         "0123", "0123",
         true
     )
-    , SETTINGS(LockWhileRunning::LOCKED)
+    , SETTINGS(LockWhileRunning::LOCK_WHILE_RUNNING)
 {
     PA_ADD_OPTION(MODE);
     PA_ADD_OPTION(CODE);

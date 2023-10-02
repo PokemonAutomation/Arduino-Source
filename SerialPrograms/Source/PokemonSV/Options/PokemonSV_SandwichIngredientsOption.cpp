@@ -48,7 +48,7 @@ SandwichIngredientsTableCell::SandwichIngredientsTableCell(
 )
     : StringSelectCell(
         SANDWICH_INGREDIENT_DATABASE(),
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         default_slug
     )
 {}

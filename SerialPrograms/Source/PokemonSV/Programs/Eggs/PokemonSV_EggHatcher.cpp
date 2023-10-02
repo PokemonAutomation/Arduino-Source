@@ -64,7 +64,7 @@ EggHatcher::EggHatcher()
             {StartLocation::AnywhereOnRide, "anywhere-on-ride", "Anywhere safe, on ride."},
             {StartLocation::AnywhereOffRide, "anywhere-off-ride", "Anywhere safe, on foot."},
         },
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         StartLocation::ZeroGateFlyingSpot
     )
     , BOXES(
@@ -77,7 +77,7 @@ EggHatcher::EggHatcher()
         "Ride legendary cannot be cloned after patch 1.0.1. To preserve the existing clone while hatching eggs, "
         "place it as second in party before starting the program.</b>"
         "The program will skip the first row of eggs in the box as a result.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         false)
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({

@@ -49,7 +49,7 @@ ApplyGrits::ApplyGrits()
             {5, "5", "5"},
             {6, "6", "6"},
         },
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         1
     )
     , NOTIFICATIONS({

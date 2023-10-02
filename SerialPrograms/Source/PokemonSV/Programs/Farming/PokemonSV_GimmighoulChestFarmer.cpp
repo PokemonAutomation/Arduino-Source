@@ -66,7 +66,7 @@ std::unique_ptr<StatsTracker> GimmighoulChestFarmer_Descriptor::make_stats() con
 GimmighoulChestFarmer::GimmighoulChestFarmer()
     : PP(
         "<b>First Attack PP:</b><br>The amount of PP remaining on your lead's first attack.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         15
     )
     , START_LOCATION(
@@ -75,7 +75,7 @@ GimmighoulChestFarmer::GimmighoulChestFarmer()
             {StartLocation::FlyPoint, "fly-point", "Fly Point - East Province (Area One) Watchtower"},
             {StartLocation::InFrontOfChest, "in-front-of-chest", "In front of chest"},
         },
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         StartLocation::FlyPoint
     )
     , GO_HOME_WHEN_DONE(false)

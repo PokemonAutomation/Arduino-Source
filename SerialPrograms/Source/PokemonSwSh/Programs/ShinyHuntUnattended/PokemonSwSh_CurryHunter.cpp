@@ -53,23 +53,23 @@ std::unique_ptr<StatsTracker> CurryHunter_Descriptor::make_stats() const{
 CurryHunter::CurryHunter()
     : WALK_UP_DELAY(
         "<b>Walk up Delay:</b><br>Wait this long for the " + STRING_POKEMON + " to walk up to you.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "2 * TICKS_PER_SECOND"
     )
     , SMALL_POKEMON(
         "<b>Small " + STRING_POKEMON + ":</b><br>If there are small " + STRING_POKEMON + ", increase this number by 30. You may have to adjust the number and check what works best for your area.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         0
     )
     , TAKE_VIDEO(
         "<b>Take Videos:</b><br>Take a video after each cooking iteration. This will spam your album with videos.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         false
     )
     , ITERATIONS(
         "<b>Iterations:</b><br># of cooking attempts.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         999
     )
 {

@@ -40,7 +40,7 @@ BattleMoveTable::BattleMoveTable()
         "<b>Move Table:</b><br>"
         "Run this sequence of moves for your lead Pokemon only. "
         "If your lead faints or the end of the table is reached, the program will switch to throwing the selected ball. ",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         make_defaults()
     )
 {}

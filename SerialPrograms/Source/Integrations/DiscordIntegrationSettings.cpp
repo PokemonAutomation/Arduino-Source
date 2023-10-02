@@ -28,11 +28,11 @@ DiscordIntegrationSettingsOption::~DiscordIntegrationSettingsOption(){
     this->remove_listener(*this);
 }
 DiscordIntegrationSettingsOption::DiscordIntegrationSettingsOption()
-    : GroupOption("Discord Integration Settings", LockWhileRunning::LOCKED, true, false)
+    : GroupOption("Discord Integration Settings", LockWhileRunning::LOCK_WHILE_RUNNING, true, false)
 //    , m_integration_enabled(integration_enabled)
     , run_on_start(
         "<b>Run Discord Integration on Launch:</b><br>Automatically connect to Discord as soon as the program is launched.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         false
     )
     , library0(
@@ -41,7 +41,7 @@ DiscordIntegrationSettingsOption::DiscordIntegrationSettingsOption()
             {Library::SleepyDiscord, "sleepy", "Sleepy Discord (normal commands, deprecated)"},
             {Library::DPP, "dpp", "D++ (slash commands and normal commands)"},
         },
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         Library::DPP
     )
     , command_type(
@@ -50,48 +50,48 @@ DiscordIntegrationSettingsOption::DiscordIntegrationSettingsOption()
             {CommandType::SlashCommands, "slash", "Slash commands"},
             {CommandType::MessageCommands, "message", "Message (prefix) commands"},
         },
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         CommandType::SlashCommands
     )
     , token(
         true,
         "<b>Discord Token:</b><br>Enter your Discord bot's token. Keep it safe and don't share it with anyone.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         "", "0123456789abcdefghijklmnopqrstuvwxyzABCDEGFHIJKLMNOPQRSTUVWXYZ"
     )
     , command_prefix(
         false,
         "<b>Discord Command Prefix:</b><br>Enter a command prefix for your bot.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         "^", "^"
     )
     , use_suffix(
         "<b>Use Suffix (Sleepy):</b><br>Use a suffix instead of a prefix for commands.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         false
     )
     , game_status(
         false,
         "<b>Discord Game Status:</b><br>Enter a status message your bot would display.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         "", "Controlling your Switch. :)"
     )
     , hello_message(
         false,
         "<b>Discord Hello Message:</b><br>Enter a message you'd like the bot to respond with to the \"$hi\" command.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         "", "Automation at your service!"
     )
     , sudo(
         false,
         "<b>Discord Sudo (Sleepy):</b><br>Enter user ID(s) to grant sudo access to.",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         "", "123456789012345678"
     )
     , owner(
         false,
         "<b>Discord Owner (Sleepy):</b><br>Enter the bot owner's ID (your own ID).",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         "", "123456789012345678"
     )
 {

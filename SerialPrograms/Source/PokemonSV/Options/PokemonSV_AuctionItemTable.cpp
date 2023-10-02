@@ -29,7 +29,7 @@ std::unique_ptr<EditableTableRow> AuctionItemSelectorRow::clone() const{
 AuctionItemTable::AuctionItemTable(std::string label)
     : EditableTableOption_t<AuctionItemSelectorRow>(
         std::move(label),
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         make_defaults()
     )
 {}

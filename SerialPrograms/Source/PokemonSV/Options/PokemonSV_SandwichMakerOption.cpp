@@ -293,14 +293,14 @@ SandwichMakerOption::~SandwichMakerOption() {
 SandwichMakerOption::SandwichMakerOption(OCR::LanguageOCROption* language_option)
     : GroupOption(
         "Sandwich Maker",
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         false, true
     )
     , m_language_owner(language_option == nullptr
         ? new OCR::LanguageOCROption(
             "<b>Game Language:</b><br>Required to read ingredients.",
             IV_READER().languages(),
-            LockWhileRunning::LOCKED,
+            LockWhileRunning::LOCK_WHILE_RUNNING,
             true
         )
         : nullptr
@@ -316,7 +316,7 @@ SandwichMakerOption::SandwichMakerOption(OCR::LanguageOCROption* language_option
             {BaseRecipe::paradox,   "paradox",  "Title + Encounter + Humungo/Teensy: Paradox-specific"},
             {BaseRecipe::custom,    "custom",   "Custom Sandwich"},
         },
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         BaseRecipe::shiny
         )
     , TYPE(
@@ -341,7 +341,7 @@ SandwichMakerOption::SandwichMakerOption(OCR::LanguageOCROption* language_option
             {PokemonType::steel,    "steel",    "Steel"},
             {PokemonType::fairy,    "fairy",    "Fairy"},
         },
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         PokemonType::normal
     )
     , PARADOX(
@@ -395,7 +395,7 @@ SandwichMakerOption::SandwichMakerOption(OCR::LanguageOCROption* language_option
             {ParadoxRecipe::teensy2_ironvaliant_1,    "teensy2_ironvaliant_1",    "Iron Valiant - Teensy #1"},
             {ParadoxRecipe::teensy2_ironvaliant_2,    "teensy2_ironvaliant_2",    "Iron Vailant - Teensy #2"},
         },
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         ParadoxRecipe::humungo3_greattusk_1
     )
     , HERBA_ONE(
@@ -407,7 +407,7 @@ SandwichMakerOption::SandwichMakerOption(OCR::LanguageOCROption* language_option
             {HerbaSelection::bitter_herba_mystica,  "bitter-herba-mystica", "Bitter Herba Mystica"},
             {HerbaSelection::spicy_herba_mystica,   "spicy-herba-mystica",  "Spicy Herba Mystica"},
         },
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         HerbaSelection::salty_herba_mystica
     )
     , HERBA_TWO(
@@ -419,7 +419,7 @@ SandwichMakerOption::SandwichMakerOption(OCR::LanguageOCROption* language_option
             {HerbaSelection::bitter_herba_mystica,  "bitter-herba-mystica", "Bitter Herba Mystica"},
             {HerbaSelection::spicy_herba_mystica,   "spicy-herba-mystica",  "Spicy Herba Mystica"},
         },
-        LockWhileRunning::LOCKED,
+        LockWhileRunning::LOCK_WHILE_RUNNING,
         HerbaSelection::salty_herba_mystica
     )
     , HERB_INCOMPATIBILITY_WARNING("")
