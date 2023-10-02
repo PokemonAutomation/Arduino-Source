@@ -10,9 +10,10 @@
 #include "ConfigWidget.h"
 #include "SimpleIntegerWidget.h"
 
-//#include <iostream>
-//using std::cout;
-//using std::endl;
+//  REMOVE
+#include <iostream>
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 
@@ -29,6 +30,7 @@ SimpleIntegerCellWidget<Type>::SimpleIntegerCellWidget(QWidget& parent, SimpleIn
     , ConfigWidget(value, *this)
     , m_value(value)
 {
+    cout << "sizeHint() = " << this->sizeHint().width() << endl;
     connect(
         this, &QLineEdit::textChanged,
         this, [this](const QString& text){

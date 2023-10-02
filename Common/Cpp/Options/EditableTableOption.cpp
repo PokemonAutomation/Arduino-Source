@@ -17,7 +17,7 @@
 namespace PokemonAutomation{
 
 
-EditableTableRow::EditableTableRow()
+EditableTableRow::EditableTableRow(void*)
     : m_index((size_t)0 - 1)
 {}
 void EditableTableRow::add_option(ConfigOption& option, std::string serialization_string){
@@ -98,6 +98,10 @@ EditableTableOption::EditableTableOption(
     , m_default(std::move(default_value))
 {
     restore_defaults();
+}
+void EditableTableOption::set_default(std::vector<std::unique_ptr<EditableTableRow>> default_value){
+    SpinLockGuard lg(m_lock);
+    m_default = std::move(default_value);
 }
 size_t EditableTableOption::current_rows() const{
     SpinLockGuard lg(m_lock);

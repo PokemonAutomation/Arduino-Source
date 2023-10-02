@@ -20,7 +20,7 @@ namespace PokemonAutomation{
 class EditableTableRow{
 public:
     virtual ~EditableTableRow() = default;
-    EditableTableRow();
+    EditableTableRow(void* = nullptr);
 
     //  Duplicate/deep-copy the entire row. Does not copy over listeners.
     virtual std::unique_ptr<EditableTableRow> clone() const = 0;
@@ -74,6 +74,7 @@ public:
         bool enable_saveload,
         std::vector<std::unique_ptr<EditableTableRow>> default_value = {}
     );
+    void set_default(std::vector<std::unique_ptr<EditableTableRow>> default_value);
 
     const std::string& label() const{ return m_label; }
 
@@ -135,7 +136,7 @@ public:
 private:
     const std::string m_label;
     const bool m_enable_saveload;
-    const std::vector<std::unique_ptr<EditableTableRow>> m_default;
+    std::vector<std::unique_ptr<EditableTableRow>> m_default;
 
     mutable SpinLock m_lock;
     uint64_t m_seqnum = 0;
@@ -159,7 +160,11 @@ public:
     }
 
     virtual std::unique_ptr<EditableTableRow> make_row() const override{
-        return std::unique_ptr<EditableTableRow>(new RowType());
+        if constexpr (std::is_default_constructible_v<RowType>){
+            return std::unique_ptr<EditableTableRow>(new RowType());
+        }else{
+            return std::unique_ptr<EditableTableRow>(new RowType(this));
+        }
     }
 };
 
