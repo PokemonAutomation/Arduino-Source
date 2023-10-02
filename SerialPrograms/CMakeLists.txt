@@ -134,6 +134,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/Options/FloatingPointOption.h
     ../Common/Cpp/Options/GroupOption.cpp
     ../Common/Cpp/Options/GroupOption.h
+    ../Common/Cpp/Options/IntegerRangeOption.cpp
+    ../Common/Cpp/Options/IntegerRangeOption.h
     ../Common/Cpp/Options/RandomCodeOption.cpp
     ../Common/Cpp/Options/RandomCodeOption.h
     ../Common/Cpp/Options/SimpleIntegerOption.cpp
@@ -214,6 +216,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Qt/Options/FloatingPointWidget.h
     ../Common/Qt/Options/GroupWidget.cpp
     ../Common/Qt/Options/GroupWidget.h
+    ../Common/Qt/Options/IntegerRangeWidget.cpp
+    ../Common/Qt/Options/IntegerRangeWidget.h
     ../Common/Qt/Options/RandomCodeWidget.cpp
     ../Common/Qt/Options/RandomCodeWidget.h
     ../Common/Qt/Options/SimpleIntegerWidget.cpp

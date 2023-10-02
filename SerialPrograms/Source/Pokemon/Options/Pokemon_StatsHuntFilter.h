@@ -8,6 +8,7 @@
 #define PokemonAutomation_Pokemon_StatsFilter_H
 
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
+#include "Common/Cpp/Options/IntegerRangeOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/EditableTableOption.h"
 //#include "Pokemon/Pokemon_IVChecker.h"
@@ -139,23 +140,12 @@ public:
 public:
     StatsHuntRowMisc misc;
 
-    SimpleIntegerCell<uint8_t> iv_lo_hp;
-    SimpleIntegerCell<uint8_t> iv_hi_hp;
-
-    SimpleIntegerCell<uint8_t> iv_lo_atk;
-    SimpleIntegerCell<uint8_t> iv_hi_atk;
-
-    SimpleIntegerCell<uint8_t> iv_lo_def;
-    SimpleIntegerCell<uint8_t> iv_hi_def;
-
-    SimpleIntegerCell<uint8_t> iv_lo_spatk;
-    SimpleIntegerCell<uint8_t> iv_hi_spatk;
-
-    SimpleIntegerCell<uint8_t> iv_lo_spdef;
-    SimpleIntegerCell<uint8_t> iv_hi_spdef;
-
-    SimpleIntegerCell<uint8_t> iv_lo_speed;
-    SimpleIntegerCell<uint8_t> iv_hi_speed;
+    IntegerRangeCell<uint8_t> iv_hp;
+    IntegerRangeCell<uint8_t> iv_atk;
+    IntegerRangeCell<uint8_t> iv_def;
+    IntegerRangeCell<uint8_t> iv_spatk;
+    IntegerRangeCell<uint8_t> iv_spdef;
+    IntegerRangeCell<uint8_t> iv_speed;
 };
 class StatsHuntIvRangeFilterTable : public EditableTableOption_t<StatsHuntIvRangeFilterRow>{
 public:

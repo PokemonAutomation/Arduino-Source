@@ -29,21 +29,25 @@ public:
     Type lo_min_value() const;
     Type lo_max_value() const;
     Type lo_default_value() const;
-    Type lo_current_value() const;
 
     Type hi_min_value() const;
     Type hi_max_value() const;
     Type hi_default_value() const;
+
+    Type lo_current_value() const;
     Type hi_current_value() const;
+    void current_values(Type& lo, Type& hi) const;
 
     virtual void set_lo(Type x);
     virtual void set_hi(Type x);
+    virtual void set(Type lo, Type hi);
+    virtual void set(const IntegerRangeCell& option);
 
     virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
 
-    std::string check_validity(Type x) const;
-    virtual std::string check_validity() const override;
+//    std::string check_validity(Type x) const;
+//    virtual std::string check_validity() const override;
     virtual void restore_defaults() override;
 
 public:

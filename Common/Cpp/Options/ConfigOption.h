@@ -23,6 +23,7 @@ class ConfigWidget;
 enum class LockWhileRunning{
     UNLOCKED,
     LOCKED,
+    READ_ONLY,
 };
 enum class ConfigOptionState{
     ENABLED,
@@ -56,7 +57,7 @@ protected:
 
 public:
     ConfigOption();
-    ConfigOption(LockWhileRunning lock_while_program_is_running);
+    ConfigOption(LockWhileRunning lock_mode);
     ConfigOption(ConfigOptionState visibility);
 
 //    //  Deep copy this entire config. This will not copy listeners.
@@ -72,7 +73,7 @@ public:
     }
 
 public:
-    bool lock_while_program_is_running() const;
+    LockWhileRunning lock_mode() const;
 
     //  Returns error message if invalid. Otherwise returns empty string.
     virtual std::string check_validity() const;

@@ -45,7 +45,7 @@ void ConfigWidget::update_visibility(){
 //    cout << "ConfigWidget::update_visibility(): " << (int)m_value.visibility() << endl;
     switch (m_value.visibility()){
     case ConfigOptionState::ENABLED:
-        m_widget->setEnabled(!m_value.lock_while_program_is_running() || !m_program_is_running);
+        m_widget->setEnabled(m_value.lock_mode() != LockWhileRunning::LOCKED || !m_program_is_running);
         m_widget->setVisible(true);
         break;
     case ConfigOptionState::DISABLED:

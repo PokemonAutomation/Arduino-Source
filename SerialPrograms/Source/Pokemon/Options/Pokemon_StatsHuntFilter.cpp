@@ -245,35 +245,23 @@ StatsHuntAction StatsHuntIvJudgeFilterTable::get_action(
 
 StatsHuntIvRangeFilterRow::StatsHuntIvRangeFilterRow(const StatsHuntMiscFeatureFlags& feature_flags)
     : misc(feature_flags)
-    , iv_lo_hp(LockWhileRunning::UNLOCKED, 0, 0, 31)
-    , iv_hi_hp(LockWhileRunning::UNLOCKED, 31, 0, 31)
-    , iv_lo_atk(LockWhileRunning::UNLOCKED, 0, 0, 31)
-    , iv_hi_atk(LockWhileRunning::UNLOCKED, 31, 0, 31)
-    , iv_lo_def(LockWhileRunning::UNLOCKED, 0, 0, 31)
-    , iv_hi_def(LockWhileRunning::UNLOCKED, 31, 0, 31)
-    , iv_lo_spatk(LockWhileRunning::UNLOCKED, 0, 0, 31)
-    , iv_hi_spatk(LockWhileRunning::UNLOCKED, 31, 0, 31)
-    , iv_lo_spdef(LockWhileRunning::UNLOCKED, 0, 0, 31)
-    , iv_hi_spdef(LockWhileRunning::UNLOCKED, 31, 0, 31)
-    , iv_lo_speed(LockWhileRunning::UNLOCKED, 0, 0, 31)
-    , iv_hi_speed(LockWhileRunning::UNLOCKED, 31, 0, 31)
+    , iv_hp(LockWhileRunning::UNLOCKED, 0, 31, 0, 0, 0, 31, 31, 31)
+    , iv_atk(LockWhileRunning::UNLOCKED, 0, 31, 0, 0, 0, 31, 31, 31)
+    , iv_def(LockWhileRunning::UNLOCKED, 0, 31, 0, 0, 0, 31, 31, 31)
+    , iv_spatk(LockWhileRunning::UNLOCKED, 0, 31, 0, 0, 0, 31, 31, 31)
+    , iv_spdef(LockWhileRunning::UNLOCKED, 0, 31, 0, 0, 0, 31, 31, 31)
+    , iv_speed(LockWhileRunning::UNLOCKED, 0, 31, 0, 0, 0, 31, 31, 31)
 {
     if (misc.feature_flags.action)  PA_ADD_OPTION(misc.action);
     if (misc.feature_flags.shiny)   PA_ADD_OPTION(misc.shiny);
     if (misc.feature_flags.gender)  PA_ADD_OPTION(misc.gender);
     if (misc.feature_flags.nature)  PA_ADD_OPTION(misc.nature);
-    PA_ADD_OPTION(iv_lo_hp);
-    PA_ADD_OPTION(iv_hi_hp);
-    PA_ADD_OPTION(iv_lo_atk);
-    PA_ADD_OPTION(iv_hi_atk);
-    PA_ADD_OPTION(iv_lo_def);
-    PA_ADD_OPTION(iv_hi_def);
-    PA_ADD_OPTION(iv_lo_spatk);
-    PA_ADD_OPTION(iv_hi_spatk);
-    PA_ADD_OPTION(iv_lo_spdef);
-    PA_ADD_OPTION(iv_hi_spdef);
-    PA_ADD_OPTION(iv_lo_speed);
-    PA_ADD_OPTION(iv_hi_speed);
+    PA_ADD_OPTION(iv_hp);
+    PA_ADD_OPTION(iv_atk);
+    PA_ADD_OPTION(iv_def);
+    PA_ADD_OPTION(iv_spatk);
+    PA_ADD_OPTION(iv_spdef);
+    PA_ADD_OPTION(iv_speed);
 }
 StatsHuntIvRangeFilterRow::StatsHuntIvRangeFilterRow(const EditableTableOption* table)
     : StatsHuntIvRangeFilterRow(static_cast<const StatsHuntIvJudgeFilterTable&>(*table).feature_flags)
@@ -281,18 +269,12 @@ StatsHuntIvRangeFilterRow::StatsHuntIvRangeFilterRow(const EditableTableOption* 
 std::unique_ptr<EditableTableRow> StatsHuntIvRangeFilterRow::clone() const{
     std::unique_ptr<StatsHuntIvRangeFilterRow> ret(new StatsHuntIvRangeFilterRow(misc.feature_flags));
     ret->misc.set(misc);
-    ret->iv_lo_hp.set(iv_lo_hp);
-    ret->iv_hi_hp.set(iv_hi_hp);
-    ret->iv_lo_atk.set(iv_lo_atk);
-    ret->iv_hi_atk.set(iv_hi_atk);
-    ret->iv_lo_def.set(iv_lo_def);
-    ret->iv_hi_def.set(iv_hi_def);
-    ret->iv_lo_spatk.set(iv_lo_spatk);
-    ret->iv_hi_spatk.set(iv_hi_spatk);
-    ret->iv_lo_spdef.set(iv_lo_spdef);
-    ret->iv_hi_spdef.set(iv_hi_spdef);
-    ret->iv_lo_speed.set(iv_lo_speed);
-    ret->iv_hi_speed.set(iv_hi_speed);
+    ret->iv_hp.set(iv_hp);
+    ret->iv_atk.set(iv_atk);
+    ret->iv_def.set(iv_def);
+    ret->iv_spatk.set(iv_spatk);
+    ret->iv_spdef.set(iv_spdef);
+    ret->iv_speed.set(iv_speed);
     return ret;
 }
 
@@ -320,6 +302,14 @@ std::vector<std::string> StatsHuntIvRangeFilterTable::make_header() const{
         ret.emplace_back("Nature");
     }
 
+#if 1
+    ret.emplace_back("HP");
+    ret.emplace_back("Atk");
+    ret.emplace_back("Def");
+    ret.emplace_back("SpAtk");
+    ret.emplace_back("SpDef");
+    ret.emplace_back("Spd");
+#else
     ret.emplace_back("HP (low)");
     ret.emplace_back("HP (high)");
     ret.emplace_back("Atk (low)");
@@ -332,6 +322,7 @@ std::vector<std::string> StatsHuntIvRangeFilterTable::make_header() const{
     ret.emplace_back("SpDef (high)");
     ret.emplace_back("Spd (low)");
     ret.emplace_back("Spd (high)");
+#endif
 
     return ret;
 }

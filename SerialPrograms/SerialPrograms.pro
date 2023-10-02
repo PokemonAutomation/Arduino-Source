@@ -109,6 +109,7 @@ SOURCES += \
     ../Common/Cpp/Options/FixedCodeOption.cpp \
     ../Common/Cpp/Options/FloatingPointOption.cpp \
     ../Common/Cpp/Options/GroupOption.cpp \
+    ../Common/Cpp/Options/IntegerRangeOption.cpp \
     ../Common/Cpp/Options/RandomCodeOption.cpp \
     ../Common/Cpp/Options/SimpleIntegerOption.cpp \
     ../Common/Cpp/Options/StaticTableOption.cpp \
@@ -138,6 +139,7 @@ SOURCES += \
     ../Common/Qt/Options/FixedCodeWidget.cpp \
     ../Common/Qt/Options/FloatingPointWidget.cpp \
     ../Common/Qt/Options/GroupWidget.cpp \
+    ../Common/Qt/Options/IntegerRangeWidget.cpp \
     ../Common/Qt/Options/RandomCodeWidget.cpp \
     ../Common/Qt/Options/SimpleIntegerWidget.cpp \
     ../Common/Qt/Options/StaticTableWidget.cpp \
@@ -1082,6 +1084,7 @@ HEADERS += \
     ../Common/Cpp/Options/FixedCodeOption.h \
     ../Common/Cpp/Options/FloatingPointOption.h \
     ../Common/Cpp/Options/GroupOption.h \
+    ../Common/Cpp/Options/IntegerRangeOption.h \
     ../Common/Cpp/Options/RandomCodeOption.h \
     ../Common/Cpp/Options/SimpleIntegerOption.h \
     ../Common/Cpp/Options/StaticTableOption.h \
@@ -1132,6 +1135,7 @@ HEADERS += \
     ../Common/Qt/Options/FixedCodeWidget.h \
     ../Common/Qt/Options/FloatingPointWidget.h \
     ../Common/Qt/Options/GroupWidget.h \
+    ../Common/Qt/Options/IntegerRangeWidget.h \
     ../Common/Qt/Options/RandomCodeWidget.h \
     ../Common/Qt/Options/SimpleIntegerWidget.h \
     ../Common/Qt/Options/StaticTableWidget.h \

@@ -120,6 +120,20 @@ StatsResetBloodmoon::StatsResetBloodmoon()
         }
         FILTERS.set_default(std::move(ret));
     }
+    {
+        std::vector<std::unique_ptr<EditableTableRow>> ret;
+        {
+            auto row = std::make_unique<StatsHuntIvRangeFilterRow>(FILTERS.feature_flags);
+            row->iv_atk.set(0, 1);
+            ret.emplace_back(std::move(row));
+        }
+        {
+            auto row = std::make_unique<StatsHuntIvRangeFilterRow>(FILTERS.feature_flags);
+            row->iv_speed.set(0, 1);
+            ret.emplace_back(std::move(row));
+        }
+        FILTERS0.set_default(std::move(ret));
+    }
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(BALL_SELECT);
     PA_ADD_OPTION(TRY_TO_TERASTILLIZE);

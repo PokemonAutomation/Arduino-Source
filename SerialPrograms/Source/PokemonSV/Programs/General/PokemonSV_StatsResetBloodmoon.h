@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonSV_StatsResetBloodmoon_H
 #define PokemonAutomation_PokemonSV_StatsResetBloodmoon_H
 
+#include "Common/Cpp/Options/StaticTextOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "CommonFramework/Options/LanguageOCROption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
@@ -17,6 +18,20 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
+
+
+class IvDisplay : public GroupOption{
+public:
+    IvDisplay();
+
+private:
+    StaticTextOption m_hp;
+    StaticTextOption m_atk;
+    StaticTextOption m_def;
+    StaticTextOption m_spatk;
+    StaticTextOption m_spdef;
+    StaticTextOption m_speed;
+};
 
 
 class StatsResetBloodmoon_Descriptor : public SingleSwitchProgramDescriptor{
@@ -33,6 +48,8 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
+
+
     OCR::LanguageOCROption LANGUAGE;
     PokemonSwSh::PokemonBallSelectOption BALL_SELECT;
     BooleanCheckBoxOption TRY_TO_TERASTILLIZE;
