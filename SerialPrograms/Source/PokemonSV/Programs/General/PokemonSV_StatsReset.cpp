@@ -97,9 +97,13 @@ StatsReset::StatsReset()
         false
     )
     , FILTERS(
-        StatsHuntFilterTable::DISABLE_ACTION,
-        StatsHuntFilterTable::DISABLE_SHINY,
-        StatsHuntFilterTable::DISABLE_GENDER
+        StatsHuntIvJudgeFilterTable_Label_Regular,
+        {
+            .action = false,
+            .shiny = false,
+            .gender = false,
+            .nature = true,
+        }
     )
     , GO_HOME_WHEN_DONE(false)
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
@@ -109,6 +113,20 @@ StatsReset::StatsReset()
         & NOTIFICATION_ERROR_FATAL,
     })
 {
+    {
+        std::vector<std::unique_ptr<EditableTableRow>> ret;
+        {
+            auto row = std::make_unique<StatsHuntIvJudgeFilterRow>(FILTERS.feature_flags);
+            row->iv_atk.set(IvJudgeFilter::NoGood);
+            ret.emplace_back(std::move(row));
+        }
+        {
+            auto row = std::make_unique<StatsHuntIvJudgeFilterRow>(FILTERS.feature_flags);
+            row->iv_speed.set(IvJudgeFilter::NoGood);
+            ret.emplace_back(std::move(row));
+        }
+        FILTERS.set_default(std::move(ret));
+    }
     PA_ADD_OPTION(TARGET);
     PA_ADD_OPTION(LANGUAGE); //This is required
     PA_ADD_OPTION(BALL_SELECT);

@@ -91,7 +91,7 @@ private:
 
     IntegerEnumDropdownOption KEEP_BOX_LOCATION;
     
-    Pokemon::StatsHuntFilterTable FILTERS;
+    Pokemon::StatsHuntIvJudgeFilterTable FILTERS;
 
     BooleanCheckBoxOption SAVE_DEBUG_VIDEO;
 

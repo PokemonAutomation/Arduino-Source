@@ -21,7 +21,7 @@ namespace PokemonSV{
 
 bool check_stats_reset_info(
     ConsoleHandle& console, BotBaseContext& context,
-    OCR::LanguageOCROption& LANGUAGE, Pokemon::StatsHuntFilterTable& FILTERS,
+    OCR::LanguageOCROption& LANGUAGE, Pokemon::StatsHuntIvJudgeFilterTable& FILTERS,
     Pokemon::StatsHuntAction& action
 ){
     context.wait_for_all_requests();

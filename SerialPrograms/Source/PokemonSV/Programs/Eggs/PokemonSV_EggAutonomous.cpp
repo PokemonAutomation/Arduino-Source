@@ -127,6 +127,15 @@ EggAutonomous::EggAutonomous()
         LockWhileRunning::UNLOCKED,
         1
     )
+    , FILTERS(
+        StatsHuntIvJudgeFilterTable_Label_Eggs,
+        {
+            .action = true,
+            .shiny = true,
+            .gender = true,
+            .nature = true,
+        }
+    )
     , SAVE_DEBUG_VIDEO(
         "<b>Save debug videos to Switch:</b><br>"
         "Set this on to save a Switch video everytime an error occurs. You can send the video to developers to help them debug later.",

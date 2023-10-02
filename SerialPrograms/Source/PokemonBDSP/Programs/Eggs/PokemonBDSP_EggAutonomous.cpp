@@ -90,6 +90,15 @@ EggAutonomous::EggAutonomous()
         LockWhileRunning::LOCKED,
         AutoSave::AfterStartAndKeep
     )
+    , FILTERS(
+        StatsHuntIvJudgeFilterTable_Label_Eggs,
+        {
+            .action = true,
+            .shiny = true,
+            .gender = true,
+            .nature = true,
+        }
+    )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATION_NONSHINY_KEEP(
         "Non-Shiny Keep",

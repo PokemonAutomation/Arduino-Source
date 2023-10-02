@@ -7,10 +7,12 @@
 #ifndef PokemonAutomation_Pokemon_StatsFilter_H
 #define PokemonAutomation_Pokemon_StatsFilter_H
 
+#include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/EditableTableOption.h"
 //#include "Pokemon/Pokemon_IVChecker.h"
 #include "Pokemon/Pokemon_NatureChecker.h"
+#include "Pokemon/Pokemon_StatsCalculation.h"
 #include "Pokemon/Options/Pokemon_IvJudgeOption.h"
 #include "Pokemon/Inference/Pokemon_IvJudgeReader.h"
 #include "Pokemon/Inference/Pokemon_NatureReader.h"
@@ -37,56 +39,56 @@ enum class StatsHuntGenderFilter{
     Female,
     Genderless
 };
-
-#if 0
-enum class StatsHuntNatureFilter{
-    Any,
-    Adamant,
-    Bashful,
-    Bold,
-    Brave,
-    Calm,
-    Careful,
-    Docile,
-    Gentle,
-    Hardy,
-    Hasty,
-    Impish,
-    Jolly,
-    Lax,
-    Lonely,
-    Mild,
-    Modest,
-    Naive,
-    Naughty,
-    Quiet,
-    Quirky,
-    Rash,
-    Relaxed,
-    Sassy,
-    Serious,
-    Timid
-};
-#endif
-
 std::string gender_to_string(StatsHuntGenderFilter gender);
 
 
-class StatsHuntFilterTable;
 
-class StatsHuntFilterRow : public EditableTableRow{
-public:
-    StatsHuntFilterRow(const EditableTableOption* table);
-    StatsHuntFilterRow(const StatsHuntFilterTable* table, StatsHuntShinyFilter p_shiny);
-    virtual std::unique_ptr<EditableTableRow> clone() const override;
+//  Preset labels.
+extern const char* StatsHuntIvJudgeFilterTable_Label_Eggs;
+extern const char* StatsHuntIvJudgeFilterTable_Label_Regular;
 
-public:
-    const StatsHuntFilterTable& m_table;
+
+
+
+struct StatsHuntMiscFeatureFlags{
+    bool action = false;
+    bool shiny = false;
+    bool gender = false;
+    bool nature = false;
+};
+struct StatsHuntRowMisc{
+    StatsHuntRowMisc(const StatsHuntMiscFeatureFlags& p_feature_flags);
+    void set(const StatsHuntRowMisc& x);
+
+    const StatsHuntMiscFeatureFlags& feature_flags;
 
     EnumDropdownCell<StatsHuntAction> action;
     EnumDropdownCell<StatsHuntShinyFilter> shiny;
     EnumDropdownCell<StatsHuntGenderFilter> gender;
     EnumDropdownCell<NatureCheckerFilter> nature;
+};
+
+
+
+
+class StatsHuntIvJudgeFilterTable;
+class StatsHuntIvJudgeFilterRow : public EditableTableRow{
+public:
+    StatsHuntIvJudgeFilterRow(const StatsHuntMiscFeatureFlags& feature_flags);
+    StatsHuntIvJudgeFilterRow(const EditableTableOption* table);
+    StatsHuntIvJudgeFilterRow(const StatsHuntMiscFeatureFlags& feature_flags, StatsHuntShinyFilter p_shiny);
+    virtual std::unique_ptr<EditableTableRow> clone() const override;
+
+    bool matches(
+        bool shiny,
+        const IvJudgeReader::Results& IVs,
+        StatsHuntGenderFilter gender,
+        NatureReader::Results nature
+    ) const;
+
+public:
+    StatsHuntRowMisc misc;
+
     IVJudgeFilterCell iv_hp;
     IVJudgeFilterCell iv_atk;
     IVJudgeFilterCell iv_def;
@@ -94,36 +96,15 @@ public:
     IVJudgeFilterCell iv_spdef;
     IVJudgeFilterCell iv_speed;
 };
-
-
-
-class StatsHuntFilterTable : public EditableTableOption_t<StatsHuntFilterRow>{
+class StatsHuntIvJudgeFilterTable : public EditableTableOption_t<StatsHuntIvJudgeFilterRow>{
 public:
-    enum EnableAction{
-        DISABLE_ACTION,
-        ENABLE_ACTION,
-    };
-    enum EnableShiny{
-        DISABLE_SHINY,
-        ENABLE_SHINY,
-    };
-    enum EnableGender{
-        DISABLE_GENDER,
-        ENABLE_GENDER,
-    };
-    enum EnableNature{
-        DISABLE_NATURE,
-        ENABLE_NATURE,
-    };
-    StatsHuntFilterTable(
-        EnableAction enable_action = ENABLE_ACTION,
-        EnableShiny enable_shiny = ENABLE_SHINY,
-        EnableGender enable_gender = ENABLE_GENDER,
-        EnableNature enable_nature = ENABLE_NATURE
+    StatsHuntIvJudgeFilterTable(
+        const std::string& label,
+        const StatsHuntMiscFeatureFlags& p_feature_flags
     );
     virtual std::vector<std::string> make_header() const override;
     std::vector<std::unique_ptr<EditableTableRow>> make_defaults() const;
-    
+
     StatsHuntAction get_action(
         bool shiny,
         const IvJudgeReader::Results& IVs,
@@ -132,16 +113,69 @@ public:
     ) const;
 
 public:
-    const bool m_enable_action;
-    const bool m_enable_shiny;
-    const bool m_enable_gender;
-    const bool m_enable_nature;
+    const StatsHuntMiscFeatureFlags feature_flags;
 };
 
 
 
 
 
+
+
+class StatsHuntIvRangeFilterTable;
+class StatsHuntIvRangeFilterRow : public EditableTableRow{
+public:
+    StatsHuntIvRangeFilterRow(const StatsHuntMiscFeatureFlags& feature_flags);
+    StatsHuntIvRangeFilterRow(const EditableTableOption* table);
+    virtual std::unique_ptr<EditableTableRow> clone() const override;
+
+    bool matches(
+        bool shiny,
+        const IvRanges& IVs,
+        StatsHuntGenderFilter gender,
+        NatureReader::Results nature
+    ) const;
+
+public:
+    StatsHuntRowMisc misc;
+
+    SimpleIntegerCell<uint8_t> iv_lo_hp;
+    SimpleIntegerCell<uint8_t> iv_hi_hp;
+
+    SimpleIntegerCell<uint8_t> iv_lo_atk;
+    SimpleIntegerCell<uint8_t> iv_hi_atk;
+
+    SimpleIntegerCell<uint8_t> iv_lo_def;
+    SimpleIntegerCell<uint8_t> iv_hi_def;
+
+    SimpleIntegerCell<uint8_t> iv_lo_spatk;
+    SimpleIntegerCell<uint8_t> iv_hi_spatk;
+
+    SimpleIntegerCell<uint8_t> iv_lo_spdef;
+    SimpleIntegerCell<uint8_t> iv_hi_spdef;
+
+    SimpleIntegerCell<uint8_t> iv_lo_speed;
+    SimpleIntegerCell<uint8_t> iv_hi_speed;
+};
+class StatsHuntIvRangeFilterTable : public EditableTableOption_t<StatsHuntIvRangeFilterRow>{
+public:
+    StatsHuntIvRangeFilterTable(
+        const std::string& label,
+        const StatsHuntMiscFeatureFlags& p_feature_flags
+    );
+    virtual std::vector<std::string> make_header() const override;
+//    std::vector<std::unique_ptr<EditableTableRow>> make_defaults() const;
+
+    StatsHuntAction get_action(
+        bool shiny,
+        const IvRanges& IVs,
+        StatsHuntGenderFilter gender,
+        NatureReader::Results nature
+    ) const;
+
+public:
+    const StatsHuntMiscFeatureFlags feature_flags;
+};
 
 
 

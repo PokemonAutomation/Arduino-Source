@@ -134,6 +134,15 @@ EggAutonomous::EggAutonomous()
         LockWhileRunning::LOCKED,
         AutoSave::AfterStartAndKeep
     )
+    , FILTERS(
+        StatsHuntIvJudgeFilterTable_Label_Eggs,
+        {
+            .action = true,
+            .shiny = true,
+            .gender = true,
+            .nature = true,
+        }
+    )
     , DEBUG_PROCESSING_HATCHED(
         "Debug the part of program after all eggs hatched",
         LockWhileRunning::LOCKED,

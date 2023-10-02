@@ -104,7 +104,7 @@ EggAutonomousState::EggAutonomousState(
     Language language,
     ShortcutDirectionOption& shortcut,
     uint16_t travel_time_per_fetch,
-    const StatsHuntFilterTable& filters,
+    const StatsHuntIvJudgeFilterTable& filters,
     uint8_t max_keepers,
     uint8_t existing_eggs_in_columns
 )

@@ -81,10 +81,22 @@ StatsResetBloodmoon::StatsResetBloodmoon()
         false
     )
     , FILTERS(
-        StatsHuntFilterTable::DISABLE_ACTION,
-        StatsHuntFilterTable::DISABLE_SHINY,
-        StatsHuntFilterTable::DISABLE_GENDER,
-        StatsHuntFilterTable::DISABLE_NATURE
+        StatsHuntIvJudgeFilterTable_Label_Regular,
+        {
+            .action = false,
+            .shiny = false,
+            .gender = false,
+            .nature = false,
+        }
+    )
+    , FILTERS0(
+        StatsHuntIvJudgeFilterTable_Label_Regular,
+        {
+            .action = false,
+            .shiny = false,
+            .gender = false,
+            .nature = false,
+        }
     )
     , GO_HOME_WHEN_DONE(false)
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
@@ -94,10 +106,25 @@ StatsResetBloodmoon::StatsResetBloodmoon()
         & NOTIFICATION_ERROR_FATAL,
     })
 {
+    {
+        std::vector<std::unique_ptr<EditableTableRow>> ret;
+        {
+            auto row = std::make_unique<StatsHuntIvJudgeFilterRow>(FILTERS.feature_flags);
+            row->iv_atk.set(IvJudgeFilter::NoGood);
+            ret.emplace_back(std::move(row));
+        }
+        {
+            auto row = std::make_unique<StatsHuntIvJudgeFilterRow>(FILTERS.feature_flags);
+            row->iv_speed.set(IvJudgeFilter::NoGood);
+            ret.emplace_back(std::move(row));
+        }
+        FILTERS.set_default(std::move(ret));
+    }
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(BALL_SELECT);
     PA_ADD_OPTION(TRY_TO_TERASTILLIZE);
     PA_ADD_OPTION(FILTERS);
+//    PA_ADD_OPTION(FILTERS0);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
 }

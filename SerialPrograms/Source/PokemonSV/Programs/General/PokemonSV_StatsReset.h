@@ -45,7 +45,7 @@ private:
     PokemonSwSh::PokemonBallSelectOption BALL_SELECT;
     BooleanCheckBoxOption QUICKBALL;
     BattleMoveTable BATTLE_MOVES;
-    Pokemon::StatsHuntFilterTable FILTERS;
+    Pokemon::StatsHuntIvJudgeFilterTable FILTERS;
 
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;

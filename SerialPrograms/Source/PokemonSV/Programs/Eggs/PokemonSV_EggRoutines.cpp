@@ -601,7 +601,7 @@ void reset_position_at_zero_gate(const ProgramInfo& info, ConsoleHandle& console
 
 bool check_baby_info(
     const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
-    OCR::LanguageOCROption& LANGUAGE, Pokemon::StatsHuntFilterTable& FILTERS,
+    OCR::LanguageOCROption& LANGUAGE, Pokemon::StatsHuntIvJudgeFilterTable& FILTERS,
     Pokemon::StatsHuntAction& action
 ){
     context.wait_for_all_requests();

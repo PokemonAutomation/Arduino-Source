@@ -14,11 +14,12 @@
 #include "Pokemon/Options/Pokemon_StatsHuntFilter.h"
 #include "PokemonSwSh/Options/PokemonSwSh_BallSelectOption.h"
 
-namespace PokemonAutomation {
-namespace NintendoSwitch {
-namespace PokemonSV {
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace PokemonSV{
 
-class StatsResetBloodmoon_Descriptor : public SingleSwitchProgramDescriptor {
+
+class StatsResetBloodmoon_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     StatsResetBloodmoon_Descriptor();
 
@@ -26,7 +27,7 @@ public:
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
-class StatsResetBloodmoon : public SingleSwitchProgramInstance {
+class StatsResetBloodmoon : public SingleSwitchProgramInstance{
 public:
     StatsResetBloodmoon();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
@@ -35,7 +36,9 @@ private:
     OCR::LanguageOCROption LANGUAGE;
     PokemonSwSh::PokemonBallSelectOption BALL_SELECT;
     BooleanCheckBoxOption TRY_TO_TERASTILLIZE;
-    Pokemon::StatsHuntFilterTable FILTERS;
+
+    Pokemon::StatsHuntIvJudgeFilterTable FILTERS;
+    Pokemon::StatsHuntIvRangeFilterTable FILTERS0;  //  REMOVE: Temporary for development
 
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
