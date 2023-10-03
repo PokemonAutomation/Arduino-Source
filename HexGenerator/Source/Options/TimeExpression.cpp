@@ -40,7 +40,7 @@ TimeExpression::TimeExpression(const JsonObject& obj)
     : SingleStatementOption(obj)
     , m_option(
         SingleStatementOption::m_label,
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         obj.get_integer_throw(JSON_MIN_VALUE),
         obj.get_integer_throw(JSON_MAX_VALUE),

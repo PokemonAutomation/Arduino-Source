@@ -67,7 +67,7 @@ PlatformResetSettings::PlatformResetSettings()
     , RESET_DURATION_MINUTES(
         "<b>Reset Duration (minutes):</b><br>If you are resetting, reset the game every "
         "this many minutes.",
-        LockWhileRunning::UNLOCK_WHILE_RUNNING,
+        LockMode::UNLOCK_WHILE_RUNNING,
         180
     )
 #endif
