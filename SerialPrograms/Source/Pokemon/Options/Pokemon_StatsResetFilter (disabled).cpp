@@ -13,7 +13,7 @@ namespace Pokemon{
 
 StatsResetFilterRow::StatsResetFilterRow()
     : action(StatsHuntAction::StopProgram)
-    , nature(NatureCheckerFilter_Database(), LockWhileRunning::LOCKED, NatureCheckerFilter::Any)
+    , nature(NatureCheckerFilter_Database(), LockMode::LOCK_WHILE_RUNNING, NatureCheckerFilter::Any)
     , iv_hp(IvJudgeFilter::Anything)
     , iv_atk(IvJudgeFilter::Anything)
     , iv_def(IvJudgeFilter::Anything)
@@ -47,7 +47,7 @@ StatsResetFilterTable::StatsResetFilterTable()
         "<b>Actions Table:</b><br>"
         "If the caught Pokemon matches one of these filters, the program will stop. "
         "IV checking requires that your right panel be set to the IV Judge and that you have selected the correct game language above.",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         make_defaults()
     )
 {}
