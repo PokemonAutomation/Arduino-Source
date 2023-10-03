@@ -508,7 +508,10 @@ bool StatsResetBloodmoon::check_stats_after_win(SingleSwitchProgramEnvironment& 
             StatsResetBloodmoon_Descriptor::Stats& stats = env.current_stats<StatsResetBloodmoon_Descriptor::Stats>();
             stats.errors++;
             env.update_stats();
-            throw UserSetupError(env.logger(), "Did not detect add-to-party prompt. Make sure your party is full and \"Send to Boxes\" to \"Manual\".");
+            throw UserSetupError(
+                env.logger(),
+                "Did not detect add-to-party prompt. Make sure your party is full and \"Send to Boxes\" is set to \"Manual\"."
+            );
         }
         default:
             StatsResetBloodmoon_Descriptor::Stats& stats = env.current_stats<StatsResetBloodmoon_Descriptor::Stats>();
