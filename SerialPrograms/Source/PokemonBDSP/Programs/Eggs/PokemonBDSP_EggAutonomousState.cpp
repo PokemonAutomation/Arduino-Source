@@ -228,7 +228,7 @@ bool EggAutonomousState::process_party(){
         StatsHuntGenderFilter gender = read_gender_from_box(m_console, m_console, screen);
         NatureReader::Results nature = nature_detector.read(m_console.logger(), screen);
 
-        StatsHuntAction action = m_filters.get_action(shiny, IVs, gender, nature);
+        StatsHuntAction action = m_filters.get_action(shiny, gender, nature.nature, IVs);
 
         switch (action){
         case StatsHuntAction::StopProgram:

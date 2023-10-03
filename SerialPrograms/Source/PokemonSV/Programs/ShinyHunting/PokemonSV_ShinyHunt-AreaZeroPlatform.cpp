@@ -384,7 +384,7 @@ void ShinyHuntAreaZeroPlatform::run_state(SingleSwitchProgramEnvironment& env, B
     }
 
     if (m_pending_platform_reset){
-        console.log("Executing: Platform Reset (time-based)...");
+        console.log("Executing: Platform Reset");
         return_to_inside_zero_gate(info, console, context);
         inside_zero_gate_to_platform(info, console, context, NAVIGATE_TO_PLATFORM);
         m_current_location = Location::AREA_ZERO;

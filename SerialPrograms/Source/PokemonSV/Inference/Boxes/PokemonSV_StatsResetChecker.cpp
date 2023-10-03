@@ -39,7 +39,7 @@ bool check_stats_reset_info(
     bool shiny = false;
 
     console.log(IVs.to_string(), COLOR_GREEN);
-    action = FILTERS.get_action(shiny, IVs, StatsHuntGenderFilter::Any, nature);
+    action = FILTERS.get_action(shiny, StatsHuntGenderFilter::Any, nature.nature, IVs);
 
     return shiny;
 }

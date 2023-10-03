@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSV_StatsResetBloodmoon_H
 #define PokemonAutomation_PokemonSV_StatsResetBloodmoon_H
 
-#include "Common/Cpp/Options/StaticTextOption.h"
+#include "Common/Cpp/Options/StringOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "CommonFramework/Options/LanguageOCROption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
@@ -19,18 +19,25 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
 
+using namespace Pokemon;
+
 
 class IvDisplay : public GroupOption{
 public:
     IvDisplay();
 
+    void set(const IvRanges& ivs);
+
 private:
-    StaticTextOption m_hp;
-    StaticTextOption m_atk;
-    StaticTextOption m_def;
-    StaticTextOption m_spatk;
-    StaticTextOption m_spdef;
-    StaticTextOption m_speed;
+    static std::string get_range_string(const IvRange& range);
+
+public:
+    StringOption hp;
+    StringOption atk;
+    StringOption def;
+    StringOption spatk;
+    StringOption spdef;
+    StringOption speed;
 };
 
 
@@ -48,13 +55,16 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
+    bool check_stats_after_win(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
+private:
+    IvDisplay CALCULATED_IVS;
 
     OCR::LanguageOCROption LANGUAGE;
     PokemonSwSh::PokemonBallSelectOption BALL_SELECT;
     BooleanCheckBoxOption TRY_TO_TERASTILLIZE;
 
-    Pokemon::StatsHuntIvJudgeFilterTable FILTERS;
+//    Pokemon::StatsHuntIvJudgeFilterTable FILTERS;
     Pokemon::StatsHuntIvRangeFilterTable FILTERS0;  //  REMOVE: Temporary for development
 
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;

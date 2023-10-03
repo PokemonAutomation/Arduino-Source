@@ -14,13 +14,15 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/PokemonSV_Settings.h"
+#include "PokemonSV/Inference/PokemonSV_PokemonSummaryReader.h"
+#include "PokemonSV/Inference/PokemonSV_StatHexagonReader.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_NormalBattleMenus.h"
+#include "PokemonSV/Inference/Battles/PokemonSV_TeraBattleMenus.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_StatsResetChecker.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_IvJudgeReader.h"
-#include "PokemonSV/Inference/Battles/PokemonSV_TeraBattleMenus.h"
-#include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
+//#include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSV/Programs/PokemonSV_BasicCatcher.h"
@@ -32,6 +34,43 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 using namespace Pokemon;
+
+
+
+IvDisplay::IvDisplay()
+    : GroupOption("Calculated IV Range", LockMode::READ_ONLY)
+    , hp(false, "<b>HP:</b>", LockMode::READ_ONLY, "-", "")
+    , atk(false, "<b>Attack:</b>", LockMode::READ_ONLY, "-", "")
+    , def(false, "<b>Defense:</b>", LockMode::READ_ONLY, "-", "")
+    , spatk(false, "<b>Special Attack:</b>", LockMode::READ_ONLY, "-", "")
+    , spdef(false, "<b>Special Defense:</b>", LockMode::READ_ONLY, "-", "")
+    , speed(false, "<b>Speed:</b>", LockMode::READ_ONLY, "-", "")
+{
+    PA_ADD_STATIC(hp);
+    PA_ADD_STATIC(atk);
+    PA_ADD_STATIC(def);
+    PA_ADD_STATIC(spatk);
+    PA_ADD_STATIC(spdef);
+    PA_ADD_STATIC(speed);
+}
+std::string IvDisplay::get_range_string(const IvRange& range){
+    if (range.low < 0 || range.high < 0){
+        return "(invalid or unable to read)";
+    }
+    if (range.low == range.high){
+        return std::to_string(range.low);
+    }
+    return std::to_string(range.low) + " - " + std::to_string(range.high);
+}
+void IvDisplay::set(const IvRanges& ivs){
+    hp.set(get_range_string(ivs.hp));
+    atk.set(get_range_string(ivs.attack));
+    def.set(get_range_string(ivs.defense));
+    spatk.set(get_range_string(ivs.spatk));
+    spdef.set(get_range_string(ivs.spdef));
+    speed.set(get_range_string(ivs.speed));
+}
+
 
 StatsResetBloodmoon_Descriptor::StatsResetBloodmoon_Descriptor()
     : SingleSwitchProgramDescriptor(
@@ -81,6 +120,7 @@ StatsResetBloodmoon::StatsResetBloodmoon()
         LockMode::UNLOCK_WHILE_RUNNING,
         false
     )
+#if 0
     , FILTERS(
         StatsHuntIvJudgeFilterTable_Label_Regular,
         {
@@ -90,8 +130,9 @@ StatsResetBloodmoon::StatsResetBloodmoon()
             .nature = false,
         }
     )
+#endif
     , FILTERS0(
-        StatsHuntIvJudgeFilterTable_Label_Regular,
+        StatsHuntIvRangeFilterTable_Label_Regular,
         {
             .action = false,
             .shiny = false,
@@ -107,6 +148,7 @@ StatsResetBloodmoon::StatsResetBloodmoon()
         & NOTIFICATION_ERROR_FATAL,
     })
 {
+#if 0
     {
         std::vector<std::unique_ptr<EditableTableRow>> ret;
         {
@@ -121,27 +163,31 @@ StatsResetBloodmoon::StatsResetBloodmoon()
         }
         FILTERS.set_default(std::move(ret));
     }
+#endif
     {
         std::vector<std::unique_ptr<EditableTableRow>> ret;
         {
-            auto row = std::make_unique<StatsHuntIvRangeFilterRow>(FILTERS.feature_flags);
+            auto row = std::make_unique<StatsHuntIvRangeFilterRow>(FILTERS0.feature_flags);
             row->iv_atk.set(0, 1);
             ret.emplace_back(std::move(row));
         }
         {
-            auto row = std::make_unique<StatsHuntIvRangeFilterRow>(FILTERS.feature_flags);
+            auto row = std::make_unique<StatsHuntIvRangeFilterRow>(FILTERS0.feature_flags);
             row->iv_speed.set(0, 1);
             ret.emplace_back(std::move(row));
         }
         FILTERS0.set_default(std::move(ret));
     }
+//    if (PreloadSettings::instance().DEVELOPER_MODE){
+        PA_ADD_STATIC(CALCULATED_IVS);
+//    }
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(BALL_SELECT);
     PA_ADD_OPTION(TRY_TO_TERASTILLIZE);
-    PA_ADD_OPTION(FILTERS);
-    if (PreloadSettings::instance().DEVELOPER_MODE){
+//    PA_ADD_OPTION(FILTERS);
+//    if (PreloadSettings::instance().DEVELOPER_MODE){
         PA_ADD_OPTION(FILTERS0);
-    }
+//    }
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
@@ -156,8 +202,7 @@ void StatsResetBloodmoon::enter_battle(SingleSwitchProgramEnvironment& env, BotB
     int ret = wait_until(env.console, context, Milliseconds(4000), { advance_detector });
     if (ret == 0){
         env.log("Dialog detected.");
-    }
-    else {
+    }else{
         env.log("Dialog not detected.");
     }
     //Yes, ready
@@ -174,8 +219,7 @@ void StatsResetBloodmoon::enter_battle(SingleSwitchProgramEnvironment& env, BotB
         );
     if (retPrompt != 0){
         env.log("Failed to detect prompt dialog!", COLOR_RED);
-    }
-    else {
+    }else{
         env.log("Detected prompt dialog.");
     }
     context.wait_for_all_requests();
@@ -195,8 +239,7 @@ void StatsResetBloodmoon::enter_battle(SingleSwitchProgramEnvironment& env, BotB
         );
     if (retPrompt2 != 0){
         env.log("Failed to detect prompt (again) dialog!", COLOR_RED);
-    }
-    else {
+    }else{
         env.log("Detected prompt (again) dialog.");
     }
     context.wait_for_all_requests();
@@ -215,8 +258,7 @@ void StatsResetBloodmoon::enter_battle(SingleSwitchProgramEnvironment& env, BotB
         );
     if (ret_battle != 0){
         env.log("Failed to detect battle start!", COLOR_RED);
-    }
-    else {
+    }else{
         env.log("Battle started.");
     }
     context.wait_for_all_requests();
@@ -321,8 +363,7 @@ bool StatsResetBloodmoon::run_battle(SingleSwitchProgramEnvironment& env, BotBas
         stats.catches++;
         env.update_stats();
         env.log("Ursaluna caught.");
-    }
-    else {
+    }else{
         env.log("Battle against Ursaluna lost.", COLOR_RED);
         env.update_stats();
         send_program_status_notification(
@@ -335,6 +376,7 @@ bool StatsResetBloodmoon::run_battle(SingleSwitchProgramEnvironment& env, BotBas
     return true;
 }
 
+#if 0
 bool StatsResetBloodmoon::check_stats(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     StatsResetBloodmoon_Descriptor::Stats& stats = env.current_stats<StatsResetBloodmoon_Descriptor::Stats>();
     bool match = false;
@@ -350,8 +392,7 @@ bool StatsResetBloodmoon::check_stats(SingleSwitchProgramEnvironment& env, BotBa
             env, NOTIFICATION_STATUS_UPDATE,
             "One or more empty slots in party. Ursaluna was not caught."
         );
-    }
-    else {
+    }else{
         //Navigate to last party slot
         move_box_cursor(env.program_info(), env.console, context, BoxCursorLocation::PARTY, 5, 0);
 
@@ -392,6 +433,96 @@ bool StatsResetBloodmoon::check_stats(SingleSwitchProgramEnvironment& env, BotBa
 
     return match;
 }
+#endif
+
+bool StatsResetBloodmoon::check_stats_after_win(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+#if 0
+    //  Clear out dialog until we're free
+    OverworldWatcher overworld(COLOR_YELLOW);
+    int retOverworld = run_until(
+        env.console, context,
+        [](BotBaseContext& context){
+            pbf_mash_button(context, BUTTON_B, 10000);
+        },
+        { overworld }
+        );
+    if (retOverworld != 0){
+        env.log("Failed to detect overworld after catching.", COLOR_RED);
+    }else{
+        env.log("Detected overworld.");
+    }
+    context.wait_for_all_requests();
+    return check_stats(env, context);
+#else
+
+    while (true){
+        PromptDialogWatcher add_to_party(COLOR_PURPLE, {0.500, 0.395, 0.400, 0.100});
+        PromptDialogWatcher view_summary(COLOR_PURPLE, {0.500, 0.470, 0.400, 0.100});
+        PromptDialogWatcher nickname(COLOR_GREEN, {0.500, 0.545, 0.400, 0.100});
+        PokemonSummaryWatcher summary(COLOR_MAGENTA);
+        AdvanceDialogWatcher advance(COLOR_YELLOW);
+        context.wait_for_all_requests();
+        int ret = wait_until(
+            env.console, context, std::chrono::seconds(60),
+            {
+                add_to_party,
+                view_summary,
+                nickname,
+                summary,
+                advance,
+            }
+        );
+        switch (ret){
+        case 0:
+            env.console.log("Detected add-to-party prompt.");
+            pbf_press_dpad(context, DPAD_DOWN, 20, 60);
+            continue;
+        case 1:
+            env.console.log("Detected cursor over view summary.");
+            pbf_press_button(context, BUTTON_A, 20, 105);
+            continue;
+        case 2:
+            env.console.log("Detected nickname prompt.");
+            pbf_press_button(context, BUTTON_B, 20, 105);
+            continue;
+        case 3:{
+            env.console.log("Detected summary.");
+            VideoOverlaySet overlays(env.console.overlay());
+
+            SummaryStatsReader reader;
+            reader.make_overlays(overlays);
+
+            pbf_press_dpad(context, DPAD_RIGHT, 20, 230);
+            context.wait_for_all_requests();
+
+            auto snapshot = env.console.video().snapshot();
+            IvRanges ivs = reader.calc_ivs(env.logger(), snapshot, {113, 70, 120, 135, 65, 52});
+
+            CALCULATED_IVS.set(ivs);
+
+            StatsHuntAction action = FILTERS0.get_action(false, StatsHuntGenderFilter::Any, NatureCheckerValue::Hardy, ivs);
+
+            return action != StatsHuntAction::Discard;
+        }
+        case 4:{
+            StatsResetBloodmoon_Descriptor::Stats& stats = env.current_stats<StatsResetBloodmoon_Descriptor::Stats>();
+            stats.errors++;
+            env.update_stats();
+            throw UserSetupError(env.logger(), "Did not detect add-to-party prompt. Make sure your party is full and \"Send to Boxes\" to \"Manual\".");
+        }
+        default:
+            StatsResetBloodmoon_Descriptor::Stats& stats = env.current_stats<StatsResetBloodmoon_Descriptor::Stats>();
+            stats.errors++;
+            env.update_stats();
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, env.console,
+                "StatsResetBloodmoon::check_stats_after_win(): No state detected after 1 minute."
+            );
+        }
+    }
+
+#endif
+}
 
 void StatsResetBloodmoon::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
@@ -408,45 +539,38 @@ void StatsResetBloodmoon::program(SingleSwitchProgramEnvironment& env, BotBaseCo
     //  Connect the controller.
     pbf_press_button(context, BUTTON_L, 10, 10);
 
-    bool stats_matched = false;
-    while (!stats_matched){
+    while (true){
         enter_battle(env, context);
-        bool battle_won = run_battle(env, context);
-        if (battle_won){
-            //Clear out dialog until we're free
-            OverworldWatcher overworld(COLOR_YELLOW);
-            int retOverworld = run_until(
-                env.console, context,
-                [](BotBaseContext& context){
-                    pbf_mash_button(context, BUTTON_B, 10000);
-                },
-                { overworld }
-                );
-            if (retOverworld != 0){
-                env.log("Failed to detect overworld after catching.", COLOR_RED);
-            }
-            else {
-                env.log("Detected overworld.");
-            }
-            context.wait_for_all_requests();
-            stats_matched = check_stats(env, context);
+        if (run_battle(env, context) && check_stats_after_win(env, context)){
+            break;
         }
 
-        if (!battle_won || !stats_matched){
-            //Reset
-            stats.resets++;
-            env.update_stats();
-            send_program_status_notification(
-                env, NOTIFICATION_STATUS_UPDATE,
-                "Resetting game."
-            );
-            pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
-            reset_game_from_home(env.program_info(), env.console, context, 5 * TICKS_PER_SECOND);
-        }
+        //  Reset
+        stats.resets++;
+        env.update_stats();
+        send_program_status_notification(
+            env, NOTIFICATION_STATUS_UPDATE,
+            "Resetting game."
+        );
+        pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+        reset_game_from_home(env.program_info(), env.console, context, 5 * TICKS_PER_SECOND);
     }
     env.update_stats();
+
+    auto snapshot = env.console.video().snapshot();
+
     GO_HOME_WHEN_DONE.run_end_of_program(context);
-    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
+    send_program_finished_notification(
+        env, NOTIFICATION_PROGRAM_FINISH,
+        "HP: " + (std::string)CALCULATED_IVS.hp + "\n" +
+        "Atk: " + (std::string)CALCULATED_IVS.atk + "\n" +
+        "Def: " + (std::string)CALCULATED_IVS.def + "\n" +
+        "SpAtk: " + (std::string)CALCULATED_IVS.spatk + "\n" +
+        "SpDef: " + (std::string)CALCULATED_IVS.spdef + "\n" +
+        "Speed: " + (std::string)CALCULATED_IVS.speed,
+        snapshot,
+        true
+    );
 }
     
 }

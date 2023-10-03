@@ -630,7 +630,7 @@ bool EggAutonomous::process_hatched_pokemon(SingleSwitchProgramEnvironment& env,
             env.log("Gender: " + gender_to_string(gender), COLOR_GREEN);
             NatureReader::Results nature = nature_detector.read(env.console.logger(), screen);
 
-            StatsHuntAction action = FILTERS.get_action(shiny, IVs, gender, nature);
+            StatsHuntAction action = FILTERS.get_action(shiny, gender, nature.nature, IVs);
 
             auto send_keep_notification = [&](){
                 if (!shiny){

@@ -26,7 +26,7 @@ std::string gender_to_string(StatsHuntGenderFilter gender){
 }
 
 
-const EnumDatabase<StatsHuntAction>& EggHatchAction_Database(){
+const EnumDatabase<StatsHuntAction>& StatsHuntAction_Database(){
     static const EnumDatabase<StatsHuntAction> database({
         {StatsHuntAction::StopProgram,   "stop",     "Stop Program"},
         {StatsHuntAction::Keep,          "keep",     "Keep"},
@@ -34,7 +34,7 @@ const EnumDatabase<StatsHuntAction>& EggHatchAction_Database(){
     });
     return database;
 }
-const EnumDatabase<StatsHuntShinyFilter>& EggHatchShinyFilter_Database(){
+const EnumDatabase<StatsHuntShinyFilter>& StatsHuntShinyFilter_Database(){
     static const EnumDatabase<StatsHuntShinyFilter> database({
         {StatsHuntShinyFilter::Anything, "anything",     "Anything"},
         {StatsHuntShinyFilter::NotShiny, "not-shiny",    "Not Shiny"},
@@ -42,7 +42,7 @@ const EnumDatabase<StatsHuntShinyFilter>& EggHatchShinyFilter_Database(){
     });
     return database;
 }
-const EnumDatabase<StatsHuntGenderFilter>& EggHatchGenderFilter_Database(){
+const EnumDatabase<StatsHuntGenderFilter>& StatsHuntGenderFilter_Database(){
     static const EnumDatabase<StatsHuntGenderFilter> database({
         {StatsHuntGenderFilter::Any,         "any",          "Any"},
         {StatsHuntGenderFilter::Male,        "male",         "Male"},
@@ -74,16 +74,54 @@ const char* StatsHuntIvJudgeFilterTable_Label_Regular =
 
 StatsHuntRowMisc::StatsHuntRowMisc(const StatsHuntMiscFeatureFlags& p_feature_flags)
     : feature_flags(p_feature_flags)
-    , action(EggHatchAction_Database(), LockMode::LOCK_WHILE_RUNNING, StatsHuntAction::Keep)
-    , shiny(EggHatchShinyFilter_Database(), LockMode::LOCK_WHILE_RUNNING, StatsHuntShinyFilter::Anything)
-    , gender(EggHatchGenderFilter_Database(), LockMode::LOCK_WHILE_RUNNING, StatsHuntGenderFilter::Any)
-    , nature(NatureCheckerFilter_Database(), LockMode::LOCK_WHILE_RUNNING, NatureCheckerFilter::Any)
+    , action(
+          StatsHuntAction_Database(),
+        LockMode::UNLOCK_WHILE_RUNNING,
+        feature_flags.action
+            ? StatsHuntAction::Keep
+            : StatsHuntAction::StopProgram
+    )
+    , shiny(StatsHuntShinyFilter_Database(), LockMode::UNLOCK_WHILE_RUNNING, StatsHuntShinyFilter::Anything)
+    , gender(StatsHuntGenderFilter_Database(), LockMode::UNLOCK_WHILE_RUNNING, StatsHuntGenderFilter::Any)
+    , nature(NatureCheckerFilter_Database(), LockMode::UNLOCK_WHILE_RUNNING, NatureCheckerFilter::Any)
 {}
 void StatsHuntRowMisc::set(const StatsHuntRowMisc& x){
     action.set(x.action);
     shiny.set(x.shiny);
     gender.set(x.gender);
     nature.set(x.nature);
+}
+bool StatsHuntRowMisc::matches(
+    bool shiny,
+    StatsHuntGenderFilter gender,
+    NatureCheckerValue nature
+) const{
+    //  Check the shiny filter.
+    switch (this->shiny){
+    case StatsHuntShinyFilter::Anything:
+        break;
+    case StatsHuntShinyFilter::NotShiny:
+        if (shiny){
+            return false;
+        }
+        break;
+    case StatsHuntShinyFilter::Shiny:
+        if (!shiny){
+            return false;
+        }
+        break;
+    }
+
+    StatsHuntGenderFilter filter_gender = this->gender;
+    if (filter_gender != gender && filter_gender != StatsHuntGenderFilter::Any){
+        return false;
+    }
+
+    if (!NatureChecker_filter_match(this->nature, nature)){
+        return false;
+    }
+
+    return true;
 }
 
 
@@ -128,24 +166,12 @@ std::unique_ptr<EditableTableRow> StatsHuntIvJudgeFilterRow::clone() const{
 }
 bool StatsHuntIvJudgeFilterRow::matches(
     bool shiny,
-    const IvJudgeReader::Results& IVs,
     StatsHuntGenderFilter gender,
-    NatureReader::Results nature
+    NatureCheckerValue nature,
+    const IvJudgeReader::Results& IVs
 ) const{
-    //  Check the shiny filter.
-    switch (misc.shiny){
-    case StatsHuntShinyFilter::Anything:
-        break;
-    case StatsHuntShinyFilter::NotShiny:
-        if (shiny){
-            return false;
-        }
-        break;
-    case StatsHuntShinyFilter::Shiny:
-        if (!shiny){
-            return false;
-        }
-        break;
+    if (!misc.matches(shiny, gender, nature)){
+        return false;
     }
 
     //  Check all the IV filters.
@@ -156,15 +182,6 @@ bool StatsHuntIvJudgeFilterRow::matches(
     if (!IvJudge_filter_match(iv_spdef, IVs.spdef)) return false;
     if (!IvJudge_filter_match(iv_speed, IVs.speed)) return false;
 
-    StatsHuntGenderFilter filter_gender = misc.gender;
-    if (filter_gender != gender && filter_gender != StatsHuntGenderFilter::Any){
-        return false;
-    }
-
-    if (!NatureChecker_filter_match(misc.nature, nature.nature)){
-        return false;
-    }
-
     return true;
 }
 
@@ -172,7 +189,7 @@ StatsHuntIvJudgeFilterTable::StatsHuntIvJudgeFilterTable(
     const std::string& label,
     const StatsHuntMiscFeatureFlags& p_feature_flags
 )
-    : EditableTableOption_t<StatsHuntIvJudgeFilterRow>(label, LockMode::LOCK_WHILE_RUNNING)
+    : EditableTableOption_t<StatsHuntIvJudgeFilterRow>(label, LockMode::UNLOCK_WHILE_RUNNING)
     , feature_flags(p_feature_flags)
 {
     set_default(make_defaults());
@@ -210,16 +227,16 @@ std::vector<std::unique_ptr<EditableTableRow>> StatsHuntIvJudgeFilterTable::make
 }
 StatsHuntAction StatsHuntIvJudgeFilterTable::get_action(
     bool shiny,
-    const IvJudgeReader::Results& IVs,
     StatsHuntGenderFilter gender,
-    NatureReader::Results nature
+    NatureCheckerValue nature,
+    const IvJudgeReader::Results& IVs
 ) const{
     StatsHuntAction action = StatsHuntAction::Discard;
     std::vector<std::unique_ptr<StatsHuntIvJudgeFilterRow>> list = copy_snapshot();
     for (size_t c = 0; c < list.size(); c++){
         const StatsHuntIvJudgeFilterRow& filter = *list[c];
 
-        if (!filter.matches(shiny, IVs, gender, nature)){
+        if (!filter.matches(shiny, gender, nature, IVs)){
             continue;
         }
 
@@ -240,6 +257,14 @@ StatsHuntAction StatsHuntIvJudgeFilterTable::get_action(
     return action;
 }
 
+
+
+
+
+const char* StatsHuntIvRangeFilterTable_Label_Regular =
+    "<b>Stop Conditions:</b><br>"
+    "If the Pok\u00e9mon matches one of these filters, the program will stop.<br>"
+    "Partially overlapping IV ranges will count as a match. So if a filter is for 0-1, but the IV calculation returns a range 1-2, it will count.";
 
 
 
@@ -277,12 +302,49 @@ std::unique_ptr<EditableTableRow> StatsHuntIvRangeFilterRow::clone() const{
     ret->iv_speed.set(iv_speed);
     return ret;
 }
+bool StatsHuntIvRangeFilterRow::match_iv(const IvRange& desired, const IvRange& actual){
+    if (desired.low == 0 && desired.high == 31){
+        return true;
+    }
+    if (actual.high < desired.low){
+        return false;
+    }
+    if (desired.high < actual.low){
+        return false;
+    }
+    return true;
+}
+bool StatsHuntIvRangeFilterRow::match_iv(const IntegerRangeCell<uint8_t>& desired, const IvRange& actual){
+    uint8_t lo, hi;
+    desired.current_values(lo, hi);
+    return match_iv(IvRange{(int8_t)lo, (int8_t)hi}, actual);
+}
+bool StatsHuntIvRangeFilterRow::matches(
+    bool shiny,
+    StatsHuntGenderFilter gender,
+    NatureCheckerValue nature,
+    const IvRanges& IVs
+) const{
+    if (!misc.matches(shiny, gender, nature)){
+        return false;
+    }
+
+    if (!match_iv(iv_hp, IVs.hp)) return false;
+    if (!match_iv(iv_atk, IVs.attack)) return false;
+    if (!match_iv(iv_def, IVs.defense)) return false;
+    if (!match_iv(iv_spatk, IVs.spatk)) return false;
+    if (!match_iv(iv_spdef, IVs.spdef)) return false;
+    if (!match_iv(iv_speed, IVs.speed)) return false;
+
+    return true;
+}
+
 
 StatsHuntIvRangeFilterTable::StatsHuntIvRangeFilterTable(
     const std::string& label,
     const StatsHuntMiscFeatureFlags& p_feature_flags
 )
-    : EditableTableOption_t<StatsHuntIvRangeFilterRow>(label, LockMode::LOCK_WHILE_RUNNING)
+    : EditableTableOption_t<StatsHuntIvRangeFilterRow>(label, LockMode::UNLOCK_WHILE_RUNNING)
     , feature_flags(p_feature_flags)
 {
 //    set_default(make_defaults());
@@ -302,29 +364,45 @@ std::vector<std::string> StatsHuntIvRangeFilterTable::make_header() const{
         ret.emplace_back("Nature");
     }
 
-#if 1
     ret.emplace_back("HP");
     ret.emplace_back("Atk");
     ret.emplace_back("Def");
     ret.emplace_back("SpAtk");
     ret.emplace_back("SpDef");
     ret.emplace_back("Spd");
-#else
-    ret.emplace_back("HP (low)");
-    ret.emplace_back("HP (high)");
-    ret.emplace_back("Atk (low)");
-    ret.emplace_back("Atk (high)");
-    ret.emplace_back("Def (low)");
-    ret.emplace_back("Def (high)");
-    ret.emplace_back("SpAtk (low)");
-    ret.emplace_back("SpAtk (high)");
-    ret.emplace_back("SpDef (low)");
-    ret.emplace_back("SpDef (high)");
-    ret.emplace_back("Spd (low)");
-    ret.emplace_back("Spd (high)");
-#endif
 
     return ret;
+}
+StatsHuntAction StatsHuntIvRangeFilterTable::get_action(
+    bool shiny,
+    StatsHuntGenderFilter gender,
+    NatureCheckerValue nature,
+    const IvRanges& IVs
+) const{
+    StatsHuntAction action = StatsHuntAction::Discard;
+    std::vector<std::unique_ptr<StatsHuntIvRangeFilterRow>> list = copy_snapshot();
+    for (size_t c = 0; c < list.size(); c++){
+        const StatsHuntIvRangeFilterRow& filter = *list[c];
+
+        if (!filter.matches(shiny, gender, nature, IVs)){
+            continue;
+        }
+
+        StatsHuntAction filter_action = filter.misc.action;
+
+        //  No action matched so far. Take the current action and continue.
+        if (action == StatsHuntAction::Discard){
+            action = filter_action;
+            continue;
+        }
+
+        //  Conflicting actions.
+        if (action != filter_action){
+            global_logger_tagged().log("Multiple filters matched with conflicting actions. Stopping program...", COLOR_RED);
+            return StatsHuntAction::StopProgram;
+        }
+    }
+    return action;
 }
 
 

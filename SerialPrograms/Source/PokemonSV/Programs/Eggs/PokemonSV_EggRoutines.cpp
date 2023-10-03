@@ -636,7 +636,7 @@ bool check_baby_info(
     console.log("Gender: " + gender_to_string(gender), COLOR_GREEN);
     console.log("Nature: " + nature.to_string(), COLOR_GREEN);
 
-    action = FILTERS.get_action(shiny, IVs, gender, nature);
+    action = FILTERS.get_action(shiny, gender, nature.nature, IVs);
 
     return shiny;
 }

@@ -61,6 +61,12 @@ struct StatsHuntRowMisc{
     StatsHuntRowMisc(const StatsHuntMiscFeatureFlags& p_feature_flags);
     void set(const StatsHuntRowMisc& x);
 
+    bool matches(
+        bool shiny,
+        StatsHuntGenderFilter gender,
+        NatureCheckerValue nature
+    ) const;
+
     const StatsHuntMiscFeatureFlags& feature_flags;
 
     EnumDropdownCell<StatsHuntAction> action;
@@ -82,9 +88,9 @@ public:
 
     bool matches(
         bool shiny,
-        const IvJudgeReader::Results& IVs,
         StatsHuntGenderFilter gender,
-        NatureReader::Results nature
+        NatureCheckerValue nature,
+        const IvJudgeReader::Results& IVs
     ) const;
 
 public:
@@ -108,9 +114,9 @@ public:
 
     StatsHuntAction get_action(
         bool shiny,
-        const IvJudgeReader::Results& IVs,
         StatsHuntGenderFilter gender,
-        NatureReader::Results nature
+        NatureCheckerValue nature,
+        const IvJudgeReader::Results& IVs
     ) const;
 
 public:
@@ -123,6 +129,11 @@ public:
 
 
 
+
+//  Preset labels.
+extern const char* StatsHuntIvRangeFilterTable_Label_Regular;
+
+
 class StatsHuntIvRangeFilterTable;
 class StatsHuntIvRangeFilterRow : public EditableTableRow{
 public:
@@ -132,10 +143,14 @@ public:
 
     bool matches(
         bool shiny,
-        const IvRanges& IVs,
         StatsHuntGenderFilter gender,
-        NatureReader::Results nature
+        NatureCheckerValue nature,
+        const IvRanges& IVs
     ) const;
+
+private:
+    static bool match_iv(const IvRange& desired, const IvRange& actual);
+    static bool match_iv(const IntegerRangeCell<uint8_t>& desired, const IvRange& actual);
 
 public:
     StatsHuntRowMisc misc;
@@ -158,9 +173,9 @@ public:
 
     StatsHuntAction get_action(
         bool shiny,
-        const IvRanges& IVs,
         StatsHuntGenderFilter gender,
-        NatureReader::Results nature
+        NatureCheckerValue nature,
+        const IvRanges& IVs
     ) const;
 
 public:
