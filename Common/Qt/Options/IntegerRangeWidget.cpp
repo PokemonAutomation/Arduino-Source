@@ -37,8 +37,8 @@ IntegerRangeCellWidget<Type>::IntegerRangeCellWidget(QWidget& parent, IntegerRan
     m_hi->setText(QString::number(hi));
 
     if (sizeof(Type) <= 1){
-        m_lo->setMaximumWidth(50);
-        m_hi->setMaximumWidth(50);
+        m_lo->setMaximumWidth(30);
+        m_hi->setMaximumWidth(30);
     }
 
     connect(
