@@ -455,6 +455,9 @@ bool StatsResetBloodmoon::check_stats_after_win(SingleSwitchProgramEnvironment& 
     return check_stats(env, context);
 #else
 
+    // If this is the first advance dialog, it might be linked to pokedex filling so press A and continue
+    bool first_advance_dialog = true;
+
     while (true){
         PromptDialogWatcher add_to_party(COLOR_PURPLE, {0.500, 0.395, 0.400, 0.100});
         PromptDialogWatcher view_summary(COLOR_PURPLE, {0.500, 0.470, 0.400, 0.100});
@@ -505,13 +508,21 @@ bool StatsResetBloodmoon::check_stats_after_win(SingleSwitchProgramEnvironment& 
             return action != StatsHuntAction::Discard;
         }
         case 4:{
-            StatsResetBloodmoon_Descriptor::Stats& stats = env.current_stats<StatsResetBloodmoon_Descriptor::Stats>();
-            stats.errors++;
-            env.update_stats();
-            throw UserSetupError(
-                env.logger(),
-                "Did not detect add-to-party prompt. Make sure your party is full and \"Send to Boxes\" is set to \"Manual\"."
-            );
+            if (first_advance_dialog){
+                env.console.log("Pressing continue, in case it's a new pokedex entry.");
+                pbf_press_button(context, BUTTON_A, 20, 105);
+                first_advance_dialog = false;
+                continue;
+            }
+            else{
+                StatsResetBloodmoon_Descriptor::Stats& stats = env.current_stats<StatsResetBloodmoon_Descriptor::Stats>();
+                stats.errors++;
+                env.update_stats();
+                throw UserSetupError(
+                    env.logger(),
+                    "Did not detect add-to-party prompt. Make sure your party is full and \"Send to Boxes\" is set to \"Manual\"."
+                );
+            }
         }
         default:
             StatsResetBloodmoon_Descriptor::Stats& stats = env.current_stats<StatsResetBloodmoon_Descriptor::Stats>();
@@ -530,14 +541,6 @@ bool StatsResetBloodmoon::check_stats_after_win(SingleSwitchProgramEnvironment& 
 void StatsResetBloodmoon::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
     StatsResetBloodmoon_Descriptor::Stats& stats = env.current_stats<StatsResetBloodmoon_Descriptor::Stats>();
-
-    /*
-    * Autosave: Off
-    * 5 pokemon in party so that last slot is free.
-    * Start standing in front of Perrin.
-    * Must be able to reliably kill Ursaluna by spamming your first move.
-    * Tested using Walking Wake w/Hydro Stream, two turn kill.
-    */
 
     //  Connect the controller.
     pbf_press_button(context, BUTTON_L, 10, 10);
