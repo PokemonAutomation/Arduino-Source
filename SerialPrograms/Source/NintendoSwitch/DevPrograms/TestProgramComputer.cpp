@@ -235,6 +235,16 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 //    using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
 
 
+
+
+    ImageRGB32 image("screenshot-20231003-202430049819.png");
+    PokemonSummaryDetector detector;
+    cout << detector.detect(image) << endl;
+
+
+
+
+
 #if 0
     uint8_t low_iv;
     uint8_t high_iv;

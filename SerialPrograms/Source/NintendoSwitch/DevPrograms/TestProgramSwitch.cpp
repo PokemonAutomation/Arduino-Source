@@ -237,12 +237,19 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
+//    ImageRGB32 image("screenshot-20231003-202430049819.png");
+    auto snapshot = console.video().snapshot();
+
+    PokemonSummaryDetector detector;
+    cout << detector.detect(snapshot) << endl;
+
+
+#if 0
     SummaryStatsReader reader;
     reader.make_overlays(overlays);
 
     auto snapshot = console.video().snapshot();
 
-#if 1
     NatureAdjustments nature = reader.read_nature(logger, snapshot);
     cout << "attack     = " << (int)nature.attack << endl;
     cout << "defense    = " << (int)nature.defense << endl;
