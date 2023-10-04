@@ -372,13 +372,19 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, BotBaseCo
 
                 GradientArrowWatcher switch_pokemon(COLOR_BLUE, GradientArrowType::RIGHT, {0.50, 0.40, 0.20, 0.30});
                 NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
+                MoveSelectWatcher move_select(COLOR_GREEN);
                 SwapMenuWatcher fainted(COLOR_RED);
                 context.wait_for_all_requests();
 
                 int ret = wait_until(
                     env.console, context,
                     std::chrono::seconds(90), //Tera takes ~25 to 30 seconds each, slightly over 60 seconds if both player and opponent uses in the same turn
-                    { switch_pokemon, battle_menu, fainted } //End of battle from tera'd ace takes longer, 45 seconds was not enough
+                    {
+                        switch_pokemon,
+                        battle_menu,
+                        move_select,
+                        fainted,
+                    }   //End of battle from tera'd ace takes longer, 45 seconds was not enough
                 );
                 switch (ret){
                 case 0:
@@ -390,6 +396,10 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, BotBaseCo
                     pbf_mash_button(context, BUTTON_A, 3 * TICKS_PER_SECOND);
                     break;
                 case 2:
+                    env.log("Detected move selection. Pressing A to attack...");
+                    pbf_mash_button(context, BUTTON_A, 3 * TICKS_PER_SECOND);
+                    break;
+                case 3:
                     // Since we can't run from the tournament, loop through all party Pokemon spamming their first move.
                     env.log("Detected fainted " + STRING_POKEMON + ". Switching to next living " + STRING_POKEMON + "...");
                     if (fainted.move_to_slot(env.console, context, switch_party_slot)){
