@@ -221,7 +221,7 @@ std::vector<std::string> StatsHuntIvJudgeFilterTable::make_header() const{
 std::vector<std::unique_ptr<EditableTableRow>> StatsHuntIvJudgeFilterTable::make_defaults() const{
     std::vector<std::unique_ptr<EditableTableRow>> ret;
     if (feature_flags.shiny){
-        ret.emplace_back(new StatsHuntIvJudgeFilterRow(this));
+        ret.emplace_back(new StatsHuntIvJudgeFilterRow(feature_flags, StatsHuntShinyFilter::Shiny));
     }
     return ret;
 }
