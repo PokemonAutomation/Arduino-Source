@@ -32,6 +32,9 @@ ScreenshotException::ScreenshotException(ErrorReport error_report, ConsoleHandle
         }
     }
 }
+void ScreenshotException::attach_screenshot(std::shared_ptr<const ImageRGB32> screenshot){
+    m_screenshot = std::move(screenshot);
+}
 ImageViewRGB32 ScreenshotException::screenshot() const{
     if (m_screenshot){
         return *m_screenshot;

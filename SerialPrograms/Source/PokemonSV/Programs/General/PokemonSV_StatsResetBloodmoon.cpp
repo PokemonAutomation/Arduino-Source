@@ -144,8 +144,9 @@ StatsResetBloodmoon::StatsResetBloodmoon()
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS_UPDATE,
-        & NOTIFICATION_PROGRAM_FINISH,
-        & NOTIFICATION_ERROR_FATAL,
+        &NOTIFICATION_PROGRAM_FINISH,
+        &NOTIFICATION_ERROR_RECOVERABLE,
+        &NOTIFICATION_ERROR_FATAL,
     })
 {
 #if 0
@@ -499,7 +500,17 @@ bool StatsResetBloodmoon::check_stats_after_win(SingleSwitchProgramEnvironment& 
             context.wait_for_all_requests();
 
             auto snapshot = env.console.video().snapshot();
-            IvRanges ivs = reader.calc_ivs(env.logger(), snapshot, {113, 70, 120, 135, 65, 52});
+            IvRanges ivs;
+            try{
+                ivs = reader.calc_ivs(env.logger(), snapshot, {113, 70, 120, 135, 65, 52});
+            }catch (OperationFailedException& e){
+                send_program_recoverable_error_notification(
+                    env, NOTIFICATION_ERROR_RECOVERABLE,
+                    e.message(),
+                    snapshot
+                );
+                return false;
+            }
 
             CALCULATED_IVS.set(ivs);
 
@@ -578,7 +589,7 @@ void StatsResetBloodmoon::program(SingleSwitchProgramEnvironment& env, BotBaseCo
         true
     );
 }
-    
+
 }
 }
 }

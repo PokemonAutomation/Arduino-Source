@@ -125,6 +125,7 @@
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_BattleMenu.h"
 #include "PokemonSV/Inference/PokemonSV_PokemonSummaryReader.h"
 #include "Pokemon/Pokemon_StatsCalculation.h"
+#include "PokemonSV/Inference/PokemonSV_StatHexagonReader.h"
 
 #ifdef PA_ARCH_x86
 //#include "Kernels/Kernels_x64_SSE41.h"
@@ -237,10 +238,16 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 
 
 
-    ImageRGB32 image("screenshot-20231003-202430049819.png");
-    PokemonSummaryDetector detector;
-    cout << detector.detect(image) << endl;
+    ImageRGB32 image("screenshot-20231005-203932147068.png");
+    SummaryStatsReader reader;
+//    cout << detector.detect(image) << endl;
+    auto nature = reader.read_nature(env.logger(), image);
 
+    cout << (int)nature.attack << endl;
+    cout << (int)nature.defense << endl;
+    cout << (int)nature.spatk << endl;
+    cout << (int)nature.spdef << endl;
+    cout << (int)nature.speed << endl;
 
 
 
