@@ -161,14 +161,17 @@ void TeraRollFilter::read_card(
         ? "?"
         : std::to_string(data.stars);
     std::string tera_type = data.tera_type.empty()
-        ? "unknown tera type"
+        ? "? tera"
         : data.tera_type;
     std::string pokemon = data.species.empty()
-        ? "unknown " + Pokemon::STRING_POKEMON
+        ? "? " + Pokemon::STRING_POKEMON
         : data.species;
 
+    console.overlay().add_log(
+        stars + "* " + tera_type + " " + pokemon,
+        COLOR_GREEN
+    );
     std::string log = "Detected a " + stars + "* " + tera_type + " " + pokemon;
-    console.overlay().add_log(log, COLOR_GREEN);
     console.log(log);
 }
 bool TeraRollFilter::check_herba(const std::string& pokemon_slug) const{
