@@ -65,7 +65,7 @@ private:
     BooleanCheckBoxOption TRY_TO_TERASTILLIZE;
 
 //    Pokemon::StatsHuntIvJudgeFilterTable FILTERS;
-    Pokemon::StatsHuntIvRangeFilterTable FILTERS0;  //  REMOVE: Temporary for development
+    Pokemon::StatsHuntIvRangeFilterTable FILTERS0;
 
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;

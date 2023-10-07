@@ -211,6 +211,8 @@ bool ShinyHuntAreaZeroPlatform::run_traversal(BotBaseContext& context){
     std::chrono::seconds window_seconds;
     bool enough_time;
     if (window == WallDuration::zero()){
+//        console.log("Debug Reset Timer: Window not initialized.", COLOR_RED);
+
         //  Not enough history.
         enough_time = false;
         window = start - m_encounter_tracker->encounter_rate_tracker_start_time();
@@ -219,6 +221,8 @@ bool ShinyHuntAreaZeroPlatform::run_traversal(BotBaseContext& context){
             kills, encounters, window_seconds
         );
     }else{
+//        console.log("Debug Reset Timer: Window started.", COLOR_RED);
+
         window_seconds = std::chrono::duration_cast<Seconds>(window);
         enough_time = m_encounter_tracker->get_encounters_in_window(
             kills, encounters, window_seconds
@@ -427,7 +431,7 @@ void ShinyHuntAreaZeroPlatform::run_state(SingleSwitchProgramEnvironment& env, B
             m_pending_platform_reset = true;
             throw;
         }
-        m_encounter_tracker->reset_rate_tracker_start_time();
+//        m_encounter_tracker->reset_rate_tracker_start_time();
         m_consecutive_failures = 0;
         return;
     }

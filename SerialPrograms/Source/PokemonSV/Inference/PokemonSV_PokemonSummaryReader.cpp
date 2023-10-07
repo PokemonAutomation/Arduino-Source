@@ -8,10 +8,9 @@
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "PokemonSV_PokemonSummaryReader.h"
 
-//  REMOVE
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -56,7 +55,7 @@ bool PokemonSummaryDetector::detect(const ImageViewRGB32& screen) const{
     }
 
     ImageStats bottom = image_stats(extract_box_reference(screen, m_bottom));
-    cout << bottom.average << bottom.stddev << endl;
+//    cout << bottom.average << bottom.stddev << endl;
 #if 0
     if (bottom.stddev.sum() > 20){
         return false;
