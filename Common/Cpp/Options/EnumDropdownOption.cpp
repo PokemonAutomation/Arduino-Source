@@ -34,7 +34,7 @@ IntegerEnumDropdownCell::IntegerEnumDropdownCell(const IntegerEnumDropdownCell& 
 {}
 IntegerEnumDropdownCell::IntegerEnumDropdownCell(
     const IntegerEnumDatabase& database,
-    LockWhileRunning lock_while_running,
+    LockMode lock_while_running,
     size_t default_value, size_t current_value
 )
     : ConfigOption(lock_while_running)
@@ -49,7 +49,7 @@ IntegerEnumDropdownCell::IntegerEnumDropdownCell(
 }
 IntegerEnumDropdownCell::IntegerEnumDropdownCell(
     const IntegerEnumDatabase& database,
-    LockWhileRunning lock_while_running,
+    LockMode lock_while_running,
     size_t default_value
 )
     : ConfigOption(lock_while_running)

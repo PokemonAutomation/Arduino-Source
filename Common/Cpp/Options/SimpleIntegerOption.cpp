@@ -55,7 +55,7 @@ SimpleIntegerCell<Type>::SimpleIntegerCell(const SimpleIntegerCell& x)
 {}
 template <typename Type>
 SimpleIntegerCell<Type>::SimpleIntegerCell(
-    LockWhileRunning lock_while_running,
+    LockMode lock_while_running,
     Type min_value, Type max_value,
     Type default_value, Type current_value
 )
@@ -65,7 +65,7 @@ SimpleIntegerCell<Type>::SimpleIntegerCell(
 
 template <typename Type>
 SimpleIntegerCell<Type>::SimpleIntegerCell(
-    LockWhileRunning lock_while_running,
+    LockMode lock_while_running,
     Type default_value
 )
     : ConfigOption(lock_while_running)
@@ -73,7 +73,7 @@ SimpleIntegerCell<Type>::SimpleIntegerCell(
 {}
 template <typename Type>
 SimpleIntegerCell<Type>::SimpleIntegerCell(
-    LockWhileRunning lock_while_running,
+    LockMode lock_while_running,
     Type default_value, Type min_value
 )
     : ConfigOption(lock_while_running)
@@ -81,7 +81,7 @@ SimpleIntegerCell<Type>::SimpleIntegerCell(
 {}
 template <typename Type>
 SimpleIntegerCell<Type>::SimpleIntegerCell(
-    LockWhileRunning lock_while_running,
+    LockMode lock_while_running,
     Type default_value, Type min_value, Type max_value
 )
     : ConfigOption(lock_while_running)
@@ -160,7 +160,7 @@ void SimpleIntegerCell<Type>::restore_defaults(){
 template <typename Type>
 SimpleIntegerOption<Type>::SimpleIntegerOption(
     std::string label,
-    LockWhileRunning lock_while_running,
+    LockMode lock_while_running,
     Type min_value, Type max_value,
     Type default_value, Type current_value
 )
@@ -170,7 +170,7 @@ SimpleIntegerOption<Type>::SimpleIntegerOption(
 template <typename Type>
 SimpleIntegerOption<Type>::SimpleIntegerOption(
     std::string label,
-    LockWhileRunning lock_while_running,
+    LockMode lock_while_running,
     Type default_value
 )
     : SimpleIntegerCell<Type>(lock_while_running, default_value)
@@ -179,7 +179,7 @@ SimpleIntegerOption<Type>::SimpleIntegerOption(
 template <typename Type>
 SimpleIntegerOption<Type>::SimpleIntegerOption(
     std::string label,
-    LockWhileRunning lock_while_running,
+    LockMode lock_while_running,
     Type default_value, Type min_value
 )
     : SimpleIntegerCell<Type>(lock_while_running, default_value, min_value)
@@ -188,7 +188,7 @@ SimpleIntegerOption<Type>::SimpleIntegerOption(
 template <typename Type>
 SimpleIntegerOption<Type>::SimpleIntegerOption(
     std::string label,
-    LockWhileRunning lock_while_running,
+    LockMode lock_while_running,
     Type default_value, Type min_value, Type max_value
 )
     : SimpleIntegerCell<Type>(lock_while_running, default_value, min_value, max_value)

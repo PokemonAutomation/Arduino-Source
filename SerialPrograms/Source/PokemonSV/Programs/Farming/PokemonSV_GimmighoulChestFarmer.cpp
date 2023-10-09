@@ -66,7 +66,7 @@ std::unique_ptr<StatsTracker> GimmighoulChestFarmer_Descriptor::make_stats() con
 GimmighoulChestFarmer::GimmighoulChestFarmer()
     : PP(
         "<b>First Attack PP:</b><br>The amount of PP remaining on your lead's first attack.",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         15
     )
     , START_LOCATION(
@@ -75,13 +75,13 @@ GimmighoulChestFarmer::GimmighoulChestFarmer()
             {StartLocation::FlyPoint, "fly-point", "Fly Point - East Province (Area One) Watchtower"},
             {StartLocation::InFrontOfChest, "in-front-of-chest", "In front of chest"},
         },
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         StartLocation::FlyPoint
     )
     , GO_HOME_WHEN_DONE(false)
     , FIX_TIME_WHEN_DONE(
         "<b>Fix time when done:</b><br>Fix the time after the program finishes.",
-        LockWhileRunning::UNLOCKED, false
+        LockMode::UNLOCK_WHILE_RUNNING, false
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({

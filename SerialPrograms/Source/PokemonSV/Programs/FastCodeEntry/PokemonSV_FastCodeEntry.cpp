@@ -46,17 +46,17 @@ FastCodeEntry::FastCodeEntry()
             {Mode::ENTER_ON_PASTE, "on-paste", "Start the program first. Code is entered when you paste into the code box."},
             {Mode::MYSTERY_GIFT, "mystery", "Enter Mystery Gift Code when clicking Start Program."},
         },
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         Mode::NORMAL
     )
     , CODE(
         "<b>Link Code:</b><br>Unless in Mystery Gift mode, code must be 4-digit numeric or 6-digit alphanumeric. (not case sensitive)<br>"
         "(Box is big so it's easy to land your mouse on.)",
-        LockWhileRunning::UNLOCKED,
+        LockMode::UNLOCK_WHILE_RUNNING,
         "0123", "0123",
         true
     )
-    , SETTINGS(LockWhileRunning::LOCKED)
+    , SETTINGS(LockMode::LOCK_WHILE_RUNNING)
 {
     PA_ADD_OPTION(MODE);
     PA_ADD_OPTION(CODE);

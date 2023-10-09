@@ -117,7 +117,7 @@ template <typename Type>
 TimeExpressionCell<Type>::~TimeExpressionCell() = default;
 template <typename Type>
 TimeExpressionCell<Type>::TimeExpressionCell(
-    LockWhileRunning lock_while_running,
+    LockMode lock_while_running,
     double ticks_per_second,
     Type min_value, Type max_value,
     std::string default_value
@@ -133,7 +133,7 @@ TimeExpressionCell<Type>::TimeExpressionCell(
 
 template <typename Type>
 TimeExpressionCell<Type>::TimeExpressionCell(
-    LockWhileRunning lock_while_running,
+    LockMode lock_while_running,
     double ticks_per_second,
     std::string default_value
 )
@@ -147,7 +147,7 @@ TimeExpressionCell<Type>::TimeExpressionCell(
 {}
 template <typename Type>
 TimeExpressionCell<Type>::TimeExpressionCell(
-    LockWhileRunning lock_while_running,
+    LockMode lock_while_running,
     double ticks_per_second,
     Type min_value,
     std::string default_value
@@ -267,7 +267,7 @@ void TimeExpressionCell<Type>::restore_defaults(){
 template <typename Type>
 TimeExpressionOption<Type>::TimeExpressionOption(
     std::string label,
-    LockWhileRunning lock_while_running,
+    LockMode lock_while_running,
     double ticks_per_second,
     Type min_value, Type max_value,
     std::string default_value
@@ -283,7 +283,7 @@ TimeExpressionOption<Type>::TimeExpressionOption(
 template <typename Type>
 TimeExpressionOption<Type>::TimeExpressionOption(
     std::string label,
-    LockWhileRunning lock_while_running,
+    LockMode lock_while_running,
     double ticks_per_second,
     std::string default_value
 )
@@ -297,7 +297,7 @@ TimeExpressionOption<Type>::TimeExpressionOption(
 template <typename Type>
 TimeExpressionOption<Type>::TimeExpressionOption(
     std::string label,
-    LockWhileRunning lock_while_running,
+    LockMode lock_while_running,
     double ticks_per_second,
     Type min_value,
     std::string default_value

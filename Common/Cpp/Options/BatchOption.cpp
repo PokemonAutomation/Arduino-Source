@@ -28,7 +28,7 @@ struct BatchOption::Data{
 
 
 BatchOption::~BatchOption() = default;
-BatchOption::BatchOption(LockWhileRunning lock_while_program_is_running, bool horizontal)
+BatchOption::BatchOption(LockMode lock_while_program_is_running, bool horizontal)
     : ConfigOption(lock_while_program_is_running)
     , m_data(CONSTRUCT_TOKEN, horizontal)
 {}

@@ -38,8 +38,8 @@ const EnumDatabase<BossAction>& BossAction_Database(){
 
 BossActionRow::BossActionRow(std::string slug, const std::string& name_slug, const std::string& sprite_slug)
     : StaticTableRow(std::move(slug))
-    , pokemon(LockWhileRunning::LOCKED, get_pokemon_name(name_slug).display_name(), ALL_POKEMON_SPRITES().get_throw(sprite_slug).icon)
-    , action(BossAction_Database(), LockWhileRunning::LOCKED, BossAction::CATCH_AND_STOP_IF_SHINY)
+    , pokemon(LockMode::LOCK_WHILE_RUNNING, get_pokemon_name(name_slug).display_name(), ALL_POKEMON_SPRITES().get_throw(sprite_slug).icon)
+    , action(BossAction_Database(), LockMode::LOCK_WHILE_RUNNING, BossAction::CATCH_AND_STOP_IF_SHINY)
     , ball("poke-ball")
 {
     PA_ADD_STATIC(pokemon);
@@ -49,7 +49,7 @@ BossActionRow::BossActionRow(std::string slug, const std::string& name_slug, con
 
 
 BossActionTable::BossActionTable()
-    : StaticTableOption("<b>Boss Actions:</b>", LockWhileRunning::LOCKED)
+    : StaticTableOption("<b>Boss Actions:</b>", LockMode::LOCK_WHILE_RUNNING)
 {
     for (const auto& item : all_bosses_by_dex()){
 //        cout << item.second << endl;

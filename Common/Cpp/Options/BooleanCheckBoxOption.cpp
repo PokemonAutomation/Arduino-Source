@@ -32,14 +32,14 @@ BooleanCheckBoxCell::BooleanCheckBoxCell(const BooleanCheckBoxCell& x)
     , m_data(CONSTRUCT_TOKEN, x.default_value(), x.current_value())
 {}
 BooleanCheckBoxCell::BooleanCheckBoxCell(
-    LockWhileRunning lock_while_running,
+    LockMode lock_while_running,
     bool default_value, bool current_value
 )
     : ConfigOption(lock_while_running)
     , m_data(CONSTRUCT_TOKEN, default_value, current_value)
 {}
 BooleanCheckBoxCell::BooleanCheckBoxCell(
-    LockWhileRunning lock_while_running,
+    LockMode lock_while_running,
     bool default_value
 )
     : ConfigOption(lock_while_running)
@@ -78,7 +78,7 @@ void BooleanCheckBoxCell::restore_defaults(){
 
 BooleanCheckBoxOption::BooleanCheckBoxOption(
     std::string label,
-    LockWhileRunning lock_while_running,
+    LockMode lock_while_running,
     bool default_value
 )
     : BooleanCheckBoxCell(lock_while_running, default_value)
@@ -86,7 +86,7 @@ BooleanCheckBoxOption::BooleanCheckBoxOption(
 {}
 BooleanCheckBoxOption::BooleanCheckBoxOption(
     std::string label,
-    LockWhileRunning lock_while_running,
+    LockMode lock_while_running,
     bool default_value, bool value
 )
     : BooleanCheckBoxCell(lock_while_running, default_value, value)

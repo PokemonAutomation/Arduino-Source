@@ -40,7 +40,7 @@ public:
     ShinyFilterCell()
         : EnumDropdownCell<ShinyFilter>(
             ShinyFilter_Database(),
-            LockWhileRunning::LOCKED,
+            LockMode::LOCK_WHILE_RUNNING,
             ShinyFilter::ANYTHING
         )
     {}

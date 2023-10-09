@@ -31,7 +31,7 @@ FriendCodeAdder_Descriptor::FriendCodeAdder_Descriptor()
 FriendCodeAdder::FriendCodeAdder()
     : USER_SLOT(
         "<b>User Slot:</b><br>Send friend requests for this profile.",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         1, 1, 8
     )
     , FRIEND_CODES(
@@ -46,19 +46,19 @@ FriendCodeAdder::FriendCodeAdder()
     )
     , OPEN_CODE_PAD_DELAY(
         "<b>Open Code Pad Delay</b>",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "1 * TICKS_PER_SECOND"
     )
     , SEARCH_TIME(
         "<b>Search Time:</b><br>Wait this long after initiating search.",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "3 * TICKS_PER_SECOND"
     )
     , TOGGLE_BEST_STATUS_DELAY(
         "<b>Toggle Best Delay:</b><br>Time needed to toggle the best friend status.",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "1 * TICKS_PER_SECOND"
     )

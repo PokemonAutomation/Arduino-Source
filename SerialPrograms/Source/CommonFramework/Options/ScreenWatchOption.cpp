@@ -28,34 +28,34 @@ ScreenWatchOption::ScreenWatchOption(
     double default_x, double default_y,
     double default_width, double default_height
 )
-    : GroupOption(std::move(label), LockWhileRunning::UNLOCKED)
+    : GroupOption(std::move(label), LockMode::UNLOCK_WHILE_RUNNING)
     , MONITOR_INDEX(
         "<b>Monitor Index:</b> For multi-monitor setups, this lets you choose which monitor to watch.",
-        LockWhileRunning::UNLOCKED,
+        LockMode::UNLOCK_WHILE_RUNNING,
         0
     )
     , X(
         "<b>X Coordinate:</b> The left edge of the box to watch.<br>"
         "0.0 is the left edge of the monitor. 1.0 is the right edge of the monitor.",
-        LockWhileRunning::UNLOCKED,
+        LockMode::UNLOCK_WHILE_RUNNING,
         default_x, 0.0, 1.0
     )
     , Y(
         "<b>Y Coordinate:</b> The top edge of the box to watch.<br>"
         "0.0 is the top edge of the monitor. 1.0 is the bottom edge of the monitor.",
-        LockWhileRunning::UNLOCKED,
+        LockMode::UNLOCK_WHILE_RUNNING,
         default_y, 0.0, 1.0
     )
     , WIDTH(
         "<b>Width:</b> The width of the box to watch.<br>"
         "The number is between 0 and 1 and is the proportion of the full width of the monitor.",
-        LockWhileRunning::UNLOCKED,
+        LockMode::UNLOCK_WHILE_RUNNING,
         default_width, 0.0, 1.0
     )
     , HEIGHT(
         "<b>Height:</b> The height of the box to watch.<br>"
         "The number is between 0 and 1 and is the proportion of the full height of the monitor.",
-        LockWhileRunning::UNLOCKED,
+        LockMode::UNLOCK_WHILE_RUNNING,
         default_height, 0.0, 1.0
     )
     , m_display(*this)

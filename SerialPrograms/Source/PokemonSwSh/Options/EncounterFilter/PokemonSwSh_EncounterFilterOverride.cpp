@@ -28,7 +28,7 @@ EncounterFilterOverride::~EncounterFilterOverride(){
 }
 EncounterFilterOverride::EncounterFilterOverride(bool rare_stars)
     : m_rare_stars(rare_stars)
-    , pokemon(COMBINED_DEX_NAMES(), LockWhileRunning::LOCKED, "rookidee")
+    , pokemon(COMBINED_DEX_NAMES(), LockMode::LOCK_WHILE_RUNNING, "rookidee")
     , shininess(rare_stars)
 {
     PA_ADD_OPTION(action);
@@ -100,7 +100,7 @@ EncounterFilterTable::EncounterFilterTable(bool rare_stars)
                 "<b>Overrides:</b><br>"
                 "The game language must be properly set to read " + STRING_POKEMON + " names.<br>"
                 "If more than one override applies, the last one will be chosen.",
-        LockWhileRunning::LOCKED
+        LockMode::LOCK_WHILE_RUNNING
     )
 {}
 std::vector<std::unique_ptr<EncounterFilterOverride>> EncounterFilterTable::copy_snapshot() const{

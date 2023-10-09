@@ -61,12 +61,12 @@ LPFarmer::LPFarmer()
     : GO_HOME_WHEN_DONE(false)
     , FETCHES(
         "<b>Fetches:</b>",
-        LockWhileRunning::UNLOCKED,
+        LockMode::UNLOCK_WHILE_RUNNING,
         10000, 1
     )
     , PERIODIC_RESET(
         "<b>Periodic Game Reset:</b><br>Reset the game after this many skips. This clears up the framerate bug.",
-        LockWhileRunning::UNLOCKED,
+        LockMode::UNLOCK_WHILE_RUNNING,
         20, 0, 100
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))

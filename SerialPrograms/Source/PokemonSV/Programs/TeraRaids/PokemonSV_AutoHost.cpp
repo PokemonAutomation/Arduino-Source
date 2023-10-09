@@ -98,7 +98,7 @@ AutoHost::AutoHost()
             {HostingMode::ONLINE_CODED,     "online-coded",     "Host Online (link code)"},
             {HostingMode::ONLINE_EVERYONE,  "online-everyone",  "Host Online (everyone)"},
         },
-        LockWhileRunning::UNLOCKED,
+        LockMode::UNLOCK_WHILE_RUNNING,
         HostingMode::ONLINE_CODED
     )
     , NOTIFICATIONS0({

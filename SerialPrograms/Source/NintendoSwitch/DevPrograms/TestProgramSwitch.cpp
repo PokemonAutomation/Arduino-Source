@@ -173,12 +173,12 @@ TestProgram::TestProgram()
     , LANGUAGE(
         "<b>OCR Language:</b>",
         { Language::English },
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         false
     )
     , STATIC_TEXT("Test text...")
-    , SELECT("String Select", test_database(), LockWhileRunning::LOCKED, 0)
-    , PLAYER_LIST("Test Table", LockWhileRunning::UNLOCKED, "Notes")
+    , SELECT("String Select", test_database(), LockMode::LOCK_WHILE_RUNNING, 0)
+    , PLAYER_LIST("Test Table", LockMode::UNLOCK_WHILE_RUNNING, "Notes")
     , NOTIFICATION_TEST("Test", true, true, ImageAttachmentMode::JPG)
     , NOTIFICATIONS({
         &NOTIFICATION_TEST,
@@ -237,12 +237,19 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
+//    ImageRGB32 image("screenshot-20231003-202430049819.png");
+    auto snapshot = console.video().snapshot();
+
+    PokemonSummaryDetector detector;
+    cout << detector.detect(snapshot) << endl;
+
+
+#if 0
     SummaryStatsReader reader;
     reader.make_overlays(overlays);
 
     auto snapshot = console.video().snapshot();
 
-#if 1
     NatureAdjustments nature = reader.read_nature(logger, snapshot);
     cout << "attack     = " << (int)nature.attack << endl;
     cout << "defense    = " << (int)nature.defense << endl;

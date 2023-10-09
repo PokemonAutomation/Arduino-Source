@@ -48,12 +48,12 @@ EggFetcher::EggFetcher()
     , SHORTCUT("<b>Bike Shortcut:</b>")
     , MAX_FETCH_ATTEMPTS(
         "<b>Fetch this many times:</b><br>This puts a limit on how many eggs you can get so you don't make a mess of your boxes for fetching too many.",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         2000
     )
     , TRAVEL_TIME_PER_FETCH(
         "<b>Travel Time per Fetch:</b><br>Fetch an egg after traveling for this long.",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "15 * TICKS_PER_SECOND"
     )

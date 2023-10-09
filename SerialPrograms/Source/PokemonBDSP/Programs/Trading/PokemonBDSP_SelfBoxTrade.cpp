@@ -38,7 +38,7 @@ std::unique_ptr<StatsTracker> SelfBoxTrade_Descriptor::make_stats() const{
 SelfBoxTrade::SelfBoxTrade()
     : BOXES_TO_TRADE(
         "<b>Number of Boxes to Trade:</b>",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         2, 0, 40
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))

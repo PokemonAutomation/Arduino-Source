@@ -183,7 +183,7 @@ OutbreakFinder::OutbreakFinder()
     , LANGUAGE(
         "<b>Game Language:</b>",
         Pokemon::PokemonNameReader::instance().languages(),
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         true
     )
     , DESIRED_MO_SLUGS(
@@ -200,7 +200,7 @@ OutbreakFinder::OutbreakFinder()
     )
     , DEBUG_MODE(
         "<b>Debug Mode:</b><br>Save MMO Sprite to debug folder.",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         false
     )
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))

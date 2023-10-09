@@ -57,18 +57,18 @@ StarterReset::StarterReset()
     , STARTER(
         "<b>Starter:</b>",
         STARTER_DATABASE,
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         "turtwig"
     )
     , USE_SOUND_DETECTION(
         "<b>Use Sound Detection:</b><br>Use sound to improve shiny detection.<br>"
         "<b>Make sure you have correct audio input set.</b>",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         true
     )
     , VIDEO_ON_SHINY(
         "<b>Video Capture:</b><br>Take a video of the encounter if it is shiny.",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         true
     )
     , NOTIFICATION_NONSHINY(

@@ -10,6 +10,7 @@
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
+#include "PokemonSV/Inference/Battles/PokemonSV_NormalBattleMenus.h"
 #include "PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV_ConnectToInternet.h"
@@ -86,11 +87,12 @@ void connect_to_internet_from_menu(const ProgramInfo& info, ConsoleHandle& conso
         AdvanceDialogWatcher dialog(COLOR_GREEN);
         PromptDialogWatcher prompt(COLOR_CYAN);
         NewsWatcher news(COLOR_BLUE);
+        NormalBattleMenuWatcher battle_menu(COLOR_MAGENTA);
         context.wait_for_all_requests();
         int ret = wait_until(
             console, context,
             std::chrono::seconds(60),
-            {overworld, main_menu, dialog, prompt, news}
+            {overworld, main_menu, dialog, prompt, news, battle_menu}
         );
         context.wait_for(std::chrono::milliseconds(100));
         switch (ret){
@@ -121,6 +123,13 @@ void connect_to_internet_from_menu(const ProgramInfo& info, ConsoleHandle& conso
             connected = true;
             pbf_press_button(context, BUTTON_B, 20, 105);
             continue;
+        case 5:
+            console.log("Detected battle menu...");
+            throw OperationFailedException(
+                ErrorReport::NO_ERROR_REPORT, console,
+                "connect_to_internet_from_menu(): Looks like you got attacked.",
+                true
+            );
         default:
             throw OperationFailedException(
                 ErrorReport::SEND_ERROR_REPORT, console,
@@ -147,11 +156,12 @@ void connect_to_internet_from_overworld(const ProgramInfo& info, ConsoleHandle& 
         AdvanceDialogWatcher dialog(COLOR_GREEN);
         PromptDialogWatcher prompt(COLOR_CYAN);
         NewsWatcher news(COLOR_BLUE);
+        NormalBattleMenuWatcher battle_menu(COLOR_MAGENTA);
         context.wait_for_all_requests();
         int ret = wait_until(
             console, context,
             std::chrono::seconds(60),
-            {overworld, main_menu, dialog, prompt, news}
+            {overworld, main_menu, dialog, prompt, news, battle_menu}
         );
         context.wait_for(std::chrono::milliseconds(100));
         switch (ret){
@@ -186,6 +196,13 @@ void connect_to_internet_from_overworld(const ProgramInfo& info, ConsoleHandle& 
             connected = true;
             pbf_press_button(context, BUTTON_B, 20, 105);
             continue;
+        case 5:
+            console.log("Detected battle menu...");
+            throw OperationFailedException(
+                ErrorReport::NO_ERROR_REPORT, console,
+                "connect_to_internet_from_overworld(): Looks like you got attacked.",
+                true
+            );
         default:
             throw OperationFailedException(
                 ErrorReport::SEND_ERROR_REPORT, console,

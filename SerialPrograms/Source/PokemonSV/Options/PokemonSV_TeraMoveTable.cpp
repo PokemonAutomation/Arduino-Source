@@ -74,10 +74,10 @@ TeraMoveTableRow::~TeraMoveTableRow(){
     type.remove_listener(*this);
 }
 TeraMoveTableRow::TeraMoveTableRow()
-    : type(tera_move_enum_database(), LockWhileRunning::UNLOCKED, TeraMoveType::Move1)
-    , seconds(LockWhileRunning::UNLOCKED, 5)
-    , target(tera_target_enum_database(), LockWhileRunning::UNLOCKED, TeraTarget::Opponent)
-    , notes(false, LockWhileRunning::UNLOCKED, "", "(e.g. Screech, Belly Drum)")
+    : type(tera_move_enum_database(), LockMode::UNLOCK_WHILE_RUNNING, TeraMoveType::Move1)
+    , seconds(LockMode::UNLOCK_WHILE_RUNNING, 5)
+    , target(tera_target_enum_database(), LockMode::UNLOCK_WHILE_RUNNING, TeraTarget::Opponent)
+    , notes(false, LockMode::UNLOCK_WHILE_RUNNING, "", "(e.g. Screech, Belly Drum)")
 {
     PA_ADD_OPTION(type);
     PA_ADD_OPTION(seconds);
@@ -134,7 +134,7 @@ TeraMoveTable::TeraMoveTable()
         "Run this sequence of moves. When the end of the table is reached, "
         "the last entry will be repeated until the battle is won or lost. "
         "Changes to this table take effect on the next battle.",
-        LockWhileRunning::UNLOCKED,
+        LockMode::UNLOCK_WHILE_RUNNING,
         make_defaults()
     )
 {}

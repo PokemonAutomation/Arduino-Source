@@ -57,7 +57,7 @@ void AudioPerSpectrumDetectorBase::log_results(){
         m_console.log(m_audio_name + " not detected. Error Coefficient = " + tostr_default(m_lowest_error), COLOR_PURPLE);
     }
 
-#if 1
+#if 0
     if (m_lowest_error >= 1){
         std::stringstream ss;
         ss << "AudioPerSpectrumDetectorBase ended with error of 1.0: " << endl;

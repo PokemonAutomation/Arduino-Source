@@ -38,15 +38,15 @@ ClothingBuyer_Descriptor::ClothingBuyer_Descriptor()
 ClothingBuyer::ClothingBuyer()
     : USE_LP(
         "<b>Use LP to purchase:</b>",
-        LockWhileRunning::UNLOCKED, false
+        LockMode::UNLOCK_WHILE_RUNNING, false
     )
     , WEAR_NEW_CLOTHES(
         "<b>Wear new clothing after purchase:</b>",
-        LockWhileRunning::UNLOCKED, false
+        LockMode::UNLOCK_WHILE_RUNNING, false
     )
     , NUM_CATEGORY(
         "<b>Number of Categories:</b><br>The number of categories of clothing the shop has.",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         1, 1, 5
     )
     , GO_HOME_WHEN_DONE(false)
@@ -55,7 +55,7 @@ ClothingBuyer::ClothingBuyer()
         &NOTIFICATION_STATUS_UPDATE,
         &NOTIFICATION_PROGRAM_FINISH,
         &NOTIFICATION_ERROR_FATAL,
-        })
+    })
 {
     PA_ADD_OPTION(USE_LP);
     PA_ADD_OPTION(WEAR_NEW_CLOTHES);

@@ -22,8 +22,8 @@ const EnumDatabase<BattleMoveType>& Battle_move_enum_database(){
 }
 
 BattleMoveTableRow::BattleMoveTableRow()
-    : type(Battle_move_enum_database(), LockWhileRunning::UNLOCKED, BattleMoveType::Move1)
-    , notes(false, LockWhileRunning::UNLOCKED, "", "(e.g. False Swipe, Thunder Wave)")
+    : type(Battle_move_enum_database(), LockMode::UNLOCK_WHILE_RUNNING, BattleMoveType::Move1)
+    , notes(false, LockMode::UNLOCK_WHILE_RUNNING, "", "(e.g. False Swipe, Thunder Wave)")
 {
     PA_ADD_OPTION(type);
     PA_ADD_OPTION(notes);
@@ -40,7 +40,7 @@ BattleMoveTable::BattleMoveTable()
         "<b>Move Table:</b><br>"
         "Run this sequence of moves for your lead Pokemon only. "
         "If your lead faints or the end of the table is reached, the program will switch to throwing the selected ball. ",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         make_defaults()
     )
 {}

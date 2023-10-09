@@ -92,19 +92,19 @@ EggAutonomous::EggAutonomous()
     , LANGUAGE(
         "<b>Game Language:</b><br>Required to read IVs.",
         IV_READER().languages(),
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         false
     )
     , MAX_KEEPERS(
         "<b>Max Keepers:</b><br>Stop the program after keeping this many " + STRING_POKEMON + ". "
         "This number plus the number of " + STRING_POKEMON + " in the box left to your current box must not exceed 30. "
         "Otherwise, the program will break when that box is full.",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         10, 1, 30
     )
     , LOOPS_PER_FETCH(
         "<b>Bike Loops Per Fetch:</b><br>Fetch an egg after doing this many bike loops on Route 5.",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         1, 1
     )
     , NUM_EGGS_IN_COLUMN(
@@ -117,7 +117,7 @@ EggAutonomous::EggAutonomous()
             {4, "4", "4"},
             {5, "5", "5"},
         },
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         0
     )
     , AUTO_SAVING(
@@ -131,17 +131,26 @@ EggAutonomous::EggAutonomous()
             {AutoSave::AfterStartAndKeep, "start-and-keep", "Save at beginning and after obtaining each baby that is kept. (Allows for error/crash recovery.)"},
             {AutoSave::EveryBatch, "every-batch", "Save before every batch. (Allows you to unhatch eggs.)"},
         },
-        LockWhileRunning::LOCKED,
+          LockMode::LOCK_WHILE_RUNNING,
         AutoSave::AfterStartAndKeep
+    )
+    , FILTERS(
+        StatsHuntIvJudgeFilterTable_Label_Eggs,
+        {
+            .action = true,
+            .shiny = true,
+            .gender = true,
+            .nature = true,
+        }
     )
     , DEBUG_PROCESSING_HATCHED(
         "Debug the part of program after all eggs hatched",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         false
     )
     , SAVE_DEBUG_VIDEO(
         "<b>Save debug videos to Switch:</b>",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         false
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
@@ -621,7 +630,7 @@ bool EggAutonomous::process_hatched_pokemon(SingleSwitchProgramEnvironment& env,
             env.log("Gender: " + gender_to_string(gender), COLOR_GREEN);
             NatureReader::Results nature = nature_detector.read(env.console.logger(), screen);
 
-            StatsHuntAction action = FILTERS.get_action(shiny, IVs, gender, nature);
+            StatsHuntAction action = FILTERS.get_action(shiny, gender, nature.nature, IVs);
 
             auto send_keep_notification = [&](){
                 if (!shiny){

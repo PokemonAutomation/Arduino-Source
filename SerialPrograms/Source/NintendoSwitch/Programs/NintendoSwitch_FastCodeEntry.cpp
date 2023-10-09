@@ -23,7 +23,7 @@ namespace NintendoSwitch{
 
 
 
-FastCodeEntrySettingsOption::FastCodeEntrySettingsOption(LockWhileRunning lock_while_program_is_running)
+FastCodeEntrySettingsOption::FastCodeEntrySettingsOption(LockMode lock_while_program_is_running)
     : GroupOption("Fast Code Entry", lock_while_program_is_running)
     , KEYBOARD_LAYOUT(
         "<b>Keyboard Layout:</b>",
@@ -31,12 +31,12 @@ FastCodeEntrySettingsOption::FastCodeEntrySettingsOption(LockWhileRunning lock_w
             {KeyboardLayout::QWERTY, "qwerty", "QWERTY"},
             {KeyboardLayout::AZERTY, "azerty", "AZERTY"},
         },
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         KeyboardLayout::QWERTY
     )
     , SKIP_PLUS(
         "<b>Skip the Plus:</b><br>Don't press + to finalize the code. Useful for testing.",
-        LockWhileRunning::UNLOCKED,
+        LockMode::UNLOCK_WHILE_RUNNING,
         false
     )
     , m_advanced_options(
@@ -44,19 +44,19 @@ FastCodeEntrySettingsOption::FastCodeEntrySettingsOption(LockWhileRunning lock_w
     )
     , DIGIT_REORDERING(
         "<b>Digit Reordering:</b><br>Allow digits to be entered out of order.",
-        LockWhileRunning::UNLOCKED,
+        LockMode::UNLOCK_WHILE_RUNNING,
         PreloadSettings::instance().DEVELOPER_MODE
     )
     , SCROLL_DELAY(
         "<b>Scroll Delay:</b><br>Delay to scroll between adjacent keys.",
-        LockWhileRunning::UNLOCKED,
+        LockMode::UNLOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         3, 15,
         PreloadSettings::instance().DEVELOPER_MODE ? "5" : "6"
     )
     , WRAP_DELAY(
         "<b>Wrap Delay:</b><br>Delay to wrap between left/right edges.",
-        LockWhileRunning::UNLOCKED,
+        LockMode::UNLOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         3, 15,
         "6"

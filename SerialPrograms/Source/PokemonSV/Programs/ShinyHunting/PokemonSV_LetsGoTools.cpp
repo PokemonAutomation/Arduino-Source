@@ -51,6 +51,9 @@ bool EncounterRateTracker::get_encounters_in_window(
 //    cout << "encounters index = " << index << endl;
     encounters = m_encounter_history.size() - index;
 
+//    cout << "time_window: " << std::chrono::duration_cast<std::chrono::seconds>(time_window).count() << endl;
+//    cout << "m_start_time: " << std::chrono::duration_cast<std::chrono::seconds>(now - m_start_time).count() << endl;
+
     return m_start_time <= threshold;
 }
 void EncounterRateTracker::report_start(WallClock now){

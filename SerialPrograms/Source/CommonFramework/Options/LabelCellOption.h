@@ -23,19 +23,19 @@ public:
 
     //  Make label with no icon.
     LabelCellOption(
-        LockWhileRunning lock_while_running,
+        LockMode lock_while_running,
         std::string text
     );
 
     //  Make label with the icon in its original resolution.
     LabelCellOption(
-        LockWhileRunning lock_while_running,
+        LockMode lock_while_running,
         std::string text, const ImageViewRGB32& icon
     );
 
     //  Make label with icon and scale it so that the largest dimension is "icon_size" pixels.
     LabelCellOption(
-        LockWhileRunning lock_while_running,
+        LockMode lock_while_running,
         std::string text, const ImageViewRGB32& icon, size_t icon_size
     );
 

@@ -44,7 +44,7 @@ public:
         Language language,
         ShortcutDirectionOption& shortcut,
         uint16_t travel_time_per_fetch,
-        const Pokemon::StatsHuntFilterTable& filters,
+        const Pokemon::StatsHuntIvJudgeFilterTable& filters,
         uint8_t max_keepers,
         uint8_t existing_eggs_in_columns
     );
@@ -89,7 +89,7 @@ private:
     Language m_language;
     ShortcutDirectionOption& m_shortcut;
     uint16_t m_travel_time_per_fetch;
-    const Pokemon::StatsHuntFilterTable& m_filters;
+    const Pokemon::StatsHuntIvJudgeFilterTable& m_filters;
     uint8_t m_max_keepers;
 
     bool m_on_bike = true;

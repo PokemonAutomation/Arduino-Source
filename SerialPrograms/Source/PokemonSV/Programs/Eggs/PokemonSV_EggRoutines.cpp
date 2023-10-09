@@ -601,7 +601,7 @@ void reset_position_at_zero_gate(const ProgramInfo& info, ConsoleHandle& console
 
 bool check_baby_info(
     const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
-    OCR::LanguageOCROption& LANGUAGE, Pokemon::StatsHuntFilterTable& FILTERS,
+    OCR::LanguageOCROption& LANGUAGE, Pokemon::StatsHuntIvJudgeFilterTable& FILTERS,
     Pokemon::StatsHuntAction& action
 ){
     context.wait_for_all_requests();
@@ -636,7 +636,7 @@ bool check_baby_info(
     console.log("Gender: " + gender_to_string(gender), COLOR_GREEN);
     console.log("Nature: " + nature.to_string(), COLOR_GREEN);
 
-    action = FILTERS.get_action(shiny, IVs, gender, nature);
+    action = FILTERS.get_action(shiny, gender, nature.nature, IVs);
 
     return shiny;
 }

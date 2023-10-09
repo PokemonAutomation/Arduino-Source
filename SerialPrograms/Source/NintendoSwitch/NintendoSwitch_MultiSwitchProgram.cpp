@@ -102,7 +102,7 @@ MultiSwitchProgramInstance::~MultiSwitchProgramInstance() = default;
 MultiSwitchProgramInstance::MultiSwitchProgramInstance(
     const std::vector<std::string>& error_notification_tags
 )
-    : m_options(LockWhileRunning::UNLOCKED)
+    : m_options(LockMode::UNLOCK_WHILE_RUNNING)
     , NOTIFICATION_PROGRAM_FINISH(
         "Program Finished",
         true, true,

@@ -77,24 +77,33 @@ StatsReset::StatsReset()
             {Target::LoyalThree, "loyal-three", "Loyal Three"},
             {Target::Generic, "generic", "Gimmighoul"},
         },
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         Target::TreasuresOfRuin
     )
     , LANGUAGE(
         "<b>Game Language:</b><br>This field is required so we can read IVs.",
         IV_READER().languages(),
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         true
     )
     , BALL_SELECT(
         "<b>Ball Select:</b>",
-        LockWhileRunning::UNLOCKED,
+        LockMode::UNLOCK_WHILE_RUNNING,
         "poke-ball"
     )
     , QUICKBALL(
         "<b>Throw Quick Ball:</b><br>Use a Quick Ball on the first turn. If there are moves in the Move Table, they will run <i>after</i> the Quick Ball is thrown.",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         false
+    )
+    , FILTERS(
+        StatsHuntIvJudgeFilterTable_Label_Regular,
+        {
+            .action = false,
+            .shiny = false,
+            .gender = false,
+            .nature = true,
+        }
     )
     , GO_HOME_WHEN_DONE(false)
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
@@ -104,6 +113,20 @@ StatsReset::StatsReset()
         & NOTIFICATION_ERROR_FATAL,
     })
 {
+    {
+        std::vector<std::unique_ptr<EditableTableRow>> ret;
+        {
+            auto row = std::make_unique<StatsHuntIvJudgeFilterRow>(FILTERS.feature_flags);
+            row->iv_atk.set(IvJudgeFilter::NoGood);
+            ret.emplace_back(std::move(row));
+        }
+        {
+            auto row = std::make_unique<StatsHuntIvJudgeFilterRow>(FILTERS.feature_flags);
+            row->iv_speed.set(IvJudgeFilter::NoGood);
+            ret.emplace_back(std::move(row));
+        }
+        FILTERS.set_default(std::move(ret));
+    }
     PA_ADD_OPTION(TARGET);
     PA_ADD_OPTION(LANGUAGE); //This is required
     PA_ADD_OPTION(BALL_SELECT);

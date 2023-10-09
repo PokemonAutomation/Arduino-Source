@@ -42,7 +42,7 @@ ShinyHuntAutonomousIoATrade::ShinyHuntAutonomousIoATrade()
     : GO_HOME_WHEN_DONE(false)
     , VIDEO_ON_SHINY(
         "<b>Video Capture:</b><br>Take a video of the encounter if it is shiny.",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         true
     )
     , NOTIFICATION_NONSHINY(
@@ -68,13 +68,13 @@ ShinyHuntAutonomousIoATrade::ShinyHuntAutonomousIoATrade()
     )
     , MASH_TO_TRADE_DELAY(
         "<b>Mash to Trade Delay:</b><br>Time to perform the trade.",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "30 * TICKS_PER_SECOND"
     )
     , RUN_FROM_EVERYTHING(
         "<b>Run from Everything:</b><br>Run from everything - even if it is shiny. (For testing only.)",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         false
     )
 {

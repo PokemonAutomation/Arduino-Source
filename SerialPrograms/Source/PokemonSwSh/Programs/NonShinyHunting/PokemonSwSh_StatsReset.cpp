@@ -58,7 +58,7 @@ StatsReset::StatsReset()
     , LANGUAGE(
         "<b>Game Language:</b>",
         IV_READER().languages(),
-        LockWhileRunning::LOCKED
+        LockMode::LOCK_WHILE_RUNNING
     )
     , POKEMON(
         "<b>Gift " + STRING_POKEMON + ":</b>",
@@ -67,7 +67,7 @@ StatsReset::StatsReset()
             {GiftPokemon::Cosmog,   "cosmog",       "Cosmog"},
             {GiftPokemon::Poipole,  "poipole",      "Poipole"},
         },
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         GiftPokemon::TypeNull
     )
     , HP("<b>HP:</b>")

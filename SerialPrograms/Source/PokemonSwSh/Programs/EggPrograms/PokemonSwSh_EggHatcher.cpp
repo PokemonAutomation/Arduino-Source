@@ -85,7 +85,7 @@ uint8_t swap_party(BotBaseContext& context, uint8_t column){
 EggHatcher::EggHatcher()
     : BOXES_TO_HATCH(
         "<b>Boxes to Hatch:</b>",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         3
     )
     , m_advanced_options(
@@ -93,13 +93,13 @@ EggHatcher::EggHatcher()
     )
     , SAFETY_TIME0(
         "<b>Safety Time:</b><br>Additional time added to the spinning.",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "12 * TICKS_PER_SECOND"
     )
     , HATCH_DELAY(
         "<b>Hatch Delay:</b><br>Total animation time for hatching 5 eggs when there are no shinies.",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "88 * TICKS_PER_SECOND"
     )

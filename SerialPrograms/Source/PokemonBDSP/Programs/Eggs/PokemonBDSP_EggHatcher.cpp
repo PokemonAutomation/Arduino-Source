@@ -50,12 +50,12 @@ EggHatcher::EggHatcher()
 //    , SHORTCUT("<b>Bike Shortcut:</b>")
     , BOXES_TO_HATCH(
         "<b>Boxes to Hatch:</b>",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         3
     )
     , SAVE_AND_RESET(
         "<b>Save and Reset:</b><br>After hatching a box, save the game and reset. This will recover from game crashes.",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         true
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
@@ -69,13 +69,13 @@ EggHatcher::EggHatcher()
     )
     , SAFETY_TIME0(
         "<b>Safety Time:</b><br>Additional time added to the spinning.",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "10 * TICKS_PER_SECOND"
     )
     , HATCH_DELAY(
         "<b>Hatch Delay:</b><br>Total animation time for hatching 5 eggs when there are no shinies.",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "105 * TICKS_PER_SECOND"
     )

@@ -69,13 +69,13 @@ ShinyHuntAutonomousFishing::ShinyHuntAutonomousFishing()
     )
     , EXIT_BATTLE_TIMEOUT(
         "<b>Exit Battle Timeout:</b><br>After running, wait this long to return to overworld and for the fish to reappear.",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "10 * TICKS_PER_SECOND"
     )
     , FISH_RESPAWN_TIME(
         "<b>Fish Respawn Time:</b><br>Wait this long for fish to respawn.",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "5 * TICKS_PER_SECOND"
     )

@@ -34,7 +34,7 @@ FriendSearchDisconnect_Descriptor::FriendSearchDisconnect_Descriptor()
 FriendSearchDisconnect::FriendSearchDisconnect()
     : USER_SLOT(
         "<b>User Slot:</b><br>Use this profile to disconnect.",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         1, 1, 8
     )
 {

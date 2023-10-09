@@ -64,7 +64,7 @@ StatsResetMoltres::StatsResetMoltres()
     , LANGUAGE(
         "<b>Game Language:</b>",
         IV_READER().languages(),
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         true
     )
     , HP("<b>HP:</b>")

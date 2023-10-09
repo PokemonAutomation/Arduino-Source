@@ -119,7 +119,7 @@ DenMonSelectOption::DenMonSelectOption(std::string label)
     : StringSelectOption(
         std::move(label),
         DenMonSelectData::m_database,
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         ""
     )
 {}

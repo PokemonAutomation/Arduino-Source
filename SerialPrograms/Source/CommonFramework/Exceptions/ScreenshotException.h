@@ -35,6 +35,8 @@ public:
     explicit ScreenshotException(ErrorReport error_report, std::string message, std::shared_ptr<const ImageRGB32> screenshot);
     explicit ScreenshotException(ErrorReport error_report, ConsoleHandle& console, std::string message, bool take_screenshot);
 
+    void attach_screenshot(std::shared_ptr<const ImageRGB32> screenshot);
+
 public:
 //    virtual const char* name() const override{ return "ScreenshotException"; }
     virtual std::string message() const override{ return m_message; }

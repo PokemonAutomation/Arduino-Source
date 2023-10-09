@@ -29,6 +29,10 @@ SimpleIntegerCellWidget<Type>::SimpleIntegerCellWidget(QWidget& parent, SimpleIn
     , ConfigWidget(value, *this)
     , m_value(value)
 {
+//    cout << "sizeHint() = " << this->sizeHint().width() << endl;
+
+    this->setReadOnly(value.lock_mode() == LockMode::READ_ONLY);
+
     connect(
         this, &QLineEdit::textChanged,
         this, [this](const QString& text){

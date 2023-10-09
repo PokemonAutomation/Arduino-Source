@@ -88,23 +88,23 @@ std::unique_ptr<StatsTracker> TeraSelfFarmer_Descriptor::make_stats() const{
 
 
 TeraFarmerStopConditions::TeraFarmerStopConditions()
-    : GroupOption("Stop Conditions", LockWhileRunning::UNLOCKED)
+    : GroupOption("Stop Conditions", LockMode::UNLOCK_WHILE_RUNNING)
     , MAX_CATCHES(
         "<b>Max Catches:</b><br>Stop program after catching this many " + STRING_POKEMON + ".",
-        LockWhileRunning::UNLOCKED,
+        LockMode::UNLOCK_WHILE_RUNNING,
         50, 1, 999
     )
     , STOP_ON_SHINY(
         "<b>Stop on Shiny:</b> (requires catching the " + STRING_POKEMON + ")<br>"
         "Stop the program if a shiny is found. Resetting the game will return you to the front of this (shiny) raid so it can be hosted again.",
-        LockWhileRunning::UNLOCKED,
+        LockMode::UNLOCK_WHILE_RUNNING,
         true
     )
     , STOP_ON_RARE_ITEMS(
         "<b>Stop on Rare Items:</b><br>"
         "Stop the program if the rewards contain at least this many rare (sparkly) items. Set to zero to disable this feature and never stop for item rewards.<br>"
         "Note that the program can only see the first 8 item rewards. It will not scroll down.",
-        LockWhileRunning::UNLOCKED,
+        LockMode::UNLOCK_WHILE_RUNNING,
         0, 0, 8
     )
 {
@@ -121,11 +121,11 @@ TeraSelfFarmer::TeraSelfFarmer()
     : LANGUAGE(
         "<b>Game Language:</b>",
         PokemonNameReader::instance().languages(),
-        LockWhileRunning::UNLOCKED
+        LockMode::UNLOCK_WHILE_RUNNING
     )
     , PERIODIC_RESET(
         "<b>Periodic Game Reset:</b><br>Reset the game after this many skips. This clears up the framerate bug.",
-        LockWhileRunning::UNLOCKED,
+        LockMode::UNLOCK_WHILE_RUNNING,
         20, 0, 100
     )
     , CATCH_ON_WIN(true)

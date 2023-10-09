@@ -139,7 +139,11 @@ NatureAdjustments StatHexagonReader::read_nature(Logger& logger, const ImageView
         return ret;
     }
     if (non_neutral.size() != 2){
-        throw OperationFailedException(ErrorReport::SEND_ERROR_REPORT, logger, "Unable to read nature.");
+        throw OperationFailedException(
+            ErrorReport::SEND_ERROR_REPORT,
+            logger,
+            "Unable to read nature."
+        );
     }
 
     if (*non_neutral[0].first != *non_neutral[1].first){
@@ -163,7 +167,11 @@ NatureAdjustments StatHexagonReader::read_nature(Logger& logger, const ImageView
         return ret;
     }
 
-    throw OperationFailedException(ErrorReport::SEND_ERROR_REPORT, logger, "Unable to read nature.");
+    throw OperationFailedException(
+        ErrorReport::SEND_ERROR_REPORT,
+        logger,
+        "Unable to read nature."
+    );
 }
 
 

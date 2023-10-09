@@ -26,7 +26,7 @@ public:
         : EnumDropdownOption<IvJudgeValue>(
             std::move(label),
             IvJudgeValue_Database(),
-            LockWhileRunning::LOCKED,
+            LockMode::LOCK_WHILE_RUNNING,
             default_value
         )
     {}

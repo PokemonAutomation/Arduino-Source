@@ -70,18 +70,18 @@ StatsResetCalyrex::StatsResetCalyrex()
     : GO_HOME_WHEN_DONE(false)
     , BALL_SELECT(
         "<b>Ball Select:</b>",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         "master-ball"
     )
     , LANGUAGE(
         "<b>Game Language:</b>",
         IV_READER().languages(),
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         true
     )
     , CHECK_CALYREX_STATS(
         "<b>Check Calyrex stats</b>",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         true
     )
     , CALYREX_HP("<b>Calyrex HP:</b>")
@@ -92,7 +92,7 @@ StatsResetCalyrex::StatsResetCalyrex()
     , CALYREX_SPEED("<b>Calyrex Speed:</b>")
     , CHECK_HORSE_STATS(
         "<b>Check Horse stats</b>",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         true
     )
     , HORSE_HP("<b>Horse HP:</b>")

@@ -21,7 +21,7 @@ public:
         : EnumDropdownOption<ThreadPriority>(
             std::move(label),
             PRIORITY_DATABASE(),
-            LockWhileRunning::LOCKED,
+            LockMode::LOCK_WHILE_RUNNING,
             default_priority
         )
     {}

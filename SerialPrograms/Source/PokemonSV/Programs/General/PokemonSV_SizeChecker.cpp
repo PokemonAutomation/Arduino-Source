@@ -64,7 +64,7 @@ SizeChecker::SizeChecker()
     : GO_HOME_WHEN_DONE(false)
     , BOXES_TO_CHECK(
         "<b>Number of Boxes to Check:</b>",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         2, 1, 32
     )
     , NOTIFICATIONS({

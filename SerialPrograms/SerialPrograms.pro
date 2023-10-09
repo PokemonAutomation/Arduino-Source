@@ -109,6 +109,7 @@ SOURCES += \
     ../Common/Cpp/Options/FixedCodeOption.cpp \
     ../Common/Cpp/Options/FloatingPointOption.cpp \
     ../Common/Cpp/Options/GroupOption.cpp \
+    ../Common/Cpp/Options/IntegerRangeOption.cpp \
     ../Common/Cpp/Options/RandomCodeOption.cpp \
     ../Common/Cpp/Options/SimpleIntegerOption.cpp \
     ../Common/Cpp/Options/StaticTableOption.cpp \
@@ -138,6 +139,7 @@ SOURCES += \
     ../Common/Qt/Options/FixedCodeWidget.cpp \
     ../Common/Qt/Options/FloatingPointWidget.cpp \
     ../Common/Qt/Options/GroupWidget.cpp \
+    ../Common/Qt/Options/IntegerRangeWidget.cpp \
     ../Common/Qt/Options/RandomCodeWidget.cpp \
     ../Common/Qt/Options/SimpleIntegerWidget.cpp \
     ../Common/Qt/Options/StaticTableWidget.cpp \
@@ -438,7 +440,6 @@ SOURCES += \
     Source/Pokemon/Options/Pokemon_NameSelectOption.cpp \
     Source/Pokemon/Options/Pokemon_NameSelectWidget.cpp \
     Source/Pokemon/Options/Pokemon_StatsHuntFilter.cpp \
-    Source/Pokemon/Options/Pokemon_StatsResetFilter.cpp \
     Source/Pokemon/Pokemon_EncounterStats.cpp \
     Source/Pokemon/Pokemon_IvJudge.cpp \
     Source/Pokemon/Pokemon_NatureChecker.cpp \
@@ -1083,6 +1084,7 @@ HEADERS += \
     ../Common/Cpp/Options/FixedCodeOption.h \
     ../Common/Cpp/Options/FloatingPointOption.h \
     ../Common/Cpp/Options/GroupOption.h \
+    ../Common/Cpp/Options/IntegerRangeOption.h \
     ../Common/Cpp/Options/RandomCodeOption.h \
     ../Common/Cpp/Options/SimpleIntegerOption.h \
     ../Common/Cpp/Options/StaticTableOption.h \
@@ -1133,6 +1135,7 @@ HEADERS += \
     ../Common/Qt/Options/FixedCodeWidget.h \
     ../Common/Qt/Options/FloatingPointWidget.h \
     ../Common/Qt/Options/GroupWidget.h \
+    ../Common/Qt/Options/IntegerRangeWidget.h \
     ../Common/Qt/Options/RandomCodeWidget.h \
     ../Common/Qt/Options/SimpleIntegerWidget.h \
     ../Common/Qt/Options/StaticTableWidget.h \
@@ -1484,7 +1487,6 @@ HEADERS += \
     Source/Pokemon/Options/Pokemon_NameSelectOption.h \
     Source/Pokemon/Options/Pokemon_NameSelectWidget.h \
     Source/Pokemon/Options/Pokemon_StatsHuntFilter.h \
-    Source/Pokemon/Options/Pokemon_StatsResetFilter.h \
     Source/Pokemon/Pokemon_DataTypes.h \
     Source/Pokemon/Pokemon_EncounterStats.h \
     Source/Pokemon/Pokemon_IvJudge.h \

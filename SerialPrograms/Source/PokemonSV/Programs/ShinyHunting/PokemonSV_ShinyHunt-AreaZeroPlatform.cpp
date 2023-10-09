@@ -89,7 +89,7 @@ ShinyHuntAreaZeroPlatform::ShinyHuntAreaZeroPlatform()
     : LANGUAGE(
         "<b>Game Language:</b><br>Required to read " + STRING_POKEMON + " names.",
         IV_READER().languages(),
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         false
     )
     , MODE(
@@ -102,7 +102,7 @@ ShinyHuntAreaZeroPlatform::ShinyHuntAreaZeroPlatform()
             {Mode::START_IN_ZERO_GATE,  "zerogate", "Start inside Zero Gate."},
             {Mode::MAKE_SANDWICH,       "sandwich", "Make a sandwich."},
         },
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         Mode::START_ON_PLATFORM
     )
     , PATH0(
@@ -112,19 +112,19 @@ ShinyHuntAreaZeroPlatform::ShinyHuntAreaZeroPlatform()
             {Path::PATH1, "path1", "Path 1"},
             {Path::PATH2, "path2", "Path 2"},
         },
-        LockWhileRunning::UNLOCKED,
+        LockMode::UNLOCK_WHILE_RUNNING,
         Path::PATH2
     )
     , SANDWICH_RESET_IN_MINUTES(
         "<b>Sandwich Reset Time (in minutes):</b><br>The time to reset game to make a new sandwich.",
-        LockWhileRunning::UNLOCKED,
+        LockMode::UNLOCK_WHILE_RUNNING,
         35
     )
     , SANDWICH_OPTIONS(LANGUAGE)
     , GO_HOME_WHEN_DONE(true)
     , AUTO_HEAL_PERCENT(
         "<b>Auto-Heal %</b><br>Auto-heal if your HP drops below this percentage.",
-        LockWhileRunning::UNLOCKED,
+        LockMode::UNLOCK_WHILE_RUNNING,
         75, 0, 100
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
@@ -211,6 +211,8 @@ bool ShinyHuntAreaZeroPlatform::run_traversal(BotBaseContext& context){
     std::chrono::seconds window_seconds;
     bool enough_time;
     if (window == WallDuration::zero()){
+//        console.log("Debug Reset Timer: Window not initialized.", COLOR_RED);
+
         //  Not enough history.
         enough_time = false;
         window = start - m_encounter_tracker->encounter_rate_tracker_start_time();
@@ -219,6 +221,8 @@ bool ShinyHuntAreaZeroPlatform::run_traversal(BotBaseContext& context){
             kills, encounters, window_seconds
         );
     }else{
+//        console.log("Debug Reset Timer: Window started.", COLOR_RED);
+
         window_seconds = std::chrono::duration_cast<Seconds>(window);
         enough_time = m_encounter_tracker->get_encounters_in_window(
             kills, encounters, window_seconds
@@ -384,7 +388,7 @@ void ShinyHuntAreaZeroPlatform::run_state(SingleSwitchProgramEnvironment& env, B
     }
 
     if (m_pending_platform_reset){
-        console.log("Executing: Platform Reset (time-based)...");
+        console.log("Executing: Platform Reset");
         return_to_inside_zero_gate(info, console, context);
         inside_zero_gate_to_platform(info, console, context, NAVIGATE_TO_PLATFORM);
         m_current_location = Location::AREA_ZERO;
@@ -427,7 +431,7 @@ void ShinyHuntAreaZeroPlatform::run_state(SingleSwitchProgramEnvironment& env, B
             m_pending_platform_reset = true;
             throw;
         }
-        m_encounter_tracker->reset_rate_tracker_start_time();
+//        m_encounter_tracker->reset_rate_tracker_start_time();
         m_consecutive_failures = 0;
         return;
     }

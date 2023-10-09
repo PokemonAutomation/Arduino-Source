@@ -45,7 +45,7 @@ FloatingPointCell::FloatingPointCell(const FloatingPointCell& x)
     , m_label(x.m_label)
 {}
 FloatingPointCell::FloatingPointCell(
-    LockWhileRunning lock_while_running,
+    LockMode lock_while_running,
     double min_value, double max_value,
     double default_value, double current_value
 )
@@ -55,7 +55,7 @@ FloatingPointCell::FloatingPointCell(
 
 
 FloatingPointCell::FloatingPointCell(
-    LockWhileRunning lock_while_running,
+    LockMode lock_while_running,
     double default_value,
     double min_value,
     double max_value
@@ -136,7 +136,7 @@ void FloatingPointCell::restore_defaults(){
 
 FloatingPointOption::FloatingPointOption(
     std::string label,
-    LockWhileRunning lock_while_running,
+    LockMode lock_while_running,
     double default_value,
     double min_value,
     double max_value
