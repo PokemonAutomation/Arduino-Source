@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_NintendoSwitch_DetectHome_H
 #define PokemonAutomation_NintendoSwitch_DetectHome_H
 
+#include "Common/Cpp/Color.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 #include "CommonFramework/Inference/VisualDetector.h"
@@ -41,12 +42,13 @@ public:
 
 class StartGameUserSelectDetector : public StaticScreenDetector{
 public:
-    StartGameUserSelectDetector();
+    StartGameUserSelectDetector(Color color = COLOR_RED);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) const override;
 
 private:
+    Color m_color;
     ImageFloatBox m_bottom_row;
     ImageFloatBox m_bottom_icons;
     ImageFloatBox m_top_row;
@@ -55,21 +57,22 @@ private:
 };
 class StartGameUserSelectWatcher : public DetectorToFinder<StartGameUserSelectDetector>{
 public:
-    StartGameUserSelectWatcher()
-         : DetectorToFinder("StartGameUserSelectWatcher", std::chrono::milliseconds(250))
+    StartGameUserSelectWatcher(Color color = COLOR_RED)
+         : DetectorToFinder("StartGameUserSelectWatcher", std::chrono::milliseconds(250), color)
     {}
 };
 
 
-// Detect the Switch system update screen when you are about to enter a game from Switch Home screen
+//  Detect the Switch system update screen when you are about to enter a game from Switch Home screen
 class UpdateMenuDetector : public StaticScreenDetector{
 public:
-    UpdateMenuDetector(bool invert = false);
+    UpdateMenuDetector(Color color = COLOR_RED, bool invert = false);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) const override;
 
 private:
+    Color m_color;
     bool m_invert;
     ImageFloatBox m_box_top;
     ImageFloatBox m_box_mid;
@@ -80,17 +83,37 @@ private:
 };
 class UpdateMenuWatcher : public DetectorToFinder<UpdateMenuDetector>{
 public:
-    UpdateMenuWatcher(bool invert)
-         : DetectorToFinder("UpdateMenuWatcher", std::chrono::milliseconds(250), invert)
+    UpdateMenuWatcher(Color color = COLOR_RED, bool invert = false)
+         : DetectorToFinder("UpdateMenuWatcher", std::chrono::milliseconds(250), color, invert)
     {}
 };
 
 
 
+//  Detect the "Checking if the software can be played..." menu.
+class CheckOnlineDetector : public StaticScreenDetector{
+public:
+    CheckOnlineDetector(Color color = COLOR_RED, bool invert = false);
 
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+    virtual bool detect(const ImageViewRGB32& screen) const override;
 
-
-
+private:
+    Color m_color;
+    bool m_invert;
+    ImageFloatBox m_box_top;
+    ImageFloatBox m_box_mid;
+    ImageFloatBox m_top;
+    ImageFloatBox m_left;
+    ImageFloatBox m_bottom_solid;
+    ImageFloatBox m_bottom_buttons;
+};
+class CheckOnlineWatcher : public DetectorToFinder<CheckOnlineDetector>{
+public:
+    CheckOnlineWatcher(Color color = COLOR_RED, bool invert = false)
+         : DetectorToFinder("CheckOnlineWatcher", std::chrono::milliseconds(250), color, invert)
+    {}
+};
 
 
 }

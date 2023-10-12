@@ -110,6 +110,7 @@
 #include <filesystem>
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_Lobby.h"
 #include "PokemonSV/Inference/PokemonSV_StatHexagonReader.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 
 
 
@@ -237,12 +238,29 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
+    start_game_from_home(
+        console, context,
+        true, 0, 0,
+        10
+    );
+
+#if 0
+//    UpdateMenuWatcher update_menu(false);
+    CheckOnlineDetector update_menu(false);
+    update_menu.make_overlays(overlays);
+
+    auto snapshot = console.video().snapshot();
+    cout << update_menu.detect(snapshot) << endl;
+#endif
+
+#if 0
+
 //    ImageRGB32 image("screenshot-20231003-202430049819.png");
     auto snapshot = console.video().snapshot();
 
     PokemonSummaryDetector detector;
     cout << detector.detect(snapshot) << endl;
-
+#endif
 
 #if 0
     SummaryStatsReader reader;

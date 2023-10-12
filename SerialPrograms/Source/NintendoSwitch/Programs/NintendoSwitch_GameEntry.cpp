@@ -39,7 +39,7 @@ void resume_game_from_home(
 
     while (true){
         {
-            UpdateMenuWatcher update_detector(false);
+            UpdateMenuWatcher update_detector;
             int ret = wait_until(
                 console, context,
                 std::chrono::milliseconds(1000),
@@ -131,14 +131,21 @@ void start_game_from_home_with_inference(
 
     while (true){
         HomeWatcher home(std::chrono::milliseconds(2000));
-        StartGameUserSelectWatcher user_select;
-        UpdateMenuWatcher update_menu(false);
-        BlackScreenWatcher black_screen;
+        StartGameUserSelectWatcher user_select(COLOR_GREEN);
+        UpdateMenuWatcher update_menu(COLOR_PURPLE);
+        CheckOnlineWatcher check_online(COLOR_CYAN);
+        BlackScreenWatcher black_screen(COLOR_BLUE);
         context.wait_for_all_requests();
         int ret = wait_until(
             console, context,
             std::chrono::seconds(10),
-            { home, user_select, update_menu, black_screen }
+            {
+                home,
+                user_select,
+                update_menu,
+                check_online,
+                black_screen,
+            }
         );
 
         //  Wait for screen to stabilize.
@@ -153,13 +160,17 @@ void start_game_from_home_with_inference(
             console.log("Detected user-select screen.");
             move_to_user(context, user_slot);
             pbf_press_button(context, BUTTON_A, 10, start_game_wait);
-            return;
+            break;
         case 2:
             console.log("Detected update menu.", COLOR_RED);
             pbf_press_dpad(context, DPAD_UP, 5, 0);
             pbf_press_button(context, BUTTON_A, 20, 105);
             break;
         case 3:
+            console.log("Detected check online.", COLOR_RED);
+            context.wait_for(std::chrono::seconds(1));
+            break;
+        case 4:
             console.log("Detected black screen. Game started...");
             return;
         default:
