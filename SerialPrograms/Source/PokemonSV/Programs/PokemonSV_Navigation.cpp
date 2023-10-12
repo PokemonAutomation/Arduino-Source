@@ -589,15 +589,35 @@ void fly_to_closest_pokecenter_on_map(const ProgramInfo& info, ConsoleHandle& co
     // detect it. So we zoom in as much as we can to prevent any icon overlap.
     pbf_press_button(context, BUTTON_ZR, 40, 100);
     
-    if (fly_to_visible_closest_pokecenter_cur_zoom_level(info, console, context) == false){
-        // Does not find any visible pokecenter. Probably the player character icon overlaps with the pokecenter.
-        // Zoom out to the max warpable level and try pressing on the player character.
-        console.log("Zoom to max level to fly without moving joystick");
-        console.overlay().add_log("Assume too close");
-        pbf_press_button(context, BUTTON_ZL, 40, 100);
-        pbf_press_button(context, BUTTON_ZL, 40, 100);
+    if (fly_to_visible_closest_pokecenter_cur_zoom_level(info, console, context)){
+        return; // success in finding the closest pokecenter. Return.
+    }
+    
+    // Does not find any visible pokecenter. Probably the player character or a nearby Pokemon icon overlaps with the pokecenter.
+    // Zoom out to the max warpable level and try pressing on the player character.
+    console.log("Zoom to max map level to try searching for pokecetner again.");
+    console.overlay().add_log("Pokecenter Icon occluded");
+    pbf_press_button(context, BUTTON_ZL, 40, 100);
+    pbf_press_button(context, BUTTON_ZL, 40, 100);
 
-        fly_to_overworld_from_map(info, console, context);
+    const bool check_fly_menuitem = true;
+    if (fly_to_overworld_from_map(info, console, context, check_fly_menuitem)){
+        return; // success in flying to the pokecenter that overlaps with the player character at max warpable level.
+    }
+
+    console.log("No PokeCenter icon overlapping with the player character on the max warpable level");
+    console.overlay().add_log("No overlapping PokeCenter");
+    // press B to first close the map menu
+    pbf_press_button(context, BUTTON_B, 60, 100);
+    // Now try finding the closest pokecenter at the max warpable level
+    if (fly_to_visible_closest_pokecenter_cur_zoom_level(info, console, context) == false){
+        // Does not detect any pokecenter on map
+        console.overlay().add_log("Still no PokeCenter Found!", COLOR_RED);
+        throw OperationFailedException(
+            ErrorReport::SEND_ERROR_REPORT, console,
+            "fly_to_closest_pokecenter_on_map(): At max warpable map level, still cannot find PokeCenter icon.",
+            true
+        );
     }
 }
 

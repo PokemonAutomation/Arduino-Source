@@ -31,8 +31,8 @@ void day_skip_from_overworld(ConsoleHandle& console, BotBaseContext& context);
 void open_map_from_overworld(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
 
 //  From map, press A to fly to a travel spot.
-//  check_fly_menuitem == true: will detect if the "Fly" menuitem is available. Return false if no "Fly" menuitem. Return
-//    true if flying successful.
+//  check_fly_menuitem == true: will detect if the "Fly" menuitem is available. Return false if no "Fly" menuitem (the game
+//    will be on the map menu opened state). Return true if the flight is successful (the game will be at the overworld).
 //  check_fly_menuitem == false: will use GradientArrowDetector to check if a map menu is opened. No "Fly" menuitem check.
 //    The function always returns true. It throws an error in the case of no "Fly" menuitem. But the error message will be about
 //    timeout running the function.
