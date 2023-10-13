@@ -10,7 +10,7 @@
 #include "CommonFramework/Tools/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
-#include "PokemonSV/Inference/Boxes/PokemonSV_IVCheckerReader.h"
+#include "PokemonSV/Inference/Boxes/PokemonSV_IvJudgeReader.h"
 #include "PokemonSV/Programs/Eggs/PokemonSV_EggRoutines.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSV_EggFetcher.h"
@@ -43,7 +43,7 @@ struct EggFetcher_Descriptor::Stats : public StatsTracker{
         m_display_order.emplace_back("Sandwiches");
         m_display_order.emplace_back("Fetch Attempts");
         m_display_order.emplace_back("Eggs");
-        m_display_order.emplace_back("Errors", true);
+        m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
     }
     std::atomic<uint64_t>& m_sandwiches;
     std::atomic<uint64_t>& m_attempts;
@@ -61,12 +61,12 @@ EggFetcher::EggFetcher()
     , LANGUAGE(
         "<b>Game Language:</b><br>Required to read IVs.",
         IV_READER().languages(),
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         false
     )
     , EGGS_TO_FETCH(
         "<b>Fetch this many eggs:</b>",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         900
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
@@ -90,7 +90,7 @@ void EggFetcher::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
     EggFetcher_Descriptor::Stats& stats = env.current_stats<EggFetcher_Descriptor::Stats>();
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_LCLICK, 10, 0);
+    pbf_press_button(context, BUTTON_L, 10, 0);
 
     size_t num_eggs_collected = 0;
 

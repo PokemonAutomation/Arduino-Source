@@ -119,7 +119,13 @@ void MultiSwitchSystemWidget::redraw_videos(size_t count){
     for (size_t c = 0; c < m_session.count(); c++){
 //        const auto& item = m_option.m_switches[c];
 //        m_switches.emplace_back(item->make_ui(*this, m_logger, m_program_id));
-        m_switches.emplace_back(new SwitchSystemWidget(*m_videos, m_session[c], m_program_id));
+        m_switches.emplace_back(
+            new SwitchSystemWidget(
+                *m_videos,
+                m_session[c],
+                m_program_id
+            )
+        );
     }
 
     QHBoxLayout* vrow0 = new QHBoxLayout();

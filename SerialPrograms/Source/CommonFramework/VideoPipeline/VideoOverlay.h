@@ -47,7 +47,7 @@ public:
     // Asynchronously, add a log message to the screen. The older messages added via `add_log_text()`
     // will be placed higher like in the logging window.
     // Use `OverlayLogTextScope` to remove the log messages automatically. 
-    virtual void add_log(std::string message, Color color) = 0;
+    virtual void add_log(std::string message, Color color = COLOR_WHITE) = 0;
     // Remove all messages added by `add_log_text()`.
     // Use `OverlayLogTextScope` to remove log messages automatically.
     virtual void clear_log() = 0;

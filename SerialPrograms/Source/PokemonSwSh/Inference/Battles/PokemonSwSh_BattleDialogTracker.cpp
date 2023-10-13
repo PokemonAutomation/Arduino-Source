@@ -6,12 +6,11 @@
 
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
-#include "PokemonSwSh/Inference/Battles/PokemonSwSh_StartBattleDetector.h"
 #include "PokemonSwSh_BattleDialogTracker.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -55,6 +54,9 @@ bool EncounterDialogTracker::process_frame(const ImageViewRGB32& screen, WallClo
         tostr_default(gap_duration.count() / 1000.) + " seconds",
         COLOR_PURPLE
     );
+
+//    static int c = 0;
+//    screen.save("test-" + std::to_string(c++) + ".png");
 
     EncounterState state = m_state.load(std::memory_order_relaxed);
     switch (state){

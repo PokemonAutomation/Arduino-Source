@@ -282,6 +282,7 @@ std::string read_raid_code(Logger& logger, AsyncDispatcher& dispatcher, const Im
             {']', '1'},
             {')', 'J'},
             {'(', 'K'},
+            {'[', 'C'},
         };
 
         bool contains_letters = false;

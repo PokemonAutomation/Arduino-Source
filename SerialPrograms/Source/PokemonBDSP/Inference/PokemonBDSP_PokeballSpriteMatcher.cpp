@@ -24,7 +24,7 @@ PokeballSpriteMatcher::PokeballSpriteMatcher(double min_euclidean_distance)
 }
 
 
-ImageRGB32 PokeballSpriteMatcher::process_image(const ImageViewRGB32& image, Color& background) const{
+auto PokeballSpriteMatcher::get_crop_candidates(const ImageViewRGB32& image) const -> std::vector<ImageViewRGB32>{
     ImageStats border = image_border_stats(image);
     ImagePixelBox box = ImageMatch::enclosing_rectangle_with_pixel_filter(
         image,
@@ -36,8 +36,9 @@ ImageRGB32 PokeballSpriteMatcher::process_image(const ImageViewRGB32& image, Col
             return stop;
         }
     );
-    background = border.average.round();
-    return extract_box_reference(image, box).copy();
+    std::vector<ImageViewRGB32> ret;
+    ret.emplace_back(extract_box_reference(image, box));
+    return ret;
 }
 
 

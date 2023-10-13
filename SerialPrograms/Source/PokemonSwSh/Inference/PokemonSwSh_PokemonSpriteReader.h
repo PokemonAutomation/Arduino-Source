@@ -8,8 +8,6 @@
 #define PokemonAutomation_PokemonSwSh_PokemonSpriteReader_H
 
 #include <set>
-#include "CommonFramework/Logging/Logger.h"
-#include "CommonFramework/ImageMatch/ImageMatchResult.h"
 #include "CommonFramework/ImageMatch/ExactImageDictionaryMatcher.h"
 #include "CommonFramework/ImageMatch/CroppedImageDictionaryMatcher.h"
 
@@ -36,7 +34,7 @@ public:
     PokemonSpriteMatcherCropped(const std::set<std::string>* subset, double min_euclidean_distance = 100);
 
 private:
-    virtual ImageRGB32 process_image(const ImageViewRGB32& image, Color& background) const override;
+    virtual std::vector<ImageViewRGB32> get_crop_candidates(const ImageViewRGB32& image) const override;
 
 private:
     double m_min_euclidean_distance_squared;

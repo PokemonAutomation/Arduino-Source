@@ -36,7 +36,7 @@ struct StringCell::Data{
 StringCell::~StringCell() = default;
 StringCell::StringCell(
     bool is_password,
-    LockWhileRunning lock_while_program_is_running,
+    LockMode lock_while_program_is_running,
     std::string default_value,
     std::string placeholder_text
 )
@@ -102,7 +102,7 @@ void StringCell::restore_defaults(){
 StringOption::StringOption(
     bool is_password,
     std::string label,
-    LockWhileRunning lock_while_program_is_running,
+    LockMode lock_while_program_is_running,
     std::string default_value,
     std::string placeholder_text
 )

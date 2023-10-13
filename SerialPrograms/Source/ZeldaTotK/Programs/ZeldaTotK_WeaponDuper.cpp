@@ -42,22 +42,22 @@ std::unique_ptr<StatsTracker> WeaponDuper_Descriptor::make_stats() const {
 WeaponDuper::WeaponDuper()
     : ATTEMPTS(
         "<b>Duplication Attempts:</b><br>The number of times you wish to run this routine.",
-        LockWhileRunning::UNLOCKED,
+        LockMode::UNLOCK_WHILE_RUNNING,
         10
     )
     , WEAPON_MENU_BUTTON_COUNT(
         "<b>Menu change button presses: :</b><br>How many button presses are required to go from option menu to weapon menu (bow = 7, shield = 6, sword = 5).",
-        LockWhileRunning::UNLOCKED,
+        LockMode::UNLOCK_WHILE_RUNNING,
         5
     )
     , DPAD_RIGHT_BUTTON_COUNT(
         "<b>Right button presses: :</b><br>How many dpad right button presses are required to go from the left-most slot to the one you want to dupe.",
-        LockWhileRunning::UNLOCKED,
+        LockMode::UNLOCK_WHILE_RUNNING,
         0
     )
     , DPAD_DOWN_BUTTON_COUNT(
         "<b>Down button presses: :</b><br>How many dpad down button presses are required to go from the top-most slot to the one you want to dupe.",
-        LockWhileRunning::UNLOCKED,
+        LockMode::UNLOCK_WHILE_RUNNING,
         0
     )
     , GO_HOME_WHEN_DONE(false)

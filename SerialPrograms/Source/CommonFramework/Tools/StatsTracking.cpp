@@ -12,11 +12,11 @@ namespace PokemonAutomation{
 
 
 
-StatsTracker::Stat::Stat(std::string&& p_label, bool p_omit_if_zero)
+StatsTracker::Stat::Stat(std::string&& p_label, DisplayMode p_display_node)
     : label(p_label)
-    , omit_if_zero(p_omit_if_zero)
+    , display_mode(p_display_node)
 {}
-std::string StatsTracker::to_str() const{
+std::string StatsTracker::to_str(PrintMode mode) const{
     std::map<std::string, uint64_t> stats;
     for (const auto& item : m_stats){
         auto alias = m_aliases.find(item.first);
@@ -41,9 +41,29 @@ std::string StatsTracker::to_str() const{
         if (iter != stats.end()){
             count += iter->second;
         }
-        if (stat.omit_if_zero && count == 0){
-            continue;
+
+        switch (stat.display_mode){
+        case ALWAYS_VISIBLE:
+            break;
+        case HIDDEN_IF_ZERO:
+            if (count == 0){
+                continue;
+            }else{
+                break;
+            }
+        case ALWAYS_HIDDEN:
+            switch (mode){
+            case DISPLAY_ON_SCREEN:
+                continue;
+            case SAVE_TO_STATS_FILE:
+                if (count == 0){
+                    continue;
+                }else{
+                    break;
+                }
+            }
         }
+
         if (!str.empty()){
             str += " - ";
         }
@@ -115,12 +135,12 @@ std::string stats_to_bar(
     if (!override_current.empty()){
         current_str = override_current;
     }else if (current){
-        current_str = current->to_str();
+        current_str = current->to_str(StatsTracker::DISPLAY_ON_SCREEN);
     }
 
     std::string historical_str;
     if (historical){
-        historical_str = historical->to_str();
+        historical_str = historical->to_str(StatsTracker::DISPLAY_ON_SCREEN);
     }
 
     if (current_str.empty() && historical_str.empty()){

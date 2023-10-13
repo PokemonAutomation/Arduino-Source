@@ -14,7 +14,7 @@
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
-#include "Pokemon/Options/Pokemon_EggHatchFilter.h"
+#include "Pokemon/Options/Pokemon_StatsHuntFilter.h"
 #include "PokemonSwSh/Options/PokemonSwSh_DateToucher.h"
 // #include "PokemonSwSh/Options/PokemonSwSh_EggStepCount.h"
 
@@ -92,8 +92,8 @@ private:
         EveryBatch,
     };
     EnumDropdownOption<AutoSave> AUTO_SAVING;
-
-    Pokemon::EggHatchFilterTable FILTERS;
+    
+    Pokemon::StatsHuntIvJudgeFilterTable FILTERS;
 
     BooleanCheckBoxOption DEBUG_PROCESSING_HATCHED;
     BooleanCheckBoxOption SAVE_DEBUG_VIDEO;

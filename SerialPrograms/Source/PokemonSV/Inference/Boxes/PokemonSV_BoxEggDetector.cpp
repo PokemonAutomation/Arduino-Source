@@ -6,7 +6,6 @@
 
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/Globals.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonFramework/ImageTools/WaterfillUtilities.h"
@@ -15,10 +14,6 @@
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.h"
 #include "PokemonSV_BoxEggDetector.h"
-
-#include <iostream>
-using std::cout;
-using std::endl;
 
 namespace PokemonAutomation{
 

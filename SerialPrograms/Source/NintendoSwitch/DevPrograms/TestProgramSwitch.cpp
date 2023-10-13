@@ -20,7 +20,8 @@
 #include "CommonFramework/OCR/OCR_RawOCR.h"
 #include "PokemonLA/Inference/PokemonLA_MountDetector.h"
 #include "CommonFramework/InferenceInfra/VisualInferencePivot.h"
-#include "PokemonBDSP/Inference/BoxSystem/PokemonBDSP_IVCheckerReader.h"
+#include "Pokemon/Pokemon_Strings.h"
+#include "PokemonBDSP/Inference/BoxSystem/PokemonBDSP_IvJudgeReader.h"
 #include "PokemonBDSP/Inference/Battles/PokemonBDSP_BattleBallReader.h"
 #include "PokemonLA/Programs/PokemonLA_LeapPokemonActions.h"
 #include "PokemonLA/Inference/PokemonLA_OverworldDetector.h"
@@ -101,6 +102,15 @@
 #include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleBallReader.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PathSelect.h"
 #include "PokemonSV/Programs/PokemonSV_ConnectToInternet.h"
+#include "CommonFramework/Inference/FrozenImageDetector.h"
+#include "PokemonLA/Inference/PokemonLA_DialogDetector.h"
+#include "PokemonLA/Programs/PokemonLA_GameSave.h"
+#include "Pokemon/Resources/Pokemon_PokemonSlugs.h"
+#include "PokemonSV/Inference/PokemonSV_BagDetector.h"
+#include <filesystem>
+#include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_Lobby.h"
+#include "PokemonSV/Inference/PokemonSV_StatHexagonReader.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 
 
 
@@ -149,16 +159,27 @@ TestProgram_Descriptor::TestProgram_Descriptor()
 {}
 
 
+TestProgram::~TestProgram(){
+    BUTTON1.remove_listener(*this);
+    BUTTON0.remove_listener(*this);
+}
 TestProgram::TestProgram()
-    : LANGUAGE(
+    : BUTTON0(
+        "Button Text 0", 0, 16
+    )
+    , BUTTON1(
+        "<b>Button Label:</b><br><font color=\"red\">asdfasdfasdf</font>",
+        "Button Text 1", 0, 16
+    )
+    , LANGUAGE(
         "<b>OCR Language:</b>",
         { Language::English },
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         false
     )
     , STATIC_TEXT("Test text...")
-    , SELECT("String Select", test_database(), LockWhileRunning::LOCKED, 0)
-    , PLAYER_LIST("Test Table", LockWhileRunning::UNLOCKED, "Notes")
+    , SELECT("String Select", test_database(), LockMode::LOCK_WHILE_RUNNING, 0)
+    , PLAYER_LIST("Test Table", LockMode::UNLOCK_WHILE_RUNNING, "Notes")
     , NOTIFICATION_TEST("Test", true, true, ImageAttachmentMode::JPG)
     , NOTIFICATIONS({
         &NOTIFICATION_TEST,
@@ -166,11 +187,15 @@ TestProgram::TestProgram()
         &NOTIFICATION_ERROR_FATAL,
     })
 {
+    PA_ADD_OPTION(BUTTON0);
+    PA_ADD_OPTION(BUTTON1);
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(STATIC_TEXT);
     PA_ADD_OPTION(SELECT);
     PA_ADD_OPTION(PLAYER_LIST);
     PA_ADD_OPTION(NOTIFICATIONS);
+    BUTTON0.add_listener(*this);
+    BUTTON1.add_listener(*this);
 }
 
 
@@ -180,42 +205,16 @@ using namespace Kernels::Waterfill;
 using namespace PokemonSV;
 
 
-
-class NewsDetector : public StaticScreenDetector{
-public:
-    NewsDetector(Color color = COLOR_RED);
-
-    virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool detect(const ImageViewRGB32& screen) const override;
-
-private:
-    Color m_color;
-    ImageFloatBox m_bottom_white;
-    ImageFloatBox m_bottom_buttons;
-};
-NewsDetector::NewsDetector(Color color)
-    : m_color(color)
-    , m_bottom_white(0.15, 0.92, 0.20, 0.06)
-    , m_bottom_buttons(0.40, 0.92, 0.58, 0.06)
-{}
-void NewsDetector::make_overlays(VideoOverlaySet& items) const{
-    items.add(m_color, m_bottom_white);
-    items.add(m_color, m_bottom_buttons);
+void TestProgram::on_press(){
+    global_logger_tagged().log("Button Pressed");
+//    BUTTON.set_enabled(false);
+    BUTTON0.set_text("Button Pressed");
+    BUTTON1.set_text("Button Pressed");
 }
-bool NewsDetector::detect(const ImageViewRGB32& screen) const{
-    ImageStats bottom_white = image_stats(extract_box_reference(screen, m_bottom_white));
-    if (!is_white(bottom_white)){
-        return false;
-    }
 
-    ImageStats bottom_buttons = image_stats(extract_box_reference(screen, m_bottom_buttons));
-//    cout << bottom_buttons.average << bottom_buttons.stddev << endl;
-    if (bottom_buttons.stddev.sum() < 100){
-        return false;
-    }
 
-    return true;
-}
+
+
 
 
 
@@ -227,8 +226,8 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     using namespace Pokemon;
 //    using namespace PokemonSwSh;
 //    using namespace PokemonBDSP;
-//    using namespace PokemonLA;
-    using namespace PokemonSV;
+    using namespace PokemonLA;
+//    using namespace PokemonSV;
 
     [[maybe_unused]] Logger& logger = env.logger();
     [[maybe_unused]] ConsoleHandle& console = env.consoles[0];
@@ -238,8 +237,179 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     BotBaseContext context(scope, console.botbase());
     VideoOverlaySet overlays(overlay);
 
-    NewsDetector detector;
+
+    start_game_from_home(
+        console, context,
+        true, 0, 0,
+        10
+    );
+
+#if 0
+//    UpdateMenuWatcher update_menu(false);
+    CheckOnlineDetector update_menu(false);
+    update_menu.make_overlays(overlays);
+
+    auto snapshot = console.video().snapshot();
+    cout << update_menu.detect(snapshot) << endl;
+#endif
+
+#if 0
+
+//    ImageRGB32 image("screenshot-20231003-202430049819.png");
+    auto snapshot = console.video().snapshot();
+
+    PokemonSummaryDetector detector;
+    cout << detector.detect(snapshot) << endl;
+#endif
+
+#if 0
+    SummaryStatsReader reader;
+    reader.make_overlays(overlays);
+
+    auto snapshot = console.video().snapshot();
+
+    NatureAdjustments nature = reader.read_nature(logger, snapshot);
+    cout << "attack     = " << (int)nature.attack << endl;
+    cout << "defense    = " << (int)nature.defense << endl;
+    cout << "spatk      = " << (int)nature.spatk << endl;
+    cout << "spdef      = " << (int)nature.spdef << endl;
+    cout << "speed      = " << (int)nature.speed << endl;
+
+    StatReads stats = reader.read_stats(logger, snapshot);
+    cout << "hp         = " << stats.hp << endl;
+    cout << "attack     = " << stats.attack << endl;
+    cout << "defense    = " << stats.defense << endl;
+    cout << "spatk      = " << stats.spatk << endl;
+    cout << "spdef      = " << stats.spdef << endl;
+    cout << "speed      = " << stats.speed << endl;
+
+    BaseStats base_stats{113, 70, 120, 135, 65, 52};
+    EVs evs{0, 0, 0, 0, 0, 0};
+    IvRanges ivs = reader.calc_ivs(logger, snapshot, base_stats, evs);
+    cout << "hp         = " << (int)ivs.hp.low << " - " << (int)ivs.hp.high << endl;
+    cout << "attack     = " << (int)ivs.attack.low << " - " << (int)ivs.attack.high << endl;
+    cout << "defense    = " << (int)ivs.defense.low << " - " << (int)ivs.defense.high << endl;
+    cout << "spatk      = " << (int)ivs.spatk.low << " - " << (int)ivs.spatk.high << endl;
+    cout << "spdef      = " << (int)ivs.spdef.low << " - " << (int)ivs.spdef.high << endl;
+    cout << "speed      = " << (int)ivs.speed.low << " - " << (int)ivs.speed.high << endl;
+#endif
+
+
+#if 0
+    cout << "attack: ";
+    reader.read_stat_adjustment({0.874, 0.293, 0.014, 0.024}, snapshot);
+    cout << "spatk: ";
+    reader.read_stat_adjustment({0.770, 0.293, 0.014, 0.024}, snapshot);
+    cout << "speed: ";
+    reader.read_stat_adjustment({0.822, 0.452, 0.014, 0.024}, snapshot);
+#endif
+
+
+#if 0
+    ImageFloatBox hp    (0.823, 0.244, 0.012, 0.022);
+    ImageFloatBox atk   (0.875, 0.294, 0.012, 0.022);
+    ImageFloatBox def   (0.875, 0.402, 0.012, 0.022);
+    ImageFloatBox spatk (0.771, 0.294, 0.012, 0.022);
+    ImageFloatBox spdef (0.771, 0.402, 0.012, 0.022);
+    ImageFloatBox spd   (0.823, 0.453, 0.012, 0.022);
+
+    overlays.add(COLOR_RED, hp);
+    overlays.add(COLOR_RED, atk);
+    overlays.add(COLOR_RED, def);
+    overlays.add(COLOR_RED, spatk);
+    overlays.add(COLOR_RED, spdef);
+    overlays.add(COLOR_RED, spd);
+#endif
+
+
+
+#if 0
+    PokemonSwSh::MaxLairInternal::LobbyJoinedDetector detector(2, false);
+
+    auto snapshot = console.video().snapshot();
+//    detector.VisualInferenceCallback::process_frame(snapshot);
+    detector.joined(snapshot, snapshot.timestamp);
+#endif
+
+//    size_t errors = 0;
+//    attach_item_from_bag(env.program_info(), console, context, errors);
+//    attach_item_from_box(env.program_info(), console, context, 1, errors);
+
+//    BagDetector detector;
+//    detector.make_overlays(overlays);
+//    auto snapshot = console.video().snapshot();
+//    cout << detector.detect(snapshot) << endl;
+
+
+#if 0
+    TeraCatchDetector detector(COLOR_RED);
     detector.make_overlays(overlays);
+
+    auto snapshot = console.video().snapshot();
+    cout << detector.detect(snapshot) << endl;
+
+    detector.move_to_slot(console, context, 1);
+#endif
+
+//    std::shared_ptr<const ImageRGB32> screen(new ImageRGB32("20230920-123043559137-OperationFailedException.png"));
+
+//    IngredientSession session(env.inference_dispatcher(), console, context, Language::English, SandwichIngredientType::FILLING);
+//    session.read_screen(screen);
+
+
+
+
+//    pbf_press_dpad(context, DPAD_RIGHT, 160, 0);
+//    pbf_press_dpad(context, DPAD_DOWN, 40, 0);
+
+
+
+
+//    PokemonLA::save_game_from_overworld(env, console, context);
+
+
+
+
+
+#if 0
+    TeraCardReader reader;
+
+    auto snapshot = console.video().snapshot();
+    cout << reader.detect(snapshot) << endl;
+#endif
+
+#if 0
+    NormalDialogDetector detector(logger, overlay, true);
+
+    detector.make_overlays(overlays);
+
+    auto snapshot = console.video().snapshot();
+    cout << detector.process_frame(snapshot, snapshot.timestamp) << endl;
+#endif
+
+//    PokemonLA::open_travel_map_from_jubilife(env, console, context);
+
+
+
+
+
+
+#if 0
+    FrozenImageDetector detector(std::chrono::seconds(5), 10);
+
+    int ret = wait_until(
+        console, scope, std::chrono::seconds(10),
+        {detector}
+    );
+    if (ret >= 0){
+        console.log("triggered");
+    }else{
+        console.log("timed out");
+    }
+#endif
+
+//    NewsDetector detector;
+//    detector.make_overlays(overlays);
 
 
 

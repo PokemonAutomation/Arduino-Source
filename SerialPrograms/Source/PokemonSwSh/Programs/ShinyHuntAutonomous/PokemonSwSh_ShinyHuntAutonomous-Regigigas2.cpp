@@ -48,7 +48,7 @@ ShinyHuntAutonomousRegigigas2::ShinyHuntAutonomousRegigigas2()
     : GO_HOME_WHEN_DONE(false)
     , REVERSAL_PP(
         "<b>Reversal PP:</b><br>The amount of Reversal PP you are saved with.",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         24
     )
     , ENCOUNTER_BOT_OPTIONS(false, false)
@@ -63,7 +63,7 @@ ShinyHuntAutonomousRegigigas2::ShinyHuntAutonomousRegigigas2()
     )
     , CATCH_TO_OVERWORLD_DELAY(
         "<b>Catch to Overworld Delay:</b>",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "8 * TICKS_PER_SECOND"
     )

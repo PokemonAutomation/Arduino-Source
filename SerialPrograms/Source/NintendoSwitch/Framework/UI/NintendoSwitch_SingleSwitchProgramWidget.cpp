@@ -68,7 +68,11 @@ SingleSwitchProgramWidget2::SingleSwitchProgramWidget2(
         QVBoxLayout* scroll_layout = new QVBoxLayout(scroll_inner);
         scroll_layout->setAlignment(Qt::AlignTop);
 
-        m_system = new SwitchSystemWidget(*this, m_session.system(), m_session.instance_id());
+        m_system = new SwitchSystemWidget(
+            *this,
+            m_session.system(),
+            m_session.instance_id()
+        );
         scroll_layout->addWidget(m_system);
 
         m_options = option.options().make_QtWidget(*this);
@@ -134,8 +138,8 @@ void SingleSwitchProgramWidget2::state_change(ProgramState state){
 void SingleSwitchProgramWidget2::stats_update(const StatsTracker* current_stats, const StatsTracker* historical_stats){
     QMetaObject::invokeMethod(this, [this, current_stats, historical_stats]{
         m_stats_bar->set_stats(
-            current_stats == nullptr ? "" : current_stats->to_str(),
-            historical_stats == nullptr ? "" : historical_stats->to_str()
+            current_stats == nullptr ? "" : current_stats->to_str(StatsTracker::DISPLAY_ON_SCREEN),
+            historical_stats == nullptr ? "" : historical_stats->to_str(StatsTracker::DISPLAY_ON_SCREEN)
         );
     });
 }

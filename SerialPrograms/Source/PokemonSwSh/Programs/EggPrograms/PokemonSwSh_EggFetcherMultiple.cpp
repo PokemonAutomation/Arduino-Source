@@ -45,12 +45,12 @@ EggFetcherMultiple_Descriptor::EggFetcherMultiple_Descriptor()
 EggFetcherMultiple::EggFetcherMultiple()
     : POKEMON_SPECIES_COUNT(
         "<b>Breed this many species:</b>",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         30
     )
     , MAX_FETCH_ATTEMPTS_PER_SPECIES(
         "<b>Fetch this many times per species:</b>",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         10
     )
 {

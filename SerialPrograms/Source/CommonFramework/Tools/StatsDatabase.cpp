@@ -40,7 +40,7 @@ const std::map<std::string, std::string> STATS_DATABASE_ALIASES{
 
 StatLine::StatLine(StatsTracker& tracker)
     : m_time(current_time_to_str())
-    , m_stats(tracker.to_str())
+    , m_stats(tracker.to_str(StatsTracker::SAVE_TO_STATS_FILE))
 {}
 StatLine::StatLine(const std::string& line){
     size_t pos = line.find(" - ");

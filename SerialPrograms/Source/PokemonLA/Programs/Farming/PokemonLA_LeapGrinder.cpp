@@ -50,7 +50,7 @@ public:
         , leap_shinies(m_stats["Leap Shinies"])
     {
         m_display_order.emplace_back("Attempts");
-        m_display_order.emplace_back("Errors", true);
+        m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
         m_display_order.emplace_back("Leaps");
         m_display_order.emplace_back("Found");
         m_display_order.emplace_back("Enroute Shinies");
@@ -77,7 +77,7 @@ LeapGrinder::LeapGrinder()
     : LANGUAGE(
         "<b>Game Language</b>",
         Pokemon::PokemonNameReader::instance().languages(),
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         true
     )
     , POKEMON_DATABASE(make_name_database({
@@ -100,12 +100,12 @@ LeapGrinder::LeapGrinder()
     , POKEMON(
         "<b>Pokemon Species</b>",
         POKEMON_DATABASE,
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         "cherubi"
     )
     , LEAPS(
         "<b>Leaps</b> <br>How many leaps before stopping the program</br>",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         1, 1, 100
     )
     , SHINY_DETECTED_ENROUTE(

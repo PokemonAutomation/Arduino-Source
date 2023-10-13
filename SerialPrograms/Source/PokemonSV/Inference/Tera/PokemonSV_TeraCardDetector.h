@@ -13,8 +13,10 @@
 #include "Common/Cpp/AbstractLogger.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/Inference/VisualDetector.h"
-#include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
+//#include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 #include "PokemonSV/Options/PokemonSV_PlayerList.h"
+#include "PokemonSV_TeraTypeReader.h"
+#include "PokemonSV_TeraSilhouetteReader.h"
 
 namespace PokemonAutomation{
     class AsyncDispatcher;
@@ -34,7 +36,18 @@ public:
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) const override;
 
-    size_t stars(const ImageViewRGB32& screen) const;
+    uint8_t stars(
+        Logger& logger, const ProgramInfo& info, const ImageViewRGB32& screen
+    ) const;
+    std::string tera_type(
+        Logger& logger, const ProgramInfo& info, const ImageViewRGB32& screen
+    ) const;
+    std::string pokemon_slug(
+        Logger& logger, const ProgramInfo& info, const ImageViewRGB32& screen
+    ) const;
+
+    static const ImageFloatBox& CARD_LABEL_BOX();
+    static bool is_card_label(const ImageViewRGB32& screen);
 
 private:
     Color m_color;
@@ -43,7 +56,10 @@ private:
     ImageFloatBox m_bottom_right;
     ImageFloatBox m_label;
     ImageFloatBox m_cursor;
+
     ImageFloatBox m_stars;
+    TeraTypeReader m_tera_type;
+    TeraSilhouetteReader m_silhouette;
 };
 class TeraCardWatcher : public DetectorToFinder<TeraCardReader>{
 public:

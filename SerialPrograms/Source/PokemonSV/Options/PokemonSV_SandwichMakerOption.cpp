@@ -6,7 +6,7 @@
 
 #include <map>
 //#include "PokemonSV/Resources/PokemonSV_Ingredients.h"
-#include "PokemonSV/Inference/Boxes/PokemonSV_IVCheckerReader.h"
+#include "PokemonSV/Inference/Boxes/PokemonSV_IvJudgeReader.h"
 #include "PokemonSV_SandwichMakerOption.h"
 //#include "PokemonSV_SandwichIngredientsOption.h"
 
@@ -284,20 +284,23 @@ SandwichRecipe SandwichMakerOption::get_premade_sandwich_recipe(BaseRecipe base,
 }
 
 SandwichMakerOption::~SandwichMakerOption() {
+    HERBA_TWO.remove_listener(*this);
+    HERBA_ONE.remove_listener(*this);
+    TYPE.remove_listener(*this);
     BASE_RECIPE.remove_listener(*this);
 }
 
 SandwichMakerOption::SandwichMakerOption(OCR::LanguageOCROption* language_option)
     : GroupOption(
         "Sandwich Maker",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         false, true
     )
     , m_language_owner(language_option == nullptr
         ? new OCR::LanguageOCROption(
             "<b>Game Language:</b><br>Required to read ingredients.",
             IV_READER().languages(),
-            LockWhileRunning::LOCKED,
+            LockMode::LOCK_WHILE_RUNNING,
             true
         )
         : nullptr
@@ -313,7 +316,7 @@ SandwichMakerOption::SandwichMakerOption(OCR::LanguageOCROption* language_option
             {BaseRecipe::paradox,   "paradox",  "Title + Encounter + Humungo/Teensy: Paradox-specific"},
             {BaseRecipe::custom,    "custom",   "Custom Sandwich"},
         },
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         BaseRecipe::shiny
         )
     , TYPE(
@@ -338,7 +341,7 @@ SandwichMakerOption::SandwichMakerOption(OCR::LanguageOCROption* language_option
             {PokemonType::steel,    "steel",    "Steel"},
             {PokemonType::fairy,    "fairy",    "Fairy"},
         },
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         PokemonType::normal
     )
     , PARADOX(
@@ -392,7 +395,7 @@ SandwichMakerOption::SandwichMakerOption(OCR::LanguageOCROption* language_option
             {ParadoxRecipe::teensy2_ironvaliant_1,    "teensy2_ironvaliant_1",    "Iron Valiant - Teensy #1"},
             {ParadoxRecipe::teensy2_ironvaliant_2,    "teensy2_ironvaliant_2",    "Iron Vailant - Teensy #2"},
         },
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         ParadoxRecipe::humungo3_greattusk_1
     )
     , HERBA_ONE(
@@ -404,7 +407,7 @@ SandwichMakerOption::SandwichMakerOption(OCR::LanguageOCROption* language_option
             {HerbaSelection::bitter_herba_mystica,  "bitter-herba-mystica", "Bitter Herba Mystica"},
             {HerbaSelection::spicy_herba_mystica,   "spicy-herba-mystica",  "Spicy Herba Mystica"},
         },
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         HerbaSelection::salty_herba_mystica
     )
     , HERBA_TWO(
@@ -416,9 +419,10 @@ SandwichMakerOption::SandwichMakerOption(OCR::LanguageOCROption* language_option
             {HerbaSelection::bitter_herba_mystica,  "bitter-herba-mystica", "Bitter Herba Mystica"},
             {HerbaSelection::spicy_herba_mystica,   "spicy-herba-mystica",  "Spicy Herba Mystica"},
         },
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         HerbaSelection::salty_herba_mystica
     )
+    , HERB_INCOMPATIBILITY_WARNING("")
     , SANDWICH_INGREDIENTS("<b>Custom Sandwich:</b><br>Make a sandwich from the selected ingredients.<br>You must have at least one ingredient and one condiment, and no more than six ingredients and four condiments.")
 {
     if (m_language_owner){
@@ -429,36 +433,109 @@ SandwichMakerOption::SandwichMakerOption(OCR::LanguageOCROption* language_option
     PA_ADD_OPTION(PARADOX);
     PA_ADD_OPTION(HERBA_ONE);
     PA_ADD_OPTION(HERBA_TWO);
+    PA_ADD_OPTION(HERB_INCOMPATIBILITY_WARNING);
     PA_ADD_OPTION(SANDWICH_INGREDIENTS);
+
+    HERB_INCOMPATIBILITY_WARNING.set_visibility(ConfigOptionState::HIDDEN);
 
     SandwichMakerOption::value_changed();
     BASE_RECIPE.add_listener(*this);
-
+    TYPE.add_listener(*this);
+    HERBA_ONE.add_listener(*this);
+    HERBA_TWO.add_listener(*this);
 }
 
-void SandwichMakerOption::value_changed() {
-    if (BASE_RECIPE == BaseRecipe::custom) {
+void SandwichMakerOption::value_changed(){
+    if (BASE_RECIPE == BaseRecipe::custom){
         SANDWICH_INGREDIENTS.set_visibility(ConfigOptionState::ENABLED);
         HERBA_ONE.set_visibility(ConfigOptionState::DISABLED);
         HERBA_TWO.set_visibility(ConfigOptionState::DISABLED);
+        HERB_INCOMPATIBILITY_WARNING.set_visibility(ConfigOptionState::HIDDEN);
         TYPE.set_visibility(ConfigOptionState::DISABLED); //to prevent the options moving around
         PARADOX.set_visibility(ConfigOptionState::HIDDEN);
-    }
-    else if (two_herba_required(BASE_RECIPE)) { //shiny, huge, tiny
+    }else if (two_herba_required(BASE_RECIPE)){ //shiny, huge, tiny
         SANDWICH_INGREDIENTS.set_visibility(ConfigOptionState::DISABLED);
         HERBA_ONE.set_visibility(ConfigOptionState::ENABLED);
         HERBA_TWO.set_visibility(ConfigOptionState::ENABLED);
+
+        std::string herb_error;
+        do{
+            if (BASE_RECIPE != BaseRecipe::shiny){
+                break;
+            }
+            herb_error = check_herb_compatibility(HERBA_ONE, HERBA_TWO, TYPE);
+        }while (false);
+
+        if (herb_error.empty()){
+            HERB_INCOMPATIBILITY_WARNING.set_visibility(ConfigOptionState::HIDDEN);
+        }else{
+            HERB_INCOMPATIBILITY_WARNING.set_text("<font color=\"red\">" + herb_error + "</font>");
+            HERB_INCOMPATIBILITY_WARNING.set_visibility(ConfigOptionState::ENABLED);
+        }
         TYPE.set_visibility(ConfigOptionState::ENABLED);
         PARADOX.set_visibility(ConfigOptionState::HIDDEN);
-    }
-    else { //other
+    }else{ //other
         SANDWICH_INGREDIENTS.set_visibility(ConfigOptionState::DISABLED);
         HERBA_ONE.set_visibility(ConfigOptionState::DISABLED);
         HERBA_TWO.set_visibility(ConfigOptionState::DISABLED);
         TYPE.set_visibility(ConfigOptionState::HIDDEN);
+        HERB_INCOMPATIBILITY_WARNING.set_visibility(ConfigOptionState::HIDDEN);
         PARADOX.set_visibility(ConfigOptionState::ENABLED);
     }
 }
+std::string SandwichMakerOption::check_validity() const{
+    if (!two_herba_required(BASE_RECIPE)){
+        return "";
+    }
+    if (BASE_RECIPE != BaseRecipe::shiny){
+        return "";
+    }
+    return check_herb_compatibility(HERBA_ONE, HERBA_TWO, TYPE);
+}
+
+std::string SandwichMakerOption::check_herb_compatibility(HerbaSelection herb1, HerbaSelection herb2, PokemonType type) const{
+    if ((herb1 == HerbaSelection::sweet_herba_mystica && herb2 == HerbaSelection::sour_herba_mystica) ||
+        (herb1 == HerbaSelection::sour_herba_mystica && herb2 == HerbaSelection::sweet_herba_mystica)
+    ){
+        return "1x Sweet and 1x Sour herb are incompatible for all types.";
+    }
+    if (herb1 == HerbaSelection::sour_herba_mystica && herb2 == HerbaSelection::sour_herba_mystica){
+        return "2x Sour herbs are incompatible for all types.";
+    }
+    if (herb1 == HerbaSelection::sweet_herba_mystica && herb2 == HerbaSelection::sweet_herba_mystica &&
+        type == PokemonType::bug
+    ){
+        return "2x Sweet herbs are incompatible with bug type.";
+    }
+    if ((herb1 == HerbaSelection::salty_herba_mystica && herb2 == HerbaSelection::sour_herba_mystica) ||
+        (herb1 == HerbaSelection::sour_herba_mystica && herb2 == HerbaSelection::salty_herba_mystica)
+    ){
+        static const std::set<PokemonType> TYPES{
+            PokemonType::flying,
+            PokemonType::ground,
+            PokemonType::rock,
+            PokemonType::ice,
+        };
+        if (!TYPES.contains(type)){
+            return "1x Salty and 1x Sour herb are only compatible with flying, ground, rock, and ice.";
+        }
+    }
+    if ((herb1 == HerbaSelection::bitter_herba_mystica && herb2 == HerbaSelection::sour_herba_mystica) ||
+        (herb1 == HerbaSelection::sour_herba_mystica && herb2 == HerbaSelection::bitter_herba_mystica)
+    ){
+        static const std::set<PokemonType> TYPES{
+            PokemonType::fighting,
+            PokemonType::bug,
+            PokemonType::fairy,
+        };
+        if (TYPES.contains(type)){
+            return "1x Sour and 1x Bitter herb are incompatible with fighting, bug, and fairy.";
+        }
+    }
+
+    return "";
+}
+
 
 
 }

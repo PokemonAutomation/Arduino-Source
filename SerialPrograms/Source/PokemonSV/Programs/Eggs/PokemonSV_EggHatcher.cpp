@@ -41,7 +41,7 @@ struct EggHatcher_Descriptor::Stats : public StatsTracker{
         , m_errors(m_stats["Errors"])
     {
         m_display_order.emplace_back("Hatched");
-        m_display_order.emplace_back("Errors", true);
+        m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
     }
     std::atomic<uint64_t>& m_hatched;
     std::atomic<uint64_t>& m_errors;
@@ -64,12 +64,12 @@ EggHatcher::EggHatcher()
             {StartLocation::AnywhereOnRide, "anywhere-on-ride", "Anywhere safe, on ride."},
             {StartLocation::AnywhereOffRide, "anywhere-off-ride", "Anywhere safe, on foot."},
         },
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         StartLocation::ZeroGateFlyingSpot
     )
     , BOXES(
         "<b>How many boxes of eggs to hatch:</b>",
-        LockWhileRunning::UNLOCKED,
+        LockMode::UNLOCK_WHILE_RUNNING,
         1, 1, 32
     )
     , HAS_CLONE_RIDE_POKEMON(
@@ -77,7 +77,7 @@ EggHatcher::EggHatcher()
         "Ride legendary cannot be cloned after patch 1.0.1. To preserve the existing clone while hatching eggs, "
         "place it as second in party before starting the program.</b>"
         "The program will skip the first row of eggs in the box as a result.",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         false)
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
@@ -178,7 +178,7 @@ void EggHatcher::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
 
     EggHatcher_Descriptor::Stats& stats = env.current_stats<EggHatcher_Descriptor::Stats>();
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_LCLICK, 10, 0);
+    pbf_press_button(context, BUTTON_L, 10, 0);
 
     if (START_LOCATION == StartLocation::AnywhereOffRide){
         // Get on ride:

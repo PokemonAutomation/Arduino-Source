@@ -70,17 +70,25 @@ bool read_platform_center(
 
 
 
-
+// Send Let's Go pokemon to beat wild pokemon while moving on the Area Zero platform following Path 0.
+// It tracks the kill chain by sound detection from `tracker`. The function does not handle any pokemon
+// battle encounters (turn-based battles).
 void area_zero_platform_run_path0(
     ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     LetsGoEncounterBotTracker& tracker,
     uint64_t iteration_count
 );
+// Send Let's Go pokemon to beat wild pokemon while moving on the Area Zero platform following Path 1.
+// It tracks the kill chain by sound detection from `tracker`. The function does not handle any pokemon
+// battle encounters (turn-based battles).
 void area_zero_platform_run_path1(
     ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     LetsGoEncounterBotTracker& tracker,
     uint64_t iteration_count
 );
+// Send Let's Go pokemon to beat wild pokemon while moving on the Area Zero platform following Path 2.
+// It tracks the kill chain by sound detection from `tracker`. The function does not handle any pokemon
+// battle encounters (turn-based battles).
 void area_zero_platform_run_path2(
     ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     LetsGoEncounterBotTracker& tracker,

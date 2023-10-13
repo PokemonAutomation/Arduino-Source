@@ -44,17 +44,19 @@ FastCodeEntry::FastCodeEntry()
         {
             {Mode::NORMAL, "normal", "Enter Code when clicking Start Program."},
             {Mode::ENTER_ON_PASTE, "on-paste", "Start the program first. Code is entered when you paste into the code box."},
+            {Mode::MYSTERY_GIFT, "mystery", "Enter Mystery Gift Code when clicking Start Program."},
         },
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         Mode::NORMAL
     )
     , CODE(
-        "<b>Link Code:</b><br>Must be 4-digit numeric or 6-digit alphanumeric. (not case sensitive)<br>"
+        "<b>Link Code:</b><br>Unless in Mystery Gift mode, code must be 4-digit numeric or 6-digit alphanumeric. (not case sensitive)<br>"
         "(Box is big so it's easy to land your mouse on.)",
-        LockWhileRunning::UNLOCKED,
+        LockMode::UNLOCK_WHILE_RUNNING,
         "0123", "0123",
         true
     )
+    , SETTINGS(LockMode::LOCK_WHILE_RUNNING)
 {
     PA_ADD_OPTION(MODE);
     PA_ADD_OPTION(CODE);
@@ -117,9 +119,9 @@ private:
 void FastCodeEntry::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
     FastCodeEntrySettings settings(SETTINGS);
 
-    if (MODE == Mode::NORMAL){
-        const char* error = enter_code(env, scope, settings, CODE, true);
-        if (error){
+    if (MODE == Mode::NORMAL || MODE == Mode::MYSTERY_GIFT){
+        const char* error = enter_code(env, scope, settings, CODE, true, MODE == Mode::MYSTERY_GIFT ? true : false);
+        if (MODE == Mode::NORMAL && error){
             throw UserSetupError(env.logger(), error);
         }
         return;

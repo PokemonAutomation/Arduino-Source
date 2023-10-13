@@ -48,7 +48,7 @@ PokemonBallSelectCell::PokemonBallSelectCell(
 )
     : StringSelectCell(
         ALL_BALLS_SELECT_DATABASE(),
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         default_slug
     )
 {}
@@ -57,7 +57,7 @@ PokemonBallSelectCell::PokemonBallSelectCell(
 
 PokemonBallSelectOption::PokemonBallSelectOption(
     std::string label,
-    LockWhileRunning lock_while_running,
+    LockMode lock_while_running,
     const std::string& default_slug
 )
     : StringSelectOption(

@@ -16,6 +16,17 @@ namespace PokemonSwSh{
 using namespace Pokemon;
 
 
+std::set<std::string> make_ALL_POKEMON_SLUGS(){
+    std::vector<std::string> list = load_pokemon_slug_json_list("PokemonSwSh/Pokedex-Combined.json");
+    return std::set<std::string>(list.begin(), list.end());
+}
+
+const std::set<std::string>& ALL_POKEMON_SLUGS(){
+    static std::set<std::string> database = make_ALL_POKEMON_SLUGS();
+    return database;
+}
+
+
 StringSelectDatabase make_name_database(const std::vector<std::string>& slugs){
     const SpriteDatabase& sprites = ALL_POKEMON_SPRITES();
 

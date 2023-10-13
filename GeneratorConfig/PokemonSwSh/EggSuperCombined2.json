@@ -32,48 +32,48 @@
         },
         {
             "00-Type": "EnumDropdown",
-            "01-Label": "<b>Step Count:</b><br>Lookup the # of steps on Serebii.",
+            "01-Label": "<b>Step Count:</b><br>Lookup the # of egg cycles on <a href=\"https://rotomlabs.net/dex\">RotomLabs</a>.",
             "02-Declaration": "const uint16_t STEPS_TO_HATCH",
             "03-Options": [
                 [
                     "1280",
-                    "1280"
+                    "5 Cycles"
                 ],
                 [
                     "2560",
-                    "2560"
+                    "10 Cycles"
                 ],
                 [
                     "3840",
-                    "3840"
+                    "15 Cycles"
                 ],
                 [
                     "5120",
-                    "5120"
+                    "20 Cycles"
                 ],
                 [
                     "6400",
-                    "6400"
+                    "25 Cycles"
                 ],
                 [
                     "7680",
-                    "7680"
+                    "30 Cycles"
                 ],
                 [
                     "8960",
-                    "8960"
+                    "35 Cycles"
                 ],
                 [
                     "10240",
-                    "10240"
+                    "40 Cycles"
                 ],
                 [
                     "20480",
-                    "20480"
+                    "80 Cycles"
                 ],
                 [
                     "30720",
-                    "30720"
+                    "120 Cycles"
                 ]
             ],
             "98-Default": "5120",

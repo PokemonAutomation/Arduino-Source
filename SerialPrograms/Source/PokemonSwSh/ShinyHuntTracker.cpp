@@ -23,15 +23,15 @@ ShinyHuntTracker::ShinyHuntTracker(bool shiny_types)
     , m_square_shinies(m_stats["Square Shinies"])
 {
     m_display_order.emplace_back("Encounters");
-    m_display_order.emplace_back("Errors", true);
+    m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
     if (shiny_types){
-        m_display_order.emplace_back("Star Shinies", true);
-        m_display_order.emplace_back("Square Shinies", true);
-        m_display_order.emplace_back("Unknown Shinies", true);
+        m_display_order.emplace_back("Star Shinies", HIDDEN_IF_ZERO);
+        m_display_order.emplace_back("Square Shinies", HIDDEN_IF_ZERO);
+        m_display_order.emplace_back("Unknown Shinies", HIDDEN_IF_ZERO);
     }else{
-        m_display_order.emplace_back("Shinies", true);
+        m_display_order.emplace_back("Shinies", HIDDEN_IF_ZERO);
     }
-    m_display_order.emplace_back("Caught", true);
+    m_display_order.emplace_back("Caught", HIDDEN_IF_ZERO);
 }
 ShinyHuntTracker::ShinyHuntTracker(bool shiny_types, std::map<std::string, std::string> aliases)
     : ShinyHuntTracker(shiny_types)

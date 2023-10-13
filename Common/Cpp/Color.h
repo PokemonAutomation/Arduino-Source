@@ -10,6 +10,7 @@
 #define PokemonAutomation_Color_H
 
 #include <stdint.h>
+#include <string>
 
 namespace PokemonAutomation{
 
@@ -44,6 +45,9 @@ public:
     uint8_t red     () const { return (uint8_t)(m_argb >> 16); }
     uint8_t green   () const { return (uint8_t)(m_argb >>  8); }
     uint8_t blue    () const { return (uint8_t)(m_argb >>  0); }
+
+    // Example: "[0xFFFDBD00 A=255 R=253 G=189 B=00]"
+    std::string to_string() const;
 
 private:
     uint32_t m_argb;

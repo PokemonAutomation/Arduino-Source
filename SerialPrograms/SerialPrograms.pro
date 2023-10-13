@@ -81,6 +81,7 @@ SOURCES += \
     ../ClientSource/Libraries/MessageConverter.cpp \
     ../Common/CRC32.cpp \
     ../Common/Cpp/CancellableScope.cpp \
+    ../Common/Cpp/Color.cpp \
     ../Common/Cpp/Concurrency/AsyncDispatcher.cpp \
     ../Common/Cpp/Concurrency/FireForgetDispatcher.cpp \
     ../Common/Cpp/Concurrency/ParallelTaskRunner.cpp \
@@ -100,6 +101,7 @@ SOURCES += \
     ../Common/Cpp/LifetimeSanitizer.cpp \
     ../Common/Cpp/Options/BatchOption.cpp \
     ../Common/Cpp/Options/BooleanCheckBoxOption.cpp \
+    ../Common/Cpp/Options/ButtonOption.cpp \
     ../Common/Cpp/Options/ConfigOption.cpp \
     ../Common/Cpp/Options/DateOption.cpp \
     ../Common/Cpp/Options/EditableTableOption.cpp \
@@ -107,6 +109,7 @@ SOURCES += \
     ../Common/Cpp/Options/FixedCodeOption.cpp \
     ../Common/Cpp/Options/FloatingPointOption.cpp \
     ../Common/Cpp/Options/GroupOption.cpp \
+    ../Common/Cpp/Options/IntegerRangeOption.cpp \
     ../Common/Cpp/Options/RandomCodeOption.cpp \
     ../Common/Cpp/Options/SimpleIntegerOption.cpp \
     ../Common/Cpp/Options/StaticTableOption.cpp \
@@ -128,6 +131,7 @@ SOURCES += \
     ../Common/Qt/ExpressionEvaluator.cpp \
     ../Common/Qt/Options/BatchWidget.cpp \
     ../Common/Qt/Options/BooleanCheckBoxWidget.cpp \
+    ../Common/Qt/Options/ButtonWidget.cpp \
     ../Common/Qt/Options/ConfigWidget.cpp \
     ../Common/Qt/Options/DateWidget.cpp \
     ../Common/Qt/Options/EditableTableWidget.cpp \
@@ -135,6 +139,7 @@ SOURCES += \
     ../Common/Qt/Options/FixedCodeWidget.cpp \
     ../Common/Qt/Options/FloatingPointWidget.cpp \
     ../Common/Qt/Options/GroupWidget.cpp \
+    ../Common/Qt/Options/IntegerRangeWidget.cpp \
     ../Common/Qt/Options/RandomCodeWidget.cpp \
     ../Common/Qt/Options/SimpleIntegerWidget.cpp \
     ../Common/Qt/Options/StaticTableWidget.cpp \
@@ -171,6 +176,7 @@ SOURCES += \
     Source/CommonFramework/CrashDump.cpp \
     Source/CommonFramework/Environment/Environment.cpp \
     Source/CommonFramework/Environment/HardwareValidation.cpp \
+    Source/CommonFramework/Environment/SystemSleep.cpp \
     Source/CommonFramework/Exceptions/FatalProgramException.cpp \
     Source/CommonFramework/Exceptions/OperationFailedException.cpp \
     Source/CommonFramework/Exceptions/ProgramFinishedException.cpp \
@@ -423,27 +429,28 @@ SOURCES += \
     Source/PanelLists.cpp \
     Source/Pokemon/Inference/Pokemon_BerryNameReader.cpp \
     Source/Pokemon/Inference/Pokemon_BoxGenderDetector.cpp \
-    Source/Pokemon/Inference/Pokemon_IVCheckerReader.cpp \
+    Source/Pokemon/Inference/Pokemon_IvJudgeReader.cpp \
     Source/Pokemon/Inference/Pokemon_NameReader.cpp \
     Source/Pokemon/Inference/Pokemon_NatureReader.cpp \
     Source/Pokemon/Inference/Pokemon_PokeballNameReader.cpp \
     Source/Pokemon/Inference/Pokemon_ReadHpBar.cpp \
     Source/Pokemon/Inference/Pokemon_TrainIVCheckerOCR.cpp \
     Source/Pokemon/Inference/Pokemon_TrainPokemonOCR.cpp \
-    Source/Pokemon/Options/Pokemon_EggHatchFilter.cpp \
-    Source/Pokemon/Options/Pokemon_IVCheckerOption.cpp \
+    Source/Pokemon/Options/Pokemon_IvJudgeOption.cpp \
     Source/Pokemon/Options/Pokemon_NameSelectOption.cpp \
     Source/Pokemon/Options/Pokemon_NameSelectWidget.cpp \
-    Source/Pokemon/Options/Pokemon_StatsResetFilter.cpp \
+    Source/Pokemon/Options/Pokemon_StatsHuntFilter.cpp \
     Source/Pokemon/Pokemon_EncounterStats.cpp \
-    Source/Pokemon/Pokemon_IVChecker.cpp \
+    Source/Pokemon/Pokemon_IvJudge.cpp \
     Source/Pokemon/Pokemon_NatureChecker.cpp \
     Source/Pokemon/Pokemon_Notification.cpp \
     Source/Pokemon/Pokemon_ShinySparkleSet.cpp \
+    Source/Pokemon/Pokemon_StatsCalculation.cpp \
     Source/Pokemon/Pokemon_Strings.cpp \
     Source/Pokemon/Pokemon_Types.cpp \
     Source/Pokemon/Resources/Pokemon_BerryNames.cpp \
     Source/Pokemon/Resources/Pokemon_BerrySprites.cpp \
+    Source/Pokemon/Resources/Pokemon_EggSteps.cpp \
     Source/Pokemon/Resources/Pokemon_PokeballNames.cpp \
     Source/Pokemon/Resources/Pokemon_PokemonNames.cpp \
     Source/Pokemon/Resources/Pokemon_PokemonSlugs.cpp \
@@ -456,7 +463,7 @@ SOURCES += \
     Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxGenderDetector.cpp \
     Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxNatureDetector.cpp \
     Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxShinyDetector.cpp \
-    Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_IVCheckerReader.cpp \
+    Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_IvJudgeReader.cpp \
     Source/PokemonBDSP/Inference/PokemonBDSP_DialogDetector.cpp \
     Source/PokemonBDSP/Inference/PokemonBDSP_MapDetector.cpp \
     Source/PokemonBDSP/Inference/PokemonBDSP_MarkFinder.cpp \
@@ -474,6 +481,7 @@ SOURCES += \
     Source/PokemonBDSP/Options/EncounterFilter/PokemonBDSP_EncounterFilterWidget.cpp \
     Source/PokemonBDSP/Options/PokemonBDSP_BerrySelectOption.cpp \
     Source/PokemonBDSP/Options/PokemonBDSP_BerryTable.cpp \
+    Source/PokemonBDSP/Options/PokemonBDSP_EggStepOption.cpp \
     Source/PokemonBDSP/Options/PokemonBDSP_ShortcutDirection.cpp \
     Source/PokemonBDSP/PokemonBDSP_Panels.cpp \
     Source/PokemonBDSP/PokemonBDSP_Settings.cpp \
@@ -488,6 +496,7 @@ SOURCES += \
     Source/PokemonBDSP/Programs/Farming/PokemonBDSP_GiftBerryReset.cpp \
     Source/PokemonBDSP/Programs/Farming/PokemonBDSP_MoneyFarmerRoute210.cpp \
     Source/PokemonBDSP/Programs/Farming/PokemonBDSP_MoneyFarmerRoute212.cpp \
+    Source/PokemonBDSP/Programs/Farming/PokemonBDSP_PoffinCooker.cpp \
     Source/PokemonBDSP/Programs/General/PokemonBDSP_AutonomousBallThrower.cpp \
     Source/PokemonBDSP/Programs/General/PokemonBDSP_MassRelease.cpp \
     Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_ActivateMenuGlitch-1.1.2.cpp \
@@ -630,11 +639,14 @@ SOURCES += \
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxGenderDetector.cpp \
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxNatureDetector.cpp \
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxShinyDetector.cpp \
-    Source/PokemonSV/Inference/Boxes/PokemonSV_IVCheckerReader.cpp \
+    Source/PokemonSV/Inference/Boxes/PokemonSV_IvJudgeReader.cpp \
     Source/PokemonSV/Inference/Boxes/PokemonSV_StatsResetChecker.cpp \
     Source/PokemonSV/Inference/Dialogs/PokemonSV_DialogArrowDetector.cpp \
     Source/PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.cpp \
     Source/PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.cpp \
+    Source/PokemonSV/Inference/Map/PokemonSV_MapDetector.cpp \
+    Source/PokemonSV/Inference/Map/PokemonSV_MapMenuDetector.cpp \
+    Source/PokemonSV/Inference/Map/PokemonSV_MapPokeCenterIconDetector.cpp \
     Source/PokemonSV/Inference/Overworld/PokemonSV_AreaZeroSkyDetector.cpp \
     Source/PokemonSV/Inference/Overworld/PokemonSV_LetsGoHpReader.cpp \
     Source/PokemonSV/Inference/Overworld/PokemonSV_LetsGoKillDetector.cpp \
@@ -642,14 +654,17 @@ SOURCES += \
     Source/PokemonSV/Inference/Picnics/PokemonSV_PicnicDetector.cpp \
     Source/PokemonSV/Inference/Picnics/PokemonSV_SandwichHandDetector.cpp \
     Source/PokemonSV/Inference/Picnics/PokemonSV_SandwichIngredientDetector.cpp \
+    Source/PokemonSV/Inference/Picnics/PokemonSV_SandwichPlateDetector.cpp \
     Source/PokemonSV/Inference/Picnics/PokemonSV_SandwichRecipeDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_AuctionItemNameReader.cpp \
+    Source/PokemonSV/Inference/PokemonSV_BagDetector.cpp \
+    Source/PokemonSV/Inference/PokemonSV_ClothingTopDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_ESPEmotionDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_MainMenuDetector.cpp \
-    Source/PokemonSV/Inference/PokemonSV_MapDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_MoneyReader.cpp \
     Source/PokemonSV/Inference/PokemonSV_PokePortalDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_PokemonSummaryReader.cpp \
+    Source/PokemonSV/Inference/PokemonSV_StatHexagonReader.cpp \
     Source/PokemonSV/Inference/PokemonSV_SweatBubbleDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_TournamentPrizeNameReader.cpp \
     Source/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.cpp \
@@ -662,6 +677,7 @@ SOURCES += \
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraTypeReader.cpp \
     Source/PokemonSV/Options/PokemonSV_AuctionItemSelectOption.cpp \
     Source/PokemonSV/Options/PokemonSV_AuctionItemTable.cpp \
+    Source/PokemonSV/Options/PokemonSV_BattleMoveTable.cpp \
     Source/PokemonSV/Options/PokemonSV_EggPowerSandwichOption.cpp \
     Source/PokemonSV/Options/PokemonSV_EncounterActionsTable.cpp \
     Source/PokemonSV/Options/PokemonSV_PlayerList.cpp \
@@ -669,31 +685,38 @@ SOURCES += \
     Source/PokemonSV/Options/PokemonSV_SandwichIngredientsTable.cpp \
     Source/PokemonSV/Options/PokemonSV_SandwichMakerOption.cpp \
     Source/PokemonSV/Options/PokemonSV_TeraAIOption.cpp \
+    Source/PokemonSV/Options/PokemonSV_TeraCatchOnWinOption.cpp \
     Source/PokemonSV/Options/PokemonSV_TeraMoveTable.cpp \
+    Source/PokemonSV/Options/PokemonSV_TeraRollFilter.cpp \
     Source/PokemonSV/Options/PokemonSV_TournamentPrizeSelectOption.cpp \
     Source/PokemonSV/Options/PokemonSV_TournamentPrizeTable.cpp \
     Source/PokemonSV/PokemonSV_Panels.cpp \
     Source/PokemonSV/PokemonSV_Settings.cpp \
+    Source/PokemonSV/Programs/Boxes/PokemonSV_BoxAttach.cpp \
+    Source/PokemonSV/Programs/Boxes/PokemonSV_BoxRelease.cpp \
     Source/PokemonSV/Programs/Boxes/PokemonSV_BoxRoutines.cpp \
+    Source/PokemonSV/Programs/Boxes/PokemonSV_MassAttachItems.cpp \
+    Source/PokemonSV/Programs/Boxes/PokemonSV_MassRelease.cpp \
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggAutonomous.cpp \
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggFetcher.cpp \
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggHatcher.cpp \
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggRoutines.cpp \
+    Source/PokemonSV/Programs/Farming/PokemonSV_AuctionFarmer.cpp \
+    Source/PokemonSV/Programs/Farming/PokemonSV_ESPTraining.cpp \
+    Source/PokemonSV/Programs/Farming/PokemonSV_GimmighoulChestFarmer.cpp \
+    Source/PokemonSV/Programs/Farming/PokemonSV_GimmighoulRoamingFarmer.cpp \
+    Source/PokemonSV/Programs/Farming/PokemonSV_LPFarmer.cpp \
+    Source/PokemonSV/Programs/Farming/PokemonSV_TournamentFarmer.cpp \
     Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_ClipboardFastCodeEntry.cpp \
     Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_CodeEntry.cpp \
     Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_FastCodeEntry.cpp \
     Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_VideoFastCodeEntry.cpp \
-    Source/PokemonSV/Programs/General/PokemonSV_AuctionFarmer.cpp \
     Source/PokemonSV/Programs/General/PokemonSV_AutonomousBallThrower.cpp \
-    Source/PokemonSV/Programs/General/PokemonSV_ESPTraining.cpp \
-    Source/PokemonSV/Programs/General/PokemonSV_GimmighoulChestFarmer.cpp \
-    Source/PokemonSV/Programs/General/PokemonSV_GimmighoulRoamingFarmer.cpp \
-    Source/PokemonSV/Programs/General/PokemonSV_LPFarmer.cpp \
+    Source/PokemonSV/Programs/General/PokemonSV_ClothingBuyer.cpp \
     Source/PokemonSV/Programs/General/PokemonSV_MassPurchase.cpp \
-    Source/PokemonSV/Programs/General/PokemonSV_MassRelease.cpp \
     Source/PokemonSV/Programs/General/PokemonSV_SizeChecker.cpp \
     Source/PokemonSV/Programs/General/PokemonSV_StatsReset.cpp \
-    Source/PokemonSV/Programs/General/PokemonSV_TournamentFarmer.cpp \
+    Source/PokemonSV/Programs/General/PokemonSV_StatsResetBloodmoon.cpp \
     Source/PokemonSV/Programs/Glitches/PokemonSV_CloneItems-1.0.1.cpp \
     Source/PokemonSV/Programs/Glitches/PokemonSV_RideCloner-1.0.1.cpp \
     Source/PokemonSV/Programs/PokemonSV_AreaZero.cpp \
@@ -709,6 +732,7 @@ SOURCES += \
     Source/PokemonSV/Programs/ShinyHunting/PokemonSV_AreaZeroPlatform.cpp \
     Source/PokemonSV/Programs/ShinyHunting/PokemonSV_LetsGoTools.cpp \
     Source/PokemonSV/Programs/ShinyHunting/PokemonSV_ShinyHunt-AreaZeroPlatform.cpp \
+    Source/PokemonSV/Programs/ShinyHunting/PokemonSV_ShinyHunt-Scatterbug.cpp \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_AutoHost.cpp \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_AutoHost-MultiGame.cpp \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_AutoHostLobbyWaiter.cpp \
@@ -716,6 +740,7 @@ SOURCES += \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_JoinTracker.cpp \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraBattler.cpp \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraMultiFarmer.cpp \
+    Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraRoller.cpp \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraRoutines.cpp \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraSelfFarmer.cpp \
     Source/PokemonSV/Programs/TestPrograms/PokemonSV_SoundListener.cpp \
@@ -748,7 +773,7 @@ SOURCES += \
     Source/PokemonSwSh/Inference/PokemonSwSh_BoxShinySymbolDetector.cpp \
     Source/PokemonSwSh/Inference/PokemonSwSh_DialogBoxDetector.cpp \
     Source/PokemonSwSh/Inference/PokemonSwSh_FishingDetector.cpp \
-    Source/PokemonSwSh/Inference/PokemonSwSh_IVCheckerReader.cpp \
+    Source/PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.cpp \
     Source/PokemonSwSh/Inference/PokemonSwSh_MarkFinder.cpp \
     Source/PokemonSwSh/Inference/PokemonSwSh_PokemonSpriteReader.cpp \
     Source/PokemonSwSh/Inference/PokemonSwSh_QuantityReader.cpp \
@@ -765,6 +790,7 @@ SOURCES += \
     Source/PokemonSwSh/Inference/Sounds/PokemonSwSh_BerryTreeRustlingSoundDetector.cpp \
     Source/PokemonSwSh/InferenceTraining/PokemonSwSh_GenerateIVCheckerOCR.cpp \
     Source/PokemonSwSh/InferenceTraining/PokemonSwSh_GenerateNameOCRPokedex.cpp \
+    Source/PokemonSwSh/InferenceTraining/PokemonSwSh_GeneratePokedexSprites.cpp \
     Source/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI.cpp \
     Source/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI_PathMatchup.cpp \
     Source/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI_RentalBossMatchup.cpp \
@@ -820,6 +846,7 @@ SOURCES += \
     Source/PokemonSwSh/Options/PokemonSwSh_BallSelectOption.cpp \
     Source/PokemonSwSh/Options/PokemonSwSh_CramomaticTable.cpp \
     Source/PokemonSwSh/Options/PokemonSwSh_DateToucher.cpp \
+    Source/PokemonSwSh/Options/PokemonSwSh_EggStepOption.cpp \
     Source/PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Battle.cpp \
     Source/PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Field.cpp \
     Source/PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Matchup.cpp \
@@ -922,6 +949,7 @@ SOURCES += \
     Source/Tests/PokemonSwSh_Tests.cpp \
     Source/Tests/TestMap.cpp \
     Source/Tests/TestUtils.cpp \
+    Source/ZeldaTotK/Programs/ZeldaTotK_BowItemDuper.cpp \
     Source/ZeldaTotK/Programs/ZeldaTotK_MineruItemDuper.cpp \
     Source/ZeldaTotK/Programs/ZeldaTotK_ParaglideItemDuper.cpp \
     Source/ZeldaTotK/Programs/ZeldaTotK_SurfItemDuper.cpp \
@@ -929,8 +957,7 @@ SOURCES += \
     Source/ZeldaTotK/ZeldaTotK_Panels.cpp \
     Source/ZeldaTotK/ZeldaTotK_Panels.h \
     Source/ZeldaTotK/ZeldaTotK_Settings.cpp \
-    Source/ZeldaTotK/ZeldaTotK_Settings.h \
-    Source/ZeldaTotK/Programs/ZeldaTotK_BowItemDuper.cpp
+    Source/ZeldaTotK/ZeldaTotK_Settings.h
 
 HEADERS += \
     ../3rdParty/QtWavFile/WavFile.h \
@@ -1050,6 +1077,7 @@ HEADERS += \
     ../Common/Cpp/LifetimeSanitizer.h \
     ../Common/Cpp/Options/BatchOption.h \
     ../Common/Cpp/Options/BooleanCheckBoxOption.h \
+    ../Common/Cpp/Options/ButtonOption.h \
     ../Common/Cpp/Options/ConfigOption.h \
     ../Common/Cpp/Options/DateOption.h \
     ../Common/Cpp/Options/EditableTableOption.h \
@@ -1057,6 +1085,7 @@ HEADERS += \
     ../Common/Cpp/Options/FixedCodeOption.h \
     ../Common/Cpp/Options/FloatingPointOption.h \
     ../Common/Cpp/Options/GroupOption.h \
+    ../Common/Cpp/Options/IntegerRangeOption.h \
     ../Common/Cpp/Options/RandomCodeOption.h \
     ../Common/Cpp/Options/SimpleIntegerOption.h \
     ../Common/Cpp/Options/StaticTableOption.h \
@@ -1100,6 +1129,7 @@ HEADERS += \
     ../Common/Qt/NoWheelComboBox.h \
     ../Common/Qt/Options/BatchWidget.h \
     ../Common/Qt/Options/BooleanCheckBoxWidget.h \
+    ../Common/Qt/Options/ButtonWidget.h \
     ../Common/Qt/Options/ConfigWidget.h \
     ../Common/Qt/Options/DateWidget.h \
     ../Common/Qt/Options/EditableTableWidget.h \
@@ -1107,6 +1137,7 @@ HEADERS += \
     ../Common/Qt/Options/FixedCodeWidget.h \
     ../Common/Qt/Options/FloatingPointWidget.h \
     ../Common/Qt/Options/GroupWidget.h \
+    ../Common/Qt/Options/IntegerRangeWidget.h \
     ../Common/Qt/Options/RandomCodeWidget.h \
     ../Common/Qt/Options/SimpleIntegerWidget.h \
     ../Common/Qt/Options/StaticTableWidget.h \
@@ -1159,6 +1190,7 @@ HEADERS += \
     Source/CommonFramework/Environment/HardwareValidation.h \
     Source/CommonFramework/Environment/HardwareValidation_arm64.tpp \
     Source/CommonFramework/Environment/HardwareValidation_x86.tpp \
+    Source/CommonFramework/Environment/SystemSleep.h \
     Source/CommonFramework/Exceptions/FatalProgramException.h \
     Source/CommonFramework/Exceptions/OperationFailedException.h \
     Source/CommonFramework/Exceptions/ProgramFinishedException.h \
@@ -1445,29 +1477,30 @@ HEADERS += \
     Source/PanelLists.h \
     Source/Pokemon/Inference/Pokemon_BerryNameReader.h \
     Source/Pokemon/Inference/Pokemon_BoxGenderDetector.h \
-    Source/Pokemon/Inference/Pokemon_IVCheckerReader.h \
+    Source/Pokemon/Inference/Pokemon_IvJudgeReader.h \
     Source/Pokemon/Inference/Pokemon_NameReader.h \
     Source/Pokemon/Inference/Pokemon_NatureReader.h \
     Source/Pokemon/Inference/Pokemon_PokeballNameReader.h \
     Source/Pokemon/Inference/Pokemon_ReadHpBar.h \
     Source/Pokemon/Inference/Pokemon_TrainIVCheckerOCR.h \
     Source/Pokemon/Inference/Pokemon_TrainPokemonOCR.h \
-    Source/Pokemon/Options/Pokemon_EggHatchFilter.h \
     Source/Pokemon/Options/Pokemon_EncounterBotOptions.h \
-    Source/Pokemon/Options/Pokemon_IVCheckerOption.h \
+    Source/Pokemon/Options/Pokemon_IvJudgeOption.h \
     Source/Pokemon/Options/Pokemon_NameSelectOption.h \
     Source/Pokemon/Options/Pokemon_NameSelectWidget.h \
-    Source/Pokemon/Options/Pokemon_StatsResetFilter.h \
+    Source/Pokemon/Options/Pokemon_StatsHuntFilter.h \
     Source/Pokemon/Pokemon_DataTypes.h \
     Source/Pokemon/Pokemon_EncounterStats.h \
-    Source/Pokemon/Pokemon_IVChecker.h \
+    Source/Pokemon/Pokemon_IvJudge.h \
     Source/Pokemon/Pokemon_NatureChecker.h \
     Source/Pokemon/Pokemon_Notification.h \
     Source/Pokemon/Pokemon_ShinySparkleSet.h \
+    Source/Pokemon/Pokemon_StatsCalculation.h \
     Source/Pokemon/Pokemon_Strings.h \
     Source/Pokemon/Pokemon_Types.h \
     Source/Pokemon/Resources/Pokemon_BerryNames.h \
     Source/Pokemon/Resources/Pokemon_BerrySprites.h \
+    Source/Pokemon/Resources/Pokemon_EggSteps.h \
     Source/Pokemon/Resources/Pokemon_PokeballNames.h \
     Source/Pokemon/Resources/Pokemon_PokemonNames.h \
     Source/Pokemon/Resources/Pokemon_PokemonSlugs.h \
@@ -1480,7 +1513,7 @@ HEADERS += \
     Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxGenderDetector.h \
     Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxNatureDetector.h \
     Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxShinyDetector.h \
-    Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_IVCheckerReader.h \
+    Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_IvJudgeReader.h \
     Source/PokemonBDSP/Inference/PokemonBDSP_DialogDetector.h \
     Source/PokemonBDSP/Inference/PokemonBDSP_MapDetector.h \
     Source/PokemonBDSP/Inference/PokemonBDSP_MarkFinder.h \
@@ -1498,6 +1531,7 @@ HEADERS += \
     Source/PokemonBDSP/Options/EncounterFilter/PokemonBDSP_EncounterFilterWidget.h \
     Source/PokemonBDSP/Options/PokemonBDSP_BerrySelectOption.h \
     Source/PokemonBDSP/Options/PokemonBDSP_BerryTable.h \
+    Source/PokemonBDSP/Options/PokemonBDSP_EggStepOption.h \
     Source/PokemonBDSP/Options/PokemonBDSP_EncounterBotCommon.h \
     Source/PokemonBDSP/Options/PokemonBDSP_LearnMove.h \
     Source/PokemonBDSP/Options/PokemonBDSP_ShortcutDirection.h \
@@ -1514,6 +1548,7 @@ HEADERS += \
     Source/PokemonBDSP/Programs/Farming/PokemonBDSP_GiftBerryReset.h \
     Source/PokemonBDSP/Programs/Farming/PokemonBDSP_MoneyFarmerRoute210.h \
     Source/PokemonBDSP/Programs/Farming/PokemonBDSP_MoneyFarmerRoute212.h \
+    Source/PokemonBDSP/Programs/Farming/PokemonBDSP_PoffinCooker.h \
     Source/PokemonBDSP/Programs/General/PokemonBDSP_AutonomousBallThrower.h \
     Source/PokemonBDSP/Programs/General/PokemonBDSP_MassRelease.h \
     Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_ActivateMenuGlitch-1.1.2.h \
@@ -1656,11 +1691,14 @@ HEADERS += \
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxGenderDetector.h \
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxNatureDetector.h \
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxShinyDetector.h \
-    Source/PokemonSV/Inference/Boxes/PokemonSV_IVCheckerReader.h \
+    Source/PokemonSV/Inference/Boxes/PokemonSV_IvJudgeReader.h \
     Source/PokemonSV/Inference/Boxes/PokemonSV_StatsResetChecker.h \
     Source/PokemonSV/Inference/Dialogs/PokemonSV_DialogArrowDetector.h \
     Source/PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h \
     Source/PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.h \
+    Source/PokemonSV/Inference/Map/PokemonSV_MapDetector.h \
+    Source/PokemonSV/Inference/Map/PokemonSV_MapMenuDetector.h \
+    Source/PokemonSV/Inference/Map/PokemonSV_MapPokeCenterIconDetector.h \
     Source/PokemonSV/Inference/Overworld/PokemonSV_AreaZeroSkyDetector.h \
     Source/PokemonSV/Inference/Overworld/PokemonSV_LetsGoHpReader.h \
     Source/PokemonSV/Inference/Overworld/PokemonSV_LetsGoKillDetector.h \
@@ -1668,14 +1706,17 @@ HEADERS += \
     Source/PokemonSV/Inference/Picnics/PokemonSV_PicnicDetector.h \
     Source/PokemonSV/Inference/Picnics/PokemonSV_SandwichHandDetector.h \
     Source/PokemonSV/Inference/Picnics/PokemonSV_SandwichIngredientDetector.h \
+    Source/PokemonSV/Inference/Picnics/PokemonSV_SandwichPlateDetector.h \
     Source/PokemonSV/Inference/Picnics/PokemonSV_SandwichRecipeDetector.h \
     Source/PokemonSV/Inference/PokemonSV_AuctionItemNameReader.h \
+    Source/PokemonSV/Inference/PokemonSV_BagDetector.h \
+    Source/PokemonSV/Inference/PokemonSV_ClothingTopDetector.h \
     Source/PokemonSV/Inference/PokemonSV_ESPEmotionDetector.h \
     Source/PokemonSV/Inference/PokemonSV_MainMenuDetector.h \
-    Source/PokemonSV/Inference/PokemonSV_MapDetector.h \
     Source/PokemonSV/Inference/PokemonSV_MoneyReader.h \
     Source/PokemonSV/Inference/PokemonSV_PokePortalDetector.h \
     Source/PokemonSV/Inference/PokemonSV_PokemonSummaryReader.h \
+    Source/PokemonSV/Inference/PokemonSV_StatHexagonReader.h \
     Source/PokemonSV/Inference/PokemonSV_SweatBubbleDetector.h \
     Source/PokemonSV/Inference/PokemonSV_TournamentPrizeNameReader.h \
     Source/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h \
@@ -1689,6 +1730,7 @@ HEADERS += \
     Source/PokemonSV/Options/PokemonSV_AuctionItemSelectOption.h \
     Source/PokemonSV/Options/PokemonSV_AuctionItemTable.h \
     Source/PokemonSV/Options/PokemonSV_AutoHostOptions.h \
+    Source/PokemonSV/Options/PokemonSV_BattleMoveTable.h \
     Source/PokemonSV/Options/PokemonSV_EggPowerSandwichOption.h \
     Source/PokemonSV/Options/PokemonSV_EncounterActionsTable.h \
     Source/PokemonSV/Options/PokemonSV_EncounterBotCommon.h \
@@ -1697,31 +1739,38 @@ HEADERS += \
     Source/PokemonSV/Options/PokemonSV_SandwichIngredientsTable.h \
     Source/PokemonSV/Options/PokemonSV_SandwichMakerOption.h \
     Source/PokemonSV/Options/PokemonSV_TeraAIOption.h \
+    Source/PokemonSV/Options/PokemonSV_TeraCatchOnWinOption.h \
     Source/PokemonSV/Options/PokemonSV_TeraMoveTable.h \
+    Source/PokemonSV/Options/PokemonSV_TeraRollFilter.h \
     Source/PokemonSV/Options/PokemonSV_TournamentPrizeSelectOption.h \
     Source/PokemonSV/Options/PokemonSV_TournamentPrizeTable.h \
     Source/PokemonSV/PokemonSV_Panels.h \
     Source/PokemonSV/PokemonSV_Settings.h \
+    Source/PokemonSV/Programs/Boxes/PokemonSV_BoxAttach.h \
+    Source/PokemonSV/Programs/Boxes/PokemonSV_BoxRelease.h \
     Source/PokemonSV/Programs/Boxes/PokemonSV_BoxRoutines.h \
+    Source/PokemonSV/Programs/Boxes/PokemonSV_MassAttachItems.h \
+    Source/PokemonSV/Programs/Boxes/PokemonSV_MassRelease.h \
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggAutonomous.h \
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggFetcher.h \
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggHatcher.h \
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggRoutines.h \
+    Source/PokemonSV/Programs/Farming/PokemonSV_AuctionFarmer.h \
+    Source/PokemonSV/Programs/Farming/PokemonSV_ESPTraining.h \
+    Source/PokemonSV/Programs/Farming/PokemonSV_GimmighoulChestFarmer.h \
+    Source/PokemonSV/Programs/Farming/PokemonSV_GimmighoulRoamingFarmer.h \
+    Source/PokemonSV/Programs/Farming/PokemonSV_LPFarmer.h \
+    Source/PokemonSV/Programs/Farming/PokemonSV_TournamentFarmer.h \
     Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_ClipboardFastCodeEntry.h \
     Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_CodeEntry.h \
     Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_FastCodeEntry.h \
     Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_VideoFastCodeEntry.h \
-    Source/PokemonSV/Programs/General/PokemonSV_AuctionFarmer.h \
     Source/PokemonSV/Programs/General/PokemonSV_AutonomousBallThrower.h \
-    Source/PokemonSV/Programs/General/PokemonSV_ESPTraining.h \
-    Source/PokemonSV/Programs/General/PokemonSV_GimmighoulChestFarmer.h \
-    Source/PokemonSV/Programs/General/PokemonSV_GimmighoulRoamingFarmer.h \
-    Source/PokemonSV/Programs/General/PokemonSV_LPFarmer.h \
+    Source/PokemonSV/Programs/General/PokemonSV_ClothingBuyer.h \
     Source/PokemonSV/Programs/General/PokemonSV_MassPurchase.h \
-    Source/PokemonSV/Programs/General/PokemonSV_MassRelease.h \
     Source/PokemonSV/Programs/General/PokemonSV_SizeChecker.h \
     Source/PokemonSV/Programs/General/PokemonSV_StatsReset.h \
-    Source/PokemonSV/Programs/General/PokemonSV_TournamentFarmer.h \
+    Source/PokemonSV/Programs/General/PokemonSV_StatsResetBloodmoon.h \
     Source/PokemonSV/Programs/Glitches/PokemonSV_CloneItems-1.0.1.h \
     Source/PokemonSV/Programs/Glitches/PokemonSV_RideCloner-1.0.1.h \
     Source/PokemonSV/Programs/PokemonSV_AreaZero.h \
@@ -1737,6 +1786,7 @@ HEADERS += \
     Source/PokemonSV/Programs/ShinyHunting/PokemonSV_AreaZeroPlatform.h \
     Source/PokemonSV/Programs/ShinyHunting/PokemonSV_LetsGoTools.h \
     Source/PokemonSV/Programs/ShinyHunting/PokemonSV_ShinyHunt-AreaZeroPlatform.h \
+    Source/PokemonSV/Programs/ShinyHunting/PokemonSV_ShinyHunt-Scatterbug.h \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_AutoHost.h \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_AutoHost-MultiGame.h \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_AutoHostLobbyWaiter.h \
@@ -1744,6 +1794,7 @@ HEADERS += \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_JoinTracker.h \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraBattler.h \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraMultiFarmer.h \
+    Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraRoller.h \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraRoutines.h \
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_TeraSelfFarmer.h \
     Source/PokemonSV/Programs/TestPrograms/PokemonSV_SoundListener.h \
@@ -1783,7 +1834,7 @@ HEADERS += \
     Source/PokemonSwSh/Inference/PokemonSwSh_BoxShinySymbolDetector.h \
     Source/PokemonSwSh/Inference/PokemonSwSh_DialogBoxDetector.h \
     Source/PokemonSwSh/Inference/PokemonSwSh_FishingDetector.h \
-    Source/PokemonSwSh/Inference/PokemonSwSh_IVCheckerReader.h \
+    Source/PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h \
     Source/PokemonSwSh/Inference/PokemonSwSh_MarkFinder.h \
     Source/PokemonSwSh/Inference/PokemonSwSh_PokemonSpriteReader.h \
     Source/PokemonSwSh/Inference/PokemonSwSh_QuantityReader.h \
@@ -1800,6 +1851,7 @@ HEADERS += \
     Source/PokemonSwSh/Inference/Sounds/PokemonSwSh_BerryTreeRustlingSoundDetector.h \
     Source/PokemonSwSh/InferenceTraining/PokemonSwSh_GenerateIVCheckerOCR.h \
     Source/PokemonSwSh/InferenceTraining/PokemonSwSh_GenerateNameOCRPokedex.h \
+    Source/PokemonSwSh/InferenceTraining/PokemonSwSh_GeneratePokedexSprites.h \
     Source/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI.h \
     Source/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI_PathMatchup.h \
     Source/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI_RentalBossMatchup.h \
@@ -1851,7 +1903,7 @@ HEADERS += \
     Source/PokemonSwSh/Options/PokemonSwSh_Catchability.h \
     Source/PokemonSwSh/Options/PokemonSwSh_CramomaticTable.h \
     Source/PokemonSwSh/Options/PokemonSwSh_DateToucher.h \
-    Source/PokemonSwSh/Options/PokemonSwSh_EggStepCount.h \
+    Source/PokemonSwSh/Options/PokemonSwSh_EggStepOption.h \
     Source/PokemonSwSh/Options/PokemonSwSh_EncounterBotCommon.h \
     Source/PokemonSwSh/Options/PokemonSwSh_RegiSelector.h \
     Source/PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Battle.h \

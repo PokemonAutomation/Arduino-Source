@@ -13,12 +13,14 @@
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
+#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "PokemonLA/Inference/Objects/PokemonLA_ArcPhoneDetector.h"
 #include "PokemonLA_GameSave.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -71,25 +73,48 @@ bool save_game_from_overworld(ProgramEnvironment& env, ConsoleHandle& console, B
         return false;
     }
 
+    bool found = false;
     for (size_t c = 0; c < 10; c++){
         if (save_tab_selected(snapshot)){
-            pbf_press_button(context, BUTTON_A, 20, 200);
-            pbf_press_button(context, BUTTON_B, 20, 100);
-            pbf_press_button(context, BUTTON_B, 20, 100);
+            pbf_press_button(context, BUTTON_A, 20, 105);
+            pbf_press_button(context, BUTTON_B, 20, 105);
+//            pbf_press_button(context, BUTTON_B, 20, 105);
             context.wait_for_all_requests();
-            return true;
+            found = true;
+            break;
         }
         pbf_press_button(context, BUTTON_ZR, 20, 80);
         context.wait_for_all_requests();
         snapshot = console.video().snapshot();
     }
+    if (!found){
+        throw OperationFailedException(
+            ErrorReport::SEND_ERROR_REPORT, console,
+            "Unable to find save menu.",
+            true
+        );
+    }
 
-    console.log("Unable to find save menu.", COLOR_RED);
-    throw OperationFailedException(
-        ErrorReport::SEND_ERROR_REPORT, console,
-        "Unable to find save menu.",
-        true
+    ArcPhoneDetector detector(console, console, std::chrono::milliseconds(100), true);
+    int ret = run_until(
+        console, context,
+        [&](BotBaseContext& context){
+            for (size_t c = 0; c < 10; c++){
+                pbf_press_button(context, BUTTON_B, 20, 230);
+            }
+        },
+        {detector}
     );
+    if (ret < 0){
+        throw OperationFailedException(
+            ErrorReport::SEND_ERROR_REPORT, console,
+            "Unable to return to overworld.",
+            true
+        );
+    }
+    console.log("Saving game... Done.");
+
+    return true;
 }
 
 

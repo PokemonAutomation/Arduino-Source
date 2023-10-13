@@ -17,13 +17,14 @@
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Pokemon_Notification.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxEggDetector.h"
-#include "PokemonSV/Inference/Boxes/PokemonSV_IVCheckerReader.h"
-#include "PokemonSV/PokemonSV_Settings.h"
+#include "PokemonSV/Inference/Boxes/PokemonSV_IvJudgeReader.h"
+//#include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSV/Programs/Boxes/PokemonSV_BoxRoutines.h"
 #include "PokemonSV/Programs/PokemonSV_SaveGame.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSV/Programs/Eggs/PokemonSV_EggRoutines.h"
+#include "PokemonSV/Programs/Boxes/PokemonSV_BoxRelease.h"
 #include "PokemonSV/Programs/Sandwiches/PokemonSV_SandwichRoutines.h"
 #include "PokemonSV_EggAutonomous.h"
 
@@ -61,7 +62,7 @@ struct EggAutonomous_Descriptor::Stats : public StatsTracker{
         m_display_order.emplace_back("Hatched");
         m_display_order.emplace_back("Shinies");
         m_display_order.emplace_back("Kept");
-        m_display_order.emplace_back("Errors", true);
+        m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
 
         m_aliases.emplace(STRING_POKEMON + " Kept", "Kept");
     }
@@ -85,13 +86,13 @@ EggAutonomous::EggAutonomous()
     , LANGUAGE(
         "<b>Game Language:</b><br>Required to read IVs.",
         IV_READER().languages(),
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         false
     )
     , MAX_KEEPERS(
         "<b>Max Keepers:</b><br>Stop the program after keeping this many " + STRING_POKEMON + ". "
         "The program will put them into a box neighboring the current box.",
-        LockWhileRunning::UNLOCKED,
+        LockMode::UNLOCK_WHILE_RUNNING,
         10, 1, 30
     )
     , AUTO_SAVING(
@@ -104,8 +105,9 @@ EggAutonomous::EggAutonomous()
             {AutoSave::NoAutoSave, "none", "No auto-saving."},
             {AutoSave::AfterStartAndKeep, "start-and-keep", "Save at beginning and after keeping a baby."},
             {AutoSave::EveryBatch, "every-batch", "Save before every batch of 4 or 5 eggs."},
+            {AutoSave::AfterFetchComplete, "after-fetch", "Save after all eggs have been fetched from picnic."}
         },
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         AutoSave::AfterStartAndKeep
     )
     , HAS_CLONE_RIDE_POKEMON(
@@ -114,7 +116,7 @@ EggAutonomous::EggAutonomous()
         "place it as second in party before starting the program.</b>"
         "The program will skip the first row of the current box when storing and hatching eggs, so you will need "
         "to fill the first row with " + STRING_POKEMON + " before running this program.",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         false)
     , KEEP_BOX_LOCATION(
         "<b>Location of the Keep Box:</b><br>Which box to keep the shiny " + STRING_POKEMON + " and others that match the filters.",
@@ -122,13 +124,22 @@ EggAutonomous::EggAutonomous()
             {0, "left", "Left Box"},
             {1, "right", "Right Box"},
         },
-        LockWhileRunning::UNLOCKED,
+        LockMode::UNLOCK_WHILE_RUNNING,
         1
+    )
+    , FILTERS(
+        StatsHuntIvJudgeFilterTable_Label_Eggs,
+        {
+            .action = true,
+            .shiny = true,
+            .gender = true,
+            .nature = true,
+        }
     )
     , SAVE_DEBUG_VIDEO(
         "<b>Save debug videos to Switch:</b><br>"
         "Set this on to save a Switch video everytime an error occurs. You can send the video to developers to help them debug later.",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         false
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
@@ -172,7 +183,7 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
     assert_16_9_720p_min(env.logger(), env.console);
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_LCLICK, 10, 0);
+    pbf_press_button(context, BUTTON_L, 10, 0);
 
     {
         // reset_position_to_flying_spot(env, context);
@@ -262,7 +273,7 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         } else if (game_already_resetted == false){
             // Nothing found in this iteration
             env.log("Resetting game since nothing found, saving sandwich ingredients.");
-            reset_game(env, context, "reset to start new meal");
+            reset_game(env.program_info(), env.console, context);
         } else { // game_already_resetted == true
             env.log("Game resetted back to egg fetching routine.");
         }
@@ -388,7 +399,9 @@ void EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
     }
 
     auto save_game_if_needed = [&](){
-        if (AUTO_SAVING == AutoSave::EveryBatch || (AUTO_SAVING == AutoSave::AfterStartAndKeep && m_in_critical_to_save_stage)){
+        if (AUTO_SAVING == AutoSave::EveryBatch ||
+            (AUTO_SAVING == AutoSave::AfterFetchComplete && m_saved_after_fetched_eggs == false) ||
+            (AUTO_SAVING == AutoSave::AfterStartAndKeep && m_in_critical_to_save_stage)){
             env.log("Saving game during egg hatching routine.");
             save_game(env, context, true);
             m_saved_after_fetched_eggs = true;
@@ -503,7 +516,7 @@ void EggAutonomous::process_one_baby(SingleSwitchProgramEnvironment& env, BotBas
     env.log("Check hatched pokemon at party slot " + std::to_string(party_row));
 
     bool found_shiny = false;
-    EggHatchAction action = EggHatchAction::Release;
+    StatsHuntAction action = StatsHuntAction::Discard;
     if (check_baby_info(env.program_info(), env.console, context, LANGUAGE, FILTERS, action)){
         found_shiny = true;
         env.console.log("Shiny found!");
@@ -534,12 +547,12 @@ void EggAutonomous::process_one_baby(SingleSwitchProgramEnvironment& env, BotBas
     };
 
     switch (action){
-        case EggHatchAction::StopProgram:
+    case StatsHuntAction::StopProgram:
             env.log("Program stop requested...");
             env.console.overlay().add_log("Request program stop", COLOR_WHITE);
             send_keep_notification();
             throw ProgramFinishedException();
-        case EggHatchAction::Keep:
+    case StatsHuntAction::Keep:
             m_in_critical_to_save_stage = true;
             env.log("Moving Pokemon to keep box...", COLOR_BLUE);
             stats.m_kept++;
@@ -561,7 +574,7 @@ void EggAutonomous::process_one_baby(SingleSwitchProgramEnvironment& env, BotBas
             }
             break;
 
-        case EggHatchAction::Release:
+    case StatsHuntAction::Discard:
         default:
             // If the auto save mode is AfterStartAndKeep, which allows resetting the game in case no eggs in the box are kept,
             // then we can save the time of releasing hatched pokemon in case we will reset the game later.
@@ -672,17 +685,6 @@ void EggAutonomous::save_game(SingleSwitchProgramEnvironment& env, BotBaseContex
     }
 }
 
-void EggAutonomous::reset_game(SingleSwitchProgramEnvironment& env, BotBaseContext& context, const std::string& error_msg){
-    try{
-        pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
-        context.wait_for_all_requests();
-        reset_game_from_home(env.program_info(), env.console, context, 5 * TICKS_PER_SECOND);
-    }catch (OperationFailedException& e){
-        // To be safe: avoid doing anything outside of game on Switch,
-        // make game resetting non error recoverable
-        throw FatalProgramException(std::move(e));
-    }
-}
 
 void EggAutonomous::handle_recoverable_error(
     SingleSwitchProgramEnvironment& env, BotBaseContext& context,
@@ -725,7 +727,7 @@ void EggAutonomous::handle_recoverable_error(
     }
 
     env.log("Reset game to handle recoverable error");
-    reset_game(env, context, "handling recoverable error");
+    reset_game(env.program_info(), env.console, context);
 }
 
 

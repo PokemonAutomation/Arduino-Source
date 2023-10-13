@@ -42,13 +42,13 @@ std::unique_ptr<StatsTracker> ParaglideItemDuper_Descriptor::make_stats() const 
 ParaglideItemDuper::ParaglideItemDuper()
     : ATTEMPTS(
         "<b>Duplication Attempts:</b><br>The number of times you wish to run this routine.",
-        LockWhileRunning::UNLOCKED,
+        LockMode::UNLOCK_WHILE_RUNNING,
         100
     )
     , LOAD_DELAY(
         "<b>Loading time:</b><br>Adjustable delay for the load screen after warping. "
         "Adjust this to match the loading time of your game.",
-        LockWhileRunning::UNLOCKED,
+        LockMode::UNLOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "3125"
     )

@@ -42,7 +42,7 @@ std::unique_ptr<StatsTracker> SurfItemDuper_Descriptor::make_stats() const {
 SurfItemDuper::SurfItemDuper()
     : ATTEMPTS(
         "<b>Duplication Attempts:</b><br>The number of times you wish to run this routine.",
-        LockWhileRunning::UNLOCKED,
+        LockMode::UNLOCK_WHILE_RUNNING,
         100
     )
     , GO_HOME_WHEN_DONE(false)

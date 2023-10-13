@@ -50,7 +50,7 @@ class PlayerListTable : public EditableTableOption_t<PlayerListRow>{
 public:
     PlayerListTable(
         std::string label,
-        LockWhileRunning lock_while_running,
+        LockMode lock_while_running,
         std::string notes_label
     );
 

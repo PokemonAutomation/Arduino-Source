@@ -93,7 +93,7 @@ public:
     virtual void add_text(const OverlayText& text) override;
     virtual void remove_text(const OverlayText& text) override;
 
-    virtual void add_log(std::string message, Color color) override;
+    virtual void add_log(std::string message, Color color = COLOR_WHITE) override;
     virtual void clear_log() override;
 
     virtual void add_stat(OverlayStat& stat) override;

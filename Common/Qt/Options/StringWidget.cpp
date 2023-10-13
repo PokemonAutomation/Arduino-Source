@@ -32,6 +32,7 @@ StringCellWidget::StringCellWidget(QWidget& parent, StringCell& value)
 {
     this->setPlaceholderText(QString::fromStdString(value.placeholder_text()));
 
+    this->setReadOnly(value.lock_mode() == LockMode::READ_ONLY);
     if (m_value.is_password()){
         this->setEchoMode(QLineEdit::PasswordEchoOnEdit);
     }
@@ -75,6 +76,7 @@ StringOptionWidget::StringOptionWidget(QWidget& parent, StringOption& value)
     m_box->setPlaceholderText(QString::fromStdString(value.placeholder_text()));
     layout->addWidget(m_box, 1);
 
+    m_box->setReadOnly(value.lock_mode() == LockMode::READ_ONLY);
     if (m_value.is_password()){
         m_box->setEchoMode(QLineEdit::PasswordEchoOnEdit);
     }

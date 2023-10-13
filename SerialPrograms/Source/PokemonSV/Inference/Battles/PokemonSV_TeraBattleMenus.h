@@ -106,12 +106,18 @@ public:
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) const override;
 
+    bool move_to_slot(ConsoleHandle& console, BotBaseContext& context, uint8_t slot) const;
+
+private:
+    bool detect_slot(const ImageViewRGB32& screen, size_t index) const;
+
 private:
     Color m_color;
     WhiteButtonDetector m_callouts_button;
-    ImageFloatBox m_button;
-    ImageFloatBox m_box_right;
-    GradientArrowDetector m_arrow;
+
+    ImageFloatBox m_button[2];
+    ImageFloatBox m_box_right[2];
+    std::vector<GradientArrowDetector> m_arrow;
 };
 class TeraCatchWatcher : public DetectorToFinder<TeraCatchDetector>{
 public:

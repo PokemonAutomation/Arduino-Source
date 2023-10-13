@@ -19,7 +19,7 @@
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_LetsGoHpReader.h"
-#include "PokemonSV/Inference/Boxes/PokemonSV_IVCheckerReader.h"
+#include "PokemonSV/Inference/Boxes/PokemonSV_IvJudgeReader.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_EncounterWatcher.h"
 #include "PokemonSV/Programs/Eggs/PokemonSV_EggRoutines.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
@@ -62,11 +62,11 @@ struct ShinyHuntAreaZeroPlatform_Descriptor::Stats : public LetsGoEncounterBotSt
         , m_game_resets(m_stats["Game Resets"])
         , m_errors(m_stats["Errors"])
     {
-        m_display_order.insert(m_display_order.begin() + 2, {"Sandwiches", true});
-        m_display_order.insert(m_display_order.begin() + 3, {"Auto Heals", true});
-        m_display_order.insert(m_display_order.begin() + 4, {"Platform Resets", true});
-        m_display_order.insert(m_display_order.begin() + 5, {"Game Resets", true});
-        m_display_order.insert(m_display_order.begin() + 6, {"Errors", true});
+        m_display_order.insert(m_display_order.begin() + 2, {"Sandwiches", HIDDEN_IF_ZERO});
+        m_display_order.insert(m_display_order.begin() + 3, {"Auto Heals", HIDDEN_IF_ZERO});
+        m_display_order.insert(m_display_order.begin() + 4, {"Platform Resets", HIDDEN_IF_ZERO});
+        m_display_order.insert(m_display_order.begin() + 5, {"Game Resets", ALWAYS_HIDDEN});
+        m_display_order.insert(m_display_order.begin() + 6, {"Errors", HIDDEN_IF_ZERO});
     }
     std::atomic<uint64_t>& m_sandwiches;
     std::atomic<uint64_t>& m_autoheals;
@@ -89,7 +89,7 @@ ShinyHuntAreaZeroPlatform::ShinyHuntAreaZeroPlatform()
     : LANGUAGE(
         "<b>Game Language:</b><br>Required to read " + STRING_POKEMON + " names.",
         IV_READER().languages(),
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         false
     )
     , MODE(
@@ -102,7 +102,7 @@ ShinyHuntAreaZeroPlatform::ShinyHuntAreaZeroPlatform()
             {Mode::START_IN_ZERO_GATE,  "zerogate", "Start inside Zero Gate."},
             {Mode::MAKE_SANDWICH,       "sandwich", "Make a sandwich."},
         },
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         Mode::START_ON_PLATFORM
     )
     , PATH0(
@@ -112,19 +112,19 @@ ShinyHuntAreaZeroPlatform::ShinyHuntAreaZeroPlatform()
             {Path::PATH1, "path1", "Path 1"},
             {Path::PATH2, "path2", "Path 2"},
         },
-        LockWhileRunning::UNLOCKED,
+        LockMode::UNLOCK_WHILE_RUNNING,
         Path::PATH2
     )
     , SANDWICH_RESET_IN_MINUTES(
         "<b>Sandwich Reset Time (in minutes):</b><br>The time to reset game to make a new sandwich.",
-        LockWhileRunning::UNLOCKED,
-        30
+        LockMode::UNLOCK_WHILE_RUNNING,
+        35
     )
     , SANDWICH_OPTIONS(LANGUAGE)
     , GO_HOME_WHEN_DONE(true)
     , AUTO_HEAL_PERCENT(
         "<b>Auto-Heal %</b><br>Auto-heal if your HP drops below this percentage.",
-        LockWhileRunning::UNLOCKED,
+        LockMode::UNLOCK_WHILE_RUNNING,
         75, 0, 100
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
@@ -184,11 +184,11 @@ bool ShinyHuntAreaZeroPlatform::run_traversal(BotBaseContext& context){
     const ProgramInfo& info = m_env->program_info();
     ConsoleHandle& console = m_env->console;
 
-    if (m_pending_save){
-        save_game_from_overworld(info, console, context);
-        m_pending_save = false;
-        m_last_save = SavedLocation::AREA_ZERO;
-    }
+//    if (m_pending_save){
+//        save_game_from_overworld(info, console, context);
+//        m_pending_save = false;
+//        m_last_save = SavedLocation::AREA_ZERO;
+//    }
 
     double hp = m_hp_watcher->last_known_value() * 100;
     if (0 < hp){
@@ -204,13 +204,15 @@ bool ShinyHuntAreaZeroPlatform::run_traversal(BotBaseContext& context){
 
     WallClock start = current_time();
 
-    size_t kills, encounters;
+    size_t kills = 0, encounters = 0;
     std::chrono::minutes window_minutes(PLATFORM_RESET.WINDOW_IN_MINUTES);
     WallDuration window = m_time_tracker->last_window_in_realtime(start, window_minutes);
 
     std::chrono::seconds window_seconds;
     bool enough_time;
     if (window == WallDuration::zero()){
+//        console.log("Debug Reset Timer: Window not initialized.", COLOR_RED);
+
         //  Not enough history.
         enough_time = false;
         window = start - m_encounter_tracker->encounter_rate_tracker_start_time();
@@ -219,6 +221,8 @@ bool ShinyHuntAreaZeroPlatform::run_traversal(BotBaseContext& context){
             kills, encounters, window_seconds
         );
     }else{
+//        console.log("Debug Reset Timer: Window started.", COLOR_RED);
+
         window_seconds = std::chrono::duration_cast<Seconds>(window);
         enough_time = m_encounter_tracker->get_encounters_in_window(
             kills, encounters, window_seconds
@@ -231,6 +235,7 @@ bool ShinyHuntAreaZeroPlatform::run_traversal(BotBaseContext& context){
         "\n    Encounters: " + std::to_string(encounters)
     );
 
+    // Check we want to do a platform reset first:
     do{
         if (!PLATFORM_RESET.enabled()){
             console.log("Platform Reset: Disabled", COLOR_ORANGE);
@@ -250,10 +255,13 @@ bool ShinyHuntAreaZeroPlatform::run_traversal(BotBaseContext& context){
         }
 
         console.log("Conditions met for platform reset.");
-        m_state = State::LEAVE_AND_RETURN;
+        m_pending_platform_reset = true;
+//        m_state = State::LEAVE_AND_RETURN;
         return false;
     }while (false);
 
+    // Send Let's Go pokemon to beat wild pokemon while moving on the platform following one path.
+    // It tracks the kill chain by sound detection from `m_encounter_tracker`.
     try{
         switch (PATH0){
         case Path::PATH0:
@@ -278,10 +286,12 @@ bool ShinyHuntAreaZeroPlatform::run_traversal(BotBaseContext& context){
 }
 
 
+struct ResetException{};
 
-void ShinyHuntAreaZeroPlatform::run_state(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    ShinyHuntAreaZeroPlatform_Descriptor::Stats& stats = m_env->current_stats<ShinyHuntAreaZeroPlatform_Descriptor::Stats>();
-    const ProgramInfo& info = m_env->program_info();
+
+void ShinyHuntAreaZeroPlatform::set_flags(SingleSwitchProgramEnvironment& env){
+//    ShinyHuntAreaZeroPlatform_Descriptor::Stats& stats = m_env->current_stats<ShinyHuntAreaZeroPlatform_Descriptor::Stats>();
+//    const ProgramInfo& info = m_env->program_info();
     ConsoleHandle& console = m_env->console;
 
     send_program_notification(
@@ -292,141 +302,153 @@ void ShinyHuntAreaZeroPlatform::run_state(SingleSwitchProgramEnvironment& env, B
     );
 
     WallClock now = current_time();
-    if (MODE == Mode::MAKE_SANDWICH && m_last_sandwich + std::chrono::minutes(SANDWICH_RESET_IN_MINUTES) < now){
-        m_state = State::RESET_SANDWICH;
+    if (MODE == Mode::MAKE_SANDWICH &&
+        m_last_sandwich + std::chrono::minutes(SANDWICH_RESET_IN_MINUTES) < now
+    ){
+        console.log("Enough time has elapsed. Time to reset sandwich...");
+        m_pending_sandwich = true;
     }
 
-    State recovery_state = State::LEAVE_AND_RETURN;
-    try{
-        switch (m_state){
-        case State::TRAVERSAL:{
-            //  If we error out, recover using LEAVE_AND_RETURN.
-            recovery_state = State::LEAVE_AND_RETURN;
+    int64_t seconds_on_sandwich = std::chrono::duration_cast<std::chrono::seconds>(now - m_last_sandwich).count();
+    console.log(
+        std::string("State:\n") +
+        "    Time on Sandwich: " + (m_last_sandwich == WallClock::min()
+            ? "N/A"
+            : std::to_string(seconds_on_sandwich)) + " seconds\n" +
+        "    Pending Save: " + (m_pending_save ? "Yes" : "No") + "\n" +
+        "    Pending Platform Reset: " + (m_pending_platform_reset ? "Yes" : "No") + "\n" +
+        "    Pending Sandwich: " + (m_pending_sandwich ? "Yes" : "No") + "\n" +
+        "    Reset after Sandwich: " + (m_reset_on_next_sandwich ? "Yes" : "No") + "\n"
+    );
 
-            //  TODO: Wrap this with the sandwich timer cancel.
-            if (run_traversal(context)){
-                break;
-            }else{
-                return;
-            }
+}
+void ShinyHuntAreaZeroPlatform::run_state(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    ShinyHuntAreaZeroPlatform_Descriptor::Stats& stats = m_env->current_stats<ShinyHuntAreaZeroPlatform_Descriptor::Stats>();
+    const ProgramInfo& info = m_env->program_info();
+    ConsoleHandle& console = m_env->console;
+
+    if (m_pending_save){
+        console.log("Executing: Pending Save...");
+        if (m_current_location != Location::ZERO_GATE_FLY_SPOT && m_current_location != Location::AREA_ZERO){
+            return_to_outside_zero_gate(info, console, context);
+            m_current_location = Location::ZERO_GATE_FLY_SPOT;
         }
-        case State::INSIDE_GATE_AND_RETURN:
-            console.log("Going from inside gate to platform...");
+        save_game_from_overworld(info, console, context);
+        m_saved_location = m_current_location;
+        m_pending_save = false;
+        return;
+    }
 
-            //  If we error out, recover using LEAVE_AND_RETURN.
-            recovery_state = State::LEAVE_AND_RETURN;
+    if (m_pending_sandwich){
+        console.log("Executing: Pending Sandwich...");
 
-            inside_zero_gate_to_platform(info, console, context, NAVIGATE_TO_PLATFORM);
-            m_encounter_tracker->reset_rate_tracker_start_time();
-//            m_last_platform_reset = now;
-
-            break;
-
-        case State::LEAVE_AND_RETURN:
-            console.log("Leaving and returning to platform...");
-
-            //  If we error out, return to this state.
-            recovery_state = State::LEAVE_AND_RETURN;
-
-            return_to_inside_zero_gate(info, console, context);
-            inside_zero_gate_to_platform(info, console, context, NAVIGATE_TO_PLATFORM);
-
-            stats.m_platform_resets++;
-            m_encounter_tracker->reset_rate_tracker_start_time();
-//            m_last_platform_reset = now;
-            m_env->update_stats();
-
-            break;
-
-        case State::RESET_AND_RETURN:
-            console.log("Resetting game and returning to platform...");
-
-            //  If we error out, return to this state.
-            recovery_state = State::RESET_AND_RETURN;
-
-//            m_last_platform_reset = current_time();
-            pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
-            reset_game_from_home(info, console, context, 5 * TICKS_PER_SECOND);
-            pbf_press_button(context, BUTTON_RCLICK, 20, 105);
-
-            switch (m_last_save){
-            case SavedLocation::NONE:
-                throw InternalProgramError(&console.logger(), PA_CURRENT_FUNCTION, "Cannot reset with no previous save.");
-            case SavedLocation::ZERO_GATE_FLY_SPOT:
-                return_to_inside_zero_gate(info, console, context);
-                inside_zero_gate_to_platform(info, console, context, NAVIGATE_TO_PLATFORM);
-                break;
-            case SavedLocation::AREA_ZERO:
-                //  No further action needed as you're already on the platform.
-                break;
-            }
-
-            inside_zero_gate_to_platform(info, console, context, NAVIGATE_TO_PLATFORM);
-
-            stats.m_game_resets++;
-            m_encounter_tracker->reset_rate_tracker_start_time();
-//            m_last_platform_reset = now;
-            m_env->update_stats();
-
-            break;
-
-        case State::RESET_SANDWICH:
-            console.log("Resetting sandwich...");
-
-            switch (m_last_save){
-            case SavedLocation::NONE:
-            case SavedLocation::AREA_ZERO:
-                return_to_outside_zero_gate(info, console, context);
-                save_game_from_overworld(info, console, context);
-                console.log("Saving at Zero Gate...");
-                m_last_save = SavedLocation::ZERO_GATE_FLY_SPOT;
-                break;
-            case SavedLocation::ZERO_GATE_FLY_SPOT:
-                break;
-            }
-
-            recovery_state = State::LEAVE_AND_RETURN;
-
-            if (stats.m_sandwiches > 0) {
-                pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
-                reset_game_from_home(info, console, context, 5 * TICKS_PER_SECOND);
-                pbf_press_button(context, BUTTON_RCLICK, 20, 105);
-                stats.m_game_resets++;
-                m_env->update_stats();
-            };
-
-            // Open picnic and make sandwich
-            picnic_at_zero_gate(info, console, context);
-            picnic_from_overworld(info, console, context);
-            pbf_move_left_joystick(context, 128, 0, 30, 40);
-            enter_sandwich_recipe_list(info, console, context);
-
-            run_sandwich_maker(env, context, SANDWICH_OPTIONS);
-
-            leave_picnic(info, console, context);
-
-            // Return to platform
-            return_to_inside_zero_gate_from_picnic(info, console, context);
-            inside_zero_gate_to_platform(info, console, context, NAVIGATE_TO_PLATFORM);
-
-            console.log("Sandwich Reset: Starting new sandwich timer...");
-            m_last_sandwich = current_time();
-
-            stats.m_sandwiches++;
-            m_env->update_stats();
-
-            break;
+        //  If we need to reset, do so now.
+        if (m_reset_on_next_sandwich){
+            throw ResetException();
         }
 
-        //  No problems. Go back to traversals.
-        m_state = State::TRAVERSAL;
+        //  If we're not at Zero Gate, go there now.
+        if (m_current_location != Location::ZERO_GATE_FLY_SPOT){
+            return_to_outside_zero_gate(info, console, context);
+            m_current_location = Location::ZERO_GATE_FLY_SPOT;
+            m_pending_platform_reset = false;
+        }
+
+        m_reset_on_next_sandwich = true;
+
+        //  If we're not saved at Zero Gate, do it now.
+        if (m_saved_location != Location::ZERO_GATE_FLY_SPOT){
+            save_game_from_overworld(info, console, context);
+            m_saved_location = m_current_location;
+        }
+
+        picnic_at_zero_gate(info, console, context);
+        pbf_move_left_joystick(context, 128, 0, 70, 0);
+        enter_sandwich_recipe_list(info, console, context);
+        run_sandwich_maker(env, context, SANDWICH_OPTIONS);
+
+        console.log("Sandwich Reset: Starting new sandwich timer...");
+        m_last_sandwich = current_time();
+
+        stats.m_sandwiches++;
+        m_env->update_stats();
+
+        leave_picnic(info, console, context);
+        return_to_inside_zero_gate_from_picnic(info, console, context);
+        m_current_location = Location::ZERO_GATE_INSIDE;
+
+        inside_zero_gate_to_platform(info, console, context, NAVIGATE_TO_PLATFORM);
+        m_current_location = Location::AREA_ZERO;
+
+        m_pending_sandwich = false;
+
+        m_encounter_tracker->reset_rate_tracker_start_time();
         m_consecutive_failures = 0;
+        return;
+    }
 
+    if (m_pending_platform_reset){
+        console.log("Executing: Platform Reset");
+        return_to_inside_zero_gate(info, console, context);
+        inside_zero_gate_to_platform(info, console, context, NAVIGATE_TO_PLATFORM);
+        m_current_location = Location::AREA_ZERO;
+
+        stats.m_platform_resets++;
+        m_env->update_stats();
+
+        m_pending_platform_reset = false;
+        m_encounter_tracker->reset_rate_tracker_start_time();
+        m_consecutive_failures = 0;
+        return;
+    }
+
+    switch (m_current_location){
+    case Location::UNKNOWN:
+    case Location::ZERO_GATE_FLY_SPOT:
+    case Location::TRAVELING_TO_PLATFORM:
+        console.log("Executing: Platform Reset (state-based)...");
+        return_to_inside_zero_gate(info, console, context);
+        inside_zero_gate_to_platform(info, console, context, NAVIGATE_TO_PLATFORM);
+        m_current_location = Location::AREA_ZERO;
+        m_pending_platform_reset = false;
+        m_encounter_tracker->reset_rate_tracker_start_time();
+        m_consecutive_failures = 0;
+        return;
+    case Location::ZERO_GATE_INSIDE:
+        console.log("Executing: Zero Gate -> Platform...");
+        m_current_location = Location::AREA_ZERO;
+        inside_zero_gate_to_platform(info, console, context, NAVIGATE_TO_PLATFORM);
+//            m_current_location = Location::AREA_ZERO;
+        m_pending_platform_reset = false;
+        m_encounter_tracker->reset_rate_tracker_start_time();
+        m_consecutive_failures = 0;
+        return;
+    case Location::AREA_ZERO:
+        console.log("Executing: Traversal...");
+        try{
+            run_traversal(context);
+        }catch (OperationFailedException&){
+            m_pending_platform_reset = true;
+            throw;
+        }
+//        m_encounter_tracker->reset_rate_tracker_start_time();
+        m_consecutive_failures = 0;
+        return;
+    }
+}
+void ShinyHuntAreaZeroPlatform::set_flags_and_run_state(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    set_flags(env);
+
+    ShinyHuntAreaZeroPlatform_Descriptor::Stats& stats = m_env->current_stats<ShinyHuntAreaZeroPlatform_Descriptor::Stats>();
+//    const ProgramInfo& info = m_env->program_info();
+    ConsoleHandle& console = m_env->console;
+
+    try{
+        run_state(env, context);
     }catch (OperationFailedException& e){
         stats.m_errors++;
         m_env->update_stats();
         m_consecutive_failures++;
-        m_state = recovery_state;
         e.send_notification(*m_env, NOTIFICATION_ERROR_RECOVERABLE);
         if (m_consecutive_failures >= 3){
             throw FatalProgramException(
@@ -444,8 +466,6 @@ void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, Bot
 
     assert_16_9_720p_min(env.logger(), env.console);
 
-//    pbf_press_button(context, BUTTON_RCLICK, 20, 105);
-
     m_iterations = 0;
 
     LetsGoHpWatcher hp_watcher(COLOR_RED);
@@ -461,20 +481,32 @@ void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, Bot
     );
     m_encounter_tracker = &encounter_tracker;
 
+    m_saved_location = Location::UNKNOWN;
+    m_pending_save = false;
+    m_pending_platform_reset = false;
+    m_pending_sandwich = false;
+    m_reset_on_next_sandwich = false;
+
     switch (MODE){
     case Mode::START_ON_PLATFORM:
-        m_state = State::TRAVERSAL;
+        m_current_location = Location::AREA_ZERO;
+//        m_state = State::TRAVERSAL;
         break;
     case Mode::START_IN_ZERO_GATE:
-        m_state = State::INSIDE_GATE_AND_RETURN;
+        m_current_location = Location::ZERO_GATE_INSIDE;
+//        m_state = State::INSIDE_GATE_AND_RETURN;
         break;
     case Mode::MAKE_SANDWICH:
-        m_state = State::RESET_SANDWICH;
+        m_current_location = Location::UNKNOWN;
+        m_pending_save = false;
+        m_pending_sandwich = true;
+//        m_state = State::RESET_SANDWICH;
         break;
     }
 
-    m_pending_save = false;
-    m_last_save = SavedLocation::NONE;
+
+//    m_pending_save = false;
+//    m_last_save = SavedLocation::NONE;
     m_last_sandwich = WallClock::min();
 
     //  This is the outer-most program loop that wraps all logic with the
@@ -483,30 +515,43 @@ void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, Bot
     //  can get attacked at almost any time while in Area Zero.
     m_consecutive_failures = 0;
     while (true){
-        env.console.log("Starting encounter loop...", COLOR_PURPLE);
-        EncounterWatcher encounter_watcher(env.console, COLOR_RED);
-        run_until(
-            env.console, context,
-            [&](BotBaseContext& context){
-                //  Inner program loop that runs the state machine.
-                while (true){
-                    run_state(env, context);
-                }
-            },
-            {
-                static_cast<VisualInferenceCallback&>(encounter_watcher),
-                static_cast<AudioInferenceCallback&>(encounter_watcher),
-                hp_watcher,
-            }
-        );
-        encounter_watcher.throw_if_no_sound();
-
-        env.console.log("Detected battle.", COLOR_PURPLE);
         try{
-            bool should_save = encounter_tracker.process_battle(encounter_watcher, ENCOUNTER_BOT_OPTIONS);
-            if (should_save){
-                m_pending_save = should_save;
+            env.console.log("Starting encounter loop...", COLOR_PURPLE);
+            EncounterWatcher encounter_watcher(env.console, COLOR_RED);
+            run_until(
+                env.console, context,
+                [&](BotBaseContext& context){
+                    //  Inner program loop that runs the state machine.
+                    while (true){
+                        set_flags_and_run_state(env, context);
+                    }
+                },
+                {
+                    static_cast<VisualInferenceCallback&>(encounter_watcher),
+                    static_cast<AudioInferenceCallback&>(encounter_watcher),
+                    hp_watcher,
+                }
+            );
+            encounter_watcher.throw_if_no_sound();
+
+            env.console.log("Detected battle.", COLOR_PURPLE);
+            bool caught, should_save;
+            encounter_tracker.process_battle(
+                caught, should_save,
+                encounter_watcher, ENCOUNTER_BOT_OPTIONS
+            );
+            m_pending_save |= should_save;
+            if (caught){
+                m_reset_on_next_sandwich = false;
             }
+        }catch (ResetException&){
+            pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+            reset_game_from_home_zoom_out(env.program_info(), env.console, context, 5 * TICKS_PER_SECOND);
+            m_current_location = m_saved_location;
+            stats.m_game_resets++;
+            m_env->update_stats();
+            m_pending_platform_reset = false;
+            m_reset_on_next_sandwich = false;
         }catch (ProgramFinishedException&){
             GO_HOME_WHEN_DONE.run_end_of_program(context);
             throw;

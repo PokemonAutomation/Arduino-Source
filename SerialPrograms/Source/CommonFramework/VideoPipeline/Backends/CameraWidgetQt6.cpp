@@ -14,7 +14,9 @@
 #include <QMediaDevices>
 #include <QVideoSink>
 //#include "Common/Cpp/Exceptions.h"
+//#include "Common/Cpp/Time.h"
 #include "CommonFramework/VideoPipeline/CameraOption.h"
+#include "MediaServicesQt6.h"
 #include "CameraWidgetQt6.h"
 
 //using std::cout;
@@ -26,15 +28,23 @@ namespace CameraQt6QVideoSink{
 
 
 std::vector<CameraInfo> CameraBackend::get_all_cameras() const{
-    std::vector<CameraInfo> ret;
+#if 1
+    const auto cameras = GlobalMediaServices::instance().get_all_cameras();
+#else
     const auto cameras = QMediaDevices::videoInputs();
+#endif
+    std::vector<CameraInfo> ret;
     for (const auto& info : cameras){
         ret.emplace_back(info.id().toStdString());
     }
     return ret;
 }
 std::string CameraBackend::get_camera_name(const CameraInfo& info) const{
+#if 1
+    const auto cameras = GlobalMediaServices::instance().get_all_cameras();
+#else
     const auto cameras = QMediaDevices::videoInputs();
+#endif
     for (const auto& camera : cameras){
         if (camera.id().toStdString() == info.device_name()){
             return camera.description().toStdString();
@@ -320,11 +330,14 @@ void CameraSession::startup(){
             {
                 WallClock now = current_time();
                 SpinLockGuard lg(m_frame_lock);
+//                WallClock start = current_time();
                 m_last_frame = frame;
+//                cout << std::chrono::duration_cast<std::chrono::microseconds>(current_time() - start).count() << endl;
                 m_last_frame_timestamp = now;
                 m_last_frame_seqnum++;
                 m_fps_tracker_source.push_event(now);
             }
+//            cout << now_to_filestring() << endl;
             std::lock_guard<std::mutex> lg(m_lock);
             for (FrameListener* listener : m_frame_listeners){
                 listener->new_frame_available();
@@ -377,8 +390,11 @@ void VideoWidget::paintEvent(QPaintEvent* event){
     QRect rect(0, 0, this->width(), this->height());
     QVideoFrame::PaintOptions options;
     QPainter painter(this);
+
+//    WallClock start = current_time();
     frame.first.paint(&painter, rect, options);
     // std::cout << "paintEvent end" << std::endl;
+//    cout << "paint = " << std::chrono::duration_cast<std::chrono::microseconds>(current_time() - start).count() << endl;
 
     if (m_last_seqnum != frame.second){
         m_last_seqnum = frame.second;

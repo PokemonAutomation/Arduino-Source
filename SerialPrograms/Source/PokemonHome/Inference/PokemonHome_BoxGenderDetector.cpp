@@ -30,7 +30,7 @@ void BoxGenderDetector::make_overlays(VideoOverlaySet& items){
     items.add(COLOR_RED, GENDER_BOX);
 }
 
-Pokemon::EggHatchGenderFilter BoxGenderDetector::detect(const ImageViewRGB32& screen){
+Pokemon::StatsHuntGenderFilter BoxGenderDetector::detect(const ImageViewRGB32& screen){
     const auto region = extract_box_reference(screen, GENDER_BOX);
 
     // Retain only red pixels from region
@@ -60,11 +60,11 @@ Pokemon::EggHatchGenderFilter BoxGenderDetector::detect(const ImageViewRGB32& sc
     const size_t threshold = region.width() * region.height() / 100;
 
     if (num_red_pixels > threshold){
-        return Pokemon::EggHatchGenderFilter::Female;
+        return Pokemon::StatsHuntGenderFilter::Female;
     } else if (num_blue_pixels > threshold){
-        return Pokemon::EggHatchGenderFilter::Male;
+        return Pokemon::StatsHuntGenderFilter::Male;
     }
-    return Pokemon::EggHatchGenderFilter::Genderless;
+    return Pokemon::StatsHuntGenderFilter::Genderless;
 }
 
 }

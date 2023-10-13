@@ -68,10 +68,10 @@ struct RideCloner101_Descriptor::Stats : public StatsTracker{
         m_display_order.emplace_back("Wins");
         m_display_order.emplace_back("Losses");
         m_display_order.emplace_back("Skipped");
-        m_display_order.emplace_back("Errors", true);
-        m_display_order.emplace_back("Shinies", true);
+        m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
+        m_display_order.emplace_back("Shinies", HIDDEN_IF_ZERO);
         m_display_order.emplace_back("Cloned");
-        m_display_order.emplace_back("Failed", true);
+        m_display_order.emplace_back("Failed", HIDDEN_IF_ZERO);
     }
     std::atomic<uint64_t>& m_skips;
 //    std::atomic<uint64_t>& m_raids;
@@ -94,7 +94,7 @@ RideCloner101::RideCloner101()
     , LANGUAGE(
         "<b>Game Language:</b>",
         PokemonNameReader::instance().languages(),
-        LockWhileRunning::UNLOCKED
+        LockMode::UNLOCK_WHILE_RUNNING
     )
     , MODE(
         "<b>Mode:</b>",
@@ -102,31 +102,31 @@ RideCloner101::RideCloner101()
             {Mode::CLONE_ONLY,  "clone-only",   "Clone only. Don't stop on a shiny raid."},
             {Mode::SHINY_HUNT,  "shiny-hunt",   "Shiny Hunt: Save before each raid and catch. Stop if shiny."},
         },
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         Mode::SHINY_HUNT
     )
     , RIDES_TO_CLONE(
         "<b>Rides to Clone:</b><br>Stop program after cloning this many times. Make sure you have enough box space for twice this amount.",
-        LockWhileRunning::UNLOCKED,
+        LockMode::UNLOCK_WHILE_RUNNING,
         100, 1, 100
     )
     , MAX_STARS(
         "<b>Max Stars:</b><br>Skip raids with more than this many stars to save time since you're likely to lose.",
-        LockWhileRunning::UNLOCKED,
+        LockMode::UNLOCK_WHILE_RUNNING,
         4, 1, 7
     )
     , BALL_SELECT(
         "<b>Ball Select:</b>",
-        LockWhileRunning::UNLOCKED,
+        LockMode::UNLOCK_WHILE_RUNNING,
         "poke-ball"
     )
     , FIX_TIME_ON_CATCH(
         "<b>Fix Clock on Catch:</b><br>Fix the time when catching so the caught date will be correct.",
-        LockWhileRunning::UNLOCKED, false
+        LockMode::UNLOCK_WHILE_RUNNING, false
     )
     , A_TO_B_DELAY(
         "<b>A-to-B Delay:</b><br>The delay between the critical A-to-B press that activates the glitch.",
-        LockWhileRunning::UNLOCKED,
+        LockMode::UNLOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "8"
     )
@@ -448,10 +448,8 @@ void RideCloner101::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
 
             VideoSnapshot screen = env.console.video().snapshot();
             TeraCardReader reader(COLOR_RED);
-            size_t stars = reader.stars(screen);
-            if (stars == 0){
-                dump_image(env.logger(), env.program_info(), "ReadStarsFailed", *screen.frame);
-            }else{
+            size_t stars = reader.stars(env.logger(),env.program_info(), screen);
+            if (stars != 0){
                 env.log("Detected " + std::to_string(stars) + " star raid.", COLOR_PURPLE);
             }
 

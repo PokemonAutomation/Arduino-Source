@@ -31,7 +31,7 @@ SizeChecker_Descriptor::SizeChecker_Descriptor()
         "PokemonSV:SizeChecker",
         STRING_POKEMON + " SV", "Size Checker",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSV/SizeChecker.md",
-        "Check boxes of Pokémon for size marks.",
+        "Check boxes of " + STRING_POKEMON + " for size marks.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB
@@ -64,7 +64,7 @@ SizeChecker::SizeChecker()
     : GO_HOME_WHEN_DONE(false)
     , BOXES_TO_CHECK(
         "<b>Number of Boxes to Check:</b>",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         2, 1, 32
     )
     , NOTIFICATIONS({
@@ -184,7 +184,7 @@ void SizeChecker::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
     SizeChecker_Descriptor::Stats& stats = env.current_stats<SizeChecker_Descriptor::Stats>();
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_LCLICK, 10, 0);
+    pbf_press_button(context, BUTTON_L, 10, 0);
 
     // Loop through boxes.
     for (uint8_t box = 0; box < BOXES_TO_CHECK; box++){

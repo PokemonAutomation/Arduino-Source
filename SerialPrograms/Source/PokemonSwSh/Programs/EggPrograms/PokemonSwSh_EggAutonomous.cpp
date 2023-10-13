@@ -20,7 +20,7 @@
 #include "PokemonSwSh/Inference/PokemonSwSh_BoxGenderDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_BoxShinySymbolDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_DialogBoxDetector.h"
-#include "PokemonSwSh/Inference/PokemonSwSh_IVCheckerReader.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_BoxNatureDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_SelectionArrowFinder.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_YCommDetector.h"
@@ -70,7 +70,7 @@ public:
         , m_shinies(m_stats["Shinies"])
     {
         m_display_order.emplace_back("Eggs Hatched");
-        m_display_order.emplace_back("Errors", true);
+        m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
         m_display_order.emplace_back("Fetch Attempts");
         m_display_order.emplace_back("Fetch Success");
         m_display_order.emplace_back("Shinies");
@@ -92,19 +92,19 @@ EggAutonomous::EggAutonomous()
     , LANGUAGE(
         "<b>Game Language:</b><br>Required to read IVs.",
         IV_READER().languages(),
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         false
     )
     , MAX_KEEPERS(
         "<b>Max Keepers:</b><br>Stop the program after keeping this many " + STRING_POKEMON + ". "
         "This number plus the number of " + STRING_POKEMON + " in the box left to your current box must not exceed 30. "
         "Otherwise, the program will break when that box is full.",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         10, 1, 30
     )
     , LOOPS_PER_FETCH(
         "<b>Bike Loops Per Fetch:</b><br>Fetch an egg after doing this many bike loops on Route 5.",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         1, 1
     )
     , NUM_EGGS_IN_COLUMN(
@@ -117,7 +117,7 @@ EggAutonomous::EggAutonomous()
             {4, "4", "4"},
             {5, "5", "5"},
         },
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         0
     )
     , AUTO_SAVING(
@@ -131,17 +131,26 @@ EggAutonomous::EggAutonomous()
             {AutoSave::AfterStartAndKeep, "start-and-keep", "Save at beginning and after obtaining each baby that is kept. (Allows for error/crash recovery.)"},
             {AutoSave::EveryBatch, "every-batch", "Save before every batch. (Allows you to unhatch eggs.)"},
         },
-        LockWhileRunning::LOCKED,
+          LockMode::LOCK_WHILE_RUNNING,
         AutoSave::AfterStartAndKeep
+    )
+    , FILTERS(
+        StatsHuntIvJudgeFilterTable_Label_Eggs,
+        {
+            .action = true,
+            .shiny = true,
+            .gender = true,
+            .nature = true,
+        }
     )
     , DEBUG_PROCESSING_HATCHED(
         "Debug the part of program after all eggs hatched",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         false
     )
     , SAVE_DEBUG_VIDEO(
         "<b>Save debug videos to Switch:</b>",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         false
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
@@ -229,7 +238,7 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
             if (run_batch(env, context, stats)){
                 break;
             }
-            env.log("stats: " + stats.to_str());
+            env.log("stats: " + stats.to_str(StatsTracker::DISPLAY_ON_SCREEN));
             // We successfully finish one egg loop iteration without any error thrown.
             // So we reset the failure counter.
             consecutive_failures = 0;
@@ -587,7 +596,7 @@ bool EggAutonomous::process_hatched_pokemon(SingleSwitchProgramEnvironment& env,
         BoxShinySymbolDetector::make_overlays(overlay_set);
         BoxGenderDetector gender_detector;
         gender_detector.make_overlays(overlay_set);
-        IVCheckerReaderScope iv_reader(env.console.overlay(), LANGUAGE);
+        IvJudgeReaderScope iv_reader(env.console.overlay(), LANGUAGE);
         BoxNatureDetector nature_detector(env.console.overlay());
 
         for (size_t i_hatched = 0; i_hatched < 5; i_hatched++){
@@ -614,14 +623,14 @@ bool EggAutonomous::process_hatched_pokemon(SingleSwitchProgramEnvironment& env,
             }
             // Note: we assume the pokemon storage UI is in the state of judging pokemon stats.
             //   In this way we can detect pokemon stats.
-
-            IVCheckerReader::Results IVs = iv_reader.read(env.console, screen);
-            EggHatchGenderFilter gender = gender_detector.detect(screen);
+            
+            IvJudgeReader::Results IVs = iv_reader.read(env.console, screen);
+            StatsHuntGenderFilter gender = gender_detector.detect(screen);
             env.log(IVs.to_string(), COLOR_GREEN);
             env.log("Gender: " + gender_to_string(gender), COLOR_GREEN);
             NatureReader::Results nature = nature_detector.read(env.console.logger(), screen);
 
-            EggHatchAction action = FILTERS.get_action(shiny, IVs, gender, nature);
+            StatsHuntAction action = FILTERS.get_action(shiny, gender, nature.nature, IVs);
 
             auto send_keep_notification = [&](){
                 if (!shiny){
@@ -635,12 +644,12 @@ bool EggAutonomous::process_hatched_pokemon(SingleSwitchProgramEnvironment& env,
                 }
             };
             switch (action){
-            case EggHatchAction::StopProgram:
+            case StatsHuntAction::StopProgram:
                 env.log("Program stop requested...");
                 env.console.overlay().add_log("Request program stop", COLOR_WHITE);
                 send_keep_notification();
                 return true;
-            case EggHatchAction::Keep:
+            case StatsHuntAction::Keep:
                 env.log("Moving Pokemon to keep box...", COLOR_BLUE);
                 m_num_pokemon_kept++;
                 env.console.overlay().add_log("Keep pokemon " + std::to_string(m_num_pokemon_kept) + "/" + std::to_string(MAX_KEEPERS), COLOR_YELLOW);
@@ -685,7 +694,7 @@ bool EggAutonomous::process_hatched_pokemon(SingleSwitchProgramEnvironment& env,
                     return true;
                 }
                 break;
-            case EggHatchAction::Release:
+            case StatsHuntAction::Discard:
                 env.log("Releasing Pokemon...", COLOR_PURPLE);
                 env.console.overlay().add_log("Release Pokemon", COLOR_WHITE);
 

@@ -48,8 +48,8 @@ public:
         , shinies(m_stats["Shinies"])
     {
         m_display_order.emplace_back("Attempts");
-        m_display_order.emplace_back("Errors", true);
-        m_display_order.emplace_back("Shinies", true);
+        m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
+        m_display_order.emplace_back("Shinies", HIDDEN_IF_ZERO);
     }
     virtual void add_shiny() override{
         shinies++;
@@ -71,12 +71,12 @@ ShinyHuntCustomPath::ShinyHuntCustomPath()
     )
     , RUNS_PER_TIME_RESET(
         "<b>How Many Runs Before Resetting Time of Day:</b><br>To avoid too much time spent on resetting time of day, reset only every several runs.",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         5, 1
     )
     , TEST_PATH(
         "<b>Test Path:</b><br>Run the path immediately on the map to test it.",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         false
     )
     , SHINY_DETECTED_ENROUTE(

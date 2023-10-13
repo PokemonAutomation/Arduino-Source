@@ -23,16 +23,28 @@ public:
     StatsTracker() = default;
     virtual ~StatsTracker() = default;
 
-    virtual std::string to_str() const;
+    enum PrintMode{
+        DISPLAY_ON_SCREEN,
+        SAVE_TO_STATS_FILE,
+    };
+    virtual std::string to_str(PrintMode mode) const;
 
     void parse_and_append_line(const std::string& line);
 
 
 protected:
+//    static constexpr bool HIDDEN_IF_ZERO = true;
+//    static constexpr bool ALWAYS_VISIBLE = false;
+    enum DisplayMode{
+        ALWAYS_VISIBLE,
+        HIDDEN_IF_ZERO,
+        ALWAYS_HIDDEN,
+    };
+
     struct Stat{
         std::string label;
-        bool omit_if_zero;
-        Stat(std::string&& p_label, bool p_omit_if_zero = false);
+        DisplayMode display_mode;
+        Stat(std::string&& p_label, DisplayMode p_display_node = ALWAYS_VISIBLE);
     };
 
     std::vector<Stat> m_display_order;

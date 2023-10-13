@@ -31,7 +31,7 @@ std::string dump_debug_image(
 ){
     create_debug_folder(path);
     std::string full_path = debug_dump_folder_name;
-    full_path += "/" + path + "/" + now_to_filestring() + "-" + label + ".jpg";
+    full_path += "/" + path + "/" + now_to_filestring() + "-" + label + ".png";
     logger.log("Saving debug image to: " + full_path, COLOR_YELLOW);
     image.save(full_path);
     return full_path;

@@ -50,6 +50,9 @@ void ScreenWatchDisplayWidget::paintEvent(QPaintEvent* event){
     QWidget::paintEvent(event);
 
     VideoSnapshot snapshot = m_last_frame;
+    if (!snapshot){
+        return;
+    }
 
     double aspect_ratio = (double)snapshot.frame->width() / snapshot.frame->height();
     if (aspect_ratio < 2.0){

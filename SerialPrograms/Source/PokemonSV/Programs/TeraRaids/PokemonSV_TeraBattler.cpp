@@ -95,7 +95,7 @@ bool run_cheer_select(
     }
     if (cheer_select_menu.move_to_slot(console, context, index)){
         std::lock_guard<std::mutex> lg(tera_battle_throttle_lock);
-        pbf_press_button(context, BUTTON_A, 20, 10);
+        pbf_press_button(context, BUTTON_A, 20, 40);
         context.wait_for_all_requests();
     }
     return true;
@@ -130,7 +130,7 @@ bool run_move_select(
     //  probably disabled. Select a different move.
     if (consecutive_move_select > 3){
         console.log("Failed to select a move 3 times. Choosing a different move.", COLOR_RED);
-//                pbf_press_dpad(context, DPAD_DOWN, 20, 40);
+//        pbf_press_dpad(context, DPAD_DOWN, 20, 40);
         index++;
         if (index >= 4){
             index = 0;
@@ -138,14 +138,23 @@ bool run_move_select(
         move.type = (TeraMoveType)((uint8_t)TeraMoveType::Move1 + index);
     }
 
-    if (terastallizing.detect(console.video().snapshot())){
-        console.log("Terastallization: Available");
-        if (battle_AI.TRY_TO_TERASTILLIZE){
-            pbf_press_button(context, BUTTON_R, 20, 4 * TICKS_PER_SECOND);
+    do{
+        if (!battle_AI.TRY_TO_TERASTILLIZE){
+            console.log("Skipping Terastallization. Reason: Disabled by settings.");
+            break;
         }
-    }else{
-        console.log("Terastallization: Not Available");
-    }
+        if (consecutive_move_select > 1){
+            console.log("Skipping Terastallization. Reason: Previously failed move select.");
+            break;
+        }
+        if (!terastallizing.detect(console.video().snapshot())){
+            console.log("Skipping Terastallization. Reason: Not ready.");
+            break;
+        }
+
+        console.log("Attempting to Terastallize...");
+        pbf_press_button(context, BUTTON_R, 20, 4 * TICKS_PER_SECOND);
+    }while (false);
 
     if (move_select_menu.move_to_slot(console, context, index)){
         pbf_press_button(context, BUTTON_A, 20, 10);
@@ -164,7 +173,7 @@ bool run_target_select(
     case TeraMoveType::Move4:{
         target_select_menu.move_to_slot(console, context, (uint8_t)move.target);
         std::lock_guard<std::mutex> lg(tera_battle_throttle_lock);
-        pbf_press_button(context, BUTTON_A, 20, 10);
+        pbf_press_button(context, BUTTON_A, 20, 40);
         context.wait_for_all_requests();
         return true;
     }
@@ -182,6 +191,8 @@ bool run_tera_battle(
     ConsoleHandle& console, BotBaseContext& context,
     TeraAIOption& battle_AI
 ){
+    console.log("Starting tera battle routine...");
+
     size_t turn = 0;
     std::vector<TeraMoveEntry> move_table = battle_AI.MOVE_TABLE.snapshot();
     TeraMoveEntry current_move{TeraMoveType::Move1, 0, TeraTarget::Opponent};
@@ -213,7 +224,7 @@ bool run_tera_battle(
             //  At the same time, there's a possibility that we miss the battle
             //  menu if the raid is won before it even loads. And this can only
             //  happen if the raid was uncatchable to begin with.
-            std::chrono::seconds(battle_menu_seen ? 5 : 60)
+            std::chrono::seconds(battle_menu_seen ? 5 : 180)
         );
         TeraCatchWatcher catch_menu(COLOR_BLUE);
         OverworldWatcher overworld(COLOR_GREEN);
@@ -310,8 +321,11 @@ bool run_tera_battle(
             }
             continue;
         case 4:
+            console.log("Detected item rewards menu!", COLOR_BLUE);
+            pbf_mash_button(context, BUTTON_B, 30);
+            return true;
         case 5:
-            console.log("Detected a win!", COLOR_BLUE);
+            console.log("Detected catch menu!", COLOR_BLUE);
             pbf_mash_button(context, BUTTON_B, 30);
             return true;
         case 6:

@@ -179,8 +179,8 @@ uint8_t check_ban_list(
 
 JoinReportRow::JoinReportRow(Language p_language, bool p_enabled)
     : StaticTableRow(language_data(p_language).code)
-    , language(LockWhileRunning::UNLOCKED, language_data(p_language).name)
-    , enabled(LockWhileRunning::UNLOCKED, p_enabled)
+    , language(LockMode::UNLOCK_WHILE_RUNNING, language_data(p_language).name)
+    , enabled(LockMode::UNLOCK_WHILE_RUNNING, p_enabled)
 {
     PA_ADD_STATIC(language);
     PA_ADD_OPTION(enabled);
@@ -190,7 +190,7 @@ JoinReportTable::JoinReportTable()
         "<b>Languages to Read:</b><br>"
         "Attempt to read every player's name in the following languages. "
         "Note that all the Latin-based languages are largely the same. So only English is enabled by default.",
-        LockWhileRunning::UNLOCKED, false
+        LockMode::UNLOCK_WHILE_RUNNING, false
     )
 {
     add_row(std::make_unique<JoinReportRow>(Language::English, true));
@@ -214,7 +214,7 @@ std::vector<std::string> JoinReportTable::make_header() const{
 
 
 RaidJoinReportOption::RaidJoinReportOption()
-    : GroupOption("Join Reports:", LockWhileRunning::UNLOCKED, true, true)
+    : GroupOption("Join Reports:", LockMode::UNLOCK_WHILE_RUNNING, true, true)
     , text(
         "Track how many times each IGN has joined and generate a report. "
         "This can be used to help identify people who join too many times for "
@@ -225,7 +225,7 @@ RaidJoinReportOption::RaidJoinReportOption()
     )
     , wins_only(
         "<b>Track Wins Only:</b><br>Track wins only. Ignore losses and incomplete raids.",
-        LockWhileRunning::UNLOCKED,
+        LockMode::UNLOCK_WHILE_RUNNING,
         true
     )
 {

@@ -94,33 +94,33 @@ std::unique_ptr<StatsTracker> BoxSorting_Descriptor::make_stats() const{
 BoxSorting::BoxSorting()
     : BOX_NUMBER(
         "<b>Number of boxes to order:</b>",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         1, 1, MAX_BOXES
     )
     , VIDEO_DELAY(
         "<b>Delay of your capture card (you probably have to increase this):</b>",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         20
     )
     , GAME_DELAY(
         "<b>Delay of your Pokemon Home app (default value should be fine):</b>",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         10
     )
     , SORT_TABLE(
         "<b>Sort Order Rules:</b><br>Sort order rules will be applied top to bottom."
     )
     , OUTPUT_FILE(
-          false,
-          "<b>Output File:</b><br>JSON file for output of storage boxes.",
-          LockWhileRunning::LOCKED,
-          "box_order",
-          "box_order"
-      )
+        false,
+        "<b>Output File:</b><br>JSON file for output of storage boxes.",
+        LockMode::LOCK_WHILE_RUNNING,
+        "box_order",
+        "box_order"
+    )
     , DRY_RUN(
-          "<b>Dry Run:</b><br>Catalogue and make sort plan without executing. (Will output to OUTPUT_FILE and OUTPUT_FILE.sortplan)",
-          LockWhileRunning::LOCKED,
-          false
+        "<b>Dry Run:</b><br>Catalogue and make sort plan without executing. (Will output to OUTPUT_FILE and OUTPUT_FILE.sortplan)",
+        LockMode::LOCK_WHILE_RUNNING,
+        false
       )
     , NOTIFICATIONS({
         &NOTIFICATION_PROGRAM_FINISH
@@ -175,7 +175,7 @@ struct Pokemon{
     bool shiny = false;
     bool gmax = false;
     std::string ball_slug = "";
-    EggHatchGenderFilter gender = EggHatchGenderFilter::Genderless;
+    StatsHuntGenderFilter gender = StatsHuntGenderFilter::Genderless;
     uint16_t ot_id = 0;
 };
 
@@ -643,7 +643,7 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
                     boxes_data[get_index(box_nb, row, column)]->ball_slug = ball_reader.read_ball(screen);
 
                     BoxGenderDetector::make_overlays(box_render);
-                    EggHatchGenderFilter gender = BoxGenderDetector::detect(screen);
+                    StatsHuntGenderFilter gender = BoxGenderDetector::detect(screen);
                     env.console.log("Gender: " + gender_to_string(gender), COLOR_GREEN);
                     boxes_data[get_index(box_nb, row, column)]->gender = gender;
 

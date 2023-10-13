@@ -51,6 +51,9 @@ bool EncounterRateTracker::get_encounters_in_window(
 //    cout << "encounters index = " << index << endl;
     encounters = m_encounter_history.size() - index;
 
+//    cout << "time_window: " << std::chrono::duration_cast<std::chrono::seconds>(time_window).count() << endl;
+//    cout << "m_start_time: " << std::chrono::duration_cast<std::chrono::seconds>(now - m_start_time).count() << endl;
+
     return m_start_time <= threshold;
 }
 void EncounterRateTracker::report_start(WallClock now){
@@ -168,7 +171,10 @@ LetsGoEncounterBotTracker::LetsGoEncounterBotTracker(
     })
     , m_session(context, console, {m_kill_sound})
 {}
-bool LetsGoEncounterBotTracker::process_battle(EncounterWatcher& watcher, EncounterBotCommonOptions& settings){
+void LetsGoEncounterBotTracker::process_battle(
+    bool& caught, bool& should_save,
+    EncounterWatcher& watcher, EncounterBotCommonOptions& settings
+){
     m_encounter_rate.report_encounter();
     m_stats.m_encounters++;
 
@@ -248,7 +254,9 @@ bool LetsGoEncounterBotTracker::process_battle(EncounterWatcher& watcher, Encoun
         }catch (OperationFailedException& e){
             throw FatalProgramException(std::move(e));
         }
-        return false;
+        caught = false;
+        should_save = false;
+        return;
     case EncounterActionsAction::STOP_PROGRAM:
         throw ProgramFinishedException();
 //        throw ProgramFinishedException(m_console, "", true);
@@ -285,10 +293,13 @@ bool LetsGoEncounterBotTracker::process_battle(EncounterWatcher& watcher, Encoun
             );
         }
 
-        return result.result == CatchResult::POKEMON_CAUGHT && action.action == EncounterActionsAction::THROW_BALLS_AND_SAVE;
+        caught = result.result == CatchResult::POKEMON_CAUGHT;
+        should_save = caught && action.action == EncounterActionsAction::THROW_BALLS_AND_SAVE;
+        return;
     }
 
-    return false;
+    caught = false;
+    should_save = false;
 }
 
 
@@ -297,7 +308,7 @@ bool LetsGoEncounterBotTracker::process_battle(EncounterWatcher& watcher, Encoun
 
 
 
-bool clear_in_front(
+bool use_lets_go_to_clear_in_front(
     ConsoleHandle& console, BotBaseContext& context,
     LetsGoEncounterBotTracker& tracker,
     bool throw_ball_if_bubble,

@@ -23,16 +23,16 @@ ConsoleSettings& ConsoleSettings::instance(){
     return settings;
 }
 ConsoleSettings::ConsoleSettings()
-    : BatchOption(LockWhileRunning::LOCKED)
+    : BatchOption(LockMode::LOCK_WHILE_RUNNING)
     , CONNECT_CONTROLLER_DELAY(
         "<b>Connection Controller Delay:</b><br>Wait this long before starting the program. The LEDs normally flash during this time.",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "5 * TICKS_PER_SECOND"
     )
     , SETTINGS_TO_HOME_DELAY(
         "<b>Settings to Home Delay:</b><br>Delay from pressing home anywhere in the settings to return to the home menu.",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "120"
     )
@@ -40,27 +40,27 @@ ConsoleSettings::ConsoleSettings()
         "<b>Start Game Requires Internet:</b><br>"
         "Set this to true if starting the game requires checking the internet. "
         "Otherwise, programs that require soft-resetting may not work properly.",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         false
     )
     , START_GAME_INTERNET_CHECK_DELAY(
         "<b>Start Game Internet Check Delay:</b><br>"
         "If starting the game requires checking the internet, wait this long for it.",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "3 * TICKS_PER_SECOND"
     )
     , TOLERATE_SYSTEM_UPDATE_MENU_FAST(
         "<b>Tolerate System Update Menu (fast):</b><br>"
         "Some programs can bypass the system update menu at little performance cost. Setting this to true enables this.",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         true
     )
     , TOLERATE_SYSTEM_UPDATE_MENU_SLOW(
         "<b>Tolerate System Update Menu (slow):</b><br"
         ">Some programs can bypass the system update menu, but will take a noticeable performance hit. "
         "Setting this to true enables this.",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         false
     )
 {

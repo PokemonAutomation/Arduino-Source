@@ -9,7 +9,7 @@
 
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "CommonFramework/Options/LanguageOCROption.h"
-#include "PokemonSwSh/Inference/PokemonSwSh_IVCheckerReader.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
@@ -17,16 +17,16 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-class IVCheckerOptionOCR : public EnumDropdownOption<IVCheckerValue>{
+class IVCheckerOptionOCR : public EnumDropdownOption<IvJudgeValue>{
 public:
     static const std::string TOKENS[];
 
 public:
-    IVCheckerOptionOCR(std::string label, IVCheckerValue default_value)
-        : EnumDropdownOption<IVCheckerValue>(
+    IVCheckerOptionOCR(std::string label, IvJudgeValue default_value)
+        : EnumDropdownOption<IvJudgeValue>(
             std::move(label),
-            IVCheckerValue_Database(),
-            LockWhileRunning::LOCKED,
+            IvJudgeValue_Database(),
+            LockMode::LOCK_WHILE_RUNNING,
             default_value
         )
     {}

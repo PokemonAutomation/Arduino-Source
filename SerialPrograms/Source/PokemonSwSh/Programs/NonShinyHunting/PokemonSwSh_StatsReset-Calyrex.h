@@ -13,9 +13,9 @@
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
-#include "Pokemon/Options/Pokemon_IVCheckerOption.h"
+#include "Pokemon/Options/Pokemon_IvJudgeOption.h"
 #include "PokemonSwSh/Options/PokemonSwSh_BallSelectOption.h"
-#include "PokemonSwSh/Inference/PokemonSwSh_IVCheckerReader.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -46,20 +46,20 @@ private:
     OCR::LanguageOCROption LANGUAGE;
 
     BooleanCheckBoxOption CHECK_CALYREX_STATS;
-    IVCheckerFilterOption CALYREX_HP;
-    IVCheckerFilterOption CALYREX_ATTACK;
-    IVCheckerFilterOption CALYREX_DEFENSE;
-    IVCheckerFilterOption CALYREX_SPATK;
-    IVCheckerFilterOption CALYREX_SPDEF;
-    IVCheckerFilterOption CALYREX_SPEED;
+    IVJudgeFilterOption CALYREX_HP;
+    IVJudgeFilterOption CALYREX_ATTACK;
+    IVJudgeFilterOption CALYREX_DEFENSE;
+    IVJudgeFilterOption CALYREX_SPATK;
+    IVJudgeFilterOption CALYREX_SPDEF;
+    IVJudgeFilterOption CALYREX_SPEED;
 
     BooleanCheckBoxOption CHECK_HORSE_STATS;
-    IVCheckerFilterOption HORSE_HP;
-    IVCheckerFilterOption HORSE_ATTACK;
-    IVCheckerFilterOption HORSE_DEFENSE;
-    IVCheckerFilterOption HORSE_SPATK;
-    IVCheckerFilterOption HORSE_SPDEF;
-    IVCheckerFilterOption HORSE_SPEED;
+    IVJudgeFilterOption HORSE_HP;
+    IVJudgeFilterOption HORSE_ATTACK;
+    IVJudgeFilterOption HORSE_DEFENSE;
+    IVJudgeFilterOption HORSE_SPATK;
+    IVJudgeFilterOption HORSE_SPDEF;
+    IVJudgeFilterOption HORSE_SPEED;
 
     EventNotificationOption NOTIFICATION_CATCH_SUCCESS;
     EventNotificationOption NOTIFICATION_CATCH_FAILED;

@@ -77,7 +77,11 @@ SwitchSystemWidget::SwitchSystemWidget(
         );
         video_holder->addWidget(m_video_display);
 
-        m_camera_widget = new CameraSelectorWidget(m_session.camera_session(), m_session.logger(), *m_video_display);
+        m_camera_widget = new CameraSelectorWidget(
+            m_session.camera_session(),
+            m_session.logger(),
+            *m_video_display
+        );
         group_layout->addWidget(m_camera_widget);
 
         m_audio_widget = new AudioSelectorWidget(*widget, m_session.logger(), m_session.audio_session());

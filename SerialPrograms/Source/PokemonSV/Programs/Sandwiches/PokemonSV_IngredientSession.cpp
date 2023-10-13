@@ -4,6 +4,7 @@
  *
  */
 
+#include <algorithm>
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
 #include "Common/Cpp/Concurrency/AsyncDispatcher.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -40,16 +41,13 @@ IngredientSession::IngredientSession(
 }
 
 
-PageIngredients IngredientSession::read_current_page() const{
-    VideoSnapshot snapshot = m_console.video().snapshot();
-
+PageIngredients IngredientSession::read_screen(std::shared_ptr<const ImageRGB32> screen) const{
     PageIngredients ret;
     ImageFloatBox box;
-    if (!m_arrow.detect(box, snapshot)){
+    if (!m_arrow.detect(box, *screen)){
         throw OperationFailedException(
             ErrorReport::SEND_ERROR_REPORT, m_console,
-            "IngredientSession::read_current_page(): Unable to find cursor.",
-            snapshot
+            "IngredientSession::read_current_page(): Unable to find cursor."
         );
     }
 
@@ -61,7 +59,7 @@ PageIngredients IngredientSession::read_current_page() const{
         throw OperationFailedException(
             ErrorReport::SEND_ERROR_REPORT, m_console,
             "IngredientSession::read_current_page(): Invalid cursor slot.",
-            snapshot
+            screen
         );
     }
 
@@ -70,7 +68,7 @@ PageIngredients IngredientSession::read_current_page() const{
     m_dispatcher.run_in_parallel(0, INGREDIENT_PAGE_LINES + 1, [&](size_t index){
         if (index < INGREDIENT_PAGE_LINES){
             // Read text at line `index`
-            OCR::StringMatchResult result = m_ingredients[index].read_with_ocr(snapshot, m_console, m_language);
+            OCR::StringMatchResult result = m_ingredients[index].read_with_ocr(*screen, m_console, m_language);
             result.clear_beyond_log10p(SandwichFillingOCR::MAX_LOG10P);
             result.clear_beyond_spread(SandwichFillingOCR::MAX_LOG10P_SPREAD);
             for (auto& item : result.results){
@@ -78,7 +76,7 @@ PageIngredients IngredientSession::read_current_page() const{
             }
         }else{
             // Read current selected icon
-            image_result = m_ingredients[ret.selected].read_with_icon_matcher(snapshot);
+            image_result = m_ingredients[ret.selected].read_with_icon_matcher(*screen);
             image_result.clear_beyond_spread(SandwichIngredientReader::ALPHA_SPREAD);
             image_result.log(m_console, SandwichIngredientReader::MAX_ALPHA);
             image_result.clear_beyond_alpha(SandwichIngredientReader::MAX_ALPHA);
@@ -103,9 +101,9 @@ PageIngredients IngredientSession::read_current_page() const{
         }
         throw OperationFailedException(
             ErrorReport::SEND_ERROR_REPORT, m_console,
-            "IngredientSession::read_current_page(): Unable to read selected item. OCR and sprite do not agree on any match: "
-            + set_to_str(ocr_result) + ", " + set_to_str(sprite_result),
-            snapshot
+            "IngredientSession::read_current_page(): Unable to read selected item. OCR and sprite do not agree on any match: ocr "
+            + set_to_str(ocr_result) + ", sprite " + set_to_str(sprite_result),
+            screen
         );
     }
     if (common.size() > 1){
@@ -117,7 +115,7 @@ PageIngredients IngredientSession::read_current_page() const{
             ErrorReport::SEND_ERROR_REPORT, m_console,
             "IngredientSession::read_current_page(): Unable to read selected item. Ambiguous result: "
             + set_to_str(ocr_result) + ", " + set_to_str(sprite_result),
-            snapshot
+            screen
         );
     }
 
@@ -125,6 +123,10 @@ PageIngredients IngredientSession::read_current_page() const{
 #endif
 
     return ret;
+
+}
+PageIngredients IngredientSession::read_current_page() const{
+    return read_screen(m_console.video().snapshot());
 }
 
 //  Returns true if a desired ingredient is found somewhere on the page.
@@ -254,12 +256,13 @@ void IngredientSession::add_ingredients(
         }
 
         const SandwichIngredientNames& name = get_ingredient_name(found);
-        console.log("Found: " + name.display_name(), COLOR_BLUE);
+        console.log("Add " + name.display_name() + " as ingredient", COLOR_BLUE);
 
         //  Add the item. But don't loop the quantity. Instead, we add one and
         //  loop again in case we run out.
         pbf_press_button(context, BUTTON_A, 20, 105);
         context.wait_for_all_requests();
+        console.overlay().add_log("Added " + name.display_name());
         // TODO add visual confirmation of ingredients added to avoid button drops
 
         auto iter = ingredients.find(found);

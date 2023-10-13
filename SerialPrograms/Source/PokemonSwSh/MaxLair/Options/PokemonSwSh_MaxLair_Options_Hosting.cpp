@@ -18,7 +18,7 @@ HostingSettings::~HostingSettings(){
     MODE.remove_listener(*this);
 }
 HostingSettings::HostingSettings()
-    : GroupOption("Hosting Options", LockWhileRunning::LOCKED)
+    : GroupOption("Hosting Options", LockMode::LOCK_WHILE_RUNNING)
     , MODE(
         "<b>Mode:</b>",
         {
@@ -26,7 +26,7 @@ HostingSettings::HostingSettings()
             {HostingMode::HOST_LOCALLY, "local", "Host Locally: Allow other local Switches to join."},
             {HostingMode::HOST_ONLINE, "online", "Host Online: Allow other people online to join."},
         },
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         HostingMode::NOT_HOSTING
     )
     , RAID_CODE(
@@ -36,7 +36,7 @@ HostingSettings::HostingSettings()
     )
     , CONNECT_TO_INTERNET_DELAY(
         "<b>Connect to Internet Delay:</b><br>Time from \"Connect to Internet\" to when you're ready to start adventure.",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "20 * TICKS_PER_SECOND"
     )
@@ -46,13 +46,13 @@ HostingSettings::HostingSettings()
         "thus fail to join each other. If you are joining someone else's auto-host, you "
         "will want to set this to 3 seconds or more to make sure that the host opens the "
         "lobby before everyone else tries to join.",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "0 * TICKS_PER_SECOND"
     )
     , LOBBY_WAIT_DELAY(
         "<b>Lobby Wait Delay:</b><br>Wait this long before starting raid. Start time is 3 minutes minus this number.",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "60 * TICKS_PER_SECOND"
     )

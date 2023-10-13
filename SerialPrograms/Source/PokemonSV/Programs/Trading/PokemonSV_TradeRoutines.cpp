@@ -30,7 +30,7 @@ TradeStats::TradeStats()
     , m_errors(m_stats["Errors"])
 {
     m_display_order.emplace_back("Trades");
-    m_display_order.emplace_back("Errors", true);
+    m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
 }
 
 

@@ -19,9 +19,8 @@ namespace OCR{
     class LanguageOCROption;
 }
 namespace Pokemon{
-    enum class EggHatchAction;
-    class EggHatchFilterTable;
-    class StatsResetFilterTable;
+    enum class StatsHuntAction;
+class StatsHuntIvJudgeFilterTable;
 }
 
 namespace NintendoSwitch{
@@ -32,8 +31,8 @@ namespace PokemonSV{
 //This is a similar to check_baby_info, except for Stats Reset
 bool check_stats_reset_info(
     ConsoleHandle& console, BotBaseContext& context,
-    OCR::LanguageOCROption& LANGUAGE, Pokemon::StatsResetFilterTable& FILTERS,
-    Pokemon::EggHatchAction& action
+    OCR::LanguageOCROption& LANGUAGE, Pokemon::StatsHuntIvJudgeFilterTable& FILTERS,
+    Pokemon::StatsHuntAction& action
 );
 
 

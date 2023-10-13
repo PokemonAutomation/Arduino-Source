@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonSV_SandwichMakerOption_H
 #define PokemonAutomation_PokemonSV_SandwichMakerOption_H
 
+#include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/GroupOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 //#include "PokemonSV/Resources/PokemonSV_Ingredients.h"
@@ -245,12 +246,15 @@ public:
     EnumDropdownOption<ParadoxRecipe> PARADOX;
     EnumDropdownOption<HerbaSelection> HERBA_ONE;
     EnumDropdownOption<HerbaSelection> HERBA_TWO;
+    StaticTextOption HERB_INCOMPATIBILITY_WARNING;
     SandwichIngredientsTable SANDWICH_INGREDIENTS;
 
 private:
     SandwichMakerOption(OCR::LanguageOCROption* language_option);
-    virtual void value_changed();
+    virtual void value_changed() override;
+    virtual std::string check_validity() const override;
 
+    std::string check_herb_compatibility(HerbaSelection herb1, HerbaSelection herb2, PokemonType type) const;
 };
 
 }

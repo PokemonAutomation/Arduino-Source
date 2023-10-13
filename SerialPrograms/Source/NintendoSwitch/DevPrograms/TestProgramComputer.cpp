@@ -60,7 +60,7 @@
 #include "PokemonLA/Inference/PokemonLA_MountDetector.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_ArcPhoneDetector.h"
 #include "Common/Cpp/Concurrency/PeriodicScheduler.h"
-#include "Pokemon/Inference/Pokemon_IVCheckerReader.h"
+#include "Pokemon/Inference/Pokemon_IvJudgeReader.h"
 #include "Kernels/Kernels_Alignment.h"
 #include "Kernels/ScaleInvariantMatrixMatch/Kernels_ScaleInvariantMatrixMatch.h"
 #include "Kernels/SpikeConvolution/Kernels_SpikeConvolution.h"
@@ -121,6 +121,11 @@
 #include "PokemonSV/Inference/Battles/PokemonSV_TeraBattleMenus.h"
 //#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_DetectHome.h"
+#include "PokemonSV/Inference/Picnics/PokemonSV_SandwichRecipeDetector.h"
+#include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_BattleMenu.h"
+#include "PokemonSV/Inference/PokemonSV_PokemonSummaryReader.h"
+#include "Pokemon/Pokemon_StatsCalculation.h"
+#include "PokemonSV/Inference/PokemonSV_StatHexagonReader.h"
 
 #ifdef PA_ARCH_x86
 //#include "Kernels/Kernels_x64_SSE41.h"
@@ -216,6 +221,13 @@ class WatchdogTest1 : public WatchdogCallback{
 
 
 
+
+
+
+
+
+
+
 void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& scope){
     using namespace Kernels;
 //    using namespace NintendoSwitch::PokemonSwSh;
@@ -223,6 +235,55 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     using namespace Pokemon;
 //    using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
 
+
+    ImageRGB32 image("screenshot-20231005-203932147068.png");
+    SummaryStatsReader reader;
+//    cout << detector.detect(image) << endl;
+    auto nature = reader.read_nature(env.logger(), image);
+
+    cout << (int)nature.attack << endl;
+    cout << (int)nature.defense << endl;
+    cout << (int)nature.spatk << endl;
+    cout << (int)nature.spdef << endl;
+    cout << (int)nature.speed << endl;
+
+
+
+
+#if 0
+    uint8_t low_iv;
+    uint8_t high_iv;
+
+    bool ok = calc_iv_range(
+        low_iv, high_iv,
+        false, 55, 100, 0,
+        126, NatureAdjustment::NEGATIVE
+    );
+
+    cout << "ok   = " << ok << endl;
+    cout << "low  = " << (int)low_iv << endl;
+    cout << "high = " << (int)high_iv << endl;
+#endif
+
+
+
+
+//    ImageRGB32 image("screenshot-20230912-194941389243.png");
+//    NintendoSwitch::PokemonSV::PokemonSummaryDetector detector;
+//    cout << detector.detect(image) << endl;
+
+
+#if 0
+    ImageRGB32 image("20230726-213101330270-ProgramHang.png");
+    NintendoSwitch::PokemonSwSh::MaxLairInternal::BattleMenuDetector detector;
+    cout << detector.detect(image) << endl;
+#endif
+
+//    SandwichRecipeNumberDetector detector(env.logger());
+//    size_t recipe_IDs[6];
+//    detector.detect_recipes(image, recipe_IDs);
+
+#if 0
     {
         ImageRGB32 image("20230630-084354220241.jpg");
         TeraLobbyReader reader(env.logger(), env.inference_dispatcher());
@@ -232,7 +293,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
         ImageRGB32 image("name1.png");
         cout << OCR::ocr_read(Language::Japanese, image) << endl;
     }
-
+#endif
 
 
 //    ImageRGB32 image("20230427-200550386826-OperationFailedException.png");

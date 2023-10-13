@@ -45,8 +45,8 @@ public:
         , shinies(m_stats["Shinies"])
     {
         m_display_order.emplace_back("Attempts");
-        m_display_order.emplace_back("Errors", true);
-        m_display_order.emplace_back("Shinies", true);
+        m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
+        m_display_order.emplace_back("Shinies", HIDDEN_IF_ZERO);
     }
     virtual void add_shiny() override{
         shinies++;
@@ -66,7 +66,7 @@ FroslassFinder::FroslassFinder()
     : DASH_DURATION(
         "<b>Braviary dash duration:</b><br>"
         "How many ticks for Braviary to dash to reach the hole.",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "986"
     )

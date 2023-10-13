@@ -19,6 +19,7 @@
 #include "Programs/Farming/PokemonBDSP_MoneyFarmerRoute212.h"
 #include "Programs/Farming/PokemonBDSP_DoublesLeveling.h"
 #include "Programs/Farming/PokemonBDSP_AmitySquarePickUpFarmer.h"
+#include "Programs/Farming/PokemonBDSP_PoffinCooker.h"
 #include "Programs/Farming/PokemonBDSP_GiftBerryReset.h"
 
 #include "Programs/ShinyHunting/PokemonBDSP_StarterReset.h"
@@ -90,6 +91,10 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back("---- Glitches (v1.1.2) ----");
     ret.emplace_back(make_single_switch_program<ActivateMenuGlitch112_Descriptor, ActivateMenuGlitch112>());
 
+    if (IS_BETA_VERSION || PreloadSettings::instance().DEVELOPER_MODE){
+        ret.emplace_back("---- Untested/Beta/WIP ----");
+        ret.emplace_back(make_single_switch_program<PoffinCooker_Descriptor, PoffinCooker>());
+    }
     if (PreloadSettings::instance().DEVELOPER_MODE){
         ret.emplace_back("---- Developer Tools ----");
         ret.emplace_back(make_single_switch_program<ShinyEncounterTester_Descriptor, ShinyEncounterTester>());

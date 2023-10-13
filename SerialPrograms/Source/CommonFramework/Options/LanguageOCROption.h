@@ -21,7 +21,7 @@ class LanguageOCRCell : public ConfigOption{
 public:
     LanguageOCRCell(
         const LanguageSet& languages,
-        LockWhileRunning lock_while_running,
+        LockMode lock_while_running,
         bool required = true
     );
 
@@ -57,7 +57,7 @@ public:
     LanguageOCROption(
         std::string label,
         const LanguageSet& languages,
-        LockWhileRunning lock_while_running,
+        LockMode lock_while_running,
         bool required = true
     );
 

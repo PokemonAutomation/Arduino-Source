@@ -80,7 +80,7 @@ void ProgramEnvironment::update_stats(){
 
 
 std::string ProgramEnvironment::historical_stats_str() const{
-    return m_historical_stats ? m_historical_stats->to_str() : "";
+    return m_historical_stats ? m_historical_stats->to_str(StatsTracker::DISPLAY_ON_SCREEN) : "";
 }
 
 

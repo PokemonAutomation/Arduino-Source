@@ -4,6 +4,8 @@
  *
  */
 
+#include "CommonFramework/Exceptions/FatalProgramException.h"
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
@@ -18,6 +20,7 @@
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSV_GameEntry.h"
+
 
 #include <iostream>
 using std::cout;
@@ -141,8 +144,38 @@ bool reset_game_from_home(
     context.wait_for_all_requests();
     return ok;
 }
+bool reset_game_from_home_zoom_out(
+    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    uint16_t post_wait_time
+){
+    bool ret = reset_game_from_home(info, console, context, post_wait_time);
 
+    //  5 zooms will guarantee that are fully zoomed out regardless of whether
+    //  we are on the DLC update.
+    pbf_press_button(context, BUTTON_RCLICK, 20, 105);
+    pbf_press_button(context, BUTTON_RCLICK, 20, 105);
+    pbf_press_button(context, BUTTON_RCLICK, 20, 105);
+    pbf_press_button(context, BUTTON_RCLICK, 20, 105);
+    pbf_press_button(context, BUTTON_RCLICK, 20, 105);
 
+    return ret;
+}
+
+void reset_game(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+    try{
+        pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+        context.wait_for_all_requests();
+        if (!reset_game_from_home(info, console, context, 5 * TICKS_PER_SECOND)){
+            throw OperationFailedException(ErrorReport::SEND_ERROR_REPORT, console,
+                "Failed to start game.", true
+            );
+        }
+    }catch (OperationFailedException& e){
+        // To be safe: avoid doing anything outside of game on Switch,
+        // make game resetting non error recoverable
+        throw FatalProgramException(std::move(e));
+    }
+}
 
 
 

@@ -15,7 +15,7 @@
 #include "CommonFramework/ImageMatch/ExactImageMatcher.h"
 #include "CommonFramework/ImageMatch/SubObjectTemplateMatcher.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "Pokemon/Options/Pokemon_EggHatchFilter.h"
+#include "Pokemon/Options/Pokemon_StatsHuntFilter.h"
 #include "PokemonBDSP_BoxGenderDetector.h"
 
 #include <iostream>
@@ -98,7 +98,7 @@ bool is_female(const ImageViewRGB32& image, const WaterfillObject& object){
 }
 
 
-EggHatchGenderFilter read_gender_from_box(Logger& logger, VideoOverlay& overlay, const ImageViewRGB32& frame)
+StatsHuntGenderFilter read_gender_from_box(Logger& logger, VideoOverlay& overlay, const ImageViewRGB32& frame)
 {
     OverlayBoxScope gender_box(overlay, {0.733, 0.022, 0.204, 0.049}, COLOR_BLUE);
     ImageViewRGB32 name_and_gender = extract_box_reference(frame, gender_box);
@@ -108,16 +108,16 @@ EggHatchGenderFilter read_gender_from_box(Logger& logger, VideoOverlay& overlay,
     for (WaterfillObject& object : objects){
         if (is_male(name_and_gender, object)){
             logger.log("Detected male symbol.", COLOR_PURPLE);
-            return EggHatchGenderFilter::Male;
+            return StatsHuntGenderFilter::Male;
         }
         if (is_female(name_and_gender, object)){
             logger.log("Detected female symbol.", COLOR_PURPLE);
-            return EggHatchGenderFilter::Female;
+            return StatsHuntGenderFilter::Female;
         }
     }
 
     logger.log("No gender symbol detected.", COLOR_PURPLE);
-    return EggHatchGenderFilter::Genderless;
+    return StatsHuntGenderFilter::Genderless;
 }
 
 

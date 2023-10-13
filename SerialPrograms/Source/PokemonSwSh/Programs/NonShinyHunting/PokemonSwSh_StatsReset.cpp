@@ -58,7 +58,7 @@ StatsReset::StatsReset()
     , LANGUAGE(
         "<b>Game Language:</b>",
         IV_READER().languages(),
-        LockWhileRunning::LOCKED
+        LockMode::LOCK_WHILE_RUNNING
     )
     , POKEMON(
         "<b>Gift " + STRING_POKEMON + ":</b>",
@@ -67,11 +67,11 @@ StatsReset::StatsReset()
             {GiftPokemon::Cosmog,   "cosmog",       "Cosmog"},
             {GiftPokemon::Poipole,  "poipole",      "Poipole"},
         },
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         GiftPokemon::TypeNull
     )
     , HP("<b>HP:</b>")
-    , ATTACK("<b>Attack:</b>", IVCheckerFilter::NoGood)
+    , ATTACK("<b>Attack:</b>", IvJudgeFilter::NoGood)
     , DEFENSE("<b>Defense:</b>")
     , SPATK("<b>Sp. Atk:</b>")
     , SPDEF("<b>Sp. Def:</b>")
@@ -145,9 +145,9 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
         context.wait_for_all_requests();
 
         {
-            IVCheckerReaderScope reader(env.console, LANGUAGE);
+            IvJudgeReaderScope reader(env.console, LANGUAGE);
             screen = env.console.video().snapshot();
-            IVCheckerReader::Results results = reader.read(env.console, screen);
+            IvJudgeReader::Results results = reader.read(env.console, screen);
             bool ok = true;
             ok &= HP.matches(stats.errors, results.hp);
             ok &= ATTACK.matches(stats.errors, results.attack);

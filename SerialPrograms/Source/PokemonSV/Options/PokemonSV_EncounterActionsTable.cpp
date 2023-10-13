@@ -44,18 +44,18 @@ EncounterActionsRow::~EncounterActionsRow(){
 EncounterActionsRow::EncounterActionsRow()
     : action(
         EncounterFilterAction_database(),
-        LockWhileRunning::UNLOCKED,
+        LockMode::UNLOCK_WHILE_RUNNING,
         EncounterActionsAction::STOP_PROGRAM
     )
     , pokeball("poke-ball")
     , pokemon(
         ALL_POKEMON_NAMES(),
-        LockWhileRunning::UNLOCKED,
+        LockMode::UNLOCK_WHILE_RUNNING,
         "glimmora"
     )
     , shininess(
         EncounterFilterShininess_database(),
-        LockWhileRunning::UNLOCKED,
+        LockMode::UNLOCK_WHILE_RUNNING,
         EncounterActionsShininess::SHINY
     )
 {
@@ -107,7 +107,7 @@ EncounterActionsTable::EncounterActionsTable()
         STRING_POKEMON + " and their shininess. "
         "If multiple entries match, the last one will be chosen. Note that running from "
         "shinies will not despawn them since they cannot be killed via Let's Go.",
-        LockWhileRunning::UNLOCKED,
+        LockMode::UNLOCK_WHILE_RUNNING,
         make_defaults()
     )
 {}

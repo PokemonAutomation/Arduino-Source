@@ -25,9 +25,9 @@ public:
         m_display_order.emplace_back(Stat("Skips Issued"));
     }
 
-    virtual std::string to_str() const override{
+    virtual std::string to_str(PrintMode mode) const override{
         if (total_skips == 0){
-            return StatsTracker::to_str();
+            return StatsTracker::to_str(mode);
         }else{
             return
                 "Skips Issued: " + tostr_u_commas(issued) +

@@ -45,7 +45,7 @@ struct MoneyFarmerRoute212_Descriptor::Stats : public StatsTracker{
         , m_both(m_stats["Both"])
     {
         m_display_order.emplace_back("Searches");
-        m_display_order.emplace_back("Errors", true);
+        m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
         m_display_order.emplace_back("No React");
         m_display_order.emplace_back("Man Only");
         m_display_order.emplace_back("Woman Only");
@@ -71,7 +71,7 @@ MoneyFarmerRoute212::MoneyFarmerRoute212()
             {StartLocation::Hearthome, "hearthome", "In front of the Hearthome City " + STRING_POKEMON + " center."},
             {StartLocation::OldCouple, "old-couple", "In the row above the rich couple in Route 212."},
         },
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         StartLocation::Hearthome
     )
     , HEALING_METHOD(
@@ -80,13 +80,13 @@ MoneyFarmerRoute212::MoneyFarmerRoute212()
             {HealMethod::Hearthome, "hearthome", "Hearthome City " + STRING_POKEMON + " center."},
             {HealMethod::GlobalRoom, "global-room", "Use Global Room. (will force update your game)"},
         },
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         HealMethod::Hearthome
     )
-    , MOVE1_PP("<b>Move 1 PP:</b><br>Set to zero to not use this move.", LockWhileRunning::LOCKED, 5, 0, 64)
-    , MOVE2_PP("<b>Move 2 PP:</b><br>Set to zero to not use this move.", LockWhileRunning::LOCKED, 5, 0, 64)
-    , MOVE3_PP("<b>Move 3 PP:</b><br>Set to zero to not use this move.", LockWhileRunning::LOCKED, 5, 0, 64)
-    , MOVE4_PP("<b>Move 4 PP:</b><br>Set to zero to not use this move.", LockWhileRunning::LOCKED, 5, 0, 64)
+    , MOVE1_PP("<b>Move 1 PP:</b><br>Set to zero to not use this move.", LockMode::LOCK_WHILE_RUNNING, 5, 0, 64)
+    , MOVE2_PP("<b>Move 2 PP:</b><br>Set to zero to not use this move.", LockMode::LOCK_WHILE_RUNNING, 5, 0, 64)
+    , MOVE3_PP("<b>Move 3 PP:</b><br>Set to zero to not use this move.", LockMode::LOCK_WHILE_RUNNING, 5, 0, 64)
+    , MOVE4_PP("<b>Move 4 PP:</b><br>Set to zero to not use this move.", LockMode::LOCK_WHILE_RUNNING, 5, 0, 64)
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS_UPDATE,

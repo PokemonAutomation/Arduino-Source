@@ -24,8 +24,8 @@ namespace PokemonAutomation{
         class LanguageOCROption;
     }
     namespace Pokemon{
-        enum class EggHatchAction;
-        class EggHatchFilterTable;
+    enum class StatsHuntAction;
+    class StatsHuntIvJudgeFilterTable;
     }
 
 namespace NintendoSwitch{
@@ -98,8 +98,8 @@ void reset_position_at_zero_gate(const ProgramInfo& info, ConsoleHandle& console
 // If judge view is not unlocked, it will settle onto stats view, and the pokemon's IVs will be regarded as unknown.
 bool check_baby_info(
     const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
-    OCR::LanguageOCROption& LANGUAGE, Pokemon::EggHatchFilterTable& FILTERS,
-    Pokemon::EggHatchAction& action
+    OCR::LanguageOCROption& LANGUAGE, Pokemon::StatsHuntIvJudgeFilterTable& FILTERS,
+    Pokemon::StatsHuntAction& action
 );
 
 }

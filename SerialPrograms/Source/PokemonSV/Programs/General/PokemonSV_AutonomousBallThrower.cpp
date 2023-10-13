@@ -53,25 +53,36 @@ AutonomousBallThrower::AutonomousBallThrower()
     : LANGUAGE(
         "<b>Game Language:</b>",
         PokemonNameReader::instance().languages(),
-        LockWhileRunning::UNLOCKED
+        LockMode::UNLOCK_WHILE_RUNNING
     )
     , BALL_SELECT(
         "<b>Ball Select:</b>",
-        LockWhileRunning::UNLOCKED,
+        LockMode::UNLOCK_WHILE_RUNNING,
         "poke-ball"
     )
-    , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
+    , USE_FIRST_MOVE_IF_CANNOT_THROW_BALL(
+        "<b>Use 1st Move if Cannot Throw Ball:</b><br>"
+        "If you can't throw a ball because the opponent is semi-invulnerable, use the 1st move instead. "
+        "Therefore, your first move should be non-damaging to avoid killing the wild " + STRING_POKEMON + ".",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        true
+    )
+    , NOTIFICATION_CATCH_SUCCESS("Catch Success", true, true)
+    , NOTIFICATION_CATCH_FAILED("Catch Failed", true, true)
     , NOTIFICATIONS({
-        &NOTIFICATION_STATUS_UPDATE,
+        &NOTIFICATION_CATCH_SUCCESS,
+        &NOTIFICATION_CATCH_FAILED,
     })
 {
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(BALL_SELECT);
+    PA_ADD_OPTION(USE_FIRST_MOVE_IF_CANNOT_THROW_BALL);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
 
 
+#if 0
 void AutonomousBallThrower::throw_ball(ConsoleHandle& console, BotBaseContext& context){
     pbf_press_button(context, BUTTON_X, 20, 100);
     context.wait_for_all_requests();
@@ -91,6 +102,7 @@ void AutonomousBallThrower::throw_ball(ConsoleHandle& console, BotBaseContext& c
     pbf_mash_button(context, BUTTON_A, 125);
     context.wait_for_all_requests();
 }
+#endif
 
 void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
@@ -100,6 +112,27 @@ void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, BotBase
     //  Connect the controller.
     pbf_press_button(context, BUTTON_LCLICK, 10, 0);
 
+    CatchResults results = basic_catcher(
+        env.console, context, LANGUAGE, BALL_SELECT.slug(),
+        USE_FIRST_MOVE_IF_CANNOT_THROW_BALL,
+        [&]{
+            stats.m_balls++;
+            env.update_stats();
+        }
+    );
+    env.update_stats();
+
+    send_catch_notification(
+        env,
+        NOTIFICATION_CATCH_SUCCESS,
+        NOTIFICATION_CATCH_FAILED,
+        nullptr,
+        BALL_SELECT.slug(),
+        results.balls_used,
+        results.result
+    );
+
+#if 0
     while (true)
     {
         NormalBattleMenuWatcher battle_menu(COLOR_RED);
@@ -127,9 +160,10 @@ void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, BotBase
         }
 
     }
+#endif
 
-    env.update_stats();
-    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
+//    env.update_stats();
+//    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 }
 
 

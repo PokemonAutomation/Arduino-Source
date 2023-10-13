@@ -47,6 +47,7 @@ public:
 struct DebugSettings{
     bool COLOR_CHECK = false;
     bool IMAGE_TEMPLATE_MATCHING = false;
+    bool IMAGE_DICTIONARY_MATCHING = false;
 };
 
 

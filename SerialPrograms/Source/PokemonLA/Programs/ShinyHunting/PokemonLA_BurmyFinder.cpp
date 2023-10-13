@@ -59,8 +59,8 @@ public:
     {
         m_display_order.emplace_back("Attempts");
         m_display_order.emplace_back("Trees");
-        m_display_order.emplace_back("Errors", true);
-        m_display_order.emplace_back("Blackouts", true);
+        m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
+        m_display_order.emplace_back("Blackouts", HIDDEN_IF_ZERO);
         m_display_order.emplace_back("Found");
         m_display_order.emplace_back("Enroute Shinies");
         m_display_order.emplace_back("Tree Alphas");
@@ -88,7 +88,7 @@ BurmyFinder::BurmyFinder()
     : LANGUAGE(
         "<b>Game Language</b>",
         Pokemon::PokemonNameReader::instance().languages(),
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         true
     )
     , SHINY_DETECTED_ENROUTE(
@@ -111,7 +111,7 @@ BurmyFinder::BurmyFinder()
     })
     , SAVE_DEBUG_VIDEO(
         "<b>Save debug videos to Switch:</b>",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         false
     )
 {

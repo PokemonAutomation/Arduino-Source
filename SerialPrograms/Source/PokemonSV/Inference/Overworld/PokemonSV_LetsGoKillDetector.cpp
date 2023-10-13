@@ -159,10 +159,11 @@ bool LetsGoKillDetector::detect(const ImageViewRGB32& screen) const{
 LetsGoKillWatcher::LetsGoKillWatcher(
     Logger& logger,
     Color color, bool trigger_if_detected,
+    const ImageFloatBox& box,
     std::function<void()> on_kill_callback,
     std::chrono::milliseconds duration
 )
-     : DetectorToFinder("LetsGoKillWatcher", duration, color)
+     : DetectorToFinder("LetsGoKillWatcher", duration, color, box)
      , m_logger(logger)
      , m_trigger_if_detected(trigger_if_detected)
      , m_on_kill_callback(on_kill_callback)

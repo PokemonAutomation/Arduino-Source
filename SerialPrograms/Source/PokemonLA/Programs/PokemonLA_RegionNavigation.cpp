@@ -364,7 +364,7 @@ void goto_camp_from_overworld(
         if (current_time() - start > std::chrono::seconds(60)){
 //            dump_image(console.logger(), env.program_info(), "EscapeFromAttack", console.video().snapshot());
             throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
+                ErrorReport::NO_ERROR_REPORT, console,
                 "Unable to escape from being attacked.",
                 true
             );
@@ -454,7 +454,7 @@ void goto_any_camp_from_overworld(
         if (current_time() - start > std::chrono::seconds(60)){
 //            dump_image(console.logger(), env.program_info(), "EscapeFromAttack", console.video().snapshot());
             throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
+                ErrorReport::NO_ERROR_REPORT, console,
                 "Unable to escape from being attacked.",
                 true
             );

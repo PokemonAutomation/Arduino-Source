@@ -49,9 +49,9 @@ public:
         , errors(m_stats["Errors"])
     {
         m_display_order.emplace_back("Battles");
-        m_display_order.emplace_back("Faint Switches", true);
-        m_display_order.emplace_back("Fourth Moves", true);
-        m_display_order.emplace_back("Errors", true);
+        m_display_order.emplace_back("Faint Switches", HIDDEN_IF_ZERO);
+        m_display_order.emplace_back("Fourth Moves", HIDDEN_IF_ZERO);
+        m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
     }
 
     std::atomic<uint64_t>& battles;
@@ -72,12 +72,12 @@ TenacityCandyFarmer::TenacityCandyFarmer()
             {FourthMoveOn::Mamoswine,   "mamoswine", "Mamoswine (fourth move needs to be set to Flamethrower)"},
             {FourthMoveOn::Avalugg,     "avalugg", "Avalugg (fourth move needs to be set to Rock Smash)"},
         },
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         FourthMoveOn::None
     )
     , SAVE_EVERY_FEW_BATTLES(
         "<b>Save every few battles:</b><br>After every this number of battles, save the game. Enter zero to never save the game.",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         0
     )
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))

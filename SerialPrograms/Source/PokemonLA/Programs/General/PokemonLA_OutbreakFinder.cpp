@@ -154,12 +154,12 @@ public:
         , matches(m_stats["Matches"])
     {
         m_display_order.emplace_back("Checks");
-        m_display_order.emplace_back("Errors", true);
+        m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
         m_display_order.emplace_back("Outbreaks");
         m_display_order.emplace_back("MMOs");
         m_display_order.emplace_back("MMO Pokemon");
         m_display_order.emplace_back("Stars");
-        m_display_order.emplace_back("Matches", true);
+        m_display_order.emplace_back("Matches", HIDDEN_IF_ZERO);
     }
 
     std::atomic<uint64_t>& checks;
@@ -183,7 +183,7 @@ OutbreakFinder::OutbreakFinder()
     , LANGUAGE(
         "<b>Game Language:</b>",
         Pokemon::PokemonNameReader::instance().languages(),
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         true
     )
     , DESIRED_MO_SLUGS(
@@ -200,7 +200,7 @@ OutbreakFinder::OutbreakFinder()
     )
     , DEBUG_MODE(
         "<b>Debug Mode:</b><br>Save MMO Sprite to debug folder.",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         false
     )
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))

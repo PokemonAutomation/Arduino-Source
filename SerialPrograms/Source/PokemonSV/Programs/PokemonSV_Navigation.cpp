@@ -5,7 +5,6 @@
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
-//#include "CommonFramework/Tools/ErrorDumper.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_ScalarButtons.h"
@@ -14,19 +13,22 @@
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
-#include "PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
-#include "PokemonSV/Inference/PokemonSV_MapDetector.h"
-#include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
+#include "PokemonSV/Inference/Map/PokemonSV_MapDetector.h"
+#include "PokemonSV/Inference/Map/PokemonSV_MapMenuDetector.h"
+#include "PokemonSV/Inference/Map/PokemonSV_MapPokeCenterIconDetector.h"
 #include "PokemonSV/Inference/Picnics/PokemonSV_PicnicDetector.h"
+#include "PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
 #include "PokemonSV/Inference/PokemonSV_ZeroGateWarpPromptDetector.h"
+#include "PokemonSV/Inference/Overworld/PokemonSV_LetsGoKillDetector.h"
+#include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV_ConnectToInternet.h"
 #include "PokemonSV_Navigation.h"
+
+#include <cmath>
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
-
-
 
 
 void set_time_to_12am_from_home(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
@@ -58,6 +60,27 @@ void day_skip_from_overworld(ConsoleHandle& console, BotBaseContext& context){
     ssf_press_button(context, BUTTON_A, 20, 10);
     pbf_press_button(context, BUTTON_HOME, 20, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
     resume_game_from_home(console, context);
+}
+
+void press_Bs_to_back_to_overworld(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+    context.wait_for_all_requests();
+    OverworldWatcher overworld(COLOR_RED);
+    int ret = run_until(
+        console, context,
+        [](BotBaseContext& context){
+            for (size_t c = 0; c < 10; c++){
+                pbf_press_button(context, BUTTON_B, 20, 230);
+            }
+        },
+        {overworld}
+    );
+    if (ret < 0){
+        throw OperationFailedException(
+            ErrorReport::SEND_ERROR_REPORT, console,
+            "press_Bs_to_back_to_overworld(): Unable to detect overworld after 10 button B presses.",
+            true
+        );
+    }
 }
 
 void open_map_from_overworld(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
@@ -140,7 +163,7 @@ void open_map_from_overworld(const ProgramInfo& info, ConsoleHandle& console, Bo
     }
 }
 
-void fly_to_overworld_from_map(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+bool fly_to_overworld_from_map(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, bool check_fly_menuitem){
     context.wait_for_all_requests();
     // Press A to bring up the promp dialog on choosing "Fly here", "Set as destination", "Never mind".
     pbf_press_button(context, BUTTON_A, 20, 130);
@@ -150,45 +173,51 @@ void fly_to_overworld_from_map(const ProgramInfo& info, ConsoleHandle& console, 
         if (current_time() - start > std::chrono::minutes(2)){
             throw OperationFailedException(
                 ErrorReport::SEND_ERROR_REPORT, console,
-                "fly_to_overworld_from_map(): Failed to open map after 2 minutes.",
+                "fly_to_overworld_from_map(): Failed to fly from map after 2 minutes.",
                 true
             );
         }
 
         int ret = 0;
-        {
-            OverworldWatcher overworld(COLOR_CYAN);
-            MapExitWatcher map(COLOR_RED);
-            GradientArrowWatcher spot_dialog_watcher(COLOR_YELLOW, GradientArrowType::RIGHT, {0.469, 0.500, 0.215, 0.150});
-            PromptDialogWatcher confirm_watcher(COLOR_BLUE, {0.686, 0.494, 0.171, 0.163});
+        OverworldWatcher overworld(COLOR_CYAN);
+        WhiteButtonWatcher map(COLOR_RED, WhiteButton::ButtonY, {0.800, 0.118, 0.030, 0.060});
+        GradientArrowWatcher spot_dialog_watcher(COLOR_YELLOW, GradientArrowType::RIGHT, {0.469, 0.500, 0.215, 0.150});
+        PromptDialogWatcher confirm_watcher(COLOR_BLUE, {0.686, 0.494, 0.171, 0.163});
+        MapFlyMenuWatcher flyMenuItemWatcher(COLOR_BLACK);
+        MapDestinationMenuWatcher destinationMenuItemWatcher(COLOR_BLACK);
 
-            context.wait_for_all_requests();
-            ret = wait_until(
-                console, context,
-                std::chrono::minutes(2),
-                {overworld, map, spot_dialog_watcher, confirm_watcher}
-            );
+        context.wait_for_all_requests();
+
+        std::vector<PeriodicInferenceCallback> callbacks{overworld, map, spot_dialog_watcher, confirm_watcher};
+        if (check_fly_menuitem){
+            callbacks[2] = flyMenuItemWatcher;
+            callbacks.push_back(destinationMenuItemWatcher);
         }
+
+        ret = wait_until(console, context, std::chrono::minutes(2), callbacks);
         context.wait_for(std::chrono::milliseconds(100));
         switch (ret){
         case 0:
-            console.log("Detected overworld.");
-            return;
+            console.log("Detected overworld. Fly successful.");
+            return true;
         case 1:
-            console.log("Detected map.");
+            console.log("Detected map. Pressing A to open map menu.");
             // Press A to bring up the promp dialog on choosing "Fly here", "Set as destination", "Never mind".
             pbf_press_button(context, BUTTON_A, 20, 130);
             continue;
         case 2:
             console.log("Detected fly here prompt dialog.");
-            console.overlay().add_log("Fly", COLOR_WHITE);
+            console.overlay().add_log("Fly");
             pbf_press_button(context, BUTTON_A, 20, 130);
             continue;
         case 3:
             console.log("Detected fly confirmation prompt.");
             pbf_press_button(context, BUTTON_A, 20, 130);
             continue;
-            
+        case 4:
+            console.log("Detected no fly spot here.");
+            console.overlay().add_log("No fly spot", COLOR_RED);
+            return false;
         default:
             throw OperationFailedException(
                 ErrorReport::SEND_ERROR_REPORT, console,
@@ -344,7 +373,7 @@ void enter_box_system_from_overworld(const ProgramInfo& info, ConsoleHandle& con
         switch (ret){
         case 0:
             console.log("Detected overworld.");
-            pbf_press_button(context, BUTTON_X, 20, 105); // open menu 
+            pbf_press_button(context, BUTTON_X, 20, 105); // open menu
             continue;
         case 1:
             console.log("Detected main menu.");
@@ -377,13 +406,89 @@ void enter_box_system_from_overworld(const ProgramInfo& info, ConsoleHandle& con
 void leave_box_system_to_overworld(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
     context.wait_for_all_requests();
     console.log("Leave box system to overworld...");
-    OverworldWatcher overworld(COLOR_RED);
+    press_Bs_to_back_to_overworld(info, console, context);
+}
+
+
+void open_pokedex_from_overworld(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+    console.log("Opening Pokédex...");
+    WallClock start = current_time();
+    while (true){
+        if (current_time() - start > std::chrono::seconds(30)){
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, console,
+                "open_pokedex_from_overworld(): Failed to open Pokédex after 30 seconds.",
+                true
+            );
+        }
+
+        OverworldWatcher overworld(COLOR_CYAN);
+        WhiteButtonWatcher pokedex(COLOR_RED, WhiteButton::ButtonY, {0.800, 0.118, 0.030, 0.060});
+
+        context.wait_for_all_requests();
+        int ret = wait_until(
+            console, context,
+            std::chrono::seconds(30),
+            {overworld, pokedex}
+        );
+        context.wait_for(std::chrono::milliseconds(100));
+        switch (ret){
+        case 0:
+            // Try opening the Pokédex if overworld is detected
+            pbf_press_button(context, BUTTON_MINUS, 20, 100);
+            continue;
+        case 1:
+            console.log("Detected Pokédex.");
+            return;
+        default:
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, console,
+                "open_pokedex_from_overworld(): No recognized state after 30 seconds.",
+                true
+            );
+        }
+    }
+}
+
+
+void open_recently_battled_from_pokedex(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+    console.log("Opening recently battled...");
+    LetsGoKillWatcher menu(console.logger(), COLOR_RED, true, {0.23, 0.23, 0.04, 0.20});
     context.wait_for_all_requests();
+
     int ret = run_until(
         console, context,
         [](BotBaseContext& context){
-            for (size_t c = 0; c < 10; c++){
-                pbf_press_button(context, BUTTON_B, 20, 230);
+            for (size_t i = 0; i < 10; i++){
+                pbf_press_dpad(context, DPAD_DOWN, 20, 105);
+            }
+        },
+        {menu}
+    );
+    if (ret == 0){
+        console.log("Detected Recently Battled menu icon.");
+        pbf_mash_button(context, BUTTON_A, 150);
+        pbf_wait(context, 200);
+    } else {
+        throw OperationFailedException(
+            ErrorReport::SEND_ERROR_REPORT, console,
+            "open_recently_battled_from_pokedex(): Unknown state after 10 dpad down presses.",
+            true
+        );
+    }
+}
+
+
+void leave_phone_to_overworld(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+    console.log("Exiting to overworld from Rotom Phone...");
+    OverworldWatcher overworld(COLOR_CYAN);
+    context.wait_for_all_requests();
+
+    int ret = run_until(
+        console, context,
+        [](BotBaseContext& context){
+            for (size_t i = 0; i < 10; i++){
+                pbf_press_button(context, BUTTON_Y, 20, 1000);
             }
         },
         {overworld}
@@ -391,16 +496,130 @@ void leave_box_system_to_overworld(const ProgramInfo& info, ConsoleHandle& conso
     if (ret < 0){
         throw OperationFailedException(
             ErrorReport::SEND_ERROR_REPORT, console,
-            "leave_box_system_to_overworld(): Unknown state after 10 button B presses.",
+            "leave_phone_to_overworld(): Unknown state after 10 button Y presses.",
             true
         );
     }
 }
 
+// While in the current map zoom level, detect pokecenter icons and move the map cursor there.
+// Return true if succeed. Return false if no visible pokcenter on map
+bool detect_closest_pokecenter_and_move_map_cursor_there(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+    context.wait_for_all_requests();
+    const auto snapshot_frame = console.video().snapshot().frame;
+    const size_t screen_width = snapshot_frame->width();
+    const size_t screen_height = snapshot_frame->height();
+
+    double closest_icon_x = 0., closest_icon_y = 0.;
+    double max_dist = 0.0;
+    const double center_x = 0.5 * screen_width, center_y = 0.5 * screen_height;
+    {
+        MapPokeCenterIconWatcher pokecenter_watcher(COLOR_RED, console.overlay(), MAP_READABLE_AREA);
+        int ret = wait_until(console, context, std::chrono::seconds(2), {pokecenter_watcher});
+        if (ret != 0){
+            console.log("No visible pokecetner found on map");
+            console.overlay().add_log("No whole PokeCenter icon");
+            return false;
+        }
+        // Find the detected PokeCenter icon closest to the screen center (where player character is on the map).
+        for(const auto& box: pokecenter_watcher.found_locations()){
+            const double loc_x = (box.x + box.width/2) * screen_width;
+            const double loc_y = (box.y + box.height/2) * screen_height;
+            const double x_diff = loc_x - center_x, y_diff = loc_y - center_y;
+            const double dist = x_diff * x_diff + y_diff * y_diff;
+            if (max_dist < dist){
+                max_dist = dist;
+                closest_icon_x = loc_x; closest_icon_y = loc_y;
+            }
+        }
+        console.log("Found closest pokecenter icon on map: (" + std::to_string(closest_icon_x) + ", " + std::to_string(closest_icon_y) + ").");
+        console.overlay().add_log("Detected PokeCenter icon");
+    }
+
+    // Convert the vector from center to the PokeCenter icon into a left joystick movement
+    const double dif_x = closest_icon_x - center_x;
+    const double dif_y = closest_icon_y - center_y;
+    const double magnitude = std::max(std::sqrt(max_dist), 1.0);
+    const double push_x = dif_x * 64 / magnitude, push_y = dif_y * 64 / magnitude;
+
+    // 0.5 is too large, 0.25 a little too small, 0.30 is a bit too much for a far-away pokecenter
+    const double scale = 0.29;
+
+    const uint8_t move_x = uint8_t(std::max(std::min(int(round(push_x + 128) + 0.5), 255), 0));
+    const uint8_t move_y = uint8_t(std::max(std::min(int(round(push_y + 128) + 0.5), 255), 0));
+
+    console.overlay().add_log("Move Cursor to PokeCenter", COLOR_WHITE);
+    const uint16_t push_time = std::max(uint16_t(magnitude * scale + 0.5), uint16_t(3));
+    pbf_move_left_joystick(context, move_x, move_y, push_time, 30);
+    context.wait_for_all_requests();
+    return true;
+}
+
+// While in the current map zoom level, detect pokecenter icons and fly to the closest one.
+// Return true if succeed. Return false if no visible pokcenter on map
+bool fly_to_visible_closest_pokecenter_cur_zoom_level(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+    const int max_try_count = 3;
+    for(int try_count = 0; try_count < max_try_count; ++try_count){
+        if (!detect_closest_pokecenter_and_move_map_cursor_there(info, console, context)){
+            return false;
+        }
+        bool check_fly_menuitem = true;
+        const bool success = fly_to_overworld_from_map(info, console, context, check_fly_menuitem);
+        if (success){
+            return true;
+        }
+        if (try_count + 1 < max_try_count){ // if this is not the last try:
+            console.log("Failed to find the fly menuitem. Restart the closest Pokecenter travel process.");
+            press_Bs_to_back_to_overworld(info, console, context);
+            open_map_from_overworld(info, console, context);
+        }
+    }
+    // last try failed:
+    throw OperationFailedException(
+        ErrorReport::SEND_ERROR_REPORT, console,
+        "fly_to_visible_closest_pokecenter_cur_zoom_level(): tried three times to fly to pokecenter, but no \"Fly\" menuitem.",
+        true
+    );
+}
 
 
+void fly_to_closest_pokecenter_on_map(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+    // Zoom in one level onto the map.
+    // If the player character icon or any wild pokemon icon overlaps with the PokeCenter icon, the code cannot
+    // detect it. So we zoom in as much as we can to prevent any icon overlap.
+    pbf_press_button(context, BUTTON_ZR, 40, 100);
+    
+    if (fly_to_visible_closest_pokecenter_cur_zoom_level(info, console, context)){
+        return; // success in finding the closest pokecenter. Return.
+    }
+    
+    // Does not find any visible pokecenter. Probably the player character or a nearby Pokemon icon overlaps with the pokecenter.
+    // Zoom out to the max warpable level and try pressing on the player character.
+    console.log("Zoom to max map level to try searching for pokecetner again.");
+    console.overlay().add_log("Pokecenter Icon occluded");
+    pbf_press_button(context, BUTTON_ZL, 40, 100);
+    pbf_press_button(context, BUTTON_ZL, 40, 100);
 
+    const bool check_fly_menuitem = true;
+    if (fly_to_overworld_from_map(info, console, context, check_fly_menuitem)){
+        return; // success in flying to the pokecenter that overlaps with the player character at max warpable level.
+    }
 
+    console.log("No PokeCenter icon overlapping with the player character on the max warpable level");
+    console.overlay().add_log("No overlapping PokeCenter");
+    // press B to first close the map menu
+    pbf_press_button(context, BUTTON_B, 60, 100);
+    // Now try finding the closest pokecenter at the max warpable level
+    if (fly_to_visible_closest_pokecenter_cur_zoom_level(info, console, context) == false){
+        // Does not detect any pokecenter on map
+        console.overlay().add_log("Still no PokeCenter Found!", COLOR_RED);
+        throw OperationFailedException(
+            ErrorReport::SEND_ERROR_REPORT, console,
+            "fly_to_closest_pokecenter_on_map(): At max warpable map level, still cannot find PokeCenter icon.",
+            true
+        );
+    }
+}
 
 
 }

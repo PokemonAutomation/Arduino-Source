@@ -8,12 +8,11 @@
 #include "CommonFramework/Options/LanguageOCROption.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "Pokemon/Options/Pokemon_EggHatchFilter.h"
-#include "Pokemon/Options/Pokemon_StatsResetFilter.h"
-#include "PokemonSV/Inference/Boxes/PokemonSV_IVCheckerReader.h"
+#include "Pokemon/Options/Pokemon_StatsHuntFilter.h"
+//#include "Pokemon/Options/Pokemon_StatsResetFilter.h"
+#include "PokemonSV/Inference/Boxes/PokemonSV_IvJudgeReader.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxNatureDetector.h"
 #include "PokemonSV/Programs/Boxes/PokemonSV_BoxRoutines.h"
-#include "PokemonSV_StatsResetChecker.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -22,8 +21,8 @@ namespace PokemonSV{
 
 bool check_stats_reset_info(
     ConsoleHandle& console, BotBaseContext& context,
-    OCR::LanguageOCROption& LANGUAGE, Pokemon::StatsResetFilterTable& FILTERS,
-    Pokemon::EggHatchAction& action
+    OCR::LanguageOCROption& LANGUAGE, Pokemon::StatsHuntIvJudgeFilterTable& FILTERS,
+    Pokemon::StatsHuntAction& action
 ){
     context.wait_for_all_requests();
 
@@ -32,15 +31,15 @@ bool check_stats_reset_info(
     change_view_to_judge(console, context, language);
 
     VideoOverlaySet overlay_set(console.overlay());
-    IVCheckerReaderScope iv_reader_scope(console.overlay(), language);
+    IvJudgeReaderScope iv_reader_scope(console.overlay(), language);
     VideoSnapshot screen = console.video().snapshot();
-    IVCheckerReader::Results IVs = iv_reader_scope.read(console.logger(), screen);
+    IvJudgeReader::Results IVs = iv_reader_scope.read(console.logger(), screen);
     BoxNatureDetector nature_detector(console.overlay(), LANGUAGE);
     NatureReader::Results nature = nature_detector.read(console.logger(), screen);
-    const bool shiny = 0;
+    bool shiny = false;
 
     console.log(IVs.to_string(), COLOR_GREEN);
-    action = FILTERS.get_action(shiny, IVs, nature);
+    action = FILTERS.get_action(shiny, StatsHuntGenderFilter::Any, nature.nature, IVs);
 
     return shiny;
 }

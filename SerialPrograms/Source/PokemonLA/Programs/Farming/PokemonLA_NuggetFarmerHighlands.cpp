@@ -54,10 +54,10 @@ public:
         , shinies(m_stats["Shinies"])
     {
         m_display_order.emplace_back("Attempts");
-        m_display_order.emplace_back("Errors", true);
-        m_display_order.emplace_back("Charm", true);
-        m_display_order.emplace_back("Coin", true);
-        m_display_order.emplace_back("Shinies", true);
+        m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
+        m_display_order.emplace_back("Charm", HIDDEN_IF_ZERO);
+        m_display_order.emplace_back("Coin", HIDDEN_IF_ZERO);
+        m_display_order.emplace_back("Shinies", HIDDEN_IF_ZERO);
     }
     virtual void add_shiny() override{
         shinies++;

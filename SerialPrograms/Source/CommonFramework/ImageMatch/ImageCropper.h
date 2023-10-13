@@ -22,7 +22,7 @@ namespace ImageMatch{
 ImageViewRGB32 trim_image_alpha(const ImageViewRGB32& image, uint8_t alpha_threshold = 128);
 
 
-//  Filter out object from background.
+//  Find a crop of the object based on background color.
 //  The pixels of the object are defined as is_object(pixel_color) == true.
 //  Return the rectangle enclosing the object.
 ImagePixelBox enclosing_rectangle_with_pixel_filter(const ImageViewRGB32& image, const std::function<bool(Color)>& is_object);

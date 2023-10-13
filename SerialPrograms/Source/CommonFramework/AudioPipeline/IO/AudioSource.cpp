@@ -14,6 +14,8 @@ using NativeAudioSource = QAudioSource;
 #endif
 
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/PrettyPrint.h"
+#include "Common/Cpp/Time.h"
 #include "Common/Cpp/StreamConverters.h"
 #include "CommonFramework/AudioPipeline/AudioStream.h"
 #include "CommonFramework/AudioPipeline/Tools/AudioFormatUtils.h"
@@ -66,7 +68,12 @@ public:
         m_source = std::make_unique<NativeAudioSource>(device, format);
 
         this->open(QIODevice::ReadWrite | QIODevice::Unbuffered);
+
+        WallClock start = current_time();
         m_source->start(this);
+        WallClock end = current_time();
+        double seconds = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() / 1000.;
+        logger.log("Done starting audio... " + tostr_fixed(seconds, 3) + " seconds", COLOR_CYAN);
     }
     ~AudioInputDevice(){
         if (m_source){

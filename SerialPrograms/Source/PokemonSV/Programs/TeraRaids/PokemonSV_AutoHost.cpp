@@ -71,8 +71,8 @@ struct AutoHost_Descriptor::Stats : public StatsTracker{
         m_display_order.emplace_back("Total Raiders");
         m_display_order.emplace_back("Wins");
         m_display_order.emplace_back("Losses");
-        m_display_order.emplace_back("Banned", true);
-        m_display_order.emplace_back("Errors", true);
+        m_display_order.emplace_back("Banned", HIDDEN_IF_ZERO);
+        m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
     }
     std::atomic<uint64_t>& m_raids;
     std::atomic<uint64_t>& m_empty;
@@ -98,7 +98,7 @@ AutoHost::AutoHost()
             {HostingMode::ONLINE_CODED,     "online-coded",     "Host Online (link code)"},
             {HostingMode::ONLINE_EVERYONE,  "online-everyone",  "Host Online (everyone)"},
         },
-        LockWhileRunning::UNLOCKED,
+        LockMode::UNLOCK_WHILE_RUNNING,
         HostingMode::ONLINE_CODED
     )
     , NOTIFICATIONS0({
@@ -275,7 +275,7 @@ void AutoHost::program(SingleSwitchProgramEnvironment& env, BotBaseContext& cont
     AutoHost_Descriptor::Stats& stats = env.current_stats<AutoHost_Descriptor::Stats>();
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_LCLICK, 10, 10);
+    pbf_press_button(context, BUTTON_L, 10, 10);
 
     m_killswitch_time = WallClock::max();
 

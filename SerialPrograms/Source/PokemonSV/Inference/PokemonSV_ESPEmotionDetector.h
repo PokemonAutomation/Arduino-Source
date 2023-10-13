@@ -87,6 +87,24 @@ private:
     ImageFloatBox m_right_box;
 };
 
+// Check that an emotion is pressed by looking for yellow in the lower right interface
+class ESPPressedEmotionDetector : public VisualInferenceCallback {
+public:
+    ESPPressedEmotionDetector();
+
+    bool detect(const ImageViewRGB32& frame);
+
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
+
+private:
+    ImageFloatBox m_left_box;
+    ImageFloatBox m_right_box;
+    ImageFloatBox m_top_box;
+    ImageFloatBox m_bottom_box;
+};
+
+
 }
 }
 }

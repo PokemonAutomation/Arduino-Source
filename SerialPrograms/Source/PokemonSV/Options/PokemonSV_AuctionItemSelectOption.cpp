@@ -41,7 +41,7 @@ AuctionItemSelectCell::AuctionItemSelectCell(
 )
     : StringSelectCell(
         AUCTION_ITEM_SELECT_DATABASE(),
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         default_slug
     )
 {}

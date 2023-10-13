@@ -13,7 +13,7 @@
 #include "CommonFramework/Options/LanguageOCROption.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
-#include "Pokemon/Options/Pokemon_EggHatchFilter.h"
+#include "Pokemon/Options/Pokemon_StatsHuntFilter.h"
 #include "PokemonSV/Options/PokemonSV_EggPowerSandwichOption.h"
 
 // #include <functional>
@@ -59,8 +59,6 @@ private:
 
     void save_game(SingleSwitchProgramEnvironment& env, BotBaseContext& context, bool from_overworld);
 
-    void reset_game(SingleSwitchProgramEnvironment& env, BotBaseContext& context, const std::string& error_msg);
-
     void handle_recoverable_error(
         SingleSwitchProgramEnvironment& env, BotBaseContext& context,
         EventNotificationOption& notification,
@@ -83,6 +81,7 @@ private:
         NoAutoSave,
         AfterStartAndKeep,
         EveryBatch,
+        AfterFetchComplete,
     };
     EnumDropdownOption<AutoSave> AUTO_SAVING;
 
@@ -91,8 +90,8 @@ private:
     BooleanCheckBoxOption HAS_CLONE_RIDE_POKEMON;
 
     IntegerEnumDropdownOption KEEP_BOX_LOCATION;
-
-    Pokemon::EggHatchFilterTable FILTERS;
+    
+    Pokemon::StatsHuntIvJudgeFilterTable FILTERS;
 
     BooleanCheckBoxOption SAVE_DEBUG_VIDEO;
 

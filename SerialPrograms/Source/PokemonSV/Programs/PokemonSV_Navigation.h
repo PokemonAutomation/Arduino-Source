@@ -31,7 +31,12 @@ void day_skip_from_overworld(ConsoleHandle& console, BotBaseContext& context);
 void open_map_from_overworld(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
 
 //  From map, press A to fly to a travel spot.
-void fly_to_overworld_from_map(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
+//  check_fly_menuitem == true: will detect if the "Fly" menuitem is available. Return false if no "Fly" menuitem (the game
+//    will be on the map menu opened state). Return true if the flight is successful (the game will be at the overworld).
+//  check_fly_menuitem == false: will use GradientArrowDetector to check if a map menu is opened. No "Fly" menuitem check.
+//    The function always returns true. It throws an error in the case of no "Fly" menuitem. But the error message will be about
+//    timeout running the function.
+bool fly_to_overworld_from_map(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, bool check_fly_menuitem = false);
 
 //  Assume the user can set up picnic at current location, start picnic from overworld.
 void picnic_from_overworld(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
@@ -45,6 +50,19 @@ void enter_box_system_from_overworld(const ProgramInfo& info, ConsoleHandle& con
 //  From box system go to overworld.
 void leave_box_system_to_overworld(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
 
+//  From overworld, open Pokédex.
+void open_pokedex_from_overworld(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
+
+//  From Pokédex, open Recently Battled.
+void open_recently_battled_from_pokedex(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
+
+//  From any of the rotom phone apps (Map/Pokédex/Profile) go to overworld.
+void leave_phone_to_overworld(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
+
+//  While on map (default zoom), move to the closest PokeCenter and fly there.
+//  The PokeCenter must be already visited before (so having the little wing icon with it) and not occluded
+//  by other map icons on the most zoomed-in level of the map.
+void fly_to_closest_pokecenter_on_map(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
 
 
 }

@@ -214,7 +214,7 @@ struct EggCombinedSession{
         }
 
         //  Calculate lower/upper bounds for incubation time.
-        const uint16_t INCUBATION_DELAY_UPPER = (uint16_t)((uint32_t)STEPS_TO_HATCH * (uint32_t)103180 >> 16);
+        const uint16_t INCUBATION_DELAY_UPPER = (uint16_t)((uint32_t)STEPS_TO_HATCH * 2 * (uint32_t)103180 >> 16);
         const uint16_t INCUBATION_DELAY_LOWER = INCUBATION_DELAY_UPPER >= EARLY_HATCH_SAFETY
             ? INCUBATION_DELAY_UPPER - EARLY_HATCH_SAFETY
             : 0;

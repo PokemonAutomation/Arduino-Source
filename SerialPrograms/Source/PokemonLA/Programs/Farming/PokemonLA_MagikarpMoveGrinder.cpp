@@ -47,7 +47,7 @@ public:
     {
         m_display_order.emplace_back("Magikarp");
         m_display_order.emplace_back("Move Attempts");
-        m_display_order.emplace_back("Errors", true);
+        m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
     }
 
     std::atomic<uint64_t>& magikarp;
@@ -65,7 +65,7 @@ MagikarpMoveGrinder::MagikarpMoveGrinder()
         "<b>Special Case, Mimic:</b><br>Grind Mimic move usages by switching between first two " + STRING_POKEMON + ". Set the first move as Mimic on the first two " + STRING_POKEMON + ".<br>"
         "After switching, the retreated " + STRING_POKEMON + " will forget the move learned by Mimic, allowing efficient Mimic grinding.<br>"
         "Choosing this will ignore the content in " + STRING_POKEMON + " Action Table.",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         false
     )
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))

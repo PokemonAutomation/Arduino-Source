@@ -2,7 +2,7 @@
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
- *  Various functions to operate in box system, like release pokemon.
+ *  Various functions to operate in box system.
  */
 
 #ifndef PokemonAutomation_PokemonSV_BoxRoutines_H
@@ -48,26 +48,7 @@ void move_to_left_box(BotBaseContext& context);
 //  Press button R to move to the box on the right
 void move_to_right_box(BotBaseContext& context);
 
-//  Assuming the current slot in box system is not an egg
-//  release current selected pokemon in the box system.
-//  It will do nothing if the current slot is empty. 
-//  Throws OperationFailedException, if it got stuck or timed out.
-//  The # of errors are stored into "errors". These are usually dropped button
-//  presses that the function recovered from.
-void release_one_pokemon(
-    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
-    size_t& errors
-);
 
-//  Release a box of pokemon. Can have empty spots or eggs. Eggs are not released.
-//  Throws OperationFailedException, if it got stuck or timed out.
-//  The # of errors are stored into "errors". These are usually dropped button
-//  presses that the function recovered from.
-void release_box(
-    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
-    size_t& errors,
-    uint8_t start_row = 0   //  Start from this row. (skip te first "start_row" rows)
-);
 
 //  In box system, check how many slots in the party are empty
 uint8_t check_empty_slots_in_party(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);

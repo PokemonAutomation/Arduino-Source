@@ -19,13 +19,13 @@ public:
     ~BooleanCheckBoxCell();
     BooleanCheckBoxCell(const BooleanCheckBoxCell& x);
     BooleanCheckBoxCell(
-        LockWhileRunning lock_while_running,
+        LockMode lock_while_running,
         bool default_value, bool current_value
     );
 
 public:
     BooleanCheckBoxCell(
-        LockWhileRunning lock_while_running,
+        LockMode lock_while_running,
         bool default_value
     );
 
@@ -55,12 +55,12 @@ public:
     BooleanCheckBoxOption(const BooleanCheckBoxOption& x) = delete;
     BooleanCheckBoxOption(
         std::string label,
-        LockWhileRunning lock_while_running,
+        LockMode lock_while_running,
         bool default_value
     );
     BooleanCheckBoxOption(
         std::string label,
-        LockWhileRunning lock_while_running,
+        LockMode lock_while_running,
         bool default_value, bool value
     );
 

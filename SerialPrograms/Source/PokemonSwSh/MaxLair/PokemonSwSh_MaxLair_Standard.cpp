@@ -6,6 +6,7 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/Tools/VideoResolutionCheck.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
@@ -54,12 +55,12 @@ public:
         : ConsoleSpecificOptions(std::move(label), languages, host)
         , normal_ball(
             "<b>Normal Ball:</b> Ball for catching non-boss " + STRING_POKEMON + ".",
-            LockWhileRunning::LOCKED,
+            LockMode::LOCK_WHILE_RUNNING,
             "poke-ball"
         )
         , boss_ball(
             "<b>Boss Ball:</b> Ball for catching the boss/legendary " + STRING_POKEMON + ".",
-            LockWhileRunning::LOCKED,
+            LockMode::LOCK_WHILE_RUNNING,
             "poke-ball"
         )
         , actions(true, false)
@@ -184,6 +185,7 @@ void MaxLairStandard::program(MultiSwitchProgramEnvironment& env, CancellableSco
     }
 
     env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
+        assert_16_9_720p_min(console, console);
         if (START_LOCATION.start_in_grip_menu()){
             grip_menu_connect_go_home(context);
             resume_game_no_interact(console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);

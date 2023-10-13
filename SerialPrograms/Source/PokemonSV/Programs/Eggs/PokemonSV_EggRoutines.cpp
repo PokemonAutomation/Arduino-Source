@@ -13,13 +13,13 @@
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_ScalarButtons.h"
-#include "Pokemon/Options/Pokemon_EggHatchFilter.h"
+#include "Pokemon/Options/Pokemon_StatsHuntFilter.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxEggDetector.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxGenderDetector.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxShinyDetector.h"
-#include "PokemonSV/Inference/Boxes/PokemonSV_IVCheckerReader.h"
+#include "PokemonSV/Inference/Boxes/PokemonSV_IvJudgeReader.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxNatureDetector.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.h"
@@ -244,7 +244,7 @@ void picnic_at_zero_gate(const ProgramInfo& info, ConsoleHandle& console, BotBas
     pbf_press_button(context, BUTTON_L, 50, 40);
 
     // Move right to make player character facing away from Aera Zero observation station
-    pbf_move_left_joystick(context, 255, 0, 50, 50);
+    pbf_move_left_joystick(context, 255, 32, 50, 50);
     // Press L to move camera to face the same direction as the player character
     pbf_press_button(context, BUTTON_L, 50, 40);
     // Move forward
@@ -601,8 +601,8 @@ void reset_position_at_zero_gate(const ProgramInfo& info, ConsoleHandle& console
 
 bool check_baby_info(
     const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
-    OCR::LanguageOCROption& LANGUAGE, Pokemon::EggHatchFilterTable& FILTERS,
-    Pokemon::EggHatchAction& action
+    OCR::LanguageOCROption& LANGUAGE, Pokemon::StatsHuntIvJudgeFilterTable& FILTERS,
+    Pokemon::StatsHuntAction& action
 ){
     context.wait_for_all_requests();
 
@@ -618,8 +618,8 @@ bool check_baby_info(
     BoxShinyWatcher shiny_detector;
     // BoxShinyDetector shiny_detector;
     shiny_detector.make_overlays(overlay_set);
-
-    IVCheckerReaderScope iv_reader_scope(console.overlay(), LANGUAGE);
+    
+    IvJudgeReaderScope iv_reader_scope(console.overlay(), LANGUAGE);
     BoxGenderDetector gender_detector;
     gender_detector.make_overlays(overlay_set);
     BoxNatureDetector nature_detector(console.overlay(), LANGUAGE);
@@ -627,16 +627,16 @@ bool check_baby_info(
     const int shiny_ret = wait_until(console, context, std::chrono::milliseconds(200), {shiny_detector});
     const bool shiny = (shiny_ret == 0);
     VideoSnapshot screen = console.video().snapshot();
-
-    IVCheckerReader::Results IVs = iv_reader_scope.read(console.logger(), screen);
-    EggHatchGenderFilter gender = gender_detector.detect(screen);
+    
+    IvJudgeReader::Results IVs = iv_reader_scope.read(console.logger(), screen);
+    StatsHuntGenderFilter gender = gender_detector.detect(screen);
     NatureReader::Results nature = nature_detector.read(console.logger(), screen);
 
     console.log(IVs.to_string(), COLOR_GREEN);
     console.log("Gender: " + gender_to_string(gender), COLOR_GREEN);
     console.log("Nature: " + nature.to_string(), COLOR_GREEN);
 
-    action = FILTERS.get_action(shiny, IVs, gender, nature);
+    action = FILTERS.get_action(shiny, gender, nature.nature, IVs);
 
     return shiny;
 }

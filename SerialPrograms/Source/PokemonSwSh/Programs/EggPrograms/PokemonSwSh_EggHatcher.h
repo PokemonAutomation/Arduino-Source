@@ -12,8 +12,8 @@
 #include "Common/Cpp/Options/TimeExpressionOption.h"
 #include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
-#include "PokemonSwSh/Options/PokemonSwSh_EggStepCount.h"
-#include "PokemonSwSh_EggHelpers.h"
+#include "PokemonSwSh/Options/PokemonSwSh_EggStepOption.h"
+//#include "PokemonSwSh_EggHelpers.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

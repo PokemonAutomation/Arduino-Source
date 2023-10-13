@@ -15,7 +15,7 @@
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonBDSP/Options/PokemonBDSP_ShortcutDirection.h"
-#include "Pokemon/Options/Pokemon_EggHatchFilter.h"
+#include "Pokemon/Options/Pokemon_StatsHuntFilter.h"
 #include "PokemonBDSP_EggAutonomousState.h"
 
 namespace PokemonAutomation{
@@ -59,8 +59,8 @@ private:
         EveryBatch,
     };
     EnumDropdownOption<AutoSave> AUTO_SAVING;
-
-    Pokemon::EggHatchFilterTable FILTERS;
+    
+    Pokemon::StatsHuntIvJudgeFilterTable FILTERS;
 
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationOption NOTIFICATION_NONSHINY_KEEP;

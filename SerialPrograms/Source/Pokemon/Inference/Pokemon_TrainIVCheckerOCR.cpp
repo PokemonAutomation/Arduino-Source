@@ -9,7 +9,7 @@
 #include "CommonFramework/OCR/OCR_TrainingTools.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "Pokemon/Pokemon_Strings.h"
-#include "Pokemon_IVCheckerReader.h"
+#include "Pokemon_IvJudgeReader.h"
 #include "Pokemon_TrainIVCheckerOCR.h"
 
 namespace PokemonAutomation{
@@ -31,13 +31,13 @@ TrainIVCheckerOCR::TrainIVCheckerOCR()
     : DIRECTORY(
         false,
         "<b>Training Data Directory:</b> (Relative to \"TrainingData/\")",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         "IVCheckerOCR/",
         "IVCheckerOCR/"
     )
     , THREADS(
         "<b>Worker Threads:</b>",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         std::thread::hardware_concurrency()
     )
 {
@@ -55,8 +55,8 @@ void TrainIVCheckerOCR::program(ProgramEnvironment& env, CancellableScope& scope
         "IVCheckerOCR.json",
         MODE == TrainOCRMode::INCREMENTAL, THREADS,
         OCR::BLACK_TEXT_FILTERS(),
-        IVCheckerReader::MAX_LOG10P,
-        IVCheckerReader::MAX_LOG10P_SPREAD
+        IvJudgeReader::MAX_LOG10P,
+        IvJudgeReader::MAX_LOG10P_SPREAD
     );
 }
 

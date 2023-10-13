@@ -161,7 +161,7 @@ std::map<Language, TesseractPool> ocr_pool;
 
 std::string ocr_read(Language language, const ImageViewRGB32& image){
 //    static size_t c = 0;
-//    image.save("test-" + QString::number(c++) + ".png");
+//    image.save("ocr-" + std::to_string(c++) + ".png");
 
     std::map<Language, TesseractPool>::iterator iter;
     {

@@ -36,7 +36,7 @@ PlatformResetSettings::~PlatformResetSettings(){
     WINDOW_IN_MINUTES.remove_listener(*this);
 }
 PlatformResetSettings::PlatformResetSettings()
-    : GroupOption("Platform Reset Conditions", LockWhileRunning::UNLOCKED, true, false)
+    : GroupOption("Platform Reset Conditions", LockMode::UNLOCK_WHILE_RUNNING, true, false)
     , m_description(
         "A \"Platform Reset\" is when you fly to Zero Gate, then return to the "
         "platform. This is usually done to recover from falling off the "
@@ -50,24 +50,24 @@ PlatformResetSettings::PlatformResetSettings()
     , m_sliding_window("")
     , WINDOW_IN_MINUTES(
         "<b>Time Window (in minutes):</b><br>The sliding time window for which to watch for kills and encounters.",
-        LockWhileRunning::UNLOCKED,
+        LockMode::UNLOCK_WHILE_RUNNING,
         10
     )
     , KILLS_IN_WINDOW0(
         "<b>Kills in Window:</b><br>If the number of kills in the last X seconds has drops below this value, consider resetting.",
-        LockWhileRunning::UNLOCKED,
+        LockMode::UNLOCK_WHILE_RUNNING,
         20
     )
     , ENCOUNTERS_IN_WINDOW(
         "<b>Encounters in Window:</b><br>If the number of encounters in the last X seconds has drops below this value, consider resetting.",
-        LockWhileRunning::UNLOCKED,
+        LockMode::UNLOCK_WHILE_RUNNING,
         5
     )
 #if 0
     , RESET_DURATION_MINUTES(
         "<b>Reset Duration (minutes):</b><br>If you are resetting, reset the game every "
         "this many minutes.",
-        LockWhileRunning::UNLOCKED,
+        LockMode::UNLOCK_WHILE_RUNNING,
         180
     )
 #endif
@@ -106,27 +106,27 @@ void PlatformResetSettings::value_changed(){
 
 
 NavigatePlatformSettings::NavigatePlatformSettings()
-    : GroupOption("Navigate to Platform Settings", LockWhileRunning::UNLOCKED)
+    : GroupOption("Navigate to Platform Settings", LockMode::UNLOCK_WHILE_RUNNING)
     , m_description(
         "These settings are used when traveling from Zero Gate to the platform. "
         "This can happen either at program start or during a platform reset."
     )
     , HEAL_AT_STATION(
         "<b>Heal at Station:</b><br>If you're passing through the station, take the opportunity to heal up.",
-        LockWhileRunning::UNLOCKED,
+        LockMode::UNLOCK_WHILE_RUNNING,
         true
     )
     , STATION_ARRIVE_PAUSE_SECONDS(
         "<b>Station Arrive Pause Time:</b><br>Pause for this many seconds after leaving the station. "
         "This gives the game time to load and thus reduce the chance of lag affecting the flight path.",
-        LockWhileRunning::UNLOCKED,
+        LockMode::UNLOCK_WHILE_RUNNING,
         1
     )
     , MIDAIR_PAUSE_TIME(
         "<b>Mid-Air Pause Time:</b><br>Pause for this long before final approach to the platform. "
         "Too small and you may crash into the wall above the platform or have reduced spawns. "
         "Too large and you may undershoot the platform.",
-        LockWhileRunning::UNLOCKED,
+        LockMode::UNLOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "50"
     )
@@ -271,14 +271,14 @@ void area_zero_platform_run_path0(
 ){
     //  Go back to the wall.
     console.log("Go back to wall...");
-    clear_in_front(console, context, tracker, false, [&](BotBaseContext& context){
+    use_lets_go_to_clear_in_front(console, context, tracker, false, [&](BotBaseContext& context){
         find_and_center_on_sky(env, console, context);
         pbf_move_right_joystick(context, 128, 255, 80, 0);
         pbf_move_left_joystick(context, 176, 255, 30, 0);
         pbf_press_button(context, BUTTON_L, 20, 50);
     });
 
-    clear_in_front(console, context, tracker, false, [&](BotBaseContext& context){
+    use_lets_go_to_clear_in_front(console, context, tracker, false, [&](BotBaseContext& context){
         //  Move to wall.
         pbf_move_left_joystick(context, 128, 0, 4 * TICKS_PER_SECOND, 0);
 
@@ -291,7 +291,7 @@ void area_zero_platform_run_path0(
     //  Move forward and kill everything in your path.
     console.log("Moving towards sky and killing everything...");
     uint16_t duration = 325;
-    clear_in_front(console, context, tracker, true, [&](BotBaseContext& context){
+    use_lets_go_to_clear_in_front(console, context, tracker, true, [&](BotBaseContext& context){
         find_and_center_on_sky(env, console, context);
         pbf_move_right_joystick(context, 128, 255, 70, 0);
 
@@ -315,7 +315,7 @@ void area_zero_platform_run_path0(
         ssf_press_button(context, BUTTON_L, 0, 20);
         pbf_move_left_joystick(context, x, 0, duration, 0);
     });
-    clear_in_front(console, context, tracker, true, [&](BotBaseContext& context){
+    use_lets_go_to_clear_in_front(console, context, tracker, true, [&](BotBaseContext& context){
         pbf_move_left_joystick(context, 128, 255, duration, 4 * TICKS_PER_SECOND);
     });
 }
@@ -327,7 +327,7 @@ void area_zero_platform_run_path1(
     //  Go back to the wall.
     console.log("Go back to wall...");
     pbf_press_button(context, BUTTON_L, 20, 105);
-    clear_in_front(console, context, tracker, true, [&](BotBaseContext& context){
+    use_lets_go_to_clear_in_front(console, context, tracker, true, [&](BotBaseContext& context){
         find_and_center_on_sky(env, console, context);
         pbf_move_right_joystick(context, 128, 255, 80, 0);
         pbf_move_left_joystick(context, 192, 255, 60, 0);
@@ -336,7 +336,7 @@ void area_zero_platform_run_path1(
     //  Clear path to the wall.
     console.log("Clear path to the wall...");
     pbf_press_button(context, BUTTON_L, 20, 50);
-    clear_in_front(console, context, tracker, false, [&](BotBaseContext& context){
+    use_lets_go_to_clear_in_front(console, context, tracker, false, [&](BotBaseContext& context){
         pbf_move_left_joystick(context, 128, 0, 5 * TICKS_PER_SECOND, 0);
 
         //  Turn right.
@@ -347,7 +347,7 @@ void area_zero_platform_run_path1(
     //  Clear the wall.
     console.log("Clear the wall...");
     uint16_t duration = 325;
-    clear_in_front(console, context, tracker, true, [&](BotBaseContext& context){
+    use_lets_go_to_clear_in_front(console, context, tracker, true, [&](BotBaseContext& context){
         pbf_move_left_joystick(context, 255, 128, 125, 0);
         pbf_press_button(context, BUTTON_L, 20, 50);
         context.wait_for_all_requests();
@@ -379,7 +379,7 @@ void area_zero_platform_run_path1(
     });
 
     console.log("Run backwards and wait...");
-    clear_in_front(console, context, tracker, true, [&](BotBaseContext& context){
+    use_lets_go_to_clear_in_front(console, context, tracker, true, [&](BotBaseContext& context){
 //        pbf_move_left_joystick(context, 64, 0, 125, 0);
 //        pbf_press_button(context, BUTTON_L, 20, 105);
         pbf_move_left_joystick(context, 128, 255, duration, 4 * TICKS_PER_SECOND);
@@ -439,7 +439,7 @@ void area_zero_platform_run_path2(
     double platform_x, platform_y;
     uint16_t duration;
     uint8_t move_x, move_y;
-    clear_in_front(console, context, tracker, true, [&](BotBaseContext& context){
+    use_lets_go_to_clear_in_front(console, context, tracker, true, [&](BotBaseContext& context){
 
         console.log("Find the sky, turn around and fire.");
         pbf_move_right_joystick(context, 128, 0, 60, 0);
@@ -464,7 +464,7 @@ void area_zero_platform_run_path2(
         pbf_mash_button(context, BUTTON_L, 60);
 //        pbf_wait(context, 1250);
     });
-    clear_in_front(console, context, tracker, duration > 100, [&](BotBaseContext& context){
+    use_lets_go_to_clear_in_front(console, context, tracker, duration > 100, [&](BotBaseContext& context){
         console.log("Making location correction...");
         pbf_move_left_joystick(context, 128, 0, duration, 0);
 
@@ -484,7 +484,7 @@ void area_zero_platform_run_path2(
         console.log("Turning along wall...");
         pbf_move_left_joystick(context, 0, 255, 20, 20);
         pbf_mash_button(context, BUTTON_L, 60);
-        clear_in_front(console, context, tracker, true, [&](BotBaseContext& context){
+        use_lets_go_to_clear_in_front(console, context, tracker, true, [&](BotBaseContext& context){
             context.wait_for(std::chrono::milliseconds(1000));
 
             console.log("Turning back to sky.");
@@ -501,7 +501,7 @@ void area_zero_platform_run_path2(
         return;
     }
 
-    clear_in_front(console, context, tracker, true, [&](BotBaseContext& context){
+    use_lets_go_to_clear_in_front(console, context, tracker, true, [&](BotBaseContext& context){
         console.log("Move forward, fire, and retreat.");
         switch (iteration_count % 3){
         case 0:
@@ -516,7 +516,7 @@ void area_zero_platform_run_path2(
         }
     });
 
-    clear_in_front(console, context, tracker, true, [&](BotBaseContext& context){
+    use_lets_go_to_clear_in_front(console, context, tracker, true, [&](BotBaseContext& context){
         pbf_move_left_joystick(context, 128, 255, 4 * TICKS_PER_SECOND, 0);
         pbf_move_left_joystick(context, 128, 0, 60, 4 * TICKS_PER_SECOND);
     });

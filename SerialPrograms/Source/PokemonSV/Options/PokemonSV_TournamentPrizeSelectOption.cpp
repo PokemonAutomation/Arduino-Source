@@ -41,7 +41,7 @@ TournamentPrizeSelectCell::TournamentPrizeSelectCell(
 )
     : StringSelectCell(
         TOURNAMENT_PRIZE_SELECT_DATABASE(),
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         default_slug
     )
 {}

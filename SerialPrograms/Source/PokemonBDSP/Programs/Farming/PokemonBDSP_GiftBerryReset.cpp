@@ -79,7 +79,7 @@ GiftBerryReset::GiftBerryReset()
     , LANGUAGE(
         "<b>Game Language:</b><br>This is needed to read the berry name.",
         Pokemon::BerryNameReader::instance().languages(),
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         true
     )
     , TARGET_BERRIES(

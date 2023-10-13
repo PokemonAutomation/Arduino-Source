@@ -44,8 +44,8 @@ public:
         , shinies(m_stats["Shinies"])
     {
         m_display_order.emplace_back("Attempts");
-        m_display_order.emplace_back("Errors", true);
-        m_display_order.emplace_back("Shinies", true);
+        m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
+        m_display_order.emplace_back("Shinies", HIDDEN_IF_ZERO);
     }
     virtual void add_shiny() override{
         shinies++;
@@ -67,7 +67,7 @@ ShinyHuntFlagPin::ShinyHuntFlagPin()
         "<font color=\"red\">If you wish to ignore enroute shinies, scroll down to "
         "\"Enroute Shiny Action\" and set it to ignore shinies. "
         "Keep in mind that the shiny sound radius is 30 and you will need some headroom.</font>",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         60
     )
     , SHINY_DETECTED_ENROUTE(
@@ -96,18 +96,18 @@ ShinyHuntFlagPin::ShinyHuntFlagPin()
         "<b>Stop Distance:</b><br>"
         "Reset the game when you come within this distance of the flag. "
         "Don't set this too small. The navigation is not precise enough to land directly on the flag.",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         20
     )
     , FLAG_REACHED_DELAY(
         "<b>Target Reached Delay:</b><br>"
         "Once you have reached the flag, wait this many seconds to ensure everything loads and that any shinies are heard before resetting.",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         1.0, 0, 60
     )
     , NAVIGATION_TIMEOUT(
         "<b>Navigation Timeout:</b><br>Give up and reset if flag is not reached after this many seconds.",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         180, 0
     )
 {

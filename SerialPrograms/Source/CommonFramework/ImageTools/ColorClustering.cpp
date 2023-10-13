@@ -117,14 +117,15 @@ bool cluster_fit_2(
     double count_ratio_desired[NUM_CLUSTERS] = {ratio0, ratio1};
 
     PixelEuclideanStatAccumulator cluster[NUM_CLUSTERS];
-    double deviation = cluster_fit_2(image, color0, cluster[0], color1, cluster[1]);
+    cluster_fit_2(image, color0, cluster[0], color1, cluster[1]);
     color0 = cluster[0].center().round();
     color1 = cluster[1].center().round();
-    deviation = cluster_fit_2(image, color0, cluster[0], color1, cluster[1]);
-//    cout << "deviation = " << deviation << endl;
+    double deviation = cluster_fit_2(image, color0, cluster[0], color1, cluster[1]);
+//    cout << "deviation = " << deviation << ", threshold = " << deviation_threshold << endl;
 //    cout << cluster[0].count() << " / " << cluster[1].count() << endl;
     if (deviation > deviation_threshold){
 //        cout << "deviation out" << endl;
+//        image.save("test.png");
         return false;
     }
 

@@ -70,17 +70,17 @@ StatsResetRegi::StatsResetRegi()
     : GO_HOME_WHEN_DONE(false)
     , BALL_SELECT(
         "<b>Ball Select:</b>",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         "master-ball"
     )
     , LANGUAGE(
         "<b>Game Language:</b>",
         IV_READER().languages(),
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         true
     )
     , HP("<b>HP:</b>")
-    , ATTACK("<b>Attack:</b>", IVCheckerFilter::NoGood)
+    , ATTACK("<b>Attack:</b>", IvJudgeFilter::NoGood)
     , DEFENSE("<b>Defense:</b>")
     , SPATK("<b>Sp. Atk:</b>")
     , SPDEF("<b>Sp. Def:</b>")
@@ -203,8 +203,8 @@ void StatsResetRegi::program(SingleSwitchProgramEnvironment& env, BotBaseContext
         pbf_press_dpad  (context, DPAD_UP   , 10, 1   * TICKS_PER_SECOND);
 
         context.wait_for_all_requests();
-        IVCheckerReaderScope reader(env.console, LANGUAGE);
-        IVCheckerReader::Results results = reader.read(env.console, env.console.video().snapshot());
+        IvJudgeReaderScope reader(env.console, LANGUAGE);
+        IvJudgeReader::Results results = reader.read(env.console, env.console.video().snapshot());
         bool ok = true;
         ok &= HP.matches(stats.errors, results.hp);
         ok &= ATTACK.matches(stats.errors, results.attack);

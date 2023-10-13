@@ -17,6 +17,7 @@ class VideoOverlaySet;
 
 class StaticScreenDetector{
 public:
+    virtual ~StaticScreenDetector() = default;
     virtual void make_overlays(VideoOverlaySet& items) const = 0;
     virtual bool detect(const ImageViewRGB32& screen) const = 0;
 };
@@ -31,7 +32,7 @@ class DetectorToFinder : public Detector, public VisualInferenceCallback{
 public:
     //  Whether a finder is to find an object is detected by the detector or find
     //  that it's no longer detected.
-    enum class FinderType {
+    enum class FinderType{
         PRESENT,    //  process_frame() returns true only when detected consecutively
         GONE,       //  process_frame() returns true only when not detected consecutively
         CONSISTENT, //  process_frame() returns true when detected consecutively or not detected consecutively

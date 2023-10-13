@@ -48,12 +48,12 @@ EggFetcher::EggFetcher()
     , SHORTCUT("<b>Bike Shortcut:</b>")
     , MAX_FETCH_ATTEMPTS(
         "<b>Fetch this many times:</b><br>This puts a limit on how many eggs you can get so you don't make a mess of your boxes for fetching too many.",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         2000
     )
     , TRAVEL_TIME_PER_FETCH(
         "<b>Travel Time per Fetch:</b><br>Fetch an egg after traveling for this long.",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "15 * TICKS_PER_SECOND"
     )
@@ -95,8 +95,8 @@ void EggFetcher::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
         pbf_move_left_joystick(context, 255, 128, 60, 0);
 
         //  Fetch egg.
-        pbf_mash_button(context, BUTTON_ZL, 500);
-        pbf_mash_button(context, BUTTON_B, 500);
+        pbf_mash_button(context, BUTTON_ZL, 600);
+        pbf_mash_button(context, BUTTON_B, 520);
         pbf_move_left_joystick(context, 0, 255, 125, 0);
         SHORTCUT.run(context, 100);
 

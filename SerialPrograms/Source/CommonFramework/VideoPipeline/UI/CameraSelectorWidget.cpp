@@ -45,7 +45,6 @@ CameraSelectorWidget::CameraSelectorWidget(
 
     m_camera_box = new NoWheelComboBox(this);
     camera_row->addWidget(m_camera_box, 5);
-    update_camera_list();
     camera_row->addSpacing(5);
 
     m_resolution_box = new NoWheelComboBox(this);
@@ -87,6 +86,7 @@ CameraSelectorWidget::CameraSelectorWidget(
     connect(
         m_reset_button, &QPushButton::clicked,
         this, [this](bool){
+            update_camera_list();
             m_session.reset();
         }
     );

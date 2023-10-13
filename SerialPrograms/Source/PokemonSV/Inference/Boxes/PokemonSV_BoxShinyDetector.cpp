@@ -18,8 +18,8 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 
-BoxShinyDetector::BoxShinyDetector(Color color)
-: m_color(color), m_box{0.878, 0.081, 0.028, 0.046} {}
+BoxShinyDetector::BoxShinyDetector(Color color, const ImageFloatBox& box)
+: m_color(color), m_box(box) {}
 
 void BoxShinyDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_box);

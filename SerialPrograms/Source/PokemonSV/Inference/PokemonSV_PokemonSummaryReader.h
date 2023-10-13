@@ -12,8 +12,12 @@
 #include "CommonFramework/Inference/VisualDetector.h"
 
 namespace PokemonAutomation{
+    struct ImageStats;
 namespace NintendoSwitch{
 namespace PokemonSV{
+
+
+bool is_summary_color(const ImageStats& stats);
 
 
 

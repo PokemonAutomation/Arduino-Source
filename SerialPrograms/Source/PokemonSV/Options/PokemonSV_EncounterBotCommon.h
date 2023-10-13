@@ -23,17 +23,17 @@ using namespace Pokemon;
 class EncounterBotCommonOptions : public BatchOption{
 public:
     EncounterBotCommonOptions()
-        : BatchOption(LockWhileRunning::UNLOCKED)
+        : BatchOption(LockMode::UNLOCK_WHILE_RUNNING)
         , USE_FIRST_MOVE_IF_CANNOT_THROW_BALL(
             "<b>Use 1st Move if Cannot Throw Ball:</b><br>"
             "If you can't throw a ball because the opponent is semi-invulnerable, use the 1st move instead. "
             "Therefore, your first move should be non-damaging to avoid killing the wild " + STRING_POKEMON + ".",
-            LockWhileRunning::UNLOCKED,
+            LockMode::UNLOCK_WHILE_RUNNING,
             true
         )
         , VIDEO_ON_SHINY(
             "<b>Video Capture:</b><br>Take a video of the encounter if it is shiny.",
-            LockWhileRunning::UNLOCKED,
+            LockMode::UNLOCK_WHILE_RUNNING,
             true
         )
         , NOTIFICATION_NONSHINY(

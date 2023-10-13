@@ -7,15 +7,14 @@
 #ifndef PokemonAutomation_CommonFramework_CroppedImageDictionaryMatcher_H
 #define PokemonAutomation_CommonFramework_CroppedImageDictionaryMatcher_H
 
-#include "Common/Compiler.h"
-#include "CommonFramework/ImageTools/FloatPixel.h"
+#include <vector>
 #include "ImageMatchResult.h"
 #include "ExactImageMatcher.h"
 
 namespace PokemonAutomation{
 namespace ImageMatch{
 
-
+// Similar to `ExactImageDictionaryMatcher` but will crop the image based on background pixel colors before matching.
 class CroppedImageDictionaryMatcher{
 public:
     CroppedImageDictionaryMatcher(
@@ -29,7 +28,8 @@ public:
 
 
 protected:
-    virtual ImageRGB32 process_image(const ImageViewRGB32& image, Color& background) const = 0;
+    //  Return potential crops for this image.
+    virtual std::vector<ImageViewRGB32> get_crop_candidates(const ImageViewRGB32& image) const = 0;
 
 
 private:

@@ -49,7 +49,7 @@ struct CloneItems101_Descriptor::Stats : public StatsTracker{
         , m_errors(m_stats["Errors"])
     {
         m_display_order.emplace_back("Cloned");
-        m_display_order.emplace_back("Errors", true);
+        m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
     }
     std::atomic<uint64_t>& m_cloned;
     std::atomic<uint64_t>& m_errors;
@@ -104,7 +104,7 @@ CloneItems101::CloneItems101()
     : GO_HOME_WHEN_DONE(false)
     , ITEMS_TO_CLONE(
         "<b>Items to Clone:</b><br>Clone this many time.",
-        LockWhileRunning::UNLOCKED,
+        LockMode::UNLOCK_WHILE_RUNNING,
         999, 1, 999
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))

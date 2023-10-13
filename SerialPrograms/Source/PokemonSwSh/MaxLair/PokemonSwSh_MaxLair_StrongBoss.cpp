@@ -7,6 +7,7 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/Tools/VideoResolutionCheck.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
@@ -49,12 +50,12 @@ public:
         : ConsoleSpecificOptions(std::move(label), languages, host)
         , normal_ball(
             "<b>Normal Ball:</b> Ball for catching non-boss " + STRING_POKEMON + ".",
-            LockWhileRunning::LOCKED,
+            LockMode::LOCK_WHILE_RUNNING,
             "poke-ball"
         )
         , boss_ball(
             "<b>Boss Ball:</b> Ball for catching the boss/legendary " + STRING_POKEMON + ".",
-            LockWhileRunning::LOCKED,
+            LockMode::LOCK_WHILE_RUNNING,
             "poke-ball"
         )
         , actions_non_host(false, false)
@@ -109,7 +110,7 @@ MaxLairStrongBoss::MaxLairStrongBoss()
     , MIN_WIN_RATE(
         "<b>Minimum Win Rate:</b><br>"
         "Keep the path if the win rate stays above this ratio. This is done by resetting the host.",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         0.75, 0, 1.0
     )
     , CONSOLES(MaxLairStrongBoss_ConsoleFactory())
@@ -234,6 +235,7 @@ void MaxLairStrongBoss::program(MultiSwitchProgramEnvironment& env, CancellableS
     }
 
     env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
+        assert_16_9_720p_min(console, console);
         if (START_LOCATION.start_in_grip_menu()){
             grip_menu_connect_go_home(context);
             resume_game_no_interact(console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);

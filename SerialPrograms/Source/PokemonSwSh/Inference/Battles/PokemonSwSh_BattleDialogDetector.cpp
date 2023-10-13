@@ -32,17 +32,17 @@ void BattleDialogDetector::make_overlays(VideoOverlaySet& items) const{
 }
 bool BattleDialogDetector::detect(const ImageViewRGB32& screen) const{
     ImageStats bottom = image_stats(extract_box_reference(screen, m_bottom));
-//    cout << "bottom: " << bottom.stddev << endl;
+//    cout << "bottom: " << bottom.average << bottom.stddev << endl;
     if (!is_grey(bottom, 0, 200, 10)){
         return false;
     }
     ImageStats left = image_stats(extract_box_reference(screen, m_left));
-//    cout << "left:   " << left.stddev << endl;
+//    cout << "left:   " << left.average << left.stddev << endl;
     if (!is_grey(left, 0, 200, 5)){
         return false;
     }
     ImageStats right = image_stats(extract_box_reference(screen, m_right));
-//    cout << "right:  " << right.stddev << endl;
+//    cout << "right:  " << right.average << right.stddev << endl;
     if (!is_grey(right, 0, 200, 5)){
         return false;
     }

@@ -10,6 +10,7 @@
 #include "Common/Cpp/Options/BatchOption.h"
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
+#include "Common/Cpp/Options/ButtonOption.h"
 #include "CommonFramework/Options/StringSelectOption.h"
 #include "CommonFramework/Options/LanguageOCROption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
@@ -35,14 +36,17 @@ public:
 };
 
 
-class TestProgram : public MultiSwitchProgramInstance{
+class TestProgram : public MultiSwitchProgramInstance, public ButtonListener{
 public:
+    ~TestProgram();
     TestProgram();
 
 //    std::unique_ptr<StatsTracker> make_stats() const override{
 //        return std::unique_ptr<StatsTracker>(new StatsTracker());
 //    }
     virtual void program(MultiSwitchProgramEnvironment& env, CancellableScope& scope) override;
+
+    virtual void on_press() override;
 
 private:
     struct Stats : public StatsTracker{
@@ -55,6 +59,9 @@ private:
     };
 
 private:
+    ButtonCell BUTTON0;
+    ButtonOption BUTTON1;
+
     OCR::LanguageOCROption LANGUAGE;
 
     StaticTextOption STATIC_TEXT;

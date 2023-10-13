@@ -8,7 +8,7 @@ Source code for the "Computer Control" programs.
 
 Currently, we build with Qt 6.3. But we still retain compatibility with Qt 5.12.
 
-- [How to Build (Qt 6.3) - Windows](Build-Qt6.3.md)
+- [How to Build (Qt 6.3.2) - Windows](Build-Qt6.3.2.md)
 - [How to Build (Qt 5.12) - Windows](Build-Qt5.12.md)
 
 

@@ -58,7 +58,7 @@ void TextEditOption::report_focus_in(){
 TextEditOption::~TextEditOption() = default;
 TextEditOption::TextEditOption(
     std::string label,
-    LockWhileRunning lock_while_program_is_running,
+    LockMode lock_while_program_is_running,
     std::string default_value,
     std::string placeholder_text,
     bool signal_all_text_changes

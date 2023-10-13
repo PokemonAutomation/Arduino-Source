@@ -6,6 +6,7 @@
 
 
 #include "CommandLineTests.h"
+#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "PokemonLA_Tests.h"
 #include "TestMap.h"
@@ -47,7 +48,14 @@ void print_equals(){
 
 #define RETURN_IF_TEST_FAILED(test_func, file_path, num_passed) \
     do { \
-        int _ret = test_func(file_path); \
+        int _ret = 0; \
+        try { \
+            _ret = test_func(file_path); \
+        } catch (const std::exception& e) { \
+            cout << "Test: " << (file_path) << " threw exception: " << e.what() << endl; \
+        } catch (const Exception& e) {\
+           cout << "Test: " << (file_path) << " threw " << e.name() << ": <<<" << e.message() << ">>>" << endl; \
+        } \
         if (_ret > 0) {\
             print_equals(); \
             cout << "Test: " << (file_path) << " failed." << endl; \

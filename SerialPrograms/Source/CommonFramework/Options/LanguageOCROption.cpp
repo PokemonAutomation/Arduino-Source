@@ -21,7 +21,7 @@ namespace OCR{
 
 LanguageOCRCell::LanguageOCRCell(
     const LanguageSet& languages,
-    LockWhileRunning lock_while_running,
+    LockMode lock_while_running,
     bool required
 )
     : ConfigOption(lock_while_running)
@@ -116,7 +116,7 @@ void LanguageOCRCell::restore_defaults(){
 LanguageOCROption::LanguageOCROption(
     std::string label,
     const LanguageSet& languages,
-    LockWhileRunning lock_while_running,
+    LockMode lock_while_running,
     bool required
 )
     : LanguageOCRCell(languages, lock_while_running, required)

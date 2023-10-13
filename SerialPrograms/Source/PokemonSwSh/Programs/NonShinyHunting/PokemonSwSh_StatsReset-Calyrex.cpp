@@ -70,33 +70,33 @@ StatsResetCalyrex::StatsResetCalyrex()
     : GO_HOME_WHEN_DONE(false)
     , BALL_SELECT(
         "<b>Ball Select:</b>",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         "master-ball"
     )
     , LANGUAGE(
         "<b>Game Language:</b>",
         IV_READER().languages(),
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         true
     )
     , CHECK_CALYREX_STATS(
         "<b>Check Calyrex stats</b>",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         true
     )
     , CALYREX_HP("<b>Calyrex HP:</b>")
-    , CALYREX_ATTACK("<b>Calyrex Attack:</b>", IVCheckerFilter::NoGood)
+    , CALYREX_ATTACK("<b>Calyrex Attack:</b>", IvJudgeFilter::NoGood)
     , CALYREX_DEFENSE("<b>Calyrex Defense:</b>")
     , CALYREX_SPATK("<b>Calyrex Sp. Atk:</b>")
     , CALYREX_SPDEF("<b>Calyrex Sp. Def:</b>")
     , CALYREX_SPEED("<b>Calyrex Speed:</b>")
     , CHECK_HORSE_STATS(
         "<b>Check Horse stats</b>",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         true
     )
     , HORSE_HP("<b>Horse HP:</b>")
-    , HORSE_ATTACK("<b>Horse Attack:</b>", IVCheckerFilter::NoGood)
+    , HORSE_ATTACK("<b>Horse Attack:</b>", IvJudgeFilter::NoGood)
     , HORSE_DEFENSE("<b>Horse Defense:</b>")
     , HORSE_SPATK("<b>Horse Sp. Atk:</b>")
     , HORSE_SPDEF("<b>Horse Sp. Def:</b>")
@@ -248,8 +248,8 @@ void StatsResetCalyrex::program(SingleSwitchProgramEnvironment& env, BotBaseCont
 
         if (CHECK_HORSE_STATS){
             context.wait_for_all_requests();
-            IVCheckerReaderScope reader(env.console, LANGUAGE);
-            IVCheckerReader::Results results = reader.read(env.console, env.console.video().snapshot());
+            IvJudgeReaderScope reader(env.console, LANGUAGE);
+            IvJudgeReader::Results results = reader.read(env.console, env.console.video().snapshot());
             bool horse_ok = true;
             horse_ok &= HORSE_HP.matches(stats.errors, results.hp);
             horse_ok &= HORSE_ATTACK.matches(stats.errors, results.attack);
@@ -264,9 +264,9 @@ void StatsResetCalyrex::program(SingleSwitchProgramEnvironment& env, BotBaseCont
         if (CHECK_CALYREX_STATS){
             pbf_press_dpad(context, DPAD_UP, 10, 1 * TICKS_PER_SECOND);
             context.wait_for_all_requests();
-
-            IVCheckerReaderScope reader(env.console, LANGUAGE);
-            IVCheckerReader::Results results = reader.read(env.console, env.console.video().snapshot());
+            
+            IvJudgeReaderScope reader(env.console, LANGUAGE);
+            IvJudgeReader::Results results = reader.read(env.console, env.console.video().snapshot());
             bool calyrex_ok = true;
             calyrex_ok &= CALYREX_HP.matches(stats.errors, results.hp);
             calyrex_ok &= CALYREX_ATTACK.matches(stats.errors, results.attack);

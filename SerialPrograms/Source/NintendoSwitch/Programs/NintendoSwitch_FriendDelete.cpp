@@ -28,29 +28,29 @@ FriendDelete_Descriptor::FriendDelete_Descriptor()
 FriendDelete::FriendDelete()
     : FRIENDS_TO_DELETE(
         "<b>Number of Friends to Delete:</b>",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         3, 0, 300
     )
     , BLOCK_FRIENDS(
         "<b>Block Friends:</b><br>Block instead of delete!",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         false
     )
     , VIEW_FRIEND_DELAY(
         "<b>View Friend Delay:</b><br>Delay from opening a friend to when you can press buttons.",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "2 * TICKS_PER_SECOND"
     )
     , DELETE_FRIEND_DELAY(
         "<b>Delete Friend Delay:</b><br>Delay to delete the friend.",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "8 * TICKS_PER_SECOND"
     )
     , FINISH_DELETE_DELAY(
         "<b>Finish Delete Delay:</b><br>Delay after deleting a friend.",
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "2 * TICKS_PER_SECOND"
     )

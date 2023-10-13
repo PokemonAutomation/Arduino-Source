@@ -34,7 +34,7 @@ public:
                 {RegiGolem::Regieleki,  "regieleki", "Regieleki"},
                 {RegiGolem::Regidrago,  "regidrago", "Regidrago"},
             },
-            LockWhileRunning::LOCKED,
+            LockMode::LOCK_WHILE_RUNNING,
             RegiGolem::Registeel
         )
     {}

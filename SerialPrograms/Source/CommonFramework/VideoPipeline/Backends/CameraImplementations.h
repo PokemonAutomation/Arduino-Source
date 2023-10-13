@@ -36,11 +36,11 @@ public:
 };
 
 
+const CameraBackend& get_camera_backend();
 
 std::vector<CameraInfo> get_all_cameras();
 std::string get_camera_name(const CameraInfo& info);
 
-const CameraBackend& get_camera_backend();
 
 
 

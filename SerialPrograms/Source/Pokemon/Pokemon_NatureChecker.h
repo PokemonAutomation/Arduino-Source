@@ -16,66 +16,79 @@ namespace Pokemon{
 
 enum class NatureCheckerValue{
     UnableToDetect,
+//    Any,
+
     Neutral,
-    Any,
-    Adamant,
+
     Bashful,
-    Bold,
-    Brave,
-    Calm,
-    Careful,
     Docile,
-    Gentle,
     Hardy,
-    Hasty,
-    Impish,
-    Jolly,
-    Lax,
+    Quirky,
+    Serious,
+
+    Bold,
+    Modest,
+    Calm,
+    Timid,
+
     Lonely,
     Mild,
-    Modest,
-    Naive,
+    Gentle,
+    Hasty,
+
+    Adamant,
+    Impish,
+    Careful,
+    Jolly,
+
     Naughty,
-    Quiet,
-    Quirky,
+    Lax,
     Rash,
+    Naive,
+
+    Brave,
     Relaxed,
+    Quiet,
     Sassy,
-    Serious,
-    Timid
 };
 const EnumDatabase<NatureCheckerValue>& NatureCheckerValue_Database();
 NatureCheckerValue NatureCheckerValue_string_to_enum(const std::string& token);
 NatureCheckerValue NatureCheckerValue_helphinder_to_enum(const std::pair<int,int>& token);
 
 
-enum class NatureCheckerFilter {
+enum class NatureCheckerFilter{
     Any,
-    Adamant,
+
     Bashful,
-    Bold,
-    Brave,
-    Calm,
-    Careful,
     Docile,
-    Gentle,
     Hardy,
-    Hasty,
-    Impish,
-    Jolly,
-    Lax,
+    Quirky,
+    Serious,
+
+    Bold,
+    Modest,
+    Calm,
+    Timid,
+
     Lonely,
     Mild,
-    Modest,
-    Naive,
+    Gentle,
+    Hasty,
+
+    Adamant,
+    Impish,
+    Careful,
+    Jolly,
+
     Naughty,
-    Quiet,
-    Quirky,
+    Lax,
     Rash,
+    Naive,
+
+    Brave,
     Relaxed,
+    Quiet,
     Sassy,
-    Serious,
-    Timid
 };
 
 const EnumDatabase<NatureCheckerFilter>& NatureCheckerFilter_Database();

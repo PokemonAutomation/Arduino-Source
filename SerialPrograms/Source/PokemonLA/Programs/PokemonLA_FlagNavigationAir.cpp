@@ -302,14 +302,14 @@ bool FlagNavigationAir::run_state(AsyncCommandSession& commands, WallClock times
     }
     if (m_dialog_detector.detected()){
         throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, m_console,
+            ErrorReport::NO_ERROR_REPORT, m_console,
             "Potential ambush by Miss Fortune sister.",
             true
         );
     }
     if (m_find_flag_failed.load(std::memory_order_acquire)){
         throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, m_console,
+            ErrorReport::NO_ERROR_REPORT, m_console,
             "Unable to find flag.",
             true
         );

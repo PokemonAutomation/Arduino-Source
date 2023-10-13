@@ -19,13 +19,36 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 
+enum VideoFceOcrMethod{
+    RAW_OCR,
+    BLACK_TEXT,
+    WHITE_TEXT,
+    TERA_CARD,
+};
+class VideoFceSettings : public GroupOption{
+public:
+    VideoFceSettings();
+
+public:
+    EnumDropdownOption<VideoFceOcrMethod> OCR_METHOD;
+    BooleanCheckBoxOption SKIP_INITIAL_CODE;
+};
+
+void wait_for_video_code_and_join(
+    MultiSwitchProgramEnvironment& env, CancellableScope& scope,
+    ScreenWatchOption& screen_watcher,
+    VideoFceSettings& join_method,
+    FastCodeEntrySettingsOption& fce_settings
+);
+
+
+
+
 
 class VideoFastCodeEntry_Descriptor : public MultiSwitchProgramDescriptor{
 public:
     VideoFastCodeEntry_Descriptor();
 };
-
-
 
 
 class VideoFastCodeEntry : public MultiSwitchProgramInstance{
@@ -44,15 +67,9 @@ private:
 
     BooleanCheckBoxOption SKIP_CONNECT_TO_CONTROLLER;
 
-    enum OcrMethod{
-        RAW_OCR,
-        BLACK_TEXT,
-        WHITE_TEXT,
-        TERA_CARD,
-    };
-    EnumDropdownOption<OcrMethod> OCR_METHOD;
+    VideoFceSettings JOIN_METHOD;
 
-    FastCodeEntrySettingsOption SETTINGS;
+    FastCodeEntrySettingsOption FCE_SETTINGS;
     EventNotificationsOption NOTIFICATIONS;
 };
 

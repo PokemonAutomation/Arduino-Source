@@ -62,8 +62,6 @@ private:
 };
 
 
-
-//
 //  Consider a virtual timeline that starts and stops relative to the wall clock.
 //  Now you want to get the last X seconds of the virtual timeline, but on the
 //  wall clock instead. Because of the starts and stops, the last X seconds
@@ -89,9 +87,6 @@ private:
 };
 
 
-
-
-
 class LetsGoEncounterBotStats : public StatsTracker{
 public:
     LetsGoEncounterBotStats()
@@ -109,8 +104,6 @@ public:
     std::atomic<uint64_t>& m_encounters;
     std::atomic<uint64_t>& m_shinies;
 };
-
-
 
 
 
@@ -148,8 +141,10 @@ public:
     }
 
     //  Returns true if you should save the game.
-    bool process_battle(EncounterWatcher& watcher, EncounterBotCommonOptions& settings);
-
+    void process_battle(
+        bool& caught, bool& should_save,
+        EncounterWatcher& watcher, EncounterBotCommonOptions& settings
+    );
 
 private:
     ProgramEnvironment& m_env;
@@ -174,7 +169,7 @@ private:
 //  chain has ended.
 //  The function tracks kill chain by sound detection from `tracker`. The function
 //  does not handle any pokemon battle encounters (turn-based battles).
-bool clear_in_front(
+bool use_lets_go_to_clear_in_front(
     ConsoleHandle& console, BotBaseContext& context,
     LetsGoEncounterBotTracker& tracker,
     bool throw_ball_if_bubble,

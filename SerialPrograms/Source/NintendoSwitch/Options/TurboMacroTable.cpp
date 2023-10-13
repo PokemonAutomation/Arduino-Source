@@ -68,13 +68,13 @@ void TurboMacroCell::operator=(const TurboMacroCell& x){
     wait_ticks.set(x.wait_ticks);
 }
 TurboMacroCell::TurboMacroCell(EnumDropdownCell<TurboMacroAction>& action)
-    : BatchOption(LockWhileRunning::LOCKED, true)
+    : BatchOption(LockMode::LOCK_WHILE_RUNNING, true)
     , m_action(action)
-    , x_axis("X:", LockWhileRunning::LOCKED, 128)
-    , y_axis("Y:", LockWhileRunning::LOCKED, 128)
-    , button_hold_ticks("Ticks to Hold:", LockWhileRunning::LOCKED, 250)
-    , button_release_ticks("Ticks to Release:", LockWhileRunning::LOCKED, 250)
-    , wait_ticks("Ticks to Wait:", LockWhileRunning::LOCKED, 125)
+    , x_axis("X:", LockMode::LOCK_WHILE_RUNNING, 128)
+    , y_axis("Y:", LockMode::LOCK_WHILE_RUNNING, 128)
+    , button_hold_ticks("Ticks to Hold:", LockMode::LOCK_WHILE_RUNNING, 250)
+    , button_release_ticks("Ticks to Release:", LockMode::LOCK_WHILE_RUNNING, 250)
+    , wait_ticks("Ticks to Wait:", LockMode::LOCK_WHILE_RUNNING, 125)
 {
     PA_ADD_OPTION(x_axis);
     PA_ADD_OPTION(y_axis);
@@ -127,7 +127,7 @@ void TurboMacroCell::value_changed(){
 
 
 TurboMacroRow::TurboMacroRow()
-    : action(TurboMacroAction_Database(), LockWhileRunning::LOCKED, TurboMacroAction::NO_ACTION)
+    : action(TurboMacroAction_Database(), LockMode::LOCK_WHILE_RUNNING, TurboMacroAction::NO_ACTION)
     , parameters(action)
 {
     PA_ADD_OPTION(action);
@@ -248,7 +248,7 @@ TurboMacroTable::TurboMacroTable()
         "<b>Custom Macro Table:</b><br>"
         "Set a list of button press to create a macro. 125 ticks = 1 second. Joystick direction is specified by (x, y).<br>"
         "x = 0 is left, x = 255 is right. y = 0 is up, y = 255 is down. 128 is neutral for both. Ex. Move joystick fully left would be (0, 128). Move joystick up-right would be (255, 0).",
-        LockWhileRunning::LOCKED
+        LockMode::LOCK_WHILE_RUNNING
     )
 {}
 std::vector<std::string> TurboMacroTable::make_header() const{

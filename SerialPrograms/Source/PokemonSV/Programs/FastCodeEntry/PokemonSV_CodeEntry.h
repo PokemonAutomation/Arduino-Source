@@ -20,18 +20,20 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 
-const char* normalize_code(std::string& normalized_code, const std::string& code);
+const char* normalize_code(std::string& normalized_code, const std::string& code, bool override_mode = false);
 
 void enter_code(
-    ConsoleHandle& console, BotBaseContext& context,
+    Logger& logger, BotBaseContext& context,
     const FastCodeEntrySettings& settings, const std::string& normalized_code,
-    bool connect_controller_press
+    bool connect_controller_press,
+    bool override_mode = false
 );
 
 const char* enter_code(
     MultiSwitchProgramEnvironment& env, CancellableScope& scope,
     const FastCodeEntrySettings& settings, const std::string& code,
-    bool connect_controller_press
+    bool connect_controller_press,
+    bool override_mode = false
 );
 
 

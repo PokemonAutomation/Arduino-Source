@@ -11,8 +11,9 @@
 #include "CommonFramework/Options/LanguageOCROption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
+#include "Pokemon/Options/Pokemon_StatsHuntFilter.h"
 #include "PokemonSwSh/Options/PokemonSwSh_BallSelectOption.h"
-#include "Pokemon/Options/Pokemon_StatsResetFilter.h"
+#include "PokemonSV/Options/PokemonSV_BattleMoveTable.h"
 
 namespace PokemonAutomation {
 namespace NintendoSwitch {
@@ -35,17 +36,25 @@ private:
     //Can expand targets assuming there's anything else not locked in the DLC
     enum class Target {
         TreasuresOfRuin,
+        LoyalThree,
         Generic,
     };
     EnumDropdownOption<Target> TARGET;
 
     OCR::LanguageOCROption LANGUAGE;
     PokemonSwSh::PokemonBallSelectOption BALL_SELECT;
-    Pokemon::StatsResetFilterTable FILTERS;
+    BooleanCheckBoxOption QUICKBALL;
+    BattleMoveTable BATTLE_MOVES;
+    Pokemon::StatsHuntIvJudgeFilterTable FILTERS;
 
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;
+
+    void enter_battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    void open_ball_menu(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    bool run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    bool check_stats(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 };
 
 }

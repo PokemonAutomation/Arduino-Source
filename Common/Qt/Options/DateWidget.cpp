@@ -31,6 +31,9 @@ DateWidget::DateWidget(QWidget& parent, DateOption& value)
     layout->setContentsMargins(0, 0, 0, 0);
     QLabel* text = new QLabel(QString::fromStdString(value.label()), this);
     text->setWordWrap(true);
+    text->setTextFormat(Qt::RichText);
+    text->setTextInteractionFlags(Qt::TextBrowserInteraction);
+    text->setOpenExternalLinks(true);
     layout->addWidget(text, 1);
 
     m_date_edit = new QDateEdit(m_value.get());

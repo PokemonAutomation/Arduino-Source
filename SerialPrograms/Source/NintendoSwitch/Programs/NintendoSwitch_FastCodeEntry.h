@@ -10,7 +10,7 @@
 #include <stdint.h>
 #include <string>
 #include <vector>
-#include "Common/Cpp/Options/BatchOption.h"
+#include "Common/Cpp/Options/GroupOption.h"
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/TimeExpressionOption.h"
@@ -28,9 +28,9 @@ enum class KeyboardLayout{
     AZERTY
 };
 
-class FastCodeEntrySettingsOption : public BatchOption{
+class FastCodeEntrySettingsOption : public GroupOption{
 public:
-    FastCodeEntrySettingsOption();
+    FastCodeEntrySettingsOption(LockMode lock_while_program_is_running);
 
 public:
     EnumDropdownOption<KeyboardLayout> KEYBOARD_LAYOUT;
@@ -79,7 +79,7 @@ struct FastCodeEntrySettings{
     bool digit_reordering = false;
 
     FastCodeEntrySettings() = default;
-    FastCodeEntrySettings(FastCodeEntrySettingsOption& option);
+    FastCodeEntrySettings(const FastCodeEntrySettingsOption& option);
 };
 void enter_alphanumeric_code(
     Logger& logger,

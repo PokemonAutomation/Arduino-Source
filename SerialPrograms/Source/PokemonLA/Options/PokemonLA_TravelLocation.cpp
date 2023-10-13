@@ -16,7 +16,7 @@ TravelLocationOption::TravelLocationOption()
     : IntegerEnumDropdownOption(
         "<b>Start Location:</b><br>Travel from this location.",
         TravelLocations::instance().database(),
-        LockWhileRunning::LOCKED,
+        LockMode::LOCK_WHILE_RUNNING,
         0
     )
 {}

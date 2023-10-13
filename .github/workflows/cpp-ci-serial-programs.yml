@@ -10,7 +10,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [windows-2022, macos-12, ubuntu-22.04]
-        qt_version: ['5.12.12', '6.3.2', '6.5.0']
+        qt_version: ['5.12.12', '6.3.2', '6.5.2']
         include:
         # Windows / Qt 5.12.12
         - os: windows-2022
@@ -32,9 +32,9 @@ jobs:
           qt_arch_path: 'msvc2019_64'
           qt_modules: '-m qtmultimedia qtserialport'
 
-        # Windows / Qt 6.5.0
+        # Windows / Qt 6.5.2
         - os: windows-2022
-          qt_version: '6.5.0'
+          qt_version: '6.5.2'
           qt_version_major: '6'
           host: 'windows'
           cmake_args: '-G "Visual Studio 17 2022"'
@@ -62,9 +62,9 @@ jobs:
           qt_arch_path: 'macos'
           qt_modules: '-m qtmultimedia qtserialport'
 
-          # Mac / Qt 6.5.0
+          # Mac / Qt 6.5.2
         - os: macos-12
-          qt_version: '6.5.0'
+          qt_version: '6.5.2'
           qt_version_major: '6'
           host: 'mac'
           cmake_args: ''
@@ -92,9 +92,9 @@ jobs:
           qt_arch_path: gcc_64
           qt_modules: '-m qtmultimedia qtserialport'
 
-          # Linux / Qt 6.5.0
+          # Linux / Qt 6.5.2
         - os: ubuntu-22.04
-          qt_version: '6.5.0'
+          qt_version: '6.5.2'
           qt_version_major: '6'
           host: 'linux'
           cmake_args: ''

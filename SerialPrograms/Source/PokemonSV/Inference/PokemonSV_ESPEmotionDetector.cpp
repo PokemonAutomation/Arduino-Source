@@ -97,6 +97,34 @@ bool ESPShowNewEmotionDetector::process_frame(const ImageViewRGB32& frame, WallC
     return detect(frame);
 }
 
+ESPPressedEmotionDetector::ESPPressedEmotionDetector()
+    : VisualInferenceCallback("ESPPressedEmotionDetector")
+    , m_left_box(0.851, 0.753, 0.015, 0.026)
+    , m_right_box(0.943, 0.850, 0.021, 0.022)
+    , m_top_box(0.874, 0.712, 0.014, 0.035)
+    , m_bottom_box(0.924, 0.884, 0.016, 0.027)
+{}
+void ESPPressedEmotionDetector::make_overlays(VideoOverlaySet& items) const {
+    items.add(COLOR_RED, m_left_box);
+    items.add(COLOR_RED, m_right_box);
+    items.add(COLOR_RED, m_top_box);
+    items.add(COLOR_RED, m_bottom_box);
+}
+bool ESPPressedEmotionDetector::detect(const ImageViewRGB32& frame) {
+    ImageViewRGB32 left_image = extract_box_reference(frame, m_left_box);
+    ImageViewRGB32 right_image = extract_box_reference(frame, m_right_box);
+    ImageViewRGB32 top_image = extract_box_reference(frame, m_top_box);
+    ImageViewRGB32 bottom_image = extract_box_reference(frame, m_bottom_box);
+    if (is_solid(left_image, { 0.506, 0.439, 0.054 }, 0.2, 15) || is_solid(right_image, { 0.506, 0.439, 0.054 }, 0.2, 15)
+        || is_solid(top_image, { 0.506, 0.439, 0.054 }, 0.2, 15) || is_solid(bottom_image, { 0.506, 0.439, 0.054 }, 0.2, 15)) {
+        return true;
+    }
+    return false;
+}
+bool ESPPressedEmotionDetector::process_frame(const ImageViewRGB32& frame, WallClock timestamp) {
+    return detect(frame);
+}
+
 }
 }
 }
