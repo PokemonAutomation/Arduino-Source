@@ -123,6 +123,7 @@ TeraSelfFarmer::TeraSelfFarmer()
         PokemonNameReader::instance().languages(),
         LockMode::UNLOCK_WHILE_RUNNING
     )
+    , FILTER(4, true)
     , PERIODIC_RESET(
         "<b>Periodic Game Reset:</b><br>Reset the game after this many skips. This clears up the framerate bug.",
         LockMode::UNLOCK_WHILE_RUNNING,

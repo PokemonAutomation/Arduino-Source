@@ -44,7 +44,7 @@ struct TeraRaidData{
 
 class TeraRollFilter : public GroupOption{
 public:
-    TeraRollFilter();
+    TeraRollFilter(uint8_t default_max_stars, bool enable_herb_filter);
 
     virtual std::string check_validity() const override;
 

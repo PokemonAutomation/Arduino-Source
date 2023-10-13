@@ -21,7 +21,7 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 
-TeraRollFilter::TeraRollFilter()
+TeraRollFilter::TeraRollFilter(uint8_t default_max_stars, bool enable_herb_filter)
     : GroupOption("Opponent Filter", LockMode::UNLOCK_WHILE_RUNNING)
     , EVENT_CHECK_MODE(
         "<b>Event Tera Raid Action:</b><br>Choose how the program interacts with event/non-event raids."
@@ -42,7 +42,7 @@ TeraRollFilter::TeraRollFilter()
     , MAX_STARS(
         "<b>Max Stars:</b><br>Skip raids with more than this many stars.",
         LockMode::UNLOCK_WHILE_RUNNING,
-        4, 1, 7
+        default_max_stars, 1, 7
     )
     , SKIP_NON_HERBA(
         "<b>Skip Non-Herba Raids:</b><br>"
@@ -54,7 +54,9 @@ TeraRollFilter::TeraRollFilter()
     PA_ADD_OPTION(EVENT_CHECK_MODE);
     PA_ADD_OPTION(MIN_STARS);
     PA_ADD_OPTION(MAX_STARS);
-    PA_ADD_OPTION(SKIP_NON_HERBA);
+    if (enable_herb_filter){
+        PA_ADD_OPTION(SKIP_NON_HERBA);
+    }
 }
 
 std::string TeraRollFilter::check_validity() const{

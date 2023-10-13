@@ -87,7 +87,8 @@ std::unique_ptr<StatsTracker> TeraRoller_Descriptor::make_stats() const{
 
 
 TeraRoller::TeraRoller()
-    : CHECK_ONLY_FIRST(
+    : FILTER0(7, false)
+    , CHECK_ONLY_FIRST(
           "<b>Check Only the First Pokédex Page:</b><br>Reduce time per reset at the expense of not checking repeated encounters.",
         LockMode::UNLOCK_WHILE_RUNNING,
           false
@@ -112,7 +113,7 @@ TeraRoller::TeraRoller()
         &NOTIFICATION_ERROR_FATAL,
     })
 {
-    PA_ADD_OPTION(FILTER);
+    PA_ADD_OPTION(FILTER0);
     PA_ADD_OPTION(CHECK_ONLY_FIRST);
     PA_ADD_OPTION(PERIODIC_RESET);
     PA_ADD_OPTION(NOTIFICATIONS);
@@ -154,7 +155,7 @@ void TeraRoller::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
         }
 
         TeraRaidData raid_data;
-        TeraRollFilter::FilterResult result = FILTER.run_filter(
+        TeraRollFilter::FilterResult result = FILTER0.run_filter(
             env.program_info(), env.console, context,
             raid_data
         );
