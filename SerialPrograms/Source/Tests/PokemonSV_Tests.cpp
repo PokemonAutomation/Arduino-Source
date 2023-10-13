@@ -459,6 +459,9 @@ int test_pokemonSV_DialogBoxDetector(const ImageViewRGB32& image, bool target) {
 int test_pokemonSV_MapPokeCenterIconDetector(const ImageViewRGB32& image, int target) {
     MapPokeCenterIconDetector detector(COLOR_RED, MAP_READABLE_AREA);
     const auto result = detector.detect_all(image);
+    for(const auto& box : result){
+        std::cout << "Box: x=" << box.x << ", y=" << box.y << ", width=" << box.width << ", height=" << box.height << std::endl;
+    }
     TEST_RESULT_EQUAL(int(result.size()), target);
 
     // auto new_image = image.copy();

@@ -542,8 +542,8 @@ bool detect_closest_pokecenter_and_move_map_cursor_there(const ProgramInfo& info
     const double magnitude = std::max(std::sqrt(max_dist), 1.0);
     const double push_x = dif_x * 64 / magnitude, push_y = dif_y * 64 / magnitude;
 
-    // 0.5 is too large, 0.25 a little too small
-    const double scale = 0.30;
+    // 0.5 is too large, 0.25 a little too small, 0.30 is a bit too much for a far-away pokecenter
+    const double scale = 0.29;
 
     const uint8_t move_x = uint8_t(std::max(std::min(int(round(push_x + 128) + 0.5), 255), 0));
     const uint8_t move_y = uint8_t(std::max(std::min(int(round(push_y + 128) + 0.5), 255), 0));

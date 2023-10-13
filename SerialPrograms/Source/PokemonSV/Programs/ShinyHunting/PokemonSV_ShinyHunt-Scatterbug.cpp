@@ -317,7 +317,7 @@ void ShinyHuntScatterbug::run_one_sandwich_iteration(SingleSwitchProgramEnvironm
 
     // Which path to choose starting at the PokeCenter.
     size_t path_id = 0;
-    const size_t num_paths = 3;
+    const size_t num_paths = 2;
 
     LetsGoHpWatcher hp_watcher(COLOR_RED);
     // In each iteration of this while-loop, it picks a path starting from the pokecenter or the
@@ -373,26 +373,39 @@ void ShinyHuntScatterbug::run_lets_go_iteration(SingleSwitchProgramEnvironment& 
     // to this location.
     pbf_press_button(context, BUTTON_L, 50, 40);
 
-    if (path_id == 1){
-        // move west
+    const bool throw_ball_if_bubble = true;
+
+    auto move_forward_with_lets_go = [&](int num_iterations){
+        for(int i = 0; i < num_iterations; i++){
+            use_lets_go_to_clear_in_front(console, context, *m_encounter_tracker, throw_ball_if_bubble, [&](BotBaseContext& context){
+                // Do the following movement while the Let's Go pokemon clearing wild pokemon.
+                // Slowly Moving forward
+                pbf_move_left_joystick(context, 128, 105, 800, 0);
+            });
+        }
+    };
+
+    if (path_id == 0){
+        // move rightward, to the west
         pbf_move_left_joystick(context, 255, 128, 100, 20);
         // Align camera
         pbf_press_button(context, BUTTON_L, 50, 40);
-    } else if (path_id == 2){
-        // move east
+
+        move_forward_with_lets_go(10);
+    } else { // path_id == 1
+        // move leftward, to the east
         pbf_move_left_joystick(context, 0, 128, 100, 20);
         // Align camera
         pbf_press_button(context, BUTTON_L, 50, 40);
-    }
 
-    const bool throw_ball_if_bubble = true;
+        move_forward_with_lets_go(5);
 
-    for(int i = 0; i < 5; i++){
-        use_lets_go_to_clear_in_front(console, context, *m_encounter_tracker, throw_ball_if_bubble, [&](BotBaseContext& context){
-            // Do the following movement while the Let's Go pokemon clearing wild pokemon.
-            // Slowly Moving forward
-            pbf_move_left_joystick(context, 128, 105, 800, 0);
-        });
+        // move rightward, to south
+        pbf_move_left_joystick(context, 255, 128, 50, 20);
+        // Align camera
+        pbf_press_button(context, BUTTON_L, 50, 40);
+
+        move_forward_with_lets_go(5);
     }
 }
 
