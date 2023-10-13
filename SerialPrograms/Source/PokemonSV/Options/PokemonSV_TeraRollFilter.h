@@ -44,9 +44,9 @@ struct TeraRaidData{
 
 class TeraRollFilter : public GroupOption{
 public:
-    TeraRollFilter();
+    TeraRollFilter(uint8_t default_max_stars, bool enable_herb_filter);
 
-    void start_program_check(Logger& logger) const;
+    virtual std::string check_validity() const override;
 
     enum class FilterResult{
         NO_RAID,
@@ -78,7 +78,7 @@ public:
     SimpleIntegerOption<uint8_t> MIN_STARS;
     SimpleIntegerOption<uint8_t> MAX_STARS;
 
-    BooleanCheckBoxOption SKIP_HERBA;
+    BooleanCheckBoxOption SKIP_NON_HERBA;
 };
 
 

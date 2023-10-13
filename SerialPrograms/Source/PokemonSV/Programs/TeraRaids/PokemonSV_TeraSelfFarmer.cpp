@@ -123,6 +123,7 @@ TeraSelfFarmer::TeraSelfFarmer()
         PokemonNameReader::instance().languages(),
         LockMode::UNLOCK_WHILE_RUNNING
     )
+    , FILTER(4, true)
     , PERIODIC_RESET(
         "<b>Periodic Game Reset:</b><br>Reset the game after this many skips. This clears up the framerate bug.",
         LockMode::UNLOCK_WHILE_RUNNING,
@@ -225,7 +226,7 @@ void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
         throw UserSetupError(env.console, "Error in the settings, \"Min Stars\" is bigger than \"Max Stars\".");
     }
 
-    if (FILTER.SKIP_HERBA && FILTER.MAX_STARS < 5){
+    if (FILTER.SKIP_NON_HERBA && FILTER.MAX_STARS < 5){
         throw UserSetupError(env.console, "Error in the settings, Skip Non-Herba Raids is checked but Max Stars is less than 5.");
     }
 

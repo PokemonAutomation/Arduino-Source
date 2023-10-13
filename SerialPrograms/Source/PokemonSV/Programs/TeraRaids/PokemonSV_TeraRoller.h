@@ -37,7 +37,7 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
-    TeraRollFilter FILTER;
+    TeraRollFilter FILTER0;
 
     BooleanCheckBoxOption CHECK_ONLY_FIRST;
     SimpleIntegerOption<uint8_t> PERIODIC_RESET;

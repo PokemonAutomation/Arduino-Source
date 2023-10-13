@@ -21,7 +21,7 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 
-TeraRollFilter::TeraRollFilter()
+TeraRollFilter::TeraRollFilter(uint8_t default_max_stars, bool enable_herb_filter)
     : GroupOption("Opponent Filter", LockMode::UNLOCK_WHILE_RUNNING)
     , EVENT_CHECK_MODE(
         "<b>Event Tera Raid Action:</b><br>Choose how the program interacts with event/non-event raids."
@@ -42,9 +42,9 @@ TeraRollFilter::TeraRollFilter()
     , MAX_STARS(
         "<b>Max Stars:</b><br>Skip raids with more than this many stars.",
         LockMode::UNLOCK_WHILE_RUNNING,
-        4, 1, 7
+        default_max_stars, 1, 7
     )
-    , SKIP_HERBA(
+    , SKIP_NON_HERBA(
         "<b>Skip Non-Herba Raids:</b><br>"
         "Skip raids that don't have the possibility to reward all types of Herba Mystica. Enable this if you are searching for an herba raid.",
         LockMode::UNLOCK_WHILE_RUNNING,
@@ -54,13 +54,24 @@ TeraRollFilter::TeraRollFilter()
     PA_ADD_OPTION(EVENT_CHECK_MODE);
     PA_ADD_OPTION(MIN_STARS);
     PA_ADD_OPTION(MAX_STARS);
-    PA_ADD_OPTION(SKIP_HERBA);
+    if (enable_herb_filter){
+        PA_ADD_OPTION(SKIP_NON_HERBA);
+    }
 }
 
-void TeraRollFilter::start_program_check(Logger& logger) const{
+std::string TeraRollFilter::check_validity() const{
     if (MIN_STARS > MAX_STARS){
-        throw UserSetupError(logger, "Error in the settings, \"Min Stars\" is bigger than \"Max Stars\".");
+        return "\"Min Stars\" is bigger than \"Max Stars\".";
     }
+    if (SKIP_NON_HERBA && MAX_STARS < 5){
+        return
+            "Setting \"Max Stars\" below 5 and \"Skip Herba\" to "
+            "true will never yield results because all herb raids are 5-star or higher.";
+    }
+    if (SKIP_NON_HERBA && EVENT_CHECK_MODE == EventCheckMode::CHECK_ONLY_EVENT){
+        return "\"Check only event raids\" and \"Skip Non-Herba Raids\" is incompatible because only non-event raids can have all herbs.";
+    }
+    return "";
 }
 
 TeraRollFilter::FilterResult TeraRollFilter::run_filter(
@@ -175,7 +186,7 @@ void TeraRollFilter::read_card(
     console.log(log);
 }
 bool TeraRollFilter::check_herba(const std::string& pokemon_slug) const{
-    if (!SKIP_HERBA){
+    if (!SKIP_NON_HERBA){
         return true;
     }
 
