@@ -225,7 +225,7 @@ void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
         throw UserSetupError(env.console, "Error in the settings, \"Min Stars\" is bigger than \"Max Stars\".");
     }
 
-    if (FILTER.SKIP_HERBA && FILTER.MAX_STARS < 5){
+    if (FILTER.SKIP_NON_HERBA && FILTER.MAX_STARS < 5){
         throw UserSetupError(env.console, "Error in the settings, Skip Non-Herba Raids is checked but Max Stars is less than 5.");
     }
 

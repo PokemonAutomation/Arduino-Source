@@ -46,7 +46,7 @@ class TeraRollFilter : public GroupOption{
 public:
     TeraRollFilter();
 
-    void start_program_check(Logger& logger) const;
+    virtual std::string check_validity() const override;
 
     enum class FilterResult{
         NO_RAID,
@@ -78,7 +78,7 @@ public:
     SimpleIntegerOption<uint8_t> MIN_STARS;
     SimpleIntegerOption<uint8_t> MAX_STARS;
 
-    BooleanCheckBoxOption SKIP_HERBA;
+    BooleanCheckBoxOption SKIP_NON_HERBA;
 };
 
 

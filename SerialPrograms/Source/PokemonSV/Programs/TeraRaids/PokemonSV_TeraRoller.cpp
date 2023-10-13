@@ -124,11 +124,6 @@ void TeraRoller::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
 
     TeraRoller_Descriptor::Stats& stats = env.current_stats<TeraRoller_Descriptor::Stats>();
 
-    FILTER.start_program_check(env.console);
-    if (FILTER.MIN_STARS > FILTER.MAX_STARS){
-        throw UserSetupError(env.console, "Error in the settings, \"Min Stars\" is bigger than \"Max Stars\".");
-    }
-
     //  Connect the controller
     pbf_press_button(context, BUTTON_L, 10, 10);
 
