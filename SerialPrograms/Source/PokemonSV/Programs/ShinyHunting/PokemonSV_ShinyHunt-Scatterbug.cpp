@@ -156,6 +156,13 @@ void ShinyHuntScatterbug::program(SingleSwitchProgramEnvironment& env, BotBaseCo
 
     save_game_from_overworld(env.program_info(), env.console, context);
 
+    LetsGoEncounterBotTracker encounter_tracker(
+        env, env.console, context,
+        stats,
+        LANGUAGE
+    );
+    m_encounter_tracker = &encounter_tracker;
+
     while(true){
         try{
             run_one_sandwich_iteration(env, context);
@@ -271,13 +278,6 @@ void ShinyHuntScatterbug::handle_battles_and_back_to_pokecenter(SingleSwitchProg
 // If 
 void ShinyHuntScatterbug::run_one_sandwich_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     ShinyHuntScatterbug_Descriptor::Stats& stats = env.current_stats<ShinyHuntScatterbug_Descriptor::Stats>();
-    
-    LetsGoEncounterBotTracker encounter_tracker(
-        env, env.console, context,
-        stats,
-        LANGUAGE
-    );
-    m_encounter_tracker = &encounter_tracker;
 
     bool saved_after_this_sandwich = false;
 

@@ -21,10 +21,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
 
-class DiscontiguousTimeTracker;
 class LetsGoEncounterBotTracker;
-class EncounterWatcher;
-
 
 
 class ShinyHuntScatterbug_Descriptor : public SingleSwitchProgramDescriptor{
