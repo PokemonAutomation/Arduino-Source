@@ -523,15 +523,17 @@ bool detect_closest_pokecenter_and_move_map_cursor_there(const ProgramInfo& info
         }
         // Find the detected PokeCenter icon closest to the screen center (where player character is on the map).
         for(const auto& box: pokecenter_watcher.found_locations()){
-            std::ostringstream os;
-            os << "Found pokecenter at box: x=" << box.x << ", y=" << box.y << ", width=" << box.width << ", height=" << box.height << std::endl;
-            console.log(os.str());
             const double loc_x = (box.x + box.width/2) * screen_width;
             const double loc_y = (box.y + box.height/2) * screen_height;
             const double x_diff = loc_x - center_x, y_diff = loc_y - center_y;
-            const double dist = x_diff * x_diff + y_diff * y_diff;
-            if (max_dist < dist){
-                max_dist = dist;
+            const double dist2 = x_diff * x_diff + y_diff * y_diff;
+            std::ostringstream os;
+            os << "Found pokecenter at box: x=" << box.x << ", y=" << box.y << ", width=" << box.width << ", height=" << box.height << 
+                ", dist to center " << std::sqrt(dist2) << " pixels";
+            console.log(os.str());
+
+            if (max_dist < dist2){
+                max_dist = dist2;
                 closest_icon_x = loc_x; closest_icon_y = loc_y;
             }
         }
