@@ -25,7 +25,7 @@
 #include "PokemonSV_Navigation.h"
 
 #include <cmath>
-
+#include <sstream>
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
@@ -523,6 +523,9 @@ bool detect_closest_pokecenter_and_move_map_cursor_there(const ProgramInfo& info
         }
         // Find the detected PokeCenter icon closest to the screen center (where player character is on the map).
         for(const auto& box: pokecenter_watcher.found_locations()){
+            std::ostringstream os;
+            os << "Found pokecenter at box: x=" << box.x << ", y=" << box.y << ", width=" << box.width << ", height=" << box.height << std::endl;
+            console.log(os.str());
             const double loc_x = (box.x + box.width/2) * screen_width;
             const double loc_y = (box.y + box.height/2) * screen_height;
             const double x_diff = loc_x - center_x, y_diff = loc_y - center_y;
