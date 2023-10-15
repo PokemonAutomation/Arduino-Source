@@ -329,7 +329,7 @@ void ShinyHuntScatterbug::run_one_sandwich_iteration(SingleSwitchProgramEnvironm
             break;
         }
 
-        env.console.log("Starting Let's Go hunting path...", COLOR_PURPLE);
+        env.console.log("Starting Let's Go hunting path " + std::to_string(path_id) + "...", COLOR_PURPLE);
         env.console.overlay().add_log("Let's Go on Path " + std::to_string(path_id));
 
         double hp = hp_watcher.last_known_value() * 100;
@@ -376,6 +376,7 @@ void ShinyHuntScatterbug::run_lets_go_iteration(SingleSwitchProgramEnvironment& 
     const bool throw_ball_if_bubble = true;
 
     auto move_forward_with_lets_go = [&](int num_iterations){
+        context.wait_for_all_requests();
         for(int i = 0; i < num_iterations; i++){
             use_lets_go_to_clear_in_front(console, context, *m_encounter_tracker, throw_ball_if_bubble, [&](BotBaseContext& context){
                 // Do the following movement while the Let's Go pokemon clearing wild pokemon.
