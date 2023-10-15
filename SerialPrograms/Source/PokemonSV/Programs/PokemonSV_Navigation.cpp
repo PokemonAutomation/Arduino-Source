@@ -26,6 +26,7 @@
 
 #include <cmath>
 #include <sstream>
+#include <cfloat>
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
@@ -511,7 +512,7 @@ bool detect_closest_pokecenter_and_move_map_cursor_there(const ProgramInfo& info
     const size_t screen_height = snapshot_frame->height();
 
     double closest_icon_x = 0., closest_icon_y = 0.;
-    double max_dist = 0.0;
+    double max_dist = DBL_MAX;
     const double center_x = 0.5 * screen_width, center_y = 0.5 * screen_height;
     {
         MapPokeCenterIconWatcher pokecenter_watcher(COLOR_RED, console.overlay(), MAP_READABLE_AREA);
@@ -532,7 +533,7 @@ bool detect_closest_pokecenter_and_move_map_cursor_there(const ProgramInfo& info
                 ", dist to center " << std::sqrt(dist2) << " pixels";
             console.log(os.str());
 
-            if (max_dist < dist2){
+            if (dist2 < max_dist){
                 max_dist = dist2;
                 closest_icon_x = loc_x; closest_icon_y = loc_y;
             }
