@@ -26,6 +26,7 @@
 #include "PokemonSV/Inference/Picnics/PokemonSV_SandwichHandDetector.h"
 #include "PokemonSV/Inference/Picnics/PokemonSV_SandwichIngredientDetector.h"
 #include "PokemonSV/Inference/Picnics/PokemonSV_SandwichPlateDetector.h"
+#include "PokemonSV/Inference/Overworld/PokemonSV_LetsGoKillDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/PokemonSV_ESPEmotionDetector.h"
@@ -530,6 +531,15 @@ int test_pokemonSV_SandwichPlateDetector(const ImageViewRGB32& image, const std:
         }
     }
     
+    return 0;
+}
+
+int test_pokemonSV_RecentlyBattledDetector(const ImageViewRGB32& image, bool target){
+    LetsGoKillDetector detector(COLOR_RED, {0.23, 0.23, 0.04, 0.20});
+
+    const bool result = detector.detect(image);
+    TEST_RESULT_EQUAL(result, target);
+
     return 0;
 }
 
