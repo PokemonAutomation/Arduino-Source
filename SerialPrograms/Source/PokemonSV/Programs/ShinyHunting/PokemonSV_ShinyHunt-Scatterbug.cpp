@@ -81,7 +81,13 @@ std::unique_ptr<StatsTracker> ShinyHuntScatterbug_Descriptor::make_stats() const
 
 
 ShinyHuntScatterbug::ShinyHuntScatterbug()
-    : LANGUAGE(
+    : SAVE_GAME_AT_START(
+        "<b>Save Game at Program Start:</b><br>"
+        "This is to ensure the program can continue after resetting the game. Uncheck this option if you have manually saved the game.",
+        LockMode::LOCK_WHILE_RUNNING,
+        true
+    )
+    , LANGUAGE(
         "<b>Game Language:</b><br>Required to read " + STRING_POKEMON + " names.",
         IV_READER().languages(),
         LockMode::UNLOCK_WHILE_RUNNING,
@@ -129,6 +135,7 @@ ShinyHuntScatterbug::ShinyHuntScatterbug()
         PA_ADD_OPTION(DEBUG_WARP_TO_POKECENTER);
         PA_ADD_OPTION(SKIP_SANDWICH);
     }
+    PA_ADD_OPTION(SAVE_GAME_AT_START);
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(SANDWICH_OPTIONS);
     PA_ADD_OPTION(ENCOUNTER_BOT_OPTIONS);
@@ -154,7 +161,9 @@ void ShinyHuntScatterbug::program(SingleSwitchProgramEnvironment& env, BotBaseCo
     size_t consecutive_failures = 0;
     m_pending_save = false;
 
-    save_game_from_overworld(env.program_info(), env.console, context);
+    if (SAVE_GAME_AT_START){
+        save_game_from_overworld(env.program_info(), env.console, context);
+    }
 
     LetsGoEncounterBotTracker encounter_tracker(
         env, env.console, context,
