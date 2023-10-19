@@ -81,7 +81,13 @@ std::unique_ptr<StatsTracker> ShinyHuntScatterbug_Descriptor::make_stats() const
 
 
 ShinyHuntScatterbug::ShinyHuntScatterbug()
-    : LANGUAGE(
+    : SAVE_GAME_AT_START(
+        "<b>Save Game at Program Start:</b><br>"
+        "This is to ensure the program can continue after resetting the game. Uncheck this option if you have manually saved the game.",
+        LockMode::LOCK_WHILE_RUNNING,
+        true
+    )
+    , LANGUAGE(
         "<b>Game Language:</b><br>Required to read " + STRING_POKEMON + " names.",
         IV_READER().languages(),
         LockMode::UNLOCK_WHILE_RUNNING,
@@ -129,6 +135,7 @@ ShinyHuntScatterbug::ShinyHuntScatterbug()
         PA_ADD_OPTION(DEBUG_WARP_TO_POKECENTER);
         PA_ADD_OPTION(SKIP_SANDWICH);
     }
+    PA_ADD_OPTION(SAVE_GAME_AT_START);
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(SANDWICH_OPTIONS);
     PA_ADD_OPTION(ENCOUNTER_BOT_OPTIONS);
@@ -154,7 +161,16 @@ void ShinyHuntScatterbug::program(SingleSwitchProgramEnvironment& env, BotBaseCo
     size_t consecutive_failures = 0;
     m_pending_save = false;
 
-    save_game_from_overworld(env.program_info(), env.console, context);
+    if (SAVE_GAME_AT_START){
+        save_game_from_overworld(env.program_info(), env.console, context);
+    }
+
+    LetsGoEncounterBotTracker encounter_tracker(
+        env, env.console, context,
+        stats,
+        LANGUAGE
+    );
+    m_encounter_tracker = &encounter_tracker;
 
     while(true){
         try{
@@ -271,13 +287,6 @@ void ShinyHuntScatterbug::handle_battles_and_back_to_pokecenter(SingleSwitchProg
 // If 
 void ShinyHuntScatterbug::run_one_sandwich_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     ShinyHuntScatterbug_Descriptor::Stats& stats = env.current_stats<ShinyHuntScatterbug_Descriptor::Stats>();
-    
-    LetsGoEncounterBotTracker encounter_tracker(
-        env, env.console, context,
-        stats,
-        LANGUAGE
-    );
-    m_encounter_tracker = &encounter_tracker;
 
     bool saved_after_this_sandwich = false;
 
@@ -317,7 +326,7 @@ void ShinyHuntScatterbug::run_one_sandwich_iteration(SingleSwitchProgramEnvironm
 
     // Which path to choose starting at the PokeCenter.
     size_t path_id = 0;
-    const size_t num_paths = 3;
+    const size_t num_paths = 2;
 
     LetsGoHpWatcher hp_watcher(COLOR_RED);
     // In each iteration of this while-loop, it picks a path starting from the pokecenter or the
@@ -329,7 +338,7 @@ void ShinyHuntScatterbug::run_one_sandwich_iteration(SingleSwitchProgramEnvironm
             break;
         }
 
-        env.console.log("Starting Let's Go hunting path...", COLOR_PURPLE);
+        env.console.log("Starting Let's Go hunting path " + std::to_string(path_id) + "...", COLOR_PURPLE);
         env.console.overlay().add_log("Let's Go on Path " + std::to_string(path_id));
 
         double hp = hp_watcher.last_known_value() * 100;
@@ -373,26 +382,40 @@ void ShinyHuntScatterbug::run_lets_go_iteration(SingleSwitchProgramEnvironment& 
     // to this location.
     pbf_press_button(context, BUTTON_L, 50, 40);
 
-    if (path_id == 1){
-        // move west
+    const bool throw_ball_if_bubble = true;
+
+    auto move_forward_with_lets_go = [&](int num_iterations){
+        context.wait_for_all_requests();
+        for(int i = 0; i < num_iterations; i++){
+            use_lets_go_to_clear_in_front(console, context, *m_encounter_tracker, throw_ball_if_bubble, [&](BotBaseContext& context){
+                // Do the following movement while the Let's Go pokemon clearing wild pokemon.
+                // Slowly Moving forward
+                pbf_move_left_joystick(context, 128, 105, 800, 0);
+            });
+        }
+    };
+
+    if (path_id == 0){
+        // move rightward, to the west
         pbf_move_left_joystick(context, 255, 128, 100, 20);
         // Align camera
         pbf_press_button(context, BUTTON_L, 50, 40);
-    } else if (path_id == 2){
-        // move east
+
+        move_forward_with_lets_go(10);
+    } else { // path_id == 1
+        // move leftward, to the east
         pbf_move_left_joystick(context, 0, 128, 100, 20);
         // Align camera
         pbf_press_button(context, BUTTON_L, 50, 40);
-    }
 
-    const bool throw_ball_if_bubble = true;
+        move_forward_with_lets_go(5);
 
-    for(int i = 0; i < 5; i++){
-        use_lets_go_to_clear_in_front(console, context, *m_encounter_tracker, throw_ball_if_bubble, [&](BotBaseContext& context){
-            // Do the following movement while the Let's Go pokemon clearing wild pokemon.
-            // Slowly Moving forward
-            pbf_move_left_joystick(context, 128, 105, 800, 0);
-        });
+        // move rightward, to south
+        pbf_move_left_joystick(context, 255, 128, 50, 20);
+        // Align camera
+        pbf_press_button(context, BUTTON_L, 50, 40);
+
+        move_forward_with_lets_go(5);
     }
 }
 

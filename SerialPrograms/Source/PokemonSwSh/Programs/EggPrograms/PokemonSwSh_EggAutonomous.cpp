@@ -134,7 +134,7 @@ EggAutonomous::EggAutonomous()
           LockMode::LOCK_WHILE_RUNNING,
         AutoSave::AfterStartAndKeep
     )
-    , FILTERS(
+    , FILTERS0(
         StatsHuntIvJudgeFilterTable_Label_Eggs,
         {
             .action = true,
@@ -184,7 +184,7 @@ EggAutonomous::EggAutonomous()
     PA_ADD_OPTION(LOOPS_PER_FETCH);
     PA_ADD_OPTION(NUM_EGGS_IN_COLUMN);
     PA_ADD_OPTION(AUTO_SAVING);
-    PA_ADD_OPTION(FILTERS);
+    PA_ADD_OPTION(FILTERS0);
     PA_ADD_OPTION(NOTIFICATIONS);
 
     if (PreloadSettings::instance().DEVELOPER_MODE){
@@ -630,7 +630,7 @@ bool EggAutonomous::process_hatched_pokemon(SingleSwitchProgramEnvironment& env,
             env.log("Gender: " + gender_to_string(gender), COLOR_GREEN);
             NatureReader::Results nature = nature_detector.read(env.console.logger(), screen);
 
-            StatsHuntAction action = FILTERS.get_action(shiny, gender, nature.nature, IVs);
+            StatsHuntAction action = FILTERS0.get_action(shiny, gender, nature.nature, IVs);
 
             auto send_keep_notification = [&](){
                 if (!shiny){

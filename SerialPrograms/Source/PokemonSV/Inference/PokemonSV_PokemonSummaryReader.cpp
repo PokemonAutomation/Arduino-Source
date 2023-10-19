@@ -21,7 +21,8 @@ namespace PokemonSV{
 bool is_summary_color(const ImageStats& stats){
     return is_solid(stats, {0.648549, 0.2861580, 0.0652928}, 0.15, 20)  //  Scarlet
         || is_solid(stats, {0.367816, 0.0746615, 0.5575230}, 0.15, 20)  //  Violet
-        || is_solid(stats, {0.196536, 0.5933000, 0.2101630}, 0.18, 20); //  DLC Green
+        || is_solid(stats, {0.196536, 0.5933000, 0.2101630}, 0.18, 20)  //  DLC Green
+        || (stats.average.g / stats.average.sum()) > 0.5;               //  DLC Green
 }
 
 

@@ -21,10 +21,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
 
-class DiscontiguousTimeTracker;
 class LetsGoEncounterBotTracker;
-class EncounterWatcher;
-
 
 
 class ShinyHuntScatterbug_Descriptor : public SingleSwitchProgramDescriptor{
@@ -53,6 +50,8 @@ private:
     void handle_battles_and_back_to_pokecenter(SingleSwitchProgramEnvironment& env, BotBaseContext& context, 
         std::function<void(SingleSwitchProgramEnvironment& env, BotBaseContext& context)>&& action);
 
+    BooleanCheckBoxOption SAVE_GAME_AT_START;
+    
     OCR::LanguageOCROption LANGUAGE;
 
     SandwichMakerOption SANDWICH_OPTIONS;

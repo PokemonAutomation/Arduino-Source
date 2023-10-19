@@ -236,6 +236,13 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 //    using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
 
 
+    ImageRGB32 image("screenshot-20231016-130205783594.png");
+    PokemonSummaryDetector detector;
+    cout << detector.detect(image) << endl;
+
+
+
+#if 0
     ImageRGB32 image("screenshot-20231005-203932147068.png");
     SummaryStatsReader reader;
 //    cout << detector.detect(image) << endl;
@@ -246,7 +253,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     cout << (int)nature.spatk << endl;
     cout << (int)nature.spdef << endl;
     cout << (int)nature.speed << endl;
-
+#endif
 
 
 

@@ -26,6 +26,7 @@
 #include "PokemonSV/Inference/Picnics/PokemonSV_SandwichHandDetector.h"
 #include "PokemonSV/Inference/Picnics/PokemonSV_SandwichIngredientDetector.h"
 #include "PokemonSV/Inference/Picnics/PokemonSV_SandwichPlateDetector.h"
+#include "PokemonSV/Inference/Overworld/PokemonSV_LetsGoKillDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/PokemonSV_ESPEmotionDetector.h"
@@ -459,6 +460,9 @@ int test_pokemonSV_DialogBoxDetector(const ImageViewRGB32& image, bool target) {
 int test_pokemonSV_MapPokeCenterIconDetector(const ImageViewRGB32& image, int target) {
     MapPokeCenterIconDetector detector(COLOR_RED, MAP_READABLE_AREA);
     const auto result = detector.detect_all(image);
+    for(const auto& box : result){
+        std::cout << "Box: x=" << box.x << ", y=" << box.y << ", width=" << box.width << ", height=" << box.height << std::endl;
+    }
     TEST_RESULT_EQUAL(int(result.size()), target);
 
     // auto new_image = image.copy();
@@ -527,6 +531,15 @@ int test_pokemonSV_SandwichPlateDetector(const ImageViewRGB32& image, const std:
         }
     }
     
+    return 0;
+}
+
+int test_pokemonSV_RecentlyBattledDetector(const ImageViewRGB32& image, bool target){
+    LetsGoKillDetector detector(COLOR_RED, {0.23, 0.23, 0.04, 0.20});
+
+    const bool result = detector.detect(image);
+    TEST_RESULT_EQUAL(result, target);
+
     return 0;
 }
 

@@ -56,7 +56,7 @@ bool MapPokeCenterIconDetector::detect(const ImageViewRGB32& screen) const{
 
 std::vector<ImageFloatBox> MapPokeCenterIconDetector::detect_all(const ImageViewRGB32& screen) const{
     const std::vector<std::pair<uint32_t, uint32_t>> filters = {
-        {combine_rgb(180, 0, 0), combine_rgb(255, 100, 100)}
+        {combine_rgb(150, 0, 0), combine_rgb(255, 120, 120)}
     };
 
     const double min_object_size = 350.0;

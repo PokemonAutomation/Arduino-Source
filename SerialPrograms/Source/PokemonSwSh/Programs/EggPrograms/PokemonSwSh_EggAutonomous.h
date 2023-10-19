@@ -93,7 +93,7 @@ private:
     };
     EnumDropdownOption<AutoSave> AUTO_SAVING;
     
-    Pokemon::StatsHuntIvJudgeFilterTable FILTERS;
+    Pokemon::StatsHuntIvJudgeFilterTable FILTERS0;
 
     BooleanCheckBoxOption DEBUG_PROCESSING_HATCHED;
     BooleanCheckBoxOption SAVE_DEBUG_VIDEO;

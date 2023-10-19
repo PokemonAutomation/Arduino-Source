@@ -25,7 +25,8 @@
 #include "PokemonSV_Navigation.h"
 
 #include <cmath>
-
+#include <sstream>
+#include <cfloat>
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
@@ -511,7 +512,7 @@ bool detect_closest_pokecenter_and_move_map_cursor_there(const ProgramInfo& info
     const size_t screen_height = snapshot_frame->height();
 
     double closest_icon_x = 0., closest_icon_y = 0.;
-    double max_dist = 0.0;
+    double max_dist = DBL_MAX;
     const double center_x = 0.5 * screen_width, center_y = 0.5 * screen_height;
     {
         MapPokeCenterIconWatcher pokecenter_watcher(COLOR_RED, console.overlay(), MAP_READABLE_AREA);
@@ -526,9 +527,14 @@ bool detect_closest_pokecenter_and_move_map_cursor_there(const ProgramInfo& info
             const double loc_x = (box.x + box.width/2) * screen_width;
             const double loc_y = (box.y + box.height/2) * screen_height;
             const double x_diff = loc_x - center_x, y_diff = loc_y - center_y;
-            const double dist = x_diff * x_diff + y_diff * y_diff;
-            if (max_dist < dist){
-                max_dist = dist;
+            const double dist2 = x_diff * x_diff + y_diff * y_diff;
+            std::ostringstream os;
+            os << "Found pokecenter at box: x=" << box.x << ", y=" << box.y << ", width=" << box.width << ", height=" << box.height << 
+                ", dist to center " << std::sqrt(dist2) << " pixels";
+            console.log(os.str());
+
+            if (dist2 < max_dist){
+                max_dist = dist2;
                 closest_icon_x = loc_x; closest_icon_y = loc_y;
             }
         }
@@ -542,8 +548,8 @@ bool detect_closest_pokecenter_and_move_map_cursor_there(const ProgramInfo& info
     const double magnitude = std::max(std::sqrt(max_dist), 1.0);
     const double push_x = dif_x * 64 / magnitude, push_y = dif_y * 64 / magnitude;
 
-    // 0.5 is too large, 0.25 a little too small
-    const double scale = 0.30;
+    // 0.5 is too large, 0.25 a little too small, 0.30 is a bit too much for a far-away pokecenter
+    const double scale = 0.29;
 
     const uint8_t move_x = uint8_t(std::max(std::min(int(round(push_x + 128) + 0.5), 255), 0));
     const uint8_t move_y = uint8_t(std::max(std::min(int(round(push_y + 128) + 0.5), 255), 0));

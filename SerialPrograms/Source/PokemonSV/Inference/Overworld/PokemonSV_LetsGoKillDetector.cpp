@@ -99,8 +99,8 @@ bool LetsGoKillDetector::detect(const ImageViewRGB32& screen) const{
         std::vector<PackedBinaryMatrix> matrices = compress_rgb32_to_binary_range(
             region,
             {
-                {0xff802020, 0xffff7f7f},
-                {0xffc02020, 0xffff7f7f},
+                {0xff801e1e, 0xffff7f7f},
+                {0xffb31e1e, 0xffff7f7f},
             }
         );
 //        size_t c = 0;
