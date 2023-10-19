@@ -127,7 +127,7 @@ EggAutonomous::EggAutonomous()
         LockMode::UNLOCK_WHILE_RUNNING,
         1
     )
-    , FILTERS(
+    , FILTERS0(
         StatsHuntIvJudgeFilterTable_Label_Eggs,
         {
             .action = true,
@@ -172,7 +172,7 @@ EggAutonomous::EggAutonomous()
     PA_ADD_OPTION(MAX_KEEPERS);
     PA_ADD_OPTION(AUTO_SAVING);
     PA_ADD_OPTION(KEEP_BOX_LOCATION);
-    PA_ADD_OPTION(FILTERS);
+    PA_ADD_OPTION(FILTERS0);
     PA_ADD_OPTION(HAS_CLONE_RIDE_POKEMON);
 
     PA_ADD_OPTION(NOTIFICATIONS);
@@ -517,7 +517,7 @@ void EggAutonomous::process_one_baby(SingleSwitchProgramEnvironment& env, BotBas
 
     bool found_shiny = false;
     StatsHuntAction action = StatsHuntAction::Discard;
-    if (check_baby_info(env.program_info(), env.console, context, LANGUAGE, FILTERS, action)){
+    if (check_baby_info(env.program_info(), env.console, context, LANGUAGE, FILTERS0, action)){
         found_shiny = true;
         env.console.log("Shiny found!");
         env.console.overlay().add_log("Shiny " + std::to_string(egg_index+1) + "/" + std::to_string(num_eggs_in_party), COLOR_GREEN);
