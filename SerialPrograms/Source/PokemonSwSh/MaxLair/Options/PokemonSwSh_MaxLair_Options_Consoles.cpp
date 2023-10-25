@@ -62,7 +62,10 @@ CaughtScreenActionsOption::CaughtScreenActionsOption(
     )
     , shiny_boss(
         true, winrate_reset_tooltip,
-        "<b>Boss/Legendary is Shiny:</b><br>If there are mulitiple shinies where one is the boss, this option still applies.",
+        "<b>Boss/Legendary is Shiny:</b><br>If there are mulitiple shinies where one is the boss, this option still applies.<br><br>"
+        "<font color=\"red\">For safety reasons, this program will <i>NEVER</i> automatically take a boss. "
+        "Likewise, the settings here are intentionally worded so that it's impossible to ask the program to take a boss. "
+        "Because taking a boss is irreversible, we refuse to automate it and require you to do it manually to avoid any mistakes.</font>",
         default_shiny_boss
     )
     , description(
