@@ -70,11 +70,11 @@ ImageMatchResult CroppedImageDictionaryMatcher::match(
     std::vector<ImageViewRGB32> crops = get_crop_candidates(image);
 
     if (PreloadSettings::debug().IMAGE_DICTIONARY_MATCHING){
-        size_t c = 0;
+//        size_t c = 0;
         for (const ImageViewRGB32& crop : crops){
 //            std::cout << "CroppedImageDictionaryMatcher: process input" << c << "image with background " << crop.background.to_string() << std::endl;
             dump_debug_image(global_logger_command_line(), "CommonFramework/CroppedImageDictionaryMatcher", "match_input_processed", crop);
-            c++;
+//            c++;
         }
     }
 
