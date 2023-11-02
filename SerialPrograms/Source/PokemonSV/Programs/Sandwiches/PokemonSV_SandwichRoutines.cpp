@@ -873,14 +873,23 @@ void run_sandwich_maker(SingleSwitchProgramEnvironment& env, BotBaseContext& con
     SandwichPlateDetector middle_plate_detector(env.console.logger(), COLOR_RED, language, SandwichPlateDetector::Side::MIDDLE);
     SandwichPlateDetector right_plate_detector(env.console.logger(), COLOR_RED, language, SandwichPlateDetector::Side::RIGHT);
 
-    {
+    const int max_read_label_tries = 4;
+    for(int read_label_try_count = 0; read_label_try_count < max_read_label_tries; ++read_label_try_count){
         VideoSnapshot screen = env.console.video().snapshot();
 
         std::string center_filling = middle_plate_detector.detect_filling_name(screen);
         if (center_filling.empty()) {
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console, "No ingredient found on center plate label.", true
-            );
+            if (read_label_try_count + 1 < max_read_label_tries){
+                // Wait more time
+                pbf_wait(context, TICKS_PER_SECOND * 2);
+                context.wait_for_all_requests();
+                continue;
+            } else{
+                env.console.log("Read nothing on center plate label.");
+                throw OperationFailedException(
+                    ErrorReport::SEND_ERROR_REPORT, env.console, "No ingredient found on center plate label.", true
+                );
+            }
         }
 
         env.console.log("Read center plate label: " + center_filling);
