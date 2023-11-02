@@ -57,19 +57,16 @@ struct ShinyHuntScatterbug_Descriptor::Stats : public LetsGoEncounterBotStats{
     Stats()
         : m_sandwiches(m_stats["Sandwiches"])
         , m_autoheals(m_stats["Auto Heals"])
-        , m_path_resets(m_stats["Path Resets"])
         , m_game_resets(m_stats["Game Resets"])
         , m_errors(m_stats["Errors"])
     {
         m_display_order.insert(m_display_order.begin() + 2, {"Sandwiches", HIDDEN_IF_ZERO});
         m_display_order.insert(m_display_order.begin() + 3, {"Auto Heals", HIDDEN_IF_ZERO});
-        m_display_order.insert(m_display_order.begin() + 4, {"Path Resets", HIDDEN_IF_ZERO});
-        m_display_order.insert(m_display_order.begin() + 5, {"Game Resets", HIDDEN_IF_ZERO});
-        m_display_order.insert(m_display_order.begin() + 6, {"Errors", HIDDEN_IF_ZERO});
+        m_display_order.insert(m_display_order.begin() + 4, {"Game Resets", HIDDEN_IF_ZERO});
+        m_display_order.insert(m_display_order.begin() + 5, {"Errors", HIDDEN_IF_ZERO});
     }
     std::atomic<uint64_t>& m_sandwiches;
     std::atomic<uint64_t>& m_autoheals;
-    std::atomic<uint64_t>& m_path_resets;
     std::atomic<uint64_t>& m_game_resets;
     std::atomic<uint64_t>& m_errors;
 };
@@ -205,6 +202,7 @@ void ShinyHuntScatterbug::program(SingleSwitchProgramEnvironment& env, BotBaseCo
 
             env.log("Reset game to handle recoverable error");
             reset_game(env.program_info(), env.console, context);
+            stats.m_game_resets++;
         }catch(ProgramFinishedException&){
             GO_HOME_WHEN_DONE.run_end_of_program(context);
             return;
