@@ -146,7 +146,7 @@ void ShinyHuntScatterbug::program(SingleSwitchProgramEnvironment& env, BotBaseCo
     ShinyHuntScatterbug_Descriptor::Stats& stats = env.current_stats<ShinyHuntScatterbug_Descriptor::Stats>();
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_L, 10, 0);
+    pbf_press_button(context, BUTTON_L, 10, 50);
 
     assert_16_9_720p_min(env.logger(), env.console);
 
