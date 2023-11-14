@@ -178,6 +178,7 @@ StatsResetBloodmoon::StatsResetBloodmoon()
             ret.emplace_back(std::move(row));
         }
         FILTERS0.set_default(std::move(ret));
+        FILTERS0.restore_defaults();
     }
 //    if (PreloadSettings::instance().DEVELOPER_MODE){
         PA_ADD_STATIC(CALCULATED_IVS);
