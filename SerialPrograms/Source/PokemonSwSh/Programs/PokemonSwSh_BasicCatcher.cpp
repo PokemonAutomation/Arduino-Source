@@ -162,7 +162,9 @@ CatchResults basic_catcher(
 
 
     //  Wait for end of battle.
+//    console.video().snapshot()->save("test0.png");
     {
+        console.log("Waiting for black screen end...");
         BlackScreenOverWatcher black_screen_detector;
         run_until(
             console, context,
@@ -171,9 +173,12 @@ CatchResults basic_catcher(
             },
             {{black_screen_detector}}
         );
+        console.log("Waiting for black screen end... Found!");
     }
 
     //  Look for the orange caught screen.
+//    console.video().snapshot()->save("test1.png");
+//    context.wait_for(std::chrono::milliseconds(5000));
     {
         ReceivePokemonDetector caught_detector(true);
 
@@ -197,7 +202,9 @@ CatchResults basic_catcher(
     }
 
 //    pbf_wait(context, 5 * TICKS_PER_SECOND);
+//    console.video().snapshot()->save("test2.png");
     {
+        console.log("Waiting for black screen end...");
         BlackScreenOverWatcher black_screen_detector;
         run_until(
             console, context,
@@ -206,6 +213,7 @@ CatchResults basic_catcher(
             },
             {{black_screen_detector}}
         );
+        console.log("Waiting for black screen end... Found!");
     }
 
     results.result = CatchResult::POKEMON_CAUGHT;

@@ -111,6 +111,7 @@
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_Lobby.h"
 #include "PokemonSV/Inference/PokemonSV_StatHexagonReader.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_ReceivePokemonDetector.h"
 
 
 
@@ -238,11 +239,17 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
+//    PokemonSwSh::ReceivePokemonDetector caught_detector(true);
+//    caught_detector.process_frame();
+
+
+#if 0
     start_game_from_home(
         console, context,
         true, 0, 0,
         10
     );
+#endif
 
 #if 0
 //    UpdateMenuWatcher update_menu(false);
