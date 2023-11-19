@@ -202,7 +202,7 @@ void ShinyHuntScatterbug::program(SingleSwitchProgramEnvironment& env, BotBaseCo
 
             env.log("Reset game to handle recoverable error");
             reset_game(env.program_info(), env.console, context);
-            stats.m_game_resets++;
+            ++stats.m_game_resets;
         }catch(ProgramFinishedException&){
             GO_HOME_WHEN_DONE.run_end_of_program(context);
             return;
@@ -368,6 +368,7 @@ void ShinyHuntScatterbug::run_one_sandwich_iteration(SingleSwitchProgramEnvironm
     if (!saved_after_this_sandwich){
         // Reset game to save rare herbs
         reset_game(env.program_info(), env.console, context);
+        ++stats.m_game_resets;
     }
 }
 
