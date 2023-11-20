@@ -44,13 +44,32 @@ public:
     }
 
 private:
+    // Change color in the four pixels according to the lowest four bits in `bits`
     PA_FORCE_INLINE __m128i filter4(uint32_t bits, __m128i pixel) const{
+        // Duplicate 4-bit pattern into four uint8_t places in `bits`
         bits *= 0x01010101;
+        // convert each uint8_t to be one bit from the lowest four bits in input `bits`
         bits &= 0x08040201;
+        // Load uint32_t `bits` into a 128-bit simd register
         __m128i mask = _mm_cvtsi32_si128(bits);
+        // Expand uint8 values into uint32 values
+        // So now each pixel (uint32) corresponds to a mask value in `mask`
         mask = _mm_cvtepu8_epi32(mask);
+        // set a pixel in mask to 1 if original mask for the pixel is 0
         mask = _mm_cmpeq_epi32(mask, _mm_setzero_si128());
+        // If constructor `replace_if_zero` is true: `m_replace_if_zero` is all 0-bits
+        // then XOR it, mask becomes the same, so it's the inverse of the original mask
+        // ----
+        // If constructor `replace_if_zero` is false: `m_replace_if_zero` is all 1-bits
+        // then XOR it, masks becomes the inverse, so it's the same as the original maask
         mask = _mm_xor_si128(mask, m_replace_if_zero);
+        // If constructor `replace_if_zero` is true,
+        //   If mask is non-zero, which means if original mask is zero, use m_replacement
+        //   Otherwise, remain the old pixel color
+        // --- 
+        // If constructor `replace_if_zero` is false,
+        //   If mask is non-zero, which means the original mask non-zero, use m_replacement
+        //   Otherwise, remain the old pixel color
         return _mm_blendv_epi8(pixel, m_replacement, mask);
     }
 
