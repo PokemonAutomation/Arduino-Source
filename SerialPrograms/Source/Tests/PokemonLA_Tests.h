@@ -51,7 +51,7 @@ int test_pokemonLA_BattleSpriteArrowDetector(const ImageViewRGB32& image, int ta
 
 int test_pokemonLA_MapMissionTabReader(const ImageViewRGB32& image, bool target);
 
-void test_pokemonLA_BerryTreeDetector(const ImageViewRGB32& image);
+int test_pokemonLA_BerryTreeDetector(const ImageViewRGB32& image);
 
 int test_pokemonLA_shinySoundDetector(const std::vector<AudioSpectrum>& spectrums, bool target);
 

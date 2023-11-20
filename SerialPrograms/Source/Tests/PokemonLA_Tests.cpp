@@ -449,10 +449,12 @@ int test_pokemonLA_MapMissionTabReader(const ImageViewRGB32& image, bool target)
     return 0;
 }
 
-void test_pokemonLA_BerryTreeDetector(const ImageViewRGB32& image){
+int test_pokemonLA_BerryTreeDetector(const ImageViewRGB32& image){
     BerryTreeDetector detector;
 
     detector.process_frame(image, current_time());
+
+    return 0;
 }
 
 int test_pokemonLA_SaveScreenDetector(const ImageViewRGB32& image, const std::vector<std::string>& keywords){
