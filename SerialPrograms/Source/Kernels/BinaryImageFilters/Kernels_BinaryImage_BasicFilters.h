@@ -28,7 +28,6 @@ namespace PokemonAutomation{
 namespace Kernels{
 
 
-
 //  Selectively replace each pixel in an image with the specified pixel
 //  according to the respective bit in the binary matrix.
 void filter_by_mask(
@@ -40,19 +39,18 @@ void filter_by_mask(
 
 
 
-//  Compress (image, bytes_per_row) into a binary_image.
-//  Use the specified RGB ranges to determine whether each pixel
-//  becomes a 0 or a 1.
+//  Compress (image, bytes_per_row) into a binary_image represented as the binary matrix `matrix`
+//  Pixels in the specified RGB ranges [`mins`, `maxs`] are assigned 1 in the binary matrix,
+//  otherwise 0.
 void compress_rgb32_to_binary_range(
     const uint32_t* image, size_t bytes_per_row,
     PackedBinaryMatrix_IB& matrix,
     uint32_t mins, uint32_t maxs
 );
 
-
-//  Same as above, but multiple filters.
-//  The purpose is to reduce passes over the entire image.
-//  All matricies must have the same dimensions.
+//  Helper struct to store filtering related data for the multi-filter overload of `compress_rgb32_to_binary_range()`.
+//  It stores `matrix`, the filtering result: a binary matrix, where 1-bits are the pixels that are in the filter RGB
+//  range [`mins`, `maxs`], and 0-bits are otherwise.
 struct CompressRgb32ToBinaryRangeFilter{
     PackedBinaryMatrix_IB& matrix;
     uint32_t mins;
@@ -64,6 +62,14 @@ struct CompressRgb32ToBinaryRangeFilter{
         , maxs(p_maxs)
     {}
 };
+
+//  Compress (image, bytes_per_row) into multiple binary_images represented as binary matrices stored in
+//  `CompressRgb32ToBinaryRangeFilter.matrix` for each `filters`. 
+//  For each filter, pixels in the specified RGB ranges [`Filter.mins`, `Filter.maxs`] are assigned 1 in `Filter.matrix`,
+//  otherwise 0.
+//  This function is like multiple calls to the single-filter overload of `compress_rgb32_to_binary_range()`, but 
+//  with the benefit of reducing passes over the entire image.
+//  All matrices in `filters` must have the same dimensions.
 void compress_rgb32_to_binary_range(
     const uint32_t* image, size_t bytes_per_row,
     CompressRgb32ToBinaryRangeFilter* filters, size_t filter_count

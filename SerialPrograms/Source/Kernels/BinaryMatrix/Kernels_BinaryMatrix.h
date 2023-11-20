@@ -27,11 +27,17 @@ namespace Kernels{
 // The shape of the tile is associated with what CPU feature to use.
 // For example, for AVX2 feature, the optimized shape is 64x16.
 enum class BinaryMatrixType{
+    // Default impl. with no SIMD intrinsics, tile size 64-bit width x 4-bit height
     i64x4_Default,
+    // Default impl. with no SIMD intrinsics, tile size 64-bit width x 8-bit height
     i64x8_Default,
+    // Use Intel SSE4.2, tile size 64-bit width x 8-bit height
     i64x8_x64_SSE42,
+    // Use Intel AVX 2, tile size 64-bit width x 16-bit height
     i64x16_x64_AVX2,
+    // Use Intel AVX 512, tile size 64-bit width x 64-bit height
     i64x64_x64_AVX512,
+    // Use Intel AVX 512, tile size 64-bit width x 32-bit height
     i64x32_x64_AVX512,
 };
 
@@ -73,8 +79,12 @@ public:
     virtual void operator|=(const PackedBinaryMatrix_IB& x) = 0;
     virtual void operator&=(const PackedBinaryMatrix_IB& x) = 0;
 
+    // Print entire binary matrix as 0s and 1s. Rows are ended with "\n".
     virtual std::string dump() const = 0;
+    // Print part of max as 0s and 1s. Rows are ended with "\n".
     virtual std::string dump(size_t min_x, size_t min_y, size_t max_x, size_t max_y) const = 0;
+    // Print all the underlying tiles that form this binary matrix. The result is a matrix that may be larger
+    // than the original matrix.
     virtual std::string dump_tiles() const = 0;
 
 public:
