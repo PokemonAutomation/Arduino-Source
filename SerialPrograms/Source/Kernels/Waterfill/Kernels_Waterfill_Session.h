@@ -17,7 +17,10 @@ namespace Waterfill{
 
 class WaterfillIterator;
 
-
+// Abstract base class for doing waterfill operations
+// Waterfill is finding connected components on in a binary matrix.
+// The implementation is in template derived class `WaterfillSession_t`.
+// It is templated to allow different implementations of SIMD code.
 class WaterfillSession{
 public:
     virtual ~WaterfillSession() = default;

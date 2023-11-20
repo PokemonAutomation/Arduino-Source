@@ -23,6 +23,7 @@ namespace Waterfill{
 
 
 
+//  Find all the objects in the matrix. This will destroy "matrix".
 template <typename Tile, typename TileRoutines>
 std::vector<WaterfillObject> find_objects_inplace(PackedBinaryMatrixCore<Tile>& matrix, size_t min_area){
     std::vector<WaterfillObject> ret;

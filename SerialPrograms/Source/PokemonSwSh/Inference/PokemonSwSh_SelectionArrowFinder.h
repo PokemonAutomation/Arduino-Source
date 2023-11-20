@@ -69,7 +69,8 @@ public:
 };
 
 
-// Selection arrow for the menu of the pokemon in a pokemon storage box
+// Selection arrow for the menu of the pokemon in a pokemon storage box.
+// The menuitems are: "Move", "Check summary", "Check held item", "Change markings", ...
 class StoragePokemonMenuArrowFinder : public SelectionArrowFinder{
 public:
     StoragePokemonMenuArrowFinder(VideoOverlay& overlay);

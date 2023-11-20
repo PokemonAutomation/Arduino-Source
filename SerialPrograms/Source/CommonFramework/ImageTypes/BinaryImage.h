@@ -12,9 +12,13 @@
 namespace PokemonAutomation{
 
 // A wrapper class of the packed binary matrix base class `Kernels::PackedBinaryMatrix_IB`.
-// See the comments of `PackedBinaryMatrix_IB` for details on its usage.
+// Those binary matrices are memory-efficient: each binary element is stored as just one bit in memory.
+// They are mainly used by the Waterfill algorithm.
+// See the comments of `PackedBinaryMatrix_IB` for more implementation details.
 //
-// This wrapper is useful in making the usage of matrix as a class. Otherwise, because of
+// This wrapper is useful in making the usage of matrix as a locally-defined class: you can use it like
+// `PackedBinaryMatrix matrix;`
+// Otherwise, because of
 // `PackedBinaryMatrix_IB` being polymorphic, we have to write explictly
 // `std::unique_ptr<Kernels::PackedBinaryMatrix_IB>` to define a matrix.
 class PackedBinaryMatrix{
@@ -51,7 +55,9 @@ public:
     void operator|=(const PackedBinaryMatrix& x){ *m_matrix |= *x.m_matrix; }
     void operator&=(const PackedBinaryMatrix& x){ *m_matrix &= *x.m_matrix; }
 
+    // Print entire binary matrix as 0s and 1s. Rows are ended with "\n".
     std::string dump() const{ return m_matrix->dump(); }
+    // Print part of max as 0s and 1s. Rows are ended with "\n".
     std::string dump(size_t min_x, size_t min_y, size_t max_x, size_t max_y) const{ return m_matrix->dump(min_x, min_y, max_x, max_y); }
 
 public:
