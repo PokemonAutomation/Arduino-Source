@@ -1,4 +1,4 @@
-#!/usr/local/bin/python3
+#!python3
 
 """
 A simple image viewer (using OpenCV) with basic ability to check pixel location and color.
