@@ -1332,6 +1332,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Inference/PokemonSV_PokePortalDetector.h
     Source/PokemonSV/Inference/PokemonSV_PokemonSummaryReader.cpp
     Source/PokemonSV/Inference/PokemonSV_PokemonSummaryReader.h
+    Source/PokemonSV/Inference/PokemonSV_StatHexagonReader.cpp
+    Source/PokemonSV/Inference/PokemonSV_StatHexagonReader.h
     Source/PokemonSV/Inference/PokemonSV_SweatBubbleDetector.cpp
     Source/PokemonSV/Inference/PokemonSV_SweatBubbleDetector.h
     Source/PokemonSV/Inference/PokemonSV_TournamentPrizeNameReader.cpp
@@ -1340,8 +1342,6 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h
     Source/PokemonSV/Inference/PokemonSV_ZeroGateWarpPromptDetector.cpp
     Source/PokemonSV/Inference/PokemonSV_ZeroGateWarpPromptDetector.h
-    Source/PokemonSV/Inference/PokemonSV_StatHexagonReader.cpp
-    Source/PokemonSV/Inference/PokemonSV_StatHexagonReader.h
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraCardDetector.cpp
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraCardDetector.h
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraCodeReader.cpp
@@ -1408,14 +1408,6 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggHatcher.h
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggRoutines.cpp
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggRoutines.h
-    Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_ClipboardFastCodeEntry.cpp
-    Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_ClipboardFastCodeEntry.h
-    Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_CodeEntry.cpp
-    Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_CodeEntry.h
-    Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_FastCodeEntry.cpp
-    Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_FastCodeEntry.h
-    Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_VideoFastCodeEntry.cpp
-    Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_VideoFastCodeEntry.h
     Source/PokemonSV/Programs/Farming/PokemonSV_AuctionFarmer.cpp
     Source/PokemonSV/Programs/Farming/PokemonSV_AuctionFarmer.h
     Source/PokemonSV/Programs/Farming/PokemonSV_ESPTraining.cpp
@@ -1428,6 +1420,14 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Programs/Farming/PokemonSV_LPFarmer.h
     Source/PokemonSV/Programs/Farming/PokemonSV_TournamentFarmer.cpp
     Source/PokemonSV/Programs/Farming/PokemonSV_TournamentFarmer.h
+    Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_ClipboardFastCodeEntry.cpp
+    Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_ClipboardFastCodeEntry.h
+    Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_CodeEntry.cpp
+    Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_CodeEntry.h
+    Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_FastCodeEntry.cpp
+    Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_FastCodeEntry.h
+    Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_VideoFastCodeEntry.cpp
+    Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_VideoFastCodeEntry.h
     Source/PokemonSV/Programs/General/PokemonSV_AutonomousBallThrower.cpp
     Source/PokemonSV/Programs/General/PokemonSV_AutonomousBallThrower.h
     Source/PokemonSV/Programs/General/PokemonSV_ClothingBuyer.cpp
