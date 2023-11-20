@@ -39,6 +39,8 @@ enum class BinaryMatrixType{
     i64x64_x64_AVX512,
     // Use Intel AVX 512, tile size 64-bit width x 32-bit height
     i64x32_x64_AVX512,
+    // Use Arm NEON, tile size 64-bit width x 8-bit height
+    arm64x8_x64_NEON,
 };
 
 // Get the current active binary matrix type that will be used or is being used

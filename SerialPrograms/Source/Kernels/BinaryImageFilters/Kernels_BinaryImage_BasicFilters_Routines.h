@@ -118,6 +118,44 @@ void compress_rgb32_to_binary(
 }
 
 
+// Change pixel (as uint32_t) color of image based on bits in a binary matrix
+// If `filter` is constructed with `replace_if_zero` being true, image pixels corresponding to 0-bits in `matrix`
+//    are replaced with color `replace_with` which is provided by the filter.
+// If `filter` is constructed with `replace_if_zero` being false, image pixels corresponding to 1-bits in `matrix`
+//    are replaced with color `replace_with`.
+// `BinaryMatrixType` is a PackedBinaryMatrixCore<BinaryMatrixTileType>,
+// where BinaryMatrixTileType is an implementation of a tile, defined for every simd architecture.
+template <typename BinaryMatrixType, typename Filter>
+void filter_rgb32(
+    const BinaryMatrixType& matrix,
+    uint32_t* image, size_t bytes_per_row,
+    const Filter& filter
+){
+    size_t bit_width = matrix.width();
+//    size_t bit_height = binary_image.height();
+//    size_t word_width = binary_image.word64_width();
+
+    // How many words in a row. Each word is 64-bit long
+    size_t word_height = matrix.word64_height();
+    for (size_t r = 0; r < word_height; r++){ // For each row
+        uint32_t* img = image;
+        // c: current index of the word. One word has 64-bit wide
+        size_t c = 0;
+        size_t left = bit_width;
+        while (left >= 64){
+            // Modify some pixels in the 64-pixel-long area of the image,
+            // starting at pointr `img`
+            filter.filter64(matrix.word64(c, r), img);
+            c++;
+            img += 64;
+            left -= 64;
+        }
+        if (left > 0){
+            filter.filter64(matrix.word64(c, r), img, left);
+        }
+        image = (uint32_t*)((const char*)image + bytes_per_row);
+    }
+}
 
 
 }

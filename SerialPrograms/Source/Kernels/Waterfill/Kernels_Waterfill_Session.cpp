@@ -26,6 +26,7 @@ std::unique_ptr<WaterfillSession> make_WaterfillSession_64x32_x64_AVX512    (Pac
 std::unique_ptr<WaterfillSession> make_WaterfillSession_64x32_x64_AVX512GF  (PackedBinaryMatrix_IB* matrix);
 std::unique_ptr<WaterfillSession> make_WaterfillSession_64x64_x64_AVX512    (PackedBinaryMatrix_IB* matrix);
 std::unique_ptr<WaterfillSession> make_WaterfillSession_64x64_x64_AVX512GF  (PackedBinaryMatrix_IB* matrix);
+std::unique_ptr<WaterfillSession> make_WaterfillSession_64x8_arm64_NEON      (PackedBinaryMatrix_IB* matrix);
 
 std::unique_ptr<WaterfillSession> make_WaterfillSession(){
 //    cout << "make_WaterfillSession()" << endl;
@@ -54,7 +55,10 @@ std::unique_ptr<WaterfillSession> make_WaterfillSession(){
     case BinaryMatrixType::i64x8_x64_SSE42:
         return make_WaterfillSession_64x8_x64_SSE42(nullptr);
 #endif
-
+#ifdef PA_AutoDispatch_arm64_20_M1
+    case BinaryMatrixType::arm64x8_x64_NEON:
+        return make_WaterfillSession_64x8_arm64_NEON(nullptr);
+#endif
     case BinaryMatrixType::i64x8_Default:
         return make_WaterfillSession_64x8_Default(nullptr);
     case BinaryMatrixType::i64x4_Default:
@@ -89,7 +93,10 @@ std::unique_ptr<WaterfillSession> make_WaterfillSession(PackedBinaryMatrix_IB& m
     case BinaryMatrixType::i64x8_x64_SSE42:
         return make_WaterfillSession_64x8_x64_SSE42(&matrix);
 #endif
-
+#ifdef PA_AutoDispatch_arm64_20_M1
+    case BinaryMatrixType::arm64x8_x64_NEON:
+        return make_WaterfillSession_64x8_arm64_NEON(&matrix);
+#endif
     case BinaryMatrixType::i64x8_Default:
         return make_WaterfillSession_64x8_Default(&matrix);
     case BinaryMatrixType::i64x4_Default:

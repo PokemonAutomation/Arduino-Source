@@ -28,6 +28,7 @@ std::vector<WaterfillObject> find_objects_inplace_64x32_x64_AVX512  (PackedBinar
 std::vector<WaterfillObject> find_objects_inplace_64x64_x64_AVX512  (PackedBinaryMatrix_IB& matrix, size_t min_area);
 std::vector<WaterfillObject> find_objects_inplace_64x32_x64_AVX512GF(PackedBinaryMatrix_IB& matrix, size_t min_area);
 std::vector<WaterfillObject> find_objects_inplace_64x64_x64_AVX512GF(PackedBinaryMatrix_IB& matrix, size_t min_area);
+std::vector<WaterfillObject> find_objects_inplace_64x8_arm64_NEON   (PackedBinaryMatrix_IB& matrix, size_t min_area);
 
 std::vector<WaterfillObject> find_objects_inplace(PackedBinaryMatrix_IB& matrix, size_t min_area){
 //    cout << "find_objects_inplace" << endl;
@@ -56,6 +57,11 @@ std::vector<WaterfillObject> find_objects_inplace(PackedBinaryMatrix_IB& matrix,
 #ifdef PA_AutoDispatch_x64_08_Nehalem
     case BinaryMatrixType::i64x8_x64_SSE42:
         return find_objects_inplace_64x8_x64_SSE42(matrix, min_area);
+#endif
+#elif PA_ARCH_arm64
+#ifdef PA_AutoDispatch_arm64_20_M1
+    case BinaryMatrixType::arm64x8_x64_NEON:
+        return find_objects_inplace_64x8_arm64_NEON(matrix, min_area);
 #endif
 #endif
 

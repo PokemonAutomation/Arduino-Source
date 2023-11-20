@@ -22,6 +22,7 @@ void filter_by_mask_64x8_x64_SSE42    (const PackedBinaryMatrix_IB& matrix, uint
 void filter_by_mask_64x16_x64_AVX2    (const PackedBinaryMatrix_IB& matrix, uint32_t* image, size_t bytes_per_row, uint32_t replace_with, bool replace_if_zero);
 void filter_by_mask_64x32_x64_AVX512  (const PackedBinaryMatrix_IB& matrix, uint32_t* image, size_t bytes_per_row, uint32_t replace_with, bool replace_if_zero);
 void filter_by_mask_64x64_x64_AVX512  (const PackedBinaryMatrix_IB& matrix, uint32_t* image, size_t bytes_per_row, uint32_t replace_with, bool replace_if_zero);
+void filter_by_mask_64x8_arm64_NEON    (const PackedBinaryMatrix_IB& matrix, uint32_t* image, size_t bytes_per_row, uint32_t replace_with, bool replace_if_zero);
 
 void filter_by_mask(
     const PackedBinaryMatrix_IB& matrix,
@@ -48,11 +49,16 @@ void filter_by_mask(
         filter_by_mask_64x8_x64_SSE42(matrix, image, bytes_per_row, replace_with, replace_if_zero);
         return;
 #endif
+#ifdef PA_AutoDispatch_arm64_20_M1
+    case BinaryMatrixType::arm64x8_x64_NEON:
+        filter_by_mask_64x8_arm64_NEON(matrix, image, bytes_per_row, replace_with, replace_if_zero);
+        return;
+#endif
     case BinaryMatrixType::i64x4_Default:
         filter_by_mask_64x4_Default(matrix, image, bytes_per_row, replace_with, replace_if_zero);
         return;
     default:
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Unsupported matrix format.");
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Unsupported matrix format in filter_by_mask().");
     }
 }
 
@@ -108,6 +114,15 @@ void compress_rgb32_to_binary_range_64x64_x64_AVX512(
     CompressRgb32ToBinaryRangeFilter* filters, size_t filter_count
 );
 
+void compress_rgb32_to_binary_range_64x8_arm64_NEON(
+    const uint32_t* image, size_t bytes_per_row,
+    PackedBinaryMatrix_IB& matrix0, uint32_t mins0, uint32_t maxs0
+);
+void compress_rgb32_to_binary_range_64x8_arm64_NEON(
+    const uint32_t* image, size_t bytes_per_row,
+    CompressRgb32ToBinaryRangeFilter* filters, size_t filter_count
+);
+
 void compress_rgb32_to_binary_range(
     const uint32_t* image, size_t bytes_per_row,
     PackedBinaryMatrix_IB& matrix,
@@ -130,6 +145,11 @@ void compress_rgb32_to_binary_range(
 #ifdef PA_AutoDispatch_x64_08_Nehalem
     case BinaryMatrixType::i64x8_x64_SSE42:
         compress_rgb32_to_binary_range_64x8_x64_SSE42(image, bytes_per_row, matrix, mins, maxs);
+        return;
+#endif
+#ifdef PA_AutoDispatch_arm64_20_M1
+    case BinaryMatrixType::arm64x8_x64_NEON:
+        compress_rgb32_to_binary_range_64x8_arm64_NEON(image, bytes_per_row, matrix, mins, maxs);
         return;
 #endif
     case BinaryMatrixType::i64x4_Default:
@@ -171,6 +191,11 @@ void compress_rgb32_to_binary_range(
         compress_rgb32_to_binary_range_64x8_x64_SSE42(image, bytes_per_row, filters, filter_count);
         return;
 #endif
+#ifdef PA_AutoDispatch_arm64_20_M1
+    case BinaryMatrixType::arm64x8_x64_NEON:
+        compress_rgb32_to_binary_range_64x8_arm64_NEON(image, bytes_per_row, filters, filter_count);
+        return;
+#endif
     case BinaryMatrixType::i64x4_Default:
         compress_rgb32_to_binary_range_64x4_Default(image, bytes_per_row, filters, filter_count);
         return;
@@ -178,7 +203,6 @@ void compress_rgb32_to_binary_range(
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Unsupported matrix format.");
     }
 }
-
 
 
 void compress_rgb32_to_binary_euclidean_64x64_x64_AVX512(
@@ -197,6 +221,11 @@ void compress_rgb32_to_binary_euclidean_64x16_x64_AVX2(
     uint32_t expected, double max_euclidean_distance
 );
 void compress_rgb32_to_binary_euclidean_64x8_x64_SSE42(
+    const uint32_t* image, size_t bytes_per_row,
+    PackedBinaryMatrix_IB& matrix,
+    uint32_t expected, double max_euclidean_distance
+);
+void compress_rgb32_to_binary_euclidean_64x8_arm64_NEON(
     const uint32_t* image, size_t bytes_per_row,
     PackedBinaryMatrix_IB& matrix,
     uint32_t expected, double max_euclidean_distance
@@ -228,6 +257,11 @@ void compress_rgb32_to_binary_euclidean(
 #ifdef PA_AutoDispatch_x64_08_Nehalem
     case BinaryMatrixType::i64x8_x64_SSE42:
         compress_rgb32_to_binary_euclidean_64x8_x64_SSE42(image, bytes_per_row, matrix, expected, max_euclidean_distance);
+        return;
+#endif
+#ifdef PA_AutoDispatch_arm64_20_M1
+    case BinaryMatrixType::arm64x8_x64_NEON:
+        compress_rgb32_to_binary_euclidean_64x8_arm64_NEON(image, bytes_per_row, matrix, expected, max_euclidean_distance);
         return;
 #endif
     case BinaryMatrixType::i64x4_Default:

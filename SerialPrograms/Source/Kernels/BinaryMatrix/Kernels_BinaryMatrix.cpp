@@ -30,6 +30,11 @@ BinaryMatrixType get_BinaryMatrixType(){
     if (CPU_CAPABILITY_CURRENT.OK_08_Nehalem){
         return BinaryMatrixType::i64x8_x64_SSE42;
     }
+#elif PA_ARCH_arm64
+    // TODO: enable this once binary matrix is ready!
+    // if (CPU_CAPABILITY_CURRENT.OK_M1){
+    //     return BinaryMatrixType::arm64x8_x64_NEON;
+    // }
 #endif
 
 //    return BinaryMatrixType::i64x8_Default;
@@ -51,6 +56,9 @@ std::unique_ptr<PackedBinaryMatrix_IB> make_PackedBinaryMatrix_64x32_x64_AVX512(
 std::unique_ptr<PackedBinaryMatrix_IB> make_PackedBinaryMatrix_64x64_x64_AVX512();
 std::unique_ptr<PackedBinaryMatrix_IB> make_PackedBinaryMatrix_64x64_x64_AVX512(size_t width, size_t height);
 
+std::unique_ptr<PackedBinaryMatrix_IB> make_PackedBinaryMatrix_64x8_arm64_NEON();
+std::unique_ptr<PackedBinaryMatrix_IB> make_PackedBinaryMatrix_64x8_arm64_NEON(size_t width, size_t height);
+
 std::unique_ptr<PackedBinaryMatrix_IB> make_PackedBinaryMatrix(BinaryMatrixType type){
     switch (type){
 
@@ -70,6 +78,11 @@ std::unique_ptr<PackedBinaryMatrix_IB> make_PackedBinaryMatrix(BinaryMatrixType 
 #ifdef PA_AutoDispatch_x64_08_Nehalem
     case BinaryMatrixType::i64x8_x64_SSE42:
         return make_PackedBinaryMatrix_64x8_x64_SSE42();
+#endif
+#elif PA_ARCH_arm64
+#ifdef PA_AutoDispatch_arm64_20_M1
+    case BinaryMatrixType::arm64x8_x64_NEON:
+        return make_PackedBinaryMatrix_64x8_arm64_NEON();
 #endif
 #endif
 
@@ -101,6 +114,11 @@ std::unique_ptr<PackedBinaryMatrix_IB> make_PackedBinaryMatrix(BinaryMatrixType 
     case BinaryMatrixType::i64x8_x64_SSE42:
         return make_PackedBinaryMatrix_64x8_x64_SSE42(width, height);
 #endif
+#elif PA_ARCH_arm64
+#ifdef PA_AutoDispatch_arm64_20_M1
+    case BinaryMatrixType::arm64x8_x64_NEON:
+        return make_PackedBinaryMatrix_64x8_arm64_NEON(width, height);
+#endif
 #endif
 
     case BinaryMatrixType::i64x8_Default:
@@ -127,6 +145,9 @@ std::unique_ptr<SparseBinaryMatrix_IB> make_SparseBinaryMatrix_64x32_x64_AVX512(
 std::unique_ptr<SparseBinaryMatrix_IB> make_SparseBinaryMatrix_64x64_x64_AVX512();
 std::unique_ptr<SparseBinaryMatrix_IB> make_SparseBinaryMatrix_64x64_x64_AVX512(size_t width, size_t height);
 
+std::unique_ptr<SparseBinaryMatrix_IB> make_SparseBinaryMatrix_64x8_arm64_NEON();
+std::unique_ptr<SparseBinaryMatrix_IB> make_SparseBinaryMatrix_64x8_arm64_NEON(size_t width, size_t height);
+
 std::unique_ptr<SparseBinaryMatrix_IB> make_SparseBinaryMatrix(BinaryMatrixType type){
     switch (type){
 
@@ -142,6 +163,11 @@ std::unique_ptr<SparseBinaryMatrix_IB> make_SparseBinaryMatrix(BinaryMatrixType 
 #ifdef PA_AutoDispatch_x64_08_Nehalem
     case BinaryMatrixType::i64x8_x64_SSE42:
         return make_SparseBinaryMatrix_64x8_x64_SSE42();
+#endif
+#elif PA_ARCH_arm64
+#ifdef PA_AutoDispatch_arm64_20_M1
+    case BinaryMatrixType::arm64x8_x64_NEON:
+        return make_SparseBinaryMatrix_64x8_arm64_NEON();
 #endif
 #endif
 
@@ -168,6 +194,11 @@ std::unique_ptr<SparseBinaryMatrix_IB> make_SparseBinaryMatrix(BinaryMatrixType 
 #ifdef PA_AutoDispatch_x64_08_Nehalem
     case BinaryMatrixType::i64x8_x64_SSE42:
         return make_SparseBinaryMatrix_64x8_x64_SSE42(width, height);
+#endif
+#elif PA_ARCH_arm64
+#ifdef PA_AutoDispatch_arm64_20_M1
+    case BinaryMatrixType::arm64x8_x64_NEON:
+        return make_SparseBinaryMatrix_64x8_arm64_NEON(width, height);
 #endif
 #endif
 
