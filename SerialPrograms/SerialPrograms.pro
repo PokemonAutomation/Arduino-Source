@@ -342,6 +342,7 @@ SOURCES += \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_x64_SSE42.cpp \
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic.cpp \
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_Default.cpp \
+    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_arm64_NEON.cpp \
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_AVX2.cpp \
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_AVX512.cpp \
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_SSE42.cpp \
@@ -1399,6 +1400,7 @@ HEADERS += \
     Source/Kernels/Kernels_x64_AVX2.h \
     Source/Kernels/Kernels_x64_AVX512.h \
     Source/Kernels/Kernels_x64_SSE41.h \
+    Source/Kernels/PartialWordAccess/Kernels_PartialWordAccess_arm64_NEON.h \
     Source/Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_AVX2.h \
     Source/Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_SSE41.h \
     Source/Kernels/ScaleInvariantMatrixMatch/Kernels_ScaleInvariantMatrixMatch.h \

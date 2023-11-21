@@ -679,6 +679,7 @@ file(GLOB MAIN_SOURCES
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic.h
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_Default.cpp
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_Routines.h
+    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_arm64_NEON.cpp
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_AVX2.cpp
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_AVX512.cpp
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_SSE42.cpp
@@ -708,6 +709,7 @@ file(GLOB MAIN_SOURCES
     Source/Kernels/Kernels_x64_AVX2.h
     Source/Kernels/Kernels_x64_AVX512.h
     Source/Kernels/Kernels_x64_SSE41.h
+    Source/Kernels/PartialWordAccess/Kernels_PartialWordAccess_arm64_NEON.h
     Source/Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_AVX2.h
     Source/Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_SSE41.h
     Source/Kernels/ScaleInvariantMatrixMatch/Kernels_ScaleInvariantMatrixMatch.cpp
