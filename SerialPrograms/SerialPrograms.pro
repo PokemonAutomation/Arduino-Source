@@ -1395,6 +1395,7 @@ HEADERS += \
     Source/Kernels/Kernels_Alignment.h \
     Source/Kernels/Kernels_BitScan.h \
     Source/Kernels/Kernels_BitSet.h \
+    Source/Kernels/Kernels_arm64_NEON.h \
     Source/Kernels/Kernels_x64_AVX2.h \
     Source/Kernels/Kernels_x64_AVX512.h \
     Source/Kernels/Kernels_x64_SSE41.h \
