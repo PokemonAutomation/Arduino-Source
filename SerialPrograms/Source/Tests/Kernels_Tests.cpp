@@ -194,7 +194,7 @@ int test_kernels_FilterRGB32(const ImageViewRGB32& image){
         );
     }
     time_end = current_time();
-    ms = std::chrono::duration_cast<Milliseconds>(time_end - time_start).count();
+    ms = (double)std::chrono::duration_cast<Milliseconds>(time_end - time_start).count();
     cout << "Running " << num_iters << " iters, avg filter time: " << ms / num_iters << " ms" << endl;
 
     if (error_count){
