@@ -12,10 +12,10 @@
 #include "CommonFramework/ImageTypes/BinaryImage.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
-#include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "Kernels/BinaryMatrix/Kernels_BinaryMatrix.h"
 #include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.h"
+#include "Kernels/ImageFilters/Kernels_ImageFilter_Basic.h"
 #include "Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness.h"
 #include "Kernels_Tests.h"
 
@@ -132,47 +132,72 @@ int test_kernels_BinaryMatrix(const ImageViewRGB32& image){
 }
 
 int test_kernels_FilterRGB32(const ImageViewRGB32& image){
-
     const size_t width = image.width();
     const size_t height = image.height();
+    cout << "Testing filter_rgb32_range(), image size " << width << " x " << height << endl;
 
     const uint32_t mins = combine_rgb(0, 0, 0);
     // uint32_t maxs = combine_rgb(255, 255, 255);
     const uint32_t maxs = combine_rgb(63, 63, 63);
 
-    bool have_error = false;
+    ImageRGB32 image_out(image.width(), image.height());
+    size_t pixels_in_range = 0;
 
     const bool replace_color_within_range = true;
-    auto new_image = filter_rgb32_range(image, mins, maxs, COLOR_WHITE, replace_color_within_range);
+    auto time_start = current_time();
+    // auto new_image = filter_rgb32_range(image, mins, maxs, COLOR_WHITE, replace_color_within_range);
+    pixels_in_range = Kernels::filter_rgb32_range(
+        image.data(), image.bytes_per_row(), image.width(), image.height(),
+        image_out.data(), image_out.bytes_per_row(), mins, maxs, (uint32_t)COLOR_WHITE, replace_color_within_range
+    );
+    auto time_end = current_time();
+    auto ns = std::chrono::duration_cast<std::chrono::nanoseconds>(time_end - time_start).count();
+    auto ms = ns / 1000000.;
+    cout << "One filter time: " << ms << " ms" << endl;
 
+    size_t actual_num_pixels_in_range = 0;
+    size_t error_count = 0;
     for (size_t r = 0; r < height; r++){
         for (size_t c = 0; c < width; c++){
             const Color color(image.pixel(c, r));
-            const Color new_color(new_image.pixel(c, r));
+            const Color new_color(image_out.pixel(c, r));
             bool in_range = (color.red() <= 63 && color.green() <= 63 && color.blue() <= 63);
-            if (in_range && uint32_t(new_color) != uint32_t(COLOR_WHITE)){
-                cout << "Error: wrong filter result: old color " << color.to_string() << ", (x,y) = "
-                     << c << ", " << r << endl;
-                have_error = true;
-                return 1;
+            actual_num_pixels_in_range += in_range;
+            if (error_count < 10){
+                // Print first 10 errors:
+                if (in_range && uint32_t(new_color) != uint32_t(COLOR_WHITE)){
+                    cout << "Error: wrong filter result: old color " << color.to_string() << ", (x,y) = "
+                        << c << ", " << r << ", should be in range but not found by the function" << endl;
+                    ++error_count;
+                }
+                else if (in_range == false && uint32_t(new_color) != uint32_t(color)){
+                    cout << "Error: wrong filter result: old color " << color.to_string() << ", (x,y) = "
+                        << c << ", " << r << ", should not be changed by the function" << endl;
+                    ++error_count;
+                }
             }
         }
     }
+    cout << "Found " << actual_num_pixels_in_range << " pixels in range" << endl;
+    if (pixels_in_range != actual_num_pixels_in_range){
+        cout << "Error: wrong pixels in range: " << pixels_in_range << " actual: " << actual_num_pixels_in_range << endl;
+        return 1;
+    }
 
-    // const size_t num_iter = 3000;
-    // auto time_start = current_time();
-    // for(size_t i = 0; i < num_iter; i++){
-    //     filter_rgb32(
-    //         matrix, new_image.data(), new_image.bytes_per_row(), uint32_t(COLOR_WHITE), replace_if_zero
-    //     );
-    // }
-    // auto time_end = current_time();
-    // const auto ms = std::chrono::duration_cast<Milliseconds>(time_end - time_start).count();
-    // cout << "Filter time: " << ms << " ms" << endl;
+    // We try to wait for three seconds:
+    const size_t num_iters = size_t(3000 / ms);
+    time_start = current_time();
+    for(size_t i = 0; i < num_iters; i++){
+        Kernels::filter_rgb32_range(
+            image.data(), image.bytes_per_row(), image.width(), image.height(),
+            image_out.data(), image_out.bytes_per_row(), mins, maxs, (uint32_t)COLOR_WHITE, replace_color_within_range
+        );
+    }
+    time_end = current_time();
+    ms = std::chrono::duration_cast<Milliseconds>(time_end - time_start).count();
+    cout << "Running " << num_iters << " iters, avg filter time: " << ms / num_iters << " ms" << endl;
 
-
-
-    if (have_error){
+    if (error_count){
         return 1;
     }
 
