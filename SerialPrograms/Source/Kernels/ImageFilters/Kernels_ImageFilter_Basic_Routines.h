@@ -16,7 +16,12 @@
 namespace PokemonAutomation{
 namespace Kernels{
 
-
+// Runner interface:
+// - static size_t Runner::VECTOR_SIZE, how many uint32_t in an SIMD vector. Note one pixel is one uint32_t.
+// - Runner::process_full(uint32_t* out, const uint32_t* in), process a full vector: replace pixels in
+//   or out of a specific color range with a particular color.
+// - Runner::process_partial(uint32_t* out, const uint32_t* in, size_t left), process a partial vector:
+//   work only on the first `left` pixels.
 template <typename Runner>
 PA_FORCE_INLINE void filter_per_pixel(
     const uint32_t* image, size_t in_bytes_per_row, size_t width, size_t height,

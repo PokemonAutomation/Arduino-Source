@@ -15,12 +15,15 @@
 namespace PokemonAutomation{
 namespace Kernels{
 
-
+// Change certain color in `image_in` and save output to `image_out`.
+//  If `replace_color_within_range` is true, replace the color within range [mins, maxs] with the color `replacement`.
+//  If `replace_color_within_range` is false, replace the color outside of the range with the color `replacement`.
+//  Returns the # of pixels inside the range [mins, maxs].
 size_t filter_rgb32_range(
-    const uint32_t* in, size_t in_bytes_per_row, size_t width, size_t height,
-    uint32_t* out, size_t out_bytes_per_row,
+    const uint32_t* image_in, size_t image_in_bytes_per_row, size_t width, size_t height,
+    uint32_t* image_out, size_t image_out_bytes_per_row,
     uint32_t mins, uint32_t maxs,
-    uint32_t replacement, bool invert
+    uint32_t replacement, bool replace_color_within_range
 );
 
 
