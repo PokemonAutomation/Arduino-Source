@@ -17,9 +17,10 @@ public:
     static const size_t VECTOR_SIZE = 1;
 
 public:
-    ImageFilter_RgbRange_Default(uint32_t mins, uint32_t maxs, uint32_t replacement, bool invert)
-        : m_replacement(replacement)
-        , m_invert(invert ? 1 : 0)
+    ImageFilter_RgbRange_Default(uint32_t mins, uint32_t maxs, uint32_t replacement_color,
+        bool replace_color_within_range)
+        : m_replacement_color(replacement_color)
+        , m_replace_color_within_range(replace_color_within_range ? 1 : 0)
         , m_minB(mins & 0x000000ff)
         , m_maxB(maxs & 0x000000ff)
         , m_minG(mins & 0x0000ff00)
@@ -59,16 +60,16 @@ public:
             ret &= p <= m_maxB;
         }
         m_count += ret;
-        ret ^= m_invert;
-        out[0] = ret ? pixel : m_replacement;
+        ret ^= m_replace_color_within_range;
+        out[0] = ret ? pixel : m_replacement_color;
     }
     PA_FORCE_INLINE void process_partial(uint32_t* out, const uint32_t* in, size_t left){
         process_full(out, in);
     }
 
 private:
-    const uint32_t m_replacement;
-    const uint32_t m_invert;
+    const uint32_t m_replacement_color;
+    const uint32_t m_replace_color_within_range;
     const uint32_t m_minB;
     const uint32_t m_maxB;
     const uint32_t m_minG;
@@ -83,9 +84,9 @@ size_t filter_rgb32_range_Default(
     const uint32_t* in, size_t in_bytes_per_row, size_t width, size_t height,
     uint32_t* out, size_t out_bytes_per_row,
     uint32_t mins, uint32_t maxs,
-    uint32_t replacement, bool invert
+    uint32_t replacement_color, bool replace_color_within_range
 ){
-    ImageFilter_RgbRange_Default filter(mins, maxs, replacement, invert);
+    ImageFilter_RgbRange_Default filter(mins, maxs, replacement_color, replace_color_within_range);
     filter_per_pixel(in, in_bytes_per_row, width, height, filter, out, out_bytes_per_row);
     return filter.count();
 }
@@ -107,9 +108,9 @@ public:
     static const size_t VECTOR_SIZE = 1;
 
 public:
-    ImageFilter_RgbEuclidean_Default(uint32_t expected, double max_euclidean_distance, uint32_t replacement, bool invert)
-        : m_replacement(replacement)
-        , m_invert(invert ? 1 : 0)
+    ImageFilter_RgbEuclidean_Default(uint32_t expected, double max_euclidean_distance, uint32_t replacement_color, bool replace_color_within_range)
+        : m_replacement_color(replacement_color)
+        , m_replace_color_within_range(replace_color_within_range ? 1 : 0)
         , m_expected_r((expected & 0x00ff0000) >> 16)
         , m_expected_g((expected & 0x0000ff00) >> 8)
         , m_expected_b(expected & 0x000000ff)
@@ -142,16 +143,16 @@ public:
         }
         ret = sum_sqr <= m_distance_squared;
         m_count += ret;
-        ret ^= m_invert;
-        out[0] = ret ? pixel : m_replacement;
+        ret ^= m_replace_color_within_range;
+        out[0] = ret ? pixel : m_replacement_color;
     }
     PA_FORCE_INLINE void process_partial(uint32_t* out, const uint32_t* in, size_t left){
         process_full(out, in);
     }
 
 private:
-    const uint32_t m_replacement;
-    const uint32_t m_invert;
+    const uint32_t m_replacement_color;
+    const uint32_t m_replace_color_within_range;
     uint32_t m_expected_r;
     uint32_t m_expected_g;
     uint32_t m_expected_b;
@@ -162,9 +163,9 @@ size_t filter_rgb32_euclidean_Default(
     const uint32_t* in, size_t in_bytes_per_row, size_t width, size_t height,
     uint32_t* out, size_t out_bytes_per_row,
     uint32_t expected, double max_euclidean_distance,
-    uint32_t replacement, bool invert
+    uint32_t replacement_color, bool replace_color_within_range
 ){
-    ImageFilter_RgbEuclidean_Default filter(expected, max_euclidean_distance, replacement, invert);
+    ImageFilter_RgbEuclidean_Default filter(expected, max_euclidean_distance, replacement_color, replace_color_within_range);
     filter_per_pixel(in, in_bytes_per_row, width, height, filter, out, out_bytes_per_row);
     return filter.count();
 }

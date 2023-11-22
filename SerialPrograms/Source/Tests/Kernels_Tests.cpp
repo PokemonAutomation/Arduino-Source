@@ -18,6 +18,7 @@
 #include "Kernels/ImageFilters/Kernels_ImageFilter_Basic.h"
 #include "Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness.h"
 #include "Kernels_Tests.h"
+#include "TestUtils.h"
 
 #include <iostream>
 using std::cout;
@@ -116,7 +117,7 @@ int test_kernels_BinaryMatrix(const ImageViewRGB32& image){
         return 1;
     }
 
-    {
+    { // time test
         auto time_start = current_time();
         for(size_t i = 0; i < num_iter; i++){
             compress_rgb32_to_binary_range(
@@ -141,6 +142,7 @@ int test_kernels_FilterRGB32(const ImageViewRGB32& image){
     const uint32_t maxs = combine_rgb(63, 63, 63);
 
     ImageRGB32 image_out(image.width(), image.height());
+    ImageRGB32 image_out_2(image.width(), image.height());
     size_t pixels_in_range = 0;
 
     const bool replace_color_within_range = true;
@@ -155,24 +157,43 @@ int test_kernels_FilterRGB32(const ImageViewRGB32& image){
     auto ms = ns / 1000000.;
     cout << "One filter time: " << ms << " ms" << endl;
 
+    size_t pixels_in_range_2 = Kernels::filter_rgb32_range(
+        image.data(), image.bytes_per_row(), image.width(), image.height(),
+        image_out_2.data(), image_out_2.bytes_per_row(), mins, maxs, (uint32_t)COLOR_WHITE, !replace_color_within_range
+    );
+
+    TEST_RESULT_EQUAL(pixels_in_range, pixels_in_range_2);
+
     size_t actual_num_pixels_in_range = 0;
     size_t error_count = 0;
     for (size_t r = 0; r < height; r++){
         for (size_t c = 0; c < width; c++){
             const Color color(image.pixel(c, r));
             const Color new_color(image_out.pixel(c, r));
+            const Color new_color_2(image_out_2.pixel(c, r));
             bool in_range = (color.red() <= 63 && color.green() <= 63 && color.blue() <= 63);
             actual_num_pixels_in_range += in_range;
             if (error_count < 10){
                 // Print first 10 errors:
-                if (in_range && uint32_t(new_color) != uint32_t(COLOR_WHITE)){
+                if (in_range && new_color != COLOR_WHITE){
                     cout << "Error: wrong filter result: old color " << color.to_string() << ", (x,y) = "
                         << c << ", " << r << ", should be in range but not found by the function" << endl;
                     ++error_count;
                 }
-                else if (in_range == false && uint32_t(new_color) != uint32_t(color)){
+                else if (in_range == false && new_color != color){
                     cout << "Error: wrong filter result: old color " << color.to_string() << ", (x,y) = "
                         << c << ", " << r << ", should not be changed by the function" << endl;
+                    ++error_count;
+                }
+
+                if (in_range && new_color_2 != color){
+                    cout << "Error: wrong inverse filter result: old color " << color.to_string() << ", (x,y) = "
+                        << c << ", " << r << ", should not be changed by the function" << endl;
+                    ++error_count;
+                }
+                else if (in_range == false && new_color_2 != COLOR_WHITE){
+                    cout << "Error: wrong inverse filter result: old color " << color.to_string() << ", (x,y) = "
+                        << c << ", " << r << ", should not be in range but not found by the function" << endl;
                     ++error_count;
                 }
             }
@@ -181,6 +202,10 @@ int test_kernels_FilterRGB32(const ImageViewRGB32& image){
     cout << "Found " << actual_num_pixels_in_range << " pixels in range" << endl;
     if (pixels_in_range != actual_num_pixels_in_range){
         cout << "Error: wrong pixels in range: " << pixels_in_range << " actual: " << actual_num_pixels_in_range << endl;
+        return 1;
+    }
+
+    if (error_count){
         return 1;
     }
 
@@ -196,10 +221,6 @@ int test_kernels_FilterRGB32(const ImageViewRGB32& image){
     time_end = current_time();
     ms = (double)std::chrono::duration_cast<Milliseconds>(time_end - time_start).count();
     cout << "Running " << num_iters << " iters, avg filter time: " << ms / num_iters << " ms" << endl;
-
-    if (error_count){
-        return 1;
-    }
 
     return 0;
 }

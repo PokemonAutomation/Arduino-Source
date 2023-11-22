@@ -40,6 +40,12 @@ public:
     bool operator<(Color color) const{
         return m_argb < color.m_argb;
     }
+    bool operator==(Color color) const{
+        return m_argb == color.m_argb;
+    }
+    bool operator!=(Color color) const{
+        return m_argb != color.m_argb;
+    }
 
     uint8_t alpha   () const { return (uint8_t)(m_argb >> 24); }
     uint8_t red     () const { return (uint8_t)(m_argb >> 16); }
