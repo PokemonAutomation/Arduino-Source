@@ -108,13 +108,13 @@ public:
     static const size_t VECTOR_SIZE = 1;
 
 public:
-    ImageFilter_RgbEuclidean_Default(uint32_t expected, double max_euclidean_distance, uint32_t replacement_color, bool replace_color_within_range)
+    ImageFilter_RgbEuclidean_Default(uint32_t expected_color, double max_euclidean_distance, uint32_t replacement_color, bool replace_color_within_range)
         : m_replacement_color(replacement_color)
         , m_replace_color_within_range(replace_color_within_range ? 1 : 0)
-        , m_expected_r((expected & 0x00ff0000) >> 16)
-        , m_expected_g((expected & 0x0000ff00) >> 8)
-        , m_expected_b(expected & 0x000000ff)
-        , m_distance_squared((uint32_t)(max_euclidean_distance * max_euclidean_distance))
+        , m_expected_r((expected_color & 0x00ff0000) >> 16)
+        , m_expected_g((expected_color & 0x0000ff00) >> 8)
+        , m_expected_b(expected_color & 0x000000ff)
+        , m_max_distance_squared((uint32_t)(max_euclidean_distance * max_euclidean_distance))
         , m_count(0)
     {}
 
@@ -141,7 +141,7 @@ public:
             p -= m_expected_b;
             sum_sqr += p * p;
         }
-        ret = sum_sqr <= m_distance_squared;
+        ret = sum_sqr <= m_max_distance_squared;
         m_count += ret;
         ret ^= m_replace_color_within_range;
         out[0] = ret ? pixel : m_replacement_color;
@@ -156,16 +156,16 @@ private:
     uint32_t m_expected_r;
     uint32_t m_expected_g;
     uint32_t m_expected_b;
-    uint32_t m_distance_squared;
+    uint32_t m_max_distance_squared;
     size_t m_count;
 };
 size_t filter_rgb32_euclidean_Default(
     const uint32_t* in, size_t in_bytes_per_row, size_t width, size_t height,
     uint32_t* out, size_t out_bytes_per_row,
-    uint32_t expected, double max_euclidean_distance,
+    uint32_t expected_color, double max_euclidean_distance,
     uint32_t replacement_color, bool replace_color_within_range
 ){
-    ImageFilter_RgbEuclidean_Default filter(expected, max_euclidean_distance, replacement_color, replace_color_within_range);
+    ImageFilter_RgbEuclidean_Default filter(expected_color, max_euclidean_distance, replacement_color, replace_color_within_range);
     filter_per_pixel(in, in_bytes_per_row, width, height, filter, out, out_bytes_per_row);
     return filter.count();
 }

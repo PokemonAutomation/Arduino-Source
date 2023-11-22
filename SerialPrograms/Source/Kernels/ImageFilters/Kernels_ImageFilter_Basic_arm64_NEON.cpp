@@ -9,7 +9,7 @@
 #include <stdint.h>
 #include <cstddef>
 #include "Kernels/Kernels_arm64_NEON.h"
-#include "Kernels/PartialWordAccess/Kernels_PartialWordAccess_arm64_NEON.h"
+// #include "Kernels/PartialWordAccess/Kernels_PartialWordAccess_arm64_NEON.h"
 #include "Kernels_ImageFilter_Basic_Routines.h"
 
 #include <iostream>
