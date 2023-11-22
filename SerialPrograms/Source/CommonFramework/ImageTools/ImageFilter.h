@@ -56,15 +56,18 @@ std::vector<std::pair<ImageRGB32, size_t>> filter_rgb32_range(
 );
 
 
-//  If `replace_color_within_range` is true, replace the color within (<=) `max_euclidean_distance` of the
+//  If `replace_color_within_range` is true, replace the colors within (<=) `max_euclidean_distance` of the
 //    `expected_color` with `replacement_color`.
 //  If `replace_color_within_range` is false, replace the color outside of the distance with the color `replacement_color`.
-//  Returns the # of pixels inside the distance.
 ImageRGB32 filter_rgb32_euclidean(
     const ImageViewRGB32& image,
     uint32_t expected_color, double max_euclidean_distance,
     Color replacement_color, bool replace_color_within_range
 );
+//  If `replace_color_within_range` is true, replace the colors within (<=) `max_euclidean_distance` of the
+//    `expected_color` with `replacement_color`.
+//  If `replace_color_within_range` is false, replace the color outside of the distance with the color `replacement_color`.
+//  Returns the # of pixels inside the distance.
 ImageRGB32 filter_rgb32_euclidean(
     size_t& pixels_in_range,
     const ImageViewRGB32& image,

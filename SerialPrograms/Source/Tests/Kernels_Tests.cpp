@@ -137,9 +137,12 @@ int test_kernels_FilterRGB32(const ImageViewRGB32& image){
     const size_t height = image.height();
     cout << "Testing filter_rgb32_range(), image size " << width << " x " << height << endl;
 
-    const uint32_t mins = combine_rgb(0, 0, 0);
-    // uint32_t maxs = combine_rgb(255, 255, 255);
-    const uint32_t maxs = combine_rgb(63, 63, 63);
+    Color min_color(0, 0, 0);
+    Color max_color(63, 63, 63);
+    // Color max_color(238, 24, 42);
+    
+    const uint32_t mins = uint32_t(min_color);
+    const uint32_t maxs = uint32_t(max_color);
 
     ImageRGB32 image_out(image.width(), image.height());
     ImageRGB32 image_out_2(image.width(), image.height());
@@ -171,7 +174,9 @@ int test_kernels_FilterRGB32(const ImageViewRGB32& image){
             const Color color(image.pixel(c, r));
             const Color new_color(image_out.pixel(c, r));
             const Color new_color_2(image_out_2.pixel(c, r));
-            bool in_range = (color.red() <= 63 && color.green() <= 63 && color.blue() <= 63);
+            bool in_range = (min_color.red() <= color.red() && color.red() <= max_color.red());
+            in_range = in_range && (min_color.green() <= color.green() && color.green() <= max_color.green());
+            in_range = in_range && (min_color.blue() <= color.blue() && color.blue() <= max_color.blue());
             actual_num_pixels_in_range += in_range;
             if (error_count < 10){
                 // Print first 10 errors:
