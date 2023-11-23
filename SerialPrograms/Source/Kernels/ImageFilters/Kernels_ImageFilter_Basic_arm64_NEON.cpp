@@ -257,8 +257,6 @@ size_t to_blackwhite_rgb32_range_arm64_NEON(
     uint32_t* out, size_t out_bytes_per_row,
     uint32_t mins, uint32_t maxs, bool in_range_black
 ){
-    // return to_blackwhite_rgb32_range_Default(in, in_bytes_per_row, width, height,
-    //     out, out_bytes_per_row, mins, maxs, in_range_black);
     ToBlackWhite_RgbRange_arm64_NEON filter(mins, maxs, in_range_black);
     filter_per_pixel(in, in_bytes_per_row, width, height, filter, out, out_bytes_per_row);
     return filter.count();
