@@ -68,6 +68,7 @@ ImageRGB32 filter_rgb32_euclidean(
 //    `expected_color` with `replacement_color`.
 //  If `replace_color_within_range` is false, replace the color outside of the distance with the color `replacement_color`.
 //  Returns the # of pixels inside the distance.
+//  Note: the alpha channel of `image` and `expected_color` are ignored during computation.
 ImageRGB32 filter_rgb32_euclidean(
     size_t& pixels_in_range,
     const ImageViewRGB32& image,
