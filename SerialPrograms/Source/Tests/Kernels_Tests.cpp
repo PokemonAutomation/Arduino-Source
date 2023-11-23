@@ -341,6 +341,107 @@ int test_kernels_FilterRGB32Euclidean(const ImageViewRGB32& image){
     return 0;
 }
 
+int test_kernels_ToBlackWhiteRGB32Range(const ImageViewRGB32& image){
+    const size_t width = image.width();
+    const size_t height = image.height();
+    cout << "Testing to_black_white_rgb32_range(), image size " << width << " x " << height << endl;
+
+    Color min_color(0, 0, 0);
+    Color max_color(63, 63, 63);
+    // Color max_color(238, 24, 42);
+    
+    const uint32_t mins = uint32_t(min_color);
+    const uint32_t maxs = uint32_t(max_color);
+
+    ImageRGB32 image_out(image.width(), image.height());
+    ImageRGB32 image_out_2(image.width(), image.height());
+    size_t pixels_in_range = 0;
+
+    const bool in_range_black = true;
+    auto time_start = current_time();
+    // auto new_image = filter_rgb32_range(image, mins, maxs, COLOR_WHITE, replace_color_within_range);
+    pixels_in_range = Kernels::to_blackwhite_rgb32_range(
+        image.data(), image.bytes_per_row(), image.width(), image.height(),
+        image_out.data(), image_out.bytes_per_row(), mins, maxs, in_range_black
+    );
+    auto time_end = current_time();
+    auto ns = std::chrono::duration_cast<std::chrono::nanoseconds>(time_end - time_start).count();
+    auto ms = ns / 1000000.;
+    cout << "One filter time: " << ms << " ms" << endl;
+
+    size_t pixels_in_range_2 = Kernels::to_blackwhite_rgb32_range(
+        image.data(), image.bytes_per_row(), image.width(), image.height(),
+        image_out_2.data(), image_out_2.bytes_per_row(), mins, maxs, !in_range_black
+    );
+
+    TEST_RESULT_EQUAL(pixels_in_range, pixels_in_range_2);
+
+    size_t actual_num_pixels_in_range = 0;
+    size_t error_count = 0;
+    for (size_t r = 0; r < height; r++){
+        for (size_t c = 0; c < width; c++){
+            const Color color(image.pixel(c, r));
+            const Color new_color(image_out.pixel(c, r));
+            const Color new_color_2(image_out_2.pixel(c, r));
+            bool in_range = (min_color.alpha() <= color.alpha() && color.alpha() <= max_color.alpha());
+            in_range = in_range && (min_color.red() <= color.red() && color.red() <= max_color.red());
+            in_range = in_range && (min_color.green() <= color.green() && color.green() <= max_color.green());
+            in_range = in_range && (min_color.blue() <= color.blue() && color.blue() <= max_color.blue());
+            actual_num_pixels_in_range += in_range;
+            if (error_count < 10){
+                // Print first 10 errors:
+                if (in_range && new_color != COLOR_BLACK){
+                    cout << "Error: wrong filter result: old color " << color.to_string() << ", (x,y) = "
+                        << c << ", " << r << ", should be black due to in range but not so" << endl;
+                    ++error_count;
+                }
+                else if (in_range == false && new_color != COLOR_WHITE){
+                    cout << "Error: wrong filter result: old color " << color.to_string() << ", (x,y) = "
+                        << c << ", " << r << ", should be white due to out of range but not so" << endl;
+                    ++error_count;
+                }
+
+                if (in_range && new_color_2 != COLOR_WHITE){
+                    cout << "Error: wrong inverse filter result: old color " << color.to_string() << ", (x,y) = "
+                        << c << ", " << r << ", should be white due to in range but not so" << endl;
+                    ++error_count;
+                }
+                else if (in_range == false && new_color_2 != COLOR_BLACK){
+                    cout << "Error: wrong inverse filter result: old color " << color.to_string() << ", (x,y) = "
+                        << c << ", " << r << ", should be black due to out of range but not so" << endl;
+                    ++error_count;
+                }
+            }
+        }
+    }
+    cout << "Found " << actual_num_pixels_in_range << " pixels in range" << endl;
+    if (pixels_in_range != actual_num_pixels_in_range){
+        cout << "Error: wrong pixels in range: " << pixels_in_range << " actual: " << actual_num_pixels_in_range << endl;
+        return 1;
+    }
+
+    if (error_count){
+        return 1;
+    }
+
+    // We try to wait for three seconds:
+    const size_t num_iters = size_t(3000 / ms);
+    time_start = current_time();
+    for(size_t i = 0; i < num_iters; i++){
+        Kernels::to_blackwhite_rgb32_range(
+            image.data(), image.bytes_per_row(), image.width(), image.height(),
+            image_out.data(), image_out.bytes_per_row(), mins, maxs, in_range_black
+        );
+    }
+    time_end = current_time();
+    ms = (double)std::chrono::duration_cast<Milliseconds>(time_end - time_start).count();
+    cout << "Running " << num_iters << " iters, avg filter time: " << ms / num_iters << " ms" << endl;
+
+    return 0;
+}
+
+
+
 int test_kernels_Waterfill(const ImageViewRGB32& image){
 
     ImagePixelBox box(0, 0, image.width(), image.height());
