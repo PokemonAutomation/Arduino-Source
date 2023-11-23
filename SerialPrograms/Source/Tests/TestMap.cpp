@@ -221,7 +221,8 @@ int sound_bool_detector_helper(SoundBoolDetectorFunction test_func, const std::s
 const std::map<std::string, TestFunction> TEST_MAP = {
     {"Kernels_ImageScaleBrightness", std::bind(image_void_detector_helper, test_kernels_ImageScaleBrightness, _1)},
     {"Kernels_BinaryMatrix", std::bind(image_void_detector_helper, test_kernels_BinaryMatrix, _1)},
-    {"Kernels_FilterRGB32", std::bind(image_void_detector_helper, test_kernels_FilterRGB32, _1)},
+    {"Kernels_FilterRGB32Range", std::bind(image_void_detector_helper, test_kernels_FilterRGB32Range, _1)},
+    {"Kernels_FilterRGB32Euclidean", std::bind(image_void_detector_helper, test_kernels_FilterRGB32Euclidean, _1)},
     {"Kernels_Waterfill", std::bind(image_void_detector_helper, test_kernels_Waterfill, _1)},
     {"CommonFramework_BlackBorderDetector", std::bind(image_bool_detector_helper, test_CommonFramework_BlackBorderDetector, _1)},
     {"NintendoSwitch_UpdateMenuDetector", std::bind(image_bool_detector_helper, test_NintendoSwitch_UpdateMenuDetector, _1)},

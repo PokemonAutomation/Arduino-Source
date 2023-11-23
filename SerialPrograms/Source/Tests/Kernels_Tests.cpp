@@ -132,7 +132,7 @@ int test_kernels_BinaryMatrix(const ImageViewRGB32& image){
     return 0;
 }
 
-int test_kernels_FilterRGB32(const ImageViewRGB32& image){
+int test_kernels_FilterRGB32Range(const ImageViewRGB32& image){
     const size_t width = image.width();
     const size_t height = image.height();
     cout << "Testing filter_rgb32_range(), image size " << width << " x " << height << endl;
@@ -174,7 +174,8 @@ int test_kernels_FilterRGB32(const ImageViewRGB32& image){
             const Color color(image.pixel(c, r));
             const Color new_color(image_out.pixel(c, r));
             const Color new_color_2(image_out_2.pixel(c, r));
-            bool in_range = (min_color.red() <= color.red() && color.red() <= max_color.red());
+            bool in_range = (min_color.alpha() <= color.alpha() && color.alpha() <= max_color.alpha());
+            in_range = in_range && (min_color.red() <= color.red() && color.red() <= max_color.red());
             in_range = in_range && (min_color.green() <= color.green() && color.green() <= max_color.green());
             in_range = in_range && (min_color.blue() <= color.blue() && color.blue() <= max_color.blue());
             actual_num_pixels_in_range += in_range;
@@ -221,6 +222,116 @@ int test_kernels_FilterRGB32(const ImageViewRGB32& image){
         Kernels::filter_rgb32_range(
             image.data(), image.bytes_per_row(), image.width(), image.height(),
             image_out.data(), image_out.bytes_per_row(), mins, maxs, (uint32_t)COLOR_WHITE, replace_color_within_range
+        );
+    }
+    time_end = current_time();
+    ms = (double)std::chrono::duration_cast<Milliseconds>(time_end - time_start).count();
+    cout << "Running " << num_iters << " iters, avg filter time: " << ms / num_iters << " ms" << endl;
+
+    return 0;
+}
+
+
+int test_kernels_FilterRGB32Euclidean(const ImageViewRGB32& image){
+    const size_t width = image.width();
+    const size_t height = image.height();
+    cout << "Testing test_kernels_FilterRGB32Euclidean(), image size " << width << " x " << height << endl;
+
+    Color middle_color = Color(image.pixel(width/2, height/2));
+    cout << "Expected color: " << middle_color.to_string() << endl;
+
+    double max_dist = 50.0;
+    size_t max_dist2 = size_t(max_dist * max_dist);
+
+    ImageRGB32 image_out(image.width(), image.height());
+    ImageRGB32 image_out_2(image.width(), image.height());
+    size_t pixels_in_range = 0;
+
+    const bool replace_color_within_range = true;
+    auto time_start = current_time();
+    pixels_in_range = Kernels::filter_rgb32_euclidean(
+        image.data(), image.bytes_per_row(), image.width(), image.height(),
+        image_out.data(), image_out.bytes_per_row(),
+        uint32_t(middle_color), max_dist, (uint32_t)COLOR_WHITE, replace_color_within_range
+    );
+    auto time_end = current_time();
+    auto ns = std::chrono::duration_cast<std::chrono::nanoseconds>(time_end - time_start).count();
+    auto ms = ns / 1000000.;
+    cout << "One filter time: " << ms << " ms" << endl;
+
+    size_t pixels_in_range_2 = Kernels::filter_rgb32_euclidean(
+        image.data(), image.bytes_per_row(), image.width(), image.height(),
+        image_out_2.data(), image_out_2.bytes_per_row(),
+        uint32_t(middle_color), max_dist, (uint32_t)COLOR_WHITE, !replace_color_within_range
+    );
+
+    TEST_RESULT_EQUAL(pixels_in_range, pixels_in_range_2);
+
+    size_t actual_num_pixels_in_range = 0;
+    size_t error_count = 0;
+    for (size_t r = 0; r < height; r++){
+        for (size_t c = 0; c < width; c++){
+            const Color color(image.pixel(c, r));
+            const Color new_color(image_out.pixel(c, r));
+            const Color new_color_2(image_out_2.pixel(c, r));
+            int red_dif = (color.red() - middle_color.red());
+            int green_dif = (color.green() - middle_color.green());
+            int blue_dif = (color.blue() - middle_color.blue());
+            size_t color_dist2 = red_dif * red_dif + green_dif * green_dif + blue_dif * blue_dif;
+            bool in_range = color_dist2 <= max_dist2;
+            actual_num_pixels_in_range += in_range;
+            if (error_count < 10){
+                // Print first 10 errors:
+                if (in_range && new_color != COLOR_WHITE){
+                    cout << "Error: wrong filter result: old color " << color.to_string()
+                         << ", (x,y) = (" << c << ", " << r << ")"
+                         << ", dist2 " << color_dist2 << ", max dist2 " << max_dist2
+                         << ", should be in range but not found by the function" << endl;
+                    ++error_count;
+                }
+                else if (in_range == false && new_color != color){
+                    cout << "Error: wrong filter result: old color " << color.to_string()
+                         << ", (x,y) = (" << c << ", " << r << ")"
+                         << ", dist2 " << color_dist2 << ", max dist2 " << max_dist2
+                         << ", should not be changed by the function" << endl;
+                    ++error_count;
+                }
+
+                if (in_range && new_color_2 != color){
+                    cout << "Error: wrong inverse filter result: old color " << color.to_string()
+                         << ", (x,y) = (" << c << ", " << r << ")"
+                         << ", dist2 " << color_dist2 << ", max dist2 " << max_dist2
+                         << ", should not be changed by the function" << endl;
+                    ++error_count;
+                }
+                else if (in_range == false && new_color_2 != COLOR_WHITE){
+                    cout << "Error: wrong inverse filter result: old color " << color.to_string()
+                         << ", (x,y) = (" << c << ", " << r << ")"
+                         << ", dist2 " << color_dist2 << ", max dist2 " << max_dist2
+                         << ", should not be in range but not found by the function" << endl;
+                    ++error_count;
+                }
+            }
+        }
+    }
+    cout << "Found " << actual_num_pixels_in_range << " pixels in range" << endl;
+    if (pixels_in_range != actual_num_pixels_in_range){
+        cout << "Error: wrong pixels in range: " << pixels_in_range << " actual: " << actual_num_pixels_in_range << endl;
+        return 1;
+    }
+
+    if (error_count){
+        return 1;
+    }
+
+    // We try to wait for three seconds:
+    const size_t num_iters = size_t(3000 / ms);
+    time_start = current_time();
+    for(size_t i = 0; i < num_iters; i++){
+        pixels_in_range = Kernels::filter_rgb32_euclidean(
+            image.data(), image.bytes_per_row(), image.width(), image.height(),
+            image_out.data(), image_out.bytes_per_row(),
+            uint32_t(middle_color), max_dist, (uint32_t)COLOR_WHITE, replace_color_within_range
         );
     }
     time_end = current_time();
