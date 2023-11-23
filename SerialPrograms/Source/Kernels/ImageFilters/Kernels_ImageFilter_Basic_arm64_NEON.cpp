@@ -151,8 +151,7 @@ public:
         uint16x8_t in_g2_u16 = vmulq_u16(in_g_u16, in_g_u16);
         uint16x8_t in_r2b2_u16 = vmulq_u16(in_rb_u16, in_rb_u16);
 
-        // Use pairwise addition operator vpaddlq_u16 to convert each g2 into 32-bit.
-        int32x4_t in_g2_u32 = vpaddlq_u16(in_g2_u16);
+        uint32x4_t in_g2_u32 = vreinterpretq_u32_u16(in_g2_u16);
         // Use pairwise addition and accumulate to add r2, g2, and b2 together
         uint32x4_t sum_sqr_u32 = vpadalq_u16(in_g2_u32, in_r2b2_u16);
 
