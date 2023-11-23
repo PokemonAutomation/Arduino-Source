@@ -11,8 +11,51 @@
  *
  *  This class is mainly used by the Waterfill algorithm which needs vertical
  *  locality in memory.
- *
+ * 
  */
+
+//  Folder structure:
+//  - Kernels_BinaryMatrix.h:
+//    Defines BinaryMatrixType, PackedBinaryMatrix_IB, SparseBinaryMatrix_IB and declares the basic functions to get/create them.
+//    PackedBinaryMatrix_IB and SparseBinaryMatrix_IB are abstract base classes (ABCs) with no function definitions.
+//
+//  - Kernels_BinaryMatrix.cpp:
+//    Defines the basic functions to create BinaryMatrixType and the two matrices.
+//    Note the matrix creation functions are large switch-case code based on CPU architecture. In each case, it calls the
+//    functinos like make_PackedBinaryMatrix_<row>>x<col>_<cpu_arch>() which do the actual work. Those architecture-specific
+//    functions are defined in Kernels_BinaryMatrix_Core_<cpu_arch>.cpp.
+//
+//  - Kernels_BinaryMatrix_t.h:
+//    Defines PackedBinaryMatrix_t and SparseBinaryMatrix_t: template classes that implement the ABCs defined in
+//    Kernels_BinaryMatrix.h.
+//    The template parameter is Tile, an architecture-specific class that handles SIMD operations on a tile of the matrix content.
+//    The template classes are just wrappers of PackedBinaryMatrixCore<Tile> and SparseBinaryMatrixCore<Tile> defined in
+//    Kernels_PackedBinaryMatrixCore.h and Kernels_SparseBinaryMatrixCore.h, which host the actual implementation of matrix
+//    functions.
+//
+//  - Kernels_PackedBinaryMatrixCore.h:
+//    Defines PackedBinaryMatrixCore<Tile> wrapped by PackedBinaryMatrix_t. The native code in PackedBinaryMatrixCore is
+//    architecture-agnostic. It relies on the template parameter Tile for architecture-specific code.
+//    The Tiles are difined in Kernels_BinaryMatrix_Tile_<row>x<col>_<cpu_arch>.h.
+//
+//  - Kernels_PackedBinaryMatrixCore.tpp:
+//    Defines the functions in PackedBinaryMatrixCore<Tile>.
+//
+//  - Kernels_SparseBinaryMatrixCore.h, Kernels_SparseBinaryMatrixCore.tpp:
+//    Same to Kernels_PackedBinaryMatrixCore.h and Kernels_PackedBinaryMatrixCore.tpp but for SparseBinaryMatrixCore<Tile>.
+//
+//  - Kernels_BinaryMatrix_Arch_<row>x<col>_<cpu_arch>.h:
+//    Defines aliases for PackedBinaryMatrix_t<Tile> and PackedBinaryMatrixCore<Tile> so they are easier to use.
+//    e.g. PackedBinaryMatrix_t<BinaryTile_<row>x<col>_<cpu_arch>> is defined as PackedBinaryMatrix_<row>x<col>_<cpu_arch>.
+//
+//  - Kernels_BinaryMatrix_Core_<cpu_arch>.cpp:
+//    Defines the boiler-plate functions of creating architecture-specific matrices, needed by Kernels_BinaryMatrix.cpp.
+//    Those functions just call the constructors of the architecture-specific template classes e.g.
+//    PackedBinaryMatrix_<row>x<col>_<cpu_arch>.
+//
+//  - Kernels_BinaryMatrixTile_<row>x<col>_<cpu_arch>.h:
+//    The implementation of the architecture-specific tile class BinaryTile_<row>x<col>_<cpu_arch> used as template parameter
+//    of Kernels_Packed/SparseBinaryMatrixCore<> and Packed/SparseBinaryMatrix_t<>
 
 #ifndef PokemonAutomation_Kernels_PackedBinaryMatrix_H
 #define PokemonAutomation_Kernels_PackedBinaryMatrix_H

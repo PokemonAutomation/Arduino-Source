@@ -24,9 +24,9 @@ namespace Kernels{
 // For example, for AVX2 feature, the optimized shape is 64x16.
 // See Kernels_BinaryMatrix.h:BinaryMatrixType as enums of different matrix types.
 //
-// `PackedBinaryMatrix_t` serves as the base class for each different implmenentations
-// for each CPU feature set. It hosts a lot of boilerplate matrix related code that
-// are agonstic to actual tile difinition and tile processing.
+// `PackedBinaryMatrix_t` serves as the template class for each different implmenentations
+// for each CPU feature set. It uses template class PackedBinaryMatrixCore<Tile> to
+// implement all the actual matrix functions.
 // Suffix "_t" stands for "template".
 template <typename Tile>
 class PackedBinaryMatrix_t final : public PackedBinaryMatrix_IB{
