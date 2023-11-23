@@ -123,8 +123,7 @@ public:
 public:
     ImageFilter_RgbEuclidean_arm64_NEON(uint32_t expected_color, double max_euclidean_distance,
         uint32_t replacement_color, bool replace_color_within_range)
-        : m_expected_color_g_s16(vreinterpretq_s16_u32(vdupq_n_u32((expected_color >> 8) & 0x000000ff)))
-        , m_expected_color_rb_s16(vreinterpretq_s16_u32(vdupq_n_u32(expected_color & 0x00ff00ff)))
+        : m_expected_color_rgb_u8(vreinterpretq_u8_u32(vdupq_n_u32(expected_color & 0x00ffffff)))
         , m_distance_squared_u32(vdupq_n_u32((uint32_t)(max_euclidean_distance * max_euclidean_distance)))
         , m_replacement_color_u32(vdupq_n_u32(replacement_color))
         , m_replace_color_within_range(replace_color_within_range)
@@ -138,19 +137,20 @@ public:
 
     PA_FORCE_INLINE void process_full(uint32_t* out, const uint32_t* in){
         uint32x4_t in_u32 = vld1q_u32(in);
+        // subtract the expected values
+        uint32x4_t in_dif_u32 = vreinterpretq_u32_u8(vabdq_u8(vreinterpretq_u8_u32(in_u32), m_expected_color_rgb_u8));
+
         // Get green channel
-        uint32x4_t in_g_u32 = vandq_u32(in_u32, vdupq_n_u32(0x0000ff00));
+        uint32x4_t in_g_u32 = vandq_u32(in_dif_u32, vdupq_n_u32(0x0000ff00));
         // Move green channel to the lower end of the 16-bit regions
         uint16x8_t in_g_u16 = vshrq_n_u16(vreinterpretq_u16_u32(in_g_u32), 8);
         // in_rb_u16 contains the red and blue channels. Each channel occupies a 16-bit region
-        uint16x8_t in_rb_u16 = vandq_u16(vreinterpretq_u16_u32(in_u32), vdupq_n_u16(0x00ff));
-        // subtract the expected values
-        int16x8_t in_g_s16 = vsubq_s16(vreinterpretq_s16_u16(in_g_u16), m_expected_color_g_s16);
-        int16x8_t in_rb_s16 = vsubq_s16(vreinterpretq_s16_u16(in_rb_u16), m_expected_color_rb_s16);
-        
+        uint16x8_t in_rb_u16 = vandq_u16(vreinterpretq_u16_u32(in_dif_u32), vdupq_n_u16(0x00ff));
+
         // Square operation
-        uint16x8_t in_g2_u16 = vreinterpretq_u16_s16(vmulq_s16(in_g_s16, in_g_s16));
-        uint16x8_t in_r2b2_u16 = vreinterpretq_u16_s16(vmulq_s16(in_rb_s16, in_rb_s16));
+        uint16x8_t in_g2_u16 = vmulq_u16(in_g_u16, in_g_u16);
+        uint16x8_t in_r2b2_u16 = vmulq_u16(in_rb_u16, in_rb_u16);
+
         // Use pairwise addition operator vpaddlq_u16 to convert each g2 into 32-bit.
         int32x4_t in_g2_u32 = vpaddlq_u16(in_g2_u16);
         // Use pairwise addition and accumulate to add r2, g2, and b2 together
@@ -179,8 +179,7 @@ public:
     }
 
 private:
-    int8x16_t m_expected_color_g_s16;
-    int8x16_t m_expected_color_rb_s16;
+    uint8x16_t m_expected_color_rgb_u8;
     uint32x4_t m_distance_squared_u32;
     uint32x4_t m_replacement_color_u32;
     bool m_replace_color_within_range;
