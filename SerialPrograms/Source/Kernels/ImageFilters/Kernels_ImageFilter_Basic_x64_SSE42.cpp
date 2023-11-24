@@ -132,19 +132,19 @@ public:
 private:
     PA_FORCE_INLINE __m128i process_word(__m128i pixel){
         // _mm_srli_epi16: Shift 16-bit integers in pixels right by 8 while shifting in zeros, 
-        // g: green channels of each pixel, but shifted right by 8 bits
-        __m128i g = _mm_and_si128(_mm_srli_epi16(pixel, 8), _mm_set1_epi32(0x000000ff));
+        // ng: green channels of each pixel, but shifted right by 8 bits
+        __m128i ng = _mm_and_si128(_mm_srli_epi16(pixel, 8), _mm_set1_epi32(0x000000ff));
         // rb: the red and blue channels of each pixel
         __m128i rb = _mm_and_si128(pixel, _mm_set1_epi32(0x00ff00ff));
         // g: the difference between input pixel channels and the expected values
-        g = _mm_sub_epi16(g, m_expected_g);
+        ng = _mm_sub_epi16(ng, m_expected_g);
         rb = _mm_sub_epi16(rb, m_expected_rb);
         // compute square operation: 
         // now each 16-bit region is a squared channel difference
         // here we assume alpha channel from input image is the same as the expected,
         // so the alpha channel difference is always 0, therefore:
         // g: each 32-bit integer contains the green channel squared difference
-        __m128i g = _mm_mullo_epi16(g, g);
+        __m128i g = _mm_mullo_epi16(ng, ng);
         rb = _mm_mullo_epi16(rb, rb);
         // r: each 32-bit integer contains the red channel squared difference
         __m128i r = _mm_srli_epi32(rb, 16);
