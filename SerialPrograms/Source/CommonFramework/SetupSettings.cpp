@@ -14,7 +14,7 @@ namespace PokemonAutomation{
 
 bool migrate_settings(Logger& logger, std::string file_name){
     QFile root_file(QString::fromStdString(file_name));
-    QFile folder_file(QString::fromStdString(SETTINGS_PATH + file_name));
+    QFile folder_file(QString::fromStdString(SETTINGS_PATH() + file_name));
 
     logger.log("Checking settings configuration...");
 
@@ -41,7 +41,7 @@ bool migrate_settings(Logger& logger, std::string file_name){
             "Settings Migrated!",
             QString::fromStdString(
                 "Detected a settings file at the old location used by version 0.29 and earlier.<br>"
-                "It has been automatically moved into the \"" + SETTINGS_PATH + "\" folder."
+                "It has been automatically moved into the \"" + SETTINGS_PATH() + "\" folder."
             )
         );
         return true;
@@ -107,7 +107,7 @@ bool migrate_stats(Logger& logger){
             "Settings Migrated!",
             QString::fromStdString(
                 "Detected a stats file at the old location used by version 0.29 and earlier.<br>"
-                "It has been automatically moved into the \"" + SETTINGS_PATH + "\" folder."
+                "It has been automatically moved into the \"" + SETTINGS_PATH() + "\" folder."
             )
         );
         return true;

@@ -51,6 +51,8 @@ const std::string PROJECT_GITHUB_URL = "https://github.com/PokemonAutomation/";
 const std::string PROJECT_SOURCE_URL = "https://github.com/PokemonAutomation/Arduino-Source/";
 
 
+namespace {
+
 std::string get_resource_path(){
     //  Find the resource directory.
     QString path = QCoreApplication::applicationDirPath();
@@ -79,10 +81,44 @@ std::string get_training_path(){
     }
     return (QCoreApplication::applicationDirPath() + "/../TrainingData/").toStdString();
 }
+std::string get_setting_path(){
+    return "UserSettings/";
+}
+std::string get_screenshot_path(){
+    return "Screenshots/";
+}
+std::string get_debug_path(){
+    return "DebugDumps/";
+}
+std::string get_error_path(){
+    return "ErrorDumps/";
+}
+std::string get_user_file_path(){
+    return "./";
+}
 
+} // anonymous namespace
 
-const std::string SETTINGS_PATH = "UserSettings/";
-const std::string SCREENSHOTS_PATH = "Screenshots/";
+const std::string& SETTINGS_PATH(){
+    static std::string path = get_setting_path();
+    return path;
+}
+const std::string& SCREENSHOTS_PATH(){
+    static std::string path = get_screenshot_path();
+    return path;
+}
+const std::string& DEBUG_PATH(){
+    static std::string path = get_debug_path();
+    return path;
+}
+const std::string& ERROR_PATH(){
+    static std::string path = get_error_path();
+    return path;
+}
+const std::string& USER_FILE_PATH(){
+    static std::string path = get_user_file_path();
+    return path;
+}
 const std::string& RESOURCE_PATH(){
     static std::string path = get_resource_path();
     return path;

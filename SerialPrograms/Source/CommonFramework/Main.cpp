@@ -52,8 +52,8 @@ int main(int argc, char *argv[]){
     OutputRedirector redirect_stdout(std::cout, "stdout", Color());
     OutputRedirector redirect_stderr(std::cerr, "stderr", COLOR_RED);
 
-    QDir().mkpath(QString::fromStdString(SETTINGS_PATH));
-    QDir().mkpath(QString::fromStdString(SCREENSHOTS_PATH));
+    QDir().mkpath(QString::fromStdString(SETTINGS_PATH()));
+    QDir().mkpath(QString::fromStdString(SCREENSHOTS_PATH()));
 
     //  Read program settings from json file: SerialPrograms-Settings.json.
     try{

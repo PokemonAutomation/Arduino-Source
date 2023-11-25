@@ -86,7 +86,7 @@ PendingFileSend::PendingFileSend(Logger& logger, const ImageAttachment& image)
     m_filename = now_to_filestring() + format;
 
     if (image.keep_file){
-        m_filepath = SCREENSHOTS_PATH + m_filename;
+        m_filepath = SCREENSHOTS_PATH() + m_filename;
     }else{
         QDir().mkdir("TempFiles");
 //        m_filename = "temp-" + m_filename;
