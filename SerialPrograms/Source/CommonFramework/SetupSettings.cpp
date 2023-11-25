@@ -6,9 +6,17 @@
 
 #include <QFile>
 #include <QMessageBox>
+#include <QApplication>
+#if QT_CONFIG(permissions)
+    #include <QPermissions>
+#endif
 #include "Globals.h"
 #include "GlobalSettingsPanel.h"
 #include "SetupSettings.h"
+
+#include <iostream>
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 
@@ -134,6 +142,55 @@ bool migrate_stats(Logger& logger){
     return true;
 }
 
+
+void set_permissions(QObject& object){
+#if defined(__APPLE__)
+#if QT_CONFIG(permissions)
+    cout << "Chcecking MacOS Permissions..." << endl;
+    QCameraPermission camera_permission;
+    switch(qApp->checkPermission(camera_permission)){
+    case Qt::PermissionStatus::Undetermined:
+        cout << "Camera permission undetermined" << endl;
+        qApp->requestPermission(camera_permission, &object, [](const QPermission &permission){
+            cout << "camera request is ready!" << endl;
+        });
+        cout << "Requested Camera permission" << endl;
+        break;
+    case Qt::PermissionStatus::Denied:
+        cout << "No camera permission found" << endl;
+        qApp->requestPermission(camera_permission, &object, [](const QPermission &permission){
+            cout << "camera request is ready!" << endl;
+        });
+        cout << "Requested Camera permission" << endl;
+        break;
+    case Qt::PermissionStatus::Granted:
+        cout << "Camera permission granted" << endl;
+        break;
+    }
+
+    QMicrophonePermission microphone_permission;
+    switch(qApp->checkPermission(microphone_permission)){
+    case Qt::PermissionStatus::Undetermined:
+        cout << "Microphone permission undetermined" << endl;
+        qApp->requestPermission(microphone_permission, &object, [](const QPermission &permission){
+            cout << "Microphone request is ready!" << endl;
+        });
+        cout << "Requested microphone permission" << endl;
+        break;
+    case Qt::PermissionStatus::Denied:
+        cout << "No microphone permission found" << endl;
+        qApp->requestPermission(microphone_permission, &object, [](const QPermission &permission){
+            cout << "Microphone request is ready!" << endl;
+        });
+        cout << "Requested microphone permission" << endl;
+        break;
+    case Qt::PermissionStatus::Granted:
+        cout << "Microphone permission granted" << endl;
+        break;
+    }
+#endif
+#endif
+}
 
 
 

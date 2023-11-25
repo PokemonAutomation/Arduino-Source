@@ -1941,7 +1941,30 @@ file(GLOB MAIN_SOURCES
     Source/ZeldaTotK/ZeldaTotK_Settings.h
 )
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}../../ FILES ${MAIN_SOURCES})
-add_executable(SerialPrograms WIN32 ${MAIN_SOURCES})
+
+if (APPLE)
+    # TODO: set up the correct application icon
+    # set(SerialPrograms_ICON ${CMAKE_CURRENT_SOURCE_DIR}/../Resources/icon.icns)
+    # set_source_files_properties(SerialPrograms_ICON PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
+
+    # Links on how to create a MacOS app bundle with cmake
+    # https://stackoverflow.com/questions/53560288/how-to-create-a-macos-app-bundle-with-cmake
+    # https://cmake.org/cmake/help/latest/command/add_executable.html
+    add_executable(SerialPrograms MACOSX_BUNDLE ${SerialPrograms_ICON} ${MAIN_SOURCES})
+    set_target_properties(SerialPrograms PROPERTIES
+        BUNDLE True
+        MACOSX_BUNDLE_GUI_IDENTIFIER PokemonAutomation.SerialPrograms 
+        MACOSX_BUNDLE_BUNDLE_NAME SerialPrograms
+        MACOSX_BUNDLE_BUNDLE_VERSION "0.1"
+        MACOSX_BUNDLE_SHORT_VERSION_STRING "0.1"
+        # MACOSX_BUNDLE_ICON_FILE icon
+        # MacOSXBundleInfo.plist.in is modified from https://github.com/Kitware/CMake/blob/master/Modules/MacOSXBundleInfo.plist.in
+        MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/cmake/MacOSXBundleInfo.plist.in
+    )
+else() # WIN and Linux:
+    add_executable(SerialPrograms WIN32 ${MAIN_SOURCES})
+endif()
+
 set_target_properties(SerialPrograms PROPERTIES LINKER_LANGUAGE CXX)
 target_link_libraries(SerialPrograms Qt${QT_MAJOR}::Widgets Qt${QT_MAJOR}::SerialPort Qt${QT_MAJOR}::Multimedia Qt${QT_MAJOR}::MultimediaWidgets)
 target_link_libraries(SerialPrograms Threads::Threads)

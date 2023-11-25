@@ -214,6 +214,7 @@ FileWindowLoggerWindow::FileWindowLoggerWindow(FileWindowLogger& logger, QWidget
     log("================================================================================");
     log("<b>Window Startup...</b>");
     log("Current path: " + QDir::currentPath());
+    log("Executable path: " + qApp->applicationDirPath());
     add_window(*this);
 }
 FileWindowLoggerWindow::~FileWindowLoggerWindow(){

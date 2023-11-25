@@ -6,6 +6,8 @@
 
 #include <QCoreApplication>
 #include <QFile>
+#include <QFileInfo>
+#include <QDir>
 #include "Globals.h"
 
 namespace PokemonAutomation{
@@ -81,20 +83,36 @@ std::string get_training_path(){
     }
     return (QCoreApplication::applicationDirPath() + "/../TrainingData/").toStdString();
 }
+
+std::string get_runtime_base_path(){
+    QString application_dir_path = qApp->applicationDirPath();
+    if (application_dir_path.endsWith(".app/Contents/MacOS")){
+        // a macOS bundle. Change working directory to the folder that hosts the .app folder.
+        QString app_bundle_path = application_dir_path.chopped(15);
+        QString base_folder_path = QFileInfo(app_bundle_path).dir().absolutePath();
+        return base_folder_path.toStdString() + "/";
+    }
+    return "./";
+}
+const std::string& RUNTIME_BASE_PATH(){
+    static std::string path = get_runtime_base_path();
+    return path;
+}
+
 std::string get_setting_path(){
-    return "UserSettings/";
+    return RUNTIME_BASE_PATH() + "UserSettings/";
 }
 std::string get_screenshot_path(){
-    return "Screenshots/";
+    return RUNTIME_BASE_PATH() + "Screenshots/";
 }
 std::string get_debug_path(){
-    return "DebugDumps/";
+    return RUNTIME_BASE_PATH() + "DebugDumps/";
 }
 std::string get_error_path(){
-    return "ErrorDumps/";
+    return RUNTIME_BASE_PATH() + "ErrorDumps/";
 }
 std::string get_user_file_path(){
-    return "./";
+    return RUNTIME_BASE_PATH();
 }
 
 } // anonymous namespace
