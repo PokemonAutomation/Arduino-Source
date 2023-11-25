@@ -6,6 +6,7 @@
 
 #include <QCoreApplication>
 #include <QMenuBar>
+#include <QDir>
 #include "CommonFramework/Windows/DpiScaler.h"
 #include "CommonFramework/Windows/WindowTracker.h"
 #include "FileWindowLogger.h"
@@ -212,6 +213,7 @@ FileWindowLoggerWindow::FileWindowLoggerWindow(FileWindowLogger& logger, QWidget
     m_logger += *this;
     log("================================================================================");
     log("<b>Window Startup...</b>");
+    log("Current path: " + QDir::currentPath());
     add_window(*this);
 }
 FileWindowLoggerWindow::~FileWindowLoggerWindow(){
