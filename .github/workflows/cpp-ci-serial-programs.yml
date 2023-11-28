@@ -25,10 +25,10 @@ jobs:
           qt_modules: 'qtmultimedia qtserialport'
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         path: Arduino-Source
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         repository: 'PokemonAutomation/Packages'
         path: Packages
@@ -41,8 +41,7 @@ jobs:
       if: startsWith(matrix.os, 'mac')
       run: |
         brew install opencv
-    - name: Install Qt
-      uses: jurplel/install-qt-action@v3
+    - uses: jurplel/install-qt-action@v3
       with:
         version: ${{ matrix.qt_version }}
         modules: ${{ matrix.qt_modules }}
@@ -60,8 +59,16 @@ jobs:
         robocopy Packages/PABotBase/PABotBase-Switch        Output/PABotBase /s
         robocopy Arduino-Source/SerialPrograms/bin          Output/Binaries dpp.dll libcrypto-1_1-x64.dll libsodium.dll libssl-1_1-x64.dll opencv_world460.dll opus.dll Sleepy.dll tesseractPA.dll zlib1.dll
         robocopy Arduino-Source/SerialPrograms/bin/Release  Output/Binaries SerialPrograms.exe
-        exit 0
-    - uses: actions/upload-artifact@v3
+        write-host "Robocopy exited with exit code:" $lastexitcode
+        if ($lastexitcode -eq 1)
+        {
+          exit 0
+        }
+        else
+        {
+          exit 1
+        }
+    - uses: actions/upload-artifact@v4
       if: startsWith(matrix.os, 'windows')
       with:
         name: Serial Programs for windows (${{ matrix.qt_version }})
