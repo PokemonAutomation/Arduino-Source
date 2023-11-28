@@ -185,6 +185,7 @@ file(GLOB MAIN_SOURCES
     ../Common/PokemonSwSh/PokemonSwSh_Protocol_EggRoutines.h
     ../Common/PokemonSwSh/PokemonSwSh_Protocol_GameEntry.h
     ../Common/PokemonSwSh/PokemonSwSh_Protocol_Misc.h
+    ../Common/PokemonSV/PokemonSV_MultiHostTable.h
     ../Common/Qt/AutoHeightTable.cpp
     ../Common/Qt/AutoHeightTable.h
     ../Common/Qt/AutoWidthLineEdit.cpp
@@ -1485,6 +1486,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Programs/ShinyHunting/PokemonSV_ShinyHunt-Scatterbug.h
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_AutoHost.cpp
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_AutoHost.h
+    Source/PokemonSV/Programs/TeraRaids/PokemonSV_AutoHost-MultiGame.cpp
+    Source/PokemonSV/Programs/TeraRaids/PokemonSV_AutoHost-MultiGame.h
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_AutoHostLobbyWaiter.cpp
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_AutoHostLobbyWaiter.h
     Source/PokemonSV/Programs/TeraRaids/PokemonSV_AutoHostTools.cpp
