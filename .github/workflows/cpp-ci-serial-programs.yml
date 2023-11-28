@@ -10,7 +10,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [windows-2022, macos-12, ubuntu-22.04]
-        qt_version: ['5.12.12', '6.3.2', '6.5.3']
+        qt_version: ['5.12.12', '6.3.2', '6.5.2']
         include:
         - qt_version: '5.12.12'
           qt_version_major: '5'
@@ -20,7 +20,7 @@ jobs:
           qt_version_major: '6'
           qt_modules: 'qtmultimedia qtserialport'
 
-        - qt_version: '6.5.3'
+        - qt_version: '6.5.2'
           qt_version_major: '6'
           qt_modules: 'qtmultimedia qtserialport'
 
