@@ -7,8 +7,11 @@
 #include <QFile>
 #include <QMessageBox>
 #include <QApplication>
-#if QT_CONFIG(permissions)
-    #include <QPermissions>
+#include <QtVersionChecks>
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+    #if QT_CONFIG(permissions)
+        #include <QPermissions>
+    #endif
 #endif
 #include "Globals.h"
 #include "GlobalSettingsPanel.h"
@@ -145,6 +148,7 @@ bool migrate_stats(Logger& logger){
 
 void set_permissions(QObject& object){
 #if defined(__APPLE__)
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
 #if QT_CONFIG(permissions)
     cout << "Chcecking MacOS Permissions..." << endl;
     QCameraPermission camera_permission;
@@ -188,6 +192,7 @@ void set_permissions(QObject& object){
         cout << "Microphone permission granted" << endl;
         break;
     }
+#endif
 #endif
 #endif
 }
