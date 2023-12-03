@@ -111,8 +111,9 @@ public:
     //  Word Access. How many words in a column. One word is 8 bytes (aka 64 bits).
     size_t word64_height() const{ return m_logical_height; }
 
-    // Get (x-th, y-th) word. One word is 16 bytes (aka 64 bits).
+    // Get (x-th, y-th) word. One word is 8 bytes (aka 64 bits), one row in a tile.
     uint64_t word64(size_t x, size_t y) const;
+    // Get (x-th, y-th) word. One word is 8 bytes (aka 64 bits), one row in a tile.
     uint64_t& word64(size_t x, size_t y);
 
 private:

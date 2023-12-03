@@ -17,9 +17,9 @@ namespace Kernels{
 void filter_by_mask_64x8_arm64_NEON(
     const PackedBinaryMatrix_IB& matrix,
     uint32_t* image, size_t bytes_per_row,
-    uint32_t replace_with, bool replace_if_zero
+    uint32_t replacement_color, bool replace_zero_bits
 ){
-    FilterByMask_arm64_NEON filter(replace_with, replace_if_zero);
+    FilterByMask_arm64_NEON filter(replacement_color, replace_zero_bits);
     filter_by_mask(static_cast<const PackedBinaryMatrix_64x8_arm64_NEON&>(matrix).get(), image, bytes_per_row, filter);
 }
 
@@ -49,12 +49,11 @@ void compress_rgb32_to_binary_euclidean_64x8_arm64_NEON(
     PackedBinaryMatrix_IB& matrix,
     uint32_t expected, double max_euclidean_distance
 ){
-    // TODO:
-    // Compressor_RgbEuclidean_arm64_NEON compressor(expected, max_euclidean_distance);
-    // compress_rgb32_to_binary(
-    //     image, bytes_per_row,
-    //     static_cast<PackedBinaryMatrix_64x8_arm64_NEON&>(matrix).get(), compressor
-    // );
+    Compressor_RgbEuclidean_arm64_NEON compressor(expected, max_euclidean_distance);
+    compress_rgb32_to_binary(
+        image, bytes_per_row,
+        static_cast<PackedBinaryMatrix_64x8_arm64_NEON&>(matrix).get(), compressor
+    );
 }
 
 

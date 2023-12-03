@@ -81,11 +81,11 @@ void compress_rgb32_to_binary_range(
 
 
 //  Compress (image, bytes_per_row) into a binary_image.
-//  For each pixel, set to 1 if distance is within the expected value.
+//  For each pixel, set to 1 if the Euclidean distance of the pixel color to the expected color <= max distance.
 void compress_rgb32_to_binary_euclidean(
     const uint32_t* image, size_t bytes_per_row,
     PackedBinaryMatrix_IB& matrix,
-    uint32_t expected, double max_euclidean_distance
+    uint32_t expected_color, double max_euclidean_distance
 );
 
 

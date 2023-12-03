@@ -25,6 +25,10 @@ int test_kernels_FilterRGB32Euclidean(const ImageViewRGB32& image);
 
 int test_kernels_ToBlackWhiteRGB32Range(const ImageViewRGB32& image);
 
+int test_kernels_FilterByMask(const ImageViewRGB32& image);
+
+int test_kernels_CompressRGB32ToBinaryEuclidean(const ImageViewRGB32& image);
+
 int test_kernels_Waterfill(const ImageViewRGB32& image);
 
 

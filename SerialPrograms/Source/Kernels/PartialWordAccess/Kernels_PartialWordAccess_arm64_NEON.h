@@ -33,11 +33,11 @@ public:
         // If `bytes` is 3, then `m_back_mask` is from low bytes to high bytes: [0xFF, 0xFF, 0xFF, ... 0xFF, 0, 0, 0]
         m_back_mask = vcgtq_u8(vdupq_n_u8((uint8_t)m_shift), seq_u8x16);
 
-        // If `bytes` is 3, then `m_shift_front` is from low bytes to high bytes: [3, 4, 5, 6, 7, ..., 18]
-        m_shift_front = vaddq_u8(vdupq_n_u8(uint8_t(bytes)), seq_u8x16);
+        // If `bytes` is 3, then `m_shift_front` is from low bytes to high bytes: [13, 14, 15, 16, 17, ..., 28]
+        m_shift_front = vaddq_u8(vdupq_n_u8(uint8_t(m_shift)), seq_u8x16);
 
-        // IF `bytes` is 3, then `m_shift_back` is from low bytes to hight bytes: [253, 254, 255, 0, 1, 2, 3]
-        m_shift_back = vsubq_u8(seq_u8x16, vdupq_n_u8((uint8_t)bytes));
+        // IF `bytes` is 3, then `m_shift_back` is from low bytes to high bytes: [243, 244, 245,... 0, 1, 2]
+        m_shift_back = vsubq_u8(seq_u8x16, vdupq_n_u8((uint8_t)m_shift));
     }
 
     // load() function that does not read past end of buffer
@@ -50,8 +50,8 @@ public:
         // for each uint8 in the result, ret_u8[i], get the index from `m_shift_front`: m_shift_front[i]
         // use the value of m_shift_front[i] as an index to get a value in x:
         // ret_u8[i] = x[m_shift_front[i]]
-        // since `m_shift_front` stores [`bytes`, `bytes+1`, `bytes+2`, ...]
-        // the resulting operation is to shift the bytes in x to the lower bytes by `bytes` bytes.
+        // since `m_shift_front` stores [`16-bytes`, `16-bytes+1`, `16-bytes+2`, ...]
+        // the resulting operation is to shift the bytes in x to the lower bytes by `16-bytes` bytes.
         // For the index values >= 16 in m_shift_front[i], `vqtbl1q_u8()` returns 0.
         return vqtbl1q_u8(x, m_shift_front);
     }
