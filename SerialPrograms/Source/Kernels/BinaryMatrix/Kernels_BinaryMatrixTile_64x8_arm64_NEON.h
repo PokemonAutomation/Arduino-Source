@@ -12,6 +12,10 @@
 #include "Kernels_BinaryMatrixTile_Debugging.h"
 #include "Kernels_BinaryMatrix.h"
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
 namespace PokemonAutomation{
 namespace Kernels{
 
@@ -183,14 +187,14 @@ public:
 
 
 public:
-    // Copy the this tile into `tile` while applying the specified shifts.
+    // Copy part of this tile into `tile` while applying the specified shifts.
     // These are used to implement submatrix extraction where the desired
-    // sub-matrix may of arbitrary shift and alignment.
+    // sub-matrix may have arbitrary shift and alignment.
     // The area covered by `tile` on the image is (+shift_x, +shift_y) from the area of this tile.
     //
     // The suffix "_pp" stands for positive (x), positive (y).
     // The shifted values are first performend a logical OR with the values in `tile` before assigned to `tile`.
-    // In this way it the operation does not damage other un-assigned regions on `tile`.
+    // In this way the operation does not damage other un-assigned regions on `tile`.
     void copy_to_shift_pp(BinaryTile_64x8_arm64_NEON& tile, size_t shift_x, size_t shift_y) const{
         int64x2_t neg_shift_x_u64x2 = vmovq_n_s64(-(int64_t)shift_x);
         const uint64_t* src = (const uint64_t*)&vec;
@@ -209,9 +213,9 @@ public:
             dest[0] |= src[shift_y] >> shift_x;
         }
     }
-    // Copy the this tile into `tile` while applying the specified shifts.
+    // Copy part of this tile into `tile` while applying the specified shifts.
     // These are used to implement submatrix extraction where the desired
-    // sub-matrix may of arbitrary shift and alignment.
+    // sub-matrix may have arbitrary shift and alignment.
     // The area covered by `tile` on the image is (-shift_x, +shift_y) from the area of this tile.
     //
     // The suffix "_np" stands for negative (x), positive (y).
@@ -234,9 +238,9 @@ public:
             dest[0] |= src[shift_y] << shift_x;
         }
     }
-    // Copy the this tile into `tile` while applying the specified shifts.
+    // Copy part of this tile into `tile` while applying the specified shifts.
     // These are used to implement submatrix extraction where the desired
-    // sub-matrix may of arbitrary shift and alignment.
+    // sub-matrix may have arbitrary shift and alignment.
     // The area covered by `tile` on the image is (+shift_x, -shift_y) from the area of this tile.
     //
     // The suffix "_pn" stands for positive (x), negative (y).
@@ -262,9 +266,9 @@ public:
             shift_y += 2;
         }
     }
-    // Copy the this tile into `tile` while applying the specified shifts.
+    // Copy part of this tile into `tile` while applying the specified shifts.
     // These are used to implement submatrix extraction where the desired
-    // sub-matrix may of arbitrary shift and alignment.
+    // sub-matrix may have arbitrary shift and alignment.
     // The area covered by `tile` on the image is (-shift_x, -shift_y) from the area of this tile.
     //
     // The suffix "_nn" stands for negative (x), negative (y).

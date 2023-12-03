@@ -18,9 +18,9 @@ namespace Kernels{
 
 
 inline std::string dump64(uint64_t x){
-    std::string str;
+    std::string str(64, 0);
     for (size_t c = 0; c < 64; c++){
-        str += ((x >> c) & 1) ? "1" : "0";
+        str[c] = ((x >> c) & 1) ? '1' : '0';
     }
     return str;
 }
