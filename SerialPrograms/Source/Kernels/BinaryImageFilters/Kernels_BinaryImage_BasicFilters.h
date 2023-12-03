@@ -28,13 +28,15 @@ namespace PokemonAutomation{
 namespace Kernels{
 
 
-//  Selectively replace each pixel in an image with the specified pixel
-//  according to the respective bit in the binary matrix.
+//  Selectively replace pixels in an image with the replacement color
+//  according to the respective bits in the binary matrix.
+//  If `replace_zero_bits` is true, replace pixels corresponding to the zero bits.
+//  Else, replace those with the one bits.
 void filter_by_mask(
     const PackedBinaryMatrix_IB& matrix,
     uint32_t* image, size_t bytes_per_row,
-    uint32_t replace_with,
-    bool replace_if_zero    //  If false, replace if one.
+    uint32_t replacement_color,
+    bool replace_zero_bits
 );
 
 

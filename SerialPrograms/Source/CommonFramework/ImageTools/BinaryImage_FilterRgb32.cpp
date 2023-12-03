@@ -21,8 +21,8 @@ namespace PokemonAutomation{
 void filter_by_mask(
     const PackedBinaryMatrix& matrix,
     ImageRGB32& image,
-    Color replace_with,
-    bool replace_if_zero    //  If false, replace if one.
+    Color replacement_color,
+    bool replace_zero_bits
 ){
     if (matrix.width() > image.width()){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Image width is too small.");
@@ -33,14 +33,14 @@ void filter_by_mask(
     Kernels::filter_by_mask(
         matrix,
         image.data(), image.bytes_per_row(),
-        (uint32_t)replace_with, replace_if_zero
+        (uint32_t)replacement_color, replace_zero_bits
     );
 }
 void filter_by_mask(
     const PackedBinaryMatrix& matrix,
     ImageRGB32& image, size_t offset_x, size_t offset_y,
-    Color replace_with,
-    bool replace_if_zero    //  If false, replace if one.
+    Color replacement_color,
+    bool replace_zero_bits
 ){
     if (matrix.width() > image.width()){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Image width is too small.");
@@ -53,7 +53,7 @@ void filter_by_mask(
         matrix,
         (uint32_t*)((char*)image.data() + bytes_per_row * offset_y + offset_x * sizeof(uint32_t)),
         bytes_per_row,
-        (uint32_t)replace_with, replace_if_zero
+        (uint32_t)replacement_color, replace_zero_bits
     );
 }
 
