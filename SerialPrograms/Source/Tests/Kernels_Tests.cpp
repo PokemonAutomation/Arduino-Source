@@ -24,6 +24,7 @@
 #include "Kernels_Tests.h"
 #include "TestUtils.h"
 
+#include <functional>
 #include <iostream>
 using std::cout;
 using std::cerr;
