@@ -31,10 +31,9 @@ BinaryMatrixType get_BinaryMatrixType(){
         return BinaryMatrixType::i64x8_x64_SSE42;
     }
 #elif PA_ARCH_arm64
-    // TODO: enable this once binary matrix is ready!
-    // if (CPU_CAPABILITY_CURRENT.OK_M1){
-    //     return BinaryMatrixType::arm64x8_x64_NEON;
-    // }
+    if (CPU_CAPABILITY_CURRENT.OK_M1){
+        return BinaryMatrixType::arm64x8_x64_NEON;
+    }
 #endif
 
 //    return BinaryMatrixType::i64x8_Default;

@@ -55,14 +55,14 @@ PA_FORCE_INLINE uint64x2_t bit_reverse(uint64x2_t x){
 
 
 
-struct Waterfill_64x8_x64_SSE42_ProcessedMask{
+struct Waterfill_64x8_arm64_NEON_ProcessedMask{
     uint64x2_t m0, m1, m2, m3; //  Copy of logical OR of the mask `m` and recorded tile `x` bits 
     uint64x2_t b0, b1, b2, b3; //  Bit-reversed copy of m0, m1, m2, m3.
     uint64x2_t t0, t1, t2, t3; //  Transposed masks.
     uint64x2_t f1, f2, f3;     //  Forward-carry mask.
     uint64x2_t r0, r1, r2;     //  Reverse-carry mask.
 
-    PA_FORCE_INLINE Waterfill_64x8_x64_SSE42_ProcessedMask(
+    PA_FORCE_INLINE Waterfill_64x8_arm64_NEON_ProcessedMask(
         const BinaryTile_64x8_arm64_NEON& m,
         uint64x2_t x0, uint64x2_t x1, uint64x2_t x2, uint64x2_t x3
     ){
@@ -104,7 +104,7 @@ struct Waterfill_64x8_x64_SSE42_ProcessedMask{
 
 
 PA_FORCE_INLINE bool keep_going(
-    const Waterfill_64x8_x64_SSE42_ProcessedMask& mask,
+    const Waterfill_64x8_arm64_NEON_ProcessedMask& mask,
     uint64x2_t& m0, uint64x2_t& m1, uint64x2_t& m2, uint64x2_t& m3,
     uint64x2_t& x0, uint64x2_t& x1, uint64x2_t& x2, uint64x2_t& x3
 ){
@@ -145,7 +145,7 @@ PA_FORCE_INLINE bool keep_going(
 
 
 PA_FORCE_INLINE void expand_forward(
-    const Waterfill_64x8_x64_SSE42_ProcessedMask& mask,
+    const Waterfill_64x8_arm64_NEON_ProcessedMask& mask,
     uint64x2_t& x0, uint64x2_t& x1, uint64x2_t& x2, uint64x2_t& x3
 ){
     uint64x2_t s0 = vaddq_u64(x0, mask.m0);
@@ -170,7 +170,7 @@ PA_FORCE_INLINE void expand_reverse(uint64x2_t m, uint64x2_t b, uint64x2_t& x){
     x = vorrq_u64(x, s);
 }
 PA_FORCE_INLINE void expand_reverse(
-    const Waterfill_64x8_x64_SSE42_ProcessedMask& mask,
+    const Waterfill_64x8_arm64_NEON_ProcessedMask& mask,
     uint64x2_t& x0, uint64x2_t& x1, uint64x2_t& x2, uint64x2_t& x3
 ){
     expand_reverse(mask.m0, mask.b0, x0);
@@ -179,7 +179,7 @@ PA_FORCE_INLINE void expand_reverse(
     expand_reverse(mask.m3, mask.b3, x3);
 }
 PA_FORCE_INLINE void expand_vertical(
-    const Waterfill_64x8_x64_SSE42_ProcessedMask& mask,
+    const Waterfill_64x8_arm64_NEON_ProcessedMask& mask,
     uint64x2_t& x0, uint64x2_t& x1, uint64x2_t& x2, uint64x2_t& x3
 ){
     //  Carry across adjacent rows.
@@ -435,7 +435,7 @@ static PA_FORCE_INLINE void waterfill_expand(BinaryTile_64x8_arm64_NEON& m, Bina
     uint64x2_t x2 = x.vec.val[2];
     uint64x2_t x3 = x.vec.val[3];
 
-    Waterfill_64x8_x64_SSE42_ProcessedMask mask(m, x0, x1, x2, x3);
+    Waterfill_64x8_arm64_NEON_ProcessedMask mask(m, x0, x1, x2, x3);
     expand_forward(mask, x0, x1, x2, x3);
 
     uint64x2_t m0, m1, m2, m3;
