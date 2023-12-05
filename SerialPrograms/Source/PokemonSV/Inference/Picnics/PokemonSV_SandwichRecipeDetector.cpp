@@ -127,6 +127,18 @@ bool SandwichRecipeSelectionWatcher::process_frame(const VideoSnapshot& frame){
     return num_arrows_found == 1;
 }
 
+bool SandwichRecipeSelectionWatcher::detect(const ImageViewRGB32& frame){
+    int num_arrows_found = 0;
+    for(int i = 0; i < 6; i++){
+        const bool found_arrow = m_arrow_watchers[i].detect(frame);
+        if (found_arrow){
+            m_selected_recipe = i;
+            num_arrows_found++;
+        }
+    }
+    return num_arrows_found == 1;
+}
+
 }
 }
 }

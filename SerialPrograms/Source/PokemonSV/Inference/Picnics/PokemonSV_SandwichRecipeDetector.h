@@ -56,6 +56,11 @@ public:
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool process_frame(const VideoSnapshot& frame) override;
 
+    // Whether it can detect the recipe selection on this frame.
+    // Unlike `process_frame()` which relies on consecutive frames to give robust result,
+    // this function uses only one frame.
+    bool detect(const ImageViewRGB32& frame);
+
     // Return which recipe cell is currented selected.
     // For cell order, see `SandwichRecipeNumberDetector`.
     // If no cell selection detected, return -1.
