@@ -84,8 +84,8 @@ int test_kernels_BinaryMatrix(const ImageViewRGB32& image){
         image.data(), image.bytes_per_row(), *binary_matrix, mins, maxs
     );
     auto time_end = current_time();
-    auto ns = std::chrono::duration_cast<std::chrono::nanoseconds>(time_end - time_start).count();
-    auto ms = ns / 1000000.;
+    size_t ns = std::chrono::duration_cast<std::chrono::nanoseconds>(time_end - time_start).count();
+    double ms = ns / 1000000.;
     cout << "One binary matrix creation. time: " << ms << " ms" << endl;
     
     size_t error_count = 0;
@@ -122,7 +122,7 @@ int test_kernels_BinaryMatrix(const ImageViewRGB32& image){
         );
     }
     time_end = current_time();
-    ms = std::chrono::duration_cast<Milliseconds>(time_end - time_start).count();
+    ms = (double)std::chrono::duration_cast<Milliseconds>(time_end - time_start).count();
     cout << "Running " << num_iters << " iters, average creation impl. time: " << ms / (double)num_iters << " ms" << endl;
 
     // cout << binary_matrix->dump() << flush;
