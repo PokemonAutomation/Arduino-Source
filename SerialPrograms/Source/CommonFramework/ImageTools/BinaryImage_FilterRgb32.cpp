@@ -7,7 +7,10 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
 #include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.h"
+#include "CommonFramework/Notifications/ProgramInfo.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
+#include "CommonFramework/Tools/ErrorDumper.h"
 #include "BinaryImage_FilterRgb32.h"
 
 //#include <iostream>
@@ -25,9 +28,19 @@ void filter_by_mask(
     bool replace_zero_bits
 ){
     if (matrix.width() > image.width()){
+        dump_image(
+            global_logger_tagged(), ProgramInfo(),
+            "filter_by_mask-width-matrix" + std::to_string(matrix.width()) + "x" + std::to_string(matrix.height()),
+            image
+        );
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Image width is too small.");
     }
     if (matrix.height() > image.height()){
+        dump_image(
+            global_logger_tagged(), ProgramInfo(),
+            "filter_by_mask-width-matrix" + std::to_string(matrix.width()) + "x" + std::to_string(matrix.height()),
+            image
+        );
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Image height is too small.");
     }
     Kernels::filter_by_mask(
@@ -43,9 +56,19 @@ void filter_by_mask(
     bool replace_zero_bits
 ){
     if (matrix.width() > image.width()){
+        dump_image(
+            global_logger_tagged(), ProgramInfo(),
+            "filter_by_mask-width-matrix" + std::to_string(matrix.width()) + "x" + std::to_string(matrix.height()),
+            image
+        );
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Image width is too small.");
     }
     if (matrix.height() > image.height()){
+        dump_image(
+            global_logger_tagged(), ProgramInfo(),
+            "filter_by_mask-width-matrix" + std::to_string(matrix.width()) + "x" + std::to_string(matrix.height()),
+            image
+        );
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Image height is too small.");
     }
     size_t bytes_per_row = image.bytes_per_row();
