@@ -522,10 +522,6 @@ bool StatsReset::check_stats(SingleSwitchProgramEnvironment& env, BotBaseContext
             env.console.log("Match found!");
             stats.matches++;
             env.update_stats();
-            send_program_status_notification(
-                env, NOTIFICATION_PROGRAM_FINISH,
-                "Match found!"
-            );
             break;
         case StatsHuntAction::Discard:
             match = false;
@@ -604,8 +600,12 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
         }
     }
     env.update_stats();
+    auto screenshot = env.console.video().snapshot();
+    send_program_finished_notification(
+        env, NOTIFICATION_PROGRAM_FINISH,
+        "Match found!", screenshot, true
+    );
     GO_HOME_WHEN_DONE.run_end_of_program(context);
-    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 }
     
 }
