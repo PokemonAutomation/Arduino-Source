@@ -105,6 +105,11 @@ ShinyHuntAreaZeroPlatform::ShinyHuntAreaZeroPlatform()
         LockMode::LOCK_WHILE_RUNNING,
         Mode::START_ON_PLATFORM
     )
+    , FLYING_UNLOCKED(
+        "<b>Flying Unlocked:</b><br>Check this box if you have unlocked your ride's ability to fly after completing the Indigo Disk DLC.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        true
+    )
     , PATH0(
         "<b>Path:</b><br>Traversal path on the platform to trigger encounters.",
         {
@@ -141,6 +146,7 @@ ShinyHuntAreaZeroPlatform::ShinyHuntAreaZeroPlatform()
 {
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(MODE);
+    PA_ADD_OPTION(FLYING_UNLOCKED);
     if (PreloadSettings::instance().DEVELOPER_MODE){
         PA_ADD_OPTION(PATH0);
     }
@@ -377,7 +383,7 @@ void ShinyHuntAreaZeroPlatform::run_state(SingleSwitchProgramEnvironment& env, B
         return_to_inside_zero_gate_from_picnic(info, console, context);
         m_current_location = Location::ZERO_GATE_INSIDE;
 
-        inside_zero_gate_to_platform(info, console, context, NAVIGATE_TO_PLATFORM);
+        inside_zero_gate_to_platform(info, console, context, FLYING_UNLOCKED, NAVIGATE_TO_PLATFORM);
         m_current_location = Location::AREA_ZERO;
 
         m_pending_sandwich = false;
@@ -390,7 +396,7 @@ void ShinyHuntAreaZeroPlatform::run_state(SingleSwitchProgramEnvironment& env, B
     if (m_pending_platform_reset){
         console.log("Executing: Platform Reset");
         return_to_inside_zero_gate(info, console, context);
-        inside_zero_gate_to_platform(info, console, context, NAVIGATE_TO_PLATFORM);
+        inside_zero_gate_to_platform(info, console, context, FLYING_UNLOCKED, NAVIGATE_TO_PLATFORM);
         m_current_location = Location::AREA_ZERO;
 
         stats.m_platform_resets++;
@@ -408,7 +414,7 @@ void ShinyHuntAreaZeroPlatform::run_state(SingleSwitchProgramEnvironment& env, B
     case Location::TRAVELING_TO_PLATFORM:
         console.log("Executing: Platform Reset (state-based)...");
         return_to_inside_zero_gate(info, console, context);
-        inside_zero_gate_to_platform(info, console, context, NAVIGATE_TO_PLATFORM);
+        inside_zero_gate_to_platform(info, console, context, FLYING_UNLOCKED, NAVIGATE_TO_PLATFORM);
         m_current_location = Location::AREA_ZERO;
         m_pending_platform_reset = false;
         m_encounter_tracker->reset_rate_tracker_start_time();
@@ -417,7 +423,7 @@ void ShinyHuntAreaZeroPlatform::run_state(SingleSwitchProgramEnvironment& env, B
     case Location::ZERO_GATE_INSIDE:
         console.log("Executing: Zero Gate -> Platform...");
         m_current_location = Location::AREA_ZERO;
-        inside_zero_gate_to_platform(info, console, context, NAVIGATE_TO_PLATFORM);
+        inside_zero_gate_to_platform(info, console, context, FLYING_UNLOCKED, NAVIGATE_TO_PLATFORM);
 //            m_current_location = Location::AREA_ZERO;
         m_pending_platform_reset = false;
         m_encounter_tracker->reset_rate_tracker_start_time();

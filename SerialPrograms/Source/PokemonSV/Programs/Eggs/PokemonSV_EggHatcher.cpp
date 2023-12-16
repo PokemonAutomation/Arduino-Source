@@ -104,7 +104,7 @@ void EggHatcher::hatch_one_box(SingleSwitchProgramEnvironment& env, BotBaseConte
             if (check_empty_slots_in_party(env.program_info(), env.console, context) != expected_empty_slots_in_party){
                 throw FatalProgramException(
                     ErrorReport::SEND_ERROR_REPORT, env.console,
-                    "Party not empty when loading one column for hatching.",
+                    "Your party should have " + std::to_string(expected_empty_slots_in_party) + " " + STRING_POKEMON + ".",
                     true
                 );
             }
