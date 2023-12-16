@@ -70,11 +70,13 @@ StatsReset::StatsReset()
         "<b>Target:</b><br>The Pokemon you are resetting for.<br>"
         "Treasures of Ruin: Stand in front of the unsealed vaults of one of the Ruinous Quartet.<br>"
         "Loyal Three: Stand in front of Okidogi/Munkidori/Fezandipiti.<br>"
+        "Snacksworth Legendary: After unlocking a legendary from Snacksworth, stand in front of it.<br>"
         //"Generic: You are standing in front of a Pokemon that requires an A press to initiate battle.<br>",
         "Gimmighoul: Stand in front of a Gimmighoul chest.<br>",
         {
             {Target::TreasuresOfRuin, "treasures-of-ruin", "Treasures of Ruin"},
             {Target::LoyalThree, "loyal-three", "Loyal Three"},
+            {Target::Snacksworth, "snacksworth", "Snacksworth Legendary"},
             {Target::Generic, "generic", "Gimmighoul"},
         },
         LockMode::LOCK_WHILE_RUNNING,
@@ -157,6 +159,11 @@ void StatsReset::enter_battle(SingleSwitchProgramEnvironment& env, BotBaseContex
     case Target::LoyalThree:
         //Mash through dialog box
         pbf_mash_button(context, BUTTON_B, 1300);
+        context.wait_for_all_requests();
+        break;
+    case Target::Snacksworth:
+        //The same as generic, but Snacksworth legendaries are not in the dex and skip the caught/summary/add to party menu.
+        pbf_mash_button(context, BUTTON_B, 90);
         context.wait_for_all_requests();
         break;
     case Target::Generic:
@@ -459,16 +466,25 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext&
 
     switch (ret) {
     case 0:
-        env.log("Advance Dialog detected. Either caught target or lost battle.");
+        //Non-Snack: dialog appears on caught screen.
+        //Snack: "target fled somewhere..."
+        //Lost battle: joy dialog
+        env.log("Advance Dialog detected. Caught regular target, lost battle, or fainted Snacksworth.");
         target_fainted = false;
         break;
     case 1:
-        env.log("Overworld detected, target Pokemon fainted.");
-        send_program_status_notification(
-            env, NOTIFICATION_STATUS_UPDATE,
-            "Overworld detected, target Pokemon fainted."
-        );
-        target_fainted = true;
+        if (TARGET == Target::Snacksworth) {
+            env.log("Overworld detected. Snacksworth legendary caught, checking box system.");
+            target_fainted = false;
+        }
+        else {
+            env.log("Overworld detected, target Pokemon fainted.");
+            send_program_status_notification(
+                env, NOTIFICATION_STATUS_UPDATE,
+                "Overworld detected, target Pokemon fainted."
+            );
+            target_fainted = true;
+        }
         break;
     default:
         if (out_of_balls) {
