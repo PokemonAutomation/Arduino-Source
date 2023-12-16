@@ -36,7 +36,7 @@ StatsReset_Descriptor::StatsReset_Descriptor()
         "PokemonSV:StatsReset",
         STRING_POKEMON + " SV", "Stats Reset",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSV/StatsReset.md",
-        "Repeatedly catch the Treasures of Ruin or Loyal Three until you get the stats you want.",
+        "Repeatedly catch static encounters until you get the stats you want.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB
@@ -67,17 +67,17 @@ std::unique_ptr<StatsTracker> StatsReset_Descriptor::make_stats() const {
 }
 StatsReset::StatsReset()
     : TARGET(
-        "<b>Target:</b><br>The Pokemon you are resetting for.<br>"
-        "Treasures of Ruin: Stand in front of the unsealed vaults of one of the Ruinous Quartet.<br>"
-        "Loyal Three: Stand in front of Okidogi/Munkidori/Fezandipiti.<br>"
-        "Snacksworth Legendary: After unlocking a legendary from Snacksworth, stand in front of it.<br>"
+        "<b>Target:</b><br>The Pokemon you are resetting for.",
+        //"Treasures of Ruin: Stand in front of the unsealed vaults of one of the Ruinous Quartet.<br>"
+        //"Loyal Three: Stand in front of Okidogi/Munkidori/Fezandipiti.<br>"
+        //"Snacksworth Legendary: After unlocking a legendary from Snacksworth, stand in front of it.<br>"
         //"Generic: You are standing in front of a Pokemon that requires an A press to initiate battle.<br>",
-        "Gimmighoul: Stand in front of a Gimmighoul chest.<br>",
+        //"Gimmighoul: Stand in front of a Gimmighoul chest.<br>",
         {
             {Target::TreasuresOfRuin, "treasures-of-ruin", "Treasures of Ruin"},
             {Target::LoyalThree, "loyal-three", "Loyal Three"},
-            {Target::Snacksworth, "snacksworth", "Snacksworth Legendary"},
-            {Target::Generic, "generic", "Gimmighoul"},
+            {Target::Snacksworth, "snacksworth", "Snacksworth Legendaries + Meloetta"},
+            {Target::Generic, "generic", "Indigo Disk Paradoxes (nature only) + Gimmighoul"},
         },
         LockMode::LOCK_WHILE_RUNNING,
         Target::TreasuresOfRuin
