@@ -535,6 +535,9 @@ bool StatsReset::check_stats(SingleSwitchProgramEnvironment& env, BotBaseContext
         switch (action) {
         case StatsHuntAction::StopProgram:
             match = true;
+
+            pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
+
             env.console.log("Match found!");
             stats.matches++;
             env.update_stats();
