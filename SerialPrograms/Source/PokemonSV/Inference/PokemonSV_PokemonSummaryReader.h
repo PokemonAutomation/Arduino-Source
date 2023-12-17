@@ -10,6 +10,7 @@
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/Inference/VisualDetector.h"
+#include "PokemonSV_WhiteButtonDetector.h"
 
 namespace PokemonAutomation{
     struct ImageStats;
@@ -36,6 +37,9 @@ protected:
     ImageFloatBox m_top_blue_left;
     ImageFloatBox m_top_blue_right;
     ImageFloatBox m_bottom;
+
+    WhiteButtonDetector m_arrow_left;
+    WhiteButtonDetector m_arrow_right;
 
     ImageFloatBox m_shiny_symbol;
 };

@@ -112,6 +112,7 @@
 #include "PokemonSV/Inference/PokemonSV_StatHexagonReader.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_ReceivePokemonDetector.h"
+#include "PokemonSV/Inference/PokemonSV_PokemonSummaryReader.h"
 
 
 
@@ -237,6 +238,31 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     [[maybe_unused]] VideoOverlay& overlay = env.consoles[0];
     BotBaseContext context(scope, console.botbase());
     VideoOverlaySet overlays(overlay);
+
+
+    auto snapshot = console.video().snapshot();
+
+    PokemonSummaryDetector detector;
+    detector.make_overlays(overlays);
+    cout << detector.detect(snapshot) << endl;
+
+
+
+#if 0
+    auto snapshot = console.video().snapshot();
+    ImageViewRGB32 box0 = extract_box_reference(snapshot, ImageFloatBox{0.415, 0.085, 0.035, 0.057});
+    ImageViewRGB32 box1 = extract_box_reference(snapshot, ImageFloatBox{0.553, 0.085, 0.035, 0.057});
+
+    {
+        PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(box1, 0xff808080, 0xffffffff);
+        std::unique_ptr<WaterfillSession> session = make_WaterfillSession(matrix);
+        auto iter = session->make_iterator(20);
+        WaterfillObject object;
+        while (iter->find_next(object, false)){
+            extract_box_reference(box1, object).save("test.png");
+        }
+    }
+    #endif
 
 
 

@@ -238,6 +238,8 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 //    using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
 
 
+
+#if 0
     ImageRGB32 image("20231120-221849973351.png");
 
 
@@ -254,7 +256,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 
     detector.read_from_image(self);
     cout << detector.to_str() << endl;
-
+#endif
 
 
 //    ImageRGB32 image("screenshot-20231016-130205783594.png");
