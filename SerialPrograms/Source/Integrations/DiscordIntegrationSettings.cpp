@@ -123,8 +123,8 @@ void DiscordIntegrationSettingsOption::value_changed(){
 #if (defined PA_SLEEPY || defined PA_DPP)
     bool options_enabled = this->enabled();
     switch (library0){
-#ifdef PA_SLEEPY
     case Library::SleepyDiscord:{
+#ifdef PA_SLEEPY
         options_enabled &= !SleepyDiscordRunner::is_running();
         ConfigOptionState state = options_enabled ? ConfigOptionState::ENABLED : ConfigOptionState::DISABLED;
 
@@ -139,11 +139,11 @@ void DiscordIntegrationSettingsOption::value_changed(){
         sudo.set_visibility(state);
         owner.set_visibility(state);
         allow_buttons_from_users.set_visibility(ConfigOptionState::HIDDEN);
+#endif
         break;
     }
-#endif
-#ifdef PA_DPP
     case Library::DPP:{
+#ifdef PA_DPP
         options_enabled &= !DppClient::Client::instance().is_initialized();
         ConfigOptionState state = options_enabled ? ConfigOptionState::ENABLED : ConfigOptionState::DISABLED;
 
@@ -158,9 +158,9 @@ void DiscordIntegrationSettingsOption::value_changed(){
         use_suffix.set_visibility(ConfigOptionState::HIDDEN);
         sudo.set_visibility(ConfigOptionState::HIDDEN);
         owner.set_visibility(ConfigOptionState::HIDDEN);
+#endif
         break;
     }
-#endif
     }
 #endif
 }
@@ -204,16 +204,16 @@ DiscordIntegrationSettingsWidget::DiscordIntegrationSettingsWidget(QWidget& pare
         button_start, &QPushButton::clicked,
         this, [&value](bool) {
             switch (value.library0){
-#ifdef PA_SLEEPY
             case DiscordIntegrationSettingsOption::Library::SleepyDiscord:
+#ifdef PA_SLEEPY
                 SleepyDiscordRunner::sleepy_connect();
-                break;
 #endif
-#ifdef PA_DPP
+                break;
             case DiscordIntegrationSettingsOption::Library::DPP:
+#ifdef PA_DPP
                 DppClient::Client::instance().connect();
-                break;
 #endif
+                break;
             }
             value.value_changed();
         }
@@ -222,16 +222,16 @@ DiscordIntegrationSettingsWidget::DiscordIntegrationSettingsWidget(QWidget& pare
         button_stop, &QPushButton::clicked,
         this, [&value](bool) {
             switch (value.library0){
-#ifdef PA_SLEEPY
             case DiscordIntegrationSettingsOption::Library::SleepyDiscord:
+#ifdef PA_SLEEPY
                 SleepyDiscordRunner::sleepy_terminate();
-                break;
 #endif
-#ifdef PA_DPP
+                break;
             case DiscordIntegrationSettingsOption::Library::DPP:
+#ifdef PA_DPP
                 DppClient::Client::instance().disconnect();
-                break;
 #endif
+                break;
             }
             value.value_changed();
         }

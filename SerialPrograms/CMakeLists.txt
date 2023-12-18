@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.18.0)
 #set the name of the project
 project(SerialPrograms)
 
-#enable c++ 20
+#enable c++ 23
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -15,9 +15,6 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
-
-add_custom_target(build-time-make-directory ALL
-    COMMAND ${CMAKE_COMMAND} -E make_directory Assembly/)
 
 #Find threads library
 set(THREADS_PREFER_PTHREAD_FLAG ON)
@@ -2064,6 +2061,17 @@ else()
         target_link_libraries(SerialPrograms ${LEPTONICA_LINK_LIBRARIES})
     endif()
 
+    # enable dpp integration
+    if ((APPLE) AND (CMAKE_SYSTEM_PROCESSOR MATCHES "(arm64)|(ARM64)"))
+        add_library(libdpp STATIC IMPORTED)
+        set_target_properties(libdpp PROPERTIES
+            IMPORTED_LOCATION ../3rdPartyBinaries/libdpp_macos_arm64.a
+            INTERFACE_COMPILE_DEFINITIONS "PA_DPP"
+            INTERFACE_LINK_LIBRARIES "-L/opt/homebrew/lib -lssl -lcrypto -lopus -lsodium -lz" # add dpp's deps
+        )
+        target_link_libraries(SerialPrograms libdpp)
+    endif()
+
     # Add -Wno-c11-extensions to avoid clang gives
     # /usr/local/Cellar/opencv/4.5.5_3/include/opencv4/opencv2/core/mat.inl.hpp:2116:9: error: '_Atomic' is a C11 extension
     # when compiling OpenCV
@@ -2162,11 +2170,11 @@ endif()
 
 
 
-
-
+if (WIN32)
 #copy needed dlls
 #file(COPY *.dll DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 file(GLOB MY_DLLS
   "../3rdPartyBinaries/*.dll"
 )
 file(COPY ${MY_DLLS} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+endif()
