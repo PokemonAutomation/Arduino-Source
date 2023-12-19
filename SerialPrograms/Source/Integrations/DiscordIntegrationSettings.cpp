@@ -161,7 +161,7 @@ void DiscordIntegrationSettingsOption::value_changed(){
         break;
     }
 #endif
-    default:
+    default:;
     }
 #endif
 }
@@ -203,7 +203,7 @@ DiscordIntegrationSettingsWidget::DiscordIntegrationSettingsWidget(QWidget& pare
 
     connect(
         button_start, &QPushButton::clicked,
-        this, [&value](bool) {
+        this, [&value](bool){
             switch (value.library0){
 #ifdef PA_SLEEPY
             case DiscordIntegrationSettingsOption::Library::SleepyDiscord:
@@ -215,14 +215,14 @@ DiscordIntegrationSettingsWidget::DiscordIntegrationSettingsWidget(QWidget& pare
                 DppClient::Client::instance().connect();
                 break;
 #endif
-            default:
+            default:;
             }
             value.value_changed();
         }
     );
     connect(
         button_stop, &QPushButton::clicked,
-        this, [&value](bool) {
+        this, [&value](bool){
             switch (value.library0){
 #ifdef PA_SLEEPY
             case DiscordIntegrationSettingsOption::Library::SleepyDiscord:
@@ -234,7 +234,7 @@ DiscordIntegrationSettingsWidget::DiscordIntegrationSettingsWidget(QWidget& pare
                 DppClient::Client::instance().disconnect();
                 break;
 #endif
-            default:
+            default:;
             }
             value.value_changed();
         }
