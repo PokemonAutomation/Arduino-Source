@@ -123,8 +123,8 @@ void DiscordIntegrationSettingsOption::value_changed(){
 #if (defined PA_SLEEPY || defined PA_DPP)
     bool options_enabled = this->enabled();
     switch (library0){
-    case Library::SleepyDiscord:{
 #ifdef PA_SLEEPY
+    case Library::SleepyDiscord:{
         options_enabled &= !SleepyDiscordRunner::is_running();
         ConfigOptionState state = options_enabled ? ConfigOptionState::ENABLED : ConfigOptionState::DISABLED;
 
@@ -139,11 +139,11 @@ void DiscordIntegrationSettingsOption::value_changed(){
         sudo.set_visibility(state);
         owner.set_visibility(state);
         allow_buttons_from_users.set_visibility(ConfigOptionState::HIDDEN);
-#endif
         break;
     }
-    case Library::DPP:{
+#endif
 #ifdef PA_DPP
+    case Library::DPP:{
         options_enabled &= !DppClient::Client::instance().is_initialized();
         ConfigOptionState state = options_enabled ? ConfigOptionState::ENABLED : ConfigOptionState::DISABLED;
 
@@ -158,9 +158,10 @@ void DiscordIntegrationSettingsOption::value_changed(){
         use_suffix.set_visibility(ConfigOptionState::HIDDEN);
         sudo.set_visibility(ConfigOptionState::HIDDEN);
         owner.set_visibility(ConfigOptionState::HIDDEN);
-#endif
         break;
     }
+#endif
+    default:
     }
 #endif
 }
@@ -204,16 +205,17 @@ DiscordIntegrationSettingsWidget::DiscordIntegrationSettingsWidget(QWidget& pare
         button_start, &QPushButton::clicked,
         this, [&value](bool) {
             switch (value.library0){
-            case DiscordIntegrationSettingsOption::Library::SleepyDiscord:
 #ifdef PA_SLEEPY
+            case DiscordIntegrationSettingsOption::Library::SleepyDiscord:
                 SleepyDiscordRunner::sleepy_connect();
-#endif
                 break;
-            case DiscordIntegrationSettingsOption::Library::DPP:
+#endif
 #ifdef PA_DPP
+            case DiscordIntegrationSettingsOption::Library::DPP:
                 DppClient::Client::instance().connect();
-#endif
                 break;
+#endif
+            default:
             }
             value.value_changed();
         }
@@ -222,16 +224,17 @@ DiscordIntegrationSettingsWidget::DiscordIntegrationSettingsWidget(QWidget& pare
         button_stop, &QPushButton::clicked,
         this, [&value](bool) {
             switch (value.library0){
-            case DiscordIntegrationSettingsOption::Library::SleepyDiscord:
 #ifdef PA_SLEEPY
+            case DiscordIntegrationSettingsOption::Library::SleepyDiscord:
                 SleepyDiscordRunner::sleepy_terminate();
-#endif
                 break;
-            case DiscordIntegrationSettingsOption::Library::DPP:
+#endif
 #ifdef PA_DPP
+            case DiscordIntegrationSettingsOption::Library::DPP:
                 DppClient::Client::instance().disconnect();
-#endif
                 break;
+#endif
+            default:
             }
             value.value_changed();
         }
