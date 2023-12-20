@@ -7,11 +7,12 @@
 #include <sstream>
 #include "ClientSource/Libraries/MessageConverter.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_ScalarButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Routines.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh_Commands_GameEntry.h"
-#include "PokemonSwSh_Messages_GameEntry.h"
+//#include "PokemonSwSh_Messages_GameEntry.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -50,12 +51,25 @@ void fast_reset_game(
     uint16_t start_game_mash, uint16_t start_game_wait,
     uint16_t enter_game_mash, uint16_t enter_game_wait
 ){
+#if 0
     context.issue_request(
         DeviceRequest_fast_reset_game(
             start_game_mash, start_game_wait,
             enter_game_mash, enter_game_wait
         )
     );
+#else
+    //  Fastest setting. No internet needed and no update menu.
+    ssf_mash1_button(context, BUTTON_X, 50);
+
+    //  Use mashing to ensure that the X press succeeds. If it fails, the SR
+    //  will fail and can kill a den for the autohosts.
+    ssf_mash2_button(context, BUTTON_X, BUTTON_A, 3 * TICKS_PER_SECOND + start_game_mash);
+    ssf_mash1_button(context, BUTTON_X, start_game_wait);
+
+    ssf_mash_AZs(context, enter_game_mash);
+    pbf_wait(context, enter_game_wait);
+#endif
 }
 
 void reset_game_from_home(BotBaseContext& context, bool tolerate_update_menu){
@@ -89,6 +103,7 @@ void settings_to_enter_game_den_lobby(
     uint16_t enter_switch_pokemon_delay,
     uint16_t exit_switch_pokemon_delay
 ){
+#if 0
     context.issue_request(
         DeviceRequest_settings_to_enter_game_den_lobby(
             tolerate_update_menu, fast,
@@ -96,6 +111,31 @@ void settings_to_enter_game_den_lobby(
             exit_switch_pokemon_delay
         )
     );
+#else
+    settings_to_enter_game(context, fast);
+    pbf_wait(context, 90);
+    if (tolerate_update_menu){
+        //  home                home
+//        ssf_press_button2(BUTTON_HOME, 100, 10);
+        //  lobby-switch        update-yes
+        ssf_press_dpad(context, DPAD_DOWN, 10);
+        ssf_press_dpad(context, DPAD_UP, 10);
+        //  lobby-switch        update-start
+        ssf_press_button(context, BUTTON_A, enter_switch_pokemon_delay, 10);
+        //  lobby-select        lobby-switch
+        ssf_press_dpad(context, DPAD_LEFT, 10);
+        //  lobby-select        lobby-switch
+        ssf_press_button(context, BUTTON_A, enter_switch_pokemon_delay);
+        //  lobby-confirm       lobby-select
+        ssf_press_button(context, BUTTON_Y, 10);
+        ssf_press_dpad(context, DPAD_LEFT, 10);
+        //  lobby-confirm       lobby-select
+        ssf_press_button(context, BUTTON_A, exit_switch_pokemon_delay);
+        //  lobby-switch        lobby-switch
+    }else{
+        pbf_wait(context, 50);
+    }
+#endif
 }
 void start_game_from_home(BotBaseContext& context, bool tolerate_update_menu, uint8_t game_slot, uint8_t user_slot, bool backup_save){
     //  Start the game with the specified "game_slot" and "user_slot".
@@ -151,13 +191,29 @@ void start_game_from_home(BotBaseContext& context, bool tolerate_update_menu, ui
 }
 
 void enter_game(BotBaseContext& context, bool backup_save, uint16_t enter_game_mash, uint16_t enter_game_wait){
+#if 0
     context.issue_request(
         DeviceRequest_enter_game(backup_save, enter_game_mash, enter_game_wait)
     );
+#else
+    if (backup_save){
+        pbf_wait(context, enter_game_mash);
+        ssf_press_dpad(context, DPAD_UP, 0, 10);
+        ssf_press_button(context, BUTTON_B | BUTTON_X, 1 * TICKS_PER_SECOND, 10);
+        ssf_mash_AZs(context, 5 * TICKS_PER_SECOND);
+        if (enter_game_wait > 4 * TICKS_PER_SECOND){
+            pbf_wait(context, enter_game_wait - 4 * TICKS_PER_SECOND);
+        }
+    }else{
+        ssf_mash_AZs(context, enter_game_mash);
+        pbf_wait(context, enter_game_wait);
+    }
+#endif
 }
 
 
 
+#if 0
 int register_message_converters_pokemon_game_entry(){
     register_message_converter(
         PABB_MSG_COMMAND_FAST_RESET_GAME,
@@ -206,6 +262,7 @@ int register_message_converters_pokemon_game_entry(){
     return 0;
 }
 int init_PokemonSwShGameEntry = register_message_converters_pokemon_game_entry();
+#endif
 
 
 }

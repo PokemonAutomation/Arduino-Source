@@ -166,12 +166,12 @@ void AuctionFarmer::reset_auctions(SingleSwitchProgramEnvironment& env, BotBaseC
         if (do_full_reset){
             if (year == MAX_YEAR){
                 pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
-                home_roll_date_enter_game_autorollback(env.console, context, year);
+                PokemonSwSh::home_roll_date_enter_game_autorollback(env.console, context, year);
             }
             save_game_from_overworld(env.program_info(), env.console, context);
 
             pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
-            home_roll_date_enter_game_autorollback(env.console, context, year);
+            PokemonSwSh::home_roll_date_enter_game_autorollback(env.console, context, year);
         }
         pbf_wait(context, 1 * TICKS_PER_SECOND);
 
