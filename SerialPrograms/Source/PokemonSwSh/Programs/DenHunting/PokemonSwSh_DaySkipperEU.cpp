@@ -44,10 +44,7 @@ DaySkipperEU::DaySkipperEU()
     , REAL_LIFE_YEAR(
         "<b>Real Life Year:</b>",
         LockMode::LOCK_WHILE_RUNNING,
-        std::min(
-            (uint16_t)std::atoi(std::format("{:%Y}", current_time()).c_str()),
-            (uint16_t)2060
-        ),
+        std::min(current_year(), (uint16_t)2060),
         2000, 2060
     )
     , NOTIFICATION_PROGRESS_UPDATE("Progress Update", true, false, std::chrono::seconds(3600))
