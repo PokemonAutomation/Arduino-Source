@@ -92,7 +92,39 @@ void ssf_issue_scroll(
 
 
 
+static std::string button_to_string(Button button){
+    std::string str;
+    if (button & BUTTON_Y) str += " BUTTON_Y ";
+    if (button & BUTTON_B) str += " BUTTON_B ";
+    if (button & BUTTON_A) str += " BUTTON_A ";
+    if (button & BUTTON_X) str += " BUTTON_X ";
+    if (button & BUTTON_L) str += " BUTTON_L ";
+    if (button & BUTTON_R) str += " BUTTON_R ";
+    if (button & BUTTON_ZL) str += " BUTTON_ZL ";
+    if (button & BUTTON_ZR) str += " BUTTON_ZR ";
+    if (button & BUTTON_MINUS) str += " BUTTON_MINUS ";
+    if (button & BUTTON_PLUS) str += " BUTTON_PLUS ";
+    if (button & BUTTON_LCLICK) str += " BUTTON_LCLICK ";
+    if (button & BUTTON_RCLICK) str += " BUTTON_RCLICK ";
+    if (button & BUTTON_HOME) str += " BUTTON_HOME ";
+    if (button & BUTTON_CAPTURE) str += " BUTTON_CAPTURE ";
+    return str;
+}
 
+static std::string dpad_to_string(Button dpad){
+    switch (dpad){
+    case DPAD_UP            : return "DPAD_UP";
+    case DPAD_UP_RIGHT      : return "DPAD_UP_RIGHT";
+    case DPAD_RIGHT         : return "DPAD_RIGHT";
+    case DPAD_DOWN_RIGHT    : return "DPAD_DOWN_RIGHT";
+    case DPAD_DOWN          : return "DPAD_DOWN";
+    case DPAD_DOWN_LEFT     : return "DPAD_DOWN_LEFT";
+    case DPAD_LEFT          : return "DPAD_LEFT";
+    case DPAD_UP_LEFT       : return "DPAD_UP_LEFT";
+    case DPAD_NONE          : return "DPAD_NONE";
+    }
+    return "UNKNOWN_DPAD";
+}
 
 
 int register_message_converters_ssf(){
@@ -127,7 +159,7 @@ int register_message_converters_ssf(){
             if (body.size() != sizeof(pabb_ssf_press_button)){ ss << "(invalid size)" << std::endl; return ss.str(); }
             const auto* params = (const pabb_ssf_press_button*)body.c_str();
             ss << "seqnum = " << (uint64_t)params->seqnum;
-            ss << ", button = " << params->button;
+            ss << ", button = " << params->button << "(" << button_to_string(params->button) << ")";
             ss << ", delay = " << params->delay;
             ss << ", hold = " << params->hold;
             ss << ", cool = " << (int)params->cool;
@@ -142,7 +174,7 @@ int register_message_converters_ssf(){
             if (body.size() != sizeof(pabb_ssf_press_dpad)){ ss << "(invalid size)" << std::endl; return ss.str(); }
             const auto* params = (const pabb_ssf_press_dpad*)body.c_str();
             ss << "seqnum = " << (uint64_t)params->seqnum;
-            ss << ", position = " << (int)params->position;
+            ss << ", dpad = " << (unsigned)params->position << "(" << dpad_to_string(params->position) << ")";
             ss << ", delay = " << params->delay;
             ss << ", hold = " << params->hold;
             ss << ", cool = " << (int)params->cool;
@@ -189,7 +221,7 @@ int register_message_converters_ssf(){
             if (body.size() != sizeof(pabb_ssf_mash1_button)){ ss << "(invalid size)" << std::endl; return ss.str(); }
             const auto* params = (const pabb_ssf_mash1_button*)body.c_str();
             ss << "seqnum = " << (uint64_t)params->seqnum;
-            ss << ", button = " << (int)params->button;
+            ss << ", button = " << params->button << "(" << button_to_string(params->button) << ")";
             ss << ", ticks = " << params->ticks;
             return ss.str();
         }
@@ -202,8 +234,8 @@ int register_message_converters_ssf(){
             if (body.size() != sizeof(pabb_ssf_mash2_button)){ ss << "(invalid size)" << std::endl; return ss.str(); }
             const auto* params = (const pabb_ssf_mash2_button*)body.c_str();
             ss << "seqnum = " << (uint64_t)params->seqnum;
-            ss << ", button0 = " << (int)params->button0;
-            ss << ", button1 = " << (int)params->button1;
+            ss << ", button = " << params->button0 << "(" << button_to_string(params->button0) << ")";
+            ss << ", button = " << params->button1 << "(" << button_to_string(params->button1) << ")";
             ss << ", ticks = " << params->ticks;
             return ss.str();
         }

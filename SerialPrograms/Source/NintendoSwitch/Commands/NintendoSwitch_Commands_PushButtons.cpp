@@ -9,6 +9,7 @@
 #include "NintendoSwitch_Commands_Device.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch_Commands_ScalarButtons.h"
 #include "NintendoSwitch_Messages_PushButtons.h"
 
 namespace PokemonAutomation{
@@ -16,34 +17,82 @@ namespace NintendoSwitch{
 
 
 void pbf_wait(BotBaseContext& context, uint16_t ticks){
+#if 0
     context.issue_request(
         DeviceRequest_pbf_wait(ticks)
     );
+#else
+    ssf_do_nothing(context, ticks);
+#endif
 }
 void pbf_press_button(BotBaseContext& context, Button button, uint16_t hold_ticks, uint16_t release_ticks){
+#if 0
     context.issue_request(
         DeviceRequest_pbf_press_button(button, hold_ticks, release_ticks)
     );
+#else
+    uint32_t delay = (uint32_t)hold_ticks + release_ticks;
+    if ((uint16_t)delay == delay){
+        ssf_press_button(context, button, (uint16_t)delay, hold_ticks, 0);
+    }else{
+        ssf_press_button(context, button, hold_ticks, hold_ticks, 0);
+        ssf_do_nothing(context, release_ticks);
+    }
+#endif
 }
 void pbf_press_dpad(BotBaseContext& context, DpadPosition position, uint16_t hold_ticks, uint16_t release_ticks){
+#if 0
     context.issue_request(
         DeviceRequest_pbf_press_dpad(position, hold_ticks, release_ticks)
     );
+#else
+    uint32_t delay = (uint32_t)hold_ticks + release_ticks;
+    if ((uint16_t)delay == delay){
+        ssf_press_dpad(context, position, (uint16_t)delay, hold_ticks, 0);
+    }else{
+        ssf_press_dpad(context, position, hold_ticks, hold_ticks, 0);
+        ssf_do_nothing(context, release_ticks);
+    }
+#endif
 }
 void pbf_move_left_joystick(BotBaseContext& context, uint8_t x, uint8_t y, uint16_t hold_ticks, uint16_t release_ticks){
+#if 0
     context.issue_request(
         DeviceRequest_pbf_move_left_joystick(x, y, hold_ticks, release_ticks)
     );
+#else
+    uint32_t delay = (uint32_t)hold_ticks + release_ticks;
+    if ((uint16_t)delay == delay){
+        ssf_press_left_joystick(context, x, y, (uint16_t)delay, hold_ticks, 0);
+    }else{
+        ssf_press_left_joystick(context, x, y, hold_ticks, hold_ticks, 0);
+        ssf_do_nothing(context, release_ticks);
+    }
+#endif
 }
 void pbf_move_right_joystick(BotBaseContext& context, uint8_t x, uint8_t y, uint16_t hold_ticks, uint16_t release_ticks){
+#if 0
     context.issue_request(
         DeviceRequest_pbf_move_right_joystick(x, y, hold_ticks, release_ticks)
     );
+#else
+    uint32_t delay = (uint32_t)hold_ticks + release_ticks;
+    if ((uint16_t)delay == delay){
+        ssf_press_right_joystick(context, x, y, (uint16_t)delay, hold_ticks, 0);
+    }else{
+        ssf_press_right_joystick(context, x, y, hold_ticks, hold_ticks, 0);
+        ssf_do_nothing(context, release_ticks);
+    }
+#endif
 }
 void pbf_mash_button(BotBaseContext& context, Button button, uint16_t ticks){
+#if 0
     context.issue_request(
         DeviceRequest_pbf_mash_button(button, ticks)
     );
+#else
+    ssf_mash1_button(context, button, ticks);
+#endif
 }
 
 void start_program_flash(BotBaseContext& context, uint16_t ticks){
@@ -92,7 +141,7 @@ void pbf_controller_state(
     } // end while loop, and function 
 }
 
-std::string button_to_string(Button button){
+static std::string button_to_string(Button button){
     std::string str;
     if (button & BUTTON_Y) str += " BUTTON_Y ";
     if (button & BUTTON_B) str += " BUTTON_B ";
@@ -111,7 +160,7 @@ std::string button_to_string(Button button){
     return str;
 }
 
-std::string dpad_to_string(Button dpad){
+static std::string dpad_to_string(Button dpad){
     switch (dpad){
     case DPAD_UP            : return "DPAD_UP";
     case DPAD_UP_RIGHT      : return "DPAD_UP_RIGHT";
@@ -127,6 +176,7 @@ std::string dpad_to_string(Button dpad){
 }
 
 int register_message_converters_push_button_framework(){
+#if 0
     register_message_converter(
         PABB_MSG_COMMAND_PBF_WAIT,
         [](const std::string& body){
@@ -210,6 +260,7 @@ int register_message_converters_push_button_framework(){
             return ss.str();
         }
     );
+#endif
     register_message_converter(
         PABB_MSG_CONTROLLER_STATE,
         [](const std::string& body){
