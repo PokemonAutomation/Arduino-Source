@@ -39,6 +39,7 @@ PABotBase::PABotBase(
 )
     : PABotBaseConnection(logger, std::move(connection))
     , m_logger(logger)
+    , m_max_pending_requests(PABB_DEVICE_QUEUE_SIZE)
     , m_send_seq(1)
     , m_retransmit_delay(retransmit_delay)
     , m_last_ack(current_time())
@@ -116,6 +117,9 @@ void PABotBase::stop(){
     //  it is safe to destruct.
     m_state.store(State::STOPPED, std::memory_order_release);
 }
+void PABotBase::set_queue_limit(size_t queue_limit){
+    m_max_pending_requests.store(queue_limit, std::memory_order_relaxed);
+}
 
 void PABotBase::wait_for_all_requests(const Cancellable* cancelled){
     m_sanitizer.check_usage();
@@ -168,7 +172,7 @@ bool PABotBase::try_stop_all_commands(){
 
     m_sanitizer.check_usage();
 
-    uint64_t seqnum = try_issue_request(nullptr, Microcontroller::DeviceRequest_request_stop(), true, MAX_PENDING_REQUESTS);
+    uint64_t seqnum = try_issue_request(nullptr, Microcontroller::DeviceRequest_request_stop(), true);
     if (seqnum != 0){
         clear_all_active_commands(seqnum);
         return true;
@@ -201,7 +205,7 @@ void PABotBase::stop_all_commands(){
 bool PABotBase::try_next_command_interrupt(){
     m_sanitizer.check_usage();
 
-    uint64_t seqnum = try_issue_request(nullptr, Microcontroller::DeviceRequest_next_command_interrupt(), true, MAX_PENDING_REQUESTS);
+    uint64_t seqnum = try_issue_request(nullptr, Microcontroller::DeviceRequest_next_command_interrupt(), true);
     if (seqnum != 0){
         clear_all_active_commands(seqnum);
         return true;
@@ -507,8 +511,7 @@ void PABotBase::retransmit_thread(){
         //  chronological order. Skip the ones that are new.
         for (auto& item : m_pending_requests){
             item.second.sanitizer.check_usage();
-            if (
-                item.second.state == AckState::NOT_ACKED &&
+            if (item.second.state == AckState::NOT_ACKED &&
                 current_time() - item.second.first_sent >= m_retransmit_delay
             ){
                 send_message(item.second.request, true);
@@ -516,8 +519,7 @@ void PABotBase::retransmit_thread(){
         }
         for (auto& item : m_pending_commands){
             item.second.sanitizer.check_usage();
-            if (
-                item.second.state == AckState::NOT_ACKED &&
+            if (item.second.state == AckState::NOT_ACKED &&
                 current_time() - item.second.first_sent >= m_retransmit_delay
             ){
                 send_message(item.second.request, true);
@@ -533,8 +535,7 @@ void PABotBase::retransmit_thread(){
 
 uint64_t PABotBase::try_issue_request(
     const Cancellable* cancelled,
-    const BotBaseRequest& request, bool silent_remove,
-    size_t queue_limit
+    const BotBaseRequest& request, bool silent_remove
 ){
     m_sanitizer.check_usage();
 
@@ -558,6 +559,8 @@ uint64_t PABotBase::try_issue_request(
     if (m_error.load(std::memory_order_acquire)){
         throw ConnectionException(&m_logger, "Serial connection was interrupted.");
     }
+
+    size_t queue_limit = m_max_pending_requests.load(std::memory_order_relaxed);
 
     //  Too many unacked requests in flight.
     if (inflight_requests() >= queue_limit){
@@ -597,8 +600,7 @@ uint64_t PABotBase::try_issue_request(
 }
 uint64_t PABotBase::try_issue_command(
     const Cancellable* cancelled,
-    const BotBaseRequest& request, bool silent_remove,
-    size_t queue_limit
+    const BotBaseRequest& request, bool silent_remove
 ){
     m_sanitizer.check_usage();
 
@@ -622,6 +624,8 @@ uint64_t PABotBase::try_issue_command(
     if (m_error.load(std::memory_order_acquire)){
         throw ConnectionException(&m_logger, "Serial connection was interrupted.");
     }
+
+    size_t queue_limit = m_max_pending_requests.load(std::memory_order_relaxed);
 
     //  Command queue is full.
     if (m_pending_commands.size() >= queue_limit){
@@ -690,7 +694,7 @@ uint64_t PABotBase::issue_request(
     //
 
     while (true){
-        uint64_t seqnum = try_issue_request(cancelled, request, silent_remove, MAX_PENDING_REQUESTS);
+        uint64_t seqnum = try_issue_request(cancelled, request, silent_remove);
         if (seqnum != 0){
             return seqnum;
         }
@@ -732,7 +736,7 @@ uint64_t PABotBase::issue_command(
     //
 
     while (true){
-        uint64_t seqnum = try_issue_command(cancelled, request, silent_remove, MAX_PENDING_REQUESTS);
+        uint64_t seqnum = try_issue_command(cancelled, request, silent_remove);
         if (seqnum != 0){
             return seqnum;
         }
@@ -757,9 +761,9 @@ bool PABotBase::try_issue_request(
     m_sanitizer.check_usage();
 
     if (!request.is_command()){
-        return try_issue_request(cancelled, request, true, MAX_PENDING_REQUESTS) != 0;
+        return try_issue_request(cancelled, request, true) != 0;
     }else{
-        return try_issue_command(cancelled, request, true, MAX_PENDING_REQUESTS) != 0;
+        return try_issue_command(cancelled, request, true) != 0;
     }
 }
 void PABotBase::issue_request(

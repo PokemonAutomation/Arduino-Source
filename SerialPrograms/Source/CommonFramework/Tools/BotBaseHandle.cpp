@@ -299,6 +299,14 @@ void BotBaseHandle::thread_body(){
             verify_protocol();
             program_id = verify_pabotbase();
             version = Microcontroller::program_version(*m_botbase);
+            if (version >= 2023121900){
+                m_logger.log("Device supports queue size.", COLOR_BLUE);
+                uint8_t queue_limit = Microcontroller::device_queue_size(*m_botbase);
+                m_logger.log("Setting queue size to: " + std::to_string(queue_limit), COLOR_BLUE);
+                m_botbase->set_queue_limit(queue_limit);
+            }else{
+                m_logger.log("Device does not support queue size.", COLOR_RED);
+            }
         }catch (InvalidConnectionStateException&){
             return;
         }catch (SerialProtocolException& e){

@@ -32,6 +32,7 @@ public:
 
     virtual Logger& logger() = 0;
     virtual State state() const = 0;
+    virtual size_t queue_limit() const = 0;
 
     //  Waits for all pending requests to finish.
     virtual void wait_for_all_requests(const Cancellable* cancelled = nullptr) = 0;

@@ -41,7 +41,7 @@ namespace PokemonAutomation{
 
 
 class PABotBase : public BotBase, private PABotBaseConnection{
-    static const size_t MAX_PENDING_REQUESTS = PABB_DEVICE_QUEUE_SIZE;
+//    static const size_t MAX_PENDING_REQUESTS = PABB_DEVICE_QUEUE_SIZE;
     static const seqnum_t MAX_SEQNUM_GAP = (seqnum_t)-1 >> 2;
 
 public:
@@ -68,6 +68,11 @@ public:
     virtual State state() const override{
         return m_state.load(std::memory_order_acquire);
     }
+
+    virtual size_t queue_limit() const override{
+        return m_max_pending_requests.load(std::memory_order_relaxed);
+    }
+    void set_queue_limit(size_t queue_limit);
 
 public:
     //  Basic Requests
@@ -133,13 +138,11 @@ private:
     //  Returns the seqnum of the request. If failed, returns zero.
     uint64_t try_issue_request(
         const Cancellable* cancelled,
-        const BotBaseRequest& request, bool silent_remove,
-        size_t queue_limit
+        const BotBaseRequest& request, bool silent_remove
     );
     uint64_t try_issue_command(
         const Cancellable* cancelled,
-        const BotBaseRequest& request, bool silent_remove,
-        size_t queue_limit
+        const BotBaseRequest& request, bool silent_remove
     );
 
     //  Returns the seqnum of the request.
@@ -169,6 +172,8 @@ private:
 
 private:
     Logger& m_logger;
+
+    std::atomic<size_t> m_max_pending_requests;
 
     uint64_t m_send_seq;
     std::chrono::milliseconds m_retransmit_delay;

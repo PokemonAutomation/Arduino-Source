@@ -4,7 +4,6 @@
  *
  */
 
-#include <format>
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "NintendoSwitch/FixedInterval.h"
 #include "Pokemon/Pokemon_Strings.h"

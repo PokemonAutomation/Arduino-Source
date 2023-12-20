@@ -9,6 +9,7 @@
 #ifndef PokemonAutomation_Tests_TestUtils_H
 #define PokemonAutomation_Tests_TestUtils_H
 
+#include "Common/Microcontroller/MessageProtocol.h"
 #include "ClientSource/Connection/BotBase.h"
 #include "ClientSource/Connection/BotBaseMessage.h"
 #include "CommonFramework/AudioPipeline/AudioFeed.h"
@@ -59,6 +60,7 @@ public:
     virtual Logger& logger() override { return m_logger; }
 
     virtual State state() const override { return State::RUNNING; }
+    virtual size_t queue_limit() const override { return PABB_DEVICE_QUEUE_SIZE; }
 
     virtual void wait_for_all_requests(const Cancellable* cancelled = nullptr) override {}
 
