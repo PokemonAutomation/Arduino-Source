@@ -23,7 +23,7 @@ EggCombined2_Descriptor::EggCombined2_Descriptor()
         "Fetch and hatch eggs at the same time. (Fastest - 1700 eggs/day for 5120-step)",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_31KB
+        PABotBaseLevel::PABOTBASE_12KB
     )
 {}
 

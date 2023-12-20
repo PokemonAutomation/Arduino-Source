@@ -36,7 +36,7 @@ EggFetcherMultiple_Descriptor::EggFetcherMultiple_Descriptor()
         "Fetch eggs from multiple species without hatching them.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_31KB
+        PABotBaseLevel::PABOTBASE_12KB
     )
 {}
 

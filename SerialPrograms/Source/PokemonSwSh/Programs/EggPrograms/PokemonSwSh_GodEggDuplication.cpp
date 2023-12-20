@@ -25,7 +25,7 @@ GodEggDuplication_Descriptor::GodEggDuplication_Descriptor()
         "Mass duplicate " + STRING_POKEMON + " with the God Egg.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_31KB
+        PABotBaseLevel::PABOTBASE_12KB
     )
 {}
 
