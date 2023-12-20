@@ -116,7 +116,7 @@ void GodEggItemDupe::collect_godegg(
         ssf_press_dpad1(context, DPAD_DOWN, 15);
         ssf_press_button2(context, BUTTON_A, 125, 10);
         ssf_press_dpad1(context, DPAD_UP, 10);
-        mash_A(context, 180);
+        ssf_mash_AZs(context, 180);
     }
 
     //  Back out to menu.

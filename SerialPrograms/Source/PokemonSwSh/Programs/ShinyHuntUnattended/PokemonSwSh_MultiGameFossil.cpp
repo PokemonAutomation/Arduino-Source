@@ -4,14 +4,13 @@
  *
  */
 
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_ScalarButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Routines.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/FixedInterval.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
-#include "PokemonSwSh/Commands/PokemonSwSh_Commands_Misc.h"
 #include "PokemonSwSh_MultiGameFossil.h"
 
 namespace PokemonAutomation{
@@ -88,10 +87,10 @@ void run_fossil_batch(
 #if 1
     for (uint16_t c = 0; c < batch.revives; c++){
 #if 1
-        mash_A(context, 170);
+        ssf_mash_AZs(context, 170);
         pbf_wait(context, 65);
 #else
-        mash_A(context, 50);
+        ssf_mash_AZs(context, 50);
         pbf_wait(context, 140);
         ssf_press_button1(context, BUTTON_A, 160);
 #endif
@@ -113,7 +112,7 @@ void run_fossil_batch(
             ssf_press_dpad1(context, DPAD_DOWN, 5);
             break;
         }
-        mash_A(context, 400);
+        ssf_mash_AZs(context, 400);
         pbf_mash_button(
             context,
             BUTTON_B,

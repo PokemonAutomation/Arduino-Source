@@ -4,19 +4,13 @@
  *
  */
 
-#include "Common/Compiler.h"
-#include "CommonFramework/Globals.h"
-#include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/FixedInterval.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_ScalarButtons.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
-#include "PokemonSwSh/Commands/PokemonSwSh_Commands_Misc.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
-#include "PokemonSwSh/Inference/Dens/PokemonSwSh_DenMonReader.h"
-#include "PokemonSwSh/Programs/PokemonSwSh_GameEntry.h"
-#include "PokemonSwSh/Programs/PokemonSwSh_Internet.h"
 #include "PokemonSwSh_DenTools.h"
 
 namespace PokemonAutomation{
@@ -30,7 +24,7 @@ void enter_den(BotBaseContext& context, uint16_t ENTER_ONLINE_DEN_DELAY, bool wa
             ssf_press_button2(context, BUTTON_A, GameSettings::instance().ENTER_OFFLINE_DEN_DELAY, 10);
         }else{
             //  This is the critical den-rolling path. It needs to be fast.
-            mash_A(context, GameSettings::instance().COLLECT_WATTS_OFFLINE_DELAY);
+            ssf_mash_AZs(context, GameSettings::instance().COLLECT_WATTS_OFFLINE_DELAY);
             pbf_wait(context, GameSettings::instance().ENTER_OFFLINE_DEN_DELAY);
         }
     }else{

@@ -1820,10 +1820,8 @@ HEADERS += \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_EggRoutines.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_Misc.h \
-    Source/PokemonSwSh/Commands/PokemonSwSh_Messages_AutoHosts.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Messages_DateSpam.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Messages_DaySkippers.h \
-    Source/PokemonSwSh/Commands/PokemonSwSh_Messages_EggRoutines.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Messages_GameEntry.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Messages_Misc.h \
     Source/PokemonSwSh/Inference/Battles/PokemonSwSh_BattleBallReader.h \

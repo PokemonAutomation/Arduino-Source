@@ -13,11 +13,13 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
+#if 0
 void mash_A(BotBaseContext& context, uint16_t ticks){
     context.issue_request(
         DeviceRequest_mash_A(ticks)
     );
 }
+#endif
 void IoA_backout(BotBaseContext& context, uint16_t pokemon_to_menu_delay){
     context.issue_request(
         DeviceRequest_IoA_backout(pokemon_to_menu_delay)
