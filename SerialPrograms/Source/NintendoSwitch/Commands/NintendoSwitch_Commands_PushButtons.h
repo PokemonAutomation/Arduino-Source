@@ -1,9 +1,13 @@
-/*  Push Button Framework
+/*  Push Button Framework (pbf_*)
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
  *  The functions to send Switch commands to the micro controller.
  *  The timing of the commnads are measured in ticks. One second is 125 ticks.
+ *
+ *  You should use these functions (instead of ssf_*) whenever possible since
+ *  these are cleaner and easier to use/understand.
+ *
  */
 
 #ifndef PokemonAutomation_NintendoSwitch_Commands_PushButtons_H
@@ -66,6 +70,23 @@ void grip_menu_connect_go_home  (BotBaseContext& context);
 //     uint8_t ticks
 // );
 
+
+//
+//  Press all the following buttons/joysticks simultaneously for the specified
+//  duration. No wait is added at the end. Thus you can issue these back-to-back
+//  to simulate buttons being pressed and released concurrently with other
+//  buttons being held down the whole time.
+//
+//  Note that this function does not play well with unfinished ssf_* functions.
+//  If there is a pending ssf_* function, a conflicting button press by this
+//  function (and possibly more) will be delayed - thus causing the buttons in
+//  this function call to not issue simultaneously. The exact behavior is
+//  undefined so you should never do this.
+//
+//  The sole purpose of this function is for keyboard commands. For in-program
+//  button overlapping, you should use ssf_* directly. (though lots of existing
+//  programs already use this for overlapping)
+//
 void pbf_controller_state(
     BotBaseContext& context,
     Button button,

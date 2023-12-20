@@ -10,7 +10,7 @@
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Tools/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_ScalarButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "PokemonSV/Programs/PokemonSV_SaveGame.h"
 //#include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "Pokemon/Pokemon_Strings.h"

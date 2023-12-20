@@ -6,7 +6,7 @@
 
 #include <sstream>
 #include "ClientSource/Libraries/MessageConverter.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_ScalarButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "PokemonSwSh_Commands_Misc.h"
 //#include "PokemonSwSh_Messages_Misc.h"
 

@@ -9,7 +9,7 @@
 #include "NintendoSwitch_Commands_Device.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch_Commands_PushButtons.h"
-#include "NintendoSwitch_Commands_ScalarButtons.h"
+#include "NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch_Messages_PushButtons.h"
 
 namespace PokemonAutomation{

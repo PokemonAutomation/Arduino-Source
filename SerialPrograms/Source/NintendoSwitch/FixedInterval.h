@@ -10,7 +10,7 @@
 #define PokemonAutomation_FixedIntervalWrappers_H
 
 #include "Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "Commands/NintendoSwitch_Commands_ScalarButtons.h"
+#include "Commands/NintendoSwitch_Commands_Superscalar.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

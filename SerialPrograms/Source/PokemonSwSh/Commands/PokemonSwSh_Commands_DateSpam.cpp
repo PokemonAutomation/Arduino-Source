@@ -7,7 +7,7 @@
 #include <sstream>
 #include "ClientSource/Libraries/MessageConverter.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_ScalarButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "PokemonSwSh_Commands_GameEntry.h"
 #include "PokemonSwSh_Commands_DateSpam.h"

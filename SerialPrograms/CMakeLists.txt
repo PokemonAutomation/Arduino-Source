@@ -171,17 +171,12 @@ file(GLOB MAIN_SOURCES
     ../Common/NintendoSwitch/NintendoSwitch_Protocol_DigitEntry.h
     ../Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h
     ../Common/NintendoSwitch/NintendoSwitch_Protocol_Routines.h
-    ../Common/NintendoSwitch/NintendoSwitch_Protocol_ScalarButtons.h
+    ../Common/NintendoSwitch/NintendoSwitch_Protocol_Superscalar.h
     ../Common/NintendoSwitch/NintendoSwitch_SlotDatabase.h
     ../Common/PokemonSwSh/PokemonProgramIDs.h
     ../Common/PokemonSwSh/PokemonSwSh_FossilTable.h
     ../Common/PokemonSwSh/PokemonSwSh_MultiHostTable.h
-    ../Common/PokemonSwSh/PokemonSwSh_Protocol_AutoHosts.h
-    ../Common/PokemonSwSh/PokemonSwSh_Protocol_DateSpam.h
     ../Common/PokemonSwSh/PokemonSwSh_Protocol_DaySkippers.h
-    ../Common/PokemonSwSh/PokemonSwSh_Protocol_EggRoutines.h
-    ../Common/PokemonSwSh/PokemonSwSh_Protocol_GameEntry.h
-    ../Common/PokemonSwSh/PokemonSwSh_Protocol_Misc.h
     ../Common/Qt/AutoHeightTable.cpp
     ../Common/Qt/AutoHeightTable.h
     ../Common/Qt/AutoWidthLineEdit.cpp
@@ -763,13 +758,13 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Routines.cpp
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Routines.h
-    Source/NintendoSwitch/Commands/NintendoSwitch_Commands_ScalarButtons.cpp
-    Source/NintendoSwitch/Commands/NintendoSwitch_Commands_ScalarButtons.h
+    Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.cpp
+    Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_Device.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_DigitEntry.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_PushButtons.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_Routines.h
-    Source/NintendoSwitch/Commands/NintendoSwitch_Messages_ScalarButtons.h
+    Source/NintendoSwitch/Commands/NintendoSwitch_Messages_Superscalar.h
     Source/NintendoSwitch/DevPrograms/BoxDraw.cpp
     Source/NintendoSwitch/DevPrograms/BoxDraw.h
     Source/NintendoSwitch/DevPrograms/TestProgramComputer.cpp
@@ -1529,10 +1524,7 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_Misc.cpp
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_Misc.h
-    Source/PokemonSwSh/Commands/PokemonSwSh_Messages_DateSpam.h
     Source/PokemonSwSh/Commands/PokemonSwSh_Messages_DaySkippers.h
-    Source/PokemonSwSh/Commands/PokemonSwSh_Messages_GameEntry.h
-    Source/PokemonSwSh/Commands/PokemonSwSh_Messages_Misc.h
     Source/PokemonSwSh/Inference/Battles/PokemonSwSh_BattleBallReader.cpp
     Source/PokemonSwSh/Inference/Battles/PokemonSwSh_BattleBallReader.h
     Source/PokemonSwSh/Inference/Battles/PokemonSwSh_BattleDialogDetector.cpp

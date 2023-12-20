@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_ReleaseHelpers_H
 #define PokemonAutomation_PokemonSwSh_ReleaseHelpers_H
 
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_ScalarButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_Misc.h"
 
 namespace PokemonAutomation{
