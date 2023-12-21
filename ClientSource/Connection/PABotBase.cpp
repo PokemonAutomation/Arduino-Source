@@ -460,6 +460,18 @@ void PABotBase::on_recv_message(BotBaseMessage message){
     case PABB_MSG_ACK_REQUEST_I32:
         process_ack_request<pabb_MsgAckRequestI32>(std::move(message));
         return;
+    case PABB_MSG_ERROR_INVALID_TYPE:{
+        if (message.body.size() != sizeof(pabb_MsgInfoInvalidType)){
+            m_sniffer->log("Ignoring message with invalid size.");
+            return;
+        }
+        const pabb_MsgInfoInvalidType* params = (const pabb_MsgInfoInvalidType*)message.body.c_str();
+        m_error_message = "PABotBase incompatibility. Device does not recognize message type: " + std::to_string(params->type);
+        m_logger.log(m_error_message, COLOR_RED);
+        m_error.store(true, std::memory_order_release);
+        std::lock_guard<std::mutex> lg0(m_sleep_lock);
+        m_cv.notify_all();
+    }
     case PABB_MSG_ERROR_MISSED_REQUEST:{
         if (message.body.size() != sizeof(pabb_MsgInfoMissedRequest)){
             m_sniffer->log("Ignoring message with invalid size.");
@@ -467,7 +479,8 @@ void PABotBase::on_recv_message(BotBaseMessage message){
         }
         const pabb_MsgInfoMissedRequest* params = (const pabb_MsgInfoMissedRequest*)message.body.c_str();
         if (params->seqnum == 1){
-            m_logger.log("Serial connection has been interrupted.", COLOR_RED);
+            m_error_message = "Serial connection has been interrupted.";
+            m_logger.log(m_error_message, COLOR_RED);
             m_error.store(true, std::memory_order_release);
             std::lock_guard<std::mutex> lg0(m_sleep_lock);
             m_cv.notify_all();
@@ -557,7 +570,7 @@ uint64_t PABotBase::try_issue_request(
         throw InvalidConnectionStateException();
     }
     if (m_error.load(std::memory_order_acquire)){
-        throw ConnectionException(&m_logger, "Serial connection was interrupted.");
+        throw ConnectionException(&m_logger, m_error_message);
     }
 
     size_t queue_limit = m_max_pending_requests.load(std::memory_order_relaxed);
@@ -622,7 +635,7 @@ uint64_t PABotBase::try_issue_command(
         throw InvalidConnectionStateException();
     }
     if (m_error.load(std::memory_order_acquire)){
-        throw ConnectionException(&m_logger, "Serial connection was interrupted.");
+        throw ConnectionException(&m_logger, m_error_message);
     }
 
     size_t queue_limit = m_max_pending_requests.load(std::memory_order_relaxed);
@@ -706,7 +719,7 @@ uint64_t PABotBase::issue_request(
             throw InvalidConnectionStateException();
         }
         if (m_error.load(std::memory_order_acquire)){
-            throw ConnectionException(&m_logger, "Serial connection was interrupted.");
+            throw ConnectionException(&m_logger, m_error_message);
         }
         m_cv.wait(lg);
     }
@@ -748,7 +761,7 @@ uint64_t PABotBase::issue_command(
             throw InvalidConnectionStateException();
         }
         if (m_error.load(std::memory_order_acquire)){
-            throw ConnectionException(&m_logger, "Serial connection was interrupted.");
+            throw ConnectionException(&m_logger, m_error_message);
         }
         m_cv.wait(lg);
     }
@@ -814,7 +827,7 @@ BotBaseMessage PABotBase::wait_for_request(uint64_t seqnum){
             if (m_error.load(std::memory_order_acquire)){
                 m_pending_requests.erase(iter);
                 m_cv.notify_all();
-                throw ConnectionException(&m_logger, "Serial connection was interrupted.");
+                throw ConnectionException(&m_logger, m_error_message);
             }
             if (iter->second.state == AckState::ACKED){
                 BotBaseMessage ret = std::move(iter->second.ack);

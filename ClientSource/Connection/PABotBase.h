@@ -189,6 +189,7 @@ private:
     std::condition_variable m_cv;
     std::atomic<State> m_state;
     std::atomic<bool> m_error;
+    std::string m_error_message;
     std::thread m_retransmit_thread;
 
     LifetimeSanitizer m_sanitizer;
