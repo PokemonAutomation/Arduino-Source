@@ -178,6 +178,7 @@ StatsResetBloodmoon::StatsResetBloodmoon()
             ret.emplace_back(std::move(row));
         }
         FILTERS0.set_default(std::move(ret));
+        FILTERS0.restore_defaults();
     }
 //    if (PreloadSettings::instance().DEVELOPER_MODE){
         PA_ADD_STATIC(CALCULATED_IVS);
@@ -572,6 +573,7 @@ void StatsResetBloodmoon::program(SingleSwitchProgramEnvironment& env, BotBaseCo
         pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
         reset_game_from_home(env.program_info(), env.console, context, 5 * TICKS_PER_SECOND);
     }
+    stats.matches++;
     env.update_stats();
 
     auto snapshot = env.console.video().snapshot();

@@ -9,6 +9,8 @@
 
 #include <string>
 
+class QObject;
+
 namespace PokemonAutomation{
 
 class Logger;
@@ -16,6 +18,10 @@ class Logger;
 
 bool migrate_settings(Logger& logger, std::string file_name);
 bool migrate_stats(Logger& logger);
+
+// Use Qt to setup permissions of cameras and microphones on macOS.
+// See https://www.qt.io/blog/permission-apis-in-qt-6.5
+void set_permissions(QObject& object);
 
 
 }

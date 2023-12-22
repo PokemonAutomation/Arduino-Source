@@ -48,7 +48,7 @@ std::vector<std::pair<ImageRGB32, size_t>> filter_rgb32_range(
         out = ImageRGB32(image.width(), image.height());
         subfilters.emplace_back(
             out.data(), out.bytes_per_row(),
-            filters[c].mins, filters[c].maxs, (uint32_t)filters[c].replace_with, filters[c].replace_color_within_range
+            filters[c].mins, filters[c].maxs, (uint32_t)filters[c].replacement_color, filters[c].replace_color_within_range
         );
     }
     Kernels::filter_rgb32_range(

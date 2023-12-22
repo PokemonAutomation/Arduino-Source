@@ -7,9 +7,9 @@
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/AudioPipeline/AudioFeed.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+//#include "CommonFramework/AudioPipeline/AudioFeed.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Messages_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Messages_Superscalar.h"
 #include "ProgramTracker.h"
 
 #include <iostream>
@@ -95,7 +95,7 @@ std::string ProgramTracker::start_program(uint64_t program_id){
         global_logger_tagged().log("SwitchProgramTracker::" + error, COLOR_RED);
         return error;
     }
-    emit iter->second->program.async_start();
+    iter->second->program.async_start();
     return "";
 }
 std::string ProgramTracker::stop_program(uint64_t program_id){
@@ -106,7 +106,7 @@ std::string ProgramTracker::stop_program(uint64_t program_id){
         global_logger_tagged().log("SwitchProgramTracker::" + error, COLOR_RED);
         return error;
     }
-    emit iter->second->program.async_stop();
+    iter->second->program.async_stop();
     return "";
 }
 std::string ProgramTracker::nsw_press_button(uint64_t console_id, Button button, uint16_t ticks){
@@ -119,7 +119,8 @@ std::string ProgramTracker::nsw_press_button(uint64_t console_id, Button button,
         return error;
     }
     const char* err = iter->second.first->sender().try_send_request(
-        NintendoSwitch::DeviceRequest_pbf_press_button(button, ticks, 0)
+//        NintendoSwitch::DeviceRequest_pbf_press_button(button, ticks, 0)
+        NintendoSwitch::DeviceRequest_ssf_press_button(button, ticks, ticks, 0)
     );
     if (err){
         global_logger_tagged().log("SwitchProgramTracker::" + header + ": " + err, COLOR_RED);
@@ -139,7 +140,8 @@ std::string ProgramTracker::nsw_press_dpad(uint64_t console_id, DpadPosition pos
         return error;
     }
     const char* err = iter->second.first->sender().try_send_request(
-        NintendoSwitch::DeviceRequest_pbf_press_dpad(position, ticks, 0)
+//        NintendoSwitch::DeviceRequest_pbf_press_dpad(position, ticks, 0)
+        NintendoSwitch::DeviceRequest_ssf_press_dpad(position, ticks, ticks, 0)
     );
     if (err){
         global_logger_tagged().log("SwitchProgramTracker::" + header + ": " + err, COLOR_RED);
@@ -159,7 +161,8 @@ std::string ProgramTracker::nsw_press_left_joystick(uint64_t console_id, uint8_t
         return error;
     }
     const char* err = iter->second.first->sender().try_send_request(
-        NintendoSwitch::DeviceRequest_pbf_move_left_joystick(x, y, ticks, 0)
+//        NintendoSwitch::DeviceRequest_pbf_move_left_joystick(x, y, ticks, 0)
+        NintendoSwitch::DeviceRequest_ssf_press_joystick(true, x, y, ticks, ticks, 0)
     );
     if (err){
         global_logger_tagged().log("SwitchProgramTracker::" + header + ": " + err, COLOR_RED);
@@ -179,7 +182,8 @@ std::string ProgramTracker::nsw_press_right_joystick(uint64_t console_id, uint8_
         return error;
     }
     const char* err = iter->second.first->sender().try_send_request(
-        NintendoSwitch::DeviceRequest_pbf_move_right_joystick(x, y, ticks, 0)
+//        NintendoSwitch::DeviceRequest_pbf_move_right_joystick(x, y, ticks, 0)
+        NintendoSwitch::DeviceRequest_ssf_press_joystick(false, x, y, ticks, ticks, 0)
     );
     if (err){
         global_logger_tagged().log("SwitchProgramTracker::" + header + ": " + err, COLOR_RED);

@@ -20,7 +20,6 @@ namespace PokemonAutomation{
 namespace Kernels{
 
 
-
 class BitSet{
     static constexpr size_t WORD_BITS = 32;
     using vtype = uint32_t;
@@ -86,7 +85,7 @@ private:
 
 
 
-
+// Used in Waterfill/Kernels_Waterfill_Session.tpp to record the tile traversal during waterfill
 class BitSet2D{
     static constexpr size_t WORD_BITS = 32;
     using vtype = uint32_t;

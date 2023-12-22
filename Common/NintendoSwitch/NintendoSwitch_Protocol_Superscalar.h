@@ -1,11 +1,11 @@
-/*  Pokemon Automation Scalar Button Framework
+/*  Pokemon Automation Superscalar Framework
  * 
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  * 
  */
 
-#ifndef PokemonAutomation_NintendoSwitch_Protocol_ScalarButtons_H
-#define PokemonAutomation_NintendoSwitch_Protocol_ScalarButtons_H
+#ifndef PokemonAutomation_NintendoSwitch_Protocol_Superscalar_H
+#define PokemonAutomation_NintendoSwitch_Protocol_Superscalar_H
 
 #include "Common/Microcontroller/MessageProtocol.h"
 #include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"

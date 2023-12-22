@@ -30,6 +30,8 @@ enum class WhiteButton{
     ButtonB,
     ButtonY,
     ButtonMinus,
+    ButtonLeft,
+    ButtonRight,
 };
 
 
@@ -40,6 +42,8 @@ public:
     static const WhiteButtonMatcher& B();
     static const WhiteButtonMatcher& Y();
     static const WhiteButtonMatcher& Minus();
+    static const WhiteButtonMatcher& ArrowLeft();
+    static const WhiteButtonMatcher& ArrowRight();
 
     virtual bool check_image(const ImageViewRGB32& image) const override{
         return image.width() >= m_min_width && image.height() >= m_min_height;

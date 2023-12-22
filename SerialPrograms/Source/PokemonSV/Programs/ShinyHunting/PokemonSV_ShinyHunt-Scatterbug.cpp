@@ -57,19 +57,16 @@ struct ShinyHuntScatterbug_Descriptor::Stats : public LetsGoEncounterBotStats{
     Stats()
         : m_sandwiches(m_stats["Sandwiches"])
         , m_autoheals(m_stats["Auto Heals"])
-        , m_path_resets(m_stats["Path Resets"])
         , m_game_resets(m_stats["Game Resets"])
         , m_errors(m_stats["Errors"])
     {
         m_display_order.insert(m_display_order.begin() + 2, {"Sandwiches", HIDDEN_IF_ZERO});
         m_display_order.insert(m_display_order.begin() + 3, {"Auto Heals", HIDDEN_IF_ZERO});
-        m_display_order.insert(m_display_order.begin() + 4, {"Path Resets", HIDDEN_IF_ZERO});
-        m_display_order.insert(m_display_order.begin() + 5, {"Game Resets", HIDDEN_IF_ZERO});
-        m_display_order.insert(m_display_order.begin() + 6, {"Errors", HIDDEN_IF_ZERO});
+        m_display_order.insert(m_display_order.begin() + 4, {"Game Resets", HIDDEN_IF_ZERO});
+        m_display_order.insert(m_display_order.begin() + 5, {"Errors", HIDDEN_IF_ZERO});
     }
     std::atomic<uint64_t>& m_sandwiches;
     std::atomic<uint64_t>& m_autoheals;
-    std::atomic<uint64_t>& m_path_resets;
     std::atomic<uint64_t>& m_game_resets;
     std::atomic<uint64_t>& m_errors;
 };
@@ -81,7 +78,13 @@ std::unique_ptr<StatsTracker> ShinyHuntScatterbug_Descriptor::make_stats() const
 
 
 ShinyHuntScatterbug::ShinyHuntScatterbug()
-    : LANGUAGE(
+    : SAVE_GAME_AT_START(
+        "<b>Save Game at Program Start:</b><br>"
+        "This is to ensure the program can continue after resetting the game. Uncheck this option if you have manually saved the game.",
+        LockMode::LOCK_WHILE_RUNNING,
+        true
+    )
+    , LANGUAGE(
         "<b>Game Language:</b><br>Required to read " + STRING_POKEMON + " names.",
         IV_READER().languages(),
         LockMode::UNLOCK_WHILE_RUNNING,
@@ -129,6 +132,7 @@ ShinyHuntScatterbug::ShinyHuntScatterbug()
         PA_ADD_OPTION(DEBUG_WARP_TO_POKECENTER);
         PA_ADD_OPTION(SKIP_SANDWICH);
     }
+    PA_ADD_OPTION(SAVE_GAME_AT_START);
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(SANDWICH_OPTIONS);
     PA_ADD_OPTION(ENCOUNTER_BOT_OPTIONS);
@@ -142,7 +146,7 @@ void ShinyHuntScatterbug::program(SingleSwitchProgramEnvironment& env, BotBaseCo
     ShinyHuntScatterbug_Descriptor::Stats& stats = env.current_stats<ShinyHuntScatterbug_Descriptor::Stats>();
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_L, 10, 0);
+    pbf_press_button(context, BUTTON_L, 10, 50);
 
     assert_16_9_720p_min(env.logger(), env.console);
 
@@ -154,7 +158,9 @@ void ShinyHuntScatterbug::program(SingleSwitchProgramEnvironment& env, BotBaseCo
     size_t consecutive_failures = 0;
     m_pending_save = false;
 
-    save_game_from_overworld(env.program_info(), env.console, context);
+    if (SAVE_GAME_AT_START){
+        save_game_from_overworld(env.program_info(), env.console, context);
+    }
 
     LetsGoEncounterBotTracker encounter_tracker(
         env, env.console, context,
@@ -196,6 +202,7 @@ void ShinyHuntScatterbug::program(SingleSwitchProgramEnvironment& env, BotBaseCo
 
             env.log("Reset game to handle recoverable error");
             reset_game(env.program_info(), env.console, context);
+            ++stats.m_game_resets;
         }catch(ProgramFinishedException&){
             GO_HOME_WHEN_DONE.run_end_of_program(context);
             return;
@@ -361,6 +368,7 @@ void ShinyHuntScatterbug::run_one_sandwich_iteration(SingleSwitchProgramEnvironm
     if (!saved_after_this_sandwich){
         // Reset game to save rare herbs
         reset_game(env.program_info(), env.console, context);
+        ++stats.m_game_resets;
     }
 }
 

@@ -16,6 +16,7 @@ namespace Microcontroller{
 
 uint32_t protocol_version(BotBase& botbase);
 uint32_t program_version(BotBase& botbase);
+uint8_t device_queue_size(BotBase& botbase);
 uint8_t program_id(BotBase& botbase);
 
 
@@ -67,6 +68,16 @@ public:
     {}
     virtual BotBaseMessage message() const override{
         return BotBaseMessage(PABB_MSG_REQUEST_PROGRAM_VERSION, params);
+    }
+};
+class DeviceRequest_queue_size : public BotBaseRequest{
+public:
+    pabb_MsgRequestProgramVersion params;
+    DeviceRequest_queue_size()
+        : BotBaseRequest(false)
+    {}
+    virtual BotBaseMessage message() const override{
+        return BotBaseMessage(PABB_MSG_REQUEST_QUEUE_SIZE, params);
     }
 };
 class DeviceRequest_program_id : public BotBaseRequest{

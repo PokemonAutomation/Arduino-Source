@@ -24,10 +24,10 @@ namespace Kernels{
 // For example, for AVX2 feature, the optimized shape is 64x16.
 // See Kernels_BinaryMatrix.h:BinaryMatrixType as enums of different matrix types.
 //
-// `PackedBinaryMatrix_t` serves as the base class for each different implmenentations
-// for each CPU feature set. It hosts a lot of boilerplate matrix related code that
-// are agonstic to actual tile difinition and tile processing.
-// Suffix _t stands for "template".
+// `PackedBinaryMatrix_t` serves as the template class for each different implmenentations
+// for each CPU feature set. It uses template class PackedBinaryMatrixCore<Tile> to
+// implement all the actual matrix functions.
+// Suffix "_t" stands for "template".
 template <typename Tile>
 class PackedBinaryMatrix_t final : public PackedBinaryMatrix_IB{
 public:
@@ -71,8 +71,12 @@ public:
         m_matrix &= static_cast<const PackedBinaryMatrix_t<Tile>&>(x).m_matrix;
     }
 
+    // Print entire binary matrix as 0s and 1s. Rows are ended with "\n".
     virtual std::string dump() const override{ return m_matrix.dump(); }
+    // Print part of max as 0s and 1s. Rows are ended with "\n".
     virtual std::string dump(size_t min_x, size_t min_y, size_t max_x, size_t max_y) const override{ return m_matrix.dump(min_x, min_y, max_x, max_y); }
+    // Print all the underlying tiles that form this binary matrix. The result is a matrix that may be larger
+    // than the original matrix.
     virtual std::string dump_tiles() const override{ return m_matrix.dump_tiles(); }
 
 public:

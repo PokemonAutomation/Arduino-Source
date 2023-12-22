@@ -13,7 +13,7 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
-
+#if 0
 class DeviceRequest_pbf_wait : public BotBaseRequest{
 public:
     pabb_pbf_wait params;
@@ -103,6 +103,7 @@ public:
         return BotBaseMessage(PABB_MSG_COMMAND_MASH_BUTTON, params);
     }
 };
+#endif
 
 
 class DeviceRequest_controller_state : public BotBaseRequest{

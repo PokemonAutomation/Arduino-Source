@@ -38,6 +38,10 @@ const char* white_button_template_path(WhiteButton type){
         return "PokemonSV/Buttons/WhiteButtonY.png";
     case WhiteButton::ButtonMinus:
         return "PokemonSV/Buttons/WhiteButtonMinus.png";
+    case WhiteButton::ButtonLeft:
+        return "PokemonSV/Buttons/ArrowLeft.png";
+    case WhiteButton::ButtonRight:
+        return "PokemonSV/Buttons/ArrowRight.png";
     default:
         return "";
     }
@@ -53,6 +57,10 @@ const WhiteButtonMatcher& get_button_matcher(WhiteButton type){
         return WhiteButtonMatcher::Y();
     case WhiteButton::ButtonMinus:
         return WhiteButtonMatcher::Minus();
+    case WhiteButton::ButtonLeft:
+        return WhiteButtonMatcher::ArrowLeft();
+    case WhiteButton::ButtonRight:
+        return WhiteButtonMatcher::ArrowRight();
     default:
         throw std::runtime_error("No corresponding ButtonMatcher for WhiteButton");
     }
@@ -83,6 +91,14 @@ const WhiteButtonMatcher& WhiteButtonMatcher::Y(){
 }
 const WhiteButtonMatcher& WhiteButtonMatcher::Minus(){
     static WhiteButtonMatcher matcher(WhiteButton::ButtonMinus, 15, 15, 90);
+    return matcher;
+}
+const WhiteButtonMatcher& WhiteButtonMatcher::ArrowLeft(){
+    static WhiteButtonMatcher matcher(WhiteButton::ButtonLeft, 15, 15, 90);
+    return matcher;
+}
+const WhiteButtonMatcher& WhiteButtonMatcher::ArrowRight(){
+    static WhiteButtonMatcher matcher(WhiteButton::ButtonRight, 15, 15, 90);
     return matcher;
 }
 

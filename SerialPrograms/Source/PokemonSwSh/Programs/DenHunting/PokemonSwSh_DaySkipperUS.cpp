@@ -4,10 +4,7 @@
  *
  */
 
-#include "Common/Cpp/PrettyPrint.h"
-#include "Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
 #include "NintendoSwitch/FixedInterval.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DaySkippers.h"
@@ -46,7 +43,8 @@ DaySkipperUS::DaySkipperUS()
     , REAL_LIFE_YEAR(
         "<b>Real Life Year:</b>",
         LockMode::LOCK_WHILE_RUNNING,
-        2023, 2000, 2060
+        std::min(current_year(), (uint16_t)2060),
+        2000, 2060
     )
     , NOTIFICATION_PROGRESS_UPDATE("Progress Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({

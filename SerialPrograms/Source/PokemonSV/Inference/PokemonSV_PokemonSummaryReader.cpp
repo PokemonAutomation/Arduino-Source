@@ -21,8 +21,9 @@ namespace PokemonSV{
 bool is_summary_color(const ImageStats& stats){
     return is_solid(stats, {0.648549, 0.2861580, 0.0652928}, 0.15, 20)  //  Scarlet
         || is_solid(stats, {0.367816, 0.0746615, 0.5575230}, 0.15, 20)  //  Violet
-        || is_solid(stats, {0.196536, 0.5933000, 0.2101630}, 0.18, 20)  //  DLC Green
-        || (stats.average.g / stats.average.sum()) > 0.5;               //  DLC Green
+        || is_solid(stats, {0.196536, 0.5933000, 0.2101630}, 0.18, 20)  //  DLC1 Green
+        || is_solid(stats, {0.169492, 0.330508 , 0.5      }, 0.18, 20)  //  DLC2 Dark Blue
+        || (stats.average.g / stats.average.sum()) > 0.5;
 }
 
 
@@ -32,12 +33,16 @@ PokemonSummaryDetector::PokemonSummaryDetector(Color color)
     , m_top_blue_left(0.30, 0.09, 0.10, 0.05)
     , m_top_blue_right(0.60, 0.09, 0.35, 0.05)
     , m_bottom(0.03, 0.94, 0.40, 0.04)
+    , m_arrow_left(color, WhiteButton::ButtonLeft, {0.415, 0.085, 0.035, 0.057})
+    , m_arrow_right(color, WhiteButton::ButtonRight, {0.553, 0.085, 0.035, 0.057})
     , m_shiny_symbol(0.575, 0.865, 0.017, 0.030)
 {}
 void PokemonSummaryDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_top_blue_left);
     items.add(m_color, m_top_blue_right);
     items.add(m_color, m_bottom);
+    m_arrow_left.make_overlays(items);
+    m_arrow_right.make_overlays(items);
     items.add(m_color, m_shiny_symbol);
 }
 bool PokemonSummaryDetector::detect(const ImageViewRGB32& screen) const{
@@ -66,6 +71,13 @@ bool PokemonSummaryDetector::detect(const ImageViewRGB32& screen) const{
         return false;
     }
 #endif
+
+    if (!m_arrow_left.detect(screen)){
+        return false;
+    }
+    if (!m_arrow_right.detect(screen)){
+        return false;
+    }
 
 //    ImageStats shiny_symbol = image_stats(extract_box_reference(screen, m_shiny_symbol));
 //    cout << shiny_symbol.average << shiny_symbol.stddev << endl;

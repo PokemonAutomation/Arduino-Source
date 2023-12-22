@@ -5,10 +5,10 @@
  */
 
 #include "Common/Cpp/PrettyPrint.h"
-#include "Kernels/Waterfill/Kernels_Waterfill.h"
+//#include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
-#include "CommonFramework/VideoPipeline/VideoOverlay.h"
+//#include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SparkleDetectorRadial.h"
 #include "PokemonBDSP_ShinySparkleSet.h"
 

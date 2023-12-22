@@ -330,6 +330,7 @@ SOURCES += \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_64x32_x64_AVX512.cpp \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_64x4_Default.cpp \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_64x64_x64_AVX512.cpp \
+    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_64x8_arm64_NEON.cpp \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_64x8_x64_SSE42.cpp \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix.cpp \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_64x16_x64_AVX2.cpp \
@@ -337,11 +338,13 @@ SOURCES += \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_64x64_x64_AVX512.cpp \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_64x8_x64_SSE42.cpp \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_64xH_Default.cpp \
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_arm64_NEON.cpp \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_x64_AVX2.cpp \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_x64_AVX512.cpp \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_x64_SSE42.cpp \
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic.cpp \
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_Default.cpp \
+    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_arm64_NEON.cpp \
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_AVX2.cpp \
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_AVX512.cpp \
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_SSE42.cpp \
@@ -377,6 +380,7 @@ SOURCES += \
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x32_x64_AVX512.cpp \
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x64_x64_AVX512-GF.cpp \
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x64_x64_AVX512.cpp \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x8_arm64_NEON.cpp \
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x8_x64_SSE42.cpp \
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64xH_Default.cpp \
     Source/Kernels/Waterfill/Kernels_Waterfill_Session.cpp \
@@ -384,7 +388,7 @@ SOURCES += \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.cpp \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.cpp \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Routines.cpp \
-    Source/NintendoSwitch/Commands/NintendoSwitch_Commands_ScalarButtons.cpp \
+    Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.cpp \
     Source/NintendoSwitch/DevPrograms/BoxDraw.cpp \
     Source/NintendoSwitch/DevPrograms/TestProgramComputer.cpp \
     Source/NintendoSwitch/DevPrograms/TestProgramSwitch.cpp \
@@ -1108,17 +1112,12 @@ HEADERS += \
     ../Common/NintendoSwitch/NintendoSwitch_Protocol_DigitEntry.h \
     ../Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h \
     ../Common/NintendoSwitch/NintendoSwitch_Protocol_Routines.h \
-    ../Common/NintendoSwitch/NintendoSwitch_Protocol_ScalarButtons.h \
+    ../Common/NintendoSwitch/NintendoSwitch_Protocol_Superscalar.h \
     ../Common/NintendoSwitch/NintendoSwitch_SlotDatabase.h \
     ../Common/PokemonSwSh/PokemonProgramIDs.h \
     ../Common/PokemonSwSh/PokemonSwSh_FossilTable.h \
     ../Common/PokemonSwSh/PokemonSwSh_MultiHostTable.h \
-    ../Common/PokemonSwSh/PokemonSwSh_Protocol_AutoHosts.h \
-    ../Common/PokemonSwSh/PokemonSwSh_Protocol_DateSpam.h \
     ../Common/PokemonSwSh/PokemonSwSh_Protocol_DaySkippers.h \
-    ../Common/PokemonSwSh/PokemonSwSh_Protocol_EggRoutines.h \
-    ../Common/PokemonSwSh/PokemonSwSh_Protocol_GameEntry.h \
-    ../Common/PokemonSwSh/PokemonSwSh_Protocol_Misc.h \
     ../Common/Qt/AutoHeightTable.h \
     ../Common/Qt/AutoWidthLineEdit.h \
     ../Common/Qt/CodeValidator.h \
@@ -1367,6 +1366,7 @@ HEADERS += \
     Source/Kernels/AudioStreamConversion/AudioStreamConversion.h \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.h \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Routines.h \
+    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_arm64_NEON.h \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_AVX2.h \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_AVX512.h \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_SSE42.h \
@@ -1375,12 +1375,14 @@ HEADERS += \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_64x32_x64_AVX512.h \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_64x4_Default.h \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_64x64_x64_AVX512.h \
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_64x8_arm64_NEON.h \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_64x8_x64_SSE42.h \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_64xH_Default.h \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_Debugging.h \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64x16_x64_AVX2.h \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64x32_x64_AVX512.h \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64x64_x64_AVX512.h \
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64x8_arm64_NEON.h \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64x8_x64_SSE42.h \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64xH_Default.h \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_t.h \
@@ -1395,9 +1397,11 @@ HEADERS += \
     Source/Kernels/Kernels_Alignment.h \
     Source/Kernels/Kernels_BitScan.h \
     Source/Kernels/Kernels_BitSet.h \
+    Source/Kernels/Kernels_arm64_NEON.h \
     Source/Kernels/Kernels_x64_AVX2.h \
     Source/Kernels/Kernels_x64_AVX512.h \
     Source/Kernels/Kernels_x64_SSE41.h \
+    Source/Kernels/PartialWordAccess/Kernels_PartialWordAccess_arm64_NEON.h \
     Source/Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_AVX2.h \
     Source/Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_SSE41.h \
     Source/Kernels/ScaleInvariantMatrixMatch/Kernels_ScaleInvariantMatrixMatch.h \
@@ -1411,6 +1415,7 @@ HEADERS += \
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x4_Default.h \
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x64_x64_AVX512-GF.h \
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x64_x64_AVX512.h \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x8_arm64_NEON.h \
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x8_x64_SSE42.h \
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64xH_Default.h \
     Source/Kernels/Waterfill/Kernels_Waterfill_Intrinsics_x64_AVX512-GF.h \
@@ -1423,12 +1428,12 @@ HEADERS += \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Routines.h \
-    Source/NintendoSwitch/Commands/NintendoSwitch_Commands_ScalarButtons.h \
+    Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_Device.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_DigitEntry.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_PushButtons.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_Routines.h \
-    Source/NintendoSwitch/Commands/NintendoSwitch_Messages_ScalarButtons.h \
+    Source/NintendoSwitch/Commands/NintendoSwitch_Messages_Superscalar.h \
     Source/NintendoSwitch/DevPrograms/BoxDraw.h \
     Source/NintendoSwitch/DevPrograms/TestProgramComputer.h \
     Source/NintendoSwitch/DevPrograms/TestProgramSwitch.h \
@@ -1810,12 +1815,7 @@ HEADERS += \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_EggRoutines.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_Misc.h \
-    Source/PokemonSwSh/Commands/PokemonSwSh_Messages_AutoHosts.h \
-    Source/PokemonSwSh/Commands/PokemonSwSh_Messages_DateSpam.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Messages_DaySkippers.h \
-    Source/PokemonSwSh/Commands/PokemonSwSh_Messages_EggRoutines.h \
-    Source/PokemonSwSh/Commands/PokemonSwSh_Messages_GameEntry.h \
-    Source/PokemonSwSh/Commands/PokemonSwSh_Messages_Misc.h \
     Source/PokemonSwSh/Inference/Battles/PokemonSwSh_BattleBallReader.h \
     Source/PokemonSwSh/Inference/Battles/PokemonSwSh_BattleDialogDetector.h \
     Source/PokemonSwSh/Inference/Battles/PokemonSwSh_BattleDialogTracker.h \

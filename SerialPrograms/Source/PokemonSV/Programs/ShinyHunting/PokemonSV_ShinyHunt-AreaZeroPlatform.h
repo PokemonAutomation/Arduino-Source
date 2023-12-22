@@ -84,6 +84,8 @@ private:
     };
     EnumDropdownOption<Mode> MODE;
 
+    BooleanCheckBoxOption FLYING_UNLOCKED;
+
     enum class Path{
         PATH0,
         PATH1,

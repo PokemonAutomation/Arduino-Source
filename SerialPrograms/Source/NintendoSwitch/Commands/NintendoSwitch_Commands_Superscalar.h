@@ -1,14 +1,19 @@
-/*  Scalar Button Framework
+/*  Superscalar Framework (ssf_*)
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
  *  Don't use these unless you know what you're doing and you really need to.
- *  These are hard to use and can cause unexpected behavior if used incorrectly.
+ *
+ *  If you don't understand how the state machine works, you will not be able
+ *  to properly use these functions.
+ *
+ *  Since the functionality here used to be internal-only, documentation remains
+ *  sparse for now and slated to be expanded in the future.
  *
  */
 
-#ifndef PokemonAutomation_NintendoSwitch_Commands_ScalarButtons_H
-#define PokemonAutomation_NintendoSwitch_Commands_ScalarButtons_H
+#ifndef PokemonAutomation_NintendoSwitch_Commands_Superscalar_H
+#define PokemonAutomation_NintendoSwitch_Commands_Superscalar_H
 
 #include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
 #include "ClientSource/Connection/BotBase.h"

@@ -57,6 +57,7 @@ public:
 
 void inside_zero_gate_to_platform(
     const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    bool flying_unlocked,
     NavigatePlatformSettings& settings
 );
 

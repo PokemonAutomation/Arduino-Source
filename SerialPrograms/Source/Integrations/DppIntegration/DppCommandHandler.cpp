@@ -227,7 +227,7 @@ void Handler::create_unified_commands(commandhandler& handler) {
         },
         [&handler, this](const std::string& command, const parameter_list_t& params, command_source src) {
             log_dpp("Executing " + command + "...", "Unified Command Handler", ll_info);
-            if (src.issuer.id != owner.id) {
+            if (!GlobalSettings::instance().DISCORD.integration.allow_buttons_from_users && src.issuer.id != owner.id) {
                 handler.reply(message("You do not have permission to use this command."), src);
                 return;
             }
@@ -258,7 +258,7 @@ void Handler::create_unified_commands(commandhandler& handler) {
         },
         [&handler, this](const std::string& command, const parameter_list_t& params, command_source src) {
             log_dpp("Executing " + command + "...", "Unified Command Handler", ll_info);
-            if (src.issuer.id != owner.id) {
+            if (!GlobalSettings::instance().DISCORD.integration.allow_buttons_from_users && src.issuer.id != owner.id) {
                 handler.reply(message("You do not have permission to use this command."), src);
                 return;
             }
@@ -289,7 +289,7 @@ void Handler::create_unified_commands(commandhandler& handler) {
         },
         [&handler, this](const std::string& command, const parameter_list_t& params, command_source src) {
             log_dpp("Executing " + command + "...", "Unified Command Handler", ll_info);
-            if (src.issuer.id != owner.id) {
+            if (!GlobalSettings::instance().DISCORD.integration.allow_buttons_from_users && src.issuer.id != owner.id) {
                 handler.reply(message("You do not have permission to use this command."), src);
                 return;
             }
@@ -320,7 +320,7 @@ void Handler::create_unified_commands(commandhandler& handler) {
         },
         [&handler, this](const std::string& command, const parameter_list_t& params, command_source src) {
             log_dpp("Executing " + command + "...", "Unified Command Handler", ll_info);
-            if (src.issuer.id != owner.id) {
+            if (!GlobalSettings::instance().DISCORD.integration.allow_buttons_from_users && src.issuer.id != owner.id) {
                 handler.reply(message("You do not have permission to use this command."), src);
                 return;
             }
@@ -384,7 +384,7 @@ void Handler::create_unified_commands(commandhandler& handler) {
         },
         [&handler, this](const std::string& command, const parameter_list_t& params, command_source src) {
             log_dpp("Executing " + command + "...", "Unified Command Handler", ll_info);
-            if (src.issuer.id != owner.id) {
+            if (!GlobalSettings::instance().DISCORD.integration.allow_buttons_from_users && src.issuer.id != owner.id) {
                 handler.reply(message("You do not have permission to use this command."), src);
                 return;
             }
@@ -447,7 +447,7 @@ void Handler::create_unified_commands(commandhandler& handler) {
         },
         [&handler, this](const std::string& command, const parameter_list_t& params, command_source src) {
             log_dpp("Executing " + command + "...", "Unified Command Handler", ll_info);
-            if (src.issuer.id != owner.id) {
+            if (!GlobalSettings::instance().DISCORD.integration.allow_buttons_from_users && src.issuer.id != owner.id) {
                 handler.reply(message("You do not have permission to use this command."), src);
                 return;
             }
@@ -511,7 +511,7 @@ void Handler::create_unified_commands(commandhandler& handler) {
         },
         [&handler, this](const std::string& command, const parameter_list_t& params, command_source src) {
             log_dpp("Executing " + command + "...", "Unified Command Handler", ll_info);
-            if (src.issuer.id != owner.id) {
+            if (!GlobalSettings::instance().DISCORD.integration.allow_buttons_from_users && src.issuer.id != owner.id) {
                 handler.reply(message("You do not have permission to use this command."), src);
                 return;
             }
@@ -569,7 +569,9 @@ void Handler::create_unified_commands(commandhandler& handler) {
             for (auto& cmd : commands) {
                 std::string name = cmd.first;
                 log_dpp(name, "help command", ll_info);
-                if (src.issuer.id != owner.id && name != "hi" && name != "ping" && name != "about" && name != "status" && name != "help") {
+                if (!GlobalSettings::instance().DISCORD.integration.allow_buttons_from_users &&
+                    src.issuer.id != owner.id && name != "hi" && name != "ping" && name != "about" && name != "status" && name != "help"
+                ){
                     continue;
                 }
 

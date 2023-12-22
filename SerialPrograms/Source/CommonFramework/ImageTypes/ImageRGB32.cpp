@@ -84,7 +84,7 @@ ImageRGB32::ImageRGB32(QImage image){
     else if (format != QImage::Format_ARGB32 && format != QImage::Format_RGB32){
         std::cout << "Non standard QImage format: " + std::to_string((int)format) << std::endl;
         // image = image.convertToFormat(QImage::Format_ARGB32);
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid QImage format." + std::to_string((int)format));
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid QImage format: " + std::to_string((int)format));
     }
     m_width = image.width();
     m_height = image.height();

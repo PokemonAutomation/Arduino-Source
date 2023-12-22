@@ -1,6 +1,7 @@
 
 #include <QDir>
 #include <QApplication>
+#include <QFileInfo>
 //#include <QTextStream>
 #include <QMessageBox>
 #include <dpp/DPP_SilenceWarnings.h>
@@ -32,6 +33,15 @@ using namespace PokemonAutomation;
 
 Q_DECLARE_METATYPE(std::string)
 
+void set_working_directory(){
+    QString application_dir_path = qApp->applicationDirPath();
+    if (application_dir_path.endsWith(".app/Contents/MacOS")){
+        // a macOS bundle. Change working directory to the folder that hosts the .app folder.
+        QString app_bundle_path = application_dir_path.chopped(15);
+        QString base_folder_path = QFileInfo(app_bundle_path).dir().absolutePath();
+        QDir::setCurrent(base_folder_path);
+    }
+}
 
 int main(int argc, char *argv[]){
     setup_crash_handler();
@@ -52,8 +62,8 @@ int main(int argc, char *argv[]){
     OutputRedirector redirect_stdout(std::cout, "stdout", Color());
     OutputRedirector redirect_stderr(std::cerr, "stderr", COLOR_RED);
 
-    QDir().mkpath(QString::fromStdString(SETTINGS_PATH));
-    QDir().mkpath(QString::fromStdString(SCREENSHOTS_PATH));
+    QDir().mkpath(QString::fromStdString(SETTINGS_PATH()));
+    QDir().mkpath(QString::fromStdString(SCREENSHOTS_PATH()));
 
     //  Read program settings from json file: SerialPrograms-Settings.json.
     try{
@@ -98,12 +108,14 @@ int main(int argc, char *argv[]){
         discord_settings.value_changed();
     }
 
-
-    int ret;
+    set_working_directory();
+    
+    int ret = 0;
     {
         MainWindow w;
         w.show();
         w.raise(); // bring the window to front on macOS
+        set_permissions(w);
         ret = application.exec();
     }
 

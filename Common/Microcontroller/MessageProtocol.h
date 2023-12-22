@@ -140,7 +140,18 @@
 //  avoid overloading the device. This has no effect on correctness since the
 //  device will automatically drop commands when the command queue fills up or
 //  if it can't process serial messages quickly enough.
-#define PABB_DEVICE_QUEUE_SIZE          4   //  Must be a power-of-two.
+
+//  Must be a power-of-two.
+#if __AVR_ATmega16U2__
+#define PABB_DEVICE_QUEUE_SIZE          8
+#elif __AVR_ATmega32U4__ || __AVR_AT90USB1286__
+#define PABB_DEVICE_QUEUE_SIZE         64
+#else
+#define PABB_DEVICE_QUEUE_SIZE          4
+#endif
+
+//  Client code should first assume the queue size is only 4. It can optionally
+//  query for the actual queue size using PABB_MSG_REQUEST_QUEUE_SIZE.
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -156,7 +167,7 @@
 #define PABB_PROTOCOL_VERSION           2021052613
 
 //  Program versioning doesn't matter. It's just for informational purposes.
-#define PABB_PROGRAM_VERSION            2023012300
+#define PABB_PROGRAM_VERSION            2023121900
 
 #define PABB_BAUD_RATE                  115200
 #define PABB_RETRANSMIT_DELAY_MILLIS    80
@@ -294,6 +305,11 @@ typedef struct{
 typedef struct{
     seqnum_t seqnum;
 } PABB_PACK pabb_MsgRequestNextCmdInterrupt;
+
+#define PABB_MSG_REQUEST_QUEUE_SIZE             0x48
+typedef struct{
+    seqnum_t seqnum;
+} PABB_PACK pabb_MsgRequestQueueSize;
 
 ////////////////////////////////////////////////////////////////////////////////
 //  Custom Info

@@ -24,6 +24,14 @@ uint32_t program_version(BotBase& botbase){
     ).convert<PABB_MSG_ACK_REQUEST_I32>(botbase.logger(), response);
     return response.data;
 }
+uint8_t device_queue_size(BotBase& botbase){
+    pabb_MsgAckRequestI8 response;
+    botbase.issue_request_and_wait(
+        DeviceRequest_queue_size()
+    ).convert<PABB_MSG_ACK_REQUEST_I8>(botbase.logger(), response);
+    return response.data;
+
+}
 uint8_t program_id(BotBase& botbase){
     pabb_MsgAckRequestI8 response;
     botbase.issue_request_and_wait(

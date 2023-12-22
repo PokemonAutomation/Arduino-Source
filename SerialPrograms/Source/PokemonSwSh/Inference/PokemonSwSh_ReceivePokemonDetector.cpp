@@ -4,16 +4,15 @@
  *
  */
 
-#include "Common/Compiler.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "PokemonSwSh_ReceivePokemonDetector.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -39,6 +38,7 @@ bool ReceivePokemonDetector::process_frame(const ImageViewRGB32& frame, WallCloc
     bool ret = receive_is_over(frame);
     bool triggered = m_triggered.load(std::memory_order_acquire);
     m_triggered.store(triggered | ret, std::memory_order_release);
+//    cout << "m_has_been_orange = " << m_has_been_orange << endl;
     return ret && m_stop_on_detected;
 }
 bool ReceivePokemonDetector::receive_is_over(const ImageViewRGB32& frame){
@@ -50,6 +50,18 @@ bool ReceivePokemonDetector::receive_is_over(const ImageViewRGB32& frame){
     FloatPixel actual0 = stats0.average;
     FloatPixel actual1 = stats1.average;
     FloatPixel actual2 = stats2.average;
+
+//    cout << actual0 << actual1 << actual2 << endl;
+
+    if (actual0.sum() < 100){
+        return m_has_been_orange;
+    }
+    if (actual1.sum() < 100){
+        return m_has_been_orange;
+    }
+    if (actual2.sum() < 100){
+        return m_has_been_orange;
+    }
 
     expected /= expected.sum();
     actual0 /= actual0.sum();

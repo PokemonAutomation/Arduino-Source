@@ -8,6 +8,7 @@
 #include "Common/Cpp/Time.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "ClientSource/Connection/BotBase.h"
+#include "CommonFramework/Globals.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "NintendoSwitch_SnapshotDumper.h"
 
@@ -50,10 +51,11 @@ SnapshotDumper::SnapshotDumper()
 }
 
 void SnapshotDumper::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    QDir().mkpath("ScreenshotDumper/");
+    std::string folder_path = USER_FILE_PATH() + "ScreenshotDumper/";
+    QDir().mkpath(folder_path.c_str());
     while (true){
         VideoSnapshot last = env.console.video().snapshot();
-        std::string filename = "ScreenshotDumper/" + now_to_filestring();
+        std::string filename = folder_path + now_to_filestring();
         switch (FORMAT){
         case Format::PNG:
             filename += ".png";

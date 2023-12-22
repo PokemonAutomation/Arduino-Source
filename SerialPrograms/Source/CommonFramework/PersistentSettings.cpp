@@ -14,9 +14,9 @@
 #include "NintendoSwitch/Framework/NintendoSwitch_VirtualControllerMapping.h"
 #include "PersistentSettings.h"
 
-//#include <iostream>
-//using std::cout;
-//using std::endl;
+// #include <iostream>
+// using std::cout;
+// using std::endl;
 
 namespace PokemonAutomation{
 
@@ -41,14 +41,14 @@ void PersistentSettings::write() const{
     root["99-Panels"] = panels.clone();
 
     try{
-        std::string settings_path = SETTINGS_PATH + QCoreApplication::applicationName().toStdString() + "-Settings.json";
+        std::string settings_path = SETTINGS_PATH() + QCoreApplication::applicationName().toStdString() + "-Settings.json";
         root.dump(settings_path);
     }catch (FileException&){}
 }
 
 
 void PersistentSettings::read(){
-    std::string settings_path = SETTINGS_PATH + QCoreApplication::applicationName().toStdString() + "-Settings.json";
+    std::string settings_path = SETTINGS_PATH() + QCoreApplication::applicationName().toStdString() + "-Settings.json";
     JsonValue json = load_json_file(settings_path);
     JsonObject* obj = json.get_object();
     if (obj == nullptr){

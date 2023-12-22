@@ -15,7 +15,7 @@
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/ImageTools/ImageFilter.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_ScalarButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.h"
 #include "PokemonSV/Inference/Picnics/PokemonSV_PicnicDetector.h"
@@ -876,16 +876,29 @@ void run_sandwich_maker(SingleSwitchProgramEnvironment& env, BotBaseContext& con
     {
         VideoSnapshot screen = env.console.video().snapshot();
 
-        std::string center_filling = middle_plate_detector.detect_filling_name(screen);
-        if (center_filling.empty()) {
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console, "No ingredient found on center plate label.", true
-            );
+        const int max_read_label_tries = 4;
+        for(int read_label_try_count = 0; read_label_try_count < max_read_label_tries; ++read_label_try_count){
+            std::string center_filling = middle_plate_detector.detect_filling_name(screen);
+            if (center_filling.empty()) {
+                if (read_label_try_count + 1 < max_read_label_tries){
+                    // Wait more time
+                    pbf_wait(context, TICKS_PER_SECOND * 2);
+                    context.wait_for_all_requests();
+                    continue;
+                } else{
+                    env.console.log("Read nothing on center plate label.");
+                    throw OperationFailedException(
+                        ErrorReport::SEND_ERROR_REPORT, env.console, "No ingredient found on center plate label.", true
+                    );
+                }
+            }
+            env.console.log("Read center plate label: " + center_filling);
+            env.console.overlay().add_log("Center plate: " + center_filling);
+            plate_order.push_back(center_filling);
+            break;
         }
 
-        env.console.log("Read center plate label: " + center_filling);
-        env.console.overlay().add_log("Center plate: " + center_filling);
-        plate_order.push_back(center_filling);
+
 
         //Get left (2nd) ingredient
         std::string left_filling = left_plate_detector.detect_filling_name(screen);
@@ -933,22 +946,21 @@ void run_sandwich_maker(SingleSwitchProgramEnvironment& env, BotBaseContext& con
         }
 
         //Now re-center plates
-        env.log("Re-centering plates if needed.", COLOR_BLACK);
-        env.console.overlay().add_log("Re-centering plates if needed.", COLOR_WHITE);
+        env.log("Re-centering plates if needed.");
+        env.console.overlay().add_log("Re-centering plates if needed.");
         for (int i = 0; i < (plates - 3); i++) {
             pbf_press_button(context, BUTTON_L, 20, 80);
         }
 
         //If a label fails to read it'll cause issues down the line
         if ((int)plate_order.size() != plates) {
-
+            env.log("Found # plate labels " + std::to_string(plate_order.size()) + ", not same as desired # plates " + std::to_string(plates));
             throw OperationFailedException(
                 ErrorReport::SEND_ERROR_REPORT, env.console,
                 "Number of plate labels did not match number of plates.",
                 true
             );
         }
-
     }
 
     //Finally.

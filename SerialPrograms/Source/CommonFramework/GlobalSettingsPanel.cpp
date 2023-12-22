@@ -327,9 +327,13 @@ void GlobalSettings::load_json(const JsonValue& json){
                 }
             }
             if (COMMAND_LINE_IGNORE_LIST.size() > 0){
-                std::cout << "Ignore following paths: " << std::endl;
-                for(const auto& name : COMMAND_LINE_IGNORE_LIST){
-                    std::cout << "- " << name << std::endl;
+                std::cout << "Ignore following " << COMMAND_LINE_IGNORE_LIST.size() << " paths: " << std::endl;
+                const size_t MAX_LINES = 5;
+                for(size_t i = 0; i < COMMAND_LINE_IGNORE_LIST.size() && i < MAX_LINES; i++){
+                    std::cout << "- " << COMMAND_LINE_IGNORE_LIST[i] << std::endl;
+                }
+                if (COMMAND_LINE_IGNORE_LIST.size() > MAX_LINES){
+                    std::cout << "..." << std::endl;
                 }
             }
         }

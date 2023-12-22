@@ -126,6 +126,7 @@
 #include "PokemonSV/Inference/PokemonSV_PokemonSummaryReader.h"
 #include "Pokemon/Pokemon_StatsCalculation.h"
 #include "PokemonSV/Inference/PokemonSV_StatHexagonReader.h"
+#include "PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinySparkleSet.h"
 
 #ifdef PA_ARCH_x86
 //#include "Kernels/Kernels_x64_SSE41.h"
@@ -230,15 +231,37 @@ class WatchdogTest1 : public WatchdogCallback{
 
 void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& scope){
     using namespace Kernels;
+    using namespace NintendoSwitch;
 //    using namespace NintendoSwitch::PokemonSwSh;
     using namespace NintendoSwitch::PokemonSV;
     using namespace Pokemon;
 //    using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
 
 
-    ImageRGB32 image("screenshot-20231016-130205783594.png");
-    PokemonSummaryDetector detector;
-    cout << detector.detect(image) << endl;
+
+#if 0
+    ImageRGB32 image("20231120-221849973351.png");
+
+
+    PokemonBDSP::ShinySparkleSetBDSP detector;
+
+    ImageViewRGB32 wild = extract_box_reference(image, ImageFloatBox{0.4, 0.02, 0.60, 0.93});
+    ImageViewRGB32 self = extract_box_reference(image, ImageFloatBox{0.0, 0.1, 0.8, 0.8});
+
+    wild.save("wild.png");
+    wild.save("self.png");
+
+    detector.read_from_image(wild);
+    cout << detector.to_str() << endl;
+
+    detector.read_from_image(self);
+    cout << detector.to_str() << endl;
+#endif
+
+
+//    ImageRGB32 image("screenshot-20231016-130205783594.png");
+//    PokemonSummaryDetector detector;
+//    cout << detector.detect(image) << endl;
 
 
 

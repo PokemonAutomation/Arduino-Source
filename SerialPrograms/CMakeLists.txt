@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.18.0)
 #set the name of the project
 project(SerialPrograms)
 
-#enable c++ 20
+#enable c++ 23
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -15,9 +15,6 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
-
-add_custom_target(build-time-make-directory ALL
-    COMMAND ${CMAKE_COMMAND} -E make_directory Assembly/)
 
 #Find threads library
 set(THREADS_PREFER_PTHREAD_FLAG ON)
@@ -174,17 +171,12 @@ file(GLOB MAIN_SOURCES
     ../Common/NintendoSwitch/NintendoSwitch_Protocol_DigitEntry.h
     ../Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h
     ../Common/NintendoSwitch/NintendoSwitch_Protocol_Routines.h
-    ../Common/NintendoSwitch/NintendoSwitch_Protocol_ScalarButtons.h
+    ../Common/NintendoSwitch/NintendoSwitch_Protocol_Superscalar.h
     ../Common/NintendoSwitch/NintendoSwitch_SlotDatabase.h
     ../Common/PokemonSwSh/PokemonProgramIDs.h
     ../Common/PokemonSwSh/PokemonSwSh_FossilTable.h
     ../Common/PokemonSwSh/PokemonSwSh_MultiHostTable.h
-    ../Common/PokemonSwSh/PokemonSwSh_Protocol_AutoHosts.h
-    ../Common/PokemonSwSh/PokemonSwSh_Protocol_DateSpam.h
     ../Common/PokemonSwSh/PokemonSwSh_Protocol_DaySkippers.h
-    ../Common/PokemonSwSh/PokemonSwSh_Protocol_EggRoutines.h
-    ../Common/PokemonSwSh/PokemonSwSh_Protocol_GameEntry.h
-    ../Common/PokemonSwSh/PokemonSwSh_Protocol_Misc.h
     ../Common/Qt/AutoHeightTable.cpp
     ../Common/Qt/AutoHeightTable.h
     ../Common/Qt/AutoWidthLineEdit.cpp
@@ -644,9 +636,11 @@ file(GLOB MAIN_SOURCES
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_64x32_x64_AVX512.cpp
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_64x4_Default.cpp
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_64x64_x64_AVX512.cpp
+    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_64x8_arm64_NEON.cpp
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_64x8_x64_SSE42.cpp
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Default.h
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Routines.h
+    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_arm64_NEON.h
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_AVX2.h
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_AVX512.h
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_SSE42.h
@@ -656,12 +650,15 @@ file(GLOB MAIN_SOURCES
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_64x32_x64_AVX512.h
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_64x4_Default.h
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_64x64_x64_AVX512.h
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_64x8_arm64_NEON.h
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_64x8_x64_SSE42.h
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_64xH_Default.h
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_Debugging.h
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64x16_x64_AVX2.h
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64x32_x64_AVX512.h
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64x4_Default.h
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64x64_x64_AVX512.h
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64x8_arm64_NEON.h
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64x8_x64_SSE42.h
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64xH_Default.h
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_64x16_x64_AVX2.cpp
@@ -669,6 +666,7 @@ file(GLOB MAIN_SOURCES
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_64x64_x64_AVX512.cpp
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_64x8_x64_SSE42.cpp
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_64xH_Default.cpp
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_arm64_NEON.cpp
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_t.h
     Source/Kernels/BinaryMatrix/Kernels_PackedBinaryMatrix.h
     Source/Kernels/BinaryMatrix/Kernels_PackedBinaryMatrixCore.h
@@ -679,6 +677,7 @@ file(GLOB MAIN_SOURCES
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic.h
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_Default.cpp
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_Routines.h
+    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_arm64_NEON.cpp
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_AVX2.cpp
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_AVX512.cpp
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_SSE42.cpp
@@ -704,9 +703,11 @@ file(GLOB MAIN_SOURCES
     Source/Kernels/Kernels_Alignment.h
     Source/Kernels/Kernels_BitScan.h
     Source/Kernels/Kernels_BitSet.h
+    Source/Kernels/Kernels_arm64_NEON.h
     Source/Kernels/Kernels_x64_AVX2.h
     Source/Kernels/Kernels_x64_AVX512.h
     Source/Kernels/Kernels_x64_SSE41.h
+    Source/Kernels/PartialWordAccess/Kernels_PartialWordAccess_arm64_NEON.h
     Source/Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_AVX2.h
     Source/Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_SSE41.h
     Source/Kernels/ScaleInvariantMatrixMatch/Kernels_ScaleInvariantMatrixMatch.cpp
@@ -736,6 +737,8 @@ file(GLOB MAIN_SOURCES
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x64_x64_AVX512-GF.h
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x64_x64_AVX512.cpp
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x64_x64_AVX512.h
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x8_arm64_NEON.cpp
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x8_arm64_NEON.h
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x8_x64_SSE42.cpp
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x8_x64_SSE42.h
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64xH_Default.cpp
@@ -755,13 +758,13 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Routines.cpp
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Routines.h
-    Source/NintendoSwitch/Commands/NintendoSwitch_Commands_ScalarButtons.cpp
-    Source/NintendoSwitch/Commands/NintendoSwitch_Commands_ScalarButtons.h
+    Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.cpp
+    Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_Device.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_DigitEntry.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_PushButtons.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_Routines.h
-    Source/NintendoSwitch/Commands/NintendoSwitch_Messages_ScalarButtons.h
+    Source/NintendoSwitch/Commands/NintendoSwitch_Messages_Superscalar.h
     Source/NintendoSwitch/DevPrograms/BoxDraw.cpp
     Source/NintendoSwitch/DevPrograms/BoxDraw.h
     Source/NintendoSwitch/DevPrograms/TestProgramComputer.cpp
@@ -1332,6 +1335,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Inference/PokemonSV_PokePortalDetector.h
     Source/PokemonSV/Inference/PokemonSV_PokemonSummaryReader.cpp
     Source/PokemonSV/Inference/PokemonSV_PokemonSummaryReader.h
+    Source/PokemonSV/Inference/PokemonSV_StatHexagonReader.cpp
+    Source/PokemonSV/Inference/PokemonSV_StatHexagonReader.h
     Source/PokemonSV/Inference/PokemonSV_SweatBubbleDetector.cpp
     Source/PokemonSV/Inference/PokemonSV_SweatBubbleDetector.h
     Source/PokemonSV/Inference/PokemonSV_TournamentPrizeNameReader.cpp
@@ -1340,8 +1345,6 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h
     Source/PokemonSV/Inference/PokemonSV_ZeroGateWarpPromptDetector.cpp
     Source/PokemonSV/Inference/PokemonSV_ZeroGateWarpPromptDetector.h
-    Source/PokemonSV/Inference/PokemonSV_StatHexagonReader.cpp
-    Source/PokemonSV/Inference/PokemonSV_StatHexagonReader.h
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraCardDetector.cpp
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraCardDetector.h
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraCodeReader.cpp
@@ -1408,14 +1411,6 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggHatcher.h
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggRoutines.cpp
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggRoutines.h
-    Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_ClipboardFastCodeEntry.cpp
-    Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_ClipboardFastCodeEntry.h
-    Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_CodeEntry.cpp
-    Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_CodeEntry.h
-    Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_FastCodeEntry.cpp
-    Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_FastCodeEntry.h
-    Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_VideoFastCodeEntry.cpp
-    Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_VideoFastCodeEntry.h
     Source/PokemonSV/Programs/Farming/PokemonSV_AuctionFarmer.cpp
     Source/PokemonSV/Programs/Farming/PokemonSV_AuctionFarmer.h
     Source/PokemonSV/Programs/Farming/PokemonSV_ESPTraining.cpp
@@ -1428,6 +1423,14 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Programs/Farming/PokemonSV_LPFarmer.h
     Source/PokemonSV/Programs/Farming/PokemonSV_TournamentFarmer.cpp
     Source/PokemonSV/Programs/Farming/PokemonSV_TournamentFarmer.h
+    Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_ClipboardFastCodeEntry.cpp
+    Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_ClipboardFastCodeEntry.h
+    Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_CodeEntry.cpp
+    Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_CodeEntry.h
+    Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_FastCodeEntry.cpp
+    Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_FastCodeEntry.h
+    Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_VideoFastCodeEntry.cpp
+    Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_VideoFastCodeEntry.h
     Source/PokemonSV/Programs/General/PokemonSV_AutonomousBallThrower.cpp
     Source/PokemonSV/Programs/General/PokemonSV_AutonomousBallThrower.h
     Source/PokemonSV/Programs/General/PokemonSV_ClothingBuyer.cpp
@@ -1521,12 +1524,7 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_Misc.cpp
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_Misc.h
-    Source/PokemonSwSh/Commands/PokemonSwSh_Messages_AutoHosts.h
-    Source/PokemonSwSh/Commands/PokemonSwSh_Messages_DateSpam.h
     Source/PokemonSwSh/Commands/PokemonSwSh_Messages_DaySkippers.h
-    Source/PokemonSwSh/Commands/PokemonSwSh_Messages_EggRoutines.h
-    Source/PokemonSwSh/Commands/PokemonSwSh_Messages_GameEntry.h
-    Source/PokemonSwSh/Commands/PokemonSwSh_Messages_Misc.h
     Source/PokemonSwSh/Inference/Battles/PokemonSwSh_BattleBallReader.cpp
     Source/PokemonSwSh/Inference/Battles/PokemonSwSh_BattleBallReader.h
     Source/PokemonSwSh/Inference/Battles/PokemonSwSh_BattleDialogDetector.cpp
@@ -1930,7 +1928,30 @@ file(GLOB MAIN_SOURCES
     Source/ZeldaTotK/ZeldaTotK_Settings.h
 )
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}../../ FILES ${MAIN_SOURCES})
-add_executable(SerialPrograms WIN32 ${MAIN_SOURCES})
+
+if (APPLE)
+    # TODO: set up the correct application icon
+    # set(SerialPrograms_ICON ${CMAKE_CURRENT_SOURCE_DIR}/../Resources/icon.icns)
+    # set_source_files_properties(SerialPrograms_ICON PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
+
+    # Links on how to create a MacOS app bundle with cmake
+    # https://stackoverflow.com/questions/53560288/how-to-create-a-macos-app-bundle-with-cmake
+    # https://cmake.org/cmake/help/latest/command/add_executable.html
+    add_executable(SerialPrograms MACOSX_BUNDLE ${SerialPrograms_ICON} ${MAIN_SOURCES})
+    set_target_properties(SerialPrograms PROPERTIES
+        BUNDLE True
+        MACOSX_BUNDLE_GUI_IDENTIFIER PokemonAutomation.SerialPrograms 
+        MACOSX_BUNDLE_BUNDLE_NAME SerialPrograms
+        MACOSX_BUNDLE_BUNDLE_VERSION "0.1"
+        MACOSX_BUNDLE_SHORT_VERSION_STRING "0.1"
+        # MACOSX_BUNDLE_ICON_FILE icon
+        # MacOSXBundleInfo.plist.in is modified from https://github.com/Kitware/CMake/blob/master/Modules/MacOSXBundleInfo.plist.in
+        MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/cmake/MacOSXBundleInfo.plist.in
+    )
+else() # WIN and Linux:
+    add_executable(SerialPrograms WIN32 ${MAIN_SOURCES})
+endif()
+
 set_target_properties(SerialPrograms PROPERTIES LINKER_LANGUAGE CXX)
 target_link_libraries(SerialPrograms Qt${QT_MAJOR}::Widgets Qt${QT_MAJOR}::SerialPort Qt${QT_MAJOR}::Multimedia Qt${QT_MAJOR}::MultimediaWidgets)
 target_link_libraries(SerialPrograms Threads::Threads)
@@ -2030,6 +2051,17 @@ else()
         target_link_libraries(SerialPrograms ${LEPTONICA_LINK_LIBRARIES})
     endif()
 
+    # enable dpp integration
+    if ((APPLE) AND (CMAKE_SYSTEM_PROCESSOR MATCHES "(arm64)|(ARM64)"))
+        add_library(libdpp STATIC IMPORTED)
+        set_target_properties(libdpp PROPERTIES
+            IMPORTED_LOCATION ../3rdPartyBinaries/libdpp_macos_arm64.a
+            INTERFACE_COMPILE_DEFINITIONS "PA_DPP"
+            INTERFACE_LINK_LIBRARIES "-L/opt/homebrew/lib -lssl -lcrypto -lopus -lsodium -lz" # add dpp's deps
+        )
+        target_link_libraries(SerialPrograms libdpp)
+    endif()
+
     # Add -Wno-c11-extensions to avoid clang gives
     # /usr/local/Cellar/opencv/4.5.5_3/include/opencv4/opencv2/core/mat.inl.hpp:2116:9: error: '_Atomic' is a C11 extension
     # when compiling OpenCV
@@ -2044,25 +2076,23 @@ else()
     endif()
 
     IF(${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm")
-    # Arm CPU
-
-    #   Run-time ISA dispatching
-    target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_arm64_20_M1)
+        # Arm CPU
+        #   Run-time ISA dispatching
+        target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_arm64_20_M1)
 
     else()
-    # Intel CPU
+        # Intel CPU
+        target_compile_options(SerialPrograms PRIVATE -msse4.2)
+        set(ARCH_FLAGS_09_Nehalem       -march=nehalem)
+        set(ARCH_FLAGS_13_Haswell       -march=haswell)
+        set(ARCH_FLAGS_17_Skylake       -march=skylake-avx512)
+        set(ARCH_FLAGS_19_IceLake       -march=icelake-client)
 
-    target_compile_options(SerialPrograms PRIVATE -msse4.2)
-    set(ARCH_FLAGS_09_Nehalem       -march=nehalem)
-    set(ARCH_FLAGS_13_Haswell       -march=haswell)
-    set(ARCH_FLAGS_17_Skylake       -march=skylake-avx512)
-    set(ARCH_FLAGS_19_IceLake       -march=icelake-client)
-
-    #   Run-time ISA dispatching
-    target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_x64_08_Nehalem)
-    target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_x64_13_Haswell)
-    target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_x64_17_Skylake)
-    target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_x64_19_IceLake)
+        #   Run-time ISA dispatching
+        target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_x64_08_Nehalem)
+        target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_x64_13_Haswell)
+        target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_x64_17_Skylake)
+        target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_x64_19_IceLake)
 
     endif()
 endif()
@@ -2130,11 +2160,11 @@ endif()
 
 
 
-
-
+if (WIN32)
 #copy needed dlls
 #file(COPY *.dll DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 file(GLOB MY_DLLS
   "../3rdPartyBinaries/*.dll"
 )
 file(COPY ${MY_DLLS} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+endif()

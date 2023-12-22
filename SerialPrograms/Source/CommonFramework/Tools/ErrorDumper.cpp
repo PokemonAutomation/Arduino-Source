@@ -8,6 +8,7 @@
 #include <QDir>
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/Notifications/EventNotificationOption.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
@@ -29,9 +30,8 @@ std::string dump_image_alone(
     static std::mutex lock;
     std::lock_guard<std::mutex> lg(lock);
 
-    QDir().mkdir("ErrorDumps");
-    std::string name = "ErrorDumps/";
-    name += now_to_filestring();
+    QDir().mkdir(ERROR_PATH().c_str());
+    std::string name = ERROR_PATH() + now_to_filestring();
     name += "-";
     name += label;
     name += ".png";

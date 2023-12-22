@@ -32,8 +32,8 @@ uint32_t pabb_crc32_basic(uint32_t crc, const void* data, size_t length){
 #else
 #define PROGMEM
 #endif
-#ifdef __AVR_ATmega16U2__
-//  4-bit table
+#if 0   //  defined __AVR_ATmega16U2__
+//  4-bit table (we used to use this on atmega16u2 because 8-bit is too much of memory hog)
 const uint32_t PROGMEM CRC32_TABLE4[] = {
     0x00000000, 0x105ec76f, 0x20bd8ede, 0x30e349b1,
     0x417b1dbc, 0x5125dad3, 0x61c69362, 0x7198540d,
@@ -65,7 +65,7 @@ uint32_t pabb_crc32_table(uint32_t crc, const void* str, size_t length){
     return crc;
 }
 #else
-//  8-bit table is too much of a memory hog for atmega16u2. :(
+//  8-bit table
 const uint32_t PROGMEM CRC32_TABLE8[] = {
     0x00000000, 0xf26b8303, 0xe13b70f7, 0x1350f3f4, 0xc79a971f, 0x35f1141c, 0x26a1e7e8, 0xd4ca64eb,
     0x8ad958cf, 0x78b2dbcc, 0x6be22838, 0x9989ab3b, 0x4d43cfd0, 0xbf284cd3, 0xac78bf27, 0x5e133c24,

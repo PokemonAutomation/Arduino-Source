@@ -30,9 +30,26 @@ extern const std::string PROJECT_SOURCE_URL;
 
 const auto SERIAL_REFRESH_RATE = std::chrono::milliseconds(1000);
 
-extern const std::string SETTINGS_PATH;
-extern const std::string SCREENSHOTS_PATH;
+// Folder path (end with "/") to hold program setting files.
+const std::string& SETTINGS_PATH();
+
+// Folder path (end with "/") to hold screenshots from the program "Screenshot" button.
+const std::string& SCREENSHOTS_PATH();
+
+// Folder path (end with "/") to hold debugging images and other debugging files
+const std::string& DEBUG_PATH();
+
+// Folder path (end with "/") to hold error images and other related files here. Useful for debugging the errors.
+const std::string& ERROR_PATH();
+
+// Folder path (end with "/") that holds various user genereated files.
+// e.g. for a program that records and dumps screenshots, the saved images can go to USER_FILE_PATH()/ScreenshotDumper.
+const std::string& USER_FILE_PATH();
+
+// Resource folder path. Resources include JSON files, images, sound files and others required by
+// various automation programs.
 const std::string& RESOURCE_PATH();
+// Hold ML trainign data.
 const std::string& TRAINING_PATH();
 
 

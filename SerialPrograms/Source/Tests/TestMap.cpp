@@ -44,7 +44,7 @@ using ImageIntDetectorFunction = std::function<int(const ImageViewRGB32& image, 
 
 using ImageWordsDetectorFunction = std::function<int(const ImageViewRGB32& image, const std::vector<std::string>& words)>;
 
-using ImageVoidDetectorFunction = std::function<void(const ImageViewRGB32& image)>;
+using ImageVoidDetectorFunction = std::function<int(const ImageViewRGB32& image)>;
 
 using SoundBoolDetectorFunction = std::function<int(const std::vector<AudioSpectrum>& spectrums, bool target)>;
 
@@ -159,8 +159,7 @@ int image_int_detector_helper(ImageIntDetectorFunction test_func, const std::str
 // debugging output. So no need to get target values from the test framework.
 int image_void_detector_helper(ImageVoidDetectorFunction test_func, const std::string& test_path){
     auto run_test = [&](const ImageViewRGB32& image, const std::string&) -> int{
-        test_func(image);
-        return 0;
+        return test_func(image);
     };
 
     return image_filename_detector_helper(run_test, test_path);
@@ -221,6 +220,13 @@ int sound_bool_detector_helper(SoundBoolDetectorFunction test_func, const std::s
 
 const std::map<std::string, TestFunction> TEST_MAP = {
     {"Kernels_ImageScaleBrightness", std::bind(image_void_detector_helper, test_kernels_ImageScaleBrightness, _1)},
+    {"Kernels_BinaryMatrix", std::bind(image_void_detector_helper, test_kernels_BinaryMatrix, _1)},
+    {"Kernels_FilterRGB32Range", std::bind(image_void_detector_helper, test_kernels_FilterRGB32Range, _1)},
+    {"Kernels_FilterRGB32Euclidean", std::bind(image_void_detector_helper, test_kernels_FilterRGB32Euclidean, _1)},
+    {"Kernels_ToBlackWhiteRGB32Range", std::bind(image_void_detector_helper, test_kernels_ToBlackWhiteRGB32Range, _1)},
+    {"Kernels_FilterByMask", std::bind(image_void_detector_helper, test_kernels_FilterByMask, _1)},
+    {"Kernels_CompressRGB32ToBinaryEuclidean", std::bind(image_void_detector_helper, test_kernels_CompressRGB32ToBinaryEuclidean, _1)},
+    {"Kernels_Waterfill", std::bind(image_void_detector_helper, test_kernels_Waterfill, _1)},
     {"CommonFramework_BlackBorderDetector", std::bind(image_bool_detector_helper, test_CommonFramework_BlackBorderDetector, _1)},
     {"NintendoSwitch_UpdateMenuDetector", std::bind(image_bool_detector_helper, test_NintendoSwitch_UpdateMenuDetector, _1)},
     {"PokemonSwSh_YCommMenuDetector", std::bind(image_bool_detector_helper, test_pokemonSwSh_YCommMenuDetector, _1)},

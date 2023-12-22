@@ -17,7 +17,7 @@ namespace PokemonAutomation{
 namespace Kernels{
 
 
-
+// The 2D index of a tile inside binary matrix `PackedBinaryMatrixCore`
 class TileIndex{
 public:
     TileIndex(size_t x, size_t y)
@@ -72,7 +72,9 @@ public:
     void operator&=(const PackedBinaryMatrixCore& x);
 
 public:
+    // How many pixels in an image row, which is equal to how many bits in a binary matrix row 
     size_t width() const{ return m_logical_width; }
+    // How many pixels in an image column, which is equal to how many bits in a binary matrix column
     size_t height() const{ return m_logical_height; }
 
     //  These are slow.
@@ -81,35 +83,50 @@ public:
 
     PackedBinaryMatrixCore submatrix(size_t x, size_t y, size_t width, size_t height) const;
 
+    // Print entire binary matrix as 0s and 1s. Rows are ended with "\n".
     std::string dump() const;
+    // Print part of max as 0s and 1s. Rows are ended with "\n".
     std::string dump(size_t min_x, size_t min_y, size_t max_x, size_t max_y) const;
+    // Print all the underlying tiles that form this binary matrix. The result is a matrix that may be larger
+    // than the original matrix.
     std::string dump_tiles() const;
 
 public:
-    //  Tile Access
+    // How many tiles in a row.
     size_t tile_width() const{ return m_tile_width; }
+    // How many tiles in a column
     size_t tile_height() const{ return m_tile_height; }
 
+    // Get (index.x()-th, index.y()-th) tile
     const TileType& tile(TileIndex index) const;
           TileType& tile(TileIndex index);
+    // Get (x-th, y-th) tile
     const TileType& tile(size_t x, size_t y) const;
           TileType& tile(size_t x, size_t y);
 
 public:
-    //  Word Access
+    //  Word Access. How many words in a row. One word is 8 bytes (aka 64 bits).
+    //  For different simd implementations, every tile is always one word wide.
     size_t word64_width() const{ return m_tile_width; }
+    //  Word Access. How many words in a column. One word is 8 bytes (aka 64 bits).
     size_t word64_height() const{ return m_logical_height; }
 
+    // Get (x-th, y-th) word. One word is 8 bytes (aka 64 bits), one row in a tile.
     uint64_t word64(size_t x, size_t y) const;
+    // Get (x-th, y-th) word. One word is 8 bytes (aka 64 bits), one row in a tile.
     uint64_t& word64(size_t x, size_t y);
 
 private:
     static constexpr size_t TILE_WIDTH = TileType::WIDTH;
     static constexpr size_t TILE_HEIGHT = TileType::HEIGHT;
 
+    // How many bits in a row (aka how many pixels in an image row)
     size_t m_logical_width;
+    // How many bits in a column (aka how many pixels in an image column)
     size_t m_logical_height;
+    // How many tiles in a row
     size_t m_tile_width;
+    // How many tiles in a column
     size_t m_tile_height;
     AlignedVector<TileType> m_data;
 };
@@ -162,11 +179,14 @@ uint64_t& PackedBinaryMatrixCore<Tile>::word64(size_t x, size_t y){
 
 //  Bit Access
 
+//  Get the bit at bit location (x, y)
 template <typename Tile>
 bool PackedBinaryMatrixCore<Tile>::get(size_t x, size_t y) const{
     const Tile& tile = this->tile(x / TILE_WIDTH, y / TILE_HEIGHT);
     return tile.get_bit(x % TILE_WIDTH, y % TILE_HEIGHT);
 }
+
+//  Set the bit at bit location (x, y) to `set`
 template <typename Tile>
 void PackedBinaryMatrixCore<Tile>::set(size_t x, size_t y, bool set){
     Tile& tile = this->tile(x / TILE_WIDTH, y / TILE_HEIGHT);

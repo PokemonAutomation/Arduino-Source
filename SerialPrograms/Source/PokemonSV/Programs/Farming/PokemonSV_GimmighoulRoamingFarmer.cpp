@@ -75,10 +75,10 @@ void GimmighoulRoamingFarmer::program(SingleSwitchProgramEnvironment& env, BotBa
         pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
         home_to_date_time(context, true, true);
         if (year >= MAX_YEAR){
-            roll_date_backward_N(context, MAX_YEAR, true);
+            PokemonSwSh::roll_date_backward_N(context, MAX_YEAR, true);
             year = 0;
         }
-        roll_date_forward_1(context, true);
+        PokemonSwSh::roll_date_forward_1(context, true);
         year++;
         pbf_press_button(context, BUTTON_HOME, 20, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
 

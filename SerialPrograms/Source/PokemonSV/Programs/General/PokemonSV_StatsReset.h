@@ -37,6 +37,7 @@ private:
     enum class Target {
         TreasuresOfRuin,
         LoyalThree,
+        Snacksworth,
         Generic,
     };
     EnumDropdownOption<Target> TARGET;

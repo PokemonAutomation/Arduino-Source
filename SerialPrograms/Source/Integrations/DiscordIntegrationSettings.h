@@ -48,6 +48,7 @@ public:
     StringOption hello_message;
     StringOption sudo;
     StringOption owner;
+    BooleanCheckBoxOption allow_buttons_from_users;
     DiscordIntegrationTable channels;
 };
 

@@ -193,6 +193,7 @@ StatsHuntIvJudgeFilterTable::StatsHuntIvJudgeFilterTable(
     , feature_flags(p_feature_flags)
 {
     set_default(make_defaults());
+    restore_defaults();
 }
 std::vector<std::string> StatsHuntIvJudgeFilterTable::make_header() const{
     std::vector<std::string> ret;
@@ -348,6 +349,7 @@ StatsHuntIvRangeFilterTable::StatsHuntIvRangeFilterTable(
     , feature_flags(p_feature_flags)
 {
 //    set_default(make_defaults());
+//    restore_defaults();
 }
 std::vector<std::string> StatsHuntIvRangeFilterTable::make_header() const{
     std::vector<std::string> ret;

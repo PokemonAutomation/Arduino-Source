@@ -145,7 +145,7 @@ SwitchSystemWidget::SwitchSystemWidget(
                 if (!image){
                     return;
                 }
-                std::string filename = SCREENSHOTS_PATH + "screenshot-" + now_to_filestring() + ".png";
+                std::string filename = SCREENSHOTS_PATH() + "screenshot-" + now_to_filestring() + ".png";
                 m_session.logger().log("Saving screenshot to: " + filename, COLOR_PURPLE);
                 image->save(filename);
             });

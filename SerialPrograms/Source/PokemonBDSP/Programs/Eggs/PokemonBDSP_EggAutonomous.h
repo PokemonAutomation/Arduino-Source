@@ -60,7 +60,7 @@ private:
     };
     EnumDropdownOption<AutoSave> AUTO_SAVING;
     
-    Pokemon::StatsHuntIvJudgeFilterTable FILTERS;
+    Pokemon::StatsHuntIvJudgeFilterTable FILTERS0;
 
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationOption NOTIFICATION_NONSHINY_KEEP;

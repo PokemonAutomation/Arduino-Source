@@ -15,7 +15,7 @@
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_ScalarButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_AreaZeroSkyDetector.h"
 #include "PokemonSV/Programs/PokemonSV_AreaZero.h"
@@ -140,6 +140,7 @@ NavigatePlatformSettings::NavigatePlatformSettings()
 
 void inside_zero_gate_to_platform(
     const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    bool flying_unlocked,
     NavigatePlatformSettings& settings
 ){
     inside_zero_gate_to_station(info, console, context, 2, settings.HEAL_AT_STATION);
@@ -199,7 +200,11 @@ void inside_zero_gate_to_platform(
     pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
     ssf_press_button(context, BUTTON_LCLICK, 0, 500);
-    ssf_press_left_joystick(context, 128, 0, 125, 1250);
+    if (!flying_unlocked){
+        ssf_press_left_joystick(context, 128, 0, 125, 1250);
+    }else{
+        ssf_press_left_joystick(context, 128, 0, 125, 875);
+    }
 
     //  Jump
     ssf_press_button(context, BUTTON_B, 125, 100);
@@ -208,9 +213,22 @@ void inside_zero_gate_to_platform(
     ssf_press_button(context, BUTTON_B, 0, 20, 10); //  Double up this press in
     ssf_press_button(context, BUTTON_B, 0, 20);     //  case one is dropped.
 
-    pbf_move_left_joystick(context, 144, 0, 700, 0);
-    pbf_move_left_joystick(context, 128, 0, 125, settings.MIDAIR_PAUSE_TIME);
-    pbf_move_left_joystick(context, 128, 0, 875, 250);
+    if (!flying_unlocked){
+//        ssf_press_left_joystick(context, 128, 0, 375, 875);
+        pbf_move_left_joystick(context, 144, 0, 700, 0);
+        pbf_move_left_joystick(context, 128, 0, 125, settings.MIDAIR_PAUSE_TIME);
+        pbf_move_left_joystick(context, 128, 0, 875, 250);
+    }else{
+//        ssf_press_button(context, BUTTON_B, 0, 20);
+//        pbf_move_left_joystick(context, 128, 0, 375, 250);
+        pbf_move_left_joystick(context, 164, 0, 125, settings.MIDAIR_PAUSE_TIME);
+        pbf_press_button(context, BUTTON_LCLICK, 50, 0);
+        ssf_press_right_joystick(context, 128, 255, 0, 1500);
+        pbf_move_left_joystick(context, 128, 255, 1550, 125);
+
+        pbf_press_button(context, BUTTON_B, 125, 375);
+
+    }
 #endif
 
 //    context.wait_for_all_requests();

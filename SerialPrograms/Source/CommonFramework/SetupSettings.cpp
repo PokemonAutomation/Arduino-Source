@@ -6,15 +6,25 @@
 
 #include <QFile>
 #include <QMessageBox>
+#include <QApplication>
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+    #if QT_CONFIG(permissions)
+        #include <QPermissions>
+    #endif
+#endif
 #include "Globals.h"
 #include "GlobalSettingsPanel.h"
 #include "SetupSettings.h"
+
+#include <iostream>
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 
 bool migrate_settings(Logger& logger, std::string file_name){
     QFile root_file(QString::fromStdString(file_name));
-    QFile folder_file(QString::fromStdString(SETTINGS_PATH + file_name));
+    QFile folder_file(QString::fromStdString(SETTINGS_PATH() + file_name));
 
     logger.log("Checking settings configuration...");
 
@@ -41,7 +51,7 @@ bool migrate_settings(Logger& logger, std::string file_name){
             "Settings Migrated!",
             QString::fromStdString(
                 "Detected a settings file at the old location used by version 0.29 and earlier.<br>"
-                "It has been automatically moved into the \"" + SETTINGS_PATH + "\" folder."
+                "It has been automatically moved into the \"" + SETTINGS_PATH() + "\" folder."
             )
         );
         return true;
@@ -107,7 +117,7 @@ bool migrate_stats(Logger& logger){
             "Settings Migrated!",
             QString::fromStdString(
                 "Detected a stats file at the old location used by version 0.29 and earlier.<br>"
-                "It has been automatically moved into the \"" + SETTINGS_PATH + "\" folder."
+                "It has been automatically moved into the \"" + SETTINGS_PATH() + "\" folder."
             )
         );
         return true;
@@ -134,6 +144,57 @@ bool migrate_stats(Logger& logger){
     return true;
 }
 
+
+void set_permissions(QObject& object){
+#if defined(__APPLE__)
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+#if QT_CONFIG(permissions)
+    cout << "Chcecking MacOS Permissions..." << endl;
+    QCameraPermission camera_permission;
+    switch(qApp->checkPermission(camera_permission)){
+    case Qt::PermissionStatus::Undetermined:
+        cout << "Camera permission undetermined" << endl;
+        qApp->requestPermission(camera_permission, &object, [](const QPermission &permission){
+            cout << "camera request is ready!" << endl;
+        });
+        cout << "Requested Camera permission" << endl;
+        break;
+    case Qt::PermissionStatus::Denied:
+        cout << "No camera permission found" << endl;
+        qApp->requestPermission(camera_permission, &object, [](const QPermission &permission){
+            cout << "camera request is ready!" << endl;
+        });
+        cout << "Requested Camera permission" << endl;
+        break;
+    case Qt::PermissionStatus::Granted:
+        cout << "Camera permission granted" << endl;
+        break;
+    }
+
+    QMicrophonePermission microphone_permission;
+    switch(qApp->checkPermission(microphone_permission)){
+    case Qt::PermissionStatus::Undetermined:
+        cout << "Microphone permission undetermined" << endl;
+        qApp->requestPermission(microphone_permission, &object, [](const QPermission &permission){
+            cout << "Microphone request is ready!" << endl;
+        });
+        cout << "Requested microphone permission" << endl;
+        break;
+    case Qt::PermissionStatus::Denied:
+        cout << "No microphone permission found" << endl;
+        qApp->requestPermission(microphone_permission, &object, [](const QPermission &permission){
+            cout << "Microphone request is ready!" << endl;
+        });
+        cout << "Requested microphone permission" << endl;
+        break;
+    case Qt::PermissionStatus::Granted:
+        cout << "Microphone permission granted" << endl;
+        break;
+    }
+#endif
+#endif
+#endif
+}
 
 
 

@@ -12,95 +12,18 @@ jobs:
         os: [windows-2022, macos-12, ubuntu-22.04]
         qt_version: ['5.12.12', '6.3.2', '6.5.2']
         include:
-        # Windows / Qt 5.12.12
-        - os: windows-2022
-          qt_version: '5.12.12'
+        - qt_version: '5.12.12'
           qt_version_major: '5'
-          host: 'windows'
-          cmake_args: '-G "Visual Studio 17 2022"'
-          qt_arch: 'win64_msvc2017_64'
-          qt_arch_path: 'msvc2017_64'
           qt_modules: ''
 
-        # Windows / Qt 6.3.2
-        - os: windows-2022
-          qt_version: '6.3.2'
+        - qt_version: '6.3.2'
           qt_version_major: '6'
-          host: 'windows'
-          cmake_args: '-G "Visual Studio 17 2022"'
-          qt_arch: 'win64_msvc2019_64'
-          qt_arch_path: 'msvc2019_64'
-          qt_modules: '-m qtmultimedia qtserialport'
+          qt_modules: 'qtmultimedia qtserialport'
 
-        # Windows / Qt 6.5.2
-        - os: windows-2022
-          qt_version: '6.5.2'
+        - qt_version: '6.5.2'
           qt_version_major: '6'
-          host: 'windows'
-          cmake_args: '-G "Visual Studio 17 2022"'
-          qt_arch: 'win64_msvc2019_64'
-          qt_arch_path: 'msvc2019_64'
-          qt_modules: '-m qtmultimedia qtserialport'
+          qt_modules: 'qtmultimedia qtserialport'
 
-        # Mac / Qt 5.12.12
-        - os: macos-12
-          qt_version: '5.12.12'
-          qt_version_major: '5'
-          host: 'mac'
-          cmake_args: ''
-          qt_arch: 'clang_64'
-          qt_arch_path: 'clang_64'
-          qt_modules: ''
-
-        # Mac / Qt 6.3.2
-        - os: macos-12
-          qt_version: '6.3.2'
-          qt_version_major: '6'
-          host: 'mac'
-          cmake_args: ''
-          qt_arch: 'clang_64'
-          qt_arch_path: 'macos'
-          qt_modules: '-m qtmultimedia qtserialport'
-
-          # Mac / Qt 6.5.2
-        - os: macos-12
-          qt_version: '6.5.2'
-          qt_version_major: '6'
-          host: 'mac'
-          cmake_args: ''
-          qt_arch: 'clang_64'
-          qt_arch_path: 'macos'
-          qt_modules: '-m qtmultimedia qtserialport'
-
-        # Linux / Qt 5.12.12
-        - os: ubuntu-22.04
-          qt_version: '5.12.12'
-          qt_version_major: '5'
-          host: 'linux'
-          cmake_args: ''
-          qt_arch: gcc_64
-          qt_arch_path: gcc_64
-          qt_modules: ''
-
-        # Linux / Qt 6.3.2
-        - os: ubuntu-22.04
-          qt_version: '6.3.2'
-          qt_version_major: '6'
-          host: 'linux'
-          cmake_args: ''
-          qt_arch: gcc_64
-          qt_arch_path: gcc_64
-          qt_modules: '-m qtmultimedia qtserialport'
-
-          # Linux / Qt 6.5.2
-        - os: ubuntu-22.04
-          qt_version: '6.5.2'
-          qt_version_major: '6'
-          host: 'linux'
-          cmake_args: ''
-          qt_arch: gcc_64
-          qt_arch_path: gcc_64
-          qt_modules: '-m qtmultimedia qtserialport'
     steps:
     - uses: actions/checkout@v3
       with:
@@ -109,38 +32,27 @@ jobs:
       with:
         repository: 'PokemonAutomation/Packages'
         path: Packages
-    - name: Add msbuild to PATH
-      if: startsWith(matrix.os, 'windows')
-      uses: ilammy/msvc-dev-cmd@v1
     - name: Install dependencies
       if: startsWith(matrix.os, 'ubuntu')
       run: |
         sudo apt update
-        sudo apt install mesa-common-dev libglu1-mesa-dev libegl1 libpulse-dev libgstreamer-gl1.0-0 libgstreamer-plugins-base1.0-0 libopencv-dev
+        sudo apt install libopencv-dev
     - name: Install dependencies
       if: startsWith(matrix.os, 'mac')
       run: |
         brew install opencv
     - name: Install Qt
-      run: |
-        python3 -m pip install aqtinstall
-        python3 -m aqt install-qt ${{ matrix.host }} desktop ${{ matrix.qt_version }} ${{ matrix.qt_arch }} ${{ matrix.qt_modules }}
-    - name: Run cmake
+      uses: jurplel/install-qt-action@v3
+      with:
+        version: ${{ matrix.qt_version }}
+        modules: ${{ matrix.qt_modules }}
+    - name: Generate binaries
       run: |
         cd Arduino-Source/SerialPrograms
         mkdir bin
         cd bin
-        cmake .. -DCMAKE_PREFIX_PATH=${{ github.workspace }}/${{ matrix.qt_version }}/${{ matrix.qt_arch_path }} -DQT_MAJOR:STRING=${{ matrix.qt_version_major }} ${{ matrix.cmake_args }}
-    - name: Generate binaries
-      if: startsWith(matrix.os, 'windows')
-      run: |
-        cd Arduino-Source/SerialPrograms/bin
-        MSBuild.exe ./SerialPrograms.vcxproj /p:Configuration=Release /p:Platform=x64
-    - name: Generate binaries
-      if: ${{ !startsWith(matrix.os, 'windows') }}
-      run: |
-        cd Arduino-Source/SerialPrograms/bin
-        cmake --build . -j 10
+        cmake .. -DQT_MAJOR:STRING=${{ matrix.qt_version_major }}
+        cmake --build . --config Release --parallel 10
     - name: Copy resources
       if: startsWith(matrix.os, 'windows')
       run: |

@@ -36,7 +36,7 @@ StatsReset_Descriptor::StatsReset_Descriptor()
         "PokemonSV:StatsReset",
         STRING_POKEMON + " SV", "Stats Reset",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSV/StatsReset.md",
-        "Repeatedly catch the Treasures of Ruin or Loyal Three until you get the stats you want.",
+        "Repeatedly catch static encounters until you get the stats you want.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB
@@ -67,15 +67,17 @@ std::unique_ptr<StatsTracker> StatsReset_Descriptor::make_stats() const {
 }
 StatsReset::StatsReset()
     : TARGET(
-        "<b>Target:</b><br>The Pokemon you are resetting for.<br>"
-        "Treasures of Ruin: Stand in front of the unsealed vaults of one of the Ruinous Quartet.<br>"
-        "Loyal Three: Stand in front of Okidogi/Munkidori/Fezandipiti.<br>"
+        "<b>Target:</b><br>The Pokemon you are resetting for.",
+        //"Treasures of Ruin: Stand in front of the unsealed vaults of one of the Ruinous Quartet.<br>"
+        //"Loyal Three: Stand in front of Okidogi/Munkidori/Fezandipiti.<br>"
+        //"Snacksworth Legendary: After unlocking a legendary from Snacksworth, stand in front of it.<br>"
         //"Generic: You are standing in front of a Pokemon that requires an A press to initiate battle.<br>",
-        "Gimmighoul: Stand in front of a Gimmighoul chest.<br>",
+        //"Gimmighoul: Stand in front of a Gimmighoul chest.<br>",
         {
             {Target::TreasuresOfRuin, "treasures-of-ruin", "Treasures of Ruin"},
             {Target::LoyalThree, "loyal-three", "Loyal Three"},
-            {Target::Generic, "generic", "Gimmighoul"},
+            {Target::Snacksworth, "snacksworth", "Snacksworth Legendaries + Meloetta"},
+            {Target::Generic, "generic", "Indigo Disk Paradoxes (nature only) + Gimmighoul"},
         },
         LockMode::LOCK_WHILE_RUNNING,
         Target::TreasuresOfRuin
@@ -157,6 +159,11 @@ void StatsReset::enter_battle(SingleSwitchProgramEnvironment& env, BotBaseContex
     case Target::LoyalThree:
         //Mash through dialog box
         pbf_mash_button(context, BUTTON_B, 1300);
+        context.wait_for_all_requests();
+        break;
+    case Target::Snacksworth:
+        //The same as generic, but Snacksworth legendaries are not in the dex and skip the caught/summary/add to party menu.
+        pbf_mash_button(context, BUTTON_B, 90);
         context.wait_for_all_requests();
         break;
     case Target::Generic:
@@ -459,16 +466,25 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext&
 
     switch (ret) {
     case 0:
-        env.log("Advance Dialog detected. Either caught target or lost battle.");
+        //Non-Snack: dialog appears on caught screen.
+        //Snack: "target fled somewhere..."
+        //Lost battle: joy dialog
+        env.log("Advance Dialog detected. Caught regular target, lost battle, or fainted Snacksworth.");
         target_fainted = false;
         break;
     case 1:
-        env.log("Overworld detected, target Pokemon fainted.");
-        send_program_status_notification(
-            env, NOTIFICATION_STATUS_UPDATE,
-            "Overworld detected, target Pokemon fainted."
-        );
-        target_fainted = true;
+        if (TARGET == Target::Snacksworth) {
+            env.log("Overworld detected. Snacksworth legendary caught, checking box system.");
+            target_fainted = false;
+        }
+        else {
+            env.log("Overworld detected, target Pokemon fainted.");
+            send_program_status_notification(
+                env, NOTIFICATION_STATUS_UPDATE,
+                "Overworld detected, target Pokemon fainted."
+            );
+            target_fainted = true;
+        }
         break;
     default:
         if (out_of_balls) {
@@ -519,13 +535,12 @@ bool StatsReset::check_stats(SingleSwitchProgramEnvironment& env, BotBaseContext
         switch (action) {
         case StatsHuntAction::StopProgram:
             match = true;
+
+            pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
+
             env.console.log("Match found!");
             stats.matches++;
             env.update_stats();
-            send_program_status_notification(
-                env, NOTIFICATION_PROGRAM_FINISH,
-                "Match found!"
-            );
             break;
         case StatsHuntAction::Discard:
             match = false;
@@ -604,8 +619,12 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
         }
     }
     env.update_stats();
+    auto screenshot = env.console.video().snapshot();
+    send_program_finished_notification(
+        env, NOTIFICATION_PROGRAM_FINISH,
+        "Match found!", screenshot, true
+    );
     GO_HOME_WHEN_DONE.run_end_of_program(context);
-    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 }
     
 }

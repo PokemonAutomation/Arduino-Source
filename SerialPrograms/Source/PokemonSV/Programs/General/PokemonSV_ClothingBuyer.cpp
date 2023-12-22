@@ -83,6 +83,9 @@ void ClothingBuyer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
 
         AdvanceDialogWatcher already_purchased(COLOR_RED);
         PromptDialogWatcher buy_yes_no(COLOR_CYAN);
+        PromptDialogWatcher hairstyle_purchase_prompt(COLOR_RED);
+        int retP = 0;
+        bool incompatible_hairstyle = false;
 
         int ret = wait_until(
             env.console, context,
@@ -91,17 +94,30 @@ void ClothingBuyer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         );
         switch (ret) {
         case 0:
-                env.log("Item already purchased.");
+                env.log("Item already purchased or incompatible hairstyle.");
                 pbf_press_button(context, BUTTON_A, 10, 100);
-                send_program_status_notification(
-                    env, NOTIFICATION_STATUS_UPDATE,
-                    "Item already purchased."
+
+                retP = wait_until(
+                    env.console, context,
+                    std::chrono::seconds(2),
+                    { hairstyle_purchase_prompt }
                 );
-                break;
+                if (retP != 0) {
+                    env.log("Item already purchased.");
+                    send_program_status_notification(
+                        env, NOTIFICATION_STATUS_UPDATE,
+                        "Item already purchased."
+                    );
+                    break;
+                }
+                env.log("Incompatible hairstyle. Proceed to purchase.");
+                incompatible_hairstyle = true;
         case 1:
         {
             PromptDialogWatcher wear_yes_no(COLOR_CYAN);
             AdvanceDialogWatcher afford_yes_no(COLOR_RED);
+            AdvanceDialogWatcher afford_yes_no_hairstyle(COLOR_RED);
+            int retHairstyle;
 
             env.log("Detected purchase prompt.");
 
@@ -137,12 +153,30 @@ void ClothingBuyer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
                 );
                 break;
             case 1:
-                env.log("Out of Cash/LP.");
-                send_program_status_notification(
-                    env, NOTIFICATION_STATUS_UPDATE,
-                    "Out of Cash/LP."
-                );
-                finish_program = true;
+                if (!incompatible_hairstyle) {
+                    env.log("Out of Cash/LP.");
+                    send_program_status_notification(
+                        env, NOTIFICATION_STATUS_UPDATE,
+                        "Out of Cash/LP."
+                    );
+                    finish_program = true;
+                }
+                else {
+                    pbf_press_button(context, BUTTON_A, 10, 100);
+                    retHairstyle = wait_until(
+                        env.console, context,
+                        std::chrono::seconds(2),
+                        { afford_yes_no_hairstyle }
+                    );
+                    if (retHairstyle == 0) {
+                        env.log("Out of Cash/LP.");
+                        send_program_status_notification(
+                            env, NOTIFICATION_STATUS_UPDATE,
+                            "Out of Cash/LP."
+                        );
+                        finish_program = true;
+                    }
+                }
                 break;
             default:
                 env.log("Error looking for wear prompt.");
@@ -169,6 +203,7 @@ void ClothingBuyer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
             break;
         }
 
+        env.log("Moving on to next item.");
         pbf_press_dpad(context, DPAD_DOWN, 10, 100);
         //Wait to load a bit for next item
         pbf_wait(context, 100);

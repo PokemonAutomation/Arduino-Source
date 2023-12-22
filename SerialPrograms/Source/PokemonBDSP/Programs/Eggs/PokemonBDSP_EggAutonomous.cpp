@@ -90,7 +90,7 @@ EggAutonomous::EggAutonomous()
         LockMode::LOCK_WHILE_RUNNING,
         AutoSave::AfterStartAndKeep
     )
-    , FILTERS(
+    , FILTERS0(
         StatsHuntIvJudgeFilterTable_Label_Eggs,
         {
             .action = true,
@@ -136,7 +136,7 @@ EggAutonomous::EggAutonomous()
     PA_ADD_OPTION(TRAVEL_TIME_PER_FETCH);
     PA_ADD_OPTION(NUM_EGGS_IN_COLUMN);
     PA_ADD_OPTION(AUTO_SAVING);
-    PA_ADD_OPTION(FILTERS);
+    PA_ADD_OPTION(FILTERS0);
     PA_ADD_OPTION(NOTIFICATIONS);
     PA_ADD_STATIC(m_advanced_options);
     PA_ADD_OPTION(SCROLL_TO_READ_DELAY);
@@ -196,7 +196,7 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         LANGUAGE,
         SHORTCUT,
         TRAVEL_TIME_PER_FETCH,
-        FILTERS,
+        FILTERS0,
         MAX_KEEPERS,
         static_cast<uint8_t>(NUM_EGGS_IN_COLUMN.current_value())
     );

@@ -94,6 +94,11 @@ DiscordIntegrationSettingsOption::DiscordIntegrationSettingsOption()
         LockMode::LOCK_WHILE_RUNNING,
         "", "123456789012345678"
     )
+    , allow_buttons_from_users(
+        "<b>Allow Buttons from Users:</b><br>Allow other users to issue button presses.",
+        LockMode::LOCK_WHILE_RUNNING,
+        false
+    )
 {
     PA_ADD_OPTION(run_on_start);
     PA_ADD_OPTION(library0);
@@ -105,6 +110,7 @@ DiscordIntegrationSettingsOption::DiscordIntegrationSettingsOption()
     PA_ADD_OPTION(hello_message);
     PA_ADD_OPTION(sudo);
     PA_ADD_OPTION(owner);
+    PA_ADD_OPTION(allow_buttons_from_users);
     PA_ADD_OPTION(channels);
 
     DiscordIntegrationSettingsOption::value_changed();
@@ -132,6 +138,7 @@ void DiscordIntegrationSettingsOption::value_changed(){
         use_suffix.set_visibility(state);
         sudo.set_visibility(state);
         owner.set_visibility(state);
+        allow_buttons_from_users.set_visibility(ConfigOptionState::HIDDEN);
         break;
     }
 #endif
@@ -145,6 +152,7 @@ void DiscordIntegrationSettingsOption::value_changed(){
         token.set_visibility(state);
         game_status.set_visibility(state);
         hello_message.set_visibility(state);
+        allow_buttons_from_users.set_visibility(state);
 
         command_prefix.set_visibility(state);
         use_suffix.set_visibility(ConfigOptionState::HIDDEN);
@@ -153,6 +161,7 @@ void DiscordIntegrationSettingsOption::value_changed(){
         break;
     }
 #endif
+    default:;
     }
 #endif
 }
@@ -194,7 +203,7 @@ DiscordIntegrationSettingsWidget::DiscordIntegrationSettingsWidget(QWidget& pare
 
     connect(
         button_start, &QPushButton::clicked,
-        this, [&value](bool) {
+        this, [&value](bool){
             switch (value.library0){
 #ifdef PA_SLEEPY
             case DiscordIntegrationSettingsOption::Library::SleepyDiscord:
@@ -206,13 +215,14 @@ DiscordIntegrationSettingsWidget::DiscordIntegrationSettingsWidget(QWidget& pare
                 DppClient::Client::instance().connect();
                 break;
 #endif
+            default:;
             }
             value.value_changed();
         }
     );
     connect(
         button_stop, &QPushButton::clicked,
-        this, [&value](bool) {
+        this, [&value](bool){
             switch (value.library0){
 #ifdef PA_SLEEPY
             case DiscordIntegrationSettingsOption::Library::SleepyDiscord:
@@ -224,6 +234,7 @@ DiscordIntegrationSettingsWidget::DiscordIntegrationSettingsWidget(QWidget& pare
                 DppClient::Client::instance().disconnect();
                 break;
 #endif
+            default:;
             }
             value.value_changed();
         }

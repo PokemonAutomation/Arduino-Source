@@ -7,7 +7,6 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "Pokemon/Pokemon_Strings.h"
-#include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_EggRoutines.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_GameEntry.h"
 #include "PokemonSwSh_EggFetcher2.h"
@@ -26,7 +25,7 @@ EggFetcher2_Descriptor::EggFetcher2_Descriptor()
         "Fetch eggs without hatching them.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_31KB
+        PABotBaseLevel::PABOTBASE_12KB
     )
 {}
 

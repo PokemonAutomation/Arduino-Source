@@ -16,6 +16,8 @@ using std::cout;
 using std::endl;
 
 
+// TODO: let this file use ERROR_PATH() declared in commonFrames/Globals.h.
+
 
 #if _WIN32 && _MSC_VER
 #pragma comment (lib, "Dbghelp.lib")

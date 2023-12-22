@@ -23,6 +23,8 @@ inline WallClock current_time(){
 }
 
 
+uint16_t current_year();
+
 
 }
 #endif

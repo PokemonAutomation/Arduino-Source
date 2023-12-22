@@ -169,7 +169,6 @@ public:
         const StatsHuntMiscFeatureFlags& p_feature_flags
     );
     virtual std::vector<std::string> make_header() const override;
-//    std::vector<std::unique_ptr<EditableTableRow>> make_defaults() const;
 
     StatsHuntAction get_action(
         bool shiny,

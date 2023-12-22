@@ -18,18 +18,27 @@
 namespace PokemonAutomation{
 
 
-
+//  Selectively replace pixels in `image` with the replacement color
+//  according to the respective bits in the binary matrix.
+//  If `replace_zero_bits` is true, replace pixels corresponding to the zero bits.
+//  Else, replace those with the one bits.
 void filter_by_mask(
     const PackedBinaryMatrix& matrix,
     ImageRGB32& image,
-    Color replace_with,
-    bool replace_if_zero    //  If false, replace if one.
+    Color replacement_color,
+    bool replace_zero_bits
 );
+//  Selectively replace pixels in an area of the `image` with the replacement color
+//  according to the respective bits in the binary matrix.
+//  If `replace_zero_bits` is true, replace pixels corresponding to the zero bits.
+//  Else, replace those with the one bits.
+//  The image area starts at (offset_x, offset_y) with the same (width, height) as
+//  the matrix. 
 void filter_by_mask(
     const PackedBinaryMatrix& matrix,
     ImageRGB32& image, size_t offset_x, size_t offset_y,
-    Color replace_with,
-    bool replace_if_zero    //  If false, replace if one.
+    Color replacement_color,
+    bool replace_zero_bits
 );
 
 
