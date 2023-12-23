@@ -12,6 +12,7 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
+#include "PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h"
 #include "PokemonSV_FlyingTrailFarmer.h"
 
 namespace PokemonAutomation{
@@ -34,7 +35,7 @@ FlyingTrailFarmer_Descriptor::FlyingTrailFarmer_Descriptor()
 {}
 struct FlyingTrailFarmer_Descriptor::Stats : public StatsTracker{
     Stats()
-        : m_trials(m_stats["Trialss"])
+        : m_trials(m_stats["Trials"])
     {
         m_display_order.emplace_back("Trials");
     }
