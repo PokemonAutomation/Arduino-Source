@@ -69,7 +69,7 @@ BoxSorting_Descriptor::BoxSorting_Descriptor()
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB
-    )
+        )
 {}
 struct BoxSorting_Descriptor::Stats : public StatsTracker{
     Stats()
@@ -97,35 +97,35 @@ BoxSorting::BoxSorting()
         "<b>Number of boxes to order:</b>",
         LockMode::LOCK_WHILE_RUNNING,
         1, 1, MAX_BOXES
-    )
+        )
     , VIDEO_DELAY(
-        "<b>Delay of your capture card (you probably have to increase this):</b>",
-        LockMode::LOCK_WHILE_RUNNING,
-        20
-    )
+          "<b>Delay of your capture card (you probably have to increase this):</b>",
+          LockMode::LOCK_WHILE_RUNNING,
+          20
+          )
     , GAME_DELAY(
-        "<b>Delay of your Pokemon Home app (default value should be fine):</b>",
-        LockMode::LOCK_WHILE_RUNNING,
-        10
-    )
+          "<b>Delay of your Pokemon Home app (default value should be fine):</b>",
+          LockMode::LOCK_WHILE_RUNNING,
+          15
+          )
     , SORT_TABLE(
-        "<b>Sort Order Rules:</b><br>Sort order rules will be applied top to bottom."
-    )
+          "<b>Sort Order Rules:</b><br>Sort order rules will be applied top to bottom."
+          )
     , OUTPUT_FILE(
-        false,
-        "<b>Output File:</b><br>JSON file for output of storage boxes.",
-        LockMode::LOCK_WHILE_RUNNING,
-        "box_order",
-        "box_order"
-    )
+          false,
+          "<b>Output File:</b><br>JSON file for output of storage boxes.",
+          LockMode::LOCK_WHILE_RUNNING,
+          "box_order",
+          "box_order"
+          )
     , DRY_RUN(
-        "<b>Dry Run:</b><br>Catalogue and make sort plan without executing. (Will output to OUTPUT_FILE and OUTPUT_FILE.sortplan)",
-        LockMode::LOCK_WHILE_RUNNING,
-        false
-      )
+          "<b>Dry Run:</b><br>Catalogue and make sort plan without executing. (Will output to OUTPUT_FILE and OUTPUT_FILE.sortplan)",
+          LockMode::LOCK_WHILE_RUNNING,
+          false
+          )
     , NOTIFICATIONS({
-        &NOTIFICATION_PROGRAM_FINISH
-    })
+          &NOTIFICATION_PROGRAM_FINISH
+      })
 {
     PA_ADD_OPTION(BOX_NUMBER); //number of box to check and sort
     PA_ADD_OPTION(VIDEO_DELAY); //delay for every input that need video feedback, user will be able to modify this to enhance capture card delay compatibility
@@ -139,9 +139,9 @@ BoxSorting::BoxSorting()
 
 
 struct Cursor{
-  size_t box;
-  size_t row;
-  size_t column;
+    size_t box;
+    size_t row;
+    size_t column;
 };
 
 std::ostream& operator<<(std::ostream& os, const Cursor& cursor){
@@ -183,10 +183,10 @@ struct Pokemon{
 bool operator==(const Pokemon& lhs, const Pokemon& rhs){
     // NOTE edit when adding new struct members
     return lhs.national_dex_number == rhs.national_dex_number &&
-        lhs.shiny == rhs.shiny &&
-        lhs.gmax == rhs.gmax &&
-        lhs.ball_slug == rhs.ball_slug &&
-        lhs.gender == rhs.gender;
+           lhs.shiny == rhs.shiny &&
+           lhs.gmax == rhs.gmax &&
+           lhs.ball_slug == rhs.ball_slug &&
+           lhs.gender == rhs.gender;
 }
 
 bool operator<(const std::optional<Pokemon>& lhs, const std::optional<Pokemon>& rhs){
@@ -199,39 +199,39 @@ bool operator<(const std::optional<Pokemon>& lhs, const std::optional<Pokemon>& 
 
     for (const BoxSortingSelection preference : *lhs->preferences){
         switch(preference.sort_type) {
-            // NOTE edit when adding new struct members
-            // TODO TESTING and account for preference.reverse
-            case BoxSortingSortType::NationalDexNo:
-                if (lhs->national_dex_number != rhs->national_dex_number){
-                    return lhs->national_dex_number < rhs->national_dex_number;
-                }
-                break;
-            case BoxSortingSortType::Shiny:
-                if (lhs->shiny != rhs->shiny){
-                     return lhs->shiny;
-                 }
-                break;
-            case BoxSortingSortType::Gigantamax:
-                if (lhs->gmax != rhs->gmax){
-                    return lhs->gmax;
-                }
-                break;
-            case BoxSortingSortType::Ball_Slug:
-                if (lhs->ball_slug < rhs->ball_slug){
-                    return true;
-                }
-                if (lhs->ball_slug > rhs->ball_slug){
-                    return false;
-                }
-                break;
-            case BoxSortingSortType::Gender:
-                if (lhs->gender < rhs->gender){
-                    return true;
-                }
-                if (lhs->gender > rhs->gender){
-                    return false;
-                }
-                break;
+        // NOTE edit when adding new struct members
+        // TODO TESTING and account for preference.reverse
+        case BoxSortingSortType::NationalDexNo:
+            if (lhs->national_dex_number != rhs->national_dex_number){
+                return lhs->national_dex_number < rhs->national_dex_number;
+            }
+            break;
+        case BoxSortingSortType::Shiny:
+            if (lhs->shiny != rhs->shiny){
+                return lhs->shiny;
+            }
+            break;
+        case BoxSortingSortType::Gigantamax:
+            if (lhs->gmax != rhs->gmax){
+                return lhs->gmax;
+            }
+            break;
+        case BoxSortingSortType::Ball_Slug:
+            if (lhs->ball_slug < rhs->ball_slug){
+                return true;
+            }
+            if (lhs->ball_slug > rhs->ball_slug){
+                return false;
+            }
+            break;
+        case BoxSortingSortType::Gender:
+            if (lhs->gender < rhs->gender){
+                return true;
+            }
+            if (lhs->gender > rhs->gender){
+                return false;
+            }
+            break;
         }
     }
 
@@ -325,19 +325,19 @@ bool go_to_first_slot(SingleSwitchProgramEnvironment& env, BotBaseContext& conte
     // direct nav up or down through rows
     if (!(cur_cursor.row == 0 && dest_cursor.row == 4) && !(dest_cursor.row == 0 && cur_cursor.row == 4)) {
         for (size_t i = cur_cursor.row; i < dest_cursor.row; ++i){
-            pbf_press_dpad(context, DPAD_DOWN, 1, GAME_DELAY);
+            pbf_press_dpad(context, DPAD_DOWN, 10, GAME_DELAY);
         }
         for (size_t i = dest_cursor.row; i < cur_cursor.row; ++i){
-            pbf_press_dpad(context, DPAD_UP, 1, GAME_DELAY);
+            pbf_press_dpad(context, DPAD_UP, 10, GAME_DELAY);
         }
     } else { // wrap around is faster to move between first or last row
         if (cur_cursor.row == 0 && dest_cursor.row == 4) {
             for (size_t i = 0; i <= 2; ++i){
-                pbf_press_dpad(context, DPAD_UP, 1, GAME_DELAY);
+                pbf_press_dpad(context, DPAD_UP, 10, GAME_DELAY);
             }
         } else {
             for (size_t i = 0; i <= 2; ++i){
-                pbf_press_dpad(context, DPAD_DOWN, 1, GAME_DELAY);
+                pbf_press_dpad(context, DPAD_DOWN, 10, GAME_DELAY);
             }
         }
     }
@@ -345,20 +345,20 @@ bool go_to_first_slot(SingleSwitchProgramEnvironment& env, BotBaseContext& conte
     // direct nav forward or backward through columns
     if ((dest_cursor.column > cur_cursor.column && dest_cursor.column - cur_cursor.column <= 3) || (cur_cursor.column > dest_cursor.column && cur_cursor.column - dest_cursor.column <= 3)) {
         for (size_t i = cur_cursor.column; i < dest_cursor.column; ++i){
-            pbf_press_dpad(context, DPAD_RIGHT, 1, GAME_DELAY);
+            pbf_press_dpad(context, DPAD_RIGHT, 10, GAME_DELAY);
         }
         for (size_t i = dest_cursor.column; i < cur_cursor.column; ++i){
-            pbf_press_dpad(context, DPAD_LEFT, 1, GAME_DELAY);
+            pbf_press_dpad(context, DPAD_LEFT, 10, GAME_DELAY);
         }
     } else { // wrap around is faster if direct movement is more than 3 away
         if (dest_cursor.column > cur_cursor.column) {
             for (size_t i = 0; i < MAX_COLUMNS - (dest_cursor.column - cur_cursor.column); ++i){
-                pbf_press_dpad(context, DPAD_LEFT, 1, GAME_DELAY);
+                pbf_press_dpad(context, DPAD_LEFT, 10, GAME_DELAY);
             }
         }
         if (cur_cursor.column > dest_cursor.column) {
             for (size_t i = 0; i < MAX_COLUMNS - (cur_cursor.column - dest_cursor.column); ++i){
-                pbf_press_dpad(context, DPAD_RIGHT, 1, GAME_DELAY);
+                pbf_press_dpad(context, DPAD_RIGHT, 10, GAME_DELAY);
             }
         }
     }
@@ -399,14 +399,14 @@ void output_boxes_data_json(const std::vector<std::optional<Pokemon>>& boxes_dat
 }
 
 void do_sort(
-        SingleSwitchProgramEnvironment& env,
-        BotBaseContext& context,
-        std::vector<std::optional<Pokemon>> boxes_data,
-        std::vector<std::optional<Pokemon>> boxes_sorted,
-        BoxSorting_Descriptor::Stats& stats,
-        Cursor& cur_cursor,
-        uint16_t GAME_DELAY
-        ) {
+    SingleSwitchProgramEnvironment& env,
+    BotBaseContext& context,
+    std::vector<std::optional<Pokemon>> boxes_data,
+    std::vector<std::optional<Pokemon>> boxes_sorted,
+    BoxSorting_Descriptor::Stats& stats,
+    Cursor& cur_cursor,
+    uint16_t GAME_DELAY
+    ) {
     std::ostringstream ss;
     // this need to be separated into functions when I will redo the whole thing but I just wanted it to work
 
@@ -504,7 +504,7 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
         env.console.log("Color detected from the select square: " + image_value.to_string());
         if(image_value.r <= image_value.g + image_value.b){
             for (int i = 0; i < 2; ++i){
-                pbf_press_button(context, BUTTON_ZR, 10, VIDEO_DELAY+20); //additional delay because this animation is slower than the rest
+                pbf_press_button(context, BUTTON_ZR, 10, VIDEO_DELAY+30); //additional delay because this animation is slower than the rest
                 context.wait_for_all_requests();
                 screen = env.console.video().snapshot();
                 image_value = image_stats(extract_box_reference(screen, select_check)).average;
@@ -522,25 +522,34 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
 
     box_render.clear();
 
+    Cursor dest_cursor;
+    std::vector<size_t> first_poke_slot;
+    Cursor nav_cursor = {0, 0, 0};
+    bool find_first_poke;
+
     //cycle through each box
     for (size_t box_nb = 0; box_nb < BOX_NUMBER; box_nb++){
 
         if(box_nb != 0){
             pbf_press_button(context, BUTTON_R, 10, VIDEO_DELAY+100);
             context.wait_for_all_requests();
+        } else {
+            // Moving the cursor until it goes to the first slot
+            if(!go_to_first_slot(env, context, VIDEO_DELAY)){
+                env.console.log("ERROR: Could not move cursor to the first slot, please consider adjusting delay\n", COLOR_RED);
+                return;
+            }
+            context.wait_for_all_requests();
         }
 
-        // Moving the cursor until it goes to the first slot
-        if(!go_to_first_slot(env, context, VIDEO_DELAY)){
-            env.console.log("ERROR: Could not move cursor to the first slot, please consider adjusting delay\n", COLOR_RED);
-            return;
-        }
-        context.wait_for_all_requests();
         screen = env.console.video().snapshot();
 
         // Box grid to find empty slots (red boxes) and fill boxes_data with value to check or not for pokemon dex number
 
         ss << "\n";
+
+        first_poke_slot = {0, 0};
+        find_first_poke = false;
 
         for (size_t row = 0; row < MAX_ROWS; row++){
 
@@ -559,6 +568,10 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
                     boxes_data.push_back(std::nullopt); //empty optional to make sorting easier later
                     ss << "\u274c " ;    //  "X"
                 }else{
+                    if(find_first_poke == false){
+                        first_poke_slot = {column, row};
+                        find_first_poke = true;;
+                    }
                     box_render.add(COLOR_GREEN, slot_box);
                     stats.pkmn++;
                     env.update_stats();
@@ -566,7 +579,7 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
                         Pokemon{
                             .preferences = &sort_preferences
                         }
-                    ); //default initialised pokemon to know there is a pokemon here that needs a value
+                        ); //default initialised pokemon to know there is a pokemon here that needs a value
                     ss << "\u2705 " ;    //  checkbox
                 }
             }
@@ -576,123 +589,114 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
         env.console.log(ss.str());
         ss.str("");
 
-        bool find_first_poke = false;
-
-        //cycling though each slot of the box in order to find the first pokemon to enter the summary
-
-        for (size_t row = 0; row < MAX_ROWS; row++){
-            for (size_t column = 0; column < MAX_COLUMNS; column++){
-                if(boxes_data[get_index(box_nb, row, column)].has_value()){
-                    find_first_poke = true;
-                }
-                if(!find_first_poke){
-                    pbf_press_dpad(context, DPAD_RIGHT, 10, GAME_DELAY);
-                }
-            }
-            if(!find_first_poke){
-                pbf_press_dpad(context, DPAD_DOWN, 10, GAME_DELAY);
-            }
-        }
+        // moving cursor to the first pokemon slot
+        dest_cursor = {0, first_poke_slot[1], first_poke_slot[0]};
+        nav_cursor = move_cursor_to(env, context, nav_cursor, dest_cursor, GAME_DELAY);
 
         //enter the summary screen
-        pbf_press_button(context, BUTTON_A, 10, GAME_DELAY);
-        context.wait_for_all_requests();
-        box_render.clear();
-        pbf_press_dpad(context, DPAD_DOWN, 10, GAME_DELAY);
-        pbf_press_button(context, BUTTON_A, 10, VIDEO_DELAY+150);
-        context.wait_for_all_requests();
+        if (find_first_poke == true){
+            pbf_press_button(context, BUTTON_A, 10, GAME_DELAY);
+            context.wait_for_all_requests();
+            box_render.clear();
+            pbf_press_dpad(context, DPAD_DOWN, 10, GAME_DELAY);
+            pbf_press_button(context, BUTTON_A, 10, VIDEO_DELAY+150);
+            context.wait_for_all_requests();
 
-        box_render.add(COLOR_RED, national_dex_number_box);
-        box_render.add(COLOR_BLUE, shiny_symbol_box);
-        box_render.add(COLOR_GREEN, gmax_symbol_box);
-        box_render.add(COLOR_DARKGREEN, origin_symbol_box);
-        box_render.add(COLOR_DARK_BLUE, pokemon_box);
-        box_render.add(COLOR_RED, level_box);
-        box_render.add(COLOR_RED, ot_id_box);
-        box_render.add(COLOR_RED, ot_box);
-        box_render.add(COLOR_RED, nature_box);
-        box_render.add(COLOR_RED, ability_box);
+            box_render.add(COLOR_RED, national_dex_number_box);
+            box_render.add(COLOR_BLUE, shiny_symbol_box);
+            box_render.add(COLOR_GREEN, gmax_symbol_box);
+            box_render.add(COLOR_DARKGREEN, origin_symbol_box);
+            box_render.add(COLOR_DARK_BLUE, pokemon_box);
+            box_render.add(COLOR_RED, level_box);
+            box_render.add(COLOR_RED, ot_id_box);
+            box_render.add(COLOR_RED, ot_box);
+            box_render.add(COLOR_RED, nature_box);
+            box_render.add(COLOR_RED, ability_box);
 
-        //cycle through each summary of the current box and fill pokemon information
-        for (size_t row = 0; row < MAX_ROWS; row++){
-            for (size_t column = 0; column < MAX_COLUMNS; column++){
+            //cycle through each summary of the current box and fill pokemon information
+            for (size_t row = 0; row < MAX_ROWS; row++){
+                for (size_t column = 0; column < MAX_COLUMNS; column++){
 
-                if(boxes_data[get_index(box_nb, row, column)].has_value()){
-                    screen = env.console.video().snapshot();
-                    ImageRGB32 image = to_blackwhite_rgb32_range(
-                        extract_box_reference(screen, national_dex_number_box),
-                        0xff808080, 0xffffffff, true
-                    );
+                    if(boxes_data[get_index(box_nb, row, column)].has_value()){
+                        screen = env.console.video().snapshot();
+                        ImageRGB32 image = to_blackwhite_rgb32_range(
+                            extract_box_reference(screen, national_dex_number_box),
+                            0xff808080, 0xffffffff, true
+                            );
 
-                    int national_dex_number = OCR::read_number(env.console, image);
-                    if (national_dex_number == -1){
-                        dump_image(env.console, ProgramInfo(), "ReadSummary", screen);
+                        int national_dex_number = OCR::read_number(env.console, image);
+                        if (national_dex_number == -1){
+                            dump_image(env.console, ProgramInfo(), "ReadSummary", screen);
+                        }
+                        boxes_data[get_index(box_nb, row, column)]->national_dex_number = national_dex_number;
+
+                        int shiny_stddev_value = image_stddev(extract_box_reference(screen, shiny_symbol_box)).sum();
+                        bool is_shiny = shiny_stddev_value > 30;
+                        boxes_data[get_index(box_nb, row, column)]->shiny = is_shiny;
+                        env.console.log("Shiny detection stddev:" + std::to_string(shiny_stddev_value) + " is shiny:" + std::to_string(is_shiny));
+
+                        int gmax_stddev_value = image_stddev(extract_box_reference(screen, gmax_symbol_box)).sum();
+                        bool is_gmax = gmax_stddev_value > 30;
+                        boxes_data[get_index(box_nb, row, column)]->gmax = is_gmax;
+                        env.console.log("Gmax detection stddev:" + std::to_string(gmax_stddev_value) + " is gmax:" + std::to_string(is_gmax));
+
+                        BallReader ball_reader(env.console);
+                        boxes_data[get_index(box_nb, row, column)]->ball_slug = ball_reader.read_ball(screen);
+
+                        BoxGenderDetector::make_overlays(box_render);
+                        StatsHuntGenderFilter gender = BoxGenderDetector::detect(screen);
+                        env.console.log("Gender: " + gender_to_string(gender), COLOR_GREEN);
+                        boxes_data[get_index(box_nb, row, column)]->gender = gender;
+
+                        image = to_blackwhite_rgb32_range(
+                            extract_box_reference(screen, ot_id_box),
+                            0xff808080, 0xffffffff, true
+                            );
+
+                        int ot_id = OCR::read_number(env.console, image);
+                        if (ot_id == -1){
+                            dump_image(env.console, ProgramInfo(), "ReadSummary", screen);
+                        }
+                        boxes_data[get_index(box_nb, row, column)]->ot_id = ot_id;
+
+                        // NOTE edit when adding new struct members (detections go here likely)
+
+                        // level_box
+                        // ot_box
+                        // nature_box
+                        // ability_box
+
+                        pbf_press_button(context, BUTTON_R, 10, VIDEO_DELAY+15);
+                        context.wait_for_all_requests();
                     }
-                    boxes_data[get_index(box_nb, row, column)]->national_dex_number = national_dex_number;
-
-                    int shiny_stddev_value = image_stddev(extract_box_reference(screen, shiny_symbol_box)).sum();
-                    bool is_shiny = shiny_stddev_value > 30;
-                    boxes_data[get_index(box_nb, row, column)]->shiny = is_shiny;
-                    env.console.log("Shiny detection stddev:" + std::to_string(shiny_stddev_value) + " is shiny:" + std::to_string(is_shiny));
-
-                    int gmax_stddev_value = image_stddev(extract_box_reference(screen, gmax_symbol_box)).sum();
-                    bool is_gmax = gmax_stddev_value > 30;
-                    boxes_data[get_index(box_nb, row, column)]->gmax = is_gmax;
-                    env.console.log("Gmax detection stddev:" + std::to_string(gmax_stddev_value) + " is gmax:" + std::to_string(is_gmax));
-
-                    BallReader ball_reader(env.console);
-                    boxes_data[get_index(box_nb, row, column)]->ball_slug = ball_reader.read_ball(screen);
-
-                    BoxGenderDetector::make_overlays(box_render);
-                    StatsHuntGenderFilter gender = BoxGenderDetector::detect(screen);
-                    env.console.log("Gender: " + gender_to_string(gender), COLOR_GREEN);
-                    boxes_data[get_index(box_nb, row, column)]->gender = gender;
-
-                    image = to_blackwhite_rgb32_range(
-                        extract_box_reference(screen, ot_id_box),
-                        0xff808080, 0xffffffff, true
-                    );
-
-                    int ot_id = OCR::read_number(env.console, image);
-                    if (ot_id == -1){
-                        dump_image(env.console, ProgramInfo(), "ReadSummary", screen);
-                    }
-                    boxes_data[get_index(box_nb, row, column)]->ot_id = ot_id;
-
-                    // NOTE edit when adding new struct members (detections go here likely)
-
-                    // level_box
-                    // ot_box
-                    // nature_box
-                    // ability_box
-
-                    pbf_press_button(context, BUTTON_R, 10, VIDEO_DELAY+15);
-                    context.wait_for_all_requests();
                 }
             }
-        }
 
-        box_render.clear();
+            box_render.clear();
 
-        ss << std::endl;
-
-        // print box information
-        for (size_t row = 0; row < MAX_ROWS; row++){
-            for (size_t column = 0; column < MAX_COLUMNS; column++){
-                ss << boxes_data[get_index(box_nb, row, column)] << " ";
-            }
             ss << std::endl;
+
+            // print box information
+            for (size_t row = 0; row < MAX_ROWS; row++){
+                for (size_t column = 0; column < MAX_COLUMNS; column++){
+                    ss << boxes_data[get_index(box_nb, row, column)] << " ";
+                }
+                ss << std::endl;
+            }
+
+            env.console.log(ss.str());
+            ss.str("");
+
+            //get out of summary with a lot of delay because it's slow for some reasons
+            pbf_press_button(context, BUTTON_B, 10, VIDEO_DELAY+250);
+            box_render.clear();
+            context.wait_for_all_requests();
         }
 
-        env.console.log(ss.str());
-        ss.str("");
-
-        //get out of summary with a lot of delay because it's slow for some reasons
-        pbf_press_button(context, BUTTON_B, 10, VIDEO_DELAY+200);
         box_render.clear();
-        context.wait_for_all_requests();
 
-        go_to_first_slot(env, context, VIDEO_DELAY);
+        dest_cursor = {0, 0, 0};
+        nav_cursor = move_cursor_to(env, context, nav_cursor, dest_cursor, GAME_DELAY);
         context.wait_for_all_requests();
     }
 
