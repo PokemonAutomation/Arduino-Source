@@ -131,7 +131,7 @@ void FlyingTrailFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseCont
         }
         // TODO: Detect success/fail cases based on either the black dialog box or BP number on top right
 
-        stats.m_rounds++;
+        stats.m_trials++;
         env.update_stats();
     }
 
