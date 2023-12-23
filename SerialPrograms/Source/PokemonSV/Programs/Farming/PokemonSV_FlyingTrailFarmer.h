@@ -34,12 +34,8 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
-    void enter_check_mode(ConsoleHandle& console, BotBaseContext& context);
-    void exit_check_mode(ConsoleHandle& console, BotBaseContext& context);
-
-private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
-    SimpleIntegerOption<uint8_t> BOXES_TO_CHECK;
+    SimpleIntegerOption<uint8_t> NUM_TRIALS;
     EventNotificationsOption NOTIFICATIONS;
 };
 

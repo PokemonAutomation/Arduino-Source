@@ -4,19 +4,14 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Inference/BlackScreenDetector.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Tools/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
-#include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
-#include "PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.h"
-#include "PokemonSV/Inference/Boxes/PokemonSV_BoxEggDetector.h"
-#include "PokemonSV/Programs/Boxes/PokemonSV_BoxRoutines.h"
 #include "PokemonSV_FlyingTrailFarmer.h"
 
 namespace PokemonAutomation{
@@ -39,20 +34,11 @@ FlyingTrailFarmer_Descriptor::FlyingTrailFarmer_Descriptor()
 {}
 struct FlyingTrailFarmer_Descriptor::Stats : public StatsTracker{
     Stats()
-        : m_boxes(m_stats["Boxes Checked"])
-        , m_checked(m_stats["Checked"])
-        , m_empty(m_stats["Empty Slots"])
-        , m_eggs(m_stats["Eggs"])
+        : m_trials(m_stats["Trialss"])
     {
-        m_display_order.emplace_back("Boxes Checked");
-        m_display_order.emplace_back("Checked");
-        m_display_order.emplace_back("Empty Slots");
-        m_display_order.emplace_back("Eggs");
+        m_display_order.emplace_back("Trials");
     }
-    std::atomic<uint64_t>& m_boxes;
-    std::atomic<uint64_t>& m_checked;
-    std::atomic<uint64_t>& m_empty;
-    std::atomic<uint64_t>& m_eggs;
+    std::atomic<uint64_t>& m_trials;
 };
 std::unique_ptr<StatsTracker> FlyingTrailFarmer_Descriptor::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
@@ -62,10 +48,10 @@ std::unique_ptr<StatsTracker> FlyingTrailFarmer_Descriptor::make_stats() const{
 
 FlyingTrailFarmer::FlyingTrailFarmer()
     : GO_HOME_WHEN_DONE(false)
-    , BOXES_TO_CHECK(
-        "<b>Number of Boxes to Check:</b>",
-        LockWhileRunning::LOCKED,
-        2, 1, 32
+    , NUM_TRIALS(
+        "<b>Number of Trials to Run (10BP/Trial):</b>",
+        LockMode::LOCK_WHILE_RUNNING,
+        20
     )
     , NOTIFICATIONS({
         &NOTIFICATION_PROGRAM_FINISH,
@@ -73,7 +59,7 @@ FlyingTrailFarmer::FlyingTrailFarmer()
     })
 {
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
-    PA_ADD_OPTION(BOXES_TO_CHECK);
+    PA_ADD_OPTION(NUM_TRIALS);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
@@ -85,65 +71,68 @@ void FlyingTrailFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseCont
     FlyingTrailFarmer_Descriptor::Stats& stats = env.current_stats<FlyingTrailFarmer_Descriptor::Stats>();
 
     //  Connect the controller.
-    pbf_press_button(context, BUTTON_LCLICK, 10, 0);
+    pbf_press_button(context, BUTTON_L, 10, 0);
 
-    // Loop through boxes.
-    for (uint8_t box = 0; box < BOXES_TO_CHECK; box++){
-        enter_check_mode(env.console, context);
+    for (uint8_t i = 0; i < NUM_TRIALS; i++){
+        BlackScreenOverWatcher black_screen(COLOR_RED, { 0.2, 0.2, 0.6, 0.6 });
         context.wait_for_all_requests();
 
-        if (box > 0){
-            move_to_right_box(context);
+        int ret_entry = run_until(
+            env.console, context,
+            [](BotBaseContext& context) {
+                pbf_mash_button(context, BUTTON_A, 10000);
+            },
+            { black_screen }
+        );
+        context.wait_for_all_requests();
+        if (ret_entry == 0) {
+            env.log("Black screen detected. Trail starting.");
         }
+
+        WhiteButtonWatcher whitebutton(COLOR_GREEN, WhiteButton::ButtonY, {0.45, 0.85, 0.10, 0.14});
+        context.wait_for_all_requests();
+        int ret_trial_start = wait_until(
+            env.console, context,
+            std::chrono::seconds(120),
+            {whitebutton}
+        );
+        if (ret_trial_start == 0) {
+            env.log("Countdown is over. Start navigation sequence.");
+            pbf_wait(context,  3 * TICKS_PER_SECOND);
+            pbf_move_left_joystick(context, 200,  30, 1 * TICKS_PER_SECOND, 0); // go through the 2nd ring
+            pbf_wait(context,  2 * TICKS_PER_SECOND);
+            pbf_move_left_joystick(context,  40,  50, 2 * TICKS_PER_SECOND, 0);
+            pbf_wait(context,  1 * TICKS_PER_SECOND);
+            pbf_move_left_joystick(context, 128,  50, 2 * TICKS_PER_SECOND, 0); // adjust vertical height
+            pbf_wait(context,  6 * TICKS_PER_SECOND);
+            pbf_move_left_joystick(context, 115, 128, 1 * TICKS_PER_SECOND, 0); // horizontal angle adjustment, might overshoot in rare cases
+            pbf_wait(context,  7 * TICKS_PER_SECOND);
+            pbf_move_left_joystick(context, 128, 180, 2 * TICKS_PER_SECOND, 0);
+            pbf_wait(context,  780);
+            pbf_move_left_joystick(context,   0, 128, 3 * TICKS_PER_SECOND, 0);
+        }
+
+        OverworldWatcher overworld(COLOR_CYAN);
         context.wait_for_all_requests();
 
-        // Loop through the rows and columns.
-        for (uint8_t row = 0; row < 5; row++){
-            for (uint8_t col = 0; col < 6; col++){
-                enter_check_mode(env.console, context);
-                context.wait_for_all_requests();
-                move_box_cursor(env.program_info(), env.console, context, BoxCursorLocation::SLOTS, row, col);
-
-                SomethingInBoxSlotDetector sth_in_box_detector(COLOR_RED);
-                BoxCurrentEggDetector egg_detector;
-                VideoOverlaySet overlays(env.console.overlay());
-                sth_in_box_detector.make_overlays(overlays);
-                egg_detector.make_overlays(overlays);
-                context.wait_for_all_requests();
-
-                VideoSnapshot screen = env.console.video().snapshot();
-
-                if (!sth_in_box_detector.detect(screen)){
-                    env.console.log("Detected empty cell.");
-                    stats.m_empty++;
-                    env.update_stats();
-                    continue;
+        int ret_finish = run_until(
+            env.console, context,
+            [](BotBaseContext& context) {
+                for (int i = 0; i < 1000; i++){
+                    pbf_mash_button(context, BUTTON_B, 10000);
                 }
-
-                if (egg_detector.detect(screen)){
-                    env.console.log("Detected egg in cell.");
-                    stats.m_eggs++;
-                    env.update_stats();
-                    continue;
-                }
-
-                // Initiate size checking prompt.
-                pbf_press_button(context, BUTTON_A, 20, 20);
-
-                exit_check_mode(env.console, context);
-                context.wait_for_all_requests();
-
-                stats.m_checked++;
-                env.update_stats();
-            }
+            },
+            { overworld }
+        );
+        context.wait_for_all_requests();
+        if (ret_finish == 0) {
+            env.log("Overworld detected. Trail completed.");
         }
+        // TODO: Detect success/fail cases based on either the black dialog box or BP number on top right
 
-        stats.m_boxes++;
+        stats.m_rounds++;
         env.update_stats();
     }
-
-    pbf_press_button(context, BUTTON_B, 20, 20);
-    exit_check_mode(env.console, context);
 
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
     GO_HOME_WHEN_DONE.run_end_of_program(context);
