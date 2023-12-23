@@ -16,6 +16,9 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
+add_custom_target(build-time-make-directory ALL
+    COMMAND ${CMAKE_COMMAND} -E make_directory Assembly/)
+
 #Find threads library
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
@@ -761,9 +764,7 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.cpp
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_Device.h
-    Source/NintendoSwitch/Commands/NintendoSwitch_Messages_DigitEntry.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_PushButtons.h
-    Source/NintendoSwitch/Commands/NintendoSwitch_Messages_Routines.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_Superscalar.h
     Source/NintendoSwitch/DevPrograms/BoxDraw.cpp
     Source/NintendoSwitch/DevPrograms/BoxDraw.h
