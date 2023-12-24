@@ -1,4 +1,4 @@
-/*  Flying Trail Farmer
+/*  Flying Trial Farmer
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
@@ -15,7 +15,7 @@
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h"
-#include "PokemonSV_FlyingTrailFarmer.h"
+#include "PokemonSV_FlyingTrialFarmer.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -24,18 +24,18 @@ namespace PokemonSV{
 using namespace Pokemon;
 
 
-FlyingTrailFarmer_Descriptor::FlyingTrailFarmer_Descriptor()
+FlyingTrialFarmer_Descriptor::FlyingTrialFarmer_Descriptor()
     : SingleSwitchProgramDescriptor(
-        "PokemonSV:FlyingTrailFarmer",
-        STRING_POKEMON + " SV", "Flying Trail Farmer",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSV/FlyingTrailFarmer.md",
-        "Farm the flying trail for BP.",
+        "PokemonSV:FlyingTrialFarmer",
+        STRING_POKEMON + " SV", "Flying Trial Farmer",
+        "ComputerControl/blob/master/Wiki/Programs/PokemonSV/FlyingTrialFarmer.md",
+        "Farm the flying trial for BP.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
-struct FlyingTrailFarmer_Descriptor::Stats : public StatsTracker{
+struct FlyingTrialFarmer_Descriptor::Stats : public StatsTracker{
     Stats()
         : m_trials(m_stats["Trials"])
         , m_success(m_stats["Success"])
@@ -49,13 +49,13 @@ struct FlyingTrailFarmer_Descriptor::Stats : public StatsTracker{
     std::atomic<uint64_t>& m_success;
     std::atomic<uint64_t>& m_fail;
 };
-std::unique_ptr<StatsTracker> FlyingTrailFarmer_Descriptor::make_stats() const{
+std::unique_ptr<StatsTracker> FlyingTrialFarmer_Descriptor::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
 }
 
 
 
-FlyingTrailFarmer::FlyingTrailFarmer()
+FlyingTrialFarmer::FlyingTrialFarmer()
     : GO_HOME_WHEN_DONE(false)
     , NUM_TRIALS(
         "<b>Number of Trials to Run (10BP/Trial):</b>",
@@ -74,7 +74,7 @@ FlyingTrailFarmer::FlyingTrailFarmer()
 
 
 
-bool FlyingTrailFarmer::run_rewards(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+bool FlyingTrialFarmer::run_rewards(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     bool trial_failed = true;
     while (true){
         DialogBoxWatcher dialog(COLOR_GREEN, true, std::chrono::milliseconds(250), DialogType::DIALOG_BLACK);
@@ -106,10 +106,10 @@ bool FlyingTrailFarmer::run_rewards(SingleSwitchProgramEnvironment& env, BotBase
     }
 }
 
-void FlyingTrailFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void FlyingTrialFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
-    FlyingTrailFarmer_Descriptor::Stats& stats = env.current_stats<FlyingTrailFarmer_Descriptor::Stats>();
+    FlyingTrialFarmer_Descriptor::Stats& stats = env.current_stats<FlyingTrialFarmer_Descriptor::Stats>();
 
     //  Connect the controller.
     pbf_press_button(context, BUTTON_L, 10, 0);
@@ -127,7 +127,7 @@ void FlyingTrailFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseCont
         );
         context.wait_for_all_requests();
         if (ret_entry == 0) {
-            env.log("Black screen detected. Trail starting.");
+            env.log("Black screen detected. Trial starting.");
         }
 
         WhiteButtonWatcher whitebutton(COLOR_GREEN, WhiteButton::ButtonY, {0.45, 0.85, 0.10, 0.14});
