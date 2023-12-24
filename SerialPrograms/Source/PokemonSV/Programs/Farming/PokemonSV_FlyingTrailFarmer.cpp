@@ -77,7 +77,7 @@ FlyingTrailFarmer::FlyingTrailFarmer()
 bool FlyingTrailFarmer::run_rewards(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     bool trial_failed = true;
     while (true){
-        BlackDialogBoxWatcher dialog(COLOR_GREEN, true);
+        DialogBoxWatcher dialog(COLOR_GREEN, true, std::chrono::milliseconds(250), DialogType::DIALOG_BLACK);
         OverworldWatcher overworld(COLOR_CYAN);
 
         context.wait_for_all_requests();
