@@ -60,7 +60,7 @@ FlyingTrialFarmer::FlyingTrialFarmer()
     , NUM_TRIALS(
         "<b>Number of Trials to Run (10BP/Trial):</b>",
         LockMode::UNLOCK_WHILE_RUNNING,
-        20
+        1000
     )
     , NOTIFICATIONS({
         &NOTIFICATION_PROGRAM_FINISH,
