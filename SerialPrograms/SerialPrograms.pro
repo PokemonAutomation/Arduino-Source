@@ -1431,9 +1431,7 @@ HEADERS += \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Routines.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_Device.h \
-    Source/NintendoSwitch/Commands/NintendoSwitch_Messages_DigitEntry.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_PushButtons.h \
-    Source/NintendoSwitch/Commands/NintendoSwitch_Messages_Routines.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_Superscalar.h \
     Source/NintendoSwitch/DevPrograms/BoxDraw.h \
     Source/NintendoSwitch/DevPrograms/TestProgramComputer.h \

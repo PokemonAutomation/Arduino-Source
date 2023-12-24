@@ -208,13 +208,16 @@ bool select_sandwich_recipe(const ProgramInfo& info, ConsoleHandle& console, Bot
     if (found_recipe){
         // Press A to enter the pick selection 
         pbf_press_button(context, BUTTON_A, 30, 100);
-        context.wait_for_all_requests();
+//        context.wait_for_all_requests();
 
         SandwichIngredientArrowWatcher pick_selection(0, COLOR_YELLOW);
         while(true){
-            int ret = wait_until(console, context, std::chrono::seconds(3),
-                {selection_watcher, pick_selection});
-            
+            context.wait_for_all_requests();
+            int ret = wait_until(
+                console, context, std::chrono::seconds(3),
+                {selection_watcher, pick_selection}
+            );
+
             if (ret == 0){
                 console.log("Detected recipe selection. Dropped Button A?");
                 pbf_press_button(context, BUTTON_A, 30, 100);
