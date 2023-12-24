@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
@@ -11,6 +12,7 @@
 #include "CommonFramework/Tools/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
+#include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h"
 #include "PokemonSV_FlyingTrailFarmer.h"
@@ -36,10 +38,16 @@ FlyingTrailFarmer_Descriptor::FlyingTrailFarmer_Descriptor()
 struct FlyingTrailFarmer_Descriptor::Stats : public StatsTracker{
     Stats()
         : m_trials(m_stats["Trials"])
+        , m_success(m_stats["Success"])
+        , m_fail(m_stats["Fail"])
     {
         m_display_order.emplace_back("Trials");
+        m_display_order.emplace_back("Success");
+        m_display_order.emplace_back("Fail");
     }
     std::atomic<uint64_t>& m_trials;
+    std::atomic<uint64_t>& m_success;
+    std::atomic<uint64_t>& m_fail;
 };
 std::unique_ptr<StatsTracker> FlyingTrailFarmer_Descriptor::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
@@ -65,6 +73,38 @@ FlyingTrailFarmer::FlyingTrailFarmer()
 }
 
 
+
+bool FlyingTrailFarmer::run_rewards(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    bool trial_failed = true;
+    while (true){
+        BlackDialogBoxWatcher dialog(COLOR_GREEN, true);
+        OverworldWatcher overworld(COLOR_CYAN);
+
+        context.wait_for_all_requests();
+
+        int ret_finish = run_until(
+            env.console, context,
+            [](BotBaseContext& context) {
+                pbf_mash_button(context, BUTTON_B, 1000);
+            },
+            { dialog, overworld }
+        );
+
+        switch (ret_finish){
+        case 0: // dialog
+            trial_failed = false;
+            continue;
+        case 1: // overworld
+            return trial_failed;
+        default:
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, env.console,
+                "No recognized state after 1000 B presses.",
+                true
+            );
+        }
+    }
+}
 
 void FlyingTrailFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
@@ -100,36 +140,21 @@ void FlyingTrailFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseCont
         if (ret_trial_start == 0) {
             env.log("Countdown is over. Start navigation sequence.");
             pbf_wait(context,  3 * TICKS_PER_SECOND);
-            pbf_move_left_joystick(context, 200,  30, 1 * TICKS_PER_SECOND, 0); // go through the 2nd ring
+            pbf_move_left_joystick(context, 180,  20, 1 * TICKS_PER_SECOND, 0); // go through the 2nd ring
             pbf_wait(context,  2 * TICKS_PER_SECOND);
-            pbf_move_left_joystick(context,  40,  50, 2 * TICKS_PER_SECOND, 0);
+            pbf_move_left_joystick(context,  40,  50, 240, 0);
             pbf_wait(context,  1 * TICKS_PER_SECOND);
             pbf_move_left_joystick(context, 128,  50, 2 * TICKS_PER_SECOND, 0); // adjust vertical height
-            pbf_wait(context,  6 * TICKS_PER_SECOND);
-            pbf_move_left_joystick(context, 115, 128, 1 * TICKS_PER_SECOND, 0); // horizontal angle adjustment, might overshoot in rare cases
-            pbf_wait(context,  7 * TICKS_PER_SECOND);
+            pbf_wait(context, 13 * TICKS_PER_SECOND);
             pbf_move_left_joystick(context, 128, 180, 2 * TICKS_PER_SECOND, 0);
-            pbf_wait(context,  780);
-            pbf_move_left_joystick(context,   0, 128, 3 * TICKS_PER_SECOND, 0);
+            pbf_wait(context,  9 * TICKS_PER_SECOND);
         }
 
-        OverworldWatcher overworld(COLOR_CYAN);
-        context.wait_for_all_requests();
-
-        int ret_finish = run_until(
-            env.console, context,
-            [](BotBaseContext& context) {
-                for (int i = 0; i < 1000; i++){
-                    pbf_mash_button(context, BUTTON_B, 10000);
-                }
-            },
-            { overworld }
-        );
-        context.wait_for_all_requests();
-        if (ret_finish == 0) {
-            env.log("Overworld detected. Trail completed.");
+        if (!run_rewards(env, context)){
+            stats.m_success++;
+        } else {
+            stats.m_fail++;
         }
-        // TODO: Detect success/fail cases based on either the black dialog box or BP number on top right
 
         stats.m_trials++;
         env.update_stats();

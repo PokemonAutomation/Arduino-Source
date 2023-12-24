@@ -107,6 +107,34 @@ public:
 
 
 
+//  Detect black dialog box.
+class BlackDialogBoxDetector : public StaticScreenDetector{
+public:
+    BlackDialogBoxDetector(Color color = COLOR_RED, bool true_if_detected = true);
+
+    Color color() const{ return m_color; }
+
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+    virtual bool detect(const ImageViewRGB32& screen) const override;
+
+private:
+    Color m_color;
+    bool m_true_if_detected;
+    ImageFloatBox m_box_top;
+    ImageFloatBox m_box_bot;
+    ImageFloatBox m_border_top;
+    ImageFloatBox m_border_bot;
+};
+class BlackDialogBoxWatcher : public DetectorToFinder<BlackDialogBoxDetector>{
+public:
+    BlackDialogBoxWatcher(
+        Color color,
+        bool trigger_if_detected,
+        std::chrono::milliseconds duration = std::chrono::milliseconds(250)
+    )
+         : DetectorToFinder("BlackDialogBoxWatcher", duration, color, trigger_if_detected)
+    {}
+};
 
 
 }
