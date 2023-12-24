@@ -99,7 +99,7 @@ bool FlyingTrialFarmer::run_rewards(SingleSwitchProgramEnvironment& env, BotBase
         default:
             throw OperationFailedException(
                 ErrorReport::SEND_ERROR_REPORT, env.console,
-                "No recognized state after 10000 B presses.",
+                "No recognized state after 80 seconds.",
                 true
             );
         }
