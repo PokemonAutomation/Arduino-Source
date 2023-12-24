@@ -59,7 +59,7 @@ FlyingTrialFarmer::FlyingTrialFarmer()
     : GO_HOME_WHEN_DONE(false)
     , NUM_TRIALS(
         "<b>Number of Trials to Run (10BP/Trial):</b>",
-        LockMode::LOCK_WHILE_RUNNING,
+        LockMode::UNLOCK_WHILE_RUNNING,
         20
     )
     , NOTIFICATIONS({
