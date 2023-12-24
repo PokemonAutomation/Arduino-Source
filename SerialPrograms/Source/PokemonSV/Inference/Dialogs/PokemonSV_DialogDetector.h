@@ -17,11 +17,16 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 
+enum class DialogType{
+    DIALOG_WHITE,
+    DIALOG_BLACK,
+    DIALOG_ALL
+};
 
 //  Detect any dialog box.
 class DialogBoxDetector : public StaticScreenDetector{
 public:
-    DialogBoxDetector(Color color = COLOR_RED, bool true_if_detected = true);
+    DialogBoxDetector(Color color = COLOR_RED, bool true_if_detected = true, DialogType type = DialogType::DIALOG_ALL);
 
     Color color() const{ return m_color; }
 
@@ -35,15 +40,17 @@ private:
     ImageFloatBox m_box_bot;
     ImageFloatBox m_border_top;
     ImageFloatBox m_border_bot;
+    DialogType m_dialog_type;
 };
 class DialogBoxWatcher : public DetectorToFinder<DialogBoxDetector>{
 public:
     DialogBoxWatcher(
         Color color,
         bool trigger_if_detected,
-        std::chrono::milliseconds duration = std::chrono::milliseconds(250)
+        std::chrono::milliseconds duration = std::chrono::milliseconds(250),
+        DialogType type = DialogType::DIALOG_ALL
     )
-         : DetectorToFinder("DialogBoxWatcher", duration, color, trigger_if_detected)
+         : DetectorToFinder("DialogBoxWatcher", duration, color, trigger_if_detected, type)
     {}
 };
 

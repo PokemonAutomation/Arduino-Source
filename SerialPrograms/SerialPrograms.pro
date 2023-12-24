@@ -707,7 +707,7 @@ SOURCES += \
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggRoutines.cpp \
     Source/PokemonSV/Programs/Farming/PokemonSV_AuctionFarmer.cpp \
     Source/PokemonSV/Programs/Farming/PokemonSV_ESPTraining.cpp \
-    Source/PokemonSV/Programs/Farming/PokemonSV_FlyingTrailFarmer.cpp \
+    Source/PokemonSV/Programs/Farming/PokemonSV_FlyingTrialFarmer.cpp \
     Source/PokemonSV/Programs/Farming/PokemonSV_GimmighoulChestFarmer.cpp \
     Source/PokemonSV/Programs/Farming/PokemonSV_GimmighoulRoamingFarmer.cpp \
     Source/PokemonSV/Programs/Farming/PokemonSV_LPFarmer.cpp \
@@ -1761,7 +1761,7 @@ HEADERS += \
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggRoutines.h \
     Source/PokemonSV/Programs/Farming/PokemonSV_AuctionFarmer.h \
     Source/PokemonSV/Programs/Farming/PokemonSV_ESPTraining.h \
-    Source/PokemonSV/Programs/Farming/PokemonSV_FlyingTrailFarmer.h \
+    Source/PokemonSV/Programs/Farming/PokemonSV_FlyingTrialFarmer.h \
     Source/PokemonSV/Programs/Farming/PokemonSV_GimmighoulChestFarmer.h \
     Source/PokemonSV/Programs/Farming/PokemonSV_GimmighoulRoamingFarmer.h \
     Source/PokemonSV/Programs/Farming/PokemonSV_LPFarmer.h \
