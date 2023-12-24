@@ -85,7 +85,7 @@ bool FlyingTrialFarmer::run_rewards(SingleSwitchProgramEnvironment& env, BotBase
         int ret_finish = run_until(
             env.console, context,
             [](BotBaseContext& context) {
-                pbf_mash_button(context, BUTTON_B, 1000);
+                pbf_mash_button(context, BUTTON_B, 10000);
             },
             { dialog, overworld }
         );
@@ -99,7 +99,7 @@ bool FlyingTrialFarmer::run_rewards(SingleSwitchProgramEnvironment& env, BotBase
         default:
             throw OperationFailedException(
                 ErrorReport::SEND_ERROR_REPORT, env.console,
-                "No recognized state after 1000 B presses.",
+                "No recognized state after 10000 B presses.",
                 true
             );
         }
