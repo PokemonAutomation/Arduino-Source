@@ -130,7 +130,7 @@ void FlyingTrialFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseCont
             env.log("Black screen detected. Trial starting.");
         }
 
-        WhiteButtonWatcher whitebutton(COLOR_GREEN, WhiteButton::ButtonY, {0.45, 0.85, 0.10, 0.14});
+        WhiteButtonWatcher whitebutton(COLOR_GREEN, WhiteButton::ButtonY, {0.40, 0.85, 0.20, 0.14});
         context.wait_for_all_requests();
         int ret_trial_start = wait_until(
             env.console, context,
@@ -140,13 +140,13 @@ void FlyingTrialFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseCont
         if (ret_trial_start == 0) {
             env.log("Countdown is over. Start navigation sequence.");
             pbf_wait(context,  3 * TICKS_PER_SECOND);
-            pbf_move_left_joystick(context, 180,  20, 1 * TICKS_PER_SECOND, 0); // go through the 2nd ring
+            pbf_move_left_joystick(context, 180,  20, 1 * TICKS_PER_SECOND, 0); // go through the 2nd ring for additional time
             pbf_wait(context,  2 * TICKS_PER_SECOND);
-            pbf_move_left_joystick(context,  40,  50, 240, 0);
+            pbf_move_left_joystick(context,  40,  50, 240, 0); // adjust horizontal angle while gaining height
             pbf_wait(context,  1 * TICKS_PER_SECOND);
-            pbf_move_left_joystick(context, 128,  50, 2 * TICKS_PER_SECOND, 0); // adjust vertical height
+            pbf_move_left_joystick(context, 128,  50, 2 * TICKS_PER_SECOND, 0); // adjust vertical height to cross mountain
             pbf_wait(context, 13 * TICKS_PER_SECOND);
-            pbf_move_left_joystick(context, 128, 180, 2 * TICKS_PER_SECOND, 0);
+            pbf_move_left_joystick(context, 128, 180, 2 * TICKS_PER_SECOND, 0); // descend for the gate
             pbf_wait(context,  9 * TICKS_PER_SECOND);
         }
 
