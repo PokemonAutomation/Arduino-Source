@@ -163,7 +163,7 @@ void StatsReset::enter_battle(SingleSwitchProgramEnvironment& env, BotBaseContex
         break;
     case Target::Snacksworth:
         //The same as generic, but Snacksworth legendaries are not in the dex and skip the caught/summary/add to party menu.
-        pbf_mash_button(context, BUTTON_B, 90);
+        pbf_mash_button(context, BUTTON_B, 250);
         context.wait_for_all_requests();
         break;
     case Target::Generic:
