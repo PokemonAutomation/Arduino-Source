@@ -154,7 +154,7 @@ void FlyingTrialFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseCont
             pbf_wait(context,  3 * TICKS_PER_SECOND);
             pbf_move_left_joystick(context, 180,  20, 1 * TICKS_PER_SECOND, 0); // go through the 2nd ring
             pbf_wait(context,  2 * TICKS_PER_SECOND);
-            pbf_move_left_joystick(context,  40,  50, 240, 0); // adjust horizontal range while gaining height
+            pbf_move_left_joystick(context,  40,  50, 240, 0); // adjust horizontal angle while gaining height
             pbf_wait(context,  1 * TICKS_PER_SECOND);
             pbf_move_left_joystick(context, 128,  50, 2 * TICKS_PER_SECOND, 0); // adjust vertical height
             pbf_wait(context, 13 * TICKS_PER_SECOND);
