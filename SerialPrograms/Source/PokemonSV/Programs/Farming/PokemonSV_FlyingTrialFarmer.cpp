@@ -71,6 +71,12 @@ FlyingTrialFarmer::FlyingTrialFarmer()
           LockMode::UNLOCK_WHILE_RUNNING,
           50
     )
+    , INVERT_CONTROLS_WHILE_FLYING(
+        "<b>Invert controls while flying:</b><br>"
+        "If you inverted controls while flying in game, turn this feature on as well.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        false
+    )
     , NOTIFICATIONS({
         &NOTIFICATION_PROGRAM_FINISH,
         &NOTIFICATION_ERROR_FATAL,
@@ -79,6 +85,7 @@ FlyingTrialFarmer::FlyingTrialFarmer()
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NUM_TRIALS);
     PA_ADD_OPTION(SAVE_NUM_ROUNDS);
+    PA_ADD_OPTION(INVERT_CONTROLS_WHILE_FLYING);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
@@ -113,6 +120,15 @@ bool FlyingTrialFarmer::run_rewards(SingleSwitchProgramEnvironment& env, BotBase
                 true
             );
         }
+    }
+}
+
+uint8_t FlyingTrialFarmer::get_final_y_axis(int8_t delta_y) {
+    if (INVERT_CONTROLS_WHILE_FLYING) {
+        return 128 - delta_y;
+    }
+    else {
+        return 128 + delta_y;
     }
 }
 
@@ -152,13 +168,13 @@ void FlyingTrialFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseCont
         if (ret_trial_start == 0) {
             env.log("Countdown is over. Starting navigation sequence...");
             pbf_wait(context,  3 * TICKS_PER_SECOND);
-            pbf_move_left_joystick(context, 180,  20, 1 * TICKS_PER_SECOND, 0); // go through the 2nd ring for additional time
+            pbf_move_left_joystick(context, 180, get_final_y_axis(-108), 1 * TICKS_PER_SECOND, 0); // go through the 2nd ring for additional time
             pbf_wait(context,  2 * TICKS_PER_SECOND);
-            pbf_move_left_joystick(context,  40,  50, 240, 0); // adjust horizontal angle while gaining height
+            pbf_move_left_joystick(context,  40, get_final_y_axis(-78), 240, 0); // adjust horizontal angle while gaining height
             pbf_wait(context,  1 * TICKS_PER_SECOND);
-            pbf_move_left_joystick(context, 128,  50, 2 * TICKS_PER_SECOND, 0); // adjust vertical height to cross mountain
+            pbf_move_left_joystick(context, 128, get_final_y_axis(-78), 2 * TICKS_PER_SECOND, 0); // adjust vertical height to cross mountain
             pbf_wait(context, 13 * TICKS_PER_SECOND);
-            pbf_move_left_joystick(context, 128, 180, 2 * TICKS_PER_SECOND, 0); // descend for the gate
+            pbf_move_left_joystick(context, 128, get_final_y_axis(52), 2 * TICKS_PER_SECOND, 0); // descend for the gate
             pbf_wait(context,  9 * TICKS_PER_SECOND);
         }
 

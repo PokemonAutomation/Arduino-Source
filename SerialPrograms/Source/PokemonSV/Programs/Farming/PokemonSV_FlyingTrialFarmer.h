@@ -37,9 +37,11 @@ private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
     SimpleIntegerOption<uint16_t> NUM_TRIALS;
     SimpleIntegerOption<uint16_t> SAVE_NUM_ROUNDS;
+    BooleanCheckBoxOption INVERT_CONTROLS_WHILE_FLYING;
     EventNotificationsOption NOTIFICATIONS;
 
     bool run_rewards(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    uint8_t get_final_y_axis(int8_t delta_y);
 };
 
 
