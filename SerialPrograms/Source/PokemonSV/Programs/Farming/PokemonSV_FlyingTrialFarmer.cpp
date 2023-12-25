@@ -15,6 +15,7 @@
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h"
+#include "PokemonSV/Programs/PokemonSV_SaveGame.h"
 #include "PokemonSV_FlyingTrialFarmer.h"
 
 namespace PokemonAutomation{
@@ -40,14 +41,17 @@ struct FlyingTrialFarmer_Descriptor::Stats : public StatsTracker{
         : m_trials(m_stats["Trials"])
         , m_success(m_stats["Success"])
         , m_fail(m_stats["Fail"])
+        , m_saves(m_stats["Game Saves"])
     {
         m_display_order.emplace_back("Trials");
         m_display_order.emplace_back("Success");
         m_display_order.emplace_back("Fail");
+        m_display_order.emplace_back("Game Saves");
     }
     std::atomic<uint64_t>& m_trials;
     std::atomic<uint64_t>& m_success;
     std::atomic<uint64_t>& m_fail;
+    std::atomic<uint64_t>& m_saves;
 };
 std::unique_ptr<StatsTracker> FlyingTrialFarmer_Descriptor::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
@@ -62,6 +66,11 @@ FlyingTrialFarmer::FlyingTrialFarmer()
         LockMode::UNLOCK_WHILE_RUNNING,
         1000
     )
+    , SAVE_NUM_ROUNDS(
+          "<b>Save after attempting this many trials:</b><br>0 disables saving.",
+          LockMode::UNLOCK_WHILE_RUNNING,
+          50
+    )
     , NOTIFICATIONS({
         &NOTIFICATION_PROGRAM_FINISH,
         &NOTIFICATION_ERROR_FATAL,
@@ -69,6 +78,7 @@ FlyingTrialFarmer::FlyingTrialFarmer()
 {
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NUM_TRIALS);
+    PA_ADD_OPTION(SAVE_NUM_ROUNDS);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
@@ -79,7 +89,6 @@ bool FlyingTrialFarmer::run_rewards(SingleSwitchProgramEnvironment& env, BotBase
     while (true){
         DialogBoxWatcher dialog(COLOR_GREEN, true, std::chrono::milliseconds(250), DialogType::DIALOG_BLACK);
         OverworldWatcher overworld(COLOR_CYAN);
-
         context.wait_for_all_requests();
 
         int ret_finish = run_until(
@@ -89,6 +98,7 @@ bool FlyingTrialFarmer::run_rewards(SingleSwitchProgramEnvironment& env, BotBase
             },
             { dialog, overworld }
         );
+        context.wait_for_all_requests();
 
         switch (ret_finish){
         case 0: // dialog
@@ -127,18 +137,20 @@ void FlyingTrialFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseCont
         );
         context.wait_for_all_requests();
         if (ret_entry == 0) {
-            env.log("Black screen detected. Trial starting.");
+            env.log("Black screen detected. Trial starting...");
         }
 
         WhiteButtonWatcher whitebutton(COLOR_GREEN, WhiteButton::ButtonY, {0.40, 0.85, 0.20, 0.14});
         context.wait_for_all_requests();
+
         int ret_trial_start = wait_until(
             env.console, context,
             std::chrono::seconds(120),
             {whitebutton}
         );
+        context.wait_for_all_requests();
         if (ret_trial_start == 0) {
-            env.log("Countdown is over. Start navigation sequence.");
+            env.log("Countdown is over. Starting navigation sequence...");
             pbf_wait(context,  3 * TICKS_PER_SECOND);
             pbf_move_left_joystick(context, 180,  20, 1 * TICKS_PER_SECOND, 0); // go through the 2nd ring for additional time
             pbf_wait(context,  2 * TICKS_PER_SECOND);
@@ -157,6 +169,12 @@ void FlyingTrialFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseCont
         }
 
         stats.m_trials++;
+
+        if (SAVE_NUM_ROUNDS != 0 && stats.m_trials % SAVE_NUM_ROUNDS == 0){
+            save_game_from_overworld(env.program_info(), env.console, context);
+            stats.m_saves++;
+        }
+
         env.update_stats();
     }
 

@@ -36,6 +36,7 @@ public:
 private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
     SimpleIntegerOption<uint16_t> NUM_TRIALS;
+    SimpleIntegerOption<uint16_t> SAVE_NUM_ROUNDS;
     EventNotificationsOption NOTIFICATIONS;
 
     bool run_rewards(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
