@@ -570,7 +570,7 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
                 }else{
                     if(find_first_poke == false){
                         first_poke_slot = {column, row};
-                        find_first_poke = true;;
+                        find_first_poke = true;
                     }
                     box_render.add(COLOR_GREEN, slot_box);
                     stats.pkmn++;
