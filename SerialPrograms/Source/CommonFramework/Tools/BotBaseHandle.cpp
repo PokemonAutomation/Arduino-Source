@@ -4,6 +4,7 @@
  *
  */
 
+#include <set>
 #include <QtGlobal>
 #include <QMessageBox>
 #include "Common/Cpp/PrettyPrint.h"
@@ -26,6 +27,63 @@
 //using std::endl;
 
 namespace PokemonAutomation{
+
+
+
+void process_device_protocol(
+    uint32_t& version,
+    uint8_t& program_id,
+    PABotBaseLevel& level,
+    Logger& logger, PABotBase& botbase, PABotBaseLevel minimum_pabotbase
+){
+    static const std::set<uint32_t> COMPATIBLE_PROTOCOLS{
+        20210526,   //  Old version
+        20231219,   //  Fewer RPCs, has queue size.
+    };
+
+    logger.log("Checking device protocol compatibility...");
+    uint32_t protocol = Microcontroller::protocol_version(botbase);
+    logger.log("Checking device protocol compatibility... Protocol = " + std::to_string(protocol));
+    if (!COMPATIBLE_PROTOCOLS.contains(protocol / 100)){
+        throw SerialProtocolException(
+            logger, PA_CURRENT_FUNCTION,
+            "Incompatible protocol. Device: " + std::to_string(protocol) + "<br>"
+            "Please install the .hex that came with this version of the program."
+        );
+    }
+
+    //  PABotBase Level
+    logger.log("Checking Program ID...");
+    program_id = Microcontroller::program_id(botbase);
+    logger.log("Checking Program ID... Program ID = " + std::to_string(program_id));
+    level = program_id_to_botbase_level(program_id);
+    if (level < minimum_pabotbase){
+        throw SerialProtocolException(
+            logger, PA_CURRENT_FUNCTION,
+            "PABotBase level not met. (" + program_name(program_id) + ")"
+        );
+    }
+
+    //  Program Version
+    logger.log("Checking Firmware Version...");
+    version = Microcontroller::program_version(botbase);
+    logger.log("Checking Firmware Version... Version = " + std::to_string(version));
+
+    //  Queue Size
+    if ((protocol / 100 == 20210526 && version == 2023121900) ||
+        (protocol / 100 == 20231219)
+    ){
+        logger.log("Device supports queue size. Requesting queue size...", COLOR_BLUE);
+        uint8_t queue_limit = Microcontroller::device_queue_size(botbase);
+        logger.log("Setting queue size to: " + std::to_string(queue_limit), COLOR_BLUE);
+        botbase.set_queue_limit(queue_limit);
+    }else{
+        logger.log("Queue size not supported. Defaulting to size 4.", COLOR_RED);
+    }
+
+}
+
+
 
 
 BotBaseHandle::BotBaseHandle(
@@ -236,32 +294,6 @@ void BotBaseHandle::reset(const QSerialPortInfo* port){
 }
 
 
-void BotBaseHandle::verify_protocol(){
-    uint32_t protocol = Microcontroller::protocol_version(*m_botbase);
-    uint32_t version_hi = protocol / 100;
-    uint32_t version_lo = protocol % 100;
-    if (version_hi != PABB_PROTOCOL_VERSION / 100 || version_lo < PABB_PROTOCOL_VERSION % 100){
-        throw SerialProtocolException(
-            m_logger, PA_CURRENT_FUNCTION,
-            "Incompatible version. Client: " + std::to_string(PABB_PROTOCOL_VERSION) + ", Device: " + std::to_string(protocol) + "<br>"
-            "Please install the .hex that came with this version of the program."
-        );
-    }
-}
-uint8_t BotBaseHandle::verify_pabotbase(){
-    using namespace PokemonAutomation;
-
-    uint8_t program_id = Microcontroller::program_id(*m_botbase);
-    PABotBaseLevel type = program_id_to_botbase_level(program_id);
-    m_current_pabotbase.store(type, std::memory_order_release);
-    if (type < m_minimum_pabotbase){
-        throw SerialProtocolException(
-            m_logger, PA_CURRENT_FUNCTION,
-            "PABotBase level not met. (" + program_name(program_id) + ")"
-        );
-    }
-    return program_id;
-}
 void BotBaseHandle::thread_body(){
     using namespace PokemonAutomation;
 
@@ -292,21 +324,16 @@ void BotBaseHandle::thread_body(){
 
     //  Check protocol and version.
     {
-        uint8_t program_id = 0;
         uint32_t version = 0;
+        uint8_t program_id = 0;
+        PABotBaseLevel level;
         std::string error;
         try{
-            verify_protocol();
-            program_id = verify_pabotbase();
-            version = Microcontroller::program_version(*m_botbase);
-            if (version >= 2023121900){
-                m_logger.log("Device supports queue size.", COLOR_BLUE);
-                uint8_t queue_limit = Microcontroller::device_queue_size(*m_botbase);
-                m_logger.log("Setting queue size to: " + std::to_string(queue_limit), COLOR_BLUE);
-                m_botbase->set_queue_limit(queue_limit);
-            }else{
-                m_logger.log("Device does not support queue size.", COLOR_RED);
-            }
+            process_device_protocol(
+                version, program_id, level,
+                m_logger, *m_botbase, m_minimum_pabotbase
+            );
+            m_current_pabotbase.store(level, std::memory_order_release);
         }catch (InvalidConnectionStateException&){
             return;
         }catch (SerialProtocolException& e){

@@ -85,8 +85,6 @@ private:
     void stop_unprotected();
     void reset_unprotected(const QSerialPortInfo* port);
 
-    void verify_protocol();
-    uint8_t verify_pabotbase();
     void thread_body();
 
 

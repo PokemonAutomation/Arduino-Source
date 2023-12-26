@@ -145,7 +145,7 @@
 #if __AVR_ATmega16U2__
 #define PABB_DEVICE_QUEUE_SIZE          8
 #elif __AVR_ATmega32U4__ || __AVR_AT90USB1286__
-#define PABB_DEVICE_QUEUE_SIZE         64
+#define PABB_DEVICE_QUEUE_SIZE          64
 #else
 #define PABB_DEVICE_QUEUE_SIZE          4
 #endif
@@ -162,9 +162,9 @@
 //      Backwards compatible changes will increase by 1.
 //
 //      (version / 100) must be the same on both server and client.
-//      (version % 100) can be higher on server than client.
+//      (version % 100) may differ though client may apply restrictions.
 //
-#define PABB_PROTOCOL_VERSION           2021052613
+#define PABB_PROTOCOL_VERSION           2023121900
 
 //  Program versioning doesn't matter. It's just for informational purposes.
 #define PABB_PROGRAM_VERSION            2023121900
