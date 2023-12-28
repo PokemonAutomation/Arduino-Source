@@ -47,6 +47,7 @@ private:
     EnumDropdownOption<FlightPath> FLIGHT_PATH;
 
     BooleanCheckBoxOption INVERT_CONTROLS_WHILE_FLYING;
+    EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;
 
     bool run_rewards(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
