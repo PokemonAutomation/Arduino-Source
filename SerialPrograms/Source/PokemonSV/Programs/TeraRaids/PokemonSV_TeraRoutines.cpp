@@ -14,7 +14,6 @@
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Pokemon_Notification.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
@@ -28,7 +27,7 @@
 #include "PokemonSV/Inference/Tera/PokemonSV_TeraRaidSearchDetector.h"
 #include "PokemonSV/Inference/Tera/PokemonSV_TeraRewardsReader.h"
 #include "PokemonSV/Programs/PokemonSV_ConnectToInternet.h"
-#include "PokemonSV/Programs/PokemonSV_BasicCatcher.h"
+#include "PokemonSV/Programs/Battles/PokemonSV_BasicCatcher.h"
 #include "PokemonSV_TeraRoutines.h"
 
 namespace PokemonAutomation{

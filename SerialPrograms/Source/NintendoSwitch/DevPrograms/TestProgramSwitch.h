@@ -20,6 +20,7 @@
 #include "PokemonSwSh/Options/EncounterFilter/PokemonSwSh_EncounterFilterOption.h"
 #include "PokemonSV/Options/PokemonSV_PlayerList.h"
 #include "CommonFramework/Tools/StatsTracking.h"
+#include "PokemonSV/Options/PokemonSV_SinglesAIOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -69,6 +70,8 @@ private:
     StringSelectOption SELECT;
 
     PokemonSV::PlayerListTable PLAYER_LIST;
+
+    PokemonSV::SinglesAIOption battle_AI;
 
     EventNotificationOption NOTIFICATION_TEST;
     EventNotificationsOption NOTIFICATIONS;

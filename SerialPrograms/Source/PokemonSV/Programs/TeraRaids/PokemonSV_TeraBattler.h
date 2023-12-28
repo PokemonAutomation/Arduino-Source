@@ -8,7 +8,6 @@
 #define PokemonAutomation_PokemonSV_TeraBattler_H
 
 #include "ClientSource/Connection/BotBase.h"
-#include "CommonFramework/Notifications/EventNotificationOption.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "PokemonSV/Options/PokemonSV_TeraAIOption.h"

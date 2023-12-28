@@ -17,8 +17,8 @@
 #include "PokemonSV/Options/PokemonSV_EncounterBotCommon.h"
 #include "PokemonSV/Inference/PokemonSV_SweatBubbleDetector.h"
 //#include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
-#include "PokemonSV/Programs/PokemonSV_Battles.h"
-#include "PokemonSV/Programs/PokemonSV_BasicCatcher.h"
+#include "PokemonSV/Programs/Battles/PokemonSV_Battles.h"
+#include "PokemonSV/Programs/Battles/PokemonSV_BasicCatcher.h"
 #include "PokemonSV_LetsGoTools.h"
 
 //#include <iostream>

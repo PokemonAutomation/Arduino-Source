@@ -1,4 +1,4 @@
-/*  Battle AI Option
+/*  Tera AI Option
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *

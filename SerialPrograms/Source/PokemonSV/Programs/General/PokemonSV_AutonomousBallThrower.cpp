@@ -4,17 +4,12 @@
  *
  */
 
-#include "CommonFramework/Exceptions/FatalProgramException.h"
-#include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Tools/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "Pokemon/Pokemon_Strings.h"
-#include "PokemonSV/Inference/Battles/PokemonSV_BattleBallReader.h"
-#include "PokemonSV/Inference/Battles/PokemonSV_NormalBattleMenus.h"
-#include "PokemonSV/Programs/PokemonSV_BasicCatcher.h"
+#include "PokemonSV/Programs/Battles/PokemonSV_BasicCatcher.h"
 #include "PokemonSV_AutonomousBallThrower.h"
 
 namespace PokemonAutomation{

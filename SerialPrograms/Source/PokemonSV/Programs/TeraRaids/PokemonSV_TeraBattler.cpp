@@ -33,11 +33,10 @@ enum class BattleMenuResult{
 };
 BattleMenuResult run_battle_menu(
     ConsoleHandle& console, BotBaseContext& context,
-    const std::vector<TeraMoveEntry>& move_table,
     TeraBattleMenuDetector& battle_menu,
     TeraCatchWatcher& catch_menu,
     OverworldWatcher& overworld,
-    TeraMoveEntry& move
+    const TeraMoveEntry& move
 ){
     console.log("Current Move Selection: " + move.to_str());
     switch (move.type){
@@ -272,7 +271,6 @@ bool run_tera_battle(
             console.log("Current Move Selection: " + current_move.to_str());
             BattleMenuResult battle_menu_result = run_battle_menu(
                 console, context,
-                move_table,
                 battle_menu,
                 catch_menu,
                 overworld,
