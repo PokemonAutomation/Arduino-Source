@@ -716,6 +716,7 @@ SOURCES += \
     Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_CodeEntry.cpp \
     Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_FastCodeEntry.cpp \
     Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_VideoFastCodeEntry.cpp \
+    Source/PokemonSV/Programs/General/PokemonSV_AutoItemPrinter.cpp \
     Source/PokemonSV/Programs/General/PokemonSV_AutonomousBallThrower.cpp \
     Source/PokemonSV/Programs/General/PokemonSV_ClothingBuyer.cpp \
     Source/PokemonSV/Programs/General/PokemonSV_MassPurchase.cpp \
@@ -1768,6 +1769,7 @@ HEADERS += \
     Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_CodeEntry.h \
     Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_FastCodeEntry.h \
     Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_VideoFastCodeEntry.h \
+    Source/PokemonSV/Programs/General/PokemonSV_AutoItemPrinter.h \
     Source/PokemonSV/Programs/General/PokemonSV_AutonomousBallThrower.h \
     Source/PokemonSV/Programs/General/PokemonSV_ClothingBuyer.h \
     Source/PokemonSV/Programs/General/PokemonSV_MassPurchase.h \

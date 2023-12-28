@@ -14,6 +14,7 @@
 #include "Programs/General/PokemonSV_ClothingBuyer.h"
 #include "Programs/General/PokemonSV_AutonomousBallThrower.h"
 #include "Programs/General/PokemonSV_SizeChecker.h"
+#include "Programs/General/PokemonSV_AutoItemPrinter.h"
 
 #include "Programs/Boxes/PokemonSV_MassRelease.h"
 #include "Programs/Boxes/PokemonSV_MassAttachItems.h"
@@ -78,6 +79,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<ClothingBuyer_Descriptor, ClothingBuyer>());
     ret.emplace_back(make_single_switch_program<AutonomousBallThrower_Descriptor, AutonomousBallThrower>());
     ret.emplace_back(make_single_switch_program<SizeChecker_Descriptor, SizeChecker>());
+    ret.emplace_back(make_single_switch_program<AutoItemPrinter_Descriptor, AutoItemPrinter>());
 
 //    ret.emplace_back("---- Trading ----");
     ret.emplace_back(make_multi_switch_program<SelfBoxTrade_Descriptor, SelfBoxTrade>());
