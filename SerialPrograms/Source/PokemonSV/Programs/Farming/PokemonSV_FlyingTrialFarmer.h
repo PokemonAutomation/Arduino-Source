@@ -37,6 +37,15 @@ private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
     SimpleIntegerOption<uint16_t> NUM_TRIALS;
     SimpleIntegerOption<uint16_t> SAVE_NUM_ROUNDS;
+
+    enum class FlightPath{
+        FRONT_ENTRY,
+        BACK_ENTRY_STRAIGHT,
+        BACK_ENTRY_SOFT_TURN,
+        BACK_ENTRY_HARD_TURN
+    };
+    EnumDropdownOption<FlightPath> FLIGHT_PATH;
+
     BooleanCheckBoxOption INVERT_CONTROLS_WHILE_FLYING;
     EventNotificationsOption NOTIFICATIONS;
 

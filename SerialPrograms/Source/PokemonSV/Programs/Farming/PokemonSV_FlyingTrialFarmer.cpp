@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
@@ -71,9 +72,20 @@ FlyingTrialFarmer::FlyingTrialFarmer()
           LockMode::UNLOCK_WHILE_RUNNING,
           50
     )
+    , FLIGHT_PATH(
+          "<b>Select the flight path to use:</b>",
+          {
+              {FlightPath::FRONT_ENTRY,          "path0", "Front gate entry, sharp turn (might be needed if game is on 3.0.0)"},
+              {FlightPath::BACK_ENTRY_STRAIGHT,  "path1", "Back gate entry, no turn (candidate for waterfill adjustments)"},
+              {FlightPath::BACK_ENTRY_SOFT_TURN, "path2", "Back gate entry, soft turn (current release candidate)"},
+              {FlightPath::BACK_ENTRY_HARD_TURN, "path3", "Back gate entry, sharp turn (highest location tolerance but tight timer)"}
+          },
+          LockMode::UNLOCK_WHILE_RUNNING,
+          FlightPath::BACK_ENTRY_SOFT_TURN
+    )
     , INVERT_CONTROLS_WHILE_FLYING(
-        "<b>Invert controls while flying:</b><br>"
-        "If you inverted controls while flying in game, turn this feature on as well.",
+        "<b>Inverted controls while flying:</b><br>"
+        "Check this option if you have inverted controls on during flying.",
         LockMode::UNLOCK_WHILE_RUNNING,
         false
     )
@@ -85,6 +97,9 @@ FlyingTrialFarmer::FlyingTrialFarmer()
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NUM_TRIALS);
     PA_ADD_OPTION(SAVE_NUM_ROUNDS);
+    if (PreloadSettings::instance().DEVELOPER_MODE){
+        PA_ADD_OPTION(FLIGHT_PATH);
+    }
     PA_ADD_OPTION(INVERT_CONTROLS_WHILE_FLYING);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
@@ -167,15 +182,56 @@ void FlyingTrialFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseCont
         context.wait_for_all_requests();
         if (ret_trial_start == 0) {
             env.log("Countdown is over. Starting navigation sequence...");
-            pbf_wait(context,  3 * TICKS_PER_SECOND);
-            pbf_move_left_joystick(context, 180, get_final_y_axis(-108), 1 * TICKS_PER_SECOND, 0); // go through the 2nd ring for additional time
-            pbf_wait(context,  2 * TICKS_PER_SECOND);
-            pbf_move_left_joystick(context,  40, get_final_y_axis(-78), 240, 0); // adjust horizontal angle while gaining height
-            pbf_wait(context,  1 * TICKS_PER_SECOND);
-            pbf_move_left_joystick(context, 128, get_final_y_axis(-78), 2 * TICKS_PER_SECOND, 0); // adjust vertical height to cross mountain
-            pbf_wait(context, 13 * TICKS_PER_SECOND);
-            pbf_move_left_joystick(context, 128, get_final_y_axis(52), 2 * TICKS_PER_SECOND, 0); // descend for the gate
-            pbf_wait(context,  9 * TICKS_PER_SECOND);
+
+            switch (FLIGHT_PATH){
+            case FlightPath::FRONT_ENTRY:
+                pbf_wait(context,  3 * TICKS_PER_SECOND);
+                pbf_move_left_joystick(context, 200, get_final_y_axis( -98), 1 * TICKS_PER_SECOND, 0);
+                pbf_wait(context,  2 * TICKS_PER_SECOND);
+                pbf_move_left_joystick(context,  40, get_final_y_axis( -78), 2 * TICKS_PER_SECOND, 0);
+                pbf_wait(context,  1 * TICKS_PER_SECOND);
+                pbf_move_left_joystick(context, 128, get_final_y_axis( -78), 2 * TICKS_PER_SECOND, 0);
+                pbf_wait(context,  6 * TICKS_PER_SECOND);
+                pbf_move_left_joystick(context, 115, get_final_y_axis(   0), 1 * TICKS_PER_SECOND, 0);
+                pbf_wait(context,  7 * TICKS_PER_SECOND);
+                pbf_move_left_joystick(context, 128, get_final_y_axis(  52), 2 * TICKS_PER_SECOND, 0);
+                pbf_wait(context,  780);
+                pbf_move_left_joystick(context,   0, get_final_y_axis(   0), 3 * TICKS_PER_SECOND, 0);
+                break;
+            case FlightPath::BACK_ENTRY_STRAIGHT:
+                pbf_wait(context,  3 * TICKS_PER_SECOND);
+                pbf_move_left_joystick(context, 180, get_final_y_axis(-108), 1 * TICKS_PER_SECOND, 0);
+                pbf_wait(context,  2 * TICKS_PER_SECOND);
+                pbf_move_left_joystick(context,  40, get_final_y_axis( -78), 240, 0);
+                pbf_wait(context,  1 * TICKS_PER_SECOND);
+                pbf_move_left_joystick(context, 128, get_final_y_axis( -78), 2 * TICKS_PER_SECOND, 0);
+                pbf_wait(context, 13 * TICKS_PER_SECOND);
+                pbf_move_left_joystick(context, 128, get_final_y_axis(  52), 2 * TICKS_PER_SECOND, 0);
+                pbf_wait(context,  9 * TICKS_PER_SECOND);
+                break;
+            case FlightPath::BACK_ENTRY_SOFT_TURN:
+                pbf_wait(context,  3 * TICKS_PER_SECOND);
+                pbf_move_left_joystick(context, 180, get_final_y_axis(-108), 1 * TICKS_PER_SECOND, 0);
+                pbf_wait(context,  2 * TICKS_PER_SECOND);
+                pbf_move_left_joystick(context,  40, get_final_y_axis( -78), 240, 0);
+                pbf_wait(context,  1 * TICKS_PER_SECOND);
+                pbf_move_left_joystick(context, 110, get_final_y_axis( -78), 2 * TICKS_PER_SECOND, 0);
+                pbf_wait(context, 14 * TICKS_PER_SECOND);
+                pbf_move_left_joystick(context, 205, get_final_y_axis(  37), 160, 0);
+                pbf_wait(context,  9 * TICKS_PER_SECOND);
+                break;
+            case FlightPath::BACK_ENTRY_HARD_TURN:
+                pbf_wait(context,  3 * TICKS_PER_SECOND);
+                pbf_move_left_joystick(context, 160, get_final_y_axis(-108), 1 * TICKS_PER_SECOND, 0);
+                pbf_wait(context,  2 * TICKS_PER_SECOND);
+                pbf_move_left_joystick(context,  40, get_final_y_axis( -78), 240, 0);
+                pbf_wait(context,  1 * TICKS_PER_SECOND);
+                pbf_move_left_joystick(context, 128, get_final_y_axis( -78), 160, 0);
+                pbf_wait(context,  2550);
+                pbf_move_left_joystick(context, 255, get_final_y_axis(  80), 250, 0);
+                pbf_wait(context,  9 * TICKS_PER_SECOND);
+                break;
+            }
         }
 
         if (!run_rewards(env, context)){
