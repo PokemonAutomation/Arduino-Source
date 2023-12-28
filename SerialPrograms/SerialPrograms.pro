@@ -688,6 +688,8 @@ SOURCES += \
     Source/PokemonSV/Options/PokemonSV_SandwichIngredientsOption.cpp \
     Source/PokemonSV/Options/PokemonSV_SandwichIngredientsTable.cpp \
     Source/PokemonSV/Options/PokemonSV_SandwichMakerOption.cpp \
+    Source/PokemonSV/Options/PokemonSV_SinglesAIOption.cpp \
+    Source/PokemonSV/Options/PokemonSV_SinglesMoveTable.cpp \
     Source/PokemonSV/Options/PokemonSV_TeraAIOption.cpp \
     Source/PokemonSV/Options/PokemonSV_TeraCatchOnWinOption.cpp \
     Source/PokemonSV/Options/PokemonSV_TeraMoveTable.cpp \
@@ -696,6 +698,9 @@ SOURCES += \
     Source/PokemonSV/Options/PokemonSV_TournamentPrizeTable.cpp \
     Source/PokemonSV/PokemonSV_Panels.cpp \
     Source/PokemonSV/PokemonSV_Settings.cpp \
+    Source/PokemonSV/Programs/Battles/PokemonSV_BasicCatcher.cpp \
+    Source/PokemonSV/Programs/Battles/PokemonSV_Battles.cpp \
+    Source/PokemonSV/Programs/Battles/PokemonSV_SinglesBattler.cpp \
     Source/PokemonSV/Programs/Boxes/PokemonSV_BoxAttach.cpp \
     Source/PokemonSV/Programs/Boxes/PokemonSV_BoxRelease.cpp \
     Source/PokemonSV/Programs/Boxes/PokemonSV_BoxRoutines.cpp \
@@ -712,6 +717,7 @@ SOURCES += \
     Source/PokemonSV/Programs/Farming/PokemonSV_GimmighoulRoamingFarmer.cpp \
     Source/PokemonSV/Programs/Farming/PokemonSV_LPFarmer.cpp \
     Source/PokemonSV/Programs/Farming/PokemonSV_TournamentFarmer.cpp \
+    Source/PokemonSV/Programs/Farming/PokemonSV_TournamentFarmer2.cpp \
     Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_ClipboardFastCodeEntry.cpp \
     Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_CodeEntry.cpp \
     Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_FastCodeEntry.cpp \
@@ -726,8 +732,6 @@ SOURCES += \
     Source/PokemonSV/Programs/Glitches/PokemonSV_CloneItems-1.0.1.cpp \
     Source/PokemonSV/Programs/Glitches/PokemonSV_RideCloner-1.0.1.cpp \
     Source/PokemonSV/Programs/PokemonSV_AreaZero.cpp \
-    Source/PokemonSV/Programs/PokemonSV_BasicCatcher.cpp \
-    Source/PokemonSV/Programs/PokemonSV_Battles.cpp \
     Source/PokemonSV/Programs/PokemonSV_ConnectToInternet.cpp \
     Source/PokemonSV/Programs/PokemonSV_GameEntry.cpp \
     Source/PokemonSV/Programs/PokemonSV_Navigation.cpp \
@@ -1741,6 +1745,8 @@ HEADERS += \
     Source/PokemonSV/Options/PokemonSV_SandwichIngredientsOption.h \
     Source/PokemonSV/Options/PokemonSV_SandwichIngredientsTable.h \
     Source/PokemonSV/Options/PokemonSV_SandwichMakerOption.h \
+    Source/PokemonSV/Options/PokemonSV_SinglesAIOption.h \
+    Source/PokemonSV/Options/PokemonSV_SinglesMoveTable.h \
     Source/PokemonSV/Options/PokemonSV_TeraAIOption.h \
     Source/PokemonSV/Options/PokemonSV_TeraCatchOnWinOption.h \
     Source/PokemonSV/Options/PokemonSV_TeraMoveTable.h \
@@ -1749,6 +1755,9 @@ HEADERS += \
     Source/PokemonSV/Options/PokemonSV_TournamentPrizeTable.h \
     Source/PokemonSV/PokemonSV_Panels.h \
     Source/PokemonSV/PokemonSV_Settings.h \
+    Source/PokemonSV/Programs/Battles/PokemonSV_BasicCatcher.h \
+    Source/PokemonSV/Programs/Battles/PokemonSV_Battles.h \
+    Source/PokemonSV/Programs/Battles/PokemonSV_SinglesBattler.h \
     Source/PokemonSV/Programs/Boxes/PokemonSV_BoxAttach.h \
     Source/PokemonSV/Programs/Boxes/PokemonSV_BoxRelease.h \
     Source/PokemonSV/Programs/Boxes/PokemonSV_BoxRoutines.h \
@@ -1765,6 +1774,7 @@ HEADERS += \
     Source/PokemonSV/Programs/Farming/PokemonSV_GimmighoulRoamingFarmer.h \
     Source/PokemonSV/Programs/Farming/PokemonSV_LPFarmer.h \
     Source/PokemonSV/Programs/Farming/PokemonSV_TournamentFarmer.h \
+    Source/PokemonSV/Programs/Farming/PokemonSV_TournamentFarmer2.h \
     Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_ClipboardFastCodeEntry.h \
     Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_CodeEntry.h \
     Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_FastCodeEntry.h \
@@ -1779,8 +1789,6 @@ HEADERS += \
     Source/PokemonSV/Programs/Glitches/PokemonSV_CloneItems-1.0.1.h \
     Source/PokemonSV/Programs/Glitches/PokemonSV_RideCloner-1.0.1.h \
     Source/PokemonSV/Programs/PokemonSV_AreaZero.h \
-    Source/PokemonSV/Programs/PokemonSV_BasicCatcher.h \
-    Source/PokemonSV/Programs/PokemonSV_Battles.h \
     Source/PokemonSV/Programs/PokemonSV_ConnectToInternet.h \
     Source/PokemonSV/Programs/PokemonSV_GameEntry.h \
     Source/PokemonSV/Programs/PokemonSV_Navigation.h \

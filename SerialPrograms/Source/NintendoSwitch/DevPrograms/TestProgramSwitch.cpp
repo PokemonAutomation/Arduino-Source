@@ -60,7 +60,7 @@
 #include "PokemonLA/Programs/PokemonLA_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
-#include "PokemonSV/Programs/PokemonSV_BasicCatcher.h"
+#include "PokemonSV/Programs/Battles/PokemonSV_BasicCatcher.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_YCommDetector.h"
 #include "PokemonSV/Inference/Tera/PokemonSV_TeraCardDetector.h"
 #include "PokemonSV/Inference/PokemonSV_PokemonSummaryReader.h"
@@ -92,7 +92,7 @@
 #include "PokemonSV/Programs/ShinyHunting/PokemonSV_AreaZeroPlatform.h"
 #include "PokemonSV/Inference/PokemonSV_SweatBubbleDetector.h"
 #include "PokemonSV/Programs/PokemonSV_AreaZero.h"
-#include "PokemonSV/Programs/PokemonSV_Battles.h"
+#include "PokemonSV/Programs/Battles/PokemonSV_Battles.h"
 #include "PokemonSV/Programs/PokemonSV_SaveGame.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_NormalBattleMenus.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_TeraBattleMenus.h"
@@ -113,6 +113,7 @@
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_ReceivePokemonDetector.h"
 #include "PokemonSV/Inference/PokemonSV_PokemonSummaryReader.h"
+#include "PokemonSV/Programs/Battles/PokemonSV_SinglesBattler.h"
 
 
 
@@ -195,6 +196,7 @@ TestProgram::TestProgram()
     PA_ADD_OPTION(STATIC_TEXT);
     PA_ADD_OPTION(SELECT);
     PA_ADD_OPTION(PLAYER_LIST);
+    PA_ADD_OPTION(battle_AI);
     PA_ADD_OPTION(NOTIFICATIONS);
     BUTTON0.add_listener(*this);
     BUTTON1.add_listener(*this);
@@ -228,8 +230,8 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     using namespace Pokemon;
 //    using namespace PokemonSwSh;
 //    using namespace PokemonBDSP;
-    using namespace PokemonLA;
-//    using namespace PokemonSV;
+//    using namespace PokemonLA;
+    using namespace PokemonSV;
 
     [[maybe_unused]] Logger& logger = env.logger();
     [[maybe_unused]] ConsoleHandle& console = env.consoles[0];
@@ -240,12 +242,31 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
+//    SinglesAIOption battle_AI;
+    run_singles_battle(env, console, context, battle_AI, false);
+
+
+#if 0
+    run_pokemon(
+        console, context,
+        {
+            {SinglesMoveType::Move1, false},
+            {SinglesMoveType::Move2, false},
+            {SinglesMoveType::Move4, true},
+            {SinglesMoveType::Run, false},
+        }
+    );
+#endif
+
+
+
+#if 0
     auto snapshot = console.video().snapshot();
 
     PokemonSummaryDetector detector;
     detector.make_overlays(overlays);
     cout << detector.detect(snapshot) << endl;
-
+#endif
 
 
 #if 0

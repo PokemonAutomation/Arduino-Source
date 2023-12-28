@@ -89,7 +89,9 @@ FlyingTrialFarmer::FlyingTrialFarmer()
         LockMode::UNLOCK_WHILE_RUNNING,
         false
     )
+    , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
+        &NOTIFICATION_STATUS_UPDATE,
         &NOTIFICATION_PROGRAM_FINISH,
         &NOTIFICATION_ERROR_FATAL,
     })
@@ -248,6 +250,7 @@ void FlyingTrialFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseCont
         }
 
         env.update_stats();
+        send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
     }
 
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);

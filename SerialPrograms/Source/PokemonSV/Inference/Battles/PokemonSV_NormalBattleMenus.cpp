@@ -66,7 +66,11 @@ bool NormalBattleMenuDetector::move_to_slot(ConsoleHandle& console, BotBaseConte
         int8_t current_slot = detect_slot(screen);
         if (current_slot < 0 || current_slot > 3){
             console.log("NormalBattleMenuDetector::move_to_slot(): Unable to detect slot.", COLOR_RED);
-            return false;
+            context.wait_for(std::chrono::milliseconds(500));
+            continue;
+//            static int c = 0;
+//            screen->save("bad-" + std::to_string(c++) + ".png");    //  REMOVE
+//            return false;
         }
         if (attempts > 10){
             console.log("NormalBattleMenuDetector::move_to_slot(): Failed to move slot after 10 attempts.", COLOR_RED);
@@ -75,8 +79,11 @@ bool NormalBattleMenuDetector::move_to_slot(ConsoleHandle& console, BotBaseConte
 
         uint8_t diff = (4 + slot - (uint8_t)current_slot) % 4;
         switch (diff){
-        case 0:
+        case 0:{
+//            static int c = 0;
+//            screen->save("good-" + std::to_string(c++) + ".png");   //  REMOVE
             return true;
+        }
         case 1:
             pbf_press_dpad(context, DPAD_DOWN, 20, 30);
             continue;
