@@ -209,10 +209,16 @@ void AutoItemPrinter::program(SingleSwitchProgramEnvironment& env, BotBaseContex
     );
     context.wait_for_all_requests();
 
-    if (ret_finish == 1){
-        send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
-        GO_HOME_WHEN_DONE.run_end_of_program(context);
+    if (ret_finish < 0){
+        throw OperationFailedException(
+            ErrorReport::SEND_ERROR_REPORT, env.console,
+            "Couldn't exit to overworld after 80 seconds.",
+            true
+        );
     }
+    
+    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
+    GO_HOME_WHEN_DONE.run_end_of_program(context);
 }
 
 
