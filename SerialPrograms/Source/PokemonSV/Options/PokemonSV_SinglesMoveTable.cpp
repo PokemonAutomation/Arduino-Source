@@ -102,7 +102,6 @@ SinglesMoveTable::SinglesMoveTable(std::string label, bool trainer_battle)
         LockMode::UNLOCK_WHILE_RUNNING,
         make_defaults(trainer_battle)
     )
-    , m_trainer_battle(trainer_battle)
 {}
 
 std::vector<SinglesMoveEntry> SinglesMoveTable::snapshot(){

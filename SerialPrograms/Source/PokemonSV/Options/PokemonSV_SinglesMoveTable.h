@@ -64,9 +64,6 @@ public:
     virtual std::vector<std::string> make_header() const;
 
     static std::vector<std::unique_ptr<EditableTableRow>> make_defaults(bool trainer_battle);
-
-private:
-    bool m_trainer_battle;
 };
 
 

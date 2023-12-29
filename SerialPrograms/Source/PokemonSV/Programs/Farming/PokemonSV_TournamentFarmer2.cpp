@@ -17,6 +17,7 @@
 #include "PokemonSV/Inference/Battles/PokemonSV_NormalBattleMenus.h"
 #include "PokemonSV/Programs/PokemonSV_SaveGame.h"
 #include "PokemonSV/Programs/Battles/PokemonSV_SinglesBattler.h"
+#include "PokemonSV_TournamentFarmer.h"
 #include "PokemonSV_TournamentFarmer2.h"
 
 namespace PokemonAutomation{
@@ -146,6 +147,7 @@ private:
 };
 
 
+
 void TournamentFarmer2::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
     assert_16_9_720p_min(env.logger(), env.console);
     TournamentFarmer2_Descriptor::Stats& stats = env.current_stats<TournamentFarmer2_Descriptor::Stats>();
@@ -265,6 +267,10 @@ void TournamentFarmer2::program(SingleSwitchProgramEnvironment& env, BotBaseCont
             }
 
 
+            if (battle_lost){
+                return_to_academy_after_loss(env, context);
+                break;
+            }
         }
 
         //  Tournament won
