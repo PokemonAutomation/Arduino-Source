@@ -71,7 +71,7 @@ private:
 
     PokemonSV::PlayerListTable PLAYER_LIST;
 
-    PokemonSV::SinglesAIOption battle_AI;
+//    PokemonSV::SinglesAIOption battle_AI;
 
     EventNotificationOption NOTIFICATION_TEST;
     EventNotificationsOption NOTIFICATIONS;

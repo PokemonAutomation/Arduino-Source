@@ -11,13 +11,22 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 
-const EnumDatabase<SinglesMoveType>& singles_move_enum_database(){
+const EnumDatabase<SinglesMoveType>& singles_move_enum_database_wild(){
     static EnumDatabase<SinglesMoveType> database{
         {SinglesMoveType::Move1,    "move1",    "Move 1"},
         {SinglesMoveType::Move2,    "move2",    "Move 2"},
         {SinglesMoveType::Move3,    "move3",    "Move 3"},
         {SinglesMoveType::Move4,    "move4",    "Move 4"},
         {SinglesMoveType::Run,      "run",      "Run"},
+    };
+    return database;
+}
+const EnumDatabase<SinglesMoveType>& singles_move_enum_database_trainer(){
+    static EnumDatabase<SinglesMoveType> database{
+        {SinglesMoveType::Move1,    "move1",    "Move 1"},
+        {SinglesMoveType::Move2,    "move2",    "Move 2"},
+        {SinglesMoveType::Move3,    "move3",    "Move 3"},
+        {SinglesMoveType::Move4,    "move4",    "Move 4"},
     };
     return database;
 }
@@ -47,8 +56,12 @@ std::string SinglesMoveEntry::to_str() const{
 SinglesMoveTableRow::~SinglesMoveTableRow(){
     type.remove_listener(*this);
 }
-SinglesMoveTableRow::SinglesMoveTableRow()
-    : type(singles_move_enum_database(), LockMode::UNLOCK_WHILE_RUNNING, SinglesMoveType::Move1)
+SinglesMoveTableRow::SinglesMoveTableRow(bool p_trainer_battle)
+    : type(
+        p_trainer_battle ? singles_move_enum_database_trainer() : singles_move_enum_database_wild(),
+        LockMode::UNLOCK_WHILE_RUNNING,
+        SinglesMoveType::Move1
+    )
     , terastallize(LockMode::UNLOCK_WHILE_RUNNING, false)
     , notes(false, LockMode::UNLOCK_WHILE_RUNNING, "", "(e.g. Screech, Belly Drum)")
 {
@@ -60,7 +73,7 @@ SinglesMoveTableRow::SinglesMoveTableRow()
     type.add_listener(*this);
 }
 std::unique_ptr<EditableTableRow> SinglesMoveTableRow::clone() const{
-    std::unique_ptr<SinglesMoveTableRow> ret(new SinglesMoveTableRow());
+    std::unique_ptr<SinglesMoveTableRow> ret(new SinglesMoveTableRow(trainer_battle));
     ret->type.set(type);
     ret->terastallize = (bool)terastallize;
     ret->notes.set(notes);
@@ -77,7 +90,7 @@ void SinglesMoveTableRow::value_changed(){
 
 
 
-SinglesMoveTable::SinglesMoveTable(std::string label)
+SinglesMoveTable::SinglesMoveTable(std::string label, bool trainer_battle)
     : EditableTableOption_t<SinglesMoveTableRow>(
         std::move(label),
 #if 0
@@ -87,8 +100,9 @@ SinglesMoveTable::SinglesMoveTable(std::string label)
         "Changes to this table take effect on the next battle.",
 #endif
         LockMode::UNLOCK_WHILE_RUNNING,
-        make_defaults()
+        make_defaults(trainer_battle)
     )
+    , m_trainer_battle(trainer_battle)
 {}
 
 std::vector<SinglesMoveEntry> SinglesMoveTable::snapshot(){
@@ -101,9 +115,9 @@ std::vector<std::string> SinglesMoveTable::make_header() const{
         "Notes",
     };
 }
-std::vector<std::unique_ptr<EditableTableRow>> SinglesMoveTable::make_defaults(){
+std::vector<std::unique_ptr<EditableTableRow>> SinglesMoveTable::make_defaults(bool trainer_battle){
     std::vector<std::unique_ptr<EditableTableRow>> ret;
-    ret.emplace_back(new SinglesMoveTableRow());
+    ret.emplace_back(new SinglesMoveTableRow(trainer_battle));
     return ret;
 }
 

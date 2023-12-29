@@ -196,7 +196,7 @@ TestProgram::TestProgram()
     PA_ADD_OPTION(STATIC_TEXT);
     PA_ADD_OPTION(SELECT);
     PA_ADD_OPTION(PLAYER_LIST);
-    PA_ADD_OPTION(battle_AI);
+//    PA_ADD_OPTION(battle_AI);
     PA_ADD_OPTION(NOTIFICATIONS);
     BUTTON0.add_listener(*this);
     BUTTON1.add_listener(*this);
@@ -243,7 +243,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 
 //    SinglesAIOption battle_AI;
-    run_singles_battle(env, console, context, battle_AI, false);
+//    run_singles_battle(env, console, context, battle_AI, false);
 
 
 #if 0

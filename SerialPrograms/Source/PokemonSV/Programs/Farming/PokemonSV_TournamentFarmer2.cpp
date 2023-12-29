@@ -103,6 +103,7 @@ TournamentFarmer2::TournamentFarmer2()
         LockMode::UNLOCK_WHILE_RUNNING,
         1, 0
     )
+    , BATTLE_AI(true)
     , GO_HOME_WHEN_DONE(false)
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
