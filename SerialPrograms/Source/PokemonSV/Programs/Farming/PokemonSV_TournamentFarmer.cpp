@@ -557,7 +557,7 @@ void TournamentFarmer::handle_end_of_tournament(SingleSwitchProgramEnvironment& 
 
 
 //Fly to academy from west pokemon center after losing.
-void TournamentFarmer::return_to_academy_after_loss(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
+void return_to_academy_after_loss(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
     env.log("Tournament lost! Navigating back to academy.");
     open_map_from_overworld(env.program_info(), env.console, context);
     pbf_press_button(context, BUTTON_ZR, 50, 40);

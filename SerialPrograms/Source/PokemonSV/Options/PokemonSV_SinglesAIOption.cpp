@@ -16,7 +16,7 @@ using namespace Pokemon;
 
 
 
-SinglesAIOption::SinglesAIOption()
+SinglesAIOption::SinglesAIOption(bool trainer_battle)
     : GroupOption(
         "Battle AI",
         LockMode::UNLOCK_WHILE_RUNNING,
@@ -32,12 +32,12 @@ SinglesAIOption::SinglesAIOption()
     )
     , MOVE_TABLES(6)
 {
-    MOVE_TABLES.emplace_back("<b>1st " + STRING_POKEMON + " Move Table:</b>");
-    MOVE_TABLES.emplace_back("<b>2nd " + STRING_POKEMON + " Move Table:</b>");
-    MOVE_TABLES.emplace_back("<b>3rd " + STRING_POKEMON + " Move Table:</b>");
-    MOVE_TABLES.emplace_back("<b>4th " + STRING_POKEMON + " Move Table:</b>");
-    MOVE_TABLES.emplace_back("<b>5th " + STRING_POKEMON + " Move Table:</b>");
-    MOVE_TABLES.emplace_back("<b>6th " + STRING_POKEMON + " Move Table:</b>");
+    MOVE_TABLES.emplace_back("<b>1st " + STRING_POKEMON + " Move Table:</b>", trainer_battle);
+    MOVE_TABLES.emplace_back("<b>2nd " + STRING_POKEMON + " Move Table:</b>", trainer_battle);
+    MOVE_TABLES.emplace_back("<b>3rd " + STRING_POKEMON + " Move Table:</b>", trainer_battle);
+    MOVE_TABLES.emplace_back("<b>4th " + STRING_POKEMON + " Move Table:</b>", trainer_battle);
+    MOVE_TABLES.emplace_back("<b>5th " + STRING_POKEMON + " Move Table:</b>", trainer_battle);
+    MOVE_TABLES.emplace_back("<b>6th " + STRING_POKEMON + " Move Table:</b>", trainer_battle);
 
     PA_ADD_STATIC(description);
     size_t c = 0;

@@ -17,6 +17,7 @@
 #include "PokemonSV/Inference/Battles/PokemonSV_NormalBattleMenus.h"
 #include "PokemonSV/Programs/PokemonSV_SaveGame.h"
 #include "PokemonSV/Programs/Battles/PokemonSV_SinglesBattler.h"
+#include "PokemonSV_TournamentFarmer.h"
 #include "PokemonSV_TournamentFarmer2.h"
 
 namespace PokemonAutomation{
@@ -103,6 +104,7 @@ TournamentFarmer2::TournamentFarmer2()
         LockMode::UNLOCK_WHILE_RUNNING,
         1, 0
     )
+    , BATTLE_AI(true)
     , GO_HOME_WHEN_DONE(false)
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
@@ -143,6 +145,7 @@ public:
 private:
     StopButton& m_button;
 };
+
 
 
 void TournamentFarmer2::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
@@ -264,6 +267,10 @@ void TournamentFarmer2::program(SingleSwitchProgramEnvironment& env, BotBaseCont
             }
 
 
+            if (battle_lost){
+                return_to_academy_after_loss(env, context);
+                break;
+            }
         }
 
         //  Tournament won

@@ -21,6 +21,10 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 
+void return_to_academy_after_loss(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+
+
+
 class TournamentFarmer_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     TournamentFarmer_Descriptor();
@@ -64,7 +68,6 @@ private:
     void run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
     void check_prize(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
     void handle_end_of_tournament(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-    void return_to_academy_after_loss(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 };
 
 }

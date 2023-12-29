@@ -24,7 +24,8 @@ enum class SinglesMoveType{
     Move4,
     Run,
 };
-const EnumDatabase<SinglesMoveType>& singles_move_enum_database();
+const EnumDatabase<SinglesMoveType>& singles_move_enum_database_wild();
+const EnumDatabase<SinglesMoveType>& singles_move_enum_database_trainer();
 
 
 struct SinglesMoveEntry{
@@ -38,7 +39,7 @@ struct SinglesMoveEntry{
 class SinglesMoveTableRow : public EditableTableRow, public ConfigOption::Listener{
 public:
     ~SinglesMoveTableRow();
-    SinglesMoveTableRow();
+    SinglesMoveTableRow(bool p_trainer_battle);
     virtual std::unique_ptr<EditableTableRow> clone() const override;
 
     SinglesMoveEntry snapshot() const;
@@ -47,6 +48,7 @@ private:
     virtual void value_changed() override;
 
 private:
+    bool trainer_battle;
     EnumDropdownCell<SinglesMoveType> type;
     BooleanCheckBoxCell terastallize;
     StringCell notes;
@@ -55,14 +57,13 @@ private:
 
 class SinglesMoveTable : public EditableTableOption_t<SinglesMoveTableRow>{
 public:
-    SinglesMoveTable(std::string label);
+    SinglesMoveTable(std::string label, bool trainer_battle);
 
     std::vector<SinglesMoveEntry> snapshot();
 
     virtual std::vector<std::string> make_header() const;
 
-    static std::vector<std::unique_ptr<EditableTableRow>> make_defaults();
-
+    static std::vector<std::unique_ptr<EditableTableRow>> make_defaults(bool trainer_battle);
 };
 
 
