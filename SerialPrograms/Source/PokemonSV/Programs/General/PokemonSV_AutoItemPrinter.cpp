@@ -4,9 +4,7 @@
  *
  */
 
-#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "CommonFramework/Inference/BlackScreenDetector.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Tools/StatsTracking.h"
@@ -16,7 +14,6 @@
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h"
-#include "PokemonSV/Programs/PokemonSV_SaveGame.h"
 #include "PokemonSV_AutoItemPrinter.h"
 
 namespace PokemonAutomation{
@@ -58,7 +55,9 @@ AutoItemPrinter::AutoItemPrinter()
         LockMode::UNLOCK_WHILE_RUNNING,
         100
     )
+    , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
+        &NOTIFICATION_STATUS_UPDATE,
         &NOTIFICATION_PROGRAM_FINISH,
         &NOTIFICATION_ERROR_FATAL,
     })
@@ -69,6 +68,112 @@ AutoItemPrinter::AutoItemPrinter()
 }
 
 
+void AutoItemPrinter::enter_printing_mode(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    env.console.log("Entering printing mode...");
+
+    while (true){
+        OverworldWatcher     overworld(COLOR_CYAN);
+        AdvanceDialogWatcher dialog(COLOR_YELLOW);
+        PromptDialogWatcher  prompt(COLOR_YELLOW);
+        WhiteButtonWatcher   material(COLOR_GREEN, WhiteButton::ButtonX, {0.60, 0.92, 0.39, 0.08});
+        context.wait_for_all_requests();
+
+        int ret_printer_entry = wait_until(
+            env.console, context,
+            std::chrono::seconds(120),
+            { material, overworld, dialog, prompt }
+        );
+        context.wait_for_all_requests();
+
+        switch (ret_printer_entry){
+        case 0: // material
+            return;
+        case 1: // overworld
+        case 2: // dialog
+        case 3: // prompt
+            pbf_press_button(context, BUTTON_A, 20, 5);
+            continue;
+        default:
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, env.console,
+                "enter_printing_mode(): No recognized state after 120 seconds.",
+                true
+            );
+        }
+    }
+}
+
+
+void AutoItemPrinter::start_print(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    env.console.log("Starting print...");
+
+    while (true){
+        PromptDialogWatcher  prompt(COLOR_YELLOW);
+        WhiteButtonWatcher   material(COLOR_GREEN, WhiteButton::ButtonX, {0.60, 0.92, 0.39, 0.08});
+        WhiteButtonWatcher   handle(COLOR_BLUE,    WhiteButton::ButtonA, {0.40, 0.80, 0.20, 0.14});
+        context.wait_for_all_requests();
+
+        int ret_print_start = wait_until(
+            env.console, context,
+            std::chrono::seconds(120),
+            { handle, prompt, material }
+        );
+        context.wait_for_all_requests();
+
+        switch (ret_print_start){
+        case 0: // handle
+            return;
+        case 1: // prompt
+            pbf_press_button(context, BUTTON_A, 20, 5);
+            continue;
+        case 2: // material
+            pbf_press_button(context, BUTTON_X, 20, 5);
+            continue;
+        default:
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, env.console,
+                "start_print(): No recognized state after 120 seconds.",
+                true
+            );
+        }
+    }
+}
+
+
+void AutoItemPrinter::finish_print(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    env.console.log("Finishing print...");
+
+    while (true){
+        AdvanceDialogWatcher dialog(COLOR_YELLOW);
+        WhiteButtonWatcher   material(COLOR_GREEN, WhiteButton::ButtonX, {0.60, 0.92, 0.39, 0.08});
+        WhiteButtonWatcher   handle(COLOR_BLUE,    WhiteButton::ButtonA, {0.40, 0.80, 0.20, 0.14});
+        WhiteButtonWatcher   result(COLOR_GREEN,   WhiteButton::ButtonA, {0.60, 0.92, 0.39, 0.08});
+        context.wait_for_all_requests();
+
+        int ret_print_end = wait_until(
+            env.console, context,
+            std::chrono::seconds(120),
+            { material, handle, dialog, result }
+        );
+        context.wait_for_all_requests();
+
+        switch (ret_print_end){
+        case 0: // material
+            return;
+        case 1: // handle
+        case 2: // dialog
+        case 3: // result
+            pbf_press_button(context, BUTTON_A, 20, 5);
+            continue;
+        default:
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, env.console,
+                "finish_print(): No recognized state after 120 seconds.",
+                true
+            );
+        }
+    }
+}
 
 
 void AutoItemPrinter::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
@@ -79,11 +184,35 @@ void AutoItemPrinter::program(SingleSwitchProgramEnvironment& env, BotBaseContex
     //  Connect the controller.
     pbf_press_button(context, BUTTON_L, 10, 0);
 
-    stats.m_trials++;
-    env.update_stats();
+    enter_printing_mode(env, context);
 
-    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
-    GO_HOME_WHEN_DONE.run_end_of_program(context);
+    for (uint16_t i = 0; i < NUM_ROUNDS; i++){
+        start_print(env, context);
+        finish_print(env, context);
+
+        env.console.log("Print completed.");
+        stats.m_rounds++;
+        env.update_stats();
+        send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
+    }
+
+    env.console.log("Returning to overworld...");
+    OverworldWatcher overworld(COLOR_CYAN);
+    context.wait_for_all_requests();
+
+    int ret_finish = run_until(
+        env.console, context,
+        [](BotBaseContext& context) {
+            pbf_mash_button(context, BUTTON_B, 10000);
+        },
+        { overworld }
+    );
+    context.wait_for_all_requests();
+
+    if (ret_finish == 1){
+        send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
+        GO_HOME_WHEN_DONE.run_end_of_program(context);
+    }
 }
 
 

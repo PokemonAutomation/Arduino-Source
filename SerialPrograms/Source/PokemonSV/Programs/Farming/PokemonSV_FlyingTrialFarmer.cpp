@@ -157,7 +157,7 @@ void FlyingTrialFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseCont
     //  Connect the controller.
     pbf_press_button(context, BUTTON_L, 10, 0);
 
-    for (uint8_t i = 0; i < NUM_TRIALS; i++){
+    for (uint16_t i = 0; i < NUM_TRIALS; i++){
         BlackScreenOverWatcher black_screen(COLOR_RED, { 0.2, 0.2, 0.6, 0.6 });
         context.wait_for_all_requests();
 

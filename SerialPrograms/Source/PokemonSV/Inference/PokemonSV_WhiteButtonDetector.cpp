@@ -34,6 +34,8 @@ const char* white_button_template_path(WhiteButton type){
         return "PokemonSV/Buttons/WhiteButtonA.png";
     case WhiteButton::ButtonB:
         return "PokemonSV/Buttons/WhiteButtonB.png";
+    case WhiteButton::ButtonX:
+        return "PokemonSV/Buttons/WhiteButtonX.png";
     case WhiteButton::ButtonY:
         return "PokemonSV/Buttons/WhiteButtonY.png";
     case WhiteButton::ButtonMinus:
@@ -53,6 +55,8 @@ const WhiteButtonMatcher& get_button_matcher(WhiteButton type){
         return WhiteButtonMatcher::A();
     case WhiteButton::ButtonB:
         return WhiteButtonMatcher::B();
+    case WhiteButton::ButtonX:
+        return WhiteButtonMatcher::X();
     case WhiteButton::ButtonY:
         return WhiteButtonMatcher::Y();
     case WhiteButton::ButtonMinus:
@@ -83,6 +87,10 @@ const WhiteButtonMatcher& WhiteButtonMatcher::A(){
 }
 const WhiteButtonMatcher& WhiteButtonMatcher::B(){
     static WhiteButtonMatcher matcher(WhiteButton::ButtonB, 15, 15, 90);
+    return matcher;
+}
+const WhiteButtonMatcher& WhiteButtonMatcher::X(){
+    static WhiteButtonMatcher matcher(WhiteButton::ButtonX, 15, 15, 90);
     return matcher;
 }
 const WhiteButtonMatcher& WhiteButtonMatcher::Y(){

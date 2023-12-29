@@ -36,8 +36,12 @@ public:
 private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
     SimpleIntegerOption<uint16_t> NUM_ROUNDS;
-    
+    EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;
+
+    void enter_printing_mode(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    void start_print(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    void finish_print(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 };
 
 
