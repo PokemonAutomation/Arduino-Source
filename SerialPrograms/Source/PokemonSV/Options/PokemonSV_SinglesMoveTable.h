@@ -36,10 +36,12 @@ struct SinglesMoveEntry{
 };
 
 
+
 class SinglesMoveTableRow : public EditableTableRow, public ConfigOption::Listener{
 public:
     ~SinglesMoveTableRow();
-    SinglesMoveTableRow(bool p_trainer_battle);
+    SinglesMoveTableRow(bool trainer_battle);
+    SinglesMoveTableRow(const EditableTableOption& table);
     virtual std::unique_ptr<EditableTableRow> clone() const override;
 
     SinglesMoveEntry snapshot() const;
@@ -48,7 +50,7 @@ private:
     virtual void value_changed() override;
 
 private:
-    bool trainer_battle;
+    const bool m_trainer_battle;
     EnumDropdownCell<SinglesMoveType> type;
     BooleanCheckBoxCell terastallize;
     StringCell notes;
@@ -63,7 +65,12 @@ public:
 
     virtual std::vector<std::string> make_header() const;
 
-    static std::vector<std::unique_ptr<EditableTableRow>> make_defaults(bool trainer_battle);
+    std::vector<std::unique_ptr<EditableTableRow>> make_defaults();
+
+private:
+    friend class SinglesMoveTableRow;
+
+    bool m_trainer_battle;
 };
 
 

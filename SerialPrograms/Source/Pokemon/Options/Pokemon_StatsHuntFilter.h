@@ -82,7 +82,7 @@ class StatsHuntIvJudgeFilterTable;
 class StatsHuntIvJudgeFilterRow : public EditableTableRow{
 public:
     StatsHuntIvJudgeFilterRow(const StatsHuntMiscFeatureFlags& feature_flags);
-    StatsHuntIvJudgeFilterRow(const EditableTableOption* table);
+    StatsHuntIvJudgeFilterRow(const EditableTableOption& table);
     StatsHuntIvJudgeFilterRow(const StatsHuntMiscFeatureFlags& feature_flags, StatsHuntShinyFilter p_shiny);
     virtual std::unique_ptr<EditableTableRow> clone() const override;
 
@@ -134,11 +134,10 @@ public:
 extern const char* StatsHuntIvRangeFilterTable_Label_Regular;
 
 
-class StatsHuntIvRangeFilterTable;
 class StatsHuntIvRangeFilterRow : public EditableTableRow{
 public:
     StatsHuntIvRangeFilterRow(const StatsHuntMiscFeatureFlags& feature_flags);
-    StatsHuntIvRangeFilterRow(const EditableTableOption* table);
+    StatsHuntIvRangeFilterRow(const EditableTableOption& table);
     virtual std::unique_ptr<EditableTableRow> clone() const override;
 
     bool matches(

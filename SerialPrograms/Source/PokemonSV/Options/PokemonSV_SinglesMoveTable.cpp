@@ -56,9 +56,10 @@ std::string SinglesMoveEntry::to_str() const{
 SinglesMoveTableRow::~SinglesMoveTableRow(){
     type.remove_listener(*this);
 }
-SinglesMoveTableRow::SinglesMoveTableRow(bool p_trainer_battle)
-    : type(
-        p_trainer_battle ? singles_move_enum_database_trainer() : singles_move_enum_database_wild(),
+SinglesMoveTableRow::SinglesMoveTableRow(bool trainer_battle)
+    : m_trainer_battle(trainer_battle)
+    , type(
+        trainer_battle ? singles_move_enum_database_trainer() : singles_move_enum_database_wild(),
         LockMode::UNLOCK_WHILE_RUNNING,
         SinglesMoveType::Move1
     )
@@ -72,8 +73,11 @@ SinglesMoveTableRow::SinglesMoveTableRow(bool p_trainer_battle)
     SinglesMoveTableRow::value_changed();
     type.add_listener(*this);
 }
+SinglesMoveTableRow::SinglesMoveTableRow(const EditableTableOption& table)
+    : SinglesMoveTableRow(static_cast<const SinglesMoveTable&>(table).m_trainer_battle)
+{}
 std::unique_ptr<EditableTableRow> SinglesMoveTableRow::clone() const{
-    std::unique_ptr<SinglesMoveTableRow> ret(new SinglesMoveTableRow(trainer_battle));
+    std::unique_ptr<SinglesMoveTableRow> ret(new SinglesMoveTableRow(m_trainer_battle));
     ret->type.set(type);
     ret->terastallize = (bool)terastallize;
     ret->notes.set(notes);
@@ -100,7 +104,7 @@ SinglesMoveTable::SinglesMoveTable(std::string label, bool trainer_battle)
         "Changes to this table take effect on the next battle.",
 #endif
         LockMode::UNLOCK_WHILE_RUNNING,
-        make_defaults(trainer_battle)
+        make_defaults()
     )
 {}
 
@@ -114,9 +118,9 @@ std::vector<std::string> SinglesMoveTable::make_header() const{
         "Notes",
     };
 }
-std::vector<std::unique_ptr<EditableTableRow>> SinglesMoveTable::make_defaults(bool trainer_battle){
+std::vector<std::unique_ptr<EditableTableRow>> SinglesMoveTable::make_defaults(){
     std::vector<std::unique_ptr<EditableTableRow>> ret;
-    ret.emplace_back(new SinglesMoveTableRow(trainer_battle));
+    ret.emplace_back(new SinglesMoveTableRow(*this));
     return ret;
 }
 
