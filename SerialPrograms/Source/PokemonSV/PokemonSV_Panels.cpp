@@ -97,9 +97,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<AuctionFarmer_Descriptor, AuctionFarmer>());
     ret.emplace_back(make_single_switch_program<ESPTraining_Descriptor, ESPTraining>());
     ret.emplace_back(make_single_switch_program<TournamentFarmer_Descriptor, TournamentFarmer>());
-    if (PreloadSettings::instance().DEVELOPER_MODE){
-        ret.emplace_back(make_single_switch_program<TournamentFarmer2_Descriptor, TournamentFarmer2>());
-    }
+    ret.emplace_back(make_single_switch_program<TournamentFarmer2_Descriptor, TournamentFarmer2>());
     ret.emplace_back(make_single_switch_program<FlyingTrialFarmer_Descriptor, FlyingTrialFarmer>());
 
     ret.emplace_back("---- Eggs ----");
