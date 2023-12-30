@@ -163,7 +163,7 @@ public:
         if constexpr (std::is_default_constructible_v<RowType>){
             return std::unique_ptr<EditableTableRow>(new RowType());
         }else{
-            return std::unique_ptr<EditableTableRow>(new RowType(this));
+            return std::unique_ptr<EditableTableRow>(new RowType(*this));
         }
     }
 };

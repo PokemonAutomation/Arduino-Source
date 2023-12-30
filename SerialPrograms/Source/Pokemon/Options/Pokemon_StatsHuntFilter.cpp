@@ -145,8 +145,8 @@ StatsHuntIvJudgeFilterRow::StatsHuntIvJudgeFilterRow(const StatsHuntMiscFeatureF
     PA_ADD_OPTION(iv_spdef);
     PA_ADD_OPTION(iv_speed);
 }
-StatsHuntIvJudgeFilterRow::StatsHuntIvJudgeFilterRow(const EditableTableOption* table)
-    : StatsHuntIvJudgeFilterRow(static_cast<const StatsHuntIvJudgeFilterTable&>(*table).feature_flags)
+StatsHuntIvJudgeFilterRow::StatsHuntIvJudgeFilterRow(const EditableTableOption& table)
+    : StatsHuntIvJudgeFilterRow(static_cast<const StatsHuntIvJudgeFilterTable&>(table).feature_flags)
 {}
 StatsHuntIvJudgeFilterRow::StatsHuntIvJudgeFilterRow(const StatsHuntMiscFeatureFlags& feature_flags, StatsHuntShinyFilter p_shiny)
     : StatsHuntIvJudgeFilterRow(feature_flags)
@@ -289,8 +289,8 @@ StatsHuntIvRangeFilterRow::StatsHuntIvRangeFilterRow(const StatsHuntMiscFeatureF
     PA_ADD_OPTION(iv_spdef);
     PA_ADD_OPTION(iv_speed);
 }
-StatsHuntIvRangeFilterRow::StatsHuntIvRangeFilterRow(const EditableTableOption* table)
-    : StatsHuntIvRangeFilterRow(static_cast<const StatsHuntIvJudgeFilterTable&>(*table).feature_flags)
+StatsHuntIvRangeFilterRow::StatsHuntIvRangeFilterRow(const EditableTableOption& table)
+    : StatsHuntIvRangeFilterRow(static_cast<const StatsHuntIvJudgeFilterTable&>(table).feature_flags)
 {}
 std::unique_ptr<EditableTableRow> StatsHuntIvRangeFilterRow::clone() const{
     std::unique_ptr<StatsHuntIvRangeFilterRow> ret(new StatsHuntIvRangeFilterRow(misc.feature_flags));
