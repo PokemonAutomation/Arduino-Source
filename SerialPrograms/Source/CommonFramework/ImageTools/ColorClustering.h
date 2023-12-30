@@ -44,7 +44,7 @@ bool cluster_fit_2(
     Color color1, double ratio1,
     double ratio_threshold = 0.2,
     double deviation_threshold = 50,
-    double distance_threshold = 0.2
+    double distance_threshold = 0.25
 );
 
 

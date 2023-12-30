@@ -117,14 +117,15 @@ bool BattleMenuDetector::detect(const ImageViewRGB32& screen){
         return false;
     }
 
+//    cout << "===============" << endl;
 
     fight = false;
-    fight |= !fight && cluster_fit_2(
+    fight |= !fight && cluster_fit_2(   //  Not selected (red on white)
         extract_box_reference(screen, m_icon_fight),
         Color(255, 255, 255), 1.7,
         Color(153, 75, 112), 1.0
     );
-    fight |= !fight && cluster_fit_2(
+    fight |= !fight && cluster_fit_2(   //  Selected (red on black)
         extract_box_reference(screen, m_icon_fight),
         Color(0, 0, 0), 1.4,
         Color(185, 6, 40), 1.0

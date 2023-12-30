@@ -137,6 +137,7 @@ bool cluster_fit_2(
         ratio_sum += count_ratio_desired[c];
         center_actual[c] = cluster[c].center();
     }
+//    cout << "---------------" << endl;
     for (size_t c = 0; c < NUM_CLUSTERS; c++){
 //        cout << cluster[c].count() << ": " << cluster[c].center() << ", " << cluster[c].deviation() << endl;
 
@@ -152,12 +153,14 @@ bool cluster_fit_2(
         }
 
         if (center_desired[c].sum() < 50){
+//            cout << "Black" << endl;
             double distance = euclidean_distance(center_desired[c], center_actual[c]) * count_ratio_desired[c];
             if (distance > 40){
 //                cout << "Black Distance is Too Large: " << distance << endl;
                 return false;
             }
         }else{
+//            cout << "Not Black" << endl;
             FloatPixel ratio_desired = center_desired[c] / center_desired[c].sum();
             FloatPixel ratio_actual = center_actual[c] / center_actual[c].sum();
             double distance = euclidean_distance(ratio_desired, ratio_actual);
