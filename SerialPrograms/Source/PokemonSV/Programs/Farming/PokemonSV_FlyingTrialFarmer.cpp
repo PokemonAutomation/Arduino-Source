@@ -16,6 +16,7 @@
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h"
+#include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_SaveGame.h"
 #include "PokemonSV_FlyingTrialFarmer.h"
 
@@ -42,12 +43,12 @@ struct FlyingTrialFarmer_Descriptor::Stats : public StatsTracker{
         : m_trials(m_stats["Trials"])
         , m_success(m_stats["Success"])
         , m_fail(m_stats["Fail"])
-        , m_saves(m_stats["Game Saves"])
+        , m_saves(m_stats["Save & Reset"])
     {
         m_display_order.emplace_back("Trials");
         m_display_order.emplace_back("Success");
         m_display_order.emplace_back("Fail");
-        m_display_order.emplace_back("Game Saves");
+        m_display_order.emplace_back("Save & Reset");
     }
     std::atomic<uint64_t>& m_trials;
     std::atomic<uint64_t>& m_success;
@@ -68,7 +69,7 @@ FlyingTrialFarmer::FlyingTrialFarmer()
         1000
     )
     , SAVE_NUM_ROUNDS(
-          "<b>Save after attempting this many trials:</b><br>0 disables saving.",
+          "<b>Save and reset the game after attempting this many trials:</b><br>This preserves progress and prevents potential game lags from long runs.<br>0 disables this option.",
           LockMode::UNLOCK_WHILE_RUNNING,
           50
     )
@@ -246,6 +247,7 @@ void FlyingTrialFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseCont
 
         if (SAVE_NUM_ROUNDS != 0 && stats.m_trials % SAVE_NUM_ROUNDS == 0){
             save_game_from_overworld(env.program_info(), env.console, context);
+            reset_game(env.program_info(), env.console, context);
             stats.m_saves++;
         }
 
