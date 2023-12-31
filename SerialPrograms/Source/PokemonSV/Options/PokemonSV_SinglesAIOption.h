@@ -21,6 +21,7 @@ namespace PokemonSV{
 
 class SinglesAIOption : public GroupOption{
 public:
+    ~SinglesAIOption();
     SinglesAIOption(bool trainer_battle);
 
 public:

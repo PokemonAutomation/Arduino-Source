@@ -16,6 +16,7 @@ using namespace Pokemon;
 
 
 
+SinglesAIOption::~SinglesAIOption() = default;
 SinglesAIOption::SinglesAIOption(bool trainer_battle)
     : GroupOption(
         "Battle AI",
