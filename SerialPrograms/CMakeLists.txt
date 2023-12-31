@@ -1446,6 +1446,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_FastCodeEntry.h
     Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_VideoFastCodeEntry.cpp
     Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_VideoFastCodeEntry.h
+    Source/PokemonSV/Programs/General/PokemonSV_AutoItemPrinter.cpp
+    Source/PokemonSV/Programs/General/PokemonSV_AutoItemPrinter.h
     Source/PokemonSV/Programs/General/PokemonSV_AutonomousBallThrower.cpp
     Source/PokemonSV/Programs/General/PokemonSV_AutonomousBallThrower.h
     Source/PokemonSV/Programs/General/PokemonSV_ClothingBuyer.cpp
