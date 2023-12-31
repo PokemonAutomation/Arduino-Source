@@ -49,6 +49,7 @@ struct FlyingTrialFarmer_Descriptor::Stats : public StatsTracker{
         m_display_order.emplace_back("Success");
         m_display_order.emplace_back("Fail");
         m_display_order.emplace_back("Save & Reset");
+        m_aliases["Game Saves"] = "Save & Reset";
     }
     std::atomic<uint64_t>& m_trials;
     std::atomic<uint64_t>& m_success;

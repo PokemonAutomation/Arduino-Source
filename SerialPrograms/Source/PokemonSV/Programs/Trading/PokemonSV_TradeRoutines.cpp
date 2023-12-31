@@ -18,6 +18,10 @@
 #include "PokemonSV/Programs/Boxes/PokemonSV_BoxRoutines.h"
 #include "PokemonSV_TradeRoutines.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
@@ -88,7 +92,10 @@ public:
         m_slot.make_overlays(items);
     }
     virtual bool detect(const ImageViewRGB32& screen) const override{
-        return m_cursor.detect(screen) && m_slot.detect(screen);
+        bool cursor_ok = m_cursor.detect(screen);
+        bool slot_ok = m_slot.detect(screen);
+//        cout << "cursor = " << cursor_ok << ", slot_ok = " << slot_ok << endl;
+        return cursor_ok && slot_ok;
     }
 
 private:
