@@ -59,6 +59,7 @@ jobs:
         robocopy Packages/PABotBase/PABotBase-Switch        Output/PABotBase /s
         robocopy Arduino-Source/SerialPrograms/bin          Output/Binaries dpp.dll libcrypto-1_1-x64.dll libsodium.dll libssl-1_1-x64.dll opencv_world460.dll opus.dll Sleepy.dll tesseractPA.dll zlib1.dll
         robocopy Arduino-Source/SerialPrograms/bin/Release  Output/Binaries SerialPrograms.exe
+        echo https://github.com/${{github.repository}}/commit/${{github.sha}} > Output/version.txt
         write-host "Robocopy exited with exit code:" $lastexitcode
         if ($lastexitcode -eq 1)
         {
