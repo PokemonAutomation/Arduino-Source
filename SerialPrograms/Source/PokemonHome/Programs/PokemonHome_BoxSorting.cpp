@@ -177,7 +177,7 @@ struct Pokemon{
     bool gmax = false;
     std::string ball_slug = "";
     StatsHuntGenderFilter gender = StatsHuntGenderFilter::Genderless;
-    uint16_t ot_id = 0;
+    uint32_t ot_id = 0;
 };
 
 bool operator==(const Pokemon& lhs, const Pokemon& rhs){
