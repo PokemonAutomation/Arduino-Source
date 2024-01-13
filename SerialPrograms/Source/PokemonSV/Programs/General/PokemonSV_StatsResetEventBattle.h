@@ -1,11 +1,11 @@
-/*  Stats Reset Bloodmoon
+/*  Stats Reset Event Battle
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
  */
 
-#ifndef PokemonAutomation_PokemonSV_StatsResetBloodmoon_H
-#define PokemonAutomation_PokemonSV_StatsResetBloodmoon_H
+#ifndef PokemonAutomation_PokemonSV_StatsResetEventBattle_H
+#define PokemonAutomation_PokemonSV_StatsResetEventBattle_H
 
 #include "Common/Cpp/Options/StringOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
@@ -41,23 +41,29 @@ public:
 };
 
 
-class StatsResetBloodmoon_Descriptor : public SingleSwitchProgramDescriptor{
+class StatsResetEventBattle_Descriptor : public SingleSwitchProgramDescriptor{
 public:
-    StatsResetBloodmoon_Descriptor();
+    StatsResetEventBattle_Descriptor();
 
     struct Stats;
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
-class StatsResetBloodmoon : public SingleSwitchProgramInstance{
+class StatsResetEventBattle : public SingleSwitchProgramInstance{
 public:
-    StatsResetBloodmoon();
+    StatsResetEventBattle();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
     bool check_stats_after_win(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
 private:
+    enum class Target {
+        Ursaluna,
+        Pecharunt,
+    };
+    EnumDropdownOption<Target> TARGET;
+
     IvDisplay CALCULATED_IVS;
 
     OCR::LanguageOCROption LANGUAGE;
@@ -71,7 +77,8 @@ private:
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;
 
-    void enter_battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    void enter_battle_ursaluna(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    void enter_battle_pecharunt(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
     bool run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
     bool check_stats(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 };

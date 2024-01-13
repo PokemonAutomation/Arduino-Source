@@ -1458,8 +1458,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Programs/General/PokemonSV_SizeChecker.h
     Source/PokemonSV/Programs/General/PokemonSV_StatsReset.cpp
     Source/PokemonSV/Programs/General/PokemonSV_StatsReset.h
-    Source/PokemonSV/Programs/General/PokemonSV_StatsResetBloodmoon.cpp
-    Source/PokemonSV/Programs/General/PokemonSV_StatsResetBloodmoon.h
+    Source/PokemonSV/Programs/General/PokemonSV_StatsResetEventBattle.cpp
+    Source/PokemonSV/Programs/General/PokemonSV_StatsResetEventBattle.h
     Source/PokemonSV/Programs/Glitches/PokemonSV_CloneItems-1.0.1.cpp
     Source/PokemonSV/Programs/Glitches/PokemonSV_CloneItems-1.0.1.h
     Source/PokemonSV/Programs/Glitches/PokemonSV_RideCloner-1.0.1.cpp

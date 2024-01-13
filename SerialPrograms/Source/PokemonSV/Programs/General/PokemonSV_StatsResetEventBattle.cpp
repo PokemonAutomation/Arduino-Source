@@ -1,4 +1,4 @@
-/*  Stats Reset Bloodmoon
+/*  Stats Reset Event Battle
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
@@ -24,7 +24,7 @@
 //#include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Programs/Battles/PokemonSV_BasicCatcher.h"
-#include "PokemonSV_StatsResetBloodmoon.h"
+#include "PokemonSV_StatsResetEventBattle.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -69,18 +69,18 @@ void IvDisplay::set(const IvRanges& ivs){
 }
 
 
-StatsResetBloodmoon_Descriptor::StatsResetBloodmoon_Descriptor()
+StatsResetEventBattle_Descriptor::StatsResetEventBattle_Descriptor()
     : SingleSwitchProgramDescriptor(
-        "PokemonSV:StatsResetBloodmoon",
-        STRING_POKEMON + " SV", "Stats Reset - Bloodmoon Ursaluna",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSV/StatsResetBloodmoon.md",
-        "Repeatedly catch Bloodmoon Ursaluna until you get the stats you want.",
+        "PokemonSV:StatsResetEventBattle",
+        STRING_POKEMON + " SV", "Stats Reset - Event Battle",
+        "ComputerControl/blob/master/Wiki/Programs/PokemonSV/StatsResetEventBattle.md",
+        "Repeatedly catch Bloodmoon Ursaluna or Pecharunt until you get the stats you want.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
-struct StatsResetBloodmoon_Descriptor::Stats : public StatsTracker{
+struct StatsResetEventBattle_Descriptor::Stats : public StatsTracker{
     Stats()
         : resets(m_stats["Resets"])
         , catches(m_stats["Catches"])
@@ -97,11 +97,20 @@ struct StatsResetBloodmoon_Descriptor::Stats : public StatsTracker{
     std::atomic<uint64_t>& matches;
     std::atomic<uint64_t>& errors;
 };
-std::unique_ptr<StatsTracker> StatsResetBloodmoon_Descriptor::make_stats() const{
+std::unique_ptr<StatsTracker> StatsResetEventBattle_Descriptor::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
 }
-StatsResetBloodmoon::StatsResetBloodmoon()
-    : LANGUAGE(
+StatsResetEventBattle::StatsResetEventBattle()
+    : TARGET(
+        "<b>Target:</b><br>The Pokemon you are resetting for.",
+        {
+            {Target::Ursaluna, "ursaluna", "Bloodmoon Ursaluna"},
+            {Target::Pecharunt, "pecharunt", "Pecharunt"},
+        },
+        LockMode::LOCK_WHILE_RUNNING,
+        Target::Ursaluna
+    )
+    , LANGUAGE(
         "<b>Game Language:</b><br>This field is required so we can read IVs.",
         IV_READER().languages(),
         LockMode::LOCK_WHILE_RUNNING,
@@ -180,6 +189,7 @@ StatsResetBloodmoon::StatsResetBloodmoon()
 //    if (PreloadSettings::instance().DEVELOPER_MODE){
         PA_ADD_STATIC(CALCULATED_IVS);
 //    }
+    PA_ADD_OPTION(TARGET);
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(BALL_SELECT);
     PA_ADD_OPTION(TRY_TO_TERASTILLIZE);
@@ -190,7 +200,7 @@ StatsResetBloodmoon::StatsResetBloodmoon()
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
-void StatsResetBloodmoon::enter_battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void StatsResetEventBattle::enter_battle_ursaluna(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
 
     AdvanceDialogWatcher advance_detector(COLOR_YELLOW);
     PromptDialogWatcher prompt_detector(COLOR_YELLOW);
@@ -263,8 +273,53 @@ void StatsResetBloodmoon::enter_battle(SingleSwitchProgramEnvironment& env, BotB
     context.wait_for_all_requests();
 }
 
-bool StatsResetBloodmoon::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    StatsResetBloodmoon_Descriptor::Stats& stats = env.current_stats<StatsResetBloodmoon_Descriptor::Stats>();
+void StatsResetEventBattle::enter_battle_pecharunt(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+
+    AdvanceDialogWatcher advance_detector(COLOR_YELLOW);
+    AdvanceDialogWatcher advance_detector2(COLOR_YELLOW);
+    NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
+
+    //Talk to Pecharunt
+    pbf_press_button(context, BUTTON_A, 10, 50);
+    int ret = wait_until(env.console, context, Milliseconds(6000), { advance_detector });
+    if (ret == 0){
+        env.log("Dialog detected.");
+    }else{
+        env.log("Dialog not detected.");
+    }
+    pbf_mash_button(context, BUTTON_A, 400);
+    context.wait_for_all_requests();
+
+    //Do you want to challenge the strange pokemon?
+    int ret2 = wait_until(env.console, context, Milliseconds(6000), { advance_detector2 });
+    if (ret2 == 0){
+        env.log("Dialog detected.");
+    }else{
+        env.log("Dialog not detected.");
+    }
+    //Mash through, answer Yes.
+    pbf_mash_button(context, BUTTON_A, 500);
+    context.wait_for_all_requests();
+
+    //Mash B until the battle starts
+    //Note - Sending out Ogerpon/Loyal Three during battle adds time, but the below is more than enough.
+    int ret_battle = run_until(
+        env.console, context,
+        [](BotBaseContext& context){
+            pbf_mash_button(context, BUTTON_B, 10000);
+        },
+        { battle_menu }
+        );
+    if (ret_battle != 0){
+        env.log("Failed to detect battle start!", COLOR_RED);
+    }else{
+        env.log("Battle started.");
+    }
+    context.wait_for_all_requests();
+}
+
+bool StatsResetEventBattle::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    StatsResetEventBattle_Descriptor::Stats& stats = env.current_stats<StatsResetEventBattle_Descriptor::Stats>();
 
     //Assuming the player has a charged orb
     if (TRY_TO_TERASTILLIZE){
@@ -361,13 +416,13 @@ bool StatsResetBloodmoon::run_battle(SingleSwitchProgramEnvironment& env, BotBas
 
         stats.catches++;
         env.update_stats();
-        env.log("Ursaluna caught.");
+        env.log("Target caught.");
     }else{
-        env.log("Battle against Ursaluna lost.", COLOR_RED);
+        env.log("Battle against target lost.", COLOR_RED);
         env.update_stats();
         send_program_status_notification(
             env, NOTIFICATION_STATUS_UPDATE,
-            "Battle against Ursaluna lost."
+            "Battle against target lost."
         );
 
         return false;
@@ -376,8 +431,8 @@ bool StatsResetBloodmoon::run_battle(SingleSwitchProgramEnvironment& env, BotBas
 }
 
 #if 0
-bool StatsResetBloodmoon::check_stats(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    StatsResetBloodmoon_Descriptor::Stats& stats = env.current_stats<StatsResetBloodmoon_Descriptor::Stats>();
+bool StatsResetEventBattle::check_stats(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    StatsResetEventBattle_Descriptor::Stats& stats = env.current_stats<StatsResetEventBattle_Descriptor::Stats>();
     bool match = false;
 
     //Open box
@@ -434,7 +489,7 @@ bool StatsResetBloodmoon::check_stats(SingleSwitchProgramEnvironment& env, BotBa
 }
 #endif
 
-bool StatsResetBloodmoon::check_stats_after_win(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+bool StatsResetEventBattle::check_stats_after_win(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
 #if 0
     //  Clear out dialog until we're free
     OverworldWatcher overworld(COLOR_YELLOW);
@@ -500,7 +555,11 @@ bool StatsResetBloodmoon::check_stats_after_win(SingleSwitchProgramEnvironment& 
             auto snapshot = env.console.video().snapshot();
             IvRanges ivs;
             try{
-                ivs = reader.calc_ivs(env.logger(), snapshot, {113, 70, 120, 135, 65, 52});
+                if (TARGET == Target::Ursaluna) {
+                    ivs = reader.calc_ivs(env.logger(), snapshot, { 113, 70, 120, 135, 65, 52 });
+                } else {
+                    ivs = reader.calc_ivs(env.logger(), snapshot, { 88, 88, 160, 88, 88, 88 });
+                }
             }catch (OperationFailedException& e){
                 send_program_recoverable_error_notification(
                     env, NOTIFICATION_ERROR_RECOVERABLE,
@@ -512,7 +571,12 @@ bool StatsResetBloodmoon::check_stats_after_win(SingleSwitchProgramEnvironment& 
 
             CALCULATED_IVS.set(ivs);
 
-            StatsHuntAction action = FILTERS0.get_action(false, StatsHuntGenderFilter::Any, NatureCheckerValue::Hardy, ivs);
+            StatsHuntAction action;
+            if (TARGET == Target::Ursaluna) {
+                action = FILTERS0.get_action(false, StatsHuntGenderFilter::Any, NatureCheckerValue::Hardy, ivs);
+            } else {
+                action = FILTERS0.get_action(false, StatsHuntGenderFilter::Any, NatureCheckerValue::Timid, ivs);
+            }
 
             return action != StatsHuntAction::Discard;
         }
@@ -524,7 +588,7 @@ bool StatsResetBloodmoon::check_stats_after_win(SingleSwitchProgramEnvironment& 
                 continue;
             }
             else{
-                StatsResetBloodmoon_Descriptor::Stats& stats = env.current_stats<StatsResetBloodmoon_Descriptor::Stats>();
+                StatsResetEventBattle_Descriptor::Stats& stats = env.current_stats<StatsResetEventBattle_Descriptor::Stats>();
                 stats.errors++;
                 env.update_stats();
                 throw UserSetupError(
@@ -534,12 +598,12 @@ bool StatsResetBloodmoon::check_stats_after_win(SingleSwitchProgramEnvironment& 
             }
         }
         default:
-            StatsResetBloodmoon_Descriptor::Stats& stats = env.current_stats<StatsResetBloodmoon_Descriptor::Stats>();
+            StatsResetEventBattle_Descriptor::Stats& stats = env.current_stats<StatsResetEventBattle_Descriptor::Stats>();
             stats.errors++;
             env.update_stats();
             throw OperationFailedException(
                 ErrorReport::SEND_ERROR_REPORT, env.console,
-                "StatsResetBloodmoon::check_stats_after_win(): No state detected after 1 minute."
+                "StatsResetEventBattle::check_stats_after_win(): No state detected after 1 minute."
             );
         }
     }
@@ -547,15 +611,20 @@ bool StatsResetBloodmoon::check_stats_after_win(SingleSwitchProgramEnvironment& 
 #endif
 }
 
-void StatsResetBloodmoon::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void StatsResetEventBattle::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
-    StatsResetBloodmoon_Descriptor::Stats& stats = env.current_stats<StatsResetBloodmoon_Descriptor::Stats>();
+    StatsResetEventBattle_Descriptor::Stats& stats = env.current_stats<StatsResetEventBattle_Descriptor::Stats>();
 
     //  Connect the controller.
     pbf_press_button(context, BUTTON_L, 10, 10);
 
     while (true){
-        enter_battle(env, context);
+        if (TARGET == Target::Ursaluna) {
+            enter_battle_ursaluna(env, context);
+        } else {
+            enter_battle_pecharunt(env, context);
+        }
+        
         if (run_battle(env, context) && check_stats_after_win(env, context)){
             break;
         }
