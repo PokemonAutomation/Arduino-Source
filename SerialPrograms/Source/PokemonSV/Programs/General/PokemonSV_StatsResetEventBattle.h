@@ -1,11 +1,11 @@
-/*  Stats Reset Bloodmoon
+/*  Stats Reset Event Battle
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
  */
 
-#ifndef PokemonAutomation_PokemonSV_StatsResetBloodmoon_H
-#define PokemonAutomation_PokemonSV_StatsResetBloodmoon_H
+#ifndef PokemonAutomation_PokemonSV_StatsResetEventBattle_H
+#define PokemonAutomation_PokemonSV_StatsResetEventBattle_H
 
 #include "Common/Cpp/Options/StringOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
@@ -41,17 +41,17 @@ public:
 };
 
 
-class StatsResetBloodmoon_Descriptor : public SingleSwitchProgramDescriptor{
+class StatsResetEventBattle_Descriptor : public SingleSwitchProgramDescriptor{
 public:
-    StatsResetBloodmoon_Descriptor();
+    StatsResetEventBattle_Descriptor();
 
     struct Stats;
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
-class StatsResetBloodmoon : public SingleSwitchProgramInstance{
+class StatsResetEventBattle : public SingleSwitchProgramInstance{
 public:
-    StatsResetBloodmoon();
+    StatsResetEventBattle();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:

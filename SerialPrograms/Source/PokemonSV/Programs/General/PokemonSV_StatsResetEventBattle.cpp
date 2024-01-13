@@ -1,4 +1,4 @@
-/*  Stats Reset Bloodmoon
+/*  Stats Reset Event Battle
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
@@ -24,7 +24,7 @@
 //#include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Programs/Battles/PokemonSV_BasicCatcher.h"
-#include "PokemonSV_StatsResetBloodmoon.h"
+#include "PokemonSV_StatsResetEventBattle.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -69,18 +69,18 @@ void IvDisplay::set(const IvRanges& ivs){
 }
 
 
-StatsResetBloodmoon_Descriptor::StatsResetBloodmoon_Descriptor()
+StatsResetEventBattle_Descriptor::StatsResetEventBattle_Descriptor()
     : SingleSwitchProgramDescriptor(
-        "PokemonSV:StatsResetBloodmoon",
-        STRING_POKEMON + " SV", "Stats Reset - BM-Ursaluna/Pecharunt",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSV/StatsResetBloodmoon.md",
+        "PokemonSV:StatsResetEventBattle",
+        STRING_POKEMON + " SV", "Stats Reset - Event Battle",
+        "ComputerControl/blob/master/Wiki/Programs/PokemonSV/StatsResetEventBattle.md",
         "Repeatedly catch Bloodmoon Ursaluna or Pecharunt until you get the stats you want.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
-struct StatsResetBloodmoon_Descriptor::Stats : public StatsTracker{
+struct StatsResetEventBattle_Descriptor::Stats : public StatsTracker{
     Stats()
         : resets(m_stats["Resets"])
         , catches(m_stats["Catches"])
@@ -97,10 +97,10 @@ struct StatsResetBloodmoon_Descriptor::Stats : public StatsTracker{
     std::atomic<uint64_t>& matches;
     std::atomic<uint64_t>& errors;
 };
-std::unique_ptr<StatsTracker> StatsResetBloodmoon_Descriptor::make_stats() const{
+std::unique_ptr<StatsTracker> StatsResetEventBattle_Descriptor::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
 }
-StatsResetBloodmoon::StatsResetBloodmoon()
+StatsResetEventBattle::StatsResetEventBattle()
     : TARGET(
         "<b>Target:</b><br>The Pokemon you are resetting for.",
         {
@@ -200,7 +200,7 @@ StatsResetBloodmoon::StatsResetBloodmoon()
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
-void StatsResetBloodmoon::enter_battle_ursaluna(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void StatsResetEventBattle::enter_battle_ursaluna(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
 
     AdvanceDialogWatcher advance_detector(COLOR_YELLOW);
     PromptDialogWatcher prompt_detector(COLOR_YELLOW);
@@ -273,7 +273,7 @@ void StatsResetBloodmoon::enter_battle_ursaluna(SingleSwitchProgramEnvironment& 
     context.wait_for_all_requests();
 }
 
-void StatsResetBloodmoon::enter_battle_pecharunt(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void StatsResetEventBattle::enter_battle_pecharunt(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
 
     AdvanceDialogWatcher advance_detector(COLOR_YELLOW);
     AdvanceDialogWatcher advance_detector2(COLOR_YELLOW);
@@ -318,8 +318,8 @@ void StatsResetBloodmoon::enter_battle_pecharunt(SingleSwitchProgramEnvironment&
     context.wait_for_all_requests();
 }
 
-bool StatsResetBloodmoon::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    StatsResetBloodmoon_Descriptor::Stats& stats = env.current_stats<StatsResetBloodmoon_Descriptor::Stats>();
+bool StatsResetEventBattle::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    StatsResetEventBattle_Descriptor::Stats& stats = env.current_stats<StatsResetEventBattle_Descriptor::Stats>();
 
     //Assuming the player has a charged orb
     if (TRY_TO_TERASTILLIZE){
@@ -431,8 +431,8 @@ bool StatsResetBloodmoon::run_battle(SingleSwitchProgramEnvironment& env, BotBas
 }
 
 #if 0
-bool StatsResetBloodmoon::check_stats(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    StatsResetBloodmoon_Descriptor::Stats& stats = env.current_stats<StatsResetBloodmoon_Descriptor::Stats>();
+bool StatsResetEventBattle::check_stats(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    StatsResetEventBattle_Descriptor::Stats& stats = env.current_stats<StatsResetEventBattle_Descriptor::Stats>();
     bool match = false;
 
     //Open box
@@ -489,7 +489,7 @@ bool StatsResetBloodmoon::check_stats(SingleSwitchProgramEnvironment& env, BotBa
 }
 #endif
 
-bool StatsResetBloodmoon::check_stats_after_win(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+bool StatsResetEventBattle::check_stats_after_win(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
 #if 0
     //  Clear out dialog until we're free
     OverworldWatcher overworld(COLOR_YELLOW);
@@ -588,7 +588,7 @@ bool StatsResetBloodmoon::check_stats_after_win(SingleSwitchProgramEnvironment& 
                 continue;
             }
             else{
-                StatsResetBloodmoon_Descriptor::Stats& stats = env.current_stats<StatsResetBloodmoon_Descriptor::Stats>();
+                StatsResetEventBattle_Descriptor::Stats& stats = env.current_stats<StatsResetEventBattle_Descriptor::Stats>();
                 stats.errors++;
                 env.update_stats();
                 throw UserSetupError(
@@ -598,12 +598,12 @@ bool StatsResetBloodmoon::check_stats_after_win(SingleSwitchProgramEnvironment& 
             }
         }
         default:
-            StatsResetBloodmoon_Descriptor::Stats& stats = env.current_stats<StatsResetBloodmoon_Descriptor::Stats>();
+            StatsResetEventBattle_Descriptor::Stats& stats = env.current_stats<StatsResetEventBattle_Descriptor::Stats>();
             stats.errors++;
             env.update_stats();
             throw OperationFailedException(
                 ErrorReport::SEND_ERROR_REPORT, env.console,
-                "StatsResetBloodmoon::check_stats_after_win(): No state detected after 1 minute."
+                "StatsResetEventBattle::check_stats_after_win(): No state detected after 1 minute."
             );
         }
     }
@@ -611,9 +611,9 @@ bool StatsResetBloodmoon::check_stats_after_win(SingleSwitchProgramEnvironment& 
 #endif
 }
 
-void StatsResetBloodmoon::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void StatsResetEventBattle::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
-    StatsResetBloodmoon_Descriptor::Stats& stats = env.current_stats<StatsResetBloodmoon_Descriptor::Stats>();
+    StatsResetEventBattle_Descriptor::Stats& stats = env.current_stats<StatsResetEventBattle_Descriptor::Stats>();
 
     //  Connect the controller.
     pbf_press_button(context, BUTTON_L, 10, 10);

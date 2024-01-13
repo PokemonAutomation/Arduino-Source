@@ -45,7 +45,7 @@
 #include "Programs/FastCodeEntry/PokemonSV_VideoFastCodeEntry.h"
 
 #include "Programs/General/PokemonSV_StatsReset.h"
-#include "Programs/General/PokemonSV_StatsResetBloodmoon.h"
+#include "Programs/General/PokemonSV_StatsResetEventBattle.h"
 
 #include "Programs/ShinyHunting/PokemonSV_ShinyHunt-AreaZeroPlatform.h"
 #include "Programs/ShinyHunting/PokemonSV_ShinyHunt-Scatterbug.h"
@@ -122,7 +122,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
 
     ret.emplace_back("---- Stats Hunting ----");
     ret.emplace_back(make_single_switch_program<StatsReset_Descriptor, StatsReset>());
-    ret.emplace_back(make_single_switch_program<StatsResetBloodmoon_Descriptor, StatsResetBloodmoon>());
+    ret.emplace_back(make_single_switch_program<StatsResetEventBattle_Descriptor, StatsResetEventBattle>());
 
     ret.emplace_back("---- Shiny Hunting ----");
     ret.emplace_back(make_single_switch_program<ShinyHuntAreaZeroPlatform_Descriptor, ShinyHuntAreaZeroPlatform>());
