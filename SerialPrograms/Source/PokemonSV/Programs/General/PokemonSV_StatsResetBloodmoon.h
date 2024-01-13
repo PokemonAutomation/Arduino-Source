@@ -58,6 +58,12 @@ private:
     bool check_stats_after_win(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
 private:
+    enum class Target {
+        Ursaluna,
+        Pecharunt,
+    };
+    EnumDropdownOption<Target> TARGET;
+
     IvDisplay CALCULATED_IVS;
 
     OCR::LanguageOCROption LANGUAGE;
@@ -71,7 +77,8 @@ private:
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;
 
-    void enter_battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    void enter_battle_ursaluna(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    void enter_battle_pecharunt(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
     bool run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
     bool check_stats(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 };
