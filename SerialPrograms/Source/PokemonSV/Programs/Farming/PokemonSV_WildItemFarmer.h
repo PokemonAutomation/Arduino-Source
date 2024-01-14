@@ -34,14 +34,15 @@ public:
 
 private:
     void refresh_pp(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    void verify_item_held(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
 private:
     SimpleIntegerOption<uint16_t> ITEMS_TO_CLONE;
 //    IntegerEnumDropdownOption TRICK_MOVE_SLOT;
     SimpleIntegerOption<uint8_t> INITIAL_TRICK_PP;
 //    GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
-//    EventNotificationOption NOTIFICATION_STATUS_UPDATE;
-//    EventNotificationsOption NOTIFICATIONS;
+    EventNotificationOption NOTIFICATION_STATUS_UPDATE;
+    EventNotificationsOption NOTIFICATIONS;
 };
 
 }

@@ -6,6 +6,7 @@
 
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Tools/VideoResolutionCheck.h"
@@ -84,10 +85,17 @@ WildItemFarmer::WildItemFarmer()
         LockMode::UNLOCK_WHILE_RUNNING,
         0, 0, 16
     )
+    , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
+    , NOTIFICATIONS({
+        &NOTIFICATION_STATUS_UPDATE,
+        &NOTIFICATION_PROGRAM_FINISH,
+        &NOTIFICATION_ERROR_FATAL,
+    })
 {
     PA_ADD_OPTION(ITEMS_TO_CLONE);
 //    PA_ADD_OPTION(TRICK_MOVE_SLOT);
     PA_ADD_OPTION(INITIAL_TRICK_PP);
+    PA_ADD_OPTION(NOTIFICATIONS);
 }
 
 
@@ -156,11 +164,15 @@ void WildItemFarmer::refresh_pp(SingleSwitchProgramEnvironment& env, BotBaseCont
             );
         }
     }
+}
 
-//    PromptDialogWatcher remember_prompt(COLOR_BLUE);
+void verify_item_held(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+
+
 
 
 }
+
 
 void WildItemFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
@@ -171,6 +183,7 @@ void WildItemFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
     bool trick_used = false;
     bool overworld_seen = false;
     int8_t trick_PP = INITIAL_TRICK_PP;
+    uint8_t consecutive_throw_attempts = 0;
     WallClock last_trick_attempt = WallClock::min();
     while (true){
         OverworldWatcher overworld(COLOR_CYAN);
@@ -201,6 +214,9 @@ void WildItemFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
                 stats.items++;
                 env.update_stats();
             }
+            if (!overworld_seen){
+                send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
+            }
             overworld_seen = true;
             trick_used = false;
 
@@ -212,6 +228,16 @@ void WildItemFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
                 continue;
             }
 
+            consecutive_throw_attempts++;
+            if (consecutive_throw_attempts > 3){
+                stats.errors++;
+                env.update_stats();
+                throw OperationFailedException(
+                    ErrorReport::SEND_ERROR_REPORT, env.logger(),
+                    "Failed to start battle after 3 attempts."
+                );
+            }
+
             pbf_press_button(context, BUTTON_L, 20, 23);
             pbf_move_left_joystick(context, 128, 0, 50, 0);
             pbf_mash_button(context, BUTTON_ZR, 250);
@@ -220,6 +246,7 @@ void WildItemFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
 
         case 1:
             env.log("Detected battle menu.");
+            consecutive_throw_attempts = 0;
             if (overworld_seen){
                 stats.battles++;
                 env.update_stats();
