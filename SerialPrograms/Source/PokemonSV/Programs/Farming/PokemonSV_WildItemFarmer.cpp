@@ -98,6 +98,14 @@ WildItemFarmer::WildItemFarmer()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
+void WildItemFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    try{
+        run_program(env, context);
+    }catch (...){
+        pbf_press_button(context, BUTTON_HOME, 20, 105);
+        throw;
+    }
+}
 
 void WildItemFarmer::refresh_pp(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     int move_overwrites = 0;
@@ -174,7 +182,7 @@ void verify_item_held(SingleSwitchProgramEnvironment& env, BotBaseContext& conte
 }
 
 
-void WildItemFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void WildItemFarmer::run_program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
     WildItemFarmer_Descriptor::Stats& stats = env.current_stats<WildItemFarmer_Descriptor::Stats>();
 
@@ -224,7 +232,6 @@ void WildItemFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
 
             if (trick_PP <= 0){
                 pbf_press_button(context, BUTTON_X, 20, 105);
-//                throw ProgramFinishedException(env.console, "Out of PP.");
                 continue;
             }
 

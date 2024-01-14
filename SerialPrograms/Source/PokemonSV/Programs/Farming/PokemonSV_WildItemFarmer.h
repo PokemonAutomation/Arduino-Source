@@ -35,6 +35,7 @@ public:
 private:
     void refresh_pp(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
     void verify_item_held(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    void run_program(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
 private:
     SimpleIntegerOption<uint16_t> ITEMS_TO_CLONE;
