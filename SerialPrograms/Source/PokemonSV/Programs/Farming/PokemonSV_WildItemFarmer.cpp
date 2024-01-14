@@ -7,6 +7,7 @@
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Tools/VideoResolutionCheck.h"
@@ -44,14 +45,17 @@ struct WildItemFarmer_Descriptor::Stats : public StatsTracker{
     Stats()
         : battles(m_stats["Battles"])
         , items(m_stats["Items Cloned"])
+        , failed(m_stats["Clone Failed"])
         , errors(m_stats["Errors"])
     {
         m_display_order.emplace_back("Battles");
         m_display_order.emplace_back("Items Cloned");
+        m_display_order.emplace_back("Clone Failed", HIDDEN_IF_ZERO);
         m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
     }
     std::atomic<uint64_t>& battles;
     std::atomic<uint64_t>& items;
+    std::atomic<uint64_t>& failed;
     std::atomic<uint64_t>& errors;
 };
 std::unique_ptr<StatsTracker> WildItemFarmer_Descriptor::make_stats() const{
@@ -63,7 +67,7 @@ std::unique_ptr<StatsTracker> WildItemFarmer_Descriptor::make_stats() const{
 
 WildItemFarmer::WildItemFarmer()
     : ITEMS_TO_CLONE(
-        "<b>Items to Clone:",
+        "<b>Items to Clone:</b>",
         LockMode::UNLOCK_WHILE_RUNNING,
         999, 0, 999
     )
@@ -81,9 +85,15 @@ WildItemFarmer::WildItemFarmer()
     )
 #endif
     , INITIAL_TRICK_PP(
-        "<b>Initial Trick PP:",
+        "<b>Initial Trick PP:</b>",
         LockMode::UNLOCK_WHILE_RUNNING,
         0, 0, 16
+    )
+    , VERIFY_ITEM_CLONED(
+        "<b>Verify Item Cloned:</b><br>Verify each run that the item has actually been cloned. "
+        "This will slow each iteration by a few seconds, but will better detect errors.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        true
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
@@ -95,6 +105,7 @@ WildItemFarmer::WildItemFarmer()
     PA_ADD_OPTION(ITEMS_TO_CLONE);
 //    PA_ADD_OPTION(TRICK_MOVE_SLOT);
     PA_ADD_OPTION(INITIAL_TRICK_PP);
+    PA_ADD_OPTION(VERIFY_ITEM_CLONED);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
@@ -174,11 +185,52 @@ void WildItemFarmer::refresh_pp(SingleSwitchProgramEnvironment& env, BotBaseCont
     }
 }
 
-void verify_item_held(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+bool WildItemFarmer::verify_item_held(SingleSwitchProgramEnvironment& env, BotBaseContext& context, NormalBattleMenuWatcher& battle_menu){
+    env.log("Verifying that item has been taken...");
 
+    if (!battle_menu.move_to_slot(env.console, context, 1)){
+        return false;
+    }
 
+    SwapMenuWatcher swap_menu(COLOR_BLUE);
+    {
+        int ret = run_until(
+            env.console, context,
+            [](BotBaseContext& context){
+                pbf_press_button(context, BUTTON_A, 20, 1230);
+            },
+            {swap_menu}
+        );
+        if (ret < 0){
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, env.logger(),
+                "Unable to detect " + Pokemon::STRING_POKEMON + " select menu."
+            );
+        }
+    }
 
+    VideoSnapshot screen = env.console.video().snapshot();
+    ImageViewRGB32 box = extract_box_reference(screen, ImageFloatBox(0.28, 0.20, 0.03, 0.055));
+    ImageStats stats = image_stats(box);
+    bool item_held = !is_solid(stats, {0.550405, 0.449595, 0.}, 0.20);
 
+    {
+        int ret = run_until(
+            env.console, context,
+            [](BotBaseContext& context){
+                pbf_mash_button(context, BUTTON_B, 500);
+            },
+            {battle_menu}
+        );
+        if (ret < 0){
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, env.logger(),
+                "Unable to back out to battle menu."
+            );
+        }
+    }
+
+    return item_held;
 }
 
 
@@ -193,7 +245,7 @@ void WildItemFarmer::run_program(SingleSwitchProgramEnvironment& env, BotBaseCon
     int8_t trick_PP = INITIAL_TRICK_PP;
     uint8_t consecutive_throw_attempts = 0;
     WallClock last_trick_attempt = WallClock::min();
-    while (true){
+    while (items_cloned < ITEMS_TO_CLONE){
         OverworldWatcher overworld(COLOR_CYAN);
         NormalBattleMenuWatcher battle_menu(COLOR_RED);
         MoveSelectWatcher move_select(COLOR_YELLOW);
@@ -218,9 +270,11 @@ void WildItemFarmer::run_program(SingleSwitchProgramEnvironment& env, BotBaseCon
             env.log("Detected overworld.");
             if (trick_used && trick_PP > 0){
                 trick_PP--;
-                items_cloned++;
-                stats.items++;
-                env.update_stats();
+                if (!VERIFY_ITEM_CLONED){
+                    items_cloned++;
+                    stats.items++;
+                    env.update_stats();
+                }
             }
             if (!overworld_seen){
                 send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
@@ -259,6 +313,21 @@ void WildItemFarmer::run_program(SingleSwitchProgramEnvironment& env, BotBaseCon
                 env.update_stats();
             }
             overworld_seen = false;
+
+            if (trick_used && VERIFY_ITEM_CLONED){
+                if (verify_item_held(env, context, battle_menu)){
+                    items_cloned++;
+                    stats.items++;
+                    env.update_stats();
+                }else{
+                    stats.failed++;
+                    env.update_stats();
+                    throw OperationFailedException(
+                        ErrorReport::SEND_ERROR_REPORT, env.logger(),
+                        "Failed to clone item. Possible incorrect encounter."
+                    );
+                }
+            }
 
             if (trick_used || trick_PP <= 0){
                 env.log("Running away...");

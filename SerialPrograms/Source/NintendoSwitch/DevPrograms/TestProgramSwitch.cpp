@@ -246,6 +246,14 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 //    run_singles_battle(env, console, context, battle_AI, false);
 
 
+    VideoSnapshot screen = console.video().snapshot();
+    ImageViewRGB32 box = extract_box_reference(screen, ImageFloatBox(0.28, 0.20, 0.03, 0.055));
+    ImageStats stats = image_stats(box);
+    cout << stats.average << stats.stddev << endl;
+
+    bool item_held = !is_solid(stats, {0.550405, 0.449595, 0.}, 0.20);
+    cout << "item_held = " << item_held << endl;
+
 #if 0
     run_pokemon(
         console, context,

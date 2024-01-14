@@ -7,17 +7,18 @@
 #ifndef PokemonAutomation_PokemonSwSh_WildItemFarmer_H
 #define PokemonAutomation_PokemonSwSh_WildItemFarmer_H
 
-//#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
-#include "Common/Cpp/Options/EnumDropdownOption.h"
+//#include "Common/Cpp/Options/EnumDropdownOption.h"
 //#include "CommonFramework/Options/LanguageOCROption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
-#include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
+
+class NormalBattleMenuWatcher;
 
 
 class WildItemFarmer_Descriptor : public SingleSwitchProgramDescriptor{
@@ -34,14 +35,14 @@ public:
 
 private:
     void refresh_pp(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-    void verify_item_held(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    bool verify_item_held(SingleSwitchProgramEnvironment& env, BotBaseContext& context, NormalBattleMenuWatcher& battle_menu);
     void run_program(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
 private:
     SimpleIntegerOption<uint16_t> ITEMS_TO_CLONE;
 //    IntegerEnumDropdownOption TRICK_MOVE_SLOT;
     SimpleIntegerOption<uint8_t> INITIAL_TRICK_PP;
-//    GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
+    BooleanCheckBoxOption VERIFY_ITEM_CLONED;
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;
 };
