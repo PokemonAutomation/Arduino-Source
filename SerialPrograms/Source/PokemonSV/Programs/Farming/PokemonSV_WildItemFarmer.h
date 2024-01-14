@@ -37,7 +37,7 @@ private:
 
 private:
     SimpleIntegerOption<uint16_t> ITEMS_TO_CLONE;
-    IntegerEnumDropdownOption TRICK_MOVE_SLOT;
+//    IntegerEnumDropdownOption TRICK_MOVE_SLOT;
     SimpleIntegerOption<uint8_t> INITIAL_TRICK_PP;
 //    GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 //    EventNotificationOption NOTIFICATION_STATUS_UPDATE;

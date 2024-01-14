@@ -66,6 +66,7 @@ WildItemFarmer::WildItemFarmer()
         LockMode::UNLOCK_WHILE_RUNNING,
         999, 0, 999
     )
+#if 0
     , TRICK_MOVE_SLOT(
         "<b>Trick Move Slot:",
         {
@@ -77,6 +78,7 @@ WildItemFarmer::WildItemFarmer()
         LockMode::UNLOCK_WHILE_RUNNING,
         0
     )
+#endif
     , INITIAL_TRICK_PP(
         "<b>Initial Trick PP:",
         LockMode::UNLOCK_WHILE_RUNNING,
@@ -84,7 +86,7 @@ WildItemFarmer::WildItemFarmer()
     )
 {
     PA_ADD_OPTION(ITEMS_TO_CLONE);
-    PA_ADD_OPTION(TRICK_MOVE_SLOT);
+//    PA_ADD_OPTION(TRICK_MOVE_SLOT);
     PA_ADD_OPTION(INITIAL_TRICK_PP);
 }
 
@@ -253,7 +255,7 @@ void WildItemFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
                 pbf_mash_button(context, BUTTON_B, 30);
                 continue;
             }
-            if (move_select.move_to_slot(env.console, context, (uint8_t)TRICK_MOVE_SLOT.current_value())){
+            if (move_select.move_to_slot(env.console, context, 0)){
                 pbf_press_button(context, BUTTON_A, 20, 30);
                 trick_used = true;
                 last_trick_attempt = current_time();
