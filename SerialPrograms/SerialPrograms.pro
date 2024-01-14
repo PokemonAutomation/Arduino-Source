@@ -718,6 +718,7 @@ SOURCES += \
     Source/PokemonSV/Programs/Farming/PokemonSV_LPFarmer.cpp \
     Source/PokemonSV/Programs/Farming/PokemonSV_TournamentFarmer.cpp \
     Source/PokemonSV/Programs/Farming/PokemonSV_TournamentFarmer2.cpp \
+    Source/PokemonSV/Programs/Farming/PokemonSV_WildItemFarmer.cpp \
     Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_ClipboardFastCodeEntry.cpp \
     Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_CodeEntry.cpp \
     Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_FastCodeEntry.cpp \
@@ -728,7 +729,7 @@ SOURCES += \
     Source/PokemonSV/Programs/General/PokemonSV_MassPurchase.cpp \
     Source/PokemonSV/Programs/General/PokemonSV_SizeChecker.cpp \
     Source/PokemonSV/Programs/General/PokemonSV_StatsReset.cpp \
-    Source/PokemonSV/Programs/General/PokemonSV_StatsResetBloodmoon.cpp \
+    Source/PokemonSV/Programs/General/PokemonSV_StatsResetEventBattle.cpp \
     Source/PokemonSV/Programs/Glitches/PokemonSV_CloneItems-1.0.1.cpp \
     Source/PokemonSV/Programs/Glitches/PokemonSV_RideCloner-1.0.1.cpp \
     Source/PokemonSV/Programs/PokemonSV_AreaZero.cpp \
@@ -1775,6 +1776,7 @@ HEADERS += \
     Source/PokemonSV/Programs/Farming/PokemonSV_LPFarmer.h \
     Source/PokemonSV/Programs/Farming/PokemonSV_TournamentFarmer.h \
     Source/PokemonSV/Programs/Farming/PokemonSV_TournamentFarmer2.h \
+    Source/PokemonSV/Programs/Farming/PokemonSV_WildItemFarmer.h \
     Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_ClipboardFastCodeEntry.h \
     Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_CodeEntry.h \
     Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_FastCodeEntry.h \
@@ -1785,7 +1787,7 @@ HEADERS += \
     Source/PokemonSV/Programs/General/PokemonSV_MassPurchase.h \
     Source/PokemonSV/Programs/General/PokemonSV_SizeChecker.h \
     Source/PokemonSV/Programs/General/PokemonSV_StatsReset.h \
-    Source/PokemonSV/Programs/General/PokemonSV_StatsResetBloodmoon.h \
+    Source/PokemonSV/Programs/General/PokemonSV_StatsResetEventBattle.h \
     Source/PokemonSV/Programs/Glitches/PokemonSV_CloneItems-1.0.1.h \
     Source/PokemonSV/Programs/Glitches/PokemonSV_RideCloner-1.0.1.h \
     Source/PokemonSV/Programs/PokemonSV_AreaZero.h \

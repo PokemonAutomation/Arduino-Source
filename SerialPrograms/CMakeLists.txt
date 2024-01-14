@@ -1438,6 +1438,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Programs/Farming/PokemonSV_TournamentFarmer.h
     Source/PokemonSV/Programs/Farming/PokemonSV_TournamentFarmer2.cpp
     Source/PokemonSV/Programs/Farming/PokemonSV_TournamentFarmer2.h
+    Source/PokemonSV/Programs/Farming/PokemonSV_WildItemFarmer.cpp
+    Source/PokemonSV/Programs/Farming/PokemonSV_WildItemFarmer.h
     Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_ClipboardFastCodeEntry.cpp
     Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_ClipboardFastCodeEntry.h
     Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_CodeEntry.cpp
