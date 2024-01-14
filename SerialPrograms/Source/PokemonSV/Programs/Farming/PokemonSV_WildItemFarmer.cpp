@@ -80,7 +80,7 @@ WildItemFarmer::WildItemFarmer()
     , INITIAL_TRICK_PP(
         "<b>Initial Trick PP:",
         LockMode::UNLOCK_WHILE_RUNNING,
-        10, 0, 16
+        0, 0, 16
     )
 {
     PA_ADD_OPTION(ITEMS_TO_CLONE);
