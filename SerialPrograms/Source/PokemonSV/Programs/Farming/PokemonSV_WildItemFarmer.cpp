@@ -211,6 +211,7 @@ void WildItemFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
             }
 
             pbf_press_button(context, BUTTON_L, 20, 23);
+            pbf_move_left_joystick(context, 128, 0, 50, 0);
             pbf_mash_button(context, BUTTON_ZR, 250);
             pbf_wait(context, 350);
             continue;
