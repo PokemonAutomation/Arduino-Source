@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Exceptions/ProgramFinishedException.h"
+//#include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
@@ -87,11 +87,17 @@ WildItemFarmer::WildItemFarmer()
     , INITIAL_TRICK_PP(
         "<b>Initial Trick PP:</b>",
         LockMode::UNLOCK_WHILE_RUNNING,
-        0, 0, 16
+        1, 0, 16
     )
     , VERIFY_ITEM_CLONED(
         "<b>Verify Item Cloned:</b><br>Verify each run that the item has actually been cloned. "
         "This will slow each iteration by a few seconds, but will better detect errors.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        true
+    )
+    , ENABLE_FORWARD_RUN(
+        "<b>Forward Run:</b><br>Run forward a bit before throwing ball. This will correct for "
+        "the clone moving away, but may cause your position to wander more.",
         LockMode::UNLOCK_WHILE_RUNNING,
         true
     )
@@ -106,6 +112,7 @@ WildItemFarmer::WildItemFarmer()
 //    PA_ADD_OPTION(TRICK_MOVE_SLOT);
     PA_ADD_OPTION(INITIAL_TRICK_PP);
     PA_ADD_OPTION(VERIFY_ITEM_CLONED);
+    PA_ADD_OPTION(ENABLE_FORWARD_RUN);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
@@ -241,8 +248,13 @@ void WildItemFarmer::run_program(SingleSwitchProgramEnvironment& env, BotBaseCon
     assert_16_9_720p_min(env.logger(), env.console);
     WildItemFarmer_Descriptor::Stats& stats = env.current_stats<WildItemFarmer_Descriptor::Stats>();
 
-    uint16_t items_cloned = 0;
+    const std::vector<std::pair<int, int>> MANUVERS{
+        {128, 0},
+        {96, 0},
+        {160, 0},
+    };
 
+    uint16_t items_cloned = 0;
     bool trick_used = false;
     bool overworld_seen = false;
     int8_t trick_PP = INITIAL_TRICK_PP;
@@ -292,25 +304,37 @@ void WildItemFarmer::run_program(SingleSwitchProgramEnvironment& env, BotBaseCon
                 continue;
             }
 
-            consecutive_throw_attempts++;
-            if (consecutive_throw_attempts > 3){
+            if (consecutive_throw_attempts >= MANUVERS.size()){
                 stats.errors++;
                 env.update_stats();
                 throw OperationFailedException(
                     ErrorReport::SEND_ERROR_REPORT, env.console,
-                    "Failed to start battle after 3 attempts.",
+                    "Failed to start battle after " + std::to_string(MANUVERS.size()) + " attempts.",
                     true
                 );
             }
 
             pbf_press_button(context, BUTTON_L, 20, 23);
-            pbf_move_left_joystick(context, 128, 0, 50, 0);
+            if (ENABLE_FORWARD_RUN){
+                const std::pair<int, int>& direction = MANUVERS[consecutive_throw_attempts];
+                pbf_move_left_joystick(context, (uint8_t)direction.first, (uint8_t)direction.second, 50, 0);
+            }
             pbf_mash_button(context, BUTTON_ZR, 250);
             pbf_wait(context, 350);
+
+            consecutive_throw_attempts++;
+
             continue;
 
         case 1:
             env.log("Detected battle menu.");
+            if (current_time() - std::chrono::seconds(5) < last_trick_attempt){
+                env.log("Unable to use move. Assume out of PP.");
+                trick_PP = 0;
+//                pbf_mash_button(context, BUTTON_B, 30);
+//                continue;
+            }
+
             consecutive_throw_attempts = 0;
             if (overworld_seen){
                 stats.battles++;
@@ -318,7 +342,7 @@ void WildItemFarmer::run_program(SingleSwitchProgramEnvironment& env, BotBaseCon
             }
             overworld_seen = false;
 
-            if (trick_used && VERIFY_ITEM_CLONED){
+            if (trick_used && trick_PP > 0 && VERIFY_ITEM_CLONED){
                 if (verify_item_held(env, context, battle_menu)){
                     items_cloned++;
                     stats.items++;

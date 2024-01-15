@@ -43,6 +43,7 @@ private:
 //    IntegerEnumDropdownOption TRICK_MOVE_SLOT;
     SimpleIntegerOption<uint8_t> INITIAL_TRICK_PP;
     BooleanCheckBoxOption VERIFY_ITEM_CLONED;
+    BooleanCheckBoxOption ENABLE_FORWARD_RUN;
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;
 };
