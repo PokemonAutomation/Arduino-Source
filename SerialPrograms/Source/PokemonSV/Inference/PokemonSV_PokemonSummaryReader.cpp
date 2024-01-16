@@ -19,10 +19,10 @@ namespace PokemonSV{
 
 
 bool is_summary_color(const ImageStats& stats){
-    return is_solid(stats, {0.648549, 0.2861580, 0.0652928}, 0.15, 20)  //  Scarlet
-        || is_solid(stats, {0.367816, 0.0746615, 0.5575230}, 0.15, 20)  //  Violet
-        || is_solid(stats, {0.196536, 0.5933000, 0.2101630}, 0.18, 20)  //  DLC1 Green
-        || is_solid(stats, {0.169492, 0.330508 , 0.5      }, 0.18, 20)  //  DLC2 Dark Blue
+    return is_solid(stats, {0.648549, 0.2861580, 0.0652928}, 0.15, 25)  //  Scarlet
+        || is_solid(stats, {0.367816, 0.0746615, 0.5575230}, 0.15, 25)  //  Violet
+        || is_solid(stats, {0.196536, 0.5933000, 0.2101630}, 0.18, 25)  //  DLC1 Green
+        || is_solid(stats, {0.169492, 0.330508 , 0.5      }, 0.18, 25)  //  DLC2 Dark Blue
         || (stats.average.g / stats.average.sum()) > 0.5;
 }
 
@@ -68,14 +68,17 @@ bool PokemonSummaryDetector::detect(const ImageViewRGB32& screen) const{
     }
 #else
     if (!is_summary_color(bottom)){
+//        cout << "bad summary color" << endl;
         return false;
     }
 #endif
 
     if (!m_arrow_left.detect(screen)){
+//        cout << "bad arrow left" << endl;
         return false;
     }
     if (!m_arrow_right.detect(screen)){
+//        cout << "bad arrow right" << endl;
         return false;
     }
 

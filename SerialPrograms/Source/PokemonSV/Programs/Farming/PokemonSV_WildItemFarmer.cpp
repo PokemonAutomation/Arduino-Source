@@ -196,26 +196,36 @@ void WildItemFarmer::refresh_pp(SingleSwitchProgramEnvironment& env, BotBaseCont
 bool WildItemFarmer::verify_item_held(SingleSwitchProgramEnvironment& env, BotBaseContext& context, NormalBattleMenuWatcher& battle_menu){
     env.log("Verifying that item has been taken...");
 
-    if (!battle_menu.move_to_slot(env.console, context, 1)){
-        return false;
-    }
-
-    SwapMenuWatcher swap_menu(COLOR_BLUE);
-    {
-        int ret = run_until(
-            env.console, context,
-            [](BotBaseContext& context){
-                pbf_press_button(context, BUTTON_A, 20, 1230);
-            },
-            {swap_menu}
+    while (true){
+        SwapMenuWatcher swap_menu(COLOR_BLUE);
+        context.wait_for_all_requests();
+        int ret = wait_until(
+            env.console, context, std::chrono::seconds(10),
+            {battle_menu, swap_menu}
         );
-        if (ret < 0){
+        context.wait_for(std::chrono::milliseconds(100));
+        switch (ret){
+        case 0:
+            env.log("Detected battle menu...");
+            if (!battle_menu.move_to_slot(env.console, context, 1)){
+                return false;
+            }
+            pbf_press_button(context, BUTTON_A, 20, 105);
+            continue;
+
+        case 1:
+            env.log("Detected swap menu...");
+            break;
+
+        default:
             throw OperationFailedException(
                 ErrorReport::SEND_ERROR_REPORT, env.console,
                 "Unable to detect " + Pokemon::STRING_POKEMON + " select menu.",
                 true
             );
         }
+
+        break;
     }
 
     VideoSnapshot screen = env.console.video().snapshot();
@@ -450,6 +460,7 @@ void WildItemFarmer::run_program(SingleSwitchProgramEnvironment& env, BotBaseCon
     }
 
 
+    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 }
 
 
