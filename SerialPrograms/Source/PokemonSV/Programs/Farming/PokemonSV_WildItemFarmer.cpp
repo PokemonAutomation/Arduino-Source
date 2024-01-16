@@ -131,7 +131,7 @@ void WildItemFarmer::refresh_pp(SingleSwitchProgramEnvironment& env, BotBaseCont
     while (true){
         WhiteButtonWatcher summary(
             COLOR_RED, WhiteButton::ButtonA,
-            {0.22, 0.67, 0.03, 0.06},
+            {0.12, 0.67, 0.20, 0.06},
             WhiteButtonWatcher::FinderType::PRESENT,
             std::chrono::milliseconds(500)
         );
