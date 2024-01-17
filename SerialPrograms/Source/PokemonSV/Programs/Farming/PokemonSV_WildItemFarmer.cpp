@@ -99,7 +99,7 @@ WildItemFarmer::WildItemFarmer()
         "<b>Forward Run:</b><br>Run forward a bit before throwing ball. This will correct for "
         "the clone moving away, but may cause your position to wander more.",
         LockMode::UNLOCK_WHILE_RUNNING,
-        true
+        false
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
@@ -318,7 +318,7 @@ void WildItemFarmer::run_program(SingleSwitchProgramEnvironment& env, BotBaseCon
                 stats.errors++;
                 env.update_stats();
                 throw OperationFailedException(
-                    ErrorReport::SEND_ERROR_REPORT, env.console,
+                    ErrorReport::NO_ERROR_REPORT, env.console,
                     "Failed to start battle after " + std::to_string(MANUVERS.size()) + " attempts.",
                     true
                 );
@@ -361,7 +361,7 @@ void WildItemFarmer::run_program(SingleSwitchProgramEnvironment& env, BotBaseCon
                     stats.failed++;
                     env.update_stats();
                     throw OperationFailedException(
-                        ErrorReport::SEND_ERROR_REPORT, env.console,
+                        ErrorReport::NO_ERROR_REPORT, env.console,
                         "Failed to clone item. Possible incorrect encounter.",
                         true
                     );
