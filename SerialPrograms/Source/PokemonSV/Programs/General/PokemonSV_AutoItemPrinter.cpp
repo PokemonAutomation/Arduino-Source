@@ -75,7 +75,7 @@ void AutoItemPrinter::enter_printing_mode(SingleSwitchProgramEnvironment& env, B
         OverworldWatcher     overworld(COLOR_CYAN);
         AdvanceDialogWatcher dialog(COLOR_YELLOW);
         PromptDialogWatcher  prompt(COLOR_YELLOW);
-        WhiteButtonWatcher   material(COLOR_GREEN, WhiteButton::ButtonX, {0.60, 0.92, 0.39, 0.08});
+        WhiteButtonWatcher   material(COLOR_GREEN, WhiteButton::ButtonX, {0.70, 0.93, 0.10, 0.06});
         context.wait_for_all_requests();
 
         int ret_printer_entry = wait_until(
@@ -87,11 +87,15 @@ void AutoItemPrinter::enter_printing_mode(SingleSwitchProgramEnvironment& env, B
 
         switch (ret_printer_entry){
         case 0: // material
+            env.console.log("Material selection screen detected.");
             return;
         case 1: // overworld
         case 2: // dialog
+            pbf_press_button(context, BUTTON_A, 20, 105);
+            continue;
         case 3: // prompt
-            pbf_press_button(context, BUTTON_A, 20, 5);
+            env.console.log("Prompt detected.");
+            pbf_press_button(context, BUTTON_A, 20, 105);
             continue;
         default:
             throw OperationFailedException(
@@ -109,7 +113,7 @@ void AutoItemPrinter::start_print(SingleSwitchProgramEnvironment& env, BotBaseCo
 
     while (true){
         PromptDialogWatcher  prompt(COLOR_YELLOW);
-        WhiteButtonWatcher   material(COLOR_GREEN, WhiteButton::ButtonX, {0.60, 0.92, 0.39, 0.08});
+        WhiteButtonWatcher   material(COLOR_GREEN, WhiteButton::ButtonX, {0.70, 0.93, 0.10, 0.06});
         WhiteButtonWatcher   handle(COLOR_BLUE,    WhiteButton::ButtonA, {0.40, 0.80, 0.20, 0.14});
         context.wait_for_all_requests();
 
@@ -124,10 +128,11 @@ void AutoItemPrinter::start_print(SingleSwitchProgramEnvironment& env, BotBaseCo
         case 0: // handle
             return;
         case 1: // prompt
-            pbf_press_button(context, BUTTON_A, 20, 5);
+            env.console.log("Confirming material selection...");
+            pbf_press_button(context, BUTTON_A, 20, 105);
             continue;
         case 2: // material
-            pbf_press_button(context, BUTTON_X, 20, 5);
+            pbf_press_button(context, BUTTON_X, 20, 230);
             continue;
         default:
             throw OperationFailedException(
@@ -145,9 +150,9 @@ void AutoItemPrinter::finish_print(SingleSwitchProgramEnvironment& env, BotBaseC
 
     while (true){
         AdvanceDialogWatcher dialog(COLOR_YELLOW);
-        WhiteButtonWatcher   material(COLOR_GREEN, WhiteButton::ButtonX, {0.60, 0.92, 0.39, 0.08});
+        WhiteButtonWatcher   material(COLOR_GREEN, WhiteButton::ButtonX, {0.70, 0.93, 0.10, 0.06});
         WhiteButtonWatcher   handle(COLOR_BLUE,    WhiteButton::ButtonA, {0.40, 0.80, 0.20, 0.14});
-        WhiteButtonWatcher   result(COLOR_GREEN,   WhiteButton::ButtonA, {0.60, 0.92, 0.39, 0.08});
+        WhiteButtonWatcher   result(COLOR_CYAN,    WhiteButton::ButtonA, {0.87, 0.93, 0.10, 0.06});
         context.wait_for_all_requests();
 
         int ret_print_end = wait_until(
@@ -162,8 +167,11 @@ void AutoItemPrinter::finish_print(SingleSwitchProgramEnvironment& env, BotBaseC
             return;
         case 1: // handle
         case 2: // dialog
+            pbf_press_button(context, BUTTON_A, 20, 105);
+            continue;
         case 3: // result
-            pbf_press_button(context, BUTTON_A, 20, 5);
+            env.console.log("Result screen detected.");
+            pbf_press_button(context, BUTTON_A, 20, 105);
             continue;
         default:
             throw OperationFailedException(
@@ -203,7 +211,7 @@ void AutoItemPrinter::program(SingleSwitchProgramEnvironment& env, BotBaseContex
     int ret_finish = run_until(
         env.console, context,
         [](BotBaseContext& context) {
-            pbf_mash_button(context, BUTTON_B, 10000);
+            pbf_press_button(context, BUTTON_B, 20, 105);
         },
         { overworld }
     );
@@ -212,7 +220,7 @@ void AutoItemPrinter::program(SingleSwitchProgramEnvironment& env, BotBaseContex
     if (ret_finish < 0){
         throw OperationFailedException(
             ErrorReport::SEND_ERROR_REPORT, env.console,
-            "Couldn't exit to overworld after 80 seconds.",
+            "Couldn't return to overworld after 80 seconds.",
             true
         );
     }
