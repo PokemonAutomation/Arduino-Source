@@ -540,20 +540,48 @@ std::set<std::string> OutbreakFinder::enter_region_and_read_MMO(
 
     pbf_mash_button(context, BUTTON_A, 350);
     context.wait_for_all_requests();
-    
-    // Wait for the last dialog box before the MMO pokemon sprites are revealed.
-    EventDialogDetector event_dialog_detector(env.logger(), env.console.overlay(), true);
-    int ret = wait_until(env.console, context, std::chrono::seconds(10), {{event_dialog_detector}});
-    if (ret < 0){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, env.console,
-            "Dialog box not detected when waiting for MMO map.",
-            true
-        );
-    }
 
+    // Wait for the last dialog box before the MMO pokemon sprites are revealed.
+    {
+        EventDialogDetector event_dialog_detector(env.logger(), env.console.overlay(), true);
+        int ret = wait_until(env.console, context, std::chrono::seconds(10), {{event_dialog_detector}});
+        if (ret < 0){
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, env.console,
+                "Dialog box not detected when waiting for MMO map.",
+                true
+            );
+        }
+    }
     pbf_press_button(context, BUTTON_B, 50, 50);
 
+    while (true){
+        EventDialogDetector event_dialog_detector(env.logger(), env.console.overlay(), true);
+        MapDetector map_detector;
+        context.wait_for_all_requests();
+        int ret = wait_until(
+            env.console, context, std::chrono::seconds(10),
+            {event_dialog_detector, map_detector}
+        );
+        switch (ret){
+        case 0:
+            env.console.log("Detected dialog.");
+            pbf_press_button(context, BUTTON_B, 20, 105);
+            continue;
+        case 1:
+            env.console.log("Found revealed map thanks to Munchlax!");
+            break;
+        default:
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, env.console,
+                "Map not detected after talking to Mai.",
+                true
+            );
+        }
+        break;
+    }
+
+#if 0
     MapDetector map_detector;
     ret = wait_until(env.console, context, std::chrono::seconds(5), {{map_detector}});
     if (ret < 0){
@@ -564,6 +592,7 @@ std::set<std::string> OutbreakFinder::enter_region_and_read_MMO(
         );
     }
     env.console.log("Found revealed map thanks to Munchlax!");
+#endif
 
     VideoOverlaySet mmo_sprites_overlay(env.console);
     for (size_t i = 0; i < new_boxes.size(); i++){
@@ -609,7 +638,7 @@ std::set<std::string> OutbreakFinder::enter_region_and_read_MMO(
     MMOSpriteStarSymbolDetector star_detector(sprites_screen, star_boxes);
 
     env.log("Detect star symbols...");
-    ret = wait_until(env.console, context, std::chrono::seconds(5), {{star_detector}});
+    wait_until(env.console, context, std::chrono::seconds(5), {{star_detector}});
     for (size_t i = 0; i < new_boxes.size(); i++){
         std::ostringstream os;
         os << "- " << sprites[i] << " box [" << star_boxes[i].min_x << ", " << star_boxes[i].min_y

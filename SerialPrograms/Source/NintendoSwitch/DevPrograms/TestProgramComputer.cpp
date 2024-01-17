@@ -233,9 +233,15 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     using namespace Kernels;
     using namespace NintendoSwitch;
 //    using namespace NintendoSwitch::PokemonSwSh;
-    using namespace NintendoSwitch::PokemonSV;
+//    using namespace NintendoSwitch::PokemonSV;
     using namespace Pokemon;
-//    using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
+    using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
+
+
+    ImageRGB32 image("20231230-221510445509-ProgramHang.png");
+
+    BattleMenuDetector detector;
+    cout << detector.detect(image) << endl;
 
 
 

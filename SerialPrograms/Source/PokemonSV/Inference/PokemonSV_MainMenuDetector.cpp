@@ -142,8 +142,8 @@ bool MainMenuDetector::move_cursor(
         }
         consecutive_detection_fails = 0;
 
-        if (moves >= 10){
-            console.log("Unable to move to target after 10 moves.", COLOR_RED);
+        if (moves >= 20){
+            console.log("Unable to move to target after 20 moves.", COLOR_RED);
             return false;
         }
 

@@ -4,8 +4,8 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Tools/StatsTracking.h"
@@ -148,7 +148,7 @@ private:
 
 
 
-void TournamentFarmer2::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
+void TournamentFarmer2::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
     TournamentFarmer2_Descriptor::Stats& stats = env.current_stats<TournamentFarmer2_Descriptor::Stats>();
 

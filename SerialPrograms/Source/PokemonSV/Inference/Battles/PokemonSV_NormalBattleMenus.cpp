@@ -69,7 +69,7 @@ bool NormalBattleMenuDetector::move_to_slot(ConsoleHandle& console, BotBaseConte
             context.wait_for(std::chrono::milliseconds(500));
             continue;
 //            static int c = 0;
-//            screen->save("bad-" + std::to_string(c++) + ".png");    //  REMOVE
+//            screen->save("bad-" + std::to_string(c++) + ".png");
 //            return false;
         }
         if (attempts > 10){
@@ -81,7 +81,7 @@ bool NormalBattleMenuDetector::move_to_slot(ConsoleHandle& console, BotBaseConte
         switch (diff){
         case 0:{
 //            static int c = 0;
-//            screen->save("good-" + std::to_string(c++) + ".png");   //  REMOVE
+//            screen->save("good-" + std::to_string(c++) + ".png");
             return true;
         }
         case 1:

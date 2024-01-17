@@ -30,6 +30,7 @@
 #include "Programs/Farming/PokemonSV_TournamentFarmer.h"
 #include "Programs/Farming/PokemonSV_TournamentFarmer2.h"
 #include "Programs/Farming/PokemonSV_FlyingTrialFarmer.h"
+#include "Programs/Farming/PokemonSV_WildItemFarmer.h"
 
 #include "Programs/Eggs/PokemonSV_EggFetcher.h"
 #include "Programs/Eggs/PokemonSV_EggHatcher.h"
@@ -45,7 +46,7 @@
 #include "Programs/FastCodeEntry/PokemonSV_VideoFastCodeEntry.h"
 
 #include "Programs/General/PokemonSV_StatsReset.h"
-#include "Programs/General/PokemonSV_StatsResetBloodmoon.h"
+#include "Programs/General/PokemonSV_StatsResetEventBattle.h"
 
 #include "Programs/ShinyHunting/PokemonSV_ShinyHunt-AreaZeroPlatform.h"
 #include "Programs/ShinyHunting/PokemonSV_ShinyHunt-Scatterbug.h"
@@ -80,7 +81,9 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<ClothingBuyer_Descriptor, ClothingBuyer>());
     ret.emplace_back(make_single_switch_program<AutonomousBallThrower_Descriptor, AutonomousBallThrower>());
     ret.emplace_back(make_single_switch_program<SizeChecker_Descriptor, SizeChecker>());
-    ret.emplace_back(make_single_switch_program<AutoItemPrinter_Descriptor, AutoItemPrinter>());
+    if (IS_BETA_VERSION){
+        ret.emplace_back(make_single_switch_program<AutoItemPrinter_Descriptor, AutoItemPrinter>());
+    }
 
 //    ret.emplace_back("---- Trading ----");
     ret.emplace_back(make_multi_switch_program<SelfBoxTrade_Descriptor, SelfBoxTrade>());
@@ -99,10 +102,11 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<AuctionFarmer_Descriptor, AuctionFarmer>());
     ret.emplace_back(make_single_switch_program<ESPTraining_Descriptor, ESPTraining>());
     ret.emplace_back(make_single_switch_program<TournamentFarmer_Descriptor, TournamentFarmer>());
-    if (PreloadSettings::instance().DEVELOPER_MODE){
-        ret.emplace_back(make_single_switch_program<TournamentFarmer2_Descriptor, TournamentFarmer2>());
-    }
+    ret.emplace_back(make_single_switch_program<TournamentFarmer2_Descriptor, TournamentFarmer2>());
     ret.emplace_back(make_single_switch_program<FlyingTrialFarmer_Descriptor, FlyingTrialFarmer>());
+    if (IS_BETA_VERSION){
+        ret.emplace_back(make_single_switch_program<WildItemFarmer_Descriptor, WildItemFarmer>());
+    }
 
     ret.emplace_back("---- Eggs ----");
     ret.emplace_back(make_single_switch_program<EggFetcher_Descriptor, EggFetcher>());
@@ -122,7 +126,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
 
     ret.emplace_back("---- Stats Hunting ----");
     ret.emplace_back(make_single_switch_program<StatsReset_Descriptor, StatsReset>());
-    ret.emplace_back(make_single_switch_program<StatsResetBloodmoon_Descriptor, StatsResetBloodmoon>());
+    ret.emplace_back(make_single_switch_program<StatsResetEventBattle_Descriptor, StatsResetEventBattle>());
 
     ret.emplace_back("---- Shiny Hunting ----");
     ret.emplace_back(make_single_switch_program<ShinyHuntAreaZeroPlatform_Descriptor, ShinyHuntAreaZeroPlatform>());
