@@ -212,7 +212,7 @@ void AutoItemPrinter::program(SingleSwitchProgramEnvironment& env, BotBaseContex
     if (ret_finish < 0){
         throw OperationFailedException(
             ErrorReport::SEND_ERROR_REPORT, env.console,
-            "Couldn't exit to overworld after 80 seconds.",
+            "Couldn't return to overworld after 80 seconds.",
             true
         );
     }
