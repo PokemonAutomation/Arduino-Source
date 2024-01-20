@@ -191,6 +191,7 @@ bool start_raid_host_solo(
         enter_digits(context, 8, code);
         pbf_wait(context, 2 * TICKS_PER_SECOND);
         pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
+        context.wait_for_all_requests();
     }
 
     send_raid_notification(

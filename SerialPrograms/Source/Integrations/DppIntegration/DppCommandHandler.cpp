@@ -198,7 +198,7 @@ void Handler::create_unified_commands(commandhandler& handler) {
             embed.add_field("Guilds", std::to_string(Utility::user_counts.size()));
             embed.add_field("Users", std::to_string(counts));
             embed.add_field("Uptime", handler.owner->uptime().to_string());
-            embed.add_field("Powered By", PROGRAM_NAME + " " + PROGRAM_VERSION + "([GitHub](" + PROJECT_GITHUB_URL + "/About)/[Discord](" + DISCORD_LINK_URL + "))");
+            embed.add_field("Powered By", PROGRAM_NAME + " " + PROGRAM_VERSION + " ([GitHub](" + PROJECT_GITHUB_URL + "/About)/[Discord](" + DISCORD_LINK_URL + "))");
 
             message message;
             message.add_embed(embed);
