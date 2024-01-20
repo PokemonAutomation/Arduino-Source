@@ -148,6 +148,7 @@ void AutoItemPrinter::start_print(SingleSwitchProgramEnvironment& env, BotBaseCo
 
 void AutoItemPrinter::finish_print(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     env.console.log("Finishing print...");
+    bool print_finished = false;
 
     while (true){
         AdvanceDialogWatcher dialog(COLOR_YELLOW);
@@ -165,6 +166,7 @@ void AutoItemPrinter::finish_print(SingleSwitchProgramEnvironment& env, BotBaseC
 
         switch (ret_print_end){
         case 0: // material
+            env.console.log("Material selection screen detected.");
             return;
         case 1: // handle
         case 2: // dialog
@@ -172,7 +174,10 @@ void AutoItemPrinter::finish_print(SingleSwitchProgramEnvironment& env, BotBaseC
             continue;
         case 3: // result
             env.console.log("Result screen detected.");
-            pbf_press_button(context, BUTTON_A, 20, 105);
+            if (!print_finished){
+                pbf_mash_button(context, BUTTON_A, 1 * TICKS_PER_SECOND);
+                print_finished = true;
+            }
             continue;
         default:
             throw OperationFailedException(
