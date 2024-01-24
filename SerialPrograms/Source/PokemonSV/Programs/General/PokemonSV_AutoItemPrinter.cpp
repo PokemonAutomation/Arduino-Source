@@ -14,6 +14,7 @@
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h"
+#include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSV_AutoItemPrinter.h"
 
 namespace PokemonAutomation{
@@ -147,6 +148,7 @@ void AutoItemPrinter::start_print(SingleSwitchProgramEnvironment& env, BotBaseCo
 
 void AutoItemPrinter::finish_print(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     env.console.log("Finishing print...");
+    bool print_finished = false;
 
     while (true){
         AdvanceDialogWatcher dialog(COLOR_YELLOW);
@@ -164,6 +166,7 @@ void AutoItemPrinter::finish_print(SingleSwitchProgramEnvironment& env, BotBaseC
 
         switch (ret_print_end){
         case 0: // material
+            env.console.log("Material selection screen detected.");
             return;
         case 1: // handle
         case 2: // dialog
@@ -171,7 +174,10 @@ void AutoItemPrinter::finish_print(SingleSwitchProgramEnvironment& env, BotBaseC
             continue;
         case 3: // result
             env.console.log("Result screen detected.");
-            pbf_press_button(context, BUTTON_A, 20, 105);
+            if (!print_finished){
+                pbf_mash_button(context, BUTTON_A, 1 * TICKS_PER_SECOND);
+                print_finished = true;
+            }
             continue;
         default:
             throw OperationFailedException(
@@ -204,27 +210,8 @@ void AutoItemPrinter::program(SingleSwitchProgramEnvironment& env, BotBaseContex
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
     }
 
-    env.console.log("Returning to overworld...");
-    OverworldWatcher overworld(COLOR_CYAN);
-    context.wait_for_all_requests();
+    press_Bs_to_back_to_overworld(env.program_info(), env.console, context);
 
-    int ret_finish = run_until(
-        env.console, context,
-        [](BotBaseContext& context) {
-            pbf_press_button(context, BUTTON_B, 20, 105);
-        },
-        { overworld }
-    );
-    context.wait_for_all_requests();
-
-    if (ret_finish < 0){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, env.console,
-            "Couldn't return to overworld after 80 seconds.",
-            true
-        );
-    }
-    
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
     GO_HOME_WHEN_DONE.run_end_of_program(context);
 }
