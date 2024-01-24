@@ -52,7 +52,7 @@ private:
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;
 
-    void enter_battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    bool enter_battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
     void open_ball_menu(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
     bool run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
     bool check_stats(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
