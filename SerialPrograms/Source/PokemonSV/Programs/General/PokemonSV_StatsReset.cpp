@@ -139,7 +139,7 @@ StatsReset::StatsReset()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void StatsReset::enter_battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
+bool StatsReset::enter_battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
     StatsReset_Descriptor::Stats& stats = env.current_stats<StatsReset_Descriptor::Stats>();
 
     //Press A to talk to target
@@ -184,12 +184,18 @@ void StatsReset::enter_battle(SingleSwitchProgramEnvironment& env, BotBaseContex
     if (ret != 0) {
         stats.errors++;
         env.update_stats();
+        env.log("Failed to enter battle!", COLOR_RED);
+
+        return false;
+        /*
         throw OperationFailedException(
             ErrorReport::SEND_ERROR_REPORT, env.console,
             "Failed to enter battle. Are you facing the Pokemon or in a menu?",
             true
         );
+        */
     }
+    return true;
 }
 
 void StatsReset::open_ball_menu(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
@@ -581,7 +587,29 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
     //Autosave must be off, settings like Tera farmer.
     bool stats_matched = false;
     while (!stats_matched){
-        enter_battle(env, context);
+        bool battle_started = false;
+        for (size_t c = 0; !battle_started; c++) {
+            battle_started = enter_battle(env, context);
+
+            if (!battle_started) {
+                env.log("Did not detect battle. Resetting.");
+                stats.resets++;
+                env.update_stats();
+                pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+                reset_game_from_home(env.program_info(), env.console, context, 5 * TICKS_PER_SECOND);
+            }
+
+            //Try to start battle 3 times.
+            if (c > 2) {
+                throw OperationFailedException(
+                    ErrorReport::SEND_ERROR_REPORT, env.console,
+                    "Failed to enter battle after 3 attempts.",
+                    true
+                );
+                break;
+            }
+        }
+        
         bool target_fainted = run_battle(env, context);
 
         if (!target_fainted) {
