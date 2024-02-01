@@ -81,9 +81,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<ClothingBuyer_Descriptor, ClothingBuyer>());
     ret.emplace_back(make_single_switch_program<AutonomousBallThrower_Descriptor, AutonomousBallThrower>());
     ret.emplace_back(make_single_switch_program<SizeChecker_Descriptor, SizeChecker>());
-    if (IS_BETA_VERSION){
-        ret.emplace_back(make_single_switch_program<AutoItemPrinter_Descriptor, AutoItemPrinter>());
-    }
+    ret.emplace_back(make_single_switch_program<AutoItemPrinter_Descriptor, AutoItemPrinter>());
 
 //    ret.emplace_back("---- Trading ----");
     ret.emplace_back(make_multi_switch_program<SelfBoxTrade_Descriptor, SelfBoxTrade>());
@@ -104,9 +102,6 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<TournamentFarmer_Descriptor, TournamentFarmer>());
     ret.emplace_back(make_single_switch_program<TournamentFarmer2_Descriptor, TournamentFarmer2>());
     ret.emplace_back(make_single_switch_program<FlyingTrialFarmer_Descriptor, FlyingTrialFarmer>());
-    if (IS_BETA_VERSION){
-        ret.emplace_back(make_single_switch_program<WildItemFarmer_Descriptor, WildItemFarmer>());
-    }
 
     ret.emplace_back("---- Eggs ----");
     ret.emplace_back(make_single_switch_program<EggFetcher_Descriptor, EggFetcher>());
@@ -132,7 +127,10 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<ShinyHuntAreaZeroPlatform_Descriptor, ShinyHuntAreaZeroPlatform>());
     ret.emplace_back(make_single_switch_program<ShinyHuntScatterbug_Descriptor, ShinyHuntScatterbug>());
 
-    ret.emplace_back("---- Glitches ----");
+    ret.emplace_back("---- Glitches (v3.0.0) ----");
+    ret.emplace_back(make_single_switch_program<WildItemFarmer_Descriptor, WildItemFarmer>());
+
+    ret.emplace_back("---- Glitches (v1.0.1) ----");
     ret.emplace_back(make_single_switch_program<RideCloner101_Descriptor, RideCloner101>());
     ret.emplace_back(make_single_switch_program<CloneItems101_Descriptor, CloneItems101>());
 
