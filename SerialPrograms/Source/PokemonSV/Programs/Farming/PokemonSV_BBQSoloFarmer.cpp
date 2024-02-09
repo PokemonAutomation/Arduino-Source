@@ -18,7 +18,6 @@
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_NormalBattleMenus.h"
-#include "PokemonSV/Inference/PokemonSV_BlueberryQuestDetector.h"
 #include "PokemonSV/Programs/PokemonSV_BlueberryQuests.h"
 #include "PokemonSV_BBQSoloFarmer.h"
 
@@ -94,25 +93,27 @@ void BBQSoloFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
     use the fixed and tera spawns for photographs
 
     smoke ball or flying pokemon required in slot 1 in case of arena trap
+    handle out of bp rerolls?
     */
 
-    //pbf_press_dpad(context, DPAD_RIGHT, 50, 20);
-    VideoSnapshot screen = env.console.video().snapshot();
-    BlueberryQuestDetector top_quest_detector(env.console.logger(), COLOR_GREEN, BBQ_OPTIONS.LANGUAGE, BlueberryQuestDetector::QuestPosition::FIRST);
-    std::string top_quest = top_quest_detector.detect_quest(screen);
-    env.log("Top quest: " + top_quest);
+    std::vector<std::string> quest_list; //all quests
+    std::vector<std::string> quests_to_do; //do-able quests
+    int eggs_hatched = 0; //Track eggs
 
-    BlueberryQuestDetector mid1_quest_detector(env.console.logger(), COLOR_GREEN, BBQ_OPTIONS.LANGUAGE, BlueberryQuestDetector::QuestPosition::SECOND);
-    std::string mid1_quest = mid1_quest_detector.detect_quest(screen);
-    env.log("Mid1 quest: " + mid1_quest);
+    //Get and reroll quests until we can at least one
+    while (quests_to_do.size() < 1) {
+        read_quests(env.program_info(), env.console, context, BBQ_OPTIONS, quest_list);
+        process_quest_list(env.program_info(), env.console, context, BBQ_OPTIONS, quest_list, quests_to_do, eggs_hatched);
+        //Clear out the regular quest list.
+        quest_list.clear();
+    }
 
-    BlueberryQuestDetector mid2_quest_detector(env.console.logger(), COLOR_GREEN, BBQ_OPTIONS.LANGUAGE, BlueberryQuestDetector::QuestPosition::THIRD);
-    std::string mid2_quest = mid2_quest_detector.detect_quest(screen);
-    env.log("Mid2 quest: " + mid2_quest);
+    env.log("Quests to do: ");
+    for (auto n : quests_to_do) {
+        env.log(n);
+    }
 
-    BlueberryQuestDetector bottom_quest_detector(env.console.logger(), COLOR_GREEN, BBQ_OPTIONS.LANGUAGE, BlueberryQuestDetector::QuestPosition::FOURTH);
-    std::string bottom_quest = bottom_quest_detector.detect_quest(screen);
-    env.log("Bottom quest: " + bottom_quest);
+
 
     //return_to_plaza(env.program_info(), env.console, context);
 

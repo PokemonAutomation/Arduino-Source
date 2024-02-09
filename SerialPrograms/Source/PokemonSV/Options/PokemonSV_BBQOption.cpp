@@ -47,6 +47,10 @@ BBQOption::BBQOption(OCR::LanguageOCROption* language_option)
         LockMode::UNLOCK_WHILE_RUNNING,
         "ultra-ball"
     )
+    , NUM_EGGS(
+        "<b>Number of Eggs:</b><br>Amount of eggs located in the box to the left of your current one. Skip egg hatching quest if no eggs.",
+        LockMode::LOCK_WHILE_RUNNING, 30
+    )
 {
     if (m_language_owner){
         PA_ADD_OPTION(LANGUAGE);
@@ -56,6 +60,7 @@ BBQOption::BBQOption(OCR::LanguageOCROption* language_option)
     PA_ADD_OPTION(QUICKBALL);
     PA_ADD_OPTION(BALL_SELECT);
     PA_ADD_OPTION(BATTLE_MOVES);
+    PA_ADD_OPTION(NUM_EGGS);
 }
 
 

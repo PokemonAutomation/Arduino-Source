@@ -47,6 +47,9 @@ public:
     PokemonSwSh::PokemonBallSelectOption BALL_SELECT;
     BattleMoveTable BATTLE_MOVES;
 
+    //For egg hatching quest
+    SimpleIntegerOption<uint8_t> NUM_EGGS;
+
 private:
     BBQOption(OCR::LanguageOCROption* language_option);
 };
