@@ -1369,6 +1369,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Options/PokemonSV_AutoHostOptions.h
     Source/PokemonSV/Options/PokemonSV_BattleMoveTable.cpp
     Source/PokemonSV/Options/PokemonSV_BattleMoveTable.h
+    Source/PokemonSV/Options/PokemonSV_BBQOption.cpp
+    Source/PokemonSV/Options/PokemonSV_BBQOption.h
     Source/PokemonSV/Options/PokemonSV_EggPowerSandwichOption.cpp
     Source/PokemonSV/Options/PokemonSV_EggPowerSandwichOption.h
     Source/PokemonSV/Options/PokemonSV_EncounterActionsTable.cpp
@@ -1428,6 +1430,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggRoutines.h
     Source/PokemonSV/Programs/Farming/PokemonSV_AuctionFarmer.cpp
     Source/PokemonSV/Programs/Farming/PokemonSV_AuctionFarmer.h
+    Source/PokemonSV/Programs/Farming/PokemonSV_BBQSoloFarmer.cpp
+    Source/PokemonSV/Programs/Farming/PokemonSV_BBQSoloFarmer.h
     Source/PokemonSV/Programs/Farming/PokemonSV_ESPTraining.cpp
     Source/PokemonSV/Programs/Farming/PokemonSV_ESPTraining.h
     Source/PokemonSV/Programs/Farming/PokemonSV_FlyingTrialFarmer.cpp
@@ -1472,6 +1476,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Programs/Glitches/PokemonSV_RideCloner-1.0.1.h
     Source/PokemonSV/Programs/PokemonSV_AreaZero.cpp
     Source/PokemonSV/Programs/PokemonSV_AreaZero.h
+    Source/PokemonSV/Programs/PokemonSV_BlueberryQuests.cpp
+    Source/PokemonSV/Programs/PokemonSV_BlueberryQuests.h
     Source/PokemonSV/Programs/PokemonSV_ConnectToInternet.cpp
     Source/PokemonSV/Programs/PokemonSV_ConnectToInternet.h
     Source/PokemonSV/Programs/PokemonSV_GameEntry.cpp
