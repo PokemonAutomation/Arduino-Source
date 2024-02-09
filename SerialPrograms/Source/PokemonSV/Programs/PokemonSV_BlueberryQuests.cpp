@@ -24,7 +24,6 @@ namespace PokemonSV{
 
 void return_to_plaza(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context) {
     //Modified version of handle_battles_and_back_to_pokecenter()
-    //TODO: Attempt to handle Cyrano upgrading quests - no way for me to test this atm.
     bool returned_to_pokecenter = false;
 
     while(!returned_to_pokecenter){
@@ -32,6 +31,20 @@ void return_to_plaza(const ProgramInfo& info, ConsoleHandle& console, BotBaseCon
         int ret = run_until(
             console, context,
             [&](BotBaseContext& context){
+                //Exit any dialogs (ex. Cyrano upgrading BBQs
+                OverworldWatcher overworld(COLOR_RED);
+                int ret_overworld = run_until(
+                    console, context,
+                    [&](BotBaseContext& context) {
+                        pbf_mash_button(context, BUTTON_B, 10000);
+                    },
+                    { overworld }
+                    );
+                if (ret_overworld == 0) {
+                    console.log("Overworld detected.");
+                }
+                context.wait_for_all_requests();
+
                 open_map_from_overworld(info, console, context);
 
                 //Move cursor to top left corner - even works when at Entrance fly point

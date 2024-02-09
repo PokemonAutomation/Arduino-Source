@@ -18,6 +18,7 @@
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_NormalBattleMenus.h"
+#include "PokemonSV/Inference/PokemonSV_BlueberryQuestDetector.h"
 #include "PokemonSV/Programs/PokemonSV_BlueberryQuests.h"
 #include "PokemonSV_BBQSoloFarmer.h"
 
@@ -95,7 +96,25 @@ void BBQSoloFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
     smoke ball or flying pokemon required in slot 1 in case of arena trap
     */
 
-    return_to_plaza(env.program_info(), env.console, context);
+    //pbf_press_dpad(context, DPAD_RIGHT, 50, 20);
+    VideoSnapshot screen = env.console.video().snapshot();
+    BlueberryQuestDetector top_quest_detector(env.console.logger(), COLOR_GREEN, BBQ_OPTIONS.LANGUAGE, BlueberryQuestDetector::QuestPosition::FIRST);
+    std::string top_quest = top_quest_detector.detect_quest(screen);
+    env.log("Top quest: " + top_quest);
+
+    BlueberryQuestDetector mid1_quest_detector(env.console.logger(), COLOR_GREEN, BBQ_OPTIONS.LANGUAGE, BlueberryQuestDetector::QuestPosition::SECOND);
+    std::string mid1_quest = mid1_quest_detector.detect_quest(screen);
+    env.log("Mid1 quest: " + mid1_quest);
+
+    BlueberryQuestDetector mid2_quest_detector(env.console.logger(), COLOR_GREEN, BBQ_OPTIONS.LANGUAGE, BlueberryQuestDetector::QuestPosition::THIRD);
+    std::string mid2_quest = mid2_quest_detector.detect_quest(screen);
+    env.log("Mid2 quest: " + mid2_quest);
+
+    BlueberryQuestDetector bottom_quest_detector(env.console.logger(), COLOR_GREEN, BBQ_OPTIONS.LANGUAGE, BlueberryQuestDetector::QuestPosition::FOURTH);
+    std::string bottom_quest = bottom_quest_detector.detect_quest(screen);
+    env.log("Bottom quest: " + bottom_quest);
+
+    //return_to_plaza(env.program_info(), env.console, context);
 
     /*
     for (uint64_t i = 0; i < NUM_QUESTS; i++) {
