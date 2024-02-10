@@ -183,9 +183,11 @@ int read_BP(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& con
     int result = run_until(
         console, context,
         [&](BotBaseContext& context){
-            pbf_press_dpad(context, DPAD_RIGHT, 50, 20);
-            pbf_wait(context, 200);
-            context.wait_for_all_requests();
+            for (int i = 0; i < 6; i++) { //try 6 times
+                pbf_press_dpad(context, DPAD_RIGHT, 50, 20);
+                pbf_wait(context, 200);
+                context.wait_for_all_requests();
+            }
         },
         {{ right_panel }}
     );
@@ -213,9 +215,11 @@ void read_quests(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
     int result = run_until(
         console, context,
         [&](BotBaseContext& context){
-            pbf_press_dpad(context, DPAD_RIGHT, 50, 20);
-            pbf_wait(context, 200);
-            context.wait_for_all_requests();
+            for (int i = 0; i < 6; i++) { //try 6 times
+                pbf_press_dpad(context, DPAD_RIGHT, 50, 20);
+                pbf_wait(context, 200);
+                context.wait_for_all_requests();
+            }
         },
         {{ right_panel }}
     );
@@ -237,7 +241,7 @@ void read_quests(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
     
     std::string fourth_quest = fourth_quest_detector.detect_quest(screen);
     if (fourth_quest != "") {
-        quest_list.push_back(BBQuests_string_to_enum(fourth_quest_detector.detect_quest(screen)));
+        quest_list.push_back(BBQuests_string_to_enum(fourth_quest));
     }
 
     //Close quest list
@@ -305,21 +309,96 @@ void process_and_do_quest(const ProgramInfo& info, ConsoleHandle& console, BotBa
     
     //while(!quest_completed)
 
-    /*switch (current_quest) {
-    case "photo-swim":
+    switch (current_quest) {
+    case BBQuests::make_tm:
+        quest_make_tm(info, console, context);
+        break;
+    //All involve taking pictures
+    case BBQuests::photo_fly: case BBQuests::photo_swim: case BBQuests::photo_canyon: case BBQuests::photo_coastal: case BBQuests::photo_polar: case BBQuests::photo_savanna:
+
+        break;
+
+    //All involve catching a pokemon
+    case BBQuests::catch_any: case BBQuests::catch_normal: case BBQuests::catch_fighting: case BBQuests::catch_flying: case BBQuests::catch_poison: case BBQuests::catch_ground:
+    case BBQuests::catch_rock: case BBQuests::catch_bug: case BBQuests::catch_ghost: case BBQuests::catch_steel: case BBQuests::catch_fire: case BBQuests::catch_water:case BBQuests::catch_grass:
+    case BBQuests::catch_electric: case BBQuests::catch_psychic: case BBQuests::catch_ice: case BBQuests::catch_dragon: case BBQuests::catch_dark: case BBQuests::catch_fairy:
 
         break;
     default:
         //throw error this should not be possible
         break;
     }
-    */
 
 
 
 
     //Validate quest was completed by checking list
 
+}
+
+void quest_make_tm(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context) {
+    PromptDialogWatcher makeTM(COLOR_RED);
+    OverworldWatcher overworld(COLOR_BLUE);
+
+    pbf_move_left_joystick(context, 255, 0, 100, 20);
+    pbf_press_button(context, BUTTON_L, 10, 50);
+
+    //The plaza is extemely bright and tends to throw off the detectors
+    pbf_press_button(context, BUTTON_A, 20, 200);
+    pbf_wait(context, 200);
+    context.wait_for_all_requests();
+    pbf_press_button(context, BUTTON_A, 20, 200);
+    pbf_wait(context, 200);
+    context.wait_for_all_requests();
+    pbf_press_button(context, BUTTON_A, 20, 200);
+    pbf_wait(context, 200);
+    context.wait_for_all_requests();
+
+    int make_tm = run_until(
+        console, context,
+        [&](BotBaseContext& context){
+            for (int i = 0; i < 229; i++) { //229 is max number of TMs
+                //click on tm
+                pbf_press_button(context, BUTTON_A, 20, 50);
+                pbf_wait(context, 100);
+                context.wait_for_all_requests();
+
+                //not craftable, close and move on to next
+                pbf_press_button(context, BUTTON_A, 20, 50);
+                pbf_press_dpad(context, DPAD_RIGHT, 20, 20);
+                pbf_wait(context, 100);
+                context.wait_for_all_requests();
+            }
+        },
+        {{ makeTM }}
+    );
+    if (make_tm == 0){
+        console.log("Craftable TM found.");
+    }
+    else {
+        console.log("make_tm != 0");
+    }
+    context.wait_for_all_requests();
+
+    //Make TM
+    pbf_mash_button(context, BUTTON_A, 220);
+    context.wait_for_all_requests();
+
+    int exit = run_until(
+        console, context,
+        [&](BotBaseContext& context){
+            //click on tm
+            pbf_mash_button(context, BUTTON_B, 2000);
+        },
+        {{ overworld }}
+    );
+    if (exit == 0){
+        console.log("Overworld detected.");
+    }
+    context.wait_for_all_requests();
+    
+    open_map_from_overworld(info, console, context);
+    fly_to_overworld_from_map(info, console, context);
 }
 
 }

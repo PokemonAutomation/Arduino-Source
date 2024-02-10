@@ -56,7 +56,8 @@ const std::set<BBQuests> gold_quests = {
 
 //Quests that are not currently supported. Gold quests currently excluded as this is singleplayer only right now.
 const std::set<BBQuests> not_possible_quests = {
-    BBQuests::UnableToDetect, BBQuests::auto_10, BBQuests::pickup_10, BBQuests::sneak_up, BBQuests::auto_30, BBQuests::tera_raid, BBQuests::photo_swim, BBQuests::catch_any, BBQuests::tera_self_defeat
+    BBQuests::UnableToDetect, BBQuests::auto_10, BBQuests::pickup_10, BBQuests::sneak_up, BBQuests::auto_30, BBQuests::tera_raid
+    //, BBQuests::photo_swim, BBQuests::catch_any, BBQuests::tera_self_defeat
 };
 
 // Return to Central Plaza from anywhere in the map.
@@ -76,6 +77,9 @@ void process_quest_list(const ProgramInfo& info, ConsoleHandle& console, BotBase
 
 //Take the current quest and call the function to do it
 void process_and_do_quest(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, BBQuests& current_quest, int& eggs_hatched);
+
+//Iterate through TMs until a craftable one is found. Make the TM and return to position.
+void quest_make_tm(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
 
 }
 }

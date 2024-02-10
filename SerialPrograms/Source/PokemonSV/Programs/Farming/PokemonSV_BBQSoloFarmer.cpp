@@ -96,6 +96,12 @@ void BBQSoloFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
     handle out of bp rerolls?
     */
 
+    //quest_make_tm(env.program_info(), env.console, context);
+
+
+    
+
+
     //Fly to plaza
     open_map_from_overworld(env.program_info(), env.console, context);
     fly_to_overworld_from_map(env.program_info(), env.console, context);
@@ -126,7 +132,7 @@ void BBQSoloFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         process_and_do_quest(env.program_info(), env.console, context, BBQ_OPTIONS, n, eggs_hatched);
     }
 
-
+    
     //return_to_plaza(env.program_info(), env.console, context);
 
     /*
