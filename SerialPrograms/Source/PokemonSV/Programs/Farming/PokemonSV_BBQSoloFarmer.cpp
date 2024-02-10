@@ -94,14 +94,16 @@ void BBQSoloFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
 
     smoke ball or flying pokemon required in slot 1 in case of arena trap
     handle out of bp rerolls?
+
+    camera support off
     */
 
     //quest_make_tm(env.program_info(), env.console, context);
 
-
+    quest_travel_500(env.program_info(), env.console, context);
     
 
-
+    /*
     //Fly to plaza
     open_map_from_overworld(env.program_info(), env.console, context);
     fly_to_overworld_from_map(env.program_info(), env.console, context);

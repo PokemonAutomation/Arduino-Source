@@ -33,6 +33,7 @@ enum class BBQuests {
 
 BBQuests BBQuests_string_to_enum(const std::string& token);
 
+
 //Basic blue quests
 const std::set<BBQuests> blue_quests = {
     BBQuests::auto_10, BBQuests::make_tm, BBQuests::pickup_10, BBQuests::sneak_up, BBQuests::photo_fly, BBQuests::photo_swim, BBQuests::photo_canyon, BBQuests::photo_coastal, BBQuests::photo_polar, BBQuests::photo_savanna, BBQuests::tera_self_defeat, 
@@ -60,6 +61,9 @@ const std::set<BBQuests> not_possible_quests = {
     //, BBQuests::photo_swim, BBQuests::catch_any, BBQuests::tera_self_defeat
 };
 
+
+
+
 // Return to Central Plaza from anywhere in the map.
 void return_to_plaza(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
 
@@ -80,6 +84,12 @@ void process_and_do_quest(const ProgramInfo& info, ConsoleHandle& console, BotBa
 
 //Iterate through TMs until a craftable one is found. Make the TM and return to position.
 void quest_make_tm(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
+
+//Do laps in central plaza.
+void quest_travel_500(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
+
+//Run around until you encounter a pokemon. Defeat it by spamming your first move.
+void quest_tera_self_defeat(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
 
 }
 }

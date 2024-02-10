@@ -305,35 +305,58 @@ void process_quest_list(const ProgramInfo& info, ConsoleHandle& console, BotBase
 }
 
 void process_and_do_quest(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, BBQuests& current_quest, int& eggs_hatched) {
-    //bool quest_completed = false;
-    
-    //while(!quest_completed)
+    bool quest_completed = false;
+    int quest_attempts = 0;
 
-    switch (current_quest) {
-    case BBQuests::make_tm:
-        quest_make_tm(info, console, context);
-        break;
-    //All involve taking pictures
-    case BBQuests::photo_fly: case BBQuests::photo_swim: case BBQuests::photo_canyon: case BBQuests::photo_coastal: case BBQuests::photo_polar: case BBQuests::photo_savanna:
+    while (!quest_completed) {
+        switch (current_quest) {
+        case BBQuests::make_tm:
+            quest_make_tm(info, console, context);
+            break;
+        case BBQuests::travel_500:
+            quest_travel_500(info, console, context);
+            break;
+        case BBQuests::tera_self_defeat:
+            quest_tera_self_defeat(info, console, context););
+            break;
+        //All involve taking pictures
+        case BBQuests::photo_fly: case BBQuests::photo_swim: case BBQuests::photo_canyon: case BBQuests::photo_coastal: case BBQuests::photo_polar: case BBQuests::photo_savanna:
+        case BBQuests::photo_normal: case BBQuests::photo_fighting: case BBQuests::photo_flying: case BBQuests::photo_poison: case BBQuests::photo_ground:
+        case BBQuests::photo_rock: case BBQuests::photo_bug: case BBQuests::photo_ghost: case BBQuests::photo_steel: case BBQuests::photo_fire: case BBQuests::photo_water:case BBQuests::photo_grass:
+        case BBQuests::photo_electric: case BBQuests::photo_psychic: case BBQuests::photo_ice: case BBQuests::photo_dragon: case BBQuests::photo_dark: case BBQuests::photo_fairy:
 
-        break;
+            break;
+        //All involve catching a pokemon
+        case BBQuests::catch_any: case BBQuests::catch_normal: case BBQuests::catch_fighting: case BBQuests::catch_flying: case BBQuests::catch_poison: case BBQuests::catch_ground:
+        case BBQuests::catch_rock: case BBQuests::catch_bug: case BBQuests::catch_ghost: case BBQuests::catch_steel: case BBQuests::catch_fire: case BBQuests::catch_water:case BBQuests::catch_grass:
+        case BBQuests::catch_electric: case BBQuests::catch_psychic: case BBQuests::catch_ice: case BBQuests::catch_dragon: case BBQuests::catch_dark: case BBQuests::catch_fairy:
 
-    //All involve catching a pokemon
-    case BBQuests::catch_any: case BBQuests::catch_normal: case BBQuests::catch_fighting: case BBQuests::catch_flying: case BBQuests::catch_poison: case BBQuests::catch_ground:
-    case BBQuests::catch_rock: case BBQuests::catch_bug: case BBQuests::catch_ghost: case BBQuests::catch_steel: case BBQuests::catch_fire: case BBQuests::catch_water:case BBQuests::catch_grass:
-    case BBQuests::catch_electric: case BBQuests::catch_psychic: case BBQuests::catch_ice: case BBQuests::catch_dragon: case BBQuests::catch_dark: case BBQuests::catch_fairy:
+            break;
 
-        break;
-    default:
-        //throw error this should not be possible
-        break;
+        default:
+            //throw error this should not be possible
+            break;
+        }
+
+        //Validate quest was completed by checking list
+        std::vector<BBQuests> quest_list;
+        read_quests(info, console, context, BBQ_OPTIONS, quest_list);
+        if (std::find(quest_list.begin(), quest_list.end(), current_quest) != quest_list.end()) {
+            console.log("Current quest exists on list. Quest did now complete.");
+            quest_attempts++;
+        }
+        else {
+            console.log("Current quest was not found. Quest completed!");
+            quest_completed = true;
+        }
+
+        //Ignore the quest this time if it keeps failing
+        //Make configurable?
+        if (quest_attempts > 3) {
+            console.log("Failed to complete a quest multiple times. Skipping.", COLOR_RED);
+            break;
+        }
     }
-
-
-
-
-    //Validate quest was completed by checking list
-
 }
 
 void quest_make_tm(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context) {
@@ -376,7 +399,7 @@ void quest_make_tm(const ProgramInfo& info, ConsoleHandle& console, BotBaseConte
         console.log("Craftable TM found.");
     }
     else {
-        console.log("make_tm != 0");
+        console.log("Failed to find craftable TM!");
     }
     context.wait_for_all_requests();
 
@@ -399,6 +422,28 @@ void quest_make_tm(const ProgramInfo& info, ConsoleHandle& console, BotBaseConte
     
     open_map_from_overworld(info, console, context);
     fly_to_overworld_from_map(info, console, context);
+}
+
+void quest_travel_500(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context) {
+    pbf_move_left_joystick(context, 0, 0, 100, 20);
+    pbf_move_left_joystick(context, 128, 0, 150, 20);
+    pbf_move_left_joystick(context, 0, 128, 140, 20);
+
+    pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
+
+    for(int j = 0; j < 60; j++){ //One min just to be safe.
+        pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE,
+            128, 0, 255, 128, TICKS_PER_SECOND);
+    }
+    context.wait_for_all_requests();
+
+    return_to_plaza(info, console, context);
+}
+
+void quest_tera_self_defeat(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context) {
+
+
+    return_to_plaza(info, console, context);
 }
 
 }
