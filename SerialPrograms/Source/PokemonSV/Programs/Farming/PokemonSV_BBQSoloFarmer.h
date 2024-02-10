@@ -36,11 +36,6 @@ private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;
-
-    
-    size_t m_current_quest;
-    size_t m_current_quest_position;
-    int m_eggs_hatched;
 };
 
 }

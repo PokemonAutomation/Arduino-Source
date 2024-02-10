@@ -83,7 +83,7 @@ void BBQSoloFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
     BBQSoloFarmer_Descriptor::Stats& stats = env.current_stats<BBQSoloFarmer_Descriptor::Stats>();
 
     /*
-    start at Central Plaza - we return here after every task (switch map and then switch back to center the map)
+    start in the terarium - we return to central plaza after every task (switch map and then switch back to center the map)
     must have flying unlocked
     must have certain fly points unlocked
     must have completed the DLC storyline (caught turtle), this is needed for tera orb recharge and flying.
@@ -96,23 +96,35 @@ void BBQSoloFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
     handle out of bp rerolls?
     */
 
-    std::vector<std::string> quest_list; //all quests
-    std::vector<std::string> quests_to_do; //do-able quests
+    //Fly to plaza
+    open_map_from_overworld(env.program_info(), env.console, context);
+    fly_to_overworld_from_map(env.program_info(), env.console, context);
+
+    //Get initial BP
+    int starting_BP = read_BP(env.program_info(), env.console, context);
+    if (starting_BP < 100) {
+        env.log("Starting BP is low."); //Todo throw error? migh tnot have enough for rerolls
+    }
+
+    std::vector<BBQuests> quest_list; //all quests
+    std::vector<BBQuests> quests_to_do; //do-able quests
     int eggs_hatched = 0; //Track eggs
+
 
     //Get and reroll quests until we can at least one
     while (quests_to_do.size() < 1) {
         read_quests(env.program_info(), env.console, context, BBQ_OPTIONS, quest_list);
         process_quest_list(env.program_info(), env.console, context, BBQ_OPTIONS, quest_list, quests_to_do, eggs_hatched);
+
         //Clear out the regular quest list.
         quest_list.clear();
     }
 
     env.log("Quests to do: ");
-    for (auto n : quests_to_do) {
-        env.log(n);
-    }
 
+    for (auto n : quests_to_do) {
+        process_and_do_quest(env.program_info(), env.console, context, BBQ_OPTIONS, n, eggs_hatched);
+    }
 
 
     //return_to_plaza(env.program_info(), env.console, context);
@@ -128,7 +140,7 @@ void BBQSoloFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         //Return to central plaza
         
         
-        
+        //CHECK THAT BP WAS EARNED BEFORE SAVING
         if (SAVE_NUM_QUESTS != 0 && i % SAVE_NUM_ROUNDS == 0) {
             env.log("Saving and resetting.");
             save_game_from_overworld(env.program_info(), env.console, context);
