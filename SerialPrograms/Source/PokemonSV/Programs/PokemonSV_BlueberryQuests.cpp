@@ -528,8 +528,6 @@ void quest_photo(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
                 //Navigate to target
                 switch (current_quest) {
                 case BBQuests::photo_fly: case BBQuests::photo_psychic:
-                    console.log("Photo: Fly/float/hover or Psychic");
-
                     //Polar Rest Area - targeting Duosion fixed spawn
                     open_map_from_overworld(info, console, context);
                     pbf_move_left_joystick(context, 75, 0, 230, 20);
@@ -541,11 +539,7 @@ void quest_photo(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
                     pbf_move_left_joystick(context, 0, 128, 250, 20);
 
                     break;
-                case BBQuests::photo_swim: case BBQuests::photo_water:
-                    console.log("Quest: Swimming or Water");
-
-                    angle_camera_down = true;
-
+                case BBQuests::photo_swim: case BBQuests::photo_water: case BBQuests::photo_polar:
                     //Polar Outdoor Classroom 1 - fixed Horsea
                     open_map_from_overworld(info, console, context);
                     pbf_move_left_joystick(context, 0, 20, 150, 20);
@@ -554,10 +548,106 @@ void quest_photo(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
 
                     pbf_press_button(context, BUTTON_L, 10, 50);
                     pbf_move_left_joystick(context, 255, 50, 180, 20);
-                    //pbf_move_left_joystick(context, 0, 128, 250, 20);
+
+                    angle_camera_down = true;
 
                     break;
-                default:
+                case BBQuests::photo_coastal: case BBQuests::photo_grass: case BBQuests::photo_dragon:
+                    //Coastal Plaza - Exeggutor-A
+                    open_map_from_overworld(info, console, context);
+                    pbf_move_left_joystick(context, 180, 0, 200, 20);
+                    pbf_press_button(context, BUTTON_ZL, 40, 100);
+                    fly_to_overworld_from_map(info, console, context);
+
+                    pbf_move_left_joystick(context, 0, 115, 400, 20);
+
+                    //Jump down
+                    pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
+                    ssf_press_button(context, BUTTON_B, 0, 100);
+                    ssf_press_button(context, BUTTON_B, 0, 20, 10);
+                    ssf_press_button(context, BUTTON_B, 0, 20);
+
+                    pbf_wait(context, 100);
+                    context.wait_for_all_requests();
+
+                    pbf_move_left_joystick(context, 128, 0, 150, 20);
+                    pbf_press_button(context, BUTTON_B, 20, 20);
+                    pbf_wait(context, 200);
+                    pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
+                    context.wait_for_all_requests();
+
+                    break;
+                case BBQuests::photo_canyon: case BBQuests::photo_ghost: case BBQuests::photo_ground:
+                    //Canyon Plaza - Golett
+                    open_map_from_overworld(info, console, context);
+                    pbf_move_left_joystick(context, 0, 255, 215, 20);
+                    pbf_press_button(context, BUTTON_ZL, 40, 100);
+                    fly_to_overworld_from_map(info, console, context);
+
+                    pbf_move_left_joystick(context, 210, 128, 10, 20);
+                    pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
+
+                   //Jump, glide, fly
+                    ssf_press_button(context, BUTTON_B, 0, 100);
+                    ssf_press_button(context, BUTTON_B, 0, 20, 10);
+                    ssf_press_button(context, BUTTON_B, 0, 20);
+                    pbf_wait(context, 100);
+                    context.wait_for_all_requests();
+                    pbf_press_button(context, BUTTON_LCLICK, 50, 0);
+
+                    if (BBQ_OPTIONS.INVERTED_FLIGHT) {
+                        pbf_move_left_joystick(context, 128, 255, 600, 250);
+                    }
+                    else {
+                        pbf_move_left_joystick(context, 128, 0, 600, 250);
+                    }
+
+                    pbf_wait(context, 250);
+                    context.wait_for_all_requests();
+                    pbf_press_button(context, BUTTON_B, 20, 50);
+
+                    pbf_wait(context, 400);
+                    context.wait_for_all_requests();
+
+                    pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
+
+                    break;
+                case BBQuests::photo_savanna: case BBQuests::photo_normal: case BBQuests::photo_fire:
+                    //Savanna Plaza - Pride Rock
+                    open_map_from_overworld(info, console, context);
+                    pbf_move_left_joystick(context, 165, 255, 180, 20);
+                    pbf_press_button(context, BUTTON_ZL, 40, 100);
+                    fly_to_overworld_from_map(info, console, context);
+
+                    pbf_move_left_joystick(context, 255, 255, 10, 20);
+                    pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
+
+                    ssf_press_button(context, BUTTON_B, 0, 100);
+                    ssf_press_button(context, BUTTON_B, 0, 20, 10);
+                    ssf_press_button(context, BUTTON_B, 0, 20);
+                    pbf_wait(context, 100);
+                    context.wait_for_all_requests();
+                    pbf_press_button(context, BUTTON_LCLICK, 50, 0);
+
+                    if (BBQ_OPTIONS.INVERTED_FLIGHT) {
+                        pbf_move_left_joystick(context, 128, 255, 600, 250);
+                    }
+                    else {
+                        pbf_move_left_joystick(context, 128, 0, 600, 250);
+                    }
+
+                    pbf_wait(context, 400);
+                    context.wait_for_all_requests();
+                    pbf_press_button(context, BUTTON_B, 20, 50);
+
+                    pbf_wait(context, 400);
+                    context.wait_for_all_requests();
+
+                    pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
+                    pbf_move_left_joystick(context, 255, 128, 10, 20);
+
+                    angle_camera_up = true;
+
                     break;
                 }
 
