@@ -30,7 +30,7 @@ using namespace Pokemon;
 BBQSoloFarmer_Descriptor::BBQSoloFarmer_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonSV:BBQSoloFarmer",
-        STRING_POKEMON + " SV", "BBQ Farmer - Solo",
+        STRING_POKEMON + " SV", "BBQ Farmer",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSV/BBQSoloFarmer.md",
         "Farm Blueberry Quests in the Terarium.",
         FeedbackType::REQUIRED,
@@ -96,13 +96,13 @@ void BBQSoloFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
     handle out of bp rerolls?
 
     camera support off
+    camera controls regular
     */
 
     //quest_make_tm(env.program_info(), env.console, context);
 
-    quest_travel_500(env.program_info(), env.console, context);
+    //navi_normal(env.program_info(), env.console, context, BBQ_OPTIONS);
     
-
     /*
     //Fly to plaza
     open_map_from_overworld(env.program_info(), env.console, context);
@@ -113,28 +113,27 @@ void BBQSoloFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
     if (starting_BP < 100) {
         env.log("Starting BP is low."); //Todo throw error? migh tnot have enough for rerolls
     }
-
+    */
     std::vector<BBQuests> quest_list; //all quests
     std::vector<BBQuests> quests_to_do; //do-able quests
     int eggs_hatched = 0; //Track eggs
 
-
     //Get and reroll quests until we can at least one
     while (quests_to_do.size() < 1) {
-        read_quests(env.program_info(), env.console, context, BBQ_OPTIONS, quest_list);
-        process_quest_list(env.program_info(), env.console, context, BBQ_OPTIONS, quest_list, quests_to_do, eggs_hatched);
+        quest_list = read_quests(env.program_info(), env.console, context, BBQ_OPTIONS);
+        quests_to_do = process_quest_list(env.program_info(), env.console, context, BBQ_OPTIONS, quest_list, eggs_hatched);
 
         //Clear out the regular quest list.
         quest_list.clear();
     }
 
-    env.log("Quests to do: ");
-
     for (auto n : quests_to_do) {
         process_and_do_quest(env.program_info(), env.console, context, BBQ_OPTIONS, n, eggs_hatched);
     }
 
-    
+    //Clear out the todo list
+    quests_to_do.clear();
+
     //return_to_plaza(env.program_info(), env.console, context);
 
     /*

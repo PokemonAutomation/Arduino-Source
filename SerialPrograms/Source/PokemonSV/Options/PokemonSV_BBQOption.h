@@ -42,6 +42,8 @@ public:
     SimpleIntegerOption<uint64_t> NUM_QUESTS;
     SimpleIntegerOption<uint64_t> SAVE_NUM_QUESTS;
 
+    BooleanCheckBoxOption INVERTED_FLIGHT;
+
     //For catching pokemon quests
     BooleanCheckBoxOption QUICKBALL;
     PokemonSwSh::PokemonBallSelectOption BALL_SELECT;

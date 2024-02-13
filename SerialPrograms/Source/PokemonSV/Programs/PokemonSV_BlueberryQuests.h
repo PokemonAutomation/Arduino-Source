@@ -73,11 +73,11 @@ int read_BP(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& con
 //Open the quest panel and read in the current quests.
 //Currently only supports singleplayer.
 //For multiplayer, we will want keep track of which quest are gold/red and scroll cursor down until all of the current player's blue quests are in.
-void read_quests(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, std::vector<BBQuests>& quest_list);
+std::vector<BBQuests> read_quests(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS);
 
 //Determine which quests are possible and which quests are not. (ex. no eggs, reroll egg hatcher.)
 //Quests not possible are removed from the list. If the list is empty, then reroll all items.
-void process_quest_list(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, std::vector<BBQuests>& quest_list, std::vector<BBQuests>& quests_to_do, int& eggs_hatched);
+std::vector<BBQuests> process_quest_list(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, std::vector<BBQuests>& quest_list, int& eggs_hatched);
 
 //Take the current quest and call the function to do it
 void process_and_do_quest(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, BBQuests& current_quest, int& eggs_hatched);
@@ -88,8 +88,20 @@ void quest_make_tm(const ProgramInfo& info, ConsoleHandle& console, BotBaseConte
 //Do laps in central plaza.
 void quest_travel_500(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
 
-//Run around until you encounter a pokemon. Defeat it by spamming your first move.
-void quest_tera_self_defeat(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
+
+//Travel to pokemon TYPE
+void navi_normal(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS);
+
+
+
+//Handle catch/kill battle
+void handle_quest_battle(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS);
+
+//Run around until you encounter a pokemon. Tera, then defeat it by spamming your first move.
+void quest_tera_self_defeat(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS);
+
+//Take picture of a pokemon/location
+void quest_photo(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, BBQuests& current_quest);
 
 }
 }

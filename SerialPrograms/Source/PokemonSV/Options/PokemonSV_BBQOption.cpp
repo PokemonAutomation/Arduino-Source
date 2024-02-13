@@ -37,6 +37,11 @@ BBQOption::BBQOption(OCR::LanguageOCROption* language_option)
         "<b>Save and reset the game after attempting this many quests:</b><br>This preserves progress and prevents potential game lags from long runs.<br>0 disables this option.",
         LockMode::UNLOCK_WHILE_RUNNING, 50
     )
+    , INVERTED_FLIGHT(
+        "<b>Inverted Flight:</b><br>Check this box if inverted flight controls are set.",
+        LockMode::LOCK_WHILE_RUNNING,
+        false
+    )
     , QUICKBALL(
         "<b>Throw Quick Ball:</b><br>When attempting to catch a Pokemon, use a Quick Ball on the first turn. If there are moves in the Move Table, they will run after the Quick Ball is thrown.",
         LockMode::LOCK_WHILE_RUNNING,
@@ -57,6 +62,7 @@ BBQOption::BBQOption(OCR::LanguageOCROption* language_option)
     }
     PA_ADD_OPTION(NUM_QUESTS);
     PA_ADD_OPTION(SAVE_NUM_QUESTS);
+    PA_ADD_OPTION(INVERTED_FLIGHT);
     PA_ADD_OPTION(QUICKBALL);
     PA_ADD_OPTION(BALL_SELECT);
     PA_ADD_OPTION(BATTLE_MOVES);

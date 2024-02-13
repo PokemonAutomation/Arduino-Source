@@ -23,6 +23,8 @@
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSV_BlueberryQuests.h"
 
+#include<vector>
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
@@ -150,11 +152,16 @@ void return_to_plaza(const ProgramInfo& info, ConsoleHandle& console, BotBaseCon
                 pbf_move_left_joystick(context, 255, 255, 250, 40);
                 pbf_press_button(context, BUTTON_ZR, 40, 100);
 
-                //The only pokecenter on the map is Central Plaza
-                fly_to_closest_pokecenter_on_map(info, console, context);
-
+                try {
+                    //The only pokecenter on the map is Central Plaza
+                    fly_to_closest_pokecenter_on_map(info, console, context);
+                    context.wait_for_all_requests();
+                    returned_to_pokecenter = true;
+                }
+                catch(...) {
+                    console.log("Failed to return to Pokecenter. Closing map and retrying.");
+                }
                 context.wait_for_all_requests();
-                returned_to_pokecenter = true;
             },
             {
                 static_cast<VisualInferenceCallback&>(encounter_watcher),
@@ -176,6 +183,7 @@ void return_to_plaza(const ProgramInfo& info, ConsoleHandle& console, BotBaseCon
             }
         }
     }
+    context.wait_for_all_requests();
 }
 
 int read_BP(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context) {
@@ -209,7 +217,9 @@ int read_BP(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& con
     return OCR::read_number(console, BP_value);
 }
 
-void read_quests(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, std::vector<BBQuests>& quest_list) {
+std::vector<BBQuests> read_quests(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS) {
+    std::vector<BBQuests> quest_list;
+
     //Open quest list. Wait for it to open.
     WhiteButtonWatcher right_panel(COLOR_BLUE, WhiteButton::ButtonB, {0.484, 0.117, 0.022, 0.037});
     int result = run_until(
@@ -247,9 +257,13 @@ void read_quests(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
     //Close quest list
     pbf_mash_button(context, BUTTON_B, 100);
     context.wait_for_all_requests();
+
+    return quest_list;
 }
 
-void process_quest_list(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, std::vector<BBQuests>& quest_list, std::vector<BBQuests>& quests_to_do, int& eggs_hatched) {
+std::vector<BBQuests> process_quest_list(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, std::vector<BBQuests>& quest_list, int& eggs_hatched) {
+    std::vector<BBQuests> quests_to_do;
+
     //Put all do-able quests into a different list
     for (auto n : quest_list) {
         if (not_possible_quests.contains(n)) {
@@ -302,6 +316,7 @@ void process_quest_list(const ProgramInfo& info, ConsoleHandle& console, BotBase
         context.wait_for_all_requests();
     }
 
+    return quests_to_do;
 }
 
 void process_and_do_quest(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, BBQuests& current_quest, int& eggs_hatched) {
@@ -317,14 +332,14 @@ void process_and_do_quest(const ProgramInfo& info, ConsoleHandle& console, BotBa
             quest_travel_500(info, console, context);
             break;
         case BBQuests::tera_self_defeat:
-            quest_tera_self_defeat(info, console, context););
+            quest_tera_self_defeat(info, console, context, BBQ_OPTIONS);
             break;
         //All involve taking pictures
         case BBQuests::photo_fly: case BBQuests::photo_swim: case BBQuests::photo_canyon: case BBQuests::photo_coastal: case BBQuests::photo_polar: case BBQuests::photo_savanna:
         case BBQuests::photo_normal: case BBQuests::photo_fighting: case BBQuests::photo_flying: case BBQuests::photo_poison: case BBQuests::photo_ground:
         case BBQuests::photo_rock: case BBQuests::photo_bug: case BBQuests::photo_ghost: case BBQuests::photo_steel: case BBQuests::photo_fire: case BBQuests::photo_water:case BBQuests::photo_grass:
         case BBQuests::photo_electric: case BBQuests::photo_psychic: case BBQuests::photo_ice: case BBQuests::photo_dragon: case BBQuests::photo_dark: case BBQuests::photo_fairy:
-
+            quest_photo(info, console, context, BBQ_OPTIONS, current_quest);
             break;
         //All involve catching a pokemon
         case BBQuests::catch_any: case BBQuests::catch_normal: case BBQuests::catch_fighting: case BBQuests::catch_flying: case BBQuests::catch_poison: case BBQuests::catch_ground:
@@ -339,10 +354,9 @@ void process_and_do_quest(const ProgramInfo& info, ConsoleHandle& console, BotBa
         }
 
         //Validate quest was completed by checking list
-        std::vector<BBQuests> quest_list;
-        read_quests(info, console, context, BBQ_OPTIONS, quest_list);
+        std::vector<BBQuests> quest_list = read_quests(info, console, context, BBQ_OPTIONS);
         if (std::find(quest_list.begin(), quest_list.end(), current_quest) != quest_list.end()) {
-            console.log("Current quest exists on list. Quest did now complete.");
+            console.log("Current quest exists on list. Quest did not complete.");
             quest_attempts++;
         }
         else {
@@ -360,6 +374,8 @@ void process_and_do_quest(const ProgramInfo& info, ConsoleHandle& console, BotBa
 }
 
 void quest_make_tm(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context) {
+    console.log("Quest: Make TM");
+
     PromptDialogWatcher makeTM(COLOR_RED);
     OverworldWatcher overworld(COLOR_BLUE);
 
@@ -421,10 +437,14 @@ void quest_make_tm(const ProgramInfo& info, ConsoleHandle& console, BotBaseConte
     context.wait_for_all_requests();
     
     open_map_from_overworld(info, console, context);
+    pbf_press_button(context, BUTTON_ZL, 40, 100);
     fly_to_overworld_from_map(info, console, context);
+    context.wait_for_all_requests();
 }
 
 void quest_travel_500(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context) {
+    console.log("Quest: Travel 500");
+
     pbf_move_left_joystick(context, 0, 0, 100, 20);
     pbf_move_left_joystick(context, 128, 0, 150, 20);
     pbf_move_left_joystick(context, 0, 128, 140, 20);
@@ -437,13 +457,199 @@ void quest_travel_500(const ProgramInfo& info, ConsoleHandle& console, BotBaseCo
     }
     context.wait_for_all_requests();
 
+    open_map_from_overworld(info, console, context);
+    pbf_press_button(context, BUTTON_ZL, 40, 100);
+    fly_to_overworld_from_map(info, console, context);
+    context.wait_for_all_requests();
+}
+
+void navi_normal(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS) {
+    //Targeting a fixed encounter Zangoose near the Coastal Outdoor Classroom
+    open_map_from_overworld(info, console, context);
+    pbf_move_left_joystick(context, 255, 0, 100, 20);
+    fly_to_overworld_from_map(info, console, context);
+
+    //Angle player toward pokemon
+    pbf_move_left_joystick(context, 128, 255, 50, 20);
+    pbf_move_left_joystick(context, 255, 0, 10, 20);
+    pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
+
+    //Jump, glide, press fly
+    ssf_press_button(context, BUTTON_B, 0, 100);
+    ssf_press_button(context, BUTTON_B, 0, 20, 10); //  Double up this press in
+    ssf_press_button(context, BUTTON_B, 0, 20);     //  case one is dropped.
+    pbf_wait(context, 100);
+    context.wait_for_all_requests();
+    pbf_press_button(context, BUTTON_LCLICK, 50, 0);
+
+    if (BBQ_OPTIONS.INVERTED_FLIGHT) {
+        pbf_move_left_joystick(context, 128, 255, 600, 250);
+    }
+    else {
+        pbf_move_left_joystick(context, 128, 0, 600, 250);
+    }
+
+
+    pbf_wait(context, 500);
+    context.wait_for_all_requests();
+    pbf_press_button(context, BUTTON_B, 20, 50);
+
+
+    //return_to_plaza(info, console, context);
+}
+
+void handle_quest_battle(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS) {
+    //Fly to savannah (open field, easy to run in)
+    open_map_from_overworld(info, console, context);
+
     return_to_plaza(info, console, context);
 }
 
-void quest_tera_self_defeat(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context) {
-
+void quest_tera_self_defeat(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS) {
+    //Fly to savannah (open field, easy to run in)
+    open_map_from_overworld(info, console, context);
 
     return_to_plaza(info, console, context);
+}
+
+void quest_photo(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, BBQuests& current_quest) {
+    bool took_photo = false;
+    bool angle_camera_up = false;
+    bool angle_camera_down = false;
+
+    console.log("Quest: Take photo");
+
+    while(!took_photo) {
+        EncounterWatcher encounter_watcher(console, COLOR_RED);
+        int ret = run_until(
+            console, context,
+            [&](BotBaseContext& context){
+
+                //Navigate to target
+                switch (current_quest) {
+                case BBQuests::photo_fly: case BBQuests::photo_psychic:
+                    console.log("Photo: Fly/float/hover or Psychic");
+
+                    //Polar Rest Area - targeting Duosion fixed spawn
+                    open_map_from_overworld(info, console, context);
+                    pbf_move_left_joystick(context, 75, 0, 230, 20);
+                    pbf_press_button(context, BUTTON_ZL, 40, 100);
+                    fly_to_overworld_from_map(info, console, context);
+
+                    pbf_press_button(context, BUTTON_L, 10, 50);
+                    pbf_move_left_joystick(context, 128, 0, 230, 20);
+                    pbf_move_left_joystick(context, 0, 128, 250, 20);
+
+                    break;
+                case BBQuests::photo_swim: case BBQuests::photo_water:
+                    console.log("Quest: Swimming or Water");
+
+                    angle_camera_down = true;
+
+                    //Polar Outdoor Classroom 1 - fixed Horsea
+                    open_map_from_overworld(info, console, context);
+                    pbf_move_left_joystick(context, 0, 20, 150, 20);
+                    pbf_press_button(context, BUTTON_ZL, 40, 100);
+                    fly_to_overworld_from_map(info, console, context);
+
+                    pbf_press_button(context, BUTTON_L, 10, 50);
+                    pbf_move_left_joystick(context, 255, 50, 180, 20);
+                    //pbf_move_left_joystick(context, 0, 128, 250, 20);
+
+                    break;
+                default:
+                    break;
+                }
+
+                /*
+                        //Chargestone Cavern?
+                    //open_map_from_overworld(info, console, context);
+                    //pbf_move_left_joystick(context, 0, 135, 130, 20);
+                    //fly_to_overworld_from_map(info, console, context);
+
+                    //pbf_wait(context, 100);
+                    //context.wait_for_all_requests();
+
+                    //pbf_move_left_joystick(context, 0, 128, 20, 20);
+    
+
+                        //Coastal Outdoor Classroom - biome is extremely laggy
+                    //open_map_from_overworld(info, console, context);
+                    //pbf_move_left_joystick(context, 255, 0, 100, 20);
+                    //fly_to_overworld_from_map(info, console, context);
+
+                    //pbf_wait(context, 100);
+                    //context.wait_for_all_requests();
+
+                    //Move toward river
+                    //pbf_move_left_joystick(context, 255, 128, 200, 20);
+    
+                */
+
+                //Take photo.
+                PromptDialogWatcher photo_prompt(COLOR_RED);
+                OverworldWatcher overworld(COLOR_BLUE);
+
+                pbf_press_dpad(context, DPAD_DOWN, 50, 20);
+                pbf_wait(context, 100);
+                context.wait_for_all_requests();
+
+                if (angle_camera_up) {
+                    pbf_move_right_joystick(context, 128, 0, 50, 20);
+                }
+                else if (angle_camera_down) {
+                    pbf_move_right_joystick(context, 128, 255, 50, 20);
+                }
+                context.wait_for_all_requests();
+
+                pbf_press_button(context, BUTTON_A, 20, 50);
+
+                int ret = wait_until(
+                    console, context,
+                    std::chrono::seconds(10),
+                    { photo_prompt }
+                );
+                if (ret != 0) {
+                    console.log("Photo not taken.");
+                }
+
+                //Mash B until overworld
+                int exit = run_until(
+                    console, context,
+                    [&](BotBaseContext& context){
+                        pbf_mash_button(context, BUTTON_B, 2000);
+                    },
+                    {{ overworld }}
+                );
+                if (exit == 0){
+                    console.log("Overworld detected.");
+                }
+                took_photo = true;
+                context.wait_for_all_requests();
+            },
+            {
+                static_cast<VisualInferenceCallback&>(encounter_watcher),
+                static_cast<AudioInferenceCallback&>(encounter_watcher),
+            }
+        );
+        encounter_watcher.throw_if_no_sound();
+        if (ret >= 0){
+            console.log("Detected battle. Running from battle.");
+            try{
+                //TODO: Currently Smoke Ball or Flying type required due to Arena Trap
+                NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
+                battle_menu.move_to_slot(console, context, 3);
+                pbf_press_button(context, BUTTON_A, 10, 50);
+            }catch (...){
+                //Arena trap and no smoke ball. Attack?
+                //GO_HOME_WHEN_DONE.run_end_of_program(context);
+                //throw;
+            }
+        }
+    }
+
+    return_to_plaza(info, console, context);
+    context.wait_for_all_requests();
 }
 
 }
