@@ -40,23 +40,17 @@ BBQSoloFarmer_Descriptor::BBQSoloFarmer_Descriptor()
 {}
 struct BBQSoloFarmer_Descriptor::Stats : public StatsTracker {
     Stats()
-        : blueQuests(m_stats["Blue Quests"])
-        , redQuests(m_stats["Red Quests"])
-        , earnedBP(m_stats["BP Earned"])
+        : questsCompleted(m_stats["Quests Completed"])
         , rerolls(m_stats["Quest Rerolls"])
         , saves(m_stats["Saves"])
         , errors(m_stats["Errors"])
     {
-        m_display_order.emplace_back("Blue Quests");
-        m_display_order.emplace_back("Red Quests");
-        m_display_order.emplace_back("BP Earned");
+        m_display_order.emplace_back("Quests Completed");
         m_display_order.emplace_back("Quest Rerolls");
         m_display_order.emplace_back("Saves");
         m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
     }
-    std::atomic<uint64_t>& blueQuests;
-    std::atomic<uint64_t>& redQuests;
-    std::atomic<uint64_t>& earnedBP;
+    std::atomic<uint64_t>& questsCompleted;
     std::atomic<uint64_t>& rerolls;
     std::atomic<uint64_t>& saves;
     std::atomic<uint64_t>& errors;
@@ -114,26 +108,40 @@ void BBQSoloFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         env.log("Starting BP is low."); //Todo throw error? migh tnot have enough for rerolls
     }
     */
+
+    open_map_from_overworld(env.program_info(), env.console, context);
+    fly_to_overworld_from_map(env.program_info(), env.console, context);
+
     std::vector<BBQuests> quest_list; //all quests
     std::vector<BBQuests> quests_to_do; //do-able quests
     int eggs_hatched = 0; //Track eggs
+    int num_completed_quests = 0;
 
-    //Get and reroll quests until we can at least one
-    while (quests_to_do.size() < 1) {
-        quest_list = read_quests(env.program_info(), env.console, context, BBQ_OPTIONS);
-        quests_to_do = process_quest_list(env.program_info(), env.console, context, BBQ_OPTIONS, quest_list, eggs_hatched);
+    while (num_completed_quests < BBQ_OPTIONS.NUM_QUESTS) {
+        //Get and reroll quests until we can at least one
+        while (quests_to_do.size() < 1) {
+            quest_list = read_quests(env.program_info(), env.console, context, BBQ_OPTIONS);
+            quests_to_do = process_quest_list(env.program_info(), env.console, context, BBQ_OPTIONS, quest_list, eggs_hatched);
 
-        //Clear out the regular quest list.
-        quest_list.clear();
+            //Clear out the regular quest list.
+            quest_list.clear();
+        }
+
+        for (auto n : quests_to_do) {
+            bool questSuccess = process_and_do_quest(env.program_info(), env.console, context, BBQ_OPTIONS, n, eggs_hatched);
+            if (questSuccess) {
+                env.log("Quest completed successfully.");
+                stats.questsCompleted++;
+                env.update_stats();
+            }
+            else {
+                env.log("Quest did not complete successfully.");
+            }
+        }
+
+        //Clear out the todo list
+        quests_to_do.clear();
     }
-
-    for (auto n : quests_to_do) {
-        process_and_do_quest(env.program_info(), env.console, context, BBQ_OPTIONS, n, eggs_hatched);
-    }
-
-    //Clear out the todo list
-    quests_to_do.clear();
-
     //return_to_plaza(env.program_info(), env.console, context);
 
     /*

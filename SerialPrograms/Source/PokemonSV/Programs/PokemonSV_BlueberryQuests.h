@@ -58,7 +58,13 @@ const std::set<BBQuests> gold_quests = {
 //Quests that are not currently supported. Gold quests currently excluded as this is singleplayer only right now.
 const std::set<BBQuests> not_possible_quests = {
     BBQuests::UnableToDetect, BBQuests::auto_10, BBQuests::pickup_10, BBQuests::sneak_up, BBQuests::auto_30, BBQuests::tera_raid
-    //, BBQuests::photo_swim, BBQuests::catch_any, BBQuests::tera_self_defeat
+    
+    //Temp
+    , BBQuests::catch_any, BBQuests::catch_normal, BBQuests::catch_fighting, BBQuests::catch_flying, BBQuests::catch_poison, BBQuests::catch_ground, BBQuests::catch_rock, BBQuests::catch_bug, BBQuests::catch_ghost, BBQuests::catch_steel, 
+    BBQuests::catch_fire, BBQuests::catch_water, BBQuests::catch_grass, BBQuests::catch_electric, BBQuests::catch_psychic, BBQuests::catch_ice, BBQuests::catch_dragon, BBQuests::catch_dark, BBQuests::catch_fairy
+    , BBQuests::wash_pokemon, BBQuests::wild_tera, BBQuests::sandwich_three, BBQuests::bitter_sandwich, BBQuests::sweet_sandwich, BBQuests::salty_sandwich, BBQuests::sour_sandwich, BBQuests::spicy_sandwich, BBQuests::hatch_egg, 
+    BBQuests::photo_fighting, BBQuests::photo_flying, BBQuests::photo_poison, BBQuests::photo_rock, BBQuests::photo_bug, BBQuests::photo_steel,
+    BBQuests::photo_electric, BBQuests::photo_ice, BBQuests::photo_dark, BBQuests::photo_fairy
 };
 
 
@@ -80,7 +86,7 @@ std::vector<BBQuests> read_quests(const ProgramInfo& info, ConsoleHandle& consol
 std::vector<BBQuests> process_quest_list(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, std::vector<BBQuests>& quest_list, int& eggs_hatched);
 
 //Take the current quest and call the function to do it
-void process_and_do_quest(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, BBQuests& current_quest, int& eggs_hatched);
+bool process_and_do_quest(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, BBQuests& current_quest, int& eggs_hatched);
 
 //Iterate through TMs until a craftable one is found. Make the TM and return to position.
 void quest_make_tm(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);

@@ -12,15 +12,23 @@
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
+#include "NintendoSwitch/NintendoSwitch_Settings.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
+#include "PokemonSV/Programs/PokemonSV_GameEntry.h"
+#include "PokemonSV/Programs/PokemonSV_SaveGame.h"
+#include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
+#include "PokemonSwSh/Programs/PokemonSwSh_GameEntry.h"
+#include "PokemonSV/PokemonSV_Settings.h"
+#include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_NormalBattleMenus.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_EncounterWatcher.h"
 #include "PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
-#include "PokemonSV/Inference/PokemonSV_BlueberryQuestDetector.h"
-#include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
+#include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
+#include "PokemonSV/Inference/PokemonSV_BlueberryQuestDetector.h"
 #include "PokemonSV_BlueberryQuests.h"
 
 #include<vector>
@@ -173,6 +181,7 @@ void return_to_plaza(const ProgramInfo& info, ConsoleHandle& console, BotBaseCon
             console.log("Detected battle. Running from battle.");
             try{
                 //TODO: Currently Smoke Ball or Flying type required due to Arena Trap
+                //Also TODO: shiny checks
                 NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
                 battle_menu.move_to_slot(console, context, 3);
                 pbf_press_button(context, BUTTON_A, 10, 50);
@@ -319,7 +328,7 @@ std::vector<BBQuests> process_quest_list(const ProgramInfo& info, ConsoleHandle&
     return quests_to_do;
 }
 
-void process_and_do_quest(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, BBQuests& current_quest, int& eggs_hatched) {
+bool process_and_do_quest(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, BBQuests& current_quest, int& eggs_hatched) {
     bool quest_completed = false;
     int quest_attempts = 0;
 
@@ -371,10 +380,16 @@ void process_and_do_quest(const ProgramInfo& info, ConsoleHandle& console, BotBa
             break;
         }
     }
+    return quest_completed;
 }
 
 void quest_make_tm(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context) {
     console.log("Quest: Make TM");
+
+    //Mount and then dismount in case you're crouched
+    pbf_press_button(context, BUTTON_PLUS, 20, 105);
+    pbf_press_button(context, BUTTON_PLUS, 20, 105);
+    context.wait_for_all_requests();
 
     PromptDialogWatcher makeTM(COLOR_RED);
     OverworldWatcher overworld(COLOR_BLUE);
@@ -445,6 +460,11 @@ void quest_make_tm(const ProgramInfo& info, ConsoleHandle& console, BotBaseConte
 void quest_travel_500(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context) {
     console.log("Quest: Travel 500");
 
+    //Mount and then dismount in case you're crouched
+    pbf_press_button(context, BUTTON_PLUS, 20, 105);
+    pbf_press_button(context, BUTTON_PLUS, 20, 105);
+    context.wait_for_all_requests();
+
     pbf_move_left_joystick(context, 0, 0, 100, 20);
     pbf_move_left_joystick(context, 128, 0, 150, 20);
     pbf_move_left_joystick(context, 0, 128, 140, 20);
@@ -506,18 +526,160 @@ void handle_quest_battle(const ProgramInfo& info, ConsoleHandle& console, BotBas
 }
 
 void quest_tera_self_defeat(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS) {
-    //Fly to savannah (open field, easy to run in)
-    open_map_from_overworld(info, console, context);
+    EncounterWatcher encounter_watcher(console, COLOR_RED);
 
+    //Navigate to target and start battle
+    int ret = run_until(
+        console, context,
+        [&](BotBaseContext& context) {
+
+            open_map_from_overworld(info, console, context);
+            pbf_move_left_joystick(context, 0, 255, 215, 20);
+            pbf_press_button(context, BUTTON_ZL, 40, 100);
+            fly_to_overworld_from_map(info, console, context);
+
+            pbf_move_left_joystick(context, 205, 64, 20, 105);
+            pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
+
+            //Jump, glide, fly
+            ssf_press_button(context, BUTTON_B, 0, 100);
+            ssf_press_button(context, BUTTON_B, 0, 20, 10);
+            ssf_press_button(context, BUTTON_B, 0, 20);
+            pbf_wait(context, 100);
+            context.wait_for_all_requests();
+            pbf_press_button(context, BUTTON_LCLICK, 50, 0);
+
+            if (BBQ_OPTIONS.INVERTED_FLIGHT) {
+                pbf_move_left_joystick(context, 128, 255, 1000, 250);
+            }
+            else {
+                pbf_move_left_joystick(context, 128, 0, 1000, 250);
+            }
+
+            //pbf_wait(context, 1500); TODO: For photo?
+            pbf_wait(context, 1650);
+            context.wait_for_all_requests();
+
+            //Drop on top of Kleavor (plenty of Scyther in the area as well)
+            pbf_press_button(context, BUTTON_B, 50, 375);
+
+            NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
+            int ret2 = wait_until(
+                console, context,
+                std::chrono::seconds(45), //Enough time for Kleavor to notice and attack twice, sometimes it misses the first charge
+                { battle_menu }
+            );
+            if (ret2 != 0) {
+                console.log("Did not enter battle. Did Kleavor spawn?");
+            }
+        },
+        {
+            static_cast<VisualInferenceCallback&>(encounter_watcher),
+            static_cast<AudioInferenceCallback&>(encounter_watcher),
+        }
+        );
+    if (ret == 0) {
+        console.log("Battle menu detected.");
+    }
+
+    encounter_watcher.throw_if_no_sound();
+
+    bool is_shiny = (bool)encounter_watcher.shiny_screenshot();
+    if (is_shiny) {
+        //TODO: Stop.
+        pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
+
+        //break;
+    } else {
+        //Tera and kill.
+        AdvanceDialogWatcher lost(COLOR_YELLOW);
+        OverworldWatcher overworld(COLOR_RED);
+        WallClock start = current_time();
+        uint8_t switch_party_slot = 1;
+        bool first_turn = true;
+
+        int ret2 = run_until(
+            console, context,
+            [&](BotBaseContext& context){
+                while(true){
+                    if (current_time() - start > std::chrono::minutes(5)){
+                        console.log("Timed out during battle after 5 minutes.", COLOR_RED);
+                        throw OperationFailedException(
+                            ErrorReport::SEND_ERROR_REPORT, console,
+                            "Timed out during battle after 5 minutes.",
+                            true
+                        );
+                    }
+
+                    if (first_turn) {
+                        console.log("Turn 1: Tera.");
+                        //Open move menu
+                        pbf_press_button(context, BUTTON_A, 10, 50);
+                        pbf_wait(context, 100);
+                        context.wait_for_all_requests();
+
+                        pbf_press_button(context, BUTTON_R, 20, 50);
+                        pbf_press_button(context, BUTTON_A, 10, 50);
+
+                        first_turn = false;
+                    }
+
+                    NormalBattleMenuWatcher battle_menu(COLOR_MAGENTA);
+                    SwapMenuWatcher fainted(COLOR_RED);
+
+                    context.wait_for_all_requests();
+
+                    int ret3 = wait_until(
+                        console, context,
+                        std::chrono::seconds(90),
+                        { battle_menu, fainted }
+                    );
+                    switch (ret3){
+                    case 0:
+                        console.log("Detected battle menu. Pressing A to attack...");
+                        pbf_mash_button(context, BUTTON_A, 3 * TICKS_PER_SECOND);
+                        context.wait_for_all_requests();
+                        break;
+                    case 1:
+                        console.log("Detected fainted Pokemon. Switching to next living Pokemon...");
+                        if (fainted.move_to_slot(console, context, switch_party_slot)){
+                            pbf_mash_button(context, BUTTON_A, 3 * TICKS_PER_SECOND);
+                            context.wait_for_all_requests();
+                            switch_party_slot++;
+                        }
+                        break;
+                    default:
+                        console.log("Timed out during battle. Stuck, crashed, or took more than 90 seconds for a turn.", COLOR_RED);
+                        throw OperationFailedException(
+                            ErrorReport::SEND_ERROR_REPORT, console,
+                            "Timed out during battle. Stuck, crashed, or took more than 90 seconds for a turn.",
+                            true
+                        );
+                    }
+                }
+            },
+            { lost, overworld }
+        );
+        if (ret2 == 0) {
+            console.log("Lost battle. Mashing B.");
+        }
+    }
+    pbf_press_button(context, BUTTON_PLUS, 20, 105);
     return_to_plaza(info, console, context);
+
+    //Day skip and attempt to respawn fixed encounters
+    pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+    home_to_date_time(context, true, true);
+    PokemonSwSh::roll_date_forward_1(context, true);
+    resume_game_from_home(console, context);
+
+    //TODO: Heal up.
 }
 
 void quest_photo(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, BBQuests& current_quest) {
     bool took_photo = false;
     bool angle_camera_up = false;
     bool angle_camera_down = false;
-
-    console.log("Quest: Take photo");
 
     while(!took_photo) {
         EncounterWatcher encounter_watcher(console, COLOR_RED);
@@ -651,31 +813,6 @@ void quest_photo(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
                     break;
                 }
 
-                /*
-                        //Chargestone Cavern?
-                    //open_map_from_overworld(info, console, context);
-                    //pbf_move_left_joystick(context, 0, 135, 130, 20);
-                    //fly_to_overworld_from_map(info, console, context);
-
-                    //pbf_wait(context, 100);
-                    //context.wait_for_all_requests();
-
-                    //pbf_move_left_joystick(context, 0, 128, 20, 20);
-    
-
-                        //Coastal Outdoor Classroom - biome is extremely laggy
-                    //open_map_from_overworld(info, console, context);
-                    //pbf_move_left_joystick(context, 255, 0, 100, 20);
-                    //fly_to_overworld_from_map(info, console, context);
-
-                    //pbf_wait(context, 100);
-                    //context.wait_for_all_requests();
-
-                    //Move toward river
-                    //pbf_move_left_joystick(context, 255, 128, 200, 20);
-    
-                */
-
                 //Take photo.
                 PromptDialogWatcher photo_prompt(COLOR_RED);
                 OverworldWatcher overworld(COLOR_BLUE);
@@ -737,9 +874,8 @@ void quest_photo(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
             }
         }
     }
-
-    return_to_plaza(info, console, context);
     context.wait_for_all_requests();
+    return_to_plaza(info, console, context);
 }
 
 }
