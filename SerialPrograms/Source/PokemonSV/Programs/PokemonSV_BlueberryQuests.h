@@ -57,13 +57,13 @@ const std::set<BBQuests> gold_quests = {
 
 //Quests that are not currently supported. Gold quests currently excluded as this is singleplayer only right now.
 const std::set<BBQuests> not_possible_quests = {
-    BBQuests::UnableToDetect, BBQuests::auto_10, BBQuests::pickup_10, BBQuests::sneak_up, BBQuests::auto_30, BBQuests::tera_raid
+    BBQuests::UnableToDetect, BBQuests::auto_10, BBQuests::pickup_10, BBQuests::auto_30, BBQuests::tera_raid
     
     //Temp
-    , BBQuests::catch_fighting, BBQuests::catch_flying, BBQuests::catch_poison, BBQuests::catch_ground, BBQuests::catch_rock, BBQuests::catch_bug, BBQuests::catch_ghost, BBQuests::catch_steel, 
-    BBQuests::catch_water, BBQuests::catch_grass, BBQuests::catch_electric, BBQuests::catch_psychic, BBQuests::catch_ice, BBQuests::catch_dragon, BBQuests::catch_dark, BBQuests::catch_fairy
+    , BBQuests::catch_fighting, BBQuests::catch_flying, BBQuests::catch_poison, BBQuests::catch_rock, BBQuests::catch_bug, BBQuests::catch_steel, 
+    BBQuests::catch_water, BBQuests::catch_electric, BBQuests::catch_ice, BBQuests::catch_dark, BBQuests::catch_fairy
     , BBQuests::wash_pokemon, BBQuests::wild_tera, BBQuests::sandwich_three, BBQuests::bitter_sandwich, BBQuests::sweet_sandwich, BBQuests::salty_sandwich, BBQuests::sour_sandwich, BBQuests::spicy_sandwich, BBQuests::hatch_egg, 
-    BBQuests::photo_fighting, BBQuests::photo_flying, BBQuests::photo_poison, BBQuests::photo_rock, BBQuests::photo_bug, BBQuests::photo_steel,
+    BBQuests::photo_fighting, BBQuests::photo_flying, BBQuests::photo_poison, BBQuests::photo_steel,
     BBQuests::photo_electric, BBQuests::photo_ice, BBQuests::photo_dark, BBQuests::photo_fairy
 };
 
@@ -83,22 +83,16 @@ std::vector<BBQuests> read_quests(const ProgramInfo& info, ConsoleHandle& consol
 
 //Determine which quests are possible and which quests are not. (ex. no eggs, reroll egg hatcher.)
 //Quests not possible are removed from the list. If the list is empty, then reroll all items.
-std::vector<BBQuests> process_quest_list(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, std::vector<BBQuests>& quest_list, int& eggs_hatched);
+std::vector<BBQuests> process_quest_list(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, std::vector<BBQuests>& quest_list, uint64_t& eggs_hatched);
 
 //Take the current quest and calls the function to do it, then checks the quest was successful. Returns true if so.
-bool process_and_do_quest(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, BBQuests& current_quest, int& eggs_hatched);
+bool process_and_do_quest(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, BBQuests& current_quest, uint64_t& eggs_hatched);
 
 //Iterate through TMs until a craftable one is found. Make the TM and return to position.
 void quest_make_tm(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
 
 //Do laps in central plaza.
 void quest_travel_500(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
-
-//Travel to pokemon TYPE - uncertain if needed anymore. also coastal is extremely laggy
-//void navi_normal(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS);
-
-//Handle catch/kill battle
-void handle_quest_battle(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS);
 
 //Run around until you encounter a pokemon. Tera, then defeat it by spamming your first move.
 void quest_tera_self_defeat(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS);
@@ -108,6 +102,9 @@ void quest_photo(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
 
 //Catch a pokemon
 void quest_catch(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, BBQuests& current_quest);
+
+//Sneak up on a pokemon
+void quest_sneak_up(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS);
 
 }
 }

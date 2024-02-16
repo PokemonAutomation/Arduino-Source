@@ -94,9 +94,6 @@ void BBQSoloFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
     camera controls regular
     date and time unsynced as this relies heavily on date skipping
     */
-
-    //quest_make_tm(env.program_info(), env.console, context);
-    //navi_normal(env.program_info(), env.console, context, BBQ_OPTIONS);
     
     //Fly to plaza
     //open_map_from_overworld(env.program_info(), env.console, context);
@@ -111,8 +108,14 @@ void BBQSoloFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
 
     std::vector<BBQuests> quest_list; //all quests
     std::vector<BBQuests> quests_to_do; //do-able quests
-    int eggs_hatched = 0; //Track eggs
-    int num_completed_quests = 0;
+    uint64_t eggs_hatched = 0; //Track eggs
+    uint64_t num_completed_quests = 0;
+
+    BBQuests test_quest = BBQuests::catch_ghost;
+    bool questTest = process_and_do_quest(env.program_info(), env.console, context, BBQ_OPTIONS, test_quest, eggs_hatched);
+    if (questTest) {
+        env.log("Success");
+    }
 
     while (num_completed_quests < BBQ_OPTIONS.NUM_QUESTS) {
         //Get and reroll quests until we can at least one
