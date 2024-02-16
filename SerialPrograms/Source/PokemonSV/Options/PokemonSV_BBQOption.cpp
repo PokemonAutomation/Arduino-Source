@@ -43,7 +43,7 @@ BBQOption::BBQOption(OCR::LanguageOCROption* language_option)
         false
     )
     , QUICKBALL(
-        "<b>Throw Quick Ball:</b><br>When attempting to catch a Pokemon, use a Quick Ball on the first turn. If there are moves in the Move Table, they will run after the Quick Ball is thrown.",
+        "<b>Throw Quick Ball:</b><br>When attempting to catch a Pokemon, use a Quick Ball on the first turn.",
         LockMode::LOCK_WHILE_RUNNING,
         true
     )
@@ -56,6 +56,10 @@ BBQOption::BBQOption(OCR::LanguageOCROption* language_option)
         "<b>Number of Eggs:</b><br>Amount of eggs located in the box to the left of your current one. Skip egg hatching quest if no eggs.",
         LockMode::LOCK_WHILE_RUNNING, 30
     )
+    , FIX_TIME_WHEN_DONE(
+        "<b>Fix time when done:</b><br>Fix the time after the program finishes.",
+        LockMode::UNLOCK_WHILE_RUNNING, false
+    )
 {
     if (m_language_owner){
         PA_ADD_OPTION(LANGUAGE);
@@ -65,8 +69,8 @@ BBQOption::BBQOption(OCR::LanguageOCROption* language_option)
     PA_ADD_OPTION(INVERTED_FLIGHT);
     PA_ADD_OPTION(QUICKBALL);
     PA_ADD_OPTION(BALL_SELECT);
-    PA_ADD_OPTION(BATTLE_MOVES);
     PA_ADD_OPTION(NUM_EGGS);
+    PA_ADD_OPTION(FIX_TIME_WHEN_DONE);
 }
 
 

@@ -47,10 +47,12 @@ public:
     //For catching pokemon quests
     BooleanCheckBoxOption QUICKBALL;
     PokemonSwSh::PokemonBallSelectOption BALL_SELECT;
-    BattleMoveTable BATTLE_MOVES;
+    //BattleMoveTable BATTLE_MOVES; No need, not catching legendaries.
 
     //For egg hatching quest
     SimpleIntegerOption<uint8_t> NUM_EGGS;
+
+    BooleanCheckBoxOption FIX_TIME_WHEN_DONE;
 
 private:
     BBQOption(OCR::LanguageOCROption* language_option);

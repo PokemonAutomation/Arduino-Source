@@ -10,6 +10,7 @@
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/OCR/OCR_NumberReader.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
+#include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
@@ -29,6 +30,7 @@
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "PokemonSV/Inference/PokemonSV_BlueberryQuestDetector.h"
+#include "PokemonSV/Programs/Battles/PokemonSV_BasicCatcher.h"
 #include "PokemonSV_BlueberryQuests.h"
 
 #include<vector>
@@ -248,6 +250,7 @@ std::vector<BBQuests> read_quests(const ProgramInfo& info, ConsoleHandle& consol
     context.wait_for_all_requests();
 
     //Read in the initial 4 quests.
+    console.log("Reading quests.");
     VideoSnapshot screen = console.video().snapshot();
     BlueberryQuestDetector first_quest_detector(console.logger(), COLOR_GREEN, BBQ_OPTIONS.LANGUAGE, BlueberryQuestDetector::QuestPosition::FIRST);
     BlueberryQuestDetector second_quest_detector(console.logger(), COLOR_GREEN, BBQ_OPTIONS.LANGUAGE, BlueberryQuestDetector::QuestPosition::SECOND);
@@ -273,6 +276,7 @@ std::vector<BBQuests> read_quests(const ProgramInfo& info, ConsoleHandle& consol
 std::vector<BBQuests> process_quest_list(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, std::vector<BBQuests>& quest_list, int& eggs_hatched) {
     std::vector<BBQuests> quests_to_do;
 
+    console.log("Processing quests.");
     //Put all do-able quests into a different list
     for (auto n : quest_list) {
         if (not_possible_quests.contains(n)) {
@@ -310,6 +314,7 @@ std::vector<BBQuests> process_quest_list(const ProgramInfo& info, ConsoleHandle&
         context.wait_for_all_requests();
 
         //Reroll all.
+        //TODO: This does not handle out of BP.
         for (int i = 0; i < quest_list.size(); i++) {
             pbf_press_button(context, BUTTON_A, 20, 50);
             pbf_press_button(context, BUTTON_A, 20, 50); //Yes.
@@ -354,11 +359,7 @@ bool process_and_do_quest(const ProgramInfo& info, ConsoleHandle& console, BotBa
         case BBQuests::catch_any: case BBQuests::catch_normal: case BBQuests::catch_fighting: case BBQuests::catch_flying: case BBQuests::catch_poison: case BBQuests::catch_ground:
         case BBQuests::catch_rock: case BBQuests::catch_bug: case BBQuests::catch_ghost: case BBQuests::catch_steel: case BBQuests::catch_fire: case BBQuests::catch_water:case BBQuests::catch_grass:
         case BBQuests::catch_electric: case BBQuests::catch_psychic: case BBQuests::catch_ice: case BBQuests::catch_dragon: case BBQuests::catch_dark: case BBQuests::catch_fairy:
-
-            break;
-
-        default:
-            //throw error this should not be possible
+            quest_catch(info, console, context, BBQ_OPTIONS, current_quest);
             break;
         }
 
@@ -483,6 +484,7 @@ void quest_travel_500(const ProgramInfo& info, ConsoleHandle& console, BotBaseCo
     context.wait_for_all_requests();
 }
 
+/*
 void navi_normal(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS) {
     //Targeting a fixed encounter Zangoose near the Coastal Outdoor Classroom
     open_map_from_overworld(info, console, context);
@@ -517,6 +519,7 @@ void navi_normal(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
 
     //return_to_plaza(info, console, context);
 }
+*/
 
 void handle_quest_battle(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS) {
     //Fly to savannah (open field, easy to run in)
@@ -708,6 +711,9 @@ void quest_photo(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
                     pbf_press_button(context, BUTTON_ZL, 40, 100);
                     fly_to_overworld_from_map(info, console, context);
 
+                    pbf_wait(context, 200);
+                    context.wait_for_all_requests();
+
                     pbf_press_button(context, BUTTON_L, 10, 50);
                     pbf_move_left_joystick(context, 255, 50, 180, 20);
 
@@ -876,6 +882,357 @@ void quest_photo(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
     }
     context.wait_for_all_requests();
     return_to_plaza(info, console, context);
+}
+
+
+
+void quest_catch(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, BBQuests& current_quest) {
+    EncounterWatcher encounter_watcher(console, COLOR_RED);
+
+    //Navigate to target and start battle
+    int ret = run_until(
+        console, context,
+        [&](BotBaseContext& context) {
+            switch (current_quest) {
+            case BBQuests::catch_any: case BBQuests::catch_normal: case BBQuests::catch_fire:
+                //Savanna Plaza - Pride Rock
+                open_map_from_overworld(info, console, context);
+                pbf_move_left_joystick(context, 165, 255, 180, 20);
+                pbf_press_button(context, BUTTON_ZL, 40, 100);
+                fly_to_overworld_from_map(info, console, context);
+
+                //pbf_move_left_joystick(context, 255, 255, 10, 20);
+                pbf_move_left_joystick(context, 220, 255, 10, 20);
+                pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
+
+                ssf_press_button(context, BUTTON_B, 0, 100);
+                ssf_press_button(context, BUTTON_B, 0, 20, 10);
+                ssf_press_button(context, BUTTON_B, 0, 20);
+                pbf_wait(context, 100);
+                context.wait_for_all_requests();
+                pbf_press_button(context, BUTTON_LCLICK, 50, 0);
+
+                if (BBQ_OPTIONS.INVERTED_FLIGHT) {
+                    pbf_move_left_joystick(context, 130, 255, 600, 250);
+                }
+                else {
+                    pbf_move_left_joystick(context, 130, 0, 600, 250);
+                }
+
+                pbf_wait(context, 400);
+                context.wait_for_all_requests();
+                pbf_press_button(context, BUTTON_B, 20, 50);
+                pbf_wait(context, 400);
+                context.wait_for_all_requests();
+
+                pbf_press_button(context, BUTTON_PLUS, 20, 105);
+                pbf_move_left_joystick(context, 255, 128, 20, 50);
+
+                pbf_press_button(context, BUTTON_L, 20, 50);
+
+                ssf_press_button(context, BUTTON_ZR, 0, 200);
+                ssf_press_button(context, BUTTON_ZL, 100, 50);
+                ssf_press_button(context, BUTTON_ZL, 150, 50);
+
+                pbf_wait(context, 300);
+                context.wait_for_all_requests();
+                break;
+            }
+
+            NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
+            int ret2 = wait_until(
+                console, context,
+                std::chrono::seconds(45),
+                { battle_menu }
+            );
+            if (ret2 != 0) {
+                console.log("Did not enter battle. Did target spawn?");
+            }
+        },
+        {
+            static_cast<VisualInferenceCallback&>(encounter_watcher),
+            static_cast<AudioInferenceCallback&>(encounter_watcher),
+        }
+        );
+    if (ret == 0) {
+        console.log("Battle menu detected.");
+    }
+
+    encounter_watcher.throw_if_no_sound();
+
+    bool is_shiny = (bool)encounter_watcher.shiny_screenshot();
+    if (is_shiny) {
+        //TODO: Stop.
+        console.log("Shiny detected!");
+        pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
+        throw ProgramFinishedException();
+    } else {
+        AdvanceDialogWatcher advance_dialog(COLOR_MAGENTA);
+        OverworldWatcher overworld(COLOR_BLUE);
+
+        uint8_t switch_party_slot = 1;
+        bool quickball_thrown = false;
+
+        int ret2 = run_until(
+            console, context,
+            [&](BotBaseContext& context) {
+                while (true) {
+                    //Check that battle menu appears - this is in case of swapping pokemon
+                    NormalBattleMenuWatcher menu_before_throw(COLOR_YELLOW);
+                    int bMenu = wait_until(
+                        console, context,
+                        std::chrono::seconds(15),
+                        { menu_before_throw }
+                    );
+                    if (bMenu < 0) {
+                        console.log("Unable to find menu_before_throw.");
+                        throw OperationFailedException(
+                            ErrorReport::SEND_ERROR_REPORT, console,
+                            "Unable to find menu_before_throw.",
+                            true
+                        );
+                    }
+
+                    //Quick ball occurs before anything else in battle, so we can throw the ball without worrying about bounce/fainted/etc.
+                    if (BBQ_OPTIONS.QUICKBALL && !quickball_thrown) {
+                        console.log("Quick Ball option checked. Throwing Quick Ball.");
+                        BattleBallReader reader(console, BBQ_OPTIONS.LANGUAGE);
+                        std::string ball_reader = "";
+                        WallClock start = current_time();
+
+                        console.log("Opening ball menu...");
+                        while (ball_reader == "") {
+                            if (current_time() - start > std::chrono::minutes(2)) {
+                                console.log("Timed out trying to read ball after 2 minutes.", COLOR_RED);
+                                throw OperationFailedException(
+                                    ErrorReport::SEND_ERROR_REPORT, console,
+                                    "Timed out trying to read ball after 2 minutes.",
+                                    true
+                                );
+                            }
+
+                            //Mash B to exit anything else
+                            pbf_mash_button(context, BUTTON_B, 125);
+                            context.wait_for_all_requests();
+
+                            //Press X to open Ball menu
+                            pbf_press_button(context, BUTTON_X, 20, 100);
+                            context.wait_for_all_requests();
+
+                            VideoSnapshot screen = console.video().snapshot();
+                            ball_reader = reader.read_ball(screen);
+                        }
+
+                        console.log("Selecting Quick Ball.");
+                        int quantity = move_to_ball(reader, console, context, "quick-ball");
+                        if (quantity == 0) {
+                            //Stop so user can check they have quick balls.
+                            console.log("Unable to find Quick Ball on turn 1.");
+                            throw OperationFailedException(
+                                ErrorReport::SEND_ERROR_REPORT, console,
+                                "Unable to find Quick Ball on turn 1.",
+                                true
+                            );
+                        }
+                        if (quantity < 0) {
+                            console.log("Unable to read ball quantity.", COLOR_RED);
+                        }
+
+                        //Throw ball
+                        console.log("Throwing Quick Ball.");
+                        pbf_mash_button(context, BUTTON_A, 150);
+                        context.wait_for_all_requests();
+
+                        quickball_thrown = true;
+                        pbf_mash_button(context, BUTTON_B, 900);
+                        context.wait_for_all_requests();
+                    }
+                    else {
+                        BattleBallReader reader(console, BBQ_OPTIONS.LANGUAGE);
+                        std::string ball_reader = "";
+                        WallClock start = current_time();
+
+                        console.log("Opening ball menu...");
+                        while (ball_reader == "") {
+                            if (current_time() - start > std::chrono::minutes(2)) {
+                                console.log("Timed out trying to read ball after 2 minutes.", COLOR_RED);
+                                throw OperationFailedException(
+                                    ErrorReport::SEND_ERROR_REPORT, console,
+                                    "Timed out trying to read ball after 2 minutes.",
+                                    true
+                                );
+                            }
+
+                            //Mash B to exit anything else
+                            pbf_mash_button(context, BUTTON_B, 125);
+                            context.wait_for_all_requests();
+
+                            //Press X to open Ball menu
+                            pbf_press_button(context, BUTTON_X, 20, 100);
+                            context.wait_for_all_requests();
+
+                            VideoSnapshot screen = console.video().snapshot();
+                            ball_reader = reader.read_ball(screen);
+                        }
+
+                        console.log("Selecting ball.");
+                        int quantity = move_to_ball(reader, console, context, BBQ_OPTIONS.BALL_SELECT.slug());
+                        if (quantity == 0) {
+                            console.log("Unable to find appropriate ball/out of balls.");
+                            break;
+                        }
+                        if (quantity < 0) {
+                            console.log("Unable to read ball quantity.", COLOR_RED);
+                        }
+
+                        //Throw ball
+                        console.log("Throwing selected ball.");
+                        pbf_mash_button(context, BUTTON_A, 150);
+                        context.wait_for_all_requests();
+
+                        //Check for battle menu
+                        //If found use _fourth_ attack this turn!
+                        NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
+                        int ret = wait_until(
+                            console, context,
+                            std::chrono::seconds(4),
+                            { battle_menu }
+                        );
+                        if (ret == 0) {
+                            console.log("Battle menu detected early. Using fourth attack.");
+                            pbf_mash_button(context, BUTTON_A, 250);
+                            context.wait_for_all_requests();
+
+                            MoveSelectWatcher move_watcher(COLOR_BLUE);
+                            MoveSelectDetector move_select(COLOR_BLUE);
+
+                            int ret_move_select = run_until(
+                            console, context,
+                            [&](BotBaseContext& context) {
+                                pbf_press_button(context, BUTTON_A, 10, 50);
+                                pbf_wait(context, 100);
+                                context.wait_for_all_requests();
+                            },
+                            { move_watcher }
+                            );
+                            if (ret_move_select != 0) {
+                                console.log("Could not find move select.");
+                            }
+                            else {
+                                console.log("Move select found!");
+                            }
+
+                            context.wait_for_all_requests();
+                            move_select.move_to_slot(console, context, 3);
+                            pbf_mash_button(context, BUTTON_A, 150);
+                            pbf_wait(context, 100);
+                            context.wait_for_all_requests();
+
+                            //Check for battle menu
+                            //If found after a second, assume out of PP and stop as this is a setup issue
+                            //None of the target pokemon for this program have disable, taunt, etc.
+                            NormalBattleMenuWatcher battle_menu2(COLOR_YELLOW);
+                            int ret3 = wait_until(
+                                console, context,
+                                std::chrono::seconds(4),
+                                { battle_menu2 }
+                            );
+                            if (ret3 == 0) {
+                                console.log("Battle menu detected early. Out of PP/No move in slot, please check your setup.");
+                                throw OperationFailedException(
+                                    ErrorReport::SEND_ERROR_REPORT, console,
+                                    "Battle menu detected early. Out of PP, please check your setup.",
+                                    true
+                                );
+                            }
+                        }
+                        else {
+                            //Wild pokemon's turn/wait for catch animation
+                            pbf_mash_button(context, BUTTON_B, 900);
+                            context.wait_for_all_requests();
+                        }
+                    }
+
+                    NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
+                    OverworldWatcher overworld(COLOR_BLUE);
+                    SwapMenuWatcher fainted(COLOR_YELLOW);
+                    int ret2 = wait_until(
+                        console, context,
+                        std::chrono::seconds(60),
+                        { battle_menu, fainted }
+                    );
+                    switch (ret2) {
+                    case 0:
+                        console.log("Battle menu detected, continuing.");
+                        break;
+                    case 1:
+                        console.log("Detected fainted Pokemon. Switching to next living Pokemon...");
+                        if (fainted.move_to_slot(console, context, switch_party_slot)) {
+                            pbf_mash_button(context, BUTTON_A, 3 * TICKS_PER_SECOND);
+                            context.wait_for_all_requests();
+                            switch_party_slot++;
+                        }
+                        break;
+                    default:
+                        console.log("Invalid state ret2 run_battle.");
+                        throw OperationFailedException(
+                            ErrorReport::SEND_ERROR_REPORT, console,
+                            "Invalid state ret2 run_battle.",
+                            true
+                        );
+                    }
+
+                }
+            },
+            { advance_dialog, overworld }
+            );
+
+        switch (ret2) {
+        case 0:
+            console.log("Advance Dialog detected.");
+            break;
+        case 1:
+            console.log("Overworld detected. Fainted?");
+            break;
+        default:
+            console.log("Invalid state in run_battle().");
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, console,
+                "Invalid state in run_battle().",
+                true
+            );
+        }
+    }
+    //pbf_press_button(context, BUTTON_PLUS, 20, 105);
+    return_to_plaza(info, console, context);
+
+    //Day skip and attempt to respawn fixed encounters
+    pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+    home_to_date_time(context, true, true);
+    PokemonSwSh::roll_date_forward_1(context, true);
+    resume_game_from_home(console, context);
+
+    //Heal up and then reset position again.
+    OverworldWatcher done_healing(COLOR_BLUE);
+    pbf_move_left_joystick(context, 128, 0, 100, 20);
+
+    pbf_mash_button(context, BUTTON_A, 300);
+    context.wait_for_all_requests();
+
+    int exit = run_until(
+        console, context,
+        [&](BotBaseContext& context){
+            pbf_mash_button(context, BUTTON_B, 2000);
+        },
+        {{ done_healing }}
+    );
+    if (exit == 0){
+        console.log("Overworld detected.");
+    }
+    open_map_from_overworld(info, console, context);
+    pbf_press_button(context, BUTTON_ZL, 40, 100);
+    fly_to_overworld_from_map(info, console, context);
+    context.wait_for_all_requests();
 }
 
 }
