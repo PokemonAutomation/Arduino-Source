@@ -116,6 +116,7 @@ const std::map<std::string, BBQuests>& BBQuests_TOKEN_TO_ENUM() {
         {"sandwich-four",       BBQuests::sandwich_four},
         {"catch-hint",          BBQuests::catch_hint},
         {"catch-hint2",         BBQuests::catch_hint2},
+        {"",                    BBQuests::UnableToDetect},
     };
     return data;
 }
@@ -351,9 +352,8 @@ bool process_and_do_quest(const ProgramInfo& info, ConsoleHandle& console, BotBa
         case BBQuests::sneak_up:
             quest_sneak_up(info, console, context, BBQ_OPTIONS);
             break;
-        case BBQuests::tera_raid:
-            //TODO
-            //tera crystal near canyon plaza?
+        case BBQuests::wild_tera:
+            quest_wild_tera(info, console, context, BBQ_OPTIONS);
             break;
         //All involve taking pictures
         case BBQuests::photo_fly: case BBQuests::photo_swim: case BBQuests::photo_canyon: case BBQuests::photo_coastal: case BBQuests::photo_polar: case BBQuests::photo_savanna:
@@ -676,7 +676,26 @@ void quest_tera_self_defeat(const ProgramInfo& info, ConsoleHandle& console, Bot
     PokemonSwSh::roll_date_forward_1(context, true);
     resume_game_from_home(console, context);
 
-    //TODO: Heal up.
+    //Heal up and then reset position again.
+    OverworldWatcher done_healing(COLOR_BLUE);
+    pbf_move_left_joystick(context, 128, 0, 100, 20);
+
+    pbf_mash_button(context, BUTTON_A, 300);
+    context.wait_for_all_requests();
+
+    int exit = run_until(
+        console, context,
+        [&](BotBaseContext& context){
+            pbf_mash_button(context, BUTTON_B, 2000);
+        },
+        {{ done_healing }}
+    );
+    if (exit == 0){
+        console.log("Overworld detected.");
+    }
+    open_map_from_overworld(info, console, context);
+    pbf_press_button(context, BUTTON_ZL, 40, 100);
+    fly_to_overworld_from_map(info, console, context);
 }
 
 void quest_photo(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, BBQuests& current_quest) {
@@ -849,6 +868,103 @@ void quest_photo(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
                     context.wait_for_all_requests();
 
                     pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
+
+                    break;
+                case BBQuests::photo_fairy:
+                    /*
+                    //Polar Plaza - Snubbull (not the best area/target but not many fairies)
+                    open_map_from_overworld(info, console, context);
+                    pbf_move_left_joystick(context, 20, 25, 245, 20);
+                    pbf_press_button(context, BUTTON_ZL, 40, 100);
+                    fly_to_overworld_from_map(info, console, context);
+
+                    pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
+
+                    ssf_press_button(context, BUTTON_B, 0, 100);
+                    ssf_press_button(context, BUTTON_B, 0, 20, 10);
+                    ssf_press_button(context, BUTTON_B, 0, 20);
+                    pbf_wait(context, 100);
+                    context.wait_for_all_requests();
+                    pbf_press_button(context, BUTTON_LCLICK, 50, 0);
+
+                    if (BBQ_OPTIONS.INVERTED_FLIGHT) {
+                        pbf_move_left_joystick(context, 128, 255, 2200, 250);
+                    }
+                    else {
+                        pbf_move_left_joystick(context, 128, 0, 2200, 250);
+                    }
+                    //Overshoot and then turn around.
+                    pbf_wait(context, 900);
+                    context.wait_for_all_requests();
+                    pbf_press_button(context, BUTTON_B, 20, 50);
+                    pbf_wait(context, 200);
+                    context.wait_for_all_requests();
+
+                    pbf_move_left_joystick(context, 128, 255, 20, 50);
+                    pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
+                    //pbf_move_left_joystick(context, 110, 100, 20, 50);
+
+                    //angle_camera_down = true;
+                    */
+
+                    //Snubbull - Central plaza
+                    pbf_move_left_joystick(context, 0, 80, 10, 20);
+                    pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
+
+                    //Jump, glide, fly
+                    ssf_press_button(context, BUTTON_B, 0, 100);
+                    ssf_press_button(context, BUTTON_B, 0, 20, 10);
+                    ssf_press_button(context, BUTTON_B, 0, 20);
+                    pbf_wait(context, 100);
+                    context.wait_for_all_requests();
+                    pbf_press_button(context, BUTTON_LCLICK, 50, 0);
+
+                    if (BBQ_OPTIONS.INVERTED_FLIGHT) {
+                        pbf_move_left_joystick(context, 128, 255, 2000, 250);
+                    }
+                    else {
+                        pbf_move_left_joystick(context, 128, 0, 2000, 250);
+                    }
+
+                    pbf_wait(context, 1500);
+                    context.wait_for_all_requests();
+                    pbf_press_button(context, BUTTON_B, 20, 50);
+
+                    pbf_wait(context, 200);
+                    context.wait_for_all_requests();
+
+                    pbf_press_button(context, BUTTON_PLUS, 20, 105);
+                    break;
+                case BBQuests::photo_ice:
+                    //Snover - Start at central plaza, fly north-ish
+                    pbf_move_left_joystick(context, 0, 0, 10, 20);
+                    pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
+
+                    //Jump, glide, fly
+                    ssf_press_button(context, BUTTON_B, 0, 100);
+                    ssf_press_button(context, BUTTON_B, 0, 20, 10);
+                    ssf_press_button(context, BUTTON_B, 0, 20);
+                    pbf_wait(context, 100);
+                    context.wait_for_all_requests();
+                    pbf_press_button(context, BUTTON_LCLICK, 50, 0);
+
+                    if (BBQ_OPTIONS.INVERTED_FLIGHT) {
+                        pbf_move_left_joystick(context, 128, 255, 1100, 250);
+                    }
+                    else {
+                        pbf_move_left_joystick(context, 128, 0, 1100, 250);
+                    }
+
+                    pbf_wait(context, 1700);
+                    context.wait_for_all_requests();
+                    pbf_press_button(context, BUTTON_B, 20, 50);
+
+                    pbf_wait(context, 200);
+                    context.wait_for_all_requests();
+
+                    pbf_press_button(context, BUTTON_PLUS, 20, 105);
+                    pbf_move_left_joystick(context, 0, 128, 20, 50);
+                    pbf_press_button(context, BUTTON_L, 20, 50);
                 }
 
                 //Take photo.
@@ -1069,7 +1185,84 @@ void quest_catch(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
                 context.wait_for_all_requests();
 
                 break;
+            case BBQuests::catch_fairy:
+                //Polar Plaza - Snubbull
+                open_map_from_overworld(info, console, context);
+                pbf_move_left_joystick(context, 20, 25, 245, 20);
+                pbf_press_button(context, BUTTON_ZL, 40, 100);
+                fly_to_overworld_from_map(info, console, context);
 
+                pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
+
+                ssf_press_button(context, BUTTON_B, 0, 100);
+                ssf_press_button(context, BUTTON_B, 0, 20, 10);
+                ssf_press_button(context, BUTTON_B, 0, 20);
+                pbf_wait(context, 100);
+                context.wait_for_all_requests();
+                pbf_press_button(context, BUTTON_LCLICK, 50, 0);
+
+                if (BBQ_OPTIONS.INVERTED_FLIGHT) {
+                    pbf_move_left_joystick(context, 128, 255, 2100, 250);
+                }
+                else {
+                    pbf_move_left_joystick(context, 128, 0, 2100, 250);
+                }
+
+                //Overshoot and then turn around.
+                pbf_wait(context, 900);
+                context.wait_for_all_requests();
+                pbf_press_button(context, BUTTON_B, 20, 50);
+                pbf_wait(context, 200);
+                context.wait_for_all_requests();
+
+                pbf_move_left_joystick(context, 128, 255, 20, 50);
+                pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
+
+                pbf_move_left_joystick(context, 128, 0, 50, 50);
+
+                ssf_press_button(context, BUTTON_ZR, 0, 400);
+                ssf_press_button(context, BUTTON_ZL, 100, 50);
+                ssf_press_button(context, BUTTON_ZL, 150, 50);
+
+                pbf_wait(context, 300);
+                context.wait_for_all_requests();
+            case BBQuests::catch_ice:
+                //Start at central plaza, fly north-ish
+                pbf_move_left_joystick(context, 0, 0, 10, 20);
+                pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
+
+                //Jump, glide, fly
+                ssf_press_button(context, BUTTON_B, 0, 100);
+                ssf_press_button(context, BUTTON_B, 0, 20, 10);
+                ssf_press_button(context, BUTTON_B, 0, 20);
+                pbf_wait(context, 100);
+                context.wait_for_all_requests();
+                pbf_press_button(context, BUTTON_LCLICK, 50, 0);
+
+                if (BBQ_OPTIONS.INVERTED_FLIGHT) {
+                    pbf_move_left_joystick(context, 128, 255, 1100, 250);
+                }
+                else {
+                    pbf_move_left_joystick(context, 128, 0, 1100, 250);
+                }
+
+                //pbf_wait(context, 1500); photo
+                pbf_wait(context, 1700);
+                context.wait_for_all_requests();
+                pbf_press_button(context, BUTTON_B, 20, 50);
+
+                pbf_wait(context, 200);
+                context.wait_for_all_requests();
+
+                pbf_press_button(context, BUTTON_PLUS, 20, 105);
+                pbf_move_left_joystick(context, 0, 128, 20, 50);
+                pbf_press_button(context, BUTTON_L, 20, 50);
+
+                ssf_press_button(context, BUTTON_ZR, 0, 200);
+                ssf_press_button(context, BUTTON_ZL, 100, 50);
+                ssf_press_button(context, BUTTON_ZL, 150, 50);
+
+                break;
 
 
 
@@ -1087,7 +1280,7 @@ void quest_catch(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
             NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
             int ret2 = wait_until(
                 console, context,
-                std::chrono::seconds(45),
+                std::chrono::seconds(25),
                 { battle_menu }
             );
             if (ret2 != 0) {
@@ -1509,6 +1702,173 @@ void quest_sneak_up(const ProgramInfo& info, ConsoleHandle& console, BotBaseCont
     PokemonSwSh::roll_date_forward_1(context, true);
     resume_game_from_home(console, context);
     context.wait_for_all_requests();
+}
+
+void quest_wild_tera(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS) {
+    EncounterWatcher encounter_watcher(console, COLOR_RED);
+
+    //Navigate to target and start battle
+    int ret = run_until(
+        console, context,
+        [&](BotBaseContext& context) {
+            //Canyon Rest Area
+            open_map_from_overworld(info, console, context);
+            pbf_move_left_joystick(context, 0, 140, 160, 20);
+            pbf_press_button(context, BUTTON_ZL, 40, 100);
+            fly_to_overworld_from_map(info, console, context);
+
+            pbf_move_left_joystick(context, 255, 180, 20, 105);
+            pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
+
+            //Jump, glide, fly
+            ssf_press_button(context, BUTTON_B, 0, 100);
+            ssf_press_button(context, BUTTON_B, 0, 20, 10);
+            ssf_press_button(context, BUTTON_B, 0, 20);
+            pbf_wait(context, 100);
+            context.wait_for_all_requests();
+            pbf_press_button(context, BUTTON_LCLICK, 50, 0);
+
+            if (BBQ_OPTIONS.INVERTED_FLIGHT) {
+                pbf_move_left_joystick(context, 128, 255, 50, 250);
+            }
+            else {
+                pbf_move_left_joystick(context, 128, 0, 500, 250);
+            }
+
+            pbf_wait(context, 1300);
+            context.wait_for_all_requests();
+
+            pbf_press_button(context, BUTTON_B, 50, 375);
+            pbf_wait(context, 150);
+            context.wait_for_all_requests();
+
+            //Skarmory is likely to attack but sometimes there is a different pokemon
+            pbf_press_button(context, BUTTON_PLUS, 20, 105);
+
+            pbf_move_left_joystick(context, 50, 0, 20, 105);
+            pbf_press_button(context, BUTTON_L, 20, 50);
+            pbf_move_left_joystick(context, 128, 0, 100, 50);
+
+            ssf_press_button(context, BUTTON_ZR, 0, 200);
+            ssf_press_button(context, BUTTON_ZL, 100, 50);
+            ssf_press_button(context, BUTTON_ZL, 150, 50);
+
+            pbf_wait(context, 300);
+            context.wait_for_all_requests();
+
+            NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
+            int ret2 = wait_until(
+                console, context,
+                std::chrono::seconds(45),
+                { battle_menu }
+            );
+            if (ret2 != 0) {
+                console.log("Did not enter battle.");
+            }
+        },
+        {
+            static_cast<VisualInferenceCallback&>(encounter_watcher),
+            static_cast<AudioInferenceCallback&>(encounter_watcher),
+        }
+        );
+    if (ret == 0) {
+        console.log("Battle menu detected.");
+    }
+
+    encounter_watcher.throw_if_no_sound();
+
+    bool is_shiny = (bool)encounter_watcher.shiny_screenshot();
+    if (is_shiny) {
+        //TODO: Stop.
+        pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
+
+        //break;
+    } else {
+        AdvanceDialogWatcher lost(COLOR_YELLOW);
+        OverworldWatcher overworld(COLOR_RED);
+        WallClock start = current_time();
+        uint8_t switch_party_slot = 1;
+
+        int ret2 = run_until(
+            console, context,
+            [&](BotBaseContext& context){
+                while(true){
+                    if (current_time() - start > std::chrono::minutes(5)){
+                        console.log("Timed out during battle after 5 minutes.", COLOR_RED);
+                        throw OperationFailedException(
+                            ErrorReport::SEND_ERROR_REPORT, console,
+                            "Timed out during battle after 5 minutes.",
+                            true
+                        );
+                    }
+                    NormalBattleMenuWatcher battle_menu(COLOR_MAGENTA);
+                    SwapMenuWatcher fainted(COLOR_RED);
+
+                    context.wait_for_all_requests();
+
+                    int ret3 = wait_until(
+                        console, context,
+                        std::chrono::seconds(90),
+                        { battle_menu, fainted }
+                    );
+                    switch (ret3){
+                    case 0:
+                        console.log("Detected battle menu. Pressing A to attack...");
+                        pbf_mash_button(context, BUTTON_A, 3 * TICKS_PER_SECOND);
+                        context.wait_for_all_requests();
+                        break;
+                    case 1:
+                        console.log("Detected fainted Pokemon. Switching to next living Pokemon...");
+                        if (fainted.move_to_slot(console, context, switch_party_slot)){
+                            pbf_mash_button(context, BUTTON_A, 3 * TICKS_PER_SECOND);
+                            context.wait_for_all_requests();
+                            switch_party_slot++;
+                        }
+                        break;
+                    default:
+                        console.log("Timed out during battle. Stuck, crashed, or took more than 90 seconds for a turn.", COLOR_RED);
+                        throw OperationFailedException(
+                            ErrorReport::SEND_ERROR_REPORT, console,
+                            "Timed out during battle. Stuck, crashed, or took more than 90 seconds for a turn.",
+                            true
+                        );
+                    }
+                }
+            },
+            { lost, overworld }
+        );
+        if (ret2 == 0) {
+            console.log("Lost battle. Mashing B.");
+        }
+    }
+    return_to_plaza(info, console, context);
+
+    //Day skip and attempt to respawn fixed encounters
+    pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+    home_to_date_time(context, true, true);
+    PokemonSwSh::roll_date_forward_1(context, true);
+    resume_game_from_home(console, context);
+
+    //Heal up and then reset position again.
+    OverworldWatcher done_healing(COLOR_BLUE);
+    pbf_move_left_joystick(context, 128, 0, 100, 20);
+
+    pbf_mash_button(context, BUTTON_A, 300);
+    context.wait_for_all_requests();
+
+    int exit = run_until(
+        console, context,
+        [&](BotBaseContext& context){
+            pbf_mash_button(context, BUTTON_B, 2000);
+        },
+        {{ done_healing }}
+    );
+    if (exit == 0){
+        console.log("Overworld detected.");
+    }
+    open_map_from_overworld(info, console, context);
+    pbf_press_button(context, BUTTON_ZL, 40, 100);
+    fly_to_overworld_from_map(info, console, context);
 }
 
 }
