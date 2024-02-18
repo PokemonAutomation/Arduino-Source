@@ -43,7 +43,7 @@ BBQOption::BBQOption(OCR::LanguageOCROption* language_option)
         false
     )
     , QUICKBALL(
-        "<b>Throw Quick Ball:</b><br>When attempting to catch a Pokemon, use a Quick Ball on the first turn.",
+        "<b>Throw Quick Ball:</b><br>When attempting to catch a non-tera Pokemon, use a Quick Ball on the first turn.",
         LockMode::LOCK_WHILE_RUNNING,
         true
     )

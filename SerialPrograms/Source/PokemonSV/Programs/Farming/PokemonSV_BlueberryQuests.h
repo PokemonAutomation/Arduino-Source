@@ -33,6 +33,11 @@ enum class BBQuests {
 
 BBQuests BBQuests_string_to_enum(const std::string& token);
 
+enum class CameraAngle {
+    none,
+    up,
+    down
+};
 
 //Basic blue quests
 const std::set<BBQuests> blue_quests = {
@@ -98,12 +103,6 @@ void quest_travel_500(const ProgramInfo& info, ConsoleHandle& console, BotBaseCo
 //Run around until you encounter a pokemon. Tera, then defeat it by spamming your first move.
 void quest_tera_self_defeat(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS);
 
-//Take picture of a pokemon/location
-void quest_photo(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, BBQuests& current_quest);
-
-//Catch a pokemon
-void quest_catch(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, BBQuests& current_quest);
-
 //Sneak up on a pokemon
 void quest_sneak_up(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS);
 
@@ -112,6 +111,10 @@ void quest_wild_tera(const ProgramInfo& info, ConsoleHandle& console, BotBaseCon
 
 //Give bath
 void quest_wash_pokemon(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
+
+
+
+
 
 }
 }

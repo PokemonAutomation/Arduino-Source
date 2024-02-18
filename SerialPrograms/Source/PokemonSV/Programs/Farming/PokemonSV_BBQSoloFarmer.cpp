@@ -23,7 +23,7 @@
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_NormalBattleMenus.h"
-#include "PokemonSV/Programs/PokemonSV_BlueberryQuests.h"
+#include "PokemonSV/Programs/Farming/PokemonSV_BlueberryQuests.h"
 #include "PokemonSV_BBQSoloFarmer.h"
 
 namespace PokemonAutomation {
@@ -114,7 +114,7 @@ void BBQSoloFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
     uint64_t eggs_hatched = 0; //Track eggs
     uint64_t num_completed_quests = 0;
 
-    BBQuests test_quest = BBQuests::wash_pokemon;
+    BBQuests test_quest = BBQuests::photo_swim;
     bool questTest = process_and_do_quest(env.program_info(), env.console, context, BBQ_OPTIONS, test_quest, eggs_hatched);
     if (questTest) {
         env.log("Success");
