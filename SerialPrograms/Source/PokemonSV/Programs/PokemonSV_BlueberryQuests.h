@@ -60,9 +60,9 @@ const std::set<BBQuests> not_possible_quests = {
     BBQuests::UnableToDetect, BBQuests::auto_10, BBQuests::pickup_10, BBQuests::auto_30, BBQuests::tera_raid
     
     //Temp
-    , BBQuests::catch_fighting, BBQuests::catch_flying, BBQuests::catch_poison, BBQuests::catch_rock, BBQuests::catch_bug, BBQuests::catch_steel, 
+    , BBQuests::catch_fighting, BBQuests::catch_flying, BBQuests::catch_poison, BBQuests::catch_steel, 
     BBQuests::catch_water, BBQuests::catch_electric, BBQuests::catch_dark
-    , BBQuests::wash_pokemon, BBQuests::sandwich_three, BBQuests::bitter_sandwich, BBQuests::sweet_sandwich, BBQuests::salty_sandwich, BBQuests::sour_sandwich, BBQuests::spicy_sandwich, BBQuests::hatch_egg,
+    , BBQuests::sandwich_three, BBQuests::bitter_sandwich, BBQuests::sweet_sandwich, BBQuests::salty_sandwich, BBQuests::sour_sandwich, BBQuests::spicy_sandwich, BBQuests::hatch_egg,
 
     BBQuests::photo_fighting, BBQuests::photo_flying, BBQuests::photo_poison, BBQuests::photo_steel,
     BBQuests::photo_electric, BBQuests::photo_dark
@@ -109,6 +109,9 @@ void quest_sneak_up(const ProgramInfo& info, ConsoleHandle& console, BotBaseCont
 
 //Kill a tera pokemon
 void quest_wild_tera(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS);
+
+//Give bath
+void quest_wash_pokemon(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
 
 }
 }

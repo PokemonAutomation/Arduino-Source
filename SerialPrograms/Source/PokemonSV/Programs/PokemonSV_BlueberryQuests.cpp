@@ -355,6 +355,9 @@ bool process_and_do_quest(const ProgramInfo& info, ConsoleHandle& console, BotBa
         case BBQuests::wild_tera:
             quest_wild_tera(info, console, context, BBQ_OPTIONS);
             break;
+        case BBQuests::wash_pokemon:
+            quest_wash_pokemon(info, console, context);
+            break;
         //All involve taking pictures
         case BBQuests::photo_fly: case BBQuests::photo_swim: case BBQuests::photo_canyon: case BBQuests::photo_coastal: case BBQuests::photo_polar: case BBQuests::photo_savanna:
         case BBQuests::photo_normal: case BBQuests::photo_fighting: case BBQuests::photo_flying: case BBQuests::photo_poison: case BBQuests::photo_ground:
@@ -466,7 +469,7 @@ void quest_make_tm(const ProgramInfo& info, ConsoleHandle& console, BotBaseConte
 }
 
 void quest_travel_500(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context) {
-    console.log("Quest: Travel 500");
+    console.log("Quest: Travel 500 meters.");
 
     //Mount and then dismount in case you're crouched
     pbf_press_button(context, BUTTON_PLUS, 20, 105);
@@ -530,7 +533,7 @@ void navi_normal(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
 
 void quest_tera_self_defeat(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS) {
     EncounterWatcher encounter_watcher(console, COLOR_RED);
-
+    console.log("Quest: Tera-self and defeat any wild.");
     //Navigate to target and start battle
     int ret = run_until(
         console, context,
@@ -589,10 +592,9 @@ void quest_tera_self_defeat(const ProgramInfo& info, ConsoleHandle& console, Bot
 
     bool is_shiny = (bool)encounter_watcher.shiny_screenshot();
     if (is_shiny) {
-        //TODO: Stop.
+        console.log("Shiny detected!");
         pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
-
-        //break;
+        throw ProgramFinishedException();
     } else {
         //Tera and kill.
         AdvanceDialogWatcher lost(COLOR_YELLOW);
@@ -712,6 +714,8 @@ void quest_photo(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
                 //Navigate to target
                 switch (current_quest) {
                 case BBQuests::photo_fly: case BBQuests::photo_psychic:
+                    console.log("Photo: In-flight/Psychic");
+
                     //Polar Rest Area - targeting Duosion fixed spawn
                     open_map_from_overworld(info, console, context);
                     pbf_move_left_joystick(context, 75, 0, 230, 20);
@@ -724,6 +728,8 @@ void quest_photo(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
 
                     break;
                 case BBQuests::photo_swim: case BBQuests::photo_water: case BBQuests::photo_polar:
+                    console.log("Photo: Swimming/Water/Polar");
+
                     //Polar Outdoor Classroom 1 - fixed Horsea
                     open_map_from_overworld(info, console, context);
                     pbf_move_left_joystick(context, 0, 20, 150, 20);
@@ -740,6 +746,8 @@ void quest_photo(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
 
                     break;
                 case BBQuests::photo_coastal: case BBQuests::photo_grass: case BBQuests::photo_dragon:
+                    console.log("Photo: Coastal/Grass/Dragon");
+
                     //Coastal Plaza - Exeggutor-A
                     open_map_from_overworld(info, console, context);
                     pbf_move_left_joystick(context, 180, 0, 200, 20);
@@ -765,6 +773,8 @@ void quest_photo(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
 
                     break;
                 case BBQuests::photo_canyon: case BBQuests::photo_ghost: case BBQuests::photo_ground:
+                    console.log("Photo: Canyon/Ghost/Ground");
+
                     //Canyon Plaza - Golett
                     open_map_from_overworld(info, console, context);
                     pbf_move_left_joystick(context, 0, 255, 215, 20);
@@ -800,6 +810,8 @@ void quest_photo(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
 
                     break;
                 case BBQuests::photo_savanna: case BBQuests::photo_normal: case BBQuests::photo_fire:
+                    console.log("Photo: Normal/Fire");
+
                     //Savanna Plaza - Pride Rock
                     open_map_from_overworld(info, console, context);
                     pbf_move_left_joystick(context, 165, 255, 180, 20);
@@ -837,6 +849,8 @@ void quest_photo(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
 
                     break;
                 case BBQuests::photo_bug: case BBQuests::photo_rock:
+                    console.log("Photo: Bug/Rock");
+
                     //Kleavor
                     open_map_from_overworld(info, console, context);
                     pbf_move_left_joystick(context, 0, 255, 215, 20);
@@ -871,6 +885,8 @@ void quest_photo(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
 
                     break;
                 case BBQuests::photo_fairy:
+                    console.log("Photo: Fairy");
+
                     /*
                     //Polar Plaza - Snubbull (not the best area/target but not many fairies)
                     open_map_from_overworld(info, console, context);
@@ -936,6 +952,8 @@ void quest_photo(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
                     pbf_press_button(context, BUTTON_PLUS, 20, 105);
                     break;
                 case BBQuests::photo_ice:
+                    console.log("Photo: Ice");
+
                     //Snover - Start at central plaza, fly north-ish
                     pbf_move_left_joystick(context, 0, 0, 10, 20);
                     pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
@@ -965,9 +983,58 @@ void quest_photo(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
                     pbf_press_button(context, BUTTON_PLUS, 20, 105);
                     pbf_move_left_joystick(context, 0, 128, 20, 50);
                     pbf_press_button(context, BUTTON_L, 20, 50);
+                case BBQuests::photo_dark: case BBQuests::photo_fighting:
+                    console.log("Photo: Dark/Fighting");
+
+                    //Savanna Plaza - Fly towards rim of Canyon Biome
+                    open_map_from_overworld(info, console, context);
+                    pbf_move_left_joystick(context, 165, 255, 180, 20);
+                    pbf_press_button(context, BUTTON_ZL, 40, 100);
+                    fly_to_overworld_from_map(info, console, context);
+
+                    pbf_move_left_joystick(context, 255, 0, 10, 20);
+                    pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
+
+                    ssf_press_button(context, BUTTON_B, 0, 100);
+                    ssf_press_button(context, BUTTON_B, 0, 20, 10);
+                    ssf_press_button(context, BUTTON_B, 0, 20);
+                    pbf_wait(context, 100);
+                    context.wait_for_all_requests();
+                    pbf_press_button(context, BUTTON_LCLICK, 50, 0);
+
+                    if (BBQ_OPTIONS.INVERTED_FLIGHT) {
+                        pbf_move_left_joystick(context, 128, 255, 1500, 250);
+                    }
+                    else {
+                        pbf_move_left_joystick(context, 128, 0, 1500, 250);
+                    }
+
+                    pbf_wait(context, 1900);
+                    context.wait_for_all_requests();
+
+                    pbf_move_left_joystick(context, 255, 128, 250, 20);
+                    pbf_press_button(context, BUTTON_L, 20, 50);
+
+                    pbf_wait(context, 300);
+                    context.wait_for_all_requests();
+
+                    pbf_press_button(context, BUTTON_B, 20, 50);
+                    pbf_wait(context, 300);
+                    context.wait_for_all_requests();
+
+                    pbf_press_button(context, BUTTON_PLUS, 20, 105);
+                    pbf_move_left_joystick(context, 0, 128, 10, 20);
+                    pbf_press_button(context, BUTTON_L, 20, 50);
+                    /*
+                    pbf_move_left_joystick(context, 0, 0, 200, 20);
+                    pbf_move_left_joystick(context, 128, 0, 200, 20);
+                    pbf_press_button(context, BUTTON_L, 20, 50);
+                    */
+                    break;
                 }
 
                 //Take photo.
+                console.log("Taking photo.");
                 PromptDialogWatcher photo_prompt(COLOR_RED);
                 OverworldWatcher overworld(COLOR_BLUE);
 
@@ -1043,6 +1110,8 @@ void quest_catch(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
         [&](BotBaseContext& context) {
             switch (current_quest) {
             case BBQuests::catch_any: case BBQuests::catch_normal: case BBQuests::catch_fire:
+                console.log("Catch: Any/Normal/Fire.");
+
                 //Savanna Plaza - Pride Rock
                 open_map_from_overworld(info, console, context);
                 pbf_move_left_joystick(context, 165, 255, 180, 20);
@@ -1087,6 +1156,7 @@ void quest_catch(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
                 break;
 
             case BBQuests::catch_psychic:
+                console.log("Catch: Psychic.");
                 //Polar Rest Area - targeting Duosion fixed spawn
                 open_map_from_overworld(info, console, context);
                 pbf_move_left_joystick(context, 75, 0, 230, 20);
@@ -1109,6 +1179,8 @@ void quest_catch(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
                 break;
 
             case BBQuests::catch_grass: case BBQuests::catch_dragon:
+                console.log("Catch: Grass/Dragon");
+
                 //Coastal Plaza - Exeggutor-A
                 open_map_from_overworld(info, console, context);
                 pbf_move_left_joystick(context, 180, 0, 200, 20);
@@ -1140,6 +1212,8 @@ void quest_catch(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
 
                 break;
             case BBQuests::catch_ghost: case BBQuests::catch_ground:
+                console.log("Catch: Ghost/Ground");
+
                 //Canyon Plaza - Golett
                 open_map_from_overworld(info, console, context);
                 pbf_move_left_joystick(context, 0, 255, 215, 20);
@@ -1186,6 +1260,8 @@ void quest_catch(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
 
                 break;
             case BBQuests::catch_fairy:
+                console.log("Catch: Fairy");
+
                 //Polar Plaza - Snubbull
                 open_map_from_overworld(info, console, context);
                 pbf_move_left_joystick(context, 20, 25, 245, 20);
@@ -1227,6 +1303,8 @@ void quest_catch(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
                 pbf_wait(context, 300);
                 context.wait_for_all_requests();
             case BBQuests::catch_ice:
+                console.log("Catch: Ice");
+
                 //Start at central plaza, fly north-ish
                 pbf_move_left_joystick(context, 0, 0, 10, 20);
                 pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
@@ -1264,10 +1342,85 @@ void quest_catch(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
 
                 break;
 
+            case BBQuests::catch_dark: case BBQuests::catch_fighting:
+                console.log("Catch: Dark/Fighting");
 
+                //Savanna Plaza - Fly towards rim of Canyon Biome
+                open_map_from_overworld(info, console, context);
+                pbf_move_left_joystick(context, 165, 255, 180, 20);
+                pbf_press_button(context, BUTTON_ZL, 40, 100);
+                fly_to_overworld_from_map(info, console, context);
 
+                pbf_move_left_joystick(context, 255, 0, 10, 20);
+                pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
+                ssf_press_button(context, BUTTON_B, 0, 100);
+                ssf_press_button(context, BUTTON_B, 0, 20, 10);
+                ssf_press_button(context, BUTTON_B, 0, 20);
+                pbf_wait(context, 100);
+                context.wait_for_all_requests();
+                pbf_press_button(context, BUTTON_LCLICK, 50, 0);
 
+                if (BBQ_OPTIONS.INVERTED_FLIGHT) {
+                    pbf_move_left_joystick(context, 128, 255, 1500, 250);
+                }
+                else {
+                    pbf_move_left_joystick(context, 128, 0, 1500, 250);
+                }
+
+                pbf_wait(context, 2800);
+                context.wait_for_all_requests();
+
+                /*
+                pbf_move_left_joystick(context, 255, 128, 250, 20);
+                pbf_press_button(context, BUTTON_L, 20, 50);
+                pbf_wait(context, 300);
+                context.wait_for_all_requests();
+                */
+
+                pbf_press_button(context, BUTTON_B, 20, 50);
+                pbf_wait(context, 300);
+                context.wait_for_all_requests();
+
+                pbf_press_button(context, BUTTON_PLUS, 20, 105);
+                //pbf_move_left_joystick(context, 0, 128, 10, 20);
+                //pbf_press_button(context, BUTTON_L, 20, 50);
+                /*
+                pbf_move_left_joystick(context, 0, 0, 200, 20);
+                pbf_move_left_joystick(context, 128, 0, 200, 20);
+                pbf_press_button(context, BUTTON_L, 20, 50);
+                */
+                break;
+
+            case BBQuests::catch_bug: case BBQuests::catch_rock:
+                open_map_from_overworld(info, console, context);
+                pbf_move_left_joystick(context, 0, 255, 215, 20);
+                pbf_press_button(context, BUTTON_ZL, 40, 100);
+                fly_to_overworld_from_map(info, console, context);
+
+                pbf_move_left_joystick(context, 205, 64, 20, 105);
+                pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
+
+                ssf_press_button(context, BUTTON_B, 0, 100);
+                ssf_press_button(context, BUTTON_B, 0, 20, 10);
+                ssf_press_button(context, BUTTON_B, 0, 20);
+                pbf_wait(context, 100);
+                context.wait_for_all_requests();
+                pbf_press_button(context, BUTTON_LCLICK, 50, 0);
+
+                if (BBQ_OPTIONS.INVERTED_FLIGHT) {
+                    pbf_move_left_joystick(context, 128, 255, 1000, 250);
+                }
+                else {
+                    pbf_move_left_joystick(context, 128, 0, 1000, 250);
+                }
+                pbf_wait(context, 1650);
+                context.wait_for_all_requests();
+
+                pbf_press_button(context, BUTTON_B, 50, 375);
+                pbf_wait(context, 500);
+                context.wait_for_all_requests();
+                break;
 
 
 
@@ -1300,11 +1453,11 @@ void quest_catch(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
 
     bool is_shiny = (bool)encounter_watcher.shiny_screenshot();
     if (is_shiny) {
-        //TODO: Stop.
         console.log("Shiny detected!");
         pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
         throw ProgramFinishedException();
     } else {
+        console.log("Catching Pokemon.");
         AdvanceDialogWatcher advance_dialog(COLOR_MAGENTA);
         OverworldWatcher overworld(COLOR_BLUE);
 
@@ -1575,7 +1728,7 @@ void quest_catch(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
 
 void quest_sneak_up(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS) {
     EncounterWatcher encounter_watcher(console, COLOR_RED);
-
+    console.log("Quest: Sneak up.");
     //Navigate to target and start battle
     int ret = run_until(
         console, context,
@@ -1644,7 +1797,6 @@ void quest_sneak_up(const ProgramInfo& info, ConsoleHandle& console, BotBaseCont
 
     bool is_shiny = (bool)encounter_watcher.shiny_screenshot();
     if (is_shiny) {
-        //TODO: Stop.
         console.log("Shiny detected!");
         pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
         throw ProgramFinishedException();
@@ -1706,7 +1858,7 @@ void quest_sneak_up(const ProgramInfo& info, ConsoleHandle& console, BotBaseCont
 
 void quest_wild_tera(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS) {
     EncounterWatcher encounter_watcher(console, COLOR_RED);
-
+    console.log("Quest: Defeat a wild tera.");
     //Navigate to target and start battle
     int ret = run_until(
         console, context,
@@ -1779,10 +1931,9 @@ void quest_wild_tera(const ProgramInfo& info, ConsoleHandle& console, BotBaseCon
 
     bool is_shiny = (bool)encounter_watcher.shiny_screenshot();
     if (is_shiny) {
-        //TODO: Stop.
+        console.log("Shiny detected!");
         pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
-
-        //break;
+        throw ProgramFinishedException();
     } else {
         AdvanceDialogWatcher lost(COLOR_YELLOW);
         OverworldWatcher overworld(COLOR_RED);
@@ -1869,6 +2020,121 @@ void quest_wild_tera(const ProgramInfo& info, ConsoleHandle& console, BotBaseCon
     open_map_from_overworld(info, console, context);
     pbf_press_button(context, BUTTON_ZL, 40, 100);
     fly_to_overworld_from_map(info, console, context);
+}
+
+void quest_wash_pokemon(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context) {
+    console.log("Quest: Give your pokemon a bath!");
+
+    //Fly to savanna plaza
+    open_map_from_overworld(info, console, context);
+    pbf_move_left_joystick(context, 165, 255, 180, 20);
+    pbf_press_button(context, BUTTON_ZL, 40, 100);
+    fly_to_overworld_from_map(info, console, context);
+
+    //Turn around, open picnic
+    pbf_move_left_joystick(context, 128, 255, 20, 50);
+    pbf_press_button(context, BUTTON_L, 50, 40);
+
+    picnic_from_overworld(info, console, context);
+
+    //Wait until Wash appears
+    WhiteButtonWatcher wash_button(COLOR_BLUE, WhiteButton::ButtonX, {0.027, 0.548, 0.022, 0.032});
+    int ret = wait_until(
+        console, context,
+        std::chrono::seconds(60),
+        { wash_button }
+    );
+    if (ret == 0){
+        console.log("Wash button found!");
+        pbf_mash_button(context, BUTTON_X, 150);
+        pbf_wait(context, 200);
+        context.wait_for_all_requests();
+
+        //Check if we've entered wash
+        WhiteButtonWatcher wash_exit_button(COLOR_BLUE, WhiteButton::ButtonB, {0.027, 0.923, 0.021, 0.033});
+        int retE = wait_until(
+            console, context,
+            std::chrono::seconds(10),
+            { wash_exit_button }
+        );
+        if (retE == 0) {
+            WhiteButtonWatcher shower_switch(COLOR_BLUE, WhiteButton::ButtonY, {0.486, 0.870, 0.027, 0.045});
+            WallClock start = current_time();
+            console.log("Scrubbing.");
+            int ret2 = run_until(
+            console, context,
+            [&](BotBaseContext& context){
+                while (true) {
+                    if (current_time() - start > std::chrono::minutes(3)) {
+                        console.log("Failed to find rinse after 3 mins.", COLOR_RED);
+                        break;
+                    }
+                    ssf_press_button(context, BUTTON_A, 0, 200, 0);
+                    ssf_press_left_joystick(context, 0, 128, 0, 50);
+                    ssf_press_left_joystick(context, 255, 128, 50, 100);
+                    ssf_press_left_joystick(context, 0, 128, 150, 50);
+
+                    ssf_press_button(context, BUTTON_A, 0, 200, 0);
+                    ssf_press_left_joystick(context, 128, 0, 0, 50);
+                    ssf_press_left_joystick(context, 128, 255, 50, 100);
+                    ssf_press_left_joystick(context, 128, 0, 150, 50);
+                }
+                },
+                {{shower_switch}}
+            );
+            if (ret2 == 0) {
+                console.log("Rinse button found. Switching to rinse.");
+                pbf_press_button(context, BUTTON_Y, 40, 50);
+                
+                WhiteButtonWatcher rinse_done(COLOR_BLUE, WhiteButton::ButtonY, {0.028, 0.923, 0.020, 0.034});
+                WallClock start2 = current_time();
+
+                int ret3 = run_until(
+                    console, context,
+                    [&](BotBaseContext& context) {
+                        while (true) {
+                            if (current_time() - start > std::chrono::minutes(3)) {
+                                console.log("Failed to find rinse after 3 mins.", COLOR_RED);
+                                break;
+                            }
+                            ssf_press_button(context, BUTTON_A, 0, 200, 0);
+                            ssf_press_left_joystick(context, 0, 128, 0, 50);
+                            ssf_press_left_joystick(context, 255, 128, 50, 100);
+                            ssf_press_left_joystick(context, 0, 128, 150, 50);
+
+                            ssf_press_button(context, BUTTON_A, 0, 200, 0);
+                            ssf_press_left_joystick(context, 128, 0, 0, 50);
+                            ssf_press_left_joystick(context, 128, 255, 50, 100);
+                            ssf_press_left_joystick(context, 128, 0, 150, 50);
+                        }
+                    },
+                    { {rinse_done} }
+                );
+                if (ret3 == 0) {
+                    console.log("Shower completed successfully.");
+                }
+                else {
+                    console.log("Shower did not complete. Backing out.");
+                    pbf_press_button(context, BUTTON_B, 40, 50);
+                }
+            }
+            else {
+                console.log("Did not find shower switch. Backing out.");
+                pbf_press_button(context, BUTTON_B, 40, 50);
+            }
+        }
+        else {
+            console.log("Pressed X but failed to enter wash.");
+        }
+    }
+    else {
+        console.log("Wash button not found. Exiting picnic.");
+    }
+
+    leave_picnic(info, console, context);
+
+    return_to_plaza(info, console, context);
+    context.wait_for_all_requests();
 }
 
 }

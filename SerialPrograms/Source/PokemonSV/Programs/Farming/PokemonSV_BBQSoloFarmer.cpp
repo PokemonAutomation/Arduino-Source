@@ -85,8 +85,10 @@ void BBQSoloFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
     for quests that cannot be done, reroll.
 
     smoke ball or flying pokemon required in slot 1 in case of arena trap
+    full party/more than one pokemon for washing pokemon/hatching egg
     first attack must be capable of killing all types (so no normal/fighting/etc in case of ghost/dark/etc.)
-    last attack can be nonlethal for capture quests. not required though.
+    first attack is used until ball menu detected when trying to catch wild tera pokemon
+    last attack can be nonlethal for capture quests. not required though, not targeting anything with fly/bounce/etc.
 
     handle out of bp rerolls? can't test this atm.
 
@@ -98,6 +100,7 @@ void BBQSoloFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
     //Fly to plaza
     //open_map_from_overworld(env.program_info(), env.console, context);
     //fly_to_overworld_from_map(env.program_info(), env.console, context);
+
     /*
     //Get initial BP
     int starting_BP = read_BP(env.program_info(), env.console, context);
@@ -111,7 +114,7 @@ void BBQSoloFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
     uint64_t eggs_hatched = 0; //Track eggs
     uint64_t num_completed_quests = 0;
 
-    BBQuests test_quest = BBQuests::wild_tera;
+    BBQuests test_quest = BBQuests::wash_pokemon;
     bool questTest = process_and_do_quest(env.program_info(), env.console, context, BBQ_OPTIONS, test_quest, eggs_hatched);
     if (questTest) {
         env.log("Success");
