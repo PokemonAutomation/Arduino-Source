@@ -426,31 +426,31 @@ void quest_photo(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
                 static_cast<AudioInferenceCallback&>(encounter_watcher),
             }
         );
-        if (ret == 0) {
+        if (ret >= 0) {
             console.log("Battle menu detected.");
-        }
-        encounter_watcher.throw_if_no_sound();
+            encounter_watcher.throw_if_no_sound();
 
-        bool is_shiny = (bool)encounter_watcher.shiny_screenshot();
-        if (is_shiny) {
-            console.log("Shiny detected!");
-            pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
-            throw ProgramFinishedException();
-        }
-        else {
-            console.log("Detected battle. Running from battle.");
-            try{
-                //Smoke Ball or Flying type required due to Arena Trap
-                NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
-                battle_menu.move_to_slot(console, context, 3);
-                pbf_press_button(context, BUTTON_A, 10, 50);
-            }catch (...){
-                console.log("Unable to flee! Check setup.");
-                throw OperationFailedException(
-                    ErrorReport::SEND_ERROR_REPORT, console,
-                    "Unable to flee!",
-                    true
-                );
+            bool is_shiny = (bool)encounter_watcher.shiny_screenshot();
+            if (is_shiny) {
+                console.log("Shiny detected!");
+                pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
+                throw ProgramFinishedException();
+            }
+            else {
+                console.log("Detected battle. Running from battle.");
+                try{
+                    //Smoke Ball or Flying type required due to Arena Trap
+                    NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
+                    battle_menu.move_to_slot(console, context, 3);
+                    pbf_press_button(context, BUTTON_A, 10, 50);
+                }catch (...){
+                    console.log("Unable to flee.");
+                    throw OperationFailedException(
+                        ErrorReport::SEND_ERROR_REPORT, console,
+                        "Unable to flee!",
+                        true
+                    );
+                }
             }
         }
     }
@@ -496,6 +496,9 @@ void quest_catch_navi(const ProgramInfo& info, ConsoleHandle& console, BotBaseCo
             pbf_press_button(context, BUTTON_PLUS, 20, 105);
             pbf_move_left_joystick(context, 255, 128, 20, 50);
 
+            pbf_press_button(context, BUTTON_L, 20, 50);
+            pbf_move_left_joystick(context, 128, 0, 100, 50);
+            pbf_move_left_joystick(context, 0, 0, 20, 50);
             pbf_press_button(context, BUTTON_L, 20, 50);
 
             ssf_press_button(context, BUTTON_ZR, 0, 200);
@@ -779,6 +782,7 @@ void quest_catch_handle_battle(const ProgramInfo& info, ConsoleHandle& console, 
     console.log("Catching Pokemon.");
     AdvanceDialogWatcher advance_dialog(COLOR_MAGENTA);
     OverworldWatcher overworld(COLOR_BLUE);
+    PromptDialogWatcher add_to_party(COLOR_PURPLE);
 
     uint8_t switch_party_slot = 1;
     bool quickball_thrown = false;
@@ -1005,15 +1009,20 @@ void quest_catch_handle_battle(const ProgramInfo& info, ConsoleHandle& console, 
 
             }
         },
-        { advance_dialog, overworld }
+        { advance_dialog, overworld, add_to_party }
         );
 
     switch (ret2) {
     case 0:
         console.log("Advance Dialog detected.");
+        press_Bs_to_back_to_overworld(info, console, context);
         break;
     case 1:
         console.log("Overworld detected. Fainted?");
+        break;
+    case 2:
+        console.log("Prompt dialog detected.");
+        press_Bs_to_back_to_overworld(info, console, context);
         break;
     default:
         console.log("Invalid state in run_battle().");

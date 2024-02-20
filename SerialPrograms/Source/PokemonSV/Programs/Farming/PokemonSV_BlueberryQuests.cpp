@@ -27,10 +27,15 @@
 #include "PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
+#include "PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.h"
+#include "PokemonSV/Programs/Boxes/PokemonSV_BoxRoutines.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "PokemonSV/Inference/PokemonSV_BlueberryQuestDetector.h"
 #include "PokemonSV/Programs/Battles/PokemonSV_BasicCatcher.h"
+#include "PokemonSV/Programs/Eggs/PokemonSV_EggRoutines.h"
+#include "PokemonSV/Programs/Boxes/PokemonSV_BoxRelease.h"
+#include "PokemonSV/Inference/Boxes/PokemonSV_BoxEggDetector.h"
 #include "PokemonSV/Programs/Farming/PokemonSV_BlueberryCatchPhoto.h"
 #include "PokemonSV_BlueberryQuests.h"
 
@@ -132,6 +137,7 @@ BBQuests BBQuests_string_to_enum(const std::string& token){
 
 
 void return_to_plaza(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context) {
+    console.log("Return to plaza");
     //Modified version of handle_battles_and_back_to_pokecenter()
     bool returned_to_pokecenter = false;
 
@@ -180,30 +186,31 @@ void return_to_plaza(const ProgramInfo& info, ConsoleHandle& console, BotBaseCon
                 static_cast<AudioInferenceCallback&>(encounter_watcher),
             }
         );
-       if (ret == 0) {
+        if (ret >= 0) {
             console.log("Battle menu detected.");
-        }
-        encounter_watcher.throw_if_no_sound();
+            encounter_watcher.throw_if_no_sound();
 
-        bool is_shiny = (bool)encounter_watcher.shiny_screenshot();
-        if (is_shiny) {
-            console.log("Shiny detected!");
-            pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
-            throw ProgramFinishedException();
-        }
-        else {
-            try{
-                //Smoke Ball or Flying type required due to Arena Trap
-                NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
-                battle_menu.move_to_slot(console, context, 3);
-                pbf_press_button(context, BUTTON_A, 10, 50);
-            }catch (...){
-                console.log("Unable to flee! Check setup.");
-                throw OperationFailedException(
-                    ErrorReport::SEND_ERROR_REPORT, console,
-                    "Unable to flee!",
-                    true
-                );
+            bool is_shiny = (bool)encounter_watcher.shiny_screenshot();
+            if (is_shiny) {
+                console.log("Shiny detected!");
+                pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
+                throw ProgramFinishedException();
+            }
+            else {
+                console.log("Detected battle. Running from battle.");
+                try{
+                    //Smoke Ball or Flying type required due to Arena Trap
+                    NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
+                    battle_menu.move_to_slot(console, context, 3);
+                    pbf_press_button(context, BUTTON_A, 10, 50);
+                }catch (...){
+                    console.log("Unable to flee.");
+                    throw OperationFailedException(
+                        ErrorReport::SEND_ERROR_REPORT, console,
+                        "Unable to flee!",
+                        true
+                    );
+                }
             }
         }
     }
@@ -286,7 +293,7 @@ std::vector<BBQuests> read_quests(const ProgramInfo& info, ConsoleHandle& consol
     return quest_list;
 }
 
-std::vector<BBQuests> process_quest_list(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, std::vector<BBQuests>& quest_list, uint64_t& eggs_hatched) {
+std::vector<BBQuests> process_quest_list(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, std::vector<BBQuests>& quest_list, uint8_t& eggs_hatched) {
     std::vector<BBQuests> quests_to_do;
 
     console.log("Processing quests.");
@@ -297,9 +304,8 @@ std::vector<BBQuests> process_quest_list(const ProgramInfo& info, ConsoleHandle&
         }
         else {
             //Check eggs remaining
-            if (n == BBQuests::hatch_egg && BBQ_OPTIONS.NUM_EGGS <= eggs_hatched) {
+            if (n == BBQuests::hatch_egg && eggs_hatched < BBQ_OPTIONS.NUM_EGGS) {
                 console.log("Out of eggs! Quest not possible.");
-
             }
             else {
                 console.log("Quest possible");
@@ -346,7 +352,7 @@ std::vector<BBQuests> process_quest_list(const ProgramInfo& info, ConsoleHandle&
     return quests_to_do;
 }
 
-bool process_and_do_quest(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, BBQuests& current_quest, uint64_t& eggs_hatched) {
+bool process_and_do_quest(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, BBQuests& current_quest, uint8_t& eggs_hatched) {
     bool quest_completed = false;
     int quest_attempts = 0;
 
@@ -369,6 +375,9 @@ bool process_and_do_quest(const ProgramInfo& info, ConsoleHandle& console, BotBa
             break;
         case BBQuests::wash_pokemon:
             quest_wash_pokemon(info, console, context);
+            break;
+        case BBQuests::hatch_egg:
+            quest_hatch_egg(info, console, context, BBQ_OPTIONS);
             break;
         //All involve taking pictures
         case BBQuests::photo_fly: case BBQuests::photo_swim: case BBQuests::photo_canyon: case BBQuests::photo_coastal: case BBQuests::photo_polar: case BBQuests::photo_savanna:
@@ -393,6 +402,11 @@ bool process_and_do_quest(const ProgramInfo& info, ConsoleHandle& console, BotBa
         }
         else {
             console.log("Current quest was not found. Quest completed!");
+            if (current_quest == BBQuests::hatch_egg) {
+                eggs_hatched++;
+                console.log("Eggs hatched: " + std::to_string(eggs_hatched));
+            }
+
             quest_completed = true;
         }
 
@@ -713,6 +727,9 @@ void quest_sneak_up(const ProgramInfo& info, ConsoleHandle& console, BotBaseCont
             pbf_press_button(context, BUTTON_PLUS, 20, 105);
             pbf_move_left_joystick(context, 255, 128, 20, 50);
 
+            pbf_press_button(context, BUTTON_L, 20, 50);
+            pbf_move_left_joystick(context, 128, 0, 100, 50);
+            pbf_move_left_joystick(context, 0, 0, 20, 50);
             pbf_press_button(context, BUTTON_L, 20, 50);
 
             ssf_press_button(context, BUTTON_ZR, 0, 200);
@@ -1085,11 +1102,71 @@ void quest_wash_pokemon(const ProgramInfo& info, ConsoleHandle& console, BotBase
     context.wait_for_all_requests();
 }
 
-//void quest_three_sand(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context) {
-//    console.log("Quest: Make a 3 ingre sand!");
+void quest_hatch_egg(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS) {
+    console.log("Quest: Hatch an Egg");
 
+    //Fly to Savanna Plaza and navigate to the battle court
+    open_map_from_overworld(info, console, context);
+    pbf_move_left_joystick(context, 165, 255, 180, 20);
+    pbf_press_button(context, BUTTON_ZL, 40, 100);
+    fly_to_overworld_from_map(info, console, context);
 
-//}
+    pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
+    pbf_move_left_joystick(context, 128, 0, 500, 50);
+
+    pbf_move_left_joystick(context, 0, 128, 20, 50);
+    pbf_press_button(context, BUTTON_L, 20, 50);
+
+    //Do this after navigating to prevent egg from hatchining enroute
+    //Enter box system, navigate to left box, find egg, swap it with first pokemon in party
+    enter_box_system_from_overworld(info, console, context);
+    context.wait_for(std::chrono::milliseconds(400));
+    
+    //move_to_left_box(context);
+    BoxCurrentEggDetector egg_detector;
+    SomethingInBoxSlotDetector sth_in_box_detector(COLOR_RED);
+    bool egg_found = false;
+    uint8_t row = 0;
+    uint8_t col = 0;
+    for (row ; row < 5; row++){
+        for (uint8_t j_col = 0; j_col < 6; j_col++){
+            col = (row % 2 == 0 ? j_col : 5 - j_col);
+            move_box_cursor(info, console, context, BoxCursorLocation::SLOTS, row, col);
+            context.wait_for_all_requests();
+            auto snapshot = console.video().snapshot();
+            if (sth_in_box_detector.detect(snapshot) && egg_detector.detect(snapshot)){
+                console.log("Found egg.");
+                egg_found = true;
+                break;
+            }
+        }
+        if (egg_found) {
+            break;
+        }
+    }
+
+    swap_two_box_slots(info, console, context,
+        BoxCursorLocation::SLOTS, row, col,
+        BoxCursorLocation::PARTY, 0, 0);
+
+    leave_box_system_to_overworld(info, console, context);
+
+    hatch_eggs_anywhere(info, console, context, true, 1);
+
+    enter_box_system_from_overworld(info, console, context);
+    context.wait_for(std::chrono::milliseconds(400));
+
+    swap_two_box_slots(info, console, context,
+        BoxCursorLocation::PARTY, 0, 0,
+        BoxCursorLocation::SLOTS, row, col);
+
+    leave_box_system_to_overworld(info, console, context);
+
+    pbf_press_button(context, BUTTON_PLUS, 20, 50);
+
+    return_to_plaza(info, console, context);
+    context.wait_for_all_requests();
+}
 
 }
 }

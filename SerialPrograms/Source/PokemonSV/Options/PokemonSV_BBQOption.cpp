@@ -53,7 +53,7 @@ BBQOption::BBQOption(OCR::LanguageOCROption* language_option)
         "ultra-ball"
     )
     , NUM_EGGS(
-        "<b>Number of Eggs:</b><br>Amount of eggs located in the box to the left of your current one. Skip egg hatching quest if no eggs.",
+        "<b>Number of Eggs:</b><br>Amount of eggs located in your current box. Skip egg hatching quest if no eggs.",
         LockMode::LOCK_WHILE_RUNNING, 30
     )
     , FIX_TIME_WHEN_DONE(
