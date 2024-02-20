@@ -90,6 +90,14 @@ void make_sandwich_preset(ProgramEnvironment& env, ConsoleHandle& console, BotBa
 void run_sandwich_maker(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, Language language, std::map<std::string, uint8_t>& fillings, std::vector<std::string>& fillings_sorted, int& plates);
 
 
+//Starting at the sandwich recipe list, make a flavored sandwich for BBQ Quest. Uses great peanut butter sandwich motions.
+void make_bbq_flavored_sandwich(const ProgramInfo& info, AsyncDispatcher& dispatcher, ConsoleHandle& console, BotBaseContext& context, Language language,
+    std::map<std::string, uint8_t>& fillings, std::map<std::string, uint8_t>& condiments);
+
+//Starting at the sandwich recipe list, make a 3 ingredient sandwich
+void make_bbq_three_sandwich(const ProgramInfo& info, AsyncDispatcher& dispatcher, ConsoleHandle& console, BotBaseContext& context, Language language,
+    std::map<std::string, uint8_t>& fillings, std::map<std::string, uint8_t>& condiments);
+
 }
 }
 }

@@ -67,9 +67,7 @@ const std::set<BBQuests> not_possible_quests = {
     //Temp
     , BBQuests::catch_fighting, BBQuests::catch_flying, BBQuests::catch_poison, BBQuests::catch_steel, 
     BBQuests::catch_water, BBQuests::catch_electric, BBQuests::catch_dark
-    , BBQuests::sandwich_three, BBQuests::bitter_sandwich, BBQuests::sweet_sandwich, BBQuests::salty_sandwich, BBQuests::sour_sandwich, BBQuests::spicy_sandwich,
-
-    BBQuests::photo_fighting, BBQuests::photo_flying, BBQuests::photo_poison, BBQuests::photo_steel,
+    , BBQuests::photo_fighting, BBQuests::photo_flying, BBQuests::photo_poison, BBQuests::photo_steel,
     BBQuests::photo_electric, BBQuests::photo_dark
 };
 
@@ -92,7 +90,7 @@ std::vector<BBQuests> read_quests(const ProgramInfo& info, ConsoleHandle& consol
 std::vector<BBQuests> process_quest_list(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, std::vector<BBQuests>& quest_list, uint8_t& eggs_hatched);
 
 //Take the current quest and calls the function to do it, then checks the quest was successful. Returns true if so.
-bool process_and_do_quest(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, BBQuests& current_quest, uint8_t& eggs_hatched);
+bool process_and_do_quest(const ProgramInfo& info, AsyncDispatcher& dispatcher, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, BBQuests& current_quest, uint8_t& eggs_hatched);
 
 //Iterate through TMs until a craftable one is found. Make the TM and return to position.
 void quest_make_tm(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
@@ -115,7 +113,8 @@ void quest_wash_pokemon(const ProgramInfo& info, ConsoleHandle& console, BotBase
 //Withdraw and hatch an egg
 void quest_hatch_egg(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS);
 
-
+//Make a sandwich of type flavor
+void quest_sandwich(const ProgramInfo& info, AsyncDispatcher& dispatcher, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, BBQuests& current_quest);
 
 }
 }

@@ -43,18 +43,22 @@ BBQOption::BBQOption(OCR::LanguageOCROption* language_option)
         false
     )
     , QUICKBALL(
-        "<b>Throw Quick Ball:</b><br>When attempting to catch a non-tera Pokemon, use a Quick Ball on the first turn.",
+        "<b>Catch Quest - Throw Quick Ball:</b><br>When attempting to catch a non-tera Pokemon, use a Quick Ball on the first turn.",
         LockMode::LOCK_WHILE_RUNNING,
         true
     )
     , BALL_SELECT(
-        "<b>Ball Select:</b><br>What ball to use when performing a catch quest.",
+        "<b>Catch Quest - Ball Select:</b><br>What ball to use when performing a catch quest.",
         LockMode::UNLOCK_WHILE_RUNNING,
         "ultra-ball"
     )
     , NUM_EGGS(
-        "<b>Number of Eggs:</b><br>Amount of eggs located in your current box. Skip egg hatching quest if no eggs.",
-        LockMode::LOCK_WHILE_RUNNING, 30
+        "<b>Hatch Quest - Number of Eggs:</b><br>Amount of eggs located in your current box. Skip egg hatching quest if no eggs.",
+        LockMode::LOCK_WHILE_RUNNING, 30, 0, 30
+    )
+    , NUM_RETRIES(
+        "<b>Number of Retries:</b><br>Reattempt a quest this many times if it fails.",
+        LockMode::LOCK_WHILE_RUNNING, 3, 0, 10
     )
     , FIX_TIME_WHEN_DONE(
         "<b>Fix time when done:</b><br>Fix the time after the program finishes.",
@@ -70,6 +74,7 @@ BBQOption::BBQOption(OCR::LanguageOCROption* language_option)
     PA_ADD_OPTION(QUICKBALL);
     PA_ADD_OPTION(BALL_SELECT);
     PA_ADD_OPTION(NUM_EGGS);
+    PA_ADD_OPTION(NUM_RETRIES);
     PA_ADD_OPTION(FIX_TIME_WHEN_DONE);
 }
 

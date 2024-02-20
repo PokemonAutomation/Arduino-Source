@@ -1107,6 +1107,80 @@ void quest_catch(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
     context.wait_for_all_requests();
 }
 
+void wild_battle_tera(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, bool& tera_self) {
+    AdvanceDialogWatcher lost(COLOR_YELLOW);
+    OverworldWatcher overworld(COLOR_RED);
+    WallClock start = current_time();
+    uint8_t switch_party_slot = 1;
+    bool first_turn = true;
+
+    int ret2 = run_until(
+        console, context,
+        [&](BotBaseContext& context){
+            while(true){
+                if (current_time() - start > std::chrono::minutes(5)){
+                    console.log("Timed out during battle after 5 minutes.", COLOR_RED);
+                    throw OperationFailedException(
+                        ErrorReport::SEND_ERROR_REPORT, console,
+                        "Timed out during battle after 5 minutes.",
+                        true
+                    );
+                }
+
+                if (first_turn && tera_self) {
+                    console.log("Turn 1: Tera.");
+                    //Open move menu
+                    pbf_press_button(context, BUTTON_A, 10, 50);
+                    pbf_wait(context, 100);
+                    context.wait_for_all_requests();
+
+                    pbf_press_button(context, BUTTON_R, 20, 50);
+                    pbf_press_button(context, BUTTON_A, 10, 50);
+
+                    first_turn = false;
+                }
+
+                NormalBattleMenuWatcher battle_menu(COLOR_MAGENTA);
+                SwapMenuWatcher fainted(COLOR_RED);
+
+                context.wait_for_all_requests();
+
+                int ret3 = wait_until(
+                    console, context,
+                    std::chrono::seconds(90),
+                    { battle_menu, fainted }
+                );
+                switch (ret3){
+                case 0:
+                    console.log("Detected battle menu. Pressing A to attack...");
+                    pbf_mash_button(context, BUTTON_A, 3 * TICKS_PER_SECOND);
+                    context.wait_for_all_requests();
+                    break;
+                case 1:
+                    console.log("Detected fainted Pokemon. Switching to next living Pokemon...");
+                    if (fainted.move_to_slot(console, context, switch_party_slot)){
+                        pbf_mash_button(context, BUTTON_A, 3 * TICKS_PER_SECOND);
+                        context.wait_for_all_requests();
+                        switch_party_slot++;
+                    }
+                    break;
+                default:
+                    console.log("Timed out during battle. Stuck, crashed, or took more than 90 seconds for a turn.", COLOR_RED);
+                    throw OperationFailedException(
+                        ErrorReport::SEND_ERROR_REPORT, console,
+                        "Timed out during battle. Stuck, crashed, or took more than 90 seconds for a turn.",
+                        true
+                    );
+                }
+            }
+        },
+        { lost, overworld }
+    );
+    if (ret2 == 0) {
+        console.log("Lost battle. Mashing B.");
+    }
+}
+
 }
 }
 }

@@ -36,6 +36,7 @@
 #include "PokemonSV/Programs/Eggs/PokemonSV_EggRoutines.h"
 #include "PokemonSV/Programs/Boxes/PokemonSV_BoxRelease.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxEggDetector.h"
+#include "PokemonSV/Programs/Sandwiches/PokemonSV_SandwichRoutines.h"
 #include "PokemonSV/Programs/Farming/PokemonSV_BlueberryCatchPhoto.h"
 #include "PokemonSV_BlueberryQuests.h"
 
@@ -352,7 +353,7 @@ std::vector<BBQuests> process_quest_list(const ProgramInfo& info, ConsoleHandle&
     return quests_to_do;
 }
 
-bool process_and_do_quest(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, BBQuests& current_quest, uint8_t& eggs_hatched) {
+bool process_and_do_quest(const ProgramInfo& info, AsyncDispatcher& dispatcher, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, BBQuests& current_quest, uint8_t& eggs_hatched) {
     bool quest_completed = false;
     int quest_attempts = 0;
 
@@ -378,6 +379,9 @@ bool process_and_do_quest(const ProgramInfo& info, ConsoleHandle& console, BotBa
             break;
         case BBQuests::hatch_egg:
             quest_hatch_egg(info, console, context, BBQ_OPTIONS);
+            break;
+        case BBQuests::bitter_sandwich: case BBQuests::salty_sandwich: case BBQuests::sour_sandwich: case BBQuests::spicy_sandwich: case BBQuests::sweet_sandwich: case BBQuests::sandwich_three:
+            quest_sandwich(info, dispatcher, console, context, BBQ_OPTIONS, current_quest);
             break;
         //All involve taking pictures
         case BBQuests::photo_fly: case BBQuests::photo_swim: case BBQuests::photo_canyon: case BBQuests::photo_coastal: case BBQuests::photo_polar: case BBQuests::photo_savanna:
@@ -410,9 +414,7 @@ bool process_and_do_quest(const ProgramInfo& info, ConsoleHandle& console, BotBa
             quest_completed = true;
         }
 
-        //Ignore the quest this time if it keeps failing
-        //Make configurable?
-        if (quest_attempts > 3) {
+        if (quest_attempts > BBQ_OPTIONS.NUM_RETRIES) {
             console.log("Failed to complete a quest multiple times. Skipping.", COLOR_RED);
             break;
         }
@@ -584,78 +586,8 @@ void quest_tera_self_defeat(const ProgramInfo& info, ConsoleHandle& console, Bot
         pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
         throw ProgramFinishedException();
     } else {
-        //Tera and kill.
-        AdvanceDialogWatcher lost(COLOR_YELLOW);
-        OverworldWatcher overworld(COLOR_RED);
-        WallClock start = current_time();
-        uint8_t switch_party_slot = 1;
-        bool first_turn = true;
-
-        int ret2 = run_until(
-            console, context,
-            [&](BotBaseContext& context){
-                while(true){
-                    if (current_time() - start > std::chrono::minutes(5)){
-                        console.log("Timed out during battle after 5 minutes.", COLOR_RED);
-                        throw OperationFailedException(
-                            ErrorReport::SEND_ERROR_REPORT, console,
-                            "Timed out during battle after 5 minutes.",
-                            true
-                        );
-                    }
-
-                    if (first_turn) {
-                        console.log("Turn 1: Tera.");
-                        //Open move menu
-                        pbf_press_button(context, BUTTON_A, 10, 50);
-                        pbf_wait(context, 100);
-                        context.wait_for_all_requests();
-
-                        pbf_press_button(context, BUTTON_R, 20, 50);
-                        pbf_press_button(context, BUTTON_A, 10, 50);
-
-                        first_turn = false;
-                    }
-
-                    NormalBattleMenuWatcher battle_menu(COLOR_MAGENTA);
-                    SwapMenuWatcher fainted(COLOR_RED);
-
-                    context.wait_for_all_requests();
-
-                    int ret3 = wait_until(
-                        console, context,
-                        std::chrono::seconds(90),
-                        { battle_menu, fainted }
-                    );
-                    switch (ret3){
-                    case 0:
-                        console.log("Detected battle menu. Pressing A to attack...");
-                        pbf_mash_button(context, BUTTON_A, 3 * TICKS_PER_SECOND);
-                        context.wait_for_all_requests();
-                        break;
-                    case 1:
-                        console.log("Detected fainted Pokemon. Switching to next living Pokemon...");
-                        if (fainted.move_to_slot(console, context, switch_party_slot)){
-                            pbf_mash_button(context, BUTTON_A, 3 * TICKS_PER_SECOND);
-                            context.wait_for_all_requests();
-                            switch_party_slot++;
-                        }
-                        break;
-                    default:
-                        console.log("Timed out during battle. Stuck, crashed, or took more than 90 seconds for a turn.", COLOR_RED);
-                        throw OperationFailedException(
-                            ErrorReport::SEND_ERROR_REPORT, console,
-                            "Timed out during battle. Stuck, crashed, or took more than 90 seconds for a turn.",
-                            true
-                        );
-                    }
-                }
-            },
-            { lost, overworld }
-        );
-        if (ret2 == 0) {
-            console.log("Lost battle. Mashing B.");
-        }
+        bool tera_self = true;
+        wild_battle_tera(info, console, context, tera_self);
     }
     pbf_press_button(context, BUTTON_PLUS, 20, 105);
     return_to_plaza(info, console, context);
@@ -900,62 +832,8 @@ void quest_wild_tera(const ProgramInfo& info, ConsoleHandle& console, BotBaseCon
         pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
         throw ProgramFinishedException();
     } else {
-        AdvanceDialogWatcher lost(COLOR_YELLOW);
-        OverworldWatcher overworld(COLOR_RED);
-        WallClock start = current_time();
-        uint8_t switch_party_slot = 1;
-
-        int ret2 = run_until(
-            console, context,
-            [&](BotBaseContext& context){
-                while(true){
-                    if (current_time() - start > std::chrono::minutes(5)){
-                        console.log("Timed out during battle after 5 minutes.", COLOR_RED);
-                        throw OperationFailedException(
-                            ErrorReport::SEND_ERROR_REPORT, console,
-                            "Timed out during battle after 5 minutes.",
-                            true
-                        );
-                    }
-                    NormalBattleMenuWatcher battle_menu(COLOR_MAGENTA);
-                    SwapMenuWatcher fainted(COLOR_RED);
-
-                    context.wait_for_all_requests();
-
-                    int ret3 = wait_until(
-                        console, context,
-                        std::chrono::seconds(90),
-                        { battle_menu, fainted }
-                    );
-                    switch (ret3){
-                    case 0:
-                        console.log("Detected battle menu. Pressing A to attack...");
-                        pbf_mash_button(context, BUTTON_A, 3 * TICKS_PER_SECOND);
-                        context.wait_for_all_requests();
-                        break;
-                    case 1:
-                        console.log("Detected fainted Pokemon. Switching to next living Pokemon...");
-                        if (fainted.move_to_slot(console, context, switch_party_slot)){
-                            pbf_mash_button(context, BUTTON_A, 3 * TICKS_PER_SECOND);
-                            context.wait_for_all_requests();
-                            switch_party_slot++;
-                        }
-                        break;
-                    default:
-                        console.log("Timed out during battle. Stuck, crashed, or took more than 90 seconds for a turn.", COLOR_RED);
-                        throw OperationFailedException(
-                            ErrorReport::SEND_ERROR_REPORT, console,
-                            "Timed out during battle. Stuck, crashed, or took more than 90 seconds for a turn.",
-                            true
-                        );
-                    }
-                }
-            },
-            { lost, overworld }
-        );
-        if (ret2 == 0) {
-            console.log("Lost battle. Mashing B.");
-        }
+        bool tera_self = false;
+        wild_battle_tera(info, console, context, tera_self);
     }
     return_to_plaza(info, console, context);
 
@@ -1002,98 +880,89 @@ void quest_wash_pokemon(const ProgramInfo& info, ConsoleHandle& console, BotBase
 
     picnic_from_overworld(info, console, context);
 
-    //Wait until Wash appears
+    WallClock start = current_time();
     WhiteButtonWatcher wash_button(COLOR_BLUE, WhiteButton::ButtonX, {0.027, 0.548, 0.022, 0.032});
-    int ret = wait_until(
-        console, context,
-        std::chrono::seconds(60),
-        { wash_button }
-    );
-    if (ret == 0){
-        console.log("Wash button found!");
-        pbf_mash_button(context, BUTTON_X, 150);
-        pbf_wait(context, 200);
+    WhiteButtonWatcher wash_exit_button(COLOR_BLUE, WhiteButton::ButtonB, {0.027, 0.923, 0.021, 0.033});
+    WhiteButtonWatcher shower_switch(COLOR_BLUE, WhiteButton::ButtonY, {0.486, 0.870, 0.027, 0.045});
+    bool rinsed_once = false;
+    while (!rinsed_once) {
         context.wait_for_all_requests();
-
-        //Check if we've entered wash
-        WhiteButtonWatcher wash_exit_button(COLOR_BLUE, WhiteButton::ButtonB, {0.027, 0.923, 0.021, 0.033});
-        int retE = wait_until(
-            console, context,
-            std::chrono::seconds(10),
-            { wash_exit_button }
-        );
-        if (retE == 0) {
-            WhiteButtonWatcher shower_switch(COLOR_BLUE, WhiteButton::ButtonY, {0.486, 0.870, 0.027, 0.045});
-            WallClock start = current_time();
-            console.log("Scrubbing.");
-            int ret2 = run_until(
-            console, context,
-            [&](BotBaseContext& context){
-                while (true) {
-                    if (current_time() - start > std::chrono::minutes(3)) {
-                        console.log("Failed to find rinse after 3 mins.", COLOR_RED);
-                        break;
-                    }
-                    ssf_press_button(context, BUTTON_A, 0, 200, 0);
-                    ssf_press_left_joystick(context, 0, 128, 0, 50);
-                    ssf_press_left_joystick(context, 255, 128, 50, 100);
-                    ssf_press_left_joystick(context, 0, 128, 150, 50);
-
-                    ssf_press_button(context, BUTTON_A, 0, 200, 0);
-                    ssf_press_left_joystick(context, 128, 0, 0, 50);
-                    ssf_press_left_joystick(context, 128, 255, 50, 100);
-                    ssf_press_left_joystick(context, 128, 0, 150, 50);
-                }
-                },
-                {{shower_switch}}
-            );
-            if (ret2 == 0) {
-                console.log("Rinse button found. Switching to rinse.");
-                pbf_press_button(context, BUTTON_Y, 40, 50);
-                
-                WhiteButtonWatcher rinse_done(COLOR_BLUE, WhiteButton::ButtonY, {0.028, 0.923, 0.020, 0.034});
-                WallClock start2 = current_time();
-
-                int ret3 = run_until(
-                    console, context,
-                    [&](BotBaseContext& context) {
-                        while (true) {
-                            if (current_time() - start > std::chrono::minutes(3)) {
-                                console.log("Failed to find rinse after 3 mins.", COLOR_RED);
-                                break;
-                            }
-                            ssf_press_button(context, BUTTON_A, 0, 200, 0);
-                            ssf_press_left_joystick(context, 0, 128, 0, 50);
-                            ssf_press_left_joystick(context, 255, 128, 50, 100);
-                            ssf_press_left_joystick(context, 0, 128, 150, 50);
-
-                            ssf_press_button(context, BUTTON_A, 0, 200, 0);
-                            ssf_press_left_joystick(context, 128, 0, 0, 50);
-                            ssf_press_left_joystick(context, 128, 255, 50, 100);
-                            ssf_press_left_joystick(context, 128, 0, 150, 50);
-                        }
-                    },
-                    { {rinse_done} }
-                );
-                if (ret3 == 0) {
-                    console.log("Shower completed successfully.");
-                }
-                else {
-                    console.log("Shower did not complete. Backing out.");
-                    pbf_press_button(context, BUTTON_B, 40, 50);
-                }
-            }
-            else {
-                console.log("Did not find shower switch. Backing out.");
-                pbf_press_button(context, BUTTON_B, 40, 50);
-            }
+        if (current_time() - start > std::chrono::minutes(3)) {
+            console.log("Failed to get to rinse after 3 minutes.", COLOR_RED);
+            break;
         }
-        else {
-            console.log("Pressed X but failed to enter wash.");
+        int ret = wait_until(
+            console, context, std::chrono::seconds(60),
+            {
+                wash_button,
+                shower_switch,
+                wash_exit_button,
+            }
+        );
+        switch (ret) {
+        case 0:
+            console.log("Wash button found!");
+            pbf_mash_button(context, BUTTON_X, 150);
+            pbf_wait(context, 200);
+            context.wait_for_all_requests();
+            break;
+        case 1:
+            console.log("Rinse button found. Switching to rinse.");
+            pbf_press_button(context, BUTTON_Y, 40, 50);
+            rinsed_once = true;
+            //Move slightly right, as the showerhead is at an angle
+            pbf_move_left_joystick(context, 255, 0, 30, 30);
+            context.wait_for_all_requests();
+            break;
+        case 2:
+            console.log("In wash. Scrubbing.");
+
+            ssf_press_button(context, BUTTON_A, 0, 200, 0);
+            ssf_press_left_joystick(context, 0, 128, 0, 50);
+            ssf_press_left_joystick(context, 255, 128, 50, 100);
+            ssf_press_left_joystick(context, 0, 128, 150, 50);
+
+            ssf_press_button(context, BUTTON_A, 0, 200, 0);
+            ssf_press_left_joystick(context, 128, 0, 0, 50);
+            ssf_press_left_joystick(context, 128, 255, 50, 100);
+            ssf_press_left_joystick(context, 128, 0, 150, 50);
+            pbf_wait(context, 400);
+            context.wait_for_all_requests();
+            break;
         }
     }
+
+    WhiteButtonWatcher rinse_done(COLOR_BLUE, WhiteButton::ButtonY, {0.028, 0.923, 0.020, 0.034});
+    WallClock start2 = current_time();
+    int ret3 = run_until(
+        console, context,
+        [&](BotBaseContext& context) {
+            while (true) {
+                if (current_time() - start2 > std::chrono::minutes(1)) {
+                    console.log("Failed to finish rinse after 1 minute.", COLOR_RED);
+                    break;
+                }
+                ssf_press_button(context, BUTTON_A, 0, 200, 0);
+                ssf_press_left_joystick(context, 0, 128, 0, 50);
+                ssf_press_left_joystick(context, 255, 128, 50, 100);
+                ssf_press_left_joystick(context, 0, 128, 150, 50);
+
+                ssf_press_button(context, BUTTON_A, 0, 200, 0);
+                ssf_press_left_joystick(context, 128, 0, 0, 50);
+                ssf_press_left_joystick(context, 128, 255, 50, 100);
+                ssf_press_left_joystick(context, 128, 0, 150, 50);
+                pbf_wait(context, 400);
+                context.wait_for_all_requests();
+            }
+        },
+        { {rinse_done} }
+    );
+    if (ret3 == 0) {
+        console.log("Shower completed successfully.");
+    }
     else {
-        console.log("Wash button not found. Exiting picnic.");
+        console.log("Shower did not complete. Backing out.");
+        pbf_press_button(context, BUTTON_B, 40, 50);
     }
 
     leave_picnic(info, console, context);
@@ -1166,6 +1035,77 @@ void quest_hatch_egg(const ProgramInfo& info, ConsoleHandle& console, BotBaseCon
 
     return_to_plaza(info, console, context);
     context.wait_for_all_requests();
+}
+
+void quest_sandwich(const ProgramInfo& info, AsyncDispatcher& dispatcher, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, BBQuests& current_quest) {
+    console.log("Quest: Make a singleplayer sandwich");
+
+    bool flavored = true;
+    //Polar Plaza - egg basket gets stuck under table in Savanna/Canyon Plaza
+    open_map_from_overworld(info, console, context);
+    pbf_move_left_joystick(context, 20, 25, 245, 20);
+    pbf_press_button(context, BUTTON_ZL, 40, 100);
+    fly_to_overworld_from_map(info, console, context);
+
+    picnic_from_overworld(info, console, context);
+
+    pbf_move_left_joystick(context, 128, 0, 30, 40);
+    context.wait_for_all_requests();
+
+    pbf_move_left_joystick(context, 128, 0, 70, 0);
+    enter_sandwich_recipe_list(info, console, context);
+    enter_custom_sandwich_mode(info, console, context);
+
+    std::map<std::string, uint8_t> fillings;
+    std::map<std::string, uint8_t> condiments;
+
+    //Avoiding Encounter Power
+    switch (current_quest) {
+    case BBQuests::sour_sandwich:
+        //Apple, Marmalade: Catch Flying 1, Item Drop Ice 1, Egg 1
+        fillings = {{"apple", (uint8_t)1}};
+        condiments = {{"marmalade", (uint8_t)1}};
+        break;
+    case BBQuests::sweet_sandwich:
+        //Apple, Butter: Egg 1, Item Drop Ice 1, Raid Steel 1
+        fillings = {{"apple", (uint8_t)1}};
+        condiments = {{"butter", (uint8_t)1}};
+        break;
+    case BBQuests::spicy_sandwich:
+        //Apple, Curry Powder: Raid Steel 1, Item Drop Ice 1, Teensy Flying 1
+        fillings = {{"apple", (uint8_t)1}};
+        condiments = {{"curry-powder", (uint8_t)1}};
+        break;
+    case BBQuests::salty_sandwich:
+        //Cheese, Salt: Exp Point Electric 1, Raid Normal 1, Catching Psychic 1
+        fillings = {{"cheese", (uint8_t)1}};
+        condiments = {{"salt", (uint8_t)1}};
+        break;
+    case BBQuests::bitter_sandwich:
+        //Watercress, Pepper: Item Drop Normal 1, Raid Power Flying 1, Exp Point Fighting 1
+        fillings = {{"watercress", (uint8_t)1}};
+        condiments = {{"pepper", (uint8_t)1}};
+        break;
+    case BBQuests::sandwich_three:
+        //Fried Fillet, Noodles, Rice, Chili Sauce: Huge Water 1, Raid Flying 1, Catching Normal 1
+        fillings = { {"fried-fillet", (uint8_t)1}, {"noodles", (uint8_t)1}, {"rice", (uint8_t)1} };
+        condiments = {{"chili-sauce", (uint8_t)1}};
+        flavored = false;
+        break;
+    }
+
+    if (flavored) {
+        make_bbq_flavored_sandwich(info, dispatcher, console, context, BBQ_OPTIONS.LANGUAGE, fillings, condiments);
+    }
+    else {
+        make_bbq_three_sandwich(info, dispatcher, console, context, BBQ_OPTIONS.LANGUAGE, fillings, condiments);
+    }
+
+    leave_picnic(info, console, context);
+
+    return_to_plaza(info, console, context);
+    context.wait_for_all_requests();
+
 }
 
 }

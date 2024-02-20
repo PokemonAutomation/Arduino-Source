@@ -37,7 +37,8 @@ void quest_catch_handle_battle(const ProgramInfo& info, ConsoleHandle& console, 
 void quest_catch(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, BBQuests& current_quest);
 
 
-
+//Handle battles for tera-self/defeat-wild-tera. Use first attack until victory.
+void wild_battle_tera(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, bool& tera_self);
 
 }
 }

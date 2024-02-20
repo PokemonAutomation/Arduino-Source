@@ -1036,6 +1036,64 @@ void run_sandwich_maker(ProgramEnvironment& env, ConsoleHandle& console, BotBase
     finish_sandwich_eating(env.program_info(), console, context);
 }
 
+void make_bbq_flavored_sandwich(const ProgramInfo& info, AsyncDispatcher& dispatcher, ConsoleHandle& console, BotBaseContext & context, Language language,
+    std::map<std::string, uint8_t>& fillings, std::map<std::string, uint8_t>& condiments) {
+    enter_custom_sandwich_mode(info, console, context);
+    add_sandwich_ingredients(dispatcher, console, context, language,
+        std::move(fillings), std::move(condiments));
+    build_great_peanut_butter_sandwich(info, dispatcher, console, context);
+    finish_sandwich_eating(info, console, context);
+}
+
+void make_bbq_three_sandwich(const ProgramInfo& info, AsyncDispatcher& dispatcher, ConsoleHandle& console, BotBaseContext & context, Language language,
+    std::map<std::string, uint8_t>& fillings, std::map<std::string, uint8_t>& condiments) {
+    enter_custom_sandwich_mode(info, console, context);
+    add_sandwich_ingredients(dispatcher, console, context, language,
+        std::move(fillings), std::move(condiments));
+
+    //Grabbed values from custom sandwich maker/great pb sandwich
+    const ImageFloatBox center_plate{ 0.455, 0.130, 0.090, 0.030 };
+    const ImageFloatBox left_plate{ 0.190, 0.136, 0.096, 0.031 };
+    const ImageFloatBox right_plate{ 0.715, 0.140, 0.108, 0.033 };
+
+    const ImageFloatBox sandwich_target_box_left  {0.386, 0.507, 0.060, 0.055};
+    const ImageFloatBox sandwich_target_box_middle{0.470, 0.507, 0.060, 0.055};
+    const ImageFloatBox sandwich_target_box_right {0.554, 0.507, 0.060, 0.055};
+
+    wait_for_initial_hand(info, console, context);
+    console.overlay().add_log("Start making sandwich", COLOR_WHITE);
+
+    //Place the ingredients
+    auto end_box = move_sandwich_hand(info, dispatcher, console, context, SandwichHandType::FREE, false, HAND_INITIAL_BOX, left_plate);
+    end_box = move_sandwich_hand(info, dispatcher, console, context, SandwichHandType::GRABBING, true, expand_box(end_box), sandwich_target_box_left);
+    end_box = move_sandwich_hand(info, dispatcher, console, context, SandwichHandType::FREE, false, {0, 0, 1.0, 1.0}, right_plate);
+    end_box = move_sandwich_hand(info, dispatcher, console, context, SandwichHandType::GRABBING, true, expand_box(end_box), sandwich_target_box_right);
+    end_box = move_sandwich_hand(info, dispatcher, console, context, SandwichHandType::FREE, false, {0, 0, 1.0, 1.0}, center_plate);
+    end_box = move_sandwich_hand(info, dispatcher, console, context, SandwichHandType::GRABBING, true, expand_box(end_box), sandwich_target_box_middle);
+
+    SandwichHandWatcher grabbing_hand(SandwichHandType::FREE, {0, 0, 1.0, 1.0});
+    int ret = wait_until(console, context, std::chrono::seconds(30), {grabbing_hand});
+    if (ret < 0){
+        throw OperationFailedException(
+            ErrorReport::SEND_ERROR_REPORT, console,
+            "make_bbq_three_sandwich(): Cannot detect grabing hand when waiting for upper bread.",
+            grabbing_hand.last_snapshot()
+        );
+    }
+
+    auto hand_box = hand_location_to_box(grabbing_hand.location());
+
+    end_box = move_sandwich_hand(info, dispatcher, console, context, SandwichHandType::GRABBING, false, expand_box(hand_box), center_plate);
+    pbf_mash_button(context, BUTTON_A, 125 * 5);
+
+    console.log("Hand end box " + box_to_string(end_box));
+    console.overlay().add_log("Built sandwich", COLOR_WHITE);
+
+    context.wait_for_all_requests();
+
+    finish_sandwich_eating(info, console, context);
+}
+
 }
 }
 }

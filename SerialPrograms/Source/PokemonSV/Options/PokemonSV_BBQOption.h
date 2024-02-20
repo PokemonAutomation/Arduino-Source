@@ -52,6 +52,8 @@ public:
     //For egg hatching quest
     SimpleIntegerOption<uint8_t> NUM_EGGS;
 
+    SimpleIntegerOption<uint8_t> NUM_RETRIES;
+
     BooleanCheckBoxOption FIX_TIME_WHEN_DONE;
 
 private:
