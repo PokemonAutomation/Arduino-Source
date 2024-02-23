@@ -56,6 +56,7 @@ BBQOption::BBQOption(OCR::LanguageOCROption* language_option)
         "<b>Hatch Quest - Number of Eggs:</b><br>Amount of eggs located in your current box. Skip egg hatching quest if no eggs.",
         LockMode::LOCK_WHILE_RUNNING, 30, 0, 30
     )
+    , CATCH_ON_WIN(true)
     , NUM_RETRIES(
         "<b>Number of Retries:</b><br>Reattempt a quest this many times if it fails.",
         LockMode::LOCK_WHILE_RUNNING, 3, 0, 10
@@ -74,6 +75,8 @@ BBQOption::BBQOption(OCR::LanguageOCROption* language_option)
     PA_ADD_OPTION(QUICKBALL);
     PA_ADD_OPTION(BALL_SELECT);
     PA_ADD_OPTION(NUM_EGGS);
+    PA_ADD_OPTION(BATTLE_AI);
+    PA_ADD_OPTION(CATCH_ON_WIN);
     PA_ADD_OPTION(NUM_RETRIES);
     PA_ADD_OPTION(FIX_TIME_WHEN_DONE);
 }

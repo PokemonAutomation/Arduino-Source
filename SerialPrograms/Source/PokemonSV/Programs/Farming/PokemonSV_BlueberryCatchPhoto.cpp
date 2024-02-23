@@ -31,6 +31,7 @@
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "PokemonSV/Inference/PokemonSV_BlueberryQuestDetector.h"
 #include "PokemonSV/Programs/Battles/PokemonSV_BasicCatcher.h"
+#include "PokemonSV/Programs/PokemonSV_Terarium.h"
 #include "PokemonSV_BlueberryQuests.h"
 
 #include<vector>
@@ -48,10 +49,7 @@ CameraAngle quest_photo_navi(const ProgramInfo& info, ConsoleHandle& console, Bo
             console.log("Photo: In-flight/Psychic");
 
             //Polar Rest Area - targeting Duosion fixed spawn
-            open_map_from_overworld(info, console, context);
-            pbf_move_left_joystick(context, 75, 0, 230, 20);
-            pbf_press_button(context, BUTTON_ZL, 40, 100);
-            fly_to_overworld_from_map(info, console, context);
+            central_to_polar_rest(info, console, context);
 
             pbf_press_button(context, BUTTON_L, 10, 50);
             pbf_move_left_joystick(context, 128, 0, 230, 20);
@@ -62,10 +60,7 @@ CameraAngle quest_photo_navi(const ProgramInfo& info, ConsoleHandle& console, Bo
             console.log("Photo: Swimming/Water/Polar");
 
             //Polar Outdoor Classroom 1 - fixed Horsea
-            open_map_from_overworld(info, console, context);
-            pbf_move_left_joystick(context, 0, 20, 150, 20);
-            pbf_press_button(context, BUTTON_ZL, 40, 100);
-            fly_to_overworld_from_map(info, console, context);
+            central_to_polar_class1(info, console, context);
 
             pbf_wait(context, 200);
             context.wait_for_all_requests();
@@ -80,10 +75,7 @@ CameraAngle quest_photo_navi(const ProgramInfo& info, ConsoleHandle& console, Bo
             console.log("Photo: Coastal/Grass/Dragon");
 
             //Coastal Plaza - Exeggutor-A
-            open_map_from_overworld(info, console, context);
-            pbf_move_left_joystick(context, 180, 0, 200, 20);
-            pbf_press_button(context, BUTTON_ZL, 40, 100);
-            fly_to_overworld_from_map(info, console, context);
+            central_to_coastal_plaza(info, console, context);
 
             pbf_move_left_joystick(context, 0, 115, 400, 20);
 
@@ -107,21 +99,12 @@ CameraAngle quest_photo_navi(const ProgramInfo& info, ConsoleHandle& console, Bo
             console.log("Photo: Canyon/Ghost/Ground");
 
             //Canyon Plaza - Golett
-            open_map_from_overworld(info, console, context);
-            pbf_move_left_joystick(context, 0, 255, 215, 20);
-            pbf_press_button(context, BUTTON_ZL, 40, 100);
-            fly_to_overworld_from_map(info, console, context);
+            central_to_canyon_plaza(info, console, context);
 
             pbf_move_left_joystick(context, 210, 128, 10, 20);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
-            //Jump, glide, fly
-            ssf_press_button(context, BUTTON_B, 0, 100);
-            ssf_press_button(context, BUTTON_B, 0, 20, 10);
-            ssf_press_button(context, BUTTON_B, 0, 20);
-            pbf_wait(context, 100);
-            context.wait_for_all_requests();
-            pbf_press_button(context, BUTTON_LCLICK, 50, 0);
+            jump_glide_fly(console, context);
 
             if (BBQ_OPTIONS.INVERTED_FLIGHT) {
                 pbf_move_left_joystick(context, 128, 255, 600, 250);
@@ -144,20 +127,12 @@ CameraAngle quest_photo_navi(const ProgramInfo& info, ConsoleHandle& console, Bo
             console.log("Photo: Normal/Fire");
 
             //Savanna Plaza - Pride Rock
-            open_map_from_overworld(info, console, context);
-            pbf_move_left_joystick(context, 165, 255, 180, 20);
-            pbf_press_button(context, BUTTON_ZL, 40, 100);
-            fly_to_overworld_from_map(info, console, context);
+            central_to_savanna_plaza(info, console, context);
 
             pbf_move_left_joystick(context, 255, 255, 10, 20);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
-            ssf_press_button(context, BUTTON_B, 0, 100);
-            ssf_press_button(context, BUTTON_B, 0, 20, 10);
-            ssf_press_button(context, BUTTON_B, 0, 20);
-            pbf_wait(context, 100);
-            context.wait_for_all_requests();
-            pbf_press_button(context, BUTTON_LCLICK, 50, 0);
+            jump_glide_fly(console, context);
 
             if (BBQ_OPTIONS.INVERTED_FLIGHT) {
                 pbf_move_left_joystick(context, 128, 255, 600, 250);
@@ -183,21 +158,12 @@ CameraAngle quest_photo_navi(const ProgramInfo& info, ConsoleHandle& console, Bo
             console.log("Photo: Bug/Rock");
 
             //Kleavor
-            open_map_from_overworld(info, console, context);
-            pbf_move_left_joystick(context, 0, 255, 215, 20);
-            pbf_press_button(context, BUTTON_ZL, 40, 100);
-            fly_to_overworld_from_map(info, console, context);
+            central_to_canyon_plaza(info, console, context);
 
             pbf_move_left_joystick(context, 205, 64, 20, 105);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
-            //Jump, glide, fly
-            ssf_press_button(context, BUTTON_B, 0, 100);
-            ssf_press_button(context, BUTTON_B, 0, 20, 10);
-            ssf_press_button(context, BUTTON_B, 0, 20);
-            pbf_wait(context, 100);
-            context.wait_for_all_requests();
-            pbf_press_button(context, BUTTON_LCLICK, 50, 0);
+            jump_glide_fly(console, context);
 
             if (BBQ_OPTIONS.INVERTED_FLIGHT) {
                 pbf_move_left_joystick(context, 128, 255, 1000, 250);
@@ -258,13 +224,7 @@ CameraAngle quest_photo_navi(const ProgramInfo& info, ConsoleHandle& console, Bo
             pbf_move_left_joystick(context, 0, 80, 10, 20);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
-            //Jump, glide, fly
-            ssf_press_button(context, BUTTON_B, 0, 100);
-            ssf_press_button(context, BUTTON_B, 0, 20, 10);
-            ssf_press_button(context, BUTTON_B, 0, 20);
-            pbf_wait(context, 100);
-            context.wait_for_all_requests();
-            pbf_press_button(context, BUTTON_LCLICK, 50, 0);
+            jump_glide_fly(console, context);
 
             if (BBQ_OPTIONS.INVERTED_FLIGHT) {
                 pbf_move_left_joystick(context, 128, 255, 2000, 250);
@@ -289,13 +249,7 @@ CameraAngle quest_photo_navi(const ProgramInfo& info, ConsoleHandle& console, Bo
             pbf_move_left_joystick(context, 0, 0, 10, 20);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
-            //Jump, glide, fly
-            ssf_press_button(context, BUTTON_B, 0, 100);
-            ssf_press_button(context, BUTTON_B, 0, 20, 10);
-            ssf_press_button(context, BUTTON_B, 0, 20);
-            pbf_wait(context, 100);
-            context.wait_for_all_requests();
-            pbf_press_button(context, BUTTON_LCLICK, 50, 0);
+            jump_glide_fly(console, context);
 
             if (BBQ_OPTIONS.INVERTED_FLIGHT) {
                 pbf_move_left_joystick(context, 128, 255, 1100, 250);
@@ -318,20 +272,12 @@ CameraAngle quest_photo_navi(const ProgramInfo& info, ConsoleHandle& console, Bo
             console.log("Photo: Dark/Fighting");
 
             //Savanna Plaza - Fly towards rim of Canyon Biome
-            open_map_from_overworld(info, console, context);
-            pbf_move_left_joystick(context, 165, 255, 180, 20);
-            pbf_press_button(context, BUTTON_ZL, 40, 100);
-            fly_to_overworld_from_map(info, console, context);
+            central_to_savanna_plaza(info, console, context);
 
             pbf_move_left_joystick(context, 255, 0, 10, 20);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
-            ssf_press_button(context, BUTTON_B, 0, 100);
-            ssf_press_button(context, BUTTON_B, 0, 20, 10);
-            ssf_press_button(context, BUTTON_B, 0, 20);
-            pbf_wait(context, 100);
-            context.wait_for_all_requests();
-            pbf_press_button(context, BUTTON_LCLICK, 50, 0);
+            jump_glide_fly(console, context);
 
             if (BBQ_OPTIONS.INVERTED_FLIGHT) {
                 pbf_move_left_joystick(context, 128, 255, 1500, 250);
@@ -464,21 +410,13 @@ void quest_catch_navi(const ProgramInfo& info, ConsoleHandle& console, BotBaseCo
             console.log("Catch: Any/Normal/Fire.");
 
             //Savanna Plaza - Pride Rock
-            open_map_from_overworld(info, console, context);
-            pbf_move_left_joystick(context, 165, 255, 180, 20);
-            pbf_press_button(context, BUTTON_ZL, 40, 100);
-            fly_to_overworld_from_map(info, console, context);
+            central_to_savanna_plaza(info, console, context);
 
             //pbf_move_left_joystick(context, 255, 255, 10, 20);
             pbf_move_left_joystick(context, 220, 255, 10, 20);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
-            ssf_press_button(context, BUTTON_B, 0, 100);
-            ssf_press_button(context, BUTTON_B, 0, 20, 10);
-            ssf_press_button(context, BUTTON_B, 0, 20);
-            pbf_wait(context, 100);
-            context.wait_for_all_requests();
-            pbf_press_button(context, BUTTON_LCLICK, 50, 0);
+            jump_glide_fly(console, context);
 
             if (BBQ_OPTIONS.INVERTED_FLIGHT) {
                 pbf_move_left_joystick(context, 130, 255, 600, 250);
@@ -512,10 +450,7 @@ void quest_catch_navi(const ProgramInfo& info, ConsoleHandle& console, BotBaseCo
         case BBQuests::catch_psychic:
             console.log("Catch: Psychic.");
             //Polar Rest Area - targeting Duosion fixed spawn
-            open_map_from_overworld(info, console, context);
-            pbf_move_left_joystick(context, 75, 0, 230, 20);
-            pbf_press_button(context, BUTTON_ZL, 40, 100);
-            fly_to_overworld_from_map(info, console, context);
+            central_to_polar_rest(info, console, context);
 
             pbf_press_button(context, BUTTON_L, 10, 50);
             pbf_move_left_joystick(context, 128, 0, 230, 20);
@@ -536,10 +471,7 @@ void quest_catch_navi(const ProgramInfo& info, ConsoleHandle& console, BotBaseCo
             console.log("Catch: Grass/Dragon");
 
             //Coastal Plaza - Exeggutor-A
-            open_map_from_overworld(info, console, context);
-            pbf_move_left_joystick(context, 180, 0, 200, 20);
-            pbf_press_button(context, BUTTON_ZL, 40, 100);
-            fly_to_overworld_from_map(info, console, context);
+            central_to_coastal_plaza(info, console, context);
 
             pbf_move_left_joystick(context, 0, 115, 400, 20);
 
@@ -569,21 +501,13 @@ void quest_catch_navi(const ProgramInfo& info, ConsoleHandle& console, BotBaseCo
             console.log("Catch: Ghost/Ground");
 
             //Canyon Plaza - Golett
-            open_map_from_overworld(info, console, context);
-            pbf_move_left_joystick(context, 0, 255, 215, 20);
-            pbf_press_button(context, BUTTON_ZL, 40, 100);
-            fly_to_overworld_from_map(info, console, context);
+            central_to_canyon_plaza(info, console, context);
 
             pbf_move_left_joystick(context, 210, 128, 10, 20);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
             //Jump, glide, fly
-            ssf_press_button(context, BUTTON_B, 0, 100);
-            ssf_press_button(context, BUTTON_B, 0, 20, 10);
-            ssf_press_button(context, BUTTON_B, 0, 20);
-            pbf_wait(context, 100);
-            context.wait_for_all_requests();
-            pbf_press_button(context, BUTTON_LCLICK, 50, 0);
+            jump_glide_fly(console, context);
 
             if (BBQ_OPTIONS.INVERTED_FLIGHT) {
                 pbf_move_left_joystick(context, 128, 255, 600, 250);
@@ -617,19 +541,11 @@ void quest_catch_navi(const ProgramInfo& info, ConsoleHandle& console, BotBaseCo
             console.log("Catch: Fairy");
 
             //Polar Plaza - Snubbull
-            open_map_from_overworld(info, console, context);
-            pbf_move_left_joystick(context, 20, 25, 245, 20);
-            pbf_press_button(context, BUTTON_ZL, 40, 100);
-            fly_to_overworld_from_map(info, console, context);
+            central_to_polar_plaza(info, console, context);
 
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
-            ssf_press_button(context, BUTTON_B, 0, 100);
-            ssf_press_button(context, BUTTON_B, 0, 20, 10);
-            ssf_press_button(context, BUTTON_B, 0, 20);
-            pbf_wait(context, 100);
-            context.wait_for_all_requests();
-            pbf_press_button(context, BUTTON_LCLICK, 50, 0);
+            jump_glide_fly(console, context);
 
             if (BBQ_OPTIONS.INVERTED_FLIGHT) {
                 pbf_move_left_joystick(context, 128, 255, 2100, 250);
@@ -663,13 +579,7 @@ void quest_catch_navi(const ProgramInfo& info, ConsoleHandle& console, BotBaseCo
             pbf_move_left_joystick(context, 0, 0, 10, 20);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
-            //Jump, glide, fly
-            ssf_press_button(context, BUTTON_B, 0, 100);
-            ssf_press_button(context, BUTTON_B, 0, 20, 10);
-            ssf_press_button(context, BUTTON_B, 0, 20);
-            pbf_wait(context, 100);
-            context.wait_for_all_requests();
-            pbf_press_button(context, BUTTON_LCLICK, 50, 0);
+            jump_glide_fly(console, context);
 
             if (BBQ_OPTIONS.INVERTED_FLIGHT) {
                 pbf_move_left_joystick(context, 128, 255, 1100, 250);
@@ -700,20 +610,12 @@ void quest_catch_navi(const ProgramInfo& info, ConsoleHandle& console, BotBaseCo
             console.log("Catch: Dark/Fighting");
 
             //Savanna Plaza - Fly towards rim of Canyon Biome
-            open_map_from_overworld(info, console, context);
-            pbf_move_left_joystick(context, 165, 255, 180, 20);
-            pbf_press_button(context, BUTTON_ZL, 40, 100);
-            fly_to_overworld_from_map(info, console, context);
+            central_to_savanna_plaza(info, console, context);
 
             pbf_move_left_joystick(context, 255, 0, 10, 20);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
-            ssf_press_button(context, BUTTON_B, 0, 100);
-            ssf_press_button(context, BUTTON_B, 0, 20, 10);
-            ssf_press_button(context, BUTTON_B, 0, 20);
-            pbf_wait(context, 100);
-            context.wait_for_all_requests();
-            pbf_press_button(context, BUTTON_LCLICK, 50, 0);
+            jump_glide_fly(console, context);
 
             if (BBQ_OPTIONS.INVERTED_FLIGHT) {
                 pbf_move_left_joystick(context, 128, 255, 1500, 250);
@@ -747,20 +649,12 @@ void quest_catch_navi(const ProgramInfo& info, ConsoleHandle& console, BotBaseCo
             break;
 
         case BBQuests::catch_bug: case BBQuests::catch_rock:
-            open_map_from_overworld(info, console, context);
-            pbf_move_left_joystick(context, 0, 255, 215, 20);
-            pbf_press_button(context, BUTTON_ZL, 40, 100);
-            fly_to_overworld_from_map(info, console, context);
+            central_to_canyon_plaza(info, console, context);
 
             pbf_move_left_joystick(context, 205, 64, 20, 105);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
-            ssf_press_button(context, BUTTON_B, 0, 100);
-            ssf_press_button(context, BUTTON_B, 0, 20, 10);
-            ssf_press_button(context, BUTTON_B, 0, 20);
-            pbf_wait(context, 100);
-            context.wait_for_all_requests();
-            pbf_press_button(context, BUTTON_LCLICK, 50, 0);
+            jump_glide_fly(console, context);
 
             if (BBQ_OPTIONS.INVERTED_FLIGHT) {
                 pbf_move_left_joystick(context, 128, 255, 1000, 250);

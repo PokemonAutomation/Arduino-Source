@@ -116,8 +116,8 @@ void BBQSoloFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
     uint64_t num_completed_quests = 0;
 
     //Test a specific quest
-    BBQuests test_quest = BBQuests::sandwich_three;
-    bool questTest = process_and_do_quest(env.program_info(), env.realtime_dispatcher(), env.console, context, BBQ_OPTIONS, test_quest, eggs_hatched);
+    BBQuests test_quest = BBQuests::tera_raid;
+    bool questTest = process_and_do_quest(env, env.program_info(), env.realtime_dispatcher(), env.console, context, BBQ_OPTIONS, test_quest, eggs_hatched);
     if (questTest) {
         env.log("Finished quest.");
     }
@@ -137,7 +137,7 @@ void BBQSoloFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
             quest_list = read_quests(env.program_info(), env.console, context, BBQ_OPTIONS);
             if (std::find(quest_list.begin(), quest_list.end(), current_quest) != quest_list.end()) {
                 env.log("Current quest exists on list. Doing quest.");
-                bool questSuccess = process_and_do_quest(env.program_info(), env.realtime_dispatcher(), env.console, context, BBQ_OPTIONS, current_quest, eggs_hatched);
+                bool questSuccess = process_and_do_quest(env, env.program_info(), env.realtime_dispatcher(), env.console, context, BBQ_OPTIONS, current_quest, eggs_hatched);
                 if (questSuccess) {
                     env.log("Quest completed successfully.");
                     num_completed_quests++;

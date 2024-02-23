@@ -37,7 +37,12 @@
 #include "PokemonSV/Programs/Boxes/PokemonSV_BoxRelease.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxEggDetector.h"
 #include "PokemonSV/Programs/Sandwiches/PokemonSV_SandwichRoutines.h"
+#include "PokemonSV/Programs/ShinyHunting/PokemonSV_LetsGoTools.h"
+#include "PokemonSV/Options/PokemonSV_EncounterBotCommon.h"
+#include "PokemonSV/Programs/TeraRaids/PokemonSV_TeraRoutines.h"
+#include "PokemonSV/Programs/TeraRaids/PokemonSV_TeraBattler.h"
 #include "PokemonSV/Programs/Farming/PokemonSV_BlueberryCatchPhoto.h"
+#include "PokemonSV/Programs/PokemonSV_Terarium.h"
 #include "PokemonSV_BlueberryQuests.h"
 
 #include<vector>
@@ -134,88 +139,6 @@ BBQuests BBQuests_string_to_enum(const std::string& token){
         return BBQuests::UnableToDetect;
     }
     return iter->second;
-}
-
-
-void return_to_plaza(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context) {
-    console.log("Return to plaza");
-    //Modified version of handle_battles_and_back_to_pokecenter()
-    bool returned_to_pokecenter = false;
-
-    while(!returned_to_pokecenter){
-        EncounterWatcher encounter_watcher(console, COLOR_RED);
-        int ret = run_until(
-            console, context,
-            [&](BotBaseContext& context){
-                //Exit any dialogs (ex. Cyrano upgrading BBQs)
-                OverworldWatcher overworld(COLOR_RED);
-                int ret_overworld = run_until(
-                    console, context,
-                    [&](BotBaseContext& context) {
-                        pbf_mash_button(context, BUTTON_B, 10000);
-                    },
-                    { overworld }
-                    );
-                if (ret_overworld == 0) {
-                    console.log("Overworld detected.");
-                }
-                context.wait_for_all_requests();
-
-                open_map_from_overworld(info, console, context);
-
-                //Move cursor to top left corner - even works when at Entrance fly point
-                pbf_press_button(context, BUTTON_ZL, 40, 100);
-                pbf_move_left_joystick(context, 0, 0, 500, 40);
-
-                //Now move toward center
-                pbf_move_left_joystick(context, 255, 255, 250, 40);
-                pbf_press_button(context, BUTTON_ZR, 40, 100);
-
-                try {
-                    //The only pokecenter on the map is Central Plaza
-                    fly_to_closest_pokecenter_on_map(info, console, context);
-                    context.wait_for_all_requests();
-                    returned_to_pokecenter = true;
-                }
-                catch(...) {
-                    console.log("Failed to return to Pokecenter. Closing map and retrying.");
-                }
-                context.wait_for_all_requests();
-            },
-            {
-                static_cast<VisualInferenceCallback&>(encounter_watcher),
-                static_cast<AudioInferenceCallback&>(encounter_watcher),
-            }
-        );
-        if (ret >= 0) {
-            console.log("Battle menu detected.");
-            encounter_watcher.throw_if_no_sound();
-
-            bool is_shiny = (bool)encounter_watcher.shiny_screenshot();
-            if (is_shiny) {
-                console.log("Shiny detected!");
-                pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
-                throw ProgramFinishedException();
-            }
-            else {
-                console.log("Detected battle. Running from battle.");
-                try{
-                    //Smoke Ball or Flying type required due to Arena Trap
-                    NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
-                    battle_menu.move_to_slot(console, context, 3);
-                    pbf_press_button(context, BUTTON_A, 10, 50);
-                }catch (...){
-                    console.log("Unable to flee.");
-                    throw OperationFailedException(
-                        ErrorReport::SEND_ERROR_REPORT, console,
-                        "Unable to flee!",
-                        true
-                    );
-                }
-            }
-        }
-    }
-    context.wait_for_all_requests();
 }
 
 int read_BP(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context) {
@@ -353,7 +276,7 @@ std::vector<BBQuests> process_quest_list(const ProgramInfo& info, ConsoleHandle&
     return quests_to_do;
 }
 
-bool process_and_do_quest(const ProgramInfo& info, AsyncDispatcher& dispatcher, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, BBQuests& current_quest, uint8_t& eggs_hatched) {
+bool process_and_do_quest(ProgramEnvironment& env, const ProgramInfo& info, AsyncDispatcher& dispatcher, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, BBQuests& current_quest, uint8_t& eggs_hatched) {
     bool quest_completed = false;
     int quest_attempts = 0;
 
@@ -382,6 +305,12 @@ bool process_and_do_quest(const ProgramInfo& info, AsyncDispatcher& dispatcher, 
             break;
         case BBQuests::bitter_sandwich: case BBQuests::salty_sandwich: case BBQuests::sour_sandwich: case BBQuests::spicy_sandwich: case BBQuests::sweet_sandwich: case BBQuests::sandwich_three:
             quest_sandwich(info, dispatcher, console, context, BBQ_OPTIONS, current_quest);
+            break;
+        case BBQuests::pickup_10:
+            quest_pickup(env, info, console, context, BBQ_OPTIONS);
+            break;
+        case BBQuests::tera_raid:
+            quest_tera_raid(env, console, context, BBQ_OPTIONS);
             break;
         //All involve taking pictures
         case BBQuests::photo_fly: case BBQuests::photo_swim: case BBQuests::photo_canyon: case BBQuests::photo_coastal: case BBQuests::photo_polar: case BBQuests::photo_savanna:
@@ -529,22 +458,12 @@ void quest_tera_self_defeat(const ProgramInfo& info, ConsoleHandle& console, Bot
     int ret = run_until(
         console, context,
         [&](BotBaseContext& context) {
-
-            open_map_from_overworld(info, console, context);
-            pbf_move_left_joystick(context, 0, 255, 215, 20);
-            pbf_press_button(context, BUTTON_ZL, 40, 100);
-            fly_to_overworld_from_map(info, console, context);
+            central_to_canyon_plaza(info, console, context);
 
             pbf_move_left_joystick(context, 205, 64, 20, 105);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
-            //Jump, glide, fly
-            ssf_press_button(context, BUTTON_B, 0, 100);
-            ssf_press_button(context, BUTTON_B, 0, 20, 10);
-            ssf_press_button(context, BUTTON_B, 0, 20);
-            pbf_wait(context, 100);
-            context.wait_for_all_requests();
-            pbf_press_button(context, BUTTON_LCLICK, 50, 0);
+            jump_glide_fly(console, context);
 
             if (BBQ_OPTIONS.INVERTED_FLIGHT) {
                 pbf_move_left_joystick(context, 128, 255, 1000, 250);
@@ -628,20 +547,12 @@ void quest_sneak_up(const ProgramInfo& info, ConsoleHandle& console, BotBaseCont
         console, context,
         [&](BotBaseContext& context) {
             //Savanna Plaza - Pride Rock
-            open_map_from_overworld(info, console, context);
-            pbf_move_left_joystick(context, 165, 255, 180, 20);
-            pbf_press_button(context, BUTTON_ZL, 40, 100);
-            fly_to_overworld_from_map(info, console, context);
+            central_to_savanna_plaza(info, console, context);
 
             pbf_move_left_joystick(context, 220, 255, 10, 20);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
-            ssf_press_button(context, BUTTON_B, 0, 100);
-            ssf_press_button(context, BUTTON_B, 0, 20, 10);
-            ssf_press_button(context, BUTTON_B, 0, 20);
-            pbf_wait(context, 100);
-            context.wait_for_all_requests();
-            pbf_press_button(context, BUTTON_LCLICK, 50, 0);
+            jump_glide_fly(console, context);
 
             if (BBQ_OPTIONS.INVERTED_FLIGHT) {
                 pbf_move_left_joystick(context, 130, 255, 600, 250);
@@ -761,21 +672,12 @@ void quest_wild_tera(const ProgramInfo& info, ConsoleHandle& console, BotBaseCon
         console, context,
         [&](BotBaseContext& context) {
             //Canyon Rest Area
-            open_map_from_overworld(info, console, context);
-            pbf_move_left_joystick(context, 0, 140, 160, 20);
-            pbf_press_button(context, BUTTON_ZL, 40, 100);
-            fly_to_overworld_from_map(info, console, context);
+            central_to_canyon_rest(info, console, context);
 
             pbf_move_left_joystick(context, 255, 180, 20, 105);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
-            //Jump, glide, fly
-            ssf_press_button(context, BUTTON_B, 0, 100);
-            ssf_press_button(context, BUTTON_B, 0, 20, 10);
-            ssf_press_button(context, BUTTON_B, 0, 20);
-            pbf_wait(context, 100);
-            context.wait_for_all_requests();
-            pbf_press_button(context, BUTTON_LCLICK, 50, 0);
+            jump_glide_fly(console, context);
 
             if (BBQ_OPTIONS.INVERTED_FLIGHT) {
                 pbf_move_left_joystick(context, 128, 255, 50, 250);
@@ -869,10 +771,7 @@ void quest_wash_pokemon(const ProgramInfo& info, ConsoleHandle& console, BotBase
     console.log("Quest: Give your pokemon a bath!");
 
     //Fly to savanna plaza
-    open_map_from_overworld(info, console, context);
-    pbf_move_left_joystick(context, 165, 255, 180, 20);
-    pbf_press_button(context, BUTTON_ZL, 40, 100);
-    fly_to_overworld_from_map(info, console, context);
+    central_to_savanna_plaza(info, console, context);
 
     //Turn around, open picnic
     pbf_move_left_joystick(context, 128, 255, 20, 50);
@@ -975,10 +874,7 @@ void quest_hatch_egg(const ProgramInfo& info, ConsoleHandle& console, BotBaseCon
     console.log("Quest: Hatch an Egg");
 
     //Fly to Savanna Plaza and navigate to the battle court
-    open_map_from_overworld(info, console, context);
-    pbf_move_left_joystick(context, 165, 255, 180, 20);
-    pbf_press_button(context, BUTTON_ZL, 40, 100);
-    fly_to_overworld_from_map(info, console, context);
+    central_to_savanna_plaza(info, console, context);
 
     pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
     pbf_move_left_joystick(context, 128, 0, 500, 50);
@@ -1042,10 +938,7 @@ void quest_sandwich(const ProgramInfo& info, AsyncDispatcher& dispatcher, Consol
 
     bool flavored = true;
     //Polar Plaza - egg basket gets stuck under table in Savanna/Canyon Plaza
-    open_map_from_overworld(info, console, context);
-    pbf_move_left_joystick(context, 20, 25, 245, 20);
-    pbf_press_button(context, BUTTON_ZL, 40, 100);
-    fly_to_overworld_from_map(info, console, context);
+    central_to_polar_plaza(info, console, context);
 
     picnic_from_overworld(info, console, context);
 
@@ -1107,6 +1000,164 @@ void quest_sandwich(const ProgramInfo& info, AsyncDispatcher& dispatcher, Consol
     context.wait_for_all_requests();
 
 }
+
+void quest_pickup(ProgramEnvironment& env, const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS) {
+    //Canyon biome from central plaza
+    pbf_press_button(context, BUTTON_PLUS, 20, 105);
+    pbf_press_button(context, BUTTON_PLUS, 20, 105);
+    context.wait_for_all_requests();
+
+    pbf_move_left_joystick(context, 0, 0, 100, 20);
+    pbf_move_left_joystick(context, 128, 0, 150, 20);
+    pbf_move_left_joystick(context, 0, 128, 140, 20);
+    pbf_press_button(context, BUTTON_L, 20, 50);
+    pbf_move_left_joystick(context, 0, 128, 20, 50);
+    
+    pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
+
+    //Fly to avoid some walking npcs
+    jump_glide_fly(console, context);
+
+    pbf_wait(context, 300);
+    context.wait_for_all_requests();
+    pbf_press_button(context, BUTTON_B, 20, 50);
+    pbf_wait(context, 100);
+    context.wait_for_all_requests();
+    pbf_move_left_joystick(context, 128, 0, 200, 50);
+    pbf_wait(context, 800); //Wait for spawns
+    context.wait_for_all_requests();
+    pbf_press_button(context, BUTTON_PLUS, 20, 105);
+
+    LetsGoEncounterBotStats stats;
+    LetsGoEncounterBotTracker tracker(env, console, context, stats, BBQ_OPTIONS.LANGUAGE);
+
+    use_lets_go_to_clear_in_front(console, context, tracker, false, [&](BotBaseContext& context){
+        pbf_move_left_joystick(context, 128, 0, 200, 500);
+        pbf_press_button(context, BUTTON_L, 20, 50);
+    });
+    use_lets_go_to_clear_in_front(console, context, tracker, false, [&](BotBaseContext& context){
+        pbf_move_left_joystick(context, 128, 0, 200, 500);
+        pbf_press_button(context, BUTTON_L, 20, 50);
+    });
+    use_lets_go_to_clear_in_front(console, context, tracker, false, [&](BotBaseContext& context){
+        pbf_move_left_joystick(context, 128, 0, 200, 500);
+        pbf_press_button(context, BUTTON_L, 20, 50);
+    });
+    use_lets_go_to_clear_in_front(console, context, tracker, false, [&](BotBaseContext& context){
+        pbf_move_left_joystick(context, 128, 0, 200, 500);
+        pbf_press_button(context, BUTTON_L, 20, 50);
+    });
+    use_lets_go_to_clear_in_front(console, context, tracker, false, [&](BotBaseContext& context){
+        pbf_move_left_joystick(context, 128, 0, 200, 500);
+        pbf_press_button(context, BUTTON_L, 20, 50);
+    });
+
+}
+
+void quest_tera_raid(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS) {
+    bool started_tera_raid = false;
+    while (!started_tera_raid) {
+        EncounterWatcher encounter_watcher(console, COLOR_RED);
+        int ret = run_until(
+            console, context,
+            [&](BotBaseContext& context){
+                //Target is a tera raid crystal near the canyon plaza
+                console.log("Navigating to tera crystal.");
+
+                central_to_canyon_plaza(env.program_info(), console, context);
+
+                pbf_move_left_joystick(context, 0, 128, 375, 20);
+                pbf_press_button(context, BUTTON_L, 10, 50);
+                pbf_move_left_joystick(context, 0, 128, 100, 20);
+                pbf_press_button(context, BUTTON_L, 10, 50);
+
+                //Keep rolling until we get a raid
+                while (!open_raid(console, context)) {
+                    env.log("No Tera raid found.", COLOR_ORANGE);
+                    day_skip_from_overworld(console, context);
+                }
+                started_tera_raid = true;
+            },
+            {
+                static_cast<VisualInferenceCallback&>(encounter_watcher),
+                static_cast<AudioInferenceCallback&>(encounter_watcher),
+            }
+        );
+        if (ret >= 0) {
+            console.log("Battle menu detected.");
+            encounter_watcher.throw_if_no_sound();
+
+            bool is_shiny = (bool)encounter_watcher.shiny_screenshot();
+            if (is_shiny) {
+                console.log("Shiny detected!");
+                pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
+                throw ProgramFinishedException();
+            }
+            else {
+                console.log("Detected battle. Running from battle.");
+                try{
+                    NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
+                    battle_menu.move_to_slot(console, context, 3);
+                    pbf_press_button(context, BUTTON_A, 10, 50);
+                    press_Bs_to_back_to_overworld(env.program_info(), console, context);
+                    return_to_plaza(env.program_info(), console, context);
+                }catch (...){
+                    console.log("Unable to flee.");
+                    throw OperationFailedException(
+                        ErrorReport::SEND_ERROR_REPORT, console,
+                        "Unable to flee!",
+                        true
+                    );
+                }
+            }
+        }
+    }
+
+    //Swap to the second pokemon in your party
+    pbf_press_dpad(context, DPAD_DOWN, 10, 10);
+    pbf_press_dpad(context, DPAD_DOWN, 10, 10);
+    pbf_press_button(context, BUTTON_A, 20, 105);
+    context.wait_for(std::chrono::milliseconds(400));
+    move_box_cursor(env.program_info(), console, context, BoxCursorLocation::PARTY, 1, 0);
+    pbf_press_button(context, BUTTON_A, 20, 105);
+    pbf_press_button(context, BUTTON_A, 20, 105);
+    pbf_press_dpad(context, DPAD_UP, 10, 10);
+    pbf_mash_button(context, BUTTON_A, 250);
+
+    bool win = run_tera_battle(env, console, context, BBQ_OPTIONS.BATTLE_AI);
+    if (win) {
+        env.log("Won tera raid.");
+        if (!BBQ_OPTIONS.CATCH_ON_WIN.enabled()) {
+            exit_tera_win_without_catching(env.program_info(), console, context, 0);
+        }
+        else {
+            if (BBQ_OPTIONS.CATCH_ON_WIN.FIX_TIME_ON_CATCH) {
+                pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
+                home_to_date_time(context, false, false);
+                pbf_press_button(context, BUTTON_A, 20, 105);
+                pbf_press_button(context, BUTTON_A, 20, 105);
+                pbf_press_button(context, BUTTON_HOME, 20, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
+                resume_game_from_home(console, context);
+            }
+            exit_tera_win_by_catching(
+                env, console, context,
+                BBQ_OPTIONS.LANGUAGE,
+                BBQ_OPTIONS.CATCH_ON_WIN.BALL_SELECT.slug(),
+                0
+            );
+        }
+    }
+    else {
+        env.log("Lost tera raid.");
+        context.wait_for(std::chrono::seconds(3));
+    }
+
+    context.wait_for_all_requests();
+    return_to_plaza(env.program_info(), console, context);
+    day_skip_from_overworld(console, context);
+}
+
+
 
 }
 }

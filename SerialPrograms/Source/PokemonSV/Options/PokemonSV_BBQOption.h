@@ -15,6 +15,8 @@
 #include "CommonFramework/Options/LanguageOCROption.h"
 #include "PokemonSwSh/Options/PokemonSwSh_BallSelectOption.h"
 #include "PokemonSV/Options/PokemonSV_BattleMoveTable.h"
+#include "PokemonSV/Options/PokemonSV_TeraAIOption.h"
+#include "PokemonSV/Options/PokemonSV_TeraCatchOnWinOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -51,6 +53,10 @@ public:
 
     //For egg hatching quest
     SimpleIntegerOption<uint8_t> NUM_EGGS;
+
+    //Tera raid
+    TeraAIOption BATTLE_AI;
+    TeraFarmerCatchOnWin CATCH_ON_WIN;
 
     SimpleIntegerOption<uint8_t> NUM_RETRIES;
 

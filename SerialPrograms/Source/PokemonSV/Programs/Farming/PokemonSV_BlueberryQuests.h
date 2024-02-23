@@ -8,6 +8,8 @@
 #define PokemonAutomation_PokemonSV_BlueberryQuests_H
 
 #include<vector>
+#include "PokemonSV/Programs/ShinyHunting/PokemonSV_LetsGoTools.h"
+#include "PokemonSV/Options/PokemonSV_EncounterBotCommon.h"
 #include "PokemonSV/Options/PokemonSV_BBQOption.h"
 
 using namespace std;
@@ -62,7 +64,7 @@ const std::set<BBQuests> gold_quests = {
 
 //Quests that are not currently supported. Gold quests currently excluded as this is singleplayer only right now.
 const std::set<BBQuests> not_possible_quests = {
-    BBQuests::UnableToDetect, BBQuests::auto_10, BBQuests::pickup_10, BBQuests::auto_30, BBQuests::tera_raid
+    BBQuests::UnableToDetect, BBQuests::auto_10, BBQuests::auto_30, BBQuests::pickup_10
     
     //Temp
     , BBQuests::catch_fighting, BBQuests::catch_flying, BBQuests::catch_poison, BBQuests::catch_steel, 
@@ -71,11 +73,6 @@ const std::set<BBQuests> not_possible_quests = {
     BBQuests::photo_electric, BBQuests::photo_dark
 };
 
-
-
-
-// Return to Central Plaza from anywhere in the map.
-void return_to_plaza(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
 
 // Open the BBQ panel and read the current amount of BP
 int read_BP(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
@@ -90,7 +87,7 @@ std::vector<BBQuests> read_quests(const ProgramInfo& info, ConsoleHandle& consol
 std::vector<BBQuests> process_quest_list(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, std::vector<BBQuests>& quest_list, uint8_t& eggs_hatched);
 
 //Take the current quest and calls the function to do it, then checks the quest was successful. Returns true if so.
-bool process_and_do_quest(const ProgramInfo& info, AsyncDispatcher& dispatcher, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, BBQuests& current_quest, uint8_t& eggs_hatched);
+bool process_and_do_quest(ProgramEnvironment& env, const ProgramInfo& info, AsyncDispatcher& dispatcher, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, BBQuests& current_quest, uint8_t& eggs_hatched);
 
 //Iterate through TMs until a craftable one is found. Make the TM and return to position.
 void quest_make_tm(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
@@ -115,6 +112,12 @@ void quest_hatch_egg(const ProgramInfo& info, ConsoleHandle& console, BotBaseCon
 
 //Make a sandwich of type flavor
 void quest_sandwich(const ProgramInfo& info, AsyncDispatcher& dispatcher, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, BBQuests& current_quest);
+
+//Pick up 10 items off the ground
+void quest_pickup(ProgramEnvironment& env, const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS);
+
+//Complete a tera raid battle
+void quest_tera_raid(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS);
 
 }
 }
