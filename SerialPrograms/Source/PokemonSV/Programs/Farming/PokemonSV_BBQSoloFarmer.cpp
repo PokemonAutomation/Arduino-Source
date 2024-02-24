@@ -101,22 +101,13 @@ void BBQSoloFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
     //open_map_from_overworld(env.program_info(), env.console, context);
     //fly_to_overworld_from_map(env.program_info(), env.console, context);
 
-    /*
-    //Get initial BP - Not needed anymore, can handle most quests
-    //Check that BP was earned before saving
-    int starting_BP = read_BP(env.program_info(), env.console, context);
-    if (starting_BP < 100) {
-        env.log("Starting BP is low.");
-    }
-    */
-
     std::vector<BBQuests> quest_list; //all quests
     std::vector<BBQuests> quests_to_do; //do-able quests
     uint8_t eggs_hatched = 0; //Track eggs
     uint64_t num_completed_quests = 0;
 
     //Test a specific quest
-    BBQuests test_quest = BBQuests::tera_raid;
+    BBQuests test_quest = BBQuests::catch_dark;
     bool questTest = process_and_do_quest(env, env.program_info(), env.realtime_dispatcher(), env.console, context, BBQ_OPTIONS, test_quest, eggs_hatched);
     if (questTest) {
         env.log("Finished quest.");

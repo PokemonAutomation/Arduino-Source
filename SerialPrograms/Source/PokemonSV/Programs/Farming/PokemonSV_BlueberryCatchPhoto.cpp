@@ -104,21 +104,7 @@ CameraAngle quest_photo_navi(const ProgramInfo& info, ConsoleHandle& console, Bo
             pbf_move_left_joystick(context, 210, 128, 10, 20);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
-            jump_glide_fly(console, context);
-
-            if (BBQ_OPTIONS.INVERTED_FLIGHT) {
-                pbf_move_left_joystick(context, 128, 255, 600, 250);
-            }
-            else {
-                pbf_move_left_joystick(context, 128, 0, 600, 250);
-            }
-
-            pbf_wait(context, 250);
-            context.wait_for_all_requests();
-            pbf_press_button(context, BUTTON_B, 20, 50);
-
-            pbf_wait(context, 400);
-            context.wait_for_all_requests();
+            jump_glide_fly(console, context, BBQ_OPTIONS, 600, 250, 400);
 
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
@@ -132,21 +118,7 @@ CameraAngle quest_photo_navi(const ProgramInfo& info, ConsoleHandle& console, Bo
             pbf_move_left_joystick(context, 255, 255, 10, 20);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
-            jump_glide_fly(console, context);
-
-            if (BBQ_OPTIONS.INVERTED_FLIGHT) {
-                pbf_move_left_joystick(context, 128, 255, 600, 250);
-            }
-            else {
-                pbf_move_left_joystick(context, 128, 0, 600, 250);
-            }
-
-            pbf_wait(context, 400);
-            context.wait_for_all_requests();
-            pbf_press_button(context, BUTTON_B, 20, 50);
-
-            pbf_wait(context, 400);
-            context.wait_for_all_requests();
+            jump_glide_fly(console, context, BBQ_OPTIONS, 600, 400, 400);
 
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
             pbf_move_left_joystick(context, 255, 128, 10, 20);
@@ -163,20 +135,7 @@ CameraAngle quest_photo_navi(const ProgramInfo& info, ConsoleHandle& console, Bo
             pbf_move_left_joystick(context, 205, 64, 20, 105);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
-            jump_glide_fly(console, context);
-
-            if (BBQ_OPTIONS.INVERTED_FLIGHT) {
-                pbf_move_left_joystick(context, 128, 255, 1000, 250);
-            }
-            else {
-                pbf_move_left_joystick(context, 128, 0, 1000, 250);
-            }
-
-            pbf_wait(context, 1500);
-            context.wait_for_all_requests();
-            pbf_press_button(context, BUTTON_B, 50, 375);
-            pbf_wait(context, 300);
-            context.wait_for_all_requests();
+            jump_glide_fly(console, context, BBQ_OPTIONS, 1000, 1500, 300);
 
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
@@ -184,63 +143,18 @@ CameraAngle quest_photo_navi(const ProgramInfo& info, ConsoleHandle& console, Bo
         case BBQuests::photo_fairy:
             console.log("Photo: Fairy");
 
-            /*
-            //Polar Plaza - Snubbull (not the best area/target but not many fairies)
-            open_map_from_overworld(info, console, context);
-            pbf_move_left_joystick(context, 20, 25, 245, 20);
-            pbf_press_button(context, BUTTON_ZL, 40, 100);
-            fly_to_overworld_from_map(info, console, context);
-
-            pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
-
-            ssf_press_button(context, BUTTON_B, 0, 100);
-            ssf_press_button(context, BUTTON_B, 0, 20, 10);
-            ssf_press_button(context, BUTTON_B, 0, 20);
-            pbf_wait(context, 100);
-            context.wait_for_all_requests();
-            pbf_press_button(context, BUTTON_LCLICK, 50, 0);
-
-            if (BBQ_OPTIONS.INVERTED_FLIGHT) {
-                pbf_move_left_joystick(context, 128, 255, 2200, 250);
-            }
-            else {
-                pbf_move_left_joystick(context, 128, 0, 2200, 250);
-            }
-            //Overshoot and then turn around.
-            pbf_wait(context, 900);
-            context.wait_for_all_requests();
-            pbf_press_button(context, BUTTON_B, 20, 50);
-            pbf_wait(context, 200);
-            context.wait_for_all_requests();
-
-            pbf_move_left_joystick(context, 128, 255, 20, 50);
-            pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
-            //pbf_move_left_joystick(context, 110, 100, 20, 50);
-
-            //angle_camera_down = true;
-            */
-
             //Snubbull - Central plaza
             pbf_move_left_joystick(context, 0, 80, 10, 20);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
-            jump_glide_fly(console, context);
-
-            if (BBQ_OPTIONS.INVERTED_FLIGHT) {
-                pbf_move_left_joystick(context, 128, 255, 2000, 250);
-            }
-            else {
-                pbf_move_left_joystick(context, 128, 0, 2000, 250);
-            }
-
-            pbf_wait(context, 1500);
-            context.wait_for_all_requests();
-            pbf_press_button(context, BUTTON_B, 20, 50);
-
-            pbf_wait(context, 200);
-            context.wait_for_all_requests();
+            jump_glide_fly(console, context, BBQ_OPTIONS, 2000, 1500, 200);
 
             pbf_press_button(context, BUTTON_PLUS, 20, 105);
+
+            pbf_move_left_joystick(context, 255, 0, 10, 20);
+            pbf_press_button(context, BUTTON_L, 20, 50);
+
+            angle = CameraAngle::down;
             break;
         case BBQuests::photo_ice:
             console.log("Photo: Ice");
@@ -249,35 +163,38 @@ CameraAngle quest_photo_navi(const ProgramInfo& info, ConsoleHandle& console, Bo
             pbf_move_left_joystick(context, 0, 0, 10, 20);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
-            jump_glide_fly(console, context);
-
-            if (BBQ_OPTIONS.INVERTED_FLIGHT) {
-                pbf_move_left_joystick(context, 128, 255, 1100, 250);
-            }
-            else {
-                pbf_move_left_joystick(context, 128, 0, 1100, 250);
-            }
-
-            pbf_wait(context, 1700);
-            context.wait_for_all_requests();
-            pbf_press_button(context, BUTTON_B, 20, 50);
-
-            pbf_wait(context, 200);
-            context.wait_for_all_requests();
+            jump_glide_fly(console, context, BBQ_OPTIONS, 1100, 1700, 200);
 
             pbf_press_button(context, BUTTON_PLUS, 20, 105);
             pbf_move_left_joystick(context, 0, 128, 20, 50);
             pbf_press_button(context, BUTTON_L, 20, 50);
-        case BBQuests::photo_dark: case BBQuests::photo_fighting:
-            console.log("Photo: Dark/Fighting");
+        case BBQuests::photo_flying: case BBQuests::photo_dark:
+            console.log("Photo: Dark/Flying.");
 
+            central_to_savanna_plaza(info, console, context);
+
+            pbf_move_left_joystick(context, 255, 0, 10, 20);
+            pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
+
+            pbf_move_left_joystick(context, 128, 0, 550, 20);
+            pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
+
+            pbf_move_left_joystick(context, 128, 0, 150, 20);
+
+            pbf_move_left_joystick(context, 255, 128, 10, 20);
+
+            angle = CameraAngle::down;
+            break;
+        case BBQuests::photo_fighting:
+            console.log("Photo: Dark/Fighting");
+            //TODO
             //Savanna Plaza - Fly towards rim of Canyon Biome
             central_to_savanna_plaza(info, console, context);
 
             pbf_move_left_joystick(context, 255, 0, 10, 20);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
-            jump_glide_fly(console, context);
+            //jump_glide_fly(console, context);
 
             if (BBQ_OPTIONS.INVERTED_FLIGHT) {
                 pbf_move_left_joystick(context, 128, 255, 1500, 250);
@@ -416,20 +333,7 @@ void quest_catch_navi(const ProgramInfo& info, ConsoleHandle& console, BotBaseCo
             pbf_move_left_joystick(context, 220, 255, 10, 20);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
-            jump_glide_fly(console, context);
-
-            if (BBQ_OPTIONS.INVERTED_FLIGHT) {
-                pbf_move_left_joystick(context, 130, 255, 600, 250);
-            }
-            else {
-                pbf_move_left_joystick(context, 130, 0, 600, 250);
-            }
-
-            pbf_wait(context, 400);
-            context.wait_for_all_requests();
-            pbf_press_button(context, BUTTON_B, 20, 50);
-            pbf_wait(context, 400);
-            context.wait_for_all_requests();
+            jump_glide_fly(console, context, BBQ_OPTIONS, 600, 400, 400);
 
             pbf_press_button(context, BUTTON_PLUS, 20, 105);
             pbf_move_left_joystick(context, 255, 128, 20, 50);
@@ -507,21 +411,7 @@ void quest_catch_navi(const ProgramInfo& info, ConsoleHandle& console, BotBaseCo
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
             //Jump, glide, fly
-            jump_glide_fly(console, context);
-
-            if (BBQ_OPTIONS.INVERTED_FLIGHT) {
-                pbf_move_left_joystick(context, 128, 255, 600, 250);
-            }
-            else {
-                pbf_move_left_joystick(context, 128, 0, 600, 250);
-            }
-
-            pbf_wait(context, 300);
-            context.wait_for_all_requests();
-            pbf_press_button(context, BUTTON_B, 20, 50);
-
-            pbf_wait(context, 400);
-            context.wait_for_all_requests();
+            jump_glide_fly(console, context, BBQ_OPTIONS, 600, 300, 400);
 
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
@@ -540,38 +430,23 @@ void quest_catch_navi(const ProgramInfo& info, ConsoleHandle& console, BotBaseCo
         case BBQuests::catch_fairy:
             console.log("Catch: Fairy");
 
-            //Polar Plaza - Snubbull
-            central_to_polar_plaza(info, console, context);
-
+            //Snubbull - Central plaza
+            //Tested while snowing, seems fine?
+            pbf_move_left_joystick(context, 0, 80, 10, 20);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
-            jump_glide_fly(console, context);
+            jump_glide_fly(console, context, BBQ_OPTIONS, 2000, 1500, 200);
 
-            if (BBQ_OPTIONS.INVERTED_FLIGHT) {
-                pbf_move_left_joystick(context, 128, 255, 2100, 250);
-            }
-            else {
-                pbf_move_left_joystick(context, 128, 0, 2100, 250);
-            }
+            pbf_press_button(context, BUTTON_PLUS, 20, 105);
 
-            //Overshoot and then turn around.
-            pbf_wait(context, 900);
-            context.wait_for_all_requests();
-            pbf_press_button(context, BUTTON_B, 20, 50);
-            pbf_wait(context, 200);
-            context.wait_for_all_requests();
+            pbf_move_left_joystick(context, 255, 0, 10, 20);
+            pbf_press_button(context, BUTTON_L, 20, 50);
 
-            pbf_move_left_joystick(context, 128, 255, 20, 50);
-            pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
-
-            pbf_move_left_joystick(context, 128, 0, 50, 50);
-
-            ssf_press_button(context, BUTTON_ZR, 0, 400);
+            ssf_press_button(context, BUTTON_ZR, 0, 200);
             ssf_press_button(context, BUTTON_ZL, 100, 50);
             ssf_press_button(context, BUTTON_ZL, 150, 50);
 
-            pbf_wait(context, 300);
-            context.wait_for_all_requests();
+            break;
         case BBQuests::catch_ice:
             console.log("Catch: Ice");
 
@@ -579,22 +454,7 @@ void quest_catch_navi(const ProgramInfo& info, ConsoleHandle& console, BotBaseCo
             pbf_move_left_joystick(context, 0, 0, 10, 20);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
-            jump_glide_fly(console, context);
-
-            if (BBQ_OPTIONS.INVERTED_FLIGHT) {
-                pbf_move_left_joystick(context, 128, 255, 1100, 250);
-            }
-            else {
-                pbf_move_left_joystick(context, 128, 0, 1100, 250);
-            }
-
-            //pbf_wait(context, 1500); photo
-            pbf_wait(context, 1700);
-            context.wait_for_all_requests();
-            pbf_press_button(context, BUTTON_B, 20, 50);
-
-            pbf_wait(context, 200);
-            context.wait_for_all_requests();
+            jump_glide_fly(console, context, BBQ_OPTIONS, 1100, 1700, 200);
 
             pbf_press_button(context, BUTTON_PLUS, 20, 105);
             pbf_move_left_joystick(context, 0, 128, 20, 50);
@@ -606,16 +466,16 @@ void quest_catch_navi(const ProgramInfo& info, ConsoleHandle& console, BotBaseCo
 
             break;
 
-        case BBQuests::catch_dark: case BBQuests::catch_fighting:
+        case BBQuests::catch_fighting:
             console.log("Catch: Dark/Fighting");
-
+            //TODO
             //Savanna Plaza - Fly towards rim of Canyon Biome
             central_to_savanna_plaza(info, console, context);
 
             pbf_move_left_joystick(context, 255, 0, 10, 20);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
-            jump_glide_fly(console, context);
+            //jump_glide_fly(console, context);
 
             if (BBQ_OPTIONS.INVERTED_FLIGHT) {
                 pbf_move_left_joystick(context, 128, 255, 1500, 250);
@@ -649,25 +509,44 @@ void quest_catch_navi(const ProgramInfo& info, ConsoleHandle& console, BotBaseCo
             break;
 
         case BBQuests::catch_bug: case BBQuests::catch_rock:
+            console.log("Catch: Bug/Rock");
+
             central_to_canyon_plaza(info, console, context);
 
             pbf_move_left_joystick(context, 205, 64, 20, 105);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
-            jump_glide_fly(console, context);
+            jump_glide_fly(console, context, BBQ_OPTIONS, 1000, 1650, 500);
+            break;
+        case BBQuests::catch_dark: case BBQuests::catch_flying:
+            console.log("Catch: Dark/Flying.");
 
-            if (BBQ_OPTIONS.INVERTED_FLIGHT) {
-                pbf_move_left_joystick(context, 128, 255, 1000, 250);
-            }
-            else {
-                pbf_move_left_joystick(context, 128, 0, 1000, 250);
-            }
-            pbf_wait(context, 1650);
+            //Vullaby/Mandibuzz
+            central_to_savanna_plaza(info, console, context);
+
+            pbf_move_left_joystick(context, 255, 40, 10, 20);
+            pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
+
+            pbf_move_left_joystick(context, 128, 0, 500, 20);
+            pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
+
+            pbf_move_left_joystick(context, 255, 0, 10, 20);
+            pbf_press_button(context, BUTTON_L, 20, 50);
+
+            pbf_move_left_joystick(context, 128, 0, 200, 20);
+            pbf_press_button(context, BUTTON_L, 20, 50);
+
+            pbf_move_left_joystick(context, 0, 0, 10, 20);
+            pbf_press_button(context, BUTTON_L, 20, 50);
+
+            pbf_move_left_joystick(context, 128, 0, 100, 20);
+            pbf_wait(context, 400);
             context.wait_for_all_requests();
 
-            pbf_press_button(context, BUTTON_B, 50, 375);
-            pbf_wait(context, 500);
-            context.wait_for_all_requests();
+            ssf_press_button(context, BUTTON_ZR, 0, 200);
+            ssf_press_button(context, BUTTON_ZL, 100, 50);
+            ssf_press_button(context, BUTTON_ZL, 150, 50);
+
             break;
     }
 }

@@ -463,20 +463,8 @@ void quest_tera_self_defeat(const ProgramInfo& info, ConsoleHandle& console, Bot
             pbf_move_left_joystick(context, 205, 64, 20, 105);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
-            jump_glide_fly(console, context);
-
-            if (BBQ_OPTIONS.INVERTED_FLIGHT) {
-                pbf_move_left_joystick(context, 128, 255, 1000, 250);
-            }
-            else {
-                pbf_move_left_joystick(context, 128, 0, 1000, 250);
-            }
-
-            pbf_wait(context, 1650);
-            context.wait_for_all_requests();
-
             //Drop on top of Kleavor (plenty of Scyther in the area as well)
-            pbf_press_button(context, BUTTON_B, 50, 375);
+            jump_glide_fly(console, context, BBQ_OPTIONS, 1000, 1650, 300);
 
             NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
             int ret2 = wait_until(
@@ -552,20 +540,7 @@ void quest_sneak_up(const ProgramInfo& info, ConsoleHandle& console, BotBaseCont
             pbf_move_left_joystick(context, 220, 255, 10, 20);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
-            jump_glide_fly(console, context);
-
-            if (BBQ_OPTIONS.INVERTED_FLIGHT) {
-                pbf_move_left_joystick(context, 130, 255, 600, 250);
-            }
-            else {
-                pbf_move_left_joystick(context, 130, 0, 600, 250);
-            }
-
-            pbf_wait(context, 400);
-            context.wait_for_all_requests();
-            pbf_press_button(context, BUTTON_B, 20, 50);
-            pbf_wait(context, 400);
-            context.wait_for_all_requests();
+            jump_glide_fly(console, context, BBQ_OPTIONS, 600, 400, 400);
 
             pbf_press_button(context, BUTTON_PLUS, 20, 105);
             pbf_move_left_joystick(context, 255, 128, 20, 50);
@@ -677,21 +652,7 @@ void quest_wild_tera(const ProgramInfo& info, ConsoleHandle& console, BotBaseCon
             pbf_move_left_joystick(context, 255, 180, 20, 105);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
-            jump_glide_fly(console, context);
-
-            if (BBQ_OPTIONS.INVERTED_FLIGHT) {
-                pbf_move_left_joystick(context, 128, 255, 50, 250);
-            }
-            else {
-                pbf_move_left_joystick(context, 128, 0, 500, 250);
-            }
-
-            pbf_wait(context, 1300);
-            context.wait_for_all_requests();
-
-            pbf_press_button(context, BUTTON_B, 50, 375);
-            pbf_wait(context, 150);
-            context.wait_for_all_requests();
+            jump_glide_fly(console, context, BBQ_OPTIONS, 500, 1300, 150);
 
             //Skarmory is likely to attack but sometimes there is a different pokemon
             pbf_press_button(context, BUTTON_PLUS, 20, 105);
@@ -1016,7 +977,7 @@ void quest_pickup(ProgramEnvironment& env, const ProgramInfo& info, ConsoleHandl
     pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
     //Fly to avoid some walking npcs
-    jump_glide_fly(console, context);
+    //jump_glide_fly(console, context);
 
     pbf_wait(context, 300);
     context.wait_for_all_requests();
