@@ -68,10 +68,8 @@ const std::set<BBQuests> not_possible_quests = {
     
     //Temp
     , BBQuests::catch_fighting, BBQuests::catch_poison, BBQuests::catch_steel, 
-    BBQuests::catch_water, BBQuests::catch_electric
-    , BBQuests::photo_fighting, BBQuests::photo_poison, BBQuests::photo_steel,
-    BBQuests::photo_electric
-    , BBQuests::photo_fighting
+    BBQuests::catch_water
+    , BBQuests::photo_fighting, BBQuests::photo_poison, BBQuests::photo_steel
 };
 
 

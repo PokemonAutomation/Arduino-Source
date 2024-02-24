@@ -168,9 +168,12 @@ CameraAngle quest_photo_navi(const ProgramInfo& info, ConsoleHandle& console, Bo
             pbf_press_button(context, BUTTON_PLUS, 20, 105);
             pbf_move_left_joystick(context, 0, 128, 20, 50);
             pbf_press_button(context, BUTTON_L, 20, 50);
-        case BBQuests::photo_flying: case BBQuests::photo_dark:
-            console.log("Photo: Dark/Flying.");
 
+            break;
+        case BBQuests::photo_flying: case BBQuests::photo_dark:
+            console.log("Photo: Dark/Flying");
+
+            //Vullaby/Mandibuzz
             central_to_savanna_plaza(info, console, context);
 
             pbf_move_left_joystick(context, 255, 0, 10, 20);
@@ -185,45 +188,20 @@ CameraAngle quest_photo_navi(const ProgramInfo& info, ConsoleHandle& console, Bo
 
             angle = CameraAngle::down;
             break;
+        case BBQuests::photo_electric:
+            console.log("Photo: Electric");
+
+            //Electabuzz
+            central_to_canyon_rest(info, console, context);
+
+            pbf_move_left_joystick(context, 255, 255, 10, 20);
+            pbf_press_button(context, BUTTON_L, 20, 50);
+            pbf_move_left_joystick(context, 128, 0, 400, 20);
+
+            break;
         case BBQuests::photo_fighting:
-            console.log("Photo: Dark/Fighting");
-            //TODO
-            //Savanna Plaza - Fly towards rim of Canyon Biome
-            central_to_savanna_plaza(info, console, context);
+            console.log("Photo: Fighting");
 
-            pbf_move_left_joystick(context, 255, 0, 10, 20);
-            pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
-
-            //jump_glide_fly(console, context);
-
-            if (BBQ_OPTIONS.INVERTED_FLIGHT) {
-                pbf_move_left_joystick(context, 128, 255, 1500, 250);
-            }
-            else {
-                pbf_move_left_joystick(context, 128, 0, 1500, 250);
-            }
-
-            pbf_wait(context, 1900);
-            context.wait_for_all_requests();
-
-            pbf_move_left_joystick(context, 255, 128, 250, 20);
-            pbf_press_button(context, BUTTON_L, 20, 50);
-
-            pbf_wait(context, 300);
-            context.wait_for_all_requests();
-
-            pbf_press_button(context, BUTTON_B, 20, 50);
-            pbf_wait(context, 300);
-            context.wait_for_all_requests();
-
-            pbf_press_button(context, BUTTON_PLUS, 20, 105);
-            pbf_move_left_joystick(context, 0, 128, 10, 20);
-            pbf_press_button(context, BUTTON_L, 20, 50);
-            /*
-            pbf_move_left_joystick(context, 0, 0, 200, 20);
-            pbf_move_left_joystick(context, 128, 0, 200, 20);
-            pbf_press_button(context, BUTTON_L, 20, 50);
-            */
             break;
     }
 
@@ -302,7 +280,7 @@ void quest_photo(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
             else {
                 console.log("Detected battle. Running from battle.");
                 try{
-                    //Smoke Ball or Flying type required due to Arena Trap
+                    //Smoke Ball or Flying type required due to Arena Trap/Magnet Pull
                     NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
                     battle_menu.move_to_slot(console, context, 3);
                     pbf_press_button(context, BUTTON_A, 10, 50);
@@ -324,7 +302,7 @@ void quest_photo(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
 void quest_catch_navi(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, BBQuests& current_quest) {
     switch (current_quest) {
         case BBQuests::catch_any: case BBQuests::catch_normal: case BBQuests::catch_fire:
-            console.log("Catch: Any/Normal/Fire.");
+            console.log("Catch: Any/Normal/Fire");
 
             //Savanna Plaza - Pride Rock
             central_to_savanna_plaza(info, console, context);
@@ -343,16 +321,11 @@ void quest_catch_navi(const ProgramInfo& info, ConsoleHandle& console, BotBaseCo
             pbf_move_left_joystick(context, 0, 0, 20, 50);
             pbf_press_button(context, BUTTON_L, 20, 50);
 
-            ssf_press_button(context, BUTTON_ZR, 0, 200);
-            ssf_press_button(context, BUTTON_ZL, 100, 50);
-            ssf_press_button(context, BUTTON_ZL, 150, 50);
-
-            pbf_wait(context, 300);
-            context.wait_for_all_requests();
             break;
 
         case BBQuests::catch_psychic:
-            console.log("Catch: Psychic.");
+            console.log("Catch: Psychic");
+
             //Polar Rest Area - targeting Duosion fixed spawn
             central_to_polar_rest(info, console, context);
 
@@ -363,12 +336,6 @@ void quest_catch_navi(const ProgramInfo& info, ConsoleHandle& console, BotBaseCo
             pbf_press_button(context, BUTTON_L, 20, 50);
             pbf_move_left_joystick(context, 128, 0, 150, 20);
 
-            ssf_press_button(context, BUTTON_ZR, 0, 200);
-            ssf_press_button(context, BUTTON_ZL, 100, 50);
-            ssf_press_button(context, BUTTON_ZL, 150, 50);
-
-            pbf_wait(context, 300);
-            context.wait_for_all_requests();
             break;
 
         case BBQuests::catch_grass: case BBQuests::catch_dragon:
@@ -393,13 +360,6 @@ void quest_catch_navi(const ProgramInfo& info, ConsoleHandle& console, BotBaseCo
             pbf_wait(context, 200);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
-            ssf_press_button(context, BUTTON_ZR, 0, 200);
-            ssf_press_button(context, BUTTON_ZL, 100, 50);
-            ssf_press_button(context, BUTTON_ZL, 150, 50);
-
-            pbf_wait(context, 300);
-            context.wait_for_all_requests();
-
             break;
         case BBQuests::catch_ghost: case BBQuests::catch_ground:
             console.log("Catch: Ghost/Ground");
@@ -410,7 +370,6 @@ void quest_catch_navi(const ProgramInfo& info, ConsoleHandle& console, BotBaseCo
             pbf_move_left_joystick(context, 210, 128, 10, 20);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
-            //Jump, glide, fly
             jump_glide_fly(console, context, BBQ_OPTIONS, 600, 300, 400);
 
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
@@ -418,13 +377,6 @@ void quest_catch_navi(const ProgramInfo& info, ConsoleHandle& console, BotBaseCo
             pbf_move_left_joystick(context, 0, 0, 10, 20);
             pbf_press_button(context, BUTTON_L, 20, 50);
             pbf_move_left_joystick(context, 128, 0, 50, 20);
-
-            ssf_press_button(context, BUTTON_ZR, 0, 200);
-            ssf_press_button(context, BUTTON_ZL, 100, 50);
-            ssf_press_button(context, BUTTON_ZL, 150, 50);
-
-            pbf_wait(context, 300);
-            context.wait_for_all_requests();
 
             break;
         case BBQuests::catch_fairy:
@@ -442,15 +394,11 @@ void quest_catch_navi(const ProgramInfo& info, ConsoleHandle& console, BotBaseCo
             pbf_move_left_joystick(context, 255, 0, 10, 20);
             pbf_press_button(context, BUTTON_L, 20, 50);
 
-            ssf_press_button(context, BUTTON_ZR, 0, 200);
-            ssf_press_button(context, BUTTON_ZL, 100, 50);
-            ssf_press_button(context, BUTTON_ZL, 150, 50);
-
             break;
         case BBQuests::catch_ice:
             console.log("Catch: Ice");
 
-            //Start at central plaza, fly north-ish
+            //Snover: Start at central plaza, fly north-ish
             pbf_move_left_joystick(context, 0, 0, 10, 20);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
@@ -460,56 +408,15 @@ void quest_catch_navi(const ProgramInfo& info, ConsoleHandle& console, BotBaseCo
             pbf_move_left_joystick(context, 0, 128, 20, 50);
             pbf_press_button(context, BUTTON_L, 20, 50);
 
-            ssf_press_button(context, BUTTON_ZR, 0, 200);
-            ssf_press_button(context, BUTTON_ZL, 100, 50);
-            ssf_press_button(context, BUTTON_ZL, 150, 50);
-
             break;
 
         case BBQuests::catch_fighting:
-            console.log("Catch: Dark/Fighting");
-            //TODO
-            //Savanna Plaza - Fly towards rim of Canyon Biome
-            central_to_savanna_plaza(info, console, context);
+            console.log("Catch: Fighting");
 
-            pbf_move_left_joystick(context, 255, 0, 10, 20);
-            pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
-
-            //jump_glide_fly(console, context);
-
-            if (BBQ_OPTIONS.INVERTED_FLIGHT) {
-                pbf_move_left_joystick(context, 128, 255, 1500, 250);
-            }
-            else {
-                pbf_move_left_joystick(context, 128, 0, 1500, 250);
-            }
-
-            pbf_wait(context, 2800);
-            context.wait_for_all_requests();
-
-            /*
-            pbf_move_left_joystick(context, 255, 128, 250, 20);
-            pbf_press_button(context, BUTTON_L, 20, 50);
-            pbf_wait(context, 300);
-            context.wait_for_all_requests();
-            */
-
-            pbf_press_button(context, BUTTON_B, 20, 50);
-            pbf_wait(context, 300);
-            context.wait_for_all_requests();
-
-            pbf_press_button(context, BUTTON_PLUS, 20, 105);
-            //pbf_move_left_joystick(context, 0, 128, 10, 20);
-            //pbf_press_button(context, BUTTON_L, 20, 50);
-            /*
-            pbf_move_left_joystick(context, 0, 0, 200, 20);
-            pbf_move_left_joystick(context, 128, 0, 200, 20);
-            pbf_press_button(context, BUTTON_L, 20, 50);
-            */
             break;
 
-        case BBQuests::catch_bug: case BBQuests::catch_rock:
-            console.log("Catch: Bug/Rock");
+        case BBQuests::catch_bug:
+            console.log("Catch: Bug");
 
             central_to_canyon_plaza(info, console, context);
 
@@ -519,7 +426,7 @@ void quest_catch_navi(const ProgramInfo& info, ConsoleHandle& console, BotBaseCo
             jump_glide_fly(console, context, BBQ_OPTIONS, 1000, 1650, 500);
             break;
         case BBQuests::catch_dark: case BBQuests::catch_flying:
-            console.log("Catch: Dark/Flying.");
+            console.log("Catch: Dark/Flying");
 
             //Vullaby/Mandibuzz
             central_to_savanna_plaza(info, console, context);
@@ -543,12 +450,32 @@ void quest_catch_navi(const ProgramInfo& info, ConsoleHandle& console, BotBaseCo
             pbf_wait(context, 400);
             context.wait_for_all_requests();
 
-            ssf_press_button(context, BUTTON_ZR, 0, 200);
-            ssf_press_button(context, BUTTON_ZL, 100, 50);
-            ssf_press_button(context, BUTTON_ZL, 150, 50);
+            break;
+        case BBQuests::catch_rock: case BBQuests::catch_electric:
+            console.log("Catch: Rock/Electric");
+
+            //Geodude-A
+            pbf_press_button(context, BUTTON_L, 20, 50);
+            pbf_move_left_joystick(context, 70, 0, 10, 20);
+            pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
+
+            jump_glide_fly(console, context, BBQ_OPTIONS, 100, 550, 300);
+
+            pbf_press_button(context, BUTTON_PLUS, 20, 105);
+
+            //pbf_move_left_joystick(context, 255, 0, 10, 20);
 
             break;
     }
+
+    //Lock on and throw ball
+    ssf_press_button(context, BUTTON_ZR, 0, 200);
+    ssf_press_button(context, BUTTON_ZL, 100, 50);
+    ssf_press_button(context, BUTTON_ZL, 150, 50);
+
+    pbf_wait(context, 300);
+    context.wait_for_all_requests();
+
 }
 
 void quest_catch_handle_battle(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, BBQuests& current_quest) {
@@ -581,7 +508,7 @@ void quest_catch_handle_battle(const ProgramInfo& info, ConsoleHandle& console, 
                 }
                     
                 //Quick ball occurs before anything else in battle.
-                //Do not throw if target is a tera pokemon
+                //todo? Do not throw if target is a tera pokemon
                 if (BBQ_OPTIONS.QUICKBALL && !quickball_thrown) {
                     console.log("Quick Ball option checked. Throwing Quick Ball.");
                     BattleBallReader reader(console, BBQ_OPTIONS.LANGUAGE);
@@ -636,16 +563,6 @@ void quest_catch_handle_battle(const ProgramInfo& info, ConsoleHandle& console, 
                     context.wait_for_all_requests();
                 }
                 else {
-                    //if (tera_target) {
-
-
-
-                            
-                    //}
-
-
-
-
                     BattleBallReader reader(console, BBQ_OPTIONS.LANGUAGE);
                     std::string ball_reader = "";
                     WallClock start = current_time();
@@ -810,8 +727,6 @@ void quest_catch_handle_battle(const ProgramInfo& info, ConsoleHandle& console, 
 void quest_catch(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, BBQuests& current_quest) {
     EncounterWatcher encounter_watcher(console, COLOR_RED);
 
-    //bool tera_target = false;
-
     //Navigate to target and start battle
     int ret = run_until(
         console, context,
@@ -848,7 +763,6 @@ void quest_catch(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
     } else {
         quest_catch_handle_battle(info, console, context, BBQ_OPTIONS, current_quest);
     }
-    //pbf_press_button(context, BUTTON_PLUS, 20, 105);
     return_to_plaza(info, console, context);
 
     //Day skip and attempt to respawn fixed encounters

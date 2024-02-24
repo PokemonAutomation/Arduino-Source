@@ -84,7 +84,7 @@ void BBQSoloFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
     must have flying unlocked, must have completed the DLC storyline (caught turtle), this is needed for tera orb recharge and flying.
     for quests that cannot be done, reroll.
 
-    smoke ball or flying pokemon required in slot 1 in case of arena trap
+    smoke ball required in slot 1 in case of arena trap/magnet pull
     full party/more than one pokemon for washing pokemon/hatching egg
     first attack must be capable of killing all types (so no normal/fighting/etc in case of ghost/dark/etc.)
     first attack is used until ball menu detected when trying to catch wild tera pokemon
@@ -107,7 +107,7 @@ void BBQSoloFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
     uint64_t num_completed_quests = 0;
 
     //Test a specific quest
-    BBQuests test_quest = BBQuests::catch_dark;
+    BBQuests test_quest = BBQuests::catch_electric;
     bool questTest = process_and_do_quest(env, env.program_info(), env.realtime_dispatcher(), env.console, context, BBQ_OPTIONS, test_quest, eggs_hatched);
     if (questTest) {
         env.log("Finished quest.");
