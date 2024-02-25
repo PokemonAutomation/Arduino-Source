@@ -144,6 +144,10 @@ CameraAngle quest_photo_navi(const ProgramInfo& info, ConsoleHandle& console, Bo
             console.log("Photo: Fairy");
 
             //Snubbull - Central plaza
+            pbf_press_button(context, BUTTON_PLUS, 20, 105);
+            pbf_press_button(context, BUTTON_PLUS, 20, 105);
+            context.wait_for_all_requests();
+
             pbf_move_left_joystick(context, 0, 80, 10, 20);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
@@ -160,6 +164,10 @@ CameraAngle quest_photo_navi(const ProgramInfo& info, ConsoleHandle& console, Bo
             console.log("Photo: Ice");
 
             //Snover - Start at central plaza, fly north-ish
+            pbf_press_button(context, BUTTON_PLUS, 20, 105);
+            pbf_press_button(context, BUTTON_PLUS, 20, 105);
+            context.wait_for_all_requests();
+
             pbf_move_left_joystick(context, 0, 0, 10, 20);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
@@ -201,6 +209,41 @@ CameraAngle quest_photo_navi(const ProgramInfo& info, ConsoleHandle& console, Bo
             break;
         case BBQuests::photo_fighting:
             console.log("Photo: Fighting");
+
+            break;
+        case BBQuests::photo_poison:
+            console.log("Photo: Poison");
+
+            //Muk-A - area a bit laggy but consistently so
+            central_to_coastal_plaza(info, console, context);
+            pbf_move_left_joystick(context, 0, 128, 20, 50);
+
+            pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
+            jump_glide_fly(console, context, BBQ_OPTIONS, 1000, 1400, 300);
+
+            pbf_press_button(context, BUTTON_PLUS, 20, 105);
+
+            pbf_move_left_joystick(context, 128, 0, 150, 50);
+            pbf_move_left_joystick(context, 180, 0, 20, 50);
+            pbf_wait(context, 200); //Give it time to spawn/load.
+            context.wait_for_all_requests();
+
+            angle = CameraAngle::down;
+
+            break;
+        case BBQuests::photo_steel:
+            console.log("Photo: Steel");
+
+            //Dugtrio-A - area a bit laggy but should work most of the time
+            central_to_coastal_plaza(info, console, context);
+            pbf_move_left_joystick(context, 0, 128, 20, 50);
+
+            pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
+            jump_glide_fly(console, context, BBQ_OPTIONS, 200, 575, 200);
+
+            pbf_press_button(context, BUTTON_PLUS, 20, 105);
+            pbf_move_left_joystick(context, 0, 128, 20, 50);
+            pbf_press_button(context, BUTTON_L, 20, 50);
 
             break;
     }
@@ -463,7 +506,54 @@ void quest_catch_navi(const ProgramInfo& info, ConsoleHandle& console, BotBaseCo
 
             pbf_press_button(context, BUTTON_PLUS, 20, 105);
 
-            //pbf_move_left_joystick(context, 255, 0, 10, 20);
+            break;
+        case BBQuests::catch_steel:
+            console.log("Catch: Steel");
+
+            //Dugtrio-A - area a bit laggy but should work most of the time
+            central_to_coastal_plaza(info, console, context);
+            pbf_move_left_joystick(context, 0, 128, 20, 50);
+
+            pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
+            jump_glide_fly(console, context, BBQ_OPTIONS, 200, 575, 200);
+
+            pbf_press_button(context, BUTTON_PLUS, 20, 105);
+            pbf_move_left_joystick(context, 0, 128, 20, 50);
+            pbf_press_button(context, BUTTON_L, 20, 50);
+            pbf_move_left_joystick(context, 128, 0, 50, 50);
+
+            break;
+        case BBQuests::catch_poison:
+            console.log("Catch: Poison");
+
+            //Muk-A - area a bit laggy but consistently so
+            central_to_coastal_plaza(info, console, context);
+            pbf_move_left_joystick(context, 0, 128, 20, 50);
+
+            pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
+            jump_glide_fly(console, context, BBQ_OPTIONS, 1000, 1800, 300);
+
+            pbf_press_button(context, BUTTON_PLUS, 20, 105);
+
+            //Extra throws for this one
+            ssf_press_button(context, BUTTON_ZR, 0, 200);
+            ssf_press_button(context, BUTTON_ZL, 100, 50);
+            ssf_press_button(context, BUTTON_ZL, 150, 50);
+            pbf_wait(context, 200);
+            context.wait_for_all_requests();
+            pbf_press_button(context, BUTTON_ZR, 20, 50); //Withdraw pokemon
+
+            pbf_move_left_joystick(context, 255, 128, 20, 50);
+            pbf_press_button(context, BUTTON_L, 20, 50);
+            ssf_press_button(context, BUTTON_ZR, 0, 200);
+            ssf_press_button(context, BUTTON_ZL, 100, 50);
+            ssf_press_button(context, BUTTON_ZL, 150, 50);
+            pbf_wait(context, 200);
+            context.wait_for_all_requests();
+            pbf_press_button(context, BUTTON_ZR, 20, 50); //Withdraw pokemon
+
+            pbf_move_left_joystick(context, 128, 255, 50, 50);
+            pbf_press_button(context, BUTTON_L, 20, 50);
 
             break;
     }
