@@ -107,13 +107,18 @@ void BBQSoloFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
     uint64_t num_completed_quests = 0;
 
     //Test a specific quest
-    BBQuests test_quest = BBQuests::catch_poison;
-    bool questTest = process_and_do_quest(env, env.program_info(), env.realtime_dispatcher(), env.console, context, BBQ_OPTIONS, test_quest, eggs_hatched);
+    BBQuests test_quest = BBQuests::photo_fighting;
+    bool questTest = process_and_do_quest(env, env.realtime_dispatcher(), env.console, context, BBQ_OPTIONS, test_quest, eggs_hatched);
     if (questTest) {
         env.log("Finished quest.");
     }
 
     while (num_completed_quests < BBQ_OPTIONS.NUM_QUESTS) {
+        if (BBQ_OPTIONS.OUT_OF_EGGS == BBQOption::OOEggs::Stop && eggs_hatched >= BBQ_OPTIONS.NUM_EGGS) {
+            env.log("Stop when out of eggs selected. Stopping program.");
+            break;
+        }
+
         //Get and reroll quests until we can at least one
         while (quests_to_do.size() < 1) {
             quest_list = read_quests(env.program_info(), env.console, context, BBQ_OPTIONS);
@@ -128,12 +133,12 @@ void BBQSoloFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
             quest_list = read_quests(env.program_info(), env.console, context, BBQ_OPTIONS);
             if (std::find(quest_list.begin(), quest_list.end(), current_quest) != quest_list.end()) {
                 env.log("Current quest exists on list. Doing quest.");
-                bool questSuccess = process_and_do_quest(env, env.program_info(), env.realtime_dispatcher(), env.console, context, BBQ_OPTIONS, current_quest, eggs_hatched);
+                bool questSuccess = process_and_do_quest(env, env.realtime_dispatcher(), env.console, context, BBQ_OPTIONS, current_quest, eggs_hatched);
                 if (questSuccess) {
                     env.log("Quest completed successfully.");
-                    num_completed_quests++;
                     stats.questsCompleted++;
                     env.update_stats();
+                    num_completed_quests++;
                 }
                 else {
                     env.log("Quest did not complete successfully.");
@@ -142,9 +147,9 @@ void BBQSoloFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
             else {
                 //Note: This doesn't account for case such as "sneak up" being added and then completed alongside the next quest
                 env.log("Current quest does not exist on list. Quest completed at some point.");
-                num_completed_quests++;
                 stats.questsCompleted++;
                 env.update_stats();
+                num_completed_quests++;
             }
             quest_list.clear();
         }
@@ -157,6 +162,7 @@ void BBQSoloFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
             reset_game(env.program_info(), env.console, context);
             stats.saves++;
         }
+
         env.update_stats();
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
     }

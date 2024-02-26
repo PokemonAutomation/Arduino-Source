@@ -227,9 +227,49 @@ std::vector<BBQuests> process_quest_list(const ProgramInfo& info, ConsoleHandle&
             console.log("Quest not possible");
         }
         else {
-            //Check eggs remaining
-            if (n == BBQuests::hatch_egg && eggs_hatched < BBQ_OPTIONS.NUM_EGGS) {
+            //Check eggs remaining.
+            if (n == BBQuests::hatch_egg && eggs_hatched >= BBQ_OPTIONS.NUM_EGGS) {
                 console.log("Out of eggs! Quest not possible.");
+                if (BBQ_OPTIONS.OUT_OF_EGGS == BBQOption::OOEggs::Reroll) {
+                    console.log("Reroll selected. Rerolling Egg quest. New quest will be run in the next batch of quests.");
+                    //console.log("Warning: This does not handle/check being out of BP!", COLOR_RED);
+
+                    WhiteButtonWatcher right_panel(COLOR_BLUE, WhiteButton::ButtonB, {0.484, 0.117, 0.022, 0.037});
+                    int result = run_until(
+                        console, context,
+                        [&](BotBaseContext& context){
+                            for (int i = 0; i < 6; i++) {
+                                pbf_press_dpad(context, DPAD_RIGHT, 50, 20);
+                                pbf_wait(context, 200);
+                                context.wait_for_all_requests();
+                            }
+                        },
+                        {{ right_panel }}
+                    );
+                    if (result == 0){
+                        console.log("Found quest panel.");
+                    }
+                    context.wait_for_all_requests();
+                    
+                    pbf_press_button(context, BUTTON_A, 20, 50);
+                    pbf_press_button(context, BUTTON_A, 20, 50);
+                    pbf_wait(context, 100);
+                    context.wait_for_all_requests();
+
+                    press_Bs_to_back_to_overworld(info, console, context);
+                }
+                else if (BBQ_OPTIONS.OUT_OF_EGGS == BBQOption::OOEggs::KeepGoing) {
+                    console.log("Keep Going selected. Ignoring quest.");
+                }
+                else {
+                    //This case is handled in BBQSoloFarmer.
+                    console.log("OOEggs is Stop in process_quest_list().");
+                    throw OperationFailedException(
+                        ErrorReport::SEND_ERROR_REPORT, console,
+                        "OOEggs is Stop in process_quest_list().",
+                        true
+                    );
+                }
             }
             else {
                 console.log("Quest possible");
@@ -237,27 +277,19 @@ std::vector<BBQuests> process_quest_list(const ProgramInfo& info, ConsoleHandle&
             }
         }
     }
+
+    /*
+    Old logic that assumes most quests are not possible. Written when first starting on the program.
+    Should not be necessary anymore. Keeping around in case anyone wants to try making a multiplayer version.
+    
     //Check that quests_to_do is not empty (after completing all quests on the list, be sure to erase it.
     //Lag might be a problem in multi - look into making slots like menu-left navigation
     if (quests_to_do.size() == 0) {
         console.log("No possible quests! Rerolling all quests.");
-        WhiteButtonWatcher right_panel(COLOR_BLUE, WhiteButton::ButtonB, {0.484, 0.117, 0.022, 0.037});
-        int result = run_until(
-            console, context,
-            [&](BotBaseContext& context){
-                pbf_press_dpad(context, DPAD_RIGHT, 50, 20);
-                pbf_wait(context, 200);
-                context.wait_for_all_requests();
-            },
-            {{ right_panel }}
-        );
-        if (result == 0){
-            console.log("Found quest panel.");
-        }
-        context.wait_for_all_requests();
 
+        //Open quest panel - see above
         //Reroll all.
-        //TODO: This does not handle out of BP.
+        //This does not handle out of BP.
         for (int i = 0; i < quest_list.size(); i++) {
             pbf_press_button(context, BUTTON_A, 20, 50);
             pbf_press_button(context, BUTTON_A, 20, 50); //Yes.
@@ -267,47 +299,52 @@ std::vector<BBQuests> process_quest_list(const ProgramInfo& info, ConsoleHandle&
             pbf_wait(context, 100);
             context.wait_for_all_requests();
         }
+        //Close quest panel - mash b
+    }*/
 
-        //Close quest panel
-        pbf_mash_button(context, BUTTON_B, 100);
-        context.wait_for_all_requests();
+    if (quests_to_do.size() == 0) {
+        throw OperationFailedException(
+            ErrorReport::SEND_ERROR_REPORT, console,
+            "No possible quests! Check language selection.",
+            true
+        );
     }
 
     return quests_to_do;
 }
 
-bool process_and_do_quest(ProgramEnvironment& env, const ProgramInfo& info, AsyncDispatcher& dispatcher, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, BBQuests& current_quest, uint8_t& eggs_hatched) {
+bool process_and_do_quest(ProgramEnvironment& env, AsyncDispatcher& dispatcher, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, BBQuests& current_quest, uint8_t& eggs_hatched) {
     bool quest_completed = false;
     int quest_attempts = 0;
 
     while (!quest_completed) {
         switch (current_quest) {
         case BBQuests::make_tm:
-            quest_make_tm(info, console, context);
+            quest_make_tm(env.program_info(), console, context);
             break;
         case BBQuests::travel_500:
-            quest_travel_500(info, console, context);
+            quest_travel_500(env.program_info(), console, context);
             break;
         case BBQuests::tera_self_defeat:
-            quest_tera_self_defeat(info, console, context, BBQ_OPTIONS);
+            quest_tera_self_defeat(env.program_info(), console, context, BBQ_OPTIONS);
             break;
         case BBQuests::sneak_up:
-            quest_sneak_up(info, console, context, BBQ_OPTIONS);
+            quest_sneak_up(env.program_info(), console, context, BBQ_OPTIONS);
             break;
         case BBQuests::wild_tera:
-            quest_wild_tera(info, console, context, BBQ_OPTIONS);
+            quest_wild_tera(env.program_info(), console, context, BBQ_OPTIONS);
             break;
         case BBQuests::wash_pokemon:
-            quest_wash_pokemon(info, console, context);
+            quest_wash_pokemon(env.program_info(), console, context);
             break;
         case BBQuests::hatch_egg:
-            quest_hatch_egg(info, console, context, BBQ_OPTIONS);
+            quest_hatch_egg(env.program_info(), console, context, BBQ_OPTIONS);
             break;
         case BBQuests::bitter_sandwich: case BBQuests::salty_sandwich: case BBQuests::sour_sandwich: case BBQuests::spicy_sandwich: case BBQuests::sweet_sandwich: case BBQuests::sandwich_three:
-            quest_sandwich(info, dispatcher, console, context, BBQ_OPTIONS, current_quest);
+            quest_sandwich(env.program_info(), dispatcher, console, context, BBQ_OPTIONS, current_quest);
             break;
         case BBQuests::pickup_10:
-            quest_pickup(env, info, console, context, BBQ_OPTIONS);
+            quest_pickup(env, env.program_info(), console, context, BBQ_OPTIONS);
             break;
         case BBQuests::tera_raid:
             quest_tera_raid(env, console, context, BBQ_OPTIONS);
@@ -317,18 +354,18 @@ bool process_and_do_quest(ProgramEnvironment& env, const ProgramInfo& info, Asyn
         case BBQuests::photo_normal: case BBQuests::photo_fighting: case BBQuests::photo_flying: case BBQuests::photo_poison: case BBQuests::photo_ground:
         case BBQuests::photo_rock: case BBQuests::photo_bug: case BBQuests::photo_ghost: case BBQuests::photo_steel: case BBQuests::photo_fire: case BBQuests::photo_water:case BBQuests::photo_grass:
         case BBQuests::photo_electric: case BBQuests::photo_psychic: case BBQuests::photo_ice: case BBQuests::photo_dragon: case BBQuests::photo_dark: case BBQuests::photo_fairy:
-            quest_photo(info, console, context, BBQ_OPTIONS, current_quest);
+            quest_photo(env.program_info(), console, context, BBQ_OPTIONS, current_quest);
             break;
         //All involve catching a pokemon
         case BBQuests::catch_any: case BBQuests::catch_normal: case BBQuests::catch_fighting: case BBQuests::catch_flying: case BBQuests::catch_poison: case BBQuests::catch_ground:
         case BBQuests::catch_rock: case BBQuests::catch_bug: case BBQuests::catch_ghost: case BBQuests::catch_steel: case BBQuests::catch_fire: case BBQuests::catch_water:case BBQuests::catch_grass:
         case BBQuests::catch_electric: case BBQuests::catch_psychic: case BBQuests::catch_ice: case BBQuests::catch_dragon: case BBQuests::catch_dark: case BBQuests::catch_fairy:
-            quest_catch(info, console, context, BBQ_OPTIONS, current_quest);
+            quest_catch(env.program_info(), console, context, BBQ_OPTIONS, current_quest);
             break;
         }
 
         //Validate quest was completed by checking list
-        std::vector<BBQuests> quest_list = read_quests(info, console, context, BBQ_OPTIONS);
+        std::vector<BBQuests> quest_list = read_quests(env.program_info(), console, context, BBQ_OPTIONS);
         if (std::find(quest_list.begin(), quest_list.end(), current_quest) != quest_list.end()) {
             console.log("Current quest exists on list. Quest did not complete.");
             quest_attempts++;
@@ -344,7 +381,7 @@ bool process_and_do_quest(ProgramEnvironment& env, const ProgramInfo& info, Asyn
         }
 
         if (quest_attempts > BBQ_OPTIONS.NUM_RETRIES) {
-            console.log("Failed to complete a quest multiple times. Skipping.", COLOR_RED);
+            console.log("Failed to complete a quest multiple times. Skipping it for now.", COLOR_RED);
             break;
         }
     }
@@ -844,7 +881,7 @@ void quest_hatch_egg(const ProgramInfo& info, ConsoleHandle& console, BotBaseCon
     pbf_press_button(context, BUTTON_L, 20, 50);
 
     //Do this after navigating to prevent egg from hatchining enroute
-    //Enter box system, navigate to left box, find egg, swap it with first pokemon in party
+    //Enter box system, navigate to left box, find the first egg, swap it with first pokemon in party
     enter_box_system_from_overworld(info, console, context);
     context.wait_for(std::chrono::milliseconds(400));
     
@@ -871,27 +908,32 @@ void quest_hatch_egg(const ProgramInfo& info, ConsoleHandle& console, BotBaseCon
         }
     }
 
-    swap_two_box_slots(info, console, context,
-        BoxCursorLocation::SLOTS, row, col,
-        BoxCursorLocation::PARTY, 0, 0);
+    if (!egg_found) {
+        console.log("No egg found during egg hatching quest!", COLOR_RED);
+    }
+    else {
+        swap_two_box_slots(info, console, context,
+            BoxCursorLocation::SLOTS, row, col,
+            BoxCursorLocation::PARTY, 0, 0);
 
-    leave_box_system_to_overworld(info, console, context);
+        leave_box_system_to_overworld(info, console, context);
 
-    hatch_eggs_anywhere(info, console, context, true, 1);
+        hatch_eggs_anywhere(info, console, context, true, 1);
 
-    enter_box_system_from_overworld(info, console, context);
-    context.wait_for(std::chrono::milliseconds(400));
+        enter_box_system_from_overworld(info, console, context);
+        context.wait_for(std::chrono::milliseconds(400));
 
-    swap_two_box_slots(info, console, context,
-        BoxCursorLocation::PARTY, 0, 0,
-        BoxCursorLocation::SLOTS, row, col);
+        swap_two_box_slots(info, console, context,
+            BoxCursorLocation::PARTY, 0, 0,
+            BoxCursorLocation::SLOTS, row, col);
 
-    leave_box_system_to_overworld(info, console, context);
+        leave_box_system_to_overworld(info, console, context);
 
-    pbf_press_button(context, BUTTON_PLUS, 20, 50);
+        pbf_press_button(context, BUTTON_PLUS, 20, 50);
 
-    return_to_plaza(info, console, context);
-    context.wait_for_all_requests();
+        return_to_plaza(info, console, context);
+        context.wait_for_all_requests();
+    }
 }
 
 void quest_sandwich(const ProgramInfo& info, AsyncDispatcher& dispatcher, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, BBQuests& current_quest) {

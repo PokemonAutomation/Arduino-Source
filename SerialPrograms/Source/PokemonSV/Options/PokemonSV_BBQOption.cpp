@@ -53,8 +53,18 @@ BBQOption::BBQOption(OCR::LanguageOCROption* language_option)
         "ultra-ball"
     )
     , NUM_EGGS(
-        "<b>Hatch Quest - Number of Eggs:</b><br>Amount of eggs located in your current box. Skip egg hatching quest if no eggs.",
+        "<b>Hatch Quest - Number of Eggs:</b><br>Amount of eggs located in your current box.",
         LockMode::LOCK_WHILE_RUNNING, 30, 0, 30
+    )
+    , OUT_OF_EGGS(
+        "<b>Hatch Quest - Zero Eggs:</b><br>When out of eggs to hatch, do the selected option.",
+        {
+            {OOEggs::Stop,      "stop",         "Stop Program"},
+            {OOEggs::Reroll,    "reroll",       "Reroll Quest - Costs 50BP"},
+            {OOEggs::KeepGoing, "keep-going",   "Keep Going - Warning: Bonus(Red) quests will be blocked!"},
+        },
+        LockMode::LOCK_WHILE_RUNNING,
+        OOEggs::Stop
     )
     , CATCH_ON_WIN(true)
     , NUM_RETRIES(
@@ -75,6 +85,7 @@ BBQOption::BBQOption(OCR::LanguageOCROption* language_option)
     PA_ADD_OPTION(QUICKBALL);
     PA_ADD_OPTION(BALL_SELECT);
     PA_ADD_OPTION(NUM_EGGS);
+    PA_ADD_OPTION(OUT_OF_EGGS);
     PA_ADD_OPTION(BATTLE_AI);
     PA_ADD_OPTION(CATCH_ON_WIN);
     PA_ADD_OPTION(NUM_RETRIES);

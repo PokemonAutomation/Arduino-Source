@@ -39,6 +39,12 @@ private:
     std::unique_ptr<OCR::LanguageOCROption> m_language_owner;
 
 public:
+    enum class OOEggs {
+        Stop,
+        Reroll,
+        KeepGoing,
+    };
+
     OCR::LanguageOCROption& LANGUAGE;
 
     SimpleIntegerOption<uint64_t> NUM_QUESTS;
@@ -53,6 +59,7 @@ public:
 
     //For egg hatching quest
     SimpleIntegerOption<uint8_t> NUM_EGGS;
+    EnumDropdownOption<OOEggs> OUT_OF_EGGS;
 
     //Tera raid
     TeraAIOption BATTLE_AI;

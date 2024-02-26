@@ -210,6 +210,18 @@ CameraAngle quest_photo_navi(const ProgramInfo& info, ConsoleHandle& console, Bo
         case BBQuests::photo_fighting:
             console.log("Photo: Fighting");
 
+            //Hitmontop (TERA ICE) - Canyon Plaza or Classroom
+            central_to_canyon_plaza(info, console, context);
+            pbf_move_left_joystick(context, 0, 128, 400, 20);
+            pbf_press_button(context, BUTTON_L, 10, 50);
+            pbf_move_left_joystick(context, 0, 100, 20, 50);
+            pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
+
+            jump_glide_fly(console, context, BBQ_OPTIONS, 200, 500, 800);
+
+            pbf_press_button(context, BUTTON_PLUS, 20, 100);
+            context.wait_for_all_requests();
+
             break;
         case BBQuests::photo_poison:
             console.log("Photo: Poison");
@@ -456,6 +468,15 @@ void quest_catch_navi(const ProgramInfo& info, ConsoleHandle& console, BotBaseCo
         case BBQuests::catch_fighting:
             console.log("Catch: Fighting");
 
+            //Hitmontop (TERA ICE) - Canyon Plaza or Classroom
+            central_to_canyon_plaza(info, console, context);
+            pbf_move_left_joystick(context, 0, 128, 400, 20);
+            pbf_press_button(context, BUTTON_L, 10, 50);
+            pbf_move_left_joystick(context, 0, 100, 20, 50);
+            pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
+
+            jump_glide_fly(console, context, BBQ_OPTIONS, 200, 500, 800);
+
             break;
 
         case BBQuests::catch_bug:
@@ -576,6 +597,7 @@ void quest_catch_handle_battle(const ProgramInfo& info, ConsoleHandle& console, 
 
     uint8_t switch_party_slot = 1;
     bool quickball_thrown = false;
+    bool tera_target = false;
 
     int ret2 = run_until(
         console, context,
@@ -596,165 +618,188 @@ void quest_catch_handle_battle(const ProgramInfo& info, ConsoleHandle& console, 
                         true
                     );
                 }
-                    
-                //Quick ball occurs before anything else in battle.
-                //todo? Do not throw if target is a tera pokemon
-                if (BBQ_OPTIONS.QUICKBALL && !quickball_thrown) {
-                    console.log("Quick Ball option checked. Throwing Quick Ball.");
-                    BattleBallReader reader(console, BBQ_OPTIONS.LANGUAGE);
-                    std::string ball_reader = "";
-                    WallClock start = current_time();
+                
+                //Check for catch menu - if none it is a tera pokemon
+                console.log("Checking for ball menu.");
+                BattleBallReader exists(console, BBQ_OPTIONS.LANGUAGE);
+                std::string ball_exists = "";
 
-                    console.log("Opening ball menu...");
-                    while (ball_reader == "") {
-                        if (current_time() - start > std::chrono::minutes(2)) {
-                            console.log("Timed out trying to read ball after 2 minutes.", COLOR_RED);
-                            throw OperationFailedException(
-                                ErrorReport::SEND_ERROR_REPORT, console,
-                                "Timed out trying to read ball after 2 minutes.",
-                                true
-                            );
-                        }
+                pbf_press_button(context, BUTTON_X, 20, 100);
+                context.wait_for_all_requests();
 
-                        //Mash B to exit anything else
-                        pbf_mash_button(context, BUTTON_B, 125);
-                        context.wait_for_all_requests();
+                VideoSnapshot screen_ball = console.video().snapshot();
+                ball_exists = exists.read_ball(screen_ball);
 
-                        //Press X to open Ball menu
-                        pbf_press_button(context, BUTTON_X, 20, 100);
-                        context.wait_for_all_requests();
-
-                        VideoSnapshot screen = console.video().snapshot();
-                        ball_reader = reader.read_ball(screen);
-                    }
-
-                    console.log("Selecting Quick Ball.");
-                    int quantity = move_to_ball(reader, console, context, "quick-ball");
-                    if (quantity == 0) {
-                        //Stop so user can check they have quick balls.
-                        console.log("Unable to find Quick Ball on turn 1.");
-                        throw OperationFailedException(
-                            ErrorReport::SEND_ERROR_REPORT, console,
-                            "Unable to find Quick Ball on turn 1.",
-                            true
-                        );
-                    }
-                    if (quantity < 0) {
-                        console.log("Unable to read ball quantity.", COLOR_RED);
-                    }
-
-                    //Throw ball
-                    console.log("Throwing Quick Ball.");
-                    pbf_mash_button(context, BUTTON_A, 150);
+                if (ball_exists == "") {
+                    console.log("Could not find ball reader. Tera battle. Using first attack.");
+                    pbf_mash_button(context, BUTTON_B, 125);
                     context.wait_for_all_requests();
 
-                    quickball_thrown = true;
-                    pbf_mash_button(context, BUTTON_B, 900);
+                    pbf_mash_button(context, BUTTON_A, 300);
                     context.wait_for_all_requests();
+
+                    tera_target = true;
                 }
                 else {
-                    BattleBallReader reader(console, BBQ_OPTIONS.LANGUAGE);
-                    std::string ball_reader = "";
-                    WallClock start = current_time();
+                    //Quick ball occurs before anything else in battle.
+                    //Do not throw if target is a tera pokemon.
+                    if (BBQ_OPTIONS.QUICKBALL && !quickball_thrown && tera_target == false) {
+                        console.log("Quick Ball option checked. Throwing Quick Ball.");
+                        BattleBallReader reader(console, BBQ_OPTIONS.LANGUAGE);
+                        std::string ball_reader = "";
+                        WallClock start = current_time();
 
-                    console.log("Opening ball menu...");
-                    while (ball_reader == "") {
-                        if (current_time() - start > std::chrono::minutes(2)) {
-                            console.log("Timed out trying to read ball after 2 minutes.", COLOR_RED);
+                        console.log("Opening ball menu...");
+                        while (ball_reader == "") {
+                            if (current_time() - start > std::chrono::minutes(2)) {
+                                console.log("Timed out trying to read ball after 2 minutes.", COLOR_RED);
+                                throw OperationFailedException(
+                                    ErrorReport::SEND_ERROR_REPORT, console,
+                                    "Timed out trying to read ball after 2 minutes.",
+                                    true
+                                );
+                            }
+
+                            //Mash B to exit anything else
+                            pbf_mash_button(context, BUTTON_B, 125);
+                            context.wait_for_all_requests();
+
+                            //Press X to open Ball menu
+                            pbf_press_button(context, BUTTON_X, 20, 100);
+                            context.wait_for_all_requests();
+
+                            VideoSnapshot screen = console.video().snapshot();
+                            ball_reader = reader.read_ball(screen);
+                        }
+
+                        console.log("Selecting Quick Ball.");
+                        int quantity = move_to_ball(reader, console, context, "quick-ball");
+                        if (quantity == 0) {
+                            //Stop so user can check they have quick balls.
+                            console.log("Unable to find Quick Ball on turn 1.");
                             throw OperationFailedException(
                                 ErrorReport::SEND_ERROR_REPORT, console,
-                                "Timed out trying to read ball after 2 minutes.",
+                                "Unable to find Quick Ball on turn 1.",
                                 true
                             );
                         }
-
-                        //Mash B to exit anything else
-                        pbf_mash_button(context, BUTTON_B, 125);
-                        context.wait_for_all_requests();
-
-                        //Press X to open Ball menu
-                        pbf_press_button(context, BUTTON_X, 20, 100);
-                        context.wait_for_all_requests();
-
-                        VideoSnapshot screen = console.video().snapshot();
-                        ball_reader = reader.read_ball(screen);
-                    }
-
-                    console.log("Selecting ball.");
-                    int quantity = move_to_ball(reader, console, context, BBQ_OPTIONS.BALL_SELECT.slug());
-                    if (quantity == 0) {
-                        console.log("Unable to find appropriate ball/out of balls.");
-                        break;
-                    }
-                    if (quantity < 0) {
-                        console.log("Unable to read ball quantity.", COLOR_RED);
-                    }
-
-                    //Throw ball
-                    console.log("Throwing selected ball.");
-                    pbf_mash_button(context, BUTTON_A, 150);
-                    context.wait_for_all_requests();
-
-                    //Check for battle menu
-                    //If found use _fourth_ attack this turn!
-                    NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
-                    int ret = wait_until(
-                        console, context,
-                        std::chrono::seconds(4),
-                        { battle_menu }
-                    );
-                    if (ret == 0) {
-                        console.log("Battle menu detected early. Using fourth attack.");
-                        pbf_mash_button(context, BUTTON_A, 250);
-                        context.wait_for_all_requests();
-
-                        MoveSelectWatcher move_watcher(COLOR_BLUE);
-                        MoveSelectDetector move_select(COLOR_BLUE);
-
-                        int ret_move_select = run_until(
-                        console, context,
-                        [&](BotBaseContext& context) {
-                            pbf_press_button(context, BUTTON_A, 10, 50);
-                            pbf_wait(context, 100);
-                            context.wait_for_all_requests();
-                        },
-                        { move_watcher }
-                        );
-                        if (ret_move_select != 0) {
-                            console.log("Could not find move select.");
-                        }
-                        else {
-                            console.log("Move select found!");
+                        if (quantity < 0) {
+                            console.log("Unable to read ball quantity.", COLOR_RED);
                         }
 
-                        context.wait_for_all_requests();
-                        move_select.move_to_slot(console, context, 3);
+                        //Throw ball
+                        console.log("Throwing Quick Ball.");
                         pbf_mash_button(context, BUTTON_A, 150);
-                        pbf_wait(context, 100);
+                        context.wait_for_all_requests();
+
+                        quickball_thrown = true;
+                        pbf_mash_button(context, BUTTON_B, 900);
+                        context.wait_for_all_requests();
+                    }
+                    else {
+                        BattleBallReader reader(console, BBQ_OPTIONS.LANGUAGE);
+                        std::string ball_reader = "";
+                        WallClock start = current_time();
+
+                        console.log("Opening ball menu...");
+                        while (ball_reader == "") {
+                            if (current_time() - start > std::chrono::minutes(2)) {
+                                console.log("Timed out trying to read ball after 2 minutes.", COLOR_RED);
+                                throw OperationFailedException(
+                                    ErrorReport::SEND_ERROR_REPORT, console,
+                                    "Timed out trying to read ball after 2 minutes.",
+                                    true
+                                );
+                            }
+
+                            //Mash B to exit anything else
+                            pbf_mash_button(context, BUTTON_B, 125);
+                            context.wait_for_all_requests();
+
+                            //Press X to open Ball menu
+                            pbf_press_button(context, BUTTON_X, 20, 100);
+                            context.wait_for_all_requests();
+
+                            VideoSnapshot screen = console.video().snapshot();
+                            ball_reader = reader.read_ball(screen);
+                        }
+
+                        console.log("Selecting ball.");
+                        int quantity = move_to_ball(reader, console, context, BBQ_OPTIONS.BALL_SELECT.slug());
+                        if (quantity == 0) {
+                            console.log("Unable to find appropriate ball/out of balls.");
+                            break;
+                        }
+                        if (quantity < 0) {
+                            console.log("Unable to read ball quantity.", COLOR_RED);
+                        }
+
+                        //Throw ball
+                        console.log("Throwing selected ball.");
+                        pbf_mash_button(context, BUTTON_A, 150);
                         context.wait_for_all_requests();
 
                         //Check for battle menu
-                        //If found after a second, assume out of PP and stop as this is a setup issue
-                        //None of the target pokemon for this program have disable, taunt, etc.
-                        NormalBattleMenuWatcher battle_menu2(COLOR_YELLOW);
-                        int ret3 = wait_until(
+                        //If found use _fourth_ attack this turn!
+                        NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
+                        int ret = wait_until(
                             console, context,
                             std::chrono::seconds(4),
-                            { battle_menu2 }
+                            { battle_menu }
                         );
-                        if (ret3 == 0) {
-                            console.log("Battle menu detected early. Out of PP/No move in slot, please check your setup.");
-                            throw OperationFailedException(
-                                ErrorReport::SEND_ERROR_REPORT, console,
-                                "Battle menu detected early. Out of PP, please check your setup.",
-                                true
+                        if (ret == 0) {
+                            console.log("Battle menu detected early. Using fourth attack.");
+                            pbf_mash_button(context, BUTTON_A, 250);
+                            context.wait_for_all_requests();
+
+                            MoveSelectWatcher move_watcher(COLOR_BLUE);
+                            MoveSelectDetector move_select(COLOR_BLUE);
+
+                            int ret_move_select = run_until(
+                            console, context,
+                            [&](BotBaseContext& context) {
+                                pbf_press_button(context, BUTTON_A, 10, 50);
+                                pbf_wait(context, 100);
+                                context.wait_for_all_requests();
+                            },
+                            { move_watcher }
                             );
+                            if (ret_move_select != 0) {
+                                console.log("Could not find move select.");
+                            }
+                            else {
+                                console.log("Move select found!");
+                            }
+
+                            context.wait_for_all_requests();
+                            move_select.move_to_slot(console, context, 3);
+                            pbf_mash_button(context, BUTTON_A, 150);
+                            pbf_wait(context, 100);
+                            context.wait_for_all_requests();
+
+                            //Check for battle menu
+                            //If found after a second, assume out of PP and stop as this is a setup issue
+                            //None of the target pokemon for this program have disable, taunt, etc.
+                            NormalBattleMenuWatcher battle_menu2(COLOR_YELLOW);
+                            int ret3 = wait_until(
+                                console, context,
+                                std::chrono::seconds(4),
+                                { battle_menu2 }
+                            );
+                            if (ret3 == 0) {
+                                console.log("Battle menu detected early. Out of PP/No move in slot, please check your setup.");
+                                throw OperationFailedException(
+                                    ErrorReport::SEND_ERROR_REPORT, console,
+                                    "Battle menu detected early. Out of PP, please check your setup.",
+                                    true
+                                );
+                            }
                         }
-                    }
-                    else {
-                        //Wild pokemon's turn/wait for catch animation
-                        pbf_mash_button(context, BUTTON_B, 900);
-                        context.wait_for_all_requests();
+                        else {
+                            //Wild pokemon's turn/wait for catch animation
+                            pbf_mash_button(context, BUTTON_B, 900);
+                            context.wait_for_all_requests();
+                        }
                     }
                 }
 

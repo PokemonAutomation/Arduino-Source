@@ -67,9 +67,7 @@ const std::set<BBQuests> not_possible_quests = {
     BBQuests::UnableToDetect, BBQuests::auto_10, BBQuests::auto_30, BBQuests::pickup_10
     
     //Temp
-    , BBQuests::catch_fighting,
-    BBQuests::catch_water
-    , BBQuests::photo_fighting
+    , BBQuests::catch_water
 };
 
 
@@ -86,7 +84,7 @@ std::vector<BBQuests> read_quests(const ProgramInfo& info, ConsoleHandle& consol
 std::vector<BBQuests> process_quest_list(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, std::vector<BBQuests>& quest_list, uint8_t& eggs_hatched);
 
 //Take the current quest and calls the function to do it, then checks the quest was successful. Returns true if so.
-bool process_and_do_quest(ProgramEnvironment& env, const ProgramInfo& info, AsyncDispatcher& dispatcher, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, BBQuests& current_quest, uint8_t& eggs_hatched);
+bool process_and_do_quest(ProgramEnvironment& env, AsyncDispatcher& dispatcher, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, BBQuests& current_quest, uint8_t& eggs_hatched);
 
 //Iterate through TMs until a craftable one is found. Make the TM and return to position.
 void quest_make_tm(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
