@@ -77,25 +77,6 @@ BBQSoloFarmer::BBQSoloFarmer()
 void BBQSoloFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
     assert_16_9_720p_min(env.logger(), env.console);
     BBQSoloFarmer_Descriptor::Stats& stats = env.current_stats<BBQSoloFarmer_Descriptor::Stats>();
-
-    /*
-    start in the terarium at central plaza - we return to central plaza after every task
-    must have certain fly points unlocked
-    must have flying unlocked, must have completed the DLC storyline (caught turtle), this is needed for tera orb recharge and flying.
-    for quests that cannot be done, reroll.
-
-    smoke ball required in slot 1 in case of arena trap/magnet pull
-    full party/more than one pokemon for washing pokemon/hatching egg
-    first attack must be capable of killing all types (so no normal/fighting/etc in case of ghost/dark/etc.)
-    first attack is used until ball menu detected when trying to catch wild tera pokemon
-    last attack can be nonlethal for capture quests. not required though, not targeting anything with fly/bounce/etc.
-
-    handle out of bp rerolls? can't test this atm.
-
-    camera support OFF
-    camera controls regular
-    date and time unsynced as this relies heavily on date skipping
-    */
     
     //Fly to plaza
     //open_map_from_overworld(env.program_info(), env.console, context);
@@ -107,11 +88,13 @@ void BBQSoloFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
     uint64_t num_completed_quests = 0;
 
     //Test a specific quest
-    BBQuests test_quest = BBQuests::photo_fighting;
+    
+    BBQuests test_quest = BBQuests::catch_poison;
     bool questTest = process_and_do_quest(env, env.realtime_dispatcher(), env.console, context, BBQ_OPTIONS, test_quest, eggs_hatched);
     if (questTest) {
         env.log("Finished quest.");
     }
+    
 
     while (num_completed_quests < BBQ_OPTIONS.NUM_QUESTS) {
         if (BBQ_OPTIONS.OUT_OF_EGGS == BBQOption::OOEggs::Stop && eggs_hatched >= BBQ_OPTIONS.NUM_EGGS) {

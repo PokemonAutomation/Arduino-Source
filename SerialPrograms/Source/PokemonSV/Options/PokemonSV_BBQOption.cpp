@@ -66,6 +66,10 @@ BBQOption::BBQOption(OCR::LanguageOCROption* language_option)
         LockMode::LOCK_WHILE_RUNNING,
         OOEggs::Stop
     )
+    , FIX_TIME_FOR_HATCH(
+        "<b>Hatch Quest - Fix time for eggs:</b><br>Fix the time before hatching an egg.",
+        LockMode::UNLOCK_WHILE_RUNNING, false
+    )
     , CATCH_ON_WIN(true)
     , NUM_RETRIES(
         "<b>Number of Retries:</b><br>Reattempt a quest this many times if it fails.",
@@ -86,6 +90,7 @@ BBQOption::BBQOption(OCR::LanguageOCROption* language_option)
     PA_ADD_OPTION(BALL_SELECT);
     PA_ADD_OPTION(NUM_EGGS);
     PA_ADD_OPTION(OUT_OF_EGGS);
+    PA_ADD_OPTION(FIX_TIME_FOR_HATCH);
     PA_ADD_OPTION(BATTLE_AI);
     PA_ADD_OPTION(CATCH_ON_WIN);
     PA_ADD_OPTION(NUM_RETRIES);

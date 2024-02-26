@@ -573,8 +573,24 @@ void quest_catch_navi(const ProgramInfo& info, ConsoleHandle& console, BotBaseCo
             context.wait_for_all_requests();
             pbf_press_button(context, BUTTON_ZR, 20, 50); //Withdraw pokemon
 
-            pbf_move_left_joystick(context, 128, 255, 50, 50);
             pbf_press_button(context, BUTTON_L, 20, 50);
+            pbf_move_left_joystick(context, 255, 128, 20, 50);
+            pbf_press_button(context, BUTTON_L, 20, 50);
+
+            break;
+        case BBQuests::catch_water:
+            console.log("Catch: Water");
+
+            //Lapras - Tera Bug
+            central_to_polar_rest(info, console, context);
+            pbf_press_button(context, BUTTON_L, 10, 50);
+            pbf_move_left_joystick(context, 128, 0, 230, 20);
+            pbf_move_left_joystick(context, 0, 128, 300, 20);
+            pbf_press_button(context, BUTTON_L, 20, 50);
+            pbf_move_left_joystick(context, 20, 0, 20, 50);
+            pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
+
+            jump_glide_fly(console, context, BBQ_OPTIONS, 700, 1700, 300);
 
             break;
     }
@@ -749,7 +765,7 @@ void quest_catch_handle_battle(const ProgramInfo& info, ConsoleHandle& console, 
                         );
                         if (ret == 0) {
                             console.log("Battle menu detected early. Using fourth attack.");
-                            pbf_mash_button(context, BUTTON_A, 250);
+                            pbf_press_button(context, BUTTON_A, 10, 50);
                             context.wait_for_all_requests();
 
                             MoveSelectWatcher move_watcher(COLOR_BLUE);

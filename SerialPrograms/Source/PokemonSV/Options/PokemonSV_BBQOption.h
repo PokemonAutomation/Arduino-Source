@@ -60,6 +60,7 @@ public:
     //For egg hatching quest
     SimpleIntegerOption<uint8_t> NUM_EGGS;
     EnumDropdownOption<OOEggs> OUT_OF_EGGS;
+    BooleanCheckBoxOption FIX_TIME_FOR_HATCH;
 
     //Tera raid
     TeraAIOption BATTLE_AI;

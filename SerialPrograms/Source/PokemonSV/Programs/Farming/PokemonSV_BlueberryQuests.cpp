@@ -871,6 +871,16 @@ void quest_wash_pokemon(const ProgramInfo& info, ConsoleHandle& console, BotBase
 void quest_hatch_egg(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS) {
     console.log("Quest: Hatch an Egg");
 
+    //Fix time before hatching
+    if (BBQ_OPTIONS.FIX_TIME_FOR_HATCH) {
+        pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
+        home_to_date_time(context, false, false);
+        pbf_press_button(context, BUTTON_A, 20, 105);
+        pbf_press_button(context, BUTTON_A, 20, 105);
+        pbf_press_button(context, BUTTON_HOME, 20, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
+        resume_game_from_home(console, context);
+    }
+
     //Fly to Savanna Plaza and navigate to the battle court
     central_to_savanna_plaza(info, console, context);
 
