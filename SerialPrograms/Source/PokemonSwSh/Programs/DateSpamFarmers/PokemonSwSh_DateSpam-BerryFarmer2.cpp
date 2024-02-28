@@ -10,6 +10,7 @@
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
@@ -346,7 +347,8 @@ void BerryFarmer2::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         pbf_press_button(context, BUTTON_HOME, 10, 5);
         pbf_mash_button(context, BUTTON_B, GameSettings::instance().GAME_TO_HOME_DELAY_FAST - 15);
     }
-
+    VideoSnapshot screen = env.console.video().snapshot();
+    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH, "", screen);
 }
 }
 
