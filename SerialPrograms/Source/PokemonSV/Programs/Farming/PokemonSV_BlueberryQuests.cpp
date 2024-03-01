@@ -503,10 +503,17 @@ void quest_tera_self_defeat(const ProgramInfo& info, ConsoleHandle& console, Bot
             //Drop on top of Kleavor (plenty of Scyther in the area as well)
             jump_glide_fly(console, context, BBQ_OPTIONS, 1000, 1650, 300);
 
+            ssf_press_button(context, BUTTON_ZR, 0, 200);
+            ssf_press_button(context, BUTTON_ZL, 100, 50);
+            ssf_press_button(context, BUTTON_ZL, 150, 50);
+
+            pbf_wait(context, 300);
+            context.wait_for_all_requests();
+
             NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
             int ret2 = wait_until(
                 console, context,
-                std::chrono::seconds(45), //Enough time for Kleavor to notice and attack twice, sometimes it misses the first charge
+                std::chrono::seconds(15),
                 { battle_menu }
             );
             if (ret2 != 0) {
@@ -597,7 +604,7 @@ void quest_sneak_up(const ProgramInfo& info, ConsoleHandle& console, BotBaseCont
             NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
             int ret2 = wait_until(
                 console, context,
-                std::chrono::seconds(45),
+                std::chrono::seconds(15),
                 { battle_menu }
             );
             if (ret2 != 0) {
@@ -628,7 +635,6 @@ void quest_sneak_up(const ProgramInfo& info, ConsoleHandle& console, BotBaseCont
             [&](BotBaseContext& context) {
                 while (true) {
                     //Flee immediately. Keep trying to flee.
-                    //TODO: Add timer in case player gets stuck. Error out and check setup for smoke ball.
                     NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
                     int ret2 = wait_until(
                         console, context,
@@ -641,10 +647,10 @@ void quest_sneak_up(const ProgramInfo& info, ConsoleHandle& console, BotBaseCont
                         pbf_press_button(context, BUTTON_A, 10, 50);
                         break;
                     default:
-                        console.log("Invalid state ret2 run_battle.");
+                        console.log("Invalid state quest_sneak_up(). Smoke Ball equipped?");
                         throw OperationFailedException(
                             ErrorReport::SEND_ERROR_REPORT, console,
-                            "Invalid state ret2 run_battle.",
+                            "Invalid state quest_sneak_up(). Smoke Ball equipped?",
                             true
                         );
                     }
@@ -708,7 +714,7 @@ void quest_wild_tera(const ProgramInfo& info, ConsoleHandle& console, BotBaseCon
             NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
             int ret2 = wait_until(
                 console, context,
-                std::chrono::seconds(45),
+                std::chrono::seconds(15),
                 { battle_menu }
             );
             if (ret2 != 0) {
@@ -960,7 +966,6 @@ void quest_sandwich(const ProgramInfo& info, AsyncDispatcher& dispatcher, Consol
 
     pbf_move_left_joystick(context, 128, 0, 70, 0);
     enter_sandwich_recipe_list(info, console, context);
-    enter_custom_sandwich_mode(info, console, context);
 
     std::map<std::string, uint8_t> fillings;
     std::map<std::string, uint8_t> condiments;

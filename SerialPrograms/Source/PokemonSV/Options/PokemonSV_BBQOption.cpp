@@ -15,7 +15,7 @@ namespace PokemonSV{
 BBQOption::BBQOption(OCR::LanguageOCROption* language_option)
     : GroupOption(
         "Blueberry Quests",
-        LockMode::LOCK_WHILE_RUNNING,
+        LockMode::UNLOCK_WHILE_RUNNING,
         false, true
     )
     , m_language_owner(language_option == nullptr
@@ -44,7 +44,7 @@ BBQOption::BBQOption(OCR::LanguageOCROption* language_option)
     )
     , QUICKBALL(
         "<b>Catch Quest - Throw Quick Ball:</b><br>When attempting to catch a non-tera Pokemon, use a Quick Ball on the first turn.",
-        LockMode::LOCK_WHILE_RUNNING,
+        LockMode::UNLOCK_WHILE_RUNNING,
         true
     )
     , BALL_SELECT(
@@ -67,7 +67,7 @@ BBQOption::BBQOption(OCR::LanguageOCROption* language_option)
         OOEggs::Stop
     )
     , FIX_TIME_FOR_HATCH(
-        "<b>Hatch Quest - Fix time for eggs:</b><br>Fix the time before hatching an egg.",
+        "<b>Hatch Quest - Fix time for eggs:</b><br>Fix the time before doing a hatch egg quest.",
         LockMode::UNLOCK_WHILE_RUNNING, false
     )
     , CATCH_ON_WIN(true)

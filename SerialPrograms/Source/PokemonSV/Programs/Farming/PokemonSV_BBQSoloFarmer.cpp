@@ -79,8 +79,8 @@ void BBQSoloFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
     BBQSoloFarmer_Descriptor::Stats& stats = env.current_stats<BBQSoloFarmer_Descriptor::Stats>();
     
     //Fly to plaza
-    //open_map_from_overworld(env.program_info(), env.console, context);
-    //fly_to_overworld_from_map(env.program_info(), env.console, context);
+    open_map_from_overworld(env.program_info(), env.console, context);
+    fly_to_overworld_from_map(env.program_info(), env.console, context);
 
     std::vector<BBQuests> quest_list; //all quests
     std::vector<BBQuests> quests_to_do; //do-able quests
@@ -88,13 +88,13 @@ void BBQSoloFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
     uint64_t num_completed_quests = 0;
 
     //Test a specific quest
-    
-    BBQuests test_quest = BBQuests::catch_poison;
+    /*
+    BBQuests test_quest = BBQuests::catch_ground;
     bool questTest = process_and_do_quest(env, env.realtime_dispatcher(), env.console, context, BBQ_OPTIONS, test_quest, eggs_hatched);
     if (questTest) {
         env.log("Finished quest.");
     }
-    
+    */
 
     while (num_completed_quests < BBQ_OPTIONS.NUM_QUESTS) {
         if (BBQ_OPTIONS.OUT_OF_EGGS == BBQOption::OOEggs::Stop && eggs_hatched >= BBQ_OPTIONS.NUM_EGGS) {
@@ -139,7 +139,8 @@ void BBQSoloFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         //Clear out the todo list
         quests_to_do.clear();
 
-        if (BBQ_OPTIONS.SAVE_NUM_QUESTS != 0 && num_completed_quests % BBQ_OPTIONS.SAVE_NUM_QUESTS == 0) {
+        uint64_t temp_save_num_option = BBQ_OPTIONS.SAVE_NUM_QUESTS;
+        if (temp_save_num_option != 0 && num_completed_quests % temp_save_num_option == 0) {
             env.log("Saving and resetting.");
             save_game_from_overworld(env.program_info(), env.console, context);
             reset_game(env.program_info(), env.console, context);
@@ -158,6 +159,9 @@ void BBQSoloFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         pbf_press_button(context, BUTTON_A, 20, 105);
         pbf_press_button(context, BUTTON_HOME, 20, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
         resume_game_from_home(env.console, context);
+
+        open_map_from_overworld(env.program_info(), env.console, context);
+        fly_to_overworld_from_map(env.program_info(), env.console, context);
     }
 
     GO_HOME_WHEN_DONE.run_end_of_program(context);

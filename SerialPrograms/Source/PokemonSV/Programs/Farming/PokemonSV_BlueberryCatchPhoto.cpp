@@ -115,15 +115,17 @@ CameraAngle quest_photo_navi(const ProgramInfo& info, ConsoleHandle& console, Bo
             //Savanna Plaza - Pride Rock
             central_to_savanna_plaza(info, console, context);
 
-            pbf_move_left_joystick(context, 255, 255, 10, 20);
+            pbf_move_left_joystick(context, 220, 255, 10, 20);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
             jump_glide_fly(console, context, BBQ_OPTIONS, 600, 400, 400);
 
-            pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
-            pbf_move_left_joystick(context, 255, 128, 10, 20);
+            pbf_press_button(context, BUTTON_PLUS, 20, 105);
+            pbf_move_left_joystick(context, 255, 128, 20, 50);
 
-            angle = CameraAngle::up;
+            pbf_press_button(context, BUTTON_L, 20, 50);
+            pbf_move_left_joystick(context, 128, 0, 100, 50);
+            pbf_move_left_joystick(context, 0, 0, 20, 50);
 
             break;
         case BBQuests::photo_bug: case BBQuests::photo_rock:
@@ -536,7 +538,7 @@ void quest_catch_navi(const ProgramInfo& info, ConsoleHandle& console, BotBaseCo
             pbf_move_left_joystick(context, 0, 128, 20, 50);
 
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
-            jump_glide_fly(console, context, BBQ_OPTIONS, 200, 575, 200);
+            jump_glide_fly(console, context, BBQ_OPTIONS, 200, 590, 200);
 
             pbf_press_button(context, BUTTON_PLUS, 20, 105);
             pbf_move_left_joystick(context, 0, 128, 20, 50);
@@ -608,12 +610,12 @@ void quest_catch_navi(const ProgramInfo& info, ConsoleHandle& console, BotBaseCo
 void quest_catch_handle_battle(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, BBQuests& current_quest) {
     console.log("Catching Pokemon.");
     AdvanceDialogWatcher advance_dialog(COLOR_MAGENTA);
-    OverworldWatcher overworld(COLOR_BLUE);
     PromptDialogWatcher add_to_party(COLOR_PURPLE);
 
     uint8_t switch_party_slot = 1;
     bool quickball_thrown = false;
     bool tera_target = false;
+    bool use_quickball = BBQ_OPTIONS.QUICKBALL;
 
     int ret2 = run_until(
         console, context,
@@ -659,7 +661,7 @@ void quest_catch_handle_battle(const ProgramInfo& info, ConsoleHandle& console, 
                 else {
                     //Quick ball occurs before anything else in battle.
                     //Do not throw if target is a tera pokemon.
-                    if (BBQ_OPTIONS.QUICKBALL && !quickball_thrown && tera_target == false) {
+                    if (use_quickball && !quickball_thrown && tera_target == false) {
                         console.log("Quick Ball option checked. Throwing Quick Ball.");
                         BattleBallReader reader(console, BBQ_OPTIONS.LANGUAGE);
                         std::string ball_reader = "";
@@ -756,7 +758,7 @@ void quest_catch_handle_battle(const ProgramInfo& info, ConsoleHandle& console, 
                         context.wait_for_all_requests();
 
                         //Check for battle menu
-                        //If found use _fourth_ attack this turn!
+                        //If found use fourth attack this turn!
                         NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
                         int ret = wait_until(
                             console, context,
@@ -765,9 +767,6 @@ void quest_catch_handle_battle(const ProgramInfo& info, ConsoleHandle& console, 
                         );
                         if (ret == 0) {
                             console.log("Battle menu detected early. Using fourth attack.");
-                            pbf_press_button(context, BUTTON_A, 10, 50);
-                            context.wait_for_all_requests();
-
                             MoveSelectWatcher move_watcher(COLOR_BLUE);
                             MoveSelectDetector move_select(COLOR_BLUE);
 
@@ -820,8 +819,8 @@ void quest_catch_handle_battle(const ProgramInfo& info, ConsoleHandle& console, 
                 }
 
                 NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
-                OverworldWatcher overworld(COLOR_BLUE);
-                SwapMenuWatcher fainted(COLOR_YELLOW);
+                GradientArrowWatcher fainted(COLOR_BLUE, GradientArrowType::RIGHT, {0.610, 0.523, 0.044, 0.079});
+                SwapMenuWatcher swap(COLOR_YELLOW);
                 int ret2 = wait_until(
                     console, context,
                     std::chrono::seconds(60),
@@ -833,7 +832,10 @@ void quest_catch_handle_battle(const ProgramInfo& info, ConsoleHandle& console, 
                     break;
                 case 1:
                     console.log("Detected fainted Pokemon. Switching to next living Pokemon...");
-                    if (fainted.move_to_slot(console, context, switch_party_slot)) {
+                    pbf_press_button(context, BUTTON_A, 20, 50);
+                    pbf_wait(context, 100);
+                    context.wait_for_all_requests();
+                    if (swap.move_to_slot(console, context, switch_party_slot)) {
                         pbf_mash_button(context, BUTTON_A, 3 * TICKS_PER_SECOND);
                         context.wait_for_all_requests();
                         switch_party_slot++;
@@ -850,7 +852,7 @@ void quest_catch_handle_battle(const ProgramInfo& info, ConsoleHandle& console, 
 
             }
         },
-        { advance_dialog, overworld, add_to_party }
+        { advance_dialog, add_to_party }
         );
 
     switch (ret2) {
@@ -859,9 +861,6 @@ void quest_catch_handle_battle(const ProgramInfo& info, ConsoleHandle& console, 
         press_Bs_to_back_to_overworld(info, console, context);
         break;
     case 1:
-        console.log("Overworld detected. Fainted?");
-        break;
-    case 2:
         console.log("Prompt dialog detected.");
         press_Bs_to_back_to_overworld(info, console, context);
         break;
@@ -888,7 +887,7 @@ void quest_catch(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
             NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
             int ret2 = wait_until(
                 console, context,
-                std::chrono::seconds(25),
+                std::chrono::seconds(15),
                 { battle_menu }
             );
             if (ret2 != 0) {
@@ -979,7 +978,8 @@ void wild_battle_tera(const ProgramInfo& info, ConsoleHandle& console, BotBaseCo
                 }
 
                 NormalBattleMenuWatcher battle_menu(COLOR_MAGENTA);
-                SwapMenuWatcher fainted(COLOR_RED);
+                GradientArrowWatcher fainted(COLOR_BLUE, GradientArrowType::RIGHT, {0.610, 0.523, 0.044, 0.079});
+                SwapMenuWatcher swap(COLOR_YELLOW);
 
                 context.wait_for_all_requests();
 
@@ -996,7 +996,10 @@ void wild_battle_tera(const ProgramInfo& info, ConsoleHandle& console, BotBaseCo
                     break;
                 case 1:
                     console.log("Detected fainted Pokemon. Switching to next living Pokemon...");
-                    if (fainted.move_to_slot(console, context, switch_party_slot)){
+                    pbf_press_button(context, BUTTON_A, 20, 50);
+                    pbf_wait(context, 100);
+                    context.wait_for_all_requests();
+                    if (swap.move_to_slot(console, context, switch_party_slot)) {
                         pbf_mash_button(context, BUTTON_A, 3 * TICKS_PER_SECOND);
                         context.wait_for_all_requests();
                         switch_party_slot++;
