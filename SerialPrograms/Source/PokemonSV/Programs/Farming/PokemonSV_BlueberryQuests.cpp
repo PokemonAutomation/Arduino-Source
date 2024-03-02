@@ -396,57 +396,66 @@ void quest_make_tm(const ProgramInfo& info, ConsoleHandle& console, BotBaseConte
     pbf_press_button(context, BUTTON_PLUS, 20, 105);
     context.wait_for_all_requests();
 
+    GradientArrowWatcher machine(COLOR_BLUE, GradientArrowType::DOWN, {0.181, 0.127, 0.045, 0.070});
     PromptDialogWatcher makeTM(COLOR_RED);
     OverworldWatcher overworld(COLOR_BLUE);
 
     pbf_move_left_joystick(context, 255, 0, 100, 20);
     pbf_press_button(context, BUTTON_L, 10, 50);
 
-    //The plaza is extemely bright and tends to throw off the detectors
-    pbf_press_button(context, BUTTON_A, 20, 200);
-    pbf_wait(context, 200);
-    context.wait_for_all_requests();
-    pbf_press_button(context, BUTTON_A, 20, 200);
-    pbf_wait(context, 200);
-    context.wait_for_all_requests();
-    pbf_press_button(context, BUTTON_A, 20, 200);
-    pbf_wait(context, 200);
-    context.wait_for_all_requests();
-
-    int make_tm = run_until(
+    int enter_machine = run_until(
         console, context,
         [&](BotBaseContext& context){
-            for (int i = 0; i < 229; i++) { //229 is max number of TMs
-                //click on tm
+            for (int i = 0; i < 10; i++) {
                 pbf_press_button(context, BUTTON_A, 20, 50);
-                pbf_wait(context, 100);
-                context.wait_for_all_requests();
-
-                //not craftable, close and move on to next
-                pbf_press_button(context, BUTTON_A, 20, 50);
-                pbf_press_dpad(context, DPAD_RIGHT, 20, 20);
-                pbf_wait(context, 100);
+                pbf_wait(context, 200);
                 context.wait_for_all_requests();
             }
         },
-        {{ makeTM }}
+        {{ machine }}
     );
-    if (make_tm == 0){
-        console.log("Craftable TM found.");
+    context.wait_for_all_requests();
+
+    if (enter_machine == 0){
+        console.log("TM machine entered. Finding TM to make.");
+
+        int make_tm = run_until(
+            console, context,
+            [&](BotBaseContext& context){
+                for (int i = 0; i < 229; i++) { //229 is max number of TMs
+                    //click on tm
+                    pbf_press_button(context, BUTTON_A, 20, 50);
+                    pbf_wait(context, 100);
+                    context.wait_for_all_requests();
+
+                    //not craftable, close and move on to next
+                    pbf_press_button(context, BUTTON_A, 20, 50);
+                    pbf_press_dpad(context, DPAD_RIGHT, 20, 20);
+                    pbf_wait(context, 100);
+                    context.wait_for_all_requests();
+                }
+            },
+            {{ makeTM }}
+        );
+        context.wait_for_all_requests();
+
+        if (make_tm == 0){
+            console.log("Craftable TM found. Making TM");
+
+            pbf_mash_button(context, BUTTON_A, 220);
+            context.wait_for_all_requests();
+        }
+        else {
+            console.log("Failed to find craftable TM!");
+        }
     }
     else {
-        console.log("Failed to find craftable TM!");
+        console.log("Failed to enter TM machine!");
     }
-    context.wait_for_all_requests();
-
-    //Make TM
-    pbf_mash_button(context, BUTTON_A, 220);
-    context.wait_for_all_requests();
-
+    
     int exit = run_until(
         console, context,
         [&](BotBaseContext& context){
-            //click on tm
             pbf_mash_button(context, BUTTON_B, 2000);
         },
         {{ overworld }}
@@ -618,58 +627,58 @@ void quest_sneak_up(const ProgramInfo& info, ConsoleHandle& console, BotBaseCont
         );
     if (ret == 0) {
         console.log("Battle menu detected.");
-    }
 
-    encounter_watcher.throw_if_no_sound();
+       encounter_watcher.throw_if_no_sound();
 
-    bool is_shiny = (bool)encounter_watcher.shiny_screenshot();
-    if (is_shiny) {
-        console.log("Shiny detected!");
-        pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
-        throw ProgramFinishedException();
-    } else {
-        OverworldWatcher overworld(COLOR_BLUE);
+        bool is_shiny = (bool)encounter_watcher.shiny_screenshot();
+        if (is_shiny) {
+            console.log("Shiny detected!");
+            pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
+            throw ProgramFinishedException();
+        } else {
+            OverworldWatcher overworld(COLOR_BLUE);
 
-        int ret2 = run_until(
-            console, context,
-            [&](BotBaseContext& context) {
-                while (true) {
-                    //Flee immediately. Keep trying to flee.
-                    NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
-                    int ret2 = wait_until(
-                        console, context,
-                        std::chrono::seconds(60),
-                        { battle_menu }
-                    );
-                    switch (ret2) {
-                    case 0:
-                        battle_menu.move_to_slot(console, context, 3);
-                        pbf_press_button(context, BUTTON_A, 10, 50);
-                        break;
-                    default:
-                        console.log("Invalid state quest_sneak_up(). Smoke Ball equipped?");
-                        throw OperationFailedException(
-                            ErrorReport::SEND_ERROR_REPORT, console,
-                            "Invalid state quest_sneak_up(). Smoke Ball equipped?",
-                            true
+            int ret2 = run_until(
+                console, context,
+                [&](BotBaseContext& context) {
+                    while (true) {
+                        //Flee immediately. Keep trying to flee.
+                        NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
+                        int ret2 = wait_until(
+                            console, context,
+                            std::chrono::seconds(60),
+                            { battle_menu }
                         );
+                        switch (ret2) {
+                        case 0:
+                            battle_menu.move_to_slot(console, context, 3);
+                            pbf_press_button(context, BUTTON_A, 10, 50);
+                            break;
+                        default:
+                            console.log("Invalid state quest_sneak_up(). Smoke Ball equipped?");
+                            throw OperationFailedException(
+                                ErrorReport::SEND_ERROR_REPORT, console,
+                                "Invalid state quest_sneak_up(). Smoke Ball equipped?",
+                                true
+                            );
+                        }
                     }
-                }
-            },
-            { overworld }
-            );
+                },
+                { overworld }
+                );
 
-        switch (ret2) {
-        case 0:
-            console.log("Overworld detected.");
-            break;
-        default:
-            console.log("Invalid state in run_battle().");
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
-                "Invalid state in run_battle().",
-                true
-            );
+            switch (ret2) {
+            case 0:
+                console.log("Overworld detected.");
+                break;
+            default:
+                console.log("Invalid state in run_battle().");
+                throw OperationFailedException(
+                    ErrorReport::SEND_ERROR_REPORT, console,
+                    "Invalid state in run_battle().",
+                    true
+                );
+            }
         }
     }
     return_to_plaza(info, console, context);

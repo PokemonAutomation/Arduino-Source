@@ -324,7 +324,7 @@ void quest_photo(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
                 static_cast<AudioInferenceCallback&>(encounter_watcher),
             }
         );
-        if (ret >= 0) {
+        if (ret == 0) {
             console.log("Battle menu detected.");
             encounter_watcher.throw_if_no_sound();
 
@@ -335,12 +335,14 @@ void quest_photo(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
                 throw ProgramFinishedException();
             }
             else {
-                console.log("Detected battle. Running from battle.");
+                console.log("Detected battle. Running from battle and returning to plaza.");
                 try{
                     //Smoke Ball or Flying type required due to Arena Trap/Magnet Pull
                     NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
                     battle_menu.move_to_slot(console, context, 3);
                     pbf_press_button(context, BUTTON_A, 10, 50);
+                    press_Bs_to_back_to_overworld(info, console, context);
+                    return_to_plaza(info, console, context);
                 }catch (...){
                     console.log("Unable to flee.");
                     throw OperationFailedException(
@@ -452,21 +454,6 @@ void quest_catch_navi(const ProgramInfo& info, ConsoleHandle& console, BotBaseCo
             pbf_press_button(context, BUTTON_L, 20, 50);
 
             break;
-        case BBQuests::catch_ice:
-            console.log("Catch: Ice");
-
-            //Snover: Start at central plaza, fly north-ish
-            pbf_move_left_joystick(context, 0, 0, 10, 20);
-            pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
-
-            jump_glide_fly(console, context, BBQ_OPTIONS, 1100, 1700, 200);
-
-            pbf_press_button(context, BUTTON_PLUS, 20, 105);
-            pbf_move_left_joystick(context, 0, 128, 20, 50);
-            pbf_press_button(context, BUTTON_L, 20, 50);
-
-            break;
-
         case BBQuests::catch_fighting:
             console.log("Catch: Fighting");
 
@@ -580,8 +567,8 @@ void quest_catch_navi(const ProgramInfo& info, ConsoleHandle& console, BotBaseCo
             pbf_press_button(context, BUTTON_L, 20, 50);
 
             break;
-        case BBQuests::catch_water:
-            console.log("Catch: Water");
+        case BBQuests::catch_water: case BBQuests::catch_ice:
+            console.log("Catch: Water/Ice");
 
             //Lapras - Tera Bug
             central_to_polar_rest(info, console, context);
@@ -757,8 +744,7 @@ void quest_catch_handle_battle(const ProgramInfo& info, ConsoleHandle& console, 
                         pbf_mash_button(context, BUTTON_A, 150);
                         context.wait_for_all_requests();
 
-                        //Check for battle menu
-                        //If found use fourth attack this turn!
+                        //Check for battle menu, if found use fourth attack this turn
                         NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
                         int ret = wait_until(
                             console, context,
@@ -883,11 +869,12 @@ void quest_catch(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
         [&](BotBaseContext& context) {
             
             quest_catch_navi(info, console, context, BBQ_OPTIONS, current_quest);
+            context.wait_for_all_requests();
 
             NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
             int ret2 = wait_until(
                 console, context,
-                std::chrono::seconds(15),
+                std::chrono::seconds(25),
                 { battle_menu }
             );
             if (ret2 != 0) {
@@ -901,18 +888,18 @@ void quest_catch(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
         );
     if (ret == 0) {
         console.log("Battle menu detected.");
+        encounter_watcher.throw_if_no_sound();
+
+        bool is_shiny = (bool)encounter_watcher.shiny_screenshot();
+        if (is_shiny) {
+            console.log("Shiny detected!");
+            pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
+            throw ProgramFinishedException();
+        } else {
+            quest_catch_handle_battle(info, console, context, BBQ_OPTIONS, current_quest);
+        }
     }
 
-    encounter_watcher.throw_if_no_sound();
-
-    bool is_shiny = (bool)encounter_watcher.shiny_screenshot();
-    if (is_shiny) {
-        console.log("Shiny detected!");
-        pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
-        throw ProgramFinishedException();
-    } else {
-        quest_catch_handle_battle(info, console, context, BBQ_OPTIONS, current_quest);
-    }
     return_to_plaza(info, console, context);
 
     //Day skip and attempt to respawn fixed encounters
