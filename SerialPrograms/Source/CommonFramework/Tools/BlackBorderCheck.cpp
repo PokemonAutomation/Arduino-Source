@@ -23,7 +23,7 @@ void start_program_video_check(ConsoleHandle& console, FeedbackType feedback){
     VideoSnapshot screen = console.video().snapshot();
 
     if (!screen){
-        if (feedback == FeedbackType::REQUIRED){
+        if (feedback == FeedbackType::REQUIRED || feedback == FeedbackType::VIDEO_AUDIO){
             throw UserSetupError(console, "This program requires video feedback. Please make sure the video is working.");
         }
         return;

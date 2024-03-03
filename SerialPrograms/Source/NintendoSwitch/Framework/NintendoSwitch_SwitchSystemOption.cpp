@@ -19,9 +19,9 @@ Color pick_color(FeedbackType feedback, PABotBaseLevel size){
     case PABotBaseLevel::NOT_PABOTBASE:
         return Color();
     case PABotBaseLevel::PABOTBASE_12KB:
-        return feedback == FeedbackType::REQUIRED ? COLOR_DARKGREEN : COLOR_BLUE;
+        return (feedback == FeedbackType::REQUIRED || feedback == FeedbackType::VIDEO_AUDIO) ? COLOR_DARKGREEN : COLOR_BLUE;
     case PABotBaseLevel::PABOTBASE_31KB:
-        return feedback == FeedbackType::REQUIRED ? COLOR_PURPLE : COLOR_RED;
+        return (feedback == FeedbackType::REQUIRED || feedback == FeedbackType::VIDEO_AUDIO) ? COLOR_PURPLE : COLOR_RED;
     }
     return Color();
 }
