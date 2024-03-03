@@ -8,6 +8,7 @@
 #include "ClientSource/Libraries/MessageConverter.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch_Commands_Routines.h"
+#include "NintendoSwitch_Commands_PushButtons.h"
 //#include "NintendoSwitch_Messages_Routines.h"
 
 namespace PokemonAutomation{
@@ -22,10 +23,16 @@ void close_game(BotBaseContext& context){
 #else
     //  Use mashing to ensure that the X press succeeds. If it fails, the SR
     //  will fail and can kill a den for the autohosts.
-    ssf_mash1_button(context, BUTTON_X, 100);           //  Close game
-    ssf_mash2_button(context, BUTTON_X, BUTTON_A, 50);  //  Confirm close game
-    ssf_mash1_button(context, BUTTON_X, 50);
-    ssf_mash1_button(context, BUTTON_B, 350);
+
+    // this sequence will close the game from the home screen, 
+    // regardless of whether the game is open or closed.
+    pbf_mash_button(context, BUTTON_X, 100);    // if game open: Close game. if game closed: does nothing
+    pbf_press_dpad(context, DPAD_DOWN, 50, 50); // if game open: Does nothing. if game closed: moves selector away from the closed game to avoid opening it.
+    pbf_mash_button(context, BUTTON_A, 50);     // if game open: Confirm close game. if game closed: opens an app in the home screen (e.g. Online)
+    pbf_mash_button(context, BUTTON_HOME, 50);  // if game open: Does nothing. if game closed: closes the app and goes back to home screen.
+    pbf_mash_button(context, BUTTON_X, 50);
+    pbf_mash_button(context, BUTTON_B, 350);
+
 #endif
 }
 
