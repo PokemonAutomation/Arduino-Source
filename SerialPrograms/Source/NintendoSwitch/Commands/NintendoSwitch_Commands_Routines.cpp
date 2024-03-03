@@ -28,6 +28,7 @@ void close_game(BotBaseContext& context){
     // regardless of whether the game is open or closed.
     pbf_mash_button(context, BUTTON_X, 100);    // if game open: Close game. if game closed: does nothing
     pbf_press_dpad(context, DPAD_DOWN, 50, 50); // if game open: Does nothing. if game closed: moves selector away from the closed game to avoid opening it.
+    pbf_press_dpad(context, DPAD_DOWN, 50, 50); // extra insurance against button drops.
     pbf_mash_button(context, BUTTON_A, 50);     // if game open: Confirm close game. if game closed: opens an app in the home screen (e.g. Online)
     pbf_mash_button(context, BUTTON_HOME, 50);  // if game open: Does nothing. if game closed: closes the app and goes back to home screen.
     pbf_mash_button(context, BUTTON_X, 50);
