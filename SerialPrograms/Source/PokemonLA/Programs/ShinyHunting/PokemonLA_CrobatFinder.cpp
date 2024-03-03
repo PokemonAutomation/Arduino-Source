@@ -31,7 +31,7 @@ CrobatFinder_Descriptor::CrobatFinder_Descriptor()
         STRING_POKEMON + " LA", "Alpha Crobat Hunter",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/AlphaCrobatHunter.md",
         "Constantly reset the cave to find Shiny Alpha Crobat.",
-        FeedbackType::REQUIRED,
+        FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB
     )

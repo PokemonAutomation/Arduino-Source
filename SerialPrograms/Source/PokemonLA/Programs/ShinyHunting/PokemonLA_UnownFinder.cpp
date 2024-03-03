@@ -39,7 +39,7 @@ UnownFinder_Descriptor::UnownFinder_Descriptor()
         STRING_POKEMON + " LA", "Unown Hunter",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/UnownHunter.md",
         "Constantly reset to find a Shiny Unown or any Shiny in the path.",
-        FeedbackType::REQUIRED,
+        FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB
     )

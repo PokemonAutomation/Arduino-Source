@@ -80,6 +80,8 @@ constexpr Color COLOR_PURPLE(0xff8a2be2);
 constexpr Color COLOR_DARKGREEN(0xff008000);
 constexpr Color COLOR_DARKCYAN(0xff008080);
 
+constexpr Color COLOR_GREEN2(0xff00aa00);
+
 
 
 

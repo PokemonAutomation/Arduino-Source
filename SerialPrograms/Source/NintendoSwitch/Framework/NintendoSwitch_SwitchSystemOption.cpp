@@ -13,15 +13,24 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
+    // constexpr Color COLOR_GREEN2(0xff00aa00);
 
 Color pick_color(FeedbackType feedback, PABotBaseLevel size){
     switch (size){
     case PABotBaseLevel::NOT_PABOTBASE:
         return Color();
     case PABotBaseLevel::PABOTBASE_12KB:
-        return feedback == FeedbackType::REQUIRED ? COLOR_DARKGREEN : COLOR_BLUE;
+        if (feedback == FeedbackType::REQUIRED){
+            return COLOR_DARKGREEN;
+        }
+        else if (feedback == FeedbackType::VIDEO_AUDIO){
+            return COLOR_GREEN2;
+        }
+        else {
+            return COLOR_BLUE;
+        }
     case PABotBaseLevel::PABOTBASE_31KB:
-        return feedback == FeedbackType::REQUIRED ? COLOR_PURPLE : COLOR_RED;
+        return (feedback == FeedbackType::REQUIRED || feedback == FeedbackType::VIDEO_AUDIO) ? COLOR_PURPLE : COLOR_RED;
     }
     return Color();
 }

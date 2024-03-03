@@ -40,7 +40,7 @@ BurmyFinder_Descriptor::BurmyFinder_Descriptor()
         STRING_POKEMON + " LA", "Burmy Hunter",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/BurmyHunter.md",
         "Check nearby trees for a possible Shiny, Alpha or Alpha Shiny Burmy",
-        FeedbackType::REQUIRED,
+        FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB
     )

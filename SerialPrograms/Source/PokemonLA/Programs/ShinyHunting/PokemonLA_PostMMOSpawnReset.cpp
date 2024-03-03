@@ -29,7 +29,7 @@ PostMMOSpawnReset_Descriptor::PostMMOSpawnReset_Descriptor()
         STRING_POKEMON + " LA", "Post-MMO Spawn Reset",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/PostMMOSpawnReset.md",
         "Constantly reset the spawn after MMO finishes.",
-        FeedbackType::REQUIRED,
+        FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB
     )
