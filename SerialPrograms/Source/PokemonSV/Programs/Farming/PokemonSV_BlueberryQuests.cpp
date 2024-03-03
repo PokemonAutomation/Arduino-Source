@@ -32,13 +32,11 @@
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "PokemonSV/Inference/PokemonSV_BlueberryQuestDetector.h"
-#include "PokemonSV/Programs/Battles/PokemonSV_BasicCatcher.h"
 #include "PokemonSV/Programs/Eggs/PokemonSV_EggRoutines.h"
 #include "PokemonSV/Programs/Boxes/PokemonSV_BoxRelease.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxEggDetector.h"
 #include "PokemonSV/Programs/Sandwiches/PokemonSV_SandwichRoutines.h"
 #include "PokemonSV/Programs/ShinyHunting/PokemonSV_LetsGoTools.h"
-#include "PokemonSV/Options/PokemonSV_EncounterBotCommon.h"
 #include "PokemonSV/Programs/TeraRaids/PokemonSV_TeraRoutines.h"
 #include "PokemonSV/Programs/TeraRaids/PokemonSV_TeraBattler.h"
 #include "PokemonSV/Programs/Farming/PokemonSV_BlueberryCatchPhoto.h"
@@ -364,6 +362,13 @@ bool process_and_do_quest(ProgramEnvironment& env, AsyncDispatcher& dispatcher, 
         case BBQuests::catch_rock: case BBQuests::catch_bug: case BBQuests::catch_ghost: case BBQuests::catch_steel: case BBQuests::catch_fire: case BBQuests::catch_water:case BBQuests::catch_grass:
         case BBQuests::catch_electric: case BBQuests::catch_psychic: case BBQuests::catch_ice: case BBQuests::catch_dragon: case BBQuests::catch_dark: case BBQuests::catch_fairy:
             quest_catch(env.program_info(), console, context, BBQ_OPTIONS, current_quest);
+            break;
+        default:
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, console,
+                    "Unknown quest selection.",
+                    true
+                );
             break;
         }
 
@@ -919,7 +924,7 @@ void quest_hatch_egg(const ProgramInfo& info, ConsoleHandle& console, BotBaseCon
     bool egg_found = false;
     uint8_t row = 0;
     uint8_t col = 0;
-    for (row ; row < 5; row++){
+    for ( ; row < 5; row++){
         for (uint8_t j_col = 0; j_col < 6; j_col++){
             col = (row % 2 == 0 ? j_col : 5 - j_col);
             move_box_cursor(info, console, context, BoxCursorLocation::SLOTS, row, col);
@@ -1014,6 +1019,13 @@ void quest_sandwich(const ProgramInfo& info, AsyncDispatcher& dispatcher, Consol
         fillings = { {"fried-fillet", (uint8_t)1}, {"noodles", (uint8_t)1}, {"rice", (uint8_t)1} };
         condiments = {{"chili-sauce", (uint8_t)1}};
         flavored = false;
+        break;
+    default:
+        throw OperationFailedException(
+            ErrorReport::SEND_ERROR_REPORT, console,
+                "Invalid sandwich selection.",
+                true
+            );
         break;
     }
 
