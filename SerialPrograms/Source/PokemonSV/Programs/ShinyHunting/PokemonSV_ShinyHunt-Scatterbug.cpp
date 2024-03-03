@@ -44,7 +44,7 @@ ShinyHuntScatterbug_Descriptor::ShinyHuntScatterbug_Descriptor()
         STRING_POKEMON + " SV", "Shiny Hunt - Scatterbug",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSV/ShinyHunt-Scatterbug.md",
         "Shiny hunt Scatterbug.",
-        FeedbackType::REQUIRED,
+        FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB
     )

@@ -39,7 +39,7 @@ NuggetFarmerHighlands_Descriptor::NuggetFarmerHighlands_Descriptor()
         STRING_POKEMON + " LA", "Nugget Farmer (Highlands)",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/NuggetFarmerHighlands.md",
         "Farm nuggets off the Miss Fortune sisters in the Coronet Highlands.",
-        FeedbackType::REQUIRED,
+        FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB
     )
