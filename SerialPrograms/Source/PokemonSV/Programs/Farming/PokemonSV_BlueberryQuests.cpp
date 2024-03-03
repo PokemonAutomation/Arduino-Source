@@ -343,11 +343,14 @@ bool process_and_do_quest(ProgramEnvironment& env, AsyncDispatcher& dispatcher, 
         case BBQuests::bitter_sandwich: case BBQuests::salty_sandwich: case BBQuests::sour_sandwich: case BBQuests::spicy_sandwich: case BBQuests::sweet_sandwich: case BBQuests::sandwich_three:
             quest_sandwich(env.program_info(), dispatcher, console, context, BBQ_OPTIONS, current_quest);
             break;
-        case BBQuests::pickup_10:
-            quest_pickup(env, env.program_info(), console, context, BBQ_OPTIONS);
-            break;
+        //case BBQuests::pickup_10:
+        //    quest_pickup(env, env.program_info(), console, context, BBQ_OPTIONS);
+        //    break;
         case BBQuests::tera_raid:
             quest_tera_raid(env, console, context, BBQ_OPTIONS);
+            break;
+        case BBQuests::auto_10: case BBQuests::auto_30:
+            quest_auto_battle(env, console, context, BBQ_OPTIONS, current_quest);
             break;
         //All involve taking pictures
         case BBQuests::photo_fly: case BBQuests::photo_swim: case BBQuests::photo_canyon: case BBQuests::photo_coastal: case BBQuests::photo_polar: case BBQuests::photo_savanna:
@@ -1028,60 +1031,9 @@ void quest_sandwich(const ProgramInfo& info, AsyncDispatcher& dispatcher, Consol
 
 }
 
-void quest_pickup(ProgramEnvironment& env, const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS) {
-    //Canyon biome from central plaza
-    pbf_press_button(context, BUTTON_PLUS, 20, 105);
-    pbf_press_button(context, BUTTON_PLUS, 20, 105);
-    context.wait_for_all_requests();
-
-    pbf_move_left_joystick(context, 0, 0, 100, 20);
-    pbf_move_left_joystick(context, 128, 0, 150, 20);
-    pbf_move_left_joystick(context, 0, 128, 140, 20);
-    pbf_press_button(context, BUTTON_L, 20, 50);
-    pbf_move_left_joystick(context, 0, 128, 20, 50);
-    
-    pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
-
-    //Fly to avoid some walking npcs
-    //jump_glide_fly(console, context);
-
-    pbf_wait(context, 300);
-    context.wait_for_all_requests();
-    pbf_press_button(context, BUTTON_B, 20, 50);
-    pbf_wait(context, 100);
-    context.wait_for_all_requests();
-    pbf_move_left_joystick(context, 128, 0, 200, 50);
-    pbf_wait(context, 800); //Wait for spawns
-    context.wait_for_all_requests();
-    pbf_press_button(context, BUTTON_PLUS, 20, 105);
-
-    LetsGoEncounterBotStats stats;
-    LetsGoEncounterBotTracker tracker(env, console, context, stats, BBQ_OPTIONS.LANGUAGE);
-
-    use_lets_go_to_clear_in_front(console, context, tracker, false, [&](BotBaseContext& context){
-        pbf_move_left_joystick(context, 128, 0, 200, 500);
-        pbf_press_button(context, BUTTON_L, 20, 50);
-    });
-    use_lets_go_to_clear_in_front(console, context, tracker, false, [&](BotBaseContext& context){
-        pbf_move_left_joystick(context, 128, 0, 200, 500);
-        pbf_press_button(context, BUTTON_L, 20, 50);
-    });
-    use_lets_go_to_clear_in_front(console, context, tracker, false, [&](BotBaseContext& context){
-        pbf_move_left_joystick(context, 128, 0, 200, 500);
-        pbf_press_button(context, BUTTON_L, 20, 50);
-    });
-    use_lets_go_to_clear_in_front(console, context, tracker, false, [&](BotBaseContext& context){
-        pbf_move_left_joystick(context, 128, 0, 200, 500);
-        pbf_press_button(context, BUTTON_L, 20, 50);
-    });
-    use_lets_go_to_clear_in_front(console, context, tracker, false, [&](BotBaseContext& context){
-        pbf_move_left_joystick(context, 128, 0, 200, 500);
-        pbf_press_button(context, BUTTON_L, 20, 50);
-    });
-
-}
-
 void quest_tera_raid(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS) {
+    console.log("Quest: Tera Raid");
+
     bool started_tera_raid = false;
     while (!started_tera_raid) {
         EncounterWatcher encounter_watcher(console, COLOR_RED);
@@ -1182,6 +1134,63 @@ void quest_tera_raid(ProgramEnvironment& env, ConsoleHandle& console, BotBaseCon
     context.wait_for_all_requests();
     return_to_plaza(env.program_info(), console, context);
     day_skip_from_overworld(console, context);
+}
+
+void quest_auto_battle(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, BBQuests& current_quest) {
+    console.log("Quest: Auto Battle 10/30");
+
+    LetsGoEncounterBotStats stats;
+    LetsGoEncounterBotTracker tracker(env, console, context, stats, BBQ_OPTIONS.LANGUAGE);
+
+    uint64_t target_number = 10;
+
+    if (current_quest == BBQuests::auto_30) {
+        target_number = 30;
+    }
+
+    while (stats.m_kills < target_number) {
+
+        central_to_chargestone(env.program_info(), console, context);
+
+        //Wait for spawns
+        pbf_wait(context, 375);
+        context.wait_for_all_requests();
+
+        //Forward and right, stay in the battle court - safe zone
+        pbf_press_button(context, BUTTON_L, 20, 50);
+        pbf_move_left_joystick(context, 128, 0, 250, 50);
+        pbf_move_left_joystick(context, 255, 128, 180, 50);
+        pbf_press_button(context, BUTTON_L, 20, 50);
+
+        use_lets_go_to_clear_in_front(console, context, tracker, false, [&](BotBaseContext& context) {
+            pbf_move_left_joystick(context, 128, 255, 180, 50);
+            pbf_wait(context, 1500);
+            context.wait_for_all_requests();
+            });
+
+        context.wait_for_all_requests();
+        return_to_plaza(env.program_info(), console, context);
+
+        OverworldWatcher done_healing(COLOR_BLUE);
+        pbf_move_left_joystick(context, 128, 0, 100, 20);
+
+        pbf_mash_button(context, BUTTON_A, 300);
+        context.wait_for_all_requests();
+
+        int exit = run_until(
+            console, context,
+            [&](BotBaseContext& context) {
+                pbf_mash_button(context, BUTTON_B, 2000);
+            },
+            { { done_healing } }
+            );
+        if (exit == 0) {
+            console.log("Overworld detected.");
+        }
+        open_map_from_overworld(env.program_info(), console, context);
+        pbf_press_button(context, BUTTON_ZL, 40, 100);
+        fly_to_overworld_from_map(env.program_info(), console, context);
+    }
 }
 
 

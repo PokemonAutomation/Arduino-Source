@@ -64,7 +64,7 @@ const std::set<BBQuests> gold_quests = {
 
 //Quests that are not currently supported. Gold quests currently excluded as this is singleplayer only right now.
 const std::set<BBQuests> not_possible_quests = {
-    BBQuests::UnableToDetect, BBQuests::auto_10, BBQuests::auto_30, BBQuests::pickup_10
+    BBQuests::UnableToDetect, BBQuests::pickup_10
 };
 
 
@@ -107,11 +107,11 @@ void quest_hatch_egg(const ProgramInfo& info, ConsoleHandle& console, BotBaseCon
 //Make a sandwich of type flavor
 void quest_sandwich(const ProgramInfo& info, AsyncDispatcher& dispatcher, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, BBQuests& current_quest);
 
-//Pick up 10 items off the ground
-void quest_pickup(ProgramEnvironment& env, const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS);
-
 //Complete a tera raid battle
 void quest_tera_raid(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS);
+
+//Defeat 10/30 pokemon in autobattle
+void quest_auto_battle(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, BBQuests& current_quest);
 
 }
 }

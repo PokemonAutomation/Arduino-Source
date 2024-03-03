@@ -4,14 +4,11 @@
  *
  */
 
-#include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Tools/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
@@ -20,8 +17,6 @@
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
-#include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
-#include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_NormalBattleMenus.h"
 #include "PokemonSV/Programs/Farming/PokemonSV_BlueberryQuests.h"
 #include "PokemonSV_BBQSoloFarmer.h"
@@ -37,7 +32,7 @@ BBQSoloFarmer_Descriptor::BBQSoloFarmer_Descriptor()
         "PokemonSV:BBQSoloFarmer",
         STRING_POKEMON + " SV", "BBQ Farmer",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSV/BBQSoloFarmer.md",
-        "Farm Blueberry Quests in the Terarium.",
+        "Farm Blueberry Quests in the Terarium for BP.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB
@@ -89,7 +84,7 @@ void BBQSoloFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
 
     //Test a specific quest
     /*
-    BBQuests test_quest = BBQuests::catch_ground;
+    BBQuests test_quest = BBQuests::auto_10;
     bool questTest = process_and_do_quest(env, env.realtime_dispatcher(), env.console, context, BBQ_OPTIONS, test_quest, eggs_hatched);
     if (questTest) {
         env.log("Finished quest.");

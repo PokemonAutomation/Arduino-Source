@@ -146,9 +146,8 @@ CameraAngle quest_photo_navi(const ProgramInfo& info, ConsoleHandle& console, Bo
             console.log("Photo: Fairy");
 
             //Snubbull - Central plaza
-            pbf_press_button(context, BUTTON_PLUS, 20, 105);
-            pbf_press_button(context, BUTTON_PLUS, 20, 105);
-            context.wait_for_all_requests();
+            open_map_from_overworld(info, console, context);
+            fly_to_overworld_from_map(info, console, context);
 
             pbf_move_left_joystick(context, 0, 80, 10, 20);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
@@ -166,9 +165,8 @@ CameraAngle quest_photo_navi(const ProgramInfo& info, ConsoleHandle& console, Bo
             console.log("Photo: Ice");
 
             //Snover - Start at central plaza, fly north-ish
-            pbf_press_button(context, BUTTON_PLUS, 20, 105);
-            pbf_press_button(context, BUTTON_PLUS, 20, 105);
-            context.wait_for_all_requests();
+            open_map_from_overworld(info, console, context);
+            fly_to_overworld_from_map(info, console, context);
 
             pbf_move_left_joystick(context, 0, 0, 10, 20);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
@@ -443,6 +441,9 @@ void quest_catch_navi(const ProgramInfo& info, ConsoleHandle& console, BotBaseCo
 
             //Snubbull - Central plaza
             //Tested while snowing, seems fine?
+            open_map_from_overworld(info, console, context);
+            fly_to_overworld_from_map(info, console, context);
+
             pbf_move_left_joystick(context, 0, 80, 10, 20);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
@@ -508,6 +509,8 @@ void quest_catch_navi(const ProgramInfo& info, ConsoleHandle& console, BotBaseCo
             console.log("Catch: Rock/Electric");
 
             //Geodude-A
+            open_map_from_overworld(info, console, context);
+            fly_to_overworld_from_map(info, console, context);
             pbf_press_button(context, BUTTON_L, 20, 50);
             pbf_move_left_joystick(context, 70, 0, 10, 20);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
@@ -515,6 +518,8 @@ void quest_catch_navi(const ProgramInfo& info, ConsoleHandle& console, BotBaseCo
             jump_glide_fly(console, context, BBQ_OPTIONS, 100, 550, 300);
 
             pbf_press_button(context, BUTTON_PLUS, 20, 105);
+            pbf_wait(context, 300);
+            context.wait_for_all_requests();
 
             break;
         case BBQuests::catch_steel:

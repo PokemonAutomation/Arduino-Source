@@ -8,7 +8,6 @@
 #define PokemonAutomation_PokemonSV_BBQSoloFarmer_H
 
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
-#include "CommonFramework/Options/LanguageOCROption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "PokemonSV/Options/PokemonSV_BBQOption.h"
