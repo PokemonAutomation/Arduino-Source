@@ -25,12 +25,16 @@ void close_game(BotBaseContext& context){
     //  will fail and can kill a den for the autohosts.
 
     // this sequence will close the game from the home screen, 
-    // regardless of whether the game is open or closed.
-    pbf_mash_button(context, BUTTON_X, 100);    // if game open: Close game. if game closed: does nothing
-    pbf_press_dpad(context, DPAD_DOWN, 50, 50); // if game open: Does nothing. if game closed: moves selector away from the closed game to avoid opening it.
-    pbf_press_dpad(context, DPAD_DOWN, 50, 50); // extra insurance against button drops.
-    pbf_mash_button(context, BUTTON_A, 50);     // if game open: Confirm close game. if game closed: opens an app in the home screen (e.g. Online)
-    pbf_mash_button(context, BUTTON_HOME, 50);  // if game open: Does nothing. if game closed: closes the app and goes back to home screen.
+    // regardless of whether the game is initially open or closed.
+
+                                                // if game initially open.  |  if game initially closed
+    pbf_mash_button(context, BUTTON_X, 100);    // - Close game.            |  - does nothing
+    pbf_press_dpad(context, DPAD_DOWN, 50, 50); // - Does nothing.          |  - moves selector away from the closed game to avoid opening it.
+    pbf_press_dpad(context, DPAD_DOWN, 50, 50); // - Does nothing.          |  - Down a second time in case we drop one.
+    pbf_mash_button(context, BUTTON_A, 50);     // - Confirm close game.    |  - opens an app on the home screen (e.g. Online)
+    pbf_mash_button(context, BUTTON_HOME, 50);  // - Does nothing.          |  - goes back to home screen.
+
+    // fail-safe against button drops and unexpected error messages.
     pbf_mash_button(context, BUTTON_X, 50);
     pbf_mash_button(context, BUTTON_B, 350);
 
