@@ -28,7 +28,18 @@ Unlike with Qt 5.12, there is no offline installer for it. So you have two optio
 If you are ok with creating an account with Qt and using their online installer, then use this method.
 
 1. Download the online installer from here: https://www.qt.io/download-qt-installer
-2. Select the following options: ![](../BuildSetup/Windows-Install-Qt6.3.1.png)
+2. When prompted to select components, check `Archive` on the right side bar, then click `Filter`. Then select the following options: 
+
+    - Qt 6.3.2            
+        - MSVC 2019 64-bit
+        - Sources
+        - Additional Libraries
+            - Qt Image Formats
+            - Qt Multimedia
+            - Qt Serial Port
+        - Qt Debug Information Files   
+        
+![](../BuildSetup/Windows-Install-Qt6.3.1.png)
 
 If you repeatedly run into an error involving "SSL handshake failed", you will not be able to use the online installer. Please try the other option.
 
@@ -52,16 +63,13 @@ If you are unable or unwilling to use the online installer, the alternative is t
 ![](../BuildSetup/Directory.png)
 
 4. Open Qt Creator.
-5. Click on `Projects` -> `Open`.
+5. Click on `File` -> `Open File or Project`.
 6. Navigate to [`SerialPrograms`](./) and select `CMakeLists.txt`.
-7. It will then ask you to configure the project. Select `Desktop Qt 6.3.2 MSVC2019 64bit`.
+7. It will then ask you to configure the project. Select `Desktop Qt 6.3.2 MSVC2019 64bit`. Click `Configure Project`.
+![](../BuildSetup/Windows-configure-project.png)
 8. At the bottom left corner, click on the little monitor and select `Release with Debug Information`.
-9. Open up the file `CMakeLists.txt`. Change `QT_MAJOR` to `6`.![](../BuildSetup/QT_MAJOR-6.png)
-10. Click the upper green arrow to compile and launch the program.
-
 ![](../BuildSetup/Windows-Configuration-Qt6.png)
-
-
+9. At the bottom left corner, click the upper green arrow to compile and launch the program.
 
 
 <hr>
