@@ -66,6 +66,7 @@ If you are unable or unwilling to use the online installer, the alternative is t
 5. Click on `File` -> `Open File or Project`.
 6. Navigate to [`SerialPrograms`](./) and select `CMakeLists.txt`.
 7. It will then ask you to configure the project. Select `Desktop Qt 6.3.2 MSVC2019 64bit`. Click `Configure Project`.
+![](../BuildSetup/Windows-configure-project.png)
 8. At the bottom left corner, click on the little monitor and select `Release with Debug Information`.
 ![](../BuildSetup/Windows-Configuration-Qt6.png)
 9. At the bottom left corner, click the upper green arrow to compile and launch the program.
