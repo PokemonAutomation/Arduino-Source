@@ -246,10 +246,17 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 //    run_singles_battle(env, console, context, battle_AI, false);
 
 
+
+    pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+    reset_game_from_home(env.program_info(), console, context, 5 * TICKS_PER_SECOND);
+
+
+#if 0
     VideoSnapshot screen = console.video().snapshot();
 
     PokemonSummaryDetector summary;
     cout << summary.detect(screen) << endl;
+#endif
 
 
 #if 0

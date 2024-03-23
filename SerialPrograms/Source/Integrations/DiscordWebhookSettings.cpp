@@ -95,7 +95,7 @@ DiscordWebhookSettingsOption::DiscordWebhookSettingsOption()
     : GroupOption("Discord Webhook Settings", LockMode::LOCK_WHILE_RUNNING, true, false)
     , sends_per_second(
         "<b>Rate Limit:</b><br>Maximum number of sends per second.",
-        LockMode::LOCK_WHILE_RUNNING, 2
+        LockMode::LOCK_WHILE_RUNNING, 2, 1
     )
 {
     PA_ADD_OPTION(urls);
