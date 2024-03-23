@@ -113,12 +113,12 @@ void DiscordWebhookSender::throttle(){
     while (!m_sent.empty() && m_sent[0] + duration < now){
         m_sent.pop_front();
     }
-    if (m_sent.size() >= GlobalSettings::instance().DISCORD.webhooks.sends_per_second){
+    if (!m_sent.empty() && m_sent.size() >= GlobalSettings::instance().DISCORD.webhooks.sends_per_second){
         m_logger.log("Throttling webhook messages due to rate limit...", COLOR_RED);
         std::unique_lock<std::mutex> lg(m_lock);
         m_cv.wait_for(
             lg, duration,
-            [&]{ return m_sent[0] + duration < now || m_stopping; }
+            [&]{ return m_stopping || m_sent.empty() || m_sent[0] + duration < now; }
         );
         if (m_stopping){
             return;

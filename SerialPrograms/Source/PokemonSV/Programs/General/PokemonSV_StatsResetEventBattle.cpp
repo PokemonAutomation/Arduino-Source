@@ -621,10 +621,10 @@ void StatsResetEventBattle::program(SingleSwitchProgramEnvironment& env, BotBase
     while (true){
         if (TARGET == Target::Ursaluna) {
             enter_battle_ursaluna(env, context);
-        } else {
+        }else{
             enter_battle_pecharunt(env, context);
         }
-        
+
         if (run_battle(env, context) && check_stats_after_win(env, context)){
             break;
         }
