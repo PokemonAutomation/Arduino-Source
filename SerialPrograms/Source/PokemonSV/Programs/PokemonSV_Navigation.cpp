@@ -627,6 +627,30 @@ void fly_to_closest_pokecenter_on_map(const ProgramInfo& info, ConsoleHandle& co
     }
 }
 
+void escape_stuck_on_wall(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context) {
+    for (auto i = 0; i < 3; i++) {
+        pbf_press_button(context, BUTTON_L, 50, 50);
+        pbf_press_button(context, BUTTON_B, 50, 50);
+        pbf_move_left_joystick(context, 128, 255, 100, 50);
+        context.wait_for_all_requests();
+        try {
+            open_map_from_overworld(info, console, context);
+            break;
+        }
+        catch(...) {
+            console.log("Failed to open map.");
+        }
+        if (i >= 3) {
+            console.log("Could not escape wall.");
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, console,
+                "escape_stuck_on_wall(): Could not escape wall.",
+                true
+            );
+        }
+    }
+}
+
 
 }
 }
