@@ -58,7 +58,7 @@ void return_to_plaza(const ProgramInfo& info, ConsoleHandle& console, BotBaseCon
                     open_map_from_overworld(info, console, context);
                 }
                 catch (...) {
-                    escape_stuck_on_wall(info, console, context);
+                    jump_off_wall_until_map_open(info, console, context);
                 }
 
                 //Move cursor to top left corner - even works when at Entrance fly point

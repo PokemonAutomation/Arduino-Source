@@ -69,7 +69,8 @@ void fly_to_closest_pokecenter_on_map(const ProgramInfo& info, ConsoleHandle& co
 
 // Attempt to escape being stuck on a wall.
 // Repeatedly center camera and try to backwards jump off.
-void escape_stuck_on_wall(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
+// Finishes when map is successfully open.
+void jump_off_wall_until_map_open(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
 
 
 }

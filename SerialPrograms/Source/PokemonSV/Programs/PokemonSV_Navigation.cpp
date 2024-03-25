@@ -627,7 +627,7 @@ void fly_to_closest_pokecenter_on_map(const ProgramInfo& info, ConsoleHandle& co
     }
 }
 
-void escape_stuck_on_wall(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context) {
+void jump_off_wall_until_map_open(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context) {
     for (auto i = 0; i < 3; i++) {
         pbf_press_button(context, BUTTON_L, 50, 50);
         pbf_press_button(context, BUTTON_B, 50, 50);
@@ -644,7 +644,7 @@ void escape_stuck_on_wall(const ProgramInfo& info, ConsoleHandle& console, BotBa
             console.log("Could not escape wall.");
             throw OperationFailedException(
                 ErrorReport::SEND_ERROR_REPORT, console,
-                "escape_stuck_on_wall(): Could not escape wall.",
+                "jump_off_wall_until_map_open(): Could not escape wall.",
                 true
             );
         }
