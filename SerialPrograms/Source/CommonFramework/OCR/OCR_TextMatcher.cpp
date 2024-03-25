@@ -192,12 +192,12 @@ std::vector<uint64_t> binomial_row_u64(size_t degree){
 
     return row;
 }
-uint64_t binomial_coefficient_u64(size_t degree, size_t index){
-    if (degree > 62){
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Cannot go beyond degree 62.");
+double binomial_coefficient_double(size_t degree, size_t index){
+    if (degree > 1000){
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Cannot go beyond degree 1000.");
     }
 
-    SpinLockGuard lg(binomial_lock, "binomial_coefficient_u64()");
+    SpinLockGuard lg(binomial_lock, "binomial_coefficient_double()");
 
     auto iter = binomial_table.find(degree);
     std::vector<uint64_t>& row = iter != binomial_table.end()
@@ -213,8 +213,8 @@ uint64_t binomial_coefficient_u64(size_t degree, size_t index){
 
 
 double random_match_probability(size_t total, size_t matched, double random_match_chance){
-    if (total > 62){
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Cannot go beyond degree 62.");
+    if (total > 1000){
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Cannot go beyond degree 1000.");
     }
 
     double c_match = 1 - random_match_chance;
@@ -238,7 +238,7 @@ double random_match_probability(size_t total, size_t matched, double random_matc
 
     double probability = 0;
     for (; m < total; m++){
-        double binomial = (double)binomial_coefficient_u64(total, m);
+        double binomial = (double)binomial_coefficient_double(total, m);
         probability += hits * binomial * misses[total - m];
         hits *= random_match_chance;
     }
