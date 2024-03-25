@@ -253,41 +253,44 @@ void picnic_at_zero_gate(const ProgramInfo& info, ConsoleHandle& console, BotBas
     picnic_from_overworld(info, console, context);
 }
 
-bool eat_egg_sandwich_at_picnic(const ProgramInfo& info, AsyncDispatcher& dispatcher, ConsoleHandle& console, BotBaseContext& context,
+bool eat_egg_sandwich_at_picnic(SingleSwitchProgramEnvironment& env, AsyncDispatcher& dispatcher, ConsoleHandle& console, BotBaseContext& context,
     EggSandwichType sandwich_type, Language language)
 {
     // Move forward to table to make sandwich
     pbf_move_left_joystick(context, 128, 0, 30, 40);
     context.wait_for_all_requests();
 
-    clear_mons_in_front(info, console, context);
-    if (enter_sandwich_recipe_list(info, console, context) == false){
+    clear_mons_in_front(env.program_info(), console, context);
+    if (enter_sandwich_recipe_list(env.program_info(), console, context) == false){
         return false;
     }
     switch (sandwich_type){
     case EggSandwichType::GREAT_PEANUT_BUTTER:
     {
-        if (select_sandwich_recipe(info, console, context, 17) == false){
+        if (select_sandwich_recipe(env.program_info(), console, context, 17) == false){
             // cannot find the sandwich recipe, either user has not unlocked it or does not have enough ingredients:
             return false;
         }
-        build_great_peanut_butter_sandwich(info, dispatcher, console, context);
+        std::map<std::string, uint8_t> fillings = { {"banana", (uint8_t)1} };
+        std::vector<std::string> fillings_sorted;
+        fillings_sorted.push_back("banana");
+        int plates = 1;
+        run_sandwich_maker(env, context, language, fillings, fillings_sorted, plates);
         break;
     }
     case EggSandwichType::TWO_SWEET_HERBS:
     case EggSandwichType::SALTY_SWEET_HERBS:
     case EggSandwichType::BITTER_SWEET_HERBS:
-        enter_custom_sandwich_mode(info, console, context);
+        enter_custom_sandwich_mode(env.program_info(), console, context);
         if (language == Language::None){
             throw UserSetupError(console.logger(), "Must set game langauge option to read ingredient lists to make herb sandwich.");
         }
-        make_two_herbs_sandwich(info, dispatcher, console, context, sandwich_type, language);
+        make_two_herbs_sandwich(env.program_info(), dispatcher, console, context, sandwich_type, language);
+        finish_sandwich_eating(env.program_info(), console, context);
         break;
     default:
         throw InternalProgramError(&console.logger(), PA_CURRENT_FUNCTION, "Unknown EggSandwichType");
     }
-    
-    finish_sandwich_eating(info, console, context);
 
     return true;
 }

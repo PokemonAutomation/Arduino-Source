@@ -388,67 +388,6 @@ ImageFloatBox move_sandwich_hand(
 
 } // end anonymous namesapce
 
-void build_great_peanut_butter_sandwich(const ProgramInfo& info, AsyncDispatcher& dispatcher, ConsoleHandle& console, BotBaseContext& context){
-    const ImageFloatBox sandwich_target_box_left  {0.386, 0.507, 0.060, 0.055};
-    const ImageFloatBox sandwich_target_box_middle{0.470, 0.507, 0.060, 0.055};
-    const ImageFloatBox sandwich_target_box_right {0.554, 0.507, 0.060, 0.055};
-    const ImageFloatBox upper_bread_drop_box{0.482, 0.400, 0.036, 0.030};
-
-    wait_for_initial_hand(info, console, context);
-    console.overlay().add_log("Start making sandwich", COLOR_WHITE);
-
-    // console.overlay().add_log("Pick first banana", COLOR_WHITE);
-    auto end_box = move_sandwich_hand(info, dispatcher, console, context, SandwichHandType::FREE, false, HAND_INITIAL_BOX, INGREDIENT_BOX);
-
-    // console.overlay().add_log("Drop first banana", COLOR_WHITE);
-    // visual feedback grabbing is not reliable. Switch to blind grabbing:
-    end_box = move_sandwich_hand(info, dispatcher, console, context, SandwichHandType::GRABBING, true, expand_box(end_box), sandwich_target_box_left);
-    
-    // pbf_controller_state(context, BUTTON_A, DPAD_NONE, 100, 200, 128, 128, 120);
-    // context.wait_for(std::chrono::milliseconds(100));
-    // context.wait_for_all_requests();
-
-    // console.overlay().add_log("Pick second banana", COLOR_WHITE);
-    end_box = move_sandwich_hand(info, dispatcher, console, context, SandwichHandType::FREE, false, {0, 0, 1.0, 1.0}, INGREDIENT_BOX);
-
-    // console.overlay().add_log("Drop second banana", COLOR_WHITE);
-    end_box = move_sandwich_hand(info, dispatcher, console, context, SandwichHandType::GRABBING, true, expand_box(end_box), sandwich_target_box_middle);
-    // pbf_controller_state(context, BUTTON_A, DPAD_NONE, 128, 200, 128, 128, 120);
-    // context.wait_for(std::chrono::milliseconds(100));
-    // context.wait_for_all_requests();
-
-    // console.overlay().add_log("Pick third banana", COLOR_WHITE);
-    end_box = move_sandwich_hand(info, dispatcher, console, context, SandwichHandType::FREE, false, {0, 0, 1.0, 1.0}, INGREDIENT_BOX);
-    
-    // console.overlay().add_log("Drop third banana", COLOR_WHITE);
-    end_box = move_sandwich_hand(info, dispatcher, console, context, SandwichHandType::GRABBING, true, expand_box(end_box), sandwich_target_box_right);
-    // pbf_controller_state(context, BUTTON_A, DPAD_NONE, 156, 200, 128, 128, 120);
-    // context.wait_for(std::chrono::milliseconds(100));
-    // context.wait_for_all_requests();
-
-    // Drop upper bread and pick
-    // console.overlay().add_log("Drop upper bread and pick", COLOR_WHITE);
-    SandwichHandWatcher grabbing_hand(SandwichHandType::FREE, {0, 0, 1.0, 1.0});
-    int ret = wait_until(console, context, std::chrono::seconds(30), {grabbing_hand});
-    if (ret < 0){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, console,
-            "make_great_peanut_butter_sandwich(): Cannot detect grabing hand when waiting for upper bread.",
-            grabbing_hand.last_snapshot()
-        );
-    }
-
-    auto hand_box = hand_location_to_box(grabbing_hand.location());
-
-    end_box = move_sandwich_hand(info, dispatcher, console, context, SandwichHandType::GRABBING, false, expand_box(hand_box), upper_bread_drop_box);
-    pbf_mash_button(context, BUTTON_A, 125 * 5);
-
-    console.log("Hand end box " + box_to_string(end_box));
-    console.overlay().add_log("Built sandwich", COLOR_WHITE);
-
-    context.wait_for_all_requests();
-}
-
 void finish_sandwich_eating(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
     console.overlay().add_log("Eating", COLOR_WHITE);
     PicnicWatcher picnic_watcher;
@@ -697,7 +636,7 @@ void make_two_herbs_sandwich(
     finish_two_herbs_sandwich(info, dispatcher, console, context);
 }
 
-void run_sandwich_maker(SingleSwitchProgramEnvironment& env, BotBaseContext& context, SandwichMakerOption& SANDWICH_OPTIONS) {
+void make_sandwich_option(SingleSwitchProgramEnvironment& env, BotBaseContext& context, SandwichMakerOption& SANDWICH_OPTIONS) {
     const Language language = SANDWICH_OPTIONS.LANGUAGE;
     if (language == Language::None) {
         throw UserSetupError(env.console.logger(), "Must set game langauge option to read ingredient lists.");
@@ -787,6 +726,10 @@ void run_sandwich_maker(SingleSwitchProgramEnvironment& env, BotBaseContext& con
     }
     */
 
+    make_sandwich_preset(env, context, SANDWICH_OPTIONS.LANGUAGE, fillings, condiments);
+}
+
+void make_sandwich_preset(SingleSwitchProgramEnvironment& env, BotBaseContext& context, Language language, std::map<std::string, uint8_t>& fillings, std::map<std::string, uint8_t>& condiments) {
     //Sort the fillings by priority for building (ex. large items on bottom, cherry tomatoes on top)
     //std::vector<std::string> fillings_game_order = {"lettuce", "tomato", "cherry-tomatoes", "cucumber", "pickle", "onion", "red-onion", "green-bell-pepper", "red-bell-pepper",
     //    "yellow-bell-pepper", "avocado", "bacon", "ham", "prosciutto", "chorizo", "herbed-sausage", "hamburger", "klawf-stick", "smoked-fillet", "fried-fillet", "egg", "potato-tortilla",
@@ -843,8 +786,9 @@ void run_sandwich_maker(SingleSwitchProgramEnvironment& env, BotBaseContext& con
         }
     }
     //cout << "Number of plates: " << plates << endl;
-    env.log("Number of plates: " + std::to_string(plates), COLOR_BLACK);
-    env.console.overlay().add_log("Number of plates: " + std::to_string(plates), COLOR_WHITE);
+    int plates_string = plates;
+    env.log("Number of plates: " + std::to_string(plates_string), COLOR_BLACK);
+    env.console.overlay().add_log("Number of plates: " + std::to_string(plates_string), COLOR_WHITE);
     for (const auto& filling: fillings){
         env.log("Require filling " + filling.first + " x" + std::to_string(int(filling.second)));
     }
@@ -857,6 +801,12 @@ void run_sandwich_maker(SingleSwitchProgramEnvironment& env, BotBaseContext& con
     enter_custom_sandwich_mode(env.program_info(), env.console, context);
     add_sandwich_ingredients(env.realtime_dispatcher(), env.console, context, language,
         std::move(fillings_copy), std::move(condiments));
+
+    run_sandwich_maker(env, context, language, fillings, fillings_sorted, plates);
+}
+
+void run_sandwich_maker(SingleSwitchProgramEnvironment& env, BotBaseContext& context, Language language, std::map<std::string, uint8_t>& fillings, std::vector<std::string>& fillings_sorted, int& plates) {
+
     wait_for_initial_hand(env.program_info(), env.console, context);
 
     //Wait for labels to appear
@@ -866,7 +816,6 @@ void run_sandwich_maker(SingleSwitchProgramEnvironment& env, BotBaseContext& con
     context.wait_for_all_requests();
 
     //Now read in plate labels and store which plate has what
-    //TODO: Clean this up - this is a mess
     env.log("Reading plate labels.", COLOR_BLACK);
     env.console.overlay().add_log("Reading plate labels.", COLOR_WHITE);
 
@@ -900,8 +849,6 @@ void run_sandwich_maker(SingleSwitchProgramEnvironment& env, BotBaseContext& con
             plate_order.push_back(center_filling);
             break;
         }
-
-
 
         //Get left (2nd) ingredient
         std::string left_filling = left_plate_detector.detect_filling_name(screen);
