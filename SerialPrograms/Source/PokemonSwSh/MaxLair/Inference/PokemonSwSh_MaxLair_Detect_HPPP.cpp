@@ -81,6 +81,10 @@ int8_t parse_pp(const std::string& str){
             tokens.back() += '0';
             continue;
         }
+        if (ch == 'A'){
+            tokens.back() += '4';
+            continue;
+        }
         if (ch == '/'){
             tokens.emplace_back();
             continue;
