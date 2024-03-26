@@ -81,6 +81,14 @@ void make_two_herbs_sandwich(
 // Make a custom sandwich as set in the sandwich maker options
 void run_sandwich_maker(SingleSwitchProgramEnvironment& env, BotBaseContext& context, SandwichMakerOption& SANDWICH_OPTIONS);
 
+//Starting at the sandwich recipe list, make a flavored sandwich for BBQ Quest. Uses great peanut butter sandwich motions.
+void make_bbq_flavored_sandwich(const ProgramInfo& info, AsyncDispatcher& dispatcher, ConsoleHandle& console, BotBaseContext& context, Language language,
+    std::map<std::string, uint8_t>& fillings, std::map<std::string, uint8_t>& condiments);
+
+//Starting at the sandwich recipe list, make a 3 ingredient sandwich
+void make_bbq_three_sandwich(const ProgramInfo& info, AsyncDispatcher& dispatcher, ConsoleHandle& console, BotBaseContext& context, Language language,
+    std::map<std::string, uint8_t>& fillings, std::map<std::string, uint8_t>& condiments);
+
 }
 }
 }

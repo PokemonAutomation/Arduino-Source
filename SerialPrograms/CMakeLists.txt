@@ -1324,6 +1324,10 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Inference/PokemonSV_AuctionItemNameReader.h
     Source/PokemonSV/Inference/PokemonSV_BagDetector.cpp
     Source/PokemonSV/Inference/PokemonSV_BagDetector.h
+    Source/PokemonSV/Inference/PokemonSV_BlueberryQuestDetector.cpp
+    Source/PokemonSV/Inference/PokemonSV_BlueberryQuestDetector.h
+    Source/PokemonSV/Inference/PokemonSV_BlueberryQuestReader.cpp
+    Source/PokemonSV/Inference/PokemonSV_BlueberryQuestReader.h
     Source/PokemonSV/Inference/PokemonSV_ClothingTopDetector.cpp
     Source/PokemonSV/Inference/PokemonSV_ClothingTopDetector.h
     Source/PokemonSV/Inference/PokemonSV_ESPEmotionDetector.cpp
@@ -1365,6 +1369,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Options/PokemonSV_AutoHostOptions.h
     Source/PokemonSV/Options/PokemonSV_BattleMoveTable.cpp
     Source/PokemonSV/Options/PokemonSV_BattleMoveTable.h
+    Source/PokemonSV/Options/PokemonSV_BBQOption.cpp
+    Source/PokemonSV/Options/PokemonSV_BBQOption.h
     Source/PokemonSV/Options/PokemonSV_EggPowerSandwichOption.cpp
     Source/PokemonSV/Options/PokemonSV_EggPowerSandwichOption.h
     Source/PokemonSV/Options/PokemonSV_EncounterActionsTable.cpp
@@ -1424,6 +1430,12 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggRoutines.h
     Source/PokemonSV/Programs/Farming/PokemonSV_AuctionFarmer.cpp
     Source/PokemonSV/Programs/Farming/PokemonSV_AuctionFarmer.h
+    Source/PokemonSV/Programs/Farming/PokemonSV_BBQSoloFarmer.cpp
+    Source/PokemonSV/Programs/Farming/PokemonSV_BBQSoloFarmer.h
+    Source/PokemonSV/Programs/Farming/PokemonSV_BlueberryCatchPhoto.cpp
+    Source/PokemonSV/Programs/Farming/PokemonSV_BlueberryCatchPhoto.h
+    Source/PokemonSV/Programs/Farming/PokemonSV_BlueberryQuests.cpp
+    Source/PokemonSV/Programs/Farming/PokemonSV_BlueberryQuests.h
     Source/PokemonSV/Programs/Farming/PokemonSV_ESPTraining.cpp
     Source/PokemonSV/Programs/Farming/PokemonSV_ESPTraining.h
     Source/PokemonSV/Programs/Farming/PokemonSV_FlyingTrialFarmer.cpp
@@ -1476,6 +1488,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Programs/PokemonSV_Navigation.h
     Source/PokemonSV/Programs/PokemonSV_SaveGame.cpp
     Source/PokemonSV/Programs/PokemonSV_SaveGame.h
+    Source/PokemonSV/Programs/PokemonSV_Terarium.cpp
+    Source/PokemonSV/Programs/PokemonSV_Terarium.h
     Source/PokemonSV/Programs/Sandwiches/PokemonSV_IngredientSession.cpp
     Source/PokemonSV/Programs/Sandwiches/PokemonSV_IngredientSession.h
     Source/PokemonSV/Programs/Sandwiches/PokemonSV_SandwichMaker.cpp

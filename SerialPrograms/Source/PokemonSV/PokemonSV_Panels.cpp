@@ -31,6 +31,7 @@
 #include "Programs/Farming/PokemonSV_TournamentFarmer2.h"
 #include "Programs/Farming/PokemonSV_FlyingTrialFarmer.h"
 #include "Programs/Farming/PokemonSV_WildItemFarmer.h"
+#include "Programs/Farming/PokemonSV_BBQSoloFarmer.h"
 
 #include "Programs/Eggs/PokemonSV_EggFetcher.h"
 #include "Programs/Eggs/PokemonSV_EggHatcher.h"
@@ -102,6 +103,9 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<TournamentFarmer_Descriptor, TournamentFarmer>());
     ret.emplace_back(make_single_switch_program<TournamentFarmer2_Descriptor, TournamentFarmer2>());
     ret.emplace_back(make_single_switch_program<FlyingTrialFarmer_Descriptor, FlyingTrialFarmer>());
+    if (PreloadSettings::instance().DEVELOPER_MODE) {
+        ret.emplace_back(make_single_switch_program<BBQSoloFarmer_Descriptor, BBQSoloFarmer>());
+    }
 
     ret.emplace_back("---- Eggs ----");
     ret.emplace_back(make_single_switch_program<EggFetcher_Descriptor, EggFetcher>());
