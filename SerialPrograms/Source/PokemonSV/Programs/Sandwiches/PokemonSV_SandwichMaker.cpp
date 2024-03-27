@@ -53,7 +53,7 @@ SandwichMaker::SandwichMaker()
 void SandwichMaker::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
     assert_16_9_720p_min(env.logger(), env.console);
 
-    make_sandwich_option(env, context, SANDWICH_OPTIONS);
+    make_sandwich_option(env.program_info(), env.realtime_dispatcher(), env.console, context, SANDWICH_OPTIONS);
 
     GO_HOME_WHEN_DONE.run_end_of_program(context);
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
