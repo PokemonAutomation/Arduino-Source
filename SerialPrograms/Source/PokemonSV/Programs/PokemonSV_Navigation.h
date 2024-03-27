@@ -67,6 +67,11 @@ void leave_phone_to_overworld(const ProgramInfo& info, ConsoleHandle& console, B
 //  by other map icons on the most zoomed-in level of the map.
 void fly_to_closest_pokecenter_on_map(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
 
+// Attempt to escape being stuck on a wall.
+// Repeatedly center camera and try to backwards jump off.
+// Finishes when map is successfully open.
+void jump_off_wall_until_map_open(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
+
 
 }
 }
