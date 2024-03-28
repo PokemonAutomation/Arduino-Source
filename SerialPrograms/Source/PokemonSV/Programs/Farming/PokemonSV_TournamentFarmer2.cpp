@@ -244,14 +244,19 @@ void TournamentFarmer2::program(SingleSwitchProgramEnvironment& env, BotBaseCont
             if (battles == 3){
                 env.log("Final battle of the tournament complete, checking for overworld/loss.");
 
-                //  Clear dialog, mash B
-                pbf_mash_button(context, BUTTON_B, 400);
                 context.wait_for_all_requests();
 
-                ret = wait_until(
+                /* 
+                - mash B to clear dialog. if reaches overworld within 15 seconds, you likely lost. else you likely won.
+                    - if lose, it takes approx 7-8 seconds from battle end to overworld
+                    - if win, it takes approx 30 seconds from battle end to overworld
+                */
+                ret = run_until(
                     env.console, context,
-                    std::chrono::seconds(3),
-                    {overworld}
+                    [](BotBaseContext& context) {
+                        pbf_mash_button(context, BUTTON_B, 15 * TICKS_PER_SECOND);
+                    },
+                    {overworld} 
                 );
                 switch (ret){
                 case 0:
