@@ -307,7 +307,7 @@ void ShinyHuntScatterbug::run_one_sandwich_iteration(SingleSwitchProgramEnvironm
 
                 pbf_move_left_joystick(context, 128, 0, 30, 40);
                 enter_sandwich_recipe_list(env.program_info(), env.console, context);
-                run_sandwich_maker(env, context, SANDWICH_OPTIONS);
+                make_sandwich_option(env, env.console, context, SANDWICH_OPTIONS);
                 last_sandwich_time = current_time();
                 leave_picnic(env.program_info(), env.console, context);
             } else {
