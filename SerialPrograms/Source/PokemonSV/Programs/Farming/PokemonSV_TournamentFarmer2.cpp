@@ -202,6 +202,7 @@ void TournamentFarmer2::program(SingleSwitchProgramEnvironment& env, BotBaseCont
         context.wait_for_all_requests();
 
         stats.tournaments++;
+        env.update_stats();
 
         bool battle_lost = false;
         for (uint16_t battles = 0; battles < 4; battles++){
@@ -281,6 +282,7 @@ void TournamentFarmer2::program(SingleSwitchProgramEnvironment& env, BotBaseCont
         //  Tournament won
         if (!battle_lost){
             stats.wins++;
+            env.update_stats();
             OverworldWatcher overworld(COLOR_CYAN);
             int ret = run_until(
                 env.console, context,
