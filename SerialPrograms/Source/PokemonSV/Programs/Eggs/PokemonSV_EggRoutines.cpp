@@ -275,7 +275,7 @@ bool eat_egg_sandwich_at_picnic(SingleSwitchProgramEnvironment& env, AsyncDispat
         std::vector<std::string> fillings_sorted;
         fillings_sorted.push_back("banana");
         int plates = 1;
-        run_sandwich_maker(env, context, language, fillings, fillings_sorted, plates);
+        run_sandwich_maker(env, console, context, language, fillings, fillings_sorted, plates);
         break;
     }
     case EggSandwichType::TWO_SWEET_HERBS:

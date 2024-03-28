@@ -75,19 +75,19 @@ void make_two_herbs_sandwich(
 
 // Assuming starting at the sandwich recipe list,
 // Process sandwich options and make a custom sandwich by calling make_sandwich_preset
-void make_sandwich_option(SingleSwitchProgramEnvironment& env, BotBaseContext& context, SandwichMakerOption& SANDWICH_OPTIONS);
+void make_sandwich_option(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, SandwichMakerOption& SANDWICH_OPTIONS);
 
 // Assuming starting at the sandwich recipe list, make a sandwich given a preset ingredient/filling list
 // calls run_sandwich_maker() when done
 // ex. fillings = {{"apple", (uint8_t)1}}; condiments = {{"marmalade", (uint8_t)1}};
 // make_sandwich_preset(env, context, language, fillings, condiments);
-void make_sandwich_preset(SingleSwitchProgramEnvironment& env, BotBaseContext& context, Language language, std::map<std::string, uint8_t>& fillings, std::map<std::string, uint8_t>& condiments);
+void make_sandwich_preset(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, Language language, std::map<std::string, uint8_t>& fillings, std::map<std::string, uint8_t>& condiments);
 
 // Assuming starting waiting for sandwich hand,
 // Take a list of ingredients and make a sandwich
 // Not meant to be run directly, use make_sandwich_option() or make_sandwich_preset() instead
 // make great pb sandwich does call this directly, as it skips the custom sandwich menu
-void run_sandwich_maker(SingleSwitchProgramEnvironment& env, BotBaseContext& context, Language language, std::map<std::string, uint8_t>& fillings, std::vector<std::string>& fillings_sorted, int& plates);
+void run_sandwich_maker(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, Language language, std::map<std::string, uint8_t>& fillings, std::vector<std::string>& fillings_sorted, int& plates);
 
 
 }
