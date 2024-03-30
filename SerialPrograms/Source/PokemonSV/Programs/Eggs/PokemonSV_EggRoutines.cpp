@@ -253,7 +253,7 @@ void picnic_at_zero_gate(const ProgramInfo& info, ConsoleHandle& console, BotBas
     picnic_from_overworld(info, console, context);
 }
 
-bool eat_egg_sandwich_at_picnic(SingleSwitchProgramEnvironment& env, AsyncDispatcher& dispatcher, ConsoleHandle& console, BotBaseContext& context,
+bool eat_egg_sandwich_at_picnic(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     EggSandwichType sandwich_type, Language language)
 {
     // Move forward to table to make sandwich
@@ -285,7 +285,7 @@ bool eat_egg_sandwich_at_picnic(SingleSwitchProgramEnvironment& env, AsyncDispat
         if (language == Language::None){
             throw UserSetupError(console.logger(), "Must set game langauge option to read ingredient lists to make herb sandwich.");
         }
-        make_two_herbs_sandwich(env.program_info(), dispatcher, console, context, sandwich_type, language);
+        make_two_herbs_sandwich(env.program_info(), env.realtime_dispatcher(), console, context, sandwich_type, language);
         finish_sandwich_eating(env.program_info(), console, context);
         break;
     default:

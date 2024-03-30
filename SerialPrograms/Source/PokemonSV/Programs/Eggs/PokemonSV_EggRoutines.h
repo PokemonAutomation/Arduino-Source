@@ -45,7 +45,7 @@ void picnic_at_zero_gate(const ProgramInfo& info, ConsoleHandle& console, BotBas
 // - Two-sweet-herbs, bitter-sweet-herbs or salty-sweet-herbs custom sandwich to gain egg power Lv 3, must have enough ingredinets and
 //   provide game language for OCR ingredient lists.
 // Return false if no needed sandwich ingredients or recipe.
-bool eat_egg_sandwich_at_picnic(SingleSwitchProgramEnvironment& env, AsyncDispatcher& dispatcher, ConsoleHandle& console,
+bool eat_egg_sandwich_at_picnic(ProgramEnvironment& env, ConsoleHandle& console,
     BotBaseContext& context, EggSandwichType sandwich_type, Language language);
 
 // After eating a sandwich, go around picnic table to wait at basket and collect eggs.
