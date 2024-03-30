@@ -15,6 +15,7 @@
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_NormalBattleMenus.h"
+#include "PokemonSV/Inference/Map/PokemonSV_FastTravelDetector.h"
 #include "PokemonSV/Programs/PokemonSV_SaveGame.h"
 #include "PokemonSV/Programs/Battles/PokemonSV_SinglesBattler.h"
 #include "PokemonSV_TournamentFarmer.h"
@@ -241,33 +242,54 @@ void TournamentFarmer2::program(SingleSwitchProgramEnvironment& env, BotBaseCont
                 );
             }
 
-            //  If this is the last battle in the tournament check for overworld in case player lost
+
             if (battles == 3){
-                env.log("Final battle of the tournament complete, checking for overworld/loss.");
+                env.log("Final battle of the tournament complete, checking for overworld.");
 
                 context.wait_for_all_requests();
 
                 /* 
-                - mash B to clear dialog. if reaches overworld within 15 seconds, you likely lost. else you likely won.
-                    - if lose, it takes approx 7-8 seconds from battle end to overworld
-                    - if win, it takes approx 30 seconds from battle end to overworld
+                - mash B to clear dialog until it reaches the overworld.
+                - then it looks for the Fast travel icon
+                  - if win: Fast Travel will be detected
+                  - if lose: will time out.
                 */
                 ret = run_until(
                     env.console, context,
                     [](BotBaseContext& context) {
-                        pbf_mash_button(context, BUTTON_B, 15 * TICKS_PER_SECOND);
+                        pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
                     },
                     {overworld} 
                 );
+                if (ret < 0){
+                    throw OperationFailedException(
+                        ErrorReport::SEND_ERROR_REPORT, env.console,
+                        "Failed to return to overworld afer 2 minutes.",
+                        true
+                    );
+                }
+                context.wait_for_all_requests();
+
+                FastTravelWatcher fast_travel(COLOR_YELLOW, env.console.overlay(), MINIMAP_AREA);
+                ret = run_until(
+                    env.console, context,
+                    [](BotBaseContext& context) {
+                        pbf_mash_button(context, BUTTON_B, 5 * TICKS_PER_SECOND);
+                    },
+                    {fast_travel}
+                );
+                context.wait_for_all_requests();
+
                 switch (ret){
                 case 0:
+                    env.log("Detected fast travel icon.");
+                    env.log("Final battle of the tournament won.");
+                    break;
+                default:
                     env.log("Final battle of the tournament lost.");
                     battle_lost = true;
                     stats.losses++;
                     env.update_stats();
-                    break;
-                default:
-                    env.log("Final battle of the tournament won.");
                     break;
                 }
             }
@@ -283,21 +305,6 @@ void TournamentFarmer2::program(SingleSwitchProgramEnvironment& env, BotBaseCont
         if (!battle_lost){
             stats.wins++;
             env.update_stats();
-            OverworldWatcher overworld(COLOR_CYAN);
-            int ret = run_until(
-                env.console, context,
-                [](BotBaseContext& context) {
-                    pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
-                },
-                {overworld}
-            );
-            if (ret < 0){
-                throw OperationFailedException(
-                    ErrorReport::SEND_ERROR_REPORT, env.console,
-                    "Failed to return to overworld afer 2 minutes.",
-                    true
-                );
-            }
         }
 
         env.log("Tournament loop complete.");

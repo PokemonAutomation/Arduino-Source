@@ -18,6 +18,7 @@
 #include "PokemonSV/Inference/Map/PokemonSV_MapDetector.h"
 #include "PokemonSV/Inference/Map/PokemonSV_MapMenuDetector.h"
 #include "PokemonSV/Inference/Map/PokemonSV_MapPokeCenterIconDetector.h"
+#include "PokemonSV/Inference/Map/PokemonSV_FastTravelDetector.h"
 #include "PokemonSV/Inference/Tera/PokemonSV_TeraCardDetector.h"
 #include "PokemonSV/Inference/Tera/PokemonSV_TeraSilhouetteReader.h"
 #include "PokemonSV/Inference/Tera/PokemonSV_TeraTypeReader.h"
@@ -454,6 +455,14 @@ int test_pokemonSV_DialogBoxDetector(const ImageViewRGB32& image, bool target) {
     DialogBoxDetector detector(COLOR_RED);
     bool result = detector.detect(image);
     TEST_RESULT_EQUAL(result, target);
+    return 0;
+}
+
+int test_pokemonSV_FastTravelDetector(const ImageViewRGB32& image, bool target) {
+    FastTravelDetector detector(COLOR_RED, MINIMAP_AREA);
+    bool result = detector.detect(image);
+    TEST_RESULT_EQUAL(result, target);
+
     return 0;
 }
 
