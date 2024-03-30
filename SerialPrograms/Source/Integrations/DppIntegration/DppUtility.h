@@ -3,6 +3,7 @@
 #define DPP_UTILITY_H
 
 #include <dpp/dpp.h>
+#include <atomic>
 #include "Common/Cpp/AbstractLogger.h"
 
 namespace PokemonAutomation{

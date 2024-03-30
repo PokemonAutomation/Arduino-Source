@@ -6,6 +6,7 @@
 
 #include <set>
 #include <atomic>
+#include <exception>
 #include <iostream>
 #include "Concurrency/SpinLock.h"
 #include "LifetimeSanitizer.h"
