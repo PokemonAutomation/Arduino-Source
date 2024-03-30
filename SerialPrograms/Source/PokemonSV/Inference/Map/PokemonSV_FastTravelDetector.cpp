@@ -30,7 +30,7 @@ public:
     ) {
         m_aspect_ratio_lower = 0.9;
         m_aspect_ratio_upper = 1.2;
-        m_area_ratio_lower = 0.7;
+        m_area_ratio_lower = 0.6;
         m_area_ratio_upper = 1.1;
     }
 
@@ -59,11 +59,13 @@ bool FastTravelDetector::detect(const ImageViewRGB32& screen) const{
 
 std::vector<ImageFloatBox> FastTravelDetector::detect_all(const ImageViewRGB32& screen) const{
     const std::vector<std::pair<uint32_t, uint32_t>> filters = {
-        {combine_rgb(0, 0, 80), combine_rgb(140, 140, 255)}
+        {combine_rgb(0, 0, 80), combine_rgb(140, 140, 255)},
+        {combine_rgb(5, 100, 200), combine_rgb(60, 135, 255)},
     };
 
     const double min_object_size = 400.0;
-    const double rmsd_threshold = 60.0;
+    // need to keep RMSD threshold below 100, else will false positive the blue dots at blueberry academy
+    const double rmsd_threshold = 80.0;
 
     const double screen_rel_size = (screen.height() / 1080.0);
     const size_t min_size = size_t(screen_rel_size * screen_rel_size * min_object_size);
