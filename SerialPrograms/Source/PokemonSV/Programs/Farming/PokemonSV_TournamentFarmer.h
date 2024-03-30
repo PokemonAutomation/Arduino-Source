@@ -23,7 +23,8 @@ namespace PokemonSV{
 
 void return_to_academy_after_loss(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
-
+// attempt to fly back to academy fly point from the West Mesogoza Pokecenter. Will attempt maxAttempts times.
+void go_to_academy_fly_point(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
 class TournamentFarmer_Descriptor : public SingleSwitchProgramDescriptor{
 public:

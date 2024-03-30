@@ -559,10 +559,8 @@ void TournamentFarmer::handle_end_of_tournament(SingleSwitchProgramEnvironment& 
 //Fly to academy from west pokemon center after losing.
 void return_to_academy_after_loss(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
     env.log("Tournament lost! Navigating back to academy.");
-    open_map_from_overworld(env.program_info(), env.console, context);
-    pbf_press_button(context, BUTTON_ZR, 50, 40);
-    pbf_move_left_joystick(context, 187, 0, 50, 0);
-    fly_to_overworld_from_map(env.program_info(), env.console, context);
+    go_to_academy_fly_point(env, context);
+
 
     pbf_wait(context, 100);
     context.wait_for_all_requests();
@@ -603,6 +601,35 @@ void return_to_academy_after_loss(SingleSwitchProgramEnvironment& env, BotBaseCo
     pbf_move_left_joystick(context, 0, 128, 100, 0);
     pbf_move_left_joystick(context, 255, 0, 100, 0);
     context.wait_for_all_requests();
+}
+
+void go_to_academy_fly_point(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    int numAttempts = 0;
+    int maxAttempts = 5;
+
+    bool isFlySuccessful = false;
+
+    while (!isFlySuccessful && numAttempts < maxAttempts ){
+        open_map_from_overworld(env.program_info(), env.console, context);
+        pbf_press_button(context, BUTTON_ZR, 50, 40);
+        pbf_move_left_joystick(context, 200, 0, 47, 25);  
+        // pbf_move_left_joystick(context, 187, 0, 50, 0);
+        numAttempts++;
+        isFlySuccessful = fly_to_overworld_from_map(env.program_info(), env.console, context, true);
+        if (!isFlySuccessful){
+            env.log("Unsuccessful fly attempt.");
+        }
+        pbf_mash_button(context, BUTTON_B, 100);
+    }
+
+    if(!isFlySuccessful){
+        throw OperationFailedException(
+            ErrorReport::SEND_ERROR_REPORT, env.console,
+            "Failed to fly back to academy!",
+            true
+        );
+    }
+
 }
 
 
