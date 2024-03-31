@@ -101,7 +101,7 @@ void EggFetcher::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
             picnic_at_zero_gate(env.program_info(), env.console, context);
             // Now we are at picnic. We are at one end of picnic table while the egg basket is at the other end
 
-            bool can_make_sandwich = eat_egg_sandwich_at_picnic(env.program_info(), env.realtime_dispatcher(), env.console, context,
+            bool can_make_sandwich = eat_egg_sandwich_at_picnic(env, env.console, context,
                 EGG_SANDWICH.EGG_SANDWICH_TYPE, LANGUAGE);
             if (can_make_sandwich == false){
                 throw UserSetupError(env.console, "No sandwich recipe or ingredients. Cannot open and select the sandwich recipe.");
