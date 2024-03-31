@@ -19,6 +19,7 @@
 #include <mutex>
 #include <condition_variable>
 #include <thread>
+#include <exception>
 
 namespace PokemonAutomation{
 
