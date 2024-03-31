@@ -311,7 +311,7 @@ std::vector<BBQuests> process_quest_list(const ProgramInfo& info, ConsoleHandle&
     return quests_to_do;
 }
 
-bool process_and_do_quest(ProgramEnvironment& env, AsyncDispatcher& dispatcher, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, BBQuests& current_quest, uint8_t& eggs_hatched) {
+bool process_and_do_quest(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, BBQuests& current_quest, uint8_t& eggs_hatched) {
     bool quest_completed = false;
     int quest_attempts = 0;
 
@@ -339,7 +339,7 @@ bool process_and_do_quest(ProgramEnvironment& env, AsyncDispatcher& dispatcher, 
             quest_hatch_egg(env.program_info(), console, context, BBQ_OPTIONS);
             break;
         case BBQuests::bitter_sandwich: case BBQuests::salty_sandwich: case BBQuests::sour_sandwich: case BBQuests::spicy_sandwich: case BBQuests::sweet_sandwich: case BBQuests::sandwich_three:
-            quest_sandwich(env.program_info(), dispatcher, console, context, BBQ_OPTIONS, current_quest);
+            quest_sandwich(env, console, context, BBQ_OPTIONS, current_quest);
             break;
         //case BBQuests::pickup_10:
         //    quest_pickup(env, env.program_info(), console, context, BBQ_OPTIONS);
@@ -518,7 +518,7 @@ void quest_tera_self_defeat(const ProgramInfo& info, ConsoleHandle& console, Bot
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
             //Drop on top of Kleavor (plenty of Scyther in the area as well)
-            jump_glide_fly(console, context, BBQ_OPTIONS, 1000, 1650, 300);
+            jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 1000, 1650, 300);
 
             ssf_press_button(context, BUTTON_ZR, 0, 200);
             ssf_press_button(context, BUTTON_ZL, 100, 50);
@@ -601,7 +601,7 @@ void quest_sneak_up(const ProgramInfo& info, ConsoleHandle& console, BotBaseCont
             pbf_move_left_joystick(context, 220, 255, 10, 20);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
-            jump_glide_fly(console, context, BBQ_OPTIONS, 600, 400, 400);
+            jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 600, 400, 400);
 
             pbf_press_button(context, BUTTON_PLUS, 20, 105);
             pbf_move_left_joystick(context, 255, 128, 20, 50);
@@ -712,7 +712,7 @@ void quest_wild_tera(const ProgramInfo& info, ConsoleHandle& console, BotBaseCon
             pbf_move_left_joystick(context, 255, 180, 20, 105);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
-            jump_glide_fly(console, context, BBQ_OPTIONS, 500, 1300, 150);
+            jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 500, 1300, 150);
 
             //Skarmory is likely to attack but sometimes there is a different pokemon
             pbf_press_button(context, BUTTON_PLUS, 20, 105);
@@ -969,20 +969,20 @@ void quest_hatch_egg(const ProgramInfo& info, ConsoleHandle& console, BotBaseCon
     }
 }
 
-void quest_sandwich(const ProgramInfo& info, AsyncDispatcher& dispatcher, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, BBQuests& current_quest) {
+void quest_sandwich(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, BBQuests& current_quest) {
     console.log("Quest: Make a singleplayer sandwich");
 
     bool flavored = true;
     //Polar Plaza - egg basket gets stuck under table in Savanna/Canyon Plaza
-    central_to_polar_plaza(info, console, context);
+    central_to_polar_plaza(env.program_info(), console, context);
 
-    picnic_from_overworld(info, console, context);
+    picnic_from_overworld(env.program_info(), console, context);
 
     pbf_move_left_joystick(context, 128, 0, 30, 40);
     context.wait_for_all_requests();
 
     pbf_move_left_joystick(context, 128, 0, 70, 0);
-    enter_sandwich_recipe_list(info, console, context);
+    enter_sandwich_recipe_list(env.program_info(), console, context);
 
     std::map<std::string, uint8_t> fillings;
     std::map<std::string, uint8_t> condiments;
@@ -1029,16 +1029,11 @@ void quest_sandwich(const ProgramInfo& info, AsyncDispatcher& dispatcher, Consol
         break;
     }
 
-    if (flavored) {
-        make_bbq_flavored_sandwich(info, dispatcher, console, context, BBQ_OPTIONS.LANGUAGE, fillings, condiments);
-    }
-    else {
-        make_bbq_three_sandwich(info, dispatcher, console, context, BBQ_OPTIONS.LANGUAGE, fillings, condiments);
-    }
+    make_sandwich_preset(env, console, context, BBQ_OPTIONS.LANGUAGE, fillings, condiments);
 
-    leave_picnic(info, console, context);
+    leave_picnic(env.program_info(), console, context);
 
-    return_to_plaza(info, console, context);
+    return_to_plaza(env.program_info(), console, context);
     context.wait_for_all_requests();
 
 }

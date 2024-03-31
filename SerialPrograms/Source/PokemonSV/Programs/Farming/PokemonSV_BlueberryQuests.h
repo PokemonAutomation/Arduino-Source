@@ -81,7 +81,7 @@ std::vector<BBQuests> read_quests(const ProgramInfo& info, ConsoleHandle& consol
 std::vector<BBQuests> process_quest_list(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, std::vector<BBQuests>& quest_list, uint8_t& eggs_hatched);
 
 //Take the current quest and calls the function to do it, then checks the quest was successful. Returns true if so.
-bool process_and_do_quest(ProgramEnvironment& env, AsyncDispatcher& dispatcher, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, BBQuests& current_quest, uint8_t& eggs_hatched);
+bool process_and_do_quest(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, BBQuests& current_quest, uint8_t& eggs_hatched);
 
 //Iterate through TMs until a craftable one is found. Make the TM and return to position.
 void quest_make_tm(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
@@ -105,7 +105,7 @@ void quest_wash_pokemon(const ProgramInfo& info, ConsoleHandle& console, BotBase
 void quest_hatch_egg(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS);
 
 //Make a sandwich of type flavor
-void quest_sandwich(const ProgramInfo& info, AsyncDispatcher& dispatcher, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, BBQuests& current_quest);
+void quest_sandwich(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, BBQuests& current_quest);
 
 //Complete a tera raid battle
 void quest_tera_raid(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS);

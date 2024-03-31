@@ -111,7 +111,7 @@ void BBQSoloFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
             quest_list = read_quests(env.program_info(), env.console, context, BBQ_OPTIONS);
             if (std::find(quest_list.begin(), quest_list.end(), current_quest) != quest_list.end()) {
                 env.log("Current quest exists on list. Doing quest.");
-                bool questSuccess = process_and_do_quest(env, env.realtime_dispatcher(), env.console, context, BBQ_OPTIONS, current_quest, eggs_hatched);
+                bool questSuccess = process_and_do_quest(env, env.console, context, BBQ_OPTIONS, current_quest, eggs_hatched);
                 if (questSuccess) {
                     env.log("Quest completed successfully.");
                     stats.questsCompleted++;

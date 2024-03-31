@@ -99,7 +99,7 @@ CameraAngle quest_photo_navi(const ProgramInfo& info, ConsoleHandle& console, Bo
             pbf_move_left_joystick(context, 210, 128, 10, 20);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
-            jump_glide_fly(console, context, BBQ_OPTIONS, 600, 250, 400);
+            jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 600, 250, 400);
 
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
@@ -113,7 +113,7 @@ CameraAngle quest_photo_navi(const ProgramInfo& info, ConsoleHandle& console, Bo
             pbf_move_left_joystick(context, 220, 255, 10, 20);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
-            jump_glide_fly(console, context, BBQ_OPTIONS, 600, 400, 400);
+            jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 600, 400, 400);
 
             pbf_press_button(context, BUTTON_PLUS, 20, 105);
             pbf_move_left_joystick(context, 255, 128, 20, 50);
@@ -132,7 +132,7 @@ CameraAngle quest_photo_navi(const ProgramInfo& info, ConsoleHandle& console, Bo
             pbf_move_left_joystick(context, 205, 64, 20, 105);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
-            jump_glide_fly(console, context, BBQ_OPTIONS, 1000, 1500, 300);
+            jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 1000, 1500, 300);
 
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
@@ -147,7 +147,7 @@ CameraAngle quest_photo_navi(const ProgramInfo& info, ConsoleHandle& console, Bo
             pbf_move_left_joystick(context, 0, 80, 10, 20);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
-            jump_glide_fly(console, context, BBQ_OPTIONS, 2000, 1500, 200);
+            jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 2000, 1500, 200);
 
             pbf_press_button(context, BUTTON_PLUS, 20, 105);
 
@@ -166,7 +166,7 @@ CameraAngle quest_photo_navi(const ProgramInfo& info, ConsoleHandle& console, Bo
             pbf_move_left_joystick(context, 0, 0, 10, 20);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
-            jump_glide_fly(console, context, BBQ_OPTIONS, 1100, 1700, 200);
+            jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 1100, 1700, 200);
 
             pbf_press_button(context, BUTTON_PLUS, 20, 105);
             pbf_move_left_joystick(context, 0, 128, 20, 50);
@@ -212,7 +212,7 @@ CameraAngle quest_photo_navi(const ProgramInfo& info, ConsoleHandle& console, Bo
             pbf_move_left_joystick(context, 0, 100, 20, 50);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
-            jump_glide_fly(console, context, BBQ_OPTIONS, 200, 500, 800);
+            jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 200, 500, 800);
 
             pbf_press_button(context, BUTTON_PLUS, 20, 100);
             context.wait_for_all_requests();
@@ -226,7 +226,7 @@ CameraAngle quest_photo_navi(const ProgramInfo& info, ConsoleHandle& console, Bo
             pbf_move_left_joystick(context, 0, 128, 20, 50);
 
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
-            jump_glide_fly(console, context, BBQ_OPTIONS, 1000, 1400, 300);
+            jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 1000, 1400, 300);
 
             pbf_press_button(context, BUTTON_PLUS, 20, 105);
 
@@ -246,7 +246,7 @@ CameraAngle quest_photo_navi(const ProgramInfo& info, ConsoleHandle& console, Bo
             pbf_move_left_joystick(context, 0, 128, 20, 50);
 
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
-            jump_glide_fly(console, context, BBQ_OPTIONS, 200, 575, 200);
+            jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 200, 575, 200);
 
             pbf_press_button(context, BUTTON_PLUS, 20, 105);
             pbf_move_left_joystick(context, 0, 128, 20, 50);
@@ -370,7 +370,7 @@ void quest_catch_navi(const ProgramInfo& info, ConsoleHandle& console, BotBaseCo
             pbf_move_left_joystick(context, 220, 255, 10, 20);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
-            jump_glide_fly(console, context, BBQ_OPTIONS, 600, 400, 400);
+            jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 600, 400, 400);
 
             pbf_press_button(context, BUTTON_PLUS, 20, 105);
             pbf_move_left_joystick(context, 255, 128, 20, 50);
@@ -429,7 +429,7 @@ void quest_catch_navi(const ProgramInfo& info, ConsoleHandle& console, BotBaseCo
             pbf_move_left_joystick(context, 210, 128, 10, 20);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
-            jump_glide_fly(console, context, BBQ_OPTIONS, 600, 300, 400);
+            jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 600, 300, 400);
 
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
@@ -449,7 +449,7 @@ void quest_catch_navi(const ProgramInfo& info, ConsoleHandle& console, BotBaseCo
             pbf_move_left_joystick(context, 0, 80, 10, 20);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
-            jump_glide_fly(console, context, BBQ_OPTIONS, 2000, 1500, 200);
+            jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 2000, 1500, 200);
 
             pbf_press_button(context, BUTTON_PLUS, 20, 105);
 
@@ -467,7 +467,7 @@ void quest_catch_navi(const ProgramInfo& info, ConsoleHandle& console, BotBaseCo
             pbf_move_left_joystick(context, 0, 100, 20, 50);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
-            jump_glide_fly(console, context, BBQ_OPTIONS, 200, 500, 800);
+            jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 200, 500, 800);
 
             break;
 
@@ -479,7 +479,7 @@ void quest_catch_navi(const ProgramInfo& info, ConsoleHandle& console, BotBaseCo
             pbf_move_left_joystick(context, 205, 64, 20, 105);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
-            jump_glide_fly(console, context, BBQ_OPTIONS, 1000, 1650, 500);
+            jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 1000, 1650, 500);
             break;
         case BBQuests::catch_dark: case BBQuests::catch_flying:
             console.log("Catch: Dark/Flying");
@@ -517,7 +517,7 @@ void quest_catch_navi(const ProgramInfo& info, ConsoleHandle& console, BotBaseCo
             pbf_move_left_joystick(context, 70, 0, 10, 20);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
-            jump_glide_fly(console, context, BBQ_OPTIONS, 100, 550, 300);
+            jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 100, 550, 300);
 
             pbf_press_button(context, BUTTON_PLUS, 20, 105);
             pbf_wait(context, 300);
@@ -532,7 +532,7 @@ void quest_catch_navi(const ProgramInfo& info, ConsoleHandle& console, BotBaseCo
             pbf_move_left_joystick(context, 0, 128, 20, 50);
 
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
-            jump_glide_fly(console, context, BBQ_OPTIONS, 200, 590, 200);
+            jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 200, 590, 200);
 
             pbf_press_button(context, BUTTON_PLUS, 20, 105);
             pbf_move_left_joystick(context, 0, 128, 20, 50);
@@ -548,7 +548,7 @@ void quest_catch_navi(const ProgramInfo& info, ConsoleHandle& console, BotBaseCo
             pbf_move_left_joystick(context, 0, 128, 20, 50);
 
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
-            jump_glide_fly(console, context, BBQ_OPTIONS, 1000, 1800, 300);
+            jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 1000, 1800, 300);
 
             pbf_press_button(context, BUTTON_PLUS, 20, 105);
 
@@ -586,7 +586,7 @@ void quest_catch_navi(const ProgramInfo& info, ConsoleHandle& console, BotBaseCo
             pbf_move_left_joystick(context, 20, 0, 20, 50);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
-            jump_glide_fly(console, context, BBQ_OPTIONS, 700, 1700, 300);
+            jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 700, 1700, 300);
 
             break;
         default:
