@@ -74,20 +74,6 @@ bool WaterfillTemplateMatcher::check_aspect_ratio(size_t candidate_width, size_t
     
     bool pass = m_aspect_ratio_lower <= error && error <= m_aspect_ratio_upper;
 
-    if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
-        if (!pass){
-            cout << "Failed to pass WaterfillTemplateMatcher aspect ratio check (W/H): ";
-        }
-        else {
-            cout << "Passed WaterfillTemplateMatcher aspect ratio check (W/H): ";
-        }
-        cout << "expected: " << image_template.width() << " : " << image_template.height()
-            << " (" << (double)image_template.width()/image_template.height() << "), "
-            << "actual: " << candidate_width << " : " << candidate_height 
-            << " (" << (double)candidate_width/candidate_height << ") "
-            << "error: " << error << " bound [" << m_aspect_ratio_lower << ", " << m_aspect_ratio_upper << "]" << endl;
-    }
-
     return pass;
 }
 bool WaterfillTemplateMatcher::check_area_ratio(double candidate_area_ratio) const{
@@ -96,16 +82,6 @@ bool WaterfillTemplateMatcher::check_area_ratio(double candidate_area_ratio) con
     }
     double error = candidate_area_ratio / m_area_ratio;
     bool pass = m_area_ratio_lower <= error && error <= m_area_ratio_upper;
-    if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
-        if (!pass){
-            cout << "Failed to pass WaterfillTemplateMatcher area ratio check: ";
-        }
-        else {
-            cout << "Passed WaterfillTemplateMatcher area ratio check: ";
-        }
-        cout << "Expected: " << m_area_ratio << ", actual: " << candidate_area_ratio << ", "
-             << "error: " << error << " bound [" << m_area_ratio_lower << ", " << m_area_ratio_upper << "]" << endl;
-    }
     
     return pass;
 }
@@ -142,6 +118,9 @@ double WaterfillTemplateMatcher::rmsd_original(const ImageViewRGB32& original_im
     if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
         cout << "rmsd_original()" << endl;
         dump_debug_image(global_logger_command_line(), "CommonFramework/WaterfillTemplateMatcher", "rmsd_original_input", extract_box_reference(original_image, object));
+        check_aspect_ratio_debug(object.width(), object.height());
+        check_area_ratio_debug(object.area_ratio());
+        calc_rmsd_debug(original_image, object);
     }
 
     if (!check_aspect_ratio(object.width(), object.height())){
@@ -152,12 +131,49 @@ double WaterfillTemplateMatcher::rmsd_original(const ImageViewRGB32& original_im
     }
 
     double rmsd = this->rmsd(extract_box_reference(original_image, object));
-    if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
-        cout << "Passed aspect and area ratio check, rmsd = " << rmsd << endl;
-    }
-   
 
     return rmsd;
+}
+void WaterfillTemplateMatcher::check_aspect_ratio_debug(size_t candidate_width, size_t candidate_height) const {
+    ImageViewRGB32 image_template = m_matcher->image_template();
+
+    double error = (double)image_template.width() * candidate_height;
+    error /= (double)image_template.height() * candidate_width;
+    
+    bool pass = m_aspect_ratio_lower <= error && error <= m_aspect_ratio_upper;
+
+    if (!pass){
+        cout << " -Failed to pass WaterfillTemplateMatcher aspect ratio check (W/H): ";
+    }
+    else {
+        cout << " -Passed WaterfillTemplateMatcher aspect ratio check (W/H): ";
+    }
+    cout << "expected: " << image_template.width() << " : " << image_template.height()
+        << " (" << (double)image_template.width()/image_template.height() << "), "
+        << "actual: " << candidate_width << " : " << candidate_height 
+        << " (" << (double)candidate_width/candidate_height << ") "
+        << "error: " << error << " bound [" << m_aspect_ratio_lower << ", " << m_aspect_ratio_upper << "]" << endl;
+
+}
+void WaterfillTemplateMatcher::check_area_ratio_debug(double candidate_area_ratio) const {
+    if (m_area_ratio == 0){
+        return;
+    }
+    double error = candidate_area_ratio / m_area_ratio;
+    bool pass = m_area_ratio_lower <= error && error <= m_area_ratio_upper;
+
+    if (!pass){
+        cout << " -Failed to pass WaterfillTemplateMatcher area ratio check: ";
+    }
+    else {
+        cout << " -Passed WaterfillTemplateMatcher area ratio check: ";
+    }
+    cout << "Expected: " << m_area_ratio << ", actual: " << candidate_area_ratio << ", "
+            << "error: " << error << " bound [" << m_area_ratio_lower << ", " << m_area_ratio_upper << "]" << endl;    
+}
+void WaterfillTemplateMatcher::calc_rmsd_debug(const ImageViewRGB32& original_image, const WaterfillObject& object) const{
+    double rmsd = this->rmsd(extract_box_reference(original_image, object));
+    cout << " -Theoretical rmsd (if passed aspect and area ratio check) = " << rmsd << endl;
 }
 
 

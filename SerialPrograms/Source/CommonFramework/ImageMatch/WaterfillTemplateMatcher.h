@@ -75,6 +75,11 @@ protected:
     bool check_aspect_ratio(size_t candidate_width, size_t candidate_height) const;
     bool check_area_ratio(double candidate_area_ratio) const;
 
+    // print out aspect ratio/area ratio/rmsd for debugging
+    void check_aspect_ratio_debug(size_t candidate_width, size_t candidate_height) const;
+    void check_area_ratio_debug(double candidate_area_ratio) const;
+    void calc_rmsd_debug(const ImageViewRGB32& original_image, const WaterfillObject& object) const;
+
 protected:
     // Below are thresholds of aspect ratio and area ratio to reject a candidate.
     // They are ususally set by the derived class of `WaterfillTemplateMatcher`.
