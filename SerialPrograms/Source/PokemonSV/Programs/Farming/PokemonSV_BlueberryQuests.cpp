@@ -972,7 +972,6 @@ void quest_hatch_egg(const ProgramInfo& info, ConsoleHandle& console, BotBaseCon
 void quest_sandwich(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, BBQuests& current_quest) {
     console.log("Quest: Make a singleplayer sandwich");
 
-    bool flavored = true;
     //Polar Plaza - egg basket gets stuck under table in Savanna/Canyon Plaza
     central_to_polar_plaza(env.program_info(), console, context);
 
@@ -1018,7 +1017,6 @@ void quest_sandwich(ProgramEnvironment& env, ConsoleHandle& console, BotBaseCont
         //Fried Fillet, Noodles, Rice, Chili Sauce: Huge Water 1, Raid Flying 1, Catching Normal 1
         fillings = { {"fried-fillet", (uint8_t)1}, {"noodles", (uint8_t)1}, {"rice", (uint8_t)1} };
         condiments = {{"chili-sauce", (uint8_t)1}};
-        flavored = false;
         break;
     default:
         throw OperationFailedException(
