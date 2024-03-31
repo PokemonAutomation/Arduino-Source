@@ -112,6 +112,7 @@ bool match_template_by_waterfill(
         const bool keep_object_matrix = false;
         while (finder->find_next(object, keep_object_matrix)){
             if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
+                std::cout << "------------" << std::endl;
                 std::cout << "Object area: " << object.area << std::endl;
             }
 

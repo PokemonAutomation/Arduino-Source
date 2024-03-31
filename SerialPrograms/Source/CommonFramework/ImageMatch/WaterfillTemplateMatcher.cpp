@@ -74,21 +74,18 @@ bool WaterfillTemplateMatcher::check_aspect_ratio(size_t candidate_width, size_t
     
     bool pass = m_aspect_ratio_lower <= error && error <= m_aspect_ratio_upper;
 
-    if (!pass && PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
-        cout << "Failed to pass WaterfillTemplateMatcher aspect ratio check (W/H): "
-             << "expected: " << image_template.width() << " : " << image_template.height()
-             << " (" << (double)image_template.width()/image_template.height() << "), "
-             << "actual: " << candidate_width << " : " << candidate_height 
-             << " (" << (double)candidate_width/candidate_height << ") "
-             << "error: " << error << " bound [" << m_aspect_ratio_lower << ", " << m_aspect_ratio_upper << "]" << endl;
-    }
-    else if (pass && PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
-        cout << "Passed WaterfillTemplateMatcher aspect ratio check (W/H): "
-                << "expected: " << image_template.width() << " : " << image_template.height()
-                << " (" << (double)image_template.width()/image_template.height() << "), "
-                << "actual: " << candidate_width << " : " << candidate_height 
-                << " (" << (double)candidate_width/candidate_height << ") "
-                << "error: " << error << " bound [" << m_aspect_ratio_lower << ", " << m_aspect_ratio_upper << "]" << endl;
+    if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
+        if (!pass){
+            cout << "Failed to pass WaterfillTemplateMatcher aspect ratio check (W/H): ";
+        }
+        else {
+            cout << "Passed WaterfillTemplateMatcher aspect ratio check (W/H): ";
+        }
+        cout << "expected: " << image_template.width() << " : " << image_template.height()
+            << " (" << (double)image_template.width()/image_template.height() << "), "
+            << "actual: " << candidate_width << " : " << candidate_height 
+            << " (" << (double)candidate_width/candidate_height << ") "
+            << "error: " << error << " bound [" << m_aspect_ratio_lower << ", " << m_aspect_ratio_upper << "]" << endl;
     }
 
     return pass;
@@ -99,14 +96,14 @@ bool WaterfillTemplateMatcher::check_area_ratio(double candidate_area_ratio) con
     }
     double error = candidate_area_ratio / m_area_ratio;
     bool pass = m_area_ratio_lower <= error && error <= m_area_ratio_upper;
-    if (!pass && PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
-        cout << "Failed to pass WaterfillTemplateMatcher area ratio check: "
-             << "Expected: " << m_area_ratio << ", actual: " << candidate_area_ratio << ", "
-             << "error: " << error << " bound [" << m_area_ratio_lower << ", " << m_area_ratio_upper << "]" << endl;
-    }
-    else if (pass && PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
-        cout << "Passed WaterfillTemplateMatcher area ratio check: "
-             << "Expected: " << m_area_ratio << ", actual: " << candidate_area_ratio << ", "
+    if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
+        if (!pass){
+            cout << "Failed to pass WaterfillTemplateMatcher area ratio check: ";
+        }
+        else {
+            cout << "Passed WaterfillTemplateMatcher area ratio check: ";
+        }
+        cout << "Expected: " << m_area_ratio << ", actual: " << candidate_area_ratio << ", "
              << "error: " << error << " bound [" << m_area_ratio_lower << ", " << m_area_ratio_upper << "]" << endl;
     }
     
