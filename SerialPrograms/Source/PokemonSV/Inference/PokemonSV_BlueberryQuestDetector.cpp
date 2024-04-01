@@ -10,6 +10,7 @@
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/ImageTools/ImageFilter.h"
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "PokemonSV_BlueberryQuestDetector.h"
 
 #include <iostream>
@@ -74,7 +75,14 @@ std::string BlueberryQuestDetector::detect_quest(const ImageViewRGB32& screen) c
     if (results.empty()){
         return "";
     }
-    
+
+    if (results.size() > 1) {
+        throw OperationFailedException(
+            ErrorReport::SEND_ERROR_REPORT, m_logger,
+            "BlueberryQuestDetector::detect_quest(): Unable to read selected item. Ambiguous or multiple results."
+        );
+    }
+
     return results.begin()->second.token;
 }
 
