@@ -13,6 +13,7 @@
 #include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
+#include "CommonFramework/Tools/DebugDumper.h"
 #include "WaterfillUtilities.h"
 
 #include <iostream>
@@ -93,6 +94,16 @@ bool match_template_by_waterfill(
     bool detected = false;
     bool stop_match = false;
     for(PokemonAutomation::PackedBinaryMatrix &matrix : matrices){
+        if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
+            ImageRGB32 binaryImage = image.copy();
+            filter_by_mask(matrix, binaryImage, Color(0xffffffff), true);
+            dump_debug_image(
+                global_logger_command_line(), 
+                "CommonFramework/WaterfillTemplateMatcher", 
+                "binary_image", 
+                binaryImage);
+        }
+
         std::unique_ptr<Kernels::Waterfill::WaterfillSession> session = Kernels::Waterfill::make_WaterfillSession();
         Kernels::Waterfill::WaterfillObject object;
         const size_t min_area = area_thresholds.first;
