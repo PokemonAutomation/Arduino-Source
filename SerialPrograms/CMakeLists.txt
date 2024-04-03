@@ -1324,6 +1324,10 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Inference/PokemonSV_AuctionItemNameReader.h
     Source/PokemonSV/Inference/PokemonSV_BagDetector.cpp
     Source/PokemonSV/Inference/PokemonSV_BagDetector.h
+    Source/PokemonSV/Inference/PokemonSV_BlueberryQuestDetector.cpp
+    Source/PokemonSV/Inference/PokemonSV_BlueberryQuestDetector.h
+    Source/PokemonSV/Inference/PokemonSV_BlueberryQuestReader.cpp
+    Source/PokemonSV/Inference/PokemonSV_BlueberryQuestReader.h
     Source/PokemonSV/Inference/PokemonSV_ClothingTopDetector.cpp
     Source/PokemonSV/Inference/PokemonSV_ClothingTopDetector.h
     Source/PokemonSV/Inference/PokemonSV_ESPEmotionDetector.cpp
