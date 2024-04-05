@@ -8,13 +8,15 @@
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
+#include "CommonFramework/Tools/DebugDumper.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonSV_NormalBattleMenus.h"
 
-//#include <iostream>
-//using std::cout;
-//using std::endl;
+
+// #include <iostream>
+// using std::cout;
+// using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -255,14 +257,21 @@ bool MoveSelectDetector::move_to_slot(ConsoleHandle& console, BotBaseContext& co
 
 TerastallizingDetector::TerastallizingDetector(Color color)
     : m_color(color)
-    , m_box(0.6, 0.7, 0.06, 0.14)
+    , m_box(0.62, 0.75, 0.03, 0.06)
 {}
 void TerastallizingDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_box);
 }
 bool TerastallizingDetector::detect(const ImageViewRGB32& screen) const{
     ImageStats box = image_stats(extract_box_reference(screen, m_box));
-    return box.stddev.sum() > 240;
+    // dump_debug_image(
+    //             global_logger_command_line(), 
+    //             "Test/TeraDetector", 
+    //             "box", 
+    //             extract_box_reference(screen, m_box));
+    // cout << box.average.sum() << endl;
+
+    return box.average.sum() > 600;
 }
 
 
