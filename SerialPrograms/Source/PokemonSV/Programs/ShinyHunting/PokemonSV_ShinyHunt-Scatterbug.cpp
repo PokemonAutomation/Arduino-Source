@@ -204,7 +204,6 @@ void ShinyHuntScatterbug::program(SingleSwitchProgramEnvironment& env, BotBaseCo
             send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
         }catch(ProgramFinishedException&){
             GO_HOME_WHEN_DONE.run_end_of_program(context);
-            send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
             return;
         }
     }
@@ -274,7 +273,6 @@ void ShinyHuntScatterbug::handle_battles_and_back_to_pokecenter(SingleSwitchProg
                 }
             }catch (ProgramFinishedException&){
                 GO_HOME_WHEN_DONE.run_end_of_program(context);
-                send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
                 throw;
             }
         }
