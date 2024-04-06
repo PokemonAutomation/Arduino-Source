@@ -204,7 +204,7 @@ void ShinyHuntScatterbug::program(SingleSwitchProgramEnvironment& env, BotBaseCo
             send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
         }catch(ProgramFinishedException&){
             GO_HOME_WHEN_DONE.run_end_of_program(context);
-            return;
+            throw;
         }
     }
 }
