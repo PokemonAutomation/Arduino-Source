@@ -1,8 +1,19 @@
 /*  Fast Travel Detector
 
  Detects the Fast Travel symbol on the screen. 
- Does not work if obstructed by the radar beam.
+
+ Limitations:
+ - Does not work if obstructed by the radar beam (while outdoors), or if obstructed by the radar dot
+ - Less reliable in areas where the map is blue. e.g. Blueberry academy.
  
+ Ideas for further improvements:
+ - Can try a two step waterfill+template match technique. Use waterfill algorithm to
+ get all blue portions of the screen. From these sub-image candidates, run a second
+ waterfill to select only white portions. Then compare to the template. Can use the same
+ template, but needs to be cropped down slightly. Make sure the template still has a blue
+ background. Need to be aware of false positives with the pokemon center, since it also
+ has the same wing symbol.
+
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
  */

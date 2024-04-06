@@ -60,7 +60,16 @@ bool FastTravelDetector::detect(const ImageViewRGB32& screen) const{
 std::vector<ImageFloatBox> FastTravelDetector::detect_all(const ImageViewRGB32& screen) const{
     const std::vector<std::pair<uint32_t, uint32_t>> filters = {
         {combine_rgb(0, 0, 80), combine_rgb(140, 140, 255)},
-        {combine_rgb(5, 100, 200), combine_rgb(60, 135, 255)},
+        {combine_rgb(5, 100, 200), combine_rgb(60, 135, 255)}, // matching at blueberry academy 1080p
+
+        // the below filters are for matching at blueberry academy at 720p
+        // however, they increase the risk of false positives. 
+        // as they select for images that are both wrong and have low RMSD (<85)
+        // {combine_rgb(0, 90, 180), combine_rgb(55, 140, 255)}, 
+        // {combine_rgb(0, 100, 180), combine_rgb(60, 135, 255)}, 
+        // {combine_rgb(0, 100, 195), combine_rgb(50, 135, 255)}, 
+        // {combine_rgb(0, 100, 180), combine_rgb(55, 130, 255)}, 
+        // {combine_rgb(0, 90, 180), combine_rgb(50, 125, 255)}, 
     };
 
     const double min_object_size = 400.0;
