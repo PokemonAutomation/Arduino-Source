@@ -199,8 +199,11 @@ void ShinyHuntScatterbug::program(SingleSwitchProgramEnvironment& env, BotBaseCo
             env.log("Reset game to handle recoverable error");
             reset_game(env.program_info(), env.console, context);
             ++stats.m_game_resets;
+            env.update_stats();
+            send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
         }catch(ProgramFinishedException&){
             GO_HOME_WHEN_DONE.run_end_of_program(context);
+            send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
             return;
         }
     }
@@ -270,6 +273,7 @@ void ShinyHuntScatterbug::handle_battles_and_back_to_pokecenter(SingleSwitchProg
                 }
             }catch (ProgramFinishedException&){
                 GO_HOME_WHEN_DONE.run_end_of_program(context);
+                send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
                 throw;
             }
         }
@@ -345,6 +349,7 @@ void ShinyHuntScatterbug::run_one_sandwich_iteration(SingleSwitchProgramEnvironm
             auto_heal_from_menu_or_overworld(env.program_info(), env.console, context, 0, true);
             stats.m_autoheals++;
             env.update_stats();
+            send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
         }
 
         handle_battles_and_back_to_pokecenter(env, context, 
@@ -365,6 +370,8 @@ void ShinyHuntScatterbug::run_one_sandwich_iteration(SingleSwitchProgramEnvironm
         // Reset game to save rare herbs
         reset_game(env.program_info(), env.console, context);
         ++stats.m_game_resets;
+        env.update_stats();
+        send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
     }
 }
 
