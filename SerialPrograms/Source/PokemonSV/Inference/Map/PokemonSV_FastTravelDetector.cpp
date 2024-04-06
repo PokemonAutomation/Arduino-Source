@@ -25,13 +25,22 @@ ImageFloatBox MINIMAP_AREA(0.815, 0.680, 0.180, 0.310);
 
 class FastTravelMatcher : public ImageMatch::WaterfillTemplateMatcher{
 public:
+    
+    /* 
+    - selects for the white, wing-shaped component of the fast travel icon
+    - Use Waterfilltemplate matcher to get your template so you get the correct area ratio
+    along with the blue background. You need the blue backgroun so you don't false positive
+    against the fly icon in Pokemon centers.
+
+     */
     FastTravelMatcher() : WaterfillTemplateMatcher(
-        "PokemonSV/Map/FastTravelIcon-Template.png", Color(0,0,0), Color(255, 255, 255), 450
+        "PokemonSV/Map/FastTravelIcon-Template.png", Color(200,200,200), Color(255, 255, 255), 50
     ) {
-        m_aspect_ratio_lower = 0.9;
+        m_aspect_ratio_lower = 0.8;
         m_aspect_ratio_upper = 1.2;
-        m_area_ratio_lower = 0.6;
-        m_area_ratio_upper = 1.1;
+        m_area_ratio_lower = 0.9;
+        m_area_ratio_upper = 1.4;
+
     }
 
     static const ImageMatch::WaterfillTemplateMatcher& instance() {
@@ -59,22 +68,20 @@ bool FastTravelDetector::detect(const ImageViewRGB32& screen) const{
 
 std::vector<ImageFloatBox> FastTravelDetector::detect_all(const ImageViewRGB32& screen) const{
     const std::vector<std::pair<uint32_t, uint32_t>> filters = {
-        {combine_rgb(0, 0, 80), combine_rgb(140, 140, 255)},
-        {combine_rgb(5, 100, 200), combine_rgb(60, 135, 255)}, // matching at blueberry academy 1080p
+        {combine_rgb(180, 180, 180), combine_rgb(255, 255, 255)},
 
-        // the below filters are for matching at blueberry academy at 720p
-        // however, they increase the risk of false positives. 
-        // as they select for images that are both wrong and have low RMSD (<85)
-        // {combine_rgb(0, 90, 180), combine_rgb(55, 140, 255)}, 
-        // {combine_rgb(0, 100, 180), combine_rgb(60, 135, 255)}, 
-        // {combine_rgb(0, 100, 195), combine_rgb(50, 135, 255)}, 
-        // {combine_rgb(0, 100, 180), combine_rgb(55, 130, 255)}, 
-        // {combine_rgb(0, 90, 180), combine_rgb(50, 125, 255)}, 
     };
 
-    const double min_object_size = 400.0;
-    // need to keep RMSD threshold below 100, else will false positive the blue dots at blueberry academy
+    /* 
+    - need to keep RMSD threshold below 100, 
+    else will false positive the fly icon at pokemon centers
+    */ 
     const double rmsd_threshold = 80.0;
+    /* 
+    - min object size restrictions also helps to filter out false positives
+    at pokemon centers
+    */
+    const double min_object_size = 150.0;
 
     const double screen_rel_size = (screen.height() / 1080.0);
     const size_t min_size = size_t(screen_rel_size * screen_rel_size * min_object_size);
