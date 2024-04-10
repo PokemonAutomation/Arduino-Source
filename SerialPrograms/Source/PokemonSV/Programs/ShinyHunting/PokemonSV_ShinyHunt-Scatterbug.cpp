@@ -201,7 +201,10 @@ void ShinyHuntScatterbug::program(SingleSwitchProgramEnvironment& env, BotBaseCo
             reset_game(env.program_info(), env.console, context);
             ++stats.m_game_resets;
             env.update_stats();
-            send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
+            dump_image_and_throw_recoverable_exception(
+                env.program_info(), env.console, "Operation Failed",
+                "Resetting game to reattempt operation."
+            );
         }catch(ProgramFinishedException&){
             GO_HOME_WHEN_DONE.run_end_of_program(context);
             throw;
