@@ -96,7 +96,8 @@ bool match_template_by_waterfill(
     for(PokemonAutomation::PackedBinaryMatrix &matrix : matrices){
         if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
             ImageRGB32 binaryImage = image.copy();
-            filter_by_mask(matrix, binaryImage, Color(0xffffffff), true);
+            filter_by_mask(matrix, binaryImage, Color(COLOR_BLACK), true);
+            //filter_by_mask(matrix, binaryImage, Color(COLOR_WHITE), true);
             dump_debug_image(
                 global_logger_command_line(), 
                 "CommonFramework/WaterfillTemplateMatcher", 
@@ -112,6 +113,7 @@ bool match_template_by_waterfill(
         const bool keep_object_matrix = false;
         while (finder->find_next(object, keep_object_matrix)){
             if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
+                std::cout << "------------" << std::endl;
                 std::cout << "Object area: " << object.area << std::endl;
             }
 

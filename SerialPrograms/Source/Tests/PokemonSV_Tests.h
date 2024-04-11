@@ -54,6 +54,8 @@ int test_pokemonSV_SwapMenuDetector(const ImageViewRGB32& image, bool target);
 
 int test_pokemonSV_DialogBoxDetector(const ImageViewRGB32& image, bool target);
 
+int test_pokemonSV_FastTravelDetector(const ImageViewRGB32& image, bool target);
+
 int test_pokemonSV_MapPokeCenterIconDetector(const ImageViewRGB32& image, int target);
 
 int test_pokemonSV_ESPPressedEmotionDetector(const ImageViewRGB32& image, bool target);
