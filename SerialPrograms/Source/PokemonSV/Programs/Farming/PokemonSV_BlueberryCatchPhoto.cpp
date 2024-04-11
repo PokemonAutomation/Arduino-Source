@@ -35,7 +35,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
 
-CameraAngle quest_photo_navi(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, BBQuests& current_quest) {
+CameraAngle quest_photo_navi(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, BBQuests current_quest) {
     CameraAngle angle = CameraAngle::none;
 
     //Navigate to target
@@ -265,7 +265,7 @@ CameraAngle quest_photo_navi(const ProgramInfo& info, ConsoleHandle& console, Bo
     return angle;
 }
 
-void quest_photo(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, BBQuests& current_quest) {
+void quest_photo(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, BBQuests current_quest) {
     bool took_photo = false;
     CameraAngle move_camera = CameraAngle::none;
 
@@ -358,7 +358,7 @@ void quest_photo(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
     return_to_plaza(info, console, context);
 }
 
-void quest_catch_navi(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, BBQuests& current_quest) {
+void quest_catch_navi(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, BBQuests current_quest) {
     switch (current_quest) {
         case BBQuests::catch_any: case BBQuests::catch_normal: case BBQuests::catch_fire:
             console.log("Catch: Any/Normal/Fire");
@@ -608,7 +608,7 @@ void quest_catch_navi(const ProgramInfo& info, ConsoleHandle& console, BotBaseCo
 
 }
 
-void quest_catch_handle_battle(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, BBQuests& current_quest) {
+void quest_catch_handle_battle(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, BBQuests current_quest) {
     console.log("Catching Pokemon.");
     AdvanceDialogWatcher advance_dialog(COLOR_MAGENTA);
     PromptDialogWatcher add_to_party(COLOR_PURPLE);
@@ -842,10 +842,10 @@ void quest_catch_handle_battle(const ProgramInfo& info, ConsoleHandle& console, 
                     }
                     break;
                 default:
-                    console.log("Invalid state ret2 run_battle.");
+                    console.log("Invalid state ret2 run_battle. Out of moves?");
                     throw OperationFailedException(
                         ErrorReport::SEND_ERROR_REPORT, console,
-                        "Invalid state ret2 run_battle.",
+                        "Invalid state ret2 run_battle. Out of moves?",
                         true
                     );
                 }
@@ -874,7 +874,7 @@ void quest_catch_handle_battle(const ProgramInfo& info, ConsoleHandle& console, 
     }
 }
 
-void quest_catch(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, BBQuests& current_quest) {
+void quest_catch(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, BBQuests current_quest) {
     EncounterWatcher encounter_watcher(console, COLOR_RED);
 
     //Navigate to target and start battle
