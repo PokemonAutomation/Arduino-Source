@@ -76,7 +76,7 @@ void AutoItemPrinter::enter_printing_mode(SingleSwitchProgramEnvironment& env, B
         OverworldWatcher     overworld(COLOR_CYAN);
         AdvanceDialogWatcher dialog(COLOR_YELLOW);
         PromptDialogWatcher  prompt(COLOR_YELLOW);
-        WhiteButtonWatcher   material(COLOR_GREEN, WhiteButton::ButtonX, {0.70, 0.93, 0.10, 0.06});
+        WhiteButtonWatcher   material(COLOR_GREEN, WhiteButton::ButtonX, {0.63, 0.93, 0.17, 0.06});
         context.wait_for_all_requests();
 
         int ret_printer_entry = wait_until(
@@ -114,7 +114,7 @@ void AutoItemPrinter::start_print(SingleSwitchProgramEnvironment& env, BotBaseCo
 
     while (true){
         PromptDialogWatcher  prompt(COLOR_YELLOW);
-        WhiteButtonWatcher   material(COLOR_GREEN, WhiteButton::ButtonX, {0.70, 0.93, 0.10, 0.06});
+        WhiteButtonWatcher   material(COLOR_GREEN, WhiteButton::ButtonX, {0.63, 0.93, 0.17, 0.06});
         WhiteButtonWatcher   handle(COLOR_BLUE,    WhiteButton::ButtonA, {0.40, 0.80, 0.20, 0.14});
         context.wait_for_all_requests();
 
@@ -152,7 +152,7 @@ void AutoItemPrinter::finish_print(SingleSwitchProgramEnvironment& env, BotBaseC
 
     while (true){
         AdvanceDialogWatcher dialog(COLOR_YELLOW);
-        WhiteButtonWatcher   material(COLOR_GREEN, WhiteButton::ButtonX, {0.70, 0.93, 0.10, 0.06});
+        WhiteButtonWatcher   material(COLOR_GREEN, WhiteButton::ButtonX, {0.63, 0.93, 0.17, 0.06});
         WhiteButtonWatcher   handle(COLOR_BLUE,    WhiteButton::ButtonA, {0.40, 0.80, 0.20, 0.14});
         WhiteButtonWatcher   result(COLOR_CYAN,    WhiteButton::ButtonA, {0.87, 0.93, 0.10, 0.06});
         context.wait_for_all_requests();
