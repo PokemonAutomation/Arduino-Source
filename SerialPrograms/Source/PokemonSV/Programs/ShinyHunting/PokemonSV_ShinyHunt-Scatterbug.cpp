@@ -11,6 +11,8 @@
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
+#include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Tools/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -199,9 +201,14 @@ void ShinyHuntScatterbug::program(SingleSwitchProgramEnvironment& env, BotBaseCo
             env.log("Reset game to handle recoverable error");
             reset_game(env.program_info(), env.console, context);
             ++stats.m_game_resets;
+            env.update_stats();
+            dump_image_and_throw_recoverable_exception(
+                env.program_info(), env.console, "Operation Failed",
+                "Resetting game to reattempt operation."
+            );
         }catch(ProgramFinishedException&){
             GO_HOME_WHEN_DONE.run_end_of_program(context);
-            return;
+            throw;
         }
     }
 }
@@ -345,6 +352,7 @@ void ShinyHuntScatterbug::run_one_sandwich_iteration(SingleSwitchProgramEnvironm
             auto_heal_from_menu_or_overworld(env.program_info(), env.console, context, 0, true);
             stats.m_autoheals++;
             env.update_stats();
+            send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
         }
 
         handle_battles_and_back_to_pokecenter(env, context, 
@@ -365,6 +373,8 @@ void ShinyHuntScatterbug::run_one_sandwich_iteration(SingleSwitchProgramEnvironm
         // Reset game to save rare herbs
         reset_game(env.program_info(), env.console, context);
         ++stats.m_game_resets;
+        env.update_stats();
+        send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
     }
 }
 
