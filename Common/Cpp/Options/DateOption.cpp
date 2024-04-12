@@ -4,8 +4,10 @@
  *
  */
 
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonArray.h"
+#include "Common/Cpp/Json/JsonObject.h"
 #include "DateOption.h"
 
 namespace PokemonAutomation{
@@ -98,7 +100,7 @@ JsonValue DateOption::to_json() const{
 
 std::string DateOption::check_validity(QDate x) const{
     if (x < m_min_value || x > m_max_value){
-        return "Invalid Switch date.";
+        return "Invalid date.";
     }
     return std::string();
 }
@@ -113,6 +115,164 @@ void DateOption::restore_defaults(){
     }
     report_value_changed();
 }
+
+
+
+
+bool DateTimeOption::is_valid(const DateTime& date) const{
+    if (date.year < 0){
+        return false;
+    }
+    if (date.month < 0){
+        return false;
+    }
+    if (date.day < 0){
+        return false;
+    }
+
+    if (m_level < DATE_HOUR_MIN){
+        return true;
+    }
+
+    if (date.hour < 0){
+        return false;
+    }
+    if (date.minute < 0){
+        return false;
+    }
+
+    if (m_level < DATE_HOUR_MIN_SEC){
+        return true;
+    }
+
+    if (date.second < 0){
+        return false;
+    }
+
+    return true;
+}
+
+DateTimeOption::DateTimeOption(
+    std::string label,
+    LockMode lock_while_running,
+    Level level,
+    const DateTime& min_value, const DateTime& max_value,
+    const DateTime& default_value
+)
+    : ConfigOption(lock_while_running)
+    , m_label(std::move(label))
+    , m_level(level)
+    , m_min_value(min_value)
+    , m_max_value(max_value)
+    , m_default(default_value)
+    , m_current(default_value)
+{
+    if (!is_valid(min_value)){
+        throw InternalProgramError(nullptr, "DateTimeOption()", "Date is invalid.");
+    }
+    if (!is_valid(max_value)){
+        throw InternalProgramError(nullptr, "DateTimeOption()", "Date is invalid.");
+    }
+    if (!is_valid(default_value)){
+        throw InternalProgramError(nullptr, "DateTimeOption()", "Date is invalid.");
+    }
+}
+
+DateTimeOption::operator DateTime() const{
+    SpinLockGuard lg(m_lock);
+    return m_current;
+}
+DateTime DateTimeOption::get() const{
+    SpinLockGuard lg(m_lock);
+    return m_current;
+}
+std::string DateTimeOption::set(const DateTime& x){
+    std::string err = check_validity(x);
+    if (!err.empty()){
+        return err;
+    }
+    {
+        SpinLockGuard lg(m_lock);
+        m_current = x;
+    }
+    report_value_changed();
+    return std::string();
+}
+
+std::string DateTimeOption::check_validity(const DateTime& x) const{
+    if (x < m_min_value || x > m_max_value){
+        return "Invalid date.";
+    }
+    return std::string();
+}
+std::string DateTimeOption::check_validity() const{
+    SpinLockGuard lg(m_lock);
+    return check_validity(m_current);
+}
+void DateTimeOption::restore_defaults(){
+    {
+        SpinLockGuard lg(m_lock);
+        m_current = m_default;
+    }
+    report_value_changed();
+}
+
+DateTime DateTimeOption::from_json(const JsonValue& json){
+    DateTime ret;
+
+    const JsonObject* object = json.get_object();
+    if (object == nullptr){
+        return ret;
+    }
+
+    object->read_integer(ret.year, "Year", 0, 9999);
+    object->read_integer(ret.month, "Month", 1, 12);
+    object->read_integer(ret.day, "Day", 1, 31);
+    object->read_integer(ret.hour, "Hour", 0, 23);
+    object->read_integer(ret.minute, "Minute", 0, 59);
+    object->read_integer(ret.second, "Second", 0, 59);
+
+    return ret;
+}
+JsonValue DateTimeOption::to_json(const DateTime& date){
+    JsonObject ret;
+    if (date.year   >= 0) ret["Year"  ] = date.year;
+    if (date.month  >= 0) ret["Month" ] = date.month;
+    if (date.day    >= 0) ret["Day"   ] = date.day;
+    if (date.hour   >= 0) ret["Hour"  ] = date.hour;
+    if (date.minute >= 0) ret["Minute"] = date.minute;
+    if (date.second >= 0) ret["Second"] = date.second;
+    return std::move(ret);
+}
+void DateTimeOption::load_json(const JsonValue& json){
+    DateTime date = from_json(json);
+    if (!is_valid(date) || !check_validity(date).empty()){
+        return;
+    }
+    {
+        SpinLockGuard lg(m_lock);
+        m_current = date;
+    }
+    report_value_changed();
+}
+JsonValue DateTimeOption::to_json() const{
+    return to_json(m_current);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

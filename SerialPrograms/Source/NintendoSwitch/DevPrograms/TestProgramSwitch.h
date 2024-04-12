@@ -11,6 +11,7 @@
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/ButtonOption.h"
+#include "Common/Cpp/Options/DateOption.h"
 #include "CommonFramework/Options/StringSelectOption.h"
 #include "CommonFramework/Options/LanguageOCROption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
@@ -69,7 +70,10 @@ private:
 
     StringSelectOption SELECT;
 
-    PokemonSV::PlayerListTable PLAYER_LIST;
+//    PokemonSV::PlayerListTable PLAYER_LIST;
+    DateTimeOption DATE0;
+    DateTimeOption DATE1;
+
 
 //    PokemonSV::SinglesAIOption battle_AI;
 

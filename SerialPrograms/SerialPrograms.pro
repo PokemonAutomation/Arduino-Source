@@ -1077,6 +1077,7 @@ HEADERS += \
     ../Common/Cpp/CpuId/CpuId_arm64.tpp \
     ../Common/Cpp/CpuId/CpuId_x86.h \
     ../Common/Cpp/CpuId/CpuId_x86.tpp \
+    ../Common/Cpp/DateTime.h \
     ../Common/Cpp/EnumDatabase.h \
     ../Common/Cpp/EventRateTracker.h \
     ../Common/Cpp/Exceptions.h \

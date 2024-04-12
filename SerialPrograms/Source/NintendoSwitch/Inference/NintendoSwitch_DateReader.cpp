@@ -6,6 +6,7 @@
 
 //#include "Common/Cpp/Exceptions.h"
 #include "Common/Qt/StringToolsQt.h"
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
@@ -18,6 +19,7 @@
 #include "CommonFramework/OCR/OCR_NumberReader.h"
 #include "CommonFramework/OCR/OCR_StringNormalization.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch_DateReader.h"
 
 #include <iostream>
@@ -32,21 +34,41 @@ DateReader::DateReader()
     : m_background_top(0.50, 0.02, 0.45, 0.08)
     , m_window_top(0.50, 0.36, 0.45, 0.07)
     , m_window_text(0.05, 0.36, 0.10, 0.07)
-    , m_us_hours(0.470, 0.60, 0.06, 0.10)
-    , m_us_min(0.572, 0.60, 0.06, 0.10)
-    , m_us_ampm(0.665, 0.60, 0.06, 0.10)
-    , m_24_hours(0.525, 0.60, 0.06, 0.10)
-    , m_24_min(0.626, 0.60, 0.06, 0.10)
+    , m_jp_month_arrow(0.30, 0.50, 0.05, 0.06)
+    , m_us_month(0.090, 0.61, 0.06, 0.09)
+    , m_us_day(0.193, 0.61, 0.06, 0.09)
+    , m_us_year(0.300, 0.61, 0.11, 0.09)
+    , m_us_hour(0.473, 0.61, 0.06, 0.09)
+    , m_us_minute(0.574, 0.61, 0.06, 0.09)
+    , m_us_ampm(0.663, 0.61, 0.07, 0.09)
+    , m_eu_day(0.145, 0.61, 0.06, 0.09)
+    , m_eu_month(0.247, 0.61, 0.06, 0.09)
+    , m_eu_year(0.355, 0.61, 0.11, 0.09)
+    , m_24_hour(0.528, 0.61, 0.06, 0.09)
+    , m_24_minute(0.629, 0.61, 0.06, 0.09)
+    , m_jp_year(0.136, 0.61, 0.11, 0.09)
+    , m_jp_month(0.295, 0.61, 0.06, 0.09)
+    , m_jp_day(0.395, 0.61, 0.06, 0.09)
 {}
 void DateReader::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_background_top);
     items.add(COLOR_RED, m_window_top);
     items.add(COLOR_RED, m_window_text);
-    items.add(COLOR_YELLOW, m_us_hours);
-    items.add(COLOR_YELLOW, m_us_min);
+    items.add(COLOR_RED, m_jp_month_arrow);
+    items.add(COLOR_YELLOW, m_us_month);
+    items.add(COLOR_YELLOW, m_us_day);
+    items.add(COLOR_YELLOW, m_us_year);
+    items.add(COLOR_YELLOW, m_us_hour);
+    items.add(COLOR_YELLOW, m_us_minute);
     items.add(COLOR_YELLOW, m_us_ampm);
-    items.add(COLOR_CYAN, m_24_hours);
-    items.add(COLOR_CYAN, m_24_min);
+    items.add(COLOR_CYAN, m_eu_day);
+    items.add(COLOR_CYAN, m_eu_month);
+    items.add(COLOR_CYAN, m_eu_year);
+    items.add(COLOR_GREEN, m_24_hour);
+    items.add(COLOR_GREEN, m_24_minute);
+    items.add(COLOR_PURPLE, m_jp_year);
+    items.add(COLOR_PURPLE, m_jp_month);
+    items.add(COLOR_PURPLE, m_jp_day);
 }
 bool DateReader::detect(const ImageViewRGB32& screen) const{
     ImageStats stats_background_top = image_stats(extract_box_reference(screen, m_background_top));
@@ -72,12 +94,12 @@ bool DateReader::detect(const ImageViewRGB32& screen) const{
 
 //    bool white_theme = stats_window_top.average.sum() > 600;
 
-    ImageViewRGB32 us_hours = extract_box_reference(screen, m_us_hours);
+    ImageViewRGB32 us_hours = extract_box_reference(screen, m_jp_year);
     ImageStats stats_us_hours = image_stats(us_hours);
 //    cout << stats_us_hours.average << stats_us_hours.stddev << endl;
 
     double stddev = stats_us_hours.stddev.sum();
-    if (10 < stddev && stddev < 80){
+    if (stddev < 80){
         return false;
     }
 
@@ -96,7 +118,7 @@ int8_t DateReader::read_hours(Logger& logger, const ImageViewRGB32& screen) cons
 
     bool white_theme = stats_window_top.average.sum() > 600;
 
-    ImageViewRGB32 us_hours = extract_box_reference(screen, m_us_hours);
+    ImageViewRGB32 us_hours = extract_box_reference(screen, m_us_hour);
     ImageStats stats_us_hours = image_stats(us_hours);
 
     double stddev = stats_us_hours.stddev.sum();
@@ -124,7 +146,7 @@ int8_t DateReader::read_hours(Logger& logger, const ImageViewRGB32& screen) cons
         }
         return (int8_t)hours;
     }else{
-        ImageViewRGB32 h24_hours = extract_box_reference(screen, m_24_hours);
+        ImageViewRGB32 h24_hours = extract_box_reference(screen, m_24_hour);
         ImageRGB32 h24_hours_filtered = to_blackwhite_rgb32_range(h24_hours, 0xff000000, 0xff7f7f7f, white_theme);
         int hours = OCR::read_number(logger, h24_hours_filtered);
         if (hours < 0 || hours > 23){
@@ -138,7 +160,7 @@ int8_t DateReader::read_hours(Logger& logger, const ImageViewRGB32& screen) cons
 void DateReader::set_hours(
     const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
     uint8_t hour
-){
+) const{
     context.wait_for_all_requests();
     {
         auto snapshot = console.video().snapshot();
@@ -183,7 +205,7 @@ void DateReader::set_hours(
         pbf_press_dpad(context, DPAD_RIGHT, 5, 3);
         pbf_press_dpad(context, DPAD_RIGHT, 5, 3);
 
-        ImageViewRGB32 us_hours = extract_box_reference(snapshot, m_us_hours);
+        ImageViewRGB32 us_hours = extract_box_reference(snapshot, m_us_hour);
         ImageStats stats_us_hours = image_stats(us_hours);
         double stddev = stats_us_hours.stddev.sum();
         bool format_us = stddev > 30;
@@ -224,6 +246,334 @@ void DateReader::set_hours(
         true
     );
 }
+
+
+std::pair<DateFormat, DateTime> DateReader::read_date(Logger& logger, std::shared_ptr<const ImageRGB32> screen) const{
+    if (!detect(*screen)){
+        throw OperationFailedException(
+            ErrorReport::SEND_ERROR_REPORT,
+            logger,
+            "Not on data change screen.",
+            std::move(screen)
+        );
+    }
+
+    ImageStats stats_window_top = image_stats(extract_box_reference(*screen, m_window_top));
+//    cout << stats_window_top.average << stats_window_top.stddev << endl;
+    if (stats_window_top.stddev.sum() > 10){
+        throw OperationFailedException(
+            ErrorReport::SEND_ERROR_REPORT,
+            logger,
+            "Not on data change screen.",
+            std::move(screen)
+        );
+    }
+
+    bool white_theme = stats_window_top.average.sum() > 600;
+
+    ImageViewRGB32 us_hours = extract_box_reference(*screen, m_us_hour);
+    ImageStats stats_us_hours = image_stats(us_hours);
+
+    if (stats_us_hours.stddev.sum() > 30){
+        return {DateFormat::US, read_date_us(logger, std::move(screen), white_theme)};
+    }
+
+    ImageViewRGB32 jp_arrow = extract_box_reference(*screen, m_jp_month_arrow);
+    ImageStats stats_arrow = image_stats(jp_arrow);
+    if (stats_arrow.stddev.sum() > 30){
+        return {DateFormat::JP, read_date_jp(logger, std::move(screen), white_theme)};
+    }
+
+    return {DateFormat::EU, read_date_eu(logger, std::move(screen), white_theme)};
+}
+int DateReader::read_box(
+    Logger& logger,
+    int min, int max,
+    const ImageViewRGB32& screen, const ImageFloatBox& box,
+    bool white_theme
+) const{
+    ImageRGB32 filtered = to_blackwhite_rgb32_range(
+        extract_box_reference(screen, box),
+        0xff000000, 0xff7f7fff,
+        white_theme
+    );
+//    extract_box_reference(*screen, m_us_month).save("test0.png");
+//    filtered.save("test1.png");
+    int value = OCR::read_number(logger, filtered);
+    if (value < min || value > max){
+        value = -1;
+    }
+    return value;
+}
+DateTime DateReader::read_date_us(Logger& logger, std::shared_ptr<const ImageRGB32> screen, bool white_theme) const{
+    logger.log("Attempting to read US date...");
+
+    DateTime date;
+
+    date.month = (int8_t)read_box(logger, 1, 12, *screen, m_us_month, white_theme);
+    date.day = (int8_t)read_box(logger, 1, 31, *screen, m_us_day, white_theme);
+    date.year = (int16_t)read_box(logger, 2000, 2060, *screen, m_us_year, white_theme);
+    date.minute = (int8_t)read_box(logger, 0, 59, *screen, m_us_minute, white_theme);
+
+    //  Hour
+    {
+        int hour = read_box(logger, 1, 12, *screen, m_us_hour, white_theme);
+        ImageRGB32 hours_filtered = to_blackwhite_rgb32_range(
+            extract_box_reference(*screen, m_us_hour),
+            0xff000000, 0xff7f7fff,
+            white_theme
+        );
+        if (hour == 12){
+            hour = 0;
+        }
+
+        ImageRGB32 us_ampm_filtered = to_blackwhite_rgb32_range(
+            extract_box_reference(*screen, m_us_ampm),
+            0xff000000, 0xff7f7fff,
+            white_theme
+        );
+
+        std::string ampm = to_utf8(OCR::normalize_utf32(OCR::ocr_read(Language::English, us_ampm_filtered)));
+        if (ampm == "am"){
+            //  Do nothing.
+        }else if (ampm == "pm"){
+            hour += 12;
+        }else{
+            hour = -1;
+        }
+
+        date.hour = (int8_t)hour;
+    }
+
+    return date;
+}
+DateTime DateReader::read_date_eu(Logger& logger, std::shared_ptr<const ImageRGB32> screen, bool white_theme) const{
+    logger.log("Attempting to read EU date...");
+
+    DateTime date;
+
+    date.day = (int8_t)read_box(logger, 1, 31, *screen, m_eu_day, white_theme);
+    date.month = (int8_t)read_box(logger, 1, 12, *screen, m_eu_month, white_theme);
+    date.year = (int16_t)read_box(logger, 2000, 2060, *screen, m_eu_year, white_theme);
+    date.hour = (int8_t)read_box(logger, 0, 23, *screen, m_24_hour, white_theme);
+    date.minute = (int8_t)read_box(logger, 0, 59, *screen, m_24_minute, white_theme);
+
+    return date;
+}
+DateTime DateReader::read_date_jp(Logger& logger, std::shared_ptr<const ImageRGB32> screen, bool white_theme) const{
+    logger.log("Attempting to read JP date...");
+
+    DateTime date;
+
+    date.day = (int8_t)read_box(logger, 1, 31, *screen, m_jp_day, white_theme);
+    date.month = (int8_t)read_box(logger, 1, 12, *screen, m_jp_month, white_theme);
+    date.year = (int16_t)read_box(logger, 2000, 2060, *screen, m_jp_year, white_theme);
+    date.hour = (int8_t)read_box(logger, 0, 23, *screen, m_24_hour, white_theme);
+    date.minute = (int8_t)read_box(logger, 0, 59, *screen, m_24_minute, white_theme);
+
+    return date;
+}
+
+
+void DateReader::move_cursor(BotBaseContext& context, int current, int desired){
+    while (current < desired){
+        ssf_issue_scroll(context, SSF_SCROLL_UP, 3);
+        current++;
+    }
+    while (current > desired){
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
+        current--;
+    }
+}
+void DateReader::adjust_year(BotBaseContext& context, int current, int desired){
+    while (current < desired){
+        ssf_issue_scroll(context, SSF_SCROLL_UP, 3);
+        current++;
+    }
+    while (current > desired){
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
+        current--;
+    }
+}
+void DateReader::adjust_month(BotBaseContext& context, int current, int desired){
+    int diff = desired - current;
+    if ((diff >= 0 && diff <= 6) || (diff < 0 && diff < -6)){
+        while (current != desired){
+            ssf_issue_scroll(context, SSF_SCROLL_UP, 3);
+            current++;
+            if (current > 12){
+                current -= 12;
+            }
+        }
+    }else{
+        while (current != desired){
+            ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
+            current--;
+            if (current < 1){
+                current += 12;
+            }
+        }
+    }
+}
+void DateReader::adjust_hour_24(BotBaseContext& context, int current, int desired){
+    int diff = desired - current;
+    if ((diff >= 0 && diff <= 12) || (diff < 0 && diff < -12)){
+        while (current != desired){
+            ssf_issue_scroll(context, SSF_SCROLL_UP, 3);
+            current++;
+            if (current > 23){
+                current -= 24;
+            }
+        }
+    }else{
+        while (current != desired){
+            ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
+            current--;
+            if (current < 0){
+                current += 24;
+            }
+        }
+    }
+}
+void DateReader::adjust_minute(BotBaseContext& context, int current, int desired){
+    int diff = desired - current;
+    if ((diff >= 0 && diff <= 30) || (diff < 0 && diff < -30)){
+        while (current != desired){
+            ssf_issue_scroll(context, SSF_SCROLL_UP, 3);
+            current++;
+            if (current > 59){
+                current -= 60;
+            }
+        }
+    }else{
+        while (current != desired){
+            ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
+            current--;
+            if (current < 0){
+                current += 60;
+            }
+        }
+    }
+}
+
+void DateReader::set_date(
+    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    const DateTime& date
+) const{
+    context.wait_for_all_requests();
+    {
+        auto snapshot = console.video().snapshot();
+        if (!detect(snapshot)){
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, console,
+                "Expected date change menu.",
+                snapshot
+            );
+        }
+    }
+
+    for (size_t attempts = 0; attempts < 10; attempts++){
+        ssf_flush_pipeline(context);
+        context.wait_for_all_requests();
+        context.wait_for(std::chrono::milliseconds(250));
+
+        auto snapshot = console.video().snapshot();
+        std::pair<DateFormat, DateTime> current = read_date(console, snapshot);
+        if (current.second.year == date.year &&
+            current.second.month == date.month &&
+            current.second.day == date.day &&
+            current.second.hour == date.hour &&
+            current.second.minute == date.minute
+        ){
+            return;
+        }
+
+        //  Move cursor to the right.
+        for (size_t c = 0; c < 7; c++){
+            ssf_issue_scroll(context, SSF_SCROLL_LEFT, 3);
+        }
+
+        switch (current.first){
+        case DateFormat::US:{
+            adjust_month(context, current.second.month, date.month);
+            ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+            adjust_year(context, current.second.day, date.day);
+            ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+            adjust_year(context, current.second.year, date.year);
+            ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+
+            uint8_t diff = (24 + date.hour - current.second.hour) % 12;
+            if (diff < 6){
+                for (size_t c = 0; c < diff; c++){
+                    ssf_issue_scroll(context, SSF_SCROLL_UP, 3);
+                }
+            }else{
+                for (size_t c = diff; c < 12; c++){
+                    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
+                }
+            }
+
+            ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+            adjust_minute(context, current.second.minute, date.minute);
+            ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+            if ((date.hour < 12) != (current.second.hour < 12)){
+                ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
+            }
+            ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+
+            break;
+        }
+        case DateFormat::EU:
+            adjust_year(context, current.second.day, date.day);
+            ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+            adjust_month(context, current.second.month, date.month);
+            ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+            adjust_year(context, current.second.year, date.year);
+            ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+            adjust_hour_24(context, current.second.hour, date.hour);
+            ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+            adjust_minute(context, current.second.minute, date.minute);
+            ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+            break;
+        case DateFormat::JP:
+            adjust_year(context, current.second.year, date.year);
+            ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+            adjust_month(context, current.second.month, date.month);
+            ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+            adjust_year(context, current.second.day, date.day);
+            ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+            adjust_hour_24(context, current.second.hour, date.hour);
+            ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+            adjust_minute(context, current.second.minute, date.minute);
+            ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+            break;
+        }
+
+    }
+
+    ssf_flush_pipeline(context);
+    throw FatalProgramException(
+        ErrorReport::SEND_ERROR_REPORT, console,
+        "Failed to set the hour after 10 attempts.",
+        true
+    );
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

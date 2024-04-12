@@ -12,6 +12,7 @@
 #include "ConfigWidget.h"
 
 class QDateEdit;
+class QDateTimeEdit;
 
 namespace PokemonAutomation{
 
@@ -30,6 +31,19 @@ private:
     QDateEdit* m_date_edit;
 };
 
+
+class DateTimeWidget : public QWidget, public ConfigWidget{
+public:
+    ~DateTimeWidget();
+    DateTimeWidget(QWidget& parent, DateTimeOption& value);
+
+    virtual void update_value() override;
+    virtual void value_changed() override;
+
+private:
+    DateTimeOption& m_value;
+    QDateTimeEdit* m_date_edit;
+};
 
 
 }

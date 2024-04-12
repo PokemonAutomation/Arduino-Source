@@ -114,6 +114,7 @@
 #include "PokemonSwSh/Inference/PokemonSwSh_ReceivePokemonDetector.h"
 #include "PokemonSV/Inference/PokemonSV_PokemonSummaryReader.h"
 #include "PokemonSV/Programs/Battles/PokemonSV_SinglesBattler.h"
+#include "NintendoSwitch/Inference/NintendoSwitch_DateReader.h"
 
 
 
@@ -182,7 +183,23 @@ TestProgram::TestProgram()
     )
     , STATIC_TEXT("Test text...")
     , SELECT("String Select", test_database(), LockMode::LOCK_WHILE_RUNNING, 0)
-    , PLAYER_LIST("Test Table", LockMode::UNLOCK_WHILE_RUNNING, "Notes")
+//    , PLAYER_LIST("Test Table", LockMode::UNLOCK_WHILE_RUNNING, "Notes")
+    , DATE0(
+        "Date",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        DateTimeOption::DATE_HOUR_MIN,
+        DateTime{2000, 1, 1, 0, 0, 0},
+        DateTime{2060, 12, 31, 23, 59, 59},
+        DateTime{2024, 4, 12, 2, 16, 30}
+    )
+    , DATE1(
+        "Date",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        DateTimeOption::DATE_HOUR_MIN,
+        DateTime{2000, 1, 1, 0, 0, 0},
+        DateTime{2060, 12, 31, 23, 59, 59},
+        DateTime{2048, 1, 13, 20, 48}
+    )
     , NOTIFICATION_TEST("Test", true, true, ImageAttachmentMode::JPG)
     , NOTIFICATIONS({
         &NOTIFICATION_TEST,
@@ -195,8 +212,10 @@ TestProgram::TestProgram()
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(STATIC_TEXT);
     PA_ADD_OPTION(SELECT);
-    PA_ADD_OPTION(PLAYER_LIST);
+//    PA_ADD_OPTION(PLAYER_LIST);
 //    PA_ADD_OPTION(battle_AI);
+    PA_ADD_OPTION(DATE0);
+    PA_ADD_OPTION(DATE1);
     PA_ADD_OPTION(NOTIFICATIONS);
     BUTTON0.add_listener(*this);
     BUTTON1.add_listener(*this);
@@ -242,13 +261,30 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
+    DateReader reader;
+    reader.make_overlays(overlays);
+    DateTime date = reader.read_date(logger, feed.snapshot()).second;
+
+    cout << "Month = " << (int)date.month << endl;
+    cout << "Day = " << (int)date.day << endl;
+    cout << "Year = " << (int)date.year << endl;
+    cout << "Hour = " << (int)date.hour << endl;
+    cout << "Minute = " << (int)date.minute << endl;
+
+    while (true){
+        reader.set_date(env.program_info(), console, context, DATE0);
+        reader.set_date(env.program_info(), console, context, DATE1);
+    }
+
+
 //    SinglesAIOption battle_AI;
 //    run_singles_battle(env, console, context, battle_AI, false);
 
 
 
-    pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
-    reset_game_from_home(env.program_info(), console, context, 5 * TICKS_PER_SECOND);
+
+//    pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+//    reset_game_from_home(env.program_info(), console, context, 5 * TICKS_PER_SECOND);
 
 
 #if 0

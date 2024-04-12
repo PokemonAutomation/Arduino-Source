@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_NintendoSwitch_DateReader_H
 #define PokemonAutomation_NintendoSwitch_DateReader_H
 
+#include "Common/Cpp/DateTime.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 #include "CommonFramework/Inference/VisualDetector.h"
@@ -17,6 +18,13 @@ namespace PokemonAutomation{
     class ConsoleHandle;
     class BotBaseContext;
 namespace NintendoSwitch{
+
+
+enum class DateFormat{
+    US,
+    EU,
+    JP,
+};
 
 
 class DateReader : public StaticScreenDetector{
@@ -35,17 +43,55 @@ public:
     void set_hours(
         const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
         uint8_t hour    //  0 - 23
-    );
+    ) const;
+
+
+    std::pair<DateFormat, DateTime> read_date(Logger& logger, std::shared_ptr<const ImageRGB32> screen) const;
+    void set_date(
+        const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+        const DateTime& date    //  Seconds is ignored.
+    ) const;
+
+private:
+    int read_box(
+        Logger& logger,
+        int min, int max,
+        const ImageViewRGB32& screen, const ImageFloatBox& box,
+        bool white_theme
+    ) const;
+
+    DateTime read_date_us(Logger& logger, std::shared_ptr<const ImageRGB32> screen, bool white_theme) const;
+    DateTime read_date_eu(Logger& logger, std::shared_ptr<const ImageRGB32> screen, bool white_theme) const;
+    DateTime read_date_jp(Logger& logger, std::shared_ptr<const ImageRGB32> screen, bool white_theme) const;
+
+    static void move_cursor(BotBaseContext& context, int current, int desired);
+    static void adjust_year(BotBaseContext& context, int current, int desired);
+    static void adjust_month(BotBaseContext& context, int current, int desired);
+    static void adjust_hour_24(BotBaseContext& context, int current, int desired);
+    static void adjust_minute(BotBaseContext& context, int current, int desired);
 
 private:
     ImageFloatBox m_background_top;
     ImageFloatBox m_window_top;
     ImageFloatBox m_window_text;
-    ImageFloatBox m_us_hours;
-    ImageFloatBox m_us_min;
+    ImageFloatBox m_jp_month_arrow;
+
+    ImageFloatBox m_us_month;
+    ImageFloatBox m_us_day;
+    ImageFloatBox m_us_year;
+    ImageFloatBox m_us_hour;
+    ImageFloatBox m_us_minute;
     ImageFloatBox m_us_ampm;
-    ImageFloatBox m_24_hours;
-    ImageFloatBox m_24_min;
+
+    ImageFloatBox m_eu_day;
+    ImageFloatBox m_eu_month;
+    ImageFloatBox m_eu_year;
+    ImageFloatBox m_24_hour;
+    ImageFloatBox m_24_minute;
+
+    ImageFloatBox m_jp_year;
+    ImageFloatBox m_jp_month;
+    ImageFloatBox m_jp_day;
 };
 
 
