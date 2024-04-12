@@ -95,7 +95,12 @@ void DateOption::load_json(const JsonValue& json){
     report_value_changed();
 }
 JsonValue DateOption::to_json() const{
-    return to_json(m_current);
+    QDate date;
+    {
+        SpinLockGuard lg(m_lock);
+        date = m_current;
+    }
+    return to_json(date);
 }
 
 std::string DateOption::check_validity(QDate x) const{
@@ -256,7 +261,12 @@ void DateTimeOption::load_json(const JsonValue& json){
     report_value_changed();
 }
 JsonValue DateTimeOption::to_json() const{
-    return to_json(m_current);
+    DateTime current;
+    {
+        SpinLockGuard lg(m_lock);
+        current = m_current;
+    }
+    return to_json(current);
 }
 
 
