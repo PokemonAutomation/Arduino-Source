@@ -10,10 +10,9 @@
 #include <QDateTimeEdit>
 #include "DateWidget.h"
 
-//  REMOVE
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 
@@ -142,7 +141,7 @@ DateTimeWidget::DateTimeWidget(QWidget& parent, DateTimeOption& value)
     m_date_edit->setMinimumDateTime(DateTime_to_QDateTime(value.min_value()));
     m_date_edit->setMaximumDateTime(DateTime_to_QDateTime(value.max_value()));
 
-    cout << "Max time = " << m_date_edit->maximumTime().toString().toStdString() << endl;
+//    cout << "Max time = " << m_date_edit->maximumTime().toString().toStdString() << endl;
 
     connect(
         m_date_edit, &QDateTimeEdit::dateTimeChanged,
