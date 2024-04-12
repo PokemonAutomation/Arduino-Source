@@ -16,6 +16,12 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
 
+
+void item_printer_start_print(ConsoleHandle& console, BotBaseContext& context);
+void item_printer_finish_print(ConsoleHandle& console, BotBaseContext& context);
+
+
+
 class AutoItemPrinter_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     AutoItemPrinter_Descriptor();
@@ -24,7 +30,6 @@ public:
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
 
 };
-
 
 
 
@@ -40,8 +45,6 @@ private:
     EventNotificationsOption NOTIFICATIONS;
 
     void enter_printing_mode(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-    void start_print(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-    void finish_print(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 };
 
 
