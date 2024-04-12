@@ -73,7 +73,7 @@ BBQOption::BBQOption(OCR::LanguageOCROption* language_option)
     , CATCH_ON_WIN(true)
     , NUM_RETRIES(
         "<b>Number of Retries:</b><br>Reattempt a quest this many times if it fails.",
-        LockMode::LOCK_WHILE_RUNNING, 3, 0, 10
+        LockMode::LOCK_WHILE_RUNNING, 1, 0, 5
     )
     , FIX_TIME_WHEN_DONE(
         "<b>Fix time when done:</b><br>Fix the time after the program finishes.",

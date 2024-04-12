@@ -170,7 +170,7 @@ int read_BP(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& con
     return OCR::read_number(console, BP_value);
 }
 
-std::vector<BBQuests> read_quests(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS) {
+std::vector<BBQuests> read_quests(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, const BBQOption& BBQ_OPTIONS) {
     std::vector<BBQuests> quest_list;
 
     //Open quest list. Wait for it to open.
@@ -215,7 +215,7 @@ std::vector<BBQuests> read_quests(const ProgramInfo& info, ConsoleHandle& consol
     return quest_list;
 }
 
-std::vector<BBQuests> process_quest_list(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, std::vector<BBQuests>& quest_list, uint8_t& eggs_hatched) {
+std::vector<BBQuests> process_quest_list(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, const BBQOption& BBQ_OPTIONS, std::vector<BBQuests>& quest_list, uint8_t& eggs_hatched) {
     std::vector<BBQuests> quests_to_do;
 
     console.log("Processing quests.");
@@ -505,7 +505,7 @@ void quest_travel_500(const ProgramInfo& info, ConsoleHandle& console, BotBaseCo
     context.wait_for_all_requests();
 }
 
-void quest_tera_self_defeat(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS) {
+void quest_tera_self_defeat(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, const BBQOption& BBQ_OPTIONS) {
     EncounterWatcher encounter_watcher(console, COLOR_RED);
     console.log("Quest: Tera-self and defeat any wild.");
     //Navigate to target and start battle
@@ -588,7 +588,7 @@ void quest_tera_self_defeat(const ProgramInfo& info, ConsoleHandle& console, Bot
     fly_to_overworld_from_map(info, console, context);
 }
 
-void quest_sneak_up(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS) {
+void quest_sneak_up(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, const BBQOption& BBQ_OPTIONS) {
     EncounterWatcher encounter_watcher(console, COLOR_RED);
     console.log("Quest: Sneak up.");
     //Navigate to target and start battle
@@ -699,7 +699,7 @@ void quest_sneak_up(const ProgramInfo& info, ConsoleHandle& console, BotBaseCont
     context.wait_for_all_requests();
 }
 
-void quest_wild_tera(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS) {
+void quest_wild_tera(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, const BBQOption& BBQ_OPTIONS) {
     EncounterWatcher encounter_watcher(console, COLOR_RED);
     console.log("Quest: Defeat a wild tera.");
     //Navigate to target and start battle
@@ -891,7 +891,7 @@ void quest_wash_pokemon(const ProgramInfo& info, ConsoleHandle& console, BotBase
     context.wait_for_all_requests();
 }
 
-void quest_hatch_egg(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS) {
+void quest_hatch_egg(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, const BBQOption& BBQ_OPTIONS) {
     console.log("Quest: Hatch an Egg");
 
     //Fix time before hatching
@@ -969,7 +969,7 @@ void quest_hatch_egg(const ProgramInfo& info, ConsoleHandle& console, BotBaseCon
     }
 }
 
-void quest_sandwich(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, BBQuests current_quest) {
+void quest_sandwich(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, const BBQOption& BBQ_OPTIONS, BBQuests current_quest) {
     console.log("Quest: Make a singleplayer sandwich");
 
     //Polar Plaza - egg basket gets stuck under table in Savanna/Canyon Plaza
@@ -1141,7 +1141,7 @@ void quest_tera_raid(ProgramEnvironment& env, ConsoleHandle& console, BotBaseCon
     day_skip_from_overworld(console, context);
 }
 
-void quest_auto_battle(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, BBQuests current_quest) {
+void quest_auto_battle(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, const BBQOption& BBQ_OPTIONS, BBQuests current_quest) {
     console.log("Quest: Auto Battle 10/30");
 
     LetsGoEncounterBotStats stats;
