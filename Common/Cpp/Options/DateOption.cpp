@@ -242,7 +242,7 @@ JsonValue DateTimeOption::to_json(const DateTime& date){
     if (date.hour   >= 0) ret["Hour"  ] = date.hour;
     if (date.minute >= 0) ret["Minute"] = date.minute;
     if (date.second >= 0) ret["Second"] = date.second;
-    return std::move(ret);
+    return ret;
 }
 void DateTimeOption::load_json(const JsonValue& json){
     DateTime date = from_json(json);
