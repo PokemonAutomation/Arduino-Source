@@ -228,7 +228,10 @@ std::vector<BBQuests> process_quest_list(const ProgramInfo& info, ConsoleHandle&
             //Check eggs remaining.
             if (n == BBQuests::hatch_egg && eggs_hatched >= BBQ_OPTIONS.NUM_EGGS) {
                 console.log("Out of eggs! Quest not possible.");
-                if (BBQ_OPTIONS.OUT_OF_EGGS == BBQOption::OOEggs::Reroll) {
+
+                switch (BBQ_OPTIONS.OUT_OF_EGGS) {
+                case BBQOption::OOEggs::Reroll:
+                {
                     console.log("Reroll selected. Rerolling Egg quest. New quest will be run in the next batch of quests.");
                     //console.log("Warning: This does not handle/check being out of BP!", COLOR_RED);
 
@@ -255,11 +258,13 @@ std::vector<BBQuests> process_quest_list(const ProgramInfo& info, ConsoleHandle&
                     context.wait_for_all_requests();
 
                     press_Bs_to_back_to_overworld(info, console, context);
+
+                    break;
                 }
-                else if (BBQ_OPTIONS.OUT_OF_EGGS == BBQOption::OOEggs::KeepGoing) {
+                case BBQOption::OOEggs::KeepGoing:
                     console.log("Keep Going selected. Ignoring quest.");
-                }
-                else {
+                    break;
+                default:
                     //This case is handled in BBQSoloFarmer.
                     console.log("OOEggs is Stop in process_quest_list().");
                     throw OperationFailedException(
@@ -267,6 +272,7 @@ std::vector<BBQuests> process_quest_list(const ProgramInfo& info, ConsoleHandle&
                         "OOEggs is Stop in process_quest_list().",
                         true
                     );
+                    break;
                 }
             }
             else {

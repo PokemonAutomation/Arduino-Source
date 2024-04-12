@@ -54,7 +54,7 @@ BBQOption::BBQOption(OCR::LanguageOCROption* language_option)
     )
     , NUM_EGGS(
         "<b>Hatch Quest - Number of Eggs:</b><br>Amount of eggs located in your current box.",
-        LockMode::LOCK_WHILE_RUNNING, 30, 0, 30
+        LockMode::UNLOCK_WHILE_RUNNING, 30, 0, 30
     )
     , OUT_OF_EGGS(
         "<b>Hatch Quest - Zero Eggs:</b><br>When out of eggs to hatch, do the selected option.",
@@ -63,7 +63,7 @@ BBQOption::BBQOption(OCR::LanguageOCROption* language_option)
             {OOEggs::Reroll,    "reroll",       "Reroll Quest - Costs 50BP"},
             {OOEggs::KeepGoing, "keep-going",   "Keep Going - Warning: Bonus(Red) quests will be blocked!"},
         },
-        LockMode::LOCK_WHILE_RUNNING,
+        LockMode::UNLOCK_WHILE_RUNNING,
         OOEggs::Stop
     )
     , FIX_TIME_FOR_HATCH(
@@ -73,7 +73,7 @@ BBQOption::BBQOption(OCR::LanguageOCROption* language_option)
     , CATCH_ON_WIN(true)
     , NUM_RETRIES(
         "<b>Number of Retries:</b><br>Reattempt a quest this many times if it fails.",
-        LockMode::LOCK_WHILE_RUNNING, 1, 0, 5
+        LockMode::UNLOCK_WHILE_RUNNING, 1, 0, 5
     )
     , FIX_TIME_WHEN_DONE(
         "<b>Fix time when done:</b><br>Fix the time after the program finishes.",
