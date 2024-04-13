@@ -610,7 +610,7 @@ void quest_catch_navi(const ProgramInfo& info, ConsoleHandle& console, BotBaseCo
 
 }
 
-void quest_catch_throw_ball(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, Language language, const std::string selected_ball) {
+void quest_catch_throw_ball(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, Language language, const std::string& selected_ball) {
     BattleBallReader reader(console, language);
     std::string ball_reader = "";
     WallClock start = current_time();
