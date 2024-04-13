@@ -198,17 +198,24 @@ GlobalSettings::GlobalSettings()
         LockMode::UNLOCK_WHILE_RUNNING,
         false
     )
-    , ENABLE_AUTO_RESET_AUDIO(
-        "<b>Enable Auto reset of the audio:</b><br>"
-        "Attempt to reset the audio when there was no audio frame in the last 5 seconds (in order to fix issues with RDP disconnection, etc).",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        true
-    )
     , ENABLE_FRAME_SCREENSHOTS(
         "<b>Enable Frame Screenshots:</b><br>"
         "Attempt to use QVideoProbe and QVideoFrame for screenshots.",
         LockMode::UNLOCK_WHILE_RUNNING,
         true
+    )
+    , AUTO_RESET_AUDIO_SECONDS(
+        "<b>Audio Auto-Reset:</b><br>"
+        "Attempt to reset the audio if this many seconds has elapsed since the last audio frame (in order to fix issues with RDP disconnection, etc).",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        5
+    )
+    , AUTO_RESET_VIDEO_SECONDS(
+        "<b>Video Auto-Reset:</b><br>"
+        "Attempt to reset the video if this many seconds has elapsed since the last video frame (in order to fix issues with RDP disconnection, etc).<br>"
+        "This option is not supported by all video frameworks.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        5
     )
     , ENABLE_LIFETIME_SANITIZER(
         "<b>Enable Lifetime Sanitizer: (for debugging)</b><br>"
@@ -249,11 +256,14 @@ GlobalSettings::GlobalSettings()
     if (PreloadSettings::instance().DEVELOPER_MODE){
         PA_ADD_OPTION(SHOW_RECORD_FREQUENCIES);
     }
-    PA_ADD_OPTION(ENABLE_AUTO_RESET_AUDIO);
     PA_ADD_OPTION(VIDEO_BACKEND);
 #if QT_VERSION_MAJOR == 5
     PA_ADD_OPTION(ENABLE_FRAME_SCREENSHOTS);
 #endif
+
+    PA_ADD_OPTION(AUTO_RESET_AUDIO_SECONDS);
+    PA_ADD_OPTION(AUTO_RESET_VIDEO_SECONDS);
+
     PA_ADD_OPTION(ENABLE_LIFETIME_SANITIZER);
 
     PA_ADD_OPTION(PROCESSOR_LEVEL0);

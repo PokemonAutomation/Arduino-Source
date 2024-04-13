@@ -45,7 +45,11 @@ AudioSession::AudioSession(Logger& logger, AudioOption& option)
 {
     AudioSession::reset();
     m_devices->add_listener(*this);
-    global_watchdog().add(*this, std::chrono::seconds(5));
+
+    uint8_t watchdog_timeout = GlobalSettings::instance().AUTO_RESET_AUDIO_SECONDS;
+    if (watchdog_timeout != 0){
+        global_watchdog().add(*this, std::chrono::seconds(watchdog_timeout));
+    }
 }
 AudioSession::~AudioSession(){
     global_watchdog().remove(*this);
@@ -268,9 +272,11 @@ void AudioSession::on_watchdog_timeout(){
     if (m_option.m_input_file.empty() && !m_option.m_input_device){
         return;
     }
-    m_logger.log("No audio detected for 5 seconds...", COLOR_RED);
 
-    if (!GlobalSettings::instance().ENABLE_AUTO_RESET_AUDIO){
+    uint8_t watchdog_timeout = GlobalSettings::instance().AUTO_RESET_AUDIO_SECONDS;
+    m_logger.log("No audio detected for " + std::to_string(watchdog_timeout) + " seconds...", COLOR_RED);
+
+    if (watchdog_timeout == 0){
         return;
     }
     m_logger.log("Resetting the audio...", COLOR_GREEN);

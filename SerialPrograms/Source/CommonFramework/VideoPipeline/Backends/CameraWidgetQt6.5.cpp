@@ -18,6 +18,8 @@
 //#include "Common/Cpp/Exceptions.h"
 //#include "Common/Cpp/Time.h"
 //#include "Common/Cpp/PrettyPrint.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/GlobalServices.h"
 #include "CommonFramework/VideoPipeline/CameraOption.h"
 #include "MediaServicesQt6.h"
 #include "CameraWidgetQt6.5.h"
@@ -91,6 +93,7 @@ void CameraSession::remove_listener(FrameListener& listener){
 }
 
 CameraSession::~CameraSession(){
+    global_watchdog().remove(*this);
     shutdown();
 }
 CameraSession::CameraSession(Logger& logger, Resolution default_resolution)
@@ -100,7 +103,13 @@ CameraSession::CameraSession(Logger& logger, Resolution default_resolution)
     , m_last_frame_seqnum(0)
     , m_last_image_timestamp(WallClock::min())
     , m_stats_conversion("ConvertFrame", "ms", 1000, std::chrono::seconds(10))
-{}
+{
+
+    uint8_t watchdog_timeout = GlobalSettings::instance().AUTO_RESET_VIDEO_SECONDS;
+    if (watchdog_timeout != 0){
+        global_watchdog().add(*this, std::chrono::seconds(watchdog_timeout));
+    }
+}
 
 void CameraSession::get(CameraOption& option){
     std::lock_guard<std::mutex> lg(m_lock);
@@ -175,8 +184,11 @@ std::pair<QVideoFrame, uint64_t> CameraSession::latest_frame(){
     return {m_last_frame, m_last_frame_seqnum};
 }
 void CameraSession::report_rendered_frame(WallClock timestamp){
-    SpinLockGuard lg(m_frame_lock);
-    m_fps_tracker_display.push_event(timestamp);
+    {
+        SpinLockGuard lg(m_frame_lock);
+        m_fps_tracker_display.push_event(timestamp);
+    }
+    global_watchdog().delay(*this);
 }
 
 VideoSnapshot CameraSession::snapshot(){
@@ -387,6 +399,25 @@ void CameraSession::startup(){
         listener->new_source(m_device, m_resolution);
     }
 }
+
+void CameraSession::on_watchdog_timeout(){
+    {
+        std::lock_guard<std::mutex> lg(m_lock);
+        if (!m_device){
+            return;
+        }
+    }
+
+    uint8_t watchdog_timeout = GlobalSettings::instance().AUTO_RESET_VIDEO_SECONDS;
+    m_logger.log("No video detected for " + std::to_string(watchdog_timeout) + " seconds...", COLOR_RED);
+
+    if (watchdog_timeout == 0){
+        return;
+    }
+    m_logger.log("Resetting the video...", COLOR_GREEN);
+    reset();
+}
+
 
 PokemonAutomation::VideoWidget* CameraSession::make_QtWidget(QWidget* parent){
     return new VideoDisplayWidget(parent, *this);

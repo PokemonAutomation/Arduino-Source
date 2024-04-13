@@ -23,6 +23,7 @@
 #include "Common/Cpp/EventRateTracker.h"
 #include "Common/Cpp/LifetimeSanitizer.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
+#include "Common/Cpp/Concurrency/Watchdog.h"
 #include "CommonFramework/Inference/StatAccumulator.h"
 #include "CommonFramework/VideoPipeline/CameraInfo.h"
 #include "CommonFramework/VideoPipeline/CameraSession.h"
@@ -57,7 +58,7 @@ struct FrameListener{
 
 
 
-class CameraSession : public QObject, public PokemonAutomation::CameraSession{
+class CameraSession : public QObject, public PokemonAutomation::CameraSession, private WatchdogCallback{
 public:
     virtual void add_listener(Listener& listener) override;
     virtual void remove_listener(Listener& listener) override;
@@ -99,6 +100,8 @@ private:
     void clear_video_output();
     void set_video_output(QVideoWidget& widget);
     void set_video_output(QGraphicsVideoItem& item);
+
+    virtual void on_watchdog_timeout() override;
 
 
 private:
