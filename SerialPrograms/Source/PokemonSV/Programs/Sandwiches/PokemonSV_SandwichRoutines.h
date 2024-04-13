@@ -89,7 +89,6 @@ void make_sandwich_preset(ProgramEnvironment& env, ConsoleHandle& console, BotBa
 // make great pb sandwich does call this directly, as it skips the custom sandwich menu
 void run_sandwich_maker(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, Language language, std::map<std::string, uint8_t>& fillings, std::vector<std::string>& fillings_sorted, int& plates);
 
-
 }
 }
 }
