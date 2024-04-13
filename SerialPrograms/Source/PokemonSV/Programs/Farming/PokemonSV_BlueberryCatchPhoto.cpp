@@ -610,7 +610,7 @@ void quest_catch_navi(const ProgramInfo& info, ConsoleHandle& console, BotBaseCo
 
 }
 
-void quest_catch_throw_ball(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, Language language, std::string selected_ball) {
+void quest_catch_throw_ball(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, Language language, const std::string selected_ball) {
     BattleBallReader reader(console, language);
     std::string ball_reader = "";
     WallClock start = current_time();
@@ -738,13 +738,13 @@ void quest_catch_handle_battle(const ProgramInfo& info, ConsoleHandle& console, 
                         MoveSelectDetector move_select(COLOR_BLUE);
 
                         int ret_move_select = run_until(
-                        console, context,
-                        [&](BotBaseContext& context) {
-                            pbf_press_button(context, BUTTON_A, 10, 50);
-                            pbf_wait(context, 100);
-                            context.wait_for_all_requests();
-                        },
-                        { move_watcher }
+                            console, context,
+                            [&](BotBaseContext& context) {
+                                pbf_press_button(context, BUTTON_A, 10, 50);
+                                pbf_wait(context, 100);
+                                context.wait_for_all_requests();
+                            },
+                            { move_watcher }
                         );
                         if (ret_move_select != 0) {
                             console.log("Could not find move select.");
