@@ -548,11 +548,11 @@ void quest_tera_self_defeat(const ProgramInfo& info, ConsoleHandle& console, Bot
             static_cast<AudioInferenceCallback&>(encounter_watcher),
         }
         );
-    if (ret == 0) {
+    encounter_watcher.throw_if_no_sound();
+
+    if (ret >= 0) {
         console.log("Battle menu detected.");
     }
-
-    encounter_watcher.throw_if_no_sound();
 
     bool is_shiny = (bool)encounter_watcher.shiny_screenshot();
     if (is_shiny) {
@@ -639,10 +639,10 @@ void quest_sneak_up(const ProgramInfo& info, ConsoleHandle& console, BotBaseCont
             static_cast<AudioInferenceCallback&>(encounter_watcher),
         }
         );
-    if (ret == 0) {
-        console.log("Battle menu detected.");
+    encounter_watcher.throw_if_no_sound();
 
-       encounter_watcher.throw_if_no_sound();
+    if (ret >= 0) {
+        console.log("Battle menu detected.");
 
         bool is_shiny = (bool)encounter_watcher.shiny_screenshot();
         if (is_shiny) {
@@ -749,11 +749,11 @@ void quest_wild_tera(const ProgramInfo& info, ConsoleHandle& console, BotBaseCon
             static_cast<AudioInferenceCallback&>(encounter_watcher),
         }
         );
-    if (ret == 0) {
+    encounter_watcher.throw_if_no_sound();
+
+    if (ret >= 0) {
         console.log("Battle menu detected.");
     }
-
-    encounter_watcher.throw_if_no_sound();
 
     bool is_shiny = (bool)encounter_watcher.shiny_screenshot();
     if (is_shiny) {
@@ -1073,9 +1073,10 @@ void quest_tera_raid(ProgramEnvironment& env, ConsoleHandle& console, BotBaseCon
                 static_cast<AudioInferenceCallback&>(encounter_watcher),
             }
         );
+        encounter_watcher.throw_if_no_sound();
+
         if (ret >= 0) {
             console.log("Battle menu detected.");
-            encounter_watcher.throw_if_no_sound();
 
             bool is_shiny = (bool)encounter_watcher.shiny_screenshot();
             if (is_shiny) {

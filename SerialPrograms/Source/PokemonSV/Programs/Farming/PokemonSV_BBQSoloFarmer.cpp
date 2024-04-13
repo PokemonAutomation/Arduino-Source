@@ -84,8 +84,8 @@ void BBQSoloFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
 
     //Test a specific quest
     /*
-    BBQuests test_quest = BBQuests::auto_10;
-    bool questTest = process_and_do_quest(env, env.realtime_dispatcher(), env.console, context, BBQ_OPTIONS, test_quest, eggs_hatched);
+    BBQuests test_quest = BBQuests::catch_bug;
+    bool questTest = process_and_do_quest(env, env.console, context, BBQ_OPTIONS, test_quest, eggs_hatched);
     if (questTest) {
         env.log("Finished quest.");
     }

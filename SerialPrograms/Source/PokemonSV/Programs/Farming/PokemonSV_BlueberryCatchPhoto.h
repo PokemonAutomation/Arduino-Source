@@ -30,6 +30,9 @@ void quest_photo(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
 //Navigate to a catch target
 void quest_catch_navi(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, const BBQOption& BBQ_OPTIONS, BBQuests current_quest);
 
+//Select and throw ball
+void quest_catch_throw_ball(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, Language language, std::string selected_ball);
+
 //Handle catching the target
 void quest_catch_handle_battle(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, const BBQOption& BBQ_OPTIONS, BBQuests current_quest);
 
