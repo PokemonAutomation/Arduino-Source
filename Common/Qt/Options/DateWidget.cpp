@@ -18,6 +18,7 @@ namespace PokemonAutomation{
 
 
 
+#if 0
 ConfigWidget* DateOption::make_QtWidget(QWidget& parent){
     return new DateWidget(parent, *this);
 }
@@ -64,7 +65,7 @@ void DateWidget::value_changed(){
         update_value();
     }, Qt::QueuedConnection);
 }
-
+#endif
 
 
 

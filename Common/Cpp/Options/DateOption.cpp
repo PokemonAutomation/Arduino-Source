@@ -6,7 +6,7 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Json/JsonValue.h"
-#include "Common/Cpp/Json/JsonArray.h"
+//#include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "DateOption.h"
 
@@ -14,6 +14,7 @@ namespace PokemonAutomation{
 
 
 
+#if 0
 DateOption::DateOption(
     std::string label,
     QDate min_value, QDate max_value,
@@ -120,6 +121,7 @@ void DateOption::restore_defaults(){
     }
     report_value_changed();
 }
+#endif
 
 
 

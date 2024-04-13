@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_Options_DateOption_H
 #define PokemonAutomation_Options_DateOption_H
 
-#include <QDate>
+//#include <QDate>
 #include "Common/Cpp/DateTime.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Common/Cpp/Options/ConfigOption.h"
@@ -15,6 +15,7 @@
 namespace PokemonAutomation{
 
 
+#if 0
 class DateOption : public ConfigOption{
 public:
     DateOption(
@@ -54,7 +55,7 @@ private:
     mutable SpinLock m_lock;
     QDate m_current;
 };
-
+#endif
 
 
 class DateTimeOption : public ConfigOption{

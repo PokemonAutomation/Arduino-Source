@@ -34,7 +34,7 @@ public:
 
 private:
     SimpleIntegerOption<uint32_t> SKIPS;
-    DateOption START_DATE;
+    DateTimeOption START_DATE;
 
     EventNotificationOption NOTIFICATION_PROGRESS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;

@@ -44,8 +44,10 @@ DaySkipperJPN7p8k::DaySkipperJPN7p8k()
     )
     , START_DATE(
         "<b>Start Date:</b>",
-        QDate(2000, 1, 1), QDate(2060, 12, 31),
-        QDate(2000, 1, 1)
+        LockMode::LOCK_WHILE_RUNNING,
+        DateTimeOption::Level::DATE,
+        DateTime{2000, 1, 1}, DateTime{2060, 12, 31},
+        DateTime{2000, 1, 1}
     )
     , NOTIFICATION_PROGRESS_UPDATE("Progress Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
@@ -147,15 +149,17 @@ void DaySkipperJPN7p8k::program(SingleSwitchProgramEnvironment& env, BotBaseCont
     //  Connect
     pbf_press_button(context, BUTTON_ZL, 5, 5);
 
+    DateTime start_date = START_DATE;
+
     //  Sanitize starting date.
-    uint16_t year = (uint16_t)((QDate)START_DATE).year();
+    uint16_t year = (uint16_t)start_date.year;
     if (year < 2000) year = 2000;
     if (year > 2060) year = 2060;
 
     DateSmall date;
     date.year   = (uint8_t)(year - 2000);
-    date.month  = (uint8_t)((QDate)START_DATE).month();
-    date.day    = (uint8_t)((QDate)START_DATE).day();
+    date.month  = (uint8_t)start_date.month;
+    date.day    = (uint8_t)start_date.day;
     if (date.month < 1)     date.month = 1;
     if (date.month > 12)    date.month = 12;
     if (date.day < 1)       date.day = 1;
@@ -175,7 +179,7 @@ void DaySkipperJPN7p8k::program(SingleSwitchProgramEnvironment& env, BotBaseCont
             correct_count++;
             remaining_skips--;
             stats.issued++;
-            env.log("Expected Date: " + QDate(date.year + 2000, date.month, date.day).toString("yyyy/MM/dd").toStdString());
+            env.log("Expected Date: " + std::to_string(date.year + 2000) + "/" + std::to_string(date.month) + "/" + std::to_string(date.day));
 //            env.log("Skips Remaining: " + tostr_u_commas(remaining_skips));
             env.update_stats();
         }

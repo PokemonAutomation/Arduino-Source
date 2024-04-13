@@ -18,6 +18,7 @@ namespace PokemonAutomation{
 
 
 
+#if 0
 class DateWidget : public QWidget, public ConfigWidget{
 public:
     ~DateWidget();
@@ -30,6 +31,7 @@ private:
     DateOption& m_value;
     QDateEdit* m_date_edit;
 };
+#endif
 
 
 class DateTimeWidget : public QWidget, public ConfigWidget{
