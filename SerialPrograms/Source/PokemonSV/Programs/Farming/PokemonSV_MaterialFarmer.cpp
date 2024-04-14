@@ -161,7 +161,7 @@ void MaterialFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
 
     // start by warping to pokecenter for positioning reasons
     if (!SKIP_WARP_TO_POKECENTER){
-        reset_to_pokecenter(env, context);
+        reset_to_pokecenter(env.program_info(), env.console, context);
     }
 
     size_t consecutive_failures = 0;
@@ -366,7 +366,7 @@ void MaterialFarmer::move_to_start_position_for_letsgo(SingleSwitchProgramEnviro
     env.console.log("Arrived at Let's go start position", COLOR_PURPLE);
     
     // pbf_wait(context, 100); // for testing
-    // reset_to_pokecenter(env, context); // for testing
+    
 
 }
 
@@ -422,7 +422,7 @@ void MaterialFarmer::handle_battles_and_back_to_pokecenter(SingleSwitchProgramEn
             [&](BotBaseContext& context){
                 if (action_finished){
                     // `action` is already finished. Now we just try to get back to pokecenter:
-                    reset_to_pokecenter(env, context);
+                    reset_to_pokecenter(env.program_info(), env.console, context);
                     context.wait_for_all_requests();
                     returned_to_pokecenter = true;
                     return;
@@ -436,7 +436,7 @@ void MaterialFarmer::handle_battles_and_back_to_pokecenter(SingleSwitchProgramEn
                     // So a previous round of action failed.
                     // We need to first re-initialize our position to the PokeCenter
                     // Use map to fly back to the pokecenter
-                    reset_to_pokecenter(env, context);
+                    reset_to_pokecenter(env.program_info(), env.console, context);
                 }
                 context.wait_for_all_requests();
                 action(env, context);
@@ -469,13 +469,6 @@ void MaterialFarmer::handle_battles_and_back_to_pokecenter(SingleSwitchProgramEn
         // Back on the overworld.
     } // end while(action_finished == false || returned_to_pokecenter == false)
 }
-
-// Open map and teleport back to town pokecenter to reset the hunting path.
-void MaterialFarmer::reset_to_pokecenter(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    open_map_from_overworld(env.program_info(), env.console, context);
-    fly_to_closest_pokecenter_on_map(env.program_info(), env.console, context);
-}
-
 
 
 }

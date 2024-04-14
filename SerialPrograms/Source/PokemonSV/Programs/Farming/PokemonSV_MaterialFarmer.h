@@ -47,8 +47,6 @@ private:
 
     void move_to_start_position_for_letsgo(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
-    void reset_to_pokecenter(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-
     void handle_battles_and_back_to_pokecenter(SingleSwitchProgramEnvironment& env, BotBaseContext& context, 
         std::function<void(SingleSwitchProgramEnvironment& env, BotBaseContext& context)>&& action);
 

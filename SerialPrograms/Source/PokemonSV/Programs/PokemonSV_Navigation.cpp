@@ -649,6 +649,12 @@ void jump_off_wall_until_map_open(const ProgramInfo& info, ConsoleHandle& consol
     }
 }
 
+// Open map and teleport back to town pokecenter to reset the hunting path.
+void reset_to_pokecenter(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+    open_map_from_overworld(info, console, context);
+    fly_to_closest_pokecenter_on_map(info, console, context);
+}
+
 
 }
 }

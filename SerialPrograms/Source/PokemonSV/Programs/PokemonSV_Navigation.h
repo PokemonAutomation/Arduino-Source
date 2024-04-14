@@ -72,6 +72,7 @@ void fly_to_closest_pokecenter_on_map(const ProgramInfo& info, ConsoleHandle& co
 // Finishes when map is successfully open.
 void jump_off_wall_until_map_open(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
 
+void reset_to_pokecenter(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
 
 }
 }
