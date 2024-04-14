@@ -16,9 +16,9 @@
 #include "CommonFramework/Windows/DpiScaler.h"
 #include "GlobalSettingsPanel.h"
 
-//#include <iostream>
-//using std::cout;
-//using std::endl;
+// #include <iostream>
+// using std::cout;
+// using std::endl;
 
 namespace PokemonAutomation{
 
@@ -30,6 +30,7 @@ const std::set<std::string> TOKENS{
     "6643d9fe87b3e54dc75dfac8ac22f0cc8bd17f6a8a786debf5fc4c517ee65469",
     "8e48e38e49bffc8462ada9d2d9d850d5b3b5c9529d20978c09bc548bc9a614a4",
     "7694adee4419d62c6a923c4efc9e7b41def7b96bb84ea882701b0bf2e8c13bee",
+    "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08", // test
     "e8d168bc482e96553ea9f9ecaea5a817474dbccc2a6a228a6bde67f2b2aa2889", //  James' token.
     "7555b7c63481cad42306718c67e7f9def5bfd1da8f6cd299ccd3d7dc95f307ae", //  Kuro's token.
 };

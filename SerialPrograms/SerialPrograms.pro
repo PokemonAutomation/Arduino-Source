@@ -725,6 +725,7 @@ SOURCES += \
     Source/PokemonSV/Programs/Farming/PokemonSV_GimmighoulChestFarmer.cpp \
     Source/PokemonSV/Programs/Farming/PokemonSV_GimmighoulRoamingFarmer.cpp \
     Source/PokemonSV/Programs/Farming/PokemonSV_LPFarmer.cpp \
+    Source/PokemonSV/Programs/Farming/PokemonSV_MaterialFarmer.cpp \
     Source/PokemonSV/Programs/Farming/PokemonSV_TournamentFarmer.cpp \
     Source/PokemonSV/Programs/Farming/PokemonSV_TournamentFarmer2.cpp \
     Source/PokemonSV/Programs/Farming/PokemonSV_WildItemFarmer.cpp \
@@ -1796,6 +1797,7 @@ HEADERS += \
     Source/PokemonSV/Programs/Farming/PokemonSV_GimmighoulChestFarmer.h \
     Source/PokemonSV/Programs/Farming/PokemonSV_GimmighoulRoamingFarmer.h \
     Source/PokemonSV/Programs/Farming/PokemonSV_LPFarmer.h \
+    Source/PokemonSV/Programs/Farming/PokemonSV_MaterialFarmer.h \
     Source/PokemonSV/Programs/Farming/PokemonSV_TournamentFarmer.h \
     Source/PokemonSV/Programs/Farming/PokemonSV_TournamentFarmer2.h \
     Source/PokemonSV/Programs/Farming/PokemonSV_WildItemFarmer.h \
