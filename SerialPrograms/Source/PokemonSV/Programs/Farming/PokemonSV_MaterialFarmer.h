@@ -52,7 +52,9 @@ private:
     void handle_battles_and_back_to_pokecenter(SingleSwitchProgramEnvironment& env, BotBaseContext& context, 
         std::function<void(SingleSwitchProgramEnvironment& env, BotBaseContext& context)>&& action);
 
-    BooleanCheckBoxOption SAVE_GAME_AT_START;
+    BooleanCheckBoxOption SAVE_GAME_BEFORE_SANDWICH;
+
+    SimpleIntegerOption<uint16_t> NUM_SANDWICH_ROUNDS;
     
     OCR::LanguageOCROption LANGUAGE;
 
@@ -65,7 +67,7 @@ private:
 
     // Debug options
     BooleanCheckBoxOption SAVE_DEBUG_VIDEO;
-    BooleanCheckBoxOption DEBUG_WARP_TO_POKECENTER;
+    BooleanCheckBoxOption SKIP_WARP_TO_POKECENTER;
     BooleanCheckBoxOption SKIP_SANDWICH;
 
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;

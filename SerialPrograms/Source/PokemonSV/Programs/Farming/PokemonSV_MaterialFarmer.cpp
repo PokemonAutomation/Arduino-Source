@@ -29,9 +29,9 @@
 #include "PokemonSV_MaterialFarmer.h"
 #include "PokemonSV/Programs/ShinyHunting/PokemonSV_ShinyHunt-Scatterbug.h"
 
-//#include <iostream>
-//using std::cout;
-//using std::endl;
+// #include <iostream>
+// using std::cout;
+// using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -46,7 +46,7 @@ MaterialFarmer_Descriptor::MaterialFarmer_Descriptor()
         "PokemonSV:MaterialFarmer",
         STRING_POKEMON + " SV", "Material Farmer",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSV/MaterialFarmer.md",
-        "Farm materials - Happiny dust from Chanseys/Blisseys.",
+        "Farm materials - Happiny dust from Chanseys/Blisseys, for Item Printer.",
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB
@@ -77,14 +77,19 @@ std::unique_ptr<StatsTracker> MaterialFarmer_Descriptor::make_stats() const{
 
 
 MaterialFarmer::MaterialFarmer()
-    : SAVE_GAME_AT_START(
-        "<b>Save Game at Program Start:</b><br>"
-        "This is to ensure the program can continue after resetting the game. Uncheck this option if you have manually saved the game.",
+    : SAVE_GAME_BEFORE_SANDWICH(
+        "<b>Save Game  before each sandwich:</b><br>"
+        "Recommended to leave on, as the sandwich maker will reset the game if it detects an error.",
         LockMode::LOCK_WHILE_RUNNING,
         true
     )
+    , NUM_SANDWICH_ROUNDS(
+          "<b>Number of sandwich rounds to run:</b><br>250-300 Happiny dust per sandwich, with Normal Encounter power level 2.",
+          LockMode::UNLOCK_WHILE_RUNNING,
+          4
+    )
     , LANGUAGE(
-        "<b>Game Language:</b><br>Required to read " + STRING_POKEMON + " names.",
+        "<b>Game Language:</b><br>Required to read " + STRING_POKEMON + " names and sandwich ingredients.",
         IV_READER().languages(),
         LockMode::UNLOCK_WHILE_RUNNING,
         false
@@ -102,14 +107,14 @@ MaterialFarmer::MaterialFarmer()
         LockMode::LOCK_WHILE_RUNNING,
         false
     )
-    , DEBUG_WARP_TO_POKECENTER(
-        "<b>Whether to change the program to just warping to closest PokeCenter and stopping:</b><br>"
-        "This is for debugging the PokeCenter warping function.",
+    , SKIP_WARP_TO_POKECENTER(
+        "<b>DEBUGGING: Skip warping to closest PokeCenter:</b><br>"
+        "This is for debugging the program without waiting for the initial warp.",
         LockMode::LOCK_WHILE_RUNNING,
         false
     )
     , SKIP_SANDWICH(
-        "<b>Whether to skip making sandwich:</b><br>"
+        "<b>DEBUGGING: Skip making sandwich:</b><br>"
         "This is for debugging the program without waiting for sandwich making.",
         LockMode::UNLOCK_WHILE_RUNNING,
         false
@@ -117,10 +122,6 @@ MaterialFarmer::MaterialFarmer()
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS_UPDATE,
-        &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_NONSHINY,
-        &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_SHINY,
-        &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_CATCH_SUCCESS,
-        &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_CATCH_FAILED,
         &NOTIFICATION_PROGRAM_FINISH,
         &NOTIFICATION_ERROR_RECOVERABLE,
         &NOTIFICATION_ERROR_FATAL,
@@ -128,13 +129,13 @@ MaterialFarmer::MaterialFarmer()
 {
     if (PreloadSettings::instance().DEVELOPER_MODE){
         PA_ADD_OPTION(SAVE_DEBUG_VIDEO);
-        PA_ADD_OPTION(DEBUG_WARP_TO_POKECENTER);
+        PA_ADD_OPTION(SKIP_WARP_TO_POKECENTER);
         PA_ADD_OPTION(SKIP_SANDWICH);
     }
-    PA_ADD_OPTION(SAVE_GAME_AT_START);
+    PA_ADD_OPTION(SAVE_GAME_BEFORE_SANDWICH);
+    PA_ADD_OPTION(NUM_SANDWICH_ROUNDS);
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(SANDWICH_OPTIONS);
-    PA_ADD_OPTION(ENCOUNTER_BOT_OPTIONS);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(AUTO_HEAL_PERCENT);
     PA_ADD_OPTION(NOTIFICATIONS);
@@ -144,22 +145,29 @@ MaterialFarmer::MaterialFarmer()
 void MaterialFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     MaterialFarmer_Descriptor::Stats& stats = env.current_stats<MaterialFarmer_Descriptor::Stats>();
 
-    //  Connect the controller.
-    // pbf_press_button(context, BUTTON_L, 10, 50);
+    
 
     assert_16_9_720p_min(env.logger(), env.console);
 
-    if (DEBUG_WARP_TO_POKECENTER){
+    //  Connect the controller.
+    pbf_press_button(context, BUTTON_L, 10, 50);
+
+    if (!SKIP_SANDWICH){
+        const Language language = LANGUAGE;
+        if (language == Language::None) {
+            throw UserSetupError(env.console.logger(), "Must set game language option to read ingredient lists.");
+        }
+    }
+
+    // start by warping to pokecenter for positioning reasons
+    if (!SKIP_WARP_TO_POKECENTER){
         reset_to_pokecenter(env, context);
-        return;
     }
 
     size_t consecutive_failures = 0;
     m_pending_save = false;
 
-    if (SAVE_GAME_AT_START){
-        save_game_from_overworld(env.program_info(), env.console, context);
-    }
+
 
     LetsGoEncounterBotTracker encounter_tracker(
         env, env.console, context,
@@ -168,7 +176,7 @@ void MaterialFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
     );
     m_encounter_tracker = &encounter_tracker;
 
-    while(true){
+    for (uint16_t i = 0; i < NUM_SANDWICH_ROUNDS; i++){
         try{
             run_one_sandwich_iteration(env, context);
         }catch(OperationFailedException& e){
@@ -220,25 +228,24 @@ void MaterialFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
 void MaterialFarmer::run_one_sandwich_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     MaterialFarmer_Descriptor::Stats& stats = env.current_stats<MaterialFarmer_Descriptor::Stats>();
 
-    bool saved_after_this_sandwich = false;
-
     WallClock last_sandwich_time = WallClock::min();
 
-    auto save_if_needed = [&](){
-        if (m_pending_save){
-            save_game_from_overworld(env.program_info(), env.console, context);
-            m_pending_save = false;
-            saved_after_this_sandwich = true;
-        }
-    };
-
+    if (SAVE_GAME_BEFORE_SANDWICH){
+        save_game_from_overworld(env.program_info(), env.console, context);
+    }
     // make sandwich then go back to Pokecenter to reset position
     if (!SKIP_SANDWICH){
         handle_battles_and_back_to_pokecenter(env, context, 
             [this, &last_sandwich_time](SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-                
-                // move up towards pokecenter counter
-                pbf_move_left_joystick(context, 128, 0, 180, 0);
+                // Orient camera to look at same direction as player character
+                // - This is needed because when save-load the game, 
+                // the camera angle is different than when just flying to pokecenter
+                pbf_press_button(context, BUTTON_L, 50, 40);
+
+                // move up towards pokecenter counter        
+                pbf_move_left_joystick(context, 128, 255, 180, 10);
+                // Orient camera to look at same direction as player character
+                pbf_press_button(context, BUTTON_L, 50, 40);
                 // look left
                 pbf_move_right_joystick(context, 0, 128, 120, 0);
                 // move toward clearing besides the pokecenter
@@ -258,7 +265,6 @@ void MaterialFarmer::run_one_sandwich_iteration(SingleSwitchProgramEnvironment& 
     else {
         last_sandwich_time = current_time();
     }
-    save_if_needed();
 
 
     LetsGoHpWatcher hp_watcher(COLOR_RED);
@@ -286,9 +292,11 @@ void MaterialFarmer::run_one_sandwich_iteration(SingleSwitchProgramEnvironment& 
             send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
         }
 
-        // Starting let's go hunting path. 
-        // Starts from pokemon center. Flies to start position. Runs a Let's Go iteration. 
-        // Then returns to pokemon center
+        /*
+        - Starts from pokemon center.
+        - Flies to start position. Runs a Let's Go iteration. 
+        - Then returns to pokemon center 
+        */
         env.console.log("Starting Let's Go hunting path", COLOR_PURPLE);
         handle_battles_and_back_to_pokecenter(env, context, 
             [this, &hp_watcher](SingleSwitchProgramEnvironment& env, BotBaseContext& context){
@@ -304,7 +312,6 @@ void MaterialFarmer::run_one_sandwich_iteration(SingleSwitchProgramEnvironment& 
         ); 
         
         context.wait_for_all_requests();
-        save_if_needed();
     }
 
 
@@ -313,8 +320,15 @@ void MaterialFarmer::run_one_sandwich_iteration(SingleSwitchProgramEnvironment& 
 
 // from the North Province (Area 3) pokecenter, move to start position for Happiny dust farming
 void MaterialFarmer::move_to_start_position_for_letsgo(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    // Orient camera to look at same direction as player character
+    // - This is needed because when save-load the game, 
+    // the camera angle is different than when just flying to pokecenter
+    pbf_press_button(context, BUTTON_L, 50, 40);
+
     // move up towards pokecenter counter        
-    pbf_move_left_joystick(context, 128, 0, 180, 10);
+    pbf_move_left_joystick(context, 128, 255, 180, 10);
+    // Orient camera to look at same direction as player character
+    pbf_press_button(context, BUTTON_L, 50, 40);
     // look left
     pbf_move_right_joystick(context, 0, 128, 120, 10);
     // move toward clearing besides the pokecenter
@@ -346,13 +360,13 @@ void MaterialFarmer::move_to_start_position_for_letsgo(SingleSwitchProgramEnviro
     pbf_press_button(context, BUTTON_PLUS, 50, 50);
 
     // look right
-    pbf_move_right_joystick(context, 255, 128, 38, 10);
+    pbf_move_right_joystick(context, 255, 128, 42, 10);
     pbf_move_left_joystick(context, 128, 0, 50, 10);
 
     env.console.log("Arrived at Let's go start position", COLOR_PURPLE);
     
-    pbf_wait(context, 100); // for testing
-    reset_to_pokecenter(env, context); // for testing
+    // pbf_wait(context, 100); // for testing
+    // reset_to_pokecenter(env, context); // for testing
 
 }
 

@@ -637,8 +637,13 @@ void make_two_herbs_sandwich(
 
 void make_sandwich_option(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, SandwichMakerOption& SANDWICH_OPTIONS){
     const Language language = SANDWICH_OPTIONS.LANGUAGE;
+<<<<<<< HEAD
     if (language == Language::None){
         throw UserSetupError(console.logger(), "Must set game langauge option to read ingredient lists.");
+=======
+    if (language == Language::None) {
+        throw UserSetupError(console.logger(), "Must set game language option to read ingredient lists.");
+>>>>>>> b7db5959 (Save before sandwich. Max number of sandwich rounds. Fix camera orientation.)
     }
 
     int num_fillings = 0;
