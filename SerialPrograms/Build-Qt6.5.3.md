@@ -2,7 +2,6 @@
 
 Required Versions:
 - **Visual Studio 2019** - You must install VS2019. If you install VS2022 instead, your Qt Creator installation will be broken. It is ok to have both VS2019 and VS2022 installed. But you must have VS2019 as that is the version that Qt Creator will look for.
-- **Qt 6.5.3** - N/A. This version is broken.
 
 ## Build Tools:
 
