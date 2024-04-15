@@ -115,6 +115,7 @@
 #include "PokemonSV/Inference/PokemonSV_PokemonSummaryReader.h"
 #include "PokemonSV/Programs/Battles/PokemonSV_SinglesBattler.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_DateReader.h"
+#include "PokemonSV/Inference/ItemPrinter/PokemonSV_ItemPrinterPrizeReader.h"
 
 
 
@@ -260,7 +261,13 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     BotBaseContext context(scope, console.botbase());
     VideoOverlaySet overlays(overlay);
 
+    ItemPrinterPrizeReader reader(Language::English);
+    reader.make_overlays(overlays);
 
+    reader.read(logger, feed.snapshot());
+
+
+#if 0
     DateReader reader;
     reader.make_overlays(overlays);
     DateTime date = reader.read_date(logger, feed.snapshot()).second;
@@ -275,7 +282,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
         reader.set_date(env.program_info(), console, context, DATE0);
         reader.set_date(env.program_info(), console, context, DATE1);
     }
-
+#endif
 
 //    SinglesAIOption battle_AI;
 //    run_singles_battle(env, console, context, battle_AI, false);

@@ -648,6 +648,7 @@ SOURCES += \
     Source/PokemonSV/Inference/Dialogs/PokemonSV_DialogArrowDetector.cpp \
     Source/PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.cpp \
     Source/PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.cpp \
+    Source/PokemonSV/Inference/ItemPrinter/PokemonSV_ItemPrinterPrizeReader.cpp \
     Source/PokemonSV/Inference/Map/PokemonSV_FastTravelDetector.cpp \
     Source/PokemonSV/Inference/Map/PokemonSV_MapDetector.cpp \
     Source/PokemonSV/Inference/Map/PokemonSV_MapMenuDetector.cpp \
@@ -663,6 +664,8 @@ SOURCES += \
     Source/PokemonSV/Inference/Picnics/PokemonSV_SandwichRecipeDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_AuctionItemNameReader.cpp \
     Source/PokemonSV/Inference/PokemonSV_BagDetector.cpp \
+    Source/PokemonSV/Inference/PokemonSV_BlueberryQuestDetector.cpp \
+    Source/PokemonSV/Inference/PokemonSV_BlueberryQuestReader.cpp \
     Source/PokemonSV/Inference/PokemonSV_ClothingTopDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_ESPEmotionDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_MainMenuDetector.cpp \
@@ -682,6 +685,7 @@ SOURCES += \
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraTypeReader.cpp \
     Source/PokemonSV/Options/PokemonSV_AuctionItemSelectOption.cpp \
     Source/PokemonSV/Options/PokemonSV_AuctionItemTable.cpp \
+    Source/PokemonSV/Options/PokemonSV_BBQOption.cpp \
     Source/PokemonSV/Options/PokemonSV_BattleMoveTable.cpp \
     Source/PokemonSV/Options/PokemonSV_EggPowerSandwichOption.cpp \
     Source/PokemonSV/Options/PokemonSV_EncounterActionsTable.cpp \
@@ -712,6 +716,9 @@ SOURCES += \
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggHatcher.cpp \
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggRoutines.cpp \
     Source/PokemonSV/Programs/Farming/PokemonSV_AuctionFarmer.cpp \
+    Source/PokemonSV/Programs/Farming/PokemonSV_BBQSoloFarmer.cpp \
+    Source/PokemonSV/Programs/Farming/PokemonSV_BlueberryCatchPhoto.cpp \
+    Source/PokemonSV/Programs/Farming/PokemonSV_BlueberryQuests.cpp \
     Source/PokemonSV/Programs/Farming/PokemonSV_ESPTraining.cpp \
     Source/PokemonSV/Programs/Farming/PokemonSV_FlyingTrialFarmer.cpp \
     Source/PokemonSV/Programs/Farming/PokemonSV_GimmighoulChestFarmer.cpp \
@@ -738,6 +745,7 @@ SOURCES += \
     Source/PokemonSV/Programs/PokemonSV_GameEntry.cpp \
     Source/PokemonSV/Programs/PokemonSV_Navigation.cpp \
     Source/PokemonSV/Programs/PokemonSV_SaveGame.cpp \
+    Source/PokemonSV/Programs/PokemonSV_Terarium.cpp \
     Source/PokemonSV/Programs/Sandwiches/PokemonSV_IngredientSession.cpp \
     Source/PokemonSV/Programs/Sandwiches/PokemonSV_SandwichMaker.cpp \
     Source/PokemonSV/Programs/Sandwiches/PokemonSV_SandwichRoutines.cpp \
@@ -1706,6 +1714,7 @@ HEADERS += \
     Source/PokemonSV/Inference/Dialogs/PokemonSV_DialogArrowDetector.h \
     Source/PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h \
     Source/PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.h \
+    Source/PokemonSV/Inference/ItemPrinter/PokemonSV_ItemPrinterPrizeReader.h \
     Source/PokemonSV/Inference/Map/PokemonSV_FastTravelDetector.h \
     Source/PokemonSV/Inference/Map/PokemonSV_MapDetector.h \
     Source/PokemonSV/Inference/Map/PokemonSV_MapMenuDetector.h \
@@ -1721,6 +1730,8 @@ HEADERS += \
     Source/PokemonSV/Inference/Picnics/PokemonSV_SandwichRecipeDetector.h \
     Source/PokemonSV/Inference/PokemonSV_AuctionItemNameReader.h \
     Source/PokemonSV/Inference/PokemonSV_BagDetector.h \
+    Source/PokemonSV/Inference/PokemonSV_BlueberryQuestDetector.h \
+    Source/PokemonSV/Inference/PokemonSV_BlueberryQuestReader.h \
     Source/PokemonSV/Inference/PokemonSV_ClothingTopDetector.h \
     Source/PokemonSV/Inference/PokemonSV_ESPEmotionDetector.h \
     Source/PokemonSV/Inference/PokemonSV_MainMenuDetector.h \
@@ -1741,6 +1752,7 @@ HEADERS += \
     Source/PokemonSV/Options/PokemonSV_AuctionItemSelectOption.h \
     Source/PokemonSV/Options/PokemonSV_AuctionItemTable.h \
     Source/PokemonSV/Options/PokemonSV_AutoHostOptions.h \
+    Source/PokemonSV/Options/PokemonSV_BBQOption.h \
     Source/PokemonSV/Options/PokemonSV_BattleMoveTable.h \
     Source/PokemonSV/Options/PokemonSV_EggPowerSandwichOption.h \
     Source/PokemonSV/Options/PokemonSV_EncounterActionsTable.h \
@@ -1772,6 +1784,9 @@ HEADERS += \
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggHatcher.h \
     Source/PokemonSV/Programs/Eggs/PokemonSV_EggRoutines.h \
     Source/PokemonSV/Programs/Farming/PokemonSV_AuctionFarmer.h \
+    Source/PokemonSV/Programs/Farming/PokemonSV_BBQSoloFarmer.h \
+    Source/PokemonSV/Programs/Farming/PokemonSV_BlueberryCatchPhoto.h \
+    Source/PokemonSV/Programs/Farming/PokemonSV_BlueberryQuests.h \
     Source/PokemonSV/Programs/Farming/PokemonSV_ESPTraining.h \
     Source/PokemonSV/Programs/Farming/PokemonSV_FlyingTrialFarmer.h \
     Source/PokemonSV/Programs/Farming/PokemonSV_GimmighoulChestFarmer.h \
@@ -1798,6 +1813,7 @@ HEADERS += \
     Source/PokemonSV/Programs/PokemonSV_GameEntry.h \
     Source/PokemonSV/Programs/PokemonSV_Navigation.h \
     Source/PokemonSV/Programs/PokemonSV_SaveGame.h \
+    Source/PokemonSV/Programs/PokemonSV_Terarium.h \
     Source/PokemonSV/Programs/Sandwiches/PokemonSV_IngredientSession.h \
     Source/PokemonSV/Programs/Sandwiches/PokemonSV_SandwichMaker.h \
     Source/PokemonSV/Programs/Sandwiches/PokemonSV_SandwichRoutines.h \
