@@ -47,6 +47,8 @@ private:
 
     void move_to_start_position_for_letsgo(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
+    bool is_sandwich_expired(WallClock last_sandwich_time);
+
     void handle_battles_and_back_to_pokecenter(SingleSwitchProgramEnvironment& env, BotBaseContext& context, 
         std::function<void(SingleSwitchProgramEnvironment& env, BotBaseContext& context)>&& action);
 

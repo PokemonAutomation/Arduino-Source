@@ -599,7 +599,7 @@ void fly_to_closest_pokecenter_on_map(const ProgramInfo& info, ConsoleHandle& co
     
     // Does not find any visible pokecenter. Probably the player character or a nearby Pokemon icon overlaps with the pokecenter.
     // Zoom out to the max warpable level and try pressing on the player character.
-    console.log("Zoom to max map level to try searching for pokecetner again.");
+    console.log("Zoom to max map level to try searching for Pokecenter again.");
     console.overlay().add_log("Pokecenter Icon occluded");
     pbf_press_button(context, BUTTON_ZL, 40, 100);
     pbf_press_button(context, BUTTON_ZL, 40, 100);
