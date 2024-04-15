@@ -83,7 +83,7 @@ MaterialFarmer::MaterialFarmer()
         true
     )
     , NUM_SANDWICH_ROUNDS(
-          "<b>Number of sandwich rounds to run:</b><br>250-300 Happiny dust per sandwich, with Normal Encounter power level 2.",
+          "<b>Number of sandwich rounds to run:</b><br>150-300 Happiny dust per sandwich, with Normal Encounter power level 2.",
           LockMode::UNLOCK_WHILE_RUNNING,
           4
     )
@@ -380,7 +380,7 @@ void MaterialFarmer::move_to_start_position_for_letsgo(SingleSwitchProgramEnviro
     pbf_press_button(context, BUTTON_PLUS, 50, 50);
 
     // look right
-    pbf_move_right_joystick(context, 255, 128, 42, 10);
+    pbf_move_right_joystick(context, 255, 128, 40, 10);
     pbf_move_left_joystick(context, 128, 0, 50, 10);
 
     env.console.log("Arrived at Let's go start position", COLOR_PURPLE);
@@ -406,7 +406,8 @@ void MaterialFarmer::run_lets_go_iteration(SingleSwitchProgramEnvironment& env, 
             use_lets_go_to_clear_in_front(console, context, *m_encounter_tracker, throw_ball_if_bubble, [&](BotBaseContext& context){
                 // Do the following movement while the Let's Go pokemon clearing wild pokemon.
                 // Slowly Moving forward
-                pbf_move_left_joystick(context, 128, 105, 800, 0);
+                pbf_move_left_joystick(context, 128, 105, 800, 10);
+                pbf_move_right_joystick(context, 255, 128, 1, 10);
             });
         }
     };
