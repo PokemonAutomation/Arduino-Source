@@ -39,7 +39,7 @@ public:
         FOURTH
     };
     BlueberryQuestDetector(Logger& logger, Color color, Language language, QuestPosition position);
-    virtual ~BlueberryQuestDetector();
+//    virtual ~BlueberryQuestDetector();
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) const override;

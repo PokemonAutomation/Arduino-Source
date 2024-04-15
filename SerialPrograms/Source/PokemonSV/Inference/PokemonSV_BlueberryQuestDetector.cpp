@@ -20,7 +20,7 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 
-BlueberryQuestDetector::~BlueberryQuestDetector() = default;
+//BlueberryQuestDetector::~BlueberryQuestDetector() = default;
 
 BlueberryQuestDetector::BlueberryQuestDetector(Logger& logger, Color color, Language language, QuestPosition position)
     : m_logger(logger), m_color(color), m_language(language), m_position(position)

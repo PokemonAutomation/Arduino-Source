@@ -9,12 +9,12 @@
 
 #include "CommonFramework/OCR/OCR_SmallDictionaryMatcher.h"
 
-namespace PokemonAutomation {
-namespace NintendoSwitch {
-namespace PokemonSV {
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace PokemonSV{
 
 
-class AuctionItemNameReader : public OCR::SmallDictionaryMatcher {
+class AuctionItemNameReader : public OCR::SmallDictionaryMatcher{
 public:
     static constexpr double MAX_LOG10P = -1.40;
     static constexpr double MAX_LOG10P_SPREAD = 0.50;

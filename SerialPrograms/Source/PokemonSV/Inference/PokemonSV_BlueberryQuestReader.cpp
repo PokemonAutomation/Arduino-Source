@@ -4,7 +4,6 @@
  *
  */
 
-#include "CommonFramework/OCR/OCR_RawOCR.h"
 #include "PokemonSV_BlueberryQuestReader.h"
 
 namespace PokemonAutomation {
@@ -12,7 +11,7 @@ namespace NintendoSwitch {
 namespace PokemonSV {
 
 
-BlueberryQuestReader& BlueberryQuestReader::instance() {
+BlueberryQuestReader& BlueberryQuestReader::instance(){
     static BlueberryQuestReader reader;
     return reader;
 }
@@ -27,7 +26,7 @@ OCR::StringMatchResult BlueberryQuestReader::read_substring(
     const ImageViewRGB32& image,
     const std::vector<OCR::TextColorRange>& text_color_ranges,
     double min_text_ratio, double max_text_ratio
-) const {
+) const{
     return match_substring_from_image_multifiltered(
         &logger, language, image, text_color_ranges,
         MAX_LOG10P, MAX_LOG10P_SPREAD, min_text_ratio, max_text_ratio
