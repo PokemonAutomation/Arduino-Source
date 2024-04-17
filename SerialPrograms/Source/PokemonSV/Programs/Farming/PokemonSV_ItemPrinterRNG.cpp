@@ -96,9 +96,9 @@ ItemPrinterRNG::ItemPrinterRNG()
     , DELAY_MILLIS(
         "<b>Delay (Milliseconds):</b><br>"
         "The delay from when you press A to when the game reads the date for the seed. "
-        "For OLED Switches, this delay is about 500 milliseconds. For older Switches, this delay is closer to 1500 milliseconds. "
+        "For OLED Switches, this delay is about 750 milliseconds. For older Switches, this delay is closer to 1750 milliseconds. "
         "You will need to experiment to find the correct delay.",
-        LockMode::UNLOCK_WHILE_RUNNING, 500,
+        LockMode::UNLOCK_WHILE_RUNNING, 750,
         0, 10000
     )
     , GO_HOME_WHEN_DONE(false)
