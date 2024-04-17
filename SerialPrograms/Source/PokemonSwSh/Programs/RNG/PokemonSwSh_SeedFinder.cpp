@@ -95,7 +95,7 @@ void SeedFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
     Xoroshiro128PlusState state(0, 0);
     // sanitize STATE_0 and STATE_1 and make ints
     if (UPDATE_STATE){
-        try {
+        try{
             state.s0 = std::stoull(STATE_0, nullptr, 16);
             state.s1 = std::stoull(STATE_1, nullptr, 16);
         }

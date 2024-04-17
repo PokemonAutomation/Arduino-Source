@@ -15,7 +15,7 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 
-class TournamentPrizeNames {
+class TournamentPrizeNames{
 public:
     const std::string& display_name() const { return m_display_name; }
 

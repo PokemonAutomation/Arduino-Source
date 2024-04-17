@@ -77,7 +77,7 @@ public:
 };
 
 // The arrow that points to one of the ten apps on Rotom Phone menu
-class RotomPhoneMenuArrowFinder {
+class RotomPhoneMenuArrowFinder{
 public:
     RotomPhoneMenuArrowFinder(VideoOverlay& overlay);
 

@@ -45,7 +45,7 @@ TournamentFarmer_Descriptor::TournamentFarmer_Descriptor()
     )
 {}
 
-struct TournamentFarmer_Descriptor::Stats : public StatsTracker {
+struct TournamentFarmer_Descriptor::Stats : public StatsTracker{
     Stats()
         : tournaments(m_stats["Tournaments won"])
         , battles(m_stats["Battles fought"])

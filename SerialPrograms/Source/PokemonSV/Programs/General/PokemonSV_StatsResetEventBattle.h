@@ -58,7 +58,7 @@ private:
     bool check_stats_after_win(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
 private:
-    enum class Target {
+    enum class Target{
         Ursaluna,
         Pecharunt,
     };

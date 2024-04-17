@@ -15,9 +15,9 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
 
-class FillingsCoordinates {
+class FillingsCoordinates{
 
-    struct FillingInfo {
+    struct FillingInfo{
         uint8_t piecesPerServing;
         uint8_t servingsPerPlate;
         std::map<int, std::vector<ImageFloatBox>> placementCoordinates;

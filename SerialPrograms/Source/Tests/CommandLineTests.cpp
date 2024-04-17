@@ -49,7 +49,7 @@ void print_equals(){
 #define RETURN_IF_TEST_FAILED(test_func, file_path, num_passed) \
     do { \
         int _ret = 0; \
-        try { \
+        try{ \
             _ret = test_func(file_path); \
         } catch (const std::exception& e) { \
             cout << "Test: " << (file_path) << " threw exception: " << e.what() << endl; \

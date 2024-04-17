@@ -223,8 +223,7 @@ bool IngoMoveGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBase
             env.console.log("Our turn!", COLOR_BLUE);
 
             Move move = POKEMON_ACTIONS.get_move(cur_pokemon, cur_move);
-            if (move_issued[cur_pokemon][cur_move] < move.attempts)
-            {
+            if (move_issued[cur_pokemon][cur_move] < move.attempts){
                 // Press A to select moves
                 pbf_press_button(context, BUTTON_A, 10, 125);
                 context.wait_for_all_requests();
@@ -238,32 +237,27 @@ bool IngoMoveGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBase
                         env.console.log("Successfully attempted a new move " + debug_current_info() + debug_move_attempts_info());
                     }
                     context.wait_for_all_requests();
-                }else
-                {
+                }else{
                     pbf_press_button(context, BUTTON_B, 20, 2 * TICKS_PER_SECOND);
                     env.console.log("No PP left for pokemon " + std::to_string(cur_pokemon) + " and move " + std::to_string(cur_move));
-                    if (get_next_move_to_switch_to() == 4)
-                    {
+                    if (get_next_move_to_switch_to() == 4){
                         // Press down to select pokemons
                         pbf_press_dpad(context, DPAD_DOWN, 20, 100);
                         go_to_next_pokemon(env, context);
 
                     }else
-                    {
+{
                         go_to_next_move(env, context);
                     }
                 }
-            }else
-            {
+            }else{
                 env.console.log("Done grinding for pokemon " + std::to_string(cur_pokemon) + " and move " + std::to_string(cur_move));
-                if (get_next_move_to_switch_to() == 4)
-                {
+                if (get_next_move_to_switch_to() == 4){
                     // Press down to select pokemons
                     pbf_press_dpad(context, DPAD_DOWN, 20, 100);
                     go_to_next_pokemon(env, context);
 
-                }else
-                {
+                }else{
                     go_to_next_move(env, context);
                 }
             }

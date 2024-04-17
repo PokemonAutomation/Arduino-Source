@@ -53,7 +53,7 @@ void return_to_plaza(const ProgramInfo& info, ConsoleHandle& console, BotBaseCon
                 }
                 context.wait_for_all_requests();
 
-                try {
+                try{
                     open_map_from_overworld(info, console, context);
                 }
                 catch (...){
@@ -72,7 +72,7 @@ void return_to_plaza(const ProgramInfo& info, ConsoleHandle& console, BotBaseCon
                 }
                 pbf_press_button(context, BUTTON_ZR, 40, 100);
 
-                try {
+                try{
                     //The only pokecenter on the map is Central Plaza
                     fly_to_closest_pokecenter_on_map(info, console, context);
                     context.wait_for_all_requests();
@@ -123,7 +123,7 @@ void map_move_cursor_fly(const ProgramInfo& info, ConsoleHandle& console, BotBas
     console.log("Attempting to fly to " + location + ".");
 
     for (int i = 0; i < 3; i++){
-        try {
+        try{
             open_map_from_overworld(info, console, context);
             pbf_move_left_joystick(context, x, y, hold, release);
             pbf_press_button(context, BUTTON_ZL, 40, 100);

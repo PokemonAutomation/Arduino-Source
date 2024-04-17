@@ -30,7 +30,7 @@ enum class Detection{
     GREEN,
     GREY,
 };
-class ESPEmotionReader {
+class ESPEmotionReader{
 public:
     ESPEmotionReader();
 
@@ -41,7 +41,7 @@ private:
     ImageFloatBox m_symbol_box;
 };
 
-class ESPEmotionDetector : public VisualInferenceCallback {
+class ESPEmotionDetector : public VisualInferenceCallback{
 public:
     ESPEmotionDetector();
 
@@ -58,7 +58,7 @@ private:
 };
 
 //This checks for the Dendra's dialog box
-class ESPStartDetector : public VisualInferenceCallback {
+class ESPStartDetector : public VisualInferenceCallback{
 public:
     ESPStartDetector();
 
@@ -73,7 +73,7 @@ private:
 };
 
 // This checks that Dendra's box vanished to shout the next emotion
-class ESPShowNewEmotionDetector : public VisualInferenceCallback {
+class ESPShowNewEmotionDetector : public VisualInferenceCallback{
 public:
     ESPShowNewEmotionDetector();
 
@@ -88,7 +88,7 @@ private:
 };
 
 // Check that an emotion is pressed by looking for yellow in the lower right interface
-class ESPPressedEmotionDetector : public VisualInferenceCallback {
+class ESPPressedEmotionDetector : public VisualInferenceCallback{
 public:
     ESPPressedEmotionDetector();
 

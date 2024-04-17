@@ -53,7 +53,7 @@ AuctionFarmer_Descriptor::AuctionFarmer_Descriptor()
     )
 {}
 
-struct AuctionFarmer_Descriptor::Stats : public StatsTracker {
+struct AuctionFarmer_Descriptor::Stats : public StatsTracker{
     Stats()
         : m_resets(m_stats["Resets"])
         , m_auctions(m_stats["Auctions"])
@@ -452,10 +452,9 @@ void AuctionFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
             for (std::pair<AuctionOffer, ImageFloatBox>& offer_pair : offers){
                 AuctionOffer offer = offer_pair.first;
                 if (is_good_offer(offer)){
-                    try {
+                    try{
                         move_to_auctioneer(env, context, offer);
-                    }
-                    catch (OperationFailedException& e){
+                    }catch (OperationFailedException& e){
                         stats.m_errors++;
                         e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
 

@@ -38,7 +38,7 @@ BBQSoloFarmer_Descriptor::BBQSoloFarmer_Descriptor()
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
-struct BBQSoloFarmer_Descriptor::Stats : public StatsTracker {
+struct BBQSoloFarmer_Descriptor::Stats : public StatsTracker{
     Stats()
         : questsCompleted(m_stats["Quests Completed"])
         , saves(m_stats["Saves"])

@@ -34,7 +34,7 @@ MassPurchase_Descriptor::MassPurchase_Descriptor()
     )
 {}
 
-struct MassPurchase_Descriptor::Stats : public StatsTracker {
+struct MassPurchase_Descriptor::Stats : public StatsTracker{
     Stats()
         : total_items(m_stats["Items Purchased"])
         , skip(m_stats["Skipped"])

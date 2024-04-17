@@ -17,7 +17,7 @@ using namespace Pokemon;
 
 const NatureReader& NATURE_READER();
 
-class BoxNatureDetector {
+class BoxNatureDetector{
 public:
     BoxNatureDetector(VideoOverlay& overlay, Language language);
 

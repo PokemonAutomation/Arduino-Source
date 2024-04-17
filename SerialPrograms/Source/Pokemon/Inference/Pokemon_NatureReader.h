@@ -14,13 +14,13 @@
 namespace PokemonAutomation{
 namespace Pokemon{
 
-class NatureReader : public OCR::SmallDictionaryMatcher {
+class NatureReader : public OCR::SmallDictionaryMatcher{
 public:
     static constexpr double MAX_LOG10P = -1.40;
     static constexpr double MAX_LOG10P_SPREAD = 0.50;
 
 public:
-    struct Results {
+    struct Results{
         NatureCheckerValue nature = NatureCheckerValue::UnableToDetect;
         std::string to_string() const;
     };

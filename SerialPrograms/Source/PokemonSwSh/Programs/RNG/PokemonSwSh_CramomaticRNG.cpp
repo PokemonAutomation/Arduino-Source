@@ -484,7 +484,7 @@ void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         do_rng_advances(env.console, context, rng, target.needed_advances, ADVANCE_PRESS_DURATION, ADVANCE_RELEASE_DURATION);
         leave_to_overworld_and_interact(env, context);
 
-        try {
+        try{
             choose_apricorn(env, context, sport);
         }
         catch (OperationFailedException& e){

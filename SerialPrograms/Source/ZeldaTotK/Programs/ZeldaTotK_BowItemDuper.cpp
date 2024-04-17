@@ -28,7 +28,7 @@ BowItemDuper_Descriptor::BowItemDuper_Descriptor()
     )
 {}
 
-struct BowItemDuper_Descriptor::Stats : public StatsTracker {
+struct BowItemDuper_Descriptor::Stats : public StatsTracker{
     Stats()
         : dupe_attempts(m_stats["Dupe Attempts"])
     {

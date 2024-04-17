@@ -14,7 +14,7 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 
-class SandwichIngredientsTableCell : public StringSelectCell {
+class SandwichIngredientsTableCell : public StringSelectCell{
 public:
     SandwichIngredientsTableCell(const std::string& default_slug);
 };

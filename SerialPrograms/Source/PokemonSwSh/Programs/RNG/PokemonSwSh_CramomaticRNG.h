@@ -23,7 +23,7 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-class CramomaticRNG_Descriptor : public SingleSwitchProgramDescriptor {
+class CramomaticRNG_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     CramomaticRNG_Descriptor();
 
@@ -31,13 +31,13 @@ public:
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
-struct CramomaticTarget {
+struct CramomaticTarget{
     CramomaticBallType ball_type;
     bool is_bonus;
     size_t needed_advances;
 };
 
-class CramomaticRNG : public SingleSwitchProgramInstance {
+class CramomaticRNG : public SingleSwitchProgramInstance{
 public:
     CramomaticRNG();
 

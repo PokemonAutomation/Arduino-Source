@@ -27,7 +27,7 @@ WeaponDuper_Descriptor::WeaponDuper_Descriptor()
     )
 {}
 
-struct WeaponDuper_Descriptor::Stats : public StatsTracker {
+struct WeaponDuper_Descriptor::Stats : public StatsTracker{
     Stats()
         : dupe_attempts(m_stats["Dupe Attempts"])
     {

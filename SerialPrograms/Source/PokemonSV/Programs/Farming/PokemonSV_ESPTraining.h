@@ -21,7 +21,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
 
-class ESPTraining_Descriptor : public SingleSwitchProgramDescriptor {
+class ESPTraining_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     ESPTraining_Descriptor();
 
@@ -29,7 +29,7 @@ public:
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
-class ESPTraining : public SingleSwitchProgramInstance {
+class ESPTraining : public SingleSwitchProgramInstance{
 public:
     ESPTraining();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;

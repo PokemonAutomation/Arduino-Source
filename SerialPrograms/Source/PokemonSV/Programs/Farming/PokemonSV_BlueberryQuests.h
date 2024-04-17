@@ -19,7 +19,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
 
-enum class BBQuests {
+enum class BBQuests{
     auto_10, make_tm, pickup_10, sneak_up, photo_fly, photo_swim, photo_canyon, photo_coastal, photo_polar, photo_savanna, tera_self_defeat,
     travel_500, catch_any, catch_normal, catch_fighting, catch_flying, catch_poison, catch_ground, catch_rock, catch_bug, catch_ghost, catch_steel,
     catch_fire, catch_water, catch_grass, catch_electric, catch_psychic, catch_ice, catch_dragon, catch_dark, catch_fairy,
@@ -33,7 +33,7 @@ enum class BBQuests {
 
 BBQuests BBQuests_string_to_enum(const std::string& token);
 
-enum class CameraAngle {
+enum class CameraAngle{
     none,
     up,
     down

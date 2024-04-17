@@ -631,7 +631,7 @@ void jump_off_wall_until_map_open(const ProgramInfo& info, ConsoleHandle& consol
         pbf_press_button(context, BUTTON_B, 50, 50);
         pbf_move_left_joystick(context, 128, 255, 100, 50);
         context.wait_for_all_requests();
-        try {
+        try{
             open_map_from_overworld(info, console, context);
             break;
         }

@@ -39,7 +39,7 @@ void Client::connect(){
 
         std::string token = settings.integration.token;
         uint32_t intents = intents::i_default_intents | intents::i_guild_members | intents::i_message_content;
-        try {
+        try{
             m_bot = std::make_unique<cluster>(token, intents);
             m_handler = std::make_unique<commandhandler>(m_bot.get(), false);
             m_bot->cache_policy = { cache_policy_setting_t::cp_lazy, cache_policy_setting_t::cp_lazy, cache_policy_setting_t::cp_aggressive };
@@ -54,7 +54,7 @@ void Client::connect(){
 void Client::disconnect(){
     std::lock_guard<std::mutex> lg(m_client_lock);
     if (m_bot != nullptr && m_is_connected.load(std::memory_order_relaxed)){
-        try {
+        try{
             m_bot->shutdown();
             m_handler.reset();
             m_bot.reset();
@@ -135,7 +135,7 @@ void Client::run(const std::string& token){
         Handler::log_dpp("DPP has been disconnected.", "run()", ll_warning);
         return;
     }
-    try {
+    try{
         Handler::initialize(*m_bot.get(), *m_handler.get());
         m_bot->set_websocket_protocol(websocket_protocol_t::ws_etf);
         m_bot->start(st_return);

@@ -27,7 +27,7 @@ ParaglideItemDuper_Descriptor::ParaglideItemDuper_Descriptor()
     )
 {}
 
-struct ParaglideItemDuper_Descriptor::Stats : public StatsTracker {
+struct ParaglideItemDuper_Descriptor::Stats : public StatsTracker{
     Stats()
         : dupe_attempts(m_stats["Dupe Attempts"])
     {

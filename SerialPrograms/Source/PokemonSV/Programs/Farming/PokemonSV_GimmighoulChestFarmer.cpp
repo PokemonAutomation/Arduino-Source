@@ -42,7 +42,7 @@ GimmighoulChestFarmer_Descriptor::GimmighoulChestFarmer_Descriptor()
     )
 {}
 
-struct GimmighoulChestFarmer_Descriptor::Stats : public StatsTracker {
+struct GimmighoulChestFarmer_Descriptor::Stats : public StatsTracker{
     Stats()
         : pokemon_fainted(m_stats["Chests farmed"])
         , wild_interrupts(m_stats["Wild interrupts"])

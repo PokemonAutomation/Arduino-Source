@@ -19,12 +19,12 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 
-class ClothingBuyer_Descriptor : public SingleSwitchProgramDescriptor {
+class ClothingBuyer_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     ClothingBuyer_Descriptor();
 };
 
-class ClothingBuyer : public SingleSwitchProgramInstance {
+class ClothingBuyer : public SingleSwitchProgramInstance{
 public:
     ClothingBuyer();
 

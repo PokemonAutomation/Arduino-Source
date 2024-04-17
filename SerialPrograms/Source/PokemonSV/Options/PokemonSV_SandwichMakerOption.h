@@ -29,7 +29,7 @@ enum class HerbaSelection{
     spicy_herba_mystica,
 };
 
-enum class BaseRecipe {
+enum class BaseRecipe{
     shiny,
     huge,
     tiny,
@@ -37,7 +37,7 @@ enum class BaseRecipe {
     custom,
 };
 
-enum class PokemonType {
+enum class PokemonType{
     normal,
     fire,
     water,
@@ -58,7 +58,7 @@ enum class PokemonType {
     fairy,
 };
 
-enum class ParadoxRecipe {
+enum class ParadoxRecipe{
     humungo3_greattusk_1,
     humungo2_screamtail_1,
     humungo2_screamtail_2,
@@ -108,7 +108,7 @@ enum class ParadoxRecipe {
     teensy2_ironvaliant_2,
 };
 
-enum class SandwichRecipe {
+enum class SandwichRecipe{
     shiny_normal,
     shiny_fire,
     shiny_water,
@@ -215,7 +215,7 @@ enum class SandwichRecipe {
 
 
 
-class SandwichMakerOption : public GroupOption, private ConfigOption::Listener {
+class SandwichMakerOption : public GroupOption, private ConfigOption::Listener{
 
 public:
     ~SandwichMakerOption();

@@ -21,7 +21,7 @@ enum class NaturePlusMinus{
     MINUS,
 };
 
-class BoxNatureDetector {
+class BoxNatureDetector{
 public:
     BoxNatureDetector(VideoOverlay& overlay);
 

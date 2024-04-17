@@ -13,7 +13,7 @@
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
-namespace PokemonHome {
+namespace PokemonHome{
 
 
 const double BallReader::MAX_ALPHA = 0.40;

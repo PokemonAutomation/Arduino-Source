@@ -19,13 +19,13 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
-class SeedFinder_Descriptor : public SingleSwitchProgramDescriptor {
+class SeedFinder_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     SeedFinder_Descriptor();
 };
 
 
-class SeedFinder : public SingleSwitchProgramInstance {
+class SeedFinder : public SingleSwitchProgramInstance{
 public:
     SeedFinder();
 

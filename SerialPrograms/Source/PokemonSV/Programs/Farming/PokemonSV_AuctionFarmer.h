@@ -19,7 +19,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
 
-struct AuctionOffer {
+struct AuctionOffer{
     std::string item;
 };
 

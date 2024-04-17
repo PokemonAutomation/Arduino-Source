@@ -88,7 +88,7 @@ private:
 
 
 
-class SwapMenuDetector : public StaticScreenDetector {
+class SwapMenuDetector : public StaticScreenDetector{
 public:
     SwapMenuDetector(Color color);
 
@@ -102,7 +102,7 @@ public:
 private:
     GradientArrowDetector m_arrow;
 };
-class SwapMenuWatcher : public DetectorToFinder<SwapMenuDetector> {
+class SwapMenuWatcher : public DetectorToFinder<SwapMenuDetector>{
 public:
     SwapMenuWatcher(Color color)
         : DetectorToFinder("SwapMenuWatcher", std::chrono::milliseconds(250), color)

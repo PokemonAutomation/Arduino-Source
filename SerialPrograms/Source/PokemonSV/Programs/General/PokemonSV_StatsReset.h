@@ -19,7 +19,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
 
-class StatsReset_Descriptor : public SingleSwitchProgramDescriptor {
+class StatsReset_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     StatsReset_Descriptor();
 
@@ -27,14 +27,14 @@ public:
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
-class StatsReset : public SingleSwitchProgramInstance {
+class StatsReset : public SingleSwitchProgramInstance{
 public:
     StatsReset();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
     //Can expand targets assuming there's anything else not locked in the DLC
-    enum class Target {
+    enum class Target{
         TreasuresOfRuin,
         LoyalThree,
         Snacksworth,

@@ -19,7 +19,7 @@ const SpriteDatabase& ALL_POKEMON_SPRITES();
 
 const SpriteDatabase& ALL_POKEMON_SILHOUETTES();
 
-enum class TeraType {
+enum class TeraType{
     Bug,
     Dark,
     Dragon,

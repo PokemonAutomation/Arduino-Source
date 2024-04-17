@@ -36,7 +36,7 @@ ESPTraining_Descriptor::ESPTraining_Descriptor()
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
-struct ESPTraining_Descriptor::Stats : public StatsTracker {
+struct ESPTraining_Descriptor::Stats : public StatsTracker{
     Stats()
         : m_emotions(m_stats["Emotions Shown"])
         , m_joy(m_stats["Joy"])

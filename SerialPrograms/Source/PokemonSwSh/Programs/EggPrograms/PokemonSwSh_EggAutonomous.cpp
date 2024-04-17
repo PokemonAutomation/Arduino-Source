@@ -336,7 +336,7 @@ bool EggAutonomous::run_batch(SingleSwitchProgramEnvironment& env, BotBaseContex
             }
 
             // Egg hatching
-            do {
+            do{
                 ++num_eggs_hatched;
                 stats.m_hatched++;
                 env.update_stats();

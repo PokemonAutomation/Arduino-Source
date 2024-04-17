@@ -43,7 +43,7 @@ void Handler::initialize(cluster& bot, commandhandler& handler){
     });
 
     bot.on_guild_create([&bot, this](const guild_create_t& event){
-        try {
+        try{
             std::string id = std::to_string(event.created->id);
             log_dpp("Loaded guild: " + event.created->name + " (" + id + ").", "Guild Create", ll_info);
             std::lock_guard<std::mutex> lg(m_count_lock);
@@ -99,7 +99,7 @@ void Handler::send_message(cluster& bot, embed& embed, const std::string& channe
         if (file != nullptr && !file->filepath().empty() && !file->filename().empty()){
             std::string data;
             std::string path = file->filepath();
-            try {
+            try{
                 data = utility::read_file(path);
                 m.add_file(file->filename(), data);
                 if (path.find(".txt") == std::string::npos){
@@ -127,7 +127,7 @@ void Handler::update_response(const dpp::command_source& src, dpp::embed& embed,
     message m;
     if (file != nullptr && !file->filepath().empty() && !file->filename().empty()){
         std::string data;
-        try {
+        try{
             data = utility::read_file(file->filepath());
             m.add_file(file->filename(), data);
             embed.set_image("attachment://" + file->filename());

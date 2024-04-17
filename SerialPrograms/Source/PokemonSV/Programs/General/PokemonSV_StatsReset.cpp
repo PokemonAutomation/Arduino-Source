@@ -42,7 +42,7 @@ StatsReset_Descriptor::StatsReset_Descriptor()
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
-struct StatsReset_Descriptor::Stats : public StatsTracker {
+struct StatsReset_Descriptor::Stats : public StatsTracker{
     Stats()
         : resets(m_stats["Resets"])
         , balls(m_stats["Balls Thrown"])

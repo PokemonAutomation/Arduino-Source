@@ -18,7 +18,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
 
-enum class SandwichHandType {
+enum class SandwichHandType{
     FREE,
     GRABBING,
 };

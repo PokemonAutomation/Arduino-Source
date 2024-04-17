@@ -177,16 +177,14 @@ void Pokemon::load_moves(){
 
 void Pokemon::update_stats(bool is_iv, uint8_t HP, uint8_t Atk, uint8_t Def, uint8_t SpAtk, uint8_t SpDef, uint8_t Speed){
     // this method updates internally what the IVs or EVs are and then recalculates stats
-    if (is_iv)
-    {
+    if (is_iv){
         m_iv_hp = HP;
         m_iv_atk = Atk;
         m_iv_def = Def;
         m_iv_spatk = SpAtk;
         m_iv_spdef = SpDef;
         m_iv_speed = Speed;
-    }else
-    {
+    }else{
         m_ev_hp = HP;
         m_ev_atk = Atk;
         m_ev_def = Def;

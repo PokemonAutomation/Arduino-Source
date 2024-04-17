@@ -25,7 +25,7 @@ namespace PokemonLA{
 
 
 
-class MMOQuestionMarkDetector {
+class MMOQuestionMarkDetector{
 public:
     MMOQuestionMarkDetector(Logger& logger);
 

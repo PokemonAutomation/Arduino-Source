@@ -19,7 +19,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
 
-class ClothingTopDetector : public StaticScreenDetector {
+class ClothingTopDetector : public StaticScreenDetector{
 public:
     ClothingTopDetector(Color color);
 
@@ -29,7 +29,7 @@ public:
 private:
     GradientArrowDetector m_arrow;
 };
-class ClothingTopWatcher : public DetectorToFinder<ClothingTopDetector> {
+class ClothingTopWatcher : public DetectorToFinder<ClothingTopDetector>{
 public:
     ClothingTopWatcher(Color color)
         : DetectorToFinder("ClothingTopWatcher", std::chrono::milliseconds(250), color)

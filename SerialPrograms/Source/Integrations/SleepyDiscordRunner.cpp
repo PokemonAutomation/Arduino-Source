@@ -103,7 +103,7 @@ Logger& sleepy_logger(){
 }
 
 
-struct SleepyDiscordRequest {
+struct SleepyDiscordRequest{
     SleepyDiscordRequest() = default;
     SleepyDiscordRequest(std::string embed, std::string channels, std::string messages, std::shared_ptr<PendingFileSend> file) :
         embed(std::move(embed)),
@@ -117,7 +117,7 @@ struct SleepyDiscordRequest {
     std::shared_ptr<PendingFileSend> file;
 };
 
-class SleepyDiscordSender {
+class SleepyDiscordSender{
 private:
     SleepyDiscordSender()
 //        : m_stopping(false)
@@ -221,7 +221,7 @@ struct CommandArgs{
 };
 
 
-class SleepyDiscordClient {
+class SleepyDiscordClient{
 public:
     bool m_connected = false;
 

@@ -18,14 +18,14 @@ namespace PokemonSV{
 
 
 
-class LPFarmer_Descriptor : public SingleSwitchProgramDescriptor {
+class LPFarmer_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     LPFarmer_Descriptor();
     struct Stats;
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
-class LPFarmer : public SingleSwitchProgramInstance {
+class LPFarmer : public SingleSwitchProgramInstance{
 public:
     LPFarmer();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;

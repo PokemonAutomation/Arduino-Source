@@ -16,14 +16,14 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace ZeldaTotK{
 
-class SurfItemDuper_Descriptor : public SingleSwitchProgramDescriptor {
+class SurfItemDuper_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     SurfItemDuper_Descriptor();
     struct Stats;
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
-class SurfItemDuper : public SingleSwitchProgramInstance {
+class SurfItemDuper : public SingleSwitchProgramInstance{
 public:
     SurfItemDuper();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;

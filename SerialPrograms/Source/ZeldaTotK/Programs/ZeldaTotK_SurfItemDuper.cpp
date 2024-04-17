@@ -27,7 +27,7 @@ SurfItemDuper_Descriptor::SurfItemDuper_Descriptor()
     )
 {}
 
-struct SurfItemDuper_Descriptor::Stats : public StatsTracker {
+struct SurfItemDuper_Descriptor::Stats : public StatsTracker{
     Stats()
         : dupe_attempts(m_stats["Dupe Attempts"])
     {

@@ -27,7 +27,7 @@
 extern "C" {
 #endif
 
-namespace SleepyDiscord {
+namespace SleepyDiscord{
     typedef void (*SleepyCallback)(int response, char* message);
     typedef void (*SleepyCommandCallback)(int request, char* channel, uint64_t console_id, uint16_t button, uint16_t hold_ticks, uint8_t x, uint8_t y);
     SLEEPY_EXPORT void client_connect();
@@ -37,7 +37,7 @@ namespace SleepyDiscord {
     SLEEPY_EXPORT void sendMessage(char* channels, char* messages = nullptr, char* json = nullptr, char* filePath = nullptr);
     void client_run();
 
-enum SleepyResponse {
+enum SleepyResponse{
     Fault = 0,
     API = 1,
     Disconnected = 2,
@@ -51,7 +51,7 @@ enum SleepyResponse {
     RemoveFile = 10,
 };
 
-enum SleepyRequest {
+enum SleepyRequest{
     Click = 0,
     DPad = 1,
 

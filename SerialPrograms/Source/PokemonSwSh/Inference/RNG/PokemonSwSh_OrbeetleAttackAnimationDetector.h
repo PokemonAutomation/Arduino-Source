@@ -20,9 +20,9 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-class OrbeetleAttackAnimationDetector {
+class OrbeetleAttackAnimationDetector{
 public:
-    enum Detection {
+    enum Detection{
         NO_DETECTION,
         SPECIAL,
         PHYSICAL,

@@ -24,7 +24,7 @@ namespace PokemonSwSh{
 using namespace Pokemon;
 
 
-class BerryFarmer2_Descriptor : public SingleSwitchProgramDescriptor {
+class BerryFarmer2_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     BerryFarmer2_Descriptor();
 

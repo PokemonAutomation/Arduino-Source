@@ -18,12 +18,12 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 
-class GimmighoulRoamingFarmer_Descriptor : public SingleSwitchProgramDescriptor {
+class GimmighoulRoamingFarmer_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     GimmighoulRoamingFarmer_Descriptor();
 };
 
-class GimmighoulRoamingFarmer : public SingleSwitchProgramInstance {
+class GimmighoulRoamingFarmer : public SingleSwitchProgramInstance{
 public:
     GimmighoulRoamingFarmer();
 

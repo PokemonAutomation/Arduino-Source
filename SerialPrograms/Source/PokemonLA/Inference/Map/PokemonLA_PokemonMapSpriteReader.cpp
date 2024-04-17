@@ -58,7 +58,7 @@ const size_t EXTENDED_IMAGE_SIZE = IMAGE_TEMPLATE_SIZE + IMAGE_COLOR_MATCH_EXTRA
 
 // Defined locally stored data for matching MMO sprites:
 // Store data belonging to one sprite
-struct PerSpriteMatchingData {
+struct PerSpriteMatchingData{
     
     FeatureVector feature;
 

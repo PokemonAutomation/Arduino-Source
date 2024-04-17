@@ -27,7 +27,7 @@ MineruItemDuper_Descriptor::MineruItemDuper_Descriptor()
     )
 {}
 
-struct MineruItemDuper_Descriptor::Stats : public StatsTracker {
+struct MineruItemDuper_Descriptor::Stats : public StatsTracker{
     Stats()
         : dupe_attempts(m_stats["Dupe Attempts"])
     {

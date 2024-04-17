@@ -19,7 +19,7 @@ public:
     Handler() {}
 
 private:
-    struct SlashCommand {
+    struct SlashCommand{
         dpp::slashcommand command;
         std::function<void(const dpp::slashcommand_t&)> func;
     };

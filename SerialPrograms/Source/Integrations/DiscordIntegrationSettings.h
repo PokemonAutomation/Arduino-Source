@@ -35,7 +35,7 @@ public:
     };
     EnumDropdownOption<Library> library0;
 
-    enum class CommandType {
+    enum class CommandType{
         SlashCommands,
         MessageCommands,
     };

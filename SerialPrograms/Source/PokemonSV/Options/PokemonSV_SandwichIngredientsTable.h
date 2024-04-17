@@ -14,7 +14,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
 
-class SandwichIngredientsTableRow : public EditableTableRow {
+class SandwichIngredientsTableRow : public EditableTableRow{
 public:
     SandwichIngredientsTableRow();
     virtual std::unique_ptr<EditableTableRow> clone() const override;
@@ -24,7 +24,7 @@ public:
 };
 
 
-class SandwichIngredientsTable : public EditableTableOption_t<SandwichIngredientsTableRow> {
+class SandwichIngredientsTable : public EditableTableOption_t<SandwichIngredientsTableRow>{
 public:
     SandwichIngredientsTable(std::string label);
 

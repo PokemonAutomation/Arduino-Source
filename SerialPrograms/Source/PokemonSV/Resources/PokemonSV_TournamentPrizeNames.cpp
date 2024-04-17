@@ -16,7 +16,7 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 
-struct TournamentPrizeNameDatabase {
+struct TournamentPrizeNameDatabase{
     TournamentPrizeNameDatabase();
 
     static const TournamentPrizeNameDatabase& instance(){

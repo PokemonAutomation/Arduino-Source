@@ -19,7 +19,7 @@ class VideoOverlaySet;
 namespace Pokemon{
 
 // Detect gender symbol inside the pokemon storage box
-class BoxGenderDetector {
+class BoxGenderDetector{
 public:
     // box: the area where the gender symbol will appear
     // area_ratio_threshold: if the number of red pixel count > box total area * area_ratio_threshold, female symbol is detected

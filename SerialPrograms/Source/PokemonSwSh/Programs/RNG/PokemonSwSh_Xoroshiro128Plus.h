@@ -13,13 +13,13 @@
 
 namespace PokemonAutomation{
 
-struct Xoroshiro128PlusState {
+struct Xoroshiro128PlusState{
     Xoroshiro128PlusState(uint64_t s0, uint64_t s1);
     uint64_t s0;
     uint64_t s1;
 };
 
-class Xoroshiro128Plus {
+class Xoroshiro128Plus{
 public:
     Xoroshiro128PlusState state;
 

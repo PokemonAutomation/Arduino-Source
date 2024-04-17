@@ -16,7 +16,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
 
-class BBQSoloFarmer_Descriptor : public SingleSwitchProgramDescriptor {
+class BBQSoloFarmer_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     BBQSoloFarmer_Descriptor();
 
@@ -24,7 +24,7 @@ public:
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
-class BBQSoloFarmer : public SingleSwitchProgramInstance {
+class BBQSoloFarmer : public SingleSwitchProgramInstance{
 public:
     BBQSoloFarmer();
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
