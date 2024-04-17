@@ -60,7 +60,6 @@ private:
 
     SandwichMakerOption SANDWICH_OPTIONS;
 
-    EncounterBotCommonOptions ENCOUNTER_BOT_OPTIONS;
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
     FloatingPointOption AUTO_HEAL_PERCENT;

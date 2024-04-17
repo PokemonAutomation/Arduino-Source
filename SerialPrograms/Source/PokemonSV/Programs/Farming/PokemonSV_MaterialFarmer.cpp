@@ -10,6 +10,7 @@
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
@@ -319,7 +320,7 @@ void MaterialFarmer::run_one_sandwich_iteration(SingleSwitchProgramEnvironment& 
                         if (is_sandwich_expired(last_sandwich_time)){
                             env.log("Sandwich expired. Return to Pokecenter.");
                             return;
-                        }
+                        }                        
                         move_to_start_position_for_letsgo(env, context);
                         run_lets_go_iteration(env, context);
                     },
@@ -393,12 +394,13 @@ void MaterialFarmer::move_to_start_position_for_letsgo(SingleSwitchProgramEnviro
 // start at North Province (Area 3) pokecenter, go out and use Let's Go to battle , 
 void MaterialFarmer::run_lets_go_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     auto& console = env.console;
-    // Orient camera to look at same direction as player character
-    // This is needed because when save-load the game, the camera is reset
-    // to this location.
+    // - Orient camera to look at same direction as player character
+    // - This is needed because when save-load the game, the camera points
+    // in the same direction as the player.
+    // - But when warping to pokecenter, the camera is facing the player.
     pbf_press_button(context, BUTTON_L, 50, 40);
 
-    const bool throw_ball_if_bubble = true;
+    const bool throw_ball_if_bubble = false;
 
     auto move_forward_with_lets_go = [&](int num_iterations){
         context.wait_for_all_requests();
@@ -419,23 +421,20 @@ void MaterialFarmer::run_lets_go_iteration(SingleSwitchProgramEnvironment& env, 
 /* 
 - This function wraps around an action (e.g. go out of PokeCenter to make a sandwich) so that
 we can handle pokemon wild encounters when executing the action.
-- Whenever a battle happens, we check shinies and handle battle according to user setting. 
-- After battle ends, move
-back to PokeCenter to start the `action` again.
+- Whenever a battle happens, we run away.
+- After battle ends, move back to PokeCenter to start the `action` again.
 - `action` must be an action starting at the PokeCenter 
 */
 void MaterialFarmer::handle_battles_and_back_to_pokecenter(SingleSwitchProgramEnvironment& env, BotBaseContext& context, 
     std::function<void(SingleSwitchProgramEnvironment& env, BotBaseContext& context)>&& action)
 {
-    assert(m_encounter_tracker != nullptr);
-
     bool action_finished = false;
     bool first_iteration = true;
     // a flag for the case that the action has finished but not yet returned to pokecenter
     bool returned_to_pokecenter = false;
     while(action_finished == false || returned_to_pokecenter == false){
         // env.console.overlay().add_log("Calculate what to do next");
-        EncounterWatcher encounter_watcher(env.console, COLOR_RED);
+        NormalBattleMenuWatcher battle_menu(COLOR_RED);
         int ret = run_until(
             env.console, context,
             [&](BotBaseContext& context){
@@ -462,27 +461,15 @@ void MaterialFarmer::handle_battles_and_back_to_pokecenter(SingleSwitchProgramEn
                 context.wait_for_all_requests();
                 action_finished = true;
             },
-            {
-                static_cast<VisualInferenceCallback&>(encounter_watcher),
-                static_cast<AudioInferenceCallback&>(encounter_watcher),
-            }
+            {battle_menu}
         );
-        encounter_watcher.throw_if_no_sound();
-        if (ret >= 0){
-            env.console.log("Detected battle.", COLOR_PURPLE);
-            env.console.overlay().add_log("Detected battle");
+        if (ret == 0){
+            env.console.log("Detected battle. Now running away.", COLOR_PURPLE);
+            env.console.overlay().add_log("Detected battle. Now running away.");
             try{
-                bool caught, should_save;
-                m_encounter_tracker->process_battle(
-                    caught, should_save,
-                    encounter_watcher, ENCOUNTER_BOT_OPTIONS
-                );
-                if (should_save){
-                    m_pending_save = should_save;
-                }
-            }catch (ProgramFinishedException&){
-                GO_HOME_WHEN_DONE.run_end_of_program(context);
-                throw;
+                run_from_battle(env.program_info(), env.console, context);
+            }catch (OperationFailedException& e){
+                throw FatalProgramException(std::move(e));
             }
         }
         // Back on the overworld.
