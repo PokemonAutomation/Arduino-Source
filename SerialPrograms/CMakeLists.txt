@@ -1297,6 +1297,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h
     Source/PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.cpp
     Source/PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.h
+    Source/PokemonSV/Inference/ItemPrinter/PokemonSV_ItemPrinterJobsDetector.cpp
+    Source/PokemonSV/Inference/ItemPrinter/PokemonSV_ItemPrinterJobsDetector.h
     Source/PokemonSV/Inference/ItemPrinter/PokemonSV_ItemPrinterPrizeReader.cpp
     Source/PokemonSV/Inference/ItemPrinter/PokemonSV_ItemPrinterPrizeReader.h
     Source/PokemonSV/Inference/Map/PokemonSV_FastTravelDetector.cpp
