@@ -116,6 +116,7 @@
 #include "PokemonSV/Programs/Battles/PokemonSV_SinglesBattler.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_DateReader.h"
 #include "PokemonSV/Inference/ItemPrinter/PokemonSV_ItemPrinterPrizeReader.h"
+#include "PokemonSV/Inference/ItemPrinter/PokemonSV_ItemPrinterJobsDetector.h"
 
 
 
@@ -261,11 +262,19 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     BotBaseContext context(scope, console.botbase());
     VideoOverlaySet overlays(overlay);
 
+
+    ItemPrinterJobsDetector detector;
+    detector.make_overlays(overlays);
+
+    detector.set_print_jobs(console, context, 5);
+
+
+#if 0
     ItemPrinterPrizeReader reader(Language::English);
     reader.make_overlays(overlays);
 
     reader.read(logger, feed.snapshot());
-
+#endif
 
 #if 0
     DateReader reader;

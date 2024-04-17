@@ -88,7 +88,7 @@ GimmighoulChestFarmer::GimmighoulChestFarmer()
         &NOTIFICATION_STATUS_UPDATE,
         &NOTIFICATION_PROGRAM_FINISH,
         &NOTIFICATION_ERROR_FATAL,
-        })
+    })
 {
     PA_ADD_OPTION(PP);
     PA_ADD_OPTION(START_LOCATION);

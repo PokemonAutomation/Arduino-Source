@@ -11,9 +11,10 @@
 #include "CommonFramework/Tools/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
+#include "PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
-#include "PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h"
+#include "PokemonSV/Inference/ItemPrinter/PokemonSV_ItemPrinterJobsDetector.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSV_AutoItemPrinter.h"
 
@@ -24,7 +25,7 @@ namespace PokemonSV{
 using namespace Pokemon;
 
 
-void item_printer_start_print(ConsoleHandle& console, BotBaseContext& context){
+void item_printer_start_print(ConsoleHandle& console, BotBaseContext& context, uint8_t jobs){
     console.log("Starting print...");
 
     while (true){
@@ -47,9 +48,14 @@ void item_printer_start_print(ConsoleHandle& console, BotBaseContext& context){
             console.log("Confirming material selection...");
             pbf_press_button(context, BUTTON_A, 20, 105);
             continue;
-        case 2: // material
+        case 2:{    // material
+            ItemPrinterJobsDetector detector;
+            VideoOverlaySet overlays(console.overlay());
+            detector.make_overlays(overlays);
+            detector.set_print_jobs(console, context, jobs);
             pbf_press_button(context, BUTTON_X, 20, 230);
             continue;
+        }
         default:
             throw OperationFailedException(
                 ErrorReport::SEND_ERROR_REPORT, console,
@@ -203,7 +209,7 @@ void AutoItemPrinter::program(SingleSwitchProgramEnvironment& env, BotBaseContex
     enter_printing_mode(env, context);
 
     for (uint16_t i = 0; i < NUM_ROUNDS; i++){
-        item_printer_start_print(env.console, context);
+        item_printer_start_print(env.console, context, 10);
         item_printer_finish_print(env.console, context);
 
         env.console.log("Print completed.");

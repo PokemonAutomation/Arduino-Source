@@ -22,15 +22,17 @@ namespace PokemonSV{
 
 ItemPrinterJobsDetector::ItemPrinterJobsDetector(Color color)
     : m_color(color)
-    , m_box(0.86, 0.34, 0.045, 0.050)
+    , m_box_normal(0.86, 0.34, 0.045, 0.050)
+    , m_box_bonus(0.86, 0.423, 0.045, 0.050)
 {}
 
 void ItemPrinterJobsDetector::make_overlays(VideoOverlaySet& items) const{
-    items.add(m_color, m_box);
+    items.add(m_color, m_box_normal);
+    items.add(m_color, m_box_bonus);
 }
-uint8_t ItemPrinterJobsDetector::detect_jobs(Logger& logger, const ImageViewRGB32& screen) const{
-    ImageViewRGB32 box = extract_box_reference(screen, m_box);
-    ImageRGB32 filtered = to_blackwhite_rgb32_range(box, 0xff808080, 0xffffffff, true);
+uint8_t ItemPrinterJobsDetector::read_box(Logger& logger, const ImageViewRGB32& screen, const ImageFloatBox& box){
+    ImageViewRGB32 cropped = extract_box_reference(screen, box);
+    ImageRGB32 filtered = to_blackwhite_rgb32_range(cropped, 0xff808080, 0xffffffff, true);
     int num = OCR::read_number(logger, filtered);
     switch (num){
     case 1: return 1;
@@ -38,6 +40,14 @@ uint8_t ItemPrinterJobsDetector::detect_jobs(Logger& logger, const ImageViewRGB3
     case 10: return 10;
     }
     return 0;
+}
+uint8_t ItemPrinterJobsDetector::detect_jobs(Logger& logger, const ImageViewRGB32& screen) const{
+    uint8_t normal = read_box(logger, screen, m_box_normal);
+    if (normal != 0){
+        return normal;
+    }
+    uint8_t bonus = read_box(logger, screen, m_box_bonus);
+    return bonus;
 }
 
 

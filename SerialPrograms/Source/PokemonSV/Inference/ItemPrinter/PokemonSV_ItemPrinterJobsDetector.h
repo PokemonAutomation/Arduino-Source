@@ -32,8 +32,12 @@ public:
 
 
 private:
+    static uint8_t read_box(Logger& logger, const ImageViewRGB32& screen, const ImageFloatBox& box);
+
+private:
     Color m_color;
-    ImageFloatBox m_box;
+    ImageFloatBox m_box_normal;
+    ImageFloatBox m_box_bonus;
 
 };
 

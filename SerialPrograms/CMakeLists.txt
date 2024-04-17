@@ -1451,6 +1451,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Programs/Farming/PokemonSV_GimmighoulChestFarmer.h
     Source/PokemonSV/Programs/Farming/PokemonSV_GimmighoulRoamingFarmer.cpp
     Source/PokemonSV/Programs/Farming/PokemonSV_GimmighoulRoamingFarmer.h
+    Source/PokemonSV/Programs/Farming/PokemonSV_ItemPrinterRNG.cpp
+    Source/PokemonSV/Programs/Farming/PokemonSV_ItemPrinterRNG.h
     Source/PokemonSV/Programs/Farming/PokemonSV_LPFarmer.cpp
     Source/PokemonSV/Programs/Farming/PokemonSV_LPFarmer.h
     Source/PokemonSV/Programs/Farming/PokemonSV_TournamentFarmer.cpp
