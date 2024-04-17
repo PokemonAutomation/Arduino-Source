@@ -69,7 +69,7 @@ void SandwichRecipeNumberDetector::detect_recipes(const ImageViewRGB32& screen, 
             
             cv::Mat dilated_image_mat(static_cast<int>(dilated_image.height()), static_cast<int>(dilated_image.width()), CV_8UC4, (void*)dilated_image.data(), dilated_image.bytes_per_row());
             cv::dilate(filtered_image_mat, dilated_image_mat, element);
-        } else{
+        }else{
             dilated_image = filterd_image.copy();
         }
 
@@ -78,7 +78,7 @@ void SandwichRecipeNumberDetector::detect_recipes(const ImageViewRGB32& screen, 
         const int number = OCR::read_number(m_logger, dilated_image);
         if (number <= 0 || number > 151){
             recipe_IDs[i] = 0;
-        } else{
+        }else{
             recipe_IDs[i] = number;
         }
     }

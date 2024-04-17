@@ -266,8 +266,7 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBa
                 pbf_press_dpad(context, DPAD_DOWN, 20, 100);
 
                 switch_cur_pokemon();
-            }
-            else{
+            }else{
                 // Choose move to use!
                 if (cur_pokemon == 0){
                     // We collect the stat of move attempts of the first pokemon.
@@ -322,26 +321,23 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBa
             }
 
             env.update_stats();
-        }
-        else if (ret == 1){
+        }else if (ret == 1){
             env.console.log("Transparent dialogue box.");
             
             pbf_press_button(context, BUTTON_B, 20, 100);
             context.wait_for_all_requests();
-        } else if(ret == 2){
+        }else if(ret == 2){
             env.console.log("Normal dialogue box.");
 
             pbf_press_button(context, BUTTON_B, 20, 100);
             context.wait_for_all_requests();
-        }
-        else if (ret == 3){
+        }else if (ret == 3){
             env.console.log("Pokemon fainted.", COLOR_RED);
             stats.faint_switches++;
             env.update_stats();
 
             switch_cur_pokemon();
-        }
-        else{ // ret is 4
+        }else{ // ret is 4
             env.console.log("Battle finished.");
             break;
         }

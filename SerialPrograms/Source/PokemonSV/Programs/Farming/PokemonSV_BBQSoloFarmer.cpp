@@ -52,7 +52,7 @@ struct BBQSoloFarmer_Descriptor::Stats : public StatsTracker {
     std::atomic<uint64_t>& saves;
     std::atomic<uint64_t>& errors;
 };
-std::unique_ptr<StatsTracker> BBQSoloFarmer_Descriptor::make_stats() const {
+std::unique_ptr<StatsTracker> BBQSoloFarmer_Descriptor::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
 }
 BBQSoloFarmer::BBQSoloFarmer()
@@ -117,12 +117,10 @@ void BBQSoloFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
                     stats.questsCompleted++;
                     env.update_stats();
                     num_completed_quests++;
-                }
-                else {
+                }else{
                     env.log("Quest did not complete successfully.");
                 }
-            }
-            else {
+            }else{
                 //Note: This doesn't account for case such as "sneak up" being added and then completed alongside the next quest
                 env.log("Current quest does not exist on list. Quest completed at some point.");
                 stats.questsCompleted++;

@@ -203,28 +203,22 @@ CramomaticTarget CramomaticRNG::calculate_target(SingleSwitchProgramEnvironment&
 
         if (is_safari_sport || ball_roll == 99){
             is_bonus = temp_rng.nextInt(1000) == 0;
-        }
-        else {
+        }else{
             is_bonus = temp_rng.nextInt(100) == 0;
         }
 
         CramomaticBallType type;
         if (is_safari_sport){
             type = CramomaticBallType::Safari;
-        }
-        else if (ball_roll < 25){
+        }else if (ball_roll < 25){
             type = CramomaticBallType::Poke;
-        }
-        else if (ball_roll < 50){
+        }else if (ball_roll < 50){
             type = CramomaticBallType::Great;
-        }
-        else if (ball_roll < 75){
+        }else if (ball_roll < 75){
             type = CramomaticBallType::Shop1;
-        }
-        else if (ball_roll < 99){
+        }else if (ball_roll < 99){
             type = CramomaticBallType::Shop2;
-        }
-        else {
+        }else{
             type = CramomaticBallType::Apricorn;
         }
         
@@ -278,8 +272,7 @@ CramomaticTarget CramomaticRNG::calculate_target(SingleSwitchProgramEnvironment&
 
         if ((*last_target).needed_advances - (*second_to_last_target).needed_advances > MAX_PRIORITY_ADVANCES){
             possible_targets.erase(last_target);
-        }
-        else {
+        }else{
             possible_targets.erase(second_to_last_target);
         }
     }
@@ -402,8 +395,7 @@ void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
         resume_game_back_out(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);
-    }
-    else {
+    }else{
         pbf_press_button(context, BUTTON_B, 5, 5);
     }
 
@@ -458,8 +450,7 @@ void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
 //            rng = Xoroshiro128Plus(100, 10000);
             is_state_valid = true;
             stats.reads++;
-        }
-        else {
+        }else{
             rng = Xoroshiro128Plus(refind_rng_state(env.console, context, rng.get_state(), 0, MAX_UNKNOWN_ADVANCES, SAVE_SCREENSHOTS, LOG_VALUES));
             stats.reads++;
         }
@@ -554,8 +545,7 @@ void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
             }
             if (target.ball_type == CramomaticBallType::Apricorn){
                 stats.apri_balls += amount;
-            }
-            else if (target.ball_type == CramomaticBallType::Sport || target.ball_type == CramomaticBallType::Safari){
+            }else if (target.ball_type == CramomaticBallType::Sport || target.ball_type == CramomaticBallType::Safari){
                 stats.sport_safari_balls += amount;
             }
             stats.total_balls += amount;

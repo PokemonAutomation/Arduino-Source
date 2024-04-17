@@ -276,8 +276,7 @@ SandwichRecipe SandwichMakerOption::get_premade_sandwich_recipe(BaseRecipe base,
     {
         auto iter = PREMADE_SANDWICH_OTHER().find(paradox);
         return iter->second;
-    }
-    else {
+    }else{
         auto iter = PREMADE_SANDWICH_TYPE().find(std::make_pair(base, type));
         return iter->second;
     }

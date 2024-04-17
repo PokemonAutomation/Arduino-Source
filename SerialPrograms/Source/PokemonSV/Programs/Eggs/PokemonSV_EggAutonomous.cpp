@@ -263,18 +263,18 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         // If the program can't save-reload, then we cannot reload spent sandwich ingredients
         if (AUTO_SAVING == AutoSave::NoAutoSave){
             m_num_sandwich_spent++;
-        } else if (m_saved_after_fetched_eggs){
+        }else if (m_saved_after_fetched_eggs){
             env.log("Game already saved during egg hatching routine, so we cannot reset game to reset sandwich.");
             // If we save after fetching eggs, then the save solidifies spent sandwich ingredients.
             m_num_sandwich_spent++;
 
             env.log("Saving game here so that we can reset sandwich later");
             save_game(env, context, true);
-        } else if (game_already_resetted == false){
+        }else if (game_already_resetted == false){
             // Nothing found in this iteration
             env.log("Resetting game since nothing found, saving sandwich ingredients.");
             reset_game(env.program_info(), env.console, context);
-        } else { // game_already_resetted == true
+        }else { // game_already_resetted == true
             env.log("Game resetted back to egg fetching routine.");
         }
 
@@ -450,7 +450,7 @@ void EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
 
             uint8_t expected_non_eggs_count_in_party = HAS_CLONE_RIDE_POKEMON ? 1 : 0;
             num_eggs_in_party = check_non_eggs_count_in_party(env.program_info(), env.console, context, expected_non_eggs_count_in_party);
-        } else {
+        }else{
             // no more eggs to hatch in box
 
             if (AUTO_SAVING == AutoSave::AfterStartAndKeep){
@@ -594,7 +594,7 @@ bool EggAutonomous::move_pokemon_to_keep(SingleSwitchProgramEnvironment& env, Bo
     const size_t keep_box_location = KEEP_BOX_LOCATION.current_value();
     if (keep_box_location == 0){
         move_to_left_box(context);
-    } else {
+    }else{
         move_to_right_box(context);
     }
     
@@ -616,7 +616,7 @@ bool EggAutonomous::move_pokemon_to_keep(SingleSwitchProgramEnvironment& env, Bo
                 // Move back to middle box
                 if (keep_box_location == 0){
                     move_to_right_box(context);
-                } else {
+                }else{
                     move_to_left_box(context);
                 }
                 context.wait_for_all_requests();
@@ -675,7 +675,7 @@ void EggAutonomous::save_game(SingleSwitchProgramEnvironment& env, BotBaseContex
     try{
         if (from_overworld){
             save_game_from_overworld(env.program_info(), env.console, context);
-        } else{
+        }else{
             save_game_from_menu(env.program_info(), env.console, context);
         }
     }catch (OperationFailedException& e){

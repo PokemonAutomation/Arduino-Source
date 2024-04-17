@@ -62,7 +62,7 @@ struct ESPTraining_Descriptor::Stats : public StatsTracker {
     std::atomic<uint64_t>& m_clears;
     std::atomic<uint64_t>& errors;
 };
-std::unique_ptr<StatsTracker> ESPTraining_Descriptor::make_stats() const {
+std::unique_ptr<StatsTracker> ESPTraining_Descriptor::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
 }
 ESPTraining::ESPTraining()
@@ -206,8 +206,7 @@ void ESPTraining::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
                 if (check < 0){
                     env.log("Emotion press not detected in bottom right. Pressing button again.");
                     pbf_press_button(context, emotion_button, 10, 50);
-                }
-                else {
+                }else{
                     env.log("Emotion press detected.");
                 }
 

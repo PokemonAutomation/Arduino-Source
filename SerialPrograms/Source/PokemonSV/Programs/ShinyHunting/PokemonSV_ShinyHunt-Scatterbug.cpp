@@ -244,8 +244,7 @@ void ShinyHuntScatterbug::handle_battles_and_back_to_pokecenter(SingleSwitchProg
                 // We still need to carry out `action`
                 if (first_iteration){
                     first_iteration = false;
-                }
-                else{
+                }else{
                     // This is at least the second iteration in the while-loop.
                     // So a previous round of action failed.
                     // We need to first re-initialize our position to the PokeCenter
@@ -317,7 +316,7 @@ void ShinyHuntScatterbug::run_one_sandwich_iteration(SingleSwitchProgramEnvironm
                 make_sandwich_option(env, env.console, context, SANDWICH_OPTIONS);
                 last_sandwich_time = current_time();
                 leave_picnic(env.program_info(), env.console, context);
-            } else {
+            }else{
                 last_sandwich_time = current_time();
             }
         }
@@ -407,7 +406,7 @@ void ShinyHuntScatterbug::run_lets_go_iteration(SingleSwitchProgramEnvironment& 
         pbf_press_button(context, BUTTON_L, 50, 40);
 
         move_forward_with_lets_go(10);
-    } else { // path_id == 1
+    }else { // path_id == 1
         // move leftward, to the east
         pbf_move_left_joystick(context, 0, 128, 100, 20);
         // Align camera

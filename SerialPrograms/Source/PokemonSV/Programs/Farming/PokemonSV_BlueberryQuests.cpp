@@ -223,8 +223,7 @@ std::vector<BBQuests> process_quest_list(const ProgramInfo& info, ConsoleHandle&
     for (auto n : quest_list){
         if (not_possible_quests.contains(n)){
             console.log("Quest not possible");
-        }
-        else {
+        }else{
             //Check eggs remaining.
             if (n == BBQuests::hatch_egg && eggs_hatched >= BBQ_OPTIONS.NUM_EGGS){
                 console.log("Out of eggs! Quest not possible.");
@@ -274,8 +273,7 @@ std::vector<BBQuests> process_quest_list(const ProgramInfo& info, ConsoleHandle&
                     );
                     break;
                 }
-            }
-            else {
+            }else{
                 console.log("Quest possible");
                 quests_to_do.push_back(n);
             }
@@ -383,8 +381,7 @@ bool process_and_do_quest(ProgramEnvironment& env, ConsoleHandle& console, BotBa
         if (std::find(quest_list.begin(), quest_list.end(), current_quest) != quest_list.end()){
             console.log("Current quest exists on list. Quest did not complete.");
             quest_attempts++;
-        }
-        else {
+        }else{
             console.log("Current quest was not found. Quest completed!");
             if (current_quest == BBQuests::hatch_egg){
                 eggs_hatched++;
@@ -458,12 +455,10 @@ void quest_make_tm(const ProgramInfo& info, ConsoleHandle& console, BotBaseConte
 
             pbf_mash_button(context, BUTTON_A, 220);
             context.wait_for_all_requests();
-        }
-        else {
+        }else{
             console.log("Failed to find craftable TM!");
         }
-    }
-    else {
+    }else{
         console.log("Failed to enter TM machine!");
     }
     
@@ -559,7 +554,7 @@ void quest_tera_self_defeat(const ProgramInfo& info, ConsoleHandle& console, Bot
         console.log("Shiny detected!");
         pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
         throw ProgramFinishedException();
-    } else {
+    }else{
         bool tera_self = true;
         wild_battle_tera(info, console, context, tera_self);
     }
@@ -649,7 +644,7 @@ void quest_sneak_up(const ProgramInfo& info, ConsoleHandle& console, BotBaseCont
             console.log("Shiny detected!");
             pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
             throw ProgramFinishedException();
-        } else {
+        }else{
             OverworldWatcher overworld(COLOR_BLUE);
 
             int ret2 = run_until(
@@ -760,7 +755,7 @@ void quest_wild_tera(const ProgramInfo& info, ConsoleHandle& console, BotBaseCon
         console.log("Shiny detected!");
         pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
         throw ProgramFinishedException();
-    } else {
+    }else{
         bool tera_self = false;
         wild_battle_tera(info, console, context, tera_self);
     }
@@ -885,8 +880,7 @@ void quest_wash_pokemon(const ProgramInfo& info, ConsoleHandle& console, BotBase
     );
     if (ret3 == 0){
         console.log("Shower completed successfully.");
-    }
-    else {
+    }else{
         console.log("Shower did not complete. Backing out.");
         pbf_press_button(context, BUTTON_B, 40, 50);
     }
@@ -949,8 +943,7 @@ void quest_hatch_egg(const ProgramInfo& info, ConsoleHandle& console, BotBaseCon
 
     if (!egg_found){
         console.log("No egg found during egg hatching quest!", COLOR_RED);
-    }
-    else {
+    }else{
         swap_two_box_slots(info, console, context,
             BoxCursorLocation::SLOTS, row, col,
             BoxCursorLocation::PARTY, 0, 0);
@@ -1083,8 +1076,7 @@ void quest_tera_raid(ProgramEnvironment& env, ConsoleHandle& console, BotBaseCon
                 console.log("Shiny detected!");
                 pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
                 throw ProgramFinishedException();
-            }
-            else {
+            }else{
                 console.log("Detected battle. Running from battle.");
                 try{
                     NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
@@ -1120,8 +1112,7 @@ void quest_tera_raid(ProgramEnvironment& env, ConsoleHandle& console, BotBaseCon
         env.log("Won tera raid.");
         if (!BBQ_OPTIONS.CATCH_ON_WIN.enabled()){
             exit_tera_win_without_catching(env.program_info(), console, context, 0);
-        }
-        else {
+        }else{
             if (BBQ_OPTIONS.CATCH_ON_WIN.FIX_TIME_ON_CATCH){
                 pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
                 home_to_date_time(context, false, false);
@@ -1137,8 +1128,7 @@ void quest_tera_raid(ProgramEnvironment& env, ConsoleHandle& console, BotBaseCon
                 0
             );
         }
-    }
-    else {
+    }else{
         env.log("Lost tera raid.");
         context.wait_for(std::chrono::seconds(3));
     }

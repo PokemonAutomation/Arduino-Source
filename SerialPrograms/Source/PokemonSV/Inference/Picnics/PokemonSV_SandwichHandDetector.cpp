@@ -21,7 +21,7 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 
-namespace {
+namespace{
 
 class SandwichFreeHandMatcher : public ImageMatch::WaterfillTemplateMatcher{
 public:
@@ -79,7 +79,7 @@ void SandwichHandLocator::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_box);
 }
 
-std::pair<double, double> SandwichHandLocator::detect(const ImageViewRGB32& frame) const {
+std::pair<double, double> SandwichHandLocator::detect(const ImageViewRGB32& frame) const{
 
     const std::vector<std::pair<uint32_t, uint32_t>> filters = {
         {combine_rgb(150, 150, 150), combine_rgb(255, 255, 255)}

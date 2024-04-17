@@ -10,7 +10,7 @@
 namespace PokemonAutomation{
 namespace Pokemon{
 
-namespace {
+namespace{
 
 std::string nature_checker_value_to_string(NatureCheckerValue value){
     const char* names[] = {
@@ -66,7 +66,7 @@ OCR::StringMatchResult NatureReader::read_substring(
     );
 }
 
-std::string NatureReader::Results::to_string() const {
+std::string NatureReader::Results::to_string() const{
     return  "Nature: " + nature_checker_value_to_string(nature);
 }
 

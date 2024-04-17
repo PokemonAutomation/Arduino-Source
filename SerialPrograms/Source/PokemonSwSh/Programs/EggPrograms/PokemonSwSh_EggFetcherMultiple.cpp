@@ -64,7 +64,7 @@ void EggFetcherMultiple::run_eggfetcher(
     Logger& logger, BotBaseContext& context,
     bool deposit_automatically,
     uint16_t attempts
-) const {
+) const{
     if (attempts == 0){
         return;
     }
@@ -119,8 +119,7 @@ void EggFetcherMultiple::program(SingleSwitchProgramEnvironment& env, BotBaseCon
         auto [box, row, column] = get_location(s);
         if (row == 0 && column == 0 && box != 0){
             box = 1;
-        }
-        else{
+        }else{
             box = 0;
         }
         for (uint16_t b = 0; b < box; ++b){

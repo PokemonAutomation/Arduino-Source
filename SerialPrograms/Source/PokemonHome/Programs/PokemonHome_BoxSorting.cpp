@@ -250,8 +250,7 @@ std::ostream& operator<<(std::ostream& os, const std::optional<Pokemon>& pokemon
         os << "gender:" << gender_to_string(pokemon->gender) << " ";
         os << "ot_id:" << pokemon->ot_id << " ";
         os << ")";
-    }
-    else{
+    }else{
         os << "(empty)";
     }
     return os;
@@ -330,12 +329,12 @@ bool go_to_first_slot(SingleSwitchProgramEnvironment& env, BotBaseContext& conte
         for (size_t i = dest_cursor.row; i < cur_cursor.row; ++i){
             pbf_press_dpad(context, DPAD_UP, 10, GAME_DELAY);
         }
-    } else { // wrap around is faster to move between first or last row
+    }else { // wrap around is faster to move between first or last row
         if (cur_cursor.row == 0 && dest_cursor.row == 4){
             for (size_t i = 0; i <= 2; ++i){
                 pbf_press_dpad(context, DPAD_UP, 10, GAME_DELAY);
             }
-        } else {
+        }else{
             for (size_t i = 0; i <= 2; ++i){
                 pbf_press_dpad(context, DPAD_DOWN, 10, GAME_DELAY);
             }
@@ -350,7 +349,7 @@ bool go_to_first_slot(SingleSwitchProgramEnvironment& env, BotBaseContext& conte
         for (size_t i = dest_cursor.column; i < cur_cursor.column; ++i){
             pbf_press_dpad(context, DPAD_LEFT, 10, GAME_DELAY);
         }
-    } else { // wrap around is faster if direct movement is more than 3 away
+    }else { // wrap around is faster if direct movement is more than 3 away
         if (dest_cursor.column > cur_cursor.column){
             for (size_t i = 0; i < MAX_COLUMNS - (dest_cursor.column - cur_cursor.column); ++i){
                 pbf_press_dpad(context, DPAD_LEFT, 10, GAME_DELAY);
@@ -533,7 +532,7 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
         if(box_nb != 0){
             pbf_press_button(context, BUTTON_R, 10, VIDEO_DELAY+100);
             context.wait_for_all_requests();
-        } else {
+        }else{
             // Moving the cursor until it goes to the first slot
             if(!go_to_first_slot(env, context, VIDEO_DELAY)){
                 env.console.log("ERROR: Could not move cursor to the first slot, please consider adjusting delay\n", COLOR_RED);

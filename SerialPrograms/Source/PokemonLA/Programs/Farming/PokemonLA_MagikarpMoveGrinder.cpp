@@ -127,8 +127,7 @@ void MagikarpMoveGrinder::grind_mimic(SingleSwitchProgramEnvironment& env, BotBa
                 cur_pokemon = switch_pokemon(env.console, context, cur_pokemon);
 
                 to_switch_pokemon = false;
-            }
-            else{
+            }else{
                 // Press A to select moves
                 pbf_press_button(context, BUTTON_A, 10, 125);
                 context.wait_for_all_requests();
@@ -139,20 +138,17 @@ void MagikarpMoveGrinder::grind_mimic(SingleSwitchProgramEnvironment& env, BotBa
                     // Finish grinding.
                     env.log("No PP. Finish grinding.");
                     return;
-                }
-                else{
+                }else{
                     stats.move_attempts++;
                     env.update_stats();
 
                     to_switch_pokemon = true;
                 }
             }
-        }
-        else if (ret == 1){
+        }else if (ret == 1){
             env.log("Your pokemon fainted. Can only happen if Magikarp Struggled and defeated your pokemon.");
             return;
-        }
-        else{ // ret is 2
+        }else{ // ret is 2
             env.log("Battle finished.");
             return;
         }
@@ -214,13 +210,11 @@ void MagikarpMoveGrinder::battle_magikarp(SingleSwitchProgramEnvironment& env, B
                 pbf_press_dpad(context, DPAD_DOWN, 20, 100);
                 
                 cur_pokemon = switch_pokemon(env.console, context, cur_pokemon, POKEMON_ACTIONS.num_pokemon());
-            }
-            else{
+            }else{
                 stats.move_attempts++;
                 env.update_stats();
             }
-        }
-        else if (ret == 1){
+        }else if (ret == 1){
             env.console.log("Pokemon fainted.");
             cur_pokemon++;
             if (cur_pokemon >= POKEMON_ACTIONS.num_pokemon()){
@@ -228,8 +222,7 @@ void MagikarpMoveGrinder::battle_magikarp(SingleSwitchProgramEnvironment& env, B
                 break;
             }
             cur_pokemon = switch_pokemon(env.console, context, cur_pokemon, POKEMON_ACTIONS.num_pokemon());
-        }
-        else{ // ret is 2
+        }else{ // ret is 2
             env.console.log("Battle finished.");
             break;
         }
@@ -255,8 +248,7 @@ void MagikarpMoveGrinder::program(SingleSwitchProgramEnvironment& env, BotBaseCo
     try{
         if (SPECIAL_CASE_MIMIC){
             grind_mimic(env, context);
-        }
-        else{
+        }else{
             battle_magikarp(env, context);
         }
 

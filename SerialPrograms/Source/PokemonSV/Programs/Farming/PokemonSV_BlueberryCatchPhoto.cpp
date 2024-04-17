@@ -289,8 +289,7 @@ void quest_photo(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
 
                 if (move_camera == CameraAngle::up){
                     pbf_move_right_joystick(context, 128, 0, 50, 20);
-                }
-                else if (move_camera == CameraAngle::down){
+                }else if (move_camera == CameraAngle::down){
                     pbf_move_right_joystick(context, 128, 255, 50, 20);
                 }
                 context.wait_for_all_requests();
@@ -335,8 +334,7 @@ void quest_photo(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
                 console.log("Shiny detected!");
                 pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
                 throw ProgramFinishedException();
-            }
-            else {
+            }else{
                 console.log("Detected battle. Running from battle and returning to plaza.");
                 try{
                     //Smoke Ball or Flying type required due to Arena Trap/Magnet Pull
@@ -711,16 +709,14 @@ void quest_catch_handle_battle(const ProgramInfo& info, ConsoleHandle& console, 
                     context.wait_for_all_requests();
 
                     tera_target = true;
-                }
-                else {
+                }else{
                     //Quick ball occurs before anything else in battle.
                     //Do not throw if target is a tera pokemon.
                     if (use_quickball && !quickball_thrown && tera_target == false){
                         console.log("Quick Ball option checked. Throwing Quick Ball.");
                         quest_catch_throw_ball(info, console, context, BBQ_OPTIONS.LANGUAGE, "quick-ball");
                         quickball_thrown = true;
-                    }
-                    else {
+                    }else{
                         console.log("Throwing selected ball.");
                         quest_catch_throw_ball(info, console, context, BBQ_OPTIONS.LANGUAGE, BBQ_OPTIONS.BALL_SELECT.slug());
                     }
@@ -748,8 +744,7 @@ void quest_catch_handle_battle(const ProgramInfo& info, ConsoleHandle& console, 
                         );
                         if (ret_move_select != 0){
                             console.log("Could not find move select.");
-                        }
-                        else {
+                        }else{
                             console.log("Move select found!");
                         }
 
@@ -776,8 +771,7 @@ void quest_catch_handle_battle(const ProgramInfo& info, ConsoleHandle& console, 
                                 true
                             );
                         }
-                    }
-                    else {
+                    }else{
                         //Wild pokemon's turn/wait for catch animation
                         pbf_mash_button(context, BUTTON_B, 900);
                         context.wait_for_all_requests();
@@ -876,7 +870,7 @@ void quest_catch(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
             console.log("Shiny detected!");
             pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
             throw ProgramFinishedException();
-        } else {
+        }else{
             quest_catch_handle_battle(info, console, context, BBQ_OPTIONS, current_quest);
         }
     }

@@ -94,7 +94,7 @@ bool detect_sphere(const Kernels::Waterfill::WaterfillObject& object, ImageRGB32
     double threshold = 0.3;
     if (object.area >= 900){
         threshold = 0.5;
-    } else if (object.area >= 100){
+    }else if (object.area >= 100){
         // For area size (assuming square shape) from 10.0 to 30.0, linearly raise
         // threshold from 0.3 to 0.5.
         threshold = 0.3 + 0.2 * (std::sqrt(object.area) - 10.0) / 20.0;

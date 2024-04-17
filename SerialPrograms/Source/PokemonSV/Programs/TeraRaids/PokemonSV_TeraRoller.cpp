@@ -224,7 +224,7 @@ void TeraRoller::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
 
             if (CHECK_ONLY_FIRST) { // Check only the first Pokédex page
                 break;
-            } else if (i < 4){ // Check the remaining four Pokédex pages
+            }else if (i < 4){ // Check the remaining four Pokédex pages
                 pbf_press_dpad(context, DPAD_RIGHT, 10, 20);
             }
         }

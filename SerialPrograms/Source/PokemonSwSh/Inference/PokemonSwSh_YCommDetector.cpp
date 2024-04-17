@@ -58,7 +58,7 @@ bool YCommMenuDetector::process_frame(const ImageViewRGB32& frame, WallClock tim
 }
 
 
-namespace {
+namespace{
 
 ImageFloatBox YCOMM_ICON_BOX{0.007, 0.944, 0.032, 0.054};
 

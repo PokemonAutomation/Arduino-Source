@@ -122,25 +122,19 @@ void AudioSpectrumHolder::clear(){
 PA_FORCE_INLINE uint32_t jetColorMap(float v){
     if (v <= 0.f){
         return combine_rgb(0,0,0);
-    }
-    else if (v < 0.125f){
+    }else if (v < 0.125f){
 //        return qRgb(0, 0, int((0.5f + 4.f * v) * 255.f));
         return combine_rgb(0, 0, uint8_t((0.0f + 8.f * v) * 255.f));
-    }
-    else if (v < 0.375f){
+    }else if (v < 0.375f){
         return combine_rgb(0, uint8_t((v - 0.125f)*1020.f), 255);
-    }
-    else if (v < 0.625f){
+    }else if (v < 0.625f){
         uint8_t c = uint8_t((v - 0.375f) * 1020.f);
         return combine_rgb(c, 255, 255-c);
-    }
-    else if (v < 0.875f){
+    }else if (v < 0.875f){
         return combine_rgb(255, 255 - uint8_t((v-0.625f) * 1020.f), 0);
-    }
-    else if (v <= 1.0){
+    }else if (v <= 1.0){
         return combine_rgb(255 - uint8_t((v-0.875)*1020.f), 0, 0);
-    }
-    else {
+    }else{
         return combine_rgb(255, 255, 255);
     }
 }
@@ -252,7 +246,7 @@ std::vector<AudioSpectrum> AudioSpectrumHolder::spectrums_since(uint64_t startin
     for (const auto& ptr : m_spectrums){
         if (ptr.stamp >= starting_stamp){
             spectrums.emplace_back(ptr);
-        } else{
+        }else{
             break;
         }
     }

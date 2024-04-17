@@ -24,7 +24,7 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 
-namespace {
+namespace{
 
 class SandwichCondimentsPageMatcher : public ImageMatch::WaterfillTemplateMatcher{
 public:

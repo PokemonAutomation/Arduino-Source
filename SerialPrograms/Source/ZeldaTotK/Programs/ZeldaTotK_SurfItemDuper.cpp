@@ -35,7 +35,7 @@ struct SurfItemDuper_Descriptor::Stats : public StatsTracker {
     }
     std::atomic<uint64_t>& dupe_attempts;
 };
-std::unique_ptr<StatsTracker> SurfItemDuper_Descriptor::make_stats() const {
+std::unique_ptr<StatsTracker> SurfItemDuper_Descriptor::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
 }
 

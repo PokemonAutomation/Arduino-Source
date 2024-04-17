@@ -51,7 +51,7 @@ template <typename Type>
 void normalize_type(const QAudioFormat& format, const char* data, size_t len, float* out){
     if (format.byteOrder() == QAudioFormat::Endian::LittleEndian){
         normalize_audio_le<Type>(out, reinterpret_cast<const Type*>(data), len/sizeof(Type));
-    } else{
+    }else{
         normalize_audio_be<Type>(out, reinterpret_cast<const Type*>(data), len/sizeof(Type));
     }
 }

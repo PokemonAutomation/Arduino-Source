@@ -59,7 +59,7 @@ struct GimmighoulChestFarmer_Descriptor::Stats : public StatsTracker {
     std::atomic<uint64_t>& resets;
     std::atomic<uint64_t>& errors;
 };
-std::unique_ptr<StatsTracker> GimmighoulChestFarmer_Descriptor::make_stats() const {
+std::unique_ptr<StatsTracker> GimmighoulChestFarmer_Descriptor::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
 }
 

@@ -68,7 +68,7 @@ struct TournamentFarmer_Descriptor::Stats : public StatsTracker {
     std::atomic<uint64_t>& matches;
     std::atomic<uint64_t>& errors;
 };
-std::unique_ptr<StatsTracker> TournamentFarmer_Descriptor::make_stats() const {
+std::unique_ptr<StatsTracker> TournamentFarmer_Descriptor::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
 }
 
@@ -214,12 +214,11 @@ void TournamentFarmer::check_money(SingleSwitchProgramEnvironment& env, BotBaseC
         if (bottom_money != -1){
             stats.money += bottom_money;
             env.update_stats();
-        } else {
+        }else{
             stats.money += top_money;
             env.update_stats();
         }
-    }
-    else {
+    }else{
         env.log("Unable to read money.");
     }
 
@@ -283,7 +282,7 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, BotBaseCo
 
             if (retF == 0){
                 env.log("Swap menu detected.");
-            } else {
+            }else{
                 env.log("Took more than 6 turns to use Memento. Was Zoroark able to faint?", COLOR_RED);
                 stats.errors++;
                 env.update_stats();
@@ -295,10 +294,9 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, BotBaseCo
                 );
             }
 
-        }
-        else if (retZ == 1){
+        }else if (retZ == 1){
             env.log("Detected swap menu. Assuming Zoroark fainted turn one.");
-        } else {
+        }else{
             env.log("Timed out after Happy Hour.", COLOR_RED);
             stats.errors++;
             env.update_stats();
@@ -324,7 +322,7 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, BotBaseCo
         );
         if (retRes == 0){
             env.log("Battle menu detected. Second Pokemon has been sent out. Resuming usual battle sequence.");
-        } else {
+        }else{
             env.log("Could not find battle menu.", COLOR_RED);
             stats.errors++;
             env.update_stats();
@@ -437,7 +435,7 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, BotBaseCo
         //Clear any remaining dialog
         pbf_mash_button(context, BUTTON_B, 300);
         context.wait_for_all_requests();
-    } else {
+    }else{
         env.log("Timed out during battle. Stuck, crashed, or took over 30 turns.", COLOR_RED);
         stats.errors++;
         env.update_stats();
@@ -685,8 +683,7 @@ void TournamentFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseConte
         int ret = wait_until(env.console, context, Milliseconds(7000), { advance_detector });
         if (ret == 0){
             env.log("Dialog detected.");
-        }
-        else {
+        }else{
             env.log("Dialog not detected.");
         }
         pbf_mash_button(context, BUTTON_A, 400);

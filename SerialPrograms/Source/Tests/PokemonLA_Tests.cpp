@@ -158,8 +158,7 @@ int test_pokemonLA_MMOQuestionMarkDetector(const ImageViewRGB32& image, const st
                 cerr << "Error: keyword must be a region number, ranging in [0, 4], but got " << word << endl;
                 return 1;
             }
-        }
-        else if (region_kw_found){
+        }else if (region_kw_found){
             // Found "Region" keyword, read a number as how many MMOs on the region map, and a region name.
             if (target_region_index < 0){
                 for(size_t index = 0; index < 5; index++){
@@ -204,7 +203,7 @@ int test_pokemonLA_MMOQuestionMarkDetector(const ImageViewRGB32& image, const st
                 return 1;
             }
         }
-    } else { // Region keyword found
+    }else { // Region keyword found
         if (target_region_index < 0 || target_num_MMOs_on_region_map < 0){
             cerr << "Error: need a region name and a number of MMOs in the filename (e.g. image-Fieldlands_5.png)." << endl; 
         }
@@ -235,9 +234,9 @@ int read_pokemon_info_from_words(const std::vector<std::string>& keywords, Langu
     const std::string& shiny_word = keywords[keywords.size()-3];
     if (shiny_word == "Shiny"){
         details.is_shiny = true;
-    } else if (shiny_word == "NotShiny"){
+    }else if (shiny_word == "NotShiny"){
         details.is_shiny = false;
-    } else{
+    }else{
         cerr << "Error: shiny keyword " << shiny_word << " is wrong. Must be \"Shiny\" or \"NotShiny\"." << endl;
         return 1;
     }
@@ -245,9 +244,9 @@ int read_pokemon_info_from_words(const std::vector<std::string>& keywords, Langu
     const std::string& alpha_word = keywords[keywords.size()-2];
     if (alpha_word == "Alpha"){
         details.is_alpha = true;
-    } else if (alpha_word == "NotAlpha"){
+    }else if (alpha_word == "NotAlpha"){
         details.is_alpha = false;
-    } else{
+    }else{
         cerr << "Error: alpha keyword " << alpha_word << " is wrong. Must be \"Alpha\" or \"NotAlpha\"." << endl;
         return 1;
     }
@@ -255,11 +254,11 @@ int read_pokemon_info_from_words(const std::vector<std::string>& keywords, Langu
     const std::string& gender_word = keywords[keywords.size()-1];
     if (gender_word == "Male"){
         details.gender = Gender::Male;
-    } else if (gender_word == "Female"){
+    }else if (gender_word == "Female"){
         details.gender = Gender::Female;
-    } else if (gender_word == "Genderless"){
+    }else if (gender_word == "Genderless"){
         details.gender = Gender::Genderless;
-    } else {
+    }else{
         cerr << "Error: gender keyword " << gender_word << " is wrong. Must be \"Male\", \"Female\" or \"Genderless\"." << endl;
         return 1;
     }
@@ -385,9 +384,9 @@ int test_pokemonLA_BattleSpriteWatcher(const ImageViewRGB32& image, const std::v
         const auto& word = *it;
         if (word == "0"){
             target.push_back(false);
-        } else if (word == "1"){
+        }else if (word == "1"){
             target.push_back(true);
-        } else {
+        }else{
             break;
         }
     }
@@ -434,7 +433,7 @@ int test_pokemonLA_BattleSpriteArrowDetector(const ImageViewRGB32& image, int ta
             cerr << "Error: in test_pokemonLA_BattleSpriteArrowDetector detected arrow at sprite index " << sprite_index
                  << " but should be at sprite index " << target << endl;
             return 1;
-        } else if (sprite_index == target_index && result == false){
+        }else if (sprite_index == target_index && result == false){
             cerr << "Error: in test_pokemonLA_BattleSpriteArrowDetector failed to detect arrow at sprite index " << sprite_index << endl;
             return 1;
         }
@@ -521,16 +520,16 @@ int test_pokemonLA_MMOSpriteMatcher(const std::string& filepath){
         if (word == "Fieldlands"){
             region = MapRegion::FIELDLANDS;
             break;
-        } else if (word == "Mirelands"){
+        }else if (word == "Mirelands"){
             region = MapRegion::MIRELANDS;
             break;
-        } else if (word == "Coastlands"){
+        }else if (word == "Coastlands"){
             region = MapRegion::COASTLANDS;
             break;
-        } else if (word == "Highlands"){
+        }else if (word == "Highlands"){
             region = MapRegion::HIGHLANDS;
             break;
-        } else if (word == "Icelands"){
+        }else if (word == "Icelands"){
             region = MapRegion::ICELANDS;
             break;
         }
@@ -626,7 +625,7 @@ int test_pokemonLA_MMOSpriteMatcher(const std::string& filepath){
         if (result.slug == target_sprites[i]){
             success_count++;
             cout << "Match SUCCESS" << endl;
-        } else{
+        }else{
             cout << "Match FAILURE" << endl;
         }
     }

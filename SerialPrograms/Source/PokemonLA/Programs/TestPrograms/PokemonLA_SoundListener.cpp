@@ -177,7 +177,7 @@ void search_alpha_roar_from_audio_dump(){
             if (audioIdx < audio.numWindows()){
                 const float * freq = audio.getWindow(audioIdx);
                 memcpy(freqVector.data(), freq, sizeof(float) * audio.numFrequencies());
-            } else{
+            }else{
                 // add zero-freq window
             }
             new_spectrums.emplace_back(

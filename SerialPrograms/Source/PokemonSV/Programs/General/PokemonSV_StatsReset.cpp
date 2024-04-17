@@ -62,7 +62,7 @@ struct StatsReset_Descriptor::Stats : public StatsTracker {
     std::atomic<uint64_t>& matches;
     std::atomic<uint64_t>& errors;
 };
-std::unique_ptr<StatsTracker> StatsReset_Descriptor::make_stats() const {
+std::unique_ptr<StatsTracker> StatsReset_Descriptor::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
 }
 StatsReset::StatsReset()
@@ -308,8 +308,7 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext&
                     env.update_stats();
                     pbf_mash_button(context, BUTTON_B, 900);
                     context.wait_for_all_requests();
-                }
-                else if (switch_party_slot == 1 && !move_table.empty() && table_turn < move_table.size()){
+                }else if (switch_party_slot == 1 && !move_table.empty() && table_turn < move_table.size()){
                     //Lead pokemon not fainted and table has not been completed
                     //Run through moves in table
                     env.log("Lead has not fainted, using move.");
@@ -347,8 +346,7 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext&
                     );
                     if (ret_move_select != 0){
                         env.log("Could not find move select.");
-                    }
-                    else {
+                    }else{
                         env.log("Move select found!");
                     }
 
@@ -377,15 +375,13 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext&
                             "Battle menu detected early. Out of PP, please check your setup.",
                             true
                         );
-                    }
-                    else {
+                    }else{
                         env.log("Move successfully used.");
                         if (table_turn == move_table.size()){
                             env.log("End of table reached. Switch to throwing balls.");
                         }
                     }
-                }
-                else {
+                }else{
                     BattleBallReader reader(env.console, LANGUAGE);
                     open_ball_menu(env, context);
 
@@ -424,8 +420,7 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext&
                         env.console.log("Battle menu detected early. Using first attack.");
                         pbf_mash_button(context, BUTTON_A, 250);
                         context.wait_for_all_requests();
-                    }
-                    else {
+                    }else{
                         //Wild pokemon's turn/wait for catch animation
                         stats.balls++;
                         env.update_stats();
@@ -482,8 +477,7 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext&
         if (TARGET == Target::Snacksworth){
             env.log("Overworld detected. Snacksworth legendary caught, checking box system.");
             target_fainted = false;
-        }
-        else {
+        }else{
             env.log("Overworld detected, target Pokemon fainted.");
             send_program_status_notification(
                 env, NOTIFICATION_STATUS_UPDATE,
@@ -526,8 +520,7 @@ bool StatsReset::check_stats(SingleSwitchProgramEnvironment& env, BotBaseContext
             env, NOTIFICATION_STATUS_UPDATE,
             "One or more empty slots in party. Target was not caught."
         );
-    }
-    else {
+    }else{
         stats.catches++;
         env.update_stats();
 
@@ -625,8 +618,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
                 );
             if (retOver != 0){
                 env.log("Failed to detect overworld.", COLOR_RED);
-            }
-            else {
+            }else{
                 env.log("Detected overworld.");
             }
             context.wait_for_all_requests();

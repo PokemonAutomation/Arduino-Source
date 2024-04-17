@@ -502,7 +502,7 @@ size_t BurmyFinder::grouped_path(SingleSwitchProgramEnvironment& env, BotBaseCon
             env.console.log("Battle found before last tree in the path.");
             tree_counter.tree[last_checked_tree]++;
         }
-    } else{
+    }else{
         // Check last tree
         if (check_tree(env, context)){
             tree_counter.tree[last_checked_tree]++;

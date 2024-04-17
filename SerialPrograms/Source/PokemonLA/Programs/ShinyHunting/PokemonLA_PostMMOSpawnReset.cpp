@@ -120,7 +120,7 @@ void PostMMOSpawnReset::run_iteration(SingleSwitchProgramEnvironment& env, BotBa
                 // forward portion
                 if (TURN_DURATION > 0){
                     pbf_move_right_joystick(context, 255, 128, uint16_t(TURN_DURATION), 0);
-                } else if (TURN_DURATION < 0){
+                }else if (TURN_DURATION < 0){
                     pbf_move_right_joystick(context, 0, 128, uint16_t(-TURN_DURATION), 0);
                 }
                 

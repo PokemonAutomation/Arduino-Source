@@ -21,7 +21,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
-namespace {
+namespace{
     ImageFloatBox SHINY_BOX{0.969, 0.145, 0.024, 0.040};
 }
 

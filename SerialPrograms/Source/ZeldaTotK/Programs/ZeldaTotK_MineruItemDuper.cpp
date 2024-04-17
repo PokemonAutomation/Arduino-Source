@@ -35,7 +35,7 @@ struct MineruItemDuper_Descriptor::Stats : public StatsTracker {
     }
     std::atomic<uint64_t>& dupe_attempts;
 };
-std::unique_ptr<StatsTracker> MineruItemDuper_Descriptor::make_stats() const {
+std::unique_ptr<StatsTracker> MineruItemDuper_Descriptor::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
 }
 
@@ -121,7 +121,7 @@ void MineruItemDuper::program(SingleSwitchProgramEnvironment& env, BotBaseContex
             for (uint32_t i = 0; i < ITEMS_PER_ATTEMPT + 2; i++){
                 pbf_press_button(context, BUTTON_A, 10, 10);
             }
-        } else {
+        }else{
             pbf_wait(context, 250);
         }
 

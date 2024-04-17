@@ -185,8 +185,7 @@ void Pokemon::update_stats(bool is_iv, uint8_t HP, uint8_t Atk, uint8_t Def, uin
         m_iv_spatk = SpAtk;
         m_iv_spdef = SpDef;
         m_iv_speed = Speed;
-    }
-    else
+    }else
     {
         m_ev_hp = HP;
         m_ev_atk = Atk;

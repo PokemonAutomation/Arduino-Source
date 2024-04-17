@@ -26,7 +26,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
 
-namespace {
+namespace{
 
 const ImageFloatBox tab_box{0.450, 0.005, 0.040, 0.010};
 const ImageFloatBox save_icon_box{0.456, 0.015, 0.026, 0.041};

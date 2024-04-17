@@ -187,8 +187,7 @@ private:
             if (item.file != nullptr && !item.file->filepath().empty()){
                 std::string filepath = item.file->filepath();
                 sendMessage(&item.channels[0], &item.messages[0], &item.embed[0], &filepath[0]);
-            }
-            else sendMessage(&item.channels[0], &item.messages[0], &item.embed[0], nullptr);
+            }else sendMessage(&item.channels[0], &item.messages[0], &item.embed[0], nullptr);
         }
     }
 #endif
@@ -612,16 +611,13 @@ bool check_if_empty(const DiscordSettingsOption& settings){
     }
     if (((std::string)settings.integration.token).empty()){
         return false;
-    }
-    else if (((std::string)settings.integration.token).find(",") != std::string::npos){
+    }else if (((std::string)settings.integration.token).find(",") != std::string::npos){
         sleepy_logger().log("\"Token\" must only contain one token. Stopping...", COLOR_RED);
         return false;
-    }
-    else if (((std::string)settings.integration.owner).find(",") != std::string::npos){
+    }else if (((std::string)settings.integration.owner).find(",") != std::string::npos){
         sleepy_logger().log("\"Owner\" must only contain one Discord ID (yours). Stopping...", COLOR_RED);
         return false;
-    }
-    else if (((std::string)settings.integration.command_prefix).empty()){
+    }else if (((std::string)settings.integration.command_prefix).empty()){
         sleepy_logger().log("Please enter a Discord command prefix. Stopping...", COLOR_RED);
         return false;
     }

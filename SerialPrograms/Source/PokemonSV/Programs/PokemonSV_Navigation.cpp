@@ -97,8 +97,7 @@ void open_map_from_overworld(const ProgramInfo& info, ConsoleHandle& console, Bo
         if (ret == 0){
             console.log("Detected overworld.");
             pbf_press_button(context, BUTTON_Y, 20, 105); // open map
-        }
-        else{
+        }else{
             throw OperationFailedException(
                 ErrorReport::SEND_ERROR_REPORT, console,
                 "open_map_from_overworld(): No overworld state found after 10 seconds.",
@@ -147,8 +146,7 @@ void open_map_from_overworld(const ProgramInfo& info, ConsoleHandle& console, Bo
             console.overlay().add_log("Map opened", COLOR_WHITE);
             if (map.map_in_fixed_view()){
                 return;
-            }
-            else{ // click R joystick to change to fixed view
+            }else{ // click R joystick to change to fixed view
                 console.log("Map in rotate view, fix it");
                 console.overlay().add_log("Change map to fixed view", COLOR_WHITE);
                 pbf_press_button(context, BUTTON_RCLICK, 20, 105);
@@ -470,7 +468,7 @@ void open_recently_battled_from_pokedex(const ProgramInfo& info, ConsoleHandle& 
         console.log("Detected Recently Battled menu icon.");
         pbf_mash_button(context, BUTTON_A, 150);
         pbf_wait(context, 200);
-    } else {
+    }else{
         throw OperationFailedException(
             ErrorReport::SEND_ERROR_REPORT, console,
             "open_recently_battled_from_pokedex(): Unknown state after 10 dpad down presses.",

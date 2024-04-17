@@ -87,9 +87,9 @@ int image_bool_detector_helper(ImageBoolDetectorFunction test_func, const std::s
         bool target_bool = false;
         if (name_base.endsWith("_True")){
             target_bool = true;
-        } else if (name_base.endsWith("_False")){
+        }else if (name_base.endsWith("_False")){
             target_bool = false;
-        } else{
+        }else{
             cerr << "Error: image test file " << test_path << " has incorrect target detection result (_True/_False) set in the filename." << endl;
             return 1;
         }
@@ -187,9 +187,9 @@ int sound_bool_detector_helper(SoundBoolDetectorFunction test_func, const std::s
     bool target_bool = false;
     if (name_base.endsWith("_True")){
         target_bool = true;
-    } else if (name_base.endsWith("_False")){
+    }else if (name_base.endsWith("_False")){
         target_bool = false;
-    } else{
+    }else{
         cerr << "Error: audio test file " << test_path << " has incorrect target detection result (_True/_False) set in the filename." << endl;
         return 1;
     }

@@ -280,16 +280,16 @@ bool TerastallizingDetector::detect(const ImageViewRGB32& screen) const{
 SwapMenuDetector::SwapMenuDetector(Color color)
     : m_arrow(color, GradientArrowType::RIGHT, { 0.02, 0.10, 0.05, 0.90 })
 {}
-void SwapMenuDetector::make_overlays(VideoOverlaySet& items) const {
+void SwapMenuDetector::make_overlays(VideoOverlaySet& items) const{
     m_arrow.make_overlays(items);
 }
-bool SwapMenuDetector::detect(const ImageViewRGB32& screen) const {
+bool SwapMenuDetector::detect(const ImageViewRGB32& screen) const{
     if (!m_arrow.detect(screen)){
         return false;
     }
     return true;
 }
-int8_t SwapMenuDetector::detect_slot(const ImageViewRGB32& screen) const {
+int8_t SwapMenuDetector::detect_slot(const ImageViewRGB32& screen) const{
     ImageFloatBox box;
     if (!m_arrow.detect(box, screen)){
         return -1;
@@ -302,7 +302,7 @@ int8_t SwapMenuDetector::detect_slot(const ImageViewRGB32& screen) const {
     //cout << "slot = " << slot << endl;
     return (int8_t)slot;
 }
-bool SwapMenuDetector::move_to_slot(ConsoleHandle& console, BotBaseContext& context, uint8_t slot) const {
+bool SwapMenuDetector::move_to_slot(ConsoleHandle& console, BotBaseContext& context, uint8_t slot) const{
     if (slot > 5){
         return false;
     }

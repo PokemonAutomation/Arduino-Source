@@ -26,7 +26,7 @@ namespace Pokemon{
 BoxGenderDetector::BoxGenderDetector(const ImageFloatBox& box, double area_ratio_threshold, Color color)
 : m_box(box), m_area_ratio_threshold(area_ratio_threshold), m_color(color) {}
 
-void BoxGenderDetector::make_overlays(VideoOverlaySet& items) const {
+void BoxGenderDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_box);
 }
 
@@ -61,7 +61,7 @@ StatsHuntGenderFilter BoxGenderDetector::detect(const ImageViewRGB32& screen) co
 
     if (num_red_pixels > threshold){
         return Pokemon::StatsHuntGenderFilter::Female;
-    } else if (num_blue_pixels > threshold){
+    }else if (num_blue_pixels > threshold){
         return Pokemon::StatsHuntGenderFilter::Male;
     }
     return Pokemon::StatsHuntGenderFilter::Genderless;

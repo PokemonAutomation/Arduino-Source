@@ -22,7 +22,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
 
-enum class Detection {
+enum class Detection{
     NO_DETECTION,
     RED,
     YELLOW,
@@ -45,7 +45,7 @@ class ESPEmotionDetector : public VisualInferenceCallback {
 public:
     ESPEmotionDetector();
 
-    Detection result() const {
+    Detection result() const{
         return m_last.load(std::memory_order_acquire);
     }
 

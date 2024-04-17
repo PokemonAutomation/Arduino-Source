@@ -467,8 +467,7 @@ void AuctionFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
                         if (npc_tries < max_npc_tries){
                             VideoSnapshot screen = env.console.video().snapshot();
                             send_program_recoverable_error_notification(env, NOTIFICATION_ERROR_RECOVERABLE, e.message(), screen);
-                        }
-                        else {
+                        }else{
                             throw OperationFailedException(
                                 ErrorReport::SEND_ERROR_REPORT, env.console,
                                 "Failed to talk to the NPC!",

@@ -60,7 +60,7 @@ void print_equals(){
             print_equals(); \
             cout << "Test: " << (file_path) << " failed." << endl; \
             return _ret; \
-        } else if (_ret == 0){ \
+        }else if (_ret == 0){ \
             num_passed++; \
         } \
     } while (0)
@@ -208,7 +208,7 @@ int run_command_line_tests(){
         for(const QFileInfo& sub_dir_info : sub_dir_list){
             RETURN_IF_NOT_ZERO(run_test_space(sub_dir_info, num_passed, ignore_list));
         }
-    } else{
+    }else{
         // Only run on selected tests
         for(const std::string& test_path : selected_test_list){
             const std::string full_path = root_folder_name + "/" + test_path;
@@ -280,7 +280,7 @@ int run_command_line_tests(){
             if (selected_path_info.isFile()){
                 // Call the function to do the actual test:
                 RETURN_IF_TEST_FAILED(test_func, full_path_cleaned.toStdString(), num_passed);
-            } else{
+            }else{
                 // selected_path_info is a directory, go through each file recursively in the directory
                 RETURN_IF_NOT_ZERO(run_test_obj_dir(test_func, full_path_cleaned, num_passed, ignore_list));
             }

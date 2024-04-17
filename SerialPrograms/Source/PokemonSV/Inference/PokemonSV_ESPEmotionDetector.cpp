@@ -16,10 +16,10 @@ ESPEmotionReader::ESPEmotionReader()
     : m_symbol_box(0.297, 0.137, 0.010, 0.016)
 {}
 
-void ESPEmotionReader::make_overlays(VideoOverlaySet& items) const {
+void ESPEmotionReader::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_symbol_box);
 }
-Detection ESPEmotionReader::detect(const ImageViewRGB32& screen) const {
+Detection ESPEmotionReader::detect(const ImageViewRGB32& screen) const{
     ImageViewRGB32 symbol = extract_box_reference(screen, m_symbol_box);
 
     //Color ratio: R/(R+G+B), G/(R+G+B), B/(R+G+B)
@@ -46,7 +46,7 @@ ESPEmotionDetector::ESPEmotionDetector()
     , m_last(Detection::NO_DETECTION)
 {}
 
-void ESPEmotionDetector::make_overlays(VideoOverlaySet& items) const {
+void ESPEmotionDetector::make_overlays(VideoOverlaySet& items) const{
     m_reader.make_overlays(items);
 }
 bool ESPEmotionDetector::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
@@ -60,7 +60,7 @@ ESPStartDetector::ESPStartDetector()
     , m_left_box(0.337, 0.144, 0.007, 0.064)
     , m_right_box(0.716, 0.140, 0.008, 0.069)
 {}
-void ESPStartDetector::make_overlays(VideoOverlaySet& items) const {
+void ESPStartDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_left_box);
     items.add(COLOR_RED, m_right_box);
 }
@@ -81,7 +81,7 @@ ESPShowNewEmotionDetector::ESPShowNewEmotionDetector()
     , m_left_box(0.337, 0.144, 0.007, 0.064)
     , m_right_box(0.716, 0.140, 0.008, 0.069)
 {}
-void ESPShowNewEmotionDetector::make_overlays(VideoOverlaySet& items) const {
+void ESPShowNewEmotionDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_left_box);
     items.add(COLOR_RED, m_right_box);
 }
@@ -104,7 +104,7 @@ ESPPressedEmotionDetector::ESPPressedEmotionDetector()
     , m_top_box(0.874, 0.712, 0.014, 0.035)
     , m_bottom_box(0.924, 0.884, 0.016, 0.027)
 {}
-void ESPPressedEmotionDetector::make_overlays(VideoOverlaySet& items) const {
+void ESPPressedEmotionDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_left_box);
     items.add(COLOR_RED, m_right_box);
     items.add(COLOR_RED, m_top_box);

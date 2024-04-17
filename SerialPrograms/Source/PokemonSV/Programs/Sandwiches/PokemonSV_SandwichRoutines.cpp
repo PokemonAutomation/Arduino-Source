@@ -37,7 +37,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
 
-namespace {
+namespace{
     const ImageFloatBox HAND_INITIAL_BOX{0.440, 0.455, 0.112, 0.179};
     const ImageFloatBox INGREDIENT_BOX{0.455, 0.130, 0.090, 0.030};
 
@@ -187,8 +187,7 @@ bool select_sandwich_recipe(const ProgramInfo& info, ConsoleHandle& console, Bot
                 console.overlay().add_log("Found recipe", COLOR_WHITE);
                 found_recipe = true;
                 break;
-            }
-            else if (target_cell == selected_cell + 1){
+            }else if (target_cell == selected_cell + 1){
                 console.log("Move to the right column.");
                 // Target is in a different column
                 // Move cursor right.
@@ -222,11 +221,11 @@ bool select_sandwich_recipe(const ProgramInfo& info, ConsoleHandle& console, Bot
                 console.log("Detected recipe selection. Dropped Button A?");
                 pbf_press_button(context, BUTTON_A, 30, 100);
                 continue;
-            } else if (ret == 1){
+            }else if (ret == 1){
                 console.log("Detected pick selection.");
                 pbf_press_button(context, BUTTON_A, 30, 100);
                 continue;
-            } else{
+            }else{
                 console.log("Entered sandwich minigame.");
                 break;
             }
@@ -241,7 +240,7 @@ bool select_sandwich_recipe(const ProgramInfo& info, ConsoleHandle& console, Bot
     return false;
 }
 
-namespace {
+namespace{
 
 // expand the hand bounding box so that the hand watcher can pick the hand in the next iteration
 ImageFloatBox expand_box(const ImageFloatBox& box){
@@ -350,7 +349,7 @@ ImageFloatBox move_sandwich_hand(
 
         if (last_loc.first < 0){
             speed = std::make_pair(0.0, 0.0);
-        } else {
+        }else{
             std::chrono::microseconds time = std::chrono::duration_cast<std::chrono::microseconds>(cur_time - last_time);
             double time_s = time.count() / 1000000.0;
             std::pair<double, double> moved((cur_loc.first - last_loc.first) * 16, (cur_loc.second - last_loc.second) * 9);
@@ -486,7 +485,7 @@ void enter_custom_sandwich_mode(const ProgramInfo& info, ConsoleHandle& console,
     );
 }
 
-namespace {
+namespace{
 
 void finish_two_herbs_sandwich(
     const ProgramInfo& info, AsyncDispatcher& dispatcher, ConsoleHandle& console, BotBaseContext& context
@@ -660,13 +659,11 @@ void make_sandwich_option(ProgramEnvironment& env, ConsoleHandle& console, BotBa
                 if (std::find(ALL_SANDWICH_FILLINGS_SLUGS().begin(), ALL_SANDWICH_FILLINGS_SLUGS().end(), table_item) != ALL_SANDWICH_FILLINGS_SLUGS().end()){
                     fillings[table_item]++;
                     num_fillings++;
-                }
-                else {
+                }else{
                     condiments[table_item]++;
                     num_condiments++;
                 }
-            }
-            else {
+            }else{
                 console.log("Skipping baguette as it is unobtainable.");
                 console.overlay().add_log("Skipping baguette as it is unobtainable.", COLOR_WHITE);
             }
@@ -683,7 +680,7 @@ void make_sandwich_option(ProgramEnvironment& env, ConsoleHandle& console, BotBa
         console.overlay().add_log("Ingredients validated.", COLOR_WHITE);
     }
     //Otherwise get the preset ingredients
-    else {
+    else{
         console.log("Preset sandwich selected.", COLOR_BLACK);
         console.overlay().add_log("Preset sandwich selected.");
 
@@ -694,8 +691,7 @@ void make_sandwich_option(ProgramEnvironment& env, ConsoleHandle& console, BotBa
             if (std::find(ALL_SANDWICH_FILLINGS_SLUGS().begin(), ALL_SANDWICH_FILLINGS_SLUGS().end(), s) != ALL_SANDWICH_FILLINGS_SLUGS().end()){
                 fillings[s]++;
                 num_fillings++;
-            }
-            else {
+            }else{
                 condiments[s]++;
                 num_condiments++;
             }
@@ -704,8 +700,7 @@ void make_sandwich_option(ProgramEnvironment& env, ConsoleHandle& console, BotBa
         if (SandwichMakerOption::two_herba_required(SANDWICH_OPTIONS.BASE_RECIPE)){
             if (SANDWICH_OPTIONS.HERBA_ONE == SANDWICH_OPTIONS.HERBA_TWO){
                 condiments.insert(std::make_pair(SANDWICH_OPTIONS.herba_to_string(SANDWICH_OPTIONS.HERBA_ONE), (uint8_t)2));
-            }
-            else {
+            }else{
                 condiments.insert(std::make_pair(SANDWICH_OPTIONS.herba_to_string(SANDWICH_OPTIONS.HERBA_ONE), (uint8_t)1));
                 condiments.insert(std::make_pair(SANDWICH_OPTIONS.herba_to_string(SANDWICH_OPTIONS.HERBA_TWO), (uint8_t)1));
             }
@@ -837,7 +832,7 @@ void run_sandwich_maker(ProgramEnvironment& env, ConsoleHandle& console, BotBase
                     pbf_wait(context, TICKS_PER_SECOND * 2);
                     context.wait_for_all_requests();
                     continue;
-                } else{
+                }else{
                     console.log("Read nothing on center plate label.");
                     throw OperationFailedException(
                         ErrorReport::SEND_ERROR_REPORT, console, "No ingredient found on center plate label.", true
@@ -855,8 +850,7 @@ void run_sandwich_maker(ProgramEnvironment& env, ConsoleHandle& console, BotBase
         if (left_filling.empty()){
             console.log("No ingredient found on left label.");
             console.overlay().add_log("No left plate");
-        }
-        else{
+        }else{
             console.log("Read left plate label: " + left_filling);
             console.overlay().add_log("Left plate: " + left_filling);
             plate_order.push_back(left_filling);
@@ -867,8 +861,7 @@ void run_sandwich_maker(ProgramEnvironment& env, ConsoleHandle& console, BotBase
         if (right_filling.empty()){
             console.log("No ingredient found on right label.");
             console.overlay().add_log("No right plate");
-        }
-        else{
+        }else{
             console.log("Read right plate label: " + right_filling);
             console.overlay().add_log("Right plate: " + right_filling);
             plate_order.push_back(right_filling);

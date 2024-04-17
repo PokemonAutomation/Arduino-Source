@@ -129,7 +129,7 @@ SpectrogramMatcher::SpectrogramMatcher(
     if (templateSubdivision <= 1){
         m_templateRange.emplace_back(0, numTemplateWindows);
         m_numSpectrumsNeeded = numTemplateWindows;
-    } else{
+    }else{
         // Number of subdivision cannot exceed number of windows in the template.
         templateSubdivision = std::min(templateSubdivision, numTemplateWindows);
         // num windows of each subdivided template
@@ -177,7 +177,7 @@ void SpectrogramMatcher::conv(const float* src, size_t num, float* dst){
 #endif
 }
 
-std::vector<float> SpectrogramMatcher::buildTemplateNorm() const {
+std::vector<float> SpectrogramMatcher::buildTemplateNorm() const{
     std::vector<float> ret(m_templateRange.size());
 
     for (size_t sub_index = 0; sub_index < m_templateRange.size(); sub_index++){
@@ -258,7 +258,7 @@ bool SpectrogramMatcher::update_to_new_spectrums(const std::vector<AudioSpectrum
     return true;
 }
 
-std::pair<float, float> SpectrogramMatcher::match_sub_template(size_t sub_index) const {
+std::pair<float, float> SpectrogramMatcher::match_sub_template(size_t sub_index) const{
 #if 0
     auto iter = m_spectrums.begin();
     auto iter2 = m_spectrumNormSqrs.begin();

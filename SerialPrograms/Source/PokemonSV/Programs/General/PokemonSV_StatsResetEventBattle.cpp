@@ -557,7 +557,7 @@ bool StatsResetEventBattle::check_stats_after_win(SingleSwitchProgramEnvironment
             try{
                 if (TARGET == Target::Ursaluna){
                     ivs = reader.calc_ivs(env.logger(), snapshot, { 113, 70, 120, 135, 65, 52 });
-                } else {
+                }else{
                     ivs = reader.calc_ivs(env.logger(), snapshot, { 88, 88, 160, 88, 88, 88 });
                 }
             }catch (OperationFailedException& e){
@@ -574,7 +574,7 @@ bool StatsResetEventBattle::check_stats_after_win(SingleSwitchProgramEnvironment
             StatsHuntAction action;
             if (TARGET == Target::Ursaluna){
                 action = FILTERS0.get_action(false, StatsHuntGenderFilter::Any, NatureCheckerValue::Hardy, ivs);
-            } else {
+            }else{
                 action = FILTERS0.get_action(false, StatsHuntGenderFilter::Any, NatureCheckerValue::Timid, ivs);
             }
 
@@ -586,8 +586,7 @@ bool StatsResetEventBattle::check_stats_after_win(SingleSwitchProgramEnvironment
                 pbf_press_button(context, BUTTON_A, 20, 105);
                 first_advance_dialog = false;
                 continue;
-            }
-            else{
+            }else{
                 StatsResetEventBattle_Descriptor::Stats& stats = env.current_stats<StatsResetEventBattle_Descriptor::Stats>();
                 stats.errors++;
                 env.update_stats();

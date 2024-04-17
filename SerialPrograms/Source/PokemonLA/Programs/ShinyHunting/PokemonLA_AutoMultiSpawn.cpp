@@ -164,7 +164,7 @@ std::pair<bool, PokemonDetails> control_focus_to_throw(
                 // just we are unlucky that the target pokemon is too far from our current position or the
                 // player character is facing a wrong direction.
                 env.log("Only one pokemon can be focused. No target pokemon nearby.");
-            } else {
+            }else{
                 // We focused on an unexpected pokemon. Maybe the trip is wrong.
                 env.log("Focus on an unexpected pokemon.");
             }
@@ -490,7 +490,7 @@ size_t AutoMultiSpawn::try_one_battle_to_remove_pokemon(
                 // Note we need `battle_menu_detectd == false` condition because if battle ends without entering battle menu, battle sprite
                 // watcher will have lots of false positives when the upper and lower dark borders gradually fade away.
                 num_removed_pokemon = 1;
-            } else {
+            }else{
                 // More than one pokemon attended the battle and they all fled.
                 // We think our pokemon is strong enough to defeat all the wild pokemon in the battle, so it is not possible
                 // that the battle ends because we lost.
@@ -523,7 +523,7 @@ size_t AutoMultiSpawn::try_one_battle_to_remove_pokemon(
                 "Removed more pokemon than needed!",
                 true
             );
-        } else if (num_removed_pokemon < num_to_despawn){
+        }else if (num_removed_pokemon < num_to_despawn){
 
             // Press A to select moves
             pbf_press_button(context, BUTTON_A, 10, 100);

@@ -192,7 +192,7 @@ AudioSelectorWidget::AudioSelectorWidget(
             m_session.spectrums().saveAudioFrequenciesToDisk(m_record_is_on);
             if (m_record_is_on){
                 m_record_button->setText("Stop recording");
-            } else{
+            }else{
                 m_record_button->setText("Record Frequencies");
             }
         });

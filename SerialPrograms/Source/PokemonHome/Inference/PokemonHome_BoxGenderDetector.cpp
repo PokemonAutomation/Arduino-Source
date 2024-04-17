@@ -22,7 +22,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonHome{
 
-namespace {
+namespace{
     ImageFloatBox GENDER_BOX{0.417, 0.097, 0.031, 0.046};
 }
 
@@ -61,7 +61,7 @@ Pokemon::StatsHuntGenderFilter BoxGenderDetector::detect(const ImageViewRGB32& s
 
     if (num_red_pixels > threshold){
         return Pokemon::StatsHuntGenderFilter::Female;
-    } else if (num_blue_pixels > threshold){
+    }else if (num_blue_pixels > threshold){
         return Pokemon::StatsHuntGenderFilter::Male;
     }
     return Pokemon::StatsHuntGenderFilter::Genderless;

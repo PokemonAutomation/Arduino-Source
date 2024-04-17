@@ -52,8 +52,7 @@ Xoroshiro128PlusState find_rng_state(
 
         if (i < 64){
             last_bits0 += last_bit << (63 - i);
-        }
-        else {
+        }else{
             last_bits1 += last_bit << (63 - (i - 64));
         }
     }

@@ -305,8 +305,7 @@ void BoxDetector::move_cursor(
                     }
                 }
                 continue;
-            }
-            else if (desired_x < 3){
+            }else if (desired_x < 3){
                 pbf_press_dpad(context, DPAD_RIGHT, 20, 30);
             }else{
                 pbf_press_dpad(context, DPAD_LEFT, 20, 30);
@@ -341,9 +340,9 @@ BoxEmptySlotDetector::BoxEmptySlotDetector(BoxCursorLocation side, uint8_t row, 
 {
     if (side == BoxCursorLocation::PARTY){
         m_box = ImageFloatBox(0.142, 0.1165 * row + 0.201, 0.048, 0.082);
-    } else if (side == BoxCursorLocation::SLOTS){
+    }else if (side == BoxCursorLocation::SLOTS){
         m_box = ImageFloatBox(0.0656 * col + 0.242, 0.1165 * row + 0.201, 0.048, 0.082);
-    } else {
+    }else{
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "INVALID BoxCursorLocation for BoxEmptySlotDetector");
     }
 }

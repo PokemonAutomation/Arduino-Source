@@ -117,16 +117,14 @@ void SeedFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
         resume_game_back_out(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);
-    }
-    else {
+    }else{
         pbf_press_dpad(context, DPAD_LEFT, 5, 5);
     }
 
 
     if (UPDATE_STATE){
         state = refind_rng_state(env.console, context, state, MIN_ADVANCES, MAX_ADVANCES, SAVE_SCREENSHOTS, LOG_VALUES);
-    }
-    else {
+    }else{
         state = find_rng_state(env.console, context, SAVE_SCREENSHOTS, LOG_VALUES);
     }
 

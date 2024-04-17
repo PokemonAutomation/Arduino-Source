@@ -179,8 +179,7 @@ void determine_shiny_status(
         auto get_timestamp_distance = [](const WallClock& t0, const WallClock& t1) -> std::chrono::milliseconds{
             if (t0 > t1){
                 return std::chrono::duration_cast<std::chrono::milliseconds>(t0 - t1);
-            }
-            else{
+            }else{
                 return std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0);
             }
         };

@@ -22,7 +22,7 @@ template class FixedLimitVector<NintendoSwitch::PokemonSV::BoxEggWatcher>;
 namespace NintendoSwitch{
 namespace PokemonSV{
 
-namespace {
+namespace{
 
 class EggMatcher : public ImageMatch::WaterfillTemplateMatcher{
 public:
@@ -63,9 +63,9 @@ BoxEggDetector::BoxEggDetector(BoxCursorLocation side, uint8_t row, uint8_t col,
 : m_color(color){
     if (side == BoxCursorLocation::PARTY){
         m_box = ImageFloatBox(0.149, 0.1165 * row + 0.235, 0.033, 0.066);
-    } else if (side == BoxCursorLocation::SLOTS){
+    }else if (side == BoxCursorLocation::SLOTS){
         m_box = ImageFloatBox(0.0656 * col + 0.249, 0.1165 * row + 0.235, 0.033, 0.066);
-    } else {
+    }else{
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "INVALID BoxCursorLocation for BoxEggDetector");
     }
 }

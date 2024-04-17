@@ -22,7 +22,7 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-namespace {
+namespace{
     // This box covers all possible locations of the black triangle arrow
     std::array<ImageFloatBox, 4> BLACK_BOXES{{
         {0.254, 0.806, 0.012, 0.052},

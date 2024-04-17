@@ -42,7 +42,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
 
-namespace {
+namespace{
 
 using FeatureType = double;
 using FeatureVector = std::vector<FeatureType>;
@@ -991,8 +991,7 @@ MapSpriteMatchResult match_sprite_on_map(Logger& logger, const ImageViewRGB32& s
             std::swap(result.slug, result.second_slug);
             logger.log("Switch to more confident color result: " + result.slug);
         }
-    }
-    else{
+    }else{
         logger.log("Low confidence match: " + result.slug);
     }
 

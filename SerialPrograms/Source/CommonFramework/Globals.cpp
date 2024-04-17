@@ -53,7 +53,7 @@ const std::string PROJECT_GITHUB_URL = "https://github.com/PokemonAutomation/";
 const std::string PROJECT_SOURCE_URL = "https://github.com/PokemonAutomation/Arduino-Source/";
 
 
-namespace {
+namespace{
 
 std::string get_resource_path(){
     //  Find the resource directory.

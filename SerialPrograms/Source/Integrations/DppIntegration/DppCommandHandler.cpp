@@ -33,7 +33,7 @@ void Handler::initialize(cluster& bot, commandhandler& handler){
 
     if (cmd_type == DiscordIntegrationSettingsOption::CommandType::MessageCommands && !prefix.empty()){
         handler.add_prefix(prefix);
-    } else {
+    }else{
         handler.add_prefix("/").add_prefix("_cmd ");
     }
 
@@ -144,7 +144,7 @@ void Handler::update_response(const dpp::command_source& src, dpp::embed& embed,
     m.add_embed(embed);
     if (src.interaction_event.has_value()){
         src.interaction_event.value().edit_response(m);
-    } else {
+    }else{
         src.message_event.value().reply(m);
     }
 }
@@ -160,8 +160,7 @@ bool Handler::check_if_empty(const DiscordSettingsOption& settings){
     if (((std::string)settings.integration.token).empty()){
         log_dpp("\"Token\" must not be empty. Stopping...", "check_if_empty()", loglevel::ll_error);
         return false;
-    }
-    else if (((std::string)settings.integration.token).find(",") != std::string::npos){
+    }else if (((std::string)settings.integration.token).find(",") != std::string::npos){
         log_dpp("\"Token\" must only contain one token. Stopping...", "check_if_empty()", loglevel::ll_error);
         return false;
     }
@@ -416,7 +415,7 @@ void Handler::create_unified_commands(commandhandler& handler){
             std::string response;
             if (button > 13){
                 response = Integration::press_dpad(id, Utility::get_button(button), 50);
-            } else {
+            }else{
                 response = Integration::press_button(id, Utility::get_button(button), 50);
             }
 
@@ -482,8 +481,7 @@ void Handler::create_unified_commands(commandhandler& handler){
             std::string response;
             if (stick == 0){
                 response = Integration::press_left_joystick(id, x, y, ticks);
-            }
-            else {
+            }else{
                 response = Integration::press_right_joystick(id, x, y, ticks);
             }
 
@@ -536,7 +534,7 @@ void Handler::create_unified_commands(commandhandler& handler){
             std::string path;
             if (format == 0){
                 path = "screenshot_slash.png";
-            } else {
+            }else{
                 path = "screenshot_slash.jpg";
             }
 
@@ -616,7 +614,7 @@ void Handler::create_unified_commands(commandhandler& handler){
                 std::string desc = "Slash commands registered! Restart your Discord client or wait a few minutes for them to show up!";
                 embed.set_color((uint32_t)color).set_description(desc).set_title("Slash Command Registration");
                 Handler::update_response(src, embed, "", nullptr);
-            } else {
+            }else{
                 handler.reply(message("Enable slash commands before registering them."), src);
             }
         },

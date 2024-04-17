@@ -55,7 +55,7 @@ void navigate_to_menu_app(
 
     if (cur_row < target_row){
         ssf_press_dpad2(context, DPAD_DOWN, BOX_SCROLL_DELAY, 10);
-    } else if (cur_row > target_row){
+    }else if (cur_row > target_row){
         ssf_press_dpad2(context, DPAD_UP, BOX_SCROLL_DELAY, 10);
     }
 

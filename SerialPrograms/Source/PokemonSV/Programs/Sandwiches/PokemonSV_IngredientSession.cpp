@@ -155,7 +155,7 @@ bool IngredientSession::run_move_iteration(
         // If the current cursor is below all the found ingredients,
         // we should move to the closest ingredient, which is also at the lowest line among found ingredients.
         target_line_index = found_ingredients.rbegin()->first;
-    } else {
+    }else{
         target_line_index = found_ingredients.begin()->first;
     }
 

@@ -37,7 +37,7 @@ using namespace Pokemon;
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
-namespace {
+namespace{
 
 // We assume Pokemon app is always at row 0, col 1
 const size_t POKEMON_APP_INDEX = 1;
@@ -317,7 +317,7 @@ bool EggAutonomous::run_batch(SingleSwitchProgramEnvironment& env, BotBaseContex
             if (restart_bike_loop){
                 env.console.overlay().add_log("Restart loop " + std::to_string(bike_loop_count+1), COLOR_WHITE);
                 restart_bike_loop = false;
-            } else {
+            }else{
                 env.console.overlay().add_log("Loop " + std::to_string(bike_loop_count+1), COLOR_WHITE);
             }
             int ret = run_until(
@@ -532,7 +532,7 @@ size_t EggAutonomous::talk_to_lady_to_fetch_egg(
             },
             {{dialog_over_detector}}
         );
-    } else if (ret == 1){
+    }else if (ret == 1){
         env.log("No egg");
         env.console.overlay().add_log("No egg", COLOR_WHITE);
         ret = run_until(
@@ -542,7 +542,7 @@ size_t EggAutonomous::talk_to_lady_to_fetch_egg(
             },
             {{dialog_over_detector}}
         );
-    } else {
+    }else{
         throw OperationFailedException(
             ErrorReport::SEND_ERROR_REPORT, env.console,
             "Cannot detect dialog selection arrow when talking to Nursery lady.",
@@ -806,7 +806,7 @@ bool EggAutonomous::process_hatched_pokemon(SingleSwitchProgramEnvironment& env,
     if (need_taxi){
         bool fly_from_overworld = false; // fly from menu
         call_flying_taxi(env, context, fly_from_overworld);
-    } else {
+    }else{
         // Leave menu, go back to overworld
         const bool y_comm_visible = true;
         YCommIconDetector y_comm_detector(y_comm_visible);

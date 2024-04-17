@@ -76,7 +76,7 @@ private:
             // bit select intrinsic: 
             // vbslq_u32(a, b, c), for 1 bits in a, choose b; for 0 bits in a, choose c
             out_u32 = vbslq_u32(mask_u32, pixels_u32, m_replacement_u32);
-        } else {
+        }else{
             out_u32 = vbslq_u32(mask_u32, m_replacement_u32, pixels_u32);
         }
         vst1q_u32(pixels, out_u32);
@@ -131,7 +131,7 @@ private:
             out_1_u32 = vbslq_u32(mask_1_u32, pixels_1_u32, m_replacement_u32);
             out_2_u32 = vbslq_u32(mask_2_u32, pixels_2_u32, m_replacement_u32);
             out_3_u32 = vbslq_u32(mask_3_u32, pixels_3_u32, m_replacement_u32);
-        } else {
+        }else{
             out_0_u32 = vbslq_u32(mask_0_u32, m_replacement_u32, pixels_0_u32);
             out_1_u32 = vbslq_u32(mask_1_u32, m_replacement_u32, pixels_1_u32);
             out_2_u32 = vbslq_u32(mask_2_u32, m_replacement_u32, pixels_2_u32);

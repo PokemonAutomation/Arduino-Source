@@ -34,7 +34,7 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 
-namespace {
+namespace{
 
 
 void clear_mons_in_front(
@@ -168,7 +168,7 @@ void order_compote_du_fils(const ProgramInfo& info, ConsoleHandle& console, BotB
                 pbf_mash_button(context, BUTTON_A, 300);
                 context.wait_for_all_requests();
                 eating = true;
-            } else{
+            }else{
                 pbf_press_button(context, BUTTON_A, 30, 100);
             }
             break;
@@ -226,11 +226,9 @@ void order_compote_du_fils(const ProgramInfo& info, ConsoleHandle& console, BotB
         if (ret == 0){
             pbf_press_button(context, BUTTON_A, 30, 100);
             continue;
-        }
-        else if (ret == 1){
+        }else if (ret == 1){
             return; // outside restaurant
-        }
-        else{
+        }else{
             dump_image_and_throw_recoverable_exception(info, console, "EndLeavingRestaurantNotDetected",
                 "order_compote_du_fils(): No end of leaving restaurant after 60 seconds.");
         }

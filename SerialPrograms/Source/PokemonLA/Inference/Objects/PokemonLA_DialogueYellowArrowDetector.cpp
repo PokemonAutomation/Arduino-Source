@@ -21,7 +21,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
 
-namespace {
+namespace{
     // This box covers all possible locations of the yellow arrow
     ImageFloatBox YELLOW_ARROW_BOX{0.720, 0.759, 0.049, 0.128};
 }

@@ -236,7 +236,7 @@ void RamanasCombeeFinder::grouped_path(SingleSwitchProgramEnvironment& env, BotB
             env.console.log("Battle found before last tree in the path.");
         }
 
-    } else{
+    }else{
         check_tree(env, context);
         env.console.log("Checked all trees in the path.");
     }

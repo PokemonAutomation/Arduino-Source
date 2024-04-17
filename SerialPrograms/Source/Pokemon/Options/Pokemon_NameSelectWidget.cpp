@@ -47,7 +47,7 @@ NameSelectWidget::NameSelectWidget(
         for (const std::string& slug : slugs){
             list.append(QString::fromStdString(get_pokemon_name(slug).display_name()));
         }
-    } else{
+    }else{
         for (const std::string& slug : slugs){
             auto it = display_names->find(slug);
             if (it == display_names->end()){

@@ -21,7 +21,7 @@ namespace PokemonSV{
 
 
 
-enum class HerbaSelection {
+enum class HerbaSelection{
     sweet_herba_mystica,
     salty_herba_mystica,
     sour_herba_mystica,

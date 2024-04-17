@@ -141,8 +141,7 @@ void ClothingBuyer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
                 if (!WEAR_NEW_CLOTHES){
                     env.log("Do not wear new clothes.");
                     pbf_press_dpad(context, DPAD_DOWN, 10, 100);
-                }
-                else {
+                }else{
                     env.log("Wear new clothes.");
                 }
                 pbf_press_button(context, BUTTON_A, 10, 100);
@@ -160,8 +159,7 @@ void ClothingBuyer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
                         "Out of Cash/LP."
                     );
                     finish_program = true;
-                }
-                else {
+                }else{
                     pbf_press_button(context, BUTTON_A, 10, 100);
                     retHairstyle = wait_until(
                         env.console, context,
@@ -224,8 +222,7 @@ void ClothingBuyer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
                 pbf_wait(context, 100);
                 context.wait_for_all_requests();
                 category_rotation_count++;
-            }
-            else {
+            }else{
                 env.log("No category rotation. Ending program.");
                 break;
             }

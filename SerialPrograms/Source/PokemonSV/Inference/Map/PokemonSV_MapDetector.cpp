@@ -21,7 +21,7 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 
-namespace {
+namespace{
 
 class MapOrangleFixedViewArrowMatcher : public ImageMatch::WaterfillTemplateMatcher{
 public:
@@ -142,7 +142,7 @@ bool MapWatcher::process_frame(const ImageViewRGB32& frame, WallClock timestamp)
     if (fixed_found && !rotated_found){
         m_in_fixed_view = true;
         return true;
-    } else if (!fixed_found && rotated_found){
+    }else if (!fixed_found && rotated_found){
         m_in_fixed_view = false;
         return true;
     }

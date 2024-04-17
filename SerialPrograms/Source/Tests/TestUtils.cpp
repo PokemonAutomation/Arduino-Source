@@ -50,7 +50,7 @@ bool parse_bool(const std::string& word, bool& value){
     if (word == "True"){
         value = true;
         return true;
-    } else if (word == "False"){
+    }else if (word == "False"){
         value = false;
         return true;
     }
@@ -72,7 +72,7 @@ bool load_sprite_count(const std::string& txt_path, std::map<std::string, int>& 
         is >> count;
         if (is.fail()){
             count = 1;
-        } else {
+        }else{
             if (count <= 0){
                 cerr << "Error: in file " << txt_path << " sprite count must be larger than zero, but got " << count << endl;
                 return false;

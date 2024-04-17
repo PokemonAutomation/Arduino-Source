@@ -46,7 +46,7 @@ NaturePlusMinus BoxNatureDetector::read(Logger& logger, const ImageViewRGB32& fr
 
     if (stats.average.b > stats.average.r + 50){
         return NaturePlusMinus::MINUS;
-    } else if (stats.average.r > stats.average.b + 50){
+    }else if (stats.average.r > stats.average.b + 50){
         return NaturePlusMinus::PLUS;
     }
     return NaturePlusMinus::NEUTRAL;
@@ -67,8 +67,7 @@ NatureReader::Results BoxNatureDetector::read(Logger& logger, const ImageViewRGB
     for (int i = 0; i < 5; i++){
         if (stats[i] == NaturePlusMinus::PLUS){
             statPlus = i;
-        }
-        else if (stats[i] == NaturePlusMinus::MINUS){
+        }else if (stats[i] == NaturePlusMinus::MINUS){
             statMinus = i;
         }
     }

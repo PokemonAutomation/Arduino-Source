@@ -48,7 +48,7 @@ struct MassPurchase_Descriptor::Stats : public StatsTracker {
     std::atomic<uint64_t>& skip;
     std::atomic<uint64_t>& errors;
 };
-std::unique_ptr<StatsTracker> MassPurchase_Descriptor::make_stats() const {
+std::unique_ptr<StatsTracker> MassPurchase_Descriptor::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
 }
 

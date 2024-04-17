@@ -9,7 +9,7 @@
 namespace PokemonAutomation{
 namespace Pokemon{
 
-namespace {
+namespace{
 
 std::string iv_checker_value_to_string(IvJudgeValue value){
     const char* names[] = {

@@ -140,7 +140,7 @@ void ShinyHuntCustomPath::do_non_listen_action(ConsoleHandle& console, BotBaseCo
 
         if (mountState == MountState::NOTHING){
             dismount(console, context);
-        } else{
+        }else{
             change_mount(console, context, mountState);
         }
         break;
@@ -150,7 +150,7 @@ void ShinyHuntCustomPath::do_non_listen_action(ConsoleHandle& console, BotBaseCo
     {
         if (row.camera_turn_ticks > 0){
             pbf_move_right_joystick(context, 255, 128, uint16_t(row.camera_turn_ticks), 0);
-        } else if (row.camera_turn_ticks < 0){
+        }else if (row.camera_turn_ticks < 0){
             pbf_move_right_joystick(context, 0, 128, uint16_t(-row.camera_turn_ticks), 0);
         }
         break;

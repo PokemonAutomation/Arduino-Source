@@ -161,8 +161,7 @@ void PoffinCooker::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
             }
             if (turn){
                 TurnClockwiseSlow(context);
-            }
-            else {
+            }else{
                 TurnCounterClockwiseSlow(context);
             }
         }
@@ -182,8 +181,7 @@ void PoffinCooker::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
             }
             if (turn){
                 TurnClockwiseFast(context);
-            }
-            else {
+            }else{
                 TurnCounterClockwiseFast(context);
             }
         }

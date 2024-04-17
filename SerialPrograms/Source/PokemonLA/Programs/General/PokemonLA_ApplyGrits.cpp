@@ -17,7 +17,7 @@ namespace PokemonLA{
 
 using namespace Pokemon;
 
-namespace {
+namespace{
 
 // For each grit item, how many levels it can increase:
 const size_t grit_level_increase[4] = {3, 3, 3, 1};

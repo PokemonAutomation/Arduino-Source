@@ -13,7 +13,7 @@
 #include "CpuId_arm64.tpp"
 #else
 
-namespace PokemonAutomation {
+namespace PokemonAutomation{
 
 const char* PA_ARCH_STRING = "Unknown";
 
@@ -30,7 +30,7 @@ const std::vector<CpuCapabilityOption>& AVAILABLE_CAPABILITIES(){
 
 #endif
 
-namespace PokemonAutomation {
+namespace PokemonAutomation{
 
 CPU_Features CPU_CAPABILITY_CURRENT = CPU_CAPABILITY_NATIVE;
 

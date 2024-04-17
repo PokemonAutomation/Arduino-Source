@@ -24,7 +24,7 @@ SystemSleepController::~SystemSleepController(){
 bool SystemSleepController::prevent_sleep(bool prevent){
     if (prevent){
         return disable_sleep();
-    } else{
+    }else{
         return enable_sleep();
     }
 }

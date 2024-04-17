@@ -18,7 +18,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
 
-namespace {
+namespace{
 
 // const std::array<ImageSolidCheck, 18> dropped_item_bg_checks = {
 //     ImageSolidCheck(0.031, 0.900, 0.024, 0.017, 0.444, 0.440, 0.116, 0.15, 20.0),

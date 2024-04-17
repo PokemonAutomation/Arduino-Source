@@ -271,8 +271,7 @@ bool TenacityCandyFarmer::run_iteration(SingleSwitchProgramEnvironment& env, Bot
                     target_move = 3;
                     stats.fourth_moves++;
                     env.update_stats();
-                }
-                else if (FOURTH_MOVE_ON == FourthMoveOn::Avalugg && cur_battle == 1 && num_turns >= 1){
+                }else if (FOURTH_MOVE_ON == FourthMoveOn::Avalugg && cur_battle == 1 && num_turns >= 1){
                     // Use Flash Cannon to finish Froslass first, then use fourth move, Rock Smash to grind Avalugg.
                     target_move = (num_turns == 1 ? 2 : 3);
                     if (num_turns == 2){
@@ -287,7 +286,7 @@ bool TenacityCandyFarmer::run_iteration(SingleSwitchProgramEnvironment& env, Bot
                     for(size_t i = 0; i < target_move - cur_move; i++){
                         pbf_press_dpad(context, DPAD_DOWN, 20, 100);
                     }
-                } else if (cur_move > target_move){
+                }else if (cur_move > target_move){
                     // Move move selection up
                     for(size_t i = 0; i < cur_move - target_move; i++){
                         pbf_press_dpad(context, DPAD_UP, 20, 100);
@@ -308,18 +307,17 @@ bool TenacityCandyFarmer::run_iteration(SingleSwitchProgramEnvironment& env, Bot
             }
 
             num_turns++;
-        } else if(ret == 1){
+        }else if(ret == 1){
             env.console.log("Normal dialogue box.");
             if (clear_dialogue_box()){
                 break;
             }
-        } else if(ret == 2){
+        }else if(ret == 2){
             env.console.log("Surprise dialogue box.");
             if (clear_dialogue_box()){
                 break;
             }
-        }
-        else if (ret == 3){
+        }else if (ret == 3){
             env.console.log("Pokemon fainted.", COLOR_RED);
 
             clearing_dialogues = false;
@@ -330,8 +328,7 @@ bool TenacityCandyFarmer::run_iteration(SingleSwitchProgramEnvironment& env, Bot
             next_pokemon_to_switch_to++;
             next_pokemon_to_switch_to = switch_pokemon(env.console, context, next_pokemon_to_switch_to);
             cur_pokemon++;
-        }
-        else{ // ret is 4
+        }else{ // ret is 4
             env.console.log("Battle finished.");
             break;
         }

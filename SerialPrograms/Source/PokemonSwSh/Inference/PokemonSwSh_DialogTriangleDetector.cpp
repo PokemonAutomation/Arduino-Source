@@ -25,7 +25,7 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-namespace {
+namespace{
     // This box covers all possible locations of the black triangle arrow
     ImageFloatBox BLACK_TRIANGLE_BOX{0.771, 0.901, 0.031, 0.069};
 }

@@ -22,11 +22,9 @@ Color pick_color(FeedbackType feedback, PABotBaseLevel size){
     case PABotBaseLevel::PABOTBASE_12KB:
         if (feedback == FeedbackType::REQUIRED){
             return COLOR_DARKGREEN;
-        }
-        else if (feedback == FeedbackType::VIDEO_AUDIO){
+        }else if (feedback == FeedbackType::VIDEO_AUDIO){
             return COLOR_GREEN2;
-        }
-        else {
+        }else{
             return COLOR_BLUE;
         }
     case PABotBaseLevel::PABOTBASE_31KB:

@@ -207,9 +207,9 @@ int test_pokemonSV_SandwichHandDetector(const ImageViewRGB32& image, const std::
     SandwichHandLocator::HandType hand_type = SandwichHandLocator::HandType::FREE;
     if (hand_type_word == "Free"){
         hand_type = SandwichHandLocator::HandType::FREE;
-    } else if (hand_type_word == "Grabbing"){
+    }else if (hand_type_word == "Grabbing"){
         hand_type = SandwichHandLocator::HandType::GRABBING;
-    } else {
+    }else{
         cerr << "Error: word " << hand_type_word << " should be \"Free\" or \"Grabbing\"." << endl;
         return 1;
     }
@@ -389,11 +389,9 @@ int test_pokemonSV_SandwichIngredientReader(const ImageViewRGB32& image, const s
     SandwichIngredientType sandwich_type;
     if (target_type == "Fillings"){
         sandwich_type = SandwichIngredientType::FILLING;
-    }
-    else if (target_type == "Condiments"){
+    }else if (target_type == "Condiments"){
         sandwich_type = SandwichIngredientType::CONDIMENT;
-    }
-    else{
+    }else{
         return 1;
     }
 
@@ -530,8 +528,7 @@ int test_pokemonSV_SandwichPlateDetector(const ImageViewRGB32& image, const std:
         
         if (target == "Yellow"){
             TEST_RESULT_COMPONENT_EQUAL(is_yellow, true, "yellow label detection at side: " + sides[i]);
-        }
-        else{
+        }else{
             std::string filling = detectors[i].detect_filling_name(image);   
             if (target == "none"){
                 target = "";

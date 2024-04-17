@@ -145,8 +145,7 @@ bool FlyingTrialFarmer::run_rewards(SingleSwitchProgramEnvironment& env, BotBase
 uint8_t FlyingTrialFarmer::get_final_y_axis(int8_t delta_y){
     if (INVERT_CONTROLS_WHILE_FLYING){
         return 128 - delta_y;
-    }
-    else {
+    }else{
         return 128 + delta_y;
     }
 }
@@ -240,7 +239,7 @@ void FlyingTrialFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseCont
 
         if (!run_rewards(env, context)){
             stats.m_success++;
-        } else {
+        }else{
             stats.m_fail++;
         }
 

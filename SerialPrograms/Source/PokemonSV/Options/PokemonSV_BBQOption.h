@@ -22,7 +22,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
 
-class BBQOption : public GroupOption {
+class BBQOption : public GroupOption{
 
 public:
     //  Include the language option in the box.

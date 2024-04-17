@@ -18,7 +18,7 @@ SandwichIngredientsTableRow::SandwichIngredientsTableRow()
 {
     PA_ADD_OPTION(item);
 }
-std::unique_ptr<EditableTableRow> SandwichIngredientsTableRow::clone() const {
+std::unique_ptr<EditableTableRow> SandwichIngredientsTableRow::clone() const{
     std::unique_ptr<SandwichIngredientsTableRow> ret(new SandwichIngredientsTableRow());
     ret->item.set_by_index(item.index());
     return ret;
@@ -33,7 +33,7 @@ SandwichIngredientsTable::SandwichIngredientsTable(std::string label)
 {}
 
 
-std::vector<std::string> SandwichIngredientsTable::make_header() const {
+std::vector<std::string> SandwichIngredientsTable::make_header() const{
     return std::vector<std::string>{
         "Ingredient/Condiment",
     };

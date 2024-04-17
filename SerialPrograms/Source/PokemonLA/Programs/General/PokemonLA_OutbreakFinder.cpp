@@ -102,7 +102,7 @@ const StringSelectDatabase& MMO_DATABASE(){
 
 
 
-namespace {
+namespace{
 
 
 
@@ -301,8 +301,7 @@ std::set<std::string> OutbreakFinder::read_travel_map_outbreaks(
             const int wild_region_index = (int)current_region - 2;
             if (mmo_appears[wild_region_index]){
                 env.log(std::string(MAP_REGION_NAMES[(int)current_region]) + " have MMO.", COLOR_ORANGE);
-            }
-            else{
+            }else{
                 OutbreakReader reader(env.console, LANGUAGE, env.console);
                 OCR::StringMatchResult result = reader.read(env.console.video().snapshot());
                 if (!result.results.empty()){
@@ -349,12 +348,10 @@ void OutbreakFinder::goto_region_and_return(SingleSwitchProgramEnvironment& env,
         if (current_region == MapRegion::JUBILIFE){
             // Move to fieldlands
             pbf_press_dpad(context, DPAD_RIGHT, 20, 40);
-        }
-        else if (current_region == MapRegion::RETREAT){
+        }else if (current_region == MapRegion::RETREAT){
             // Move to icelands
             pbf_press_dpad(context, DPAD_LEFT, 20, 40);
-        }
-        else{
+        }else{
             // Cannot read current region. Try move to another region
             pbf_press_dpad(context, DPAD_RIGHT, 20, 40);
         }
@@ -492,7 +489,7 @@ std::set<std::string> OutbreakFinder::enter_region_and_read_MMO(
         pbf_press_button(context, BUTTON_ZR, 50, 50);
         context.wait_for_all_requests();
         question_mark_image = env.console.video().snapshot();
-    } else if (zoom_level == 2){
+    }else if (zoom_level == 2){
         pbf_press_button(context, BUTTON_ZL, 50, 50);
         context.wait_for_all_requests();
         question_mark_image = env.console.video().snapshot();
@@ -702,8 +699,7 @@ bool OutbreakFinder::run_iteration(
                 }
                 env.log(os.str());
                 return true;
-            }
-            else{
+            }else{
                 env.log("No desired outbreak.");
             }
         }

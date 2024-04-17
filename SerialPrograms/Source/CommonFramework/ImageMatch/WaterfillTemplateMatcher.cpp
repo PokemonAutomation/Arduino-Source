@@ -77,8 +77,7 @@ bool WaterfillTemplateMatcher::check_aspect_ratio(size_t candidate_width, size_t
     if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
         if (!pass){
             cout << "Failed to pass WaterfillTemplateMatcher aspect ratio check (W/H): ";
-        }
-        else {
+        }else{
             cout << "Passed WaterfillTemplateMatcher aspect ratio check (W/H): ";
         }
         cout << "expected: " << image_template.width() << " : " << image_template.height()
@@ -100,8 +99,7 @@ bool WaterfillTemplateMatcher::check_area_ratio(double candidate_area_ratio) con
     if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
         if (!pass){
             cout << "Failed to pass WaterfillTemplateMatcher area ratio check: ";
-        }
-        else {
+        }else{
             cout << "Passed WaterfillTemplateMatcher area ratio check: ";
         }
         cout << "Expected: " << m_area_ratio << ", actual: " << candidate_area_ratio << ", "

@@ -118,10 +118,10 @@ PokemonDetails read_focused_wild_pokemon_info(
     if (gender_stats.count > 0 && gender_avg.r > gender_avg.b + 50.0 && gender_avg.r > 150.0){
         ret.gender = Gender::Female;
         logger.log("Gender Female, color " + gender_avg.to_string());
-    } else if (gender_stats.count > 0 && gender_avg.b > gender_avg.r + 50.0 && gender_avg.b > 150.0){
+    }else if (gender_stats.count > 0 && gender_avg.b > gender_avg.r + 50.0 && gender_avg.b > 150.0){
         ret.gender = Gender::Male;
         logger.log("Gender Male, color " + gender_avg.to_string());
-    } else{
+    }else{
         ret.gender = Gender::Genderless;
         logger.log("Gender Genderless, color " + gender_avg.to_string());
     }

@@ -58,7 +58,7 @@ public:
         if (m_replace_color_within_range){
             // vbslq_u32(a, b, c) for 1 bits in a, choose b; for 0 bits in a, choose c
             out_u32 = vbslq_u32(cmp_u32, m_replacement_color_u32, vreinterpretq_u32_u8(in_u8));
-        } else{
+        }else{
             out_u32 = vbslq_u32(cmp_u32, vreinterpretq_u32_u8(in_u8), m_replacement_color_u32);
         }
         vst1q_u32(out, out_u32);
@@ -153,7 +153,7 @@ public:
         if (m_replace_color_within_range){
             // vbslq_u32(a, b, c) for 1 bits in a, choose b; for 0 bits in a, choose c
             out_u32 = vbslq_u32(cmp_u32, m_replacement_color_u32, in_u32);
-        } else{
+        }else{
             out_u32 = vbslq_u32(cmp_u32, in_u32, m_replacement_color_u32);
         }
         vst1q_u32(out, out_u32);

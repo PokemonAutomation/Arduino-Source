@@ -25,7 +25,7 @@ namespace PokemonLA{
 
 using namespace Kernels::Waterfill;
 
-namespace {
+namespace{
 
 // Match the dark blue background of the question mark
 class MMOQuestionMarkBackgroundMatcher : public ImageMatch::WaterfillTemplateMatcher{

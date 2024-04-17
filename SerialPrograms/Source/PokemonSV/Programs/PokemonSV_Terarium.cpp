@@ -67,8 +67,7 @@ void return_to_plaza(const ProgramInfo& info, ConsoleHandle& console, BotBaseCon
                 //Now move toward center
                 if (laggy){
                     pbf_move_left_joystick(context, 255, 255, 300, 40); //overshoot by a bit (still works even if not laggy)
-                }
-                else {
+                }else{
                     pbf_move_left_joystick(context, 255, 255, 250, 40); //250 is more accurate but 300 helps with lag
                 }
                 pbf_press_button(context, BUTTON_ZR, 40, 100);
@@ -99,8 +98,7 @@ void return_to_plaza(const ProgramInfo& info, ConsoleHandle& console, BotBaseCon
                 console.log("Shiny detected!");
                 pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
                 throw ProgramFinishedException();
-            }
-            else {
+            }else{
                 console.log("Detected battle. Running from battle.");
                 try{
                     //Smoke Ball or Flying type required due to Arena Trap
@@ -195,8 +193,7 @@ void jump_glide_fly(ConsoleHandle& console, BotBaseContext& context, bool invert
 
     if (inverted_flight){
         pbf_move_left_joystick(context, 128, 255, hold_up, 250);
-    }
-    else {
+    }else{
         pbf_move_left_joystick(context, 128, 0, hold_up, 250);
     }
 

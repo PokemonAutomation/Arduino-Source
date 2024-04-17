@@ -83,8 +83,7 @@ bool match_template_by_waterfill(
                   << area_thresholds.first << ", ";
         if (area_thresholds.second == SIZE_MAX){
             std::cout << "SIZE_MAX";
-        }
-        else{
+        }else{
             std::cout << area_thresholds.second;
         }
         std::cout << ")" << std::endl;

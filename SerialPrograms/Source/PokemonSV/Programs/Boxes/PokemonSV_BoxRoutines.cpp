@@ -140,7 +140,7 @@ void move_to_right_box(BotBaseContext& context){
     pbf_press_button(context, BUTTON_R, 60, 100);
 }
 
-namespace {
+namespace{
 
 // In box system, when using button Minus or button Y, it will enter a mode for box selection and holding pokemon.
 // The function detects the existence of button symbol in the bottom row of the screen to make
