@@ -150,5 +150,29 @@ WallClock parse_utc_time_str(const std::string& str){
 
 
 
+int64_t to_seconds_since_epoch(const DateTime& date){
+    QDate qdate(date.year, date.month, date.day);
+    QTime qtime(date.hour, date.minute, date.second);
+    QDateTime qdatetime(qdate, qtime, Qt::UTC);
+    int64_t secs_since_epoch = qdatetime.toSecsSinceEpoch();
+    return secs_since_epoch;
+}
+DateTime from_seconds_since_epoch(int64_t seconds_since_epoch){
+    QDateTime qdatetime = QDateTime::fromSecsSinceEpoch(seconds_since_epoch, Qt::UTC);
+    QDate qdate = qdatetime.date();
+    QTime qtime = qdatetime.time();
+    return DateTime{
+        (int16_t)qdate.year(),
+        (int8_t)qdate.month(),
+        (int8_t)qdate.day(),
+        (int8_t)qtime.hour(),
+        (int8_t)qtime.minute(),
+        (int8_t)qtime.second(),
+    };
+}
+
+
+
+
 
 }
