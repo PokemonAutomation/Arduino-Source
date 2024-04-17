@@ -11,7 +11,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
 
-TournamentPrizeNameReader& TournamentPrizeNameReader::instance() {
+TournamentPrizeNameReader& TournamentPrizeNameReader::instance(){
     static TournamentPrizeNameReader reader;
     return reader;
 }

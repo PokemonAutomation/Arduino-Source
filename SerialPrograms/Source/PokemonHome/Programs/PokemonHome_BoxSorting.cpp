@@ -198,7 +198,7 @@ bool operator<(const std::optional<Pokemon>& lhs, const std::optional<Pokemon>& 
     }
 
     for (const BoxSortingSelection preference : *lhs->preferences){
-        switch(preference.sort_type) {
+        switch(preference.sort_type){
         // NOTE edit when adding new struct members
         // TODO TESTING and account for preference.reverse
         case BoxSortingSortType::NationalDexNo:
@@ -323,7 +323,7 @@ bool go_to_first_slot(SingleSwitchProgramEnvironment& env, BotBaseContext& conte
 
 
     // direct nav up or down through rows
-    if (!(cur_cursor.row == 0 && dest_cursor.row == 4) && !(dest_cursor.row == 0 && cur_cursor.row == 4)) {
+    if (!(cur_cursor.row == 0 && dest_cursor.row == 4) && !(dest_cursor.row == 0 && cur_cursor.row == 4)){
         for (size_t i = cur_cursor.row; i < dest_cursor.row; ++i){
             pbf_press_dpad(context, DPAD_DOWN, 10, GAME_DELAY);
         }
@@ -331,7 +331,7 @@ bool go_to_first_slot(SingleSwitchProgramEnvironment& env, BotBaseContext& conte
             pbf_press_dpad(context, DPAD_UP, 10, GAME_DELAY);
         }
     } else { // wrap around is faster to move between first or last row
-        if (cur_cursor.row == 0 && dest_cursor.row == 4) {
+        if (cur_cursor.row == 0 && dest_cursor.row == 4){
             for (size_t i = 0; i <= 2; ++i){
                 pbf_press_dpad(context, DPAD_UP, 10, GAME_DELAY);
             }
@@ -343,7 +343,7 @@ bool go_to_first_slot(SingleSwitchProgramEnvironment& env, BotBaseContext& conte
     }
 
     // direct nav forward or backward through columns
-    if ((dest_cursor.column > cur_cursor.column && dest_cursor.column - cur_cursor.column <= 3) || (cur_cursor.column > dest_cursor.column && cur_cursor.column - dest_cursor.column <= 3)) {
+    if ((dest_cursor.column > cur_cursor.column && dest_cursor.column - cur_cursor.column <= 3) || (cur_cursor.column > dest_cursor.column && cur_cursor.column - dest_cursor.column <= 3)){
         for (size_t i = cur_cursor.column; i < dest_cursor.column; ++i){
             pbf_press_dpad(context, DPAD_RIGHT, 10, GAME_DELAY);
         }
@@ -351,12 +351,12 @@ bool go_to_first_slot(SingleSwitchProgramEnvironment& env, BotBaseContext& conte
             pbf_press_dpad(context, DPAD_LEFT, 10, GAME_DELAY);
         }
     } else { // wrap around is faster if direct movement is more than 3 away
-        if (dest_cursor.column > cur_cursor.column) {
+        if (dest_cursor.column > cur_cursor.column){
             for (size_t i = 0; i < MAX_COLUMNS - (dest_cursor.column - cur_cursor.column); ++i){
                 pbf_press_dpad(context, DPAD_LEFT, 10, GAME_DELAY);
             }
         }
-        if (cur_cursor.column > dest_cursor.column) {
+        if (cur_cursor.column > dest_cursor.column){
             for (size_t i = 0; i < MAX_COLUMNS - (cur_cursor.column - dest_cursor.column); ++i){
                 pbf_press_dpad(context, DPAD_RIGHT, 10, GAME_DELAY);
             }
@@ -406,7 +406,7 @@ void do_sort(
     BoxSorting_Descriptor::Stats& stats,
     Cursor& cur_cursor,
     uint16_t GAME_DELAY
-    ) {
+    ){
     std::ostringstream ss;
     // this need to be separated into functions when I will redo the whole thing but I just wanted it to work
 
@@ -457,7 +457,7 @@ void do_sort(
 void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
 
     std::vector<BoxSortingSelection> sort_preferences = SORT_TABLE.preferences();
-    if (sort_preferences.empty()) {
+    if (sort_preferences.empty()){
         throw UserSetupError(env.console, "At least one sorting method selection needs to be made!");
     }
 
@@ -716,7 +716,7 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
     const std::string sorted_path = json_path + "-sorted";
     output_boxes_data_json(boxes_sorted, sorted_path);
 
-    if (!DRY_RUN) {
+    if (!DRY_RUN){
         do_sort(env, context, boxes_data, boxes_sorted, stats, cur_cursor, GAME_DELAY);
     }
 

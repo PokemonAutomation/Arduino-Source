@@ -106,9 +106,9 @@ NatureCheckerValue NatureCheckerValue_string_to_enum(const std::string& token){
     return iter->second;
 }
 
-NatureCheckerValue NatureCheckerValue_helphinder_to_enum(const std::pair<int,int>& token) {
+NatureCheckerValue NatureCheckerValue_helphinder_to_enum(const std::pair<int,int>& token){
     auto iter = NatureCheckerValue_HELPHINDER_TO_ENUM().find(token);
-    if (iter == NatureCheckerValue_HELPHINDER_TO_ENUM().end()) {
+    if (iter == NatureCheckerValue_HELPHINDER_TO_ENUM().end()){
         return NatureCheckerValue::UnableToDetect;
     }
     return iter->second;
@@ -190,7 +190,7 @@ bool NatureChecker_filter_match(NatureCheckerFilter filter, NatureCheckerValue v
     case NatureCheckerFilter::Adamant:
         return value == NatureCheckerValue::Adamant;
     case NatureCheckerFilter::Bashful:
-        if (value == NatureCheckerValue::Neutral) {
+        if (value == NatureCheckerValue::Neutral){
             return true;
         }
         return value == NatureCheckerValue::Bashful;
@@ -203,14 +203,14 @@ bool NatureChecker_filter_match(NatureCheckerFilter filter, NatureCheckerValue v
     case NatureCheckerFilter::Careful:
         return value == NatureCheckerValue::Careful;
     case NatureCheckerFilter::Docile:
-        if (value == NatureCheckerValue::Neutral) {
+        if (value == NatureCheckerValue::Neutral){
             return true;
         }
         return value == NatureCheckerValue::Docile;
     case NatureCheckerFilter::Gentle:
         return value == NatureCheckerValue::Gentle;
     case NatureCheckerFilter::Hardy:
-        if (value == NatureCheckerValue::Neutral) {
+        if (value == NatureCheckerValue::Neutral){
             return true;
         }
         return value == NatureCheckerValue::Hardy;
@@ -235,7 +235,7 @@ bool NatureChecker_filter_match(NatureCheckerFilter filter, NatureCheckerValue v
     case NatureCheckerFilter::Quiet:
         return value == NatureCheckerValue::Quiet;
     case NatureCheckerFilter::Quirky:
-        if (value == NatureCheckerValue::Neutral) {
+        if (value == NatureCheckerValue::Neutral){
             return true;
         }
         return value == NatureCheckerValue::Quirky;
@@ -246,7 +246,7 @@ bool NatureChecker_filter_match(NatureCheckerFilter filter, NatureCheckerValue v
     case NatureCheckerFilter::Sassy:
         return value == NatureCheckerValue::Sassy;
     case NatureCheckerFilter::Serious:
-        if (value == NatureCheckerValue::Neutral) {
+        if (value == NatureCheckerValue::Neutral){
             return true;
         }
         return value == NatureCheckerValue::Serious;

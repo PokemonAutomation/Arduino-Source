@@ -207,7 +207,7 @@ void PokemonSV::MassPurchase::program(SingleSwitchProgramEnvironment& env, BotBa
             pbf_press_button(context, BUTTON_A, 20, 230);
             pbf_press_button(context, BUTTON_A, 20, 105);
             extra = extra_items(env, env.console, context);
-            if (extra) {
+            if (extra){
                 pbf_press_button(context, BUTTON_A, 20, 105);
             };
 

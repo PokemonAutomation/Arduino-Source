@@ -15,11 +15,11 @@
 namespace PokemonAutomation{
 
 
-constexpr inline uint32_t combine_argb(uint8_t a, uint8_t r, uint8_t g, uint8_t b) {
+constexpr inline uint32_t combine_argb(uint8_t a, uint8_t r, uint8_t g, uint8_t b){
     return (((uint32_t)a << 8 | r) << 8 | g) << 8 | b;
 }
 
-constexpr inline uint32_t combine_rgb(uint8_t r, uint8_t g, uint8_t b) {
+constexpr inline uint32_t combine_rgb(uint8_t r, uint8_t g, uint8_t b){
     return (((uint32_t)255 << 8 | r) << 8 | g) << 8 | b;
 }
 

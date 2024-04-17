@@ -11,7 +11,7 @@ namespace NintendoSwitch{
 namespace PokemonHome{
 
 
-const EnumDatabase<BoxSortingSortType>& BallType_Database() {
+const EnumDatabase<BoxSortingSortType>& BallType_Database(){
     static const EnumDatabase<BoxSortingSortType> database({
         {BoxSortingSortType::NationalDexNo,     "dex",     "National Dex Number"},
         {BoxSortingSortType::Shiny,    "shiny",    "Shiny"},

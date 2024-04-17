@@ -172,7 +172,7 @@ CramomaticRNG::CramomaticRNG()
     PA_ADD_OPTION(LOG_VALUES);
 }
 
-void CramomaticRNG::navigate_to_party(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
+void CramomaticRNG::navigate_to_party(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     pbf_press_button(context, BUTTON_X, 10, 125);
     pbf_press_button(context, BUTTON_A, 10, 10);
     pbf_wait(context, 2 * TICKS_PER_SECOND);
@@ -186,11 +186,11 @@ CramomaticTarget CramomaticRNG::calculate_target(SingleSwitchProgramEnvironment&
 
     std::sort(selected_balls.begin(), selected_balls.end(), [](CramomaticSelection sel1, CramomaticSelection sel2) { return sel1.priority > sel2.priority; });
     // priority_advances only starts counting up after the first good result is found
-    while (priority_advances <= MAX_PRIORITY_ADVANCES) {
+    while (priority_advances <= MAX_PRIORITY_ADVANCES){
         // calculate the result for the current temp_rng state
         Xoroshiro128Plus temp_rng(rng.get_state());
 
-        for (size_t i = 0; i < NUM_NPCS; i++) {
+        for (size_t i = 0; i < NUM_NPCS; i++){
             temp_rng.nextInt(91);
         }
         temp_rng.next();
@@ -201,7 +201,7 @@ CramomaticTarget CramomaticRNG::calculate_target(SingleSwitchProgramEnvironment&
         bool is_safari_sport = temp_rng.nextInt(1000) == 0;
         bool is_bonus = false;
 
-        if (is_safari_sport || ball_roll == 99) {
+        if (is_safari_sport || ball_roll == 99){
             is_bonus = temp_rng.nextInt(1000) == 0;
         }
         else {
@@ -209,19 +209,19 @@ CramomaticTarget CramomaticRNG::calculate_target(SingleSwitchProgramEnvironment&
         }
 
         CramomaticBallType type;
-        if (is_safari_sport) {
+        if (is_safari_sport){
             type = CramomaticBallType::Safari;
         }
-        else if (ball_roll < 25) {
+        else if (ball_roll < 25){
             type = CramomaticBallType::Poke;
         }
-        else if (ball_roll < 50) {
+        else if (ball_roll < 50){
             type = CramomaticBallType::Great;
         }
-        else if (ball_roll < 75) {
+        else if (ball_roll < 75){
             type = CramomaticBallType::Shop1;
         }
-        else if (ball_roll < 99) {
+        else if (ball_roll < 99){
             type = CramomaticBallType::Shop2;
         }
         else {
@@ -230,16 +230,16 @@ CramomaticTarget CramomaticRNG::calculate_target(SingleSwitchProgramEnvironment&
         
 
         // check whether the result is a good result
-        for (size_t i = 0; i < selected_balls.size(); i++) {
+        for (size_t i = 0; i < selected_balls.size(); i++){
             CramomaticSelection selection = selected_balls[i];
-            if (!selection.is_bonus || is_bonus) {
-                if (is_safari_sport) {
-                    if (selection.ball_type == CramomaticBallType::Safari || selection.ball_type == CramomaticBallType::Sport) {
+            if (!selection.is_bonus || is_bonus){
+                if (is_safari_sport){
+                    if (selection.ball_type == CramomaticBallType::Safari || selection.ball_type == CramomaticBallType::Sport){
                         type = selection.ball_type;
                     }
                 }
                 
-                if (selection.ball_type == type) {
+                if (selection.ball_type == type){
                     CramomaticTarget target;
                     target.ball_type = type;
                     target.is_bonus = is_bonus;
@@ -258,8 +258,8 @@ CramomaticTarget CramomaticRNG::calculate_target(SingleSwitchProgramEnvironment&
 
             }
         }
-        if (possible_targets.size() > 0) {
-            if (selected_balls.empty()) {
+        if (possible_targets.size() > 0){
+            if (selected_balls.empty()){
                 //priority_advances = MAX_PRIORITY_ADVANCES + 1;
                 break;
             }
@@ -272,11 +272,11 @@ CramomaticTarget CramomaticRNG::calculate_target(SingleSwitchProgramEnvironment&
 
     // Choose the first result which doesn't overshadow a higher priority choice.
     // Ignores rng advances done by NPCs when the menu closes
-    while (possible_targets.size() > 1) {
+    while (possible_targets.size() > 1){
         auto last_target = possible_targets.end() - 1;
         auto second_to_last_target = possible_targets.end() - 2;
 
-        if ((*last_target).needed_advances - (*second_to_last_target).needed_advances > MAX_PRIORITY_ADVANCES) {
+        if ((*last_target).needed_advances - (*second_to_last_target).needed_advances > MAX_PRIORITY_ADVANCES){
             possible_targets.erase(last_target);
         }
         else {
@@ -287,7 +287,7 @@ CramomaticTarget CramomaticRNG::calculate_target(SingleSwitchProgramEnvironment&
     return possible_targets[0];
 }
 
-void CramomaticRNG::leave_to_overworld_and_interact(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
+void CramomaticRNG::leave_to_overworld_and_interact(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     pbf_press_button(context, BUTTON_B, 2 * TICKS_PER_SECOND, 5);
     pbf_press_button(context, BUTTON_B, 10, 70);
 
@@ -295,7 +295,7 @@ void CramomaticRNG::leave_to_overworld_and_interact(SingleSwitchProgramEnvironme
     pbf_wait(context, 125);
 }
 
-void CramomaticRNG::choose_apricorn(SingleSwitchProgramEnvironment& env, BotBaseContext& context, bool sport) {
+void CramomaticRNG::choose_apricorn(SingleSwitchProgramEnvironment& env, BotBaseContext& context, bool sport){
     // check whether the bag is open
     context.wait_for_all_requests();
     VideoOverlaySet boxes(env.console);
@@ -303,7 +303,7 @@ void CramomaticRNG::choose_apricorn(SingleSwitchProgramEnvironment& env, BotBase
     bag_arrow_detector.make_overlays(boxes);
 
     int ret = wait_until(env.console, context, Milliseconds(5000), { bag_arrow_detector });
-    if (ret < 0) {
+    if (ret < 0){
         throw OperationFailedException(
             ErrorReport::SEND_ERROR_REPORT, env.console,
             "Could not detect bag.",
@@ -314,12 +314,12 @@ void CramomaticRNG::choose_apricorn(SingleSwitchProgramEnvironment& env, BotBase
     // select the apricorn(s)
     pbf_wait(context, 1 * TICKS_PER_SECOND);
     pbf_press_button(context, BUTTON_A, 10, 30);
-    if (sport) {
+    if (sport){
         pbf_press_dpad(context, DPAD_DOWN, 20, 10);
     }
     pbf_press_button(context, BUTTON_A, 10, 30);
     pbf_press_button(context, BUTTON_A, 10, 30);
-    if (sport) {
+    if (sport){
         pbf_press_dpad(context, DPAD_UP, 20, 10);
     }
     pbf_press_button(context, BUTTON_A, 10, 30);
@@ -327,7 +327,7 @@ void CramomaticRNG::choose_apricorn(SingleSwitchProgramEnvironment& env, BotBase
     pbf_mash_button(context, BUTTON_A, 5 * TICKS_PER_SECOND);
 }
 
-std::pair<bool, std::string> CramomaticRNG::receive_ball(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
+std::pair<bool, std::string> CramomaticRNG::receive_ball(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     // receive ball and refuse to use the cram-o-matic again
     VideoOverlaySet boxes(env.console);
 
@@ -342,13 +342,13 @@ std::pair<bool, std::string> CramomaticRNG::receive_ball(SingleSwitchProgramEnvi
     size_t presses = 0;
     bool arrow_detected = false;
 
-    while (presses < 30 && !arrow_detected) {
+    while (presses < 30 && !arrow_detected){
         presses++;
         pbf_press_button(context, BUTTON_B, 10, 165);
         context.wait_for_all_requests();
 
         VideoSnapshot screen = env.console.video().snapshot();
-        if (SAVE_SCREENSHOTS) {
+        if (SAVE_SCREENSHOTS){
             dump_debug_image(env.logger(), "cramomatic-rng", "receive", screen);
         }
 
@@ -370,7 +370,7 @@ std::pair<bool, std::string> CramomaticRNG::receive_ball(SingleSwitchProgramEnvi
             }
         }
 
-        if (arrow_detector.detect(screen)) {
+        if (arrow_detector.detect(screen)){
             arrow_detected = true;
         }
     }
@@ -378,7 +378,7 @@ std::pair<bool, std::string> CramomaticRNG::receive_ball(SingleSwitchProgramEnvi
     return {arrow_detected, best_ball};
 }
 
-void CramomaticRNG::recover_from_wrong_state(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
+void CramomaticRNG::recover_from_wrong_state(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     // Mash the B button to exit potential menus or dialog boxes
     pbf_mash_button(context, BUTTON_B, 30 * TICKS_PER_SECOND);
 
@@ -389,17 +389,17 @@ void CramomaticRNG::recover_from_wrong_state(SingleSwitchProgramEnvironment& env
 }
 
 
-void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
+void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     CramomaticRNG_Descriptor::Stats& stats = env.current_stats<CramomaticRNG_Descriptor::Stats>();
     env.update_stats();
 
     std::vector<CramomaticSelection> selections = BALL_TABLE.selected_balls();
-    if (selections.empty()) {
+    if (selections.empty()){
         throw UserSetupError(env.console, "At least one type of ball needs to be selected!");
     }
 
 
-    if (START_LOCATION.start_in_grip_menu()) {
+    if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
         resume_game_back_out(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);
     }
@@ -428,8 +428,8 @@ void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
 
     // if there is no Sport Ball in the selected balls we ignore num_apricorn_two
     bool sport_wanted = false;
-    for (CramomaticSelection selection : selections) {
-        if (selection.ball_type == CramomaticBallType::Sport) {
+    for (CramomaticSelection selection : selections){
+        if (selection.ball_type == CramomaticBallType::Sport){
             sport_wanted = true;
             break;
         }
@@ -438,7 +438,7 @@ void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
     size_t iteration = 0;
     uint16_t state_errors = 0;
     uint16_t apricorn_selection_errors = 0;
-    while (num_apricorn_one > 4 && (!sport_wanted || num_apricorn_two > 2)) {
+    while (num_apricorn_one > 4 && (!sport_wanted || num_apricorn_two > 2)){
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
 
         //  Touch the date.
@@ -453,7 +453,7 @@ void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         navigate_to_party(env, context);
         context.wait_for_all_requests();
 
-        if (!is_state_valid) {
+        if (!is_state_valid){
             rng = Xoroshiro128Plus(find_rng_state(env.console, context, SAVE_SCREENSHOTS, LOG_VALUES));
 //            rng = Xoroshiro128Plus(100, 10000);
             is_state_valid = true;
@@ -466,12 +466,12 @@ void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         env.update_stats();
 
         Xoroshiro128PlusState rng_state = rng.get_state();
-        if (rng_state.s0 == 0 && rng_state.s1 == 0) {
+        if (rng_state.s0 == 0 && rng_state.s1 == 0){
             stats.errors++;
             env.update_stats();
 
             state_errors++;
-            if (state_errors >= 3) {
+            if (state_errors >= 3){
                 throw OperationFailedException(
                     ErrorReport::SEND_ERROR_REPORT, env.console,
                     "Detected invalid RNG state three times in a row."
@@ -496,13 +496,13 @@ void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         try {
             choose_apricorn(env, context, sport);
         }
-        catch (OperationFailedException& e) {
+        catch (OperationFailedException& e){
             stats.errors++;
             env.update_stats();
             e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
 
             apricorn_selection_errors++;
-            if (apricorn_selection_errors >= 3) {
+            if (apricorn_selection_errors >= 3){
                 throw OperationFailedException(
                     ErrorReport::SEND_ERROR_REPORT, env.console,
                     "Could not detect the bag three times on a row.",
@@ -549,13 +549,13 @@ void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
 #if 0
         if (!ball.empty() || num_apricorn_one <= 4 || (sport_wanted && num_apricorn_two <= 2)){
             int amount = target.is_bonus ? 5 : 1;
-            if (target.is_bonus) {
+            if (target.is_bonus){
                 stats.bonus++;
             }
-            if (target.ball_type == CramomaticBallType::Apricorn) {
+            if (target.ball_type == CramomaticBallType::Apricorn){
                 stats.apri_balls += amount;
             }
-            else if (target.ball_type == CramomaticBallType::Sport || target.ball_type == CramomaticBallType::Safari) {
+            else if (target.ball_type == CramomaticBallType::Sport || target.ball_type == CramomaticBallType::Safari){
                 stats.sport_safari_balls += amount;
             }
             stats.total_balls += amount;

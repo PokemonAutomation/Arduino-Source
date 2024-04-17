@@ -163,7 +163,7 @@ void TournamentFarmer::on_press(){
 }
 
 //Check and process the amount of money earned at the end of a battle
-void TournamentFarmer::check_money(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
+void TournamentFarmer::check_money(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     TournamentFarmer_Descriptor::Stats& stats = env.current_stats<TournamentFarmer_Descriptor::Stats>();
 
     int top_money = -1;
@@ -171,7 +171,7 @@ void TournamentFarmer::check_money(SingleSwitchProgramEnvironment& env, BotBaseC
 
     //There must be a value for top money
     //Bottom money only appear after 1st battle and should clear out
-    for (uint16_t c = 0; c < 3 && top_money == -1; c++) {
+    for (uint16_t c = 0; c < 3 && top_money == -1; c++){
         VideoSnapshot screen = env.console.video().snapshot();
         ImageFloatBox top_notif(0.745, 0.152, 0.206, 0.083);
         ImageFloatBox bottom_notif(0.745, 0.261, 0.220, 0.083);
@@ -201,17 +201,17 @@ void TournamentFarmer::check_money(SingleSwitchProgramEnvironment& env, BotBaseC
         //Filter out low and high numbers in case of misreads
         //From bulbapedia: Nemona is lowest at 8640,  Penny and Geeta are highest at 16800
         //Max earnings? in one battle: happy hour * amulet coin * (base winnings + (8 * make it rain lv100))
-        if (top_money < 8000 || top_money > 80000 ) {
+        if (top_money < 8000 || top_money > 80000 ){
             top_money = -1;
         }
-        if (bottom_money < 8000 || bottom_money > 80000) {
+        if (bottom_money < 8000 || bottom_money > 80000){
             bottom_money = -1;
         }
     }
 
-    if (top_money != -1) {
+    if (top_money != -1){
         //If both notification boxes appear take the newer one.
-        if (bottom_money != -1) {
+        if (bottom_money != -1){
             stats.money += bottom_money;
             env.update_stats();
         } else {
@@ -227,11 +227,11 @@ void TournamentFarmer::check_money(SingleSwitchProgramEnvironment& env, BotBaseC
 
 
 //Handle a single battle by mashing A until AdvanceDialog (end of battle) is detected
-void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
+void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     TournamentFarmer_Descriptor::Stats& stats = env.current_stats<TournamentFarmer_Descriptor::Stats>();
 
     //Only applies if the player has The Hidden Treasure of Area Zero Hisuian Zoroark
-    if (HHH_ZOROARK) {
+    if (HHH_ZOROARK){
         env.log("Zoroark option checked.");
         
         //Use happy hour
@@ -248,7 +248,7 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, BotBaseCo
             std::chrono::seconds(60),
             { memento, fainted }
         );
-        if (retZ == 0) {
+        if (retZ == 0){
             env.log("Using Memento to faint.");
             pbf_press_button(context, BUTTON_A, 10, 50);
             move_select.move_to_slot(env.console, context, 1);
@@ -263,15 +263,15 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, BotBaseCo
             //Try six times, in case of paralysis (only applies to Pachirisu's Nuzzle) preventing use of Memento.
             int retF = run_until(
                 env.console, context,
-                [&](BotBaseContext& context) {
-                    for (size_t c = 0; c < 6; c++) {
+                [&](BotBaseContext& context){
+                    for (size_t c = 0; c < 6; c++){
                         NormalBattleMenuWatcher battle_memento(COLOR_RED);
                         int ret_memento = wait_until(
                             env.console, context,
                             std::chrono::seconds(60),
                             { battle_memento }
                         );
-                        if (ret_memento == 0) {
+                        if (ret_memento == 0){
                             env.log("Attempting to use Memento.");
                             pbf_mash_button(context, BUTTON_A, 300);
                             context.wait_for_all_requests();
@@ -281,7 +281,7 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, BotBaseCo
                 { fainted }
             );
 
-            if (retF == 0) {
+            if (retF == 0){
                 env.log("Swap menu detected.");
             } else {
                 env.log("Took more than 6 turns to use Memento. Was Zoroark able to faint?", COLOR_RED);
@@ -296,7 +296,7 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, BotBaseCo
             }
 
         }
-        else if (retZ == 1) {
+        else if (retZ == 1){
             env.log("Detected swap menu. Assuming Zoroark fainted turn one.");
         } else {
             env.log("Timed out after Happy Hour.", COLOR_RED);
@@ -322,7 +322,7 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, BotBaseCo
             std::chrono::seconds(60),
             { resume_battle }
         );
-        if (retRes == 0) {
+        if (retRes == 0){
             env.log("Battle menu detected. Second Pokemon has been sent out. Resuming usual battle sequence.");
         } else {
             env.log("Could not find battle menu.", COLOR_RED);
@@ -339,7 +339,7 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, BotBaseCo
     }
 
     //Assuming the player has a charged orb
-    if (TRY_TO_TERASTILLIZE) {
+    if (TRY_TO_TERASTILLIZE){
         env.log("Attempting to terastillize.");
         //Open move menu
         pbf_press_button(context, BUTTON_A, 10, 50);
@@ -356,9 +356,9 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, BotBaseCo
     uint8_t switch_party_slot = HHH_ZOROARK ? 2: 1;
     int ret_black = run_until(
         env.console, context,
-        [&](BotBaseContext& context) {
+        [&](BotBaseContext& context){
             for(size_t c = 0; c < 30; c++) { //Sylveon build has 16 PP at max, and Chi-Yu build has 24.
-                if (current_time() - start > std::chrono::minutes(5)) {
+                if (current_time() - start > std::chrono::minutes(5)){
                     env.log("Timed out during battle after 5 minutes.", COLOR_RED);
                     stats.errors++;
                     env.update_stats();
@@ -421,7 +421,7 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, BotBaseCo
         },
         { end_of_battle }
         );
-    if (ret_black == 0) {
+    if (ret_black == 0){
         env.log("Battle finished."); //Cannot tell if win or loss.
         stats.battles++;
         env.update_stats();
@@ -453,7 +453,7 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, BotBaseCo
 
 
 //Check prize and notify if it matches filters after a tournament win
-void TournamentFarmer::check_prize(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
+void TournamentFarmer::check_prize(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     TournamentFarmer_Descriptor::Stats& stats = env.current_stats<TournamentFarmer_Descriptor::Stats>();
 
     VideoSnapshot screen = env.console.video().snapshot();
@@ -473,13 +473,13 @@ void TournamentFarmer::check_prize(SingleSwitchProgramEnvironment& env, BotBaseC
         OCR::BLUE_TEXT_FILTERS()
     );
     result.clear_beyond_log10p(LOG10P_THRESHOLD);
-    if (result.results.empty()) {
+    if (result.results.empty()){
         env.log("No matching prize name found in dialog box.");
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
     }
-    for (const auto& r : result.results) {
+    for (const auto& r : result.results){
         env.console.log("Found prize: " + r.second.token);
-        if (TARGET_ITEMS.find_item(r.second.token)) {
+        if (TARGET_ITEMS.find_item(r.second.token)){
             env.log("Prize matched");
 
             stats.matches++;
@@ -499,7 +499,7 @@ void TournamentFarmer::check_prize(SingleSwitchProgramEnvironment& env, BotBaseC
 
 
 //Tournament won and over
-void TournamentFarmer::handle_end_of_tournament(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
+void TournamentFarmer::handle_end_of_tournament(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     TournamentFarmer_Descriptor::Stats& stats = env.current_stats<TournamentFarmer_Descriptor::Stats>();
 
     //Space out the black screen detection after the "champion" battle
@@ -510,12 +510,12 @@ void TournamentFarmer::handle_end_of_tournament(SingleSwitchProgramEnvironment& 
     BlackScreenOverWatcher black_screen(COLOR_RED, { 0.2, 0.2, 0.6, 0.6 });
     int ret_black_won = run_until(
         env.console, context,
-        [](BotBaseContext& context) {
+        [](BotBaseContext& context){
             pbf_mash_button(context, BUTTON_B, 10000);
         },
         { black_screen }
         );
-    if (ret_black_won == 0) {
+    if (ret_black_won == 0){
         env.log("Tournament complete, waiting for academy.");
     }
     context.wait_for_all_requests();
@@ -523,7 +523,7 @@ void TournamentFarmer::handle_end_of_tournament(SingleSwitchProgramEnvironment& 
     //Wait for congrats dialog - wait an extra bit since the dialog appears while still loading in
     AdvanceDialogWatcher advance_detector(COLOR_YELLOW);
     int ret_dialog = wait_until(env.console, context, Milliseconds(1000), { advance_detector });
-    if (ret_dialog == 0) {
+    if (ret_dialog == 0){
         env.log("Dialog detected.");
     }
     pbf_wait(context, 300);
@@ -540,12 +540,12 @@ void TournamentFarmer::handle_end_of_tournament(SingleSwitchProgramEnvironment& 
     OverworldWatcher overworld(COLOR_CYAN);
     int ret_over = run_until(
         env.console, context,
-        [](BotBaseContext& context) {
+        [](BotBaseContext& context){
             pbf_mash_button(context, BUTTON_B, 700);
         },
         { overworld }
         );
-    if (ret_over != 0) {
+    if (ret_over != 0){
         env.console.log("Failed to detect overworld.", COLOR_RED);
     }
     context.wait_for_all_requests();
@@ -557,7 +557,7 @@ void TournamentFarmer::handle_end_of_tournament(SingleSwitchProgramEnvironment& 
 
 
 //Fly to academy from west pokemon center after losing.
-void return_to_academy_after_loss(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
+void return_to_academy_after_loss(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     env.log("Tournament lost! Navigating back to academy.");
     go_to_academy_fly_point(env, context);
 
@@ -578,20 +578,20 @@ void return_to_academy_after_loss(SingleSwitchProgramEnvironment& env, BotBaseCo
     BlackScreenOverWatcher black_screen(COLOR_RED, { 0.2, 0.2, 0.6, 0.6 });
     int ret_black_lost = run_until(
         env.console, context,
-        [](BotBaseContext& context) {
+        [](BotBaseContext& context){
             pbf_move_left_joystick(context, 128, 0, 5000, 0);
         },
         { black_screen }
         );
     context.wait_for_all_requests();
-    if (ret_black_lost == 0) {
+    if (ret_black_lost == 0){
         env.log("Black screen detected.");
     }
 
     //Wait for academy to load.
     OverworldWatcher overworld(COLOR_CYAN);
     int ret_academy = wait_until(env.console, context, Milliseconds(4000), { overworld });
-    if (ret_academy == 0) {
+    if (ret_academy == 0){
         env.log("Entered academy. Walking to tournament entry.");
     }
     context.wait_for_all_requests();
@@ -649,7 +649,7 @@ private:
 
 
 
-void TournamentFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
+void TournamentFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
     TournamentFarmer_Descriptor::Stats& stats = env.current_stats<TournamentFarmer_Descriptor::Stats>();
 
@@ -683,7 +683,7 @@ void TournamentFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseConte
         pbf_press_button(context, BUTTON_A, 10, 50);
         pbf_press_button(context, BUTTON_A, 10, 50);
         int ret = wait_until(env.console, context, Milliseconds(7000), { advance_detector });
-        if (ret == 0) {
+        if (ret == 0){
             env.log("Dialog detected.");
         }
         else {
@@ -695,12 +695,12 @@ void TournamentFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseConte
         NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
         int ret_battle = run_until(
             env.console, context,
-            [](BotBaseContext& context) {
+            [](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 10000); //it takes a while to load and start
             },
             { battle_menu }
         );
-        if (ret_battle != 0) {
+        if (ret_battle != 0){
             env.console.log("Failed to detect battle start!", COLOR_RED);
         }
         context.wait_for_all_requests();
@@ -711,14 +711,14 @@ void TournamentFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseConte
             OverworldWatcher overworld(COLOR_CYAN); //Previous battle was lost
             int ret_battle2 = run_until(
                 env.console, context,
-                [](BotBaseContext& context) {
+                [](BotBaseContext& context){
                     pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
                 },
                 { battle_menu2, overworld }
             );
             context.wait_for_all_requests();
 
-            switch (ret_battle2) {
+            switch (ret_battle2){
             case 0:
                 env.log("Detected battle menu.");
                 run_battle(env, context);

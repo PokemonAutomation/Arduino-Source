@@ -172,7 +172,7 @@ void TournamentFarmer2::program(SingleSwitchProgramEnvironment& env, BotBaseCont
             pbf_press_button(context, BUTTON_A, 10, 50);
             pbf_press_button(context, BUTTON_A, 10, 50);
             int ret = wait_until(env.console, context, Milliseconds(7000), { advance_detector });
-            if (ret == 0) {
+            if (ret == 0){
                 env.log("Dialog detected.");
             }
             else {
@@ -211,7 +211,7 @@ void TournamentFarmer2::program(SingleSwitchProgramEnvironment& env, BotBaseCont
             OverworldWatcher overworld(COLOR_CYAN);             //  Previous battle was lost
             int ret = run_until(
                 env.console, context,
-                [](BotBaseContext& context) {
+                [](BotBaseContext& context){
                     pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
                 },
                 {battle_menu, overworld}
@@ -256,7 +256,7 @@ void TournamentFarmer2::program(SingleSwitchProgramEnvironment& env, BotBaseCont
                 */
                 ret = run_until(
                     env.console, context,
-                    [](BotBaseContext& context) {
+                    [](BotBaseContext& context){
                         pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
                     },
                     {overworld} 
@@ -273,7 +273,7 @@ void TournamentFarmer2::program(SingleSwitchProgramEnvironment& env, BotBaseCont
                 FastTravelWatcher fast_travel(COLOR_YELLOW, env.console.overlay(), MINIMAP_AREA);
                 ret = run_until(
                     env.console, context,
-                    [](BotBaseContext& context) {
+                    [](BotBaseContext& context){
                         pbf_mash_button(context, BUTTON_B, 5 * TICKS_PER_SECOND);
                     },
                     {fast_travel}

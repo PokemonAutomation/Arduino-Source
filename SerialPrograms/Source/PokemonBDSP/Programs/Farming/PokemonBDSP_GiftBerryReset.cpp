@@ -155,7 +155,7 @@ void GiftBerryReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext
         for (const auto& r: result.results){
             env.console.log("Found potential berry name: " + r.second.token);
 
-            if (TARGET_BERRIES.find_berry(r.second.token)) {
+            if (TARGET_BERRIES.find_berry(r.second.token)){
                 found_berry = true;
                 break;
             }

@@ -22,7 +22,7 @@ ImageMatch::SilhouetteDictionaryMatcher make_TERA_RAID_SILHOUETTE_MATCHER(){
     for (const auto& item : ALL_POKEMON_SILHOUETTES()){
         if (item.first == "pm1084_00_00_00_big" ||
             item.first == "pm1091_00_00_00_big" ||
-            item.first == "error") {
+            item.first == "error"){
             continue;
         }
         ImageRGB32 filtered_image = to_blackwhite_rgb32_range(item.second.icon, 0xff000000, 0xff5f5f5f, true);

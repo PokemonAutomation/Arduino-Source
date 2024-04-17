@@ -125,7 +125,7 @@ private:
         : m_dispatcher(nullptr, 1)
         , m_queue(m_dispatcher)
     {}
-    ~SleepyDiscordSender() {
+    ~SleepyDiscordSender(){
 //        {
 //            std::lock_guard<std::mutex> lg(m_lock);
 //            m_stopping = true;
@@ -135,7 +135,7 @@ private:
     }
 
 public:
-    static SleepyDiscordSender& instance() {
+    static SleepyDiscordSender& instance(){
         static SleepyDiscordSender sender;
         return sender;
     }
@@ -167,15 +167,15 @@ public:
 
 private:
 #if 0
-    void thread_loop() {
-        while (true) {
+    void thread_loop(){
+        while (true){
             SleepyDiscordRequest item;
             {
                 std::unique_lock<std::mutex> lg(m_lock);
-                if (m_stopping) {
+                if (m_stopping){
                     break;
                 }
-                if (m_queue.empty()) {
+                if (m_queue.empty()){
                     m_cv.wait(lg);
                     continue;
                 }
@@ -184,7 +184,7 @@ private:
                 m_queue.pop_front();
             }
 
-            if (item.file != nullptr && !item.file->filepath().empty()) {
+            if (item.file != nullptr && !item.file->filepath().empty()){
                 std::string filepath = item.file->filepath();
                 sendMessage(&item.channels[0], &item.messages[0], &item.embed[0], &filepath[0]);
             }
@@ -233,8 +233,8 @@ public:
         std::chrono::milliseconds delay,
         std::string messages,
         std::shared_ptr<PendingFileSend> file
-    ) {
-        if (m_sleepy_client != nullptr) {
+    ){
+        if (m_sleepy_client != nullptr){
             if (file){
 //                cout << "Sending: " << file->filepath().toStdString() << endl;
                 m_active_list.emplace(file->filepath(), file);
@@ -245,15 +245,15 @@ public:
         }
     }
 
-    void callback(int response, const char* message) {
-        if (m_sleepy_client == nullptr) {
+    void callback(int response, const char* message){
+        if (m_sleepy_client == nullptr){
             return;
         }
 
         std::string msg = (std::string)message + " (Callback: " + (std::string)enum_str_callback[response] + ")";
         Color color = response == SleepyResponse::Disconnected || response == SleepyResponse::Fault ? COLOR_RED : COLOR_PURPLE;
 
-        switch (response) {
+        switch (response){
         case SleepyResponse::Connected: m_connected = true; break;
         case SleepyResponse::Disconnected: m_connected = false; break;
         case SleepyResponse::RemoveFile:{
@@ -285,8 +285,8 @@ public:
         sleepy_logger().log(msg, color);
     }
 
-    void cmd_callback(SleepyRequest request, char* channel, uint64_t id, uint16_t button, uint16_t hold_ticks, uint8_t x, uint8_t y) {
-        if (m_sleepy_client == nullptr) {
+    void cmd_callback(SleepyRequest request, char* channel, uint64_t id, uint16_t button, uint16_t hold_ticks, uint8_t x, uint8_t y){
+        if (m_sleepy_client == nullptr){
             return;
         }
 
@@ -295,7 +295,7 @@ public:
         std::string cmd = "Received command: " + (std::string)enum_str_command[request] + ".";
         sleepy_logger().log(cmd, COLOR_PURPLE);
 
-        switch (request) {
+        switch (request){
         case SleepyRequest::Click:
             run_Click(channel, id, hold_ticks, button);
             break;
@@ -343,7 +343,7 @@ public:
 private:
     void send_response(SleepyRequest request, char* channel, std::string message, std::shared_ptr<PendingFileSend> file = nullptr){
         std::string filename = file == nullptr ? "" : file->filepath();
-        if ((int)request <= 11) {
+        if ((int)request <= 11){
             program_response(request, channel, &message[0], &filename[0]);
         }else{
             send("", channel, std::chrono::milliseconds(0), &message[0], std::move(file));
@@ -353,7 +353,7 @@ private:
     void run_Click(char* channel, uint64_t id, uint16_t hold_ticks, uint16_t button){
         std::string message;
         auto it = str_buttons.find(button);
-        if (it == str_buttons.end()) {
+        if (it == str_buttons.end()){
             message = "Unrecognized button input";
         }else{
             message = Integration::press_button(id, button, hold_ticks);
@@ -366,7 +366,7 @@ private:
     void run_DPad(char* channel, uint64_t id, uint16_t hold_ticks, uint16_t button){
         std::string message;
         auto it = str_dpad.find(button);
-        if (it == str_dpad.end()) {
+        if (it == str_dpad.end()){
             message = "Unrecognized button input";
         }else{
             message = Integration::press_dpad(id, button, hold_ticks);
@@ -502,24 +502,24 @@ void sleepy_connect(){
     sleepy_logger().log("Finished Connecting...", COLOR_PURPLE);
 }
 
-void sleepy_terminate() {
+void sleepy_terminate(){
     std::lock_guard<std::mutex> lg(m_client_lock);
     program_response(SleepyRequest::Terminate);
-    if (m_sleepy_client != nullptr) {
+    if (m_sleepy_client != nullptr){
         m_sleepy_client.reset();
     }
 }
 
-void sleepy_response(int response, char* message) {
+void sleepy_response(int response, char* message){
     //std::lock_guard<std::mutex> lg(m_client_lock);
-    if (m_sleepy_client != nullptr) {
+    if (m_sleepy_client != nullptr){
         return m_sleepy_client->callback(response, message);
     }
 }
 
-void sleepy_cmd_response(int request, char* channel, uint64_t console_id, uint16_t button, uint16_t hold_ticks, uint8_t x, uint8_t y) {
+void sleepy_cmd_response(int request, char* channel, uint64_t console_id, uint16_t button, uint16_t hold_ticks, uint8_t x, uint8_t y){
     std::lock_guard<std::mutex> lg(m_client_lock);
-    if (m_sleepy_client != nullptr) {
+    if (m_sleepy_client != nullptr){
         return m_sleepy_client->cmd_callback((SleepyRequest)request, channel, console_id, button, hold_ticks, x, y);
     }
 }
@@ -571,11 +571,11 @@ void send_embed_sleepy(
 }
 
 
-bool initialize_sleepy_settings() {
+bool initialize_sleepy_settings(){
     //  Must be called inside lock.
 //    std::lock_guard<std::mutex> lg(m_client_lock);
     DiscordSettingsOption& settings = GlobalSettings::instance().DISCORD;
-    if (!check_if_empty(settings)) {
+    if (!check_if_empty(settings)){
         return false;
     }
 
@@ -605,23 +605,23 @@ bool initialize_sleepy_settings() {
     return true;
 }
 
-bool check_if_empty(const DiscordSettingsOption& settings) {
+bool check_if_empty(const DiscordSettingsOption& settings){
 
     if (!settings.integration.enabled()){
         return false;
     }
-    if (((std::string)settings.integration.token).empty()) {
+    if (((std::string)settings.integration.token).empty()){
         return false;
     }
-    else if (((std::string)settings.integration.token).find(",") != std::string::npos) {
+    else if (((std::string)settings.integration.token).find(",") != std::string::npos){
         sleepy_logger().log("\"Token\" must only contain one token. Stopping...", COLOR_RED);
         return false;
     }
-    else if (((std::string)settings.integration.owner).find(",") != std::string::npos) {
+    else if (((std::string)settings.integration.owner).find(",") != std::string::npos){
         sleepy_logger().log("\"Owner\" must only contain one Discord ID (yours). Stopping...", COLOR_RED);
         return false;
     }
-    else if (((std::string)settings.integration.command_prefix).empty()) {
+    else if (((std::string)settings.integration.command_prefix).empty()){
         sleepy_logger().log("Please enter a Discord command prefix. Stopping...", COLOR_RED);
         return false;
     }

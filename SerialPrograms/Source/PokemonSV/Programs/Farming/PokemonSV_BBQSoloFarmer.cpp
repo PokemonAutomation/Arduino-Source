@@ -69,7 +69,7 @@ BBQSoloFarmer::BBQSoloFarmer()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void BBQSoloFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
+void BBQSoloFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
     BBQSoloFarmer_Descriptor::Stats& stats = env.current_stats<BBQSoloFarmer_Descriptor::Stats>();
     
@@ -86,19 +86,19 @@ void BBQSoloFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
     /*
     BBQuests test_quest = BBQuests::catch_bug;
     bool questTest = process_and_do_quest(env, env.console, context, BBQ_OPTIONS, test_quest, eggs_hatched);
-    if (questTest) {
+    if (questTest){
         env.log("Finished quest.");
     }
     */
 
-    while (num_completed_quests < BBQ_OPTIONS.NUM_QUESTS) {
-        if (BBQ_OPTIONS.OUT_OF_EGGS == BBQOption::OOEggs::Stop && eggs_hatched >= BBQ_OPTIONS.NUM_EGGS) {
+    while (num_completed_quests < BBQ_OPTIONS.NUM_QUESTS){
+        if (BBQ_OPTIONS.OUT_OF_EGGS == BBQOption::OOEggs::Stop && eggs_hatched >= BBQ_OPTIONS.NUM_EGGS){
             env.log("Stop when out of eggs selected. Stopping program.");
             break;
         }
 
         //Get and reroll quests until we can at least one
-        while (quests_to_do.size() < 1) {
+        while (quests_to_do.size() < 1){
             quest_list = read_quests(env.program_info(), env.console, context, BBQ_OPTIONS);
             quests_to_do = process_quest_list(env.program_info(), env.console, context, BBQ_OPTIONS, quest_list, eggs_hatched);
 
@@ -106,13 +106,13 @@ void BBQSoloFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
             quest_list.clear();
         }
 
-        for (auto current_quest : quests_to_do) {
+        for (auto current_quest : quests_to_do){
             //Check if quest was already completed (ex. 500 meters completed while navigating to take a photo)
             quest_list = read_quests(env.program_info(), env.console, context, BBQ_OPTIONS);
-            if (std::find(quest_list.begin(), quest_list.end(), current_quest) != quest_list.end()) {
+            if (std::find(quest_list.begin(), quest_list.end(), current_quest) != quest_list.end()){
                 env.log("Current quest exists on list. Doing quest.");
                 bool questSuccess = process_and_do_quest(env, env.console, context, BBQ_OPTIONS, current_quest, eggs_hatched);
-                if (questSuccess) {
+                if (questSuccess){
                     env.log("Quest completed successfully.");
                     stats.questsCompleted++;
                     env.update_stats();
@@ -135,7 +135,7 @@ void BBQSoloFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         quests_to_do.clear();
 
         uint64_t temp_save_num_option = BBQ_OPTIONS.SAVE_NUM_QUESTS;
-        if (temp_save_num_option != 0 && num_completed_quests % temp_save_num_option == 0) {
+        if (temp_save_num_option != 0 && num_completed_quests % temp_save_num_option == 0){
             env.log("Saving and resetting.");
             save_game_from_overworld(env.program_info(), env.console, context);
             reset_game(env.program_info(), env.console, context);
@@ -147,7 +147,7 @@ void BBQSoloFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
     }
     env.update_stats();
 
-    if (BBQ_OPTIONS.FIX_TIME_WHEN_DONE) {
+    if (BBQ_OPTIONS.FIX_TIME_WHEN_DONE){
         pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
         home_to_date_time(context, false, false);
         pbf_press_button(context, BUTTON_A, 20, 105);

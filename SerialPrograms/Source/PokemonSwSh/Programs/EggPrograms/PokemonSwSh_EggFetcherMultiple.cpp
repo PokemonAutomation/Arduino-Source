@@ -65,7 +65,7 @@ void EggFetcherMultiple::run_eggfetcher(
     bool deposit_automatically,
     uint16_t attempts
 ) const {
-    if (attempts == 0) {
+    if (attempts == 0){
         return;
     }
 
@@ -78,13 +78,13 @@ void EggFetcherMultiple::run_eggfetcher(
         collect_egg_mash_out(context, deposit_automatically);
 
         c++;
-        if (c >= attempts) {
+        if (c >= attempts){
             return;
         }
     }
 
     //  Now we are in steady state.
-    for (; c < attempts; c++) {
+    for (; c < attempts; c++){
         logger.log("Fetch Attempts: " + tostr_u_commas(c));
         eggfetcher_loop(context);
         collect_egg(context);

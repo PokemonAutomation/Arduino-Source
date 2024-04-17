@@ -119,7 +119,7 @@ bool FlyingTrialFarmer::run_rewards(SingleSwitchProgramEnvironment& env, BotBase
 
         int ret_finish = run_until(
             env.console, context,
-            [](BotBaseContext& context) {
+            [](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 10000);
             },
             { dialog, overworld }
@@ -142,8 +142,8 @@ bool FlyingTrialFarmer::run_rewards(SingleSwitchProgramEnvironment& env, BotBase
     }
 }
 
-uint8_t FlyingTrialFarmer::get_final_y_axis(int8_t delta_y) {
-    if (INVERT_CONTROLS_WHILE_FLYING) {
+uint8_t FlyingTrialFarmer::get_final_y_axis(int8_t delta_y){
+    if (INVERT_CONTROLS_WHILE_FLYING){
         return 128 - delta_y;
     }
     else {
@@ -165,13 +165,13 @@ void FlyingTrialFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseCont
 
         int ret_entry = run_until(
             env.console, context,
-            [](BotBaseContext& context) {
+            [](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_A, 10000);
             },
             { black_screen }
         );
         context.wait_for_all_requests();
-        if (ret_entry == 0) {
+        if (ret_entry == 0){
             env.log("Black screen detected. Trial starting...");
         }
 
@@ -184,7 +184,7 @@ void FlyingTrialFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseCont
             {whitebutton}
         );
         context.wait_for_all_requests();
-        if (ret_trial_start == 0) {
+        if (ret_trial_start == 0){
             env.log("Countdown is over. Starting navigation sequence...");
 
             switch (FLIGHT_PATH){

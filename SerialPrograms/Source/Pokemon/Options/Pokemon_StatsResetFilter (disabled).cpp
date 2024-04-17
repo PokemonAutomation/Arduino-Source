@@ -82,7 +82,7 @@ StatsHuntAction StatsResetFilterTable::get_action(bool shiny, const IvJudgeReade
         if (!IvJudge_filter_match(filter.iv_spdef, IVs.spdef)) continue;
         if (!IvJudge_filter_match(filter.iv_speed, IVs.speed)) continue;
 
-        if (!NatureChecker_filter_match(filter.nature, nature.nature)) {
+        if (!NatureChecker_filter_match(filter.nature, nature.nature)){
             continue;
         }
 

@@ -75,7 +75,7 @@ int test_kernels_ImageScaleBrightness(const ImageViewRGB32& image){
 
 int test_kernels_BinaryMatrix(const ImageViewRGB32& image){
 
-    if (test_binary_matrix_tile() != 0) {
+    if (test_binary_matrix_tile() != 0){
         return 1;
     }
 

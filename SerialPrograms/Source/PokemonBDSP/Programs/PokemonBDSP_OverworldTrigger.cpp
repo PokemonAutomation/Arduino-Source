@@ -109,7 +109,7 @@ bool OverworldTrigger::find_encounter(ConsoleHandle& console, BotBaseContext& co
         result = run_until(
             console, context,
             [&](BotBaseContext& context){
-                while (true) {
+                while (true){
                     run_trigger(context);
                 }
             },

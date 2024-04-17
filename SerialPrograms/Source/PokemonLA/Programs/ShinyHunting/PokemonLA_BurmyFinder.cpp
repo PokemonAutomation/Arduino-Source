@@ -284,7 +284,7 @@ size_t BurmyFinder::grouped_path(SingleSwitchProgramEnvironment& env, BotBaseCon
     int ret = run_until(
         env.console, context,
         [&](BotBaseContext& context){
-            switch (path) {
+            switch (path){
             case 0:
                 //============ Tree 0=============//
                 env.console.log("Checking tree: 0");
@@ -516,7 +516,7 @@ size_t BurmyFinder::grouped_path(SingleSwitchProgramEnvironment& env, BotBaseCon
 void BurmyFinder::single_path(SingleSwitchProgramEnvironment& env, BotBaseContext& context, size_t path, size_t last_tree, TreeCounter& tree_counter){
     env.console.log("Last tree was: " + std::to_string(last_tree));
 
-    switch (path) {
+    switch (path){
     case 0:
         if (last_tree < 1){
             env.console.log("Heading to tree 1");
@@ -741,7 +741,7 @@ void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
         env.console, context,
         [&](BotBaseContext& context){
 
-            for (int path = 0; path < 4; path++) {
+            for (int path = 0; path < 4; path++){
                 size_t last_tree = grouped_path(env, context, path, tree_counter);
                 context.wait_for_all_requests();
                 single_path(env, context, path, last_tree, tree_counter);

@@ -89,8 +89,8 @@ SerialPortWidget::SerialPortWidget(
     connect(
         &m_session.botbase(), &BotBaseHandle::on_connecting,
         this, [this](const std::string& port_name){
-            for (size_t i = 0; i < m_ports.size(); i++) {
-                if (m_ports[i].systemLocation().toUtf8().data() == port_name) {
+            for (size_t i = 0; i < m_ports.size(); i++){
+                if (m_ports[i].systemLocation().toUtf8().data() == port_name){
                     m_serial_box->setCurrentIndex(static_cast<int>(i + 1));
                     break;
                 }

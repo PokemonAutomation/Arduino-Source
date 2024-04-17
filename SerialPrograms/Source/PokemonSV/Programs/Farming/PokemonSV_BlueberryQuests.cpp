@@ -49,7 +49,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
 
-const std::map<std::string, BBQuests>& BBQuests_TOKEN_TO_ENUM() {
+const std::map<std::string, BBQuests>& BBQuests_TOKEN_TO_ENUM(){
     static std::map<std::string, BBQuests> data{
         {"auto-10",             BBQuests::auto_10},
         {"make-tm",             BBQuests::make_tm },
@@ -139,7 +139,7 @@ BBQuests BBQuests_string_to_enum(const std::string& token){
     return iter->second;
 }
 
-int read_BP(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context) {
+int read_BP(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
     WhiteButtonWatcher right_panel(COLOR_BLUE, WhiteButton::ButtonB, {0.484, 0.117, 0.022, 0.037});
     int result = run_until(
         console, context,
@@ -170,7 +170,7 @@ int read_BP(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& con
     return OCR::read_number(console, BP_value);
 }
 
-std::vector<BBQuests> read_quests(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, const BBQOption& BBQ_OPTIONS) {
+std::vector<BBQuests> read_quests(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, const BBQOption& BBQ_OPTIONS){
     std::vector<BBQuests> quest_list;
 
     //Open quest list. Wait for it to open.
@@ -204,7 +204,7 @@ std::vector<BBQuests> read_quests(const ProgramInfo& info, ConsoleHandle& consol
     quest_list.push_back(BBQuests_string_to_enum(third_quest_detector.detect_quest(screen)));
     
     std::string fourth_quest = fourth_quest_detector.detect_quest(screen);
-    if (fourth_quest != "") {
+    if (fourth_quest != ""){
         quest_list.push_back(BBQuests_string_to_enum(fourth_quest));
     }
 
@@ -215,21 +215,21 @@ std::vector<BBQuests> read_quests(const ProgramInfo& info, ConsoleHandle& consol
     return quest_list;
 }
 
-std::vector<BBQuests> process_quest_list(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, const BBQOption& BBQ_OPTIONS, std::vector<BBQuests>& quest_list, uint8_t& eggs_hatched) {
+std::vector<BBQuests> process_quest_list(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, const BBQOption& BBQ_OPTIONS, std::vector<BBQuests>& quest_list, uint8_t& eggs_hatched){
     std::vector<BBQuests> quests_to_do;
 
     console.log("Processing quests.");
     //Put all do-able quests into a different list
-    for (auto n : quest_list) {
-        if (not_possible_quests.contains(n)) {
+    for (auto n : quest_list){
+        if (not_possible_quests.contains(n)){
             console.log("Quest not possible");
         }
         else {
             //Check eggs remaining.
-            if (n == BBQuests::hatch_egg && eggs_hatched >= BBQ_OPTIONS.NUM_EGGS) {
+            if (n == BBQuests::hatch_egg && eggs_hatched >= BBQ_OPTIONS.NUM_EGGS){
                 console.log("Out of eggs! Quest not possible.");
 
-                switch (BBQ_OPTIONS.OUT_OF_EGGS) {
+                switch (BBQ_OPTIONS.OUT_OF_EGGS){
                 case BBQOption::OOEggs::Reroll:
                 {
                     console.log("Reroll selected. Rerolling Egg quest. New quest will be run in the next batch of quests.");
@@ -239,7 +239,7 @@ std::vector<BBQuests> process_quest_list(const ProgramInfo& info, ConsoleHandle&
                     int result = run_until(
                         console, context,
                         [&](BotBaseContext& context){
-                            for (int i = 0; i < 6; i++) {
+                            for (int i = 0; i < 6; i++){
                                 pbf_press_dpad(context, DPAD_RIGHT, 50, 20);
                                 pbf_wait(context, 200);
                                 context.wait_for_all_requests();
@@ -288,13 +288,13 @@ std::vector<BBQuests> process_quest_list(const ProgramInfo& info, ConsoleHandle&
     
     //Check that quests_to_do is not empty (after completing all quests on the list, be sure to erase it.
     //Lag might be a problem in multi - look into making slots like menu-left navigation
-    if (quests_to_do.size() == 0) {
+    if (quests_to_do.size() == 0){
         console.log("No possible quests! Rerolling all quests.");
 
         //Open quest panel - see above
         //Reroll all.
         //This does not handle out of BP.
-        for (int i = 0; i < quest_list.size(); i++) {
+        for (int i = 0; i < quest_list.size(); i++){
             pbf_press_button(context, BUTTON_A, 20, 50);
             pbf_press_button(context, BUTTON_A, 20, 50); //Yes.
             pbf_wait(context, 100);
@@ -306,7 +306,7 @@ std::vector<BBQuests> process_quest_list(const ProgramInfo& info, ConsoleHandle&
         //Close quest panel - mash b
     }*/
 
-    if (quests_to_do.size() == 0) {
+    if (quests_to_do.size() == 0){
         throw OperationFailedException(
             ErrorReport::SEND_ERROR_REPORT, console,
             "No possible quests! Check language selection.",
@@ -317,12 +317,12 @@ std::vector<BBQuests> process_quest_list(const ProgramInfo& info, ConsoleHandle&
     return quests_to_do;
 }
 
-bool process_and_do_quest(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, BBQuests current_quest, uint8_t& eggs_hatched) {
+bool process_and_do_quest(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS, BBQuests current_quest, uint8_t& eggs_hatched){
     bool quest_completed = false;
     int quest_attempts = 0;
 
-    while (!quest_completed) {
-        switch (current_quest) {
+    while (!quest_completed){
+        switch (current_quest){
         case BBQuests::make_tm:
             quest_make_tm(env.program_info(), console, context);
             break;
@@ -380,13 +380,13 @@ bool process_and_do_quest(ProgramEnvironment& env, ConsoleHandle& console, BotBa
 
         //Validate quest was completed by checking list
         std::vector<BBQuests> quest_list = read_quests(env.program_info(), console, context, BBQ_OPTIONS);
-        if (std::find(quest_list.begin(), quest_list.end(), current_quest) != quest_list.end()) {
+        if (std::find(quest_list.begin(), quest_list.end(), current_quest) != quest_list.end()){
             console.log("Current quest exists on list. Quest did not complete.");
             quest_attempts++;
         }
         else {
             console.log("Current quest was not found. Quest completed!");
-            if (current_quest == BBQuests::hatch_egg) {
+            if (current_quest == BBQuests::hatch_egg){
                 eggs_hatched++;
                 console.log("Eggs hatched: " + std::to_string(eggs_hatched));
             }
@@ -394,7 +394,7 @@ bool process_and_do_quest(ProgramEnvironment& env, ConsoleHandle& console, BotBa
             quest_completed = true;
         }
 
-        if (quest_attempts > BBQ_OPTIONS.NUM_RETRIES) {
+        if (quest_attempts > BBQ_OPTIONS.NUM_RETRIES){
             console.log("Failed to complete a quest multiple times. Skipping it for now.", COLOR_RED);
             break;
         }
@@ -402,7 +402,7 @@ bool process_and_do_quest(ProgramEnvironment& env, ConsoleHandle& console, BotBa
     return quest_completed;
 }
 
-void quest_make_tm(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context) {
+void quest_make_tm(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
     console.log("Quest: Make TM");
 
     //Mount and then dismount in case you're crouched
@@ -420,7 +420,7 @@ void quest_make_tm(const ProgramInfo& info, ConsoleHandle& console, BotBaseConte
     int enter_machine = run_until(
         console, context,
         [&](BotBaseContext& context){
-            for (int i = 0; i < 10; i++) {
+            for (int i = 0; i < 10; i++){
                 pbf_press_button(context, BUTTON_A, 20, 50);
                 pbf_wait(context, 200);
                 context.wait_for_all_requests();
@@ -485,7 +485,7 @@ void quest_make_tm(const ProgramInfo& info, ConsoleHandle& console, BotBaseConte
     context.wait_for_all_requests();
 }
 
-void quest_travel_500(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context) {
+void quest_travel_500(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
     console.log("Quest: Travel 500 meters.");
 
     //Mount and then dismount in case you're crouched
@@ -511,13 +511,13 @@ void quest_travel_500(const ProgramInfo& info, ConsoleHandle& console, BotBaseCo
     context.wait_for_all_requests();
 }
 
-void quest_tera_self_defeat(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, const BBQOption& BBQ_OPTIONS) {
+void quest_tera_self_defeat(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, const BBQOption& BBQ_OPTIONS){
     EncounterWatcher encounter_watcher(console, COLOR_RED);
     console.log("Quest: Tera-self and defeat any wild.");
     //Navigate to target and start battle
     int ret = run_until(
         console, context,
-        [&](BotBaseContext& context) {
+        [&](BotBaseContext& context){
             central_to_canyon_plaza(info, console, context);
 
             pbf_move_left_joystick(context, 205, 64, 20, 105);
@@ -539,7 +539,7 @@ void quest_tera_self_defeat(const ProgramInfo& info, ConsoleHandle& console, Bot
                 std::chrono::seconds(15),
                 { battle_menu }
             );
-            if (ret2 != 0) {
+            if (ret2 != 0){
                 console.log("Did not enter battle. Did Kleavor spawn?");
             }
         },
@@ -550,12 +550,12 @@ void quest_tera_self_defeat(const ProgramInfo& info, ConsoleHandle& console, Bot
         );
     encounter_watcher.throw_if_no_sound();
 
-    if (ret >= 0) {
+    if (ret >= 0){
         console.log("Battle menu detected.");
     }
 
     bool is_shiny = (bool)encounter_watcher.shiny_screenshot();
-    if (is_shiny) {
+    if (is_shiny){
         console.log("Shiny detected!");
         pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
         throw ProgramFinishedException();
@@ -594,13 +594,13 @@ void quest_tera_self_defeat(const ProgramInfo& info, ConsoleHandle& console, Bot
     fly_to_overworld_from_map(info, console, context);
 }
 
-void quest_sneak_up(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, const BBQOption& BBQ_OPTIONS) {
+void quest_sneak_up(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, const BBQOption& BBQ_OPTIONS){
     EncounterWatcher encounter_watcher(console, COLOR_RED);
     console.log("Quest: Sneak up.");
     //Navigate to target and start battle
     int ret = run_until(
         console, context,
-        [&](BotBaseContext& context) {
+        [&](BotBaseContext& context){
             //Savanna Plaza - Pride Rock
             central_to_savanna_plaza(info, console, context);
 
@@ -630,7 +630,7 @@ void quest_sneak_up(const ProgramInfo& info, ConsoleHandle& console, BotBaseCont
                 std::chrono::seconds(15),
                 { battle_menu }
             );
-            if (ret2 != 0) {
+            if (ret2 != 0){
                 console.log("Did not enter battle. Did target spawn?");
             }
         },
@@ -641,11 +641,11 @@ void quest_sneak_up(const ProgramInfo& info, ConsoleHandle& console, BotBaseCont
         );
     encounter_watcher.throw_if_no_sound();
 
-    if (ret >= 0) {
+    if (ret >= 0){
         console.log("Battle menu detected.");
 
         bool is_shiny = (bool)encounter_watcher.shiny_screenshot();
-        if (is_shiny) {
+        if (is_shiny){
             console.log("Shiny detected!");
             pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
             throw ProgramFinishedException();
@@ -654,8 +654,8 @@ void quest_sneak_up(const ProgramInfo& info, ConsoleHandle& console, BotBaseCont
 
             int ret2 = run_until(
                 console, context,
-                [&](BotBaseContext& context) {
-                    while (true) {
+                [&](BotBaseContext& context){
+                    while (true){
                         //Flee immediately. Keep trying to flee.
                         NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
                         int ret2 = wait_until(
@@ -663,7 +663,7 @@ void quest_sneak_up(const ProgramInfo& info, ConsoleHandle& console, BotBaseCont
                             std::chrono::seconds(60),
                             { battle_menu }
                         );
-                        switch (ret2) {
+                        switch (ret2){
                         case 0:
                             battle_menu.move_to_slot(console, context, 3);
                             pbf_press_button(context, BUTTON_A, 10, 50);
@@ -681,7 +681,7 @@ void quest_sneak_up(const ProgramInfo& info, ConsoleHandle& console, BotBaseCont
                 { overworld }
                 );
 
-            switch (ret2) {
+            switch (ret2){
             case 0:
                 console.log("Overworld detected.");
                 break;
@@ -705,13 +705,13 @@ void quest_sneak_up(const ProgramInfo& info, ConsoleHandle& console, BotBaseCont
     context.wait_for_all_requests();
 }
 
-void quest_wild_tera(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, const BBQOption& BBQ_OPTIONS) {
+void quest_wild_tera(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, const BBQOption& BBQ_OPTIONS){
     EncounterWatcher encounter_watcher(console, COLOR_RED);
     console.log("Quest: Defeat a wild tera.");
     //Navigate to target and start battle
     int ret = run_until(
         console, context,
-        [&](BotBaseContext& context) {
+        [&](BotBaseContext& context){
             //Canyon Rest Area
             central_to_canyon_rest(info, console, context);
 
@@ -740,7 +740,7 @@ void quest_wild_tera(const ProgramInfo& info, ConsoleHandle& console, BotBaseCon
                 std::chrono::seconds(15),
                 { battle_menu }
             );
-            if (ret2 != 0) {
+            if (ret2 != 0){
                 console.log("Did not enter battle.");
             }
         },
@@ -751,12 +751,12 @@ void quest_wild_tera(const ProgramInfo& info, ConsoleHandle& console, BotBaseCon
         );
     encounter_watcher.throw_if_no_sound();
 
-    if (ret >= 0) {
+    if (ret >= 0){
         console.log("Battle menu detected.");
     }
 
     bool is_shiny = (bool)encounter_watcher.shiny_screenshot();
-    if (is_shiny) {
+    if (is_shiny){
         console.log("Shiny detected!");
         pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
         throw ProgramFinishedException();
@@ -794,7 +794,7 @@ void quest_wild_tera(const ProgramInfo& info, ConsoleHandle& console, BotBaseCon
     fly_to_overworld_from_map(info, console, context);
 }
 
-void quest_wash_pokemon(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context) {
+void quest_wash_pokemon(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
     console.log("Quest: Give your pokemon a bath!");
 
     //Fly to savanna plaza
@@ -811,9 +811,9 @@ void quest_wash_pokemon(const ProgramInfo& info, ConsoleHandle& console, BotBase
     WhiteButtonWatcher wash_exit_button(COLOR_BLUE, WhiteButton::ButtonB, {0.027, 0.923, 0.021, 0.033});
     WhiteButtonWatcher shower_switch(COLOR_BLUE, WhiteButton::ButtonY, {0.486, 0.870, 0.027, 0.045});
     bool rinsed_once = false;
-    while (!rinsed_once) {
+    while (!rinsed_once){
         context.wait_for_all_requests();
-        if (current_time() - start > std::chrono::minutes(3)) {
+        if (current_time() - start > std::chrono::minutes(3)){
             console.log("Failed to get to rinse after 3 minutes.", COLOR_RED);
             break;
         }
@@ -825,7 +825,7 @@ void quest_wash_pokemon(const ProgramInfo& info, ConsoleHandle& console, BotBase
                 wash_exit_button,
             }
         );
-        switch (ret) {
+        switch (ret){
         case 0:
             console.log("Wash button found!");
             pbf_mash_button(context, BUTTON_X, 150);
@@ -862,9 +862,9 @@ void quest_wash_pokemon(const ProgramInfo& info, ConsoleHandle& console, BotBase
     WallClock start2 = current_time();
     int ret3 = run_until(
         console, context,
-        [&](BotBaseContext& context) {
-            while (true) {
-                if (current_time() - start2 > std::chrono::minutes(1)) {
+        [&](BotBaseContext& context){
+            while (true){
+                if (current_time() - start2 > std::chrono::minutes(1)){
                     console.log("Failed to finish rinse after 1 minute.", COLOR_RED);
                     break;
                 }
@@ -883,7 +883,7 @@ void quest_wash_pokemon(const ProgramInfo& info, ConsoleHandle& console, BotBase
         },
         { {rinse_done} }
     );
-    if (ret3 == 0) {
+    if (ret3 == 0){
         console.log("Shower completed successfully.");
     }
     else {
@@ -897,11 +897,11 @@ void quest_wash_pokemon(const ProgramInfo& info, ConsoleHandle& console, BotBase
     context.wait_for_all_requests();
 }
 
-void quest_hatch_egg(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, const BBQOption& BBQ_OPTIONS) {
+void quest_hatch_egg(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, const BBQOption& BBQ_OPTIONS){
     console.log("Quest: Hatch an Egg");
 
     //Fix time before hatching
-    if (BBQ_OPTIONS.FIX_TIME_FOR_HATCH) {
+    if (BBQ_OPTIONS.FIX_TIME_FOR_HATCH){
         pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
         home_to_date_time(context, false, false);
         pbf_press_button(context, BUTTON_A, 20, 105);
@@ -942,12 +942,12 @@ void quest_hatch_egg(const ProgramInfo& info, ConsoleHandle& console, BotBaseCon
                 break;
             }
         }
-        if (egg_found) {
+        if (egg_found){
             break;
         }
     }
 
-    if (!egg_found) {
+    if (!egg_found){
         console.log("No egg found during egg hatching quest!", COLOR_RED);
     }
     else {
@@ -975,7 +975,7 @@ void quest_hatch_egg(const ProgramInfo& info, ConsoleHandle& console, BotBaseCon
     }
 }
 
-void quest_sandwich(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, const BBQOption& BBQ_OPTIONS, BBQuests current_quest) {
+void quest_sandwich(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, const BBQOption& BBQ_OPTIONS, BBQuests current_quest){
     console.log("Quest: Make a singleplayer sandwich");
 
     //Polar Plaza - egg basket gets stuck under table in Savanna/Canyon Plaza
@@ -993,7 +993,7 @@ void quest_sandwich(ProgramEnvironment& env, ConsoleHandle& console, BotBaseCont
     std::map<std::string, uint8_t> condiments;
 
     //Avoiding Encounter Power
-    switch (current_quest) {
+    switch (current_quest){
     case BBQuests::sour_sandwich:
         //Apple, Marmalade: Catch Flying 1, Item Drop Ice 1, Egg 1
         fillings = {{"apple", (uint8_t)1}};
@@ -1042,11 +1042,11 @@ void quest_sandwich(ProgramEnvironment& env, ConsoleHandle& console, BotBaseCont
 
 }
 
-void quest_tera_raid(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS) {
+void quest_tera_raid(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, BBQOption& BBQ_OPTIONS){
     console.log("Quest: Tera Raid");
 
     bool started_tera_raid = false;
-    while (!started_tera_raid) {
+    while (!started_tera_raid){
         EncounterWatcher encounter_watcher(console, COLOR_RED);
         int ret = run_until(
             console, context,
@@ -1062,7 +1062,7 @@ void quest_tera_raid(ProgramEnvironment& env, ConsoleHandle& console, BotBaseCon
                 pbf_press_button(context, BUTTON_L, 10, 50);
 
                 //Keep rolling until we get a raid
-                while (!open_raid(console, context)) {
+                while (!open_raid(console, context)){
                     env.log("No Tera raid found.", COLOR_ORANGE);
                     day_skip_from_overworld(console, context);
                 }
@@ -1075,11 +1075,11 @@ void quest_tera_raid(ProgramEnvironment& env, ConsoleHandle& console, BotBaseCon
         );
         encounter_watcher.throw_if_no_sound();
 
-        if (ret >= 0) {
+        if (ret >= 0){
             console.log("Battle menu detected.");
 
             bool is_shiny = (bool)encounter_watcher.shiny_screenshot();
-            if (is_shiny) {
+            if (is_shiny){
                 console.log("Shiny detected!");
                 pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
                 throw ProgramFinishedException();
@@ -1116,13 +1116,13 @@ void quest_tera_raid(ProgramEnvironment& env, ConsoleHandle& console, BotBaseCon
     pbf_mash_button(context, BUTTON_A, 250);
 
     bool win = run_tera_battle(env, console, context, BBQ_OPTIONS.BATTLE_AI);
-    if (win) {
+    if (win){
         env.log("Won tera raid.");
-        if (!BBQ_OPTIONS.CATCH_ON_WIN.enabled()) {
+        if (!BBQ_OPTIONS.CATCH_ON_WIN.enabled()){
             exit_tera_win_without_catching(env.program_info(), console, context, 0);
         }
         else {
-            if (BBQ_OPTIONS.CATCH_ON_WIN.FIX_TIME_ON_CATCH) {
+            if (BBQ_OPTIONS.CATCH_ON_WIN.FIX_TIME_ON_CATCH){
                 pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
                 home_to_date_time(context, false, false);
                 pbf_press_button(context, BUTTON_A, 20, 105);
@@ -1148,7 +1148,7 @@ void quest_tera_raid(ProgramEnvironment& env, ConsoleHandle& console, BotBaseCon
     day_skip_from_overworld(console, context);
 }
 
-void quest_auto_battle(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, const BBQOption& BBQ_OPTIONS, BBQuests current_quest) {
+void quest_auto_battle(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, const BBQOption& BBQ_OPTIONS, BBQuests current_quest){
     console.log("Quest: Auto Battle 10/30");
 
     LetsGoEncounterBotStats stats;
@@ -1156,11 +1156,11 @@ void quest_auto_battle(ProgramEnvironment& env, ConsoleHandle& console, BotBaseC
 
     uint64_t target_number = 10;
 
-    if (current_quest == BBQuests::auto_30) {
+    if (current_quest == BBQuests::auto_30){
         target_number = 30;
     }
 
-    while (stats.m_kills < target_number) {
+    while (stats.m_kills < target_number){
 
         central_to_chargestone(env.program_info(), console, context);
 
@@ -1174,7 +1174,7 @@ void quest_auto_battle(ProgramEnvironment& env, ConsoleHandle& console, BotBaseC
         pbf_move_left_joystick(context, 255, 128, 180, 50);
         pbf_press_button(context, BUTTON_L, 20, 50);
 
-        use_lets_go_to_clear_in_front(console, context, tracker, false, [&](BotBaseContext& context) {
+        use_lets_go_to_clear_in_front(console, context, tracker, false, [&](BotBaseContext& context){
             pbf_move_left_joystick(context, 128, 255, 180, 50);
             pbf_wait(context, 1500);
             context.wait_for_all_requests();
@@ -1191,12 +1191,12 @@ void quest_auto_battle(ProgramEnvironment& env, ConsoleHandle& console, BotBaseC
 
         int exit = run_until(
             console, context,
-            [&](BotBaseContext& context) {
+            [&](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 2000);
             },
             { { done_healing } }
             );
-        if (exit == 0) {
+        if (exit == 0){
             console.log("Overworld detected.");
         }
         open_map_from_overworld(env.program_info(), console, context);

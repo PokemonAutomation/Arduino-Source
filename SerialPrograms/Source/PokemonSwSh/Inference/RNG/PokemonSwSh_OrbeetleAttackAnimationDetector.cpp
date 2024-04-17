@@ -31,12 +31,12 @@ OrbeetleAttackAnimationDetector::Detection OrbeetleAttackAnimationDetector::run(
 {
     //  Grab baseline image.
     VideoSnapshot baseline_image = m_console.video().snapshot();
-    if (!baseline_image) {
+    if (!baseline_image){
         m_console.log("Orbeetle Attack Animation: Screenshot failed.", COLOR_PURPLE);
         return Detection::NO_DETECTION;
     }
 
-    if (save_screenshot) {
+    if (save_screenshot){
         //baseline_image->save("orbeetle-baseline-" + now_to_filestring() + ".png");
         dump_debug_image(m_console.logger(), "rng", "orbeetle-baseline", baseline_image);
     }
@@ -52,7 +52,7 @@ OrbeetleAttackAnimationDetector::Detection OrbeetleAttackAnimationDetector::run(
 
     //  Grab the animation image.
     VideoSnapshot animation_image = m_console.video().snapshot();
-    if (!animation_image) {
+    if (!animation_image){
         m_console.log("Orbeetle Attack Animation: Screenshot failed.", COLOR_PURPLE);
         return Detection::NO_DETECTION;
     }
@@ -60,7 +60,7 @@ OrbeetleAttackAnimationDetector::Detection OrbeetleAttackAnimationDetector::run(
     FloatPixel animation_values = image_average(extract_box_reference(animation_image, m_box));
     FloatPixel animation_ratios = animation_values / animation_values.sum();
 
-    if (log_values) {
+    if (log_values){
         m_console.log("Orbeetle baseline value red: " + std::to_string(baseline_values.r));
         m_console.log("Orbeetle attack value red: " + std::to_string(animation_values.r));
         m_console.log("Orbeetle baseline value green: " + std::to_string(baseline_values.g));
@@ -81,14 +81,14 @@ OrbeetleAttackAnimationDetector::Detection OrbeetleAttackAnimationDetector::run(
 //        && (animation_ratios.b <= 0.85 * baseline_ratios.b)
         )
     {
-        if (save_screenshot) {
+        if (save_screenshot){
             //animation_image->save("orbeetle-attack-special-" + now_to_filestring() + ".png");
             dump_debug_image(m_console.logger(), "rng", "orbeetle-special", animation_image);
         }
         m_console.log("Orbeetle Attack Animation: Special animation detected.");
         return Detection::SPECIAL;
     }
-    if (save_screenshot) {
+    if (save_screenshot){
         animation_image->save("orbeetle-attack-physical-" + now_to_filestring() + ".png");
         dump_debug_image(m_console.logger(), "rng", "orbeetle-physical", animation_image);
     }

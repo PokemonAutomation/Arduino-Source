@@ -35,7 +35,7 @@ public:
      */
     FastTravelMatcher() : WaterfillTemplateMatcher(
         "PokemonSV/Map/FastTravelIcon-Template.png", Color(200,200,200), Color(255, 255, 255), 50
-    ) {
+    ){
         m_aspect_ratio_lower = 0.8;
         m_aspect_ratio_upper = 1.2;
         m_area_ratio_lower = 0.9;
@@ -43,7 +43,7 @@ public:
 
     }
 
-    static const ImageMatch::WaterfillTemplateMatcher& instance() {
+    static const ImageMatch::WaterfillTemplateMatcher& instance(){
         static FastTravelMatcher matcher;
         return matcher;
     }

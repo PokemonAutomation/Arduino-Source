@@ -39,7 +39,7 @@ AuctionItemTable::AuctionItemTable(std::string label)
 bool AuctionItemTable::find_item(const std::string& item_slug) const{
     std::vector<std::unique_ptr<AuctionItemSelectorRow>> table = copy_snapshot();
     for (const std::unique_ptr<AuctionItemSelectorRow>& row : table){
-        if (row->item.slug() == item_slug) {
+        if (row->item.slug() == item_slug){
             return true;
         }
     }

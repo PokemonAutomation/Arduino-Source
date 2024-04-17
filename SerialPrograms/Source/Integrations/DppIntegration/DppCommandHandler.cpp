@@ -20,10 +20,10 @@ namespace DppCommandHandler{
 user Handler::owner;
 Color Handler::color = COLOR_WHITE;
 
-void Handler::initialize(cluster& bot, commandhandler& handler) {
+void Handler::initialize(cluster& bot, commandhandler& handler){
     global_logger_tagged().log("Initializing DPP...");
 
-    bot.on_log([this](const log_t& log) {
+    bot.on_log([this](const log_t& log){
         log_dpp(log.message, "Internal Log", log.severity);
     });
 
@@ -31,87 +31,87 @@ void Handler::initialize(cluster& bot, commandhandler& handler) {
     auto cmd_type = GlobalSettings::instance().DISCORD.integration.command_type.get();
     std::string prefix = GlobalSettings::instance().DISCORD.integration.command_prefix;
 
-    if (cmd_type == DiscordIntegrationSettingsOption::CommandType::MessageCommands && !prefix.empty()) {
+    if (cmd_type == DiscordIntegrationSettingsOption::CommandType::MessageCommands && !prefix.empty()){
         handler.add_prefix(prefix);
     } else {
         handler.add_prefix("/").add_prefix("_cmd ");
     }
 
-    bot.on_ready([&bot, &handler, this](const ready_t&) {
+    bot.on_ready([&bot, &handler, this](const ready_t&){
         log_dpp("Logged in as: " + bot.current_user_get_sync().format_username() + ".", "Ready", ll_info);
         Handler::create_unified_commands(handler);
     });
 
-    bot.on_guild_create([&bot, this](const guild_create_t& event) {
+    bot.on_guild_create([&bot, this](const guild_create_t& event){
         try {
             std::string id = std::to_string(event.created->id);
             log_dpp("Loaded guild: " + event.created->name + " (" + id + ").", "Guild Create", ll_info);
             std::lock_guard<std::mutex> lg(m_count_lock);
             Utility::get_user_counts(bot, event);
         }
-        catch (std::exception& e) {
+        catch (std::exception& e){
             log_dpp("Failed to get user counts: " + (std::string)e.what(), "Guild Create", ll_error);
         }
     });
 
-    bot.on_guild_member_add([this](const guild_member_add_t& event) {
+    bot.on_guild_member_add([this](const guild_member_add_t& event){
         std::string id = std::to_string(event.adding_guild->id);
-        if (!user_counts.empty() && user_counts.count(id)) {
+        if (!user_counts.empty() && user_counts.count(id)){
             log_dpp("New member joined " + event.adding_guild->name + ". Incrementing member count.", "Guild Member Add", ll_info);
             user_counts.at(id)++;
         }
     });
 
-    bot.on_guild_member_remove([this](const guild_member_remove_t& event) {
+    bot.on_guild_member_remove([this](const guild_member_remove_t& event){
         std::string id = std::to_string(event.removing_guild->id);
-        if (!user_counts.empty() && user_counts.count(id)) {
+        if (!user_counts.empty() && user_counts.count(id)){
             log_dpp("Member left " + event.removing_guild->name + ". Decrementing member count.", "Guild Member Remove", ll_info);
             user_counts.at(id)--;
         }
     });
 
-    bot.on_message_create([&handler](const message_create_t& event) {
+    bot.on_message_create([&handler](const message_create_t& event){
         std::string content = event.msg.content;
-        if (!event.msg.author.is_bot() && handler.string_has_prefix(content)) {
+        if (!event.msg.author.is_bot() && handler.string_has_prefix(content)){
             auto channels = GlobalSettings::instance().DISCORD.integration.channels.command_channels();
             auto channel = std::find(channels.begin(), channels.end(), std::to_string(event.msg.channel_id));
-            if (channel != channels.end()) {
+            if (channel != channels.end()){
                 handler.route(event);
             }
         }
     });
 
-    bot.on_slashcommand([&handler](const slashcommand_t& event) {
-        if (!event.command.usr.is_bot() && handler.slash_commands_enabled) {
+    bot.on_slashcommand([&handler](const slashcommand_t& event){
+        if (!event.command.usr.is_bot() && handler.slash_commands_enabled){
             auto channels = GlobalSettings::instance().DISCORD.integration.channels.command_channels();
             auto channel = std::find(channels.begin(), channels.end(), std::to_string(event.command.channel_id));
-            if (channel != channels.end()) {
+            if (channel != channels.end()){
                 handler.route(event);
             }
         }
     });
 }
 
-void Handler::send_message(cluster& bot, embed& embed, const std::string& channel, std::chrono::milliseconds delay, const std::string& msg, std::shared_ptr<PendingFileSend> file) {
+void Handler::send_message(cluster& bot, embed& embed, const std::string& channel, std::chrono::milliseconds delay, const std::string& msg, std::shared_ptr<PendingFileSend> file){
     Handler::m_queue.add_event(delay > std::chrono::milliseconds(10000) ? std::chrono::milliseconds(0) : delay,
     [&bot, this, embed = std::move(embed), channel = channel, msg = msg, file = std::move(file)]() mutable {
         message m;
-        if (file != nullptr && !file->filepath().empty() && !file->filename().empty()) {
+        if (file != nullptr && !file->filepath().empty() && !file->filename().empty()){
             std::string data;
             std::string path = file->filepath();
             try {
                 data = utility::read_file(path);
                 m.add_file(file->filename(), data);
-                if (path.find(".txt") == std::string::npos) {
+                if (path.find(".txt") == std::string::npos){
                     embed.set_image("attachment://" + file->filename());
                 }
             }
-            catch (dpp::exception e) {
+            catch (dpp::exception e){
                 log_dpp("Exception thrown while reading screenshot data: " + (std::string)e.what(), "send_message()", ll_error);
             }
         }
 
-        if (!msg.empty() && msg != "") {
+        if (!msg.empty() && msg != ""){
             m.content = msg;
         }
 
@@ -123,57 +123,57 @@ void Handler::send_message(cluster& bot, embed& embed, const std::string& channe
     log_dpp("Sending message...", "send_message()", ll_info);
 }
 
-void Handler::update_response(const dpp::command_source& src, dpp::embed& embed, const std::string& msg, std::shared_ptr<PendingFileSend> file) {
+void Handler::update_response(const dpp::command_source& src, dpp::embed& embed, const std::string& msg, std::shared_ptr<PendingFileSend> file){
     message m;
-    if (file != nullptr && !file->filepath().empty() && !file->filename().empty()) {
+    if (file != nullptr && !file->filepath().empty() && !file->filename().empty()){
         std::string data;
         try {
             data = utility::read_file(file->filepath());
             m.add_file(file->filename(), data);
             embed.set_image("attachment://" + file->filename());
         }
-        catch (dpp::exception e) {
+        catch (dpp::exception e){
             log_dpp("Exception thrown while reading screenshot data: " + (std::string)e.what(), "send_message()", ll_error);
         }
     }
 
-    if (!msg.empty() && msg != "") {
+    if (!msg.empty() && msg != ""){
         m.content = msg;
     }
 
     m.add_embed(embed);
-    if (src.interaction_event.has_value()) {
+    if (src.interaction_event.has_value()){
         src.interaction_event.value().edit_response(m);
     } else {
         src.message_event.value().reply(m);
     }
 }
 
-void Handler::log_dpp(const std::string& message, const std::string& identity, const dpp::loglevel& ll) {
+void Handler::log_dpp(const std::string& message, const std::string& identity, const dpp::loglevel& ll){
     Utility::log(message, identity, ll);
 }
 
-bool Handler::check_if_empty(const DiscordSettingsOption& settings) {
-    if (!settings.integration.enabled()) {
+bool Handler::check_if_empty(const DiscordSettingsOption& settings){
+    if (!settings.integration.enabled()){
         return false;
     }
-    if (((std::string)settings.integration.token).empty()) {
+    if (((std::string)settings.integration.token).empty()){
         log_dpp("\"Token\" must not be empty. Stopping...", "check_if_empty()", loglevel::ll_error);
         return false;
     }
-    else if (((std::string)settings.integration.token).find(",") != std::string::npos) {
+    else if (((std::string)settings.integration.token).find(",") != std::string::npos){
         log_dpp("\"Token\" must only contain one token. Stopping...", "check_if_empty()", loglevel::ll_error);
         return false;
     }
     return true;
 }
 
-void Handler::create_unified_commands(commandhandler& handler) {
+void Handler::create_unified_commands(commandhandler& handler){
     handler
     .add_command(
         "ping",
         {},
-        [&handler, this](const std::string& command, const parameter_list_t&, command_source src) {
+        [&handler, this](const std::string& command, const parameter_list_t&, command_source src){
             log_dpp("Executing " + command + "...", "Unified Command Handler", ll_info);
             handler.reply(message("Pong! :ping_pong:"), src);
         },
@@ -182,14 +182,14 @@ void Handler::create_unified_commands(commandhandler& handler) {
     .add_command(
         "about",
         {},
-        [&handler, this](const std::string& command, const parameter_list_t&, command_source src) {
+        [&handler, this](const std::string& command, const parameter_list_t&, command_source src){
             log_dpp("Executing " + command + "...", "Unified Command Handler", ll_info);
             embed embed;
             embed.set_color((uint32_t)color).set_title("Here's a little bit about me!");
 
             int counts = 0;
-            if (!Utility::user_counts.empty()) {
-                for (auto& count : Utility::user_counts) {
+            if (!Utility::user_counts.empty()){
+                for (auto& count : Utility::user_counts){
                     counts += count.second;
                 }
             }
@@ -209,11 +209,11 @@ void Handler::create_unified_commands(commandhandler& handler) {
     .add_command(
         "hi",
         {},
-        [&handler, this](const std::string& command, const parameter_list_t&, command_source src) {
+        [&handler, this](const std::string& command, const parameter_list_t&, command_source src){
             log_dpp("Executing " + command + "...", "Unified Command Handler", ll_info);
             message message;
             message.set_content((std::string)GlobalSettings::instance().DISCORD.integration.hello_message);
-            if (src.message_event.has_value()) {
+            if (src.message_event.has_value()){
                 message.set_reference(src.message_event.value().msg.id);
             }
             handler.reply(message, src);
@@ -225,9 +225,9 @@ void Handler::create_unified_commands(commandhandler& handler) {
         {
             {"id", param_info(pt_integer, false, "Console ID. Find yours by using the \"status\" command.")}
         },
-        [&handler, this](const std::string& command, const parameter_list_t& params, command_source src) {
+        [&handler, this](const std::string& command, const parameter_list_t& params, command_source src){
             log_dpp("Executing " + command + "...", "Unified Command Handler", ll_info);
-            if (!GlobalSettings::instance().DISCORD.integration.allow_buttons_from_users && src.issuer.id != owner.id) {
+            if (!GlobalSettings::instance().DISCORD.integration.allow_buttons_from_users && src.issuer.id != owner.id){
                 handler.reply(message("You do not have permission to use this command."), src);
                 return;
             }
@@ -238,7 +238,7 @@ void Handler::create_unified_commands(commandhandler& handler) {
 
             int64_t id = Utility::sanitize_integer_input(params, 0);
             std::string response = Integration::reset_serial(id);
-            if (!response.empty()) {
+            if (!response.empty()){
                 embed.set_description(response);
                 message.add_embed(embed);
                 handler.reply(message, src);
@@ -256,9 +256,9 @@ void Handler::create_unified_commands(commandhandler& handler) {
         {
             {"id", param_info(pt_integer, false, "Console ID. Find yours by using the \"status\" command.")}
         },
-        [&handler, this](const std::string& command, const parameter_list_t& params, command_source src) {
+        [&handler, this](const std::string& command, const parameter_list_t& params, command_source src){
             log_dpp("Executing " + command + "...", "Unified Command Handler", ll_info);
-            if (!GlobalSettings::instance().DISCORD.integration.allow_buttons_from_users && src.issuer.id != owner.id) {
+            if (!GlobalSettings::instance().DISCORD.integration.allow_buttons_from_users && src.issuer.id != owner.id){
                 handler.reply(message("You do not have permission to use this command."), src);
                 return;
             }
@@ -269,7 +269,7 @@ void Handler::create_unified_commands(commandhandler& handler) {
 
             int64_t id = Utility::sanitize_integer_input(params, 0);
             std::string response = Integration::reset_camera(id);
-            if (!response.empty()) {
+            if (!response.empty()){
                 embed.set_description(response);
                 message.add_embed(embed);
                 handler.reply(message, src);
@@ -287,9 +287,9 @@ void Handler::create_unified_commands(commandhandler& handler) {
         {
             {"id", param_info(pt_integer, false, "Console ID. Find yours by using the \"status\" command.")}
         },
-        [&handler, this](const std::string& command, const parameter_list_t& params, command_source src) {
+        [&handler, this](const std::string& command, const parameter_list_t& params, command_source src){
             log_dpp("Executing " + command + "...", "Unified Command Handler", ll_info);
-            if (!GlobalSettings::instance().DISCORD.integration.allow_buttons_from_users && src.issuer.id != owner.id) {
+            if (!GlobalSettings::instance().DISCORD.integration.allow_buttons_from_users && src.issuer.id != owner.id){
                 handler.reply(message("You do not have permission to use this command."), src);
                 return;
             }
@@ -300,7 +300,7 @@ void Handler::create_unified_commands(commandhandler& handler) {
 
             int64_t id = Utility::sanitize_integer_input(params, 0);
             std::string response = Integration::start_program(id);
-            if (!response.empty()) {
+            if (!response.empty()){
                 embed.set_description(response);
                 message.add_embed(embed);
                 handler.reply(message, src);
@@ -318,9 +318,9 @@ void Handler::create_unified_commands(commandhandler& handler) {
         {
             {"id", param_info(pt_integer, false, "Console ID. Find yours by using the \"status\" command.")}
         },
-        [&handler, this](const std::string& command, const parameter_list_t& params, command_source src) {
+        [&handler, this](const std::string& command, const parameter_list_t& params, command_source src){
             log_dpp("Executing " + command + "...", "Unified Command Handler", ll_info);
-            if (!GlobalSettings::instance().DISCORD.integration.allow_buttons_from_users && src.issuer.id != owner.id) {
+            if (!GlobalSettings::instance().DISCORD.integration.allow_buttons_from_users && src.issuer.id != owner.id){
                 handler.reply(message("You do not have permission to use this command."), src);
                 return;
             }
@@ -331,7 +331,7 @@ void Handler::create_unified_commands(commandhandler& handler) {
 
             int64_t id = Utility::sanitize_integer_input(params, 0);
             std::string response = Integration::stop_program(id);
-            if (!response.empty()) {
+            if (!response.empty()){
                 embed.set_description(response);
                 message.add_embed(embed);
                 handler.reply(message, src);
@@ -347,7 +347,7 @@ void Handler::create_unified_commands(commandhandler& handler) {
     .add_command(
         "status",
         {},
-        [&handler, this](const std::string& command, const parameter_list_t&, command_source src) {
+        [&handler, this](const std::string& command, const parameter_list_t&, command_source src){
             log_dpp("Executing " + command + "...", "Unified Command Handler", ll_info);
             message message;
             embed embed;
@@ -382,9 +382,9 @@ void Handler::create_unified_commands(commandhandler& handler) {
                 {"17", "DRIGHT"},}
             )}
         },
-        [&handler, this](const std::string& command, const parameter_list_t& params, command_source src) {
+        [&handler, this](const std::string& command, const parameter_list_t& params, command_source src){
             log_dpp("Executing " + command + "...", "Unified Command Handler", ll_info);
-            if (!GlobalSettings::instance().DISCORD.integration.allow_buttons_from_users && src.issuer.id != owner.id) {
+            if (!GlobalSettings::instance().DISCORD.integration.allow_buttons_from_users && src.issuer.id != owner.id){
                 handler.reply(message("You do not have permission to use this command."), src);
                 return;
             }
@@ -393,7 +393,7 @@ void Handler::create_unified_commands(commandhandler& handler) {
             embed embed;
             embed.set_color((uint32_t)color).set_title("Command Response");
 
-            if (params.size() < 2) {
+            if (params.size() < 2){
                 embed.set_description("Missing command arguments.");
                 message.add_embed(embed);
                 handler.reply(message, src);
@@ -406,7 +406,7 @@ void Handler::create_unified_commands(commandhandler& handler) {
             std::string name = "None";
             int64_t button = Utility::get_value_from_input(handler, command, button_input, name);
 
-            if (button < 0) {
+            if (button < 0){
                 embed.set_description("No such button found: " + button_input);
                 message.add_embed(embed);
                 handler.reply(message, src);
@@ -414,13 +414,13 @@ void Handler::create_unified_commands(commandhandler& handler) {
             }
 
             std::string response;
-            if (button > 13) {
+            if (button > 13){
                 response = Integration::press_dpad(id, Utility::get_button(button), 50);
             } else {
                 response = Integration::press_button(id, Utility::get_button(button), 50);
             }
 
-            if (!response.empty()) {
+            if (!response.empty()){
                 embed.set_description(response);
                 message.add_embed(embed);
                 handler.reply(message, src);
@@ -445,9 +445,9 @@ void Handler::create_unified_commands(commandhandler& handler) {
             {"magnitude_y", param_info(pt_integer, false, "Movement amount in the vertical direction. \"Down\" is 0, \"up\" is 255, \"neutral\" is 127.")},
             {"ticks", param_info(pt_integer, false, "How long to hold the stick for, in ticks.")},
         },
-        [&handler, this](const std::string& command, const parameter_list_t& params, command_source src) {
+        [&handler, this](const std::string& command, const parameter_list_t& params, command_source src){
             log_dpp("Executing " + command + "...", "Unified Command Handler", ll_info);
-            if (!GlobalSettings::instance().DISCORD.integration.allow_buttons_from_users && src.issuer.id != owner.id) {
+            if (!GlobalSettings::instance().DISCORD.integration.allow_buttons_from_users && src.issuer.id != owner.id){
                 handler.reply(message("You do not have permission to use this command."), src);
                 return;
             }
@@ -456,7 +456,7 @@ void Handler::create_unified_commands(commandhandler& handler) {
             embed embed;
             embed.set_color((uint32_t)color).set_title("Command Response");
 
-            if (params.size() < 5) {
+            if (params.size() < 5){
                 embed.set_description("Missing command arguments.");
                 message.add_embed(embed);
                 handler.reply(message, src);
@@ -468,7 +468,7 @@ void Handler::create_unified_commands(commandhandler& handler) {
             std::string stick_input = std::get<std::string>(params[1].second);
             int64_t stick = Utility::get_value_from_input(handler, command, stick_input, name);
 
-            if (stick < 0) {
+            if (stick < 0){
                 embed.set_description("No such joystick found: " + stick_input);
                 message.add_embed(embed);
                 handler.reply(message, src);
@@ -480,14 +480,14 @@ void Handler::create_unified_commands(commandhandler& handler) {
             int64_t ticks = Utility::sanitize_integer_input(params, 4);
 
             std::string response;
-            if (stick == 0) {
+            if (stick == 0){
                 response = Integration::press_left_joystick(id, x, y, ticks);
             }
             else {
                 response = Integration::press_right_joystick(id, x, y, ticks);
             }
 
-            if (!response.empty()) {
+            if (!response.empty()){
                 embed.set_description(response);
                 message.add_embed(embed);
                 handler.reply(message, src);
@@ -509,9 +509,9 @@ void Handler::create_unified_commands(commandhandler& handler) {
                 {"1", "jpg"},}
             )},
         },
-        [&handler, this](const std::string& command, const parameter_list_t& params, command_source src) {
+        [&handler, this](const std::string& command, const parameter_list_t& params, command_source src){
             log_dpp("Executing " + command + "...", "Unified Command Handler", ll_info);
-            if (!GlobalSettings::instance().DISCORD.integration.allow_buttons_from_users && src.issuer.id != owner.id) {
+            if (!GlobalSettings::instance().DISCORD.integration.allow_buttons_from_users && src.issuer.id != owner.id){
                 handler.reply(message("You do not have permission to use this command."), src);
                 return;
             }
@@ -520,7 +520,7 @@ void Handler::create_unified_commands(commandhandler& handler) {
             embed embed;
             embed.set_color((uint32_t)color).set_title("Program Screenshot");
 
-            if (params.size() < 2) {
+            if (params.size() < 2){
                 embed.set_description("Missing command arguments.");
                 message.add_embed(embed);
                 handler.reply(message, src);
@@ -534,14 +534,14 @@ void Handler::create_unified_commands(commandhandler& handler) {
             int64_t format = Utility::get_value_from_input(handler, command, button_input, name);
 
             std::string path;
-            if (format == 0) {
+            if (format == 0){
                 path = "screenshot_slash.png";
             } else {
                 path = "screenshot_slash.jpg";
             }
 
             std::string response = Integration::screenshot(id, path.c_str());
-            if (!response.empty()) {
+            if (!response.empty()){
                 embed.set_description(response);
                 Handler::update_response(src, embed, "", nullptr);
                 return;
@@ -559,14 +559,14 @@ void Handler::create_unified_commands(commandhandler& handler) {
     .add_command(
         "help",
         {},
-        [&handler, this](const std::string& command, const parameter_list_t&, command_source src) {
+        [&handler, this](const std::string& command, const parameter_list_t&, command_source src){
             log_dpp("Executing " + command + "...", "Unified Command Handler", ll_info);
             message message;
             embed embed;
             embed.set_color((uint32_t)color).set_title("Command List");
 
             auto& commands = handler.commands;
-            for (auto& cmd : commands) {
+            for (auto& cmd : commands){
                 std::string name = cmd.first;
                 log_dpp(name, "help command", ll_info);
                 if (!GlobalSettings::instance().DISCORD.integration.allow_buttons_from_users &&
@@ -576,11 +576,11 @@ void Handler::create_unified_commands(commandhandler& handler) {
                 }
 
                 std::string param_info;
-                for (auto& param : cmd.second.parameters) {
+                for (auto& param : cmd.second.parameters){
                     param_info += ("\n**- " + param.first + "** - " + param.second.description);
-                    if (!param.second.choices.empty()) {
+                    if (!param.second.choices.empty()){
                         param_info += " (";
-                        for (auto& choice : param.second.choices) {
+                        for (auto& choice : param.second.choices){
                             param_info += (choice.second + ", ");
                         }
                         param_info = param_info.substr(0, param_info.size() - 2);
@@ -600,14 +600,14 @@ void Handler::create_unified_commands(commandhandler& handler) {
     .add_command(
         "register",
         {},
-        [&handler, this](const std::string& command, const parameter_list_t&, command_source src) {
+        [&handler, this](const std::string& command, const parameter_list_t&, command_source src){
             log_dpp("Executing " + command + "...", "Unified Command Handler", ll_info);
-            if (src.issuer.id != owner.id) {
+            if (src.issuer.id != owner.id){
                 handler.reply(message("You do not have permission to use this command."), src);
                 return;
             }
 
-            if (handler.slash_commands_enabled) {
+            if (handler.slash_commands_enabled){
                 handler.thinking(src);
                 log_dpp("Registering commands.", "Command Registration", ll_info);
                 handler.register_commands();

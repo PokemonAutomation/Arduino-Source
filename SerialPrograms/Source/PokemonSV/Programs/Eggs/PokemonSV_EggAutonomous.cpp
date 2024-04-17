@@ -561,7 +561,7 @@ void EggAutonomous::process_one_baby(SingleSwitchProgramEnvironment& env, BotBas
             env.console.overlay().add_log("Keep pokemon " + std::to_string(m_num_kept) + "/" + std::to_string(MAX_KEEPERS), COLOR_YELLOW);
             send_keep_notification();
 
-            if (move_pokemon_to_keep(env, context, party_row) == false) {
+            if (move_pokemon_to_keep(env, context, party_row) == false){
                 env.log("No empty slot availble to place new pokemon.");
                 env.console.overlay().add_log("No box space", COLOR_RED);
                 throw ProgramFinishedException();

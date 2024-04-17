@@ -50,7 +50,7 @@ SandwichMaker::SandwichMaker()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void SandwichMaker::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
+void SandwichMaker::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
     make_sandwich_option(env, env.console, context, SANDWICH_OPTIONS);

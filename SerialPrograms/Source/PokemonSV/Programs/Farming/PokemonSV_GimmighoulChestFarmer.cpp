@@ -97,10 +97,10 @@ GimmighoulChestFarmer::GimmighoulChestFarmer()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void GimmighoulChestFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
+void GimmighoulChestFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
-    if (START_LOCATION == StartLocation::FlyPoint) {
+    if (START_LOCATION == StartLocation::FlyPoint){
         //Set starting position by flying - must fly to East Province (Area One) Watchtower, do not move from fly point
         open_map_from_overworld(env.program_info(), env.console, context);
         fly_to_overworld_from_map(env.program_info(), env.console, context);
@@ -130,7 +130,7 @@ void GimmighoulChestFarmer::program(SingleSwitchProgramEnvironment& env, BotBase
 
     GimmighoulChestFarmer_Descriptor::Stats& stats = env.current_stats<GimmighoulChestFarmer_Descriptor::Stats>();
     uint32_t c = 0;
-    while(c < PP) {
+    while(c < PP){
 
         //  Press A to enter battle, assuming there is a chest
         env.log("Fetch Attempts: " + tostr_u_commas(c));
@@ -144,7 +144,7 @@ void GimmighoulChestFarmer::program(SingleSwitchProgramEnvironment& env, BotBase
             { battle_menu }
         );
 
-        if (ret == 0) {
+        if (ret == 0){
             //  Attack using your first move
             pbf_mash_button(context, BUTTON_A, 90);
             c++;
@@ -155,7 +155,7 @@ void GimmighoulChestFarmer::program(SingleSwitchProgramEnvironment& env, BotBase
                 std::chrono::seconds(120),
                 { overworld }
             );
-            if (ret2 != 0) {
+            if (ret2 != 0){
                 stats.errors++;
                 env.update_stats();
                 throw OperationFailedException(
@@ -198,7 +198,7 @@ void GimmighoulChestFarmer::program(SingleSwitchProgramEnvironment& env, BotBase
                 std::chrono::seconds(1),
                 { battle_menu }
             );
-            if (ret == 0) {
+            if (ret == 0){
                 pbf_mash_button(context, BUTTON_A, 90);
                 c++;
                 context.wait_for_all_requests();
@@ -207,7 +207,7 @@ void GimmighoulChestFarmer::program(SingleSwitchProgramEnvironment& env, BotBase
                     std::chrono::seconds(120),
                     { overworld }
                 );
-                if (ret2 != 0) {
+                if (ret2 != 0){
                     stats.errors++;
                     env.update_stats();
                     throw OperationFailedException(
@@ -271,7 +271,7 @@ void GimmighoulChestFarmer::program(SingleSwitchProgramEnvironment& env, BotBase
         reset_game_from_home(env.program_info(), env.console, context, 5 * TICKS_PER_SECOND);
     }
 
-    if (FIX_TIME_WHEN_DONE) {
+    if (FIX_TIME_WHEN_DONE){
         pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
         home_to_date_time(context, false, false);
         pbf_press_button(context, BUTTON_A, 20, 105);

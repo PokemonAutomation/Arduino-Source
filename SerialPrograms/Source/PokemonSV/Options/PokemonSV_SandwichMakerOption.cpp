@@ -243,8 +243,8 @@ const std::map<SandwichRecipe, std::vector<std::string>>& PREMADE_SANDWICH_INGRE
 
 
 
-std::string SandwichMakerOption::herba_to_string(HerbaSelection value) {
-    switch (value) {
+std::string SandwichMakerOption::herba_to_string(HerbaSelection value){
+    switch (value){
     case HerbaSelection::bitter_herba_mystica:
         return "bitter-herba-mystica";
     case HerbaSelection::salty_herba_mystica:
@@ -259,19 +259,19 @@ std::string SandwichMakerOption::herba_to_string(HerbaSelection value) {
     return "ERROR";
 }
 
-std::vector<std::string> SandwichMakerOption::get_premade_ingredients(SandwichRecipe value) {
+std::vector<std::string> SandwichMakerOption::get_premade_ingredients(SandwichRecipe value){
     auto iter = PREMADE_SANDWICH_INGREDIENTS().find(value);
     return iter->second;
 }
 
-bool SandwichMakerOption::two_herba_required(BaseRecipe value) {
-    if (value == BaseRecipe::shiny || value == BaseRecipe::huge || value == BaseRecipe::tiny) {
+bool SandwichMakerOption::two_herba_required(BaseRecipe value){
+    if (value == BaseRecipe::shiny || value == BaseRecipe::huge || value == BaseRecipe::tiny){
         return true;
     }
     return false;
 }
 
-SandwichRecipe SandwichMakerOption::get_premade_sandwich_recipe(BaseRecipe base, PokemonType type, ParadoxRecipe paradox) {
+SandwichRecipe SandwichMakerOption::get_premade_sandwich_recipe(BaseRecipe base, PokemonType type, ParadoxRecipe paradox){
     if (base == BaseRecipe::paradox)
     {
         auto iter = PREMADE_SANDWICH_OTHER().find(paradox);
@@ -283,7 +283,7 @@ SandwichRecipe SandwichMakerOption::get_premade_sandwich_recipe(BaseRecipe base,
     }
 }
 
-SandwichMakerOption::~SandwichMakerOption() {
+SandwichMakerOption::~SandwichMakerOption(){
     HERBA_TWO.remove_listener(*this);
     HERBA_ONE.remove_listener(*this);
     TYPE.remove_listener(*this);

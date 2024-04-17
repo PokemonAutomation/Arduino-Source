@@ -57,12 +57,12 @@ GimmighoulRoamingFarmer::GimmighoulRoamingFarmer()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void GimmighoulRoamingFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
+void GimmighoulRoamingFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
     //  Start in game facing a roaming Gimmighoul somewhere safe. (ex. Pokemon Center since wild Pokemon can't fight you there.)
     uint8_t year = MAX_YEAR;
-    for (uint32_t c = 0; c < SKIPS; c++) {
+    for (uint32_t c = 0; c < SKIPS; c++){
         //  Grab coin assuming there is one
         env.log("Fetch Attempts: " + tostr_u_commas(c));
         pbf_mash_button(context, BUTTON_A, 90);
@@ -86,7 +86,7 @@ void GimmighoulRoamingFarmer::program(SingleSwitchProgramEnvironment& env, BotBa
         reset_game_from_home(env.program_info(), env.console, context, 5 * TICKS_PER_SECOND);
     }
 
-    if (FIX_TIME_WHEN_DONE) {
+    if (FIX_TIME_WHEN_DONE){
         pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
         home_to_date_time(context, false, false);
         pbf_press_button(context, BUTTON_A, 20, 105);

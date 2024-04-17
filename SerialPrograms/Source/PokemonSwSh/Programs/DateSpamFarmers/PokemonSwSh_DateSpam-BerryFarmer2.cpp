@@ -185,7 +185,7 @@ BerryFarmer2::Rustling BerryFarmer2::check_rustling(SingleSwitchProgramEnvironme
 
         int ret1 = run_until(
             env.console, context,
-            [&](BotBaseContext& context) {
+            [&](BotBaseContext& context){
                 pbf_wait(context, RUSTLING_TIMEOUT);
                 context.wait_for_all_requests();
             },
@@ -259,15 +259,15 @@ uint16_t BerryFarmer2::do_secondary_attempts(SingleSwitchProgramEnvironment& env
 
         current_rustling = check_rustling(env, context);
 
-        if (current_rustling == Rustling::No) {
+        if (current_rustling == Rustling::No){
             no_rustling++;
         }
     }
     /* Fast rustling, in Battle or too many times No rustling */
-    if (no_rustling >= 3) {
+    if (no_rustling >= 3){
         return attempts;
     }
-    if (current_rustling == Rustling::Fast) {
+    if (current_rustling == Rustling::Fast){
         // this is the last tree interaction for this time skip
         pbf_mash_button(context, BUTTON_ZL, SECONDARY_ATTEMPT_MASH_TIME);
         pbf_mash_button(context, BUTTON_B, 10);
@@ -275,7 +275,7 @@ uint16_t BerryFarmer2::do_secondary_attempts(SingleSwitchProgramEnvironment& env
         stats.shakes++;
         current_rustling = check_rustling(env, context);
     }
-    if (current_rustling == Rustling::Battle) {
+    if (current_rustling == Rustling::Battle){
         pbf_mash_button(context, BUTTON_B, TICKS_PER_SECOND);
         env.console.log("Clearing dialog boxes...");
 //        run_away(env.console, context, EXIT_BATTLE_TIMEOUT);

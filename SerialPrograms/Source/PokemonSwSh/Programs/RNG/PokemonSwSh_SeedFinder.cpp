@@ -91,18 +91,18 @@ SeedFinder::SeedFinder()
 
 
 
-void SeedFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
+void SeedFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     Xoroshiro128PlusState state(0, 0);
     // sanitize STATE_0 and STATE_1 and make ints
-    if (UPDATE_STATE) {
+    if (UPDATE_STATE){
         try {
             state.s0 = std::stoull(STATE_0, nullptr, 16);
             state.s1 = std::stoull(STATE_1, nullptr, 16);
         }
-        catch (std::invalid_argument&) {
+        catch (std::invalid_argument&){
             throw UserSetupError(env.console, "State is invalid.");
         }
-        catch (std::out_of_range&) {
+        catch (std::out_of_range&){
             throw UserSetupError(env.console, "State is invalid. Are there any extra characters?");
         }
 
@@ -114,7 +114,7 @@ void SeedFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
     }
 
 
-    if (START_LOCATION.start_in_grip_menu()) {
+    if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
         resume_game_back_out(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);
     }
@@ -123,7 +123,7 @@ void SeedFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
     }
 
 
-    if (UPDATE_STATE) {
+    if (UPDATE_STATE){
         state = refind_rng_state(env.console, context, state, MIN_ADVANCES, MAX_ADVANCES, SAVE_SCREENSHOTS, LOG_VALUES);
     }
     else {

@@ -68,7 +68,7 @@ bool BlackOutDetector::process_frame(const ImageViewRGB32& frame, WallClock time
 
     // check whether it is the black out screen
     const bool is_screen_black = is_black(extract_box_reference(frame, m_black_screen), 100, 10);
-    if (is_screen_black && m_yellow_arrow_detector.process_frame(frame, timestamp)) {
+    if (is_screen_black && m_yellow_arrow_detector.process_frame(frame, timestamp)){
         // We have both a mostly black screen and a yellow arrow:
         save_image();
         return true;

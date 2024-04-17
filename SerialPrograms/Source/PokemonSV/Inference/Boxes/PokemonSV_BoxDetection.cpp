@@ -337,7 +337,8 @@ void BoxDetector::move_cursor(
 }
 
 BoxEmptySlotDetector::BoxEmptySlotDetector(BoxCursorLocation side, uint8_t row, uint8_t col, Color color)
-: m_color(color) {
+    : m_color(color)
+{
     if (side == BoxCursorLocation::PARTY){
         m_box = ImageFloatBox(0.142, 0.1165 * row + 0.201, 0.048, 0.082);
     } else if (side == BoxCursorLocation::SLOTS){
@@ -358,7 +359,7 @@ bool BoxEmptySlotDetector::detect(const ImageViewRGB32& frame) const{
 
 
 
-BoxEmptyPartyWatcher::BoxEmptyPartyWatcher(Color color) : VisualInferenceCallback("BoxEmptyPartyWatcher"), m_empty_watchers(5) {
+BoxEmptyPartyWatcher::BoxEmptyPartyWatcher(Color color) : VisualInferenceCallback("BoxEmptyPartyWatcher"), m_empty_watchers(5){
     for(uint8_t i = 0; i < 5; i++){
         m_empty_watchers.emplace_back(
             BoxCursorLocation::PARTY,

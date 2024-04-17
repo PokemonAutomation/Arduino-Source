@@ -41,11 +41,11 @@ uint64_t Xoroshiro128Plus::next()
     return result;
 }
 
-Xoroshiro128PlusState Xoroshiro128Plus::get_state() {
+Xoroshiro128PlusState Xoroshiro128Plus::get_state(){
     return state;
 }
 
-uint64_t nextPowerOfTwo(uint64_t number) {
+uint64_t nextPowerOfTwo(uint64_t number){
     uint64_t x = number;
     x--;
     x |= x >> 1;
@@ -58,20 +58,20 @@ uint64_t nextPowerOfTwo(uint64_t number) {
     return x;
 }
 
-uint64_t Xoroshiro128Plus::nextInt(uint64_t bound) {
+uint64_t Xoroshiro128Plus::nextInt(uint64_t bound){
     uint64_t power = nextPowerOfTwo(bound);
     uint64_t result = next() & (power - 1);
-    while (result >= bound) {
+    while (result >= bound){
         result = next() & (power - 1);
     }
     return result;
 }
 
-std::vector<bool> Xoroshiro128Plus::generate_last_bit_sequence(size_t max_advances) {
+std::vector<bool> Xoroshiro128Plus::generate_last_bit_sequence(size_t max_advances){
     std::vector<bool> sequence(max_advances);
     Xoroshiro128Plus temp_rng(Xoroshiro128PlusState(state.s0, state.s1));
 
-    for (size_t i = 0; i < max_advances; i++) {
+    for (size_t i = 0; i < max_advances; i++){
         sequence.at(i) = (temp_rng.next() & 1) == 1;
     };
 
@@ -217,7 +217,7 @@ Xoroshiro128Plus Xoroshiro128Plus::xoroshiro128plus_from_last_bits(std::pair<uin
     uint64_t s0 = 0;
     uint64_t s1 = 0;
 
-    for (size_t i = 0; i < 64; i++) {
+    for (size_t i = 0; i < 64; i++){
         uint64_t first_half = last_bits_reverse_matrix[i][0] & last_bits.first;
         uint64_t second_half = last_bits_reverse_matrix[i][1] & last_bits.second;
 
@@ -232,7 +232,7 @@ Xoroshiro128Plus Xoroshiro128Plus::xoroshiro128plus_from_last_bits(std::pair<uin
 
         s0 += x << (63 - i);
     }
-    for (size_t i = 0; i < 64; i++) {
+    for (size_t i = 0; i < 64; i++){
         uint64_t first_half = last_bits_reverse_matrix[i + 64][0] & last_bits.first;
         uint64_t second_half = last_bits_reverse_matrix[i + 64][1] & last_bits.second;
 

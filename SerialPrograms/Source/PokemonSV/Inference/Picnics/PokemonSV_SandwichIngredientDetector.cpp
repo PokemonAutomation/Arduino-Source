@@ -30,14 +30,14 @@ class SandwichCondimentsPageMatcher : public ImageMatch::WaterfillTemplateMatche
 public:
     SandwichCondimentsPageMatcher() : WaterfillTemplateMatcher(
         "PokemonSV/Picnic/Condiments-Template.png", Color(100,100,100), Color(255, 255, 255), 50
-    ) {
+    ){
         m_aspect_ratio_lower = 0.9;
         m_aspect_ratio_upper = 1.1;
         m_area_ratio_lower = 0.9;
         m_area_ratio_upper = 1.1;
     }
 
-    static const ImageMatch::WaterfillTemplateMatcher& instance() {
+    static const ImageMatch::WaterfillTemplateMatcher& instance(){
         static SandwichCondimentsPageMatcher matcher;
         return matcher;
     }
@@ -47,14 +47,14 @@ class SandwichPicksPageMatcher : public ImageMatch::WaterfillTemplateMatcher{
 public:
     SandwichPicksPageMatcher() : WaterfillTemplateMatcher(
         "PokemonSV/Picnic/Picks-Template.png", Color(100,100,100), Color(255, 255, 255), 50
-    ) {
+    ){
         m_aspect_ratio_lower = 0.8;
         m_aspect_ratio_upper = 1.2;
         m_area_ratio_lower = 0.8;
         m_area_ratio_upper = 1.2;
     }
 
-    static const ImageMatch::WaterfillTemplateMatcher& instance() {
+    static const ImageMatch::WaterfillTemplateMatcher& instance(){
         static SandwichPicksPageMatcher matcher;
         return matcher;
     }

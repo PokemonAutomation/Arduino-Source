@@ -61,7 +61,7 @@ int test_pokemonLA_BattleMenuDetector(const ImageViewRGB32& image, bool target){
     return 0;
 }
 
-int test_pokemonLA_BattlePokemonSwitchDetector(const ImageViewRGB32& image, bool target) {
+int test_pokemonLA_BattlePokemonSwitchDetector(const ImageViewRGB32& image, bool target){
     auto& logger = global_logger_command_line();
     auto overlay = DummyVideoOverlay();
     const bool stop_on_detected = true;
@@ -199,7 +199,7 @@ int test_pokemonLA_MMOQuestionMarkDetector(const ImageViewRGB32& image, const st
         for(size_t i = 0; i < 5; i++){
             const bool result = region_has_MMO[i];
             const bool target = target_hisui_region_has_MMO[i];
-            if (result != target) {
+            if (result != target){
                 cerr << "Error: " << __func__ << " result on region " << i << " is " << result << " but should be " << target << "." << endl;
                 return 1;
             }
@@ -569,10 +569,10 @@ int test_pokemonLA_MMOSpriteMatcher(const std::string& filepath){
 
     std::vector<ImagePixelBox> quest_results = detector.detect_MMOs_on_region_map(question_mark_image);
     std::sort(quest_results.begin(), quest_results.end(), [](const ImagePixelBox& a, const ImagePixelBox& b) -> bool {
-        if (a.center_y() < b.center_y()) {
+        if (a.center_y() < b.center_y()){
             return true;
         }
-        if (a.center_y() > b.center_y()) {
+        if (a.center_y() > b.center_y()){
             return false;
         }
         return a.center_x() < b.center_x();

@@ -98,14 +98,14 @@ AuctionFarmer::AuctionFarmer()
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(TARGET_ITEMS);
     PA_ADD_OPTION(NOTIFICATIONS);
-    if (PreloadSettings::instance().DEVELOPER_MODE) {
+    if (PreloadSettings::instance().DEVELOPER_MODE){
         PA_ADD_STATIC(m_advanced_options);
         PA_ADD_OPTION(ONE_NPC);
     }
 }
 
 
-std::vector<ImageFloatBox> AuctionFarmer::detect_dialog_boxes(const ImageViewRGB32& screen) {
+std::vector<ImageFloatBox> AuctionFarmer::detect_dialog_boxes(const ImageViewRGB32& screen){
     using namespace Kernels::Waterfill;
 
     uint32_t MIN_BORDER_THRESHOLD = 0xffc07000;
@@ -125,7 +125,7 @@ std::vector<ImageFloatBox> AuctionFarmer::detect_dialog_boxes(const ImageViewRGB
         std::unique_ptr<WaterfillSession> session = make_WaterfillSession(border_matrix);
         auto iter = session->make_iterator(50);
         WaterfillObject object;
-        while (iter->find_next(object, true)) {
+        while (iter->find_next(object, true)){
             //  Discard objects touching the edge of the screen or bottom right corner where the map is located or if the object is too small
             if (object.min_x == 0 || object.min_y == 0 // touching left or top edge
                 || object.max_x + 1 >= width || object.max_y + 1 >= height // touching right or bottom edge
@@ -145,9 +145,9 @@ std::vector<ImageFloatBox> AuctionFarmer::detect_dialog_boxes(const ImageViewRGB
             std::unique_ptr<WaterfillSession> yellow_session = make_WaterfillSession(yellow_matrix);
             auto yellow_iter = yellow_session->make_iterator(300);
             WaterfillObject yellow_object;
-            while (yellow_iter->find_next(yellow_object, true)) {
+            while (yellow_iter->find_next(yellow_object, true)){
                 //  Discard small objects
-                if (object.width() < width * 0.0925 || object.height() < height * 0.0925) {
+                if (object.width() < width * 0.0925 || object.height() < height * 0.0925){
                     continue;
                 }
                 ImagePixelBox dialog_pixel_box(yellow_object);
@@ -186,7 +186,7 @@ void AuctionFarmer::reset_auctions(SingleSwitchProgramEnvironment& env, BotBaseC
     }
 }
 
-std::vector<std::pair<AuctionOffer, ImageFloatBox>> AuctionFarmer::check_offers(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
+std::vector<std::pair<AuctionOffer, ImageFloatBox>> AuctionFarmer::check_offers(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AuctionFarmer_Descriptor::Stats& stats = env.current_stats<AuctionFarmer_Descriptor::Stats>();
 
     pbf_wait(context, 2 * TICKS_PER_SECOND);
@@ -196,7 +196,7 @@ std::vector<std::pair<AuctionOffer, ImageFloatBox>> AuctionFarmer::check_offers(
     std::vector<ImageFloatBox> dialog_boxes = detect_dialog_boxes(screen);
     std::vector<std::pair<AuctionOffer, ImageFloatBox>> offers;
 
-    if (dialog_boxes.empty()) {
+    if (dialog_boxes.empty()){
         stats.m_errors++;
         send_program_recoverable_error_notification(env, NOTIFICATION_ERROR_RECOVERABLE, "Could not detect any offer dialogs.", screen);
     }
@@ -222,9 +222,9 @@ std::vector<std::pair<AuctionOffer, ImageFloatBox>> AuctionFarmer::check_offers(
         );
 
         result.clear_beyond_log10p(LOG10P_THRESHOLD);
-        if (best_item.empty() && !result.results.empty()) {
+        if (best_item.empty() && !result.results.empty()){
             auto iter = result.results.begin();
-            if (iter->first < LOG10P_THRESHOLD) {
+            if (iter->first < LOG10P_THRESHOLD){
                 best_item = iter->second.token;
 
                 AuctionOffer offer{ best_item };
@@ -236,10 +236,10 @@ std::vector<std::pair<AuctionOffer, ImageFloatBox>> AuctionFarmer::check_offers(
     return offers;
 }
 
-bool AuctionFarmer::is_good_offer(AuctionOffer offer) {
+bool AuctionFarmer::is_good_offer(AuctionOffer offer){
     // Special handling for Japanese bottle cap items
     bool any_bottle_cap = false;
-    if (LANGUAGE == Language::Japanese) {
+    if (LANGUAGE == Language::Japanese){
         any_bottle_cap = (offer.item == "bottle-cap" || offer.item == "gold-bottle-cap") 
             && (TARGET_ITEMS.find_item("bottle-cap") || TARGET_ITEMS.find_item("gold-bottle-cap"));
     }
@@ -248,12 +248,12 @@ bool AuctionFarmer::is_good_offer(AuctionOffer offer) {
 }
 
 // Move to auctioneer and interact
-void AuctionFarmer::move_to_auctioneer(SingleSwitchProgramEnvironment& env, BotBaseContext& context, AuctionOffer offer) {
+void AuctionFarmer::move_to_auctioneer(SingleSwitchProgramEnvironment& env, BotBaseContext& context, AuctionOffer offer){
     AdvanceDialogWatcher advance_detector(COLOR_YELLOW);
 
     size_t tries = 0;
-    while (tries < 10) {
-        if (!ONE_NPC) {
+    while (tries < 10){
+        if (!ONE_NPC){
             move_dialog_to_center(env, context, offer);
             pbf_move_left_joystick(context, 128, 0, 60, 10);
         }
@@ -261,7 +261,7 @@ void AuctionFarmer::move_to_auctioneer(SingleSwitchProgramEnvironment& env, BotB
         pbf_press_button(context, BUTTON_A, 20, 100);
         int ret = wait_until(env.console, context, Milliseconds(4000), { advance_detector });
 
-        if (ret == 0) {
+        if (ret == 0){
             return;
         }
         tries++;
@@ -275,17 +275,17 @@ void AuctionFarmer::move_to_auctioneer(SingleSwitchProgramEnvironment& env, BotB
 
 // Dialog is the only piece of orientation we have, so the goal is to put it into the center of the screen so we know in which direction the character walks.
 // This is only used for multiple NPCs.
-void AuctionFarmer::move_dialog_to_center(SingleSwitchProgramEnvironment& env, BotBaseContext& context, AuctionOffer wanted) {
+void AuctionFarmer::move_dialog_to_center(SingleSwitchProgramEnvironment& env, BotBaseContext& context, AuctionOffer wanted){
     float center_x = 0.0f;
     float center_y = 0.0f;
     bool offer_visible = false;
 
-    while (center_x < 0.43 || center_x > 0.57) {
+    while (center_x < 0.43 || center_x > 0.57){
         context.wait_for_all_requests();
         std::vector<std::pair<AuctionOffer, ImageFloatBox>> offers = check_offers(env, context);
 
-        for (std::pair<AuctionOffer, ImageFloatBox> offer : offers) {
-            if (offer.first.item != wanted.item) {
+        for (std::pair<AuctionOffer, ImageFloatBox> offer : offers){
+            if (offer.first.item != wanted.item){
                 continue;
             }
             offer_visible = true;
@@ -295,7 +295,7 @@ void AuctionFarmer::move_dialog_to_center(SingleSwitchProgramEnvironment& env, B
 
 
             // check whether the stop condition is fullfilled by now.
-            if (!(center_x < 0.43 || center_x > 0.57)) {
+            if (!(center_x < 0.43 || center_x > 0.57)){
                 break;
             }
 
@@ -309,7 +309,7 @@ void AuctionFarmer::move_dialog_to_center(SingleSwitchProgramEnvironment& env, B
             break;
         }
 
-        if (!offer_visible) {
+        if (!offer_visible){
             throw OperationFailedException(
                 ErrorReport::SEND_ERROR_REPORT, env.console,
                 "Lost offer dialog for wanted item.",
@@ -319,8 +319,8 @@ void AuctionFarmer::move_dialog_to_center(SingleSwitchProgramEnvironment& env, B
     }
 }
 
-void AuctionFarmer::reset_position(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
-    if (ONE_NPC) {
+void AuctionFarmer::reset_position(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    if (ONE_NPC){
         // No movement, player character should always be directly in front of an auctioneer.
         return;
     }
@@ -331,7 +331,7 @@ void AuctionFarmer::reset_position(SingleSwitchProgramEnvironment& env, BotBaseC
 }
 
 
-uint64_t read_next_bid(ConsoleHandle& console, BotBaseContext& context, bool high) {
+uint64_t read_next_bid(ConsoleHandle& console, BotBaseContext& context, bool high){
     float box_y = high ? 0.42f : 0.493f;
     OverlayBoxScope box(console, { 0.73, box_y, 0.17, 0.048 });
     std::unordered_map<uint64_t, size_t> read_bids;
@@ -339,16 +339,16 @@ uint64_t read_next_bid(ConsoleHandle& console, BotBaseContext& context, bool hig
     uint64_t read_value = 0;
 
     // read next bid multiple times since the selection arrow sometimes blocks the first digit
-    for (size_t i = 0; i < 10; i++) {
+    for (size_t i = 0; i < 10; i++){
         VideoSnapshot screen = console.video().snapshot();
         uint64_t read_bid = OCR::read_number(console.logger(), extract_box_reference(screen, box));
 
-        if (read_bids.find(read_bid) == read_bids.end()) {
+        if (read_bids.find(read_bid) == read_bids.end()){
             read_bids[read_bid] = 0;
         }
         read_bids[read_bid] += 1;
 
-        if (read_bids[read_bid] > highest_read) {
+        if (read_bids[read_bid] > highest_read){
             highest_read = read_bids[read_bid];
             read_value = read_bid;
         }
@@ -359,7 +359,7 @@ uint64_t read_next_bid(ConsoleHandle& console, BotBaseContext& context, bool hig
     return read_value;
 }
 
-void AuctionFarmer::bid_on_item(SingleSwitchProgramEnvironment& env, BotBaseContext& context, AuctionOffer offer) {
+void AuctionFarmer::bid_on_item(SingleSwitchProgramEnvironment& env, BotBaseContext& context, AuctionOffer offer){
     AuctionFarmer_Descriptor::Stats& stats = env.current_stats<AuctionFarmer_Descriptor::Stats>();
 
     VideoSnapshot offer_screen = env.console.video().snapshot();
@@ -374,11 +374,11 @@ void AuctionFarmer::bid_on_item(SingleSwitchProgramEnvironment& env, BotBaseCont
     int64_t current_bid = 0;
 
     context.wait_for_all_requests();
-    while (auction_ongoing) {
+    while (auction_ongoing){
         int ret = wait_until(env.console, context, Milliseconds(5000), { advance_detector, high_detector, mid_detector, low_detector, overworld_detector });
         context.wait_for(Milliseconds(100));
 
-        switch (ret) {
+        switch (ret){
         case 0:
             pbf_press_button(context, BUTTON_A, 20, TICKS_PER_SECOND);
             break;
@@ -402,9 +402,9 @@ void AuctionFarmer::bid_on_item(SingleSwitchProgramEnvironment& env, BotBaseCont
         context.wait_for_all_requests();
     }
 
-    if (won_auction) {
+    if (won_auction){
         stats.m_auctions++;
-        if (current_bid >= 0) {
+        if (current_bid >= 0){
             stats.m_money += current_bid;
         }
         env.update_stats();
@@ -434,7 +434,7 @@ void AuctionFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
     uint8_t year = MAX_YEAR;
 
 
-    while (true) {
+    while (true){
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
 
         reset_auctions(env, context, true, year);
@@ -442,16 +442,16 @@ void AuctionFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         env.update_stats();
         
         bool good_offer = false;
-        while (!good_offer) {
+        while (!good_offer){
             size_t npc_tries = 0;
-            if (!ONE_NPC) {
+            if (!ONE_NPC){
                 pbf_move_right_joystick(context, 128, 255, 2 * TICKS_PER_SECOND, 20);
             }
 
             std::vector<std::pair<AuctionOffer, ImageFloatBox>> offers = check_offers(env, context);
             for (std::pair<AuctionOffer, ImageFloatBox>& offer_pair : offers){
                 AuctionOffer offer = offer_pair.first;
-                if (is_good_offer(offer)) {
+                if (is_good_offer(offer)){
                     try {
                         move_to_auctioneer(env, context, offer);
                     }
@@ -464,7 +464,7 @@ void AuctionFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
                         // at this point it is more likely to be non-recoverable
                         size_t max_npc_tries = ONE_NPC ? 1 : 3;
 
-                        if (npc_tries < max_npc_tries) {
+                        if (npc_tries < max_npc_tries){
                             VideoSnapshot screen = env.console.video().snapshot();
                             send_program_recoverable_error_notification(env, NOTIFICATION_ERROR_RECOVERABLE, e.message(), screen);
                         }

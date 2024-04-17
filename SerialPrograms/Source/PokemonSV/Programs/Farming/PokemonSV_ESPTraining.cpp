@@ -89,11 +89,11 @@ ESPTraining::ESPTraining()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void ESPTraining::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
+void ESPTraining::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
     ESPTraining_Descriptor::Stats& stats = env.current_stats<ESPTraining_Descriptor::Stats>();
 
-    for (uint32_t c = 0; c < ROUNDS; c++) {
+    for (uint32_t c = 0; c < ROUNDS; c++){
         env.log("Round: " + tostr_u_commas(c));
 
         //Initiate dialog with Dendra
@@ -101,7 +101,7 @@ void ESPTraining::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
         AdvanceDialogWatcher advance_detector(COLOR_YELLOW);
         pbf_press_button(context, BUTTON_A, 10, 50);
         int retD = wait_until(env.console, context, Milliseconds(4000), { advance_detector });
-        if (retD < 0) {
+        if (retD < 0){
             env.log("Dialog detected.");
         }
         pbf_press_button(context, BUTTON_A, 10, 50);
@@ -128,7 +128,7 @@ void ESPTraining::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
         //151 emotions + pauses but the game is inconsistent and sometimes displays an emotion during the transitions
         //Note: can hit the wrong emotion and then the right one right after, as long as its before the timer
         bool endflag = true;
-        while (endflag) {
+        while (endflag){
             ESPStartDetector ESPstart;
             ESPShowNewEmotionDetector ESPstop;
             ESPEmotionDetector detector;
@@ -139,7 +139,7 @@ void ESPTraining::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
                     std::chrono::seconds(15),
                     { { ESPstart } }
                 );
-                if (ret < 0) {
+                if (ret < 0){
                     env.log("Timeout waiting for dialog.");
                     endflag = false;
                     break;
@@ -149,13 +149,13 @@ void ESPTraining::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
                     std::chrono::seconds(5),
                     { { detector } }
                 );
-                if (ret2 < 0) {
+                if (ret2 < 0){
                     env.log("Timeout waiting for emotion.");
                 }
 
                 Button emotion_button = BUTTON_X;
 
-                switch (detector.result()) {
+                switch (detector.result()){
                 case Detection::RED:
                     env.log("ESPEmotionDetector: Angry - Red - Press X", COLOR_BLACK);
                     emotion_button = BUTTON_X;
@@ -203,7 +203,7 @@ void ESPTraining::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
                     std::chrono::seconds(1),
                     { { emotion_press_detected } }
                 );
-                if (check < 0) {
+                if (check < 0){
                     env.log("Emotion press not detected in bottom right. Pressing button again.");
                     pbf_press_button(context, emotion_button, 10, 50);
                 }
@@ -217,7 +217,7 @@ void ESPTraining::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
                     std::chrono::seconds(15),
                     { { ESPstop } }
                 );
-                if (ret < 0) {
+                if (ret < 0){
                     env.log("Timeout waiting for dialog to vanish.");
                 }
             }
@@ -228,18 +228,18 @@ void ESPTraining::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
         OverworldWatcher overworld(COLOR_CYAN);
         int ret = run_until(
             env.console, context,
-            [](BotBaseContext& context) {
+            [](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 700);
             },
             {overworld}
         );
-        if (ret != 0) {
+        if (ret != 0){
             env.console.log("Failed to detect overworld after ending.", COLOR_RED);
         }
         context.wait_for_all_requests();
 
         //Save the game if option checked, then loop again
-        if(SAVE) {
+        if(SAVE){
             save_game_from_overworld(env.program_info(), env.console, context);
         }
 

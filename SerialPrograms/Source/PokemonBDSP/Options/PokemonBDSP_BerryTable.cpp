@@ -43,7 +43,7 @@ BerryTable::BerryTable(std::string label)
 bool BerryTable::find_berry(const std::string& berry_slug) const{
     std::vector<std::unique_ptr<BerrySelectorRow2>> table = copy_snapshot();
     for (const std::unique_ptr<BerrySelectorRow2>& row : table){
-        if (row->berry.slug() == berry_slug) {
+        if (row->berry.slug() == berry_slug){
             return true;
         }
     }

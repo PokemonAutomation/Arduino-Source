@@ -45,7 +45,7 @@ const std::vector<std::string>& ALL_SANDWICH_CONDIMENTS_SLUGS(){
 struct IngredientNameDatabase{
     IngredientNameDatabase();
 
-    static const IngredientNameDatabase& instance() {
+    static const IngredientNameDatabase& instance(){
         static IngredientNameDatabase database;
         return database;
     }
@@ -107,7 +107,7 @@ IngredientNameDatabase::IngredientNameDatabase(){
 const SandwichIngredientNames& get_ingredient_name(const std::string& slug){
     const std::map<std::string, SandwichIngredientNames>& database = IngredientNameDatabase::instance().database;
     auto iter = database.find(slug);
-    if (iter == database.end()) {
+    if (iter == database.end()){
         throw InternalProgramError(
             nullptr, PA_CURRENT_FUNCTION,
             "Ingredient slug not found in database: " + slug
@@ -119,7 +119,7 @@ const SandwichIngredientNames& get_ingredient_name(const std::string& slug){
 const std::string& parse_ingredient_name(const std::string& display_name){
     const std::map<std::string, std::string>& database = IngredientNameDatabase::instance().m_display_name_to_slug;
     auto iter = database.find(display_name);
-    if (iter == database.end()) {
+    if (iter == database.end()){
         throw InternalProgramError(
             nullptr, PA_CURRENT_FUNCTION,
             "Ingredient name not found in database: " + display_name

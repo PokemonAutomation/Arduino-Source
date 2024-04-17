@@ -27,14 +27,14 @@ class MapOrangleFixedViewArrowMatcher : public ImageMatch::WaterfillTemplateMatc
 public:
     MapOrangleFixedViewArrowMatcher() : WaterfillTemplateMatcher(
         "PokemonSV/Map/OrangleFixedView-Template.png", Color(50,50,0), Color(255, 255, 255), 50
-    ) {
+    ){
         m_aspect_ratio_lower = 0.8;
         m_aspect_ratio_upper = 1.2;
         m_area_ratio_lower = 0.8;
         m_area_ratio_upper = 1.2;
     }
 
-    static const MapOrangleFixedViewArrowMatcher& instance() {
+    static const MapOrangleFixedViewArrowMatcher& instance(){
         static MapOrangleFixedViewArrowMatcher matcher;
         return matcher;
     }
@@ -45,14 +45,14 @@ class MapOrangleRotatedViewArrowMatcher : public ImageMatch::WaterfillTemplateMa
 public:
     MapOrangleRotatedViewArrowMatcher() : WaterfillTemplateMatcher(
         "PokemonSV/Map/OrangleRotatedView-Template.png", Color(50,50,0), Color(255, 255, 255), 50
-    ) {
+    ){
         m_aspect_ratio_lower = 0.8;
         m_aspect_ratio_upper = 1.2;
         m_area_ratio_lower = 0.8;
         m_area_ratio_upper = 1.2;
     }
 
-    static const MapOrangleRotatedViewArrowMatcher& instance() {
+    static const MapOrangleRotatedViewArrowMatcher& instance(){
         static MapOrangleRotatedViewArrowMatcher matcher;
         return matcher;
     }
@@ -132,7 +132,7 @@ void MapWatcher::make_overlays(VideoOverlaySet& items) const{
 
 bool MapWatcher::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     const bool exit_found = m_exit_watcher.process_frame(frame, timestamp);
-    if (!exit_found) {
+    if (!exit_found){
         return false;
     }
 

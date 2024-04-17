@@ -76,12 +76,12 @@ WeaponDuper::WeaponDuper()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void WeaponDuper::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
+void WeaponDuper::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     WeaponDuper_Descriptor::Stats& stats = env.current_stats<WeaponDuper_Descriptor::Stats>();
 
     uint32_t c = 0;
 
-    while (c < ATTEMPTS) {
+    while (c < ATTEMPTS){
         env.log("Current Attempts: " + tostr_u_commas(c));
 
         env.log("Open menu");

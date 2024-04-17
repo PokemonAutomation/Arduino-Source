@@ -229,7 +229,7 @@ bool IngoMoveGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBase
                 pbf_press_button(context, BUTTON_A, 10, 125);
                 context.wait_for_all_requests();
                 const bool check_move_success = true;
-                if (use_move(env.console, context, cur_pokemon, cur_move, move.style, check_move_success)) {
+                if (use_move(env.console, context, cur_pokemon, cur_move, move.style, check_move_success)){
                     stats.turns++;
                     if (cur_pokemon < 4)
                     {
@@ -334,7 +334,7 @@ void IngoMoveGrinder::program(SingleSwitchProgramEnvironment& env, BotBaseContex
         env.update_stats();
         send_program_status_notification(env, NOTIFICATION_STATUS);
         try{
-            if (run_iteration(env, context)) {
+            if (run_iteration(env, context)){
                 break;
             }
         }catch (OperationFailedException&){

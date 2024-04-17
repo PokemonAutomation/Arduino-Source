@@ -64,7 +64,7 @@ ClothingBuyer::ClothingBuyer()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void ClothingBuyer::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
+void ClothingBuyer::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
     /*
@@ -78,7 +78,7 @@ void ClothingBuyer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
 
     uint8_t category_rotation_count = 0;
     bool finish_program = false;
-    while (category_rotation_count < NUM_CATEGORY) {
+    while (category_rotation_count < NUM_CATEGORY){
         pbf_press_button(context, BUTTON_A, 20, 100);
 
         AdvanceDialogWatcher already_purchased(COLOR_RED);
@@ -92,7 +92,7 @@ void ClothingBuyer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
             std::chrono::seconds(10),
             { already_purchased, buy_yes_no }
         );
-        switch (ret) {
+        switch (ret){
         case 0:
                 env.log("Item already purchased or incompatible hairstyle.");
                 pbf_press_button(context, BUTTON_A, 10, 100);
@@ -102,7 +102,7 @@ void ClothingBuyer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
                     std::chrono::seconds(2),
                     { hairstyle_purchase_prompt }
                 );
-                if (retP != 0) {
+                if (retP != 0){
                     env.log("Item already purchased.");
                     send_program_status_notification(
                         env, NOTIFICATION_STATUS_UPDATE,
@@ -121,7 +121,7 @@ void ClothingBuyer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
 
             env.log("Detected purchase prompt.");
 
-            if (USE_LP) {
+            if (USE_LP){
                 env.log("Using LP.");
                 pbf_press_dpad(context, DPAD_DOWN, 10, 100);
             }
@@ -136,9 +136,9 @@ void ClothingBuyer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
                 std::chrono::seconds(10),
                 { wear_yes_no, afford_yes_no }
             );
-            switch (retWear) {
+            switch (retWear){
             case 0:
-                if (!WEAR_NEW_CLOTHES) {
+                if (!WEAR_NEW_CLOTHES){
                     env.log("Do not wear new clothes.");
                     pbf_press_dpad(context, DPAD_DOWN, 10, 100);
                 }
@@ -153,7 +153,7 @@ void ClothingBuyer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
                 );
                 break;
             case 1:
-                if (!incompatible_hairstyle) {
+                if (!incompatible_hairstyle){
                     env.log("Out of Cash/LP.");
                     send_program_status_notification(
                         env, NOTIFICATION_STATUS_UPDATE,
@@ -168,7 +168,7 @@ void ClothingBuyer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
                         std::chrono::seconds(2),
                         { afford_yes_no_hairstyle }
                     );
-                    if (retHairstyle == 0) {
+                    if (retHairstyle == 0){
                         env.log("Out of Cash/LP.");
                         send_program_status_notification(
                             env, NOTIFICATION_STATUS_UPDATE,
@@ -199,7 +199,7 @@ void ClothingBuyer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
                 break;
         }
         //Out of cash/LP, stop.
-        if (finish_program) {
+        if (finish_program){
             break;
         }
 
@@ -216,9 +216,9 @@ void ClothingBuyer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
             std::chrono::seconds(1),
             { top_item }
         );
-        if (retTop == 0) {
+        if (retTop == 0){
             env.log("Reached top of category.");
-            if (NUM_CATEGORY > 1) {
+            if (NUM_CATEGORY > 1){
                 env.log("Category rotation set. Moving to next category.");
                 pbf_press_dpad(context, DPAD_RIGHT, 10, 100);
                 pbf_wait(context, 100);

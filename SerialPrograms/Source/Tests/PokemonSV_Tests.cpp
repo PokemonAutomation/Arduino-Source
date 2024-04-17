@@ -65,7 +65,7 @@ int test_pokemonSV_MapDetector(const ImageViewRGB32& image, const std::vector<st
 
     TEST_RESULT_EQUAL(result_map, target_map_existence);
 
-    if (result_map) {
+    if (result_map){
 
         MapFixedViewDetector map_fixed_view_detector;
         MapRotatedViewDetector map_rotated_view_detected;
@@ -144,7 +144,7 @@ int test_pokemonSV_TeraTypeReader(const ImageViewRGB32& image, const std::vector
     return 0;
 }
 
-int test_pokemonSV_SandwichRecipeDetector(const ImageViewRGB32& image, const std::vector<std::string>& words) {
+int test_pokemonSV_SandwichRecipeDetector(const ImageViewRGB32& image, const std::vector<std::string>& words){
     auto& logger = global_logger_command_line();
 
     // seven words: the sandwich recipe IDs on the screen. Order:
@@ -404,7 +404,7 @@ int test_pokemonSV_SandwichIngredientReader(const ImageViewRGB32& image, const s
     }
 
     size_t selected_ingredient = 0;
-    if (parse_size_t(words[words.size() - 11], selected_ingredient) == false) {
+    if (parse_size_t(words[words.size() - 11], selected_ingredient) == false){
         cerr << "Error: word " << words[words.size() - 2] << " is wrong. Must be int of range [0, 9]. " << endl;
         return 1;
     }
@@ -437,28 +437,28 @@ int test_pokemonSV_SandwichIngredientReader(const ImageViewRGB32& image, const s
     return 0;
 }
 
-int test_pokemonSV_AdvanceDialogDetector(const ImageViewRGB32& image, bool target) {
+int test_pokemonSV_AdvanceDialogDetector(const ImageViewRGB32& image, bool target){
     AdvanceDialogDetector detector(COLOR_RED);
     bool result = detector.detect(image);
     TEST_RESULT_EQUAL(result, target);
     return 0;
 }
 
-int test_pokemonSV_SwapMenuDetector(const ImageViewRGB32& image, bool target) {
+int test_pokemonSV_SwapMenuDetector(const ImageViewRGB32& image, bool target){
     SwapMenuDetector detector(COLOR_RED);
     bool result = detector.detect(image);
     TEST_RESULT_EQUAL(result, target);
     return 0;
 }
 
-int test_pokemonSV_DialogBoxDetector(const ImageViewRGB32& image, bool target) {
+int test_pokemonSV_DialogBoxDetector(const ImageViewRGB32& image, bool target){
     DialogBoxDetector detector(COLOR_RED);
     bool result = detector.detect(image);
     TEST_RESULT_EQUAL(result, target);
     return 0;
 }
 
-int test_pokemonSV_FastTravelDetector(const ImageViewRGB32& image, bool target) {
+int test_pokemonSV_FastTravelDetector(const ImageViewRGB32& image, bool target){
     FastTravelDetector detector(COLOR_RED, MINIMAP_AREA);
     bool result = detector.detect(image);
     TEST_RESULT_EQUAL(result, target);
@@ -466,7 +466,7 @@ int test_pokemonSV_FastTravelDetector(const ImageViewRGB32& image, bool target) 
     return 0;
 }
 
-int test_pokemonSV_MapPokeCenterIconDetector(const ImageViewRGB32& image, int target) {
+int test_pokemonSV_MapPokeCenterIconDetector(const ImageViewRGB32& image, int target){
     MapPokeCenterIconDetector detector(COLOR_RED, MAP_READABLE_AREA);
     const auto result = detector.detect_all(image);
     for(const auto& box : result){

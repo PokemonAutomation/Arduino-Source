@@ -86,7 +86,7 @@ void SandwichRecipeNumberDetector::detect_recipes(const ImageViewRGB32& screen, 
     // Fix any broken OCR reads:
     for (int i = 1; i < 5; i++){
         if (recipe_IDs[i+1] > 0 && recipe_IDs[i-1] > 0 && recipe_IDs[i-1] + 2 == recipe_IDs[i+1]){
-            if (recipe_IDs[i] != recipe_IDs[i-1] + 1) {
+            if (recipe_IDs[i] != recipe_IDs[i-1] + 1){
                 recipe_IDs[i] = recipe_IDs[i-1] + 1;
                 m_logger.log("Fix recipe number at cell " + std::to_string(i) + " to be " + std::to_string(recipe_IDs[i]));
             }

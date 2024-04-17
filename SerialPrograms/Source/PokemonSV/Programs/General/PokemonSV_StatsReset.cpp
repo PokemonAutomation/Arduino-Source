@@ -139,18 +139,18 @@ StatsReset::StatsReset()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-bool StatsReset::enter_battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
+bool StatsReset::enter_battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     StatsReset_Descriptor::Stats& stats = env.current_stats<StatsReset_Descriptor::Stats>();
 
     //Press A to talk to target
     AdvanceDialogWatcher advance_detector(COLOR_YELLOW);
     pbf_press_button(context, BUTTON_A, 10, 50);
     int retD = wait_until(env.console, context, Milliseconds(4000), { advance_detector });
-    if (retD < 0) {
+    if (retD < 0){
         env.log("Dialog not detected.");
     }
 
-    switch (TARGET) {
+    switch (TARGET){
     case Target::TreasuresOfRuin:
         //~30 seconds to start battle?
         pbf_mash_button(context, BUTTON_A, 3250);
@@ -181,7 +181,7 @@ bool StatsReset::enter_battle(SingleSwitchProgramEnvironment& env, BotBaseContex
         std::chrono::seconds(15),
         { battle_menu }
     );
-    if (ret != 0) {
+    if (ret != 0){
         stats.errors++;
         env.update_stats();
         env.log("Failed to enter battle!", COLOR_RED);
@@ -198,7 +198,7 @@ bool StatsReset::enter_battle(SingleSwitchProgramEnvironment& env, BotBaseContex
     return true;
 }
 
-void StatsReset::open_ball_menu(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
+void StatsReset::open_ball_menu(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     StatsReset_Descriptor::Stats& stats = env.current_stats<StatsReset_Descriptor::Stats>();
 
     BattleBallReader reader(env.console, LANGUAGE);
@@ -206,8 +206,8 @@ void StatsReset::open_ball_menu(SingleSwitchProgramEnvironment& env, BotBaseCont
     WallClock start = current_time();
 
     env.log("Opening ball menu...");
-    while (ball_reader == "") {
-        if (current_time() - start > std::chrono::minutes(2)) {
+    while (ball_reader == ""){
+        if (current_time() - start > std::chrono::minutes(2)){
             env.log("Timed out trying to read ball after 2 minutes.", COLOR_RED);
             stats.errors++;
             env.update_stats();
@@ -234,7 +234,7 @@ void StatsReset::open_ball_menu(SingleSwitchProgramEnvironment& env, BotBaseCont
 
 //Returns target_fainted. If overworld is detected then the target fainted.
 //Otherwise if AdvanceDialog is detected the Pokemon was caught or the player lost.
-bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
+bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     StatsReset_Descriptor::Stats& stats = env.current_stats<StatsReset_Descriptor::Stats>();
 
     AdvanceDialogWatcher advance_dialog(COLOR_MAGENTA);
@@ -251,8 +251,8 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext&
 
     int ret = run_until(
         env.console, context,
-        [&](BotBaseContext& context) {
-            while (true) {
+        [&](BotBaseContext& context){
+            while (true){
                 //Check that battle menu appears - this is in case of swapping pokemon
                 NormalBattleMenuWatcher menu_before_throw(COLOR_YELLOW);
                 int bMenu = wait_until(
@@ -260,7 +260,7 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext&
                     std::chrono::seconds(15),
                     { menu_before_throw }
                 );
-                if (bMenu < 0) {
+                if (bMenu < 0){
                     env.console.log("Unable to find menu_before_throw.");
                     stats.errors++;
                     env.update_stats();
@@ -272,7 +272,7 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext&
                 }
 
                 //Quick ball occurs before anything else in battle, so we can throw the ball without worrying about bounce/fainted/etc.
-                if (QUICKBALL && !quickball_thrown) {
+                if (QUICKBALL && !quickball_thrown){
                     env.log("Quick Ball option checked. Throwing Quick Ball.");
 
                     BattleBallReader reader(env.console, LANGUAGE);
@@ -280,7 +280,7 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext&
 
                     env.log("Selecting Quick Ball.");
                     int quantity = move_to_ball(reader, env.console, context, "quick-ball");
-                    if (quantity == 0) {
+                    if (quantity == 0){
                         //Stop so user can check they have quick balls.
                         env.console.log("Unable to find Quick Ball on turn 1.");
                         stats.errors++;
@@ -291,7 +291,7 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext&
                             true
                         );
                     }
-                    if (quantity < 0) {
+                    if (quantity < 0){
                         stats.errors++;
                         env.update_stats();
                         env.console.log("Unable to read ball quantity.", COLOR_RED);
@@ -309,7 +309,7 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext&
                     pbf_mash_button(context, BUTTON_B, 900);
                     context.wait_for_all_requests();
                 }
-                else if (switch_party_slot == 1 && !move_table.empty() && table_turn < move_table.size()) {
+                else if (switch_party_slot == 1 && !move_table.empty() && table_turn < move_table.size()){
                     //Lead pokemon not fainted and table has not been completed
                     //Run through moves in table
                     env.log("Lead has not fainted, using move.");
@@ -320,7 +320,7 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext&
                     uint8_t move_slot = 0;
 
                     //Leaving room to expand to other battle actions later
-                    switch (move) {
+                    switch (move){
                     case BattleMoveType::Move1:
                         move_slot = 0;
                         break;
@@ -338,14 +338,14 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext&
                     //Select and use move
                     int ret_move_select = run_until(
                     env.console, context,
-                    [&](BotBaseContext& context) {
+                    [&](BotBaseContext& context){
                         pbf_press_button(context, BUTTON_A, 10, 50);
                         pbf_wait(context, 100);
                         context.wait_for_all_requests();
                     },
                     { move_watcher }
                     );
-                    if (ret_move_select != 0) {
+                    if (ret_move_select != 0){
                         env.log("Could not find move select.");
                     }
                     else {
@@ -368,7 +368,7 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext&
                         std::chrono::seconds(4),
                         { battle_menu }
                     );
-                    if (ret == 0) {
+                    if (ret == 0){
                         env.console.log("Battle menu detected early. Out of PP, please check your setup.");
                         stats.errors++;
                         env.update_stats();
@@ -380,7 +380,7 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext&
                     }
                     else {
                         env.log("Move successfully used.");
-                        if (table_turn == move_table.size()) {
+                        if (table_turn == move_table.size()){
                             env.log("End of table reached. Switch to throwing balls.");
                         }
                     }
@@ -391,7 +391,7 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext&
 
                     env.log("Selecting ball.");
                     int quantity = move_to_ball(reader, env.console, context, BALL_SELECT.slug());
-                    if (quantity == 0) {
+                    if (quantity == 0){
                         out_of_balls = true;
                         env.console.log("Unable to find appropriate ball/out of balls.");
                         send_program_status_notification(
@@ -400,7 +400,7 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext&
                         );
                         break;
                     }
-                    if (quantity < 0) {
+                    if (quantity < 0){
                         stats.errors++;
                         env.update_stats();
                         env.console.log("Unable to read ball quantity.", COLOR_RED);
@@ -420,7 +420,7 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext&
                         std::chrono::seconds(4),
                         { battle_menu }
                     );
-                    if (ret == 0) {
+                    if (ret == 0){
                         env.console.log("Battle menu detected early. Using first attack.");
                         pbf_mash_button(context, BUTTON_A, 250);
                         context.wait_for_all_requests();
@@ -442,13 +442,13 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext&
                     std::chrono::seconds(60),
                     { battle_menu, fainted }
                 );
-                switch (ret2) {
+                switch (ret2){
                 case 0:
                     env.log("Battle menu detected, continuing.");
                     break;
                 case 1:
                     env.log("Detected fainted Pokemon. Switching to next living Pokemon...");
-                    if (fainted.move_to_slot(env.console, context, switch_party_slot)) {
+                    if (fainted.move_to_slot(env.console, context, switch_party_slot)){
                         pbf_mash_button(context, BUTTON_A, 3 * TICKS_PER_SECOND);
                         context.wait_for_all_requests();
                         switch_party_slot++;
@@ -470,7 +470,7 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext&
         { advance_dialog, overworld }
         );
 
-    switch (ret) {
+    switch (ret){
     case 0:
         //Non-Snack: dialog appears on caught screen.
         //Snack: "target fled somewhere..."
@@ -479,7 +479,7 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext&
         target_fainted = false;
         break;
     case 1:
-        if (TARGET == Target::Snacksworth) {
+        if (TARGET == Target::Snacksworth){
             env.log("Overworld detected. Snacksworth legendary caught, checking box system.");
             target_fainted = false;
         }
@@ -493,7 +493,7 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext&
         }
         break;
     default:
-        if (out_of_balls) {
+        if (out_of_balls){
             target_fainted = true; //Resets game.
             env.log("Ran out of selected Pokeball. Resetting.");
             break;
@@ -511,7 +511,7 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext&
     return target_fainted;
 }
 
-bool StatsReset::check_stats(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
+bool StatsReset::check_stats(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     StatsReset_Descriptor::Stats& stats = env.current_stats<StatsReset_Descriptor::Stats>();
     bool match = false;
 
@@ -520,7 +520,7 @@ bool StatsReset::check_stats(SingleSwitchProgramEnvironment& env, BotBaseContext
     context.wait_for(std::chrono::milliseconds(400));
 
     //Check that the target pokemon was caught
-    if (check_empty_slots_in_party(env.program_info(), env.console, context) != 0) {
+    if (check_empty_slots_in_party(env.program_info(), env.console, context) != 0){
         env.console.log("One or more empty slots in party. Target was not caught or user setup error.");
         send_program_status_notification(
             env, NOTIFICATION_STATUS_UPDATE,
@@ -538,7 +538,7 @@ bool StatsReset::check_stats(SingleSwitchProgramEnvironment& env, BotBaseContext
         StatsHuntAction action = StatsHuntAction::Keep;
         check_stats_reset_info(env.console, context, LANGUAGE, FILTERS, action);
 
-        switch (action) {
+        switch (action){
         case StatsHuntAction::StopProgram:
             match = true;
 
@@ -571,7 +571,7 @@ bool StatsReset::check_stats(SingleSwitchProgramEnvironment& env, BotBaseContext
     return match;
 }
 
-void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
+void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     //This will only work for Pokemon that you press A to talk to.
     //Regular static spawns will have the same stats, resetting won't work.
     //Won't apply to the former titan pokemon or the box legends + ogrepon either, as their IVs are locked.
@@ -588,10 +588,10 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
     bool stats_matched = false;
     while (!stats_matched){
         bool battle_started = false;
-        for (size_t c = 0; !battle_started; c++) {
+        for (size_t c = 0; !battle_started; c++){
             battle_started = enter_battle(env, context);
 
-            if (!battle_started) {
+            if (!battle_started){
                 env.log("Did not detect battle. Resetting.");
                 stats.resets++;
                 env.update_stats();
@@ -600,7 +600,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
             }
 
             //Try to start battle 3 times.
-            if (c > 2) {
+            if (c > 2){
                 throw OperationFailedException(
                     ErrorReport::SEND_ERROR_REPORT, env.console,
                     "Failed to enter battle after 3 attempts.",
@@ -612,18 +612,18 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
         
         bool target_fainted = run_battle(env, context);
 
-        if (!target_fainted) {
+        if (!target_fainted){
             //Close all the dex entry and caught menus
             //If the player lost, this closes all dialog from Joy
             OverworldWatcher overworld;
             int retOver = run_until(
                 env.console, context,
-                [](BotBaseContext& context) {
+                [](BotBaseContext& context){
                     pbf_mash_button(context, BUTTON_B, 10000);
                 },
                 { overworld }
                 );
-            if (retOver != 0) {
+            if (retOver != 0){
                 env.log("Failed to detect overworld.", COLOR_RED);
             }
             else {
@@ -634,7 +634,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
             stats_matched = check_stats(env, context);
         }
 
-        if (target_fainted || !stats_matched) {
+        if (target_fainted || !stats_matched){
             //Reset game
             send_program_status_notification(
                 env, NOTIFICATION_STATUS_UPDATE,

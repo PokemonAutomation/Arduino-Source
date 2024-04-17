@@ -69,14 +69,14 @@ BowItemDuper::BowItemDuper()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void BowItemDuper::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
+void BowItemDuper::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     // assert_16_9_720p_min(env.logger(), env.console);
 
     // just do a forever loop where we have to do stuff
     uint32_t c = 0;
     BowItemDuper_Descriptor::Stats& stats = env.current_stats<BowItemDuper_Descriptor::Stats>();
 
-    while (c < ATTEMPTS) {
+    while (c < ATTEMPTS){
 
         env.log("Current Attempts: " + tostr_u_commas(c));
 

@@ -23,19 +23,19 @@ Detection ESPEmotionReader::detect(const ImageViewRGB32& screen) const {
     ImageViewRGB32 symbol = extract_box_reference(screen, m_symbol_box);
 
     //Color ratio: R/(R+G+B), G/(R+G+B), B/(R+G+B)
-    if (is_solid(symbol, { 0.567, 0.2, 0.232 }, 0.2, 40)) {
+    if (is_solid(symbol, { 0.567, 0.2, 0.232 }, 0.2, 40)){
         return Detection::RED;
     }
-    if (is_solid(symbol, { 0.529, 0.447, 0.0258 }, 0.2, 40)) {
+    if (is_solid(symbol, { 0.529, 0.447, 0.0258 }, 0.2, 40)){
         return Detection::YELLOW;
     }
-    if (is_solid(symbol, { 0.132, 0.332, 0.536 }, 0.2, 40)) {
+    if (is_solid(symbol, { 0.132, 0.332, 0.536 }, 0.2, 40)){
         return Detection::BLUE; //Sometimes picks up the grey as well but that works
     }
-    if (is_solid(symbol, { 0.323, 0.491, 0.184 }, 0.2, 40)) {
+    if (is_solid(symbol, { 0.323, 0.491, 0.184 }, 0.2, 40)){
         return Detection::GREEN;
     }
-    if (is_solid(symbol, { 0.219, 0.355, 0.426 }, 0.2, 40)) {
+    if (is_solid(symbol, { 0.219, 0.355, 0.426 }, 0.2, 40)){
         return Detection::GREY;
     }
     return Detection::NO_DETECTION;
@@ -49,7 +49,7 @@ ESPEmotionDetector::ESPEmotionDetector()
 void ESPEmotionDetector::make_overlays(VideoOverlaySet& items) const {
     m_reader.make_overlays(items);
 }
-bool ESPEmotionDetector::process_frame(const ImageViewRGB32& frame, WallClock timestamp) {
+bool ESPEmotionDetector::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     Detection result = m_reader.detect(frame);
     m_last.store(result, std::memory_order_release);
     return result != Detection::NO_DETECTION;
@@ -64,15 +64,15 @@ void ESPStartDetector::make_overlays(VideoOverlaySet& items) const {
     items.add(COLOR_RED, m_left_box);
     items.add(COLOR_RED, m_right_box);
 }
-bool ESPStartDetector::detect(const ImageViewRGB32& frame) {
+bool ESPStartDetector::detect(const ImageViewRGB32& frame){
     ImageViewRGB32 left_image = extract_box_reference(frame, m_left_box);
     ImageViewRGB32 right_image = extract_box_reference(frame, m_right_box);
-    if (is_solid(left_image, { 0.332, 0.335, 0.332 }) && is_solid(right_image, { 0.332, 0.335, 0.332 })) {
+    if (is_solid(left_image, { 0.332, 0.335, 0.332 }) && is_solid(right_image, { 0.332, 0.335, 0.332 })){
         return true;
     }
     return false;
 }
-bool ESPStartDetector::process_frame(const ImageViewRGB32& frame, WallClock timestamp) {
+bool ESPStartDetector::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     return detect(frame);
 }
 
@@ -85,15 +85,15 @@ void ESPShowNewEmotionDetector::make_overlays(VideoOverlaySet& items) const {
     items.add(COLOR_RED, m_left_box);
     items.add(COLOR_RED, m_right_box);
 }
-bool ESPShowNewEmotionDetector::detect(const ImageViewRGB32& frame) {
+bool ESPShowNewEmotionDetector::detect(const ImageViewRGB32& frame){
     ImageViewRGB32 left_image = extract_box_reference(frame, m_left_box);
     ImageViewRGB32 right_image = extract_box_reference(frame, m_right_box);
-    if (is_solid(left_image, { 0.332, 0.335, 0.332 }) && is_solid(right_image, { 0.332, 0.335, 0.332 })) {
+    if (is_solid(left_image, { 0.332, 0.335, 0.332 }) && is_solid(right_image, { 0.332, 0.335, 0.332 })){
         return false;
     }
     return true;
 }
-bool ESPShowNewEmotionDetector::process_frame(const ImageViewRGB32& frame, WallClock timestamp) {
+bool ESPShowNewEmotionDetector::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     return detect(frame);
 }
 
@@ -110,18 +110,18 @@ void ESPPressedEmotionDetector::make_overlays(VideoOverlaySet& items) const {
     items.add(COLOR_RED, m_top_box);
     items.add(COLOR_RED, m_bottom_box);
 }
-bool ESPPressedEmotionDetector::detect(const ImageViewRGB32& frame) {
+bool ESPPressedEmotionDetector::detect(const ImageViewRGB32& frame){
     ImageViewRGB32 left_image = extract_box_reference(frame, m_left_box);
     ImageViewRGB32 right_image = extract_box_reference(frame, m_right_box);
     ImageViewRGB32 top_image = extract_box_reference(frame, m_top_box);
     ImageViewRGB32 bottom_image = extract_box_reference(frame, m_bottom_box);
     if (is_solid(left_image, { 0.506, 0.439, 0.054 }, 0.2, 15) || is_solid(right_image, { 0.506, 0.439, 0.054 }, 0.2, 15)
-        || is_solid(top_image, { 0.506, 0.439, 0.054 }, 0.2, 15) || is_solid(bottom_image, { 0.506, 0.439, 0.054 }, 0.2, 15)) {
+        || is_solid(top_image, { 0.506, 0.439, 0.054 }, 0.2, 15) || is_solid(bottom_image, { 0.506, 0.439, 0.054 }, 0.2, 15)){
         return true;
     }
     return false;
 }
-bool ESPPressedEmotionDetector::process_frame(const ImageViewRGB32& frame, WallClock timestamp) {
+bool ESPPressedEmotionDetector::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     return detect(frame);
 }
 

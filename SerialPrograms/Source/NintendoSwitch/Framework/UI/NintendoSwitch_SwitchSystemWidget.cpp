@@ -123,9 +123,9 @@ SwitchSystemWidget::SwitchSystemWidget(
     );
     connect(
         m_command, &CommandRow::save_profile,
-        m_command, [this]() {
+        m_command, [this](){
             std::string path = QFileDialog::getSaveFileName(this, tr("Choose the name of your profile file"), "", tr("JSON files (*.json)")).toStdString();
-            if (path.empty()) {
+            if (path.empty()){
                 return;
             }
 

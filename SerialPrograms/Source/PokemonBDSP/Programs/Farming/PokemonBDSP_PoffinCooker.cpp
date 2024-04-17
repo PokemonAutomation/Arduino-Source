@@ -128,7 +128,7 @@ void PoffinCooker::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
     pbf_press_button(context, BUTTON_A, 5, 100);
 
 
-    for (uint16_t c = 0; c < MAX_COOK_ATTEMPTS; c++) {
+    for (uint16_t c = 0; c < MAX_COOK_ATTEMPTS; c++){
 
         env.log("Select the 4 berries to use");
         // Select the first four berries to cook and confirm the selection.

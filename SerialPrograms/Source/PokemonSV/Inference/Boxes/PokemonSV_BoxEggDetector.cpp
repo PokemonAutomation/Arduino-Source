@@ -28,14 +28,14 @@ class EggMatcher : public ImageMatch::WaterfillTemplateMatcher{
 public:
     EggMatcher() : WaterfillTemplateMatcher(
         "PokemonSV/Egg-Template.png", Color(100,100,100), Color(255, 255, 255), 50
-    ) {
+    ){
         m_aspect_ratio_lower = 0.9;
         m_aspect_ratio_upper = 1.2;
         m_area_ratio_lower = 0.9;
         m_area_ratio_upper = 1.2;
     }
 
-    static const ImageMatch::WaterfillTemplateMatcher& instance() {
+    static const ImageMatch::WaterfillTemplateMatcher& instance(){
         static EggMatcher matcher;
         return matcher;
     }
@@ -60,7 +60,7 @@ bool BoxCurrentEggDetector::detect(const ImageViewRGB32& frame) const{
 
 
 BoxEggDetector::BoxEggDetector(BoxCursorLocation side, uint8_t row, uint8_t col, Color color)
-: m_color(color) {
+: m_color(color){
     if (side == BoxCursorLocation::PARTY){
         m_box = ImageFloatBox(0.149, 0.1165 * row + 0.235, 0.033, 0.066);
     } else if (side == BoxCursorLocation::SLOTS){

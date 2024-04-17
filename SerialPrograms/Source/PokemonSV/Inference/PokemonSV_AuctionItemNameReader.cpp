@@ -12,7 +12,7 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 
-AuctionItemNameReader& AuctionItemNameReader::instance() {
+AuctionItemNameReader& AuctionItemNameReader::instance(){
     static AuctionItemNameReader reader;
     return reader;
 }

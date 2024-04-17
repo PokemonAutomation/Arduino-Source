@@ -636,9 +636,9 @@ void make_two_herbs_sandwich(
     finish_two_herbs_sandwich(info, dispatcher, console, context);
 }
 
-void make_sandwich_option(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, SandwichMakerOption& SANDWICH_OPTIONS) {
+void make_sandwich_option(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, SandwichMakerOption& SANDWICH_OPTIONS){
     const Language language = SANDWICH_OPTIONS.LANGUAGE;
-    if (language == Language::None) {
+    if (language == Language::None){
         throw UserSetupError(console.logger(), "Must set game langauge option to read ingredient lists.");
     }
 
@@ -648,16 +648,16 @@ void make_sandwich_option(ProgramEnvironment& env, ConsoleHandle& console, BotBa
     std::map<std::string, uint8_t> condiments;
 
     //Add the selected ingredients to the maps if set to custom
-    if (SANDWICH_OPTIONS.BASE_RECIPE == BaseRecipe::custom) {
+    if (SANDWICH_OPTIONS.BASE_RECIPE == BaseRecipe::custom){
         console.log("Custom sandwich selected. Validating ingredients.", COLOR_BLACK);
         console.overlay().add_log("Custom sandwich selected.");
 
         std::vector<std::unique_ptr<SandwichIngredientsTableRow>> table = SANDWICH_OPTIONS.SANDWICH_INGREDIENTS.copy_snapshot();
 
-        for (const std::unique_ptr<SandwichIngredientsTableRow>& row : table) {
+        for (const std::unique_ptr<SandwichIngredientsTableRow>& row : table){
             const std::string& table_item = row->item.slug();
             if (!(table_item == "baguette")) { //ignore baguette
-                if (std::find(ALL_SANDWICH_FILLINGS_SLUGS().begin(), ALL_SANDWICH_FILLINGS_SLUGS().end(), table_item) != ALL_SANDWICH_FILLINGS_SLUGS().end()) {
+                if (std::find(ALL_SANDWICH_FILLINGS_SLUGS().begin(), ALL_SANDWICH_FILLINGS_SLUGS().end(), table_item) != ALL_SANDWICH_FILLINGS_SLUGS().end()){
                     fillings[table_item]++;
                     num_fillings++;
                 }
@@ -672,11 +672,11 @@ void make_sandwich_option(ProgramEnvironment& env, ConsoleHandle& console, BotBa
             }
         }
 
-        if (num_fillings == 0 || num_condiments == 0) {
+        if (num_fillings == 0 || num_condiments == 0){
             throw UserSetupError(console.logger(), "Must have at least one filling and at least one condiment.");
         }
 
-        if (num_fillings > 6 || num_condiments > 4) {
+        if (num_fillings > 6 || num_condiments > 4){
             throw UserSetupError(console.logger(), "Number of fillings exceed 6 and/or number of condiments exceed 4.");
         }
         console.log("Ingredients validated.", COLOR_BLACK);
@@ -690,8 +690,8 @@ void make_sandwich_option(ProgramEnvironment& env, ConsoleHandle& console, BotBa
         std::vector<std::string> table = SANDWICH_OPTIONS.get_premade_ingredients(
             SANDWICH_OPTIONS.get_premade_sandwich_recipe(SANDWICH_OPTIONS.BASE_RECIPE, SANDWICH_OPTIONS.TYPE, SANDWICH_OPTIONS.PARADOX));
 
-        for (auto&& s : table) {
-            if (std::find(ALL_SANDWICH_FILLINGS_SLUGS().begin(), ALL_SANDWICH_FILLINGS_SLUGS().end(), s) != ALL_SANDWICH_FILLINGS_SLUGS().end()) {
+        for (auto&& s : table){
+            if (std::find(ALL_SANDWICH_FILLINGS_SLUGS().begin(), ALL_SANDWICH_FILLINGS_SLUGS().end(), s) != ALL_SANDWICH_FILLINGS_SLUGS().end()){
                 fillings[s]++;
                 num_fillings++;
             }
@@ -701,8 +701,8 @@ void make_sandwich_option(ProgramEnvironment& env, ConsoleHandle& console, BotBa
             }
         }
         //Insert Herba Mystica if required
-        if (SandwichMakerOption::two_herba_required(SANDWICH_OPTIONS.BASE_RECIPE)) {
-            if (SANDWICH_OPTIONS.HERBA_ONE == SANDWICH_OPTIONS.HERBA_TWO) {
+        if (SandwichMakerOption::two_herba_required(SANDWICH_OPTIONS.BASE_RECIPE)){
+            if (SANDWICH_OPTIONS.HERBA_ONE == SANDWICH_OPTIONS.HERBA_TWO){
                 condiments.insert(std::make_pair(SANDWICH_OPTIONS.herba_to_string(SANDWICH_OPTIONS.HERBA_ONE), (uint8_t)2));
             }
             else {
@@ -717,11 +717,11 @@ void make_sandwich_option(ProgramEnvironment& env, ConsoleHandle& console, BotBa
     /*
     //Print ingredients
     cout << "Fillings:" << endl;
-    for (const auto& [key, value] : fillings) {
+    for (const auto& [key, value] : fillings){
         std::cout << key << ": " << (int)value << endl;
     }
     cout << "Condiments:" << endl;
-    for (const auto& [key, value] : condiments) {
+    for (const auto& [key, value] : condiments){
         std::cout << key << ": " << (int)value << endl;
     }
     */
@@ -729,7 +729,7 @@ void make_sandwich_option(ProgramEnvironment& env, ConsoleHandle& console, BotBa
     make_sandwich_preset(env, console, context, SANDWICH_OPTIONS.LANGUAGE, fillings, condiments);
 }
 
-void make_sandwich_preset(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, Language language, std::map<std::string, uint8_t>& fillings, std::map<std::string, uint8_t>& condiments) {
+void make_sandwich_preset(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, Language language, std::map<std::string, uint8_t>& fillings, std::map<std::string, uint8_t>& condiments){
     //Sort the fillings by priority for building (ex. large items on bottom, cherry tomatoes on top)
     //std::vector<std::string> fillings_game_order = {"lettuce", "tomato", "cherry-tomatoes", "cucumber", "pickle", "onion", "red-onion", "green-bell-pepper", "red-bell-pepper",
     //    "yellow-bell-pepper", "avocado", "bacon", "ham", "prosciutto", "chorizo", "herbed-sausage", "hamburger", "klawf-stick", "smoked-fillet", "fried-fillet", "egg", "potato-tortilla",
@@ -740,14 +740,14 @@ void make_sandwich_preset(ProgramEnvironment& env, ConsoleHandle& console, BotBa
 
     //Add keys to new vector and sort
     std::vector<std::string> fillings_sorted;
-    for (auto i = fillings.begin(); i != fillings.end(); i++) {
+    for (auto i = fillings.begin(); i != fillings.end(); i++){
         fillings_sorted.push_back(i->first);
     }
     std::unordered_map<std::string, int> temp_map;
-    for (auto i = 0; i < (int)fillings_game_order.size(); i++) {
+    for (auto i = 0; i < (int)fillings_game_order.size(); i++){
         temp_map[fillings_game_order[i]] = i;
     }
-    auto compare = [&temp_map](const std::string& s, const std::string& s1) {
+    auto compare = [&temp_map](const std::string& s, const std::string& s1){
         return temp_map[s] < temp_map[s1];
     };
     std::sort(fillings_sorted.begin(), fillings_sorted.end(), compare);
@@ -755,7 +755,7 @@ void make_sandwich_preset(ProgramEnvironment& env, ConsoleHandle& console, BotBa
     /*
     //Print sorted fillings
     cout << "Sorted fillings:" << endl;
-    for (auto i : fillings_sorted) {
+    for (auto i : fillings_sorted){
         cout << i << endl;
     }
     */
@@ -766,12 +766,12 @@ void make_sandwich_preset(ProgramEnvironment& env, ConsoleHandle& console, BotBa
     int plates = 0;
     std::vector<int> plate_amounts;
 
-    for (const std::string& i : fillings_sorted) {
+    for (const std::string& i : fillings_sorted){
         //Add "full" plates
         int plate_calcs = (int)(fillings[i] / FillingsCoordinates::instance().get_filling_information(i).servingsPerPlate);
-        if (plate_calcs != 0) {
+        if (plate_calcs != 0){
             plates += plate_calcs;
-            for (int j = 0; j < plate_calcs; j++) {
+            for (int j = 0; j < plate_calcs; j++){
                 plate_amounts.push_back(
                     (int)(FillingsCoordinates::instance().get_filling_information(i).servingsPerPlate)
                     * (int)(FillingsCoordinates::instance().get_filling_information(i).piecesPerServing));
@@ -780,7 +780,7 @@ void make_sandwich_preset(ProgramEnvironment& env, ConsoleHandle& console, BotBa
 
         //Add plates for remaining servings
         int plate_remaining = ((int)(fillings[i] % FillingsCoordinates::instance().get_filling_information(i).servingsPerPlate));
-        if (plate_remaining != 0) {
+        if (plate_remaining != 0){
             plates++;
             plate_amounts.push_back(plate_remaining * (int)(FillingsCoordinates::instance().get_filling_information(i).piecesPerServing));
         }
@@ -805,7 +805,7 @@ void make_sandwich_preset(ProgramEnvironment& env, ConsoleHandle& console, BotBa
     run_sandwich_maker(env, console, context, language, fillings, fillings_sorted, plates);
 }
 
-void run_sandwich_maker(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, Language language, std::map<std::string, uint8_t>& fillings, std::vector<std::string>& fillings_sorted, int& plates) {
+void run_sandwich_maker(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, Language language, std::map<std::string, uint8_t>& fillings, std::vector<std::string>& fillings_sorted, int& plates){
 
     wait_for_initial_hand(env.program_info(), console, context);
 
@@ -831,7 +831,7 @@ void run_sandwich_maker(ProgramEnvironment& env, ConsoleHandle& console, BotBase
         const int max_read_label_tries = 4;
         for(int read_label_try_count = 0; read_label_try_count < max_read_label_tries; ++read_label_try_count){
             std::string center_filling = middle_plate_detector.detect_filling_name(screen);
-            if (center_filling.empty()) {
+            if (center_filling.empty()){
                 if (read_label_try_count + 1 < max_read_label_tries){
                     // Wait more time
                     pbf_wait(context, TICKS_PER_SECOND * 2);
@@ -852,7 +852,7 @@ void run_sandwich_maker(ProgramEnvironment& env, ConsoleHandle& console, BotBase
 
         //Get left (2nd) ingredient
         std::string left_filling = left_plate_detector.detect_filling_name(screen);
-        if (left_filling.empty()) {
+        if (left_filling.empty()){
             console.log("No ingredient found on left label.");
             console.overlay().add_log("No left plate");
         }
@@ -864,7 +864,7 @@ void run_sandwich_maker(ProgramEnvironment& env, ConsoleHandle& console, BotBase
 
         //Get right (3rd) ingredient
         std::string right_filling = right_plate_detector.detect_filling_name(screen);
-        if (right_filling.empty()) {
+        if (right_filling.empty()){
             console.log("No ingredient found on right label.");
             console.overlay().add_log("No right plate");
         }
@@ -878,14 +878,14 @@ void run_sandwich_maker(ProgramEnvironment& env, ConsoleHandle& console, BotBase
         //center 1, left 2, right 3, far left 4, far far left/right 5, right 6
         //this differs from the game layout: far right is 5 and far far left/right is 6 in game
         //however as long as we stay internally consistent with this numbering it will work
-        for (int i = 0; i < (plates - 3); i++) {
+        for (int i = 0; i < (plates - 3); i++){
             pbf_press_button(context, BUTTON_R, 20, 180);
             context.wait_for_all_requests();
 
             screen = console.video().snapshot();
             left_filling = left_plate_detector.detect_filling_name(screen);
 
-            if (left_filling.empty()) {
+            if (left_filling.empty()){
                 throw OperationFailedException(
                     ErrorReport::SEND_ERROR_REPORT, console, "No ingredient label found on remaining plate " + std::to_string(i) + ".", true
                 );
@@ -898,12 +898,12 @@ void run_sandwich_maker(ProgramEnvironment& env, ConsoleHandle& console, BotBase
         //Now re-center plates
         console.log("Re-centering plates if needed.");
         console.overlay().add_log("Re-centering plates if needed.");
-        for (int i = 0; i < (plates - 3); i++) {
+        for (int i = 0; i < (plates - 3); i++){
             pbf_press_button(context, BUTTON_L, 20, 80);
         }
 
         //If a label fails to read it'll cause issues down the line
-        if ((int)plate_order.size() != plates) {
+        if ((int)plate_order.size() != plates){
             env.log("Found # plate labels " + std::to_string(plate_order.size()) + ", not same as desired # plates " + std::to_string(plates));
             throw OperationFailedException(
                 ErrorReport::SEND_ERROR_REPORT, console,
@@ -928,7 +928,7 @@ void run_sandwich_maker(ProgramEnvironment& env, ConsoleHandle& console, BotBase
     context.wait_for_all_requests();
 
     //Find fillings and add them in order
-    for (const std::string& i : fillings_sorted) {
+    for (const std::string& i : fillings_sorted){
         //cout << "Placing " << i << endl;
         console.overlay().add_log("Placing " + i, COLOR_WHITE);
 
@@ -940,18 +940,18 @@ void run_sandwich_maker(ProgramEnvironment& env, ConsoleHandle& console, BotBase
 
         std::vector<int> plate_index;
         //Get the plates we want to go to
-        for (int j = 0; j < (int)plate_order.size(); j++) {
-            if (i == plate_order.at(j)) {
+        for (int j = 0; j < (int)plate_order.size(); j++){
+            if (i == plate_order.at(j)){
                 plate_index.push_back(j);
             }
         }
 
         //Target the correct filling plate and place until it is empty
-        for (int j = 0; j < (int)plate_index.size(); j++) {
+        for (int j = 0; j < (int)plate_index.size(); j++){
             //Navigate to plate and set target plate
             //cout << "Target plate: " << plate_index.at(j) << endl;
             console.overlay().add_log("Target plate: " + std::to_string(plate_index.at(j)), COLOR_WHITE);
-            switch (plate_index.at(j)) {
+            switch (plate_index.at(j)){
             case 0:
                 target_plate = center_plate;
                 break;
@@ -963,7 +963,7 @@ void run_sandwich_maker(ProgramEnvironment& env, ConsoleHandle& console, BotBase
                 break;
             case 3: case 4: case 5: case 6:
                 //Press R the appropriate number of times
-                for (int k = 2; k < plate_index.at(j); k++) {
+                for (int k = 2; k < plate_index.at(j); k++){
                     pbf_press_button(context, BUTTON_R, 20, 80);
                 }
                 target_plate = left_plate;
@@ -973,9 +973,9 @@ void run_sandwich_maker(ProgramEnvironment& env, ConsoleHandle& console, BotBase
             }
 
             //Place the fillings until label does not light up yellow on grab/the piece count is not hit
-            while (true) {
+            while (true){
                 //Break out after placing all pieces of the filling
-                if (placement_number == times_to_place) {
+                if (placement_number == times_to_place){
                     break;
                 }
 
@@ -996,7 +996,7 @@ void run_sandwich_maker(ProgramEnvironment& env, ConsoleHandle& console, BotBase
 
                 //The label check is needed for ingredients with multiple plates as we don't know which plate has what amount
                 if (!left_plate_detector.is_label_yellow(screen) && !middle_plate_detector.is_label_yellow(screen)
-                    && !right_plate_detector.is_label_yellow(screen)) {
+                    && !right_plate_detector.is_label_yellow(screen)){
                     context.wait_for_all_requests();
                     break;
                 }
@@ -1006,7 +1006,7 @@ void run_sandwich_maker(ProgramEnvironment& env, ConsoleHandle& console, BotBase
             }
 
             //Reset plate positions
-            for (int k = 2; k < plate_index.at(j); k++) {
+            for (int k = 2; k < plate_index.at(j); k++){
                 pbf_press_button(context, BUTTON_L, 20, 80);
             }
         }
@@ -1014,7 +1014,7 @@ void run_sandwich_maker(ProgramEnvironment& env, ConsoleHandle& console, BotBase
     // Handle top slice by tossing it away
     SandwichHandWatcher grabbing_hand(SandwichHandType::FREE, { 0, 0, 1.0, 1.0 });
     int ret = wait_until(console, context, std::chrono::seconds(30), { grabbing_hand });
-    if (ret < 0) {
+    if (ret < 0){
         throw OperationFailedException(
             ErrorReport::SEND_ERROR_REPORT, console,
             "SandwichMaker: Cannot detect grabing hand when waiting for upper bread.",

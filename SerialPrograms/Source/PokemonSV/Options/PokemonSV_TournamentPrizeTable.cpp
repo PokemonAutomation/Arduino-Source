@@ -33,7 +33,7 @@ TournamentPrizeTable::TournamentPrizeTable(std::string label)
 bool TournamentPrizeTable::find_item(const std::string& item_slug) const{
     std::vector<std::unique_ptr<TournamentPrizeSelectorRow>> table = copy_snapshot();
     for (const std::unique_ptr<TournamentPrizeSelectorRow>& row : table){
-        if (row->item.slug() == item_slug) {
+        if (row->item.slug() == item_slug){
             return true;
         }
     }

@@ -555,7 +555,7 @@ bool StatsResetEventBattle::check_stats_after_win(SingleSwitchProgramEnvironment
             auto snapshot = env.console.video().snapshot();
             IvRanges ivs;
             try{
-                if (TARGET == Target::Ursaluna) {
+                if (TARGET == Target::Ursaluna){
                     ivs = reader.calc_ivs(env.logger(), snapshot, { 113, 70, 120, 135, 65, 52 });
                 } else {
                     ivs = reader.calc_ivs(env.logger(), snapshot, { 88, 88, 160, 88, 88, 88 });
@@ -572,7 +572,7 @@ bool StatsResetEventBattle::check_stats_after_win(SingleSwitchProgramEnvironment
             CALCULATED_IVS.set(ivs);
 
             StatsHuntAction action;
-            if (TARGET == Target::Ursaluna) {
+            if (TARGET == Target::Ursaluna){
                 action = FILTERS0.get_action(false, StatsHuntGenderFilter::Any, NatureCheckerValue::Hardy, ivs);
             } else {
                 action = FILTERS0.get_action(false, StatsHuntGenderFilter::Any, NatureCheckerValue::Timid, ivs);
@@ -619,7 +619,7 @@ void StatsResetEventBattle::program(SingleSwitchProgramEnvironment& env, BotBase
     pbf_press_button(context, BUTTON_L, 10, 10);
 
     while (true){
-        if (TARGET == Target::Ursaluna) {
+        if (TARGET == Target::Ursaluna){
             enter_battle_ursaluna(env, context);
         }else{
             enter_battle_pecharunt(env, context);

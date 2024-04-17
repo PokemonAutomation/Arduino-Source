@@ -166,7 +166,7 @@ void StatsResetCalyrex::program(SingleSwitchProgramEnvironment& env, BotBaseCont
                     },
                     {{fight_detector}}
                 );
-                if (result == 0) {
+                if (result == 0){
                     env.log("New fight detected, let's begin to throw balls.", COLOR_PURPLE);
                     pbf_mash_button(context, BUTTON_B, 1 * TICKS_PER_SECOND);
                 }

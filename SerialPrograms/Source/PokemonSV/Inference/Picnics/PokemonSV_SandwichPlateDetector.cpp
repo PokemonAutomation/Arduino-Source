@@ -70,7 +70,7 @@ std::string SandwichPlateDetector::detect_filling_name(const ImageViewRGB32& scr
         );
         ocr_result.clear_beyond_log10p(SandwichFillingOCR::MAX_LOG10P);
         ocr_result.clear_beyond_spread(SandwichFillingOCR::MAX_LOG10P_SPREAD);
-        if (!ocr_result.results.empty()) {
+        if (!ocr_result.results.empty()){
             for (const auto& result : ocr_result.results){
                 results.emplace(result.first, result.second);
             }

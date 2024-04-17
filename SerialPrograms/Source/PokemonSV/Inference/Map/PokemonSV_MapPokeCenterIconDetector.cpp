@@ -25,14 +25,14 @@ class MapPokeCenterIconMatcher : public ImageMatch::WaterfillTemplateMatcher{
 public:
     MapPokeCenterIconMatcher() : WaterfillTemplateMatcher(
         "PokemonSV/Map/PokeCenterIcon-Template.png", Color(150,0,0), Color(255, 100, 100), 50
-    ) {
+    ){
         m_aspect_ratio_lower = 0.9;
         m_aspect_ratio_upper = 1.1;
         m_area_ratio_lower = 0.6;
         m_area_ratio_upper = 1.2;
     }
 
-    static const ImageMatch::WaterfillTemplateMatcher& instance() {
+    static const ImageMatch::WaterfillTemplateMatcher& instance(){
         static MapPokeCenterIconMatcher matcher;
         return matcher;
     }

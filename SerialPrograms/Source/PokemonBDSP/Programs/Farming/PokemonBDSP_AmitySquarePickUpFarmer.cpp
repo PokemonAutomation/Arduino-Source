@@ -90,11 +90,11 @@ void AmitySquarePickUpFarmer::program(SingleSwitchProgramEnvironment& env, BotBa
     //  Connect the controller.
     pbf_move_right_joystick(context, 0, 255, 10, 0);
 
-    for (uint16_t c = 0; c < MAX_FETCH_ATTEMPTS; c++) {
+    for (uint16_t c = 0; c < MAX_FETCH_ATTEMPTS; c++){
         env.update_stats();
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
 
-        for (uint16_t i = 0; i < ROUNDS_PER_FETCH; i++) {
+        for (uint16_t i = 0; i < ROUNDS_PER_FETCH; i++){
             //  Move right
             pbf_move_left_joystick(context, 255, 128, ONE_WAY_MOVING_TIME, 0);
             // Move left

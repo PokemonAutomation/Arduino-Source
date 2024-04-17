@@ -66,7 +66,7 @@ ParaglideItemDuper::ParaglideItemDuper()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void ParaglideItemDuper::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
+void ParaglideItemDuper::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     ParaglideItemDuper_Descriptor::Stats& stats = env.current_stats<ParaglideItemDuper_Descriptor::Stats>();
 
     /*
@@ -100,7 +100,7 @@ void ParaglideItemDuper::program(SingleSwitchProgramEnvironment& env, BotBaseCon
 
     uint32_t c = 0;
 
-    while (c < ATTEMPTS) {
+    while (c < ATTEMPTS){
         env.log("Current Attempts: " + tostr_u_commas(c));
 
         //Walk forward from teleportation point

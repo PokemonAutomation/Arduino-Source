@@ -58,7 +58,7 @@ SurfItemDuper::SurfItemDuper()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void SurfItemDuper::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
+void SurfItemDuper::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     SurfItemDuper_Descriptor::Stats& stats = env.current_stats<SurfItemDuper_Descriptor::Stats>();
 
     /*
@@ -85,7 +85,7 @@ void SurfItemDuper::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
 
     uint32_t c = 0;
 
-    while (c < ATTEMPTS) {
+    while (c < ATTEMPTS){
         env.log("Current Attempts: " + tostr_u_commas(c));
 
         //Initiate Shield Surf

@@ -234,7 +234,7 @@ int run_command_line_tests(){
             {
                 QString path = full_path_cleaned;
                 QFileInfo cur_info(path);
-                while(cur_info != test_root_info) {
+                while(cur_info != test_root_info){
                     path_components.push_front(cur_info.fileName());
                     // Go upper one level of folder:
                     path = cur_info.path();

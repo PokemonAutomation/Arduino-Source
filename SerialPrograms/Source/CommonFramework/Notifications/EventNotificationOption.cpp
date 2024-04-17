@@ -86,7 +86,7 @@ std::vector<std::string> EventNotificationOption::parse_tags(const std::string& 
     std::vector<std::string> tags;
     size_t start = 0;
     
-    for (size_t end; (end = str.find(",", start)) != std::string::npos; start = end+1) {
+    for (size_t end; (end = str.find(",", start)) != std::string::npos; start = end+1){
         std::string token = str.substr(start, end - start);
         token = sanitize_tag(token);
         if (!token.empty()){

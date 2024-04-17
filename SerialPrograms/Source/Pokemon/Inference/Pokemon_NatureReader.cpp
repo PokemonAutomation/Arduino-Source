@@ -12,7 +12,7 @@ namespace Pokemon{
 
 namespace {
 
-std::string nature_checker_value_to_string(NatureCheckerValue value) {
+std::string nature_checker_value_to_string(NatureCheckerValue value){
     const char* names[] = {
         "UnableToDetect",
         "Any",

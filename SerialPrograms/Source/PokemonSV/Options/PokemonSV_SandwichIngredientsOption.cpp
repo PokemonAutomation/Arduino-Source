@@ -12,9 +12,9 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
 
-StringSelectDatabase make_sandwich_ingredient_database() {
+StringSelectDatabase make_sandwich_ingredient_database(){
     StringSelectDatabase ret;
-    for (const auto& slug : ALL_SANDWICH_FILLINGS_SLUGS()) {
+    for (const auto& slug : ALL_SANDWICH_FILLINGS_SLUGS()){
         const SandwichIngredientNames& data = get_ingredient_name(slug);
         const SpriteDatabase::Sprite* sprite = SANDWICH_FILLINGS_DATABASE().get_nothrow(slug);
         if (sprite == nullptr){
@@ -24,7 +24,7 @@ StringSelectDatabase make_sandwich_ingredient_database() {
             ret.add_entry(StringSelectEntry(slug, data.display_name(), sprite->icon));
         }
     }
-    for (const auto& slug : ALL_SANDWICH_CONDIMENTS_SLUGS()) {
+    for (const auto& slug : ALL_SANDWICH_CONDIMENTS_SLUGS()){
         const SandwichIngredientNames& data = get_ingredient_name(slug);
         const SpriteDatabase::Sprite* sprite = SANDWICH_CONDIMENTS_DATABASE().get_nothrow(slug);
         if (sprite == nullptr){
@@ -37,7 +37,7 @@ StringSelectDatabase make_sandwich_ingredient_database() {
     
     return ret;
 }
-const StringSelectDatabase& SANDWICH_INGREDIENT_DATABASE() {
+const StringSelectDatabase& SANDWICH_INGREDIENT_DATABASE(){
     static StringSelectDatabase database = make_sandwich_ingredient_database();
     return database;
 }

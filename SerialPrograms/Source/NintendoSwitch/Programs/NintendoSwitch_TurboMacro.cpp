@@ -114,7 +114,7 @@ void TurboMacro::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
     //  Connect the controller.
     //pbf_press_button(context, BUTTON_LCLICK, 5, 5);
 
-    for (uint32_t c = 0; c < LOOP; c++) {
+    for (uint32_t c = 0; c < LOOP; c++){
         run_macro(env, context);
     }
 }

@@ -232,7 +232,7 @@ static PA_FORCE_INLINE uint64_t row_or(const BinaryTile_64x8_arm64_NEON& tile){
 static PA_FORCE_INLINE bool find_bit(size_t& x, size_t& y, const BinaryTile_64x8_arm64_NEON& tile){
     // Check whether thera are any 1-bits in the tile:
     uint64x2_t anything = vec_or(tile);
-    if ((vgetq_lane_u64(anything, 0) | vgetq_lane_u64(anything, 1)) == 0) {
+    if ((vgetq_lane_u64(anything, 0) | vgetq_lane_u64(anything, 1)) == 0){
         return false;
     }
     // Check each tile row:

@@ -64,7 +64,7 @@ MineruItemDuper::MineruItemDuper()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void MineruItemDuper::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
+void MineruItemDuper::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     MineruItemDuper_Descriptor::Stats& stats = env.current_stats<MineruItemDuper_Descriptor::Stats>();
 
     /*
@@ -88,7 +88,7 @@ void MineruItemDuper::program(SingleSwitchProgramEnvironment& env, BotBaseContex
 
     uint32_t ITEMS_PER_ATTEMPT = IS_ZONAI_DEVICE ? 10 : 5;
     uint32_t c = 0;
-    while (c < AMOUNT) {
+    while (c < AMOUNT){
         env.log("Current Amount: " + tostr_u_commas(c));
 
         // Open menu
@@ -98,12 +98,12 @@ void MineruItemDuper::program(SingleSwitchProgramEnvironment& env, BotBaseContex
         pbf_press_button(context, BUTTON_A, 10, 10);
 
         // Pressing "Hold Item" is only necessary for Materials
-        if (!IS_ZONAI_DEVICE) {
+        if (!IS_ZONAI_DEVICE){
             pbf_press_dpad(context, DPAD_DOWN, 10, 10);
         }
 
         pbf_press_button(context, BUTTON_A, 10, 10);
-         for (uint32_t i = 0; i < ITEMS_PER_ATTEMPT && c < AMOUNT; i++) {
+         for (uint32_t i = 0; i < ITEMS_PER_ATTEMPT && c < AMOUNT; i++){
             pbf_press_button(context, BUTTON_A, 10, 10);
 
             // Increment counters
@@ -116,9 +116,9 @@ void MineruItemDuper::program(SingleSwitchProgramEnvironment& env, BotBaseContex
         pbf_press_button(context, BUTTON_Y, 10, 40);
 
         // There is no need to pick up Zonai devices 
-        if (!IS_ZONAI_DEVICE) {
+        if (!IS_ZONAI_DEVICE){
             // Pick up duped items plus some extra attempts for potentially missed ones
-            for (uint32_t i = 0; i < ITEMS_PER_ATTEMPT + 2; i++) {
+            for (uint32_t i = 0; i < ITEMS_PER_ATTEMPT + 2; i++){
                 pbf_press_button(context, BUTTON_A, 10, 10);
             }
         } else {

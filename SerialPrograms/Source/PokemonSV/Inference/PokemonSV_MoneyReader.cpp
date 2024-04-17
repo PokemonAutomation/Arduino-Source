@@ -39,19 +39,19 @@ int read_money(Logger& logger, const ImageViewRGB32& image){
     std::ssub_match sub_match = match[0];
 
     bool has_digit = false;
-    for (char ch : sub_match.str()) {
+    for (char ch : sub_match.str()){
         //  4 is commonly misread as A.
-        if (ch == 'a' || ch == 'A') {
+        if (ch == 'a' || ch == 'A'){
             normalized += '4';
             has_digit = true;
         }
-        if ('0' <= ch && ch <= '9') {
+        if ('0' <= ch && ch <= '9'){
             normalized += ch;
             has_digit = true;
         }
     }
 
-    if (!has_digit) {
+    if (!has_digit){
         return -1;
     }
 

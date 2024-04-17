@@ -16,7 +16,7 @@ void AutoHeightTableWidget::update_height(){
     int total_height = 5;
     total_height += this->horizontalHeader()->height();
     total_height += this->horizontalScrollBar()->height();
-    for (int c = 0; c < rows; c++) {
+    for (int c = 0; c < rows; c++){
         total_height += this->verticalHeader()->sectionSize(c);
     }
 //    cout << total_height << endl;

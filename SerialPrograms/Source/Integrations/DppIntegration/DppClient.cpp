@@ -17,7 +17,7 @@ namespace Integration{
 namespace DppClient{
 
 
-Client& Client::instance() {
+Client& Client::instance(){
     static Client client;
     return client;
 }
@@ -26,13 +26,13 @@ bool Client::is_initialized(){
     std::lock_guard<std::mutex> lg(m_client_lock);
     return m_bot != nullptr;
 }
-bool Client::is_running() {
+bool Client::is_running(){
     return m_is_connected.load(std::memory_order_acquire);
 }
 
-void Client::connect() {
+void Client::connect(){
     std::lock_guard<std::mutex> lg(m_client_lock);
-    if (m_bot == nullptr && !m_is_connected.load(std::memory_order_relaxed)) {
+    if (m_bot == nullptr && !m_is_connected.load(std::memory_order_relaxed)){
         DiscordSettingsOption& settings = GlobalSettings::instance().DISCORD;
         if (!Handler::check_if_empty(settings))
             return;
@@ -45,22 +45,22 @@ void Client::connect() {
             m_bot->cache_policy = { cache_policy_setting_t::cp_lazy, cache_policy_setting_t::cp_lazy, cache_policy_setting_t::cp_aggressive };
             std::thread(&Client::run, this, token).detach();
         }
-        catch (std::exception& e) {
+        catch (std::exception& e){
             Handler::log_dpp("DPP thew an exception: " + (std::string)e.what(), "connect()", ll_critical);
         }
     }
 }
 
-void Client::disconnect() {
+void Client::disconnect(){
     std::lock_guard<std::mutex> lg(m_client_lock);
-    if (m_bot != nullptr && m_is_connected.load(std::memory_order_relaxed)) {
+    if (m_bot != nullptr && m_is_connected.load(std::memory_order_relaxed)){
         try {
             m_bot->shutdown();
             m_handler.reset();
             m_bot.reset();
             m_is_connected.store(false, std::memory_order_release);
         }
-        catch (std::exception& e) {
+        catch (std::exception& e){
             Handler::log_dpp("DPP thew an exception: " + (std::string)e.what(), "disconnect()", ll_critical);
         }
     }
@@ -89,14 +89,14 @@ void Client::send_embed_dpp(
         embed.set_color((int)((uint32_t)color & 0xffffff));
 
         auto fields = json_obj.get_array("fields");
-        for (auto& field : *fields) {
+        for (auto& field : *fields){
             auto obj = field.get_object();
             embed.add_field(*obj->get_string("name"), *obj->get_string("value"));
         }
     }
 
     std::set<std::string> tag_set;
-    for (const std::string& tag : tags) {
+    for (const std::string& tag : tags){
         tag_set.insert(to_lower(tag));
     }
 
@@ -104,9 +104,9 @@ void Client::send_embed_dpp(
     const DiscordIntegrationTable& channels = settings.integration.channels;
 
     auto table = channels.copy_snapshot();
-    for (auto& ch : table) {
+    for (auto& ch : table){
         const Integration::DiscordIntegrationChannel& channel = *ch;
-        if (((std::string)channel.tags_text).empty() || !channel.enabled) {
+        if (((std::string)channel.tags_text).empty() || !channel.enabled){
             continue;
         }
         if (!builder.should_send(EventNotificationOption::parse_tags(channel.tags_text))){
@@ -129,7 +129,7 @@ void Client::send_embed_dpp(
     }
 }
 
-void Client::run(const std::string& token) {
+void Client::run(const std::string& token){
     std::lock_guard<std::mutex> lg(m_client_lock);
     if (!m_bot){
         Handler::log_dpp("DPP has been disconnected.", "run()", ll_warning);
@@ -142,7 +142,7 @@ void Client::run(const std::string& token) {
         m_bot->set_presence(presence(presence_status::ps_online, activity_type::at_game, (std::string)GlobalSettings::instance().DISCORD.integration.game_status));
         m_is_connected.store(true, std::memory_order_release);
     }
-    catch (std::exception& e) {
+    catch (std::exception& e){
         Handler::log_dpp("DPP thew an exception: " + (std::string)e.what(), "run()", ll_critical);
         m_handler.reset();
         m_bot.reset();

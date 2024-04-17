@@ -19,7 +19,7 @@ namespace PokemonSV{
 struct AuctionItemNameDatabase {
     AuctionItemNameDatabase();
 
-    static const AuctionItemNameDatabase& instance() {
+    static const AuctionItemNameDatabase& instance(){
         static AuctionItemNameDatabase database;
         return database;
     }
@@ -53,7 +53,7 @@ AuctionItemNameDatabase::AuctionItemNameDatabase()
     JsonValue json_disp = load_json_file(path_disp);
     JsonObject& item_disp = json_disp.get_object_throw(path_disp);
 
-    for (auto& item : slugs) {
+    for (auto& item : slugs){
         std::string& slug = item.get_string_throw(path_slugs);
 
         JsonObject& auction_item_name_dict = item_disp.get_object_throw(slug, path_disp);
@@ -63,15 +63,15 @@ AuctionItemNameDatabase::AuctionItemNameDatabase()
         database[std::move(slug)].m_display_name = std::move(display_name);
     }
 
-    for (const auto& item : database) {
+    for (const auto& item : database){
         reverse_lookup[item.second.m_display_name] = item.first;
     }
 }
 
-const AuctionItemNames& get_auction_item_name(const std::string& slug) {
+const AuctionItemNames& get_auction_item_name(const std::string& slug){
     const std::map<std::string, AuctionItemNames>& database = AuctionItemNameDatabase::instance().database;
     auto iter = database.find(slug);
-    if (iter == database.end()) {
+    if (iter == database.end()){
         throw InternalProgramError(
             nullptr, PA_CURRENT_FUNCTION,
             "Auction item slug not found in database: " + slug
@@ -79,10 +79,10 @@ const AuctionItemNames& get_auction_item_name(const std::string& slug) {
     }
     return iter->second;
 }
-const std::string& parse_auction_item_name(const std::string& display_name) {
+const std::string& parse_auction_item_name(const std::string& display_name){
     const std::map<std::string, std::string>& database = AuctionItemNameDatabase::instance().reverse_lookup;
     auto iter = database.find(display_name);
-    if (iter == database.end()) {
+    if (iter == database.end()){
         throw InternalProgramError(
             nullptr, PA_CURRENT_FUNCTION,
             "Auction item name not found in database: " + display_name
@@ -90,17 +90,17 @@ const std::string& parse_auction_item_name(const std::string& display_name) {
     }
     return iter->second;
 }
-const std::string& parse_auction_item_name_nothrow(const std::string& display_name) {
+const std::string& parse_auction_item_name_nothrow(const std::string& display_name){
     const std::map<std::string, std::string>& database = AuctionItemNameDatabase::instance().reverse_lookup;
     auto iter = database.find(display_name);
-    if (iter == database.end()) {
+    if (iter == database.end()){
         return AuctionItemNameDatabase::NULL_SLUG;
     }
     return iter->second;
 }
 
 
-const std::vector<std::string>& AUCTION_ITEM_SLUGS() {
+const std::vector<std::string>& AUCTION_ITEM_SLUGS(){
     return AuctionItemNameDatabase::instance().ordered_list;
 }
 

@@ -65,7 +65,7 @@ std::string BlueberryQuestDetector::detect_quest(const ImageViewRGB32& screen) c
     );
     ocr_result.clear_beyond_log10p(BlueberryQuestReader::MAX_LOG10P);
     ocr_result.clear_beyond_spread(BlueberryQuestReader::MAX_LOG10P_SPREAD);
-    if (!ocr_result.results.empty()) {
+    if (!ocr_result.results.empty()){
         for (const auto& result : ocr_result.results){
             results.emplace(result.first, result.second);
         }
@@ -76,7 +76,7 @@ std::string BlueberryQuestDetector::detect_quest(const ImageViewRGB32& screen) c
         return "";
     }
 
-    if (results.size() > 1) {
+    if (results.size() > 1){
         throw OperationFailedException(
             ErrorReport::SEND_ERROR_REPORT, m_logger,
             "BlueberryQuestDetector::detect_quest(): Unable to read selected item. Ambiguous or multiple results."

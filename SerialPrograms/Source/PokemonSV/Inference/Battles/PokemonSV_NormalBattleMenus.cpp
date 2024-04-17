@@ -284,43 +284,43 @@ void SwapMenuDetector::make_overlays(VideoOverlaySet& items) const {
     m_arrow.make_overlays(items);
 }
 bool SwapMenuDetector::detect(const ImageViewRGB32& screen) const {
-    if (!m_arrow.detect(screen)) {
+    if (!m_arrow.detect(screen)){
         return false;
     }
     return true;
 }
 int8_t SwapMenuDetector::detect_slot(const ImageViewRGB32& screen) const {
     ImageFloatBox box;
-    if (!m_arrow.detect(box, screen)) {
+    if (!m_arrow.detect(box, screen)){
         return -1;
     }
 
     int slot = (int)((box.y - 0.172222) / 0.116482 + 0.5);
-    if (slot < 0) {
+    if (slot < 0){
         slot = 0;
     }
     //cout << "slot = " << slot << endl;
     return (int8_t)slot;
 }
 bool SwapMenuDetector::move_to_slot(ConsoleHandle& console, BotBaseContext& context, uint8_t slot) const {
-    if (slot > 5) {
+    if (slot > 5){
         return false;
     }
-    for (size_t attempts = 0;; attempts++) {
+    for (size_t attempts = 0;; attempts++){
         context.wait_for_all_requests();
         VideoSnapshot screen = console.video().snapshot();
         int8_t current_slot = detect_slot(screen);
-        if (current_slot < 0 || current_slot > 5) {
+        if (current_slot < 0 || current_slot > 5){
             console.log("SwapMenuDetector::move_to_slot(): Unable to detect slot.", COLOR_RED);
             return false;
         }
-        if (attempts > 20) {
+        if (attempts > 20){
             console.log("SwapMenuDetector::move_to_slot(): Failed to move slot after 20 attempts.", COLOR_RED);
             return false;
         }
 
         uint8_t diff = (6 + slot - (uint8_t)current_slot) % 6;
-        switch (diff) {
+        switch (diff){
         case 0:
             return true;
         case 1:

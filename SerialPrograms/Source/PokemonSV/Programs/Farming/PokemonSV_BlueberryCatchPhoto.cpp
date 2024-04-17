@@ -36,11 +36,11 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
 
-CameraAngle quest_photo_navi(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, const BBQOption& BBQ_OPTIONS, BBQuests current_quest) {
+CameraAngle quest_photo_navi(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, const BBQOption& BBQ_OPTIONS, BBQuests current_quest){
     CameraAngle angle = CameraAngle::none;
 
     //Navigate to target
-    switch (current_quest) {
+    switch (current_quest){
         case BBQuests::photo_fly: case BBQuests::photo_psychic:
             console.log("Photo: In-flight/Psychic");
 
@@ -266,11 +266,11 @@ CameraAngle quest_photo_navi(const ProgramInfo& info, ConsoleHandle& console, Bo
     return angle;
 }
 
-void quest_photo(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, const BBQOption& BBQ_OPTIONS, BBQuests current_quest) {
+void quest_photo(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, const BBQOption& BBQ_OPTIONS, BBQuests current_quest){
     bool took_photo = false;
     CameraAngle move_camera = CameraAngle::none;
 
-    while(!took_photo) {
+    while(!took_photo){
         EncounterWatcher encounter_watcher(console, COLOR_RED);
         int ret = run_until(
             console, context,
@@ -287,10 +287,10 @@ void quest_photo(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
                 pbf_wait(context, 100);
                 context.wait_for_all_requests();
 
-                if (move_camera == CameraAngle::up) {
+                if (move_camera == CameraAngle::up){
                     pbf_move_right_joystick(context, 128, 0, 50, 20);
                 }
-                else if (move_camera == CameraAngle::down) {
+                else if (move_camera == CameraAngle::down){
                     pbf_move_right_joystick(context, 128, 255, 50, 20);
                 }
                 context.wait_for_all_requests();
@@ -302,7 +302,7 @@ void quest_photo(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
                     std::chrono::seconds(10),
                     { photo_prompt }
                 );
-                if (ret != 0) {
+                if (ret != 0){
                     console.log("Photo not taken.");
                 }
 
@@ -327,11 +327,11 @@ void quest_photo(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
         );
         encounter_watcher.throw_if_no_sound();
 
-        if (ret >= 0) {
+        if (ret >= 0){
             console.log("Battle menu detected.");
 
             bool is_shiny = (bool)encounter_watcher.shiny_screenshot();
-            if (is_shiny) {
+            if (is_shiny){
                 console.log("Shiny detected!");
                 pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
                 throw ProgramFinishedException();
@@ -360,8 +360,8 @@ void quest_photo(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
     return_to_plaza(info, console, context);
 }
 
-void quest_catch_navi(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, const BBQOption& BBQ_OPTIONS, BBQuests current_quest) {
-    switch (current_quest) {
+void quest_catch_navi(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, const BBQOption& BBQ_OPTIONS, BBQuests current_quest){
+    switch (current_quest){
         case BBQuests::catch_any: case BBQuests::catch_normal: case BBQuests::catch_fire:
             console.log("Catch: Any/Normal/Fire");
 
@@ -610,14 +610,14 @@ void quest_catch_navi(const ProgramInfo& info, ConsoleHandle& console, BotBaseCo
 
 }
 
-void quest_catch_throw_ball(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, Language language, const std::string& selected_ball) {
+void quest_catch_throw_ball(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, Language language, const std::string& selected_ball){
     BattleBallReader reader(console, language);
     std::string ball_reader = "";
     WallClock start = current_time();
 
     console.log("Opening ball menu...");
-    while (ball_reader == "") {
-        if (current_time() - start > std::chrono::minutes(2)) {
+    while (ball_reader == ""){
+        if (current_time() - start > std::chrono::minutes(2)){
             console.log("Timed out trying to read ball after 2 minutes.", COLOR_RED);
             throw OperationFailedException(
                 ErrorReport::SEND_ERROR_REPORT, console,
@@ -640,7 +640,7 @@ void quest_catch_throw_ball(const ProgramInfo& info, ConsoleHandle& console, Bot
 
     console.log("Selecting ball.");
     int quantity = move_to_ball(reader, console, context, selected_ball);
-    if (quantity == 0) {
+    if (quantity == 0){
         console.log("Unable to find ball.");
         throw OperationFailedException(
             ErrorReport::SEND_ERROR_REPORT, console,
@@ -648,7 +648,7 @@ void quest_catch_throw_ball(const ProgramInfo& info, ConsoleHandle& console, Bot
             true
         );
     }
-    if (quantity < 0) {
+    if (quantity < 0){
         console.log("Unable to read ball quantity.", COLOR_RED);
     }
 
@@ -661,7 +661,7 @@ void quest_catch_throw_ball(const ProgramInfo& info, ConsoleHandle& console, Bot
     context.wait_for_all_requests();
 }
 
-void quest_catch_handle_battle(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, const BBQOption& BBQ_OPTIONS, BBQuests current_quest) {
+void quest_catch_handle_battle(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, const BBQOption& BBQ_OPTIONS, BBQuests current_quest){
     console.log("Catching Pokemon.");
     AdvanceDialogWatcher advance_dialog(COLOR_MAGENTA);
     PromptDialogWatcher add_to_party(COLOR_PURPLE);
@@ -673,8 +673,8 @@ void quest_catch_handle_battle(const ProgramInfo& info, ConsoleHandle& console, 
 
     int ret2 = run_until(
         console, context,
-        [&](BotBaseContext& context) {
-            while (true) {
+        [&](BotBaseContext& context){
+            while (true){
                 //Check that battle menu appears - this is in case of swapping pokemon
                 NormalBattleMenuWatcher menu_before_throw(COLOR_YELLOW);
                 int bMenu = wait_until(
@@ -682,7 +682,7 @@ void quest_catch_handle_battle(const ProgramInfo& info, ConsoleHandle& console, 
                     std::chrono::seconds(15),
                     { menu_before_throw }
                 );
-                if (bMenu < 0) {
+                if (bMenu < 0){
                     console.log("Unable to find menu_before_throw.");
                     throw OperationFailedException(
                         ErrorReport::SEND_ERROR_REPORT, console,
@@ -702,7 +702,7 @@ void quest_catch_handle_battle(const ProgramInfo& info, ConsoleHandle& console, 
                 VideoSnapshot screen_ball = console.video().snapshot();
                 ball_exists = exists.read_ball(screen_ball);
 
-                if (ball_exists == "") {
+                if (ball_exists == ""){
                     console.log("Could not find ball reader. Tera battle. Using first attack.");
                     pbf_mash_button(context, BUTTON_B, 125);
                     context.wait_for_all_requests();
@@ -715,7 +715,7 @@ void quest_catch_handle_battle(const ProgramInfo& info, ConsoleHandle& console, 
                 else {
                     //Quick ball occurs before anything else in battle.
                     //Do not throw if target is a tera pokemon.
-                    if (use_quickball && !quickball_thrown && tera_target == false) {
+                    if (use_quickball && !quickball_thrown && tera_target == false){
                         console.log("Quick Ball option checked. Throwing Quick Ball.");
                         quest_catch_throw_ball(info, console, context, BBQ_OPTIONS.LANGUAGE, "quick-ball");
                         quickball_thrown = true;
@@ -732,21 +732,21 @@ void quest_catch_handle_battle(const ProgramInfo& info, ConsoleHandle& console, 
                         std::chrono::seconds(4),
                         { battle_menu }
                     );
-                    if (ret == 0) {
+                    if (ret == 0){
                         console.log("Battle menu detected early. Using fourth attack.");
                         MoveSelectWatcher move_watcher(COLOR_BLUE);
                         MoveSelectDetector move_select(COLOR_BLUE);
 
                         int ret_move_select = run_until(
                             console, context,
-                            [&](BotBaseContext& context) {
+                            [&](BotBaseContext& context){
                                 pbf_press_button(context, BUTTON_A, 10, 50);
                                 pbf_wait(context, 100);
                                 context.wait_for_all_requests();
                             },
                             { move_watcher }
                         );
-                        if (ret_move_select != 0) {
+                        if (ret_move_select != 0){
                             console.log("Could not find move select.");
                         }
                         else {
@@ -768,7 +768,7 @@ void quest_catch_handle_battle(const ProgramInfo& info, ConsoleHandle& console, 
                             std::chrono::seconds(4),
                             { battle_menu2 }
                         );
-                        if (ret3 == 0) {
+                        if (ret3 == 0){
                             console.log("Battle menu detected early. Out of PP/No move in slot, please check your setup.");
                             throw OperationFailedException(
                                 ErrorReport::SEND_ERROR_REPORT, console,
@@ -792,7 +792,7 @@ void quest_catch_handle_battle(const ProgramInfo& info, ConsoleHandle& console, 
                     std::chrono::seconds(60),
                     { battle_menu, fainted }
                 );
-                switch (ret2) {
+                switch (ret2){
                 case 0:
                     console.log("Battle menu detected, continuing.");
                     break;
@@ -801,7 +801,7 @@ void quest_catch_handle_battle(const ProgramInfo& info, ConsoleHandle& console, 
                     pbf_press_button(context, BUTTON_A, 20, 50);
                     pbf_wait(context, 100);
                     context.wait_for_all_requests();
-                    if (swap.move_to_slot(console, context, switch_party_slot)) {
+                    if (swap.move_to_slot(console, context, switch_party_slot)){
                         pbf_mash_button(context, BUTTON_A, 3 * TICKS_PER_SECOND);
                         context.wait_for_all_requests();
                         switch_party_slot++;
@@ -821,7 +821,7 @@ void quest_catch_handle_battle(const ProgramInfo& info, ConsoleHandle& console, 
         { advance_dialog, add_to_party }
         );
 
-    switch (ret2) {
+    switch (ret2){
     case 0:
         console.log("Advance Dialog detected.");
         press_Bs_to_back_to_overworld(info, console, context);
@@ -840,13 +840,13 @@ void quest_catch_handle_battle(const ProgramInfo& info, ConsoleHandle& console, 
     }
 }
 
-void quest_catch(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, const BBQOption& BBQ_OPTIONS, BBQuests current_quest) {
+void quest_catch(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, const BBQOption& BBQ_OPTIONS, BBQuests current_quest){
     EncounterWatcher encounter_watcher(console, COLOR_RED);
 
     //Navigate to target and start battle
     int ret = run_until(
         console, context,
-        [&](BotBaseContext& context) {
+        [&](BotBaseContext& context){
             
             quest_catch_navi(info, console, context, BBQ_OPTIONS, current_quest);
             context.wait_for_all_requests();
@@ -857,7 +857,7 @@ void quest_catch(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
                 std::chrono::seconds(25),
                 { battle_menu }
             );
-            if (ret2 != 0) {
+            if (ret2 != 0){
                 console.log("Did not enter battle. Did target spawn?");
             }
         },
@@ -868,11 +868,11 @@ void quest_catch(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
         );
     encounter_watcher.throw_if_no_sound();
 
-    if (ret >= 0) {
+    if (ret >= 0){
         console.log("Battle menu detected.");
 
         bool is_shiny = (bool)encounter_watcher.shiny_screenshot();
-        if (is_shiny) {
+        if (is_shiny){
             console.log("Shiny detected!");
             pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
             throw ProgramFinishedException();
@@ -912,7 +912,7 @@ void quest_catch(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
     context.wait_for_all_requests();
 }
 
-void wild_battle_tera(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, bool& tera_self) {
+void wild_battle_tera(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, bool& tera_self){
     AdvanceDialogWatcher lost(COLOR_YELLOW);
     OverworldWatcher overworld(COLOR_RED);
     WallClock start = current_time();
@@ -932,7 +932,7 @@ void wild_battle_tera(const ProgramInfo& info, ConsoleHandle& console, BotBaseCo
                     );
                 }
 
-                if (first_turn && tera_self) {
+                if (first_turn && tera_self){
                     console.log("Turn 1: Tera.");
                     //Open move menu
                     pbf_press_button(context, BUTTON_A, 10, 50);
@@ -967,7 +967,7 @@ void wild_battle_tera(const ProgramInfo& info, ConsoleHandle& console, BotBaseCo
                     pbf_press_button(context, BUTTON_A, 20, 50);
                     pbf_wait(context, 100);
                     context.wait_for_all_requests();
-                    if (swap.move_to_slot(console, context, switch_party_slot)) {
+                    if (swap.move_to_slot(console, context, switch_party_slot)){
                         pbf_mash_button(context, BUTTON_A, 3 * TICKS_PER_SECOND);
                         context.wait_for_all_requests();
                         switch_party_slot++;
@@ -985,7 +985,7 @@ void wild_battle_tera(const ProgramInfo& info, ConsoleHandle& console, BotBaseCo
         },
         { lost, overworld }
     );
-    if (ret2 == 0) {
+    if (ret2 == 0){
         console.log("Lost battle. Mashing B.");
     }
 }

@@ -12,7 +12,7 @@
 namespace PokemonAutomation{
 namespace Kernels{
 
-DisjointSet::DisjointSet(size_t size) : m_parent(size), m_size(size, 1) {
+DisjointSet::DisjointSet(size_t size) : m_parent(size), m_size(size, 1){
     std::iota(m_parent.begin(), m_parent.end(), 0);
 }
 

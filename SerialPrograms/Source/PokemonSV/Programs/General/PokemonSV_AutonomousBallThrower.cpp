@@ -84,14 +84,14 @@ void AutonomousBallThrower::throw_ball(ConsoleHandle& console, BotBaseContext& c
 
     BattleBallReader reader(console, LANGUAGE);
     int quantity = move_to_ball(reader, console, context, BALL_SELECT.slug());
-    if (quantity == 0) {
+    if (quantity == 0){
         throw FatalProgramException(
             ErrorReport::NO_ERROR_REPORT, console,
             "Unable to find appropriate ball. Did you run out?",
             true
         );
     }
-    if (quantity < 0) {
+    if (quantity < 0){
         console.log("Unable to read ball quantity.", COLOR_RED);
     }
     pbf_mash_button(context, BUTTON_A, 125);

@@ -27,7 +27,7 @@ void ClothingTopDetector::make_overlays(VideoOverlaySet& items) const {
     m_arrow.make_overlays(items);
 }
 bool ClothingTopDetector::detect(const ImageViewRGB32& screen) const {
-    if (!m_arrow.detect(screen)) {
+    if (!m_arrow.detect(screen)){
         return false;
     }
     return true;

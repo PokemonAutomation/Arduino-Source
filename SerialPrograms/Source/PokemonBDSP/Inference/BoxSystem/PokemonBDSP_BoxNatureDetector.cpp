@@ -11,7 +11,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonBDSP{
 
-const NatureReader& NATURE_READER() {
+const NatureReader& NATURE_READER(){
     const static Pokemon::NatureReader reader("Pokemon/NatureCheckerOCR.json");
     return reader;
 }

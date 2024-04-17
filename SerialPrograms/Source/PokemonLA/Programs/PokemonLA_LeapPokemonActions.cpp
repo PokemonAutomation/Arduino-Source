@@ -22,7 +22,7 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 void route(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, LeapPokemon pokemon){
-    switch (pokemon) {
+    switch (pokemon){
     case LeapPokemon::Aipom:
         goto_camp_from_jubilife(env, console, context, TravelLocations::instance().Coastlands_Beachside);
         pbf_move_left_joystick(context, 238, 255, 30, 30);
@@ -158,7 +158,7 @@ void route(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& cont
 
 void return_to_jubilife(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, LeapPokemon pokemon){
     goto_camp_from_overworld(env, console, context);
-    switch (pokemon) {
+    switch (pokemon){
     case LeapPokemon::Aipom:
         goto_professor(console, context, Camp::COASTLANDS_BEACHSIDE);
         break;
