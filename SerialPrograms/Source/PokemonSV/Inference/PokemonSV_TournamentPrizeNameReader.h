@@ -13,7 +13,7 @@ namespace PokemonAutomation {
 namespace NintendoSwitch {
 namespace PokemonSV {
 
-class TournamentPrizeNameReader : public OCR::SmallDictionaryMatcher {
+class TournamentPrizeNameReader : public OCR::SmallDictionaryMatcher{
 public:
     static constexpr double MAX_LOG10P = -1.40;
     static constexpr double MAX_LOG10P_SPREAD = 0.50;
