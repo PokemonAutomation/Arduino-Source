@@ -7,7 +7,7 @@
 #include <cstddef>
 #include "PokemonSwSh/Programs/RNG/PokemonSwSh_Xoroshiro128Plus.h"
 
-namespace PokemonAutomation {
+namespace PokemonAutomation{
 
 Xoroshiro128PlusState::Xoroshiro128PlusState(uint64_t s0, uint64_t s1)
     : s0(s0)

@@ -9,9 +9,9 @@
 
 #include "CommonFramework/OCR/OCR_SmallDictionaryMatcher.h"
 
-namespace PokemonAutomation {
-namespace NintendoSwitch {
-namespace PokemonSV {
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace PokemonSV{
 
 class TournamentPrizeNameReader : public OCR::SmallDictionaryMatcher{
 public:

@@ -27,9 +27,9 @@
 #include "PokemonSV/Resources/PokemonSV_TournamentPrizeNames.h"
 #include "PokemonSV_TournamentFarmer.h"
 
-namespace PokemonAutomation {
-namespace NintendoSwitch {
-namespace PokemonSV {
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace PokemonSV{
 
 using namespace Pokemon;
 

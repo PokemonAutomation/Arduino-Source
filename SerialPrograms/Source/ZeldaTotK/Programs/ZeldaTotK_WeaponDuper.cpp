@@ -11,9 +11,9 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "ZeldaTotK_WeaponDuper.h"
 
-namespace PokemonAutomation {
-namespace NintendoSwitch {
-namespace ZeldaTotK {
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace ZeldaTotK{
 
 WeaponDuper_Descriptor::WeaponDuper_Descriptor()
     : SingleSwitchProgramDescriptor(

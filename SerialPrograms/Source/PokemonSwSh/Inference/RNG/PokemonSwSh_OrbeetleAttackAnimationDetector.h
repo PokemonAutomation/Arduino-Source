@@ -13,11 +13,11 @@
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 
-namespace PokemonAutomation {
+namespace PokemonAutomation{
 class BotBaseContext;
 class ProgramEnvironment;
-namespace NintendoSwitch {
-namespace PokemonSwSh {
+namespace NintendoSwitch{
+namespace PokemonSwSh{
 
 
 class OrbeetleAttackAnimationDetector {

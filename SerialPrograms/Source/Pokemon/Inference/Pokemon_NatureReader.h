@@ -11,8 +11,8 @@
 #include "CommonFramework/OCR/OCR_SmallDictionaryMatcher.h"
 #include "Pokemon/Pokemon_NatureChecker.h"
 
-namespace PokemonAutomation {
-namespace Pokemon {
+namespace PokemonAutomation{
+namespace Pokemon{
 
 class NatureReader : public OCR::SmallDictionaryMatcher {
 public:

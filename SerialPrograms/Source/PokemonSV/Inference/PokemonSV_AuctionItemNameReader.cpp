@@ -7,9 +7,9 @@
 #include "CommonFramework/OCR/OCR_RawOCR.h"
 #include "PokemonSV_AuctionItemNameReader.h"
 
-namespace PokemonAutomation {
-namespace NintendoSwitch {
-namespace PokemonSV {
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace PokemonSV{
 
 
 AuctionItemNameReader& AuctionItemNameReader::instance() {

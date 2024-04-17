@@ -14,9 +14,9 @@
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 
-namespace PokemonAutomation {
-namespace NintendoSwitch {
-namespace ZeldaTotK {
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace ZeldaTotK{
 
 class MineruItemDuper_Descriptor : public SingleSwitchProgramDescriptor {
 public:

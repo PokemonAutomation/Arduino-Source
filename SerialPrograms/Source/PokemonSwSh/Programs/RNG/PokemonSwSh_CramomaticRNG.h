@@ -18,9 +18,9 @@
 #include "PokemonSwSh/Options/PokemonSwSh_CramomaticTable.h"
 #include "PokemonSwSh/Programs/RNG/PokemonSwSh_Xoroshiro128Plus.h"
 
-namespace PokemonAutomation {
-namespace NintendoSwitch {
-namespace PokemonSwSh {
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace PokemonSwSh{
 
 
 class CramomaticRNG_Descriptor : public SingleSwitchProgramDescriptor {

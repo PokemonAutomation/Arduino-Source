@@ -35,9 +35,9 @@
 //using std::cout;
 //using std::endl;
 
-namespace PokemonAutomation {
-namespace NintendoSwitch {
-namespace PokemonSwSh {
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace PokemonSwSh{
 using namespace Pokemon;
 
 CramomaticRNG_Descriptor::CramomaticRNG_Descriptor()

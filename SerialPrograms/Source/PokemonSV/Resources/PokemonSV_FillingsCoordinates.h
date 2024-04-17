@@ -11,9 +11,9 @@
 #include <vector>
 #include <map>
 
-namespace PokemonAutomation {
-namespace NintendoSwitch {
-namespace PokemonSV {
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace PokemonSV{
 
 class FillingsCoordinates {
 

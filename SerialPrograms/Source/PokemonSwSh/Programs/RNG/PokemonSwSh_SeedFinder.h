@@ -15,9 +15,9 @@
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonSwSh/Programs/RNG/PokemonSwSh_Xoroshiro128Plus.h"
 
-namespace PokemonAutomation {
-namespace NintendoSwitch {
-namespace PokemonSwSh {
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace PokemonSwSh{
 
 class SeedFinder_Descriptor : public SingleSwitchProgramDescriptor {
 public:

@@ -6,9 +6,9 @@
 
 #include "PokemonSV_BlueberryQuestReader.h"
 
-namespace PokemonAutomation {
-namespace NintendoSwitch {
-namespace PokemonSV {
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace PokemonSV{
 
 
 BlueberryQuestReader& BlueberryQuestReader::instance(){

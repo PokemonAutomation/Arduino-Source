@@ -19,9 +19,9 @@
 #include "PokemonSV/Inference/PokemonSV_ESPEmotionDetector.h"
 #include "PokemonSV_ESPTraining.h"
 
-namespace PokemonAutomation {
-namespace NintendoSwitch {
-namespace PokemonSV {
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace PokemonSV{
 
 using namespace Pokemon;
  

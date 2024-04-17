@@ -8,10 +8,10 @@
 #include "PokemonSwSh/Inference/RNG/PokemonSwSh_OrbeetleAttackAnimationDetector.h"
 #include "PokemonSwSh/Programs/RNG/PokemonSwSh_Xoroshiro128Plus.h"
 
-namespace PokemonAutomation {
+namespace PokemonAutomation{
 class BotBaseContext;
-namespace NintendoSwitch {
-namespace PokemonSwSh {
+namespace NintendoSwitch{
+namespace PokemonSwSh{
 
 // Performs 128 Orbeetle attack animations. 
 // Returns the state after those animations.

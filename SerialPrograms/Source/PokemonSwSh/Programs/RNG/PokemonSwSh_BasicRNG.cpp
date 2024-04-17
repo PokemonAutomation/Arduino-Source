@@ -11,9 +11,9 @@
 #include "PokemonSwSh/Inference/RNG/PokemonSwSh_OrbeetleAttackAnimationDetector.h"
 #include "PokemonSwSh/Programs/RNG/PokemonSwSh_BasicRNG.h"
 
-namespace PokemonAutomation {
-namespace NintendoSwitch {
-namespace PokemonSwSh {
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace PokemonSwSh{
 
 Xoroshiro128PlusState find_rng_state(
     ConsoleHandle& console,

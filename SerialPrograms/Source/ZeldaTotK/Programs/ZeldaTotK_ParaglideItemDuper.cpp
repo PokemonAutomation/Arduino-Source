@@ -11,9 +11,9 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "ZeldaTotK_ParaglideItemDuper.h"
 
-namespace PokemonAutomation {
-namespace NintendoSwitch {
-namespace ZeldaTotK {
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace ZeldaTotK{
 
 ParaglideItemDuper_Descriptor::ParaglideItemDuper_Descriptor()
     : SingleSwitchProgramDescriptor(

@@ -24,9 +24,9 @@
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSV_GimmighoulChestFarmer.h"
 
-namespace PokemonAutomation {
-namespace NintendoSwitch {
-namespace PokemonSV {
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace PokemonSV{
 
 using namespace Pokemon;
 

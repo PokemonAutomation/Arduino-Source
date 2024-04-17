@@ -15,9 +15,9 @@
 
 #include <string>
 
-namespace PokemonAutomation {
-namespace NintendoSwitch {
-namespace PokemonSwSh {
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace PokemonSwSh{
 using namespace Pokemon;
 
 SeedFinder_Descriptor::SeedFinder_Descriptor()

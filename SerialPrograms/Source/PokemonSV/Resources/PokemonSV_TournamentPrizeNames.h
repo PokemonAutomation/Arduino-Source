@@ -10,9 +10,9 @@
 #include <string>
 #include <vector>
 
-namespace PokemonAutomation {
-namespace NintendoSwitch {
-namespace PokemonSV {
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace PokemonSV{
 
 
 class TournamentPrizeNames {

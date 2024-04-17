@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_PokemonSwSh_GimmighoulRoamingFarm_H
-#define PokemonAutomation_PokemonSwSh_GimmighoulRoamingFarm_H
+#ifndef PokemonAutomation_PokemonSV_GimmighoulRoamingFarm_H
+#define PokemonAutomation_PokemonSV_GimmighoulRoamingFarm_H
 
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
@@ -13,9 +13,9 @@
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 
-namespace PokemonAutomation {
-namespace NintendoSwitch {
-namespace PokemonSV {
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace PokemonSV{
 
 
 class GimmighoulRoamingFarmer_Descriptor : public SingleSwitchProgramDescriptor {

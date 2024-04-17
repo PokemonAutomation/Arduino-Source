@@ -11,9 +11,9 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "ZeldaTotK_SurfItemDuper.h"
 
-namespace PokemonAutomation {
-namespace NintendoSwitch {
-namespace ZeldaTotK {
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace ZeldaTotK{
 
 SurfItemDuper_Descriptor::SurfItemDuper_Descriptor()
     : SingleSwitchProgramDescriptor(

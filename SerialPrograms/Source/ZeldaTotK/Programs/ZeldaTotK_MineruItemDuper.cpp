@@ -11,9 +11,9 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "ZeldaTotK_MineruItemDuper.h"
 
-namespace PokemonAutomation {
-namespace NintendoSwitch {
-namespace ZeldaTotK {
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace ZeldaTotK{
 
 MineruItemDuper_Descriptor::MineruItemDuper_Descriptor()
     : SingleSwitchProgramDescriptor(

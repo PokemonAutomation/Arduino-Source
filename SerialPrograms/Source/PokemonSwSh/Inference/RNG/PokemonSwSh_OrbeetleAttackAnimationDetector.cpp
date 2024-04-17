@@ -16,9 +16,9 @@
 #include "PokemonSwSh_OrbeetleAttackAnimationDetector.h"
 
 
-namespace PokemonAutomation {
-namespace NintendoSwitch {
-namespace PokemonSwSh {
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace PokemonSwSh{
 
 OrbeetleAttackAnimationDetector::OrbeetleAttackAnimationDetector(ConsoleHandle& console, BotBaseContext& context)
     : m_console(console)

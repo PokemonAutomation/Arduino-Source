@@ -17,9 +17,9 @@
 #include "PokemonSV/Inference/PokemonSV_ESPEmotionDetector.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 
-namespace PokemonAutomation {
-namespace NintendoSwitch {
-namespace PokemonSV {
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace PokemonSV{
 
 class ESPTraining_Descriptor : public SingleSwitchProgramDescriptor {
 public:

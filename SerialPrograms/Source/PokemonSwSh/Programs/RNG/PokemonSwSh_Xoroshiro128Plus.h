@@ -11,7 +11,7 @@
 #include <utility>
 #include <vector>
 
-namespace PokemonAutomation {
+namespace PokemonAutomation{
 
 struct Xoroshiro128PlusState {
     Xoroshiro128PlusState(uint64_t s0, uint64_t s1);
