@@ -34,7 +34,6 @@ public:
     DateTimeOptionWidget(QWidget& parent, DateTimeOption& value);
 
 private:
-    DateTimeOption& m_value;
     DateTimeCellWidget* m_date_edit;
 };
 

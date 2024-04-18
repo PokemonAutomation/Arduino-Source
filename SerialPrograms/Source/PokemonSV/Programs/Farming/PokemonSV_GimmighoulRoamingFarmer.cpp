@@ -49,7 +49,7 @@ GimmighoulRoamingFarmer::GimmighoulRoamingFarmer()
     , NOTIFICATIONS({
         &NOTIFICATION_PROGRAM_FINISH,
         &NOTIFICATION_ERROR_FATAL,
-        })
+    })
 {
     PA_ADD_OPTION(SKIPS);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);

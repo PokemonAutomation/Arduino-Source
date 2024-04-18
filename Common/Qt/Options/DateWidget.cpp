@@ -112,7 +112,6 @@ void DateTimeCellWidget::value_changed(){
 DateTimeOptionWidget::DateTimeOptionWidget(QWidget& parent, DateTimeOption& value)
     : QWidget(&parent)
     , ConfigWidget(value, *this)
-    , m_value(value)
 {
     QHBoxLayout* layout = new QHBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);

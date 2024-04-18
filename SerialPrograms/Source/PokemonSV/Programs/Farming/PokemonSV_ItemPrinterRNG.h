@@ -10,14 +10,47 @@
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/DateOption.h"
+#include "Common/Cpp/Options/EditableTableOption.h"
 #include "CommonFramework/Options/LanguageOCROption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
+#include "PokemonSV/Programs/ItemPrinter/PokemonSV_ItemPrinterTools.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
+
+
+struct ItemPrinterRngRowSnapshot{
+    bool chain;
+    DateTime date;
+    ItemPrinterJobs jobs;
+};
+class ItemPrinterRngRow : public EditableTableRow, public ConfigOption::Listener{
+public:
+
+    ~ItemPrinterRngRow();
+    ItemPrinterRngRow();
+    ItemPrinterRngRow(bool p_chain, const DateTime& p_date, ItemPrinterJobs p_jobs);
+
+    ItemPrinterRngRowSnapshot snapshot() const;
+
+    virtual std::unique_ptr<EditableTableRow> clone() const override;
+    virtual void value_changed() override;
+
+public:
+    BooleanCheckBoxCell chain;
+    DateTimeCell date;
+    EnumDropdownCell<ItemPrinterJobs> jobs;
+};
+class ItemPrinterRngTable : public EditableTableOption_t<ItemPrinterRngRow>{
+public:
+    ItemPrinterRngTable(std::string label);
+    virtual std::vector<std::string> make_header() const override;
+    static std::vector<std::unique_ptr<EditableTableRow>> make_defaults();
+};
+
 
 
 class ItemPrinterRNG_Descriptor : public SingleSwitchProgramDescriptor{
@@ -35,9 +68,14 @@ public:
 
 
 private:
-    void run_print(
+    void run_print_at_date(
         SingleSwitchProgramEnvironment& env, BotBaseContext& context,
-        const DateTime& date, uint8_t jobs
+        const DateTime& date, ItemPrinterJobs jobs
+    ) const;
+
+    void print_again(
+        SingleSwitchProgramEnvironment& env, BotBaseContext& context,
+        ItemPrinterJobs jobs
     ) const;
 
 
@@ -45,8 +83,9 @@ private:
     OCR::LanguageOCROption LANGUAGE;
     SimpleIntegerOption<uint16_t> TOTAL_ROUNDS;
 
-    DateTimeOption DATE0;
-    DateTimeOption DATE1;
+//    DateTimeOption DATE0;
+//    DateTimeOption DATE1;
+    ItemPrinterRngTable TABLE;
 
     SimpleIntegerOption<uint16_t> DELAY_MILLIS;
 

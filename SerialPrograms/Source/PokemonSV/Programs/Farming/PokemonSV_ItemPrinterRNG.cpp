@@ -25,12 +25,90 @@
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 //#include "PokemonSV/Programs/PokemonSV_GameEntry.h"
-#include "PokemonSV/Programs/General/PokemonSV_AutoItemPrinter.h"
 #include "PokemonSV_ItemPrinterRNG.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
+
+
+
+static const EnumDatabase<ItemPrinterJobs>& ItemPrinterJobs_Database(){
+    static const EnumDatabase<ItemPrinterJobs> database({
+        {ItemPrinterJobs::Jobs_1, "1", "1 Job"},
+        {ItemPrinterJobs::Jobs_5, "5", "5 Jobs"},
+        {ItemPrinterJobs::Jobs_10, "10", "10 Jobs"},
+    });
+    return database;
+}
+
+ItemPrinterRngRow::~ItemPrinterRngRow(){
+    chain.remove_listener(*this);
+}
+ItemPrinterRngRow::ItemPrinterRngRow()
+    : chain(LockMode::UNLOCK_WHILE_RUNNING, false)
+    , date(
+        LockMode::UNLOCK_WHILE_RUNNING,
+        DateTimeOption::DATE_HOUR_MIN_SEC,
+        DateTime{2000, 1, 1, 0, 1, 0},
+        DateTime{2060, 12, 31, 23, 59, 59},
+        DateTime{2024, 4, 22, 13, 27, 9}
+    )
+    , jobs(
+        ItemPrinterJobs_Database(),
+        LockMode::UNLOCK_WHILE_RUNNING,
+        ItemPrinterJobs::Jobs_1
+    )
+{
+    PA_ADD_OPTION(chain);
+    PA_ADD_OPTION(date);
+    PA_ADD_OPTION(jobs);
+    chain.add_listener(*this);
+}
+ItemPrinterRngRow::ItemPrinterRngRow(bool p_chain, const DateTime& p_date, ItemPrinterJobs p_jobs)
+    : ItemPrinterRngRow()
+{
+    chain = p_chain;
+    date.set(p_date);
+    jobs.set(p_jobs);
+}
+ItemPrinterRngRowSnapshot ItemPrinterRngRow::snapshot() const{
+    return ItemPrinterRngRowSnapshot{chain, date, jobs};
+}
+std::unique_ptr<EditableTableRow> ItemPrinterRngRow::clone() const{
+    std::unique_ptr<ItemPrinterRngRow> ret(new ItemPrinterRngRow());
+    ret->chain = (bool)chain;
+    ret->date.set(date);
+    ret->jobs.set(jobs);
+    return ret;
+}
+void ItemPrinterRngRow::value_changed(){
+    date.set_visibility(chain ? ConfigOptionState::DISABLED : ConfigOptionState::ENABLED);
+}
+
+ItemPrinterRngTable::ItemPrinterRngTable(std::string label)
+    : EditableTableOption_t<ItemPrinterRngRow>(
+        std::move(label),
+        LockMode::UNLOCK_WHILE_RUNNING,
+        make_defaults()
+    )
+{}
+std::vector<std::string> ItemPrinterRngTable::make_header() const{
+    return std::vector<std::string>{
+        "Continue Previous?",
+        "Date Seed",
+        "Jobs to Print",
+    };
+}
+std::vector<std::unique_ptr<EditableTableRow>> ItemPrinterRngTable::make_defaults(){
+    std::vector<std::unique_ptr<EditableTableRow>> ret;
+    ret.emplace_back(std::make_unique<ItemPrinterRngRow>(false, DateTime{2024, 4, 22, 13, 27, 9}, ItemPrinterJobs::Jobs_1));
+    ret.emplace_back(std::make_unique<ItemPrinterRngRow>(false, DateTime{2016, 5, 20, 2, 11, 13}, ItemPrinterJobs::Jobs_10));
+    return ret;
+}
+
+
+
 
 ItemPrinterRNG_Descriptor::ItemPrinterRNG_Descriptor()
     : SingleSwitchProgramDescriptor(
@@ -81,9 +159,10 @@ ItemPrinterRNG::ItemPrinterRNG()
         false
     )
     , TOTAL_ROUNDS(
-        "<b>Total Rounds:</b>",
+        "<b>Total Rounds:</b><br>Iterate the rounds table this many times before stopping the program.",
         LockMode::UNLOCK_WHILE_RUNNING, 10
     )
+#if 0
     , DATE0(
         "<b>Initial Date:</b><br>Date/Time for the first print. This one should setup the bonus print.",
         LockMode::UNLOCK_WHILE_RUNNING,
@@ -99,6 +178,11 @@ ItemPrinterRNG::ItemPrinterRNG()
         DateTime{2000, 1, 1, 0, 1, 0},
         DateTime{2060, 12, 31, 23, 59, 59},
         DateTime{2016, 5, 20, 2, 11, 13}
+    )
+#endif
+    , TABLE(
+        "<b>Rounds Table:</b><br>Run the following prints in order and repeat. "
+        "Changes to this table take effect the next time the table starts from the beginning."
     )
     , DELAY_MILLIS(
         "<b>Delay (Milliseconds):</b><br>"
@@ -122,8 +206,9 @@ ItemPrinterRNG::ItemPrinterRNG()
 {
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(TOTAL_ROUNDS);
-    PA_ADD_OPTION(DATE0);
-    PA_ADD_OPTION(DATE1);
+//    PA_ADD_OPTION(DATE0);
+//    PA_ADD_OPTION(DATE1);
+    PA_ADD_OPTION(TABLE);
     PA_ADD_OPTION(DELAY_MILLIS);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(FIX_TIME_WHEN_DONE);
@@ -131,13 +216,14 @@ ItemPrinterRNG::ItemPrinterRNG()
 }
 
 
-void ItemPrinterRNG::run_print(
+void ItemPrinterRNG::run_print_at_date(
     SingleSwitchProgramEnvironment& env, BotBaseContext& context,
-    const DateTime& date, uint8_t jobs
+    const DateTime& date, ItemPrinterJobs jobs
 ) const{
     ItemPrinterRNG_Descriptor::Stats& stats = env.current_stats<ItemPrinterRNG_Descriptor::Stats>();
 
     bool printed = false;
+    bool overworld_seen = false;
     while (true){
         context.wait_for_all_requests();
 
@@ -156,8 +242,9 @@ void ItemPrinterRNG::run_print(
         );
         switch (ret){
         case 0:
+            overworld_seen = true;
             if (printed){
-                env.log("Detected overworld... Print finished.");
+                env.log("Detected overworld... (unexpected)", COLOR_RED);
                 return;
             }
             env.log("Detected overworld... Starting print.");
@@ -213,6 +300,9 @@ void ItemPrinterRNG::run_print(
         case 3:{
             env.log("Detected material selection.");
             if (printed){
+                return;
+            }
+            if (!overworld_seen){
                 pbf_press_button(context, BUTTON_B, 20, 30);
                 continue;
             }
@@ -221,7 +311,63 @@ void ItemPrinterRNG::run_print(
             env.update_stats();
             printed = true;
             item_printer_finish_print(env.inference_dispatcher(), env.console, context, LANGUAGE);
+//            pbf_press_button(context, BUTTON_B, 20, 30);
+            continue;
+        }
+        default:
+            stats.errors++;
+            env.update_stats();
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT,
+                env.logger(),
+                ""
+            );
+        }
+    }
+}
+void ItemPrinterRNG::print_again(
+    SingleSwitchProgramEnvironment& env, BotBaseContext& context,
+    ItemPrinterJobs jobs
+) const{
+    ItemPrinterRNG_Descriptor::Stats& stats = env.current_stats<ItemPrinterRNG_Descriptor::Stats>();
+
+    bool printed = false;
+    while (true){
+        context.wait_for_all_requests();
+
+        OverworldWatcher overworld(COLOR_BLUE);
+        AdvanceDialogWatcher dialog(COLOR_RED);
+//        PromptDialogWatcher prompt(COLOR_GREEN);
+        WhiteButtonWatcher material(COLOR_GREEN, WhiteButton::ButtonX, {0.63, 0.93, 0.17, 0.06});
+        int ret = wait_until(
+            env.console, context, std::chrono::seconds(120),
+            {
+                overworld,
+                dialog,
+//                prompt,
+                material,
+            }
+        );
+        switch (ret){
+        case 0:
+            env.log("Detected overworld... (unexpected)", COLOR_RED);
+            return;
+
+        case 1:
+            env.log("Detected advance dialog.");
             pbf_press_button(context, BUTTON_B, 20, 30);
+            continue;
+
+        case 2:{
+            env.log("Detected material selection.");
+            if (printed){
+                return;
+            }
+            item_printer_start_print(env.console, context, jobs);
+            stats.prints++;
+            env.update_stats();
+            printed = true;
+            item_printer_finish_print(env.inference_dispatcher(), env.console, context, LANGUAGE);
             continue;
         }
         default:
@@ -243,8 +389,16 @@ void ItemPrinterRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext
 
     env.update_stats();
     for (uint32_t c = 0; c < TOTAL_ROUNDS; c++){
-        run_print(env, context, DATE0, 1);
-        run_print(env, context, DATE1, 10);
+        std::vector<ItemPrinterRngRowSnapshot> table = TABLE.snapshot<ItemPrinterRngRowSnapshot>();
+        for (const ItemPrinterRngRowSnapshot& row : table){
+            if (row.chain){
+                print_again(env, context, row.jobs);
+            }else{
+                run_print_at_date(env, context, row.date, row.jobs);
+            }
+        }
+//        run_print_at_date(env, context, DATE0, 1);
+//        run_print_at_date(env, context, DATE1, 10);
         stats.iterations++;
         env.update_stats();
     }

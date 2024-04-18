@@ -40,8 +40,8 @@ DictionaryOCR::DictionaryOCR(
             std::u32string normalized = normalize_utf32(candidate);
             std::set<std::string>& set = m_candidate_to_token[normalized];
             if (!set.empty()){
-                global_logger_tagged().log("DictionaryOCR - Duplicate Candidate: " + token);
-//                cout << "Duplicate Candidate: " << it.key().toUtf8().data() << endl;
+                global_logger_tagged().log("DictionaryOCR - Duplicate Candidate: " + token + " (" + to_utf8(normalized) + ")");
+//                cout << "Duplicate Candidate: " << candidate << endl;
             }
             set.insert(token);
             candidates.emplace_back(candidate);

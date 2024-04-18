@@ -72,6 +72,7 @@ std::array<std::string, 10> ItemPrinterPrizeReader::read(
     Logger& logger, AsyncDispatcher& dispatcher,
     const ImageViewRGB32& screen
 ) const{
+    //  OCR 20 things in parallel.
     OCR::StringMatchResult results[20];
     std::unique_ptr<AsyncTask> tasks[20];
     for (size_t c = 0; c < 10; c++){
@@ -93,18 +94,13 @@ std::array<std::string, 10> ItemPrinterPrizeReader::read(
         });
     }
 
+    //  Wait for everything.
     for (size_t c = 0; c < 20; c++){
         tasks[c]->wait_and_rethrow_exceptions();
     }
 
-
     std::array<std::string, 10> ret;
     for (size_t c = 0; c < 10; c++){
-//        OCR::StringMatchResult result = ItemPrinterPrizeOCR::instance().read_substring(
-//            nullptr, m_language,
-//            extract_box_reference(screen, m_boxes_normal[c]),
-//            OCR::WHITE_TEXT_FILTERS()
-//        );
         OCR::StringMatchResult& result = results[c];
         result.clear_beyond_log10p(MAX_LOG10P);
         result.clear_beyond_spread(MAX_LOG10P_SPREAD);

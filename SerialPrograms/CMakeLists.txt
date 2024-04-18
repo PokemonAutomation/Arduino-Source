@@ -1487,6 +1487,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Programs/Glitches/PokemonSV_CloneItems-1.0.1.h
     Source/PokemonSV/Programs/Glitches/PokemonSV_RideCloner-1.0.1.cpp
     Source/PokemonSV/Programs/Glitches/PokemonSV_RideCloner-1.0.1.h
+    Source/PokemonSV/Programs/ItemPrinter/PokemonSV_ItemPrinterTools.cpp
+    Source/PokemonSV/Programs/ItemPrinter/PokemonSV_ItemPrinterTools.h
     Source/PokemonSV/Programs/PokemonSV_AreaZero.cpp
     Source/PokemonSV/Programs/PokemonSV_AreaZero.h
     Source/PokemonSV/Programs/PokemonSV_ConnectToInternet.cpp

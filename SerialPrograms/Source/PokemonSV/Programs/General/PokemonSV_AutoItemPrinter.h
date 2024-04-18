@@ -7,9 +7,7 @@
 #ifndef PokemonAutomation_PokemonSV_AutoItemPrinter_H
 #define PokemonAutomation_PokemonSV_AutoItemPrinter_H
 
-#include <array>
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
-#include "CommonFramework/Language.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
@@ -17,16 +15,6 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
-
-
-void item_printer_start_print(
-    ConsoleHandle& console, BotBaseContext& context, uint8_t jobs
-);
-std::array<std::string, 10> item_printer_finish_print(
-    AsyncDispatcher& dispatcher,
-    ConsoleHandle& console, BotBaseContext& context,
-    Language language
-);
 
 
 
