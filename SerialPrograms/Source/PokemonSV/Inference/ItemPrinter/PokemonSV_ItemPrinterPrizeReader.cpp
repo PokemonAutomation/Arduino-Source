@@ -75,7 +75,7 @@ std::array<std::string, 10> ItemPrinterPrizeReader::read(
     OCR::StringMatchResult results[20];
     std::unique_ptr<AsyncTask> tasks[20];
     for (size_t c = 0; c < 10; c++){
-        tasks[c] = dispatcher.dispatch([=, &results]{
+        tasks[c] = dispatcher.dispatch([=, this, &results]{
             results[c] = ItemPrinterPrizeOCR::instance().read_substring(
                 nullptr, m_language,
                 extract_box_reference(screen, m_boxes_normal[c]),
@@ -84,7 +84,7 @@ std::array<std::string, 10> ItemPrinterPrizeReader::read(
         });
     }
     for (size_t c = 0; c < 10; c++){
-        tasks[10 + c] = dispatcher.dispatch([=, &results]{
+        tasks[10 + c] = dispatcher.dispatch([=, this, &results]{
             results[10 + c] = ItemPrinterPrizeOCR::instance().read_substring(
                 nullptr, m_language,
                 extract_box_reference(screen, m_boxes_bonus[c]),
