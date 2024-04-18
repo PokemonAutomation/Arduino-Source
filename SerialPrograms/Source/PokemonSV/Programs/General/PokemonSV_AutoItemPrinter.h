@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonSV_AutoItemPrinter_H
 #define PokemonAutomation_PokemonSV_AutoItemPrinter_H
 
+#include <array>
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Language.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
