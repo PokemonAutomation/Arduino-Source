@@ -1451,8 +1451,6 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Programs/Farming/PokemonSV_GimmighoulChestFarmer.h
     Source/PokemonSV/Programs/Farming/PokemonSV_GimmighoulRoamingFarmer.cpp
     Source/PokemonSV/Programs/Farming/PokemonSV_GimmighoulRoamingFarmer.h
-    Source/PokemonSV/Programs/Farming/PokemonSV_ItemPrinterRNG.cpp
-    Source/PokemonSV/Programs/Farming/PokemonSV_ItemPrinterRNG.h
     Source/PokemonSV/Programs/Farming/PokemonSV_LPFarmer.cpp
     Source/PokemonSV/Programs/Farming/PokemonSV_LPFarmer.h
     Source/PokemonSV/Programs/Farming/PokemonSV_TournamentFarmer.cpp
@@ -1469,8 +1467,6 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_FastCodeEntry.h
     Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_VideoFastCodeEntry.cpp
     Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_VideoFastCodeEntry.h
-    Source/PokemonSV/Programs/General/PokemonSV_AutoItemPrinter.cpp
-    Source/PokemonSV/Programs/General/PokemonSV_AutoItemPrinter.h
     Source/PokemonSV/Programs/General/PokemonSV_AutonomousBallThrower.cpp
     Source/PokemonSV/Programs/General/PokemonSV_AutonomousBallThrower.h
     Source/PokemonSV/Programs/General/PokemonSV_ClothingBuyer.cpp
@@ -1487,6 +1483,10 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Programs/Glitches/PokemonSV_CloneItems-1.0.1.h
     Source/PokemonSV/Programs/Glitches/PokemonSV_RideCloner-1.0.1.cpp
     Source/PokemonSV/Programs/Glitches/PokemonSV_RideCloner-1.0.1.h
+    Source/PokemonSV/Programs/ItemPrinter/PokemonSV_AutoItemPrinter.cpp
+    Source/PokemonSV/Programs/ItemPrinter/PokemonSV_AutoItemPrinter.h
+    Source/PokemonSV/Programs/ItemPrinter/PokemonSV_ItemPrinterRNG.cpp
+    Source/PokemonSV/Programs/ItemPrinter/PokemonSV_ItemPrinterRNG.h
     Source/PokemonSV/Programs/ItemPrinter/PokemonSV_ItemPrinterTools.cpp
     Source/PokemonSV/Programs/ItemPrinter/PokemonSV_ItemPrinterTools.h
     Source/PokemonSV/Programs/PokemonSV_AreaZero.cpp

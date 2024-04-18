@@ -14,7 +14,6 @@
 #include "Programs/General/PokemonSV_ClothingBuyer.h"
 #include "Programs/General/PokemonSV_AutonomousBallThrower.h"
 #include "Programs/General/PokemonSV_SizeChecker.h"
-#include "Programs/General/PokemonSV_AutoItemPrinter.h"
 
 #include "Programs/Boxes/PokemonSV_MassRelease.h"
 #include "Programs/Boxes/PokemonSV_MassAttachItems.h"
@@ -32,7 +31,8 @@
 #include "Programs/Farming/PokemonSV_FlyingTrialFarmer.h"
 #include "Programs/Farming/PokemonSV_WildItemFarmer.h"
 #include "Programs/Farming/PokemonSV_BBQSoloFarmer.h"
-#include "Programs/Farming/PokemonSV_ItemPrinterRNG.h"
+#include "Programs/ItemPrinter/PokemonSV_AutoItemPrinter.h"
+#include "Programs/ItemPrinter/PokemonSV_ItemPrinterRNG.h"
 
 #include "Programs/Eggs/PokemonSV_EggFetcher.h"
 #include "Programs/Eggs/PokemonSV_EggHatcher.h"

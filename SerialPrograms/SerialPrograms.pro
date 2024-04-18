@@ -724,7 +724,6 @@ SOURCES += \
     Source/PokemonSV/Programs/Farming/PokemonSV_FlyingTrialFarmer.cpp \
     Source/PokemonSV/Programs/Farming/PokemonSV_GimmighoulChestFarmer.cpp \
     Source/PokemonSV/Programs/Farming/PokemonSV_GimmighoulRoamingFarmer.cpp \
-    Source/PokemonSV/Programs/Farming/PokemonSV_ItemPrinterRNG.cpp \
     Source/PokemonSV/Programs/Farming/PokemonSV_LPFarmer.cpp \
     Source/PokemonSV/Programs/Farming/PokemonSV_TournamentFarmer.cpp \
     Source/PokemonSV/Programs/Farming/PokemonSV_TournamentFarmer2.cpp \
@@ -733,7 +732,6 @@ SOURCES += \
     Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_CodeEntry.cpp \
     Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_FastCodeEntry.cpp \
     Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_VideoFastCodeEntry.cpp \
-    Source/PokemonSV/Programs/General/PokemonSV_AutoItemPrinter.cpp \
     Source/PokemonSV/Programs/General/PokemonSV_AutonomousBallThrower.cpp \
     Source/PokemonSV/Programs/General/PokemonSV_ClothingBuyer.cpp \
     Source/PokemonSV/Programs/General/PokemonSV_MassPurchase.cpp \
@@ -742,6 +740,9 @@ SOURCES += \
     Source/PokemonSV/Programs/General/PokemonSV_StatsResetEventBattle.cpp \
     Source/PokemonSV/Programs/Glitches/PokemonSV_CloneItems-1.0.1.cpp \
     Source/PokemonSV/Programs/Glitches/PokemonSV_RideCloner-1.0.1.cpp \
+    Source/PokemonSV/Programs/ItemPrinter/PokemonSV_AutoItemPrinter.cpp \
+    Source/PokemonSV/Programs/ItemPrinter/PokemonSV_ItemPrinterRNG.cpp \
+    Source/PokemonSV/Programs/ItemPrinter/PokemonSV_ItemPrinterTools.cpp \
     Source/PokemonSV/Programs/PokemonSV_AreaZero.cpp \
     Source/PokemonSV/Programs/PokemonSV_ConnectToInternet.cpp \
     Source/PokemonSV/Programs/PokemonSV_GameEntry.cpp \
@@ -1794,7 +1795,6 @@ HEADERS += \
     Source/PokemonSV/Programs/Farming/PokemonSV_FlyingTrialFarmer.h \
     Source/PokemonSV/Programs/Farming/PokemonSV_GimmighoulChestFarmer.h \
     Source/PokemonSV/Programs/Farming/PokemonSV_GimmighoulRoamingFarmer.h \
-    Source/PokemonSV/Programs/Farming/PokemonSV_ItemPrinterRNG.h \
     Source/PokemonSV/Programs/Farming/PokemonSV_LPFarmer.h \
     Source/PokemonSV/Programs/Farming/PokemonSV_TournamentFarmer.h \
     Source/PokemonSV/Programs/Farming/PokemonSV_TournamentFarmer2.h \
@@ -1803,7 +1803,6 @@ HEADERS += \
     Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_CodeEntry.h \
     Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_FastCodeEntry.h \
     Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_VideoFastCodeEntry.h \
-    Source/PokemonSV/Programs/General/PokemonSV_AutoItemPrinter.h \
     Source/PokemonSV/Programs/General/PokemonSV_AutonomousBallThrower.h \
     Source/PokemonSV/Programs/General/PokemonSV_ClothingBuyer.h \
     Source/PokemonSV/Programs/General/PokemonSV_MassPurchase.h \
@@ -1812,6 +1811,9 @@ HEADERS += \
     Source/PokemonSV/Programs/General/PokemonSV_StatsResetEventBattle.h \
     Source/PokemonSV/Programs/Glitches/PokemonSV_CloneItems-1.0.1.h \
     Source/PokemonSV/Programs/Glitches/PokemonSV_RideCloner-1.0.1.h \
+    Source/PokemonSV/Programs/ItemPrinter/PokemonSV_AutoItemPrinter.h \
+    Source/PokemonSV/Programs/ItemPrinter/PokemonSV_ItemPrinterRNG.h \
+    Source/PokemonSV/Programs/ItemPrinter/PokemonSV_ItemPrinterTools.h \
     Source/PokemonSV/Programs/PokemonSV_AreaZero.h \
     Source/PokemonSV/Programs/PokemonSV_ConnectToInternet.h \
     Source/PokemonSV/Programs/PokemonSV_GameEntry.h \

@@ -15,7 +15,7 @@
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
-#include "PokemonSV/Programs/ItemPrinter/PokemonSV_ItemPrinterTools.h"
+#include "PokemonSV_ItemPrinterTools.h"
 #include "PokemonSV_AutoItemPrinter.h"
 
 namespace PokemonAutomation{

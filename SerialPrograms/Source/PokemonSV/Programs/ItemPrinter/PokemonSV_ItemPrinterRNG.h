@@ -15,7 +15,7 @@
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
-#include "PokemonSV/Programs/ItemPrinter/PokemonSV_ItemPrinterTools.h"
+#include "PokemonSV_ItemPrinterTools.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
