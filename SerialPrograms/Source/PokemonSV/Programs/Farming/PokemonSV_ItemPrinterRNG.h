@@ -10,9 +10,10 @@
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/DateOption.h"
+#include "CommonFramework/Options/LanguageOCROption.h"
+#include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
-#include "CommonFramework/Notifications/EventNotificationsTable.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -41,6 +42,7 @@ private:
 
 
 private:
+    OCR::LanguageOCROption LANGUAGE;
     SimpleIntegerOption<uint16_t> TOTAL_ROUNDS;
 
     DateTimeOption DATE0;

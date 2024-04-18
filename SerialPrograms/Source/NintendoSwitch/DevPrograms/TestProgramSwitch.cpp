@@ -262,18 +262,19 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     BotBaseContext context(scope, console.botbase());
     VideoOverlaySet overlays(overlay);
 
-
+#if 0
     ItemPrinterJobsDetector detector;
     detector.make_overlays(overlays);
 
     detector.set_print_jobs(console, context, 5);
+#endif
 
 
-#if 0
+#if 1
     ItemPrinterPrizeReader reader(Language::English);
     reader.make_overlays(overlays);
 
-    reader.read(logger, feed.snapshot());
+    reader.read(logger, env.inference_dispatcher(), feed.snapshot());
 #endif
 
 #if 0

@@ -40,6 +40,8 @@ struct StringMatchResult{
     void add(double log10p, StringMatchData data);
     void clear_beyond_spread(double log10p_spread);
     void clear_beyond_log10p(double max_log10p);
+
+    void operator+=(const StringMatchResult& result);
 };
 
 

@@ -237,12 +237,32 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     using namespace Pokemon;
     using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
 
+    JsonValue json = load_json_file("ItemPrinterOCR.json");
+    JsonObject& obj = json.get_object_throw();
+    JsonObject& jpn0 = obj.get_object_throw("jpn");
+    JsonObject& jpn1 = obj.get_object_throw("jpn-t");
 
+    for (auto& item : jpn0){
+        cout << "testing: " << item.first << endl;
+        auto iter = jpn1.find(item.first);
+        if (iter == jpn1.end()){
+            throw "missing name";
+        }
+        JsonArray& arr0 = item.second.get_array_throw();
+        JsonArray& arr1 = iter->second.get_array_throw();
+        if (arr0[0].get_string_throw() != arr1[0].get_string_throw()){
+            cout << "mismatch found: " << arr0[0].get_string_throw() << " : " << arr1[0].get_string_throw() << endl;
+        }
+    }
+
+
+
+#if 0
     ImageRGB32 image("20231230-221510445509-ProgramHang.png");
 
     BattleMenuDetector detector;
     cout << detector.detect(image) << endl;
-
+#endif
 
 
 #if 0

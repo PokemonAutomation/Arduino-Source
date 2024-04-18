@@ -15,6 +15,7 @@
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV/Inference/ItemPrinter/PokemonSV_ItemPrinterJobsDetector.h"
+#include "PokemonSV/Inference/ItemPrinter/PokemonSV_ItemPrinterPrizeReader.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSV_AutoItemPrinter.h"
 
@@ -25,7 +26,9 @@ namespace PokemonSV{
 using namespace Pokemon;
 
 
-void item_printer_start_print(ConsoleHandle& console, BotBaseContext& context, uint8_t jobs){
+void item_printer_start_print(
+    ConsoleHandle& console, BotBaseContext& context, uint8_t jobs
+){
     console.log("Starting print...");
 
     while (true){
@@ -65,10 +68,15 @@ void item_printer_start_print(ConsoleHandle& console, BotBaseContext& context, u
         }
     }
 }
-void item_printer_finish_print(ConsoleHandle& console, BotBaseContext& context){
+std::array<std::string, 10> item_printer_finish_print(
+    AsyncDispatcher& dispatcher,
+    ConsoleHandle& console, BotBaseContext& context,
+    Language language
+){
     console.log("Finishing print...");
     bool print_finished = false;
 
+    std::array<std::string, 10> ret;
     while (true){
         AdvanceDialogWatcher dialog(COLOR_YELLOW);
         WhiteButtonWatcher   material(COLOR_GREEN, WhiteButton::ButtonX, {0.63, 0.93, 0.17, 0.06});
@@ -86,18 +94,31 @@ void item_printer_finish_print(ConsoleHandle& console, BotBaseContext& context){
         switch (ret_print_end){
         case 0: // material
             console.log("Material selection screen detected.");
-            return;
+            return ret;
         case 1: // handle
         case 2: // dialog
             pbf_press_button(context, BUTTON_A, 20, 105);
             continue;
-        case 3: // result
+        case 3:{    // result
             console.log("Result screen detected.");
-            if (!print_finished){
-                pbf_mash_button(context, BUTTON_A, 1 * TICKS_PER_SECOND);
-                print_finished = true;
+            if (print_finished){
+                continue;
             }
+
+            if (language != Language::None){
+                ItemPrinterPrizeReader reader(Language::English);
+                VideoOverlaySet overlays(console.overlay());
+                reader.make_overlays(overlays);
+                auto snapshot = console.video().snapshot();
+                ret = reader.read(console.logger(), dispatcher, snapshot);
+                static int c = 0;
+                snapshot->save("test-" + std::to_string(c) + ".png");
+            }
+
+            pbf_mash_button(context, BUTTON_A, 1 * TICKS_PER_SECOND);
+            print_finished = true;
             continue;
+        }
         default:
             throw OperationFailedException(
                 ErrorReport::SEND_ERROR_REPORT, console,
@@ -210,7 +231,7 @@ void AutoItemPrinter::program(SingleSwitchProgramEnvironment& env, BotBaseContex
 
     for (uint16_t i = 0; i < NUM_ROUNDS; i++){
         item_printer_start_print(env.console, context, 10);
-        item_printer_finish_print(env.console, context);
+        item_printer_finish_print(env.inference_dispatcher(), env.console, context, Language::None);
 
         env.console.log("Print completed.");
         stats.m_rounds++;

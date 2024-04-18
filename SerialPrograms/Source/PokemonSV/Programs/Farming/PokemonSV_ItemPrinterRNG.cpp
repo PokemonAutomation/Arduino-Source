@@ -19,6 +19,7 @@
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h"
 #include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
@@ -73,7 +74,13 @@ std::unique_ptr<StatsTracker> ItemPrinterRNG_Descriptor::make_stats() const{
 
 
 ItemPrinterRNG::ItemPrinterRNG()
-    : TOTAL_ROUNDS(
+    : LANGUAGE(
+        "<b>Game Language:</b><br>Required to read prizes.",
+        PokemonSwSh::IV_READER().languages(),
+        LockMode::UNLOCK_WHILE_RUNNING,
+        false
+    )
+    , TOTAL_ROUNDS(
         "<b>Total Rounds:</b>",
         LockMode::UNLOCK_WHILE_RUNNING, 10
     )
@@ -104,7 +111,7 @@ ItemPrinterRNG::ItemPrinterRNG()
     , GO_HOME_WHEN_DONE(false)
     , FIX_TIME_WHEN_DONE(
         "<b>Fix time when done:</b><br>Fix the time after the program finishes.",
-        LockMode::UNLOCK_WHILE_RUNNING, false
+        LockMode::UNLOCK_WHILE_RUNNING, true
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
@@ -113,6 +120,7 @@ ItemPrinterRNG::ItemPrinterRNG()
         &NOTIFICATION_ERROR_FATAL,
     })
 {
+    PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(TOTAL_ROUNDS);
     PA_ADD_OPTION(DATE0);
     PA_ADD_OPTION(DATE1);
@@ -212,7 +220,7 @@ void ItemPrinterRNG::run_print(
             stats.prints++;
             env.update_stats();
             printed = true;
-            item_printer_finish_print(env.console, context);
+            item_printer_finish_print(env.inference_dispatcher(), env.console, context, LANGUAGE);
             pbf_press_button(context, BUTTON_B, 20, 30);
             continue;
         }

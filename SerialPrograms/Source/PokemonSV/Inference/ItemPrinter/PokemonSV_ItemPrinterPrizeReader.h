@@ -8,12 +8,13 @@
 #define PokemonAutomation_PokemonSV_ItemPrinterPrizeReader_H
 
 #include <array>
-#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Language.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/Inference/VisualDetector.h"
 
 namespace PokemonAutomation{
+    class Logger;
+    class AsyncDispatcher;
 namespace NintendoSwitch{
 namespace PokemonSV{
 
@@ -28,11 +29,15 @@ public:
     ItemPrinterPrizeReader(Language language);
 
     void make_overlays(VideoOverlaySet& items) const;
-    std::array<std::string, 10> read(Logger& logger, const ImageViewRGB32& screen) const;
+    std::array<std::string, 10> read(
+        Logger& logger, AsyncDispatcher& dispatcher,
+        const ImageViewRGB32& screen
+    ) const;
 
 private:
     Language m_language;
-    ImageFloatBox m_boxes[10];
+    ImageFloatBox m_boxes_normal[10];
+    ImageFloatBox m_boxes_bonus[10];
 };
 
 

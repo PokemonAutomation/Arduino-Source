@@ -100,6 +100,14 @@ void StringMatchResult::clear_beyond_log10p(double max_log10p){
 }
 
 
+void StringMatchResult::operator+=(const StringMatchResult& result){
+    exact_match |= result.exact_match;
+    for (auto& item : result.results){
+        results.insert(item);
+    }
+}
+
+
 
 
 }
