@@ -30,9 +30,9 @@
 #include "PokemonSV_MaterialFarmer.h"
 #include "PokemonSV/Programs/ShinyHunting/PokemonSV_ShinyHunt-Scatterbug.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+// #include <iostream>
+// using std::cout;
+// using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -84,9 +84,9 @@ MaterialFarmer::MaterialFarmer()
         true
     )
     , NUM_SANDWICH_ROUNDS(
-          "<b>Number of sandwich rounds to run:</b><br>150-300 Happiny dust per sandwich, with Normal Encounter power level 2.",
+          "<b>Number of sandwich rounds to run:</b><br>400-650 Happiny dust per sandwich, with Normal Encounter power level 2.",
           LockMode::UNLOCK_WHILE_RUNNING,
-          4
+          3
     )
     , LANGUAGE(
         "<b>Game Language:</b><br>Required to read " + STRING_POKEMON + " names and sandwich ingredients.",
@@ -277,10 +277,12 @@ void MaterialFarmer::run_one_sandwich_iteration(SingleSwitchProgramEnvironment& 
     - Keeping repeating this until the sandwich expires.
      */
     while (true){
-        cout << "time sandwich expire: ";
-        cout << std::chrono::minutes(1) + last_sandwich_time << endl;
-        cout << "current time: ";
-        cout << current_time() << endl;
+        
+        auto sandwich_time_left =  std::chrono::minutes(30) + std::chrono::duration_cast<std::chrono::minutes>(last_sandwich_time - current_time());
+        env.console.log(
+            "Time left on sandwich: " + 
+            std::to_string(sandwich_time_left.count()) + " min", 
+            COLOR_PURPLE);
 
         if (is_sandwich_expired(last_sandwich_time)){
             env.log("Sandwich expired. Start another sandwich round.");
@@ -326,7 +328,7 @@ void MaterialFarmer::run_one_sandwich_iteration(SingleSwitchProgramEnvironment& 
                             env.log("Sandwich expired. Return to Pokecenter.");
                             return;
                         }                        
-                        move_to_start_position_for_letsgo0(env, context);
+                        move_to_start_position_for_letsgo1(env, context);
                         run_lets_go_iteration(env, context);
                     },
                     {hp_watcher}
@@ -411,24 +413,22 @@ void MaterialFarmer::move_to_start_position_for_letsgo1(SingleSwitchProgramEnvir
     pbf_move_left_joystick(context, 128, 0, 300, 10);
 
     // look right, towards the start position
-    pbf_move_right_joystick(context, 255, 128, 120, 10);
+    pbf_move_right_joystick(context, 255, 128, 130, 10);
     pbf_move_left_joystick(context, 128, 0, 10, 10);
 
     // get on ride
     pbf_press_button(context, BUTTON_PLUS, 50, 50);
 
     // Jump
-    pbf_press_button(context, BUTTON_B, 125, 100);
+    pbf_press_button(context, BUTTON_B, 125, 30);
 
     // Fly 
-    pbf_press_button(context, BUTTON_B, 50, 10); //  Double up this press 
-    pbf_press_button(context, BUTTON_B, 50, 10);     //  in case one is dropped.
+    pbf_press_button(context, BUTTON_B, 50, 10); 
+    pbf_press_button(context, BUTTON_B, 50, 10); // Double click in case of drop
     pbf_press_button(context, BUTTON_LCLICK, 50, 0);
-    // you automatically move forward without pressing any buttons. so just wait
-    pbf_wait(context, 1400);
 
-    // Glide forward
-    // pbf_move_left_joystick(context, 128, 0, 2500, 10);
+    // you automatically move forward without pressing any buttons. so just wait
+    pbf_wait(context, 2100);
 
     // arrived at start position. stop flying
     pbf_press_button(context, BUTTON_B, 50, 400);
@@ -436,12 +436,12 @@ void MaterialFarmer::move_to_start_position_for_letsgo1(SingleSwitchProgramEnvir
     pbf_press_button(context, BUTTON_PLUS, 50, 50);
 
     // look right
-    pbf_move_right_joystick(context, 255, 128, 30, 10);
+    pbf_move_right_joystick(context, 255, 128, 20, 10);
+
+    // move forward slightly
     pbf_move_left_joystick(context, 128, 0, 50, 10);
 
     env.console.log("Arrived at Let's go start position", COLOR_PURPLE);
-    
-
 }
 
 
@@ -451,7 +451,7 @@ void MaterialFarmer::lets_go_movement0(BotBaseContext& context){
     pbf_move_left_joystick(context, 128, 0, 200, 10);
 }
 
-// wait, then move forward quickly
+// wait, then move forward quickly, then wait some more.
 void MaterialFarmer::lets_go_movement1(BotBaseContext& context){
     pbf_wait(context, 500);
     pbf_move_left_joystick(context, 128, 0, 100, 10);
@@ -470,20 +470,21 @@ void MaterialFarmer::run_lets_go_iteration(SingleSwitchProgramEnvironment& env, 
     pbf_press_button(context, BUTTON_L, 50, 40);
 
     const bool throw_ball_if_bubble = false;
+    const int total_iterations = 13;
 
     auto move_forward_with_lets_go = [&](int num_iterations){
         context.wait_for_all_requests();
         for(int i = 0; i < num_iterations; i++){
             use_lets_go_to_clear_in_front(console, context, *m_encounter_tracker, throw_ball_if_bubble, [&](BotBaseContext& context){
                 // Do the following movement while the Let's Go pokemon clearing wild pokemon.
-                env.console.log("Number of iterations: " + std::to_string(i), COLOR_PURPLE);
+                env.console.log("Move-forward iteration number: " + std::to_string(i + 1) + "/" + std::to_string(total_iterations), COLOR_PURPLE);
 
                 lets_go_movement1(context);
             });
         }
     };
 
-    move_forward_with_lets_go(7);
+    move_forward_with_lets_go(total_iterations);
 
 }
 
