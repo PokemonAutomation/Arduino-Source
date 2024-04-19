@@ -30,9 +30,9 @@
 #include "PokemonSV_MaterialFarmer.h"
 #include "PokemonSV/Programs/ShinyHunting/PokemonSV_ShinyHunt-Scatterbug.h"
 
-// #include <iostream>
-// using std::cout;
-// using std::endl;
+#include <iostream>
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -221,6 +221,10 @@ void MaterialFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
     }
 }
 
+void run_material_farmer(){
+
+}
+
 
 
 // start at North Province (Area 3) Pokecenter, make a sandwich, then use let's go repeatedly until 30 min passes.
@@ -273,6 +277,11 @@ void MaterialFarmer::run_one_sandwich_iteration(SingleSwitchProgramEnvironment& 
     - Keeping repeating this until the sandwich expires.
      */
     while (true){
+        cout << "time sandwich expire: ";
+        cout << std::chrono::minutes(1) + last_sandwich_time << endl;
+        cout << "current time: ";
+        cout << current_time() << endl;
+
         if (is_sandwich_expired(last_sandwich_time)){
             env.log("Sandwich expired. Start another sandwich round.");
             env.console.overlay().add_log("Sandwich expired.");
@@ -305,10 +314,6 @@ void MaterialFarmer::run_one_sandwich_iteration(SingleSwitchProgramEnvironment& 
                 run_until(
                     env.console, context,
                     [&](BotBaseContext& context){
-                        // cout << "time sandwich expire: ";
-                        // cout << std::chrono::minutes(1) + last_sandwich_time << endl;
-                        // cout << "current time: ";
-                        // cout << current_time() << endl;
 
                         /*                         
                         - handle_battles_and_back_to_pokecenter will keep looping `action` 
@@ -321,7 +326,7 @@ void MaterialFarmer::run_one_sandwich_iteration(SingleSwitchProgramEnvironment& 
                             env.log("Sandwich expired. Return to Pokecenter.");
                             return;
                         }                        
-                        move_to_start_position_for_letsgo(env, context);
+                        move_to_start_position_for_letsgo0(env, context);
                         run_lets_go_iteration(env, context);
                     },
                     {hp_watcher}
@@ -340,7 +345,7 @@ bool MaterialFarmer::is_sandwich_expired(WallClock last_sandwich_time){
 }
 
 // from the North Province (Area 3) pokecenter, move to start position for Happiny dust farming
-void MaterialFarmer::move_to_start_position_for_letsgo(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void MaterialFarmer::move_to_start_position_for_letsgo0(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     // Orient camera to look at same direction as player character
     // - This is needed because when save-load the game, 
     // the camera angle is different than when just flying to pokecenter
@@ -370,7 +375,7 @@ void MaterialFarmer::move_to_start_position_for_letsgo(SingleSwitchProgramEnviro
     pbf_press_button(context, BUTTON_B, 50, 10);     //  in case one is dropped.
     pbf_press_button(context, BUTTON_LCLICK, 50, 0);
     // you automatically move forward without pressing any buttons. so just wait
-    pbf_wait(context, 1500);
+    pbf_wait(context, 1400);
 
     // Glide forward
     // pbf_move_left_joystick(context, 128, 0, 2500, 10);
@@ -381,12 +386,76 @@ void MaterialFarmer::move_to_start_position_for_letsgo(SingleSwitchProgramEnviro
     pbf_press_button(context, BUTTON_PLUS, 50, 50);
 
     // look right
-    pbf_move_right_joystick(context, 255, 128, 40, 10);
+    pbf_move_right_joystick(context, 255, 128, 30, 10);
     pbf_move_left_joystick(context, 128, 0, 50, 10);
 
     env.console.log("Arrived at Let's go start position", COLOR_PURPLE);
     
 
+}
+
+// from the North Province (Area 3) pokecenter, move to start position for Happiny dust farming
+void MaterialFarmer::move_to_start_position_for_letsgo1(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    // Orient camera to look at same direction as player character
+    // - This is needed because when save-load the game, 
+    // the camera angle is different than when just flying to pokecenter
+    pbf_press_button(context, BUTTON_L, 50, 40);
+
+    // move up towards pokecenter counter        
+    pbf_move_left_joystick(context, 128, 255, 180, 10);
+    // Orient camera to look at same direction as player character
+    pbf_press_button(context, BUTTON_L, 50, 40);
+    // look left
+    pbf_move_right_joystick(context, 0, 128, 120, 10);
+    // move toward clearing besides the pokecenter
+    pbf_move_left_joystick(context, 128, 0, 300, 10);
+
+    // look right, towards the start position
+    pbf_move_right_joystick(context, 255, 128, 120, 10);
+    pbf_move_left_joystick(context, 128, 0, 10, 10);
+
+    // get on ride
+    pbf_press_button(context, BUTTON_PLUS, 50, 50);
+
+    // Jump
+    pbf_press_button(context, BUTTON_B, 125, 100);
+
+    // Fly 
+    pbf_press_button(context, BUTTON_B, 50, 10); //  Double up this press 
+    pbf_press_button(context, BUTTON_B, 50, 10);     //  in case one is dropped.
+    pbf_press_button(context, BUTTON_LCLICK, 50, 0);
+    // you automatically move forward without pressing any buttons. so just wait
+    pbf_wait(context, 1400);
+
+    // Glide forward
+    // pbf_move_left_joystick(context, 128, 0, 2500, 10);
+
+    // arrived at start position. stop flying
+    pbf_press_button(context, BUTTON_B, 50, 400);
+    // get off ride
+    pbf_press_button(context, BUTTON_PLUS, 50, 50);
+
+    // look right
+    pbf_move_right_joystick(context, 255, 128, 30, 10);
+    pbf_move_left_joystick(context, 128, 0, 50, 10);
+
+    env.console.log("Arrived at Let's go start position", COLOR_PURPLE);
+    
+
+}
+
+
+// wait, then move forward quickly
+void MaterialFarmer::lets_go_movement0(BotBaseContext& context){
+    pbf_wait(context, 500);
+    pbf_move_left_joystick(context, 128, 0, 200, 10);
+}
+
+// wait, then move forward quickly
+void MaterialFarmer::lets_go_movement1(BotBaseContext& context){
+    pbf_wait(context, 500);
+    pbf_move_left_joystick(context, 128, 0, 100, 10);
+    pbf_wait(context, 100);
 }
 
 
@@ -407,14 +476,14 @@ void MaterialFarmer::run_lets_go_iteration(SingleSwitchProgramEnvironment& env, 
         for(int i = 0; i < num_iterations; i++){
             use_lets_go_to_clear_in_front(console, context, *m_encounter_tracker, throw_ball_if_bubble, [&](BotBaseContext& context){
                 // Do the following movement while the Let's Go pokemon clearing wild pokemon.
-                // Slowly Moving forward
-                pbf_move_left_joystick(context, 128, 105, 800, 10);
-                pbf_move_right_joystick(context, 255, 128, 1, 10);
+                env.console.log("Number of iterations: " + std::to_string(i), COLOR_PURPLE);
+
+                lets_go_movement1(context);
             });
         }
     };
 
-    move_forward_with_lets_go(10);
+    move_forward_with_lets_go(7);
 
 }
 

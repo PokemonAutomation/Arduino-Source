@@ -637,8 +637,7 @@ void make_two_herbs_sandwich(
 
 void make_sandwich_option(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, SandwichMakerOption& SANDWICH_OPTIONS){
     const Language language = SANDWICH_OPTIONS.LANGUAGE;
-
-    if (language == Language::None) {
+    if (language == Language::None){
         throw UserSetupError(console.logger(), "Must set game language option to read ingredient lists.");
     }
 

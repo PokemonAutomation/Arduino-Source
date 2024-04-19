@@ -45,7 +45,13 @@ private:
     
     void run_lets_go_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
-    void move_to_start_position_for_letsgo(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    void move_to_start_position_for_letsgo0(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+
+    void move_to_start_position_for_letsgo1(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+
+    void lets_go_movement0(BotBaseContext& context);
+
+    void lets_go_movement1(BotBaseContext& context);
 
     bool is_sandwich_expired(WallClock last_sandwich_time);
 
