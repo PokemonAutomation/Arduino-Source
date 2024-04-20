@@ -170,6 +170,7 @@ void ShinyHuntScatterbug::program(SingleSwitchProgramEnvironment& env, BotBaseCo
     while(true){
         try{
             run_one_sandwich_iteration(env, context);
+            consecutive_failures = 0;
         }catch(OperationFailedException& e){
             stats.m_errors++;
             env.update_stats();
@@ -202,10 +203,7 @@ void ShinyHuntScatterbug::program(SingleSwitchProgramEnvironment& env, BotBaseCo
             reset_game(env.program_info(), env.console, context);
             ++stats.m_game_resets;
             env.update_stats();
-            dump_image_and_throw_recoverable_exception(
-                env.program_info(), env.console, "Operation Failed",
-                "Resetting game to reattempt operation."
-            );
+
         }catch(ProgramFinishedException&){
             GO_HOME_WHEN_DONE.run_end_of_program(context);
             throw;

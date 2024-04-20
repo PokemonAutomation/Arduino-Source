@@ -84,7 +84,9 @@ MaterialFarmer::MaterialFarmer()
         true
     )
     , NUM_SANDWICH_ROUNDS(
-          "<b>Number of sandwich rounds to run:</b><br>400-650 Happiny dust per sandwich, with Normal Encounter power level 2.",
+          "<b>Number of sandwich rounds to run:</b><br>"
+          "400-650 Happiny dust per sandwich, with Normal Encounter power level 2.<br>"
+          "(e.g. Chorizo x4, Banana x2, Mayo x3, Whipped Cream x1)",
           LockMode::UNLOCK_WHILE_RUNNING,
           3
     )
@@ -163,10 +165,6 @@ void MaterialFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
         reset_to_pokecenter(env.program_info(), env.console, context);
     }
 
-    size_t consecutive_failures = 0;
-    m_pending_save = false;
-
-
 
     LetsGoEncounterBotTracker encounter_tracker(
         env, env.console, context,
@@ -175,48 +173,44 @@ void MaterialFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
     );
     m_encounter_tracker = &encounter_tracker;
 
+
+    size_t consecutive_failures;
+    bool done_sandwich_iteration;
     for (uint16_t i = 0; i < NUM_SANDWICH_ROUNDS; i++){
-        try{
-            run_one_sandwich_iteration(env, context);
-        }catch(OperationFailedException& e){
-            stats.m_errors++;
-            env.update_stats();
-            e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
+        consecutive_failures = 0;
+        done_sandwich_iteration = false;
+        while (!done_sandwich_iteration){
+            try{
+                run_one_sandwich_iteration(env, context);
+                done_sandwich_iteration = true;
+            }catch(OperationFailedException& e){
+                stats.m_errors++;
+                env.update_stats();
+                e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
 
-            if (SAVE_DEBUG_VIDEO){
-                // Take a video to give more context for debugging
-                pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
-                context.wait_for_all_requests();
+                if (SAVE_DEBUG_VIDEO){
+                    // Take a video to give more context for debugging
+                    pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
+                    context.wait_for_all_requests();
+                }
+
+                consecutive_failures++;
+                if (consecutive_failures >= 3){
+                    throw OperationFailedException(
+                        ErrorReport::SEND_ERROR_REPORT, env.console,
+                        "Failed 3 times in the row.",
+                        true
+                    );
+                }
+
+                env.log("Reset game to handle recoverable error");
+                reset_game(env.program_info(), env.console, context);
+                ++stats.m_game_resets;
+                env.update_stats();
+            }catch(ProgramFinishedException&){
+                GO_HOME_WHEN_DONE.run_end_of_program(context);
+                throw;
             }
-
-            if (m_pending_save){
-                // We have found a pokemon to keep, but before we can save the game to protect the pokemon, an error occurred.
-                // To not lose the pokemon, don't reset.
-                env.log("Found an error before we can save the game to protect the newly kept pokemon.", COLOR_RED);
-                env.log("Don't reset game to protect it.", COLOR_RED);
-                throw std::move(e);
-            }
-
-            consecutive_failures++;
-            if (consecutive_failures >= 3){
-                throw OperationFailedException(
-                    ErrorReport::SEND_ERROR_REPORT, env.console,
-                    "Failed 3 times in the row.",
-                    true
-                );
-            }
-
-            env.log("Reset game to handle recoverable error");
-            reset_game(env.program_info(), env.console, context);
-            ++stats.m_game_resets;
-            env.update_stats();
-            dump_image_and_throw_recoverable_exception(
-                env.program_info(), env.console, "Operation Failed",
-                "Resetting game to reattempt operation."
-            );
-        }catch(ProgramFinishedException&){
-            GO_HOME_WHEN_DONE.run_end_of_program(context);
-            throw;
         }
     }
 }
@@ -427,13 +421,20 @@ void MaterialFarmer::move_to_start_position_for_letsgo1(SingleSwitchProgramEnvir
     pbf_press_button(context, BUTTON_B, 50, 10); // Double click in case of drop
     pbf_press_button(context, BUTTON_LCLICK, 50, 0);
 
-    // you automatically move forward without pressing any buttons. so just wait
-    pbf_wait(context, 2100);
+    // you automatically move forward  when flying without pressing any buttons. 
+    // so, just wait.
+    pbf_wait(context, 2200);
 
     // arrived at start position. stop flying
     pbf_press_button(context, BUTTON_B, 50, 400);
     // get off ride
     pbf_press_button(context, BUTTON_PLUS, 50, 50);
+
+    // extra B presses to ensure we stop flying, in case the previous B press
+    // was dropped. This way, you eventually reset back to Pokecenter, instead
+    // of flying until an exception is thrown.
+    pbf_press_button(context, BUTTON_B, 50, 10);
+    pbf_press_button(context, BUTTON_B, 50, 10);
 
     // look right
     pbf_move_right_joystick(context, 255, 128, 20, 10);
@@ -468,6 +469,9 @@ void MaterialFarmer::run_lets_go_iteration(SingleSwitchProgramEnvironment& env, 
     // in the same direction as the player.
     // - But when warping to pokecenter, the camera is facing the player.
     pbf_press_button(context, BUTTON_L, 50, 40);
+
+    // zoom out camera
+    pbf_move_right_joystick(context, 128, 255, 45, 10);
 
     const bool throw_ball_if_bubble = false;
     const int total_iterations = 13;
