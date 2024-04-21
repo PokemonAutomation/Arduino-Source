@@ -32,7 +32,8 @@ void close_game(BotBaseContext& context){
     pbf_press_dpad(context, DPAD_DOWN, 50, 50);      // - Does nothing.          |  - moves selector away from the closed game to avoid opening it.
     pbf_press_dpad(context, DPAD_DOWN, 50, 50);      // - Does nothing.          |  - Press Down a second time in case we drop one.
     pbf_mash_button(context, BUTTON_A, 50);          // - Confirm close game.    |  - opens an app on the home screen (e.g. Online)
-    pbf_press_button(context, BUTTON_HOME, 50, 50);  // - Does nothing.          |  - goes back to home screen.
+    pbf_press_button(context, BUTTON_HOME, 50, 125); // - Does nothing.          |  - goes back to home screen.
+    context.wait_for_all_requests();
     pbf_press_button(context, BUTTON_HOME, 50, 50);  // - Does nothing.          |  - Press Home a second time in case we drop one.
 
 
