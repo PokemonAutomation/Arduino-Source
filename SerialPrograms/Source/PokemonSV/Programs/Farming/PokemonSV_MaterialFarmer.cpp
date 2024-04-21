@@ -91,7 +91,7 @@ MaterialFarmer::MaterialFarmer()
           3
     )
     , LANGUAGE(
-        "<b>Game Language:</b><br>Required to read " + STRING_POKEMON + " names and sandwich ingredients.",
+        "<b>Game Language:</b><br>Required to read sandwich ingredients.",
         IV_READER().languages(),
         LockMode::UNLOCK_WHILE_RUNNING,
         false
@@ -104,19 +104,19 @@ MaterialFarmer::MaterialFarmer()
         75, 0, 100
     )
     , SAVE_DEBUG_VIDEO(
-        "<b>Save debug videos to Switch:</b><br>"
+        "<b>DEV MODE: Save debug videos to Switch:</b><br>"
         "Set this on to save a Switch video everytime an error occurs. You can send the video to developers to help them debug later.",
         LockMode::LOCK_WHILE_RUNNING,
         false
     )
     , SKIP_WARP_TO_POKECENTER(
-        "<b>DEBUGGING: Skip warping to closest PokeCenter:</b><br>"
+        "<b>DEV MODE: Skip warping to closest PokeCenter:</b><br>"
         "This is for debugging the program without waiting for the initial warp.",
         LockMode::LOCK_WHILE_RUNNING,
         false
     )
     , SKIP_SANDWICH(
-        "<b>DEBUGGING: Skip making sandwich:</b><br>"
+        "<b>DEV MODE: Skip making sandwich:</b><br>"
         "This is for debugging the program without waiting for sandwich making.",
         LockMode::UNLOCK_WHILE_RUNNING,
         false
@@ -153,18 +153,30 @@ void MaterialFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
     //  Connect the controller.
     pbf_press_button(context, BUTTON_L, 10, 50);
 
-    if (!SKIP_SANDWICH){
-        const Language language = LANGUAGE;
-        if (language == Language::None) {
-            throw UserSetupError(env.console.logger(), "Must set game language option to read ingredient lists.");
-        }
+    // Throw user setup errors early in program
+    // - Ensure language is set
+    const Language language = LANGUAGE;
+    if (language == Language::None) {
+        throw UserSetupError(env.console.logger(), "Must set game language option to read ingredient lists.");
     }
+
+    // - Ensure audio input is enabled
+    LetsGoKillSoundDetector audio_detector(env.console, [](float){ return true; });
+    run_until(
+        env.console, context,
+        [&](BotBaseContext& context){
+            context.wait_for(std::chrono::milliseconds(1100));
+        },
+        {
+            static_cast<AudioInferenceCallback&>(audio_detector)
+        }
+    );
+    audio_detector.throw_if_no_sound(std::chrono::milliseconds(1000));
 
     // start by warping to pokecenter for positioning reasons
     if (!SKIP_WARP_TO_POKECENTER){
         reset_to_pokecenter(env.program_info(), env.console, context);
     }
-
 
     LetsGoEncounterBotTracker encounter_tracker(
         env, env.console, context,
