@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_Commands_GameEntry_H
 
 #include "ClientSource/Connection/BotBase.h"
+#include "CommonFramework/Tools/ConsoleHandle.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -31,7 +32,7 @@ void fast_reset_game(
     uint16_t start_game_mash, uint16_t start_game_wait,
     uint16_t enter_game_mash, uint16_t enter_game_wait
 );
-void reset_game_from_home               (BotBaseContext& device, bool tolerate_update_menu);
+void reset_game_from_home               (ConsoleHandle& console, BotBaseContext& device, bool tolerate_update_menu);
 
 
 

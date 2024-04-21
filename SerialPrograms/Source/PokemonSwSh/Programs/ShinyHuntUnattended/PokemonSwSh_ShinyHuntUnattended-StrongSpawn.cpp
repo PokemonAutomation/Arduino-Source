@@ -104,9 +104,9 @@ void ShinyHuntUnattendedStrongSpawn::program(SingleSwitchProgramEnvironment& env
 //        if (true){
         if (TIME_ROLLBACK_HOURS > 0 && system_clock(context) - last_touch >= PERIOD){
             last_touch += PERIOD;
-            close_game_if_overworld(context, false, TIME_ROLLBACK_HOURS);
+            close_game_if_overworld(env.console, context, false, TIME_ROLLBACK_HOURS);
         }else{
-            close_game_if_overworld(context, false, 0);
+            close_game_if_overworld(env.console, context, false, 0);
         }
 
     }

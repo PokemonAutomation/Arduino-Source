@@ -39,6 +39,7 @@ MultiGameFossil::MultiGameFossil(){
 }
 
 void run_fossil_batch(
+    ConsoleHandle& console, 
     Logger& logger,
     BotBaseContext& context,
     const FossilGame& batch,
@@ -134,7 +135,7 @@ void run_fossil_batch(
 
     //  Exit game.
     ssf_press_button2(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE, 10);
-    close_game(context);
+    close_game(console, context);
 }
 
 
@@ -155,7 +156,7 @@ void MultiGameFossil::program(SingleSwitchProgramEnvironment& env, BotBaseContex
     bool game_slot_flipped = false;
     for (size_t c = 0; c < games; c++){
 //        batch = GAME_LIST2[c];
-        run_fossil_batch(env.logger(), context, *list[c], &game_slot_flipped, c + 1 < games);
+        run_fossil_batch(env.console, env.logger(), context, *list[c], &game_slot_flipped, c + 1 < games);
     }
 
     ssf_press_button2(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE, 10);

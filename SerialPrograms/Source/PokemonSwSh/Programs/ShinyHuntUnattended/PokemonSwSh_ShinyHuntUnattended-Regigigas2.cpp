@@ -109,6 +109,7 @@ void ShinyHuntUnattendedRegigigas2::program(SingleSwitchProgramEnvironment& env,
 
         //  Conditional close game.
         close_game_if_overworld(
+            env.console,
             context,
             TOUCH_DATE_INTERVAL.ok_to_touch_now(),
             0

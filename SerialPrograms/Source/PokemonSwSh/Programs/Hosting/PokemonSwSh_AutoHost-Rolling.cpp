@@ -203,7 +203,7 @@ void AutoHostRolling::program(SingleSwitchProgramEnvironment& env, BotBaseContex
 
         //  Exit game.
         ssf_press_button2(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE, 10);
-        close_game(context);
+        close_game(env.console, context);
 
         //  Post-raid delay.
         pbf_wait(context, EXTRA_DELAY_BETWEEN_RAIDS);

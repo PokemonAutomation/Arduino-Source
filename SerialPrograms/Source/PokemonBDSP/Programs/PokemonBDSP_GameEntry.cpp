@@ -79,7 +79,7 @@ bool reset_game_from_home(
         ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET ||
         tolerate_update_menu
     ){
-        close_game(context);
+        close_game(console, context);
         start_game_from_home(
             console,
             context,

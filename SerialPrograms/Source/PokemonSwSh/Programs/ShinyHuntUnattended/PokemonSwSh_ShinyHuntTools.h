@@ -16,7 +16,7 @@ namespace PokemonSwSh{
 
 void run_away_with_lights(BotBaseContext& context);
 void enter_summary(BotBaseContext& context, bool regi_move_right);
-void close_game_if_overworld(BotBaseContext& context, bool touch_date, uint8_t rollback_hours);
+void close_game_if_overworld(ConsoleHandle& console, BotBaseContext& context, bool touch_date, uint8_t rollback_hours);
 
 
 
