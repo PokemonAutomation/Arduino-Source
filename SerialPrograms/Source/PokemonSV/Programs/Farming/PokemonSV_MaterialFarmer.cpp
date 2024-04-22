@@ -162,11 +162,9 @@ void MaterialFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
 
     // - Ensure audio input is enabled
     LetsGoKillSoundDetector audio_detector(env.console, [](float){ return true; });
-    run_until(
+    wait_until(
         env.console, context,
-        [&](BotBaseContext& context){
-            context.wait_for(std::chrono::milliseconds(1100));
-        },
+        std::chrono::milliseconds(1100),
         {
             static_cast<AudioInferenceCallback&>(audio_detector)
         }
