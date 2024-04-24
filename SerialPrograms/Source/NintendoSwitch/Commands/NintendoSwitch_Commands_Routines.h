@@ -8,12 +8,13 @@
 #define PokemonAutomation_NintendoSwitch_Commands_Routines_H
 
 #include "ClientSource/Connection/BotBase.h"
+#include "CommonFramework/Tools/ConsoleHandle.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-void close_game(BotBaseContext& device);
+void close_game(ConsoleHandle& console, BotBaseContext& device);
 
 
 

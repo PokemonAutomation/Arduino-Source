@@ -75,7 +75,7 @@ void BeamReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
         }
         pbf_wait(context, DELAY_BEFORE_RESET);
 
-        reset_game_from_home(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
+        reset_game_from_home(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
     }
 }
 

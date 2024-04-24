@@ -228,7 +228,7 @@ void AutoHostMultiGame::program(SingleSwitchProgramEnvironment& env, BotBaseCont
 
             //  Exit game.
             pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
-            close_game(context);
+            close_game(env.console, context);
 
             //  Post-raid delay.
             pbf_wait(context, game.post_raid_delay);

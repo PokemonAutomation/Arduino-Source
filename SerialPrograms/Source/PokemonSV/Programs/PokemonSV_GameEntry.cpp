@@ -64,7 +64,7 @@ private:
 
 
 bool reset_game_to_gamemenu(ConsoleHandle& console, BotBaseContext& context){
-    close_game(context);
+    close_game(console, context);
     start_game_from_home(
         console,
         context,

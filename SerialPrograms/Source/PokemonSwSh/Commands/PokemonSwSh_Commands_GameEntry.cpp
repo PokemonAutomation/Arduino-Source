@@ -72,7 +72,7 @@ void fast_reset_game(
 #endif
 }
 
-void reset_game_from_home(BotBaseContext& context, bool tolerate_update_menu){
+void reset_game_from_home(ConsoleHandle& console, BotBaseContext& context, bool tolerate_update_menu){
     if (!ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET && !tolerate_update_menu){
         fast_reset_game(
             context,
@@ -82,7 +82,7 @@ void reset_game_from_home(BotBaseContext& context, bool tolerate_update_menu){
         return;
     }
 
-    close_game(context);
+    close_game(console, context);
     start_game_from_home(context, tolerate_update_menu, 0, 0, false);
 }
 void settings_to_enter_game(BotBaseContext& context, bool fast){

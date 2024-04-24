@@ -138,6 +138,7 @@ void ShinyHuntUnattendedIoATrade::program(SingleSwitchProgramEnvironment& env, B
 
         //  Conditional close game.
         close_game_if_overworld(
+            env.console,
             context,
             TOUCH_DATE_INTERVAL.ok_to_touch_now(),
             0

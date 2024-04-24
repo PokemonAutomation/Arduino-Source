@@ -133,7 +133,7 @@ void reset_game_from_home_with_inference(
         ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET ||
         tolerate_update_menu
     ){
-        close_game(context);
+        close_game(console, context);
         start_game_from_home_with_inference(
             console, context, tolerate_update_menu, 0, 0, backup_save, post_wait_time
         );
