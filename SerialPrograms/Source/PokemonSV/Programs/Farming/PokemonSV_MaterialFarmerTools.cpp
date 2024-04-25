@@ -568,6 +568,261 @@ void run_from_battles_and_back_to_pokecenter(SingleSwitchProgramEnvironment& env
 
 
 
+
+void move_from_material_farming_to_item_printer(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    
+    fly_from_paldea_to_blueberry_entrance(env, context);
+    move_from_blueberry_entrance_to_league_club(env, context);
+    move_from_league_club_entrance_to_item_printer(env, context);
+}
+
+void fly_from_paldea_to_blueberry_entrance(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    int numAttempts = 0;
+    int maxAttempts = 5;
+    bool isFlySuccessful = false;
+
+    while (!isFlySuccessful && numAttempts < maxAttempts){
+        // close all menus
+        pbf_mash_button(context, BUTTON_B, 100);
+
+        numAttempts++;
+
+        open_map_from_overworld(env.program_info(), env.console, context);
+
+        // change from Paldea map to Blueberry map
+        pbf_press_button(context, BUTTON_L, 50, 300);
+
+        // move cursor to bottom right corner
+        pbf_move_left_joystick(context, 255, 255, TICKS_PER_SECOND*5, 50);
+
+        // move cursor to Blueberry academy fast travel point (up-left)
+        pbf_move_left_joystick(context, 0, 0, 76, 50);
+
+        // press A to fly to Blueberry academy
+        isFlySuccessful = fly_to_overworld_from_map(env.program_info(), env.console, context, true);
+        if (!isFlySuccessful){
+            env.log("Failed to fly to Blueberry academy.");
+        }
+    }
+
+    if (!isFlySuccessful){
+        throw OperationFailedException(
+            ErrorReport::SEND_ERROR_REPORT, env.console,
+            "Failed to fly to Blueberry academy, five times in a row.",
+            true
+        );
+    }
+}
+
+void move_from_blueberry_entrance_to_league_club(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+
+    int numAttempts = 0;
+    int maxAttempts = 5;
+    bool isSuccessful = false;
+
+    while (!isSuccessful && numAttempts < maxAttempts){
+        if (numAttempts > 0){ // failed at least once
+            pbf_mash_button(context, BUTTON_B, 100);
+            open_map_from_overworld(env.program_info(), env.console, context);
+            fly_to_overworld_from_map(env.program_info(), env.console, context, false);
+        }
+
+        numAttempts++;
+
+        // move toward entrance gates
+        pbf_move_left_joystick(context, 190, 0, 200, 50);
+
+        context.wait_for_all_requests();
+
+        // Wait for detection of Blueberry navigation menu
+        ImageFloatBox select_entrance_box(0.031, 0.193, 0.047, 0.078);
+        GradientArrowWatcher select_entrance(COLOR_RED, GradientArrowType::RIGHT, select_entrance_box);
+        int ret = wait_until(env.console, context, Milliseconds(5000), { select_entrance });
+        if (ret == 0){
+            env.log("Blueberry navigation menu detected.");
+        } else {
+            env.console.log("Failed to detect Blueberry navigation menu.");
+            continue;
+        }
+
+        // Move selector to League club room
+        pbf_press_dpad(context, DPAD_UP, 20, 50);
+
+        // Confirm to League club room is selected
+        ImageFloatBox select_league_club_box(0.038, 0.785, 0.043, 0.081);
+        GradientArrowWatcher select_league_club(COLOR_RED, GradientArrowType::RIGHT, select_league_club_box, Milliseconds(1000));
+        ret = wait_until(env.console, context, Milliseconds(5000), { select_league_club });
+        if (ret == 0){
+            env.log("League club room selected.");
+        } else {
+            env.console.log("Failed to select League club room in navigation menu.");
+            continue;            
+        }
+        // press A
+        pbf_mash_button(context, BUTTON_A, 100);
+
+        // check for overworld
+        OverworldWatcher overworld(COLOR_CYAN);  
+        ret = wait_until(env.console, context, Milliseconds(10000), { overworld });
+        if (ret == 0){
+            env.log("Entered League club room.");
+        } else {
+            env.console.log("Failed to enter League club room from menu selection.");
+            continue;            
+        }
+
+        isSuccessful = true;
+    }
+
+    if (!isSuccessful){
+        throw OperationFailedException(
+            ErrorReport::SEND_ERROR_REPORT, env.console,
+            "Failed to enter League club room, five times in a row.",
+            true
+        );
+    }
+
+}
+
+void move_from_league_club_entrance_to_item_printer(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+
+    context.wait_for_all_requests();
+
+    // move forwards towards table next to item printer
+    pbf_move_left_joystick(context, 120, 0, 200, 50);
+
+    // look left towards item printer
+    pbf_move_left_joystick(context, 0, 128, 10, 50);
+}
+
+void move_from_item_printer_to_material_farming(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    move_from_item_printer_to_blueberry_entrance(env, context);
+    fly_from_blueberry_to_north_province_3(env, context);
+}
+
+// assumes you start in the position in fron of the item printer, as if you finished using it.
+void move_from_item_printer_to_blueberry_entrance(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+
+    context.wait_for_all_requests();
+
+    // look left towards door
+    pbf_move_left_joystick(context, 0, 128, 10, 50);
+
+    // re-orient camera to look same direction as player
+    pbf_press_button(context, BUTTON_L, 50, 50);
+
+    // move forward towards door
+    pbf_move_left_joystick(context, 128, 0, 700, 50);
+
+    context.wait_for_all_requests();
+
+    env.log("Wait for detection of Blueberry navigation menu.");
+
+    // Wait for detection of Blueberry navigation menu
+    ImageFloatBox select_entrance_box(0.031, 0.193, 0.047, 0.078);
+    GradientArrowWatcher select_entrance(COLOR_RED, GradientArrowType::RIGHT, select_entrance_box);
+    int ret = wait_until(env.console, context, Milliseconds(5000), { select_entrance }, Milliseconds(1000));
+    if (ret == 0){
+        env.log("Blueberry navigation menu detected.");
+    } else {
+        env.console.log("Failed to detect Blueberry navigation menu.");
+        throw OperationFailedException(
+            ErrorReport::SEND_ERROR_REPORT, env.console,
+            "Failed to find the exit from the League room.",
+            true
+        );
+    }
+
+    // press A
+    pbf_mash_button(context, BUTTON_A, 100);    
+
+    // check for overworld
+    OverworldWatcher overworld(COLOR_CYAN);  
+    ret = wait_until(env.console, context, Milliseconds(10000), { overworld });
+    if (ret == 0){
+        env.log("Overworld detected");
+    } else {
+        throw OperationFailedException(
+            ErrorReport::SEND_ERROR_REPORT, env.console,
+            "Failed to detect overworld.",
+            true
+        );      
+    }
+}
+
+
+void fly_from_blueberry_to_north_province_3(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    int numAttempts = 0;
+    int maxAttempts = 10;
+    bool isFlySuccessful = false;
+
+    while (!isFlySuccessful && numAttempts < maxAttempts){
+        numAttempts++;
+
+        // close all menus
+        pbf_mash_button(context, BUTTON_B, 100);
+
+        open_map_from_overworld(env.program_info(), env.console, context);
+
+        // change from Blueberry map to Paldea map
+        pbf_press_button(context, BUTTON_R, 50, 300);
+
+        // zoom out
+        pbf_press_button(context, BUTTON_ZL, 25, 200);
+
+        // move cursor up-left
+        pbf_move_left_joystick(context, 112, 0, 171, 50);
+
+        // press A to fly to North province area 3
+        isFlySuccessful = fly_to_overworld_from_map(env.program_info(), env.console, context, true);
+
+        if (!isFlySuccessful){
+            env.log("Failed to fly to North province area 3.");
+        }
+    }
+
+    if (!isFlySuccessful){
+
+        throw OperationFailedException(
+            ErrorReport::SEND_ERROR_REPORT, env.console,
+            "Failed to fly to North province area 3, ten times in a row.",
+            true
+        );
+        /* try{
+            // try one last attempt, by using pokecenter detection
+
+            // close all menus
+            pbf_mash_button(context, BUTTON_B, 100);
+
+            open_map_from_overworld(env.program_info(), env.console, context);
+
+            // change from Blueberry map to Paldea map
+            pbf_press_button(context, BUTTON_R, 50, 300);
+
+            // zoom out
+            pbf_press_button(context, BUTTON_ZL, 25, 200);
+
+            // move up, but ending up far from other pokecenters
+            pbf_move_left_joystick(context, 128, 0, 190, 50);
+
+            // zoom back in to default zoom level
+            pbf_press_button(context, BUTTON_ZR, 25, 200);
+
+            fly_to_closest_pokecenter_on_map(env.program_info(), env.console, context);
+        }
+        catch(OperationFailedException& e){
+            (void)e;
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, env.console,
+                "Failed to fly to North province area 3, five times in a row.",
+                true
+            );
+        } */
+    }
+}
+
+
+
 }
 }
 }
