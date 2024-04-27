@@ -28,7 +28,7 @@
 #include "PokemonSV/Programs/Sandwiches/PokemonSV_SandwichRoutines.h"
 #include "PokemonSV/Programs/ShinyHunting/PokemonSV_LetsGoTools.h"
 #include "PokemonSV_MaterialFarmer.h"
-#include "PokemonSV_MaterialFarmerTools.h"
+
 
 // #include <iostream>
 // using std::cout;
@@ -39,23 +39,6 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 using namespace Pokemon;
-
-
-
-MaterialFarmer_Descriptor::MaterialFarmer_Descriptor()
-    : SingleSwitchProgramDescriptor(
-        "PokemonSV:MaterialFarmer",
-        STRING_POKEMON + " SV", "Material Farmer",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSV/MaterialFarmer.md",
-        "Farm materials - Happiny dust from Chanseys/Blisseys, for Item Printer.",
-        FeedbackType::VIDEO_AUDIO,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
-    )
-{}
-std::unique_ptr<StatsTracker> MaterialFarmer_Descriptor::make_stats() const{
-    return std::unique_ptr<StatsTracker>(new Stats());
-}
 
 
 
@@ -97,8 +80,8 @@ void MaterialFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
         reset_to_pokecenter(env.program_info(), env.console, context);
     }
 
-
-    run_material_farmer(env, context, MATERIAL_FARMER_OPTIONS);
+    MaterialFarmer_Descriptor::Stats& stats = env.current_stats<MaterialFarmer_Descriptor::Stats>();
+    run_material_farmer(env, context, MATERIAL_FARMER_OPTIONS, stats);
     
 }
 

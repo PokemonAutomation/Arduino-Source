@@ -521,7 +521,7 @@ ItemPrinterRNG::ItemPrinterRNG()
         true
     )
     , TOTAL_ROUNDS(
-         "<b>Total Rounds per item printer session:</b><br>Iterate the rounds table this many times. "
+        "<b>Total Rounds per item printer session:</b><br>Iterate the rounds table this many times. "
         "Then stop the program, or proceed to material farming (if enabled).",
         LockMode::UNLOCK_WHILE_RUNNING, 10
     )
@@ -1249,11 +1249,13 @@ void ItemPrinterRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext
         );
         audio_detector.throw_if_no_sound(std::chrono::milliseconds(1000));
 
+        // Don't allow the material farmer stats to affect the Item Printer's stats.
+        MaterialFarmer_Descriptor::Stats mat_farm_stats;// = env.current_stats<MaterialFarmer_Descriptor::Stats>();
         for (int i = 0; i < NUM_MATERIAL_FARM_ROUNDS; i++){
             run_item_printer_rng(env, context, stats);
             press_Bs_to_back_to_overworld(env.program_info(), env.console, context);
             move_from_item_printer_to_material_farming(env, context);
-            run_material_farmer(env, context, MATERIAL_FARMER_OPTIONS);
+            run_material_farmer(env, context, MATERIAL_FARMER_OPTIONS, mat_farm_stats);
             move_from_material_farming_to_item_printer(env, context);
         }
 

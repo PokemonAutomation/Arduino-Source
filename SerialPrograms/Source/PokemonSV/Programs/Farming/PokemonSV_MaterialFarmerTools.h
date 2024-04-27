@@ -83,7 +83,32 @@ private:
     );
 };
 
-void run_material_farmer(SingleSwitchProgramEnvironment& env, BotBaseContext& context, MaterialFarmerOptions& options);
+class MaterialFarmer_Descriptor : public SingleSwitchProgramDescriptor{
+public:
+    MaterialFarmer_Descriptor();
+
+    struct Stats : public LetsGoEncounterBotStats{
+        Stats()
+            : m_sandwiches(m_stats["Sandwiches"])
+            , m_autoheals(m_stats["Auto Heals"])
+            , m_game_resets(m_stats["Game Resets"])
+            , m_errors(m_stats["Errors"])
+        {
+            m_display_order.insert(m_display_order.begin() + 2, {"Sandwiches", HIDDEN_IF_ZERO});
+            m_display_order.insert(m_display_order.begin() + 3, {"Auto Heals", HIDDEN_IF_ZERO});
+            m_display_order.insert(m_display_order.begin() + 4, {"Game Resets", HIDDEN_IF_ZERO});
+            m_display_order.insert(m_display_order.begin() + 5, {"Errors", HIDDEN_IF_ZERO});
+        }
+        std::atomic<uint64_t>& m_sandwiches;
+        std::atomic<uint64_t>& m_autoheals;
+        std::atomic<uint64_t>& m_game_resets;
+        std::atomic<uint64_t>& m_errors;
+    };
+    virtual std::unique_ptr<StatsTracker> make_stats() const override;
+};
+
+void run_material_farmer(SingleSwitchProgramEnvironment& env, BotBaseContext& context, 
+    MaterialFarmerOptions& options, MaterialFarmer_Descriptor::Stats& stats);
 
 void run_one_sandwich_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context, 
     LetsGoEncounterBotTracker& encounter_tracker, MaterialFarmerOptions& options);
