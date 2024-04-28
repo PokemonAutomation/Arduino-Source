@@ -136,6 +136,11 @@ MaterialFarmerOptions::MaterialFarmerOptions(
         LockMode::UNLOCK_WHILE_RUNNING,
         false
     )
+    , TIME_PER_SANDWICH(
+        "<b>DEV MODE: Time per sandwich:</b><br>Number of minutes before resetting sandwich.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        30, 1, 30
+    )    
     , NOTIFICATION_STATUS_UPDATE(notif_status_update_option == nullptr 
         ? *m_notif_status_update_owner 
         : *notif_status_update_option
@@ -287,14 +292,14 @@ void run_one_sandwich_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
     - Keeping repeating this until the sandwich expires.
      */
     while (true){
-        
-        auto sandwich_time_left =  std::chrono::minutes(30) + std::chrono::duration_cast<std::chrono::minutes>(last_sandwich_time - current_time());
+        int time_per_sandwich = options.TIME_PER_SANDWICH;
+        auto sandwich_time_left =  std::chrono::minutes(time_per_sandwich) + std::chrono::duration_cast<std::chrono::minutes>(last_sandwich_time - current_time());
         env.console.log(
             "Time left on sandwich: " + 
             std::to_string(sandwich_time_left.count()) + " min", 
             COLOR_PURPLE);
 
-        if (is_sandwich_expired(last_sandwich_time)){
+        if (is_sandwich_expired(last_sandwich_time, time_per_sandwich)){
             env.log("Sandwich expired. Start another sandwich round.");
             env.console.overlay().add_log("Sandwich expired.");
             break;
@@ -322,7 +327,7 @@ void run_one_sandwich_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
         */
         env.console.log("Starting Let's Go hunting path", COLOR_PURPLE);
         run_from_battles_and_back_to_pokecenter(env, context, 
-            [&hp_watcher, &last_sandwich_time, &encounter_tracker](SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+            [&hp_watcher, &last_sandwich_time, &time_per_sandwich, &encounter_tracker](SingleSwitchProgramEnvironment& env, BotBaseContext& context){
                 run_until(
                     env.console, context,
                     [&](BotBaseContext& context){
@@ -334,7 +339,7 @@ void run_one_sandwich_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
                         you are very unlucky and can't finish a Let's Go iteration due to getting caught
                         up in battles.
                         */
-                        if (is_sandwich_expired(last_sandwich_time)){
+                        if (is_sandwich_expired(last_sandwich_time, time_per_sandwich)){
                             env.log("Sandwich expired. Return to Pokecenter.");
                             return;
                         }                        
@@ -354,8 +359,8 @@ void run_one_sandwich_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
 
 
 
-bool is_sandwich_expired(WallClock last_sandwich_time){
-    return last_sandwich_time + std::chrono::minutes(30) < current_time();
+bool is_sandwich_expired(WallClock last_sandwich_time, int time_per_sandwich){
+    return last_sandwich_time + std::chrono::minutes(time_per_sandwich) < current_time();
 }
 
 // from the North Province (Area 3) pokecenter, move to start position for Happiny dust farming

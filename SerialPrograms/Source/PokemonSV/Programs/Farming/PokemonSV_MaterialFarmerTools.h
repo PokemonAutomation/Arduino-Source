@@ -66,6 +66,7 @@ public:
     BooleanCheckBoxOption SAVE_DEBUG_VIDEO;
     BooleanCheckBoxOption SKIP_WARP_TO_POKECENTER;
     BooleanCheckBoxOption SKIP_SANDWICH;
+    SimpleIntegerOption<uint16_t> TIME_PER_SANDWICH;
 
     EventNotificationOption& NOTIFICATION_STATUS_UPDATE;
     EventNotificationOption& NOTIFICATION_PROGRAM_FINISH;
@@ -94,7 +95,7 @@ void lets_go_movement0(BotBaseContext& context);
 
 void lets_go_movement1(BotBaseContext& context);
 
-bool is_sandwich_expired(WallClock last_sandwich_time);
+bool is_sandwich_expired(WallClock last_sandwich_time, int time_per_sandwich);
 
 void run_lets_go_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context, LetsGoEncounterBotTracker& encounter_tracker);
 
