@@ -230,6 +230,7 @@ void ItemPrinterRNG::run_print_at_date(
         OverworldWatcher overworld(COLOR_BLUE);
         AdvanceDialogWatcher dialog(COLOR_RED);
         PromptDialogWatcher prompt(COLOR_GREEN);
+        DateChangeWatcher date_reader;
         WhiteButtonWatcher material(COLOR_GREEN, WhiteButton::ButtonX, {0.63, 0.93, 0.17, 0.06});
         int ret = wait_until(
             env.console, context, std::chrono::seconds(120),
@@ -237,6 +238,7 @@ void ItemPrinterRNG::run_print_at_date(
                 overworld,
                 dialog,
                 prompt,
+                date_reader,
                 material,
             }
         );
@@ -262,7 +264,10 @@ void ItemPrinterRNG::run_print_at_date(
             home_to_date_time(context, true, false);
             pbf_press_button(context, BUTTON_A, 10, 30);
             context.wait_for_all_requests();
-
+            continue;
+        }
+        case 3:{
+            env.log("Detected date change.");
             uint16_t delay_mills = DELAY_MILLIS;
 
             //  This is the seed we intend to hit.
@@ -277,10 +282,9 @@ void ItemPrinterRNG::run_print_at_date(
 
             std::chrono::milliseconds trigger_delay(seed_epoch_millis - clock_epoch * 1000);
 
-            DateReader reader;
             VideoOverlaySet overlays(env.console.overlay());
-            reader.make_overlays(overlays);
-            reader.set_date(env.program_info(), env.console, context, set_date);
+            date_reader.make_overlays(overlays);
+            date_reader.set_date(env.program_info(), env.console, context, set_date);
 
             //  Commit the date and start the timer.
             pbf_press_button(context, BUTTON_A, 20, 30);
@@ -297,7 +301,7 @@ void ItemPrinterRNG::run_print_at_date(
             pbf_press_button(context, BUTTON_A, 10, 10);
             continue;
         }
-        case 3:{
+        case 4:{
             env.log("Detected material selection.");
             if (printed){
                 return;
