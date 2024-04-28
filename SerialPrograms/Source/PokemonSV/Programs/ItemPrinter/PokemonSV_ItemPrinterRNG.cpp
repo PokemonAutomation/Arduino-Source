@@ -102,8 +102,8 @@ std::vector<std::string> ItemPrinterRngTable::make_header() const{
 }
 std::vector<std::unique_ptr<EditableTableRow>> ItemPrinterRngTable::make_defaults(){
     std::vector<std::unique_ptr<EditableTableRow>> ret;
-    ret.emplace_back(std::make_unique<ItemPrinterRngRow>(false, DateTime{2024, 4, 22, 13, 27, 9}, ItemPrinterJobs::Jobs_1));
-    ret.emplace_back(std::make_unique<ItemPrinterRngRow>(false, DateTime{2016, 5, 20, 2, 11, 13}, ItemPrinterJobs::Jobs_10));
+    ret.emplace_back(std::make_unique<ItemPrinterRngRow>(false, DateTime{2039, 3, 21, 12, 14, 42}, ItemPrinterJobs::Jobs_1));
+    ret.emplace_back(std::make_unique<ItemPrinterRngRow>(true, DateTime{2016, 5, 20, 2, 11, 13}, ItemPrinterJobs::Jobs_10));
     return ret;
 }
 
@@ -194,7 +194,7 @@ ItemPrinterRNG::ItemPrinterRNG()
     )
     , GO_HOME_WHEN_DONE(false)
     , FIX_TIME_WHEN_DONE(
-        "<b>Fix time when done:</b><br>Fix the time after the program finishes.",
+        "<b>Fix Time When Done:</b><br>Fix the time after the program finishes.",
         LockMode::UNLOCK_WHILE_RUNNING, true
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))

@@ -80,7 +80,7 @@ GimmighoulChestFarmer::GimmighoulChestFarmer()
     )
     , GO_HOME_WHEN_DONE(false)
     , FIX_TIME_WHEN_DONE(
-        "<b>Fix time when done:</b><br>Fix the time after the program finishes.",
+        "<b>Fix Time When Done:</b><br>Fix the time after the program finishes.",
         LockMode::UNLOCK_WHILE_RUNNING, false
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))

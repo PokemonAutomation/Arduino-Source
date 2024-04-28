@@ -76,7 +76,7 @@ BBQOption::BBQOption(OCR::LanguageOCROption* language_option)
         LockMode::UNLOCK_WHILE_RUNNING, 1, 0, 5
     )
     , FIX_TIME_WHEN_DONE(
-        "<b>Fix time when done:</b><br>Fix the time after the program finishes.",
+        "<b>Fix Time When Done:</b><br>Fix the time after the program finishes.",
         LockMode::UNLOCK_WHILE_RUNNING, false
     )
 {
