@@ -59,10 +59,10 @@ std::unique_ptr<StatsTracker> EggFetcher_Descriptor::make_stats() const{
 EggFetcher::EggFetcher()
     : GO_HOME_WHEN_DONE(false)
     , LANGUAGE(
-        "<b>Game Language:</b><br>Required to read IVs.",
+        "<b>Game Language:</b>",
         IV_READER().languages(),
         LockMode::LOCK_WHILE_RUNNING,
-        false
+        true
     )
     , EGGS_TO_FETCH(
         "<b>Fetch this many eggs:</b>",

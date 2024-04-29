@@ -83,10 +83,10 @@ ShinyHuntScatterbug::ShinyHuntScatterbug()
         true
     )
     , LANGUAGE(
-        "<b>Game Language:</b><br>Required to read " + STRING_POKEMON + " names.",
+        "<b>Game Language:</b>",
         IV_READER().languages(),
         LockMode::UNLOCK_WHILE_RUNNING,
-        false
+        true
     )
     , SANDWICH_OPTIONS(LANGUAGE)
     , GO_HOME_WHEN_DONE(true)

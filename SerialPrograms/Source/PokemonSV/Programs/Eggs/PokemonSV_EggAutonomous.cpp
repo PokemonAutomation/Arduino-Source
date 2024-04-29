@@ -84,10 +84,10 @@ std::unique_ptr<StatsTracker> EggAutonomous_Descriptor::make_stats() const{
 EggAutonomous::EggAutonomous()
     : GO_HOME_WHEN_DONE(false)
     , LANGUAGE(
-        "<b>Game Language:</b><br>Required to read IVs.",
+        "<b>Game Language:</b>",
         IV_READER().languages(),
         LockMode::LOCK_WHILE_RUNNING,
-        false
+        true
     )
     , MAX_KEEPERS(
         "<b>Max Keepers:</b><br>Stop the program after keeping this many " + STRING_POKEMON + ". "
