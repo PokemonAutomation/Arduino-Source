@@ -292,7 +292,6 @@ void ItemPrinterRNG::run_print_at_date(
             env.log("Will commit in " + tostr_u_commas(trigger_delay.count()) + " milliseconds.");
 
             //  Re-enter the game.
-            pbf_press_button(context, BUTTON_A, 10, 10);
             pbf_press_button(context, BUTTON_HOME, 20, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
             resume_game_from_home(env.console, context, false);
 

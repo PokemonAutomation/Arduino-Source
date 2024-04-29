@@ -461,6 +461,7 @@ void DateReader::set_date(
     const DateTime& date
 ) const{
     context.wait_for_all_requests();
+
     {
         auto snapshot = console.video().snapshot();
         if (!detect(snapshot)){
@@ -471,6 +472,8 @@ void DateReader::set_date(
             );
         }
     }
+
+    bool cursor_on_right = false;
 
     for (size_t attempts = 0; attempts < 10; attempts++){
         ssf_flush_pipeline(context);
@@ -485,10 +488,15 @@ void DateReader::set_date(
             current.second.hour == date.hour &&
             current.second.minute == date.minute
         ){
+            if (!cursor_on_right){
+                for (size_t c = 0; c < 7; c++){
+                    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+                }
+            }
             return;
         }
 
-        //  Move cursor to the right.
+        //  Move cursor to the left.
         for (size_t c = 0; c < 7; c++){
             ssf_issue_scroll(context, SSF_SCROLL_LEFT, 3);
         }
@@ -549,6 +557,7 @@ void DateReader::set_date(
             break;
         }
 
+        cursor_on_right = true;
     }
 
     ssf_flush_pipeline(context);
