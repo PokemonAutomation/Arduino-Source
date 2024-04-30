@@ -20,8 +20,9 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 
-ItemPrinterJobsDetector::ItemPrinterJobsDetector(Color color)
+ItemPrinterJobsDetector::ItemPrinterJobsDetector(Color color, Language language)
     : m_color(color)
+    , m_language(language)
     , m_box_normal(0.86, 0.34, 0.045, 0.050)
     , m_box_bonus(0.86, 0.423, 0.045, 0.050)
 {}
@@ -30,14 +31,19 @@ void ItemPrinterJobsDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_box_normal);
     items.add(m_color, m_box_bonus);
 }
-uint8_t ItemPrinterJobsDetector::read_box(Logger& logger, const ImageViewRGB32& screen, const ImageFloatBox& box){
+uint8_t ItemPrinterJobsDetector::read_box(Logger& logger, const ImageViewRGB32& screen, const ImageFloatBox& box) const{
     ImageViewRGB32 cropped = extract_box_reference(screen, box);
     ImageRGB32 filtered = to_blackwhite_rgb32_range(cropped, 0xff808080, 0xffffffff, true);
-    int num = OCR::read_number(logger, filtered);
-    switch (num){
-    case 1: return 1;
-    case 5: return 5;
-    case 10: return 10;
+    int num = OCR::read_number(logger, filtered, m_language);
+    std::string str = std::to_string(num);
+    if (str[0] == '5'){
+        return 5;
+    }
+    if (str[0] == '1' && str[1] == '0'){
+        return 10;
+    }
+    if (str[0] == '1'){
+        return 1;
     }
     return 0;
 }

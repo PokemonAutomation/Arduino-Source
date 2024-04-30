@@ -153,10 +153,10 @@ std::unique_ptr<StatsTracker> ItemPrinterRNG_Descriptor::make_stats() const{
 
 ItemPrinterRNG::ItemPrinterRNG()
     : LANGUAGE(
-        "<b>Game Language:</b><br>Required to read prizes.",
+        "<b>Game Language:</b>",
         PokemonSwSh::IV_READER().languages(),
         LockMode::UNLOCK_WHILE_RUNNING,
-        false
+        true
     )
     , TOTAL_ROUNDS(
         "<b>Total Rounds:</b><br>Iterate the rounds table this many times before stopping the program.",
@@ -309,7 +309,7 @@ void ItemPrinterRNG::run_print_at_date(
                 pbf_press_button(context, BUTTON_B, 20, 30);
                 continue;
             }
-            item_printer_start_print(env.console, context, jobs);
+            item_printer_start_print(env.console, context, LANGUAGE, jobs);
             stats.prints++;
             env.update_stats();
             printed = true;
@@ -366,7 +366,7 @@ void ItemPrinterRNG::print_again(
             if (printed){
                 return;
             }
-            item_printer_start_print(env.console, context, jobs);
+            item_printer_start_print(env.console, context, LANGUAGE, jobs);
             stats.prints++;
             env.update_stats();
             printed = true;

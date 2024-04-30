@@ -20,7 +20,8 @@ namespace PokemonSV{
 
 
 void item_printer_start_print(
-    ConsoleHandle& console, BotBaseContext& context, ItemPrinterJobs jobs
+    ConsoleHandle& console, BotBaseContext& context,
+    Language language, ItemPrinterJobs jobs
 ){
     console.log("Starting print...");
 
@@ -45,7 +46,7 @@ void item_printer_start_print(
             pbf_press_button(context, BUTTON_A, 20, 105);
             continue;
         case 2:{    // material
-            ItemPrinterJobsDetector detector;
+            ItemPrinterJobsDetector detector(COLOR_RED, language);
             VideoOverlaySet overlays(console.overlay());
             detector.make_overlays(overlays);
             detector.set_print_jobs(console, context, (uint8_t)jobs);
@@ -99,7 +100,7 @@ std::array<std::string, 10> item_printer_finish_print(
             }
 
             if (language != Language::None){
-                ItemPrinterPrizeReader reader(Language::English);
+                ItemPrinterPrizeReader reader(language);
                 VideoOverlaySet overlays(console.overlay());
                 reader.make_overlays(overlays);
                 auto snapshot = console.video().snapshot();

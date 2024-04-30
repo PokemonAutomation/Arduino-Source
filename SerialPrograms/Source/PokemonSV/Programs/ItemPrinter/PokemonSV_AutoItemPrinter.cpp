@@ -11,6 +11,7 @@
 #include "CommonFramework/Tools/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h"
 #include "PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
@@ -53,12 +54,18 @@ std::unique_ptr<StatsTracker> AutoItemPrinter_Descriptor::make_stats() const{
 
 
 AutoItemPrinter::AutoItemPrinter()
-    : GO_HOME_WHEN_DONE(false)
+    : LANGUAGE(
+        "<b>Game Language:</b>",
+        PokemonSwSh::IV_READER().languages(),
+        LockMode::UNLOCK_WHILE_RUNNING,
+        true
+    )
     , NUM_ROUNDS(
         "<b>Number of Rounds to Run:</b>",
         LockMode::UNLOCK_WHILE_RUNNING,
         100
     )
+    , GO_HOME_WHEN_DONE(false)
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS_UPDATE,
@@ -66,8 +73,9 @@ AutoItemPrinter::AutoItemPrinter()
         &NOTIFICATION_ERROR_FATAL,
     })
 {
-    PA_ADD_OPTION(GO_HOME_WHEN_DONE);
+    PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(NUM_ROUNDS);
+    PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
@@ -125,7 +133,7 @@ void AutoItemPrinter::program(SingleSwitchProgramEnvironment& env, BotBaseContex
     enter_printing_mode(env, context);
 
     for (uint16_t i = 0; i < NUM_ROUNDS; i++){
-        item_printer_start_print(env.console, context, ItemPrinterJobs::Jobs_10);
+        item_printer_start_print(env.console, context, LANGUAGE, ItemPrinterJobs::Jobs_10);
         item_printer_finish_print(env.inference_dispatcher(), env.console, context, Language::None);
 
         env.console.log("Print completed.");
