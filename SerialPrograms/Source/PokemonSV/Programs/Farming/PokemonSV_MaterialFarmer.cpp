@@ -78,7 +78,7 @@ std::unique_ptr<StatsTracker> MaterialFarmer_Descriptor::make_stats() const{
 
 MaterialFarmer::MaterialFarmer()
     : SAVE_GAME_BEFORE_SANDWICH(
-        "<b>Save Game  before each sandwich:</b><br>"
+        "<b>Save Game before each sandwich:</b><br>"
         "Recommended to leave on, as the sandwich maker will reset the game if it detects an error.",
         LockMode::LOCK_WHILE_RUNNING,
         true
@@ -145,7 +145,7 @@ MaterialFarmer::MaterialFarmer()
 
 
 void MaterialFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    MaterialFarmer_Descriptor::Stats& stats = env.current_stats<MaterialFarmer_Descriptor::Stats>();
+    
 
 
     assert_16_9_720p_min(env.logger(), env.console);
@@ -176,29 +176,53 @@ void MaterialFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
         reset_to_pokecenter(env.program_info(), env.console, context);
     }
 
+    MaterialFarmerOptions options {
+        SAVE_GAME_BEFORE_SANDWICH,
+        NUM_SANDWICH_ROUNDS,
+        LANGUAGE,
+        SANDWICH_OPTIONS,
+        GO_HOME_WHEN_DONE, 
+        AUTO_HEAL_PERCENT,
+        SAVE_DEBUG_VIDEO, 
+        SKIP_WARP_TO_POKECENTER,
+        SKIP_SANDWICH,
+        NOTIFICATION_STATUS_UPDATE,
+        NOTIFICATION_ERROR_RECOVERABLE,
+        NOTIFICATIONS
+    };
+
+    run_material_farmer(env, context, options);
+    
+}
+
+
+
+void run_material_farmer(SingleSwitchProgramEnvironment& env, BotBaseContext& context, MaterialFarmerOptions options){
+    
+    MaterialFarmer_Descriptor::Stats& stats = env.current_stats<MaterialFarmer_Descriptor::Stats>();
+
     LetsGoEncounterBotTracker encounter_tracker(
         env, env.console, context,
         stats,
-        LANGUAGE
+        options.language_option
     );
-    m_encounter_tracker = &encounter_tracker;
 
 
     size_t consecutive_failures;
     bool done_sandwich_iteration;
-    for (uint16_t i = 0; i < NUM_SANDWICH_ROUNDS; i++){
+    for (uint16_t i = 0; i < options.num_sandwich_rounds_option; i++){
         consecutive_failures = 0;
         done_sandwich_iteration = false;
         while (!done_sandwich_iteration){
             try{
-                run_one_sandwich_iteration(env, context);
+                run_one_sandwich_iteration(env, context, encounter_tracker, options);
                 done_sandwich_iteration = true;
             }catch(OperationFailedException& e){
                 stats.m_errors++;
                 env.update_stats();
-                e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
+                e.send_notification(env, options.notification_error_recoverable_option);
 
-                if (SAVE_DEBUG_VIDEO){
+                if (options.save_debug_video_option){
                     // Take a video to give more context for debugging
                     pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
                     context.wait_for_all_requests();
@@ -218,32 +242,31 @@ void MaterialFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
                 ++stats.m_game_resets;
                 env.update_stats();
             }catch(ProgramFinishedException&){
-                GO_HOME_WHEN_DONE.run_end_of_program(context);
+                options.go_home_when_done_option.run_end_of_program(context);
                 throw;
             }
         }
     }
 }
 
-void run_material_farmer(){
-
-}
-
 
 
 // start at North Province (Area 3) Pokecenter, make a sandwich, then use let's go repeatedly until 30 min passes.
-void MaterialFarmer::run_one_sandwich_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void run_one_sandwich_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context, 
+    LetsGoEncounterBotTracker& encounter_tracker, MaterialFarmerOptions& options)
+{
+
     MaterialFarmer_Descriptor::Stats& stats = env.current_stats<MaterialFarmer_Descriptor::Stats>();
 
     WallClock last_sandwich_time = WallClock::min();
 
-    if (SAVE_GAME_BEFORE_SANDWICH){
+    if (options.save_game_before_sandwich_option){
         save_game_from_overworld(env.program_info(), env.console, context);
     }
     // make sandwich then go back to Pokecenter to reset position
-    if (!SKIP_SANDWICH){
-        handle_battles_and_back_to_pokecenter(env, context, 
-            [this, &last_sandwich_time](SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    if (!options.skip_sandwich_option){
+        run_from_battles_and_back_to_pokecenter(env, context, 
+            [&last_sandwich_time, &options](SingleSwitchProgramEnvironment& env, BotBaseContext& context){
                 // Orient camera to look at same direction as player character
                 // - This is needed because when save-load the game, 
                 // the camera angle is different than when just flying to pokecenter
@@ -262,7 +285,7 @@ void MaterialFarmer::run_one_sandwich_iteration(SingleSwitchProgramEnvironment& 
                 picnic_from_overworld(env.program_info(), env.console, context);
                 pbf_move_left_joystick(context, 128, 0, 30, 40);
                 enter_sandwich_recipe_list(env.program_info(), env.console, context);
-                make_sandwich_option(env, env.console, context, SANDWICH_OPTIONS);
+                make_sandwich_option(env, env.console, context, options.sandwich_options);
                 last_sandwich_time = current_time();
                 leave_picnic(env.program_info(), env.console, context);
 
@@ -302,11 +325,11 @@ void MaterialFarmer::run_one_sandwich_iteration(SingleSwitchProgramEnvironment& 
         }else{
             env.console.log("Last Known HP: ?", COLOR_RED);
         }
-        if (0 < hp && hp < AUTO_HEAL_PERCENT){
+        if (0 < hp && hp < options.auto_heal_percent_option){
             auto_heal_from_menu_or_overworld(env.program_info(), env.console, context, 0, true);
             stats.m_autoheals++;
             env.update_stats();
-            send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
+            send_program_status_notification(env, options.notification_status_update_option);
         }
 
         /*
@@ -315,14 +338,14 @@ void MaterialFarmer::run_one_sandwich_iteration(SingleSwitchProgramEnvironment& 
         - Then returns to pokemon center 
         */
         env.console.log("Starting Let's Go hunting path", COLOR_PURPLE);
-        handle_battles_and_back_to_pokecenter(env, context, 
-            [this, &hp_watcher, &last_sandwich_time](SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+        run_from_battles_and_back_to_pokecenter(env, context, 
+            [&hp_watcher, &last_sandwich_time, &encounter_tracker](SingleSwitchProgramEnvironment& env, BotBaseContext& context){
                 run_until(
                     env.console, context,
                     [&](BotBaseContext& context){
 
                         /*                         
-                        - handle_battles_and_back_to_pokecenter will keep looping `action` 
+                        - run_from_battles_and_back_to_pokecenter will keep looping `action` 
                         (i.e. this lambda function) until it succeeeds
                         - Do a sandwich time check here to break out of the loop, in the case where
                         you are very unlucky and can't finish a Let's Go iteration due to getting caught
@@ -333,7 +356,7 @@ void MaterialFarmer::run_one_sandwich_iteration(SingleSwitchProgramEnvironment& 
                             return;
                         }                        
                         move_to_start_position_for_letsgo1(env, context);
-                        run_lets_go_iteration(env, context);
+                        run_lets_go_iteration(env, context, encounter_tracker);
                     },
                     {hp_watcher}
                 );
@@ -346,12 +369,12 @@ void MaterialFarmer::run_one_sandwich_iteration(SingleSwitchProgramEnvironment& 
 
 }
 
-bool MaterialFarmer::is_sandwich_expired(WallClock last_sandwich_time){
+bool is_sandwich_expired(WallClock last_sandwich_time){
     return last_sandwich_time + std::chrono::minutes(30) < current_time();
 }
 
 // from the North Province (Area 3) pokecenter, move to start position for Happiny dust farming
-void MaterialFarmer::move_to_start_position_for_letsgo0(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void move_to_start_position_for_letsgo0(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     // Orient camera to look at same direction as player character
     // - This is needed because when save-load the game, 
     // the camera angle is different than when just flying to pokecenter
@@ -401,7 +424,7 @@ void MaterialFarmer::move_to_start_position_for_letsgo0(SingleSwitchProgramEnvir
 }
 
 // from the North Province (Area 3) pokecenter, move to start position for Happiny dust farming
-void MaterialFarmer::move_to_start_position_for_letsgo1(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void move_to_start_position_for_letsgo1(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     // Orient camera to look at same direction as player character
     // - This is needed because when save-load the game, 
     // the camera angle is different than when just flying to pokecenter
@@ -457,13 +480,13 @@ void MaterialFarmer::move_to_start_position_for_letsgo1(SingleSwitchProgramEnvir
 
 
 // wait, then move forward quickly
-void MaterialFarmer::lets_go_movement0(BotBaseContext& context){
+void lets_go_movement0(BotBaseContext& context){
     pbf_wait(context, 500);
     pbf_move_left_joystick(context, 128, 0, 200, 10);
 }
 
 // wait, then move forward quickly, then wait some more.
-void MaterialFarmer::lets_go_movement1(BotBaseContext& context){
+void lets_go_movement1(BotBaseContext& context){
     pbf_wait(context, 500);
     pbf_move_left_joystick(context, 128, 0, 100, 10);
     pbf_wait(context, 100);
@@ -472,7 +495,9 @@ void MaterialFarmer::lets_go_movement1(BotBaseContext& context){
 
 // One iteration of the hunt: 
 // start at North Province (Area 3) pokecenter, go out and use Let's Go to battle , 
-void MaterialFarmer::run_lets_go_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void run_lets_go_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context, 
+    LetsGoEncounterBotTracker& encounter_tracker)
+{
     auto& console = env.console;
     // - Orient camera to look at same direction as player character
     // - This is needed because when save-load the game, the camera points
@@ -504,7 +529,7 @@ we can handle pokemon wild encounters when executing the action.
 - After battle ends, move back to PokeCenter to start the `action` again.
 - `action` must be an action starting at the PokeCenter 
 */
-void MaterialFarmer::handle_battles_and_back_to_pokecenter(SingleSwitchProgramEnvironment& env, BotBaseContext& context, 
+void run_from_battles_and_back_to_pokecenter(SingleSwitchProgramEnvironment& env, BotBaseContext& context, 
     std::function<void(SingleSwitchProgramEnvironment& env, BotBaseContext& context)>&& action)
 {
     bool action_finished = false;
