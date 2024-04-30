@@ -295,6 +295,14 @@ void ItemPrinterRNG::run_print_at_date(
             pbf_press_button(context, BUTTON_HOME, 20, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
             resume_game_from_home(env.console, context, false);
 
+            if (!prompt.detect(env.console.video().snapshot())){
+                env.log("Expected to be on prompt menu. Backing out.", COLOR_RED);
+                stats.errors++;
+                env.update_stats();
+                pbf_mash_button(context, BUTTON_B, 500);
+                continue;
+            }
+
             //  Wait for trigger time.
             context.wait_until(trigger_time);
             pbf_press_button(context, BUTTON_A, 10, 10);
