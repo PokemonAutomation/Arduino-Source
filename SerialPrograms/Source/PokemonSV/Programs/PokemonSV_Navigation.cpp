@@ -603,7 +603,7 @@ void fly_to_closest_pokecenter_on_map(const ProgramInfo& info, ConsoleHandle& co
             // no visible pokecenters at this zoom level. Move on to part 2.
             break;
         }
-        catch (OperationFailedException e){ // pokecenter was detected, but failed to fly there
+        catch (OperationFailedException& e){ // pokecenter was detected, but failed to fly there
             if (try_count >= max_try_count){
                 throw e;
             }
@@ -651,7 +651,7 @@ void fly_to_closest_pokecenter_on_map(const ProgramInfo& info, ConsoleHandle& co
                 );
             }
         }
-        catch (OperationFailedException e){ // pokecenter was detected, but failed to fly there
+        catch (OperationFailedException& e){ // pokecenter was detected, but failed to fly there
             if (try_count >= max_try_count){
                 throw e;
             }
