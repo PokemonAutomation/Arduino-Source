@@ -561,43 +561,59 @@ bool detect_closest_pokecenter_and_move_map_cursor_there(const ProgramInfo& info
 
 // While in the current map zoom level, detect pokecenter icons and fly to the closest one.
 // Return true if succeed. Return false if no visible pokcenter on map
+// Throw Operation failed Exception if detected pokecenter, but failed to fly there.
 bool fly_to_visible_closest_pokecenter_cur_zoom_level(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
-    const int max_try_count = 3;
-    for(int try_count = 0; try_count < max_try_count; ++try_count){
-        if (!detect_closest_pokecenter_and_move_map_cursor_there(info, console, context)){
-            return false;
+
+    if (!detect_closest_pokecenter_and_move_map_cursor_there(info, console, context)){
+        return false;
+    }
+    bool check_fly_menuitem = true;
+    const bool success = fly_to_overworld_from_map(info, console, context, check_fly_menuitem);
+    if (success){
+        return true;
+    }
+    else {
+        // detected pokecenter, but failed to fly there.
+        throw OperationFailedException(
+            ErrorReport::SEND_ERROR_REPORT, console,
+            "fly_to_visible_closest_pokecenter_cur_zoom_level(): Detected pokecenter, but failed to fly there as no \"Fly\" menuitem.",
+            true
+        );
+    }
+
+}
+
+
+void fly_to_closest_pokecenter_on_map(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+    const int max_try_count = 5;
+    int try_count = 0;
+    // Part 1: Tries to detect a pokecenter that is very close to the player
+    // Zoom in one level onto the map.
+    // If the player character icon or any wild pokemon icon overlaps with the PokeCenter icon, the code cannot
+    // detect it. So we zoom in as much as we can to prevent any icon overlap.
+    while(true){
+        try {
+            try_count++;
+            pbf_press_button(context, BUTTON_ZR, 40, 100);
+            
+            if (fly_to_visible_closest_pokecenter_cur_zoom_level(info, console, context)){
+                return; // success in finding the closest pokecenter. Return.
+            }
+
+            // no visible pokecenters at this zoom level. Move on to part 2.
+            break;
         }
-        bool check_fly_menuitem = true;
-        const bool success = fly_to_overworld_from_map(info, console, context, check_fly_menuitem);
-        if (success){
-            return true;
-        }
-        if (try_count + 1 < max_try_count){ // if this is not the last try:
+        catch (OperationFailedException e){ // pokecenter was detected, but failed to fly there
+            if (try_count >= max_try_count){
+                throw e;
+            }
             console.log("Failed to find the fly menuitem. Restart the closest Pokecenter travel process.");
             press_Bs_to_back_to_overworld(info, console, context);
             open_map_from_overworld(info, console, context);
         }
     }
-    // last try failed:
-    throw OperationFailedException(
-        ErrorReport::SEND_ERROR_REPORT, console,
-        "fly_to_visible_closest_pokecenter_cur_zoom_level(): tried three times to fly to pokecenter, but no \"Fly\" menuitem.",
-        true
-    );
-}
 
-
-void fly_to_closest_pokecenter_on_map(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
-    // Zoom in one level onto the map.
-    // If the player character icon or any wild pokemon icon overlaps with the PokeCenter icon, the code cannot
-    // detect it. So we zoom in as much as we can to prevent any icon overlap.
-    pbf_press_button(context, BUTTON_ZR, 40, 100);
-    
-    if (fly_to_visible_closest_pokecenter_cur_zoom_level(info, console, context)){
-        return; // success in finding the closest pokecenter. Return.
-    }
-    
-    // Does not find any visible pokecenter. Probably the player character or a nearby Pokemon icon overlaps with the pokecenter.
+    // Part 2: Tries to detect any pokecenter that is overlapped with the player.
     // Zoom out to the max warpable level and try pressing on the player character.
     console.log("Zoom to max map level to try searching for pokecetner again.");
     console.overlay().add_log("Pokecenter Icon occluded");
@@ -609,20 +625,49 @@ void fly_to_closest_pokecenter_on_map(const ProgramInfo& info, ConsoleHandle& co
         return; // success in flying to the pokecenter that overlaps with the player character at max warpable level.
     }
 
+    // Failed to find pokecenter overlapping with player
     console.log("No PokeCenter icon overlapping with the player character on the max warpable level");
     console.overlay().add_log("No overlapping PokeCenter");
-    // press B to first close the map menu
+    // press B to close the destination menu item
     pbf_press_button(context, BUTTON_B, 60, 100);
-    // Now try finding the closest pokecenter at the max warpable level
-    if (fly_to_visible_closest_pokecenter_cur_zoom_level(info, console, context) == false){
-        // Does not detect any pokecenter on map
-        console.overlay().add_log("Still no PokeCenter Found!", COLOR_RED);
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, console,
-            "fly_to_closest_pokecenter_on_map(): At max warpable map level, still cannot find PokeCenter icon.",
-            true
-        );
+
+
+    // Part 3: Tries to detect a pokecenter that is further away from the player, while at max warpable level
+    try_count = 0;
+    while(true){
+        try {
+            try_count++;
+            // Now try finding the closest pokecenter at the max warpable level
+            if (fly_to_visible_closest_pokecenter_cur_zoom_level(info, console, context)){
+                return; // success in finding the closest pokecenter. Return.
+            }
+            else {
+                // Does not detect any pokecenter on map
+                console.overlay().add_log("Still no PokeCenter Found!", COLOR_RED);
+                throw OperationFailedException(
+                    ErrorReport::SEND_ERROR_REPORT, console,
+                    "fly_to_closest_pokecenter_on_map(): At max warpable map level, still cannot find PokeCenter icon.",
+                    true
+                );
+            }
+        }
+        catch (OperationFailedException e){ // pokecenter was detected, but failed to fly there
+            if (try_count >= max_try_count){
+                throw e;
+            }
+            console.log("Failed to find the fly menuitem. Restart the closest Pokecenter travel process.");
+            press_Bs_to_back_to_overworld(info, console, context);
+            open_map_from_overworld(info, console, context);
+            // zoom out to max warpable level
+            pbf_press_button(context, BUTTON_ZL, 40, 100);
+        }
     }
+
+
+
+    
+    
+   
 }
 
 void jump_off_wall_until_map_open(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
