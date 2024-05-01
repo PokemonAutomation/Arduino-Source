@@ -486,19 +486,14 @@ void MaterialFarmer::run_lets_go_iteration(SingleSwitchProgramEnvironment& env, 
     const bool throw_ball_if_bubble = false;
     const int total_iterations = 13;
 
-    auto move_forward_with_lets_go = [&](int num_iterations){
-        context.wait_for_all_requests();
-        for(int i = 0; i < num_iterations; i++){
-            use_lets_go_to_clear_in_front(console, context, *m_encounter_tracker, throw_ball_if_bubble, [&](BotBaseContext& context){
-                // Do the following movement while the Let's Go pokemon clearing wild pokemon.
-                env.console.log("Move-forward iteration number: " + std::to_string(i + 1) + "/" + std::to_string(total_iterations), COLOR_PURPLE);
-
-                lets_go_movement1(context);
-            });
-        }
-    };
-
-    move_forward_with_lets_go(total_iterations);
+    context.wait_for_all_requests();
+    for(int i = 0; i < total_iterations; i++){
+        use_lets_go_to_clear_in_front(console, context, *m_encounter_tracker, throw_ball_if_bubble, [&](BotBaseContext& context){
+            // Do the following movement while the Let's Go pokemon clearing wild pokemon.
+            env.console.log("Move-forward iteration number: " + std::to_string(i + 1) + "/" + std::to_string(total_iterations), COLOR_PURPLE);
+            lets_go_movement1(context);
+        });
+    }
 
 }
 
