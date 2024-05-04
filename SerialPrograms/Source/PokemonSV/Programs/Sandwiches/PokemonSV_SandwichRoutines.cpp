@@ -304,6 +304,20 @@ ImageFloatBox move_sandwich_hand(
     WallClock cur_time, last_time;
     VideoOverlaySet overlay_set(console.overlay());
 
+    #if 0
+        // to intentionally trigger failures in hand detection, for testing recovery
+        if (SandwichHandType::FREE == hand_type){
+            std::pair<double, double> hand_location(1.0, 1.0);
+            const ImageFloatBox hand_bb_debug = hand_location_to_box(hand_location); 
+            const ImageFloatBox expanded_hand_bb_debug = expand_box(hand_bb_debug);
+            hand_watcher.change_box(expanded_hand_bb_debug);
+            overlay_set.clear();
+            overlay_set.add(COLOR_RED, hand_bb_debug);
+            overlay_set.add(COLOR_BLUE, expanded_hand_bb_debug);
+            pbf_move_left_joystick(context, 0, 0, TICKS_PER_SECOND*5, 100);  // move hand to screen edge
+        }
+    #endif
+
     while(true){
         int ret = wait_until(console, context, std::chrono::seconds(5), {hand_watcher});
         if (ret < 0){
