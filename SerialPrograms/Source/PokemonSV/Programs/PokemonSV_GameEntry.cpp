@@ -137,7 +137,7 @@ bool reset_game_from_home(
     ok &= reset_game_to_gamemenu(console, context);
     ok &= gamemenu_to_ingame(console, context);
     if (!ok){
-        dump_image(console.logger(), info, "StartGame", console.video().snapshot());
+        dump_image(info, console, "StartGame");
     }
     console.log("Entered game! Waiting out grace period.");
     pbf_wait(context, post_wait_time);

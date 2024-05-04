@@ -245,7 +245,11 @@ std::set<std::string> OutbreakFinder::read_travel_map_outbreaks(
 
     MMOQuestionMarkDetector question_mark_detector(env.logger());
     VideoOverlaySet mmo_overlay_set(env.console);
-    std::array<bool, 5> mmo_appears = question_mark_detector.detect_MMO_on_hisui_map(env.console.video().snapshot());
+    std::array<bool, 5> mmo_appears;
+    {
+        auto snapshot = env.console.video().snapshot();
+        mmo_appears = question_mark_detector.detect_MMO_on_hisui_map(snapshot);
+    }
     add_hisui_MMO_detection_to_overlay(mmo_appears, mmo_overlay_set);
 
     // If the current region is a wild area, the yellow cursor may overlap with the MMO question marker, causing
@@ -255,7 +259,8 @@ std::set<std::string> OutbreakFinder::read_travel_map_outbreaks(
         size_t current_wild_area_index = (int)current_region - 2;
         pbf_press_dpad(context, DPAD_RIGHT, 20, 40);
         context.wait_for_all_requests();
-        auto new_mmo_read = question_mark_detector.detect_MMO_on_hisui_map(env.console.video().snapshot());
+        auto snapshot = env.console.video().snapshot();
+        auto new_mmo_read = question_mark_detector.detect_MMO_on_hisui_map(snapshot);
         mmo_appears[current_wild_area_index] = new_mmo_read[current_wild_area_index];
         if (new_mmo_read[current_wild_area_index]){
             add_hisui_MMO_detection_to_overlay(mmo_appears, mmo_overlay_set);
@@ -358,11 +363,12 @@ void OutbreakFinder::goto_region_and_return(SingleSwitchProgramEnvironment& env,
         context.wait_for_all_requests();
     }
     if (is_wild_land(current_region) == false){
-        dump_image(env.console.logger(), env.program_info(), "FindRegion", env.console.video().snapshot());
+        auto snapshot = env.console.video().snapshot();
+        dump_image(env.console.logger(), env.program_info(), "FindRegion", snapshot);
         throw OperationFailedException(
             ErrorReport::SEND_ERROR_REPORT, env.console,
             "Unable to find a wild land.",
-            true
+            std::move(snapshot)
         );
     }
 
@@ -822,12 +828,13 @@ void OutbreakFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext
 
     env.update_stats();
 
+    auto snapshot = env.console.video().snapshot();
     send_program_notification(
         env, NOTIFICATION_MATCHED,
         COLOR_GREEN,
         "Found Outbreak",
         {}, "",
-        env.console.video().snapshot()
+        snapshot
     );
 
     GO_HOME_WHEN_DONE.run_end_of_program(context);

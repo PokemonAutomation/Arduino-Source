@@ -97,9 +97,12 @@ bool start_adventure(
     size_t consoles
 ){
     LobbyMinReadyDetector ready_detector(consoles, true);
-    if (ready_detector.ready_players(console.video().snapshot()) < consoles){
-        console.log("Number of players less than expected. Did someone join the wrong lobby?", COLOR_RED);
-        return false;
+    {
+        auto snapshot = console.video().snapshot();
+        if (ready_detector.ready_players(snapshot) < consoles){
+            console.log("Number of players less than expected. Did someone join the wrong lobby?", COLOR_RED);
+            return false;
+        }
     }
 
     //  Press A until you're not in the lobby anymore.

@@ -54,7 +54,11 @@ void SkipToFullMoon::program(SingleSwitchProgramEnvironment& env, BotBaseContext
         pbf_press_dpad(context, DPAD_UP, 20, 120);
         context.wait_for_all_requests();
 
-        const auto compatibility = detect_item_compatibility(env.console.video().snapshot());
+        ItemCompatibility compatibility;
+        {
+            auto snapshot = env.console.video().snapshot();
+            compatibility = detect_item_compatibility(snapshot);
+        }
 
         if (compatibility == ItemCompatibility::NONE){
             throw OperationFailedException(

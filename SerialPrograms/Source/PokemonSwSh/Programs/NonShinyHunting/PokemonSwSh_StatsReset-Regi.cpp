@@ -204,7 +204,11 @@ void StatsResetRegi::program(SingleSwitchProgramEnvironment& env, BotBaseContext
 
         context.wait_for_all_requests();
         IvJudgeReaderScope reader(env.console, LANGUAGE);
-        IvJudgeReader::Results results = reader.read(env.console, env.console.video().snapshot());
+        IvJudgeReader::Results results;
+        {
+            auto snapshot = env.console.video().snapshot();
+            results = reader.read(env.console, snapshot);
+        }
         bool ok = true;
         ok &= HP.matches(stats.errors, results.hp);
         ok &= ATTACK.matches(stats.errors, results.attack);

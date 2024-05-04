@@ -251,7 +251,8 @@ void RamanasCombeeFinder::run_iteration(SingleSwitchProgramEnvironment& env, Bot
 
     for (size_t c = 0; true; c++){
         context.wait_for_all_requests();
-        if (is_pokemon_selection(env.console, env.console.video().snapshot())){
+        auto snapshot = env.console.video().snapshot();
+        if (is_pokemon_selection(env.console, snapshot)){
             break;
         }
         if (c >= 5){

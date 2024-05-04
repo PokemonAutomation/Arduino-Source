@@ -419,7 +419,11 @@ bool TeraMultiFarmer::run_raid(
                 : HostingMode::LOCAL
         );
         lobby_start_time = current_time();
-        std::string code = lobby_reader.raid_code(env.logger(), env.realtime_dispatcher(), host_console.video().snapshot());
+        std::string code;
+        {
+            auto snapshot = host_console.video().snapshot();
+            code = lobby_reader.raid_code(env.logger(), env.realtime_dispatcher(), snapshot);
+        }
         const char* error = normalize_code(lobby_code, code);
         if (error){
             throw OperationFailedException(

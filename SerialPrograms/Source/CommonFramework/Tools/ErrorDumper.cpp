@@ -54,6 +54,14 @@ std::string dump_image(
     );
     return name;
 }
+std::string dump_image(
+    const ProgramInfo& program_info,
+    ConsoleHandle& console,
+    const std::string& label
+){
+    auto snapshot = console.video().snapshot();
+    return dump_image(console, program_info, label, snapshot);
+}
 
 #if 0
 void dump_image_and_throw_recoverable_exception(

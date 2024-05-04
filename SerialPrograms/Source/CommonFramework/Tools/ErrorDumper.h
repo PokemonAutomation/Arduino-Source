@@ -16,6 +16,7 @@ class ConsoleHandle;
 class EventNotificationOption;
 class ImageViewRGB32;
 class Logger;
+struct VideoSnapshot;
 class ProgramEnvironment;
 struct ProgramInfo;
 
@@ -30,6 +31,11 @@ std::string dump_image(
     Logger& logger,
     const ProgramInfo& program_info, const std::string& label,
     const ImageViewRGB32& image
+);
+std::string dump_image(
+    const ProgramInfo& program_info,
+    ConsoleHandle& console,
+    const std::string& label
 );
 
 #if 0

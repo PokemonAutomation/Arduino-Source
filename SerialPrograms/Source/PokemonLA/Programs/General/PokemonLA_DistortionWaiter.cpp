@@ -140,12 +140,13 @@ void DistortionWaiter::program(SingleSwitchProgramEnvironment& env, BotBaseConte
 
     env.update_stats();
 
+    auto snapshot = env.console.video().snapshot();
     send_program_notification(
         env, NOTIFICATION_DISTORTION,
         COLOR_GREEN,
         "Found Distortion",
         {}, "",
-        env.console.video().snapshot()
+        snapshot
     );
     pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
 }

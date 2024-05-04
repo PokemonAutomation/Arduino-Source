@@ -24,6 +24,7 @@ public:
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) const override;
+    using StaticScreenDetector::detect;
 
 private:
     Color m_color;

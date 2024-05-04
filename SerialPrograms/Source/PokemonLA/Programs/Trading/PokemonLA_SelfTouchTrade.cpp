@@ -181,7 +181,8 @@ void SelfTouchTrade::program(MultiSwitchProgramEnvironment& env, CancellableScop
         OverlayBoxScope box0(host, {0.925, 0.100, 0.014, 0.030});
         OverlayBoxScope box1(recv, {0.925, 0.100, 0.014, 0.030});
         env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
-            ImageStats stats = image_stats(extract_box_reference(console.video().snapshot(), box0));
+            auto snapshot = console.video().snapshot();
+            ImageStats stats = image_stats(extract_box_reference(snapshot, box0));
             bool ok = is_white(stats);
             if (host.index() == console.index()){
                 host_ok = ok;

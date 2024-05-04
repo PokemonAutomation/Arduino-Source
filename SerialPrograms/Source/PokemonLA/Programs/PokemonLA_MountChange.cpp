@@ -60,7 +60,11 @@ void change_mount(ConsoleHandle& console, BotBaseContext& context, MountState mo
     for (size_t c = 0; c < 20; c++){
         context.wait_for_all_requests();
 
-        MountState current = mount_detector.detect(console.video().snapshot());
+        MountState current;
+        {
+            auto snapshot = console.video().snapshot();
+            current = mount_detector.detect(snapshot);
+        }
         if (mount == current){
             return;
         }
@@ -113,7 +117,8 @@ void dismount(ConsoleHandle& console, BotBaseContext& context){
     for (size_t c = 0; c < 10; c++){
         context.wait_for_all_requests();
 
-        MountState current = mount_detector.detect(console.video().snapshot());
+        auto snapshot = console.video().snapshot();
+        MountState current = mount_detector.detect(snapshot);
         switch (current){
         case MountState::WYRDEER_OFF:
         case MountState::URSALUNA_OFF:

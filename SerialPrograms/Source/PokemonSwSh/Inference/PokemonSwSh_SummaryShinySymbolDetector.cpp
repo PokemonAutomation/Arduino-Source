@@ -72,7 +72,8 @@ SummaryShinySymbolDetector::Detection SummaryShinySymbolDetector::wait_for_detec
     while (true){
         scope.throw_if_cancelled();
 
-        Detection detection = detect(feed.snapshot());
+        auto snapshot = feed.snapshot();
+        Detection detection = detect(snapshot);
         if (detection == last_detection){
             confirmations++;
         }else{

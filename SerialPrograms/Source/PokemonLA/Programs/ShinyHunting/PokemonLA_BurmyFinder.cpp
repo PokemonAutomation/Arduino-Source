@@ -707,14 +707,15 @@ void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
 
     for (size_t c = 0; true; c++){
         context.wait_for_all_requests();
-        if (is_pokemon_selection(env.console, env.console.video().snapshot())){
+        auto snapshot = env.console.video().snapshot();
+        if (is_pokemon_selection(env.console, snapshot)){
             break;
         }
         if (c >= 5){
             throw OperationFailedException(
                 ErrorReport::SEND_ERROR_REPORT, env.console,
                 "Failed to switch to Pokemon selection after 5 attempts.",
-                true
+                std::move(snapshot)
             );
         }
         env.console.log("Not on Pokemon selection. Attempting to switch to it...", COLOR_ORANGE);

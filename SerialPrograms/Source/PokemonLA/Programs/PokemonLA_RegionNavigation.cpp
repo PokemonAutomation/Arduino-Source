@@ -279,11 +279,12 @@ void goto_camp_from_jubilife(
             {{detector}}
         );
         if (ret < 0){
-            dump_image(env.logger(), env.program_info(), "MapNotFound", console.video().snapshot());
+            auto snapshot = console.video().snapshot();
+            dump_image(env.logger(), env.program_info(), "MapNotFound", snapshot);
             throw OperationFailedException(
                 ErrorReport::SEND_ERROR_REPORT, console,
                 "Map not detected after 5 seconds.",
-                true
+                std::move(snapshot)
             );
         }
         console.log("Found map!");
@@ -424,11 +425,12 @@ void goto_camp_from_overworld(
         {{black_screen}}
     );
     if (ret < 0){
-        dump_image(console.logger(), env.program_info(), "FlyToCamp", console.video().snapshot());
+        auto snapshot = console.video().snapshot();
+        dump_image(console.logger(), env.program_info(), "FlyToCamp", snapshot);
         throw OperationFailedException(
             ErrorReport::SEND_ERROR_REPORT, console,
             "Failed to fly to camp after 20 seconds.",
-            true
+            std::move(snapshot)
         );
     }
     console.log("Arrived at camp...");

@@ -26,7 +26,8 @@ void assert_16_9_720p_min(Logger& logger, const ImageViewRGB32& frame){
     }
 }
 void assert_16_9_720p_min(Logger& logger, ConsoleHandle& console){
-    assert_16_9_720p_min(logger, console.video().snapshot());
+    auto snapshot = console.video().snapshot();
+    assert_16_9_720p_min(logger, snapshot);
 }
 
 void assert_16_9_1080p_min(Logger& logger, const ImageViewRGB32& frame){
@@ -42,7 +43,8 @@ void assert_16_9_1080p_min(Logger& logger, const ImageViewRGB32& frame){
     }
 }
 void assert_16_9_1080p_min(Logger& logger, ConsoleHandle& console){
-    assert_16_9_1080p_min(logger, console.video().snapshot());
+    auto snapshot = console.video().snapshot();
+    assert_16_9_1080p_min(logger, snapshot);
 }
 
 

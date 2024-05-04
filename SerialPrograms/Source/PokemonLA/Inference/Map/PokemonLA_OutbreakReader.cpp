@@ -7,6 +7,7 @@
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 //#include "CommonFramework/Tools/ErrorDumper.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonLA_OutbreakReader.h"
@@ -45,6 +46,10 @@ OCR::StringMatchResult OutbreakReader::read(const ImageViewRGB32& screen) const{
 //    }
 
     return result;
+}
+
+OCR::StringMatchResult OutbreakReader::read(const VideoSnapshot& snapshot) const{
+    return read((ImageViewRGB32)snapshot);
 }
 
 

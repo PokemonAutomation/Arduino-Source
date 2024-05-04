@@ -228,7 +228,8 @@ void run_autohost(
         BlackScreenOverWatcher black_screen;
         uint32_t now = start;
         while (true){
-            if (black_screen.black_is_over(console.video().snapshot())){
+            auto snapshot = console.video().snapshot();
+            if (black_screen.black_is_over(snapshot)){
                 env.log("Raid has Started!", COLOR_BLUE);
                 stats.add_raid(raid_state.raiders());
                 break;

@@ -171,7 +171,11 @@ void VideoFastCodeEntry::program(MultiSwitchProgramEnvironment& env, Cancellable
     FastCodeEntrySettings settings(FCE_SETTINGS);
 
     if (MODE == Mode::MANUAL){
-        std::string code = read_raid_code(env.logger(), env.realtime_dispatcher(), SCREEN_WATCHER.screenshot());
+        std::string code;
+        {
+            auto snapshot = SCREEN_WATCHER.screenshot();
+            code = read_raid_code(env.logger(), env.realtime_dispatcher(), snapshot);
+        }
         const char* error = enter_code(env, scope, settings, code, !SKIP_CONNECT_TO_CONTROLLER);
         if (error){
             env.log("No valid code found: " + std::string(error), COLOR_RED);

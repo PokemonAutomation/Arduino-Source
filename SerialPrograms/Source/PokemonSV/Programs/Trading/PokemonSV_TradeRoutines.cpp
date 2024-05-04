@@ -122,7 +122,8 @@ void trade_current_pokemon(
     //  Make sure there is something to trade.
     {
         SomethingInBoxSlotDetector detector(COLOR_CYAN, true);
-        if (!detector.detect(console.video().snapshot())){
+        auto snapshot = console.video().snapshot();
+        if (!detector.detect(snapshot)){
             stats.m_errors++;
             tracker.report_unrecoverable_error(console, "Box slot is empty.");
         }

@@ -559,10 +559,15 @@ TeraResult exit_tera_win_by_catching(
             console.log("Detected nickname prompt.");
             pbf_press_button(context, BUTTON_B, 20, 105);
             continue;
-        case 1:
+        case 1:{
             //  Next button detector is unreliable. Check if the summary is
             //  open. If so, fall-through to that.
-            if (!summary.detect(console.video().snapshot())){
+            bool detected;
+            {
+                auto snapshot = console.video().snapshot();
+                detected = summary.detect(snapshot);
+            }
+            if (!detected){
                 console.log("Detected possible (A) Next button.");
                 stop_if_enough_rare_items(console, context, stop_on_sparkly_items);
                 pbf_press_button(context, BUTTON_A, 20, 105);
@@ -570,6 +575,7 @@ TeraResult exit_tera_win_by_catching(
                 break;
             }
             console.log("Detected false positive (A) Next button.", COLOR_RED);
+        }
         case 6:
             console.log("Detected summary.");
             if (result == TeraResult::NO_DETECTION){

@@ -523,12 +523,13 @@ void EggAutonomous::process_one_baby(SingleSwitchProgramEnvironment& env, BotBas
         env.console.overlay().add_log("Shiny " + std::to_string(egg_index+1) + "/" + std::to_string(num_eggs_in_party), COLOR_GREEN);
         stats.m_shinies++;
         env.update_stats();
+        auto snapshot = env.console.video().snapshot();
         send_encounter_notification(
             env,
             m_notification_noop,
             NOTIFICATION_SHINY,
             false, true, {{{}, ShinyType::UNKNOWN_SHINY}}, std::nan(""),
-            env.console.video().snapshot()
+            snapshot
         );
     }else{
         env.console.overlay().add_log("Not shiny " + std::to_string(egg_index+1) + "/" + std::to_string(num_eggs_in_party), COLOR_WHITE);
@@ -536,12 +537,13 @@ void EggAutonomous::process_one_baby(SingleSwitchProgramEnvironment& env, BotBas
 
     auto send_keep_notification = [&](){
         if (!found_shiny){
+            auto snapshot = env.console.video().snapshot();
             send_encounter_notification(
                 env,
                 NOTIFICATION_NONSHINY_KEEP,
                 NOTIFICATION_SHINY,
                 false, false, {}, std::nan(""),
-                env.console.video().snapshot()
+                snapshot
             );
         }
     };
@@ -606,7 +608,12 @@ bool EggAutonomous::move_pokemon_to_keep(SingleSwitchProgramEnvironment& env, Bo
             move_box_cursor(env.program_info(), env.console, context, BoxCursorLocation::SLOTS, row, col);
             context.wait_for_all_requests();
             // If no pokemon in the slot:
-            if (!sth_in_box_detector.detect(env.console.video().snapshot())){
+            bool something_in_box;
+            {
+                auto snapshot = env.console.video().snapshot();
+                something_in_box = sth_in_box_detector.detect(snapshot);
+            }
+            if (!something_in_box){
 
                 // Move the to-keep pokemon in party to the empty slot.
                 swap_two_box_slots(env.program_info(), env.console, context,

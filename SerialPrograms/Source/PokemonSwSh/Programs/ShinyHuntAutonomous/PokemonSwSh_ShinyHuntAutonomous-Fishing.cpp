@@ -170,7 +170,8 @@ void ShinyHuntAutonomousFishing::program(SingleSwitchProgramEnvironment& env, Bo
                 continue;
             }
             context.wait_for(std::chrono::seconds(3));
-            if (miss_detector.detect(env.console.video().snapshot())){
+            auto snapshot = env.console.video().snapshot();
+            if (miss_detector.detect(snapshot)){
                 env.log("False alarm! We actually missed.", COLOR_RED);
                 stats.m_misses++;
                 pbf_mash_button(context, BUTTON_B, 2 * TICKS_PER_SECOND);

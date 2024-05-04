@@ -146,12 +146,13 @@ void ShinyHuntAutonomousIoATrade::program(SingleSwitchProgramEnvironment& env, B
             break;
         case SummaryShinySymbolDetector::SHINY:
             stats.add_unknown_shiny();
+            auto snapshot = env.console.video().snapshot();
             send_encounter_notification(
                 env,
                 NOTIFICATION_NONSHINY,
                 NOTIFICATION_SHINY,
                 false, true, {{{}, ShinyType::UNKNOWN_SHINY}}, std::nan(""),
-                env.console.video().snapshot()
+                snapshot
             );
             if (VIDEO_ON_SHINY){
                 pbf_wait(context, 1 * TICKS_PER_SECOND);

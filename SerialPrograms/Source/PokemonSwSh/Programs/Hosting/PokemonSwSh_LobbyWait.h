@@ -50,7 +50,10 @@ static RaidLobbyState raid_lobby_wait(
         uint32_t delay = time_elapsed;
 
         while (true){
-            state = inference.read(console.video().snapshot());
+            {
+                auto snapshot = console.video().snapshot();
+                state = inference.read(snapshot);
+            }
             if (state.valid && state.raid_is_full() && state.raiders_are_ready()){
                 return state;
             }
@@ -70,7 +73,10 @@ static RaidLobbyState raid_lobby_wait(
     }
 
     while (true){
-        state = inference.read(console.video().snapshot());
+        {
+            auto snapshot = console.video().snapshot();
+            state = inference.read(snapshot);
+        }
         if (state.valid && state.raid_is_full() && state.raiders_are_ready()){
             return state;
         }
@@ -106,7 +112,8 @@ static RaidLobbyState raid_lobby_wait(
             )
         );
         context.wait_for_all_requests();
-        state = inference.read(console.video().snapshot());
+        auto snapshot = console.video().snapshot();
+        state = inference.read(snapshot);
     }
 }
 

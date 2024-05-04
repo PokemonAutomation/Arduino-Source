@@ -15,6 +15,7 @@
 #include "CommonFramework/OCR/OCR_StringMatchResult.h"
 
 namespace PokemonAutomation{
+    struct VideoSnapshot;
 namespace NintendoSwitch{
 namespace PokemonLA{
 
@@ -24,6 +25,7 @@ public:
     OutbreakReader(Logger& logger, Language language, VideoOverlay& overlay);
 
     OCR::StringMatchResult read(const ImageViewRGB32& screen) const;
+    OCR::StringMatchResult read(const VideoSnapshot& snapshot) const;
 
 
 private:

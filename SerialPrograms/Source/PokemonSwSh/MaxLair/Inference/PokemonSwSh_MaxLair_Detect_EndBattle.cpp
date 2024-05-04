@@ -6,6 +6,7 @@
 
 #include "Common/Compiler.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "PokemonSwSh_MaxLair_Detect_EndBattle.h"
 
@@ -110,6 +111,9 @@ size_t count_catches(VideoOverlay& overlay, const ImageViewRGB32& screen){
     }
 
     return count;
+}
+size_t count_catches(VideoOverlay& overlay, const VideoSnapshot& snapshot){
+    return count_catches(overlay, (ImageViewRGB32)snapshot);
 }
 
 

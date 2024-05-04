@@ -229,11 +229,14 @@ void PurpleBeamFinder::program(SingleSwitchProgramEnvironment& env, BotBaseConte
     }
 
     context.wait_for(std::chrono::seconds(2));
-    send_program_finished_notification(
-        env, NOTIFICATION_PURPLE_BEAM,
-        "Found a purple beam!",
-        env.console.video().snapshot()
-    );
+    {
+        auto snapshot = env.console.video().snapshot();
+        send_program_finished_notification(
+            env, NOTIFICATION_PURPLE_BEAM,
+            "Found a purple beam!",
+            snapshot
+        );
+    }
     while (true){
         pbf_press_button(context, BUTTON_B, 20, 20);
         pbf_press_button(context, BUTTON_LCLICK, 20, 20);

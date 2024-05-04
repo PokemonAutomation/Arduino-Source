@@ -28,7 +28,11 @@ int move_to_ball(
     const std::string& ball_slug,
     bool forward, int attempts, uint16_t delay
 ){
-    std::string first_ball = reader.read_ball(console.video().snapshot());
+    std::string first_ball;
+    {
+        auto snapshot = console.video().snapshot();
+        first_ball = reader.read_ball(snapshot);
+    }
     if (first_ball == ball_slug){
         return 0;
     }
@@ -37,7 +41,8 @@ int move_to_ball(
     for (int c = 1; c < attempts; c++){
         pbf_press_dpad(context, forward ? DPAD_RIGHT : DPAD_LEFT, 10, delay);
         context.wait_for_all_requests();
-        std::string current_ball = reader.read_ball(console.video().snapshot());
+        auto snapshot = console.video().snapshot();
+        std::string current_ball = reader.read_ball(snapshot);
         if (current_ball == ball_slug){
             return c;
         }
@@ -65,7 +70,8 @@ int16_t move_to_ball(
         return 0;
     }
     if (ret == 0){
-        uint16_t quantity = reader.read_quantity(console.video().snapshot());
+        auto snapshot = console.video().snapshot();
+        uint16_t quantity = reader.read_quantity(snapshot);
         return quantity == 0 ? -1 : quantity;
     }
 
@@ -80,10 +86,13 @@ int16_t move_to_ball(
         return 0;
     }
     if (ret > 0){
-        console.log("BasicCatcher: Fast ball scrolling overshot by " +
-            std::to_string(ret) + " slot(s).", COLOR_RED);
+        console.log(
+            "BasicCatcher: Fast ball scrolling overshot by " +
+            std::to_string(ret) + " slot(s).", COLOR_RED
+        );
     }
-    uint16_t quantity = reader.read_quantity(console.video().snapshot());
+    auto snapshot = console.video().snapshot();
+    uint16_t quantity = reader.read_quantity(snapshot);
     return quantity == 0 ? -1 : quantity;
 }
 

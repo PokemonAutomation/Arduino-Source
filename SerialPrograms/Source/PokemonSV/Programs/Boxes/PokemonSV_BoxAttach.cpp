@@ -159,8 +159,7 @@ void attach_item_from_box(
                 errors++;
             }
 
-            auto screenshot = console.video().snapshot();
-            if (exists.detect(screenshot)){
+            if (exists.detect(console.video().snapshot())){
                 if (attach_attempted){
                     return;
                 }

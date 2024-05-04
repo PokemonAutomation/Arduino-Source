@@ -42,6 +42,7 @@ private:
 
 
 size_t count_catches(VideoOverlay& overlay, const ImageViewRGB32& screen);
+size_t count_catches(VideoOverlay& overlay, const VideoSnapshot& snapshot);
 
 
 

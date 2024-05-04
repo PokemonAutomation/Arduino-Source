@@ -350,7 +350,7 @@ bool RideCloner101::run_post_win(
                 success = true;
             }
             continue;
-        case 1:
+        case 1:{
             //  Next button detector is unreliable. Check if the summary is
             //  open. If so, fall-through to that.
             if (!summary.detect(console.video().snapshot())){
@@ -360,6 +360,7 @@ bool RideCloner101::run_post_win(
                 continue;
             }
             console.log("Detected false positive (A) Next button.", COLOR_RED);
+        }
         case 5:
             console.log("Detected summary.");
             if (result == TeraResult::NO_DETECTION){

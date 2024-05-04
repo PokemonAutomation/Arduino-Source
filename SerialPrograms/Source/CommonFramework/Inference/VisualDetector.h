@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_CommonFramework_VisualDetector_H
 #define PokemonAutomation_CommonFramework_VisualDetector_H
 
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 
 namespace PokemonAutomation{
@@ -20,6 +21,9 @@ public:
     virtual ~StaticScreenDetector() = default;
     virtual void make_overlays(VideoOverlaySet& items) const = 0;
     virtual bool detect(const ImageViewRGB32& screen) const = 0;
+    virtual bool detect(const VideoSnapshot& snapshot) const{
+        return detect((ImageViewRGB32)snapshot);
+    }
 };
 
 

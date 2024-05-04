@@ -105,12 +105,13 @@ bool on_shiny_callback(
     ss << "Error Coefficient: " << error_coefficient << "\n(Shiny may not be visible on the screen.)";
     embeds.emplace_back("Detection Results:", ss.str());
 
+    auto snapshot = console.video().snapshot();
     send_program_notification(
         env, options.NOTIFICATIONS,
         Pokemon::COLOR_STAR_SHINY,
         "Detected Shiny Sound",
         embeds, "",
-        console.video().snapshot(), true
+        snapshot, true
     );
     return false;
 }
@@ -131,12 +132,13 @@ void on_shiny_sound(
     pbf_mash_button(context, BUTTON_ZL, options.SCREENSHOT_DELAY);
     context.wait_for_all_requests();
 
+    auto snapshot = console.video().snapshot();
     send_program_notification(
         env, options.NOTIFICATIONS,
         Pokemon::COLOR_STAR_SHINY,
         "Detected Shiny Sound",
         embeds, "",
-        console.video().snapshot(), true
+        snapshot, true
     );
 
     ShinyDetectedAction action = options.ACTION;
@@ -158,13 +160,16 @@ void on_match_found(
     pbf_mash_button(context, BUTTON_ZL, options.SCREENSHOT_DELAY);
     context.wait_for_all_requests();
 
-    send_program_notification(
-        env, options.NOTIFICATIONS,
-        Pokemon::COLOR_STAR_SHINY,
-        "Match Found",
-        embeds, "",
-        console.video().snapshot(), true
-    );
+    {
+        auto snapshot = console.video().snapshot();
+        send_program_notification(
+            env, options.NOTIFICATIONS,
+            Pokemon::COLOR_STAR_SHINY,
+            "Match Found",
+            embeds, "",
+            snapshot, true
+        );
+    }
 
     ShinyDetectedAction action = options.ACTION;
     if (action == ShinyDetectedAction::TAKE_VIDEO_STOP_PROGRAM){

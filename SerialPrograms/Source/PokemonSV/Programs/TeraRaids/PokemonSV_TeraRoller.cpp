@@ -208,13 +208,17 @@ void TeraRoller::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
 
                 pbf_wait(context, 500); // Wait enough time for the Pokemon sprite to load
                 context.wait_for_all_requests();
-                send_encounter_notification(
-                    env,
-                    m_notification_noop,
-                    NOTIFICATION_SHINY,
-                    false, true, {{{}, ShinyType::UNKNOWN_SHINY}}, std::nan(""),
-                    env.console.video().snapshot()
-                );
+
+                {
+                    auto snapshot = env.console.video().snapshot();
+                    send_encounter_notification(
+                        env,
+                        m_notification_noop,
+                        NOTIFICATION_SHINY,
+                        false, true, {{{}, ShinyType::UNKNOWN_SHINY}}, std::nan(""),
+                        snapshot
+                    );
+                }
 
                 leave_phone_to_overworld(env.program_info(), env.console, context);
                 save_game_from_overworld(env.program_info(), env.console, context);

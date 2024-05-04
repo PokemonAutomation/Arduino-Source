@@ -78,14 +78,12 @@ void PokedexTasksReader::program(SingleSwitchProgramEnvironment& env, BotBaseCon
 
     std::ofstream output_file("output.txt");
 
-    for (int i = 0; i < 242; ++i)
-    {
+    for (int i = 0; i < 242; ++i){
         PokemonTasksReader reader(env.console);
-        std::array<int, 9> tasks = reader.read_tasks(env.console.video().snapshot());
-        for (auto task : tasks)
-        {
-            if (task != -1)
-            {
+        auto snapshot = env.console.video().snapshot();
+        std::array<int, 9> tasks = reader.read_tasks(snapshot);
+        for (auto task : tasks){
+            if (task != -1){
                 output_file << task << "\n";
             }
         }

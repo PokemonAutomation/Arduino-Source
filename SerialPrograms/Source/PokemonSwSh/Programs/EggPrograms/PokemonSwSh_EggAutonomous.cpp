@@ -755,7 +755,8 @@ bool EggAutonomous::process_hatched_pokemon(SingleSwitchProgramEnvironment& env,
                 const size_t max_dialog_count = 6;
                 for (; dialog_count < max_dialog_count; dialog_count++){
                     context.wait_for_all_requests();
-                    if (!dialog_detector.process_frame(env.console.video().snapshot(), current_time())){
+                    auto snapshot = env.console.video().snapshot();
+                    if (!dialog_detector.process_frame(snapshot, current_time())){
                         break;
                     }
                     pbf_press_button(context, BUTTON_A, 20, 100);

@@ -35,6 +35,7 @@ public:
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) const override;
+    using StaticScreenDetector::detect;
 
     uint8_t stars(
         Logger& logger, const ProgramInfo& info, const ImageViewRGB32& screen

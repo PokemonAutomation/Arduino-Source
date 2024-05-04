@@ -249,7 +249,8 @@ void StatsResetCalyrex::program(SingleSwitchProgramEnvironment& env, BotBaseCont
         if (CHECK_HORSE_STATS){
             context.wait_for_all_requests();
             IvJudgeReaderScope reader(env.console, LANGUAGE);
-            IvJudgeReader::Results results = reader.read(env.console, env.console.video().snapshot());
+            auto snapshot = env.console.video().snapshot();
+            IvJudgeReader::Results results = reader.read(env.console, snapshot);
             bool horse_ok = true;
             horse_ok &= HORSE_HP.matches(stats.errors, results.hp);
             horse_ok &= HORSE_ATTACK.matches(stats.errors, results.attack);
@@ -266,7 +267,8 @@ void StatsResetCalyrex::program(SingleSwitchProgramEnvironment& env, BotBaseCont
             context.wait_for_all_requests();
             
             IvJudgeReaderScope reader(env.console, LANGUAGE);
-            IvJudgeReader::Results results = reader.read(env.console, env.console.video().snapshot());
+            auto snapshot = env.console.video().snapshot();
+            IvJudgeReader::Results results = reader.read(env.console, snapshot);
             bool calyrex_ok = true;
             calyrex_ok &= CALYREX_HP.matches(stats.errors, results.hp);
             calyrex_ok &= CALYREX_ATTACK.matches(stats.errors, results.attack);

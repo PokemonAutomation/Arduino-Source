@@ -29,7 +29,12 @@ bool connect_to_internet_with_inference(
 //    cout << "Waiting for Y-COMM to open..." << endl;
     {
         YCommMenuDetector detector(true);
-        if (!detector.detect(console.video().snapshot())){
+        bool detected;
+        {
+            auto snapshot = console.video().snapshot();
+            detected = detector.detect(snapshot);
+        }
+        if (!detected){
             pbf_press_button(context, BUTTON_Y, 10, TICKS_PER_SECOND);
             context.wait_for_all_requests();
         }
@@ -42,7 +47,7 @@ bool connect_to_internet_with_inference(
             console.log("Y-COMM detected.");
         }else{
             console.log("Failed to detect Y-COMM after timeout.", COLOR_RED);
-            dump_image(console, ProgramInfo(), "connect_to_internet_with_inference", console.video().snapshot());
+            dump_image(ProgramInfo(), console, "connect_to_internet_with_inference");
             ok = false;
         }
     }

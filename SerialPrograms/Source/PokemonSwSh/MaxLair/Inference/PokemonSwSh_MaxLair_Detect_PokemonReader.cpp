@@ -77,7 +77,11 @@ struct SpeciesReadDatabase{
 
 std::string read_boss_sprite(ConsoleHandle& console){
     DenMonReader reader(console, console);
-    DenMonReadResults results = reader.read(console.video().snapshot());
+    DenMonReadResults results;
+    {
+        auto snapshot = console.video().snapshot();
+        results = reader.read(snapshot);
+    }
 
     std::string sprite_slug;
     {

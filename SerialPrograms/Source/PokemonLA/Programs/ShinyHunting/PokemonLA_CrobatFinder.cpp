@@ -105,7 +105,8 @@ void CrobatFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCon
     bool error = true;
     MountDetector mount_detector;
     for (size_t c = 0; c < 10; c++){
-        MountState mount = mount_detector.detect(env.console.video().snapshot());
+        auto snapshot = env.console.video().snapshot();
+        MountState mount = mount_detector.detect(snapshot);
         if (mount == MountState::WYRDEER_OFF){
             pbf_press_button(context, BUTTON_PLUS, 20, 105);
             error = false;
