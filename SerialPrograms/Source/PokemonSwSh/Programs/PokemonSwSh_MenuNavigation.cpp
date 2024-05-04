@@ -29,12 +29,13 @@ void navigate_to_menu_app(
 ){
     context.wait_for_all_requests();
     RotomPhoneMenuArrowFinder menu_arrow_detector(console);
-    const int cur_app_index = menu_arrow_detector.detect(console.video().snapshot());
+    auto snapshot = console.video().snapshot();
+    const int cur_app_index = menu_arrow_detector.detect(snapshot);
     if (cur_app_index < 0){
         throw OperationFailedException(
             ErrorReport::SEND_ERROR_REPORT, console,
             "Cannot detect Rotom phone menu.",
-            true
+            std::move(snapshot)
         );
     }
     console.log("Detect menu cursor at " + std::to_string(cur_app_index) + ".");

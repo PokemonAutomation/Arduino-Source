@@ -133,7 +133,8 @@ void SelfBoxTrade::program(MultiSwitchProgramEnvironment& env, CancellableScope&
         TradeNameReader name_reader0(env.consoles[0], env.consoles[0], LANGUAGE_LEFT);
         TradeNameReader name_reader1(env.consoles[1], env.consoles[1], LANGUAGE_RIGHT);
         env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
-            ImageStats stats = image_stats(extract_box_reference(console.video().snapshot(), box0));
+            auto snapshot = console.video().snapshot();
+            ImageStats stats = image_stats(extract_box_reference(snapshot, box0));
             bool is_ok = is_white(stats);
             if (!is_ok){
                 console.log("Skipping empty slot.", COLOR_ORANGE);
@@ -141,8 +142,7 @@ void SelfBoxTrade::program(MultiSwitchProgramEnvironment& env, CancellableScope&
                 return;
             }
 
-            VideoSnapshot image1 = console.video().snapshot();
-            std::string slug = (console.index() == 0 ? name_reader0 : name_reader1).read(image1);
+            std::string slug = (console.index() == 0 ? name_reader0 : name_reader1).read(snapshot);
             if (slug == "machoke" || slug == "haunter" || slug == "graveler" || slug == "kadabra"){
                 console.log("Skipping trade evolution: " + slug, COLOR_RED);
                 ok.store(false, std::memory_order_release);
