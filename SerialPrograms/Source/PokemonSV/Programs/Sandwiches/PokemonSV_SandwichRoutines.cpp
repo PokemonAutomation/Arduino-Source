@@ -262,6 +262,13 @@ std::string box_to_string(const ImageFloatBox& box){
     return os.str();
 }
 
+/* 
+- moves the sandwich hand from start_box to end_box
+- It detects the location of the sandwich hand, from within the bounds of the last frame's 
+expanded_hand_bb (i.e. m_box field in SandwichHandLocator). 
+Then updates the current location of expanded_hand_bb. 
+Then moves the sandwich hand closer towards end_box. 
+ */
 ImageFloatBox move_sandwich_hand(
     const ProgramInfo& info,
     AsyncDispatcher& dispatcher,
@@ -300,11 +307,49 @@ ImageFloatBox move_sandwich_hand(
     while(true){
         int ret = wait_until(console, context, std::chrono::seconds(5), {hand_watcher});
         if (ret < 0){
+            /* 
+            - search the whole screen for the sandwich hand, instead of just the box, and
+            update the location of the sandwich hand
+            - return true if successful. else false
+            */
+            auto recover_sandwich_hand_position = [&](){
+                const VideoSnapshot& frame = console.video().snapshot();
+                std::pair<double, double> hand_location = hand_watcher.search_entire_screen_for_sandwich_hand(frame);
+                bool is_hand_found_on_screen = hand_location.first >= 0.0; // if hand not found, its location is (-1, -1)
+                if(is_hand_found_on_screen){
+                    // if hand is found, update the location of the hand stored in the Watcher
+                    const ImageFloatBox hand_bb = hand_location_to_box(hand_location); 
+                    const ImageFloatBox expanded_hand_bb = expand_box(hand_bb);
+                    hand_watcher.change_box(expanded_hand_bb);
+                    return true;
+                } 
+                return false;
+            };
+            
+            console.log("Failed to detect sandwich hand. Try searching the whole screen.");
+            if(recover_sandwich_hand_position()){
+                continue;
+            }
+
+            // - sandwich hand, might be at the edge of the screen, so move it to the middle
+            // and try searching the entire screen again
+            // - move hand to bottom-right, then to the middle
+            console.log(
+                "Still failed to detect sandwich hand. It may be at the screen's edge. " 
+                "Try moving the hand to the middle of the screen and try searching the whole screen again.");
+            pbf_move_left_joystick(context, 255, 255, TICKS_PER_SECOND*5, 100);
+            pbf_move_left_joystick(context, 0, 128, 100, 100);
+            context.wait_for_all_requests();
+            
+            if(recover_sandwich_hand_position()){
+                continue;
+            }
+
+            // if still can't find the sandwich hand, throw a exception
             dump_image_and_throw_recoverable_exception(
                 info, console,
                 SANDWICH_HAND_TYPE_NAMES(hand_type) + "SandwichHandNotDetected",
-                "move_sandwich_hand(): Cannot detect " + SANDWICH_HAND_TYPE_NAMES(hand_type) + " hand.",
-                hand_watcher.last_snapshot()
+                "move_sandwich_hand(): Cannot detect " + SANDWICH_HAND_TYPE_NAMES(hand_type) + " hand."
             );
         }
 
@@ -404,6 +449,7 @@ void finish_sandwich_eating(const ProgramInfo& info, ConsoleHandle& console, Bot
             "finish_sandwich_eating(): cannot detect picnic after 60 seconds.");
     }
     console.overlay().add_log("Finish eating", COLOR_WHITE);
+    console.log("Finished eating sandwich. Back at picnic.");
     context.wait_for(std::chrono::seconds(1));
 }
 

@@ -42,6 +42,10 @@ public:
 
     void change_box(const ImageFloatBox& new_box) { m_box = new_box; }
 
+    // return the coordinates of the sandwich hand.
+    // search within the confines of the box area_to_search.
+    std::pair<double, double> locate_sandwich_hand(const ImageViewRGB32& frame, ImageFloatBox area_to_search) const;
+
 private:
     HandType m_type;
     ImageFloatBox m_box;
@@ -62,6 +66,9 @@ public:
     const std::pair<double, double>& location() const { return m_location; }
 
     void change_box(const ImageFloatBox& new_box) { m_locator.change_box(new_box); }
+
+    std::pair<double, double> search_entire_screen_for_sandwich_hand(const ImageViewRGB32& frame) const;
+
 
 private:
     SandwichHandLocator m_locator;
