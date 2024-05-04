@@ -1051,13 +1051,16 @@ void quest_tera_raid(ProgramEnvironment& env, ConsoleHandle& console, BotBaseCon
 
                 pbf_move_left_joystick(context, 0, 128, 375, 20);
                 pbf_press_button(context, BUTTON_L, 10, 50);
-                pbf_move_left_joystick(context, 0, 128, 100, 20);
+                pbf_move_left_joystick(context, 0, 128, 90, 20);
                 pbf_press_button(context, BUTTON_L, 10, 50);
 
                 //Keep rolling until we get a raid
-                while (!open_raid(console, context)){
+                uint64_t rerolls = 0;
+                while (!open_raid(console, context) && rerolls < 150){
                     env.log("No Tera raid found.", COLOR_ORANGE);
                     day_skip_from_overworld(console, context);
+                    pbf_wait(context, GameSettings::instance().RAID_SPAWN_DELAY);
+                    rerolls++;
                 }
                 started_tera_raid = true;
             },

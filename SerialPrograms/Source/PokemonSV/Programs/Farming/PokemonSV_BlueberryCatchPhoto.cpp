@@ -663,6 +663,7 @@ void quest_catch_handle_battle(const ProgramInfo& info, ConsoleHandle& console, 
     console.log("Catching Pokemon.");
     AdvanceDialogWatcher advance_dialog(COLOR_MAGENTA);
     PromptDialogWatcher add_to_party(COLOR_PURPLE);
+    OverworldWatcher overworld(COLOR_RED);
 
     uint8_t switch_party_slot = 1;
     bool quickball_thrown = false;
@@ -781,12 +782,12 @@ void quest_catch_handle_battle(const ProgramInfo& info, ConsoleHandle& console, 
                 NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
                 GradientArrowWatcher fainted(COLOR_BLUE, GradientArrowType::RIGHT, {0.610, 0.523, 0.044, 0.079});
                 SwapMenuWatcher swap(COLOR_YELLOW);
-                int ret2 = wait_until(
+                int ret2_run = wait_until(
                     console, context,
                     std::chrono::seconds(60),
                     { battle_menu, fainted }
                 );
-                switch (ret2){
+                switch (ret2_run){
                 case 0:
                     console.log("Battle menu detected, continuing.");
                     break;
@@ -802,17 +803,17 @@ void quest_catch_handle_battle(const ProgramInfo& info, ConsoleHandle& console, 
                     }
                     break;
                 default:
-                    console.log("Invalid state ret2 run_battle. Out of moves?");
+                    console.log("Invalid state ret2_run. Out of moves?");
                     throw OperationFailedException(
                         ErrorReport::SEND_ERROR_REPORT, console,
-                        "Invalid state ret2 run_battle. Out of moves?",
+                        "Invalid state ret2_run. Out of moves?",
                         true
                     );
                 }
 
             }
         },
-        { advance_dialog, add_to_party }
+        { advance_dialog, add_to_party, overworld }
         );
 
     switch (ret2){
@@ -823,6 +824,9 @@ void quest_catch_handle_battle(const ProgramInfo& info, ConsoleHandle& console, 
     case 1:
         console.log("Prompt dialog detected.");
         press_Bs_to_back_to_overworld(info, console, context);
+        break;
+    case 2:
+        console.log("Overworld detected.");
         break;
     default:
         console.log("Invalid state in run_battle().");
