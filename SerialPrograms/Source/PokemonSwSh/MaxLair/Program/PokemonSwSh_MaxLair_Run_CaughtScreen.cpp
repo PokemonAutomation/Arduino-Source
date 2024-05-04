@@ -81,7 +81,7 @@ StateMachineAction run_caught_screen(
     pbf_wait(context, TICKS_PER_SECOND);
     context.wait_for_all_requests();
 
-    CaughtPokemonScreen tracker(env, console, context);
+    CaughtPokemonScreen tracker(console, context);
     runtime.session_stats.add_run(tracker.total());
     if (is_host){
         runtime.path_stats.add_run(tracker.total() >= 4);
