@@ -263,6 +263,52 @@ std::string box_to_string(const ImageFloatBox& box){
 }
 
 /* 
+- search the whole screen for the sandwich hand, instead of just the box, and
+update the location of the sandwich hand
+- return true if successful. else false
+*/
+bool recover_sandwich_hand_position(ConsoleHandle& console, SandwichHandWatcher& hand_watcher){
+    const VideoSnapshot& frame = console.video().snapshot();
+    std::pair<double, double> hand_location = hand_watcher.search_entire_screen_for_sandwich_hand(frame);
+    bool is_hand_found_on_screen = hand_location.first >= 0.0; // if hand not found, its location is (-1, -1)
+    if(is_hand_found_on_screen){
+        // if hand is found, update the location of the hand stored in the Watcher
+        const ImageFloatBox hand_bb = hand_location_to_box(hand_location); 
+        const ImageFloatBox expanded_hand_bb = expand_box(hand_bb);
+        hand_watcher.change_box(expanded_hand_bb);
+        return true;
+    } 
+    return false;
+}
+
+/* 
+- center the cursor by moving the cursor to the edge of the screen, then away from the edge.
+- then search the whole screen for the sandwich hand, instead of just the box, and
+update the location of the sandwich hand
+- return true if successful. else throw an exception
+*/
+bool move_then_recover_sandwich_hand_position(
+    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, 
+    SandwichHandType hand_type, SandwichHandWatcher& hand_watcher
+){
+
+    pbf_move_left_joystick(context, 255, 255, TICKS_PER_SECOND*5, 100);
+    pbf_move_left_joystick(context, 0, 128, 100, 100);
+    context.wait_for_all_requests();
+    
+    if(recover_sandwich_hand_position(console, hand_watcher)){
+        return true;
+    }
+
+    // if still can't find the sandwich hand, throw an exception
+    dump_image_and_throw_recoverable_exception(
+        info, console,
+        SANDWICH_HAND_TYPE_NAMES(hand_type) + "SandwichHandNotDetected",
+        "move_sandwich_hand(): Cannot detect " + SANDWICH_HAND_TYPE_NAMES(hand_type) + " hand."
+    );
+}
+
+/* 
 - moves the sandwich hand from start_box to end_box
 - It detects the location of the sandwich hand, from within the bounds of the last frame's 
 expanded_hand_bb (i.e. m_box field in SandwichHandLocator). 
@@ -318,53 +364,25 @@ ImageFloatBox move_sandwich_hand(
         }
     #endif
 
+    int consec_no_move = 0;
     while(true){
         int ret = wait_until(console, context, std::chrono::seconds(5), {hand_watcher});
         if (ret < 0){
-            /* 
-            - search the whole screen for the sandwich hand, instead of just the box, and
-            update the location of the sandwich hand
-            - return true if successful. else false
-            */
-            auto recover_sandwich_hand_position = [&](){
-                const VideoSnapshot& frame = console.video().snapshot();
-                std::pair<double, double> hand_location = hand_watcher.search_entire_screen_for_sandwich_hand(frame);
-                bool is_hand_found_on_screen = hand_location.first >= 0.0; // if hand not found, its location is (-1, -1)
-                if(is_hand_found_on_screen){
-                    // if hand is found, update the location of the hand stored in the Watcher
-                    const ImageFloatBox hand_bb = hand_location_to_box(hand_location); 
-                    const ImageFloatBox expanded_hand_bb = expand_box(hand_bb);
-                    hand_watcher.change_box(expanded_hand_bb);
-                    return true;
-                } 
-                return false;
-            };
-            
             console.log("Failed to detect sandwich hand. Try searching the whole screen.");
-            if(recover_sandwich_hand_position()){
+            if(recover_sandwich_hand_position(console, hand_watcher)){
                 continue;
             }
 
             // - sandwich hand, might be at the edge of the screen, so move it to the middle
             // and try searching the entire screen again
             // - move hand to bottom-right, then to the middle
+            // throw exception if unable to find sandwich hand
             console.log(
                 "Still failed to detect sandwich hand. It may be at the screen's edge. " 
                 "Try moving the hand to the middle of the screen and try searching the whole screen again.");
-            pbf_move_left_joystick(context, 255, 255, TICKS_PER_SECOND*5, 100);
-            pbf_move_left_joystick(context, 0, 128, 100, 100);
-            context.wait_for_all_requests();
-            
-            if(recover_sandwich_hand_position()){
+            if(move_then_recover_sandwich_hand_position(info, console, context, hand_type, hand_watcher)){
                 continue;
             }
-
-            // if still can't find the sandwich hand, throw a exception
-            dump_image_and_throw_recoverable_exception(
-                info, console,
-                SANDWICH_HAND_TYPE_NAMES(hand_type) + "SandwichHandNotDetected",
-                "move_sandwich_hand(): Cannot detect " + SANDWICH_HAND_TYPE_NAMES(hand_type) + " hand."
-            );
         }
 
         auto cur_loc = hand_watcher.location();
@@ -378,6 +396,23 @@ ImageFloatBox move_sandwich_hand(
         overlay_set.clear();
         overlay_set.add(COLOR_RED, hand_bb);
         overlay_set.add(COLOR_BLUE, expanded_hand_bb);
+
+        // track if hand is stuck in place
+        if(last_loc.first == cur_loc.first && last_loc.second == cur_loc.second){
+            consec_no_move++;
+        }
+        else {
+            consec_no_move = 0;
+        }
+        // if hand is stuck for a long time, attempt to recover it's location
+        if (consec_no_move >= 20){
+            console.log("Hand hasn't moved " + std::to_string(consec_no_move) + " times in a row. "
+            "Attempt to recover.");
+            if(move_then_recover_sandwich_hand_position(info, console, context, hand_type, hand_watcher)){
+                continue;
+            }
+
+        }
 
         std::pair<double, double> dif(target_loc.first - cur_loc.first, target_loc.second - cur_loc.second);
         // console.log("float diff to target: " + std::to_string(dif.first) + ", " + std::to_string(dif.second));
@@ -394,8 +429,8 @@ ImageFloatBox move_sandwich_hand(
         // Assume screen width is 16.0, then the screen height is 9.0
         std::pair<double, double> real_dif(dif.first * 16, dif.second * 9);
         double distance = std::sqrt(real_dif.first * real_dif.first + real_dif.second * real_dif.second);
-        // console.log("scaled diff to target: " + std::to_string(real_dif.first) + ", " + std::to_string(real_dif.second)
-        //     + " distance " + std::to_string(distance));
+        console.log("scaled diff to target: " + std::to_string(real_dif.first) + ", " + std::to_string(real_dif.second)
+            + " distance " + std::to_string(distance));
 
         // Build a P-D controller!
 
@@ -404,7 +439,7 @@ ImageFloatBox move_sandwich_hand(
         double target_joystick_push = std::min(distance * 32, 128.0);
 
         std::pair<double, double> push(real_dif.first * target_joystick_push / distance, real_dif.second * target_joystick_push / distance);
-        // console.log("push force " + std::to_string(push.first) + ", " + std::to_string(push.second));
+        console.log("push force " + std::to_string(push.first) + ", " + std::to_string(push.second));
 
         if (last_loc.first < 0){
             speed = std::make_pair(0.0, 0.0);
