@@ -44,7 +44,7 @@ public:
 
     // return the coordinates of the sandwich hand.
     // search within the confines of the box area_to_search.
-    std::pair<double, double> locate_sandwich_hand(const ImageViewRGB32& frame, ImageFloatBox area_to_search) const;
+    std::pair<double, double> locate_sandwich_hand(const ImageViewRGB32& frame, ImageFloatBox area_to_search, bool check_outline) const;
 
 private:
     HandType m_type;
