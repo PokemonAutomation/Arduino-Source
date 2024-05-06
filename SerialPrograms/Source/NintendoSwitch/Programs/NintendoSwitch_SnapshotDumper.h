@@ -37,7 +37,8 @@ private:
     EnumDropdownOption<Format> FORMAT;
 };
 
-
+// takes a snapshot of the screen and saves it to the given folder_name
+void dump_snapshot(ConsoleHandle& console, std::string folder_name = "ScreenshotDumper");
 
 }
 }

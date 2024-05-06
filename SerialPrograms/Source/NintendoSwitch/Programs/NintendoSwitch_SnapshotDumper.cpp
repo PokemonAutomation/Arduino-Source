@@ -69,7 +69,13 @@ void SnapshotDumper::program(SingleSwitchProgramEnvironment& env, BotBaseContext
     }
 }
 
-
+void dump_snapshot(ConsoleHandle& console, std::string folder_name){
+    std::string folder_path = USER_FILE_PATH() + folder_name + "/";
+    QDir().mkpath(folder_path.c_str());
+    VideoSnapshot last = console.video().snapshot();
+    std::string filename = folder_path + now_to_filestring() + ".png";
+    last->save(filename);
+}
 
 
 }
