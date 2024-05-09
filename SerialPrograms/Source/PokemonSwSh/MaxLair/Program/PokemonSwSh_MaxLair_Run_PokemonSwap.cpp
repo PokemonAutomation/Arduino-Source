@@ -112,8 +112,9 @@ void run_swap_pokemon(
     context.wait_for(std::chrono::milliseconds(100));
 
     PathReader path_reader(console, player_index);
-    path_reader.read_sprites(console, state, console.video().snapshot());
-    path_reader.read_hp(console, state, console.video().snapshot());
+    auto snapshot = console.video().snapshot();
+    path_reader.read_sprites(console, state, snapshot);
+    path_reader.read_hp(console, state, snapshot);
 }
 
 

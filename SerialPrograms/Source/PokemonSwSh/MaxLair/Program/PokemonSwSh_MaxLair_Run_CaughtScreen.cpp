@@ -52,7 +52,7 @@ StateMachineAction mash_A_to_entrance(
     if (result < 0){
         console.log("Failed to detect entrance.", COLOR_RED);
         runtime.session_stats.add_error();
-        dump_image(console, MODULE_NAME, "FailedToDetectEntrance", console.video().snapshot());
+        dump_image(MODULE_NAME, console, "FailedToDetectEntrance");
         return StateMachineAction::RESET_RECOVER;
     }
     return StateMachineAction::KEEP_GOING;
@@ -81,7 +81,7 @@ StateMachineAction run_caught_screen(
     pbf_wait(context, TICKS_PER_SECOND);
     context.wait_for_all_requests();
 
-    CaughtPokemonScreen tracker(env, console, context);
+    CaughtPokemonScreen tracker(console, context);
     runtime.session_stats.add_run(tracker.total());
     if (is_host){
         runtime.path_stats.add_run(tracker.total() >= 4);

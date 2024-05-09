@@ -43,8 +43,6 @@ public:
 private:
     void run_one_sandwich_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
     
-    void reset_to_pokecenter(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-    
     void run_lets_go_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context, size_t path_id);
 
     void handle_battles_and_back_to_pokecenter(SingleSwitchProgramEnvironment& env, BotBaseContext& context, 

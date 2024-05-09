@@ -94,6 +94,13 @@ private:
     ImageFloatBox m_jp_day;
 };
 
+class DateChangeWatcher : public DetectorToFinder<DateReader>{
+public:
+    DateChangeWatcher(std::chrono::milliseconds duration = std::chrono::milliseconds(250))
+         : DetectorToFinder("DateChangeWatcher", duration)
+    {}
+};
+
 
 
 }

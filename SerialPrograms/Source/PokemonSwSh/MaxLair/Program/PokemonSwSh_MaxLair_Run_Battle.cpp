@@ -81,7 +81,7 @@ bool read_battle_menu(
 
     if (state.wins != 3 && is_boss(opponent)){
         console.log("Boss found before 3 wins. Something is seriously out-of-sync.", COLOR_RED);
-        dump_image(console, MODULE_NAME, "BossBeforeEnd", console.video().snapshot());
+        dump_image(MODULE_NAME, console, "BossBeforeEnd");
 //        send_program_telemetry(
 //            env.logger(), true, COLOR_RED, MODULE_NAME,
 //            "Error",

@@ -117,6 +117,7 @@
 #include "NintendoSwitch/Inference/NintendoSwitch_DateReader.h"
 #include "PokemonSV/Inference/ItemPrinter/PokemonSV_ItemPrinterPrizeReader.h"
 #include "PokemonSV/Inference/ItemPrinter/PokemonSV_ItemPrinterJobsDetector.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h"
 
 
 
@@ -179,7 +180,7 @@ TestProgram::TestProgram()
     )
     , LANGUAGE(
         "<b>OCR Language:</b>",
-        { Language::English },
+        PokemonSwSh::IV_READER().languages(),
         LockMode::LOCK_WHILE_RUNNING,
         false
     )
@@ -262,15 +263,15 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     BotBaseContext context(scope, console.botbase());
     VideoOverlaySet overlays(overlay);
 
-#if 0
-    ItemPrinterJobsDetector detector;
+#if 1
+    ItemPrinterJobsDetector detector(COLOR_RED, LANGUAGE);
     detector.make_overlays(overlays);
 
     detector.set_print_jobs(console, context, 5);
 #endif
 
 
-#if 1
+#if 0
     ItemPrinterPrizeReader reader(Language::English);
     reader.make_overlays(overlays);
 

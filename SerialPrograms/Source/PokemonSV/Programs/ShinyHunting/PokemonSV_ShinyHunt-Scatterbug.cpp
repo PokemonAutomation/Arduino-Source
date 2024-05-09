@@ -83,10 +83,10 @@ ShinyHuntScatterbug::ShinyHuntScatterbug()
         true
     )
     , LANGUAGE(
-        "<b>Game Language:</b><br>Required to read " + STRING_POKEMON + " names.",
+        "<b>Game Language:</b>",
         IV_READER().languages(),
         LockMode::UNLOCK_WHILE_RUNNING,
-        false
+        true
     )
     , SANDWICH_OPTIONS(LANGUAGE)
     , GO_HOME_WHEN_DONE(true)
@@ -149,7 +149,7 @@ void ShinyHuntScatterbug::program(SingleSwitchProgramEnvironment& env, BotBaseCo
     assert_16_9_720p_min(env.logger(), env.console);
 
     if (DEBUG_WARP_TO_POKECENTER){
-        reset_to_pokecenter(env, context);
+        reset_to_pokecenter(env.program_info(), env.console, context);
         return;
     }
 
@@ -170,6 +170,7 @@ void ShinyHuntScatterbug::program(SingleSwitchProgramEnvironment& env, BotBaseCo
     while(true){
         try{
             run_one_sandwich_iteration(env, context);
+            consecutive_failures = 0;
         }catch(OperationFailedException& e){
             stats.m_errors++;
             env.update_stats();
@@ -202,10 +203,7 @@ void ShinyHuntScatterbug::program(SingleSwitchProgramEnvironment& env, BotBaseCo
             reset_game(env.program_info(), env.console, context);
             ++stats.m_game_resets;
             env.update_stats();
-            dump_image_and_throw_recoverable_exception(
-                env.program_info(), env.console, "Operation Failed",
-                "Resetting game to reattempt operation."
-            );
+
         }catch(ProgramFinishedException&){
             GO_HOME_WHEN_DONE.run_end_of_program(context);
             throw;
@@ -236,7 +234,7 @@ void ShinyHuntScatterbug::handle_battles_and_back_to_pokecenter(SingleSwitchProg
             [&](BotBaseContext& context){
                 if (action_finished){
                     // `action` is already finished. Now we just try to get back to pokecenter:
-                    reset_to_pokecenter(env, context);
+                    reset_to_pokecenter(env.program_info(), env.console, context);
                     context.wait_for_all_requests();
                     returned_to_pokecenter = true;
                     return;
@@ -249,7 +247,7 @@ void ShinyHuntScatterbug::handle_battles_and_back_to_pokecenter(SingleSwitchProg
                     // So a previous round of action failed.
                     // We need to first re-initialize our position to the PokeCenter
                     // Use map to fly back to the pokecenter
-                    reset_to_pokecenter(env, context);
+                    reset_to_pokecenter(env.program_info(), env.console, context);
                 }
                 context.wait_for_all_requests();
                 action(env, context);
@@ -421,12 +419,6 @@ void ShinyHuntScatterbug::run_lets_go_iteration(SingleSwitchProgramEnvironment& 
 
         move_forward_with_lets_go(5);
     }
-}
-
-// Open map and teleport back to town pokecenter to reset the hunting path.
-void ShinyHuntScatterbug::reset_to_pokecenter(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    open_map_from_overworld(env.program_info(), env.console, context);
-    fly_to_closest_pokecenter_on_map(env.program_info(), env.console, context);
 }
 
 

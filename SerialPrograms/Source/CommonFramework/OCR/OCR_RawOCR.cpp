@@ -163,6 +163,10 @@ std::string ocr_read(Language language, const ImageViewRGB32& image){
 //    static size_t c = 0;
 //    image.save("ocr-" + std::to_string(c++) + ".png");
 
+    if (language == Language::None){
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Attempted to call OCR without a language.");
+    }
+
     std::map<Language, TesseractPool>::iterator iter;
     {
         SpinLockGuard lg(ocr_pool_lock, "ocr_read()");
@@ -174,6 +178,10 @@ std::string ocr_read(Language language, const ImageViewRGB32& image){
     return iter->second.run(image);
 }
 void ensure_instances(Language language, size_t instances){
+    if (language == Language::None){
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Attempted to call OCR without a language.");
+    }
+
     std::map<Language, TesseractPool>::iterator iter;
     {
         SpinLockGuard lg(ocr_pool_lock, "ocr_read()");

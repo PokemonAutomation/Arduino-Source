@@ -251,9 +251,10 @@ void picnic_at_zero_gate(const ProgramInfo& info, ConsoleHandle& console, BotBas
     picnic_from_overworld(info, console, context);
 }
 
-bool eat_egg_sandwich_at_picnic(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
-    EggSandwichType sandwich_type, Language language)
-{
+bool eat_egg_sandwich_at_picnic(
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    EggSandwichType sandwich_type, Language language
+){
     // Move forward to table to make sandwich
     pbf_move_left_joystick(context, 128, 0, 30, 40);
     context.wait_for_all_requests();
@@ -293,7 +294,8 @@ bool eat_egg_sandwich_at_picnic(ProgramEnvironment& env, ConsoleHandle& console,
     return true;
 }
 
-void collect_eggs_after_sandwich(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+void collect_eggs_after_sandwich(
+    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
     size_t basket_wait_seconds, size_t max_eggs, size_t& num_eggs_collected,
     std::function<void(size_t new_eggs)> basket_check_callback
 ){

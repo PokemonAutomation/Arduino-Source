@@ -9,6 +9,7 @@
 
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
+#include "CommonFramework/Options/LanguageOCROption.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
@@ -35,8 +36,11 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
-    GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
+    OCR::LanguageOCROption LANGUAGE;
     SimpleIntegerOption<uint16_t> NUM_ROUNDS;
+
+    GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
+
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;
 

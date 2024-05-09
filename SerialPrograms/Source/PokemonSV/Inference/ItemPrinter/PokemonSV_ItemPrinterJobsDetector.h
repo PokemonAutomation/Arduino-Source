@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonSV_ItemPrinterJobsDetector_H
 
 #include "Common/Cpp/Color.h"
+#include "CommonFramework/Language.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/Inference/VisualDetector.h"
 
@@ -20,7 +21,7 @@ namespace PokemonSV{
 
 class ItemPrinterJobsDetector{
 public:
-    ItemPrinterJobsDetector(Color color = COLOR_RED);
+    ItemPrinterJobsDetector(Color color, Language language);
 
     void make_overlays(VideoOverlaySet& items) const;
     uint8_t detect_jobs(Logger& logger, const ImageViewRGB32& screen) const;
@@ -32,10 +33,11 @@ public:
 
 
 private:
-    static uint8_t read_box(Logger& logger, const ImageViewRGB32& screen, const ImageFloatBox& box);
+    uint8_t read_box(Logger& logger, const ImageViewRGB32& screen, const ImageFloatBox& box) const;
 
 private:
     Color m_color;
+    Language m_language;
     ImageFloatBox m_box_normal;
     ImageFloatBox m_box_bonus;
 

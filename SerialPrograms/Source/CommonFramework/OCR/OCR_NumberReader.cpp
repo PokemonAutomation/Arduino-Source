@@ -6,6 +6,7 @@
 
 #include <vector>
 #include <map>
+#include "Common/Qt/StringToolsQt.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/Language.h"
 #include "CommonFramework/Logging/Logger.h"
@@ -26,7 +27,7 @@ namespace OCR{
 
 
 std::string run_number_normalization(const std::string& input){
-    static const std::map<char, char> SUBSTITUTION_TABLE{
+    static const std::map<char32_t, char> SUBSTITUTION_TABLE{
         {'0', '0'},
         {'1', '1'},
         {'2', '2'},
@@ -39,16 +40,29 @@ std::string run_number_normalization(const std::string& input){
         {'9', '9'},
 
         //  Common misreads.
+        {']', '1'},
         {'l', '1'},
         {'i', '1'},
         {'A', '4'},
         {'a', '4'},
         {'S', '5'},
         {'s', '5'},
+
+        //  Japanese OCR likes to do this.
+        {U'🄋', '1'},
+        {U'①', '1'},
+        {U'②', '2'},
+        {U'③', '3'},
+        {U'④', '4'},
+        {U'⑤', '5'},
+        {U'⑥', '6'},
+        {U'⑦', '7'},
+        {U'⑧', '8'},
+        {U'⑨', '9'},
     };
 
     std::string normalized;
-    for (char ch : input){
+    for (char32_t ch : to_utf32(input)){
         auto iter = SUBSTITUTION_TABLE.find(ch);
         if (iter == SUBSTITUTION_TABLE.end()){
             continue;
@@ -60,8 +74,8 @@ std::string run_number_normalization(const std::string& input){
 }
 
 
-int read_number(Logger& logger, const ImageViewRGB32& image){
-    std::string ocr_text = OCR::ocr_read(Language::English, image);
+int read_number(Logger& logger, const ImageViewRGB32& image, Language language){
+    std::string ocr_text = OCR::ocr_read(language, image);
     std::string normalized = run_number_normalization(ocr_text);
 
     std::string str;

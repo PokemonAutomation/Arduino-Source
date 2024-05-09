@@ -8,6 +8,7 @@
 #define PokemonAutomation_OCR_NumberReader_H
 
 #include <stdint.h>
+#include "CommonFramework/Language.h"
 
 namespace PokemonAutomation{
     class Logger;
@@ -17,7 +18,7 @@ namespace OCR{
 
 //  Returns -1 if no number is found.
 //  No processing is done on the image. It is OCR'ed directly.
-int read_number(Logger& logger, const ImageViewRGB32& image);
+int read_number(Logger& logger, const ImageViewRGB32& image, Language language = Language::English);
 
 
 //  This version attempts to improve reliability by first isolating each number

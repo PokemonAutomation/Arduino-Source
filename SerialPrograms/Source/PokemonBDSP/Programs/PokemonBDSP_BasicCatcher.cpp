@@ -118,8 +118,10 @@ CatchResults throw_balls(
                 return {CatchResult::OUT_OF_BALLS, balls_used};
             }
 
-            console.log("BasicCatcher: Found " + ball_slug + " with amount " + 
-                std::to_string(num_balls));
+            console.log(
+                "BasicCatcher: Found " + ball_slug + " with amount " +
+                std::to_string(num_balls)
+            );
             pbf_mash_button(context, BUTTON_ZL, 125);
             context.wait_for_all_requests();
         }

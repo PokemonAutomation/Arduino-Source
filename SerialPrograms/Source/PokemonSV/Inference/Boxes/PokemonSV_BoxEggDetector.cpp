@@ -76,7 +76,9 @@ void BoxEggDetector::make_overlays(VideoOverlaySet& items) const{
 
 bool BoxEggDetector::detect(const ImageViewRGB32& frame) const{
     const std::vector<std::pair<uint32_t, uint32_t>> filters = {
-        {combine_rgb(200, 200, 200), combine_rgb(255, 255, 255)}
+        {combine_rgb(200, 200, 200), combine_rgb(255, 255, 255)},
+        {combine_rgb(180, 180, 180), combine_rgb(255, 255, 255)} // for darker capture cards
+
     };
 
     const double screen_rel_size = (frame.height() / 1080.0);

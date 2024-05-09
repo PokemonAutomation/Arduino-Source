@@ -87,10 +87,10 @@ ShinyHuntAreaZeroPlatform::~ShinyHuntAreaZeroPlatform(){
 
 ShinyHuntAreaZeroPlatform::ShinyHuntAreaZeroPlatform()
     : LANGUAGE(
-        "<b>Game Language:</b><br>Required to read " + STRING_POKEMON + " names.",
+        "<b>Game Language:</b>",
         IV_READER().languages(),
         LockMode::LOCK_WHILE_RUNNING,
-        false
+        true
     )
     , MODE(
         "<b>Mode:</b><br>"

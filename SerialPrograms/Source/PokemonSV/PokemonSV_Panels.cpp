@@ -31,6 +31,7 @@
 #include "Programs/Farming/PokemonSV_FlyingTrialFarmer.h"
 #include "Programs/Farming/PokemonSV_WildItemFarmer.h"
 #include "Programs/Farming/PokemonSV_BBQSoloFarmer.h"
+#include "Programs/Farming/PokemonSV_MaterialFarmer.h"
 #include "Programs/ItemPrinter/PokemonSV_AutoItemPrinter.h"
 #include "Programs/ItemPrinter/PokemonSV_ItemPrinterRNG.h"
 
@@ -107,7 +108,9 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<BBQSoloFarmer_Descriptor, BBQSoloFarmer>());
     ret.emplace_back(make_single_switch_program<ItemPrinterRNG_Descriptor, ItemPrinterRNG>());
     if (IS_BETA_VERSION){
+        ret.emplace_back(make_single_switch_program<MaterialFarmer_Descriptor, MaterialFarmer>());
     }
+
 
     ret.emplace_back("---- Eggs ----");
     ret.emplace_back(make_single_switch_program<EggFetcher_Descriptor, EggFetcher>());

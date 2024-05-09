@@ -26,7 +26,8 @@ enum class ItemPrinterJobs{
 
 
 void item_printer_start_print(
-    ConsoleHandle& console, BotBaseContext& context, ItemPrinterJobs jobs
+    ConsoleHandle& console, BotBaseContext& context,
+    Language language, ItemPrinterJobs jobs
 );
 std::array<std::string, 10> item_printer_finish_print(
     AsyncDispatcher& dispatcher,

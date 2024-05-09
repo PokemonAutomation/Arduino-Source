@@ -20,9 +20,8 @@ namespace PokemonSwSh{
 namespace MaxLairInternal{
 
 
-CaughtPokemonScreen::CaughtPokemonScreen(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context)
-    : m_env(env)
-    , m_console(console)
+CaughtPokemonScreen::CaughtPokemonScreen(ConsoleHandle& console, BotBaseContext& context)
+    : m_console(console)
     , m_context(context)
     , m_total(count_catches(console, console.video().snapshot()))
 {
@@ -86,7 +85,8 @@ void CaughtPokemonScreen::leave_summary(){
         m_context.wait_for_all_requests();
         break;
     default:
-        dump_image(m_console, m_env.program_info(), "CaughtMenu", m_console.video().snapshot());
+//        auto snapshot = m_console.video().snapshot();
+//        dump_image(m_console, m_env.program_info(), "CaughtMenu", snapshot);
         throw OperationFailedException(
             ErrorReport::SEND_ERROR_REPORT, m_console,
             "Failed to detect caught menu.",
