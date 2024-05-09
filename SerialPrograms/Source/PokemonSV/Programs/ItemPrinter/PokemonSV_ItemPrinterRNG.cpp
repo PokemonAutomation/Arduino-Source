@@ -25,6 +25,8 @@
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 //#include "PokemonSV/Programs/PokemonSV_GameEntry.h"
+#include "PokemonSV/Programs/Farming/PokemonSV_MaterialFarmerTools.h"
+#include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSV_ItemPrinterRNG.h"
 #include <iostream>
 
@@ -474,7 +476,7 @@ ItemPrinterRNG_Descriptor::ItemPrinterRNG_Descriptor()
         Pokemon::STRING_POKEMON + " SV", "Item Printer RNG",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSV/ItemPrinterRNG.md",
         "Farm the Item Printer using RNG Manipulation.",
-        FeedbackType::REQUIRED,
+        FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB
     )
@@ -507,7 +509,9 @@ std::unique_ptr<StatsTracker> ItemPrinterRNG_Descriptor::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
 }
 
-
+ItemPrinterRNG::~ItemPrinterRNG(){
+    AUTO_MATERIAL_FARMING.remove_listener(*this);
+}
 
 ItemPrinterRNG::ItemPrinterRNG()
     : LANGUAGE(
@@ -517,7 +521,8 @@ ItemPrinterRNG::ItemPrinterRNG()
         true
     )
     , TOTAL_ROUNDS(
-        "<b>Total Rounds:</b><br>Iterate the rounds table this many times before stopping the program.",
+         "<b>Total Rounds per item printer session:</b><br>Iterate the rounds table this many times. "
+        "Then stop the program, or proceed to material farming (if enabled).",
         LockMode::UNLOCK_WHILE_RUNNING, 10
     )
 #if 0
@@ -560,12 +565,32 @@ ItemPrinterRNG::ItemPrinterRNG()
         "<b>Fix Time When Done:</b><br>Fix the time after the program finishes.",
         LockMode::UNLOCK_WHILE_RUNNING, true
     )
+    , AUTO_MATERIAL_FARMING(
+        "<b>Auto material gathering:</b><br>"
+        "After using the item printer, automatically fly to North Province (Area 3) to farm materials, "
+        "then fly back to keep using the item printer.",
+        LockMode::LOCK_WHILE_RUNNING,
+        true
+    )
+    , NUM_MATERIAL_FARM_ROUNDS(
+        "<b>Number Material farm rounds:</b><br>"
+        "One round is: Doing one item printer session (as per 'Total Rounds' entered above), "
+        "then farming materials at North Provice area 3 (as per 'Number of sandwich rounds' entered below), "
+        "then flying back to the item printer.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        3
+    )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS_UPDATE,
         &NOTIFICATION_PROGRAM_FINISH,
         &NOTIFICATION_ERROR_FATAL,
     })
+    , MATERIAL_FARMER_OPTIONS(
+        LANGUAGE, GO_HOME_WHEN_DONE, 
+        NOTIFICATION_STATUS_UPDATE, NOTIFICATION_PROGRAM_FINISH,
+        NOTIFICATION_ERROR_RECOVERABLE, NOTIFICATION_ERROR_FATAL
+    )
 {
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(TOTAL_ROUNDS);
@@ -576,7 +601,21 @@ ItemPrinterRNG::ItemPrinterRNG()
     PA_ADD_OPTION(ADJUST_DELAY);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(FIX_TIME_WHEN_DONE);
+
+    PA_ADD_OPTION(AUTO_MATERIAL_FARMING);
+    PA_ADD_OPTION(NUM_MATERIAL_FARM_ROUNDS);
+    PA_ADD_OPTION(MATERIAL_FARMER_OPTIONS);
+
     PA_ADD_OPTION(NOTIFICATIONS);
+
+    ItemPrinterRNG::value_changed();
+    AUTO_MATERIAL_FARMING.add_listener(*this);
+}
+
+void ItemPrinterRNG::value_changed(){
+    ConfigOptionState state = AUTO_MATERIAL_FARMING ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN;
+    MATERIAL_FARMER_OPTIONS.set_visibility(state);
+    NUM_MATERIAL_FARM_ROUNDS.set_visibility(state);
 }
 
 
@@ -1161,12 +1200,10 @@ void ItemPrinterRNG::print_again(
     }
 }
 
-
-void ItemPrinterRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    assert_16_9_720p_min(env.logger(), env.console);
-    ItemPrinterRNG_Descriptor::Stats& stats = env.current_stats<ItemPrinterRNG_Descriptor::Stats>();
-
-    env.update_stats();
+void ItemPrinterRNG::run_item_printer_rng(
+    SingleSwitchProgramEnvironment& env, BotBaseContext& context, 
+    ItemPrinterRNG_Descriptor::Stats& stats
+){
     for (uint32_t c = 0; c < TOTAL_ROUNDS; c++){
         std::vector<ItemPrinterRngRowSnapshot> table = TABLE.snapshot<ItemPrinterRngRowSnapshot>();
         for (const ItemPrinterRngRowSnapshot& row : table){
@@ -1180,6 +1217,46 @@ void ItemPrinterRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext
 //        run_print_at_date(env, context, DATE1, 10);
         stats.iterations++;
         env.update_stats();
+    }
+}
+
+void ItemPrinterRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    assert_16_9_720p_min(env.logger(), env.console);
+    ItemPrinterRNG_Descriptor::Stats& stats = env.current_stats<ItemPrinterRNG_Descriptor::Stats>();
+    env.update_stats();
+
+
+
+    if (!AUTO_MATERIAL_FARMING){
+        run_item_printer_rng(env, context, stats);
+    }
+    else {
+        // Throw user setup errors early in program
+        // - Ensure language is set
+        const Language language = LANGUAGE;
+        if (language == Language::None) {
+            throw UserSetupError(env.console.logger(), "Must set game language option to read item printer rewards.");
+        }        
+
+        // - Ensure audio input is enabled
+        LetsGoKillSoundDetector audio_detector(env.console, [](float){ return true; });
+        wait_until(
+            env.console, context,
+            std::chrono::milliseconds(1100),
+            {
+                static_cast<AudioInferenceCallback&>(audio_detector)
+            }
+        );
+        audio_detector.throw_if_no_sound(std::chrono::milliseconds(1000));
+
+        for (int i = 0; i < NUM_MATERIAL_FARM_ROUNDS; i++){
+            run_item_printer_rng(env, context, stats);
+            press_Bs_to_back_to_overworld(env.program_info(), env.console, context);
+            move_from_item_printer_to_material_farming(env, context);
+            run_material_farmer(env, context, MATERIAL_FARMER_OPTIONS);
+            move_from_material_farming_to_item_printer(env, context);
+        }
+
     }
 
     if (FIX_TIME_WHEN_DONE){
