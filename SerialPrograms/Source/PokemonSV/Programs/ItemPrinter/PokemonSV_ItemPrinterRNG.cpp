@@ -149,7 +149,9 @@ std::unique_ptr<StatsTracker> ItemPrinterRNG_Descriptor::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
 }
 
-
+ItemPrinterRNG::~ItemPrinterRNG(){
+    AUTO_MATERIAL_FARMING.remove_listener(*this);
+}
 
 ItemPrinterRNG::ItemPrinterRNG()
     : LANGUAGE(
@@ -197,12 +199,24 @@ ItemPrinterRNG::ItemPrinterRNG()
         "<b>Fix Time When Done:</b><br>Fix the time after the program finishes.",
         LockMode::UNLOCK_WHILE_RUNNING, true
     )
+    , AUTO_MATERIAL_FARMING(
+        "<b>Auto material gathering:</b><br>"
+        "After using the item printer, automatically fly to North Province (Area 3) to farm materials, "
+        "then fly back to keep using the item printer.",
+        LockMode::LOCK_WHILE_RUNNING,
+        true
+    )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS_UPDATE,
         &NOTIFICATION_PROGRAM_FINISH,
         &NOTIFICATION_ERROR_FATAL,
     })
+    , MATERIAL_FARMER_OPTIONS(
+        LANGUAGE, GO_HOME_WHEN_DONE, 
+        NOTIFICATION_STATUS_UPDATE, NOTIFICATION_PROGRAM_FINISH,
+        NOTIFICATION_ERROR_RECOVERABLE, NOTIFICATION_ERROR_FATAL
+    )
 {
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(TOTAL_ROUNDS);
@@ -212,7 +226,20 @@ ItemPrinterRNG::ItemPrinterRNG()
     PA_ADD_OPTION(DELAY_MILLIS);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(FIX_TIME_WHEN_DONE);
+
+    PA_ADD_OPTION(AUTO_MATERIAL_FARMING);
+    PA_ADD_OPTION(MATERIAL_FARMER_OPTIONS);
+
     PA_ADD_OPTION(NOTIFICATIONS);
+
+    ItemPrinterRNG::value_changed();
+    AUTO_MATERIAL_FARMING.add_listener(*this);
+}
+
+void ItemPrinterRNG::value_changed(){
+    ConfigOptionState state = AUTO_MATERIAL_FARMING ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN;
+    MATERIAL_FARMER_OPTIONS.set_visibility(state);
+
 }
 
 
