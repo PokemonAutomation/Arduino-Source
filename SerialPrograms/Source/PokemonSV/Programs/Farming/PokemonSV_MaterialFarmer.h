@@ -57,25 +57,7 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
-    BooleanCheckBoxOption SAVE_GAME_BEFORE_SANDWICH;
-
-    SimpleIntegerOption<uint16_t> NUM_SANDWICH_ROUNDS;
-    
-    OCR::LanguageOCROption LANGUAGE;
-
-    SandwichMakerOption SANDWICH_OPTIONS;
-
-    GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
-
-    FloatingPointOption AUTO_HEAL_PERCENT;
-
-    // Debug options
-    BooleanCheckBoxOption SAVE_DEBUG_VIDEO;
-    BooleanCheckBoxOption SKIP_WARP_TO_POKECENTER;
-    BooleanCheckBoxOption SKIP_SANDWICH;
-
-    EventNotificationOption NOTIFICATION_STATUS_UPDATE;
-    EventNotificationsOption NOTIFICATIONS;
+    MaterialFarmerOptions MATERIAL_FARMER_OPTIONS;
 
 };
 

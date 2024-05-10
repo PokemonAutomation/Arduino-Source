@@ -19,7 +19,7 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_LetsGoHpReader.h"
-#include "PokemonSV/Inference/Boxes/PokemonSV_IvJudgeReader.h"
+
 #include "PokemonSV/Inference/Battles/PokemonSV_EncounterWatcher.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
@@ -44,20 +44,20 @@ namespace PokemonSV{
 using namespace Pokemon;
 
 
-void run_material_farmer(SingleSwitchProgramEnvironment& env, BotBaseContext& context, MaterialFarmerOptions options){
+void run_material_farmer(SingleSwitchProgramEnvironment& env, BotBaseContext& context, MaterialFarmerOptions& options){
     
     MaterialFarmer_Descriptor::Stats& stats = env.current_stats<MaterialFarmer_Descriptor::Stats>();
 
     LetsGoEncounterBotTracker encounter_tracker(
         env, env.console, context,
         stats,
-        options.language_option
+        options.LANGUAGE
     );
 
 
     size_t consecutive_failures;
     bool done_sandwich_iteration;
-    for (uint16_t i = 0; i < options.num_sandwich_rounds_option; i++){
+    for (uint16_t i = 0; i < options.NUM_SANDWICH_ROUNDS; i++){
         consecutive_failures = 0;
         done_sandwich_iteration = false;
         while (!done_sandwich_iteration){
@@ -67,9 +67,9 @@ void run_material_farmer(SingleSwitchProgramEnvironment& env, BotBaseContext& co
             }catch(OperationFailedException& e){
                 stats.m_errors++;
                 env.update_stats();
-                e.send_notification(env, options.notification_error_recoverable_option);
+                e.send_notification(env, options.NOTIFICATION_ERROR_RECOVERABLE);
 
-                if (options.save_debug_video_option){
+                if (options.SAVE_DEBUG_VIDEO){
                     // Take a video to give more context for debugging
                     pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
                     context.wait_for_all_requests();
@@ -89,7 +89,7 @@ void run_material_farmer(SingleSwitchProgramEnvironment& env, BotBaseContext& co
                 ++stats.m_game_resets;
                 env.update_stats();
             }catch(ProgramFinishedException&){
-                options.go_home_when_done_option.run_end_of_program(context);
+                options.GO_HOME_WHEN_DONE.run_end_of_program(context);
                 throw;
             }
         }
@@ -107,11 +107,11 @@ void run_one_sandwich_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
 
     WallClock last_sandwich_time = WallClock::min();
 
-    if (options.save_game_before_sandwich_option){
+    if (options.SAVE_GAME_BEFORE_SANDWICH){
         save_game_from_overworld(env.program_info(), env.console, context);
     }
     // make sandwich then go back to Pokecenter to reset position
-    if (!options.skip_sandwich_option){
+    if (!options.SKIP_SANDWICH){
         run_from_battles_and_back_to_pokecenter(env, context, 
             [&last_sandwich_time, &options](SingleSwitchProgramEnvironment& env, BotBaseContext& context){
                 // Orient camera to look at same direction as player character
@@ -132,7 +132,7 @@ void run_one_sandwich_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
                 picnic_from_overworld(env.program_info(), env.console, context);
                 pbf_move_left_joystick(context, 128, 0, 30, 40);
                 enter_sandwich_recipe_list(env.program_info(), env.console, context);
-                make_sandwich_option(env, env.console, context, options.sandwich_options);
+                make_sandwich_option(env, env.console, context, options.SANDWICH_OPTIONS);
                 last_sandwich_time = current_time();
                 leave_picnic(env.program_info(), env.console, context);
 
@@ -172,11 +172,11 @@ void run_one_sandwich_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
         }else{
             env.console.log("Last Known HP: ?", COLOR_RED);
         }
-        if (0 < hp && hp < options.auto_heal_percent_option){
+        if (0 < hp && hp < options.AUTO_HEAL_PERCENT){
             auto_heal_from_menu_or_overworld(env.program_info(), env.console, context, 0, true);
             stats.m_autoheals++;
             env.update_stats();
-            send_program_status_notification(env, options.notification_status_update_option);
+            send_program_status_notification(env, options.NOTIFICATION_STATUS_UPDATE);
         }
 
         /*
