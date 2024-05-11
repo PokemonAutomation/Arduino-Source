@@ -43,6 +43,142 @@ namespace PokemonSV{
 
 using namespace Pokemon;
 
+MaterialFarmerOptions::MaterialFarmerOptions(
+    OCR::LanguageOCROption* language_option, GoHomeWhenDoneOption* go_home_when_done_option,
+    EventNotificationOption* notif_status_update_option, EventNotificationOption* notif_program_finish_option, 
+    EventNotificationOption* notif_error_recoverable_option, EventNotificationOption* notif_error_fatal_option
+)
+    : GroupOption(
+        "Material Farmer",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        false, true
+    )
+    , m_language_owner(language_option == nullptr
+        ? new OCR::LanguageOCROption(
+            "<b>Game Language:</b><br>Required to read sandwich ingredients.",
+            IV_READER().languages(),
+            LockMode::UNLOCK_WHILE_RUNNING,
+            true
+        )
+        : nullptr
+    )
+    , m_go_home_when_done_owner(go_home_when_done_option == nullptr 
+        ? new GoHomeWhenDoneOption(true) 
+        : nullptr
+    )
+    , m_notif_status_update_owner(notif_status_update_option == nullptr 
+        ? new EventNotificationOption("Status Update", true, false, std::chrono::seconds(3600)) 
+        : nullptr
+    )
+    , m_notif_program_finish_owner(notif_program_finish_option == nullptr 
+        ? new EventNotificationOption(
+            "Program Finished",
+            true, true,
+            ImageAttachmentMode::JPG,
+            {"Notifs"}
+        ) 
+        : nullptr
+    )
+    , m_notif_error_recoverable_owner(notif_error_recoverable_option == nullptr 
+        ? new EventNotificationOption(
+            "Program Error (Recoverable)",
+            true, false,
+            ImageAttachmentMode::PNG,
+            {"Notifs"}
+        ) 
+        : nullptr
+    )
+    , m_notif_error_fatal_owner(notif_error_fatal_option == nullptr 
+        ? new EventNotificationOption(
+            "Program Error (Fatal)",
+            true, true,
+            ImageAttachmentMode::PNG,
+            {"Notifs"}
+        ) 
+        : nullptr
+    )
+    , SAVE_GAME_BEFORE_SANDWICH(
+        "<b>Save Game before each sandwich:</b><br>"
+        "Recommended to leave on, as the sandwich maker will reset the game if it detects an error.",
+        LockMode::LOCK_WHILE_RUNNING,
+        true
+    )
+    , NUM_SANDWICH_ROUNDS(
+        "<b>Number of sandwich rounds to run:</b><br>"
+        "400-650 Happiny dust per sandwich, with Normal Encounter power level 2.<br>"
+        "(e.g. Chorizo x4, Banana x2, Mayo x3, Whipped Cream x1)",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        3
+    )
+    , LANGUAGE(language_option == nullptr ? *m_language_owner : *language_option)
+    , SANDWICH_OPTIONS(LANGUAGE)
+    , GO_HOME_WHEN_DONE(go_home_when_done_option == nullptr ? *m_go_home_when_done_owner : *go_home_when_done_option)
+    , AUTO_HEAL_PERCENT(
+        "<b>Auto-Heal %</b><br>Auto-heal if your HP drops below this percentage.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        75, 0, 100
+    )
+    , SAVE_DEBUG_VIDEO(
+        "<b>DEV MODE: Save debug videos to Switch:</b><br>"
+        "Set this on to save a Switch video everytime an error occurs. You can send the video to developers to help them debug later.",
+        LockMode::LOCK_WHILE_RUNNING,
+        false
+    )
+    , SKIP_WARP_TO_POKECENTER(
+        "<b>DEV MODE: Skip warping to closest PokeCenter:</b><br>"
+        "This is for debugging the program without waiting for the initial warp.",
+        LockMode::LOCK_WHILE_RUNNING,
+        false
+    )
+    , SKIP_SANDWICH(
+        "<b>DEV MODE: Skip making sandwich:</b><br>"
+        "This is for debugging the program without waiting for sandwich making.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        false
+    )
+    , NOTIFICATION_STATUS_UPDATE(notif_status_update_option == nullptr 
+        ? *m_notif_status_update_owner 
+        : *notif_status_update_option
+    )
+    , NOTIFICATION_PROGRAM_FINISH(notif_program_finish_option == nullptr 
+        ? *m_notif_program_finish_owner 
+        : *notif_program_finish_option
+    )
+    , NOTIFICATION_ERROR_RECOVERABLE(notif_error_recoverable_option == nullptr 
+        ? *m_notif_error_recoverable_owner 
+        : *notif_error_recoverable_option
+    )
+    , NOTIFICATION_ERROR_FATAL(notif_error_fatal_option == nullptr 
+        ? *m_notif_error_fatal_owner 
+        : *notif_error_fatal_option
+    )
+    , NOTIFICATIONS({
+        &NOTIFICATION_STATUS_UPDATE,
+        &NOTIFICATION_PROGRAM_FINISH,
+        &NOTIFICATION_ERROR_RECOVERABLE,
+        &NOTIFICATION_ERROR_FATAL,
+    })
+{
+    if (PreloadSettings::instance().DEVELOPER_MODE){
+        PA_ADD_OPTION(SAVE_DEBUG_VIDEO);
+        PA_ADD_OPTION(SKIP_WARP_TO_POKECENTER);
+        PA_ADD_OPTION(SKIP_SANDWICH);
+    }
+    PA_ADD_OPTION(SAVE_GAME_BEFORE_SANDWICH);
+    PA_ADD_OPTION(NUM_SANDWICH_ROUNDS);
+    if (m_language_owner){
+        PA_ADD_OPTION(LANGUAGE);
+    }
+    PA_ADD_OPTION(SANDWICH_OPTIONS);
+    if(m_go_home_when_done_owner){
+        PA_ADD_OPTION(GO_HOME_WHEN_DONE);
+    }
+    PA_ADD_OPTION(AUTO_HEAL_PERCENT);
+    if(m_notif_status_update_owner){
+        PA_ADD_OPTION(NOTIFICATIONS);
+    }
+}
+
 
 void run_material_farmer(SingleSwitchProgramEnvironment& env, BotBaseContext& context, MaterialFarmerOptions& options){
     
