@@ -140,7 +140,13 @@ MaterialFarmerOptions::MaterialFarmerOptions(
         "<b>DEV MODE: Time per sandwich:</b><br>Number of minutes before resetting sandwich.",
         LockMode::UNLOCK_WHILE_RUNNING,
         30, 1, 30
-    )    
+    )
+    , NUM_FORWARD_MOVES_PER_LETS_GO_ITERATION(
+        "<b>DEV MODE: Number of forward moves per lets go iteration:</b><br>"
+        "During Let's go autobattling sequence, the number of forward movements before resetting to Pokecenter.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        13
+    )
     , NOTIFICATION_STATUS_UPDATE(notif_status_update_option == nullptr 
         ? *m_notif_status_update_owner 
         : *notif_status_update_option
@@ -168,6 +174,7 @@ MaterialFarmerOptions::MaterialFarmerOptions(
         PA_ADD_OPTION(SAVE_DEBUG_VIDEO);
         PA_ADD_OPTION(SKIP_WARP_TO_POKECENTER);
         PA_ADD_OPTION(SKIP_SANDWICH);
+        PA_ADD_OPTION(NUM_FORWARD_MOVES_PER_LETS_GO_ITERATION);
     }
     PA_ADD_OPTION(SAVE_GAME_BEFORE_SANDWICH);
     PA_ADD_OPTION(NUM_SANDWICH_ROUNDS);
@@ -326,8 +333,11 @@ void run_one_sandwich_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
         - Then returns to pokemon center 
         */
         env.console.log("Starting Let's Go hunting path", COLOR_PURPLE);
+        int num_forward_moves_per_lets_go_iteration = options.NUM_FORWARD_MOVES_PER_LETS_GO_ITERATION;
         run_from_battles_and_back_to_pokecenter(env, context, 
-            [&hp_watcher, &last_sandwich_time, &time_per_sandwich, &encounter_tracker](SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+            [&hp_watcher, &last_sandwich_time, &time_per_sandwich, &encounter_tracker, &num_forward_moves_per_lets_go_iteration](
+                SingleSwitchProgramEnvironment& env, BotBaseContext& context
+            ){
                 run_until(
                     env.console, context,
                     [&](BotBaseContext& context){
@@ -344,7 +354,7 @@ void run_one_sandwich_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
                             return;
                         }                        
                         move_to_start_position_for_letsgo1(env, context);
-                        run_lets_go_iteration(env, context, encounter_tracker);
+                        run_lets_go_iteration(env, context, encounter_tracker, num_forward_moves_per_lets_go_iteration);
                     },
                     {hp_watcher}
                 );
@@ -483,10 +493,14 @@ void lets_go_movement1(BotBaseContext& context){
 }
 
 
-// One iteration of the hunt: 
-// start at North Province (Area 3) pokecenter, go out and use Let's Go to battle , 
+/*
+- One iteration of the hunt: 
+- start at North Province (Area 3) pokecenter, go out and use Let's Go to battle
+- move forward and send out lead pokemon to autobattle. When it runs out of pokemon to battle, 
+move forward again to repeat the cycle. It does this as many times as per num_forward_moves_per_lets_go_iteration.
+ */
 void run_lets_go_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context, 
-    LetsGoEncounterBotTracker& encounter_tracker)
+    LetsGoEncounterBotTracker& encounter_tracker, int num_forward_moves_per_lets_go_iteration)
 {
     auto& console = env.console;
     // - Orient camera to look at same direction as player character
@@ -499,7 +513,7 @@ void run_lets_go_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& 
     pbf_move_right_joystick(context, 128, 255, 45, 10);
 
     const bool throw_ball_if_bubble = false;
-    const int total_iterations = 13;
+    const int total_iterations = num_forward_moves_per_lets_go_iteration;
 
     context.wait_for_all_requests();
     for(int i = 0; i < total_iterations; i++){
