@@ -196,6 +196,11 @@ int test_pokemonSV_SandwichRecipeDetector(const ImageViewRGB32& image, const std
     return 0;
 }
 
+/* 
+- the last 4 words should be the coordinates for the FloatBox, that the detector will search
+- the 5th word from last should be the Hand type (Free or Grabbing)
+- if the image should not detect the hand, the 6th word from last should "False"
+ */
 int test_pokemonSV_SandwichHandDetector(const ImageViewRGB32& image, const std::vector<std::string>& words){
     // five words: hand_type("Free"/"Grabbing"), <image float box (four words total)>
     if (words.size() < 5){
@@ -225,6 +230,25 @@ int test_pokemonSV_SandwichHandDetector(const ImageViewRGB32& image, const std::
     ImageFloatBox box(box_values[0], box_values[1], box_values[2], box_values[3]);
 
     SandwichHandLocator detector(hand_type, box);
+
+    // for testing locate_sandwich_hand(), which does a second check to ensure the 
+    // hand has a black outline around it.
+    auto hand_expected_word = words[words.size() - 6];
+    if(hand_expected_word == "False"){
+        auto result = detector.locate_sandwich_hand(image, box, true);
+        bool has_hand = result.first >= 0.0;
+
+        TEST_RESULT_EQUAL(has_hand, false);
+        return 0;
+    }
+    else if (hand_expected_word == "True"){
+        auto result = detector.locate_sandwich_hand(image, box, true);
+        bool has_hand = result.first >= 0.0;
+
+        TEST_RESULT_EQUAL(has_hand, true);
+        return 0;
+    }
+    
 
     auto result = detector.detect(image);
     bool has_hand = result.first >= 0.0;
