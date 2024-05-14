@@ -3,7 +3,6 @@
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
  */
-
 #include <atomic>
 #include <sstream>
 #include "Common/Cpp/PrettyPrint.h"
@@ -32,6 +31,7 @@
 #include "PokemonSV_MaterialFarmer.h"
 #include "PokemonSV_MaterialFarmerTools.h"
 #include "PokemonSV/Programs/ShinyHunting/PokemonSV_ShinyHunt-Scatterbug.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_SnapshotDumper.h"
 
 // #include <iostream>
 // using std::cout;
@@ -204,6 +204,7 @@ void run_material_farmer(SingleSwitchProgramEnvironment& env, BotBaseContext& co
 
 
     size_t consecutive_failures;
+    size_t max_consecutive_failures = 10;    
     bool done_sandwich_iteration;
     for (uint16_t i = 0; i < options.NUM_SANDWICH_ROUNDS; i++){
         consecutive_failures = 0;
@@ -217,6 +218,9 @@ void run_material_farmer(SingleSwitchProgramEnvironment& env, BotBaseContext& co
                 env.update_stats();
                 e.send_notification(env, options.NOTIFICATION_ERROR_RECOVERABLE);
 
+                // save screenshot after operation failed, 
+                dump_snapshot(env.console);
+
                 if (options.SAVE_DEBUG_VIDEO){
                     // Take a video to give more context for debugging
                     pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
@@ -224,10 +228,10 @@ void run_material_farmer(SingleSwitchProgramEnvironment& env, BotBaseContext& co
                 }
 
                 consecutive_failures++;
-                if (consecutive_failures >= 5){
+                if (consecutive_failures >= max_consecutive_failures){
                     throw OperationFailedException(
                         ErrorReport::SEND_ERROR_REPORT, env.console,
-                        "Failed 5 times in a row.",
+                        "Failed 10 times in a row.",
                         true
                     );
                 }
@@ -314,6 +318,7 @@ void run_one_sandwich_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
 
         // heal before starting Let's go
         env.console.log("Heal before starting Let's go", COLOR_PURPLE);
+        env.console.log("Heal threshold: " + tostr_default(options.AUTO_HEAL_PERCENT), COLOR_PURPLE);
         double hp = hp_watcher.last_known_value() * 100;
         if (0 < hp){
             env.console.log("Last Known HP: " + tostr_default(hp) + "%", COLOR_BLUE);
@@ -589,7 +594,7 @@ void run_from_battles_and_back_to_pokecenter(SingleSwitchProgramEnvironment& env
 
 
 void move_from_material_farming_to_item_printer(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    
+    env.console.log("Start moving from material farming to item printer.");
     fly_from_paldea_to_blueberry_entrance(env, context);
     move_from_blueberry_entrance_to_league_club(env, context);
     move_from_league_club_entrance_to_item_printer(env, context);
@@ -715,6 +720,7 @@ void move_from_league_club_entrance_to_item_printer(SingleSwitchProgramEnvironme
 }
 
 void move_from_item_printer_to_material_farming(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    env.console.log("Start moving from item printer to material farming.");
     move_from_item_printer_to_blueberry_entrance(env, context);
     fly_from_blueberry_to_north_province_3(env, context);
 }
