@@ -80,7 +80,15 @@ void SandwichHandLocator::make_overlays(VideoOverlaySet& items) const{
 }
 
 std::pair<double, double> SandwichHandLocator::detect(const ImageViewRGB32& frame) const{
-    return locate_sandwich_hand(frame, m_box);
+    ImageFloatBox entire_screen(0.0, 0.0, 1.0, 1.0);
+    std::pair<double, double> location = locate_sandwich_hand(frame, m_box);
+    if (location.first >= 0.0){
+        return location;
+    }
+    else {
+        return locate_sandwich_hand(frame, entire_screen);
+    }
+    
 }
 
 
@@ -132,9 +140,10 @@ bool SandwichHandWatcher::process_frame(const VideoSnapshot& frame){
     return m_location.first >= 0.0;
 }
 
-std::pair<double, double> SandwichHandWatcher::search_entire_screen_for_sandwich_hand(const ImageViewRGB32& frame) const{
+bool SandwichHandWatcher::recover_sandwich_hand_position(const ImageViewRGB32& frame){
     ImageFloatBox entire_screen(0.0, 0.0, 1.0, 1.0);
-    return m_locator.locate_sandwich_hand(frame, entire_screen);
+    m_location = m_locator.locate_sandwich_hand(frame, entire_screen);
+    return m_location.first >= 0.0;
 }
 
 
