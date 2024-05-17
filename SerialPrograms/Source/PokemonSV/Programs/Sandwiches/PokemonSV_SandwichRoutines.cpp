@@ -271,14 +271,52 @@ update the location of the sandwich hand
 */
 bool move_then_recover_sandwich_hand_position(
     const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, 
-    SandwichHandType hand_type, SandwichHandWatcher& hand_watcher
+    SandwichHandType& hand_type, SandwichHandWatcher& hand_watcher,
+    AsyncCommandSession& move_session
 ){
 
-    pbf_move_left_joystick(context, 255, 255, TICKS_PER_SECOND*5, 100);
-    pbf_move_left_joystick(context, 0, 128, 100, 100);
-    context.wait_for_all_requests();
+    console.log("center the cursor: move towards bottom right, then left slightly.");
+    int num_ticks_to_move_1 = TICKS_PER_SECOND*4;
+    int num_ticks_to_move_2 = 100;
+
+    // center the cursor
+    if(SandwichHandType::FREE == hand_type){
+        // move to bottom right corner,
+        pbf_move_left_joystick(context, 255, 255, num_ticks_to_move_1, 100);
+        // move to left slightly
+        pbf_move_left_joystick(context, 0, 128, num_ticks_to_move_2, 100);
+        context.wait_for_all_requests();
+    }
+    else if(SandwichHandType::GRABBING == hand_type){
+        // center the cursor while holding the A button, so you don't drop the ingredient.
+
+        int num_ticks_to_move_total = num_ticks_to_move_1 + num_ticks_to_move_2;
+        int num_ticks_to_wait = num_ticks_to_move_total + TICKS_PER_SECOND; // add one extra second of waiting
+        int num_miliseconds_to_wait = (num_ticks_to_wait*1000)/TICKS_PER_SECOND;
+        int num_ticks_to_hold_A = num_ticks_to_wait + TICKS_PER_SECOND*10; // hold A for extra 10 seconds
+        // the A button hold will be overwritten on the next move_session.dispatch, in the main function
+        
+        move_session.dispatch([&](BotBaseContext& context){
+            // move to bottom right corner, while holding A
+            pbf_controller_state(context, BUTTON_A, DPAD_NONE, 255, 255, 128, 128, num_ticks_to_move_1);
+
+            // move to left slightly, while holding A
+            pbf_controller_state(context, BUTTON_A, DPAD_NONE, 0, 128, 128, 128, num_ticks_to_move_2);
+
+            // keep holding A. 
+            pbf_press_button(context, BUTTON_A, num_ticks_to_hold_A, 0);
+            // pbf_controller_state(context, BUTTON_A, DPAD_NONE, 128, 128, 128, 128, 3000);
+        });
+
+        // - wait long enough for the cursor movement to finish, before we try image matching
+        // - wait_for_all_requests doesn't work since we want to still hold the A button.
+        // - this is a workaround until there is a way to wait for a subset of a bunch of overlapping buttons to finish
+        // - need to make sure the A button hold is long enough to last past this wait.
+        context.wait_for(Milliseconds(num_miliseconds_to_wait));
+    }
     
     const VideoSnapshot& frame = console.video().snapshot();
+    console.log("Try to recover sandwich hand location.");
     if(hand_watcher.recover_sandwich_hand_position(frame)){
         // sandwich hand detected.
         return true;
@@ -349,6 +387,16 @@ ImageFloatBox move_sandwich_hand(
                 context.wait_for_all_requests();
             }
         #endif
+
+        #if 0
+            // to intentionally trigger failures in hand detection, for testing recovery
+            // move hand to edge of screen, while still holding A
+            if (SandwichHandType::GRABBING == hand_type){
+                pbf_controller_state(context, BUTTON_A, DPAD_NONE, 0, 0, 128, 128, TICKS_PER_SECOND*5);
+                pbf_press_button(context, BUTTON_A, 200, 0);
+                // pbf_controller_state(context, BUTTON_A, DPAD_NONE, 128, 128, 128, 128, 100);
+            }
+        #endif
     }
 
     while(true){
@@ -361,7 +409,7 @@ ImageFloatBox move_sandwich_hand(
                 "Failed to detect sandwich hand. It may be at the screen's edge. " 
                 "Try moving the hand to the middle of the screen and try searching again.");
 
-            if(move_then_recover_sandwich_hand_position(info, console, context, hand_type, hand_watcher)){
+            if(move_then_recover_sandwich_hand_position(info, console, context, hand_type, hand_watcher, move_session)){
                 continue;
             }
 
