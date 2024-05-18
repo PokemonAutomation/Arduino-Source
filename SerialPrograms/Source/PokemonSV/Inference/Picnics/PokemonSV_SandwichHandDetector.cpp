@@ -80,7 +80,19 @@ void SandwichHandLocator::make_overlays(VideoOverlaySet& items) const{
 }
 
 std::pair<double, double> SandwichHandLocator::detect(const ImageViewRGB32& frame) const{
+    ImageFloatBox entire_screen(0.0, 0.0, 1.0, 1.0);
+    std::pair<double, double> location = locate_sandwich_hand(frame, m_box);
+    if (location.first >= 0.0){
+        return location;
+    }
+    else {
+        return locate_sandwich_hand(frame, entire_screen);
+    }
+    
+}
 
+
+std::pair<double, double> SandwichHandLocator::locate_sandwich_hand(const ImageViewRGB32& frame, ImageFloatBox area_to_search) const{
     const std::vector<std::pair<uint32_t, uint32_t>> filters = {
         {combine_rgb(150, 150, 150), combine_rgb(255, 255, 255)}
     };
@@ -92,9 +104,9 @@ std::pair<double, double> SandwichHandLocator::detect(const ImageViewRGB32& fram
 
     std::pair<double, double> hand_location(-1.0, -1.0);
 
-    ImagePixelBox pixel_box = floatbox_to_pixelbox(frame.width(), frame.height(), m_box);
+    ImagePixelBox pixel_box = floatbox_to_pixelbox(frame.width(), frame.height(), area_to_search);
     match_template_by_waterfill(
-        extract_box_reference(frame, m_box), 
+        extract_box_reference(frame, area_to_search), 
         ((m_type == HandType::FREE) ? SandwichFreeHandMatcher::instance() : SandwichGrabbingHandMatcher::instance()),
         filters,
         {min_size, SIZE_MAX},
@@ -125,6 +137,12 @@ void SandwichHandWatcher::make_overlays(VideoOverlaySet& items) const{
 bool SandwichHandWatcher::process_frame(const VideoSnapshot& frame){
     m_last_snapshot = frame;
     m_location = m_locator.detect(frame);
+    return m_location.first >= 0.0;
+}
+
+bool SandwichHandWatcher::recover_sandwich_hand_position(const ImageViewRGB32& frame){
+    ImageFloatBox entire_screen(0.0, 0.0, 1.0, 1.0);
+    m_location = m_locator.locate_sandwich_hand(frame, entire_screen);
     return m_location.first >= 0.0;
 }
 

@@ -53,6 +53,14 @@ SandwichMaker::SandwichMaker()
 void SandwichMaker::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
+    #if 0
+        // make unlimited sandwiches. until it errors out.
+        while (true){
+            make_sandwich_option(env, env.console, context, SANDWICH_OPTIONS);
+            enter_sandwich_recipe_list(env.program_info(), env.console, context);
+        }
+    #endif
+
     make_sandwich_option(env, env.console, context, SANDWICH_OPTIONS);
 
     GO_HOME_WHEN_DONE.run_end_of_program(context);

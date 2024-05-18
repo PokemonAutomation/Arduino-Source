@@ -35,12 +35,17 @@ public:
 
     void make_overlays(VideoOverlaySet& items) const;
     
-    // return detected hand cetner location on screen, (x, y) where
+    // - return detected hand cetner location on screen, (x, y) where
     // x: [0, 1), 0 left-most, 1 right-most, y: [0, 1), 0 top-most 1 bottom-most
-    // If hand not detected, return (-1, -1).
+    // - first search m_box, then search the entire screen
+    // - If hand not detected, return (-1, -1).
     std::pair<double, double> detect(const ImageViewRGB32& screen) const;
 
     void change_box(const ImageFloatBox& new_box) { m_box = new_box; }
+
+    // return the coordinates of the sandwich hand.
+    // search within the confines of the box area_to_search.
+    std::pair<double, double> locate_sandwich_hand(const ImageViewRGB32& frame, ImageFloatBox area_to_search) const;
 
 private:
     HandType m_type;
@@ -62,6 +67,12 @@ public:
     const std::pair<double, double>& location() const { return m_location; }
 
     void change_box(const ImageFloatBox& new_box) { m_locator.change_box(new_box); }
+
+    // - searches the whole screen for the sandwich hand,
+    // - then updates its location
+    // - return true if hand successfully found
+    bool recover_sandwich_hand_position(const ImageViewRGB32& frame);
+
 
 private:
     SandwichHandLocator m_locator;
