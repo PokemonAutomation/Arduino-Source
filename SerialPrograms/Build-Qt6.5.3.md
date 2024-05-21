@@ -25,7 +25,17 @@ Unlike with Qt 5.12, there is no offline installer for it. So you have two optio
 If you are ok with creating an account with Qt and using their online installer, then use this method.
 
 1. Download the online installer from here: https://www.qt.io/download-qt-installer
-2. Select the following options: ![](../BuildSetup/Windows-Install-Qt6.5.3.png)
+2. Select the following options: 
+    - Qt 6.5.3            
+        - MSVC 2019 64-bit
+        - Sources
+        - Additional Libraries
+            - Qt Image Formats
+            - Qt Multimedia
+            - Qt Serial Port
+        - Qt Debug Information Files   
+
+![](../BuildSetup/Windows-Install-Qt6.5.3.png)
 
 If you repeatedly run into an error involving "SSL handshake failed", you will not be able to use the online installer. Please try the other option.
 
@@ -49,13 +59,28 @@ If you are unable or unwilling to use the online installer, the alternative is t
 ![](../BuildSetup/Directory.png)
 
 4. Open Qt Creator.
-5. Click on `Projects` -> `Open`.
-6. Navigate to [`SerialPrograms`](./) and select `CMakeLists.txt`.
-7. It will then ask you to configure the project. Select `Desktop Qt 6.5.3 MSVC2019 64bit`.
+5. Click on `File` -> `Open File or Project`.
+6. Navigate to `SerialPrograms` and select `CMakeLists.txt`.
+7. It will then ask you to configure the project. Ensure `Desktop Qt 6.5.3 MSVC2019 64bit` and `Release with Debug Information` are selected.
+    - Ensure the build directory for `Desktop_Qt_6_5_3_MSVC2019_64bit-RelWithDebInfo` is located in the root of the `Arduino-Source` repo, and not buried in subfolders (e.g. `build` or `SerialPrograms`).
+    - Click `Configure Project`.
+
+![](../BuildSetup/Windows-configure-project-qt-creator-13.png)
+
 8. At the bottom left corner, click on the little monitor and select `Release with Debug Information`.
-9. Click the upper green arrow to compile and launch the program.
 
+![](../BuildSetup/Windows-Configuration-Qt6.png)
 
+9. Still in the bottom left corner, click the upper green arrow to compile and launch the program.
+
+## Troubleshooting
+
+### Failed to open '../3rdPartyBinaries/opencv_world460d.zip', or file missing
+
+- Click `Projects` on the left sidebar.
+- In `Build directory`, ensure the build directory for `Desktop_Qt_6_5_3_MSVC2019_64bit-RelWithDebInfo` is located in the root of the `Arduino-Source` repo, and not buried in subfolders (e.g. `build` or `SerialPrograms`).
+  - e.g. change the default build directory from:  `Arduino-Source/SerialPrograms/build/Desktop_Qt_6_5_3_MSVC2019_64bit-RelWithDebInfo`
+    - to: `Arduino-Source/build-SerialPrograms-Desktop_Qt_6_5_3_MSVC2019_64bit-RelWithDebInfo`
 
 
 <hr>
