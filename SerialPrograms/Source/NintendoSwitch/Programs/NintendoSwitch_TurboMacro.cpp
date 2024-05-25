@@ -16,7 +16,7 @@ TurboMacro_Descriptor::TurboMacro_Descriptor()
     : SingleSwitchProgramDescriptor(
         "NintendoSwitch:TurboMacro",
         "Nintendo Switch", "Turbo Macro",
-        "",
+        "ComputerControl/blob/master/Wiki/Programs/NintendoSwitch/TurboMacro.md",
         "Create macros",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
@@ -39,7 +39,6 @@ void TurboMacro::run_macro(SingleSwitchProgramEnvironment& env, BotBaseContext& 
     std::vector<std::unique_ptr<TurboMacroRow>> table = MACRO.copy_snapshot();
     for (const std::unique_ptr<TurboMacroRow>& row : table){
         execute_action(env.console, context, *row);
-        context.wait_for_all_requests();
     }
 }
 
@@ -102,11 +101,10 @@ void TurboMacro::execute_action(ConsoleHandle& console, BotBaseContext& context,
         pbf_press_dpad(context, DPAD_DOWN, cell.button_hold_ticks, cell.button_release_ticks);
         break;
     case TurboMacroAction::WAIT:
-        pbf_wait(context, (cell.wait_ticks * TICKS_PER_SECOND));
+        pbf_wait(context, cell.wait_ticks);
     default:
         break;
     }
-    context.wait_for_all_requests();
 }
 
 void TurboMacro::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
