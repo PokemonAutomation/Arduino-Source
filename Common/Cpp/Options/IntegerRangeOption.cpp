@@ -163,6 +163,9 @@ void IntegerRangeCell<Type>::set_lo(Type lo){
             m_data->m_lo_current.store(lo, std::memory_order_relaxed);
         }
     }
+    //  It is impossible for hi to change without also changing lo. So we only
+    //  need to check for lo. If this condition fails, we were already in a bad
+    //  state to begin with.
     if (current_lo != lo){
         report_value_changed();
     }
@@ -183,6 +186,9 @@ void IntegerRangeCell<Type>::set_hi(Type hi){
             m_data->m_hi_current.store(hi, std::memory_order_relaxed);
         }
     }
+    //  It is impossible for lo to change without also changing hi. So we only
+    //  need to check for hi. If this condition fails, we were already in a bad
+    //  state to begin with.
     if (current_hi != hi){
         report_value_changed();
     }

@@ -45,6 +45,9 @@ std::string StaticTextOption::text() const{
 void StaticTextOption::set_text(std::string label){
     {
         SpinLockGuard lg(m_data->m_lock);
+        if (label == m_data->m_text){
+            return;
+        }
         m_data->m_text = std::move(label);
     }
     report_value_changed();
@@ -86,6 +89,9 @@ std::string SectionDividerOption::text() const{
 void SectionDividerOption::set_text(std::string label){
     {
         SpinLockGuard lg(m_data->m_lock);
+        if (label == m_data->m_text){
+            return;
+        }
         m_data->m_text = std::move(label);
     }
     report_value_changed();

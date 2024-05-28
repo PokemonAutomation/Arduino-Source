@@ -61,8 +61,9 @@ void LanguageOCRCell::set(Language language){
     if (iter == m_case_map.end()){
         return;
     }
-    m_current.store(iter->second, std::memory_order_relaxed);
-    report_value_changed();
+    if (iter->second != m_current.exchange(iter->second, std::memory_order_relaxed)){
+        report_value_changed();
+    }
 }
 
 

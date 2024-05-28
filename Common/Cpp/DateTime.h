@@ -33,6 +33,14 @@ struct DateTime{
     bool operator>(const DateTime& x) const{
         return x < *this;
     }
+    bool operator==(const DateTime& x) const{
+        return year == x.year
+            && month == x.month
+            && day == x.day
+            && hour == x.hour
+            && minute == x.minute
+            && second == x.second;
+    }
 };
 
 

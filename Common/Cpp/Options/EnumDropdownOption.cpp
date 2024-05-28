@@ -70,8 +70,9 @@ bool IntegerEnumDropdownCell::set_value(size_t value){
     if (data.m_database.find(value) == nullptr){
         return false;
     }
-    data.m_current.store(value, std::memory_order_relaxed);
-    report_value_changed();
+    if (value != data.m_current.exchange(value, std::memory_order_relaxed)){
+        report_value_changed();
+    }
     return true;
 }
 const IntegerEnumDatabase& IntegerEnumDropdownCell::database() const{
@@ -101,9 +102,7 @@ JsonValue IntegerEnumDropdownCell::to_json() const{
     return data.m_database.find(data.m_current.load(std::memory_order_relaxed))->slug;
 }
 void IntegerEnumDropdownCell::restore_defaults(){
-    Data& data = *m_data;
-    data.m_current.store(data.m_default, std::memory_order_relaxed);
-    report_value_changed();
+    set_value(m_data->m_default);
 }
 
 

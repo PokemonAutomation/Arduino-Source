@@ -58,9 +58,10 @@ bool GroupOption::enabled() const{
     return m_data->m_enabled.load(std::memory_order_relaxed);
 }
 void GroupOption::set_enabled(bool enabled){
-    m_data->m_enabled.store(enabled, std::memory_order_relaxed);
-    report_value_changed();
-    on_set_enabled(enabled);
+    if (enabled != m_data->m_enabled.exchange(enabled, std::memory_order_relaxed)){
+        report_value_changed();
+        on_set_enabled(enabled);
+    }
 }
 void GroupOption::load_json(const JsonValue& json){
     BatchOption::load_json(json);
@@ -86,9 +87,12 @@ JsonValue GroupOption::to_json() const{
     return obj;
 }
 void GroupOption::restore_defaults(){
-    m_data->m_enabled.store(m_data->m_default_enabled, std::memory_order_relaxed);
     BatchOption::restore_defaults();
-    on_set_enabled(m_data->m_default_enabled);
+    bool default_value = m_data->m_default_enabled;
+    if (default_value != m_data->m_enabled.exchange(default_value, std::memory_order_relaxed)){
+        report_value_changed();
+        on_set_enabled(default_value);
+    }
 }
 void GroupOption::on_set_enabled(bool enabled){}
 

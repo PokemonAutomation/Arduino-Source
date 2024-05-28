@@ -88,6 +88,9 @@ std::string DateTimeCell::set(const DateTime& x){
     }
     {
         SpinLockGuard lg(m_lock);
+        if (x == m_current){
+            return std::string();
+        }
         m_current = x;
     }
     report_value_changed();
@@ -105,11 +108,7 @@ std::string DateTimeCell::check_validity() const{
     return check_validity(m_current);
 }
 void DateTimeCell::restore_defaults(){
-    {
-        SpinLockGuard lg(m_lock);
-        m_current = m_default;
-    }
-    report_value_changed();
+    set(m_default);
 }
 
 DateTime DateTimeCell::from_json(const JsonValue& json){

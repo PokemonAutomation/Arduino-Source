@@ -119,6 +119,9 @@ std::string FixedCodeOption::check_validity(const std::string& x) const{
 void FixedCodeOption::restore_defaults(){
     {
         SpinLockGuard lg(m_data->m_lock);
+        if (m_data->m_current == m_data->m_default){
+            return;
+        }
         m_data->m_current = m_data->m_default;
     }
     report_value_changed();

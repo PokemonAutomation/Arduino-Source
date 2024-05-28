@@ -128,29 +128,6 @@ struct StringSelectCell::Data{
         }
     }
 
-    void set_by_index(size_t index){
-        if (index >= m_database.case_list().size()){
-            index = m_default;
-        }
-        m_index.store(index, std::memory_order_relaxed);
-    }
-    std::string set_by_slug(const std::string& slug){
-        size_t index = m_database.search_index_by_slug(slug);
-        if (index == (size_t)0 - 1){
-            return "Invalid Slug: " + slug;
-        }
-        m_index.store(index, std::memory_order_relaxed);
-        return "";
-    }
-    std::string set_by_name(const std::string& display_name){
-        size_t index = m_database.search_index_by_name(display_name);
-        if (index == (size_t)0 - 1){
-            return "Invalid Name: " + display_name;
-        }
-        m_index.store(index, std::memory_order_relaxed);
-        return "";
-    }
-
     bool load_json(const JsonValue& json){
         const std::string* str = json.get_string();
         if (str == nullptr){
@@ -208,19 +185,29 @@ size_t StringSelectCell::index() const{
 }
 
 void StringSelectCell::set_by_index(size_t index){
-    m_data->set_by_index(index);
-    report_value_changed();
+    if (index >= m_data->m_database.case_list().size()){
+        index = m_data->m_default;
+    }
+    if (index != m_data->m_index.exchange(index, std::memory_order_relaxed)){
+        report_value_changed();
+    }
 }
 std::string StringSelectCell::set_by_slug(const std::string& slug){
-    std::string error = m_data->set_by_slug(slug);
-    if (error.empty()){
+    size_t index = m_data->m_database.search_index_by_slug(slug);
+    if (index == (size_t)0 - 1){
+        return "Invalid Slug: " + slug;
+    }
+    if (index != m_data->m_index.exchange(index, std::memory_order_relaxed)){
         report_value_changed();
     }
     return "";
 }
 std::string StringSelectCell::set_by_name(const std::string& display_name){
-    std::string error = m_data->set_by_name(display_name);
-    if (error.empty()){
+    size_t index = m_data->m_database.search_index_by_name(display_name);
+    if (index == (size_t)0 - 1){
+        return "Invalid Name: " + display_name;
+    }
+    if (index != m_data->m_index.exchange(index, std::memory_order_relaxed)){
         report_value_changed();
     }
     return "";
