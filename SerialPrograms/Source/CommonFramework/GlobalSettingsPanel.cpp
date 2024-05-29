@@ -127,7 +127,7 @@ GlobalSettings::GlobalSettings()
         "Window Size:",
         "Set the size of the window. Takes effect immediately.<br>"
         "Use this to easily set the window to a specific resolution for streaming alignment.",
-        1280, 720
+        1280, 1000
     )
     , m_discord_settings(
         "<font size=4><b>Discord Settings:</b> Integrate with Discord. (" +

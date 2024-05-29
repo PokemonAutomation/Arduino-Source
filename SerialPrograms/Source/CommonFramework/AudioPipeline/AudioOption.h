@@ -64,7 +64,7 @@ private:
     AudioDeviceInfo m_input_device;
     AudioChannelFormat m_input_format = AudioChannelFormat::NONE;
     AudioDeviceInfo m_output_device;
-    AudioDisplayType m_display_type = AudioDisplayType::NO_DISPLAY;
+    AudioDisplayType m_display_type = AudioDisplayType::FREQ_BARS;
     double m_volume = 1.0;  //  Volume Range: [0, 1.0]
 };
 
