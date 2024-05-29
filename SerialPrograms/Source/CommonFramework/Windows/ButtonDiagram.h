@@ -11,7 +11,7 @@ namespace PokemonAutomation{
 
 class ButtonDiagram : public QMainWindow{
 public:
-    ButtonDiagram(QWidget& parent);
+    ButtonDiagram(QWidget* parent = nullptr);
     ~ButtonDiagram();
 
 private:

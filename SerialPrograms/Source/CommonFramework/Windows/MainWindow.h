@@ -17,6 +17,7 @@ class QVBoxLayout;
 
 namespace PokemonAutomation{
 
+class ButtonDiagram;
 class FileWindowLoggerWindow;
 
 
@@ -60,6 +61,7 @@ private:
     std::unique_ptr<PanelInstance> m_current_panel;
     QWidget* m_current_panel_widget;
 
+    std::unique_ptr<ButtonDiagram> m_button_diagram;
     std::unique_ptr<FileWindowLoggerWindow> m_output_window;
 
     bool m_pending_resize = false;

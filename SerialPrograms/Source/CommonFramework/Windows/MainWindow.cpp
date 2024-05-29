@@ -141,11 +141,11 @@ MainWindow::MainWindow(QWidget* parent)
 
     QPushButton* keyboard = new QPushButton("Keyboard Layout", support_box);
     buttons->addWidget(keyboard);
-    QMainWindow* keyboard_window = new ButtonDiagram(*support_box);
+    m_button_diagram.reset(new ButtonDiagram());
     connect(
         keyboard, &QPushButton::clicked,
-        this, [keyboard_window](bool){
-            keyboard_window->show();
+        this, [button = m_button_diagram.get()](bool){
+            button->show();
         }
     );
 

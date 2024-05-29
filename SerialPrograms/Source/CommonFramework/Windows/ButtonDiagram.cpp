@@ -14,16 +14,16 @@
 #include "WindowTracker.h"
 #include "ButtonDiagram.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 
 namespace PokemonAutomation{
 
 
-ButtonDiagram::ButtonDiagram(QWidget& parent)
-    : QMainWindow(&parent)
+ButtonDiagram::ButtonDiagram(QWidget* parent)
+    : QMainWindow(parent)
 {
     setWindowTitle("Controller Keyboard Mapping");
 
@@ -48,11 +48,11 @@ ButtonDiagram::~ButtonDiagram(){
 }
 
 void ButtonDiagram::resizeEvent(QResizeEvent*){
-//    cout << "asdf" << endl;
     int iw = m_image.width();
     int ih = m_image.height();
     int ww = m_image_label->width();
     int wh = m_image_label->height();
+//    cout << "ww = " << ww << ", wh = " << wh << endl;
 
     double scale_w = (double)ww / iw;
     double scale_h = (double)wh / ih;
