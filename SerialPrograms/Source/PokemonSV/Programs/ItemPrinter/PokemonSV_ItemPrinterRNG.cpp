@@ -42,6 +42,16 @@ static const EnumDatabase<ItemPrinterJobs>& ItemPrinterJobs_Database(){
     return database;
 }
 
+static const EnumDatabase<ItemPrinterItems>& ItemPrinterItems_Database(){
+    static const EnumDatabase<ItemPrinterItems> database({
+        {ItemPrinterItems::NONE, "none", "---"},
+        {ItemPrinterItems::ABILITY_PATCH, "ability-patch", "Ability patch"},
+        {ItemPrinterItems::EXP_CANDY, "exp-candy", "Exp Candy"},
+        {ItemPrinterItems::MASTER_BALL, "master-ball", "Master Ball"},
+    });
+    return database;
+}
+
 ItemPrinterRngRow::~ItemPrinterRngRow(){
     chain.remove_listener(*this);
 }
@@ -59,11 +69,24 @@ ItemPrinterRngRow::ItemPrinterRngRow()
         LockMode::UNLOCK_WHILE_RUNNING,
         ItemPrinterJobs::Jobs_1
     )
+    , desired_item(
+        ItemPrinterItems_Database(),
+        LockMode::UNLOCK_WHILE_RUNNING,
+        ItemPrinterItems::NONE
+    )
+    , prev_desired_item(ItemPrinterItems::NONE)
+    // , prev_desired_item_is_none(true)
 {
     PA_ADD_OPTION(chain);
     PA_ADD_OPTION(date);
     PA_ADD_OPTION(jobs);
+    PA_ADD_OPTION(desired_item);
+    
+    date.add_listener(*this);
     chain.add_listener(*this);
+    
+    jobs.add_listener(*this);
+    desired_item.add_listener(*this);
 }
 ItemPrinterRngRow::ItemPrinterRngRow(bool p_chain, const DateTime& p_date, ItemPrinterJobs p_jobs)
     : ItemPrinterRngRow()
@@ -82,8 +105,40 @@ std::unique_ptr<EditableTableRow> ItemPrinterRngRow::clone() const{
     ret->jobs.set(jobs);
     return ret;
 }
+
+void ItemPrinterRngRow::set_seed_based_on_desired_item(){
+    int64_t seed;
+    switch(desired_item) {
+    case ItemPrinterItems::ABILITY_PATCH:
+        seed = 2342338998;
+        break;
+    case ItemPrinterItems::EXP_CANDY:
+        seed = 2691258789;
+        break;
+    case ItemPrinterItems::MASTER_BALL:
+        seed = 1457307058;
+        break;
+    default:
+        seed = -1;
+    }
+
+    if (seed == -1){
+        return;
+    }
+
+    DateTime set_date = from_seconds_since_epoch(seed);
+    date.set(set_date);
+}
+
 void ItemPrinterRngRow::value_changed(){
+    if (prev_desired_item != desired_item){ // check if desired_item has changed.
+        set_seed_based_on_desired_item();
+        prev_desired_item = desired_item;
+        return;
+    }
+
     date.set_visibility(chain ? ConfigOptionState::DISABLED : ConfigOptionState::ENABLED);
+    desired_item.set(ItemPrinterItems::NONE);
 }
 
 ItemPrinterRngTable::ItemPrinterRngTable(std::string label)
@@ -98,6 +153,7 @@ std::vector<std::string> ItemPrinterRngTable::make_header() const{
         "Continue Previous?",
         "Date Seed",
         "Jobs to Print",
+        "Desired Item",
     };
 }
 std::vector<std::unique_ptr<EditableTableRow>> ItemPrinterRngTable::make_defaults(){

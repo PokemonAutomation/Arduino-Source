@@ -24,6 +24,13 @@ enum class ItemPrinterJobs{
     Jobs_10     =   10,
 };
 
+enum class ItemPrinterItems{
+    NONE,
+    ABILITY_PATCH,
+    EXP_CANDY,
+    MASTER_BALL
+};
+
 
 void item_printer_start_print(
     ConsoleHandle& console, BotBaseContext& context,
