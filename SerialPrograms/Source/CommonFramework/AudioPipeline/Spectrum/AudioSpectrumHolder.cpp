@@ -10,6 +10,10 @@
 #include "CommonFramework/AudioPipeline/AudioConstants.h"
 #include "AudioSpectrumHolder.h"
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
 namespace PokemonAutomation{
 
 
@@ -17,67 +21,78 @@ namespace PokemonAutomation{
 AudioSpectrumHolder::AudioSpectrumHolder()
     : m_num_freqs(NUM_FFT_SAMPLES/2)
     , m_num_freq_windows(1000)
-    , m_num_freq_visualization_blocks(96)
-    , m_freq_visualization_block_boundaries(m_num_freq_visualization_blocks+1)
-    , m_spectrograph(m_num_freq_visualization_blocks, m_num_freq_windows)
+//    , m_num_freq_visualization_blocks(384)
+//    , m_freq_visualization_block_boundaries(m_num_freq_visualization_blocks + 1)
+//    , m_spectrograph(m_num_freq_visualization_blocks, m_num_freq_windows)
     , m_freqVisStamps(m_num_freq_windows)
 {
-    m_last_spectrum.values.resize(m_num_freq_visualization_blocks);
-    m_last_spectrum.colors.resize(m_num_freq_visualization_blocks);
-
     // We will display frequencies in log scale, so need to convert
     // log scale: 0, 1/m_numFreqVisBlocks, 2/m_numFreqVisBlocks, ..., 1.0
     // to linear scale:
     // The conversion function is: linear_value = (exp(log_value * LOG_MAX) - 1) / 10
 //    const float LOG_SCALE_MAX = std::log(11.0f);
 
-    m_freq_visualization_block_boundaries[0] = 1;
-    for (size_t i = 1; i < m_num_freq_visualization_blocks; i++){
+    size_t blocks = 384;
+    std::vector<size_t> boundaries(blocks);
+
+    boundaries[0] = 1;
+    for (size_t i = 1; i < blocks - 1; i++){
 //        const float logValue = i / (float)m_numFreqVisBlocks;
 //        float linearValue = (std::exp(logValue * LOG_SCALE_MAX) - 1.f) / 10.f;
 //        linearValue = std::max(std::min(linearValue, 1.0f), 0.0f);
-//        m_freq_visualization_block_boundaries[i] = std::min(size_t(linearValue * m_num_freqs + 0.5), m_num_freqs);
+//        boundaries[i] = std::min(size_t(linearValue * m_num_freqs + 0.5), m_num_freqs);
 
-        //  (96 / 8 = 12) give us 12 bars per octave.
-        const float x = (float)i / m_num_freq_visualization_blocks;
+        //  (384 / 8 = 48) give us 48 bars per octave.
+        const float x = (float)i / blocks;
         float freq = std::exp2f(8.0f * x + 3);
         size_t index = (size_t)freq;
 
         index = std::max(index, (size_t)1);
         index = std::min(index, m_num_freqs);
-        m_freq_visualization_block_boundaries[i] = index;
+        boundaries[i] = index;
     }
-    m_freq_visualization_block_boundaries[m_num_freq_visualization_blocks] = m_num_freqs;
+    boundaries[blocks - 1] = m_num_freqs;
 
     //  Iterate buckets in reverse order and push the lower frequencies over so that everyone has
     //  a width of at least 1.
-    size_t last = m_freq_visualization_block_boundaries[m_num_freq_visualization_blocks - 1];
-    for (size_t c = m_num_freq_visualization_blocks - 1; c-- > 0;){
-        size_t current = m_freq_visualization_block_boundaries[c];
+    size_t last = boundaries[blocks - 1];
+    for (size_t c = blocks - 1; c-- > 0;){
+        size_t current = boundaries[c];
         if (current >= last){
             current = last - 1;
             if (current == 0){
                 current = 1;
             }
-            m_freq_visualization_block_boundaries[c] = current;
+        }
+        m_freq_visualization_block_boundaries.emplace_back(current);
+        if (current == 1){
+            break;
         }
         last = current;
     }
 
-    for (size_t i = 1; i <= m_num_freq_visualization_blocks; i++){
-        assert(m_freq_visualization_block_boundaries[i-1] < m_freq_visualization_block_boundaries[i]);
-    }
-    for (size_t i = 0; i < m_num_freq_visualization_blocks; i++){
-//        cout << "index = " << m_freq_visualization_block_boundaries[i] << endl;
-    }
+    blocks = m_freq_visualization_block_boundaries.size();
+    std::reverse(m_freq_visualization_block_boundaries.begin(), m_freq_visualization_block_boundaries.end());
 
-    // std::cout << "Freq vis block boundaries: ";
-    // for(const auto v : m_freq_visualization_block_boundaries){
-    //     std::cout << v << " ";
-    // }
-    // std::cout << std::endl;
+
+//    for (size_t i = 1; i <= m_num_freq_visualization_blocks; i++){
+//        assert(m_freq_visualization_block_boundaries[i-1] < m_freq_visualization_block_boundaries[i]);
+//    }
+//    for (size_t i = 0; i < m_num_freq_visualization_blocks; i++){
+//        cout << "index = " << m_freq_visualization_block_boundaries[i] << endl;
+//    }
+
+//    cout << "Freq vis block boundaries: ";
+//    for(const auto v : m_freq_visualization_block_boundaries){
+//        cout << v << " ";
+//    }
+//    cout << endl;
 
     // saveAudioFrequenciesToDisk(true);
+
+    m_spectrograph.reset(new Spectrograph(blocks, m_num_freq_windows));
+    m_last_spectrum.values.resize(blocks);
+    m_last_spectrum.colors.resize(blocks);
 }
 
 
@@ -103,7 +118,7 @@ void AudioSpectrumHolder::clear(){
         }
         m_spectrums.clear();
 
-        m_spectrograph.clear();
+        m_spectrograph->clear();
         memset(m_last_spectrum.values.data(), 0, m_last_spectrum.values.size() * sizeof(float));
         memset(m_last_spectrum.colors.data(), 0, m_last_spectrum.colors.size() * sizeof(uint32_t));
     }
@@ -158,7 +173,7 @@ void AudioSpectrumHolder::push_spectrum(size_t sample_rate, std::shared_ptr<cons
     //  Scale the by the square root of the transform length.
     //  For random noise input, the frequency domain will have an average
     //  magnitude of sqrt(transform length).
-    float scale = std::sqrt(0.5f / (float)output.size());
+    float scale = std::sqrt(0.25f / (float)output.size());
 
 //    //  Divide by output size. Since samples can never be larger than 1.0, the
 //    //  frequency domain can never be larger than the FFT length. So we scale by
@@ -170,7 +185,7 @@ void AudioSpectrumHolder::push_spectrum(size_t sample_rate, std::shared_ptr<cons
 
     // For one window, use how many blocks to show all frequencies:
     float previous = 0;
-    for (size_t i = 0; i < m_num_freq_visualization_blocks; i++){
+    for (size_t i = 0; i < m_freq_visualization_block_boundaries.size() - 1; i++){
         float mag = 0.0f;
         for(size_t j = m_freq_visualization_block_boundaries[i]; j < m_freq_visualization_block_boundaries[i+1]; j++){
             mag += output[j];
@@ -200,7 +215,7 @@ void AudioSpectrumHolder::push_spectrum(size_t sample_rate, std::shared_ptr<cons
         m_last_spectrum.colors[i] = jetColorMap(mag);
         previous = mag;
     }
-    m_spectrograph.push_spectrum(m_last_spectrum.colors.data());
+    m_spectrograph->push_spectrum(m_last_spectrum.colors.data());
     m_nextFFTWindowIndex = (m_nextFFTWindowIndex+1) % m_num_freq_windows;
     // std::cout << "Computed FFT! "  << magSum << std::endl;
 
@@ -275,7 +290,7 @@ AudioSpectrumHolder::SpectrographSnapshot AudioSpectrumHolder::get_spectrograph(
     std::lock_guard<std::mutex> lg(m_state_lock);
 
     SpectrographSnapshot ret;
-    ret.image = m_spectrograph.to_image();
+    ret.image = m_spectrograph->to_image();
 
     //  Calculate overplay coordinates.
 

@@ -69,15 +69,25 @@ void AudioDisplayWidget::render_bars(){
     AudioSpectrumHolder::SpectrumSnapshot last_spectrum = m_session.spectrums().get_last_spectrum();
     size_t num_buckets = last_spectrum.values.size();
 
+//    for (int c = 0; c < 10; c++){
+//        cout << last_spectrum.values[c] << ", ";
+//    }
+//    cout << endl;
+
     const size_t barPlusGapWidth = widgetWidth / num_buckets;
     const size_t barWidth = 0.8 * barPlusGapWidth;
     const size_t gapWidth = barPlusGapWidth - barWidth;
     const size_t paddingWidth = widgetWidth - num_buckets * (barWidth + gapWidth);
     const size_t leftPaddingWidth = (paddingWidth + gapWidth) / 2;
     const size_t barHeight = widgetHeight - 2 * gapWidth;
-//        cout << "barHeight = " << barHeight << endl;
+//    cout << "barHeight = " << barHeight << endl;
+
+    double bucket_rcp = (double)widgetWidth / num_buckets;
 
     for (size_t i = 0; i < num_buckets; i++){
+        int s = (int)((i + 0  ) * bucket_rcp);    //  Start of bucket.
+        int e = (int)((i + 0.8) * bucket_rcp);    //  End of bucket.
+
 //        size_t curWindow = (m_nextFFTWindowIndex + m_num_freq_windows - 1) % m_num_freq_windows;
 //            // +1 here to skip the freq-0 value
 //        float value = m_freqVisBlocks[curWindow * m_numFreqVisBlocks + i];
@@ -87,6 +97,9 @@ void AudioDisplayWidget::render_bars(){
         bar.setWidth((int)barWidth);
         bar.setTop((int)(rect().top() + gapWidth + (1.0 - value) * barHeight));
         bar.setBottom((int)(rect().bottom() - gapWidth));
+
+        bar.setLeft(s);
+        bar.setWidth(e - s);
 
         painter.fillRect(bar, last_spectrum.colors[i]);
     }

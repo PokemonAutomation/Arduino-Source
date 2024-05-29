@@ -71,7 +71,7 @@ private:
     // Num sliding fft windows to visualize.
     const size_t m_num_freq_windows;
     // Num blocks of frequencies to visualize for one sliding window.
-    const size_t m_num_freq_visualization_blocks;
+//    const size_t m_num_freq_visualization_blocks;
 
     // The boundaries to separate each frequency vis block.
     // i-th freq vis block is made by frequencies whose indices in m_spectrums
@@ -79,7 +79,7 @@ private:
     std::vector<size_t> m_freq_visualization_block_boundaries;
 
     SpectrumSnapshot m_last_spectrum;
-    Spectrograph m_spectrograph;
+    std::unique_ptr<Spectrograph> m_spectrograph;
 
     // The timestamp of each window that's been visualized.
     std::vector<uint64_t> m_freqVisStamps;
