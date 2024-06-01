@@ -92,6 +92,9 @@ static const EnumDatabase<ItemPrinterItems>& ItemPrinterItems_Database(){
 
 ItemPrinterRngRow::~ItemPrinterRngRow(){
     chain.remove_listener(*this);
+    date.remove_listener(*this);
+    jobs.remove_listener(*this);
+    desired_item.remove_listener(*this);
 }
 ItemPrinterRngRow::ItemPrinterRngRow()
     : chain(LockMode::UNLOCK_WHILE_RUNNING, false)
@@ -120,9 +123,8 @@ ItemPrinterRngRow::ItemPrinterRngRow()
     PA_ADD_OPTION(jobs);
     PA_ADD_OPTION(desired_item);
     
-    date.add_listener(*this);
     chain.add_listener(*this);
-    
+    date.add_listener(*this);
     jobs.add_listener(*this);
     desired_item.add_listener(*this);
 }
@@ -429,6 +431,9 @@ void ItemPrinterRngRow::set_seed_based_on_desired_item(){
     date.set(set_date);
 }
 
+// - always update the date's visibility when chain is changed.
+// - if desired_item has changed, set the seed (and number of jobs) accordingly
+// - if any other value changes, set desired_item to NONE
 void ItemPrinterRngRow::value_changed(){
     date.set_visibility(chain ? ConfigOptionState::DISABLED : ConfigOptionState::ENABLED);
     if (prev_desired_item != desired_item){ // check if desired_item has changed.
