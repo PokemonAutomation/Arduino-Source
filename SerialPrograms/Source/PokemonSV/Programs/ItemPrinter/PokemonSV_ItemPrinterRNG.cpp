@@ -26,6 +26,7 @@
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 //#include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV_ItemPrinterRNG.h"
+#include <iostream>
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -45,9 +46,46 @@ static const EnumDatabase<ItemPrinterJobs>& ItemPrinterJobs_Database(){
 static const EnumDatabase<ItemPrinterItems>& ItemPrinterItems_Database(){
     static const EnumDatabase<ItemPrinterItems> database({
         {ItemPrinterItems::NONE, "none", "---"},
+        {ItemPrinterItems::ITEM_BONUS, "item-bonus", "Item Bonus"},
+        {ItemPrinterItems::BALL_BONUS, "ball-bonus", "Ball Bonus"},
+
+        // ordered by category
         {ItemPrinterItems::ABILITY_PATCH, "ability-patch", "Ability patch"},
         {ItemPrinterItems::EXP_CANDY, "exp-candy", "Exp Candy"},
+
+        {ItemPrinterItems::BUG_TERA, "bug-tera", "Bug Tera Shard"},
+        {ItemPrinterItems::DARK_TERA, "dark-tera", "Dark Tera Shard"},
+        {ItemPrinterItems::DRAGON_TERA, "dragon-tera", "Dragon Tera Shard"},
+        {ItemPrinterItems::ELECTRIC_TERA, "electric-tera", "Electric Tera Shard"},
+        {ItemPrinterItems::FAIRY_TERA, "fairy-tera", "Fairy Tera Shard"},
+        {ItemPrinterItems::FIGHTING_TERA, "fighting-tera", "Fighting Tera Shard"},
+        {ItemPrinterItems::FIRE_TERA, "fire-tera", "Fire Tera Shard"},
+        {ItemPrinterItems::FLYING_TERA, "flying-tera", "Flying Tera Shard"},
+        {ItemPrinterItems::GHOST_TERA, "ghost-tera", "Ghost Tera Shard"},
+        {ItemPrinterItems::GRASS_TERA, "grass-tera", "Grass Tera Shard"},
+        {ItemPrinterItems::GROUND_TERA, "ground-tera", "Ground Tera Shard"},
+        {ItemPrinterItems::ICE_TERA, "ice-tera", "Ice Tera Shard"},
+        {ItemPrinterItems::NORMAL_TERA, "normal-tera", "Normal Tera Shard"},
+        {ItemPrinterItems::POISON_TERA, "poison-tera", "Poison Tera Shard"},
+        {ItemPrinterItems::PSYCHIC_TERA, "psychic-tera", "Psychic Tera Shard"},
+        {ItemPrinterItems::ROCK_TERA, "rock-tera", "Rock Tera Shard"},
+        {ItemPrinterItems::STEEL_TERA, "steel-tera", "Steel Tera Shard"},
+        {ItemPrinterItems::STELLAR_TERA, "stellar-tera", "Stellar Tera Shard"},
+        {ItemPrinterItems::WATER_TERA, "water-tera", "Water Tera Shard"},
+        
+        {ItemPrinterItems::BEAST_BALL, "beast-ball", "Beast Ball"},
+        {ItemPrinterItems::DREAM_BALL, "dream-ball", "Dream Ball"},
+        {ItemPrinterItems::FAST_BALL, "fast-ball", "Fast Ball"},
+        {ItemPrinterItems::FRIEND_BALL, "friend-ball", "Friend Ball"},
+        {ItemPrinterItems::HEAVY_BALL, "heavy-ball", "Heavy Ball"},
+        {ItemPrinterItems::LEVEL_BALL, "level-ball", "Level Ball"},
+        {ItemPrinterItems::LOVE_BALL, "love-ball", "Love Ball"},
+        {ItemPrinterItems::LURE_BALL, "lure-ball", "Lure Ball"},
         {ItemPrinterItems::MASTER_BALL, "master-ball", "Master Ball"},
+        {ItemPrinterItems::MOON_BALL, "moon-ball", "Moon Ball"},
+        {ItemPrinterItems::SAFARI_BALL, "safari-ball", "Safari Ball"},
+        {ItemPrinterItems::SPORT_BALL, "sport-ball", "Sport Ball"},
+
     });
     return database;
 }
@@ -106,17 +144,277 @@ std::unique_ptr<EditableTableRow> ItemPrinterRngRow::clone() const{
     return ret;
 }
 
+
+// - Specific item seeds taken from Anubis's Item printer seeds
+//   - https://gist.github.com/Lusamine/112d4230919fadd254f0e6dfca850471
+// - How I chose the specific item seeds
+//   - seeds (and adjacent seeds +/- 2) that didn't also trigger item/ball bonuses. This is because
+// accidentally triggering a ball bonus, may prevent you from intentionally triggering an item bonus
+// on the next job, and vice versa for the item bonus.
+//   - seconds value: minimum of 8. ideally less than 20.
+// - Confirmation of seeds done with Kurt's ItemPrinterDeGacha tool
 void ItemPrinterRngRow::set_seed_based_on_desired_item(){
     int64_t seed;
     switch(desired_item) {
+    case ItemPrinterItems::ITEM_BONUS:
+        // 2044-05-06 15:33:08
+        // Calcium
+        seed = 2346161588;
+        jobs.set(ItemPrinterJobs::Jobs_1);
+        break;
+    case ItemPrinterItems::BALL_BONUS:
+        // 2024-06-04 00:37:08 
+        // Full Restore
+        seed = 1717461428;
+        jobs.set(ItemPrinterJobs::Jobs_1);
+        break;        
     case ItemPrinterItems::ABILITY_PATCH:
-        seed = 2342338998;
+        // 2000-05-12 22:59:28
+        // total 8 Ability Patch
+        // x18 Dark Tera Shard; x2 Ability Patch; x2 Ability Patch; x2 Ability Patch; x2 Ability Patch
+        seed = 958172368;
+        jobs.set(ItemPrinterJobs::Jobs_5);
         break;
     case ItemPrinterItems::EXP_CANDY:
-        seed = 2691258789;
+        // 2033-02-08 10:48:09
+        // x5 Exp. Candy XL; x2 Protein: x10 Exp. Candy L; x4 Exp. Candy XL; x5 Exp. Candy XL
+        // 520000 exp
+        seed = 1991472489;
+        jobs.set(ItemPrinterJobs::Jobs_5);
+        break;
+    case ItemPrinterItems::NORMAL_TERA:
+        // 2041-03-11 01:10:10
+        // x20 Normal Tera Shard; x14 Normal Tera Shard; x8 Normal Tera Shard; x19 Normal Tera Shard; x6 Normal Tera Shard
+        // 67 Normal Tera Shards
+        seed = 2246577010;
+        jobs.set(ItemPrinterJobs::Jobs_5);
+        break;
+    case ItemPrinterItems::FIRE_TERA:
+        // 2054-08-05 03:35:10
+        // 74 Fire Tera Shards, 74 total Tera Shards
+        // x20 Fire Tera Shard; x18 Fire Tera Shard; x20 Fire Tera Shard; x16 Fire Tera Shard; x10 Honey
+        seed = 2669513710;
+        jobs.set(ItemPrinterJobs::Jobs_5);
+        break;
+    case ItemPrinterItems::WATER_TERA:
+        // 2046-09-02 18:42:14
+        // 60 Water Tera Shards, 77 total Tera Shards
+        // x20 Water Tera Shard; x4 Full Restore; x20 Water Tera Shard; x17 Flying Tera Shard; x20 Water Tera Shard
+        seed = 2419526534;
+        jobs.set(ItemPrinterJobs::Jobs_5);
+        break;
+    case ItemPrinterItems::ELECTRIC_TERA:
+        // 2011-03-14 16:54:13
+        // 69 Electric Tera Shards, 69 total Tera Shards
+        // x13 Electric Tera Shard; x2 Light Clay; x20 Electric Tera Shard; x20 Electric Tera Shard; x16 Electric Tera Shard
+        seed = 1300121653;
+        jobs.set(ItemPrinterJobs::Jobs_5);
+        break;
+    case ItemPrinterItems::GRASS_TERA:
+        // 2009-11-15 23:04:10
+        // 61 Grass Tera Shards, 61 total Tera Shards
+        // x15 Grass Tera Shard; x6 Tiny Mushroom; x19 Grass Tera Shard; x17 Grass Tera Shard; x10 Grass Tera Shard
+        seed = 1258326250;
+        jobs.set(ItemPrinterJobs::Jobs_5);
+        break;
+    case ItemPrinterItems::ICE_TERA:
+        // 2051-05-10 10:07:10
+        // 67 Ice Tera Shards, 67 total Tera Shards
+        // x19 Ice Tera Shard; x8 Ice Tera Shard; x20 Ice Tera Shard; x20 Ice Tera Shard; x1 Metal Alloy
+        seed = 2567326030;
+        jobs.set(ItemPrinterJobs::Jobs_5);
+        break;
+    case ItemPrinterItems::FIGHTING_TERA:
+        // 2017-11-14 18:02:15
+        // 66 Fighting Tera Shards, 66 total Tera Shards
+        // x20 Fighting Tera Shard; x16 Fighting Tera Shard; x10 Fighting Tera Shard; x20 Fighting Tera Shard; x3 Shiny Stone
+        seed = 1510682535;
+        jobs.set(ItemPrinterJobs::Jobs_5);
+        break;
+    case ItemPrinterItems::POISON_TERA:
+        // 2034-09-09 06:36:12
+        // 70 Poison Tera Shards, 70 total Tera Shards
+        // x2 Electirizer; x16 Poison Tera Shard; x18 Poison Tera Shard; x19 Poison Tera Shard; x17 Poison Tera Shard
+        seed = 2041396572;
+        jobs.set(ItemPrinterJobs::Jobs_5);
+        break;
+    case ItemPrinterItems::GROUND_TERA:
+        // 2016-05-15 14:18:09
+        // 65 Ground Tera Shards, 65 total Tera Shards
+        // x5 PP Up; x14 Ground Tera Shard; x17 Ground Tera Shard; x15 Ground Tera Shard; x19 Ground Tera Shard
+        seed = 1463321889;
+        jobs.set(ItemPrinterJobs::Jobs_5);
+        break;
+    case ItemPrinterItems::FLYING_TERA:
+        // 2020-02-02 08:51:40
+        // 64 Flying Tera Shards, 64 total Tera Shards
+        // x11 Flying Tera Shard; x15 Flying Tera Shard; x14 Flying Tera Shard; x19 Flying Tera Shard; x5 Flying Tera Shard
+        seed = 1580633500;
+        jobs.set(ItemPrinterJobs::Jobs_5);
+        break;
+    case ItemPrinterItems::PSYCHIC_TERA:
+        // 2039-06-02 02:15:13
+        // 67 Psychic Tera Shards, 67 total Tera Shards
+        // x15 Psychic Tera Shard
+        // x2 Never-Melt Ice
+        // x14 Psychic Tera Shard
+        // x18 Psychic Tera Shard
+        // x20 Psychic Tera Shard
+        seed = 2190593713;
+        jobs.set(ItemPrinterJobs::Jobs_5);
+        break;
+    case ItemPrinterItems::BUG_TERA:
+        // 2047-11-23 08:17:28
+        // 67 Bug Tera Shards, 67 total Tera Shards
+        // x2 Ether
+        // x19 Bug Tera Shard
+        // x17 Bug Tera Shard
+        // x16 Bug Tera Shard
+        // x15 Bug Tera Shard
+        seed = 2458109848;
+        jobs.set(ItemPrinterJobs::Jobs_5);
+        break;
+    case ItemPrinterItems::ROCK_TERA:
+        // 2058-10-16 00:38:09
+        // 60 Rock Tera Shards, 60 total Tera Shards
+        // x20 Rock Tera Shard
+        // x20 Rock Tera Shard
+        // x8 Pretty Feather
+        // x20 Rock Tera Shard
+        // x9 Stardust
+        seed = 2801954289;
+        jobs.set(ItemPrinterJobs::Jobs_5);
+        break;
+    case ItemPrinterItems::GHOST_TERA:
+        // 2017-11-05 17:51:11
+        // 61 Ghost Tera Shards, 61 total Tera Shards
+        // x19 Ghost Tera Shard
+        // x18 Ghost Tera Shard
+        // x6 Ghost Tera Shard
+        // x2 Magnet
+        // x18 Ghost Tera Shard
+        seed = 1509904271;
+        jobs.set(ItemPrinterJobs::Jobs_5);
+        break;
+    case ItemPrinterItems::DRAGON_TERA:
+        // 2038-04-23 22:25:09
+        // 68 Dragon Tera Shards, 68 total Tera Shards
+        // x1 Ability Patch
+        // x12 Dragon Tera Shard
+        // x19 Dragon Tera Shard
+        // x20 Dragon Tera Shard
+        // x17 Dragon Tera Shard
+        seed = 2155674309;
+        jobs.set(ItemPrinterJobs::Jobs_5);
+        break;
+    case ItemPrinterItems::DARK_TERA:
+        // 2050-05-26 12:20:13
+        // 60 Dark Tera Shards, 60 total Tera Shards
+        // x10 Dark Tera Shard
+        // x14 Dark Tera Shard
+        // x16 Dark Tera Shard
+        // x20 Dark Tera Shard
+        // x2 Prism Scale
+        seed = 2537180413;
+        jobs.set(ItemPrinterJobs::Jobs_5);
+        break;             
+    case ItemPrinterItems::STEEL_TERA:
+        // 2025-12-18 14:16:09
+        // 60 Steel Tera Shards, 60 total Tera Shards
+        // x20 Steel Tera Shard
+        // x12 Steel Tera Shard
+        // x19 Steel Tera Shard
+        // x9 Steel Tera Shard
+        // x2 Berry Sweet
+        seed = 1766067369;
+        jobs.set(ItemPrinterJobs::Jobs_5);
+        break;
+    case ItemPrinterItems::FAIRY_TERA:
+        // 2039-03-06 12:56:14
+        // 60 Fairy Tera Shards, 67 total Tera Shards
+        // x20 Fairy Tera Shard
+        // x20 Fairy Tera Shard
+        // x7 Water Tera Shard
+        // x6 Tiny Bamboo Shoot
+        // x20 Fairy Tera Shard
+        seed = 2183028974;
+        jobs.set(ItemPrinterJobs::Jobs_5);
+        break;
+    case ItemPrinterItems::STELLAR_TERA:
+        // 2006-12-09 08:47:14
+        // 44 Stellar Tera Shards, 44 total Tera Shards
+        // x15 Stellar Tera Shard
+        // x3 Max Revive
+        // x14 Stellar Tera Shard
+        // x15 Stellar Tera Shard
+        // x1 Clover Sweet
+        seed = 1165654034;
+        jobs.set(ItemPrinterJobs::Jobs_5);
         break;
     case ItemPrinterItems::MASTER_BALL:
-        seed = 1457307058;
+        // 2005-11-07 11:32:08
+        // x1 Master Ball
+        // x1 Master Ball
+        // x5 Great Ball
+        // x1 Master Ball
+        // x1 Master Ball
+        seed = 1131363128;
+        jobs.set(ItemPrinterJobs::Jobs_5);
+        break;
+    case ItemPrinterItems::SAFARI_BALL:
+        // 2049-01-02 01:20:22
+        seed = 2493163222;
+        jobs.set(ItemPrinterJobs::Jobs_5);
+        break;
+    case ItemPrinterItems::FAST_BALL:
+        // 2034-09-01 02:33:39
+        seed = 2040690819;
+        jobs.set(ItemPrinterJobs::Jobs_5);
+        break;
+    case ItemPrinterItems::LEVEL_BALL:
+        // 2045-03-17 10:05:38
+        seed = 2373357938;
+        jobs.set(ItemPrinterJobs::Jobs_5);
+        break;   
+    case ItemPrinterItems::LURE_BALL:
+        // 2057-11-21 04:28:37
+        seed = 2773542517;
+        jobs.set(ItemPrinterJobs::Jobs_5);
+        break;
+    case ItemPrinterItems::HEAVY_BALL:
+        // 2029-07-24 11:53:11
+        seed = 1879588391;
+        jobs.set(ItemPrinterJobs::Jobs_5);
+        break;
+    case ItemPrinterItems::LOVE_BALL:
+        // 2023-05-22 05:36:11
+        seed = 1684733771;
+        jobs.set(ItemPrinterJobs::Jobs_5);
+        break;
+    case ItemPrinterItems::FRIEND_BALL:
+        // 2046-12-11 02:23:17
+        seed = 2428107797;
+        jobs.set(ItemPrinterJobs::Jobs_5);
+        break;          
+    case ItemPrinterItems::MOON_BALL:
+        // 2042-10-14 05:56:33
+        seed = 2296878993;
+        jobs.set(ItemPrinterJobs::Jobs_5);
+        break;   
+    case ItemPrinterItems::SPORT_BALL:
+        // 2009-06-05 20:17:11
+        seed = 1244233031;
+        jobs.set(ItemPrinterJobs::Jobs_5);
+        break;
+    case ItemPrinterItems::DREAM_BALL:
+        // 2054-03-22 09:31:21
+        seed = 2657784681;
+        jobs.set(ItemPrinterJobs::Jobs_5);
+        break;
+    case ItemPrinterItems::BEAST_BALL:
+        // 2037-02-02 15:37:15
+        seed = 2117201835;
+        jobs.set(ItemPrinterJobs::Jobs_5);
         break;
     default:
         seed = -1;
@@ -126,18 +424,20 @@ void ItemPrinterRngRow::set_seed_based_on_desired_item(){
         return;
     }
 
+    chain = false;
     DateTime set_date = from_seconds_since_epoch(seed);
     date.set(set_date);
 }
 
 void ItemPrinterRngRow::value_changed(){
+    date.set_visibility(chain ? ConfigOptionState::DISABLED : ConfigOptionState::ENABLED);
     if (prev_desired_item != desired_item){ // check if desired_item has changed.
         set_seed_based_on_desired_item();
         prev_desired_item = desired_item;
         return;
     }
-
-    date.set_visibility(chain ? ConfigOptionState::DISABLED : ConfigOptionState::ENABLED);
+    // std::cout << chain << std::endl;
+    // std::cout << "changed" << std::endl;
     desired_item.set(ItemPrinterItems::NONE);
 }
 
