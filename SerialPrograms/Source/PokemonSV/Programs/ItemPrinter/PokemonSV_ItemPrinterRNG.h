@@ -39,10 +39,14 @@ public:
     virtual std::unique_ptr<EditableTableRow> clone() const override;
     virtual void value_changed() override;
 
+    void set_seed_based_on_desired_item();
+
 public:
     BooleanCheckBoxCell chain;
     DateTimeCell date;
     EnumDropdownCell<ItemPrinterJobs> jobs;
+    EnumDropdownCell<ItemPrinterItems> desired_item;
+    ItemPrinterItems prev_desired_item;
 };
 class ItemPrinterRngTable : public EditableTableOption_t<ItemPrinterRngRow>{
 public:

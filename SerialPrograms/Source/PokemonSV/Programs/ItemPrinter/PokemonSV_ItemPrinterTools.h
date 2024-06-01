@@ -24,6 +24,48 @@ enum class ItemPrinterJobs{
     Jobs_10     =   10,
 };
 
+enum class ItemPrinterItems{
+    NONE,
+    ITEM_BONUS,
+    BALL_BONUS,
+
+    ABILITY_PATCH,
+    EXP_CANDY,
+
+    BUG_TERA,
+    DARK_TERA,
+    DRAGON_TERA,
+    ELECTRIC_TERA,
+    FAIRY_TERA,
+    FIGHTING_TERA,
+    FIRE_TERA,
+    FLYING_TERA,
+    GHOST_TERA,
+    GRASS_TERA,
+    GROUND_TERA,
+    ICE_TERA,
+    NORMAL_TERA,
+    POISON_TERA,
+    PSYCHIC_TERA,
+    ROCK_TERA,
+    STEEL_TERA,
+    STELLAR_TERA,
+    WATER_TERA,
+
+    BEAST_BALL,
+    DREAM_BALL,
+    FAST_BALL,
+    FRIEND_BALL,
+    HEAVY_BALL,
+    LEVEL_BALL,
+    LOVE_BALL,
+    LURE_BALL,
+    MASTER_BALL,
+    MOON_BALL,
+    SAFARI_BALL,
+    SPORT_BALL,
+};
+
 
 void item_printer_start_print(
     ConsoleHandle& console, BotBaseContext& context,
