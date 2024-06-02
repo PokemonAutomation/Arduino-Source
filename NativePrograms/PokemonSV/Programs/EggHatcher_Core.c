@@ -92,6 +92,7 @@ int main(void) {
 
     for(int curBox = 0; curBox < BOXES_TO_HATCH; curBox++) {
         // ########## Intial loop setup ##########
+        fly_to_gate();
         open_box();
         pbf_press_dpad(DPAD_LEFT, 20, 200);
         if (HAS_CLONED_RIDER) {
