@@ -96,7 +96,7 @@ void lets_go_movement0(BotBaseContext& context);
 
 void lets_go_movement1(BotBaseContext& context);
 
-bool is_sandwich_expired(WallClock last_sandwich_time, int time_per_sandwich);
+bool is_sandwich_expired(WallClock last_sandwich_time, std::chrono::minutes minutes_per_sandwich);
 
 void run_lets_go_iteration(
     SingleSwitchProgramEnvironment& env, BotBaseContext& context, 
