@@ -727,7 +727,7 @@ void move_from_item_printer_to_material_farming(SingleSwitchProgramEnvironment& 
     fly_from_blueberry_to_north_province_3(env, context);
 }
 
-// assumes you start in the position in fron of the item printer, as if you finished using it.
+// assumes you start in the position in front of the item printer, as if you finished using it.
 void move_from_item_printer_to_blueberry_entrance(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
 
     context.wait_for_all_requests();
