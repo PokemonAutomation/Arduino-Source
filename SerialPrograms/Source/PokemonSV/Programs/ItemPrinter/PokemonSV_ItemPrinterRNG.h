@@ -75,13 +75,16 @@ private:
     void run_print_at_date(
         SingleSwitchProgramEnvironment& env, BotBaseContext& context,
         const DateTime& date, ItemPrinterJobs jobs
-    ) const;
+    );
 
     void print_again(
         SingleSwitchProgramEnvironment& env, BotBaseContext& context,
         ItemPrinterJobs jobs
     ) const;
 
+    void adjust_delay(std::array<std::string, 10> print_results, uint64_t seed);
+
+    DistanceFromTarget get_distance_from_target(std::array<std::string, 10> print_results, uint64_t seed);
 
 private:
     OCR::LanguageOCROption LANGUAGE;
