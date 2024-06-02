@@ -66,6 +66,8 @@ public:
     BooleanCheckBoxOption SAVE_DEBUG_VIDEO;
     BooleanCheckBoxOption SKIP_WARP_TO_POKECENTER;
     BooleanCheckBoxOption SKIP_SANDWICH;
+    SimpleIntegerOption<uint16_t> TIME_PER_SANDWICH;
+    SimpleIntegerOption<uint16_t> NUM_FORWARD_MOVES_PER_LETS_GO_ITERATION;
 
     EventNotificationOption& NOTIFICATION_STATUS_UPDATE;
     EventNotificationOption& NOTIFICATION_PROGRAM_FINISH;
@@ -94,12 +96,35 @@ void lets_go_movement0(BotBaseContext& context);
 
 void lets_go_movement1(BotBaseContext& context);
 
-bool is_sandwich_expired(WallClock last_sandwich_time);
+bool is_sandwich_expired(WallClock last_sandwich_time, std::chrono::minutes minutes_per_sandwich);
 
-void run_lets_go_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context, LetsGoEncounterBotTracker& encounter_tracker);
+void run_lets_go_iteration(
+    SingleSwitchProgramEnvironment& env, BotBaseContext& context, 
+    LetsGoEncounterBotTracker& encounter_tracker, int num_forward_moves_per_lets_go_iteration
+);
 
 void run_from_battles_and_back_to_pokecenter(SingleSwitchProgramEnvironment& env, BotBaseContext& context, 
     std::function<void(SingleSwitchProgramEnvironment& env, BotBaseContext& context)>&& action);
+
+
+
+void move_from_material_farming_to_item_printer(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+
+void fly_from_paldea_to_blueberry_entrance(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+
+void move_from_blueberry_entrance_to_league_club(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+
+void move_from_league_club_entrance_to_item_printer(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+
+
+
+void move_from_item_printer_to_material_farming(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+
+void move_from_item_printer_to_blueberry_entrance(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+
+void fly_from_blueberry_to_north_province_3(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+
+
 
 }
 }

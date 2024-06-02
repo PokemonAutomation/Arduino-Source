@@ -3,7 +3,6 @@
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
  */
-
 #include <atomic>
 #include <sstream>
 #include "Common/Cpp/PrettyPrint.h"
@@ -32,6 +31,7 @@
 #include "PokemonSV_MaterialFarmer.h"
 #include "PokemonSV_MaterialFarmerTools.h"
 #include "PokemonSV/Programs/ShinyHunting/PokemonSV_ShinyHunt-Scatterbug.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_SnapshotDumper.h"
 
 // #include <iostream>
 // using std::cout;
@@ -136,6 +136,17 @@ MaterialFarmerOptions::MaterialFarmerOptions(
         LockMode::UNLOCK_WHILE_RUNNING,
         false
     )
+    , TIME_PER_SANDWICH(
+        "<b>DEV MODE: Time per sandwich:</b><br>Number of minutes before resetting sandwich.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        30, 1, 30
+    )
+    , NUM_FORWARD_MOVES_PER_LETS_GO_ITERATION(
+        "<b>DEV MODE: Number of forward moves per lets go iteration:</b><br>"
+        "During Let's go autobattling sequence, the number of forward movements before resetting to Pokecenter.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        13
+    )
     , NOTIFICATION_STATUS_UPDATE(notif_status_update_option == nullptr 
         ? *m_notif_status_update_owner 
         : *notif_status_update_option
@@ -163,6 +174,8 @@ MaterialFarmerOptions::MaterialFarmerOptions(
         PA_ADD_OPTION(SAVE_DEBUG_VIDEO);
         PA_ADD_OPTION(SKIP_WARP_TO_POKECENTER);
         PA_ADD_OPTION(SKIP_SANDWICH);
+        PA_ADD_OPTION(TIME_PER_SANDWICH);
+        PA_ADD_OPTION(NUM_FORWARD_MOVES_PER_LETS_GO_ITERATION);
     }
     PA_ADD_OPTION(SAVE_GAME_BEFORE_SANDWICH);
     PA_ADD_OPTION(NUM_SANDWICH_ROUNDS);
@@ -192,6 +205,7 @@ void run_material_farmer(SingleSwitchProgramEnvironment& env, BotBaseContext& co
 
 
     size_t consecutive_failures;
+    size_t max_consecutive_failures = 10;    
     bool done_sandwich_iteration;
     for (uint16_t i = 0; i < options.NUM_SANDWICH_ROUNDS; i++){
         consecutive_failures = 0;
@@ -205,6 +219,9 @@ void run_material_farmer(SingleSwitchProgramEnvironment& env, BotBaseContext& co
                 env.update_stats();
                 e.send_notification(env, options.NOTIFICATION_ERROR_RECOVERABLE);
 
+                // save screenshot after operation failed, 
+                dump_snapshot(env.console);
+
                 if (options.SAVE_DEBUG_VIDEO){
                     // Take a video to give more context for debugging
                     pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
@@ -212,10 +229,10 @@ void run_material_farmer(SingleSwitchProgramEnvironment& env, BotBaseContext& co
                 }
 
                 consecutive_failures++;
-                if (consecutive_failures >= 5){
+                if (consecutive_failures >= max_consecutive_failures){
                     throw OperationFailedException(
                         ErrorReport::SEND_ERROR_REPORT, env.console,
-                        "Failed 5 times in a row.",
+                        "Failed 10 times in a row.",
                         true
                     );
                 }
@@ -287,14 +304,15 @@ void run_one_sandwich_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
     - Keeping repeating this until the sandwich expires.
      */
     while (true){
-        
-        auto sandwich_time_left =  std::chrono::minutes(30) + std::chrono::duration_cast<std::chrono::minutes>(last_sandwich_time - current_time());
+        int time_per_sandwich = options.TIME_PER_SANDWICH;
+        std::chrono::minutes minutes_per_sandwich = std::chrono::minutes(time_per_sandwich);
+        auto sandwich_time_left =  minutes_per_sandwich + std::chrono::duration_cast<std::chrono::minutes>(last_sandwich_time - current_time());
         env.console.log(
             "Time left on sandwich: " + 
             std::to_string(sandwich_time_left.count()) + " min", 
             COLOR_PURPLE);
 
-        if (is_sandwich_expired(last_sandwich_time)){
+        if (is_sandwich_expired(last_sandwich_time, minutes_per_sandwich)){
             env.log("Sandwich expired. Start another sandwich round.");
             env.console.overlay().add_log("Sandwich expired.");
             break;
@@ -302,6 +320,7 @@ void run_one_sandwich_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
 
         // heal before starting Let's go
         env.console.log("Heal before starting Let's go", COLOR_PURPLE);
+        env.console.log("Heal threshold: " + tostr_default(options.AUTO_HEAL_PERCENT), COLOR_PURPLE);
         double hp = hp_watcher.last_known_value() * 100;
         if (0 < hp){
             env.console.log("Last Known HP: " + tostr_default(hp) + "%", COLOR_BLUE);
@@ -321,8 +340,11 @@ void run_one_sandwich_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
         - Then returns to pokemon center 
         */
         env.console.log("Starting Let's Go hunting path", COLOR_PURPLE);
+        int num_forward_moves_per_lets_go_iteration = options.NUM_FORWARD_MOVES_PER_LETS_GO_ITERATION;
         run_from_battles_and_back_to_pokecenter(env, context, 
-            [&hp_watcher, &last_sandwich_time, &encounter_tracker](SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+            [&](
+                SingleSwitchProgramEnvironment& env, BotBaseContext& context
+            ){
                 run_until(
                     env.console, context,
                     [&](BotBaseContext& context){
@@ -334,12 +356,12 @@ void run_one_sandwich_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
                         you are very unlucky and can't finish a Let's Go iteration due to getting caught
                         up in battles.
                         */
-                        if (is_sandwich_expired(last_sandwich_time)){
+                        if (is_sandwich_expired(last_sandwich_time, minutes_per_sandwich)){
                             env.log("Sandwich expired. Return to Pokecenter.");
                             return;
                         }                        
                         move_to_start_position_for_letsgo1(env, context);
-                        run_lets_go_iteration(env, context, encounter_tracker);
+                        run_lets_go_iteration(env, context, encounter_tracker, num_forward_moves_per_lets_go_iteration);
                     },
                     {hp_watcher}
                 );
@@ -354,8 +376,8 @@ void run_one_sandwich_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
 
 
 
-bool is_sandwich_expired(WallClock last_sandwich_time){
-    return last_sandwich_time + std::chrono::minutes(30) < current_time();
+bool is_sandwich_expired(WallClock last_sandwich_time, std::chrono::minutes minutes_per_sandwich){
+    return (last_sandwich_time + minutes_per_sandwich) < current_time();
 }
 
 // from the North Province (Area 3) pokecenter, move to start position for Happiny dust farming
@@ -478,10 +500,14 @@ void lets_go_movement1(BotBaseContext& context){
 }
 
 
-// One iteration of the hunt: 
-// start at North Province (Area 3) pokecenter, go out and use Let's Go to battle , 
+/*
+- One iteration of the hunt: 
+- start at North Province (Area 3) pokecenter, go out and use Let's Go to battle
+- move forward and send out lead pokemon to autobattle. When it runs out of pokemon to battle, 
+move forward again to repeat the cycle. It does this as many times as per num_forward_moves_per_lets_go_iteration.
+ */
 void run_lets_go_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context, 
-    LetsGoEncounterBotTracker& encounter_tracker)
+    LetsGoEncounterBotTracker& encounter_tracker, int num_forward_moves_per_lets_go_iteration)
 {
     auto& console = env.console;
     // - Orient camera to look at same direction as player character
@@ -494,7 +520,7 @@ void run_lets_go_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& 
     pbf_move_right_joystick(context, 128, 255, 45, 10);
 
     const bool throw_ball_if_bubble = false;
-    const int total_iterations = 13;
+    const int total_iterations = num_forward_moves_per_lets_go_iteration;
 
     context.wait_for_all_requests();
     for(int i = 0; i < total_iterations; i++){
@@ -564,6 +590,262 @@ void run_from_battles_and_back_to_pokecenter(SingleSwitchProgramEnvironment& env
         }
         // Back on the overworld.
     } // end while(action_finished == false || returned_to_pokecenter == false)
+}
+
+
+
+
+void move_from_material_farming_to_item_printer(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    env.console.log("Start moving from material farming to item printer.");
+    fly_from_paldea_to_blueberry_entrance(env, context);
+    move_from_blueberry_entrance_to_league_club(env, context);
+    move_from_league_club_entrance_to_item_printer(env, context);
+}
+
+void fly_from_paldea_to_blueberry_entrance(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    int numAttempts = 0;
+    int maxAttempts = 5;
+    bool isFlySuccessful = false;
+
+    while (!isFlySuccessful && numAttempts < maxAttempts){
+        // close all menus
+        pbf_mash_button(context, BUTTON_B, 100);
+
+        numAttempts++;
+
+        open_map_from_overworld(env.program_info(), env.console, context);
+
+        // change from Paldea map to Blueberry map
+        pbf_press_button(context, BUTTON_L, 50, 300);
+
+        // move cursor to bottom right corner
+        pbf_move_left_joystick(context, 255, 255, TICKS_PER_SECOND*5, 50);
+
+        // move cursor to Blueberry academy fast travel point (up-left)
+        pbf_move_left_joystick(context, 0, 0, 76, 50);
+
+        // press A to fly to Blueberry academy
+        isFlySuccessful = fly_to_overworld_from_map(env.program_info(), env.console, context, true);
+        if (!isFlySuccessful){
+            env.log("Failed to fly to Blueberry academy.");
+        }
+    }
+
+    if (!isFlySuccessful){
+        throw OperationFailedException(
+            ErrorReport::SEND_ERROR_REPORT, env.console,
+            "Failed to fly to Blueberry academy, five times in a row.",
+            true
+        );
+    }
+}
+
+void move_from_blueberry_entrance_to_league_club(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+
+    int numAttempts = 0;
+    int maxAttempts = 5;
+    bool isSuccessful = false;
+
+    while (!isSuccessful && numAttempts < maxAttempts){
+        if (numAttempts > 0){ // failed at least once
+            pbf_mash_button(context, BUTTON_B, 100);
+            open_map_from_overworld(env.program_info(), env.console, context);
+            fly_to_overworld_from_map(env.program_info(), env.console, context, false);
+        }
+
+        numAttempts++;
+
+        // move toward entrance gates
+        pbf_move_left_joystick(context, 190, 0, 200, 50);
+
+        context.wait_for_all_requests();
+
+        // Wait for detection of Blueberry navigation menu
+        ImageFloatBox select_entrance_box(0.031, 0.193, 0.047, 0.078);
+        GradientArrowWatcher select_entrance(COLOR_RED, GradientArrowType::RIGHT, select_entrance_box);
+        int ret = wait_until(env.console, context, Milliseconds(5000), { select_entrance });
+        if (ret == 0){
+            env.log("Blueberry navigation menu detected.");
+        } else {
+            env.console.log("Failed to detect Blueberry navigation menu.");
+            continue;
+        }
+
+        // Move selector to League club room
+        pbf_press_dpad(context, DPAD_UP, 20, 50);
+
+        // Confirm to League club room is selected
+        ImageFloatBox select_league_club_box(0.038, 0.785, 0.043, 0.081);
+        GradientArrowWatcher select_league_club(COLOR_RED, GradientArrowType::RIGHT, select_league_club_box, Milliseconds(1000));
+        ret = wait_until(env.console, context, Milliseconds(5000), { select_league_club });
+        if (ret == 0){
+            env.log("League club room selected.");
+        } else {
+            env.console.log("Failed to select League club room in navigation menu.");
+            continue;            
+        }
+        // press A
+        pbf_mash_button(context, BUTTON_A, 100);
+
+        // check for overworld
+        OverworldWatcher overworld(COLOR_CYAN);  
+        ret = wait_until(env.console, context, Milliseconds(10000), { overworld });
+        if (ret == 0){
+            env.log("Entered League club room.");
+        } else {
+            env.console.log("Failed to enter League club room from menu selection.");
+            continue;            
+        }
+
+        isSuccessful = true;
+    }
+
+    if (!isSuccessful){
+        throw OperationFailedException(
+            ErrorReport::SEND_ERROR_REPORT, env.console,
+            "Failed to enter League club room, five times in a row.",
+            true
+        );
+    }
+
+}
+
+void move_from_league_club_entrance_to_item_printer(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+
+    context.wait_for_all_requests();
+
+    // move forwards towards table next to item printer
+    pbf_move_left_joystick(context, 120, 0, 200, 50);
+
+    // look left towards item printer
+    pbf_move_left_joystick(context, 0, 128, 10, 50);
+}
+
+void move_from_item_printer_to_material_farming(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    env.console.log("Start moving from item printer to material farming.");
+    move_from_item_printer_to_blueberry_entrance(env, context);
+    fly_from_blueberry_to_north_province_3(env, context);
+}
+
+// assumes you start in the position in front of the item printer, as if you finished using it.
+void move_from_item_printer_to_blueberry_entrance(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+
+    context.wait_for_all_requests();
+
+    // look left towards door
+    pbf_move_left_joystick(context, 0, 128, 10, 50);
+
+    // re-orient camera to look same direction as player
+    pbf_press_button(context, BUTTON_L, 50, 50);
+
+    // move forward towards door
+    pbf_move_left_joystick(context, 128, 0, 700, 50);
+
+    context.wait_for_all_requests();
+
+    env.log("Wait for detection of Blueberry navigation menu.");
+
+    // Wait for detection of Blueberry navigation menu
+    ImageFloatBox select_entrance_box(0.031, 0.193, 0.047, 0.078);
+    GradientArrowWatcher select_entrance(COLOR_RED, GradientArrowType::RIGHT, select_entrance_box);
+    int ret = wait_until(env.console, context, Milliseconds(5000), { select_entrance }, Milliseconds(1000));
+    if (ret == 0){
+        env.log("Blueberry navigation menu detected.");
+    } else {
+        env.console.log("Failed to detect Blueberry navigation menu.");
+        throw OperationFailedException(
+            ErrorReport::SEND_ERROR_REPORT, env.console,
+            "Failed to find the exit from the League room.",
+            true
+        );
+    }
+
+    // press A
+    pbf_mash_button(context, BUTTON_A, 100);    
+
+    // check for overworld
+    OverworldWatcher overworld(COLOR_CYAN);  
+    ret = wait_until(env.console, context, Milliseconds(10000), { overworld });
+    if (ret == 0){
+        env.log("Overworld detected");
+    } else {
+        throw OperationFailedException(
+            ErrorReport::SEND_ERROR_REPORT, env.console,
+            "Failed to detect overworld.",
+            true
+        );      
+    }
+}
+
+
+void fly_from_blueberry_to_north_province_3(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    int numAttempts = 0;
+    int maxAttempts = 10;
+    bool isFlySuccessful = false;
+
+    while (!isFlySuccessful && numAttempts < maxAttempts){
+        numAttempts++;
+
+        // close all menus
+        pbf_mash_button(context, BUTTON_B, 100);
+
+        open_map_from_overworld(env.program_info(), env.console, context);
+
+        // change from Blueberry map to Paldea map
+        pbf_press_button(context, BUTTON_R, 50, 300);
+
+        // zoom out
+        pbf_press_button(context, BUTTON_ZL, 25, 200);
+
+        // move cursor up-left
+        pbf_move_left_joystick(context, 112, 0, 171, 50);
+
+        // press A to fly to North province area 3
+        isFlySuccessful = fly_to_overworld_from_map(env.program_info(), env.console, context, true);
+
+        if (!isFlySuccessful){
+            env.log("Failed to fly to North province area 3.");
+        }
+    }
+
+    if (!isFlySuccessful){
+
+        throw OperationFailedException(
+            ErrorReport::SEND_ERROR_REPORT, env.console,
+            "Failed to fly to North province area 3, ten times in a row.",
+            true
+        );
+        /* try{
+            // try one last attempt, by using pokecenter detection
+
+            // close all menus
+            pbf_mash_button(context, BUTTON_B, 100);
+
+            open_map_from_overworld(env.program_info(), env.console, context);
+
+            // change from Blueberry map to Paldea map
+            pbf_press_button(context, BUTTON_R, 50, 300);
+
+            // zoom out
+            pbf_press_button(context, BUTTON_ZL, 25, 200);
+
+            // move up, but ending up far from other pokecenters
+            pbf_move_left_joystick(context, 128, 0, 190, 50);
+
+            // zoom back in to default zoom level
+            pbf_press_button(context, BUTTON_ZR, 25, 200);
+
+            fly_to_closest_pokecenter_on_map(env.program_info(), env.console, context);
+        }
+        catch(OperationFailedException& e){
+            (void)e;
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, env.console,
+                "Failed to fly to North province area 3, five times in a row.",
+                true
+            );
+        } */
+    }
 }
 
 
