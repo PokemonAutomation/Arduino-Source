@@ -80,16 +80,19 @@ public:
     );
 
 public:
-    SimpleIntegerOption(std::string label,
-                        LockMode lock_while_running,
+    SimpleIntegerOption(
+        std::string label,
+        LockMode lock_while_running,
         Type default_value
     );
-    SimpleIntegerOption(std::string label,
-                        LockMode lock_while_running,
+    SimpleIntegerOption(
+        std::string label,
+        LockMode lock_while_running,
         Type default_value, Type min_value
     );
-    SimpleIntegerOption(std::string label,
-                        LockMode lock_while_running,
+    SimpleIntegerOption(
+        std::string label,
+        LockMode lock_while_running,
         Type default_value, Type min_value, Type max_value
     );
 

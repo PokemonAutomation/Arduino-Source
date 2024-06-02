@@ -206,12 +206,18 @@ template class SimpleIntegerCell<uint16_t>;
 template class SimpleIntegerCell<uint32_t>;
 template class SimpleIntegerCell<uint64_t>;
 template class SimpleIntegerCell<int8_t>;
+template class SimpleIntegerCell<int16_t>;
+template class SimpleIntegerCell<int32_t>;
+template class SimpleIntegerCell<int64_t>;
 
 template class SimpleIntegerOption<uint8_t>;
 template class SimpleIntegerOption<uint16_t>;
 template class SimpleIntegerOption<uint32_t>;
 template class SimpleIntegerOption<uint64_t>;
 template class SimpleIntegerOption<int8_t>;
+template class SimpleIntegerOption<int16_t>;
+template class SimpleIntegerOption<int32_t>;
+template class SimpleIntegerOption<int64_t>;
 
 
 

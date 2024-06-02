@@ -122,12 +122,18 @@ template class SimpleIntegerCellWidget<uint16_t>;
 template class SimpleIntegerCellWidget<uint32_t>;
 template class SimpleIntegerCellWidget<uint64_t>;
 template class SimpleIntegerCellWidget<int8_t>;
+template class SimpleIntegerCellWidget<int16_t>;
+template class SimpleIntegerCellWidget<int32_t>;
+template class SimpleIntegerCellWidget<int64_t>;
 
 template class SimpleIntegerOptionWidget<uint8_t>;
 template class SimpleIntegerOptionWidget<uint16_t>;
 template class SimpleIntegerOptionWidget<uint32_t>;
 template class SimpleIntegerOptionWidget<uint64_t>;
 template class SimpleIntegerOptionWidget<int8_t>;
+template class SimpleIntegerOptionWidget<int16_t>;
+template class SimpleIntegerOptionWidget<int32_t>;
+template class SimpleIntegerOptionWidget<int64_t>;
 
 
 }
