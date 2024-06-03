@@ -550,6 +550,11 @@ ItemPrinterRNG::ItemPrinterRNG()
         LockMode::UNLOCK_WHILE_RUNNING, 750,
         0, 10000
     )
+    , ADJUST_DELAY(
+        "<b>Automatically adjust delay:</b><br>Adjust the delay, depending on the desired item and the actual print result. "
+        "This only works if the \"Desired Item\" column is used for selecting Date Seeds. ",
+        LockMode::UNLOCK_WHILE_RUNNING, true
+    )
     , GO_HOME_WHEN_DONE(false)
     , FIX_TIME_WHEN_DONE(
         "<b>Fix Time When Done:</b><br>Fix the time after the program finishes.",
@@ -568,6 +573,7 @@ ItemPrinterRNG::ItemPrinterRNG()
 //    PA_ADD_OPTION(DATE1);
     PA_ADD_OPTION(TABLE);
     PA_ADD_OPTION(DELAY_MILLIS);
+    PA_ADD_OPTION(ADJUST_DELAY);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(FIX_TIME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
@@ -680,8 +686,10 @@ void ItemPrinterRNG::run_print_at_date(
             env.update_stats();
             printed = true;
             std::array<std::string, 10> print_results = item_printer_finish_print(env.inference_dispatcher(), env.console, context, LANGUAGE);
-            uint64_t seed = to_seconds_since_epoch(date);
-            adjust_delay(print_results, seed);
+            if (ADJUST_DELAY){
+                uint64_t seed = to_seconds_since_epoch(date);
+                adjust_delay(print_results, seed, env.console);
+            }
 
 //            pbf_press_button(context, BUTTON_B, 20, 30);
             continue;
@@ -698,8 +706,11 @@ void ItemPrinterRNG::run_print_at_date(
     }
 }
 
-void ItemPrinterRNG::adjust_delay(std::array<std::string, 10> print_results, uint64_t seed){
-    DistanceFromTarget distance_from_target = get_distance_from_target(print_results, seed);
+void ItemPrinterRNG::adjust_delay(
+    std::array<std::string, 10> print_results, 
+    uint64_t seed, ConsoleHandle& console
+) {
+    DistanceFromTarget distance_from_target = get_distance_from_target(print_results, seed, console);
     int16_t delay_adjustment;
     int16_t current_delay_mills = DELAY_MILLIS;
     switch (distance_from_target){
@@ -728,12 +739,16 @@ void ItemPrinterRNG::adjust_delay(std::array<std::string, 10> print_results, uin
     if (new_delay < 0){
         new_delay = 0;
     }
-
     DELAY_MILLIS.set((uint16_t) new_delay);
+    console.log("Current delay: " + std::to_string(new_delay));
+    // std::cout << "Current delay:" << new_delay << std::endl;
     
 }
 
-DistanceFromTarget ItemPrinterRNG::get_distance_from_target(std::array<std::string, 10> print_results, uint64_t seed){
+DistanceFromTarget ItemPrinterRNG::get_distance_from_target(
+    std::array<std::string, 10> print_results, 
+    uint64_t seed, ConsoleHandle& console
+){
     DistanceFromTarget distance_from_target;
     std::array<std::string, 10> target_result;
     std::array<std::string, 10> target_result_plus_1;
@@ -741,10 +756,10 @@ DistanceFromTarget ItemPrinterRNG::get_distance_from_target(std::array<std::stri
     std::array<std::string, 10> target_result_plus_2;
     std::array<std::string, 10> target_result_minus_2;
     bool unknown_seed = false;
-    
+    std::string current_print;
     switch (seed){
     case 2346161588: // item bonus
-        std::cout << "Item bonus: ";
+        current_print = "Item bonus: ";
         target_result_minus_2 = {"stardust", "", "", "", "", "", "", "", "", ""};
         target_result_minus_1 = {"tiny-mushroom", "", "", "", "", "", "", "", "", ""};
         target_result = {"calcium", "", "", "", "", "", "", "", "", ""};
@@ -752,7 +767,7 @@ DistanceFromTarget ItemPrinterRNG::get_distance_from_target(std::array<std::stri
         target_result_plus_2 = {"electric-tera-shard", "", "", "", "", "", "", "", "", ""};
         break;
     case 1717461428: // ball bonus
-        std::cout << "Ball bonus: ";
+        current_print = "Ball bonus: ";
         target_result_minus_2 = {"balm-mushroom", "", "", "", "", "", "", "", "", ""};
         target_result_minus_1 = {"revive", "", "", "", "", "", "", "", "", ""};
         target_result = {"full-restore", "", "", "", "", "", "", "", "", ""};
@@ -760,7 +775,7 @@ DistanceFromTarget ItemPrinterRNG::get_distance_from_target(std::array<std::stri
         target_result_plus_2 = {"big-bamboo-shoot", "", "", "", "", "", "", "", "", ""};
         break;        
     case 958172368:
-        std::cout << "Ability patch: ";
+        current_print = "Ability patch: ";
         target_result_minus_2 = {"dark-tera-shard", "revive", "reaper-cloth", "ability-patch", "poison-tera-shard", "", "", "", "", ""};
         target_result_minus_1 = {"dark-tera-shard", "fire-tera-shard", "big-bamboo-shoot", "balm-mushroom", "super-potion", "", "", "", "", ""};
         target_result = {"dark-tera-shard", "ability-patch", "ability-patch", "ability-patch", "ability-patch", "", "", "", "", ""};
@@ -768,7 +783,7 @@ DistanceFromTarget ItemPrinterRNG::get_distance_from_target(std::array<std::stri
         target_result_plus_2 = {"dark-tera-shard", "water-stone", "max-potion", "tiny-mushroom", "electric-tera-shard", "", "", "", "", ""};
         break;
     case 1991472489:
-        std::cout << "EXP_CANDY: ";
+        current_print = "EXP_CANDY: ";
         target_result_minus_2 = {"exp-candy-xl", "tiny-bamboo-shoot", "exp-candy-s", "iron", "tiny-bamboo-shoot", "", "", "", "", ""};
         target_result_minus_1 = {"exp-candy-xl", "toxic-orb", "rare-bone", "silver-powder", "lucky-egg", "", "", "", "", ""};
         target_result         = {"exp-candy-xl", "protein", "exp-candy-l", "exp-candy-xl", "exp-candy-xl", "", "", "", "", ""};
@@ -776,7 +791,7 @@ DistanceFromTarget ItemPrinterRNG::get_distance_from_target(std::array<std::stri
         target_result_plus_2  = {"exp-candy-xl", "tiny-bamboo-shoot", "toxic-orb", "ice-stone", "charcoal", "", "", "", "", ""};
         break;
     case 2246577010:
-        std::cout << "NORMAL_TERA: ";
+        current_print = "NORMAL_TERA: ";
         target_result_minus_2 = {"normal-tera-shard", "exp-candy-l", "star-piece", "tiny-mushroom", "rock-tera-shard", "", "", "", "", ""};
         target_result_minus_1 = {"normal-tera-shard", "oval-stone", "ether", "stardust", "steel-tera-shard", "", "", "", "", ""};
         target_result         = {"normal-tera-shard", "normal-tera-shard", "normal-tera-shard", "normal-tera-shard", "normal-tera-shard", "", "", "", "", ""};
@@ -784,7 +799,7 @@ DistanceFromTarget ItemPrinterRNG::get_distance_from_target(std::array<std::stri
         target_result_plus_2  = {"normal-tera-shard", "dragon-tera-shard", "ice-tera-shard", "exp-candy-xl", "black-sludge", "", "", "", "", ""};
         break;
     case 2669513710:
-        std::cout << "FIRE_TERA: ";
+        current_print = "FIRE_TERA: ";
         target_result_minus_2 = {"fire-tera-shard", "flame-orb", "steel-tera-shard", "fire-stone", "max-revive", "", "", "", "", ""};
         target_result_minus_1 = {"fire-tera-shard", "exp-candy-xs", "miracle-seed", "sun-stone", "iron", "", "", "", "", ""};
         target_result         = {"fire-tera-shard", "fire-tera-shard", "fire-tera-shard", "fire-tera-shard", "honey", "", "", "", "", ""};
@@ -792,7 +807,7 @@ DistanceFromTarget ItemPrinterRNG::get_distance_from_target(std::array<std::stri
         target_result_plus_2  = {"fire-tera-shard", "rare-bone", "dubious-disc", "berry-sweet", "hp-up", "", "", "", "", ""};
         break;
     case 2419526534:
-        std::cout << "WATER_TERA: ";
+        current_print = "WATER_TERA: ";
         target_result_minus_2 = {"water-tera-shard", "exp-candy-xs", "flame-orb", "exp-candy-s", "honey", "", "", "", "", ""};
         target_result_minus_1 = {"water-tera-shard", "never-melt-ice", "rock-tera-shard", "hp-up", "sun-stone", "", "", "", "", ""};
         target_result         = {"water-tera-shard", "full-restore", "water-tera-shard", "flying-tera-shard", "water-tera-shard", "", "", "", "", ""};
@@ -800,7 +815,7 @@ DistanceFromTarget ItemPrinterRNG::get_distance_from_target(std::array<std::stri
         target_result_plus_2  = {"water-tera-shard", "ghost-tera-shard", "max-revive", "ground-tera-shard", "exp-candy-xl", "", "", "", "", ""};
         break;
     case 1300121653:
-        std::cout << "ELECTRIC_TERA: ";
+        current_print = "ELECTRIC_TERA: ";
         target_result_minus_2 = {"electric-tera-shard", "elixir", "full-restore", "upgrade", "toxic-orb", "", "", "", "", ""};
         target_result_minus_1 = {"electric-tera-shard", "exp-candy-xs", "steel-tera-shard", "big-mushroom", "exp-candy-s", "", "", "", "", ""};
         target_result         = {"electric-tera-shard", "light-clay", "electric-tera-shard", "electric-tera-shard", "electric-tera-shard", "", "", "", "", ""};
@@ -808,7 +823,7 @@ DistanceFromTarget ItemPrinterRNG::get_distance_from_target(std::array<std::stri
         target_result_plus_2  = {"electric-tera-shard", "max-potion", "charcoal", "exp-candy-xs", "grass-tera-shard", "", "", "", "", ""};
         break;                        
     case 1258326250:
-        std::cout << "GRASS_TERA: ";
+        current_print = "GRASS_TERA: ";
         target_result_minus_2 = {"grass-tera-shard", "pretty-feather", "exp-candy-m", "bug-tera-shard", "tiny-mushroom", "", "", "", "", ""};
         target_result_minus_1 = {"grass-tera-shard", "ghost-tera-shard", "bug-tera-shard", "silver-powder", "berry-sweet", "", "", "", "", ""};
         target_result         = {"grass-tera-shard", "tiny-mushroom", "grass-tera-shard", "grass-tera-shard", "grass-tera-shard", "", "", "", "", ""};
@@ -816,7 +831,7 @@ DistanceFromTarget ItemPrinterRNG::get_distance_from_target(std::array<std::stri
         target_result_plus_2  = {"grass-tera-shard", "exp-candy-xl", "exp-candy-xs", "zinc", "dragon-fang", "", "", "", "", ""};
         break; 
     case 2567326030:
-        std::cout << "ICE_TERA: ";
+        current_print = "ICE_TERA: ";
         target_result_minus_2 = {"ice-tera-shard", "pearl-string", "dragon-tera-shard", "sun-stone", "water-tera-shard", "", "", "", "", ""};
         target_result_minus_1 = {"ice-tera-shard", "scope-lens", "full-restore", "dubious-disc", "lucky-egg", "", "", "", "", ""};
         target_result         = {"ice-tera-shard", "ice-tera-shard", "ice-tera-shard", "ice-tera-shard", "metal-alloy", "", "", "", "", ""};
@@ -824,7 +839,7 @@ DistanceFromTarget ItemPrinterRNG::get_distance_from_target(std::array<std::stri
         target_result_plus_2  = {"ice-tera-shard", "exp-candy-xs", "rock-tera-shard", "loaded-dice", "Pretty Feather", "", "", "", "", ""};
         break;
     case 1510682535:
-        std::cout << "FIGHTING_TERA: ";
+        current_print = "FIGHTING_TERA: ";
         target_result_minus_2 = {"fairy-feather", "normal-tera-shard", "air-balloon", "poison-tera-shard", "pearl", "", "", "", "", ""};
         target_result_minus_1 = {"strawberry-sweet", "electric-tera-shard", "calcium", "revive", "ghost-tera-shard", "", "", "", "", ""};
         target_result         = {"fighting-tera-shard", "fighting-tera-shard", "fighting-tera-shard", "fighting-tera-shard", "shiny-stone", "", "", "", "", ""};
@@ -832,7 +847,7 @@ DistanceFromTarget ItemPrinterRNG::get_distance_from_target(std::array<std::stri
         target_result_plus_2  = {"rare-bone", "max-elixir", "leaf-stone", "metal-alloy", "magmarizer", "", "", "", "", ""};
         break;
     case 2041396572:
-        std::cout << "POISON_TERA: ";
+        current_print = "POISON_TERA: ";
         target_result_minus_2 = {"electirizer", "upgrade", "zinc", "elixir", "revive", "", "", "", "", ""};
         target_result_minus_1 = {"electirizer", "flame-orb", "magmarizer", "hp-up", "pretty-feather", "", "", "", "", ""};
         target_result         = {"electirizer", "poison-tera-shard", "poison-tera-shard", "poison-tera-shard", "poison-tera-shard", "", "", "", "", ""};
@@ -840,7 +855,7 @@ DistanceFromTarget ItemPrinterRNG::get_distance_from_target(std::array<std::stri
         target_result_plus_2  = {"electirizer", "fire-tera-shard", "revive", "big-bamboo-shoot", "dark-tera-shard", "", "", "", "", ""};
         break;
     case 1463321889:
-        std::cout << "GROUND_TERA: ";
+        current_print = "GROUND_TERA: ";
         target_result_minus_2 = {"pp-up", "pretty-feather", "max-ether", "big-pearl", "carbos", "", "", "", "", ""};
         target_result_minus_1 = {"pp-up", "spell-tag", "bug-tera-shard", "pearl", "fighting-tera-shard", "", "", "", "", ""};
         target_result         = {"pp-up", "ground-tera-shard", "ground-tera-shard", "ground-tera-shard", "ground-tera-shard", "", "", "", "", ""};
@@ -848,7 +863,7 @@ DistanceFromTarget ItemPrinterRNG::get_distance_from_target(std::array<std::stri
         target_result_plus_2  = {"pp-up", "ghost-tera-shard", "nugget", "safety-goggles", "leftovers", "", "", "", "", ""};
         break; 
     case 1580633500:
-        std::cout << "FLYING_TERA: ";
+        current_print = "FLYING_TERA: ";
         target_result_minus_2 = {"black-glasses", "big-nugget", "max-revive", "pearl-string", "balm-mushroom", "", "", "", "", ""};
         target_result_minus_1 = {"loaded-dice", "exp-candy-s", "strawberry-sweet", "never-melt-ice", "moon-stone", "", "", "", "", ""};
         target_result         = {"flying-tera-shard", "flying-tera-shard", "flying-tera-shard", "flying-tera-shard", "flying-tera-shard", "", "", "", "", ""};
@@ -856,7 +871,7 @@ DistanceFromTarget ItemPrinterRNG::get_distance_from_target(std::array<std::stri
         target_result_plus_2  = {"max-ether", "big-bamboo-shoot", "iron", "big-mushroom", "pearl", "", "", "", "", ""};
         break; 
     case 2190593713:
-        std::cout << "PSYCHIC_TERA: ";
+        current_print = "PSYCHIC_TERA: ";
         target_result_minus_2 = {"psychic-tera-shard", "big-mushroom", "fairy-feather", "fairy-tera-shard", "reaper-cloth", "", "", "", "", ""};
         target_result_minus_1 = {"psychic-tera-shard", "electric-tera-shard", "pearl", "stellar-tera-shard", "dawn-stone", "", "", "", "", ""};
         target_result         = {"psychic-tera-shard", "never-melt-ice", "psychic-tera-shard", "psychic-tera-shard", "psychic-tera-shard", "", "", "", "", ""};
@@ -864,7 +879,7 @@ DistanceFromTarget ItemPrinterRNG::get_distance_from_target(std::array<std::stri
         target_result_plus_2  = {"psychic-tera-shard", "heavy-duty-boots", "water-tera-shard", "rock-tera-shard", "twisted-spoon", "", "", "", "", ""};
         break;
     case 2458109848:
-        std::cout << "BUG_TERA: ";
+        current_print = "BUG_TERA: ";
         target_result_minus_2 = {"ether", "big-nugget", "mystic-water", "pretty-feather", "pretty-feather", "", "", "", "", ""};
         target_result_minus_1 = {"ether", "psychic-tera-shard", "exp-candy-s", "honey", "sharp-beak", "", "", "", "", ""};
         target_result         = {"ether", "bug-tera-shard", "bug-tera-shard", "bug-tera-shard", "bug-tera-shard", "", "", "", "", ""};
@@ -872,7 +887,7 @@ DistanceFromTarget ItemPrinterRNG::get_distance_from_target(std::array<std::stri
         target_result_plus_2  = {"ether", "exp-candy-xl", "normal-tera-shard", "fairy-tera-shard", "balm-mushroom", "", "", "", "", ""};
         break;
     case 2801954289:
-        std::cout << "ROCK_TERA: ";
+        current_print = "ROCK_TERA: ";
         target_result_minus_2 = {"max-revive", "scope-lens", "razor-claw", "big-nugget", "tiny-bamboo-shoot", "", "", "", "", ""};
         target_result_minus_1 = {"iron", "dark-tera-shard", "air-balloon", "rare-bone", "ability-patch", "", "", "", "", ""};
         target_result         = {"rock-tera-shard", "rock-tera-shard", "pretty-feather", "rock-tera-shard", "stardust", "", "", "", "", ""};
@@ -880,7 +895,7 @@ DistanceFromTarget ItemPrinterRNG::get_distance_from_target(std::array<std::stri
         target_result_plus_2  = {"heavy-duty-boots", "ice-tera-shard", "sun-stone", "dubious-disc", "pearl", "", "", "", "", ""};
         break;
     case 1509904271:
-        std::cout << "GHOST_TERA: ";
+        current_print = "GHOST_TERA: ";
         target_result_minus_2 = {"ghost-tera-shard", "hyper-potion", "toxic-orb", "magmarizer", "black-glasses", "", "", "", "", ""};
         target_result_minus_1 = {"ghost-tera-shard", "black-belt", "pp-up", "ice-tera-shard", "magmarizer", "", "", "", "", ""};
         target_result         = {"ghost-tera-shard", "ghost-tera-shard", "ghost-tera-shard", "magnet", "ghost-tera-shard", "", "", "", "", ""};
@@ -888,7 +903,7 @@ DistanceFromTarget ItemPrinterRNG::get_distance_from_target(std::array<std::stri
         target_result_plus_2  = {"ghost-tera-shard", "hp-up", "elixir", "water-tera-shard", "pp-up", "", "", "", "", ""};
         break;                        
     case 2155674309:
-        std::cout << "DRAGON_TERA: ";
+        current_print = "DRAGON_TERA: ";
         target_result_minus_2 = {"comet-shard", "soft-sand", "big-mushroom", "steel-tera-shard", "metronome", "", "", "", "", ""};
         target_result_minus_1 = {"pearl", "balm-mushroom", "moon-stone", "protein", "ability-patch", "", "", "", "", ""};
         target_result         = {"ability-patch", "dragon-tera-shard", "dragon-tera-shard", "dragon-tera-shard", "dragon-tera-shard", "", "", "", "", ""};
@@ -896,7 +911,7 @@ DistanceFromTarget ItemPrinterRNG::get_distance_from_target(std::array<std::stri
         target_result_plus_2  = {"spell-tag", "love-sweet", "fire-tera-shard", "ether", "black-belt", "", "", "", "", ""};
         break; 
     case 2537180413:
-        std::cout << "DARK_TERA: ";
+        current_print = "DARK_TERA: ";
         target_result_minus_2 = {"dark-tera-shard", "upgrade", "big-mushroom", "normal-tera-shard", "exp-candy-m", "", "", "", "", ""};
         target_result_minus_1 = {"dark-tera-shard", "pp-max", "calcium", "rock-tera-shard", "hard-stone", "", "", "", "", ""};
         target_result         = {"dark-tera-shard", "dark-tera-shard", "dark-tera-shard", "dark-tera-shard", "prism-scale", "", "", "", "", ""};
@@ -904,7 +919,7 @@ DistanceFromTarget ItemPrinterRNG::get_distance_from_target(std::array<std::stri
         target_result_plus_2  = {"dark-tera-shard", "ground-tera-shard", "fairy-tera-shard", "exp-candy-xs", "fighting-tera-shard", "", "", "", "", ""};
         break; 
     case 1766067369:
-        std::cout << "STEEL_TERA: ";
+        current_print = "STEEL_TERA: ";
         target_result_minus_2 = {"steel-tera-shard", "bug-tera-shard", "exp-candy-xl", "pretty-feather", "silk-scarf", "", "", "", "", ""};
         target_result_minus_1 = {"steel-tera-shard", "tiny-mushroom", "super-potion", "sharp-beak", "ice-tera-shard", "", "", "", "", ""};
         target_result         = {"steel-tera-shard", "steel-tera-shard", "steel-tera-shard", "steel-tera-shard", "berry-sweet", "", "", "", "", ""};
@@ -912,7 +927,7 @@ DistanceFromTarget ItemPrinterRNG::get_distance_from_target(std::array<std::stri
         target_result_plus_2  = {"steel-tera-shard", "metal-alloy", "ability-patch", "pp-up", "rare-bone", "", "", "", "", ""};
         break;
     case 2183028974:
-        std::cout << "FAIRY_TERA: ";
+        current_print = "FAIRY_TERA: ";
         target_result_minus_2 = {"max-elixir", "never-melt-ice", "pearl", "max-potion", "pp-up", "", "", "", "", ""};
         target_result_minus_1 = {"full-restore", "psychic-tera-shard", "gold-bottle-cap", "dawn-stone", "never-melt-ice", "", "", "", "", ""};
         target_result         = {"fairy-tera-shard", "fairy-tera-shard", "water-tera-shard", "tiny-bamboo-shoot", "fairy-tera-shard", "", "", "", "", ""};
@@ -920,7 +935,7 @@ DistanceFromTarget ItemPrinterRNG::get_distance_from_target(std::array<std::stri
         target_result_plus_2  = {"exp-candy-xl", "bug-tera-shard", "star-piece", "hp-up", "bug-tera-shard", "", "", "", "", ""};
         break;
     case 1165654034:
-        std::cout << "STELLAR_TERA: ";
+        current_print = "STELLAR_TERA: ";
         target_result_minus_2 = {"stellar-tera-shard", "pp-up", "scope-lens", "electric-tera-shard", "metronome", "", "", "", "", ""};
         target_result_minus_1 = {"stellar-tera-shard", "dragon-tera-shard", "honey", "steel-tera-shard", "max-potion", "", "", "", "", ""};
         target_result         = {"stellar-tera-shard", "max-revive", "stellar-tera-shard", "stellar-tera-shard", "clover-sweet", "", "", "", "", ""};
@@ -928,7 +943,7 @@ DistanceFromTarget ItemPrinterRNG::get_distance_from_target(std::array<std::stri
         target_result_plus_2  = {"stellar-tera-shard", "big-bamboo-shoot", "poison-tera-shard", "honey", "oval-stone", "", "", "", "", ""};
         break;
     case 1131363128:
-        std::cout << "MASTER_BALL: ";
+        current_print = "MASTER_BALL: ";
         target_result_minus_2 = {"master-ball", "great-ball", "quick-ball", "luxury-ball", "heal-ball", "", "", "", "", ""};
         target_result_minus_1 = {"master-ball", "great-ball", "timer-ball", "fast-ball", "love-ball", "", "", "", "", ""};
         target_result         = {"master-ball", "master-ball", "great-ball", "master-ball", "master-ball", "", "", "", "", ""};
@@ -936,7 +951,7 @@ DistanceFromTarget ItemPrinterRNG::get_distance_from_target(std::array<std::stri
         target_result_plus_2  = {"master-ball", "quick-ball", "poke-ball", "premier-ball", "poke-ball", "", "", "", "", ""};
         break;                        
     case 2493163222:
-        std::cout << "SAFARI_BALL: ";
+        current_print = "SAFARI_BALL: ";
         target_result_minus_2 = {"premier-ball", "great-ball", "lure-ball", "ultra-ball", "safari-ball", "", "", "", "", ""};
         target_result_minus_1 = {"premier-ball", "great-ball", "poke-ball", "poke-ball", "poke-ball", "", "", "", "", ""};
         target_result         = {"safari-ball", "safari-ball", "safari-ball", "safari-ball", "safari-ball", "", "", "", "", ""};
@@ -944,7 +959,7 @@ DistanceFromTarget ItemPrinterRNG::get_distance_from_target(std::array<std::stri
         target_result_plus_2  = {"great-ball", "great-ball", "level-ball", "poke-ball", "safari-ball", "", "", "", "", ""};
         break;       
     case 2040690819:
-        std::cout << "FAST_BALL: ";
+        current_print = "FAST_BALL: ";
         target_result_minus_2 = {"fast-ball", "lure-ball", "dream-ball", "friend-ball", "level-ball", "", "", "", "", ""};
         target_result_minus_1 = {"fast-ball", "great-ball", "quick-ball", "great-ball", "heal-ball", "", "", "", "", ""};
         target_result         = {"fast-ball", "fast-ball", "fast-ball", "fast-ball", "fast-ball", "", "", "", "", ""};
@@ -952,7 +967,7 @@ DistanceFromTarget ItemPrinterRNG::get_distance_from_target(std::array<std::stri
         target_result_plus_2  = {"fast-ball", "luxury-ball", "great-ball", "poke-ball", "premier-ball", "", "", "", "", ""};
         break;  
     case 2373357938:
-        std::cout << "LEVEL_BALL: ";
+        current_print = "LEVEL_BALL: ";
         target_result_minus_2 = {"dusk-ball", "heal-ball", "luxury-ball", "premier-ball", "poke-ball", "", "", "", "", ""};
         target_result_minus_1 = {"great-ball", "dive-ball", "dream-ball", "luxury-ball", "luxury-ball", "", "", "", "", ""};
         target_result         = {"level-ball", "level-ball", "level-ball", "level-ball", "level-ball", "", "", "", "", ""};
@@ -960,7 +975,7 @@ DistanceFromTarget ItemPrinterRNG::get_distance_from_target(std::array<std::stri
         target_result_plus_2  = {"luxury-ball", "master-ball", "premier-ball", "ultra-ball", "heal-ball", "", "", "", "", ""};
         break;  
     case 2773542517:
-        std::cout << "LURE_BALL: ";
+        current_print = "LURE_BALL: ";
         target_result_minus_2 = {"lure-ball", "premier-ball", "premier-ball", "great-ball", "poke-ball", "", "", "", "", ""};
         target_result_minus_1 = {"dream-ball", "poke-ball", "poke-ball", "luxury-ball", "poke-ball", "", "", "", "", ""};
         target_result         = {"lure-ball", "lure-ball", "lure-ball", "lure-ball", "lure-ball", "", "", "", "", ""};
@@ -968,7 +983,7 @@ DistanceFromTarget ItemPrinterRNG::get_distance_from_target(std::array<std::stri
         target_result_plus_2  = {"timer-ball", "safari-ball", "dive-ball", "poke-ball", "premier-ball", "", "", "", "", ""};
         break;       
     case 1879588391:
-        std::cout << "HEAVY_BALL: ";
+        current_print = "HEAVY_BALL: ";
         target_result_minus_2 = {"heavy-ball", "nest-ball", "nest-ball", "heal-ball", "luxury-ball", "", "", "", "", ""};
         target_result_minus_1 = {"heavy-ball", "poke-ball", "premier-ball", "premier-ball", "heal-ball", "", "", "", "", ""};
         target_result         = {"heavy-ball", "heavy-ball", "heavy-ball", "heavy-ball", "heavy-ball", "", "", "", "", ""};
@@ -976,7 +991,7 @@ DistanceFromTarget ItemPrinterRNG::get_distance_from_target(std::array<std::stri
         target_result_plus_2  = {"heavy-ball", "ultra-ball", "heal-ball", "quick-ball", "beast-ball", "", "", "", "", ""};
         break;  
     case 1684733771:
-        std::cout << "LOVE_BALL: ";
+        current_print = "LOVE_BALL: ";
         target_result_minus_2 = {"love-ball", "sport-ball", "great-ball", "poke-ball", "poke-ball", "", "", "", "", ""};
         target_result_minus_1 = {"love-ball", "poke-ball", "great-ball", "luxury-ball", "master-ball", "", "", "", "", ""};
         target_result         = {"love-ball", "love-ball", "love-ball", "love-ball", "love-ball", "", "", "", "", ""};
@@ -984,7 +999,7 @@ DistanceFromTarget ItemPrinterRNG::get_distance_from_target(std::array<std::stri
         target_result_plus_2  = {"love-ball", "luxury-ball", "premier-ball", "poke-ball", "quick-ball", "", "", "", "", ""};
         break; 
     case 2428107797:
-        std::cout << "FRIEND_BALL: ";
+        current_print = "FRIEND_BALL: ";
         target_result_minus_2 = {"friend-ball", "great-ball", "sport-ball", "great-ball", "great-ball", "", "", "", "", ""};
         target_result_minus_1 = {"friend-ball", "premier-ball", "heal-ball", "repeat-ball", "nest-ball", "", "", "", "", ""};
         target_result         = {"friend-ball", "friend-ball", "friend-ball", "friend-ball", "friend-ball", "", "", "", "", ""};
@@ -992,7 +1007,7 @@ DistanceFromTarget ItemPrinterRNG::get_distance_from_target(std::array<std::stri
         target_result_plus_2  = {"friend-ball", "heal-ball", "great-ball", "beast-ball", "moon-ball", "", "", "", "", ""};
         break;       
     case 2296878993:
-        std::cout << "MOON_BALL: ";
+        current_print = "MOON_BALL: ";
         target_result_minus_2 = {"luxury-ball", "timer-ball", "premier-ball", "luxury-ball", "poke-ball", "", "", "", "", ""};
         target_result_minus_1 = {"nest-ball", "poke-ball", "heal-ball", "premier-ball", "premier-ball", "", "", "", "", ""};
         target_result         = {"moon-ball", "moon-ball", "moon-ball", "moon-ball", "moon-ball", "", "", "", "", ""};
@@ -1000,7 +1015,7 @@ DistanceFromTarget ItemPrinterRNG::get_distance_from_target(std::array<std::stri
         target_result_plus_2  = {"lure-ball", "heavy-ball", "luxury-ball", "heal-ball", "poke-ball", "", "", "", "", ""};
         break;  
     case 1244233031:
-        std::cout << "SPORT_BALL: ";
+        current_print = "SPORT_BALL: ";
         target_result_minus_2 = {"sport-ball", "heal-ball", "luxury-ball", "great-ball", "heal-ball", "", "", "", "", ""};
         target_result_minus_1 = {"sport-ball", "dream-ball", "level-ball", "poke-ball", "luxury-ball", "", "", "", "", ""};
         target_result         = {"sport-ball", "sport-ball", "sport-ball", "sport-ball", "sport-ball", "", "", "", "", ""};
@@ -1008,7 +1023,7 @@ DistanceFromTarget ItemPrinterRNG::get_distance_from_target(std::array<std::stri
         target_result_plus_2  = {"moon-ball", "poke-ball", "ultra-ball", "poke-ball", "great-ball", "", "", "", "", ""};
         break;    
     case 2657784681:
-        std::cout << "DREAM_BALL: ";
+        current_print = "DREAM_BALL: ";
         target_result_minus_2 = {"master-ball", "poke-ball", "luxury-ball", "level-ball", "dream-ball", "", "", "", "", ""};
         target_result_minus_1 = {"timer-ball", "beast-ball", "poke-ball", "premier-ball", "heal-ball", "", "", "", "", ""};
         target_result         = {"dream-ball", "dream-ball", "dream-ball", "dream-ball", "dream-ball", "", "", "", "", ""};
@@ -1016,7 +1031,7 @@ DistanceFromTarget ItemPrinterRNG::get_distance_from_target(std::array<std::stri
         target_result_plus_2  = {"luxury-ball", "poke-ball", "luxury-ball", "quick-ball", "friend-ball", "", "", "", "", ""};
         break;  
     case 2117201835:
-        std::cout << "BEAST_BALL: ";
+        current_print = "BEAST_BALL: ";
         target_result_minus_2 = {"luxury-ball", "poke-ball", "lure-ball", "master-ball", "dive-ball", "", "", "", "", ""};
         target_result_minus_1 = {"heavy-ball", "premier-ball", "premier-ball", "poke-ball", "level-ball", "", "", "", "", ""};
         target_result         = {"beast-ball", "beast-ball", "beast-ball", "beast-ball", "beast-ball", "", "", "", "", ""};
@@ -1025,7 +1040,7 @@ DistanceFromTarget ItemPrinterRNG::get_distance_from_target(std::array<std::stri
         break;       
     default:
         unknown_seed = true;
-        std::cout << "Unknown seed. can't calculate distance from target." << std::endl;
+        console.log("Unknown seed. Can't calculate distance from target.");
         break;
     }
 
@@ -1035,27 +1050,27 @@ DistanceFromTarget ItemPrinterRNG::get_distance_from_target(std::array<std::stri
 
     if (print_results == target_result){
         distance_from_target = DistanceFromTarget::ON_TARGET;
-        std::cout << "on target." << std::endl;
+        console.log("Attempted to get " + current_print + "Success. On target.");
     }
     else if (print_results == target_result_plus_1){
         distance_from_target = DistanceFromTarget::PLUS_1;
-        std::cout << "target +1." << std::endl;
+        console.log("Attempted to get " + current_print + "Missed. Target +1.");
     }
     else if (print_results == target_result_minus_1){
         distance_from_target = DistanceFromTarget::MINUS_1;
-        std::cout << "target -1." << std::endl;
+        console.log("Attempted to get " + current_print + "Missed. Target -1.");
     }
     else if (print_results == target_result_plus_2){
         distance_from_target = DistanceFromTarget::PLUS_2;
-        std::cout << "target +2." << std::endl;
+        console.log("Attempted to get " + current_print + "Missed. Target +2.");
     }
     else if (print_results == target_result_minus_2){
         distance_from_target = DistanceFromTarget::MINUS_2;
-        std::cout << "target -2." << std::endl;
+        console.log("Attempted to get " + current_print + "Missed. Target -2.");
     }
     else {
         distance_from_target = DistanceFromTarget::UNKNOWN;
-        std::cout << "unknown distance from target." << std::endl;
+        console.log("Attempted to get " + current_print + "Missed. Unknown distance from target.");
     }
 
     return distance_from_target;
