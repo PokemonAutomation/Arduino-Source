@@ -39,6 +39,7 @@ void get_egg(int boxCol) {
     };
     pbf_press_dpad(DPAD_DOWN, 20, 400);
     pbf_press_button(BUTTON_A, 20, 400);
+    pbf_wait(500);
     pbf_mash_button(BUTTON_B,600);
     
 };
