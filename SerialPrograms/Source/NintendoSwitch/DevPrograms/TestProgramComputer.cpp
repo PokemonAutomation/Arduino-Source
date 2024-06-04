@@ -123,6 +123,7 @@
 #include "NintendoSwitch/Inference/NintendoSwitch_DetectHome.h"
 #include "PokemonSV/Inference/Picnics/PokemonSV_SandwichRecipeDetector.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_BattleMenu.h"
+#include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonSelectMenu.h"
 #include "PokemonSV/Inference/PokemonSV_PokemonSummaryReader.h"
 #include "Pokemon/Pokemon_StatsCalculation.h"
 #include "PokemonSV/Inference/PokemonSV_StatHexagonReader.h"
@@ -237,6 +238,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     using namespace Pokemon;
     using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
 
+#if 0
     JsonValue json = load_json_file("ItemPrinterOCR.json");
     JsonObject& obj = json.get_object_throw();
     JsonObject& jpn0 = obj.get_object_throw("jpn");
@@ -254,14 +256,18 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
             cout << "mismatch found: " << arr0[0].get_string_throw() << " : " << arr1[0].get_string_throw() << endl;
         }
     }
+    #endif
 
 
 
-#if 0
-    ImageRGB32 image("20231230-221510445509-ProgramHang.png");
+#if 1
+    ImageRGB32 image("screenshot-20240605-000823122811.png");
 
-    BattleMenuDetector detector;
+    PokemonSwSh::MaxLairInternal::PokemonSelectMenuDetector detector(false);
     cout << detector.detect(image) << endl;
+
+//    BattleMenuDetector detector;
+//    cout << detector.detect(image) << endl;
 #endif
 
 

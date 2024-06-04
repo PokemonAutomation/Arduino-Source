@@ -13,6 +13,10 @@
 #include "PokemonSwSh_MaxLair_Detect_PokemonReader.h"
 #include "PokemonSwSh_MaxLair_Detect_PokemonSelectMenu.h"
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
@@ -25,7 +29,7 @@ PokemonSelectMenuDetector::PokemonSelectMenuDetector(bool stop_no_detect)
     , m_box0(0.02, 0.02, 0.40, 0.04)
 //    , m_box1(overlay, 0.09, 0.18, 0.30, 0.10)
     , m_box1(0.10, 0.18, 0.27, 0.12)
-    , m_box2(0.50, 0.02, 0.20, 0.03)
+    , m_box2(0.50, 0.02, 0.15, 0.03)
     , m_box3(0.55, 0.07, 0.10, 0.05)
 //    , m_box4(overlay, 0.87, 0.17, 0.03, 0.20)
 //    , m_box5(overlay, 0.87, 0.43, 0.03, 0.20)
