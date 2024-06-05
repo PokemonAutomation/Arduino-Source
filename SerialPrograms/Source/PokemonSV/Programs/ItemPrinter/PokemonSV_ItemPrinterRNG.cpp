@@ -707,7 +707,7 @@ void ItemPrinterRNG::run_print_at_date(
 }
 
 void ItemPrinterRNG::adjust_delay(
-    std::array<std::string, 10> print_results, 
+    const std::array<std::string, 10>& print_results, 
     uint64_t seed, ConsoleHandle& console
 ) {
     DistanceFromTarget distance_from_target = get_distance_from_target(print_results, seed, console);
@@ -746,7 +746,7 @@ void ItemPrinterRNG::adjust_delay(
 }
 
 DistanceFromTarget ItemPrinterRNG::get_distance_from_target(
-    std::array<std::string, 10> print_results, 
+    const std::array<std::string, 10>& print_results, 
     uint64_t seed, ConsoleHandle& console
 ){
     DistanceFromTarget distance_from_target;
@@ -755,7 +755,12 @@ DistanceFromTarget ItemPrinterRNG::get_distance_from_target(
     std::array<std::string, 10> target_result_minus_1;
     std::array<std::string, 10> target_result_plus_2;
     std::array<std::string, 10> target_result_minus_2;
+
+    // allow 1 misread/mismatch for all prints, except for the 
+    // item and ball bonuses, since they only print 1.
+    uint8_t max_number_of_mismatches = 1; 
     bool unknown_seed = false;
+
     std::string current_print;
     switch (seed){
     case 2346161588: // item bonus
@@ -765,6 +770,7 @@ DistanceFromTarget ItemPrinterRNG::get_distance_from_target(
         target_result = {"calcium", "", "", "", "", "", "", "", "", ""};
         target_result_plus_1 = {"max-ether", "", "", "", "", "", "", "", "", ""};
         target_result_plus_2 = {"electric-tera-shard", "", "", "", "", "", "", "", "", ""};
+        max_number_of_mismatches = 0;
         break;
     case 1717461428: // ball bonus
         current_print = "Ball bonus: ";
@@ -773,6 +779,7 @@ DistanceFromTarget ItemPrinterRNG::get_distance_from_target(
         target_result = {"full-restore", "", "", "", "", "", "", "", "", ""};
         target_result_plus_1 = {"fairy-tera-shard", "", "", "", "", "", "", "", "", ""};
         target_result_plus_2 = {"big-bamboo-shoot", "", "", "", "", "", "", "", "", ""};
+        max_number_of_mismatches = 0;
         break;        
     case 958172368:
         current_print = "Ability patch: ";
@@ -1048,32 +1055,53 @@ DistanceFromTarget ItemPrinterRNG::get_distance_from_target(
         return DistanceFromTarget::UNKNOWN;
     }
 
-    if (print_results == target_result){
+    if(check_print_results_match(print_results, target_result, max_number_of_mismatches)){
         distance_from_target = DistanceFromTarget::ON_TARGET;
         console.log("Attempted to get " + current_print + "Success. On target.");
     }
-    else if (print_results == target_result_plus_1){
+    else if(check_print_results_match(print_results, target_result_plus_1, max_number_of_mismatches)){
         distance_from_target = DistanceFromTarget::PLUS_1;
         console.log("Attempted to get " + current_print + "Missed. Target +1.");
     }
-    else if (print_results == target_result_minus_1){
+    else if(check_print_results_match(print_results, target_result_minus_1, max_number_of_mismatches)){
         distance_from_target = DistanceFromTarget::MINUS_1;
         console.log("Attempted to get " + current_print + "Missed. Target -1.");
     }
-    else if (print_results == target_result_plus_2){
+    else if(check_print_results_match(print_results, target_result_plus_2, max_number_of_mismatches)){
         distance_from_target = DistanceFromTarget::PLUS_2;
         console.log("Attempted to get " + current_print + "Missed. Target +2.");
     }
-    else if (print_results == target_result_minus_2){
+    else if(check_print_results_match(print_results, target_result_minus_2, max_number_of_mismatches)){
         distance_from_target = DistanceFromTarget::MINUS_2;
         console.log("Attempted to get " + current_print + "Missed. Target -2.");
     }
-    else {
+    else{
         distance_from_target = DistanceFromTarget::UNKNOWN;
         console.log("Attempted to get " + current_print + "Missed. Unknown distance from target.");
     }
 
     return distance_from_target;
+}
+
+
+// - return true if print_results matches with expected_result
+// - the lists don't have to match exactly, as long as current_number_of_mismatches <= max_number_of_mismatches
+bool ItemPrinterRNG::check_print_results_match(
+    const std::array<std::string, 10>& print_results, 
+    const std::array<std::string, 10>& expected_result,
+    uint8_t max_number_of_mismatches
+) {
+    uint8_t current_number_of_mismatches = 0;
+    for (uint8_t i = 0; i < 10; i++){
+        if(print_results.at(i) != expected_result.at(i)){
+            current_number_of_mismatches++;
+            if(current_number_of_mismatches > max_number_of_mismatches){
+                return false;
+            }
+        }
+    }
+
+    return true;
 }
 
 void ItemPrinterRNG::print_again(
