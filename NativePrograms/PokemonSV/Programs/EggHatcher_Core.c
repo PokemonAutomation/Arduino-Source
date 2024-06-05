@@ -70,7 +70,7 @@ void ride_hatch(void) {
     // hatch the first egg at full speed, sometimes the speed boost can fail %point for optimizing%
     pbf_move_left_joystick(STICK_MAX, STICK_CENTER, 50, 0);
     pbf_press_button(BUTTON_LCLICK, 5, 0);
-    pbf_move_left_joystick(STICK_MAX, STICK_CENTER, STEPS_TO_HATCH * SAFETY_COEFF *1.9 , 0);
+    pbf_move_left_joystick(STICK_MAX, STICK_CENTER, STEPS_TO_HATCH * 1.9 * SAFETY_COEFF , 0);
     // hatch the remaining 4 eggs, not speed boosted to reduce error due to random positioning
     for (int checkEggLoop = 0; checkEggLoop < 90; checkEggLoop++) {
         pbf_move_left_joystick(STICK_MAX, STICK_CENTER, 220, 0);
