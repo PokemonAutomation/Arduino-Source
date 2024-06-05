@@ -66,6 +66,15 @@ enum class ItemPrinterItems{
     SPORT_BALL,
 };
 
+enum class DistanceFromTarget{
+    UNKNOWN,
+    ON_TARGET,
+    MINUS_1,
+    MINUS_2,
+    PLUS_1,
+    PLUS_2,
+};
+
 
 void item_printer_start_print(
     ConsoleHandle& console, BotBaseContext& context,

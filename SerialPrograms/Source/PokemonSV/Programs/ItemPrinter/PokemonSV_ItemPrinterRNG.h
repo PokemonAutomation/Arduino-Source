@@ -75,13 +75,28 @@ private:
     void run_print_at_date(
         SingleSwitchProgramEnvironment& env, BotBaseContext& context,
         const DateTime& date, ItemPrinterJobs jobs
-    ) const;
+    );
 
     void print_again(
         SingleSwitchProgramEnvironment& env, BotBaseContext& context,
         ItemPrinterJobs jobs
     ) const;
 
+    void adjust_delay(
+        const std::array<std::string, 10>& print_results, 
+        uint64_t seed, ConsoleHandle& console
+    );
+
+    DistanceFromTarget get_distance_from_target(
+        const std::array<std::string, 10>& print_results, 
+        uint64_t seed, ConsoleHandle& console
+    );
+
+    bool check_print_results_match(
+        const std::array<std::string, 10>& print_results, 
+        const std::array<std::string, 10>& expected_result, 
+        uint8_t max_number_of_mismatches
+    );
 
 private:
     OCR::LanguageOCROption LANGUAGE;
@@ -92,6 +107,7 @@ private:
     ItemPrinterRngTable TABLE;
 
     SimpleIntegerOption<uint16_t> DELAY_MILLIS;
+    BooleanCheckBoxOption ADJUST_DELAY;
 
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
     BooleanCheckBoxOption FIX_TIME_WHEN_DONE;
