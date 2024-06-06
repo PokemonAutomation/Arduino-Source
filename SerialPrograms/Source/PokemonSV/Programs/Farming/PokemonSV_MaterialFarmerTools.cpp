@@ -681,7 +681,7 @@ void move_from_blueberry_entrance_to_league_club(SingleSwitchProgramEnvironment&
         int ret = wait_until(env.console, context, Milliseconds(5000), { select_entrance });
         if (ret == 0){
             env.log("Blueberry navigation menu detected.");
-        } else {
+        }else{
             env.console.log("Failed to detect Blueberry navigation menu.");
             continue;
         }
@@ -695,7 +695,7 @@ void move_from_blueberry_entrance_to_league_club(SingleSwitchProgramEnvironment&
         ret = wait_until(env.console, context, Milliseconds(5000), { select_league_club });
         if (ret == 0){
             env.log("League club room selected.");
-        } else {
+        }else{
             env.console.log("Failed to select League club room in navigation menu.");
             continue;            
         }
@@ -707,7 +707,7 @@ void move_from_blueberry_entrance_to_league_club(SingleSwitchProgramEnvironment&
         ret = wait_until(env.console, context, Milliseconds(10000), { overworld });
         if (ret == 0){
             env.log("Entered League club room.");
-        } else {
+        }else{
             env.console.log("Failed to enter League club room from menu selection.");
             continue;            
         }
@@ -766,7 +766,7 @@ void move_from_item_printer_to_blueberry_entrance(SingleSwitchProgramEnvironment
     int ret = wait_until(env.console, context, Milliseconds(5000), { select_entrance }, Milliseconds(1000));
     if (ret == 0){
         env.log("Blueberry navigation menu detected.");
-    } else {
+    }else{
         env.console.log("Failed to detect Blueberry navigation menu.");
         throw OperationFailedException(
             ErrorReport::SEND_ERROR_REPORT, env.console,
@@ -783,7 +783,7 @@ void move_from_item_printer_to_blueberry_entrance(SingleSwitchProgramEnvironment
     ret = wait_until(env.console, context, Milliseconds(10000), { overworld });
     if (ret == 0){
         env.log("Overworld detected");
-    } else {
+    }else{
         throw OperationFailedException(
             ErrorReport::SEND_ERROR_REPORT, env.console,
             "Failed to detect overworld.",

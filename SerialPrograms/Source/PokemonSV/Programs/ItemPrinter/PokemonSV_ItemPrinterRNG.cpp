@@ -520,10 +520,12 @@ ItemPrinterRNG::ItemPrinterRNG()
         LockMode::UNLOCK_WHILE_RUNNING,
         true
     )
-    , TOTAL_ROUNDS(
-        "<b>Total Rounds per item printer session:</b><br>Iterate the rounds table this many times. "
-        "Then stop the program, or proceed to material farming (if enabled).",
+    , NUM_ITEM_PRINTER_ROUNDS(
+        "<b>Number of rounds per Item Printer session:</b><br>Iterate the rounds table this many times. ",
         LockMode::UNLOCK_WHILE_RUNNING, 10
+    )
+    , AFTER_ITEM_PRINTER_DONE_EXPLANATION(
+        "Then proceed to material farming."
     )
 #if 0
     , DATE0(
@@ -566,17 +568,24 @@ ItemPrinterRNG::ItemPrinterRNG()
         LockMode::UNLOCK_WHILE_RUNNING, true
     )
     , AUTO_MATERIAL_FARMING(
-        "<b>Auto material gathering:</b><br>"
+        "<b>Automatic Material Farming:</b><br>"
         "After using the item printer, automatically fly to North Province (Area 3) to farm materials, "
         "then fly back to keep using the item printer.",
+        // "This will do the item printer loops, then the material farmer loops, then repeat.<br>",
+        // "The number of item printer loops is set by \"Number of rounds per Item Printer session\".<br>"
+        // "The number of material farmer loops is set by \"Number of sandwich rounds to run\".<br>"
+        // "The number of Item Printer to Material Farmer loops is set by \"Number of rounds of Item Printer → Material farm\".",
         LockMode::LOCK_WHILE_RUNNING,
-        true
+        false
     )
-    , NUM_MATERIAL_FARM_ROUNDS(
-        "<b>Number Material farm rounds:</b><br>"
-        "One round is: Doing one item printer session (as per 'Total Rounds' entered above), "
-        "then farming materials at North Provice area 3 (as per 'Number of sandwich rounds' entered below), "
-        "then flying back to the item printer.",
+    , NUM_ROUNDS_OF_ITEM_PRINTER_TO_MATERIAL_FARM(
+        "<b>Number of rounds of Item Printer → Material farm:</b><br>"
+        "One round is: Using the item printer (looping through the table for as many rounds as you specify below), "
+        "then farming materials at North Provice area 3, "
+        "then flying back to the item printer.<br>"
+        "Automatic Material Farming (see above) must be enabled",
+        // (as per \"Number of rounds per Item Printer session\" below)
+        //(as per \"Number of sandwich rounds\" below, under \"Material Farmer\")
         LockMode::UNLOCK_WHILE_RUNNING,
         3
     )
@@ -586,6 +595,7 @@ ItemPrinterRNG::ItemPrinterRNG()
         &NOTIFICATION_PROGRAM_FINISH,
         &NOTIFICATION_ERROR_FATAL,
     })
+    , MATERIAL_FARMER_DISABLED_EXPLANATION("")
     , MATERIAL_FARMER_OPTIONS(
         LANGUAGE, GO_HOME_WHEN_DONE, 
         NOTIFICATION_STATUS_UPDATE, NOTIFICATION_PROGRAM_FINISH,
@@ -593,7 +603,11 @@ ItemPrinterRNG::ItemPrinterRNG()
     )
 {
     PA_ADD_OPTION(LANGUAGE);
-    PA_ADD_OPTION(TOTAL_ROUNDS);
+
+    PA_ADD_OPTION(AUTO_MATERIAL_FARMING);
+    PA_ADD_OPTION(NUM_ROUNDS_OF_ITEM_PRINTER_TO_MATERIAL_FARM);
+    PA_ADD_OPTION(NUM_ITEM_PRINTER_ROUNDS);
+    PA_ADD_OPTION(AFTER_ITEM_PRINTER_DONE_EXPLANATION);
 //    PA_ADD_OPTION(DATE0);
 //    PA_ADD_OPTION(DATE1);
     PA_ADD_OPTION(TABLE);
@@ -602,8 +616,7 @@ ItemPrinterRNG::ItemPrinterRNG()
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(FIX_TIME_WHEN_DONE);
 
-    PA_ADD_OPTION(AUTO_MATERIAL_FARMING);
-    PA_ADD_OPTION(NUM_MATERIAL_FARM_ROUNDS);
+    PA_ADD_OPTION(MATERIAL_FARMER_DISABLED_EXPLANATION);
     PA_ADD_OPTION(MATERIAL_FARMER_OPTIONS);
 
     PA_ADD_OPTION(NOTIFICATIONS);
@@ -613,9 +626,16 @@ ItemPrinterRNG::ItemPrinterRNG()
 }
 
 void ItemPrinterRNG::value_changed(){
-    ConfigOptionState state = AUTO_MATERIAL_FARMING ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN;
+    ConfigOptionState state = AUTO_MATERIAL_FARMING ? ConfigOptionState::ENABLED : ConfigOptionState::DISABLED;
     MATERIAL_FARMER_OPTIONS.set_visibility(state);
-    NUM_MATERIAL_FARM_ROUNDS.set_visibility(state);
+    NUM_ROUNDS_OF_ITEM_PRINTER_TO_MATERIAL_FARM.set_visibility(state);
+    if (AUTO_MATERIAL_FARMING){
+        AFTER_ITEM_PRINTER_DONE_EXPLANATION.set_text("Then proceed to material farming.");
+        MATERIAL_FARMER_DISABLED_EXPLANATION.set_text("<br>");
+    }else{
+        AFTER_ITEM_PRINTER_DONE_EXPLANATION.set_text("Then stop the program.");
+        MATERIAL_FARMER_DISABLED_EXPLANATION.set_text("<br>To enable the Material Farmer, enable \"Automatic Material Farming\" above");
+    }
 }
 
 
@@ -1097,24 +1117,19 @@ DistanceFromTarget ItemPrinterRNG::get_distance_from_target(
     if(check_print_results_match(print_results, target_result, max_number_of_mismatches)){
         distance_from_target = DistanceFromTarget::ON_TARGET;
         console.log("Attempted to get " + current_print + "Success. On target.");
-    }
-    else if(check_print_results_match(print_results, target_result_plus_1, max_number_of_mismatches)){
+    }else if (check_print_results_match(print_results, target_result_plus_1, max_number_of_mismatches)){
         distance_from_target = DistanceFromTarget::PLUS_1;
         console.log("Attempted to get " + current_print + "Missed. Target +1.");
-    }
-    else if(check_print_results_match(print_results, target_result_minus_1, max_number_of_mismatches)){
+    }else if (check_print_results_match(print_results, target_result_minus_1, max_number_of_mismatches)){
         distance_from_target = DistanceFromTarget::MINUS_1;
         console.log("Attempted to get " + current_print + "Missed. Target -1.");
-    }
-    else if(check_print_results_match(print_results, target_result_plus_2, max_number_of_mismatches)){
+    }else if (check_print_results_match(print_results, target_result_plus_2, max_number_of_mismatches)){
         distance_from_target = DistanceFromTarget::PLUS_2;
         console.log("Attempted to get " + current_print + "Missed. Target +2.");
-    }
-    else if(check_print_results_match(print_results, target_result_minus_2, max_number_of_mismatches)){
+    }else if (check_print_results_match(print_results, target_result_minus_2, max_number_of_mismatches)){
         distance_from_target = DistanceFromTarget::MINUS_2;
         console.log("Attempted to get " + current_print + "Missed. Target -2.");
-    }
-    else{
+    }else{
         distance_from_target = DistanceFromTarget::UNKNOWN;
         console.log("Attempted to get " + current_print + "Missed. Unknown distance from target.");
     }
@@ -1204,7 +1219,7 @@ void ItemPrinterRNG::run_item_printer_rng(
     SingleSwitchProgramEnvironment& env, BotBaseContext& context, 
     ItemPrinterRNG_Descriptor::Stats& stats
 ){
-    for (uint32_t c = 0; c < TOTAL_ROUNDS; c++){
+    for (uint32_t c = 0; c < NUM_ITEM_PRINTER_ROUNDS; c++){
         std::vector<ItemPrinterRngRowSnapshot> table = TABLE.snapshot<ItemPrinterRngRowSnapshot>();
         for (const ItemPrinterRngRowSnapshot& row : table){
             if (row.chain){
@@ -1251,7 +1266,7 @@ void ItemPrinterRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext
 
         // Don't allow the material farmer stats to affect the Item Printer's stats.
         MaterialFarmer_Descriptor::Stats mat_farm_stats;// = env.current_stats<MaterialFarmer_Descriptor::Stats>();
-        for (int i = 0; i < NUM_MATERIAL_FARM_ROUNDS; i++){
+        for (int i = 0; i < NUM_ROUNDS_OF_ITEM_PRINTER_TO_MATERIAL_FARM; i++){
             run_item_printer_rng(env, context, stats);
             press_Bs_to_back_to_overworld(env.program_info(), env.console, context);
             move_from_item_printer_to_material_farming(env, context);

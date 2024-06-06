@@ -106,7 +106,8 @@ private:
 
 private:
     OCR::LanguageOCROption LANGUAGE;
-    SimpleIntegerOption<uint16_t> TOTAL_ROUNDS;
+    SimpleIntegerOption<uint16_t> NUM_ITEM_PRINTER_ROUNDS;
+    StaticTextOption AFTER_ITEM_PRINTER_DONE_EXPLANATION;
 
 //    DateTimeOption DATE0;
 //    DateTimeOption DATE1;
@@ -119,11 +120,12 @@ private:
     BooleanCheckBoxOption FIX_TIME_WHEN_DONE;
 
     BooleanCheckBoxOption AUTO_MATERIAL_FARMING;
-    SimpleIntegerOption<uint16_t> NUM_MATERIAL_FARM_ROUNDS;
+    SimpleIntegerOption<uint16_t> NUM_ROUNDS_OF_ITEM_PRINTER_TO_MATERIAL_FARM;
     
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;
     
+    StaticTextOption MATERIAL_FARMER_DISABLED_EXPLANATION;
     MaterialFarmerOptions MATERIAL_FARMER_OPTIONS;
 };
 
