@@ -42,6 +42,11 @@ namespace PokemonSV{
 
 using namespace Pokemon;
 
+
+MaterialFarmerOptions::~MaterialFarmerOptions(){
+    ENABLE_SANDWICH.remove_listener(*this);
+}
+
 MaterialFarmerOptions::MaterialFarmerOptions(
     OCR::LanguageOCROption* language_option, GoHomeWhenDoneOption* go_home_when_done_option,
     EventNotificationOption* notif_status_update_option, EventNotificationOption* notif_program_finish_option, 
@@ -97,18 +102,17 @@ MaterialFarmerOptions::MaterialFarmerOptions(
         : nullptr
     )
     , SAVE_GAME_BEFORE_SANDWICH(
-        "<b>Save Game before each sandwich:</b><br>"
-        "Recommended to leave on, as the sandwich maker will reset the game if it detects an error.",
-        LockMode::LOCK_WHILE_RUNNING,
+        "<b>Save Game before each round:</b>",
+        LockMode::UNLOCK_WHILE_RUNNING,
         true
     )
+    , SAVE_GAME_BEFORE_SANDWICH_STATIC_TEXT("")
     , NUM_SANDWICH_ROUNDS(
-        "<b>Number of sandwich rounds to run:</b><br>"
-        "400-650 Happiny dust per sandwich, with Normal Encounter power level 2.<br>"
-        "(e.g. Chorizo x4, Banana x2, Mayo x3, Whipped Cream x1)",
+        "<b>Number of rounds to run:</b>",
         LockMode::UNLOCK_WHILE_RUNNING,
         3
     )
+    , NUM_SANDWICH_ROUNDS_STATIC_TEXT("")
     , LANGUAGE(language_option == nullptr ? *m_language_owner : *language_option)
     , SANDWICH_OPTIONS(LANGUAGE)
     , GO_HOME_WHEN_DONE(go_home_when_done_option == nullptr ? *m_go_home_when_done_owner : *go_home_when_done_option)
@@ -120,18 +124,18 @@ MaterialFarmerOptions::MaterialFarmerOptions(
     , SAVE_DEBUG_VIDEO(
         "<b>DEV MODE: Save debug videos to Switch:</b><br>"
         "Set this on to save a Switch video everytime an error occurs. You can send the video to developers to help them debug later.",
-        LockMode::LOCK_WHILE_RUNNING,
+        LockMode::UNLOCK_WHILE_RUNNING,
         false
     )
     , SKIP_WARP_TO_POKECENTER(
         "<b>DEV MODE: Skip warping to closest PokeCenter:</b><br>"
         "This is for debugging the program without waiting for the initial warp.",
-        LockMode::LOCK_WHILE_RUNNING,
+        LockMode::UNLOCK_WHILE_RUNNING,
         false
     )
-    , SKIP_SANDWICH(
-        "<b>DEV MODE: Skip making sandwich:</b><br>"
-        "This is for debugging the program without waiting for sandwich making.",
+    , ENABLE_SANDWICH(
+        "<b>Enable Sandwich making:</b><br>"
+        "This is for boosting spawn rates of specific Pokemon.",
         LockMode::UNLOCK_WHILE_RUNNING,
         false
     )
@@ -171,13 +175,15 @@ MaterialFarmerOptions::MaterialFarmerOptions(
 {
     if (PreloadSettings::instance().DEVELOPER_MODE){
         PA_ADD_OPTION(SAVE_DEBUG_VIDEO);
-        PA_ADD_OPTION(SKIP_WARP_TO_POKECENTER);
-        PA_ADD_OPTION(SKIP_SANDWICH);
+        PA_ADD_OPTION(SKIP_WARP_TO_POKECENTER);        
         PA_ADD_OPTION(TIME_PER_SANDWICH);
         PA_ADD_OPTION(NUM_FORWARD_MOVES_PER_LETS_GO_ITERATION);
     }
+    PA_ADD_OPTION(ENABLE_SANDWICH);
     PA_ADD_OPTION(SAVE_GAME_BEFORE_SANDWICH);
+    PA_ADD_OPTION(SAVE_GAME_BEFORE_SANDWICH_STATIC_TEXT);
     PA_ADD_OPTION(NUM_SANDWICH_ROUNDS);
+    PA_ADD_OPTION(NUM_SANDWICH_ROUNDS_STATIC_TEXT);
     if (m_language_owner){
         PA_ADD_OPTION(LANGUAGE);
     }
@@ -189,7 +195,31 @@ MaterialFarmerOptions::MaterialFarmerOptions(
     if(m_notif_status_update_owner){
         PA_ADD_OPTION(NOTIFICATIONS);
     }
+    MaterialFarmerOptions::value_changed();
+    ENABLE_SANDWICH.add_listener(*this);
 }
+
+void MaterialFarmerOptions::value_changed(){
+
+    if (MaterialFarmerOptions::ENABLE_SANDWICH){
+        SAVE_GAME_BEFORE_SANDWICH_STATIC_TEXT.set_text(
+            "Saves the game before each sandwich.<br>"
+            "Recommended to leave on, as the sandwich maker will reset the game if it detects an error.<br>"
+        );
+        NUM_SANDWICH_ROUNDS_STATIC_TEXT.set_text(
+            "One sandwich per round.<br>"
+            "400-650 Happiny dust per sandwich, with Normal Encounter power level 2.<br>"
+            "(e.g. Chorizo x4, Banana x2, Mayo x3, Whipped Cream x1)<br>"
+        );
+        MaterialFarmerOptions::SANDWICH_OPTIONS.set_visibility(ConfigOptionState::ENABLED);
+    }else{
+        SAVE_GAME_BEFORE_SANDWICH_STATIC_TEXT.set_text("");
+        NUM_SANDWICH_ROUNDS_STATIC_TEXT.set_text("30 minutes per round.<br>");
+        MaterialFarmerOptions::SANDWICH_OPTIONS.set_visibility(ConfigOptionState::DISABLED);
+    }
+
+}
+
 
 
 
@@ -264,7 +294,7 @@ void run_one_sandwich_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
         save_game_from_overworld(env.program_info(), env.console, context);
     }
     // make sandwich then go back to Pokecenter to reset position
-    if (!options.SKIP_SANDWICH){
+    if (options.ENABLE_SANDWICH){
         run_from_battles_and_back_to_pokecenter(env, context, 
             [&last_sandwich_time, &options](SingleSwitchProgramEnvironment& env, BotBaseContext& context){
                 // Orient camera to look at same direction as player character
