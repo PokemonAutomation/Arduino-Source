@@ -43,12 +43,12 @@ struct MaterialFarmerStats : public LetsGoEncounterBotStats{
     std::atomic<uint64_t>& m_errors;
 };
 
-class MaterialFarmerOptions : public GroupOption{
+class MaterialFarmerOptions : public GroupOption, public ConfigOption::Listener{
 public:
+    ~MaterialFarmerOptions();
     MaterialFarmerOptions()
         : MaterialFarmerOptions(nullptr, nullptr, nullptr, nullptr, nullptr, nullptr)
     {}
-    
     MaterialFarmerOptions(
         OCR::LanguageOCROption& language_option, GoHomeWhenDoneOption& go_home_when_done_option,
         EventNotificationOption& notif_status_update_option, EventNotificationOption& notif_program_finish_option, 
@@ -59,6 +59,7 @@ public:
         &notif_error_recoverable_option, &notif_error_fatal_option
         )
     {}
+    virtual void value_changed() override;
 private:
     std::unique_ptr<OCR::LanguageOCROption> m_language_owner;
     std::unique_ptr<GoHomeWhenDoneOption> m_go_home_when_done_owner;
@@ -70,8 +71,10 @@ private:
 public:
 
     BooleanCheckBoxOption SAVE_GAME_BEFORE_SANDWICH;
+    StaticTextOption SAVE_GAME_BEFORE_SANDWICH_STATIC_TEXT;
 
     SimpleIntegerOption<uint16_t> NUM_SANDWICH_ROUNDS;
+    StaticTextOption NUM_SANDWICH_ROUNDS_STATIC_TEXT;
     
     OCR::LanguageOCROption& LANGUAGE;
 
@@ -84,7 +87,7 @@ public:
     // Debug options
     BooleanCheckBoxOption SAVE_DEBUG_VIDEO;
     BooleanCheckBoxOption SKIP_WARP_TO_POKECENTER;
-    BooleanCheckBoxOption SKIP_SANDWICH;
+    BooleanCheckBoxOption ENABLE_SANDWICH;
     SimpleIntegerOption<uint16_t> TIME_PER_SANDWICH;
     SimpleIntegerOption<uint16_t> NUM_FORWARD_MOVES_PER_LETS_GO_ITERATION;
 
