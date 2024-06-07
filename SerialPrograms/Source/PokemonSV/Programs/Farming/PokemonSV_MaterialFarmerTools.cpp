@@ -28,7 +28,6 @@
 #include "PokemonSV/Programs/Battles/PokemonSV_Battles.h"
 #include "PokemonSV/Programs/Sandwiches/PokemonSV_SandwichRoutines.h"
 #include "PokemonSV/Programs/ShinyHunting/PokemonSV_LetsGoTools.h"
-#include "PokemonSV_MaterialFarmer.h"
 #include "PokemonSV_MaterialFarmerTools.h"
 #include "PokemonSV/Programs/ShinyHunting/PokemonSV_ShinyHunt-Scatterbug.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_SnapshotDumper.h"
@@ -193,10 +192,11 @@ MaterialFarmerOptions::MaterialFarmerOptions(
 }
 
 
-void run_material_farmer(SingleSwitchProgramEnvironment& env, BotBaseContext& context, MaterialFarmerOptions& options){
-    
-    MaterialFarmer_Descriptor::Stats& stats = env.current_stats<MaterialFarmer_Descriptor::Stats>();
 
+void run_material_farmer(SingleSwitchProgramEnvironment& env, BotBaseContext& context, 
+    MaterialFarmerOptions& options, MaterialFarmerStats& stats
+){
+    
     LetsGoEncounterBotTracker encounter_tracker(
         env, env.console, context,
         stats,
@@ -256,7 +256,7 @@ void run_one_sandwich_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
     LetsGoEncounterBotTracker& encounter_tracker, MaterialFarmerOptions& options)
 {
 
-    MaterialFarmer_Descriptor::Stats& stats = env.current_stats<MaterialFarmer_Descriptor::Stats>();
+    MaterialFarmerStats& stats = env.current_stats<MaterialFarmerStats>();
 
     WallClock last_sandwich_time = WallClock::min();
 
@@ -666,7 +666,7 @@ void move_from_blueberry_entrance_to_league_club(SingleSwitchProgramEnvironment&
         int ret = wait_until(env.console, context, Milliseconds(5000), { select_entrance });
         if (ret == 0){
             env.log("Blueberry navigation menu detected.");
-        } else {
+        }else{
             env.console.log("Failed to detect Blueberry navigation menu.");
             continue;
         }
@@ -680,7 +680,7 @@ void move_from_blueberry_entrance_to_league_club(SingleSwitchProgramEnvironment&
         ret = wait_until(env.console, context, Milliseconds(5000), { select_league_club });
         if (ret == 0){
             env.log("League club room selected.");
-        } else {
+        }else{
             env.console.log("Failed to select League club room in navigation menu.");
             continue;            
         }
@@ -692,7 +692,7 @@ void move_from_blueberry_entrance_to_league_club(SingleSwitchProgramEnvironment&
         ret = wait_until(env.console, context, Milliseconds(10000), { overworld });
         if (ret == 0){
             env.log("Entered League club room.");
-        } else {
+        }else{
             env.console.log("Failed to enter League club room from menu selection.");
             continue;            
         }
@@ -751,7 +751,7 @@ void move_from_item_printer_to_blueberry_entrance(SingleSwitchProgramEnvironment
     int ret = wait_until(env.console, context, Milliseconds(5000), { select_entrance }, Milliseconds(1000));
     if (ret == 0){
         env.log("Blueberry navigation menu detected.");
-    } else {
+    }else{
         env.console.log("Failed to detect Blueberry navigation menu.");
         throw OperationFailedException(
             ErrorReport::SEND_ERROR_REPORT, env.console,
@@ -768,7 +768,7 @@ void move_from_item_printer_to_blueberry_entrance(SingleSwitchProgramEnvironment
     ret = wait_until(env.console, context, Milliseconds(10000), { overworld });
     if (ret == 0){
         env.log("Overworld detected");
-    } else {
+    }else{
         throw OperationFailedException(
             ErrorReport::SEND_ERROR_REPORT, env.console,
             "Failed to detect overworld.",

@@ -16,6 +16,7 @@
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "PokemonSV_ItemPrinterTools.h"
+#include "PokemonSV/Programs/Farming/PokemonSV_MaterialFarmerTools.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -64,14 +65,19 @@ public:
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
-class ItemPrinterRNG : public SingleSwitchProgramInstance{
+class ItemPrinterRNG : public SingleSwitchProgramInstance, public ConfigOption::Listener{
 public:
+    ~ItemPrinterRNG();
     ItemPrinterRNG();
 
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 
 private:
+    virtual void value_changed() override;
+
+    void run_item_printer_rng(SingleSwitchProgramEnvironment& env, BotBaseContext& context, ItemPrinterRNG_Descriptor::Stats& stats);
+
     void run_print_at_date(
         SingleSwitchProgramEnvironment& env, BotBaseContext& context,
         const DateTime& date, ItemPrinterJobs jobs
@@ -100,7 +106,8 @@ private:
 
 private:
     OCR::LanguageOCROption LANGUAGE;
-    SimpleIntegerOption<uint16_t> TOTAL_ROUNDS;
+    SimpleIntegerOption<uint16_t> NUM_ITEM_PRINTER_ROUNDS;
+    StaticTextOption AFTER_ITEM_PRINTER_DONE_EXPLANATION;
 
 //    DateTimeOption DATE0;
 //    DateTimeOption DATE1;
@@ -112,8 +119,14 @@ private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
     BooleanCheckBoxOption FIX_TIME_WHEN_DONE;
 
+    BooleanCheckBoxOption AUTO_MATERIAL_FARMING;
+    SimpleIntegerOption<uint16_t> NUM_ROUNDS_OF_ITEM_PRINTER_TO_MATERIAL_FARM;
+    
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;
+    
+    StaticTextOption MATERIAL_FARMER_DISABLED_EXPLANATION;
+    MaterialFarmerOptions MATERIAL_FARMER_OPTIONS;
 };
 
 
