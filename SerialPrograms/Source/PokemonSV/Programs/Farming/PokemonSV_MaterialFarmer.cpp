@@ -53,7 +53,7 @@ MaterialFarmer_Descriptor::MaterialFarmer_Descriptor()
 {}
 
 std::unique_ptr<StatsTracker> MaterialFarmer_Descriptor::make_stats() const{
-    return std::unique_ptr<StatsTracker>(new MaterialFarmerTools::Stats());
+    return std::unique_ptr<StatsTracker>(new MaterialFarmerStats());
 }
 
 
@@ -95,7 +95,7 @@ void MaterialFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
         reset_to_pokecenter(env.program_info(), env.console, context);
     }
 
-    MaterialFarmerTools::Stats& stats = env.current_stats<MaterialFarmerTools::Stats>();
+    MaterialFarmerStats& stats = env.current_stats<MaterialFarmerStats>();
     run_material_farmer(env, context, MATERIAL_FARMER_OPTIONS, stats);
     
 }

@@ -1265,7 +1265,7 @@ void ItemPrinterRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext
         audio_detector.throw_if_no_sound(std::chrono::milliseconds(1000));
 
         // Don't allow the material farmer stats to affect the Item Printer's stats.
-        MaterialFarmerTools::Stats mat_farm_stats;// = env.current_stats<MaterialFarmer_Descriptor::Stats>();
+        MaterialFarmerStats mat_farm_stats;// = env.current_stats<MaterialFarmer_Descriptor::Stats>();
         for (int i = 0; i < NUM_ROUNDS_OF_ITEM_PRINTER_TO_MATERIAL_FARM; i++){
             run_item_printer_rng(env, context, stats);
             press_Bs_to_back_to_overworld(env.program_info(), env.console, context);

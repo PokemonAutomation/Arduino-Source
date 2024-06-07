@@ -194,7 +194,7 @@ MaterialFarmerOptions::MaterialFarmerOptions(
 
 
 void run_material_farmer(SingleSwitchProgramEnvironment& env, BotBaseContext& context, 
-    MaterialFarmerOptions& options, MaterialFarmerTools::Stats& stats
+    MaterialFarmerOptions& options, MaterialFarmerStats& stats
 ){
     
     LetsGoEncounterBotTracker encounter_tracker(
@@ -256,7 +256,7 @@ void run_one_sandwich_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
     LetsGoEncounterBotTracker& encounter_tracker, MaterialFarmerOptions& options)
 {
 
-    MaterialFarmerTools::Stats& stats = env.current_stats<MaterialFarmerTools::Stats>();
+    MaterialFarmerStats& stats = env.current_stats<MaterialFarmerStats>();
 
     WallClock last_sandwich_time = WallClock::min();
 
