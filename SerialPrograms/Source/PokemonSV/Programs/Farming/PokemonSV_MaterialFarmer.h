@@ -22,6 +22,13 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
 
+class MaterialFarmer_Descriptor : public SingleSwitchProgramDescriptor{
+public:
+    MaterialFarmer_Descriptor();
+
+    virtual std::unique_ptr<StatsTracker> make_stats() const override;
+};
+
 
 class MaterialFarmer : public SingleSwitchProgramInstance{
 public:

@@ -191,25 +191,10 @@ MaterialFarmerOptions::MaterialFarmerOptions(
     }
 }
 
-MaterialFarmer_Descriptor::MaterialFarmer_Descriptor()
-    : SingleSwitchProgramDescriptor(
-        "PokemonSV:MaterialFarmer",
-        STRING_POKEMON + " SV", "Material Farmer",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSV/MaterialFarmer.md",
-        "Farm materials - Happiny dust from Chanseys/Blisseys, for Item Printer.",
-        FeedbackType::VIDEO_AUDIO,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
-    )
-{}
-
-std::unique_ptr<StatsTracker> MaterialFarmer_Descriptor::make_stats() const{
-    return std::unique_ptr<StatsTracker>(new Stats());
-}
 
 
 void run_material_farmer(SingleSwitchProgramEnvironment& env, BotBaseContext& context, 
-    MaterialFarmerOptions& options, MaterialFarmer_Descriptor::Stats& stats
+    MaterialFarmerOptions& options, MaterialFarmerTools::Stats& stats
 ){
     
     LetsGoEncounterBotTracker encounter_tracker(
@@ -271,7 +256,7 @@ void run_one_sandwich_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
     LetsGoEncounterBotTracker& encounter_tracker, MaterialFarmerOptions& options)
 {
 
-    MaterialFarmer_Descriptor::Stats& stats = env.current_stats<MaterialFarmer_Descriptor::Stats>();
+    MaterialFarmerTools::Stats& stats = env.current_stats<MaterialFarmerTools::Stats>();
 
     WallClock last_sandwich_time = WallClock::min();
 
