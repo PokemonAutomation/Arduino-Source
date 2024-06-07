@@ -4,31 +4,14 @@
  *
  */
 
-#include <atomic>
-#include <sstream>
-#include "Common/Cpp/PrettyPrint.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
-#include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Tools/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
-#include "PokemonSV/Inference/Overworld/PokemonSV_LetsGoHpReader.h"
-#include "PokemonSV/Inference/Boxes/PokemonSV_IvJudgeReader.h"
-#include "PokemonSV/Inference/Battles/PokemonSV_EncounterWatcher.h"
-#include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
-#include "PokemonSV/Programs/PokemonSV_SaveGame.h"
-#include "PokemonSV/Programs/Battles/PokemonSV_Battles.h"
-#include "PokemonSV/Programs/Sandwiches/PokemonSV_SandwichRoutines.h"
-#include "PokemonSV/Programs/ShinyHunting/PokemonSV_LetsGoTools.h"
 #include "PokemonSV_MaterialFarmer.h"
-
 
 // #include <iostream>
 // using std::cout;
@@ -58,15 +41,27 @@ std::unique_ptr<StatsTracker> MaterialFarmer_Descriptor::make_stats() const{
 
 
 MaterialFarmer::MaterialFarmer()
+    : MATERIAL_FARMER_OPTIONS(
+        nullptr, nullptr,
+        NOTIFICATION_STATUS_UPDATE,
+        NOTIFICATION_PROGRAM_FINISH,
+        NOTIFICATION_ERROR_RECOVERABLE,
+        NOTIFICATION_ERROR_FATAL
+    )
+    , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
+    , NOTIFICATIONS({
+        &NOTIFICATION_STATUS_UPDATE,
+        &NOTIFICATION_PROGRAM_FINISH,
+        &NOTIFICATION_ERROR_RECOVERABLE,
+        &NOTIFICATION_ERROR_FATAL,
+    })
 {
     PA_ADD_OPTION(MATERIAL_FARMER_OPTIONS);
+    PA_ADD_OPTION(NOTIFICATIONS);
 }
 
 
 void MaterialFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    
-
-
     assert_16_9_720p_min(env.logger(), env.console);
 
     //  Connect the controller.
@@ -84,9 +79,7 @@ void MaterialFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
     wait_until(
         env.console, context,
         std::chrono::milliseconds(1100),
-        {
-            static_cast<AudioInferenceCallback&>(audio_detector)
-        }
+        {audio_detector}
     );
     audio_detector.throw_if_no_sound(std::chrono::milliseconds(1000));
 

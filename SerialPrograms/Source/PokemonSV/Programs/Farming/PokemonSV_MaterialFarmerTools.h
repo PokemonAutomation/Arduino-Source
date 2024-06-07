@@ -46,27 +46,19 @@ struct MaterialFarmerStats : public LetsGoEncounterBotStats{
 class MaterialFarmerOptions : public GroupOption, public ConfigOption::Listener{
 public:
     ~MaterialFarmerOptions();
-    MaterialFarmerOptions()
-        : MaterialFarmerOptions(nullptr, nullptr, nullptr, nullptr, nullptr, nullptr)
-    {}
     MaterialFarmerOptions(
-        OCR::LanguageOCROption& language_option, GoHomeWhenDoneOption& go_home_when_done_option,
-        EventNotificationOption& notif_status_update_option, EventNotificationOption& notif_program_finish_option, 
-        EventNotificationOption& notif_error_recoverable_option, EventNotificationOption& notif_error_fatal_option
-    )
-        : MaterialFarmerOptions(&language_option, &go_home_when_done_option,
-        &notif_status_update_option, &notif_program_finish_option,
-        &notif_error_recoverable_option, &notif_error_fatal_option
-        )
-    {}
+        OCR::LanguageOCROption* language_option,
+        GoHomeWhenDoneOption* go_home_when_done_option,
+        EventNotificationOption& notif_status_update_option,
+        EventNotificationOption& notif_program_finish_option,
+        EventNotificationOption& notif_error_recoverable_option,
+        EventNotificationOption& notif_error_fatal_option
+    );
     virtual void value_changed() override;
+
 private:
     std::unique_ptr<OCR::LanguageOCROption> m_language_owner;
     std::unique_ptr<GoHomeWhenDoneOption> m_go_home_when_done_owner;
-    std::unique_ptr<EventNotificationOption> m_notif_status_update_owner;
-    std::unique_ptr<EventNotificationOption> m_notif_program_finish_owner;
-    std::unique_ptr<EventNotificationOption> m_notif_error_recoverable_owner;
-    std::unique_ptr<EventNotificationOption> m_notif_error_fatal_owner;
 
 public:
 
@@ -77,11 +69,8 @@ public:
     StaticTextOption NUM_SANDWICH_ROUNDS_STATIC_TEXT;
     
     OCR::LanguageOCROption& LANGUAGE;
-
     SandwichMakerOption SANDWICH_OPTIONS;
-
     GoHomeWhenDoneOption& GO_HOME_WHEN_DONE;
-
     FloatingPointOption AUTO_HEAL_PERCENT;
 
     // Debug options
@@ -95,14 +84,6 @@ public:
     EventNotificationOption& NOTIFICATION_PROGRAM_FINISH;
     EventNotificationOption& NOTIFICATION_ERROR_RECOVERABLE;
     EventNotificationOption& NOTIFICATION_ERROR_FATAL;
-    EventNotificationsOption NOTIFICATIONS;
-
-private:
-    MaterialFarmerOptions(
-        OCR::LanguageOCROption* language_option, GoHomeWhenDoneOption* go_home_when_done_option,
-        EventNotificationOption* notif_status_update_option, EventNotificationOption* notif_program_finish_option, 
-        EventNotificationOption* notif_error_recoverable_option, EventNotificationOption* notif_error_fatal_option
-    );
 };
 
 

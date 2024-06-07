@@ -48,9 +48,12 @@ MaterialFarmerOptions::~MaterialFarmerOptions(){
 }
 
 MaterialFarmerOptions::MaterialFarmerOptions(
-    OCR::LanguageOCROption* language_option, GoHomeWhenDoneOption* go_home_when_done_option,
-    EventNotificationOption* notif_status_update_option, EventNotificationOption* notif_program_finish_option, 
-    EventNotificationOption* notif_error_recoverable_option, EventNotificationOption* notif_error_fatal_option
+    OCR::LanguageOCROption* language_option,
+    GoHomeWhenDoneOption* go_home_when_done_option,
+    EventNotificationOption& notif_status_update_option,
+    EventNotificationOption& notif_program_finish_option,
+    EventNotificationOption& notif_error_recoverable_option,
+    EventNotificationOption& notif_error_fatal_option
 )
     : GroupOption(
         "Material Farmer",
@@ -68,37 +71,6 @@ MaterialFarmerOptions::MaterialFarmerOptions(
     )
     , m_go_home_when_done_owner(go_home_when_done_option == nullptr 
         ? new GoHomeWhenDoneOption(true) 
-        : nullptr
-    )
-    , m_notif_status_update_owner(notif_status_update_option == nullptr 
-        ? new EventNotificationOption("Status Update", true, false, std::chrono::seconds(3600)) 
-        : nullptr
-    )
-    , m_notif_program_finish_owner(notif_program_finish_option == nullptr 
-        ? new EventNotificationOption(
-            "Program Finished",
-            true, true,
-            ImageAttachmentMode::JPG,
-            {"Notifs"}
-        ) 
-        : nullptr
-    )
-    , m_notif_error_recoverable_owner(notif_error_recoverable_option == nullptr 
-        ? new EventNotificationOption(
-            "Program Error (Recoverable)",
-            true, false,
-            ImageAttachmentMode::PNG,
-            {"Notifs"}
-        ) 
-        : nullptr
-    )
-    , m_notif_error_fatal_owner(notif_error_fatal_option == nullptr 
-        ? new EventNotificationOption(
-            "Program Error (Fatal)",
-            true, true,
-            ImageAttachmentMode::PNG,
-            {"Notifs"}
-        ) 
         : nullptr
     )
     , SAVE_GAME_BEFORE_SANDWICH(
@@ -150,35 +122,11 @@ MaterialFarmerOptions::MaterialFarmerOptions(
         LockMode::UNLOCK_WHILE_RUNNING,
         13
     )
-    , NOTIFICATION_STATUS_UPDATE(notif_status_update_option == nullptr 
-        ? *m_notif_status_update_owner 
-        : *notif_status_update_option
-    )
-    , NOTIFICATION_PROGRAM_FINISH(notif_program_finish_option == nullptr 
-        ? *m_notif_program_finish_owner 
-        : *notif_program_finish_option
-    )
-    , NOTIFICATION_ERROR_RECOVERABLE(notif_error_recoverable_option == nullptr 
-        ? *m_notif_error_recoverable_owner 
-        : *notif_error_recoverable_option
-    )
-    , NOTIFICATION_ERROR_FATAL(notif_error_fatal_option == nullptr 
-        ? *m_notif_error_fatal_owner 
-        : *notif_error_fatal_option
-    )
-    , NOTIFICATIONS({
-        &NOTIFICATION_STATUS_UPDATE,
-        &NOTIFICATION_PROGRAM_FINISH,
-        &NOTIFICATION_ERROR_RECOVERABLE,
-        &NOTIFICATION_ERROR_FATAL,
-    })
+    , NOTIFICATION_STATUS_UPDATE(notif_status_update_option)
+    , NOTIFICATION_PROGRAM_FINISH(notif_program_finish_option)
+    , NOTIFICATION_ERROR_RECOVERABLE(notif_error_recoverable_option)
+    , NOTIFICATION_ERROR_FATAL(notif_error_fatal_option)
 {
-    if (PreloadSettings::instance().DEVELOPER_MODE){
-        PA_ADD_OPTION(SAVE_DEBUG_VIDEO);
-        PA_ADD_OPTION(SKIP_WARP_TO_POKECENTER);        
-        PA_ADD_OPTION(TIME_PER_SANDWICH);
-        PA_ADD_OPTION(NUM_FORWARD_MOVES_PER_LETS_GO_ITERATION);
-    }
     PA_ADD_OPTION(ENABLE_SANDWICH);
     PA_ADD_OPTION(SAVE_GAME_BEFORE_SANDWICH);
     PA_ADD_OPTION(SAVE_GAME_BEFORE_SANDWICH_STATIC_TEXT);
@@ -192,9 +140,14 @@ MaterialFarmerOptions::MaterialFarmerOptions(
         PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     }
     PA_ADD_OPTION(AUTO_HEAL_PERCENT);
-    if(m_notif_status_update_owner){
-        PA_ADD_OPTION(NOTIFICATIONS);
+
+    if (PreloadSettings::instance().DEVELOPER_MODE){
+        PA_ADD_OPTION(SAVE_DEBUG_VIDEO);
+        PA_ADD_OPTION(SKIP_WARP_TO_POKECENTER);
+        PA_ADD_OPTION(TIME_PER_SANDWICH);
+        PA_ADD_OPTION(NUM_FORWARD_MOVES_PER_LETS_GO_ITERATION);
     }
+
     MaterialFarmerOptions::value_changed();
     ENABLE_SANDWICH.add_listener(*this);
 }

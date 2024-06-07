@@ -39,6 +39,8 @@ public:
 private:
     MaterialFarmerOptions MATERIAL_FARMER_OPTIONS;
 
+    EventNotificationOption NOTIFICATION_STATUS_UPDATE;
+    EventNotificationsOption NOTIFICATIONS;
 };
 
 
