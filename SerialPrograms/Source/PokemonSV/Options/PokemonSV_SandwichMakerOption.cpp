@@ -289,11 +289,15 @@ SandwichMakerOption::~SandwichMakerOption(){
     BASE_RECIPE.remove_listener(*this);
 }
 
-SandwichMakerOption::SandwichMakerOption(OCR::LanguageOCROption* language_option)
+SandwichMakerOption::SandwichMakerOption(
+    OCR::LanguageOCROption* language_option,
+    bool toggleable,
+    bool enabled
+)
     : GroupOption(
         "Sandwich Maker",
         LockMode::LOCK_WHILE_RUNNING,
-        false, true
+        toggleable, enabled
     )
     , m_language_owner(language_option == nullptr
         ? new OCR::LanguageOCROption(

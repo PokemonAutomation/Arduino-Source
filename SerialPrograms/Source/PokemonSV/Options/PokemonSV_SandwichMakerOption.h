@@ -221,13 +221,20 @@ public:
     ~SandwichMakerOption();
 
     //  Include the language option in the box.
-    SandwichMakerOption()
-        : SandwichMakerOption(nullptr)
+    SandwichMakerOption(
+        bool toggleable = false,
+        bool enabled = true
+    )
+        : SandwichMakerOption(nullptr, toggleable, enabled)
     {}
 
     //  Don't include language option. Give it one instead.
-    SandwichMakerOption(OCR::LanguageOCROption& language_option)
-        : SandwichMakerOption(&language_option)
+    SandwichMakerOption(
+        OCR::LanguageOCROption& language_option,
+        bool toggleable = false,
+        bool enabled = true
+    )
+        : SandwichMakerOption(&language_option, toggleable, enabled)
     {}
 
 public:
@@ -250,7 +257,11 @@ public:
     SandwichIngredientsTable SANDWICH_INGREDIENTS;
 
 private:
-    SandwichMakerOption(OCR::LanguageOCROption* language_option);
+    SandwichMakerOption(
+        OCR::LanguageOCROption* language_option,
+        bool toggleable,
+        bool enabled
+    );
     virtual void value_changed() override;
     virtual std::string check_validity() const override;
 
