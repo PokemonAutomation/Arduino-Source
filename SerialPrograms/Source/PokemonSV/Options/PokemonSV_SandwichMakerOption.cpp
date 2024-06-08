@@ -18,6 +18,7 @@ namespace PokemonSV{
 //  Map for standard+type recipes taking Base + Type to find SandwichRecipe
 const std::map<std::pair<BaseRecipe, PokemonType>, SandwichRecipe>& PREMADE_SANDWICH_TYPE(){
     static const std::map<std::pair<BaseRecipe, PokemonType>, SandwichRecipe> map{
+        {{BaseRecipe::non_shiny, PokemonType::normal},  SandwichRecipe::non_shiny_normal},
         {{BaseRecipe::shiny, PokemonType::normal},  SandwichRecipe::shiny_normal},
         {{BaseRecipe::shiny, PokemonType::fire},    SandwichRecipe::shiny_fire},
         {{BaseRecipe::shiny, PokemonType::water},   SandwichRecipe::shiny_water},
@@ -134,6 +135,7 @@ const std::map<ParadoxRecipe, SandwichRecipe>& PREMADE_SANDWICH_OTHER(){
 //  Remember the ingredient limits: Six fillings, four condiments. Two condiment slots will be taken by the Herba.
 const std::map<SandwichRecipe, std::vector<std::string>>& PREMADE_SANDWICH_INGREDIENTS(){
     static const std::map<SandwichRecipe, std::vector<std::string>> map{
+        {SandwichRecipe::non_shiny_normal,      {"chorizo", "chorizo", "chorizo", "chorizo", "banana", "banana", "mayonnaise", "mayonnaise", "mayonnaise", "whipped-cream"}},
         {SandwichRecipe::shiny_normal,          {"cucumber", "pickle", "tofu", "tofu", "tofu", "curry-powder", "curry-powder"}},
         {SandwichRecipe::shiny_fire,            {"cucumber", "pickle", "red-bell-pepper", "red-bell-pepper","curry-powder","curry-powder", "red-bell-pepper"}},
         {SandwichRecipe::shiny_water,           {"cucumber", "pickle", "cucumber", "cucumber", "cucumber","curry-powder","curry-powder"}},
@@ -313,6 +315,7 @@ SandwichMakerOption::SandwichMakerOption(
         "<b>Sandwich Recipe:</b><br>Select a recipe to make a sandwich with preset ingredients, or select Custom Sandwich to make a sandwich using the table below. "
         "Refer to the documentation for recipe ingredients and valid Herba Mystica combinations.",
         {
+            {BaseRecipe::non_shiny,  "non-shiny",    "Normal Encounter (non-shiny)"},
             {BaseRecipe::shiny,     "shiny",    "Sparkling + Title + Encounter"},
             {BaseRecipe::huge,      "huge",     "Sparkling + Title + Humungo"},
             {BaseRecipe::tiny,      "tiny",     "Sparkling + Title + Teensy"},
@@ -320,7 +323,7 @@ SandwichMakerOption::SandwichMakerOption(
             {BaseRecipe::custom,    "custom",   "Custom Sandwich"},
         },
         LockMode::LOCK_WHILE_RUNNING,
-        BaseRecipe::shiny
+        BaseRecipe::non_shiny
         )
     , TYPE(
         "",
@@ -451,6 +454,13 @@ SandwichMakerOption::SandwichMakerOption(
 void SandwichMakerOption::value_changed(){
     if (BASE_RECIPE == BaseRecipe::custom){
         SANDWICH_INGREDIENTS.set_visibility(ConfigOptionState::ENABLED);
+        HERBA_ONE.set_visibility(ConfigOptionState::DISABLED);
+        HERBA_TWO.set_visibility(ConfigOptionState::DISABLED);
+        HERB_INCOMPATIBILITY_WARNING.set_visibility(ConfigOptionState::HIDDEN);
+        TYPE.set_visibility(ConfigOptionState::DISABLED); //to prevent the options moving around
+        PARADOX.set_visibility(ConfigOptionState::HIDDEN);
+    }else if (BASE_RECIPE == BaseRecipe::non_shiny){
+        SANDWICH_INGREDIENTS.set_visibility(ConfigOptionState::DISABLED);
         HERBA_ONE.set_visibility(ConfigOptionState::DISABLED);
         HERBA_TWO.set_visibility(ConfigOptionState::DISABLED);
         HERB_INCOMPATIBILITY_WARNING.set_visibility(ConfigOptionState::HIDDEN);

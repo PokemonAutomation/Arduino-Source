@@ -30,6 +30,7 @@ enum class HerbaSelection{
 };
 
 enum class BaseRecipe{
+    non_shiny,
     shiny,
     huge,
     tiny,
@@ -109,6 +110,7 @@ enum class ParadoxRecipe{
 };
 
 enum class SandwichRecipe{
+    non_shiny_normal,
     shiny_normal,
     shiny_fire,
     shiny_water,
