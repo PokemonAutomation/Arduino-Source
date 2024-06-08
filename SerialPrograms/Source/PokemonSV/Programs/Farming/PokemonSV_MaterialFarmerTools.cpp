@@ -249,7 +249,7 @@ void run_one_sandwich_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
     // make sandwich then go back to Pokecenter to reset position
     if (options.ENABLE_SANDWICH){
         run_from_battles_and_back_to_pokecenter(env, context, 
-            [&last_sandwich_time, &options](SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+            [&](SingleSwitchProgramEnvironment& env, BotBaseContext& context){
                 // Orient camera to look at same direction as player character
                 // - This is needed because when save-load the game, 
                 // the camera angle is different than when just flying to pokecenter
@@ -271,6 +271,9 @@ void run_one_sandwich_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
                 make_sandwich_option(env, env.console, context, options.SANDWICH_OPTIONS);
                 last_sandwich_time = current_time();
                 leave_picnic(env.program_info(), env.console, context);
+
+                stats.m_sandwiches++;
+                env.update_stats();
 
             }
         );
@@ -527,6 +530,7 @@ we can handle pokemon wild encounters when executing the action.
 void run_from_battles_and_back_to_pokecenter(SingleSwitchProgramEnvironment& env, BotBaseContext& context, 
     std::function<void(SingleSwitchProgramEnvironment& env, BotBaseContext& context)>&& action)
 {
+    MaterialFarmerStats& stats = env.current_stats<MaterialFarmerStats>();
     bool action_finished = false;
     bool first_iteration = true;
     // a flag for the case that the action has finished but not yet returned to pokecenter
@@ -563,6 +567,8 @@ void run_from_battles_and_back_to_pokecenter(SingleSwitchProgramEnvironment& env
             {battle_menu}
         );
         if (ret == 0){
+            stats.m_encounters++;
+            env.update_stats();
             env.console.log("Detected battle. Now running away.", COLOR_PURPLE);
             env.console.overlay().add_log("Detected battle. Now running away.");
             try{
