@@ -14,8 +14,7 @@ void fly_to_gate(void) {
 
 void move_to_location(void) {
     pbf_move_left_joystick(STICK_MIN, STICK_CENTER, 190, 0);
-    pbf_press_button(BUTTON_L, 20, 0);
-    pbf_wait(200);
+    pbf_press_button(BUTTON_L, 20, 200);
     pbf_move_left_joystick(STICK_CENTER, STICK_MIN, 175, 200);
     pbf_move_left_joystick(STICK_CENTER, STICK_MAX, 20, 0);
     pbf_press_button(BUTTON_L, 20, 300);
@@ -29,8 +28,7 @@ void open_box(void) {
 
 void get_egg(int boxCol) {
     pbf_press_dpad(DPAD_RIGHT, 20, 400);
-    pbf_press_button(BUTTON_MINUS, 20, 400);
-    pbf_wait(400);
+    pbf_press_button(BUTTON_MINUS, 20, 800);
     for (int i = 0; i < 60; i++) {
         pbf_press_dpad(DPAD_DOWN, 5, 0);
     };
@@ -40,8 +38,7 @@ void get_egg(int boxCol) {
         pbf_press_dpad(DPAD_LEFT, 20, 250);
     };
     pbf_press_dpad(DPAD_DOWN, 20, 400);
-    pbf_press_button(BUTTON_A, 20, 400);
-    pbf_wait(200);
+    pbf_press_button(BUTTON_A, 20, 600);
     pbf_mash_button(BUTTON_B,600);
     
 };
@@ -76,8 +73,7 @@ void ride_hatch(void) {
         pbf_move_left_joystick(STICK_MAX, STICK_CENTER, 220, 0);
         pbf_press_button(BUTTON_A, 5, 0);
     };
-    pbf_mash_button(BUTTON_A, 750);
-    pbf_wait(500);
+    pbf_mash_button(BUTTON_A, 1250);
 };
 
 int main(void) {
