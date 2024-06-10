@@ -224,19 +224,21 @@ public:
 
     //  Include the language option in the box.
     SandwichMakerOption(
+        BaseRecipe base_recipe = BaseRecipe::non_shiny,
         bool toggleable = false,
         bool enabled = true
     )
-        : SandwichMakerOption(nullptr, toggleable, enabled)
+        : SandwichMakerOption(nullptr, base_recipe, toggleable, enabled)
     {}
 
     //  Don't include language option. Give it one instead.
     SandwichMakerOption(
         OCR::LanguageOCROption& language_option,
+        BaseRecipe base_recipe = BaseRecipe::non_shiny,
         bool toggleable = false,
         bool enabled = true
     )
-        : SandwichMakerOption(&language_option, toggleable, enabled)
+        : SandwichMakerOption(&language_option, base_recipe, toggleable, enabled)
     {}
 
 public:
@@ -261,6 +263,7 @@ public:
 private:
     SandwichMakerOption(
         OCR::LanguageOCROption* language_option,
+        BaseRecipe base_recipe,
         bool toggleable,
         bool enabled
     );

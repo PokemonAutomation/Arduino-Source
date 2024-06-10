@@ -293,6 +293,7 @@ SandwichMakerOption::~SandwichMakerOption(){
 
 SandwichMakerOption::SandwichMakerOption(
     OCR::LanguageOCROption* language_option,
+    BaseRecipe base_recipe,
     bool toggleable,
     bool enabled
 )
@@ -323,7 +324,7 @@ SandwichMakerOption::SandwichMakerOption(
             {BaseRecipe::custom,    "custom",   "Custom Sandwich"},
         },
         LockMode::LOCK_WHILE_RUNNING,
-        BaseRecipe::non_shiny
+        base_recipe
         )
     , TYPE(
         "",
