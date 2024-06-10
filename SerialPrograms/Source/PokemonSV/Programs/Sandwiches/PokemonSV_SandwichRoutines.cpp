@@ -787,6 +787,26 @@ void make_sandwich_option(ProgramEnvironment& env, ConsoleHandle& console, BotBa
         console.log("Ingredients validated.", COLOR_BLACK);
         console.overlay().add_log("Ingredients validated.", COLOR_WHITE);
     }
+    else if(SANDWICH_OPTIONS.BASE_RECIPE == BaseRecipe::non_shiny){
+        console.log("Preset sandwich selected.", COLOR_BLACK);
+        console.overlay().add_log("Preset sandwich selected.");
+
+        // std::vector<std::string> table = SANDWICH_OPTIONS.get_premade_ingredients(
+        //     SANDWICH_OPTIONS.get_premade_sandwich_recipe(SANDWICH_OPTIONS.BASE_RECIPE, SANDWICH_OPTIONS.TYPE, SANDWICH_OPTIONS.PARADOX));
+
+        // The only non-shiny sandwich added at this time is Normal Encounter.
+        std::vector<std::string> table = SANDWICH_OPTIONS.get_premade_ingredients(SandwichRecipe::non_shiny_normal);
+
+        for (auto&& s : table){
+            if (std::find(ALL_SANDWICH_FILLINGS_SLUGS().begin(), ALL_SANDWICH_FILLINGS_SLUGS().end(), s) != ALL_SANDWICH_FILLINGS_SLUGS().end()){
+                fillings[s]++;
+                num_fillings++;
+            }else{
+                condiments[s]++;
+                num_condiments++;
+            }
+        }
+    }
     //Otherwise get the preset ingredients
     else{
         console.log("Preset sandwich selected.", COLOR_BLACK);

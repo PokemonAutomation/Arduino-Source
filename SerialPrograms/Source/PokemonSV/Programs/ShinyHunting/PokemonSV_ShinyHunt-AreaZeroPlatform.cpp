@@ -125,7 +125,7 @@ ShinyHuntAreaZeroPlatform::ShinyHuntAreaZeroPlatform()
         LockMode::UNLOCK_WHILE_RUNNING,
         35
     )
-    , SANDWICH_OPTIONS(LANGUAGE)
+    , SANDWICH_OPTIONS(LANGUAGE, BaseRecipe::paradox)
     , GO_HOME_WHEN_DONE(true)
     , AUTO_HEAL_PERCENT(
         "<b>Auto-Heal %</b><br>Auto-heal if your HP drops below this percentage.",
