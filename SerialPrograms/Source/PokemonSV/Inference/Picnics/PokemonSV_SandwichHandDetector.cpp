@@ -110,7 +110,7 @@ std::pair<double, double> SandwichHandLocator::locate_sandwich_hand(const ImageV
         ((m_type == HandType::FREE) ? SandwichFreeHandMatcher::instance() : SandwichGrabbingHandMatcher::instance()),
         filters,
         {min_size, SIZE_MAX},
-        60,
+        80,
         [&](Kernels::Waterfill::WaterfillObject& object) -> bool {
             hand_location = std::make_pair(
                 (object.center_of_gravity_x() + pixel_box.min_x) / (double)frame.width(),
