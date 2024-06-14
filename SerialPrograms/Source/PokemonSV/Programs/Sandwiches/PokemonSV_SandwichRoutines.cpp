@@ -14,7 +14,7 @@
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/InterruptableCommands.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
-#include "CommonFramework/ImageTools/ImageFilter.h"
+//#include "CommonFramework/ImageTools/ImageFilter.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
@@ -897,7 +897,8 @@ void make_sandwich_preset(ProgramEnvironment& env, ConsoleHandle& console, BotBa
             for (int j = 0; j < plate_calcs; j++){
                 plate_amounts.push_back(
                     (int)(FillingsCoordinates::instance().get_filling_information(i).servingsPerPlate)
-                    * (int)(FillingsCoordinates::instance().get_filling_information(i).piecesPerServing));
+                    *(int)(FillingsCoordinates::instance().get_filling_information(i).piecesPerServing)
+                );
             }
         }
 
@@ -922,8 +923,13 @@ void make_sandwich_preset(ProgramEnvironment& env, ConsoleHandle& console, BotBa
     //Player must be on default sandwich menu
     std::map<std::string, uint8_t> fillings_copy(fillings); //Making a copy as we need the map for later
     enter_custom_sandwich_mode(env.program_info(), console, context);
-    add_sandwich_ingredients(env.realtime_dispatcher(), console, context, language,
-        std::move(fillings_copy), std::move(condiments));
+    add_sandwich_ingredients(
+        env.realtime_dispatcher(),
+        console, context,
+        language,
+        std::move(fillings_copy),
+        std::move(condiments)
+    );
 
     run_sandwich_maker(env, console, context, language, fillings, fillings_sorted, plates);
 }
@@ -963,7 +969,10 @@ void run_sandwich_maker(ProgramEnvironment& env, ConsoleHandle& console, BotBase
                 }else{
                     console.log("Read nothing on center plate label.");
                     throw OperationFailedException(
-                        ErrorReport::SEND_ERROR_REPORT, console, "No ingredient found on center plate label.", true
+                        ErrorReport::SEND_ERROR_REPORT,
+                        console,
+                        "No ingredient found on center plate label.",
+                        std::move(screen)
                     );
                 }
             }
@@ -1008,7 +1017,10 @@ void run_sandwich_maker(ProgramEnvironment& env, ConsoleHandle& console, BotBase
 
             if (left_filling.empty()){
                 throw OperationFailedException(
-                    ErrorReport::SEND_ERROR_REPORT, console, "No ingredient label found on remaining plate " + std::to_string(i) + ".", true
+                    ErrorReport::SEND_ERROR_REPORT,
+                    console,
+                    "No ingredient label found on remaining plate " + std::to_string(i) + ".",
+                    std::move(screen)
                 );
             }
             console.log("Read remaining plate " + std::to_string(i) + " label: " + left_filling);
@@ -1027,9 +1039,10 @@ void run_sandwich_maker(ProgramEnvironment& env, ConsoleHandle& console, BotBase
         if ((int)plate_order.size() != plates){
             env.log("Found # plate labels " + std::to_string(plate_order.size()) + ", not same as desired # plates " + std::to_string(plates));
             throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
+                ErrorReport::SEND_ERROR_REPORT,
+                console,
                 "Number of plate labels did not match number of plates.",
-                true
+                std::move(screen)
             );
         }
     }

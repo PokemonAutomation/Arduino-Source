@@ -104,7 +104,6 @@ CameraSession::CameraSession(Logger& logger, Resolution default_resolution)
     , m_last_image_timestamp(WallClock::min())
     , m_stats_conversion("ConvertFrame", "ms", 1000, std::chrono::seconds(10))
 {
-
     uint8_t watchdog_timeout = GlobalSettings::instance().AUTO_RESET_VIDEO_SECONDS;
     if (watchdog_timeout != 0){
         global_watchdog().add(*this, std::chrono::seconds(watchdog_timeout));
