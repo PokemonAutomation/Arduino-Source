@@ -8,13 +8,9 @@
 #define PokemonAutomation_PokemonSV_MaterialFarmer_H
 
 #include <functional>
-#include "Common/Cpp/Options/FloatingPointOption.h"
-#include "Common/Cpp/Options/EnumDropdownOption.h"
-#include "CommonFramework/Options/LanguageOCROption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
-#include "PokemonSV/Options/PokemonSV_EncounterBotCommon.h"
 #include "PokemonSV/Options/PokemonSV_SandwichMakerOption.h"
 #include "PokemonSV_MaterialFarmerTools.h"
 
@@ -37,6 +33,7 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
+    GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
     MaterialFarmerOptions MATERIAL_FARMER_OPTIONS;
 
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;

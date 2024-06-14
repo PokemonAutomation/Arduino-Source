@@ -9,14 +9,10 @@
 
 #include <functional>
 #include "Common/Cpp/Options/FloatingPointOption.h"
-#include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Options/LanguageOCROption.h"
-#include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
-#include "PokemonSV/Inference/Boxes/PokemonSV_IvJudgeReader.h"
-#include "PokemonSV/Options/PokemonSV_EncounterBotCommon.h"
 #include "PokemonSV/Options/PokemonSV_SandwichMakerOption.h"
 #include "PokemonSV/Programs/ShinyHunting/PokemonSV_LetsGoTools.h"
 
@@ -48,7 +44,6 @@ public:
     ~MaterialFarmerOptions();
     MaterialFarmerOptions(
         OCR::LanguageOCROption* language_option,
-        GoHomeWhenDoneOption* go_home_when_done_option,
         EventNotificationOption& notif_status_update_option,
         EventNotificationOption& notif_program_finish_option,
         EventNotificationOption& notif_error_recoverable_option,
@@ -58,26 +53,25 @@ public:
 
 private:
     std::unique_ptr<OCR::LanguageOCROption> m_language_owner;
-    std::unique_ptr<GoHomeWhenDoneOption> m_go_home_when_done_owner;
 
 public:
+    SimpleIntegerOption<uint16_t> RUN_TIME_IN_MINUTES;
 
-    BooleanCheckBoxOption SAVE_GAME_BEFORE_SANDWICH;
-    StaticTextOption SAVE_GAME_BEFORE_SANDWICH_STATIC_TEXT;
 
-    SimpleIntegerOption<uint16_t> NUM_SANDWICH_ROUNDS;
-    StaticTextOption NUM_SANDWICH_ROUNDS_STATIC_TEXT;
+//    BooleanCheckBoxOption SAVE_GAME_BEFORE_SANDWICH;
+//    StaticTextOption SAVE_GAME_BEFORE_SANDWICH_STATIC_TEXT;
+
+//    StaticTextOption NUM_SANDWICH_ROUNDS_STATIC_TEXT;
     
     OCR::LanguageOCROption& LANGUAGE;
     SandwichMakerOption SANDWICH_OPTIONS;
-    GoHomeWhenDoneOption& GO_HOME_WHEN_DONE;
     FloatingPointOption AUTO_HEAL_PERCENT;
 
     // Debug options
     SectionDividerOption m_advanced_options;
     BooleanCheckBoxOption SAVE_DEBUG_VIDEO;
     BooleanCheckBoxOption SKIP_WARP_TO_POKECENTER;
-    BooleanCheckBoxOption ENABLE_SANDWICH;
+//    BooleanCheckBoxOption ENABLE_SANDWICH;
     SimpleIntegerOption<uint16_t> TIME_PER_SANDWICH;
     SimpleIntegerOption<uint16_t> NUM_FORWARD_MOVES_PER_LETS_GO_ITERATION;
 
@@ -89,8 +83,12 @@ public:
 
 
 
-void run_material_farmer(SingleSwitchProgramEnvironment& env, BotBaseContext& context, 
-    MaterialFarmerOptions& options, MaterialFarmerStats& stats);
+void run_material_farmer(
+    SingleSwitchProgramEnvironment& env,
+    BotBaseContext& context,
+    MaterialFarmerOptions& options,
+    MaterialFarmerStats& stats
+);
 
 void run_one_sandwich_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context, 
     LetsGoEncounterBotTracker& encounter_tracker, MaterialFarmerOptions& options);
@@ -106,12 +104,20 @@ void lets_go_movement1(BotBaseContext& context);
 bool is_sandwich_expired(WallClock last_sandwich_time, std::chrono::minutes minutes_per_sandwich);
 
 void run_lets_go_iteration(
-    SingleSwitchProgramEnvironment& env, BotBaseContext& context, 
-    LetsGoEncounterBotTracker& encounter_tracker, int num_forward_moves_per_lets_go_iteration
+    SingleSwitchProgramEnvironment& env,
+    BotBaseContext& context,
+    LetsGoEncounterBotTracker& encounter_tracker,
+    int num_forward_moves_per_lets_go_iteration
 );
 
-void run_from_battles_and_back_to_pokecenter(SingleSwitchProgramEnvironment& env, BotBaseContext& context, 
-    std::function<void(SingleSwitchProgramEnvironment& env, BotBaseContext& context)>&& action);
+void run_from_battles_and_back_to_pokecenter(
+    SingleSwitchProgramEnvironment& env,
+    BotBaseContext& context,
+    std::function<
+        void(SingleSwitchProgramEnvironment& env,
+        BotBaseContext& context)
+    >&& action
+);
 
 
 

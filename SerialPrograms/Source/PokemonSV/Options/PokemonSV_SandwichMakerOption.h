@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonSV_SandwichMakerOption_H
 
 #include "Common/Cpp/Options/StaticTextOption.h"
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/GroupOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 //#include "PokemonSV/Resources/PokemonSV_Ingredients.h"
@@ -222,24 +223,14 @@ class SandwichMakerOption : public GroupOption, private ConfigOption::Listener{
 public:
     ~SandwichMakerOption();
 
-    //  Include the language option in the box.
     SandwichMakerOption(
-        BaseRecipe base_recipe = BaseRecipe::non_shiny,
-        bool toggleable = false,
-        bool enabled = true
-    )
-        : SandwichMakerOption(nullptr, base_recipe, toggleable, enabled)
-    {}
-
-    //  Don't include language option. Give it one instead.
-    SandwichMakerOption(
-        OCR::LanguageOCROption& language_option,
-        BaseRecipe base_recipe = BaseRecipe::non_shiny,
-        bool toggleable = false,
-        bool enabled = true
-    )
-        : SandwichMakerOption(&language_option, base_recipe, toggleable, enabled)
-    {}
+        std::string label,
+        OCR::LanguageOCROption* language_option,
+        BaseRecipe base_recipe,
+        bool show_save_option,
+        bool toggleable,
+        bool enabled
+    );
 
 public:
     std::string herba_to_string(HerbaSelection value);
@@ -252,6 +243,8 @@ private:
 public:
     OCR::LanguageOCROption& LANGUAGE;
 
+    BooleanCheckBoxOption SAVE_GAME_BEFORE_SANDWICH;
+
     EnumDropdownOption<BaseRecipe> BASE_RECIPE;
     EnumDropdownOption<PokemonType> TYPE;
     EnumDropdownOption<ParadoxRecipe> PARADOX;
@@ -261,12 +254,6 @@ public:
     SandwichIngredientsTable SANDWICH_INGREDIENTS;
 
 private:
-    SandwichMakerOption(
-        OCR::LanguageOCROption* language_option,
-        BaseRecipe base_recipe,
-        bool toggleable,
-        bool enabled
-    );
     virtual void value_changed() override;
     virtual std::string check_validity() const override;
 

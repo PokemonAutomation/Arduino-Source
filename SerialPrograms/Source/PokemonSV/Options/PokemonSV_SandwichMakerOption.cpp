@@ -292,14 +292,16 @@ SandwichMakerOption::~SandwichMakerOption(){
 }
 
 SandwichMakerOption::SandwichMakerOption(
+    std::string label,
     OCR::LanguageOCROption* language_option,
     BaseRecipe base_recipe,
+    bool show_save_option,
     bool toggleable,
     bool enabled
 )
     : GroupOption(
-        "Sandwich Maker",
-        LockMode::LOCK_WHILE_RUNNING,
+        std::move(label),
+        LockMode::UNLOCK_WHILE_RUNNING,
         toggleable, enabled
     )
     , m_language_owner(language_option == nullptr
@@ -312,6 +314,12 @@ SandwichMakerOption::SandwichMakerOption(
         : nullptr
     )
     , LANGUAGE(language_option == nullptr ? *m_language_owner : *language_option)
+    , SAVE_GAME_BEFORE_SANDWICH(
+        "<b>Save game before making sandwich:</b><br>Sandwich making can be unreliable. "
+        "Save the game before each sandwich to prevent loss of progress.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        true
+    )
     , BASE_RECIPE(
         "<b>Sandwich Recipe:</b><br>Select a recipe to make a sandwich with preset ingredients, or select Custom Sandwich to make a sandwich using the table below. "
         "Refer to the documentation for recipe ingredients and valid Herba Mystica combinations.",
@@ -434,6 +442,9 @@ SandwichMakerOption::SandwichMakerOption(
 {
     if (m_language_owner){
         PA_ADD_OPTION(LANGUAGE);
+    }
+    if (show_save_option){
+        PA_ADD_OPTION(SAVE_GAME_BEFORE_SANDWICH);
     }
     PA_ADD_OPTION(BASE_RECIPE);
     PA_ADD_OPTION(TYPE);

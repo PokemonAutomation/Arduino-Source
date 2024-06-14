@@ -5,6 +5,7 @@
  */
 
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
+#include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Tools/VideoResolutionCheck.h"
@@ -41,8 +42,9 @@ std::unique_ptr<StatsTracker> MaterialFarmer_Descriptor::make_stats() const{
 
 
 MaterialFarmer::MaterialFarmer()
-    : MATERIAL_FARMER_OPTIONS(
-        nullptr, nullptr,
+    : GO_HOME_WHEN_DONE(true)
+    , MATERIAL_FARMER_OPTIONS(
+        nullptr,
         NOTIFICATION_STATUS_UPDATE,
         NOTIFICATION_PROGRAM_FINISH,
         NOTIFICATION_ERROR_RECOVERABLE,
@@ -56,6 +58,7 @@ MaterialFarmer::MaterialFarmer()
         &NOTIFICATION_ERROR_FATAL,
     })
 {
+    PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(MATERIAL_FARMER_OPTIONS);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
@@ -89,8 +92,13 @@ void MaterialFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
     }
 
     MaterialFarmerStats& stats = env.current_stats<MaterialFarmerStats>();
-    run_material_farmer(env, context, MATERIAL_FARMER_OPTIONS, stats);
-    
+
+    try{
+        run_material_farmer(env, context, MATERIAL_FARMER_OPTIONS, stats);
+    }catch (ProgramFinishedException&){}
+
+    GO_HOME_WHEN_DONE.run_end_of_program(context);
+    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 }
 
 

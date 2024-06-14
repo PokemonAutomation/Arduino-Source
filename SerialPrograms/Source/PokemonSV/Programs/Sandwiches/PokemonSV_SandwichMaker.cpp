@@ -39,7 +39,8 @@ SandwichMaker_Descriptor::SandwichMaker_Descriptor()
 {}
 
 SandwichMaker::SandwichMaker()
-    : GO_HOME_WHEN_DONE(false)
+    : SANDWICH_OPTIONS("Sandwich Options", nullptr, BaseRecipe::non_shiny, false, false, true)
+    , GO_HOME_WHEN_DONE(false)
     , NOTIFICATIONS({
         &NOTIFICATION_PROGRAM_FINISH,
         &NOTIFICATION_ERROR_FATAL,

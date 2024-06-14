@@ -7,6 +7,7 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Qt/TimeQt.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Tools/StatsTracking.h"
@@ -599,7 +600,6 @@ ItemPrinterRNG::ItemPrinterRNG()
     , MATERIAL_FARMER_DISABLED_EXPLANATION("")
     , MATERIAL_FARMER_OPTIONS(
         &LANGUAGE,
-        &GO_HOME_WHEN_DONE,
         NOTIFICATION_STATUS_UPDATE,
         NOTIFICATION_PROGRAM_FINISH,
         NOTIFICATION_ERROR_RECOVERABLE,
@@ -1248,41 +1248,40 @@ void ItemPrinterRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext
     ItemPrinterRNG_Descriptor::Stats& stats = env.current_stats<ItemPrinterRNG_Descriptor::Stats>();
     env.update_stats();
 
-
-
-    if (!AUTO_MATERIAL_FARMING){
-        run_item_printer_rng(env, context, stats);
-    }
-    else {
-        // Throw user setup errors early in program
-        // - Ensure language is set
-        const Language language = LANGUAGE;
-        if (language == Language::None) {
-            throw UserSetupError(env.console.logger(), "Must set game language option to read item printer rewards.");
-        }        
-
-        // - Ensure audio input is enabled
-        LetsGoKillSoundDetector audio_detector(env.console, [](float){ return true; });
-        wait_until(
-            env.console, context,
-            std::chrono::milliseconds(1100),
-            {
-                static_cast<AudioInferenceCallback&>(audio_detector)
-            }
-        );
-        audio_detector.throw_if_no_sound(std::chrono::milliseconds(1000));
-
-        // Don't allow the material farmer stats to affect the Item Printer's stats.
-        MaterialFarmerStats mat_farm_stats;// = env.current_stats<MaterialFarmer_Descriptor::Stats>();
-        for (int i = 0; i < NUM_ROUNDS_OF_ITEM_PRINTER_TO_MATERIAL_FARM; i++){
+    try{
+        if (!AUTO_MATERIAL_FARMING){
             run_item_printer_rng(env, context, stats);
-            press_Bs_to_back_to_overworld(env.program_info(), env.console, context);
-            move_from_item_printer_to_material_farming(env, context);
-            run_material_farmer(env, context, MATERIAL_FARMER_OPTIONS, mat_farm_stats);
-            move_from_material_farming_to_item_printer(env, context);
-        }
+        }else{
+            // Throw user setup errors early in program
+            // - Ensure language is set
+            const Language language = LANGUAGE;
+            if (language == Language::None) {
+                throw UserSetupError(env.console.logger(), "Must set game language option to read item printer rewards.");
+            }
 
-    }
+            // - Ensure audio input is enabled
+            LetsGoKillSoundDetector audio_detector(env.console, [](float){ return true; });
+            wait_until(
+                env.console, context,
+                std::chrono::milliseconds(1100),
+                {
+                    static_cast<AudioInferenceCallback&>(audio_detector)
+                }
+            );
+            audio_detector.throw_if_no_sound(std::chrono::milliseconds(1000));
+
+            // Don't allow the material farmer stats to affect the Item Printer's stats.
+            MaterialFarmerStats mat_farm_stats;// = env.current_stats<MaterialFarmer_Descriptor::Stats>();
+            for (int i = 0; i < NUM_ROUNDS_OF_ITEM_PRINTER_TO_MATERIAL_FARM; i++){
+                run_item_printer_rng(env, context, stats);
+                press_Bs_to_back_to_overworld(env.program_info(), env.console, context);
+                move_from_item_printer_to_material_farming(env, context);
+                run_material_farmer(env, context, MATERIAL_FARMER_OPTIONS, mat_farm_stats);
+                move_from_material_farming_to_item_printer(env, context);
+            }
+        }
+    }catch (ProgramFinishedException&){}
+
 
     if (FIX_TIME_WHEN_DONE){
         pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);

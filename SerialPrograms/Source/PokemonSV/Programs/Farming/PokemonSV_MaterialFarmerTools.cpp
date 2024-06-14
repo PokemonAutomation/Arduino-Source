@@ -12,14 +12,10 @@
 #include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/Tools/ErrorDumper.h"
-#include "CommonFramework/Tools/StatsTracking.h"
-#include "CommonFramework/Tools/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_LetsGoHpReader.h"
 
-#include "PokemonSV/Inference/Battles/PokemonSV_EncounterWatcher.h"
+#include "PokemonSV/Inference/Boxes/PokemonSV_IvJudgeReader.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
@@ -29,7 +25,6 @@
 #include "PokemonSV/Programs/Sandwiches/PokemonSV_SandwichRoutines.h"
 #include "PokemonSV/Programs/ShinyHunting/PokemonSV_LetsGoTools.h"
 #include "PokemonSV_MaterialFarmerTools.h"
-#include "PokemonSV/Programs/ShinyHunting/PokemonSV_ShinyHunt-Scatterbug.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_SnapshotDumper.h"
 
 // #include <iostream>
@@ -44,12 +39,11 @@ using namespace Pokemon;
 
 
 MaterialFarmerOptions::~MaterialFarmerOptions(){
-    ENABLE_SANDWICH.remove_listener(*this);
+//    ENABLE_SANDWICH.remove_listener(*this);
 }
 
 MaterialFarmerOptions::MaterialFarmerOptions(
     OCR::LanguageOCROption* language_option,
-    GoHomeWhenDoneOption* go_home_when_done_option,
     EventNotificationOption& notif_status_update_option,
     EventNotificationOption& notif_program_finish_option,
     EventNotificationOption& notif_error_recoverable_option,
@@ -69,25 +63,20 @@ MaterialFarmerOptions::MaterialFarmerOptions(
         )
         : nullptr
     )
-    , m_go_home_when_done_owner(go_home_when_done_option == nullptr 
-        ? new GoHomeWhenDoneOption(true) 
-        : nullptr
-    )
-    , SAVE_GAME_BEFORE_SANDWICH(
-        "<b>Save Game before each round:</b>",
+    , RUN_TIME_IN_MINUTES(
+        "<b>Run Duration:</b><br>Run the material farmer for this many minutes.",
         LockMode::UNLOCK_WHILE_RUNNING,
-        true
+        60
     )
-    , SAVE_GAME_BEFORE_SANDWICH_STATIC_TEXT("")
-    , NUM_SANDWICH_ROUNDS(
-        "<b>Number of rounds to run:</b>",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        3
-    )
-    , NUM_SANDWICH_ROUNDS_STATIC_TEXT("")
+//    , SAVE_GAME_BEFORE_SANDWICH(
+//        "<b>Save Game before each round:</b>",
+//        LockMode::UNLOCK_WHILE_RUNNING,
+//        true
+//    )
+//    , SAVE_GAME_BEFORE_SANDWICH_STATIC_TEXT("")
+//    , NUM_SANDWICH_ROUNDS_STATIC_TEXT("")
     , LANGUAGE(language_option == nullptr ? *m_language_owner : *language_option)
-    , SANDWICH_OPTIONS(LANGUAGE)
-    , GO_HOME_WHEN_DONE(go_home_when_done_option == nullptr ? *m_go_home_when_done_owner : *go_home_when_done_option)
+    , SANDWICH_OPTIONS("Make a Sandwich", &LANGUAGE, BaseRecipe::non_shiny, true, true, false)
     , AUTO_HEAL_PERCENT(
         "<b>Auto-Heal %</b><br>Auto-heal if your HP drops below this percentage.",
         LockMode::UNLOCK_WHILE_RUNNING,
@@ -108,12 +97,12 @@ MaterialFarmerOptions::MaterialFarmerOptions(
         LockMode::UNLOCK_WHILE_RUNNING,
         false
     )
-    , ENABLE_SANDWICH(
-        "<b>Enable Sandwich making:</b><br>"
-        "This is for boosting spawn rates of specific Pokemon.",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        false
-    )
+//    , ENABLE_SANDWICH(
+//        "<b>Enable Sandwich making:</b><br>"
+//        "This is for boosting spawn rates of specific Pokemon.",
+//        LockMode::UNLOCK_WHILE_RUNNING,
+//        false
+//    )
     , TIME_PER_SANDWICH(
         "<b>Time per sandwich:</b><br>Number of minutes before resetting sandwich.",
         LockMode::UNLOCK_WHILE_RUNNING,
@@ -130,18 +119,15 @@ MaterialFarmerOptions::MaterialFarmerOptions(
     , NOTIFICATION_ERROR_RECOVERABLE(notif_error_recoverable_option)
     , NOTIFICATION_ERROR_FATAL(notif_error_fatal_option)
 {
-    PA_ADD_OPTION(ENABLE_SANDWICH);
-    PA_ADD_OPTION(SAVE_GAME_BEFORE_SANDWICH);
-    PA_ADD_OPTION(SAVE_GAME_BEFORE_SANDWICH_STATIC_TEXT);
-    PA_ADD_OPTION(NUM_SANDWICH_ROUNDS);
-    PA_ADD_OPTION(NUM_SANDWICH_ROUNDS_STATIC_TEXT);
+    PA_ADD_OPTION(RUN_TIME_IN_MINUTES);
+//    PA_ADD_OPTION(ENABLE_SANDWICH);
+//    PA_ADD_OPTION(SAVE_GAME_BEFORE_SANDWICH);
+//    PA_ADD_OPTION(SAVE_GAME_BEFORE_SANDWICH_STATIC_TEXT);
+//    PA_ADD_OPTION(NUM_SANDWICH_ROUNDS_STATIC_TEXT);
     if (m_language_owner){
         PA_ADD_OPTION(LANGUAGE);
     }
     PA_ADD_OPTION(SANDWICH_OPTIONS);
-    if(m_go_home_when_done_owner){
-        PA_ADD_OPTION(GO_HOME_WHEN_DONE);
-    }
     PA_ADD_OPTION(AUTO_HEAL_PERCENT);
 
     if (PreloadSettings::instance().DEVELOPER_MODE){
@@ -153,48 +139,57 @@ MaterialFarmerOptions::MaterialFarmerOptions(
     }
 
     MaterialFarmerOptions::value_changed();
-    ENABLE_SANDWICH.add_listener(*this);
+//    ENABLE_SANDWICH.add_listener(*this);
 }
 
 void MaterialFarmerOptions::value_changed(){
 
-    if (MaterialFarmerOptions::ENABLE_SANDWICH){
-        SAVE_GAME_BEFORE_SANDWICH_STATIC_TEXT.set_text(
-            "Saves the game before each sandwich.<br>"
-            "Recommended to leave on, as the sandwich maker will reset the game if it detects an error.<br>"
-        );
-        NUM_SANDWICH_ROUNDS_STATIC_TEXT.set_text(
-            "One sandwich per round.<br>"
-            "400-650 Happiny dust per sandwich, with Normal Encounter power level 2.<br>"
-            "(e.g. Chorizo x4, Banana x2, Mayo x3, Whipped Cream x1)<br>"
-        );
-        MaterialFarmerOptions::SANDWICH_OPTIONS.set_visibility(ConfigOptionState::ENABLED);
-    }else{
-        SAVE_GAME_BEFORE_SANDWICH_STATIC_TEXT.set_text("");
-        NUM_SANDWICH_ROUNDS_STATIC_TEXT.set_text("30 minutes per round.<br>");
-        MaterialFarmerOptions::SANDWICH_OPTIONS.set_visibility(ConfigOptionState::DISABLED);
-    }
+//    if (MaterialFarmerOptions::ENABLE_SANDWICH){
+//        SAVE_GAME_BEFORE_SANDWICH_STATIC_TEXT.set_text(
+//            "Saves the game before each sandwich.<br>"
+//            "Recommended to leave on, as the sandwich maker will reset the game if it detects an error.<br>"
+//        );
+//        NUM_SANDWICH_ROUNDS_STATIC_TEXT.set_text(
+//            "One sandwich per round.<br>"
+//            "400-650 Happiny dust per sandwich, with Normal Encounter power level 2.<br>"
+//            "(e.g. Chorizo x4, Banana x2, Mayo x3, Whipped Cream x1)<br>"
+//        );
+//        MaterialFarmerOptions::SANDWICH_OPTIONS.set_visibility(ConfigOptionState::ENABLED);
+//    }else{
+//        SAVE_GAME_BEFORE_SANDWICH_STATIC_TEXT.set_text("");
+//        NUM_SANDWICH_ROUNDS_STATIC_TEXT.set_text("30 minutes per round.<br>");
+//        MaterialFarmerOptions::SANDWICH_OPTIONS.set_visibility(ConfigOptionState::DISABLED);
+//    }
 
 }
 
 
 
 
-void run_material_farmer(SingleSwitchProgramEnvironment& env, BotBaseContext& context, 
-    MaterialFarmerOptions& options, MaterialFarmerStats& stats
+void run_material_farmer(
+    SingleSwitchProgramEnvironment& env,
+    BotBaseContext& context,
+    MaterialFarmerOptions& options,
+    MaterialFarmerStats& stats
 ){
-    
     LetsGoEncounterBotTracker encounter_tracker(
         env, env.console, context,
         stats,
         options.LANGUAGE
     );
 
+    WallClock start = current_time();
 
     size_t consecutive_failures;
     size_t max_consecutive_failures = 10;    
     bool done_sandwich_iteration;
-    for (uint16_t i = 0; i < options.NUM_SANDWICH_ROUNDS; i++){
+    while (true){
+        WallDuration runtime = current_time() - start;
+        auto total_minutes = std::chrono::duration_cast<std::chrono::minutes>(runtime).count();
+        if (total_minutes >= options.RUN_TIME_IN_MINUTES){
+            break;
+        }
+
         consecutive_failures = 0;
         done_sandwich_iteration = false;
         while (!done_sandwich_iteration){
@@ -228,9 +223,6 @@ void run_material_farmer(SingleSwitchProgramEnvironment& env, BotBaseContext& co
                 reset_game(env.program_info(), env.console, context);
                 ++stats.m_game_resets;
                 env.update_stats();
-            }catch(ProgramFinishedException&){
-                options.GO_HOME_WHEN_DONE.run_end_of_program(context);
-                throw;
             }
         }
     }
@@ -239,20 +231,23 @@ void run_material_farmer(SingleSwitchProgramEnvironment& env, BotBaseContext& co
 
 
 // start at North Province (Area 3) Pokecenter, make a sandwich, then use let's go repeatedly until 30 min passes.
-void run_one_sandwich_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context, 
-    LetsGoEncounterBotTracker& encounter_tracker, MaterialFarmerOptions& options)
-{
-
+void run_one_sandwich_iteration(
+    SingleSwitchProgramEnvironment& env,
+    BotBaseContext& context,
+    LetsGoEncounterBotTracker& encounter_tracker,
+    MaterialFarmerOptions& options
+){
     MaterialFarmerStats& stats = env.current_stats<MaterialFarmerStats>();
 
     WallClock last_sandwich_time = WallClock::min();
 
-    if (options.SAVE_GAME_BEFORE_SANDWICH){
-        save_game_from_overworld(env.program_info(), env.console, context);
-    }
     // make sandwich then go back to Pokecenter to reset position
-    if (options.ENABLE_SANDWICH){
-        run_from_battles_and_back_to_pokecenter(env, context, 
+    if (options.SANDWICH_OPTIONS.enabled()){
+        if (options.SANDWICH_OPTIONS.SAVE_GAME_BEFORE_SANDWICH){
+            save_game_from_overworld(env.program_info(), env.console, context);
+        }
+        run_from_battles_and_back_to_pokecenter(
+            env, context,
             [&](SingleSwitchProgramEnvironment& env, BotBaseContext& context){
                 // Orient camera to look at same direction as player character
                 // - This is needed because when save-load the game, 
@@ -281,8 +276,7 @@ void run_one_sandwich_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
 
             }
         );
-    }
-    else {
+    }else{
         last_sandwich_time = current_time();
     }
 
@@ -496,9 +490,12 @@ void lets_go_movement1(BotBaseContext& context){
 - move forward and send out lead pokemon to autobattle. When it runs out of pokemon to battle, 
 move forward again to repeat the cycle. It does this as many times as per num_forward_moves_per_lets_go_iteration.
  */
-void run_lets_go_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context, 
-    LetsGoEncounterBotTracker& encounter_tracker, int num_forward_moves_per_lets_go_iteration)
-{
+void run_lets_go_iteration(
+    SingleSwitchProgramEnvironment& env,
+    BotBaseContext& context,
+    LetsGoEncounterBotTracker& encounter_tracker,
+    int num_forward_moves_per_lets_go_iteration
+){
     auto& console = env.console;
     // - Orient camera to look at same direction as player character
     // - This is needed because when save-load the game, the camera points
@@ -531,9 +528,14 @@ we can handle pokemon wild encounters when executing the action.
 - After battle ends, move back to PokeCenter to start the `action` again.
 - `action` must be an action starting at the PokeCenter 
 */
-void run_from_battles_and_back_to_pokecenter(SingleSwitchProgramEnvironment& env, BotBaseContext& context, 
-    std::function<void(SingleSwitchProgramEnvironment& env, BotBaseContext& context)>&& action)
-{
+void run_from_battles_and_back_to_pokecenter(
+    SingleSwitchProgramEnvironment& env,
+    BotBaseContext& context,
+    std::function<
+        void(SingleSwitchProgramEnvironment& env,
+        BotBaseContext& context)
+    >&& action
+){
     MaterialFarmerStats& stats = env.current_stats<MaterialFarmerStats>();
     bool action_finished = false;
     bool first_iteration = true;
@@ -555,8 +557,7 @@ void run_from_battles_and_back_to_pokecenter(SingleSwitchProgramEnvironment& env
                 // We still need to carry out `action`
                 if (first_iteration){
                     first_iteration = false;
-                }
-                else{
+                }else{
                     // This is at least the second iteration in the while-loop.
                     // So a previous round of action failed.
                     // We need to first re-initialize our position to the PokeCenter
@@ -704,7 +705,6 @@ void move_from_blueberry_entrance_to_league_club(SingleSwitchProgramEnvironment&
 }
 
 void move_from_league_club_entrance_to_item_printer(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-
     context.wait_for_all_requests();
 
     // move forwards towards table next to item printer
@@ -722,7 +722,6 @@ void move_from_item_printer_to_material_farming(SingleSwitchProgramEnvironment& 
 
 // assumes you start in the position in front of the item printer, as if you finished using it.
 void move_from_item_printer_to_blueberry_entrance(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-
     context.wait_for_all_requests();
 
     // look left towards door
