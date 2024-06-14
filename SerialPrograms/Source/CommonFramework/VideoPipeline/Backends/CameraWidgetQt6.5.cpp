@@ -126,6 +126,7 @@ void CameraSession::set(const CameraOption& option){
     });
 }
 void CameraSession::reset(){
+    m_logger.log("Resetting the video...", COLOR_GREEN);
     QMetaObject::invokeMethod(this, [this]{
         std::lock_guard<std::mutex> lg(m_lock);
         shutdown();
@@ -387,9 +388,11 @@ void CameraSession::startup(){
 //    capture-
 
     connect(m_camera.get(), &QCamera::errorOccurred, this, [&](){
-        if (m_camera->error() != QCamera::NoError){
-            m_logger.log("QCamera error: " + m_camera->errorString().toStdString());
+        if (m_camera->error() == QCamera::NoError){
+            return;
         }
+        m_logger.log("QCamera error: " + m_camera->errorString().toStdString());
+        reset();
     });
     clear_video_output();
 
@@ -414,7 +417,6 @@ void CameraSession::on_watchdog_timeout(){
     if (watchdog_timeout == 0){
         return;
     }
-    m_logger.log("Resetting the video...", COLOR_GREEN);
     reset();
 }
 
