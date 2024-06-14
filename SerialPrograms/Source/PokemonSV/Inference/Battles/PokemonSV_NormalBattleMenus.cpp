@@ -63,7 +63,13 @@ bool NormalBattleMenuDetector::move_to_slot(ConsoleHandle& console, BotBaseConte
         return false;
     }
     for (size_t attempts = 0;; attempts++){
+        if (attempts > 10){
+            console.log("NormalBattleMenuDetector::move_to_slot(): Failed to move slot after 10 attempts.", COLOR_RED);
+            return false;
+        }
+
         context.wait_for_all_requests();
+
         VideoSnapshot screen = console.video().snapshot();
         int8_t current_slot = detect_slot(screen);
         if (current_slot < 0 || current_slot > 3){
@@ -73,10 +79,6 @@ bool NormalBattleMenuDetector::move_to_slot(ConsoleHandle& console, BotBaseConte
 //            static int c = 0;
 //            screen->save("bad-" + std::to_string(c++) + ".png");
 //            return false;
-        }
-        if (attempts > 10){
-            console.log("NormalBattleMenuDetector::move_to_slot(): Failed to move slot after 10 attempts.", COLOR_RED);
-            return false;
         }
 
         uint8_t diff = (4 + slot - (uint8_t)current_slot) % 4;
