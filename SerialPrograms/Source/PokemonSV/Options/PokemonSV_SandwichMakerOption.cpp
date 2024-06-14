@@ -454,23 +454,23 @@ SandwichMakerOption::SandwichMakerOption(
 
 void SandwichMakerOption::value_changed(){
     if (BASE_RECIPE == BaseRecipe::custom){
+        HERBA_ONE.set_visibility(ConfigOptionState::HIDDEN);
+        HERBA_TWO.set_visibility(ConfigOptionState::HIDDEN);
+        HERB_INCOMPATIBILITY_WARNING.set_visibility(ConfigOptionState::HIDDEN);
+        TYPE.set_visibility(ConfigOptionState::HIDDEN); //to prevent the options moving around
+        PARADOX.set_visibility(ConfigOptionState::HIDDEN);
         SANDWICH_INGREDIENTS.set_visibility(ConfigOptionState::ENABLED);
-        HERBA_ONE.set_visibility(ConfigOptionState::DISABLED);
-        HERBA_TWO.set_visibility(ConfigOptionState::DISABLED);
-        HERB_INCOMPATIBILITY_WARNING.set_visibility(ConfigOptionState::HIDDEN);
-        TYPE.set_visibility(ConfigOptionState::DISABLED); //to prevent the options moving around
-        PARADOX.set_visibility(ConfigOptionState::HIDDEN);
     }else if (BASE_RECIPE == BaseRecipe::non_shiny){
-        SANDWICH_INGREDIENTS.set_visibility(ConfigOptionState::DISABLED);
-        HERBA_ONE.set_visibility(ConfigOptionState::DISABLED);
-        HERBA_TWO.set_visibility(ConfigOptionState::DISABLED);
+        HERBA_ONE.set_visibility(ConfigOptionState::HIDDEN);
+        HERBA_TWO.set_visibility(ConfigOptionState::HIDDEN);
         HERB_INCOMPATIBILITY_WARNING.set_visibility(ConfigOptionState::HIDDEN);
-        TYPE.set_visibility(ConfigOptionState::DISABLED); //to prevent the options moving around
+        TYPE.set_visibility(ConfigOptionState::HIDDEN); //to prevent the options moving around
         PARADOX.set_visibility(ConfigOptionState::HIDDEN);
+        SANDWICH_INGREDIENTS.set_visibility(ConfigOptionState::HIDDEN);
     }else if (two_herba_required(BASE_RECIPE)){ //shiny, huge, tiny
-        SANDWICH_INGREDIENTS.set_visibility(ConfigOptionState::DISABLED);
         HERBA_ONE.set_visibility(ConfigOptionState::ENABLED);
         HERBA_TWO.set_visibility(ConfigOptionState::ENABLED);
+        SANDWICH_INGREDIENTS.set_visibility(ConfigOptionState::HIDDEN);
 
         std::string herb_error;
         do{
@@ -489,12 +489,12 @@ void SandwichMakerOption::value_changed(){
         TYPE.set_visibility(ConfigOptionState::ENABLED);
         PARADOX.set_visibility(ConfigOptionState::HIDDEN);
     }else{ //other
-        SANDWICH_INGREDIENTS.set_visibility(ConfigOptionState::DISABLED);
-        HERBA_ONE.set_visibility(ConfigOptionState::DISABLED);
-        HERBA_TWO.set_visibility(ConfigOptionState::DISABLED);
+        HERBA_ONE.set_visibility(ConfigOptionState::HIDDEN);
+        HERBA_TWO.set_visibility(ConfigOptionState::HIDDEN);
         TYPE.set_visibility(ConfigOptionState::HIDDEN);
         HERB_INCOMPATIBILITY_WARNING.set_visibility(ConfigOptionState::HIDDEN);
         PARADOX.set_visibility(ConfigOptionState::ENABLED);
+        SANDWICH_INGREDIENTS.set_visibility(ConfigOptionState::HIDDEN);
     }
 }
 std::string SandwichMakerOption::check_validity() const{

@@ -74,6 +74,7 @@ public:
     FloatingPointOption AUTO_HEAL_PERCENT;
 
     // Debug options
+    SectionDividerOption m_advanced_options;
     BooleanCheckBoxOption SAVE_DEBUG_VIDEO;
     BooleanCheckBoxOption SKIP_WARP_TO_POKECENTER;
     BooleanCheckBoxOption ENABLE_SANDWICH;

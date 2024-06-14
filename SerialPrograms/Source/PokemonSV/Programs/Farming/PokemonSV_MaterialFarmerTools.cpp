@@ -93,14 +93,17 @@ MaterialFarmerOptions::MaterialFarmerOptions(
         LockMode::UNLOCK_WHILE_RUNNING,
         75, 0, 100
     )
+    , m_advanced_options(
+        "<font size=4><b>Advanced Options: (developer only)</b></font>"
+    )
     , SAVE_DEBUG_VIDEO(
-        "<b>DEV MODE: Save debug videos to Switch:</b><br>"
+        "<b>Save debug videos to Switch:</b><br>"
         "Set this on to save a Switch video everytime an error occurs. You can send the video to developers to help them debug later.",
         LockMode::UNLOCK_WHILE_RUNNING,
         false
     )
     , SKIP_WARP_TO_POKECENTER(
-        "<b>DEV MODE: Skip warping to closest PokeCenter:</b><br>"
+        "<b>Skip warping to closest PokeCenter:</b><br>"
         "This is for debugging the program without waiting for the initial warp.",
         LockMode::UNLOCK_WHILE_RUNNING,
         false
@@ -112,12 +115,12 @@ MaterialFarmerOptions::MaterialFarmerOptions(
         false
     )
     , TIME_PER_SANDWICH(
-        "<b>DEV MODE: Time per sandwich:</b><br>Number of minutes before resetting sandwich.",
+        "<b>Time per sandwich:</b><br>Number of minutes before resetting sandwich.",
         LockMode::UNLOCK_WHILE_RUNNING,
         30, 1, 30
     )
     , NUM_FORWARD_MOVES_PER_LETS_GO_ITERATION(
-        "<b>DEV MODE: Number of forward moves per lets go iteration:</b><br>"
+        "<b>Number of forward moves per lets go iteration:</b><br>"
         "During Let's go autobattling sequence, the number of forward movements before resetting to Pokecenter.",
         LockMode::UNLOCK_WHILE_RUNNING,
         13
@@ -142,6 +145,7 @@ MaterialFarmerOptions::MaterialFarmerOptions(
     PA_ADD_OPTION(AUTO_HEAL_PERCENT);
 
     if (PreloadSettings::instance().DEVELOPER_MODE){
+        PA_ADD_OPTION(m_advanced_options);
         PA_ADD_OPTION(SAVE_DEBUG_VIDEO);
         PA_ADD_OPTION(SKIP_WARP_TO_POKECENTER);
         PA_ADD_OPTION(TIME_PER_SANDWICH);

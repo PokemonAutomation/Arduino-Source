@@ -6,6 +6,7 @@
 
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Qt/TimeQt.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Tools/StatsTracking.h"
@@ -607,8 +608,10 @@ ItemPrinterRNG::ItemPrinterRNG()
 {
     PA_ADD_OPTION(LANGUAGE);
 
-    PA_ADD_OPTION(AUTO_MATERIAL_FARMING);
-    PA_ADD_OPTION(NUM_ROUNDS_OF_ITEM_PRINTER_TO_MATERIAL_FARM);
+    if (PreloadSettings::instance().DEVELOPER_MODE){
+        PA_ADD_OPTION(AUTO_MATERIAL_FARMING);
+        PA_ADD_OPTION(NUM_ROUNDS_OF_ITEM_PRINTER_TO_MATERIAL_FARM);
+    }
     PA_ADD_OPTION(NUM_ITEM_PRINTER_ROUNDS);
     PA_ADD_OPTION(AFTER_ITEM_PRINTER_DONE_EXPLANATION);
 //    PA_ADD_OPTION(DATE0);
@@ -619,8 +622,10 @@ ItemPrinterRNG::ItemPrinterRNG()
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(FIX_TIME_WHEN_DONE);
 
-    PA_ADD_OPTION(MATERIAL_FARMER_DISABLED_EXPLANATION);
-    PA_ADD_OPTION(MATERIAL_FARMER_OPTIONS);
+    if (PreloadSettings::instance().DEVELOPER_MODE){
+        PA_ADD_OPTION(MATERIAL_FARMER_DISABLED_EXPLANATION);
+        PA_ADD_OPTION(MATERIAL_FARMER_OPTIONS);
+    }
 
     PA_ADD_OPTION(NOTIFICATIONS);
 
