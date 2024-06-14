@@ -958,13 +958,14 @@ void run_sandwich_maker(ProgramEnvironment& env, ConsoleHandle& console, BotBase
         VideoSnapshot screen = console.video().snapshot();
 
         const int max_read_label_tries = 4;
-        for(int read_label_try_count = 0; read_label_try_count < max_read_label_tries; ++read_label_try_count){
+        for (int read_label_try_count = 0; read_label_try_count < max_read_label_tries; ++read_label_try_count){
             std::string center_filling = middle_plate_detector.detect_filling_name(screen);
             if (center_filling.empty()){
                 if (read_label_try_count + 1 < max_read_label_tries){
                     // Wait more time
                     pbf_wait(context, TICKS_PER_SECOND * 2);
                     context.wait_for_all_requests();
+                    screen = console.video().snapshot();
                     continue;
                 }else{
                     console.log("Read nothing on center plate label.");
