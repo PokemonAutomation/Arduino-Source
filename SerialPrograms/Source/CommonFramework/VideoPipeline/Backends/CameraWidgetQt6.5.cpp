@@ -392,7 +392,7 @@ void CameraSession::startup(){
             return;
         }
         m_logger.log("QCamera error: " + m_camera->errorString().toStdString());
-#if 1
+#if 0
         QMetaObject::invokeMethod(this, [this]{
             reset();
         }, Qt::QueuedConnection);
