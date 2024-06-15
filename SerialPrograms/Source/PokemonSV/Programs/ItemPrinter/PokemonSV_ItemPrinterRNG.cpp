@@ -489,22 +489,22 @@ struct ItemPrinterRNG_Descriptor::Stats : public StatsTracker{
         : iterations(m_stats["Rounds"])
         , prints(m_stats["Prints"])
 //        , total_jobs(m_stats["Total Jobs"])
-        , seed_hits(m_stats["Seed Hits"])
-        , seed_misses(m_stats["Seed Misses"])
+        , frame_hits(m_stats["Frame Hits"])
+        , frame_misses(m_stats["Frame Misses"])
         , errors(m_stats["Errors"])
     {
         m_display_order.emplace_back("Rounds");
         m_display_order.emplace_back("Prints");
 //        m_display_order.emplace_back("Total Jobs", HIDDEN_IF_ZERO);
-        m_display_order.emplace_back("Seed Hits", HIDDEN_IF_ZERO);
-        m_display_order.emplace_back("Seed Misses", HIDDEN_IF_ZERO);
+        m_display_order.emplace_back("Frame Hits", HIDDEN_IF_ZERO);
+        m_display_order.emplace_back("Frame Misses", HIDDEN_IF_ZERO);
         m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
     }
     std::atomic<uint64_t>& iterations;
     std::atomic<uint64_t>& prints;
 //    std::atomic<uint64_t>& total_jobs;
-    std::atomic<uint64_t>& seed_hits;
-    std::atomic<uint64_t>& seed_misses;
+    std::atomic<uint64_t>& frame_hits;
+    std::atomic<uint64_t>& frame_misses;
     std::atomic<uint64_t>& errors;
 };
 std::unique_ptr<StatsTracker> ItemPrinterRNG_Descriptor::make_stats() const{
@@ -755,7 +755,7 @@ void ItemPrinterRNG::run_print_at_date(
             std::array<std::string, 10> print_results = item_printer_finish_print(env.inference_dispatcher(), env.console, context, LANGUAGE);
             if (ADJUST_DELAY){
                 uint64_t seed = to_seconds_since_epoch(date);
-                adjust_delay(print_results, seed, env.console);
+                adjust_delay(env, print_results, seed, env.console);
             }
 
 //            pbf_press_button(context, BUTTON_B, 20, 30);
@@ -774,9 +774,12 @@ void ItemPrinterRNG::run_print_at_date(
 }
 
 void ItemPrinterRNG::adjust_delay(
+    SingleSwitchProgramEnvironment& env,
     const std::array<std::string, 10>& print_results, 
     uint64_t seed, ConsoleHandle& console
-) {
+){
+    ItemPrinterRNG_Descriptor::Stats& stats = env.current_stats<ItemPrinterRNG_Descriptor::Stats>();
+
     DistanceFromTarget distance_from_target = get_distance_from_target(print_results, seed, console);
     int16_t delay_adjustment;
     int16_t current_delay_mills = DELAY_MILLIS;
@@ -784,23 +787,29 @@ void ItemPrinterRNG::adjust_delay(
     case DistanceFromTarget::UNKNOWN:
     case DistanceFromTarget::ON_TARGET:
         delay_adjustment = 0;
+        stats.frame_hits++;
         break;
     case DistanceFromTarget::MINUS_1:
         delay_adjustment = -50;
+        stats.frame_misses++;
         break;
     case DistanceFromTarget::MINUS_2:
         delay_adjustment =  -1000;
+        stats.frame_misses++;
         break;
     case DistanceFromTarget::PLUS_1:
         delay_adjustment =  50;
+        stats.frame_misses++;
         break;
     case DistanceFromTarget::PLUS_2:
         delay_adjustment = 1000;
+        stats.frame_misses++;
         break;        
     default:
         delay_adjustment = 0;
         break;
     }
+    env.update_stats();
 
     int16_t new_delay = current_delay_mills + delay_adjustment;
     if (new_delay < 0){
@@ -1228,6 +1237,8 @@ void ItemPrinterRNG::run_item_printer_rng(
     ItemPrinterRNG_Descriptor::Stats& stats
 ){
     for (uint32_t c = 0; c < NUM_ITEM_PRINTER_ROUNDS; c++){
+        send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
+
         std::vector<ItemPrinterRngRowSnapshot> table = TABLE.snapshot<ItemPrinterRngRowSnapshot>();
         for (const ItemPrinterRngRowSnapshot& row : table){
             if (row.chain){
@@ -1264,9 +1275,7 @@ void ItemPrinterRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext
             wait_until(
                 env.console, context,
                 std::chrono::milliseconds(1100),
-                {
-                    static_cast<AudioInferenceCallback&>(audio_detector)
-                }
+                {audio_detector}
             );
             audio_detector.throw_if_no_sound(std::chrono::milliseconds(1000));
 
@@ -1281,7 +1290,6 @@ void ItemPrinterRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext
             }
         }
     }catch (ProgramFinishedException&){}
-
 
     if (FIX_TIME_WHEN_DONE){
         pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);

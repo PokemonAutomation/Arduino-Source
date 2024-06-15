@@ -89,6 +89,7 @@ private:
     ) const;
 
     void adjust_delay(
+        SingleSwitchProgramEnvironment& env,
         const std::array<std::string, 10>& print_results, 
         uint64_t seed, ConsoleHandle& console
     );
