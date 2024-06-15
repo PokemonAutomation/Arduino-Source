@@ -13,7 +13,7 @@
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "PokemonSV/Inference/Overworld/PokemonSV_LetsGoHpReader.h"
+
 
 #include "PokemonSV/Inference/Boxes/PokemonSV_IvJudgeReader.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.h"
@@ -66,7 +66,7 @@ MaterialFarmerOptions::MaterialFarmerOptions(
     , RUN_TIME_IN_MINUTES(
         "<b>Run Duration:</b><br>Run the material farmer for this many minutes.",
         LockMode::UNLOCK_WHILE_RUNNING,
-        60
+        70
     )
 //    , SAVE_GAME_BEFORE_SANDWICH(
 //        "<b>Save Game before each round:</b>",
@@ -177,77 +177,170 @@ void run_material_farmer(
         stats,
         options.LANGUAGE
     );
+    WallClock start_time = current_time();
+    WallClock last_sandwich_time = WallClock::min();
+    LetsGoHpWatcher hp_watcher(COLOR_RED);
 
-    WallClock start = current_time();
-
-    size_t consecutive_failures;
-    size_t max_consecutive_failures = 10;    
-    bool done_sandwich_iteration;
+    /* 
+    - Use Let's Go along the path. Fly back to pokecenter when it reaches the end of the path.
+    - Keeping repeating this for RUN_TIME_IN_MINUTES minutes
+    */
     while (true){
-        WallDuration runtime = current_time() - start;
-        auto total_minutes = std::chrono::duration_cast<std::chrono::minutes>(runtime).count();
-        if (total_minutes >= options.RUN_TIME_IN_MINUTES){
+        // check time left on material farming
+        auto farming_time_left =  
+            std::chrono::minutes(options.RUN_TIME_IN_MINUTES) - 
+            std::chrono::duration_cast<std::chrono::minutes>(current_time() - start_time);
+        env.console.log(
+            "Time left in Material Farming: " + 
+            std::to_string(farming_time_left.count()) + " min", 
+            COLOR_PURPLE
+        );
+        if (farming_time_left < std::chrono::minutes(0)){
+            env.console.log("Time's up. Stop the Material farming program.", COLOR_RED);
             break;
         }
-
-        consecutive_failures = 0;
-        done_sandwich_iteration = false;
-        while (!done_sandwich_iteration){
-            try{
-                run_one_sandwich_iteration(env, context, encounter_tracker, options);
-                done_sandwich_iteration = true;
-            }catch(OperationFailedException& e){
-                stats.m_errors++;
-                env.update_stats();
-                e.send_notification(env, options.NOTIFICATION_ERROR_RECOVERABLE);
-
-                // save screenshot after operation failed, 
-                dump_snapshot(env.console);
-
-                if (options.SAVE_DEBUG_VIDEO){
-                    // Take a video to give more context for debugging
-                    pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
-                    context.wait_for_all_requests();
-                }
-
-                consecutive_failures++;
-                if (consecutive_failures >= max_consecutive_failures){
-                    throw OperationFailedException(
-                        ErrorReport::SEND_ERROR_REPORT, env.console,
-                        "Failed 10 times in a row.",
-                        true
-                    );
-                }
-
-                env.log("Reset game to handle recoverable error");
-                reset_game(env.program_info(), env.console, context);
-                stats.m_game_resets++;
-                env.update_stats();
+        
+        // Check time left on sandwich
+        if (options.SANDWICH_OPTIONS.enabled()){
+            auto sandwich_time_left =  
+                std::chrono::minutes(options.TIME_PER_SANDWICH) - 
+                std::chrono::duration_cast<std::chrono::minutes>(current_time() - last_sandwich_time);
+            env.console.log(
+                "Time left on sandwich: " + 
+                std::to_string(sandwich_time_left.count()) + " min", 
+                COLOR_PURPLE
+            );                   
+            if (sandwich_time_left < std::chrono::minutes(0)){
+                env.log("Sandwich not active. Make a sandwich.");
+                last_sandwich_time = make_sandwich_material_farm(env, context, options);
+                env.console.overlay().add_log("Sandwich made.");
             }
         }
+
+        // heal before starting Let's go
+        env.console.log("Heal before starting Let's go", COLOR_PURPLE);
+        env.console.log("Heal threshold: " + tostr_default(options.AUTO_HEAL_PERCENT), COLOR_PURPLE);
+        check_hp(env, context, options, hp_watcher);
+
+        /*
+        - Starts from pokemon center.
+        - Flies to start position. Runs a Let's Go iteration. 
+        - Then returns to pokemon center, regardless of whether 
+        it completes the action or gets caught in a battle 
+        */
+        run_from_battles_and_back_to_pokecenter(env, context, 
+            [&](
+                SingleSwitchProgramEnvironment& env, BotBaseContext& context
+            ){
+                // Move to starting position for Let's Go hunting path
+                env.console.log("Move to starting position for Let's Go hunting path.", COLOR_PURPLE);
+                move_to_start_position_for_letsgo1(env, context);
+
+                // run let's go while updating the HP watcher
+                env.console.log("Starting Let's Go hunting path.", COLOR_PURPLE);
+                run_until(
+                    env.console, context,
+                    [&](BotBaseContext& context){
+                        run_lets_go_iteration(env, context, encounter_tracker, options.NUM_FORWARD_MOVES_PER_LETS_GO_ITERATION);
+                    },
+                    {hp_watcher}
+                );
+            } 
+        ); 
+        
+        context.wait_for_all_requests();
+    }
+
+
+}
+
+void check_hp(
+    SingleSwitchProgramEnvironment& env,
+    BotBaseContext& context,
+    MaterialFarmerOptions& options,
+    LetsGoHpWatcher& hp_watcher
+){
+    MaterialFarmerStats& stats = env.current_stats<MaterialFarmerStats>();
+    double hp = hp_watcher.last_known_value() * 100;
+    if (0 < hp){
+        env.console.log("Last Known HP: " + tostr_default(hp) + "%", COLOR_BLUE);
+    }else{
+        env.console.log("Last Known HP: ?", COLOR_RED);
+    }
+    if (0 < hp && hp < options.AUTO_HEAL_PERCENT){
+        auto_heal_from_menu_or_overworld(env.program_info(), env.console, context, 0, true);
+        stats.m_autoheals++;
+        env.update_stats();
+        send_program_status_notification(env, options.NOTIFICATION_STATUS_UPDATE);
     }
 }
 
 
 
-// start at North Province (Area 3) Pokecenter, make a sandwich, then use let's go repeatedly until 30 min passes.
-void run_one_sandwich_iteration(
-    SingleSwitchProgramEnvironment& env,
-    BotBaseContext& context,
-    LetsGoEncounterBotTracker& encounter_tracker,
+// start at North Province (Area 3) Pokecenter. make sandwich then go back to Pokecenter to reset position
+// return the time that the sandwich was made
+WallClock make_sandwich_material_farm(
+    SingleSwitchProgramEnvironment& env, 
+    BotBaseContext& context, 
+    MaterialFarmerOptions& options
+){
+    if (options.SANDWICH_OPTIONS.SAVE_GAME_BEFORE_SANDWICH){
+        save_game_from_overworld(env.program_info(), env.console, context);
+    }
+
+    MaterialFarmerStats& stats = env.current_stats<MaterialFarmerStats>();
+    WallClock last_sandwich_time;
+    size_t consecutive_failures = 0;
+    size_t max_consecutive_failures = 10;  
+    while (true){
+        try{
+            last_sandwich_time = try_make_sandwich_material_farm(env, context, options);
+            break;
+        }catch(OperationFailedException& e){
+            stats.m_errors++;
+            env.update_stats();
+            e.send_notification(env, options.NOTIFICATION_ERROR_RECOVERABLE);
+
+            // save screenshot after operation failed, 
+            dump_snapshot(env.console);
+
+            if (options.SAVE_DEBUG_VIDEO){
+                // Take a video to give more context for debugging
+                pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
+                context.wait_for_all_requests();
+            }
+
+            consecutive_failures++;
+            if (consecutive_failures >= max_consecutive_failures){
+                throw OperationFailedException(
+                    ErrorReport::SEND_ERROR_REPORT, env.console,
+                    "Failed to make sandwich "+ std::to_string(max_consecutive_failures) + " times in a row.",
+                    true
+                );
+            }
+
+            env.log("Failed to make sandwich. Reset game to handle recoverable error.");
+            reset_game(env.program_info(), env.console, context);
+            stats.m_game_resets++;
+            env.update_stats();
+        }
+    }
+
+    return last_sandwich_time;
+}
+
+
+// make sandwich then go back to Pokecenter to reset position
+// if gets caught up in a battle, try again.
+WallClock try_make_sandwich_material_farm(
+    SingleSwitchProgramEnvironment& env, 
+    BotBaseContext& context, 
     MaterialFarmerOptions& options
 ){
     MaterialFarmerStats& stats = env.current_stats<MaterialFarmerStats>();
-
     WallClock last_sandwich_time = WallClock::min();
-
-    // make sandwich then go back to Pokecenter to reset position
-    if (options.SANDWICH_OPTIONS.enabled()){
-        if (options.SANDWICH_OPTIONS.SAVE_GAME_BEFORE_SANDWICH){
-            save_game_from_overworld(env.program_info(), env.console, context);
-        }
-        run_from_battles_and_back_to_pokecenter(
-            env, context,
+    while(last_sandwich_time == WallClock::min()){
+        run_from_battles_and_back_to_pokecenter(env, context, 
             [&](SingleSwitchProgramEnvironment& env, BotBaseContext& context){
                 // Orient camera to look at same direction as player character
                 // - This is needed because when save-load the game, 
@@ -276,92 +369,16 @@ void run_one_sandwich_iteration(
 
             }
         );
-    }else{
-        last_sandwich_time = current_time();
     }
-
-
-    LetsGoHpWatcher hp_watcher(COLOR_RED);
-
-    /* 
-    - Use Let's Go along the path. Fly back to pokecenter when it reaches the end of the path.
-    - Keeping repeating this until the sandwich expires.
-     */
-    while (true){
-        int time_per_sandwich = options.TIME_PER_SANDWICH;
-        std::chrono::minutes minutes_per_sandwich = std::chrono::minutes(time_per_sandwich);
-        auto sandwich_time_left =  minutes_per_sandwich + std::chrono::duration_cast<std::chrono::minutes>(last_sandwich_time - current_time());
-        env.console.log(
-            "Time left on sandwich: " + 
-            std::to_string(sandwich_time_left.count()) + " min", 
-            COLOR_PURPLE);
-
-        if (is_sandwich_expired(last_sandwich_time, minutes_per_sandwich)){
-            env.log("Sandwich expired. Start another sandwich round.");
-            env.console.overlay().add_log("Sandwich expired.");
-            break;
-        }
-
-        // heal before starting Let's go
-        env.console.log("Heal before starting Let's go", COLOR_PURPLE);
-        env.console.log("Heal threshold: " + tostr_default(options.AUTO_HEAL_PERCENT), COLOR_PURPLE);
-        double hp = hp_watcher.last_known_value() * 100;
-        if (0 < hp){
-            env.console.log("Last Known HP: " + tostr_default(hp) + "%", COLOR_BLUE);
-        }else{
-            env.console.log("Last Known HP: ?", COLOR_RED);
-        }
-        if (0 < hp && hp < options.AUTO_HEAL_PERCENT){
-            auto_heal_from_menu_or_overworld(env.program_info(), env.console, context, 0, true);
-            stats.m_autoheals++;
-            env.update_stats();
-            send_program_status_notification(env, options.NOTIFICATION_STATUS_UPDATE);
-        }
-
-        /*
-        - Starts from pokemon center.
-        - Flies to start position. Runs a Let's Go iteration. 
-        - Then returns to pokemon center 
-        */
-        env.console.log("Starting Let's Go hunting path", COLOR_PURPLE);
-        int num_forward_moves_per_lets_go_iteration = options.NUM_FORWARD_MOVES_PER_LETS_GO_ITERATION;
-        run_from_battles_and_back_to_pokecenter(env, context, 
-            [&](
-                SingleSwitchProgramEnvironment& env, BotBaseContext& context
-            ){
-                run_until(
-                    env.console, context,
-                    [&](BotBaseContext& context){
-
-                        /*                         
-                        - run_from_battles_and_back_to_pokecenter will keep looping `action` 
-                        (i.e. this lambda function) until it succeeeds
-                        - Do a sandwich time check here to break out of the loop, in the case where
-                        you are very unlucky and can't finish a Let's Go iteration due to getting caught
-                        up in battles.
-                        */
-                        if (is_sandwich_expired(last_sandwich_time, minutes_per_sandwich)){
-                            env.log("Sandwich expired. Return to Pokecenter.");
-                            return;
-                        }                        
-                        move_to_start_position_for_letsgo1(env, context);
-                        run_lets_go_iteration(env, context, encounter_tracker, num_forward_moves_per_lets_go_iteration);
-                    },
-                    {hp_watcher}
-                );
-            } 
-        ); 
-        
-        context.wait_for_all_requests();
-    }
-
-
+    
+    return last_sandwich_time;
 }
 
-
-
-bool is_sandwich_expired(WallClock last_sandwich_time, std::chrono::minutes minutes_per_sandwich){
-    return (last_sandwich_time + minutes_per_sandwich) < current_time();
+// given the start time, and duration in minutes, check if the current time is
+// past the expected end time.
+bool is_time_expired(WallClock start_time, std::chrono::minutes minutes_duration){
+    auto end_time = start_time + minutes_duration;
+    return end_time < current_time();
 }
 
 // from the North Province (Area 3) pokecenter, move to start position for Happiny dust farming
@@ -522,11 +539,16 @@ void run_lets_go_iteration(
 }
 
 /* 
-- This function wraps around an action (e.g. go out of PokeCenter to make a sandwich) so that
+- This function wraps around an action (e.g. leave the PokeCenter to make a sandwich) so that
 we can handle pokemon wild encounters when executing the action.
-- Whenever a battle happens, we run away.
-- After battle ends, move back to PokeCenter to start the `action` again.
-- `action` must be an action starting at the PokeCenter 
+  - note that returning to the PokeCenter is also wrapped, since it's possible to get caught
+  in a wild encounter when trying to return to the PokeCenter.
+- Whenever a battle happens, we run away and after the battle ends, move back to the PokeCenter
+- When `action` ends, go back to the PokeCenter.
+- i.e. return to Pokecenter regardless of whether the action succeeds or not.
+- NOTE: This works differently than `handle_battles_and_back_to_pokecenter` from the Scatterbug program,
+where the action will be attempted infinite times if you keep failing. In contrast, this function
+only gives you one attempt before returning to the Pokecenter
 */
 void run_from_battles_and_back_to_pokecenter(
     SingleSwitchProgramEnvironment& env,
@@ -537,41 +559,30 @@ void run_from_battles_and_back_to_pokecenter(
     >&& action
 ){
     MaterialFarmerStats& stats = env.current_stats<MaterialFarmerStats>();
-    bool action_finished = false;
-    bool first_iteration = true;
+    bool attempted_action = false;
     // a flag for the case that the action has finished but not yet returned to pokecenter
     bool returned_to_pokecenter = false;
-    while(action_finished == false || returned_to_pokecenter == false){
-        // env.console.overlay().add_log("Calculate what to do next");
+    while(returned_to_pokecenter == false){
         NormalBattleMenuWatcher battle_menu(COLOR_RED);
         int ret = run_until(
             env.console, context,
             [&](BotBaseContext& context){
-                if (action_finished){
-                    // `action` is already finished. Now we just try to get back to pokecenter:
-                    reset_to_pokecenter(env.program_info(), env.console, context);
+                if (!attempted_action){ // We still need to carry out `action`
+                    attempted_action = true;
                     context.wait_for_all_requests();
-                    returned_to_pokecenter = true;
-                    return;
+                    action(env, context);
+                    context.wait_for_all_requests();                    
                 }
-                // We still need to carry out `action`
-                if (first_iteration){
-                    first_iteration = false;
-                }else{
-                    // This is at least the second iteration in the while-loop.
-                    // So a previous round of action failed.
-                    // We need to first re-initialize our position to the PokeCenter
-                    // Use map to fly back to the pokecenter
-                    reset_to_pokecenter(env.program_info(), env.console, context);
-                }
-                context.wait_for_all_requests();
-                action(env, context);
-                context.wait_for_all_requests();
-                action_finished = true;
+
+                // we have already attempted the action,
+                // so reset to the Pokecenter
+                env.console.log("Go back to PokeCenter.");
+                reset_to_pokecenter(env.program_info(), env.console, context);
+                returned_to_pokecenter = true;
             },
             {battle_menu}
         );
-        if (ret == 0){
+        if (ret == 0){ // battle detected
             stats.m_encounters++;
             env.update_stats();
             env.console.log("Detected battle. Now running away.", COLOR_PURPLE);
@@ -582,8 +593,7 @@ void run_from_battles_and_back_to_pokecenter(
                 throw FatalProgramException(std::move(e));
             }
         }
-        // Back on the overworld.
-    } // end while(action_finished == false || returned_to_pokecenter == false)
+    } 
 }
 
 

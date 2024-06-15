@@ -15,6 +15,7 @@
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "PokemonSV/Options/PokemonSV_SandwichMakerOption.h"
 #include "PokemonSV/Programs/ShinyHunting/PokemonSV_LetsGoTools.h"
+#include "PokemonSV/Inference/Overworld/PokemonSV_LetsGoHpReader.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -90,8 +91,24 @@ void run_material_farmer(
     MaterialFarmerStats& stats
 );
 
-void run_one_sandwich_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context, 
-    LetsGoEncounterBotTracker& encounter_tracker, MaterialFarmerOptions& options);
+void check_hp(
+    SingleSwitchProgramEnvironment& env,
+    BotBaseContext& context,
+    MaterialFarmerOptions& options,
+    LetsGoHpWatcher& hp_watcher
+);
+
+WallClock make_sandwich_material_farm(
+    SingleSwitchProgramEnvironment& env, 
+    BotBaseContext& context, 
+    MaterialFarmerOptions& options
+);        
+
+WallClock try_make_sandwich_material_farm(
+    SingleSwitchProgramEnvironment& env, 
+    BotBaseContext& context, 
+    MaterialFarmerOptions& options
+);        
 
 void move_to_start_position_for_letsgo0(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
@@ -101,7 +118,7 @@ void lets_go_movement0(BotBaseContext& context);
 
 void lets_go_movement1(BotBaseContext& context);
 
-bool is_sandwich_expired(WallClock last_sandwich_time, std::chrono::minutes minutes_per_sandwich);
+bool is_time_expired(WallClock last_sandwich_time, std::chrono::minutes minutes_per_sandwich);
 
 void run_lets_go_iteration(
     SingleSwitchProgramEnvironment& env,
