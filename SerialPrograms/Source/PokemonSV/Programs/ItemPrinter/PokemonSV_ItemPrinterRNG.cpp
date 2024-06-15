@@ -438,7 +438,7 @@ void ItemPrinterRngRow::set_seed_based_on_desired_item(){
 // - if desired_item has changed, set the seed (and number of jobs) accordingly
 // - if any other value changes, set desired_item to NONE
 void ItemPrinterRngRow::value_changed(){
-    date.set_visibility(chain ? ConfigOptionState::DISABLED : ConfigOptionState::ENABLED);
+    date.set_visibility(chain ? ConfigOptionState::HIDDEN : ConfigOptionState::ENABLED);
     if (prev_desired_item != desired_item){ // check if desired_item has changed.
         set_seed_based_on_desired_item();
         prev_desired_item = desired_item;
@@ -785,6 +785,8 @@ void ItemPrinterRNG::adjust_delay(
     int16_t current_delay_mills = DELAY_MILLIS;
     switch (distance_from_target){
     case DistanceFromTarget::UNKNOWN:
+        delay_adjustment = 0;
+        break;
     case DistanceFromTarget::ON_TARGET:
         delay_adjustment = 0;
         stats.frame_hits++;
