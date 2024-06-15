@@ -21,6 +21,10 @@ public:
     ~DateTimeCellWidget();
     DateTimeCellWidget(QWidget& parent, DateTimeCell& value);
 
+    virtual void wheelEvent(QWheelEvent* event) override{
+        QWidget::wheelEvent(event);
+    }
+
     virtual void update_value() override;
     virtual void value_changed() override;
 
