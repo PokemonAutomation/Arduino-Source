@@ -187,33 +187,44 @@ void run_material_farmer(
     */
     while (true){
         // check time left on material farming
-        auto farming_time_left =  
-            std::chrono::minutes(options.RUN_TIME_IN_MINUTES) - 
-            std::chrono::duration_cast<std::chrono::minutes>(current_time() - start_time);
+        auto farming_time_remaining =  minutes_remaining(start_time, std::chrono::minutes(options.RUN_TIME_IN_MINUTES));
         env.console.log(
             "Time left in Material Farming: " + 
-            std::to_string(farming_time_left.count()) + " min", 
+            std::to_string(farming_time_remaining.count()) + " min", 
             COLOR_PURPLE
         );
-        if (farming_time_left < std::chrono::minutes(0)){
+        if (farming_time_remaining < std::chrono::minutes(0)){
             env.console.log("Time's up. Stop the Material farming program.", COLOR_RED);
             break;
         }
         
         // Check time left on sandwich
         if (options.SANDWICH_OPTIONS.enabled()){
-            auto sandwich_time_left =  
-                std::chrono::minutes(options.TIME_PER_SANDWICH) - 
-                std::chrono::duration_cast<std::chrono::minutes>(current_time() - last_sandwich_time);
+            auto sandwich_time_remaining =  minutes_remaining(last_sandwich_time, std::chrono::minutes(options.TIME_PER_SANDWICH));
             env.console.log(
                 "Time left on sandwich: " + 
-                std::to_string(sandwich_time_left.count()) + " min", 
+                std::to_string(sandwich_time_remaining.count()) + " min", 
                 COLOR_PURPLE
             );                   
-            if (sandwich_time_left < std::chrono::minutes(0)){
-                env.log("Sandwich not active. Make a sandwich.");
+            if (sandwich_time_remaining < std::chrono::minutes(0)){
+                env.console.log("Sandwich not active. Make a sandwich.");
                 last_sandwich_time = make_sandwich_material_farm(env, context, options);
                 env.console.overlay().add_log("Sandwich made.");
+
+                // Log time remaining in Material farming 
+                farming_time_remaining =  minutes_remaining(start_time, std::chrono::minutes(options.RUN_TIME_IN_MINUTES));
+                env.console.log(
+                    "Time left in Material Farming: " + 
+                    std::to_string(farming_time_remaining.count()) + " min", 
+                    COLOR_PURPLE
+                );
+                // Log time remaining on Sandwich
+                sandwich_time_remaining =  minutes_remaining(last_sandwich_time, std::chrono::minutes(options.TIME_PER_SANDWICH));
+                env.console.log(
+                    "Time left on sandwich: " + 
+                    std::to_string(sandwich_time_remaining.count()) + " min", 
+                    COLOR_PURPLE
+                );                  
             }
         }
 
@@ -374,11 +385,10 @@ WallClock try_make_sandwich_material_farm(
     return last_sandwich_time;
 }
 
-// given the start time, and duration in minutes, check if the current time is
-// past the expected end time.
-bool is_time_expired(WallClock start_time, std::chrono::minutes minutes_duration){
-    auto end_time = start_time + minutes_duration;
-    return end_time < current_time();
+// given the start time, and duration in minutes, return the number of remaining minutes
+std::chrono::minutes minutes_remaining(WallClock start_time, std::chrono::minutes minutes_duration){
+    return std::chrono::minutes(minutes_duration) - 
+           std::chrono::duration_cast<std::chrono::minutes>(current_time() - start_time);
 }
 
 // from the North Province (Area 3) pokecenter, move to start position for Happiny dust farming
