@@ -221,7 +221,7 @@ void run_material_farmer(
 
                 env.log("Reset game to handle recoverable error");
                 reset_game(env.program_info(), env.console, context);
-                ++stats.m_game_resets;
+                stats.m_game_resets++;
                 env.update_stats();
             }
         }

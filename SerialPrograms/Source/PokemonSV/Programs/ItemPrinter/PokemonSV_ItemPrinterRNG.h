@@ -16,6 +16,7 @@
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "PokemonSV_ItemPrinterTools.h"
+#include "PokemonSV_ItemPrinterDatabase.h"
 #include "PokemonSV/Programs/Farming/PokemonSV_MaterialFarmerTools.h"
 
 namespace PokemonAutomation{
@@ -47,7 +48,7 @@ public:
     DateTimeCell date;
     EnumDropdownCell<ItemPrinterJobs> jobs;
     EnumDropdownCell<ItemPrinterItems> desired_item;
-    ItemPrinterItems prev_desired_item;
+//    ItemPrinterItems prev_desired_item;
 };
 class ItemPrinterRngTable : public EditableTableOption_t<ItemPrinterRngRow>{
 public:
@@ -89,14 +90,16 @@ private:
     ) const;
 
     void adjust_delay(
+        Logger& logger,
         SingleSwitchProgramEnvironment& env,
         const std::array<std::string, 10>& print_results, 
-        uint64_t seed, ConsoleHandle& console
+        int distance_from_target
     );
 
-    DistanceFromTarget get_distance_from_target(
-        const std::array<std::string, 10>& print_results, 
-        uint64_t seed, ConsoleHandle& console
+    int get_distance_from_target(
+        Logger& logger,
+        const std::array<std::string, 10>& print_results,
+        uint64_t seed
     );
 
     bool results_approximately_match(
