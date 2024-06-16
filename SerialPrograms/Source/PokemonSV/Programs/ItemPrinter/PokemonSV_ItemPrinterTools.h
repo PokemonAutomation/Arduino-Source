@@ -52,18 +52,18 @@ enum class ItemPrinterItems{
     STELLAR_TERA,
     WATER_TERA,
 
-    BEAST_BALL,
-    DREAM_BALL,
+    MASTER_BALL,
     FAST_BALL,
     FRIEND_BALL,
-    HEAVY_BALL,
-    LEVEL_BALL,
-    LOVE_BALL,
     LURE_BALL,
-    MASTER_BALL,
+    LEVEL_BALL,
+    HEAVY_BALL,
+    LOVE_BALL,
     MOON_BALL,
-    SAFARI_BALL,
+    DREAM_BALL,
     SPORT_BALL,
+    SAFARI_BALL,
+    BEAST_BALL,
 };
 
 enum class DistanceFromTarget{
