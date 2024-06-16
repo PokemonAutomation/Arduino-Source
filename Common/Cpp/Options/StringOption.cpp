@@ -78,7 +78,7 @@ void StringCell::set(std::string x){
         }
         m_data->m_current = std::move(x);
     }
-    report_value_changed();
+    report_value_changed(this);
 }
 
 void StringCell::load_json(const JsonValue& json){

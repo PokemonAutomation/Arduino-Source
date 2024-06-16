@@ -210,7 +210,7 @@ std::string TimeExpressionCell<Type>::set(std::string text){
         data.m_value = value;
         data.m_error.clear();
     }
-    report_value_changed();
+    report_value_changed(this);
     return error;
 }
 template <typename Type>
@@ -235,7 +235,7 @@ void TimeExpressionCell<Type>::load_json(const JsonValue& json){
         data.m_current = *str;
         data.m_error = data.process(data.m_current, data.m_value);
     }
-    report_value_changed();
+    report_value_changed(this);
 }
 template <typename Type>
 JsonValue TimeExpressionCell<Type>::to_json() const{
@@ -258,7 +258,7 @@ void TimeExpressionCell<Type>::restore_defaults(){
         data.m_current = data.m_default;
         data.m_error = data.process(data.m_current, data.m_value);
     }
-    report_value_changed();
+    report_value_changed(this);
 }
 
 

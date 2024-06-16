@@ -55,7 +55,7 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
-    virtual void value_changed() override;
+    virtual void value_changed(void* object) override;
     bool run_raid(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
 private:

@@ -70,7 +70,7 @@ void ButtonCellWidget::update_value(){
     }
 //    cout << "Update: " << this->font().pointSize() << endl;
 }
-void ButtonCellWidget::value_changed(){
+void ButtonCellWidget::value_changed(void* object){
     QMetaObject::invokeMethod(this, [this]{
         update_value();
     }, Qt::QueuedConnection);
@@ -138,7 +138,7 @@ void ButtonOptionWidget::update_value(){
     }
 //    cout << "Update: " << this->font().pointSize() << endl;
 }
-void ButtonOptionWidget::value_changed(){
+void ButtonOptionWidget::value_changed(void* object){
     QMetaObject::invokeMethod(this, [this]{
         update_value();
     }, Qt::QueuedConnection);

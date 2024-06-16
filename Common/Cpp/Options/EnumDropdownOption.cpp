@@ -9,6 +9,10 @@
 #include "Common/Cpp/Json/JsonValue.h"
 #include "EnumDropdownOption.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 
 
@@ -70,8 +74,9 @@ bool IntegerEnumDropdownCell::set_value(size_t value){
     if (data.m_database.find(value) == nullptr){
         return false;
     }
+//    cout << "value = " << value << ", current = " << data.m_current.load() << endl;
     if (value != data.m_current.exchange(value, std::memory_order_relaxed)){
-        report_value_changed();
+        report_value_changed(this);
     }
     return true;
 }
@@ -87,14 +92,14 @@ void IntegerEnumDropdownCell::load_json(const JsonValue& json){
     const EnumEntry* entry = data.m_database.find_slug(*str);
     if (entry != nullptr && entry->enabled){
         data.m_current.store(entry->enum_value, std::memory_order_relaxed);
-        report_value_changed();
+        report_value_changed(this);
     }
 
     //  Backward compatibility with display names.
     entry = data.m_database.find_display(*str);
     if (entry != nullptr && entry->enabled){
         data.m_current.store(entry->enum_value, std::memory_order_relaxed);
-        report_value_changed();
+        report_value_changed(this);
     }
 }
 JsonValue IntegerEnumDropdownCell::to_json() const{

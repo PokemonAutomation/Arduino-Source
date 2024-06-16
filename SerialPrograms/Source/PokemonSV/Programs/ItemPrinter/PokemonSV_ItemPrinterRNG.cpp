@@ -640,6 +640,8 @@ ItemPrinterRngRow::ItemPrinterRngRow()
     PA_ADD_OPTION(date);
     PA_ADD_OPTION(jobs);
     PA_ADD_OPTION(desired_item);
+
+    ItemPrinterRngRow::value_changed(this);
     
     chain.add_listener(*this);
     date.add_listener(*this);
@@ -652,6 +654,8 @@ ItemPrinterRngRow::ItemPrinterRngRow(bool p_chain, const DateTime& p_date, ItemP
     chain = p_chain;
     date.set(p_date);
     jobs.set(p_jobs);
+
+    ItemPrinterRngRow::value_changed(this);
 }
 ItemPrinterRngRowSnapshot ItemPrinterRngRow::snapshot() const{
     return ItemPrinterRngRowSnapshot{chain, date, jobs};
@@ -669,7 +673,7 @@ std::unique_ptr<EditableTableRow> ItemPrinterRngRow::clone() const{
 // - always update the date's visibility when chain is changed.
 // - if desired_item has changed, set the seed (and number of jobs) accordingly
 // - if any other value changes, set desired_item to NONE
-void ItemPrinterRngRow::value_changed(){
+void ItemPrinterRngRow::value_changed(void* object){
     date.set_visibility(chain ? ConfigOptionState::HIDDEN : ConfigOptionState::ENABLED);
 
     ItemPrinterItems option = desired_item;
@@ -677,11 +681,18 @@ void ItemPrinterRngRow::value_changed(){
         const ItemPrinterEnumOption& option_data = option_lookup_by_enum(option);
 
         chain = false;
-        DateTime set_date = from_seconds_since_epoch(option_data.seed);
-        date.set(set_date);
+        if (object != &date){
+            DateTime set_date = from_seconds_since_epoch(option_data.seed);
+            date.set(set_date);
+        }
         jobs.set(option_data.jobs);
 
         prev_desired_item = option;
+        return;
+    }
+
+    //  Don't change if it came from us. Prevent infinite recursion.
+    if (object == &desired_item){
         return;
     }
 
@@ -689,8 +700,7 @@ void ItemPrinterRngRow::value_changed(){
     if (option_data == nullptr){
         desired_item.set(ItemPrinterItems::NONE);
     }else{
-        //  Infinite recursion + deadlock.
-//        desired_item.set(option_data->enum_value);
+        desired_item.set(option_data->enum_value);
     }
 
 }
@@ -881,11 +891,11 @@ ItemPrinterRNG::ItemPrinterRNG()
 
     PA_ADD_OPTION(NOTIFICATIONS);
 
-    ItemPrinterRNG::value_changed();
+    ItemPrinterRNG::value_changed(this);
     AUTO_MATERIAL_FARMING.add_listener(*this);
 }
 
-void ItemPrinterRNG::value_changed(){
+void ItemPrinterRNG::value_changed(void* object){
     ConfigOptionState state = AUTO_MATERIAL_FARMING ? ConfigOptionState::ENABLED : ConfigOptionState::DISABLED;
     MATERIAL_FARMER_OPTIONS.set_visibility(state);
     NUM_ROUNDS_OF_ITEM_PRINTER_TO_MATERIAL_FARM.set_visibility(state);

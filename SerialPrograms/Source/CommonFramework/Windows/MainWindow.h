@@ -42,7 +42,7 @@ private:
 private:
     virtual void on_busy() override;
     virtual void on_idle() override;
-    virtual void value_changed() override;
+    virtual void value_changed(void* object) override;
 
 private:
     QWidget* centralwidget;

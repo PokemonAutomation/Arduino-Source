@@ -38,7 +38,7 @@ public:
     ItemPrinterRngRowSnapshot snapshot() const;
 
     virtual std::unique_ptr<EditableTableRow> clone() const override;
-    virtual void value_changed() override;
+    virtual void value_changed(void* object) override;
 
     void set_seed_based_on_desired_item();
 
@@ -74,7 +74,7 @@ public:
 
 
 private:
-    virtual void value_changed() override;
+    virtual void value_changed(void* object) override;
 
     void run_item_printer_rng(SingleSwitchProgramEnvironment& env, BotBaseContext& context, ItemPrinterRNG_Descriptor::Stats& stats);
 

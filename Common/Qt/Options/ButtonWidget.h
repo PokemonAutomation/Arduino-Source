@@ -23,7 +23,7 @@ public:
     ButtonCellWidget(QWidget& parent, ButtonCell& value);
 
     virtual void update_value() override;
-    virtual void value_changed() override;
+    virtual void value_changed(void* object) override;
 
 private:
     ButtonCell& m_value;
@@ -40,7 +40,7 @@ public:
     ButtonOptionWidget(QWidget& parent, ButtonOption& value);
 
     virtual void update_value() override;
-    virtual void value_changed() override;
+    virtual void value_changed(void* object) override;
 
 private:
     ButtonOption& m_value;

@@ -88,7 +88,7 @@ bool ButtonCell::is_enabled() const{
 void ButtonCell::set_enabled(bool enabled){
     Enabled e = enabled ? ENABLED : DISABLED;
     if (e != m_data->m_state.exchange(e, std::memory_order_relaxed)){
-        report_value_changed();
+        report_value_changed(this);
     }
 }
 std::string ButtonCell::text() const{
@@ -108,7 +108,7 @@ void ButtonCell::set_text(std::string text){
         }
         m_data->m_text = std::move(text);
     }
-    report_value_changed();
+    report_value_changed(this);
 }
 
 void ButtonCell::press_button(){
@@ -171,7 +171,7 @@ void ButtonOption::set_label(std::string label){
         }
         m_data->m_label = std::move(label);
     }
-    report_value_changed();
+    report_value_changed(this);
 }
 
 

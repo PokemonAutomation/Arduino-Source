@@ -21,7 +21,7 @@ public:
     BatchWidget(QWidget& parent, BatchOption& value);
 
     virtual void update_value() override;
-    virtual void value_changed() override;
+    virtual void value_changed(void* object) override;
 
 protected:
     BatchOption& m_value;

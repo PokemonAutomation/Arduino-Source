@@ -254,7 +254,7 @@ public:
     SandwichIngredientsTable SANDWICH_INGREDIENTS;
 
 private:
-    virtual void value_changed() override;
+    virtual void value_changed(void* object) override;
     virtual std::string check_validity() const override;
 
     std::string check_herb_compatibility(HerbaSelection herb1, HerbaSelection herb2, PokemonType type) const;

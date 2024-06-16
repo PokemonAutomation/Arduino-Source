@@ -84,9 +84,9 @@ TeraFarmerPerConsoleOptions::TeraFarmerPerConsoleOptions(std::string label, cons
 }
 void TeraFarmerPerConsoleOptions::set_host(bool is_host){
     this->is_host = is_host;
-    TeraFarmerPerConsoleOptions::value_changed();
+    TeraFarmerPerConsoleOptions::value_changed(this);
 }
-void TeraFarmerPerConsoleOptions::value_changed(){
+void TeraFarmerPerConsoleOptions::value_changed(void* object){
     if (this->is_host){
         is_host_label.set_visibility(ConfigOptionState::ENABLED);
         catch_on_win.set_visibility(ConfigOptionState::DISABLED);
@@ -225,7 +225,7 @@ TeraMultiFarmer::TeraMultiFarmer()
 
     PA_ADD_OPTION(NOTIFICATIONS);
 
-    TeraMultiFarmer::value_changed();
+    TeraMultiFarmer::value_changed(this);
 
     HOSTING_SWITCH.add_listener(*this);
     HOSTING_MODE.add_listener(*this);
@@ -235,7 +235,7 @@ void TeraMultiFarmer::update_active_consoles(size_t switch_count){
         PLAYERS[c]->set_visibility(c < switch_count ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
     }
 }
-void TeraMultiFarmer::value_changed(){
+void TeraMultiFarmer::value_changed(void* object){
     size_t host = HOSTING_SWITCH.current_value();
     for (size_t c = 0; c < 4; c++){
         PLAYERS[c]->set_host(host == c);

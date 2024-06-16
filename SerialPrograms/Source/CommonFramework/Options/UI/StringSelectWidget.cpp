@@ -138,7 +138,7 @@ void StringSelectCellWidget::update_value(){
         hide_options();
     }
 }
-void StringSelectCellWidget::value_changed(){
+void StringSelectCellWidget::value_changed(void* object){
     QMetaObject::invokeMethod(this, [this]{
         update_value();
     }, Qt::QueuedConnection);

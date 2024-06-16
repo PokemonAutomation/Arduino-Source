@@ -21,7 +21,7 @@ public:
     StringSelectCellWidget(QWidget& parent, StringSelectCell& value);
 
     virtual void update_value() override;
-    virtual void value_changed() override;
+    virtual void value_changed(void* object) override;
 
 private:
     void load_options();

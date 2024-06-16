@@ -99,7 +99,7 @@ std::unique_ptr<EditableTableRow> EncounterFilterOverride::clone() const{
     ret->shininess.set(shininess);
     return ret;
 }
-void EncounterFilterOverride::value_changed(){
+void EncounterFilterOverride::value_changed(void* object){
     switch ((EncounterAction)action){
     case EncounterAction::StopProgram:
     case EncounterAction::RunAway:

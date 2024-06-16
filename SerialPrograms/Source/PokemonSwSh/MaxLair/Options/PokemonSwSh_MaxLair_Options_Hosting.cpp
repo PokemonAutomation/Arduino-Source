@@ -73,7 +73,7 @@ std::string HostingSettings::check_validity(size_t consoles) const{
     }
     return std::string();
 }
-void HostingSettings::value_changed(){
+void HostingSettings::value_changed(void* object){
     HostingMode mode = MODE;
     if (mode == HostingMode::HOST_ONLINE){
         CONNECT_TO_INTERNET_DELAY.set_visibility(ConfigOptionState::ENABLED);

@@ -269,7 +269,7 @@ void MainWindow::on_idle(){
 }
 
 
-void MainWindow::value_changed(){
+void MainWindow::value_changed(void* object){
     QMetaObject::invokeMethod(this, [this]{
         if (!m_pending_resize){
             resize(GlobalSettings::instance().WINDOW_SIZE.WIDTH, GlobalSettings::instance().WINDOW_SIZE.HEIGHT);

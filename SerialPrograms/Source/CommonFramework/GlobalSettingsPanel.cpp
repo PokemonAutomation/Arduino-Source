@@ -271,7 +271,7 @@ GlobalSettings::GlobalSettings()
 
     PA_ADD_OPTION(DEVELOPER_TOKEN);
 
-    GlobalSettings::value_changed();
+    GlobalSettings::value_changed(this);
     ENABLE_LIFETIME_SANITIZER.add_listener(*this);
 }
 
@@ -388,7 +388,7 @@ JsonValue GlobalSettings::to_json() const{
     return obj;
 }
 
-void GlobalSettings::value_changed(){
+void GlobalSettings::value_changed(void* object){
     bool enabled = ENABLE_LIFETIME_SANITIZER;
     LifetimeSanitizer::set_enabled(enabled);
     if (enabled){

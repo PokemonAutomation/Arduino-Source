@@ -47,7 +47,7 @@ public:
     SinglesMoveEntry snapshot() const;
 
 private:
-    virtual void value_changed() override;
+    virtual void value_changed(void* object) override;
 
 private:
     const bool m_trainer_battle;

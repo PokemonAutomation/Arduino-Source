@@ -24,7 +24,7 @@ public:
     virtual void load_json(const JsonValue& json) override;
     virtual std::unique_ptr<EditableTableRow> clone() const override;
 
-    virtual void value_changed() override;
+    virtual void value_changed(void* object) override;
 
 private:
     const bool m_rare_stars;

@@ -70,7 +70,7 @@ SinglesMoveTableRow::SinglesMoveTableRow(bool trainer_battle)
     PA_ADD_OPTION(terastallize);
     PA_ADD_OPTION(notes);
 
-    SinglesMoveTableRow::value_changed();
+    SinglesMoveTableRow::value_changed(this);
     type.add_listener(*this);
 }
 SinglesMoveTableRow::SinglesMoveTableRow(const EditableTableOption& table)
@@ -86,7 +86,7 @@ std::unique_ptr<EditableTableRow> SinglesMoveTableRow::clone() const{
 SinglesMoveEntry SinglesMoveTableRow::snapshot() const{
     return SinglesMoveEntry{type, terastallize};
 }
-void SinglesMoveTableRow::value_changed(){
+void SinglesMoveTableRow::value_changed(void* object){
 
 }
 

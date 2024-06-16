@@ -19,8 +19,9 @@ const std::string ConfigItem::JSON_LABEL    = "01-Label";
 
 ConfigItem::ConfigItem(const JsonObject& obj)
     : m_label(obj.get_string_throw(JSON_LABEL))
-{}
-
+{
+//    cout << obj.dump() << endl; //
+}
 JsonObject ConfigItem::to_json() const{
     JsonObject root;
     root[JSON_TYPE] = type();

@@ -1,4 +1,4 @@
-﻿{
+{
     "0-ProgramName": "DaySkipperJPN-7.8k",
     "1-Documentation": "Microcontroller/blob/master/Wiki/Programs/PokemonSwSh/DaySkipperJPN-7.8k.md",
     "2-Description": "A faster, but less reliable Japanese date skipper. (7800 skips/hour)",
@@ -16,16 +16,16 @@
             "00-Type": "SwitchDate",
             "01-Label": "<b>Start Date:</b>",
             "02-Declaration": "const Date START_DATE",
-            "98-Default": [
-                2000,
-                1,
-                1
-            ],
-            "99-Current": [
-                2000,
-                1,
-                1
-            ]
+            "98-Default": {
+                "Year": 2000,
+                "Month": 1,
+                "Day": 1
+            },
+            "99-Current": {
+                "Year": 2000,
+                "Month": 1,
+                "Day": 1
+            }
         },
         {
             "00-Type": "Divider",

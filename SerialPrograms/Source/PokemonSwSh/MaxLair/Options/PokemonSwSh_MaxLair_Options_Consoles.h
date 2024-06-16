@@ -83,7 +83,7 @@ public:
         return *PLAYERS[index];
     }
 
-    virtual void value_changed() override;
+    virtual void value_changed(void* object) override;
 
 private:
     LanguageSet m_languages;

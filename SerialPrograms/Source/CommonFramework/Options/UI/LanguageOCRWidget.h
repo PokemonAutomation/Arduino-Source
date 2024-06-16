@@ -23,7 +23,7 @@ public:
     LanguageOCRCellWidget(QWidget& parent, LanguageOCRCell& value);
 
     virtual void update_value() override;
-    virtual void value_changed() override;
+    virtual void value_changed(void* object) override;
 
 private:
     LanguageOCRCell& m_value;
@@ -41,7 +41,7 @@ public:
     LanguageOCROptionWidget(QWidget& parent, LanguageOCROption& value);
 
     virtual void update_value() override;
-    virtual void value_changed() override;
+    virtual void value_changed(void* object) override;
 
 private:
     LanguageOCRCellWidget* m_cell;

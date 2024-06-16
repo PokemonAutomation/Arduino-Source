@@ -105,7 +105,7 @@ int main(int argc, char *argv[]){
             Integration::DppClient::Client::instance().connect();
         }
 #endif
-        discord_settings.value_changed();
+        discord_settings.value_changed(nullptr);
     }
 
     set_working_directory();

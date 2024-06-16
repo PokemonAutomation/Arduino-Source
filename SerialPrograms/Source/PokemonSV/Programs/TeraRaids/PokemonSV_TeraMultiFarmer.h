@@ -50,7 +50,7 @@ public:
     TeraFarmerPerConsoleOptions(std::string label, const LanguageSet& languages, bool host);
 
     void set_host(bool is_host);
-    virtual void value_changed() override;
+    virtual void value_changed(void* object) override;
 
 public:
     bool is_host;
@@ -81,7 +81,7 @@ public:
     virtual void update_active_consoles(size_t switch_count) override;
     virtual void program(MultiSwitchProgramEnvironment& env, CancellableScope& scope) override;
 
-    virtual void value_changed() override;
+    virtual void value_changed(void* object) override;
 
 private:
     void reset_host(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);

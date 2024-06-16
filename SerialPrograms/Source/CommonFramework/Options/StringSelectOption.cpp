@@ -189,7 +189,7 @@ void StringSelectCell::set_by_index(size_t index){
         index = m_data->m_default;
     }
     if (index != m_data->m_index.exchange(index, std::memory_order_relaxed)){
-        report_value_changed();
+        report_value_changed(this);
     }
 }
 std::string StringSelectCell::set_by_slug(const std::string& slug){
@@ -198,7 +198,7 @@ std::string StringSelectCell::set_by_slug(const std::string& slug){
         return "Invalid Slug: " + slug;
     }
     if (index != m_data->m_index.exchange(index, std::memory_order_relaxed)){
-        report_value_changed();
+        report_value_changed(this);
     }
     return "";
 }
@@ -208,7 +208,7 @@ std::string StringSelectCell::set_by_name(const std::string& display_name){
         return "Invalid Name: " + display_name;
     }
     if (index != m_data->m_index.exchange(index, std::memory_order_relaxed)){
-        report_value_changed();
+        report_value_changed(this);
     }
     return "";
 }
@@ -219,7 +219,7 @@ const StringSelectDatabase& StringSelectCell::database() const{
 
 void StringSelectCell::load_json(const JsonValue& json){
     if (m_data->load_json(json)){
-        report_value_changed();
+        report_value_changed(this);
     }
 }
 JsonValue StringSelectCell::to_json() const{
@@ -227,7 +227,7 @@ JsonValue StringSelectCell::to_json() const{
 }
 void StringSelectCell::restore_defaults(){
     m_data->restore_defaults();
-    report_value_changed();
+    report_value_changed(this);
 }
 
 

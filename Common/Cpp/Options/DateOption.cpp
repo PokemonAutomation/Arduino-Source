@@ -93,7 +93,7 @@ std::string DateTimeCell::set(const DateTime& x){
         }
         m_current = x;
     }
-    report_value_changed();
+    report_value_changed(this);
     return std::string();
 }
 
@@ -147,7 +147,7 @@ void DateTimeCell::load_json(const JsonValue& json){
         SpinLockGuard lg(m_lock);
         m_current = date;
     }
-    report_value_changed();
+    report_value_changed(this);
 }
 JsonValue DateTimeCell::to_json() const{
     DateTime current;

@@ -113,12 +113,12 @@ DiscordIntegrationSettingsOption::DiscordIntegrationSettingsOption()
     PA_ADD_OPTION(allow_buttons_from_users);
     PA_ADD_OPTION(channels);
 
-    DiscordIntegrationSettingsOption::value_changed();
+    DiscordIntegrationSettingsOption::value_changed(this);
 
     this->add_listener(*this);
     library0.add_listener(*this);
 }
-void DiscordIntegrationSettingsOption::value_changed(){
+void DiscordIntegrationSettingsOption::value_changed(void* object){
 //    cout << this->enabled() << endl;
 #if (defined PA_SLEEPY || defined PA_DPP)
     bool options_enabled = this->enabled();
@@ -203,7 +203,7 @@ DiscordIntegrationSettingsWidget::DiscordIntegrationSettingsWidget(QWidget& pare
 
     connect(
         button_start, &QPushButton::clicked,
-        this, [&value](bool){
+        this, [this, &value](bool){
             switch (value.library0){
 #ifdef PA_SLEEPY
             case DiscordIntegrationSettingsOption::Library::SleepyDiscord:
@@ -217,12 +217,12 @@ DiscordIntegrationSettingsWidget::DiscordIntegrationSettingsWidget(QWidget& pare
 #endif
             default:;
             }
-            value.value_changed();
+            value.value_changed(this);
         }
     );
     connect(
         button_stop, &QPushButton::clicked,
-        this, [&value](bool){
+        this, [this, &value](bool){
             switch (value.library0){
 #ifdef PA_SLEEPY
             case DiscordIntegrationSettingsOption::Library::SleepyDiscord:
@@ -236,7 +236,7 @@ DiscordIntegrationSettingsWidget::DiscordIntegrationSettingsWidget(QWidget& pare
 #endif
             default:;
             }
-            value.value_changed();
+            value.value_changed(this);
         }
     );
 

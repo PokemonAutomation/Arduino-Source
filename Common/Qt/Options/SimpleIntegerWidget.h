@@ -22,7 +22,7 @@ public:
     SimpleIntegerCellWidget(QWidget& parent, SimpleIntegerCell<Type>& value);
 
     virtual void update_value() override;
-    virtual void value_changed() override;
+    virtual void value_changed(void* object) override;
 
 private:
     SimpleIntegerCell<Type>& m_value;
@@ -37,7 +37,7 @@ public:
     SimpleIntegerOptionWidget(QWidget& parent, SimpleIntegerOption<Type>& value);
 
     virtual void update_value() override;
-    virtual void value_changed() override;
+    virtual void value_changed(void* object) override;
 
 private:
     SimpleIntegerCellWidget<Type>* m_cell;

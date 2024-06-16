@@ -26,7 +26,7 @@ public:
 //    void set_options_enabled(bool enabled);
 
     virtual void update_value() override;
-    virtual void value_changed() override;
+    virtual void value_changed(void* object) override;
 
 private:
     virtual void mouseDoubleClickEvent(QMouseEvent* event) override;

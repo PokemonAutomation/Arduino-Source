@@ -23,7 +23,7 @@ public:
     TextEditWidget(QWidget& parent, TextEditOption& value);
 
     virtual void update_value() override;
-    virtual void value_changed() override;
+    virtual void value_changed(void* object) override;
 
 private:
     class Box;

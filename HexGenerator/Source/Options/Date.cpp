@@ -34,11 +34,13 @@ SwitchDate::SwitchDate(const JsonObject& obj)
     : SingleStatementOption(obj)
     , m_option(
         SingleStatementOption::m_label,
-        QDate(2000, 1, 1), QDate(2060, 12, 31),
-        DateOption::from_json(obj.get_value_throw(JSON_DEFAULT))
+        LockMode::LOCK_WHILE_RUNNING,
+        DateTimeCell::Level::DATE,
+        DateTime{2000, 1, 1}, DateTime{2060, 12, 31},
+        DateTimeOption::from_json(obj.get_value_throw(JSON_DEFAULT))
     )
 {
-    m_option.set(DateOption::from_json(obj.get_value_throw(JSON_CURRENT)));
+    m_option.set(DateTimeOption::from_json(obj.get_value_throw(JSON_CURRENT)));
 }
 std::string SwitchDate::check_validity() const{
     return m_option.check_validity();
@@ -48,21 +50,21 @@ void SwitchDate::restore_defaults(){
 }
 JsonObject SwitchDate::to_json() const{
     JsonObject root = SingleStatementOption::to_json();
-    root[JSON_DEFAULT] = DateOption::to_json(m_option.default_value());
+    root[JSON_DEFAULT] = DateTimeOption::to_json(m_option.default_value());
     root[JSON_CURRENT] = m_option.to_json();
     return root;
 }
 std::string SwitchDate::to_cpp() const{
-    QDate date = m_option;
+    DateTime date = m_option;
 
     std::string str;
     str += m_declaration;
     str += " = {";
-    str += std::to_string(date.year());
+    str += std::to_string(date.year);
     str += ", ";
-    str += std::to_string(date.month());
+    str += std::to_string(date.month);
     str += ", ";
-    str += std::to_string(date.day());
+    str += std::to_string(date.day);
     str += "};\r\n";
     return str;
 }

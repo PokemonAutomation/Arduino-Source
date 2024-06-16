@@ -64,7 +64,7 @@ EncounterActionsRow::EncounterActionsRow()
     PA_ADD_OPTION(pokemon);
     PA_ADD_OPTION(shininess);
 
-    EncounterActionsRow::value_changed();
+    EncounterActionsRow::value_changed(this);
 
     action.add_listener(*this);
 }
@@ -84,7 +84,7 @@ EncounterActionsEntry EncounterActionsRow::snapshot() const{
         shininess,
     };
 }
-void EncounterActionsRow::value_changed(){
+void EncounterActionsRow::value_changed(void* object){
     switch (action){
     case EncounterActionsAction::STOP_PROGRAM:
     case EncounterActionsAction::RUN_AWAY:

@@ -56,7 +56,7 @@ public:
             throw;
         }
     }
-    virtual void value_changed() override{
+    virtual void value_changed(void* object) override{
         std::lock_guard<std::mutex> lg(m_lock);
         m_overlay_set.clear();
         m_overlay_set.add(COLOR_RED, {m_parent.X, m_parent.Y, m_parent.WIDTH, m_parent.HEIGHT});
@@ -78,7 +78,7 @@ private:
 
 void BoxDraw::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     Overlay overlay(*this, env.console.overlay());
-    overlay.value_changed();
+    overlay.value_changed(this);
     context.wait_until_cancel();
 }
 

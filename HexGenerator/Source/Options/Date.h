@@ -31,7 +31,7 @@ public:
     virtual QWidget* make_ui(QWidget& parent) override;
 
 private:
-    DateOption m_option;
+    DateTimeOption m_option;
 };
 
 

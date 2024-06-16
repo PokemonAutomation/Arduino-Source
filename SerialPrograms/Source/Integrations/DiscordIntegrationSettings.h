@@ -25,7 +25,7 @@ public:
     DiscordIntegrationSettingsOption();
 
     virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
-    virtual void value_changed() override;
+    virtual void value_changed(void* object) override;
 
     BooleanCheckBoxOption run_on_start;
 

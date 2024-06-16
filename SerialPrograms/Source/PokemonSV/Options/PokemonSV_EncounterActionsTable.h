@@ -50,7 +50,7 @@ public:
     EncounterActionsEntry snapshot() const;
 
 private:
-    virtual void value_changed() override;
+    virtual void value_changed(void* object) override;
 
 private:
     EnumDropdownCell<EncounterActionsAction> action;

@@ -37,7 +37,7 @@ void TimeExpressionCellWidget<Type>::update_value(){
     this->setText(QString::fromStdString(m_value.current_text()));
 }
 template <typename Type>
-void TimeExpressionCellWidget<Type>::value_changed(){
+void TimeExpressionCellWidget<Type>::value_changed(void* object){
     QMetaObject::invokeMethod(this, [this]{
         this->update_value();
     }, Qt::QueuedConnection);
@@ -100,7 +100,7 @@ void TimeExpressionOptionWidget<Type>::update_value(){
     m_box->setText(QString::fromStdString(m_value.current_text()));
 }
 template <typename Type>
-void TimeExpressionOptionWidget<Type>::value_changed(){
+void TimeExpressionOptionWidget<Type>::value_changed(void* object){
     QMetaObject::invokeMethod(m_box, [this]{
         this->update_value();
     }, Qt::QueuedConnection);

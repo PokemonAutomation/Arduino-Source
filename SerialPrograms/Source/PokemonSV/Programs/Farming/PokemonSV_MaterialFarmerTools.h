@@ -49,7 +49,7 @@ public:
         EventNotificationOption& notif_error_recoverable_option,
         EventNotificationOption& notif_error_fatal_option
     );
-    virtual void value_changed() override;
+    virtual void value_changed(void* object) override;
 
 private:
     std::unique_ptr<OCR::LanguageOCROption> m_language_owner;

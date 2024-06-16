@@ -78,7 +78,7 @@ public:
     virtual JsonValue to_json() const override;
 
 private:
-    virtual void value_changed() override;
+    virtual void value_changed(void* object) override;
 
 public:
     BooleanCheckBoxOption SEND_ERROR_REPORTS;

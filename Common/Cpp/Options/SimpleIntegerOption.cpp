@@ -118,7 +118,7 @@ std::string SimpleIntegerCell<Type>::set(Type x){
         return std::string();
     }
     if (x != m_data->m_current.exchange(x, std::memory_order_relaxed)){
-        report_value_changed();
+        report_value_changed(this);
     }
     return std::string();
 }

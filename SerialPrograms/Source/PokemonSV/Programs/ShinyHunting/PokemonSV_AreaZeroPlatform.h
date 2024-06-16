@@ -30,7 +30,7 @@ public:
     PlatformResetSettings();
 
 private:
-    virtual void value_changed() override;
+    virtual void value_changed(void* object) override;
 
 public:
     StaticTextOption m_description;

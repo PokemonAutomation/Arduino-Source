@@ -50,10 +50,10 @@ void StaticTextOption::set_text(std::string label){
         }
         m_data->m_text = std::move(label);
     }
-    report_value_changed();
+    report_value_changed(this);
 }
 void StaticTextOption::load_json(const JsonValue&){
-    report_value_changed();
+    report_value_changed(this);
 }
 JsonValue StaticTextOption::to_json() const{
     return JsonValue();
@@ -94,10 +94,10 @@ void SectionDividerOption::set_text(std::string label){
         }
         m_data->m_text = std::move(label);
     }
-    report_value_changed();
+    report_value_changed(this);
 }
 void SectionDividerOption::load_json(const JsonValue&){
-    report_value_changed();
+    report_value_changed(this);
 }
 JsonValue SectionDividerOption::to_json() const{
     return JsonValue();

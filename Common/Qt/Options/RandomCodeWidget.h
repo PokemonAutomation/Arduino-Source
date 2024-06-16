@@ -24,7 +24,7 @@ public:
     RandomCodeWidget(QWidget& parent, RandomCodeOption& value);
 
     virtual void update_value() override;
-    virtual void value_changed() override;
+    virtual void value_changed(void* object) override;
 
 private:
     std::string sanitized_code(const std::string& text) const;

@@ -22,7 +22,7 @@ public:
     TimeExpressionCellWidget(QWidget& parent, TimeExpressionCell<Type>& value);
 
     virtual void update_value() override;
-    virtual void value_changed() override;
+    virtual void value_changed(void* object) override;
 
 private:
     TimeExpressionCell<Type>& m_value;
@@ -37,7 +37,7 @@ public:
     TimeExpressionOptionWidget(QWidget& parent, TimeExpressionOption<Type>& value);
 
     virtual void update_value() override;
-    virtual void value_changed() override;
+    virtual void value_changed(void* object) override;
 
 private:
     TimeExpressionOption<Type>& m_value;

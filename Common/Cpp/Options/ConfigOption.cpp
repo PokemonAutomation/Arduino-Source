@@ -131,13 +131,13 @@ void ConfigOption::report_program_state(bool program_is_running){
         listener->program_state_changed(program_is_running);
     }
 }
-void ConfigOption::report_value_changed(){
+void ConfigOption::report_value_changed(void* object){
     m_lifetime_sanitizer.check_usage();
     Data& data = *m_data;
     SpinLockGuard lg(data.lock);
 //    cout << "listeners = " << data.listeners.size() << endl;
     for (Listener* listener : data.listeners){
-        listener->value_changed();
+        listener->value_changed(object);
     }
 }
 

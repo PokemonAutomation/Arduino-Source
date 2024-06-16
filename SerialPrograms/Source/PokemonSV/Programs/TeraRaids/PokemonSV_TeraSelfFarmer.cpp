@@ -161,7 +161,7 @@ TeraSelfFarmer::TeraSelfFarmer()
 
     CATCH_ON_WIN.add_listener(*this);
 }
-void TeraSelfFarmer::value_changed(){
+void TeraSelfFarmer::value_changed(void* object){
     STOP_CONDITIONS.STOP_ON_SHINY.set_visibility(
         CATCH_ON_WIN.enabled() ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN
     );

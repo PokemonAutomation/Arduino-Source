@@ -106,10 +106,10 @@ CustomPathCell::CustomPathCell(EnumDropdownCell<PathAction>& action)
     PA_ADD_OPTION(jump_wait_ticks);
     PA_ADD_OPTION(wait_ticks);
 
-    CustomPathCell::value_changed();
+    CustomPathCell::value_changed(this);
     action.add_listener(*this);
 }
-void CustomPathCell::value_changed(){
+void CustomPathCell::value_changed(void* object){
     text.set_visibility(ConfigOptionState::HIDDEN);
     mount.set_visibility(ConfigOptionState::HIDDEN);
     move_forward_ticks.set_visibility(ConfigOptionState::HIDDEN);

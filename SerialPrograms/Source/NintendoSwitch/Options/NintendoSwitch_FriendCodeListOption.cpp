@@ -36,7 +36,7 @@ void FriendCodeListOption::load_json(const JsonValue& json){
         SpinLockGuard lg(m_lock);
         m_lines = std::move(lines);
     }
-    report_value_changed();
+    report_value_changed(this);
 }
 JsonValue FriendCodeListOption::to_json() const{
     JsonArray list;
@@ -51,7 +51,7 @@ void FriendCodeListOption::restore_defaults(){
         SpinLockGuard lg(m_lock);
         m_lines = m_default;
     }
-    report_value_changed();
+    report_value_changed(this);
 }
 
 
@@ -83,7 +83,7 @@ void FriendCodeListOption::set(const std::string& text){
         SpinLockGuard lg(m_lock);
         m_lines = std::move(lines);
     }
-    report_value_changed();
+    report_value_changed(this);
 }
 std::vector<std::string> FriendCodeListOption::lines() const{
     SpinLockGuard lg(m_lock);

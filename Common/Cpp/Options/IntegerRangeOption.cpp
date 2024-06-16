@@ -167,7 +167,7 @@ void IntegerRangeCell<Type>::set_lo(Type lo){
     //  need to check for lo. If this condition fails, we were already in a bad
     //  state to begin with.
     if (current_lo != lo){
-        report_value_changed();
+        report_value_changed(this);
     }
 }
 template <typename Type>
@@ -190,7 +190,7 @@ void IntegerRangeCell<Type>::set_hi(Type hi){
     //  need to check for hi. If this condition fails, we were already in a bad
     //  state to begin with.
     if (current_hi != hi){
-        report_value_changed();
+        report_value_changed(this);
     }
 }
 template <typename Type>
@@ -214,7 +214,7 @@ void IntegerRangeCell<Type>::set(Type lo, Type hi){
         }
     }
     if (current_lo != lo || current_hi != hi){
-        report_value_changed();
+        report_value_changed(this);
     }
 }
 

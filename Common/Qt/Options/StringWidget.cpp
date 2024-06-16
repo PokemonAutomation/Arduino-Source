@@ -49,7 +49,7 @@ StringCellWidget::StringCellWidget(QWidget& parent, StringCell& value)
 void StringCellWidget::update_value(){
     this->setText(QString::fromStdString(m_value));
 }
-void StringCellWidget::value_changed(){
+void StringCellWidget::value_changed(void* object){
     QMetaObject::invokeMethod(this, [this]{
         update_value();
     }, Qt::QueuedConnection);
@@ -93,7 +93,7 @@ StringOptionWidget::StringOptionWidget(QWidget& parent, StringOption& value)
 void StringOptionWidget::update_value(){
     m_box->setText(QString::fromStdString(m_value));
 }
-void StringOptionWidget::value_changed(){
+void StringOptionWidget::value_changed(void* object){
     QMetaObject::invokeMethod(m_box, [this]{
         update_value();
     }, Qt::QueuedConnection);

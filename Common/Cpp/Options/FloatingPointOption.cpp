@@ -86,7 +86,7 @@ std::string FloatingPointCell::set(double x){
         return err;
     }
     if (x != m_data->m_current.exchange(x, std::memory_order_relaxed)){
-        report_value_changed();
+        report_value_changed(this);
     }
     return err;
 }

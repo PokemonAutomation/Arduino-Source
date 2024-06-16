@@ -105,7 +105,7 @@ void TextEditWidget::update_value(){
     }
     m_box->setText(QString::fromStdString(m_value));
 }
-void TextEditWidget::value_changed(){
+void TextEditWidget::value_changed(void* object){
     QMetaObject::invokeMethod(m_box, [this]{
         update_value();
     }, Qt::QueuedConnection);

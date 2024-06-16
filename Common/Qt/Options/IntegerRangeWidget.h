@@ -22,7 +22,7 @@ public:
     IntegerRangeCellWidget(QWidget& parent, IntegerRangeCell<Type>& value);
 
     virtual void update_value() override;
-    virtual void value_changed() override;
+    virtual void value_changed(void* object) override;
 
 private:
     IntegerRangeCell<Type>& m_value;

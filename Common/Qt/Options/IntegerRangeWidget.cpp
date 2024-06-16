@@ -78,7 +78,7 @@ void IntegerRangeCellWidget<Type>::update_value(){
     m_hi->setText(QString::number(hi));
 }
 template <typename Type>
-void IntegerRangeCellWidget<Type>::value_changed(){
+void IntegerRangeCellWidget<Type>::value_changed(void* object){
     QMetaObject::invokeMethod(this, [this]{
         update_value();
     }, Qt::QueuedConnection);

@@ -40,7 +40,7 @@ enum class ConfigOptionState{
 class ConfigOption{
 public:
     struct Listener{
-        virtual void value_changed(){}
+        virtual void value_changed(void* object){}
         virtual void visibility_changed(){}
         virtual void program_state_changed(bool program_is_running){}
     };
@@ -101,7 +101,7 @@ public:
 protected:
     //  Report that the value of this config has changed. This will be pushed to
     //  all listeners.
-    void report_value_changed();
+    void report_value_changed(void* object);
 
 
 public:
