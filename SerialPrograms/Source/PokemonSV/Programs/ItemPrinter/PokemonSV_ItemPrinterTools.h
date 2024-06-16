@@ -64,6 +64,10 @@ enum class ItemPrinterItems{
     SPORT_BALL,
     SAFARI_BALL,
     BEAST_BALL,
+
+    ASSORTED_BALLS_1,
+    ASSORTED_BALLS_2,
+    ASSORTED_BALLS_3,
 };
 
 enum class DistanceFromTarget{

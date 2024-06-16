@@ -99,10 +99,9 @@ private:
         uint64_t seed, ConsoleHandle& console
     );
 
-    bool check_print_results_match(
+    bool results_approximately_match(
         const std::array<std::string, 10>& print_results, 
-        const std::array<std::string, 10>& expected_result, 
-        uint8_t max_number_of_mismatches
+        const std::array<std::string, 10>& expected_result
     );
 
 private:

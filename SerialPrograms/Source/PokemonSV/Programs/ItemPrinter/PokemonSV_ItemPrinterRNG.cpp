@@ -89,6 +89,10 @@ static const EnumDatabase<ItemPrinterItems>& ItemPrinterItems_Database(){
         {ItemPrinterItems::SAFARI_BALL, "safari-ball", "Safari Ball"},
         {ItemPrinterItems::BEAST_BALL, "beast-ball", "Beast Ball"},
 
+        {ItemPrinterItems::ASSORTED_BALLS_1, "assorted-balls-1", "Assorted Balls 1"},
+        {ItemPrinterItems::ASSORTED_BALLS_2, "assorted-balls-2", "Assorted Balls 2"},
+        {ItemPrinterItems::ASSORTED_BALLS_3, "assorted-balls-3", "Assorted Balls 3"},
+
     });
     return database;
 }
@@ -298,6 +302,15 @@ static const std::vector<ItemPrinterEnumOption>& ItemPrinter_AllOptions(){
 
         // 2037-02-02 15:37:15
         {2117201835, ItemPrinterItems::BEAST_BALL,      ItemPrinterJobs::Jobs_5},
+
+        // 2049-08-18 23:51:08
+        {2512943468, ItemPrinterItems::ASSORTED_BALLS_1,ItemPrinterJobs::Jobs_10},
+
+        // 2031-10-08 07:09:09
+        {1949209749, ItemPrinterItems::ASSORTED_BALLS_2,ItemPrinterJobs::Jobs_10},
+
+        // 2020-03-03 06:38:18
+        {1583217498, ItemPrinterItems::ASSORTED_BALLS_3,ItemPrinterJobs::Jobs_10},
     };
     return database;
 };
@@ -356,8 +369,12 @@ struct DateSeed{
         , items(std::move(p_items))
         , balls(std::move(p_balls))
     {}
+
+    operator bool() const{
+        return seed >= 0;
+    }
 };
-const DateSeed* get_date_seed(int64_t seed){
+DateSeed get_date_seed(int64_t seed){
     //  This is the function that we would replace with Kurt's seed calculator.
 
     static const std::map<int64_t, DateSeed> DATABASE{
@@ -571,6 +588,10 @@ const DateSeed* get_date_seed(int64_t seed){
         {2117201835 + 1, {2117201835 + 1, {}, {"heal-ball", "great-ball", "luxury-ball", "heavy-ball", "great-ball"}}},
         {2117201835 + 2, {2117201835 + 2, {}, {"poke-ball", "premier-ball", "great-ball", "poke-ball", "dive-ball"}}},
 
+        {2512943468, {2512943468, {}, {"level-ball", "level-ball", "friend-ball", "lure-ball", "beast-ball", "moon-ball", "fast-ball", "dream-ball", "love-ball", "beast-ball"}}},
+        {1949209749, {1949209749, {}, {"love-ball", "dream-ball", "heavy-ball", "lure-ball", "fast-ball", "fast-ball", "safari-ball", "safari-ball", "friend-ball", "heavy-ball"}}},
+        {1583217498, {1583217498, {}, {"sport-ball", "master-ball", "fast-ball", "master-ball", "dream-ball", "friend-ball", "lure-ball", "sport-ball", "moon-ball", "dream-ball"}}},
+
         //  Template
 //        {1717461428 - 2, {1717461428 - 2, {}, }},
 //        {1717461428 - 1, {1717461428 - 1, {}, }},
@@ -581,10 +602,10 @@ const DateSeed* get_date_seed(int64_t seed){
 
     auto iter = DATABASE.find(seed);
     if (iter != DATABASE.end()){
-        return &iter->second;
+        return iter->second;
     }
 
-    return nullptr;
+    return DateSeed{0, {}};
 }
 
 
@@ -601,7 +622,7 @@ ItemPrinterRngRow::ItemPrinterRngRow()
         DateTimeOption::DATE_HOUR_MIN_SEC,
         DateTime{2000, 1, 1, 0, 1, 0},
         DateTime{2060, 12, 31, 23, 59, 59},
-        DateTime{2024, 4, 22, 13, 27, 9}
+        DateTime{2024,  6,  4,  0, 37,  8}
     )
     , jobs(
         ItemPrinterJobs_Database(),
@@ -668,7 +689,8 @@ void ItemPrinterRngRow::value_changed(){
     if (option_data == nullptr){
         desired_item.set(ItemPrinterItems::NONE);
     }else{
-        desired_item.set(option_data->enum_value);
+        //  Infinite recursion + deadlock.
+//        desired_item.set(option_data->enum_value);
     }
 
 }
@@ -690,8 +712,12 @@ std::vector<std::string> ItemPrinterRngTable::make_header() const{
 }
 std::vector<std::unique_ptr<EditableTableRow>> ItemPrinterRngTable::make_defaults(){
     std::vector<std::unique_ptr<EditableTableRow>> ret;
-    ret.emplace_back(std::make_unique<ItemPrinterRngRow>(false, DateTime{2039, 3, 21, 12, 14, 42}, ItemPrinterJobs::Jobs_1));
-    ret.emplace_back(std::make_unique<ItemPrinterRngRow>(true, DateTime{2016, 5, 20, 2, 11, 13}, ItemPrinterJobs::Jobs_10));
+    ret.emplace_back(std::make_unique<ItemPrinterRngRow>(false, DateTime{2024,  6,  4,  0, 37,  8}, ItemPrinterJobs::Jobs_1));
+    ret.emplace_back(std::make_unique<ItemPrinterRngRow>(false, DateTime{2049,  8, 18, 23, 51,  8}, ItemPrinterJobs::Jobs_10));
+    ret.emplace_back(std::make_unique<ItemPrinterRngRow>(false, DateTime{2024,  6,  4,  0, 37,  8}, ItemPrinterJobs::Jobs_1));
+    ret.emplace_back(std::make_unique<ItemPrinterRngRow>(false, DateTime{2031, 10,  8,  7,  9,  9}, ItemPrinterJobs::Jobs_10));
+    ret.emplace_back(std::make_unique<ItemPrinterRngRow>(false, DateTime{2024,  6,  4,  0, 37,  8}, ItemPrinterJobs::Jobs_1));
+    ret.emplace_back(std::make_unique<ItemPrinterRngRow>(false, DateTime{2020,  3,  3,  6, 38, 18}, ItemPrinterJobs::Jobs_10));
     return ret;
 }
 
@@ -876,7 +902,7 @@ void ItemPrinterRNG::value_changed(){
 void ItemPrinterRNG::run_print_at_date(
     SingleSwitchProgramEnvironment& env, BotBaseContext& context,
     const DateTime& date, ItemPrinterJobs jobs
-) {
+){
     ItemPrinterRNG_Descriptor::Stats& stats = env.current_stats<ItemPrinterRNG_Descriptor::Stats>();
 
     bool printed = false;
@@ -1022,11 +1048,11 @@ void ItemPrinterRNG::adjust_delay(
         stats.frame_misses++;
         break;
     case DistanceFromTarget::MINUS_2:
-        delay_adjustment =  -1000;
+        delay_adjustment = -1000;
         stats.frame_misses++;
         break;
     case DistanceFromTarget::PLUS_1:
-        delay_adjustment =  50;
+        delay_adjustment = 50;
         stats.frame_misses++;
         break;
     case DistanceFromTarget::PLUS_2:
@@ -1053,354 +1079,112 @@ DistanceFromTarget ItemPrinterRNG::get_distance_from_target(
     const std::array<std::string, 10>& print_results, 
     uint64_t seed, ConsoleHandle& console
 ){
-    DistanceFromTarget distance_from_target;
-    std::array<std::string, 10> target_result;
-    std::array<std::string, 10> target_result_plus_1;
-    std::array<std::string, 10> target_result_minus_1;
-    std::array<std::string, 10> target_result_plus_2;
-    std::array<std::string, 10> target_result_minus_2;
+    DistanceFromTarget distance_from_target = DistanceFromTarget::UNKNOWN;
+    do{
+        DateSeed seed_data = get_date_seed(seed);
+        if (results_approximately_match(print_results, seed_data.items)){
+            distance_from_target = DistanceFromTarget::ON_TARGET;
+            break;
+        }
+        if (results_approximately_match(print_results, seed_data.balls)){
+            distance_from_target = DistanceFromTarget::ON_TARGET;
+            break;
+        }
 
-    // allow 1 misread/mismatch for all prints, except for the 
-    // item and ball bonuses, since they only print 1.
-    uint8_t max_number_of_mismatches = 1; 
-    bool unknown_seed = false;
+        seed_data = get_date_seed(seed - 1);
+        if (results_approximately_match(print_results, seed_data.items)){
+            distance_from_target = DistanceFromTarget::MINUS_1;
+            break;
+        }
+        if (results_approximately_match(print_results, seed_data.balls)){
+            distance_from_target = DistanceFromTarget::MINUS_1;
+            break;
+        }
 
-    std::string current_print;
-    switch (seed){
-    case 2346161588: // item bonus
-        current_print = "Item bonus: ";
-        target_result_minus_2 = {"stardust"};
-        target_result_minus_1 = {"tiny-mushroom"};
-        target_result = {"calcium"};
-        target_result_plus_1 = {"max-ether"};
-        target_result_plus_2 = {"electric-tera-shard"};
-        max_number_of_mismatches = 0;
+        seed_data = get_date_seed(seed + 1);
+        if (results_approximately_match(print_results, seed_data.items)){
+            distance_from_target = DistanceFromTarget::PLUS_1;
+            break;
+        }
+        if (results_approximately_match(print_results, seed_data.balls)){
+            distance_from_target = DistanceFromTarget::PLUS_1;
+            break;
+        }
+
+        seed_data = get_date_seed(seed - 2);
+        if (results_approximately_match(print_results, seed_data.items)){
+            distance_from_target = DistanceFromTarget::MINUS_2;
+            break;
+        }
+        if (results_approximately_match(print_results, seed_data.balls)){
+            distance_from_target = DistanceFromTarget::MINUS_2;
+            break;
+        }
+
+        seed_data = get_date_seed(seed + 2);
+        if (results_approximately_match(print_results, seed_data.items)){
+            distance_from_target = DistanceFromTarget::PLUS_2;
+            break;
+        }
+        if (results_approximately_match(print_results, seed_data.balls)){
+            distance_from_target = DistanceFromTarget::PLUS_2;
+            break;
+        }
+
+    }while (false);
+
+    switch (distance_from_target){
+    case DistanceFromTarget::ON_TARGET:
+        console.log("Frame Result: Target hit", COLOR_BLUE);
         break;
-    case 1717461428: // ball bonus
-        current_print = "Ball bonus: ";
-        target_result_minus_2 = {"balm-mushroom"};
-        target_result_minus_1 = {"revive"};
-        target_result = {"full-restore"};
-        target_result_plus_1 = {"fairy-tera-shard"};
-        target_result_plus_2 = {"big-bamboo-shoot"};
-        max_number_of_mismatches = 0;
-        break;        
-    case 958172368:
-        current_print = "Ability patch: ";
-        target_result_minus_2 = {"dark-tera-shard", "revive", "reaper-cloth", "ability-patch", "poison-tera-shard"};
-        target_result_minus_1 = {"dark-tera-shard", "fire-tera-shard", "big-bamboo-shoot", "balm-mushroom", "super-potion"};
-        target_result = {"dark-tera-shard", "ability-patch", "ability-patch", "ability-patch", "ability-patch"};
-        target_result_plus_1 = {"dark-tera-shard", "pearl", "spell-tag", "flower-sweet", "ribbon-sweet"};
-        target_result_plus_2 = {"dark-tera-shard", "water-stone", "max-potion", "tiny-mushroom", "electric-tera-shard"};
+    case DistanceFromTarget::MINUS_1:
+        console.log("Frame Result: Missed. (Target - 1)", COLOR_ORANGE);
         break;
-    case 1991472489:
-        current_print = "EXP_CANDY: ";
-        target_result_minus_2 = {"exp-candy-xl", "tiny-bamboo-shoot", "exp-candy-s", "iron", "tiny-bamboo-shoot"};
-        target_result_minus_1 = {"exp-candy-xl", "toxic-orb", "rare-bone", "silver-powder", "lucky-egg"};
-        target_result         = {"exp-candy-xl", "protein", "exp-candy-l", "exp-candy-xl", "exp-candy-xl"};
-        target_result_plus_1  = {"exp-candy-xl", "silver-powder", "dubious-disc", "mystic-water", "toxic-orb"};
-        target_result_plus_2  = {"exp-candy-xl", "tiny-bamboo-shoot", "toxic-orb", "ice-stone", "charcoal"};
+    case DistanceFromTarget::PLUS_1:
+        console.log("Frame Result: Missed. (Target + 1)", COLOR_ORANGE);
         break;
-    case 2246577010:
-        current_print = "NORMAL_TERA: ";
-        target_result_minus_2 = {"normal-tera-shard", "exp-candy-l", "star-piece", "tiny-mushroom", "rock-tera-shard"};
-        target_result_minus_1 = {"normal-tera-shard", "oval-stone", "ether", "stardust", "steel-tera-shard"};
-        target_result         = {"normal-tera-shard", "normal-tera-shard", "normal-tera-shard", "normal-tera-shard", "normal-tera-shard"};
-        target_result_plus_1  = {"normal-tera-shard", "exp-candy-s", "ether", "elixir", "big-pearl"};
-        target_result_plus_2  = {"normal-tera-shard", "dragon-tera-shard", "ice-tera-shard", "exp-candy-xl", "black-sludge"};
+    case DistanceFromTarget::MINUS_2:
+        console.log("Frame Result: Missed. (Target - 2)", COLOR_RED);
         break;
-    case 2669513710:
-        current_print = "FIRE_TERA: ";
-        target_result_minus_2 = {"fire-tera-shard", "flame-orb", "steel-tera-shard", "fire-stone", "max-revive"};
-        target_result_minus_1 = {"fire-tera-shard", "exp-candy-xs", "miracle-seed", "sun-stone", "iron"};
-        target_result         = {"fire-tera-shard", "fire-tera-shard", "fire-tera-shard", "fire-tera-shard", "honey"};
-        target_result_plus_1  = {"fire-tera-shard", "poison-tera-shard", "love-sweet", "safety-goggles", "exp-candy-m"};
-        target_result_plus_2  = {"fire-tera-shard", "rare-bone", "dubious-disc", "berry-sweet", "hp-up"};
+    case DistanceFromTarget::PLUS_2:
+        console.log("Frame Result: Missed. (Target + 2)", COLOR_RED);
         break;
-    case 2419526534:
-        current_print = "WATER_TERA: ";
-        target_result_minus_2 = {"water-tera-shard", "exp-candy-xs", "flame-orb", "exp-candy-s", "honey"};
-        target_result_minus_1 = {"water-tera-shard", "never-melt-ice", "rock-tera-shard", "hp-up", "sun-stone"};
-        target_result         = {"water-tera-shard", "full-restore", "water-tera-shard", "flying-tera-shard", "water-tera-shard"};
-        target_result_plus_1  = {"water-tera-shard", "heavy-duty-boots", "moon-stone", "strawberry-sweet", "exp-candy-xs"};
-        target_result_plus_2  = {"water-tera-shard", "ghost-tera-shard", "max-revive", "ground-tera-shard", "exp-candy-xl"};
-        break;
-    case 1300121653:
-        current_print = "ELECTRIC_TERA: ";
-        target_result_minus_2 = {"electric-tera-shard", "elixir", "full-restore", "upgrade", "toxic-orb"};
-        target_result_minus_1 = {"electric-tera-shard", "exp-candy-xs", "steel-tera-shard", "big-mushroom", "exp-candy-s"};
-        target_result         = {"electric-tera-shard", "light-clay", "electric-tera-shard", "electric-tera-shard", "electric-tera-shard"};
-        target_result_plus_1  = {"electric-tera-shard", "calcium", "ground-tera-shard", "water-tera-shard", "upgrade"};
-        target_result_plus_2  = {"electric-tera-shard", "max-potion", "charcoal", "exp-candy-xs", "grass-tera-shard"};
-        break;                        
-    case 1258326250:
-        current_print = "GRASS_TERA: ";
-        target_result_minus_2 = {"grass-tera-shard", "pretty-feather", "exp-candy-m", "bug-tera-shard", "tiny-mushroom"};
-        target_result_minus_1 = {"grass-tera-shard", "ghost-tera-shard", "bug-tera-shard", "silver-powder", "berry-sweet"};
-        target_result         = {"grass-tera-shard", "tiny-mushroom", "grass-tera-shard", "grass-tera-shard", "grass-tera-shard"};
-        target_result_plus_1  = {"grass-tera-shard", "steel-tera-shard", "honey", "strawberry-sweet", "normal-tera-shard"};
-        target_result_plus_2  = {"grass-tera-shard", "exp-candy-xl", "exp-candy-xs", "zinc", "dragon-fang"};
-        break; 
-    case 2567326030:
-        current_print = "ICE_TERA: ";
-        target_result_minus_2 = {"ice-tera-shard", "pearl-string", "dragon-tera-shard", "sun-stone", "water-tera-shard"};
-        target_result_minus_1 = {"ice-tera-shard", "scope-lens", "full-restore", "dubious-disc", "lucky-egg"};
-        target_result         = {"ice-tera-shard", "ice-tera-shard", "ice-tera-shard", "ice-tera-shard", "metal-alloy"};
-        target_result_plus_1  = {"ice-tera-shard", "poison-barb", "leaf-stone", "cracked-pot", "ghost-tera-shard"};
-        target_result_plus_2  = {"ice-tera-shard", "exp-candy-xs", "rock-tera-shard", "loaded-dice", "Pretty Feather"};
-        break;
-    case 1510682535:
-        current_print = "FIGHTING_TERA: ";
-        target_result_minus_2 = {"fairy-feather", "normal-tera-shard", "air-balloon", "poison-tera-shard", "pearl"};
-        target_result_minus_1 = {"strawberry-sweet", "electric-tera-shard", "calcium", "revive", "ghost-tera-shard"};
-        target_result         = {"fighting-tera-shard", "fighting-tera-shard", "fighting-tera-shard", "fighting-tera-shard", "shiny-stone"};
-        target_result_plus_1  = {"miracle-seed", "fighting-tera-shard", "ice-tera-shard", "light-clay", "dark-tera-shard"};
-        target_result_plus_2  = {"rare-bone", "max-elixir", "leaf-stone", "metal-alloy", "magmarizer"};
-        break;
-    case 2041396572:
-        current_print = "POISON_TERA: ";
-        target_result_minus_2 = {"electirizer", "upgrade", "zinc", "elixir", "revive"};
-        target_result_minus_1 = {"electirizer", "flame-orb", "magmarizer", "hp-up", "pretty-feather"};
-        target_result         = {"electirizer", "poison-tera-shard", "poison-tera-shard", "poison-tera-shard", "poison-tera-shard"};
-        target_result_plus_1  = {"electirizer", "pp-up", "rock-tera-shard", "big-mushroom", "light-clay"};
-        target_result_plus_2  = {"electirizer", "fire-tera-shard", "revive", "big-bamboo-shoot", "dark-tera-shard"};
-        break;
-    case 1463321889:
-        current_print = "GROUND_TERA: ";
-        target_result_minus_2 = {"pp-up", "pretty-feather", "max-ether", "big-pearl", "carbos"};
-        target_result_minus_1 = {"pp-up", "spell-tag", "bug-tera-shard", "pearl", "fighting-tera-shard"};
-        target_result         = {"pp-up", "ground-tera-shard", "ground-tera-shard", "ground-tera-shard", "ground-tera-shard"};
-        target_result_plus_1  = {"pp-up", "metal-alloy", "full-restore", "pearl", "silver-powder"};
-        target_result_plus_2  = {"pp-up", "ghost-tera-shard", "nugget", "safety-goggles", "leftovers"};
-        break; 
-    case 1580633500:
-        current_print = "FLYING_TERA: ";
-        target_result_minus_2 = {"black-glasses", "big-nugget", "max-revive", "pearl-string", "balm-mushroom"};
-        target_result_minus_1 = {"loaded-dice", "exp-candy-s", "strawberry-sweet", "never-melt-ice", "moon-stone"};
-        target_result         = {"flying-tera-shard", "flying-tera-shard", "flying-tera-shard", "flying-tera-shard", "flying-tera-shard"};
-        target_result_plus_1  = {"water-stone", "rare-bone", "max-ether", "moon-stone", "ability-patch"};
-        target_result_plus_2  = {"max-ether", "big-bamboo-shoot", "iron", "big-mushroom", "pearl"};
-        break; 
-    case 2190593713:
-        current_print = "PSYCHIC_TERA: ";
-        target_result_minus_2 = {"psychic-tera-shard", "big-mushroom", "fairy-feather", "fairy-tera-shard", "reaper-cloth"};
-        target_result_minus_1 = {"psychic-tera-shard", "electric-tera-shard", "pearl", "stellar-tera-shard", "dawn-stone"};
-        target_result         = {"psychic-tera-shard", "never-melt-ice", "psychic-tera-shard", "psychic-tera-shard", "psychic-tera-shard"};
-        target_result_plus_1  = {"psychic-tera-shard", "pearl-string", "twisted-spoon", "big-pearl", "iron"};
-        target_result_plus_2  = {"psychic-tera-shard", "heavy-duty-boots", "water-tera-shard", "rock-tera-shard", "twisted-spoon"};
-        break;
-    case 2458109848:
-        current_print = "BUG_TERA: ";
-        target_result_minus_2 = {"ether", "big-nugget", "mystic-water", "pretty-feather", "pretty-feather"};
-        target_result_minus_1 = {"ether", "psychic-tera-shard", "exp-candy-s", "honey", "sharp-beak"};
-        target_result         = {"ether", "bug-tera-shard", "bug-tera-shard", "bug-tera-shard", "bug-tera-shard"};
-        target_result_plus_1  = {"ether", "black-glasses", "fighting-tera-shard", "tiny-bamboo-shoot", "poison-barb"};
-        target_result_plus_2  = {"ether", "exp-candy-xl", "normal-tera-shard", "fairy-tera-shard", "balm-mushroom"};
-        break;
-    case 2801954289:
-        current_print = "ROCK_TERA: ";
-        target_result_minus_2 = {"max-revive", "scope-lens", "razor-claw", "big-nugget", "tiny-bamboo-shoot"};
-        target_result_minus_1 = {"iron", "dark-tera-shard", "air-balloon", "rare-bone", "ability-patch"};
-        target_result         = {"rock-tera-shard", "rock-tera-shard", "pretty-feather", "rock-tera-shard", "stardust"};
-        target_result_plus_1  = {"normal-tera-shard", "ground-tera-shard", "honey", "upgrade", "honey"};
-        target_result_plus_2  = {"heavy-duty-boots", "ice-tera-shard", "sun-stone", "dubious-disc", "pearl"};
-        break;
-    case 1509904271:
-        current_print = "GHOST_TERA: ";
-        target_result_minus_2 = {"ghost-tera-shard", "hyper-potion", "toxic-orb", "magmarizer", "black-glasses"};
-        target_result_minus_1 = {"ghost-tera-shard", "black-belt", "pp-up", "ice-tera-shard", "magmarizer"};
-        target_result         = {"ghost-tera-shard", "ghost-tera-shard", "ghost-tera-shard", "magnet", "ghost-tera-shard"};
-        target_result_plus_1  = {"ghost-tera-shard", "big-nugget", "hp-up", "gold-bottle-cap", "big-bamboo-shoot"};
-        target_result_plus_2  = {"ghost-tera-shard", "hp-up", "elixir", "water-tera-shard", "pp-up"};
-        break;                        
-    case 2155674309:
-        current_print = "DRAGON_TERA: ";
-        target_result_minus_2 = {"comet-shard", "soft-sand", "big-mushroom", "steel-tera-shard", "metronome"};
-        target_result_minus_1 = {"pearl", "balm-mushroom", "moon-stone", "protein", "ability-patch"};
-        target_result         = {"ability-patch", "dragon-tera-shard", "dragon-tera-shard", "dragon-tera-shard", "dragon-tera-shard"};
-        target_result_plus_1  = {"reaper-cloth", "hp-up", "revive", "light-clay", "focus-band"};
-        target_result_plus_2  = {"spell-tag", "love-sweet", "fire-tera-shard", "ether", "black-belt"};
-        break; 
-    case 2537180413:
-        current_print = "DARK_TERA: ";
-        target_result_minus_2 = {"dark-tera-shard", "upgrade", "big-mushroom", "normal-tera-shard", "exp-candy-m"};
-        target_result_minus_1 = {"dark-tera-shard", "pp-max", "calcium", "rock-tera-shard", "hard-stone"};
-        target_result         = {"dark-tera-shard", "dark-tera-shard", "dark-tera-shard", "dark-tera-shard", "prism-scale"};
-        target_result_plus_1  = {"dark-tera-shard", "leaf-stone", "big-pearl", "comet-shard", "exp-candy-m"};
-        target_result_plus_2  = {"dark-tera-shard", "ground-tera-shard", "fairy-tera-shard", "exp-candy-xs", "fighting-tera-shard"};
-        break; 
-    case 1766067369:
-        current_print = "STEEL_TERA: ";
-        target_result_minus_2 = {"steel-tera-shard", "bug-tera-shard", "exp-candy-xl", "pretty-feather", "silk-scarf"};
-        target_result_minus_1 = {"steel-tera-shard", "tiny-mushroom", "super-potion", "sharp-beak", "ice-tera-shard"};
-        target_result         = {"steel-tera-shard", "steel-tera-shard", "steel-tera-shard", "steel-tera-shard", "berry-sweet"};
-        target_result_plus_1  = {"steel-tera-shard", "moon-stone", "exp-candy-xl", "iron", "exp-candy-xs"};
-        target_result_plus_2  = {"steel-tera-shard", "metal-alloy", "ability-patch", "pp-up", "rare-bone"};
-        break;
-    case 2183028974:
-        current_print = "FAIRY_TERA: ";
-        target_result_minus_2 = {"max-elixir", "never-melt-ice", "pearl", "max-potion", "pp-up"};
-        target_result_minus_1 = {"full-restore", "psychic-tera-shard", "gold-bottle-cap", "dawn-stone", "never-melt-ice"};
-        target_result         = {"fairy-tera-shard", "fairy-tera-shard", "water-tera-shard", "tiny-bamboo-shoot", "fairy-tera-shard"};
-        target_result_plus_1  = {"ice-tera-shard", "twisted-spoon", "exp-candy-s", "max-elixir", "razor-fang"};
-        target_result_plus_2  = {"exp-candy-xl", "bug-tera-shard", "star-piece", "hp-up", "bug-tera-shard"};
-        break;
-    case 1165654034:
-        current_print = "STELLAR_TERA: ";
-        target_result_minus_2 = {"stellar-tera-shard", "pp-up", "scope-lens", "electric-tera-shard", "metronome"};
-        target_result_minus_1 = {"stellar-tera-shard", "dragon-tera-shard", "honey", "steel-tera-shard", "max-potion"};
-        target_result         = {"stellar-tera-shard", "max-revive", "stellar-tera-shard", "stellar-tera-shard", "clover-sweet"};
-        target_result_plus_1  = {"stellar-tera-shard", "full-heal", "toxic-orb", "max-potion", "miracle-seed"};
-        target_result_plus_2  = {"stellar-tera-shard", "big-bamboo-shoot", "poison-tera-shard", "honey", "oval-stone"};
-        break;
-    case 1131363128:
-        current_print = "MASTER_BALL: ";
-        target_result_minus_2 = {"master-ball", "great-ball", "quick-ball", "luxury-ball", "heal-ball"};
-        target_result_minus_1 = {"master-ball", "great-ball", "timer-ball", "fast-ball", "love-ball"};
-        target_result         = {"master-ball", "master-ball", "great-ball", "master-ball", "master-ball"};
-        target_result_plus_1  = {"master-ball", "premier-ball", "great-ball", "luxury-ball", "heal-ball"};
-        target_result_plus_2  = {"master-ball", "quick-ball", "poke-ball", "premier-ball", "poke-ball"};
-        break;                        
-    case 2493163222:
-        current_print = "SAFARI_BALL: ";
-        target_result_minus_2 = {"premier-ball", "great-ball", "lure-ball", "ultra-ball", "safari-ball"};
-        target_result_minus_1 = {"premier-ball", "great-ball", "poke-ball", "poke-ball", "poke-ball"};
-        target_result         = {"safari-ball", "safari-ball", "safari-ball", "safari-ball", "safari-ball"};
-        target_result_plus_1  = {"poke-ball", "poke-ball", "poke-ball", "premier-ball", "great-ball"};
-        target_result_plus_2  = {"great-ball", "great-ball", "level-ball", "poke-ball", "safari-ball"};
-        break;       
-    case 2040690819:
-        current_print = "FAST_BALL: ";
-        target_result_minus_2 = {"fast-ball", "lure-ball", "dream-ball", "friend-ball", "level-ball"};
-        target_result_minus_1 = {"fast-ball", "great-ball", "quick-ball", "great-ball", "heal-ball"};
-        target_result         = {"fast-ball", "fast-ball", "fast-ball", "fast-ball", "fast-ball"};
-        target_result_plus_1  = {"fast-ball", "dream-ball", "luxury-ball", "luxury-ball", "premier-ball"};
-        target_result_plus_2  = {"fast-ball", "luxury-ball", "great-ball", "poke-ball", "premier-ball"};
-        break;  
-    case 2373357938:
-        current_print = "LEVEL_BALL: ";
-        target_result_minus_2 = {"dusk-ball", "heal-ball", "luxury-ball", "premier-ball", "poke-ball"};
-        target_result_minus_1 = {"great-ball", "dive-ball", "dream-ball", "luxury-ball", "luxury-ball"};
-        target_result         = {"level-ball", "level-ball", "level-ball", "level-ball", "level-ball"};
-        target_result_plus_1  = {"repeat-ball", "heal-ball", "heal-ball", "luxury-ball", "dive-ball"};
-        target_result_plus_2  = {"luxury-ball", "master-ball", "premier-ball", "ultra-ball", "heal-ball"};
-        break;  
-    case 2773542517:
-        current_print = "LURE_BALL: ";
-        target_result_minus_2 = {"lure-ball", "premier-ball", "premier-ball", "great-ball", "poke-ball"};
-        target_result_minus_1 = {"dream-ball", "poke-ball", "poke-ball", "luxury-ball", "poke-ball"};
-        target_result         = {"lure-ball", "lure-ball", "lure-ball", "lure-ball", "lure-ball"};
-        target_result_plus_1  = {"luxury-ball", "premier-ball", "great-ball", "luxury-ball", "fast-ball"};
-        target_result_plus_2  = {"timer-ball", "safari-ball", "dive-ball", "poke-ball", "premier-ball"};
-        break;       
-    case 1879588391:
-        current_print = "HEAVY_BALL: ";
-        target_result_minus_2 = {"heavy-ball", "nest-ball", "nest-ball", "heal-ball", "luxury-ball"};
-        target_result_minus_1 = {"heavy-ball", "poke-ball", "premier-ball", "premier-ball", "heal-ball"};
-        target_result         = {"heavy-ball", "heavy-ball", "heavy-ball", "heavy-ball", "heavy-ball"};
-        target_result_plus_1  = {"heavy-ball", "heal-ball", "premier-ball", "timer-ball", "premier-ball"};
-        target_result_plus_2  = {"heavy-ball", "ultra-ball", "heal-ball", "quick-ball", "beast-ball"};
-        break;  
-    case 1684733771:
-        current_print = "LOVE_BALL: ";
-        target_result_minus_2 = {"love-ball", "sport-ball", "great-ball", "poke-ball", "poke-ball"};
-        target_result_minus_1 = {"love-ball", "poke-ball", "great-ball", "luxury-ball", "master-ball"};
-        target_result         = {"love-ball", "love-ball", "love-ball", "love-ball", "love-ball"};
-        target_result_plus_1  = {"love-ball", "great-ball", "luxury-ball", "luxury-ball", "poke-ball"};
-        target_result_plus_2  = {"love-ball", "luxury-ball", "premier-ball", "poke-ball", "quick-ball"};
-        break; 
-    case 2428107797:
-        current_print = "FRIEND_BALL: ";
-        target_result_minus_2 = {"friend-ball", "great-ball", "sport-ball", "great-ball", "great-ball"};
-        target_result_minus_1 = {"friend-ball", "premier-ball", "heal-ball", "repeat-ball", "nest-ball"};
-        target_result         = {"friend-ball", "friend-ball", "friend-ball", "friend-ball", "friend-ball"};
-        target_result_plus_1  = {"friend-ball", "premier-ball", "heavy-ball", "timer-ball", "friend-ball"};
-        target_result_plus_2  = {"friend-ball", "heal-ball", "great-ball", "beast-ball", "moon-ball"};
-        break;       
-    case 2296878993:
-        current_print = "MOON_BALL: ";
-        target_result_minus_2 = {"luxury-ball", "timer-ball", "premier-ball", "luxury-ball", "poke-ball"};
-        target_result_minus_1 = {"nest-ball", "poke-ball", "heal-ball", "premier-ball", "premier-ball"};
-        target_result         = {"moon-ball", "moon-ball", "moon-ball", "moon-ball", "moon-ball"};
-        target_result_plus_1  = {"fast-ball", "heal-ball", "poke-ball", "dusk-ball", "luxury-ball"};
-        target_result_plus_2  = {"lure-ball", "heavy-ball", "luxury-ball", "heal-ball", "poke-ball"};
-        break;  
-    case 1244233031:
-        current_print = "SPORT_BALL: ";
-        target_result_minus_2 = {"sport-ball", "heal-ball", "luxury-ball", "great-ball", "heal-ball"};
-        target_result_minus_1 = {"sport-ball", "dream-ball", "level-ball", "poke-ball", "luxury-ball"};
-        target_result         = {"sport-ball", "sport-ball", "sport-ball", "sport-ball", "sport-ball"};
-        target_result_plus_1  = {"moon-ball", "heal-ball", "poke-ball", "poke-ball", "heal-ball"};
-        target_result_plus_2  = {"moon-ball", "poke-ball", "ultra-ball", "poke-ball", "great-ball"};
-        break;    
-    case 2657784681:
-        current_print = "DREAM_BALL: ";
-        target_result_minus_2 = {"master-ball", "poke-ball", "luxury-ball", "level-ball", "dream-ball"};
-        target_result_minus_1 = {"timer-ball", "beast-ball", "poke-ball", "premier-ball", "heal-ball"};
-        target_result         = {"dream-ball", "dream-ball", "dream-ball", "dream-ball", "dream-ball"};
-        target_result_plus_1  = {"heavy-ball", "poke-ball", "friend-ball", "fast-ball", "heavy-ball"};
-        target_result_plus_2  = {"luxury-ball", "poke-ball", "luxury-ball", "quick-ball", "friend-ball"};
-        break;  
-    case 2117201835:
-        current_print = "BEAST_BALL: ";
-        target_result_minus_2 = {"luxury-ball", "poke-ball", "lure-ball", "master-ball", "dive-ball"};
-        target_result_minus_1 = {"heavy-ball", "premier-ball", "premier-ball", "poke-ball", "level-ball"};
-        target_result         = {"beast-ball", "beast-ball", "beast-ball", "beast-ball", "beast-ball"};
-        target_result_plus_1  = {"heal-ball", "great-ball", "luxury-ball", "heavy-ball", "great-ball"};
-        target_result_plus_2  = {"poke-ball", "premier-ball", "great-ball", "poke-ball", "dive-ball"};
-        break;       
     default:
-        unknown_seed = true;
-        console.log("Unknown seed. Can't calculate distance from target.");
-        break;
-    }
-
-    if (unknown_seed){
-        return DistanceFromTarget::UNKNOWN;
-    }
-
-    if(check_print_results_match(print_results, target_result, max_number_of_mismatches)){
-        distance_from_target = DistanceFromTarget::ON_TARGET;
-        console.log("Attempted to get " + current_print + "Success. On target.");
-    }else if (check_print_results_match(print_results, target_result_plus_1, max_number_of_mismatches)){
-        distance_from_target = DistanceFromTarget::PLUS_1;
-        console.log("Attempted to get " + current_print + "Missed. Target +1.");
-    }else if (check_print_results_match(print_results, target_result_minus_1, max_number_of_mismatches)){
-        distance_from_target = DistanceFromTarget::MINUS_1;
-        console.log("Attempted to get " + current_print + "Missed. Target -1.");
-    }else if (check_print_results_match(print_results, target_result_plus_2, max_number_of_mismatches)){
-        distance_from_target = DistanceFromTarget::PLUS_2;
-        console.log("Attempted to get " + current_print + "Missed. Target +2.");
-    }else if (check_print_results_match(print_results, target_result_minus_2, max_number_of_mismatches)){
-        distance_from_target = DistanceFromTarget::MINUS_2;
-        console.log("Attempted to get " + current_print + "Missed. Target -2.");
-    }else{
-        distance_from_target = DistanceFromTarget::UNKNOWN;
-        console.log("Attempted to get " + current_print + "Missed. Unknown distance from target.");
+        console.log("Frame Result: Unknown. No seed not found in database.", COLOR_ORANGE);
     }
 
     return distance_from_target;
 }
 
 
-// - return true if print_results matches with expected_result
-// - the lists don't have to match exactly, as long as current_number_of_mismatches <= max_number_of_mismatches
-bool ItemPrinterRNG::check_print_results_match(
+
+bool ItemPrinterRNG::results_approximately_match(
     const std::array<std::string, 10>& print_results, 
-    const std::array<std::string, 10>& expected_result,
-    uint8_t max_number_of_mismatches
-) {
-    uint8_t current_number_of_mismatches = 0;
+    const std::array<std::string, 10>& expected_result
+){
+    size_t total_items = 0;
+    size_t mismatches = 0;
     for (uint8_t i = 0; i < 10; i++){
-        if(print_results.at(i) != expected_result.at(i)){
-            current_number_of_mismatches++;
-            if(current_number_of_mismatches > max_number_of_mismatches){
-                return false;
-            }
+        const std::string& x = print_results[i];
+        const std::string& y = expected_result[i];
+        if (x.empty() || y.empty()){
+            continue;
         }
+
+        total_items++;
+
+        if (x == y){
+            continue;
+        }
+
+        mismatches++;
     }
 
-    return true;
+    if (total_items == 0){
+        return false;
+    }
+
+    return mismatches * 5 <= total_items;
 }
 
 void ItemPrinterRNG::print_again(
