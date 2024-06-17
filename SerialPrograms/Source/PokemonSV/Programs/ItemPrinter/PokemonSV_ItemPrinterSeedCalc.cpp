@@ -241,6 +241,9 @@ struct ItemPrinterItemData{
 };
 
 std::vector<ItemPrinterItemData> make_item_prize_list(){
+    //  This is taken from:
+    //      https://github.com/kwsch/ItemPrinterDeGacha/blob/main/ItemPrinterDeGacha.Core/Resources/item_table_array.json
+    //  The file itself is originally from a pkNX dump of the game.
     const std::string path = "PokemonSV/ItemPrinterItems.json";
     JsonValue json = load_json_file(RESOURCE_PATH() + path);
     const JsonArray& array = json
@@ -270,6 +273,9 @@ std::vector<ItemPrinterItemData> make_item_prize_list(){
     return ret;
 }
 std::vector<ItemPrinterItemData> make_ball_prize_list(){
+    //  This is taken from:
+    //      https://github.com/kwsch/ItemPrinterDeGacha/blob/main/ItemPrinterDeGacha.Core/Resources/special_item_table_array.json
+    //  The file itself is originally from a pkNX dump of the game.
     const std::string path = "PokemonSV/ItemPrinterBalls.json";
     JsonValue json = load_json_file(RESOURCE_PATH() + path);
     const JsonArray& array = json
