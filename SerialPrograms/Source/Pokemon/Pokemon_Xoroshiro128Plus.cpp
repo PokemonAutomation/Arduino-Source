@@ -5,9 +5,10 @@
  */
 
 #include <cstddef>
-#include "PokemonSwSh/Programs/RNG/PokemonSwSh_Xoroshiro128Plus.h"
+#include "Pokemon_Xoroshiro128Plus.h"
 
 namespace PokemonAutomation{
+namespace Pokemon{
 
 Xoroshiro128PlusState::Xoroshiro128PlusState(uint64_t s0, uint64_t s1)
     : s0(s0)
@@ -23,13 +24,11 @@ Xoroshiro128Plus::Xoroshiro128Plus(uint64_t s0, uint64_t s1)
     : state(Xoroshiro128PlusState(s0, s1))
 {}
 
-uint64_t Xoroshiro128Plus::rotl(const uint64_t x, const int k)
-{
+uint64_t Xoroshiro128Plus::rotl(const uint64_t x, const int k){
     return (x << k) | (x >> (64 - k));
 }
 
-uint64_t Xoroshiro128Plus::next()
-{
+uint64_t Xoroshiro128Plus::next(){
     const uint64_t s0 = state.s0;
     uint64_t s1 = state.s1;
     const uint64_t result = s0 + s1;
@@ -73,7 +72,7 @@ std::vector<bool> Xoroshiro128Plus::generate_last_bit_sequence(size_t max_advanc
 
     for (size_t i = 0; i < max_advances; i++){
         sequence.at(i) = (temp_rng.next() & 1) == 1;
-    };
+    }
 
     return sequence;
 }
@@ -212,8 +211,7 @@ uint64_t Xoroshiro128Plus::last_bits_reverse_matrix[128][2] = {
 };
 
 
-Xoroshiro128Plus Xoroshiro128Plus::xoroshiro128plus_from_last_bits(std::pair<uint64_t, uint64_t> last_bits)
-{
+Xoroshiro128Plus Xoroshiro128Plus::xoroshiro128plus_from_last_bits(std::pair<uint64_t, uint64_t> last_bits){
     uint64_t s0 = 0;
     uint64_t s1 = 0;
 
@@ -252,4 +250,5 @@ Xoroshiro128Plus Xoroshiro128Plus::xoroshiro128plus_from_last_bits(std::pair<uin
 }
 
 
+}
 }

@@ -12,6 +12,7 @@
 #include <vector>
 
 namespace PokemonAutomation{
+namespace Pokemon{
 
 struct Xoroshiro128PlusState{
     Xoroshiro128PlusState(uint64_t s0, uint64_t s1);
@@ -39,5 +40,6 @@ private:
     uint64_t rotl(const uint64_t x, int k);
 };
 
+}
 }
 #endif
