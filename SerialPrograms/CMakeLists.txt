@@ -1496,6 +1496,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Programs/ItemPrinter/PokemonSV_ItemPrinterDatabase.h
     Source/PokemonSV/Programs/ItemPrinter/PokemonSV_ItemPrinterRNG.cpp
     Source/PokemonSV/Programs/ItemPrinter/PokemonSV_ItemPrinterRNG.h
+    Source/PokemonSV/Programs/ItemPrinter/PokemonSV_ItemPrinterRNGTable.cpp
+    Source/PokemonSV/Programs/ItemPrinter/PokemonSV_ItemPrinterRNGTable.h
     Source/PokemonSV/Programs/ItemPrinter/PokemonSV_ItemPrinterSeedCalc.cpp
     Source/PokemonSV/Programs/ItemPrinter/PokemonSV_ItemPrinterSeedCalc.h
     Source/PokemonSV/Programs/ItemPrinter/PokemonSV_ItemPrinterTools.cpp
