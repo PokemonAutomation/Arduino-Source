@@ -95,19 +95,22 @@ void check_hp(
     SingleSwitchProgramEnvironment& env,
     BotBaseContext& context,
     MaterialFarmerOptions& options,
-    LetsGoHpWatcher& hp_watcher
+    LetsGoHpWatcher& hp_watcher,
+    MaterialFarmerStats& stats
 );
 
 WallClock make_sandwich_material_farm(
     SingleSwitchProgramEnvironment& env, 
     BotBaseContext& context, 
-    MaterialFarmerOptions& options
+    MaterialFarmerOptions& options,
+    MaterialFarmerStats& stats
 );        
 
 WallClock try_make_sandwich_material_farm(
     SingleSwitchProgramEnvironment& env, 
     BotBaseContext& context, 
-    MaterialFarmerOptions& options
+    MaterialFarmerOptions& options,
+    MaterialFarmerStats& stats
 );        
 
 void move_to_start_position_for_letsgo0(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
@@ -130,6 +133,7 @@ void run_lets_go_iteration(
 void run_from_battles_and_back_to_pokecenter(
     SingleSwitchProgramEnvironment& env,
     BotBaseContext& context,
+    MaterialFarmerStats& stats,
     std::function<
         void(SingleSwitchProgramEnvironment& env,
         BotBaseContext& context)

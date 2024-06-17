@@ -208,7 +208,7 @@ void run_material_farmer(
             );                   
             if (sandwich_time_remaining < std::chrono::minutes(0)){
                 env.console.log("Sandwich not active. Make a sandwich.");
-                last_sandwich_time = make_sandwich_material_farm(env, context, options);
+                last_sandwich_time = make_sandwich_material_farm(env, context, options, stats);
                 env.console.overlay().add_log("Sandwich made.");
 
                 // Log time remaining in Material farming 
@@ -231,7 +231,7 @@ void run_material_farmer(
         // heal before starting Let's go
         env.console.log("Heal before starting Let's go", COLOR_PURPLE);
         env.console.log("Heal threshold: " + tostr_default(options.AUTO_HEAL_PERCENT), COLOR_PURPLE);
-        check_hp(env, context, options, hp_watcher);
+        check_hp(env, context, options, hp_watcher, stats);
 
         /*
         - Starts from pokemon center.
@@ -239,7 +239,7 @@ void run_material_farmer(
         - Then returns to pokemon center, regardless of whether 
         it completes the action or gets caught in a battle 
         */
-        run_from_battles_and_back_to_pokecenter(env, context, 
+        run_from_battles_and_back_to_pokecenter(env, context, stats,
             [&](
                 SingleSwitchProgramEnvironment& env, BotBaseContext& context
             ){
@@ -269,9 +269,9 @@ void check_hp(
     SingleSwitchProgramEnvironment& env,
     BotBaseContext& context,
     MaterialFarmerOptions& options,
-    LetsGoHpWatcher& hp_watcher
+    LetsGoHpWatcher& hp_watcher,
+    MaterialFarmerStats& stats
 ){
-    MaterialFarmerStats& stats = env.current_stats<MaterialFarmerStats>();
     double hp = hp_watcher.last_known_value() * 100;
     if (0 < hp){
         env.console.log("Last Known HP: " + tostr_default(hp) + "%", COLOR_BLUE);
@@ -293,19 +293,19 @@ void check_hp(
 WallClock make_sandwich_material_farm(
     SingleSwitchProgramEnvironment& env, 
     BotBaseContext& context, 
-    MaterialFarmerOptions& options
+    MaterialFarmerOptions& options,
+    MaterialFarmerStats& stats
 ){
     if (options.SANDWICH_OPTIONS.SAVE_GAME_BEFORE_SANDWICH){
         save_game_from_overworld(env.program_info(), env.console, context);
     }
 
-    MaterialFarmerStats& stats = env.current_stats<MaterialFarmerStats>();
     WallClock last_sandwich_time;
     size_t consecutive_failures = 0;
     size_t max_consecutive_failures = 10;  
     while (true){
         try{
-            last_sandwich_time = try_make_sandwich_material_farm(env, context, options);
+            last_sandwich_time = try_make_sandwich_material_farm(env, context, options, stats);
             break;
         }catch(OperationFailedException& e){
             stats.m_errors++;
@@ -346,12 +346,12 @@ WallClock make_sandwich_material_farm(
 WallClock try_make_sandwich_material_farm(
     SingleSwitchProgramEnvironment& env, 
     BotBaseContext& context, 
-    MaterialFarmerOptions& options
+    MaterialFarmerOptions& options,
+    MaterialFarmerStats& stats
 ){
-    MaterialFarmerStats& stats = env.current_stats<MaterialFarmerStats>();
     WallClock last_sandwich_time = WallClock::min();
     while(last_sandwich_time == WallClock::min()){
-        run_from_battles_and_back_to_pokecenter(env, context, 
+        run_from_battles_and_back_to_pokecenter(env, context, stats,
             [&](SingleSwitchProgramEnvironment& env, BotBaseContext& context){
                 // Orient camera to look at same direction as player character
                 // - This is needed because when save-load the game, 
@@ -563,12 +563,12 @@ only gives you one attempt before returning to the Pokecenter
 void run_from_battles_and_back_to_pokecenter(
     SingleSwitchProgramEnvironment& env,
     BotBaseContext& context,
+    MaterialFarmerStats& stats,
     std::function<
         void(SingleSwitchProgramEnvironment& env,
         BotBaseContext& context)
     >&& action
 ){
-    MaterialFarmerStats& stats = env.current_stats<MaterialFarmerStats>();
     bool attempted_action = false;
     // a flag for the case that the action has finished but not yet returned to pokecenter
     bool returned_to_pokecenter = false;
