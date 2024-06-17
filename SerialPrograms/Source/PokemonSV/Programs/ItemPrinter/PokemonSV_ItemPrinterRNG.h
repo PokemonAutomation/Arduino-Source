@@ -9,59 +9,17 @@
 
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
-#include "Common/Cpp/Options/DateOption.h"
-#include "Common/Cpp/Options/EditableTableOption.h"
 #include "CommonFramework/Options/LanguageOCROption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
-#include "PokemonSV_ItemPrinterTools.h"
-#include "PokemonSV_ItemPrinterDatabase.h"
 #include "PokemonSV/Programs/Farming/PokemonSV_MaterialFarmerTools.h"
+#include "PokemonSV_ItemPrinterTools.h"
+#include "PokemonSV_ItemPrinterRNGTable.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
-
-
-struct ItemPrinterRngRowSnapshot{
-    bool chain;
-    DateTime date;
-    ItemPrinterJobs jobs;
-};
-class ItemPrinterRngRow : public EditableTableRow, public ConfigOption::Listener{
-public:
-
-    ~ItemPrinterRngRow();
-    ItemPrinterRngRow(EditableTableOption& parent_table);
-    ItemPrinterRngRow(
-        EditableTableOption& parent_table,
-        bool p_chain, const DateTime& p_date, ItemPrinterJobs p_jobs
-    );
-
-    ItemPrinterRngRowSnapshot snapshot() const;
-
-    virtual std::unique_ptr<EditableTableRow> clone() const override;
-    virtual void value_changed(void* object) override;
-
-    void set_seed_based_on_desired_item();
-
-public:
-    BooleanCheckBoxCell chain;
-    DateTimeCell date;
-    EnumDropdownCell<ItemPrinterJobs> jobs;
-    EnumDropdownCell<ItemPrinter::PrebuiltOptions> desired_item;
-//    ItemPrinterItems prev_desired_item;
-};
-class ItemPrinterRngTable : public EditableTableOption_t<ItemPrinterRngRow>{
-public:
-    ItemPrinterRngTable(std::string label);
-    virtual std::vector<std::string> make_header() const override;
-    std::vector<std::unique_ptr<EditableTableRow>> make_defaults();
-
-    friend class ItemPrinterRngRow;
-};
-
 
 
 class ItemPrinterRNG_Descriptor : public SingleSwitchProgramDescriptor{
@@ -117,11 +75,7 @@ private:
     SimpleIntegerOption<uint16_t> NUM_ITEM_PRINTER_ROUNDS;
     StaticTextOption AFTER_ITEM_PRINTER_DONE_EXPLANATION;
 
-    BooleanCheckBoxOption ENABLE_SEED_CALC;
-
-//    DateTimeOption DATE0;
-//    DateTimeOption DATE1;
-    ItemPrinterRngTable TABLE;
+    ItemPrinterRngTable TABLE0;
 
     SimpleIntegerOption<uint16_t> DELAY_MILLIS;
     BooleanCheckBoxOption ADJUST_DELAY;
@@ -132,11 +86,13 @@ private:
     BooleanCheckBoxOption AUTO_MATERIAL_FARMING;
     SimpleIntegerOption<uint16_t> NUM_ROUNDS_OF_ITEM_PRINTER_TO_MATERIAL_FARM;
     
-    EventNotificationOption NOTIFICATION_STATUS_UPDATE;
-    EventNotificationsOption NOTIFICATIONS;
-    
     StaticTextOption MATERIAL_FARMER_DISABLED_EXPLANATION;
     MaterialFarmerOptions MATERIAL_FARMER_OPTIONS;
+
+    BooleanCheckBoxOption ENABLE_SEED_CALC;
+
+    EventNotificationOption NOTIFICATION_STATUS_UPDATE;
+    EventNotificationsOption NOTIFICATIONS;
 };
 
 

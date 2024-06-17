@@ -41,133 +41,6 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 
-ItemPrinterRngRow::~ItemPrinterRngRow(){
-    chain.remove_listener(*this);
-    date.remove_listener(*this);
-    jobs.remove_listener(*this);
-    desired_item.remove_listener(*this);
-}
-ItemPrinterRngRow::ItemPrinterRngRow(EditableTableOption& parent_table)
-    : EditableTableRow(parent_table)
-    , chain(LockMode::UNLOCK_WHILE_RUNNING, false)
-    , date(
-        LockMode::UNLOCK_WHILE_RUNNING,
-        DateTimeOption::DATE_HOUR_MIN_SEC,
-        DateTime{2000, 1, 1, 0, 1, 0},
-        DateTime{2060, 12, 31, 23, 59, 59},
-        DateTime{2024,  6,  4,  0, 37,  8}
-    )
-    , jobs(
-        ItemPrinterJobs_Database(),
-        LockMode::UNLOCK_WHILE_RUNNING,
-        ItemPrinterJobs::Jobs_1
-    )
-    , desired_item(
-        ItemPrinter::PrebuiltOptions_Database(),
-        LockMode::UNLOCK_WHILE_RUNNING,
-        ItemPrinter::PrebuiltOptions::BALL_BONUS
-    )
-//    , prev_desired_item(ItemPrinterItems::NONE)
-{
-    PA_ADD_OPTION(chain);
-    PA_ADD_OPTION(date);
-    PA_ADD_OPTION(jobs);
-    PA_ADD_OPTION(desired_item);
-
-    chain.add_listener(*this);
-    date.add_listener(*this);
-    jobs.add_listener(*this);
-    desired_item.add_listener(*this);
-
-    ItemPrinterRngRow::value_changed(this);
-}
-ItemPrinterRngRow::ItemPrinterRngRow(
-    EditableTableOption& parent_table,
-    bool p_chain, const DateTime& p_date, ItemPrinterJobs p_jobs
-)
-    : ItemPrinterRngRow(parent_table)
-{
-    chain = p_chain;
-    date.set(p_date);
-    jobs.set(p_jobs);
-
-    ItemPrinterRngRow::value_changed(this);
-}
-ItemPrinterRngRowSnapshot ItemPrinterRngRow::snapshot() const{
-    return ItemPrinterRngRowSnapshot{chain, date, jobs};
-}
-std::unique_ptr<EditableTableRow> ItemPrinterRngRow::clone() const{
-    std::unique_ptr<ItemPrinterRngRow> ret(new ItemPrinterRngRow(parent()));
-    ret->chain = (bool)chain;
-    ret->date.set(date);
-    ret->jobs.set(jobs);
-    return ret;
-}
-
-
-
-// - always update the date's visibility when chain is changed.
-// - if desired_item has changed, set the seed (and number of jobs) accordingly
-// - if any other value changes, set desired_item to NONE
-void ItemPrinterRngRow::value_changed(void* object){
-    date.set_visibility(chain ? ConfigOptionState::HIDDEN : ConfigOptionState::ENABLED);
-
-    ItemPrinterRngTable& table = static_cast<ItemPrinterRngTable&>(parent());
-
-    if (object == &desired_item){
-        ItemPrinter::PrebuiltOptions option = desired_item;
-        if (option != ItemPrinter::PrebuiltOptions::NONE){
-            const ItemPrinter::ItemPrinterEnumOption& option_data = option_lookup_by_enum(option);
-            chain = false;
-            date.set(from_seconds_since_epoch(option_data.seed));
-            jobs.set(option_data.jobs);
-        }
-    }else if (object == &chain){
-        if (chain){
-            desired_item.set(ItemPrinter::PrebuiltOptions::NONE);
-        }
-    }else if (object == &date){
-        const ItemPrinter::ItemPrinterEnumOption* option_data = ItemPrinter::option_lookup_by_seed(to_seconds_since_epoch(date));
-        if (option_data == nullptr){
-            desired_item.set(ItemPrinter::PrebuiltOptions::NONE);
-        }else{
-            desired_item.set(option_data->enum_value);
-        }
-    }
-
-    table.report_value_changed(object);
-}
-
-ItemPrinterRngTable::ItemPrinterRngTable(std::string label)
-    : EditableTableOption_t<ItemPrinterRngRow>(
-        std::move(label),
-        LockMode::UNLOCK_WHILE_RUNNING
-    )
-{
-    //  Need to do this separately because this prematurely accesses the table.
-    set_default(make_defaults());
-}
-std::vector<std::string> ItemPrinterRngTable::make_header() const{
-    return std::vector<std::string>{
-        "Continue Previous?",
-        "Date Seed",
-        "Jobs to Print",
-        "Desired Item",
-    };
-}
-std::vector<std::unique_ptr<EditableTableRow>> ItemPrinterRngTable::make_defaults(){
-    std::vector<std::unique_ptr<EditableTableRow>> ret;
-    ret.emplace_back(std::make_unique<ItemPrinterRngRow>(*this, false, DateTime{2024,  6,  4,  0, 37,  8}, ItemPrinterJobs::Jobs_1));
-    ret.emplace_back(std::make_unique<ItemPrinterRngRow>(*this, false, DateTime{2049,  8, 18, 23, 51,  8}, ItemPrinterJobs::Jobs_10));
-    ret.emplace_back(std::make_unique<ItemPrinterRngRow>(*this, false, DateTime{2024,  6,  4,  0, 37,  8}, ItemPrinterJobs::Jobs_1));
-    ret.emplace_back(std::make_unique<ItemPrinterRngRow>(*this, false, DateTime{2031, 10,  8,  7,  9,  9}, ItemPrinterJobs::Jobs_10));
-    ret.emplace_back(std::make_unique<ItemPrinterRngRow>(*this, false, DateTime{2024,  6,  4,  0, 37,  8}, ItemPrinterJobs::Jobs_1));
-    ret.emplace_back(std::make_unique<ItemPrinterRngRow>(*this, false, DateTime{2020,  3,  3,  6, 38, 18}, ItemPrinterJobs::Jobs_10));
-    return ret;
-}
-
-
-
 
 ItemPrinterRNG_Descriptor::ItemPrinterRNG_Descriptor()
     : SingleSwitchProgramDescriptor(
@@ -188,13 +61,15 @@ struct ItemPrinterRNG_Descriptor::Stats : public StatsTracker{
 //        , total_jobs(m_stats["Total Jobs"])
         , frame_hits(m_stats["Frame Hits"])
         , frame_misses(m_stats["Frame Misses"])
+        , frame_unknown(m_stats["Unknown Frame"])
         , errors(m_stats["Errors"])
     {
         m_display_order.emplace_back("Rounds");
         m_display_order.emplace_back("Prints");
 //        m_display_order.emplace_back("Total Jobs", HIDDEN_IF_ZERO);
-        m_display_order.emplace_back("Frame Hits", HIDDEN_IF_ZERO);
-        m_display_order.emplace_back("Frame Misses", HIDDEN_IF_ZERO);
+        m_display_order.emplace_back("Frame Hits");
+        m_display_order.emplace_back("Frame Misses");
+        m_display_order.emplace_back("Unknown Frame", HIDDEN_IF_ZERO);
         m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
     }
     std::atomic<uint64_t>& iterations;
@@ -202,6 +77,7 @@ struct ItemPrinterRNG_Descriptor::Stats : public StatsTracker{
 //    std::atomic<uint64_t>& total_jobs;
     std::atomic<uint64_t>& frame_hits;
     std::atomic<uint64_t>& frame_misses;
+    std::atomic<uint64_t>& frame_unknown;
     std::atomic<uint64_t>& errors;
 };
 std::unique_ptr<StatsTracker> ItemPrinterRNG_Descriptor::make_stats() const{
@@ -209,7 +85,7 @@ std::unique_ptr<StatsTracker> ItemPrinterRNG_Descriptor::make_stats() const{
 }
 
 ItemPrinterRNG::~ItemPrinterRNG(){
-    TABLE.remove_listener(*this);
+    TABLE0.remove_listener(*this);
     AUTO_MATERIAL_FARMING.remove_listener(*this);
 }
 
@@ -227,31 +103,7 @@ ItemPrinterRNG::ItemPrinterRNG()
     , AFTER_ITEM_PRINTER_DONE_EXPLANATION(
         "Then proceed to material farming."
     )
-    , ENABLE_SEED_CALC(
-        "<b>Enable Seed Calculation: (developer only)</b><br>"
-        "Use Kurt's seed calculation instead of hardcoded database. Ensure you have the appropriate resources.",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        false
-    )
-#if 0
-    , DATE0(
-        "<b>Initial Date:</b><br>Date/Time for the first print. This one should setup the bonus print.",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        DateTimeOption::DATE_HOUR_MIN_SEC,
-        DateTime{2000, 1, 1, 0, 1, 0},
-        DateTime{2060, 12, 31, 23, 59, 59},
-        DateTime{2024, 4, 22, 13, 27, 9}
-    )
-    , DATE1(
-        "<b>Second Date:</b><br>Date/Time for the second print. This one gets you the main items.",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        DateTimeOption::DATE_HOUR_MIN_SEC,
-        DateTime{2000, 1, 1, 0, 1, 0},
-        DateTime{2060, 12, 31, 23, 59, 59},
-        DateTime{2016, 5, 20, 2, 11, 13}
-    )
-#endif
-    , TABLE(
+    , TABLE0(
         "<b>Rounds Table:</b><br>Run the following prints in order and repeat. "
         "Changes to this table take effect the next time the table starts from the beginning."
     )
@@ -295,12 +147,6 @@ ItemPrinterRNG::ItemPrinterRNG()
         LockMode::UNLOCK_WHILE_RUNNING,
         3
     )
-    , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
-    , NOTIFICATIONS({
-        &NOTIFICATION_STATUS_UPDATE,
-        &NOTIFICATION_PROGRAM_FINISH,
-        &NOTIFICATION_ERROR_FATAL,
-    })
     , MATERIAL_FARMER_DISABLED_EXPLANATION("")
     , MATERIAL_FARMER_OPTIONS(
         &LANGUAGE,
@@ -309,6 +155,18 @@ ItemPrinterRNG::ItemPrinterRNG()
         NOTIFICATION_ERROR_RECOVERABLE,
         NOTIFICATION_ERROR_FATAL
     )
+    , ENABLE_SEED_CALC(
+        "<b>Enable Seed Calculation: (developer only)</b><br>"
+        "Use Kurt's seed calculation instead of hardcoded database. Ensure you have the appropriate resources.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        true
+    )
+    , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
+    , NOTIFICATIONS({
+        &NOTIFICATION_STATUS_UPDATE,
+        &NOTIFICATION_PROGRAM_FINISH,
+        &NOTIFICATION_ERROR_FATAL,
+    })
 {
     PA_ADD_OPTION(LANGUAGE);
 
@@ -318,12 +176,7 @@ ItemPrinterRNG::ItemPrinterRNG()
     }
     PA_ADD_OPTION(NUM_ITEM_PRINTER_ROUNDS);
     PA_ADD_OPTION(AFTER_ITEM_PRINTER_DONE_EXPLANATION);
-    if (PreloadSettings::instance().DEVELOPER_MODE){
-        PA_ADD_OPTION(ENABLE_SEED_CALC);
-    }
-//    PA_ADD_OPTION(DATE0);
-//    PA_ADD_OPTION(DATE1);
-    PA_ADD_OPTION(TABLE);
+    PA_ADD_OPTION(TABLE0);
     PA_ADD_OPTION(DELAY_MILLIS);
     PA_ADD_OPTION(ADJUST_DELAY);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
@@ -333,12 +186,15 @@ ItemPrinterRNG::ItemPrinterRNG()
         PA_ADD_OPTION(MATERIAL_FARMER_DISABLED_EXPLANATION);
         PA_ADD_OPTION(MATERIAL_FARMER_OPTIONS);
     }
+    if (PreloadSettings::instance().DEVELOPER_MODE){
+        PA_ADD_OPTION(ENABLE_SEED_CALC);
+    }
 
     PA_ADD_OPTION(NOTIFICATIONS);
 
     ItemPrinterRNG::value_changed(this);
     AUTO_MATERIAL_FARMING.add_listener(*this);
-    TABLE.add_listener(*this);
+    TABLE0.add_listener(*this);
 }
 
 void ItemPrinterRNG::value_changed(void* object){
@@ -466,6 +322,8 @@ void ItemPrinterRNG::run_print_at_date(
             int distance_from_target = get_distance_from_target(env.console, print_results, seed);
             if (distance_from_target == 0){
                 stats.frame_hits++;
+            }else if (distance_from_target == std::numeric_limits<int>::min()){
+                stats.frame_unknown++;
             }else{
                 stats.frame_misses++;
             }
@@ -555,7 +413,9 @@ int ItemPrinterRNG::get_distance_from_target(
         }
     }
 
-    if (distance_from_target < 0){
+    if (distance_from_target == std::numeric_limits<int>::min()){
+        logger.log("Frame Result: Unable to determine frame.", COLOR_RED);
+    }else if (distance_from_target < 0){
         logger.log("Frame Result: Missed. (Target - " + std::to_string(-distance_from_target) + ")", COLOR_ORANGE);
     }else if (distance_from_target > 0){
         logger.log("Frame Result: Missed. (Target + " + std::to_string(distance_from_target) + ")", COLOR_ORANGE);
@@ -661,7 +521,7 @@ void ItemPrinterRNG::run_item_printer_rng(
     for (uint32_t c = 0; c < NUM_ITEM_PRINTER_ROUNDS; c++){
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
 
-        std::vector<ItemPrinterRngRowSnapshot> table = TABLE.snapshot<ItemPrinterRngRowSnapshot>();
+        std::vector<ItemPrinterRngRowSnapshot> table = TABLE0.snapshot<ItemPrinterRngRowSnapshot>();
         for (const ItemPrinterRngRowSnapshot& row : table){
             if (row.chain){
                 print_again(env, context, row.jobs);

@@ -1,0 +1,69 @@
+/*  Item Printer RNG Table
+ *
+ *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *
+ */
+
+#ifndef PokemonAutomation_PokemonSV_ItemPrinterRNGTable_H
+#define PokemonAutomation_PokemonSV_ItemPrinterRNGTable_H
+
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
+#include "Common/Cpp/Options/EnumDropdownOption.h"
+#include "Common/Cpp/Options/DateOption.h"
+#include "Common/Cpp/Options/EditableTableOption.h"
+#include "PokemonSV_ItemPrinterTools.h"
+#include "PokemonSV_ItemPrinterDatabase.h"
+
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace PokemonSV{
+
+
+struct ItemPrinterRngRowSnapshot{
+    bool chain;
+    DateTime date;
+    ItemPrinterJobs jobs;
+};
+
+
+class ItemPrinterRngRow : public EditableTableRow, public ConfigOption::Listener{
+public:
+
+    ~ItemPrinterRngRow();
+    ItemPrinterRngRow(EditableTableOption& parent_table);
+    ItemPrinterRngRow(
+        EditableTableOption& parent_table,
+        bool p_chain, const DateTime& p_date, ItemPrinterJobs p_jobs
+    );
+
+    ItemPrinterRngRowSnapshot snapshot() const;
+
+    virtual std::unique_ptr<EditableTableRow> clone() const override;
+    virtual void value_changed(void* object) override;
+
+    void set_seed_based_on_desired_item();
+
+public:
+    BooleanCheckBoxCell chain;
+    DateTimeCell date;
+    EnumDropdownCell<ItemPrinterJobs> jobs;
+    EnumDropdownCell<ItemPrinter::PrebuiltOptions> desired_item;
+};
+
+
+class ItemPrinterRngTable : public EditableTableOption_t<ItemPrinterRngRow>{
+public:
+    ItemPrinterRngTable(std::string label);
+    virtual std::vector<std::string> make_header() const override;
+    std::vector<std::unique_ptr<EditableTableRow>> make_defaults();
+
+    friend class ItemPrinterRngRow;
+};
+
+
+
+}
+}
+}
+
+#endif
