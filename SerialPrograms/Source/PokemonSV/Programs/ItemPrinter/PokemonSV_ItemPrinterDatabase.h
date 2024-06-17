@@ -24,6 +24,24 @@ enum class PrebuiltOptions{
 
     ABILITY_PATCH,
     EXP_CANDY,
+    PP_MAX,
+
+    ASSORTED_BALLS_1,
+    ASSORTED_BALLS_2,
+    ASSORTED_BALLS_3,
+
+    MASTER_BALL,
+    FAST_BALL,
+    FRIEND_BALL,
+    LURE_BALL,
+    LEVEL_BALL,
+    HEAVY_BALL,
+    LOVE_BALL,
+    MOON_BALL,
+    DREAM_BALL,
+    SPORT_BALL,
+    SAFARI_BALL,
+    BEAST_BALL,
 
     BUG_TERA,
     DARK_TERA,
@@ -42,25 +60,8 @@ enum class PrebuiltOptions{
     PSYCHIC_TERA,
     ROCK_TERA,
     STEEL_TERA,
-    STELLAR_TERA,
     WATER_TERA,
-
-    MASTER_BALL,
-    FAST_BALL,
-    FRIEND_BALL,
-    LURE_BALL,
-    LEVEL_BALL,
-    HEAVY_BALL,
-    LOVE_BALL,
-    MOON_BALL,
-    DREAM_BALL,
-    SPORT_BALL,
-    SAFARI_BALL,
-    BEAST_BALL,
-
-    ASSORTED_BALLS_1,
-    ASSORTED_BALLS_2,
-    ASSORTED_BALLS_3,
+    STELLAR_TERA,
 };
 const EnumDatabase<PrebuiltOptions>& PrebuiltOptions_Database();
 

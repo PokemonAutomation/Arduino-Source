@@ -24,6 +24,24 @@ const EnumDatabase<PrebuiltOptions>& PrebuiltOptions_Database(){
         // ordered by category
         {PrebuiltOptions::ABILITY_PATCH, "ability-patch", "Ability patch"},
         {PrebuiltOptions::EXP_CANDY, "exp-candy", "Exp Candy"},
+        {PrebuiltOptions::PP_MAX, "pp-max", "PP Max"},
+
+        {PrebuiltOptions::ASSORTED_BALLS_1, "assorted-balls-1", "Assorted Balls 1"},
+        {PrebuiltOptions::ASSORTED_BALLS_2, "assorted-balls-2", "Assorted Balls 2"},
+        {PrebuiltOptions::ASSORTED_BALLS_3, "assorted-balls-3", "Assorted Balls 3"},
+
+        {PrebuiltOptions::MASTER_BALL, "master-ball", "Master Ball"},
+        {PrebuiltOptions::FAST_BALL, "fast-ball", "Fast Ball"},
+        {PrebuiltOptions::FRIEND_BALL, "friend-ball", "Friend Ball"},
+        {PrebuiltOptions::LURE_BALL, "lure-ball", "Lure Ball"},
+        {PrebuiltOptions::LEVEL_BALL, "level-ball", "Level Ball"},
+        {PrebuiltOptions::HEAVY_BALL, "heavy-ball", "Heavy Ball"},
+        {PrebuiltOptions::LOVE_BALL, "love-ball", "Love Ball"},
+        {PrebuiltOptions::MOON_BALL, "moon-ball", "Moon Ball"},
+        {PrebuiltOptions::DREAM_BALL, "dream-ball", "Dream Ball"},
+        {PrebuiltOptions::SPORT_BALL, "sport-ball", "Sport Ball"},
+        {PrebuiltOptions::SAFARI_BALL, "safari-ball", "Safari Ball"},
+        {PrebuiltOptions::BEAST_BALL, "beast-ball", "Beast Ball"},
 
         {PrebuiltOptions::BUG_TERA, "bug-tera", "Bug Tera Shard"},
         {PrebuiltOptions::DARK_TERA, "dark-tera", "Dark Tera Shard"},
@@ -42,25 +60,8 @@ const EnumDatabase<PrebuiltOptions>& PrebuiltOptions_Database(){
         {PrebuiltOptions::PSYCHIC_TERA, "psychic-tera", "Psychic Tera Shard"},
         {PrebuiltOptions::ROCK_TERA, "rock-tera", "Rock Tera Shard"},
         {PrebuiltOptions::STEEL_TERA, "steel-tera", "Steel Tera Shard"},
-        {PrebuiltOptions::STELLAR_TERA, "stellar-tera", "Stellar Tera Shard"},
         {PrebuiltOptions::WATER_TERA, "water-tera", "Water Tera Shard"},
-
-        {PrebuiltOptions::MASTER_BALL, "master-ball", "Master Ball"},
-        {PrebuiltOptions::FAST_BALL, "fast-ball", "Fast Ball"},
-        {PrebuiltOptions::FRIEND_BALL, "friend-ball", "Friend Ball"},
-        {PrebuiltOptions::LURE_BALL, "lure-ball", "Lure Ball"},
-        {PrebuiltOptions::LEVEL_BALL, "level-ball", "Level Ball"},
-        {PrebuiltOptions::HEAVY_BALL, "heavy-ball", "Heavy Ball"},
-        {PrebuiltOptions::LOVE_BALL, "love-ball", "Love Ball"},
-        {PrebuiltOptions::MOON_BALL, "moon-ball", "Moon Ball"},
-        {PrebuiltOptions::DREAM_BALL, "dream-ball", "Dream Ball"},
-        {PrebuiltOptions::SPORT_BALL, "sport-ball", "Sport Ball"},
-        {PrebuiltOptions::SAFARI_BALL, "safari-ball", "Safari Ball"},
-        {PrebuiltOptions::BEAST_BALL, "beast-ball", "Beast Ball"},
-
-        {PrebuiltOptions::ASSORTED_BALLS_1, "assorted-balls-1", "Assorted Balls 1"},
-        {PrebuiltOptions::ASSORTED_BALLS_2, "assorted-balls-2", "Assorted Balls 2"},
-        {PrebuiltOptions::ASSORTED_BALLS_3, "assorted-balls-3", "Assorted Balls 3"},
+        {PrebuiltOptions::STELLAR_TERA, "stellar-tera", "Stellar Tera Shard"},
 
     });
     return database;
@@ -94,6 +95,61 @@ static const std::vector<ItemPrinterEnumOption>& ItemPrinter_AllOptions(){
         // x5 Exp. Candy XL; x2 Protein: x10 Exp. Candy L; x4 Exp. Candy XL; x5 Exp. Candy XL
         // 520000 exp
         {1991472489, PrebuiltOptions::EXP_CANDY,        ItemPrinterJobs::Jobs_5},
+
+        // 2030-03-11 16:44:09
+        // 6x PP Max, 6x PP Max, 14x Honey, 10x Revive, 6x PP Max
+        // 520000 exp
+        {1899477849, PrebuiltOptions::PP_MAX,           ItemPrinterJobs::Jobs_5},
+
+        // 2049-08-18 23:51:08
+        {2512943468, PrebuiltOptions::ASSORTED_BALLS_1, ItemPrinterJobs::Jobs_10},
+
+        // 2031-10-08 07:09:09
+        {1949209749, PrebuiltOptions::ASSORTED_BALLS_2, ItemPrinterJobs::Jobs_10},
+
+        // 2020-03-03 06:38:18
+        {1583217498, PrebuiltOptions::ASSORTED_BALLS_3, ItemPrinterJobs::Jobs_10},
+
+        // 2005-11-07 11:32:08
+        // x1 Master Ball
+        // x1 Master Ball
+        // x5 Great Ball
+        // x1 Master Ball
+        // x1 Master Ball
+        {1131363128, PrebuiltOptions::MASTER_BALL,      ItemPrinterJobs::Jobs_5},
+
+        // 2034-09-01 02:33:39
+        {2040690819, PrebuiltOptions::FAST_BALL,        ItemPrinterJobs::Jobs_5},
+
+        // 2046-12-11 02:23:17
+        {2428107797, PrebuiltOptions::FRIEND_BALL,      ItemPrinterJobs::Jobs_5},
+
+        // 2057-11-21 04:28:37
+        {2773542517, PrebuiltOptions::LURE_BALL,        ItemPrinterJobs::Jobs_5},
+
+        // 2045-03-17 10:05:38
+        {2373357938, PrebuiltOptions::LEVEL_BALL,       ItemPrinterJobs::Jobs_5},
+
+        // 2029-07-24 11:53:11
+        {1879588391, PrebuiltOptions::HEAVY_BALL,       ItemPrinterJobs::Jobs_5},
+
+        // 2023-05-22 05:36:11
+        {1684733771, PrebuiltOptions::LOVE_BALL,        ItemPrinterJobs::Jobs_5},
+
+        // 2042-10-14 05:56:33
+        {2296878993, PrebuiltOptions::MOON_BALL,        ItemPrinterJobs::Jobs_5},
+
+        // 2054-03-22 09:31:21
+        {2657784681, PrebuiltOptions::DREAM_BALL,       ItemPrinterJobs::Jobs_5},
+
+        // 2009-06-05 20:17:11
+        {1244233031, PrebuiltOptions::SPORT_BALL,       ItemPrinterJobs::Jobs_5},
+
+        // 2049-01-02 01:20:22
+        {2493163222, PrebuiltOptions::SAFARI_BALL,      ItemPrinterJobs::Jobs_5},
+
+        // 2037-02-02 15:37:15
+        {2117201835, PrebuiltOptions::BEAST_BALL,       ItemPrinterJobs::Jobs_5},
 
         // 2041-03-11 01:10:10
         // x20 Normal Tera Shard; x14 Normal Tera Shard; x8 Normal Tera Shard; x19 Normal Tera Shard; x6 Normal Tera Shard
@@ -225,56 +281,6 @@ static const std::vector<ItemPrinterEnumOption>& ItemPrinter_AllOptions(){
         // x15 Stellar Tera Shard
         // x1 Clover Sweet
         {1165654034, PrebuiltOptions::STELLAR_TERA,     ItemPrinterJobs::Jobs_5},
-
-        // 2005-11-07 11:32:08
-        // x1 Master Ball
-        // x1 Master Ball
-        // x5 Great Ball
-        // x1 Master Ball
-        // x1 Master Ball
-        {1131363128, PrebuiltOptions::MASTER_BALL,      ItemPrinterJobs::Jobs_5},
-
-        // 2034-09-01 02:33:39
-        {2040690819, PrebuiltOptions::FAST_BALL,        ItemPrinterJobs::Jobs_5},
-
-        // 2046-12-11 02:23:17
-        {2428107797, PrebuiltOptions::FRIEND_BALL,      ItemPrinterJobs::Jobs_5},
-
-        // 2057-11-21 04:28:37
-        {2773542517, PrebuiltOptions::LURE_BALL,        ItemPrinterJobs::Jobs_5},
-
-        // 2045-03-17 10:05:38
-        {2373357938, PrebuiltOptions::LEVEL_BALL,       ItemPrinterJobs::Jobs_5},
-
-        // 2029-07-24 11:53:11
-        {1879588391, PrebuiltOptions::HEAVY_BALL,       ItemPrinterJobs::Jobs_5},
-
-        // 2023-05-22 05:36:11
-        {1684733771, PrebuiltOptions::LOVE_BALL,        ItemPrinterJobs::Jobs_5},
-
-        // 2042-10-14 05:56:33
-        {2296878993, PrebuiltOptions::MOON_BALL,        ItemPrinterJobs::Jobs_5},
-
-        // 2054-03-22 09:31:21
-        {2657784681, PrebuiltOptions::DREAM_BALL,       ItemPrinterJobs::Jobs_5},
-
-        // 2009-06-05 20:17:11
-        {1244233031, PrebuiltOptions::SPORT_BALL,       ItemPrinterJobs::Jobs_5},
-
-        // 2049-01-02 01:20:22
-        {2493163222, PrebuiltOptions::SAFARI_BALL,      ItemPrinterJobs::Jobs_5},
-
-        // 2037-02-02 15:37:15
-        {2117201835, PrebuiltOptions::BEAST_BALL,       ItemPrinterJobs::Jobs_5},
-
-        // 2049-08-18 23:51:08
-        {2512943468, PrebuiltOptions::ASSORTED_BALLS_1, ItemPrinterJobs::Jobs_10},
-
-        // 2031-10-08 07:09:09
-        {1949209749, PrebuiltOptions::ASSORTED_BALLS_2, ItemPrinterJobs::Jobs_10},
-
-        // 2020-03-03 06:38:18
-        {1583217498, PrebuiltOptions::ASSORTED_BALLS_3, ItemPrinterJobs::Jobs_10},
     };
     return database;
 };
