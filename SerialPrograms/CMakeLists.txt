@@ -1489,6 +1489,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Programs/Glitches/PokemonSV_RideCloner-1.0.1.h
     Source/PokemonSV/Programs/ItemPrinter/PokemonSV_AutoItemPrinter.cpp
     Source/PokemonSV/Programs/ItemPrinter/PokemonSV_AutoItemPrinter.h
+    Source/PokemonSV/Programs/ItemPrinter/PokemonSV_ItemPrinterDatabase.cpp
+    Source/PokemonSV/Programs/ItemPrinter/PokemonSV_ItemPrinterDatabase.h
     Source/PokemonSV/Programs/ItemPrinter/PokemonSV_ItemPrinterRNG.cpp
     Source/PokemonSV/Programs/ItemPrinter/PokemonSV_ItemPrinterRNG.h
     Source/PokemonSV/Programs/ItemPrinter/PokemonSV_ItemPrinterTools.cpp
