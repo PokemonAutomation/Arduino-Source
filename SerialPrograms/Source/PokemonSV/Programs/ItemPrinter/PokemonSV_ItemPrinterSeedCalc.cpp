@@ -5,6 +5,8 @@
  *  This file is ported from:
  *  https://github.com/kwsch/ItemPrinterDeGacha/blob/main/ItemPrinterDeGacha.Core/ItemPrinter.cs
  *
+ *  The actual RNG logic is from Anubis.
+ *
  */
 
 #include <vector>
