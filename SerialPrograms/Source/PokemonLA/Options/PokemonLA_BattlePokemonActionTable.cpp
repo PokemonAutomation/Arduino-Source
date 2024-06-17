@@ -4,7 +4,7 @@
  *
  */
 
-
+#include <limits>
 //#include "Common/Compiler.h"
 //#include "Common/Cpp/Json/JsonValue.h"
 //#include "Common/Cpp/Json/JsonObject.h"
