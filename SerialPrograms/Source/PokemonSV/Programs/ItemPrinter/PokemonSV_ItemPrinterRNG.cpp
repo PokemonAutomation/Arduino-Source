@@ -65,7 +65,7 @@ ItemPrinterRngRow::ItemPrinterRngRow(EditableTableOption& parent_table)
     , desired_item(
         ItemPrinter::PrebuiltOptions_Database(),
         LockMode::UNLOCK_WHILE_RUNNING,
-        ItemPrinter::PrebuiltOptions::NONE
+        ItemPrinter::PrebuiltOptions::BALL_BONUS
     )
 //    , prev_desired_item(ItemPrinterItems::NONE)
 {

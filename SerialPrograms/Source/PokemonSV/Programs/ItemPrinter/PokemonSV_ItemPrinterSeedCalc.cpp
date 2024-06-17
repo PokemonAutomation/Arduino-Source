@@ -259,12 +259,12 @@ std::vector<ItemPrinterItemData> make_item_prize_list(){
         if (slug == nullptr){
             throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Unknown Item ID: " + std::to_string(item_id));
         }
-        ret.emplace_back(
+        ret.emplace_back(ItemPrinterItemData{
             slug,
             (uint16_t)entry.get_integer_throw("EmergePercent", path),
             (uint8_t)entry.get_integer_throw("LotteryItemNumMin", path),
             (uint8_t)entry.get_integer_throw("LotteryItemNumMax", path)
-        );
+        });
     }
 
     return ret;
