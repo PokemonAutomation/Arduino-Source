@@ -44,12 +44,12 @@ std::u32string remove_non_alphanumeric(const std::u32string& text){
 std::map<char32_t, std::u32string> make_substitution_map32(){
     std::string path = RESOURCE_PATH() + "Tesseract/CharacterReductions.json";
     JsonValue json = load_json_file(path);
-    JsonObject& obj = json.get_object_throw(path);
+    JsonObject& obj = json.to_object_throw(path);
 
     std::map<char32_t, std::u32string> map;
     for (auto& item : obj){
         const std::string& target = item.first;
-        std::string& sources = item.second.get_string_throw(path);
+        std::string& sources = item.second.to_string_throw(path);
         for (char32_t ch : to_utf32(sources)){
             auto iter = map.find(ch);
             if (iter != map.end()){

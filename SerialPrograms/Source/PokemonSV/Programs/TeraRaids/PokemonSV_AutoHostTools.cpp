@@ -140,7 +140,7 @@ void KillSwitchTracker::check_kill_switch(const std::string& kill_switch_url){
 
         try{
             JsonValue json = FileDownloader::download_json_file(m_env.logger(), kill_switch_url);
-            const JsonObject* obj = json.get_object();
+            const JsonObject* obj = json.to_object();
             if (obj == nullptr){
                 throw ParseException("Invalid kill-switch Json.");
             }

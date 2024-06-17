@@ -112,14 +112,14 @@ nlohmann::json to_nlohmann(const JsonValue& json){
     }
     if (json.is_array()){
         nlohmann::json::array_t ret;
-        for (const auto& item : *json.get_array()){
+        for (const auto& item : *json.to_array()){
             ret.emplace_back(to_nlohmann(item));
         }
         return ret;
     }
     if (json.is_object()){
         nlohmann::json ret;
-        for (const auto& item : *json.get_object()){
+        for (const auto& item : *json.to_object()){
             ret[item.first] = to_nlohmann(item.second);
         }
         return ret;
@@ -191,14 +191,14 @@ QJsonValue to_QJson(const JsonValue& json){
     }
     if (json.is_array()){
         QJsonArray ret;
-        for (const auto& item : *json.get_array()){
+        for (const auto& item : *json.to_array()){
             ret.append(to_QJson(item));
         }
         return ret;
     }
     if (json.is_object()){
         QJsonObject ret;
-        for (const auto& item : *json.get_object()){
+        for (const auto& item : *json.to_object()){
             ret.insert(QString::fromStdString(item.first), to_QJson(item.second));
         }
         return ret;

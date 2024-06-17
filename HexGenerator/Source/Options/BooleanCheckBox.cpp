@@ -34,10 +34,10 @@ BooleanCheckBox::BooleanCheckBox(const JsonObject& obj)
     , m_option(
         SingleStatementOption::m_label,
         LockMode::LOCK_WHILE_RUNNING,
-        obj.get_value_throw(JSON_DEFAULT).get_boolean_throw()
+        obj.get_value_throw(JSON_DEFAULT).to_boolean_throw()
     )
 {
-    m_option = obj.get_value_throw(JSON_CURRENT).get_boolean_throw();
+    m_option = obj.get_value_throw(JSON_CURRENT).to_boolean_throw();
 }
 void BooleanCheckBox::restore_defaults(){
     m_option.restore_defaults();

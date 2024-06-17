@@ -26,7 +26,7 @@ void StaticTableRow::add_option(ConfigOption& option, std::string serialization_
     m_options.emplace_back(std::move(serialization_string), &option);
 }
 void StaticTableRow::load_json(const JsonValue& json){
-    const JsonObject* obj = json.get_object();
+    const JsonObject* obj = json.to_object();
     if (obj == nullptr){
         return;
     }
@@ -160,13 +160,13 @@ struct StaticTableOption::Data{
             throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Attempted to use an unfinalized table.");
         }
 
-        const JsonArray* array = json.get_array();
+        const JsonArray* array = json.to_array();
         if (array == nullptr){
             return;
         }
 
         for (const auto& item : *array){
-            const JsonObject* obj = item.get_object();
+            const JsonObject* obj = item.to_object();
             if (obj == nullptr){
                 continue;
             }
@@ -189,7 +189,7 @@ struct StaticTableOption::Data{
         JsonArray array;
         for (const StaticTableRow* row : m_table){
             JsonValue val = row->to_json();
-            val.get_object_throw()["slug"] = row->slug();
+            val.to_object_throw()["slug"] = row->slug();
             array.push_back(std::move(val));
         }
         return array;

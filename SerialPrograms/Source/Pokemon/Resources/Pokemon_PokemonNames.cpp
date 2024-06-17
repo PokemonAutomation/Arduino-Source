@@ -32,15 +32,15 @@ struct PokemonNameDatabase{
 PokemonNameDatabase::PokemonNameDatabase(){
     std::string path = RESOURCE_PATH() + "Pokemon/PokemonNameDisplay.json";
     JsonValue json = load_json_file(path);
-    JsonObject& displays = json.get_object_throw(path);
+    JsonObject& displays = json.to_object_throw(path);
 
     for (auto& item0 : displays){
         const std::string& slug = item0.first;
 
-        JsonObject& names = item0.second.get_object_throw(path);
+        JsonObject& names = item0.second.to_object_throw(path);
         PokemonNames data;
         for (auto& item1 : names){
-            std::string& name = item1.second.get_string_throw(path);
+            std::string& name = item1.second.to_string_throw(path);
             data.m_display_names[language_code_to_enum(item1.first)] = std::move(name);
         }
 
@@ -107,11 +107,11 @@ const std::string& parse_pokemon_name_nothrow(const std::string& display_name){
 std::vector<std::string> load_pokemon_slug_json_list(const char* json_path){
     std::string path = RESOURCE_PATH() + json_path;
     JsonValue json = load_json_file(path);
-    JsonArray& array = json.get_array_throw();
+    JsonArray& array = json.to_array_throw();
 
     std::vector<std::string> list;
     for (auto& item : array){
-        std::string& slug = item.get_string_throw();
+        std::string& slug = item.to_string_throw();
         if (slug.empty()){
             throw FileException(
                 nullptr, PA_CURRENT_FUNCTION,

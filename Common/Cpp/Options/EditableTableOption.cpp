@@ -33,7 +33,7 @@ void EditableTableRow::load_json(const JsonValue& json){
         m_options[0].second->load_json(json);
         return;
     }
-    const JsonObject* obj = json.get_object();
+    const JsonObject* obj = json.to_object();
     if (obj == nullptr){
         return;
     }
@@ -122,7 +122,7 @@ void EditableTableOption::clear(){
     m_current.clear();
 }
 void EditableTableOption::load_json(const JsonValue& json){
-    const JsonArray* array = json.get_array();
+    const JsonArray* array = json.to_array();
     if (array == nullptr){
         return;
     }

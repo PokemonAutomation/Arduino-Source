@@ -151,9 +151,9 @@ TradeNameReader::TradeNameReader(Logger& logger, VideoOverlay& overlay, Language
 {
     std::string path = RESOURCE_PATH() + "Pokemon/Pokedex/Pokedex-Hisui.json";
     JsonValue json = load_json_file(path);
-    JsonArray& array = json.get_array_throw(path);
+    JsonArray& array = json.to_array_throw(path);
     for (auto& item : array){
-        m_slugs.insert(std::move(item.get_string_throw(path)));
+        m_slugs.insert(std::move(item.to_string_throw(path)));
     }
 }
 

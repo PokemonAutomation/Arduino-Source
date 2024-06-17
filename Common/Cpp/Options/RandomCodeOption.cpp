@@ -122,7 +122,7 @@ const std::string& RandomCodeOption::label() const{
 }
 
 void RandomCodeOption::load_json(const JsonValue& json){
-    const JsonObject* obj = json.get_object();
+    const JsonObject* obj = json.to_object();
     if (obj == nullptr){
         return;
     }

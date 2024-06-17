@@ -23,7 +23,7 @@ void SerialPortOption::clear(){
 }
 
 void SerialPortOption::load_json(const JsonValue& json){
-    const std::string* name = json.get_string();
+    const std::string* name = json.to_string();
     if (name == nullptr || name->empty()){
         return;
     }

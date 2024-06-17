@@ -64,7 +64,7 @@ DebugSettings& PreloadSettings::debug(){
 }
 
 void PreloadSettings::load(const JsonValue& json){
-    const JsonObject* obj = json.get_object();
+    const JsonObject* obj = json.to_object();
     if (obj == nullptr){
         return;
     }
@@ -276,7 +276,7 @@ GlobalSettings::GlobalSettings()
 }
 
 void GlobalSettings::load_json(const JsonValue& json){
-    const JsonObject* obj = json.get_object();
+    const JsonObject* obj = json.to_object();
     if (obj == nullptr){
         return;
     }
@@ -310,7 +310,7 @@ void GlobalSettings::load_json(const JsonValue& json){
                 if (!value.is_string()){
                     continue;
                 }
-                const std::string* test_name = value.get_string();
+                const std::string* test_name = value.to_string();
                 if (test_name != nullptr && !test_name->empty()){
                     COMMAND_LINE_TEST_LIST.emplace_back(*test_name);
                 }
@@ -322,7 +322,7 @@ void GlobalSettings::load_json(const JsonValue& json){
                 if (!value.is_string()){
                     continue;
                 }
-                const std::string* test_name = value.get_string();
+                const std::string* test_name = value.to_string();
                 if (test_name != nullptr && !test_name->empty()){
                     COMMAND_LINE_IGNORE_LIST.emplace_back(*test_name);
                 }
@@ -353,7 +353,7 @@ void GlobalSettings::load_json(const JsonValue& json){
 
 
 JsonValue GlobalSettings::to_json() const{
-    JsonObject obj = std::move(*BatchOption::to_json().get_object());
+    JsonObject obj = std::move(*BatchOption::to_json().to_object());
     obj["NAUGHTY_MODE"] = PreloadSettings::instance().NAUGHTY_MODE;
 
     JsonObject command_line_test_obj;

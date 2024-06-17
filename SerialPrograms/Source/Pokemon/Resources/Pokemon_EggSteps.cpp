@@ -23,7 +23,7 @@ namespace Pokemon{
 EggStepDatabase::EggStepDatabase(const char* resource_path, const SpriteDatabase* sprites){
     std::string path_slugs = RESOURCE_PATH() + resource_path;
     JsonValue json_slugs = load_json_file(path_slugs);
-    JsonObject& slugs = json_slugs.get_object_throw(path_slugs);
+    JsonObject& slugs = json_slugs.to_object_throw(path_slugs);
 
     const std::map<std::string, size_t>& SLUGS_TO_NATIONAL_DEX = Pokemon::SLUGS_TO_NATIONAL_DEX();
 
@@ -38,13 +38,13 @@ EggStepDatabase::EggStepDatabase(const char* resource_path, const SpriteDatabase
         auto ret = nat_id_to_steps.emplace(
             std::piecewise_construct,
             std::forward_as_tuple(iter->second),
-            std::forward_as_tuple(iter->first, (uint16_t)slug.second.get_integer_throw(path_slugs))
+            std::forward_as_tuple(iter->first, (uint16_t)slug.second.to_integer_throw(path_slugs))
         );
         if (!ret.second){
             global_logger_tagged().log("Duplicate " + Pokemon::STRING_POKEMON + " nat-dex ID: " + std::to_string(iter->second));
         }
 
-        m_slug_to_steps[slug.first] = (uint16_t)slug.second.get_integer_throw(path_slugs);
+        m_slug_to_steps[slug.first] = (uint16_t)slug.second.to_integer_throw(path_slugs);
     }
 
     for (const auto& item : nat_id_to_steps){

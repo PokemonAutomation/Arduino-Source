@@ -27,7 +27,7 @@ EncounterFilterOption::EncounterFilterOption(bool enable_overrides)
 void EncounterFilterOption::load_json(const JsonValue& json){
     using namespace Pokemon;
 
-    const JsonObject* obj = json.get_object();
+    const JsonObject* obj = json.to_object();
     if (obj == nullptr){
         return;
     }

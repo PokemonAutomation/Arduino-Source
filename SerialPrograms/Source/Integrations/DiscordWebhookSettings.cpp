@@ -44,7 +44,7 @@ std::unique_ptr<EditableTableRow> DiscordWebhookUrl::clone() const{
 }
 void DiscordWebhookUrl::load_json(const JsonValue& json){
     EditableTableRow::load_json(json);
-    const JsonObject* obj = json.get_object();
+    const JsonObject* obj = json.to_object();
     if (obj == nullptr){
         return;
     }
@@ -54,7 +54,7 @@ void DiscordWebhookUrl::load_json(const JsonValue& json){
     if (array){
         std::string tags;
         for (const auto& tag : *array){
-            const std::string* str = tag.get_string();
+            const std::string* str = tag.to_string();
             if (str == nullptr){
                 continue;
             }

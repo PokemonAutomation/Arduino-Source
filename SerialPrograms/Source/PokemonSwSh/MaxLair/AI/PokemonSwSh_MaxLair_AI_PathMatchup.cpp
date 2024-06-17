@@ -33,7 +33,7 @@ private:
     PathMatchDatabase(){
         std::string path = RESOURCE_PATH() + "PokemonSwSh/MaxLair/path_tree.json";
         JsonValue json = load_json_file(path);
-        JsonObject& root = json.get_object_throw(path);
+        JsonObject& root = json.to_object_throw(path);
 
         {
             JsonObject& obj = root.get_object_throw("rental_by_type", path);
@@ -44,7 +44,7 @@ private:
                 JsonArray& array = obj.get_array_throw(type.second, path);
                 std::set<std::string>& set = rentals_by_type[type.first];
                 for (auto& item : array){
-                    std::string& str = item.get_string_throw(path);
+                    std::string& str = item.to_string_throw(path);
                     set.insert(std::move(str));
                 }
             }
@@ -54,7 +54,7 @@ private:
         for (auto& item : node){
             std::map<PokemonType, double>& boss = type_vs_boss[item.first];
 
-            JsonObject& obj = item.second.get_object_throw(path).get_object_throw("hash_table", path);
+            JsonObject& obj = item.second.to_object_throw(path).get_object_throw("hash_table", path);
 
             for (const auto& type : TYPE_ENUM_TO_SLUG){
                 if (type.first == PokemonType::NONE){

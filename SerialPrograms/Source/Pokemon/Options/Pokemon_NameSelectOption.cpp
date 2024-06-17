@@ -42,10 +42,10 @@ PokemonNameSelectData::PokemonNameSelectData(const std::vector<std::string>& slu
 PokemonNameSelectData::PokemonNameSelectData(const std::string& json_file_slugs){
     std::string path = RESOURCE_PATH() + json_file_slugs;
     JsonValue json_slugs = load_json_file(path);
-    JsonArray& slugs = json_slugs.get_array_throw(path);
+    JsonArray& slugs = json_slugs.to_array_throw(path);
 
     for (auto& item : slugs){
-        std::string& slug = item.get_string_throw(path);
+        std::string& slug = item.to_string_throw(path);
 
         using namespace NintendoSwitch::PokemonSwSh;
         const PokemonNames& data = get_pokemon_name(slug);

@@ -37,7 +37,7 @@ void BatchOption::add_option(ConfigOption& option, std::string serialization_str
 }
 
 void BatchOption::load_json(const JsonValue& json){
-    const JsonObject* obj = json.get_object();
+    const JsonObject* obj = json.to_object();
     if (obj == nullptr){
         return;
     }

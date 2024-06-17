@@ -92,7 +92,7 @@ void check_new_version(Logger& logger){
 
 //    cout << json.dump() << endl;
 
-    const JsonObject* obj = json.get_object();
+    const JsonObject* obj = json.to_object();
     if (obj == nullptr){
         logger.log("Invalid version JSON.", COLOR_RED);
         return;

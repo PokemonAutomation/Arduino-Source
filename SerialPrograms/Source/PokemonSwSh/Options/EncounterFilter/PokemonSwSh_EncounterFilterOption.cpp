@@ -29,7 +29,7 @@ EncounterFilterOption::EncounterFilterOption(bool rare_stars, bool enable_overri
 void EncounterFilterOption::load_json(const JsonValue& json){
     using namespace Pokemon;
 
-    const JsonObject* obj = json.get_object();
+    const JsonObject* obj = json.to_object();
 
     const std::string* str = obj->get_string("ShinyFilter");
     if (str != nullptr){

@@ -90,7 +90,7 @@ void Client::send_embed_dpp(
 
         auto fields = json_obj.get_array("fields");
         for (auto& field : *fields){
-            auto obj = field.get_object();
+            auto obj = field.to_object();
             embed.add_field(*obj->get_string("name"), *obj->get_string("value"));
         }
     }

@@ -336,7 +336,7 @@ std::string Pokemon::dump() const{
 std::map<std::string, Pokemon> load_pokemon(const std::string& filepath, bool is_legendary){
     std::string path = RESOURCE_PATH() + filepath;
     JsonValue json = load_json_file(path);
-    JsonObject& root = json.get_object_throw(path);
+    JsonObject& root = json.to_object_throw(path);
 
     std::map<std::string, Pokemon> map;
 
@@ -352,7 +352,7 @@ std::map<std::string, Pokemon> load_pokemon(const std::string& filepath, bool is
 
     for (auto& item : root){
         const std::string& slug = item.first;
-        JsonObject& obj = item.second.get_object_throw(path);
+        JsonObject& obj = item.second.to_object_throw(path);
 
         Type type1 = Type::none;
         Type type2 = Type::none;
@@ -361,9 +361,9 @@ std::map<std::string, Pokemon> load_pokemon(const std::string& filepath, bool is
             if (array.size() < 1){
                 throw FileException(nullptr, PA_CURRENT_FUNCTION, "Must have at least one type: " + slug, std::move(path));
             }
-            type1 = get_type_from_string(array[0].get_string_throw(path));
+            type1 = get_type_from_string(array[0].to_string_throw(path));
             if (array.size() > 1){
-                type2 = get_type_from_string(array[1].get_string_throw(path));
+                type2 = get_type_from_string(array[1].to_string_throw(path));
             }
         }
 
@@ -374,7 +374,7 @@ std::map<std::string, Pokemon> load_pokemon(const std::string& filepath, bool is
                 throw FileException(nullptr, PA_CURRENT_FUNCTION, "Too many moves specified: " + slug, std::move(path));
             }
             for (size_t c = 0; c < array.size(); c++){
-                moves[c] = (uint32_t)array[c].get_integer_throw(path);
+                moves[c] = (uint32_t)array[c].to_integer_throw(path);
             }
         }
 
@@ -385,7 +385,7 @@ std::map<std::string, Pokemon> load_pokemon(const std::string& filepath, bool is
                 throw FileException(nullptr, PA_CURRENT_FUNCTION, "Too many moves specified: " + slug, std::move(path));
             }
             for (size_t c = 0; c < array.size(); c++){
-                max_moves[c] = (uint32_t)array[c].get_integer_throw(path);
+                max_moves[c] = (uint32_t)array[c].to_integer_throw(path);
             }
         }
         JsonArray& base_stats = obj.get_array_throw("base_stats", path);
@@ -402,12 +402,12 @@ std::map<std::string, Pokemon> load_pokemon(const std::string& filepath, bool is
                 obj.get_string_throw("ability_id", path),
                 type1, type2,
                 level,
-                (uint8_t)base_stats[0].get_integer_throw(path),
-                (uint8_t)base_stats[1].get_integer_throw(path),
-                (uint8_t)base_stats[2].get_integer_throw(path),
-                (uint8_t)base_stats[3].get_integer_throw(path),
-                (uint8_t)base_stats[4].get_integer_throw(path),
-                (uint8_t)base_stats[5].get_integer_throw(path),
+                (uint8_t)base_stats[0].to_integer_throw(path),
+                (uint8_t)base_stats[1].to_integer_throw(path),
+                (uint8_t)base_stats[2].to_integer_throw(path),
+                (uint8_t)base_stats[3].to_integer_throw(path),
+                (uint8_t)base_stats[4].to_integer_throw(path),
+                (uint8_t)base_stats[5].to_integer_throw(path),
                 moves[0],
                 moves[1],
                 moves[2],

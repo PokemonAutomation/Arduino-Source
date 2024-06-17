@@ -34,21 +34,21 @@ struct MaxLairSlugsDatabase{
     MaxLairSlugsDatabase(){
         std::string path = RESOURCE_PATH() + "PokemonSwSh/MaxLairSlugMap.json";
         JsonValue json = load_json_file(path);
-        JsonObject& root = json.get_object_throw(path);
+        JsonObject& root = json.to_object_throw(path);
 
         for (auto& item0 : root){
             const std::string& maxlair_slug = item0.first;
-            JsonObject& obj = item0.second.get_object_throw(path);
+            JsonObject& obj = item0.second.to_object_throw(path);
             MaxLairSlugs slugs;
             for (auto& item1 : obj.get_array_throw("OCR", path)){
-                std::string& slug = item1.get_string_throw(path);
+                std::string& slug = item1.to_string_throw(path);
                 if (!slugs.name_slug.empty()){
                     throw FileException(nullptr, PA_CURRENT_FUNCTION, "Multiple names specified for MaxLair slug.", std::move(path));
                 }
                 slugs.name_slug = std::move(slug);
             }
             for (auto& item1 : obj.get_array_throw("Sprite", path)){
-                std::string& slug = item1.get_string_throw(path);
+                std::string& slug = item1.to_string_throw(path);
                 slugs.sprite_slugs.insert(std::move(slug));
             }
             m_slugs[maxlair_slug] = std::move(slugs);
@@ -133,13 +133,13 @@ MaxLairMove parse_move(JsonObject&& obj, const std::string& path){
 std::map<std::string, MaxLairMon> build_maxlair_mon_database(const std::string& path){
     std::string filepath = RESOURCE_PATH() + path;
     JsonValue json = load_json_file(filepath);
-    JsonObject& root = json.get_object_throw(filepath);
+    JsonObject& root = json.to_object_throw(filepath);
 
     std::map<std::string, MaxLairMon> database;
 
     for (auto& item : root){
         const std::string& slug = item.first;
-        JsonObject& obj = item.second.get_object_throw(filepath);
+        JsonObject& obj = item.second.to_object_throw(filepath);
 
         MaxLairMon& mon = database[slug];
         mon.species = slug;
@@ -148,11 +148,11 @@ std::map<std::string, MaxLairMon> build_maxlair_mon_database(const std::string& 
         {
             JsonArray& array = obj.get_array_throw("type", filepath);
             if (array.size() >= 1){
-                std::string& str = array[0].get_string_throw(filepath);
+                std::string& str = array[0].to_string_throw(filepath);
                 mon.type[0] = parse_type_slug(str);
             }
             if (array.size() >= 2){
-                std::string& str = array[1].get_string_throw(filepath);
+                std::string& str = array[1].to_string_throw(filepath);
                 mon.type[1] = parse_type_slug(str);
             }
         }
@@ -166,14 +166,14 @@ std::map<std::string, MaxLairMon> build_maxlair_mon_database(const std::string& 
                 throw FileException(nullptr, PA_CURRENT_FUNCTION, "Base stats should contain 6 elements: " + slug, std::move(path));
             }
             for (int c = 0; c < 6; c++){
-                mon.base_stats[c] = (uint8_t)array[c].get_integer_throw(filepath);
+                mon.base_stats[c] = (uint8_t)array[c].to_integer_throw(filepath);
             }
         }
         {
             JsonArray& array = obj.get_array_throw("moves", filepath);
             size_t stop = std::min<size_t>(5, array.size());
             for (size_t c = 0; c < stop; c++){
-                JsonObject& move = array[c].get_object_throw(filepath);
+                JsonObject& move = array[c].to_object_throw(filepath);
                 mon.moves[c] = parse_move(std::move(move), filepath);
             }
         }
@@ -181,7 +181,7 @@ std::map<std::string, MaxLairMon> build_maxlair_mon_database(const std::string& 
             JsonArray& array = obj.get_array_throw("max_moves", filepath);
             size_t stop = std::min<size_t>(5, array.size());
             for (size_t c = 0; c < stop; c++){
-                JsonObject& move = array[c].get_object_throw(filepath);
+                JsonObject& move = array[c].to_object_throw(filepath);
                 mon.max_moves[c] = parse_move(std::move(move), filepath);
             }
         }

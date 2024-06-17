@@ -20,7 +20,7 @@ SpriteDatabase::SpriteDatabase(const char* sprite_path, const char* json_path)
 {
     std::string path = RESOURCE_PATH() + json_path;
     JsonValue json = load_json_file(path);
-    JsonObject& root = json.get_object_throw(path);
+    JsonObject& root = json.to_object_throw(path);
 
     int64_t width = root.get_integer_throw("spriteWidth", path);
     int64_t height = root.get_integer_throw("spriteHeight", path);
@@ -34,7 +34,7 @@ SpriteDatabase::SpriteDatabase(const char* sprite_path, const char* json_path)
     JsonObject& locations = root.get_object_throw("spriteLocations", path);
     for (auto& item : locations){
         const std::string& slug = item.first;
-        JsonObject& obj = item.second.get_object_throw(path);
+        JsonObject& obj = item.second.to_object_throw(path);
         int y = (int)obj.get_integer_throw("top", path);
         int x = (int)obj.get_integer_throw("left", path);
 

@@ -142,7 +142,7 @@ std::unique_ptr<EditableTableRow> TurboMacroRow::clone() const{
 }
 
 void TurboMacroRow::load_json(const JsonValue& json){
-    const JsonObject* obj = json.get_object();
+    const JsonObject* obj = json.to_object();
     if (obj == nullptr){
         return;
     }

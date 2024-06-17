@@ -38,13 +38,13 @@ EnumDropdown::EnumDropdown(const JsonObject& obj)
 {
     const JsonArray& options = obj.get_array_throw(JSON_OPTIONS);
     for (const auto& option : options){
-        const JsonArray& pair = option.get_array_throw();
+        const JsonArray& pair = option.to_array_throw();
         if (pair.size() != 2){
             throw ParseException("Config Error - Enum pairs should be 2 elements: " + JSON_OPTIONS);
         }
         m_options.emplace_back(
-            pair[0].get_string_throw(),
-            pair[1].get_string_throw()
+            pair[0].to_string_throw(),
+            pair[1].to_string_throw()
         );
     }
     for (size_t c = 0; c < m_options.size(); c++){

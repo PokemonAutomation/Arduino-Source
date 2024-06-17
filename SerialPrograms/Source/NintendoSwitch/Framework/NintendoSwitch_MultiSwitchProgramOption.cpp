@@ -32,7 +32,7 @@ MultiSwitchProgramOption::MultiSwitchProgramOption(const MultiSwitchProgramDescr
 {}
 
 void MultiSwitchProgramOption::from_json(const JsonValue& json){
-    const JsonObject* obj = json.get_object();
+    const JsonObject* obj = json.to_object();
     if (obj == nullptr){
         return;
     }
@@ -43,7 +43,7 @@ void MultiSwitchProgramOption::from_json(const JsonValue& json){
     m_instance->from_json(json);
 }
 JsonValue MultiSwitchProgramOption::to_json() const{
-    JsonObject obj = std::move(*m_instance->to_json().get_object());
+    JsonObject obj = std::move(*m_instance->to_json().to_object());
     obj["SwitchSetup"] = m_system.to_json();
     return obj;
 }

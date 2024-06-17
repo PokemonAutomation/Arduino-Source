@@ -114,7 +114,7 @@ void DateTimeCell::restore_defaults(){
 DateTime DateTimeCell::from_json(const JsonValue& json){
     DateTime ret;
 
-    const JsonObject* object = json.get_object();
+    const JsonObject* object = json.to_object();
     if (object == nullptr){
         return ret;
     }

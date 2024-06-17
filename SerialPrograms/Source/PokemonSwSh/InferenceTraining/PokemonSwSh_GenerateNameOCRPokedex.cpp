@@ -149,9 +149,9 @@ void GenerateNameOCRDataPokedex::program(SingleSwitchProgramEnvironment& env, Bo
     if (MODE == Mode::GenerateTrainingData){
         std::string path = RESOURCE_PATH() + "Pokemon/Pokedex/Pokedex-" + dex_name + ".json";
         JsonValue json = load_json_file(path);
-        JsonArray& array = json.get_array_throw(path);
+        JsonArray& array = json.to_array_throw(path);
         for (const auto& item : array){
-            expected.emplace_back(item.get_string_throw(path));
+            expected.emplace_back(item.to_string_throw(path));
         }
     }
 

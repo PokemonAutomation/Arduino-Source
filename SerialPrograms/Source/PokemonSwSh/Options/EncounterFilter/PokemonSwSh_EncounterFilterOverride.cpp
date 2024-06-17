@@ -41,7 +41,7 @@ void EncounterFilterOverride::load_json(const JsonValue& json){
     EditableTableRow::load_json(json);
 
     //  Parse old format for backwards compatibility.
-    const JsonObject* obj = json.get_object();
+    const JsonObject* obj = json.to_object();
     if (obj == nullptr){
         return;
     }

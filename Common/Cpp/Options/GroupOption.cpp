@@ -65,7 +65,7 @@ void GroupOption::set_enabled(bool enabled){
 }
 void GroupOption::load_json(const JsonValue& json){
     BatchOption::load_json(json);
-    const JsonObject* obj = json.get_object();
+    const JsonObject* obj = json.to_object();
     if (obj == nullptr){
         return;
     }
@@ -80,7 +80,7 @@ void GroupOption::load_json(const JsonValue& json){
     }
 }
 JsonValue GroupOption::to_json() const{
-    JsonObject obj = std::move(*BatchOption::to_json().get_object());
+    JsonObject obj = std::move(*BatchOption::to_json().to_object());
     if (m_data->m_toggleable){
         obj["Enabled"] = m_data->m_enabled.load(std::memory_order_relaxed);
     }

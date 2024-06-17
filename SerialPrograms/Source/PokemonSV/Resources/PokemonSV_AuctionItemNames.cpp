@@ -38,7 +38,7 @@ AuctionItemNameDatabase::AuctionItemNameDatabase()
     // ["potion", "fresh-water", ... ]
     std::string path_slugs = RESOURCE_PATH() + "PokemonSV/Auction/AuctionItemList.json";
     JsonValue json_slugs = load_json_file(path_slugs);
-    JsonArray& slugs = json_slugs.get_array_throw(path_slugs);
+    JsonArray& slugs = json_slugs.to_array_throw(path_slugs);
 
     // Load a map of auction item slugs to item names in all languages, e.g.:
     // {
@@ -51,10 +51,10 @@ AuctionItemNameDatabase::AuctionItemNameDatabase()
     // }
     std::string path_disp = RESOURCE_PATH() + "PokemonSV/Auction/AuctionItemNameDisplay.json";
     JsonValue json_disp = load_json_file(path_disp);
-    JsonObject& item_disp = json_disp.get_object_throw(path_disp);
+    JsonObject& item_disp = json_disp.to_object_throw(path_disp);
 
     for (auto& item : slugs){
-        std::string& slug = item.get_string_throw(path_slugs);
+        std::string& slug = item.to_string_throw(path_slugs);
 
         JsonObject& auction_item_name_dict = item_disp.get_object_throw(slug, path_disp);
         std::string& display_name = auction_item_name_dict.get_string_throw("eng", path_disp);

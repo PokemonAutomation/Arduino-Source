@@ -106,11 +106,11 @@ private:
     ){
         std::string path = RESOURCE_PATH() + filepath;
         JsonValue json = load_json_file(path);
-        JsonObject& root = json.get_object_throw(path);
+        JsonObject& root = json.to_object_throw(path);
 
         for (auto& item : root){
             uint32_t move_id = std::atoi(item.first.c_str());
-            JsonObject& obj = item.second.get_object_throw(path);
+            JsonObject& obj = item.second.to_object_throw(path);
             std::string& slug = obj.get_string_throw("name", path);
             moves.emplace_back(
                 move_id,

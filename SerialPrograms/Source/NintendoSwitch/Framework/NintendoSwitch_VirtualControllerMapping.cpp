@@ -277,7 +277,7 @@ void set_keyboard_mapping(const JsonArray& json){
     std::vector<std::pair<Qt::Key, const ControllerButton&>> mapping;
 
     for (const auto& item : json){
-        const JsonObject* obj = item.get_object();
+        const JsonObject* obj = item.to_object();
         if (obj == nullptr){
             continue;
         }

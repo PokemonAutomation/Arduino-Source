@@ -101,31 +101,31 @@ public:
     bool is_object  () const{ return m_type == JsonType::OBJECT; }
 
     //  Get the value. Throws if the type doesn't match.
-    bool                get_boolean_throw   (const std::string& filename = std::string()) const;
-    int64_t             get_integer_throw   (const std::string& filename = std::string()) const;
-    double              get_double_throw    (const std::string& filename = std::string()) const;
-    const std::string&  get_string_throw    (const std::string& filename = std::string()) const;
-          std::string&  get_string_throw    (const std::string& filename = std::string());
-    const JsonArray&    get_array_throw     (const std::string& filename = std::string()) const;
-          JsonArray&    get_array_throw     (const std::string& filename = std::string());
-    const JsonObject&   get_object_throw    (const std::string& filename = std::string()) const;
-          JsonObject&   get_object_throw    (const std::string& filename = std::string());
+    bool                to_boolean_throw(const std::string& filename = std::string()) const;
+    int64_t             to_integer_throw(const std::string& filename = std::string()) const;
+    double              to_double_throw (const std::string& filename = std::string()) const;
+    const std::string&  to_string_throw (const std::string& filename = std::string()) const;
+          std::string&  to_string_throw (const std::string& filename = std::string());
+    const JsonArray&    to_array_throw  (const std::string& filename = std::string()) const;
+          JsonArray&    to_array_throw  (const std::string& filename = std::string());
+    const JsonObject&   to_object_throw (const std::string& filename = std::string()) const;
+          JsonObject&   to_object_throw (const std::string& filename = std::string());
 
     //  Get a pointer to the data for this value.
     //  If the type matches, returns the pointer.
     //  If the type does match, returns nullptr.
-    const std::string*  get_string  () const;
-          std::string*  get_string  ();
-    const JsonArray*    get_array   () const;
-          JsonArray*    get_array   ();
-    const JsonObject*   get_object  () const;
-          JsonObject*   get_object  ();
+    const std::string*  to_string   () const;
+          std::string*  to_string   ();
+    const JsonArray*    to_array    () const;
+          JsonArray*    to_array    ();
+    const JsonObject*   to_object   () const;
+          JsonObject*   to_object   ();
 
     //  Convert to the specified type. If the type doesn't match, return the default.
-    bool        get_boolean_default (bool default_value = false) const;
-    int64_t     get_integer_default (int64_t default_value = 0) const;
-    double      get_double_default  (double default_value = 0) const;
-    std::string get_string_default  (const char* default_value = "") const;
+    bool        to_boolean_default (bool default_value = false) const;
+    int64_t     to_integer_default (int64_t default_value = 0) const;
+    double      to_double_default  (double default_value = 0) const;
+    std::string to_string_default  (const char* default_value = "") const;
 
     //  Attempt to read this value as a specific type.
     //  If the type matches, the value is assigned to "value" and returns true.

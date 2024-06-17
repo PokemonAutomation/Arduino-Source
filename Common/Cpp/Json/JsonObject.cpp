@@ -35,63 +35,63 @@ bool JsonObject::get_boolean_throw(const std::string& key, const std::string& fi
     if (iter == m_data.end()){
         throw JsonParseException(filename, key);
     }
-    return iter->second.get_boolean_throw(filename);
+    return iter->second.to_boolean_throw(filename);
 }
 int64_t JsonObject::get_integer_throw(const std::string& key, const std::string& filename) const{
     auto iter = m_data.find(key);
     if (iter == m_data.end()){
         throw JsonParseException(filename, key);
     }
-    return iter->second.get_integer_throw(filename);
+    return iter->second.to_integer_throw(filename);
 }
 double JsonObject::get_double_throw(const std::string& key, const std::string& filename) const{
     auto iter = m_data.find(key);
     if (iter == m_data.end()){
         throw JsonParseException(filename, key);
     }
-    return iter->second.get_double_throw(filename);
+    return iter->second.to_double_throw(filename);
 }
 const std::string& JsonObject::get_string_throw(const std::string& key, const std::string& filename) const{
     auto iter = m_data.find(key);
     if (iter == m_data.end()){
         throw JsonParseException(filename, key);
     }
-    return iter->second.get_string_throw(filename);
+    return iter->second.to_string_throw(filename);
 }
 std::string& JsonObject::get_string_throw(const std::string& key, const std::string& filename){
     auto iter = m_data.find(key);
     if (iter == m_data.end()){
         throw JsonParseException(filename, key);
     }
-    return iter->second.get_string_throw(filename);
+    return iter->second.to_string_throw(filename);
 }
 const JsonArray& JsonObject::get_array_throw(const std::string& key, const std::string& filename) const{
     auto iter = m_data.find(key);
     if (iter == m_data.end()){
         throw JsonParseException(filename, key);
     }
-    return iter->second.get_array_throw(filename);
+    return iter->second.to_array_throw(filename);
 }
 JsonArray& JsonObject::get_array_throw(const std::string& key, const std::string& filename){
     auto iter = m_data.find(key);
     if (iter == m_data.end()){
         throw JsonParseException(filename, key);
     }
-    return iter->second.get_array_throw(filename);
+    return iter->second.to_array_throw(filename);
 }
 const JsonObject& JsonObject::get_object_throw(const std::string& key, const std::string& filename) const{
     auto iter = m_data.find(key);
     if (iter == m_data.end()){
         throw JsonParseException(filename, key);
     }
-    return iter->second.get_object_throw(filename);
+    return iter->second.to_object_throw(filename);
 }
 JsonObject& JsonObject::get_object_throw(const std::string& key, const std::string& filename){
     auto iter = m_data.find(key);
     if (iter == m_data.end()){
         throw JsonParseException(filename, key);
     }
-    return iter->second.get_object_throw(filename);
+    return iter->second.to_object_throw(filename);
 }
 const JsonValue& JsonObject::get_value_throw(const std::string& key, const std::string& filename) const{
     auto iter = m_data.find(key);
@@ -117,42 +117,42 @@ const std::string* JsonObject::get_string(const std::string& key) const{
     if (iter == m_data.end()){
         return nullptr;
     }
-    return iter->second.get_string();
+    return iter->second.to_string();
 }
 std::string* JsonObject::get_string(const std::string& key){
     auto iter = m_data.find(key);
     if (iter == m_data.end()){
         return nullptr;
     }
-    return iter->second.get_string();
+    return iter->second.to_string();
 }
 const JsonArray* JsonObject::get_array(const std::string& key) const{
     auto iter = m_data.find(key);
     if (iter == m_data.end()){
         return nullptr;
     }
-    return iter->second.get_array();
+    return iter->second.to_array();
 }
 JsonArray* JsonObject::get_array(const std::string& key){
     auto iter = m_data.find(key);
     if (iter == m_data.end()){
         return nullptr;
     }
-    return iter->second.get_array();
+    return iter->second.to_array();
 }
 const JsonObject* JsonObject::get_object(const std::string& key) const{
     auto iter = m_data.find(key);
     if (iter == m_data.end()){
         return nullptr;
     }
-    return iter->second.get_object();
+    return iter->second.to_object();
 }
 JsonObject* JsonObject::get_object(const std::string& key){
     auto iter = m_data.find(key);
     if (iter == m_data.end()){
         return nullptr;
     }
-    return iter->second.get_object();
+    return iter->second.to_object();
 }
 const JsonValue* JsonObject::get_value(const std::string& key) const{
     auto iter = m_data.find(key);

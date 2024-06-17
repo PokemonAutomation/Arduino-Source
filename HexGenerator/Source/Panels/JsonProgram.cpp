@@ -18,13 +18,13 @@ namespace HexGenerator{
 
 
 Program_JsonFile::Program_JsonFile(std::string category, const std::string& filepath)
-    : Program_JsonFile(std::move(category), load_json_file(filepath).get_object_throw())
+    : Program_JsonFile(std::move(category), load_json_file(filepath).to_object_throw())
 {}
 Program_JsonFile::Program_JsonFile(std::string category, const JsonObject& obj)
     : Program(std::move(category), obj)
 {
     for (const auto& item : obj.get_array_throw(JSON_PARAMETERS)){
-        m_options.emplace_back(parse_option(item.get_object_throw()));
+        m_options.emplace_back(parse_option(item.to_object_throw()));
     }
 }
 

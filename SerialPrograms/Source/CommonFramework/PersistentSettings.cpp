@@ -50,7 +50,7 @@ void PersistentSettings::write() const{
 void PersistentSettings::read(){
     std::string settings_path = SETTINGS_PATH() + QCoreApplication::applicationName().toStdString() + "-Settings.json";
     JsonValue json = load_json_file(settings_path);
-    JsonObject* obj = json.get_object();
+    JsonObject* obj = json.to_object();
     if (obj == nullptr){
         throw FileException(nullptr, PA_CURRENT_FUNCTION, "Invalid settings file.", settings_path);
     }

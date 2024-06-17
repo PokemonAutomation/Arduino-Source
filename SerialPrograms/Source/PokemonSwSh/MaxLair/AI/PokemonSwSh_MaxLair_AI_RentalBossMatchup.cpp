@@ -43,12 +43,12 @@ private:
     MatchupDatabase(){
         std::string path = RESOURCE_PATH() + "PokemonSwSh/MaxLair/boss_matchup_LUT.json";
         JsonValue json = load_json_file(path);
-        JsonObject& root = json.get_object_throw(path);
+        JsonObject& root = json.to_object_throw(path);
         for (auto& item0 : root){
             std::map<std::string, double>& sub = map[item0.first];
-            JsonObject& obj = item0.second.get_object_throw(path);
+            JsonObject& obj = item0.second.to_object_throw(path);
             for (auto& item1 : obj){
-                sub[item1.first] = item1.second.get_double_throw(path);
+                sub[item1.first] = item1.second.to_double_throw(path);
             }
         }
     }

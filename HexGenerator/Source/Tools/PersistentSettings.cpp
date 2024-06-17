@@ -62,7 +62,7 @@ void PersistentSettings::load(){
     try{
         std::string full_path = path + SETTINGS_NAME;
         JsonValue json = load_json_file(full_path);
-        JsonObject& obj = json.get_object_throw(full_path);
+        JsonObject& obj = json.to_object_throw(full_path);
         obj.read_integer(board_index, "Board", 0, 3);
     }catch (const Exception& e){
         std::cout << std::string("Error Parsing ") + SETTINGS_NAME + ": " + e.message() << std::endl;

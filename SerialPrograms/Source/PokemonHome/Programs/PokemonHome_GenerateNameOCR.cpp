@@ -58,11 +58,11 @@ GenerateNameOCRData::GenerateNameOCRData()
 void GenerateNameOCRData::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     std::string resource_path = RESOURCE_PATH() + "Pokemon/Pokedex/Pokedex-National.json";
     JsonValue json = load_json_file(resource_path);
-    JsonArray& array = json.get_array_throw(resource_path);
+    JsonArray& array = json.to_array_throw(resource_path);
 
     std::vector<std::string> slugs;
     for (auto& item : array){
-        std::string& slug = item.get_string_throw(resource_path);
+        std::string& slug = item.to_string_throw(resource_path);
         slugs.emplace_back(std::move(slug));
     }
 

@@ -82,7 +82,7 @@ void StringCell::set(std::string x){
 }
 
 void StringCell::load_json(const JsonValue& json){
-    const std::string* str = json.get_string();
+    const std::string* str = json.to_string();
     if (str == nullptr){
         return;
     }

@@ -226,7 +226,7 @@ std::string TimeExpressionCell<Type>::time_string() const{
 template <typename Type>
 void TimeExpressionCell<Type>::load_json(const JsonValue& json){
     Data& data = *m_data;
-    const std::string* str = json.get_string();
+    const std::string* str = json.to_string();
     if (str == nullptr){
         return;
     }

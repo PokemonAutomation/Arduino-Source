@@ -26,7 +26,7 @@ PanelList::PanelList(QWidget& parent, MainWindow& window, const JsonValue& json)
     : QListWidget(&parent)
     , m_window(window)
 {
-    const JsonObject& category = json.get_object_throw();
+    const JsonObject& category = json.to_object_throw();
 
     const std::string& category_name = category.get_string_throw("Name");
     m_display_name = category.get_string_throw("Display");
@@ -35,7 +35,7 @@ PanelList::PanelList(QWidget& parent, MainWindow& window, const JsonValue& json)
 //    std::vector<QString> settings_list;
     bool first = true;
     for (const auto& item : category.get_array_throw("Settings")){
-        const std::string& setting = item.get_string_throw();
+        const std::string& setting = item.to_string_throw();
 //        settings.emplace_back(setting.toString());
 //        m_list.emplace_back();
 //        cout << setting.toUtf8().data() << endl;

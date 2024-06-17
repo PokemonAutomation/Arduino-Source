@@ -157,7 +157,7 @@ void RaidPlayerBanList::refresh_online_table(Logger& logger){
             logger.log("Downloaded ban table is empty or invalid.", COLOR_RED);
             return;
         }
-        size_t items = json.get_array()->size();
+        size_t items = json.to_array()->size();
         logger.log("Downloaded table has " + std::to_string(items) + " row(s).");
         online_table.load_json(json);
     }catch (OperationFailedException&){}

@@ -26,10 +26,10 @@ struct PokemonSlugDatabase{
     PokemonSlugDatabase(){
         std::string path = RESOURCE_PATH() + "Pokemon/Pokedex/Pokedex-National.json";
         JsonValue json = load_json_file(path);
-        JsonArray& slugs = json.get_array_throw(path);
+        JsonArray& slugs = json.to_array_throw(path);
 
         for (auto& item : slugs){
-            std::string& slug = item.get_string_throw(path);
+            std::string& slug = item.to_string_throw(path);
             all_slugs.insert(slug);
             national_dex.emplace_back(slug);
             slugs_to_dex[std::move(slug)] = national_dex.size();

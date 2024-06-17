@@ -174,7 +174,7 @@ std::unique_ptr<EditableTableRow> CustomPathTableRow2::clone() const{
     return ret;
 }
 void CustomPathTableRow2::load_json(const JsonValue& json){
-    const JsonObject* obj = json.get_object();
+    const JsonObject* obj = json.to_object();
     if (obj == nullptr){
         return;
     }
@@ -368,7 +368,7 @@ public:
                 return;
             }
             JsonValue json = load_json_file(path);
-            JsonObject& root = json.get_object_throw(path);
+            JsonObject& root = json.to_object_throw(path);
             JsonValue& obj = root.get_value_throw("CUSTOM_PATH_TABLE", path);
             value.load_json(obj);
             if (m_table_widget == nullptr){

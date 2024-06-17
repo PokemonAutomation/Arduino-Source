@@ -185,19 +185,19 @@ JsonValue::JsonValue(JsonObject&& x)
 
 //  Get with exception.
 
-bool JsonValue::get_boolean_throw(const std::string& filename) const{
+bool JsonValue::to_boolean_throw(const std::string& filename) const{
     if (m_type == JsonType::BOOLEAN){
         return u.m_bool;
     }
     throw JsonParseException(filename, JsonType::BOOLEAN, m_type);
 }
-int64_t JsonValue::get_integer_throw(const std::string& filename) const{
+int64_t JsonValue::to_integer_throw(const std::string& filename) const{
     if (m_type == JsonType::INTEGER){
         return u.m_integer;
     }
     throw JsonParseException(filename, JsonType::INTEGER, m_type);
 }
-double JsonValue::get_double_throw(const std::string& filename) const{
+double JsonValue::to_double_throw(const std::string& filename) const{
     if (m_type == JsonType::INTEGER){
         return (double)u.m_integer;
     }
@@ -206,37 +206,37 @@ double JsonValue::get_double_throw(const std::string& filename) const{
     }
     throw JsonParseException(filename, JsonType::FLOAT, m_type);
 }
-const std::string& JsonValue::get_string_throw(const std::string& filename) const{
+const std::string& JsonValue::to_string_throw(const std::string& filename) const{
     if (m_type == JsonType::STRING){
         return *u.m_string;
     }
     throw JsonParseException(filename, JsonType::STRING, m_type);
 }
-std::string& JsonValue::get_string_throw(const std::string& filename){
+std::string& JsonValue::to_string_throw(const std::string& filename){
     if (m_type == JsonType::STRING){
         return *u.m_string;
     }
     throw JsonParseException(filename, JsonType::STRING, m_type);
 }
-const JsonArray& JsonValue::get_array_throw(const std::string& filename) const{
+const JsonArray& JsonValue::to_array_throw(const std::string& filename) const{
     if (m_type == JsonType::ARRAY){
         return *u.m_array;
     }
     throw JsonParseException(filename, JsonType::ARRAY, m_type);
 }
-JsonArray& JsonValue::get_array_throw(const std::string& filename){
+JsonArray& JsonValue::to_array_throw(const std::string& filename){
     if (m_type == JsonType::ARRAY){
         return *u.m_array;
     }
     throw JsonParseException(filename, JsonType::ARRAY, m_type);
 }
-const JsonObject& JsonValue::get_object_throw(const std::string& filename) const{
+const JsonObject& JsonValue::to_object_throw(const std::string& filename) const{
     if (m_type == JsonType::OBJECT){
         return *u.m_object;
     }
     throw JsonParseException(filename, JsonType::OBJECT, m_type);
 }
-JsonObject& JsonValue::get_object_throw(const std::string& filename){
+JsonObject& JsonValue::to_object_throw(const std::string& filename){
     if (m_type == JsonType::OBJECT){
         return *u.m_object;
     }
@@ -247,28 +247,28 @@ JsonObject& JsonValue::get_object_throw(const std::string& filename){
 
 //  Get pointer.
 
-const std::string* JsonValue::get_string() const{
+const std::string* JsonValue::to_string() const{
     if (m_type != JsonType::STRING){
         return nullptr;
     }
     return u.m_string;
 }
-std::string* JsonValue::get_string(){
+std::string* JsonValue::to_string(){
     if (m_type != JsonType::STRING){
         return nullptr;
     }
     return u.m_string;
 }
-const JsonArray* JsonValue::get_array() const{
+const JsonArray* JsonValue::to_array() const{
     return m_type == JsonType::ARRAY ? u.m_array : nullptr;
 }
-JsonArray* JsonValue::get_array(){
+JsonArray* JsonValue::to_array(){
     return m_type == JsonType::ARRAY ? u.m_array : nullptr;
 }
-const JsonObject* JsonValue::get_object() const{
+const JsonObject* JsonValue::to_object() const{
     return m_type == JsonType::OBJECT ? u.m_object : nullptr;
 }
-JsonObject* JsonValue::get_object(){
+JsonObject* JsonValue::to_object(){
     return m_type == JsonType::OBJECT ? u.m_object : nullptr;
 }
 
@@ -276,19 +276,19 @@ JsonObject* JsonValue::get_object(){
 
 //  Get with default.
 
-bool JsonValue::get_boolean_default(bool default_value) const{
+bool JsonValue::to_boolean_default(bool default_value) const{
     if (m_type == JsonType::BOOLEAN){
         return u.m_bool;
     }
     return default_value;
 }
-int64_t JsonValue::get_integer_default(int64_t default_value) const{
+int64_t JsonValue::to_integer_default(int64_t default_value) const{
     if (m_type == JsonType::INTEGER){
         return u.m_integer;
     }
     return default_value;
 }
-double JsonValue::get_double_default(double default_value) const{
+double JsonValue::to_double_default(double default_value) const{
     if (m_type == JsonType::INTEGER){
         return (double)u.m_integer;
     }
@@ -297,7 +297,7 @@ double JsonValue::get_double_default(double default_value) const{
     }
     return default_value;
 }
-std::string JsonValue::get_string_default(const char* default_value) const{
+std::string JsonValue::to_string_default(const char* default_value) const{
     if (m_type == JsonType::STRING){
         return *u.m_string;
     }

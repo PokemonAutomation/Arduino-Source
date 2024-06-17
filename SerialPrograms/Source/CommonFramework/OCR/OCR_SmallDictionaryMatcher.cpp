@@ -19,7 +19,7 @@ namespace OCR{
 
 SmallDictionaryMatcher::SmallDictionaryMatcher(const std::string& json_path, bool first_only)
     : SmallDictionaryMatcher(
-        load_json_file(RESOURCE_PATH() + json_path).get_object_throw(),
+        load_json_file(RESOURCE_PATH() + json_path).to_object_throw(),
         first_only
     )
 {}
@@ -30,7 +30,7 @@ SmallDictionaryMatcher::SmallDictionaryMatcher(const JsonObject& json, bool firs
         m_database.emplace(
             std::piecewise_construct,
             std::forward_as_tuple(language),
-            std::forward_as_tuple(item.second.get_object_throw(), nullptr, data.random_match_chance, first_only)
+            std::forward_as_tuple(item.second.to_object_throw(), nullptr, data.random_match_chance, first_only)
         );
         m_languages += language;
     }

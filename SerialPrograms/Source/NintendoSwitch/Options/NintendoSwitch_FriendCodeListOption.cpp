@@ -20,13 +20,13 @@ FriendCodeListOption::FriendCodeListOption(std::string label, std::vector<std::s
 {}
 
 void FriendCodeListOption::load_json(const JsonValue& json){
-    const JsonArray* list = json.get_array();
+    const JsonArray* list = json.to_array();
     if (list == nullptr){
         return;
     }
     std::vector<std::string> lines;
     for (const auto& line : *list){
-        const std::string* str = line.get_string();
+        const std::string* str = line.to_string();
         if (str == nullptr || str->empty()){
             continue;
         }

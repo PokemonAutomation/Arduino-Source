@@ -35,8 +35,8 @@ DictionaryOCR::DictionaryOCR(
             continue;
         }
         std::vector<std::string>& candidates = m_database[token];
-        for (const auto& item1 : item0.second.get_array_throw()){
-            const std::string& candidate = item1.get_string_throw();
+        for (const auto& item1 : item0.second.to_array_throw()){
+            const std::string& candidate = item1.to_string_throw();
             std::u32string normalized = normalize_utf32(candidate);
             std::set<std::string>& set = m_candidate_to_token[normalized];
             if (!set.empty()){
@@ -63,7 +63,7 @@ DictionaryOCR::DictionaryOCR(
     bool first_only
 )
     : DictionaryOCR(
-        load_json_file(json_path).get_object_throw(json_path),
+        load_json_file(json_path).to_object_throw(json_path),
         subset,
         random_match_chance,
         first_only

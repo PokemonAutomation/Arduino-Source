@@ -129,7 +129,7 @@ struct StringSelectCell::Data{
     }
 
     bool load_json(const JsonValue& json){
-        const std::string* str = json.get_string();
+        const std::string* str = json.to_string();
         if (str == nullptr){
             return false;
         }

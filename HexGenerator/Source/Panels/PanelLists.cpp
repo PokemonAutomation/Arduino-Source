@@ -29,7 +29,7 @@ PanelLists::PanelLists(QWidget& parent, MainWindow& window)
     JsonValue json;
     try{
         json = load_json_file(path);
-        for (const auto& item : json.get_array_throw(path)){
+        for (const auto& item : json.to_array_throw(path)){
             try{
                 PanelList* tab = new PanelList(*this, window, item);
                 addTab(tab, QString::fromStdString(tab->display_name()));
