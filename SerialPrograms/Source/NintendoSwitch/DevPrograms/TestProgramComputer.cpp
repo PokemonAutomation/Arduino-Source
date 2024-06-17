@@ -128,6 +128,7 @@
 #include "Pokemon/Pokemon_StatsCalculation.h"
 #include "PokemonSV/Inference/PokemonSV_StatHexagonReader.h"
 #include "PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinySparkleSet.h"
+#include "PokemonSV/Programs/ItemPrinter/PokemonSV_ItemPrinterSeedCalc.h"
 
 #ifdef PA_ARCH_x86
 //#include "Kernels/Kernels_x64_SSE41.h"
@@ -230,6 +231,9 @@ class WatchdogTest1 : public WatchdogCallback{
 
 
 
+
+
+
 void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& scope){
     using namespace Kernels;
     using namespace NintendoSwitch;
@@ -237,6 +241,43 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 //    using namespace NintendoSwitch::PokemonSV;
     using namespace Pokemon;
     using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
+
+#if 0
+    PokemonSV::DateSeed data = PokemonSV::ItemPrinter::calculate_seed_prizes(2346161588);
+
+    cout << "Regular:" << endl;
+    for (auto& item : data.regular){
+        cout << "    " << item << endl;
+    }
+
+    cout << "Item Bonus:" << endl;
+    for (auto& item : data.item_bonus){
+        cout << "    " << item << endl;
+    }
+
+    cout << "Ball Bonus:" << endl;
+    for (auto& item : data.ball_bonus){
+        cout << "    " << item << endl;
+    }
+#endif
+
+
+//    make_item_prize_table();
+//    make_ball_prize_table();
+
+#if 0
+    {
+        std::string path = "PokemonSV/ItemPrinterItems.json";
+        JsonValue json = load_json_file(RESOURCE_PATH() + path);
+        const JsonArray& array = json
+            .to_object_throw(path)
+            .get_array_throw("Table", path);
+        make_prize_table(array, path, 10001);
+    }
+#endif
+
+//    make_prize_table(, 10001);
+
 
 #if 0
     JsonValue json = load_json_file("ItemPrinterOCR.json");
@@ -260,7 +301,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 
 
 
-#if 1
+#if 0
     ImageRGB32 image("screenshot-20240605-000823122811.png");
 
     PokemonSwSh::MaxLairInternal::PokemonSelectMenuDetector detector(false);

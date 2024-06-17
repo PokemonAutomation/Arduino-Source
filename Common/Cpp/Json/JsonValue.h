@@ -36,6 +36,10 @@ public:
         JsonType expected_type,
         JsonType actual_type
     );
+    JsonParseException( //  Out-of-bounds index.
+        const std::string& filename,
+        size_t size, size_t index
+    );
     JsonParseException( //  Missing Key
         const std::string& filename,
         const std::string& key

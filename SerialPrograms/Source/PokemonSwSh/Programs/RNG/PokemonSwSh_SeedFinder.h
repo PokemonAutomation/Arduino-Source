@@ -13,7 +13,6 @@
 #include "Common/Cpp/Options/StringOption.h"
 #include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
-#include "PokemonSwSh/Programs/RNG/PokemonSwSh_Xoroshiro128Plus.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

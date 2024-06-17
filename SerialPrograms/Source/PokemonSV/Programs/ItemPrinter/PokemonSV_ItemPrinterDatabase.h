@@ -13,10 +13,11 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
+namespace ItemPrinter{
 
 
 
-enum class ItemPrinterItems{
+enum class PrebuiltOptions{
     NONE,
     ITEM_BONUS,
     BALL_BONUS,
@@ -61,18 +62,15 @@ enum class ItemPrinterItems{
     ASSORTED_BALLS_2,
     ASSORTED_BALLS_3,
 };
-
-
-const EnumDatabase<ItemPrinterJobs>& ItemPrinterJobs_Database();
-const EnumDatabase<ItemPrinterItems>& ItemPrinterItems_Database();
+const EnumDatabase<PrebuiltOptions>& PrebuiltOptions_Database();
 
 
 struct ItemPrinterEnumOption{
     int64_t seed;
-    ItemPrinterItems enum_value;
+    PrebuiltOptions enum_value;
     ItemPrinterJobs jobs;
 };
-const ItemPrinterEnumOption& option_lookup_by_enum(ItemPrinterItems enum_value);
+const ItemPrinterEnumOption& option_lookup_by_enum(PrebuiltOptions enum_value);
 const ItemPrinterEnumOption* option_lookup_by_seed(int64_t seed);
 
 
@@ -80,8 +78,13 @@ const ItemPrinterEnumOption* option_lookup_by_seed(int64_t seed);
 struct DateSeed{
     //  Seed details.
     int64_t seed;
-    std::array<std::string, 10> items;
-    std::array<std::string, 10> balls;
+    std::array<std::string, 10> regular;
+    std::array<std::string, 10> item_bonus;
+    std::array<std::string, 10> ball_bonus;
+
+    DateSeed()
+        : seed(0)
+    {}
 
     DateSeed(
         int64_t p_seed,
@@ -89,8 +92,19 @@ struct DateSeed{
         std::array<std::string, 10> p_balls = {}
     )
         : seed(p_seed)
-        , items(std::move(p_items))
-        , balls(std::move(p_balls))
+        , item_bonus(std::move(p_items))
+        , ball_bonus(std::move(p_balls))
+    {}
+    DateSeed(
+        int64_t p_seed,
+        std::array<std::string, 10> p_regular,
+        std::array<std::string, 10> p_item_bonus,
+        std::array<std::string, 10> p_ball_bonus
+    )
+        : seed(p_seed)
+        , regular(std::move(p_regular))
+        , item_bonus(std::move(p_item_bonus))
+        , ball_bonus(std::move(p_ball_bonus))
     {}
 
     operator bool() const{
@@ -100,6 +114,7 @@ struct DateSeed{
 DateSeed get_date_seed(int64_t seed);
 
 
+}
 }
 }
 }

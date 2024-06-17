@@ -19,6 +19,17 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 
+const EnumDatabase<ItemPrinterJobs>& ItemPrinterJobs_Database(){
+    static const EnumDatabase<ItemPrinterJobs> database({
+        {ItemPrinterJobs::Jobs_1, "1", "1 Job"},
+        {ItemPrinterJobs::Jobs_5, "5", "5 Jobs"},
+        {ItemPrinterJobs::Jobs_10, "10", "10 Jobs"},
+    });
+    return database;
+}
+
+
+
 void item_printer_start_print(
     ConsoleHandle& console, BotBaseContext& context,
     Language language, ItemPrinterJobs jobs

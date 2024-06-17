@@ -50,7 +50,7 @@ public:
     BooleanCheckBoxCell chain;
     DateTimeCell date;
     EnumDropdownCell<ItemPrinterJobs> jobs;
-    EnumDropdownCell<ItemPrinterItems> desired_item;
+    EnumDropdownCell<ItemPrinter::PrebuiltOptions> desired_item;
 //    ItemPrinterItems prev_desired_item;
 };
 class ItemPrinterRngTable : public EditableTableOption_t<ItemPrinterRngRow>{
@@ -116,6 +116,8 @@ private:
     OCR::LanguageOCROption LANGUAGE;
     SimpleIntegerOption<uint16_t> NUM_ITEM_PRINTER_ROUNDS;
     StaticTextOption AFTER_ITEM_PRINTER_DONE_EXPLANATION;
+
+    BooleanCheckBoxOption ENABLE_SEED_CALC;
 
 //    DateTimeOption DATE0;
 //    DateTimeOption DATE1;

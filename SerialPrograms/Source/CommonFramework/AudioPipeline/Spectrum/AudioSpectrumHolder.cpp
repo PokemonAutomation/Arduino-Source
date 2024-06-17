@@ -7,6 +7,7 @@
 #include <string.h>
 #include <cmath>
 #include <cassert>
+#include <algorithm>
 #include "CommonFramework/AudioPipeline/AudioConstants.h"
 #include "AudioSpectrumHolder.h"
 

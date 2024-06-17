@@ -910,6 +910,8 @@ file(GLOB MAIN_SOURCES
     Source/Pokemon/Resources/Pokemon_PokemonNames.h
     Source/Pokemon/Resources/Pokemon_PokemonSlugs.cpp
     Source/Pokemon/Resources/Pokemon_PokemonSlugs.h
+    Source/Pokemon/Pokemon_Xoroshiro128Plus.cpp
+    Source/Pokemon/Pokemon_Xoroshiro128Plus.h
     Source/PokemonBDSP/Inference/Battles/PokemonBDSP_BattleBallReader.cpp
     Source/PokemonBDSP/Inference/Battles/PokemonBDSP_BattleBallReader.h
     Source/PokemonBDSP/Inference/Battles/PokemonBDSP_BattleMenuDetector.cpp
@@ -1494,6 +1496,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Programs/ItemPrinter/PokemonSV_ItemPrinterDatabase.h
     Source/PokemonSV/Programs/ItemPrinter/PokemonSV_ItemPrinterRNG.cpp
     Source/PokemonSV/Programs/ItemPrinter/PokemonSV_ItemPrinterRNG.h
+    Source/PokemonSV/Programs/ItemPrinter/PokemonSV_ItemPrinterSeedCalc.cpp
+    Source/PokemonSV/Programs/ItemPrinter/PokemonSV_ItemPrinterSeedCalc.h
     Source/PokemonSV/Programs/ItemPrinter/PokemonSV_ItemPrinterTools.cpp
     Source/PokemonSV/Programs/ItemPrinter/PokemonSV_ItemPrinterTools.h
     Source/PokemonSV/Programs/PokemonSV_AreaZero.cpp
@@ -1888,8 +1892,6 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSwSh/Programs/RNG/PokemonSwSh_CramomaticRNG.h
     Source/PokemonSwSh/Programs/RNG/PokemonSwSh_SeedFinder.cpp
     Source/PokemonSwSh/Programs/RNG/PokemonSwSh_SeedFinder.h
-    Source/PokemonSwSh/Programs/RNG/PokemonSwSh_Xoroshiro128Plus.cpp
-    Source/PokemonSwSh/Programs/RNG/PokemonSwSh_Xoroshiro128Plus.h
     Source/PokemonSwSh/Programs/ReleaseHelpers.h
     Source/PokemonSwSh/Programs/ShinyHuntAutonomous/PokemonSwSh_ShinyHuntAutonomous-BerryTree.cpp
     Source/PokemonSwSh/Programs/ShinyHuntAutonomous/PokemonSwSh_ShinyHuntAutonomous-BerryTree.h

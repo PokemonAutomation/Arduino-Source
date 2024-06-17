@@ -14,9 +14,9 @@
 #include "CommonFramework/Options/LanguageOCROption.h"
 #include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
+#include "Pokemon/Pokemon_Xoroshiro128Plus.h"
 #include "PokemonSwSh/Options/PokemonSwSh_DateToucher.h"
 #include "PokemonSwSh/Options/PokemonSwSh_CramomaticTable.h"
-#include "PokemonSwSh/Programs/RNG/PokemonSwSh_Xoroshiro128Plus.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

@@ -9,6 +9,7 @@
 
 #include <array>
 #include "CommonFramework/Language.h"
+#include "Common/Cpp/EnumDatabase.h"
 
 namespace PokemonAutomation{
     class AsyncDispatcher;
@@ -23,6 +24,7 @@ enum class ItemPrinterJobs{
     Jobs_5      =   5,
     Jobs_10     =   10,
 };
+const EnumDatabase<ItemPrinterJobs>& ItemPrinterJobs_Database();
 
 
 void item_printer_start_print(

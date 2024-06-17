@@ -29,6 +29,7 @@
 //#include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Programs/Farming/PokemonSV_MaterialFarmerTools.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
+#include "PokemonSV_ItemPrinterSeedCalc.h"
 #include "PokemonSV_ItemPrinterRNG.h"
 
 #include <iostream>
@@ -38,7 +39,6 @@ using std::endl;
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
-
 
 
 ItemPrinterRngRow::~ItemPrinterRngRow(){
@@ -63,9 +63,9 @@ ItemPrinterRngRow::ItemPrinterRngRow(EditableTableOption& parent_table)
         ItemPrinterJobs::Jobs_1
     )
     , desired_item(
-        ItemPrinterItems_Database(),
+        ItemPrinter::PrebuiltOptions_Database(),
         LockMode::UNLOCK_WHILE_RUNNING,
-        ItemPrinterItems::NONE
+        ItemPrinter::PrebuiltOptions::NONE
     )
 //    , prev_desired_item(ItemPrinterItems::NONE)
 {
@@ -115,21 +115,21 @@ void ItemPrinterRngRow::value_changed(void* object){
     ItemPrinterRngTable& table = static_cast<ItemPrinterRngTable&>(parent());
 
     if (object == &desired_item){
-        ItemPrinterItems option = desired_item;
-        if (option != ItemPrinterItems::NONE){
-            const ItemPrinterEnumOption& option_data = option_lookup_by_enum(option);
+        ItemPrinter::PrebuiltOptions option = desired_item;
+        if (option != ItemPrinter::PrebuiltOptions::NONE){
+            const ItemPrinter::ItemPrinterEnumOption& option_data = option_lookup_by_enum(option);
             chain = false;
             date.set(from_seconds_since_epoch(option_data.seed));
             jobs.set(option_data.jobs);
         }
     }else if (object == &chain){
         if (chain){
-            desired_item.set(ItemPrinterItems::NONE);
+            desired_item.set(ItemPrinter::PrebuiltOptions::NONE);
         }
     }else if (object == &date){
-        const ItemPrinterEnumOption* option_data = option_lookup_by_seed(to_seconds_since_epoch(date));
+        const ItemPrinter::ItemPrinterEnumOption* option_data = ItemPrinter::option_lookup_by_seed(to_seconds_since_epoch(date));
         if (option_data == nullptr){
-            desired_item.set(ItemPrinterItems::NONE);
+            desired_item.set(ItemPrinter::PrebuiltOptions::NONE);
         }else{
             desired_item.set(option_data->enum_value);
         }
@@ -227,6 +227,12 @@ ItemPrinterRNG::ItemPrinterRNG()
     , AFTER_ITEM_PRINTER_DONE_EXPLANATION(
         "Then proceed to material farming."
     )
+    , ENABLE_SEED_CALC(
+        "<b>Enable Seed Calculation: (developer only)</b><br>"
+        "Use Kurt's seed calculation instead of hardcoded database. Ensure you have the appropriate resources.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        false
+    )
 #if 0
     , DATE0(
         "<b>Initial Date:</b><br>Date/Time for the first print. This one should setup the bonus print.",
@@ -312,6 +318,9 @@ ItemPrinterRNG::ItemPrinterRNG()
     }
     PA_ADD_OPTION(NUM_ITEM_PRINTER_ROUNDS);
     PA_ADD_OPTION(AFTER_ITEM_PRINTER_DONE_EXPLANATION);
+    if (PreloadSettings::instance().DEVELOPER_MODE){
+        PA_ADD_OPTION(ENABLE_SEED_CALC);
+    }
 //    PA_ADD_OPTION(DATE0);
 //    PA_ADD_OPTION(DATE1);
     PA_ADD_OPTION(TABLE);
@@ -514,12 +523,16 @@ int ItemPrinterRNG::get_distance_from_target(
     int distance_from_target = std::numeric_limits<int>::min();
     const int MAX_DEVIATION = 2;
     for (int current_deviation = 0; current_deviation < MAX_DEVIATION; current_deviation++){
-        DateSeed seed_data = get_date_seed(seed - current_deviation);
-        if (results_approximately_match(print_results, seed_data.items)){
-            distance_from_target = -current_deviation;
-            break;
+        ItemPrinter::DateSeed seed_data;
+        if (ENABLE_SEED_CALC){
+            seed_data = ItemPrinter::calculate_seed_prizes(seed - current_deviation);
+        }else{
+            seed_data = ItemPrinter::get_date_seed(seed - current_deviation);
         }
-        if (results_approximately_match(print_results, seed_data.balls)){
+        if (results_approximately_match(print_results, seed_data.regular) ||
+            results_approximately_match(print_results, seed_data.item_bonus) ||
+            results_approximately_match(print_results, seed_data.ball_bonus)
+        ){
             distance_from_target = -current_deviation;
             break;
         }
@@ -528,12 +541,15 @@ int ItemPrinterRNG::get_distance_from_target(
             continue;
         }
 
-        seed_data = get_date_seed(seed + current_deviation);
-        if (results_approximately_match(print_results, seed_data.items)){
-            distance_from_target = current_deviation;
-            break;
+        if (ENABLE_SEED_CALC){
+            seed_data = ItemPrinter::calculate_seed_prizes(seed + current_deviation);
+        }else{
+            seed_data = ItemPrinter::get_date_seed(seed + current_deviation);
         }
-        if (results_approximately_match(print_results, seed_data.balls)){
+        if (results_approximately_match(print_results, seed_data.regular) ||
+            results_approximately_match(print_results, seed_data.item_bonus) ||
+            results_approximately_match(print_results, seed_data.ball_bonus)
+        ){
             distance_from_target = current_deviation;
             break;
         }

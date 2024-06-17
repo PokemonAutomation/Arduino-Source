@@ -453,6 +453,7 @@ SOURCES += \
     Source/Pokemon/Pokemon_StatsCalculation.cpp \
     Source/Pokemon/Pokemon_Strings.cpp \
     Source/Pokemon/Pokemon_Types.cpp \
+    Source/Pokemon/Pokemon_Xoroshiro128Plus.cpp \
     Source/Pokemon/Resources/Pokemon_BerryNames.cpp \
     Source/Pokemon/Resources/Pokemon_BerrySprites.cpp \
     Source/Pokemon/Resources/Pokemon_EggSteps.cpp \
@@ -940,7 +941,6 @@ SOURCES += \
     Source/PokemonSwSh/Programs/RNG/PokemonSwSh_BasicRNG.cpp \
     Source/PokemonSwSh/Programs/RNG/PokemonSwSh_CramomaticRNG.cpp \
     Source/PokemonSwSh/Programs/RNG/PokemonSwSh_Seedfinder.cpp \
-    Source/PokemonSwSh/Programs/RNG/PokemonSwSh_Xoroshiro128Plus.cpp \
     Source/PokemonSwSh/Programs/ShinyHuntAutonomous/PokemonSwSh_ShinyHuntAutonomous-BerryTree.cpp \
     Source/PokemonSwSh/Programs/ShinyHuntAutonomous/PokemonSwSh_ShinyHuntAutonomous-Fishing.cpp \
     Source/PokemonSwSh/Programs/ShinyHuntAutonomous/PokemonSwSh_ShinyHuntAutonomous-IoATrade.cpp \
@@ -1523,6 +1523,7 @@ HEADERS += \
     Source/Pokemon/Pokemon_StatsCalculation.h \
     Source/Pokemon/Pokemon_Strings.h \
     Source/Pokemon/Pokemon_Types.h \
+    Source/Pokemon/Pokemon_Xoroshiro128Plus.h \
     Source/Pokemon/Resources/Pokemon_BerryNames.h \
     Source/Pokemon/Resources/Pokemon_BerrySprites.h \
     Source/Pokemon/Resources/Pokemon_EggSteps.h \
@@ -2018,7 +2019,6 @@ HEADERS += \
     Source/PokemonSwSh/Programs/RNG/PokemonSwSh_BasicRNG.h \
     Source/PokemonSwSh/Programs/RNG/PokemonSwSh_CramomaticRNG.h \
     Source/PokemonSwSh/Programs/RNG/PokemonSwSh_SeedFinder.h \
-    Source/PokemonSwSh/Programs/RNG/PokemonSwSh_Xoroshiro128Plus.h \
     Source/PokemonSwSh/Programs/ReleaseHelpers.h \
     Source/PokemonSwSh/Programs/ShinyHuntAutonomous/PokemonSwSh_ShinyHuntAutonomous-BerryTree.h \
     Source/PokemonSwSh/Programs/ShinyHuntAutonomous/PokemonSwSh_ShinyHuntAutonomous-Fishing.h \

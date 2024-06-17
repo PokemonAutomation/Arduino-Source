@@ -37,5 +37,19 @@ void JsonArray::dump(const std::string& filename, int indent) const{
 }
 
 
+const JsonValue& JsonArray::operator[](size_t index) const{
+    if (index >= m_data.size()){
+        throw JsonParseException("", m_data.size(), index);
+    }
+    return m_data[index];
+}
+JsonValue& JsonArray::operator[](size_t index){
+    if (index >= m_data.size()){
+        throw JsonParseException("", m_data.size(), index);
+    }
+    return m_data[index];
+}
+
+
 
 }

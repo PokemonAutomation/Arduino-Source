@@ -40,6 +40,17 @@ JsonParseException::JsonParseException(
 }
 JsonParseException::JsonParseException(
     const std::string& filename,
+    size_t size, size_t index
+)
+    : ParseException("Index Out-of-Bounds: size = " + std::to_string(size) + ", index = " + std::to_string(index))
+{
+    if (!filename.empty()){
+        m_message += "\n\n";
+        m_message += filename;
+    }
+}
+JsonParseException::JsonParseException(
+    const std::string& filename,
     const std::string& key
 )
     : ParseException("Key not Found: " + key)

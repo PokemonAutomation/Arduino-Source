@@ -33,8 +33,8 @@ public:
     bool    empty   () const{ return m_data.empty(); }
     size_t  size    () const{ return m_data.size(); }
 
-    const JsonValue& operator[](size_t index) const{ return m_data[index]; }
-          JsonValue& operator[](size_t index)      { return m_data[index]; }
+    const JsonValue& operator[](size_t index) const;
+          JsonValue& operator[](size_t index)      ;
 
     void push_back(JsonValue&& x){ m_data.emplace_back(std::move(x)); }
 
