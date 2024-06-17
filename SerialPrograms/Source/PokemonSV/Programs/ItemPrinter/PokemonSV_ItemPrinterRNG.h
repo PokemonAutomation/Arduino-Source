@@ -58,6 +58,8 @@ public:
     ItemPrinterRngTable(std::string label);
     virtual std::vector<std::string> make_header() const override;
     std::vector<std::unique_ptr<EditableTableRow>> make_defaults();
+
+    friend class ItemPrinterRngRow;
 };
 
 

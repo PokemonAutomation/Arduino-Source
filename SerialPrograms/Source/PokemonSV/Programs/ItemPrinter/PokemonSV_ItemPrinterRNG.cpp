@@ -30,7 +30,10 @@
 #include "PokemonSV/Programs/Farming/PokemonSV_MaterialFarmerTools.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSV_ItemPrinterRNG.h"
+
 #include <iostream>
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -41,7 +44,7 @@ namespace PokemonSV{
 ItemPrinterRngRow::~ItemPrinterRngRow(){
     chain.remove_listener(*this);
     date.remove_listener(*this);
-//    jobs.remove_listener(*this);
+    jobs.remove_listener(*this);
     desired_item.remove_listener(*this);
 }
 ItemPrinterRngRow::ItemPrinterRngRow(EditableTableOption& parent_table)
@@ -73,7 +76,7 @@ ItemPrinterRngRow::ItemPrinterRngRow(EditableTableOption& parent_table)
 
     chain.add_listener(*this);
     date.add_listener(*this);
-//    jobs.add_listener(*this);
+    jobs.add_listener(*this);
     desired_item.add_listener(*this);
 
     ItemPrinterRngRow::value_changed(this);
@@ -109,6 +112,8 @@ std::unique_ptr<EditableTableRow> ItemPrinterRngRow::clone() const{
 void ItemPrinterRngRow::value_changed(void* object){
     date.set_visibility(chain ? ConfigOptionState::HIDDEN : ConfigOptionState::ENABLED);
 
+    ItemPrinterRngTable& table = static_cast<ItemPrinterRngTable&>(parent());
+
     //  User initiated desired item change.
     if (object == &desired_item){
         ItemPrinterItems option = desired_item;
@@ -118,6 +123,7 @@ void ItemPrinterRngRow::value_changed(void* object){
             date.set(from_seconds_since_epoch(option_data.seed));
             jobs.set(option_data.jobs);
         }
+        table.report_value_changed(object);
         return;
     }
 
@@ -125,6 +131,7 @@ void ItemPrinterRngRow::value_changed(void* object){
 
     if (chain){
         desired_item.set(ItemPrinterItems::NONE);
+        table.report_value_changed(object);
         return;
     }
 
@@ -135,15 +142,19 @@ void ItemPrinterRngRow::value_changed(void* object){
     }else{
         desired_item.set(option_data->enum_value);
     }
+
+    table.report_value_changed(object);
 }
 
 ItemPrinterRngTable::ItemPrinterRngTable(std::string label)
     : EditableTableOption_t<ItemPrinterRngRow>(
         std::move(label),
-        LockMode::UNLOCK_WHILE_RUNNING,
-        make_defaults()
+        LockMode::UNLOCK_WHILE_RUNNING
     )
-{}
+{
+    //  Need to do this separately because this prematurely accesses the table.
+    set_default(make_defaults());
+}
 std::vector<std::string> ItemPrinterRngTable::make_header() const{
     return std::vector<std::string>{
         "Continue Previous?",
@@ -206,6 +217,7 @@ std::unique_ptr<StatsTracker> ItemPrinterRNG_Descriptor::make_stats() const{
 }
 
 ItemPrinterRNG::~ItemPrinterRNG(){
+    TABLE.remove_listener(*this);
     AUTO_MATERIAL_FARMING.remove_listener(*this);
 }
 
@@ -325,6 +337,7 @@ ItemPrinterRNG::ItemPrinterRNG()
 
     ItemPrinterRNG::value_changed(this);
     AUTO_MATERIAL_FARMING.add_listener(*this);
+    TABLE.add_listener(*this);
 }
 
 void ItemPrinterRNG::value_changed(void* object){
