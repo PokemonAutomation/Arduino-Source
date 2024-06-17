@@ -114,7 +114,6 @@ void ItemPrinterRngRow::value_changed(void* object){
 
     ItemPrinterRngTable& table = static_cast<ItemPrinterRngTable&>(parent());
 
-    //  User initiated desired item change.
     if (object == &desired_item){
         ItemPrinterItems option = desired_item;
         if (option != ItemPrinterItems::NONE){
@@ -123,24 +122,17 @@ void ItemPrinterRngRow::value_changed(void* object){
             date.set(from_seconds_since_epoch(option_data.seed));
             jobs.set(option_data.jobs);
         }
-        table.report_value_changed(object);
-        return;
-    }
-
-    //  Other change.
-
-    if (chain){
-        desired_item.set(ItemPrinterItems::NONE);
-        table.report_value_changed(object);
-        return;
-    }
-
-    //  See if the seed matches a known seed.
-    const ItemPrinterEnumOption* option_data = option_lookup_by_seed(to_seconds_since_epoch(date));
-    if (option_data == nullptr){
-        desired_item.set(ItemPrinterItems::NONE);
-    }else{
-        desired_item.set(option_data->enum_value);
+    }else if (object == &chain){
+        if (chain){
+            desired_item.set(ItemPrinterItems::NONE);
+        }
+    }else if (object == &date){
+        const ItemPrinterEnumOption* option_data = option_lookup_by_seed(to_seconds_since_epoch(date));
+        if (option_data == nullptr){
+            desired_item.set(ItemPrinterItems::NONE);
+        }else{
+            desired_item.set(option_data->enum_value);
+        }
     }
 
     table.report_value_changed(object);
