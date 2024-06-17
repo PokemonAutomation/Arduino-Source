@@ -103,6 +103,9 @@ ItemPrinterRNG::ItemPrinterRNG()
     , AFTER_ITEM_PRINTER_DONE_EXPLANATION(
         "Then proceed to material farming."
     )
+    , OVERLAPPING_BONUS_WARNING(
+        ""
+    )
     , TABLE0(
         "<b>Rounds Table:</b><br>Run the following prints in order and repeat. "
         "Changes to this table take effect the next time the table starts from the beginning."
@@ -175,6 +178,7 @@ ItemPrinterRNG::ItemPrinterRNG()
     }
     PA_ADD_OPTION(NUM_ITEM_PRINTER_ROUNDS);
     PA_ADD_OPTION(AFTER_ITEM_PRINTER_DONE_EXPLANATION);
+    PA_ADD_OPTION(OVERLAPPING_BONUS_WARNING);
     PA_ADD_OPTION(TABLE0);
     PA_ADD_OPTION(DELAY_MILLIS);
     PA_ADD_OPTION(ADJUST_DELAY);
@@ -207,6 +211,44 @@ void ItemPrinterRNG::value_changed(void* object){
         AFTER_ITEM_PRINTER_DONE_EXPLANATION.set_text("Then stop the program.");
         MATERIAL_FARMER_DISABLED_EXPLANATION.set_text("<br>To enable the Material Farmer, enable \"Automatic Material Farming\" above");
     }
+
+    if (overlapping_bonus()){
+        OVERLAPPING_BONUS_WARNING.set_text(
+            "<font color=\"red\">WARNING: At least one of the Ball/Item bonuses haven't been fully used up. "
+            "This can mess up your rewards for subsequent prints.</font><br>"
+            "<font color=\"red\">\nNote: Each Ball/Item bonus lasts for 10 prints.</font>");
+        // std::cout << "Warning: One of the Ball/Item bonuses haven't been fully used up. This can mess up your rewards for subsequent prints. Note: Each Ball/Item bonus lasts for 10 prints" << std::endl;
+    }else{
+        OVERLAPPING_BONUS_WARNING.set_text("");
+    }
+    
+}
+
+
+// - return true if the user is trying to trigger another Ball/Item bonus without
+// using up the previous bonus. Doing this can mess up rewards for subsequent prints, 
+// since a ball bonus interferes with activating an item bonus and vice versa.
+// - each Bonus lasts for 10 prints.
+bool ItemPrinterRNG::overlapping_bonus(){
+    // for each row in table. if ball/item bonus, ensure that sum of prints in subsequent rows >=10 before the next bonus, or end of the table.
+    uint16_t total_prints_since_last_bonus = 10;
+    for (std::shared_ptr<EditableTableRow> table_row : TABLE0.current_refs()){
+        std::shared_ptr<ItemPrinterRngRow> row = std::static_pointer_cast<ItemPrinterRngRow>(table_row);
+        if (row->desired_item == ItemPrinter::PrebuiltOptions::BALL_BONUS || row->desired_item == ItemPrinter::PrebuiltOptions::ITEM_BONUS){
+            if (total_prints_since_last_bonus < 10){
+                return true;
+            }
+            total_prints_since_last_bonus = 0;
+        }else{
+            total_prints_since_last_bonus += (uint16_t)static_cast<ItemPrinterJobs>(row->jobs);
+        }
+    }
+
+    if (total_prints_since_last_bonus < 10){
+        return true;
+    }
+
+    return false;
 }
 
 
