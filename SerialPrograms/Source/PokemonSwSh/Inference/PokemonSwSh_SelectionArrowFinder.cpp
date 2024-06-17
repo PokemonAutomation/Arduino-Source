@@ -5,16 +5,18 @@
  */
 
 #include <iostream>
+#include "Common/Cpp/Exceptions.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/Notifications/ProgramInfo.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "CommonFramework/ImageMatch/ExactImageMatcher.h"
+#include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/DebugDumper.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "PokemonSwSh_SelectionArrowFinder.h"
-
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -41,13 +43,29 @@ bool is_selection_arrow(const ImageViewRGB32& image, const WaterfillObject& obje
     }
 
     ImageRGB32 cropped = extract_box_reference(image, object).copy();
+    auto packed_matrix = object.packed_matrix();
+    size_t matrix_width = packed_matrix->width();
+    size_t matrix_height = packed_matrix->height();
+    try{
+        filter_by_mask(
+            std::move(packed_matrix),
+            cropped,
+            COLOR_WHITE,
+            true
+        );
+    }catch (InternalProgramError&){
+        global_logger_tagged().log(
+            "Mismatching matrix and image size.\n"
+            "    Matrix: " + std::to_string(matrix_width) + "x" + std::to_string(matrix_height) +
+            "    Object: " + std::to_string(object.width()) + "x" + std::to_string(object.height()) +
+            "    Object X: " + std::to_string(object.min_x) + "-" + std::to_string(object.max_x) +
+            "    Object Y: " + std::to_string(object.min_y) + "-" + std::to_string(object.max_y),
+            COLOR_RED
+        );
+        dump_image(global_logger_tagged(), ProgramInfo(), "is_selection_arrow_size_mismatch", image);
+        throw;
+    }
 
-    filter_by_mask(
-        object.packed_matrix(),
-        cropped,
-        COLOR_WHITE,
-        true
-    );
 
     double rmsd = SELECTION_ARROW().rmsd(cropped);
     
