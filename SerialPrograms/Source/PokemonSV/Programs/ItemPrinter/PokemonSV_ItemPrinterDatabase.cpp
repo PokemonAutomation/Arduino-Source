@@ -540,8 +540,22 @@ DateSeed get_date_seed(int64_t seed){
         {2117201835 + 2, {2117201835 + 2, {}, {"poke-ball", "premier-ball", "great-ball", "poke-ball", "dive-ball"}}},
 
         {2512943468, {2512943468, {}, {"level-ball", "level-ball", "friend-ball", "lure-ball", "beast-ball", "moon-ball", "fast-ball", "dream-ball", "love-ball", "beast-ball"}}},
+        {2512943468 - 2, {2512943468 - 2, {}, {"level-ball", "dusk-ball", "sport-ball", "great-ball", "dusk-ball", "great-ball", "timer-ball", "premier-ball", "premier-ball", "safari-ball"}}},
+        {2512943468 - 1, {2512943468 - 1, {}, {"level-ball", "premier-ball", "dream-ball", "beast-ball", "dream-ball", "premier-ball", "luxury-ball", "lure-ball", "luxury-ball", "poke-ball"}}},
+        {2512943468 + 1, {2512943468 + 1, {}, {"level-ball", "premier-ball", "sport-ball", "premier-ball", "poke-ball", "great-ball", "great-ball", "poke-ball", "luxury-ball", "dive-ball"}}},
+        {2512943468 + 2, {2512943468 + 2, {}, {"level-ball", "lure-ball", "moon-ball", "heal-ball", "heal-ball", "dream-ball", "great-ball", "safari-ball", "premier-ball", "premier-ball"}}},
+
         {1949209749, {1949209749, {}, {"love-ball", "dream-ball", "heavy-ball", "lure-ball", "fast-ball", "fast-ball", "safari-ball", "safari-ball", "friend-ball", "heavy-ball"}}},
+        {1949209749 - 2, {1949209749 - 2, {}, {"ultra-ball", "luxury-ball", "luxury-ball", "poke-ball", "poke-ball", "moon-ball", "heal-ball", "timer-ball", "dusk-ball", "great-ball"}}},
+        {1949209749 - 1, {1949209749 - 1, {}, {"net-ball", "heal-ball", "heavy-ball", "heal-ball", "dive-ball", "great-ball", "great-ball", "premier-ball", "luxury-ball", "love-ball"}}},
+        {1949209749 + 1, {1949209749 + 1, {}, {"luxury-ball", "heal-ball", "poke-ball", "poke-ball", "premier-ball", "sport-ball", "luxury-ball", "premier-ball", "poke-ball", "poke-ball"}}},
+        {1949209749 + 2, {1949209749 + 2, {}, {"dusk-ball", "lure-ball", "fast-ball", "premier-ball", "great-ball", "luxury-ball", "poke-ball", "safari-ball", "luxury-ball", "premier-ball"}}},
+
         {1583217498, {1583217498, {}, {"sport-ball", "master-ball", "fast-ball", "master-ball", "dream-ball", "friend-ball", "lure-ball", "sport-ball", "moon-ball", "dream-ball"}}},
+        {1583217498 - 2, {1583217498 - 2, {}, {"heal-ball", "net-ball", "poke-ball", "premier-ball", "poke-ball", "repeat-ball", "luxury-ball", "poke-ball", "great-ball", "heal-ball"}}},
+        {1583217498 - 1, {1583217498 - 1, {}, {"poke-ball", "heal-ball", "heavy-ball", "luxury-ball", "moon-ball", "timer-ball", "premier-ball", "great-ball", "great-ball", "friend-ball"}}},
+        {1583217498 + 1, {1583217498 + 1, {}, {"level-ball", "dive-ball", "great-ball", "luxury-ball", "moon-ball", "friend-ball", "timer-ball", "heal-ball", "poke-ball", "quick-ball"}}},
+        {1583217498 + 2, {1583217498 + 2, {}, {"luxury-ball", "friend-ball", "dream-ball", "heal-ball", "luxury-ball", "great-ball", "premier-ball", "dusk-ball", "level-ball", "beast-ball"}}},
 
         //  Template
 //        {1717461428 - 2, {1717461428 - 2, {}, }},
