@@ -124,6 +124,7 @@ SOURCES += \
     ../Common/Cpp/Time.cpp \
     ../Common/Cpp/Unicode.cpp \
     ../Common/Microcontroller/DeviceRoutines.cpp \
+    ../Common/PokemonSwSh/PokemonSwSh_MultiHostTable.cpp \
     ../Common/Qt/AutoHeightTable.cpp \
     ../Common/Qt/AutoWidthLineEdit.cpp \
     ../Common/Qt/CodeValidator.cpp \

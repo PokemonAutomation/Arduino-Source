@@ -44,8 +44,9 @@ ItemPrinterRngRow::~ItemPrinterRngRow(){
 //    jobs.remove_listener(*this);
     desired_item.remove_listener(*this);
 }
-ItemPrinterRngRow::ItemPrinterRngRow()
-    : chain(LockMode::UNLOCK_WHILE_RUNNING, false)
+ItemPrinterRngRow::ItemPrinterRngRow(EditableTableOption& parent_table)
+    : EditableTableRow(parent_table)
+    , chain(LockMode::UNLOCK_WHILE_RUNNING, false)
     , date(
         LockMode::UNLOCK_WHILE_RUNNING,
         DateTimeOption::DATE_HOUR_MIN_SEC,
@@ -77,8 +78,11 @@ ItemPrinterRngRow::ItemPrinterRngRow()
 
     ItemPrinterRngRow::value_changed(this);
 }
-ItemPrinterRngRow::ItemPrinterRngRow(bool p_chain, const DateTime& p_date, ItemPrinterJobs p_jobs)
-    : ItemPrinterRngRow()
+ItemPrinterRngRow::ItemPrinterRngRow(
+    EditableTableOption& parent_table,
+    bool p_chain, const DateTime& p_date, ItemPrinterJobs p_jobs
+)
+    : ItemPrinterRngRow(parent_table)
 {
     chain = p_chain;
     date.set(p_date);
@@ -90,7 +94,7 @@ ItemPrinterRngRowSnapshot ItemPrinterRngRow::snapshot() const{
     return ItemPrinterRngRowSnapshot{chain, date, jobs};
 }
 std::unique_ptr<EditableTableRow> ItemPrinterRngRow::clone() const{
-    std::unique_ptr<ItemPrinterRngRow> ret(new ItemPrinterRngRow());
+    std::unique_ptr<ItemPrinterRngRow> ret(new ItemPrinterRngRow(parent()));
     ret->chain = (bool)chain;
     ret->date.set(date);
     ret->jobs.set(jobs);
@@ -150,12 +154,12 @@ std::vector<std::string> ItemPrinterRngTable::make_header() const{
 }
 std::vector<std::unique_ptr<EditableTableRow>> ItemPrinterRngTable::make_defaults(){
     std::vector<std::unique_ptr<EditableTableRow>> ret;
-    ret.emplace_back(std::make_unique<ItemPrinterRngRow>(false, DateTime{2024,  6,  4,  0, 37,  8}, ItemPrinterJobs::Jobs_1));
-    ret.emplace_back(std::make_unique<ItemPrinterRngRow>(false, DateTime{2049,  8, 18, 23, 51,  8}, ItemPrinterJobs::Jobs_10));
-    ret.emplace_back(std::make_unique<ItemPrinterRngRow>(false, DateTime{2024,  6,  4,  0, 37,  8}, ItemPrinterJobs::Jobs_1));
-    ret.emplace_back(std::make_unique<ItemPrinterRngRow>(false, DateTime{2031, 10,  8,  7,  9,  9}, ItemPrinterJobs::Jobs_10));
-    ret.emplace_back(std::make_unique<ItemPrinterRngRow>(false, DateTime{2024,  6,  4,  0, 37,  8}, ItemPrinterJobs::Jobs_1));
-    ret.emplace_back(std::make_unique<ItemPrinterRngRow>(false, DateTime{2020,  3,  3,  6, 38, 18}, ItemPrinterJobs::Jobs_10));
+    ret.emplace_back(std::make_unique<ItemPrinterRngRow>(*this, false, DateTime{2024,  6,  4,  0, 37,  8}, ItemPrinterJobs::Jobs_1));
+    ret.emplace_back(std::make_unique<ItemPrinterRngRow>(*this, false, DateTime{2049,  8, 18, 23, 51,  8}, ItemPrinterJobs::Jobs_10));
+    ret.emplace_back(std::make_unique<ItemPrinterRngRow>(*this, false, DateTime{2024,  6,  4,  0, 37,  8}, ItemPrinterJobs::Jobs_1));
+    ret.emplace_back(std::make_unique<ItemPrinterRngRow>(*this, false, DateTime{2031, 10,  8,  7,  9,  9}, ItemPrinterJobs::Jobs_10));
+    ret.emplace_back(std::make_unique<ItemPrinterRngRow>(*this, false, DateTime{2024,  6,  4,  0, 37,  8}, ItemPrinterJobs::Jobs_1));
+    ret.emplace_back(std::make_unique<ItemPrinterRngRow>(*this, false, DateTime{2020,  3,  3,  6, 38, 18}, ItemPrinterJobs::Jobs_10));
     return ret;
 }
 

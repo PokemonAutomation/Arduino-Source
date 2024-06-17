@@ -40,6 +40,8 @@ enum class ConfigOptionState{
 class ConfigOption{
 public:
     struct Listener{
+        //  Pass the object that initiated the change. This is mainly used to
+        //  identify yourself as the initiater to avoid infinite loops.
         virtual void value_changed(void* object){}
         virtual void visibility_changed(){}
         virtual void program_state_changed(bool program_is_running){}

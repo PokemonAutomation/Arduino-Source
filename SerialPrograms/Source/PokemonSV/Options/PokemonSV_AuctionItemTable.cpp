@@ -13,13 +13,14 @@ namespace PokemonSV{
 
 
 
-AuctionItemSelectorRow::AuctionItemSelectorRow()
-    : item("level-ball")
+AuctionItemSelectorRow::AuctionItemSelectorRow(EditableTableOption& parent_table)
+    : EditableTableRow(parent_table)
+    , item("level-ball")
 {
     PA_ADD_OPTION(item);
 }
 std::unique_ptr<EditableTableRow> AuctionItemSelectorRow::clone() const{
-    std::unique_ptr<AuctionItemSelectorRow> ret(new AuctionItemSelectorRow());
+    std::unique_ptr<AuctionItemSelectorRow> ret(new AuctionItemSelectorRow(parent()));
     ret->item.set_by_index(item.index());
     return ret;
 }
@@ -66,7 +67,7 @@ std::vector<std::string> AuctionItemTable::make_header() const{
 
 std::vector<std::unique_ptr<EditableTableRow>> AuctionItemTable::make_defaults(){
     std::vector<std::unique_ptr<EditableTableRow>> ret;
-    ret.emplace_back(std::make_unique<AuctionItemSelectorRow>());
+    ret.emplace_back(std::make_unique<AuctionItemSelectorRow>(*this));
     return ret;
 }
 

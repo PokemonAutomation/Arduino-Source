@@ -19,7 +19,7 @@ namespace Integration{
 
 class DiscordWebhookUrl : public EditableTableRow{
 public:
-    DiscordWebhookUrl();
+    DiscordWebhookUrl(EditableTableOption& parent_table);
     virtual std::unique_ptr<EditableTableRow> clone() const override;
     virtual void load_json(const JsonValue& json) override;
 

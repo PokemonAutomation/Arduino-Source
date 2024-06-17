@@ -11,13 +11,14 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
 
-TournamentPrizeSelectorRow::TournamentPrizeSelectorRow()
-    : item("beast-ball")
+TournamentPrizeSelectorRow::TournamentPrizeSelectorRow(EditableTableOption& parent_table)
+    : EditableTableRow(parent_table)
+    , item("beast-ball")
 {
     PA_ADD_OPTION(item);
 }
 std::unique_ptr<EditableTableRow> TournamentPrizeSelectorRow::clone() const{
-    std::unique_ptr<TournamentPrizeSelectorRow> ret(new TournamentPrizeSelectorRow());
+    std::unique_ptr<TournamentPrizeSelectorRow> ret(new TournamentPrizeSelectorRow(parent()));
     ret->item.set_by_index(item.index());
     return ret;
 }
@@ -58,7 +59,7 @@ std::vector<std::string> TournamentPrizeTable::make_header() const{
 
 std::vector<std::unique_ptr<EditableTableRow>> TournamentPrizeTable::make_defaults(){
     std::vector<std::unique_ptr<EditableTableRow>> ret;
-    ret.emplace_back(std::make_unique<TournamentPrizeSelectorRow>());
+    ret.emplace_back(std::make_unique<TournamentPrizeSelectorRow>(*this));
     return ret;
 }
 

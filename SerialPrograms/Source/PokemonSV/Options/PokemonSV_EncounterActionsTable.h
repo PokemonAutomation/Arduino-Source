@@ -43,7 +43,7 @@ struct EncounterActionsEntry{
 class EncounterActionsRow : public EditableTableRow, private ConfigOption::Listener{
 public:
     ~EncounterActionsRow();
-    EncounterActionsRow();
+    EncounterActionsRow(EditableTableOption& parent_table);
 
     virtual std::unique_ptr<EditableTableRow> clone() const override;
 
@@ -68,7 +68,7 @@ public:
 
     virtual std::vector<std::string> make_header() const;
 
-    static std::vector<std::unique_ptr<EditableTableRow>> make_defaults();
+    std::vector<std::unique_ptr<EditableTableRow>> make_defaults();
 
 };
 

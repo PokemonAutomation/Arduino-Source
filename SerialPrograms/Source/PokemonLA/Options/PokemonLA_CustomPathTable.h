@@ -82,7 +82,7 @@ public:
 
 class CustomPathTableRow2 : public EditableTableRow{
 public:
-    CustomPathTableRow2();
+    CustomPathTableRow2(EditableTableOption& parent_table);
     virtual std::unique_ptr<EditableTableRow> clone() const override;
 
     virtual void load_json(const JsonValue& json) override;
@@ -99,7 +99,7 @@ public:
     virtual std::vector<std::string> make_header() const override;
 
 private:
-    std::vector<std::unique_ptr<EditableTableRow>> make_defaults() const;
+    std::vector<std::unique_ptr<EditableTableRow>> make_defaults();
 };
 
 

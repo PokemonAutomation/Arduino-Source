@@ -55,8 +55,9 @@ std::string EncounterActionFull::to_str() const{
 EncounterFilterOverride::~EncounterFilterOverride(){
     action.remove_listener(*this);
 }
-EncounterFilterOverride::EncounterFilterOverride()
-    : pokemon(ALL_POKEMON_NAMES(), LockMode::LOCK_WHILE_RUNNING, "starly")
+EncounterFilterOverride::EncounterFilterOverride(EditableTableOption& parent_table)
+    : EditableTableRow(parent_table)
+    , pokemon(ALL_POKEMON_NAMES(), LockMode::LOCK_WHILE_RUNNING, "starly")
 {
     PA_ADD_OPTION(action);
     PA_ADD_OPTION(pokeball);
@@ -92,7 +93,7 @@ void EncounterFilterOverride::load_json(const JsonValue& json){
     }
 }
 std::unique_ptr<EditableTableRow> EncounterFilterOverride::clone() const{
-    std::unique_ptr<EncounterFilterOverride> ret(new EncounterFilterOverride());
+    std::unique_ptr<EncounterFilterOverride> ret(new EncounterFilterOverride(parent()));
     ret->action.set(action);
     ret->pokeball.set_by_index(pokeball.index());
     ret->pokemon.set_by_index(pokemon.index());

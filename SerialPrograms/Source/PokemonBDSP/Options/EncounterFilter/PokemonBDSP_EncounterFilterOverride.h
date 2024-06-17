@@ -31,7 +31,7 @@ struct EncounterActionFull{
 class EncounterFilterOverride : public EditableTableRow, private ConfigOption::Listener{
 public:
     ~EncounterFilterOverride();
-    EncounterFilterOverride();
+    EncounterFilterOverride(EditableTableOption& parent_table);
     virtual void load_json(const JsonValue& json) override;
     virtual std::unique_ptr<EditableTableRow> clone() const override;
 

@@ -73,8 +73,9 @@ std::string TeraMoveEntry::to_str() const{
 TeraMoveTableRow::~TeraMoveTableRow(){
     type.remove_listener(*this);
 }
-TeraMoveTableRow::TeraMoveTableRow()
-    : type(tera_move_enum_database(), LockMode::UNLOCK_WHILE_RUNNING, TeraMoveType::Move1)
+TeraMoveTableRow::TeraMoveTableRow(EditableTableOption& parent_table)
+    : EditableTableRow(parent_table)
+    , type(tera_move_enum_database(), LockMode::UNLOCK_WHILE_RUNNING, TeraMoveType::Move1)
     , seconds(LockMode::UNLOCK_WHILE_RUNNING, 5)
     , target(tera_target_enum_database(), LockMode::UNLOCK_WHILE_RUNNING, TeraTarget::Opponent)
     , notes(false, LockMode::UNLOCK_WHILE_RUNNING, "", "(e.g. Screech, Belly Drum)")
@@ -88,7 +89,7 @@ TeraMoveTableRow::TeraMoveTableRow()
     type.add_listener(*this);
 }
 std::unique_ptr<EditableTableRow> TeraMoveTableRow::clone() const{
-    std::unique_ptr<TeraMoveTableRow> ret(new TeraMoveTableRow());
+    std::unique_ptr<TeraMoveTableRow> ret(new TeraMoveTableRow(parent()));
     ret->type.set(type);
     ret->seconds.set(seconds);
     ret->target.set(target);
@@ -152,7 +153,7 @@ std::vector<std::string> TeraMoveTable::make_header() const{
 }
 std::vector<std::unique_ptr<EditableTableRow>> TeraMoveTable::make_defaults(){
     std::vector<std::unique_ptr<EditableTableRow>> ret;
-    ret.emplace_back(new TeraMoveTableRow());
+    ret.emplace_back(new TeraMoveTableRow(*this));
     return ret;
 }
 

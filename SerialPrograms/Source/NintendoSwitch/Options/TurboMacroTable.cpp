@@ -126,15 +126,16 @@ void TurboMacroCell::value_changed(void* object){
 
 
 
-TurboMacroRow::TurboMacroRow()
-    : action(TurboMacroAction_Database(), LockMode::LOCK_WHILE_RUNNING, TurboMacroAction::NO_ACTION)
+TurboMacroRow::TurboMacroRow(EditableTableOption& parent_table)
+    : EditableTableRow(parent_table)
+    , action(TurboMacroAction_Database(), LockMode::LOCK_WHILE_RUNNING, TurboMacroAction::NO_ACTION)
     , parameters(action)
 {
     PA_ADD_OPTION(action);
     PA_ADD_OPTION(parameters);
 }
 std::unique_ptr<EditableTableRow> TurboMacroRow::clone() const{
-    std::unique_ptr<TurboMacroRow> ret(new TurboMacroRow());
+    std::unique_ptr<TurboMacroRow> ret(new TurboMacroRow(parent()));
     ret->action.set(action);
     ret->parameters = parameters;
     return ret;

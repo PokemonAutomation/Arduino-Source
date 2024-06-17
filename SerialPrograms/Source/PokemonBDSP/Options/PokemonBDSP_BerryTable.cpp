@@ -15,13 +15,14 @@ using namespace Pokemon;
 
 
 
-BerrySelectorRow2::BerrySelectorRow2()
-    : berry("cheri-berry")
+BerrySelectorRow2::BerrySelectorRow2(EditableTableOption& parent_table)
+    : EditableTableRow(parent_table)
+    , berry("cheri-berry")
 {
     PA_ADD_OPTION(berry);
 }
 std::unique_ptr<EditableTableRow> BerrySelectorRow2::clone() const{
-    std::unique_ptr<BerrySelectorRow2> ret(new BerrySelectorRow2());
+    std::unique_ptr<BerrySelectorRow2> ret(new BerrySelectorRow2(parent()));
     ret->berry.set_by_index(berry.index());
     return ret;
 }
@@ -70,7 +71,7 @@ std::vector<std::string> BerryTable::make_header() const{
 
 std::vector<std::unique_ptr<EditableTableRow>> BerryTable::make_defaults(){
     std::vector<std::unique_ptr<EditableTableRow>> ret;
-    ret.emplace_back(std::make_unique<BerrySelectorRow2>());
+    ret.emplace_back(std::make_unique<BerrySelectorRow2>(*this));
     return ret;
 }
 

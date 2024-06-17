@@ -41,8 +41,9 @@ const EnumDatabase<EncounterActionsShininess>& EncounterFilterShininess_database
 EncounterActionsRow::~EncounterActionsRow(){
     action.remove_listener(*this);
 }
-EncounterActionsRow::EncounterActionsRow()
-    : action(
+EncounterActionsRow::EncounterActionsRow(EditableTableOption& parent_table)
+    : EditableTableRow(parent_table)
+    , action(
         EncounterFilterAction_database(),
         LockMode::UNLOCK_WHILE_RUNNING,
         EncounterActionsAction::STOP_PROGRAM
@@ -69,7 +70,7 @@ EncounterActionsRow::EncounterActionsRow()
     action.add_listener(*this);
 }
 std::unique_ptr<EditableTableRow> EncounterActionsRow::clone() const{
-    std::unique_ptr<EncounterActionsRow> ret(new EncounterActionsRow());
+    std::unique_ptr<EncounterActionsRow> ret(new EncounterActionsRow(parent()));
     ret->action.set(action);
     ret->pokeball.set_by_index(pokeball.index());
     ret->pokemon.set_by_index(pokemon.index());

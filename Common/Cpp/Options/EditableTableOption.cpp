@@ -17,8 +17,13 @@
 namespace PokemonAutomation{
 
 
-EditableTableRow::EditableTableRow(void*)
-    : m_index((size_t)0 - 1)
+//EditableTableRow::EditableTableRow(void*)
+//    : m_parent(nullptr)
+//    , m_index((size_t)0 - 1)
+//{}
+EditableTableRow::EditableTableRow(EditableTableOption& parent_table)
+    : m_parent_table(parent_table)
+    , m_index((size_t)0 - 1)
 {}
 void EditableTableRow::add_option(ConfigOption& option, std::string serialization_string){
     m_options.emplace_back(std::move(serialization_string), &option);

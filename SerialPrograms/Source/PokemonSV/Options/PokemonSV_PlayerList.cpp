@@ -17,8 +17,9 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 
-PlayerListRow::PlayerListRow()
-    : enabled(LockMode::UNLOCK_WHILE_RUNNING, true)
+PlayerListRow::PlayerListRow(EditableTableOption& parent_table)
+    : EditableTableRow(parent_table)
+    , enabled(LockMode::UNLOCK_WHILE_RUNNING, true)
     , language(
         Pokemon::PokemonNameReader::instance().languages(),
         LockMode::UNLOCK_WHILE_RUNNING
@@ -34,7 +35,7 @@ PlayerListRow::PlayerListRow()
     PA_ADD_OPTION(notes);
 }
 std::unique_ptr<EditableTableRow> PlayerListRow::clone() const{
-    std::unique_ptr<PlayerListRow> ret(new PlayerListRow());
+    std::unique_ptr<PlayerListRow> ret(new PlayerListRow(parent()));
     ret->enabled = enabled.current_value();
     ret->language.set(language);
     ret->name.set(name);

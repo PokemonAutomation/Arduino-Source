@@ -27,7 +27,7 @@ const EnumDatabase<BattleMoveType>& Battle_move_enum_database();
 
 class BattleMoveTableRow : public EditableTableRow{
 public:
-    BattleMoveTableRow();
+    BattleMoveTableRow(EditableTableOption& parent_table);
     virtual std::unique_ptr<EditableTableRow> clone() const override;
 
 public:
@@ -40,7 +40,7 @@ public:
     BattleMoveTable();
 
     virtual std::vector<std::string> make_header() const;
-    static std::vector<std::unique_ptr<EditableTableRow>> make_defaults();
+    std::vector<std::unique_ptr<EditableTableRow>> make_defaults();
 };
 
 

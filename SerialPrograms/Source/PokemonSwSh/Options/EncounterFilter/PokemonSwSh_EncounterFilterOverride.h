@@ -20,14 +20,12 @@ namespace PokemonSwSh{
 class EncounterFilterOverride : public EditableTableRow, private ConfigOption::Listener{
 public:
     ~EncounterFilterOverride();
-    EncounterFilterOverride(bool rare_stars);
+    EncounterFilterOverride(EditableTableOption& parent_table);
     virtual void load_json(const JsonValue& json) override;
     virtual std::unique_ptr<EditableTableRow> clone() const override;
 
     virtual void value_changed(void* object) override;
 
-private:
-    const bool m_rare_stars;
 public:
     EncounterActionCell action;
     PokemonBallSelectCell pokeball;
@@ -43,10 +41,10 @@ public:
     EncounterFilterTable(bool rare_stars);
     std::vector<std::unique_ptr<EncounterFilterOverride>> copy_snapshot() const;
     virtual std::vector<std::string> make_header() const override;
-    virtual std::unique_ptr<EditableTableRow> make_row() const override;
+    virtual std::unique_ptr<EditableTableRow> make_row() override;
 
-private:
-    bool m_rare_stars;
+public:
+    const bool rare_stars;
 };
 
 

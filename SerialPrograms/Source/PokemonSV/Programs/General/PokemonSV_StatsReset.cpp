@@ -118,12 +118,12 @@ StatsReset::StatsReset()
     {
         std::vector<std::unique_ptr<EditableTableRow>> ret;
         {
-            auto row = std::make_unique<StatsHuntIvJudgeFilterRow>(FILTERS.feature_flags);
+            auto row = std::make_unique<StatsHuntIvJudgeFilterRow>(FILTERS);
             row->iv_atk.set(IvJudgeFilter::NoGood);
             ret.emplace_back(std::move(row));
         }
         {
-            auto row = std::make_unique<StatsHuntIvJudgeFilterRow>(FILTERS.feature_flags);
+            auto row = std::make_unique<StatsHuntIvJudgeFilterRow>(FILTERS);
             row->iv_speed.set(IvJudgeFilter::NoGood);
             ret.emplace_back(std::move(row));
         }

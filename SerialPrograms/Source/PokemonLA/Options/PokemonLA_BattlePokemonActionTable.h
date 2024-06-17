@@ -50,7 +50,7 @@ public:
 
 class BattlePokemonActionRow : public EditableTableRow{
 public:
-    BattlePokemonActionRow();
+    BattlePokemonActionRow(EditableTableOption& parent_table);
     virtual std::unique_ptr<EditableTableRow> clone() const override;
 
 public:
@@ -82,7 +82,7 @@ public:
 
 private:
     virtual std::vector<std::string> make_header() const;
-    static std::vector<std::unique_ptr<EditableTableRow>> make_defaults();
+    std::vector<std::unique_ptr<EditableTableRow>> make_defaults();
 };
 
 
@@ -100,7 +100,7 @@ private:
 // Used by MagikarpMoveGrinder, for each pokemon, set what style the first move to use
 class OneMoveBattlePokemonActionRow : public EditableTableRow{
 public:
-    OneMoveBattlePokemonActionRow();
+    OneMoveBattlePokemonActionRow(EditableTableOption& parent_table);
     virtual std::unique_ptr<EditableTableRow> clone() const override;
 
 public:
@@ -119,7 +119,7 @@ public:
 
 private:
     virtual std::vector<std::string> make_header() const;
-    std::vector<std::unique_ptr<EditableTableRow>> make_defaults() const;
+    std::vector<std::unique_ptr<EditableTableRow>> make_defaults();
 };
 
 
@@ -129,7 +129,7 @@ private:
 
 class MoveGrinderActionRow : public EditableTableRow{
 public:
-    MoveGrinderActionRow();
+    MoveGrinderActionRow(EditableTableOption& parent_table);
     virtual std::unique_ptr<EditableTableRow> clone() const override;
 
 public:

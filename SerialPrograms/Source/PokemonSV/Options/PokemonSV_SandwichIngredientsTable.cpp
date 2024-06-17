@@ -13,13 +13,14 @@ namespace PokemonSV{
 
 
 
-SandwichIngredientsTableRow::SandwichIngredientsTableRow()
-    : item("lettuce")
+SandwichIngredientsTableRow::SandwichIngredientsTableRow(EditableTableOption& parent_table)
+    : EditableTableRow(parent_table)
+    , item("lettuce")
 {
     PA_ADD_OPTION(item);
 }
 std::unique_ptr<EditableTableRow> SandwichIngredientsTableRow::clone() const{
-    std::unique_ptr<SandwichIngredientsTableRow> ret(new SandwichIngredientsTableRow());
+    std::unique_ptr<SandwichIngredientsTableRow> ret(new SandwichIngredientsTableRow(parent()));
     ret->item.set_by_index(item.index());
     return ret;
 }
@@ -41,7 +42,7 @@ std::vector<std::string> SandwichIngredientsTable::make_header() const{
 
 std::vector<std::unique_ptr<EditableTableRow>> SandwichIngredientsTable::make_defaults(){
     std::vector<std::unique_ptr<EditableTableRow>> ret;
-    ret.emplace_back(std::make_unique<SandwichIngredientsTableRow>());
+    ret.emplace_back(std::make_unique<SandwichIngredientsTableRow>(*this));
     return ret;
 }
 

@@ -15,8 +15,9 @@ namespace Integration{
 
 
 
-DiscordIntegrationChannel::DiscordIntegrationChannel()
-    : enabled(LockMode::UNLOCK_WHILE_RUNNING, true)
+DiscordIntegrationChannel::DiscordIntegrationChannel(EditableTableOption& parent_table)
+    : EditableTableRow(parent_table)
+    , enabled(LockMode::UNLOCK_WHILE_RUNNING, true)
     , label(false, LockMode::UNLOCK_WHILE_RUNNING, "", "My test server")
     , ping(LockMode::UNLOCK_WHILE_RUNNING, true)
     , tags_text(false, LockMode::UNLOCK_WHILE_RUNNING, "Notifs, Showcase, LiveHost", "")
@@ -34,7 +35,7 @@ DiscordIntegrationChannel::DiscordIntegrationChannel()
     add_option(channel_id, "Channel");
 }
 std::unique_ptr<EditableTableRow> DiscordIntegrationChannel::clone() const{
-    std::unique_ptr<DiscordIntegrationChannel> ret(new DiscordIntegrationChannel());
+    std::unique_ptr<DiscordIntegrationChannel> ret(new DiscordIntegrationChannel(parent()));
     ret->enabled = (bool)enabled;
     ret->label.set(label);
     ret->ping = (bool)ping;

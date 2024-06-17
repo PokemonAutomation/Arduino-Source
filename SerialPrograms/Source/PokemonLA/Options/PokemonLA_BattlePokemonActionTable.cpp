@@ -5,10 +5,10 @@
  */
 
 
-#include "Common/Compiler.h"
-#include "Common/Cpp/Json/JsonValue.h"
-#include "Common/Cpp/Json/JsonObject.h"
-#include "CommonFramework/Globals.h"
+//#include "Common/Compiler.h"
+//#include "Common/Cpp/Json/JsonValue.h"
+//#include "Common/Cpp/Json/JsonObject.h"
+//#include "CommonFramework/Globals.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLA_BattlePokemonActionTable.h"
 
@@ -35,8 +35,9 @@ const EnumDatabase<MoveStyle>& MoveStyle_Database(){
 
 
 
-BattlePokemonActionRow::BattlePokemonActionRow()
-    : switch_pokemon(LockMode::LOCK_WHILE_RUNNING, false)
+BattlePokemonActionRow::BattlePokemonActionRow(EditableTableOption& parent_table)
+    : EditableTableRow(parent_table)
+    , switch_pokemon(LockMode::LOCK_WHILE_RUNNING, false)
     , num_turns_to_switch(LockMode::LOCK_WHILE_RUNNING, 1)
     , stop_after_num_moves(LockMode::LOCK_WHILE_RUNNING, false)
     , num_moves_to_stop(LockMode::LOCK_WHILE_RUNNING, 25, 0)
@@ -51,7 +52,7 @@ BattlePokemonActionRow::BattlePokemonActionRow()
     PA_ADD_OPTION(num_moves_to_stop);
 }
 std::unique_ptr<EditableTableRow> BattlePokemonActionRow::clone() const{
-    std::unique_ptr<BattlePokemonActionRow> ret(new BattlePokemonActionRow());
+    std::unique_ptr<BattlePokemonActionRow> ret(new BattlePokemonActionRow(parent()));
     ret->style[0].set(style[0]);
     ret->style[1].set(style[1]);
     ret->style[2].set(style[2]);
@@ -66,7 +67,7 @@ std::unique_ptr<EditableTableRow> BattlePokemonActionRow::clone() const{
 
 std::vector<std::unique_ptr<EditableTableRow>> BattlePokemonActionTable::make_defaults(){
     std::vector<std::unique_ptr<EditableTableRow>> ret;
-    ret.emplace_back(std::make_unique<BattlePokemonActionRow>());
+    ret.emplace_back(std::make_unique<BattlePokemonActionRow>(*this));
     return ret;
 }
 BattlePokemonActionTable::BattlePokemonActionTable()
@@ -133,18 +134,20 @@ bool BattlePokemonActionTable::stop_battle(size_t pokemon, size_t num_move_attem
 
 
 
-OneMoveBattlePokemonActionRow::OneMoveBattlePokemonActionRow(){
+OneMoveBattlePokemonActionRow::OneMoveBattlePokemonActionRow(EditableTableOption& parent_table)
+    : EditableTableRow(parent_table)
+{
     PA_ADD_OPTION(style);
 }
 std::unique_ptr<EditableTableRow> OneMoveBattlePokemonActionRow::clone() const{
-    std::unique_ptr<OneMoveBattlePokemonActionRow> ret(new OneMoveBattlePokemonActionRow());
+    std::unique_ptr<OneMoveBattlePokemonActionRow> ret(new OneMoveBattlePokemonActionRow(parent()));
     ret->style.set(style);
     return ret;
 }
 
-std::vector<std::unique_ptr<EditableTableRow>> OneMoveBattlePokemonActionTable::make_defaults() const{
+std::vector<std::unique_ptr<EditableTableRow>> OneMoveBattlePokemonActionTable::make_defaults(){
     std::vector<std::unique_ptr<EditableTableRow>> ret;
-    ret.emplace_back(std::make_unique<OneMoveBattlePokemonActionRow>());
+    ret.emplace_back(std::make_unique<OneMoveBattlePokemonActionRow>(*this));
     return ret;
 }
 OneMoveBattlePokemonActionTable::OneMoveBattlePokemonActionTable()
@@ -198,8 +201,9 @@ const IntegerEnumDatabase& MoveIndex_Database(){
 
 
 
-MoveGrinderActionRow::MoveGrinderActionRow()
-    : pokemon_index(PokemonIndex_Database(), LockMode::LOCK_WHILE_RUNNING, 0)
+MoveGrinderActionRow::MoveGrinderActionRow(EditableTableOption& parent_table)
+    : EditableTableRow(parent_table)
+    , pokemon_index(PokemonIndex_Database(), LockMode::LOCK_WHILE_RUNNING, 0)
     , move_index(MoveIndex_Database(), LockMode::LOCK_WHILE_RUNNING, 0)
     , attempts(LockMode::LOCK_WHILE_RUNNING, 1, 1)
 {
@@ -209,7 +213,7 @@ MoveGrinderActionRow::MoveGrinderActionRow()
     PA_ADD_OPTION(attempts);
 }
 std::unique_ptr<EditableTableRow> MoveGrinderActionRow::clone() const{
-    std::unique_ptr<MoveGrinderActionRow> ret(new MoveGrinderActionRow());
+    std::unique_ptr<MoveGrinderActionRow> ret(new MoveGrinderActionRow(parent()));
     ret->pokemon_index.set_value(pokemon_index.current_value());
     ret->move_index.set_value(move_index.current_value());
     ret->style.set(style);

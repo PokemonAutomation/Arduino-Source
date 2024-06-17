@@ -24,15 +24,16 @@ const EnumDatabase<BoxSortingSortType>& BallType_Database(){
 
 
 
-BoxSortingRow::BoxSortingRow()
-    : sort_type(BallType_Database(), LockMode::LOCK_WHILE_RUNNING, BoxSortingSortType::NationalDexNo)
+BoxSortingRow::BoxSortingRow(EditableTableOption& parent_table)
+    : EditableTableRow(parent_table)
+    , sort_type(BallType_Database(), LockMode::LOCK_WHILE_RUNNING, BoxSortingSortType::NationalDexNo)
     , reverse(LockMode::LOCK_WHILE_RUNNING, false)
 {
     PA_ADD_OPTION(sort_type);
     PA_ADD_OPTION(reverse);
 }
 std::unique_ptr<EditableTableRow> BoxSortingRow::clone() const{
-    std::unique_ptr<BoxSortingRow> ret(new BoxSortingRow());
+    std::unique_ptr<BoxSortingRow> ret(new BoxSortingRow(parent()));
     ret->sort_type.set_value(sort_type.current_value());
     ret->reverse = reverse.current_value();
     return ret;
@@ -72,7 +73,7 @@ std::vector<std::string> BoxSortingTable::make_header() const{
 
 std::vector<std::unique_ptr<EditableTableRow>> BoxSortingTable::make_defaults(){
     std::vector<std::unique_ptr<EditableTableRow>> ret;
-    ret.emplace_back(std::make_unique<BoxSortingRow>());
+    ret.emplace_back(std::make_unique<BoxSortingRow>(*this));
     return ret;
 }
 

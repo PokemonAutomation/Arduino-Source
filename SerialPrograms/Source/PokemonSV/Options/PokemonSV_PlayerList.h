@@ -34,7 +34,7 @@ struct PlayerListRowSnapshot{
 
 class PlayerListRow : public EditableTableRow{
 public:
-    PlayerListRow();
+    PlayerListRow(EditableTableOption& parent_table);
     virtual std::unique_ptr<EditableTableRow> clone() const;
 
     PlayerListRowSnapshot snapshot() const;
@@ -55,7 +55,7 @@ public:
     );
 
     virtual std::vector<std::string> make_header() const;
-    static std::vector<std::unique_ptr<EditableTableRow>> make_defaults();
+    std::vector<std::unique_ptr<EditableTableRow>> make_defaults();
 
     std::vector<PlayerListRowSnapshot> snapshot() const;
 

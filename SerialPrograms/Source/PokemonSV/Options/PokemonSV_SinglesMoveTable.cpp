@@ -56,10 +56,12 @@ std::string SinglesMoveEntry::to_str() const{
 SinglesMoveTableRow::~SinglesMoveTableRow(){
     type.remove_listener(*this);
 }
-SinglesMoveTableRow::SinglesMoveTableRow(bool trainer_battle)
-    : m_trainer_battle(trainer_battle)
+SinglesMoveTableRow::SinglesMoveTableRow(EditableTableOption& parent_table)
+    : EditableTableRow(parent_table)
     , type(
-        trainer_battle ? singles_move_enum_database_trainer() : singles_move_enum_database_wild(),
+        static_cast<const SinglesMoveTable&>(parent_table).m_trainer_battle
+            ? singles_move_enum_database_trainer()
+            : singles_move_enum_database_wild(),
         LockMode::UNLOCK_WHILE_RUNNING,
         SinglesMoveType::Move1
     )
@@ -73,11 +75,8 @@ SinglesMoveTableRow::SinglesMoveTableRow(bool trainer_battle)
     SinglesMoveTableRow::value_changed(this);
     type.add_listener(*this);
 }
-SinglesMoveTableRow::SinglesMoveTableRow(const EditableTableOption& table)
-    : SinglesMoveTableRow(static_cast<const SinglesMoveTable&>(table).m_trainer_battle)
-{}
 std::unique_ptr<EditableTableRow> SinglesMoveTableRow::clone() const{
-    std::unique_ptr<SinglesMoveTableRow> ret(new SinglesMoveTableRow(m_trainer_battle));
+    std::unique_ptr<SinglesMoveTableRow> ret(new SinglesMoveTableRow(parent()));
     ret->type.set(type);
     ret->terastallize = (bool)terastallize;
     ret->notes.set(notes);

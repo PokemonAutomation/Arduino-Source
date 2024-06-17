@@ -81,9 +81,8 @@ struct StatsHuntRowMisc{
 class StatsHuntIvJudgeFilterTable;
 class StatsHuntIvJudgeFilterRow : public EditableTableRow{
 public:
-    StatsHuntIvJudgeFilterRow(const StatsHuntMiscFeatureFlags& feature_flags);
-    StatsHuntIvJudgeFilterRow(const EditableTableOption& table);
-    StatsHuntIvJudgeFilterRow(const StatsHuntMiscFeatureFlags& feature_flags, StatsHuntShinyFilter p_shiny);
+    StatsHuntIvJudgeFilterRow(EditableTableOption& parent_table);
+    StatsHuntIvJudgeFilterRow(EditableTableOption& parent_table, StatsHuntShinyFilter p_shiny);
     virtual std::unique_ptr<EditableTableRow> clone() const override;
 
     bool matches(
@@ -110,7 +109,7 @@ public:
         const StatsHuntMiscFeatureFlags& p_feature_flags
     );
     virtual std::vector<std::string> make_header() const override;
-    std::vector<std::unique_ptr<EditableTableRow>> make_defaults() const;
+    std::vector<std::unique_ptr<EditableTableRow>> make_defaults();
 
     StatsHuntAction get_action(
         bool shiny,
@@ -136,8 +135,7 @@ extern const char* StatsHuntIvRangeFilterTable_Label_Regular;
 
 class StatsHuntIvRangeFilterRow : public EditableTableRow{
 public:
-    StatsHuntIvRangeFilterRow(const StatsHuntMiscFeatureFlags& feature_flags);
-    StatsHuntIvRangeFilterRow(const EditableTableOption& table);
+    StatsHuntIvRangeFilterRow(EditableTableOption& parent_table);
     virtual std::unique_ptr<EditableTableRow> clone() const override;
 
     bool matches(

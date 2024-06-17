@@ -26,8 +26,9 @@ const EnumDatabase<CramomaticBallType>& BallType_Database(){
 
 
 
-CramomaticRow::CramomaticRow()
-    : ball_type(BallType_Database(), LockMode::LOCK_WHILE_RUNNING, CramomaticBallType::Apricorn)
+CramomaticRow::CramomaticRow(EditableTableOption& parent_table)
+    : EditableTableRow(parent_table)
+    , ball_type(BallType_Database(), LockMode::LOCK_WHILE_RUNNING, CramomaticBallType::Apricorn)
     , is_bonus(LockMode::LOCK_WHILE_RUNNING, false)
     , priority(LockMode::LOCK_WHILE_RUNNING, 0)
 {
@@ -36,7 +37,7 @@ CramomaticRow::CramomaticRow()
     PA_ADD_OPTION(priority);
 }
 std::unique_ptr<EditableTableRow> CramomaticRow::clone() const{
-    std::unique_ptr<CramomaticRow> ret(new CramomaticRow());
+    std::unique_ptr<CramomaticRow> ret(new CramomaticRow(parent()));
     ret->ball_type.set_value(ball_type.current_value());
     ret->is_bonus = is_bonus.current_value();
     ret->priority.set(priority.current_value());
@@ -78,7 +79,7 @@ std::vector<std::string> CramomaticTable::make_header() const{
 
 std::vector<std::unique_ptr<EditableTableRow>> CramomaticTable::make_defaults(){
     std::vector<std::unique_ptr<EditableTableRow>> ret;
-    ret.emplace_back(std::make_unique<CramomaticRow>());
+    ret.emplace_back(std::make_unique<CramomaticRow>(*this));
     return ret;
 }
 

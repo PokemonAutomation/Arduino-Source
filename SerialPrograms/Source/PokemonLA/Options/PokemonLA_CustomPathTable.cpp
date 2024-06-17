@@ -11,13 +11,13 @@
 #include <QFileDialog>
 #include <QMessageBox>
 
-#include "Common/Compiler.h"
+//#include "Common/Compiler.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonObject.h"
-#include "Common/Cpp/Json/JsonTools.h"
+//#include "Common/Cpp/Json/JsonTools.h"
 #include "Common/Qt/Options/ConfigWidget.h"
-#include "CommonFramework/Globals.h"
+//#include "CommonFramework/Globals.h"
 #include "PokemonLA_CustomPathTable.h"
 
 #include <iostream>
@@ -159,15 +159,16 @@ void CustomPathCell::value_changed(void* object){
 
 
 
-CustomPathTableRow2::CustomPathTableRow2()
-    : action(PathAction_Database(), LockMode::LOCK_WHILE_RUNNING, PathAction::NO_ACTION)
+CustomPathTableRow2::CustomPathTableRow2(EditableTableOption& parent_table)
+    : EditableTableRow(parent_table)
+    , action(PathAction_Database(), LockMode::LOCK_WHILE_RUNNING, PathAction::NO_ACTION)
     , parameters(action)
 {
     PA_ADD_OPTION(action);
     PA_ADD_OPTION(parameters);
 }
 std::unique_ptr<EditableTableRow> CustomPathTableRow2::clone() const{
-    std::unique_ptr<CustomPathTableRow2> ret(new CustomPathTableRow2());
+    std::unique_ptr<CustomPathTableRow2> ret(new CustomPathTableRow2(parent()));
     ret->action.set(action);
     ret->parameters = parameters;
     return ret;
@@ -280,29 +281,29 @@ std::vector<std::string> CustomPathTable2::make_header() const{
         "Parameters",
     };
 }
-std::vector<std::unique_ptr<EditableTableRow>> CustomPathTable2::make_defaults() const{
+std::vector<std::unique_ptr<EditableTableRow>> CustomPathTable2::make_defaults(){
     std::vector<std::unique_ptr<EditableTableRow>> ret;
-    auto row = std::make_unique<CustomPathTableRow2>();
+    auto row = std::make_unique<CustomPathTableRow2>(*this);
     row->action.set(PathAction::START_LISTEN);
     ret.emplace_back(std::move(row));
 
-    row = std::make_unique<CustomPathTableRow2>();
+    row = std::make_unique<CustomPathTableRow2>(*this);
     row->action.set(PathAction::CHANGE_MOUNT);
     row->parameters.mount.set(PathMount::WYRDEER);
     ret.emplace_back(std::move(row));
 
-    row = std::make_unique<CustomPathTableRow2>();
+    row = std::make_unique<CustomPathTableRow2>(*this);
     row->action.set(PathAction::MOVE_IN_DIRECTION);
     row->parameters.move_forward_ticks.set(400);
     row->parameters.left_x.set(-1.0);
     row->parameters.left_y.set(1.0);
     ret.emplace_back(std::move(row));
 
-    row = std::make_unique<CustomPathTableRow2>();
+    row = std::make_unique<CustomPathTableRow2>(*this);
     row->action.set(PathAction::CENTER_CAMERA);
     ret.emplace_back(std::move(row));
 
-    row = std::make_unique<CustomPathTableRow2>();
+    row = std::make_unique<CustomPathTableRow2>(*this);
     row->action.set(PathAction::MOVE_FORWARD);
     row->parameters.move_speed.set(PathSpeed::DASH);
     row->parameters.move_forward_ticks.set(400);

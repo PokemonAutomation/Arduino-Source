@@ -17,13 +17,17 @@ namespace PokemonAutomation{
 
 class StringSelectTableRow : public EditableTableRow{
 public:
-    StringSelectTableRow(const StringSelectDatabase& database, const std::string& default_slug)
-        : cell(database, LockMode::LOCK_WHILE_RUNNING, default_slug)
+    StringSelectTableRow(
+        EditableTableOption& parent_table,
+        const StringSelectDatabase& database, const std::string& default_slug
+    )
+        : EditableTableRow(parent_table)
+        , cell(database, LockMode::LOCK_WHILE_RUNNING, default_slug)
     {
         PA_ADD_OPTION(cell);
     }
     virtual std::unique_ptr<EditableTableRow> clone() const{
-        std::unique_ptr<StringSelectTableRow> ret(new StringSelectTableRow(cell.database(), cell.default_slug()));
+        std::unique_ptr<StringSelectTableRow> ret(new StringSelectTableRow(parent(), cell.database(), cell.default_slug()));
         ret->cell.set_by_index(cell.index());
         return ret;
     }
@@ -56,8 +60,8 @@ public:
     virtual std::vector<std::string> make_header() const{
         return {m_header};
     }
-    virtual std::unique_ptr<EditableTableRow> make_row() const{
-        return std::make_unique<StringSelectTableRow>(m_database, m_default_slug);
+    virtual std::unique_ptr<EditableTableRow> make_row(){
+        return std::make_unique<StringSelectTableRow>(*this, m_database, m_default_slug);
     }
 
 private:

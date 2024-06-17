@@ -174,12 +174,12 @@ StatsResetEventBattle::StatsResetEventBattle()
     {
         std::vector<std::unique_ptr<EditableTableRow>> ret;
         {
-            auto row = std::make_unique<StatsHuntIvRangeFilterRow>(FILTERS0.feature_flags);
+            auto row = std::make_unique<StatsHuntIvRangeFilterRow>(FILTERS0);
             row->iv_atk.set(0, 1);
             ret.emplace_back(std::move(row));
         }
         {
-            auto row = std::make_unique<StatsHuntIvRangeFilterRow>(FILTERS0.feature_flags);
+            auto row = std::make_unique<StatsHuntIvRangeFilterRow>(FILTERS0);
             row->iv_speed.set(0, 1);
             ret.emplace_back(std::move(row));
         }

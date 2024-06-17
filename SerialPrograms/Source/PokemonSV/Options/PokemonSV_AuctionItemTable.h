@@ -18,7 +18,7 @@ namespace PokemonSV{
 
 class AuctionItemSelectorRow : public EditableTableRow{
 public:
-    AuctionItemSelectorRow();
+    AuctionItemSelectorRow(EditableTableOption& parent_table);
     virtual std::unique_ptr<EditableTableRow> clone() const override;
 
 public:
@@ -39,7 +39,7 @@ public:
 
     virtual std::vector<std::string> make_header() const override;
 
-    static std::vector<std::unique_ptr<EditableTableRow>> make_defaults();
+    std::vector<std::unique_ptr<EditableTableRow>> make_defaults();
 };
 
 

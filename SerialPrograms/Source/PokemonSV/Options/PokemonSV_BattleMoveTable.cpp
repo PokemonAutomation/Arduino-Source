@@ -21,15 +21,16 @@ const EnumDatabase<BattleMoveType>& Battle_move_enum_database(){
     return database;
 }
 
-BattleMoveTableRow::BattleMoveTableRow()
-    : type(Battle_move_enum_database(), LockMode::UNLOCK_WHILE_RUNNING, BattleMoveType::Move1)
+BattleMoveTableRow::BattleMoveTableRow(EditableTableOption& parent_table)
+    : EditableTableRow(parent_table)
+    , type(Battle_move_enum_database(), LockMode::UNLOCK_WHILE_RUNNING, BattleMoveType::Move1)
     , notes(false, LockMode::UNLOCK_WHILE_RUNNING, "", "(e.g. False Swipe, Thunder Wave)")
 {
     PA_ADD_OPTION(type);
     PA_ADD_OPTION(notes);
 }
 std::unique_ptr<EditableTableRow> BattleMoveTableRow::clone() const{
-    std::unique_ptr<BattleMoveTableRow> ret(new BattleMoveTableRow());
+    std::unique_ptr<BattleMoveTableRow> ret(new BattleMoveTableRow(parent()));
     ret->type.set(type);
     ret->notes.set(notes);
     return ret;
@@ -53,7 +54,7 @@ std::vector<std::string> BattleMoveTable::make_header() const{
 }
 std::vector<std::unique_ptr<EditableTableRow>> BattleMoveTable::make_defaults(){
     std::vector<std::unique_ptr<EditableTableRow>> ret;
-    ret.emplace_back(new BattleMoveTableRow());
+    ret.emplace_back(new BattleMoveTableRow(*this));
     return ret;
 }
 

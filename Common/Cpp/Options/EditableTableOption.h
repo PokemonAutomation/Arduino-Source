@@ -14,16 +14,23 @@
 
 namespace PokemonAutomation{
 
+class EditableTableOption;
+
 
 //  Represents a row of the table. Users should subclass this and add all the
 //  configs/fields that is in the row.
 class EditableTableRow{
 public:
     virtual ~EditableTableRow() = default;
-    EditableTableRow(void* = nullptr);
+//    EditableTableRow(void* = nullptr);
+    EditableTableRow(EditableTableOption& parent_table);
 
     //  Duplicate/deep-copy the entire row. Does not copy over listeners.
     virtual std::unique_ptr<EditableTableRow> clone() const = 0;
+
+    EditableTableOption& parent() const{
+        return m_parent_table;
+    }
 
     virtual void load_json(const JsonValue& json);
     virtual JsonValue to_json() const;
@@ -46,6 +53,8 @@ public:
 
 private:
     friend class EditableTableOption;
+
+    EditableTableOption& m_parent_table;
 
     //  A unique # for this row within its table.
     uint64_t m_seqnum = 0;
@@ -123,7 +132,7 @@ public:
 public:
     bool saveload_enabled() const{ return m_enable_saveload; }
     virtual std::vector<std::string> make_header() const = 0;
-    virtual std::unique_ptr<EditableTableRow> make_row() const = 0;
+    virtual std::unique_ptr<EditableTableRow> make_row() = 0;
 
     //  Undefined behavior to call these on rows that aren't part of the table.
     void insert_row(size_t index, std::unique_ptr<EditableTableRow> row);
@@ -159,12 +168,8 @@ public:
         return EditableTableOption::snapshot<RowType, RowSnapshotType>();
     }
 
-    virtual std::unique_ptr<EditableTableRow> make_row() const override{
-        if constexpr (std::is_default_constructible_v<RowType>){
-            return std::unique_ptr<EditableTableRow>(new RowType());
-        }else{
-            return std::unique_ptr<EditableTableRow>(new RowType(*this));
-        }
+    virtual std::unique_ptr<EditableTableRow> make_row() override{
+        return std::unique_ptr<EditableTableRow>(new RowType(*this));
     }
 };
 

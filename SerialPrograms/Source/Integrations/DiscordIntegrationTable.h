@@ -15,11 +15,12 @@
 namespace PokemonAutomation{
 namespace Integration{
 
+class DiscordIntegrationTable;
 
 
 class DiscordIntegrationChannel : public EditableTableRow{
 public:
-    DiscordIntegrationChannel();
+    DiscordIntegrationChannel(EditableTableOption& parent_table);
     virtual std::unique_ptr<EditableTableRow> clone() const override;
     virtual void load_json(const JsonValue& json) override;
 

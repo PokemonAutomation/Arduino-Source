@@ -40,6 +40,7 @@ SOURCES += \
     ../Common/Cpp/Options/TimeExpressionOption.cpp \
     ../Common/Cpp/PrettyPrint.cpp \
     ../Common/Cpp/Unicode.cpp \
+    ../Common/PokemonSwSh/PokemonSwSh_MultiHostTable.cpp \
     ../Common/Qt/AutoHeightTable.cpp \
     ../Common/Qt/CodeValidator.cpp \
     ../Common/Qt/ExpressionEvaluator.cpp \

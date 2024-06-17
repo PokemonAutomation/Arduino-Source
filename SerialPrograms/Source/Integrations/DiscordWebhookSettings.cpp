@@ -15,8 +15,9 @@ namespace Integration{
 
 
 
-DiscordWebhookUrl::DiscordWebhookUrl()
-    : enabled(LockMode::LOCK_WHILE_RUNNING, true)
+DiscordWebhookUrl::DiscordWebhookUrl(EditableTableOption& parent_table)
+    : EditableTableRow(parent_table)
+    , enabled(LockMode::LOCK_WHILE_RUNNING, true)
     , label(false, LockMode::LOCK_WHILE_RUNNING, "", "My test server")
     , ping(LockMode::LOCK_WHILE_RUNNING, true)
     , tags_text(false, LockMode::LOCK_WHILE_RUNNING, "Notifs, Showcase, LiveHost", "")
@@ -32,7 +33,7 @@ DiscordWebhookUrl::DiscordWebhookUrl()
     add_option(url, "URL");
 }
 std::unique_ptr<EditableTableRow> DiscordWebhookUrl::clone() const{
-    std::unique_ptr<DiscordWebhookUrl> ret(new DiscordWebhookUrl());
+    std::unique_ptr<DiscordWebhookUrl> ret(new DiscordWebhookUrl(parent()));
     ret->enabled = (bool)enabled;
     ret->label.set(label);
     ret->ping = (bool)ping;

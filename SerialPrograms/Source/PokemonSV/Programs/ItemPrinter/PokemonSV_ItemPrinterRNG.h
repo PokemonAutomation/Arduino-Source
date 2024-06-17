@@ -33,8 +33,11 @@ class ItemPrinterRngRow : public EditableTableRow, public ConfigOption::Listener
 public:
 
     ~ItemPrinterRngRow();
-    ItemPrinterRngRow();
-    ItemPrinterRngRow(bool p_chain, const DateTime& p_date, ItemPrinterJobs p_jobs);
+    ItemPrinterRngRow(EditableTableOption& parent_table);
+    ItemPrinterRngRow(
+        EditableTableOption& parent_table,
+        bool p_chain, const DateTime& p_date, ItemPrinterJobs p_jobs
+    );
 
     ItemPrinterRngRowSnapshot snapshot() const;
 
@@ -54,7 +57,7 @@ class ItemPrinterRngTable : public EditableTableOption_t<ItemPrinterRngRow>{
 public:
     ItemPrinterRngTable(std::string label);
     virtual std::vector<std::string> make_header() const override;
-    static std::vector<std::unique_ptr<EditableTableRow>> make_defaults();
+    std::vector<std::unique_ptr<EditableTableRow>> make_defaults();
 };
 
 

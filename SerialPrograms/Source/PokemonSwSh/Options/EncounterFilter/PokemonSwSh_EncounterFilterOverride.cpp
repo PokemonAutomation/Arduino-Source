@@ -26,10 +26,10 @@ using namespace Pokemon;
 EncounterFilterOverride::~EncounterFilterOverride(){
     action.remove_listener(*this);
 }
-EncounterFilterOverride::EncounterFilterOverride(bool rare_stars)
-    : m_rare_stars(rare_stars)
+EncounterFilterOverride::EncounterFilterOverride(EditableTableOption& parent_table)
+    : EditableTableRow(parent_table)
     , pokemon(COMBINED_DEX_NAMES(), LockMode::LOCK_WHILE_RUNNING, "rookidee")
-    , shininess(rare_stars)
+    , shininess(static_cast<EncounterFilterTable&>(parent_table).rare_stars)
 {
     PA_ADD_OPTION(action);
     PA_ADD_OPTION(pokeball);
@@ -65,7 +65,7 @@ void EncounterFilterOverride::load_json(const JsonValue& json){
     }
 }
 std::unique_ptr<EditableTableRow> EncounterFilterOverride::clone() const{
-    std::unique_ptr<EncounterFilterOverride> ret(new EncounterFilterOverride(m_rare_stars));
+    std::unique_ptr<EncounterFilterOverride> ret(new EncounterFilterOverride(parent()));
     ret->action.set(action);
     ret->pokeball.set_by_index(pokeball.index());
     ret->pokemon.set_by_index(pokemon.index());
@@ -87,9 +87,9 @@ void EncounterFilterOverride::value_changed(void* object){
 
 
 
-EncounterFilterTable::EncounterFilterTable(bool rare_stars)
+EncounterFilterTable::EncounterFilterTable(bool p_rare_stars)
     : EditableTableOption(
-        rare_stars
+        p_rare_stars
             ?   "<b>Overrides:</b><br>"
                 "The game language must be properly set to read " + STRING_POKEMON + " names. "
                 "If more than one override applies, the last one will be chosen.<br>"
@@ -102,6 +102,7 @@ EncounterFilterTable::EncounterFilterTable(bool rare_stars)
                 "If more than one override applies, the last one will be chosen.",
         LockMode::LOCK_WHILE_RUNNING
     )
+    , rare_stars(p_rare_stars)
 {}
 std::vector<std::unique_ptr<EncounterFilterOverride>> EncounterFilterTable::copy_snapshot() const{
     return EditableTableOption::copy_snapshot<EncounterFilterOverride>();
@@ -114,8 +115,8 @@ std::vector<std::string> EncounterFilterTable::make_header() const{
         "Shininess",
     };
 }
-std::unique_ptr<EditableTableRow> EncounterFilterTable::make_row() const{
-    return std::unique_ptr<EditableTableRow>(new EncounterFilterOverride(m_rare_stars));
+std::unique_ptr<EditableTableRow> EncounterFilterTable::make_row(){
+    return std::unique_ptr<EditableTableRow>(new EncounterFilterOverride(*this));
 }
 
 

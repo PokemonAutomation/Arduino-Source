@@ -36,7 +36,7 @@ struct CramomaticSelection
 
 class CramomaticRow : public EditableTableRow{
 public:
-    CramomaticRow();
+    CramomaticRow(EditableTableOption& parent_table);
     virtual std::unique_ptr<EditableTableRow> clone() const;
 
 public:
@@ -55,7 +55,7 @@ public:
 
     virtual std::vector<std::string> make_header() const;
 
-    static std::vector<std::unique_ptr<EditableTableRow>> make_defaults();
+    std::vector<std::unique_ptr<EditableTableRow>> make_defaults();
 };
 
 
