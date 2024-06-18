@@ -121,7 +121,7 @@ ItemPrinterRNG::ItemPrinterRNG()
     )
     , GO_HOME_WHEN_DONE(false)
     , FIX_TIME_WHEN_DONE(
-        "<b>Fix Time When Done:</b><br>Fix the time after the program finishes.",
+        "<b>Fix Time when Done:</b><br>Fix the time after the program finishes.",
         LockMode::UNLOCK_WHILE_RUNNING, true
     )
     , AUTO_MATERIAL_FARMING(
