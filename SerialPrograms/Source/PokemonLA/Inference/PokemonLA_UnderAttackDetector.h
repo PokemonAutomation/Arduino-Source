@@ -4,7 +4,6 @@
  *
  */
 
-
 #ifndef PokemonAutomation_PokemonLA_UnderAttackDetector_H
 #define PokemonAutomation_PokemonLA_UnderAttackDetector_H
 

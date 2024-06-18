@@ -229,12 +229,13 @@ void EditableTableOption::clone_row(const EditableTableRow& row){
 }
 void EditableTableOption::remove_row(EditableTableRow& row){
     {
-        WriteSpinLock lg(m_current_lock);
         size_t index = row.m_index;
         if (index == (size_t)0 - 1){
 //            cout << "EditableTableOptionCore::remove_row(): Orphaned row" << endl;
             return;
         }
+
+        WriteSpinLock lg(m_current_lock);
         auto iter = m_current.begin() + index;
         (*iter)->m_index.store((size_t)0 - 1, std::memory_order_relaxed);
         m_current.erase(iter);

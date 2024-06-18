@@ -84,42 +84,51 @@ PageIngredients IngredientSession::read_screen(std::shared_ptr<const ImageRGB32>
     });
 
 #if 1
-    std::set<std::string>& ocr_result = ret.item[ret.selected];
-    //  Find the items in common between the two detection methods.
-    std::set<std::string> common;
-    for (auto& item : image_result.results){
-        auto iter = ocr_result.find(item.second);
-        if (iter != ocr_result.end()){
-            common.insert(item.second);
-        }
-    }
+    do{
+        std::set<std::string>& ocr_result = ret.item[ret.selected];
 
-    if (common.empty()){
-        std::set<std::string> sprite_result;
-        for(const auto& p : image_result.results){
-            sprite_result.insert(p.second);
+        //  Special case where OCR fails and image result returns 1 item.
+        if (ocr_result.empty() || image_result.results.size() == 1){
+            ocr_result.insert(image_result.results.begin()->second);
+            break;
         }
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, m_console,
-            "IngredientSession::read_current_page(): Unable to read selected item. OCR and sprite do not agree on any match: ocr "
-            + set_to_str(ocr_result) + ", sprite " + set_to_str(sprite_result),
-            screen
-        );
-    }
-    if (common.size() > 1){
-        std::set<std::string> sprite_result;
-        for(const auto& p : image_result.results){
-            sprite_result.insert(p.second);
-        }
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, m_console,
-            "IngredientSession::read_current_page(): Unable to read selected item. Ambiguous result: "
-            + set_to_str(ocr_result) + ", " + set_to_str(sprite_result),
-            screen
-        );
-    }
 
-    ocr_result = std::move(common);
+        //  Find the items in common between the two detection methods.
+        std::set<std::string> common;
+        for (auto& item : image_result.results){
+            auto iter = ocr_result.find(item.second);
+            if (iter != ocr_result.end()){
+                common.insert(item.second);
+            }
+        }
+
+        if (common.empty()){
+            std::set<std::string> sprite_result;
+            for(const auto& p : image_result.results){
+                sprite_result.insert(p.second);
+            }
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, m_console,
+                "IngredientSession::read_current_page(): Unable to read selected item. OCR and sprite do not agree on any match: ocr "
+                + set_to_str(ocr_result) + ", sprite " + set_to_str(sprite_result),
+                screen
+            );
+        }
+        if (common.size() > 1){
+            std::set<std::string> sprite_result;
+            for(const auto& p : image_result.results){
+                sprite_result.insert(p.second);
+            }
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, m_console,
+                "IngredientSession::read_current_page(): Unable to read selected item. Ambiguous result: "
+                + set_to_str(ocr_result) + ", " + set_to_str(sprite_result),
+                screen
+            );
+        }
+
+        ocr_result = std::move(common);
+    }while (false);
 #endif
 
     return ret;

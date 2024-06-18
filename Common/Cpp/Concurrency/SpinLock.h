@@ -49,18 +49,25 @@ private:
 
 
 
-
+//
+//  This is a simple multi-reader/single-writer (MRSW) spin lock.
+//  Fairness is not guaranteed. Multiple readers can starve a writer indefinitely.
+//
+//  As a spin lock, this is optimized for low contention.
+//
 
 class SpinLockMRSW{
 public:
     SpinLockMRSW() : m_readers(0) {}
 
     PA_FORCE_INLINE void acquire_read(const char* label = nullptr){
-        //  Assume unlocked.
+        //  Optimization: Assume unlocked
         size_t state = 0;
         if (m_readers.compare_exchange_weak(state, 1)){
             return;
         }
+
+        //  Only if we fail do we enter the (slow) retry logic.
         if (label == nullptr){
             internal_acquire_read();
         }else{
@@ -68,11 +75,13 @@ public:
         }
     }
     PA_FORCE_INLINE void acquire_write(const char* label = nullptr){
-        //  Assume unlocked.
+        //  Optimization: Assume unlocked
         size_t state = 0;
         if (m_readers.compare_exchange_weak(state, (size_t)-1)){
             return;
         }
+
+        //  Only if we fail do we enter the (slow) retry logic.
         if (label == nullptr){
             internal_acquire_write();
         }else{
@@ -94,7 +103,10 @@ private:
     void internal_acquire_write(const char* label);
 
 private:
-    std::atomic<size_t> m_readers;  //  -1 means write locked.
+    //  0           =   unlocked
+    //  positive    =   # of readers holding lock
+    //  -1          =   write locked
+    std::atomic<size_t> m_readers;
 };
 
 

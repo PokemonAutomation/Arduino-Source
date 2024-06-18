@@ -89,13 +89,11 @@ void SpinLockMRSW::internal_acquire_read(){
 void SpinLockMRSW::internal_acquire_write(){
 //    cout << "SpinLockMRSW::internal_acquire_write()" << endl;
 
-    while (true){
-        size_t state = m_readers.load(std::memory_order_acquire);
-        if (state == 0 && m_readers.compare_exchange_weak(state, (size_t)-1)){
-            return;
-        }
+    size_t state;
+    do{
         pause();
-    }
+        state = m_readers.load(std::memory_order_acquire);
+    }while (state != 0 || !m_readers.compare_exchange_weak(state, (size_t)-1));
 }
 void SpinLockMRSW::internal_acquire_read(const char* label){
 //    cout << "SpinLockMRSW::internal_acquire_read()" << endl;
@@ -124,17 +122,15 @@ void SpinLockMRSW::internal_acquire_write(const char* label){
     internal_acquire_write();
 #else
     uint64_t start = x86_rdtsc();
-    while (true){
-        size_t state = m_readers.load(std::memory_order_acquire);
-        if (state == 0 && m_readers.compare_exchange_weak(state, (size_t)-1)){
-            return;
-        }
+    size_t state;
+    do{
         pause();
         if (x86_rdtsc() - start > 10000000000){
             cout << "Slow WriteSpinLock: " << label << endl;
             start = x86_rdtsc();
         }
-    }
+        state = m_readers.load(std::memory_order_acquire);
+    }while (state != 0 || !m_readers.compare_exchange_weak(state, (size_t)-1));
 #endif
 }
 
