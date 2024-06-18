@@ -206,14 +206,19 @@ void EditableTableOption::insert_row(size_t index, std::unique_ptr<EditableTable
 }
 void EditableTableOption::clone_row(const EditableTableRow& row){
     {
-        WriteSpinLock lg(m_current_lock);
         size_t index = row.m_index;
         if (index == (size_t)0 - 1){
 //            cout << "EditableTableOptionCore::clone_row(): Orphaned row" << endl;
             return;
         }
+
+        //  Copy the row first.
         std::unique_ptr<EditableTableRow> new_row = row.clone();
         new_row->m_seqnum = m_seqnum++;
+
+        //  Now add it to the table.
+        WriteSpinLock lg(m_current_lock);
+        index = std::min(index, m_current.size());
         m_current.insert(m_current.begin() + index, std::move(new_row));
         size_t stop = m_current.size();
         for (size_t c = index; c < stop; c++){
