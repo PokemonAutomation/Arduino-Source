@@ -62,11 +62,11 @@ size_t FixedCodeOption::digits() const{
 }
 
 FixedCodeOption::operator const std::string&() const{
-    SpinLockGuard lg(m_data->m_lock);
+    ReadSpinLock lg(m_data->m_lock);
     return m_data->m_current;
 }
 const std::string& FixedCodeOption::get() const{
-    SpinLockGuard lg(m_data->m_lock);
+    ReadSpinLock lg(m_data->m_lock);
     return m_data->m_current;
 }
 std::string FixedCodeOption::set(std::string x){
@@ -75,7 +75,7 @@ std::string FixedCodeOption::set(std::string x){
         return error;
     }
     {
-        SpinLockGuard lg(m_data->m_lock);
+        WriteSpinLock lg(m_data->m_lock);
         if (m_data->m_current == x){
             return std::string();
         }
@@ -91,26 +91,29 @@ void FixedCodeOption::load_json(const JsonValue& json){
         return;
     }
     {
-        SpinLockGuard lg(m_data->m_lock);
+        WriteSpinLock lg(m_data->m_lock);
         m_data->m_current = *str;
     }
     report_value_changed(this);
 }
 JsonValue FixedCodeOption::to_json() const{
-    SpinLockGuard lg(m_data->m_lock);
+    ReadSpinLock lg(m_data->m_lock);
     return m_data->m_current;
 }
 
 void FixedCodeOption::to_str(uint8_t* code) const{
-    SpinLockGuard lg(m_data->m_lock);
-    std::string qstr = sanitize_code(8, m_data->m_current);
+    std::string qstr;
+    {
+        ReadSpinLock lg(m_data->m_lock);
+        qstr = sanitize_code(8, m_data->m_current);
+    }
     for (int c = 0; c < 8; c++){
         code[c] = qstr[c] - '0';
     }
 }
 
 std::string FixedCodeOption::check_validity() const{
-    SpinLockGuard lg(m_data->m_lock);
+    ReadSpinLock lg(m_data->m_lock);
     return check_validity(m_data->m_current);
 }
 std::string FixedCodeOption::check_validity(const std::string& x) const{
@@ -118,7 +121,7 @@ std::string FixedCodeOption::check_validity(const std::string& x) const{
 }
 void FixedCodeOption::restore_defaults(){
     {
-        SpinLockGuard lg(m_data->m_lock);
+        WriteSpinLock lg(m_data->m_lock);
         if (m_data->m_current == m_data->m_default){
             return;
         }

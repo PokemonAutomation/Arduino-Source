@@ -85,6 +85,7 @@ public:
     );
     void set_default(std::vector<std::unique_ptr<EditableTableRow>> default_value);
 
+public:
     const std::string& label() const{ return m_label; }
 
     //  Returns the # of rows at this moment of time.
@@ -100,7 +101,7 @@ public:
     template <typename RowType>
     std::vector<std::unique_ptr<RowType>> copy_snapshot() const{
         std::vector<std::unique_ptr<RowType>> ret;
-        SpinLockGuard lg(m_lock);
+        ReadSpinLock lg(m_current_lock);
         ret.reserve(m_current.size());
         for (auto& item : m_current){
             std::unique_ptr<EditableTableRow> parent = item->clone();
@@ -112,7 +113,7 @@ public:
     template <typename RowType, typename RowSnapshotType>
     std::vector<RowSnapshotType> snapshot() const{
         std::vector<RowSnapshotType> ret;
-        SpinLockGuard lg(m_lock);
+        ReadSpinLock lg(m_current_lock);
         ret.reserve(m_current.size());
         for (auto& item : m_current){
             RowType& row = static_cast<RowType&>(*item);
@@ -145,10 +146,11 @@ public:
 private:
     const std::string m_label;
     const bool m_enable_saveload;
+    mutable SpinLock m_default_lock;
     std::vector<std::unique_ptr<EditableTableRow>> m_default;
 
-    mutable SpinLock m_lock;
-    uint64_t m_seqnum = 0;
+    mutable SpinLock m_current_lock;
+    std::atomic<uint64_t> m_seqnum = 0;
     std::vector<std::shared_ptr<EditableTableRow>> m_current;
 };
 

@@ -20,6 +20,7 @@ using std::endl;
 namespace PokemonAutomation{
 
 
+#if 0
 void SpinLock::spin_acquire(){
     bool state = false;
     if (m_locked.compare_exchange_weak(state, true)){
@@ -54,6 +55,52 @@ void SpinLock::spin_acquire(const char* label){
     spin_acquire();
 #endif
 }
+#endif
+
+
+
+void SpinLockMRSW::internal_acquire_read(const char* label){
+//    cout << "SpinLockMRSW::internal_acquire_read()" << endl;
+
+    uint64_t start = __rdtsc();
+    while (true){
+        size_t state = m_readers.load(std::memory_order_acquire);
+        if (state != (size_t)-1 && m_readers.compare_exchange_weak(state, state + 1)){
+            return;
+        }
+        pause();
+        if (__rdtsc() - start > 10000000000){
+            if (label){
+                cout << "Slow ReadSpinLock: " << label << endl;
+            }else{
+                cout << "Slow ReadSpinLock" << endl;
+            }
+            start = __rdtsc();
+        }
+    }
+}
+void SpinLockMRSW::internal_acquire_write(const char* label){
+//    cout << "SpinLockMRSW::internal_acquire_write()" << endl;
+
+    uint64_t start = __rdtsc();
+    while (true){
+        size_t state = m_readers.load(std::memory_order_acquire);
+        if (state == 0 && m_readers.compare_exchange_weak(state, (size_t)-1)){
+            return;
+        }
+        pause();
+        if (__rdtsc() - start > 10000000000){
+            if (label){
+                cout << "Slow WriteSpinLock: " << label << endl;
+            }else{
+                cout << "Slow WriteSpinLock" << endl;
+            }
+            start = __rdtsc();
+        }
+    }
+}
+
+
 
 
 }

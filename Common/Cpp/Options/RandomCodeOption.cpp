@@ -137,13 +137,13 @@ void RandomCodeOption::load_json(const JsonValue& json){
     }
 
     {
-        SpinLockGuard lg(m_data->m_lock);
+        WriteSpinLock lg(m_data->m_lock);
         m_data->m_current = code;
     }
     report_value_changed(this);
 }
 JsonValue RandomCodeOption::to_json() const{
-    SpinLockGuard lg(m_data->m_lock);
+    ReadSpinLock lg(m_data->m_lock);
     JsonObject obj;
     obj["RandomDigits"] = m_data->m_current.m_random_digits;
     obj["RaidCode"] = m_data->m_current.m_code;
@@ -153,7 +153,7 @@ JsonValue RandomCodeOption::to_json() const{
 
 
 RandomCodeOption::operator RaidCodeOption() const{
-    SpinLockGuard lg(m_data->m_lock);
+    ReadSpinLock lg(m_data->m_lock);
     return m_data->m_current;
 }
 std::string RandomCodeOption::set(RaidCodeOption code){
@@ -162,7 +162,7 @@ std::string RandomCodeOption::set(RaidCodeOption code){
         return error;
     }
     {
-        SpinLockGuard lg(m_data->m_lock);
+        WriteSpinLock lg(m_data->m_lock);
         if (m_data->m_current == code){
             return std::string();
         }
@@ -172,11 +172,11 @@ std::string RandomCodeOption::set(RaidCodeOption code){
     return std::string();
 }
 bool RandomCodeOption::code_enabled() const{
-    SpinLockGuard lg(m_data->m_lock);
+    ReadSpinLock lg(m_data->m_lock);
     return m_data->m_current.code_enabled();
 }
 bool RandomCodeOption::get_code(uint8_t* code) const{
-    SpinLockGuard lg(m_data->m_lock);
+    ReadSpinLock lg(m_data->m_lock);
     return m_data->m_current.get_code(code);
 }
 
@@ -185,7 +185,7 @@ std::string RandomCodeOption::check_validity() const{
 }
 void RandomCodeOption::restore_defaults(){
     {
-        SpinLockGuard lg(m_data->m_lock);
+        WriteSpinLock lg(m_data->m_lock);
         m_data->m_current = m_data->m_default;
     }
     report_value_changed(this);

@@ -39,12 +39,12 @@ bool StaticTextOption::text_wrapping() const{
     return m_data->m_text_wrapping;
 }
 std::string StaticTextOption::text() const{
-    SpinLockGuard lg(m_data->m_lock);
+    ReadSpinLock lg(m_data->m_lock);
     return m_data->m_text;
 }
 void StaticTextOption::set_text(std::string label){
     {
-        SpinLockGuard lg(m_data->m_lock);
+        WriteSpinLock lg(m_data->m_lock);
         if (label == m_data->m_text){
             return;
         }
@@ -83,12 +83,12 @@ bool SectionDividerOption::text_wrapping() const{
     return m_data->m_text_wrapping;
 }
 std::string SectionDividerOption::text() const{
-    SpinLockGuard lg(m_data->m_lock);
+    ReadSpinLock lg(m_data->m_lock);
     return m_data->m_text;
 }
 void SectionDividerOption::set_text(std::string label){
     {
-        SpinLockGuard lg(m_data->m_lock);
+        WriteSpinLock lg(m_data->m_lock);
         if (label == m_data->m_text){
             return;
         }

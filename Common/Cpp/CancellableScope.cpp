@@ -52,7 +52,7 @@ bool Cancellable::cancelled() const noexcept{
 bool Cancellable::cancel(std::exception_ptr exception) noexcept{
     m_sanitizer.check_usage();
     CancellableData& data(*m_impl);
-    SpinLockGuard lg(data.lock);
+    WriteSpinLock lg(data.lock);
     if (exception && !data.exception){
         data.exception = std::move(exception);
     }
@@ -67,7 +67,7 @@ void Cancellable::throw_if_cancelled() const{
     if (!data.cancelled.load(std::memory_order_acquire)){
         return;
     }
-    SpinLockGuard lg(data.lock);
+    ReadSpinLock lg(data.lock);
     if (data.exception){
         std::rethrow_exception(data.exception);
     }else{
@@ -80,7 +80,7 @@ bool Cancellable::throw_if_cancelled_with_exception() const{
     if (!data.cancelled.load(std::memory_order_acquire)){
         return false;
     }
-    SpinLockGuard lg(data.lock);
+    ReadSpinLock lg(data.lock);
     if (data.exception){
         std::rethrow_exception(data.exception);
     }

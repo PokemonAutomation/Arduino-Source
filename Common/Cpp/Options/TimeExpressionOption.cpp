@@ -180,19 +180,19 @@ const std::string& TimeExpressionCell<Type>::default_value() const{
 template <typename Type>
 std::string TimeExpressionCell<Type>::current_text() const{
     const Data& data = *m_data;
-    SpinLockGuard lg(data.m_lock);
+    ReadSpinLock lg(data.m_lock);
     return data.m_current;
 }
 template <typename Type>
 TimeExpressionCell<Type>::operator Type() const{
     const Data& data = *m_data;
-    SpinLockGuard lg(data.m_lock);
+    ReadSpinLock lg(data.m_lock);
     return data.m_value;
 }
 template <typename Type>
 Type TimeExpressionCell<Type>::get() const{
     const Data& data = *m_data;
-    SpinLockGuard lg(data.m_lock);
+    ReadSpinLock lg(data.m_lock);
     return data.m_value;
 }
 template <typename Type>
@@ -201,7 +201,7 @@ std::string TimeExpressionCell<Type>::set(std::string text){
     Type value = 0;
     std::string error;
     {
-        SpinLockGuard lg(data.m_lock);
+        WriteSpinLock lg(data.m_lock);
         if (data.m_current == text){
             return std::string();
         }
@@ -216,7 +216,7 @@ std::string TimeExpressionCell<Type>::set(std::string text){
 template <typename Type>
 std::string TimeExpressionCell<Type>::time_string() const{
     const Data& data = *m_data;
-    SpinLockGuard lg(data.m_lock);
+    ReadSpinLock lg(data.m_lock);
     if (!data.m_error.empty()){
         return "<font color=\"red\">" + data.m_error + "</font>";
     }
@@ -231,7 +231,7 @@ void TimeExpressionCell<Type>::load_json(const JsonValue& json){
         return;
     }
     {
-        SpinLockGuard lg(data.m_lock);
+        WriteSpinLock lg(data.m_lock);
         data.m_current = *str;
         data.m_error = data.process(data.m_current, data.m_value);
     }
@@ -240,21 +240,21 @@ void TimeExpressionCell<Type>::load_json(const JsonValue& json){
 template <typename Type>
 JsonValue TimeExpressionCell<Type>::to_json() const{
     const Data& data = *m_data;
-    SpinLockGuard lg(data.m_lock);
+    ReadSpinLock lg(data.m_lock);
     return data.m_current;
 }
 
 template <typename Type>
 std::string TimeExpressionCell<Type>::check_validity() const{
     const Data& data = *m_data;
-    SpinLockGuard lg(data.m_lock);
+    ReadSpinLock lg(data.m_lock);
     return data.m_error;
 }
 template <typename Type>
 void TimeExpressionCell<Type>::restore_defaults(){
     Data& data = *m_data;
     {
-        SpinLockGuard lg(data.m_lock);
+        WriteSpinLock lg(data.m_lock);
         data.m_current = data.m_default;
         data.m_error = data.process(data.m_current, data.m_value);
     }

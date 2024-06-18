@@ -39,7 +39,6 @@ ItemPrinterRngRow::ItemPrinterRngRow(EditableTableOption& parent_table)
         LockMode::UNLOCK_WHILE_RUNNING,
         ItemPrinter::PrebuiltOptions::BALL_BONUS
     )
-//    , prev_desired_item(ItemPrinterItems::NONE)
 {
     PA_ADD_OPTION(chain);
     PA_ADD_OPTION(date);
@@ -50,8 +49,6 @@ ItemPrinterRngRow::ItemPrinterRngRow(EditableTableOption& parent_table)
     date.add_listener(*this);
     jobs.add_listener(*this);
     desired_item.add_listener(*this);
-
-    ItemPrinterRngRow::value_changed(this);
 }
 ItemPrinterRngRow::ItemPrinterRngRow(
     EditableTableOption& parent_table,
@@ -62,8 +59,6 @@ ItemPrinterRngRow::ItemPrinterRngRow(
     chain = p_chain;
     date.set(p_date);
     jobs.set(p_jobs);
-
-    ItemPrinterRngRow::value_changed(this);
 }
 ItemPrinterRngRowSnapshot ItemPrinterRngRow::snapshot() const{
     return ItemPrinterRngRowSnapshot{chain, date, jobs};

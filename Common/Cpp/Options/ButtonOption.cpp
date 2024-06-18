@@ -39,7 +39,7 @@ struct ButtonCell::Data{
     {}
 
     std::string text() const{
-        SpinLockGuard lg(m_text_lock);
+        ReadSpinLock lg(m_text_lock);
         return m_text;
     }
 };
@@ -74,11 +74,11 @@ ButtonCell::ButtonCell(
 {}
 
 void ButtonCell::add_listener(ButtonListener& listener){
-    SpinLockGuard lg(m_data->m_listener_lock);
+    WriteSpinLock lg(m_data->m_listener_lock);
     m_data->m_listeners.insert(&listener);
 }
 void ButtonCell::remove_listener(ButtonListener& listener){
-    SpinLockGuard lg(m_data->m_listener_lock);
+    WriteSpinLock lg(m_data->m_listener_lock);
     m_data->m_listeners.erase(&listener);
 }
 
@@ -102,7 +102,7 @@ int ButtonCell::text_size() const{
 }
 void ButtonCell::set_text(std::string text){
     {
-        SpinLockGuard lg(m_data->m_text_lock);
+        WriteSpinLock lg(m_data->m_text_lock);
         if (text == m_data->m_text){
             return;
         }
@@ -112,7 +112,7 @@ void ButtonCell::set_text(std::string text){
 }
 
 void ButtonCell::press_button(){
-    SpinLockGuard lg(m_data->m_listener_lock);
+    ReadSpinLock lg(m_data->m_listener_lock);
     for (ButtonListener* listener : m_data->m_listeners){
         listener->on_press();
     }
@@ -160,12 +160,12 @@ ButtonOption::ButtonOption(
 
 
 std::string ButtonOption::label() const{
-    SpinLockGuard lg(m_data->m_label_lock);
+    ReadSpinLock lg(m_data->m_label_lock);
     return m_data->m_label;
 }
 void ButtonOption::set_label(std::string label){
     {
-        SpinLockGuard lg(m_data->m_label_lock);
+        WriteSpinLock lg(m_data->m_label_lock);
         if (label == m_data->m_label){
             return;
         }

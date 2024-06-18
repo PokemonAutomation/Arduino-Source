@@ -132,7 +132,7 @@ void PeriodicRunner::remove_event(void* event){
     m_cv.notify_all();
 
     if (m_scheduler.events() == 0){
-        SpinLockGuard lg1(m_stats_lock);
+        WriteSpinLock lg1(m_stats_lock);
         m_utilization.push_idle();
     }
 }
@@ -162,7 +162,7 @@ void PeriodicRunner::thread_loop(){
         WallClock now = current_time();
 
         {
-            SpinLockGuard lg1(m_stats_lock);
+            WriteSpinLock lg1(m_stats_lock);
             m_utilization.push_event(now - last_check_timestamp - idle_since_last_check, now);
         }
         last_check_timestamp = now;
@@ -202,7 +202,7 @@ void PeriodicRunner::stop_thread(){
 }
 
 double PeriodicRunner::current_utilization() const{
-    SpinLockGuard lg(m_stats_lock);
+    ReadSpinLock lg(m_stats_lock);
     return m_utilization.utilization();
 }
 

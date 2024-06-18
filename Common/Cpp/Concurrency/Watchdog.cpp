@@ -34,7 +34,7 @@ void Watchdog::add(WatchdogCallback& callback, std::chrono::milliseconds period)
 
     WallClock now = current_time();
     {
-        SpinLockGuard slg(m_state_lock);
+        WriteSpinLock slg(m_state_lock);
 
         auto iter = m_callbacks.find(&callback);
         if (iter == m_callbacks.end()){
@@ -65,7 +65,7 @@ void Watchdog::add(WatchdogCallback& callback, std::chrono::milliseconds period)
 void Watchdog::remove(WatchdogCallback& callback){
     while (true){
         {
-            SpinLockGuard slg(m_state_lock);
+            WriteSpinLock slg(m_state_lock);
             auto iter_c = m_callbacks.find(&callback);
             if (iter_c == m_callbacks.end()){
                 return;
@@ -113,7 +113,7 @@ void Watchdog::delay(WatchdogCallback& callback, WallClock next_call){
 
     WallClock now = current_time();
     {
-        SpinLockGuard slg(m_state_lock);
+        WriteSpinLock slg(m_state_lock);
         auto iter = m_callbacks.find(&callback);
         if (iter == m_callbacks.end()){
             return;
@@ -165,7 +165,7 @@ void Watchdog::thread_body(){
         Entry* entry;
         CallbackMap::iterator iter_c;
         {
-            SpinLockGuard slg(m_state_lock);
+            WriteSpinLock slg(m_state_lock);
 
             //  Nothing scheduled.
             if (m_schedule.empty()){
@@ -202,7 +202,7 @@ void Watchdog::thread_body(){
             std::cerr << "Watchdog callback threw an exception." << std::endl;
         }
 
-        SpinLockGuard slg(m_state_lock);
+        WriteSpinLock slg(m_state_lock);
         update_unprotected(iter_c, current_time() + entry->period);
 //        entry->lock.unlock();
 

@@ -142,7 +142,7 @@ Type IntegerRangeCell<Type>::hi_current_value() const{
 }
 template <typename Type>
 void IntegerRangeCell<Type>::current_values(Type& lo, Type& hi) const{
-    SpinLockGuard lg(m_data->m_lock);
+    ReadSpinLock lg(m_data->m_lock);
     lo = lo_current_value();
     hi = hi_current_value();
 }
@@ -154,7 +154,7 @@ void IntegerRangeCell<Type>::set_lo(Type lo){
 
     Type current_lo;
     {
-        SpinLockGuard lg(m_data->m_lock);
+        WriteSpinLock lg(m_data->m_lock);
         current_lo = lo_current_value();
         if (hi_current_value() < lo){
             m_data->m_hi_current.store(lo, std::memory_order_relaxed);
@@ -177,7 +177,7 @@ void IntegerRangeCell<Type>::set_hi(Type hi){
 
     Type current_hi;
     {
-        SpinLockGuard lg(m_data->m_lock);
+        WriteSpinLock lg(m_data->m_lock);
         current_hi = hi_current_value();
         if (lo_current_value() > hi){
             m_data->m_lo_current.store(hi, std::memory_order_relaxed);
@@ -203,7 +203,7 @@ void IntegerRangeCell<Type>::set(Type lo, Type hi){
 
     Type current_lo, current_hi;
     {
-        SpinLockGuard lg(m_data->m_lock);
+        WriteSpinLock lg(m_data->m_lock);
         current_lo = lo_current_value();
         current_hi = hi_current_value();
         if (current_lo != lo){

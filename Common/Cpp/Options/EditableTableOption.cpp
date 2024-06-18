@@ -105,20 +105,20 @@ EditableTableOption::EditableTableOption(
     restore_defaults();
 }
 void EditableTableOption::set_default(std::vector<std::unique_ptr<EditableTableRow>> default_value){
-    SpinLockGuard lg(m_lock);
+    WriteSpinLock lg(m_default_lock);
     m_default = std::move(default_value);
 }
 size_t EditableTableOption::current_rows() const{
-    SpinLockGuard lg(m_lock);
+    ReadSpinLock lg(m_current_lock);
     return m_current.size();
 }
 std::vector<std::shared_ptr<EditableTableRow>> EditableTableOption::current_refs() const{
-    SpinLockGuard lg(m_lock);
+    ReadSpinLock lg(m_current_lock);
     return m_current;
 }
 
 void EditableTableOption::clear(){
-    SpinLockGuard lg(m_lock);
+    WriteSpinLock lg(m_current_lock);
     m_current.clear();
 }
 void EditableTableOption::load_json(const JsonValue& json){
@@ -127,21 +127,27 @@ void EditableTableOption::load_json(const JsonValue& json){
         return;
     }
     {
-        SpinLockGuard lg(m_lock);
+        //  Pre-allocate seqnums.
+        uint64_t seqnum = m_seqnum.fetch_add(array->size());
+
+        //  Build table outside of lock first.
         std::vector<std::shared_ptr<EditableTableRow>> table;
         for (const auto& item : *array){
             std::unique_ptr<EditableTableRow> row = make_row();
-            row->m_seqnum = m_seqnum++;
+            row->m_seqnum = seqnum++;
             row->m_index = table.size();
             table.emplace_back(std::move(row));
             table.back()->load_json(item);
         }
+
+        //  Now commit the table inside the lock.
+        WriteSpinLock lg(m_current_lock);
         m_current = std::move(table);
     }
     report_value_changed(this);
 }
 JsonValue EditableTableOption::to_json() const{
-    SpinLockGuard lg(m_lock);
+    ReadSpinLock lg(m_current_lock);
     JsonArray array;
     for (const std::shared_ptr<EditableTableRow>& row : m_current){
         array.push_back(row->to_json());
@@ -150,7 +156,7 @@ JsonValue EditableTableOption::to_json() const{
 }
 
 std::string EditableTableOption::check_validity() const{
-    SpinLockGuard lg(m_lock);
+    ReadSpinLock lg(m_current_lock);
     for (const std::shared_ptr<EditableTableRow>& item : m_current){
         std::string error = item->check_validity();
         if (!error.empty()){
@@ -162,12 +168,22 @@ std::string EditableTableOption::check_validity() const{
 void EditableTableOption::restore_defaults(){
     {
         std::vector<std::shared_ptr<EditableTableRow>> tmp;
-        SpinLockGuard lg(m_lock);
-        for (const std::unique_ptr<EditableTableRow>& item : m_default){
-            tmp.emplace_back(item->clone());
-            tmp.back()->m_seqnum = m_seqnum++;
-            tmp.back()->m_index = tmp.size() - 1;
+        {
+            ReadSpinLock lg(m_default_lock);
+
+            //  Pre-allocate seqnums.
+            uint64_t seqnum = m_seqnum.fetch_add(m_default.size());
+
+            //  Build table outside of lock first.
+            for (const std::unique_ptr<EditableTableRow>& item : m_default){
+                tmp.emplace_back(item->clone());
+                tmp.back()->m_seqnum = seqnum++;
+                tmp.back()->m_index = tmp.size() - 1;
+            }
         }
+
+        //  Now commit the table inside the lock.
+        WriteSpinLock lg(m_current_lock);
         m_current = std::move(tmp);
     }
     report_value_changed(this);
@@ -177,7 +193,7 @@ void EditableTableOption::restore_defaults(){
 
 void EditableTableOption::insert_row(size_t index, std::unique_ptr<EditableTableRow> row){
     {
-        SpinLockGuard lg(m_lock);
+        WriteSpinLock lg(m_current_lock);
         index = std::min(index, m_current.size());
         row->m_seqnum = m_seqnum++;
         m_current.insert(m_current.begin() + index, std::move(row));
@@ -190,7 +206,7 @@ void EditableTableOption::insert_row(size_t index, std::unique_ptr<EditableTable
 }
 void EditableTableOption::clone_row(const EditableTableRow& row){
     {
-        SpinLockGuard lg(m_lock);
+        WriteSpinLock lg(m_current_lock);
         size_t index = row.m_index;
         if (index == (size_t)0 - 1){
 //            cout << "EditableTableOptionCore::clone_row(): Orphaned row" << endl;
@@ -208,7 +224,7 @@ void EditableTableOption::clone_row(const EditableTableRow& row){
 }
 void EditableTableOption::remove_row(EditableTableRow& row){
     {
-        SpinLockGuard lg(m_lock);
+        WriteSpinLock lg(m_current_lock);
         size_t index = row.m_index;
         if (index == (size_t)0 - 1){
 //            cout << "EditableTableOptionCore::remove_row(): Orphaned row" << endl;

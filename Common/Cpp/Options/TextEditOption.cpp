@@ -39,17 +39,17 @@ struct TextEditOption::Data{
 
 void TextEditOption::add_listener(FocusListener& listener){
     Data& data = *m_data;
-    SpinLockGuard lg(data.m_lock);
+    WriteSpinLock lg(data.m_lock);
     data.listeners.insert(&listener);
 }
 void TextEditOption::remove_listener(FocusListener& listener){
     Data& data = *m_data;
-    SpinLockGuard lg(data.m_lock);
+    WriteSpinLock lg(data.m_lock);
     data.listeners.erase(&listener);
 }
 void TextEditOption::report_focus_in(){
     Data& data = *m_data;
-    SpinLockGuard lg(data.m_lock);
+    ReadSpinLock lg(data.m_lock);
     for (FocusListener* listener : data.listeners){
         listener->focus_in();
     }
@@ -85,12 +85,12 @@ bool TextEditOption::signal_all_text_changes() const{
 }
 
 TextEditOption::operator std::string() const{
-    SpinLockGuard lg(m_data->m_lock);
+    ReadSpinLock lg(m_data->m_lock);
     return m_data->m_current;
 }
 void TextEditOption::set(std::string x){
     {
-        SpinLockGuard lg(m_data->m_lock);
+        WriteSpinLock lg(m_data->m_lock);
         if (m_data->m_current == x){
             return;
         }
@@ -108,7 +108,7 @@ void TextEditOption::load_json(const JsonValue& json){
     set(*str);
 }
 JsonValue TextEditOption::to_json() const{
-    SpinLockGuard lg(m_data->m_lock);
+    ReadSpinLock lg(m_data->m_lock);
     return m_data->m_current;
 }
 void TextEditOption::restore_defaults(){

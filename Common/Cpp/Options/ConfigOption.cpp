@@ -18,9 +18,10 @@ namespace PokemonAutomation{
 
 
 struct ConfigOption::Data{
-    mutable SpinLock lock;
-    LockMode lock_mode;
+    const LockMode lock_mode;
     std::atomic<ConfigOptionState> visibility;
+
+    mutable SpinLock listener_lock;
     std::set<Listener*> listeners;
     
     Data(LockMode p_lock_mode, ConfigOptionState p_visibility)
@@ -65,19 +66,19 @@ ConfigOption::ConfigOption(ConfigOptionState visibility)
 void ConfigOption::add_listener(Listener& listener){
     m_lifetime_sanitizer.check_usage();
     Data& data = *m_data;
-    SpinLockGuard lg(data.lock);
+    WriteSpinLock lg(data.listener_lock);
     data.listeners.insert(&listener);
 }
 void ConfigOption::remove_listener(Listener& listener){
     m_lifetime_sanitizer.check_usage();
     Data& data = *m_data;
-    SpinLockGuard lg(data.lock);
+    WriteSpinLock lg(data.listener_lock);
     data.listeners.erase(&listener);
 }
 size_t ConfigOption::total_listeners() const{
     m_lifetime_sanitizer.check_usage();
     const Data& data = *m_data;
-    SpinLockGuard lg(data.lock);
+    ReadSpinLock lg(data.listener_lock);
     return data.listeners.size();
 }
 
@@ -118,7 +119,7 @@ void ConfigOption::set_visibility(ConfigOptionState visibility){
 void ConfigOption::report_visibility_changed(){
     m_lifetime_sanitizer.check_usage();
     Data& data = *m_data;
-    SpinLockGuard lg(data.lock);
+    ReadSpinLock lg(data.listener_lock);
     for (Listener* listener : data.listeners){
         listener->visibility_changed();
     }
@@ -126,7 +127,7 @@ void ConfigOption::report_visibility_changed(){
 void ConfigOption::report_program_state(bool program_is_running){
     m_lifetime_sanitizer.check_usage();
     Data& data = *m_data;
-    SpinLockGuard lg(data.lock);
+    ReadSpinLock lg(data.listener_lock);
     for (Listener* listener : data.listeners){
         listener->program_state_changed(program_is_running);
     }
@@ -134,7 +135,7 @@ void ConfigOption::report_program_state(bool program_is_running){
 void ConfigOption::report_value_changed(void* object){
     m_lifetime_sanitizer.check_usage();
     Data& data = *m_data;
-    SpinLockGuard lg(data.lock);
+    ReadSpinLock lg(data.listener_lock);
 //    cout << "listeners = " << data.listeners.size() << endl;
     for (Listener* listener : data.listeners){
         listener->value_changed(object);

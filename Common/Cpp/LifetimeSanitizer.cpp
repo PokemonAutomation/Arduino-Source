@@ -32,7 +32,7 @@ void LifetimeSanitizer::set_enabled(bool enabled){
         LifetimeSanitizer_enabled.store(true, std::memory_order_relaxed);
         return;
     }
-    SpinLockGuard lg(sanitizer_lock);
+    WriteSpinLock lg(sanitizer_lock);
     LifetimeSanitizer_has_been_disabled = true;
     LifetimeSanitizer_enabled.store(false, std::memory_order_relaxed);
 }
@@ -49,7 +49,7 @@ LifetimeSanitizer::LifetimeSanitizer()
         return;
     }
 
-    SpinLockGuard lg(sanitizer_lock);
+    WriteSpinLock lg(sanitizer_lock);
 #ifdef PA_SANITIZER_PRINT_ALL
     std::cout << "LifetimeSanitizer - Allocating: " << this << std::endl;
 #endif
@@ -72,7 +72,7 @@ LifetimeSanitizer::~LifetimeSanitizer(){
         std::terminate();
     }
 
-    SpinLockGuard lg(sanitizer_lock);
+    WriteSpinLock lg(sanitizer_lock);
 #ifdef PA_SANITIZER_PRINT_ALL
     std::cout << "LifetimeSanitizer - Freeing: " << this << std::endl;
 #endif
@@ -103,7 +103,7 @@ LifetimeSanitizer::LifetimeSanitizer(LifetimeSanitizer&& x)
     }
     x.check_usage();
 
-    SpinLockGuard lg(sanitizer_lock);
+    WriteSpinLock lg(sanitizer_lock);
 #ifdef PA_SANITIZER_PRINT_ALL
     std::cout << "LifetimeSanitizer - Allocating (move-construct): " << this << std::endl;
 #endif
@@ -131,7 +131,7 @@ LifetimeSanitizer::LifetimeSanitizer(const LifetimeSanitizer& x){
     }
     x.check_usage();
 
-    SpinLockGuard lg(sanitizer_lock);
+    WriteSpinLock lg(sanitizer_lock);
 #ifdef PA_SANITIZER_PRINT_ALL
     std::cout << "LifetimeSanitizer - Allocating (copy-construct): " << this << std::endl;
 #endif
@@ -162,7 +162,7 @@ void LifetimeSanitizer::check_usage() const{
         return;
     }
 
-    SpinLockGuard lg(sanitizer_lock);
+    ReadSpinLock lg(sanitizer_lock);
 #ifdef PA_SANITIZER_PRINT_ALL
     std::cout << "LifetimeSanitizer - Using: " << this << std::endl;
 #endif

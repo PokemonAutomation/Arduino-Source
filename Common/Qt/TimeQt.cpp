@@ -17,7 +17,7 @@ std::string to_utc_time_str(WallClock time){
 #if 0
     time_t tt = std::chrono::system_clock::to_time_t(time);
     static SpinLock lock;
-    SpinLockGuard lg(lock);
+    WriteSpinLock lg(lock);
     std::tm* utc = gmtime(&tt);
     std::string str;
     str += std::to_string(utc->tm_year + 1900);
