@@ -353,12 +353,15 @@ void ItemPrinterRNG::adjust_delay(
     const std::array<std::string, 10>& print_results,
     int distance_from_target
 ){
-    const int16_t ADJUSTMENT_TABLE[] = {0, 50, 1000};
+    const int MAX_MISS = 2;
+    const int16_t ADJUSTMENT_TABLE[MAX_MISS + 1] = {0, 50, 1000};
 
     int16_t delay_adjustment;
     if (distance_from_target < 0){
-        delay_adjustment = -ADJUSTMENT_TABLE[-distance_from_target];
+        distance_from_target = std::min(-distance_from_target, MAX_MISS);
+        delay_adjustment = -ADJUSTMENT_TABLE[distance_from_target];
     }else if (distance_from_target > 0){
+        distance_from_target = std::min(distance_from_target, MAX_MISS);
         delay_adjustment = ADJUSTMENT_TABLE[distance_from_target];
     }else{
         return;
