@@ -116,8 +116,8 @@ std::array<std::string, 10> item_printer_finish_print(
                 reader.make_overlays(overlays);
                 auto snapshot = console.video().snapshot();
                 ret = reader.read(console.logger(), dispatcher, snapshot);
-                static int c = 0;
-                snapshot->save("test-" + std::to_string(c) + ".png");
+//                static int c = 0;
+//                snapshot->save("test-" + std::to_string(c) + ".png");
             }
 
             pbf_mash_button(context, BUTTON_A, 1 * TICKS_PER_SECOND);
