@@ -356,7 +356,7 @@ void ItemPrinterRNG::adjust_delay(
 
     int16_t delay_adjustment;
     if (distance_from_target < 0){
-        delay_adjustment = ADJUSTMENT_TABLE[-distance_from_target];
+        delay_adjustment = -ADJUSTMENT_TABLE[-distance_from_target];
     }else if (distance_from_target > 0){
         delay_adjustment = ADJUSTMENT_TABLE[distance_from_target];
     }else{
