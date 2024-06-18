@@ -22,11 +22,11 @@ namespace NintendoSwitch{
 
 
 void MultiSwitchProgramSession::add_listener(Listener& listener){
-    SpinLockGuard lg(m_lock);
+    WriteSpinLock lg(m_lock);
     m_listeners.insert(&listener);
 }
 void MultiSwitchProgramSession::remove_listener(Listener& listener){
-    SpinLockGuard lg(m_lock);
+    WriteSpinLock lg(m_lock);
     m_listeners.erase(&listener);
 }
 
@@ -39,7 +39,7 @@ MultiSwitchProgramSession::MultiSwitchProgramSession(MultiSwitchProgramOption& o
     , m_system(option.system(), instance_id())
     , m_scope(nullptr)
 {
-    SpinLockGuard lg(m_lock);
+    WriteSpinLock lg(m_lock);
     m_system.add_listener(*this);
     m_option.instance().update_active_consoles(option.system().count());
 }
@@ -98,7 +98,7 @@ void MultiSwitchProgramSession::run_program_instance(MultiSwitchProgramEnvironme
     m_scope.store(nullptr, std::memory_order_release);
 }
 void MultiSwitchProgramSession::internal_stop_program(){
-    SpinLockGuard lg(m_lock);
+    WriteSpinLock lg(m_lock);
     size_t consoles = m_system.count();
     for (size_t c = 0; c < consoles; c++){
         m_system[c].serial_session().stop();
@@ -211,7 +211,7 @@ void MultiSwitchProgramSession::shutdown(){
     internal_stop_program();
 }
 void MultiSwitchProgramSession::startup(size_t switch_count){
-    SpinLockGuard lg(m_lock);
+    WriteSpinLock lg(m_lock);
     m_option.instance().update_active_consoles(switch_count);
     for (Listener* listener : m_listeners){
         listener->redraw_options();

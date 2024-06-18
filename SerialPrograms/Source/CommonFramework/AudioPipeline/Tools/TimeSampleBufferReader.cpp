@@ -21,7 +21,7 @@ TimeSampleBufferReader<Type>::TimeSampleBufferReader(TimeSampleBuffer<Type>& buf
 
 template <typename Type>
 void TimeSampleBufferReader<Type>::set_to_timestamp(WallClock timestamp){
-    SpinLockGuard lg(m_buffer.m_lock);
+    WriteSpinLock lg(m_buffer.m_lock);
     set_to_timestamp_unprotected(timestamp);
 }
 
@@ -88,7 +88,7 @@ void TimeSampleBufferReader<Type>::read_samples(
 ){
     const typename TimeSampleBuffer<Type>::MapType& buffer = m_buffer.m_samples;
 
-    SpinLockGuard lg(m_buffer.m_lock);
+    WriteSpinLock lg(m_buffer.m_lock);
 
     if (buffer.empty()){
         memset(samples, 0, count * sizeof(Type));

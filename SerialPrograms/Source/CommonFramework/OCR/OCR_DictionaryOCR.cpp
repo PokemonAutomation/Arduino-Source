@@ -101,7 +101,7 @@ void DictionaryOCR::add_candidate(std::string token, const std::u32string& candi
         return;
     }
 
-    SpinLockGuard lg(m_lock, "DictionaryOCR::add_candidate()");
+    WriteSpinLock lg(m_lock, "DictionaryOCR::add_candidate()");
 
     auto iter = m_candidate_to_token.find(candidate);
     if (iter == m_candidate_to_token.end()){

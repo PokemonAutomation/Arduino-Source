@@ -50,7 +50,7 @@ void TouchDateIntervalOption::restore_defaults(){
     m_hours.restore_defaults();
 }
 void TouchDateIntervalOption::reset_state(){
-    SpinLockGuard lg(m_lock);
+    WriteSpinLock lg(m_lock);
     m_last_touch = WallClock::min();
 }
 ConfigWidget* TouchDateIntervalOption::make_QtWidget(QWidget& parent){
@@ -64,7 +64,7 @@ bool TouchDateIntervalOption::ok_to_touch_now(){
         return false;
     }
     auto now = current_time();
-    SpinLockGuard lg(m_lock);
+    WriteSpinLock lg(m_lock);
     if (now < m_last_touch + std::chrono::hours(hours)){
         return false;
     }

@@ -58,7 +58,7 @@ AreaZeroSkyTracker::AreaZeroSkyTracker(VideoOverlay& overlay)
 {}
 
 bool AreaZeroSkyTracker::sky_location(double& x, double& y) const{
-    SpinLock m_lock;
+    ReadSpinLock lg(m_lock);
     if (!m_box){
         return false;
     }
@@ -73,7 +73,7 @@ bool AreaZeroSkyTracker::process_frame(const ImageViewRGB32& frame, WallClock ti
 
     WaterfillObject object;
     bool detected = this->detect(object, frame);
-    SpinLockGuard lg(m_lock);
+    WriteSpinLock lg(m_lock);
     if (detected){
         m_box.reset(new OverlayBoxScope(
             m_overlay,

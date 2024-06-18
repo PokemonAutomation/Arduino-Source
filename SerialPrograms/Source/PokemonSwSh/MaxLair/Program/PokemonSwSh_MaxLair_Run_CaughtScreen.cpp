@@ -124,7 +124,7 @@ StateMachineAction run_caught_screen(
         tracker.leave_summary();
         VideoSnapshot screen = console.video().snapshot();
 
-        SpinLockGuard lg(runtime.m_lock);
+        WriteSpinLock lg(runtime.m_lock);
         send_shiny_notification(
             env, console,
             runtime.notification_shiny,

@@ -76,7 +76,7 @@ void SingleSwitchProgramSession::run_program_instance(SingleSwitchProgramEnviron
     m_scope.store(nullptr, std::memory_order_release);
 }
 void SingleSwitchProgramSession::internal_stop_program(){
-    SpinLockGuard lg(m_lock);
+    WriteSpinLock lg(m_lock);
     m_system.serial_session().stop();
     CancellableScope* scope = m_scope.load(std::memory_order_acquire);
     if (scope != nullptr){

@@ -31,7 +31,6 @@ GlobalStateTracker::~GlobalStateTracker(){
 }
 std::pair<uint64_t, std::string> GlobalStateTracker::dump(){
     std::lock_guard<std::mutex> lg(m_lock);
-//    SpinLockGuard lg(m_lock);
     std::string str;
     for (size_t c = 0; c < m_count; c++){
         str += "Switch " + std::to_string(c) + ": (group " + std::to_string(m_groups[c]) + ")\n";
@@ -63,7 +62,6 @@ void GlobalStateTracker::push_update(size_t index){
 
 GlobalState GlobalStateTracker::infer_actual_state(size_t index){
     std::lock_guard<std::mutex> lg(m_lock);
-//    SpinLockGuard lg(m_lock);
     return infer_actual_state_unprotected(index);
 }
 

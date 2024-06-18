@@ -65,7 +65,7 @@ public:
     void read_samples(
         Type* samples, size_t count,
         WallClock timestamp = current_time()
-    );
+    ) const;
 
     std::string dump() const;
 

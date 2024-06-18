@@ -10,8 +10,9 @@
 
 #include <deque>
 #include <map>
-#include "Common/Cpp/Concurrency/SpinLock.h"
-#include "CommonFramework/Logging/Logger.h"
+#include "Common/Cpp/AbstractLogger.h"
+//#include "Common/Cpp/Concurrency/SpinLock.h"
+//#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 
@@ -55,7 +56,7 @@ private:
 
     std::atomic<UnderAttackState> m_state;
 
-    SpinLock m_lock;
+//    SpinLock m_lock;
     std::deque<Sample> m_history;
     std::map<UnderAttackState, size_t> m_counts;
 };

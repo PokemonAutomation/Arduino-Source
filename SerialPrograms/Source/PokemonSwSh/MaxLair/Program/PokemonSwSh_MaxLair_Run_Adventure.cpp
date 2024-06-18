@@ -59,7 +59,7 @@ AdventureResult run_adventure(
         while (true){
             //  Dump current state, but don't spam if nothing has changed.
             {
-                SpinLockGuard lg(lock);
+                WriteSpinLock lg(lock);
                 std::pair<uint64_t, std::string> status = state_tracker.dump();
                 if (status.first > epoch){
                     console.log("State Tracker\n" + status.second);

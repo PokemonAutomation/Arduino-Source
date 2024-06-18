@@ -56,7 +56,7 @@ void OverworldTargetTracker::set_stop_on_target(bool stop){
     m_stop_on_target.store(stop, std::memory_order_release);
 }
 void OverworldTargetTracker::clear_detections(){
-    SpinLockGuard lg(m_lock, "OverworldTargetTracker::clear_detections()");
+    WriteSpinLock lg(m_lock, "OverworldTargetTracker::clear_detections()");
     m_best_target.first = -1;
     m_detection_boxes.clear();
     m_exclamations.clear();
@@ -64,7 +64,7 @@ void OverworldTargetTracker::clear_detections(){
 }
 bool OverworldTargetTracker::has_good_target(){
 //    m_logger.log("has_good_target()");
-    SpinLockGuard lg(m_lock, "OverworldTargetTracker::has_good_target()");
+    ReadSpinLock lg(m_lock, "OverworldTargetTracker::has_good_target()");
     if (m_best_target.first < 0){
 //        m_logger.log("has_good_target(): < 0");
         return false;
@@ -72,8 +72,8 @@ bool OverworldTargetTracker::has_good_target(){
 //    m_logger.log("has_good_target(): " + std::to_string(m_best_target.first));
     return m_best_target.first <= m_max_alpha;
 }
-std::pair<double, OverworldTarget> OverworldTargetTracker::best_target(){
-    SpinLockGuard lg(m_lock, "OverworldTargetTracker::best_target()");
+std::pair<double, OverworldTarget> OverworldTargetTracker::best_target() const{
+    ReadSpinLock lg(m_lock, "OverworldTargetTracker::best_target()");
     return m_best_target;
 }
 
@@ -144,7 +144,7 @@ bool OverworldTargetTracker::save_target(std::multimap<double, OverworldTarget>:
         COLOR_ORANGE
     );
 #endif
-//    SpinLockGuard lg(m_lock, "OverworldTargetTracker::save_target()");
+//    WriteSpinLock lg(m_lock, "OverworldTargetTracker::save_target()");
     m_best_target = *target;
     return target->first <= m_max_alpha && m_stop_on_target.load(std::memory_order_acquire);
 //    return target->first <= m_max_alpha;
@@ -157,7 +157,7 @@ bool OverworldTargetTracker::process_frame(const ImageViewRGB32& frame, WallCloc
     std::vector<ImagePixelBox> question_marks = find_question_marks(image);
 //    question_marks.clear();
 
-    SpinLockGuard lg(m_lock, "OverworldTargetTracker::on_frame()");
+    WriteSpinLock lg(m_lock, "OverworldTargetTracker::on_frame()");
 
     //  Clear out old detections.
     auto oldest = timestamp - m_window;

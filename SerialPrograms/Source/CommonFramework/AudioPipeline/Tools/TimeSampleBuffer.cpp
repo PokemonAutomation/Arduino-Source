@@ -40,7 +40,7 @@ void TimeSampleBuffer<Type>::push_samples(
     std::vector<Type> block(count);
     memcpy(block.data(), samples, count * sizeof(Type));
 
-    SpinLockGuard lg(m_lock);
+    WriteSpinLock lg(m_lock);
 
 #if 0
     auto iter = m_samples.find(timestamp);
@@ -66,7 +66,7 @@ void TimeSampleBuffer<Type>::push_samples(
 
 template <typename Type>
 std::string TimeSampleBuffer<Type>::dump() const{
-    SpinLockGuard lg(m_lock);
+    ReadSpinLock lg(m_lock);
 
     std::string str;
     if (m_samples.empty()){
@@ -93,8 +93,8 @@ template <typename Type>
 void TimeSampleBuffer<Type>::read_samples(
     Type* samples, size_t count,
     WallClock timestamp
-){
-    SpinLockGuard lg(m_lock);
+) const{
+    ReadSpinLock lg(m_lock);
 
     if (m_samples.empty()){
         memset(samples, 0, count * sizeof(Type));

@@ -58,7 +58,7 @@ void GlobalMediaServices::refresh_cameras(){
 
         QList<QCameraDevice> cameras = QMediaDevices::videoInputs();
         {
-            SpinLockGuard lg(m_camera_lock);
+            WriteSpinLock lg(m_camera_lock);
             m_cameras = std::move(cameras);
         }
 

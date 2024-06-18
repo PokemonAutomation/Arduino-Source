@@ -27,7 +27,7 @@ public:
     bool get(
         double& distance, double& x, double& y,
         WallClock timestamp = current_time()
-    );
+    ) const;
 
     virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
 
@@ -42,7 +42,7 @@ private:
 private:
     // Logger& m_logger;
 
-    SpinLock m_lock;
+    mutable SpinLock m_lock;
     FlagDetector m_flags;
     WhiteObjectWatcher m_watcher;
 

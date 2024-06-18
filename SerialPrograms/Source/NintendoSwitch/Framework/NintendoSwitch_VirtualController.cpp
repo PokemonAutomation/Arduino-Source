@@ -22,14 +22,14 @@ namespace NintendoSwitch{
 
 
 void KeyboardDebouncer::clear(){
-    SpinLockGuard lg(m_lock);
+    WriteSpinLock lg(m_lock);
     m_last = VirtualControllerState();
     m_history.clear();
 }
 
 void KeyboardDebouncer::add_event(bool press, VirtualControllerState state){
     WallClock now = current_time();
-    SpinLockGuard lg(m_lock);
+    WriteSpinLock lg(m_lock);
     while (!m_history.empty()){
         if (m_history.front().timestamp + std::chrono::seconds(1) < now){
             m_history.pop_front();
@@ -45,7 +45,7 @@ WallClock KeyboardDebouncer::get_current_state(VirtualControllerState& state){
 
     const std::chrono::milliseconds RELEASE_DELAY(10);
 
-    SpinLockGuard lg(m_lock);
+    WriteSpinLock lg(m_lock);
 
     if (m_history.empty()){
 //        cout << "empty" << endl;

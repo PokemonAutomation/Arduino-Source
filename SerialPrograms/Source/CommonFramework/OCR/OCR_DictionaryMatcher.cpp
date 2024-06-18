@@ -19,7 +19,7 @@ const DictionaryOCR& DictionaryMatcher::dictionary(Language language) const{
     return iter->second;
 }
 DictionaryOCR& DictionaryMatcher::dictionary(Language language){
-    SpinLockGuard lg(m_lock, "LargeDictionaryMatcher::dictionary()");
+    ReadSpinLock lg(m_lock, "LargeDictionaryMatcher::dictionary()");
     auto iter = m_database.find(language);
     if (iter == m_database.end()){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Language not loaded.");

@@ -25,13 +25,13 @@ OverlayStat::OverlayStat()
 {}
 
 Color OverlayStat::get_text(std::string& text) const{
-    SpinLockGuard lg(m_data->m_lock);
+    ReadSpinLock lg(m_data->m_lock);
     text = m_data->m_current.text;
     return m_data->m_current.color;
 }
 
 void OverlayStat::set_text(std::string text, Color color){
-    SpinLockGuard lg(m_data->m_lock);
+    WriteSpinLock lg(m_data->m_lock);
     m_data->m_current.text = std::move(text);
     m_data->m_current.color = color;
 }

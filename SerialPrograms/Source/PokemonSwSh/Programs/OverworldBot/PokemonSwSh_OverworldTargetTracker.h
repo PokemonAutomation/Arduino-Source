@@ -69,7 +69,7 @@ public:
 
     //  Get the best target as of right now.
     //  The return value is only valid if the first element is non-negative.
-    std::pair<double, OverworldTarget> best_target();
+    std::pair<double, OverworldTarget> best_target() const;
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override final;
@@ -110,7 +110,7 @@ private:
     std::deque<Mark> m_questions;
 
     std::atomic<bool> m_stop_on_target;
-    SpinLock m_lock;
+    mutable SpinLock m_lock;
     std::pair<double, OverworldTarget> m_best_target;
 };
 

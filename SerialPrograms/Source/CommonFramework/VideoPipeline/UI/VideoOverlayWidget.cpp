@@ -64,25 +64,25 @@ void VideoOverlayWidget::enabled_stats(bool enabled){
 }
 
 void VideoOverlayWidget::update_boxes(const std::shared_ptr<const std::vector<OverlayBox>>& boxes){
-    SpinLockGuard lg(m_lock, "VideoOverlay::update_boxes()");
+    WriteSpinLock lg(m_lock, "VideoOverlay::update_boxes()");
     m_boxes = boxes;
 }
 void VideoOverlayWidget::update_text(const std::shared_ptr<const std::vector<OverlayText>>& texts){
-    SpinLockGuard lg(m_lock, "VideoOverlay::update_text()");
+    WriteSpinLock lg(m_lock, "VideoOverlay::update_text()");
     m_texts = texts;
 }
 void VideoOverlayWidget::update_log(const std::shared_ptr<const std::vector<OverlayLogLine>>& texts){
-    SpinLockGuard lg(m_lock, "VideoOverlay::update_log_text()");
+    WriteSpinLock lg(m_lock, "VideoOverlay::update_log_text()");
     m_log = texts;
 }
 #if 0
 void VideoOverlayWidget::update_log_background(const std::shared_ptr<const std::vector<VideoOverlaySession::Box>>& bg_boxes){
-    SpinLockGuard lg(m_lock, "VideoOverlay::update_log_background()");
+    WriteSpinLock lg(m_lock, "VideoOverlay::update_log_background()");
     m_log_text_bg_boxes = bg_boxes;
 }
 #endif
 void VideoOverlayWidget::update_stats(const std::list<OverlayStat*>* stats){
-    SpinLockGuard lg(m_lock, "VideoOverlay::update_stats()");
+    WriteSpinLock lg(m_lock, "VideoOverlay::update_stats()");
     m_stats = stats;
 }
 
@@ -97,7 +97,7 @@ void VideoOverlayWidget::paintEvent(QPaintEvent*){
     QPainter painter(this);
 
     {
-        SpinLockGuard lg(m_lock, "VideoOverlay::paintEvent()");
+        WriteSpinLock lg(m_lock, "VideoOverlay::paintEvent()");
 
         if (m_session.enabled_boxes()){
             update_boxes(painter);

@@ -56,7 +56,7 @@ void AudioInferencePivot::add_callback(
     AudioInferenceCallback& callback,
     std::chrono::milliseconds period
 ){
-    SpinLockGuard lg(m_lock);
+    WriteSpinLock lg(m_lock);
     auto iter = m_map.find(&callback);
     if (iter != m_map.end()){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Attempted to add the same callback twice.");
@@ -74,7 +74,7 @@ void AudioInferencePivot::add_callback(
     }
 }
 StatAccumulatorI32 AudioInferencePivot::remove_callback(AudioInferenceCallback& callback){
-    SpinLockGuard lg(m_lock);
+    WriteSpinLock lg(m_lock);
     auto iter = m_map.find(&callback);
     if (iter == m_map.end()){
         return StatAccumulatorI32();

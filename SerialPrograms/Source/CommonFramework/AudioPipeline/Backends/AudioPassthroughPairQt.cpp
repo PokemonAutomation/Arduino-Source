@@ -22,11 +22,11 @@ namespace PokemonAutomation{
 
 
 void AudioPassthroughPairQt::add_listener(FFTListener& listener){
-    SpinLockGuard lg(m_lock);
+    WriteSpinLock lg(m_lock);
     m_listeners.insert(&listener);
 }
 void AudioPassthroughPairQt::remove_listener(FFTListener& listener){
-    SpinLockGuard lg(m_lock);
+    WriteSpinLock lg(m_lock);
     m_listeners.erase(&listener);
 }
 
@@ -45,7 +45,7 @@ public:
     }
     virtual void on_samples(const float* data, size_t frames) override{
         AudioPassthroughPairQt& parent = m_parent;
-        SpinLockGuard lg(parent.m_lock);
+        WriteSpinLock lg(parent.m_lock);
         if (parent.m_writer){
             parent.m_writer->operator AudioFloatStreamListener&().on_samples(data, frames);
         }
@@ -71,7 +71,7 @@ public:
     }
     virtual void on_fft(size_t sample_rate, std::shared_ptr<AlignedVector<float>> fft_output) override{
         //  This is already inside the lock.
-//        SpinLockGuard lg(m_parent.m_lock);
+//        ReadSpinLock lg(m_parent.m_lock);
         for (FFTListener* listener : m_parent.m_listeners){
             listener->on_fft(sample_rate, fft_output);
         }
@@ -98,7 +98,7 @@ void AudioPassthroughPairQt::reset(
     const AudioDeviceInfo& output, double output_volume
 ){
     QMetaObject::invokeMethod(this, [this, file, output, output_volume]{
-        SpinLockGuard lg(m_lock);
+        WriteSpinLock lg(m_lock);
         if (m_reader){
             m_fft_listener.reset();
             m_fft_runner.reset();
@@ -123,7 +123,7 @@ void AudioPassthroughPairQt::reset(
 ){
 //    cout << "AudioPassthroughPairQt::reset(): " << output.display_name() << endl;
     QMetaObject::invokeMethod(this, [this, format, output, output_volume, input]{
-        SpinLockGuard lg(m_lock);
+        WriteSpinLock lg(m_lock);
         if (m_reader){
             m_fft_listener.reset();
             m_fft_runner.reset();
@@ -146,7 +146,7 @@ void AudioPassthroughPairQt::reset(
 }
 void AudioPassthroughPairQt::clear_audio_source(){
     QMetaObject::invokeMethod(this, [this]{
-        SpinLockGuard lg(m_lock);
+        WriteSpinLock lg(m_lock);
         if (m_reader){
             m_fft_listener.reset();
             m_fft_runner.reset();
@@ -158,7 +158,7 @@ void AudioPassthroughPairQt::clear_audio_source(){
 }
 void AudioPassthroughPairQt::set_audio_source(const std::string& file){
     QMetaObject::invokeMethod(this, [this, file]{
-        SpinLockGuard lg(m_lock);
+        WriteSpinLock lg(m_lock);
         if (m_reader){
             m_fft_listener.reset();
             m_fft_runner.reset();
@@ -177,7 +177,7 @@ void AudioPassthroughPairQt::set_audio_source(const std::string& file){
 }
 void AudioPassthroughPairQt::set_audio_source(const AudioDeviceInfo& device, AudioChannelFormat format){
     QMetaObject::invokeMethod(this, [this, format, device]{
-        SpinLockGuard lg(m_lock);
+        WriteSpinLock lg(m_lock);
         if (m_reader){
             m_fft_listener.reset();
             m_fft_runner.reset();
@@ -199,14 +199,14 @@ void AudioPassthroughPairQt::set_audio_source(const AudioDeviceInfo& device, Aud
 
 void AudioPassthroughPairQt::clear_audio_sink(){
     QMetaObject::invokeMethod(this, [this]{
-        SpinLockGuard lg(m_lock);
+        WriteSpinLock lg(m_lock);
         m_writer.reset();
         m_output_device = AudioDeviceInfo();
     });
 }
 void AudioPassthroughPairQt::set_audio_sink(const AudioDeviceInfo& device, double volume){
     QMetaObject::invokeMethod(this, [this, device, volume]{
-        SpinLockGuard lg(m_lock);
+        WriteSpinLock lg(m_lock);
         m_writer.reset();
         m_output_device = device;
         m_output_volume = volume;
@@ -245,7 +245,7 @@ void AudioPassthroughPairQt::init_audio_sink(){
 
 void AudioPassthroughPairQt::set_sink_volume(double volume){
     QMetaObject::invokeMethod(this, [this, volume]{
-        SpinLockGuard lg(m_lock);
+        WriteSpinLock lg(m_lock);
         m_output_volume = volume;
         if (m_writer){
             m_writer->set_volume(volume);

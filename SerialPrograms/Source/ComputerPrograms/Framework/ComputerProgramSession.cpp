@@ -59,22 +59,22 @@ void ComputerProgramSession::run_program_instance(ProgramEnvironment& env, Cance
     }
 
     {
-        SpinLockGuard lg(m_lock);
+        WriteSpinLock lg(m_lock);
         m_scope = &scope;
     }
 
     try{
         m_option.instance().program(env, scope);
     }catch (...){
-        SpinLockGuard lg(m_lock);
+        WriteSpinLock lg(m_lock);
         m_scope = nullptr;
         throw;
     }
-    SpinLockGuard lg(m_lock);
+    WriteSpinLock lg(m_lock);
     m_scope = nullptr;
 }
 void ComputerProgramSession::internal_stop_program(){
-    SpinLockGuard lg(m_lock);
+    WriteSpinLock lg(m_lock);
     if (m_scope != nullptr){
         m_scope->cancel(std::make_exception_ptr(ProgramCancelledException()));
     }

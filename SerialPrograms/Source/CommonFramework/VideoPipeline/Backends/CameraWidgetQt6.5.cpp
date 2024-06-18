@@ -180,12 +180,12 @@ std::vector<Resolution> CameraSession::supported_resolutions() const{
     return ret;
 }
 std::pair<QVideoFrame, uint64_t> CameraSession::latest_frame(){
-    SpinLockGuard lg(m_frame_lock);
+    ReadSpinLock lg(m_frame_lock);
     return {m_last_frame, m_last_frame_seqnum};
 }
 void CameraSession::report_rendered_frame(WallClock timestamp){
     {
-        SpinLockGuard lg(m_frame_lock);
+        WriteSpinLock lg(m_frame_lock);
         m_fps_tracker_display.push_event(timestamp);
     }
     global_watchdog().delay(*this);
@@ -204,7 +204,7 @@ VideoSnapshot CameraSession::snapshot(){
     WallClock frame_timestamp;
     uint64_t frame_seqnum;
     {
-        SpinLockGuard lg0(m_frame_lock);
+        ReadSpinLock lg0(m_frame_lock);
         frame_seqnum = m_last_frame_seqnum;
         if (!m_last_image.isNull() && m_last_image_seqnum == frame_seqnum){
             return VideoSnapshot(m_last_image, m_last_image_timestamp);
@@ -236,11 +236,11 @@ VideoSnapshot CameraSession::snapshot(){
     return VideoSnapshot(m_last_image, m_last_image_timestamp);
 }
 double CameraSession::fps_source(){
-    SpinLockGuard lg(m_frame_lock);
+    ReadSpinLock lg(m_frame_lock);
     return m_fps_tracker_source.events_per_second();
 }
 double CameraSession::fps_display(){
-    SpinLockGuard lg(m_frame_lock);
+    ReadSpinLock lg(m_frame_lock);
     return m_fps_tracker_display.events_per_second();
 }
 
@@ -251,7 +251,7 @@ void CameraSession::connect_video_sink(QVideoSink* sink){
         this, [&](const QVideoFrame& frame){
             {
                 WallClock now = current_time();
-                SpinLockGuard lg(m_frame_lock);
+                WriteSpinLock lg(m_frame_lock);
                 m_last_frame = frame;
                 m_last_frame_timestamp = now;
                 m_last_frame_seqnum++;
@@ -307,7 +307,7 @@ void CameraSession::shutdown(){
     m_resolution_map.clear();
     m_formats.clear();
 
-    SpinLockGuard lg(m_frame_lock);
+    WriteSpinLock lg(m_frame_lock);
 
     m_last_frame = QVideoFrame();
     m_last_frame_timestamp = current_time();

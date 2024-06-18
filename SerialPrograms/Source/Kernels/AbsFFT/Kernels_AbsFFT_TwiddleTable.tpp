@@ -69,7 +69,7 @@ void TwiddleTable<Context>::ensure(int k){
 }
 template <typename Context>
 void TwiddleTable<Context>::expand(int k){
-    SpinLockGuard lg(m_resize_lock);
+    WriteSpinLock lg(m_resize_lock);
     int size_k = m_size_k.load(std::memory_order_acquire);
     if (size_k >= k){
         return;

@@ -197,7 +197,7 @@ double binomial_coefficient_double(size_t degree, size_t index){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Cannot go beyond degree 1000.");
     }
 
-    SpinLockGuard lg(binomial_lock, "binomial_coefficient_double()");
+    WriteSpinLock lg(binomial_lock, "binomial_coefficient_double()");
 
     auto iter = binomial_table.find(degree);
     std::vector<uint64_t>& row = iter != binomial_table.end()

@@ -50,7 +50,7 @@ public:
         TesseractAPI* instance;
         while (true){
             {
-                SpinLockGuard lg(m_lock, "TesseractPool::run()");
+                WriteSpinLock lg(m_lock, "TesseractPool::run()");
                 if (!m_idle.empty()){
                     instance = m_idle.back();
                     m_idle.pop_back();
@@ -71,7 +71,7 @@ public:
 //        cout << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << endl;
 
         {
-            SpinLockGuard lg(m_lock, "TesseractPool::run()");
+            WriteSpinLock lg(m_lock, "TesseractPool::run()");
             m_idle.emplace_back(instance);
         }
 
@@ -101,7 +101,7 @@ public:
             throw InternalSystemError(nullptr, PA_CURRENT_FUNCTION, "Could not initialize TesseractAPI.");
         }
 
-        SpinLockGuard lg(m_lock, "TesseractPool::run()");
+        WriteSpinLock lg(m_lock, "TesseractPool::run()");
 
         m_instances.emplace_back(std::move(api));
         try{
@@ -116,7 +116,7 @@ public:
         size_t current_instances;
         while (true){
             {
-                SpinLockGuard lg(m_lock, "TesseractPool::run()");
+                ReadSpinLock lg(m_lock, "TesseractPool::run()");
                 current_instances = m_instances.size();
             }
             if (current_instances >= instances){
@@ -169,7 +169,7 @@ std::string ocr_read(Language language, const ImageViewRGB32& image){
 
     std::map<Language, TesseractPool>::iterator iter;
     {
-        SpinLockGuard lg(ocr_pool_lock, "ocr_read()");
+        WriteSpinLock lg(ocr_pool_lock, "ocr_read()");
         iter = ocr_pool.find(language);
         if (iter == ocr_pool.end()){
             iter = ocr_pool.emplace(language, language).first;
@@ -184,7 +184,7 @@ void ensure_instances(Language language, size_t instances){
 
     std::map<Language, TesseractPool>::iterator iter;
     {
-        SpinLockGuard lg(ocr_pool_lock, "ocr_read()");
+        WriteSpinLock lg(ocr_pool_lock, "ocr_read()");
         iter = ocr_pool.find(language);
         if (iter == ocr_pool.end()){
             iter = ocr_pool.emplace(language, language).first;

@@ -9,9 +9,10 @@
 
 #include <deque>
 #include <map>
-#include "Common/Cpp/Concurrency/SpinLock.h"
+#include "Common/Cpp/AbstractLogger.h"
+//#include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
-#include "CommonFramework/Logging/Logger.h"
+//#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 
@@ -96,7 +97,7 @@ private:
     Logger& m_logger;
     std::atomic<MountState> m_state;
 
-    SpinLock m_lock;
+//    SpinLock m_lock;
     MountDetector m_detector;
 
     std::deque<Sample> m_history;

@@ -46,7 +46,7 @@ public:
 
 private:
     VideoOverlay& m_overlay;
-    SpinLock m_lock;
+    mutable SpinLock m_lock;
     double m_center_x;
     double m_center_y;
     std::unique_ptr<OverlayBoxScope> m_box;

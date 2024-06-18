@@ -602,8 +602,6 @@ bool MountTracker::process_frame(const ImageViewRGB32& frame, WallClock timestam
     MountState state = m_detector.detect(frame);
 //    cout << "state = " << (int)state << endl;
 
-//    SpinLockGuard lg(m_lock);
-
     //  Clear out old history.
     WallClock threshold = timestamp - std::chrono::seconds(1);
     while (!m_history.empty()){

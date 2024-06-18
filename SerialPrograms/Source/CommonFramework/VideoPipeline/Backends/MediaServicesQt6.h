@@ -25,7 +25,7 @@ public:
     }
 
     QList<QCameraDevice> get_all_cameras(){
-        SpinLockGuard lg(m_camera_lock);
+        ReadSpinLock lg(m_camera_lock);
         return m_cameras;
     }
 
