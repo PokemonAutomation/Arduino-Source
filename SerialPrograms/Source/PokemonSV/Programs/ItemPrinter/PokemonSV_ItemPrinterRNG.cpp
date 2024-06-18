@@ -318,17 +318,12 @@ void ItemPrinterRNG::run_print_at_date(
             printed = true;
             std::array<std::string, 10> print_results = item_printer_finish_print(env.inference_dispatcher(), env.console, context, LANGUAGE);
             uint64_t seed = to_seconds_since_epoch(date);
-            int distance_from_target = get_distance_from_target(env.console, print_results, seed);
-            if (distance_from_target == 0){
-                stats.frame_hits++;
-            }else if (distance_from_target == std::numeric_limits<int>::min()){
-                distance_from_target = 0;
-                stats.frame_unknown++;
-            }else{
-                stats.frame_misses++;
-            }
+            int distance_from_target = get_distance_from_target(env.console, stats, print_results, seed);
             env.update_stats();
-            if (ADJUST_DELAY){
+            if (ADJUST_DELAY &&
+                distance_from_target != 0 &&
+                distance_from_target != std::numeric_limits<int>::min()
+            ){
                 adjust_delay(env.logger(), env, print_results, distance_from_target);
             }
 
@@ -373,17 +368,18 @@ void ItemPrinterRNG::adjust_delay(
     DELAY_MILLIS.set((uint16_t)new_delay);
     logger.log("Current delay: " + std::to_string(new_delay));
     // std::cout << "Current delay:" << new_delay << std::endl;
-    
+
 }
 
 int ItemPrinterRNG::get_distance_from_target(
     Logger& logger,
-    const std::array<std::string, 10>& print_results, 
+    ItemPrinterRNG_Descriptor::Stats& stats,
+    const std::array<std::string, 10>& print_results,
     uint64_t seed
 ){
     int distance_from_target = std::numeric_limits<int>::min();
-    const int MAX_DEVIATION = 2;
-    for (int current_deviation = 0; current_deviation < MAX_DEVIATION; current_deviation++){
+    const int MAX_DEVIATION = 10;
+    for (int current_deviation = 0; current_deviation <= MAX_DEVIATION; current_deviation++){
         ItemPrinter::DateSeed seed_data;
         if (ENABLE_SEED_CALC){
             seed_data = ItemPrinter::calculate_seed_prizes(seed - current_deviation);
@@ -418,12 +414,16 @@ int ItemPrinterRNG::get_distance_from_target(
 
     if (distance_from_target == std::numeric_limits<int>::min()){
         logger.log("Frame Result: Unable to determine frame.", COLOR_RED);
+        stats.frame_unknown++;
     }else if (distance_from_target < 0){
         logger.log("Frame Result: Missed. (Target - " + std::to_string(-distance_from_target) + ")", COLOR_ORANGE);
+        stats.frame_misses++;
     }else if (distance_from_target > 0){
         logger.log("Frame Result: Missed. (Target + " + std::to_string(distance_from_target) + ")", COLOR_ORANGE);
+        stats.frame_misses++;
     }else{
         logger.log("Frame Result: Target hit", COLOR_BLUE);
+        stats.frame_hits++;
     }
 
     return distance_from_target;

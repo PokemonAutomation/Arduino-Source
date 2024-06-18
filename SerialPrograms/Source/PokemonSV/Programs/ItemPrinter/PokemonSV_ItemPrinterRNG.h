@@ -61,6 +61,7 @@ private:
 
     int get_distance_from_target(
         Logger& logger,
+        ItemPrinterRNG_Descriptor::Stats& stats,
         const std::array<std::string, 10>& print_results,
         uint64_t seed
     );
