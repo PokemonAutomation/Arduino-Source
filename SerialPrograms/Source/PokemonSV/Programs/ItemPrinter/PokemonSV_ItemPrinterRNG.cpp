@@ -322,6 +322,7 @@ void ItemPrinterRNG::run_print_at_date(
             if (distance_from_target == 0){
                 stats.frame_hits++;
             }else if (distance_from_target == std::numeric_limits<int>::min()){
+                distance_from_target = 0;
                 stats.frame_unknown++;
             }else{
                 stats.frame_misses++;
