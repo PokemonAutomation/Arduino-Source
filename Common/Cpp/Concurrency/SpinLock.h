@@ -61,7 +61,11 @@ public:
         if (m_readers.compare_exchange_weak(state, 1)){
             return;
         }
-        internal_acquire_read(label);
+        if (label == nullptr){
+            internal_acquire_read();
+        }else{
+            internal_acquire_read(label);
+        }
     }
     PA_FORCE_INLINE void acquire_write(const char* label = nullptr){
         //  Assume unlocked.
@@ -69,7 +73,11 @@ public:
         if (m_readers.compare_exchange_weak(state, (size_t)-1)){
             return;
         }
-        internal_acquire_write(label);
+        if (label == nullptr){
+            internal_acquire_write();
+        }else{
+            internal_acquire_write(label);
+        }
     }
 
     PA_FORCE_INLINE void unlock_read(){
@@ -80,6 +88,8 @@ public:
     }
 
 private:
+    void internal_acquire_read();
+    void internal_acquire_write();
     void internal_acquire_read(const char* label);
     void internal_acquire_write(const char* label);
 
