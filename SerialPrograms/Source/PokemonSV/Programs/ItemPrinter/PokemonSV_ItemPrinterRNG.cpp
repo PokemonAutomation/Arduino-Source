@@ -232,14 +232,14 @@ bool ItemPrinterRNG::overlapping_bonus(){
     // for each row in table. if ball/item bonus, ensure that sum of prints in subsequent rows >=10 before the next bonus, or end of the table.
     uint16_t total_prints_since_last_bonus = 10;
     for (std::shared_ptr<EditableTableRow> table_row : TABLE0.current_refs()){
-        std::shared_ptr<ItemPrinterRngRow> row = std::static_pointer_cast<ItemPrinterRngRow>(table_row);
-        if (row->desired_item == ItemPrinter::PrebuiltOptions::BALL_BONUS || row->desired_item == ItemPrinter::PrebuiltOptions::ITEM_BONUS){
+        ItemPrinterRngRow& row = static_cast<ItemPrinterRngRow&>(*table_row);
+        if (row.desired_item == ItemPrinter::PrebuiltOptions::BALL_BONUS || row.desired_item == ItemPrinter::PrebuiltOptions::ITEM_BONUS){
             if (total_prints_since_last_bonus < 10){
                 return true;
             }
             total_prints_since_last_bonus = 0;
         }else{
-            total_prints_since_last_bonus += (uint16_t)static_cast<ItemPrinterJobs>(row->jobs);
+            total_prints_since_last_bonus += (uint16_t)static_cast<ItemPrinterJobs>(row.jobs);
         }
     }
 
