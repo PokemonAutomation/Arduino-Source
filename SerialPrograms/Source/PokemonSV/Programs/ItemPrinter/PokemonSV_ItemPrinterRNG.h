@@ -40,6 +40,8 @@ public:
 private:
     virtual void value_changed(void* object) override;
 
+    bool overlapping_bonus();
+
     void run_item_printer_rng(SingleSwitchProgramEnvironment& env, BotBaseContext& context, ItemPrinterRNG_Descriptor::Stats& stats);
 
     void run_print_at_date(
@@ -76,6 +78,7 @@ private:
     SimpleIntegerOption<uint16_t> NUM_ITEM_PRINTER_ROUNDS;
     StaticTextOption AFTER_ITEM_PRINTER_DONE_EXPLANATION;
 
+    StaticTextOption OVERLAPPING_BONUS_WARNING;
     ItemPrinterRngTable TABLE0;
 
     SimpleIntegerOption<uint16_t> DELAY_MILLIS;
