@@ -362,6 +362,7 @@ bool use_lets_go_to_clear_in_front(
         last_kill = tracker.last_kill();
     }
     console.log("Nothing left to clear...");
+    tracker.throw_if_no_sound();
     return tracker.last_kill() != WallClock::min();
 }
 

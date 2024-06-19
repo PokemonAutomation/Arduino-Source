@@ -62,6 +62,7 @@ struct ItemPrinterRNG_Descriptor::Stats : public StatsTracker{
         , frame_hits(m_stats["Frame Hits"])
         , frame_misses(m_stats["Frame Misses"])
         , frame_unknown(m_stats["Unknown Frame"])
+        , material_farmer_runs(m_stats["Material Farmer Runs"])
         , errors(m_stats["Errors"])
     {
         m_display_order.emplace_back("Rounds");
@@ -70,6 +71,7 @@ struct ItemPrinterRNG_Descriptor::Stats : public StatsTracker{
         m_display_order.emplace_back("Frame Hits");
         m_display_order.emplace_back("Frame Misses");
         m_display_order.emplace_back("Unknown Frame", HIDDEN_IF_ZERO);
+        m_display_order.emplace_back("Material Farmer Runs", HIDDEN_IF_ZERO);
         m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
     }
     std::atomic<uint64_t>& iterations;
@@ -78,6 +80,7 @@ struct ItemPrinterRNG_Descriptor::Stats : public StatsTracker{
     std::atomic<uint64_t>& frame_hits;
     std::atomic<uint64_t>& frame_misses;
     std::atomic<uint64_t>& frame_unknown;
+    std::atomic<uint64_t>& material_farmer_runs;
     std::atomic<uint64_t>& errors;
 };
 std::unique_ptr<StatsTracker> ItemPrinterRNG_Descriptor::make_stats() const{
@@ -612,6 +615,8 @@ void ItemPrinterRNG::run_item_printer_rng(
                 //  Dummy stats since we don't use the material farmer stats.
                 MaterialFarmerStats mat_farm_stats;
                 run_material_farmer(env, context, MATERIAL_FARMER_OPTIONS, mat_farm_stats);
+                stats.material_farmer_runs++;
+                env.update_stats();
             }
             move_from_material_farming_to_item_printer(env, context);
 

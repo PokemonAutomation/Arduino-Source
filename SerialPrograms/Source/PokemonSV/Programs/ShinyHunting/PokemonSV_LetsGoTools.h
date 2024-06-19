@@ -118,6 +118,10 @@ public:
         OCR::LanguageOCROption& language
     );
 
+    void throw_if_no_sound(std::chrono::milliseconds min_duration = std::chrono::milliseconds(10000)) const{
+        m_kill_sound.throw_if_no_sound(min_duration);
+    }
+
     WallClock encounter_rate_tracker_start_time() const{
         return m_encounter_rate.start_time();
     }

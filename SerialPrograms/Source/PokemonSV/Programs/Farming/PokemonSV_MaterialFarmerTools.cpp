@@ -188,7 +188,7 @@ void run_material_farmer(
     */
     while (true){
         // check time left on material farming
-        auto farming_time_remaining =  minutes_remaining(start_time, std::chrono::minutes(options.RUN_TIME_IN_MINUTES));
+        auto farming_time_remaining = minutes_remaining(start_time, std::chrono::minutes(options.RUN_TIME_IN_MINUTES));
         env.console.log(
             "Time left in Material Farming: " + 
             std::to_string(farming_time_remaining.count()) + " min", 
@@ -201,7 +201,7 @@ void run_material_farmer(
         
         // Check time left on sandwich
         if (options.SANDWICH_OPTIONS.enabled()){
-            auto sandwich_time_remaining =  minutes_remaining(last_sandwich_time, std::chrono::minutes(options.TIME_PER_SANDWICH));
+            auto sandwich_time_remaining = minutes_remaining(last_sandwich_time, std::chrono::minutes(options.TIME_PER_SANDWICH));
             env.console.log(
                 "Time left on sandwich: " + 
                 std::to_string(sandwich_time_remaining.count()) + " min", 
@@ -213,14 +213,14 @@ void run_material_farmer(
                 env.console.overlay().add_log("Sandwich made.");
 
                 // Log time remaining in Material farming 
-                farming_time_remaining =  minutes_remaining(start_time, std::chrono::minutes(options.RUN_TIME_IN_MINUTES));
+                farming_time_remaining = minutes_remaining(start_time, std::chrono::minutes(options.RUN_TIME_IN_MINUTES));
                 env.console.log(
                     "Time left in Material Farming: " + 
                     std::to_string(farming_time_remaining.count()) + " min", 
                     COLOR_PURPLE
                 );
                 // Log time remaining on Sandwich
-                sandwich_time_remaining =  minutes_remaining(last_sandwich_time, std::chrono::minutes(options.TIME_PER_SANDWICH));
+                sandwich_time_remaining = minutes_remaining(last_sandwich_time, std::chrono::minutes(options.TIME_PER_SANDWICH));
                 env.console.log(
                     "Time left on sandwich: " + 
                     std::to_string(sandwich_time_remaining.count()) + " min", 
