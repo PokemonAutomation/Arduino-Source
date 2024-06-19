@@ -52,8 +52,8 @@ public:
     void add_entry(StringSelectEntry entry);
 
 public:
-    size_t longest_text_length() const;
     const std::vector<StringSelectEntry>& case_list() const;
+    size_t longest_text_length() const;
 
     const StringSelectEntry& operator[](size_t index) const;
     size_t search_index_by_slug(const std::string& slug) const;

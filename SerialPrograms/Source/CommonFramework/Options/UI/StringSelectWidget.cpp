@@ -8,13 +8,14 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QCompleter>
+#include <QLineEdit>
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "StringSelectWidget.h"
 
-//#include <iostream>
-//using std::cout;
-//using std::endl;
+#include <iostream>
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 
@@ -53,6 +54,10 @@ StringSelectCellWidget::StringSelectCellWidget(QWidget& parent, StringSelectCell
 
     StringSelectCellWidget::update_value();
 
+    QPalette palette;
+    palette.setColor(QPalette::Text, QColor((uint32_t)entry.text_color));
+    this->lineEdit()->setPalette(palette);
+
     connect(
         this, static_cast<void(QComboBox::*)(int)>(&QComboBox::activated),
         this, [this](int index){
@@ -70,8 +75,8 @@ StringSelectCellWidget::StringSelectCellWidget(QWidget& parent, StringSelectCell
 
 void StringSelectCellWidget::load_options(){
 //    cout << "load_options()" << endl;
+    const std::vector<StringSelectEntry>& cases = m_value.database().case_list();
     if (this->count() <= 1){
-        const std::vector<StringSelectEntry>& cases = m_value.database().case_list();
         global_logger_tagged().log("Loading dropdown with " + tostr_u_commas(cases.size()) + " elements.");
         this->clear();
         for (const StringSelectEntry& item : cases){
@@ -82,7 +87,14 @@ void StringSelectCellWidget::load_options(){
             }
         }
     }
-    this->setCurrentIndex((int)m_value.index());
+    size_t index = m_value.index();
+    this->setCurrentIndex((int)index);
+
+    QPalette palette;
+    palette.setColor(QPalette::Text, QColor((uint32_t)cases[index].text_color));
+//    palette.setColor(QPalette::Text, Qt::red);
+    this->lineEdit()->setPalette(palette);
+
     update_size_cache();
 }
 void StringSelectCellWidget::hide_options(){
@@ -114,6 +126,12 @@ void StringSelectCellWidget::hide_options(){
     QPixmap pixmap = QPixmap::fromImage(entry.icon.to_QImage_ref());
     this->addItem(pixmap, QString::fromStdString(entry.display_name));
     this->setCurrentIndex(0);
+
+    QPalette palette;
+    palette.setColor(QPalette::Text, QColor((uint32_t)entry.text_color));
+//    palette.setColor(QPalette::Text, Qt::red);
+    this->lineEdit()->setPalette(palette);
+
 }
 QSize StringSelectCellWidget::sizeHint() const{
     QSize ret = NoWheelComboBox::sizeHint();
