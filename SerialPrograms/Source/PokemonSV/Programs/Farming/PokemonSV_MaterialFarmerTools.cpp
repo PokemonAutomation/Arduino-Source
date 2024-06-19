@@ -43,6 +43,7 @@ MaterialFarmerOptions::~MaterialFarmerOptions(){
 }
 
 MaterialFarmerOptions::MaterialFarmerOptions(
+    bool toggleable, bool enabled,
     OCR::LanguageOCROption* language_option,
     EventNotificationOption& notif_status_update_option,
     EventNotificationOption& notif_program_finish_option,
@@ -52,7 +53,7 @@ MaterialFarmerOptions::MaterialFarmerOptions(
     : GroupOption(
         "Material Farmer",
         LockMode::UNLOCK_WHILE_RUNNING,
-        false, true
+        toggleable, enabled
     )
     , m_language_owner(language_option == nullptr
         ? new OCR::LanguageOCROption(
@@ -777,7 +778,7 @@ void move_from_item_printer_to_blueberry_entrance(SingleSwitchProgramEnvironment
 
     // check for overworld
     OverworldWatcher overworld(COLOR_CYAN);  
-    ret = wait_until(env.console, context, Milliseconds(10000), { overworld });
+    ret = wait_until(env.console, context, std::chrono::seconds(30), { overworld });
     if (ret == 0){
         env.log("Overworld detected");
     }else{

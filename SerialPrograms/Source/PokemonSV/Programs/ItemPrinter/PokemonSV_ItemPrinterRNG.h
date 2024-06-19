@@ -76,7 +76,7 @@ private:
 private:
     OCR::LanguageOCROption LANGUAGE;
     SimpleIntegerOption<uint16_t> NUM_ITEM_PRINTER_ROUNDS;
-    StaticTextOption AFTER_ITEM_PRINTER_DONE_EXPLANATION;
+//    StaticTextOption AFTER_ITEM_PRINTER_DONE_EXPLANATION;
 
     StaticTextOption OVERLAPPING_BONUS_WARNING;
     ItemPrinterRngTable TABLE0;
@@ -87,10 +87,11 @@ private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
     BooleanCheckBoxOption FIX_TIME_WHEN_DONE;
 
-    BooleanCheckBoxOption AUTO_MATERIAL_FARMING;
-    SimpleIntegerOption<uint16_t> NUM_ROUNDS_OF_ITEM_PRINTER_TO_MATERIAL_FARM;
+//    BooleanCheckBoxOption AUTO_MATERIAL_FARMING;
+//    SimpleIntegerOption<uint16_t> NUM_ROUNDS_OF_ITEM_PRINTER_TO_MATERIAL_FARM;
     
-    StaticTextOption MATERIAL_FARMER_DISABLED_EXPLANATION;
+//    StaticTextOption MATERIAL_FARMER_DISABLED_EXPLANATION;
+    SimpleIntegerOption<uint16_t> MATERIAL_FARMER_JOBS_PERIOD;
     MaterialFarmerOptions MATERIAL_FARMER_OPTIONS;
 
     BooleanCheckBoxOption ENABLE_SEED_CALC;

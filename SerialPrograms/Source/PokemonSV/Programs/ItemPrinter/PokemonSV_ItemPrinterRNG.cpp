@@ -85,8 +85,9 @@ std::unique_ptr<StatsTracker> ItemPrinterRNG_Descriptor::make_stats() const{
 }
 
 ItemPrinterRNG::~ItemPrinterRNG(){
+    MATERIAL_FARMER_OPTIONS.remove_listener(*this);
     TABLE0.remove_listener(*this);
-    AUTO_MATERIAL_FARMING.remove_listener(*this);
+//    AUTO_MATERIAL_FARMING.remove_listener(*this);
 }
 
 ItemPrinterRNG::ItemPrinterRNG()
@@ -100,9 +101,9 @@ ItemPrinterRNG::ItemPrinterRNG()
         "<b>Number of rounds per Item Printer session:</b><br>Iterate the rounds table this many times. ",
         LockMode::UNLOCK_WHILE_RUNNING, 10
     )
-    , AFTER_ITEM_PRINTER_DONE_EXPLANATION(
-        "Then proceed to material farming."
-    )
+//    , AFTER_ITEM_PRINTER_DONE_EXPLANATION(
+//        "Then proceed to material farming."
+//    )
     , OVERLAPPING_BONUS_WARNING(
         "<font color=\"red\">WARNING: At least one of the Ball/Item bonuses haven't been fully used up. "
         "This can mess up your rewards for subsequent prints.</font><br>"
@@ -129,30 +130,37 @@ ItemPrinterRNG::ItemPrinterRNG()
         "<b>Fix Time when Done:</b><br>Fix the time after the program finishes.",
         LockMode::UNLOCK_WHILE_RUNNING, true
     )
-    , AUTO_MATERIAL_FARMING(
-        "<b>Automatic Material Farming:</b><br>"
-        "After using the item printer, automatically fly to North Province (Area 3) to farm materials, "
-        "then fly back to keep using the item printer.",
-        // "This will do the item printer loops, then the material farmer loops, then repeat.<br>",
-        // "The number of item printer loops is set by \"Number of rounds per Item Printer session\".<br>"
-        // "The number of material farmer loops is set by \"Number of sandwich rounds to run\".<br>"
-        // "The number of Item Printer to Material Farmer loops is set by \"Number of rounds of Item Printer → Material farm\".",
-        LockMode::LOCK_WHILE_RUNNING,
-        false
+//    , AUTO_MATERIAL_FARMING(
+//        "<b>Automatic Material Farming:</b><br>"
+//        "After using the item printer, automatically fly to North Province (Area 3) to farm materials, "
+//        "then fly back to keep using the item printer.",
+//        // "This will do the item printer loops, then the material farmer loops, then repeat.<br>",
+//        // "The number of item printer loops is set by \"Number of rounds per Item Printer session\".<br>"
+//        // "The number of material farmer loops is set by \"Number of sandwich rounds to run\".<br>"
+//        // "The number of Item Printer to Material Farmer loops is set by \"Number of rounds of Item Printer → Material farm\".",
+//        LockMode::LOCK_WHILE_RUNNING,
+//        false
+//    )
+//    , NUM_ROUNDS_OF_ITEM_PRINTER_TO_MATERIAL_FARM(
+//        "<b>Number of rounds of Item Printer → Material farm:</b><br>"
+//        "One round is: Using the item printer (looping through the table for as many rounds as you specify below), "
+//        "then farming materials at North Provice area 3, "
+//        "then flying back to the item printer.<br>"
+//        "Automatic Material Farming (see above) must be enabled",
+//        // (as per \"Number of rounds per Item Printer session\" below)
+//        //(as per \"Number of sandwich rounds\" below, under \"Material Farmer\")
+//        LockMode::UNLOCK_WHILE_RUNNING,
+//        3
+//    )
+//    , MATERIAL_FARMER_DISABLED_EXPLANATION("")
+    , MATERIAL_FARMER_JOBS_PERIOD(
+        "<b>Print Jobs per Material Farming Session:</b><br>"
+        "Run the material farmer once for this many jobs printed.",
+        LockMode::UNLOCK_WHILE_RUNNING, 500,
+        20, 650
     )
-    , NUM_ROUNDS_OF_ITEM_PRINTER_TO_MATERIAL_FARM(
-        "<b>Number of rounds of Item Printer → Material farm:</b><br>"
-        "One round is: Using the item printer (looping through the table for as many rounds as you specify below), "
-        "then farming materials at North Provice area 3, "
-        "then flying back to the item printer.<br>"
-        "Automatic Material Farming (see above) must be enabled",
-        // (as per \"Number of rounds per Item Printer session\" below)
-        //(as per \"Number of sandwich rounds\" below, under \"Material Farmer\")
-        LockMode::UNLOCK_WHILE_RUNNING,
-        3
-    )
-    , MATERIAL_FARMER_DISABLED_EXPLANATION("")
     , MATERIAL_FARMER_OPTIONS(
+        true, false,
         &LANGUAGE,
         NOTIFICATION_STATUS_UPDATE,
         NOTIFICATION_PROGRAM_FINISH,
@@ -174,21 +182,22 @@ ItemPrinterRNG::ItemPrinterRNG()
 {
     PA_ADD_OPTION(LANGUAGE);
 
-    if (PreloadSettings::instance().DEVELOPER_MODE){
-        PA_ADD_OPTION(AUTO_MATERIAL_FARMING);
-        PA_ADD_OPTION(NUM_ROUNDS_OF_ITEM_PRINTER_TO_MATERIAL_FARM);
-    }
+//    if (PreloadSettings::instance().DEVELOPER_MODE){
+//        PA_ADD_OPTION(AUTO_MATERIAL_FARMING);
+//        PA_ADD_OPTION(NUM_ROUNDS_OF_ITEM_PRINTER_TO_MATERIAL_FARM);
+//    }
     PA_ADD_OPTION(NUM_ITEM_PRINTER_ROUNDS);
-    PA_ADD_OPTION(AFTER_ITEM_PRINTER_DONE_EXPLANATION);
-    PA_ADD_OPTION(OVERLAPPING_BONUS_WARNING);
+//    PA_ADD_OPTION(AFTER_ITEM_PRINTER_DONE_EXPLANATION);
     PA_ADD_OPTION(TABLE0);
+    PA_ADD_OPTION(OVERLAPPING_BONUS_WARNING);
     PA_ADD_OPTION(DELAY_MILLIS);
     PA_ADD_OPTION(ADJUST_DELAY);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(FIX_TIME_WHEN_DONE);
 
     if (PreloadSettings::instance().DEVELOPER_MODE){
-        PA_ADD_OPTION(MATERIAL_FARMER_DISABLED_EXPLANATION);
+//        PA_ADD_OPTION(MATERIAL_FARMER_DISABLED_EXPLANATION);
+        PA_ADD_OPTION(MATERIAL_FARMER_JOBS_PERIOD);
         PA_ADD_OPTION(MATERIAL_FARMER_OPTIONS);
     }
     if (PreloadSettings::instance().DEVELOPER_MODE){
@@ -198,29 +207,29 @@ ItemPrinterRNG::ItemPrinterRNG()
     PA_ADD_OPTION(NOTIFICATIONS);
 
     ItemPrinterRNG::value_changed(this);
-    AUTO_MATERIAL_FARMING.add_listener(*this);
+//    AUTO_MATERIAL_FARMING.add_listener(*this);
     TABLE0.add_listener(*this);
+    MATERIAL_FARMER_OPTIONS.add_listener(*this);
 }
 
 void ItemPrinterRNG::value_changed(void* object){
-    ConfigOptionState state = AUTO_MATERIAL_FARMING ? ConfigOptionState::ENABLED : ConfigOptionState::DISABLED;
-    MATERIAL_FARMER_OPTIONS.set_visibility(state);
-    NUM_ROUNDS_OF_ITEM_PRINTER_TO_MATERIAL_FARM.set_visibility(state);
-    if (AUTO_MATERIAL_FARMING){
-        AFTER_ITEM_PRINTER_DONE_EXPLANATION.set_text("Then proceed to material farming.");
-        MATERIAL_FARMER_DISABLED_EXPLANATION.set_text("<br>");
-    }else{
-        AFTER_ITEM_PRINTER_DONE_EXPLANATION.set_text("Then stop the program.");
-        MATERIAL_FARMER_DISABLED_EXPLANATION.set_text("<br>To enable the Material Farmer, enable \"Automatic Material Farming\" above");
-    }
+//    ConfigOptionState state = AUTO_MATERIAL_FARMING ? ConfigOptionState::ENABLED : ConfigOptionState::DISABLED;
+//    MATERIAL_FARMER_OPTIONS.set_visibility(state);
+//    NUM_ROUNDS_OF_ITEM_PRINTER_TO_MATERIAL_FARM.set_visibility(state);
+//    if (AUTO_MATERIAL_FARMING){
+//        AFTER_ITEM_PRINTER_DONE_EXPLANATION.set_text("Then proceed to material farming.");
+//        MATERIAL_FARMER_DISABLED_EXPLANATION.set_text("<br>");
+//    }else{
+//        AFTER_ITEM_PRINTER_DONE_EXPLANATION.set_text("Then stop the program.");
+//        MATERIAL_FARMER_DISABLED_EXPLANATION.set_text("<br>To enable the Material Farmer, enable \"Automatic Material Farming\" above");
+//    }
 
-    if (overlapping_bonus()){
-        OVERLAPPING_BONUS_WARNING.set_visibility(ConfigOptionState::ENABLED);
-        // std::cout << "Warning: One of the Ball/Item bonuses haven't been fully used up. This can mess up your rewards for subsequent prints. Note: Each Ball/Item bonus lasts for 10 prints" << std::endl;
-    }else{
-        OVERLAPPING_BONUS_WARNING.set_visibility(ConfigOptionState::HIDDEN);
-    }
-    
+    MATERIAL_FARMER_JOBS_PERIOD.set_visibility(
+        MATERIAL_FARMER_OPTIONS.enabled() ? ConfigOptionState::ENABLED : ConfigOptionState::DISABLED
+    );
+    OVERLAPPING_BONUS_WARNING.set_visibility(
+        overlapping_bonus() ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN
+    );
 }
 
 
@@ -231,7 +240,7 @@ void ItemPrinterRNG::value_changed(void* object){
 bool ItemPrinterRNG::overlapping_bonus(){
     // for each row in table. if ball/item bonus, ensure that sum of prints in subsequent rows >=10 before the next bonus, or end of the table.
     uint16_t total_prints_since_last_bonus = 10;
-    for (std::shared_ptr<EditableTableRow> table_row : TABLE0.current_refs()){
+    for (std::shared_ptr<EditableTableRow>& table_row : TABLE0.current_refs()){
         ItemPrinterRngRow& row = static_cast<ItemPrinterRngRow&>(*table_row);
         if (row.desired_item == ItemPrinter::PrebuiltOptions::BALL_BONUS || row.desired_item == ItemPrinter::PrebuiltOptions::ITEM_BONUS){
             if (total_prints_since_last_bonus < 10){
@@ -562,16 +571,51 @@ void ItemPrinterRNG::run_item_printer_rng(
     SingleSwitchProgramEnvironment& env, BotBaseContext& context, 
     ItemPrinterRNG_Descriptor::Stats& stats
 ){
+    //  For each job that we print, we increment this number.
+    //  Each time we run the material farmer, we decrease this number by MATERIAL_FARMER_JOBS_PERIOD.
+    uint32_t jobs_counter = 0;
+
     for (uint32_t c = 0; c < NUM_ITEM_PRINTER_ROUNDS; c++){
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
 
         std::vector<ItemPrinterRngRowSnapshot> table = TABLE0.snapshot<ItemPrinterRngRowSnapshot>();
         for (const ItemPrinterRngRowSnapshot& row : table){
+            if (!MATERIAL_FARMER_OPTIONS.enabled()){
+                jobs_counter = 0;
+            }
+
+            //  Cannot run material farmer between chained prints.
             if (row.chain){
                 print_again(env, context, row.jobs);
-            }else{
-                run_print_at_date(env, context, row.date, row.jobs);
+                jobs_counter += (uint32_t)row.jobs;
+                continue;
             }
+
+            run_print_at_date(env, context, row.date, row.jobs);
+            jobs_counter += (uint32_t)row.jobs;
+
+            //  Material farmer is disabled.
+            if (!MATERIAL_FARMER_OPTIONS.enabled()){
+                continue;
+            }
+
+            //  Not ready to run material farmer yet.
+            uint16_t period = MATERIAL_FARMER_JOBS_PERIOD;
+            if (jobs_counter < period){
+                continue;
+            }
+
+            //  Run the material farmer.
+            press_Bs_to_back_to_overworld(env.program_info(), env.console, context);
+            move_from_item_printer_to_material_farming(env, context);
+            {
+                //  Dummy stats since we don't use the material farmer stats.
+                MaterialFarmerStats mat_farm_stats;
+                run_material_farmer(env, context, MATERIAL_FARMER_OPTIONS, mat_farm_stats);
+            }
+            move_from_material_farming_to_item_printer(env, context);
+
+            jobs_counter -= period;
         }
 //        run_print_at_date(env, context, DATE0, 1);
 //        run_print_at_date(env, context, DATE1, 10);
@@ -585,7 +629,20 @@ void ItemPrinterRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext
     ItemPrinterRNG_Descriptor::Stats& stats = env.current_stats<ItemPrinterRNG_Descriptor::Stats>();
     env.update_stats();
 
+    if (MATERIAL_FARMER_OPTIONS.enabled()){
+        // - Ensure audio input is enabled
+        LetsGoKillSoundDetector audio_detector(env.console, [](float){ return true; });
+        wait_until(
+            env.console, context,
+            std::chrono::milliseconds(1100),
+            {audio_detector}
+        );
+        audio_detector.throw_if_no_sound(std::chrono::milliseconds(1000));
+    }
+
     try{
+        run_item_printer_rng(env, context, stats);
+#if 0
         if (!AUTO_MATERIAL_FARMING){
             run_item_printer_rng(env, context, stats);
         }else{
@@ -615,6 +672,7 @@ void ItemPrinterRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext
                 move_from_material_farming_to_item_printer(env, context);
             }
         }
+#endif
     }catch (ProgramFinishedException&){}
 
     if (FIX_TIME_WHEN_DONE){

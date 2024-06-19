@@ -263,7 +263,13 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     BotBaseContext context(scope, console.botbase());
     VideoOverlaySet overlays(overlay);
 
-#if 1
+
+    VideoSnapshot screen = console.video().snapshot();
+
+    OverworldDetector detector;
+    cout << detector.detect(screen) << endl;
+
+#if 0
     ItemPrinterJobsDetector detector(COLOR_RED, LANGUAGE);
     detector.make_overlays(overlays);
 
