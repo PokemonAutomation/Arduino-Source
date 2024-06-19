@@ -131,6 +131,16 @@ void EditableTableOption::load_json(const JsonValue& json){
         uint64_t seqnum = m_seqnum.fetch_add(array->size());
 
         //  Build table outside of lock first.
+        //  If the table is built inside of the lock, you can get issues with deadlock. 
+        //  The reason for this is that during the construction of the new table, 
+        //  the listeners get triggered. Specifically, the row elements trigger
+        //  their own Row.report_value_changed(), which may then propagate up with Table.report_value_changed(). 
+        //  If the table's listener includes any functions that accesses the table (e.g. current_refs()),
+        //  then this can result in deadlock since current_refs() can't access the table 
+        //  until the table is finished building and releases the lock. 
+        //  But the table can't finish building until current_refs() finishes.
+        //  Building the table outside of the lock bypasses this issue since the listeners won't be 
+        //  triggered in the first place.
         std::vector<std::shared_ptr<EditableTableRow>> table;
         for (const auto& item : *array){
             std::unique_ptr<EditableTableRow> row = make_row();
@@ -175,6 +185,8 @@ void EditableTableOption::restore_defaults(){
             uint64_t seqnum = m_seqnum.fetch_add(m_default.size());
 
             //  Build table outside of lock first.
+            //  If the table is built inside of the lock, you can get issues with deadlock.  
+            //  (see load_json() for more details)           
             for (const std::unique_ptr<EditableTableRow>& item : m_default){
                 tmp.emplace_back(item->clone());
                 tmp.back()->m_seqnum = seqnum++;
@@ -213,6 +225,8 @@ void EditableTableOption::clone_row(const EditableTableRow& row){
         }
 
         //  Copy the row first.
+        //  If the row is cloned inside of the lock, you can get issues with deadlock.
+        //  (see load_json() for more details)            
         std::unique_ptr<EditableTableRow> new_row = row.clone();
         new_row->m_seqnum = m_seqnum++;
 
