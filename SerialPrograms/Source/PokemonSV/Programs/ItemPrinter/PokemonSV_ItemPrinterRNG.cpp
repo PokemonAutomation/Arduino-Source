@@ -104,7 +104,9 @@ ItemPrinterRNG::ItemPrinterRNG()
         "Then proceed to material farming."
     )
     , OVERLAPPING_BONUS_WARNING(
-        ""
+        "<font color=\"red\">WARNING: At least one of the Ball/Item bonuses haven't been fully used up. "
+        "This can mess up your rewards for subsequent prints.</font><br>"
+        "<font color=\"red\">\nNote: Each Ball/Item bonus lasts for 10 prints.</font>"
     )
     , TABLE0(
         "<b>Rounds Table:</b><br>Run the following prints in order and repeat. "
@@ -213,13 +215,10 @@ void ItemPrinterRNG::value_changed(void* object){
     }
 
     if (overlapping_bonus()){
-        OVERLAPPING_BONUS_WARNING.set_text(
-            "<font color=\"red\">WARNING: At least one of the Ball/Item bonuses haven't been fully used up. "
-            "This can mess up your rewards for subsequent prints.</font><br>"
-            "<font color=\"red\">\nNote: Each Ball/Item bonus lasts for 10 prints.</font>");
+        OVERLAPPING_BONUS_WARNING.set_visibility(ConfigOptionState::ENABLED);
         // std::cout << "Warning: One of the Ball/Item bonuses haven't been fully used up. This can mess up your rewards for subsequent prints. Note: Each Ball/Item bonus lasts for 10 prints" << std::endl;
     }else{
-        OVERLAPPING_BONUS_WARNING.set_text("");
+        OVERLAPPING_BONUS_WARNING.set_visibility(ConfigOptionState::HIDDEN);
     }
     
 }
