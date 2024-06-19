@@ -4,6 +4,7 @@
  *
  */
 
+#include <QStandardItemModel>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QCompleter>
@@ -47,6 +48,7 @@ StringSelectCellWidget::StringSelectCellWidget(QWidget& parent, StringSelectCell
     QPixmap pixmap = QPixmap::fromImage(entry.icon.to_QImage_ref());
     this->addItem(pixmap, QString::fromStdString(entry.display_name));
     this->setCurrentIndex(0);
+    this->setMinimumContentsLength((int)value.database().longest_text_length());
 
     StringSelectCellWidget::update_value();
 
@@ -71,9 +73,21 @@ void StringSelectCellWidget::load_options(){
         const std::vector<StringSelectEntry>& cases = m_value.database().case_list();
         global_logger_tagged().log("Loading dropdown with " + tostr_u_commas(cases.size()) + " elements.");
         this->clear();
-        for (const auto& item : cases){
+        for (const StringSelectEntry& item : cases){
             QPixmap pixmap = QPixmap::fromImage(item.icon.to_QImage_ref());
             this->addItem(pixmap, QString::fromStdString(item.display_name));
+            auto* model = qobject_cast<QStandardItemModel*>(this->model());
+            if (model == nullptr){
+                continue;
+            }
+            QStandardItem* line_handle = model->item(this->count() - 1);
+            if (line_handle != nullptr){
+                if (item.text_color){
+                    QBrush brush = line_handle->foreground();
+                    brush.setColor(QColor((uint32_t)item.text_color));
+                    line_handle->setForeground(brush);
+                }
+            }
         }
     }
     this->setCurrentIndex((int)m_value.index());

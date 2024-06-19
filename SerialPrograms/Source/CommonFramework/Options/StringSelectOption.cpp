@@ -22,6 +22,7 @@ namespace PokemonAutomation{
 
 
 struct StringSelectDatabase::Data{
+    size_t m_longest_text_length = 0;
     std::vector<StringSelectEntry> m_list;
     std::map<std::string, size_t> m_slug_to_entry;
     std::map<std::string, size_t> m_display_name_to_entry;
@@ -70,6 +71,8 @@ struct StringSelectDatabase::Data{
             }
             throw;
         }
+
+        m_longest_text_length = std::max(m_longest_text_length, item.display_name.size());
     }
 };
 
@@ -84,6 +87,9 @@ StringSelectDatabase::StringSelectDatabase()
     : m_data(CONSTRUCT_TOKEN)
 {}
 
+size_t StringSelectDatabase::longest_text_length() const{
+    return m_data->m_longest_text_length;
+}
 const std::vector<StringSelectEntry>& StringSelectDatabase::case_list() const{
     return m_data->m_list;
 }

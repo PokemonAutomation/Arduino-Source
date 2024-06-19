@@ -8,6 +8,7 @@
 #define PokemonAutomation_Options_StringSelectOption_H
 
 #include <vector>
+#include "Common/Cpp/Color.h"
 #include "Common/Cpp/Containers/Pimpl.h"
 #include "Common/Cpp/Options/ConfigOption.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
@@ -21,15 +22,18 @@ struct StringSelectEntry{
     std::string slug;
     std::string display_name;
     ImageViewRGB32 icon;
+    Color text_color;
 
-    StringSelectEntry(std::string p_slug, std::string p_display_name)
-        : slug(std::move(p_slug))
-        , display_name(std::move(p_display_name))
-    {}
-    StringSelectEntry(std::string p_slug, std::string p_display_name, ImageViewRGB32 p_icon)
+    StringSelectEntry(
+        std::string p_slug,
+        std::string p_display_name,
+        ImageViewRGB32 p_icon = ImageViewRGB32(),
+        Color p_text_color = Color()
+    )
         : slug(std::move(p_slug))
         , display_name(std::move(p_display_name))
         , icon(std::move(p_icon))
+        , text_color(p_text_color)
     {}
 };
 
@@ -48,6 +52,7 @@ public:
     void add_entry(StringSelectEntry entry);
 
 public:
+    size_t longest_text_length() const;
     const std::vector<StringSelectEntry>& case_list() const;
 
     const StringSelectEntry& operator[](size_t index) const;
