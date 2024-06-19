@@ -43,6 +43,7 @@ StringSelectCellWidget::StringSelectCellWidget(QWidget& parent, StringSelectCell
     this->completer()->setCompletionMode(QCompleter::PopupCompletion);
     this->completer()->setFilterMode(Qt::MatchContains);
     this->setIconSize(QSize(25, 25));
+//    this->setFrame(false);
 
     const StringSelectEntry& entry = value.entry();
     QPixmap pixmap = QPixmap::fromImage(entry.icon.to_QImage_ref());
@@ -76,17 +77,8 @@ void StringSelectCellWidget::load_options(){
         for (const StringSelectEntry& item : cases){
             QPixmap pixmap = QPixmap::fromImage(item.icon.to_QImage_ref());
             this->addItem(pixmap, QString::fromStdString(item.display_name));
-            auto* model = qobject_cast<QStandardItemModel*>(this->model());
-            if (model == nullptr){
-                continue;
-            }
-            QStandardItem* line_handle = model->item(this->count() - 1);
-            if (line_handle != nullptr){
-                if (item.text_color){
-                    QBrush brush = line_handle->foreground();
-                    brush.setColor(QColor((uint32_t)item.text_color));
-                    line_handle->setForeground(brush);
-                }
+            if (item.text_color){
+                this->setItemData(this->count() - 1, QBrush(QColor((uint32_t)item.text_color)), Qt::ForegroundRole);
             }
         }
     }

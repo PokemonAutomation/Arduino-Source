@@ -30,6 +30,8 @@ EnumDropdownCellWidget::EnumDropdownCellWidget(QWidget& parent, IntegerEnumDropd
     , ConfigWidget(value, *this)
     , m_value(value)
 {
+//    this->setFrame(false);
+
     for (const auto& item : value.database().all_values()){
         int index = this->count();
         m_value_to_index[item] = index;
