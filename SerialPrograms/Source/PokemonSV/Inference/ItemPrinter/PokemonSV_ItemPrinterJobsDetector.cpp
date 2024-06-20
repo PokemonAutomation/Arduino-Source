@@ -116,6 +116,9 @@ std::pair<uint8_t, uint8_t> ItemPrinterJobsDetector::read_box(
 }
 uint8_t ItemPrinterJobsDetector::detect_jobs(Logger& logger, AsyncDispatcher& dispatcher, const ImageViewRGB32& screen) const{
     std::pair<uint8_t, uint8_t> normal = read_box(logger, dispatcher, screen, m_box_normal);
+    if (normal.second > 6){
+        return normal.first;
+    }
     std::pair<uint8_t, uint8_t> bonus = read_box(logger, dispatcher, screen, m_box_bonus);
     if (normal.second + 2 > bonus.second){
         return normal.first;
