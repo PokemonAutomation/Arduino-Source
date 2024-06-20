@@ -2010,7 +2010,7 @@ target_link_libraries(SerialPrograms Threads::Threads)
 #add defines
 target_compile_definitions(SerialPrograms PRIVATE NOMINMAX)
 
-if (EXISTS "../../Internal/SerialPrograms/TelemetryURLs.h")
+if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../../Internal/SerialPrograms/TelemetryURLs.h")
     target_compile_definitions(SerialPrograms PRIVATE PA_OFFICIAL)
     target_sources(SerialPrograms PRIVATE ../../Internal/SerialPrograms/TelemetryURLs.h)
     target_sources(SerialPrograms PRIVATE ../../Internal/SerialPrograms/NintendoSwitch_TestPrograms.cpp)
