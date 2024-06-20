@@ -21,3 +21,4 @@ rd /s /q "ErrorDumps\"
 rd /s /q "UserSettings\"
 
 ::rd /s /q "..\build-SerialPrograms*"
+rd /s /q "build\"
