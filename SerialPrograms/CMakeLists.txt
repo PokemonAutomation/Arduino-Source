@@ -2035,8 +2035,8 @@ target_link_directories(SerialPrograms PRIVATE ../3rdPartyBinaries/)
 if (MSVC)
     add_library(OpenCV_lib IMPORTED UNKNOWN)
     set_target_properties(OpenCV_lib PROPERTIES
-        IMPORTED_LOCATION_RELEASE   ../3rdPartyBinaries/opencv_world460.lib
-        IMPORTED_LOCATION_DEBUG     ../3rdPartyBinaries/opencv_world460d.lib)
+        IMPORTED_LOCATION_RELEASE   ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/opencv_world460.lib
+        IMPORTED_LOCATION_DEBUG     ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/opencv_world460d.lib)
     set_target_properties(OpenCV_lib PROPERTIES
         MAP_IMPORTED_CONFIG_DEBUG           DEBUG
         MAP_IMPORTED_CONFIG_RELEASE         RELEASE
@@ -2046,8 +2046,8 @@ if (MSVC)
 
     add_library(dpp_lib IMPORTED UNKNOWN)
     set_target_properties(dpp_lib PROPERTIES
-        IMPORTED_LOCATION_RELEASE ../3rdPartyBinaries/dpp.lib
-        IMPORTED_LOCATION_DEBUG ../3rdPartyBinaries/dppd.lib)
+        IMPORTED_LOCATION_RELEASE ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/dpp.lib
+        IMPORTED_LOCATION_DEBUG ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/dppd.lib)
     set_target_properties(dpp_lib PROPERTIES
         MAP_IMPORTED_CONFIG_DEBUG           DEBUG
         MAP_IMPORTED_CONFIG_RELEASE         RELEASE
