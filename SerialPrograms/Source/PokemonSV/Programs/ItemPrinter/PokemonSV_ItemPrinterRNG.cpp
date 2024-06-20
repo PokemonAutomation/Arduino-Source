@@ -365,7 +365,7 @@ void ItemPrinterRNG::run_print_at_date(
                 pbf_press_button(context, BUTTON_B, 20, 30);
                 continue;
             }
-            item_printer_start_print(env.console, context, LANGUAGE, jobs);
+            item_printer_start_print(env.inference_dispatcher(), env.console, context, LANGUAGE, jobs);
             stats.prints++;
             env.update_stats();
             printed = true;
@@ -551,7 +551,7 @@ void ItemPrinterRNG::print_again(
             if (printed){
                 return;
             }
-            item_printer_start_print(env.console, context, LANGUAGE, jobs);
+            item_printer_start_print(env.inference_dispatcher(), env.console, context, LANGUAGE, jobs);
             stats.prints++;
             env.update_stats();
             printed = true;

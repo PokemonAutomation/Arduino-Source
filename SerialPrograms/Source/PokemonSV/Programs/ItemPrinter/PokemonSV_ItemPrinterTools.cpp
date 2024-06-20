@@ -31,6 +31,7 @@ const EnumDatabase<ItemPrinterJobs>& ItemPrinterJobs_Database(){
 
 
 void item_printer_start_print(
+    AsyncDispatcher& dispatcher,
     ConsoleHandle& console, BotBaseContext& context,
     Language language, ItemPrinterJobs jobs
 ){
@@ -60,7 +61,7 @@ void item_printer_start_print(
             ItemPrinterJobsDetector detector(COLOR_RED, language);
             VideoOverlaySet overlays(console.overlay());
             detector.make_overlays(overlays);
-            detector.set_print_jobs(console, context, (uint8_t)jobs);
+            detector.set_print_jobs(dispatcher, console, context, (uint8_t)jobs);
             pbf_press_button(context, BUTTON_X, 20, 230);
             continue;
         }

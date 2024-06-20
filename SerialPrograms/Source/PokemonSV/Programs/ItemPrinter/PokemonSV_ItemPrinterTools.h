@@ -28,6 +28,7 @@ const EnumDatabase<ItemPrinterJobs>& ItemPrinterJobs_Database();
 
 
 void item_printer_start_print(
+    AsyncDispatcher& dispatcher,
     ConsoleHandle& console, BotBaseContext& context,
     Language language, ItemPrinterJobs jobs
 );
