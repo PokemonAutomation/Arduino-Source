@@ -73,11 +73,12 @@ std::unique_ptr<EditableTableRow> ItemPrinterRngRow::clone() const{
 
 
 
-// - always update the date's visibility when chain is changed.
 // - if desired_item has changed, set the seed (and number of jobs) accordingly
-// - if any other value changes, set desired_item to NONE
+// - if any of date/jobs/chain changes, check if the date and jobs match one of ItemPrinterEnumOption, 
+// and that chain is disabled. If so, set the desired item to the enum_value. Else set desired_item to NONE.
+//  - also, hide the date if chain enabled.
+// - trigger the listener for the parent table.
 void ItemPrinterRngRow::value_changed(void* object){
-    date.set_visibility(chain ? ConfigOptionState::HIDDEN : ConfigOptionState::ENABLED);
 
     ItemPrinterRngTable& table = static_cast<ItemPrinterRngTable&>(parent());
 
@@ -89,16 +90,14 @@ void ItemPrinterRngRow::value_changed(void* object){
             date.set(from_seconds_since_epoch(option_data.seed));
             jobs.set(option_data.jobs);
         }
-    }else if (object == &chain){
-        if (chain){
-            desired_item.set(ItemPrinter::PrebuiltOptions::NONE);
-        }
-    }else if (object == &date){
+    }else if (object == &date || object == &jobs || object == &chain){
+        date.set_visibility(chain ? ConfigOptionState::HIDDEN : ConfigOptionState::ENABLED);
         const ItemPrinter::ItemPrinterEnumOption* option_data = ItemPrinter::option_lookup_by_seed(to_seconds_since_epoch(date));
-        if (option_data == nullptr){
-            desired_item.set(ItemPrinter::PrebuiltOptions::NONE);
-        }else{
+        // seed found in the PrebuiltOptions table, and jobs number matches and chain disabled
+        if (option_data != nullptr && option_data->jobs == jobs && !chain){ 
             desired_item.set(option_data->enum_value);
+        }else{
+            desired_item.set(ItemPrinter::PrebuiltOptions::NONE);
         }
     }
 
