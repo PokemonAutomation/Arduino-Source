@@ -62,10 +62,17 @@ std::pair<uint8_t, uint8_t> ItemPrinterJobsDetector::read_box(
             int num = OCR::read_number(logger, filtered[c].first, m_language);
             std::string str = std::to_string(num);
             WriteSpinLock lg(lock);
-            if (str[0] == '5'){
+            if (str == "1"){
+                candidates[1]++;
+            }else if (str == "5"){
+                candidates[5]++;
+            }else if (str == "10"){
+                candidates[10]++;
+            }else if (str[0] == '5'){
                 candidates[5]++;
             }else if (str[0] == '1' && str[1] == '0'){
                 candidates[10]++;
+            }else if (str[0] == '1' && str[1] == '5'){
             }else if (str[0] == '1'){
                 candidates[1]++;
             }
@@ -110,7 +117,7 @@ std::pair<uint8_t, uint8_t> ItemPrinterJobsDetector::read_box(
 uint8_t ItemPrinterJobsDetector::detect_jobs(Logger& logger, AsyncDispatcher& dispatcher, const ImageViewRGB32& screen) const{
     std::pair<uint8_t, uint8_t> normal = read_box(logger, dispatcher, screen, m_box_normal);
     std::pair<uint8_t, uint8_t> bonus = read_box(logger, dispatcher, screen, m_box_bonus);
-    if (normal.second > bonus.second){
+    if (normal.second + 2 > bonus.second){
         return normal.first;
     }else{
         return bonus.first;
