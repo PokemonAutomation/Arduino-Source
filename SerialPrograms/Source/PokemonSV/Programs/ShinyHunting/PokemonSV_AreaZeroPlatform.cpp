@@ -236,6 +236,8 @@ void inside_zero_gate_to_platform(
     ssf_press_left_joystick(context, 128, 0, 1 * TICKS_PER_SECOND, 4 * TICKS_PER_SECOND);
     pbf_press_button(context, BUTTON_R, 20, 355);
     pbf_press_button(context, BUTTON_R, 20, 105);
+
+    context.wait_for_all_requests();
 }
 
 

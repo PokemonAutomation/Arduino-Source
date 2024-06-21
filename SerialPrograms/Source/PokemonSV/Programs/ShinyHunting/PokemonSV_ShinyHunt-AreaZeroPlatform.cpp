@@ -391,7 +391,6 @@ void ShinyHuntAreaZeroPlatform::run_state(SingleSwitchProgramEnvironment& env, B
         m_encounter_tracker->reset_rate_tracker_start_time();
         m_consecutive_failures = 0;
 
-        context.wait_for_all_requests();
         return;
     }
 
