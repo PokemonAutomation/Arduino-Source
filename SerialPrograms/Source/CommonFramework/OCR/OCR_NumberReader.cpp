@@ -49,7 +49,7 @@ std::string run_number_normalization(const std::string& input){
         {'s', '5'},
 
         //  Japanese OCR likes to do this.
-        {U'🄋', '1'},
+        {U'🄋', '0'},
         {U'①', '1'},
         {U'②', '2'},
         {U'③', '3'},
