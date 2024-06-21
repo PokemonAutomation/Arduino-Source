@@ -21,11 +21,11 @@ namespace PokemonSwSh{
 class EncounterBotCommonOptions : public BatchOption{
 public:
     EncounterBotCommonOptions(bool rare_stars, bool enable_overrides)
-        : BatchOption(LockMode::LOCK_WHILE_RUNNING)
+        : BatchOption(LockMode::UNLOCK_WHILE_RUNNING)
         , FILTER(rare_stars, enable_overrides)
         , VIDEO_ON_SHINY(
             "<b>Video Capture:</b><br>Take a video of the encounter if it is shiny.",
-            LockMode::LOCK_WHILE_RUNNING,
+            LockMode::UNLOCK_WHILE_RUNNING,
             true
         )
         , NOTIFICATION_NONSHINY(
@@ -54,7 +54,7 @@ public:
         PA_ADD_OPTION(VIDEO_ON_SHINY);
     }
 
-    EncounterFilterOption FILTER;
+    EncounterFilterOption2 FILTER;
     BooleanCheckBoxOption VIDEO_ON_SHINY;
 
     EventNotificationOption NOTIFICATION_NONSHINY;

@@ -167,7 +167,7 @@ bool StandardEncounterHandler::handle_standard_encounter(const ShinyDetectionRes
         take_video(m_context);
     }
 
-    return encounter.get_action().first == EncounterAction::StopProgram;
+    return encounter.get_action().action == EncounterAction::StopProgram;
 }
 bool StandardEncounterHandler::handle_standard_encounter_end_battle(
     const ShinyDetectionResult& result,
@@ -202,12 +202,12 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
         take_video(m_context);
     }
 
-    std::pair<EncounterAction, std::string> action = encounter.get_action();
+    EncounterActionFull action = encounter.get_action();
 
 //    cout << "action = " << (int)action.first << " : " << action.second << endl;
 
     //  Fast run-away sequence to save time.
-    if (action.first == EncounterAction::RunAway){
+    if (action.action == EncounterAction::RunAway){
         run_away_and_update_stats(encounter, exit_battle_time, result);
         return false;
     }
@@ -227,19 +227,19 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
         &m_frequencies
     );
 
-    switch (action.first){
+    switch (action.action){
     case EncounterAction::StopProgram:
         return true;
     case EncounterAction::RunAway:
         return false;
     case EncounterAction::ThrowBalls:{
-        CatchResults results = basic_catcher(m_console, m_context, m_language, action.second);
+        CatchResults results = basic_catcher(m_console, m_context, m_language, action.pokeball_slug, action.ball_limit);
         send_catch_notification(
             m_env,
             m_settings.NOTIFICATION_CATCH_SUCCESS,
             m_settings.NOTIFICATION_CATCH_FAILED,
             encounter.candidates(),
-            action.second,
+            action.pokeball_slug,
             results.balls_used,
             results.result
         );
@@ -257,13 +257,13 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
         return false;
     }
     case EncounterAction::ThrowBallsAndSave:{
-        CatchResults results = basic_catcher(m_console, m_context, m_language, action.second);
+        CatchResults results = basic_catcher(m_console, m_context, m_language, action.pokeball_slug, action.ball_limit);
         send_catch_notification(
             m_env,
             m_settings.NOTIFICATION_CATCH_SUCCESS,
             m_settings.NOTIFICATION_CATCH_FAILED,
             encounter.candidates(),
-            action.second,
+            action.pokeball_slug,
             results.balls_used,
             results.result
         );

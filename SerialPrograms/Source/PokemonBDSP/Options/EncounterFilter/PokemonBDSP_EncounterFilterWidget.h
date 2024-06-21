@@ -16,6 +16,7 @@ namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 
+#if 0
 class EncounterFilterWidget : public QWidget, public ConfigWidget{
 public:
     EncounterFilterWidget(QWidget& parent, EncounterFilterOption& value);
@@ -29,7 +30,7 @@ private:
     QComboBox* m_shininess = nullptr;
     ConfigWidget* m_table = nullptr;
 };
-
+#endif
 
 
 }

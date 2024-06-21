@@ -255,7 +255,12 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
 
     case EncounterAction::ThrowBalls:
     case EncounterAction::ThrowBallsAndSave:{
-        CatchResults catch_result = basic_catcher(m_console, m_context, m_language, action.pokeball_slug);
+        CatchResults catch_result = basic_catcher(
+            m_console, m_context,
+            m_language,
+            action.pokeball_slug,
+            action.ball_limit
+        );
         send_catch_notification(
             m_env,
             m_settings.NOTIFICATION_CATCH_SUCCESS,

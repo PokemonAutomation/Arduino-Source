@@ -17,7 +17,7 @@ const EnumDatabase<ShinyFilter>& ShinyFilter_Database(){
         {ShinyFilter::ANYTHING,     "anything",     "Anything"},
         {ShinyFilter::NOT_SHINY,    "not-shiny",    "Not Shiny"},
         {ShinyFilter::SHINY,        "shiny",        "Shiny"},
-//        {ShinyFilter::NOTHING,      "nothing",      "Nothing"},
+        {ShinyFilter::NOTHING,      "nothing",      "Nothing"},
     });
     return database;
 }

@@ -25,6 +25,8 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
+using namespace Pokemon;
+
 
 class ShinyHuntAutonomousOverworld_Descriptor : public SingleSwitchProgramDescriptor{
 public:

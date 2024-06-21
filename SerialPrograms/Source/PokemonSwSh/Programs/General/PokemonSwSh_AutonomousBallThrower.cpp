@@ -135,7 +135,7 @@ void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, BotBase
             }
         }
 
-        CatchResults result = basic_catcher(env.console, context, LANGUAGE, BALL_SELECT.slug());
+        CatchResults result = basic_catcher(env.console, context, LANGUAGE, BALL_SELECT.slug(), 999);
         switch (result.result){
         case CatchResult::POKEMON_CAUGHT:
             pokemon_caught = true;
@@ -150,6 +150,7 @@ void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, BotBase
         case CatchResult::OUT_OF_BALLS:
             stats.out_of_balls++;
             break;
+        case CatchResult::BALL_LIMIT_REACHED:
         case CatchResult::CANNOT_THROW_BALL:
         case CatchResult::TIMED_OUT:
             stats.errors++;

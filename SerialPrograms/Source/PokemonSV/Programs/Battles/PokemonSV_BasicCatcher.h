@@ -43,7 +43,7 @@ struct CatchResults{
 CatchResults basic_catcher(
     ConsoleHandle& console, BotBaseContext& context,
     Language language,
-    const std::string& ball_slug,
+    const std::string& ball_slug, uint16_t ball_limit,
     bool use_first_move_if_cant_throw,
     std::function<void()> on_throw_lambda = nullptr
 );

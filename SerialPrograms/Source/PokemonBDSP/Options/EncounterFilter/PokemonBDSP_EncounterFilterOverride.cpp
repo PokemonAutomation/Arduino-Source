@@ -57,12 +57,14 @@ EncounterFilterOverride::~EncounterFilterOverride(){
 }
 EncounterFilterOverride::EncounterFilterOverride(EditableTableOption& parent_table)
     : EditableTableRow(parent_table)
-    , pokemon(ALL_POKEMON_NAMES(), LockMode::LOCK_WHILE_RUNNING, "starly")
+    , pokemon(ALL_POKEMON_NAMES(), LockMode::UNLOCK_WHILE_RUNNING, "starly")
+    , ball_limit(LockMode::UNLOCK_WHILE_RUNNING, 40, 1, 999)
 {
-    PA_ADD_OPTION(action);
-    PA_ADD_OPTION(pokeball);
     PA_ADD_OPTION(pokemon);
     PA_ADD_OPTION(shininess);
+    PA_ADD_OPTION(action);
+    PA_ADD_OPTION(pokeball);
+    PA_ADD_OPTION(ball_limit);
     action.add_listener(*this);
 }
 void EncounterFilterOverride::load_json(const JsonValue& json){
@@ -98,6 +100,7 @@ std::unique_ptr<EditableTableRow> EncounterFilterOverride::clone() const{
     ret->pokeball.set_by_index(pokeball.index());
     ret->pokemon.set_by_index(pokemon.index());
     ret->shininess.set(shininess);
+    ret->ball_limit.set(ball_limit);
     return ret;
 }
 void EncounterFilterOverride::value_changed(void* object){
@@ -123,15 +126,16 @@ EncounterFilterTable::EncounterFilterTable()
         "The game language must be properly set to read " + STRING_POKEMON + " names. "
         "If multiple overrides apply and are conflicting, the program will stop." +
         "<br>Auto-catching only applies in single battles. The program will stop if asked to auto-catch in a double-battle.",
-        LockMode::LOCK_WHILE_RUNNING
+        LockMode::UNLOCK_WHILE_RUNNING
     )
 {}
 std::vector<std::string> EncounterFilterTable::make_header() const{
     return std::vector<std::string>{
-        "Action",
-        STRING_POKEBALL,
         STRING_POKEMON,
         "Shininess",
+        "Action",
+        STRING_POKEBALL,
+        "Ball Limit"
     };
 }
 

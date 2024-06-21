@@ -35,7 +35,15 @@ const EnumDatabase<ShinyFilter>& ShinyFilter_Normal_Database(){
     });
     return database;
 }
-const EnumDatabase<ShinyFilter>& ShinyFilter_RareStars_Database(){
+const EnumDatabase<ShinyFilter>& ShinyFilter_StopRareStars_Database(){
+    static const EnumDatabase<ShinyFilter> database({
+        {ShinyFilter::NOT_SHINY,    "not-shiny",    "Not Shiny"},
+        {ShinyFilter::ANY_SHINY,    "any-shiny",    "Any Shiny"},
+        {ShinyFilter::STAR_ONLY,    "star-shiny",   "Star Shiny"},
+    });
+    return database;
+}
+const EnumDatabase<ShinyFilter>& ShinyFilter_TableRareStars_Database(){
     static const EnumDatabase<ShinyFilter> database({
         {ShinyFilter::NOT_SHINY,    "not-shiny",    "Not Shiny"},
         {ShinyFilter::SQUARE_ONLY,  "square-shiny", "Square Shiny"},

@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonBDSP_EncounterFilterOverride_H
 #define PokemonAutomation_PokemonBDSP_EncounterFilterOverride_H
 
+#include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/EditableTableOption.h"
 #include "PokemonSwSh/Options/PokemonSwSh_BallSelectOption.h"
 #include "PokemonBDSP_EncounterFilterEnums.h"
@@ -19,12 +20,12 @@ namespace PokemonBDSP{
 struct EncounterActionFull{
     EncounterAction action;
     std::string pokeball_slug;
+    uint16_t ball_limit = 999;
 
     bool operator==(const EncounterActionFull& x) const;
     bool operator!=(const EncounterActionFull& x) const;
     std::string to_str() const;
 };
-
 
 
 
@@ -38,10 +39,11 @@ public:
     virtual void value_changed(void* object) override;
 
 public:
-    EncounterActionCell action;
-    PokemonSwSh::PokemonBallSelectCell pokeball;
     StringSelectCell pokemon;
     ShinyFilterCell shininess;
+    EncounterActionCell action;
+    PokemonSwSh::PokemonBallSelectCell pokeball;
+    SimpleIntegerCell<uint16_t> ball_limit;
 };
 
 class EncounterFilterTable : public EditableTableOption_t<EncounterFilterOverride>{

@@ -28,13 +28,15 @@ EncounterFilterOverride::~EncounterFilterOverride(){
 }
 EncounterFilterOverride::EncounterFilterOverride(EditableTableOption& parent_table)
     : EditableTableRow(parent_table)
-    , pokemon(COMBINED_DEX_NAMES(), LockMode::LOCK_WHILE_RUNNING, "rookidee")
+    , pokemon(COMBINED_DEX_NAMES(), LockMode::UNLOCK_WHILE_RUNNING, "rookidee")
     , shininess(static_cast<EncounterFilterTable&>(parent_table).rare_stars)
+    , ball_limit(LockMode::UNLOCK_WHILE_RUNNING, 40, 1, 999)
 {
-    PA_ADD_OPTION(action);
-    PA_ADD_OPTION(pokeball);
     PA_ADD_OPTION(pokemon);
     PA_ADD_OPTION(shininess);
+    PA_ADD_OPTION(action);
+    PA_ADD_OPTION(pokeball);
+    PA_ADD_OPTION(ball_limit);
     action.add_listener(*this);
 }
 void EncounterFilterOverride::load_json(const JsonValue& json){
@@ -47,14 +49,6 @@ void EncounterFilterOverride::load_json(const JsonValue& json){
     }
 
     const JsonValue* value;
-    value = obj->get_value("Action");
-    if (value != nullptr){
-        action.load_json(*value);
-    }
-    value = obj->get_value("Ball");
-    if (value != nullptr){
-        pokeball.load_json(*value);
-    }
     value = obj->get_value("Species");
     if (value != nullptr){
         pokemon.load_json(*value);
@@ -63,13 +57,22 @@ void EncounterFilterOverride::load_json(const JsonValue& json){
     if (value != nullptr){
         shininess.load_json(*value);
     }
+    value = obj->get_value("Action");
+    if (value != nullptr){
+        action.load_json(*value);
+    }
+    value = obj->get_value("Ball");
+    if (value != nullptr){
+        pokeball.load_json(*value);
+    }
 }
 std::unique_ptr<EditableTableRow> EncounterFilterOverride::clone() const{
     std::unique_ptr<EncounterFilterOverride> ret(new EncounterFilterOverride(parent()));
-    ret->action.set(action);
-    ret->pokeball.set_by_index(pokeball.index());
     ret->pokemon.set_by_index(pokemon.index());
     ret->shininess.set(shininess);
+    ret->action.set(action);
+    ret->pokeball.set_by_index(pokeball.index());
+    ret->ball_limit.set(ball_limit);
     return ret;
 }
 void EncounterFilterOverride::value_changed(void* object){
@@ -100,7 +103,7 @@ EncounterFilterTable::EncounterFilterTable(bool p_rare_stars)
                 "<b>Overrides:</b><br>"
                 "The game language must be properly set to read " + STRING_POKEMON + " names.<br>"
                 "If more than one override applies, the last one will be chosen.",
-        LockMode::LOCK_WHILE_RUNNING
+        LockMode::UNLOCK_WHILE_RUNNING
     )
     , rare_stars(p_rare_stars)
 {}
@@ -109,10 +112,11 @@ std::vector<std::unique_ptr<EncounterFilterOverride>> EncounterFilterTable::copy
 }
 std::vector<std::string> EncounterFilterTable::make_header() const{
     return std::vector<std::string>{
-        "Action",
-        STRING_POKEBALL,
         STRING_POKEMON,
         "Shininess",
+        "Action",
+        STRING_POKEBALL,
+        "Ball Limit",
     };
 }
 std::unique_ptr<EditableTableRow> EncounterFilterTable::make_row(){

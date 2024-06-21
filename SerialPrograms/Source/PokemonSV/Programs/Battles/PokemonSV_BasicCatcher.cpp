@@ -164,7 +164,7 @@ int16_t throw_ball(
 CatchResults basic_catcher(
     ConsoleHandle& console, BotBaseContext& context,
     Language language,
-    const std::string& ball_slug,
+    const std::string& ball_slug, uint16_t ball_limit,
     bool use_first_move_if_cant_throw,
     std::function<void()> on_throw_lambda
 ){
@@ -202,6 +202,10 @@ CatchResults basic_catcher(
             if (overworld_seen){
                 console.log("Detected battle after overworld. Did you get chain attacked?", COLOR_RED);
                 return CatchResults{CatchResult::POKEMON_FAINTED, balls_used};
+            }
+            if (balls_used >= ball_limit){
+                console.log("Reached the limit of " + std::to_string(ball_limit) + " balls.", COLOR_RED);
+                return CatchResults{CatchResult::BALL_LIMIT_REACHED, balls_used};
             }
 
             WallClock now = current_time();

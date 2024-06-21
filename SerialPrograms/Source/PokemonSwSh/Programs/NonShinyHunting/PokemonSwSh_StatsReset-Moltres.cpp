@@ -125,7 +125,7 @@ void StatsResetMoltres::program(SingleSwitchProgramEnvironment& env, BotBaseCont
         }
 
         context.wait_for_all_requests();
-        CatchResults result = basic_catcher(env.console, context, LANGUAGE, "master-ball");
+        CatchResults result = basic_catcher(env.console, context, LANGUAGE, "master-ball", 999);
         if (result.result != CatchResult::POKEMON_CAUGHT){
             throw OperationFailedException(
                 ErrorReport::SEND_ERROR_REPORT, env.console,

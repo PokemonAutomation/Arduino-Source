@@ -91,7 +91,7 @@ int16_t move_to_ball(
 CatchResults throw_balls(
     ConsoleHandle& console, BotBaseContext& context,
     Language language,
-    const std::string& ball_slug
+    const std::string& ball_slug, uint16_t ball_limit
 ){
     uint16_t balls_used = 0;
     while (true){
@@ -147,6 +147,10 @@ CatchResults throw_balls(
                 return {CatchResult::CANNOT_THROW_BALL, balls_used};
             }
             console.log("BasicCatcher: Failed to catch.", COLOR_ORANGE);
+            if (balls_used >= ball_limit){
+                console.log("Reached the limit of " + std::to_string(ball_limit) + " balls.", COLOR_RED);
+                return {CatchResult::BALL_LIMIT_REACHED, balls_used};
+            }
             continue;
         case 1:
             console.log("BasicCatcher: End of battle detected.", COLOR_PURPLE);
@@ -165,12 +169,12 @@ CatchResults throw_balls(
 CatchResults basic_catcher(
     ConsoleHandle& console, BotBaseContext& context,
     Language language,
-    const std::string& ball_slug
+    const std::string& ball_slug, uint16_t ball_limit
 ){
     context.wait_for_all_requests();
     console.log("Attempting to catch with: " + ball_slug);
 
-    CatchResults results = throw_balls(console, context, language, ball_slug);
+    CatchResults results = throw_balls(console, context, language, ball_slug, ball_limit);
     const std::string s = (results.balls_used <= 1 ? "" : "s");
     const std::string pokeball_str = std::to_string(results.balls_used) + " " + ball_slug + s;
 
@@ -179,13 +183,16 @@ CatchResults basic_catcher(
         console.log("BasicCatcher: Out of balls after throwing " + pokeball_str, COLOR_RED);
         return results;
     case CatchResult::CANNOT_THROW_BALL:
-        console.log("BasicCatcher: cannot throw ball for some reason.", COLOR_RED);
+        console.log("BasicCatcher: Unable to throw a ball.", COLOR_RED);
+        return results;
+    case CatchResult::BALL_LIMIT_REACHED:
+        console.log("BasicCatcher: Ball limit reached.", COLOR_RED);
         return results;
     case CatchResult::OWN_FAINTED:
-        console.log("BasicCatcher: own pokemon fainted after throwing " + pokeball_str, COLOR_RED);
+        console.log("BasicCatcher: Wwn " + Pokemon::STRING_POKEMON + " fainted after throwing " + pokeball_str, COLOR_RED);
         return results;
     case CatchResult::TIMED_OUT:
-        console.log("BasicCatcher: time out.", COLOR_RED);
+        console.log("BasicCatcher: Timed out.", COLOR_RED);
         return results;
     default:;
     }

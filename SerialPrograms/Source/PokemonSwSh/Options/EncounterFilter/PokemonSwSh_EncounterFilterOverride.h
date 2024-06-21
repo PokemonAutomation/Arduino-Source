@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_EncounterFilterOverride_H
 #define PokemonAutomation_PokemonSwSh_EncounterFilterOverride_H
 
+#include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/EditableTableOption.h"
 #include "PokemonSwSh/Options/PokemonSwSh_BallSelectOption.h"
 #include "PokemonSwSh_EncounterFilterEnums.h"
@@ -15,6 +16,12 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
+
+struct EncounterActionFull{
+    EncounterAction action;
+    std::string pokeball_slug;
+    uint16_t ball_limit = 999;
+};
 
 
 class EncounterFilterOverride : public EditableTableRow, private ConfigOption::Listener{
@@ -27,10 +34,11 @@ public:
     virtual void value_changed(void* object) override;
 
 public:
-    EncounterActionCell action;
-    PokemonBallSelectCell pokeball;
     StringSelectCell pokemon;
     ShinyFilterCell shininess;
+    EncounterActionCell action;
+    PokemonBallSelectCell pokeball;
+    SimpleIntegerCell<uint16_t> ball_limit;
 };
 
 

@@ -108,7 +108,8 @@ void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, BotBase
     pbf_press_button(context, BUTTON_LCLICK, 10, 0);
 
     CatchResults results = basic_catcher(
-        env.console, context, LANGUAGE, BALL_SELECT.slug(),
+        env.console, context, LANGUAGE,
+        BALL_SELECT.slug(), 999,
         USE_FIRST_MOVE_IF_CANNOT_THROW_BALL,
         [&]{
             stats.m_balls++;
