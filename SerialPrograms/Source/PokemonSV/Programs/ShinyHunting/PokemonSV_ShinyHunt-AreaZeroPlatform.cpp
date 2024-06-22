@@ -95,11 +95,11 @@ ShinyHuntAreaZeroPlatform::ShinyHuntAreaZeroPlatform()
     , MODE(
         "<b>Mode:</b><br>"
         "If starting on the platform, you should stand near the center of the platform facing any direction.<br>"
-        "If starting in the Zero Gate, you should be just inside the building as if you just entered."
+        "If starting at the Zero Gate fly spot, you should be at the fly spot as if you just flew there."
         "<br>If making a sandwich, you should be at the Zero Gate fly spot as if you just flew there.",
         {
             {Mode::START_ON_PLATFORM,   "platform", "Start on platform."},
-            {Mode::START_IN_ZERO_GATE,  "zerogate", "Start inside Zero Gate."},
+            {Mode::START_AT_ZERO_GATE_FLY_SPOT,  "zerogate", "Start at Zero Gate fly spot."},
             {Mode::MAKE_SANDWICH,       "sandwich", "Make a sandwich."},
         },
         LockMode::LOCK_WHILE_RUNNING,
@@ -381,8 +381,6 @@ void ShinyHuntAreaZeroPlatform::run_state(SingleSwitchProgramEnvironment& env, B
 
         leave_picnic(info, console, context);
         return_to_inside_zero_gate_from_picnic(info, console, context);
-        m_current_location = Location::ZERO_GATE_INSIDE;
-
         inside_zero_gate_to_platform(info, console, context, FLYING_UNLOCKED, NAVIGATE_TO_PLATFORM);
         m_current_location = Location::AREA_ZERO;
 
@@ -417,15 +415,6 @@ void ShinyHuntAreaZeroPlatform::run_state(SingleSwitchProgramEnvironment& env, B
         return_to_inside_zero_gate(info, console, context);
         inside_zero_gate_to_platform(info, console, context, FLYING_UNLOCKED, NAVIGATE_TO_PLATFORM);
         m_current_location = Location::AREA_ZERO;
-        m_pending_platform_reset = false;
-        m_encounter_tracker->reset_rate_tracker_start_time();
-        m_consecutive_failures = 0;
-        return;
-    case Location::ZERO_GATE_INSIDE:
-        console.log("Executing: Zero Gate -> Platform...");
-        m_current_location = Location::AREA_ZERO;
-        inside_zero_gate_to_platform(info, console, context, FLYING_UNLOCKED, NAVIGATE_TO_PLATFORM);
-//            m_current_location = Location::AREA_ZERO;
         m_pending_platform_reset = false;
         m_encounter_tracker->reset_rate_tracker_start_time();
         m_consecutive_failures = 0;
@@ -499,8 +488,8 @@ void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, Bot
         m_current_location = Location::AREA_ZERO;
 //        m_state = State::TRAVERSAL;
         break;
-    case Mode::START_IN_ZERO_GATE:
-        m_current_location = Location::ZERO_GATE_INSIDE;
+    case Mode::START_AT_ZERO_GATE_FLY_SPOT:
+        m_current_location = Location::ZERO_GATE_FLY_SPOT;
 //        m_state = State::INSIDE_GATE_AND_RETURN;
         break;
     case Mode::MAKE_SANDWICH:

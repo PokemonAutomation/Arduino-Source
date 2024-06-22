@@ -54,7 +54,6 @@ private:
     enum class Location{
         UNKNOWN,
         ZERO_GATE_FLY_SPOT,
-        ZERO_GATE_INSIDE,
         TRAVELING_TO_PLATFORM,
         AREA_ZERO,
     };
@@ -79,7 +78,7 @@ private:
 
     enum class Mode{
         START_ON_PLATFORM,
-        START_IN_ZERO_GATE,
+        START_AT_ZERO_GATE_FLY_SPOT,
         MAKE_SANDWICH,
     };
     EnumDropdownOption<Mode> MODE;
