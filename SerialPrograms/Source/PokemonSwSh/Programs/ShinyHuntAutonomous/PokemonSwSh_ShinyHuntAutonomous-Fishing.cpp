@@ -154,7 +154,8 @@ void ShinyHuntAutonomousFishing::program(SingleSwitchProgramEnvironment& env, Bo
                 continue;
             case 1:
                 env.log("Detected hook!", COLOR_PURPLE);
-                pbf_mash_button(context, BUTTON_A, TICKS_PER_SECOND);
+                pbf_press_button(context, BUTTON_A, 10, 5);
+//                pbf_mash_button(context, BUTTON_A, TICKS_PER_SECOND);
                 break;
             case 2:
                 env.log("Unexpected battle menu.", COLOR_RED);
