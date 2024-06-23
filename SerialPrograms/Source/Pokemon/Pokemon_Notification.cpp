@@ -223,6 +223,9 @@ void send_catch_notification(
     case CatchResult::OUT_OF_BALLS:
         embeds.emplace_back("Fail Reason:", "Unable to find the desired ball. Did you run out?");
         break;
+    case CatchResult::BALL_LIMIT_REACHED:
+        embeds.emplace_back("Fail Reason:", "Ball limit reached.");
+        break;
     case CatchResult::CANNOT_THROW_BALL:
         embeds.emplace_back("Fail Reason:", "Unable to throw ball. Is the " + STRING_POKEMON + " semi-invulnerable?");
         break;

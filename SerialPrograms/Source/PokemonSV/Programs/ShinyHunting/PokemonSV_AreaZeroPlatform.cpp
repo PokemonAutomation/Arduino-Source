@@ -224,7 +224,7 @@ void inside_zero_gate_to_platform(
         pbf_move_left_joystick(context, 164, 0, 125, settings.MIDAIR_PAUSE_TIME);
         pbf_press_button(context, BUTTON_LCLICK, 50, 0);
         ssf_press_right_joystick(context, 128, 255, 0, 1500);
-        pbf_move_left_joystick(context, 128, 255, 1650, 125);
+        pbf_move_left_joystick(context, 128, 255, 1600, 125);
 
         pbf_press_button(context, BUTTON_B, 125, 375);
 
@@ -236,6 +236,8 @@ void inside_zero_gate_to_platform(
     ssf_press_left_joystick(context, 128, 0, 1 * TICKS_PER_SECOND, 4 * TICKS_PER_SECOND);
     pbf_press_button(context, BUTTON_R, 20, 355);
     pbf_press_button(context, BUTTON_R, 20, 105);
+
+    context.wait_for_all_requests();
 }
 
 

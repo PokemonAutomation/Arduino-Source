@@ -31,7 +31,7 @@ public:
     StandardEncounterDetection(
         ConsoleHandle& console, BotBaseContext& context,
         Language language,
-        const EncounterFilterOption& filter,
+        const EncounterFilterOption2& filter,
         const DoublesShinyDetection& shininess,
         std::chrono::milliseconds read_name_delay = std::chrono::milliseconds(500)
     );
@@ -62,7 +62,7 @@ private:
 
     const Language m_language;
 
-    const EncounterFilterOption& m_filter;
+    const EncounterFilterOption2& m_filter;
     const DoublesShinyDetection& m_shininess;
 
     bool m_double_battle = false;

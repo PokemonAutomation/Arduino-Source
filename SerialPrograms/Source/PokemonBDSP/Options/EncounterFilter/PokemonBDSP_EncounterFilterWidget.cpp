@@ -17,6 +17,7 @@ namespace PokemonBDSP{
 
 
 
+#if 0
 EncounterFilterWidget::EncounterFilterWidget(QWidget& parent, EncounterFilterOption& value)
     : QWidget(&parent)
     , ConfigWidget(value, *this)
@@ -84,7 +85,7 @@ void EncounterFilterWidget::update_visibility(){
         m_table->update_visibility();
     }
 }
-
+#endif
 
 
 }

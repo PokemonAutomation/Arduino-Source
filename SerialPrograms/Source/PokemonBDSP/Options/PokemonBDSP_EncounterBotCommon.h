@@ -10,7 +10,7 @@
 #include "Common/Cpp/Options/BatchOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "CommonFramework/Notifications/EventNotificationOption.h"
-#include "Pokemon/Options/Pokemon_EncounterBotOptions.h"
+//#include "Pokemon/Options/Pokemon_EncounterBotOptions.h"
 #include "EncounterFilter/PokemonBDSP_EncounterFilterOption.h"
 
 namespace PokemonAutomation{
@@ -22,17 +22,17 @@ namespace PokemonBDSP{
 class EncounterBotCommonOptions : public BatchOption{
 public:
     EncounterBotCommonOptions(bool enable_overrides)
-        : BatchOption(LockMode::LOCK_WHILE_RUNNING)
+        : BatchOption(LockMode::UNLOCK_WHILE_RUNNING)
         , USE_SOUND_DETECTION(
             "<b>Use Sound Detection:</b><br>Use sound to improve shiny detection.<br>"
             "<b>Make sure you have correct audio input set.</b>",
-            LockMode::LOCK_WHILE_RUNNING,
+            LockMode::UNLOCK_WHILE_RUNNING,
             true
         )
         , FILTER(enable_overrides)
         , VIDEO_ON_SHINY(
             "<b>Video Capture:</b><br>Take a video of the encounter if it is shiny.",
-            LockMode::LOCK_WHILE_RUNNING,
+            LockMode::UNLOCK_WHILE_RUNNING,
             true
         )
         , NOTIFICATION_NONSHINY(
@@ -63,7 +63,7 @@ public:
     }
 
     BooleanCheckBoxOption USE_SOUND_DETECTION;
-    EncounterFilterOption FILTER;
+    EncounterFilterOption2 FILTER;
     BooleanCheckBoxOption VIDEO_ON_SHINY;
 
     EventNotificationOption NOTIFICATION_NONSHINY;

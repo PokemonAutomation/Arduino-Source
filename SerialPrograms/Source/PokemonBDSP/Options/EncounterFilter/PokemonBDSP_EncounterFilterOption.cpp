@@ -4,21 +4,22 @@
  *
  */
 
-#include "Common/Cpp/Json/JsonValue.h"
-#include "Common/Cpp/Json/JsonObject.h"
-#include "CommonFramework/Globals.h"
-#include "Pokemon/Pokemon_Strings.h"
+//#include "Common/Cpp/Json/JsonValue.h"
+//#include "Common/Cpp/Json/JsonObject.h"
+//#include "CommonFramework/Globals.h"
+//#include "Pokemon/Pokemon_Strings.h"
 #include "PokemonBDSP_EncounterFilterEnums.h"
 #include "PokemonBDSP_EncounterFilterOption.h"
-#include "PokemonBDSP_EncounterFilterWidget.h"
+//#include "PokemonBDSP_EncounterFilterWidget.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonBDSP{
-    using namespace Pokemon;
+//    using namespace Pokemon;
 
 
 
+#if 0
 EncounterFilterOption::EncounterFilterOption(bool enable_overrides)
     : m_enable_overrides(enable_overrides)
     , m_shiny_filter_default(ShinyFilter::SHINY)
@@ -64,6 +65,24 @@ void EncounterFilterOption::restore_defaults(){
 ConfigWidget* EncounterFilterOption::make_QtWidget(QWidget& parent){
     return new EncounterFilterWidget(parent, *this);
 }
+#endif
+
+
+EncounterFilterOption2::EncounterFilterOption2(bool enable_overrides)
+    : BatchOption(LockMode::UNLOCK_WHILE_RUNNING)
+    , SHINY_FILTER(
+        "<b>Stop on:</b>",
+        ShinyFilter_Database(),
+        LockMode::UNLOCK_WHILE_RUNNING,
+        ShinyFilter::SHINY
+    )
+{
+    PA_ADD_OPTION(SHINY_FILTER);
+    if (enable_overrides){
+        PA_ADD_OPTION(FILTER_TABLE);
+    }
+}
+
 
 
 

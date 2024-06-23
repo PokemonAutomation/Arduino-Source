@@ -8,10 +8,11 @@
 #define PokemonAutomation_PokemonBDSP_DoublesLeveling_H
 
 #include "Common/Cpp/Options/StaticTextOption.h"
-#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
+//#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
+#include "Pokemon/Options/Pokemon_EncounterBotOptions.h"
 #include "PokemonBDSP/Options/PokemonBDSP_LearnMove.h"
 #include "PokemonBDSP/Options/PokemonBDSP_EncounterBotCommon.h"
 #include "PokemonBDSP/Programs/PokemonBDSP_OverworldTrigger.h"

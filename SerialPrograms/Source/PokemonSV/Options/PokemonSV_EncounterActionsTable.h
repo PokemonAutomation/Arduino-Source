@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonSV_EncounterFilterTable_H
 #define PokemonAutomation_PokemonSV_EncounterFilterTable_H
 
+#include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/EditableTableOption.h"
 #include "CommonFramework/Options/StringSelectOption.h"
@@ -33,10 +34,11 @@ enum class EncounterActionsShininess{
 
 
 struct EncounterActionsEntry{
-    EncounterActionsAction action;
-    std::string ball;
     std::string pokemon;
     EncounterActionsShininess shininess;
+    EncounterActionsAction action;
+    std::string ball;
+    uint16_t ball_limit;
 };
 
 
@@ -53,10 +55,11 @@ private:
     virtual void value_changed(void* object) override;
 
 private:
-    EnumDropdownCell<EncounterActionsAction> action;
-    PokemonSwSh::PokemonBallSelectCell pokeball;
     StringSelectCell pokemon;
     EnumDropdownCell<EncounterActionsShininess> shininess;
+    EnumDropdownCell<EncounterActionsAction> action;
+    PokemonSwSh::PokemonBallSelectCell pokeball;
+    SimpleIntegerCell<uint16_t> ball_limit;
 };
 
 

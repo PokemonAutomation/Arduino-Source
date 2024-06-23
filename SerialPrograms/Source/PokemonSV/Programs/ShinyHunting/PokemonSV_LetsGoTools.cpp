@@ -268,7 +268,8 @@ void LetsGoEncounterBotTracker::process_battle(
 
         CatchResults result = basic_catcher(
             m_console, m_context,
-            language, action.ball,
+            language,
+            action.ball, action.ball_limit,
             settings.USE_FIRST_MOVE_IF_CANNOT_THROW_BALL
         );
         send_catch_notification(

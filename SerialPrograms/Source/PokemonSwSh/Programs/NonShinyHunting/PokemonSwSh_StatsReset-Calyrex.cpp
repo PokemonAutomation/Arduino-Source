@@ -173,7 +173,7 @@ void StatsResetCalyrex::program(SingleSwitchProgramEnvironment& env, BotBaseCont
             }
 
             pbf_mash_button(context, BUTTON_B, 1 * TICKS_PER_SECOND);
-            CatchResults result = basic_catcher(env.console, context, LANGUAGE, BALL_SELECT.slug());
+            CatchResults result = basic_catcher(env.console, context, LANGUAGE, BALL_SELECT.slug(), 999);
             switch (result.result){
             case CatchResult::POKEMON_CAUGHT:
                 calyrex_caught = true;
@@ -188,6 +188,7 @@ void StatsResetCalyrex::program(SingleSwitchProgramEnvironment& env, BotBaseCont
             case CatchResult::OUT_OF_BALLS:
                 stats.out_of_balls++;
                 break;
+            case CatchResult::BALL_LIMIT_REACHED:
             case CatchResult::CANNOT_THROW_BALL:
             case CatchResult::TIMED_OUT:
                 stats.errors++;

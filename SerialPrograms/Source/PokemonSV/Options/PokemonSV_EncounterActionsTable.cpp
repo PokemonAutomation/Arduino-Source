@@ -43,12 +43,6 @@ EncounterActionsRow::~EncounterActionsRow(){
 }
 EncounterActionsRow::EncounterActionsRow(EditableTableOption& parent_table)
     : EditableTableRow(parent_table)
-    , action(
-        EncounterFilterAction_database(),
-        LockMode::UNLOCK_WHILE_RUNNING,
-        EncounterActionsAction::STOP_PROGRAM
-    )
-    , pokeball("poke-ball")
     , pokemon(
         ALL_POKEMON_NAMES(),
         LockMode::UNLOCK_WHILE_RUNNING,
@@ -59,11 +53,19 @@ EncounterActionsRow::EncounterActionsRow(EditableTableOption& parent_table)
         LockMode::UNLOCK_WHILE_RUNNING,
         EncounterActionsShininess::SHINY
     )
+    , action(
+        EncounterFilterAction_database(),
+        LockMode::UNLOCK_WHILE_RUNNING,
+        EncounterActionsAction::STOP_PROGRAM
+    )
+    , pokeball("poke-ball")
+    , ball_limit(LockMode::UNLOCK_WHILE_RUNNING, 40, 1, 999)
 {
-    PA_ADD_OPTION(action);
-    PA_ADD_OPTION(pokeball);
     PA_ADD_OPTION(pokemon);
     PA_ADD_OPTION(shininess);
+    PA_ADD_OPTION(action);
+    PA_ADD_OPTION(pokeball);
+    PA_ADD_OPTION(ball_limit);
 
     EncounterActionsRow::value_changed(this);
 
@@ -75,25 +77,29 @@ std::unique_ptr<EditableTableRow> EncounterActionsRow::clone() const{
     ret->pokeball.set_by_index(pokeball.index());
     ret->pokemon.set_by_index(pokemon.index());
     ret->shininess.set(shininess);
+    ret->ball_limit.set(ball_limit);
     return ret;
 }
 EncounterActionsEntry EncounterActionsRow::snapshot() const{
     return {
-        action,
-        pokeball.slug(),
         pokemon.slug(),
         shininess,
+        action,
+        pokeball.slug(),
+        ball_limit,
     };
 }
 void EncounterActionsRow::value_changed(void* object){
     switch (action){
     case EncounterActionsAction::STOP_PROGRAM:
     case EncounterActionsAction::RUN_AWAY:
-        pokeball.set_visibility(ConfigOptionState::DISABLED);
+        pokeball.set_visibility(ConfigOptionState::HIDDEN);
+        ball_limit.set_visibility(ConfigOptionState::HIDDEN);
         break;
     case EncounterActionsAction::THROW_BALLS:
     case EncounterActionsAction::THROW_BALLS_AND_SAVE:
         pokeball.set_visibility(ConfigOptionState::ENABLED);
+        ball_limit.set_visibility(ConfigOptionState::ENABLED);
         break;
     }
 }
@@ -118,10 +124,11 @@ std::vector<EncounterActionsEntry> EncounterActionsTable::snapshot(){
 }
 std::vector<std::string> EncounterActionsTable::make_header() const{
     return {
-        "Action",
-        Pokemon::STRING_POKEBALL,
         "Species",
         "Shininess",
+        "Action",
+        Pokemon::STRING_POKEBALL,
+        "Ball Limit"
     };
 }
 std::vector<std::unique_ptr<EditableTableRow>> EncounterActionsTable::make_defaults(){

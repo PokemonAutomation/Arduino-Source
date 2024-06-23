@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Cpp/Exceptions.h"
+//#include "Common/Cpp/Exceptions.h"
 #include "ClientSource/Connection/BotBase.h"
 #include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
@@ -25,7 +25,7 @@ namespace PokemonBDSP{
 StandardEncounterDetection::StandardEncounterDetection(
     ConsoleHandle& console, BotBaseContext& context,
     Language language,
-    const EncounterFilterOption& filter,
+    const EncounterFilterOption2& filter,
     const DoublesShinyDetection& shininess,
     std::chrono::milliseconds read_name_delay
 )
@@ -189,7 +189,7 @@ bool StandardEncounterDetection::run_overrides(
         //  Matched the filter.
         if (filter_match(shiny, override->shininess)){
             triggered = true;
-            action = {override->action, override->pokeball.slug()};
+            action = {override->action, override->pokeball.slug(), override->ball_limit};
         }
     }
     return triggered;
@@ -198,15 +198,17 @@ bool StandardEncounterDetection::run_overrides(
 
 EncounterActionFull StandardEncounterDetection::get_action_singles(){
     if (m_shininess_right == ShinyType::UNKNOWN){
-        return {EncounterAction::RunAway, ""};
+        return {EncounterAction::RunAway, "", 999};
     }
 
+    ShinyFilter shiny_filter = m_filter.SHINY_FILTER;
+
     EncounterActionFull default_action;
-    default_action.action = filter_match(m_shininess_right, m_filter.shiny_filter())
+    default_action.action = filter_match(m_shininess_right, shiny_filter)
         ? EncounterAction::StopProgram
         : EncounterAction::RunAway;
 
-    const std::vector<std::unique_ptr<EncounterFilterOverride>>& overrides = m_filter.copy_snapshot();
+    const std::vector<std::unique_ptr<EncounterFilterOverride>>& overrides = m_filter.FILTER_TABLE.copy_snapshot();
     if (m_language != Language::None && !overrides.empty()){
         run_overrides(default_action, overrides, m_pokemon_right, m_shininess_right);
     }
@@ -216,17 +218,19 @@ EncounterActionFull StandardEncounterDetection::get_action_singles(){
     return default_action;
 }
 EncounterActionFull StandardEncounterDetection::get_action_doubles(){
+    ShinyFilter shiny_filter = m_filter.SHINY_FILTER;
+
     EncounterActionFull action_left;
-    action_left.action = filter_match(m_shininess_left, m_filter.shiny_filter())
+    action_left.action = filter_match(m_shininess_left, shiny_filter)
         ? EncounterAction::StopProgram
         : EncounterAction::RunAway;
 
     EncounterActionFull action_right;
-    action_right.action = filter_match(m_shininess_right, m_filter.shiny_filter())
+    action_right.action = filter_match(m_shininess_right, shiny_filter)
         ? EncounterAction::StopProgram
         : EncounterAction::RunAway;
 
-    const std::vector<std::unique_ptr<EncounterFilterOverride>>& overrides = m_filter.copy_snapshot();
+    const std::vector<std::unique_ptr<EncounterFilterOverride>>& overrides = m_filter.FILTER_TABLE.copy_snapshot();
     if (m_language != Language::None && !overrides.empty()){
         run_overrides(action_left, overrides, m_pokemon_left, m_shininess_left);
         run_overrides(action_right, overrides, m_pokemon_right, m_shininess_right);

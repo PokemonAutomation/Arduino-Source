@@ -50,6 +50,7 @@ enum class CatchResult{
     POKEMON_FAINTED,
     OWN_FAINTED,
     OUT_OF_BALLS,
+    BALL_LIMIT_REACHED,
     CANNOT_THROW_BALL,
     TIMED_OUT,
 };

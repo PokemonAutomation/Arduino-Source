@@ -8,8 +8,8 @@
 #define PokemonAutomation_PokemonSwSh_EncounterHandler_H
 
 #include "CommonFramework/Tools/ConsoleHandle.h"
-#include "Pokemon/Pokemon_Notification.h"
-#include "Pokemon/Options/Pokemon_EncounterBotOptions.h"
+//#include "Pokemon/Pokemon_Notification.h"
+//#include "Pokemon/Options/Pokemon_EncounterBotOptions.h"
 #include "PokemonSwSh/Options/PokemonSwSh_EncounterBotCommon.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_EncounterDetection.h"
 

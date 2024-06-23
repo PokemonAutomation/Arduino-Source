@@ -49,13 +49,14 @@ enum class ShinyFilter{
     NOTHING,
 };
 const EnumDatabase<ShinyFilter>& ShinyFilter_Normal_Database();
-const EnumDatabase<ShinyFilter>& ShinyFilter_RareStars_Database();
+const EnumDatabase<ShinyFilter>& ShinyFilter_StopRareStars_Database();
+const EnumDatabase<ShinyFilter>& ShinyFilter_TableRareStars_Database();
 
 class ShinyFilterCell : public EnumDropdownCell<ShinyFilter>{
 public:
     ShinyFilterCell(bool rare_stars)
         : EnumDropdownCell<ShinyFilter>(
-            rare_stars ? ShinyFilter_RareStars_Database() : ShinyFilter_Normal_Database(),
+            rare_stars ? ShinyFilter_TableRareStars_Database() : ShinyFilter_Normal_Database(),
             LockMode::LOCK_WHILE_RUNNING,
             ShinyFilter::NOT_SHINY
         )

@@ -25,7 +25,7 @@ public:
     StandardEncounterDetection(
         ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
         Language language,
-        const EncounterFilterOption& filter,
+        const EncounterFilterOption2& filter,
         ShinyType shininess,
         std::chrono::milliseconds read_name_delay = std::chrono::milliseconds(500)
     );
@@ -37,7 +37,7 @@ public:
     //  empty set   =   unable to detect
     const std::set<std::string>* candidates();
 
-    std::pair<EncounterAction, std::string> get_action();
+    EncounterActionFull get_action();
 
 private:
     ProgramEnvironment& m_env;
@@ -46,7 +46,7 @@ private:
 
     const Language m_language;
 
-    const EncounterFilterOption& m_filter;
+    const EncounterFilterOption2& m_filter;
     const ShinyType m_shininess;
     const std::chrono::milliseconds m_read_name_delay;
 
