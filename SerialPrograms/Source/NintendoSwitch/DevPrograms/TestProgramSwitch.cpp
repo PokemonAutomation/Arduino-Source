@@ -117,6 +117,7 @@
 #include "NintendoSwitch/Inference/NintendoSwitch_DateReader.h"
 #include "PokemonSV/Inference/ItemPrinter/PokemonSV_ItemPrinterPrizeReader.h"
 #include "PokemonSV/Inference/ItemPrinter/PokemonSV_ItemPrinterJobsDetector.h"
+#include "PokemonSV/Inference/ItemPrinter/PokemonSV_ItemPrinterMaterialDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h"
 
 
@@ -285,6 +286,13 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoSnapshot screen = console.video().snapshot();
     ItemPrinterJobsDetector detector(COLOR_RED);
     cout << (int)detector.detect_jobs(logger, env.inference_dispatcher(), screen) << endl;
+#endif
+
+#if 1
+    ItemPrinterMaterialDetector detector(COLOR_RED, LANGUAGE);
+    detector.make_overlays(overlays);
+    // detector.find_happiny_dust(env.inference_dispatcher(), console, context);
+    cout << (int)detector.detect_material_quantity(env.inference_dispatcher(), console, context) << endl;
 #endif
 
 #if 0
