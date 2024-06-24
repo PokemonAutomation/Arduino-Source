@@ -264,7 +264,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
     VideoSnapshot screen = console.video().snapshot();
-    ItemPrinterJobsDetector detector(COLOR_RED, Language::English);
+    ItemPrinterJobsDetector detector(COLOR_RED);
     cout << (int)detector.detect_jobs(logger, env.inference_dispatcher(), screen) << endl;
 
 

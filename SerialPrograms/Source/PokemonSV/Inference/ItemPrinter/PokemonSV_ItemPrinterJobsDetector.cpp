@@ -23,9 +23,8 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 
-ItemPrinterJobsDetector::ItemPrinterJobsDetector(Color color, Language language)
+ItemPrinterJobsDetector::ItemPrinterJobsDetector(Color color)
     : m_color(color)
-    , m_language(language)
     , m_box_normal(0.86, 0.34, 0.045, 0.050)
     , m_box_bonus(0.86, 0.423, 0.045, 0.050)
 {}
