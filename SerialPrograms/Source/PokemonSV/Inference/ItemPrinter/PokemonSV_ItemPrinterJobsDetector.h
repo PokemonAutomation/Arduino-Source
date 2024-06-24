@@ -42,7 +42,7 @@ private:
 
 private:
     Color m_color;
-    Language m_language;
+    Language m_language;  // language isn't really used, since it default to English
     ImageFloatBox m_box_normal;
     ImageFloatBox m_box_bonus;
 
