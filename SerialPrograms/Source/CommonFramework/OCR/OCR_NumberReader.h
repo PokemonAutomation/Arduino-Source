@@ -18,6 +18,8 @@ namespace OCR{
 
 //  Returns -1 if no number is found.
 //  No processing is done on the image. It is OCR'ed directly.
+//  The best way to use read_number() is to not give Language as a parameter.
+//  This is because the default language is English, since it works best for OCR for numbers.
 int read_number(Logger& logger, const ImageViewRGB32& image, Language language = Language::English);
 
 

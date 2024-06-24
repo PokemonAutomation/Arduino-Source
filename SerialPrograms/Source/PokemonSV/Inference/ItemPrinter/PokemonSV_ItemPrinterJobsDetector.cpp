@@ -23,9 +23,8 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 
-ItemPrinterJobsDetector::ItemPrinterJobsDetector(Color color, Language language)
+ItemPrinterJobsDetector::ItemPrinterJobsDetector(Color color)
     : m_color(color)
-    , m_language(language)
     , m_box_normal(0.86, 0.34, 0.045, 0.050)
     , m_box_bonus(0.86, 0.423, 0.045, 0.050)
 {}
@@ -59,7 +58,7 @@ std::pair<uint8_t, uint8_t> ItemPrinterJobsDetector::read_box(
     std::vector<std::unique_ptr<AsyncTask>> tasks(filtered.size());
     for (size_t c = 0; c < filtered.size(); c++){
         tasks[c] = dispatcher.dispatch([&, c]{
-            int num = OCR::read_number(logger, filtered[c].first, m_language);
+            int num = OCR::read_number(logger, filtered[c].first);
             std::string str = std::to_string(num);
             WriteSpinLock lg(lock);
             if (str == "1"){

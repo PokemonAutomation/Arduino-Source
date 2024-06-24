@@ -22,7 +22,7 @@ namespace PokemonSV{
 
 class ItemPrinterJobsDetector{
 public:
-    ItemPrinterJobsDetector(Color color, Language language);
+    ItemPrinterJobsDetector(Color color);
 
     void make_overlays(VideoOverlaySet& items) const;
     uint8_t detect_jobs(Logger& logger, AsyncDispatcher& dispatcher, const ImageViewRGB32& screen) const;
@@ -42,7 +42,6 @@ private:
 
 private:
     Color m_color;
-    Language m_language;
     ImageFloatBox m_box_normal;
     ImageFloatBox m_box_bonus;
 

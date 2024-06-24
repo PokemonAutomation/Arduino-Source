@@ -58,7 +58,7 @@ void item_printer_start_print(
             pbf_press_button(context, BUTTON_A, 20, 105);
             continue;
         case 2:{    // material
-            ItemPrinterJobsDetector detector(COLOR_RED, language);
+            ItemPrinterJobsDetector detector(COLOR_RED);
             VideoOverlaySet overlays(console.overlay());
             detector.make_overlays(overlays);
             detector.set_print_jobs(dispatcher, console, context, (uint8_t)jobs);
