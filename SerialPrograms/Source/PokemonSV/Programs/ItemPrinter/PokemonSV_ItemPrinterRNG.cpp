@@ -731,7 +731,7 @@ uint32_t ItemPrinterRNG::check_num_happiny_dust(
         }
         case 3:{
             env.log("Detected material selection.");
-            ItemPrinterMaterialDetector detector(COLOR_RED, LANGUAGE);
+            ItemPrinterMaterialDetector detector(COLOR_RED);
             // Press the right button 6 times to see the Happiny Dust in the material selector.
             pbf_press_dpad(context, DPAD_RIGHT, 20, 30);
             pbf_press_dpad(context, DPAD_RIGHT, 20, 30);

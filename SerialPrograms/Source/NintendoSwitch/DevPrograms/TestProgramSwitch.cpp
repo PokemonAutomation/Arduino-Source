@@ -297,6 +297,12 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 #if 0
     VideoSnapshot screen = console.video().snapshot();
+    ItemPrinterJobsDetector detector(COLOR_RED);
+    cout << (int)detector.detect_jobs(logger, env.inference_dispatcher(), screen) << endl;
+#endif
+
+#if 0
+    VideoSnapshot screen = console.video().snapshot();
 
     OverworldDetector detector;
     cout << detector.detect(screen) << endl;

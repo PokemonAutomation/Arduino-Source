@@ -22,7 +22,7 @@ namespace PokemonSV{
 
 class ItemPrinterMaterialDetector{
 public:
-    ItemPrinterMaterialDetector(Color color, Language language);
+    ItemPrinterMaterialDetector(Color color);
 
     void make_overlays(VideoOverlaySet& items) const;
 
@@ -45,7 +45,6 @@ private:
 
 private:
     Color m_color;
-    Language m_language;
     ImageFloatBox m_box_mat_value;
     ImageFloatBox m_box_mat_quantity;
 

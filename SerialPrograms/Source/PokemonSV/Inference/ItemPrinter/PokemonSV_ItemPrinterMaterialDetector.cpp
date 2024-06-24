@@ -24,9 +24,8 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 
-ItemPrinterMaterialDetector::ItemPrinterMaterialDetector(Color color, Language language)
+ItemPrinterMaterialDetector::ItemPrinterMaterialDetector(Color color)
     : m_color(color)
-    , m_language(language)
     , m_box_mat_value(0.39, 0.623, 0.025, 0.050)
     , m_box_mat_quantity(0.485, 0.623, 0.037, 0.050)
 {}
@@ -93,27 +92,6 @@ uint16_t ItemPrinterMaterialDetector::read_box(
         return (uint16_t)OCR::read_number_waterfill(logger, cropped, 0xff808080, 0xffffffff);
     }
 
-
-
-#if 0
-    ImageRGB32 filtered = to_blackwhite_rgb32_range(cropped, 0xffc0c0c0, 0xffffffff, true);
-
-    static int c = 0;
-    filtered.save("test-" + std::to_string(c++) + ".png");
-
-    int num = OCR::read_number(logger, filtered, m_language);
-    std::string str = std::to_string(num);
-    if (str[0] == '5'){
-        return 5;
-    }
-    if (str[0] == '1' && str[1] == '0'){
-        return 10;
-    }
-    if (str[0] == '1'){
-        return 1;
-    }
-    return 0;
-#endif
 }
 
 // Press DPAD_RIGHT until a material with 68% value is on the screen,
