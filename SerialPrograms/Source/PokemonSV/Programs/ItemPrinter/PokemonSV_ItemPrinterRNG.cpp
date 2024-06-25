@@ -608,8 +608,16 @@ void ItemPrinterRNG::run_item_printer_rng(
     //  Each time we run the material farmer, we reset jobs_counter to 0.
     uint32_t jobs_counter = 0;
 
+    bool done_one_last_material_check_before_mat_farming = false;
     uint32_t material_farmer_jobs_period = MATERIAL_FARMER_FIXED_NUM_JOBS;
     if (MATERIAL_FARMER_TRIGGER == MaterialFarmerTrigger::MINIMUM_HAPPINY_DUST){
+        // Check material quantity when:
+        // - once when first starting the item printer
+        // - before starting material farming. If still have material, 
+        // can keep using item printer. But this check is only done once, 
+        // until you farm materials again.
+        // - when back from material farming
+
         uint32_t num_jobs_with_happiny_dust = calc_num_jobs_with_happiny_dust(env, context);
         material_farmer_jobs_period = num_jobs_with_happiny_dust;
     }
@@ -619,10 +627,6 @@ void ItemPrinterRNG::run_item_printer_rng(
 
         std::vector<ItemPrinterRngRowSnapshot> table = TABLE0.snapshot<ItemPrinterRngRowSnapshot>();
         for (const ItemPrinterRngRowSnapshot& row : table){
-            if (!MATERIAL_FARMER_OPTIONS.enabled()){
-                jobs_counter = 0;
-            }
-
             //  Cannot run material farmer between chained prints.
             if (row.chain){
                 print_again(env, context, row.jobs);
@@ -633,20 +637,41 @@ void ItemPrinterRNG::run_item_printer_rng(
             run_print_at_date(env, context, row.date, row.jobs);
             jobs_counter += (uint32_t)row.jobs;
 
-            //  Material farmer is disabled.
             if (!MATERIAL_FARMER_OPTIONS.enabled()){
                 continue;
             }
 
+            ////////////////////////////////////////////////////
+            //  Material farmer is enabled. 
+            //  Check number of print jobs before triggering material farmer.
+            ////////////////////////////////////////////////////
+
             if (MATERIAL_FARMER_TRIGGER == MaterialFarmerTrigger::FIXED_NUM_PRINT_JOBS){
                 material_farmer_jobs_period = MATERIAL_FARMER_FIXED_NUM_JOBS;
             }
-            env.console.log("Print job counter: " + std::to_string(jobs_counter) + "/" + std::to_string(material_farmer_jobs_period));
+            env.console.log(
+                "Print job counter: " 
+                + std::to_string(jobs_counter) 
+                + "/" 
+                + std::to_string(material_farmer_jobs_period)
+            );
             
             //  Not ready to run material farmer yet.
             if (jobs_counter < material_farmer_jobs_period){
                 continue;
             }
+            
+            if (MATERIAL_FARMER_TRIGGER == MaterialFarmerTrigger::MINIMUM_HAPPINY_DUST 
+                && !done_one_last_material_check_before_mat_farming
+            ){
+                // one more material quantity check before material farming
+                // if still have material, keep using item printer
+                uint32_t num_jobs_with_happiny_dust = calc_num_jobs_with_happiny_dust(env, context);
+                material_farmer_jobs_period = num_jobs_with_happiny_dust;
+                jobs_counter = 0;
+                done_one_last_material_check_before_mat_farming = true;
+                continue;
+            }            
 
             //  Run the material farmer.
             press_Bs_to_back_to_overworld(env.program_info(), env.console, context);
@@ -660,11 +685,14 @@ void ItemPrinterRNG::run_item_printer_rng(
             }
             move_from_material_farming_to_item_printer(env, context);
 
+            // Recheck number of Happiny Dust after returning from Material Farming,
+            // prior to restarting Item printing
             if (MATERIAL_FARMER_TRIGGER == MaterialFarmerTrigger::MINIMUM_HAPPINY_DUST){
                 uint32_t num_jobs_with_happiny_dust = calc_num_jobs_with_happiny_dust(env, context);
                 material_farmer_jobs_period = num_jobs_with_happiny_dust;
+                done_one_last_material_check_before_mat_farming = false;
             }
-
+            
             jobs_counter = 0;
         }
 //        run_print_at_date(env, context, DATE0, 1);
