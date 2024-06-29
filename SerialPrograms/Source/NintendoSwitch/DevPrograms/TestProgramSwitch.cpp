@@ -288,11 +288,11 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     cout << (int)detector.detect_jobs(logger, env.inference_dispatcher(), screen) << endl;
 #endif
 
-#if 1
+#if 0
     ItemPrinterMaterialDetector detector(COLOR_RED, LANGUAGE);
     detector.make_overlays(overlays);
-    detector.find_happiny_dust_row_num(env.inference_dispatcher(), console, context);
-    cout << (int)detector.detect_material_quantity(env.inference_dispatcher(), console, context, 2) << endl;
+    cout << (int)detector.find_happiny_dust_row_index(env.inference_dispatcher(), console, context) << endl;
+    // cout << (int)detector.detect_material_quantity(env.inference_dispatcher(), console, context, 2) << endl;
 #endif
 
 #if 0

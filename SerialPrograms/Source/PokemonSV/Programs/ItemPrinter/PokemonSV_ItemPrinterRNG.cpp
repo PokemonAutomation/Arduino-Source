@@ -765,7 +765,7 @@ uint32_t ItemPrinterRNG::check_num_happiny_dust(
             env.log("Detected material selection.");
             ItemPrinterMaterialDetector detector(COLOR_RED, LANGUAGE);
             
-            int8_t happiny_dust_row_num = detector.find_happiny_dust_row_num(env.inference_dispatcher(), env.console, context);
+            int8_t happiny_dust_row_num = detector.find_happiny_dust_row_index(env.inference_dispatcher(), env.console, context);
             num_happiny_dust = detector.detect_material_quantity(env.inference_dispatcher(), env.console, context, happiny_dust_row_num);
             pbf_mash_button(context, BUTTON_B, 100);
             return num_happiny_dust;

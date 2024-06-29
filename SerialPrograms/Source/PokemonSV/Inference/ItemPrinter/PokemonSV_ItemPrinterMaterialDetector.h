@@ -12,6 +12,7 @@
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/Inference/VisualDetector.h"
 #include "CommonFramework/OCR/OCR_SmallDictionaryMatcher.h"
+#include <array>
 
 namespace PokemonAutomation{
     class Logger;
@@ -46,12 +47,14 @@ public:
 
     void make_overlays(VideoOverlaySet& items) const;
 
-    int8_t find_happiny_dust_row_num(
+    std::array<ImageFloatBox, 10> Material_Boxes(ImageFloatBox initial_box);
+
+    int8_t find_happiny_dust_row_index(
         AsyncDispatcher& dispatcher,
         ConsoleHandle& console, BotBaseContext& context
     ) const;
 
-    int8_t find_material_value_row_num(
+    int8_t find_material_value_row_index(
         AsyncDispatcher& dispatcher,
         ConsoleHandle& console, 
         BotBaseContext& context,
@@ -62,13 +65,13 @@ public:
         AsyncDispatcher& dispatcher,
         ConsoleHandle& console, 
         BotBaseContext& context,
-        int8_t row_num
+        int8_t row_index
     ) const;
 
     std::string detect_material_name(
         ConsoleHandle& console, 
         BotBaseContext& context,
-        int8_t row_num
+        int8_t row_index
     ) const;    
 
 
@@ -84,45 +87,13 @@ private:
         bool is_white_text
     ) const;    
 
-    ImageFloatBox get_material_quantity_box(int8_t row_num) const;
-
-    ImageFloatBox get_material_value_box(int8_t row_num) const;
-
-    ImageFloatBox get_material_name_box(int8_t row_num) const;
 
 private:
     Color m_color;
     Language m_language;
-    ImageFloatBox m_box_1_mat_value;
-    ImageFloatBox m_box_1_mat_quantity;
-    ImageFloatBox m_box_1_mat_name;
-    ImageFloatBox m_box_2_mat_value;
-    ImageFloatBox m_box_2_mat_quantity;
-    ImageFloatBox m_box_2_mat_name;
-    ImageFloatBox m_box_3_mat_value;
-    ImageFloatBox m_box_3_mat_quantity;
-    ImageFloatBox m_box_3_mat_name;
-    ImageFloatBox m_box_4_mat_value;
-    ImageFloatBox m_box_4_mat_quantity;
-    ImageFloatBox m_box_4_mat_name;
-    ImageFloatBox m_box_5_mat_value;
-    ImageFloatBox m_box_5_mat_quantity;
-    ImageFloatBox m_box_5_mat_name;
-    ImageFloatBox m_box_6_mat_value;
-    ImageFloatBox m_box_6_mat_quantity;
-    ImageFloatBox m_box_6_mat_name;
-    ImageFloatBox m_box_7_mat_value;
-    ImageFloatBox m_box_7_mat_quantity;
-    ImageFloatBox m_box_7_mat_name;
-    ImageFloatBox m_box_8_mat_value;
-    ImageFloatBox m_box_8_mat_quantity;
-    ImageFloatBox m_box_8_mat_name;
-    ImageFloatBox m_box_9_mat_value;
-    ImageFloatBox m_box_9_mat_quantity;
-    ImageFloatBox m_box_9_mat_name;
-    ImageFloatBox m_box_10_mat_value;
-    ImageFloatBox m_box_10_mat_quantity;
-    ImageFloatBox m_box_10_mat_name;
+    std::array<ImageFloatBox, 10> m_box_mat_value;
+    std::array<ImageFloatBox, 10> m_box_mat_quantity;
+    std::array<ImageFloatBox, 10> m_box_mat_name;
 };
 
 
