@@ -291,8 +291,8 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 #if 1
     ItemPrinterMaterialDetector detector(COLOR_RED, LANGUAGE);
     detector.make_overlays(overlays);
-    // detector.find_happiny_dust(env.inference_dispatcher(), console, context);
-    cout << (int)detector.detect_material_quantity(env.inference_dispatcher(), console, context) << endl;
+    detector.find_happiny_dust_row_num(env.inference_dispatcher(), console, context);
+    cout << (int)detector.detect_material_quantity(env.inference_dispatcher(), console, context, 2) << endl;
 #endif
 
 #if 0
