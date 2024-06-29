@@ -29,7 +29,9 @@ MaterialNameReader& MaterialNameReader::instance(){
     return reader;
 }
 
-
+// MaterialNameReader has a very limited dictionary,
+// so it can only reliably read the material names with 68% value
+// (i.e. Ditto Goo, Happiny Dust, Magby Hair, Beldum Claw)
 MaterialNameReader::MaterialNameReader()
     : SmallDictionaryMatcher("PokemonSV/ItemPrinterMaterialOCR.json")
 {}
@@ -230,7 +232,7 @@ int8_t ItemPrinterMaterialDetector::find_happiny_dust_row_num(
             && detect_material_name(console, context, value_68_row_num) == "happiny-dust"
         ){  
             // found screen and row number with Happiny dust.
-            std::cout << "Happiny dust found. Row number: " << std::to_string(value_68_row_num) << std::endl;
+            // std::cout << "Happiny dust found. Row number: " << std::to_string(value_68_row_num) << std::endl;
             return value_68_row_num;
         }
         // keep searching for Happiny dust
@@ -245,6 +247,10 @@ int8_t ItemPrinterMaterialDetector::find_happiny_dust_row_num(
 
 }
 
+// detects the material name at the given row_num
+// MaterialNameReader has a very limited dictionary,
+// so it can only reliably read the material names with 68% value
+// (i.e. Ditto Goo, Happiny Dust, Magby Hair, Beldum Claw)
 std::string ItemPrinterMaterialDetector::detect_material_name(
     ConsoleHandle& console, 
     BotBaseContext& context,
