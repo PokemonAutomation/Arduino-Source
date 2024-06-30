@@ -125,7 +125,7 @@ ItemPrinterRNG::ItemPrinterRNG()
         0, 5000
     )
     , ADJUST_DELAY(
-        "<b>Automatically adjust delay:</b><br>Adjust the delay, depending on the desired item and the actual print result.",
+        "<b>Automatically Adjust Delay:</b><br>Adjust the delay, depending on the desired item and the actual print result.",
         LockMode::UNLOCK_WHILE_RUNNING, true
     )
     , GO_HOME_WHEN_DONE(false)

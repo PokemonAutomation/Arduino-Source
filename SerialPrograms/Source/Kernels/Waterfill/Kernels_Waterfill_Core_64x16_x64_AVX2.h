@@ -402,7 +402,11 @@ static PA_FORCE_INLINE void waterfill_expand(BinaryTile_64x16_x64_AVX2& m, Binar
 
 //  Touch the edge of "tile" with the specified border.
 //  Returns true if "tile" has changed and needs to be updated.
-static PA_FORCE_INLINE bool waterfill_touch_top(const BinaryTile_64x16_x64_AVX2& mask, BinaryTile_64x16_x64_AVX2& tile, const BinaryTile_64x16_x64_AVX2& border){
+static PA_FORCE_INLINE bool waterfill_touch_top(
+    const BinaryTile_64x16_x64_AVX2& mask,
+    BinaryTile_64x16_x64_AVX2& tile,
+    const BinaryTile_64x16_x64_AVX2& border
+){
     uint64_t available = mask.top() & ~tile.top();
     uint64_t new_bits = available & border.bottom();
     if (new_bits == 0){
@@ -411,7 +415,11 @@ static PA_FORCE_INLINE bool waterfill_touch_top(const BinaryTile_64x16_x64_AVX2&
     tile.top() |= new_bits;
     return true;
 }
-static PA_FORCE_INLINE bool waterfill_touch_bottom(const BinaryTile_64x16_x64_AVX2& mask, BinaryTile_64x16_x64_AVX2& tile, const BinaryTile_64x16_x64_AVX2& border){
+static PA_FORCE_INLINE bool waterfill_touch_bottom(
+    const BinaryTile_64x16_x64_AVX2& mask,
+    BinaryTile_64x16_x64_AVX2& tile,
+    const BinaryTile_64x16_x64_AVX2& border
+){
     uint64_t available = mask.bottom() & ~tile.bottom();
     uint64_t new_bits = available & border.top();
     if (new_bits == 0){
@@ -420,7 +428,11 @@ static PA_FORCE_INLINE bool waterfill_touch_bottom(const BinaryTile_64x16_x64_AV
     tile.bottom() |= new_bits;
     return true;
 }
-static PA_FORCE_INLINE bool waterfill_touch_left(const BinaryTile_64x16_x64_AVX2& mask, BinaryTile_64x16_x64_AVX2& tile, const BinaryTile_64x16_x64_AVX2& border){
+static PA_FORCE_INLINE bool waterfill_touch_left(
+    const BinaryTile_64x16_x64_AVX2& mask,
+    BinaryTile_64x16_x64_AVX2& tile,
+    const BinaryTile_64x16_x64_AVX2& border
+){
     __m256i changed = _mm256_setzero_si256();
     for (size_t c = 0; c < 4; c++){
         __m256i available = _mm256_andnot_si256(tile.vec[c], mask.vec[c]);
@@ -430,7 +442,11 @@ static PA_FORCE_INLINE bool waterfill_touch_left(const BinaryTile_64x16_x64_AVX2
     }
     return !_mm256_testz_si256(changed, changed);
 }
-static PA_FORCE_INLINE bool waterfill_touch_right(const BinaryTile_64x16_x64_AVX2& mask, BinaryTile_64x16_x64_AVX2& tile, const BinaryTile_64x16_x64_AVX2& border){
+static PA_FORCE_INLINE bool waterfill_touch_right(
+    const BinaryTile_64x16_x64_AVX2& mask,
+    BinaryTile_64x16_x64_AVX2& tile,
+    const BinaryTile_64x16_x64_AVX2& border
+){
     __m256i changed = _mm256_setzero_si256();
     for (size_t c = 0; c < 4; c++){
         __m256i available = _mm256_andnot_si256(tile.vec[c], mask.vec[c]);

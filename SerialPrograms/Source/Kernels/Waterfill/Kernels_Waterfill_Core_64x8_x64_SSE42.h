@@ -381,7 +381,11 @@ static PA_FORCE_INLINE void waterfill_expand(BinaryTile_64x8_x64_SSE42& m, Binar
 
 //  Touch the edge of "tile" with the specified border.
 //  Returns true if "tile" has changed and needs to be updated.
-static PA_FORCE_INLINE bool waterfill_touch_top(const BinaryTile_64x8_x64_SSE42& mask, BinaryTile_64x8_x64_SSE42& tile, const BinaryTile_64x8_x64_SSE42& border){
+static PA_FORCE_INLINE bool waterfill_touch_top(
+    const BinaryTile_64x8_x64_SSE42& mask,
+    BinaryTile_64x8_x64_SSE42& tile,
+    const BinaryTile_64x8_x64_SSE42& border
+){
     uint64_t available = mask.top() & ~tile.top();
     uint64_t new_bits = available & border.bottom();
     if (new_bits == 0){
@@ -390,7 +394,11 @@ static PA_FORCE_INLINE bool waterfill_touch_top(const BinaryTile_64x8_x64_SSE42&
     tile.top() |= new_bits;
     return true;
 }
-static PA_FORCE_INLINE bool waterfill_touch_bottom(const BinaryTile_64x8_x64_SSE42& mask, BinaryTile_64x8_x64_SSE42& tile, const BinaryTile_64x8_x64_SSE42& border){
+static PA_FORCE_INLINE bool waterfill_touch_bottom(
+    const BinaryTile_64x8_x64_SSE42& mask,
+    BinaryTile_64x8_x64_SSE42& tile,
+    const BinaryTile_64x8_x64_SSE42& border
+){
     uint64_t available = mask.bottom() & ~tile.bottom();
     uint64_t new_bits = available & border.top();
     if (new_bits == 0){
@@ -399,7 +407,11 @@ static PA_FORCE_INLINE bool waterfill_touch_bottom(const BinaryTile_64x8_x64_SSE
     tile.bottom() |= new_bits;
     return true;
 }
-static PA_FORCE_INLINE bool waterfill_touch_left(const BinaryTile_64x8_x64_SSE42& mask, BinaryTile_64x8_x64_SSE42& tile, const BinaryTile_64x8_x64_SSE42& border){
+static PA_FORCE_INLINE bool waterfill_touch_left(
+    const BinaryTile_64x8_x64_SSE42& mask,
+    BinaryTile_64x8_x64_SSE42& tile,
+    const BinaryTile_64x8_x64_SSE42& border
+){
     __m128i changed = _mm_setzero_si128();
     for (size_t c = 0; c < 4; c++){
         __m128i available = _mm_andnot_si128(tile.vec[c], mask.vec[c]);
@@ -409,7 +421,11 @@ static PA_FORCE_INLINE bool waterfill_touch_left(const BinaryTile_64x8_x64_SSE42
     }
     return !_mm_test_all_zeros(changed, changed);
 }
-static PA_FORCE_INLINE bool waterfill_touch_right(const BinaryTile_64x8_x64_SSE42& mask, BinaryTile_64x8_x64_SSE42& tile, const BinaryTile_64x8_x64_SSE42& border){
+static PA_FORCE_INLINE bool waterfill_touch_right(
+    const BinaryTile_64x8_x64_SSE42& mask,
+    BinaryTile_64x8_x64_SSE42& tile,
+    const BinaryTile_64x8_x64_SSE42& border
+){
     __m128i changed = _mm_setzero_si128();
     for (size_t c = 0; c < 4; c++){
         __m128i available = _mm_andnot_si128(tile.vec[c], mask.vec[c]);

@@ -462,7 +462,11 @@ static PA_FORCE_INLINE void waterfill_expand(BinaryTile_64x8_arm64_NEON& m, Bina
 
 //  Touch the edge of "tile" with the specified border.
 //  Returns true if "tile" has changed and needs to be updated.
-static PA_FORCE_INLINE bool waterfill_touch_top(const BinaryTile_64x8_arm64_NEON& mask, BinaryTile_64x8_arm64_NEON& tile, const BinaryTile_64x8_arm64_NEON& border){
+static PA_FORCE_INLINE bool waterfill_touch_top(
+    const BinaryTile_64x8_arm64_NEON& mask,
+    BinaryTile_64x8_arm64_NEON& tile,
+    const BinaryTile_64x8_arm64_NEON& border
+){
     uint64_t available = mask.top() & ~tile.top();
     uint64_t new_bits = available & border.bottom();
     if (new_bits == 0){
@@ -471,7 +475,11 @@ static PA_FORCE_INLINE bool waterfill_touch_top(const BinaryTile_64x8_arm64_NEON
     tile.top() |= new_bits;
     return true;
 }
-static PA_FORCE_INLINE bool waterfill_touch_bottom(const BinaryTile_64x8_arm64_NEON& mask, BinaryTile_64x8_arm64_NEON& tile, const BinaryTile_64x8_arm64_NEON& border){
+static PA_FORCE_INLINE bool waterfill_touch_bottom(
+    const BinaryTile_64x8_arm64_NEON& mask,
+    BinaryTile_64x8_arm64_NEON& tile,
+    const BinaryTile_64x8_arm64_NEON& border
+){
     uint64_t available = mask.bottom() & ~tile.bottom();
     uint64_t new_bits = available & border.top();
     if (new_bits == 0){
@@ -480,7 +488,11 @@ static PA_FORCE_INLINE bool waterfill_touch_bottom(const BinaryTile_64x8_arm64_N
     tile.bottom() |= new_bits;
     return true;
 }
-static PA_FORCE_INLINE bool waterfill_touch_left(const BinaryTile_64x8_arm64_NEON& mask, BinaryTile_64x8_arm64_NEON& tile, const BinaryTile_64x8_arm64_NEON& border){
+static PA_FORCE_INLINE bool waterfill_touch_left(
+    const BinaryTile_64x8_arm64_NEON& mask,
+    BinaryTile_64x8_arm64_NEON& tile,
+    const BinaryTile_64x8_arm64_NEON& border
+){
     uint64x2_t changed = vreinterpretq_u64_u8(vdupq_n_u8(0));
     for (size_t c = 0; c < 4; c++){
         uint64x2_t available = vbicq_u64(mask.vec.val[c], tile.vec.val[c]);
@@ -491,7 +503,11 @@ static PA_FORCE_INLINE bool waterfill_touch_left(const BinaryTile_64x8_arm64_NEO
     // Test if there is 1 bit in `changed`
     return vgetq_lane_u64(changed, 0) | vgetq_lane_u64(changed, 1);
 }
-static PA_FORCE_INLINE bool waterfill_touch_right(const BinaryTile_64x8_arm64_NEON& mask, BinaryTile_64x8_arm64_NEON& tile, const BinaryTile_64x8_arm64_NEON& border){
+static PA_FORCE_INLINE bool waterfill_touch_right(
+    const BinaryTile_64x8_arm64_NEON& mask,
+    BinaryTile_64x8_arm64_NEON& tile,
+    const BinaryTile_64x8_arm64_NEON& border
+){
     uint64x2_t changed = vreinterpretq_u64_u8(vdupq_n_u8(0));
     for (size_t c = 0; c < 4; c++){
         uint64x2_t available = vbicq_u64(mask.vec.val[c], tile.vec.val[c]);

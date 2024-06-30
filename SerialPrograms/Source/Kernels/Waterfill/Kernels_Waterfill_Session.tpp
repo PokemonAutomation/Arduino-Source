@@ -252,7 +252,7 @@ bool WaterfillSession_t<Tile, TileRoutines>::find_object(
         }else{
             // source_mask = (NOT tile) AND source_mask
             // Delete the bits on source tile `source_mask` that are already found (and recorded in `recorded_tile`)
-            // In this way we want ente an infinite loop of discovering old visited bits from `source_mask`.
+            // In this way we won't enter an infinite loop of discovering old visited bits from `source_mask`.
             source_mask.andnot(recorded_tile);
         }
         first_expand = true;
@@ -280,7 +280,7 @@ bool WaterfillSession_t<Tile, TileRoutines>::find_object(
         }
         // logical OR each row in `recorded_tile` together
         uint64_t row_or = TileRoutines::row_or(recorded_tile);
-        // If we have a left nbr tile and th current found bits reach the left-most column of the current tile
+        // If we have a left nbr tile and the current found bits reach the left-most column of the current tile
         // waterfill into the left nbr tile
         if (x > 0 && (row_or & 1)){
             current_x = x - 1;
@@ -290,7 +290,7 @@ bool WaterfillSession_t<Tile, TileRoutines>::find_object(
                 m_object_tiles.set(current_x, y);
             }
         }
-        // If we have a right nbr tile and th current found bits reach the right-most column of the current tile
+        // If we have a right nbr tile and the current found bits reach the right-most column of the current tile
         // waterfill into the right nbr tile
         current_x = x + 1;
         const uint64_t MASK = (uint64_t)1 << (Tile::WIDTH - 1);
