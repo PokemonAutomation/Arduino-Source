@@ -24,9 +24,11 @@
 #include "PokemonSV_ConnectToInternet.h"
 #include "PokemonSV_Navigation.h"
 
+#include <array>
 #include <cmath>
 #include <sstream>
 #include <cfloat>
+#include <iostream>
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
@@ -503,7 +505,12 @@ void leave_phone_to_overworld(const ProgramInfo& info, ConsoleHandle& console, B
 
 // While in the current map zoom level, detect pokecenter icons and move the map cursor there.
 // Return true if succeed. Return false if no visible pokcenter on map
-bool detect_closest_pokecenter_and_move_map_cursor_there(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+bool detect_closest_pokecenter_and_move_map_cursor_there(
+    const ProgramInfo& info,
+    ConsoleHandle& console, 
+    BotBaseContext& context,
+    double push_scale
+){
     context.wait_for_all_requests();
     const auto snapshot_frame = console.video().snapshot().frame;
     const size_t screen_width = snapshot_frame->width();
@@ -547,7 +554,7 @@ bool detect_closest_pokecenter_and_move_map_cursor_there(const ProgramInfo& info
     const double push_x = dif_x * 64 / magnitude, push_y = dif_y * 64 / magnitude;
 
     // 0.5 is too large, 0.25 a little too small, 0.30 is a bit too much for a far-away pokecenter
-    const double scale = 0.29;
+    const double scale = push_scale;
 
     const uint8_t move_x = uint8_t(std::max(std::min(int(round(push_x + 128) + 0.5), 255), 0));
     const uint8_t move_y = uint8_t(std::max(std::min(int(round(push_y + 128) + 0.5), 255), 0));
@@ -562,9 +569,14 @@ bool detect_closest_pokecenter_and_move_map_cursor_there(const ProgramInfo& info
 // While in the current map zoom level, detect pokecenter icons and fly to the closest one.
 // Return true if succeed. Return false if no visible pokcenter on map
 // Throw Operation failed Exception if detected pokecenter, but failed to fly there.
-bool fly_to_visible_closest_pokecenter_cur_zoom_level(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+bool fly_to_visible_closest_pokecenter_cur_zoom_level(
+    const ProgramInfo& info, 
+    ConsoleHandle& console, 
+    BotBaseContext& context, 
+    double push_scale
+){
 
-    if (!detect_closest_pokecenter_and_move_map_cursor_there(info, console, context)){
+    if (!detect_closest_pokecenter_and_move_map_cursor_there(info, console, context, push_scale)){
         return false;
     }
     bool check_fly_menuitem = true;
@@ -585,18 +597,21 @@ bool fly_to_visible_closest_pokecenter_cur_zoom_level(const ProgramInfo& info, C
 
 
 void fly_to_closest_pokecenter_on_map(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
-    const int max_try_count = 5;
+    const int max_try_count = 6;
     int try_count = 0;
     // Part 1: Tries to detect a pokecenter that is very close to the player
     // Zoom in one level onto the map.
     // If the player character icon or any wild pokemon icon overlaps with the PokeCenter icon, the code cannot
     // detect it. So we zoom in as much as we can to prevent any icon overlap.
+    const std::array<double, max_try_count + 1> adjustment_table =  {1, 1, 1, 1.1, 1.2, 0.9, 0.8};
+    
     while(true){
         try {
-            try_count++;
             pbf_press_button(context, BUTTON_ZR, 40, 100);
-            
-            if (fly_to_visible_closest_pokecenter_cur_zoom_level(info, console, context)){
+            // try different magnitudes of cursor push with each failure.
+            double push_scale = 0.29 * adjustment_table[try_count];
+            // std::cout << "push_scale: " << std::to_string(push_scale) << std::endl;
+            if (fly_to_visible_closest_pokecenter_cur_zoom_level(info, console, context, push_scale)){
                 return; // success in finding the closest pokecenter. Return.
             }
 
@@ -604,7 +619,8 @@ void fly_to_closest_pokecenter_on_map(const ProgramInfo& info, ConsoleHandle& co
             break;
         }
         catch (OperationFailedException& e){ // pokecenter was detected, but failed to fly there
-            if (try_count >= max_try_count){
+            try_count++;
+            if (try_count > max_try_count){
                 throw e;
             }
             console.log("Failed to find the fly menuitem. Restart the closest Pokecenter travel process.");
@@ -636,9 +652,10 @@ void fly_to_closest_pokecenter_on_map(const ProgramInfo& info, ConsoleHandle& co
     try_count = 0;
     while(true){
         try {
-            try_count++;
+            double push_scale = 0.29 * adjustment_table[try_count];
+            // std::cout << "push_scale: " << std::to_string(push_scale) << std::endl;
             // Now try finding the closest pokecenter at the max warpable level
-            if (fly_to_visible_closest_pokecenter_cur_zoom_level(info, console, context)){
+            if (fly_to_visible_closest_pokecenter_cur_zoom_level(info, console, context, push_scale)){
                 return; // success in finding the closest pokecenter. Return.
             }
             else {
@@ -652,7 +669,8 @@ void fly_to_closest_pokecenter_on_map(const ProgramInfo& info, ConsoleHandle& co
             }
         }
         catch (OperationFailedException& e){ // pokecenter was detected, but failed to fly there
-            if (try_count >= max_try_count){
+            try_count++;
+            if (try_count > max_try_count){
                 throw e;
             }
             console.log("Failed to find the fly menuitem. Restart the closest Pokecenter travel process.");
