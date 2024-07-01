@@ -24,6 +24,7 @@
 #include "PokemonSV_ConnectToInternet.h"
 #include "PokemonSV_Navigation.h"
 
+#include <array>
 #include <cmath>
 #include <sstream>
 #include <cfloat>
@@ -602,12 +603,13 @@ void fly_to_closest_pokecenter_on_map(const ProgramInfo& info, ConsoleHandle& co
     // Zoom in one level onto the map.
     // If the player character icon or any wild pokemon icon overlaps with the PokeCenter icon, the code cannot
     // detect it. So we zoom in as much as we can to prevent any icon overlap.
-    const double ADJUSTMENT_TABLE[max_try_count + 1] = {1, 1, 1, 1.1, 1.2, 0.9, 0.8};
+    const std::array<double, max_try_count + 1> adjustment_table =  {1, 1, 1, 1.1, 1.2, 0.9, 0.8};
+    
     while(true){
         try {
             pbf_press_button(context, BUTTON_ZR, 40, 100);
             // try different magnitudes of cursor push with each failure.
-            double push_scale = 0.29 * ADJUSTMENT_TABLE[try_count];
+            double push_scale = 0.29 * adjustment_table[try_count];
             // std::cout << "push_scale: " << std::to_string(push_scale) << std::endl;
             if (fly_to_visible_closest_pokecenter_cur_zoom_level(info, console, context, push_scale)){
                 return; // success in finding the closest pokecenter. Return.
@@ -650,7 +652,7 @@ void fly_to_closest_pokecenter_on_map(const ProgramInfo& info, ConsoleHandle& co
     try_count = 0;
     while(true){
         try {
-            double push_scale = 0.29 * ADJUSTMENT_TABLE[try_count];
+            double push_scale = 0.29 * adjustment_table[try_count];
             // std::cout << "push_scale: " << std::to_string(push_scale) << std::endl;
             // Now try finding the closest pokecenter at the max warpable level
             if (fly_to_visible_closest_pokecenter_cur_zoom_level(info, console, context, push_scale)){
