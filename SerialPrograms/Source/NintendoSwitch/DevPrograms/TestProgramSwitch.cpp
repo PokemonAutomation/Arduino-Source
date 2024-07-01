@@ -252,8 +252,8 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     using namespace Pokemon;
 //    using namespace PokemonSwSh;
 //    using namespace PokemonBDSP;
-//    using namespace PokemonLA;
-    using namespace PokemonSV;
+    using namespace PokemonLA;
+//    using namespace PokemonSV;
 
     [[maybe_unused]] Logger& logger = env.logger();
     [[maybe_unused]] ConsoleHandle& console = env.consoles[0];
@@ -263,10 +263,21 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     BotBaseContext context(scope, console.botbase());
     VideoOverlaySet overlays(overlay);
 
+//    PokemonLA::ButtonDetector detector(logger, PokemonLA::ButtonType::ButtonA,);
+
+
+    ImageRGB32 image("screenshot-20240630-183016042676.png");
+
+    ButtonTracker tracker(ButtonType::ButtonA);
+    WhiteObjectWatcher watcher(overlay, {0.55, 0.40, 0.20, 0.40}, { {tracker, false} });
+    watcher.process_frame(image, current_time());
+
+
+#if 0
     VideoSnapshot screen = console.video().snapshot();
     ItemPrinterJobsDetector detector(COLOR_RED);
     cout << (int)detector.detect_jobs(logger, env.inference_dispatcher(), screen) << endl;
-
+#endif
 
 #if 0
     VideoSnapshot screen = console.video().snapshot();

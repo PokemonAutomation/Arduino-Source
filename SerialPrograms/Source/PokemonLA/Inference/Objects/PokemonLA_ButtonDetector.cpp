@@ -6,6 +6,10 @@
 
 #include "PokemonLA_ButtonDetector.h"
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
@@ -80,11 +84,11 @@ ButtonMatcher::ButtonMatcher(ButtonType type, size_t min_width, size_t max_width
     , m_max_rmsd(max_rmsd)
 {}
 const ButtonMatcher& ButtonMatcher::A(){
-    static ButtonMatcher matcher(ButtonType::ButtonA, 15, 15, 80);
+    static ButtonMatcher matcher(ButtonType::ButtonA, 15, 15, 90);
     return matcher;
 }
 const ButtonMatcher& ButtonMatcher::B(){
-    static ButtonMatcher matcher(ButtonType::ButtonB, 15, 15, 80);
+    static ButtonMatcher matcher(ButtonType::ButtonB, 15, 15, 90);
     return matcher;
 }
 const ButtonMatcher& ButtonMatcher::Plus(){
@@ -132,8 +136,9 @@ void ButtonTracker::process_object(const ImageViewRGB32& image, const WaterfillO
 
     double rmsd = m_matcher.rmsd_precropped(extract_box_reference(image, object), object);
 //    cout << "rmsd = " << rmsd << endl;
+//    cout << "max = " << m_matcher.m_max_rmsd << endl;
     if (rmsd < m_matcher.m_max_rmsd){
-//        cout << "rmsd = " << rmsd << endl;
+//        cout << "matching rmsd = " << rmsd << endl;
         m_detections.emplace_back(object);
     }
 }
