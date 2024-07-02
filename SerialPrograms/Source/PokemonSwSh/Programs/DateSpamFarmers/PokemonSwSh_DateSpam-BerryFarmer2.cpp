@@ -70,12 +70,12 @@ BerryFarmer2::BerryFarmer2()
     )
     , FETCH_ATTEMPTS(
         "<b>Number of Fetch Attempts:</b>",
-        LockMode::LOCK_WHILE_RUNNING,
+        LockMode::UNLOCK_WHILE_RUNNING,
         100000
     )
     , SAVE_ITERATIONS(
         "<b>Save Every this Many Fetches:</b><br>(zero disables saving): ",
-        LockMode::LOCK_WHILE_RUNNING,
+        LockMode::UNLOCK_WHILE_RUNNING,
         0
     )
     , ENCOUNTER_BOT_OPTIONS(false, true)
@@ -92,36 +92,36 @@ BerryFarmer2::BerryFarmer2()
     )
     , EXIT_BATTLE_TIMEOUT(
         "<b>Exit Battle Timeout:</b><br>After running, wait this long to return to overworld.",
-        LockMode::LOCK_WHILE_RUNNING,
+        LockMode::UNLOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "10 * TICKS_PER_SECOND"
     )
-    , START_BATTLE_TIMEOUT(
-        "<b>Start Battle Timeout:</b><br>After a battle is detected, wait this long to flee in seconds.",
-        LockMode::LOCK_WHILE_RUNNING,
-        15
-    )
+//    , START_BATTLE_TIMEOUT(
+//        "<b>Start Battle Timeout:</b><br>After a battle is detected, wait this long to flee in seconds.",
+//        LockMode::LOCK_WHILE_RUNNING,
+//        15
+//    )
     , RUSTLING_INTERVAL(
         "<b>Rustling Interval:</b><br>How much time between two rustling sounds has to pass to be considered slow rustling in ms.",
-        LockMode::LOCK_WHILE_RUNNING,
+        LockMode::UNLOCK_WHILE_RUNNING,
         1350
     )
     , RUSTLING_TIMEOUT(
         "<b>Rustling Timeout:</b><br>Wait this many ticks to detect rustling.",
-        LockMode::LOCK_WHILE_RUNNING,
+        LockMode::UNLOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "400"
     )
     , SECONDARY_ATTEMPT_MASH_TIME(
         "<b>Secondary attempt mash time:</b><br>Mash ZL this many ticks for secondary fetch attempts.",
-        LockMode::LOCK_WHILE_RUNNING,
+        LockMode::UNLOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "240"
     )
     , SOUND_THRESHOLD(
         "<b>Maximum Sound Error Coefficient",
-        LockMode::LOCK_WHILE_RUNNING,
-        0.68, 0, 1.0
+        LockMode::UNLOCK_WHILE_RUNNING,
+        0.75, 0, 1.0
     )
 {
     PA_ADD_OPTION(REQUIRES_AUDIO);
@@ -135,7 +135,7 @@ BerryFarmer2::BerryFarmer2()
 
     PA_ADD_STATIC(m_advanced_options);
     PA_ADD_OPTION(EXIT_BATTLE_TIMEOUT);
-    PA_ADD_OPTION(START_BATTLE_TIMEOUT);
+//    PA_ADD_OPTION(START_BATTLE_TIMEOUT);
     PA_ADD_OPTION(RUSTLING_INTERVAL);
     PA_ADD_OPTION(RUSTLING_TIMEOUT);
     PA_ADD_OPTION(SECONDARY_ATTEMPT_MASH_TIME);
@@ -332,9 +332,10 @@ void BerryFarmer2::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
 
         c += iteration_attempts;
 
-        if (SAVE_ITERATIONS != 0){
+        uint16_t save_iterations = SAVE_ITERATIONS;
+        if (save_iterations != 0){
             save_count += iteration_attempts;
-            if (save_count >= SAVE_ITERATIONS){
+            if (save_count >= save_iterations){
                 save_count = 0;
                 pbf_mash_button(context, BUTTON_B, 2 * TICKS_PER_SECOND);
                 pbf_press_button(context, BUTTON_X, 20, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
