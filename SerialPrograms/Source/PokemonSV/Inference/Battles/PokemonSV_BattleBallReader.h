@@ -34,7 +34,7 @@ public:
 protected:
     const PokeballNameReader& m_name_reader;
     Language m_language;
-    ConsoleHandle& m_console;
+    Logger& m_logger;
     OverlayBoxScope m_name;
     OverlayBoxScope m_sprite;
     OverlayBoxScope m_quantity;

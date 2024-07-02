@@ -266,12 +266,20 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 //    PokemonLA::ButtonDetector detector(logger, PokemonLA::ButtonType::ButtonA,);
 
 
+
+    ImageRGB32 image("screenshot-20240701-165012250266.png");
+
+    BattleBallReader reader(console, Language::English);
+    cout << reader.read_quantity(image) << endl;
+
+
+#if 0
     ImageRGB32 image("screenshot-20240630-183016042676.png");
 
     ButtonTracker tracker(ButtonType::ButtonA);
     WhiteObjectWatcher watcher(overlay, {0.55, 0.40, 0.20, 0.40}, { {tracker, false} });
     watcher.process_frame(image, current_time());
-
+#endif
 
 #if 0
     VideoSnapshot screen = console.video().snapshot();

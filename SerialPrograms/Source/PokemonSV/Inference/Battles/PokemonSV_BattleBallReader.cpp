@@ -19,7 +19,7 @@ namespace PokemonSV{
 BattleBallReader::BattleBallReader(ConsoleHandle& console, Language language, Color color)
     : m_name_reader(PokeballNameReader::instance())
     , m_language(language)
-    , m_console(console)
+    , m_logger(console)
     , m_name(console.overlay(), {0.380, 0.687, 0.240, 0.050}, color)
     , m_sprite(console.overlay(), {0.480, 0.764, 0.040, 0.060}, color)
     , m_quantity(console.overlay(), {0.480, 0.830, 0.040, 0.035}, color)
@@ -37,7 +37,7 @@ std::string BattleBallReader::read_ball(const ImageViewRGB32& screen) const{
     {
         ImageViewRGB32 cropped = extract_box_reference(screen, m_name);
         name_result = m_name_reader.read_substring(
-            m_console, m_language, cropped,
+            m_logger, m_language, cropped,
             {
                 {0xffe0e0e0, 0xffffffff},
                 {0xffc0c0c0, 0xffffffff},
@@ -55,11 +55,19 @@ std::string BattleBallReader::read_ball(const ImageViewRGB32& screen) const{
 }
 
 uint16_t BattleBallReader::read_quantity(const ImageViewRGB32& screen) const{
+#if 0
     ImageRGB32 image = to_blackwhite_rgb32_range(
         extract_box_reference(screen, m_quantity),
         0xff000000, 0xff7f7f7f, true
     );
-    int qty = OCR::read_number(m_console, image);
+    int qty = OCR::read_number(m_logger, image);
+#else
+    int qty = OCR::read_number_waterfill(
+        m_logger,
+        extract_box_reference(screen, m_quantity),
+        0xff000000, 0xff7f7f7f
+    );
+    #endif
     return (uint16_t)std::max(qty, 0);
 }
 

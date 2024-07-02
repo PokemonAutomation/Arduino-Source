@@ -129,6 +129,7 @@
 #include "PokemonSV/Inference/PokemonSV_StatHexagonReader.h"
 #include "PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinySparkleSet.h"
 #include "PokemonSV/Programs/ItemPrinter/PokemonSV_ItemPrinterSeedCalc.h"
+#include "PokemonSV/Inference/Battles/PokemonSV_BattleBallReader.h"
 
 #ifdef PA_ARCH_x86
 //#include "Kernels/Kernels_x64_SSE41.h"
@@ -237,9 +238,12 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     using namespace Kernels;
     using namespace NintendoSwitch;
 //    using namespace NintendoSwitch::PokemonSwSh;
-//    using namespace NintendoSwitch::PokemonSV;
+    using namespace NintendoSwitch::PokemonSV;
     using namespace Pokemon;
     using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
+
+
+
 
 #if 0
     PokemonSV::DateSeed data = PokemonSV::ItemPrinter::calculate_seed_prizes(2346161588);
