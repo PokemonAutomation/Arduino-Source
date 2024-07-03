@@ -821,7 +821,7 @@ void fly_from_blueberry_to_north_province_3(const ProgramInfo& info, ConsoleHand
         pbf_press_button(context, BUTTON_ZL, 25, 200);
 
         // move cursor up-left
-        pbf_move_left_joystick(context, 112, 0, 171, 50);
+        pbf_move_left_joystick(context, 112, 0, 166, 50);
 
         // press A to fly to North province area 3
         isFlySuccessful = fly_to_overworld_from_map(info, console, context, true);
