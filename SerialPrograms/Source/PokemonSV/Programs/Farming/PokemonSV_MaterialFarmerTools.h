@@ -143,21 +143,21 @@ void run_from_battles_and_back_to_pokecenter(
 
 
 
-void move_from_material_farming_to_item_printer(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+void move_from_material_farming_to_item_printer(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
 
-void fly_from_paldea_to_blueberry_entrance(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+void fly_from_paldea_to_blueberry_entrance(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
 
-void move_from_blueberry_entrance_to_league_club(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+void move_from_blueberry_entrance_to_league_club(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
 
-void move_from_league_club_entrance_to_item_printer(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+void move_from_league_club_entrance_to_item_printer(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
 
 
 
-void move_from_item_printer_to_material_farming(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+void move_from_item_printer_to_material_farming(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
 
-void move_from_item_printer_to_blueberry_entrance(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+void move_from_item_printer_to_blueberry_entrance(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
 
-void fly_from_blueberry_to_north_province_3(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+void fly_from_blueberry_to_north_province_3(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
 
 
 

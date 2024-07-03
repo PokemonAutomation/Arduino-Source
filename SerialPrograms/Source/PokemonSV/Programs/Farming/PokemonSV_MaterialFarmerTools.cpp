@@ -610,14 +610,14 @@ void run_from_battles_and_back_to_pokecenter(
 
 
 
-void move_from_material_farming_to_item_printer(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    env.console.log("Start moving from material farming to item printer.");
-    fly_from_paldea_to_blueberry_entrance(env, context);
-    move_from_blueberry_entrance_to_league_club(env, context);
-    move_from_league_club_entrance_to_item_printer(env, context);
+void move_from_material_farming_to_item_printer(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+    console.log("Start moving from material farming to item printer.");
+    fly_from_paldea_to_blueberry_entrance(info, console, context);
+    move_from_blueberry_entrance_to_league_club(info, console, context);
+    move_from_league_club_entrance_to_item_printer(info, console, context);
 }
 
-void fly_from_paldea_to_blueberry_entrance(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void fly_from_paldea_to_blueberry_entrance(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
     int numAttempts = 0;
     int maxAttempts = 5;
     bool isFlySuccessful = false;
@@ -628,7 +628,7 @@ void fly_from_paldea_to_blueberry_entrance(SingleSwitchProgramEnvironment& env, 
 
         numAttempts++;
 
-        open_map_from_overworld(env.program_info(), env.console, context);
+        open_map_from_overworld(info, console, context);
 
         // change from Paldea map to Blueberry map
         pbf_press_button(context, BUTTON_L, 50, 300);
@@ -640,22 +640,23 @@ void fly_from_paldea_to_blueberry_entrance(SingleSwitchProgramEnvironment& env, 
         pbf_move_left_joystick(context, 0, 0, 76, 50);
 
         // press A to fly to Blueberry academy
-        isFlySuccessful = fly_to_overworld_from_map(env.program_info(), env.console, context, true);
+        isFlySuccessful = fly_to_overworld_from_map(info, console, context, true);
         if (!isFlySuccessful){
-            env.log("Failed to fly to Blueberry academy.");
+            console.log("Failed to fly to Blueberry academy.");
+            // dump_snapshot(console);
         }
     }
 
     if (!isFlySuccessful){
         throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, env.console,
+            ErrorReport::SEND_ERROR_REPORT, console,
             "Failed to fly to Blueberry academy, five times in a row.",
             true
         );
     }
 }
 
-void move_from_blueberry_entrance_to_league_club(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void move_from_blueberry_entrance_to_league_club(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
 
     int numAttempts = 0;
     int maxAttempts = 5;
@@ -664,8 +665,8 @@ void move_from_blueberry_entrance_to_league_club(SingleSwitchProgramEnvironment&
     while (!isSuccessful && numAttempts < maxAttempts){
         if (numAttempts > 0){ // failed at least once
             pbf_mash_button(context, BUTTON_B, 100);
-            open_map_from_overworld(env.program_info(), env.console, context);
-            fly_to_overworld_from_map(env.program_info(), env.console, context, false);
+            open_map_from_overworld(info, console, context);
+            fly_to_overworld_from_map(info, console, context, false);
         }
 
         numAttempts++;
@@ -678,11 +679,11 @@ void move_from_blueberry_entrance_to_league_club(SingleSwitchProgramEnvironment&
         // Wait for detection of Blueberry navigation menu
         ImageFloatBox select_entrance_box(0.031, 0.193, 0.047, 0.078);
         GradientArrowWatcher select_entrance(COLOR_RED, GradientArrowType::RIGHT, select_entrance_box);
-        int ret = wait_until(env.console, context, Milliseconds(5000), { select_entrance });
+        int ret = wait_until(console, context, Milliseconds(5000), { select_entrance });
         if (ret == 0){
-            env.log("Blueberry navigation menu detected.");
+            console.log("Blueberry navigation menu detected.");
         }else{
-            env.console.log("Failed to detect Blueberry navigation menu.");
+            console.log("Failed to detect Blueberry navigation menu.");
             continue;
         }
 
@@ -692,11 +693,11 @@ void move_from_blueberry_entrance_to_league_club(SingleSwitchProgramEnvironment&
         // Confirm to League club room is selected
         ImageFloatBox select_league_club_box(0.038, 0.785, 0.043, 0.081);
         GradientArrowWatcher select_league_club(COLOR_RED, GradientArrowType::RIGHT, select_league_club_box, Milliseconds(1000));
-        ret = wait_until(env.console, context, Milliseconds(5000), { select_league_club });
+        ret = wait_until(console, context, Milliseconds(5000), { select_league_club });
         if (ret == 0){
-            env.log("League club room selected.");
+            console.log("League club room selected.");
         }else{
-            env.console.log("Failed to select League club room in navigation menu.");
+            console.log("Failed to select League club room in navigation menu.");
             continue;            
         }
         // press A
@@ -704,11 +705,11 @@ void move_from_blueberry_entrance_to_league_club(SingleSwitchProgramEnvironment&
 
         // check for overworld
         OverworldWatcher overworld(COLOR_CYAN);  
-        ret = wait_until(env.console, context, Milliseconds(10000), { overworld });
+        ret = wait_until(console, context, Milliseconds(10000), { overworld });
         if (ret == 0){
-            env.log("Entered League club room.");
+            console.log("Entered League club room.");
         }else{
-            env.console.log("Failed to enter League club room from menu selection.");
+            console.log("Failed to enter League club room from menu selection.");
             continue;            
         }
 
@@ -717,7 +718,7 @@ void move_from_blueberry_entrance_to_league_club(SingleSwitchProgramEnvironment&
 
     if (!isSuccessful){
         throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, env.console,
+            ErrorReport::SEND_ERROR_REPORT, console,
             "Failed to enter League club room, five times in a row.",
             true
         );
@@ -725,7 +726,7 @@ void move_from_blueberry_entrance_to_league_club(SingleSwitchProgramEnvironment&
 
 }
 
-void move_from_league_club_entrance_to_item_printer(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void move_from_league_club_entrance_to_item_printer(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
     context.wait_for_all_requests();
 
     // move forwards towards table next to item printer
@@ -735,14 +736,14 @@ void move_from_league_club_entrance_to_item_printer(SingleSwitchProgramEnvironme
     pbf_move_left_joystick(context, 0, 128, 10, 50);
 }
 
-void move_from_item_printer_to_material_farming(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    env.console.log("Start moving from item printer to material farming.");
-    move_from_item_printer_to_blueberry_entrance(env, context);
-    fly_from_blueberry_to_north_province_3(env, context);
+void move_from_item_printer_to_material_farming(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+    console.log("Start moving from item printer to material farming.");
+    move_from_item_printer_to_blueberry_entrance(info, console, context);
+    fly_from_blueberry_to_north_province_3(info, console, context);
 }
 
 // assumes you start in the position in front of the item printer, as if you finished using it.
-void move_from_item_printer_to_blueberry_entrance(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void move_from_item_printer_to_blueberry_entrance(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
     context.wait_for_all_requests();
 
     // look left towards door
@@ -756,18 +757,18 @@ void move_from_item_printer_to_blueberry_entrance(SingleSwitchProgramEnvironment
 
     context.wait_for_all_requests();
 
-    env.log("Wait for detection of Blueberry navigation menu.");
+    console.log("Wait for detection of Blueberry navigation menu.");
 
     // Wait for detection of Blueberry navigation menu
     ImageFloatBox select_entrance_box(0.031, 0.193, 0.047, 0.078);
     GradientArrowWatcher select_entrance(COLOR_RED, GradientArrowType::RIGHT, select_entrance_box);
-    int ret = wait_until(env.console, context, Milliseconds(5000), { select_entrance }, Milliseconds(1000));
+    int ret = wait_until(console, context, Milliseconds(5000), { select_entrance }, Milliseconds(1000));
     if (ret == 0){
-        env.log("Blueberry navigation menu detected.");
+        console.log("Blueberry navigation menu detected.");
     }else{
-        env.console.log("Failed to detect Blueberry navigation menu.");
+        console.log("Failed to detect Blueberry navigation menu.");
         throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, env.console,
+            ErrorReport::SEND_ERROR_REPORT, console,
             "Failed to find the exit from the League room.",
             true
         );
@@ -778,12 +779,12 @@ void move_from_item_printer_to_blueberry_entrance(SingleSwitchProgramEnvironment
 
     // check for overworld
     OverworldWatcher overworld(COLOR_CYAN);  
-    ret = wait_until(env.console, context, std::chrono::seconds(30), { overworld });
+    ret = wait_until(console, context, std::chrono::seconds(30), { overworld });
     if (ret == 0){
-        env.log("Overworld detected");
+        console.log("Overworld detected");
     }else{
         throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, env.console,
+            ErrorReport::SEND_ERROR_REPORT, console,
             "Failed to detect overworld.",
             true
         );      
@@ -791,7 +792,7 @@ void move_from_item_printer_to_blueberry_entrance(SingleSwitchProgramEnvironment
 }
 
 
-void fly_from_blueberry_to_north_province_3(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void fly_from_blueberry_to_north_province_3(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
     int numAttempts = 0;
     int maxAttempts = 10;
     bool isFlySuccessful = false;
@@ -802,7 +803,7 @@ void fly_from_blueberry_to_north_province_3(SingleSwitchProgramEnvironment& env,
         // close all menus
         pbf_mash_button(context, BUTTON_B, 100);
 
-        open_map_from_overworld(env.program_info(), env.console, context);
+        open_map_from_overworld(info, console, context);
 
         // change from Blueberry map to Paldea map
         pbf_press_button(context, BUTTON_R, 50, 300);
@@ -814,17 +815,18 @@ void fly_from_blueberry_to_north_province_3(SingleSwitchProgramEnvironment& env,
         pbf_move_left_joystick(context, 112, 0, 171, 50);
 
         // press A to fly to North province area 3
-        isFlySuccessful = fly_to_overworld_from_map(env.program_info(), env.console, context, true);
+        isFlySuccessful = fly_to_overworld_from_map(info, console, context, true);
 
         if (!isFlySuccessful){
-            env.log("Failed to fly to North province area 3.");
+            console.log("Failed to fly to North province area 3.");
+            // dump_snapshot(console);
         }
     }
 
     if (!isFlySuccessful){
 
         throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, env.console,
+            ErrorReport::SEND_ERROR_REPORT, console,
             "Failed to fly to North province area 3, ten times in a row.",
             true
         );
@@ -834,7 +836,7 @@ void fly_from_blueberry_to_north_province_3(SingleSwitchProgramEnvironment& env,
             // close all menus
             pbf_mash_button(context, BUTTON_B, 100);
 
-            open_map_from_overworld(env.program_info(), env.console, context);
+            open_map_from_overworld(info, console, context);
 
             // change from Blueberry map to Paldea map
             pbf_press_button(context, BUTTON_R, 50, 300);
@@ -848,12 +850,12 @@ void fly_from_blueberry_to_north_province_3(SingleSwitchProgramEnvironment& env,
             // zoom back in to default zoom level
             pbf_press_button(context, BUTTON_ZR, 25, 200);
 
-            fly_to_closest_pokecenter_on_map(env.program_info(), env.console, context);
+            fly_to_closest_pokecenter_on_map(info, console, context);
         }
         catch(OperationFailedException& e){
             (void)e;
             throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
+                ErrorReport::SEND_ERROR_REPORT, console,
                 "Failed to fly to North province area 3, five times in a row.",
                 true
             );
