@@ -628,9 +628,9 @@ void move_from_material_farming_to_item_printer(const ProgramInfo& info, Console
 
 void fly_from_paldea_to_blueberry_entrance(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
     int numAttempts = 0;
-    int maxAttempts = 5;
+    const int maxAttempts = 6;
     bool isFlySuccessful = false;
-
+    const std::array<int, maxAttempts + 1> adjustment_table =  {0, 0, 0, 2, 5, -2, -5};
     while (!isFlySuccessful && numAttempts < maxAttempts){
         // close all menus
         pbf_mash_button(context, BUTTON_B, 100);
@@ -646,7 +646,9 @@ void fly_from_paldea_to_blueberry_entrance(const ProgramInfo& info, ConsoleHandl
         pbf_move_left_joystick(context, 255, 255, TICKS_PER_SECOND*5, 50);
 
         // move cursor to Blueberry academy fast travel point (up-left)
-        pbf_move_left_joystick(context, 0, 0, 76, 50);
+        // try different magnitudes of cursor push with each failure.
+        int push_magnitude = 76 + adjustment_table[numAttempts];
+        pbf_move_left_joystick(context, 0, 0, push_magnitude, 50);
 
         // press A to fly to Blueberry academy
         isFlySuccessful = fly_to_overworld_from_map(info, console, context, true);
@@ -803,9 +805,9 @@ void move_from_item_printer_to_blueberry_entrance(const ProgramInfo& info, Conso
 
 void fly_from_blueberry_to_north_province_3(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
     int numAttempts = 0;
-    int maxAttempts = 10;
+    const int maxAttempts = 9;
     bool isFlySuccessful = false;
-
+    const std::array<int, maxAttempts + 1> adjustment_table =  {0, 0, 0, 2, 5, -2, -5, 0, 0, 0};
     while (!isFlySuccessful && numAttempts < maxAttempts){
         numAttempts++;
 
@@ -821,7 +823,9 @@ void fly_from_blueberry_to_north_province_3(const ProgramInfo& info, ConsoleHand
         pbf_press_button(context, BUTTON_ZL, 25, 200);
 
         // move cursor up-left
-        pbf_move_left_joystick(context, 112, 0, 166, 50);
+        // try different magnitudes of cursor push with each failure.
+        int push_magnitude = 166 + adjustment_table[numAttempts];
+        pbf_move_left_joystick(context, 112, 0, push_magnitude, 50);
 
         // press A to fly to North province area 3
         isFlySuccessful = fly_to_overworld_from_map(info, console, context, true);
