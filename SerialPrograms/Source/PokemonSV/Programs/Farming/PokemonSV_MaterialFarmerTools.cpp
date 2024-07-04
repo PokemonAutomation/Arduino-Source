@@ -628,9 +628,14 @@ void move_from_material_farming_to_item_printer(const ProgramInfo& info, Console
 
 void fly_from_paldea_to_blueberry_entrance(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
     int numAttempts = 0;
-    const int maxAttempts = 6;
+    const int maxAttempts = 11;
     bool isFlySuccessful = false;
-    const std::array<int, maxAttempts + 1> adjustment_table =  {0, 0, 0, 2, 5, -2, -5};
+
+    // in order to land on the target fly point semi-consistently, 
+    // the push magnitude can range from 69 to 85 (range of 16). 
+    // On each failure, try increasing/decreasing the push by 1/4 of the max range,
+    // then 1/2 of the range, then the full range, then back to re-attempts with no adjustment
+    const std::array<int, maxAttempts + 1> adjustment_table =  {0, 0, 0, 4, -4, 8, -8, 16, -16, 0, 0, 0};
     while (!isFlySuccessful && numAttempts < maxAttempts){
         // close all menus
         pbf_mash_button(context, BUTTON_B, 100);
@@ -647,7 +652,7 @@ void fly_from_paldea_to_blueberry_entrance(const ProgramInfo& info, ConsoleHandl
 
         // move cursor to Blueberry academy fast travel point (up-left)
         // try different magnitudes of cursor push with each failure.
-        int push_magnitude = 76 + adjustment_table[numAttempts];
+        int push_magnitude = 77 + adjustment_table[numAttempts];
         pbf_move_left_joystick(context, 0, 0, push_magnitude, 50);
 
         // press A to fly to Blueberry academy
@@ -805,9 +810,14 @@ void move_from_item_printer_to_blueberry_entrance(const ProgramInfo& info, Conso
 
 void fly_from_blueberry_to_north_province_3(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
     int numAttempts = 0;
-    const int maxAttempts = 9;
+    const int maxAttempts = 11;
     bool isFlySuccessful = false;
-    const std::array<int, maxAttempts + 1> adjustment_table =  {0, 0, 0, 2, 5, -2, -5, 0, 0, 0};
+
+    // in order to land on the target fly point, the push magnitude can range from
+    // 156 to 172 (range of 16). 
+    // On each failure, try increasing/decreasing the push by 1/4 of the max range,
+    // then 1/2 of the range, then the full range, then back to re-attempts with no adjustment
+    const std::array<int, maxAttempts + 1> adjustment_table =  {0, 0, 0, 4, -4, 8, -8, 16, -16, 0, 0, 0};
     while (!isFlySuccessful && numAttempts < maxAttempts){
         numAttempts++;
 
@@ -824,7 +834,7 @@ void fly_from_blueberry_to_north_province_3(const ProgramInfo& info, ConsoleHand
 
         // move cursor up-left
         // try different magnitudes of cursor push with each failure.
-        int push_magnitude = 166 + adjustment_table[numAttempts];
+        int push_magnitude = 164 + adjustment_table[numAttempts];
         pbf_move_left_joystick(context, 112, 0, push_magnitude, 50);
 
         // press A to fly to North province area 3
@@ -843,36 +853,7 @@ void fly_from_blueberry_to_north_province_3(const ProgramInfo& info, ConsoleHand
             "Failed to fly to North province area 3, ten times in a row.",
             true
         );
-        /* try{
-            // try one last attempt, by using pokecenter detection
 
-            // close all menus
-            pbf_mash_button(context, BUTTON_B, 100);
-
-            open_map_from_overworld(info, console, context);
-
-            // change from Blueberry map to Paldea map
-            pbf_press_button(context, BUTTON_R, 50, 300);
-
-            // zoom out
-            pbf_press_button(context, BUTTON_ZL, 25, 200);
-
-            // move up, but ending up far from other pokecenters
-            pbf_move_left_joystick(context, 128, 0, 190, 50);
-
-            // zoom back in to default zoom level
-            pbf_press_button(context, BUTTON_ZR, 25, 200);
-
-            fly_to_closest_pokecenter_on_map(info, console, context);
-        }
-        catch(OperationFailedException& e){
-            (void)e;
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
-                "Failed to fly to North province area 3, five times in a row.",
-                true
-            );
-        } */
     }
 }
 
