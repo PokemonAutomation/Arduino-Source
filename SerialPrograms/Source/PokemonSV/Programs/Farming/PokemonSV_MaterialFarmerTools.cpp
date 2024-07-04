@@ -168,13 +168,14 @@ void MaterialFarmerOptions::value_changed(void* object){
 
 
 void run_material_farmer(
-    SingleSwitchProgramEnvironment& env,
+    ProgramEnvironment& env,
+    ConsoleHandle& console,
     BotBaseContext& context,
     MaterialFarmerOptions& options,
     MaterialFarmerStats& stats
 ){
     LetsGoEncounterBotTracker encounter_tracker(
-        env, env.console, context,
+        env, console, context,
         stats,
         options.LANGUAGE
     );
@@ -189,39 +190,39 @@ void run_material_farmer(
     while (true){
         // check time left on material farming
         auto farming_time_remaining = minutes_remaining(start_time, std::chrono::minutes(options.RUN_TIME_IN_MINUTES));
-        env.console.log(
+        console.log(
             "Time left in Material Farming: " + 
             std::to_string(farming_time_remaining.count()) + " min", 
             COLOR_PURPLE
         );
         if (farming_time_remaining < std::chrono::minutes(0)){
-            env.console.log("Time's up. Stop the Material farming program.", COLOR_RED);
+            console.log("Time's up. Stop the Material farming program.", COLOR_RED);
             break;
         }
         
         // Check time left on sandwich
         if (options.SANDWICH_OPTIONS.enabled()){
             auto sandwich_time_remaining = minutes_remaining(last_sandwich_time, std::chrono::minutes(options.TIME_PER_SANDWICH));
-            env.console.log(
+            console.log(
                 "Time left on sandwich: " + 
                 std::to_string(sandwich_time_remaining.count()) + " min", 
                 COLOR_PURPLE
             );                   
             if (sandwich_time_remaining < std::chrono::minutes(0)){
-                env.console.log("Sandwich not active. Make a sandwich.");
-                last_sandwich_time = make_sandwich_material_farm(env, context, options, stats);
-                env.console.overlay().add_log("Sandwich made.");
+                console.log("Sandwich not active. Make a sandwich.");
+                last_sandwich_time = make_sandwich_material_farm(env, console, context, options, stats);
+                console.overlay().add_log("Sandwich made.");
 
                 // Log time remaining in Material farming 
                 farming_time_remaining = minutes_remaining(start_time, std::chrono::minutes(options.RUN_TIME_IN_MINUTES));
-                env.console.log(
+                console.log(
                     "Time left in Material Farming: " + 
                     std::to_string(farming_time_remaining.count()) + " min", 
                     COLOR_PURPLE
                 );
                 // Log time remaining on Sandwich
                 sandwich_time_remaining = minutes_remaining(last_sandwich_time, std::chrono::minutes(options.TIME_PER_SANDWICH));
-                env.console.log(
+                console.log(
                     "Time left on sandwich: " + 
                     std::to_string(sandwich_time_remaining.count()) + " min", 
                     COLOR_PURPLE
@@ -230,9 +231,9 @@ void run_material_farmer(
         }
 
         // heal before starting Let's go
-        env.console.log("Heal before starting Let's go", COLOR_PURPLE);
-        env.console.log("Heal threshold: " + tostr_default(options.AUTO_HEAL_PERCENT), COLOR_PURPLE);
-        check_hp(env, context, options, hp_watcher, stats);
+        console.log("Heal before starting Let's go", COLOR_PURPLE);
+        console.log("Heal threshold: " + tostr_default(options.AUTO_HEAL_PERCENT), COLOR_PURPLE);
+        check_hp(env, console, context, options, hp_watcher, stats);
 
         /*
         - Starts from pokemon center.
@@ -240,20 +241,18 @@ void run_material_farmer(
         - Then returns to pokemon center, regardless of whether 
         it completes the action or gets caught in a battle 
         */
-        run_from_battles_and_back_to_pokecenter(env, context, stats,
-            [&](
-                SingleSwitchProgramEnvironment& env, BotBaseContext& context
-            ){
+        run_from_battles_and_back_to_pokecenter(env, console, context, stats,
+            [&](ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){
                 // Move to starting position for Let's Go hunting path
-                env.console.log("Move to starting position for Let's Go hunting path.", COLOR_PURPLE);
-                move_to_start_position_for_letsgo1(env, context);
+                console.log("Move to starting position for Let's Go hunting path.", COLOR_PURPLE);
+                move_to_start_position_for_letsgo1(console, context);
 
                 // run let's go while updating the HP watcher
-                env.console.log("Starting Let's Go hunting path.", COLOR_PURPLE);
+                console.log("Starting Let's Go hunting path.", COLOR_PURPLE);
                 run_until(
-                    env.console, context,
+                    console, context,
                     [&](BotBaseContext& context){
-                        run_lets_go_iteration(env, context, encounter_tracker, options.NUM_FORWARD_MOVES_PER_LETS_GO_ITERATION);
+                        run_lets_go_iteration(console, context, encounter_tracker, options.NUM_FORWARD_MOVES_PER_LETS_GO_ITERATION);
                     },
                     {hp_watcher}
                 );
@@ -267,7 +266,8 @@ void run_material_farmer(
 }
 
 void check_hp(
-    SingleSwitchProgramEnvironment& env,
+    ProgramEnvironment& env,
+    ConsoleHandle& console,
     BotBaseContext& context,
     MaterialFarmerOptions& options,
     LetsGoHpWatcher& hp_watcher,
@@ -275,12 +275,12 @@ void check_hp(
 ){
     double hp = hp_watcher.last_known_value() * 100;
     if (0 < hp){
-        env.console.log("Last Known HP: " + tostr_default(hp) + "%", COLOR_BLUE);
+        console.log("Last Known HP: " + tostr_default(hp) + "%", COLOR_BLUE);
     }else{
-        env.console.log("Last Known HP: ?", COLOR_RED);
+        console.log("Last Known HP: ?", COLOR_RED);
     }
     if (0 < hp && hp < options.AUTO_HEAL_PERCENT){
-        auto_heal_from_menu_or_overworld(env.program_info(), env.console, context, 0, true);
+        auto_heal_from_menu_or_overworld(env.program_info(), console, context, 0, true);
         stats.m_autoheals++;
         env.update_stats();
         send_program_status_notification(env, options.NOTIFICATION_STATUS_UPDATE);
@@ -292,13 +292,14 @@ void check_hp(
 // start at North Province (Area 3) Pokecenter. make sandwich then go back to Pokecenter to reset position
 // return the time that the sandwich was made
 WallClock make_sandwich_material_farm(
-    SingleSwitchProgramEnvironment& env, 
+    ProgramEnvironment& env,
+    ConsoleHandle& console,
     BotBaseContext& context, 
     MaterialFarmerOptions& options,
     MaterialFarmerStats& stats
 ){
     if (options.SANDWICH_OPTIONS.SAVE_GAME_BEFORE_SANDWICH){
-        save_game_from_overworld(env.program_info(), env.console, context);
+        save_game_from_overworld(env.program_info(), console, context);
     }
 
     WallClock last_sandwich_time;
@@ -306,7 +307,7 @@ WallClock make_sandwich_material_farm(
     size_t max_consecutive_failures = 10;  
     while (true){
         try{
-            last_sandwich_time = try_make_sandwich_material_farm(env, context, options, stats);
+            last_sandwich_time = try_make_sandwich_material_farm(env, console, context, options, stats);
             break;
         }catch(OperationFailedException& e){
             stats.m_errors++;
@@ -314,7 +315,7 @@ WallClock make_sandwich_material_farm(
             e.send_notification(env, options.NOTIFICATION_ERROR_RECOVERABLE);
 
             // save screenshot after operation failed, 
-            dump_snapshot(env.console);
+            dump_snapshot(console);
 
             if (options.SAVE_DEBUG_VIDEO){
                 // Take a video to give more context for debugging
@@ -325,14 +326,14 @@ WallClock make_sandwich_material_farm(
             consecutive_failures++;
             if (consecutive_failures >= max_consecutive_failures){
                 throw OperationFailedException(
-                    ErrorReport::SEND_ERROR_REPORT, env.console,
+                    ErrorReport::SEND_ERROR_REPORT, console,
                     "Failed to make sandwich "+ std::to_string(max_consecutive_failures) + " times in a row.",
                     true
                 );
             }
 
             env.log("Failed to make sandwich. Reset game to handle recoverable error.");
-            reset_game(env.program_info(), env.console, context);
+            reset_game(env.program_info(), console, context);
             stats.m_game_resets++;
             env.update_stats();
         }
@@ -345,15 +346,16 @@ WallClock make_sandwich_material_farm(
 // make sandwich then go back to Pokecenter to reset position
 // if gets caught up in a battle, try again.
 WallClock try_make_sandwich_material_farm(
-    SingleSwitchProgramEnvironment& env, 
+    ProgramEnvironment& env,
+    ConsoleHandle& console,
     BotBaseContext& context, 
     MaterialFarmerOptions& options,
     MaterialFarmerStats& stats
 ){
     WallClock last_sandwich_time = WallClock::min();
     while(last_sandwich_time == WallClock::min()){
-        run_from_battles_and_back_to_pokecenter(env, context, stats,
-            [&](SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+        run_from_battles_and_back_to_pokecenter(env, console, context, stats,
+            [&](ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){
                 // Orient camera to look at same direction as player character
                 // - This is needed because when save-load the game, 
                 // the camera angle is different than when just flying to pokecenter
@@ -369,12 +371,12 @@ WallClock try_make_sandwich_material_farm(
                 pbf_move_left_joystick(context, 128, 0, 300, 0);
 
                 // make sandwich
-                picnic_from_overworld(env.program_info(), env.console, context);
+                picnic_from_overworld(env.program_info(), console, context);
                 pbf_move_left_joystick(context, 128, 0, 30, 40);
-                enter_sandwich_recipe_list(env.program_info(), env.console, context);
-                make_sandwich_option(env, env.console, context, options.SANDWICH_OPTIONS);
+                enter_sandwich_recipe_list(env.program_info(), console, context);
+                make_sandwich_option(env, console, context, options.SANDWICH_OPTIONS);
                 last_sandwich_time = current_time();
-                leave_picnic(env.program_info(), env.console, context);
+                leave_picnic(env.program_info(), console, context);
 
                 stats.m_sandwiches++;
                 env.update_stats();
@@ -393,7 +395,10 @@ std::chrono::minutes minutes_remaining(WallClock start_time, std::chrono::minute
 }
 
 // from the North Province (Area 3) pokecenter, move to start position for Happiny dust farming
-void move_to_start_position_for_letsgo0(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void move_to_start_position_for_letsgo0(    
+    ConsoleHandle& console, 
+    BotBaseContext& context
+){
     // Orient camera to look at same direction as player character
     // - This is needed because when save-load the game, 
     // the camera angle is different than when just flying to pokecenter
@@ -437,13 +442,16 @@ void move_to_start_position_for_letsgo0(SingleSwitchProgramEnvironment& env, Bot
     pbf_move_right_joystick(context, 255, 128, 30, 10);
     pbf_move_left_joystick(context, 128, 0, 50, 10);
 
-    env.console.log("Arrived at Let's go start position", COLOR_PURPLE);
+    console.log("Arrived at Let's go start position", COLOR_PURPLE);
     
 
 }
 
 // from the North Province (Area 3) pokecenter, move to start position for Happiny dust farming
-void move_to_start_position_for_letsgo1(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void move_to_start_position_for_letsgo1(
+    ConsoleHandle& console, 
+    BotBaseContext& context
+){
     // Orient camera to look at same direction as player character
     // - This is needed because when save-load the game, 
     // the camera angle is different than when just flying to pokecenter
@@ -494,7 +502,7 @@ void move_to_start_position_for_letsgo1(SingleSwitchProgramEnvironment& env, Bot
     // move forward slightly
     pbf_move_left_joystick(context, 128, 0, 50, 10);
 
-    env.console.log("Arrived at Let's go start position", COLOR_PURPLE);
+    console.log("Arrived at Let's go start position", COLOR_PURPLE);
 }
 
 
@@ -519,12 +527,11 @@ void lets_go_movement1(BotBaseContext& context){
 move forward again to repeat the cycle. It does this as many times as per num_forward_moves_per_lets_go_iteration.
  */
 void run_lets_go_iteration(
-    SingleSwitchProgramEnvironment& env,
+    ConsoleHandle& console, 
     BotBaseContext& context,
     LetsGoEncounterBotTracker& encounter_tracker,
     int num_forward_moves_per_lets_go_iteration
 ){
-    auto& console = env.console;
     // - Orient camera to look at same direction as player character
     // - This is needed because when save-load the game, the camera points
     // in the same direction as the player.
@@ -541,7 +548,7 @@ void run_lets_go_iteration(
     for(int i = 0; i < total_iterations; i++){
         use_lets_go_to_clear_in_front(console, context, encounter_tracker, throw_ball_if_bubble, [&](BotBaseContext& context){
             // Do the following movement while the Let's Go pokemon clearing wild pokemon.
-            env.console.log("Move-forward iteration number: " + std::to_string(i + 1) + "/" + std::to_string(total_iterations), COLOR_PURPLE);
+            console.log("Move-forward iteration number: " + std::to_string(i + 1) + "/" + std::to_string(total_iterations), COLOR_PURPLE);
 
             lets_go_movement1(context);
         });
@@ -562,11 +569,13 @@ where the action will be attempted infinite times if you keep failing. In contra
 only gives you one attempt before returning to the Pokecenter
 */
 void run_from_battles_and_back_to_pokecenter(
-    SingleSwitchProgramEnvironment& env,
+    ProgramEnvironment& env,
+    ConsoleHandle& console, 
     BotBaseContext& context,
     MaterialFarmerStats& stats,
     std::function<
-        void(SingleSwitchProgramEnvironment& env,
+        void(ProgramEnvironment& env,
+        ConsoleHandle& console,
         BotBaseContext& context)
     >&& action
 ){
@@ -576,19 +585,19 @@ void run_from_battles_and_back_to_pokecenter(
     while(returned_to_pokecenter == false){
         NormalBattleMenuWatcher battle_menu(COLOR_RED);
         int ret = run_until(
-            env.console, context,
+            console, context,
             [&](BotBaseContext& context){
                 if (!attempted_action){ // We still need to carry out `action`
                     attempted_action = true;
                     context.wait_for_all_requests();
-                    action(env, context);
+                    action(env, console, context);
                     context.wait_for_all_requests();                    
                 }
 
                 // we have already attempted the action,
                 // so reset to the Pokecenter
-                env.console.log("Go back to PokeCenter.");
-                reset_to_pokecenter(env.program_info(), env.console, context);
+                console.log("Go back to PokeCenter.");
+                reset_to_pokecenter(env.program_info(), console, context);
                 returned_to_pokecenter = true;
             },
             {battle_menu}
@@ -596,10 +605,10 @@ void run_from_battles_and_back_to_pokecenter(
         if (ret == 0){ // battle detected
             stats.m_encounters++;
             env.update_stats();
-            env.console.log("Detected battle. Now running away.", COLOR_PURPLE);
-            env.console.overlay().add_log("Detected battle. Now running away.");
+            console.log("Detected battle. Now running away.", COLOR_PURPLE);
+            console.overlay().add_log("Detected battle. Now running away.");
             try{
-                run_from_battle(env.program_info(), env.console, context);
+                run_from_battle(env.program_info(), console, context);
             }catch (OperationFailedException& e){
                 throw FatalProgramException(std::move(e));
             }
