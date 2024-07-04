@@ -610,15 +610,15 @@ void ItemPrinterRNG::run_item_printer_rng(
 
             //  Run the material farmer.
             press_Bs_to_back_to_overworld(env.program_info(), env.console, context);
-            move_from_item_printer_to_material_farming(env, context);
+            move_from_item_printer_to_material_farming(env.program_info(), env.console, context);
             {
                 //  Dummy stats since we don't use the material farmer stats.
                 MaterialFarmerStats mat_farm_stats;
-                run_material_farmer(env, context, MATERIAL_FARMER_OPTIONS, mat_farm_stats);
+                run_material_farmer(env, env.console, context, MATERIAL_FARMER_OPTIONS, mat_farm_stats);
                 stats.material_farmer_runs++;
                 env.update_stats();
             }
-            move_from_material_farming_to_item_printer(env, context);
+            move_from_material_farming_to_item_printer(env.program_info(), env.console, context);
 
             jobs_counter -= period;
         }
@@ -673,7 +673,7 @@ void ItemPrinterRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext
                 run_item_printer_rng(env, context, stats);
                 press_Bs_to_back_to_overworld(env.program_info(), env.console, context);
                 move_from_item_printer_to_material_farming(env, context);
-                run_material_farmer(env, context, MATERIAL_FARMER_OPTIONS, mat_farm_stats);
+                run_material_farmer(env, env.console, context, MATERIAL_FARMER_OPTIONS, mat_farm_stats);
                 move_from_material_farming_to_item_printer(env, context);
             }
         }

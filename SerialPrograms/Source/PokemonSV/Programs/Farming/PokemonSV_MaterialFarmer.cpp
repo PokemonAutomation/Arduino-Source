@@ -95,7 +95,7 @@ void MaterialFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
     MaterialFarmerStats& stats = env.current_stats<MaterialFarmerStats>();
 
     try{
-        run_material_farmer(env, context, MATERIAL_FARMER_OPTIONS, stats);
+        run_material_farmer(env, env.console, context, MATERIAL_FARMER_OPTIONS, stats);
     }catch (ProgramFinishedException&){}
 
     GO_HOME_WHEN_DONE.run_end_of_program(context);
