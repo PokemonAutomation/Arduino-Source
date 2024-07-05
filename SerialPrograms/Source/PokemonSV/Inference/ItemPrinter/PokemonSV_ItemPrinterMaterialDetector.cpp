@@ -187,7 +187,7 @@ int8_t ItemPrinterMaterialDetector::find_happiny_dust_row_index(
     ConsoleHandle& console, BotBaseContext& context
 ) const{
     int8_t value_68_row_index;
-    for (size_t c = 0; c < 10; c++){
+    for (size_t c = 0; c < 30; c++){
         context.wait_for_all_requests();
         value_68_row_index = find_material_value_row_index(dispatcher, console, context, 68);
         if (value_68_row_index != -1 

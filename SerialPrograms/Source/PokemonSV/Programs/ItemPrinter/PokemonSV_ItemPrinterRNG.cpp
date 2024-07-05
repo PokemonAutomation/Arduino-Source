@@ -181,7 +181,7 @@ ItemPrinterRNG::ItemPrinterRNG()
         "If a material starts below this threshold, it remains there.<br>"
         "Changes to this number only take place after returning to "
         "the item printer, after material farming.",
-        LockMode::UNLOCK_WHILE_RUNNING, 100,
+        LockMode::UNLOCK_WHILE_RUNNING, 400,
         1, 999
     )
     , MATERIAL_FARMER_OPTIONS(
