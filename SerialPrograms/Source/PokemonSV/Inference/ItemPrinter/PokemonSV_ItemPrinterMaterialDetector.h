@@ -54,7 +54,7 @@ public:
         ConsoleHandle& console, BotBaseContext& context
     ) const;
 
-    int8_t find_material_value_row_index(
+    std::vector<int8_t> find_material_value_row_index(
         AsyncDispatcher& dispatcher,
         ConsoleHandle& console, 
         BotBaseContext& context,

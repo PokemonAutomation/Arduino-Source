@@ -189,14 +189,16 @@ int8_t ItemPrinterMaterialDetector::find_happiny_dust_row_index(
     int8_t value_68_row_index;
     for (size_t c = 0; c < 30; c++){
         context.wait_for_all_requests();
-        value_68_row_index = find_material_value_row_index(dispatcher, console, context, 68);
-        if (value_68_row_index != -1 
-            && detect_material_name(console, context, value_68_row_index) == "happiny-dust"
-        ){  
-            // found screen and row number with Happiny dust.
-            // std::cout << "Happiny dust found. Row number: " << std::to_string(value_68_row_index) << std::endl;
-            return value_68_row_index;
+        std::vector<int8_t> value_68_row_index_list = find_material_value_row_index(dispatcher, console, context, 68);
+        for (size_t i = 0; i < value_68_row_index_list.size(); i++){
+            value_68_row_index = value_68_row_index_list[i];
+            if (detect_material_name(console, context, value_68_row_index) == "happiny-dust"){  
+                // found screen and row number with Happiny dust.
+                // std::cout << "Happiny dust found. Row number: " << std::to_string(value_68_row_index) << std::endl;
+                return value_68_row_index;
+            }
         }
+        
         // keep searching for Happiny dust
         pbf_press_dpad(context, DPAD_RIGHT, 20, 30);
     }
@@ -248,8 +250,8 @@ std::string ItemPrinterMaterialDetector::detect_material_name(
     return results.begin()->second.token;
 }
 
-// return row number that matches given material_value. else return -1
-int8_t ItemPrinterMaterialDetector::find_material_value_row_index(
+// return vector of row index(es) that matches given material_value.
+std::vector<int8_t> ItemPrinterMaterialDetector::find_material_value_row_index(
     AsyncDispatcher& dispatcher,
     ConsoleHandle& console, 
     BotBaseContext& context,
@@ -257,14 +259,16 @@ int8_t ItemPrinterMaterialDetector::find_material_value_row_index(
 ) const{
     context.wait_for_all_requests();
     VideoSnapshot snapshot = console.video().snapshot();
-    for (int8_t i = 0; i < 10; i++){
-        int16_t value = read_number(console, dispatcher, snapshot, m_box_mat_value[i]);
+    int8_t total_rows = 10;
+    std::vector<int8_t> row_indexes;
+    for (int8_t row_index = 0; row_index < total_rows; row_index++){
+        int16_t value = read_number(console, dispatcher, snapshot, m_box_mat_value[row_index]);
         if (value == material_value){
-            return i;
+            row_indexes.push_back(row_index);
         }
     }
 
-    return -1;    
+    return row_indexes;    
 
 }
 
