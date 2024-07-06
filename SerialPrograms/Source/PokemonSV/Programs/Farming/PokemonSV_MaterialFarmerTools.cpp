@@ -652,7 +652,7 @@ void fly_from_paldea_to_blueberry_entrance(const ProgramInfo& info, ConsoleHandl
 
         // move cursor to Blueberry academy fast travel point (up-left)
         // try different magnitudes of cursor push with each failure.
-        int push_magnitude = 77 + adjustment_table[numAttempts];
+        int push_magnitude = 81 + adjustment_table[numAttempts];
         pbf_move_left_joystick(context, 0, 0, push_magnitude, 50);
 
         // press A to fly to Blueberry academy
@@ -834,7 +834,7 @@ void fly_from_blueberry_to_north_province_3(const ProgramInfo& info, ConsoleHand
 
         // move cursor up-left
         // try different magnitudes of cursor push with each failure.
-        int push_magnitude = 164 + adjustment_table[numAttempts];
+        int push_magnitude = 168 + adjustment_table[numAttempts];
         pbf_move_left_joystick(context, 112, 0, push_magnitude, 50);
 
         // press A to fly to North province area 3
