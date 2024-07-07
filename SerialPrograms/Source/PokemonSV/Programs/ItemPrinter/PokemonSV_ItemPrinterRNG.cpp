@@ -26,6 +26,7 @@
 #include "PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
+#include "PokemonSV/Inference/ItemPrinter/PokemonSV_ItemPrinterMaterialDetector.h"
 //#include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Programs/Farming/PokemonSV_MaterialFarmerTools.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
@@ -89,6 +90,7 @@ std::unique_ptr<StatsTracker> ItemPrinterRNG_Descriptor::make_stats() const{
 
 ItemPrinterRNG::~ItemPrinterRNG(){
     MATERIAL_FARMER_OPTIONS.remove_listener(*this);
+    MATERIAL_FARMER_TRIGGER.remove_listener(*this);
     TABLE0.remove_listener(*this);
 //    AUTO_MATERIAL_FARMING.remove_listener(*this);
 }
@@ -156,11 +158,31 @@ ItemPrinterRNG::ItemPrinterRNG()
 //        3
 //    )
 //    , MATERIAL_FARMER_DISABLED_EXPLANATION("")
-    , MATERIAL_FARMER_JOBS_PERIOD(
+    , MATERIAL_FARMER_TRIGGER(
+        "<b>Trigger to start material farmer:</b><br>",
+        {
+            {MaterialFarmerTrigger::FIXED_NUM_PRINT_JOBS, "fixed", "Start Material Farmer when done a certain number of print jobs."},
+            {MaterialFarmerTrigger::MINIMUM_HAPPINY_DUST, "happiny-dust", "Start Material Farmer when Happiny Dust is less than a certain number."},
+        },
+        LockMode::UNLOCK_WHILE_RUNNING,
+        MaterialFarmerTrigger::FIXED_NUM_PRINT_JOBS
+    )
+    , MATERIAL_FARMER_FIXED_NUM_JOBS(
         "<b>Print Jobs per Material Farming Session:</b><br>"
         "Run the material farmer once for this many jobs printed.",
         LockMode::UNLOCK_WHILE_RUNNING, 500,
         20, 650
+    )
+    , MIN_HAPPINY_DUST(
+        "<b>Minimum Happiny Dust:</b><br>"
+        "Run the material farmer before the number of Happiny Dust drops "
+        "below this number.<br>"
+        "This ensures no other material drops below this number. "
+        "If a material starts below this threshold, it remains there.<br>"
+        "Changes to this number only take place after returning to "
+        "the item printer, after material farming.",
+        LockMode::UNLOCK_WHILE_RUNNING, 400,
+        1, 999
     )
     , MATERIAL_FARMER_OPTIONS(
         true, false,
@@ -200,7 +222,9 @@ ItemPrinterRNG::ItemPrinterRNG()
 
     if (PreloadSettings::instance().DEVELOPER_MODE){
 //        PA_ADD_OPTION(MATERIAL_FARMER_DISABLED_EXPLANATION);
-        PA_ADD_OPTION(MATERIAL_FARMER_JOBS_PERIOD);
+        PA_ADD_OPTION(MATERIAL_FARMER_TRIGGER);
+        PA_ADD_OPTION(MATERIAL_FARMER_FIXED_NUM_JOBS);
+        PA_ADD_OPTION(MIN_HAPPINY_DUST);
         PA_ADD_OPTION(MATERIAL_FARMER_OPTIONS);
     }
     if (PreloadSettings::instance().DEVELOPER_MODE){
@@ -213,6 +237,7 @@ ItemPrinterRNG::ItemPrinterRNG()
 //    AUTO_MATERIAL_FARMING.add_listener(*this);
     TABLE0.add_listener(*this);
     MATERIAL_FARMER_OPTIONS.add_listener(*this);
+    MATERIAL_FARMER_TRIGGER.add_listener(*this);
 }
 
 void ItemPrinterRNG::value_changed(void* object){
@@ -227,8 +252,13 @@ void ItemPrinterRNG::value_changed(void* object){
 //        MATERIAL_FARMER_DISABLED_EXPLANATION.set_text("<br>To enable the Material Farmer, enable \"Automatic Material Farming\" above");
 //    }
 
-    MATERIAL_FARMER_JOBS_PERIOD.set_visibility(
-        MATERIAL_FARMER_OPTIONS.enabled() ? ConfigOptionState::ENABLED : ConfigOptionState::DISABLED
+    MATERIAL_FARMER_FIXED_NUM_JOBS.set_visibility(
+        MATERIAL_FARMER_OPTIONS.enabled() && (MATERIAL_FARMER_TRIGGER == MaterialFarmerTrigger::FIXED_NUM_PRINT_JOBS)
+        ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN
+    );
+    MIN_HAPPINY_DUST.set_visibility(
+        MATERIAL_FARMER_OPTIONS.enabled() && (MATERIAL_FARMER_TRIGGER == MaterialFarmerTrigger::MINIMUM_HAPPINY_DUST)
+        ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN
     );
     OVERLAPPING_BONUS_WARNING.set_visibility(
         overlapping_bonus() ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN
@@ -574,19 +604,29 @@ void ItemPrinterRNG::run_item_printer_rng(
     SingleSwitchProgramEnvironment& env, BotBaseContext& context, 
     ItemPrinterRNG_Descriptor::Stats& stats
 ){
-    //  For each job that we print, we increment this number.
-    //  Each time we run the material farmer, we decrease this number by MATERIAL_FARMER_JOBS_PERIOD.
+    //  For each job that we print, we increment jobs_counter.
+    //  Each time we run the material farmer, we reset jobs_counter to 0.
     uint32_t jobs_counter = 0;
+
+    bool done_one_last_material_check_before_mat_farming = false;
+    uint32_t material_farmer_jobs_period = MATERIAL_FARMER_FIXED_NUM_JOBS;
+    if (MATERIAL_FARMER_TRIGGER == MaterialFarmerTrigger::MINIMUM_HAPPINY_DUST){
+        // Check material quantity when:
+        // - once when first starting the item printer
+        // - before starting material farming. If still have material, 
+        // can keep using item printer. But this check is only done once, 
+        // until you farm materials again.
+        // - when back from material farming
+
+        uint32_t num_jobs_with_happiny_dust = calc_num_jobs_with_happiny_dust(env, context);
+        material_farmer_jobs_period = num_jobs_with_happiny_dust;
+    }
 
     for (uint32_t c = 0; c < NUM_ITEM_PRINTER_ROUNDS; c++){
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
 
         std::vector<ItemPrinterRngRowSnapshot> table = TABLE0.snapshot<ItemPrinterRngRowSnapshot>();
         for (const ItemPrinterRngRowSnapshot& row : table){
-            if (!MATERIAL_FARMER_OPTIONS.enabled()){
-                jobs_counter = 0;
-            }
-
             //  Cannot run material farmer between chained prints.
             if (row.chain){
                 print_again(env, context, row.jobs);
@@ -597,16 +637,43 @@ void ItemPrinterRNG::run_item_printer_rng(
             run_print_at_date(env, context, row.date, row.jobs);
             jobs_counter += (uint32_t)row.jobs;
 
-            //  Material farmer is disabled.
             if (!MATERIAL_FARMER_OPTIONS.enabled()){
                 continue;
             }
 
+            ////////////////////////////////////////////////////
+            //  Material farmer is enabled. 
+            //  Check number of print jobs before triggering material farmer.
+            ////////////////////////////////////////////////////
+
+            if (MATERIAL_FARMER_TRIGGER == MaterialFarmerTrigger::FIXED_NUM_PRINT_JOBS){
+                material_farmer_jobs_period = MATERIAL_FARMER_FIXED_NUM_JOBS;
+            }
+            env.console.log(
+                "Print job counter: " 
+                + std::to_string(jobs_counter) 
+                + "/" 
+                + std::to_string(material_farmer_jobs_period)
+            );
+            
             //  Not ready to run material farmer yet.
-            uint16_t period = MATERIAL_FARMER_JOBS_PERIOD;
-            if (jobs_counter < period){
+            if (jobs_counter < material_farmer_jobs_period){
                 continue;
             }
+            
+            if (MATERIAL_FARMER_TRIGGER == MaterialFarmerTrigger::MINIMUM_HAPPINY_DUST 
+                && !done_one_last_material_check_before_mat_farming
+            ){
+                // one more material quantity check before material farming
+                // if still have material, keep using item printer
+                uint32_t num_jobs_with_happiny_dust = calc_num_jobs_with_happiny_dust(env, context);
+                material_farmer_jobs_period = num_jobs_with_happiny_dust;
+                jobs_counter = 0;
+                done_one_last_material_check_before_mat_farming = true;
+                if (material_farmer_jobs_period > 0){
+                    continue;
+                }                
+            }            
 
             //  Run the material farmer.
             press_Bs_to_back_to_overworld(env.program_info(), env.console, context);
@@ -620,13 +687,101 @@ void ItemPrinterRNG::run_item_printer_rng(
             }
             move_from_material_farming_to_item_printer(env.program_info(), env.console, context);
 
-            jobs_counter -= period;
+            // Recheck number of Happiny Dust after returning from Material Farming,
+            // prior to restarting Item printing
+            if (MATERIAL_FARMER_TRIGGER == MaterialFarmerTrigger::MINIMUM_HAPPINY_DUST){
+                uint32_t num_jobs_with_happiny_dust = calc_num_jobs_with_happiny_dust(env, context);
+                material_farmer_jobs_period = num_jobs_with_happiny_dust;
+                done_one_last_material_check_before_mat_farming = false;
+            }
+            
+            jobs_counter = 0;
         }
 //        run_print_at_date(env, context, DATE0, 1);
 //        run_print_at_date(env, context, DATE1, 10);
         stats.iterations++;
         env.update_stats();
     }
+}
+
+uint32_t ItemPrinterRNG::calc_num_jobs_with_happiny_dust(
+    SingleSwitchProgramEnvironment& env, BotBaseContext& context
+){
+    uint32_t num_happiny_dust = check_num_happiny_dust(env, context);
+
+    // give a buffer of 50, for a margin of safety. signed int to handle negative numbers
+    int32_t num_happiny_dust_can_use = num_happiny_dust - MIN_HAPPINY_DUST - 50; 
+    num_happiny_dust_can_use = num_happiny_dust_can_use < 0 ? 0 : num_happiny_dust_can_use;
+
+    // assume 62% value for Happiny Dust to account for item printer wasteage.
+    uint32_t num_print_jobs = num_happiny_dust_can_use * 0.62; // truncate the float back to int
+    env.console.log("Number of Happiny Dust we have: " + std::to_string(num_happiny_dust));
+    env.console.log("Number of Happiny Dust we can use (with some safety margins): " + std::to_string(num_happiny_dust_can_use));
+    env.console.log("Number of print jobs we can do before material farming: " + std::to_string(num_print_jobs));
+    return num_print_jobs;
+}
+
+uint32_t ItemPrinterRNG::check_num_happiny_dust(
+    SingleSwitchProgramEnvironment& env, BotBaseContext& context
+){
+    ItemPrinterRNG_Descriptor::Stats& stats = env.current_stats<ItemPrinterRNG_Descriptor::Stats>();
+    env.log("Check how much Happiny Dust we have.");
+    uint32_t num_happiny_dust;
+    while (true){
+        context.wait_for_all_requests();
+
+        OverworldWatcher overworld(COLOR_BLUE);
+        AdvanceDialogWatcher dialog(COLOR_RED);
+        PromptDialogWatcher prompt(COLOR_GREEN);
+        DateChangeWatcher date_reader;
+        WhiteButtonWatcher material(COLOR_GREEN, WhiteButton::ButtonX, {0.63, 0.93, 0.17, 0.06});
+        int ret = wait_until(
+            env.console, context, std::chrono::seconds(120),
+            {
+                overworld,
+                dialog,
+                prompt,
+                material,
+            }
+        );
+        switch (ret){
+        case 0:
+            env.log("Detected overworld... Entering item printer.");
+            pbf_press_button(context, BUTTON_A, 20, 30);
+            continue;
+
+        case 1:
+            env.log("Detected advance dialog.");
+            pbf_press_button(context, BUTTON_B, 20, 30);
+            continue;
+
+        case 2:{
+            env.log("Detected prompt dialog. Entering item printer.");
+            pbf_press_button(context, BUTTON_A, 10, 30);
+            context.wait_for_all_requests();
+            continue;
+        }
+        case 3:{
+            env.log("Detected material selection.");
+            ItemPrinterMaterialDetector detector(COLOR_RED, LANGUAGE);
+            
+            int8_t happiny_dust_row_num = detector.find_happiny_dust_row_index(env.inference_dispatcher(), env.console, context);
+            num_happiny_dust = detector.detect_material_quantity(env.inference_dispatcher(), env.console, context, happiny_dust_row_num);
+            pbf_mash_button(context, BUTTON_B, 100);
+            return num_happiny_dust;
+        }
+        default:
+            stats.errors++;
+            env.update_stats();
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT,
+                env.logger(),
+                ""
+            );
+        }
+    }    
+
+    return 0;
 }
 
 void ItemPrinterRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){

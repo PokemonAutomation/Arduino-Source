@@ -73,6 +73,14 @@ private:
         const std::array<std::string, 10>& expected_result
     );
 
+    uint32_t calc_num_jobs_with_happiny_dust(
+        SingleSwitchProgramEnvironment& env, BotBaseContext& context
+    );
+
+    uint32_t check_num_happiny_dust(
+        SingleSwitchProgramEnvironment& env, BotBaseContext& context
+    );
+
 private:
     OCR::LanguageOCROption LANGUAGE;
     SimpleIntegerOption<uint16_t> NUM_ITEM_PRINTER_ROUNDS;
@@ -91,7 +99,13 @@ private:
 //    SimpleIntegerOption<uint16_t> NUM_ROUNDS_OF_ITEM_PRINTER_TO_MATERIAL_FARM;
     
 //    StaticTextOption MATERIAL_FARMER_DISABLED_EXPLANATION;
-    SimpleIntegerOption<uint16_t> MATERIAL_FARMER_JOBS_PERIOD;
+    enum class MaterialFarmerTrigger{
+        FIXED_NUM_PRINT_JOBS,
+        MINIMUM_HAPPINY_DUST,
+    };
+    EnumDropdownOption<MaterialFarmerTrigger> MATERIAL_FARMER_TRIGGER;
+    SimpleIntegerOption<uint16_t> MATERIAL_FARMER_FIXED_NUM_JOBS;
+    SimpleIntegerOption<uint16_t> MIN_HAPPINY_DUST;
     MaterialFarmerOptions MATERIAL_FARMER_OPTIONS;
 
     BooleanCheckBoxOption ENABLE_SEED_CALC;
