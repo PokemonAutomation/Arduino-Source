@@ -252,6 +252,10 @@ void ItemPrinterRNG::value_changed(void* object){
 //        MATERIAL_FARMER_DISABLED_EXPLANATION.set_text("<br>To enable the Material Farmer, enable \"Automatic Material Farming\" above");
 //    }
 
+    MATERIAL_FARMER_TRIGGER.set_visibility(
+        MATERIAL_FARMER_OPTIONS.enabled() ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN
+    );
+
     MATERIAL_FARMER_FIXED_NUM_JOBS.set_visibility(
         MATERIAL_FARMER_OPTIONS.enabled() && (MATERIAL_FARMER_TRIGGER == MaterialFarmerTrigger::FIXED_NUM_PRINT_JOBS)
         ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN
