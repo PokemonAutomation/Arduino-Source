@@ -267,7 +267,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 //    PokemonLA::ButtonDetector detector(logger, PokemonLA::ButtonType::ButtonA,);
 
 
-#if 1
+#if 0
     ItemPrinterMaterialDetector detector(COLOR_RED, LANGUAGE);
     detector.make_overlays(overlays);
     // cout << (int)detector.find_happiny_dust_row_index(env.inference_dispatcher(), console, context) << endl;

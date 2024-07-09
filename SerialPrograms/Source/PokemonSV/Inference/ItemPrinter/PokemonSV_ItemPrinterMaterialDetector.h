@@ -81,12 +81,6 @@ private:
         const ImageViewRGB32& screen, const ImageFloatBox& box
     ) const;
 
-    int16_t read_number_black_or_white_text(
-        Logger& logger, AsyncDispatcher& dispatcher,
-        const ImageViewRGB32& screen, const ImageFloatBox& box,
-        bool is_white_text
-    ) const;    
-
 
 private:
     Color m_color;
