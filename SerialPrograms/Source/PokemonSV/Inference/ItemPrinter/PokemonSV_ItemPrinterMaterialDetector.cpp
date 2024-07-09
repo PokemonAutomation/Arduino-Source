@@ -11,6 +11,7 @@
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
+#include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/OCR/OCR_NumberReader.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
@@ -84,13 +85,47 @@ int16_t ItemPrinterMaterialDetector::read_number(
     Logger& logger, AsyncDispatcher& dispatcher,
     const ImageViewRGB32& screen, const ImageFloatBox& box
 ) const{
-    int16_t number_result_white_text = read_number_black_or_white_text(logger, dispatcher, screen, box, true);
-    if (number_result_white_text == -1){
-        // try looking for black text
-        return read_number_black_or_white_text(logger, dispatcher, screen, box, false);
+
+    ImageViewRGB32 cropped = extract_box_reference(screen, box);
+    ImageRGB32 filtered = to_blackwhite_rgb32_range(
+        cropped,
+        0xff000000, 0xff808080,
+        true
+    );
+    // filtered.save("DebugDumps/test-one-filter-1.png");
+    bool is_dark_text_light_background = image_stats(filtered).average.sum() > 500;
+    // std::cout << "Average sum of filtered: "<< std::to_string(image_stats(filtered).average.sum()) << std::endl;
+
+    int16_t number;
+    if (is_dark_text_light_background){
+        number = (int16_t)OCR::read_number_waterfill(logger, cropped, 0xff000000, 0xff808080);
     }else{
-        return number_result_white_text;
+        number = (int16_t)OCR::read_number_waterfill(logger, cropped, 0xff808080, 0xffffffff);
     }
+
+    if (number < 1 || number > 999){
+        number = -1;
+    }
+    return (int16_t)number;
+
+    // return read_number_black_or_white_text(logger, dispatcher, screen, box, true);
+
+
+    // if (!is_dark_text_light_background){
+    //     filtered = to_blackwhite_rgb32_range(
+    //         extract_box_reference(screen, box),
+    //         0xff808080, 0xffffffff,
+    //         true
+    //     );
+    //     filtered.save("DebugDumps/test-one-filter-2.png");
+    // }
+    
+    // ImageRGB32 scaled_image = filtered.scale_to(600, 200);
+    // scaled_image.save("DebugDumps/test-one-scaled-1.png");
+    // int value = OCR::read_number(logger, scaled_image);
+
+    // return (int16_t)value;
+
 
 }
 
@@ -143,6 +178,7 @@ int16_t ItemPrinterMaterialDetector::read_number_black_or_white_text(
     // }
     for (size_t c = 0; c < filtered.size(); c++){
         tasks[c] = dispatcher.dispatch([&, c]{
+            filtered[c].first.save("DebugDumps/test-" + std::to_string(c) + ".png");
             int num = OCR::read_number(logger, filtered[c].first);
             WriteSpinLock lg(lock);
             candidates[(int16_t)num]++;

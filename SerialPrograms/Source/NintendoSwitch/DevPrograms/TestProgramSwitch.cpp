@@ -267,12 +267,52 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 //    PokemonLA::ButtonDetector detector(logger, PokemonLA::ButtonType::ButtonA,);
 
 
+#if 1
+    ItemPrinterMaterialDetector detector(COLOR_RED, LANGUAGE);
+    detector.make_overlays(overlays);
+    // cout << (int)detector.find_happiny_dust_row_index(env.inference_dispatcher(), console, context) << endl;
+    // cout << (int)detector.detect_material_quantity(env.inference_dispatcher(), console, context, 2) << endl;
 
+    // test OCR for number 1 -> 999. for black text on light background.
+    // increasing quantity of materials to sell. 
+    for (int i = 1; i < 1000; i++){
+       context.wait_for_all_requests();
+        if (i != (int)detector.detect_material_quantity(env.inference_dispatcher(), console, context, 2)){
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT,
+                console,
+                "OCR didn't match expected value."
+            );
+        }
+        pbf_press_dpad(context, DPAD_UP, 20, 30);
+    }
+
+    // test OCR for number 1 -> 999. for white text on dark background
+    // decreasing quantity of current materials by selling.
+    // for (int i = 999; i > 0; i--){
+    //     context.wait_for_all_requests();
+    //     if (i != (int)detector.detect_material_quantity(env.inference_dispatcher(), console, context, 2)){
+    //         throw OperationFailedException(
+    //             ErrorReport::SEND_ERROR_REPORT,
+    //             console,
+    //             "OCR didn't match expected value."
+    //         );
+    //     }
+    //     pbf_press_button(context, BUTTON_A, 30, 150);
+    //     pbf_press_button(context, BUTTON_A, 30, 150);
+    //     pbf_press_button(context, BUTTON_A, 30, 150);
+    //     pbf_press_button(context, BUTTON_A, 30, 150);
+    // }
+
+
+#endif
+
+#if 0
     ImageRGB32 image("screenshot-20240701-165012250266.png");
 
     BattleBallReader reader(console, Language::English);
     cout << reader.read_quantity(image) << endl;
-
+#endif
 
 #if 0
     ImageRGB32 image("screenshot-20240630-183016042676.png");
