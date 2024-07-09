@@ -229,11 +229,13 @@ std::string IngredientSession::move_to_ingredient(const std::set<std::string>& i
 
         m_console.log("Ingredient not found on current page. Scrolling down.", COLOR_ORANGE);
 
-        //  Not found on page. Scroll to last item.
-        while (current < INGREDIENT_PAGE_LINES - 1){
-            pbf_press_dpad(m_context, DPAD_DOWN, 10, 30);
-            current++;
-        }
+        //  Not found on page. Scroll to next screen
+        pbf_press_dpad(m_context, DPAD_RIGHT, 10, 30);
+
+        // while (current < INGREDIENT_PAGE_LINES - 1){
+        //     pbf_press_dpad(m_context, DPAD_DOWN, 10, 30);
+        //     current++;
+        // }
 
         m_context.wait_for_all_requests();
         m_context.wait_for(std::chrono::milliseconds(180));
@@ -269,6 +271,8 @@ void IngredientSession::add_ingredients(
 
         //  Add the item. But don't loop the quantity. Instead, we add one and
         //  loop again in case we run out.
+        //  If you don't have enough ingredient, it errors out instead of proceeding 
+        //  with less than the desired quantity.
         pbf_press_button(context, BUTTON_A, 20, 105);
         context.wait_for_all_requests();
         console.overlay().add_log("Added " + name.display_name());
