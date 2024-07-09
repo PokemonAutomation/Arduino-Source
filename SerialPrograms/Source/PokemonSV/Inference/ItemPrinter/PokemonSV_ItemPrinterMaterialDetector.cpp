@@ -192,11 +192,16 @@ std::vector<int8_t> ItemPrinterMaterialDetector::find_material_value_row_index(
     VideoSnapshot snapshot = console.video().snapshot();
     int8_t total_rows = 10;
     std::vector<int8_t> row_indexes;
+    SpinLock lock;
+    std::vector<std::unique_ptr<AsyncTask>> tasks(total_rows);
     for (int8_t row_index = 0; row_index < total_rows; row_index++){
-        int16_t value = read_number(console, dispatcher, snapshot, m_box_mat_value[row_index]);
-        if (value == material_value){
-            row_indexes.push_back(row_index);
-        }
+        tasks[row_index] = dispatcher.dispatch([&, row_index]{
+            int16_t value = read_number(console, dispatcher, snapshot, m_box_mat_value[row_index]);
+            if (value == material_value){
+                WriteSpinLock lg(lock);
+                row_indexes.push_back(row_index);
+            }
+        });
     }
 
     return row_indexes;    
