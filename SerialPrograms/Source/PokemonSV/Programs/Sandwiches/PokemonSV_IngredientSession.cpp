@@ -14,6 +14,9 @@
 #include "PokemonSV/Resources/PokemonSV_Ingredients.h"
 #include "PokemonSV_IngredientSession.h"
 #include "Common/Cpp/PrettyPrint.h"
+#include <iostream>
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -31,14 +34,49 @@ IngredientSession::IngredientSession(
     , m_context(context)
     , m_language(language)
     , m_overlays(console.overlay())
+    , m_type(type)
     , m_ingredients(10)
+    , m_num_confirmed(0)
+    , m_box_confirmed(confirmed_ingredient_boxes(type))
     , m_arrow(COLOR_CYAN, GradientArrowType::RIGHT, {0.02, 0.15, 0.05, 0.80})
 {
     for (size_t c = 0; c < INGREDIENT_PAGE_LINES; c++){
         m_ingredients.emplace_back(type, c, COLOR_CYAN);
         m_ingredients.back().make_overlays(m_overlays);
     }
+
+    for (size_t i = 0; i < m_box_confirmed.size(); i++){
+        m_overlays.add(COLOR_RED, m_box_confirmed[i]);
+    }
 }
+
+std::array<ImageFloatBox, 6> IngredientSession::confirmed_ingredient_boxes(SandwichIngredientType type){
+    std::array<ImageFloatBox, 6> boxes;
+    ImageFloatBox initial_box;
+    int total_count = 0;
+    switch (type){
+    case SandwichIngredientType::FILLING:
+        initial_box = ImageFloatBox(0.508781, 0.820, 0.032, 0.057);
+        total_count = 6;
+        break;
+    case SandwichIngredientType::CONDIMENT:
+        initial_box = ImageFloatBox(0.797474, 0.820, 0.032, 0.057);
+        total_count = 4;
+        break;
+    }
+    
+    double initial_x = initial_box.x;
+    double width = initial_box.width;
+    double height = initial_box.height;
+    double y = initial_box.y;
+    double x_spacing = 0.0468;
+    for (size_t i = 0; i < total_count; i++){
+        double x = initial_x + i*x_spacing;
+        boxes[i] = ImageFloatBox(x, y, width, height);
+    }
+    return boxes;
+}
+
 
 
 PageIngredients IngredientSession::read_screen(std::shared_ptr<const ImageRGB32> screen) const{
@@ -76,7 +114,7 @@ PageIngredients IngredientSession::read_screen(std::shared_ptr<const ImageRGB32>
             }
         }else{
             // Read current selected icon
-            image_result = m_ingredients[ret.selected].read_with_icon_matcher(*screen);
+            image_result = m_ingredients[ret.selected].read_with_icon_matcher(*screen, m_ingredients[ret.selected].m_icon_box);
             image_result.clear_beyond_spread(SandwichIngredientReader::ALPHA_SPREAD);
             image_result.log(m_console, SandwichIngredientReader::MAX_ALPHA);
             image_result.clear_beyond_alpha(SandwichIngredientReader::MAX_ALPHA);
@@ -190,7 +228,7 @@ bool IngredientSession::run_move_iteration(
     }
     m_context.wait_for_all_requests();
     m_context.wait_for(std::chrono::seconds(1));
-
+    // slug = item;
     return true;
 }
 
@@ -205,7 +243,6 @@ std::string IngredientSession::move_to_ingredient(const std::set<std::string>& i
     while (true){
         m_context.wait_for_all_requests();
         PageIngredients page = read_current_page();
-
         std::string found_ingredient;
         if (run_move_iteration(found_ingredient, ingredients, page)){
             if (found_ingredient.empty()){
@@ -247,7 +284,7 @@ std::string IngredientSession::move_to_ingredient(const std::set<std::string>& i
 void IngredientSession::add_ingredients(
     ConsoleHandle& console, BotBaseContext& context,
     std::map<std::string, uint8_t>&& ingredients
-) const{
+){
     //  "ingredients" will be what we still need.
     //  Each time we add an ingredient, it will be removed from the map.
     //  Loop until there's nothing left.
@@ -269,19 +306,39 @@ void IngredientSession::add_ingredients(
         const SandwichIngredientNames& name = get_ingredient_name(found);
         console.log("Add " + name.display_name() + " as ingredient", COLOR_BLUE);
 
-        //  Add the item. But don't loop the quantity. Instead, we add one and
-        //  loop again in case we run out.
         //  If you don't have enough ingredient, it errors out instead of proceeding 
         //  with less than the desired quantity.
-        pbf_press_button(context, BUTTON_A, 20, 105);
-        context.wait_for_all_requests();
-        console.overlay().add_log("Added " + name.display_name());
-        // TODO add visual confirmation of ingredients added to avoid button drops
-
         auto iter = ingredients.find(found);
-        if (--iter->second == 0){
-            ingredients.erase(iter);
+        SandwichIngredientReader reader(m_type, 0);
+        while (iter->second > 0){
+            bool ingredient_added = false;
+            for (int attempt = 0; attempt < 5; attempt++){
+                pbf_press_button(context, BUTTON_A, 20, 105);
+                context.wait_for_all_requests();
+                VideoSnapshot image = console.video().snapshot();
+                ImageMatch::ImageMatchResult image_result = 
+                    reader.read_with_icon_matcher(image, m_box_confirmed[m_num_confirmed]);
+                image_result.clear_beyond_spread(SandwichIngredientReader::ALPHA_SPREAD);
+                image_result.clear_beyond_alpha(SandwichIngredientReader::MAX_ALPHA);
+                image_result.log(console, SandwichIngredientReader::MAX_ALPHA);                
+                if (image_result.results.size() > 0){ // confirmed that the ingredient was added
+                    console.overlay().add_log("Added " + name.display_name());
+                    m_num_confirmed++;
+                    ingredient_added = true;
+                    iter->second--;
+                    break;
+                }
+            }
+
+            if (!ingredient_added){
+                    throw OperationFailedException(
+                    ErrorReport::SEND_ERROR_REPORT,
+                    console,
+                    "Unable to add ingredient: \"" + name.display_name() + "\" - Did you run out?"
+                );
+            }
         }
+        ingredients.erase(iter);
     }
 }
 

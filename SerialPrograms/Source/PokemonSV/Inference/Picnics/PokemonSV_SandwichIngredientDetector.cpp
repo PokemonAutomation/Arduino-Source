@@ -282,10 +282,10 @@ void SandwichIngredientReader::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_text_box);
 }
 
-ImageMatch::ImageMatchResult SandwichIngredientReader::read_with_icon_matcher(const ImageViewRGB32& screen) const{
+ImageMatch::ImageMatchResult SandwichIngredientReader::read_with_icon_matcher(const ImageViewRGB32& screen, const ImageFloatBox icon_box) const{
     // Get a crop of the sandwich ingredient icon
-    ImageViewRGB32 image = extract_box_reference(screen, m_icon_box);
-//    image.save("image.png");
+    ImageViewRGB32 image = extract_box_reference(screen, icon_box);
+   image.save("image" + std::to_string(icon_box.x) + ".png");
 
 //    // Remove the orange / yellow background when the ingredient is selected
 //    ImageRGB32 filtered_image = filter_rgb32_range(image, 0xffdfaf00, 0xffffef20, Color(0x00000000), true);

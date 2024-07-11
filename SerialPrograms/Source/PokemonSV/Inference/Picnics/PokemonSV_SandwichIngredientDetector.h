@@ -185,12 +185,12 @@ public:
     void make_overlays(VideoOverlaySet& items) const;
 
     // The icon matcher only works on the selected item, because we want to remove the yellow / orange background
-    ImageMatch::ImageMatchResult read_with_icon_matcher(const ImageViewRGB32& screen) const;
+    ImageMatch::ImageMatchResult read_with_icon_matcher(const ImageViewRGB32& screen, const ImageFloatBox icon_box) const;
 
     // The OCR works on any ingredient, selected or not
     OCR::StringMatchResult read_with_ocr(const ImageViewRGB32& screen, Logger& logger, Language language) const;
 
-private:
+// private:
     Color m_color;
     ImageFloatBox m_icon_box;
     ImageFloatBox m_text_box;

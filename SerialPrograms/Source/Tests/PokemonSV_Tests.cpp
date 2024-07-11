@@ -422,7 +422,7 @@ int test_pokemonSV_SandwichIngredientReader(const ImageViewRGB32& image, const s
         SandwichIngredientReader reader(sandwich_type, i);
         if (selected_ingredient == i){
             // The icon matcher only works on the selected item, because we want to remove the yellow / orange background
-            ImageMatch::ImageMatchResult results = reader.read_with_icon_matcher(image);
+            ImageMatch::ImageMatchResult results = reader.read_with_icon_matcher(image, reader.m_icon_box);
 
             if (results.results.empty()){
                 cerr << "No ingredient detected via icon matcher" << endl;

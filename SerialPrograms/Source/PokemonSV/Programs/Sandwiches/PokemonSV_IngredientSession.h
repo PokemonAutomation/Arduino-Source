@@ -42,6 +42,8 @@ public:
         Language language, SandwichIngredientType type
     );
 
+    std::array<ImageFloatBox, 6> confirmed_ingredient_boxes(SandwichIngredientType type);
+
     //  Move to any ingredient in the set. Returns the ingredient it moved to.
     //  Returns empty string if not found.
     std::string move_to_ingredient(const std::set<std::string>& ingredients) const;
@@ -49,7 +51,7 @@ public:
     void add_ingredients(
         ConsoleHandle& console, BotBaseContext& context,
         std::map<std::string, uint8_t>&& ingredients
-    ) const;
+    );
 
 
 public:
@@ -67,7 +69,10 @@ private:
     BotBaseContext& m_context;
     Language m_language;
     VideoOverlaySet m_overlays;
+    SandwichIngredientType m_type;
+    int8_t m_num_confirmed;
     FixedLimitVector<SandwichIngredientReader> m_ingredients;
+    std::array<ImageFloatBox, 6> m_box_confirmed;
     GradientArrowDetector m_arrow;
 };
 
