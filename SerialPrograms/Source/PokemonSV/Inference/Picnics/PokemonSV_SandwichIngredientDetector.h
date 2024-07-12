@@ -177,24 +177,45 @@ class SandwichIngredientReader{
 public:
     static constexpr double MAX_ALPHA = 180;
     static constexpr double ALPHA_SPREAD = 10;
-
+    static constexpr size_t INGREDIENT_PAGE_LINES = 10;
 
 public:
-    SandwichIngredientReader(SandwichIngredientType ingredient_type, size_t index, Color color = COLOR_RED);
+    SandwichIngredientReader(SandwichIngredientType ingredient_type, Color color = COLOR_RED);
 
     void make_overlays(VideoOverlaySet& items) const;
+
+    std::array<ImageFloatBox, 6> confirmed_ingredient_boxes(SandwichIngredientType type);
+
+    std::array<ImageFloatBox, 10> ingredient_list_boxes(ImageFloatBox initial_box);
+
+    ImageMatch::ImageMatchResult read_ingredient_page_with_icon_matcher(const ImageViewRGB32& screen, size_t index) const;
+
+    ImageMatch::ImageMatchResult read_confirmed_list_with_icon_matcher(const ImageViewRGB32& screen, size_t index) const;
 
     // The icon matcher only works on the selected item, because we want to remove the yellow / orange background
     ImageMatch::ImageMatchResult read_with_icon_matcher(const ImageViewRGB32& screen, const ImageFloatBox icon_box) const;
 
+    OCR::StringMatchResult read_ingredient_page_with_ocr(
+        const ImageViewRGB32& screen, 
+        Logger& logger, 
+        Language language, 
+        size_t index
+    ) const;
+
     // The OCR works on any ingredient, selected or not
-    OCR::StringMatchResult read_with_ocr(const ImageViewRGB32& screen, Logger& logger, Language language) const;
+    OCR::StringMatchResult read_with_ocr(
+        const ImageViewRGB32& screen, 
+        Logger& logger, 
+        Language language, 
+        const ImageFloatBox icon_box
+    ) const;
 
 // private:
     Color m_color;
-    ImageFloatBox m_icon_box;
-    ImageFloatBox m_text_box;
     SandwichIngredientType m_ingredient_type;
+    std::array<ImageFloatBox, INGREDIENT_PAGE_LINES> m_box_ingred_text;
+    std::array<ImageFloatBox, INGREDIENT_PAGE_LINES> m_box_ingred_icon;
+    std::array<ImageFloatBox, 6> m_box_confirmed;
 };
 
 }

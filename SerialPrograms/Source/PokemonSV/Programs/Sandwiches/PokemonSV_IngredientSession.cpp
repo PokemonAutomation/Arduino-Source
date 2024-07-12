@@ -35,46 +35,11 @@ IngredientSession::IngredientSession(
     , m_language(language)
     , m_overlays(console.overlay())
     , m_type(type)
-    , m_ingredients(10)
     , m_num_confirmed(0)
-    , m_box_confirmed(confirmed_ingredient_boxes(type))
     , m_arrow(COLOR_CYAN, GradientArrowType::RIGHT, {0.02, 0.15, 0.05, 0.80})
 {
-    for (size_t c = 0; c < INGREDIENT_PAGE_LINES; c++){
-        m_ingredients.emplace_back(type, c, COLOR_CYAN);
-        m_ingredients.back().make_overlays(m_overlays);
-    }
-
-    for (size_t i = 0; i < m_box_confirmed.size(); i++){
-        m_overlays.add(COLOR_RED, m_box_confirmed[i]);
-    }
-}
-
-std::array<ImageFloatBox, 6> IngredientSession::confirmed_ingredient_boxes(SandwichIngredientType type){
-    std::array<ImageFloatBox, 6> boxes;
-    ImageFloatBox initial_box;
-    int total_count = 0;
-    switch (type){
-    case SandwichIngredientType::FILLING:
-        initial_box = ImageFloatBox(0.508781, 0.820, 0.032, 0.057);
-        total_count = 6;
-        break;
-    case SandwichIngredientType::CONDIMENT:
-        initial_box = ImageFloatBox(0.797474, 0.820, 0.032, 0.057);
-        total_count = 4;
-        break;
-    }
-    
-    double initial_x = initial_box.x;
-    double width = initial_box.width;
-    double height = initial_box.height;
-    double y = initial_box.y;
-    double x_spacing = 0.0468;
-    for (size_t i = 0; i < total_count; i++){
-        double x = initial_x + i*x_spacing;
-        boxes[i] = ImageFloatBox(x, y, width, height);
-    }
-    return boxes;
+    SandwichIngredientReader reader(m_type, COLOR_CYAN);
+    reader.make_overlays(m_overlays);
 }
 
 
@@ -103,10 +68,11 @@ PageIngredients IngredientSession::read_screen(std::shared_ptr<const ImageRGB32>
 
     //  Read the names of every line and the sprite of the selected line.
     ImageMatch::ImageMatchResult image_result;
-    m_dispatcher.run_in_parallel(0, INGREDIENT_PAGE_LINES + 1, [&](size_t index){
-        if (index < INGREDIENT_PAGE_LINES){
+    SandwichIngredientReader reader(m_type);
+    m_dispatcher.run_in_parallel(0, SandwichIngredientReader::INGREDIENT_PAGE_LINES + 1, [&](size_t index){
+        if (index < SandwichIngredientReader::INGREDIENT_PAGE_LINES){
             // Read text at line `index`
-            OCR::StringMatchResult result = m_ingredients[index].read_with_ocr(*screen, m_console, m_language);
+            OCR::StringMatchResult result = reader.read_ingredient_page_with_ocr(*screen, m_console, m_language, index);
             result.clear_beyond_log10p(SandwichFillingOCR::MAX_LOG10P);
             result.clear_beyond_spread(SandwichFillingOCR::MAX_LOG10P_SPREAD);
             for (auto& item : result.results){
@@ -114,7 +80,7 @@ PageIngredients IngredientSession::read_screen(std::shared_ptr<const ImageRGB32>
             }
         }else{
             // Read current selected icon
-            image_result = m_ingredients[ret.selected].read_with_icon_matcher(*screen, m_ingredients[ret.selected].m_icon_box);
+            image_result = reader.read_ingredient_page_with_icon_matcher(*screen, ret.selected);
             image_result.clear_beyond_spread(SandwichIngredientReader::ALPHA_SPREAD);
             image_result.log(m_console, SandwichIngredientReader::MAX_ALPHA);
             image_result.clear_beyond_alpha(SandwichIngredientReader::MAX_ALPHA);
@@ -184,7 +150,7 @@ bool IngredientSession::run_move_iteration(
 ) const{
     size_t current_index = page.selected;
     std::map<size_t, std::string> found_ingredients;
-    for (size_t c = 0; c < INGREDIENT_PAGE_LINES; c++){
+    for (size_t c = 0; c < SandwichIngredientReader::INGREDIENT_PAGE_LINES; c++){
         for (const std::string& item : page.item[c]){
             auto iter = ingredients.find(item);
             if (iter != ingredients.end()){
@@ -253,7 +219,7 @@ std::string IngredientSession::move_to_ingredient(const std::set<std::string>& i
         }
 
         size_t current = page.selected;
-        if (current == INGREDIENT_PAGE_LINES - 1){
+        if (current == SandwichIngredientReader::INGREDIENT_PAGE_LINES - 1){
             not_found_count++;
             if (not_found_count >= 2){
                 m_console.log("Ingredient not found anywhere.", COLOR_RED);
@@ -309,7 +275,7 @@ void IngredientSession::add_ingredients(
         //  If you don't have enough ingredient, it errors out instead of proceeding 
         //  with less than the desired quantity.
         auto iter = ingredients.find(found);
-        SandwichIngredientReader reader(m_type, 0);
+        SandwichIngredientReader reader(m_type);
         while (iter->second > 0){
             bool ingredient_added = false;
             for (int attempt = 0; attempt < 5; attempt++){
@@ -317,7 +283,7 @@ void IngredientSession::add_ingredients(
                 context.wait_for_all_requests();
                 VideoSnapshot image = console.video().snapshot();
                 ImageMatch::ImageMatchResult image_result = 
-                    reader.read_with_icon_matcher(image, m_box_confirmed[m_num_confirmed]);
+                    reader.read_confirmed_list_with_icon_matcher(image, m_num_confirmed);
                 image_result.clear_beyond_spread(SandwichIngredientReader::ALPHA_SPREAD);
                 image_result.clear_beyond_alpha(SandwichIngredientReader::MAX_ALPHA);
                 image_result.log(console, SandwichIngredientReader::MAX_ALPHA);                

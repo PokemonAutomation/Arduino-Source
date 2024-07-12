@@ -315,6 +315,27 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 #endif
 
 #if 0
+    // ImageRGB32 image("screenshot-20240701-165012250266.png");
+
+    // BattleBallReader reader(console, Language::English);
+    // cout << reader.read_quantity(image) << endl;
+
+    VideoSnapshot image = feed.snapshot();
+    // IngredientSession session(env.inference_dispatcher(), console, context, Language::English, SandwichIngredientType::CONDIMENT);
+    // session.read_ingredient_quantity(console, context, 8);
+
+    SandwichIngredientReader reader(SandwichIngredientType::FILLING);
+    // ImageMatch::ImageMatchResult image_result = reader.read_with_icon_matcher(image, ImageFloatBox(0.508, 0.820, 0.032, 0.057));
+    for (int i = 0; i < 6; i++){
+        ImageMatch::ImageMatchResult image_result = reader.read_with_icon_matcher(image, ImageFloatBox(0.508781 + 0.0468*i, 0.820, 0.032, 0.057));
+        image_result.clear_beyond_spread(SandwichIngredientReader::ALPHA_SPREAD);
+        image_result.log(console, SandwichIngredientReader::MAX_ALPHA);
+        image_result.clear_beyond_alpha(SandwichIngredientReader::MAX_ALPHA);
+    }
+#endif
+
+
+#if 0
     ImageRGB32 image("screenshot-20240630-183016042676.png");
 
     ButtonTracker tracker(ButtonType::ButtonA);
@@ -331,8 +352,8 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 #if 0
     ItemPrinterMaterialDetector detector(COLOR_RED, LANGUAGE);
     detector.make_overlays(overlays);
-    cout << (int)detector.find_happiny_dust_row_index(env.inference_dispatcher(), console, context) << endl;
-    // cout << (int)detector.detect_material_quantity(env.inference_dispatcher(), console, context, 2) << endl;
+    // cout << (int)detector.find_happiny_dust_row_index(env.inference_dispatcher(), console, context) << endl;
+    cout << (int)detector.detect_material_quantity(env.inference_dispatcher(), console, context, 2) << endl;
 #endif
 
 #if 0
