@@ -5,6 +5,7 @@
  */
 #include <atomic>
 #include <sstream>
+#include <array>
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
