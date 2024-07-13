@@ -93,7 +93,7 @@ int16_t ItemPrinterMaterialDetector::read_number(
         true
     );
     // filtered.save("DebugDumps/test-one-filter-1.png");
-    bool is_dark_text_light_background = image_stats(filtered).average.sum() > 500;
+    bool is_dark_text_light_background = image_stats(filtered).average.sum() > 400;
     // std::cout << "Average sum of filtered: "<< std::to_string(image_stats(filtered).average.sum()) << std::endl;
 
     int16_t number;
