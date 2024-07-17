@@ -11,6 +11,7 @@
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
+#include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/OCR/OCR_NumberReader.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
@@ -84,100 +85,30 @@ int16_t ItemPrinterMaterialDetector::read_number(
     Logger& logger, AsyncDispatcher& dispatcher,
     const ImageViewRGB32& screen, const ImageFloatBox& box
 ) const{
-    int16_t number_result_white_text = read_number_black_or_white_text(logger, dispatcher, screen, box, true);
-    if (number_result_white_text == -1){
-        // try looking for black text
-        return read_number_black_or_white_text(logger, dispatcher, screen, box, false);
-    }else{
-        return number_result_white_text;
-    }
 
-}
-
-int16_t ItemPrinterMaterialDetector::read_number_black_or_white_text(
-    Logger& logger, AsyncDispatcher& dispatcher,
-    const ImageViewRGB32& screen, const ImageFloatBox& box,
-    bool is_white_text
-) const{
     ImageViewRGB32 cropped = extract_box_reference(screen, box);
-
-    std::vector<BlackWhiteRgb32Range> filters; 
-    if (is_white_text){
-        filters = 
-        {
-            // white text filters
-            {0xff808080, 0xffffffff, true},
-            {0xff909090, 0xffffffff, true},
-            {0xffa0a0a0, 0xffffffff, true},
-            {0xffb0b0b0, 0xffffffff, true},
-            {0xffc0c0c0, 0xffffffff, true},
-            {0xffd0d0d0, 0xffffffff, true},
-            {0xffe0e0e0, 0xffffffff, true},
-            {0xfff0f0f0, 0xffffffff, true},
-        };
-    }else{
-        filters = 
-        {
-            // black text filters
-            // {0xff000000, 0xff101010, true},
-            // {0xff000000, 0xff202020, true},
-            {0xff000000, 0xff303030, true},
-            {0xff000000, 0xff404040, true},
-            {0xff000000, 0xff505050, true},
-            {0xff000000, 0xff606060, true},
-            {0xff000000, 0xff707070, true},
-            {0xff000000, 0xff808080, true},
-        };
-    }
-
-    std::vector<std::pair<ImageRGB32, size_t>> filtered = to_blackwhite_rgb32_range(
+    ImageRGB32 filtered = to_blackwhite_rgb32_range(
         cropped,
-        filters
+        0xff000000, 0xff808080,
+        true
     );
+    // filtered.save("DebugDumps/test-one-filter-1.png");
+    bool is_dark_text_light_background = image_stats(filtered).average.sum() > 400;
+    // std::cout << "Average sum of filtered: "<< std::to_string(image_stats(filtered).average.sum()) << std::endl;
 
-    SpinLock lock;
-    std::map<int16_t, int8_t> candidates;
-    std::vector<std::unique_ptr<AsyncTask>> tasks(filtered.size());
-    // for (size_t c = 0; c < filtered.size(); c++){
-    //     filtered[c].first.save("DebugDumps/test-" + std::to_string(c) + ".png");
-    // }
-    for (size_t c = 0; c < filtered.size(); c++){
-        tasks[c] = dispatcher.dispatch([&, c]{
-            int num = OCR::read_number(logger, filtered[c].first);
-            WriteSpinLock lg(lock);
-            candidates[(int16_t)num]++;
-        });
-    }
-
-    //  Wait for everything.
-    for (auto& task : tasks){
-        task->wait_and_rethrow_exceptions();
-    }
-
-    std::pair<int16_t, int8_t> best;
-    std::pair<int16_t, int8_t> second_best;
-    for (const auto& item : candidates){
-        logger.log("Candidate OCR: " + std::to_string(item.first) + "; x" + std::to_string(item.second));
-        if (item.second >= best.second){
-            second_best = best;
-            best = item;
-        }
-        // std::cout << "Best: " << std::to_string(best.first) << "; x" << std::to_string(best.second) << std::endl;
-        // std::cout << "Second Best: " << std::to_string(second_best.first) << "; x" << std::to_string(second_best.second) << std::endl;
-    }
-
-    if (best.second > second_best.second + 3){
-        return best.first;
+    int16_t number;
+    if (is_dark_text_light_background){
+        number = (int16_t)OCR::read_number_waterfill(logger, cropped, 0xff000000, 0xff808080);
     }else{
-        logger.log("Ambiguous or multiple results with normal number OCR. Use Waterfill number OCR.");
-        if(is_white_text){
-            return (int16_t)OCR::read_number_waterfill(logger, cropped, 0xff808080, 0xffffffff);
-        }else{
-            return (int16_t)OCR::read_number_waterfill(logger, cropped, 0xff000000, 0xff808080);
-        }
+        number = (int16_t)OCR::read_number_waterfill(logger, cropped, 0xff808080, 0xffffffff);
     }
 
+    if (number < 1 || number > 999){
+        number = -1;
+    }
+    return (int16_t)number;
 }
+
 
 // return row number where Happiny dust is located on screen
 // keep pressing DPAD_RIGHT until Happiny dust is on screen
@@ -261,11 +192,16 @@ std::vector<int8_t> ItemPrinterMaterialDetector::find_material_value_row_index(
     VideoSnapshot snapshot = console.video().snapshot();
     int8_t total_rows = 10;
     std::vector<int8_t> row_indexes;
+    SpinLock lock;
+    std::vector<std::unique_ptr<AsyncTask>> tasks(total_rows);
     for (int8_t row_index = 0; row_index < total_rows; row_index++){
-        int16_t value = read_number(console, dispatcher, snapshot, m_box_mat_value[row_index]);
-        if (value == material_value){
-            row_indexes.push_back(row_index);
-        }
+        tasks[row_index] = dispatcher.dispatch([&, row_index]{
+            int16_t value = read_number(console, dispatcher, snapshot, m_box_mat_value[row_index]);
+            if (value == material_value){
+                WriteSpinLock lg(lock);
+                row_indexes.push_back(row_index);
+            }
+        });
     }
 
     return row_indexes;    
