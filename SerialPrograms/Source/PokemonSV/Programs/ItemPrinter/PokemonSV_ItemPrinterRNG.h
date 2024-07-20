@@ -56,11 +56,16 @@ private:
 
     void run_item_printer_rng(SingleSwitchProgramEnvironment& env, BotBaseContext& context, ItemPrinterRNG_Descriptor::Stats& stats);
 
-    std::vector<ItemPrinterRngRowSnapshot> get_print_table_from_desired_item_snapshot(const ItemPrinterDesiredItemRowSnapshot& desired_row);
+    std::vector<ItemPrinterRngRowSnapshot> desired_print_table(
+        ItemPrinter::PrebuiltOptions desired_item,
+        uint16_t quantity_to_print
+    );
 
     // return Ball bonus or item bonus, based on the desired_item
     // if the desired_item is a type of ball, return Ball Bonus, else return Item Bonus
     ItemPrinter::PrebuiltOptions get_bonus_type(ItemPrinter::PrebuiltOptions desired_item);
+
+    int16_t check_obtained_quantity(std::map<std::string, uint16_t> obtained_prizes, std::string desired_slug);
 
     // move from item printer to material farming, run material farmer, then 
     // return to item printer
@@ -71,7 +76,7 @@ private:
         MaterialFarmerOptions& material_farmer_options
     );
 
-    void run_print_at_date(
+    ItemPrinterPrizeResult run_print_at_date(
         SingleSwitchProgramEnvironment& env, BotBaseContext& context,
         const DateTime& date, ItemPrinterJobs jobs
     );

@@ -26,13 +26,18 @@ enum class ItemPrinterJobs{
 };
 const EnumDatabase<ItemPrinterJobs>& ItemPrinterJobs_Database();
 
+struct ItemPrinterPrizeResult{
+    std::array<std::string, 10> prizes;
+    std::array<int16_t, 10> quantities;
+};
+
 
 void item_printer_start_print(
     AsyncDispatcher& dispatcher,
     ConsoleHandle& console, BotBaseContext& context,
     Language language, ItemPrinterJobs jobs
 );
-std::array<std::string, 10> item_printer_finish_print(
+ItemPrinterPrizeResult item_printer_finish_print(
     AsyncDispatcher& dispatcher,
     ConsoleHandle& console, BotBaseContext& context,
     Language language
