@@ -134,6 +134,66 @@ std::vector<std::unique_ptr<EditableTableRow>> ItemPrinterRngTable::make_default
 }
 
 
+
+ItemPrinterDesiredItemRow::ItemPrinterDesiredItemRow(EditableTableOption& parent_table)
+    : EditableTableRow(parent_table)
+    , desired_item(
+        ItemPrinter::PrebuiltOptions_Simple_Database(),
+        LockMode::UNLOCK_WHILE_RUNNING,
+        ItemPrinter::PrebuiltOptions::EXP_CANDY
+    )
+    , desired_quantity(
+        "",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        999, 1, 999
+    )
+{
+    PA_ADD_OPTION(desired_item);
+    PA_ADD_OPTION(desired_quantity);
+
+}
+
+ItemPrinterDesiredItemRowSnapshot ItemPrinterDesiredItemRow::snapshot() const{
+    
+    return ItemPrinterDesiredItemRowSnapshot{desired_item, desired_quantity};
+}
+
+
+std::unique_ptr<EditableTableRow> ItemPrinterDesiredItemRow::clone() const{
+    std::unique_ptr<ItemPrinterDesiredItemRow> ret(new ItemPrinterDesiredItemRow(parent()));
+    ret->desired_item.set(desired_item);
+    ret->desired_quantity.set(desired_quantity);
+    return ret;
+}
+
+
+void ItemPrinterDesiredItemRow::value_changed(void* object){
+
+}
+
+ItemPrinterDesiredItemTable::ItemPrinterDesiredItemTable(std::string label)
+    : EditableTableOption_t<ItemPrinterDesiredItemRow>(
+        std::move(label),
+        LockMode::UNLOCK_WHILE_RUNNING
+    )
+{
+    //  Need to do this separately because this prematurely accesses the table.
+    set_default(make_defaults());
+    restore_defaults();
+}
+std::vector<std::string> ItemPrinterDesiredItemTable::make_header() const{
+    return std::vector<std::string>{
+        "Desired Item",
+        "Quantity",
+    };
+}
+std::vector<std::unique_ptr<EditableTableRow>> ItemPrinterDesiredItemTable::make_defaults(){
+    std::vector<std::unique_ptr<EditableTableRow>> ret;
+    // ret.emplace_back(std::make_unique<ItemPrinterRngRow>(*this, false, DateTime{2020,  3,  3,  6, 38, 18}, ItemPrinterJobs::Jobs_10));
+    return ret;
+}
+
+
 }
 }
 }
