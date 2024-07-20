@@ -309,12 +309,12 @@ bool ItemPrinterRNG::overlapping_bonus(){
 }
 
 
-void ItemPrinterRNG::run_print_at_date(
+ItemPrinterPrizeResult ItemPrinterRNG::run_print_at_date(
     SingleSwitchProgramEnvironment& env, BotBaseContext& context,
     const DateTime& date, ItemPrinterJobs jobs
 ){
     ItemPrinterRNG_Descriptor::Stats& stats = env.current_stats<ItemPrinterRNG_Descriptor::Stats>();
-
+    ItemPrinterPrizeResult prize_result;
     bool printed = false;
     bool overworld_seen = false;
     while (true){
@@ -340,7 +340,7 @@ void ItemPrinterRNG::run_print_at_date(
             overworld_seen = true;
             if (printed){
                 env.log("Detected overworld... (unexpected)", COLOR_RED);
-                return;
+                return prize_result;
             }
             env.log("Detected overworld... Starting print.");
             pbf_press_button(context, BUTTON_A, 20, 30);
@@ -405,7 +405,7 @@ void ItemPrinterRNG::run_print_at_date(
         case 4:{
             env.log("Detected material selection.");
             if (printed){
-                return;
+                return prize_result;
             }
             if (!overworld_seen){
                 pbf_press_button(context, BUTTON_B, 20, 30);
@@ -415,7 +415,8 @@ void ItemPrinterRNG::run_print_at_date(
             stats.prints++;
             env.update_stats();
             printed = true;
-            std::array<std::string, 10> print_results = item_printer_finish_print(env.inference_dispatcher(), env.console, context, LANGUAGE);
+            prize_result = item_printer_finish_print(env.inference_dispatcher(), env.console, context, LANGUAGE);
+            std::array<std::string, 10> print_results = prize_result.prizes;
             uint64_t seed = to_seconds_since_epoch(date);
             int distance_from_target = get_distance_from_target(env.console, stats, print_results, seed);
             env.update_stats();
@@ -650,56 +651,93 @@ void ItemPrinterRNG::run_item_printer_rng_simple(
     bool done_one_last_material_check_before_mat_farming = false;
     uint32_t material_farmer_jobs_period = calc_num_jobs_using_happiny_dust(env, context, min_happiny_dust);   
     bool have_cleared_out_bonus = false;
+    std::map<std::string, uint16_t> obtained_prizes;
 
     std::vector<ItemPrinterDesiredItemRowSnapshot> desired_table = TABLE1.snapshot<ItemPrinterDesiredItemRowSnapshot>();
     for (const ItemPrinterDesiredItemRowSnapshot& desired_row : desired_table){
-        std::vector<ItemPrinterRngRowSnapshot> print_table = get_print_table_from_desired_item_snapshot(desired_row);
-        if (!have_cleared_out_bonus){
-            // 2323229535, 8 Ability Patches, with no bonus active
-            // x2 Magnet, x9 Exp. Candy S, x7 Pretty Feather, x2 Ability Patch, x2 Ability Patch, 
-            // x7 Big Pearl, x1 Ability Patch, x1 Ability Patch, x16 Ground Tera Shard, x2 Ability Patch     
+        std::string desired_slug = ItemPrinter::PrebuiltOptions_Simple_Database().find(desired_row.item)->slug;
+        int16_t desired_quantity = desired_row.quantity;
+        int16_t obtained_quantity = check_obtained_quantity(obtained_prizes, desired_slug);
+        
+        while (obtained_quantity < desired_quantity){
+            int16_t quantity_to_print = desired_quantity - obtained_quantity;
+            std::vector<ItemPrinterRngRowSnapshot> print_table = desired_print_table(desired_row.item, quantity_to_print);
+            env.console.log(desired_slug + ": " + std::to_string(obtained_quantity) + "/" + std::to_string(desired_quantity));
+            if (!have_cleared_out_bonus){
+                // 2323229535, 8 Ability Patches, with no bonus active
+                // x2 Magnet, x9 Exp. Candy S, x7 Pretty Feather, x2 Ability Patch, x2 Ability Patch, 
+                // x7 Big Pearl, x1 Ability Patch, x1 Ability Patch, x16 Ground Tera Shard, x2 Ability Patch     
 
-            // start with printing out 10 just to clear out any lingering bonuses.       
-            ItemPrinterRngRowSnapshot print_10_items = {false, from_seconds_since_epoch(2323229535), ItemPrinterJobs::Jobs_10};
-            print_table.insert(print_table.begin(), print_10_items);
-            have_cleared_out_bonus = true;
-        }
-
-        for (const ItemPrinterRngRowSnapshot& row : print_table){
-           
-            if (jobs_counter < material_farmer_jobs_period){  //  Not ready to run material farmer yet.
-                run_print_at_date(env, context, row.date, row.jobs);
-                jobs_counter += (uint32_t)row.jobs;
-                env.console.log("Print job counter: " + std::to_string(jobs_counter) + "/" + std::to_string(material_farmer_jobs_period));
-                continue;
+                // start with printing out 10 just to clear out any lingering bonuses.       
+                ItemPrinterRngRowSnapshot print_10_items = {false, from_seconds_since_epoch(2323229535), ItemPrinterJobs::Jobs_10};
+                print_table.insert(print_table.begin(), print_10_items);
+                have_cleared_out_bonus = true;
             }
             
-            if (!done_one_last_material_check_before_mat_farming){
-                // one more material quantity check before material farming
-                // if still have material, keep using item printer
-                material_farmer_jobs_period = calc_num_jobs_using_happiny_dust(env, context, min_happiny_dust);
-                jobs_counter = 0;
-                done_one_last_material_check_before_mat_farming = true;
-                if (material_farmer_jobs_period > 0){
+            for (const ItemPrinterRngRowSnapshot& row : print_table){
+            
+                if (jobs_counter < material_farmer_jobs_period){  //  Not ready to run material farmer yet.
+                    ItemPrinterPrizeResult prize_result = run_print_at_date(env, context, row.date, row.jobs);
+                    std::array<std::string, 10> prizes = prize_result.prizes;
+                    std::array<int16_t, 10> quantities = prize_result.quantities;
+                    for (size_t i = 0; i < 10; i++){
+                        obtained_prizes[prizes[i]] += quantities[i];
+                    }
+
+                    jobs_counter += (uint32_t)row.jobs;
+                    env.console.log("Print job counter: " + std::to_string(jobs_counter) + "/" + std::to_string(material_farmer_jobs_period));
+                    env.console.log("Cumulative prize list:");
+                    for (const auto& prize : obtained_prizes){
+                        if (prize.first == ""){
+                            continue;
+                        }
+                        env.console.log(prize.first + ": " + std::to_string(prize.second));
+                    }                
+
                     continue;
-                }                
-            }            
+                }
+                
+                if (!done_one_last_material_check_before_mat_farming){
+                    // one more material quantity check before material farming
+                    // if still have material, keep using item printer
+                    material_farmer_jobs_period = calc_num_jobs_using_happiny_dust(env, context, min_happiny_dust);
+                    jobs_counter = 0;
+                    done_one_last_material_check_before_mat_farming = true;
+                    if (material_farmer_jobs_period > 0){
+                        continue;
+                    }                
+                }            
 
-            //  Run the material farmer.
-            run_material_farming_then_return_to_item_printer(env, context, stats, material_farmer_options);
+                //  Run the material farmer.
+                run_material_farming_then_return_to_item_printer(env, context, stats, material_farmer_options);
 
-            // Recheck number of Happiny Dust after returning from Material Farming,
-            // prior to restarting Item printing
-            material_farmer_jobs_period = calc_num_jobs_using_happiny_dust(env, context, min_happiny_dust);
-            done_one_last_material_check_before_mat_farming = false;
-            
-            jobs_counter = 0;    
-            
+                // Recheck number of Happiny Dust after returning from Material Farming,
+                // prior to restarting Item printing
+                material_farmer_jobs_period = calc_num_jobs_using_happiny_dust(env, context, min_happiny_dust);
+                done_one_last_material_check_before_mat_farming = false;
+                
+                jobs_counter = 0;    
+                
+            }
+
+            obtained_quantity = check_obtained_quantity(obtained_prizes, desired_slug);
         }
+
+        
         // stats.iterations++;
         // env.update_stats();
     }
   
+}
+
+int16_t ItemPrinterRNG::check_obtained_quantity(std::map<std::string, uint16_t> obtained_prizes, std::string desired_slug){
+    int16_t obtained_quantity = 0;
+    auto prize_iter = obtained_prizes.find(desired_slug);
+    if (prize_iter != obtained_prizes.end()){
+        obtained_quantity = prize_iter->second;
+    }
+
+    return obtained_quantity;
 }
 
 
@@ -722,15 +760,16 @@ void ItemPrinterRNG::run_material_farming_then_return_to_item_printer(
 
 }
 
-std::vector<ItemPrinterRngRowSnapshot> ItemPrinterRNG::get_print_table_from_desired_item_snapshot(const ItemPrinterDesiredItemRowSnapshot& desired_row){
-    uint16_t desired_quantity = desired_row.quantity;
-    ItemPrinter::PrebuiltOptions desired_item = desired_row.item;
+std::vector<ItemPrinterRngRowSnapshot> ItemPrinterRNG::desired_print_table(
+    ItemPrinter::PrebuiltOptions desired_item,
+    uint16_t quantity_to_print
+){
     ItemPrinter::ItemPrinterEnumOption desired_enum_option = option_lookup_by_enum(desired_item);
 
     // one bonus bundle is Item/Ball Bonus -> 5 print -> 5 print
     // quantity_obtained stores the quantity of the desired item that
     // is produced with one 5 print, with the bonus active.
-    uint16_t num_bonus_bundles = (desired_quantity + (desired_enum_option.quantity_obtained * 2) - 1)/(desired_enum_option.quantity_obtained * 2); // round up after dividing
+    uint16_t num_bonus_bundles = (quantity_to_print + (desired_enum_option.quantity_obtained * 2) - 1)/(desired_enum_option.quantity_obtained * 2); // round up after dividing
 
     ItemPrinter::PrebuiltOptions bonus_type = get_bonus_type(desired_item);
     ItemPrinter::ItemPrinterEnumOption bonus_enum_option = option_lookup_by_enum(bonus_type);
@@ -740,7 +779,9 @@ std::vector<ItemPrinterRngRowSnapshot> ItemPrinterRNG::get_print_table_from_desi
     std::vector<ItemPrinterRngRowSnapshot> print_table;
     for (size_t i = 0; i < num_bonus_bundles; i++){
         print_table.push_back(bonus_snapshot);
-        print_table.push_back(desired_item_snapshot);
+        // - we assume all the desired item prints are 5 prints,
+        // since all the single item prints stored in the database are 5 prints.
+        print_table.push_back(desired_item_snapshot); 
         print_table.push_back(desired_item_snapshot);
     }
 
