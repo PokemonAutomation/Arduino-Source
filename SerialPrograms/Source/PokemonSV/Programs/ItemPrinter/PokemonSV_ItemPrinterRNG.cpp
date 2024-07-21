@@ -675,29 +675,29 @@ void ItemPrinterRNG::run_item_printer_rng_simple(
             }
             
             for (const ItemPrinterRngRowSnapshot& row : print_table){
-            
+                env.console.log(desired_slug + ": " + std::to_string(check_obtained_quantity(obtained_prizes, desired_slug)) + "/" + std::to_string(desired_quantity));
+
                 // check if need to run material farmer
-                if (jobs_counter >= material_farmer_jobs_period){ 
+                while (jobs_counter >= material_farmer_jobs_period){ 
                     if (!done_one_last_material_check_before_mat_farming){
                         // one more material quantity check before material farming
                         // if still have material, keep using item printer
                         material_farmer_jobs_period = calc_num_jobs_using_happiny_dust(env, context, min_happiny_dust);
                         jobs_counter = 0;
                         done_one_last_material_check_before_mat_farming = true;
+                        continue;
                     }
 
-                    if (jobs_counter >= material_farmer_jobs_period){ 
-                        //  Run the material farmer.
-                        run_material_farming_then_return_to_item_printer(env, context, stats, material_farmer_options);
+                    //  Run the material farmer.
+                    run_material_farming_then_return_to_item_printer(env, context, stats, material_farmer_options);
 
-                        // Recheck number of Happiny Dust after returning from Material Farming,
-                        // prior to restarting Item printing
-                        material_farmer_jobs_period = calc_num_jobs_using_happiny_dust(env, context, min_happiny_dust);
-                        jobs_counter = 0;
-                        done_one_last_material_check_before_mat_farming = false;
-                    }    
+                    // Recheck number of Happiny Dust after returning from Material Farming,
+                    // prior to restarting Item printing
+                    material_farmer_jobs_period = calc_num_jobs_using_happiny_dust(env, context, min_happiny_dust);
+                    jobs_counter = 0;
+                    done_one_last_material_check_before_mat_farming = false;
                 }
-                
+
                 ItemPrinterPrizeResult prize_result = run_print_at_date(env, context, row.date, row.jobs);
                 std::array<std::string, 10> prizes = prize_result.prizes;
                 std::array<int16_t, 10> quantities = prize_result.quantities;
