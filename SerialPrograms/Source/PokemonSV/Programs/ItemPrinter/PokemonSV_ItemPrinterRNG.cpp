@@ -118,11 +118,11 @@ ItemPrinterRNG::ItemPrinterRNG()
     , MODE(
         "<b>Item Printer mode:</b><br>",
         {
-            {ItemPrinterMode::SIMPLE_MODE, "simple", "Simple Mode: Select your desired item and its quantity, and items will be automatically printed."},
+            {ItemPrinterMode::AUTO_MODE, "auto", "Auto Mode: Select your desired item and its quantity, and items will be automatically printed."},
             {ItemPrinterMode::STANDARD_MODE, "standard", "Standard Mode: Manually select exactly what is being printed for each print job."},
         },
         LockMode::UNLOCK_WHILE_RUNNING,
-        ItemPrinterMode::SIMPLE_MODE
+        ItemPrinterMode::AUTO_MODE
     )
     , TABLE1(
         "<b>Item Table:</b><br>"
@@ -236,47 +236,47 @@ ItemPrinterRNG::ItemPrinterRNG()
 void ItemPrinterRNG::value_changed(void* object){
 
     NUM_ITEM_PRINTER_ROUNDS.set_visibility(
-        MODE == ItemPrinterMode::SIMPLE_MODE ? ConfigOptionState::HIDDEN : ConfigOptionState::ENABLED
+        MODE == ItemPrinterMode::AUTO_MODE ? ConfigOptionState::HIDDEN : ConfigOptionState::ENABLED
     );
 
     OVERLAPPING_BONUS_WARNING.set_visibility(
-        (MODE != ItemPrinterMode::SIMPLE_MODE) && overlapping_bonus()
+        (MODE != ItemPrinterMode::AUTO_MODE) && overlapping_bonus()
         ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN
     );
 
     TABLE1.set_visibility(
-        MODE == ItemPrinterMode::SIMPLE_MODE ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN
+        MODE == ItemPrinterMode::AUTO_MODE ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN
     );
 
     TABLE0.set_visibility(
-        MODE == ItemPrinterMode::SIMPLE_MODE ? ConfigOptionState::HIDDEN : ConfigOptionState::ENABLED
+        MODE == ItemPrinterMode::AUTO_MODE ? ConfigOptionState::HIDDEN : ConfigOptionState::ENABLED
     );
 
     ADJUST_DELAY.set_visibility(
-        MODE == ItemPrinterMode::SIMPLE_MODE ? ConfigOptionState::HIDDEN : ConfigOptionState::ENABLED
+        MODE == ItemPrinterMode::AUTO_MODE ? ConfigOptionState::HIDDEN : ConfigOptionState::ENABLED
     );
 
     MATERIAL_FARMER_TRIGGER.set_visibility(
-        (MODE != ItemPrinterMode::SIMPLE_MODE) && MATERIAL_FARMER_OPTIONS.enabled()
+        (MODE != ItemPrinterMode::AUTO_MODE) && MATERIAL_FARMER_OPTIONS.enabled()
         ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN
     );
 
     MATERIAL_FARMER_FIXED_NUM_JOBS.set_visibility(
-        (MODE != ItemPrinterMode::SIMPLE_MODE) && MATERIAL_FARMER_OPTIONS.enabled() && (MATERIAL_FARMER_TRIGGER == MaterialFarmerTrigger::FIXED_NUM_PRINT_JOBS)
+        (MODE != ItemPrinterMode::AUTO_MODE) && MATERIAL_FARMER_OPTIONS.enabled() && (MATERIAL_FARMER_TRIGGER == MaterialFarmerTrigger::FIXED_NUM_PRINT_JOBS)
         ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN
     );    
 
     MIN_HAPPINY_DUST.set_visibility(
-        (MODE != ItemPrinterMode::SIMPLE_MODE) && MATERIAL_FARMER_OPTIONS.enabled() && (MATERIAL_FARMER_TRIGGER == MaterialFarmerTrigger::MINIMUM_HAPPINY_DUST)
+        (MODE != ItemPrinterMode::AUTO_MODE) && MATERIAL_FARMER_OPTIONS.enabled() && (MATERIAL_FARMER_TRIGGER == MaterialFarmerTrigger::MINIMUM_HAPPINY_DUST)
         ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN
     );
 
     MATERIAL_FARMER_OPTIONS.set_visibility(
-        MODE == ItemPrinterMode::SIMPLE_MODE ? ConfigOptionState::HIDDEN : ConfigOptionState::ENABLED
+        MODE == ItemPrinterMode::AUTO_MODE ? ConfigOptionState::HIDDEN : ConfigOptionState::ENABLED
     );
 
     ENABLE_SEED_CALC.set_visibility(
-        MODE == ItemPrinterMode::SIMPLE_MODE ? ConfigOptionState::HIDDEN : ConfigOptionState::ENABLED
+        MODE == ItemPrinterMode::AUTO_MODE ? ConfigOptionState::HIDDEN : ConfigOptionState::ENABLED
     );
 
 }
@@ -420,7 +420,7 @@ ItemPrinterPrizeResult ItemPrinterRNG::run_print_at_date(
             uint64_t seed = to_seconds_since_epoch(date);
             int distance_from_target = get_distance_from_target(env.console, stats, print_results, seed);
             env.update_stats();
-            if ((ADJUST_DELAY || MODE == ItemPrinterMode::SIMPLE_MODE) &&
+            if ((ADJUST_DELAY || MODE == ItemPrinterMode::AUTO_MODE) &&
                 distance_from_target != 0 &&
                 distance_from_target != std::numeric_limits<int>::min()
             ){
@@ -481,7 +481,7 @@ int ItemPrinterRNG::get_distance_from_target(
     const int MAX_DEVIATION = 10;
     for (int current_deviation = 0; current_deviation <= MAX_DEVIATION; current_deviation++){
         ItemPrinter::DateSeed seed_data;
-        if (ENABLE_SEED_CALC || MODE == ItemPrinterMode::SIMPLE_MODE){
+        if (ENABLE_SEED_CALC || MODE == ItemPrinterMode::AUTO_MODE){
             seed_data = ItemPrinter::calculate_seed_prizes(seed - current_deviation);
         }else{
             seed_data = ItemPrinter::get_date_seed(seed - current_deviation);
@@ -498,7 +498,7 @@ int ItemPrinterRNG::get_distance_from_target(
             continue;
         }
 
-        if (ENABLE_SEED_CALC || MODE == ItemPrinterMode::SIMPLE_MODE){
+        if (ENABLE_SEED_CALC || MODE == ItemPrinterMode::AUTO_MODE){
             seed_data = ItemPrinter::calculate_seed_prizes(seed + current_deviation);
         }else{
             seed_data = ItemPrinter::get_date_seed(seed + current_deviation);
@@ -617,7 +617,7 @@ void ItemPrinterRNG::print_again(
     }
 }
 
-void ItemPrinterRNG::run_item_printer_rng_simple(
+void ItemPrinterRNG::run_item_printer_rng_automode(
     SingleSwitchProgramEnvironment& env, 
     BotBaseContext& context, 
     ItemPrinterRNG_Descriptor::Stats& stats
@@ -655,7 +655,7 @@ void ItemPrinterRNG::run_item_printer_rng_simple(
 
     std::vector<ItemPrinterDesiredItemRowSnapshot> desired_table = TABLE1.snapshot<ItemPrinterDesiredItemRowSnapshot>();
     for (const ItemPrinterDesiredItemRowSnapshot& desired_row : desired_table){
-        std::string desired_slug = ItemPrinter::PrebuiltOptions_Simple_Database().find(desired_row.item)->slug;
+        std::string desired_slug = ItemPrinter::PrebuiltOptions_AutoMode_Database().find(desired_row.item)->slug;
         int16_t desired_quantity = desired_row.quantity;
         int16_t obtained_quantity = check_obtained_quantity(obtained_prizes, desired_slug);
         
@@ -794,9 +794,9 @@ std::vector<ItemPrinterRngRowSnapshot> ItemPrinterRNG::desired_print_table(
 
 
 ItemPrinter::PrebuiltOptions ItemPrinterRNG::get_bonus_type(ItemPrinter::PrebuiltOptions desired_item){
-    // EnumDatabase<ItemPrinter::PrebuiltOptions> database = ItemPrinter::PrebuiltOptions_Simple_Database();
+    // EnumDatabase<ItemPrinter::PrebuiltOptions> database = ItemPrinter::PrebuiltOptions_AutoMode_Database();
     // std::string slug = database.find(desired_item)->slug;
-    std::string slug = ItemPrinter::PrebuiltOptions_Simple_Database().find(desired_item)->slug;
+    std::string slug = ItemPrinter::PrebuiltOptions_AutoMode_Database().find(desired_item)->slug;
     // cout << slug << endl;
     if (slug.find("ball") != std::string::npos){
         return ItemPrinter::PrebuiltOptions::BALL_BONUS;
@@ -1000,7 +1000,7 @@ void ItemPrinterRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext
     env.update_stats();
 
 
-    if (MODE == ItemPrinterMode::SIMPLE_MODE || MATERIAL_FARMER_OPTIONS.enabled()){
+    if (MODE == ItemPrinterMode::AUTO_MODE || MATERIAL_FARMER_OPTIONS.enabled()){
         // - Ensure audio input is enabled
         LetsGoKillSoundDetector audio_detector(env.console, [](float){ return true; });
         wait_until(
@@ -1012,8 +1012,8 @@ void ItemPrinterRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext
     }
 
     try{
-        if (MODE == ItemPrinterMode::SIMPLE_MODE){
-            run_item_printer_rng_simple(env, context, stats);
+        if (MODE == ItemPrinterMode::AUTO_MODE){
+            run_item_printer_rng_automode(env, context, stats);
         }else{
             run_item_printer_rng(env, context, stats);
         }
