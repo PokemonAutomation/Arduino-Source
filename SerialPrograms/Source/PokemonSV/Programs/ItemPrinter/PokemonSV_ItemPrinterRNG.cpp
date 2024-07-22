@@ -121,14 +121,15 @@ ItemPrinterRNG::ItemPrinterRNG()
             {ItemPrinterMode::AUTO_MODE, "auto", "Auto Mode: Select your desired item and its quantity, and items will be automatically printed."},
             {ItemPrinterMode::STANDARD_MODE, "standard", "Standard Mode: Manually select exactly what is being printed for each print job."},
         },
-        LockMode::UNLOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         ItemPrinterMode::AUTO_MODE
     )
     , TABLE1(
         "<b>Item Table:</b><br>"
         "Input your desired item and desired quantity to the table.<br>"
-        "Ensure you have enough BP and are maxed out on the following sandwich ingredients: Chorizo, Bananas, Mayonnaise, Whipped Cream.<br>"
-        "Changes to this table will not affect the program while it is running."
+        "Ensure you have enough BP and are maxed out on the following sandwich ingredients: Chorizo, Bananas, Mayonnaise, Whipped Cream. "
+        "Also, ensure you have a strong lead pokemon for auto-battling, for farming materials.<br>"
+        "If there are duplicate items in the table, only the higher quantity will be considered."
     )
     , TABLE0(
         "<b>Rounds Table:</b><br>Run the following prints in order and repeat. "
