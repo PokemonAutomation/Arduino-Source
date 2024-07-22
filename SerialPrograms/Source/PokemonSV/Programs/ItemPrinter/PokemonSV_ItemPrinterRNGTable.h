@@ -71,6 +71,11 @@ public:
 
     ItemPrinterDesiredItemRow(EditableTableOption& parent_table);
 
+    ItemPrinterDesiredItemRow(
+        EditableTableOption& parent_table,
+        ItemPrinter::PrebuiltOptions item, uint16_t quantity
+    );
+
     ItemPrinterDesiredItemRowSnapshot snapshot() const;
 
     virtual std::unique_ptr<EditableTableRow> clone() const override;
