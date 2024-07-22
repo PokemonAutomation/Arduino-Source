@@ -65,7 +65,7 @@ enum class PrebuiltOptions{
 };
 const EnumDatabase<PrebuiltOptions>& PrebuiltOptions_Database();
 
-const EnumDatabase<PrebuiltOptions>& PrebuiltOptions_Simple_Database();
+const EnumDatabase<PrebuiltOptions>& PrebuiltOptions_AutoMode_Database();
 
 const EnumDatabase<PrebuiltOptions>& PrebuiltOptions_Simple_Database2();
 

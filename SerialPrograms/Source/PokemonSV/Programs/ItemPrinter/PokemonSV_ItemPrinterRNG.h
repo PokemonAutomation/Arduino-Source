@@ -44,7 +44,7 @@ private:
     };
 
     enum class ItemPrinterMode{
-        SIMPLE_MODE,
+        AUTO_MODE,
         STANDARD_MODE
     };
 
@@ -52,7 +52,7 @@ private:
 
     bool overlapping_bonus();
 
-    void run_item_printer_rng_simple(SingleSwitchProgramEnvironment& env, BotBaseContext& context, ItemPrinterRNG_Descriptor::Stats& stats);
+    void run_item_printer_rng_automode(SingleSwitchProgramEnvironment& env, BotBaseContext& context, ItemPrinterRNG_Descriptor::Stats& stats);
 
     void run_item_printer_rng(SingleSwitchProgramEnvironment& env, BotBaseContext& context, ItemPrinterRNG_Descriptor::Stats& stats);
 

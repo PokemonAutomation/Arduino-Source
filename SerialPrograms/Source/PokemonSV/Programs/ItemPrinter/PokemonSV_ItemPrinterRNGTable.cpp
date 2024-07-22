@@ -138,7 +138,7 @@ std::vector<std::unique_ptr<EditableTableRow>> ItemPrinterRngTable::make_default
 ItemPrinterDesiredItemRow::ItemPrinterDesiredItemRow(EditableTableOption& parent_table)
     : EditableTableRow(parent_table)
     , desired_item(
-        ItemPrinter::PrebuiltOptions_Simple_Database(),
+        ItemPrinter::PrebuiltOptions_AutoMode_Database(),
         LockMode::UNLOCK_WHILE_RUNNING,
         ItemPrinter::PrebuiltOptions::EXP_CANDY
     )

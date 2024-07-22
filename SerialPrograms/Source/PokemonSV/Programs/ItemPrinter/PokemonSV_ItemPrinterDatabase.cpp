@@ -68,7 +68,7 @@ const EnumDatabase<PrebuiltOptions>& PrebuiltOptions_Database(){
     return database;
 }
 
-const EnumDatabase<PrebuiltOptions>& PrebuiltOptions_Simple_Database(){
+const EnumDatabase<PrebuiltOptions>& PrebuiltOptions_AutoMode_Database(){
     static const EnumDatabase<PrebuiltOptions> database({
 
         // ordered by category
