@@ -128,12 +128,12 @@ std::array<int16_t, 10> ItemPrinterPrizeReader::read_quantity(
     Logger& logger, AsyncDispatcher& dispatcher,
     const ImageViewRGB32& screen
 ) const{
-    int8_t total_rows = 10;
+    size_t total_rows = 10;
 
     // determine whether to use normal or bonus boxes for OCR
     double total_average_sum_normal = 0;
     double total_average_sum_bonus = 0;
-    for (int8_t i = 0; i < total_rows; i++){
+    for (size_t i = 0; i < total_rows; i++){
         total_average_sum_normal += average_sum_filtered(screen, m_boxes_normal[i]);
         total_average_sum_bonus += average_sum_filtered(screen, m_boxes_bonus[i]);
     }
@@ -144,7 +144,7 @@ std::array<int16_t, 10> ItemPrinterPrizeReader::read_quantity(
 
     std::array<int16_t, 10> results;
     std::vector<std::unique_ptr<AsyncTask>> tasks(total_rows);
-    for (int8_t i = 0; i < total_rows; i++){
+    for (size_t i = 0; i < total_rows; i++){
         // ImageRGB32 filtered = to_blackwhite_rgb32_range(
         //     extract_box_reference(screen, m_boxes_bonus_quantity[i]),
         //     0xff808000, 0xffffffff,
