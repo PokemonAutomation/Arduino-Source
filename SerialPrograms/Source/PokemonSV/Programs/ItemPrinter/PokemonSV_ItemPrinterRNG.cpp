@@ -663,7 +663,6 @@ void ItemPrinterRNG::run_item_printer_rng_automode(
         while (obtained_quantity < desired_quantity){
             int16_t quantity_to_print = desired_quantity - obtained_quantity;
             std::vector<ItemPrinterRngRowSnapshot> print_table = desired_print_table(desired_row.item, quantity_to_print);
-            env.console.log(desired_slug + ": " + std::to_string(obtained_quantity) + "/" + std::to_string(desired_quantity));
             if (!have_cleared_out_bonus){
                 // 2323229535, 8 Ability Patches, with no bonus active
                 // x2 Magnet, x9 Exp. Candy S, x7 Pretty Feather, x2 Ability Patch, x2 Ability Patch, 
@@ -783,7 +782,7 @@ std::vector<ItemPrinterRngRowSnapshot> ItemPrinterRNG::desired_print_table(
         print_table.push_back(desired_item_snapshot);
     }
 
-    cout << "Total number of bonus bundles: " << num_bonus_bundles << endl;
+    // cout << "Total number of bonus bundles: " << num_bonus_bundles << endl;
     // for (const ItemPrinterRngRowSnapshot& row : print_table){
     //     cout << (int)row.jobs << ": ";
     //     std::cout << row.date.year << "-" << (int)row.date.month << "-" << (int)row.date.day << " ";
