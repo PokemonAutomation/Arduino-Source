@@ -138,8 +138,8 @@ std::array<int16_t, 10> ItemPrinterPrizeReader::read_quantity(
         total_average_sum_bonus += average_sum_filtered(screen, m_boxes_bonus[i]);
     }
 
-    std::cout << "total_average_sum_normal: " << std::to_string(total_average_sum_normal) << std::endl;
-    std::cout << "total_average_sum_bonus: " << std::to_string(total_average_sum_bonus) << std::endl;
+    // std::cout << "total_average_sum_normal: " << std::to_string(total_average_sum_normal) << std::endl;
+    // std::cout << "total_average_sum_bonus: " << std::to_string(total_average_sum_bonus) << std::endl;
 
 
     std::array<int16_t, 10> results;
