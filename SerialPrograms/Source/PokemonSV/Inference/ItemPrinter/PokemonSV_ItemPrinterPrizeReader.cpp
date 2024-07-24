@@ -141,6 +141,9 @@ std::array<int16_t, 10> ItemPrinterPrizeReader::read_quantity(
     // std::cout << "total_average_sum_normal: " << std::to_string(total_average_sum_normal) << std::endl;
     // std::cout << "total_average_sum_bonus: " << std::to_string(total_average_sum_bonus) << std::endl;
 
+    const std::array<ImageFloatBox, 10>& boxes = (total_average_sum_normal > total_average_sum_bonus) 
+                                                    ? m_boxes_bonus_quantity 
+                                                    : m_boxes_normal_quantity;
 
     std::array<int16_t, 10> results;
     std::vector<std::unique_ptr<AsyncTask>> tasks(total_rows);
@@ -153,11 +156,7 @@ std::array<int16_t, 10> ItemPrinterPrizeReader::read_quantity(
         // filtered.save("DebugDumps/test"+ std::to_string(i) +".png");   
 
         tasks[i] = dispatcher.dispatch([&, i]{
-            if (total_average_sum_normal > total_average_sum_bonus){
-                results[i] = read_number(logger, screen, m_boxes_normal_quantity[i]);
-            }else{
-                results[i] = read_number(logger, screen, m_boxes_bonus_quantity[i]);
-            }
+            results[i] = read_number(logger, screen, boxes[i]);
         });
     }
 
