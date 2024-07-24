@@ -270,22 +270,81 @@ OCR::StringMatchResult SandwichCondimentOCR::read_substring(
     );
 }
 
-SandwichIngredientReader::SandwichIngredientReader(SandwichIngredientType ingredient_type, size_t index, Color color)
+SandwichIngredientReader::SandwichIngredientReader(SandwichIngredientType ingredient_type, Color color)
     : m_color(color)
-    , m_icon_box(0.064, 0.179 + 0.074 * index, 0.032, 0.057)
-    , m_text_box(0.100, 0.179 + 0.074 * index, 0.273, 0.057)
     , m_ingredient_type(ingredient_type)
+    , m_box_ingred_text(ingredient_list_boxes(ImageFloatBox(0.100, 0.179, 0.273, 0.057)))
+    , m_box_ingred_icon(ingredient_list_boxes(ImageFloatBox(0.064, 0.179, 0.032, 0.057)))
+    , m_box_confirmed(confirmed_ingredient_boxes(ingredient_type))
 {}
 
 void SandwichIngredientReader::make_overlays(VideoOverlaySet& items) const{
-    items.add(m_color, m_icon_box);
-    items.add(m_color, m_text_box);
+    for (size_t c = 0; c < INGREDIENT_PAGE_LINES; c++){
+        items.add(m_color, m_box_ingred_text[c]);
+        items.add(m_color, m_box_ingred_icon[c]);
+    }
+
+    for (size_t i = 0; i < m_box_confirmed.size(); i++){
+        items.add(m_color, m_box_confirmed[i]);
+    }
 }
 
-ImageMatch::ImageMatchResult SandwichIngredientReader::read_with_icon_matcher(const ImageViewRGB32& screen) const{
+
+std::array<ImageFloatBox, 6> SandwichIngredientReader::confirmed_ingredient_boxes(SandwichIngredientType type){
+    std::array<ImageFloatBox, 6> boxes;
+    ImageFloatBox initial_box;
+    size_t total_count = 0;
+    switch (type){
+    case SandwichIngredientType::FILLING:
+        initial_box = ImageFloatBox(0.508781, 0.820, 0.032, 0.057);
+        total_count = 6;
+        break;
+    case SandwichIngredientType::CONDIMENT:
+        initial_box = ImageFloatBox(0.797474, 0.820, 0.032, 0.057);
+        total_count = 4;
+        break;
+    }
+    
+    double initial_x = initial_box.x;
+    double width = initial_box.width;
+    double height = initial_box.height;
+    double y = initial_box.y;
+    double x_spacing = 0.0468;
+    for (size_t i = 0; i < total_count; i++){
+        double x = initial_x + i*x_spacing;
+        boxes[i] = ImageFloatBox(x, y, width, height);
+    }
+    return boxes;
+}
+
+
+std::array<ImageFloatBox, 10> SandwichIngredientReader::ingredient_list_boxes(ImageFloatBox initial_box){
+    std::array<ImageFloatBox, 10> material_boxes;
+    double x = initial_box.x;
+    double width = initial_box.width;
+    double height = initial_box.height;
+    double initial_y = initial_box.y;
+    double y_spacing = 0.074;
+    for (size_t i = 0; i < 10; i++){
+        double y = initial_y + i*y_spacing;
+        material_boxes[i] = ImageFloatBox(x, y, width, height);
+    }
+    return material_boxes;
+}
+
+
+ImageMatch::ImageMatchResult SandwichIngredientReader::read_ingredient_page_with_icon_matcher(const ImageViewRGB32& screen, size_t index) const{
+    return read_with_icon_matcher(screen, m_box_ingred_icon[index]);
+}
+
+ImageMatch::ImageMatchResult SandwichIngredientReader::read_confirmed_list_with_icon_matcher(const ImageViewRGB32& screen, size_t index) const{
+    return read_with_icon_matcher(screen, m_box_confirmed[index]);
+}
+
+ImageMatch::ImageMatchResult SandwichIngredientReader::read_with_icon_matcher(const ImageViewRGB32& screen, const ImageFloatBox icon_box) const{
     // Get a crop of the sandwich ingredient icon
-    ImageViewRGB32 image = extract_box_reference(screen, m_icon_box);
-//    image.save("image.png");
+    ImageViewRGB32 image = extract_box_reference(screen, icon_box);
+//    image.save("image" + std::to_string(icon_box.x) + ".png");
 
 //    // Remove the orange / yellow background when the ingredient is selected
 //    ImageRGB32 filtered_image = filter_rgb32_range(image, 0xffdfaf00, 0xffffef20, Color(0x00000000), true);
@@ -307,9 +366,24 @@ ImageMatch::ImageMatchResult SandwichIngredientReader::read_with_icon_matcher(co
     return results;
 }
 
-OCR::StringMatchResult SandwichIngredientReader::read_with_ocr(const ImageViewRGB32& screen, Logger& logger, Language language) const{
+OCR::StringMatchResult SandwichIngredientReader::read_ingredient_page_with_ocr(
+    const ImageViewRGB32& screen, 
+    Logger& logger, 
+    Language language, 
+    size_t index
+) const{
+    return read_with_ocr(screen, logger, language, m_box_ingred_text[index]);
+}
+
+OCR::StringMatchResult SandwichIngredientReader::read_with_ocr(
+    const ImageViewRGB32& screen, 
+    Logger& logger, 
+    Language language, 
+    const ImageFloatBox icon_box
+) const{
+
     // Get a crop of the sandwich ingredient text
-    ImageViewRGB32 image = extract_box_reference(screen, m_text_box);
+    ImageViewRGB32 image = extract_box_reference(screen, icon_box);
     //image.save("image.png");
 
     OCR::StringMatchResult results;

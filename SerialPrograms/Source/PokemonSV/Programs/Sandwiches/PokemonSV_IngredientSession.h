@@ -24,12 +24,12 @@ namespace PokemonSV{
 class SandwichIngredientReader;
 
 
-static constexpr size_t INGREDIENT_PAGE_LINES = 10;
+
 
 struct PageIngredients{
     // the line index of the current selected ingredient, < INGREDIENT_PAGE_LINES
     int8_t selected = -1;
-    std::set<std::string> item[INGREDIENT_PAGE_LINES];
+    std::set<std::string> item[SandwichIngredientReader::INGREDIENT_PAGE_LINES];
 };
 
 
@@ -49,7 +49,7 @@ public:
     void add_ingredients(
         ConsoleHandle& console, BotBaseContext& context,
         std::map<std::string, uint8_t>&& ingredients
-    ) const;
+    );
 
 
 public:
@@ -67,7 +67,8 @@ private:
     BotBaseContext& m_context;
     Language m_language;
     VideoOverlaySet m_overlays;
-    FixedLimitVector<SandwichIngredientReader> m_ingredients;
+    SandwichIngredientType m_type;
+    int8_t m_num_confirmed;
     GradientArrowDetector m_arrow;
 };
 
