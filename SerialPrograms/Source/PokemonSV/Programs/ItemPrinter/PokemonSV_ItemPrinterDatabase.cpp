@@ -8,6 +8,7 @@
 #include <map>
 #include "Common/Cpp/Exceptions.h"
 #include "PokemonSV_ItemPrinterDatabase.h"
+#include <iostream>
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -23,7 +24,7 @@ const EnumDatabase<PrebuiltOptions>& PrebuiltOptions_Database(){
 
         // ordered by category
         {PrebuiltOptions::ABILITY_PATCH, "ability-patch", "Ability patch"},
-        {PrebuiltOptions::EXP_CANDY, "exp-candy", "Exp Candy"},
+        {PrebuiltOptions::EXP_CANDY, "exp-candy-xl", "Exp Candy"},
         {PrebuiltOptions::PP_MAX, "pp-max", "PP Max"},
 
         {PrebuiltOptions::ASSORTED_BALLS_1, "assorted-balls-1", "Assorted Balls 1"},
@@ -43,25 +44,70 @@ const EnumDatabase<PrebuiltOptions>& PrebuiltOptions_Database(){
         {PrebuiltOptions::SAFARI_BALL, "safari-ball", "Safari Ball"},
         {PrebuiltOptions::BEAST_BALL, "beast-ball", "Beast Ball"},
 
-        {PrebuiltOptions::BUG_TERA, "bug-tera", "Bug Tera Shard"},
-        {PrebuiltOptions::DARK_TERA, "dark-tera", "Dark Tera Shard"},
-        {PrebuiltOptions::DRAGON_TERA, "dragon-tera", "Dragon Tera Shard"},
-        {PrebuiltOptions::ELECTRIC_TERA, "electric-tera", "Electric Tera Shard"},
-        {PrebuiltOptions::FAIRY_TERA, "fairy-tera", "Fairy Tera Shard"},
-        {PrebuiltOptions::FIGHTING_TERA, "fighting-tera", "Fighting Tera Shard"},
-        {PrebuiltOptions::FIRE_TERA, "fire-tera", "Fire Tera Shard"},
-        {PrebuiltOptions::FLYING_TERA, "flying-tera", "Flying Tera Shard"},
-        {PrebuiltOptions::GHOST_TERA, "ghost-tera", "Ghost Tera Shard"},
-        {PrebuiltOptions::GRASS_TERA, "grass-tera", "Grass Tera Shard"},
-        {PrebuiltOptions::GROUND_TERA, "ground-tera", "Ground Tera Shard"},
-        {PrebuiltOptions::ICE_TERA, "ice-tera", "Ice Tera Shard"},
-        {PrebuiltOptions::NORMAL_TERA, "normal-tera", "Normal Tera Shard"},
-        {PrebuiltOptions::POISON_TERA, "poison-tera", "Poison Tera Shard"},
-        {PrebuiltOptions::PSYCHIC_TERA, "psychic-tera", "Psychic Tera Shard"},
-        {PrebuiltOptions::ROCK_TERA, "rock-tera", "Rock Tera Shard"},
-        {PrebuiltOptions::STEEL_TERA, "steel-tera", "Steel Tera Shard"},
-        {PrebuiltOptions::WATER_TERA, "water-tera", "Water Tera Shard"},
-        {PrebuiltOptions::STELLAR_TERA, "stellar-tera", "Stellar Tera Shard"},
+        {PrebuiltOptions::BUG_TERA, "bug-tera-shard", "Bug Tera Shard"},
+        {PrebuiltOptions::DARK_TERA, "dark-tera-shard", "Dark Tera Shard"},
+        {PrebuiltOptions::DRAGON_TERA, "dragon-tera-shard", "Dragon Tera Shard"},
+        {PrebuiltOptions::ELECTRIC_TERA, "electric-tera-shard", "Electric Tera Shard"},
+        {PrebuiltOptions::FAIRY_TERA, "fairy-tera-shard", "Fairy Tera Shard"},
+        {PrebuiltOptions::FIGHTING_TERA, "fighting-tera-shard", "Fighting Tera Shard"},
+        {PrebuiltOptions::FIRE_TERA, "fire-tera-shard", "Fire Tera Shard"},
+        {PrebuiltOptions::FLYING_TERA, "flying-tera-shard", "Flying Tera Shard"},
+        {PrebuiltOptions::GHOST_TERA, "ghost-tera-shard", "Ghost Tera Shard"},
+        {PrebuiltOptions::GRASS_TERA, "grass-tera-shard", "Grass Tera Shard"},
+        {PrebuiltOptions::GROUND_TERA, "ground-tera-shard", "Ground Tera Shard"},
+        {PrebuiltOptions::ICE_TERA, "ice-tera-shard", "Ice Tera Shard"},
+        {PrebuiltOptions::NORMAL_TERA, "normal-tera-shard", "Normal Tera Shard"},
+        {PrebuiltOptions::POISON_TERA, "poison-tera-shard", "Poison Tera Shard"},
+        {PrebuiltOptions::PSYCHIC_TERA, "psychic-tera-shard", "Psychic Tera Shard"},
+        {PrebuiltOptions::ROCK_TERA, "rock-tera-shard", "Rock Tera Shard"},
+        {PrebuiltOptions::STEEL_TERA, "steel-tera-shard", "Steel Tera Shard"},
+        {PrebuiltOptions::WATER_TERA, "water-tera-shard", "Water Tera Shard"},
+        {PrebuiltOptions::STELLAR_TERA, "stellar-tera-shard", "Stellar Tera Shard"},
+
+    });
+    return database;
+}
+
+const EnumDatabase<PrebuiltOptions>& PrebuiltOptions_AutoMode_Database(){
+    static const EnumDatabase<PrebuiltOptions> database({
+
+        // ordered by category
+        {PrebuiltOptions::ABILITY_PATCH, "ability-patch", "Ability patch"},
+        {PrebuiltOptions::EXP_CANDY, "exp-candy-xl", "Exp Candy"},
+        {PrebuiltOptions::PP_MAX, "pp-max", "PP Max"},
+
+        {PrebuiltOptions::MASTER_BALL, "master-ball", "Master Ball"},
+        {PrebuiltOptions::FAST_BALL, "fast-ball", "Fast Ball"},
+        {PrebuiltOptions::FRIEND_BALL, "friend-ball", "Friend Ball"},
+        {PrebuiltOptions::LURE_BALL, "lure-ball", "Lure Ball"},
+        {PrebuiltOptions::LEVEL_BALL, "level-ball", "Level Ball"},
+        {PrebuiltOptions::HEAVY_BALL, "heavy-ball", "Heavy Ball"},
+        {PrebuiltOptions::LOVE_BALL, "love-ball", "Love Ball"},
+        {PrebuiltOptions::MOON_BALL, "moon-ball", "Moon Ball"},
+        {PrebuiltOptions::DREAM_BALL, "dream-ball", "Dream Ball"},
+        {PrebuiltOptions::SPORT_BALL, "sport-ball", "Sport Ball"},
+        {PrebuiltOptions::SAFARI_BALL, "safari-ball", "Safari Ball"},
+        {PrebuiltOptions::BEAST_BALL, "beast-ball", "Beast Ball"},
+
+        {PrebuiltOptions::BUG_TERA, "bug-tera-shard", "Bug Tera Shard"},
+        {PrebuiltOptions::DARK_TERA, "dark-tera-shard", "Dark Tera Shard"},
+        {PrebuiltOptions::DRAGON_TERA, "dragon-tera-shard", "Dragon Tera Shard"},
+        {PrebuiltOptions::ELECTRIC_TERA, "electric-tera-shard", "Electric Tera Shard"},
+        {PrebuiltOptions::FAIRY_TERA, "fairy-tera-shard", "Fairy Tera Shard"},
+        {PrebuiltOptions::FIGHTING_TERA, "fighting-tera-shard", "Fighting Tera Shard"},
+        {PrebuiltOptions::FIRE_TERA, "fire-tera-shard", "Fire Tera Shard"},
+        {PrebuiltOptions::FLYING_TERA, "flying-tera-shard", "Flying Tera Shard"},
+        {PrebuiltOptions::GHOST_TERA, "ghost-tera-shard", "Ghost Tera Shard"},
+        {PrebuiltOptions::GRASS_TERA, "grass-tera-shard", "Grass Tera Shard"},
+        {PrebuiltOptions::GROUND_TERA, "ground-tera-shard", "Ground Tera Shard"},
+        {PrebuiltOptions::ICE_TERA, "ice-tera-shard", "Ice Tera Shard"},
+        {PrebuiltOptions::NORMAL_TERA, "normal-tera-shard", "Normal Tera Shard"},
+        {PrebuiltOptions::POISON_TERA, "poison-tera-shard", "Poison Tera Shard"},
+        {PrebuiltOptions::PSYCHIC_TERA, "psychic-tera-shard", "Psychic Tera Shard"},
+        {PrebuiltOptions::ROCK_TERA, "rock-tera-shard", "Rock Tera Shard"},
+        {PrebuiltOptions::STEEL_TERA, "steel-tera-shard", "Steel Tera Shard"},
+        {PrebuiltOptions::WATER_TERA, "water-tera-shard", "Water Tera Shard"},
+        {PrebuiltOptions::STELLAR_TERA, "stellar-tera-shard", "Stellar Tera Shard"},
 
     });
     return database;
@@ -80,35 +126,43 @@ static const std::vector<ItemPrinterEnumOption>& ItemPrinter_AllOptions(){
     static const std::vector<ItemPrinterEnumOption> database{
         // 2044-05-06 15:33:08
         // Calcium
-        {2346161588, PrebuiltOptions::ITEM_BONUS,       ItemPrinterJobs::Jobs_1},
+        {2346161588, PrebuiltOptions::ITEM_BONUS,       ItemPrinterJobs::Jobs_1, 0},
 
         // 2024-06-04 00:37:08
         // Full Restore
-        {1717461428, PrebuiltOptions::BALL_BONUS,       ItemPrinterJobs::Jobs_1},
+        {1717461428, PrebuiltOptions::BALL_BONUS,       ItemPrinterJobs::Jobs_1, 0},
 
-        // 2000-05-12 22:59:28
-        // total 8 Ability Patch
-        // x18 Dark Tera Shard; x2 Ability Patch; x2 Ability Patch; x2 Ability Patch; x2 Ability Patch
-        {958172368,  PrebuiltOptions::ABILITY_PATCH,    ItemPrinterJobs::Jobs_5},
+        // 958172368, 2000-05-12 22:59:28
+        // 16 total Ability Patches
+        // x36 Dark Tera Shard
+        // x4 Ability Patch
+        // x4 Ability Patch
+        // x4 Ability Patch
+        // x4 Ability Patch
+        {958172368,  PrebuiltOptions::ABILITY_PATCH,    ItemPrinterJobs::Jobs_5, 16},
 
-        // 2033-02-08 10:48:09
-        // x5 Exp. Candy XL; x2 Protein: x10 Exp. Candy L; x4 Exp. Candy XL; x5 Exp. Candy XL
-        // 520000 exp
-        {1991472489, PrebuiltOptions::EXP_CANDY,        ItemPrinterJobs::Jobs_5},
+        // 1991472489, 2033-02-08 10:48:09
+        // 1040000 exp, 28 total Exp. Candy XL
+        // x10 Exp. Candy XL
+        // x4 Protein
+        // x20 Exp. Candy L
+        // x8 Exp. Candy XL
+        // x10 Exp. Candy XL
+        {1991472489, PrebuiltOptions::EXP_CANDY,        ItemPrinterJobs::Jobs_5, 28},
 
         // 2030-03-11 16:44:09
+        // 18 total PP Maxes
         // 6x PP Max, 6x PP Max, 14x Honey, 10x Revive, 6x PP Max
-        // 520000 exp
-        {1899477849, PrebuiltOptions::PP_MAX,           ItemPrinterJobs::Jobs_5},
+        {1899477849, PrebuiltOptions::PP_MAX,           ItemPrinterJobs::Jobs_5, 18},
 
         // 2049-08-18 23:51:08
-        {2512943468, PrebuiltOptions::ASSORTED_BALLS_1, ItemPrinterJobs::Jobs_10},
+        {2512943468, PrebuiltOptions::ASSORTED_BALLS_1, ItemPrinterJobs::Jobs_10, 1},
 
         // 2031-10-08 07:09:09
-        {1949209749, PrebuiltOptions::ASSORTED_BALLS_2, ItemPrinterJobs::Jobs_10},
+        {1949209749, PrebuiltOptions::ASSORTED_BALLS_2, ItemPrinterJobs::Jobs_10, 1},
 
         // 2020-03-03 06:38:18
-        {1583217498, PrebuiltOptions::ASSORTED_BALLS_3, ItemPrinterJobs::Jobs_10},
+        {1583217498, PrebuiltOptions::ASSORTED_BALLS_3, ItemPrinterJobs::Jobs_10, 1},
 
         // 2005-11-07 11:32:08
         // x1 Master Ball
@@ -116,171 +170,211 @@ static const std::vector<ItemPrinterEnumOption>& ItemPrinter_AllOptions(){
         // x5 Great Ball
         // x1 Master Ball
         // x1 Master Ball
-        {1131363128, PrebuiltOptions::MASTER_BALL,      ItemPrinterJobs::Jobs_5},
+        {1131363128, PrebuiltOptions::MASTER_BALL,      ItemPrinterJobs::Jobs_5, 4},
 
         // 2034-09-01 02:33:39
-        {2040690819, PrebuiltOptions::FAST_BALL,        ItemPrinterJobs::Jobs_5},
+        {2040690819, PrebuiltOptions::FAST_BALL,        ItemPrinterJobs::Jobs_5, 5},
 
         // 2046-12-11 02:23:17
-        {2428107797, PrebuiltOptions::FRIEND_BALL,      ItemPrinterJobs::Jobs_5},
+        {2428107797, PrebuiltOptions::FRIEND_BALL,      ItemPrinterJobs::Jobs_5, 5},
 
         // 2057-11-21 04:28:37
-        {2773542517, PrebuiltOptions::LURE_BALL,        ItemPrinterJobs::Jobs_5},
+        {2773542517, PrebuiltOptions::LURE_BALL,        ItemPrinterJobs::Jobs_5, 5},
 
         // 2045-03-17 10:05:38
-        {2373357938, PrebuiltOptions::LEVEL_BALL,       ItemPrinterJobs::Jobs_5},
+        {2373357938, PrebuiltOptions::LEVEL_BALL,       ItemPrinterJobs::Jobs_5, 5},
 
         // 2029-07-24 11:53:11
-        {1879588391, PrebuiltOptions::HEAVY_BALL,       ItemPrinterJobs::Jobs_5},
+        {1879588391, PrebuiltOptions::HEAVY_BALL,       ItemPrinterJobs::Jobs_5, 5},
 
         // 2023-05-22 05:36:11
-        {1684733771, PrebuiltOptions::LOVE_BALL,        ItemPrinterJobs::Jobs_5},
+        {1684733771, PrebuiltOptions::LOVE_BALL,        ItemPrinterJobs::Jobs_5, 5},
 
         // 2042-10-14 05:56:33
-        {2296878993, PrebuiltOptions::MOON_BALL,        ItemPrinterJobs::Jobs_5},
+        {2296878993, PrebuiltOptions::MOON_BALL,        ItemPrinterJobs::Jobs_5, 5},
 
         // 2054-03-22 09:31:21
-        {2657784681, PrebuiltOptions::DREAM_BALL,       ItemPrinterJobs::Jobs_5},
+        {2657784681, PrebuiltOptions::DREAM_BALL,       ItemPrinterJobs::Jobs_5, 5},
 
         // 2009-06-05 20:17:11
-        {1244233031, PrebuiltOptions::SPORT_BALL,       ItemPrinterJobs::Jobs_5},
+        {1244233031, PrebuiltOptions::SPORT_BALL,       ItemPrinterJobs::Jobs_5, 5},
 
         // 2049-01-02 01:20:22
-        {2493163222, PrebuiltOptions::SAFARI_BALL,      ItemPrinterJobs::Jobs_5},
+        {2493163222, PrebuiltOptions::SAFARI_BALL,      ItemPrinterJobs::Jobs_5, 5},
 
         // 2037-02-02 15:37:15
-        {2117201835, PrebuiltOptions::BEAST_BALL,       ItemPrinterJobs::Jobs_5},
+        {2117201835, PrebuiltOptions::BEAST_BALL,       ItemPrinterJobs::Jobs_5, 5},
 
-        // 2041-03-11 01:10:10
-        // x20 Normal Tera Shard; x14 Normal Tera Shard; x8 Normal Tera Shard; x19 Normal Tera Shard; x6 Normal Tera Shard
-        // 67 Normal Tera Shards
-        {2246577010, PrebuiltOptions::NORMAL_TERA,      ItemPrinterJobs::Jobs_5},
+        // 2246577010, 2041-03-11 01:10:10
+        // 134 Normal Tera Shards, 134 total Tera Shards
+        // x40 Normal Tera Shard
+        // x28 Normal Tera Shard
+        // x16 Normal Tera Shard
+        // x38 Normal Tera Shard
+        // x12 Normal Tera Shard
+        {2246577010, PrebuiltOptions::NORMAL_TERA,      ItemPrinterJobs::Jobs_5, 134},
 
-        // 2054-08-05 03:35:10
-        // 74 Fire Tera Shards, 74 total Tera Shards
-        // x20 Fire Tera Shard; x18 Fire Tera Shard; x20 Fire Tera Shard; x16 Fire Tera Shard; x10 Honey
-        {2669513710, PrebuiltOptions::FIRE_TERA,        ItemPrinterJobs::Jobs_5},
+        // 2669513710, 2054-08-05 03:35:10
+        // 148 Fire Tera Shards, 148 total Tera Shards
+        // x40 Fire Tera Shard
+        // x36 Fire Tera Shard
+        // x40 Fire Tera Shard
+        // x32 Fire Tera Shard
+        // x20 Honey
+        {2669513710, PrebuiltOptions::FIRE_TERA,        ItemPrinterJobs::Jobs_5, 148},
 
-        // 2046-09-02 18:42:14
-        // 60 Water Tera Shards, 77 total Tera Shards
-        // x20 Water Tera Shard; x4 Full Restore; x20 Water Tera Shard; x17 Flying Tera Shard; x20 Water Tera Shard
-        {2419526534, PrebuiltOptions::WATER_TERA,       ItemPrinterJobs::Jobs_5},
+        // 2419526534, 2046-09-02 18:42:14
+        // 120 Water Tera Shards, 154 total Tera Shards
+        // x40 Water Tera Shard
+        // x8 Full Restore
+        // x40 Water Tera Shard
+        // x34 Flying Tera Shard
+        // x40 Water Tera Shard        
+        {2419526534, PrebuiltOptions::WATER_TERA,       ItemPrinterJobs::Jobs_5, 120},
 
-        // 2011-03-14 16:54:13
-        // 69 Electric Tera Shards, 69 total Tera Shards
-        // x13 Electric Tera Shard; x2 Light Clay; x20 Electric Tera Shard; x20 Electric Tera Shard; x16 Electric Tera Shard
-        {1300121653, PrebuiltOptions::ELECTRIC_TERA,    ItemPrinterJobs::Jobs_5},
+        // 1300121653, 2011-03-14 16:54:13
+        // 138 Electric Tera Shards, 138 total Tera Shards
+        // x26 Electric Tera Shard
+        // x4 Light Clay
+        // x40 Electric Tera Shard
+        // x40 Electric Tera Shard
+        // x32 Electric Tera Shard
+        {1300121653, PrebuiltOptions::ELECTRIC_TERA,    ItemPrinterJobs::Jobs_5, 138},
 
-        // 2009-11-15 23:04:10
-        // 61 Grass Tera Shards, 61 total Tera Shards
-        // x15 Grass Tera Shard; x6 Tiny Mushroom; x19 Grass Tera Shard; x17 Grass Tera Shard; x10 Grass Tera Shard
-        {1258326250, PrebuiltOptions::GRASS_TERA,       ItemPrinterJobs::Jobs_5},
+        // 1258326250, 2009-11-15 23:04:10
+        // 122 Grass Tera Shards, 122 total Tera Shards
+        // x30 Grass Tera Shard
+        // x12 Tiny Mushroom
+        // x38 Grass Tera Shard
+        // x34 Grass Tera Shard
+        // x20 Grass Tera Shard
+        {1258326250, PrebuiltOptions::GRASS_TERA,       ItemPrinterJobs::Jobs_5, 122},
 
-        // 2051-05-10 10:07:10
-        // 67 Ice Tera Shards, 67 total Tera Shards
-        // x19 Ice Tera Shard; x8 Ice Tera Shard; x20 Ice Tera Shard; x20 Ice Tera Shard; x1 Metal Alloy
-        {2567326030, PrebuiltOptions::ICE_TERA,         ItemPrinterJobs::Jobs_5},
+        // 2567326030, 2051-05-10 10:07:10
+        // 134 Ice Tera Shards, 134 total Tera Shards
+        // x38 Ice Tera Shard
+        // x16 Ice Tera Shard
+        // x40 Ice Tera Shard
+        // x40 Ice Tera Shard
+        // x2 Metal Alloy
+        {2567326030, PrebuiltOptions::ICE_TERA,         ItemPrinterJobs::Jobs_5, 134},
 
-        // 2017-11-14 18:02:15
-        // 66 Fighting Tera Shards, 66 total Tera Shards
-        // x20 Fighting Tera Shard; x16 Fighting Tera Shard; x10 Fighting Tera Shard; x20 Fighting Tera Shard; x3 Shiny Stone
-        {1510682535, PrebuiltOptions::FIGHTING_TERA,    ItemPrinterJobs::Jobs_5},
+        // 1510682535, 2017-11-14 18:02:15
+        // 132 Fighting Tera Shards, 132 total Tera Shards
+        // x40 Fighting Tera Shard
+        // x32 Fighting Tera Shard
+        // x20 Fighting Tera Shard
+        // x40 Fighting Tera Shard
+        // x6 Shiny Stone
+        {1510682535, PrebuiltOptions::FIGHTING_TERA,    ItemPrinterJobs::Jobs_5, 132},
 
-        // 2034-09-09 06:36:12
-        // 70 Poison Tera Shards, 70 total Tera Shards
-        // x2 Electirizer; x16 Poison Tera Shard; x18 Poison Tera Shard; x19 Poison Tera Shard; x17 Poison Tera Shard
-        {2041396572, PrebuiltOptions::POISON_TERA,      ItemPrinterJobs::Jobs_5},
+        // 2041396572, 2034-09-09 06:36:12
+        // 140 Poison Tera Shards, 140 total Tera Shards
+        // x4 Electirizer
+        // x32 Poison Tera Shard
+        // x36 Poison Tera Shard
+        // x38 Poison Tera Shard
+        // x34 Poison Tera Shard
+        {2041396572, PrebuiltOptions::POISON_TERA,      ItemPrinterJobs::Jobs_5, 140},
 
-        // 2016-05-15 14:18:09
-        // 65 Ground Tera Shards, 65 total Tera Shards
-        // x5 PP Up; x14 Ground Tera Shard; x17 Ground Tera Shard; x15 Ground Tera Shard; x19 Ground Tera Shard
-        {1463321889, PrebuiltOptions::GROUND_TERA,      ItemPrinterJobs::Jobs_5},
+        // 1463321889, 2016-05-15 14:18:09
+        // 130 Ground Tera Shards, 130 total Tera Shards
+        // x10 PP Up
+        // x28 Ground Tera Shard
+        // x34 Ground Tera Shard
+        // x30 Ground Tera Shard
+        // x38 Ground Tera Shard
+        {1463321889, PrebuiltOptions::GROUND_TERA,      ItemPrinterJobs::Jobs_5, 130},
 
-        // 2020-02-02 08:51:40
-        // 64 Flying Tera Shards, 64 total Tera Shards
-        // x11 Flying Tera Shard; x15 Flying Tera Shard; x14 Flying Tera Shard; x19 Flying Tera Shard; x5 Flying Tera Shard
-        {1580633500, PrebuiltOptions::FLYING_TERA,      ItemPrinterJobs::Jobs_5},
+        // 1580633500, 2020-02-02 08:51:40
+        // 128 Flying Tera Shards, 128 total Tera Shards
+        // x22 Flying Tera Shard
+        // x30 Flying Tera Shard
+        // x28 Flying Tera Shard
+        // x38 Flying Tera Shard
+        // x10 Flying Tera Shard
+        {1580633500, PrebuiltOptions::FLYING_TERA,      ItemPrinterJobs::Jobs_5, 128},
 
-        // 2039-06-02 02:15:13
-        // 67 Psychic Tera Shards, 67 total Tera Shards
-        // x15 Psychic Tera Shard
-        // x2 Never-Melt Ice
-        // x14 Psychic Tera Shard
-        // x18 Psychic Tera Shard
-        // x20 Psychic Tera Shard
-        {2190593713, PrebuiltOptions::PSYCHIC_TERA,     ItemPrinterJobs::Jobs_5},
+        // 2190593713, 2039-06-02 02:15:13
+        // 134 Psychic Tera Shards, 134 total Tera Shards
+        // x30 Psychic Tera Shard
+        // x4 Never-Melt Ice
+        // x28 Psychic Tera Shard
+        // x36 Psychic Tera Shard
+        // x40 Psychic Tera Shard
+        {2190593713, PrebuiltOptions::PSYCHIC_TERA,     ItemPrinterJobs::Jobs_5, 134},
 
-        // 2047-11-23 08:17:28
-        // 67 Bug Tera Shards, 67 total Tera Shards
-        // x2 Ether
-        // x19 Bug Tera Shard
-        // x17 Bug Tera Shard
-        // x16 Bug Tera Shard
-        // x15 Bug Tera Shard
-        {2458109848, PrebuiltOptions::BUG_TERA,         ItemPrinterJobs::Jobs_5},
+        // 2458109848, 2047-11-23 08:17:28
+        // 134 Bug Tera Shards, 134 total Tera Shards
+        // x4 Ether
+        // x38 Bug Tera Shard
+        // x34 Bug Tera Shard
+        // x32 Bug Tera Shard
+        // x30 Bug Tera Shard
+        {2458109848, PrebuiltOptions::BUG_TERA,         ItemPrinterJobs::Jobs_5, 134},
 
-        // 2058-10-16 00:38:09
-        // 60 Rock Tera Shards, 60 total Tera Shards
-        // x20 Rock Tera Shard
-        // x20 Rock Tera Shard
-        // x8 Pretty Feather
-        // x20 Rock Tera Shard
-        // x9 Stardust
-        {2801954289, PrebuiltOptions::ROCK_TERA,        ItemPrinterJobs::Jobs_5},
+        // 2801954289, 2058-10-16 00:38:09
+        // 120 Rock Tera Shards, 120 total Tera Shards
+        // x40 Rock Tera Shard
+        // x40 Rock Tera Shard
+        // x16 Pretty Feather
+        // x40 Rock Tera Shard
+        // x18 Stardust
+        {2801954289, PrebuiltOptions::ROCK_TERA,        ItemPrinterJobs::Jobs_5, 120},
 
-        // 2017-11-05 17:51:11
-        // 61 Ghost Tera Shards, 61 total Tera Shards
-        // x19 Ghost Tera Shard
-        // x18 Ghost Tera Shard
-        // x6 Ghost Tera Shard
-        // x2 Magnet
-        // x18 Ghost Tera Shard
-        {1509904271, PrebuiltOptions::GHOST_TERA,       ItemPrinterJobs::Jobs_5},
+        // 1509904271, 2017-11-05 17:51:11
+        // 122 Ghost Tera Shards, 122 total Tera Shards
+        // x38 Ghost Tera Shard
+        // x36 Ghost Tera Shard
+        // x12 Ghost Tera Shard
+        // x4 Magnet
+        // x36 Ghost Tera Shard
+        {1509904271, PrebuiltOptions::GHOST_TERA,       ItemPrinterJobs::Jobs_5, 122},
 
-        // 2038-04-23 22:25:09
-        // 68 Dragon Tera Shards, 68 total Tera Shards
-        // x1 Ability Patch
-        // x12 Dragon Tera Shard
-        // x19 Dragon Tera Shard
-        // x20 Dragon Tera Shard
-        // x17 Dragon Tera Shard
-        {2155674309, PrebuiltOptions::DRAGON_TERA,      ItemPrinterJobs::Jobs_5},
+        // 2155674309, 2038-04-23 22:25:09
+        // 136 Dragon Tera Shards, 136 total Tera Shards
+        // x2 Ability Patch
+        // x24 Dragon Tera Shard
+        // x38 Dragon Tera Shard
+        // x40 Dragon Tera Shard
+        // x34 Dragon Tera Shard
+        {2155674309, PrebuiltOptions::DRAGON_TERA,      ItemPrinterJobs::Jobs_5, 136},
 
-        // 2050-05-26 12:20:13
-        // 60 Dark Tera Shards, 60 total Tera Shards
-        // x10 Dark Tera Shard
-        // x14 Dark Tera Shard
-        // x16 Dark Tera Shard
+        // 2537180413, 2050-05-26 12:20:13
+        // 120 Dark Tera Shards, 120 total Tera Shards
         // x20 Dark Tera Shard
-        // x2 Prism Scale
-        {2537180413, PrebuiltOptions::DARK_TERA,        ItemPrinterJobs::Jobs_5},
+        // x28 Dark Tera Shard
+        // x32 Dark Tera Shard
+        // x40 Dark Tera Shard
+        // x4 Prism Scale
+        {2537180413, PrebuiltOptions::DARK_TERA,        ItemPrinterJobs::Jobs_5, 120},
 
-        // 2025-12-18 14:16:09
-        // 60 Steel Tera Shards, 60 total Tera Shards
-        // x20 Steel Tera Shard
-        // x12 Steel Tera Shard
-        // x19 Steel Tera Shard
-        // x9 Steel Tera Shard
-        // x2 Berry Sweet
-        {1766067369, PrebuiltOptions::STEEL_TERA,       ItemPrinterJobs::Jobs_5},
+        // 1766067369, 2025-12-18 14:16:09
+        // 120 Steel Tera Shards, 120 total Tera Shards
+        // x40 Steel Tera Shard
+        // x24 Steel Tera Shard
+        // x38 Steel Tera Shard
+        // x18 Steel Tera Shard
+        // x4 Berry Sweet
+        {1766067369, PrebuiltOptions::STEEL_TERA,       ItemPrinterJobs::Jobs_5, 120},
 
-        // 2039-03-06 12:56:14
-        // 60 Fairy Tera Shards, 67 total Tera Shards
-        // x20 Fairy Tera Shard
-        // x20 Fairy Tera Shard
-        // x7 Water Tera Shard
-        // x6 Tiny Bamboo Shoot
-        // x20 Fairy Tera Shard
-        {2183028974, PrebuiltOptions::FAIRY_TERA,       ItemPrinterJobs::Jobs_5},
+        // 2183028974, 2039-03-06 12:56:14
+        // 120 Fairy Tera Shards, 134 total Tera Shards
+        // x40 Fairy Tera Shard
+        // x40 Fairy Tera Shard
+        // x14 Water Tera Shard
+        // x12 Tiny Bamboo Shoot
+        // x40 Fairy Tera Shard
+        {2183028974, PrebuiltOptions::FAIRY_TERA,       ItemPrinterJobs::Jobs_5, 120},
 
-        // 2006-12-09 08:47:14
-        // 44 Stellar Tera Shards, 44 total Tera Shards
-        // x15 Stellar Tera Shard
-        // x3 Max Revive
-        // x14 Stellar Tera Shard
-        // x15 Stellar Tera Shard
-        // x1 Clover Sweet
-        {1165654034, PrebuiltOptions::STELLAR_TERA,     ItemPrinterJobs::Jobs_5},
+        // 1165654034, 2006-12-09 08:47:14
+        // 88 Stellar Tera Shards, 88 total Tera Shards
+        // x30 Stellar Tera Shard
+        // x6 Max Revive
+        // x28 Stellar Tera Shard
+        // x30 Stellar Tera Shard
+        // x2 Clover Sweet
+        {1165654034, PrebuiltOptions::STELLAR_TERA,     ItemPrinterJobs::Jobs_5, 88},
     };
     return database;
 };

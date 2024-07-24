@@ -31,6 +31,7 @@
 #include "PokemonSV/Programs/Farming/PokemonSV_MaterialFarmerTools.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSV_ItemPrinterSeedCalc.h"
+#include "PokemonSV_ItemPrinterDatabase.h"
 #include "PokemonSV_ItemPrinterRNG.h"
 
 #include <iostream>
@@ -114,6 +115,22 @@ ItemPrinterRNG::ItemPrinterRNG()
         "This can mess up your rewards for subsequent prints.</font><br>"
         "<font color=\"red\">\nNote: Each Ball/Item bonus lasts for 10 prints.</font>"
     )
+    , MODE(
+        "<b>Item Printer mode:</b><br>",
+        {
+            {ItemPrinterMode::AUTO_MODE, "auto", "Auto Mode: Select your desired item and its quantity, and items will be automatically printed."},
+            {ItemPrinterMode::STANDARD_MODE, "standard", "Standard Mode: Manually select exactly what is being printed for each print job."},
+        },
+        LockMode::LOCK_WHILE_RUNNING,
+        ItemPrinterMode::AUTO_MODE
+    )
+    , TABLE1(
+        "<b>Item Table:</b><br>"
+        "Input your desired item and desired quantity to the table.<br>"
+        "Ensure you have enough BP and are maxed out on the following sandwich ingredients: Chorizo, Bananas, Mayonnaise, Whipped Cream. "
+        "Also, ensure you have a strong lead pokemon for auto-battling, for farming materials.<br>"
+        "If there are duplicate items in the table, only the higher quantity will be considered."
+    )
     , TABLE0(
         "<b>Rounds Table:</b><br>Run the following prints in order and repeat. "
         "Changes to this table take effect the next time the table starts from the beginning."
@@ -135,29 +152,6 @@ ItemPrinterRNG::ItemPrinterRNG()
         "<b>Fix Time when Done:</b><br>Fix the time after the program finishes.",
         LockMode::UNLOCK_WHILE_RUNNING, true
     )
-//    , AUTO_MATERIAL_FARMING(
-//        "<b>Automatic Material Farming:</b><br>"
-//        "After using the item printer, automatically fly to North Province (Area 3) to farm materials, "
-//        "then fly back to keep using the item printer.",
-//        // "This will do the item printer loops, then the material farmer loops, then repeat.<br>",
-//        // "The number of item printer loops is set by \"Number of rounds per Item Printer session\".<br>"
-//        // "The number of material farmer loops is set by \"Number of sandwich rounds to run\".<br>"
-//        // "The number of Item Printer to Material Farmer loops is set by \"Number of rounds of Item Printer → Material farm\".",
-//        LockMode::LOCK_WHILE_RUNNING,
-//        false
-//    )
-//    , NUM_ROUNDS_OF_ITEM_PRINTER_TO_MATERIAL_FARM(
-//        "<b>Number of rounds of Item Printer → Material farm:</b><br>"
-//        "One round is: Using the item printer (looping through the table for as many rounds as you specify below), "
-//        "then farming materials at North Provice area 3, "
-//        "then flying back to the item printer.<br>"
-//        "Automatic Material Farming (see above) must be enabled",
-//        // (as per \"Number of rounds per Item Printer session\" below)
-//        //(as per \"Number of sandwich rounds\" below, under \"Material Farmer\")
-//        LockMode::UNLOCK_WHILE_RUNNING,
-//        3
-//    )
-//    , MATERIAL_FARMER_DISABLED_EXPLANATION("")
     , MATERIAL_FARMER_TRIGGER(
         "<b>Trigger to start material farmer:</b><br>",
         {
@@ -207,12 +201,11 @@ ItemPrinterRNG::ItemPrinterRNG()
 {
     PA_ADD_OPTION(LANGUAGE);
 
-//    if (PreloadSettings::instance().DEVELOPER_MODE){
-//        PA_ADD_OPTION(AUTO_MATERIAL_FARMING);
-//        PA_ADD_OPTION(NUM_ROUNDS_OF_ITEM_PRINTER_TO_MATERIAL_FARM);
-//    }
+   if (PreloadSettings::instance().DEVELOPER_MODE){
+       PA_ADD_OPTION(MODE);
+       PA_ADD_OPTION(TABLE1);
+   }
     PA_ADD_OPTION(NUM_ITEM_PRINTER_ROUNDS);
-//    PA_ADD_OPTION(AFTER_ITEM_PRINTER_DONE_EXPLANATION);
     PA_ADD_OPTION(TABLE0);
     PA_ADD_OPTION(OVERLAPPING_BONUS_WARNING);
     PA_ADD_OPTION(DELAY_MILLIS);
@@ -221,7 +214,7 @@ ItemPrinterRNG::ItemPrinterRNG()
     PA_ADD_OPTION(FIX_TIME_WHEN_DONE);
 
     if (PreloadSettings::instance().DEVELOPER_MODE){
-//        PA_ADD_OPTION(MATERIAL_FARMER_DISABLED_EXPLANATION);
+        
         PA_ADD_OPTION(MATERIAL_FARMER_TRIGGER);
         PA_ADD_OPTION(MATERIAL_FARMER_FIXED_NUM_JOBS);
         PA_ADD_OPTION(MIN_HAPPINY_DUST);
@@ -236,37 +229,57 @@ ItemPrinterRNG::ItemPrinterRNG()
     ItemPrinterRNG::value_changed(this);
 //    AUTO_MATERIAL_FARMING.add_listener(*this);
     TABLE0.add_listener(*this);
+    MODE.add_listener(*this);
     MATERIAL_FARMER_OPTIONS.add_listener(*this);
     MATERIAL_FARMER_TRIGGER.add_listener(*this);
 }
 
 void ItemPrinterRNG::value_changed(void* object){
-//    ConfigOptionState state = AUTO_MATERIAL_FARMING ? ConfigOptionState::ENABLED : ConfigOptionState::DISABLED;
-//    MATERIAL_FARMER_OPTIONS.set_visibility(state);
-//    NUM_ROUNDS_OF_ITEM_PRINTER_TO_MATERIAL_FARM.set_visibility(state);
-//    if (AUTO_MATERIAL_FARMING){
-//        AFTER_ITEM_PRINTER_DONE_EXPLANATION.set_text("Then proceed to material farming.");
-//        MATERIAL_FARMER_DISABLED_EXPLANATION.set_text("<br>");
-//    }else{
-//        AFTER_ITEM_PRINTER_DONE_EXPLANATION.set_text("Then stop the program.");
-//        MATERIAL_FARMER_DISABLED_EXPLANATION.set_text("<br>To enable the Material Farmer, enable \"Automatic Material Farming\" above");
-//    }
+
+    NUM_ITEM_PRINTER_ROUNDS.set_visibility(
+        MODE == ItemPrinterMode::AUTO_MODE ? ConfigOptionState::HIDDEN : ConfigOptionState::ENABLED
+    );
+
+    OVERLAPPING_BONUS_WARNING.set_visibility(
+        (MODE != ItemPrinterMode::AUTO_MODE) && overlapping_bonus()
+        ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN
+    );
+
+    TABLE1.set_visibility(
+        MODE == ItemPrinterMode::AUTO_MODE ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN
+    );
+
+    TABLE0.set_visibility(
+        MODE == ItemPrinterMode::AUTO_MODE ? ConfigOptionState::HIDDEN : ConfigOptionState::ENABLED
+    );
+
+    ADJUST_DELAY.set_visibility(
+        MODE == ItemPrinterMode::AUTO_MODE ? ConfigOptionState::HIDDEN : ConfigOptionState::ENABLED
+    );
 
     MATERIAL_FARMER_TRIGGER.set_visibility(
-        MATERIAL_FARMER_OPTIONS.enabled() ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN
+        (MODE != ItemPrinterMode::AUTO_MODE) && MATERIAL_FARMER_OPTIONS.enabled()
+        ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN
     );
 
     MATERIAL_FARMER_FIXED_NUM_JOBS.set_visibility(
-        MATERIAL_FARMER_OPTIONS.enabled() && (MATERIAL_FARMER_TRIGGER == MaterialFarmerTrigger::FIXED_NUM_PRINT_JOBS)
+        (MODE != ItemPrinterMode::AUTO_MODE) && MATERIAL_FARMER_OPTIONS.enabled() && (MATERIAL_FARMER_TRIGGER == MaterialFarmerTrigger::FIXED_NUM_PRINT_JOBS)
         ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN
-    );
+    );    
+
     MIN_HAPPINY_DUST.set_visibility(
-        MATERIAL_FARMER_OPTIONS.enabled() && (MATERIAL_FARMER_TRIGGER == MaterialFarmerTrigger::MINIMUM_HAPPINY_DUST)
+        (MODE != ItemPrinterMode::AUTO_MODE) && MATERIAL_FARMER_OPTIONS.enabled() && (MATERIAL_FARMER_TRIGGER == MaterialFarmerTrigger::MINIMUM_HAPPINY_DUST)
         ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN
     );
-    OVERLAPPING_BONUS_WARNING.set_visibility(
-        overlapping_bonus() ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN
+
+    MATERIAL_FARMER_OPTIONS.set_visibility(
+        MODE == ItemPrinterMode::AUTO_MODE ? ConfigOptionState::HIDDEN : ConfigOptionState::ENABLED
     );
+
+    ENABLE_SEED_CALC.set_visibility(
+        MODE == ItemPrinterMode::AUTO_MODE ? ConfigOptionState::HIDDEN : ConfigOptionState::ENABLED
+    );
+
 }
 
 
@@ -297,12 +310,12 @@ bool ItemPrinterRNG::overlapping_bonus(){
 }
 
 
-void ItemPrinterRNG::run_print_at_date(
+ItemPrinterPrizeResult ItemPrinterRNG::run_print_at_date(
     SingleSwitchProgramEnvironment& env, BotBaseContext& context,
     const DateTime& date, ItemPrinterJobs jobs
 ){
     ItemPrinterRNG_Descriptor::Stats& stats = env.current_stats<ItemPrinterRNG_Descriptor::Stats>();
-
+    ItemPrinterPrizeResult prize_result;
     bool printed = false;
     bool overworld_seen = false;
     while (true){
@@ -328,7 +341,7 @@ void ItemPrinterRNG::run_print_at_date(
             overworld_seen = true;
             if (printed){
                 env.log("Detected overworld... (unexpected)", COLOR_RED);
-                return;
+                return prize_result;
             }
             env.log("Detected overworld... Starting print.");
             pbf_press_button(context, BUTTON_A, 20, 30);
@@ -393,7 +406,7 @@ void ItemPrinterRNG::run_print_at_date(
         case 4:{
             env.log("Detected material selection.");
             if (printed){
-                return;
+                return prize_result;
             }
             if (!overworld_seen){
                 pbf_press_button(context, BUTTON_B, 20, 30);
@@ -403,11 +416,12 @@ void ItemPrinterRNG::run_print_at_date(
             stats.prints++;
             env.update_stats();
             printed = true;
-            std::array<std::string, 10> print_results = item_printer_finish_print(env.inference_dispatcher(), env.console, context, LANGUAGE);
+            prize_result = item_printer_finish_print(env.inference_dispatcher(), env.console, context, LANGUAGE);
+            std::array<std::string, 10> print_results = prize_result.prizes;
             uint64_t seed = to_seconds_since_epoch(date);
             int distance_from_target = get_distance_from_target(env.console, stats, print_results, seed);
             env.update_stats();
-            if (ADJUST_DELAY &&
+            if ((ADJUST_DELAY || MODE == ItemPrinterMode::AUTO_MODE) &&
                 distance_from_target != 0 &&
                 distance_from_target != std::numeric_limits<int>::min()
             ){
@@ -468,7 +482,7 @@ int ItemPrinterRNG::get_distance_from_target(
     const int MAX_DEVIATION = 10;
     for (int current_deviation = 0; current_deviation <= MAX_DEVIATION; current_deviation++){
         ItemPrinter::DateSeed seed_data;
-        if (ENABLE_SEED_CALC){
+        if (ENABLE_SEED_CALC || MODE == ItemPrinterMode::AUTO_MODE){
             seed_data = ItemPrinter::calculate_seed_prizes(seed - current_deviation);
         }else{
             seed_data = ItemPrinter::get_date_seed(seed - current_deviation);
@@ -485,7 +499,7 @@ int ItemPrinterRNG::get_distance_from_target(
             continue;
         }
 
-        if (ENABLE_SEED_CALC){
+        if (ENABLE_SEED_CALC || MODE == ItemPrinterMode::AUTO_MODE){
             seed_data = ItemPrinter::calculate_seed_prizes(seed + current_deviation);
         }else{
             seed_data = ItemPrinter::get_date_seed(seed + current_deviation);
@@ -604,6 +618,194 @@ void ItemPrinterRNG::print_again(
     }
 }
 
+void ItemPrinterRNG::run_item_printer_rng_automode(
+    SingleSwitchProgramEnvironment& env, 
+    BotBaseContext& context, 
+    ItemPrinterRNG_Descriptor::Stats& stats
+){
+    const uint16_t min_happiny_dust = 400;
+
+    MaterialFarmerOptions material_farmer_options(
+        true, true,
+        &LANGUAGE,
+        NOTIFICATION_STATUS_UPDATE,
+        NOTIFICATION_PROGRAM_FINISH,
+        NOTIFICATION_ERROR_RECOVERABLE,
+        NOTIFICATION_ERROR_FATAL
+    );
+
+    material_farmer_options.RUN_TIME_IN_MINUTES.set(32);
+    material_farmer_options.SANDWICH_OPTIONS.set_enabled(true);
+    material_farmer_options.SANDWICH_OPTIONS.SAVE_GAME_BEFORE_SANDWICH = true;
+    material_farmer_options.SANDWICH_OPTIONS.BASE_RECIPE.set(BaseRecipe::non_shiny);
+
+    //  For each job that we print, we increment jobs_counter.
+    //  Each time we run the material farmer, we reset jobs_counter to 0.
+    uint32_t jobs_counter = 0;
+
+    // Check material quantity when:
+    // - once when first starting the item printer
+    // - before starting material farming. If still have material, 
+    // can keep using item printer. But this check is only done once, 
+    // until you farm materials again.
+    // - when back from material farming
+    bool done_one_last_material_check_before_mat_farming = false;
+    uint32_t material_farmer_jobs_period = calc_num_jobs_using_happiny_dust(env, context, min_happiny_dust);   
+    bool have_cleared_out_bonus = false;
+    std::map<std::string, uint16_t> obtained_prizes;
+
+    std::vector<ItemPrinterDesiredItemRowSnapshot> desired_table = TABLE1.snapshot<ItemPrinterDesiredItemRowSnapshot>();
+    for (const ItemPrinterDesiredItemRowSnapshot& desired_row : desired_table){
+        std::string desired_slug = ItemPrinter::PrebuiltOptions_AutoMode_Database().find(desired_row.item)->slug;
+        int16_t desired_quantity = desired_row.quantity;
+        int16_t obtained_quantity = check_obtained_quantity(obtained_prizes, desired_slug);
+        
+        while (obtained_quantity < desired_quantity){
+            int16_t quantity_to_print = desired_quantity - obtained_quantity;
+            std::vector<ItemPrinterRngRowSnapshot> print_table = desired_print_table(desired_row.item, quantity_to_print);
+            if (!have_cleared_out_bonus){
+                // 2323229535, 8 Ability Patches, with no bonus active
+                // x2 Magnet, x9 Exp. Candy S, x7 Pretty Feather, x2 Ability Patch, x2 Ability Patch, 
+                // x7 Big Pearl, x1 Ability Patch, x1 Ability Patch, x16 Ground Tera Shard, x2 Ability Patch     
+
+                // start with printing out 10 just to clear out any lingering bonuses.       
+                ItemPrinterRngRowSnapshot print_10_items = {false, from_seconds_since_epoch(2323229535), ItemPrinterJobs::Jobs_10};
+                print_table.insert(print_table.begin(), print_10_items);
+                have_cleared_out_bonus = true;
+            }
+            
+            for (const ItemPrinterRngRowSnapshot& row : print_table){
+                env.console.log(desired_slug + ": " + std::to_string(check_obtained_quantity(obtained_prizes, desired_slug)) + "/" + std::to_string(desired_quantity));
+
+                // check if need to run material farmer
+                while (jobs_counter >= material_farmer_jobs_period){ 
+                    if (!done_one_last_material_check_before_mat_farming){
+                        // one more material quantity check before material farming
+                        // if still have material, keep using item printer
+                        material_farmer_jobs_period = calc_num_jobs_using_happiny_dust(env, context, min_happiny_dust);
+                        jobs_counter = 0;
+                        done_one_last_material_check_before_mat_farming = true;
+                        continue;
+                    }
+
+                    //  Run the material farmer.
+                    run_material_farming_then_return_to_item_printer(env, context, stats, material_farmer_options);
+
+                    // Recheck number of Happiny Dust after returning from Material Farming,
+                    // prior to restarting Item printing
+                    material_farmer_jobs_period = calc_num_jobs_using_happiny_dust(env, context, min_happiny_dust);
+                    jobs_counter = 0;
+                    done_one_last_material_check_before_mat_farming = false;
+                }
+
+                ItemPrinterPrizeResult prize_result = run_print_at_date(env, context, row.date, row.jobs);
+                std::array<std::string, 10> prizes = prize_result.prizes;
+                std::array<int16_t, 10> quantities = prize_result.quantities;
+                for (size_t i = 0; i < 10; i++){
+                    obtained_prizes[prizes[i]] += quantities[i];
+                }
+
+                jobs_counter += (uint32_t)row.jobs;
+                env.console.log("Print job counter: " + std::to_string(jobs_counter) + "/" + std::to_string(material_farmer_jobs_period));
+                env.console.log("Cumulative prize list:");
+                for (const auto& prize : obtained_prizes){
+                    if (prize.first == ""){
+                        continue;
+                    }
+                    env.console.log(prize.first + ": " + std::to_string(prize.second));
+                }                   
+                
+            }
+
+            obtained_quantity = check_obtained_quantity(obtained_prizes, desired_slug);
+        }
+
+        
+        // stats.iterations++;
+        // env.update_stats();
+    }
+  
+}
+
+int16_t ItemPrinterRNG::check_obtained_quantity(std::map<std::string, uint16_t> obtained_prizes, std::string desired_slug){
+    int16_t obtained_quantity = 0;
+    auto prize_iter = obtained_prizes.find(desired_slug);
+    if (prize_iter != obtained_prizes.end()){
+        obtained_quantity = prize_iter->second;
+    }
+
+    return obtained_quantity;
+}
+
+
+void ItemPrinterRNG::run_material_farming_then_return_to_item_printer(
+    SingleSwitchProgramEnvironment& env, 
+    BotBaseContext& context, 
+    ItemPrinterRNG_Descriptor::Stats& stats,
+    MaterialFarmerOptions& material_farmer_options
+){
+    press_Bs_to_back_to_overworld(env.program_info(), env.console, context);
+    move_from_item_printer_to_material_farming(env.program_info(), env.console, context);
+    {
+        //  Dummy stats since we don't use the material farmer stats.
+        MaterialFarmerStats mat_farm_stats;
+        run_material_farmer(env, env.console, context, material_farmer_options, mat_farm_stats);
+        stats.material_farmer_runs++;
+        env.update_stats();
+    }
+    move_from_material_farming_to_item_printer(env.program_info(), env.console, context);
+
+}
+
+std::vector<ItemPrinterRngRowSnapshot> ItemPrinterRNG::desired_print_table(
+    ItemPrinter::PrebuiltOptions desired_item,
+    uint16_t quantity_to_print
+){
+    ItemPrinter::ItemPrinterEnumOption desired_enum_option = option_lookup_by_enum(desired_item);
+
+    // one bonus bundle is Item/Ball Bonus -> 5 print -> 5 print
+    // quantity_obtained stores the quantity of the desired item that
+    // is produced with one 5 print, with the bonus active.
+    uint16_t num_bonus_bundles = (quantity_to_print + (desired_enum_option.quantity_obtained * 2) - 1)/(desired_enum_option.quantity_obtained * 2); // round up after dividing
+
+    ItemPrinter::PrebuiltOptions bonus_type = get_bonus_type(desired_item);
+    ItemPrinter::ItemPrinterEnumOption bonus_enum_option = option_lookup_by_enum(bonus_type);
+    ItemPrinterRngRowSnapshot bonus_snapshot = {false, from_seconds_since_epoch(bonus_enum_option.seed), bonus_enum_option.jobs};    
+    ItemPrinterRngRowSnapshot desired_item_snapshot = {false, from_seconds_since_epoch(desired_enum_option.seed), desired_enum_option.jobs};
+
+    std::vector<ItemPrinterRngRowSnapshot> print_table;
+    for (size_t i = 0; i < num_bonus_bundles; i++){
+        print_table.push_back(bonus_snapshot);
+        // - we assume all the desired item prints are 5 prints,
+        // since all the single item prints stored in the database are 5 prints.
+        print_table.push_back(desired_item_snapshot); 
+        print_table.push_back(desired_item_snapshot);
+    }
+
+    // cout << "Total number of bonus bundles: " << num_bonus_bundles << endl;
+    // for (const ItemPrinterRngRowSnapshot& row : print_table){
+    //     cout << (int)row.jobs << ": ";
+    //     std::cout << row.date.year << "-" << (int)row.date.month << "-" << (int)row.date.day << " ";
+    //     std::cout << (int)row.date.hour << ":" << (int)row.date.minute << ":" << (int)row.date.second << endl;
+    // }
+
+    return print_table;
+}
+
+
+ItemPrinter::PrebuiltOptions ItemPrinterRNG::get_bonus_type(ItemPrinter::PrebuiltOptions desired_item){
+    // EnumDatabase<ItemPrinter::PrebuiltOptions> database = ItemPrinter::PrebuiltOptions_AutoMode_Database();
+    // std::string slug = database.find(desired_item)->slug;
+    std::string slug = ItemPrinter::PrebuiltOptions_AutoMode_Database().find(desired_item)->slug;
+    // cout << slug << endl;
+    if (slug.find("ball") != std::string::npos){
+        return ItemPrinter::PrebuiltOptions::BALL_BONUS;
+    }else{
+        return ItemPrinter::PrebuiltOptions::ITEM_BONUS;
+    }
+}
+
+
 void ItemPrinterRNG::run_item_printer_rng(
     SingleSwitchProgramEnvironment& env, BotBaseContext& context, 
     ItemPrinterRNG_Descriptor::Stats& stats
@@ -622,7 +824,7 @@ void ItemPrinterRNG::run_item_printer_rng(
         // until you farm materials again.
         // - when back from material farming
 
-        uint32_t num_jobs_with_happiny_dust = calc_num_jobs_with_happiny_dust(env, context);
+        uint32_t num_jobs_with_happiny_dust = calc_num_jobs_using_happiny_dust(env, context, MIN_HAPPINY_DUST);
         material_farmer_jobs_period = num_jobs_with_happiny_dust;
     }
 
@@ -670,7 +872,7 @@ void ItemPrinterRNG::run_item_printer_rng(
             ){
                 // one more material quantity check before material farming
                 // if still have material, keep using item printer
-                uint32_t num_jobs_with_happiny_dust = calc_num_jobs_with_happiny_dust(env, context);
+                uint32_t num_jobs_with_happiny_dust = calc_num_jobs_using_happiny_dust(env, context, MIN_HAPPINY_DUST);
                 material_farmer_jobs_period = num_jobs_with_happiny_dust;
                 jobs_counter = 0;
                 done_one_last_material_check_before_mat_farming = true;
@@ -694,7 +896,7 @@ void ItemPrinterRNG::run_item_printer_rng(
             // Recheck number of Happiny Dust after returning from Material Farming,
             // prior to restarting Item printing
             if (MATERIAL_FARMER_TRIGGER == MaterialFarmerTrigger::MINIMUM_HAPPINY_DUST){
-                uint32_t num_jobs_with_happiny_dust = calc_num_jobs_with_happiny_dust(env, context);
+                uint32_t num_jobs_with_happiny_dust = calc_num_jobs_using_happiny_dust(env, context, MIN_HAPPINY_DUST);
                 material_farmer_jobs_period = num_jobs_with_happiny_dust;
                 done_one_last_material_check_before_mat_farming = false;
             }
@@ -708,8 +910,12 @@ void ItemPrinterRNG::run_item_printer_rng(
     }
 }
 
-uint32_t ItemPrinterRNG::calc_num_jobs_with_happiny_dust(
-    SingleSwitchProgramEnvironment& env, BotBaseContext& context
+// return number of print jobs we can do, based on how much Happiny Dust we have,
+// and how low we allow the Happiny dust to go (min_happiny_dust)
+uint32_t ItemPrinterRNG::calc_num_jobs_using_happiny_dust(
+    SingleSwitchProgramEnvironment& env, 
+    BotBaseContext& context,
+    uint16_t min_happiny_dust
 ){
     uint32_t num_happiny_dust = check_num_happiny_dust(env, context);
 
@@ -793,7 +999,8 @@ void ItemPrinterRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext
     ItemPrinterRNG_Descriptor::Stats& stats = env.current_stats<ItemPrinterRNG_Descriptor::Stats>();
     env.update_stats();
 
-    if (MATERIAL_FARMER_OPTIONS.enabled()){
+
+    if (MODE == ItemPrinterMode::AUTO_MODE || MATERIAL_FARMER_OPTIONS.enabled()){
         // - Ensure audio input is enabled
         LetsGoKillSoundDetector audio_detector(env.console, [](float){ return true; });
         wait_until(
@@ -805,7 +1012,12 @@ void ItemPrinterRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext
     }
 
     try{
-        run_item_printer_rng(env, context, stats);
+        if (MODE == ItemPrinterMode::AUTO_MODE){
+            run_item_printer_rng_automode(env, context, stats);
+        }else{
+            run_item_printer_rng(env, context, stats);
+        }
+
 #if 0
         if (!AUTO_MATERIAL_FARMING){
             run_item_printer_rng(env, context, stats);

@@ -11,6 +11,7 @@
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/DateOption.h"
 #include "Common/Cpp/Options/EditableTableOption.h"
+#include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "PokemonSV_ItemPrinterTools.h"
 #include "PokemonSV_ItemPrinterDatabase.h"
 
@@ -58,6 +59,41 @@ public:
     std::vector<std::unique_ptr<EditableTableRow>> make_defaults();
 
     friend class ItemPrinterRngRow;
+};
+
+struct ItemPrinterDesiredItemRowSnapshot{
+    ItemPrinter::PrebuiltOptions item;
+    uint16_t quantity;
+};
+
+class ItemPrinterDesiredItemRow : public EditableTableRow, public ConfigOption::Listener{
+public:
+
+    ItemPrinterDesiredItemRow(EditableTableOption& parent_table);
+
+    ItemPrinterDesiredItemRow(
+        EditableTableOption& parent_table,
+        ItemPrinter::PrebuiltOptions item, uint16_t quantity
+    );
+
+    ItemPrinterDesiredItemRowSnapshot snapshot() const;
+
+    virtual std::unique_ptr<EditableTableRow> clone() const override;
+    virtual void value_changed(void* object) override;
+
+public:
+    EnumDropdownCell<ItemPrinter::PrebuiltOptions> desired_item;
+    SimpleIntegerOption<uint16_t> desired_quantity;
+
+};
+
+class ItemPrinterDesiredItemTable : public EditableTableOption_t<ItemPrinterDesiredItemRow>{
+public:
+    ItemPrinterDesiredItemTable(std::string label);
+    virtual std::vector<std::string> make_header() const override;
+    std::vector<std::unique_ptr<EditableTableRow>> make_defaults();
+
+    friend class ItemPrinterDesiredItemRow;
 };
 
 

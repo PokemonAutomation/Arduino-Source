@@ -266,6 +266,19 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 //    PokemonLA::ButtonDetector detector(logger, PokemonLA::ButtonType::ButtonA,);
 
+#if 0
+    ItemPrinterPrizeReader reader(Language::English);
+    reader.make_overlays(overlays);
+    auto snapshot = console.video().snapshot();
+    // reader.read_prizes(console.logger(), env.inference_dispatcher(), snapshot);
+    reader.read_quantity(console.logger(), env.inference_dispatcher(), snapshot);
+
+    // for (int i = 0; i < 10; i++){
+    //     reader.read_number(console.logger(), snapshot, ImageFloatBox(0.649, 0.204 + i * 0.0764444, 0.034000, 0.060));
+    // }
+
+    // reader.read_number(console.logger(), snapshot, ImageFloatBox(0.649, 0.204 + 0 * 0.0764444, 0.034000, 0.060));
+#endif    
 
 #if 0
     ItemPrinterMaterialDetector detector(COLOR_RED, LANGUAGE);
