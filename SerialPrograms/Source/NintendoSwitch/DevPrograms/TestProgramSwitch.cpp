@@ -276,6 +276,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     // DirectionDetector detector(COLOR_BLUE, ImageFloatBox(0,0,1,1));
 
     std::pair<double, double> north_location = detector.locate_north(image);
+    // detector.north_candidate_locations(image);
     // cout << "north location: " << std::to_string(north_location.first) << ", " << std::to_string(north_location.second) << endl;
 
 #endif

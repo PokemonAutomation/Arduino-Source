@@ -42,7 +42,9 @@ public:
     // return the coordinates of the N symbol, where the coordinates are measured relative to the original image size
     std::pair<double, double> locate_north(const ImageViewRGB32& screen) const;
 
-    std::vector<ImageFloatBox> north_candidates(const ImageViewRGB32& screen) const;
+    std::vector<ImageFloatBox> north_candidate_locations(const ImageViewRGB32& screen) const;
+
+    std::vector<ImageRGB32> north_candidate_images(const ImageViewRGB32& screen, const ImageFloatBox& box) const;
 
     // return the direction of the N symbol, in radians, where 3 o'clock is 0 radians
     int16_t current_direction(const ImageViewRGB32& screen) const;
