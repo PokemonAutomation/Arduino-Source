@@ -11,6 +11,7 @@
 #include <functional>
 #include <utility>
 #include "CommonFramework/ImageTypes/BinaryImage.h"
+#include "CommonFramework/ImageTools/ImageBoxes.h"
 
 namespace PokemonAutomation{
     class ImageRGB32;
@@ -60,6 +61,15 @@ bool match_template_by_waterfill(
     const std::pair<size_t, size_t> &area_thresholds,
     double rmsd_threshold,
     std::function<bool(Kernels::Waterfill::WaterfillObject& object)> check_matched_object);
+
+// Similar to match_template_by_waterfill(), except instead of matching by template,
+// matches by filters, and returns a vector of ImageFloatBox
+std::vector<ImageFloatBox> match_filters_by_waterfill(
+    const ImageViewRGB32 &screen,
+    const ImageFloatBox &box,
+    const std::vector<std::pair<uint32_t, uint32_t>> &filters,
+    const std::pair<size_t, size_t> &area_thresholds
+);    
 
 // Draw matrix on an image. Used for debugging the matrix.
 // color: color of the pixels from the matrix to render on the image.
