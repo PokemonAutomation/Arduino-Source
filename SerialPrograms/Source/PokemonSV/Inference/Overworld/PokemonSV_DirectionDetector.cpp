@@ -143,9 +143,8 @@ void DirectionDetector::change_direction(
             diff += (2 * M_PI);
         }
         double abs_diff = std::abs(diff);
-
-        // std::cout << "current: " << std::to_string(current) << ", target: ";
-        // std::cout << std::to_string(target) << ", diff: " << std::to_string(diff) << std::endl;
+        console.log("current direction: " +  std::to_string(current));
+        console.log("target: " +  std::to_string(target) + ", diff: " + std::to_string(diff));
         if (abs_diff < 0.015){
             // stop the loop when we're close enough to the target
             break;
@@ -156,8 +155,7 @@ void DirectionDetector::change_direction(
         int16_t push_direction = (diff > 0) ? -1 : 1;
         double push_magnitude = (128 / (i + 1)); // push less with each iteration/attempt
         uint8_t push_x = uint8_t(std::max(std::min(int(128 + (push_direction * push_magnitude)), 255), 0));
-        // std::cout << "push_duration: " << std::to_string(push_duration);
-        // std::cout << ", push_x: " << std::to_string(push_x) << std::endl;
+        console.log("push magnitude: " + std::to_string(push_x) + ", push duration: " +  std::to_string(push_duration));
         pbf_move_right_joystick(context, push_x, 128, push_duration, 100);
     }
     
