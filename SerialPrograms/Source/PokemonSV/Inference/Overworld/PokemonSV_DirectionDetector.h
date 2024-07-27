@@ -33,28 +33,22 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 
-class DirectionDetector : public StaticScreenDetector{
+class DirectionDetector {
 public:
     DirectionDetector(Color color = COLOR_RED, const ImageFloatBox& box = ImageFloatBox(0.815, 0.680, 0.180, 0.310));
     virtual ~DirectionDetector();
-
-    virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool detect(const ImageViewRGB32& screen) const override;
 
     // return the coordinates of the N symbol, where the coordinates are measured in absolute pixels (scaled to 1080/height)
     // with respect to the radar ball
     // return 0,0 if unable to locate the N symbol
     std::pair<double, double> locate_north(const ImageViewRGB32& screen) const;
 
-    std::vector<ImageFloatBox> north_candidate_locations(const ImageViewRGB32& screen) const;
-
-    std::vector<ImageRGB32> north_candidate_images(const ImageViewRGB32& screen, const ImageFloatBox& box) const;
-
     // return the direction of the N symbol, in radians, using North-clockwise convention. [0, 2pi)
     // return -1 if unable to locate the N symbol
     double current_direction(const ImageViewRGB32& screen) const;
 
-    // given direction in radians (North-clockwise), change the direction 
+    // given direction in radians (North-clockwise), rotate the camera so N is pointing in the desired direction.
+    // mini-map must be unlocked.
     void change_direction(
         ConsoleHandle& console, 
         BotBaseContext& context,
@@ -65,24 +59,6 @@ protected:
     Color m_color;
     ImageFloatBox m_minimap_box;
 };
-
-
-
-class DirectionWatcher : public VisualInferenceCallback{
-public:
-    DirectionWatcher(Color color, VideoOverlay& overlay, const ImageFloatBox& box = ImageFloatBox(0.815, 0.680, 0.180, 0.310));
-    virtual ~DirectionWatcher();
-
-    virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
-
-
-protected:
-    VideoOverlay& m_overlay;
-    DirectionDetector m_detector;
-    FixedLimitVector<OverlayBoxScope> m_hits;
-};
-
 
 
 
