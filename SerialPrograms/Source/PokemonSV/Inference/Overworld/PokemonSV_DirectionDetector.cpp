@@ -84,7 +84,8 @@ std::pair<double, double> DirectionDetector::locate_north(const ImageViewRGB32& 
     const double screen_rel_size = (screen.height() / 1080.0);
     const size_t min_size = size_t(screen_rel_size * screen_rel_size * min_object_size);
 
-    std::pair<double, double> north_location(-1.0, -1.0);
+    std::pair<double, double> north_location(0, 0);
+    std::pair<double, double> zero_coord(0.9065, 0.8335);
 
     #if 0
         std::vector<ImageFloatBox> candidate_locations = north_candidate_locations(screen);
@@ -151,17 +152,30 @@ std::pair<double, double> DirectionDetector::locate_north(const ImageViewRGB32& 
             {min_size, SIZE_MAX},
             rmsd_threshold,
             [&](Kernels::Waterfill::WaterfillObject& object) -> bool {
-                north_location = std::make_pair(
-                    (object.center_of_gravity_x() + pixel_search_area.min_x) / (double)screen.width(),
-                    (object.center_of_gravity_y() + pixel_search_area.min_y) / (double)screen.height()
-                );
+                
+                // relative coord wrt upper left corner
+                double x1 = (object.center_of_gravity_x() + pixel_search_area.min_x) / (double)screen.width();
+                double y1 = (object.center_of_gravity_y() + pixel_search_area.min_y) / (double)screen.height();
+                // relative coord wrt minimap radar
+                double x2 = x1 - zero_coord.first;
+                double y2 = zero_coord.second - y1; // subtract y from zero_coord since I want north to be positive
+                // absolute coord wrt minimap radar, scaled to screen size
+                double x3 = x2 * (double)screen.width() / screen_rel_size;
+                double y3 = y2 * (double)screen.height() / screen_rel_size;
+
+                double hypotenuse = std::hypot(x3, y3);
+                // std::cout << "hypotenuse: " << std::to_string(hypotenuse) << std::endl;
+                if (hypotenuse < 135 || hypotenuse > 155){
+                    return false;
+                }
+                north_location = std::make_pair(x3, y3);
                 return true;
             }
         );
     #endif
 
 
-    std::cout << "north location: " << std::to_string(north_location.first) << ", " << std::to_string(north_location.second) << std::endl;
+    // std::cout << "north location: " << std::to_string(north_location.first) << ", " << std::to_string(north_location.second) << std::endl;
 
     return north_location;
 }
@@ -223,14 +237,13 @@ std::vector<ImageRGB32> DirectionDetector::north_candidate_images(const ImageVie
 
 double DirectionDetector::current_direction(const ImageViewRGB32& screen) const{
     std::pair<double, double> north_location = locate_north(screen);
-    std::pair<double, double> zero_coord(0.906250, 0.830);
-    double x_coord = north_location.first - zero_coord.first;
-    double y_coord = zero_coord.second - north_location.second; // subtract north_location from zero_coord since I want north to be positive
-    // std::cout << std::to_string(x_coord) << ", " << std::to_string(y_coord) << std::endl;
-    double direction = std::atan2(x_coord, y_coord);  // swap x and y to use north-clockwise convention
+    if (north_location.first == 0 && north_location.second == 0){ // unable to locate north
+        return -1;
+    }
+    double direction = std::atan2(north_location.first, north_location.second);  // swap x and y to use north-clockwise convention
     // std::cout << std::to_string(direction) << std::endl;
     direction = (direction < 0) ? (direction + 2 * M_PI) : direction; // change (-pi, pi] to [0, 2pi)
-    std::cout << "current_direction: " << std::to_string(direction) << std::endl;
+    // std::cout << "current_direction: " << std::to_string(direction) << std::endl;
     return direction;
 }
 
@@ -243,6 +256,9 @@ void DirectionDetector::change_direction(
         context.wait_for_all_requests();
         VideoSnapshot screen = console.video().snapshot();
         double current = current_direction(screen);
+        if (current < 0){ 
+            return;
+        }
         double target = std::fmod(direction, (2 * M_PI));
 
         double diff = target - current;
@@ -254,34 +270,22 @@ void DirectionDetector::change_direction(
         }
         double abs_diff = std::abs(diff);
 
-        std::cout << "current: " << std::to_string(current) << ", target: ";
-        std::cout << std::to_string(target) << ", diff: " << std::to_string(diff) << std::endl;
-        if (abs_diff < 0.02){
+        // std::cout << "current: " << std::to_string(current) << ", target: ";
+        // std::cout << std::to_string(target) << ", diff: " << std::to_string(diff) << std::endl;
+        if (abs_diff < 0.015){
             // stop the loop when we're close enough to the target
             break;
         }
-        uint8_t scale_factor = 70;
-        // if (abs_diff <= 0.5){
-        //     scale_factor = 115;
-        // }else if (abs_diff <= 1){
-        //     scale_factor = 100;
-        // }else if (abs_diff <= 1.5){
-        //     scale_factor = 85;
-        // }else if (abs_diff <= 2){
-        //     scale_factor = 75;
-        // }else if (abs_diff <= 2.5){
-        //     scale_factor = 70;
-        // }else if (abs_diff <= 3.0){
-        //     scale_factor = 75;
-        // }else{
-        //     scale_factor = 85;
-        // }
+        uint8_t scale_factor = 80;
 
-        uint16_t push_duration = (int16_t)std::abs(diff * scale_factor);
-        uint8_t push_direction = (diff > 0) ? 0 : 255;
-        std::cout << "push_duration: " << std::to_string(push_duration);
-        std::cout << ", scale_factor: " << std::to_string(scale_factor) << std::endl;
-        pbf_move_right_joystick(context, push_direction, 128, push_duration, 100);
+
+        uint16_t push_duration = std::max(uint16_t(std::abs(diff * scale_factor)), uint16_t(3));
+        int16_t push_direction = (diff > 0) ? -1 : 1;
+        double push_magnitude = (128 / (i + 1)); // push less with each iteration/attempt
+        uint8_t push_x = uint8_t(std::max(std::min(int(128 + (push_direction * push_magnitude)), 255), 0));
+        // std::cout << "push_duration: " << std::to_string(push_duration);
+        // std::cout << ", push_x: " << std::to_string(push_x) << std::endl;
+        pbf_move_right_joystick(context, push_x, 128, push_duration, 100);
     }
     
 

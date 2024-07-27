@@ -41,14 +41,17 @@ public:
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) const override;
 
-    // return the coordinates of the N symbol, where the coordinates are measured relative to the original image size
+    // return the coordinates of the N symbol, where the coordinates are measured in absolute pixels (scaled to 1080/height)
+    // with respect to the radar ball
+    // return 0,0 if unable to locate the N symbol
     std::pair<double, double> locate_north(const ImageViewRGB32& screen) const;
 
     std::vector<ImageFloatBox> north_candidate_locations(const ImageViewRGB32& screen) const;
 
     std::vector<ImageRGB32> north_candidate_images(const ImageViewRGB32& screen, const ImageFloatBox& box) const;
 
-    // return the direction of the N symbol, in radians, using North-clockwise convention
+    // return the direction of the N symbol, in radians, using North-clockwise convention. [0, 2pi)
+    // return -1 if unable to locate the N symbol
     double current_direction(const ImageViewRGB32& screen) const;
 
     // given direction in radians (North-clockwise), change the direction 
