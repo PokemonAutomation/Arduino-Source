@@ -14,10 +14,14 @@
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Tools/DebugDumper.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "PokemonSV_DirectionDetector.h"
-
+#include <cmath>
 #include <iostream>
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
 //using std::cout;
 //using std::endl;
 
@@ -217,11 +221,72 @@ std::vector<ImageRGB32> DirectionDetector::north_candidate_images(const ImageVie
 
 }
 
-int16_t DirectionDetector::current_direction(const ImageViewRGB32& screen) const{
-    return 0;
+double DirectionDetector::current_direction(const ImageViewRGB32& screen) const{
+    std::pair<double, double> north_location = locate_north(screen);
+    std::pair<double, double> zero_coord(0.906250, 0.830);
+    double x_coord = north_location.first - zero_coord.first;
+    double y_coord = zero_coord.second - north_location.second; // subtract north_location from zero_coord since I want north to be positive
+    // std::cout << std::to_string(x_coord) << ", " << std::to_string(y_coord) << std::endl;
+    double direction = std::atan2(x_coord, y_coord);  // swap x and y to use north-clockwise convention
+    // std::cout << std::to_string(direction) << std::endl;
+    direction = (direction < 0) ? (direction + 2 * M_PI) : direction; // change (-pi, pi] to [0, 2pi)
+    std::cout << "current_direction: " << std::to_string(direction) << std::endl;
+    return direction;
 }
 
+void DirectionDetector::change_direction(
+    ConsoleHandle& console, 
+    BotBaseContext& context,
+    double direction
+) const{
+    for (size_t i = 0; i < 10; i++){ // 10 attempts to move the direction to the target
+        context.wait_for_all_requests();
+        VideoSnapshot screen = console.video().snapshot();
+        double current = current_direction(screen);
+        double target = std::fmod(direction, (2 * M_PI));
 
+        double diff = target - current;
+        if(diff > M_PI) {
+            diff -= (2 * M_PI);
+        }
+        if(diff <= -M_PI) {
+            diff += (2 * M_PI);
+        }
+        double abs_diff = std::abs(diff);
+
+        std::cout << "current: " << std::to_string(current) << ", target: ";
+        std::cout << std::to_string(target) << ", diff: " << std::to_string(diff) << std::endl;
+        if (abs_diff < 0.02){
+            // stop the loop when we're close enough to the target
+            break;
+        }
+        uint8_t scale_factor = 70;
+        // if (abs_diff <= 0.5){
+        //     scale_factor = 115;
+        // }else if (abs_diff <= 1){
+        //     scale_factor = 100;
+        // }else if (abs_diff <= 1.5){
+        //     scale_factor = 85;
+        // }else if (abs_diff <= 2){
+        //     scale_factor = 75;
+        // }else if (abs_diff <= 2.5){
+        //     scale_factor = 70;
+        // }else if (abs_diff <= 3.0){
+        //     scale_factor = 75;
+        // }else{
+        //     scale_factor = 85;
+        // }
+
+        uint16_t push_duration = (int16_t)std::abs(diff * scale_factor);
+        uint8_t push_direction = (diff > 0) ? 0 : 255;
+        std::cout << "push_duration: " << std::to_string(push_duration);
+        std::cout << ", scale_factor: " << std::to_string(scale_factor) << std::endl;
+        pbf_move_right_joystick(context, push_direction, 128, push_duration, 100);
+    }
+    
+
+
+}
 
 DirectionWatcher::~DirectionWatcher() = default;
 

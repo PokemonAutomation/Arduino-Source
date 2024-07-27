@@ -16,6 +16,8 @@
 #include <vector>
 #include "Common/Cpp/Color.h"
 #include "Common/Cpp/Containers/FixedLimitVector.h"
+#include "ClientSource/Connection/BotBase.h"
+#include "CommonFramework/Tools/ConsoleHandle.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
@@ -46,8 +48,15 @@ public:
 
     std::vector<ImageRGB32> north_candidate_images(const ImageViewRGB32& screen, const ImageFloatBox& box) const;
 
-    // return the direction of the N symbol, in radians, where 3 o'clock is 0 radians
-    int16_t current_direction(const ImageViewRGB32& screen) const;
+    // return the direction of the N symbol, in radians, using North-clockwise convention
+    double current_direction(const ImageViewRGB32& screen) const;
+
+    // given direction in radians (North-clockwise), change the direction 
+    void change_direction(
+        ConsoleHandle& console, 
+        BotBaseContext& context,
+        double direction
+    ) const;
 
 protected:
     Color m_color;

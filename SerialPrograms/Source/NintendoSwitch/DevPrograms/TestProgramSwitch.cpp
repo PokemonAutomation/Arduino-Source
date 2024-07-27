@@ -275,7 +275,16 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     // ImageRGB32 image("dark-capture-card_1.png");
     // DirectionDetector detector(COLOR_BLUE, ImageFloatBox(0,0,1,1));
 
-    std::pair<double, double> north_location = detector.locate_north(image);
+    // std::pair<double, double> north_location = detector.locate_north(image);
+    // detector.current_direction(image);
+    // context.wait_for(Milliseconds(100));
+    // pbf_move_right_joystick(context, 255, 128, 100, 100);
+    // context.wait_for_all_requests();
+    // context.wait_for(Milliseconds(200));
+    // image = feed.snapshot();
+    // detector.current_direction(image);
+
+    detector.change_direction(console, context, 0);
     // detector.north_candidate_locations(image);
     // cout << "north location: " << std::to_string(north_location.first) << ", " << std::to_string(north_location.second) << endl;
 
