@@ -33,6 +33,16 @@ WaterfillTemplateMatcher::WaterfillTemplateMatcher(
     ImageRGB32 reference(full_path);
 
     PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(reference, (uint32_t)min_color, (uint32_t)max_color);
+    if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
+        ImageRGB32 binaryImage = reference.copy();
+        filter_by_mask(matrix, binaryImage, Color(COLOR_BLACK), true);
+        //filter_by_mask(matrix, binaryImage, Color(COLOR_WHITE), true);
+        dump_debug_image(
+            global_logger_command_line(), 
+            "CommonFramework/WaterfillTemplateMatcher", 
+            "binary_image", 
+            binaryImage);
+    }
     std::vector<WaterfillObject> objects = find_objects_inplace(matrix, min_area);
     if (objects.empty()){
         throw FileException(
