@@ -54,6 +54,8 @@
 #include "Programs/ShinyHunting/PokemonSV_ShinyHunt-AreaZeroPlatform.h"
 #include "Programs/ShinyHunting/PokemonSV_ShinyHunt-Scatterbug.h"
 
+#include "Programs/AutoStory/PokemonSV_AutoStory.h"
+
 #include "Programs/Glitches/PokemonSV_RideCloner-1.0.1.h"
 #include "Programs/Glitches/PokemonSV_CloneItems-1.0.1.h"
 
@@ -144,6 +146,8 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
         // || IS_BETA_VERSION
     ){
         ret.emplace_back("---- Untested/Beta/WIP ----");
+        ret.emplace_back("---- Story Automation ----");
+        ret.emplace_back(make_single_switch_program<AutoStory_Descriptor, AutoStory>());
     }
     if (IS_BETA_VERSION){
     }
