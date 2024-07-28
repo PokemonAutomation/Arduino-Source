@@ -79,7 +79,7 @@ AutoStory::AutoStory()
         "<b>Start Point:</b><br>Program will start with this segment.",
         {
             {StartPoint::INTRO_CUTSCENE,        "00_gameintro",         "00: Intro Cutscene"},
-            {StartPoint::PICK_STARTER,          "01_pickstarter",       "01: Pick Starter"},
+            {StartPoint::IN_ROOM,               "01_inroom",            "01: Start in room"},
             {StartPoint::NEMONA_FIRST_BATTLE,   "02_nemonabattle1",     "02: First Nemona Battle"},
             {StartPoint::CATCH_TUTORIAL,        "03_catchtutorial",     "03: Catch Tutorial"},
             {StartPoint::LEGENDARY_RESCUE,      "04_legendaryrescue",   "04: Rescue Legendary"},
@@ -93,7 +93,7 @@ AutoStory::AutoStory()
     , ENDPOINT(
         "<b>End Point:</b><br>Program will stop after completing this segment.",
         {
-            {EndPoint::PICK_STARTER,            "01_pickstarter",       "01: Pick Starter"},
+            {EndPoint::IN_ROOM,            "01_pickstarter",       "01: Pick Starter"},
             {EndPoint::NEMONA_FIRST_BATTLE,     "02_nemonabattle1",     "02: First Nemona Battle"},
             {EndPoint::CATCH_TUTORIAL,          "03_catchtutorial",     "03: Catch Tutorial"},
             {EndPoint::LEGENDARY_RESCUE,        "04_legendaryrescue",   "04: Rescue Legendary"},
@@ -102,7 +102,7 @@ AutoStory::AutoStory()
             {EndPoint::MESAGOZA_SOUTH,          "07_mesagozasouth",     "07: Go to Mesagoza South"},
         },
         LockMode::LOCK_WHILE_RUNNING,
-        EndPoint::PICK_STARTER
+        EndPoint::IN_ROOM
     )
     , STARTERCHOICE(
         "<b>Starter " + STRING_POKEMON + ":",
@@ -136,31 +136,31 @@ AutoStory::AutoStory()
 }
 
 void AutoStory::value_changed(void* object){
-    ConfigOptionState state = (STARTPOINT == StartPoint::INTRO_CUTSCENE) || (STARTPOINT == StartPoint::PICK_STARTER)
+    ConfigOptionState state = (STARTPOINT == StartPoint::INTRO_CUTSCENE) || (STARTPOINT == StartPoint::IN_ROOM)
         ? ConfigOptionState::ENABLED
         : ConfigOptionState::HIDDEN;
     STARTERCHOICE.set_visibility(state);
 }
 
-void realign_player(SingleSwitchProgramEnvironment& env, BotBaseContext& context,
+void realign_player(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
     PlayerRealignMode realign_mode,
-    uint8_t move_x = 0, uint8_t move_y = 0, uint8_t move_duration = 0
+    uint8_t move_x, uint8_t move_y, uint8_t move_duration
 ){
-    env.console.log("Realigning player direction...");
+    console.log("Realigning player direction...");
 
     switch (realign_mode){
     case PlayerRealignMode::REALIGN_NEW_MARKER:
-        env.console.log("Setting new map marker...");
-        open_map_from_overworld(env.program_info(), env.console, context);
+        console.log("Setting new map marker...");
+        open_map_from_overworld(info, console, context);
         pbf_press_button(context, BUTTON_ZR, 20, 105);
         pbf_move_left_joystick(context, move_x, move_y, move_duration, 1 * TICKS_PER_SECOND);
         pbf_press_button(context, BUTTON_A, 20, 105);
         pbf_press_button(context, BUTTON_A, 20, 105);
-        leave_phone_to_overworld(env.program_info(), env.console, context);
+        leave_phone_to_overworld(info, console, context);
         break;
     case PlayerRealignMode::REALIGN_OLD_MARKER:
-        open_map_from_overworld(env.program_info(), env.console, context);
-        leave_phone_to_overworld(env.program_info(), env.console, context);
+        open_map_from_overworld(info, console, context);
+        leave_phone_to_overworld(info, console, context);
         pbf_press_button(context, BUTTON_L, 20, 105);
         break;
     case PlayerRealignMode::REALIGN_NO_MARKER:
@@ -170,7 +170,9 @@ void realign_player(SingleSwitchProgramEnvironment& env, BotBaseContext& context
     }
 }
 
-bool run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context,
+bool run_battle(
+    ConsoleHandle& console, 
+    BotBaseContext& context,
     BattleStopCondition stop_condition
 ){
     while (true){
@@ -181,7 +183,7 @@ bool run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context,
         context.wait_for_all_requests();
 
         int ret = wait_until(
-            env.console, context,
+            console, context,
             std::chrono::seconds(90),
             {battle, fainted, overworld, dialog}
         );
@@ -189,35 +191,35 @@ bool run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context,
 
         switch (ret){
         case 0: // battle
-            env.console.log("Detected battle menu, spam first move.");
+            console.log("Detected battle menu, spam first move.");
             pbf_mash_button(context, BUTTON_A, 3 * TICKS_PER_SECOND);
             break;
         case 1: // fainted
             // TODO: Handle fainting during battle
-            env.console.log("Detected fainting.");
+            console.log("Detected fainting.");
             return false;
         case 2: // overworld
-            env.console.log("Detected overworld, battle over.");
+            console.log("Detected overworld, battle over.");
             if (stop_condition == BattleStopCondition::STOP_OVERWORLD){
                 return true;
             }
             break;
         case 3: // dialog
-            env.console.log("Detected dialog.");
+            console.log("Detected dialog.");
             if (stop_condition == BattleStopCondition::STOP_DIALOG){
                 return true;
             }
             pbf_press_button(context, BUTTON_A, 20, 105);
             break;
         default: // timeout
-            env.console.log("run_battle(): Timed out.");
+            console.log("run_battle(): Timed out.");
             return false;
         }
     }
 }
 
-bool clear_dialog(SingleSwitchProgramEnvironment& env, BotBaseContext& context,
-    ClearDialogMode mode, uint16_t seconds_timeout = 60
+bool clear_dialog(ConsoleHandle& console, BotBaseContext& context,
+    ClearDialogMode mode, uint16_t seconds_timeout
 ){
     while (true){
         OverworldWatcher    overworld(COLOR_CYAN);
@@ -227,7 +229,7 @@ bool clear_dialog(SingleSwitchProgramEnvironment& env, BotBaseContext& context,
         context.wait_for_all_requests();
 
         int ret = wait_until(
-            env.console, context,
+            console, context,
             std::chrono::seconds(seconds_timeout),
             {overworld, prompt, whitebutton, dialog}
         );
@@ -235,31 +237,31 @@ bool clear_dialog(SingleSwitchProgramEnvironment& env, BotBaseContext& context,
 
         switch (ret){
         case 0: // overworld
-            env.console.log("Detected overworld.");
+            console.log("Detected overworld.");
             if (mode == ClearDialogMode::STOP_OVERWORLD){
                 return true;
             }
             break;
         case 1: // prompt
-            env.console.log("Detected prompt.");
+            console.log("Detected prompt.");
             if (mode == ClearDialogMode::STOP_PROMPT){
                 return true;
             }
             pbf_press_button(context, BUTTON_A, 20, 105);
             break;
         case 2: // whitebutton
-            env.console.log("Detected white A button.");
+            console.log("Detected white A button.");
             if (mode == ClearDialogMode::STOP_WHITEBUTTON){
                 return true;
             }
             pbf_press_button(context, BUTTON_A, 20, 105);
             break;
         case 3: // dialog
-            env.console.log("Detected dialog.");
+            console.log("Detected dialog.");
             pbf_press_button(context, BUTTON_A, 20, 105);
             break;
         default:
-            env.console.log("clear_dialog(): Timed out.");
+            console.log("clear_dialog(): Timed out.");
             if (mode == ClearDialogMode::STOP_TIMEOUT){
                 return true;
             }
@@ -268,11 +270,14 @@ bool clear_dialog(SingleSwitchProgramEnvironment& env, BotBaseContext& context,
     }
 }
 
-bool overworld_navigation(SingleSwitchProgramEnvironment& env, BotBaseContext& context,
+bool overworld_navigation(
+    const ProgramInfo& info, 
+    ConsoleHandle& console, 
+    BotBaseContext& context,
     NavigationStopCondition stop_condition,
     NavigationMovementMode movement_mode,
     uint8_t x, uint8_t y,
-    uint16_t seconds_timeout = 60, uint16_t seconds_realign = 60
+    uint16_t seconds_timeout, uint16_t seconds_realign
 ){
     bool should_realign = true;
     if (seconds_timeout <= seconds_realign){
@@ -286,7 +291,7 @@ bool overworld_navigation(SingleSwitchProgramEnvironment& env, BotBaseContext& c
         context.wait_for_all_requests();
 
         int ret = run_until(
-            env.console, context,
+            console, context,
             [&](BotBaseContext& context){
                 for (int i = 0; i < seconds_timeout / seconds_realign; i++){
                     ssf_press_left_joystick(context, x, y, 0, seconds_realign * TICKS_PER_SECOND);
@@ -298,7 +303,7 @@ bool overworld_navigation(SingleSwitchProgramEnvironment& env, BotBaseContext& c
                         }
                     }
                     if (should_realign){
-                        realign_player(env, context, PlayerRealignMode::REALIGN_OLD_MARKER);
+                        realign_player(info, console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
                     }
                 }
             },
@@ -308,30 +313,34 @@ bool overworld_navigation(SingleSwitchProgramEnvironment& env, BotBaseContext& c
 
         switch (ret){
         case 0: // battle
-            env.console.log("Detected start of battle.");
-            run_battle(env, context, BattleStopCondition::STOP_OVERWORLD);
-            auto_heal_from_menu_or_overworld(env.program_info(), env.console, context, 0, true);
-            realign_player(env, context, PlayerRealignMode::REALIGN_OLD_MARKER);
+            console.log("Detected start of battle.");
+            run_battle(console, context, BattleStopCondition::STOP_OVERWORLD);
+            auto_heal_from_menu_or_overworld(info, console, context, 0, true);
+            realign_player(info, console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             break;
         case 1: // dialog
-            env.console.log("Detected dialog.");
+            console.log("Detected dialog.");
             if (stop_condition == NavigationStopCondition::STOP_DIALOG){
                 return true;
             }
             break;
         default:
-            env.console.log("overworld_navigation(): Timed out.");
+            console.log("overworld_navigation(): Timed out.");
             return false;
         }
     }
 }
 
-void mash_button_till_overworld(SingleSwitchProgramEnvironment& env, BotBaseContext& context, uint16_t button = BUTTON_A, uint16_t seconds_run = 360){
+void mash_button_till_overworld(
+    ConsoleHandle& console, 
+    BotBaseContext& context, 
+    uint16_t button, uint16_t seconds_run
+){
     OverworldWatcher overworld(COLOR_CYAN);
     context.wait_for_all_requests();
 
     int ret = run_until(
-        env.console, context,
+        console, context,
         [button, seconds_run](BotBaseContext& context){
             ssf_mash1_button(context, button, seconds_run * TICKS_PER_SECOND);
             pbf_wait(context, seconds_run * TICKS_PER_SECOND);
@@ -341,18 +350,23 @@ void mash_button_till_overworld(SingleSwitchProgramEnvironment& env, BotBaseCont
 
     if (ret < 0){
         throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, env.console,
+            ErrorReport::SEND_ERROR_REPORT, console,
             "mash_button_till_overworld(): Timed out, no recognized state found.",
             true
         );
     }
 }
 
-void reset_game(SingleSwitchProgramEnvironment& env, BotBaseContext& context, const std::string& error_msg){
+void reset_game(
+    const ProgramInfo& info, 
+    ConsoleHandle& console, 
+    BotBaseContext& context, 
+    const std::string& error_msg
+){
     try{
         pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
         context.wait_for_all_requests();
-        reset_game_from_home(env.program_info(), env.console, context, 5 * TICKS_PER_SECOND);
+        reset_game_from_home(info, console, context, 5 * TICKS_PER_SECOND);
     }catch (OperationFailedException& e){
         // To be safe: avoid doing anything outside of game on Switch,
         // make game resetting non error recoverable
@@ -367,10 +381,10 @@ void config_option(BotBaseContext& context, int change_option_value){
     pbf_press_dpad(context, DPAD_DOWN,  15, 20);
 }
 
-void enter_menu_from_overworld(SingleSwitchProgramEnvironment& env, BotBaseContext& context,
+void enter_menu_from_overworld(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
     int menu_index,
-    MenuSide side = MenuSide::RIGHT,
-    bool has_minimap = true
+    MenuSide side,
+    bool has_minimap
 ){
     if (!has_minimap){
         pbf_press_button(context, BUTTON_X, 20, 105);
@@ -382,7 +396,7 @@ void enter_menu_from_overworld(SingleSwitchProgramEnvironment& env, BotBaseConte
     while (true){
         if (current_time() - start > std::chrono::minutes(3)){
             throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
+                ErrorReport::SEND_ERROR_REPORT, console,
                 "enter_menu_from_overworld(): Failed to enter specified menu after 3 minutes.",
                 true
             );
@@ -393,7 +407,7 @@ void enter_menu_from_overworld(SingleSwitchProgramEnvironment& env, BotBaseConte
         context.wait_for_all_requests();
 
         int ret = run_until(
-            env.console, context,
+            console, context,
             [](BotBaseContext& context){
                 for (int i = 0; i < 10; i++){
                     pbf_wait(context, 2 * TICKS_PER_SECOND);
@@ -407,15 +421,15 @@ void enter_menu_from_overworld(SingleSwitchProgramEnvironment& env, BotBaseConte
         const bool fast_mode = false;
         switch (ret){
         case 0:
-            env.console.log("Detected overworld.");
+            console.log("Detected overworld.");
             pbf_press_button(context, BUTTON_X, 20, 105);
             continue;
         case 1:
-            env.console.log("Detected main menu.");
-            success = main_menu.move_cursor(env.program_info(), env.console, context, side, menu_index, fast_mode);
+            console.log("Detected main menu.");
+            success = main_menu.move_cursor(info, console, context, side, menu_index, fast_mode);
             if (success == false){
                 throw OperationFailedException(
-                    ErrorReport::SEND_ERROR_REPORT, env.console,
+                    ErrorReport::SEND_ERROR_REPORT, console,
                     "enter_menu_from_overworld(): Cannot move menu cursor to specified menu.",
                     true
                 );
@@ -424,7 +438,7 @@ void enter_menu_from_overworld(SingleSwitchProgramEnvironment& env, BotBaseConte
             return;
         default:
             throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
+                ErrorReport::SEND_ERROR_REPORT, console,
                 "enter_menu_from_overworld(): No recognized state after 30 seconds.",
                 true
             );
@@ -457,16 +471,19 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
         stats.m_segment++;
         env.update_stats();
         pbf_wait(context, 1 * TICKS_PER_SECOND);
-    case StartPoint::PICK_STARTER:
+    case StartPoint::IN_ROOM:
         context.wait_for_all_requests();
         env.console.log("Start Segment 01: Pick Starter", COLOR_ORANGE);
         env.console.overlay().add_log("Start Segment 01: Pick Starter", COLOR_ORANGE);
 
-        // Stand up from chair and set options
+        // Stand up from chair and walk to left side of room
         pbf_move_left_joystick(context, 128, 255, 3 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
         pbf_move_left_joystick(context,   0, 128, 6 * TICKS_PER_SECOND, 1 * TICKS_PER_SECOND);
 
-        enter_menu_from_overworld(env, context, 0, MenuSide::RIGHT, false);
+        // set settings
+        enter_menu_from_overworld(env.program_info(), env.console, context, 0, MenuSide::RIGHT, false);
+
+        // TODO: use visual inference to confirm settings
         config_option(context, 1); // Text Speed: Fast
         config_option(context, 1); // Skip Move Learning: On
         config_option(context, 1); // Send to Boxes: Automatic
@@ -485,7 +502,7 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
         config_option(context, 0); // Controller Rumble: On
         config_option(context, 1); // Helping Functions: Off
         pbf_mash_button(context, BUTTON_A, 1 * TICKS_PER_SECOND);
-        clear_dialog(env, context, ClearDialogMode::STOP_TIMEOUT, 5);
+        clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 5);
         pbf_mash_button(context, BUTTON_B, 2 * TICKS_PER_SECOND);
 
         context.wait_for_all_requests();
@@ -494,21 +511,21 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
         pbf_move_left_joystick(context, 128,   0, 3 * TICKS_PER_SECOND, 20);
         pbf_move_left_joystick(context,   0, 128, 3 * TICKS_PER_SECOND, 20);
         pbf_move_left_joystick(context, 128, 255, 3 * TICKS_PER_SECOND, 20);
-        clear_dialog(env, context, ClearDialogMode::STOP_TIMEOUT, 5);
+        clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 5);
 
         context.wait_for_all_requests();
         env.console.log("Go to the kitchen, talk with mom");
         env.console.overlay().add_log("Go to the kitchen, talk with mom", COLOR_WHITE);
         pbf_move_left_joystick(context, 128, 255, 2 * TICKS_PER_SECOND, 20);
-        overworld_navigation(env, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 0, 128);
-        clear_dialog(env, context, ClearDialogMode::STOP_TIMEOUT, 5);
+        overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 0, 128);
+        clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 5);
 
         context.wait_for_all_requests();
         env.console.log("Go to the front door, talk with Clavell");
         env.console.overlay().add_log("Go to the front door, talk with Clavell", COLOR_WHITE);
         pbf_move_left_joystick(context, 230, 200, 2 * TICKS_PER_SECOND, 20);
-        overworld_navigation(env, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 255, 128);
-        clear_dialog(env, context, ClearDialogMode::STOP_TIMEOUT, 5);
+        overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 255, 128);
+        clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 5);
 
         context.wait_for_all_requests();
         env.console.log("Go upstairs, dress up");
@@ -528,14 +545,14 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
         pbf_move_left_joystick(context,   0,   0, 3 * TICKS_PER_SECOND, 20);
         pbf_move_left_joystick(context,   0, 128, 3 * TICKS_PER_SECOND, 20);
         pbf_move_left_joystick(context, 128, 255, 4 * TICKS_PER_SECOND, 20);
-        overworld_navigation(env, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 0, 128);
-        clear_dialog(env, context, ClearDialogMode::STOP_TIMEOUT, 10);
+        overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 0, 128);
+        clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 10);
 
         context.wait_for_all_requests();
         env.console.log("Go outside, receive Rotom Phone");
         env.console.overlay().add_log("Go outside, receive Rotom Phone", COLOR_WHITE);
-        overworld_navigation(env, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 245, 230);
-        clear_dialog(env, context, ClearDialogMode::STOP_OVERWORLD);
+        overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 245, 230);
+        clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD);
 
         context.wait_for_all_requests();
         env.console.log("Bump into power of science NPC");
@@ -555,19 +572,19 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
 
         while (true){
             pbf_move_left_joystick(context, 255, 0, 1 * TICKS_PER_SECOND, 20);
-            realign_player(env, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 155, 1 * TICKS_PER_SECOND);
-            if (!overworld_navigation(env, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 0)){
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 155, 1 * TICKS_PER_SECOND);
+            if (!overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 0)){
                 context.wait_for_all_requests();
                 env.console.log("Did not enter Nemona's house, resetting from checkpoint...", COLOR_RED);
                 env.console.overlay().add_log("Failed to enter house, reset", COLOR_RED);
-                reset_game(env, context, "Did not enter Nemona's house, resetting from checkpoint...");
+                reset_game(env.program_info(), env.console, context, "Did not enter Nemona's house, resetting from checkpoint...");
                 stats.m_reset++;
                 env.update_stats();
                 continue;
             }
             context.wait_for_all_requests();
             env.console.overlay().add_log("Entered Nemona's house", COLOR_WHITE);
-            mash_button_till_overworld(env, context);
+            mash_button_till_overworld(env.console, context);
             context.wait_for_all_requests();
             env.console.log("Picking a starter...");
             env.console.overlay().add_log("Picking a starter", COLOR_WHITE);
@@ -589,33 +606,33 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
                 break;
             }
             pbf_press_button(context, BUTTON_A, 20, 105);
-            if (!clear_dialog(env, context, ClearDialogMode::STOP_PROMPT, 20)){
+            if (!clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 20)){
                 context.wait_for_all_requests();
                 env.console.log("Failed to pick starter, resetting from checkpoint...", COLOR_RED);
                 env.console.overlay().add_log("Failed to select a starter, reset", COLOR_RED);
-                reset_game(env, context, "Failed to pick starter, resetting from checkpoint...");
+                reset_game(env.program_info(), env.console, context, "Failed to pick starter, resetting from checkpoint...");
                 stats.m_reset++;
                 env.update_stats();
                 continue;
             }
             pbf_press_button(context, BUTTON_A, 20, 105);
             // Don't give a nickname
-            if (!clear_dialog(env, context, ClearDialogMode::STOP_PROMPT, 20)){
+            if (!clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 20)){
                 context.wait_for_all_requests();
                 env.console.log("Stuck trying to give a nickname, resetting from checkpoint...", COLOR_RED);
                 env.console.overlay().add_log("Stuck on nickname page, reset", COLOR_RED);
-                reset_game(env, context, "Stuck trying to give a nickname, resetting from checkpoint...");
+                reset_game(env.program_info(), env.console, context, "Stuck trying to give a nickname, resetting from checkpoint...");
                 stats.m_reset++;
                 env.update_stats();
                 continue;
             }
             pbf_press_dpad(context, DPAD_DOWN,  20, 105);
             pbf_press_button(context, BUTTON_A, 20, 105);
-            if (!clear_dialog(env, context, ClearDialogMode::STOP_OVERWORLD, 20)){
+            if (!clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 20)){
                 context.wait_for_all_requests();
                 env.console.log("Stuck trying to give a nickname, resetting from checkpoint...", COLOR_RED);
                 env.console.overlay().add_log("Stuck on nickname page, reset", COLOR_RED);
-                reset_game(env, context, "Stuck trying to give a nickname, resetting from checkpoint...");
+                reset_game(env.program_info(), env.console, context, "Stuck trying to give a nickname, resetting from checkpoint...");
                 stats.m_reset++;
                 env.update_stats();
                 continue;
@@ -626,7 +643,7 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
         context.wait_for_all_requests();
         env.console.log("Clear auto heal tutorial");
         env.console.overlay().add_log("Clear auto heal tutorial", COLOR_WHITE);
-        enter_menu_from_overworld(env, context, 0, MenuSide::LEFT);
+        enter_menu_from_overworld(env.program_info(), env.console, context, 0, MenuSide::LEFT);
         pbf_press_button(context, BUTTON_A, 20, 8 * TICKS_PER_SECOND);
 
         context.wait_for_all_requests();
@@ -651,7 +668,7 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
         env.console.overlay().add_log("End Segment 02: Pick Starter", COLOR_GREEN);
         stats.m_segment++;
         env.update_stats();
-        if (ENDPOINT == EndPoint::PICK_STARTER){
+        if (ENDPOINT == EndPoint::IN_ROOM){
             break;
         }
 
@@ -661,17 +678,17 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
         env.console.overlay().add_log("Start Segment 02: First Nemona Battle", COLOR_ORANGE);
 
         while (true){
-            realign_player(env, context, PlayerRealignMode::REALIGN_NEW_MARKER, 220, 245, 50);
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 220, 245, 50);
             pbf_move_left_joystick(context, 128, 0, 4 * TICKS_PER_SECOND, 1 * TICKS_PER_SECOND);
-            realign_player(env, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 128, 50);
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 128, 50);
             pbf_move_left_joystick(context, 128, 0, 4 * TICKS_PER_SECOND, 1 * TICKS_PER_SECOND);
-            realign_player(env, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 60, 50);
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 60, 50);
             pbf_move_left_joystick(context, 128, 0, 4 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
-            if (!overworld_navigation(env, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_SPAM_A, 128, 0, 8)){
+            if (!overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_SPAM_A, 128, 0, 8)){
                 context.wait_for_all_requests();
                 env.console.log("Did not talk to Nemona at beach, resetting from checkpoint...", COLOR_RED);
                 env.console.overlay().add_log("Can't find Nemona, reset", COLOR_RED);
-                reset_game(env, context, "Did not talk to Nemona at beach, resetting from checkpoint...");
+                reset_game(env.program_info(), env.console, context, "Did not talk to Nemona at beach, resetting from checkpoint...");
                 stats.m_reset++;
                 env.update_stats();
                 continue;
@@ -685,7 +702,7 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
         env.console.log("Starting battle...");
         env.console.overlay().add_log("Starting battle...", COLOR_WHITE);
         // TODO: Battle start prompt detection
-        mash_button_till_overworld(env, context);
+        mash_button_till_overworld(env.console, context);
         context.wait_for_all_requests();
         env.console.log("Finished battle.");
         env.console.overlay().add_log("Finished battle.", COLOR_WHITE);
@@ -710,14 +727,14 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
         env.console.overlay().add_log("Start Segment 03: Catch Tutorial", COLOR_ORANGE);
 
         while (true){
-            realign_player(env, context, PlayerRealignMode::REALIGN_NEW_MARKER, 40, 160, 60);
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 40, 160, 60);
             pbf_move_left_joystick(context, 128, 0, 7 * TICKS_PER_SECOND, 20);
-            realign_player(env, context, PlayerRealignMode::REALIGN_NEW_MARKER, 40, 84, 60);
-            if (!overworld_navigation(env, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 0, 20)){
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 40, 84, 60);
+            if (!overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 0, 20)){
                 context.wait_for_all_requests();
                 env.console.log("Did not find Mom, resetting from checkpoint...", COLOR_RED);
                 env.console.overlay().add_log("Can't find mom, reset", COLOR_RED);
-                reset_game(env, context, "Did not find Mom, resetting from checkpoint...");
+                reset_game(env.program_info(), env.console, context, "Did not find Mom, resetting from checkpoint...");
                 stats.m_reset++;
                 env.update_stats();
                 continue;
@@ -725,7 +742,7 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
             context.wait_for_all_requests();
             env.console.log("Get mom's sandwich");
             env.console.overlay().add_log("Get mom's sandwich", COLOR_WHITE);
-            mash_button_till_overworld(env, context);
+            mash_button_till_overworld(env.console, context);
             break;
         }
 
@@ -735,14 +752,14 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE, "Saved at checkpoint.");
 
         while (true){
-            realign_player(env, context, PlayerRealignMode::REALIGN_NEW_MARKER, 40, 82, 60);
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 40, 82, 60);
             pbf_move_left_joystick(context, 128, 0, 6 * TICKS_PER_SECOND, 20);
-            realign_player(env, context, PlayerRealignMode::REALIGN_NEW_MARKER, 110, 10, 60);
-            if (!overworld_navigation(env, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 0, 20)){
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 110, 10, 60);
+            if (!overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 0, 20)){
                 context.wait_for_all_requests();
                 env.console.log("Did not find Nemona, resetting from checkpoint...", COLOR_RED);
                 env.console.overlay().add_log("Can't find Nemona, reset", COLOR_RED);
-                reset_game(env, context, "Did not find Nemona, resetting from checkpoint...");
+                reset_game(env.program_info(), env.console, context, "Did not find Nemona, resetting from checkpoint...");
                 stats.m_reset++;
                 env.update_stats();
                 continue;
@@ -750,12 +767,12 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
             context.wait_for_all_requests();
             env.console.log("Start catch tutorial");
             env.console.overlay().add_log("Start catch tutorial", COLOR_WHITE);
-            clear_dialog(env, context, ClearDialogMode::STOP_TIMEOUT, 10);
+            clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 10);
             // TODO: Tutorial detection
             pbf_press_button(context, BUTTON_A, 20, 105);
             pbf_press_button(context, BUTTON_A, 20, 105);
-            run_battle(env, context, BattleStopCondition::STOP_DIALOG);
-            clear_dialog(env, context, ClearDialogMode::STOP_TIMEOUT, 10);
+            run_battle(env.console, context, BattleStopCondition::STOP_DIALOG);
+            clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 10);
             // TODO: Tutorial detection
             pbf_press_button(context, BUTTON_A, 20, 105);
             pbf_press_button(context, BUTTON_A, 20, 105);
@@ -775,21 +792,21 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
         env.console.overlay().add_log("Move to cliff", COLOR_WHITE);
 
         while (true){
-            realign_player(env, context, PlayerRealignMode::REALIGN_NEW_MARKER, 240, 60, 80);
-            if (!overworld_navigation(env, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 116, 0, 72, 24)){
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 240, 60, 80);
+            if (!overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 116, 0, 72, 24)){
                 context.wait_for_all_requests();
                 env.console.log("Did not reach cliff, resetting from checkpoint...", COLOR_RED);
                 env.console.overlay().add_log("Did not reach cliff, reset", COLOR_RED);
-                reset_game(env, context, "Did not reach cliff, resetting from checkpoint...");
+                reset_game(env.program_info(), env.console, context, "Did not reach cliff, resetting from checkpoint...");
                 stats.m_reset++;
                 env.update_stats();
                 continue;
             }
-            if (!clear_dialog(env, context, ClearDialogMode::STOP_OVERWORLD)){
+            if (!clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD)){
                 context.wait_for_all_requests();
                 env.console.log("Did not reach cliff, resetting from checkpoint...", COLOR_RED);
                 env.console.overlay().add_log("Did not reach cliff, reset", COLOR_RED);
-                reset_game(env, context, "Did not reach cliff, resetting from checkpoint...");
+                reset_game(env.program_info(), env.console, context, "Did not reach cliff, resetting from checkpoint...");
                 stats.m_reset++;
                 env.update_stats();
                 continue;
@@ -820,29 +837,29 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
         env.console.overlay().add_log("Start Segment 04: Rescue Legendary", COLOR_ORANGE);
 
         while (true){
-            realign_player(env, context, PlayerRealignMode::REALIGN_NEW_MARKER, 230, 70, 100);
-            if (!overworld_navigation(env, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 0)){
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 230, 70, 100);
+            if (!overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 0)){
                 context.wait_for_all_requests();
                 env.console.log("Did not reach cliff, resetting from checkpoint...", COLOR_RED);
                 env.console.overlay().add_log("Did not reach cliff, reset", COLOR_RED);
-                reset_game(env, context, "Did not reach cliff, resetting from checkpoint...");
+                reset_game(env.program_info(), env.console, context, "Did not reach cliff, resetting from checkpoint...");
                 stats.m_reset++;
                 env.update_stats();
                 continue;
             }
-            clear_dialog(env, context, ClearDialogMode::STOP_TIMEOUT, 20);
+            clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 20);
             // long animation
-            clear_dialog(env, context, ClearDialogMode::STOP_TIMEOUT, 10);
-            if (!overworld_navigation(env, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 0, 30)){
+            clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 10);
+            if (!overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 0, 30)){
                 context.wait_for_all_requests();
                 env.console.log("Did not reach legendary, resetting from checkpoint...", COLOR_RED);
                 env.console.overlay().add_log("Did not reach legendary, reset", COLOR_RED);
-                reset_game(env, context, "Did not reach legendaryf, resetting from checkpoint...");
+                reset_game(env.program_info(), env.console, context, "Did not reach legendaryf, resetting from checkpoint...");
                 stats.m_reset++;
                 env.update_stats();
                 continue;
             }
-            clear_dialog(env, context, ClearDialogMode::STOP_TIMEOUT, 10);
+            clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 10);
 
             // TODO: Bag menu navigation
             context.wait_for_all_requests();
@@ -850,9 +867,9 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
             env.console.overlay().add_log("Feed mom's sandwich", COLOR_WHITE);
             pbf_press_dpad(context, DPAD_UP, 20, 105);
             pbf_mash_button(context, BUTTON_A, 100);
-            clear_dialog(env, context, ClearDialogMode::STOP_TIMEOUT, 25);
+            clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 25);
             // long animation
-            clear_dialog(env, context, ClearDialogMode::STOP_TIMEOUT, 10);
+            clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 10);
 
             // First Nemona cave conversation
             context.wait_for_all_requests();
@@ -862,23 +879,23 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
             pbf_move_left_joystick(context, 150, 20, 1 * TICKS_PER_SECOND, 20);
             pbf_move_left_joystick(context, 128, 20, 8 * TICKS_PER_SECOND, 20);
             pbf_move_left_joystick(context, 150, 20, 2 * TICKS_PER_SECOND, 20);
-            if (!overworld_navigation(env, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 20, 10)){
+            if (!overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 20, 10)){
                 context.wait_for_all_requests();
                 env.console.log("Did not enter cave, resetting from checkpoint...", COLOR_RED);
                 env.console.overlay().add_log("Did not enter cave, reset", COLOR_RED);
-                reset_game(env, context, "Did not enter cave, resetting from checkpoint...");
+                reset_game(env.program_info(), env.console, context, "Did not enter cave, resetting from checkpoint...");
                 stats.m_reset++;
                 env.update_stats();
                 continue;
             }
-            clear_dialog(env, context, ClearDialogMode::STOP_TIMEOUT, 10);
+            clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 10);
 
             // Legendary rock break
             context.wait_for_all_requests();
             env.console.log("Rock break");
             env.console.overlay().add_log("Rock break", COLOR_WHITE);
             pbf_move_left_joystick(context, 128, 20, 3 * TICKS_PER_SECOND, 20);
-            realign_player(env, context, PlayerRealignMode::REALIGN_NO_MARKER, 230, 25, 30);
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NO_MARKER, 230, 25, 30);
             pbf_move_left_joystick(context, 128, 0, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
 
             // Houndour wave
@@ -886,11 +903,11 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
             env.console.log("Houndour wave");
             env.console.overlay().add_log("Houndour wave", COLOR_WHITE);
             pbf_move_left_joystick(context, 128, 20, 4 * TICKS_PER_SECOND, 20);
-            realign_player(env, context, PlayerRealignMode::REALIGN_NO_MARKER, 200, 15, 30);
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NO_MARKER, 200, 15, 30);
             pbf_move_left_joystick(context, 128, 20, 10 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
-            realign_player(env, context, PlayerRealignMode::REALIGN_NO_MARKER, 200, 25, 20);
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NO_MARKER, 200, 25, 20);
             pbf_move_left_joystick(context, 128, 20, 11 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
-            realign_player(env, context, PlayerRealignMode::REALIGN_NO_MARKER, 230, 25, 25);
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NO_MARKER, 230, 25, 25);
             pbf_move_left_joystick(context, 128, 20, 6 * TICKS_PER_SECOND, 20 * TICKS_PER_SECOND);
 
             // Houndoom encounter
@@ -898,21 +915,21 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
             env.console.log("Houndoom encounter");
             env.console.overlay().add_log("Houndoom encounter", COLOR_WHITE);
             pbf_move_left_joystick(context, 128, 20, 4 * TICKS_PER_SECOND, 20);
-            realign_player(env, context, PlayerRealignMode::REALIGN_NO_MARKER, 245, 20, 20);
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NO_MARKER, 245, 20, 20);
             pbf_move_left_joystick(context, 128, 20, 2 * TICKS_PER_SECOND, 20);
-            realign_player(env, context, PlayerRealignMode::REALIGN_NO_MARKER, 255, 90, 20);
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NO_MARKER, 255, 90, 20);
             pbf_move_left_joystick(context, 128, 20, 8 * TICKS_PER_SECOND, 8 * TICKS_PER_SECOND);
             pbf_press_button(context, BUTTON_L, 20, 20);
-            if (!overworld_navigation(env, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 20, 40)){
+            if (!overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 20, 40)){
                 context.wait_for_all_requests();
                 env.console.log("Did not reach Houndoom, resetting from checkpoint...", COLOR_RED);
                 env.console.overlay().add_log("Did not reach Houndoom, reset", COLOR_RED);
-                reset_game(env, context, "Did not reach Houndoom, resetting from checkpoint...");
+                reset_game(env.program_info(), env.console, context, "Did not reach Houndoom, resetting from checkpoint...");
                 stats.m_reset++;
                 env.update_stats();
                 continue;
             }
-            mash_button_till_overworld(env, context, BUTTON_A);
+            mash_button_till_overworld(env.console, context, BUTTON_A);
             break;
         }
 
@@ -936,12 +953,12 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
         env.console.overlay().add_log("Start Segment 05: First Arven Battle", COLOR_ORANGE);
 
         while (true){
-            realign_player(env, context, PlayerRealignMode::REALIGN_NEW_MARKER, 230, 120, 100);
-            if (!overworld_navigation(env, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 0)){
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 230, 120, 100);
+            if (!overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 0)){
                 context.wait_for_all_requests();
                 env.console.log("Did not talk to Arven at lab, resetting from checkpoint...", COLOR_RED);
                 env.console.overlay().add_log("Can't find Arven, reset", COLOR_RED);
-                reset_game(env, context, "Did not talk to Arven at lab, resetting from checkpoint...");
+                reset_game(env.program_info(), env.console, context, "Did not talk to Arven at lab, resetting from checkpoint...");
                 stats.m_reset++;
                 env.update_stats();
                 continue;
@@ -949,7 +966,7 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
             context.wait_for_all_requests();
             env.console.log("Found Arven");
             env.console.overlay().add_log("Found Arven", COLOR_WHITE);
-            mash_button_till_overworld(env, context, BUTTON_A);
+            mash_button_till_overworld(env.console, context, BUTTON_A);
             context.wait_for_all_requests();
             env.console.log("Receive legendary ball");
             env.console.overlay().add_log("Receive legendary ball", COLOR_WHITE);
@@ -965,22 +982,22 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
             context.wait_for_all_requests();
             env.console.log("Lighthouse view");
             env.console.overlay().add_log("Lighthouse view", COLOR_WHITE);
-            realign_player(env, context, PlayerRealignMode::REALIGN_NEW_MARKER, 230, 110, 100);
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 230, 110, 100);
             pbf_move_left_joystick(context, 128, 0, 6 * TICKS_PER_SECOND, 8 * TICKS_PER_SECOND);
             pbf_move_left_joystick(context, 128, 0, 4 * TICKS_PER_SECOND, 20);
             pbf_move_left_joystick(context, 255, 128, 15, 20);
             pbf_press_button(context, BUTTON_L, 20, 20);
             pbf_move_left_joystick(context, 128, 0, 7 * TICKS_PER_SECOND, 20);
-            if (!overworld_navigation(env, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_SPAM_A, 128, 0, 20)){
+            if (!overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_SPAM_A, 128, 0, 20)){
                 context.wait_for_all_requests();
                 env.console.log("Did not talk to Nemona on the lighthouse, resetting from checkpoint...", COLOR_RED);
                 env.console.overlay().add_log("Can't find Nemona, reset", COLOR_RED);
-                reset_game(env, context, "Did not talk to Nemona on the lighthouse, resetting from checkpoint...");
+                reset_game(env.program_info(), env.console, context, "Did not talk to Nemona on the lighthouse, resetting from checkpoint...");
                 stats.m_reset++;
                 env.update_stats();
                 continue;
             }
-            mash_button_till_overworld(env, context, BUTTON_A);
+            mash_button_till_overworld(env.console, context, BUTTON_A);
             break;
         }
 
@@ -1004,22 +1021,22 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
         env.console.overlay().add_log("Start Segment 06: Go to Los Platos", COLOR_ORANGE);
 
         while (true){
-            realign_player(env, context, PlayerRealignMode::REALIGN_NEW_MARKER, 100, 210, 100);
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 100, 210, 100);
             pbf_move_left_joystick(context, 128, 0, 187, 20);
             pbf_move_left_joystick(context, 0, 128, 30, 8 * TICKS_PER_SECOND);
             pbf_move_left_joystick(context, 128, 0, 1 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
 
-            realign_player(env, context, PlayerRealignMode::REALIGN_NEW_MARKER, 100, 60, 200);
-            if (!overworld_navigation(env, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 0, 75)){
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 100, 60, 200);
+            if (!overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 0, 75)){
                 context.wait_for_all_requests();
                 env.console.log("Did not reach Los Platos, resetting from checkpoint...", COLOR_RED);
                 env.console.overlay().add_log("Did not reach Los Platos, reset", COLOR_RED);
-                reset_game(env, context, "Did not reach Los Platos, resetting from checkpoint...");
+                reset_game(env.program_info(), env.console, context, "Did not reach Los Platos, resetting from checkpoint...");
                 stats.m_reset++;
                 env.update_stats();
                 continue;
             }
-            clear_dialog(env, context, ClearDialogMode::STOP_TIMEOUT, 10);
+            clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 10);
             // TODO: Tutorial detection
             pbf_press_button(context, BUTTON_A, 20, 105);
             pbf_press_button(context, BUTTON_A, 20, 105);
@@ -1050,14 +1067,14 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
         env.console.overlay().add_log("Start Segment 07: Go to Mesagoza South", COLOR_ORANGE);
 
         // // Mystery Gift, delete later
-        // enter_menu_from_overworld(env, context, 2);
+        // enter_menu_from_overworld(env.program_info(), env.console, context, 2);
         // pbf_press_button(context, BUTTON_A, 20, 4 * TICKS_PER_SECOND);
         // pbf_press_dpad(context, DPAD_UP, 20, 105);
         // pbf_press_button(context, BUTTON_A, 20, 4 * TICKS_PER_SECOND);
         // pbf_press_dpad(context, DPAD_DOWN, 20, 105);
         // pbf_press_button(context, BUTTON_A, 20, 4 * TICKS_PER_SECOND);
         // pbf_press_button(context, BUTTON_A, 20, 10 * TICKS_PER_SECOND);
-        // clear_dialog(env, context, ClearDialogMode::STOP_TIMEOUT, 10);
+        // clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 10);
 
         context.wait_for_all_requests();
         env.console.log("End Segment 07: Go to Mesagoza South", COLOR_GREEN);
