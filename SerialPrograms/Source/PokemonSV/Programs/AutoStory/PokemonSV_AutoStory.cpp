@@ -446,6 +446,203 @@ void enter_menu_from_overworld(const ProgramInfo& info, ConsoleHandle& console, 
     }
 }
 
+void AutoStory::checkpoint_save(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){
+    AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
+    save_game_from_overworld(env.program_info(), console, context);
+    stats.m_checkpoint++;
+    env.update_stats();
+    send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE, "Saved at checkpoint.");        
+}
+
+void AutoStory::segment_01_00(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){
+    context.wait_for_all_requests();
+    console.log("Start Segment 01: Pick Starter", COLOR_ORANGE);
+    console.overlay().add_log("Start Segment 01: Pick Starter", COLOR_ORANGE);
+
+    // Stand up from chair and walk to left side of room
+    pbf_move_left_joystick(context, 128, 255, 3 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
+    pbf_move_left_joystick(context,   0, 128, 6 * TICKS_PER_SECOND, 1 * TICKS_PER_SECOND);
+
+    // set settings
+    enter_menu_from_overworld(env.program_info(), console, context, 0, MenuSide::RIGHT, false);
+
+    // TODO: use visual inference to confirm settings
+    config_option(context, 1); // Text Speed: Fast
+    config_option(context, 1); // Skip Move Learning: On
+    config_option(context, 1); // Send to Boxes: Automatic
+    config_option(context, 1); // Give Nicknames: Off
+    config_option(context, 0); // Vertical Camera Controls: Regular
+    config_option(context, 0); // Horiztontal Camera Controls: Regular
+    config_option(context, 0); // Camera Support: On
+    config_option(context, 0); // Camera Interpolation: Normal
+    config_option(context, 0); // Camera Distance: Close
+    config_option(context, 1); // Autosave: Off
+    config_option(context, 1); // Show Nicknames: Don't show
+    config_option(context, 1); // Skip Cutscenes: On
+    config_option(context, 0); // Background Music: 10
+    config_option(context, 0); // Sound Effects: 10
+    config_option(context, 0); // Pokemon Cries: 10
+    config_option(context, 0); // Controller Rumble: On
+    config_option(context, 1); // Helping Functions: Off
+    pbf_mash_button(context, BUTTON_A, 1 * TICKS_PER_SECOND);
+    clear_dialog(console, context, ClearDialogMode::STOP_TIMEOUT, 5);
+    pbf_mash_button(context, BUTTON_B, 2 * TICKS_PER_SECOND);
+
+    context.wait_for_all_requests();
+    console.log("Go downstairs, get stopped by Skwovet");
+    console.overlay().add_log("Go downstairs, get stopped by Skwovet", COLOR_WHITE);
+    pbf_move_left_joystick(context, 128,   0, 3 * TICKS_PER_SECOND, 20);
+    pbf_move_left_joystick(context,   0, 128, 3 * TICKS_PER_SECOND, 20);
+    pbf_move_left_joystick(context, 128, 255, 3 * TICKS_PER_SECOND, 20);
+    clear_dialog(console, context, ClearDialogMode::STOP_TIMEOUT, 5);
+
+    context.wait_for_all_requests();
+    console.log("Go to the kitchen, talk with mom");
+    console.overlay().add_log("Go to the kitchen, talk with mom", COLOR_WHITE);
+    pbf_move_left_joystick(context, 128, 255, 2 * TICKS_PER_SECOND, 20);
+    overworld_navigation(env.program_info(), console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 0, 128);
+    clear_dialog(console, context, ClearDialogMode::STOP_TIMEOUT, 5);
+
+    context.wait_for_all_requests();
+    console.log("Go to the front door, talk with Clavell");
+    console.overlay().add_log("Go to the front door, talk with Clavell", COLOR_WHITE);
+    pbf_move_left_joystick(context, 230, 200, 2 * TICKS_PER_SECOND, 20);
+    overworld_navigation(env.program_info(), console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 255, 128);
+    clear_dialog(console, context, ClearDialogMode::STOP_TIMEOUT, 5);
+
+    context.wait_for_all_requests();
+    console.log("Go upstairs, dress up");
+    console.overlay().add_log("Go upstairs, dress up", COLOR_WHITE);
+    pbf_move_left_joystick(context, 255, 128, 2 * TICKS_PER_SECOND, 20);
+    pbf_move_left_joystick(context, 185,  10, 1 * TICKS_PER_SECOND, 20);
+    pbf_move_left_joystick(context, 128,   0, 4 * TICKS_PER_SECOND, 20);
+    pbf_move_left_joystick(context, 255, 128, 4 * TICKS_PER_SECOND, 20);
+    pbf_move_left_joystick(context, 110, 200, 3 * TICKS_PER_SECOND, 20);
+    pbf_move_left_joystick(context, 255, 128, 2 * TICKS_PER_SECOND, 20);
+    // TODO: Tutorial detection
+    pbf_mash_button(context, BUTTON_A, 20 * TICKS_PER_SECOND);
+
+    context.wait_for_all_requests();
+    console.log("Go to the living room, talk with Clavell");
+    console.overlay().add_log("Go to the living room, talk with Clavell", COLOR_WHITE);
+    pbf_move_left_joystick(context,   0,   0, 3 * TICKS_PER_SECOND, 20);
+    pbf_move_left_joystick(context,   0, 128, 3 * TICKS_PER_SECOND, 20);
+    pbf_move_left_joystick(context, 128, 255, 4 * TICKS_PER_SECOND, 20);
+    overworld_navigation(env.program_info(), console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 0, 128);
+    clear_dialog(console, context, ClearDialogMode::STOP_TIMEOUT, 10);
+
+    context.wait_for_all_requests();
+    console.log("Go outside, receive Rotom Phone");
+    console.overlay().add_log("Go outside, receive Rotom Phone", COLOR_WHITE);
+    overworld_navigation(env.program_info(), console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 245, 230);
+    clear_dialog(console, context, ClearDialogMode::STOP_OVERWORLD);
+
+    context.wait_for_all_requests();
+    console.log("Bump into power of science NPC");
+    console.overlay().add_log("Bump into power of science NPC", COLOR_WHITE);
+    pbf_move_left_joystick(context, 128,   0, 33 * TICKS_PER_SECOND, 20);
+
+    context.wait_for_all_requests();
+    console.log("Clear map tutorial");
+    console.overlay().add_log("Clear map tutorial", COLOR_WHITE);
+    open_map_from_overworld(env.program_info(), console, context, true);
+    leave_phone_to_overworld(env.program_info(), console, context);
+
+
+}
+
+void AutoStory::segment_01_01(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){
+    AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
+    while (true){   
+        pbf_move_left_joystick(context, 255, 0, 1 * TICKS_PER_SECOND, 20);
+        realign_player(env.program_info(), console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 155, 1 * TICKS_PER_SECOND);
+        if (!overworld_navigation(env.program_info(), console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 0)){
+            context.wait_for_all_requests();
+            console.log("Did not enter Nemona's house, resetting from checkpoint...", COLOR_RED);
+            console.overlay().add_log("Failed to enter house, reset", COLOR_RED);
+            reset_game(env.program_info(), console, context, "Did not enter Nemona's house, resetting from checkpoint...");
+            stats.m_reset++;
+            env.update_stats();
+            continue;
+        }
+        context.wait_for_all_requests();
+        console.overlay().add_log("Entered Nemona's house", COLOR_WHITE);
+        mash_button_till_overworld(console, context);
+        context.wait_for_all_requests();
+        console.log("Picking a starter...");
+        console.overlay().add_log("Picking a starter", COLOR_WHITE);
+        switch(STARTERCHOICE){
+        case StarterChoice::SPRIGATITO:
+            console.log("Picking Sprigatito...");
+            console.overlay().add_log("Picking Sprigatito...", COLOR_WHITE);
+            pbf_move_left_joystick(context, 75, 0, 80, 20);
+            break;
+        case StarterChoice::FUECOCO:
+            console.log("Picking Fuecoco...");
+            console.overlay().add_log("Picking Fuecoco...", COLOR_WHITE);
+            pbf_move_left_joystick(context, 180, 0, 80, 20);
+            break;
+        case StarterChoice::QUAXLY:
+            console.log("Picking Quaxly...");
+            console.overlay().add_log("Picking Quaxly...", COLOR_WHITE);
+            pbf_move_left_joystick(context, 128, 0, 80, 20);
+            break;
+        }
+        pbf_press_button(context, BUTTON_A, 20, 105);
+        if (!clear_dialog(console, context, ClearDialogMode::STOP_PROMPT, 20)){
+            context.wait_for_all_requests();
+            console.log("Failed to pick starter, resetting from checkpoint...", COLOR_RED);
+            console.overlay().add_log("Failed to select a starter, reset", COLOR_RED);
+            reset_game(env.program_info(), console, context, "Failed to pick starter, resetting from checkpoint...");
+            stats.m_reset++;
+            env.update_stats();
+            continue;
+        }
+        pbf_press_button(context, BUTTON_A, 20, 105);
+        // Don't give a nickname
+        if (!clear_dialog(console, context, ClearDialogMode::STOP_PROMPT, 20)){
+            context.wait_for_all_requests();
+            console.log("Stuck trying to give a nickname, resetting from checkpoint...", COLOR_RED);
+            console.overlay().add_log("Stuck on nickname page, reset", COLOR_RED);
+            reset_game(env.program_info(), console, context, "Stuck trying to give a nickname, resetting from checkpoint...");
+            stats.m_reset++;
+            env.update_stats();
+            continue;
+        }
+        pbf_press_dpad(context, DPAD_DOWN,  20, 105);
+        pbf_press_button(context, BUTTON_A, 20, 105);
+        if (!clear_dialog(console, context, ClearDialogMode::STOP_OVERWORLD, 20)){
+            context.wait_for_all_requests();
+            console.log("Stuck trying to give a nickname, resetting from checkpoint...", COLOR_RED);
+            console.overlay().add_log("Stuck on nickname page, reset", COLOR_RED);
+            reset_game(env.program_info(), console, context, "Stuck trying to give a nickname, resetting from checkpoint...");
+            stats.m_reset++;
+            env.update_stats();
+            continue;
+        }
+        break;
+    }
+
+    context.wait_for_all_requests();
+    console.log("Clear auto heal tutorial");
+    console.overlay().add_log("Clear auto heal tutorial", COLOR_WHITE);
+    enter_menu_from_overworld(env.program_info(), console, context, 0, MenuSide::LEFT);
+    pbf_press_button(context, BUTTON_A, 20, 8 * TICKS_PER_SECOND);
+
+    context.wait_for_all_requests();
+    console.log("Changing move order...");
+    console.overlay().add_log("Changing move order...", COLOR_WHITE);
+    // TODO: Detect move swapping
+    pbf_press_dpad(context, DPAD_RIGHT, 15, 1 * TICKS_PER_SECOND);
+    pbf_press_button(context, BUTTON_Y, 20, 40);
+    pbf_press_button(context, BUTTON_A, 20, 40);
+    pbf_press_dpad(context, DPAD_DOWN,  15, 40);
+    pbf_press_dpad(context, DPAD_DOWN,  15, 40);
+    pbf_press_button(context, BUTTON_A, 20, 40);
+    leave_box_system_to_overworld(env.program_info(), console, context);    
+
+}
+
 void AutoStory::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
@@ -472,196 +669,10 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
         env.update_stats();
         pbf_wait(context, 1 * TICKS_PER_SECOND);
     case StartPoint::IN_ROOM:
-        context.wait_for_all_requests();
-        env.console.log("Start Segment 01: Pick Starter", COLOR_ORANGE);
-        env.console.overlay().add_log("Start Segment 01: Pick Starter", COLOR_ORANGE);
-
-        // Stand up from chair and walk to left side of room
-        pbf_move_left_joystick(context, 128, 255, 3 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
-        pbf_move_left_joystick(context,   0, 128, 6 * TICKS_PER_SECOND, 1 * TICKS_PER_SECOND);
-
-        // set settings
-        enter_menu_from_overworld(env.program_info(), env.console, context, 0, MenuSide::RIGHT, false);
-
-        // TODO: use visual inference to confirm settings
-        config_option(context, 1); // Text Speed: Fast
-        config_option(context, 1); // Skip Move Learning: On
-        config_option(context, 1); // Send to Boxes: Automatic
-        config_option(context, 1); // Give Nicknames: Off
-        config_option(context, 0); // Vertical Camera Controls: Regular
-        config_option(context, 0); // Horiztontal Camera Controls: Regular
-        config_option(context, 0); // Camera Support: On
-        config_option(context, 0); // Camera Interpolation: Normal
-        config_option(context, 0); // Camera Distance: Close
-        config_option(context, 1); // Autosave: Off
-        config_option(context, 1); // Show Nicknames: Don't show
-        config_option(context, 1); // Skip Cutscenes: On
-        config_option(context, 0); // Background Music: 10
-        config_option(context, 0); // Sound Effects: 10
-        config_option(context, 0); // Pokemon Cries: 10
-        config_option(context, 0); // Controller Rumble: On
-        config_option(context, 1); // Helping Functions: Off
-        pbf_mash_button(context, BUTTON_A, 1 * TICKS_PER_SECOND);
-        clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 5);
-        pbf_mash_button(context, BUTTON_B, 2 * TICKS_PER_SECOND);
-
-        context.wait_for_all_requests();
-        env.console.log("Go downstairs, get stopped by Skwovet");
-        env.console.overlay().add_log("Go downstairs, get stopped by Skwovet", COLOR_WHITE);
-        pbf_move_left_joystick(context, 128,   0, 3 * TICKS_PER_SECOND, 20);
-        pbf_move_left_joystick(context,   0, 128, 3 * TICKS_PER_SECOND, 20);
-        pbf_move_left_joystick(context, 128, 255, 3 * TICKS_PER_SECOND, 20);
-        clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 5);
-
-        context.wait_for_all_requests();
-        env.console.log("Go to the kitchen, talk with mom");
-        env.console.overlay().add_log("Go to the kitchen, talk with mom", COLOR_WHITE);
-        pbf_move_left_joystick(context, 128, 255, 2 * TICKS_PER_SECOND, 20);
-        overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 0, 128);
-        clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 5);
-
-        context.wait_for_all_requests();
-        env.console.log("Go to the front door, talk with Clavell");
-        env.console.overlay().add_log("Go to the front door, talk with Clavell", COLOR_WHITE);
-        pbf_move_left_joystick(context, 230, 200, 2 * TICKS_PER_SECOND, 20);
-        overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 255, 128);
-        clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 5);
-
-        context.wait_for_all_requests();
-        env.console.log("Go upstairs, dress up");
-        env.console.overlay().add_log("Go upstairs, dress up", COLOR_WHITE);
-        pbf_move_left_joystick(context, 255, 128, 2 * TICKS_PER_SECOND, 20);
-        pbf_move_left_joystick(context, 185,  10, 1 * TICKS_PER_SECOND, 20);
-        pbf_move_left_joystick(context, 128,   0, 4 * TICKS_PER_SECOND, 20);
-        pbf_move_left_joystick(context, 255, 128, 4 * TICKS_PER_SECOND, 20);
-        pbf_move_left_joystick(context, 110, 200, 3 * TICKS_PER_SECOND, 20);
-        pbf_move_left_joystick(context, 255, 128, 2 * TICKS_PER_SECOND, 20);
-        // TODO: Tutorial detection
-        pbf_mash_button(context, BUTTON_A, 20 * TICKS_PER_SECOND);
-
-        context.wait_for_all_requests();
-        env.console.log("Go to the living room, talk with Clavell");
-        env.console.overlay().add_log("Go to the living room, talk with Clavell", COLOR_WHITE);
-        pbf_move_left_joystick(context,   0,   0, 3 * TICKS_PER_SECOND, 20);
-        pbf_move_left_joystick(context,   0, 128, 3 * TICKS_PER_SECOND, 20);
-        pbf_move_left_joystick(context, 128, 255, 4 * TICKS_PER_SECOND, 20);
-        overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 0, 128);
-        clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 10);
-
-        context.wait_for_all_requests();
-        env.console.log("Go outside, receive Rotom Phone");
-        env.console.overlay().add_log("Go outside, receive Rotom Phone", COLOR_WHITE);
-        overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 245, 230);
-        clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD);
-
-        context.wait_for_all_requests();
-        env.console.log("Bump into power of science NPC");
-        env.console.overlay().add_log("Bump into power of science NPC", COLOR_WHITE);
-        pbf_move_left_joystick(context, 128,   0, 33 * TICKS_PER_SECOND, 20);
-
-        context.wait_for_all_requests();
-        env.console.log("Clear map tutorial");
-        env.console.overlay().add_log("Clear map tutorial", COLOR_WHITE);
-        open_map_from_overworld(env.program_info(), env.console, context, true);
-        leave_phone_to_overworld(env.program_info(), env.console, context);
-
-        save_game_from_overworld(env.program_info(), env.console, context);
-        stats.m_checkpoint++;
-        env.update_stats();
-        send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE, "Saved at checkpoint.");
-
-        while (true){
-            pbf_move_left_joystick(context, 255, 0, 1 * TICKS_PER_SECOND, 20);
-            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 155, 1 * TICKS_PER_SECOND);
-            if (!overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 0)){
-                context.wait_for_all_requests();
-                env.console.log("Did not enter Nemona's house, resetting from checkpoint...", COLOR_RED);
-                env.console.overlay().add_log("Failed to enter house, reset", COLOR_RED);
-                reset_game(env.program_info(), env.console, context, "Did not enter Nemona's house, resetting from checkpoint...");
-                stats.m_reset++;
-                env.update_stats();
-                continue;
-            }
-            context.wait_for_all_requests();
-            env.console.overlay().add_log("Entered Nemona's house", COLOR_WHITE);
-            mash_button_till_overworld(env.console, context);
-            context.wait_for_all_requests();
-            env.console.log("Picking a starter...");
-            env.console.overlay().add_log("Picking a starter", COLOR_WHITE);
-            switch(STARTERCHOICE){
-            case StarterChoice::SPRIGATITO:
-                env.console.log("Picking Sprigatito...");
-                env.console.overlay().add_log("Picking Sprigatito...", COLOR_WHITE);
-                pbf_move_left_joystick(context, 75, 0, 80, 20);
-                break;
-            case StarterChoice::FUECOCO:
-                env.console.log("Picking Fuecoco...");
-                env.console.overlay().add_log("Picking Fuecoco...", COLOR_WHITE);
-                pbf_move_left_joystick(context, 180, 0, 80, 20);
-                break;
-            case StarterChoice::QUAXLY:
-                env.console.log("Picking Quaxly...");
-                env.console.overlay().add_log("Picking Quaxly...", COLOR_WHITE);
-                pbf_move_left_joystick(context, 128, 0, 80, 20);
-                break;
-            }
-            pbf_press_button(context, BUTTON_A, 20, 105);
-            if (!clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 20)){
-                context.wait_for_all_requests();
-                env.console.log("Failed to pick starter, resetting from checkpoint...", COLOR_RED);
-                env.console.overlay().add_log("Failed to select a starter, reset", COLOR_RED);
-                reset_game(env.program_info(), env.console, context, "Failed to pick starter, resetting from checkpoint...");
-                stats.m_reset++;
-                env.update_stats();
-                continue;
-            }
-            pbf_press_button(context, BUTTON_A, 20, 105);
-            // Don't give a nickname
-            if (!clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 20)){
-                context.wait_for_all_requests();
-                env.console.log("Stuck trying to give a nickname, resetting from checkpoint...", COLOR_RED);
-                env.console.overlay().add_log("Stuck on nickname page, reset", COLOR_RED);
-                reset_game(env.program_info(), env.console, context, "Stuck trying to give a nickname, resetting from checkpoint...");
-                stats.m_reset++;
-                env.update_stats();
-                continue;
-            }
-            pbf_press_dpad(context, DPAD_DOWN,  20, 105);
-            pbf_press_button(context, BUTTON_A, 20, 105);
-            if (!clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 20)){
-                context.wait_for_all_requests();
-                env.console.log("Stuck trying to give a nickname, resetting from checkpoint...", COLOR_RED);
-                env.console.overlay().add_log("Stuck on nickname page, reset", COLOR_RED);
-                reset_game(env.program_info(), env.console, context, "Stuck trying to give a nickname, resetting from checkpoint...");
-                stats.m_reset++;
-                env.update_stats();
-                continue;
-            }
-            break;
-        }
-
-        context.wait_for_all_requests();
-        env.console.log("Clear auto heal tutorial");
-        env.console.overlay().add_log("Clear auto heal tutorial", COLOR_WHITE);
-        enter_menu_from_overworld(env.program_info(), env.console, context, 0, MenuSide::LEFT);
-        pbf_press_button(context, BUTTON_A, 20, 8 * TICKS_PER_SECOND);
-
-        context.wait_for_all_requests();
-        env.console.log("Changing move order...");
-        env.console.overlay().add_log("Changing move order...", COLOR_WHITE);
-        // TODO: Detect move swapping
-        pbf_press_dpad(context, DPAD_RIGHT, 15, 1 * TICKS_PER_SECOND);
-        pbf_press_button(context, BUTTON_Y, 20, 40);
-        pbf_press_button(context, BUTTON_A, 20, 40);
-        pbf_press_dpad(context, DPAD_DOWN,  15, 40);
-        pbf_press_dpad(context, DPAD_DOWN,  15, 40);
-        pbf_press_button(context, BUTTON_A, 20, 40);
-        leave_box_system_to_overworld(env.program_info(), env.console, context);
-
-        save_game_from_overworld(env.program_info(), env.console, context);
-        stats.m_checkpoint++;
-        env.update_stats();
-        send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE, "Saved at checkpoint.");
+        segment_01_00(env, env.console, context);
+        checkpoint_save(env, env.console, context);
+        segment_01_01(env, env.console, context);
+        checkpoint_save(env, env.console, context);
 
         context.wait_for_all_requests();
         env.console.log("End Segment 02: Pick Starter", COLOR_GREEN);

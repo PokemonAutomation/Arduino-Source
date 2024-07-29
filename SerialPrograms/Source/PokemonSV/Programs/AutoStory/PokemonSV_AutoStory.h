@@ -100,7 +100,15 @@ public:
 
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
+    void checkpoint_save(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context);
 
+    // start: in room, sitting in chair
+    // end: map tutorial cleared, standing in front of Power of science NPC. heading towards Nemona's house
+    void segment_01_00(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context);
+
+    // start: map tutorial cleared, standing in front of Power of science NPC. heading towards Nemona's house
+    // end: 
+    void segment_01_01(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context);
 
 private:
     virtual void value_changed(void* object) override;
