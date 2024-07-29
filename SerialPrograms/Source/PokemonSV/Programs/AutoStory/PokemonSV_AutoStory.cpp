@@ -562,7 +562,7 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
         context.wait_for_all_requests();
         env.console.log("Clear map tutorial");
         env.console.overlay().add_log("Clear map tutorial", COLOR_WHITE);
-        open_map_from_overworld(env.program_info(), env.console, context);
+        open_map_from_overworld(env.program_info(), env.console, context, true);
         leave_phone_to_overworld(env.program_info(), env.console, context);
 
         save_game_from_overworld(env.program_info(), env.console, context);
