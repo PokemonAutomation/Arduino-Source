@@ -79,7 +79,7 @@ AutoStory::AutoStory()
         "<b>Start Point:</b><br>Program will start with this segment.",
         {
             {StartPoint::INTRO_CUTSCENE,        "00_gameintro",         "00: Intro Cutscene"},
-            {StartPoint::IN_ROOM,               "01_inroom",            "01: Start in room"},
+            {StartPoint::PICK_STARTER,          "01_pickstarter",       "01: Pick Starter"},
             {StartPoint::NEMONA_FIRST_BATTLE,   "02_nemonabattle1",     "02: First Nemona Battle"},
             {StartPoint::CATCH_TUTORIAL,        "03_catchtutorial",     "03: Catch Tutorial"},
             {StartPoint::LEGENDARY_RESCUE,      "04_legendaryrescue",   "04: Rescue Legendary"},
@@ -93,7 +93,7 @@ AutoStory::AutoStory()
     , ENDPOINT(
         "<b>End Point:</b><br>Program will stop after completing this segment.",
         {
-            {EndPoint::IN_ROOM,            "01_pickstarter",       "01: Pick Starter"},
+            {EndPoint::PICK_STARTER,            "01_pickstarter",       "01: Pick Starter"},
             {EndPoint::NEMONA_FIRST_BATTLE,     "02_nemonabattle1",     "02: First Nemona Battle"},
             {EndPoint::CATCH_TUTORIAL,          "03_catchtutorial",     "03: Catch Tutorial"},
             {EndPoint::LEGENDARY_RESCUE,        "04_legendaryrescue",   "04: Rescue Legendary"},
@@ -102,7 +102,7 @@ AutoStory::AutoStory()
             {EndPoint::MESAGOZA_SOUTH,          "07_mesagozasouth",     "07: Go to Mesagoza South"},
         },
         LockMode::LOCK_WHILE_RUNNING,
-        EndPoint::IN_ROOM
+        EndPoint::PICK_STARTER
     )
     , STARTERCHOICE(
         "<b>Starter " + STRING_POKEMON + ":",
@@ -136,7 +136,7 @@ AutoStory::AutoStory()
 }
 
 void AutoStory::value_changed(void* object){
-    ConfigOptionState state = (STARTPOINT == StartPoint::INTRO_CUTSCENE) || (STARTPOINT == StartPoint::IN_ROOM)
+    ConfigOptionState state = (STARTPOINT == StartPoint::INTRO_CUTSCENE) || (STARTPOINT == StartPoint::PICK_STARTER)
         ? ConfigOptionState::ENABLED
         : ConfigOptionState::HIDDEN;
     STARTERCHOICE.set_visibility(state);
@@ -455,7 +455,7 @@ void AutoStory::test_segments(
                 if (i > 0){
                     reset_game(env.program_info(), console, context);
                 }
-                console.log("segment_01: loop" + std::to_string(i));
+                console.log("segment_01: loop " + std::to_string(i));
                 segment_01(env, console, context);
             }
             break;
@@ -464,7 +464,7 @@ void AutoStory::test_segments(
                 if (i > 0){
                     reset_game(env.program_info(), console, context);
                 }
-                console.log("segment_02: loop" + std::to_string(i));
+                console.log("segment_02: loop " + std::to_string(i));
                 segment_02(env, console, context);
             }
             break;
@@ -592,7 +592,7 @@ void AutoStory::segment_01(ProgramEnvironment& env, ConsoleHandle& console, BotB
         console.log("Go outside, receive Rotom Phone");
         console.overlay().add_log("Go outside, receive Rotom Phone", COLOR_WHITE);
         if(!overworld_navigation(env.program_info(), console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 245, 230)){
-            console.log("Failed to receive Rotom phone, resetting...", COLOR_RED);
+            console.log("Failed to go outside, resetting...", COLOR_RED);
             context.wait_for_all_requests();
             reset_game(env.program_info(), console, context);
             stats.m_reset++;
@@ -611,76 +611,78 @@ void AutoStory::segment_02(ProgramEnvironment& env, ConsoleHandle& console, BotB
     while (true){   
         context.wait_for_all_requests();
         console.log("Bump into power of science NPC");
-        console.overlay().add_log("Bump into power of science NPC", COLOR_WHITE);
+        // console.overlay().add_log("Bump into power of science NPC", COLOR_WHITE);
         pbf_move_left_joystick(context, 128,   0, 33 * TICKS_PER_SECOND, 20);
 
         context.wait_for_all_requests();
         console.log("Clear map tutorial");
-        console.overlay().add_log("Clear map tutorial", COLOR_WHITE);
+        // console.overlay().add_log("Clear map tutorial", COLOR_WHITE);
         open_map_from_overworld(env.program_info(), console, context, true);
         leave_phone_to_overworld(env.program_info(), console, context);  
 
         pbf_move_left_joystick(context, 255, 0, 1 * TICKS_PER_SECOND, 20);
         realign_player(env.program_info(), console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 155, 1 * TICKS_PER_SECOND);
         if (!overworld_navigation(env.program_info(), console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 0)){
+            // timed out before detecting dialog box
             context.wait_for_all_requests();
             console.log("Did not enter Nemona's house, resetting from checkpoint...", COLOR_RED);
-            console.overlay().add_log("Failed to enter house, reset", COLOR_RED);
+            // console.overlay().add_log("Failed to enter house, reset", COLOR_RED);
             reset_game(env.program_info(), console, context);
             stats.m_reset++;
             env.update_stats();
             continue;
         }
         context.wait_for_all_requests();
-        console.overlay().add_log("Entered Nemona's house", COLOR_WHITE);
+        console.log("Entered Nemona's house");
+        // console.overlay().add_log("Entered Nemona's house", COLOR_WHITE);
         mash_button_till_overworld(console, context);
         context.wait_for_all_requests();
         console.log("Picking a starter...");
-        console.overlay().add_log("Picking a starter", COLOR_WHITE);
+        // console.overlay().add_log("Picking a starter", COLOR_WHITE);
         switch(STARTERCHOICE){
         case StarterChoice::SPRIGATITO:
             console.log("Picking Sprigatito...");
-            console.overlay().add_log("Picking Sprigatito...", COLOR_WHITE);
+            // console.overlay().add_log("Picking Sprigatito...", COLOR_WHITE);
             pbf_move_left_joystick(context, 75, 0, 80, 20);
             break;
         case StarterChoice::FUECOCO:
             console.log("Picking Fuecoco...");
-            console.overlay().add_log("Picking Fuecoco...", COLOR_WHITE);
+            // console.overlay().add_log("Picking Fuecoco...", COLOR_WHITE);
             pbf_move_left_joystick(context, 180, 0, 80, 20);
             break;
         case StarterChoice::QUAXLY:
             console.log("Picking Quaxly...");
-            console.overlay().add_log("Picking Quaxly...", COLOR_WHITE);
+            // console.overlay().add_log("Picking Quaxly...", COLOR_WHITE);
             pbf_move_left_joystick(context, 128, 0, 80, 20);
             break;
         }
-        pbf_press_button(context, BUTTON_A, 20, 105);
+        pbf_press_button(context, BUTTON_A, 20, 105); // choose the starter
         if (!clear_dialog(console, context, ClearDialogMode::STOP_PROMPT, 20)){
+            // timed out before detecting the dialog prompt, to confirm receiving the starter
             context.wait_for_all_requests();
             console.log("Failed to pick starter, resetting from checkpoint...", COLOR_RED);
-            console.overlay().add_log("Failed to select a starter, reset", COLOR_RED);
+            // console.overlay().add_log("Failed to select a starter, reset", COLOR_RED);
             reset_game(env.program_info(), console, context);
             stats.m_reset++;
             env.update_stats();
             continue;
         }
-        pbf_press_button(context, BUTTON_A, 20, 105);
-        // Don't give a nickname
+        pbf_press_button(context, BUTTON_A, 20, 105); // accept the pokemon
         if (!clear_dialog(console, context, ClearDialogMode::STOP_PROMPT, 20)){
+            // timed out before detecting the dialog prompt to give a nickname
             context.wait_for_all_requests();
             console.log("Stuck trying to give a nickname, resetting from checkpoint...", COLOR_RED);
-            console.overlay().add_log("Stuck on nickname page, reset", COLOR_RED);
+            // console.overlay().add_log("Stuck on nickname page, reset", COLOR_RED);
             reset_game(env.program_info(), console, context);
             stats.m_reset++;
             env.update_stats();
             continue;
         }
-        pbf_press_dpad(context, DPAD_DOWN,  20, 105);
-        pbf_press_button(context, BUTTON_A, 20, 105);
+        pbf_mash_button(context, BUTTON_B, 100);  // Don't give a nickname
         if (!clear_dialog(console, context, ClearDialogMode::STOP_OVERWORLD, 20)){
             context.wait_for_all_requests();
             console.log("Stuck trying to give a nickname, resetting from checkpoint...", COLOR_RED);
-            console.overlay().add_log("Stuck on nickname page, reset", COLOR_RED);
+            // console.overlay().add_log("Stuck on nickname page, reset", COLOR_RED);
             reset_game(env.program_info(), console, context);
             stats.m_reset++;
             env.update_stats();
@@ -691,13 +693,13 @@ void AutoStory::segment_02(ProgramEnvironment& env, ConsoleHandle& console, BotB
 
     context.wait_for_all_requests();
     console.log("Clear auto heal tutorial");
-    console.overlay().add_log("Clear auto heal tutorial", COLOR_WHITE);
+    // console.overlay().add_log("Clear auto heal tutorial", COLOR_WHITE);
     enter_menu_from_overworld(env.program_info(), console, context, 0, MenuSide::LEFT);
     pbf_press_button(context, BUTTON_A, 20, 8 * TICKS_PER_SECOND);
 
     context.wait_for_all_requests();
     console.log("Changing move order...");
-    console.overlay().add_log("Changing move order...", COLOR_WHITE);
+    // console.overlay().add_log("Changing move order...", COLOR_WHITE);
     // TODO: Detect move swapping
     pbf_press_dpad(context, DPAD_RIGHT, 15, 1 * TICKS_PER_SECOND);
     pbf_press_button(context, BUTTON_Y, 20, 40);
@@ -725,7 +727,7 @@ void AutoStory::run_autostory(SingleSwitchProgramEnvironment& env, BotBaseContex
         stats.m_segment++;
         env.update_stats();
         pbf_wait(context, 1 * TICKS_PER_SECOND);        
-    case StartPoint::IN_ROOM:
+    case StartPoint::PICK_STARTER:
         context.wait_for_all_requests();
         env.console.log("Start Segment 01: Pick Starter", COLOR_ORANGE);
         env.console.overlay().add_log("Start Segment 01: Pick Starter", COLOR_ORANGE);
@@ -738,7 +740,7 @@ void AutoStory::run_autostory(SingleSwitchProgramEnvironment& env, BotBaseContex
         env.console.overlay().add_log("End Segment 02: Pick Starter", COLOR_GREEN);
         stats.m_segment++;
         env.update_stats();
-        if (ENDPOINT == EndPoint::IN_ROOM){
+        if (ENDPOINT == EndPoint::PICK_STARTER){
             break;
         }
 
@@ -1165,9 +1167,9 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
     // Connect controller
     pbf_press_button(context, BUTTON_L, 20, 20);
 
-    int start = 0;
-    int end = 1;
-    int loops = 3;
+    int start = 2;
+    int end = 2;
+    int loops = 1;
     test_segments(env, env.console, context, start, end, loops);
 
 

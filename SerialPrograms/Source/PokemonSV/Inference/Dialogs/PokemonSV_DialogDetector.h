@@ -80,6 +80,7 @@ public:
 
 
 //  Detect dialog that prompts the player to make a choice.
+//  i.e. detects that Dialog box and Gradient arrow are present
 class PromptDialogDetector : public StaticScreenDetector{
 public:
     //  Will catch any prompt.

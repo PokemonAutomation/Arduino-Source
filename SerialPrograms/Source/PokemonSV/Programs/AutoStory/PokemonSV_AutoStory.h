@@ -72,6 +72,9 @@ bool run_battle(ConsoleHandle& console, BotBaseContext& context,
     BattleStopCondition stop_condition
 );
 
+// spam the A button to clear dialog.
+// stop depending on ClearDialogMode: stop when detect overworld, or dialog prompt, or A button prompt. Or if times out
+// return false if times out, unless this is the intended stop condition.
 bool clear_dialog(ConsoleHandle& console, BotBaseContext& context,
     ClearDialogMode mode, uint16_t seconds_timeout = 60
 );
@@ -86,6 +89,7 @@ bool overworld_navigation(const ProgramInfo& info, ConsoleHandle& console, BotBa
     uint16_t seconds_timeout = 60, uint16_t seconds_realign = 60
 );
 
+// mashes A button by default
 void mash_button_till_overworld(
     ConsoleHandle& console, 
     BotBaseContext& context, 
@@ -126,11 +130,11 @@ public:
     void segment_00(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context);
 
     // start: stood up from chair. updated settings
-    // end: map tutorial cleared, standing in front of Power of science NPC. heading towards Nemona's house
+    // end: standing outside of home, received Rotom phone
     void segment_01(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context);
 
-    // start: map tutorial cleared, standing in front of Power of science NPC. heading towards Nemona's house
-    // end: 
+    // start: standing outside of home, received Rotom phone
+    // end: received starter, changed move order
     void segment_02(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context);
 
 private:
@@ -139,7 +143,7 @@ private:
 private:
     enum class StartPoint{
         INTRO_CUTSCENE,
-        IN_ROOM,
+        PICK_STARTER,
         NEMONA_FIRST_BATTLE,
         CATCH_TUTORIAL,
         LEGENDARY_RESCUE,
@@ -150,7 +154,7 @@ private:
     EnumDropdownOption<StartPoint> STARTPOINT;
 
     enum class EndPoint{
-        IN_ROOM,
+        PICK_STARTER,
         NEMONA_FIRST_BATTLE,
         CATCH_TUTORIAL,
         LEGENDARY_RESCUE,
