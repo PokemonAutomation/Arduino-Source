@@ -115,7 +115,7 @@ public:
     // test the segments from start to end, inclusive
     // test each segment "loop" number of times
     void test_segments(
-        ProgramEnvironment& env,
+        SingleSwitchProgramEnvironment& env,
         ConsoleHandle& console, 
         BotBaseContext& context,
         int start, int end, int loop = 1
@@ -130,12 +130,14 @@ public:
     void segment_00(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context);
 
     // start: stood up from chair. updated settings
-    // end: standing outside of home, received Rotom phone
+    // end: standing in front of power of science NPC. cleared map tutorial
     void segment_01(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context);
 
-    // start: standing outside of home, received Rotom phone
+    // start: standing in front of power of science NPC. cleared map tutorial
     // end: received starter, changed move order
     void segment_02(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context);
+
+    void segment_03(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
 private:
     virtual void value_changed(void* object) override;

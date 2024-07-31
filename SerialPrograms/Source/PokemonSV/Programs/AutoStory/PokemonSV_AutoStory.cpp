@@ -439,7 +439,7 @@ void AutoStory::checkpoint_save(ProgramEnvironment& env, ConsoleHandle& console,
 }
 
 void AutoStory::test_segments(
-    ProgramEnvironment& env,
+    SingleSwitchProgramEnvironment& env,
     ConsoleHandle& console, 
     BotBaseContext& context,
     int start, int end, int loop
@@ -468,6 +468,15 @@ void AutoStory::test_segments(
                 segment_02(env, console, context);
             }
             break;
+        case 3:
+            for (int i = 0; i < loop; i++){
+                if (i > 0){
+                    reset_game(env.program_info(), console, context);
+                }
+                console.log("segment_03: loop " + std::to_string(i));
+                segment_03(env, context);
+            }
+            break;        
         }
 
         segment++;
@@ -601,14 +610,6 @@ void AutoStory::segment_01(ProgramEnvironment& env, ConsoleHandle& console, BotB
         }
         clear_dialog(console, context, ClearDialogMode::STOP_OVERWORLD);
 
-        break;          
-    }
-}
-
-void AutoStory::segment_02(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){
-    AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
-    checkpoint_save(env, console, context);
-    while (true){   
         context.wait_for_all_requests();
         console.log("Bump into power of science NPC");
         // console.overlay().add_log("Bump into power of science NPC", COLOR_WHITE);
@@ -618,8 +619,17 @@ void AutoStory::segment_02(ProgramEnvironment& env, ConsoleHandle& console, BotB
         console.log("Clear map tutorial");
         // console.overlay().add_log("Clear map tutorial", COLOR_WHITE);
         open_map_from_overworld(env.program_info(), console, context, true);
-        leave_phone_to_overworld(env.program_info(), console, context);  
+        leave_phone_to_overworld(env.program_info(), console, context);
 
+        break;          
+    }
+}
+
+void AutoStory::segment_02(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){
+    AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
+    checkpoint_save(env, console, context);
+    while (true){   
+          
         pbf_move_left_joystick(context, 255, 0, 1 * TICKS_PER_SECOND, 20);
         realign_player(env.program_info(), console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 155, 1 * TICKS_PER_SECOND);
         if (!overworld_navigation(env.program_info(), console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 0)){
@@ -711,6 +721,41 @@ void AutoStory::segment_02(ProgramEnvironment& env, ConsoleHandle& console, BotB
 
 }
 
+void AutoStory::segment_03(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
+    checkpoint_save(env, env.console, context);
+    while (true){
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 220, 245, 50);
+        pbf_move_left_joystick(context, 128, 0, 4 * TICKS_PER_SECOND, 1 * TICKS_PER_SECOND);
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 128, 50);
+        pbf_move_left_joystick(context, 128, 0, 4 * TICKS_PER_SECOND, 1 * TICKS_PER_SECOND);
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 60, 50);
+        pbf_move_left_joystick(context, 128, 0, 4 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
+        if (!overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_SPAM_A, 128, 0, 8)){
+            context.wait_for_all_requests();
+            env.console.log("Did not talk to Nemona at beach, resetting from checkpoint...", COLOR_RED);
+            env.console.overlay().add_log("Can't find Nemona, reset", COLOR_RED);
+            reset_game(env.program_info(), env.console, context);
+            stats.m_reset++;
+            env.update_stats();
+            continue;
+        }
+        context.wait_for_all_requests();
+        env.console.overlay().add_log("Found Nemona", COLOR_WHITE);
+        break;
+    }
+
+    context.wait_for_all_requests();
+    env.console.log("Starting battle...");
+    env.console.overlay().add_log("Starting battle...", COLOR_WHITE);
+    // TODO: Battle start prompt detection
+    mash_button_till_overworld(env.console, context);
+    context.wait_for_all_requests();
+    env.console.log("Finished battle.");
+    env.console.overlay().add_log("Finished battle.", COLOR_WHITE);
+
+}
+
 void AutoStory::run_autostory(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     switch (STARTPOINT){
@@ -749,40 +794,7 @@ void AutoStory::run_autostory(SingleSwitchProgramEnvironment& env, BotBaseContex
         env.console.log("Start Segment 02: First Nemona Battle", COLOR_ORANGE);
         env.console.overlay().add_log("Start Segment 02: First Nemona Battle", COLOR_ORANGE);
 
-        while (true){
-            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 220, 245, 50);
-            pbf_move_left_joystick(context, 128, 0, 4 * TICKS_PER_SECOND, 1 * TICKS_PER_SECOND);
-            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 128, 50);
-            pbf_move_left_joystick(context, 128, 0, 4 * TICKS_PER_SECOND, 1 * TICKS_PER_SECOND);
-            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 60, 50);
-            pbf_move_left_joystick(context, 128, 0, 4 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
-            if (!overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_SPAM_A, 128, 0, 8)){
-                context.wait_for_all_requests();
-                env.console.log("Did not talk to Nemona at beach, resetting from checkpoint...", COLOR_RED);
-                env.console.overlay().add_log("Can't find Nemona, reset", COLOR_RED);
-                reset_game(env.program_info(), env.console, context);
-                stats.m_reset++;
-                env.update_stats();
-                continue;
-            }
-            context.wait_for_all_requests();
-            env.console.overlay().add_log("Found Nemona", COLOR_WHITE);
-            break;
-        }
-
-        context.wait_for_all_requests();
-        env.console.log("Starting battle...");
-        env.console.overlay().add_log("Starting battle...", COLOR_WHITE);
-        // TODO: Battle start prompt detection
-        mash_button_till_overworld(env.console, context);
-        context.wait_for_all_requests();
-        env.console.log("Finished battle.");
-        env.console.overlay().add_log("Finished battle.", COLOR_WHITE);
-
-        save_game_from_overworld(env.program_info(), env.console, context);
-        stats.m_checkpoint++;
-        env.update_stats();
-        send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE, "Saved at checkpoint.");
+        segment_03(env, context);
 
         context.wait_for_all_requests();
         env.console.log("End Segment 02: First Nemona Battle", COLOR_GREEN);
@@ -1167,9 +1179,9 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
     // Connect controller
     pbf_press_button(context, BUTTON_L, 20, 20);
 
-    int start = 2;
-    int end = 2;
-    int loops = 1;
+    int start = 3;
+    int end = 3;
+    int loops = 4;
     test_segments(env, env.console, context, start, end, loops);
 
 
