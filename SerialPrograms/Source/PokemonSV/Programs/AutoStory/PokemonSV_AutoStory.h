@@ -139,6 +139,22 @@ public:
 
     void segment_03(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
+    void segment_04(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+
+    void segment_05(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+
+    void segment_06(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+
+    void segment_07(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+
+    void segment_08(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+
+    void segment_09(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+
+    void segment_10(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+
+    void segment_11(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+
 private:
     virtual void value_changed(void* object) override;
 
