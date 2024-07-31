@@ -834,7 +834,7 @@ void AutoStory::segment_03(SingleSwitchProgramEnvironment& env, BotBaseContext& 
 
 void AutoStory::segment_04(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
-    // checkpoint_save(env, env.console, context);
+    checkpoint_save(env, env.console, context);
     context.wait_for_all_requests();
     while (true){
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 40, 160, 60);
@@ -859,7 +859,7 @@ void AutoStory::segment_04(SingleSwitchProgramEnvironment& env, BotBaseContext& 
 
 void AutoStory::segment_05(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
-    // checkpoint_save(env, env.console, context);
+    checkpoint_save(env, env.console, context);
     context.wait_for_all_requests();
     while (true){
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 40, 82, 60);
@@ -895,7 +895,7 @@ void AutoStory::segment_05(SingleSwitchProgramEnvironment& env, BotBaseContext& 
 
 void AutoStory::segment_06(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
-    // checkpoint_save(env, env.console, context);
+    checkpoint_save(env, env.console, context);
 
     context.wait_for_all_requests();
     env.console.log("Move to cliff");
@@ -930,7 +930,7 @@ void AutoStory::segment_06(SingleSwitchProgramEnvironment& env, BotBaseContext& 
 
 void AutoStory::segment_07(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
-    // checkpoint_save(env, env.console, context);
+    checkpoint_save(env, env.console, context);
 
     context.wait_for_all_requests();
     while (true){
@@ -1004,7 +1004,7 @@ void AutoStory::segment_07(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         pbf_move_left_joystick(context, 128, 20, 10 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NO_MARKER, 200, 25, 20);
         pbf_move_left_joystick(context, 128, 20, 11 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NO_MARKER, 230, 25, 25);
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NO_MARKER, 220, 25, 25);
         pbf_move_left_joystick(context, 128, 20, 6 * TICKS_PER_SECOND, 20 * TICKS_PER_SECOND);
 
         // Houndoom encounter
@@ -1035,7 +1035,7 @@ void AutoStory::segment_07(SingleSwitchProgramEnvironment& env, BotBaseContext& 
 
 void AutoStory::segment_08(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
-    // checkpoint_save(env, env.console, context);
+    checkpoint_save(env, env.console, context);
     context.wait_for_all_requests();
     while (true){
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 230, 120, 100);
@@ -1061,7 +1061,7 @@ void AutoStory::segment_08(SingleSwitchProgramEnvironment& env, BotBaseContext& 
 
 void AutoStory::segment_09(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
-    // checkpoint_save(env, env.console, context);
+    checkpoint_save(env, env.console, context);
     context.wait_for_all_requests();
     while (true){
         context.wait_for_all_requests();
@@ -1089,7 +1089,7 @@ void AutoStory::segment_09(SingleSwitchProgramEnvironment& env, BotBaseContext& 
 
 void AutoStory::segment_10(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
-    // checkpoint_save(env, env.console, context);
+    checkpoint_save(env, env.console, context);
     context.wait_for_all_requests();
 
     while (true){
@@ -1279,9 +1279,9 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
     // Connect controller
     pbf_press_button(context, BUTTON_L, 20, 20);
 
-    int start = 0;
+    int start = 7;
     int end = 10;
-    int loops = 2;
+    int loops = 10;
     test_segments(env, env.console, context, start, end, loops);
 
 
