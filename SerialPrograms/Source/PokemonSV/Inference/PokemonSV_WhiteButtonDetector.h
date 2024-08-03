@@ -78,6 +78,7 @@ protected:
     const WhiteButtonMatcher& m_matcher;
     Color m_color;
     ImageFloatBox m_box;
+    WhiteButton m_button;
 };
 class WhiteButtonWatcher : public DetectorToFinder<WhiteButtonDetector>{
 public:

@@ -14,6 +14,7 @@
 #include "CommonFramework/Tools/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_SnapshotDumper.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_NormalBattleMenus.h"
 #include "PokemonSV/PokemonSV_Settings.h"
@@ -224,7 +225,7 @@ bool clear_dialog(ConsoleHandle& console, BotBaseContext& context,
     while (true){
         OverworldWatcher    overworld(COLOR_CYAN);
         PromptDialogWatcher prompt(COLOR_YELLOW);
-        WhiteButtonWatcher  whitebutton(COLOR_GREEN, WhiteButton::ButtonA, {0.650, 0.650, 0.140, 0.240});
+        WhiteButtonWatcher  whitebutton(COLOR_GREEN, WhiteButton::ButtonA2, {0.725, 0.833, 0.024, 0.045}); // {0.650, 0.650, 0.140, 0.240}
         DialogBoxWatcher    dialog(COLOR_RED, true);
         context.wait_for_all_requests();
 
@@ -255,6 +256,7 @@ bool clear_dialog(ConsoleHandle& console, BotBaseContext& context,
                 return true;
             }
             pbf_press_button(context, BUTTON_A, 20, 105);
+            dump_snapshot(console);
             break;
         case 3: // dialog
             console.log("clear_dialog: Detected dialog.");
@@ -1279,9 +1281,9 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
     // Connect controller
     pbf_press_button(context, BUTTON_L, 20, 20);
 
-    int start = 7;
-    int end = 10;
-    int loops = 10;
+    int start = 0;
+    int end = 4;
+    int loops = 1;
     test_segments(env, env.console, context, start, end, loops);
 
 

@@ -140,6 +140,7 @@ WhiteButtonDetector::WhiteButtonDetector(
     : m_matcher(get_button_matcher(button))
     , m_color(color)
     , m_box(box)
+    , m_button(button)
 {}
 void WhiteButtonDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_box);
