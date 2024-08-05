@@ -401,6 +401,77 @@ void config_option(BotBaseContext& context, int change_option_value){
     pbf_press_dpad(context, DPAD_DOWN,  15, 20);
 }
 
+// NOTE: we can't confirm that the moves are actually swapped, unless we detect the moves themselves (either names or PP)
+void swap_starter_moves(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+    WallClock start = current_time();
+    while (true){
+        if (current_time() - start > std::chrono::minutes(3)){
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, console,
+                "swap_starter_moves(): Failed to swap the starter moves after 3 minutes.",
+                true
+            );
+        }
+
+        // open menu, select your starter
+        enter_menu_from_overworld(info, console, context, 0, MenuSide::LEFT);
+
+        // enter Pokemon summary screen
+        GradientArrowWatcher arrow1(COLOR_RED, GradientArrowType::RIGHT, {0.30, 0.156, 0.046, 0.075});
+        context.wait_for_all_requests();
+        int ret = wait_until(
+            console, context,
+            std::chrono::seconds(10),
+            {arrow1}
+        );
+        if (ret < 0){
+            press_Bs_to_back_to_overworld(info, console, context);
+            continue;
+        }
+        pbf_press_button(context, BUTTON_A, 20, 5 * TICKS_PER_SECOND);
+        pbf_press_dpad(context, DPAD_RIGHT, 15, 1 * TICKS_PER_SECOND);
+        pbf_press_button(context, BUTTON_Y, 20, 40);
+
+        // swap first and third move
+        GradientArrowWatcher arrow2(COLOR_RED, GradientArrowType::RIGHT, {0.275, 0.240, 0.046, 0.075});
+        context.wait_for_all_requests();
+        ret = wait_until(
+            console, context,
+            std::chrono::seconds(10),
+            {arrow2}
+        );
+        if (ret < 0){
+            press_Bs_to_back_to_overworld(info, console, context);
+            continue;
+        }
+        // note: we can't confirm that we press this A button, unless we detect the moves themselves
+        pbf_press_button(context, BUTTON_A, 20, 40);  
+        pbf_press_dpad(context, DPAD_DOWN,  15, 40);
+        pbf_press_dpad(context, DPAD_DOWN,  15, 40);
+
+        // extra button presses to avoid drops
+        pbf_press_dpad(context, DPAD_DOWN,  15, 40); 
+        pbf_press_dpad(context, DPAD_DOWN,  15, 40);
+
+        GradientArrowWatcher arrow3(COLOR_RED, GradientArrowType::RIGHT, {0.275, 0.389, 0.046, 0.075});
+        context.wait_for_all_requests();
+        ret = wait_until(
+            console, context,
+            std::chrono::seconds(10),
+            {arrow3}
+        );
+        if (ret < 0){
+            press_Bs_to_back_to_overworld(info, console, context);
+            continue;
+        }
+        // note: we can't confirm that we press this A button, unless we detect the moves themselves
+        pbf_press_button(context, BUTTON_A, 20, 40);    
+
+        break;    
+    }
+
+}
+
 void enter_menu_from_overworld(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
     int menu_index,
     MenuSide side,
@@ -843,21 +914,9 @@ void AutoStory::segment_02(ProgramEnvironment& env, ConsoleHandle& console, BotB
     }
 
     context.wait_for_all_requests();
-    console.log("Clear auto heal tutorial");
-    // console.overlay().add_log("Clear auto heal tutorial", COLOR_WHITE);
-    enter_menu_from_overworld(env.program_info(), console, context, 0, MenuSide::LEFT);
-    clear_tutorial(console, context);
+    console.log("Clear auto heal tutorial and change move order...");
+    swap_starter_moves(env.program_info(), console, context);
 
-    context.wait_for_all_requests();
-    console.log("Changing move order...");
-    // console.overlay().add_log("Changing move order...", COLOR_WHITE);
-    // TODO: Detect move swapping
-    pbf_press_dpad(context, DPAD_RIGHT, 15, 1 * TICKS_PER_SECOND);
-    pbf_press_button(context, BUTTON_Y, 20, 40);
-    pbf_press_button(context, BUTTON_A, 20, 40);
-    pbf_press_dpad(context, DPAD_DOWN,  15, 40);
-    pbf_press_dpad(context, DPAD_DOWN,  15, 40);
-    pbf_press_button(context, BUTTON_A, 20, 40);
     leave_box_system_to_overworld(env.program_info(), console, context);    
 
 }
@@ -1336,11 +1395,12 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
 
     // Connect controller
     pbf_press_button(context, BUTTON_L, 20, 20);
+    // swap_starter_moves(env.program_info(), env.console, context);
 
     // TODO: set settings. to ensure autosave is off.
 
     int start = 2;
-    int end = 3;
+    int end = 2;
     int loops = 1;
     test_segments(env, env.console, context, start, end, loops);
 

@@ -101,6 +101,10 @@ void mash_button_till_overworld(
 
 void config_option(BotBaseContext& context, int change_option_value);
 
+// enter menu and swap the first and third moves for your starter
+void swap_starter_moves(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
+
+// enter menu and move the cursor the given side, and index. then press the A button
 void enter_menu_from_overworld(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
     int menu_index,
     MenuSide side = MenuSide::RIGHT,
