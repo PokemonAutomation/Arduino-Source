@@ -27,6 +27,7 @@
 #include "PokemonSV/Programs/PokemonSV_SaveGame.h"
 #include "PokemonSV/Programs/Battles/PokemonSV_Battles.h"
 #include "PokemonSV/Programs/AutoStory/PokemonSV_MenuOption.h"
+#include "PokemonSV/Programs/AutoStory/PokemonSV_TutorialDetector.h"
 #include "PokemonSV_AutoStory.h"
 
 //#include <iostream>
@@ -223,6 +224,30 @@ bool run_battle(
         default: // timeout
             console.log("run_battle(): Timed out.");
             return false;
+        }
+    }
+}
+
+void clear_tutorial(ConsoleHandle& console, BotBaseContext& context, uint16_t seconds_timeout){
+    while (true){
+        TutorialWatcher tutorial;
+        context.wait_for_all_requests();
+
+        int ret = wait_until(
+            console, context,
+            std::chrono::seconds(seconds_timeout),
+            {tutorial}
+        );
+        context.wait_for(std::chrono::milliseconds(100));
+
+        switch (ret){
+        case 0: // overworld
+            console.log("clear_tutorial: Detected tutorial screen.");
+            pbf_press_button(context, BUTTON_A, 20, 105);
+            break;
+        default:
+            console.log("clear_tutorial: Timed out.");
+            return;
         }
     }
 }
@@ -687,8 +712,7 @@ void AutoStory::segment_01(ProgramEnvironment& env, ConsoleHandle& console, BotB
         pbf_move_left_joystick(context, 255, 128, 4 * TICKS_PER_SECOND, 20);
         pbf_move_left_joystick(context, 110, 200, 3 * TICKS_PER_SECOND, 20);
         pbf_move_left_joystick(context, 255, 128, 2 * TICKS_PER_SECOND, 20);
-        // TODO: Tutorial detection
-        pbf_mash_button(context, BUTTON_A, 20 * TICKS_PER_SECOND);
+        clear_tutorial(console, context);
 
         context.wait_for_all_requests();
         console.log("Go to the living room, talk with Clavell");
@@ -815,7 +839,7 @@ void AutoStory::segment_02(ProgramEnvironment& env, ConsoleHandle& console, BotB
     console.log("Clear auto heal tutorial");
     // console.overlay().add_log("Clear auto heal tutorial", COLOR_WHITE);
     enter_menu_from_overworld(env.program_info(), console, context, 0, MenuSide::LEFT);
-    pbf_press_button(context, BUTTON_A, 20, 8 * TICKS_PER_SECOND);
+    clear_tutorial(console, context);
 
     context.wait_for_all_requests();
     console.log("Changing move order...");
@@ -912,15 +936,11 @@ void AutoStory::segment_05(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         context.wait_for_all_requests();
         env.console.log("Start catch tutorial");
         env.console.overlay().add_log("Start catch tutorial", COLOR_WHITE);
-        clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 10);
-        // TODO: Tutorial detection
-        pbf_press_button(context, BUTTON_A, 20, 105);
-        pbf_press_button(context, BUTTON_A, 20, 105);
+        clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 5);
+        clear_tutorial(env.console, context);
         run_battle(env.console, context, BattleStopCondition::STOP_DIALOG);
-        clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 10);
-        // TODO: Tutorial detection
-        pbf_press_button(context, BUTTON_A, 20, 105);
-        pbf_press_button(context, BUTTON_A, 20, 105);
+        clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 5);
+        clear_tutorial(env.console, context);
         context.wait_for_all_requests();
         env.console.log("Finished catch tutorial");
         env.console.overlay().add_log("Finished catch tutorial", COLOR_WHITE);
@@ -1143,12 +1163,8 @@ void AutoStory::segment_10(SingleSwitchProgramEnvironment& env, BotBaseContext& 
             env.update_stats();
             continue;
         }
-        clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 10);
-        // TODO: Tutorial detection
-        pbf_press_button(context, BUTTON_A, 20, 105);
-        pbf_press_button(context, BUTTON_A, 20, 105);
-        pbf_press_button(context, BUTTON_A, 20, 105);
-        pbf_press_button(context, BUTTON_A, 20, 105);
+        clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 5);
+        clear_tutorial(env.console, context);
         context.wait_for_all_requests();
         env.console.log("Reached Los Platos");
         env.console.overlay().add_log("Reached Los Platos", COLOR_WHITE);
@@ -1316,8 +1332,8 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
 
     // TODO: set settings. to ensure autosave is off.
 
-    int start = 3;
-    int end = 6;
+    int start = 0;
+    int end = 0;
     int loops = 1;
     test_segments(env, env.console, context, start, end, loops);
 
