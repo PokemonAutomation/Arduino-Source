@@ -35,8 +35,8 @@ void TutorialDetector::make_overlays(VideoOverlaySet& items) const{
 bool TutorialDetector::detect(const ImageViewRGB32& screen) const{
     ImageStats bottom = image_stats(extract_box_reference(screen, m_bottom));
     ImageStats left = image_stats(extract_box_reference(screen, m_left));
-    cout << "bottom.average.sum(): " << bottom.average.sum() << endl;
-    cout << "left.average.sum(): " << left.average.sum() << endl;
+    // cout << "bottom.average.sum(): " << bottom.average.sum() << endl;
+    // cout << "left.average.sum(): " << left.average.sum() << endl;
 
     // expected color is {255, 255, 235}
     return is_solid(bottom, {0.342282, 0.342282, 0.315436}) 

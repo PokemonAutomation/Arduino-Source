@@ -133,6 +133,7 @@ AutoStory::AutoStory()
         &NOTIFICATION_ERROR_FATAL,
     })
 {
+    PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(STARTPOINT);
     PA_ADD_OPTION(ENDPOINT);
     PA_ADD_OPTION(STARTERCHOICE);
@@ -595,10 +596,16 @@ void AutoStory::test_segments(
 void AutoStory::segment_00(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){
 
 
-    // Mash A through intro cutscene
-    // TODO: Stand up icon detection
-
-    pbf_mash_button(context, BUTTON_A, 240 * TICKS_PER_SECOND);
+    // Mash A through intro cutscene, until the L stick button is detected
+    WhiteButtonWatcher leftstick(COLOR_GREEN, WhiteButton::ButtonLStick, {0.435, 0.912, 0.042, 0.047});
+    context.wait_for_all_requests();
+    run_until(
+        console, context,
+        [](BotBaseContext& context){
+            pbf_mash_button(context, BUTTON_A, 240 * TICKS_PER_SECOND);
+        },
+        {leftstick}
+    );
     
     // Stand up from chair and walk to left side of room
     pbf_move_left_joystick(context, 128, 255, 3 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
@@ -712,7 +719,7 @@ void AutoStory::segment_01(ProgramEnvironment& env, ConsoleHandle& console, BotB
         pbf_move_left_joystick(context, 255, 128, 4 * TICKS_PER_SECOND, 20);
         pbf_move_left_joystick(context, 110, 200, 3 * TICKS_PER_SECOND, 20);
         pbf_move_left_joystick(context, 255, 128, 2 * TICKS_PER_SECOND, 20);
-        clear_tutorial(console, context);
+        pbf_mash_button(context, BUTTON_A, 20 * TICKS_PER_SECOND);
 
         context.wait_for_all_requests();
         console.log("Go to the living room, talk with Clavell");
@@ -1332,8 +1339,8 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
 
     // TODO: set settings. to ensure autosave is off.
 
-    int start = 0;
-    int end = 0;
+    int start = 2;
+    int end = 3;
     int loops = 1;
     test_segments(env, env.console, context, start, end, loops);
 
