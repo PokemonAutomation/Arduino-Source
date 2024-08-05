@@ -73,16 +73,20 @@ void MenuOption::set_target_option(const std::vector<MenuOptionToggleEnum>& targ
         "MenuOption::set_target_option(): Unable to set option to the correct toggle."
     );
 
-    int8_t selected_index = get_selected_index(console, context);
     for (size_t attempt = 0; attempt < 10; attempt++){
-        std::string current_option_slug = read_option_toggle(console, context, selected_index);
+        std::string current_option_slug = read_option_toggle();
         MenuOptionToggleEnum current_option_toggle_enum = menu_option_toggle_lookup_by_slug(current_option_slug).enum_value;
         if (current_option_toggle_enum == target_option_toggle_enum){
             return;
         }
 
-        pbf_press_dpad(context, DPAD_RIGHT, 10, 50);
+        pbf_press_dpad(m_context, DPAD_RIGHT, 10, 50);
     }
+
+    throw OperationFailedException(
+        ErrorReport::SEND_ERROR_REPORT, m_console,
+        "MenuOption::set_target_option(): Unable to set option to the correct toggle."
+    );
 
 }
 
