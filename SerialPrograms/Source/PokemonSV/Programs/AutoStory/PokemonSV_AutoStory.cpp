@@ -16,6 +16,7 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_SnapshotDumper.h"
 #include "Pokemon/Pokemon_Strings.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_NormalBattleMenus.h"
 #include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
@@ -25,6 +26,7 @@
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_SaveGame.h"
 #include "PokemonSV/Programs/Battles/PokemonSV_Battles.h"
+#include "PokemonSV/Programs/AutoStory/PokemonSV_MenuOption.h"
 #include "PokemonSV_AutoStory.h"
 
 //#include <iostream>
@@ -76,7 +78,13 @@ AutoStory::~AutoStory(){
 }
 
 AutoStory::AutoStory()
-    : STARTPOINT(
+    : LANGUAGE(
+        "<b>Game Language:</b>",
+        PokemonSwSh::IV_READER().languages(),
+        LockMode::UNLOCK_WHILE_RUNNING,
+        true
+    )
+    , STARTPOINT(
         "<b>Start Point:</b><br>Program will start with this segment.",
         {
             {StartPoint::INTRO_CUTSCENE,        "00_gameintro",         "00: Intro Cutscene"},
@@ -256,7 +264,7 @@ bool clear_dialog(ConsoleHandle& console, BotBaseContext& context,
                 return true;
             }
             pbf_press_button(context, BUTTON_A, 20, 105);
-            dump_snapshot(console);
+            // dump_snapshot(console);
             break;
         case 3: // dialog
             console.log("clear_dialog: Detected dialog.");
@@ -561,7 +569,6 @@ void AutoStory::test_segments(
 
 void AutoStory::segment_00(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){
 
-    //TODO: Automate character settings
 
     // Mash A through intro cutscene
     // TODO: Stand up icon detection
@@ -575,24 +582,50 @@ void AutoStory::segment_00(ProgramEnvironment& env, ConsoleHandle& console, BotB
     // set settings
     enter_menu_from_overworld(env.program_info(), console, context, 0, MenuSide::RIGHT, false);
 
-    // TODO: use visual inference to confirm settings
-    config_option(context, 1); // Text Speed: Fast
-    config_option(context, 1); // Skip Move Learning: On
-    config_option(context, 1); // Send to Boxes: Automatic
-    config_option(context, 1); // Give Nicknames: Off
-    config_option(context, 0); // Vertical Camera Controls: Regular
-    config_option(context, 0); // Horiztontal Camera Controls: Regular
-    config_option(context, 0); // Camera Support: On
-    config_option(context, 0); // Camera Interpolation: Normal
-    config_option(context, 0); // Camera Distance: Close
-    config_option(context, 1); // Autosave: Off
-    config_option(context, 1); // Show Nicknames: Don't show
-    config_option(context, 1); // Skip Cutscenes: On
-    config_option(context, 0); // Background Music: 10
-    config_option(context, 0); // Sound Effects: 10
-    config_option(context, 0); // Pokemon Cries: 10
-    config_option(context, 0); // Controller Rumble: On
-    config_option(context, 1); // Helping Functions: Off
+    if (LANGUAGE == Language::English){
+        MenuOption session(console, context, LANGUAGE);
+    
+        std::vector<std::pair<MenuOptionItemEnum, MenuOptionToggleEnum>> options = {
+            {MenuOptionItemEnum::TEXT_SPEED, MenuOptionToggleEnum::FAST},
+            {MenuOptionItemEnum::SKIP_MOVE_LEARNING, MenuOptionToggleEnum::ON},
+            {MenuOptionItemEnum::SEND_TO_BOXES, MenuOptionToggleEnum::AUTOMATIC},
+            {MenuOptionItemEnum::GIVE_NICKNAMES, MenuOptionToggleEnum::OFF},
+            {MenuOptionItemEnum::VERTICAL_CAMERA_CONTROLS, MenuOptionToggleEnum::REGULAR},
+            {MenuOptionItemEnum::HORIZONTAL_CAMERA_CONTROLS, MenuOptionToggleEnum::REGULAR},
+            {MenuOptionItemEnum::CAMERA_SUPPORT, MenuOptionToggleEnum::ON},
+            {MenuOptionItemEnum::CAMERA_INTERPOLATION, MenuOptionToggleEnum::NORMAL},
+            {MenuOptionItemEnum::CAMERA_DISTANCE, MenuOptionToggleEnum::CLOSE},
+            {MenuOptionItemEnum::AUTOSAVE, MenuOptionToggleEnum::OFF},
+            {MenuOptionItemEnum::SHOW_NICKNAMES, MenuOptionToggleEnum::DONT_SHOW},
+            {MenuOptionItemEnum::SKIP_CUTSCENES, MenuOptionToggleEnum::ON},
+            {MenuOptionItemEnum::CONTROLLER_RUMBLE, MenuOptionToggleEnum::ON},
+            {MenuOptionItemEnum::HELPING_FUNCTIONS, MenuOptionToggleEnum::OFF},
+
+        };
+        session.set_options(options);
+
+    }else{
+        //TODO: Add OCR file for other languages
+
+        config_option(context, 1); // Text Speed: Fast
+        config_option(context, 1); // Skip Move Learning: On
+        config_option(context, 1); // Send to Boxes: Automatic
+        config_option(context, 1); // Give Nicknames: Off
+        config_option(context, 0); // Vertical Camera Controls: Regular
+        config_option(context, 0); // Horiztontal Camera Controls: Regular
+        config_option(context, 0); // Camera Support: On
+        config_option(context, 0); // Camera Interpolation: Normal
+        config_option(context, 0); // Camera Distance: Close
+        config_option(context, 1); // Autosave: Off
+        config_option(context, 1); // Show Nicknames: Don't show
+        config_option(context, 1); // Skip Cutscenes: On
+        config_option(context, 0); // Background Music: 10
+        config_option(context, 0); // Sound Effects: 10
+        config_option(context, 0); // Pokemon Cries: 10
+        config_option(context, 0); // Controller Rumble: On
+        config_option(context, 1); // Helping Functions: Off
+    }
+
     pbf_mash_button(context, BUTTON_A, 1 * TICKS_PER_SECOND);
     clear_dialog(console, context, ClearDialogMode::STOP_TIMEOUT, 5);
     pbf_mash_button(context, BUTTON_B, 2 * TICKS_PER_SECOND);    
@@ -1281,8 +1314,10 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
     // Connect controller
     pbf_press_button(context, BUTTON_L, 20, 20);
 
-    int start = 0;
-    int end = 4;
+    // TODO: set settings. to ensure autosave is off.
+
+    int start = 3;
+    int end = 6;
     int loops = 1;
     test_segments(env, env.console, context, start, end, loops);
 

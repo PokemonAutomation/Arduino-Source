@@ -12,6 +12,7 @@
 //#include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
+#include "CommonFramework/Options/LanguageOCROption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
@@ -159,6 +160,7 @@ private:
     virtual void value_changed(void* object) override;
 
 private:
+    OCR::LanguageOCROption LANGUAGE;
     enum class StartPoint{
         INTRO_CUTSCENE,
         PICK_STARTER,
