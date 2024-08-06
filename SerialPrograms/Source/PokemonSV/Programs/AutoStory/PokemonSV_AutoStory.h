@@ -58,6 +58,13 @@ public:
 };
 
 // align player orientation based on the alignment mode
+// The direction is specified by (x, y):
+// x = 0 : left
+// x = 128 : neutral
+// x = 255 : right
+// y = 0 : up
+// y = 128 : neutral
+// y = 255 : down
 // - REALIGN_NEW_MARKER: place down a map marker, which will align the player towards the marker
 // location of the marker is set with move_x, move_y, move_duration
 // - REALIGN_OLD_MARKER: assuming a marker is already set, open and close the map, 
@@ -130,19 +137,19 @@ public:
 
     void run_autostory(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
-    void checkpoint_save(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context);
+    void checkpoint_save(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
     // start: after selecting character name, style and the cutscene has started
     // end: stood up from chair. updated settings
-    void segment_00(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context);
+    void segment_00(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
     // start: stood up from chair. updated settings
     // end: standing in front of power of science NPC. cleared map tutorial
-    void segment_01(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context);
+    void segment_01(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
     // start: standing in front of power of science NPC. cleared map tutorial
     // end: received starter, changed move order
-    void segment_02(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context);
+    void segment_02(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
     void segment_03(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
