@@ -124,6 +124,7 @@
 #include "PokemonSV/Programs/AutoStory/PokemonSV_MenuOption.h"
 #include "PokemonSV/Programs/AutoStory/PokemonSV_MenuOptionDatabase.h"
 #include "PokemonSV/Programs/AutoStory/PokemonSV_TutorialDetector.h"
+#include "PokemonSV/Programs/AutoStory/PokemonSV_PokemonMovesReader.h"
 
 
 #include <QPixmap>

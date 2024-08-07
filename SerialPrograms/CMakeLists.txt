@@ -1432,6 +1432,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Programs/AutoStory/PokemonSV_MenuOptionDatabase.h
     Source/PokemonSV/Programs/AutoStory/PokemonSV_MenuOptionReader.cpp
     Source/PokemonSV/Programs/AutoStory/PokemonSV_MenuOptionReader.h
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_PokemonMovesReader.cpp
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_PokemonMovesReader.h
     Source/PokemonSV/Programs/AutoStory/PokemonSV_TutorialDetector.cpp
     Source/PokemonSV/Programs/AutoStory/PokemonSV_TutorialDetector.h
     Source/PokemonSV/Programs/Battles/PokemonSV_BasicCatcher.cpp

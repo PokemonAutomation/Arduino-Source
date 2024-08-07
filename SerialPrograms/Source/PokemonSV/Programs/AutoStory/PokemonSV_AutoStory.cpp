@@ -28,6 +28,7 @@
 #include "PokemonSV/Programs/Battles/PokemonSV_Battles.h"
 #include "PokemonSV/Programs/AutoStory/PokemonSV_MenuOption.h"
 #include "PokemonSV/Programs/AutoStory/PokemonSV_TutorialDetector.h"
+#include "PokemonSV/Programs/AutoStory/PokemonSV_PokemonMovesReader.h"
 #include "PokemonSV_AutoStory.h"
 
 //#include <iostream>
@@ -402,7 +403,7 @@ void config_option(BotBaseContext& context, int change_option_value){
 }
 
 // NOTE: we can't confirm that the moves are actually swapped, unless we detect the moves themselves (either names or PP)
-void swap_starter_moves(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+void swap_starter_moves(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, Language language){
     WallClock start = current_time();
     while (true){
         if (current_time() - start > std::chrono::minutes(3)){
@@ -412,60 +413,41 @@ void swap_starter_moves(const ProgramInfo& info, ConsoleHandle& console, BotBase
                 true
             );
         }
+        // start in the overworld
+        press_Bs_to_back_to_overworld(info, console, context);
 
         // open menu, select your starter
         enter_menu_from_overworld(info, console, context, 0, MenuSide::LEFT);
 
         // enter Pokemon summary screen
-        GradientArrowWatcher arrow1(COLOR_RED, GradientArrowType::RIGHT, {0.30, 0.156, 0.046, 0.075});
-        context.wait_for_all_requests();
-        int ret = wait_until(
-            console, context,
-            std::chrono::seconds(10),
-            {arrow1}
-        );
-        if (ret < 0){
-            press_Bs_to_back_to_overworld(info, console, context);
-            continue;
-        }
         pbf_press_button(context, BUTTON_A, 20, 5 * TICKS_PER_SECOND);
         pbf_press_dpad(context, DPAD_RIGHT, 15, 1 * TICKS_PER_SECOND);
         pbf_press_button(context, BUTTON_Y, 20, 40);
 
-        // swap first and third move
-        GradientArrowWatcher arrow2(COLOR_RED, GradientArrowType::RIGHT, {0.275, 0.240, 0.046, 0.075});
-        context.wait_for_all_requests();
-        ret = wait_until(
-            console, context,
-            std::chrono::seconds(10),
-            {arrow2}
-        );
-        if (ret < 0){
-            press_Bs_to_back_to_overworld(info, console, context);
-            continue;
-        }
-        // note: we can't confirm that we press this A button, unless we detect the moves themselves
+        // select move 1
         pbf_press_button(context, BUTTON_A, 20, 40);  
         pbf_press_dpad(context, DPAD_DOWN,  15, 40);
         pbf_press_dpad(context, DPAD_DOWN,  15, 40);
-
         // extra button presses to avoid drops
         pbf_press_dpad(context, DPAD_DOWN,  15, 40); 
         pbf_press_dpad(context, DPAD_DOWN,  15, 40);
 
-        GradientArrowWatcher arrow3(COLOR_RED, GradientArrowType::RIGHT, {0.275, 0.389, 0.046, 0.075});
-        context.wait_for_all_requests();
-        ret = wait_until(
-            console, context,
-            std::chrono::seconds(10),
-            {arrow3}
-        );
-        if (ret < 0){
-            press_Bs_to_back_to_overworld(info, console, context);
-            continue;
-        }
-        // note: we can't confirm that we press this A button, unless we detect the moves themselves
+        // select move 3. swap move 1 and move 3.
         pbf_press_button(context, BUTTON_A, 20, 40);    
+
+        // confirm that Ember/Leafage/Water Gun is in slot 1
+        if (language == Language::English){
+            context.wait_for_all_requests();
+            VideoSnapshot screen = console.video().snapshot();
+            PokemonMovesReader reader(Language::English);
+            std::string top_move = reader.read_move(console, screen, 0);
+            console.log("Current top move: " + top_move);
+            if (top_move != "ember" && top_move != "leafage" && top_move != "water-gun"){
+                console.log("Failed to swap moves. Re-try.");
+                continue;
+            }   
+
+        }
 
         break;    
     }
@@ -914,7 +896,7 @@ void AutoStory::segment_02(SingleSwitchProgramEnvironment& env, BotBaseContext& 
 
     context.wait_for_all_requests();
     env.console.log("Clear auto heal tutorial and change move order...");
-    swap_starter_moves(env.program_info(), env.console, context);
+    swap_starter_moves(env.program_info(), env.console, context, LANGUAGE);
 
     leave_box_system_to_overworld(env.program_info(), env.console, context);    
 
@@ -1394,14 +1376,14 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
 
     // Connect controller
     pbf_press_button(context, BUTTON_L, 20, 20);
-    // swap_starter_moves(env.program_info(), env.console, context);
+    swap_starter_moves(env.program_info(), env.console, context, LANGUAGE);
 
     // TODO: set settings. to ensure autosave is off.
 
-    int start = 3;
-    int end = 7;
-    int loops = 1;
-    test_segments(env, env.console, context, start, end, loops);
+    // int start = 2;
+    // int end = 2;
+    // int loops = 1;
+    // test_segments(env, env.console, context, start, end, loops);
 
 
     // run_autostory(env, context);
