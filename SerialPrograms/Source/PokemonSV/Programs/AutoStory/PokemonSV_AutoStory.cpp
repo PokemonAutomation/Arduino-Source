@@ -481,10 +481,13 @@ void enter_menu_from_overworld(const ProgramInfo& info, ConsoleHandle& console, 
 
         int ret = run_until(
             console, context,
-            [](BotBaseContext& context){
+            [has_minimap](BotBaseContext& context){
                 for (int i = 0; i < 10; i++){
-                    pbf_wait(context, 2 * TICKS_PER_SECOND);
-                    pbf_press_button(context, BUTTON_A, 20, 105);
+                    pbf_wait(context, 3 * TICKS_PER_SECOND);
+                    if (!has_minimap){ 
+                        // if no minimap, can't detect overworld, so repeatedly press X to cover for button drops
+                        pbf_press_button(context, BUTTON_X, 20, 100);
+                    }
                 }
             },
             {overworld, main_menu}
@@ -829,7 +832,6 @@ void AutoStory::segment_02(SingleSwitchProgramEnvironment& env, BotBaseContext& 
             // timed out before detecting dialog box
             context.wait_for_all_requests();
             env.console.log("Did not enter Nemona's house, resetting from checkpoint...", COLOR_RED);
-            // console.overlay().add_log("Failed to enter house, reset", COLOR_RED);
             reset_game(env.program_info(), env.console, context);
             stats.m_reset++;
             env.update_stats();
@@ -837,25 +839,20 @@ void AutoStory::segment_02(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         }
         context.wait_for_all_requests();
         env.console.log("Entered Nemona's house");
-        // console.overlay().add_log("Entered Nemona's house", COLOR_WHITE);
         mash_button_till_overworld(env.console, context);
         context.wait_for_all_requests();
         env.console.log("Picking a starter...");
-        // console.overlay().add_log("Picking a starter", COLOR_WHITE);
         switch(STARTERCHOICE){
         case StarterChoice::SPRIGATITO:
             env.console.log("Picking Sprigatito...");
-            // console.overlay().add_log("Picking Sprigatito...", COLOR_WHITE);
             pbf_move_left_joystick(context, 75, 0, 80, 20);
             break;
         case StarterChoice::FUECOCO:
             env.console.log("Picking Fuecoco...");
-            // console.overlay().add_log("Picking Fuecoco...", COLOR_WHITE);
             pbf_move_left_joystick(context, 180, 0, 80, 20);
             break;
         case StarterChoice::QUAXLY:
             env.console.log("Picking Quaxly...");
-            // console.overlay().add_log("Picking Quaxly...", COLOR_WHITE);
             pbf_move_left_joystick(context, 128, 0, 80, 20);
             break;
         }
@@ -864,7 +861,6 @@ void AutoStory::segment_02(SingleSwitchProgramEnvironment& env, BotBaseContext& 
             // timed out before detecting the dialog prompt, to confirm receiving the starter
             context.wait_for_all_requests();
             env.console.log("Failed to pick starter, resetting from checkpoint...", COLOR_RED);
-            // console.overlay().add_log("Failed to select a starter, reset", COLOR_RED);
             reset_game(env.program_info(), env.console, context);
             stats.m_reset++;
             env.update_stats();
@@ -875,7 +871,6 @@ void AutoStory::segment_02(SingleSwitchProgramEnvironment& env, BotBaseContext& 
             // timed out before detecting the dialog prompt to give a nickname
             context.wait_for_all_requests();
             env.console.log("Stuck trying to give a nickname, resetting from checkpoint...", COLOR_RED);
-            // console.overlay().add_log("Stuck on nickname page, reset", COLOR_RED);
             reset_game(env.program_info(), env.console, context);
             stats.m_reset++;
             env.update_stats();
@@ -885,7 +880,6 @@ void AutoStory::segment_02(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         if (!clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 20)){
             context.wait_for_all_requests();
             env.console.log("Stuck trying to give a nickname, resetting from checkpoint...", COLOR_RED);
-            // console.overlay().add_log("Stuck on nickname page, reset", COLOR_RED);
             reset_game(env.program_info(), env.console, context);
             stats.m_reset++;
             env.update_stats();
@@ -895,7 +889,29 @@ void AutoStory::segment_02(SingleSwitchProgramEnvironment& env, BotBaseContext& 
     }
 
     context.wait_for_all_requests();
-    env.console.log("Clear auto heal tutorial and change move order...");
+    env.console.log("Clear auto heal tutorial.");
+    // Press X until Auto heal tutorial shows up
+    TutorialWatcher tutorial;
+    int ret = run_until(
+        env.console, context,
+        [](BotBaseContext& context){
+            for (int i = 0; i < 10; i++){
+                pbf_press_button(context, BUTTON_X, 20, 250);
+            }
+        },
+        {tutorial}
+    );
+    if (ret < 0){
+        // context.wait_for_all_requests();
+        // env.console.log("Stuck trying clear auto heal tutorial, resetting from checkpoint...", COLOR_RED);
+        // reset_game(env.program_info(), env.console, context);
+        // stats.m_reset++;
+        // env.update_stats();
+        // continue;
+    }
+    clear_tutorial(env.console, context);
+
+    env.console.log("Change move order.");
     swap_starter_moves(env.program_info(), env.console, context, LANGUAGE);
 
     leave_box_system_to_overworld(env.program_info(), env.console, context);    
@@ -1376,14 +1392,15 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
 
     // Connect controller
     pbf_press_button(context, BUTTON_L, 20, 20);
-    swap_starter_moves(env.program_info(), env.console, context, LANGUAGE);
+    // swap_starter_moves(env.program_info(), env.console, context, LANGUAGE);
+    // enter_menu_from_overworld(env.program_info(), env.console, context, 0, MenuSide::LEFT, false);
 
     // TODO: set settings. to ensure autosave is off.
 
-    // int start = 2;
-    // int end = 2;
-    // int loops = 1;
-    // test_segments(env, env.console, context, start, end, loops);
+    int start = 2;
+    int end = 2;
+    int loops = 1;
+    test_segments(env, env.console, context, start, end, loops);
 
 
     // run_autostory(env, context);
