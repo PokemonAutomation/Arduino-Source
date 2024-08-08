@@ -1080,8 +1080,30 @@ void AutoStory::segment_07(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         context.wait_for_all_requests();
         env.console.log("Feed mom's sandwich");
         env.console.overlay().add_log("Feed mom's sandwich", COLOR_WHITE);
-        pbf_press_dpad(context, DPAD_UP, 20, 105);
+        
+        GradientArrowWatcher arrow(COLOR_RED, GradientArrowType::RIGHT, {0.104, 0.312, 0.043, 0.08});
+        context.wait_for_all_requests();
+
+        int ret = run_until(
+            env.console, context,
+            [](BotBaseContext& context){
+                for (int i = 0; i < 10; i++){
+                    pbf_press_dpad(context, DPAD_UP, 20, 250);
+                }
+            },
+            {arrow}
+        );
+        if (ret < 0){
+            // context.wait_for_all_requests();
+            // env.console.log("Stuck trying clear auto heal tutorial, resetting from checkpoint...", COLOR_RED);
+            // reset_game(env.program_info(), env.console, context);
+            // stats.m_reset++;
+            // env.update_stats();
+            // continue;
+        }
+        // only press A when the sandwich is selected
         pbf_mash_button(context, BUTTON_A, 100);
+        
         clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 25);
         // long animation
         clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 10);
@@ -1397,8 +1419,8 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
 
     // TODO: set settings. to ensure autosave is off.
 
-    int start = 2;
-    int end = 2;
+    int start = 7;
+    int end = 7;
     int loops = 1;
     test_segments(env, env.console, context, start, end, loops);
 
