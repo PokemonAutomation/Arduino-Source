@@ -522,6 +522,40 @@ void enter_menu_from_overworld(const ProgramInfo& info, ConsoleHandle& console, 
     }
 }
 
+bool do_action_and_monitor_for_battles(
+    ProgramEnvironment& env,
+    ConsoleHandle& console, 
+    BotBaseContext& context,
+    std::function<
+        void(ProgramEnvironment& env,
+        ConsoleHandle& console,
+        BotBaseContext& context)
+    >&& action
+){
+    NormalBattleMenuWatcher battle_menu(COLOR_RED);
+    bool finished_action = false;
+    run_until(
+        console, context,
+        [&](BotBaseContext& context){
+            context.wait_for_all_requests();
+            action(env, console, context);
+            finished_action = true;
+        },
+        {battle_menu}
+    );
+    // if (ret == 0){ // battle detected
+    //     console.log("Detected battle. Now running away.", COLOR_PURPLE);
+    //     console.overlay().add_log("Detected battle. Now running away.");
+    //     try{
+    //         run_from_battle(env.program_info(), console, context);
+    //     }catch (OperationFailedException& e){
+    //         throw FatalProgramException(std::move(e));
+    //     }
+    // }
+
+    return finished_action;
+}
+
 void AutoStory::checkpoint_save(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     save_game_from_overworld(env.program_info(), env.console, context);
@@ -1112,10 +1146,23 @@ void AutoStory::segment_07(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         context.wait_for_all_requests();
         env.console.log("Enter cave");
         env.console.overlay().add_log("Enter cave", COLOR_WHITE);
-        pbf_move_left_joystick(context, 128, 20, 10 * TICKS_PER_SECOND, 20);
-        pbf_move_left_joystick(context, 150, 20, 1 * TICKS_PER_SECOND, 20);
-        pbf_move_left_joystick(context, 128, 20, 8 * TICKS_PER_SECOND, 20);
-        pbf_move_left_joystick(context, 150, 20, 2 * TICKS_PER_SECOND, 20);
+        bool finished_action = do_action_and_monitor_for_battles(env, env.console, context,
+            [&](ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){
+                pbf_move_left_joystick(context, 128, 20, 10 * TICKS_PER_SECOND, 20);
+                pbf_move_left_joystick(context, 150, 20, 1 * TICKS_PER_SECOND, 20);
+                pbf_move_left_joystick(context, 128, 20, 8 * TICKS_PER_SECOND, 20);
+                pbf_move_left_joystick(context, 150, 20, 2 * TICKS_PER_SECOND, 20);                
+            }
+        );
+        if (!finished_action){
+            context.wait_for_all_requests();
+            env.console.log("Did not enter cave, resetting from checkpoint...", COLOR_RED);
+            reset_game(env.program_info(), env.console, context);
+            stats.m_reset++;
+            env.update_stats();
+            continue;
+        }
+
         if (!overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 20, 10)){
             context.wait_for_all_requests();
             env.console.log("Did not enter cave, resetting from checkpoint...", COLOR_RED);
@@ -1127,37 +1174,50 @@ void AutoStory::segment_07(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         }
         clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 10);
 
-        // Legendary rock break
-        context.wait_for_all_requests();
-        env.console.log("Rock break");
-        env.console.overlay().add_log("Rock break", COLOR_WHITE);
-        pbf_move_left_joystick(context, 128, 20, 3 * TICKS_PER_SECOND, 20);
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NO_MARKER, 230, 25, 30);
-        pbf_move_left_joystick(context, 128, 0, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
+        finished_action = do_action_and_monitor_for_battles(env, env.console, context,
+            [&](ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){
+                // Legendary rock break
+                context.wait_for_all_requests();
+                console.log("Rock break");
+                console.overlay().add_log("Rock break", COLOR_WHITE);
+                pbf_move_left_joystick(context, 128, 20, 3 * TICKS_PER_SECOND, 20);
+                realign_player(env.program_info(), console, context, PlayerRealignMode::REALIGN_NO_MARKER, 230, 25, 30);
+                pbf_move_left_joystick(context, 128, 0, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
 
-        // Houndour wave
-        context.wait_for_all_requests();
-        env.console.log("Houndour wave");
-        env.console.overlay().add_log("Houndour wave", COLOR_WHITE);
-        pbf_move_left_joystick(context, 130, 20, 4 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NO_MARKER, 220, 15, 30);
-        pbf_move_left_joystick(context, 128, 20, 5 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
-        pbf_move_left_joystick(context, 128, 20, 6 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NO_MARKER, 220, 25, 20);
-        pbf_move_left_joystick(context, 128, 20, 8 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NO_MARKER, 220, 25, 25);
-        pbf_move_left_joystick(context, 128, 20, 6 * TICKS_PER_SECOND, 20 * TICKS_PER_SECOND);
+                // Houndour wave
+                context.wait_for_all_requests();
+                console.log("Houndour wave");
+                console.overlay().add_log("Houndour wave", COLOR_WHITE);
+                pbf_move_left_joystick(context, 130, 20, 4 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
+                realign_player(env.program_info(), console, context, PlayerRealignMode::REALIGN_NO_MARKER, 220, 15, 30);
+                pbf_move_left_joystick(context, 128, 20, 5 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
+                pbf_move_left_joystick(context, 128, 20, 6 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
+                realign_player(env.program_info(), console, context, PlayerRealignMode::REALIGN_NO_MARKER, 220, 25, 20);
+                pbf_move_left_joystick(context, 128, 20, 8 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
+                realign_player(env.program_info(), console, context, PlayerRealignMode::REALIGN_NO_MARKER, 220, 25, 25);
+                pbf_move_left_joystick(context, 128, 20, 6 * TICKS_PER_SECOND, 20 * TICKS_PER_SECOND);
 
-        // Houndoom encounter
-        context.wait_for_all_requests();
-        env.console.log("Houndoom encounter");
-        env.console.overlay().add_log("Houndoom encounter", COLOR_WHITE);
-        pbf_move_left_joystick(context, 128, 20, 4 * TICKS_PER_SECOND, 20);
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NO_MARKER, 245, 20, 20);
-        pbf_move_left_joystick(context, 128, 20, 2 * TICKS_PER_SECOND, 20);
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NO_MARKER, 255, 90, 20);
-        pbf_move_left_joystick(context, 128, 20, 8 * TICKS_PER_SECOND, 8 * TICKS_PER_SECOND);
-        pbf_press_button(context, BUTTON_L, 20, 20);
+                // Houndoom encounter
+                context.wait_for_all_requests();
+                console.log("Houndoom encounter");
+                console.overlay().add_log("Houndoom encounter", COLOR_WHITE);
+                pbf_move_left_joystick(context, 128, 20, 4 * TICKS_PER_SECOND, 20);
+                realign_player(env.program_info(), console, context, PlayerRealignMode::REALIGN_NO_MARKER, 245, 20, 20);
+                pbf_move_left_joystick(context, 128, 20, 2 * TICKS_PER_SECOND, 20);
+                realign_player(env.program_info(), console, context, PlayerRealignMode::REALIGN_NO_MARKER, 255, 90, 20);
+                pbf_move_left_joystick(context, 128, 20, 8 * TICKS_PER_SECOND, 8 * TICKS_PER_SECOND);
+                pbf_press_button(context, BUTTON_L, 20, 20);
+            }
+        );
+        if (!finished_action){
+            context.wait_for_all_requests();
+            env.console.log("Did not traverse cave, resetting from checkpoint...", COLOR_RED);
+            reset_game(env.program_info(), env.console, context);
+            stats.m_reset++;
+            env.update_stats();
+            continue;
+        }
+        
         if (!overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 20, 40)){
             context.wait_for_all_requests();
             env.console.log("Did not reach Houndoom, resetting from checkpoint...", COLOR_RED);
@@ -1208,12 +1268,25 @@ void AutoStory::segment_09(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         context.wait_for_all_requests();
         env.console.log("Lighthouse view");
         env.console.overlay().add_log("Lighthouse view", COLOR_WHITE);
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 230, 110, 100);
-        pbf_move_left_joystick(context, 128, 0, 6 * TICKS_PER_SECOND, 8 * TICKS_PER_SECOND);
-        pbf_move_left_joystick(context, 128, 0, 4 * TICKS_PER_SECOND, 20);
-        pbf_move_left_joystick(context, 255, 128, 15, 20);
-        pbf_press_button(context, BUTTON_L, 20, 20);
-        pbf_move_left_joystick(context, 128, 0, 7 * TICKS_PER_SECOND, 20);
+        bool finished_action = do_action_and_monitor_for_battles(env, env.console, context,
+            [&](ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){
+                realign_player(env.program_info(), console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 230, 110, 100);
+                pbf_move_left_joystick(context, 128, 0, 6 * TICKS_PER_SECOND, 8 * TICKS_PER_SECOND);
+                pbf_move_left_joystick(context, 128, 0, 4 * TICKS_PER_SECOND, 20);
+                pbf_move_left_joystick(context, 255, 128, 15, 20);
+                pbf_press_button(context, BUTTON_L, 20, 20);
+                pbf_move_left_joystick(context, 128, 0, 7 * TICKS_PER_SECOND, 20);                
+            }
+        );
+        if (!finished_action){
+            context.wait_for_all_requests();
+            env.console.log("Failed to go to Nemona at the lighthouse, resetting from checkpoint...", COLOR_RED);
+            reset_game(env.program_info(), env.console, context);
+            stats.m_reset++;
+            env.update_stats();
+            continue;
+        }  
+        
         if (!overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_SPAM_A, 128, 0, 20)){
             context.wait_for_all_requests();
             env.console.log("Did not talk to Nemona on the lighthouse, resetting from checkpoint...", COLOR_RED);
@@ -1234,12 +1307,25 @@ void AutoStory::segment_10(SingleSwitchProgramEnvironment& env, BotBaseContext& 
     context.wait_for_all_requests();
 
     while (true){
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 100, 210, 100);
-        pbf_move_left_joystick(context, 128, 0, 187, 20);
-        pbf_move_left_joystick(context, 0, 128, 30, 8 * TICKS_PER_SECOND);
-        pbf_move_left_joystick(context, 128, 0, 1 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
+        bool finished_action = do_action_and_monitor_for_battles(env, env.console, context,
+            [&](ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){
+                realign_player(env.program_info(), console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 100, 210, 100);
+                pbf_move_left_joystick(context, 128, 0, 187, 20);
+                pbf_move_left_joystick(context, 0, 128, 30, 8 * TICKS_PER_SECOND);
+                pbf_move_left_joystick(context, 128, 0, 1 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
 
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 100, 60, 200);
+                realign_player(env.program_info(), console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 100, 60, 200);                
+            }
+        );     
+        if (!finished_action){
+            context.wait_for_all_requests();
+            env.console.log("Did not reach Los Platos, resetting from checkpoint...", COLOR_RED);
+            reset_game(env.program_info(), env.console, context);
+            stats.m_reset++;
+            env.update_stats();
+            continue;
+        }             
+
         if (!overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 0, 75)){
             context.wait_for_all_requests();
             env.console.log("Did not reach Los Platos, resetting from checkpoint...", COLOR_RED);
@@ -1420,8 +1506,8 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
 
     // TODO: set settings. to ensure autosave is off.
 
-    int start = 7;
-    int end = 7;
+    int start = 0;
+    int end = 10;
     int loops = 10;
     test_segments(env, env.console, context, start, end, loops);
 

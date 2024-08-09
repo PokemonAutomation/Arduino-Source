@@ -109,7 +109,7 @@ void mash_button_till_overworld(
 void config_option(BotBaseContext& context, int change_option_value);
 
 // enter menu and swap the first and third moves for your starter
-void swap_starter_moves(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
+void swap_starter_moves(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, Language language);
 
 // enter menu and move the cursor the given side, and index. then press the A button
 void enter_menu_from_overworld(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
@@ -117,6 +117,20 @@ void enter_menu_from_overworld(const ProgramInfo& info, ConsoleHandle& console, 
     MenuSide side = MenuSide::RIGHT,
     bool has_minimap = true
 );
+
+// run the given `action`. if detect a battle, stop the action.
+// return true if finished the action. else false
+bool do_action_and_monitor_for_battles(
+    ProgramEnvironment& env, 
+    ConsoleHandle& console,
+    BotBaseContext& context,
+    std::function<
+        void(ProgramEnvironment& env,
+        ConsoleHandle& console,
+        BotBaseContext& context)
+    >&& action
+);
+
 
 
 class AutoStory : public SingleSwitchProgramInstance, public ConfigOption::Listener{
