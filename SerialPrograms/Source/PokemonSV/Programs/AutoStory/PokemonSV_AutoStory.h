@@ -118,9 +118,8 @@ void enter_menu_from_overworld(const ProgramInfo& info, ConsoleHandle& console, 
     bool has_minimap = true
 );
 
-// run the given `action`. if detect a battle, stop the action.
-// return true if finished the action. else false
-bool do_action_and_monitor_for_battles(
+// run the given `action`. if detect a battle, stop the action, and throw exception
+void do_action_and_monitor_for_battles(
     ProgramEnvironment& env, 
     ConsoleHandle& console,
     BotBaseContext& context,
