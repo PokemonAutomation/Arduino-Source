@@ -953,7 +953,7 @@ void AutoStory::segment_02(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         if (ret < 0){
             throw OperationFailedException(
                 ErrorReport::SEND_ERROR_REPORT, env.console,
-                "Stuck trying clear auto heal tutorial.",
+                "Stuck trying to clear auto heal tutorial.",
                 true
             );  
         }
@@ -1378,7 +1378,7 @@ void AutoStory::segment_10(SingleSwitchProgramEnvironment& env, BotBaseContext& 
                 true
             );  
         }
-        clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 5);
+        clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 10);
         clear_tutorial(env.console, context);
         context.wait_for_all_requests();
         env.console.log("Reached Los Platos");
@@ -1557,7 +1557,7 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
 
     // TODO: set settings. to ensure autosave is off.
 
-    int start = 2;
+    int start = 10;
     int end = 10;
     int loops = 1;
     test_segments(env, env.console, context, start, end, loops);
