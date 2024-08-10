@@ -115,6 +115,12 @@ AutoStory::AutoStory()
         LockMode::LOCK_WHILE_RUNNING,
         EndPoint::PICK_STARTER
     )
+    , START_DESCRIPTION(
+        ""
+    )
+    , END_DESCRIPTION(
+        ""
+    )    
     , STARTERCHOICE(
         "<b>Starter " + STRING_POKEMON + ":",
         {
@@ -136,7 +142,9 @@ AutoStory::AutoStory()
 {
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(STARTPOINT);
+    PA_ADD_OPTION(START_DESCRIPTION);
     PA_ADD_OPTION(ENDPOINT);
+    PA_ADD_OPTION(END_DESCRIPTION);
     PA_ADD_OPTION(STARTERCHOICE);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
@@ -152,6 +160,55 @@ void AutoStory::value_changed(void* object){
         ? ConfigOptionState::ENABLED
         : ConfigOptionState::HIDDEN;
     STARTERCHOICE.set_visibility(state);
+
+    START_DESCRIPTION.set_text(start_segment_description());
+    END_DESCRIPTION.set_text(end_segment_description());
+}
+
+std::string AutoStory::start_segment_description(){
+    switch(STARTPOINT){
+    case StartPoint::INTRO_CUTSCENE:
+        return "Start: Intro cutscene.";
+    case StartPoint::PICK_STARTER:
+        return "Start: Finished cutscene. Adjusted settings. Standing in room.";
+    case StartPoint::NEMONA_FIRST_BATTLE:
+        return "Start: Picked the starter.";
+    case StartPoint::CATCH_TUTORIAL:
+        return "Start: Battled Nemona on the beach.";
+    case StartPoint::LEGENDARY_RESCUE:
+        return "Start: Finished catch tutorial. Walked to the cliff.";
+    case StartPoint::ARVEN_FIRST_BATTLE:
+        return "Start: Saved the Legendary. Escaped from the Houndoom cave.";
+    case StartPoint::LOS_PLATOS:
+        return "Start: Battled Arven, received Legendary's Pokeball. Talked to Nemona at Lighthouse.";
+    case StartPoint::MESAGOZA_SOUTH:
+        return "Start: Reached Pokecenter at Los Platos.";
+    default:
+        return "";        
+    }
+}
+
+std::string AutoStory::end_segment_description(){
+    switch(ENDPOINT){
+    case EndPoint::INTRO_CUTSCENE:
+        return "End: Finished cutscene. Adjusted settings. Standing in room.";
+    case EndPoint::PICK_STARTER:
+        return "End: Picked the starter.";
+    case EndPoint::NEMONA_FIRST_BATTLE:
+        return "End: Battled Nemona on the beach.";
+    case EndPoint::CATCH_TUTORIAL:
+        return "End: Finished catch tutorial. Walked to the cliff.";
+    case EndPoint::LEGENDARY_RESCUE:
+        return "End: Saved the Legendary. Escaped from the Houndoom cave.";
+    case EndPoint::ARVEN_FIRST_BATTLE:
+        return "End: Battled Arven, received Legendary's Pokeball. Talked to Nemona at Lighthouse.";
+    case EndPoint::LOS_PLATOS:
+        return "End: Reached Pokecenter at Los Platos.";
+    case EndPoint::MESAGOZA_SOUTH:
+        return "End: ";
+    default:
+        return "";
+    }
 }
 
 void realign_player(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,

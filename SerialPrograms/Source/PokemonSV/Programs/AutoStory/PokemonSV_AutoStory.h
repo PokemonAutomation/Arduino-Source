@@ -188,6 +188,9 @@ public:
 private:
     virtual void value_changed(void* object) override;
 
+    std::string start_segment_description();
+    std::string end_segment_description();
+
 private:
     OCR::LanguageOCROption LANGUAGE;
     enum class StartPoint{
@@ -203,6 +206,7 @@ private:
     EnumDropdownOption<StartPoint> STARTPOINT;
 
     enum class EndPoint{
+        INTRO_CUTSCENE,
         PICK_STARTER,
         NEMONA_FIRST_BATTLE,
         CATCH_TUTORIAL,
@@ -212,6 +216,9 @@ private:
         MESAGOZA_SOUTH,
     };
     EnumDropdownOption<EndPoint> ENDPOINT;
+
+    StaticTextOption START_DESCRIPTION;
+    StaticTextOption END_DESCRIPTION;
 
     enum class StarterChoice{
         SPRIGATITO,
