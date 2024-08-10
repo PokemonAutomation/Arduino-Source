@@ -231,6 +231,7 @@ bool run_battle(
 }
 
 void clear_tutorial(ConsoleHandle& console, BotBaseContext& context, uint16_t seconds_timeout){
+    bool seen_tutorial = false;
     while (true){
         TutorialWatcher tutorial;
         context.wait_for_all_requests();
@@ -245,10 +246,18 @@ void clear_tutorial(ConsoleHandle& console, BotBaseContext& context, uint16_t se
         switch (ret){
         case 0: // overworld
             console.log("clear_tutorial: Detected tutorial screen.");
+            seen_tutorial = true;
             pbf_press_button(context, BUTTON_A, 20, 105);
             break;
         default:
             console.log("clear_tutorial: Timed out.");
+            if(!seen_tutorial){
+                throw OperationFailedException(
+                    ErrorReport::SEND_ERROR_REPORT, console,
+                    "clear_tutorial(): Tutorial screen never detected.",
+                    true
+                );                
+            }
             return;
         }
     }
@@ -257,29 +266,31 @@ void clear_tutorial(ConsoleHandle& console, BotBaseContext& context, uint16_t se
 bool clear_dialog(ConsoleHandle& console, BotBaseContext& context,
     ClearDialogMode mode, uint16_t seconds_timeout
 ){
+    bool seen_dialog = false;
     while (true){
         OverworldWatcher    overworld(COLOR_CYAN);
         PromptDialogWatcher prompt(COLOR_YELLOW);
         WhiteButtonWatcher  whitebutton(COLOR_GREEN, WhiteButton::ButtonA2, {0.725, 0.833, 0.024, 0.045}); // {0.650, 0.650, 0.140, 0.240}
-        DialogBoxWatcher    dialog(COLOR_RED, true);
+        AdvanceDialogWatcher    advance_dialog(COLOR_RED);
         context.wait_for_all_requests();
 
         int ret = wait_until(
             console, context,
             std::chrono::seconds(seconds_timeout),
-            {overworld, prompt, whitebutton, dialog}
+            {overworld, prompt, whitebutton, advance_dialog}
         );
         context.wait_for(std::chrono::milliseconds(100));
 
         switch (ret){
         case 0: // overworld
             console.log("clear_dialog: Detected overworld.");
-            if (mode == ClearDialogMode::STOP_OVERWORLD){
+            if (seen_dialog && mode == ClearDialogMode::STOP_OVERWORLD){
                 return true;
             }
             break;
         case 1: // prompt
             console.log("clear_dialog: Detected prompt.");
+            seen_dialog = true;
             if (mode == ClearDialogMode::STOP_PROMPT){
                 return true;
             }
@@ -287,19 +298,21 @@ bool clear_dialog(ConsoleHandle& console, BotBaseContext& context,
             break;
         case 2: // whitebutton
             console.log("clear_dialog: Detected white A button.");
+            seen_dialog = true;
             if (mode == ClearDialogMode::STOP_WHITEBUTTON){
                 return true;
             }
             pbf_press_button(context, BUTTON_A, 20, 105);
             // dump_snapshot(console);
             break;
-        case 3: // dialog
-            console.log("clear_dialog: Detected dialog.");
+        case 3: // advance dialog
+            console.log("clear_dialog: Detected advance dialog.");
+            seen_dialog = true;
             pbf_press_button(context, BUTTON_A, 20, 105);
             break;
         default:
             console.log("clear_dialog(): Timed out.");
-            if (mode == ClearDialogMode::STOP_TIMEOUT){
+            if (seen_dialog && mode == ClearDialogMode::STOP_TIMEOUT){
                 return true;
             }
             return false;

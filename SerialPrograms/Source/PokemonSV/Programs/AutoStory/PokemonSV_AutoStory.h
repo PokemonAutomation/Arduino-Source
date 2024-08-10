@@ -80,11 +80,14 @@ bool run_battle(ConsoleHandle& console, BotBaseContext& context,
     BattleStopCondition stop_condition
 );
 
+// press A to clear tutorial screens
+// throw exception if tutorial screen never detected
 void clear_tutorial(ConsoleHandle& console, BotBaseContext& context, uint16_t seconds_timeout = 5);
 
 // spam the A button to clear dialog.
 // stop depending on ClearDialogMode: stop when detect overworld, or dialog prompt, or A button prompt. Or if times out
 // return false if times out, unless this is the intended stop condition.
+// also return false if dialog is never detected.
 bool clear_dialog(ConsoleHandle& console, BotBaseContext& context,
     ClearDialogMode mode, uint16_t seconds_timeout = 60
 );
