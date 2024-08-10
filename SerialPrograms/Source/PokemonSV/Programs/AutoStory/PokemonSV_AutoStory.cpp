@@ -592,6 +592,101 @@ void enter_menu_from_overworld(const ProgramInfo& info, ConsoleHandle& console, 
     }
 }
 
+void AutoStory::change_settings_prior_to_autostory(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    if (STARTPOINT == StartPoint::INTRO_CUTSCENE){
+        return;
+    }
+    
+    enter_options_menu_from_overworld(env, context);
+    change_settings(env, context);
+    if(STARTPOINT == StartPoint::PICK_STARTER){
+        pbf_mash_button(context, BUTTON_B, 2 * TICKS_PER_SECOND);
+    }else{
+        press_Bs_to_back_to_overworld(env.program_info(), env.console, context);        
+    }
+}
+
+void AutoStory::enter_options_menu_from_overworld(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    int8_t index = option_index();
+    if (index < 0){
+        return;
+    }
+    bool has_minimap = !(STARTPOINT == StartPoint::INTRO_CUTSCENE || STARTPOINT == StartPoint::PICK_STARTER);
+
+    enter_menu_from_overworld(env.program_info(), env.console, context, index, MenuSide::RIGHT, has_minimap);
+
+}
+
+
+int8_t AutoStory::option_index(){
+    switch(STARTPOINT){
+    // case StartPoint::INTRO_CUTSCENE:
+    case StartPoint::PICK_STARTER:
+        return 0;
+    case StartPoint::NEMONA_FIRST_BATTLE:
+        return 1;
+    case StartPoint::CATCH_TUTORIAL:
+    case StartPoint::LEGENDARY_RESCUE:
+    case StartPoint::ARVEN_FIRST_BATTLE:
+    case StartPoint::LOS_PLATOS:
+    case StartPoint::MESAGOZA_SOUTH:
+        return 2;
+    default:
+        return -1;        
+    }    
+}
+
+void AutoStory::change_settings(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    env.console.log("Update settings.");
+    if (LANGUAGE == Language::English){
+        MenuOption session(env.console, context, LANGUAGE);
+    
+        std::vector<std::pair<MenuOptionItemEnum, MenuOptionToggleEnum>> options = {
+            {MenuOptionItemEnum::TEXT_SPEED, MenuOptionToggleEnum::FAST},
+            {MenuOptionItemEnum::SKIP_MOVE_LEARNING, MenuOptionToggleEnum::ON},
+            {MenuOptionItemEnum::SEND_TO_BOXES, MenuOptionToggleEnum::AUTOMATIC},
+            {MenuOptionItemEnum::GIVE_NICKNAMES, MenuOptionToggleEnum::OFF},
+            {MenuOptionItemEnum::VERTICAL_CAMERA_CONTROLS, MenuOptionToggleEnum::REGULAR},
+            {MenuOptionItemEnum::HORIZONTAL_CAMERA_CONTROLS, MenuOptionToggleEnum::REGULAR},
+            {MenuOptionItemEnum::CAMERA_SUPPORT, MenuOptionToggleEnum::ON},
+            {MenuOptionItemEnum::CAMERA_INTERPOLATION, MenuOptionToggleEnum::NORMAL},
+            {MenuOptionItemEnum::CAMERA_DISTANCE, MenuOptionToggleEnum::CLOSE},
+            {MenuOptionItemEnum::AUTOSAVE, MenuOptionToggleEnum::OFF},
+            {MenuOptionItemEnum::SHOW_NICKNAMES, MenuOptionToggleEnum::DONT_SHOW},
+            {MenuOptionItemEnum::SKIP_CUTSCENES, MenuOptionToggleEnum::ON},
+            {MenuOptionItemEnum::CONTROLLER_RUMBLE, MenuOptionToggleEnum::ON},
+            {MenuOptionItemEnum::HELPING_FUNCTIONS, MenuOptionToggleEnum::OFF},
+
+        };
+        session.set_options(options);
+
+    }else{
+        //TODO: Add OCR file for other languages
+
+        config_option(context, 1); // Text Speed: Fast
+        config_option(context, 1); // Skip Move Learning: On
+        config_option(context, 1); // Send to Boxes: Automatic
+        config_option(context, 1); // Give Nicknames: Off
+        config_option(context, 0); // Vertical Camera Controls: Regular
+        config_option(context, 0); // Horiztontal Camera Controls: Regular
+        config_option(context, 0); // Camera Support: On
+        config_option(context, 0); // Camera Interpolation: Normal
+        config_option(context, 0); // Camera Distance: Close
+        config_option(context, 1); // Autosave: Off
+        config_option(context, 1); // Show Nicknames: Don't show
+        config_option(context, 1); // Skip Cutscenes: On
+        config_option(context, 0); // Background Music: 10
+        config_option(context, 0); // Sound Effects: 10
+        config_option(context, 0); // Pokemon Cries: 10
+        config_option(context, 0); // Controller Rumble: On
+        config_option(context, 1); // Helping Functions: Off
+    }
+
+    pbf_mash_button(context, BUTTON_A, 1 * TICKS_PER_SECOND);
+    clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 5);
+    
+}
+
 void do_action_and_monitor_for_battles(
     ProgramEnvironment& env,
     ConsoleHandle& console, 
@@ -775,55 +870,8 @@ void AutoStory::segment_00(SingleSwitchProgramEnvironment& env, BotBaseContext& 
 
     // set settings
     enter_menu_from_overworld(env.program_info(), env.console, context, 0, MenuSide::RIGHT, false);
-
-    if (LANGUAGE == Language::English){
-        MenuOption session(env.console, context, LANGUAGE);
-    
-        std::vector<std::pair<MenuOptionItemEnum, MenuOptionToggleEnum>> options = {
-            {MenuOptionItemEnum::TEXT_SPEED, MenuOptionToggleEnum::FAST},
-            {MenuOptionItemEnum::SKIP_MOVE_LEARNING, MenuOptionToggleEnum::ON},
-            {MenuOptionItemEnum::SEND_TO_BOXES, MenuOptionToggleEnum::AUTOMATIC},
-            {MenuOptionItemEnum::GIVE_NICKNAMES, MenuOptionToggleEnum::OFF},
-            {MenuOptionItemEnum::VERTICAL_CAMERA_CONTROLS, MenuOptionToggleEnum::REGULAR},
-            {MenuOptionItemEnum::HORIZONTAL_CAMERA_CONTROLS, MenuOptionToggleEnum::REGULAR},
-            {MenuOptionItemEnum::CAMERA_SUPPORT, MenuOptionToggleEnum::ON},
-            {MenuOptionItemEnum::CAMERA_INTERPOLATION, MenuOptionToggleEnum::NORMAL},
-            {MenuOptionItemEnum::CAMERA_DISTANCE, MenuOptionToggleEnum::CLOSE},
-            {MenuOptionItemEnum::AUTOSAVE, MenuOptionToggleEnum::OFF},
-            {MenuOptionItemEnum::SHOW_NICKNAMES, MenuOptionToggleEnum::DONT_SHOW},
-            {MenuOptionItemEnum::SKIP_CUTSCENES, MenuOptionToggleEnum::ON},
-            {MenuOptionItemEnum::CONTROLLER_RUMBLE, MenuOptionToggleEnum::ON},
-            {MenuOptionItemEnum::HELPING_FUNCTIONS, MenuOptionToggleEnum::OFF},
-
-        };
-        session.set_options(options);
-
-    }else{
-        //TODO: Add OCR file for other languages
-
-        config_option(context, 1); // Text Speed: Fast
-        config_option(context, 1); // Skip Move Learning: On
-        config_option(context, 1); // Send to Boxes: Automatic
-        config_option(context, 1); // Give Nicknames: Off
-        config_option(context, 0); // Vertical Camera Controls: Regular
-        config_option(context, 0); // Horiztontal Camera Controls: Regular
-        config_option(context, 0); // Camera Support: On
-        config_option(context, 0); // Camera Interpolation: Normal
-        config_option(context, 0); // Camera Distance: Close
-        config_option(context, 1); // Autosave: Off
-        config_option(context, 1); // Show Nicknames: Don't show
-        config_option(context, 1); // Skip Cutscenes: On
-        config_option(context, 0); // Background Music: 10
-        config_option(context, 0); // Sound Effects: 10
-        config_option(context, 0); // Pokemon Cries: 10
-        config_option(context, 0); // Controller Rumble: On
-        config_option(context, 1); // Helping Functions: Off
-    }
-
-    pbf_mash_button(context, BUTTON_A, 1 * TICKS_PER_SECOND);
-    clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 5);
-    pbf_mash_button(context, BUTTON_B, 2 * TICKS_PER_SECOND);    
-
+    change_settings(env, context);
+    pbf_mash_button(context, BUTTON_B, 2 * TICKS_PER_SECOND);
 }
 
 void AutoStory::segment_01(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
@@ -1609,10 +1657,12 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
 
     // Connect controller
     pbf_press_button(context, BUTTON_L, 20, 20);
-    // swap_starter_moves(env.program_info(), env.console, context, LANGUAGE);
-    // enter_menu_from_overworld(env.program_info(), env.console, context, 0, MenuSide::LEFT, false);
 
-    // TODO: set settings. to ensure autosave is off.
+    // Set settings. to ensure autosave is off.
+    // TODO: enable it for other languages
+    if (LANGUAGE == Language::English){
+        change_settings_prior_to_autostory(env, context);
+    }
 
     int start = 10;
     int end = 10;

@@ -151,6 +151,13 @@ public:
         int start, int end, int loop = 1
     );
 
+    void change_settings_prior_to_autostory(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+
+    void enter_options_menu_from_overworld(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+
+    // from within the Settings/Options menu, change the settings
+    void change_settings(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+
     void run_autostory(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
     void checkpoint_save(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
@@ -190,6 +197,9 @@ private:
 
     std::string start_segment_description();
     std::string end_segment_description();
+
+    // return the index for `Options` in the Main Menu
+    int8_t option_index();
 
 private:
     OCR::LanguageOCROption LANGUAGE;
