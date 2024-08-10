@@ -244,6 +244,7 @@ bool run_battle(
     BotBaseContext& context,
     BattleStopCondition stop_condition
 ){
+    int16_t num_times_seen_overworld = 0;
     while (true){
         NormalBattleMenuWatcher battle(COLOR_BLUE);
         SwapMenuWatcher         fainted(COLOR_PURPLE);
@@ -269,9 +270,14 @@ bool run_battle(
             return false;
         case 2: // overworld
             console.log("Detected overworld, battle over.");
+            num_times_seen_overworld++;
             if (stop_condition == BattleStopCondition::STOP_OVERWORLD){
                 return true;
             }
+            if(num_times_seen_overworld > 30){
+                console.log("run_battle: Stuck in overworld.");
+                return false;
+            }            
             break;
         case 3: // dialog
             console.log("Detected dialog.");
@@ -301,7 +307,7 @@ void clear_tutorial(ConsoleHandle& console, BotBaseContext& context, uint16_t se
         context.wait_for(std::chrono::milliseconds(100));
 
         switch (ret){
-        case 0: // overworld
+        case 0:
             console.log("clear_tutorial: Detected tutorial screen.");
             seen_tutorial = true;
             pbf_press_button(context, BUTTON_A, 20, 105);
@@ -324,6 +330,7 @@ bool clear_dialog(ConsoleHandle& console, BotBaseContext& context,
     ClearDialogMode mode, uint16_t seconds_timeout
 ){
     bool seen_dialog = false;
+    int16_t num_times_seen_overworld = 0;
     while (true){
         OverworldWatcher    overworld(COLOR_CYAN);
         PromptDialogWatcher prompt(COLOR_YELLOW);
@@ -341,9 +348,15 @@ bool clear_dialog(ConsoleHandle& console, BotBaseContext& context,
         switch (ret){
         case 0: // overworld
             console.log("clear_dialog: Detected overworld.");
+            num_times_seen_overworld++;
             if (seen_dialog && mode == ClearDialogMode::STOP_OVERWORLD){
                 return true;
             }
+            if(num_times_seen_overworld > 30){
+                console.log("clear_dialog: Stuck in overworld.");
+                return false;
+            }
+
             break;
         case 1: // prompt
             console.log("clear_dialog: Detected prompt.");
@@ -1664,13 +1677,13 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
         change_settings_prior_to_autostory(env, context);
     }
 
-    int start = 10;
-    int end = 10;
-    int loops = 1;
-    test_segments(env, env.console, context, start, end, loops);
+    // int start = 10;
+    // int end = 10;
+    // int loops = 1;
+    // test_segments(env, env.console, context, start, end, loops);
 
 
-    // run_autostory(env, context);
+    run_autostory(env, context);
     
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
     GO_HOME_WHEN_DONE.run_end_of_program(context);
