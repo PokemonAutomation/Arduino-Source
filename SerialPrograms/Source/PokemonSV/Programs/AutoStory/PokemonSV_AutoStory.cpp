@@ -760,9 +760,9 @@ void AutoStory::segment_01(SingleSwitchProgramEnvironment& env, BotBaseContext& 
     stats.m_checkpoint++;
     env.update_stats();
     send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE, "Saved at checkpoint.");     
-    context.wait_for_all_requests();
+    
     while (true){
-
+    try{
         context.wait_for_all_requests();
         env.console.log("Go downstairs, get stopped by Skwovet");
         env.console.overlay().add_log("Go downstairs, get stopped by Skwovet", COLOR_WHITE);
@@ -776,12 +776,11 @@ void AutoStory::segment_01(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         env.console.overlay().add_log("Go to the kitchen, talk with mom", COLOR_WHITE);
         pbf_move_left_joystick(context, 128, 255, 2 * TICKS_PER_SECOND, 20);
         if(!overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 0, 128)){
-            env.console.log("Failed to talk to mom, resetting...", COLOR_RED);            
-            context.wait_for_all_requests();
-            reset_game(env.program_info(), env.console, context);
-            stats.m_reset++;
-            env.update_stats();
-            continue;
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, env.console,
+                "Failed to talk to mom.",
+                true
+            );
         }
         clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 5);
 
@@ -790,12 +789,11 @@ void AutoStory::segment_01(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         env.console.overlay().add_log("Go to the front door, talk with Clavell", COLOR_WHITE);
         pbf_move_left_joystick(context, 230, 200, 2 * TICKS_PER_SECOND, 20);
         if(!overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 255, 128)){
-            env.console.log("Failed to talk to Clavell, resetting...", COLOR_RED);
-            context.wait_for_all_requests();
-            reset_game(env.program_info(), env.console, context);
-            stats.m_reset++;
-            env.update_stats();
-            continue;
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, env.console,
+                "Failed to talk to Clavell.",
+                true
+            );            
         }
         clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 5);
 
@@ -817,12 +815,11 @@ void AutoStory::segment_01(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         pbf_move_left_joystick(context,   0, 128, 3 * TICKS_PER_SECOND, 20);
         pbf_move_left_joystick(context, 128, 255, 4 * TICKS_PER_SECOND, 20);
         if(!overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 0, 128)){
-            env.console.log("Failed to talk to Clavell, resetting...", COLOR_RED);
-            context.wait_for_all_requests();
-            reset_game(env.program_info(), env.console, context);
-            stats.m_reset++;
-            env.update_stats();
-            continue;
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, env.console,
+                "Failed to talk to Clavell.",
+                true
+            );               
         }
         clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 10);
 
@@ -830,12 +827,11 @@ void AutoStory::segment_01(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         env.console.log("Go outside, receive Rotom Phone");
         env.console.overlay().add_log("Go outside, receive Rotom Phone", COLOR_WHITE);
         if(!overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 245, 230)){
-            env.console.log("Failed to go outside, resetting...", COLOR_RED);
-            context.wait_for_all_requests();
-            reset_game(env.program_info(), env.console, context);
-            stats.m_reset++;
-            env.update_stats();
-            continue;
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, env.console,
+                "Failed to go outside.",
+                true
+            );             
         }
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD);
 
@@ -850,26 +846,35 @@ void AutoStory::segment_01(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         open_map_from_overworld(env.program_info(), env.console, context, true);
         leave_phone_to_overworld(env.program_info(), env.console, context);
 
-        break;          
+        break;  
+    }catch(OperationFailedException& e){
+        context.wait_for_all_requests();
+        env.console.log(e.m_message, COLOR_RED);
+        env.console.log("Resetting from checkpoint.");
+        reset_game(env.program_info(), env.console, context);
+        stats.m_reset++;
+        env.update_stats();
+    }
     }
 }
 
 void AutoStory::segment_02(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     checkpoint_save(env, context);
-    context.wait_for_all_requests();
+    
     while (true){   
-          
+    try{
+        context.wait_for_all_requests();
+        
         pbf_move_left_joystick(context, 255, 0, 1 * TICKS_PER_SECOND, 20);
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 156, 1 * TICKS_PER_SECOND);
         if (!overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 0)){
             // timed out before detecting dialog box
-            context.wait_for_all_requests();
-            env.console.log("Did not enter Nemona's house, resetting from checkpoint...", COLOR_RED);
-            reset_game(env.program_info(), env.console, context);
-            stats.m_reset++;
-            env.update_stats();
-            continue;
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, env.console,
+                "Failed to enter Nemona's house.",
+                true
+            );               
         }
         context.wait_for_all_requests();
         env.console.log("Entered Nemona's house");
@@ -893,70 +898,77 @@ void AutoStory::segment_02(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         pbf_press_button(context, BUTTON_A, 20, 105); // choose the starter
         if (!clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 20)){
             // timed out before detecting the dialog prompt, to confirm receiving the starter
-            context.wait_for_all_requests();
-            env.console.log("Failed to pick starter, resetting from checkpoint...", COLOR_RED);
-            reset_game(env.program_info(), env.console, context);
-            stats.m_reset++;
-            env.update_stats();
-            continue;
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, env.console,
+                "Failed to pick starter.",
+                true
+            );  
         }
         pbf_press_button(context, BUTTON_A, 20, 105); // accept the pokemon
         if (!clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 20)){
             // timed out before detecting the dialog prompt to give a nickname
-            context.wait_for_all_requests();
-            env.console.log("Stuck trying to give a nickname, resetting from checkpoint...", COLOR_RED);
-            reset_game(env.program_info(), env.console, context);
-            stats.m_reset++;
-            env.update_stats();
-            continue;
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, env.console,
+                "Stuck trying to give a nickname.",
+                true
+            );  
         }
         pbf_mash_button(context, BUTTON_B, 100);  // Don't give a nickname
         if (!clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 20)){
-            context.wait_for_all_requests();
-            env.console.log("Stuck trying to give a nickname, resetting from checkpoint...", COLOR_RED);
-            reset_game(env.program_info(), env.console, context);
-            stats.m_reset++;
-            env.update_stats();
-            continue;
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, env.console,
+                "Stuck trying to give a nickname.",
+                true
+            );  
         }
+
+        context.wait_for_all_requests();
+        env.console.log("Clear auto heal tutorial.");
+        // Press X until Auto heal tutorial shows up
+        TutorialWatcher tutorial;
+        int ret = run_until(
+            env.console, context,
+            [](BotBaseContext& context){
+                for (int i = 0; i < 10; i++){
+                    pbf_press_button(context, BUTTON_X, 20, 250);
+                }
+            },
+            {tutorial}
+        );
+        if (ret < 0){
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, env.console,
+                "Stuck trying clear auto heal tutorial.",
+                true
+            );  
+        }
+        clear_tutorial(env.console, context);
+
+        env.console.log("Change move order.");
+        swap_starter_moves(env.program_info(), env.console, context, LANGUAGE);
+        leave_box_system_to_overworld(env.program_info(), env.console, context);
+
         break;
+    }catch(OperationFailedException& e){
+        context.wait_for_all_requests();
+        env.console.log(e.m_message, COLOR_RED);
+        env.console.log("Resetting from checkpoint.");
+        reset_game(env.program_info(), env.console, context);
+        stats.m_reset++;
+        env.update_stats();
     }
-
-    context.wait_for_all_requests();
-    env.console.log("Clear auto heal tutorial.");
-    // Press X until Auto heal tutorial shows up
-    TutorialWatcher tutorial;
-    int ret = run_until(
-        env.console, context,
-        [](BotBaseContext& context){
-            for (int i = 0; i < 10; i++){
-                pbf_press_button(context, BUTTON_X, 20, 250);
-            }
-        },
-        {tutorial}
-    );
-    if (ret < 0){
-        // context.wait_for_all_requests();
-        // env.console.log("Stuck trying clear auto heal tutorial, resetting from checkpoint...", COLOR_RED);
-        // reset_game(env.program_info(), env.console, context);
-        // stats.m_reset++;
-        // env.update_stats();
-        // continue;
     }
-    clear_tutorial(env.console, context);
-
-    env.console.log("Change move order.");
-    swap_starter_moves(env.program_info(), env.console, context, LANGUAGE);
-
-    leave_box_system_to_overworld(env.program_info(), env.console, context);    
 
 }
 
 void AutoStory::segment_03(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     checkpoint_save(env, context);
-    context.wait_for_all_requests();
+    
     while (true){
+    try{        
+        context.wait_for_all_requests();
+
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 220, 245, 50);
         pbf_move_left_joystick(context, 128, 0, 4 * TICKS_PER_SECOND, 1 * TICKS_PER_SECOND);
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 128, 50);
@@ -964,52 +976,68 @@ void AutoStory::segment_03(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 60, 50);
         pbf_move_left_joystick(context, 128, 0, 4 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
         if (!overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_SPAM_A, 128, 0, 8)){
-            context.wait_for_all_requests();
-            env.console.log("Did not talk to Nemona at beach, resetting from checkpoint...", COLOR_RED);
-            env.console.overlay().add_log("Can't find Nemona, reset", COLOR_RED);
-            reset_game(env.program_info(), env.console, context);
-            stats.m_reset++;
-            env.update_stats();
-            continue;
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, env.console,
+                "Failed to talk to Nemona at beach.",
+                true
+            );  
         }
         context.wait_for_all_requests();
         env.console.overlay().add_log("Found Nemona", COLOR_WHITE);
-        break;
-    }
 
-    context.wait_for_all_requests();
-    env.console.log("Starting battle...");
-    env.console.overlay().add_log("Starting battle...", COLOR_WHITE);
-    // TODO: Battle start prompt detection
-    mash_button_till_overworld(env.console, context);
-    context.wait_for_all_requests();
-    env.console.log("Finished battle.");
-    env.console.overlay().add_log("Finished battle.", COLOR_WHITE);
+        context.wait_for_all_requests();
+        env.console.log("Starting battle...");
+        env.console.overlay().add_log("Starting battle...", COLOR_WHITE);
+        // TODO: Battle start prompt detection
+        mash_button_till_overworld(env.console, context);
+        context.wait_for_all_requests();
+        env.console.log("Finished battle.");
+        env.console.overlay().add_log("Finished battle.", COLOR_WHITE);        
+
+        break;
+    }catch(OperationFailedException& e){
+        context.wait_for_all_requests();
+        env.console.log(e.m_message, COLOR_RED);
+        env.console.log("Resetting from checkpoint.");
+        reset_game(env.program_info(), env.console, context);
+        stats.m_reset++;
+        env.update_stats();
+    }        
+    }
 
 }
 
 void AutoStory::segment_04(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     checkpoint_save(env, context);
-    context.wait_for_all_requests();
+    
     while (true){
+    try{
+        context.wait_for_all_requests();
+
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 40, 160, 60);
         pbf_move_left_joystick(context, 128, 0, 7 * TICKS_PER_SECOND, 20);
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 40, 84, 60);
         if (!overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 0, 20)){
-            context.wait_for_all_requests();
-            env.console.log("Did not find Mom, resetting from checkpoint...", COLOR_RED);
-            env.console.overlay().add_log("Can't find mom, reset", COLOR_RED);
-            reset_game(env.program_info(), env.console, context);
-            stats.m_reset++;
-            env.update_stats();
-            continue;
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, env.console,
+                "Failed to find Mom.",
+                true
+            );  
         }
         context.wait_for_all_requests();
         env.console.log("Get mom's sandwich");
         env.console.overlay().add_log("Get mom's sandwich", COLOR_WHITE);
         mash_button_till_overworld(env.console, context);
         break;
+    }catch(OperationFailedException& e){
+        context.wait_for_all_requests();
+        env.console.log(e.m_message, COLOR_RED);
+        env.console.log("Resetting from checkpoint.");
+        reset_game(env.program_info(), env.console, context);
+        stats.m_reset++;
+        env.update_stats();
+    }             
     }    
 }
 
@@ -1018,17 +1046,16 @@ void AutoStory::segment_05(SingleSwitchProgramEnvironment& env, BotBaseContext& 
     checkpoint_save(env, context);
     context.wait_for_all_requests();
     while (true){
+    try{        
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 40, 82, 60);
         pbf_move_left_joystick(context, 128, 0, 6 * TICKS_PER_SECOND, 20);
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 110, 10, 60);
         if (!overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 0, 20)){
-            context.wait_for_all_requests();
-            env.console.log("Did not find Nemona, resetting from checkpoint...", COLOR_RED);
-            env.console.overlay().add_log("Can't find Nemona, reset", COLOR_RED);
-            reset_game(env.program_info(), env.console, context);
-            stats.m_reset++;
-            env.update_stats();
-            continue;
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, env.console,
+                "Failed to find Nemona.",
+                true
+            );  
         }
         context.wait_for_all_requests();
         env.console.log("Start catch tutorial");
@@ -1041,7 +1068,16 @@ void AutoStory::segment_05(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         context.wait_for_all_requests();
         env.console.log("Finished catch tutorial");
         env.console.overlay().add_log("Finished catch tutorial", COLOR_WHITE);
+
         break;
+    }catch(OperationFailedException& e){
+        context.wait_for_all_requests();
+        env.console.log(e.m_message, COLOR_RED);
+        env.console.log("Resetting from checkpoint.");
+        reset_game(env.program_info(), env.console, context);
+        stats.m_reset++;
+        env.update_stats();
+    }            
     }
 }
 
@@ -1049,34 +1085,40 @@ void AutoStory::segment_06(SingleSwitchProgramEnvironment& env, BotBaseContext& 
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     checkpoint_save(env, context);
 
-    context.wait_for_all_requests();
-    env.console.log("Move to cliff");
-    env.console.overlay().add_log("Move to cliff", COLOR_WHITE);
-
     while (true){
+    try{
+        context.wait_for_all_requests();
+        env.console.log("Move to cliff");
+        env.console.overlay().add_log("Move to cliff", COLOR_WHITE);
+
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 240, 60, 80);
         if (!overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 116, 0, 72, 24)){
-            context.wait_for_all_requests();
-            env.console.log("Did not reach cliff, resetting from checkpoint...", COLOR_RED);
-            env.console.overlay().add_log("Did not reach cliff, reset", COLOR_RED);
-            reset_game(env.program_info(), env.console, context);
-            stats.m_reset++;
-            env.update_stats();
-            continue;
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, env.console,
+                "Failed to reach cliff.",
+                true
+            );  
         }
         if (!clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD)){
-            context.wait_for_all_requests();
-            env.console.log("Did not reach cliff, resetting from checkpoint...", COLOR_RED);
-            env.console.overlay().add_log("Did not reach cliff, reset", COLOR_RED);
-            reset_game(env.program_info(), env.console, context);
-            stats.m_reset++;
-            env.update_stats();
-            continue;
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, env.console,
+                "Failed to reach cliff.",
+                true
+            );  
         }
         context.wait_for_all_requests();
         env.console.log("Mystery cry");
         env.console.overlay().add_log("Mystery cry", COLOR_WHITE);
+        
         break;
+    }catch(OperationFailedException& e){
+        context.wait_for_all_requests();
+        env.console.log(e.m_message, COLOR_RED);
+        env.console.log("Resetting from checkpoint.");
+        reset_game(env.program_info(), env.console, context);
+        stats.m_reset++;
+        env.update_stats();
+    }           
     }
 }
 
@@ -1084,29 +1126,27 @@ void AutoStory::segment_07(SingleSwitchProgramEnvironment& env, BotBaseContext& 
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     checkpoint_save(env, context);
 
-    context.wait_for_all_requests();
     while (true){
+    try{
+        context.wait_for_all_requests();
+
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 230, 70, 100);
         if (!overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 0)){
-            context.wait_for_all_requests();
-            env.console.log("Did not reach cliff, resetting from checkpoint...", COLOR_RED);
-            env.console.overlay().add_log("Did not reach cliff, reset", COLOR_RED);
-            reset_game(env.program_info(), env.console, context);
-            stats.m_reset++;
-            env.update_stats();
-            continue;
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, env.console,
+                "Failed to reach cliff.",
+                true
+            );  
         }
         clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 20);
         // long animation
         clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 10);
         if (!overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 0, 30)){
-            context.wait_for_all_requests();
-            env.console.log("Did not reach legendary, resetting from checkpoint...", COLOR_RED);
-            env.console.overlay().add_log("Did not reach legendary, reset", COLOR_RED);
-            reset_game(env.program_info(), env.console, context);
-            stats.m_reset++;
-            env.update_stats();
-            continue;
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, env.console,
+                "Failed to reach legendary.",
+                true
+            );  
         }
         clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 10);
 
@@ -1128,13 +1168,13 @@ void AutoStory::segment_07(SingleSwitchProgramEnvironment& env, BotBaseContext& 
             {arrow}
         );
         if (ret < 0){
-            // context.wait_for_all_requests();
-            // env.console.log("Stuck trying clear auto heal tutorial, resetting from checkpoint...", COLOR_RED);
-            // reset_game(env.program_info(), env.console, context);
-            // stats.m_reset++;
-            // env.update_stats();
-            // continue;
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, env.console,
+                "Failed to feed mom's sandwich.",
+                true
+            );  
         }
+
         // only press A when the sandwich is selected
         pbf_mash_button(context, BUTTON_A, 100);
 
@@ -1155,22 +1195,19 @@ void AutoStory::segment_07(SingleSwitchProgramEnvironment& env, BotBaseContext& 
             }
         );
         if (!finished_action){
-            context.wait_for_all_requests();
-            env.console.log("Did not enter cave, resetting from checkpoint...", COLOR_RED);
-            reset_game(env.program_info(), env.console, context);
-            stats.m_reset++;
-            env.update_stats();
-            continue;
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, env.console,
+                "Failed to enter cave.",
+                true
+            );  
         }
 
         if (!overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 20, 10)){
-            context.wait_for_all_requests();
-            env.console.log("Did not enter cave, resetting from checkpoint...", COLOR_RED);
-            env.console.overlay().add_log("Did not enter cave, reset", COLOR_RED);
-            reset_game(env.program_info(), env.console, context);
-            stats.m_reset++;
-            env.update_stats();
-            continue;
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, env.console,
+                "Failed to enter cave.",
+                true
+            );  
         }
         clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 10);
 
@@ -1210,25 +1247,31 @@ void AutoStory::segment_07(SingleSwitchProgramEnvironment& env, BotBaseContext& 
             }
         );
         if (!finished_action){
-            context.wait_for_all_requests();
-            env.console.log("Did not traverse cave, resetting from checkpoint...", COLOR_RED);
-            reset_game(env.program_info(), env.console, context);
-            stats.m_reset++;
-            env.update_stats();
-            continue;
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, env.console,
+                "Failed to traverse cave.",
+                true
+            );  
         }
         
         if (!overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 20, 40)){
-            context.wait_for_all_requests();
-            env.console.log("Did not reach Houndoom, resetting from checkpoint...", COLOR_RED);
-            env.console.overlay().add_log("Did not reach Houndoom, reset", COLOR_RED);
-            reset_game(env.program_info(), env.console, context);
-            stats.m_reset++;
-            env.update_stats();
-            continue;
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, env.console,
+                "Failed to reach Houndoom.",
+                true
+            );  
         }
         mash_button_till_overworld(env.console, context, BUTTON_A);
+
         break;
+    }catch(OperationFailedException& e){
+        context.wait_for_all_requests();
+        env.console.log(e.m_message, COLOR_RED);
+        env.console.log("Resetting from checkpoint.");
+        reset_game(env.program_info(), env.console, context);
+        stats.m_reset++;
+        env.update_stats();
+    }            
     }
 
 }
@@ -1239,15 +1282,14 @@ void AutoStory::segment_08(SingleSwitchProgramEnvironment& env, BotBaseContext& 
     checkpoint_save(env, context);
     context.wait_for_all_requests();
     while (true){
+    try{        
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 230, 120, 100);
         if (!overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 0)){
-            context.wait_for_all_requests();
-            env.console.log("Did not talk to Arven at lab, resetting from checkpoint...", COLOR_RED);
-            env.console.overlay().add_log("Can't find Arven, reset", COLOR_RED);
-            reset_game(env.program_info(), env.console, context);
-            stats.m_reset++;
-            env.update_stats();
-            continue;
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, env.console,
+                "Failed to talk to Arven at the tower.",
+                true
+            );  
         }
         context.wait_for_all_requests();
         env.console.log("Found Arven");
@@ -1256,7 +1298,16 @@ void AutoStory::segment_08(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         context.wait_for_all_requests();
         env.console.log("Receive legendary ball");
         env.console.overlay().add_log("Receive legendary ball", COLOR_WHITE);
+
         break;
+    }catch(OperationFailedException& e){
+        context.wait_for_all_requests();
+        env.console.log(e.m_message, COLOR_RED);
+        env.console.log("Resetting from checkpoint.");
+        reset_game(env.program_info(), env.console, context);
+        stats.m_reset++;
+        env.update_stats();
+    }            
     }
 }
 
@@ -1265,6 +1316,7 @@ void AutoStory::segment_09(SingleSwitchProgramEnvironment& env, BotBaseContext& 
     checkpoint_save(env, context);
     context.wait_for_all_requests();
     while (true){
+    try{
         context.wait_for_all_requests();
         env.console.log("Lighthouse view");
         env.console.overlay().add_log("Lighthouse view", COLOR_WHITE);
@@ -1279,25 +1331,31 @@ void AutoStory::segment_09(SingleSwitchProgramEnvironment& env, BotBaseContext& 
             }
         );
         if (!finished_action){
-            context.wait_for_all_requests();
-            env.console.log("Failed to go to Nemona at the lighthouse, resetting from checkpoint...", COLOR_RED);
-            reset_game(env.program_info(), env.console, context);
-            stats.m_reset++;
-            env.update_stats();
-            continue;
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, env.console,
+                "Failed to go to Nemona at the lighthouse.",
+                true
+            );  
         }  
         
         if (!overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_SPAM_A, 128, 0, 20)){
-            context.wait_for_all_requests();
-            env.console.log("Did not talk to Nemona on the lighthouse, resetting from checkpoint...", COLOR_RED);
-            env.console.overlay().add_log("Can't find Nemona, reset", COLOR_RED);
-            reset_game(env.program_info(), env.console, context);
-            stats.m_reset++;
-            env.update_stats();
-            continue;
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, env.console,
+                "Failed to talk to Nemona on the lighthouse.",
+                true
+            );  
         }
         mash_button_till_overworld(env.console, context, BUTTON_A);
+
         break;
+    }catch(OperationFailedException& e){
+        context.wait_for_all_requests();
+        env.console.log(e.m_message, COLOR_RED);
+        env.console.log("Resetting from checkpoint.");
+        reset_game(env.program_info(), env.console, context);
+        stats.m_reset++;
+        env.update_stats();
+    }           
     }
 }
 
@@ -1307,6 +1365,7 @@ void AutoStory::segment_10(SingleSwitchProgramEnvironment& env, BotBaseContext& 
     context.wait_for_all_requests();
 
     while (true){
+    try{
         bool finished_action = do_action_and_monitor_for_battles(env, env.console, context,
             [&](ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){
                 realign_player(env.program_info(), console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 100, 210, 100);
@@ -1318,22 +1377,19 @@ void AutoStory::segment_10(SingleSwitchProgramEnvironment& env, BotBaseContext& 
             }
         );     
         if (!finished_action){
-            context.wait_for_all_requests();
-            env.console.log("Did not reach Los Platos, resetting from checkpoint...", COLOR_RED);
-            reset_game(env.program_info(), env.console, context);
-            stats.m_reset++;
-            env.update_stats();
-            continue;
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, env.console,
+                "Failed to reach Los Platos.",
+                true
+            );  
         }             
 
         if (!overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 0, 75)){
-            context.wait_for_all_requests();
-            env.console.log("Did not reach Los Platos, resetting from checkpoint...", COLOR_RED);
-            env.console.overlay().add_log("Did not reach Los Platos, reset", COLOR_RED);
-            reset_game(env.program_info(), env.console, context);
-            stats.m_reset++;
-            env.update_stats();
-            continue;
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, env.console,
+                "Failed to reach Los Platos.",
+                true
+            );  
         }
         clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 5);
         clear_tutorial(env.console, context);
@@ -1341,6 +1397,14 @@ void AutoStory::segment_10(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         env.console.log("Reached Los Platos");
         env.console.overlay().add_log("Reached Los Platos", COLOR_WHITE);
         break;
+    }catch(OperationFailedException& e){
+        context.wait_for_all_requests();
+        env.console.log(e.m_message, COLOR_RED);
+        env.console.log("Resetting from checkpoint.");
+        reset_game(env.program_info(), env.console, context);
+        stats.m_reset++;
+        env.update_stats();
+    }             
     }
 
 }
@@ -1506,9 +1570,9 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
 
     // TODO: set settings. to ensure autosave is off.
 
-    int start = 0;
+    int start = 2;
     int end = 10;
-    int loops = 10;
+    int loops = 1;
     test_segments(env, env.console, context, start, end, loops);
 
 
