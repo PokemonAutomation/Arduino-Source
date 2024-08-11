@@ -29,15 +29,31 @@ public:
     ItemPrinterPrizeReader(Language language);
 
     void make_overlays(VideoOverlaySet& items) const;
-    std::array<std::string, 10> read(
+
+    std::array<std::string, 10> read_prizes(
         Logger& logger, AsyncDispatcher& dispatcher,
         const ImageViewRGB32& screen
     ) const;
 
+    std::array<int16_t, 10> read_quantity(
+        Logger& logger, AsyncDispatcher& dispatcher,
+        const ImageViewRGB32& screen
+    ) const;
+
+    int16_t read_number(
+        Logger& logger,
+        const ImageViewRGB32& screen, 
+        const ImageFloatBox& box
+    ) const;
+
+    double average_sum_filtered(const ImageViewRGB32& screen, const ImageFloatBox& box) const;
+
 private:
     Language m_language;
-    ImageFloatBox m_boxes_normal[10];
-    ImageFloatBox m_boxes_bonus[10];
+    std::array<ImageFloatBox, 10> m_boxes_normal;
+    std::array<ImageFloatBox, 10> m_boxes_bonus;
+    std::array<ImageFloatBox, 10> m_boxes_normal_quantity;
+    std::array<ImageFloatBox, 10> m_boxes_bonus_quantity;
 };
 
 
