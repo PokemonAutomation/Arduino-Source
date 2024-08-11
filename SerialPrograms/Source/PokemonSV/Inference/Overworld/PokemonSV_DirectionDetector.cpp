@@ -1,4 +1,4 @@
-/*  Fast Travel Detector
+/*  Direction Detector
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
