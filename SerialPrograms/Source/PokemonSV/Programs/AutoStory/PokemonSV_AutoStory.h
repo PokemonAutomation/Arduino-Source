@@ -242,6 +242,9 @@ private:
 
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;
+    
+    SectionDividerOption m_advanced_options;
+    BooleanCheckBoxOption CHANGE_SETTINGS;    
 };
 
 

@@ -6,6 +6,7 @@
 
 #include <atomic>
 #include <sstream>
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
@@ -139,6 +140,15 @@ AutoStory::AutoStory()
         &NOTIFICATION_ERROR_RECOVERABLE,
         &NOTIFICATION_ERROR_FATAL,
     })
+    , m_advanced_options(
+        "<font size=4><b>Advanced Options: (developer only)</b></font>"
+    )
+    , CHANGE_SETTINGS(
+        "<b>Change settings at Program Start:</b><br>"
+        "This is to ensure the program has the correct settings, particularly with Autosave turned off.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        true
+    )    
 {
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(STARTPOINT);
@@ -148,6 +158,11 @@ AutoStory::AutoStory()
     PA_ADD_OPTION(STARTERCHOICE);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
+
+    if (PreloadSettings::instance().DEVELOPER_MODE){
+        PA_ADD_OPTION(m_advanced_options);
+        PA_ADD_OPTION(CHANGE_SETTINGS);
+    }
 
     AutoStory::value_changed(this);
 
@@ -1673,7 +1688,7 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
 
     // Set settings. to ensure autosave is off.
     // TODO: enable it for other languages
-    if (LANGUAGE == Language::English){
+    if (LANGUAGE == Language::English && CHANGE_SETTINGS){
         change_settings_prior_to_autostory(env, context);
     }
 
