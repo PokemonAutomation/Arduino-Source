@@ -1208,7 +1208,7 @@ void AutoStory::segment_05(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         context.wait_for_all_requests();
         env.console.log("Start catch tutorial");
         env.console.overlay().add_log("Start catch tutorial", COLOR_WHITE);
-        clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 5);
+        clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 10);
         clear_tutorial(env.console, context);
         run_battle(env.console, context, BattleStopCondition::STOP_DIALOG);
         clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 5);
@@ -1692,13 +1692,13 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
         change_settings_prior_to_autostory(env, context);
     }
 
-    // int start = 10;
-    // int end = 10;
-    // int loops = 1;
-    // test_segments(env, env.console, context, start, end, loops);
+    int start = 0;
+    int end = 10;
+    int loops = 10;
+    test_segments(env, env.console, context, start, end, loops);
 
 
-    run_autostory(env, context);
+    // run_autostory(env, context);
     
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
     GO_HOME_WHEN_DONE.run_end_of_program(context);
