@@ -904,13 +904,17 @@ void AutoStory::segment_00(SingleSwitchProgramEnvironment& env, BotBaseContext& 
 
 void AutoStory::segment_01(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
-    save_game_tutorial(env.program_info(), env.console, context);
-    stats.m_checkpoint++;
-    env.update_stats();
-    send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE, "Saved at checkpoint.");     
-    
+    bool has_saved_game = false;
     while (true){
     try{
+        if(!has_saved_game){
+            save_game_tutorial(env.program_info(), env.console, context);
+            stats.m_checkpoint++;
+            env.update_stats();
+            send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE, "Saved at checkpoint.");     
+            has_saved_game = true;
+        }
+        
         context.wait_for_all_requests();
         env.console.log("Go downstairs, get stopped by Skwovet");
         env.console.overlay().add_log("Go downstairs, get stopped by Skwovet", COLOR_WHITE);
@@ -1008,10 +1012,14 @@ void AutoStory::segment_01(SingleSwitchProgramEnvironment& env, BotBaseContext& 
 
 void AutoStory::segment_02(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
-    checkpoint_save(env, context);
-    
+    bool has_saved_game = false;
     while (true){   
     try{
+        if (!has_saved_game){
+            checkpoint_save(env, context);
+            has_saved_game = true;
+        }
+        
         context.wait_for_all_requests();
         
         pbf_move_left_joystick(context, 255, 0, 1 * TICKS_PER_SECOND, 20);
@@ -1111,10 +1119,13 @@ void AutoStory::segment_02(SingleSwitchProgramEnvironment& env, BotBaseContext& 
 
 void AutoStory::segment_03(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
-    checkpoint_save(env, context);
-    
+    bool has_saved_game = false;
     while (true){
     try{        
+        if (!has_saved_game){
+            checkpoint_save(env, context);
+            has_saved_game = true;
+        }        
         context.wait_for_all_requests();
 
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 220, 245, 50);
@@ -1157,10 +1168,13 @@ void AutoStory::segment_03(SingleSwitchProgramEnvironment& env, BotBaseContext& 
 
 void AutoStory::segment_04(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
-    checkpoint_save(env, context);
-    
+    bool has_saved_game = false;
     while (true){
     try{
+        if (!has_saved_game){
+            checkpoint_save(env, context);
+            has_saved_game = true;
+        }         
         context.wait_for_all_requests();
 
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 40, 160, 60);
@@ -1191,10 +1205,16 @@ void AutoStory::segment_04(SingleSwitchProgramEnvironment& env, BotBaseContext& 
 
 void AutoStory::segment_05(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
-    checkpoint_save(env, context);
-    context.wait_for_all_requests();
+    bool has_saved_game = false;
     while (true){
     try{        
+        if (!has_saved_game){
+            checkpoint_save(env, context);
+            has_saved_game = true;
+        }        
+
+        context.wait_for_all_requests();
+
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 40, 82, 60);
         pbf_move_left_joystick(context, 128, 0, 6 * TICKS_PER_SECOND, 20);
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 110, 10, 60);
@@ -1231,10 +1251,14 @@ void AutoStory::segment_05(SingleSwitchProgramEnvironment& env, BotBaseContext& 
 
 void AutoStory::segment_06(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
-    checkpoint_save(env, context);
-
+    bool has_saved_game = false;
     while (true){
     try{
+        if (!has_saved_game){
+            checkpoint_save(env, context);
+            has_saved_game = true;
+        }         
+
         context.wait_for_all_requests();
         env.console.log("Move to cliff");
         env.console.overlay().add_log("Move to cliff", COLOR_WHITE);
@@ -1272,10 +1296,13 @@ void AutoStory::segment_06(SingleSwitchProgramEnvironment& env, BotBaseContext& 
 
 void AutoStory::segment_07(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
-    checkpoint_save(env, context);
-
+    bool has_saved_game = false;
     while (true){
     try{
+        if (!has_saved_game){
+            checkpoint_save(env, context);
+            has_saved_game = true;
+        }         
         context.wait_for_all_requests();
 
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 230, 70, 100);
@@ -1413,10 +1440,15 @@ void AutoStory::segment_07(SingleSwitchProgramEnvironment& env, BotBaseContext& 
 
 void AutoStory::segment_08(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
-    checkpoint_save(env, context);
-    context.wait_for_all_requests();
+    bool has_saved_game = false;
     while (true){
     try{        
+        if (!has_saved_game){
+            checkpoint_save(env, context);
+            has_saved_game = true;
+        }      
+        context.wait_for_all_requests();
+
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 230, 120, 100);
         if (!overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 0)){
             throw OperationFailedException(
@@ -1447,10 +1479,13 @@ void AutoStory::segment_08(SingleSwitchProgramEnvironment& env, BotBaseContext& 
 
 void AutoStory::segment_09(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
-    checkpoint_save(env, context);
-    context.wait_for_all_requests();
+    bool has_saved_game = false;
     while (true){
     try{
+        if (!has_saved_game){
+            checkpoint_save(env, context);
+            has_saved_game = true;
+        }        
         context.wait_for_all_requests();
         env.console.log("Lighthouse view");
         env.console.overlay().add_log("Lighthouse view", COLOR_WHITE);
@@ -1488,11 +1523,15 @@ void AutoStory::segment_09(SingleSwitchProgramEnvironment& env, BotBaseContext& 
 
 void AutoStory::segment_10(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
-    checkpoint_save(env, context);
-    context.wait_for_all_requests();
-
+    bool has_saved_game = false;
     while (true){
     try{
+        if (!has_saved_game){
+            checkpoint_save(env, context);
+            has_saved_game = true;
+        } 
+
+        context.wait_for_all_requests();
         do_action_and_monitor_for_battles(env, env.console, context,
             [&](ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){
                 realign_player(env.program_info(), console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 100, 210, 100);
