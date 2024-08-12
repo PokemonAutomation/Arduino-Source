@@ -116,7 +116,7 @@ std::array<std::string, 10> item_printer_finish_print(
                 VideoOverlaySet overlays(console.overlay());
                 reader.make_overlays(overlays);
                 auto snapshot = console.video().snapshot();
-                ret = reader.read(console.logger(), dispatcher, snapshot);
+                ret = reader.read_prizes(console.logger(), dispatcher, snapshot);
 //                static int c = 0;
 //                snapshot->save("test-" + std::to_string(c) + ".png");
             }
