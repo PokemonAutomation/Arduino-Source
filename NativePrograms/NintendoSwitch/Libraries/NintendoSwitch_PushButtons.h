@@ -40,6 +40,8 @@ void pbf_move_right_joystick(uint8_t x, uint8_t y, uint16_t hold_ticks, uint16_t
 //  specified amount of time.
 void pbf_mash_button(Button button, uint16_t ticks);
 
+//  Alternately mash 2 buttons.
+void pbf_mash2_button(Button button0, Button button1, uint16_t ticks);
 
 
 

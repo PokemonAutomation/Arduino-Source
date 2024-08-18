@@ -8,4 +8,7 @@ cd %~dp0\PokemonSwSh
 cd %~dp0\PokemonBDSP
 @call !Cleanup.cmd
 
+cd %~dp0\PokemonSV
+@call !Cleanup.cmd
+
 

@@ -77,30 +77,32 @@ SRC += $(PATH_PUBLIC)/NativePrograms/NintendoSwitch/FrameworkSettings.c
 ifneq ("$(wildcard $(PATH_INTERNAL)/NativePrograms/NintendoSwitch/Framework/NintendoSwitch_PushButtons.c)","")
 CC_FLAGS += -I$(PATH_INTERNAL)
 SRC += $(PATH_PUBLIC)/Common/CRC32.c
-SRC += $(PATH_INTERNAL)/NativePrograms/NintendoSwitch/Framework/uart.c
 SRC += $(PATH_INTERNAL)/NativePrograms/NintendoSwitch/Framework/HardwareUSB.c
 ifeq ($(TARGET), PABotBase)
+SRC += $(PATH_INTERNAL)/NativePrograms/NintendoSwitch/Framework/Uart-PABotBase.c
 SRC += $(PATH_INTERNAL)/NativePrograms/NintendoSwitch/Framework/CommandQueue.c
 else
+SRC += $(PATH_INTERNAL)/NativePrograms/NintendoSwitch/Framework/Uart.c
 SRC += $(PATH_INTERNAL)/NativePrograms/NintendoSwitch/Framework/CommandQueueNull.c
 endif
 SRC += $(PATH_INTERNAL)/NativePrograms/NintendoSwitch/Framework/HardwareSerial.c
 SRC += $(PATH_INTERNAL)/NativePrograms/NintendoSwitch/Framework/Controller.c
 SRC += $(PATH_INTERNAL)/NativePrograms/NintendoSwitch/Framework/NintendoSwitch_PushButtons.c
-SRC += $(PATH_INTERNAL)/NativePrograms/NintendoSwitch/Framework/NintendoSwitch_ScalarButtons.c
+SRC += $(PATH_INTERNAL)/NativePrograms/NintendoSwitch/Framework/NintendoSwitch_Superscalar.c
 else
 LD_FLAGS += obj/obj-$(MCU)/CRC32.o
-LD_FLAGS += obj/obj-$(MCU)/uart.o
 LD_FLAGS += obj/obj-$(MCU)/HardwareUSB.o
 ifeq ($(TARGET), PABotBase)
+LD_FLAGS += obj/obj-$(MCU)/Uart-PABotBase.o
 LD_FLAGS += obj/obj-$(MCU)/CommandQueue.o
 else
+LD_FLAGS += obj/obj-$(MCU)/Uart.o
 LD_FLAGS += obj/obj-$(MCU)/CommandQueueNull.o
 endif
 LD_FLAGS += obj/obj-$(MCU)/HardwareSerial.o
 LD_FLAGS += obj/obj-$(MCU)/Controller.o
 LD_FLAGS += obj/obj-$(MCU)/NintendoSwitch_PushButtons.o
-LD_FLAGS += obj/obj-$(MCU)/NintendoSwitch_ScalarButtons.o
+LD_FLAGS += obj/obj-$(MCU)/NintendoSwitch_Superscalar.o
 endif
 
 #   Program
