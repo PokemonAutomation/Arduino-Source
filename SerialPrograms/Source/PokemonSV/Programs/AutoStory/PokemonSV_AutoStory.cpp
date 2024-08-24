@@ -264,7 +264,7 @@ bool run_battle(
         NormalBattleMenuWatcher battle(COLOR_BLUE);
         SwapMenuWatcher         fainted(COLOR_PURPLE);
         OverworldWatcher        overworld(COLOR_CYAN);
-        DialogBoxWatcher        dialog(COLOR_RED, true);
+        AdvanceDialogWatcher    dialog(COLOR_RED);
         context.wait_for_all_requests();
 
         int ret = wait_until(
@@ -294,8 +294,19 @@ bool run_battle(
                 return false;
             }            
             break;
-        case 3: // dialog
+        case 3: // advance dialog
             console.log("Detected dialog.");
+            {
+                context.wait_for_all_requests();
+                WipeoutDetector wipeout;
+                VideoSnapshot screen = console.video().snapshot();
+                // dump_snapshot(console);
+                if (wipeout.detect(screen)){
+                    console.log("Detected wipeout. All pokemon fainted.");
+                    return false;                
+                }
+            }
+
             if (stop_condition == BattleStopCondition::STOP_DIALOG){
                 return true;
             }
@@ -449,7 +460,9 @@ bool overworld_navigation(
         switch (ret){
         case 0: // battle
             console.log("overworld_navigation: Detected start of battle.");
-            run_battle(console, context, BattleStopCondition::STOP_OVERWORLD);
+            if (!run_battle(console, context, BattleStopCondition::STOP_OVERWORLD)){
+                return false;
+            }
             auto_heal_from_menu_or_overworld(info, console, context, 0, true);
             realign_player(info, console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             break;
@@ -1230,7 +1243,13 @@ void AutoStory::segment_05(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         env.console.overlay().add_log("Start catch tutorial", COLOR_WHITE);
         clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 10);
         clear_tutorial(env.console, context);
-        run_battle(env.console, context, BattleStopCondition::STOP_DIALOG);
+        if (!run_battle(env.console, context, BattleStopCondition::STOP_DIALOG)){
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, env.console,
+                "Failed to complete catch tutorial.",
+                true
+            );  
+        }
         clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 5);
         clear_tutorial(env.console, context);
         context.wait_for_all_requests();
@@ -1725,16 +1744,18 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
     // Connect controller
     pbf_press_button(context, BUTTON_L, 20, 20);
 
+    run_battle(env.console, context, BattleStopCondition::STOP_DIALOG);
+
     // Set settings. to ensure autosave is off.
     // TODO: enable it for other languages
     if (LANGUAGE == Language::English && CHANGE_SETTINGS){
         change_settings_prior_to_autostory(env, context);
     }
 
-    int start = 0;
-    int end = 10;
-    int loops = 10;
-    test_segments(env, env.console, context, start, end, loops);
+    // int start = 0;
+    // int end = 10;
+    // int loops = 10;
+    // test_segments(env, env.console, context, start, end, loops);
 
 
     // run_autostory(env, context);
