@@ -76,7 +76,8 @@ void MenuOption::set_target_option(const std::vector<MenuOptionToggleEnum>& targ
     for (size_t attempt = 0; attempt < 10; attempt++){
         std::string current_option_slug = read_option_toggle();
         MenuOptionToggleEnum current_option_toggle_enum = menu_option_toggle_lookup_by_slug(current_option_slug).enum_value;
-        if (current_option_toggle_enum == target_option_toggle_enum){
+        
+        if (std::find(target_option_toggle_list.begin(), target_option_toggle_list.end(), current_option_toggle_enum) != target_option_toggle_list.end()){
             return;
         }
 

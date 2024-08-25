@@ -513,7 +513,6 @@ void config_option(BotBaseContext& context, int change_option_value){
     pbf_press_dpad(context, DPAD_DOWN,  15, 20);
 }
 
-// NOTE: we can't confirm that the moves are actually swapped, unless we detect the moves themselves (either names or PP)
 void swap_starter_moves(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, Language language){
     WallClock start = current_time();
     while (true){
@@ -547,18 +546,16 @@ void swap_starter_moves(const ProgramInfo& info, ConsoleHandle& console, BotBase
         pbf_press_button(context, BUTTON_A, 20, 40);    
 
         // confirm that Ember/Leafage/Water Gun is in slot 1
-        if (language == Language::English){
-            context.wait_for_all_requests();
-            VideoSnapshot screen = console.video().snapshot();
-            PokemonMovesReader reader(Language::English);
-            std::string top_move = reader.read_move(console, screen, 0);
-            console.log("Current top move: " + top_move);
-            if (top_move != "ember" && top_move != "leafage" && top_move != "water-gun"){
-                console.log("Failed to swap moves. Re-try.");
-                continue;
-            }   
+        context.wait_for_all_requests();
+        VideoSnapshot screen = console.video().snapshot();
+        PokemonMovesReader reader(language);
+        std::string top_move = reader.read_move(console, screen, 0);
+        console.log("Current top move: " + top_move);
+        if (top_move != "ember" && top_move != "leafage" && top_move != "water-gun"){
+            console.log("Failed to swap moves. Re-try.");
+            continue;
+        }   
 
-        }
 
         break;    
     }
@@ -679,31 +676,28 @@ int8_t AutoStory::option_index(){
 
 void AutoStory::change_settings(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     env.console.log("Update settings.");
-    if (LANGUAGE == Language::English){
-        MenuOption session(env.console, context, LANGUAGE);
-    
-        std::vector<std::pair<MenuOptionItemEnum, MenuOptionToggleEnum>> options = {
-            {MenuOptionItemEnum::TEXT_SPEED, MenuOptionToggleEnum::FAST},
-            {MenuOptionItemEnum::SKIP_MOVE_LEARNING, MenuOptionToggleEnum::ON},
-            {MenuOptionItemEnum::SEND_TO_BOXES, MenuOptionToggleEnum::AUTOMATIC},
-            {MenuOptionItemEnum::GIVE_NICKNAMES, MenuOptionToggleEnum::OFF},
-            {MenuOptionItemEnum::VERTICAL_CAMERA_CONTROLS, MenuOptionToggleEnum::REGULAR},
-            {MenuOptionItemEnum::HORIZONTAL_CAMERA_CONTROLS, MenuOptionToggleEnum::REGULAR},
-            {MenuOptionItemEnum::CAMERA_SUPPORT, MenuOptionToggleEnum::ON},
-            {MenuOptionItemEnum::CAMERA_INTERPOLATION, MenuOptionToggleEnum::NORMAL},
-            {MenuOptionItemEnum::CAMERA_DISTANCE, MenuOptionToggleEnum::CLOSE},
-            {MenuOptionItemEnum::AUTOSAVE, MenuOptionToggleEnum::OFF},
-            {MenuOptionItemEnum::SHOW_NICKNAMES, MenuOptionToggleEnum::DONT_SHOW},
-            {MenuOptionItemEnum::SKIP_CUTSCENES, MenuOptionToggleEnum::ON},
-            {MenuOptionItemEnum::CONTROLLER_RUMBLE, MenuOptionToggleEnum::ON},
-            {MenuOptionItemEnum::HELPING_FUNCTIONS, MenuOptionToggleEnum::OFF},
+    MenuOption session(env.console, context, LANGUAGE);
 
-        };
-        session.set_options(options);
+    std::vector<std::pair<MenuOptionItemEnum, std::vector<MenuOptionToggleEnum>>> options = {
+        {MenuOptionItemEnum::TEXT_SPEED, {MenuOptionToggleEnum::FAST}},
+        {MenuOptionItemEnum::SKIP_MOVE_LEARNING, {MenuOptionToggleEnum::ON}},
+        {MenuOptionItemEnum::SEND_TO_BOXES, {MenuOptionToggleEnum::AUTOMATIC, MenuOptionToggleEnum::ON}},
+        {MenuOptionItemEnum::GIVE_NICKNAMES, {MenuOptionToggleEnum::OFF}},
+        {MenuOptionItemEnum::VERTICAL_CAMERA_CONTROLS, {MenuOptionToggleEnum::REGULAR, MenuOptionToggleEnum::NORMAL}},
+        {MenuOptionItemEnum::HORIZONTAL_CAMERA_CONTROLS, {MenuOptionToggleEnum::REGULAR, MenuOptionToggleEnum::NORMAL}},
+        {MenuOptionItemEnum::CAMERA_SUPPORT, {MenuOptionToggleEnum::ON}},
+        {MenuOptionItemEnum::CAMERA_INTERPOLATION, {MenuOptionToggleEnum::NORMAL, MenuOptionToggleEnum::AVERAGE}},
+        {MenuOptionItemEnum::CAMERA_DISTANCE, {MenuOptionToggleEnum::CLOSE}},
+        {MenuOptionItemEnum::AUTOSAVE, {MenuOptionToggleEnum::OFF}},
+        {MenuOptionItemEnum::SHOW_NICKNAMES, {MenuOptionToggleEnum::OFF, MenuOptionToggleEnum::DONT_SHOW}},
+        {MenuOptionItemEnum::SKIP_CUTSCENES, {MenuOptionToggleEnum::ON}},
+        {MenuOptionItemEnum::CONTROLLER_RUMBLE, {MenuOptionToggleEnum::ON}},
+        {MenuOptionItemEnum::HELPING_FUNCTIONS, {MenuOptionToggleEnum::OFF}},
 
-    }else{
-        //TODO: Add OCR file for other languages
+    };
+    session.set_options(options);
 
+    #if 0
         config_option(context, 1); // Text Speed: Fast
         config_option(context, 1); // Skip Move Learning: On
         config_option(context, 1); // Send to Boxes: Automatic
@@ -721,7 +715,7 @@ void AutoStory::change_settings(SingleSwitchProgramEnvironment& env, BotBaseCont
         config_option(context, 0); // Pokemon Cries: 10
         config_option(context, 0); // Controller Rumble: On
         config_option(context, 1); // Helping Functions: Off
-    }
+    #endif
 
     pbf_mash_button(context, BUTTON_A, 1 * TICKS_PER_SECOND);
     clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 5);
@@ -895,7 +889,7 @@ void AutoStory::segment_00(SingleSwitchProgramEnvironment& env, BotBaseContext& 
 
 
     // Mash A through intro cutscene, until the L stick button is detected
-    WhiteButtonWatcher leftstick(COLOR_GREEN, WhiteButton::ButtonLStick, {0.435, 0.912, 0.042, 0.047});
+    WhiteButtonWatcher leftstick(COLOR_GREEN, WhiteButton::ButtonLStick, {0.435, 0.912, 0.046, 0.047});
     context.wait_for_all_requests();
     run_until(
         env.console, context,
@@ -1744,18 +1738,18 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
     // Connect controller
     pbf_press_button(context, BUTTON_L, 20, 20);
 
-    run_battle(env.console, context, BattleStopCondition::STOP_DIALOG);
+    // change_settings(env, context);
+    // pbf_wait(context, 10000);
 
     // Set settings. to ensure autosave is off.
-    // TODO: enable it for other languages
-    if (LANGUAGE == Language::English && CHANGE_SETTINGS){
+    if (CHANGE_SETTINGS){
         change_settings_prior_to_autostory(env, context);
     }
 
-    // int start = 0;
-    // int end = 10;
-    // int loops = 10;
-    // test_segments(env, env.console, context, start, end, loops);
+    int start = 0;
+    int end = 10;
+    int loops = 1;
+    test_segments(env, env.console, context, start, end, loops);
 
 
     // run_autostory(env, context);
