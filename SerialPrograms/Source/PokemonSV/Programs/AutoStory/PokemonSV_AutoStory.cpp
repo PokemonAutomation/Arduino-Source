@@ -1193,6 +1193,7 @@ void AutoStory::segment_04(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         env.console.log("Starting battle...");
         env.console.overlay().add_log("Starting battle...", COLOR_WHITE);
         // TODO: Battle start prompt detection
+        // can lose this battle, and story will continue
         mash_button_till_overworld(env.console, context);
         context.wait_for_all_requests();
         env.console.log("Finished battle.");
@@ -1275,6 +1276,7 @@ void AutoStory::segment_06(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         env.console.overlay().add_log("Start catch tutorial", COLOR_WHITE);
         clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 10);
         clear_tutorial(env.console, context);
+        // can die in catch tutorial, and the story will continue
         if (!run_battle(env.console, context, BattleStopCondition::STOP_DIALOG)){
             throw OperationFailedException(
                 ErrorReport::SEND_ERROR_REPORT, env.console,
@@ -1512,6 +1514,7 @@ void AutoStory::segment_09(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         context.wait_for_all_requests();
         env.console.log("Found Arven");
         env.console.overlay().add_log("Found Arven", COLOR_WHITE);
+        // can lose battle, and story will still continue
         mash_button_till_overworld(env.console, context, BUTTON_A);
         context.wait_for_all_requests();
         env.console.log("Receive legendary ball");
