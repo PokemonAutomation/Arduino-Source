@@ -1449,7 +1449,8 @@ void AutoStory::segment_08(SingleSwitchProgramEnvironment& env, BotBaseContext& 
                 pbf_move_left_joystick(context, 128, 20, 5 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
                 pbf_move_left_joystick(context, 128, 20, 6 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
                 realign_player(env.program_info(), console, context, PlayerRealignMode::REALIGN_NO_MARKER, 220, 25, 20);
-                pbf_move_left_joystick(context, 128, 20, 8 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
+                pbf_move_left_joystick(context, 128, 20, 4 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
+                pbf_move_left_joystick(context, 128, 20, 4 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
                 realign_player(env.program_info(), console, context, PlayerRealignMode::REALIGN_NO_MARKER, 220, 25, 25);
                 pbf_move_left_joystick(context, 128, 20, 6 * TICKS_PER_SECOND, 20 * TICKS_PER_SECOND);
 
@@ -1785,7 +1786,7 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
     }
 
     int start = 0;
-    int end = 10;
+    int end = 12;
     int loops = 1;
     test_segments(env, env.console, context, start, end, loops);
 
