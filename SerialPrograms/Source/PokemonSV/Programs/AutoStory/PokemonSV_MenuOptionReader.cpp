@@ -1,4 +1,4 @@
-/*  Menu Option Session
+/*  Menu Option Reader
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *

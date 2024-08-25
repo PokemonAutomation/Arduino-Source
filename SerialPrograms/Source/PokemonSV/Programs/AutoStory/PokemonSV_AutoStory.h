@@ -1,4 +1,4 @@
-/*  Shiny Hunt - Area Zero Platform
+/*  Autostory
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *

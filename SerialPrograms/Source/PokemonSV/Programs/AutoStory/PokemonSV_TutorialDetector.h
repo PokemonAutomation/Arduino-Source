@@ -1,4 +1,4 @@
-/*  Main Menu Detector
+/*  Tutorial Detector
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *

@@ -1,4 +1,4 @@
-/*  Menu Option Session
+/*  Pokemon Moves Reader
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
