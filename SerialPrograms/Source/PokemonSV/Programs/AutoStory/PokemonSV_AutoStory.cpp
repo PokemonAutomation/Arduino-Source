@@ -674,30 +674,30 @@ int8_t AutoStory::option_index(){
     }    
 }
 
-void AutoStory::change_settings(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void AutoStory::change_settings(SingleSwitchProgramEnvironment& env, BotBaseContext& context, bool use_inference){
     env.console.log("Update settings.");
-    MenuOption session(env.console, context, LANGUAGE);
+    if (use_inference){
+        MenuOption session(env.console, context, LANGUAGE);
 
-    std::vector<std::pair<MenuOptionItemEnum, std::vector<MenuOptionToggleEnum>>> options = {
-        {MenuOptionItemEnum::TEXT_SPEED, {MenuOptionToggleEnum::FAST}},
-        {MenuOptionItemEnum::SKIP_MOVE_LEARNING, {MenuOptionToggleEnum::ON}},
-        {MenuOptionItemEnum::SEND_TO_BOXES, {MenuOptionToggleEnum::AUTOMATIC, MenuOptionToggleEnum::ON}},
-        {MenuOptionItemEnum::GIVE_NICKNAMES, {MenuOptionToggleEnum::OFF}},
-        {MenuOptionItemEnum::VERTICAL_CAMERA_CONTROLS, {MenuOptionToggleEnum::REGULAR, MenuOptionToggleEnum::NORMAL}},
-        {MenuOptionItemEnum::HORIZONTAL_CAMERA_CONTROLS, {MenuOptionToggleEnum::REGULAR, MenuOptionToggleEnum::NORMAL}},
-        {MenuOptionItemEnum::CAMERA_SUPPORT, {MenuOptionToggleEnum::ON}},
-        {MenuOptionItemEnum::CAMERA_INTERPOLATION, {MenuOptionToggleEnum::NORMAL, MenuOptionToggleEnum::AVERAGE}},
-        {MenuOptionItemEnum::CAMERA_DISTANCE, {MenuOptionToggleEnum::CLOSE}},
-        {MenuOptionItemEnum::AUTOSAVE, {MenuOptionToggleEnum::OFF}},
-        {MenuOptionItemEnum::SHOW_NICKNAMES, {MenuOptionToggleEnum::OFF, MenuOptionToggleEnum::DONT_SHOW}},
-        {MenuOptionItemEnum::SKIP_CUTSCENES, {MenuOptionToggleEnum::ON}},
-        {MenuOptionItemEnum::CONTROLLER_RUMBLE, {MenuOptionToggleEnum::ON}},
-        {MenuOptionItemEnum::HELPING_FUNCTIONS, {MenuOptionToggleEnum::OFF}},
+        std::vector<std::pair<MenuOptionItemEnum, std::vector<MenuOptionToggleEnum>>> options = {
+            {MenuOptionItemEnum::TEXT_SPEED, {MenuOptionToggleEnum::FAST}},
+            {MenuOptionItemEnum::SKIP_MOVE_LEARNING, {MenuOptionToggleEnum::ON}},
+            {MenuOptionItemEnum::SEND_TO_BOXES, {MenuOptionToggleEnum::AUTOMATIC, MenuOptionToggleEnum::ON}},
+            {MenuOptionItemEnum::GIVE_NICKNAMES, {MenuOptionToggleEnum::OFF}},
+            {MenuOptionItemEnum::VERTICAL_CAMERA_CONTROLS, {MenuOptionToggleEnum::REGULAR, MenuOptionToggleEnum::NORMAL}},
+            {MenuOptionItemEnum::HORIZONTAL_CAMERA_CONTROLS, {MenuOptionToggleEnum::REGULAR, MenuOptionToggleEnum::NORMAL}},
+            {MenuOptionItemEnum::CAMERA_SUPPORT, {MenuOptionToggleEnum::ON}},
+            {MenuOptionItemEnum::CAMERA_INTERPOLATION, {MenuOptionToggleEnum::NORMAL, MenuOptionToggleEnum::AVERAGE}},
+            {MenuOptionItemEnum::CAMERA_DISTANCE, {MenuOptionToggleEnum::CLOSE}},
+            {MenuOptionItemEnum::AUTOSAVE, {MenuOptionToggleEnum::OFF}},
+            {MenuOptionItemEnum::SHOW_NICKNAMES, {MenuOptionToggleEnum::OFF, MenuOptionToggleEnum::DONT_SHOW}},
+            {MenuOptionItemEnum::SKIP_CUTSCENES, {MenuOptionToggleEnum::ON}},
+            {MenuOptionItemEnum::CONTROLLER_RUMBLE, {MenuOptionToggleEnum::ON}},
+            {MenuOptionItemEnum::HELPING_FUNCTIONS, {MenuOptionToggleEnum::OFF}},
 
-    };
-    session.set_options(options);
-
-    #if 0
+        };
+        session.set_options(options);        
+    }else{
         config_option(context, 1); // Text Speed: Fast
         config_option(context, 1); // Skip Move Learning: On
         config_option(context, 1); // Send to Boxes: Automatic
@@ -715,7 +715,7 @@ void AutoStory::change_settings(SingleSwitchProgramEnvironment& env, BotBaseCont
         config_option(context, 0); // Pokemon Cries: 10
         config_option(context, 0); // Controller Rumble: On
         config_option(context, 1); // Helping Functions: Off
-    #endif
+    }
 
     pbf_mash_button(context, BUTTON_A, 1 * TICKS_PER_SECOND);
     clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 5);
@@ -876,7 +876,16 @@ void AutoStory::test_segments(
                 console.log("segment_11: loop " + std::to_string(i));
                 segment_11(env, context);
             }
-            break;                                     
+            break;   
+        case 12:
+            for (int i = 0; i < loop; i++){
+                if (i > 0){
+                    reset_game(env.program_info(), console, context);
+                }
+                console.log("segment_11: loop " + std::to_string(i));
+                segment_12(env, context);
+            }
+            break;                                            
 
         }
 
@@ -903,13 +912,42 @@ void AutoStory::segment_00(SingleSwitchProgramEnvironment& env, BotBaseContext& 
     pbf_move_left_joystick(context, 128, 255, 3 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
     pbf_move_left_joystick(context,   0, 128, 6 * TICKS_PER_SECOND, 1 * TICKS_PER_SECOND);
 
-    // set settings
-    enter_menu_from_overworld(env.program_info(), env.console, context, 0, MenuSide::RIGHT, false);
-    change_settings(env, context);
-    pbf_mash_button(context, BUTTON_B, 2 * TICKS_PER_SECOND);
 }
 
 void AutoStory::segment_01(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
+    bool has_saved_game = false;
+    bool first_attempt = true;
+    while (true){
+    try{
+        if(!has_saved_game){
+            save_game_tutorial(env.program_info(), env.console, context);
+            stats.m_checkpoint++;
+            env.update_stats();
+            send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE, "Saved at checkpoint.");     
+            has_saved_game = true;
+        }
+        
+        context.wait_for_all_requests();
+        // set settings
+        enter_menu_from_overworld(env.program_info(), env.console, context, 0, MenuSide::RIGHT, false);
+        change_settings(env, context, first_attempt);
+        pbf_mash_button(context, BUTTON_B, 2 * TICKS_PER_SECOND);
+
+        break;  
+    }catch(...){
+        // (void)e;
+        first_attempt = false;
+        context.wait_for_all_requests();
+        env.console.log("Resetting from checkpoint.");
+        reset_game(env.program_info(), env.console, context);
+        stats.m_reset++;
+        env.update_stats();
+    }
+    }
+}
+
+void AutoStory::segment_02(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     bool has_saved_game = false;
     while (true){
@@ -1017,7 +1055,7 @@ void AutoStory::segment_01(SingleSwitchProgramEnvironment& env, BotBaseContext& 
     }
 }
 
-void AutoStory::segment_02(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void AutoStory::segment_03(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     bool has_saved_game = false;
     while (true){   
@@ -1124,7 +1162,7 @@ void AutoStory::segment_02(SingleSwitchProgramEnvironment& env, BotBaseContext& 
 
 }
 
-void AutoStory::segment_03(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void AutoStory::segment_04(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     bool has_saved_game = false;
     while (true){
@@ -1173,7 +1211,7 @@ void AutoStory::segment_03(SingleSwitchProgramEnvironment& env, BotBaseContext& 
 
 }
 
-void AutoStory::segment_04(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void AutoStory::segment_05(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     bool has_saved_game = false;
     while (true){
@@ -1210,7 +1248,7 @@ void AutoStory::segment_04(SingleSwitchProgramEnvironment& env, BotBaseContext& 
     }    
 }
 
-void AutoStory::segment_05(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void AutoStory::segment_06(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     bool has_saved_game = false;
     while (true){
@@ -1262,7 +1300,7 @@ void AutoStory::segment_05(SingleSwitchProgramEnvironment& env, BotBaseContext& 
     }
 }
 
-void AutoStory::segment_06(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void AutoStory::segment_07(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     bool has_saved_game = false;
     while (true){
@@ -1307,7 +1345,7 @@ void AutoStory::segment_06(SingleSwitchProgramEnvironment& env, BotBaseContext& 
     }
 }
 
-void AutoStory::segment_07(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void AutoStory::segment_08(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     bool has_saved_game = false;
     while (true){
@@ -1451,7 +1489,7 @@ void AutoStory::segment_07(SingleSwitchProgramEnvironment& env, BotBaseContext& 
 }
 
 
-void AutoStory::segment_08(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void AutoStory::segment_09(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     bool has_saved_game = false;
     while (true){
@@ -1490,7 +1528,7 @@ void AutoStory::segment_08(SingleSwitchProgramEnvironment& env, BotBaseContext& 
     }
 }
 
-void AutoStory::segment_09(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void AutoStory::segment_10(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     bool has_saved_game = false;
     while (true){
@@ -1534,7 +1572,7 @@ void AutoStory::segment_09(SingleSwitchProgramEnvironment& env, BotBaseContext& 
     }
 }
 
-void AutoStory::segment_10(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void AutoStory::segment_11(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     bool has_saved_game = false;
     while (true){
@@ -1582,7 +1620,7 @@ void AutoStory::segment_10(SingleSwitchProgramEnvironment& env, BotBaseContext& 
 }
 
 
-void AutoStory::segment_11(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void AutoStory::segment_12(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     // AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     // checkpoint_save(env, env.console, context);
     context.wait_for_all_requests();

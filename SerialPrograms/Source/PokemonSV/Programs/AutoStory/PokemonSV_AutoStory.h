@@ -156,24 +156,26 @@ public:
     void enter_options_menu_from_overworld(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
     // from within the Settings/Options menu, change the settings
-    void change_settings(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    void change_settings(SingleSwitchProgramEnvironment& env, BotBaseContext& context, bool use_inference = true);
 
     void run_autostory(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
     void checkpoint_save(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
     // start: after selecting character name, style and the cutscene has started
-    // end: stood up from chair. updated settings
+    // end: stood up from chair.
     void segment_00(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
-    // start: stood up from chair. updated settings
-    // end: standing in front of power of science NPC. cleared map tutorial
+    // start: stood up from chair. 
+    // end: standing in room. updated settings
     void segment_01(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    
+    // start: standing in room. updated settings
+    // end: standing in front of power of science NPC. cleared map tutorial
+    void segment_02(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
     // start: standing in front of power of science NPC. cleared map tutorial
     // end: received starter, changed move order
-    void segment_02(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-
     void segment_03(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
     void segment_04(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
@@ -191,6 +193,8 @@ public:
     void segment_10(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
     void segment_11(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+
+    void segment_12(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
 private:
     virtual void value_changed(void* object) override;
