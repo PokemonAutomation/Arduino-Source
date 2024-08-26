@@ -1,11 +1,5 @@
-/*  Fast Travel Detector
-
- Detects the Fast Travel symbol on the screen. 
-
- Limitations:
- - Does not work if obstructed by the radar beam (while outdoors), 
- or if obstructed by the radar dot
-
+/*  Direction Detector
+ *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
  */
