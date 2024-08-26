@@ -144,6 +144,7 @@ bool match_template_by_waterfill(
     return detected;
 }
 
+
 void draw_matrix_on_image(
     const PackedBinaryMatrix& matrix,
     uint32_t color, ImageRGB32& image, size_t offset_x, size_t offset_y

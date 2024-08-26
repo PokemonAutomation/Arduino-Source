@@ -11,7 +11,6 @@
 #include <functional>
 #include <utility>
 #include "CommonFramework/ImageTypes/BinaryImage.h"
-#include "CommonFramework/ImageTools/ImageBoxes.h"
 
 namespace PokemonAutomation{
     class ImageRGB32;

@@ -20,11 +20,9 @@
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV_DirectionDetector.h"
+#define _USE_MATH_DEFINES
 #include <cmath>
 #include <iostream>
-#ifndef M_PI
-#define M_PI 3.14159265358979323846
-#endif
 //using std::cout;
 //using std::endl;
 
