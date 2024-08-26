@@ -58,7 +58,7 @@ bool is_kill_icon(
 
 //    extract_box_reference(image, object).save("test.png");
 
-    if (object.width() < 20 || object.height() < 20){
+    if (object.width() < 18 || object.height() < 18){
 //        cout << "too small: " << object.width() << endl;
         return false;
     }
@@ -133,7 +133,7 @@ bool LetsGoKillDetector::detect(const ImageViewRGB32& screen) const{
             WaterfillObject object;
             while (iter->find_next(object, false)){
                 double aspect_ratio = object.aspect_ratio();
-                if (aspect_ratio < 1.5 || aspect_ratio > 2.5){
+                if (aspect_ratio < 1.5 || aspect_ratio > 2.7){
                     continue;
                 }
 //                cout << object.area << endl;
