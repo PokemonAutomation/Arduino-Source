@@ -35,11 +35,11 @@ public:
     // return the coordinates of the N symbol, where the coordinates are measured in absolute pixels (scaled to 1080/height)
     // with respect to the radar ball
     // return 0,0 if unable to locate the N symbol
-    std::pair<double, double> locate_north(const ImageViewRGB32& screen) const;
+    std::pair<double, double> locate_north(ConsoleHandle& console, const ImageViewRGB32& screen) const;
 
     // return the direction of the N symbol, in radians, using North-clockwise convention. [0, 2pi)
     // return -1 if unable to locate the N symbol
-    double current_direction(const ImageViewRGB32& screen) const;
+    double current_direction(ConsoleHandle& console, const ImageViewRGB32& screen) const;
 
     // given direction in radians (North-clockwise), rotate the camera so N is pointing in the desired direction.
     // mini-map must be unlocked.

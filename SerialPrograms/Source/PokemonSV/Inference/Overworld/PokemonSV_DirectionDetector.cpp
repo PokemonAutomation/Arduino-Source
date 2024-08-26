@@ -14,6 +14,7 @@
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Tools/DebugDumper.h"
+#include "CommonFramework/Tools/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "PokemonSV_DirectionDetector.h"
@@ -58,7 +59,8 @@ DirectionDetector::DirectionDetector(Color color, const ImageFloatBox& box)
 {}
 
 
-std::pair<double, double> DirectionDetector::locate_north(const ImageViewRGB32& screen) const{
+std::pair<double, double> DirectionDetector::locate_north(ConsoleHandle& console, const ImageViewRGB32& screen) const{
+    assert_16_9_720p_min(console, screen);
     const std::vector<std::pair<uint32_t, uint32_t>> filters = {
         {combine_rgb(0, 100, 0), combine_rgb(50, 230, 80)},
 
@@ -108,8 +110,8 @@ std::pair<double, double> DirectionDetector::locate_north(const ImageViewRGB32& 
 }
 
 
-double DirectionDetector::current_direction(const ImageViewRGB32& screen) const{
-    std::pair<double, double> north_location = locate_north(screen);
+double DirectionDetector::current_direction(ConsoleHandle& console, const ImageViewRGB32& screen) const{
+    std::pair<double, double> north_location = locate_north(console, screen);
     if (north_location.first == 0 && north_location.second == 0){ // unable to locate north
         return -1;
     }
@@ -128,7 +130,7 @@ void DirectionDetector::change_direction(
     for (size_t i = 0; i < 10; i++){ // 10 attempts to move the direction to the target
         context.wait_for_all_requests();
         VideoSnapshot screen = console.video().snapshot();
-        double current = current_direction(screen);
+        double current = current_direction(console, screen);
         if (current < 0){ 
             return;
         }
