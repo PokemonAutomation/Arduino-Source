@@ -6,6 +6,7 @@
 
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
+#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTools/WaterfillUtilities.h"
@@ -17,6 +18,7 @@
 #include "CommonFramework/Tools/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
+#include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV_DirectionDetector.h"
 #include <cmath>
 #include <iostream>
@@ -73,7 +75,16 @@ std::pair<double, double> DirectionDetector::locate_north(ConsoleHandle& console
     const size_t min_size = size_t(screen_rel_size * screen_rel_size * min_object_size);
 
     std::pair<double, double> north_location(0, 0);
-    std::pair<double, double> zero_coord(0.9065, 0.8335);
+    OverworldDetector detector;
+    std::pair<double, double> zero_coord = detector.locate_ball(screen); // 0.9061, 0.8328
+    if (zero_coord.first > 0.91 || zero_coord.first < 0.90 || 
+        zero_coord.second > 0.84 || zero_coord.second < 0.82)
+    {
+        console.log("Unable to locate the overworld radar ball, falling back on hard coded location.");
+        zero_coord.first = 0.9061;
+        zero_coord.second = 0.8328;
+        // throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Unable to locate the overworld radar ball.");
+    }
 
     ImagePixelBox pixel_search_area = floatbox_to_pixelbox(screen.width(), screen.height(), m_minimap_box);
     match_template_by_waterfill(
@@ -147,7 +158,7 @@ void DirectionDetector::change_direction(
         double abs_diff = std::abs(diff);
         console.log("current direction: " +  std::to_string(current));
         console.log("target: " +  std::to_string(target) + ", diff: " + std::to_string(diff));
-        if (abs_diff < 0.015){
+        if (abs_diff < 0.02){
             // stop the loop when we're close enough to the target
             break;
         }

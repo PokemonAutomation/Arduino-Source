@@ -28,6 +28,8 @@ public:
 
     bool detect_ball(const ImageViewRGB32& screen) const;
 
+    std::pair<double, double> locate_ball(const ImageViewRGB32& screen) const;
+
 protected:
     const Color m_color;
     const ImageFloatBox m_ball;

@@ -10,6 +10,8 @@
 #include "CommonFramework/ImageMatch/ImageDiff.h"
 #include "CommonFramework/ImageMatch/ExactImageMatcher.h"
 #include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
+#include "CommonFramework/ImageTools/WaterfillUtilities.h"
+#include "CommonFramework/ImageMatch/WaterfillTemplateMatcher.h"
 #include "PokemonSV_OverworldDetector.h"
 
 //#include <iostream>
@@ -27,6 +29,22 @@ const ImageMatch::ExactImageMatcher& RADAR_BALL(){
     return matcher;
 }
 
+class RadarBallMatcher : public ImageMatch::WaterfillTemplateMatcher{
+public:
+    RadarBallMatcher() : WaterfillTemplateMatcher(
+        "PokemonSV/RadarBall.png", Color(192,192,0), Color(255, 255, 127), 5
+    ){
+        m_aspect_ratio_lower = 0.8;
+        m_aspect_ratio_upper = 1.2;
+        m_area_ratio_lower = 0.1;
+        m_area_ratio_upper = 1.2;
+    }
+
+    static const ImageMatch::WaterfillTemplateMatcher& instance(){
+        static RadarBallMatcher matcher;
+        return matcher;
+    }
+};
 
 
 
@@ -122,6 +140,71 @@ bool OverworldDetector::detect_ball(const ImageViewRGB32& screen) const{
         }
     }
     return false;
+}
+
+std::pair<double, double> OverworldDetector::locate_ball(const ImageViewRGB32& screen) const{
+    const std::vector<std::pair<uint32_t, uint32_t>> filters = {
+        {0xffc0a000, 0xffffff1f},
+        {0xffc0b000, 0xffffff1f},
+        {0xffc0c000, 0xffffff1f},
+        {0xffd0d000, 0xffffff1f},
+        {0xffe0e000, 0xffffff1f},
+        {0xfff0f000, 0xffffff1f},
+        {0xfff8f800, 0xffffff1f},
+
+        {0xffc0c000, 0xffffff3f},
+        {0xffd0d000, 0xffffff3f},
+        {0xffe0e000, 0xffffff3f},
+        {0xfff0f000, 0xffffff3f},
+        {0xfff8f800, 0xffffff3f},
+
+        {0xffc0c000, 0xffffff5f},
+        {0xffd0d000, 0xffffff5f},
+        {0xffe0e000, 0xffffff5f},
+        {0xfff0f000, 0xffffff5f},
+        {0xfff8f800, 0xffffff5f},
+
+        {0xffc0c000, 0xffffff7f},
+        {0xffd0d000, 0xffffff7f},
+        {0xffe0e000, 0xffffff7f},
+        {0xfff0f000, 0xffffff7f},
+        {0xfff8f800, 0xffffff7f},
+    };
+
+    // yellow arrow has area of 70-80. the yellow ball, when only partially filled (which excludes the beam), has an area of 300. 
+    // when the ball is fully filled in, it has an area of 550
+    const double min_object_size = 150.0;
+    const double rmsd_threshold = 50.0;
+
+    const double screen_rel_size = (screen.height() / 1080.0);
+    const size_t min_size = size_t(screen_rel_size * screen_rel_size * min_object_size);
+
+    std::pair<double, double> ball_location(-1.0, -1.0);
+    ImageViewRGB32 cropped = extract_box_reference(screen, m_ball);
+    ImagePixelBox pixel_box = floatbox_to_pixelbox(screen.width(), screen.height(), m_ball);
+    match_template_by_waterfill(
+        cropped, 
+        RadarBallMatcher::instance(),
+        filters,
+        {min_size, SIZE_MAX},
+        rmsd_threshold,
+        [&](Kernels::Waterfill::WaterfillObject& object) -> bool {
+            //  Exclude if it touches the borders of the box
+            if (object.min_x == 0 || object.min_y == 0 ||
+                object.max_x == cropped.width() || object.max_y == cropped.height()
+            ){
+                return false;
+            }
+
+            ball_location = std::make_pair(
+                (object.center_of_gravity_x() + pixel_box.min_x) / (double)screen.width(),
+                (object.center_of_gravity_y() + pixel_box.min_y) / (double)screen.height()
+            );
+            return true;
+        }
+    );
+
+    return ball_location;
 }
 
 
