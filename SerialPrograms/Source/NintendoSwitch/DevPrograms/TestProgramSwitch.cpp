@@ -118,6 +118,7 @@
 #include "PokemonSV/Inference/ItemPrinter/PokemonSV_ItemPrinterPrizeReader.h"
 #include "PokemonSV/Inference/ItemPrinter/PokemonSV_ItemPrinterJobsDetector.h"
 #include "PokemonSV/Inference/ItemPrinter/PokemonSV_ItemPrinterMaterialDetector.h"
+#include "PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h"
 
 
@@ -266,6 +267,20 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 //    PokemonLA::ButtonDetector detector(logger, PokemonLA::ButtonType::ButtonA,);
 
+#if 1
+
+    VideoSnapshot image = feed.snapshot();
+    DirectionDetector detector;
+    
+    // ImageRGB32 image("MaterialFarmer-1.png");
+    // ImageRGB32 image("dark-capture-card_1.png");
+    // DirectionDetector detector(COLOR_BLUE, ImageFloatBox(0,0,1,1));
+
+    // std::pair<double, double> north_location = detector.locate_north(image);
+    // detector.current_direction(image);
+    detector.change_direction(console, context, 3.14);
+
+#endif
 
 #if 0
     ItemPrinterMaterialDetector detector(COLOR_RED, LANGUAGE);

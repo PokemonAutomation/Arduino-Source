@@ -658,6 +658,7 @@ SOURCES += \
     Source/PokemonSV/Inference/Map/PokemonSV_MapMenuDetector.cpp \
     Source/PokemonSV/Inference/Map/PokemonSV_MapPokeCenterIconDetector.cpp \
     Source/PokemonSV/Inference/Overworld/PokemonSV_AreaZeroSkyDetector.cpp \
+    Source/PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.cpp \
     Source/PokemonSV/Inference/Overworld/PokemonSV_LetsGoHpReader.cpp \
     Source/PokemonSV/Inference/Overworld/PokemonSV_LetsGoKillDetector.cpp \
     Source/PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.cpp \
@@ -1733,6 +1734,7 @@ HEADERS += \
     Source/PokemonSV/Inference/Map/PokemonSV_MapMenuDetector.h \
     Source/PokemonSV/Inference/Map/PokemonSV_MapPokeCenterIconDetector.h \
     Source/PokemonSV/Inference/Overworld/PokemonSV_AreaZeroSkyDetector.h \
+    Source/PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h \
     Source/PokemonSV/Inference/Overworld/PokemonSV_LetsGoHpReader.h \
     Source/PokemonSV/Inference/Overworld/PokemonSV_LetsGoKillDetector.h \
     Source/PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h \
