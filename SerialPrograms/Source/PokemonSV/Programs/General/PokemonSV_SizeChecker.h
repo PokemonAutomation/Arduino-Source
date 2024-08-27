@@ -37,12 +37,13 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
-    void enter_check_mode(ConsoleHandle& console, BotBaseContext& context);
-    void exit_check_mode(ConsoleHandle& console, BotBaseContext& context);
+    void enter_check_mode(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    void exit_check_mode(SingleSwitchProgramEnvironment& env, BotBaseContext& context, struct VideoSnapshot screen);
 
 private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
     SimpleIntegerOption<uint8_t> BOXES_TO_CHECK;
+    EventNotificationOption NOTIFICATION_MARK;
     EventNotificationsOption NOTIFICATIONS;
 };
 

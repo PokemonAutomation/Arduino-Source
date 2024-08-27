@@ -17,6 +17,7 @@
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxEggDetector.h"
 #include "PokemonSV/Programs/Boxes/PokemonSV_BoxRoutines.h"
+#include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSV_SizeChecker.h"
 
 namespace PokemonAutomation{
@@ -43,16 +44,19 @@ struct SizeChecker_Descriptor::Stats : public StatsTracker{
         , m_checked(m_stats["Checked"])
         , m_empty(m_stats["Empty Slots"])
         , m_eggs(m_stats["Eggs"])
+        , m_mark(m_stats["Mark/Ribbon"])
     {
         m_display_order.emplace_back("Boxes Checked");
         m_display_order.emplace_back("Checked");
         m_display_order.emplace_back("Empty Slots");
         m_display_order.emplace_back("Eggs");
+        m_display_order.emplace_back("Mark/Ribbon");
     }
     std::atomic<uint64_t>& m_boxes;
     std::atomic<uint64_t>& m_checked;
     std::atomic<uint64_t>& m_empty;
     std::atomic<uint64_t>& m_eggs;
+    std::atomic<uint64_t>& m_mark;
 };
 std::unique_ptr<StatsTracker> SizeChecker_Descriptor::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
@@ -67,7 +71,9 @@ SizeChecker::SizeChecker()
         LockMode::LOCK_WHILE_RUNNING,
         2, 1, 32
     )
+    , NOTIFICATION_MARK("Mark/Ribbon Given", true, false, ImageAttachmentMode::JPG, { "Notifs" })
     , NOTIFICATIONS({
+        &NOTIFICATION_MARK,
         &NOTIFICATION_PROGRAM_FINISH,
         &NOTIFICATION_ERROR_FATAL,
     })
@@ -80,14 +86,14 @@ SizeChecker::SizeChecker()
 
 
 
-void SizeChecker::enter_check_mode(ConsoleHandle& console, BotBaseContext& context){
-    console.log("Enter box mode to check size...");
+void SizeChecker::enter_check_mode(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    env.console.log("Enter box mode to check size...");
     WallClock start = current_time();
 
     while (true){
         if (current_time() - start > std::chrono::minutes(2)){
             throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
+                ErrorReport::SEND_ERROR_REPORT, env.console,
                 "enter_check_mode(): Failed to enter box mode after 2 minutes.",
                 true
             );
@@ -101,7 +107,7 @@ void SizeChecker::enter_check_mode(ConsoleHandle& console, BotBaseContext& conte
         context.wait_for_all_requests();
 
         int ret = wait_until(
-            console, context,
+            env.console, context,
             std::chrono::seconds(60),
             {dialog, overworld, prompt, box}
         );
@@ -119,7 +125,7 @@ void SizeChecker::enter_check_mode(ConsoleHandle& console, BotBaseContext& conte
 
         default:
             throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
+                ErrorReport::SEND_ERROR_REPORT, env.console,
                 "enter_check_mode(): No recognized state after 60 seconds.",
                 true
             );
@@ -130,43 +136,54 @@ void SizeChecker::enter_check_mode(ConsoleHandle& console, BotBaseContext& conte
 
 
 
-void SizeChecker::exit_check_mode(ConsoleHandle& console, BotBaseContext& context){
-    console.log("Check size and exit box mode...");
+void SizeChecker::exit_check_mode(SingleSwitchProgramEnvironment& env, BotBaseContext& context, struct VideoSnapshot screen){
+    SizeChecker_Descriptor::Stats& stats = env.current_stats<SizeChecker_Descriptor::Stats>();
+    env.console.log("Check size and exit box mode...");
     WallClock start = current_time();
 
     while (true){
         if (current_time() - start > std::chrono::minutes(2)){
             throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
+                ErrorReport::SEND_ERROR_REPORT, env.console,
                 "exit_check_mode(): Failed to exit box mode after 2 minutes.",
                 true
             );
         }
 
-        AdvanceDialogWatcher dialog(COLOR_GREEN);
+        DialogBoxWatcher ribbon(COLOR_GREEN, true, std::chrono::milliseconds(250), DialogType::DIALOG_BLACK);
+        DialogBoxWatcher dialog(COLOR_GREEN, true, std::chrono::milliseconds(250), DialogType::DIALOG_WHITE);
         OverworldWatcher overworld(COLOR_CYAN);
         
         context.wait_for_all_requests();
 
         int ret = wait_until(
-            console, context,
+            env.console, context,
             std::chrono::seconds(60),
-            {dialog, overworld}
+            {ribbon, dialog, overworld}
         );
         context.wait_for(std::chrono::milliseconds(100));
 
         switch (ret){
 
-        case 0: // dialog
-            // TODO: Detect if mark was given and update stats.
+        case 0: // ribbon
+            stats.m_mark++;
+            env.update_stats();
+
+            send_program_notification(
+                env, NOTIFICATION_MARK,
+                COLOR_ORANGE, "Mark/Ribbon Given",
+                {}, "",
+                screen
+            );
+        case 1: // dialog
             pbf_press_button(context, BUTTON_A, 20, 5);
             continue;
-        case 1: // overworld
+        case 2: // overworld
             return;
 
         default:
             throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
+                ErrorReport::SEND_ERROR_REPORT, env.console,
                 "exit_check_mode(): No recognized state after 60 seconds.",
                 true
             );
@@ -188,7 +205,7 @@ void SizeChecker::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
 
     // Loop through boxes.
     for (uint8_t box = 0; box < BOXES_TO_CHECK; box++){
-        enter_check_mode(env.console, context);
+        enter_check_mode(env, context);
         context.wait_for_all_requests();
 
         if (box > 0){
@@ -199,7 +216,7 @@ void SizeChecker::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
         // Loop through the rows and columns.
         for (uint8_t row = 0; row < 5; row++){
             for (uint8_t col = 0; col < 6; col++){
-                enter_check_mode(env.console, context);
+                enter_check_mode(env, context);
                 context.wait_for_all_requests();
                 move_box_cursor(env.program_info(), env.console, context, BoxCursorLocation::SLOTS, row, col);
 
@@ -225,11 +242,29 @@ void SizeChecker::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
                     env.update_stats();
                     continue;
                 }
+                context.wait_for_all_requests();
 
                 // Initiate size checking prompt.
-                pbf_press_button(context, BUTTON_A, 20, 20);
+                DialogBoxWatcher dialog(COLOR_GREEN, true, std::chrono::milliseconds(250), DialogType::DIALOG_WHITE);
+                int ret = run_until(
+                    env.console, context,
+                    [](BotBaseContext& context){
+                        for (size_t c = 0; c < 10; c++){
+                            pbf_press_button(context, BUTTON_A, 20, 105);
+                        }
+                    },
+                    {dialog}
+                );
+                if (ret < 0){
+                    throw OperationFailedException(
+                        ErrorReport::SEND_ERROR_REPORT, env.console,
+                        "Unable to initiate check after 10 A presses.",
+                        true
+                    );
+                }
+                context.wait_for_all_requests();
 
-                exit_check_mode(env.console, context);
+                exit_check_mode(env, context, screen);
                 context.wait_for_all_requests();
 
                 stats.m_checked++;
@@ -241,8 +276,8 @@ void SizeChecker::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
         env.update_stats();
     }
 
-    pbf_press_button(context, BUTTON_B, 20, 20);
-    exit_check_mode(env.console, context);
+    // handle last box space being empty
+    press_Bs_to_back_to_overworld(env.program_info(), env.console, context);
 
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
     GO_HOME_WHEN_DONE.run_end_of_program(context);
