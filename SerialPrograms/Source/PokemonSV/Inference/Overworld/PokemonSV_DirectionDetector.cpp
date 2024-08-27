@@ -74,7 +74,7 @@ std::pair<double, double> DirectionDetector::locate_north(ConsoleHandle& console
 
     std::pair<double, double> north_location(0, 0);
     OverworldDetector detector;
-    std::pair<double, double> zero_coord = detector.locate_ball(screen); // 0.9061, 0.8328
+    std::pair<double, double> zero_coord = detector.locate_ball(screen, true); // 0.9061, 0.8328
     if (zero_coord.first > 0.91 || zero_coord.first < 0.90 || 
         zero_coord.second > 0.84 || zero_coord.second < 0.82)
     {

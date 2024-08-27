@@ -36,7 +36,7 @@ public:
     ){
         m_aspect_ratio_lower = 0.8;
         m_aspect_ratio_upper = 1.2;
-        m_area_ratio_lower = 0.1;
+        m_area_ratio_lower = 0.01;
         m_area_ratio_upper = 1.2;
     }
 
@@ -60,89 +60,10 @@ void OverworldDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_radar_inside);
 }
 bool OverworldDetector::detect(const ImageViewRGB32& screen) const{
-    if (!detect_ball(screen)){
-        return false;
-    }
-
-    //  TODO: Detect the directions.
-
-    return true;
+    return locate_ball(screen, false).first > 0;
 }
 
-bool OverworldDetector::detect_ball(const ImageViewRGB32& screen) const{
-    using namespace Kernels::Waterfill;
-
-    std::unique_ptr<WaterfillSession> session = make_WaterfillSession();
-    ImageViewRGB32 image = extract_box_reference(screen, m_ball);
-    std::vector<PackedBinaryMatrix> matrices = compress_rgb32_to_binary_range(
-        image,
-        {
-            {0xffc0a000, 0xffffff1f},
-            {0xffc0b000, 0xffffff1f},
-            {0xffc0c000, 0xffffff1f},
-            {0xffd0d000, 0xffffff1f},
-            {0xffe0e000, 0xffffff1f},
-            {0xfff0f000, 0xffffff1f},
-            {0xfff8f800, 0xffffff1f},
-
-            {0xffc0c000, 0xffffff3f},
-            {0xffd0d000, 0xffffff3f},
-            {0xffe0e000, 0xffffff3f},
-            {0xfff0f000, 0xffffff3f},
-            {0xfff8f800, 0xffffff3f},
-
-            {0xffc0c000, 0xffffff5f},
-            {0xffd0d000, 0xffffff5f},
-            {0xffe0e000, 0xffffff5f},
-            {0xfff0f000, 0xffffff5f},
-            {0xfff8f800, 0xffffff5f},
-
-            {0xffc0c000, 0xffffff7f},
-            {0xffd0d000, 0xffffff7f},
-            {0xffe0e000, 0xffffff7f},
-            {0xfff0f000, 0xffffff7f},
-            {0xfff8f800, 0xffffff7f},
-        }
-    );
-
-//    size_t c = 0;
-    for (PackedBinaryMatrix& matrix : matrices){
-        session->set_source(matrix);
-        auto iter = session->make_iterator(50);
-        WaterfillObject object;
-        while (iter->find_next(object, false)){
-//            c++;
-//            extract_box_reference(image, object).save("object-" + std::to_string(c) + ".png");
-
-            //  Exclude if it touches the borders.
-            if (object.min_x == 0 || object.min_y == 0 ||
-                object.max_x == image.width() || object.max_y == image.height()
-            ){
-                continue;
-            }
-            double aspect_ratio = object.aspect_ratio();
-//            cout << "object " << c << " ratio " << aspect_ratio << " area " << object.area_ratio() << endl;
-            if (!(0.8 < aspect_ratio && aspect_ratio < 1.2)){
-                continue;
-            }
-            double area_ratio = object.area_ratio();
-            if (area_ratio > 0.9){
-//                cout << c << " : bad area ratio = " << area_ratio << endl;
-                continue;
-            }
-
-//            extract_box_reference(image, object).save("ball-" + std::to_string(c) + ".png");
-            double rmsd = RADAR_BALL().rmsd(extract_box_reference(image, object));
-//            cout << "rmsd = " << rmsd << endl;
-            if (rmsd < 50){
-                return true;
-            }
-        }
-    }
-    return false;
-}
-
-std::pair<double, double> OverworldDetector::locate_ball(const ImageViewRGB32& screen) const{
+std::pair<double, double> OverworldDetector::locate_ball(const ImageViewRGB32& screen, bool strict_requirements) const{
     const std::vector<std::pair<uint32_t, uint32_t>> filters = {
         {0xffc0a000, 0xffffff1f},
         {0xffc0b000, 0xffffff1f},
@@ -171,10 +92,10 @@ std::pair<double, double> OverworldDetector::locate_ball(const ImageViewRGB32& s
         {0xfff8f800, 0xffffff7f},
     };
 
-    // yellow arrow has area of 70-80. the yellow ball, when only partially filled (which excludes the beam), has an area of 300. 
+    // yellow arrow has area of 70-80. the yellow ball, when only partially filled (i.e. only the outer ring is waterfilled), has an area of 200. 
     // when the ball is fully filled in, it has an area of 550
-    const double min_object_size = 150.0;
-    const double rmsd_threshold = 50.0;
+    const double min_object_size = strict_requirements ? 150.0 : 0;
+    const double rmsd_threshold = strict_requirements ? 35.0 : 50.0;
 
     const double screen_rel_size = (screen.height() / 1080.0);
     const size_t min_size = size_t(screen_rel_size * screen_rel_size * min_object_size);
