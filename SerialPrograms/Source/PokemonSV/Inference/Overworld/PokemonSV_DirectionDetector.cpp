@@ -78,7 +78,7 @@ std::pair<double, double> DirectionDetector::locate_north(ConsoleHandle& console
     if (zero_coord.first > 0.91 || zero_coord.first < 0.90 || 
         zero_coord.second > 0.84 || zero_coord.second < 0.82)
     {
-        console.log("Unable to locate the overworld radar ball, falling back on hard coded location.");
+        console.log("Unable to locate the overworld radar ball, falling back on hard coded location.", COLOR_ORANGE);
         zero_coord.first = 0.9061;
         zero_coord.second = 0.8328;
         // throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Unable to locate the overworld radar ball.");
