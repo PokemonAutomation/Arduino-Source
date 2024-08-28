@@ -20,7 +20,6 @@
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV_DirectionDetector.h"
-#define _USE_MATH_DEFINES
 #include <cmath>
 #include <iostream>
 //using std::cout;
@@ -126,7 +125,7 @@ double DirectionDetector::current_direction(ConsoleHandle& console, const ImageV
     }
     double direction = std::atan2(north_location.first, north_location.second);  // swap x and y to use north-clockwise convention
     // std::cout << std::to_string(direction) << std::endl;
-    direction = (direction < 0) ? (direction + 2 * M_PI) : direction; // change (-pi, pi] to [0, 2pi)
+    direction = (direction < 0) ? (direction + 2 * PI) : direction; // change (-pi, pi] to [0, 2pi)
     // std::cout << "current_direction: " << std::to_string(direction) << std::endl;
     return direction;
 }
@@ -143,15 +142,15 @@ void DirectionDetector::change_direction(
         if (current < 0){ 
             return;
         }
-        double target = std::fmod(direction, (2 * M_PI));
+        double target = std::fmod(direction, (2 * PI));
 
         // try to find the shortest path around the circle
         double diff = target - current;
-        if(diff > M_PI) {
-            diff -= (2 * M_PI);
+        if(diff > PI) {
+            diff -= (2 * PI);
         }
-        if(diff <= -M_PI) {
-            diff += (2 * M_PI);
+        if(diff <= -PI) {
+            diff += (2 * PI);
         }
         double abs_diff = std::abs(diff);
         console.log("current direction: " +  std::to_string(current));
