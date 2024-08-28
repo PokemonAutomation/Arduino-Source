@@ -26,6 +26,7 @@ class OverlayBoxScope;
 namespace NintendoSwitch{
 namespace PokemonSV{
 
+static constexpr double PI = 3.14159265358979323846;
 
 class DirectionDetector {
 public:
