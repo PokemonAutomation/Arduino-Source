@@ -772,124 +772,35 @@ void AutoStory::test_segments(
     BotBaseContext& context,
     int start, int end, int loop
 ){
-    int segment = start;
-    while (segment <= end){
-        switch(segment){
-        case 0:
-            segment_00(env, context);
-            break;
-        case 1:
-            for (int i = 0; i < loop; i++){
-                if (i > 0){
-                    reset_game(env.program_info(), console, context);
-                }
-                console.log("segment_01: loop " + std::to_string(i));
-                segment_01(env, context);
-            }
-            break;
-        case 2:
-            for (int i = 0; i < loop; i++){
-                if (i > 0){
-                    reset_game(env.program_info(), console, context);
-                }
-                console.log("segment_02: loop " + std::to_string(i));
-                segment_02(env, context);
-            }
-            break;
-        case 3:
-            for (int i = 0; i < loop; i++){
-                if (i > 0){
-                    reset_game(env.program_info(), console, context);
-                }
-                console.log("segment_03: loop " + std::to_string(i));
-                segment_03(env, context);
-            }
-            break;  
-        case 4:
-            for (int i = 0; i < loop; i++){
-                if (i > 0){
-                    reset_game(env.program_info(), console, context);
-                }
-                console.log("segment_04: loop " + std::to_string(i));
-                segment_04(env, context);
-            }
-            break;
-        case 5:
-            for (int i = 0; i < loop; i++){
-                if (i > 0){
-                    reset_game(env.program_info(), console, context);
-                }
-                console.log("segment_05: loop " + std::to_string(i));
-                segment_05(env, context);
-            }
-            break; 
-        case 6:
-            for (int i = 0; i < loop; i++){
-                if (i > 0){
-                    reset_game(env.program_info(), console, context);
-                }
-                console.log("segment_06: loop " + std::to_string(i));
-                segment_06(env, context);
-            }
-            break;  
-        case 7:
-            for (int i = 0; i < loop; i++){
-                if (i > 0){
-                    reset_game(env.program_info(), console, context);
-                }
-                console.log("segment_07: loop " + std::to_string(i));
-                segment_07(env, context);
-            }
-            break;
-        case 8:
-            for (int i = 0; i < loop; i++){
-                if (i > 0){
-                    reset_game(env.program_info(), console, context);
-                }
-                console.log("segment_08: loop " + std::to_string(i));
-                segment_08(env, context);
-            }
-            break; 
-        case 9:
-            for (int i = 0; i < loop; i++){
-                if (i > 0){
-                    reset_game(env.program_info(), console, context);
-                }
-                console.log("segment_09: loop " + std::to_string(i));
-                segment_09(env, context);
-            }
-            break; 
-        case 10:
-            for (int i = 0; i < loop; i++){
-                if (i > 0){
-                    reset_game(env.program_info(), console, context);
-                }
-                console.log("segment_10: loop " + std::to_string(i));
-                segment_10(env, context);
-            }
-            break; 
-        case 11:
-            for (int i = 0; i < loop; i++){
-                if (i > 0){
-                    reset_game(env.program_info(), console, context);
-                }
-                console.log("segment_11: loop " + std::to_string(i));
-                segment_11(env, context);
-            }
-            break;   
-        case 12:
-            for (int i = 0; i < loop; i++){
-                if (i > 0){
-                    reset_game(env.program_info(), console, context);
-                }
-                console.log("segment_11: loop " + std::to_string(i));
-                segment_12(env, context);
-            }
-            break;                                            
 
+    std::vector<std::function<void()>> segment_list;
+    segment_list.push_back([&](){segment_00(env, context);});
+    segment_list.push_back([&](){segment_01(env, context);});
+    segment_list.push_back([&](){segment_02(env, context);});
+    segment_list.push_back([&](){segment_03(env, context);});
+    segment_list.push_back([&](){segment_04(env, context);});
+    segment_list.push_back([&](){segment_05(env, context);});
+    segment_list.push_back([&](){segment_06(env, context);});
+    segment_list.push_back([&](){segment_07(env, context);});
+    segment_list.push_back([&](){segment_08(env, context);});
+    segment_list.push_back([&](){segment_09(env, context);});
+    segment_list.push_back([&](){segment_10(env, context);});
+    segment_list.push_back([&](){segment_11(env, context);});
+    segment_list.push_back([&](){segment_12(env, context);});
+
+    for (int segment = start; segment <= end; segment++){
+        if (segment == 0){
+            segment_list[segment]();
         }
-
-        segment++;
+        
+        std::string leading_zero = segment < 10 ? "0" : "";
+        for (int i = 0; i < loop; i++){
+            if (i > 0){
+                reset_game(env.program_info(), console, context);
+            }
+            console.log("segment_" + leading_zero + std::to_string(segment) + ": loop " + std::to_string(i));
+            segment_list[segment]();
+        }        
     }
     
 }
@@ -1788,9 +1699,9 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
         change_settings_prior_to_autostory(env, context);
     }
 
-    int start = 0;
+    int start = 11;
     int end = 12;
-    int loops = 1;
+    int loops = 2;
     test_segments(env, env.console, context, start, end, loops);
 
 
