@@ -148,7 +148,27 @@ AutoStory::AutoStory()
         "This is to ensure the program has the correct settings, particularly with Autosave turned off.",
         LockMode::UNLOCK_WHILE_RUNNING,
         true
+    )  
+    , ENABLE_TEST_SEGMENTS(
+        "<b>Test specific autostory segments:</b>",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        false
+    )   
+    , START_SEGMENT(
+        "<b>Start segment:</b><br>Start testing with this segment number.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        0
     )    
+    , END_SEGMENT(
+        "<b>End segment:</b><br>Stop testing when done this segment number.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        11
+    )     
+    , LOOP_SEGMENTS(
+        "<b>Loop segments:</b><br>Loop each test segment this number of times.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        1
+    )        
 {
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(STARTPOINT);
@@ -162,12 +182,17 @@ AutoStory::AutoStory()
     if (PreloadSettings::instance().DEVELOPER_MODE){
         PA_ADD_OPTION(m_advanced_options);
         PA_ADD_OPTION(CHANGE_SETTINGS);
+        PA_ADD_OPTION(ENABLE_TEST_SEGMENTS);
+        PA_ADD_OPTION(START_SEGMENT);
+        PA_ADD_OPTION(END_SEGMENT);
+        PA_ADD_OPTION(LOOP_SEGMENTS);
     }
 
     AutoStory::value_changed(this);
 
     STARTPOINT.add_listener(*this);
     ENDPOINT.add_listener(*this);
+    ENABLE_TEST_SEGMENTS.add_listener(*this);
 }
 
 void AutoStory::value_changed(void* object){
@@ -178,6 +203,17 @@ void AutoStory::value_changed(void* object){
 
     START_DESCRIPTION.set_text(start_segment_description());
     END_DESCRIPTION.set_text(end_segment_description());
+
+    if (ENABLE_TEST_SEGMENTS){
+        START_SEGMENT.set_visibility(ConfigOptionState::ENABLED);
+        END_SEGMENT.set_visibility(ConfigOptionState::ENABLED);
+        LOOP_SEGMENTS.set_visibility(ConfigOptionState::ENABLED);
+    }else{
+        START_SEGMENT.set_visibility(ConfigOptionState::DISABLED);
+        END_SEGMENT.set_visibility(ConfigOptionState::DISABLED);
+        LOOP_SEGMENTS.set_visibility(ConfigOptionState::DISABLED);
+    }
+
 }
 
 std::string AutoStory::start_segment_description(){
@@ -790,7 +826,9 @@ void AutoStory::test_segments(
 
     for (int segment = start; segment <= end; segment++){
         if (segment == 0){
+            console.log("segment_0");
             segment_list[segment]();
+            continue;
         }
         
         std::string leading_zero = segment < 10 ? "0" : "";
@@ -1691,21 +1729,17 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
     // Connect controller
     pbf_press_button(context, BUTTON_L, 20, 20);
 
-    // change_settings(env, context);
-    // pbf_wait(context, 10000);
-
     // Set settings. to ensure autosave is off.
     if (CHANGE_SETTINGS){
         change_settings_prior_to_autostory(env, context);
     }
 
-    int start = 11;
-    int end = 12;
-    int loops = 2;
-    test_segments(env, env.console, context, start, end, loops);
-
-
-    // run_autostory(env, context);
+    if (ENABLE_TEST_SEGMENTS){
+        // test individual segments/checkpoints
+        test_segments(env, env.console, context, START_SEGMENT, END_SEGMENT, LOOP_SEGMENTS);
+    }else{
+        run_autostory(env, context);
+    }
     
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
     GO_HOME_WHEN_DONE.run_end_of_program(context);

@@ -249,6 +249,10 @@ private:
     
     SectionDividerOption m_advanced_options;
     BooleanCheckBoxOption CHANGE_SETTINGS;    
+    BooleanCheckBoxOption ENABLE_TEST_SEGMENTS;    
+    SimpleIntegerOption<uint16_t> START_SEGMENT;
+    SimpleIntegerOption<uint16_t> END_SEGMENT;
+    SimpleIntegerOption<uint16_t> LOOP_SEGMENTS;
 };
 
 
