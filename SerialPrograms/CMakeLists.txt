@@ -1352,8 +1352,8 @@ file(GLOB MAIN_SOURCES
     # Source/PokemonSV/Inference/PokemonSV_MenuOptionReader.h    
     Source/PokemonSV/Inference/PokemonSV_MoneyReader.cpp
     Source/PokemonSV/Inference/PokemonSV_MoneyReader.h
-    # Source/PokemonSV/Inference/PokemonSV_PokemonMovesReader.cpp
-    # Source/PokemonSV/Inference/PokemonSV_PokemonMovesReader.h    
+    Source/PokemonSV/Inference/PokemonSV_PokemonMovesReader.cpp
+    Source/PokemonSV/Inference/PokemonSV_PokemonMovesReader.h    
     Source/PokemonSV/Inference/PokemonSV_PokePortalDetector.cpp
     Source/PokemonSV/Inference/PokemonSV_PokePortalDetector.h
     Source/PokemonSV/Inference/PokemonSV_PokemonSummaryReader.cpp
