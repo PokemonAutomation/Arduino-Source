@@ -109,6 +109,29 @@ void mash_button_till_overworld(
     uint16_t button = BUTTON_A, uint16_t seconds_run = 360
 );
 
+// walk forward while using lets go to clear the path
+// forward_ticks: number of ticks to walk forward
+// y = 0: walks forward. y = 128: stand in place. y = 255: walk backwards (towards camera)
+// ticks_between_lets_go: number of ticks between firing off Let's go to clear the path from wild pokemon
+// delay_after_lets_go: number of ticks to wait after firing off Let's go.
+void walk_forward_while_clear_front_path(
+    const ProgramInfo& info, 
+    ConsoleHandle& console, 
+    BotBaseContext& context,
+    uint16_t forward_ticks,
+    uint8_t y = 0,
+    uint16_t ticks_between_lets_go = 125,
+    uint16_t delay_after_lets_go = 250
+);
+
+// fly to the pokecenter that overlaps with the player on the map, and return true.
+// if no overlapping pokecenter, return false.
+bool fly_to_overlapping_pokecenter(
+    const ProgramInfo& info, 
+    ConsoleHandle& console, 
+    BotBaseContext& context
+);
+
 void config_option(BotBaseContext& context, int change_option_value);
 
 // enter menu and swap the first and third moves for your starter
@@ -171,30 +194,52 @@ public:
     void segment_01(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
     
     // start: standing in room. updated settings
-    // end: standing in front of power of science NPC. cleared map tutorial
+    // end: standing in front of power of science NPC. Cleared map tutorial.
     void segment_02(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
-    // start: standing in front of power of science NPC. cleared map tutorial
+    // start: standing in front of power of science NPC. Cleared map tutorial.
     // end: received starter, changed move order
     void segment_03(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
+    // start: Received starter pokemon and changed move order. Cleared autoheal tutorial.
+    // end: Battled Nemona on the beach.
     void segment_04(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
+    // start: Battled Nemona on the beach.
+    // end: Met mom at gate. Received mom's sandwich.
     void segment_05(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
+    // start: Met mom at gate. Received mom's sandwich.
+    // end: Cleared catch tutorial.
     void segment_06(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
+    // start: Cleared catch tutorial.
+    // end: Moved to cliff. Heard mystery cry.
     void segment_07(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
+    // start: Moved to cliff. Heard mystery cry.
+    // end: Rescued Koraidon/Miraidon and escaped from the Houndoom Cave.
     void segment_08(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
+    // start: Rescued Koraidon/Miraidon and escaped from the Houndoom Cave.
+    // end: Battled Arven and received Legendary's Pokeball.
     void segment_09(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
+    // start: Battled Arven and received Legendary's Pokeball.
+    // end: Talked to Nemona at the Lighthouse.
     void segment_10(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
+    // start: Talked to Nemona at the Lighthouse.
+    // end: Arrived at Los Platos pokecenter. Cleared Let's go tutorial.
     void segment_11(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
+    // start: Arrived at Los Platos pokecenter. Cleared Let's go tutorial.
+    // end: Arrived at Mesagoza (South) Pokecenter
     void segment_12(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+
+    // start: Arrived at Mesagoza (South) Pokecenter
+    // end:
+    void segment_13(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
 private:
     virtual void value_changed(void* object) override;
@@ -253,6 +298,15 @@ private:
     SimpleIntegerOption<uint16_t> START_SEGMENT;
     SimpleIntegerOption<uint16_t> END_SEGMENT;
     SimpleIntegerOption<uint16_t> LOOP_SEGMENTS;
+
+    BooleanCheckBoxOption ENABLE_TEST_REALIGN;    
+    EnumDropdownOption<PlayerRealignMode> REALIGN_MODE;
+    SimpleIntegerOption<uint16_t> X_REALIGN;
+    SimpleIntegerOption<uint16_t> Y_REALIGN;
+    SimpleIntegerOption<uint16_t> REALIGN_DURATION;
+
+    BooleanCheckBoxOption ENABLE_TEST_OVERWORLD_MOVE;    
+    SimpleIntegerOption<uint16_t> FORWARD_TICKS;
 };
 
 

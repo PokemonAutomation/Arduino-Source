@@ -23,6 +23,7 @@
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
+#include "PokemonSV/Inference/Map/PokemonSV_MapMenuDetector.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_SaveGame.h"
@@ -155,20 +156,60 @@ AutoStory::AutoStory()
         false
     )   
     , START_SEGMENT(
-        "<b>Start segment:</b><br>Start testing with this segment number.",
+        "--Start segment:<br>Start testing with this segment number.",
         LockMode::UNLOCK_WHILE_RUNNING,
         0
     )    
     , END_SEGMENT(
-        "<b>End segment:</b><br>Stop testing when done this segment number.",
+        "--End segment:<br>Stop testing when done this segment number.",
         LockMode::UNLOCK_WHILE_RUNNING,
         11
     )     
     , LOOP_SEGMENTS(
-        "<b>Loop segments:</b><br>Loop each test segment this number of times.",
+        "--Loop segments:<br>Loop each test segment this number of times.",
         LockMode::UNLOCK_WHILE_RUNNING,
         1
-    )        
+    )
+    , ENABLE_TEST_REALIGN(
+        "<b>ENABLE_TEST_REALIGN:</b>",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        false
+    )   
+    , REALIGN_MODE(
+        "--REALIGN_MODE:",
+        {
+            {PlayerRealignMode::REALIGN_NEW_MARKER,            "realign_new",       "Realign New Marker"},
+            {PlayerRealignMode::REALIGN_NO_MARKER,     "realign_no",     "Realign No Marker"},
+            {PlayerRealignMode::REALIGN_OLD_MARKER,          "realign_old",     "Realign Old Marker"},
+        },
+        LockMode::UNLOCK_WHILE_RUNNING,
+        PlayerRealignMode::REALIGN_NEW_MARKER
+    )    
+    , X_REALIGN(
+        "--X_REALIGN:<br>x = 0 : left, x = 128 : neutral, x = 255 : right.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        128
+    )    
+    , Y_REALIGN(
+        "--Y_REALIGN:<br>y = 0 : up, y = 128 : neutral, y = 255 : down.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        128
+    )     
+    , REALIGN_DURATION(
+        "--REALIGN_DURATION",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        0
+    )
+    , ENABLE_TEST_OVERWORLD_MOVE(
+        "<b>ENABLE_TEST_OVERWORLD_MOVE:</b>",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        false
+    )       
+    , FORWARD_TICKS(
+        "--FORWARD_TICKS:",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        0
+    )       
 {
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(STARTPOINT);
@@ -186,6 +227,15 @@ AutoStory::AutoStory()
         PA_ADD_OPTION(START_SEGMENT);
         PA_ADD_OPTION(END_SEGMENT);
         PA_ADD_OPTION(LOOP_SEGMENTS);
+
+        PA_ADD_OPTION(ENABLE_TEST_REALIGN);
+        PA_ADD_OPTION(REALIGN_MODE);
+        PA_ADD_OPTION(X_REALIGN);
+        PA_ADD_OPTION(Y_REALIGN);
+        PA_ADD_OPTION(REALIGN_DURATION);
+
+        PA_ADD_OPTION(ENABLE_TEST_OVERWORLD_MOVE);
+        PA_ADD_OPTION(FORWARD_TICKS);
     }
 
     AutoStory::value_changed(this);
@@ -193,6 +243,8 @@ AutoStory::AutoStory()
     STARTPOINT.add_listener(*this);
     ENDPOINT.add_listener(*this);
     ENABLE_TEST_SEGMENTS.add_listener(*this);
+    ENABLE_TEST_REALIGN.add_listener(*this);
+    ENABLE_TEST_OVERWORLD_MOVE.add_listener(*this);
 }
 
 void AutoStory::value_changed(void* object){
@@ -213,6 +265,25 @@ void AutoStory::value_changed(void* object){
         END_SEGMENT.set_visibility(ConfigOptionState::DISABLED);
         LOOP_SEGMENTS.set_visibility(ConfigOptionState::DISABLED);
     }
+
+    if (ENABLE_TEST_REALIGN){
+        REALIGN_MODE.set_visibility(ConfigOptionState::ENABLED);
+        X_REALIGN.set_visibility(ConfigOptionState::ENABLED);
+        Y_REALIGN.set_visibility(ConfigOptionState::ENABLED);
+        REALIGN_DURATION.set_visibility(ConfigOptionState::ENABLED);
+    }else{
+        REALIGN_MODE.set_visibility(ConfigOptionState::DISABLED);
+        X_REALIGN.set_visibility(ConfigOptionState::DISABLED);
+        Y_REALIGN.set_visibility(ConfigOptionState::DISABLED);
+        REALIGN_DURATION.set_visibility(ConfigOptionState::DISABLED);        
+    }
+
+    if (ENABLE_TEST_OVERWORLD_MOVE){
+        FORWARD_TICKS.set_visibility(ConfigOptionState::ENABLED);
+    }else{
+        FORWARD_TICKS.set_visibility(ConfigOptionState::DISABLED);
+    }
+
 
 }
 
@@ -541,6 +612,52 @@ void mash_button_till_overworld(
     }
 }
 
+void walk_forward_while_clear_front_path(
+    const ProgramInfo& info, 
+    ConsoleHandle& console, 
+    BotBaseContext& context,
+    uint16_t forward_ticks,
+    uint8_t y,
+    uint16_t ticks_between_lets_go,
+    uint16_t delay_after_lets_go
+){
+    context.wait_for_all_requests();
+    pbf_press_button(context, BUTTON_R, 20, delay_after_lets_go);
+
+    uint16_t num_ticks_left = forward_ticks;
+    while (true){
+
+        if (num_ticks_left < ticks_between_lets_go){
+            pbf_move_left_joystick(context, 128, y, num_ticks_left, 20);
+            context.wait_for_all_requests();
+            console.log("walk_forward_while_clear_front_path() ticks traveled: " + std::to_string(forward_ticks));
+            break;
+        }
+
+        pbf_move_left_joystick(context, 128, y, ticks_between_lets_go, 20);
+        num_ticks_left -= ticks_between_lets_go;
+
+        context.wait_for_all_requests();
+        console.log("walk_forward_while_clear_front_path() ticks traveled: " + std::to_string(forward_ticks - num_ticks_left));
+
+        pbf_press_button(context, BUTTON_R, 20, delay_after_lets_go);
+        
+
+    }
+}
+
+bool fly_to_overlapping_pokecenter(
+    const ProgramInfo& info, 
+    ConsoleHandle& console, 
+    BotBaseContext& context
+){
+    open_map_from_overworld(info, console, context);
+    context.wait_for_all_requests();
+    pbf_press_button(context, BUTTON_ZL, 40, 100);
+
+    return fly_to_overworld_from_map(info, console, context, true);
+}
+
 
 void config_option(BotBaseContext& context, int change_option_value){
     for (int i = 0; i < change_option_value; i++){
@@ -759,11 +876,11 @@ void AutoStory::change_settings(SingleSwitchProgramEnvironment& env, BotBaseCont
 }
 
 void do_action_and_monitor_for_battles(
-    ProgramEnvironment& env,
+    SingleSwitchProgramEnvironment& env,
     ConsoleHandle& console, 
     BotBaseContext& context,
     std::function<
-        void(ProgramEnvironment& env,
+        void(SingleSwitchProgramEnvironment& env,
         ConsoleHandle& console,
         BotBaseContext& context)
     >&& action
@@ -1364,7 +1481,7 @@ void AutoStory::segment_08(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         env.console.log("Enter cave");
         env.console.overlay().add_log("Enter cave", COLOR_WHITE);
         do_action_and_monitor_for_battles(env, env.console, context,
-            [&](ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){
+            [&](SingleSwitchProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){
                 pbf_move_left_joystick(context, 128, 20, 10 * TICKS_PER_SECOND, 20);
                 pbf_move_left_joystick(context, 150, 20, 1 * TICKS_PER_SECOND, 20);
                 pbf_move_left_joystick(context, 128, 20, 8 * TICKS_PER_SECOND, 20);
@@ -1382,7 +1499,7 @@ void AutoStory::segment_08(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 10);
 
         do_action_and_monitor_for_battles(env, env.console, context,
-            [&](ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){
+            [&](SingleSwitchProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){
                 // Legendary rock break
                 context.wait_for_all_requests();
                 console.log("Rock break");
@@ -1494,7 +1611,7 @@ void AutoStory::segment_10(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         env.console.log("Lighthouse view");
         env.console.overlay().add_log("Lighthouse view", COLOR_WHITE);
         do_action_and_monitor_for_battles(env, env.console, context,
-            [&](ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){
+            [&](SingleSwitchProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){
                 realign_player(env.program_info(), console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 230, 110, 100);
                 pbf_move_left_joystick(context, 128, 0, 6 * TICKS_PER_SECOND, 8 * TICKS_PER_SECOND);
                 pbf_move_left_joystick(context, 128, 0, 4 * TICKS_PER_SECOND, 20);
@@ -1537,7 +1654,7 @@ void AutoStory::segment_11(SingleSwitchProgramEnvironment& env, BotBaseContext& 
 
         context.wait_for_all_requests();
         do_action_and_monitor_for_battles(env, env.console, context,
-            [&](ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){
+            [&](SingleSwitchProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){
                 realign_player(env.program_info(), console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 100, 210, 100);
                 pbf_move_left_joystick(context, 128, 0, 187, 20);
                 pbf_move_left_joystick(context, 0, 128, 30, 8 * TICKS_PER_SECOND);
@@ -1557,8 +1674,10 @@ void AutoStory::segment_11(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 10);
         clear_tutorial(env.console, context);
         context.wait_for_all_requests();
+
         env.console.log("Reached Los Platos");
         env.console.overlay().add_log("Reached Los Platos", COLOR_WHITE);
+
         break;
     }catch(OperationFailedException& e){
         context.wait_for_all_requests();
@@ -1574,9 +1693,104 @@ void AutoStory::segment_11(SingleSwitchProgramEnvironment& env, BotBaseContext& 
 
 
 void AutoStory::segment_12(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    // AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
-    // checkpoint_save(env, env.console, context);
-    context.wait_for_all_requests();
+    AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
+    bool has_saved_game = false;
+    while (true){
+    try{
+        do_action_and_monitor_for_battles(env, env.console, context,
+            [&](SingleSwitchProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){        
+        
+            if (!has_saved_game){
+                checkpoint_save(env, context);
+                has_saved_game = true;
+            } 
+
+            context.wait_for_all_requests();
+            
+            if (!fly_to_overlapping_pokecenter(env.program_info(), env.console, context)){
+                throw OperationFailedException(
+                    ErrorReport::SEND_ERROR_REPORT, env.console,
+                    "Failed to reset to Los Platos pokecenter.",
+                    true
+                );  
+            }            
+
+            // re-orient camera
+            pbf_press_button(context, BUTTON_L, 20, 20);
+
+            walk_forward_while_clear_front_path(env.program_info(), env.console, context, 35);
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 128, 0, 100);
+            walk_forward_while_clear_front_path(env.program_info(), env.console, context, 500);
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 100, 0, 120);
+            walk_forward_while_clear_front_path(env.program_info(), env.console, context, 2000);
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 0, 120);
+            walk_forward_while_clear_front_path(env.program_info(), env.console, context, 1250);
+            
+            // check we're not still at the Los Platos Pokecenter.
+            if (fly_to_overlapping_pokecenter(env.program_info(), env.console, context)){
+                throw OperationFailedException(
+                    ErrorReport::SEND_ERROR_REPORT, env.console,
+                    "Stuck at Los Platos Pokecenter.",
+                    true
+                );  
+            }
+            // not stuck at Los Platos Pokecenter
+            pbf_press_button(context, BUTTON_B, 20, 1 * TICKS_PER_SECOND);
+            pbf_press_button(context, BUTTON_B, 20, 1 * TICKS_PER_SECOND);
+            press_Bs_to_back_to_overworld(env.program_info(), env.console, context, 7);
+
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 80, 0, 100);
+            walk_forward_while_clear_front_path(env.program_info(), env.console, context, 1500);
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 30, 0, 50);
+            walk_forward_while_clear_front_path(env.program_info(), env.console, context, 1000);
+
+            if (!fly_to_overlapping_pokecenter(env.program_info(), env.console, context)){
+                throw OperationFailedException(
+                    ErrorReport::SEND_ERROR_REPORT, env.console,
+                    "Failed to reach Mesagoza (South) Pokecenter.",
+                    true
+                );  
+            }    
+            }  
+        );
+
+        env.console.log("Reached Mesagoza (South) Pokecenter.");
+        
+        break;
+    }catch(OperationFailedException& e){
+        context.wait_for_all_requests();
+        env.console.log(e.m_message, COLOR_RED);
+        env.console.log("Resetting from checkpoint.");
+        reset_game(env.program_info(), env.console, context);
+        stats.m_reset++;
+        env.update_stats();
+    }             
+    }
+
+}
+
+void AutoStory::segment_13(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
+    bool has_saved_game = false;
+    while (true){
+    try{
+        if (!has_saved_game){
+            checkpoint_save(env, context);
+            has_saved_game = true;
+        } 
+
+        context.wait_for_all_requests();
+       
+        break;
+    }catch(OperationFailedException& e){
+        context.wait_for_all_requests();
+        env.console.log(e.m_message, COLOR_RED);
+        env.console.log("Resetting from checkpoint.");
+        reset_game(env.program_info(), env.console, context);
+        stats.m_reset++;
+        env.update_stats();
+    }             
+    }
 
 }
 
@@ -1728,6 +1942,23 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
 
     // Connect controller
     pbf_press_button(context, BUTTON_L, 20, 20);
+
+    // pbf_press_button(context, BUTTON_B, 20, 1 * TICKS_PER_SECOND);
+    // pbf_press_button(context, BUTTON_B, 20, 1 * TICKS_PER_SECOND);
+    // press_Bs_to_back_to_overworld(env.program_info(), env.console, context, 7);
+    // context.wait_for(Milliseconds(1000000));
+
+    if (ENABLE_TEST_REALIGN){
+        // clear realign marker
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 128, 128, 0);
+        realign_player(env.program_info(), env.console, context, REALIGN_MODE, X_REALIGN, Y_REALIGN, REALIGN_DURATION);
+        context.wait_for(Milliseconds(1000000));
+    }
+
+    if (ENABLE_TEST_OVERWORLD_MOVE){
+        walk_forward_while_clear_front_path(env.program_info(), env.console, context, FORWARD_TICKS);
+        context.wait_for(Milliseconds(1000000));
+    }
 
     // Set settings. to ensure autosave is off.
     if (CHANGE_SETTINGS){
