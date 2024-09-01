@@ -92,7 +92,7 @@ std::unique_ptr<StatsTracker> ItemPrinterRNG_Descriptor::make_stats() const{
 ItemPrinterRNG::~ItemPrinterRNG(){
     MATERIAL_FARMER_OPTIONS.remove_listener(*this);
     MATERIAL_FARMER_TRIGGER.remove_listener(*this);
-    TABLE0.remove_listener(*this);
+    DATE_SEED_TABLE.remove_listener(*this);
 //    AUTO_MATERIAL_FARMING.remove_listener(*this);
 }
 
@@ -124,14 +124,14 @@ ItemPrinterRNG::ItemPrinterRNG()
         LockMode::LOCK_WHILE_RUNNING,
         ItemPrinterMode::AUTO_MODE
     )
-    , TABLE1(
+    , DESIRED_ITEM_TABLE(
         "<b>Item Table:</b><br>"
         "Input your desired item and desired quantity to the table.<br>"
         "Ensure you have enough BP and are maxed out on the following sandwich ingredients: Chorizo, Bananas, Mayonnaise, Whipped Cream. "
         "Also, ensure you have a strong lead pokemon for auto-battling, for farming materials.<br>"
         "If there are duplicate items in the table, only the higher quantity will be considered."
     )
-    , TABLE0(
+    , DATE_SEED_TABLE(
         "<b>Rounds Table:</b><br>Run the following prints in order and repeat. "
         "Changes to this table take effect the next time the table starts from the beginning."
     )
@@ -203,10 +203,10 @@ ItemPrinterRNG::ItemPrinterRNG()
 
    if (PreloadSettings::instance().DEVELOPER_MODE){
        PA_ADD_OPTION(MODE);
-       PA_ADD_OPTION(TABLE1);
+       PA_ADD_OPTION(DESIRED_ITEM_TABLE);
    }
     PA_ADD_OPTION(NUM_ITEM_PRINTER_ROUNDS);
-    PA_ADD_OPTION(TABLE0);
+    PA_ADD_OPTION(DATE_SEED_TABLE);
     PA_ADD_OPTION(OVERLAPPING_BONUS_WARNING);
     PA_ADD_OPTION(DELAY_MILLIS);
     PA_ADD_OPTION(ADJUST_DELAY);
@@ -228,7 +228,7 @@ ItemPrinterRNG::ItemPrinterRNG()
 
     ItemPrinterRNG::value_changed(this);
 //    AUTO_MATERIAL_FARMING.add_listener(*this);
-    TABLE0.add_listener(*this);
+    DATE_SEED_TABLE.add_listener(*this);
     MODE.add_listener(*this);
     MATERIAL_FARMER_OPTIONS.add_listener(*this);
     MATERIAL_FARMER_TRIGGER.add_listener(*this);
@@ -245,11 +245,11 @@ void ItemPrinterRNG::value_changed(void* object){
         ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN
     );
 
-    TABLE1.set_visibility(
+    DESIRED_ITEM_TABLE.set_visibility(
         MODE == ItemPrinterMode::AUTO_MODE ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN
     );
 
-    TABLE0.set_visibility(
+    DATE_SEED_TABLE.set_visibility(
         MODE == ItemPrinterMode::AUTO_MODE ? ConfigOptionState::HIDDEN : ConfigOptionState::ENABLED
     );
 
@@ -290,7 +290,7 @@ void ItemPrinterRNG::value_changed(void* object){
 bool ItemPrinterRNG::overlapping_bonus(){
     // for each row in table. if ball/item bonus, ensure that sum of prints in subsequent rows >=10 before the next bonus, or end of the table.
     uint16_t total_prints_since_last_bonus = 10;
-    for (std::shared_ptr<EditableTableRow>& table_row : TABLE0.current_refs()){
+    for (std::shared_ptr<EditableTableRow>& table_row : DATE_SEED_TABLE.current_refs()){
         ItemPrinterRngRow& row = static_cast<ItemPrinterRngRow&>(*table_row);
         if (row.desired_item == ItemPrinter::PrebuiltOptions::BALL_BONUS || row.desired_item == ItemPrinter::PrebuiltOptions::ITEM_BONUS){
             if (total_prints_since_last_bonus < 10){
@@ -654,7 +654,7 @@ void ItemPrinterRNG::run_item_printer_rng_automode(
     bool have_cleared_out_bonus = false;
     std::map<std::string, uint16_t> obtained_prizes;
 
-    std::vector<ItemPrinterDesiredItemRowSnapshot> desired_table = TABLE1.snapshot<ItemPrinterDesiredItemRowSnapshot>();
+    std::vector<ItemPrinterDesiredItemRowSnapshot> desired_table = DESIRED_ITEM_TABLE.snapshot<ItemPrinterDesiredItemRowSnapshot>();
     for (const ItemPrinterDesiredItemRowSnapshot& desired_row : desired_table){
         std::string desired_slug = ItemPrinter::PrebuiltOptions_AutoMode_Database().find(desired_row.item)->slug;
         int16_t desired_quantity = desired_row.quantity;
@@ -831,7 +831,7 @@ void ItemPrinterRNG::run_item_printer_rng(
     for (uint32_t c = 0; c < NUM_ITEM_PRINTER_ROUNDS; c++){
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
 
-        std::vector<ItemPrinterRngRowSnapshot> table = TABLE0.snapshot<ItemPrinterRngRowSnapshot>();
+        std::vector<ItemPrinterRngRowSnapshot> table = DATE_SEED_TABLE.snapshot<ItemPrinterRngRowSnapshot>();
         for (const ItemPrinterRngRowSnapshot& row : table){
             //  Cannot run material farmer between chained prints.
             if (row.chain){

@@ -121,8 +121,8 @@ private:
 
     StaticTextOption OVERLAPPING_BONUS_WARNING;
     EnumDropdownOption<ItemPrinterMode> MODE;
-    ItemPrinterDesiredItemTable TABLE1;
-    ItemPrinterRngTable TABLE0;
+    ItemPrinterDesiredItemTable DESIRED_ITEM_TABLE;
+    ItemPrinterRngTable DATE_SEED_TABLE;
 
     SimpleIntegerOption<uint16_t> DELAY_MILLIS;
     BooleanCheckBoxOption ADJUST_DELAY;
