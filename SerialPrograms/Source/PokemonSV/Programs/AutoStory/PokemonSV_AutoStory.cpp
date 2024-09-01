@@ -28,8 +28,8 @@
 #include "PokemonSV/Programs/PokemonSV_SaveGame.h"
 #include "PokemonSV/Programs/Battles/PokemonSV_Battles.h"
 #include "PokemonSV/Programs/AutoStory/PokemonSV_MenuOption.h"
-#include "PokemonSV/Programs/AutoStory/PokemonSV_TutorialDetector.h"
-#include "PokemonSV/Programs/AutoStory/PokemonSV_PokemonMovesReader.h"
+#include "PokemonSV/Inference/PokemonSV_TutorialDetector.h"
+#include "PokemonSV/Inference/PokemonSV_PokemonMovesReader.h"
 #include "PokemonSV_AutoStory.h"
 
 //#include <iostream>
