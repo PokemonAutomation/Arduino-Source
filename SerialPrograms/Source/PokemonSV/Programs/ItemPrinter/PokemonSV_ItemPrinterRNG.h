@@ -38,13 +38,45 @@ public:
 
 
 private:
+    enum class MaterialFarmerTrigger{
+        FIXED_NUM_PRINT_JOBS,
+        MINIMUM_HAPPINY_DUST,
+    };
+
+    enum class ItemPrinterMode{
+        AUTO_MODE,
+        STANDARD_MODE
+    };
+
     virtual void value_changed(void* object) override;
 
     bool overlapping_bonus();
 
+    void run_item_printer_rng_automode(SingleSwitchProgramEnvironment& env, BotBaseContext& context, ItemPrinterRNG_Descriptor::Stats& stats);
+
     void run_item_printer_rng(SingleSwitchProgramEnvironment& env, BotBaseContext& context, ItemPrinterRNG_Descriptor::Stats& stats);
 
-    void run_print_at_date(
+    std::vector<ItemPrinterRngRowSnapshot> desired_print_table(
+        ItemPrinter::PrebuiltOptions desired_item,
+        uint16_t quantity_to_print
+    );
+
+    // return Ball bonus or item bonus, based on the desired_item
+    // if the desired_item is a type of ball, return Ball Bonus, else return Item Bonus
+    ItemPrinter::PrebuiltOptions get_bonus_type(ItemPrinter::PrebuiltOptions desired_item);
+
+    int16_t check_obtained_quantity(std::map<std::string, uint16_t> obtained_prizes, std::string desired_slug);
+
+    // move from item printer to material farming, run material farmer, then 
+    // return to item printer
+    void run_material_farming_then_return_to_item_printer(
+        SingleSwitchProgramEnvironment& env, 
+        BotBaseContext& context, 
+        ItemPrinterRNG_Descriptor::Stats& stats,
+        MaterialFarmerOptions& material_farmer_options
+    );
+
+    ItemPrinterPrizeResult run_print_at_date(
         SingleSwitchProgramEnvironment& env, BotBaseContext& context,
         const DateTime& date, ItemPrinterJobs jobs
     );
@@ -73,8 +105,10 @@ private:
         const std::array<std::string, 10>& expected_result
     );
 
-    uint32_t calc_num_jobs_with_happiny_dust(
-        SingleSwitchProgramEnvironment& env, BotBaseContext& context
+    uint32_t calc_num_jobs_using_happiny_dust(
+        SingleSwitchProgramEnvironment& env, 
+        BotBaseContext& context,
+        uint16_t min_happiny_dust
     );
 
     uint32_t check_num_happiny_dust(
@@ -84,9 +118,10 @@ private:
 private:
     OCR::LanguageOCROption LANGUAGE;
     SimpleIntegerOption<uint16_t> NUM_ITEM_PRINTER_ROUNDS;
-//    StaticTextOption AFTER_ITEM_PRINTER_DONE_EXPLANATION;
 
     StaticTextOption OVERLAPPING_BONUS_WARNING;
+    EnumDropdownOption<ItemPrinterMode> MODE;
+    ItemPrinterDesiredItemTable TABLE1;
     ItemPrinterRngTable TABLE0;
 
     SimpleIntegerOption<uint16_t> DELAY_MILLIS;
@@ -95,14 +130,6 @@ private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
     BooleanCheckBoxOption FIX_TIME_WHEN_DONE;
 
-//    BooleanCheckBoxOption AUTO_MATERIAL_FARMING;
-//    SimpleIntegerOption<uint16_t> NUM_ROUNDS_OF_ITEM_PRINTER_TO_MATERIAL_FARM;
-    
-//    StaticTextOption MATERIAL_FARMER_DISABLED_EXPLANATION;
-    enum class MaterialFarmerTrigger{
-        FIXED_NUM_PRINT_JOBS,
-        MINIMUM_HAPPINY_DUST,
-    };
     EnumDropdownOption<MaterialFarmerTrigger> MATERIAL_FARMER_TRIGGER;
     SimpleIntegerOption<uint16_t> MATERIAL_FARMER_FIXED_NUM_JOBS;
     SimpleIntegerOption<uint16_t> MIN_HAPPINY_DUST;

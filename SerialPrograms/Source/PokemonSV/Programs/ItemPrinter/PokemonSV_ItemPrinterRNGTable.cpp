@@ -134,6 +134,77 @@ std::vector<std::unique_ptr<EditableTableRow>> ItemPrinterRngTable::make_default
 }
 
 
+
+ItemPrinterDesiredItemRow::ItemPrinterDesiredItemRow(EditableTableOption& parent_table)
+    : EditableTableRow(parent_table)
+    , desired_item(
+        ItemPrinter::PrebuiltOptions_AutoMode_Database(),
+        LockMode::UNLOCK_WHILE_RUNNING,
+        ItemPrinter::PrebuiltOptions::ABILITY_PATCH
+    )
+    , desired_quantity(
+        "",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        999, 1, 999
+    )
+{
+    PA_ADD_OPTION(desired_item);
+    PA_ADD_OPTION(desired_quantity);
+
+}
+
+ItemPrinterDesiredItemRow::ItemPrinterDesiredItemRow(
+    EditableTableOption& parent_table,
+    ItemPrinter::PrebuiltOptions item, uint16_t quantity
+)
+    : ItemPrinterDesiredItemRow(parent_table)
+{
+    desired_item.set(item);
+    desired_quantity.set(quantity);
+}
+
+ItemPrinterDesiredItemRowSnapshot ItemPrinterDesiredItemRow::snapshot() const{
+    
+    return ItemPrinterDesiredItemRowSnapshot{desired_item, desired_quantity};
+}
+
+
+std::unique_ptr<EditableTableRow> ItemPrinterDesiredItemRow::clone() const{
+    std::unique_ptr<ItemPrinterDesiredItemRow> ret(new ItemPrinterDesiredItemRow(parent()));
+    ret->desired_item.set(desired_item);
+    ret->desired_quantity.set(desired_quantity);
+    return ret;
+}
+
+
+void ItemPrinterDesiredItemRow::value_changed(void* object){
+
+}
+
+ItemPrinterDesiredItemTable::ItemPrinterDesiredItemTable(std::string label)
+    : EditableTableOption_t<ItemPrinterDesiredItemRow>(
+        std::move(label),
+        LockMode::LOCK_WHILE_RUNNING
+    )
+{
+    //  Need to do this separately because this prematurely accesses the table.
+    set_default(make_defaults());
+    restore_defaults();
+}
+std::vector<std::string> ItemPrinterDesiredItemTable::make_header() const{
+    return std::vector<std::string>{
+        "Desired Item",
+        "Quantity",
+    };
+}
+std::vector<std::unique_ptr<EditableTableRow>> ItemPrinterDesiredItemTable::make_defaults(){
+    std::vector<std::unique_ptr<EditableTableRow>> ret;
+    ret.emplace_back(std::make_unique<ItemPrinterDesiredItemRow>(*this, ItemPrinter::PrebuiltOptions::ABILITY_PATCH, 999));
+    ret.emplace_back(std::make_unique<ItemPrinterDesiredItemRow>(*this, ItemPrinter::PrebuiltOptions::EXP_CANDY, 999));
+    return ret;
+}
+
+
 }
 }
 }

@@ -74,7 +74,7 @@ void item_printer_start_print(
         }
     }
 }
-std::array<std::string, 10> item_printer_finish_print(
+ItemPrinterPrizeResult item_printer_finish_print(
     AsyncDispatcher& dispatcher,
     ConsoleHandle& console, BotBaseContext& context,
     Language language
@@ -82,7 +82,7 @@ std::array<std::string, 10> item_printer_finish_print(
     console.log("Finishing print...");
     bool print_finished = false;
 
-    std::array<std::string, 10> ret;
+    ItemPrinterPrizeResult prize_result;
     while (true){
         AdvanceDialogWatcher dialog(COLOR_YELLOW);
         WhiteButtonWatcher   material(COLOR_GREEN, WhiteButton::ButtonX, {0.63, 0.93, 0.17, 0.06});
@@ -100,7 +100,7 @@ std::array<std::string, 10> item_printer_finish_print(
         switch (ret_print_end){
         case 0: // material
             console.log("Material selection screen detected.");
-            return ret;
+            return prize_result;
         case 1: // handle
         case 2: // dialog
             pbf_press_button(context, BUTTON_A, 20, 105);
@@ -116,7 +116,9 @@ std::array<std::string, 10> item_printer_finish_print(
                 VideoOverlaySet overlays(console.overlay());
                 reader.make_overlays(overlays);
                 auto snapshot = console.video().snapshot();
-                ret = reader.read_prizes(console.logger(), dispatcher, snapshot);
+                std::array<std::string, 10> prizes = reader.read_prizes(console.logger(), dispatcher, snapshot);
+                std::array<int16_t, 10> quantities = reader.read_quantity(console.logger(), dispatcher, snapshot);
+                prize_result = {prizes, quantities};
 //                static int c = 0;
 //                snapshot->save("test-" + std::to_string(c) + ".png");
             }

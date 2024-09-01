@@ -65,11 +65,16 @@ enum class PrebuiltOptions{
 };
 const EnumDatabase<PrebuiltOptions>& PrebuiltOptions_Database();
 
+const EnumDatabase<PrebuiltOptions>& PrebuiltOptions_AutoMode_Database();
+
+const EnumDatabase<PrebuiltOptions>& PrebuiltOptions_Simple_Database2();
+
 
 struct ItemPrinterEnumOption{
     int64_t seed;
     PrebuiltOptions enum_value;
     ItemPrinterJobs jobs;
+    uint16_t quantity_obtained;  // quantity obtained from the given seed, with given number of print jobs (ususally 5 print), with bonus active
 };
 const ItemPrinterEnumOption& option_lookup_by_enum(PrebuiltOptions enum_value);
 const ItemPrinterEnumOption* option_lookup_by_seed(int64_t seed);
