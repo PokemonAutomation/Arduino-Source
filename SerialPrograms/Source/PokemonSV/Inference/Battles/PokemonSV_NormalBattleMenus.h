@@ -9,8 +9,12 @@
 
 #include "CommonFramework/Language.h"
 #include "CommonFramework/Inference/VisualDetector.h"
+#include "CommonFramework/Inference/BlackScreenDetector.h"
 #include "PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.h"
+#include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
+#include "PokemonSV/Inference/Dialogs/PokemonSV_DialogArrowDetector.h"
+
 
 namespace PokemonAutomation{
     class ConsoleHandle;
@@ -106,6 +110,27 @@ class SwapMenuWatcher : public DetectorToFinder<SwapMenuDetector>{
 public:
     SwapMenuWatcher(Color color)
         : DetectorToFinder("SwapMenuWatcher", std::chrono::milliseconds(250), color)
+    {}
+};
+
+class WipeoutDetector : public StaticScreenDetector{
+public:
+    WipeoutDetector(Color color = COLOR_CYAN);
+
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+
+    // return true if detects a black screen, black dialog box, and dialog arrow.
+    virtual bool detect(const ImageViewRGB32& screen) const override;
+
+private:
+    BlackScreenDetector m_blackscreen;
+    DialogBoxDetector m_dialog;
+    DialogArrowDetector m_arrow_detector;
+};
+class WipeoutWatcher : public DetectorToFinder<WipeoutDetector>{
+public:
+    WipeoutWatcher(Color color = COLOR_CYAN)
+        : DetectorToFinder("WipeoutWatcher", std::chrono::milliseconds(250), color)
     {}
 };
 
