@@ -344,6 +344,28 @@ bool SwapMenuDetector::move_to_slot(ConsoleHandle& console, BotBaseContext& cont
     }
 }
 
+WipeoutDetector::WipeoutDetector(Color color)
+    : m_blackscreen(COLOR_RED, {0.1, 0.1, 0.8, 0.6})
+    , m_dialog(color, true, DialogType::DIALOG_WHITE)
+    , m_arrow_detector(COLOR_BLUE, {0.710, 0.850, 0.030, 0.042})
+{}
+void WipeoutDetector::make_overlays(VideoOverlaySet& items) const{
+    m_blackscreen.make_overlays(items);
+    m_dialog.make_overlays(items);
+    m_arrow_detector.make_overlays(items);
+}
+bool WipeoutDetector::detect(const ImageViewRGB32& screen) const{
+    if (!m_blackscreen.detect(screen)){
+        return false;
+    }
+    
+    if(!m_dialog.detect(screen)){
+        return false;
+    }
+
+    return m_arrow_detector.detect(screen);
+}
+
 
 }
 }
