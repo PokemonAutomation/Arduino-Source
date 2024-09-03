@@ -9,7 +9,6 @@
 
 #include <map>
 #include <array>
-#include "Common/Cpp/Containers/FixedLimitVector.h"
 #include "CommonFramework/Language.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/OCR/OCR_SmallDictionaryMatcher.h"
