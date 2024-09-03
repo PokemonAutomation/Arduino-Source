@@ -156,6 +156,14 @@ void do_action_and_monitor_for_battles(
     >&& action
 );
 
+// heal at the pokecenter, that your character is currently at.
+// if not currently at the pokecenter, throws error.
+void heal_at_pokecenter(
+    const ProgramInfo& info, 
+    ConsoleHandle& console, 
+    BotBaseContext& context
+);
+
 
 
 class AutoStory : public SingleSwitchProgramInstance, public ConfigOption::Listener{

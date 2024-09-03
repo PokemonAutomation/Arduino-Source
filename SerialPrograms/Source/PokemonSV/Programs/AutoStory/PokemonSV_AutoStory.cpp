@@ -911,6 +911,82 @@ void do_action_and_monitor_for_battles(
     }
 }
 
+void heal_at_pokecenter(
+    const ProgramInfo& info, 
+    ConsoleHandle& console, 
+    BotBaseContext& context
+){
+    context.wait_for_all_requests();
+    
+    if (!fly_to_overlapping_pokecenter(info, console, context)){
+        throw OperationFailedException(
+            ErrorReport::SEND_ERROR_REPORT, console,
+            "Failed to fly to pokecenter.",
+            true
+        );  
+    }           
+    uint16_t seconds_timeout = 60;
+
+    // re-orient camera
+    pbf_press_button(context, BUTTON_L, 20, 20);
+    // move towards pokecenter
+    pbf_move_left_joystick(context, 128, 255, 100, 20);
+    // re-orient camera
+    pbf_press_button(context, BUTTON_L, 20, 20); 
+
+    bool seen_prompt = false;
+
+    while (true){
+        OverworldWatcher    overworld(COLOR_CYAN);
+        // TODO: test the Prompt watcher on all languages. Ensure FloatBox is sized correctly.
+        PromptDialogWatcher prompt(COLOR_YELLOW, {0.630, 0.400, 0.100, 0.080}); // 0.630, 0.400, 0.100, 0.080
+        AdvanceDialogWatcher    advance_dialog(COLOR_RED);
+        TutorialWatcher     tutorial(COLOR_RED);
+        context.wait_for_all_requests();
+
+        int ret = wait_until(
+            console, context,
+            std::chrono::seconds(seconds_timeout),
+            {overworld, prompt, advance_dialog, tutorial}
+        );
+        context.wait_for(std::chrono::milliseconds(100));
+
+        switch (ret){
+        case 0: // overworld
+            console.log("heal_at_pokecenter: Detected overworld.");
+            if (seen_prompt){ 
+                // if have seen the prompt dialog and are now in overworld, assume we have healed
+                console.log("heal_at_pokecenter: Done healing.");
+                return;
+            }
+            pbf_press_button(context, BUTTON_A, 20, 105);
+            break;
+        case 1: // prompt
+            console.log("heal_at_pokecenter: Detected prompt.");
+            seen_prompt = true;
+            pbf_press_button(context, BUTTON_A, 20, 105);
+            break;
+        case 2: // advance dialog
+            console.log("heal_at_pokecenter: Detected advance dialog.");
+            pbf_press_button(context, BUTTON_A, 20, 105);
+            break;
+        case 3: // tutorial
+            console.log("heal_at_pokecenter: Detected tutorial.");
+            pbf_press_button(context, BUTTON_A, 20, 105);
+            break;            
+        default:
+            console.log("heal_at_pokecenter: Timed out.");
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, console,
+                "Failed to heal at pokecenter.",
+                true
+            );  
+        }
+    }
+
+
+}
+
 void AutoStory::checkpoint_save(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     save_game_from_overworld(env.program_info(), env.console, context);
@@ -1693,12 +1769,15 @@ void AutoStory::segment_11(SingleSwitchProgramEnvironment& env, BotBaseContext& 
 
 
 void AutoStory::segment_12(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    // reset rate: ~25%. 12 resets out of 52. 
+    // resets due to: getting attacked by wild pokemon, either from behind, 
+    // or when lead pokemon not strong enough to clear them with Let's go
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     bool has_saved_game = false;
     while (true){
     try{
         do_action_and_monitor_for_battles(env, env.console, context,
-            [&](SingleSwitchProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){        
+        [&](SingleSwitchProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){        
         
             if (!has_saved_game){
                 checkpoint_save(env, context);
@@ -1744,14 +1823,9 @@ void AutoStory::segment_12(SingleSwitchProgramEnvironment& env, BotBaseContext& 
             realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 30, 0, 50);
             walk_forward_while_clear_front_path(env.program_info(), env.console, context, 1000);
 
-            if (!fly_to_overlapping_pokecenter(env.program_info(), env.console, context)){
-                throw OperationFailedException(
-                    ErrorReport::SEND_ERROR_REPORT, env.console,
-                    "Failed to reach Mesagoza (South) Pokecenter.",
-                    true
-                );  
-            }    
-            }  
+            heal_at_pokecenter(env.program_info(), env.console, context);
+   
+        }  
         );
 
         env.console.log("Reached Mesagoza (South) Pokecenter.");
@@ -1774,12 +1848,19 @@ void AutoStory::segment_13(SingleSwitchProgramEnvironment& env, BotBaseContext& 
     bool has_saved_game = false;
     while (true){
     try{
-        if (!has_saved_game){
-            checkpoint_save(env, context);
-            has_saved_game = true;
-        } 
+        do_action_and_monitor_for_battles(env, env.console, context,
+        [&](SingleSwitchProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){        
+        
+            if (!has_saved_game){
+                checkpoint_save(env, context);
+                has_saved_game = true;
+            } 
 
-        context.wait_for_all_requests();
+            
+
+            context.wait_for_all_requests();
+        }
+        );
        
         break;
     }catch(OperationFailedException& e){
@@ -1946,7 +2027,8 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
     // pbf_press_button(context, BUTTON_B, 20, 1 * TICKS_PER_SECOND);
     // pbf_press_button(context, BUTTON_B, 20, 1 * TICKS_PER_SECOND);
     // press_Bs_to_back_to_overworld(env.program_info(), env.console, context, 7);
-    // context.wait_for(Milliseconds(1000000));
+    heal_at_pokecenter(env.program_info(), env.console, context);
+    context.wait_for(Milliseconds(1000000));
 
     if (ENABLE_TEST_REALIGN){
         // clear realign marker
