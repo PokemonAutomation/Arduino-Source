@@ -38,6 +38,7 @@ enum class ClearDialogMode{
     STOP_PROMPT,
     STOP_WHITEBUTTON,
     STOP_TIMEOUT,
+    STOP_BATTLE,
 };
 
 enum class NavigationStopCondition{
@@ -102,11 +103,13 @@ bool overworld_navigation(const ProgramInfo& info, ConsoleHandle& console, BotBa
     uint16_t seconds_timeout = 60, uint16_t seconds_realign = 60
 );
 
-// mashes A button by default
-void mash_button_till_overworld(
+void walk_forward_until_dialog(
+    const ProgramInfo& info, 
     ConsoleHandle& console, 
-    BotBaseContext& context, 
-    uint16_t button = BUTTON_A, uint16_t seconds_run = 360
+    BotBaseContext& context,
+    NavigationMovementMode movement_mode,
+    uint16_t seconds_timeout = 10,
+    uint8_t y = 0
 );
 
 // walk forward while using lets go to clear the path
@@ -122,6 +125,13 @@ void walk_forward_while_clear_front_path(
     uint8_t y = 0,
     uint16_t ticks_between_lets_go = 125,
     uint16_t delay_after_lets_go = 250
+);
+
+// mashes A button by default
+void mash_button_till_overworld(
+    ConsoleHandle& console, 
+    BotBaseContext& context, 
+    uint16_t button = BUTTON_A, uint16_t seconds_run = 360
 );
 
 // fly to the pokecenter that overlaps with the player on the map, and return true.
@@ -246,8 +256,16 @@ public:
     void segment_12(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
     // start: Arrived at Mesagoza (South) Pokecenter
-    // end:
+    // end: Battled Nemona at Mesagoza gate. Entered Mesagoza.
     void segment_13(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+
+    // start: Battled Nemona at Mesagoza gate. Entered Mesagoza.
+    // end: 
+    void segment_14(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+
+    // start: 
+    // end: 
+    void segment_15(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
 private:
     virtual void value_changed(void* object) override;

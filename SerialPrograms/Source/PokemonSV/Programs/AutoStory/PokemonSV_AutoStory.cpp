@@ -369,7 +369,7 @@ bool run_battle(
     int16_t num_times_seen_overworld = 0;
     while (true){
         NormalBattleMenuWatcher battle(COLOR_BLUE);
-        SwapMenuWatcher         fainted(COLOR_PURPLE);
+        // SwapMenuWatcher         fainted(COLOR_PURPLE);
         OverworldWatcher        overworld(COLOR_CYAN);
         AdvanceDialogWatcher    dialog(COLOR_RED);
         context.wait_for_all_requests();
@@ -377,7 +377,7 @@ bool run_battle(
         int ret = wait_until(
             console, context,
             std::chrono::seconds(90),
-            {battle, fainted, overworld, dialog}
+            {battle, overworld, dialog}
         );
         context.wait_for(std::chrono::milliseconds(100));
 
@@ -386,11 +386,7 @@ bool run_battle(
             console.log("Detected battle menu, spam first move.");
             pbf_mash_button(context, BUTTON_A, 3 * TICKS_PER_SECOND);
             break;
-        case 1: // fainted
-            // TODO: Handle fainting during battle
-            console.log("Detected fainting.");
-            return false;
-        case 2: // overworld
+        case 1: // overworld
             console.log("Detected overworld, battle over.");
             num_times_seen_overworld++;
             if (stop_condition == BattleStopCondition::STOP_OVERWORLD){
@@ -401,7 +397,7 @@ bool run_battle(
                 return false;
             }            
             break;
-        case 3: // advance dialog
+        case 2: // advance dialog
             console.log("Detected dialog.");
             {
                 context.wait_for_all_requests();
@@ -463,33 +459,48 @@ bool clear_dialog(ConsoleHandle& console, BotBaseContext& context,
     ClearDialogMode mode, uint16_t seconds_timeout
 ){
     bool seen_dialog = false;
-    int16_t num_times_seen_overworld = 0;
+    WallClock start = current_time();
     while (true){
+        if (current_time() - start > std::chrono::minutes(3)){
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, console,
+                "clear_dialog(): Failed to clear dialog after 3 minutes.",
+                true
+            );
+        }
+
         OverworldWatcher    overworld(COLOR_CYAN);
         PromptDialogWatcher prompt(COLOR_YELLOW);
         WhiteButtonWatcher  whitebutton(COLOR_GREEN, WhiteButton::ButtonA2, {0.725, 0.833, 0.024, 0.045}); // {0.650, 0.650, 0.140, 0.240}
         AdvanceDialogWatcher    advance_dialog(COLOR_RED);
+        DialogArrowWatcher dialog_arrow(COLOR_RED, console.overlay(), {0.850, 0.820, 0.020, 0.050}, 0.8365, 0.846);
+        NormalBattleMenuWatcher battle(COLOR_ORANGE);
         context.wait_for_all_requests();
+
+        std::vector<PeriodicInferenceCallback> callbacks{overworld, prompt, whitebutton, advance_dialog, dialog_arrow, battle};
 
         int ret = wait_until(
             console, context,
             std::chrono::seconds(seconds_timeout),
-            {overworld, prompt, whitebutton, advance_dialog}
+            callbacks
         );
+        // int ret = run_until(
+        //     console, context,
+        //     [&](BotBaseContext& context){
+        //         for (size_t j = 0; j < seconds_timeout/3; j++){
+        //             pbf_press_button(context, BUTTON_A, 20, 3*TICKS_PER_SECOND-20);
+        //         }
+        //     },
+        //     {overworld, prompt, whitebutton, advance_dialog, battle}
+        // );
         context.wait_for(std::chrono::milliseconds(100));
 
         switch (ret){
         case 0: // overworld
             console.log("clear_dialog: Detected overworld.");
-            num_times_seen_overworld++;
             if (seen_dialog && mode == ClearDialogMode::STOP_OVERWORLD){
                 return true;
             }
-            if(num_times_seen_overworld > 30){
-                console.log("clear_dialog: Stuck in overworld.");
-                return false;
-            }
-
             break;
         case 1: // prompt
             console.log("clear_dialog: Detected prompt.");
@@ -513,6 +524,17 @@ bool clear_dialog(ConsoleHandle& console, BotBaseContext& context,
             seen_dialog = true;
             pbf_press_button(context, BUTTON_A, 20, 105);
             break;
+        case 4: // dialog arrow
+            console.log("clear_dialog: Detected dialog arrow.");
+            seen_dialog = true;
+            pbf_press_button(context, BUTTON_A, 20, 105);
+            break;               
+        case 5: // battle
+            console.log("clear_dialog: Detected battle.");
+            if (mode == ClearDialogMode::STOP_BATTLE){
+                return true;
+            }
+            break;            
         default:
             console.log("clear_dialog(): Timed out.");
             if (seen_dialog && mode == ClearDialogMode::STOP_TIMEOUT){
@@ -586,27 +608,41 @@ bool overworld_navigation(
     }
 }
 
-void mash_button_till_overworld(
+void walk_forward_until_dialog(
+    const ProgramInfo& info, 
     ConsoleHandle& console, 
-    BotBaseContext& context, 
-    uint16_t button, uint16_t seconds_run
+    BotBaseContext& context,
+    NavigationMovementMode movement_mode,
+    uint16_t seconds_timeout,
+    uint8_t y
 ){
-    OverworldWatcher overworld(COLOR_CYAN);
-    context.wait_for_all_requests();
 
+    DialogBoxWatcher        dialog(COLOR_RED, true);
+    context.wait_for_all_requests();
     int ret = run_until(
         console, context,
-        [button, seconds_run](BotBaseContext& context){
-            ssf_mash1_button(context, button, seconds_run * TICKS_PER_SECOND);
-            pbf_wait(context, seconds_run * TICKS_PER_SECOND);
+        [&](BotBaseContext& context){
+            ssf_press_left_joystick(context, 128, y, 0, seconds_timeout * TICKS_PER_SECOND);
+            if (movement_mode == NavigationMovementMode::DIRECTIONAL_ONLY){
+                pbf_wait(context, seconds_timeout * TICKS_PER_SECOND);
+            } else if (movement_mode == NavigationMovementMode::DIRECTIONAL_SPAM_A){
+                for (size_t j = 0; j < seconds_timeout; j++){
+                    pbf_press_button(context, BUTTON_A, 20, 105);
+                }
+            }
         },
-        {overworld}
+        {dialog}
     );
+    context.wait_for(std::chrono::milliseconds(100));
 
-    if (ret < 0){
+    switch (ret){
+    case 0: // dialog
+        console.log("walk_forward_until_dialog(): Detected dialog.");
+        return;
+    default:
         throw OperationFailedException(
             ErrorReport::SEND_ERROR_REPORT, console,
-            "mash_button_till_overworld(): Timed out, no recognized state found.",
+            "walk_forward_until_dialog(): Timed out. Did not detect dialog.",
             true
         );
     }
@@ -645,6 +681,33 @@ void walk_forward_while_clear_front_path(
 
     }
 }
+
+void mash_button_till_overworld(
+    ConsoleHandle& console, 
+    BotBaseContext& context, 
+    uint16_t button, uint16_t seconds_run
+){
+    OverworldWatcher overworld(COLOR_CYAN);
+    context.wait_for_all_requests();
+
+    int ret = run_until(
+        console, context,
+        [button, seconds_run](BotBaseContext& context){
+            ssf_mash1_button(context, button, seconds_run * TICKS_PER_SECOND);
+            pbf_wait(context, seconds_run * TICKS_PER_SECOND);
+        },
+        {overworld}
+    );
+
+    if (ret < 0){
+        throw OperationFailedException(
+            ErrorReport::SEND_ERROR_REPORT, console,
+            "mash_button_till_overworld(): Timed out, no recognized state found.",
+            true
+        );
+    }
+}
+
 
 bool fly_to_overlapping_pokecenter(
     const ProgramInfo& info, 
@@ -1016,6 +1079,9 @@ void AutoStory::test_segments(
     segment_list.push_back([&](){segment_10(env, context);});
     segment_list.push_back([&](){segment_11(env, context);});
     segment_list.push_back([&](){segment_12(env, context);});
+    segment_list.push_back([&](){segment_13(env, context);});
+    segment_list.push_back([&](){segment_14(env, context);});
+    segment_list.push_back([&](){segment_15(env, context);});
 
     for (int segment = start; segment <= end; segment++){
         if (segment == 0){
@@ -1856,11 +1922,92 @@ void AutoStory::segment_13(SingleSwitchProgramEnvironment& env, BotBaseContext& 
                 has_saved_game = true;
             } 
 
-            
+            if (!fly_to_overlapping_pokecenter(env.program_info(), env.console, context)){
+                throw OperationFailedException(
+                    ErrorReport::SEND_ERROR_REPORT, env.console,
+                    "Failed to reset to Mesagoza (South) pokecenter.",
+                    true
+                );  
+            }
 
             context.wait_for_all_requests();
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 80, 50);
+            walk_forward_while_clear_front_path(env.program_info(), env.console, context, 500);
+            walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 30);
         }
         );
+
+        if (!clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60)){
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, env.console,
+                "Failed to battle Nemona at Mesagoza gate.",
+                true
+            );              
+        }
+        
+        if (!run_battle(env.console, context, BattleStopCondition::STOP_DIALOG)){
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, env.console,
+                "Failed to finish battle with Nemona at Mesagoza gate.",
+                true
+            );  
+        }
+        
+        if (!clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60)){
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, env.console,
+                "Failed to enter Mesagoza.",
+                true
+            );  
+        }
+       
+        break;
+    }catch(OperationFailedException& e){
+        context.wait_for_all_requests();
+        env.console.log(e.m_message, COLOR_RED);
+        env.console.log("Resetting from checkpoint.");
+        reset_game(env.program_info(), env.console, context);
+        stats.m_reset++;
+        env.update_stats();
+    }             
+    }
+
+}
+
+void AutoStory::segment_14(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
+    bool has_saved_game = false;
+    while (true){
+    try{
+        if (!has_saved_game){
+            checkpoint_save(env, context);
+            has_saved_game = true;
+        }         
+        context.wait_for_all_requests();
+       
+        break;
+    }catch(OperationFailedException& e){
+        context.wait_for_all_requests();
+        env.console.log(e.m_message, COLOR_RED);
+        env.console.log("Resetting from checkpoint.");
+        reset_game(env.program_info(), env.console, context);
+        stats.m_reset++;
+        env.update_stats();
+    }             
+    }
+
+}
+
+void AutoStory::segment_15(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
+    bool has_saved_game = false;
+    while (true){
+    try{
+        if (!has_saved_game){
+            checkpoint_save(env, context);
+            has_saved_game = true;
+        }         
+        context.wait_for_all_requests();
        
         break;
     }catch(OperationFailedException& e){
@@ -2024,15 +2171,13 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
     // Connect controller
     pbf_press_button(context, BUTTON_L, 20, 20);
 
-    // pbf_press_button(context, BUTTON_B, 20, 1 * TICKS_PER_SECOND);
-    // pbf_press_button(context, BUTTON_B, 20, 1 * TICKS_PER_SECOND);
     // press_Bs_to_back_to_overworld(env.program_info(), env.console, context, 7);
-    heal_at_pokecenter(env.program_info(), env.console, context);
-    context.wait_for(Milliseconds(1000000));
+    // walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 10);
+    // context.wait_for(Milliseconds(1000000));
 
     if (ENABLE_TEST_REALIGN){
         // clear realign marker
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 128, 128, 0);
+        // realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 128, 128, 0);
         realign_player(env.program_info(), env.console, context, REALIGN_MODE, X_REALIGN, Y_REALIGN, REALIGN_DURATION);
         context.wait_for(Milliseconds(1000000));
     }
