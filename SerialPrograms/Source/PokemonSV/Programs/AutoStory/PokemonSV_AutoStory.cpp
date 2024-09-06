@@ -456,7 +456,8 @@ void clear_tutorial(ConsoleHandle& console, BotBaseContext& context, uint16_t se
 }
 
 bool clear_dialog(ConsoleHandle& console, BotBaseContext& context,
-    ClearDialogMode mode, uint16_t seconds_timeout
+    ClearDialogMode mode, uint16_t seconds_timeout,
+    std::vector<ClearDialogCallback> enum_optional_callbacks
 ){
     bool seen_dialog = false;
     WallClock start = current_time();
@@ -469,15 +470,44 @@ bool clear_dialog(ConsoleHandle& console, BotBaseContext& context,
             );
         }
 
+        AdvanceDialogWatcher    advance_dialog(COLOR_RED);
         OverworldWatcher    overworld(COLOR_CYAN);
         PromptDialogWatcher prompt(COLOR_YELLOW);
         WhiteButtonWatcher  whitebutton(COLOR_GREEN, WhiteButton::ButtonA2, {0.725, 0.833, 0.024, 0.045}); // {0.650, 0.650, 0.140, 0.240}
-        AdvanceDialogWatcher    advance_dialog(COLOR_RED);
         DialogArrowWatcher dialog_arrow(COLOR_RED, console.overlay(), {0.850, 0.820, 0.020, 0.050}, 0.8365, 0.846);
         NormalBattleMenuWatcher battle(COLOR_ORANGE);
+        TutorialWatcher     tutorial(COLOR_BLUE);
         context.wait_for_all_requests();
 
-        std::vector<PeriodicInferenceCallback> callbacks{overworld, prompt, whitebutton, advance_dialog, dialog_arrow, battle};
+        std::vector<PeriodicInferenceCallback> callbacks; 
+        std::vector<ClearDialogCallback> enum_all_callbacks{ClearDialogCallback::ADVANCE_DIALOG};
+        enum_all_callbacks.insert(enum_all_callbacks.end(), enum_optional_callbacks.begin(), enum_optional_callbacks.end()); // append the mandatory and optional callback vectors together
+        for (const ClearDialogCallback& enum_callback : enum_all_callbacks){
+            switch(enum_callback){
+            case ClearDialogCallback::ADVANCE_DIALOG:
+                callbacks.emplace_back(advance_dialog);
+                break;                
+            case ClearDialogCallback::OVERWORLD:
+                callbacks.emplace_back(overworld);
+                break;
+            case ClearDialogCallback::PROMPT_DIALOG:
+                callbacks.emplace_back(prompt);
+                break;
+            case ClearDialogCallback::WHITE_A_BUTTON:
+                callbacks.emplace_back(whitebutton);
+                break;
+            case ClearDialogCallback::DIALOG_ARROW:
+                callbacks.emplace_back(dialog_arrow);
+                break;
+            case ClearDialogCallback::BATTLE:
+                callbacks.emplace_back(battle);
+                break;
+            case ClearDialogCallback::TUTORIAL:
+                callbacks.emplace_back(tutorial);
+                break;                
+            }
+        }
+
 
         int ret = wait_until(
             console, context,
@@ -494,15 +524,28 @@ bool clear_dialog(ConsoleHandle& console, BotBaseContext& context,
         //     {overworld, prompt, whitebutton, advance_dialog, battle}
         // );
         context.wait_for(std::chrono::milliseconds(100));
+        if (ret < 0){
+            console.log("clear_dialog(): Timed out.");
+            if (seen_dialog && mode == ClearDialogMode::STOP_TIMEOUT){
+                return true;
+            }
+            return false;
+        }
 
-        switch (ret){
-        case 0: // overworld
+        ClearDialogCallback enum_callback = enum_all_callbacks[ret];
+        switch(enum_callback){
+        case ClearDialogCallback::ADVANCE_DIALOG:
+            console.log("clear_dialog: Detected advance dialog.");
+            seen_dialog = true;
+            pbf_press_button(context, BUTTON_A, 20, 105);
+            break;            
+        case ClearDialogCallback::OVERWORLD:
             console.log("clear_dialog: Detected overworld.");
             if (seen_dialog && mode == ClearDialogMode::STOP_OVERWORLD){
                 return true;
             }
             break;
-        case 1: // prompt
+        case ClearDialogCallback::PROMPT_DIALOG:
             console.log("clear_dialog: Detected prompt.");
             seen_dialog = true;
             if (mode == ClearDialogMode::STOP_PROMPT){
@@ -510,38 +553,34 @@ bool clear_dialog(ConsoleHandle& console, BotBaseContext& context,
             }
             pbf_press_button(context, BUTTON_A, 20, 105);
             break;
-        case 2: // whitebutton
+        case ClearDialogCallback::WHITE_A_BUTTON:
             console.log("clear_dialog: Detected white A button.");
             seen_dialog = true;
             if (mode == ClearDialogMode::STOP_WHITEBUTTON){
                 return true;
             }
             pbf_press_button(context, BUTTON_A, 20, 105);
-            // dump_snapshot(console);
             break;
-        case 3: // advance dialog
-            console.log("clear_dialog: Detected advance dialog.");
-            seen_dialog = true;
-            pbf_press_button(context, BUTTON_A, 20, 105);
-            break;
-        case 4: // dialog arrow
+        case ClearDialogCallback::DIALOG_ARROW:
             console.log("clear_dialog: Detected dialog arrow.");
             seen_dialog = true;
             pbf_press_button(context, BUTTON_A, 20, 105);
-            break;               
-        case 5: // battle
+            break;
+        case ClearDialogCallback::BATTLE:
             console.log("clear_dialog: Detected battle.");
             if (mode == ClearDialogMode::STOP_BATTLE){
                 return true;
             }
-            break;            
+            break;
+        case ClearDialogCallback::TUTORIAL:    
+            console.log("clear_dialog: Detected tutorial.");
+            pbf_press_button(context, BUTTON_A, 20, 105);
+            break;
         default:
-            console.log("clear_dialog(): Timed out.");
-            if (seen_dialog && mode == ClearDialogMode::STOP_TIMEOUT){
-                return true;
-            }
-            return false;
-        }
+            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "clear_dialog: Unknown callback triggered.");
+
+        }        
+
     }
 }
 
@@ -1937,7 +1976,9 @@ void AutoStory::segment_13(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         }
         );
 
-        if (!clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60)){
+        if (!clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60,
+        {ClearDialogCallback::PROMPT_DIALOG, ClearDialogCallback::DIALOG_ARROW, ClearDialogCallback::BATTLE})
+        ){
             throw OperationFailedException(
                 ErrorReport::SEND_ERROR_REPORT, env.console,
                 "Failed to battle Nemona at Mesagoza gate.",
@@ -1953,7 +1994,9 @@ void AutoStory::segment_13(SingleSwitchProgramEnvironment& env, BotBaseContext& 
             );  
         }
         
-        if (!clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60)){
+        if (!clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, 
+        {ClearDialogCallback::OVERWORLD, ClearDialogCallback::PROMPT_DIALOG, ClearDialogCallback::WHITE_A_BUTTON})
+        ){
             throw OperationFailedException(
                 ErrorReport::SEND_ERROR_REPORT, env.console,
                 "Failed to enter Mesagoza.",

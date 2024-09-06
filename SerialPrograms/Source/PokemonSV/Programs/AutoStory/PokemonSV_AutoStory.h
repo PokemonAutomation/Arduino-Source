@@ -50,6 +50,16 @@ enum class NavigationMovementMode{
     DIRECTIONAL_SPAM_A,
 };
 
+enum class ClearDialogCallback{
+    ADVANCE_DIALOG,
+    OVERWORLD,
+    PROMPT_DIALOG,
+    WHITE_A_BUTTON,
+    DIALOG_ARROW,
+    BATTLE,
+    TUTORIAL,
+};
+
 class AutoStory_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     AutoStory_Descriptor();
@@ -90,7 +100,8 @@ void clear_tutorial(ConsoleHandle& console, BotBaseContext& context, uint16_t se
 // return false if times out, unless this is the intended stop condition.
 // also return false if dialog is never detected.
 bool clear_dialog(ConsoleHandle& console, BotBaseContext& context,
-    ClearDialogMode mode, uint16_t seconds_timeout = 60
+    ClearDialogMode mode, uint16_t seconds_timeout = 60,
+    std::vector<ClearDialogCallback> optional_callbacks = {ClearDialogCallback::OVERWORLD, ClearDialogCallback::PROMPT_DIALOG, ClearDialogCallback::WHITE_A_BUTTON}
 );
 
 // move character with ssf left joystick, as per given x, y, until 
