@@ -278,6 +278,10 @@ public:
     // end: 
     void segment_15(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
+    // start: 
+    // end: 
+    void segment_16(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+
 private:
     virtual void value_changed(void* object) override;
 
@@ -344,6 +348,12 @@ private:
 
     BooleanCheckBoxOption ENABLE_TEST_OVERWORLD_MOVE;    
     SimpleIntegerOption<uint16_t> FORWARD_TICKS;
+
+    BooleanCheckBoxOption TEST_PBF_LEFT_JOYSTICK;
+    SimpleIntegerOption<uint16_t> X_MOVE;
+    SimpleIntegerOption<uint16_t> Y_MOVE;
+    SimpleIntegerOption<uint16_t> HOLD_TICKS;
+    SimpleIntegerOption<uint16_t> RELEASE_TICKS;
 };
 
 

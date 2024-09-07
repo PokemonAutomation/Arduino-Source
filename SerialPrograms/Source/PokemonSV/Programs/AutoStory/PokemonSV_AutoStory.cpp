@@ -151,7 +151,7 @@ AutoStory::AutoStory()
         true
     )  
     , ENABLE_TEST_SEGMENTS(
-        "<b>Test specific autostory segments:</b>",
+        "<b>TEST: test_segments():</b>",
         LockMode::UNLOCK_WHILE_RUNNING,
         false
     )   
@@ -171,7 +171,7 @@ AutoStory::AutoStory()
         1
     )
     , ENABLE_TEST_REALIGN(
-        "<b>ENABLE_TEST_REALIGN:</b>",
+        "<b>TEST: realign_player():</b>",
         LockMode::UNLOCK_WHILE_RUNNING,
         false
     )   
@@ -201,7 +201,7 @@ AutoStory::AutoStory()
         0
     )
     , ENABLE_TEST_OVERWORLD_MOVE(
-        "<b>ENABLE_TEST_OVERWORLD_MOVE:</b>",
+        "<b>TEST: walk_forward_while_clear_front_path():</b>",
         LockMode::UNLOCK_WHILE_RUNNING,
         false
     )       
@@ -209,7 +209,32 @@ AutoStory::AutoStory()
         "--FORWARD_TICKS:",
         LockMode::UNLOCK_WHILE_RUNNING,
         0
-    )       
+    )   
+    , TEST_PBF_LEFT_JOYSTICK(
+        "<b>TEST: pbf_move_left_joystick():</b>",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        false
+    )     
+    , X_MOVE(
+        "--X_MOVE:<br>x = 0 : left, x = 128 : neutral, x = 255 : right.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        128
+    )     
+    , Y_MOVE(
+        "--Y_MOVE:<br>y = 0 : up, y = 128 : neutral, y = 255 : down.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        128
+    )   
+    , HOLD_TICKS(
+        "--HOLD_TICKS:",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        0
+    )    
+    , RELEASE_TICKS(
+        "--RELEASE_TICKS:",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        0
+    )             
 {
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(STARTPOINT);
@@ -236,6 +261,12 @@ AutoStory::AutoStory()
 
         PA_ADD_OPTION(ENABLE_TEST_OVERWORLD_MOVE);
         PA_ADD_OPTION(FORWARD_TICKS);
+
+        PA_ADD_OPTION(TEST_PBF_LEFT_JOYSTICK);
+        PA_ADD_OPTION(X_MOVE);
+        PA_ADD_OPTION(Y_MOVE);
+        PA_ADD_OPTION(HOLD_TICKS);
+        PA_ADD_OPTION(RELEASE_TICKS);
     }
 
     AutoStory::value_changed(this);
@@ -245,6 +276,7 @@ AutoStory::AutoStory()
     ENABLE_TEST_SEGMENTS.add_listener(*this);
     ENABLE_TEST_REALIGN.add_listener(*this);
     ENABLE_TEST_OVERWORLD_MOVE.add_listener(*this);
+    TEST_PBF_LEFT_JOYSTICK.add_listener(*this);
 }
 
 void AutoStory::value_changed(void* object){
@@ -283,6 +315,18 @@ void AutoStory::value_changed(void* object){
     }else{
         FORWARD_TICKS.set_visibility(ConfigOptionState::DISABLED);
     }
+
+    if (TEST_PBF_LEFT_JOYSTICK){
+        X_MOVE.set_visibility(ConfigOptionState::ENABLED);
+        Y_MOVE.set_visibility(ConfigOptionState::ENABLED);
+        HOLD_TICKS.set_visibility(ConfigOptionState::ENABLED);
+        RELEASE_TICKS.set_visibility(ConfigOptionState::ENABLED);
+    }else{
+        X_MOVE.set_visibility(ConfigOptionState::DISABLED);
+        Y_MOVE.set_visibility(ConfigOptionState::DISABLED);
+        HOLD_TICKS.set_visibility(ConfigOptionState::DISABLED);
+        RELEASE_TICKS.set_visibility(ConfigOptionState::DISABLED);      
+    }    
 
 
 }
@@ -480,7 +524,7 @@ bool clear_dialog(ConsoleHandle& console, BotBaseContext& context,
         context.wait_for_all_requests();
 
         std::vector<PeriodicInferenceCallback> callbacks; 
-        std::vector<ClearDialogCallback> enum_all_callbacks{ClearDialogCallback::ADVANCE_DIALOG};
+        std::vector<ClearDialogCallback> enum_all_callbacks{ClearDialogCallback::ADVANCE_DIALOG}; // mandatory callbacks
         enum_all_callbacks.insert(enum_all_callbacks.end(), enum_optional_callbacks.begin(), enum_optional_callbacks.end()); // append the mandatory and optional callback vectors together
         for (const ClearDialogCallback& enum_callback : enum_all_callbacks){
             switch(enum_callback){
@@ -1121,6 +1165,7 @@ void AutoStory::test_segments(
     segment_list.push_back([&](){segment_13(env, context);});
     segment_list.push_back([&](){segment_14(env, context);});
     segment_list.push_back([&](){segment_15(env, context);});
+    segment_list.push_back([&](){segment_16(env, context);});
 
     for (int segment = start; segment <= end; segment++){
         if (segment == 0){
@@ -1949,6 +1994,7 @@ void AutoStory::segment_12(SingleSwitchProgramEnvironment& env, BotBaseContext& 
 }
 
 void AutoStory::segment_13(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    // reset rate: 0%. 0 resets out of 70.
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     bool has_saved_game = false;
     while (true){
@@ -2023,6 +2069,57 @@ void AutoStory::segment_14(SingleSwitchProgramEnvironment& env, BotBaseContext& 
     while (true){
     try{
         if (!has_saved_game){
+            // checkpoint_save(env, context);
+            // has_saved_game = true;
+        }         
+        context.wait_for_all_requests();
+        // realign diagonally to the left
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 80, 0, 100);
+        // walk forward so you're off center
+        pbf_move_left_joystick(context, 128, 0, 100, 100);
+        // realign going straight
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 128, 0, 100);
+        // walk forward, while still off center
+        pbf_move_left_joystick(context, 128, 0, 2000, 100);
+        // realign diagonally to the right
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 178, 0, 100);
+        // walk forward so you're closer to the center
+        pbf_move_left_joystick(context, 128, 0, 150, 100);
+        // realign going straight
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 128, 0, 100);
+        // walk forward until hit dialog at top of stairs
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 60);
+        // clear dialog until battle. with prompt, battle
+        clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {ClearDialogCallback::PROMPT_DIALOG, ClearDialogCallback::BATTLE, ClearDialogCallback::DIALOG_ARROW});
+        // run battle until dialog
+        run_battle(env.console, context, BattleStopCondition::STOP_DIALOG);
+        // clear dialog until battle, with prompt, white button, tutorial, battle
+        clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, 
+            {ClearDialogCallback::PROMPT_DIALOG, ClearDialogCallback::WHITE_A_BUTTON, ClearDialogCallback::TUTORIAL, ClearDialogCallback::BATTLE, ClearDialogCallback::DIALOG_ARROW});
+        // run battle until dialog
+        run_battle(env.console, context, BattleStopCondition::STOP_DIALOG);
+        // clear dialog until overworld
+        clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {ClearDialogCallback::OVERWORLD});
+       
+        break;
+    }catch(OperationFailedException& e){
+        context.wait_for_all_requests();
+        env.console.log(e.m_message, COLOR_RED);
+        env.console.log("Resetting from checkpoint.");
+        reset_game(env.program_info(), env.console, context);
+        stats.m_reset++;
+        env.update_stats();
+    }             
+    }
+
+}
+
+void AutoStory::segment_15(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
+    bool has_saved_game = false;
+    while (true){
+    try{
+        if (!has_saved_game){
             checkpoint_save(env, context);
             has_saved_game = true;
         }         
@@ -2041,7 +2138,7 @@ void AutoStory::segment_14(SingleSwitchProgramEnvironment& env, BotBaseContext& 
 
 }
 
-void AutoStory::segment_15(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void AutoStory::segment_16(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     bool has_saved_game = false;
     while (true){
@@ -2229,6 +2326,11 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
         walk_forward_while_clear_front_path(env.program_info(), env.console, context, FORWARD_TICKS);
         context.wait_for(Milliseconds(1000000));
     }
+
+    if (TEST_PBF_LEFT_JOYSTICK){
+        pbf_move_left_joystick(context, X_MOVE, Y_MOVE, HOLD_TICKS, RELEASE_TICKS);
+        context.wait_for(Milliseconds(1000000));
+    }    
 
     // Set settings. to ensure autosave is off.
     if (CHANGE_SETTINGS){
