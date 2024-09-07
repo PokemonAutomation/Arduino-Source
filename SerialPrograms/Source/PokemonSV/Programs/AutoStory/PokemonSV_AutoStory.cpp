@@ -1181,6 +1181,8 @@ void AutoStory::test_checkpoints(
     checkpoint_list.push_back([&](){checkpoint_14(env, context);});
     checkpoint_list.push_back([&](){checkpoint_15(env, context);});
     checkpoint_list.push_back([&](){checkpoint_16(env, context);});
+    checkpoint_list.push_back([&](){checkpoint_17(env, context);});
+    checkpoint_list.push_back([&](){checkpoint_18(env, context);});
 
     for (int checkpoint = start; checkpoint <= end; checkpoint++){
         if (checkpoint == 0){
@@ -2043,6 +2045,22 @@ void AutoStory::checkpoint_15(SingleSwitchProgramEnvironment& env, BotBaseContex
             first_attempt = false;
         }         
         context.wait_for_all_requests();
+        // realign diagonally to the right
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 178, 0, 100);
+        // walk forward so you're closer to the center
+        pbf_move_left_joystick(context, 128, 0, 100, 100);
+        // realign going straight
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 128, 0, 100);
+        // walk forward up stairs
+        pbf_move_left_joystick(context, 128, 0, 1000, 100);
+        // realign going straight
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
+        // walk forward until hit dialog inside the school
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 60);
+
+        env.console.log("clear_dialog: Talk with Nemona, Clavell, and Jacq inside the school. Stop when detect overworld.");
+        clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, 
+            {ClearDialogCallback::PROMPT_DIALOG, ClearDialogCallback::OVERWORLD});
        
         break;
     }catch(OperationFailedException& e){
@@ -2058,6 +2076,54 @@ void AutoStory::checkpoint_15(SingleSwitchProgramEnvironment& env, BotBaseContex
 }
 
 void AutoStory::checkpoint_16(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
+    bool first_attempt = true;
+    while (true){
+    try{
+        if (first_attempt){
+            checkpoint_save(env, context);
+            first_attempt = false;
+        }         
+        context.wait_for_all_requests();
+       
+        break;
+    }catch(OperationFailedException& e){
+        context.wait_for_all_requests();
+        env.console.log(e.m_message, COLOR_RED);
+        env.console.log("Resetting from checkpoint.");
+        reset_game(env.program_info(), env.console, context);
+        stats.m_reset++;
+        env.update_stats();
+    }             
+    }
+
+}
+
+void AutoStory::checkpoint_17(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
+    bool first_attempt = true;
+    while (true){
+    try{
+        if (first_attempt){
+            checkpoint_save(env, context);
+            first_attempt = false;
+        }         
+        context.wait_for_all_requests();
+       
+        break;
+    }catch(OperationFailedException& e){
+        context.wait_for_all_requests();
+        env.console.log(e.m_message, COLOR_RED);
+        env.console.log("Resetting from checkpoint.");
+        reset_game(env.program_info(), env.console, context);
+        stats.m_reset++;
+        env.update_stats();
+    }             
+    }
+
+}
+
+void AutoStory::checkpoint_18(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     bool first_attempt = true;
     while (true){

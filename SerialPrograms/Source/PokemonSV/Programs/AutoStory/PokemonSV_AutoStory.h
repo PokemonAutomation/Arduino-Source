@@ -273,16 +273,24 @@ public:
     void checkpoint_13(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
     // start: Battled Nemona at Mesagoza gate. Entered Mesagoza.
-    // end: 
+    // end: Battled Team Star at school entrance.
     void checkpoint_14(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
-    // start: 
-    // end: 
+    // start: Battled Team Star at school entrance.
+    // end: Talked to Jacq in classroom.
     void checkpoint_15(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+
+    // start: Talked to Jacq in classroom.
+    // end: 
+    void checkpoint_16(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
     // start: 
     // end: 
-    void checkpoint_16(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    void checkpoint_17(SingleSwitchProgramEnvironment& env, BotBaseContext& context); 
+
+    // start: 
+    // end: 
+    void checkpoint_18(SingleSwitchProgramEnvironment& env, BotBaseContext& context);          
 
 private:
     virtual void value_changed(void* object) override;
