@@ -87,7 +87,9 @@ void realign_player(const ProgramInfo& info, ConsoleHandle& console, BotBaseCont
     uint8_t move_x = 0, uint8_t move_y = 0, uint8_t move_duration = 0
 );
 
-bool run_battle(ConsoleHandle& console, BotBaseContext& context,
+// spam A button to choose the first move
+// throw exception if wipeout.
+void run_battle(ConsoleHandle& console, BotBaseContext& context,
     BattleStopCondition stop_condition
 );
 
@@ -97,17 +99,17 @@ void clear_tutorial(ConsoleHandle& console, BotBaseContext& context, uint16_t se
 
 // spam the A button to clear dialog.
 // stop depending on ClearDialogMode: stop when detect overworld, or dialog prompt, or A button prompt. Or if times out
-// return false if times out, unless this is the intended stop condition.
-// also return false if dialog is never detected.
-bool clear_dialog(ConsoleHandle& console, BotBaseContext& context,
+// throw exception if times out, unless this is the intended stop condition.
+// also throw exception if dialog is never detected.
+void clear_dialog(ConsoleHandle& console, BotBaseContext& context,
     ClearDialogMode mode, uint16_t seconds_timeout = 60,
     std::vector<ClearDialogCallback> optional_callbacks = {ClearDialogCallback::OVERWORLD, ClearDialogCallback::PROMPT_DIALOG, ClearDialogCallback::WHITE_A_BUTTON}
 );
 
 // move character with ssf left joystick, as per given x, y, until 
 // stop_condition is met (e.g. Dialog detected). 
-// return false if reaches timeout before detecting stop condition
-bool overworld_navigation(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+// throw exception if reaches timeout before detecting stop condition
+void overworld_navigation(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
     NavigationStopCondition stop_condition,
     NavigationMovementMode movement_mode,
     uint8_t x, uint8_t y,

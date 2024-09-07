@@ -405,7 +405,7 @@ void realign_player(const ProgramInfo& info, ConsoleHandle& console, BotBaseCont
     }
 }
 
-bool run_battle(
+void run_battle(
     ConsoleHandle& console, 
     BotBaseContext& context,
     BattleStopCondition stop_condition
@@ -434,11 +434,14 @@ bool run_battle(
             console.log("Detected overworld, battle over.");
             num_times_seen_overworld++;
             if (stop_condition == BattleStopCondition::STOP_OVERWORLD){
-                return true;
+                return;
             }
             if(num_times_seen_overworld > 30){
-                console.log("run_battle: Stuck in overworld.");
-                return false;
+                throw OperationFailedException(
+                    ErrorReport::SEND_ERROR_REPORT, console,
+                    "run_battle(): Stuck in overworld. Did not detect expected stop condition.",
+                    true
+                );  
             }            
             break;
         case 2: // advance dialog
@@ -449,19 +452,25 @@ bool run_battle(
                 VideoSnapshot screen = console.video().snapshot();
                 // dump_snapshot(console);
                 if (wipeout.detect(screen)){
-                    console.log("Detected wipeout. All pokemon fainted.");
-                    return false;                
+                    throw OperationFailedException(
+                        ErrorReport::SEND_ERROR_REPORT, console,
+                        "run_battle(): Detected wipeout. All pokemon fainted.",
+                        true
+                    );                
                 }
             }
 
             if (stop_condition == BattleStopCondition::STOP_DIALOG){
-                return true;
+                return;
             }
             pbf_press_button(context, BUTTON_A, 20, 105);
             break;
         default: // timeout
-            console.log("run_battle(): Timed out.");
-            return false;
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, console,
+                "run_battle(): Timed out. Did not detect expected stop condition.",
+                true
+            );             
         }
     }
 }
@@ -499,7 +508,7 @@ void clear_tutorial(ConsoleHandle& console, BotBaseContext& context, uint16_t se
     }
 }
 
-bool clear_dialog(ConsoleHandle& console, BotBaseContext& context,
+void clear_dialog(ConsoleHandle& console, BotBaseContext& context,
     ClearDialogMode mode, uint16_t seconds_timeout,
     std::vector<ClearDialogCallback> enum_optional_callbacks
 ){
@@ -571,9 +580,13 @@ bool clear_dialog(ConsoleHandle& console, BotBaseContext& context,
         if (ret < 0){
             console.log("clear_dialog(): Timed out.");
             if (seen_dialog && mode == ClearDialogMode::STOP_TIMEOUT){
-                return true;
+                return;
             }
-            return false;
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, console,
+                "clear_dialog(): Timed out. Did not detect dialog or did not detect the expected stop condition.",
+                true
+            );
         }
 
         ClearDialogCallback enum_callback = enum_all_callbacks[ret];
@@ -586,14 +599,14 @@ bool clear_dialog(ConsoleHandle& console, BotBaseContext& context,
         case ClearDialogCallback::OVERWORLD:
             console.log("clear_dialog: Detected overworld.");
             if (seen_dialog && mode == ClearDialogMode::STOP_OVERWORLD){
-                return true;
+                return;
             }
             break;
         case ClearDialogCallback::PROMPT_DIALOG:
             console.log("clear_dialog: Detected prompt.");
             seen_dialog = true;
             if (mode == ClearDialogMode::STOP_PROMPT){
-                return true;
+                return;
             }
             pbf_press_button(context, BUTTON_A, 20, 105);
             break;
@@ -601,7 +614,7 @@ bool clear_dialog(ConsoleHandle& console, BotBaseContext& context,
             console.log("clear_dialog: Detected white A button.");
             seen_dialog = true;
             if (mode == ClearDialogMode::STOP_WHITEBUTTON){
-                return true;
+                return;
             }
             pbf_press_button(context, BUTTON_A, 20, 105);
             break;
@@ -613,7 +626,7 @@ bool clear_dialog(ConsoleHandle& console, BotBaseContext& context,
         case ClearDialogCallback::BATTLE:
             console.log("clear_dialog: Detected battle.");
             if (mode == ClearDialogMode::STOP_BATTLE){
-                return true;
+                return;
             }
             break;
         case ClearDialogCallback::TUTORIAL:    
@@ -628,7 +641,7 @@ bool clear_dialog(ConsoleHandle& console, BotBaseContext& context,
     }
 }
 
-bool overworld_navigation(
+void overworld_navigation(
     const ProgramInfo& info, 
     ConsoleHandle& console, 
     BotBaseContext& context,
@@ -672,21 +685,23 @@ bool overworld_navigation(
         switch (ret){
         case 0: // battle
             console.log("overworld_navigation: Detected start of battle.");
-            if (!run_battle(console, context, BattleStopCondition::STOP_OVERWORLD)){
-                return false;
-            }
+            run_battle(console, context, BattleStopCondition::STOP_OVERWORLD);                
             auto_heal_from_menu_or_overworld(info, console, context, 0, true);
             realign_player(info, console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             break;
         case 1: // dialog
             console.log("overworld_navigation: Detected dialog.");
             if (stop_condition == NavigationStopCondition::STOP_DIALOG){
-                return true;
+                return;
             }
             break;
         default:
             console.log("overworld_navigation(): Timed out.");
-            return false;
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, console,
+                "overworld_navigation(): Timed out. Did not detect expected stop condition.",
+                true
+            );
         }
     }
 }
@@ -1264,26 +1279,16 @@ void AutoStory::segment_02(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         env.console.log("Go to the kitchen, talk with mom");
         env.console.overlay().add_log("Go to the kitchen, talk with mom", COLOR_WHITE);
         pbf_move_left_joystick(context, 128, 255, 2 * TICKS_PER_SECOND, 20);
-        if(!overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 0, 128)){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
-                "Failed to talk to mom.",
-                true
-            );
-        }
+        overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 0, 128);
+
         clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 5);
 
         context.wait_for_all_requests();
         env.console.log("Go to the front door, talk with Clavell");
         env.console.overlay().add_log("Go to the front door, talk with Clavell", COLOR_WHITE);
         pbf_move_left_joystick(context, 230, 200, 2 * TICKS_PER_SECOND, 20);
-        if(!overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 255, 128)){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
-                "Failed to talk to Clavell.",
-                true
-            );            
-        }
+        overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 255, 128);
+        
         clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 5);
 
         context.wait_for_all_requests();
@@ -1303,25 +1308,15 @@ void AutoStory::segment_02(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         pbf_move_left_joystick(context,   0,   0, 3 * TICKS_PER_SECOND, 20);
         pbf_move_left_joystick(context,   0, 128, 3 * TICKS_PER_SECOND, 20);
         pbf_move_left_joystick(context, 128, 255, 4 * TICKS_PER_SECOND, 20);
-        if(!overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 0, 128)){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
-                "Failed to talk to Clavell.",
-                true
-            );               
-        }
+        overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 0, 128);
+        
         clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 10);
 
         context.wait_for_all_requests();
         env.console.log("Go outside, receive Rotom Phone");
         env.console.overlay().add_log("Go outside, receive Rotom Phone", COLOR_WHITE);
-        if(!overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 245, 230)){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
-                "Failed to go outside.",
-                true
-            );             
-        }
+        overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 245, 230);
+
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD);
 
         context.wait_for_all_requests();
@@ -1361,14 +1356,9 @@ void AutoStory::segment_03(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         
         pbf_move_left_joystick(context, 255, 0, 1 * TICKS_PER_SECOND, 20);
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 156, 1 * TICKS_PER_SECOND);
-        if (!overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 0)){
-            // timed out before detecting dialog box
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
-                "Failed to enter Nemona's house.",
-                true
-            );               
-        }
+        env.console.log("overworld_navigation(): Go to Nemona's house.");
+        overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 0);
+        
         context.wait_for_all_requests();
         env.console.log("Entered Nemona's house");
         mash_button_till_overworld(env.console, context);
@@ -1389,32 +1379,17 @@ void AutoStory::segment_03(SingleSwitchProgramEnvironment& env, BotBaseContext& 
             break;
         }
         pbf_press_button(context, BUTTON_A, 20, 105); // choose the starter
-        if (!clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 20)){
-            // timed out before detecting the dialog prompt, to confirm receiving the starter
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
-                "Failed to pick starter.",
-                true
-            );  
-        }
-        pbf_press_button(context, BUTTON_A, 20, 105); // accept the pokemon
-        if (!clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 20)){
-            // timed out before detecting the dialog prompt to give a nickname
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
-                "Stuck trying to give a nickname.",
-                true
-            );  
-        }
-        pbf_mash_button(context, BUTTON_B, 100);  // Don't give a nickname
-        if (!clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 20)){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
-                "Stuck trying to give a nickname.",
-                true
-            );  
-        }
+        env.console.log("clear_dialog: Stop when detect prompt to receive starter.");
+        clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 20);
 
+        pbf_press_button(context, BUTTON_A, 20, 105); // accept the pokemon
+        env.console.log("clear_dialog: Stop when detect prompt to give nickname to starter.");
+        clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 20);
+
+        pbf_mash_button(context, BUTTON_B, 100);  // Don't give a nickname
+        env.console.log("clear_dialog: Stop when detect overworld.");
+        clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 20);
+        
         context.wait_for_all_requests();
         env.console.log("Clear auto heal tutorial.");
         // Press X until Auto heal tutorial shows up
@@ -1471,13 +1446,9 @@ void AutoStory::segment_04(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         pbf_move_left_joystick(context, 128, 0, 4 * TICKS_PER_SECOND, 1 * TICKS_PER_SECOND);
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 60, 50);
         pbf_move_left_joystick(context, 128, 0, 4 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
-        if (!overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_SPAM_A, 128, 0, 8)){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
-                "Failed to talk to Nemona at beach.",
-                true
-            );  
-        }
+        env.console.log("overworld_navigation: Go to Nemona at the beach.");
+        overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_SPAM_A, 128, 0, 8);
+        
         context.wait_for_all_requests();
         env.console.overlay().add_log("Found Nemona", COLOR_WHITE);
 
@@ -1518,13 +1489,9 @@ void AutoStory::segment_05(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 40, 160, 60);
         pbf_move_left_joystick(context, 128, 0, 7 * TICKS_PER_SECOND, 20);
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 40, 84, 60);
-        if (!overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 0, 20)){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
-                "Failed to find Mom.",
-                true
-            );  
-        }
+        env.console.log("overworld_navigation: Go to mom at the gate.");
+        overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 0, 20);
+        
         context.wait_for_all_requests();
         env.console.log("Get mom's sandwich");
         env.console.overlay().add_log("Get mom's sandwich", COLOR_WHITE);
@@ -1556,26 +1523,18 @@ void AutoStory::segment_06(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 40, 82, 60);
         pbf_move_left_joystick(context, 128, 0, 6 * TICKS_PER_SECOND, 20);
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 110, 10, 60);
-        if (!overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 0, 20)){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
-                "Failed to find Nemona.",
-                true
-            );  
-        }
+        env.console.log("overworld_navigation: Go to Nemona.");
+        overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 0, 20);
+        
         context.wait_for_all_requests();
         env.console.log("Start catch tutorial");
         env.console.overlay().add_log("Start catch tutorial", COLOR_WHITE);
         clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 10);
         clear_tutorial(env.console, context);
         // can die in catch tutorial, and the story will continue
-        if (!run_battle(env.console, context, BattleStopCondition::STOP_DIALOG)){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
-                "Failed to complete catch tutorial.",
-                true
-            );  
-        }
+        env.console.log("run_battle: Battle Lechonk in catch tutorial. Stop when detect dialog.");
+        run_battle(env.console, context, BattleStopCondition::STOP_DIALOG);
+
         clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 5);
         clear_tutorial(env.console, context);
         context.wait_for_all_requests();
@@ -1609,20 +1568,12 @@ void AutoStory::segment_07(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         env.console.overlay().add_log("Move to cliff", COLOR_WHITE);
 
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 240, 60, 80);
-        if (!overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 116, 0, 72, 24)){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
-                "Failed to reach cliff.",
-                true
-            );  
-        }
-        if (!clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD)){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
-                "Failed to reach cliff.",
-                true
-            );  
-        }
+        env.console.log("overworld_navigation: Go to cliff.");
+        overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 116, 0, 72, 24);
+
+        env.console.log("clear_dialog: Stop when detect overworld.");
+        clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD);
+
         context.wait_for_all_requests();
         env.console.log("Mystery cry");
         env.console.overlay().add_log("Mystery cry", COLOR_WHITE);
@@ -1651,23 +1602,15 @@ void AutoStory::segment_08(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         context.wait_for_all_requests();
 
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 230, 70, 100);
-        if (!overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 0)){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
-                "Failed to reach cliff.",
-                true
-            );  
-        }
+        env.console.log("overworld_navigation: Go to cliff.");
+        overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 0);
+
         clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 20);
         // long animation
         clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 10);
-        if (!overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 0, 30)){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
-                "Failed to reach legendary.",
-                true
-            );  
-        }
+        env.console.log("overworld_navigation: Go to Legendary pokemon laying on the beach.");
+        overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 0, 30);
+
         clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 10);
 
         // TODO: Bag menu navigation
@@ -1714,14 +1657,10 @@ void AutoStory::segment_08(SingleSwitchProgramEnvironment& env, BotBaseContext& 
                 pbf_move_left_joystick(context, 150, 20, 2 * TICKS_PER_SECOND, 20);                
             }
         );
+        
+        env.console.log("overworld_navigation: Go to cave.");
+        overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 20, 10);
 
-        if (!overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 20, 10)){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
-                "Failed to enter cave.",
-                true
-            );  
-        }
         clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 10);
 
         do_action_and_monitor_for_battles(env, env.console, context,
@@ -1761,13 +1700,9 @@ void AutoStory::segment_08(SingleSwitchProgramEnvironment& env, BotBaseContext& 
             }
         );
         
-        if (!overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 20, 40)){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
-                "Failed to reach Houndoom.",
-                true
-            );  
-        }
+        env.console.log("overworld_navigation: Go to Houndoom.");
+        overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 20, 40);
+        
         mash_button_till_overworld(env.console, context, BUTTON_A);
 
         break;
@@ -1796,13 +1731,9 @@ void AutoStory::segment_09(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         context.wait_for_all_requests();
 
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 230, 120, 100);
-        if (!overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 0)){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
-                "Failed to talk to Arven at the tower.",
-                true
-            );  
-        }
+        env.console.log("overworld_navigation: Go to Arven at the tower.");
+        overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 0);
+            
         context.wait_for_all_requests();
         env.console.log("Found Arven");
         env.console.overlay().add_log("Found Arven", COLOR_WHITE);
@@ -1846,14 +1777,10 @@ void AutoStory::segment_10(SingleSwitchProgramEnvironment& env, BotBaseContext& 
                 pbf_move_left_joystick(context, 128, 0, 7 * TICKS_PER_SECOND, 20);                
             }
         );
-        
-        if (!overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_SPAM_A, 128, 0, 20)){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
-                "Failed to talk to Nemona on the lighthouse.",
-                true
-            );  
-        }
+
+        env.console.log("overworld_navigation: Go to Nemona on the lighthouse.");
+        overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_SPAM_A, 128, 0, 20);
+
         mash_button_till_overworld(env.console, context, BUTTON_A);
 
         break;
@@ -1890,13 +1817,9 @@ void AutoStory::segment_11(SingleSwitchProgramEnvironment& env, BotBaseContext& 
             }
         );     
 
-        if (!overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 0, 75)){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
-                "Failed to reach Los Platos.",
-                true
-            );  
-        }
+        env.console.log("overworld_navigation: Go to Los Platos.");
+        overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 0, 75);
+
         clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 10);
         clear_tutorial(env.console, context);
         context.wait_for_all_requests();
@@ -2019,36 +1942,19 @@ void AutoStory::segment_13(SingleSwitchProgramEnvironment& env, BotBaseContext& 
             realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 80, 50);
             walk_forward_while_clear_front_path(env.program_info(), env.console, context, 500);
             walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 30);
-        }
-        );
+        });
 
-        if (!clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60,
-        {ClearDialogCallback::PROMPT_DIALOG, ClearDialogCallback::DIALOG_ARROW, ClearDialogCallback::BATTLE})
-        ){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
-                "Failed to battle Nemona at Mesagoza gate.",
-                true
-            );              
-        }
+        env.console.log("clear_dialog: Stop when detect battle, with Nemona at Mesagoza gate.");
+        clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60,
+            {ClearDialogCallback::PROMPT_DIALOG, ClearDialogCallback::DIALOG_ARROW, ClearDialogCallback::BATTLE});
         
-        if (!run_battle(env.console, context, BattleStopCondition::STOP_DIALOG)){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
-                "Failed to finish battle with Nemona at Mesagoza gate.",
-                true
-            );  
-        }
+        env.console.log("run_battle: Battle with Nemona at Mesagoza gate. Stop when detect dialog.");
+        run_battle(env.console, context, BattleStopCondition::STOP_DIALOG);
         
-        if (!clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, 
-        {ClearDialogCallback::OVERWORLD, ClearDialogCallback::PROMPT_DIALOG, ClearDialogCallback::WHITE_A_BUTTON})
-        ){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
-                "Failed to enter Mesagoza.",
-                true
-            );  
-        }
+        env.console.log("clear_dialog: Stop when detect overworld, within Mesagoza.");
+        clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, 
+            {ClearDialogCallback::OVERWORLD, ClearDialogCallback::PROMPT_DIALOG, ClearDialogCallback::WHITE_A_BUTTON});
+        
        
         break;
     }catch(OperationFailedException& e){
@@ -2092,11 +1998,13 @@ void AutoStory::segment_14(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         // clear dialog until battle. with prompt, battle
         clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {ClearDialogCallback::PROMPT_DIALOG, ClearDialogCallback::BATTLE, ClearDialogCallback::DIALOG_ARROW});
         // run battle until dialog
+        env.console.log("run_battle: Battle with Team Star grunt 1. Stop when detect dialog.");
         run_battle(env.console, context, BattleStopCondition::STOP_DIALOG);
         // clear dialog until battle, with prompt, white button, tutorial, battle
         clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, 
             {ClearDialogCallback::PROMPT_DIALOG, ClearDialogCallback::WHITE_A_BUTTON, ClearDialogCallback::TUTORIAL, ClearDialogCallback::BATTLE, ClearDialogCallback::DIALOG_ARROW});
         // run battle until dialog
+        env.console.log("run_battle: Battle with Team Star grunt 2. Stop when detect dialog.");
         run_battle(env.console, context, BattleStopCondition::STOP_DIALOG);
         // clear dialog until overworld
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {ClearDialogCallback::OVERWORLD});
