@@ -2085,6 +2085,40 @@ void AutoStory::checkpoint_16(SingleSwitchProgramEnvironment& env, BotBaseContex
             first_attempt = false;
         }         
         context.wait_for_all_requests();
+
+        // walk left
+        pbf_move_left_joystick(context, 0, 128, 400, 100);
+        // walk down to classroom exit.
+        pbf_move_left_joystick(context, 128, 255, 300, 100);
+        env.console.log("clear_dialog: Leave classroom.");
+        clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 5);
+
+        // Wait for detection of school navigation menu
+        ImageFloatBox select_box_0(0.031, 0.193, 0.047, 0.078);
+        GradientArrowWatcher select_entrance(COLOR_RED, GradientArrowType::RIGHT, select_box_0);
+        int ret = wait_until(env.console, context, Milliseconds(5000), { select_entrance }, Milliseconds(1000));
+        if (ret == 0){
+            env.console.log("School navigation menu detected. Top item selected.");
+        }else{
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, env.console,
+                "Failed to detect school navigation menu",
+                true
+            );
+        }        
+
+        // enter Cafeteria
+        pbf_mash_button(context, BUTTON_A, 3 * TICKS_PER_SECOND);
+        pbf_wait(context, 3 * TICKS_PER_SECOND);
+        context.wait_for_all_requests();
+
+        // walk forward and talk to Arven
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 60);
+        
+        // talk to Arven. stop at overworld. need prompt, overworld, white button A. and book?
+        env.console.log("Talk with Arven. Receive Titan questline (Path of Legends).");
+        mash_button_till_overworld(env.console, context);
+        
        
         break;
     }catch(OperationFailedException& e){

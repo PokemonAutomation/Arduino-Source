@@ -281,7 +281,7 @@ public:
     void checkpoint_15(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
     // start: Talked to Jacq in classroom.
-    // end: 
+    // end: Talked to Arven. Received Titan questline (Path of Legends).
     void checkpoint_16(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
     // start: 
