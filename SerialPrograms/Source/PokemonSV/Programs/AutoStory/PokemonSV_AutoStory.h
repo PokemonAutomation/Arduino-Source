@@ -103,7 +103,7 @@ void clear_tutorial(ConsoleHandle& console, BotBaseContext& context, uint16_t se
 // also throw exception if dialog is never detected.
 void clear_dialog(ConsoleHandle& console, BotBaseContext& context,
     ClearDialogMode mode, uint16_t seconds_timeout = 60,
-    std::vector<ClearDialogCallback> optional_callbacks = {ClearDialogCallback::OVERWORLD, ClearDialogCallback::PROMPT_DIALOG, ClearDialogCallback::WHITE_A_BUTTON}
+    std::vector<ClearDialogCallback> optional_callbacks = {}
 );
 
 // move character with ssf left joystick, as per given x, y, until 
