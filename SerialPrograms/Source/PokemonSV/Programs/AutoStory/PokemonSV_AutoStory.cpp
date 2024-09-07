@@ -1223,16 +1223,15 @@ void AutoStory::checkpoint_00(SingleSwitchProgramEnvironment& env, BotBaseContex
 
 void AutoStory::checkpoint_01(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
 AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
-    bool has_saved_game = false;
     bool first_attempt = true;
     while (true){
     try{
-        if(!has_saved_game){
+        if(first_attempt){
             save_game_tutorial(env.program_info(), env.console, context);
             stats.m_checkpoint++;
             env.update_stats();
             send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE, "Saved at checkpoint.");     
-            has_saved_game = true;
+            first_attempt = false;
         }
         
         context.wait_for_all_requests();
@@ -1256,15 +1255,15 @@ AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Sta
 
 void AutoStory::checkpoint_02(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
-    bool has_saved_game = false;
+    bool first_attempt = true;
     while (true){
     try{
-        if(!has_saved_game){
+        if(!first_attempt){
             save_game_tutorial(env.program_info(), env.console, context);
             stats.m_checkpoint++;
             env.update_stats();
             send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE, "Saved at checkpoint.");     
-            has_saved_game = true;
+            first_attempt = false;
         }
         
         context.wait_for_all_requests();
@@ -1349,12 +1348,12 @@ void AutoStory::checkpoint_02(SingleSwitchProgramEnvironment& env, BotBaseContex
 
 void AutoStory::checkpoint_03(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
-    bool has_saved_game = false;
+    bool first_attempt = true;
     while (true){   
     try{
-        if (!has_saved_game){
+        if (first_attempt){
             checkpoint_save(env, context);
-            has_saved_game = true;
+            first_attempt = false;
         }
         
         context.wait_for_all_requests();
@@ -1436,12 +1435,12 @@ void AutoStory::checkpoint_03(SingleSwitchProgramEnvironment& env, BotBaseContex
 
 void AutoStory::checkpoint_04(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
-    bool has_saved_game = false;
+    bool first_attempt = true;
     while (true){
     try{        
-        if (!has_saved_game){
+        if (first_attempt){
             checkpoint_save(env, context);
-            has_saved_game = true;
+            first_attempt = false;
         }        
         context.wait_for_all_requests();
 
@@ -1482,12 +1481,12 @@ void AutoStory::checkpoint_04(SingleSwitchProgramEnvironment& env, BotBaseContex
 
 void AutoStory::checkpoint_05(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
-    bool has_saved_game = false;
+    bool first_attempt = true;
     while (true){
     try{
-        if (!has_saved_game){
+        if (first_attempt){
             checkpoint_save(env, context);
-            has_saved_game = true;
+            first_attempt = false;
         }         
         context.wait_for_all_requests();
 
@@ -1515,12 +1514,12 @@ void AutoStory::checkpoint_05(SingleSwitchProgramEnvironment& env, BotBaseContex
 
 void AutoStory::checkpoint_06(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
-    bool has_saved_game = false;
+    bool first_attempt = true;
     while (true){
     try{        
-        if (!has_saved_game){
+        if (first_attempt){
             checkpoint_save(env, context);
-            has_saved_game = true;
+            first_attempt = false;
         }        
 
         context.wait_for_all_requests();
@@ -1562,12 +1561,12 @@ void AutoStory::checkpoint_06(SingleSwitchProgramEnvironment& env, BotBaseContex
 
 void AutoStory::checkpoint_07(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
-    bool has_saved_game = false;
+    bool first_attempt = true;
     while (true){
     try{
-        if (!has_saved_game){
+        if (first_attempt){
             checkpoint_save(env, context);
-            has_saved_game = true;
+            first_attempt = false;
         }         
 
         context.wait_for_all_requests();
@@ -1599,12 +1598,12 @@ void AutoStory::checkpoint_07(SingleSwitchProgramEnvironment& env, BotBaseContex
 
 void AutoStory::checkpoint_08(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
-    bool has_saved_game = false;
+    bool first_attempt = true;
     while (true){
     try{
-        if (!has_saved_game){
+        if (first_attempt){
             checkpoint_save(env, context);
-            has_saved_game = true;
+            first_attempt = false;
         }         
         context.wait_for_all_requests();
 
@@ -1730,12 +1729,12 @@ void AutoStory::checkpoint_08(SingleSwitchProgramEnvironment& env, BotBaseContex
 
 void AutoStory::checkpoint_09(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
-    bool has_saved_game = false;
+    bool first_attempt = true;
     while (true){
     try{        
-        if (!has_saved_game){
+        if (first_attempt){
             checkpoint_save(env, context);
-            has_saved_game = true;
+            first_attempt = false;
         }      
         context.wait_for_all_requests();
 
@@ -1766,12 +1765,12 @@ void AutoStory::checkpoint_09(SingleSwitchProgramEnvironment& env, BotBaseContex
 
 void AutoStory::checkpoint_10(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
-    bool has_saved_game = false;
+    bool first_attempt = true;
     while (true){
     try{
-        if (!has_saved_game){
+        if (first_attempt){
             checkpoint_save(env, context);
-            has_saved_game = true;
+            first_attempt = false;
         }        
         context.wait_for_all_requests();
         env.console.log("Lighthouse view");
@@ -1806,12 +1805,12 @@ void AutoStory::checkpoint_10(SingleSwitchProgramEnvironment& env, BotBaseContex
 
 void AutoStory::checkpoint_11(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
-    bool has_saved_game = false;
+    bool first_attempt = true;
     while (true){
     try{
-        if (!has_saved_game){
+        if (first_attempt){
             checkpoint_save(env, context);
-            has_saved_game = true;
+            first_attempt = false;
         } 
 
         context.wait_for_all_requests();
@@ -1856,15 +1855,15 @@ void AutoStory::checkpoint_12(SingleSwitchProgramEnvironment& env, BotBaseContex
     // resets due to: getting attacked by wild pokemon, either from behind, 
     // or when lead pokemon not strong enough to clear them with Let's go
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
-    bool has_saved_game = false;
+    bool first_attempt = true;
     while (true){
     try{
         do_action_and_monitor_for_battles(env, env.console, context,
         [&](SingleSwitchProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){        
         
-            if (!has_saved_game){
+            if (first_attempt){
                 checkpoint_save(env, context);
-                has_saved_game = true;
+                first_attempt = false;
             } 
 
             context.wait_for_all_requests();
@@ -1929,15 +1928,15 @@ void AutoStory::checkpoint_12(SingleSwitchProgramEnvironment& env, BotBaseContex
 void AutoStory::checkpoint_13(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     // reset rate: 0%. 0 resets out of 70.
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
-    bool has_saved_game = false;
+    bool first_attempt = true;
     while (true){
     try{
         do_action_and_monitor_for_battles(env, env.console, context,
         [&](SingleSwitchProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){        
         
-            if (!has_saved_game){
+            if (first_attempt){
                 checkpoint_save(env, context);
-                has_saved_game = true;
+                first_attempt = false;
             } 
 
             if (!fly_to_overlapping_pokecenter(env.program_info(), env.console, context)){
@@ -1981,12 +1980,12 @@ void AutoStory::checkpoint_13(SingleSwitchProgramEnvironment& env, BotBaseContex
 
 void AutoStory::checkpoint_14(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
-    bool has_saved_game = false;
+    bool first_attempt = true;
     while (true){
     try{
-        if (!has_saved_game){
+        if (first_attempt){
             checkpoint_save(env, context);
-            has_saved_game = true;
+            first_attempt = false;
         }         
         context.wait_for_all_requests();
         // realign diagonally to the left
@@ -2036,12 +2035,12 @@ void AutoStory::checkpoint_14(SingleSwitchProgramEnvironment& env, BotBaseContex
 
 void AutoStory::checkpoint_15(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
-    bool has_saved_game = false;
+    bool first_attempt = true;
     while (true){
     try{
-        if (!has_saved_game){
+        if (first_attempt){
             checkpoint_save(env, context);
-            has_saved_game = true;
+            first_attempt = false;
         }         
         context.wait_for_all_requests();
        
@@ -2060,12 +2059,12 @@ void AutoStory::checkpoint_15(SingleSwitchProgramEnvironment& env, BotBaseContex
 
 void AutoStory::checkpoint_16(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
-    bool has_saved_game = false;
+    bool first_attempt = true;
     while (true){
     try{
-        if (!has_saved_game){
+        if (first_attempt){
             checkpoint_save(env, context);
-            has_saved_game = true;
+            first_attempt = false;
         }         
         context.wait_for_all_requests();
        
