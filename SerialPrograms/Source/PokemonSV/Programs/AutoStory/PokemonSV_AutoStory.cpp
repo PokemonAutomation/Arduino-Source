@@ -1100,7 +1100,7 @@ void heal_at_pokecenter(
     while (true){
         OverworldWatcher    overworld(COLOR_CYAN);
         // TODO: test the Prompt watcher on all languages. Ensure FloatBox is sized correctly.
-        PromptDialogWatcher prompt(COLOR_YELLOW, {0.630, 0.400, 0.100, 0.080}); // 0.630, 0.400, 0.100, 0.080
+        PromptDialogWatcher prompt(COLOR_YELLOW, {0.50, 0.400, 0.400, 0.080}); // 0.630, 0.400, 0.100, 0.080 // {0.50, 0.40, 0.40, 0.50}
         AdvanceDialogWatcher    advance_dialog(COLOR_RED);
         TutorialWatcher     tutorial(COLOR_RED);
         context.wait_for_all_requests();
@@ -1273,7 +1273,8 @@ void AutoStory::segment_02(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         pbf_move_left_joystick(context, 128,   0, 3 * TICKS_PER_SECOND, 20);
         pbf_move_left_joystick(context,   0, 128, 3 * TICKS_PER_SECOND, 20);
         pbf_move_left_joystick(context, 128, 255, 3 * TICKS_PER_SECOND, 20);
-        clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 5, {});
+        pbf_wait(context, 5 * TICKS_PER_SECOND);
+        // clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 5, {});
 
         context.wait_for_all_requests();
         env.console.log("Go to the kitchen, talk with mom");
@@ -1281,6 +1282,7 @@ void AutoStory::segment_02(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         pbf_move_left_joystick(context, 128, 255, 2 * TICKS_PER_SECOND, 20);
         overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 0, 128);
 
+        env.console.log("clear_dialog: Talk with Mom.");
         clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 5, {});
 
         context.wait_for_all_requests();
@@ -1289,6 +1291,7 @@ void AutoStory::segment_02(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         pbf_move_left_joystick(context, 230, 200, 2 * TICKS_PER_SECOND, 20);
         overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 255, 128);
         
+        env.console.log("clear_dialog: Talk with Clavell at front door.");
         clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 5, {});
 
         context.wait_for_all_requests();
@@ -1310,13 +1313,15 @@ void AutoStory::segment_02(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         pbf_move_left_joystick(context, 128, 255, 4 * TICKS_PER_SECOND, 20);
         overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 0, 128);
         
-        clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 5, {});
+        env.console.log("clear_dialog: Talk with Clavell at living room.");
+        clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 10, {});
 
         context.wait_for_all_requests();
         env.console.log("Go outside, receive Rotom Phone");
         env.console.overlay().add_log("Go outside, receive Rotom Phone", COLOR_WHITE);
         overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 245, 230);
 
+        env.console.log("clear_dialog: Talk with Clavell outside. Receive Rotom phone. Stop when detect overworld.");
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {ClearDialogCallback::OVERWORLD, ClearDialogCallback::WHITE_A_BUTTON});
 
         context.wait_for_all_requests();
@@ -1527,8 +1532,7 @@ void AutoStory::segment_06(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 0, 20);
         
         context.wait_for_all_requests();
-        env.console.log("Start catch tutorial");
-        env.console.overlay().add_log("Start catch tutorial", COLOR_WHITE);
+        env.console.log("clear_dialog: Talk with Nemona to start catch tutorial. Stop when detect battle.");
         clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, 
             {ClearDialogCallback::WHITE_A_BUTTON, ClearDialogCallback::TUTORIAL, ClearDialogCallback::BATTLE});
         
@@ -1536,6 +1540,7 @@ void AutoStory::segment_06(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         env.console.log("run_battle: Battle Lechonk in catch tutorial. Stop when detect dialog.");
         run_battle(env.console, context, BattleStopCondition::STOP_DIALOG);
 
+        env.console.log("clear_dialog: Talk with Nemona to finish catch tutorial. Stop when detect overworld.");
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, 
             {ClearDialogCallback::TUTORIAL, ClearDialogCallback::OVERWORLD});
 
@@ -1608,12 +1613,12 @@ void AutoStory::segment_08(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 0);
 
         env.console.log("clear_dialog: Look over the injured Miraidon/Koraidon on the beach. Fall down the cliff");
-        clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 20, {});
+        clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 30, {});
         // long animation
-        clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 10, {});
         env.console.log("overworld_navigation: Go to Legendary pokemon laying on the beach.");
         overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 0, 30);
 
+        env.console.log("clear_dialog: Offer Miraidon/Koraidon a sandwich.");
         clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 10, {});
 
         // TODO: Bag menu navigation
@@ -1644,9 +1649,9 @@ void AutoStory::segment_08(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         // only press A when the sandwich is selected
         pbf_mash_button(context, BUTTON_A, 100);
 
-        clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 25, {});
+        env.console.log("clear_dialog: Miraidon/Koraidon gets up and walks to cave entrance.");
+        clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 35, {});
         // long animation
-        clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 10, {});
 
         // First Nemona cave conversation
         context.wait_for_all_requests();
@@ -1664,6 +1669,7 @@ void AutoStory::segment_08(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         env.console.log("overworld_navigation: Go to cave.");
         overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 20, 10);
 
+        env.console.log("clear_dialog: Talk to Nemona yelling down, while you're down in the cave.");
         clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 10, {ClearDialogCallback::PROMPT_DIALOG});
 
         do_action_and_monitor_for_battles(env, env.console, context,
@@ -1680,7 +1686,7 @@ void AutoStory::segment_08(SingleSwitchProgramEnvironment& env, BotBaseContext& 
                 context.wait_for_all_requests();
                 console.log("Houndour wave");
                 console.overlay().add_log("Houndour wave", COLOR_WHITE);
-                pbf_move_left_joystick(context, 130, 20, 4 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
+                pbf_move_left_joystick(context, 140, 20, 4 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
                 realign_player(env.program_info(), console, context, PlayerRealignMode::REALIGN_NO_MARKER, 220, 15, 30);
                 pbf_move_left_joystick(context, 128, 20, 5 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
                 pbf_move_left_joystick(context, 128, 20, 6 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
@@ -1823,6 +1829,7 @@ void AutoStory::segment_11(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         env.console.log("overworld_navigation: Go to Los Platos.");
         overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 0, 75);
 
+        env.console.log("clear_dialog: Talk with Nemona at Los Platos. Clear Let's go tutorial. Stop when detect overworld.");
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {ClearDialogCallback::TUTORIAL, ClearDialogCallback::OVERWORLD});
 
         context.wait_for_all_requests();
@@ -1947,14 +1954,14 @@ void AutoStory::segment_13(SingleSwitchProgramEnvironment& env, BotBaseContext& 
             walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 30);
         });
 
-        env.console.log("clear_dialog: Stop when detect battle, with Nemona at Mesagoza gate.");
+        env.console.log("clear_dialog: Talk with Nemona at Mesagoza gate. Stop when detect battle.");
         clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60,
             {ClearDialogCallback::PROMPT_DIALOG, ClearDialogCallback::DIALOG_ARROW, ClearDialogCallback::BATTLE});
         
         env.console.log("run_battle: Battle with Nemona at Mesagoza gate. Stop when detect dialog.");
         run_battle(env.console, context, BattleStopCondition::STOP_DIALOG);
         
-        env.console.log("clear_dialog: Stop when detect overworld, within Mesagoza.");
+        env.console.log("clear_dialog: Talk with Nemona within Mesagoza. Stop when detect overworld.");
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, 
             {ClearDialogCallback::OVERWORLD, ClearDialogCallback::PROMPT_DIALOG, ClearDialogCallback::WHITE_A_BUTTON});
         
@@ -1999,11 +2006,13 @@ void AutoStory::segment_14(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         // walk forward until hit dialog at top of stairs
         walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 60);
         // clear dialog until battle. with prompt, battle
+        env.console.log("clear_dialog: Talk with Team Star at the top of the stairs. Stop when detect battle.");
         clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {ClearDialogCallback::PROMPT_DIALOG, ClearDialogCallback::BATTLE, ClearDialogCallback::DIALOG_ARROW});
         // run battle until dialog
         env.console.log("run_battle: Battle with Team Star grunt 1. Stop when detect dialog.");
         run_battle(env.console, context, BattleStopCondition::STOP_DIALOG);
         // clear dialog until battle, with prompt, white button, tutorial, battle
+        env.console.log("clear_dialog: Talk with Team Star and Nemona. Receive Tera orb. Stop when detect battle.");
         clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, 
             {ClearDialogCallback::PROMPT_DIALOG, ClearDialogCallback::WHITE_A_BUTTON, ClearDialogCallback::TUTORIAL, ClearDialogCallback::BATTLE, ClearDialogCallback::DIALOG_ARROW});
         // run battle until dialog
