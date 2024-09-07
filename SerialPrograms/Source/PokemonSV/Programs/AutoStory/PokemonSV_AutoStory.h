@@ -196,9 +196,9 @@ public:
 
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
-    // test the segments from start to end, inclusive
-    // test each segment "loop" number of times
-    void test_segments(
+    // test the checkpoints from start to end, inclusive
+    // test each checkpoints "loop" number of times
+    void test_checkpoints(
         SingleSwitchProgramEnvironment& env,
         ConsoleHandle& console, 
         BotBaseContext& context,
@@ -217,72 +217,72 @@ public:
     void checkpoint_save(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
     // start: after selecting character name, style and the cutscene has started
-    // end: stood up from chair.
-    void segment_00(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    // end: stood up from chair. Walked to left side of room.
+    void checkpoint_00(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
-    // start: stood up from chair. 
+    // start: stood up from chair. Walked to left side of room.
     // end: standing in room. updated settings
-    void segment_01(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    void checkpoint_01(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
     
     // start: standing in room. updated settings
     // end: standing in front of power of science NPC. Cleared map tutorial.
-    void segment_02(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    void checkpoint_02(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
     // start: standing in front of power of science NPC. Cleared map tutorial.
     // end: received starter, changed move order
-    void segment_03(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    void checkpoint_03(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
     // start: Received starter pokemon and changed move order. Cleared autoheal tutorial.
     // end: Battled Nemona on the beach.
-    void segment_04(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    void checkpoint_04(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
     // start: Battled Nemona on the beach.
     // end: Met mom at gate. Received mom's sandwich.
-    void segment_05(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    void checkpoint_05(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
     // start: Met mom at gate. Received mom's sandwich.
     // end: Cleared catch tutorial.
-    void segment_06(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    void checkpoint_06(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
     // start: Cleared catch tutorial.
     // end: Moved to cliff. Heard mystery cry.
-    void segment_07(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    void checkpoint_07(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
     // start: Moved to cliff. Heard mystery cry.
     // end: Rescued Koraidon/Miraidon and escaped from the Houndoom Cave.
-    void segment_08(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    void checkpoint_08(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
     // start: Rescued Koraidon/Miraidon and escaped from the Houndoom Cave.
     // end: Battled Arven and received Legendary's Pokeball.
-    void segment_09(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    void checkpoint_09(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
     // start: Battled Arven and received Legendary's Pokeball.
     // end: Talked to Nemona at the Lighthouse.
-    void segment_10(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    void checkpoint_10(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
     // start: Talked to Nemona at the Lighthouse.
     // end: Arrived at Los Platos pokecenter. Cleared Let's go tutorial.
-    void segment_11(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    void checkpoint_11(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
     // start: Arrived at Los Platos pokecenter. Cleared Let's go tutorial.
     // end: Arrived at Mesagoza (South) Pokecenter
-    void segment_12(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    void checkpoint_12(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
     // start: Arrived at Mesagoza (South) Pokecenter
     // end: Battled Nemona at Mesagoza gate. Entered Mesagoza.
-    void segment_13(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    void checkpoint_13(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
     // start: Battled Nemona at Mesagoza gate. Entered Mesagoza.
     // end: 
-    void segment_14(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    void checkpoint_14(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
     // start: 
     // end: 
-    void segment_15(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    void checkpoint_15(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
     // start: 
     // end: 
-    void segment_16(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    void checkpoint_16(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
 private:
     virtual void value_changed(void* object) override;
@@ -337,10 +337,11 @@ private:
     
     SectionDividerOption m_advanced_options;
     BooleanCheckBoxOption CHANGE_SETTINGS;    
-    BooleanCheckBoxOption ENABLE_TEST_SEGMENTS;    
-    SimpleIntegerOption<uint16_t> START_SEGMENT;
-    SimpleIntegerOption<uint16_t> END_SEGMENT;
-    SimpleIntegerOption<uint16_t> LOOP_SEGMENTS;
+
+    BooleanCheckBoxOption ENABLE_TEST_CHECKPOINTS;    
+    SimpleIntegerOption<uint16_t> START_CHECKPOINT;
+    SimpleIntegerOption<uint16_t> END_CHECKPOINT;
+    SimpleIntegerOption<uint16_t> LOOP_CHECKPOINT;
 
     BooleanCheckBoxOption ENABLE_TEST_REALIGN;    
     EnumDropdownOption<PlayerRealignMode> REALIGN_MODE;

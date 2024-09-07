@@ -150,23 +150,23 @@ AutoStory::AutoStory()
         LockMode::UNLOCK_WHILE_RUNNING,
         true
     )  
-    , ENABLE_TEST_SEGMENTS(
-        "<b>TEST: test_segments():</b>",
+    , ENABLE_TEST_CHECKPOINTS(
+        "<b>TEST: test_checkpoints():</b>",
         LockMode::UNLOCK_WHILE_RUNNING,
         false
     )   
-    , START_SEGMENT(
-        "--Start segment:<br>Start testing with this segment number.",
+    , START_CHECKPOINT(
+        "--Start checkpoint:<br>Start testing with this checkpoint number.",
         LockMode::UNLOCK_WHILE_RUNNING,
         0
     )    
-    , END_SEGMENT(
-        "--End segment:<br>Stop testing when done this segment number.",
+    , END_CHECKPOINT(
+        "--End checkpoint:<br>Stop testing when done this checkpoint number.",
         LockMode::UNLOCK_WHILE_RUNNING,
         11
     )     
-    , LOOP_SEGMENTS(
-        "--Loop segments:<br>Loop each test segment this number of times.",
+    , LOOP_CHECKPOINT(
+        "--Loop checkpoints:<br>Loop each test checkpoint this number of times.",
         LockMode::UNLOCK_WHILE_RUNNING,
         1
     )
@@ -248,10 +248,10 @@ AutoStory::AutoStory()
     if (PreloadSettings::instance().DEVELOPER_MODE){
         PA_ADD_OPTION(m_advanced_options);
         PA_ADD_OPTION(CHANGE_SETTINGS);
-        PA_ADD_OPTION(ENABLE_TEST_SEGMENTS);
-        PA_ADD_OPTION(START_SEGMENT);
-        PA_ADD_OPTION(END_SEGMENT);
-        PA_ADD_OPTION(LOOP_SEGMENTS);
+        PA_ADD_OPTION(ENABLE_TEST_CHECKPOINTS);
+        PA_ADD_OPTION(START_CHECKPOINT);
+        PA_ADD_OPTION(END_CHECKPOINT);
+        PA_ADD_OPTION(LOOP_CHECKPOINT);
 
         PA_ADD_OPTION(ENABLE_TEST_REALIGN);
         PA_ADD_OPTION(REALIGN_MODE);
@@ -273,7 +273,7 @@ AutoStory::AutoStory()
 
     STARTPOINT.add_listener(*this);
     ENDPOINT.add_listener(*this);
-    ENABLE_TEST_SEGMENTS.add_listener(*this);
+    ENABLE_TEST_CHECKPOINTS.add_listener(*this);
     ENABLE_TEST_REALIGN.add_listener(*this);
     ENABLE_TEST_OVERWORLD_MOVE.add_listener(*this);
     TEST_PBF_LEFT_JOYSTICK.add_listener(*this);
@@ -288,14 +288,14 @@ void AutoStory::value_changed(void* object){
     START_DESCRIPTION.set_text(start_segment_description());
     END_DESCRIPTION.set_text(end_segment_description());
 
-    if (ENABLE_TEST_SEGMENTS){
-        START_SEGMENT.set_visibility(ConfigOptionState::ENABLED);
-        END_SEGMENT.set_visibility(ConfigOptionState::ENABLED);
-        LOOP_SEGMENTS.set_visibility(ConfigOptionState::ENABLED);
+    if (ENABLE_TEST_CHECKPOINTS){
+        START_CHECKPOINT.set_visibility(ConfigOptionState::ENABLED);
+        END_CHECKPOINT.set_visibility(ConfigOptionState::ENABLED);
+        LOOP_CHECKPOINT.set_visibility(ConfigOptionState::ENABLED);
     }else{
-        START_SEGMENT.set_visibility(ConfigOptionState::DISABLED);
-        END_SEGMENT.set_visibility(ConfigOptionState::DISABLED);
-        LOOP_SEGMENTS.set_visibility(ConfigOptionState::DISABLED);
+        START_CHECKPOINT.set_visibility(ConfigOptionState::DISABLED);
+        END_CHECKPOINT.set_visibility(ConfigOptionState::DISABLED);
+        LOOP_CHECKPOINT.set_visibility(ConfigOptionState::DISABLED);
     }
 
     if (ENABLE_TEST_REALIGN){
@@ -336,19 +336,19 @@ std::string AutoStory::start_segment_description(){
     case StartPoint::INTRO_CUTSCENE:
         return "Start: Intro cutscene.";
     case StartPoint::PICK_STARTER:
-        return "Start: Finished cutscene. Adjusted settings. Standing in room.";
+        return "Start: Finished cutscene. Adjusted settings. Standing in left side of room.";
     case StartPoint::NEMONA_FIRST_BATTLE:
         return "Start: Picked the starter.";
     case StartPoint::CATCH_TUTORIAL:
         return "Start: Battled Nemona on the beach.";
     case StartPoint::LEGENDARY_RESCUE:
-        return "Start: Finished catch tutorial. Walked to the cliff.";
+        return "Start: Finished catch tutorial. Walked to the cliff and heard mystery cry.";
     case StartPoint::ARVEN_FIRST_BATTLE:
         return "Start: Saved the Legendary. Escaped from the Houndoom cave.";
     case StartPoint::LOS_PLATOS:
         return "Start: Battled Arven, received Legendary's Pokeball. Talked to Nemona at Lighthouse.";
     case StartPoint::MESAGOZA_SOUTH:
-        return "Start: Reached Pokecenter at Los Platos.";
+        return "Start: At Los Platos Pokecenter.";
     default:
         return "";        
     }
@@ -357,19 +357,19 @@ std::string AutoStory::start_segment_description(){
 std::string AutoStory::end_segment_description(){
     switch(ENDPOINT){
     case EndPoint::INTRO_CUTSCENE:
-        return "End: Finished cutscene. Adjusted settings. Standing in room.";
+        return "End: Finished cutscene. Adjusted settings. Standing in left side of room.";
     case EndPoint::PICK_STARTER:
         return "End: Picked the starter.";
     case EndPoint::NEMONA_FIRST_BATTLE:
         return "End: Battled Nemona on the beach.";
     case EndPoint::CATCH_TUTORIAL:
-        return "End: Finished catch tutorial. Walked to the cliff.";
+        return "End: Finished catch tutorial. Walked to the cliff and heard mystery cry.";
     case EndPoint::LEGENDARY_RESCUE:
         return "End: Saved the Legendary. Escaped from the Houndoom cave.";
     case EndPoint::ARVEN_FIRST_BATTLE:
         return "End: Battled Arven, received Legendary's Pokeball. Talked to Nemona at Lighthouse.";
     case EndPoint::LOS_PLATOS:
-        return "End: Reached Pokecenter at Los Platos.";
+        return "End: At Los Platos Pokecenter.";
     case EndPoint::MESAGOZA_SOUTH:
         return "End: ";
     default:
@@ -1156,52 +1156,52 @@ void AutoStory::checkpoint_save(SingleSwitchProgramEnvironment& env, BotBaseCont
     send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE, "Saved at checkpoint.");        
 }
 
-void AutoStory::test_segments(
+void AutoStory::test_checkpoints(
     SingleSwitchProgramEnvironment& env,
     ConsoleHandle& console, 
     BotBaseContext& context,
     int start, int end, int loop
 ){
 
-    std::vector<std::function<void()>> segment_list;
-    segment_list.push_back([&](){segment_00(env, context);});
-    segment_list.push_back([&](){segment_01(env, context);});
-    segment_list.push_back([&](){segment_02(env, context);});
-    segment_list.push_back([&](){segment_03(env, context);});
-    segment_list.push_back([&](){segment_04(env, context);});
-    segment_list.push_back([&](){segment_05(env, context);});
-    segment_list.push_back([&](){segment_06(env, context);});
-    segment_list.push_back([&](){segment_07(env, context);});
-    segment_list.push_back([&](){segment_08(env, context);});
-    segment_list.push_back([&](){segment_09(env, context);});
-    segment_list.push_back([&](){segment_10(env, context);});
-    segment_list.push_back([&](){segment_11(env, context);});
-    segment_list.push_back([&](){segment_12(env, context);});
-    segment_list.push_back([&](){segment_13(env, context);});
-    segment_list.push_back([&](){segment_14(env, context);});
-    segment_list.push_back([&](){segment_15(env, context);});
-    segment_list.push_back([&](){segment_16(env, context);});
+    std::vector<std::function<void()>> checkpoint_list;
+    checkpoint_list.push_back([&](){checkpoint_00(env, context);});
+    checkpoint_list.push_back([&](){checkpoint_01(env, context);});
+    checkpoint_list.push_back([&](){checkpoint_02(env, context);});
+    checkpoint_list.push_back([&](){checkpoint_03(env, context);});
+    checkpoint_list.push_back([&](){checkpoint_04(env, context);});
+    checkpoint_list.push_back([&](){checkpoint_05(env, context);});
+    checkpoint_list.push_back([&](){checkpoint_06(env, context);});
+    checkpoint_list.push_back([&](){checkpoint_07(env, context);});
+    checkpoint_list.push_back([&](){checkpoint_08(env, context);});
+    checkpoint_list.push_back([&](){checkpoint_09(env, context);});
+    checkpoint_list.push_back([&](){checkpoint_10(env, context);});
+    checkpoint_list.push_back([&](){checkpoint_11(env, context);});
+    checkpoint_list.push_back([&](){checkpoint_12(env, context);});
+    checkpoint_list.push_back([&](){checkpoint_13(env, context);});
+    checkpoint_list.push_back([&](){checkpoint_14(env, context);});
+    checkpoint_list.push_back([&](){checkpoint_15(env, context);});
+    checkpoint_list.push_back([&](){checkpoint_16(env, context);});
 
-    for (int segment = start; segment <= end; segment++){
-        if (segment == 0){
-            console.log("segment_0");
-            segment_list[segment]();
+    for (int checkpoint = start; checkpoint <= end; checkpoint++){
+        if (checkpoint == 0){
+            console.log("checkpoint_0");
+            checkpoint_list[checkpoint]();
             continue;
         }
         
-        std::string leading_zero = segment < 10 ? "0" : "";
+        std::string leading_zero = checkpoint < 10 ? "0" : "";
         for (int i = 0; i < loop; i++){
             if (i > 0){
                 reset_game(env.program_info(), console, context);
             }
-            console.log("segment_" + leading_zero + std::to_string(segment) + ": loop " + std::to_string(i));
-            segment_list[segment]();
+            console.log("checkpoint_" + leading_zero + std::to_string(checkpoint) + ": loop " + std::to_string(i));
+            checkpoint_list[checkpoint]();
         }        
     }
     
 }
 
-void AutoStory::segment_00(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void AutoStory::checkpoint_00(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
 
 
     // Mash A through intro cutscene, until the L stick button is detected
@@ -1221,7 +1221,7 @@ void AutoStory::segment_00(SingleSwitchProgramEnvironment& env, BotBaseContext& 
 
 }
 
-void AutoStory::segment_01(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void AutoStory::checkpoint_01(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
 AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     bool has_saved_game = false;
     bool first_attempt = true;
@@ -1254,7 +1254,7 @@ AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Sta
     }
 }
 
-void AutoStory::segment_02(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void AutoStory::checkpoint_02(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     bool has_saved_game = false;
     while (true){
@@ -1347,7 +1347,7 @@ void AutoStory::segment_02(SingleSwitchProgramEnvironment& env, BotBaseContext& 
     }
 }
 
-void AutoStory::segment_03(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void AutoStory::checkpoint_03(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     bool has_saved_game = false;
     while (true){   
@@ -1434,7 +1434,7 @@ void AutoStory::segment_03(SingleSwitchProgramEnvironment& env, BotBaseContext& 
 
 }
 
-void AutoStory::segment_04(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void AutoStory::checkpoint_04(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     bool has_saved_game = false;
     while (true){
@@ -1480,7 +1480,7 @@ void AutoStory::segment_04(SingleSwitchProgramEnvironment& env, BotBaseContext& 
 
 }
 
-void AutoStory::segment_05(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void AutoStory::checkpoint_05(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     bool has_saved_game = false;
     while (true){
@@ -1513,7 +1513,7 @@ void AutoStory::segment_05(SingleSwitchProgramEnvironment& env, BotBaseContext& 
     }    
 }
 
-void AutoStory::segment_06(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void AutoStory::checkpoint_06(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     bool has_saved_game = false;
     while (true){
@@ -1560,7 +1560,7 @@ void AutoStory::segment_06(SingleSwitchProgramEnvironment& env, BotBaseContext& 
     }
 }
 
-void AutoStory::segment_07(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void AutoStory::checkpoint_07(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     bool has_saved_game = false;
     while (true){
@@ -1597,7 +1597,7 @@ void AutoStory::segment_07(SingleSwitchProgramEnvironment& env, BotBaseContext& 
     }
 }
 
-void AutoStory::segment_08(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void AutoStory::checkpoint_08(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     bool has_saved_game = false;
     while (true){
@@ -1728,7 +1728,7 @@ void AutoStory::segment_08(SingleSwitchProgramEnvironment& env, BotBaseContext& 
 }
 
 
-void AutoStory::segment_09(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void AutoStory::checkpoint_09(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     bool has_saved_game = false;
     while (true){
@@ -1764,7 +1764,7 @@ void AutoStory::segment_09(SingleSwitchProgramEnvironment& env, BotBaseContext& 
     }
 }
 
-void AutoStory::segment_10(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void AutoStory::checkpoint_10(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     bool has_saved_game = false;
     while (true){
@@ -1804,7 +1804,7 @@ void AutoStory::segment_10(SingleSwitchProgramEnvironment& env, BotBaseContext& 
     }
 }
 
-void AutoStory::segment_11(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void AutoStory::checkpoint_11(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     bool has_saved_game = false;
     while (true){
@@ -1851,7 +1851,7 @@ void AutoStory::segment_11(SingleSwitchProgramEnvironment& env, BotBaseContext& 
 }
 
 
-void AutoStory::segment_12(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void AutoStory::checkpoint_12(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     // reset rate: ~25%. 12 resets out of 52. 
     // resets due to: getting attacked by wild pokemon, either from behind, 
     // or when lead pokemon not strong enough to clear them with Let's go
@@ -1926,7 +1926,7 @@ void AutoStory::segment_12(SingleSwitchProgramEnvironment& env, BotBaseContext& 
 
 }
 
-void AutoStory::segment_13(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void AutoStory::checkpoint_13(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     // reset rate: 0%. 0 resets out of 70.
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     bool has_saved_game = false;
@@ -1979,14 +1979,14 @@ void AutoStory::segment_13(SingleSwitchProgramEnvironment& env, BotBaseContext& 
 
 }
 
-void AutoStory::segment_14(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void AutoStory::checkpoint_14(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     bool has_saved_game = false;
     while (true){
     try{
         if (!has_saved_game){
-            // checkpoint_save(env, context);
-            // has_saved_game = true;
+            checkpoint_save(env, context);
+            has_saved_game = true;
         }         
         context.wait_for_all_requests();
         // realign diagonally to the left
@@ -2034,7 +2034,7 @@ void AutoStory::segment_14(SingleSwitchProgramEnvironment& env, BotBaseContext& 
 
 }
 
-void AutoStory::segment_15(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void AutoStory::checkpoint_15(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     bool has_saved_game = false;
     while (true){
@@ -2058,7 +2058,7 @@ void AutoStory::segment_15(SingleSwitchProgramEnvironment& env, BotBaseContext& 
 
 }
 
-void AutoStory::segment_16(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void AutoStory::checkpoint_16(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     bool has_saved_game = false;
     while (true){
@@ -2090,7 +2090,7 @@ void AutoStory::run_autostory(SingleSwitchProgramEnvironment& env, BotBaseContex
         env.console.log("Start Segment 00: Intro Cutscene", COLOR_ORANGE);
         env.console.overlay().add_log("Start Segment 00: Intro Cutscene", COLOR_ORANGE);
 
-        segment_00(env, context);
+        checkpoint_00(env, context);
 
         context.wait_for_all_requests();
         env.console.log("End Segment 00: Intro Cutscene", COLOR_GREEN);
@@ -2103,8 +2103,9 @@ void AutoStory::run_autostory(SingleSwitchProgramEnvironment& env, BotBaseContex
         env.console.log("Start Segment 01: Pick Starter", COLOR_ORANGE);
         env.console.overlay().add_log("Start Segment 01: Pick Starter", COLOR_ORANGE);
 
-        segment_01(env, context);
-        segment_02(env, context);
+        checkpoint_01(env, context);
+        checkpoint_02(env, context);
+        checkpoint_03(env, context);
 
         context.wait_for_all_requests();
         env.console.log("End Segment 02: Pick Starter", COLOR_GREEN);
@@ -2120,7 +2121,7 @@ void AutoStory::run_autostory(SingleSwitchProgramEnvironment& env, BotBaseContex
         env.console.log("Start Segment 02: First Nemona Battle", COLOR_ORANGE);
         env.console.overlay().add_log("Start Segment 02: First Nemona Battle", COLOR_ORANGE);
 
-        segment_03(env, context);
+        checkpoint_04(env, context);
 
         context.wait_for_all_requests();
         env.console.log("End Segment 02: First Nemona Battle", COLOR_GREEN);
@@ -2136,9 +2137,9 @@ void AutoStory::run_autostory(SingleSwitchProgramEnvironment& env, BotBaseContex
         env.console.log("Start Segment 03: Catch Tutorial", COLOR_ORANGE);
         env.console.overlay().add_log("Start Segment 03: Catch Tutorial", COLOR_ORANGE);
 
-        segment_04(env, context);
-        segment_05(env, context);
-        segment_06(env, context);
+        checkpoint_05(env, context);
+        checkpoint_06(env, context);
+        checkpoint_07(env, context);
 
         context.wait_for_all_requests();
         env.console.log("End Segment 03: Catch Tutorial", COLOR_GREEN);
@@ -2154,7 +2155,7 @@ void AutoStory::run_autostory(SingleSwitchProgramEnvironment& env, BotBaseContex
         env.console.log("Start Segment 04: Rescue Legendary", COLOR_ORANGE);
         env.console.overlay().add_log("Start Segment 04: Rescue Legendary", COLOR_ORANGE);
 
-        segment_07(env, context);
+        checkpoint_08(env, context);
 
         context.wait_for_all_requests();
         env.console.log("End Segment 04: Rescue Legendary", COLOR_GREEN);
@@ -2170,8 +2171,8 @@ void AutoStory::run_autostory(SingleSwitchProgramEnvironment& env, BotBaseContex
         env.console.log("Start Segment 05: First Arven Battle", COLOR_ORANGE);
         env.console.overlay().add_log("Start Segment 05: First Arven Battle", COLOR_ORANGE);
 
-        segment_08(env, context);
-        segment_09(env, context);
+        checkpoint_09(env, context);
+        checkpoint_10(env, context);
 
         context.wait_for_all_requests();
         env.console.log("End Segment 05: First Arven Battle", COLOR_GREEN);
@@ -2187,7 +2188,7 @@ void AutoStory::run_autostory(SingleSwitchProgramEnvironment& env, BotBaseContex
         env.console.log("Start Segment 06: Go to Los Platos", COLOR_ORANGE);
         env.console.overlay().add_log("Start Segment 06: Go to Los Platos", COLOR_ORANGE);
 
-        segment_10(env, context);
+        checkpoint_11(env, context);
 
         context.wait_for_all_requests();
         env.console.log("End Segment 06: Go to Los Platos", COLOR_GREEN);
@@ -2257,9 +2258,9 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
         change_settings_prior_to_autostory(env, context);
     }
 
-    if (ENABLE_TEST_SEGMENTS){
-        // test individual segments/checkpoints
-        test_segments(env, env.console, context, START_SEGMENT, END_SEGMENT, LOOP_SEGMENTS);
+    if (ENABLE_TEST_CHECKPOINTS){
+        // test individual checkpoints
+        test_checkpoints(env, env.console, context, START_CHECKPOINT, END_CHECKPOINT, LOOP_CHECKPOINT);
     }else{
         run_autostory(env, context);
     }
