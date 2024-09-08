@@ -35,7 +35,7 @@ public:
 
     // change all settings as per options
     void set_options(
-        std::vector<std::pair<MenuOptionItemEnum, std::vector<MenuOptionToggleEnum>>> options) const;
+        const std::vector<std::pair<MenuOptionItemEnum, std::vector<MenuOptionToggleEnum>>>& options) const;
 
 private:
 

@@ -47,7 +47,7 @@ MenuOption::MenuOption(
 }
 
 void MenuOption::set_options(
-    std::vector<std::pair<MenuOptionItemEnum, std::vector<MenuOptionToggleEnum>>> options
+    const std::vector<std::pair<MenuOptionItemEnum, std::vector<MenuOptionToggleEnum>>>& options
 ) const{
     for (std::pair<MenuOptionItemEnum, std::vector<MenuOptionToggleEnum>> option : options){
         move_to_option(option.first);
@@ -179,7 +179,7 @@ void MenuOption::move_to_option(const MenuOptionItemEnum target_option_enum) con
     std::string current_option_slug = read_option_item();
     MenuOptionItem current_option = menu_option_item_lookup_by_slug(current_option_slug);
 
-    MenuOptionItem target_option = menu_option_item_lookup_by_enum(target_option_enum);
+    const MenuOptionItem& target_option = menu_option_item_lookup_by_enum(target_option_enum);
     std::string target_option_slug = target_option.slug;
     int diff = target_option.index - current_option.index;
     // cout << "target_option diff: " << std::to_string(target_option.index) << endl;
