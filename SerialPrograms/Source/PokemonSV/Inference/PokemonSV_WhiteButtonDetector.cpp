@@ -32,6 +32,8 @@ const char* white_button_template_path(WhiteButton type){
     switch (type){
     case WhiteButton::ButtonA:
         return "PokemonSV/Buttons/WhiteButtonA.png";
+    case WhiteButton::ButtonA_DarkBackground:
+        return "PokemonSV/Buttons/WhiteButtonA-dark.png";        
     case WhiteButton::ButtonB:
         return "PokemonSV/Buttons/WhiteButtonB.png";
     case WhiteButton::ButtonX:
@@ -44,6 +46,8 @@ const char* white_button_template_path(WhiteButton type){
         return "PokemonSV/Buttons/ArrowLeft.png";
     case WhiteButton::ButtonRight:
         return "PokemonSV/Buttons/ArrowRight.png";
+    case WhiteButton::ButtonLStick:
+        return "PokemonSV/Buttons/LStick.png";
     default:
         return "";
     }
@@ -53,6 +57,8 @@ const WhiteButtonMatcher& get_button_matcher(WhiteButton type){
     switch (type){
     case WhiteButton::ButtonA:
         return WhiteButtonMatcher::A();
+    case WhiteButton::ButtonA_DarkBackground:
+        return WhiteButtonMatcher::A_DarkBackground();        
     case WhiteButton::ButtonB:
         return WhiteButtonMatcher::B();
     case WhiteButton::ButtonX:
@@ -65,6 +71,8 @@ const WhiteButtonMatcher& get_button_matcher(WhiteButton type){
         return WhiteButtonMatcher::ArrowLeft();
     case WhiteButton::ButtonRight:
         return WhiteButtonMatcher::ArrowRight();
+    case WhiteButton::ButtonLStick:
+        return WhiteButtonMatcher::LStick();
     default:
         throw std::runtime_error("No corresponding ButtonMatcher for WhiteButton");
     }
@@ -83,6 +91,10 @@ WhiteButtonMatcher::WhiteButtonMatcher(WhiteButton type, size_t min_width, size_
 {}
 const WhiteButtonMatcher& WhiteButtonMatcher::A(){
     static WhiteButtonMatcher matcher(WhiteButton::ButtonA, 15, 15, 100);
+    return matcher;
+}
+const WhiteButtonMatcher& WhiteButtonMatcher::A_DarkBackground(){
+    static WhiteButtonMatcher matcher(WhiteButton::ButtonA_DarkBackground, 15, 15, 100);
     return matcher;
 }
 const WhiteButtonMatcher& WhiteButtonMatcher::B(){
@@ -109,6 +121,11 @@ const WhiteButtonMatcher& WhiteButtonMatcher::ArrowRight(){
     static WhiteButtonMatcher matcher(WhiteButton::ButtonRight, 15, 15, 90);
     return matcher;
 }
+const WhiteButtonMatcher& WhiteButtonMatcher::LStick(){
+    static WhiteButtonMatcher matcher(WhiteButton::ButtonLStick, 15, 15, 90);
+    return matcher;
+}
+
 
 
 

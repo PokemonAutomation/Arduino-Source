@@ -27,12 +27,14 @@ namespace PokemonSV{
 
 enum class WhiteButton{
     ButtonA,
+    ButtonA_DarkBackground,
     ButtonB,
     ButtonX,
     ButtonY,
     ButtonMinus,
     ButtonLeft,
     ButtonRight,
+    ButtonLStick,
 };
 
 
@@ -40,12 +42,14 @@ class WhiteButtonMatcher : public ImageMatch::WaterfillTemplateMatcher{
 public:
     WhiteButtonMatcher(WhiteButton type, size_t min_width, size_t max_width, double max_rmsd);
     static const WhiteButtonMatcher& A();
+    static const WhiteButtonMatcher& A_DarkBackground();
     static const WhiteButtonMatcher& B();
     static const WhiteButtonMatcher& X();
     static const WhiteButtonMatcher& Y();
     static const WhiteButtonMatcher& Minus();
     static const WhiteButtonMatcher& ArrowLeft();
     static const WhiteButtonMatcher& ArrowRight();
+    static const WhiteButtonMatcher& LStick();
 
     virtual bool check_image(const ImageViewRGB32& image) const override{
         return image.width() >= m_min_width && image.height() >= m_min_height;
