@@ -73,22 +73,6 @@ void MenuOption::set_target_option(const std::vector<MenuOptionToggleEnum>& targ
         "MenuOption::set_target_option(): Unable to set option to the correct toggle."
     );
 
-    for (size_t attempt = 0; attempt < 10; attempt++){
-        std::string current_option_slug = read_option_toggle();
-        MenuOptionToggleEnum current_option_toggle_enum = menu_option_toggle_lookup_by_slug(current_option_slug).enum_value;
-        
-        if (std::find(target_option_toggle_list.begin(), target_option_toggle_list.end(), current_option_toggle_enum) != target_option_toggle_list.end()){
-            return;
-        }
-
-        pbf_press_dpad(m_context, DPAD_RIGHT, 10, 50);
-    }
-
-    throw OperationFailedException(
-        ErrorReport::SEND_ERROR_REPORT, m_console,
-        "MenuOption::set_target_option(): Unable to set option to the correct toggle."
-    );
-
 }
 
 int8_t MenuOption::get_selected_index(const ImageViewRGB32& screen) const {
@@ -153,7 +137,6 @@ std::string MenuOption::read_option(const ImageViewRGB32& cropped) const{
             "MenuOption::read_option(): Unable to read item. Ambiguous or multiple results."
         );
     }
-    // cout << "selected index:" + std::to_string(selected_index) << endl;
 
     return results.begin()->second.token;
 }
