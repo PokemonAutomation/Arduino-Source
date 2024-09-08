@@ -526,7 +526,7 @@ void clear_dialog(ConsoleHandle& console, BotBaseContext& context,
         AdvanceDialogWatcher    advance_dialog(COLOR_RED);
         OverworldWatcher    overworld(COLOR_CYAN);
         PromptDialogWatcher prompt(COLOR_YELLOW);
-        WhiteButtonWatcher  whitebutton(COLOR_GREEN, WhiteButton::ButtonA2, {0.725, 0.833, 0.024, 0.045}); // {0.650, 0.650, 0.140, 0.240}
+        WhiteButtonWatcher  whitebutton(COLOR_GREEN, WhiteButton::ButtonA_DarkBackground, {0.725, 0.833, 0.024, 0.045}); // {0.650, 0.650, 0.140, 0.240}
         DialogArrowWatcher dialog_arrow(COLOR_RED, console.overlay(), {0.850, 0.820, 0.020, 0.050}, 0.8365, 0.846);
         NormalBattleMenuWatcher battle(COLOR_ORANGE);
         TutorialWatcher     tutorial(COLOR_BLUE);
