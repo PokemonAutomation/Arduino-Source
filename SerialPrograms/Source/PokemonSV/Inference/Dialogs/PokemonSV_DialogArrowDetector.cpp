@@ -6,6 +6,8 @@
 
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
+#include "CommonFramework/ImageMatch/WaterfillTemplateMatcher.h"
+#include "CommonFramework/ImageTools/WaterfillUtilities.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTypes/BinaryImage.h"
@@ -14,9 +16,9 @@
 #include "CommonFramework/ImageMatch/ExactImageMatcher.h"
 #include "PokemonSV_DialogArrowDetector.h"
 
-//#include <iostream>
-//using std::cout;
-//using std::endl;
+// #include <iostream>
+// using std::cout;
+// using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -25,7 +27,25 @@ namespace PokemonSV{
 using namespace Kernels;
 using namespace Kernels::Waterfill;
 
+class DialogArrowMatcher : public ImageMatch::WaterfillTemplateMatcher{
+public:
+    
+    DialogArrowMatcher() : WaterfillTemplateMatcher(
+        // "PokemonSV/DialogArrow-White-BlackBackground.png", Color(140, 140, 140), Color(255, 255, 255), 50
+        "PokemonSV/DialogArrow-White-NoBackground.png", Color(140, 140, 140), Color(255, 255, 255), 50
+    ){
+        m_aspect_ratio_lower = 0.8;
+        m_aspect_ratio_upper = 1.2;
+        m_area_ratio_lower = 0.8;
+        m_area_ratio_upper = 1.3;
 
+    }
+
+    static const ImageMatch::WaterfillTemplateMatcher& instance(){
+        static DialogArrowMatcher matcher;
+        return matcher;
+    }
+};
 
 const ImageMatch::ExactImageMatcher& DIALOG_ARROW_BLACK(){
     static ImageMatch::ExactImageMatcher matcher(RESOURCE_PATH() + "PokemonSV/DialogArrow-Black.png");
@@ -105,25 +125,102 @@ std::vector<ImageFloatBox> DialogArrowDetector::detect_all(const ImageViewRGB32&
 }
 
 
+std::pair<double, double> DialogArrowDetector::locate_dialog_arrow(const ImageViewRGB32& screen) const{
+    const std::vector<std::pair<uint32_t, uint32_t>> filters = {
+        {combine_rgb(200, 200, 200), combine_rgb(255, 255, 255)},
+
+    };
+
+    ImageViewRGB32 cropped = extract_box_reference(screen, m_box);
+    // ImageRGB32 binaryImage = cropped.copy();
+    // PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(cropped, 0xffC8C8C8, 0xffffffff);
+    // filter_by_mask(matrix, binaryImage, Color(COLOR_BLACK), true);
+
+    const double min_object_size = 50.0;
+    const double rmsd_threshold = 80.0;
+
+    const double screen_rel_size = (screen.height() / 1080.0);
+    const size_t min_size = size_t(screen_rel_size * screen_rel_size * min_object_size);
+
+    std::pair<double, double> arrow_location(-1.0, -1.0);
+
+    ImagePixelBox pixel_search_area = floatbox_to_pixelbox(screen.width(), screen.height(), m_box);
+    match_template_by_waterfill(
+        cropped, 
+        DialogArrowMatcher::instance(),
+        filters,
+        {min_size, SIZE_MAX},
+        rmsd_threshold,
+        [&](Kernels::Waterfill::WaterfillObject& object) -> bool {
+            
+            arrow_location = std::make_pair(
+                (object.center_of_gravity_x() + pixel_search_area.min_x) / (double)screen.width(),
+                (object.center_of_gravity_y() + pixel_search_area.min_y) / (double)screen.height()
+            );
+
+            return true;
+        }
+    );
+
+    // std::cout << "north location: " << std::to_string(north_location.first) << ", " << std::to_string(north_location.second) << std::endl;
+
+    return arrow_location;
+}
+
+
 
 DialogArrowWatcher::~DialogArrowWatcher() = default;
-DialogArrowWatcher::DialogArrowWatcher(Color color, VideoOverlay& overlay, const ImageFloatBox& box)
+DialogArrowWatcher::DialogArrowWatcher(Color color, VideoOverlay& overlay, const ImageFloatBox& box, const double top_line, const double bottom_line)
     : VisualInferenceCallback("GradientArrowFinder")
     , m_overlay(overlay)
     , m_detector(color, box)
+    , m_top_line(top_line)
+    , m_bottom_line(bottom_line)
+    , m_num_oscillation_above_top_line(0)
+    , m_num_oscillation_below_bottom_line(0)
 {}
 
 void DialogArrowWatcher::make_overlays(VideoOverlaySet& items) const{
     m_detector.make_overlays(items);
 }
+
+// - return true if detects the arrow for 5 up and down oscillations
+// - every time the arrow is above top_line, increment m_num_oscillation_above_top_line. 
+// - likewise for m_num_oscillation_below_bottom_line
+// - we alternate between looking for the arrow being above top_line vs below bottom_line
+// - reset counts whenever the dialog arrow is not detected
 bool DialogArrowWatcher::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
-    std::vector<ImageFloatBox> arrows = m_detector.detect_all(frame);
-//    cout << "arrors = " << arrows.size() << endl;
-    m_arrows.reset(arrows.size());
-    for (const ImageFloatBox& arrow : arrows){
-        m_arrows.emplace_back(m_overlay, arrow, COLOR_MAGENTA);
+    std::pair<double, double> arrow_location = m_detector.locate_dialog_arrow(frame);
+    double y_location = arrow_location.second;
+    // cout << std::to_string(y_location) << endl;
+
+    if (y_location < 0){ // dialog arrow not detected
+        // reset oscillation counts
+        m_num_oscillation_above_top_line = 0;
+        m_num_oscillation_below_bottom_line = 0;
+        return false;
     }
-    return !arrows.empty();
+
+    if (m_num_oscillation_above_top_line >= 5 && m_num_oscillation_below_bottom_line >= 5){
+        // we have had 5 oscillations above and below the top and bottom line respectively
+        return true;
+    }
+
+    if (m_num_oscillation_above_top_line < m_num_oscillation_below_bottom_line){
+        // watch for the arrow above the top_line
+        if (y_location < m_top_line){ // remember that 0,0 is the top left corner. so being above a line, means less-than
+            // cout << "above top line." << endl;
+            m_num_oscillation_above_top_line++;
+        }
+    }else{
+        // watch for the arrow below the bottom_line
+        if (y_location > m_bottom_line){
+            // cout << "below bottom line." << endl;
+            m_num_oscillation_below_bottom_line++;
+        }        
+    }
+
+    return false;
 }
 
 

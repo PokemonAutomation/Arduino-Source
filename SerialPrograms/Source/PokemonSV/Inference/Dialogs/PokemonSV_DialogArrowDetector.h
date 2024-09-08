@@ -14,6 +14,7 @@
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 #include "CommonFramework/Inference/VisualDetector.h"
+#include "CommonFramework/Tools/ConsoleHandle.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -29,6 +30,8 @@ public:
 
     std::vector<ImageFloatBox> detect_all(const ImageViewRGB32& screen) const;
 
+    std::pair<double, double> locate_dialog_arrow(const ImageViewRGB32& screen) const;
+
 protected:
     Color m_color;
     ImageFloatBox m_box;
@@ -39,7 +42,7 @@ protected:
 class DialogArrowWatcher : public VisualInferenceCallback{
 public:
     ~DialogArrowWatcher();
-    DialogArrowWatcher(Color color, VideoOverlay& overlay, const ImageFloatBox& box);
+    DialogArrowWatcher(Color color, VideoOverlay& overlay, const ImageFloatBox& box, const double top_line, const double bottom_line);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
@@ -48,7 +51,12 @@ public:
 protected:
     VideoOverlay& m_overlay;
     DialogArrowDetector m_detector;
-    FixedLimitVector<OverlayBoxScope> m_arrows;
+    double m_top_line;
+    double m_bottom_line;
+    uint16_t m_num_oscillation_above_top_line;
+    uint16_t m_num_oscillation_below_bottom_line;
+    // FixedLimitVector<OverlayBoxScope> m_arrows;
+
 };
 
 
