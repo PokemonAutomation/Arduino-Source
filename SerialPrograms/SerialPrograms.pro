@@ -674,6 +674,7 @@ SOURCES += \
     Source/PokemonSV/Inference/PokemonSV_ClothingTopDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_ESPEmotionDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_MainMenuDetector.cpp \
+    Source/PokemonSV/Inference/PokemonSV_MenuOptionReader.cpp \
     Source/PokemonSV/Inference/PokemonSV_MoneyReader.cpp \
     Source/PokemonSV/Inference/PokemonSV_PokemonMovesReader.cpp \
     Source/PokemonSV/Inference/PokemonSV_PokePortalDetector.cpp \
@@ -710,6 +711,8 @@ SOURCES += \
     Source/PokemonSV/Options/PokemonSV_TournamentPrizeTable.cpp \
     Source/PokemonSV/PokemonSV_Panels.cpp \
     Source/PokemonSV/PokemonSV_Settings.cpp \
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_MenuOption.cpp \
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_MenuOptionDatabase.cpp \
     Source/PokemonSV/Programs/Battles/PokemonSV_BasicCatcher.cpp \
     Source/PokemonSV/Programs/Battles/PokemonSV_Battles.cpp \
     Source/PokemonSV/Programs/Battles/PokemonSV_SinglesBattler.cpp \
@@ -1752,6 +1755,7 @@ HEADERS += \
     Source/PokemonSV/Inference/PokemonSV_ClothingTopDetector.h \
     Source/PokemonSV/Inference/PokemonSV_ESPEmotionDetector.h \
     Source/PokemonSV/Inference/PokemonSV_MainMenuDetector.h \
+    Source/PokemonSV/Inference/PokemonSV_MenuOptionReader.h \    
     Source/PokemonSV/Inference/PokemonSV_MoneyReader.h \
     Source/PokemonSV/Inference/PokemonSV_PokemonMovesReader.h \
     Source/PokemonSV/Inference/PokemonSV_PokePortalDetector.h \
@@ -1790,6 +1794,8 @@ HEADERS += \
     Source/PokemonSV/Options/PokemonSV_TournamentPrizeTable.h \
     Source/PokemonSV/PokemonSV_Panels.h \
     Source/PokemonSV/PokemonSV_Settings.h \
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_MenuOption.h \
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_MenuOptionDatabase.h \
     Source/PokemonSV/Programs/Battles/PokemonSV_BasicCatcher.h \
     Source/PokemonSV/Programs/Battles/PokemonSV_Battles.h \
     Source/PokemonSV/Programs/Battles/PokemonSV_SinglesBattler.h \
