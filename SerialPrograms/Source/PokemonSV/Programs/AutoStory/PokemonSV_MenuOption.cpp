@@ -55,7 +55,7 @@ void MenuOption::set_options(
     }
 }
 
-void MenuOption::set_target_option(const std::vector<MenuOptionToggleEnum> target_option_toggle_list) const{
+void MenuOption::set_target_option(const std::vector<MenuOptionToggleEnum>& target_option_toggle_list) const{
 
     for (size_t attempt = 0; attempt < 10; attempt++){
         std::string current_option_slug = read_option_toggle();

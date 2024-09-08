@@ -39,10 +39,12 @@ public:
 
 private:
 
-    // set the current selected option, to the given option_toggle 
-    // (which is a list of option_toggles, since the mapping for the options in each language is slightly different)
+    // set the current selected option, to one of the option_toggle in the given list.
+    // We need a list of option_toggle since the mapping for the options in each language is slightly different.
+    //  - e.g. For "Send to Boxes", the options may be Manual/Automatic in English, but may be On/Off in other languages.
+    // the program keeps cycling the options, until it matches one of the option_toggles in the list.
     void set_target_option(
-        const std::vector<MenuOptionToggleEnum> target_option_toggle_list
+        const std::vector<MenuOptionToggleEnum>& target_option_toggle_list
     ) const;
 
     //  Move to the target_option. 
