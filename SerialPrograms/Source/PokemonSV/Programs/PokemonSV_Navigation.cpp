@@ -21,6 +21,9 @@
 #include "PokemonSV/Inference/PokemonSV_ZeroGateWarpPromptDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_LetsGoKillDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
+#include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
+#include "PokemonSV/Inference/PokemonSV_TutorialDetector.h"
+#include "PokemonSV/Inference/Battles/PokemonSV_NormalBattleMenus.h"
 #include "PokemonSV_ConnectToInternet.h"
 #include "PokemonSV_Navigation.h"
 
@@ -725,6 +728,295 @@ void jump_off_wall_until_map_open(const ProgramInfo& info, ConsoleHandle& consol
 void reset_to_pokecenter(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
     open_map_from_overworld(info, console, context);
     fly_to_closest_pokecenter_on_map(info, console, context);
+}
+
+void realign_player(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    PlayerRealignMode realign_mode,
+    uint8_t move_x, uint8_t move_y, uint8_t move_duration
+){
+    console.log("Realigning player direction...");
+
+    switch (realign_mode){
+    case PlayerRealignMode::REALIGN_NEW_MARKER:
+        console.log("Setting new map marker...");
+        open_map_from_overworld(info, console, context);
+        pbf_press_button(context, BUTTON_ZR, 20, 105);
+        pbf_move_left_joystick(context, move_x, move_y, move_duration, 1 * TICKS_PER_SECOND);
+        pbf_press_button(context, BUTTON_A, 20, 105);
+        pbf_press_button(context, BUTTON_A, 20, 105);
+        leave_phone_to_overworld(info, console, context);
+        break;
+    case PlayerRealignMode::REALIGN_OLD_MARKER:
+        open_map_from_overworld(info, console, context);
+        leave_phone_to_overworld(info, console, context);
+        pbf_press_button(context, BUTTON_L, 20, 105);
+        break;
+    case PlayerRealignMode::REALIGN_NO_MARKER:
+        pbf_move_left_joystick(context, move_x, move_y, move_duration, 1 * TICKS_PER_SECOND);
+        pbf_press_button(context, BUTTON_L, 20, 105);
+        break;
+    }
+}
+
+
+void walk_forward_until_dialog(
+    const ProgramInfo& info, 
+    ConsoleHandle& console, 
+    BotBaseContext& context,
+    NavigationMovementMode movement_mode,
+    uint16_t seconds_timeout,
+    uint8_t y
+){
+
+    DialogBoxWatcher        dialog(COLOR_RED, true);
+    context.wait_for_all_requests();
+    int ret = run_until(
+        console, context,
+        [&](BotBaseContext& context){
+            ssf_press_left_joystick(context, 128, y, 0, seconds_timeout * TICKS_PER_SECOND);
+            if (movement_mode == NavigationMovementMode::DIRECTIONAL_ONLY){
+                pbf_wait(context, seconds_timeout * TICKS_PER_SECOND);
+            } else if (movement_mode == NavigationMovementMode::DIRECTIONAL_SPAM_A){
+                for (size_t j = 0; j < seconds_timeout; j++){
+                    pbf_press_button(context, BUTTON_A, 20, 105);
+                }
+            }
+        },
+        {dialog}
+    );
+    context.wait_for(std::chrono::milliseconds(100));
+
+    switch (ret){
+    case 0: // dialog
+        console.log("walk_forward_until_dialog(): Detected dialog.");
+        return;
+    default:
+        throw OperationFailedException(
+            ErrorReport::SEND_ERROR_REPORT, console,
+            "walk_forward_until_dialog(): Timed out. Did not detect dialog.",
+            true
+        );
+    }
+}
+
+void walk_forward_while_clear_front_path(
+    const ProgramInfo& info, 
+    ConsoleHandle& console, 
+    BotBaseContext& context,
+    uint16_t forward_ticks,
+    uint8_t y,
+    uint16_t ticks_between_lets_go,
+    uint16_t delay_after_lets_go
+){
+    context.wait_for_all_requests();
+    pbf_press_button(context, BUTTON_R, 20, delay_after_lets_go);
+
+    uint16_t num_ticks_left = forward_ticks;
+    while (true){
+
+        if (num_ticks_left < ticks_between_lets_go){
+            pbf_move_left_joystick(context, 128, y, num_ticks_left, 20);
+            context.wait_for_all_requests();
+            console.log("walk_forward_while_clear_front_path() ticks traveled: " + std::to_string(forward_ticks));
+            break;
+        }
+
+        pbf_move_left_joystick(context, 128, y, ticks_between_lets_go, 20);
+        num_ticks_left -= ticks_between_lets_go;
+
+        context.wait_for_all_requests();
+        console.log("walk_forward_while_clear_front_path() ticks traveled: " + std::to_string(forward_ticks - num_ticks_left));
+
+        pbf_press_button(context, BUTTON_R, 20, delay_after_lets_go);
+        
+
+    }
+}
+
+void mash_button_till_overworld(
+    ConsoleHandle& console, 
+    BotBaseContext& context, 
+    uint16_t button, uint16_t seconds_run
+){
+    OverworldWatcher overworld(COLOR_CYAN);
+    context.wait_for_all_requests();
+
+    int ret = run_until(
+        console, context,
+        [button, seconds_run](BotBaseContext& context){
+            ssf_mash1_button(context, button, seconds_run * TICKS_PER_SECOND);
+            pbf_wait(context, seconds_run * TICKS_PER_SECOND);
+        },
+        {overworld}
+    );
+
+    if (ret < 0){
+        throw OperationFailedException(
+            ErrorReport::SEND_ERROR_REPORT, console,
+            "mash_button_till_overworld(): Timed out, no recognized state found.",
+            true
+        );
+    }
+}
+
+
+bool fly_to_overlapping_pokecenter(
+    const ProgramInfo& info, 
+    ConsoleHandle& console, 
+    BotBaseContext& context
+){
+    open_map_from_overworld(info, console, context);
+    context.wait_for_all_requests();
+    pbf_press_button(context, BUTTON_ZL, 40, 100);
+
+    return fly_to_overworld_from_map(info, console, context, true);
+}
+
+
+void enter_menu_from_overworld(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    int menu_index,
+    MenuSide side,
+    bool has_minimap
+){
+    if (!has_minimap){
+        pbf_press_button(context, BUTTON_X, 20, 105);
+    }
+
+    WallClock start = current_time();
+    bool success = false;
+
+    while (true){
+        if (current_time() - start > std::chrono::minutes(3)){
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, console,
+                "enter_menu_from_overworld(): Failed to enter specified menu after 3 minutes.",
+                true
+            );
+        }
+
+        OverworldWatcher overworld(COLOR_CYAN);
+        MainMenuWatcher main_menu(COLOR_RED);
+        context.wait_for_all_requests();
+
+        int ret = run_until(
+            console, context,
+            [has_minimap](BotBaseContext& context){
+                for (int i = 0; i < 10; i++){
+                    pbf_wait(context, 3 * TICKS_PER_SECOND);
+                    if (!has_minimap){ 
+                        // if no minimap, can't detect overworld, so repeatedly press X to cover for button drops
+                        pbf_press_button(context, BUTTON_X, 20, 100);
+                    }
+                }
+            },
+            {overworld, main_menu}
+        );
+        context.wait_for(std::chrono::milliseconds(100));
+
+        const bool fast_mode = false;
+        switch (ret){
+        case 0:
+            console.log("Detected overworld.");
+            pbf_press_button(context, BUTTON_X, 20, 105);
+            continue;
+        case 1:
+            console.log("Detected main menu.");
+            success = main_menu.move_cursor(info, console, context, side, menu_index, fast_mode);
+            if (success == false){
+                throw OperationFailedException(
+                    ErrorReport::SEND_ERROR_REPORT, console,
+                    "enter_menu_from_overworld(): Cannot move menu cursor to specified menu.",
+                    true
+                );
+            }
+            pbf_press_button(context, BUTTON_A, 20, 105);
+            return;
+        default:
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, console,
+                "enter_menu_from_overworld(): No recognized state after 30 seconds.",
+                true
+            );
+        }
+    }
+}
+
+
+
+void heal_at_pokecenter(
+    const ProgramInfo& info, 
+    ConsoleHandle& console, 
+    BotBaseContext& context
+){
+    context.wait_for_all_requests();
+    
+    if (!fly_to_overlapping_pokecenter(info, console, context)){
+        throw OperationFailedException(
+            ErrorReport::SEND_ERROR_REPORT, console,
+            "Failed to fly to pokecenter.",
+            true
+        );  
+    }           
+    uint16_t seconds_timeout = 60;
+
+    // re-orient camera
+    pbf_press_button(context, BUTTON_L, 20, 20);
+    // move towards pokecenter
+    pbf_move_left_joystick(context, 128, 255, 100, 20);
+    // re-orient camera
+    pbf_press_button(context, BUTTON_L, 20, 20); 
+
+    bool seen_prompt = false;
+
+    while (true){
+        OverworldWatcher    overworld(COLOR_CYAN);
+        // TODO: test the Prompt watcher on all languages. Ensure FloatBox is sized correctly.
+        PromptDialogWatcher prompt(COLOR_YELLOW, {0.50, 0.400, 0.400, 0.080}); // 0.630, 0.400, 0.100, 0.080 // {0.50, 0.40, 0.40, 0.50}
+        AdvanceDialogWatcher    advance_dialog(COLOR_RED);
+        TutorialWatcher     tutorial(COLOR_RED);
+        context.wait_for_all_requests();
+
+        int ret = wait_until(
+            console, context,
+            std::chrono::seconds(seconds_timeout),
+            {overworld, prompt, advance_dialog, tutorial}
+        );
+        context.wait_for(std::chrono::milliseconds(100));
+
+        switch (ret){
+        case 0: // overworld
+            console.log("heal_at_pokecenter: Detected overworld.");
+            if (seen_prompt){ 
+                // if have seen the prompt dialog and are now in overworld, assume we have healed
+                console.log("heal_at_pokecenter: Done healing.");
+                return;
+            }
+            pbf_press_button(context, BUTTON_A, 20, 105);
+            break;
+        case 1: // prompt
+            console.log("heal_at_pokecenter: Detected prompt.");
+            seen_prompt = true;
+            pbf_press_button(context, BUTTON_A, 20, 105);
+            break;
+        case 2: // advance dialog
+            console.log("heal_at_pokecenter: Detected advance dialog.");
+            pbf_press_button(context, BUTTON_A, 20, 105);
+            break;
+        case 3: // tutorial
+            console.log("heal_at_pokecenter: Detected tutorial.");
+            pbf_press_button(context, BUTTON_A, 20, 105);
+            break;            
+        default:
+            console.log("heal_at_pokecenter: Timed out.");
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, console,
+                "Failed to heal at pokecenter.",
+                true
+            );  
+        }
+    }
+
+
 }
 
 
