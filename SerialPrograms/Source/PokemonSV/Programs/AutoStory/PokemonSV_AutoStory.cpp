@@ -378,7 +378,7 @@ std::string AutoStory::end_segment_description(){
 }
 
 
-void run_battle(
+void run_battle_press_A(
     ConsoleHandle& console, 
     BotBaseContext& context,
     BattleStopCondition stop_condition
@@ -412,7 +412,7 @@ void run_battle(
             if(num_times_seen_overworld > 30){
                 throw OperationFailedException(
                     ErrorReport::SEND_ERROR_REPORT, console,
-                    "run_battle(): Stuck in overworld. Did not detect expected stop condition.",
+                    "run_battle_press_A(): Stuck in overworld. Did not detect expected stop condition.",
                     true
                 );  
             }            
@@ -427,7 +427,7 @@ void run_battle(
                 if (wipeout.detect(screen)){
                     throw OperationFailedException(
                         ErrorReport::SEND_ERROR_REPORT, console,
-                        "run_battle(): Detected wipeout. All pokemon fainted.",
+                        "run_battle_press_A(): Detected wipeout. All pokemon fainted.",
                         true
                     );                
                 }
@@ -441,7 +441,7 @@ void run_battle(
         default: // timeout
             throw OperationFailedException(
                 ErrorReport::SEND_ERROR_REPORT, console,
-                "run_battle(): Timed out. Did not detect expected stop condition.",
+                "run_battle_press_A(): Timed out. Did not detect expected stop condition.",
                 true
             );             
         }
@@ -658,7 +658,7 @@ void overworld_navigation(
         switch (ret){
         case 0: // battle
             console.log("overworld_navigation: Detected start of battle.");
-            run_battle(console, context, BattleStopCondition::STOP_OVERWORLD);                
+            run_battle_press_A(console, context, BattleStopCondition::STOP_OVERWORLD);                
             auto_heal_from_menu_or_overworld(info, console, context, 0, true);
             realign_player(info, console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             break;
@@ -900,6 +900,8 @@ void AutoStory::test_checkpoints(
     checkpoint_list.push_back([&](){checkpoint_16(env, context);});
     checkpoint_list.push_back([&](){checkpoint_17(env, context);});
     checkpoint_list.push_back([&](){checkpoint_18(env, context);});
+    checkpoint_list.push_back([&](){checkpoint_19(env, context);});
+    checkpoint_list.push_back([&](){checkpoint_20(env, context);});
 
     for (int checkpoint = start; checkpoint <= end; checkpoint++){
         if (checkpoint == 0){
@@ -1255,8 +1257,8 @@ void AutoStory::checkpoint_06(SingleSwitchProgramEnvironment& env, BotBaseContex
             {ClearDialogCallback::WHITE_A_BUTTON, ClearDialogCallback::TUTORIAL, ClearDialogCallback::BATTLE});
         
         // can die in catch tutorial, and the story will continue
-        env.console.log("run_battle: Battle Lechonk in catch tutorial. Stop when detect dialog.");
-        run_battle(env.console, context, BattleStopCondition::STOP_DIALOG);
+        env.console.log("run_battle_press_A: Battle Lechonk in catch tutorial. Stop when detect dialog.");
+        run_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
 
         env.console.log("clear_dialog: Talk with Nemona to finish catch tutorial. Stop when detect overworld.");
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, 
@@ -1676,8 +1678,8 @@ void AutoStory::checkpoint_13(SingleSwitchProgramEnvironment& env, BotBaseContex
         clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60,
             {ClearDialogCallback::PROMPT_DIALOG, ClearDialogCallback::DIALOG_ARROW, ClearDialogCallback::BATTLE});
         
-        env.console.log("run_battle: Battle with Nemona at Mesagoza gate. Stop when detect dialog.");
-        run_battle(env.console, context, BattleStopCondition::STOP_DIALOG);
+        env.console.log("run_battle_press_A: Battle with Nemona at Mesagoza gate. Stop when detect dialog.");
+        run_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
         
         env.console.log("clear_dialog: Talk with Nemona within Mesagoza. Stop when detect overworld.");
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, 
@@ -1727,15 +1729,15 @@ void AutoStory::checkpoint_14(SingleSwitchProgramEnvironment& env, BotBaseContex
         env.console.log("clear_dialog: Talk with Team Star at the top of the stairs. Stop when detect battle.");
         clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {ClearDialogCallback::PROMPT_DIALOG, ClearDialogCallback::BATTLE, ClearDialogCallback::DIALOG_ARROW});
         // run battle until dialog
-        env.console.log("run_battle: Battle with Team Star grunt 1. Stop when detect dialog.");
-        run_battle(env.console, context, BattleStopCondition::STOP_DIALOG);
+        env.console.log("run_battle_press_A: Battle with Team Star grunt 1. Stop when detect dialog.");
+        run_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
         // clear dialog until battle, with prompt, white button, tutorial, battle
         env.console.log("clear_dialog: Talk with Team Star and Nemona. Receive Tera orb. Stop when detect battle.");
         clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, 
             {ClearDialogCallback::PROMPT_DIALOG, ClearDialogCallback::WHITE_A_BUTTON, ClearDialogCallback::TUTORIAL, ClearDialogCallback::BATTLE, ClearDialogCallback::DIALOG_ARROW});
         // run battle until dialog
-        env.console.log("run_battle: Battle with Team Star grunt 2. Stop when detect dialog.");
-        run_battle(env.console, context, BattleStopCondition::STOP_DIALOG);
+        env.console.log("run_battle_press_A: Battle with Team Star grunt 2. Stop when detect dialog.");
+        run_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
         // clear dialog until overworld
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {ClearDialogCallback::OVERWORLD});
        
@@ -1860,6 +1862,27 @@ void AutoStory::checkpoint_17(SingleSwitchProgramEnvironment& env, BotBaseContex
             first_attempt = false;
         }         
         context.wait_for_all_requests();
+        // re-orient camera
+        pbf_press_button(context, BUTTON_L, 20, 100);
+        // move backwards towards front desk
+        pbf_move_left_joystick(context, 128, 255, 200, 100);
+        // re-orient camera
+        pbf_press_button(context, BUTTON_L, 20, 100);
+        // move right towards navigation kiosk
+        pbf_move_left_joystick(context, 255, 128, 100, 100);
+        // open school navigation screen
+        press_button_until_gradient_arrow(env.program_info(), env.console, context, {0.031, 0.193, 0.047, 0.078});
+        // go to staff room
+        basic_menu_navigation(env.program_info(), env.console, context, {0.031, 0.193, 0.047, 0.078}, {0.031, 0.193 + 0.074219, 0.047, 0.078}, DPAD_DOWN, 1);
+        // enter staff room
+        pbf_mash_button(context, BUTTON_A, 3 * TICKS_PER_SECOND);
+        pbf_wait(context, 3 * TICKS_PER_SECOND);
+
+        env.console.log("clear_dialog: See Geeta. Talk to Nemona. Receive Gym/Elite Four questline (Victory Road).");
+        clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, 
+            {ClearDialogCallback::OVERWORLD, ClearDialogCallback::PROMPT_DIALOG});
+
+        
        
         break;
     }catch(OperationFailedException& e){
@@ -1875,6 +1898,54 @@ void AutoStory::checkpoint_17(SingleSwitchProgramEnvironment& env, BotBaseContex
 }
 
 void AutoStory::checkpoint_18(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
+    bool first_attempt = true;
+    while (true){
+    try{
+        if (first_attempt){
+            checkpoint_save(env, context);
+            first_attempt = false;
+        }         
+        context.wait_for_all_requests();
+       
+        break;
+    }catch(OperationFailedException& e){
+        context.wait_for_all_requests();
+        env.console.log(e.m_message, COLOR_RED);
+        env.console.log("Resetting from checkpoint.");
+        reset_game(env.program_info(), env.console, context);
+        stats.m_reset++;
+        env.update_stats();
+    }             
+    }
+
+}
+
+void AutoStory::checkpoint_19(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
+    bool first_attempt = true;
+    while (true){
+    try{
+        if (first_attempt){
+            checkpoint_save(env, context);
+            first_attempt = false;
+        }         
+        context.wait_for_all_requests();
+       
+        break;
+    }catch(OperationFailedException& e){
+        context.wait_for_all_requests();
+        env.console.log(e.m_message, COLOR_RED);
+        env.console.log("Resetting from checkpoint.");
+        reset_game(env.program_info(), env.console, context);
+        stats.m_reset++;
+        env.update_stats();
+    }             
+    }
+
+}
+
+void AutoStory::checkpoint_20(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     bool first_attempt = true;
     while (true){
@@ -2037,6 +2108,8 @@ void AutoStory::run_autostory(SingleSwitchProgramEnvironment& env, BotBaseContex
         if (ENDPOINT == EndPoint::MESAGOZA_SOUTH){
             break;
         }
+    default:
+        break;
 
     }
 }

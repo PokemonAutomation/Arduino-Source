@@ -162,6 +162,31 @@ void enter_menu_from_overworld(const ProgramInfo& info, ConsoleHandle& console, 
     bool has_minimap = true
 );
 
+// press given button until gradient arrow appears in given box_area_to_check.
+void press_button_until_gradient_arrow(
+    const ProgramInfo& info, 
+    ConsoleHandle& console, 
+    BotBaseContext& context,
+    ImageFloatBox box_area_to_check,
+    uint16_t button = BUTTON_A,
+    GradientArrowType arrow_type = GradientArrowType::RIGHT
+);
+
+// navigate menus using only gradient arrow detection, without OCR
+// first, wait for the gradient arrow to appear within `arrow_box_start`.
+// then, press `dpad_button` a certain number of times, as per `num_button_presses`.
+// then, watch for the gradient arrow within `arrow_box_end`. 
+// If arrow not seen, press `dpad_button` a maximum of 3 times, while still watching for the gradient arrow
+// If arrow still not seen, throw exception.
+void basic_menu_navigation(
+    const ProgramInfo& info, 
+    ConsoleHandle& console, 
+    BotBaseContext& context,
+    ImageFloatBox arrow_box_start,
+    ImageFloatBox arrow_box_end,
+    uint8_t dpad_button,
+    uint16_t num_button_presses
+);
 
 // heal at the pokecenter, that your character is currently at.
 // if not currently at the pokecenter, throws error.

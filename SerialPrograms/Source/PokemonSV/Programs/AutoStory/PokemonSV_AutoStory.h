@@ -58,7 +58,9 @@ public:
 
 // spam A button to choose the first move
 // throw exception if wipeout.
-void run_battle(ConsoleHandle& console, BotBaseContext& context,
+void run_battle_press_A(
+    ConsoleHandle& console, 
+    BotBaseContext& context,
     BattleStopCondition stop_condition
 );
 
@@ -191,20 +193,28 @@ public:
     void checkpoint_14(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
     // start: Battled Team Star at school entrance.
-    // end: Talked to Jacq in classroom.
+    // end: Talked to Jacq in classroom. Standing in classroom.
     void checkpoint_15(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
-    // start: Talked to Jacq in classroom.
-    // end: Talked to Arven. Received Titan questline (Path of Legends).
+    // start: Talked to Jacq in classroom. Standing in classroom.
+    // end: Talked to Arven. Received Titan questline (Path of Legends). Talked to Cassiopeia. Standing in main hall.
     void checkpoint_16(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
-    // start: 
-    // end: 
+    // start: Talked to Arven. Received Titan questline (Path of Legends). Talked to Cassiopeia. Standing in main hall.
+    // end: Saw Geeta. Talked to Nemona. Received Gym/Elite Four questline (Victory Road). Standing in staff room.
     void checkpoint_17(SingleSwitchProgramEnvironment& env, BotBaseContext& context); 
 
     // start: 
     // end: 
     void checkpoint_18(SingleSwitchProgramEnvironment& env, BotBaseContext& context);          
+
+    // start: 
+    // end: 
+    void checkpoint_19(SingleSwitchProgramEnvironment& env, BotBaseContext& context);      
+
+    // start: 
+    // end: 
+    void checkpoint_20(SingleSwitchProgramEnvironment& env, BotBaseContext& context);       
 
 private:
     virtual void value_changed(void* object) override;
