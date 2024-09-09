@@ -49,8 +49,8 @@ uint16_t Utility::get_button(const uint16_t& bt){
         switch (bt){
             case 14: dpad = 0; break; // DUP
             case 15: dpad = 4; break; // DDown
-            case 16: dpad = 2; break; // DLeft
-            case 17: dpad = 6; break; // DRight
+            case 16: dpad = 6; break; // DLeft
+            case 17: dpad = 2; break; // DRight
             default: dpad = 0; break;
         };
         return dpad;
