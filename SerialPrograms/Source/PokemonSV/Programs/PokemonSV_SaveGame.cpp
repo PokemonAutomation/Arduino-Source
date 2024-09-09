@@ -106,7 +106,31 @@ void save_game_from_menu_or_overworld(
 }
 
 
+void save_game_tutorial(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+    
+    // open the menu.
+    MainMenuWatcher menu(COLOR_RED);
+    int ret0 = run_until(
+        console, context,
+        [](BotBaseContext& context){
+            for (size_t i = 0; i < 10; i++){
+                pbf_press_button(context, BUTTON_X, 20, 500);
+            }
+        },
+        {menu}
+    );
+    if (ret0 != 0){
+        throw OperationFailedException(
+            ErrorReport::SEND_ERROR_REPORT, console,
+            "Failed to open menu!",
+            true
+        );
+    }    
 
+    save_game_from_menu(info, console, context);
+    pbf_mash_button(context, BUTTON_B, 200);
+
+}
 
 
 

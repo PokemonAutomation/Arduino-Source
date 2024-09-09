@@ -29,7 +29,8 @@ void save_game_from_menu_or_overworld(
     bool return_to_overworld
 );
 
-
+// Save game from overworld in the tutorial, where the minimap isn't available.
+void save_game_tutorial(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
 
 }
 }
