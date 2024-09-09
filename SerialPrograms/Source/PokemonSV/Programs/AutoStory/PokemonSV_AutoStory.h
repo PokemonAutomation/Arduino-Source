@@ -17,16 +17,12 @@
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
 #include "PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
+#include "PokemonSV/Programs/PokemonSV_Navigation.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
 
-enum class PlayerRealignMode{
-    REALIGN_NEW_MARKER,
-    REALIGN_OLD_MARKER,
-    REALIGN_NO_MARKER,
-};
 
 enum class BattleStopCondition{
     STOP_OVERWORLD,
@@ -41,14 +37,6 @@ enum class ClearDialogMode{
     STOP_BATTLE,
 };
 
-enum class NavigationStopCondition{
-    STOP_DIALOG,
-};
-
-enum class NavigationMovementMode{
-    DIRECTIONAL_ONLY,
-    DIRECTIONAL_SPAM_A,
-};
 
 enum class ClearDialogCallback{
     ADVANCE_DIALOG,
@@ -67,25 +55,6 @@ public:
     struct Stats;
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
-
-// align player orientation based on the alignment mode
-// The direction is specified by (x, y):
-// x = 0 : left
-// x = 128 : neutral
-// x = 255 : right
-// y = 0 : up
-// y = 128 : neutral
-// y = 255 : down
-// - REALIGN_NEW_MARKER: place down a map marker, which will align the player towards the marker
-// location of the marker is set with move_x, move_y, move_duration
-// - REALIGN_OLD_MARKER: assuming a marker is already set, open and close the map, 
-// which will align the player towards the marker
-// - REALIGN_NO_MARKER: move player towards in the direction set by move_x, move_y, move_duration
-// then re-align the camera
-void realign_player(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
-    PlayerRealignMode realign_mode,
-    uint8_t move_x = 0, uint8_t move_y = 0, uint8_t move_duration = 0
-);
 
 // spam A button to choose the first move
 // throw exception if wipeout.
@@ -116,77 +85,22 @@ void overworld_navigation(const ProgramInfo& info, ConsoleHandle& console, BotBa
     uint16_t seconds_timeout = 60, uint16_t seconds_realign = 60
 );
 
-void walk_forward_until_dialog(
-    const ProgramInfo& info, 
-    ConsoleHandle& console, 
-    BotBaseContext& context,
-    NavigationMovementMode movement_mode,
-    uint16_t seconds_timeout = 10,
-    uint8_t y = 0
-);
-
-// walk forward while using lets go to clear the path
-// forward_ticks: number of ticks to walk forward
-// y = 0: walks forward. y = 128: stand in place. y = 255: walk backwards (towards camera)
-// ticks_between_lets_go: number of ticks between firing off Let's go to clear the path from wild pokemon
-// delay_after_lets_go: number of ticks to wait after firing off Let's go.
-void walk_forward_while_clear_front_path(
-    const ProgramInfo& info, 
-    ConsoleHandle& console, 
-    BotBaseContext& context,
-    uint16_t forward_ticks,
-    uint8_t y = 0,
-    uint16_t ticks_between_lets_go = 125,
-    uint16_t delay_after_lets_go = 250
-);
-
-// mashes A button by default
-void mash_button_till_overworld(
-    ConsoleHandle& console, 
-    BotBaseContext& context, 
-    uint16_t button = BUTTON_A, uint16_t seconds_run = 360
-);
-
-// fly to the pokecenter that overlaps with the player on the map, and return true.
-// if no overlapping pokecenter, return false.
-bool fly_to_overlapping_pokecenter(
-    const ProgramInfo& info, 
-    ConsoleHandle& console, 
-    BotBaseContext& context
-);
-
 void config_option(BotBaseContext& context, int change_option_value);
 
 // enter menu and swap the first and third moves for your starter
 void swap_starter_moves(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, Language language);
 
-// enter menu and move the cursor the given side, and index. then press the A button
-void enter_menu_from_overworld(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
-    int menu_index,
-    MenuSide side = MenuSide::RIGHT,
-    bool has_minimap = true
-);
-
 // run the given `action`. if detect a battle, stop the action, and throw exception
 void do_action_and_monitor_for_battles(
-    ProgramEnvironment& env, 
+    SingleSwitchProgramEnvironment& env, 
     ConsoleHandle& console,
     BotBaseContext& context,
     std::function<
-        void(ProgramEnvironment& env,
+        void(SingleSwitchProgramEnvironment& env,
         ConsoleHandle& console,
         BotBaseContext& context)
     >&& action
 );
-
-// heal at the pokecenter, that your character is currently at.
-// if not currently at the pokecenter, throws error.
-void heal_at_pokecenter(
-    const ProgramInfo& info, 
-    ConsoleHandle& console, 
-    BotBaseContext& context
-);
-
 
 
 class AutoStory : public SingleSwitchProgramInstance, public ConfigOption::Listener{
