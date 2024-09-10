@@ -1846,11 +1846,14 @@ void AutoStory::checkpoint_16(SingleSwitchProgramEnvironment& env, BotBaseContex
         pbf_wait(context, 3 * TICKS_PER_SECOND);
         context.wait_for_all_requests();
 
-        // walk forward and talk to Arven
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 60);
-        
+        // walk forward
+        pbf_move_left_joystick(context, 128, 0, 300, 100);
+        // turn left 
+        pbf_move_left_joystick(context, 0, 128, 50, 100);
+
         // talk to Arven. stop at overworld. need prompt, overworld, white button A. and book?
         env.console.log("Talk with Arven. Receive Titan questline (Path of Legends).");
+        pbf_mash_button(context, BUTTON_A, 3 * TICKS_PER_SECOND);
         mash_button_till_overworld(env.console, context, BUTTON_A, 360);
         
        

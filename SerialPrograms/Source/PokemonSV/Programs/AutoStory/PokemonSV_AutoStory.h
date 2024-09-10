@@ -116,6 +116,14 @@ void do_action_and_monitor_for_battles(
     >&& action
 );
 
+void wait_for_gradient_arrow(
+    const ProgramInfo& info, 
+    ConsoleHandle& console, 
+    BotBaseContext& context, 
+    ImageFloatBox box_area_to_check,
+    uint16_t seconds_timeout
+);
+
 
 class AutoStory : public SingleSwitchProgramInstance, public ConfigOption::Listener{
 public:
