@@ -46,6 +46,7 @@ enum class ClearDialogCallback{
     DIALOG_ARROW,
     BATTLE,
     TUTORIAL,
+    BLACK_DIALOG_BOX
 };
 
 enum class StartPoint{
@@ -215,17 +216,29 @@ public:
     // end: Saw Geeta. Talked to Nemona. Received Gym/Elite Four questline (Victory Road). Standing in staff room.
     void checkpoint_17(SingleSwitchProgramEnvironment& env, BotBaseContext& context); 
 
-    // start: 
-    // end: 
+    // start: Saw Geeta. Talked to Nemona. Received Gym/Elite Four questline (Victory Road). Standing in staff room.
+    // end: Talked to Clavell and the professor.
     void checkpoint_18(SingleSwitchProgramEnvironment& env, BotBaseContext& context);          
 
-    // start: 
-    // end: 
+    // start: Talked to Clavell and the professor.
+    // end: Talked to Nemona, visited dorm, time passed.
     void checkpoint_19(SingleSwitchProgramEnvironment& env, BotBaseContext& context);      
+
+    // start: Talked to Nemona, visited dorm, time passed.
+    // end: 
+    void checkpoint_20(SingleSwitchProgramEnvironment& env, BotBaseContext& context);   
 
     // start: 
     // end: 
-    void checkpoint_20(SingleSwitchProgramEnvironment& env, BotBaseContext& context);       
+    void checkpoint_21(SingleSwitchProgramEnvironment& env, BotBaseContext& context);   
+
+    // start: 
+    // end: 
+    void checkpoint_22(SingleSwitchProgramEnvironment& env, BotBaseContext& context);   
+
+    // start: 
+    // end: 
+    void checkpoint_23(SingleSwitchProgramEnvironment& env, BotBaseContext& context);              
 
 private:
     virtual void value_changed(void* object) override;

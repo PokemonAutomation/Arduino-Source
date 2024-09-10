@@ -503,6 +503,7 @@ void clear_dialog(ConsoleHandle& console, BotBaseContext& context,
         DialogArrowWatcher dialog_arrow(COLOR_RED, console.overlay(), {0.850, 0.820, 0.020, 0.050}, 0.8365, 0.846);
         NormalBattleMenuWatcher battle(COLOR_ORANGE);
         TutorialWatcher     tutorial(COLOR_BLUE);
+        DialogBoxWatcher black_dialog_box(COLOR_BLACK, true, std::chrono::milliseconds(250), DialogType::DIALOG_BLACK);
         context.wait_for_all_requests();
 
         std::vector<PeriodicInferenceCallback> callbacks; 
@@ -530,7 +531,10 @@ void clear_dialog(ConsoleHandle& console, BotBaseContext& context,
                 break;
             case ClearDialogCallback::TUTORIAL:
                 callbacks.emplace_back(tutorial);
-                break;                
+                break;          
+            case ClearDialogCallback::BLACK_DIALOG_BOX:
+                callbacks.emplace_back(black_dialog_box);
+                break;              
             }
         }
 
@@ -606,6 +610,10 @@ void clear_dialog(ConsoleHandle& console, BotBaseContext& context,
             console.log("clear_dialog: Detected tutorial.");
             pbf_press_button(context, BUTTON_A, 20, 105);
             break;
+        case ClearDialogCallback::BLACK_DIALOG_BOX:    
+            console.log("clear_dialog: Detected black dialog box.");
+            pbf_press_button(context, BUTTON_A, 20, 105);
+            break;            
         default:
             throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "clear_dialog: Unknown callback triggered.");
 
@@ -1843,7 +1851,7 @@ void AutoStory::checkpoint_16(SingleSwitchProgramEnvironment& env, BotBaseContex
         
         // talk to Arven. stop at overworld. need prompt, overworld, white button A. and book?
         env.console.log("Talk with Arven. Receive Titan questline (Path of Legends).");
-        mash_button_till_overworld(env.console, context);
+        mash_button_till_overworld(env.console, context, BUTTON_A, 360);
         
        
         break;
@@ -1957,6 +1965,23 @@ void AutoStory::checkpoint_19(SingleSwitchProgramEnvironment& env, BotBaseContex
             first_attempt = false;
         }         
         context.wait_for_all_requests();
+
+        // walk right 
+        pbf_move_left_joystick(context, 255, 128, 50, 100);
+        // walk down towards door
+        pbf_move_left_joystick(context, 128, 255, 200, 100);
+
+        env.console.log("Talk to Nemona and go to dorm.");
+        mash_button_till_overworld(env.console, context, BUTTON_A, 360);
+
+        // walk forward
+        pbf_move_left_joystick(context, 128, 0, 100, 100);
+        // walk left towards bed
+        pbf_move_left_joystick(context, 0, 128, 100, 100);
+
+        env.console.log("Go to bed. Time passes until treasure hunt.");
+        mash_button_till_overworld(env.console, context, BUTTON_A, 360);
+
        
         break;
     }catch(OperationFailedException& e){
@@ -1972,6 +1997,103 @@ void AutoStory::checkpoint_19(SingleSwitchProgramEnvironment& env, BotBaseContex
 }
 
 void AutoStory::checkpoint_20(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
+    bool first_attempt = true;
+    while (true){
+    try{
+        if (first_attempt){
+            checkpoint_save(env, context);
+            first_attempt = false;
+        }         
+        context.wait_for_all_requests();
+       
+        //walk right towards door
+        pbf_move_left_joystick(context, 255, 128, 200, 100);
+
+        wait_for_gradient_arrow(env.program_info(), env.console, context, {0.031, 0.193, 0.047, 0.078}, 10);
+
+        env.console.log("Leave dorm for schoolyard.");
+        mash_button_till_overworld(env.console, context, BUTTON_A, 360);
+
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 60, 0);
+
+        env.console.log("Talk to Nemona, Arven, Cassiopeia.");
+        clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 16, 
+            {ClearDialogCallback::PROMPT_DIALOG, ClearDialogCallback::BLACK_DIALOG_BOX}); // max time between dialog: 11
+        
+        // mash A to get through the Random A press that you need. when the Nemona shows you a Poke Gym.
+        pbf_mash_button(context, BUTTON_A, 250);
+
+        clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 10, 
+            {ClearDialogCallback::TUTORIAL}); // max time between dialog: 3
+        
+        env.console.log("Get on ride.");
+        pbf_mash_button(context, BUTTON_PLUS, 1 * TICKS_PER_SECOND);
+
+        mash_button_till_overworld(env.console, context, BUTTON_A, 360);
+
+        break;
+    }catch(OperationFailedException& e){
+        context.wait_for_all_requests();
+        env.console.log(e.m_message, COLOR_RED);
+        env.console.log("Resetting from checkpoint.");
+        reset_game(env.program_info(), env.console, context);
+        stats.m_reset++;
+        env.update_stats();
+    }             
+    }
+
+}
+
+void AutoStory::checkpoint_21(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
+    bool first_attempt = true;
+    while (true){
+    try{
+        if (first_attempt){
+            checkpoint_save(env, context);
+            first_attempt = false;
+        }         
+        context.wait_for_all_requests();
+       
+        break;
+    }catch(OperationFailedException& e){
+        context.wait_for_all_requests();
+        env.console.log(e.m_message, COLOR_RED);
+        env.console.log("Resetting from checkpoint.");
+        reset_game(env.program_info(), env.console, context);
+        stats.m_reset++;
+        env.update_stats();
+    }             
+    }
+
+}
+
+void AutoStory::checkpoint_22(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
+    bool first_attempt = true;
+    while (true){
+    try{
+        if (first_attempt){
+            checkpoint_save(env, context);
+            first_attempt = false;
+        }         
+        context.wait_for_all_requests();
+       
+        break;
+    }catch(OperationFailedException& e){
+        context.wait_for_all_requests();
+        env.console.log(e.m_message, COLOR_RED);
+        env.console.log("Resetting from checkpoint.");
+        reset_game(env.program_info(), env.console, context);
+        stats.m_reset++;
+        env.update_stats();
+    }             
+    }
+
+}
+
+void AutoStory::checkpoint_23(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     bool first_attempt = true;
     while (true){
