@@ -124,6 +124,8 @@ void wait_for_gradient_arrow(
     uint16_t seconds_timeout
 );
 
+void press_A_until_dialog(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, uint16_t seconds_between_button_presses);
+
 
 class AutoStory : public SingleSwitchProgramInstance, public ConfigOption::Listener{
 public:
@@ -220,11 +222,11 @@ public:
     // end: Talked to Arven. Received Titan questline (Path of Legends). Talked to Cassiopeia. Standing in main hall.
     void checkpoint_16(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
-    // start: Talked to Arven. Received Titan questline (Path of Legends). Talked to Cassiopeia. Standing in main hall.
-    // end: Saw Geeta. Talked to Nemona. Received Gym/Elite Four questline (Victory Road). Standing in staff room.
+    // start: Talked to Arven. Received Titan questline (Path of Legends).
+    // end: Talked to Cassiopeia. Saw Geeta. Talked to Nemona. Received Gym/Elite Four questline (Victory Road). Standing in staff room.
     void checkpoint_17(SingleSwitchProgramEnvironment& env, BotBaseContext& context); 
 
-    // start: Saw Geeta. Talked to Nemona. Received Gym/Elite Four questline (Victory Road). Standing in staff room.
+    // start: Talked to Cassiopeia. Saw Geeta. Talked to Nemona. Received Gym/Elite Four questline (Victory Road). Standing in staff room.
     // end: Talked to Clavell and the professor.
     void checkpoint_18(SingleSwitchProgramEnvironment& env, BotBaseContext& context);          
 
@@ -233,10 +235,10 @@ public:
     void checkpoint_19(SingleSwitchProgramEnvironment& env, BotBaseContext& context);      
 
     // start: Talked to Nemona, visited dorm, time passed.
-    // end: 
+    // end: Get on ride for first time.
     void checkpoint_20(SingleSwitchProgramEnvironment& env, BotBaseContext& context);   
 
-    // start: 
+    // start: Get on ride for first time.
     // end: 
     void checkpoint_21(SingleSwitchProgramEnvironment& env, BotBaseContext& context);   
 

@@ -890,6 +890,30 @@ void wait_for_gradient_arrow(
     }          
 }
 
+void press_A_until_dialog(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, uint16_t seconds_between_button_presses){
+    context.wait_for_all_requests();
+    AdvanceDialogWatcher advance_dialog(COLOR_RED);
+    int ret = run_until(
+        console, context,
+        [seconds_between_button_presses](BotBaseContext& context){
+            pbf_wait(context, seconds_between_button_presses * TICKS_PER_SECOND); // avoiding pressing A if dialog already present
+            for (size_t c = 0; c < 10; c++){
+                pbf_press_button(context, BUTTON_A, 20, seconds_between_button_presses * TICKS_PER_SECOND);
+            }
+        },
+        {advance_dialog}
+    );
+    if (ret == 0){
+        console.log("press_A_until_dialog: Detected dialog.");
+    }else{
+        throw OperationFailedException(
+            ErrorReport::SEND_ERROR_REPORT, console,
+            "press_A_until_dialog(): Unable to detect dialog after 10 button presses.",
+            true
+        );
+    }
+}
+
 
 void AutoStory::checkpoint_save(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
@@ -1853,7 +1877,7 @@ void AutoStory::checkpoint_16(SingleSwitchProgramEnvironment& env, BotBaseContex
 
         // talk to Arven. stop at overworld. need prompt, overworld, white button A. and book?
         env.console.log("Talk with Arven. Receive Titan questline (Path of Legends).");
-        pbf_mash_button(context, BUTTON_A, 3 * TICKS_PER_SECOND);
+        press_A_until_dialog(env.program_info(), env.console, context, 1);
         mash_button_till_overworld(env.console, context, BUTTON_A, 360);
         
        
@@ -1880,6 +1904,12 @@ void AutoStory::checkpoint_17(SingleSwitchProgramEnvironment& env, BotBaseContex
             first_attempt = false;
         }         
         context.wait_for_all_requests();
+
+        // walk backwards until dialog
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 20, 255);
+        env.console.log("Talk with Cassiopeia.");
+        mash_button_till_overworld(env.console, context, BUTTON_A, 360);
+
         // re-orient camera
         pbf_press_button(context, BUTTON_L, 20, 100);
         // move backwards towards front desk
