@@ -48,6 +48,17 @@ enum class ClearDialogCallback{
     TUTORIAL,
 };
 
+enum class StartPoint{
+    INTRO_CUTSCENE,
+    PICK_STARTER,
+    NEMONA_FIRST_BATTLE,
+    CATCH_TUTORIAL,
+    LEGENDARY_RESCUE,
+    ARVEN_FIRST_BATTLE,
+    LOS_PLATOS,
+    MESAGOZA_SOUTH,
+};
+
 class AutoStory_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     AutoStory_Descriptor();
@@ -121,9 +132,9 @@ public:
         int start, int end, int loop = 1
     );
 
-    void change_settings_prior_to_autostory(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-
-    void enter_options_menu_from_overworld(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    // change the settings prior to Autostory
+    // Assumes that `current_segment` represents where we currently are in the story.
+    void change_settings_prior_to_autostory(SingleSwitchProgramEnvironment& env, BotBaseContext& context, StartPoint current_segment);
 
     // from within the Settings/Options menu, change the settings
     void change_settings(SingleSwitchProgramEnvironment& env, BotBaseContext& context, bool use_inference = true);
@@ -222,21 +233,9 @@ private:
     std::string start_segment_description();
     std::string end_segment_description();
 
-    // return the index for `Options` in the Main Menu
-    int8_t option_index();
-
 private:
     OCR::LanguageOCROption LANGUAGE;
-    enum class StartPoint{
-        INTRO_CUTSCENE,
-        PICK_STARTER,
-        NEMONA_FIRST_BATTLE,
-        CATCH_TUTORIAL,
-        LEGENDARY_RESCUE,
-        ARVEN_FIRST_BATTLE,
-        LOS_PLATOS,
-        MESAGOZA_SOUTH,
-    };
+
     EnumDropdownOption<StartPoint> STARTPOINT;
 
     enum class EndPoint{

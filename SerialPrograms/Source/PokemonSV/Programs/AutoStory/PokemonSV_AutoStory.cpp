@@ -736,48 +736,41 @@ void swap_starter_moves(const ProgramInfo& info, ConsoleHandle& console, BotBase
 }
 
 
-void AutoStory::change_settings_prior_to_autostory(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    if (STARTPOINT == StartPoint::INTRO_CUTSCENE){
+void AutoStory::change_settings_prior_to_autostory(SingleSwitchProgramEnvironment& env, BotBaseContext& context, StartPoint current_segment){
+    if (current_segment == StartPoint::INTRO_CUTSCENE){
         return;
     }
-    
-    enter_options_menu_from_overworld(env, context);
-    change_settings(env, context);
-    if(STARTPOINT == StartPoint::PICK_STARTER){
-        pbf_mash_button(context, BUTTON_B, 2 * TICKS_PER_SECOND);
-    }else{
-        press_Bs_to_back_to_overworld(env.program_info(), env.console, context);        
-    }
-}
 
-void AutoStory::enter_options_menu_from_overworld(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    int8_t index = option_index();
-    if (index < 0){
-        return;
-    }
-    bool has_minimap = !(STARTPOINT == StartPoint::INTRO_CUTSCENE || STARTPOINT == StartPoint::PICK_STARTER);
-
-    enter_menu_from_overworld(env.program_info(), env.console, context, index, MenuSide::RIGHT, has_minimap);
-
-}
-
-
-int8_t AutoStory::option_index(){
-    switch(STARTPOINT){
+    // get index of `Options` in the Main Menu, depending on where you are in Autostory
+    int8_t index;  
+    switch(current_segment){
     // case StartPoint::INTRO_CUTSCENE:
     case StartPoint::PICK_STARTER:
-        return 0;
+        index = 0;
     case StartPoint::NEMONA_FIRST_BATTLE:
-        return 1;
+        index = 1;
     case StartPoint::CATCH_TUTORIAL:
     case StartPoint::LEGENDARY_RESCUE:
     case StartPoint::ARVEN_FIRST_BATTLE:
     case StartPoint::LOS_PLATOS:
     case StartPoint::MESAGOZA_SOUTH:
-        return 2;
+        index = 2;
     default:
-        return -1;        
-    }    
+        index = -1;        
+    }
+    
+    if (index < 0){
+        return;
+    }
+    bool has_minimap = current_segment != StartPoint::PICK_STARTER; // and also not equal to StartPoint::INTRO_CUTSCENE:
+
+    enter_menu_from_overworld(env.program_info(), env.console, context, index, MenuSide::RIGHT, has_minimap);
+    change_settings(env, context);
+    if(current_segment == StartPoint::PICK_STARTER){
+        pbf_mash_button(context, BUTTON_B, 2 * TICKS_PER_SECOND);
+    }else{
+        press_Bs_to_back_to_overworld(env.program_info(), env.console, context);    
+    }
 }
 
 void AutoStory::change_settings(SingleSwitchProgramEnvironment& env, BotBaseContext& context, bool use_inference){
@@ -2144,7 +2137,7 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
 
     // Set settings. to ensure autosave is off.
     if (CHANGE_SETTINGS){
-        change_settings_prior_to_autostory(env, context);
+        change_settings_prior_to_autostory(env, context, STARTPOINT);
     }
 
     if (ENABLE_TEST_CHECKPOINTS){
