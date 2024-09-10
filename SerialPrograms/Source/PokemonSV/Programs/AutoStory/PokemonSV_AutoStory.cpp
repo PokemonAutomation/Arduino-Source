@@ -857,6 +857,31 @@ void do_action_and_monitor_for_battles(
     }
 }
 
+void wait_for_gradient_arrow(
+    const ProgramInfo& info, 
+    ConsoleHandle& console, 
+    BotBaseContext& context, 
+    ImageFloatBox box_area_to_check,
+    uint16_t seconds_timeout
+){
+    context.wait_for_all_requests();
+    GradientArrowWatcher arrow(COLOR_RED, GradientArrowType::RIGHT, box_area_to_check);
+    int ret = wait_until(
+        console, context, 
+        Milliseconds(seconds_timeout * 1000),
+        { arrow }
+    );
+    if (ret == 0){
+        console.log("Gradient arrow detected.");
+    }else{
+        throw OperationFailedException(
+            ErrorReport::SEND_ERROR_REPORT, console,
+            "Failed to detect gradient arrow.",
+            true
+        );
+    }          
+}
+
 
 void AutoStory::checkpoint_save(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
@@ -1806,18 +1831,7 @@ void AutoStory::checkpoint_16(SingleSwitchProgramEnvironment& env, BotBaseContex
         clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 5);
 
         // Wait for detection of school navigation menu
-        ImageFloatBox select_box_0(0.031, 0.193, 0.047, 0.078);
-        GradientArrowWatcher select_entrance(COLOR_RED, GradientArrowType::RIGHT, select_box_0);
-        int ret = wait_until(env.console, context, Milliseconds(5000), { select_entrance }, Milliseconds(1000));
-        if (ret == 0){
-            env.console.log("School navigation menu detected. Top item selected.");
-        }else{
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
-                "Failed to detect school navigation menu",
-                true
-            );
-        }        
+        wait_for_gradient_arrow(env.program_info(), env.console, context, {0.031, 0.193, 0.047, 0.078}, 5);
 
         // enter Cafeteria
         pbf_mash_button(context, BUTTON_A, 3 * TICKS_PER_SECOND);
@@ -1900,6 +1914,25 @@ void AutoStory::checkpoint_18(SingleSwitchProgramEnvironment& env, BotBaseContex
             first_attempt = false;
         }         
         context.wait_for_all_requests();
+
+        // walk down
+        pbf_move_left_joystick(context, 128, 255, 200, 100);
+        // walk left towards door
+        pbf_move_left_joystick(context, 0, 128, 100, 100);
+
+        // wait for school navigation menu
+        context.wait_for_all_requests();
+        wait_for_gradient_arrow(env.program_info(), env.console, context, {0.031, 0.193, 0.047, 0.078}, 10);
+        // enter Directors office
+        pbf_mash_button(context, BUTTON_A, 6 * TICKS_PER_SECOND);
+
+        env.console.log("Talk to Clavell in his office, and the professor.");
+        clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 25, 
+            {ClearDialogCallback::PROMPT_DIALOG});  // max time between dialog: 17s. set timeout to 25 seconds for buffer.
+        // mash A to get through the Random A press that you need. when the professor shows you area zero.
+        pbf_mash_button(context, BUTTON_A, 3 * TICKS_PER_SECOND);
+        clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, 
+            {ClearDialogCallback::OVERWORLD, ClearDialogCallback::PROMPT_DIALOG});
        
         break;
     }catch(OperationFailedException& e){

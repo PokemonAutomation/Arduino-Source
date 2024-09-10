@@ -260,7 +260,6 @@ private:
     };
     EnumDropdownOption<StarterChoice> STARTERCHOICE;
 
-private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
