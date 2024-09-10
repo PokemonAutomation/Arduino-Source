@@ -166,10 +166,20 @@ AutoStory::AutoStory()
         11
     )     
     , LOOP_CHECKPOINT(
-        "--Loop checkpoints:<br>Loop each test checkpoint this number of times.",
+        "--Loop checkpoints:<br>Loop the checkpoints from \"Start loop\" to \"End loop\", inclusive. Loop these checkpoints this number of times.",
         LockMode::UNLOCK_WHILE_RUNNING,
-        1
+        1, 1
     )
+    , START_LOOP(
+        "--Start loop:<br>Start looping with this checkpoint number.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        0
+    )    
+    , END_LOOP(
+        "--End loop:<br>Stop looping when done this checkpoint number.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        11
+    )      
     , ENABLE_TEST_REALIGN(
         "<b>TEST: realign_player():</b>",
         LockMode::UNLOCK_WHILE_RUNNING,
@@ -252,6 +262,8 @@ AutoStory::AutoStory()
         PA_ADD_OPTION(START_CHECKPOINT);
         PA_ADD_OPTION(END_CHECKPOINT);
         PA_ADD_OPTION(LOOP_CHECKPOINT);
+        PA_ADD_OPTION(START_LOOP);
+        PA_ADD_OPTION(END_LOOP);
 
         PA_ADD_OPTION(ENABLE_TEST_REALIGN);
         PA_ADD_OPTION(REALIGN_MODE);
@@ -292,10 +304,14 @@ void AutoStory::value_changed(void* object){
         START_CHECKPOINT.set_visibility(ConfigOptionState::ENABLED);
         END_CHECKPOINT.set_visibility(ConfigOptionState::ENABLED);
         LOOP_CHECKPOINT.set_visibility(ConfigOptionState::ENABLED);
+        START_LOOP.set_visibility(ConfigOptionState::ENABLED);
+        END_LOOP.set_visibility(ConfigOptionState::ENABLED);
     }else{
         START_CHECKPOINT.set_visibility(ConfigOptionState::DISABLED);
         END_CHECKPOINT.set_visibility(ConfigOptionState::DISABLED);
         LOOP_CHECKPOINT.set_visibility(ConfigOptionState::DISABLED);
+        START_LOOP.set_visibility(ConfigOptionState::DISABLED);
+        END_LOOP.set_visibility(ConfigOptionState::DISABLED);
     }
 
     if (ENABLE_TEST_REALIGN){
@@ -927,7 +943,8 @@ void AutoStory::test_checkpoints(
     SingleSwitchProgramEnvironment& env,
     ConsoleHandle& console, 
     BotBaseContext& context,
-    int start, int end, int loop
+    int start, int end, 
+    int loop, int start_loop, int end_loop
 ){
 
     std::vector<std::function<void()>> checkpoint_list;
@@ -961,13 +978,19 @@ void AutoStory::test_checkpoints(
         }
         
         std::string leading_zero = checkpoint < 10 ? "0" : "";
-        for (int i = 0; i < loop; i++){
-            if (i > 0){
-                reset_game(env.program_info(), console, context);
-            }
-            console.log("checkpoint_" + leading_zero + std::to_string(checkpoint) + ": loop " + std::to_string(i));
-            checkpoint_list[checkpoint]();
-        }        
+        if (checkpoint >= start_loop && checkpoint <= end_loop){
+            for (int i = 0; i < loop; i++){
+                if (i > 0){
+                    reset_game(env.program_info(), console, context);
+                }
+                console.log("checkpoint_" + leading_zero + std::to_string(checkpoint) + ": loop " + std::to_string(i));
+                checkpoint_list[checkpoint]();
+            } 
+        }else{
+            console.log("checkpoint_" + leading_zero + std::to_string(checkpoint) + ".");
+            checkpoint_list[checkpoint]();            
+        }
+       
     }
     
 }
@@ -2330,7 +2353,7 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
 
     if (ENABLE_TEST_CHECKPOINTS){
         // test individual checkpoints
-        test_checkpoints(env, env.console, context, START_CHECKPOINT, END_CHECKPOINT, LOOP_CHECKPOINT);
+        test_checkpoints(env, env.console, context, START_CHECKPOINT, END_CHECKPOINT, LOOP_CHECKPOINT, START_LOOP, END_LOOP);
     }else{
         run_autostory(env, context);
     }

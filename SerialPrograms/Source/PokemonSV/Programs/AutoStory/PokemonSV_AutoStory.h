@@ -140,7 +140,8 @@ public:
         SingleSwitchProgramEnvironment& env,
         ConsoleHandle& console, 
         BotBaseContext& context,
-        int start, int end, int loop = 1
+        int start, int end, 
+        int loop, int start_loop, int end_loop
     );
 
     // change the settings prior to Autostory
@@ -295,6 +296,8 @@ private:
     SimpleIntegerOption<uint16_t> START_CHECKPOINT;
     SimpleIntegerOption<uint16_t> END_CHECKPOINT;
     SimpleIntegerOption<uint16_t> LOOP_CHECKPOINT;
+    SimpleIntegerOption<uint16_t> START_LOOP;
+    SimpleIntegerOption<uint16_t> END_LOOP;
 
     BooleanCheckBoxOption ENABLE_TEST_REALIGN;    
     EnumDropdownOption<PlayerRealignMode> REALIGN_MODE;
