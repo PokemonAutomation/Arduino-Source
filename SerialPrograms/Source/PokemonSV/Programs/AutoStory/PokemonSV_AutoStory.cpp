@@ -13,6 +13,7 @@
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Tools/VideoResolutionCheck.h"
+#include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_SnapshotDumper.h"
@@ -930,6 +931,36 @@ void press_A_until_dialog(const ProgramInfo& info, ConsoleHandle& console, BotBa
     }
 }
 
+bool check_ride_active(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+    // open main menu
+    enter_menu_from_overworld(info, console, context, -1, MenuSide::NONE, true);
+    context.wait_for_all_requests();
+    ImageStats ride_indicator = image_stats(extract_box_reference(console.video().snapshot(), ImageFloatBox(0.05, 0.995, 0.25, 0.003)));
+
+    bool is_ride_active = !is_black(ride_indicator); // ride is active if the ride indicator isn't black.
+    pbf_press_button(context, BUTTON_B, 30, 100);
+    press_Bs_to_back_to_overworld(info, console, context, 7);
+    if (is_ride_active){
+        console.log("Ride is active.");
+    }else{
+        console.log("Ride is not active.");
+    }
+    return is_ride_active;
+}
+
+void get_on_ride(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+    WallClock start = current_time();
+    while (!check_ride_active(info, console, context)){
+        if (current_time() - start > std::chrono::minutes(3)){
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, console,
+                "get_on_ride(): Failed to get on ride after 3 minutes.",
+                true
+            );
+        }        
+        pbf_press_button(context, BUTTON_PLUS, 30, 100);
+    }
+}
 
 void AutoStory::checkpoint_save(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();

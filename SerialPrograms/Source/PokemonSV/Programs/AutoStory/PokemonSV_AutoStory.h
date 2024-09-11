@@ -126,6 +126,9 @@ void wait_for_gradient_arrow(
 
 void press_A_until_dialog(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, uint16_t seconds_between_button_presses);
 
+bool check_ride_active(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
+
+void get_on_ride(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
 
 class AutoStory : public SingleSwitchProgramInstance, public ConfigOption::Listener{
 public:

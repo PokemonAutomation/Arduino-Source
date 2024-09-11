@@ -921,6 +921,9 @@ void enter_menu_from_overworld(const ProgramInfo& info, ConsoleHandle& console, 
             continue;
         case 1:
             console.log("Detected main menu.");
+            if (menu_index == -1){
+                return;
+            }
             success = main_menu.move_cursor(info, console, context, side, menu_index, fast_mode);
             if (success == false){
                 throw OperationFailedException(

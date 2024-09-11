@@ -156,6 +156,7 @@ bool fly_to_overlapping_pokecenter(
 );
 
 // enter menu and move the cursor the given side, and index. then press the A button
+// if menu_index is -1, return once the menu is detected.
 void enter_menu_from_overworld(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
     int menu_index,
     MenuSide side = MenuSide::RIGHT,
