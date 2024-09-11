@@ -860,7 +860,7 @@ void mash_button_till_overworld(
 }
 
 
-bool fly_to_overlapping_pokecenter(
+bool attempt_fly_to_overlapping_flypoint(
     const ProgramInfo& info, 
     ConsoleHandle& console, 
     BotBaseContext& context
@@ -872,6 +872,25 @@ bool fly_to_overlapping_pokecenter(
     return fly_to_overworld_from_map(info, console, context, true);
 }
 
+void fly_to_overlapping_flypoint(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+    if (!attempt_fly_to_overlapping_flypoint(info, console, context)){
+        throw OperationFailedException(
+            ErrorReport::SEND_ERROR_REPORT, console,
+            "Failed to reset to overlapping Pokecenter.",
+            true
+        );
+    }
+}
+
+void confirm_no_overlapping_flypoint(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+    if (attempt_fly_to_overlapping_flypoint(info, console, context)){
+        throw OperationFailedException(
+            ErrorReport::SEND_ERROR_REPORT, console,
+            "Overlapping fly detected, when it wasn't expected.",
+            true
+        );
+    }
+}
 
 void enter_menu_from_overworld(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
     int menu_index,
@@ -1029,7 +1048,7 @@ void heal_at_pokecenter(
 ){
     context.wait_for_all_requests();
     
-    if (!fly_to_overlapping_pokecenter(info, console, context)){
+    if (!attempt_fly_to_overlapping_flypoint(info, console, context)){
         throw OperationFailedException(
             ErrorReport::SEND_ERROR_REPORT, console,
             "Failed to fly to pokecenter.",

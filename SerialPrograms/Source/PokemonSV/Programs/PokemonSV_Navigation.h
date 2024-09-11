@@ -149,11 +149,18 @@ void mash_button_till_overworld(
 
 // fly to the pokecenter that overlaps with the player on the map, and return true.
 // if no overlapping pokecenter, return false.
-bool fly_to_overlapping_pokecenter(
+bool attempt_fly_to_overlapping_flypoint(
     const ProgramInfo& info, 
     ConsoleHandle& console, 
     BotBaseContext& context
 );
+
+// fly to the pokecenter that overlaps with the player on the map
+// throw exception if unsuccessful
+void fly_to_overlapping_flypoint(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
+
+// throw exception if there is a fly point/pokecenter that overlaps with the player on the map
+void confirm_no_overlapping_flypoint(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
 
 // enter menu and move the cursor the given side, and index. then press the A button
 // if menu_index is -1, return once the menu is detected.

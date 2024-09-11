@@ -1000,6 +1000,20 @@ void AutoStory::test_checkpoints(
     checkpoint_list.push_back([&](){checkpoint_18(env, context);});
     checkpoint_list.push_back([&](){checkpoint_19(env, context);});
     checkpoint_list.push_back([&](){checkpoint_20(env, context);});
+    checkpoint_list.push_back([&](){checkpoint_21(env, context);});
+    checkpoint_list.push_back([&](){checkpoint_22(env, context);});
+    checkpoint_list.push_back([&](){checkpoint_23(env, context);});
+    checkpoint_list.push_back([&](){checkpoint_24(env, context);});
+    checkpoint_list.push_back([&](){checkpoint_25(env, context);});
+    checkpoint_list.push_back([&](){checkpoint_26(env, context);});
+    checkpoint_list.push_back([&](){checkpoint_27(env, context);});
+    checkpoint_list.push_back([&](){checkpoint_28(env, context);});
+    checkpoint_list.push_back([&](){checkpoint_29(env, context);});
+    checkpoint_list.push_back([&](){checkpoint_30(env, context);});
+    checkpoint_list.push_back([&](){checkpoint_31(env, context);});
+    checkpoint_list.push_back([&](){checkpoint_32(env, context);});
+    checkpoint_list.push_back([&](){checkpoint_33(env, context);});
+    checkpoint_list.push_back([&](){checkpoint_34(env, context);});
 
     for (int checkpoint = start; checkpoint <= end; checkpoint++){
         if (checkpoint == 0){
@@ -1693,13 +1707,7 @@ void AutoStory::checkpoint_12(SingleSwitchProgramEnvironment& env, BotBaseContex
 
             context.wait_for_all_requests();
             
-            if (!fly_to_overlapping_pokecenter(env.program_info(), env.console, context)){
-                throw OperationFailedException(
-                    ErrorReport::SEND_ERROR_REPORT, env.console,
-                    "Failed to reset to Los Platos pokecenter.",
-                    true
-                );  
-            }            
+            fly_to_overlapping_flypoint(env.program_info(), env.console, context);
 
             // re-orient camera
             pbf_press_button(context, BUTTON_L, 20, 20);
@@ -1713,13 +1721,8 @@ void AutoStory::checkpoint_12(SingleSwitchProgramEnvironment& env, BotBaseContex
             walk_forward_while_clear_front_path(env.program_info(), env.console, context, 1250);
             
             // check we're not still at the Los Platos Pokecenter.
-            if (fly_to_overlapping_pokecenter(env.program_info(), env.console, context)){
-                throw OperationFailedException(
-                    ErrorReport::SEND_ERROR_REPORT, env.console,
-                    "Stuck at Los Platos Pokecenter.",
-                    true
-                );  
-            }
+            confirm_no_overlapping_flypoint(env.program_info(), env.console, context);
+
             // not stuck at Los Platos Pokecenter
             pbf_press_button(context, BUTTON_B, 20, 1 * TICKS_PER_SECOND);
             pbf_press_button(context, BUTTON_B, 20, 1 * TICKS_PER_SECOND);
@@ -1764,13 +1767,7 @@ void AutoStory::checkpoint_13(SingleSwitchProgramEnvironment& env, BotBaseContex
                 first_attempt = false;
             } 
 
-            if (!fly_to_overlapping_pokecenter(env.program_info(), env.console, context)){
-                throw OperationFailedException(
-                    ErrorReport::SEND_ERROR_REPORT, env.console,
-                    "Failed to reset to Mesagoza (South) pokecenter.",
-                    true
-                );  
-            }
+            fly_to_overlapping_flypoint(env.program_info(), env.console, context);
 
             context.wait_for_all_requests();
             realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 80, 50);
@@ -2181,6 +2178,276 @@ void AutoStory::checkpoint_22(SingleSwitchProgramEnvironment& env, BotBaseContex
 }
 
 void AutoStory::checkpoint_23(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
+    bool first_attempt = true;
+    while (true){
+    try{
+        if (first_attempt){
+            checkpoint_save(env, context);
+            first_attempt = false;
+        }         
+        context.wait_for_all_requests();
+       
+        break;
+    }catch(OperationFailedException& e){
+        context.wait_for_all_requests();
+        env.console.log(e.m_message, COLOR_RED);
+        env.console.log("Resetting from checkpoint.");
+        reset_game(env.program_info(), env.console, context);
+        stats.m_reset++;
+        env.update_stats();
+    }             
+    }
+
+}
+
+void AutoStory::checkpoint_24(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
+    bool first_attempt = true;
+    while (true){
+    try{
+        if (first_attempt){
+            checkpoint_save(env, context);
+            first_attempt = false;
+        }         
+        context.wait_for_all_requests();
+       
+        break;
+    }catch(OperationFailedException& e){
+        context.wait_for_all_requests();
+        env.console.log(e.m_message, COLOR_RED);
+        env.console.log("Resetting from checkpoint.");
+        reset_game(env.program_info(), env.console, context);
+        stats.m_reset++;
+        env.update_stats();
+    }             
+    }
+
+}
+
+void AutoStory::checkpoint_25(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
+    bool first_attempt = true;
+    while (true){
+    try{
+        if (first_attempt){
+            checkpoint_save(env, context);
+            first_attempt = false;
+        }         
+        context.wait_for_all_requests();
+       
+        break;
+    }catch(OperationFailedException& e){
+        context.wait_for_all_requests();
+        env.console.log(e.m_message, COLOR_RED);
+        env.console.log("Resetting from checkpoint.");
+        reset_game(env.program_info(), env.console, context);
+        stats.m_reset++;
+        env.update_stats();
+    }             
+    }
+
+}
+
+void AutoStory::checkpoint_26(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
+    bool first_attempt = true;
+    while (true){
+    try{
+        if (first_attempt){
+            checkpoint_save(env, context);
+            first_attempt = false;
+        }         
+        context.wait_for_all_requests();
+        do_action_and_monitor_for_battles(env, env.console, context,
+            [&](SingleSwitchProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){
+                fly_to_overlapping_flypoint(env.program_info(), env.console, context);
+                
+            }
+        );
+       
+        break;
+    }catch(OperationFailedException& e){
+        context.wait_for_all_requests();
+        env.console.log(e.m_message, COLOR_RED);
+        env.console.log("Resetting from checkpoint.");
+        reset_game(env.program_info(), env.console, context);
+        stats.m_reset++;
+        env.update_stats();
+    }             
+    }
+
+}
+
+void AutoStory::checkpoint_27(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
+    bool first_attempt = true;
+    while (true){
+    try{
+        if (first_attempt){
+            checkpoint_save(env, context);
+            first_attempt = false;
+        }         
+        context.wait_for_all_requests();
+       
+        break;
+    }catch(OperationFailedException& e){
+        context.wait_for_all_requests();
+        env.console.log(e.m_message, COLOR_RED);
+        env.console.log("Resetting from checkpoint.");
+        reset_game(env.program_info(), env.console, context);
+        stats.m_reset++;
+        env.update_stats();
+    }             
+    }
+
+}
+
+void AutoStory::checkpoint_28(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
+    bool first_attempt = true;
+    while (true){
+    try{
+        if (first_attempt){
+            checkpoint_save(env, context);
+            first_attempt = false;
+        }         
+        context.wait_for_all_requests();
+       
+        break;
+    }catch(OperationFailedException& e){
+        context.wait_for_all_requests();
+        env.console.log(e.m_message, COLOR_RED);
+        env.console.log("Resetting from checkpoint.");
+        reset_game(env.program_info(), env.console, context);
+        stats.m_reset++;
+        env.update_stats();
+    }             
+    }
+
+}
+
+void AutoStory::checkpoint_29(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
+    bool first_attempt = true;
+    while (true){
+    try{
+        if (first_attempt){
+            checkpoint_save(env, context);
+            first_attempt = false;
+        }         
+        context.wait_for_all_requests();
+       
+        break;
+    }catch(OperationFailedException& e){
+        context.wait_for_all_requests();
+        env.console.log(e.m_message, COLOR_RED);
+        env.console.log("Resetting from checkpoint.");
+        reset_game(env.program_info(), env.console, context);
+        stats.m_reset++;
+        env.update_stats();
+    }             
+    }
+
+}
+
+void AutoStory::checkpoint_30(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
+    bool first_attempt = true;
+    while (true){
+    try{
+        if (first_attempt){
+            checkpoint_save(env, context);
+            first_attempt = false;
+        }         
+        context.wait_for_all_requests();
+       
+        break;
+    }catch(OperationFailedException& e){
+        context.wait_for_all_requests();
+        env.console.log(e.m_message, COLOR_RED);
+        env.console.log("Resetting from checkpoint.");
+        reset_game(env.program_info(), env.console, context);
+        stats.m_reset++;
+        env.update_stats();
+    }             
+    }
+
+}
+
+void AutoStory::checkpoint_31(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
+    bool first_attempt = true;
+    while (true){
+    try{
+        if (first_attempt){
+            checkpoint_save(env, context);
+            first_attempt = false;
+        }         
+        context.wait_for_all_requests();
+       
+        break;
+    }catch(OperationFailedException& e){
+        context.wait_for_all_requests();
+        env.console.log(e.m_message, COLOR_RED);
+        env.console.log("Resetting from checkpoint.");
+        reset_game(env.program_info(), env.console, context);
+        stats.m_reset++;
+        env.update_stats();
+    }             
+    }
+
+}
+
+void AutoStory::checkpoint_32(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
+    bool first_attempt = true;
+    while (true){
+    try{
+        if (first_attempt){
+            checkpoint_save(env, context);
+            first_attempt = false;
+        }         
+        context.wait_for_all_requests();
+       
+        break;
+    }catch(OperationFailedException& e){
+        context.wait_for_all_requests();
+        env.console.log(e.m_message, COLOR_RED);
+        env.console.log("Resetting from checkpoint.");
+        reset_game(env.program_info(), env.console, context);
+        stats.m_reset++;
+        env.update_stats();
+    }             
+    }
+
+}
+
+void AutoStory::checkpoint_33(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
+    bool first_attempt = true;
+    while (true){
+    try{
+        if (first_attempt){
+            checkpoint_save(env, context);
+            first_attempt = false;
+        }         
+        context.wait_for_all_requests();
+       
+        break;
+    }catch(OperationFailedException& e){
+        context.wait_for_all_requests();
+        env.console.log(e.m_message, COLOR_RED);
+        env.console.log("Resetting from checkpoint.");
+        reset_game(env.program_info(), env.console, context);
+        stats.m_reset++;
+        env.update_stats();
+    }             
+    }
+
+}
+
+void AutoStory::checkpoint_34(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     bool first_attempt = true;
     while (true){

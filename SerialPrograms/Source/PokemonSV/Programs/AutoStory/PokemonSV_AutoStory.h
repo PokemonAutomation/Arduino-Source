@@ -242,17 +242,61 @@ public:
     // end: Get on ride for first time.
     void checkpoint_20(SingleSwitchProgramEnvironment& env, BotBaseContext& context);   
 
-    // start: Get on ride for first time.
+    // start: (After the break, with level 100 Gardevoir. At Mesagoza West pokecenter.)
     // end: 
     void checkpoint_21(SingleSwitchProgramEnvironment& env, BotBaseContext& context);   
 
-    // start: 
+    // start: (At South Province Area Two Pokecenter. )
     // end: 
     void checkpoint_22(SingleSwitchProgramEnvironment& env, BotBaseContext& context);   
 
+    // start: (At Cortondo East Pokecenter)
+    // end: 
+    void checkpoint_23(SingleSwitchProgramEnvironment& env, BotBaseContext& context);   
+
+    // start: (Done Cortondo Gym challenge)
+    // end: 
+    void checkpoint_24(SingleSwitchProgramEnvironment& env, BotBaseContext& context);   
+
+    // start: (Beat Cortondo Gym leader (Bug))
+    // end: 
+    void checkpoint_25(SingleSwitchProgramEnvironment& env, BotBaseContext& context);  
+
+    // start: At Cortondo West Pokecenter.
+    // end: 
+    void checkpoint_26(SingleSwitchProgramEnvironment& env, BotBaseContext& context);   
+
     // start: 
     // end: 
-    void checkpoint_23(SingleSwitchProgramEnvironment& env, BotBaseContext& context);              
+    void checkpoint_27(SingleSwitchProgramEnvironment& env, BotBaseContext& context);    
+
+    // start: 
+    // end: 
+    void checkpoint_28(SingleSwitchProgramEnvironment& env, BotBaseContext& context);   
+
+    // start: 
+    // end: 
+    void checkpoint_29(SingleSwitchProgramEnvironment& env, BotBaseContext& context);   
+
+    // start: 
+    // end: 
+    void checkpoint_30(SingleSwitchProgramEnvironment& env, BotBaseContext& context);   
+
+    // start: 
+    // end: 
+    void checkpoint_31(SingleSwitchProgramEnvironment& env, BotBaseContext& context);  
+
+    // start: 
+    // end: 
+    void checkpoint_32(SingleSwitchProgramEnvironment& env, BotBaseContext& context);   
+
+    // start: 
+    // end: 
+    void checkpoint_33(SingleSwitchProgramEnvironment& env, BotBaseContext& context);             
+    
+    // start: 
+    // end: 
+    void checkpoint_34(SingleSwitchProgramEnvironment& env, BotBaseContext& context);                    
 
 private:
     virtual void value_changed(void* object) override;
