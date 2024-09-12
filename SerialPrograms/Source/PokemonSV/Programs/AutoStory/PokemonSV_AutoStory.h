@@ -96,7 +96,8 @@ void overworld_navigation(const ProgramInfo& info, ConsoleHandle& console, BotBa
     NavigationStopCondition stop_condition,
     NavigationMovementMode movement_mode,
     uint8_t x, uint8_t y,
-    uint16_t seconds_timeout = 60, uint16_t seconds_realign = 60
+    uint16_t seconds_timeout = 60, uint16_t seconds_realign = 60,
+    bool auto_heal = true
 );
 
 void config_option(BotBaseContext& context, int change_option_value);

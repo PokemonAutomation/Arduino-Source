@@ -32,6 +32,7 @@
 #include "PokemonSV/Programs/AutoStory/PokemonSV_MenuOption.h"
 #include "PokemonSV/Inference/PokemonSV_TutorialDetector.h"
 #include "PokemonSV/Inference/PokemonSV_PokemonMovesReader.h"
+#include "PokemonSV/Inference/Map/PokemonSV_DestinationMarkerDetector.h"
 #include "PokemonSV_AutoStory.h"
 
 //#include <iostream>
@@ -646,29 +647,49 @@ void overworld_navigation(
     NavigationStopCondition stop_condition,
     NavigationMovementMode movement_mode,
     uint8_t x, uint8_t y,
-    uint16_t seconds_timeout, uint16_t seconds_realign
+    uint16_t seconds_timeout, uint16_t seconds_realign, 
+    bool auto_heal
 ){
     bool should_realign = true;
     if (seconds_timeout <= seconds_realign){
         seconds_realign = seconds_timeout;
         should_realign = false;
     }
+    uint16_t forward_ticks = seconds_realign * TICKS_PER_SECOND;
+    // WallClock start = current_time();
+
+    if (movement_mode == NavigationMovementMode::CLEAR_WITH_LETS_GO){
+        context.wait_for(Milliseconds(3000)); // for some reason, the "Destination arrived" notification reappears when you re-assign the marker.
+    }
+
 
     while (true){
         NormalBattleMenuWatcher battle(COLOR_BLUE);
         DialogBoxWatcher        dialog(COLOR_RED, true);
+        DestinationMarkerWatcher marker(COLOR_CYAN, {0.717, 0.165, 0.03, 0.061});
         context.wait_for_all_requests();
+        std::vector<PeriodicInferenceCallback> callbacks = {battle, dialog}; 
+        if (stop_condition == NavigationStopCondition::STOP_MARKER){
+            callbacks.emplace_back(marker);
+        }
+        // uint16_t ticks_passed = std::chrono::duration_cast<std::chrono::milliseconds>(current_time() - start).count() * TICKS_PER_SECOND / 1000;
+        // forward_ticks = seconds_realign * TICKS_PER_SECOND - ticks_passed;
 
         int ret = run_until(
             console, context,
             [&](BotBaseContext& context){
+
                 for (int i = 0; i < seconds_timeout / seconds_realign; i++){
-                    ssf_press_left_joystick(context, x, y, 0, seconds_realign * TICKS_PER_SECOND);
-                    if (movement_mode == NavigationMovementMode::DIRECTIONAL_ONLY){
-                        pbf_wait(context, seconds_realign * TICKS_PER_SECOND);
-                    } else if (movement_mode == NavigationMovementMode::DIRECTIONAL_SPAM_A){
-                        for (size_t j = 0; j < seconds_realign; j++){
-                            pbf_press_button(context, BUTTON_A, 20, 105);
+                    if (movement_mode == NavigationMovementMode::CLEAR_WITH_LETS_GO){
+                        walk_forward_while_clear_front_path(info, console, context, forward_ticks, y);
+                    }else{
+                        ssf_press_left_joystick(context, x, y, 0, seconds_realign * TICKS_PER_SECOND);
+                        if (movement_mode == NavigationMovementMode::DIRECTIONAL_ONLY){
+                            pbf_wait(context, seconds_realign * TICKS_PER_SECOND);
+                        } else if (movement_mode == NavigationMovementMode::DIRECTIONAL_SPAM_A){
+                            for (size_t j = 0; j < seconds_realign; j++){
+                                pbf_press_button(context, BUTTON_A, 20, 105);
+                            }
                         }
                     }
                     if (should_realign){
@@ -676,20 +697,29 @@ void overworld_navigation(
                     }
                 }
             },
-            {battle, dialog}
+            callbacks
         );
         context.wait_for(std::chrono::milliseconds(100));
 
         switch (ret){
         case 0: // battle
             console.log("overworld_navigation: Detected start of battle.");
-            run_battle_press_A(console, context, BattleStopCondition::STOP_OVERWORLD);                
-            auto_heal_from_menu_or_overworld(info, console, context, 0, true);
+            run_battle_press_A(console, context, BattleStopCondition::STOP_OVERWORLD);   
+            if (auto_heal){
+                auto_heal_from_menu_or_overworld(info, console, context, 0, true);
+            }
+
             realign_player(info, console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             break;
         case 1: // dialog
             console.log("overworld_navigation: Detected dialog.");
             if (stop_condition == NavigationStopCondition::STOP_DIALOG){
+                return;
+            }
+            break;
+        case 2: // marker
+            console.log("overworld_navigation: Detected marker.");
+            if (stop_condition == NavigationStopCondition::STOP_MARKER){
                 return;
             }
             break;
@@ -2249,22 +2279,82 @@ void AutoStory::checkpoint_25(SingleSwitchProgramEnvironment& env, BotBaseContex
 
 }
 
+// todo: uncomment checkpoint_save and fly_to_overlapping_flypoint
 void AutoStory::checkpoint_26(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     bool first_attempt = true;
     while (true){
     try{
         if (first_attempt){
-            checkpoint_save(env, context);
+            // checkpoint_save(env, context);
             first_attempt = false;
         }         
         context.wait_for_all_requests();
+
+        // fly_to_overlapping_flypoint(env.program_info(), env.console, context);
+
         do_action_and_monitor_for_battles(env, env.console, context,
-            [&](SingleSwitchProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){
-                fly_to_overlapping_flypoint(env.program_info(), env.console, context);
-                
-            }
-        );
+        [&](SingleSwitchProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){     
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 80, 0, 70);
+        });
+
+        overworld_navigation(env.program_info(), env.console, context, 
+            NavigationStopCondition::STOP_MARKER, NavigationMovementMode::CLEAR_WITH_LETS_GO, 
+            128, 0, 60, 10, false);
+
+        do_action_and_monitor_for_battles(env, env.console, context,
+        [&](SingleSwitchProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){     
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 128, 0, 55);
+        });
+        
+        overworld_navigation(env.program_info(), env.console, context, 
+            NavigationStopCondition::STOP_MARKER, NavigationMovementMode::CLEAR_WITH_LETS_GO, 
+            128, 0, 60, 10, false);
+
+        do_action_and_monitor_for_battles(env, env.console, context,
+        [&](SingleSwitchProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){     
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 70, 255, 100);
+
+        });
+
+        overworld_navigation(env.program_info(), env.console, context, 
+            NavigationStopCondition::STOP_MARKER, NavigationMovementMode::CLEAR_WITH_LETS_GO, 
+            128, 0, 60, 10, false);
+
+        do_action_and_monitor_for_battles(env, env.console, context,
+        [&](SingleSwitchProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){     
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 128, 100);
+
+        });
+        
+        walk_forward_while_clear_front_path(env.program_info(), env.console, context, 250);
+
+        // testing from here.
+
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 100, 0, 100);
+
+        walk_forward_while_clear_front_path(env.program_info(), env.console, context, 3875);
+
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 0, 100);
+
+        walk_forward_while_clear_front_path(env.program_info(), env.console, context, 3750);
+
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 128, 100);
+
+        // cross the bridge
+        walk_forward_while_clear_front_path(env.program_info(), env.console, context, 1125);
+
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 30, 0, 100);
+
+        walk_forward_while_clear_front_path(env.program_info(), env.console, context, 1375);
+
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 150, 100);
+
+        walk_forward_while_clear_front_path(env.program_info(), env.console, context, 1000);
+
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 180, 100);
+
+        walk_forward_while_clear_front_path(env.program_info(), env.console, context, 1625);                  
        
         break;
     }catch(OperationFailedException& e){
