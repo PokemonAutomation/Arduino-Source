@@ -716,6 +716,13 @@ void overworld_navigation(
             if (stop_condition == NavigationStopCondition::STOP_DIALOG){
                 return;
             }
+            if (stop_condition == NavigationStopCondition::STOP_MARKER){
+                throw OperationFailedException(
+                    ErrorReport::SEND_ERROR_REPORT, console,
+                    "overworld_navigation(): Unexpectedly detected dialog.",
+                    true
+                );
+            }            
             break;
         case 2: // marker
             console.log("overworld_navigation: Detected marker.");
@@ -2293,6 +2300,7 @@ void AutoStory::checkpoint_26(SingleSwitchProgramEnvironment& env, BotBaseContex
 
         // fly_to_overlapping_flypoint(env.program_info(), env.console, context);
 
+        // align for long stretch 1, part 1
         do_action_and_monitor_for_battles(env, env.console, context,
         [&](SingleSwitchProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){     
             realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 80, 0, 70);
@@ -2302,15 +2310,17 @@ void AutoStory::checkpoint_26(SingleSwitchProgramEnvironment& env, BotBaseContex
             NavigationStopCondition::STOP_MARKER, NavigationMovementMode::CLEAR_WITH_LETS_GO, 
             128, 0, 60, 10, false);
 
+        // align for long stretch 1, part 2
         do_action_and_monitor_for_battles(env, env.console, context,
         [&](SingleSwitchProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){     
-            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 128, 0, 55);
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 120, 0, 55);
         });
         
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_MARKER, NavigationMovementMode::CLEAR_WITH_LETS_GO, 
             128, 0, 60, 10, false);
 
+        // align for long stretch 2
         do_action_and_monitor_for_battles(env, env.console, context,
         [&](SingleSwitchProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){     
             realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 70, 255, 100);
@@ -2321,40 +2331,41 @@ void AutoStory::checkpoint_26(SingleSwitchProgramEnvironment& env, BotBaseContex
             NavigationStopCondition::STOP_MARKER, NavigationMovementMode::CLEAR_WITH_LETS_GO, 
             128, 0, 60, 10, false);
 
+        // align for long stretch 3, part 1
         do_action_and_monitor_for_battles(env, env.console, context,
         [&](SingleSwitchProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){     
-            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 128, 100);
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 120, 0, 75);
 
         });
         
-        walk_forward_while_clear_front_path(env.program_info(), env.console, context, 250);
+        overworld_navigation(env.program_info(), env.console, context, 
+            NavigationStopCondition::STOP_MARKER, NavigationMovementMode::CLEAR_WITH_LETS_GO, 
+            128, 0, 60, 10, false);
 
-        // testing from here.
+        // align for long stretch 3, part 2. // todo: consider realign based on pokecenter.
+        do_action_and_monitor_for_battles(env, env.console, context,
+        [&](SingleSwitchProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){     
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 35, 0, 85);
 
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 100, 0, 100);
+        });
 
-        walk_forward_while_clear_front_path(env.program_info(), env.console, context, 3875);
+        overworld_navigation(env.program_info(), env.console, context, 
+            NavigationStopCondition::STOP_MARKER, NavigationMovementMode::CLEAR_WITH_LETS_GO, 
+            128, 0, 60, 10, false);        
 
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 0, 100);
+        // align to cross bridge
+        do_action_and_monitor_for_battles(env, env.console, context,
+        [&](SingleSwitchProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){     
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 105, 30);
 
-        walk_forward_while_clear_front_path(env.program_info(), env.console, context, 3750);
+        });
 
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 128, 100);
+        overworld_navigation(env.program_info(), env.console, context, 
+            NavigationStopCondition::STOP_MARKER, NavigationMovementMode::CLEAR_WITH_LETS_GO, 
+            128, 0, 30, 30, false);    
 
-        // cross the bridge
-        walk_forward_while_clear_front_path(env.program_info(), env.console, context, 1125);
-
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 30, 0, 100);
-
-        walk_forward_while_clear_front_path(env.program_info(), env.console, context, 1375);
-
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 150, 100);
-
-        walk_forward_while_clear_front_path(env.program_info(), env.console, context, 1000);
-
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 180, 100);
-
-        walk_forward_while_clear_front_path(env.program_info(), env.console, context, 1625);                  
+                       
+              
        
         break;
     }catch(OperationFailedException& e){
@@ -2715,6 +2726,7 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
 
     // press_Bs_to_back_to_overworld(env.program_info(), env.console, context, 7);
     // walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 10);
+
     // context.wait_for(Milliseconds(1000000));
 
     if (ENABLE_TEST_REALIGN){
@@ -2725,7 +2737,10 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
     }
 
     if (ENABLE_TEST_OVERWORLD_MOVE){
-        walk_forward_while_clear_front_path(env.program_info(), env.console, context, FORWARD_TICKS);
+        // walk_forward_while_clear_front_path(env.program_info(), env.console, context, FORWARD_TICKS);
+        overworld_navigation(env.program_info(), env.console, context, 
+            NavigationStopCondition::STOP_MARKER, NavigationMovementMode::CLEAR_WITH_LETS_GO, 
+            128, 0, 60, 10, false);
         context.wait_for(Milliseconds(1000000));
     }
 
