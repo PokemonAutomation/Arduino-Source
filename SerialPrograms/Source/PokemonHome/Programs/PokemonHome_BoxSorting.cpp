@@ -99,14 +99,14 @@ BoxSorting::BoxSorting()
         1, 1, MAX_BOXES
         )
     , VIDEO_DELAY(
-          "<b>Delay of your capture card (you probably have to increase this):</b>",
+          "<b>Delay of your capture card:</b>",
           LockMode::LOCK_WHILE_RUNNING,
-          20
+          50
           )
     , GAME_DELAY(
-          "<b>Delay of your Pokemon Home app (default value should be fine):</b>",
+          "<b>Delay of your Pokemon Home app:</b>",
           LockMode::LOCK_WHILE_RUNNING,
-          15
+          30
           )
     , SORT_TABLE(
           "<b>Sort Order Rules:</b><br>Sort order rules will be applied top to bottom."
@@ -200,7 +200,6 @@ bool operator<(const std::optional<Pokemon>& lhs, const std::optional<Pokemon>& 
     for (const BoxSortingSelection preference : *lhs->preferences){
         switch(preference.sort_type){
         // NOTE edit when adding new struct members
-        // TODO TESTING and account for preference.reverse
         case BoxSortingSortType::NationalDexNo:
             if (lhs->national_dex_number != rhs->national_dex_number){
                 return lhs->national_dex_number < rhs->national_dex_number;
@@ -383,14 +382,14 @@ void output_boxes_data_json(const std::vector<std::optional<Pokemon>>& boxes_dat
         pokemon["box"] = cursor.box;
         pokemon["row"] =  cursor.row;
         pokemon["column"] =  cursor.column;
-        if (boxes_data[poke_nb] != std::nullopt){
+        if (std::optional<Pokemon> current_pokemon = boxes_data[poke_nb]; current_pokemon != std::nullopt){
             // NOTE edit when adding new struct members
-            pokemon["national_dex_number"] =  boxes_data[poke_nb]->national_dex_number;
-            pokemon["shiny"] =  boxes_data[poke_nb]->shiny;
-            pokemon["gmax"] =  boxes_data[poke_nb]->gmax;
-            pokemon["ball_slug"] =  boxes_data[poke_nb]->ball_slug;
-            pokemon["gender"] = gender_to_string(boxes_data[poke_nb]->gender);
-            pokemon["ot_id"] = boxes_data[poke_nb]->ot_id;
+            pokemon["national_dex_number"] = current_pokemon->national_dex_number;
+            pokemon["shiny"] = current_pokemon->shiny;
+            pokemon["gmax"] = current_pokemon->gmax;
+            pokemon["ball_slug"] = current_pokemon->ball_slug;
+            pokemon["gender"] = gender_to_string(current_pokemon->gender);
+            pokemon["ot_id"] = current_pokemon->ot_id;
         }
         pokemon_data.push_back(std::move(pokemon));
     }
@@ -463,7 +462,7 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
     BoxSorting_Descriptor::Stats& stats = env.current_stats< BoxSorting_Descriptor::Stats>();
 
     ImageFloatBox select_check(0.495, 0.0045, 0.01, 0.005); // square color to check which mode is active
-    ImageFloatBox national_dex_number_box(0.445, 0.245, 0.05, 0.04); //pokemon national dex number pos
+    ImageFloatBox national_dex_number_box(0.448, 0.245, 0.042, 0.04); //pokemon national dex number pos
     ImageFloatBox shiny_symbol_box(0.702, 0.09, 0.04, 0.06); // shiny symbol pos
     ImageFloatBox gmax_symbol_box(0.463, 0.09, 0.04, 0.06); // gmax symbol pos
     ImageFloatBox origin_symbol_box(0.623, 0.095, 0.033, 0.05); // origin symbol pos
@@ -618,14 +617,10 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
 
                     if(boxes_data[get_index(box_nb, row, column)].has_value()){
                         screen = env.console.video().snapshot();
-                        ImageRGB32 image = to_blackwhite_rgb32_range(
-                            extract_box_reference(screen, national_dex_number_box),
-                            0xff808080, 0xffffffff, true
-                            );
 
-                        int national_dex_number = OCR::read_number(env.console, image);
-                        if (national_dex_number == -1){
-                            dump_image(env.console, ProgramInfo(), "ReadSummary", screen);
+                        int national_dex_number = OCR::read_number_waterfill(env.console, extract_box_reference(screen, national_dex_number_box), 0xff808080, 0xffffffff);
+                        if (national_dex_number < 0 || national_dex_number > 1025) {
+                            dump_image(env.console, ProgramInfo(), "ReadSummary_national_dex_number", screen);
                         }
                         boxes_data[get_index(box_nb, row, column)]->national_dex_number = national_dex_number;
 
@@ -647,14 +642,9 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
                         env.console.log("Gender: " + gender_to_string(gender), COLOR_GREEN);
                         boxes_data[get_index(box_nb, row, column)]->gender = gender;
 
-                        image = to_blackwhite_rgb32_range(
-                            extract_box_reference(screen, ot_id_box),
-                            0xff808080, 0xffffffff, true
-                            );
-
-                        int ot_id = OCR::read_number(env.console, image);
-                        if (ot_id == -1){
-                            dump_image(env.console, ProgramInfo(), "ReadSummary", screen);
+                        int ot_id = OCR::read_number_waterfill(env.console, extract_box_reference(screen, ot_id_box), 0xff808080, 0xffffffff);
+                        if (ot_id < 0 || ot_id > 999'999) {
+                            dump_image(env.console, ProgramInfo(), "ReadSummary_OT", screen);
                         }
                         boxes_data[get_index(box_nb, row, column)]->ot_id = ot_id;
 
