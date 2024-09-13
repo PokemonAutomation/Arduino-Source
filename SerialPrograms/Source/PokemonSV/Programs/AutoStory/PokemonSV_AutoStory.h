@@ -60,6 +60,12 @@ enum class StartPoint{
     MESAGOZA_SOUTH,
 };
 
+enum class StarterChoice{
+    SPRIGATITO,
+    FUECOCO,
+    QUAXLY,
+};
+
 class AutoStory_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     AutoStory_Descriptor();
@@ -131,6 +137,159 @@ bool check_ride_active(const ProgramInfo& info, ConsoleHandle& console, BotBaseC
 
 void get_on_ride(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
 
+
+// change the settings prior to Autostory
+// Assumes that `current_segment` represents where we currently are in the story.
+void change_settings_prior_to_autostory(SingleSwitchProgramEnvironment& env, BotBaseContext& context, StartPoint current_segment, Language language);
+
+// from within the Settings/Options menu, change the settings
+void change_settings(SingleSwitchProgramEnvironment& env, BotBaseContext& context, Language language, bool use_inference = true);
+
+
+void checkpoint_save(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EventNotificationOption& notif_status_update);
+
+
+// start: after selecting character name, style and the cutscene has started
+// end: stood up from chair. Walked to left side of room.
+void checkpoint_00(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+
+// start: stood up from chair. Walked to left side of room.
+// end: standing in room. updated settings
+void checkpoint_01(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EventNotificationOption& notif_status_update, Language language);
+
+// start: standing in room. updated settings
+// end: standing in front of power of science NPC. Cleared map tutorial.
+void checkpoint_02(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EventNotificationOption& notif_status_update);
+
+// start: standing in front of power of science NPC. Cleared map tutorial.
+// end: received starter, changed move order
+void checkpoint_03(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EventNotificationOption& notif_status_update, Language language, StarterChoice starter_choice);
+
+// start: Received starter pokemon and changed move order. Cleared autoheal tutorial.
+// end: Battled Nemona on the beach.
+void checkpoint_04(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EventNotificationOption& notif_status_update);
+
+// start: Battled Nemona on the beach.
+// end: Met mom at gate. Received mom's sandwich.
+void checkpoint_05(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EventNotificationOption& notif_status_update);
+
+// start: Met mom at gate. Received mom's sandwich.
+// end: Cleared catch tutorial.
+void checkpoint_06(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EventNotificationOption& notif_status_update);
+
+// start: Cleared catch tutorial.
+// end: Moved to cliff. Heard mystery cry.
+void checkpoint_07(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EventNotificationOption& notif_status_update);
+
+// start: Moved to cliff. Heard mystery cry.
+// end: Rescued Koraidon/Miraidon and escaped from the Houndoom Cave.
+void checkpoint_08(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EventNotificationOption& notif_status_update);
+
+// start: Rescued Koraidon/Miraidon and escaped from the Houndoom Cave.
+// end: Battled Arven and received Legendary's Pokeball.
+void checkpoint_09(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EventNotificationOption& notif_status_update);
+
+// start: Battled Arven and received Legendary's Pokeball.
+// end: Talked to Nemona at the Lighthouse.
+void checkpoint_10(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EventNotificationOption& notif_status_update);
+
+// start: Talked to Nemona at the Lighthouse.
+// end: Arrived at Los Platos pokecenter. Cleared Let's go tutorial.
+void checkpoint_11(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EventNotificationOption& notif_status_update);
+
+// start: Arrived at Los Platos pokecenter. Cleared Let's go tutorial.
+// end: Arrived at Mesagoza (South) Pokecenter
+void checkpoint_12(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EventNotificationOption& notif_status_update);
+
+// start: Arrived at Mesagoza (South) Pokecenter
+// end: Battled Nemona at Mesagoza gate. Entered Mesagoza.
+void checkpoint_13(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EventNotificationOption& notif_status_update);
+
+// start: Battled Nemona at Mesagoza gate. Entered Mesagoza.
+// end: Battled Team Star at school entrance.
+void checkpoint_14(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EventNotificationOption& notif_status_update);
+
+// start: Battled Team Star at school entrance.
+// end: Talked to Jacq in classroom. Standing in classroom.
+void checkpoint_15(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EventNotificationOption& notif_status_update);
+
+// start: Talked to Jacq in classroom. Standing in classroom.
+// end: Talked to Arven. Received Titan questline (Path of Legends). Talked to Cassiopeia. Standing in main hall.
+void checkpoint_16(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EventNotificationOption& notif_status_update);
+
+// start: Talked to Arven. Received Titan questline (Path of Legends).
+// end: Talked to Cassiopeia. Saw Geeta. Talked to Nemona. Received Gym/Elite Four questline (Victory Road). Standing in staff room.
+void checkpoint_17(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EventNotificationOption& notif_status_update); 
+
+// start: Talked to Cassiopeia. Saw Geeta. Talked to Nemona. Received Gym/Elite Four questline (Victory Road). Standing in staff room.
+// end: Talked to Clavell and the professor.
+void checkpoint_18(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EventNotificationOption& notif_status_update);          
+
+// start: Talked to Clavell and the professor.
+// end: Talked to Nemona, visited dorm, time passed.
+void checkpoint_19(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EventNotificationOption& notif_status_update);      
+
+// start: Talked to Nemona, visited dorm, time passed.
+// end: Get on ride for first time.
+void checkpoint_20(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EventNotificationOption& notif_status_update);   
+
+// start: (After the break, with level 100 Gardevoir. At Mesagoza West pokecenter.)
+// end: 
+void checkpoint_21(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EventNotificationOption& notif_status_update);   
+
+// start: (At South Province Area Two Pokecenter. )
+// end: 
+void checkpoint_22(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EventNotificationOption& notif_status_update);   
+
+// start: (At Cortondo East Pokecenter)
+// end: 
+void checkpoint_23(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EventNotificationOption& notif_status_update);   
+
+// start: (Done Cortondo Gym challenge)
+// end: 
+void checkpoint_24(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EventNotificationOption& notif_status_update);   
+
+// start: (Beat Cortondo Gym leader (Bug))
+// end: 
+void checkpoint_25(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EventNotificationOption& notif_status_update);  
+
+// start: At Cortondo West Pokecenter.
+// end: 
+void checkpoint_26(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EventNotificationOption& notif_status_update);   
+
+// start: 
+// end: 
+void checkpoint_27(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EventNotificationOption& notif_status_update);    
+
+// start: 
+// end: 
+void checkpoint_28(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EventNotificationOption& notif_status_update);   
+
+// start: 
+// end: 
+void checkpoint_29(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EventNotificationOption& notif_status_update);   
+
+// start: 
+// end: 
+void checkpoint_30(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EventNotificationOption& notif_status_update);   
+
+// start: 
+// end: 
+void checkpoint_31(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EventNotificationOption& notif_status_update);  
+
+// start: 
+// end: 
+void checkpoint_32(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EventNotificationOption& notif_status_update);   
+
+// start: 
+// end: 
+void checkpoint_33(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EventNotificationOption& notif_status_update);             
+
+// start: 
+// end: 
+void checkpoint_34(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EventNotificationOption& notif_status_update);  
+
+
 class AutoStory : public SingleSwitchProgramInstance, public ConfigOption::Listener{
 public:
     ~AutoStory();
@@ -148,156 +307,7 @@ public:
         int loop, int start_loop, int end_loop
     );
 
-    // change the settings prior to Autostory
-    // Assumes that `current_segment` represents where we currently are in the story.
-    void change_settings_prior_to_autostory(SingleSwitchProgramEnvironment& env, BotBaseContext& context, StartPoint current_segment);
-
-    // from within the Settings/Options menu, change the settings
-    void change_settings(SingleSwitchProgramEnvironment& env, BotBaseContext& context, bool use_inference = true);
-
     void run_autostory(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-
-    void checkpoint_save(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-
-    // start: after selecting character name, style and the cutscene has started
-    // end: stood up from chair. Walked to left side of room.
-    void checkpoint_00(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-
-    // start: stood up from chair. Walked to left side of room.
-    // end: standing in room. updated settings
-    void checkpoint_01(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-    
-    // start: standing in room. updated settings
-    // end: standing in front of power of science NPC. Cleared map tutorial.
-    void checkpoint_02(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-
-    // start: standing in front of power of science NPC. Cleared map tutorial.
-    // end: received starter, changed move order
-    void checkpoint_03(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-
-    // start: Received starter pokemon and changed move order. Cleared autoheal tutorial.
-    // end: Battled Nemona on the beach.
-    void checkpoint_04(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-
-    // start: Battled Nemona on the beach.
-    // end: Met mom at gate. Received mom's sandwich.
-    void checkpoint_05(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-
-    // start: Met mom at gate. Received mom's sandwich.
-    // end: Cleared catch tutorial.
-    void checkpoint_06(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-
-    // start: Cleared catch tutorial.
-    // end: Moved to cliff. Heard mystery cry.
-    void checkpoint_07(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-
-    // start: Moved to cliff. Heard mystery cry.
-    // end: Rescued Koraidon/Miraidon and escaped from the Houndoom Cave.
-    void checkpoint_08(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-
-    // start: Rescued Koraidon/Miraidon and escaped from the Houndoom Cave.
-    // end: Battled Arven and received Legendary's Pokeball.
-    void checkpoint_09(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-
-    // start: Battled Arven and received Legendary's Pokeball.
-    // end: Talked to Nemona at the Lighthouse.
-    void checkpoint_10(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-
-    // start: Talked to Nemona at the Lighthouse.
-    // end: Arrived at Los Platos pokecenter. Cleared Let's go tutorial.
-    void checkpoint_11(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-
-    // start: Arrived at Los Platos pokecenter. Cleared Let's go tutorial.
-    // end: Arrived at Mesagoza (South) Pokecenter
-    void checkpoint_12(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-
-    // start: Arrived at Mesagoza (South) Pokecenter
-    // end: Battled Nemona at Mesagoza gate. Entered Mesagoza.
-    void checkpoint_13(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-
-    // start: Battled Nemona at Mesagoza gate. Entered Mesagoza.
-    // end: Battled Team Star at school entrance.
-    void checkpoint_14(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-
-    // start: Battled Team Star at school entrance.
-    // end: Talked to Jacq in classroom. Standing in classroom.
-    void checkpoint_15(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-
-    // start: Talked to Jacq in classroom. Standing in classroom.
-    // end: Talked to Arven. Received Titan questline (Path of Legends). Talked to Cassiopeia. Standing in main hall.
-    void checkpoint_16(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-
-    // start: Talked to Arven. Received Titan questline (Path of Legends).
-    // end: Talked to Cassiopeia. Saw Geeta. Talked to Nemona. Received Gym/Elite Four questline (Victory Road). Standing in staff room.
-    void checkpoint_17(SingleSwitchProgramEnvironment& env, BotBaseContext& context); 
-
-    // start: Talked to Cassiopeia. Saw Geeta. Talked to Nemona. Received Gym/Elite Four questline (Victory Road). Standing in staff room.
-    // end: Talked to Clavell and the professor.
-    void checkpoint_18(SingleSwitchProgramEnvironment& env, BotBaseContext& context);          
-
-    // start: Talked to Clavell and the professor.
-    // end: Talked to Nemona, visited dorm, time passed.
-    void checkpoint_19(SingleSwitchProgramEnvironment& env, BotBaseContext& context);      
-
-    // start: Talked to Nemona, visited dorm, time passed.
-    // end: Get on ride for first time.
-    void checkpoint_20(SingleSwitchProgramEnvironment& env, BotBaseContext& context);   
-
-    // start: (After the break, with level 100 Gardevoir. At Mesagoza West pokecenter.)
-    // end: 
-    void checkpoint_21(SingleSwitchProgramEnvironment& env, BotBaseContext& context);   
-
-    // start: (At South Province Area Two Pokecenter. )
-    // end: 
-    void checkpoint_22(SingleSwitchProgramEnvironment& env, BotBaseContext& context);   
-
-    // start: (At Cortondo East Pokecenter)
-    // end: 
-    void checkpoint_23(SingleSwitchProgramEnvironment& env, BotBaseContext& context);   
-
-    // start: (Done Cortondo Gym challenge)
-    // end: 
-    void checkpoint_24(SingleSwitchProgramEnvironment& env, BotBaseContext& context);   
-
-    // start: (Beat Cortondo Gym leader (Bug))
-    // end: 
-    void checkpoint_25(SingleSwitchProgramEnvironment& env, BotBaseContext& context);  
-
-    // start: At Cortondo West Pokecenter.
-    // end: 
-    void checkpoint_26(SingleSwitchProgramEnvironment& env, BotBaseContext& context);   
-
-    // start: 
-    // end: 
-    void checkpoint_27(SingleSwitchProgramEnvironment& env, BotBaseContext& context);    
-
-    // start: 
-    // end: 
-    void checkpoint_28(SingleSwitchProgramEnvironment& env, BotBaseContext& context);   
-
-    // start: 
-    // end: 
-    void checkpoint_29(SingleSwitchProgramEnvironment& env, BotBaseContext& context);   
-
-    // start: 
-    // end: 
-    void checkpoint_30(SingleSwitchProgramEnvironment& env, BotBaseContext& context);   
-
-    // start: 
-    // end: 
-    void checkpoint_31(SingleSwitchProgramEnvironment& env, BotBaseContext& context);  
-
-    // start: 
-    // end: 
-    void checkpoint_32(SingleSwitchProgramEnvironment& env, BotBaseContext& context);   
-
-    // start: 
-    // end: 
-    void checkpoint_33(SingleSwitchProgramEnvironment& env, BotBaseContext& context);             
-    
-    // start: 
-    // end: 
-    void checkpoint_34(SingleSwitchProgramEnvironment& env, BotBaseContext& context);                    
 
 private:
     virtual void value_changed(void* object) override;
@@ -325,11 +335,7 @@ private:
     StaticTextOption START_DESCRIPTION;
     StaticTextOption END_DESCRIPTION;
 
-    enum class StarterChoice{
-        SPRIGATITO,
-        FUECOCO,
-        QUAXLY,
-    };
+
     EnumDropdownOption<StarterChoice> STARTERCHOICE;
 
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;

@@ -798,7 +798,7 @@ void swap_starter_moves(const ProgramInfo& info, ConsoleHandle& console, BotBase
 }
 
 
-void AutoStory::change_settings_prior_to_autostory(SingleSwitchProgramEnvironment& env, BotBaseContext& context, StartPoint current_segment){
+void change_settings_prior_to_autostory(SingleSwitchProgramEnvironment& env, BotBaseContext& context, StartPoint current_segment, Language language){
     if (current_segment == StartPoint::INTRO_CUTSCENE){
         return;
     }
@@ -827,7 +827,7 @@ void AutoStory::change_settings_prior_to_autostory(SingleSwitchProgramEnvironmen
     bool has_minimap = current_segment != StartPoint::PICK_STARTER; // and also not equal to StartPoint::INTRO_CUTSCENE:
 
     enter_menu_from_overworld(env.program_info(), env.console, context, index, MenuSide::RIGHT, has_minimap);
-    change_settings(env, context);
+    change_settings(env, context, language);
     if(current_segment == StartPoint::PICK_STARTER){
         pbf_mash_button(context, BUTTON_B, 2 * TICKS_PER_SECOND);
     }else{
@@ -835,10 +835,10 @@ void AutoStory::change_settings_prior_to_autostory(SingleSwitchProgramEnvironmen
     }
 }
 
-void AutoStory::change_settings(SingleSwitchProgramEnvironment& env, BotBaseContext& context, bool use_inference){
+void change_settings(SingleSwitchProgramEnvironment& env, BotBaseContext& context,  Language language, bool use_inference){
     env.console.log("Update settings.");
     if (use_inference){
-        MenuOption session(env.console, context, LANGUAGE);
+        MenuOption session(env.console, context, language);
 
         std::vector<std::pair<MenuOptionItemEnum, std::vector<MenuOptionToggleEnum>>> options = {
             {MenuOptionItemEnum::TEXT_SPEED, {MenuOptionToggleEnum::FAST}},
@@ -999,12 +999,12 @@ void get_on_ride(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
     }
 }
 
-void AutoStory::checkpoint_save(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void checkpoint_save(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EventNotificationOption& notif_status_update){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     save_game_from_overworld(env.program_info(), env.console, context);
     stats.m_checkpoint++;
     env.update_stats();
-    send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE, "Saved at checkpoint.");        
+    send_program_status_notification(env, notif_status_update, "Saved at checkpoint.");        
 }
 
 void AutoStory::test_checkpoints(
@@ -1014,43 +1014,45 @@ void AutoStory::test_checkpoints(
     int start, int end, 
     int loop, int start_loop, int end_loop
 ){
-
+    EventNotificationOption& notif_status_update = NOTIFICATION_STATUS_UPDATE;
+    Language language = LANGUAGE;
+    StarterChoice starter_choice = STARTERCHOICE;
     std::vector<std::function<void()>> checkpoint_list;
     checkpoint_list.push_back([&](){checkpoint_00(env, context);});
-    checkpoint_list.push_back([&](){checkpoint_01(env, context);});
-    checkpoint_list.push_back([&](){checkpoint_02(env, context);});
-    checkpoint_list.push_back([&](){checkpoint_03(env, context);});
-    checkpoint_list.push_back([&](){checkpoint_04(env, context);});
-    checkpoint_list.push_back([&](){checkpoint_05(env, context);});
-    checkpoint_list.push_back([&](){checkpoint_06(env, context);});
-    checkpoint_list.push_back([&](){checkpoint_07(env, context);});
-    checkpoint_list.push_back([&](){checkpoint_08(env, context);});
-    checkpoint_list.push_back([&](){checkpoint_09(env, context);});
-    checkpoint_list.push_back([&](){checkpoint_10(env, context);});
-    checkpoint_list.push_back([&](){checkpoint_11(env, context);});
-    checkpoint_list.push_back([&](){checkpoint_12(env, context);});
-    checkpoint_list.push_back([&](){checkpoint_13(env, context);});
-    checkpoint_list.push_back([&](){checkpoint_14(env, context);});
-    checkpoint_list.push_back([&](){checkpoint_15(env, context);});
-    checkpoint_list.push_back([&](){checkpoint_16(env, context);});
-    checkpoint_list.push_back([&](){checkpoint_17(env, context);});
-    checkpoint_list.push_back([&](){checkpoint_18(env, context);});
-    checkpoint_list.push_back([&](){checkpoint_19(env, context);});
-    checkpoint_list.push_back([&](){checkpoint_20(env, context);});
-    checkpoint_list.push_back([&](){checkpoint_21(env, context);});
-    checkpoint_list.push_back([&](){checkpoint_22(env, context);});
-    checkpoint_list.push_back([&](){checkpoint_23(env, context);});
-    checkpoint_list.push_back([&](){checkpoint_24(env, context);});
-    checkpoint_list.push_back([&](){checkpoint_25(env, context);});
-    checkpoint_list.push_back([&](){checkpoint_26(env, context);});
-    checkpoint_list.push_back([&](){checkpoint_27(env, context);});
-    checkpoint_list.push_back([&](){checkpoint_28(env, context);});
-    checkpoint_list.push_back([&](){checkpoint_29(env, context);});
-    checkpoint_list.push_back([&](){checkpoint_30(env, context);});
-    checkpoint_list.push_back([&](){checkpoint_31(env, context);});
-    checkpoint_list.push_back([&](){checkpoint_32(env, context);});
-    checkpoint_list.push_back([&](){checkpoint_33(env, context);});
-    checkpoint_list.push_back([&](){checkpoint_34(env, context);});
+    checkpoint_list.push_back([&](){checkpoint_01(env, context, notif_status_update, language);});
+    checkpoint_list.push_back([&](){checkpoint_02(env, context, notif_status_update);});
+    checkpoint_list.push_back([&](){checkpoint_03(env, context, notif_status_update, language, starter_choice);});
+    checkpoint_list.push_back([&](){checkpoint_04(env, context, notif_status_update);});
+    checkpoint_list.push_back([&](){checkpoint_05(env, context, notif_status_update);});
+    checkpoint_list.push_back([&](){checkpoint_06(env, context, notif_status_update);});
+    checkpoint_list.push_back([&](){checkpoint_07(env, context, notif_status_update);});
+    checkpoint_list.push_back([&](){checkpoint_08(env, context, notif_status_update);});
+    checkpoint_list.push_back([&](){checkpoint_09(env, context, notif_status_update);});
+    checkpoint_list.push_back([&](){checkpoint_10(env, context, notif_status_update);});
+    checkpoint_list.push_back([&](){checkpoint_11(env, context, notif_status_update);});
+    checkpoint_list.push_back([&](){checkpoint_12(env, context, notif_status_update);});
+    checkpoint_list.push_back([&](){checkpoint_13(env, context, notif_status_update);});
+    checkpoint_list.push_back([&](){checkpoint_14(env, context, notif_status_update);});
+    checkpoint_list.push_back([&](){checkpoint_15(env, context, notif_status_update);});
+    checkpoint_list.push_back([&](){checkpoint_16(env, context, notif_status_update);});
+    checkpoint_list.push_back([&](){checkpoint_17(env, context, notif_status_update);});
+    checkpoint_list.push_back([&](){checkpoint_18(env, context, notif_status_update);});
+    checkpoint_list.push_back([&](){checkpoint_19(env, context, notif_status_update);});
+    checkpoint_list.push_back([&](){checkpoint_20(env, context, notif_status_update);});
+    checkpoint_list.push_back([&](){checkpoint_21(env, context, notif_status_update);});
+    checkpoint_list.push_back([&](){checkpoint_22(env, context, notif_status_update);});
+    checkpoint_list.push_back([&](){checkpoint_23(env, context, notif_status_update);});
+    checkpoint_list.push_back([&](){checkpoint_24(env, context, notif_status_update);});
+    checkpoint_list.push_back([&](){checkpoint_25(env, context, notif_status_update);});
+    checkpoint_list.push_back([&](){checkpoint_26(env, context, notif_status_update);});
+    checkpoint_list.push_back([&](){checkpoint_27(env, context, notif_status_update);});
+    checkpoint_list.push_back([&](){checkpoint_28(env, context, notif_status_update);});
+    checkpoint_list.push_back([&](){checkpoint_29(env, context, notif_status_update);});
+    checkpoint_list.push_back([&](){checkpoint_30(env, context, notif_status_update);});
+    checkpoint_list.push_back([&](){checkpoint_31(env, context, notif_status_update);});
+    checkpoint_list.push_back([&](){checkpoint_32(env, context, notif_status_update);});
+    checkpoint_list.push_back([&](){checkpoint_33(env, context, notif_status_update);});
+    checkpoint_list.push_back([&](){checkpoint_34(env, context, notif_status_update);});
 
     for (int checkpoint = start; checkpoint <= end; checkpoint++){
         if (checkpoint == 0){
@@ -1077,7 +1079,7 @@ void AutoStory::test_checkpoints(
     
 }
 
-void AutoStory::checkpoint_00(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void checkpoint_00(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
 
 
     // Mash A through intro cutscene, until the L stick button is detected
@@ -1097,7 +1099,12 @@ void AutoStory::checkpoint_00(SingleSwitchProgramEnvironment& env, BotBaseContex
 
 }
 
-void AutoStory::checkpoint_01(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void checkpoint_01(
+    SingleSwitchProgramEnvironment& env, 
+    BotBaseContext& context, 
+    EventNotificationOption& notif_status_update, 
+    Language language
+){
 AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     bool first_attempt = true;
     while (true){
@@ -1106,14 +1113,14 @@ AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Sta
             save_game_tutorial(env.program_info(), env.console, context);
             stats.m_checkpoint++;
             env.update_stats();
-            send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE, "Saved at checkpoint.");     
+            send_program_status_notification(env, notif_status_update, "Saved at checkpoint.");     
             first_attempt = false;
         }
         
         context.wait_for_all_requests();
         // set settings
         enter_menu_from_overworld(env.program_info(), env.console, context, 0, MenuSide::RIGHT, false);
-        change_settings(env, context, first_attempt);
+        change_settings(env, context, language, first_attempt);
         pbf_mash_button(context, BUTTON_B, 2 * TICKS_PER_SECOND);
 
         break;  
@@ -1129,7 +1136,11 @@ AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Sta
     }
 }
 
-void AutoStory::checkpoint_02(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void checkpoint_02(
+    SingleSwitchProgramEnvironment& env, 
+    BotBaseContext& context, 
+    EventNotificationOption& notif_status_update
+){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     bool first_attempt = true;
     while (true){
@@ -1138,7 +1149,7 @@ void AutoStory::checkpoint_02(SingleSwitchProgramEnvironment& env, BotBaseContex
             save_game_tutorial(env.program_info(), env.console, context);
             stats.m_checkpoint++;
             env.update_stats();
-            send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE, "Saved at checkpoint.");     
+            send_program_status_notification(env, notif_status_update, "Saved at checkpoint.");     
             first_attempt = false;
         }
         
@@ -1222,13 +1233,19 @@ void AutoStory::checkpoint_02(SingleSwitchProgramEnvironment& env, BotBaseContex
     }
 }
 
-void AutoStory::checkpoint_03(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void checkpoint_03(
+    SingleSwitchProgramEnvironment& env, 
+    BotBaseContext& context, 
+    EventNotificationOption& notif_status_update,
+    Language language,
+    StarterChoice starter_choice
+){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     bool first_attempt = true;
     while (true){   
     try{
         if (first_attempt){
-            checkpoint_save(env, context);
+            checkpoint_save(env, context, notif_status_update);
             first_attempt = false;
         }
         
@@ -1244,7 +1261,7 @@ void AutoStory::checkpoint_03(SingleSwitchProgramEnvironment& env, BotBaseContex
         mash_button_till_overworld(env.console, context);
         context.wait_for_all_requests();
         env.console.log("Picking a starter...");
-        switch(STARTERCHOICE){
+        switch(starter_choice){
         case StarterChoice::SPRIGATITO:
             env.console.log("Picking Sprigatito...");
             pbf_move_left_joystick(context, 75, 0, 80, 20);
@@ -1293,7 +1310,7 @@ void AutoStory::checkpoint_03(SingleSwitchProgramEnvironment& env, BotBaseContex
         clear_tutorial(env.console, context);
 
         env.console.log("Change move order.");
-        swap_starter_moves(env.program_info(), env.console, context, LANGUAGE);
+        swap_starter_moves(env.program_info(), env.console, context, language);
         leave_box_system_to_overworld(env.program_info(), env.console, context);
 
         break;
@@ -1309,13 +1326,17 @@ void AutoStory::checkpoint_03(SingleSwitchProgramEnvironment& env, BotBaseContex
 
 }
 
-void AutoStory::checkpoint_04(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void checkpoint_04(
+    SingleSwitchProgramEnvironment& env, 
+    BotBaseContext& context, 
+    EventNotificationOption& notif_status_update
+){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     bool first_attempt = true;
     while (true){
     try{        
         if (first_attempt){
-            checkpoint_save(env, context);
+            checkpoint_save(env, context, notif_status_update);
             first_attempt = false;
         }        
         context.wait_for_all_requests();
@@ -1355,13 +1376,17 @@ void AutoStory::checkpoint_04(SingleSwitchProgramEnvironment& env, BotBaseContex
 
 }
 
-void AutoStory::checkpoint_05(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void checkpoint_05(
+    SingleSwitchProgramEnvironment& env, 
+    BotBaseContext& context, 
+    EventNotificationOption& notif_status_update
+){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     bool first_attempt = true;
     while (true){
     try{
         if (first_attempt){
-            checkpoint_save(env, context);
+            checkpoint_save(env, context, notif_status_update);
             first_attempt = false;
         }         
         context.wait_for_all_requests();
@@ -1388,13 +1413,17 @@ void AutoStory::checkpoint_05(SingleSwitchProgramEnvironment& env, BotBaseContex
     }    
 }
 
-void AutoStory::checkpoint_06(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void checkpoint_06(
+    SingleSwitchProgramEnvironment& env, 
+    BotBaseContext& context, 
+    EventNotificationOption& notif_status_update
+){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     bool first_attempt = true;
     while (true){
     try{        
         if (first_attempt){
-            checkpoint_save(env, context);
+            checkpoint_save(env, context, notif_status_update);
             first_attempt = false;
         }        
 
@@ -1435,13 +1464,17 @@ void AutoStory::checkpoint_06(SingleSwitchProgramEnvironment& env, BotBaseContex
     }
 }
 
-void AutoStory::checkpoint_07(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void checkpoint_07(
+    SingleSwitchProgramEnvironment& env, 
+    BotBaseContext& context, 
+    EventNotificationOption& notif_status_update
+){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     bool first_attempt = true;
     while (true){
     try{
         if (first_attempt){
-            checkpoint_save(env, context);
+            checkpoint_save(env, context, notif_status_update);
             first_attempt = false;
         }         
 
@@ -1472,13 +1505,17 @@ void AutoStory::checkpoint_07(SingleSwitchProgramEnvironment& env, BotBaseContex
     }
 }
 
-void AutoStory::checkpoint_08(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void checkpoint_08(
+    SingleSwitchProgramEnvironment& env, 
+    BotBaseContext& context, 
+    EventNotificationOption& notif_status_update
+){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     bool first_attempt = true;
     while (true){
     try{
         if (first_attempt){
-            checkpoint_save(env, context);
+            checkpoint_save(env, context, notif_status_update);
             first_attempt = false;
         }         
         context.wait_for_all_requests();
@@ -1603,13 +1640,17 @@ void AutoStory::checkpoint_08(SingleSwitchProgramEnvironment& env, BotBaseContex
 }
 
 
-void AutoStory::checkpoint_09(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void checkpoint_09(
+    SingleSwitchProgramEnvironment& env, 
+    BotBaseContext& context, 
+    EventNotificationOption& notif_status_update
+){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     bool first_attempt = true;
     while (true){
     try{        
         if (first_attempt){
-            checkpoint_save(env, context);
+            checkpoint_save(env, context, notif_status_update);
             first_attempt = false;
         }      
         context.wait_for_all_requests();
@@ -1639,13 +1680,17 @@ void AutoStory::checkpoint_09(SingleSwitchProgramEnvironment& env, BotBaseContex
     }
 }
 
-void AutoStory::checkpoint_10(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void checkpoint_10(
+    SingleSwitchProgramEnvironment& env, 
+    BotBaseContext& context, 
+    EventNotificationOption& notif_status_update
+){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     bool first_attempt = true;
     while (true){
     try{
         if (first_attempt){
-            checkpoint_save(env, context);
+            checkpoint_save(env, context, notif_status_update);
             first_attempt = false;
         }        
         context.wait_for_all_requests();
@@ -1679,13 +1724,17 @@ void AutoStory::checkpoint_10(SingleSwitchProgramEnvironment& env, BotBaseContex
     }
 }
 
-void AutoStory::checkpoint_11(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void checkpoint_11(
+    SingleSwitchProgramEnvironment& env, 
+    BotBaseContext& context, 
+    EventNotificationOption& notif_status_update
+){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     bool first_attempt = true;
     while (true){
     try{
         if (first_attempt){
-            checkpoint_save(env, context);
+            checkpoint_save(env, context, notif_status_update);
             first_attempt = false;
         } 
 
@@ -1726,7 +1775,11 @@ void AutoStory::checkpoint_11(SingleSwitchProgramEnvironment& env, BotBaseContex
 }
 
 
-void AutoStory::checkpoint_12(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void checkpoint_12(
+    SingleSwitchProgramEnvironment& env, 
+    BotBaseContext& context, 
+    EventNotificationOption& notif_status_update
+){
     // reset rate: ~25%. 12 resets out of 52. 
     // resets due to: getting attacked by wild pokemon, either from behind, 
     // or when lead pokemon not strong enough to clear them with Let's go
@@ -1738,7 +1791,7 @@ void AutoStory::checkpoint_12(SingleSwitchProgramEnvironment& env, BotBaseContex
         [&](SingleSwitchProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){        
         
             if (first_attempt){
-                checkpoint_save(env, context);
+                checkpoint_save(env, context, notif_status_update);
                 first_attempt = false;
             } 
 
@@ -1790,7 +1843,11 @@ void AutoStory::checkpoint_12(SingleSwitchProgramEnvironment& env, BotBaseContex
 
 }
 
-void AutoStory::checkpoint_13(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void checkpoint_13(
+    SingleSwitchProgramEnvironment& env, 
+    BotBaseContext& context, 
+    EventNotificationOption& notif_status_update
+){
     // reset rate: 0%. 0 resets out of 70.
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     bool first_attempt = true;
@@ -1800,7 +1857,7 @@ void AutoStory::checkpoint_13(SingleSwitchProgramEnvironment& env, BotBaseContex
         [&](SingleSwitchProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){        
         
             if (first_attempt){
-                checkpoint_save(env, context);
+                checkpoint_save(env, context, notif_status_update);
                 first_attempt = false;
             } 
 
@@ -1837,13 +1894,17 @@ void AutoStory::checkpoint_13(SingleSwitchProgramEnvironment& env, BotBaseContex
 
 }
 
-void AutoStory::checkpoint_14(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void checkpoint_14(
+    SingleSwitchProgramEnvironment& env, 
+    BotBaseContext& context, 
+    EventNotificationOption& notif_status_update
+){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     bool first_attempt = true;
     while (true){
     try{
         if (first_attempt){
-            checkpoint_save(env, context);
+            checkpoint_save(env, context, notif_status_update);
             first_attempt = false;
         }         
         context.wait_for_all_requests();
@@ -1892,13 +1953,17 @@ void AutoStory::checkpoint_14(SingleSwitchProgramEnvironment& env, BotBaseContex
 
 }
 
-void AutoStory::checkpoint_15(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void checkpoint_15(
+    SingleSwitchProgramEnvironment& env, 
+    BotBaseContext& context, 
+    EventNotificationOption& notif_status_update
+){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     bool first_attempt = true;
     while (true){
     try{
         if (first_attempt){
-            checkpoint_save(env, context);
+            checkpoint_save(env, context, notif_status_update);
             first_attempt = false;
         }         
         context.wait_for_all_requests();
@@ -1932,13 +1997,17 @@ void AutoStory::checkpoint_15(SingleSwitchProgramEnvironment& env, BotBaseContex
 
 }
 
-void AutoStory::checkpoint_16(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void checkpoint_16(
+    SingleSwitchProgramEnvironment& env, 
+    BotBaseContext& context, 
+    EventNotificationOption& notif_status_update
+){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     bool first_attempt = true;
     while (true){
     try{
         if (first_attempt){
-            checkpoint_save(env, context);
+            checkpoint_save(env, context, notif_status_update);
             first_attempt = false;
         }         
         context.wait_for_all_requests();
@@ -1982,13 +2051,17 @@ void AutoStory::checkpoint_16(SingleSwitchProgramEnvironment& env, BotBaseContex
 
 }
 
-void AutoStory::checkpoint_17(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void checkpoint_17(
+    SingleSwitchProgramEnvironment& env, 
+    BotBaseContext& context, 
+    EventNotificationOption& notif_status_update
+){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     bool first_attempt = true;
     while (true){
     try{
         if (first_attempt){
-            checkpoint_save(env, context);
+            checkpoint_save(env, context, notif_status_update);
             first_attempt = false;
         }         
         context.wait_for_all_requests();
@@ -2033,13 +2106,17 @@ void AutoStory::checkpoint_17(SingleSwitchProgramEnvironment& env, BotBaseContex
 
 }
 
-void AutoStory::checkpoint_18(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void checkpoint_18(
+    SingleSwitchProgramEnvironment& env, 
+    BotBaseContext& context, 
+    EventNotificationOption& notif_status_update
+){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     bool first_attempt = true;
     while (true){
     try{
         if (first_attempt){
-            checkpoint_save(env, context);
+            checkpoint_save(env, context, notif_status_update);
             first_attempt = false;
         }         
         context.wait_for_all_requests();
@@ -2076,13 +2153,17 @@ void AutoStory::checkpoint_18(SingleSwitchProgramEnvironment& env, BotBaseContex
 
 }
 
-void AutoStory::checkpoint_19(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void checkpoint_19(
+    SingleSwitchProgramEnvironment& env, 
+    BotBaseContext& context, 
+    EventNotificationOption& notif_status_update
+){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     bool first_attempt = true;
     while (true){
     try{
         if (first_attempt){
-            checkpoint_save(env, context);
+            checkpoint_save(env, context, notif_status_update);
             first_attempt = false;
         }         
         context.wait_for_all_requests();
@@ -2117,13 +2198,17 @@ void AutoStory::checkpoint_19(SingleSwitchProgramEnvironment& env, BotBaseContex
 
 }
 
-void AutoStory::checkpoint_20(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void checkpoint_20(
+    SingleSwitchProgramEnvironment& env, 
+    BotBaseContext& context, 
+    EventNotificationOption& notif_status_update
+){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     bool first_attempt = true;
     while (true){
     try{
         if (first_attempt){
-            checkpoint_save(env, context);
+            checkpoint_save(env, context, notif_status_update);
             first_attempt = false;
         }         
         context.wait_for_all_requests();
@@ -2166,13 +2251,17 @@ void AutoStory::checkpoint_20(SingleSwitchProgramEnvironment& env, BotBaseContex
 
 }
 
-void AutoStory::checkpoint_21(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void checkpoint_21(
+    SingleSwitchProgramEnvironment& env, 
+    BotBaseContext& context, 
+    EventNotificationOption& notif_status_update
+){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     bool first_attempt = true;
     while (true){
     try{
         if (first_attempt){
-            checkpoint_save(env, context);
+            checkpoint_save(env, context, notif_status_update);
             first_attempt = false;
         }         
         context.wait_for_all_requests();
@@ -2190,13 +2279,17 @@ void AutoStory::checkpoint_21(SingleSwitchProgramEnvironment& env, BotBaseContex
 
 }
 
-void AutoStory::checkpoint_22(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void checkpoint_22(
+    SingleSwitchProgramEnvironment& env, 
+    BotBaseContext& context, 
+    EventNotificationOption& notif_status_update
+){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     bool first_attempt = true;
     while (true){
     try{
         if (first_attempt){
-            checkpoint_save(env, context);
+            checkpoint_save(env, context, notif_status_update);
             first_attempt = false;
         }         
         context.wait_for_all_requests();
@@ -2214,13 +2307,17 @@ void AutoStory::checkpoint_22(SingleSwitchProgramEnvironment& env, BotBaseContex
 
 }
 
-void AutoStory::checkpoint_23(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void checkpoint_23(
+    SingleSwitchProgramEnvironment& env, 
+    BotBaseContext& context, 
+    EventNotificationOption& notif_status_update
+){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     bool first_attempt = true;
     while (true){
     try{
         if (first_attempt){
-            checkpoint_save(env, context);
+            checkpoint_save(env, context, notif_status_update);
             first_attempt = false;
         }         
         context.wait_for_all_requests();
@@ -2238,13 +2335,17 @@ void AutoStory::checkpoint_23(SingleSwitchProgramEnvironment& env, BotBaseContex
 
 }
 
-void AutoStory::checkpoint_24(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void checkpoint_24(
+    SingleSwitchProgramEnvironment& env, 
+    BotBaseContext& context, 
+    EventNotificationOption& notif_status_update
+){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     bool first_attempt = true;
     while (true){
     try{
         if (first_attempt){
-            checkpoint_save(env, context);
+            checkpoint_save(env, context, notif_status_update);
             first_attempt = false;
         }         
         context.wait_for_all_requests();
@@ -2262,13 +2363,17 @@ void AutoStory::checkpoint_24(SingleSwitchProgramEnvironment& env, BotBaseContex
 
 }
 
-void AutoStory::checkpoint_25(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void checkpoint_25(
+    SingleSwitchProgramEnvironment& env, 
+    BotBaseContext& context, 
+    EventNotificationOption& notif_status_update
+){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     bool first_attempt = true;
     while (true){
     try{
         if (first_attempt){
-            checkpoint_save(env, context);
+            checkpoint_save(env, context, notif_status_update);
             first_attempt = false;
         }         
         context.wait_for_all_requests();
@@ -2287,13 +2392,17 @@ void AutoStory::checkpoint_25(SingleSwitchProgramEnvironment& env, BotBaseContex
 }
 
 // todo: uncomment checkpoint_save and fly_to_overlapping_flypoint
-void AutoStory::checkpoint_26(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void checkpoint_26(
+    SingleSwitchProgramEnvironment& env, 
+    BotBaseContext& context, 
+    EventNotificationOption& notif_status_update
+){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     bool first_attempt = true;
     while (true){
     try{
         if (first_attempt){
-            // checkpoint_save(env, context);
+            // checkpoint_save(env, context, notif_status_update);
             first_attempt = false;
         }         
         context.wait_for_all_requests();
@@ -2380,13 +2489,17 @@ void AutoStory::checkpoint_26(SingleSwitchProgramEnvironment& env, BotBaseContex
 
 }
 
-void AutoStory::checkpoint_27(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void checkpoint_27(
+    SingleSwitchProgramEnvironment& env, 
+    BotBaseContext& context, 
+    EventNotificationOption& notif_status_update
+){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     bool first_attempt = true;
     while (true){
     try{
         if (first_attempt){
-            checkpoint_save(env, context);
+            checkpoint_save(env, context, notif_status_update);
             first_attempt = false;
         }         
         context.wait_for_all_requests();
@@ -2404,13 +2517,17 @@ void AutoStory::checkpoint_27(SingleSwitchProgramEnvironment& env, BotBaseContex
 
 }
 
-void AutoStory::checkpoint_28(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void checkpoint_28(
+    SingleSwitchProgramEnvironment& env, 
+    BotBaseContext& context, 
+    EventNotificationOption& notif_status_update
+){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     bool first_attempt = true;
     while (true){
     try{
         if (first_attempt){
-            checkpoint_save(env, context);
+            checkpoint_save(env, context, notif_status_update);
             first_attempt = false;
         }         
         context.wait_for_all_requests();
@@ -2428,13 +2545,17 @@ void AutoStory::checkpoint_28(SingleSwitchProgramEnvironment& env, BotBaseContex
 
 }
 
-void AutoStory::checkpoint_29(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void checkpoint_29(
+    SingleSwitchProgramEnvironment& env, 
+    BotBaseContext& context, 
+    EventNotificationOption& notif_status_update
+){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     bool first_attempt = true;
     while (true){
     try{
         if (first_attempt){
-            checkpoint_save(env, context);
+            checkpoint_save(env, context, notif_status_update);
             first_attempt = false;
         }         
         context.wait_for_all_requests();
@@ -2452,13 +2573,17 @@ void AutoStory::checkpoint_29(SingleSwitchProgramEnvironment& env, BotBaseContex
 
 }
 
-void AutoStory::checkpoint_30(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void checkpoint_30(
+    SingleSwitchProgramEnvironment& env, 
+    BotBaseContext& context, 
+    EventNotificationOption& notif_status_update
+){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     bool first_attempt = true;
     while (true){
     try{
         if (first_attempt){
-            checkpoint_save(env, context);
+            checkpoint_save(env, context, notif_status_update);
             first_attempt = false;
         }         
         context.wait_for_all_requests();
@@ -2476,13 +2601,17 @@ void AutoStory::checkpoint_30(SingleSwitchProgramEnvironment& env, BotBaseContex
 
 }
 
-void AutoStory::checkpoint_31(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void checkpoint_31(
+    SingleSwitchProgramEnvironment& env, 
+    BotBaseContext& context, 
+    EventNotificationOption& notif_status_update
+){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     bool first_attempt = true;
     while (true){
     try{
         if (first_attempt){
-            checkpoint_save(env, context);
+            checkpoint_save(env, context, notif_status_update);
             first_attempt = false;
         }         
         context.wait_for_all_requests();
@@ -2500,13 +2629,17 @@ void AutoStory::checkpoint_31(SingleSwitchProgramEnvironment& env, BotBaseContex
 
 }
 
-void AutoStory::checkpoint_32(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void checkpoint_32(
+    SingleSwitchProgramEnvironment& env, 
+    BotBaseContext& context, 
+    EventNotificationOption& notif_status_update
+){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     bool first_attempt = true;
     while (true){
     try{
         if (first_attempt){
-            checkpoint_save(env, context);
+            checkpoint_save(env, context, notif_status_update);
             first_attempt = false;
         }         
         context.wait_for_all_requests();
@@ -2524,13 +2657,17 @@ void AutoStory::checkpoint_32(SingleSwitchProgramEnvironment& env, BotBaseContex
 
 }
 
-void AutoStory::checkpoint_33(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void checkpoint_33(
+    SingleSwitchProgramEnvironment& env, 
+    BotBaseContext& context, 
+    EventNotificationOption& notif_status_update
+){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     bool first_attempt = true;
     while (true){
     try{
         if (first_attempt){
-            checkpoint_save(env, context);
+            checkpoint_save(env, context, notif_status_update);
             first_attempt = false;
         }         
         context.wait_for_all_requests();
@@ -2548,13 +2685,17 @@ void AutoStory::checkpoint_33(SingleSwitchProgramEnvironment& env, BotBaseContex
 
 }
 
-void AutoStory::checkpoint_34(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void checkpoint_34(
+    SingleSwitchProgramEnvironment& env, 
+    BotBaseContext& context, 
+    EventNotificationOption& notif_status_update
+){
     AutoStory_Descriptor::Stats& stats = env.current_stats<AutoStory_Descriptor::Stats>();
     bool first_attempt = true;
     while (true){
     try{
         if (first_attempt){
-            checkpoint_save(env, context);
+            checkpoint_save(env, context, notif_status_update);
             first_attempt = false;
         }         
         context.wait_for_all_requests();
@@ -2593,9 +2734,9 @@ void AutoStory::run_autostory(SingleSwitchProgramEnvironment& env, BotBaseContex
         env.console.log("Start Segment 01: Pick Starter", COLOR_ORANGE);
         env.console.overlay().add_log("Start Segment 01: Pick Starter", COLOR_ORANGE);
 
-        checkpoint_01(env, context);
-        checkpoint_02(env, context);
-        checkpoint_03(env, context);
+        checkpoint_01(env, context, NOTIFICATION_STATUS_UPDATE, LANGUAGE);
+        checkpoint_02(env, context, NOTIFICATION_STATUS_UPDATE);
+        checkpoint_03(env, context, NOTIFICATION_STATUS_UPDATE, LANGUAGE, STARTERCHOICE);
 
         context.wait_for_all_requests();
         env.console.log("End Segment 02: Pick Starter", COLOR_GREEN);
@@ -2611,7 +2752,7 @@ void AutoStory::run_autostory(SingleSwitchProgramEnvironment& env, BotBaseContex
         env.console.log("Start Segment 02: First Nemona Battle", COLOR_ORANGE);
         env.console.overlay().add_log("Start Segment 02: First Nemona Battle", COLOR_ORANGE);
 
-        checkpoint_04(env, context);
+        checkpoint_04(env, context, NOTIFICATION_STATUS_UPDATE);
 
         context.wait_for_all_requests();
         env.console.log("End Segment 02: First Nemona Battle", COLOR_GREEN);
@@ -2627,9 +2768,9 @@ void AutoStory::run_autostory(SingleSwitchProgramEnvironment& env, BotBaseContex
         env.console.log("Start Segment 03: Catch Tutorial", COLOR_ORANGE);
         env.console.overlay().add_log("Start Segment 03: Catch Tutorial", COLOR_ORANGE);
 
-        checkpoint_05(env, context);
-        checkpoint_06(env, context);
-        checkpoint_07(env, context);
+        checkpoint_05(env, context, NOTIFICATION_STATUS_UPDATE);
+        checkpoint_06(env, context, NOTIFICATION_STATUS_UPDATE);
+        checkpoint_07(env, context, NOTIFICATION_STATUS_UPDATE);
 
         context.wait_for_all_requests();
         env.console.log("End Segment 03: Catch Tutorial", COLOR_GREEN);
@@ -2645,7 +2786,7 @@ void AutoStory::run_autostory(SingleSwitchProgramEnvironment& env, BotBaseContex
         env.console.log("Start Segment 04: Rescue Legendary", COLOR_ORANGE);
         env.console.overlay().add_log("Start Segment 04: Rescue Legendary", COLOR_ORANGE);
 
-        checkpoint_08(env, context);
+        checkpoint_08(env, context, NOTIFICATION_STATUS_UPDATE);
 
         context.wait_for_all_requests();
         env.console.log("End Segment 04: Rescue Legendary", COLOR_GREEN);
@@ -2661,8 +2802,8 @@ void AutoStory::run_autostory(SingleSwitchProgramEnvironment& env, BotBaseContex
         env.console.log("Start Segment 05: First Arven Battle", COLOR_ORANGE);
         env.console.overlay().add_log("Start Segment 05: First Arven Battle", COLOR_ORANGE);
 
-        checkpoint_09(env, context);
-        checkpoint_10(env, context);
+        checkpoint_09(env, context, NOTIFICATION_STATUS_UPDATE);
+        checkpoint_10(env, context, NOTIFICATION_STATUS_UPDATE);
 
         context.wait_for_all_requests();
         env.console.log("End Segment 05: First Arven Battle", COLOR_GREEN);
@@ -2678,7 +2819,7 @@ void AutoStory::run_autostory(SingleSwitchProgramEnvironment& env, BotBaseContex
         env.console.log("Start Segment 06: Go to Los Platos", COLOR_ORANGE);
         env.console.overlay().add_log("Start Segment 06: Go to Los Platos", COLOR_ORANGE);
 
-        checkpoint_11(env, context);
+        checkpoint_11(env, context, NOTIFICATION_STATUS_UPDATE);
 
         context.wait_for_all_requests();
         env.console.log("End Segment 06: Go to Los Platos", COLOR_GREEN);
@@ -2751,7 +2892,7 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
 
     // Set settings. to ensure autosave is off.
     if (CHANGE_SETTINGS){
-        change_settings_prior_to_autostory(env, context, STARTPOINT);
+        change_settings_prior_to_autostory(env, context, STARTPOINT, LANGUAGE);
     }
 
     if (ENABLE_TEST_CHECKPOINTS){
