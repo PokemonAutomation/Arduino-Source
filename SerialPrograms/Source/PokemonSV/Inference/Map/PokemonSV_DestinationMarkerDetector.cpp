@@ -93,33 +93,6 @@ std::vector<ImageFloatBox> DestinationMarkerDetector::detect_all(const ImageView
 
 
 
-DestinationMarkerWatcher::~DestinationMarkerWatcher() = default;
-
-DestinationMarkerWatcher::DestinationMarkerWatcher(Color color, const ImageFloatBox& box)
-    : VisualInferenceCallback("DestinationMarkerWatcher")
-    , m_detector(color, box)
-{}
-
-void DestinationMarkerWatcher::make_overlays(VideoOverlaySet& items) const{
-    m_detector.make_overlays(items);
-}
-
-bool DestinationMarkerWatcher::process_frame(const ImageViewRGB32& screen, WallClock timestamp){
-    std::vector<ImageFloatBox> hits = m_detector.detect_all(screen);
-
-    m_hits.reset(hits.size());
-
-
-    return !hits.empty();
-}
-
-
-
-
-
-
-
-
 }
 }
 }

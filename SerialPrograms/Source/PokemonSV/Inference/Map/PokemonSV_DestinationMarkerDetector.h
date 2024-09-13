@@ -40,18 +40,15 @@ protected:
 
 
 
-class DestinationMarkerWatcher : public VisualInferenceCallback{
-public:
-    DestinationMarkerWatcher(Color color, const ImageFloatBox& box);
-    virtual ~DestinationMarkerWatcher();
-
-    virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
-
-
-protected:
-    DestinationMarkerDetector m_detector;
-    FixedLimitVector<OverlayBoxScope> m_hits;
+class DestinationMarkerWatcher : public DetectorToFinder<DestinationMarkerDetector>{
+    public:
+    DestinationMarkerWatcher(
+        Color color,
+        const ImageFloatBox& box,
+        std::chrono::milliseconds duration = std::chrono::milliseconds(250)
+    )
+         : DetectorToFinder("DestinationMarkerWatcher", std::chrono::milliseconds(250), color, box)
+    {}
 };
 
 
