@@ -1306,6 +1306,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Inference/ItemPrinter/PokemonSV_ItemPrinterMaterialDetector.h
     Source/PokemonSV/Inference/ItemPrinter/PokemonSV_ItemPrinterPrizeReader.cpp
     Source/PokemonSV/Inference/ItemPrinter/PokemonSV_ItemPrinterPrizeReader.h
+    Source/PokemonSV/Inference/Map/PokemonSV_DestinationMarkerDetector.cpp
+    Source/PokemonSV/Inference/Map/PokemonSV_DestinationMarkerDetector.h    
     Source/PokemonSV/Inference/Map/PokemonSV_FastTravelDetector.cpp
     Source/PokemonSV/Inference/Map/PokemonSV_FastTravelDetector.h
     Source/PokemonSV/Inference/Map/PokemonSV_MapDetector.cpp
