@@ -120,7 +120,11 @@
 #include "PokemonSV/Inference/ItemPrinter/PokemonSV_ItemPrinterMaterialDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h"
-
+#include "PokemonSV/Programs/AutoStory/PokemonSV_AutoStory.h"
+#include "PokemonSV/Programs/AutoStory/PokemonSV_MenuOption.h"
+#include "PokemonSV/Programs/AutoStory/PokemonSV_MenuOptionDatabase.h"
+#include "PokemonSV/Inference/PokemonSV_TutorialDetector.h"
+#include "PokemonSV/Inference/PokemonSV_PokemonMovesReader.h"
 
 
 #include <QPixmap>

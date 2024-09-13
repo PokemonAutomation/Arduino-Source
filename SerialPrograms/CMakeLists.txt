@@ -1306,6 +1306,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Inference/ItemPrinter/PokemonSV_ItemPrinterMaterialDetector.h
     Source/PokemonSV/Inference/ItemPrinter/PokemonSV_ItemPrinterPrizeReader.cpp
     Source/PokemonSV/Inference/ItemPrinter/PokemonSV_ItemPrinterPrizeReader.h
+    Source/PokemonSV/Inference/Map/PokemonSV_DestinationMarkerDetector.cpp
+    Source/PokemonSV/Inference/Map/PokemonSV_DestinationMarkerDetector.h
     Source/PokemonSV/Inference/Map/PokemonSV_FastTravelDetector.cpp
     Source/PokemonSV/Inference/Map/PokemonSV_FastTravelDetector.h
     Source/PokemonSV/Inference/Map/PokemonSV_MapDetector.cpp
@@ -1424,6 +1426,22 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/PokemonSV_Panels.h
     Source/PokemonSV/PokemonSV_Settings.cpp
     Source/PokemonSV/PokemonSV_Settings.h
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Checkpoint_00_04.cpp
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Checkpoint_00_04.h   
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Checkpoint_05_10.cpp
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Checkpoint_05_10.h
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Checkpoint_11_15.cpp
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Checkpoint_11_15.h
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Checkpoint_16_20.cpp
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Checkpoint_16_20.h     
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Checkpoint_21_25.cpp
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Checkpoint_21_25.h
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Checkpoint_26_30.cpp
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Checkpoint_26_30.h       
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory.cpp
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory.h
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStoryTools.cpp
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStoryTools.h    
     Source/PokemonSV/Programs/AutoStory/PokemonSV_MenuOption.cpp
     Source/PokemonSV/Programs/AutoStory/PokemonSV_MenuOption.h
     Source/PokemonSV/Programs/AutoStory/PokemonSV_MenuOptionDatabase.cpp
