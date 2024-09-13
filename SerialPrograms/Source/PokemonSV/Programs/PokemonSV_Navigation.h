@@ -108,11 +108,13 @@ void realign_player(const ProgramInfo& info, ConsoleHandle& console, BotBaseCont
 
 enum class NavigationStopCondition{
     STOP_DIALOG,
+    STOP_MARKER,
 };
 
 enum class NavigationMovementMode{
     DIRECTIONAL_ONLY,
     DIRECTIONAL_SPAM_A,
+    CLEAR_WITH_LETS_GO,
 };
 
 
@@ -149,19 +151,52 @@ void mash_button_till_overworld(
 
 // fly to the pokecenter that overlaps with the player on the map, and return true.
 // if no overlapping pokecenter, return false.
-bool fly_to_overlapping_pokecenter(
+bool attempt_fly_to_overlapping_flypoint(
     const ProgramInfo& info, 
     ConsoleHandle& console, 
     BotBaseContext& context
 );
 
+// fly to the pokecenter that overlaps with the player on the map
+// throw exception if unsuccessful
+void fly_to_overlapping_flypoint(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
+
+// throw exception if there is a fly point/pokecenter that overlaps with the player on the map
+void confirm_no_overlapping_flypoint(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
+
 // enter menu and move the cursor the given side, and index. then press the A button
+// if menu_index is -1, return once the menu is detected.
 void enter_menu_from_overworld(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
     int menu_index,
     MenuSide side = MenuSide::RIGHT,
     bool has_minimap = true
 );
 
+// press given button until gradient arrow appears in given box_area_to_check.
+void press_button_until_gradient_arrow(
+    const ProgramInfo& info, 
+    ConsoleHandle& console, 
+    BotBaseContext& context,
+    ImageFloatBox box_area_to_check,
+    uint16_t button = BUTTON_A,
+    GradientArrowType arrow_type = GradientArrowType::RIGHT
+);
+
+// navigate menus using only gradient arrow detection, without OCR
+// first, wait for the gradient arrow to appear within `arrow_box_start`.
+// then, press `dpad_button` a certain number of times, as per `num_button_presses`.
+// then, watch for the gradient arrow within `arrow_box_end`. 
+// If arrow not seen, press `dpad_button` a maximum of 3 times, while still watching for the gradient arrow
+// If arrow still not seen, throw exception.
+void basic_menu_navigation(
+    const ProgramInfo& info, 
+    ConsoleHandle& console, 
+    BotBaseContext& context,
+    ImageFloatBox arrow_box_start,
+    ImageFloatBox arrow_box_end,
+    uint8_t dpad_button,
+    uint16_t num_button_presses
+);
 
 // heal at the pokecenter, that your character is currently at.
 // if not currently at the pokecenter, throws error.

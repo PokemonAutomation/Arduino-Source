@@ -860,7 +860,7 @@ void mash_button_till_overworld(
 }
 
 
-bool fly_to_overlapping_pokecenter(
+bool attempt_fly_to_overlapping_flypoint(
     const ProgramInfo& info, 
     ConsoleHandle& console, 
     BotBaseContext& context
@@ -872,6 +872,25 @@ bool fly_to_overlapping_pokecenter(
     return fly_to_overworld_from_map(info, console, context, true);
 }
 
+void fly_to_overlapping_flypoint(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+    if (!attempt_fly_to_overlapping_flypoint(info, console, context)){
+        throw OperationFailedException(
+            ErrorReport::SEND_ERROR_REPORT, console,
+            "Failed to reset to overlapping Pokecenter.",
+            true
+        );
+    }
+}
+
+void confirm_no_overlapping_flypoint(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+    if (attempt_fly_to_overlapping_flypoint(info, console, context)){
+        throw OperationFailedException(
+            ErrorReport::SEND_ERROR_REPORT, console,
+            "Overlapping fly detected, when it wasn't expected.",
+            true
+        );
+    }
+}
 
 void enter_menu_from_overworld(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
     int menu_index,
@@ -921,6 +940,9 @@ void enter_menu_from_overworld(const ProgramInfo& info, ConsoleHandle& console, 
             continue;
         case 1:
             console.log("Detected main menu.");
+            if (menu_index == -1){
+                return;
+            }
             success = main_menu.move_cursor(info, console, context, side, menu_index, fast_mode);
             if (success == false){
                 throw OperationFailedException(
@@ -941,6 +963,82 @@ void enter_menu_from_overworld(const ProgramInfo& info, ConsoleHandle& console, 
     }
 }
 
+void press_button_until_gradient_arrow(
+    const ProgramInfo& info, 
+    ConsoleHandle& console, 
+    BotBaseContext& context,
+    ImageFloatBox box_area_to_check,
+    uint16_t button,
+    GradientArrowType arrow_type
+){
+    GradientArrowWatcher arrow(COLOR_RED, arrow_type, box_area_to_check);
+    int ret = run_until(
+        console, context,
+        [button](BotBaseContext& context){
+            pbf_wait(context, 3 * TICKS_PER_SECOND); // avoid pressing button if arrow already detected
+            for (size_t c = 0; c < 10; c++){
+                pbf_press_button(context, button, 20, 3 * TICKS_PER_SECOND);
+            }
+        },
+        {arrow}
+    );
+    if (ret == 0){
+        console.log("Gradient arrow detected.");
+    }else{
+        throw OperationFailedException(
+            ErrorReport::SEND_ERROR_REPORT, console,
+            "Failed to detect gradient arrow.",
+            true
+        );
+    }     
+}
+
+void basic_menu_navigation(
+    const ProgramInfo& info, 
+    ConsoleHandle& console, 
+    BotBaseContext& context,
+    ImageFloatBox arrow_box_start,
+    ImageFloatBox arrow_box_end,
+    uint8_t dpad_button,
+    uint16_t num_button_presses
+){
+    GradientArrowWatcher arrow_start(COLOR_RED, GradientArrowType::RIGHT, arrow_box_start);
+
+    int ret = wait_until(console, context, Milliseconds(5000), { arrow_start });
+    if (ret < 0){
+        throw OperationFailedException(
+            ErrorReport::SEND_ERROR_REPORT, console,
+            "basic_menu_navigation: Failed to detect gradient arrow at expected start position.",
+            true
+        );        
+    }
+
+    for (uint16_t i = 0; i < num_button_presses; i++){
+        pbf_press_dpad(context, dpad_button, 20, 105);
+    }
+
+    GradientArrowWatcher arrow_end(COLOR_RED, GradientArrowType::RIGHT, arrow_box_end);
+    ret = run_until(
+        console,
+        context,
+        [dpad_button](BotBaseContext& context){
+            for (int i = 0; i < 3; i++){
+                pbf_press_dpad(context, dpad_button, 20, 500);
+            }
+        },
+        { arrow_end }        
+    );
+
+    if (ret == 0){
+        console.log("basic_menu_navigation: Desired item selected.");
+    }else{
+        throw OperationFailedException(
+            ErrorReport::SEND_ERROR_REPORT, console,
+            "basic_menu_navigation: Failed to detect gradient arrow at expected end position.",
+            true
+        );        
+    }
+}
 
 
 void heal_at_pokecenter(
@@ -950,7 +1048,7 @@ void heal_at_pokecenter(
 ){
     context.wait_for_all_requests();
     
-    if (!fly_to_overlapping_pokecenter(info, console, context)){
+    if (!attempt_fly_to_overlapping_flypoint(info, console, context)){
         throw OperationFailedException(
             ErrorReport::SEND_ERROR_REPORT, console,
             "Failed to fly to pokecenter.",
