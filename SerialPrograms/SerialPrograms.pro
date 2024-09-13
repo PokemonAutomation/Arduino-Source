@@ -712,6 +712,12 @@ SOURCES += \
     Source/PokemonSV/Options/PokemonSV_TournamentPrizeTable.cpp \
     Source/PokemonSV/PokemonSV_Panels.cpp \
     Source/PokemonSV/PokemonSV_Settings.cpp \
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Checkpoint_00_04.cpp \
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Checkpoint_05_10.cpp \
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Checkpoint_11_15.cpp \
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Checkpoint_16_20.cpp \
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Checkpoint_21_25.cpp \
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Checkpoint_26_30.cpp \
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory.cpp \
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStoryTools.cpp \
     Source/PokemonSV/Programs/AutoStory/PokemonSV_MenuOption.cpp \
@@ -1798,6 +1804,12 @@ HEADERS += \
     Source/PokemonSV/Options/PokemonSV_TournamentPrizeTable.h \
     Source/PokemonSV/PokemonSV_Panels.h \
     Source/PokemonSV/PokemonSV_Settings.h \
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Checkpoint_00_04.h \
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Checkpoint_05_10.h \
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Checkpoint_11_15.h \
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Checkpoint_16_20.h \
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Checkpoint_21_25.h \    
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Checkpoint_26_30.h \
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory.h \
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStoryTools.h \
     Source/PokemonSV/Programs/AutoStory/PokemonSV_MenuOption.h \

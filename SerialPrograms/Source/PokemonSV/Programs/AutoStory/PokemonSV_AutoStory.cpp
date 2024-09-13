@@ -15,6 +15,12 @@
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
+#include "PokemonSV_AutoStory_Checkpoint_00_04.h"
+#include "PokemonSV_AutoStory_Checkpoint_05_10.h"
+#include "PokemonSV_AutoStory_Checkpoint_11_15.h"
+#include "PokemonSV_AutoStory_Checkpoint_16_20.h"
+#include "PokemonSV_AutoStory_Checkpoint_21_25.h"
+#include "PokemonSV_AutoStory_Checkpoint_26_30.h"
 #include "PokemonSV_AutoStory.h"
 
 //#include <iostream>
