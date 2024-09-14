@@ -378,9 +378,9 @@ void AutoStory::test_checkpoints(
     int start, int end, 
     int loop, int start_loop, int end_loop
 ){
-    EventNotificationOption& notif_status_update = NOTIFICATION_STATUS_UPDATE;
-    Language language = LANGUAGE;
-    StarterChoice starter_choice = STARTERCHOICE;
+    // EventNotificationOption& notif_status_update = NOTIFICATION_STATUS_UPDATE;
+    // Language language = LANGUAGE;
+    // StarterChoice starter_choice = STARTERCHOICE;
     std::vector<std::function<void()>> checkpoint_list;
     // checkpoint_list.push_back([&](){checkpoint_00(env, context);});
     // checkpoint_list.push_back([&](){checkpoint_01(env, context, notif_status_update, language);});
@@ -446,8 +446,8 @@ void AutoStory::test_checkpoints(
 
 
 void AutoStory::run_autostory(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
-    switch (STARTPOINT){
+    // AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
+    // switch (STARTPOINT){
     // case StartPoint::INTRO_CUTSCENE:
     //     context.wait_for_all_requests();
     //     env.console.log("Start Segment 00: Intro Cutscene", COLOR_ORANGE);
@@ -584,10 +584,10 @@ void AutoStory::run_autostory(SingleSwitchProgramEnvironment& env, BotBaseContex
     //     if (ENDPOINT == EndPoint::MESAGOZA_SOUTH){
     //         break;
     //     }
-    default:
-        break;
+    // default:
+    //     break;
 
-    }
+    // }
 }
 
 void AutoStory::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
