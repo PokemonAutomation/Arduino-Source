@@ -12,6 +12,7 @@
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 #include "CommonFramework/Inference/VisualDetector.h"
+#include "PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -48,9 +49,12 @@ public:
 private:
     std::chrono::milliseconds m_ball_hold_duration;
     std::chrono::milliseconds m_map_hold_duration;
+    std::chrono::milliseconds m_north_hold_duration;
     WallClock m_last_ball;
+    WallClock m_last_north;
     VideoSnapshot m_start_of_detection;
     bool m_detect_event;
+    DirectionDetector m_direction_detector;
 };
 
 
