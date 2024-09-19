@@ -186,9 +186,8 @@ void checkpoint_02(
         leave_phone_to_overworld(env.program_info(), env.console, context);
 
         break;  
-    }catch(OperationFailedException& e){
+    }catch(...){
         context.wait_for_all_requests();
-        env.console.log(e.m_message, COLOR_RED);
         env.console.log("Resetting from checkpoint.");
         reset_game(env.program_info(), env.console, context);
         stats.m_reset++;
@@ -278,9 +277,8 @@ void checkpoint_03(
         leave_box_system_to_overworld(env.program_info(), env.console, context);
 
         break;
-    }catch(OperationFailedException& e){
+    }catch(...){
         context.wait_for_all_requests();
-        env.console.log(e.m_message, COLOR_RED);
         env.console.log("Resetting from checkpoint.");
         reset_game(env.program_info(), env.console, context);
         stats.m_reset++;
@@ -328,9 +326,8 @@ void checkpoint_04(
         env.console.overlay().add_log("Finished battle.", COLOR_WHITE);        
 
         break;
-    }catch(OperationFailedException& e){
+    }catch(...){
         context.wait_for_all_requests();
-        env.console.log(e.m_message, COLOR_RED);
         env.console.log("Resetting from checkpoint.");
         reset_game(env.program_info(), env.console, context);
         stats.m_reset++;
