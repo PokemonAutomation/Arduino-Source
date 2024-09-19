@@ -271,7 +271,7 @@ void WildItemFarmer::run_program(SingleSwitchProgramEnvironment& env, BotBaseCon
     uint8_t consecutive_throw_attempts = 0;
     WallClock last_trick_attempt = WallClock::min();
     while (items_cloned < ITEMS_TO_CLONE){
-        OverworldWatcher overworld(COLOR_CYAN);
+        OverworldWatcher overworld(env.console, COLOR_CYAN);
         NormalBattleMenuWatcher battle_menu(COLOR_RED);
         MoveSelectWatcher move_select(COLOR_YELLOW);
         MainMenuWatcher main_menu(COLOR_GREEN);

@@ -135,7 +135,7 @@ bool CloneItems101::clone_item(ProgramEnvironment& env, ConsoleHandle& console, 
             );
         }
 
-        OverworldWatcher overworld(COLOR_RED);
+        OverworldWatcher overworld(console, COLOR_RED);
         MainMenuWatcher main_menu(COLOR_YELLOW);
         GradientArrowWatcher party_select_top(COLOR_GREEN, GradientArrowType::RIGHT, {0.30, 0.27, 0.10, 0.08});
         GradientArrowWatcher party_select_return(COLOR_GREEN, GradientArrowType::RIGHT, {0.30, 0.57, 0.10, 0.08});
@@ -286,7 +286,7 @@ void CloneItems101::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
 
         env.console.log("Attempting to recover by backing out to a known state.", COLOR_RED);
 
-        OverworldWatcher overworld(COLOR_RED);
+        OverworldWatcher overworld(env.console, COLOR_RED);
         MainMenuWatcher main_menu(COLOR_YELLOW);
         context.wait_for_all_requests();
         int ret = run_until(

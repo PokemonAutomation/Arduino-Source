@@ -177,7 +177,7 @@ CatchResults basic_catcher(
     WallClock last_battle_menu = WallClock::min();
     while (true){
         NormalBattleMenuWatcher battle_menu(COLOR_RED);
-        OverworldWatcher overworld(COLOR_YELLOW);
+        OverworldWatcher overworld(console, COLOR_YELLOW);
         GradientArrowWatcher next_pokemon(COLOR_GREEN, GradientArrowType::RIGHT, {0.50, 0.51, 0.30, 0.10});
         GradientArrowWatcher add_to_party(COLOR_BLUE, GradientArrowType::RIGHT, {0.50, 0.39, 0.30, 0.10});
         AdvanceDialogWatcher dialog(COLOR_PURPLE);

@@ -40,7 +40,7 @@ void return_to_plaza(const ProgramInfo& info, ConsoleHandle& console, BotBaseCon
             console, context,
             [&](BotBaseContext& context){
                 //Exit any dialogs (ex. Cyrano upgrading BBQs)
-                OverworldWatcher overworld(COLOR_RED);
+                OverworldWatcher overworld(console, COLOR_RED);
                 int ret_overworld = run_until(
                     console, context,
                     [&](BotBaseContext& context){

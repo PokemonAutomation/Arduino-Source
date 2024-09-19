@@ -177,7 +177,7 @@ void RideCloner101::setup(const ProgramInfo& info, ConsoleHandle& console, BotBa
             dump_image_and_throw_recoverable_exception(info, console, "RideCloneSetupFailed", "Failed to setup after 5 minutes.");
         }
 
-        OverworldWatcher overworld(COLOR_RED);
+        OverworldWatcher overworld(console, COLOR_RED);
         MainMenuWatcher main_menu(COLOR_YELLOW);
         AdvanceDialogWatcher advance(COLOR_PURPLE);
         PromptDialogWatcher prompt(COLOR_GREEN, {0.500, 0.545, 0.400, 0.100});
@@ -290,7 +290,7 @@ bool RideCloner101::run_post_win(
         PromptDialogWatcher nickname(COLOR_GREEN, {0.500, 0.545, 0.400, 0.100});
         PokemonSummaryWatcher summary(COLOR_MAGENTA);
         MainMenuWatcher main_menu(COLOR_BLUE);
-        OverworldWatcher overworld(COLOR_RED);
+        OverworldWatcher overworld(console, COLOR_RED);
         context.wait_for_all_requests();
         int ret = wait_until(
             console, context,

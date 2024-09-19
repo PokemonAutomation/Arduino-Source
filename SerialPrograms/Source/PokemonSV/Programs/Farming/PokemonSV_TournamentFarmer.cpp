@@ -535,7 +535,7 @@ void TournamentFarmer::handle_end_of_tournament(SingleSwitchProgramEnvironment& 
     check_prize(env, context);
 
     //Clear remaining dialog
-    OverworldWatcher overworld(COLOR_CYAN);
+    OverworldWatcher overworld(env.console, COLOR_CYAN);
     int ret_over = run_until(
         env.console, context,
         [](BotBaseContext& context){
@@ -587,7 +587,7 @@ void return_to_academy_after_loss(SingleSwitchProgramEnvironment& env, BotBaseCo
     }
 
     //Wait for academy to load.
-    OverworldWatcher overworld(COLOR_CYAN);
+    OverworldWatcher overworld(env.console, COLOR_CYAN);
     int ret_academy = wait_until(env.console, context, Milliseconds(4000), { overworld });
     if (ret_academy == 0){
         env.log("Entered academy. Walking to tournament entry.");
@@ -705,7 +705,7 @@ void TournamentFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseConte
         bool battle_lost = false;
         for (uint16_t battles = 0; battles < 4; battles++){
             NormalBattleMenuWatcher battle_menu2(COLOR_YELLOW); //Next battle started
-            OverworldWatcher overworld(COLOR_CYAN); //Previous battle was lost
+            OverworldWatcher overworld(env.console, COLOR_CYAN); //Previous battle was lost
             int ret_battle2 = run_until(
                 env.console, context,
                 [](BotBaseContext& context){
@@ -748,7 +748,7 @@ void TournamentFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseConte
                 pbf_mash_button(context, BUTTON_B, 400);
                 context.wait_for_all_requests();
 
-                OverworldWatcher overworld2(COLOR_RED);
+                OverworldWatcher overworld2(env.console, COLOR_RED);
                 int ret_lost_final = wait_until(
                     env.console, context,
                     std::chrono::seconds(3),

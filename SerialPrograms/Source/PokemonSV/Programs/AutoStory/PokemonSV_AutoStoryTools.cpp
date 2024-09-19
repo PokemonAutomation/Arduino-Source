@@ -54,7 +54,7 @@ void run_battle_press_A(
     while (true){
         NormalBattleMenuWatcher battle(COLOR_BLUE);
         // SwapMenuWatcher         fainted(COLOR_PURPLE);
-        OverworldWatcher        overworld(COLOR_CYAN);
+        OverworldWatcher        overworld(console, COLOR_CYAN);
         AdvanceDialogWatcher    dialog(COLOR_RED);
         context.wait_for_all_requests();
 
@@ -164,7 +164,7 @@ void clear_dialog(ConsoleHandle& console, BotBaseContext& context,
         }
 
         AdvanceDialogWatcher    advance_dialog(COLOR_RED);
-        OverworldWatcher    overworld(COLOR_CYAN);
+        OverworldWatcher    overworld(console, COLOR_CYAN);
         PromptDialogWatcher prompt(COLOR_YELLOW);
         WhiteButtonWatcher  whitebutton(COLOR_GREEN, WhiteButton::ButtonA_DarkBackground, {0.725, 0.833, 0.024, 0.045}); // {0.650, 0.650, 0.140, 0.240}
         DialogArrowWatcher dialog_arrow(COLOR_RED, console.overlay(), {0.850, 0.820, 0.020, 0.050}, 0.8365, 0.846);

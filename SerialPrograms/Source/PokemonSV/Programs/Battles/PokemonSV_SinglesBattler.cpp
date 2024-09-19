@@ -147,7 +147,7 @@ bool run_pokemon(
         GradientArrowWatcher next_pokemon(COLOR_BLUE, GradientArrowType::RIGHT, {0.50, 0.51, 0.30, 0.10});
         SwapMenuWatcher swap_menu(COLOR_BLUE);
         AdvanceDialogWatcher dialog(COLOR_CYAN);
-        OverworldWatcher overworld(COLOR_GREEN);
+        OverworldWatcher overworld(console, COLOR_GREEN);
         context.wait_for_all_requests();
         int ret = run_until(
             console, context,

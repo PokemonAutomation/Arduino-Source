@@ -38,7 +38,7 @@ void auto_heal_from_menu_or_overworld(
             );
         }
 
-        OverworldWatcher overworld(COLOR_RED);
+        OverworldWatcher overworld(console, COLOR_RED);
         MainMenuWatcher main_menu(COLOR_CYAN);
         AdvanceDialogWatcher dialog(COLOR_YELLOW);
         context.wait_for_all_requests();
@@ -90,7 +90,7 @@ int run_from_battle(const ProgramInfo& info, ConsoleHandle& console, BotBaseCont
 
     int attempts = 0;
     for (size_t c = 0; c < 10; c++){
-        OverworldWatcher overworld(COLOR_RED);
+        OverworldWatcher overworld(console, COLOR_RED);
         NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
         GradientArrowWatcher next_pokemon(COLOR_GREEN, GradientArrowType::RIGHT, {0.50, 0.51, 0.30, 0.10});
         context.wait_for_all_requests();

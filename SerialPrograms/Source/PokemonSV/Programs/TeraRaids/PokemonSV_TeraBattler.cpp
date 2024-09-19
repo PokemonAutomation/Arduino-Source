@@ -226,7 +226,7 @@ bool run_tera_battle(
             std::chrono::seconds(battle_menu_seen ? 5 : 180)
         );
         TeraCatchWatcher catch_menu(COLOR_BLUE);
-        OverworldWatcher overworld(COLOR_GREEN);
+        OverworldWatcher overworld(console, COLOR_GREEN);
         context.wait_for_all_requests();
         int ret = run_until(
             console, context,

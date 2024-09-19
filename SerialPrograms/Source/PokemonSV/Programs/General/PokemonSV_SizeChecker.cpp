@@ -100,7 +100,7 @@ void SizeChecker::enter_check_mode(SingleSwitchProgramEnvironment& env, BotBaseC
         }
         
         AdvanceDialogWatcher dialog(COLOR_GREEN);
-        OverworldWatcher overworld(COLOR_CYAN);
+        OverworldWatcher overworld(env.console, COLOR_CYAN);
         GradientArrowWatcher prompt(COLOR_YELLOW, GradientArrowType::RIGHT, {0.72, 0.55, 0.05, 0.08});
         BoxWatcher box(COLOR_BLUE);
         
@@ -152,7 +152,7 @@ void SizeChecker::exit_check_mode(SingleSwitchProgramEnvironment& env, BotBaseCo
 
         DialogBoxWatcher ribbon(COLOR_GREEN, true, std::chrono::milliseconds(250), DialogType::DIALOG_BLACK);
         DialogBoxWatcher dialog(COLOR_GREEN, true, std::chrono::milliseconds(250), DialogType::DIALOG_WHITE);
-        OverworldWatcher overworld(COLOR_CYAN);
+        OverworldWatcher overworld(env.console, COLOR_CYAN);
         
         context.wait_for_all_requests();
 

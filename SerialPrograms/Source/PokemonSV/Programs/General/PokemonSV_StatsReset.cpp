@@ -238,7 +238,7 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext&
     StatsReset_Descriptor::Stats& stats = env.current_stats<StatsReset_Descriptor::Stats>();
 
     AdvanceDialogWatcher advance_dialog(COLOR_MAGENTA);
-    OverworldWatcher overworld(COLOR_BLUE);
+    OverworldWatcher overworld(env.console, COLOR_BLUE);
 
     uint8_t switch_party_slot = 1;
 
@@ -430,7 +430,7 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext&
                 }
 
                 NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
-                OverworldWatcher overworld(COLOR_BLUE);
+                OverworldWatcher overworld(env.console, COLOR_BLUE);
                 SwapMenuWatcher fainted(COLOR_YELLOW);
                 int ret2 = wait_until(
                     env.console, context,
@@ -608,7 +608,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
         if (!target_fainted){
             //Close all the dex entry and caught menus
             //If the player lost, this closes all dialog from Joy
-            OverworldWatcher overworld;
+            OverworldWatcher overworld(env.console);
             int retOver = run_until(
                 env.console, context,
                 [](BotBaseContext& context){

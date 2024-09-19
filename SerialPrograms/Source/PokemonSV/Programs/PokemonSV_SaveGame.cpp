@@ -49,7 +49,7 @@ void save_game_from_menu_or_overworld(
             );
         }
 
-        OverworldWatcher overworld(COLOR_CYAN);
+        OverworldWatcher overworld(console, COLOR_CYAN);
         MainMenuWatcher menu(COLOR_RED);
         GradientArrowWatcher confirmation(COLOR_YELLOW, GradientArrowType::RIGHT, {0.72, 0.55, 0.05, 0.08});
         AdvanceDialogWatcher finished(COLOR_GREEN);

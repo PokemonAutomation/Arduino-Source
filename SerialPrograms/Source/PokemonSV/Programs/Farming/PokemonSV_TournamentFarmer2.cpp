@@ -207,7 +207,7 @@ void TournamentFarmer2::program(SingleSwitchProgramEnvironment& env, BotBaseCont
         bool battle_lost = false;
         for (uint16_t battles = 0; battles < 4; battles++){
             NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);  //  Next battle started
-            OverworldWatcher overworld(COLOR_CYAN);             //  Previous battle was lost
+            OverworldWatcher overworld(env.console, COLOR_CYAN);             //  Previous battle was lost
             int ret = run_until(
                 env.console, context,
                 [](BotBaseContext& context){

@@ -82,7 +82,7 @@ void connect_to_internet_from_menu(const ProgramInfo& info, ConsoleHandle& conso
             );
         }
 
-        OverworldWatcher overworld(COLOR_RED);
+        OverworldWatcher overworld(console, COLOR_RED);
         MainMenuWatcher main_menu(COLOR_YELLOW);
         AdvanceDialogWatcher dialog(COLOR_GREEN);
         PromptDialogWatcher prompt(COLOR_CYAN);
@@ -151,7 +151,7 @@ void connect_to_internet_from_overworld(const ProgramInfo& info, ConsoleHandle& 
             );
         }
 
-        OverworldWatcher overworld(COLOR_RED);
+        OverworldWatcher overworld(console, COLOR_RED);
         MainMenuWatcher main_menu(COLOR_YELLOW);
         AdvanceDialogWatcher dialog(COLOR_GREEN);
         PromptDialogWatcher prompt(COLOR_CYAN);

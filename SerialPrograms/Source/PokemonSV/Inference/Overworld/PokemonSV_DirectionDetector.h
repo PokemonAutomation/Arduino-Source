@@ -33,10 +33,12 @@ public:
     DirectionDetector(Color color = COLOR_RED, const ImageFloatBox& box = ImageFloatBox(0.815, 0.680, 0.180, 0.310));
     virtual ~DirectionDetector();
 
+    bool detect_north(Logger& logger, const ImageViewRGB32& screen) const;
+
     // return the coordinates of the N symbol, where the coordinates are measured in absolute pixels (scaled to 1080/height)
     // with respect to the radar ball
     // return 0,0 if unable to locate the N symbol
-    std::pair<double, double> locate_north(ConsoleHandle& console, const ImageViewRGB32& screen) const;
+    std::pair<double, double> locate_north(Logger& logger, const ImageViewRGB32& screen) const;
 
     // return the direction of the N symbol, in radians, using North-clockwise convention. [0, 2pi)
     // return -1 if unable to locate the N symbol

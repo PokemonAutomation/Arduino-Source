@@ -86,7 +86,7 @@ MassPurchase::MassPurchase()
 bool MassPurchase::mass_purchase(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){
     MassPurchase_Descriptor::Stats& stats = env.current_stats<MassPurchase_Descriptor::Stats>();
 
-    OverworldWatcher overworld(COLOR_RED);
+    OverworldWatcher overworld(console, COLOR_RED);
     AdvanceDialogWatcher dialog(COLOR_CYAN);
     context.wait_for_all_requests();
     int ret = wait_until(
@@ -123,7 +123,7 @@ bool MassPurchase::mass_purchase(ProgramEnvironment& env, ConsoleHandle& console
 bool MassPurchase::extra_items(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){
     MassPurchase_Descriptor::Stats& stats = env.current_stats<MassPurchase_Descriptor::Stats>();
 
-    OverworldWatcher overworld(COLOR_RED);
+    OverworldWatcher overworld(console, COLOR_RED);
     AdvanceDialogWatcher dialog(COLOR_CYAN);
     context.wait_for_all_requests();
     int ret = wait_until(

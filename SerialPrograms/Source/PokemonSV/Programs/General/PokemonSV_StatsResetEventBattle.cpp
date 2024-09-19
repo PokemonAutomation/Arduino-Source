@@ -492,7 +492,7 @@ bool StatsResetEventBattle::check_stats(SingleSwitchProgramEnvironment& env, Bot
 bool StatsResetEventBattle::check_stats_after_win(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
 #if 0
     //  Clear out dialog until we're free
-    OverworldWatcher overworld(COLOR_YELLOW);
+    OverworldWatcher overworld(console, COLOR_YELLOW);
     int retOverworld = run_until(
         env.console, context,
         [](BotBaseContext& context){

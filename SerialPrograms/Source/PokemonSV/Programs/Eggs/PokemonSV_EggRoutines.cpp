@@ -84,7 +84,7 @@ void handle_egg_hatching(const ProgramInfo& info, ConsoleHandle& console, BotBas
 {
     console.log("Detect hatching dialog: " + std::to_string(egg_idx+1) + "/" + std::to_string(num_eggs_in_party));
     console.overlay().add_log("Hatched " + std::to_string(egg_idx+1) + "/" + std::to_string(num_eggs_in_party), COLOR_GREEN);
-    OverworldWatcher overworld(COLOR_CYAN);
+    OverworldWatcher overworld(console, COLOR_CYAN);
     int ret = run_until(
         console, context,
         [](BotBaseContext& context){
@@ -217,7 +217,7 @@ void order_compote_du_fils(const ProgramInfo& info, ConsoleHandle& console, BotB
         context.wait_for_all_requests();
 
         AdvanceDialogWatcher dialog_watcher(COLOR_RED, std::chrono::milliseconds(100));
-        OverworldWatcher overworld(COLOR_CYAN);
+        OverworldWatcher overworld(console, COLOR_CYAN);
         int ret = wait_until(
             console, context,
             std::chrono::seconds(60),

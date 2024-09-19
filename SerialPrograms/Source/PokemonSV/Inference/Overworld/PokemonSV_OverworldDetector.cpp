@@ -130,14 +130,19 @@ std::pair<double, double> OverworldDetector::locate_ball(const ImageViewRGB32& s
 
 
 
-OverworldWatcher::OverworldWatcher(Color color, bool detect_event)
+OverworldWatcher::OverworldWatcher(Logger& logger, Color color, bool detect_event)
      : OverworldDetector(color)
      , VisualInferenceCallback("OverworldWatcher")
+     , m_logger(logger)
      , m_ball_hold_duration(std::chrono::milliseconds(5000))
      , m_map_hold_duration(std::chrono::milliseconds(1000))
+     , m_north_hold_duration(std::chrono::milliseconds(1000))
      , m_last_ball(WallClock::min())
+     , m_last_north(WallClock::min())
      , m_detect_event(detect_event)
-{}
+{
+    m_direction_detector = DirectionDetector(COLOR_RED);
+}
 
 void OverworldWatcher::make_overlays(VideoOverlaySet& items) const{
     OverworldDetector::make_overlays(items);
@@ -145,10 +150,14 @@ void OverworldWatcher::make_overlays(VideoOverlaySet& items) const{
 bool OverworldWatcher::process_frame(const VideoSnapshot& frame){
     //  Return true if either of the following is true:
     //    - Ball is held and radar map stays still for 1 second.
+    //    - Ball is held for 1 second and N symbol is held for 1 second
     //    - Ball is held for 5 seconds.
 
     //  The map is not static when there is an event raid in it as it will
     //  sparkle. So instead, we revert to the ball being held for 5 seconds.
+
+    // Using Ball detection alone can false positive on the slow moving lights after a tera raid.
+    // To reduce false positives, we also require: either the map staying still for 1 second, or detecting the N symbol.
 
     //  No detection.
     if (!detect(frame)){
@@ -157,7 +166,7 @@ bool OverworldWatcher::process_frame(const VideoSnapshot& frame){
         return false;
     }
 
-    //  First detection.
+    //  First detection of ball
     if (m_last_ball == WallClock::min()){
         m_last_ball = frame.timestamp;
     }
@@ -166,10 +175,26 @@ bool OverworldWatcher::process_frame(const VideoSnapshot& frame){
         return false;
     }
 
-    //  Ball held for long enough.
+    //  Ball held for long enough. (5 seconds)
     if (!m_detect_event && (frame.timestamp - m_last_ball >= m_ball_hold_duration)){
         return true;
     }
+
+
+    // check for North symbol
+    if (!m_direction_detector.detect_north(m_logger, frame)){ 
+        m_last_north = WallClock::min(); // not detecting north
+    }else{
+        if (m_last_north == WallClock::min()){ // first detection of north
+            m_last_north = frame.timestamp;  
+        }
+        if (frame.timestamp - m_last_north >= m_north_hold_duration){
+            return true;
+        }        
+    }
+
+
+    // Check if radar map stays still for 1 second.
 
     //  Mismatching image sizes.
     ImageViewRGB32 start = extract_box_reference(m_start_of_detection, m_detect_event ? m_ball : m_radar_inside);
@@ -179,15 +204,15 @@ bool OverworldWatcher::process_frame(const VideoSnapshot& frame){
         return false;
     }
 
-    //  Image has changed too much.
+    
     double rmsd = ImageMatch::pixel_RMSD(start, current);
 //    cout << "rmsd = " << rmsd << endl;
-    if (rmsd > 2.0){
+    if (rmsd > 2.0){ //  Image of radar map has changed too much.
         m_start_of_detection = frame;
         return false;
     }
 
-    //  Make sure it's held for long enough.
+    //  Make sure radar map held for long enough.
     return frame.timestamp - m_start_of_detection.timestamp >= m_map_hold_duration;
 }
 

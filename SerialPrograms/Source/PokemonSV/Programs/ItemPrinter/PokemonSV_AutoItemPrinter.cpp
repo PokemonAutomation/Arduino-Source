@@ -84,7 +84,7 @@ void AutoItemPrinter::enter_printing_mode(SingleSwitchProgramEnvironment& env, B
     env.console.log("Entering printing mode...");
 
     while (true){
-        OverworldWatcher     overworld(COLOR_CYAN);
+        OverworldWatcher     overworld(env.console, COLOR_CYAN);
         AdvanceDialogWatcher dialog(COLOR_YELLOW);
         PromptDialogWatcher  prompt(COLOR_YELLOW);
         WhiteButtonWatcher   material(COLOR_GREEN, WhiteButton::ButtonX, {0.63, 0.93, 0.17, 0.06});
