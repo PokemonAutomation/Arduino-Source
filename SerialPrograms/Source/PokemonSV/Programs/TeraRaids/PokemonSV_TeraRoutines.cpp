@@ -84,7 +84,7 @@ void close_raid(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext&
         }
 
         TeraCardWatcher card_detector(COLOR_RED);
-        OverworldWatcher overworld(COLOR_CYAN);
+        OverworldWatcher overworld(console, COLOR_CYAN);
         int ret = wait_until(
             console, context,
             std::chrono::seconds(60),
@@ -122,7 +122,7 @@ void open_hosting_lobby(
             );
         }
 
-        OverworldWatcher overworld(COLOR_RED);
+        OverworldWatcher overworld(console, COLOR_RED);
         if (recovery_mode){
             context.wait_for_all_requests();
             int ret = run_until(
@@ -203,7 +203,7 @@ void enter_tera_search(
             );
         }
 
-        OverworldWatcher overworld(COLOR_RED);
+        OverworldWatcher overworld(console, COLOR_RED);
         MainMenuWatcher main_menu(COLOR_YELLOW);
         PokePortalWatcher poke_portal(COLOR_GREEN);
         TeraRaidSearchWatcher raid_search(COLOR_CYAN);
@@ -312,7 +312,7 @@ void exit_tera_win_without_catching(
             std::chrono::seconds(1)
         );
         AdvanceDialogWatcher dialog(COLOR_YELLOW);
-        OverworldWatcher overworld(COLOR_RED);
+        OverworldWatcher overworld(console, COLOR_RED);
         int ret = wait_until(
             console, context,
             std::chrono::seconds(60),
@@ -381,7 +381,7 @@ void exit_tera_win_by_catching(
         PromptDialogWatcher add_to_party(COLOR_PURPLE, {0.500, 0.395, 0.400, 0.100});
         PromptDialogWatcher nickname(COLOR_GREEN, {0.500, 0.545, 0.400, 0.100});
         MainMenuWatcher main_menu(COLOR_BLUE);
-        OverworldWatcher overworld(COLOR_RED);
+        OverworldWatcher overworld(console, COLOR_RED);
         context.wait_for_all_requests();
         int ret = wait_until(
             console, context,
@@ -495,7 +495,7 @@ TeraResult exit_tera_win_by_catching(
         PromptDialogWatcher nickname(COLOR_GREEN, {0.500, 0.545, 0.400, 0.100});
         PokemonSummaryWatcher summary(COLOR_MAGENTA);
         MainMenuWatcher main_menu(COLOR_BLUE);
-        OverworldWatcher overworld(COLOR_RED);
+        OverworldWatcher overworld(console, COLOR_RED);
         context.wait_for_all_requests();
         int ret = wait_until(
             console, context,
@@ -669,7 +669,7 @@ void run_from_tera_battle(const ProgramInfo& info, ConsoleHandle& console, BotBa
         }
 
         TeraBattleMenuWatcher battle_menu(COLOR_GREEN);
-        OverworldWatcher overworld(COLOR_CYAN);
+        OverworldWatcher overworld(console, COLOR_CYAN);
         context.wait_for_all_requests();
 
         int ret = wait_until(
@@ -701,7 +701,7 @@ void run_from_tera_battle(const ProgramInfo& info, ConsoleHandle& console, BotBa
 
 
 bool is_sparkling_raid(ConsoleHandle& console, BotBaseContext& context){
-    OverworldWatcher static_map(COLOR_CYAN, true);
+    OverworldWatcher static_map(console, COLOR_CYAN, true);
     context.wait_for_all_requests();
 
     int ret = wait_until(

@@ -40,13 +40,14 @@ protected:
 
 class OverworldWatcher : public OverworldDetector, public VisualInferenceCallback{
 public:
-    OverworldWatcher(Color color = COLOR_RED, bool detect_event = false);
+    OverworldWatcher(Logger& logger, Color color = COLOR_RED, bool detect_event = false);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool process_frame(const VideoSnapshot& frame) override;
 
 
 private:
+    Logger& m_logger;
     std::chrono::milliseconds m_ball_hold_duration;
     std::chrono::milliseconds m_map_hold_duration;
     std::chrono::milliseconds m_north_hold_duration;

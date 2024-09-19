@@ -149,7 +149,7 @@ void GimmighoulChestFarmer::program(SingleSwitchProgramEnvironment& env, BotBase
             pbf_mash_button(context, BUTTON_A, 90);
             c++;
             context.wait_for_all_requests();
-            OverworldWatcher overworld(COLOR_RED);
+            OverworldWatcher overworld(env.console, COLOR_RED);
             int ret2 = wait_until(
                 env.console, context,
                 std::chrono::seconds(120),

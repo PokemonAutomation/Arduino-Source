@@ -281,7 +281,7 @@ void quest_photo(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
                 //Take photo.
                 console.log("Taking photo.");
                 PromptDialogWatcher photo_prompt(COLOR_RED);
-                OverworldWatcher overworld(COLOR_BLUE);
+                OverworldWatcher overworld(console, COLOR_BLUE);
 
                 pbf_press_dpad(context, DPAD_DOWN, 50, 20);
                 pbf_wait(context, 100);
@@ -663,7 +663,7 @@ void quest_catch_handle_battle(const ProgramInfo& info, ConsoleHandle& console, 
     console.log("Catching Pokemon.");
     AdvanceDialogWatcher advance_dialog(COLOR_MAGENTA);
     PromptDialogWatcher add_to_party(COLOR_PURPLE);
-    OverworldWatcher overworld(COLOR_RED);
+    OverworldWatcher overworld(console, COLOR_RED);
 
     uint8_t switch_party_slot = 1;
     bool quickball_thrown = false;
@@ -888,7 +888,7 @@ void quest_catch(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
     resume_game_from_home(console, context);
 
     //Heal up and then reset position again.
-    OverworldWatcher done_healing(COLOR_BLUE);
+    OverworldWatcher done_healing(console, COLOR_BLUE);
     pbf_move_left_joystick(context, 128, 0, 100, 20);
 
     pbf_mash_button(context, BUTTON_A, 300);
@@ -912,7 +912,7 @@ void quest_catch(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
 
 void wild_battle_tera(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, bool& tera_self){
     AdvanceDialogWatcher lost(COLOR_YELLOW);
-    OverworldWatcher overworld(COLOR_RED);
+    OverworldWatcher overworld(console, COLOR_RED);
     WallClock start = current_time();
     uint8_t switch_party_slot = 1;
     bool first_turn = true;

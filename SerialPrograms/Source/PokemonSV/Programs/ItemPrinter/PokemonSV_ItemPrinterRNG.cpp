@@ -321,7 +321,7 @@ ItemPrinterPrizeResult ItemPrinterRNG::run_print_at_date(
     while (true){
         context.wait_for_all_requests();
 
-        OverworldWatcher overworld(COLOR_BLUE);
+        OverworldWatcher overworld(env.console, COLOR_BLUE);
         AdvanceDialogWatcher dialog(COLOR_RED);
         PromptDialogWatcher prompt(COLOR_GREEN);
         DateChangeWatcher date_reader;
@@ -571,7 +571,7 @@ void ItemPrinterRNG::print_again(
     while (true){
         context.wait_for_all_requests();
 
-        OverworldWatcher overworld(COLOR_BLUE);
+        OverworldWatcher overworld(env.console, COLOR_BLUE);
         AdvanceDialogWatcher dialog(COLOR_RED);
 //        PromptDialogWatcher prompt(COLOR_GREEN);
         WhiteButtonWatcher material(COLOR_GREEN, WhiteButton::ButtonX, {0.63, 0.93, 0.17, 0.06});
@@ -940,7 +940,7 @@ uint32_t ItemPrinterRNG::check_num_happiny_dust(
     while (true){
         context.wait_for_all_requests();
 
-        OverworldWatcher overworld(COLOR_BLUE);
+        OverworldWatcher overworld(env.console, COLOR_BLUE);
         AdvanceDialogWatcher dialog(COLOR_RED);
         PromptDialogWatcher prompt(COLOR_GREEN);
         DateChangeWatcher date_reader;

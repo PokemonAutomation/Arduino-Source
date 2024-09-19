@@ -58,19 +58,16 @@ DirectionDetector::DirectionDetector(Color color, const ImageFloatBox& box)
 {}
 
 
-bool DirectionDetector::detect_north(const ImageViewRGB32& screen) const{
-    std::pair<double, double> north_location = locate_north(screen);
+bool DirectionDetector::detect_north(Logger& logger, const ImageViewRGB32& screen) const{
+    std::pair<double, double> north_location = locate_north(logger, screen);
 
     return !(north_location.first == 0 && north_location.second == 0);
 }
 
 
-std::pair<double, double> DirectionDetector::locate_north(ConsoleHandle& console, const ImageViewRGB32& screen) const{
-    assert_16_9_720p_min(console, screen);
-    return locate_north(screen);
-}
+std::pair<double, double> DirectionDetector::locate_north(Logger& logger, const ImageViewRGB32& screen) const{
+    assert_16_9_720p_min(logger, screen);
 
-std::pair<double, double> DirectionDetector::locate_north(const ImageViewRGB32& screen) const{
     const std::vector<std::pair<uint32_t, uint32_t>> filters = {
         {combine_rgb(0, 100, 0), combine_rgb(50, 230, 80)},
 
@@ -88,7 +85,7 @@ std::pair<double, double> DirectionDetector::locate_north(const ImageViewRGB32& 
     if (zero_coord.first > 0.91 || zero_coord.first < 0.90 || 
         zero_coord.second > 0.84 || zero_coord.second < 0.82)
     {
-        std::cout << "Unable to locate the overworld radar ball, falling back on hard coded location." << std::endl;
+        logger.log("Unable to locate the overworld radar ball, falling back on hard coded location.", COLOR_ORANGE);
         zero_coord.first = 0.9061;
         zero_coord.second = 0.8328;
         // throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Unable to locate the overworld radar ball.");

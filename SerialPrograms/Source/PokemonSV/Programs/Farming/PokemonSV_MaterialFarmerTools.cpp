@@ -721,7 +721,7 @@ void move_from_blueberry_entrance_to_league_club(const ProgramInfo& info, Consol
         pbf_mash_button(context, BUTTON_A, 100);
 
         // check for overworld
-        OverworldWatcher overworld(COLOR_CYAN);  
+        OverworldWatcher overworld(console, COLOR_CYAN);  
         ret = wait_until(console, context, Milliseconds(10000), { overworld });
         if (ret == 0){
             console.log("Entered League club room.");
@@ -795,7 +795,7 @@ void move_from_item_printer_to_blueberry_entrance(const ProgramInfo& info, Conso
     pbf_mash_button(context, BUTTON_A, 100);    
 
     // check for overworld
-    OverworldWatcher overworld(COLOR_CYAN);  
+    OverworldWatcher overworld(console, COLOR_CYAN);  
     ret = wait_until(console, context, std::chrono::seconds(30), { overworld });
     if (ret == 0){
         console.log("Overworld detected");

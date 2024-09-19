@@ -114,7 +114,7 @@ bool FlyingTrialFarmer::run_rewards(SingleSwitchProgramEnvironment& env, BotBase
     bool trial_failed = true;
     while (true){
         DialogBoxWatcher dialog(COLOR_GREEN, true, std::chrono::milliseconds(250), DialogType::DIALOG_BLACK);
-        OverworldWatcher overworld(COLOR_CYAN);
+        OverworldWatcher overworld(env.console, COLOR_CYAN);
         context.wait_for_all_requests();
 
         int ret_finish = run_until(

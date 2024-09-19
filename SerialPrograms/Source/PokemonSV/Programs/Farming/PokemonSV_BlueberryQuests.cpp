@@ -409,7 +409,7 @@ void quest_make_tm(const ProgramInfo& info, ConsoleHandle& console, BotBaseConte
 
     GradientArrowWatcher machine(COLOR_BLUE, GradientArrowType::DOWN, {0.181, 0.127, 0.045, 0.070});
     PromptDialogWatcher makeTM(COLOR_RED);
-    OverworldWatcher overworld(COLOR_BLUE);
+    OverworldWatcher overworld(console, COLOR_BLUE);
 
     pbf_move_left_joystick(context, 255, 0, 100, 20);
     pbf_press_button(context, BUTTON_L, 10, 50);
@@ -568,7 +568,7 @@ void quest_tera_self_defeat(const ProgramInfo& info, ConsoleHandle& console, Bot
     resume_game_from_home(console, context);
 
     //Heal up and then reset position again.
-    OverworldWatcher done_healing(COLOR_BLUE);
+    OverworldWatcher done_healing(console, COLOR_BLUE);
     pbf_move_left_joystick(context, 128, 0, 100, 20);
 
     pbf_mash_button(context, BUTTON_A, 300);
@@ -645,7 +645,7 @@ void quest_sneak_up(const ProgramInfo& info, ConsoleHandle& console, BotBaseCont
             pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
             throw ProgramFinishedException();
         }else{
-            OverworldWatcher overworld(COLOR_BLUE);
+            OverworldWatcher overworld(console, COLOR_BLUE);
 
             int ret2 = run_until(
                 console, context,
@@ -768,7 +768,7 @@ void quest_wild_tera(const ProgramInfo& info, ConsoleHandle& console, BotBaseCon
     resume_game_from_home(console, context);
 
     //Heal up and then reset position again.
-    OverworldWatcher done_healing(COLOR_BLUE);
+    OverworldWatcher done_healing(console, COLOR_BLUE);
     pbf_move_left_joystick(context, 128, 0, 100, 20);
 
     pbf_mash_button(context, BUTTON_A, 300);
@@ -1176,7 +1176,7 @@ void quest_auto_battle(ProgramEnvironment& env, ConsoleHandle& console, BotBaseC
         context.wait_for_all_requests();
         return_to_plaza(env.program_info(), console, context);
 
-        OverworldWatcher done_healing(COLOR_BLUE);
+        OverworldWatcher done_healing(console, COLOR_BLUE);
         pbf_move_left_joystick(context, 128, 0, 100, 20);
 
         pbf_mash_button(context, BUTTON_A, 300);

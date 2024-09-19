@@ -368,7 +368,7 @@ void AuctionFarmer::bid_on_item(SingleSwitchProgramEnvironment& env, BotBaseCont
     PromptDialogWatcher high_detector(COLOR_RED, { 0.50, 0.40, 0.40, 0.082 });
     PromptDialogWatcher mid_detector(COLOR_PURPLE, { 0.50, 0.475, 0.40, 0.082 });
     PromptDialogWatcher low_detector(COLOR_PURPLE, { 0.50, 0.55, 0.40, 0.082 });
-    OverworldWatcher overworld_detector(COLOR_BLUE);
+    OverworldWatcher overworld_detector(env.console, COLOR_BLUE);
     bool won_auction = true;
     bool auction_ongoing = true;
     int64_t current_bid = 0;

@@ -101,7 +101,7 @@ void inside_zero_gate_to_station(
             AdvanceDialogWatcher dialog(COLOR_GREEN);
             PromptDialogWatcher confirm(COLOR_GREEN);
             BlackScreenOverWatcher black_screen(COLOR_RED);
-            OverworldWatcher overworld(COLOR_BLUE);
+            OverworldWatcher overworld(console, COLOR_BLUE);
             context.wait_for_all_requests();
             int ret = wait_until(
                 console, context, std::chrono::seconds(30),
@@ -165,7 +165,7 @@ void inside_zero_gate_to_station(
 
     console.log("Exiting station. Waiting for overworld...");
     {
-        OverworldWatcher overworld(COLOR_BLUE);
+        OverworldWatcher overworld(console, COLOR_BLUE);
         int ret = wait_until(
             console, context, std::chrono::seconds(30),
             {overworld}
@@ -206,7 +206,7 @@ void return_to_inside_zero_gate(const ProgramInfo& info, ConsoleHandle& console,
         );
     }
 
-    OverworldWatcher overworld;
+    OverworldWatcher overworld(console);
     ret = wait_until(
         console, context, std::chrono::seconds(10),
         {overworld}
@@ -238,7 +238,7 @@ void return_to_inside_zero_gate_from_picnic(const ProgramInfo& info, ConsoleHand
         );
     }
 
-    OverworldWatcher overworld;
+    OverworldWatcher overworld(console);
     ret = wait_until(
         console, context, std::chrono::seconds(10),
         {overworld}

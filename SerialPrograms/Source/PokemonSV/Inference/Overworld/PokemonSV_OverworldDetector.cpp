@@ -130,9 +130,10 @@ std::pair<double, double> OverworldDetector::locate_ball(const ImageViewRGB32& s
 
 
 
-OverworldWatcher::OverworldWatcher(Color color, bool detect_event)
+OverworldWatcher::OverworldWatcher(Logger& logger, Color color, bool detect_event)
      : OverworldDetector(color)
      , VisualInferenceCallback("OverworldWatcher")
+     , m_logger(logger)
      , m_ball_hold_duration(std::chrono::milliseconds(5000))
      , m_map_hold_duration(std::chrono::milliseconds(1000))
      , m_north_hold_duration(std::chrono::milliseconds(1000))
@@ -181,7 +182,7 @@ bool OverworldWatcher::process_frame(const VideoSnapshot& frame){
 
 
     // check for North symbol
-    if (!m_direction_detector.detect_north(frame)){ 
+    if (!m_direction_detector.detect_north(m_logger, frame)){ 
         m_last_north = WallClock::min(); // not detecting north
     }else{
         if (m_last_north == WallClock::min()){ // first detection of north

@@ -70,7 +70,7 @@ void day_skip_from_overworld(ConsoleHandle& console, BotBaseContext& context){
 
 void press_Bs_to_back_to_overworld(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, uint16_t seconds_between_b_presses){
     context.wait_for_all_requests();
-    OverworldWatcher overworld(COLOR_RED);
+    OverworldWatcher overworld(console, COLOR_RED);
     int ret = run_until(
         console, context,
         [seconds_between_b_presses](BotBaseContext& context){
@@ -97,7 +97,7 @@ void open_map_from_overworld(
     bool clear_tutorial
 ){
     {
-        OverworldWatcher overworld(COLOR_CYAN);
+        OverworldWatcher overworld(console, COLOR_CYAN);
         context.wait_for_all_requests();
         int ret = wait_until(
             console, context,
@@ -127,7 +127,7 @@ void open_map_from_overworld(
             );
         }
 
-        OverworldWatcher overworld(COLOR_CYAN);
+        OverworldWatcher overworld(console, COLOR_CYAN);
         AdvanceDialogWatcher advance_dialog(COLOR_YELLOW);
         PromptDialogWatcher prompt_dialog(COLOR_GREEN);
         MapWatcher map(COLOR_RED);
@@ -192,7 +192,7 @@ bool fly_to_overworld_from_map(const ProgramInfo& info, ConsoleHandle& console, 
         }
 
         int ret = 0;
-        OverworldWatcher overworld(COLOR_CYAN);
+        OverworldWatcher overworld(console, COLOR_CYAN);
         WhiteButtonWatcher map(COLOR_RED, WhiteButton::ButtonY, {0.800, 0.118, 0.030, 0.060});
         GradientArrowWatcher spot_dialog_watcher(COLOR_YELLOW, GradientArrowType::RIGHT, {0.469, 0.500, 0.215, 0.150});
         PromptDialogWatcher confirm_watcher(COLOR_BLUE, {0.686, 0.494, 0.171, 0.163});
@@ -256,7 +256,7 @@ void picnic_from_overworld(const ProgramInfo& info, ConsoleHandle& console, BotB
             );
         }
 
-        OverworldWatcher overworld(COLOR_CYAN);
+        OverworldWatcher overworld(console, COLOR_CYAN);
         MainMenuWatcher main_menu(COLOR_RED);
         PicnicWatcher picnic;
         context.wait_for_all_requests();
@@ -340,7 +340,7 @@ void leave_picnic(const ProgramInfo& info, ConsoleHandle& console, BotBaseContex
     context.wait_for_all_requests();
     
     // Wait for overworld:
-    OverworldWatcher overworld(COLOR_CYAN);
+    OverworldWatcher overworld(console, COLOR_CYAN);
     int ret = wait_until(
         console, context,
         std::chrono::seconds(20),
@@ -372,7 +372,7 @@ void enter_box_system_from_overworld(const ProgramInfo& info, ConsoleHandle& con
             );
         }
 
-        OverworldWatcher overworld(COLOR_CYAN);
+        OverworldWatcher overworld(console, COLOR_CYAN);
         MainMenuWatcher main_menu(COLOR_RED);
         GradientArrowWatcher box_slot_one(COLOR_BLUE, GradientArrowType::DOWN, {0.24, 0.16, 0.05, 0.09});
         context.wait_for_all_requests();
@@ -435,7 +435,7 @@ void open_pokedex_from_overworld(const ProgramInfo& info, ConsoleHandle& console
             );
         }
 
-        OverworldWatcher overworld(COLOR_CYAN);
+        OverworldWatcher overworld(console, COLOR_CYAN);
         WhiteButtonWatcher pokedex(COLOR_RED, WhiteButton::ButtonY, {0.800, 0.118, 0.030, 0.060});
 
         context.wait_for_all_requests();
@@ -494,7 +494,7 @@ void open_recently_battled_from_pokedex(const ProgramInfo& info, ConsoleHandle& 
 
 void leave_phone_to_overworld(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
     console.log("Exiting to overworld from Rotom Phone...");
-    OverworldWatcher overworld(COLOR_CYAN);
+    OverworldWatcher overworld(console, COLOR_CYAN);
     context.wait_for_all_requests();
 
     int ret = run_until(
@@ -838,7 +838,7 @@ void mash_button_till_overworld(
     BotBaseContext& context, 
     uint16_t button, uint16_t seconds_run
 ){
-    OverworldWatcher overworld(COLOR_CYAN);
+    OverworldWatcher overworld(console, COLOR_CYAN);
     context.wait_for_all_requests();
 
     int ret = run_until(
@@ -913,7 +913,7 @@ void enter_menu_from_overworld(const ProgramInfo& info, ConsoleHandle& console, 
             );
         }
 
-        OverworldWatcher overworld(COLOR_CYAN);
+        OverworldWatcher overworld(console, COLOR_CYAN);
         MainMenuWatcher main_menu(COLOR_RED);
         context.wait_for_all_requests();
 
@@ -1067,7 +1067,7 @@ void heal_at_pokecenter(
     bool seen_prompt = false;
 
     while (true){
-        OverworldWatcher    overworld(COLOR_CYAN);
+        OverworldWatcher    overworld(console, COLOR_CYAN);
         // TODO: test the Prompt watcher on all languages. Ensure FloatBox is sized correctly.
         PromptDialogWatcher prompt(COLOR_YELLOW, {0.50, 0.400, 0.400, 0.080}); // 0.630, 0.400, 0.100, 0.080 // {0.50, 0.40, 0.40, 0.50}
         AdvanceDialogWatcher    advance_dialog(COLOR_RED);
