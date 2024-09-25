@@ -15,12 +15,22 @@
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
-// #include "PokemonSV_AutoStory_Checkpoint_00_04.h"
-// #include "PokemonSV_AutoStory_Checkpoint_05_10.h"
-// #include "PokemonSV_AutoStory_Checkpoint_11_15.h"
-// #include "PokemonSV_AutoStory_Checkpoint_16_20.h"
-// #include "PokemonSV_AutoStory_Checkpoint_21_25.h"
-// #include "PokemonSV_AutoStory_Checkpoint_26_30.h"
+#include "PokemonSV_AutoStory_Segment_00.h"
+// #include "PokemonSV_AutoStory_Segment_01.h"
+// #include "PokemonSV_AutoStory_Segment_02.h"
+// #include "PokemonSV_AutoStory_Segment_03.h"
+// #include "PokemonSV_AutoStory_Segment_04.h"
+// #include "PokemonSV_AutoStory_Segment_05.h"
+// #include "PokemonSV_AutoStory_Segment_06.h"
+// #include "PokemonSV_AutoStory_Segment_07.h"
+// #include "PokemonSV_AutoStory_Segment_08.h"
+// #include "PokemonSV_AutoStory_Segment_09.h"
+// #include "PokemonSV_AutoStory_Segment_10.h"
+// #include "PokemonSV_AutoStory_Segment_11.h"
+// #include "PokemonSV_AutoStory_Segment_12.h"
+// #include "PokemonSV_AutoStory_Segment_13.h"
+// #include "PokemonSV_AutoStory_Segment_14.h"
+// #include "PokemonSV_AutoStory_Segment_15.h"
 #include "PokemonSV_AutoStory.h"
 
 //#include <iostream>
@@ -34,6 +44,83 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 using namespace Pokemon;
+
+
+std::vector<std::unique_ptr<AutoStory_Segment>> make_autoStory_segment_list(){
+    std::vector<std::unique_ptr<AutoStory_Segment>> segment_list;
+    segment_list.emplace_back(std::make_unique<AutoStory_Segment_00>());
+    // segment_list.emplace_back(std::make_unique<AutoStory_Segment_01>());
+    // segment_list.emplace_back(std::make_unique<AutoStory_Segment_02>());
+    // segment_list.emplace_back(std::make_unique<AutoStory_Segment_03>());
+    // segment_list.emplace_back(std::make_unique<AutoStory_Segment_04>());
+    // segment_list.emplace_back(std::make_unique<AutoStory_Segment_05>());
+    // segment_list.emplace_back(std::make_unique<AutoStory_Segment_06>());
+    // segment_list.emplace_back(std::make_unique<AutoStory_Segment_07>());
+    // segment_list.emplace_back(std::make_unique<AutoStory_Segment_08>());
+    // segment_list.emplace_back(std::make_unique<AutoStory_Segment_09>());
+    // segment_list.emplace_back(std::make_unique<AutoStory_Segment_10>());
+    // segment_list.emplace_back(std::make_unique<AutoStory_Segment_11>());
+    // segment_list.emplace_back(std::make_unique<AutoStory_Segment_12>());
+    // segment_list.emplace_back(std::make_unique<AutoStory_Segment_13>());
+    // segment_list.emplace_back(std::make_unique<AutoStory_Segment_14>());
+
+    return segment_list;
+};
+
+const std::vector<std::unique_ptr<AutoStory_Segment>>& ALL_AUTO_STORY_SEGMENT_LIST(){
+    static std::vector<std::unique_ptr<AutoStory_Segment>> segment_list = make_autoStory_segment_list();
+    return segment_list;
+}
+
+
+StringSelectDatabase make_all_segments_database(){
+    StringSelectDatabase ret;
+    int index_num = 0;
+    for (const auto& segment : ALL_AUTO_STORY_SEGMENT_LIST()){
+        ret.add_entry(StringSelectEntry(std::to_string(index_num), segment->name()));
+        index_num++;
+    }
+    return ret;
+}
+const StringSelectDatabase& ALL_SEGMENTS_SELECT_DATABASE(){
+    static StringSelectDatabase database = make_all_segments_database();
+    return database;
+}
+
+StringSelectDatabase make_tutorial_segments_database(){
+    StringSelectDatabase ret;
+    const StringSelectDatabase& all_segments = ALL_SEGMENTS_SELECT_DATABASE();
+    size_t start = 0;
+    size_t end = all_segments.case_list().size(); // 10. size() is the placeholder value. will be 10 when rest of segments merged.
+    for (size_t i = start; i < end; i++){
+        const auto& segment = all_segments[i];
+        ret.add_entry(segment);
+    }
+    return ret;
+}
+
+const StringSelectDatabase& TUTORIAL_SEGMENTS_SELECT_DATABASE(){
+    static StringSelectDatabase database = make_tutorial_segments_database();
+    return database;
+}
+
+StringSelectDatabase make_mainstory_segments_database(){
+    StringSelectDatabase ret;
+    const StringSelectDatabase& all_segments = ALL_SEGMENTS_SELECT_DATABASE();
+    size_t start = 0; // 10. 0 is the placeholder value. will be 10 when rest of segments merged.
+    size_t end = all_segments.case_list().size();
+    for (size_t i = start; i < end; i++){
+        const auto& segment = all_segments[i];
+        ret.add_entry(segment);
+    }
+    return ret;
+}
+
+const StringSelectDatabase& MAINSTORY_SEGMENTS_SELECT_DATABASE(){
+    static StringSelectDatabase database = make_mainstory_segments_database();
+    return database;
+}
+
 
 AutoStory_Descriptor::AutoStory_Descriptor()
     : SingleSwitchProgramDescriptor(
@@ -54,8 +141,8 @@ std::unique_ptr<StatsTracker> AutoStory_Descriptor::make_stats() const{
 
 
 AutoStory::~AutoStory(){
-    STARTPOINT.remove_listener(*this);
-    ENDPOINT.remove_listener(*this);
+    STARTPOINT_TUTORIAL.remove_listener(*this);
+    ENDPOINT_TUTORIAL.remove_listener(*this);
 }
 
 AutoStory::AutoStory()
@@ -65,35 +152,43 @@ AutoStory::AutoStory()
         LockMode::UNLOCK_WHILE_RUNNING,
         true
     )
-    , STARTPOINT(
+    , STORY_SECTION(
+        "<b>Story Section:",
+        {
+            {StorySection::TUTORIAL,         "tutorial",           "Tutorial"},
+            {StorySection::MAIN_STORY,            "main-story",              "Main Story"},
+        },
+        LockMode::LOCK_WHILE_RUNNING,
+        StorySection::TUTORIAL
+    )    
+    , STARTPOINT_TUTORIAL(
         "<b>Start Point:</b><br>Program will start with this segment.",
-        {
-            {StartPoint::INTRO_CUTSCENE,        "00_gameintro",         "00: Intro Cutscene"},
-            {StartPoint::PICK_STARTER,          "01_pickstarter",       "01: Pick Starter"},
-            {StartPoint::NEMONA_FIRST_BATTLE,   "02_nemonabattle1",     "02: First Nemona Battle"},
-            {StartPoint::CATCH_TUTORIAL,        "03_catchtutorial",     "03: Catch Tutorial"},
-            {StartPoint::LEGENDARY_RESCUE,      "04_legendaryrescue",   "04: Rescue Legendary"},
-            {StartPoint::ARVEN_FIRST_BATTLE,    "05_arvenbattle1",      "05: First Arven Battle"},
-            {StartPoint::LOS_PLATOS,            "06_losplatos",         "06: Go to Los Platos"},
-            {StartPoint::MESAGOZA_SOUTH,        "07_mesagozasouth",     "07: Go to Mesagoza South"},
-        },
-        LockMode::LOCK_WHILE_RUNNING,
-        StartPoint::INTRO_CUTSCENE
+        TUTORIAL_SEGMENTS_SELECT_DATABASE(),
+        LockMode::UNLOCK_WHILE_RUNNING,
+        "0"
     )
-    , ENDPOINT(
+    , ENDPOINT_TUTORIAL(
         "<b>End Point:</b><br>Program will stop after completing this segment.",
-        {
-            {EndPoint::PICK_STARTER,            "01_pickstarter",       "01: Pick Starter"},
-            {EndPoint::NEMONA_FIRST_BATTLE,     "02_nemonabattle1",     "02: First Nemona Battle"},
-            {EndPoint::CATCH_TUTORIAL,          "03_catchtutorial",     "03: Catch Tutorial"},
-            {EndPoint::LEGENDARY_RESCUE,        "04_legendaryrescue",   "04: Rescue Legendary"},
-            {EndPoint::ARVEN_FIRST_BATTLE,      "05_arvenbattle1",      "05: First Arven Battle"},
-            {EndPoint::LOS_PLATOS,              "06_losplatos",         "06: Go to Los Platos"},
-            {EndPoint::MESAGOZA_SOUTH,          "07_mesagozasouth",     "07: Go to Mesagoza South"},
-        },
-        LockMode::LOCK_WHILE_RUNNING,
-        EndPoint::PICK_STARTER
-    )
+        TUTORIAL_SEGMENTS_SELECT_DATABASE(),
+        LockMode::UNLOCK_WHILE_RUNNING,
+        "0"  //"9"
+    )   
+    // , STARTPOINT_MAINSTORY(
+    //     "<b>Start Point:</b><br>Program will start with this segment.",
+    //     MAINSTORY_SEGMENTS_SELECT_DATABASE(),
+    //     LockMode::UNLOCK_WHILE_RUNNING,
+    //     "10"
+    // )
+    // , ENDPOINT_MAINSTORY(
+    //     "<b>End Point:</b><br>Program will stop after completing this segment.",
+    //     MAINSTORY_SEGMENTS_SELECT_DATABASE(),
+    //     LockMode::UNLOCK_WHILE_RUNNING,
+    //     "10"
+    // )       
+    , MAINSTORY_NOTE{
+        "Ensure you have a level 100 Gardevoir with the moves in the following order: Moonblast, Dazzling Gleam, Psychic, Mystical Fire.<br>"
+        "Refer to the documentation on github for more details."
+    }
     , START_DESCRIPTION(
         ""
     )
@@ -224,9 +319,13 @@ AutoStory::AutoStory()
     )             
 {
     PA_ADD_OPTION(LANGUAGE);
-    PA_ADD_OPTION(STARTPOINT);
+    PA_ADD_OPTION(STORY_SECTION);
+    PA_ADD_OPTION(STARTPOINT_TUTORIAL);
+    PA_ADD_OPTION(MAINSTORY_NOTE);
+    // PA_ADD_OPTION(STARTPOINT_MAINSTORY);
     PA_ADD_OPTION(START_DESCRIPTION);
-    PA_ADD_OPTION(ENDPOINT);
+    PA_ADD_OPTION(ENDPOINT_TUTORIAL);
+    // PA_ADD_OPTION(ENDPOINT_MAINSTORY);
     PA_ADD_OPTION(END_DESCRIPTION);
     PA_ADD_OPTION(STARTERCHOICE);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
@@ -260,8 +359,11 @@ AutoStory::AutoStory()
 
     AutoStory::value_changed(this);
 
-    STARTPOINT.add_listener(*this);
-    ENDPOINT.add_listener(*this);
+    STORY_SECTION.add_listener(*this);
+    STARTPOINT_TUTORIAL.add_listener(*this);
+    ENDPOINT_TUTORIAL.add_listener(*this);
+    // STARTPOINT_MAINSTORY.add_listener(*this);
+    // ENDPOINT_MAINSTORY.add_listener(*this);    
     ENABLE_TEST_CHECKPOINTS.add_listener(*this);
     ENABLE_TEST_REALIGN.add_listener(*this);
     ENABLE_TEST_OVERWORLD_MOVE.add_listener(*this);
@@ -269,11 +371,26 @@ AutoStory::AutoStory()
 }
 
 void AutoStory::value_changed(void* object){
-    ConfigOptionState state = (STARTPOINT == StartPoint::INTRO_CUTSCENE) || (STARTPOINT == StartPoint::PICK_STARTER)
+    ConfigOptionState state = (STARTPOINT_TUTORIAL.index() <= 1)
         ? ConfigOptionState::ENABLED
         : ConfigOptionState::HIDDEN;
     STARTERCHOICE.set_visibility(state);
 
+    if (STORY_SECTION == StorySection::TUTORIAL){
+        STARTPOINT_TUTORIAL.set_visibility(ConfigOptionState::ENABLED);
+        ENDPOINT_TUTORIAL.set_visibility(ConfigOptionState::ENABLED);
+
+        // STARTPOINT_MAINSTORY.set_visibility(ConfigOptionState::HIDDEN);
+        // ENDPOINT_MAINSTORY.set_visibility(ConfigOptionState::HIDDEN);
+    }else if (STORY_SECTION == StorySection::MAIN_STORY){
+        STARTPOINT_TUTORIAL.set_visibility(ConfigOptionState::HIDDEN);
+        ENDPOINT_TUTORIAL.set_visibility(ConfigOptionState::HIDDEN);
+
+        // STARTPOINT_MAINSTORY.set_visibility(ConfigOptionState::ENABLED);
+        // ENDPOINT_MAINSTORY.set_visibility(ConfigOptionState::ENABLED);        
+    }
+
+    MAINSTORY_NOTE.set_visibility(STORY_SECTION == StorySection::TUTORIAL ? ConfigOptionState::HIDDEN : ConfigOptionState::ENABLED);
     START_DESCRIPTION.set_text(start_segment_description());
     END_DESCRIPTION.set_text(end_segment_description());
 
@@ -324,51 +441,9 @@ void AutoStory::value_changed(void* object){
 
 }
 
-std::string AutoStory::start_segment_description(){
-    switch(STARTPOINT){
-    case StartPoint::INTRO_CUTSCENE:
-        return "Start: Intro cutscene.";
-    case StartPoint::PICK_STARTER:
-        return "Start: Finished cutscene. Adjusted settings. Standing in left side of room.";
-    case StartPoint::NEMONA_FIRST_BATTLE:
-        return "Start: Picked the starter.";
-    case StartPoint::CATCH_TUTORIAL:
-        return "Start: Battled Nemona on the beach.";
-    case StartPoint::LEGENDARY_RESCUE:
-        return "Start: Finished catch tutorial. Walked to the cliff and heard mystery cry.";
-    case StartPoint::ARVEN_FIRST_BATTLE:
-        return "Start: Saved the Legendary. Escaped from the Houndoom cave.";
-    case StartPoint::LOS_PLATOS:
-        return "Start: Battled Arven, received Legendary's Pokeball. Talked to Nemona at Lighthouse.";
-    case StartPoint::MESAGOZA_SOUTH:
-        return "Start: At Los Platos Pokecenter.";
-    default:
-        return "";        
-    }
-}
 
-std::string AutoStory::end_segment_description(){
-    switch(ENDPOINT){
-    case EndPoint::INTRO_CUTSCENE:
-        return "End: Finished cutscene. Adjusted settings. Standing in left side of room.";
-    case EndPoint::PICK_STARTER:
-        return "End: Picked the starter.";
-    case EndPoint::NEMONA_FIRST_BATTLE:
-        return "End: Battled Nemona on the beach.";
-    case EndPoint::CATCH_TUTORIAL:
-        return "End: Finished catch tutorial. Walked to the cliff and heard mystery cry.";
-    case EndPoint::LEGENDARY_RESCUE:
-        return "End: Saved the Legendary. Escaped from the Houndoom cave.";
-    case EndPoint::ARVEN_FIRST_BATTLE:
-        return "End: Battled Arven, received Legendary's Pokeball. Talked to Nemona at Lighthouse.";
-    case EndPoint::LOS_PLATOS:
-        return "End: At Los Platos Pokecenter.";
-    case EndPoint::MESAGOZA_SOUTH:
-        return "End: ";
-    default:
-        return "";
-    }
-}
+
+
 
 
 void AutoStory::test_checkpoints(
@@ -382,7 +457,7 @@ void AutoStory::test_checkpoints(
     // Language language = LANGUAGE;
     // StarterChoice starter_choice = STARTERCHOICE;
     std::vector<std::function<void()>> checkpoint_list;
-    // checkpoint_list.push_back([&](){checkpoint_00(env, context);});
+    checkpoint_list.push_back([&](){checkpoint_00(env, context);});
     // checkpoint_list.push_back([&](){checkpoint_01(env, context, notif_status_update, language);});
     // checkpoint_list.push_back([&](){checkpoint_02(env, context, notif_status_update);});
     // checkpoint_list.push_back([&](){checkpoint_03(env, context, notif_status_update, language, starter_choice);});
@@ -425,17 +500,21 @@ void AutoStory::test_checkpoints(
             continue;
         }
         
-        std::string leading_zero = checkpoint < 10 ? "0" : "";
+        const size_t DIGITS = 3;
+        std::string number = std::to_string(checkpoint);
+        if (number.size() < DIGITS){
+            number = std::string(DIGITS - number.size(), '0') + number;
+        }        
         if (checkpoint >= start_loop && checkpoint <= end_loop){
             for (int i = 0; i < loop; i++){
                 if (i > 0){
                     reset_game(env.program_info(), console, context);
                 }
-                console.log("checkpoint_" + leading_zero + std::to_string(checkpoint) + ": loop " + std::to_string(i));
+                console.log("checkpoint_" + number + ": loop " + std::to_string(i));
                 checkpoint_list[checkpoint]();
             } 
         }else{
-            console.log("checkpoint_" + leading_zero + std::to_string(checkpoint) + ".");
+            console.log("checkpoint_" + number + ".");
             checkpoint_list[checkpoint]();            
         }
        
@@ -443,151 +522,78 @@ void AutoStory::test_checkpoints(
     
 }
 
+std::string AutoStory::start_segment_description(){
+    size_t segment_index = 0;
+    if (STORY_SECTION == StorySection::TUTORIAL){
+        segment_index = STARTPOINT_TUTORIAL.index();
+    }else if (STORY_SECTION == StorySection::MAIN_STORY){
+        // segment_index = STARTPOINT_MAINSTORY.index() + 10;
+    }
+    return ALL_AUTO_STORY_SEGMENT_LIST()[segment_index]->start_text();
+}
+
+std::string AutoStory::end_segment_description(){
+    size_t segment_index = 0;
+    if (STORY_SECTION == StorySection::TUTORIAL){
+        segment_index = ENDPOINT_TUTORIAL.index();
+    }else if (STORY_SECTION == StorySection::MAIN_STORY){
+        // segment_index = ENDPOINT_MAINSTORY.index() + 10;
+    }    
+    return ALL_AUTO_STORY_SEGMENT_LIST()[segment_index]->end_text();
+}
 
 
 void AutoStory::run_autostory(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    // AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
-    // switch (STARTPOINT){
-    // case StartPoint::INTRO_CUTSCENE:
-    //     context.wait_for_all_requests();
-    //     env.console.log("Start Segment 00: Intro Cutscene", COLOR_ORANGE);
-    //     env.console.overlay().add_log("Start Segment 00: Intro Cutscene", COLOR_ORANGE);
+    AutoStoryOptions options{
+        LANGUAGE,
+        STARTERCHOICE,
+        NOTIFICATION_STATUS_UPDATE
+    };    
 
-    //     checkpoint_00(env, context);
+    size_t start = STARTPOINT_TUTORIAL.index();
+    size_t end = ENDPOINT_TUTORIAL.index();
+    for (size_t segment_index = start; segment_index <= end; segment_index++){
+        ALL_AUTO_STORY_SEGMENT_LIST()[segment_index]->run_segment(env, context, options);
+    }
+}
 
-    //     context.wait_for_all_requests();
-    //     env.console.log("End Segment 00: Intro Cutscene", COLOR_GREEN);
-    //     env.console.overlay().add_log("End Segment 00: Intro Cutscene", COLOR_GREEN);
-    //     stats.m_segment++;
-    //     env.update_stats();
-    //     pbf_wait(context, 1 * TICKS_PER_SECOND);        
-    // case StartPoint::PICK_STARTER:
-    //     context.wait_for_all_requests();
-    //     env.console.log("Start Segment 01: Pick Starter", COLOR_ORANGE);
-    //     env.console.overlay().add_log("Start Segment 01: Pick Starter", COLOR_ORANGE);
+void AutoStory::test_code(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
 
-    //     checkpoint_01(env, context, NOTIFICATION_STATUS_UPDATE, LANGUAGE);
-    //     checkpoint_02(env, context, NOTIFICATION_STATUS_UPDATE);
-    //     checkpoint_03(env, context, NOTIFICATION_STATUS_UPDATE, LANGUAGE, STARTERCHOICE);
+    if (ENABLE_TEST_CHECKPOINTS){
+        // test individual checkpoints
+        test_checkpoints(env, env.console, context, START_CHECKPOINT, END_CHECKPOINT, LOOP_CHECKPOINT, START_LOOP, END_LOOP);
+        return;
+    }
+    
 
-    //     context.wait_for_all_requests();
-    //     env.console.log("End Segment 02: Pick Starter", COLOR_GREEN);
-    //     env.console.overlay().add_log("End Segment 02: Pick Starter", COLOR_GREEN);
-    //     stats.m_segment++;
-    //     env.update_stats();
-    //     if (ENDPOINT == EndPoint::PICK_STARTER){
-    //         break;
-    //     }
+    if (ENABLE_TEST_REALIGN){
+        // clear realign marker
+        // realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 128, 128, 0);
+        realign_player(env.program_info(), env.console, context, REALIGN_MODE, X_REALIGN, Y_REALIGN, REALIGN_DURATION);
+        return;
+    }
 
-    // case StartPoint::NEMONA_FIRST_BATTLE:
-    //     context.wait_for_all_requests();
-    //     env.console.log("Start Segment 02: First Nemona Battle", COLOR_ORANGE);
-    //     env.console.overlay().add_log("Start Segment 02: First Nemona Battle", COLOR_ORANGE);
+    if (ENABLE_TEST_OVERWORLD_MOVE){
+        // walk_forward_while_clear_front_path(env.program_info(), env.console, context, FORWARD_TICKS);
 
-    //     checkpoint_04(env, context, NOTIFICATION_STATUS_UPDATE);
+        overworld_navigation(env.program_info(), env.console, context, 
+            NavigationStopCondition::STOP_MARKER, NavigationMovementMode::CLEAR_WITH_LETS_GO, 
+            128, 0, 60, 10, false);
 
-    //     context.wait_for_all_requests();
-    //     env.console.log("End Segment 02: First Nemona Battle", COLOR_GREEN);
-    //     env.console.overlay().add_log("End Segment 02: First Nemona Battle", COLOR_GREEN);
-    //     stats.m_segment++;
-    //     env.update_stats();
-    //     if (ENDPOINT == EndPoint::NEMONA_FIRST_BATTLE){
-    //         break;
-    //     }
+        // overworld_navigation(env.program_info(), env.console, context, 
+        //     NavigationStopCondition::STOP_TIME, NavigationMovementMode::CLEAR_WITH_LETS_GO, 
+        //     128, 0, 25, 10, false);         
+        return;
+    }
 
-    // case StartPoint::CATCH_TUTORIAL:
-    //     context.wait_for_all_requests();
-    //     env.console.log("Start Segment 03: Catch Tutorial", COLOR_ORANGE);
-    //     env.console.overlay().add_log("Start Segment 03: Catch Tutorial", COLOR_ORANGE);
+    if (TEST_PBF_LEFT_JOYSTICK){
+        pbf_move_left_joystick(context, X_MOVE, Y_MOVE, HOLD_TICKS, RELEASE_TICKS);
+        return;
+    }        
 
-    //     checkpoint_05(env, context, NOTIFICATION_STATUS_UPDATE);
-    //     checkpoint_06(env, context, NOTIFICATION_STATUS_UPDATE);
-    //     checkpoint_07(env, context, NOTIFICATION_STATUS_UPDATE);
+    // context.wait_for(Milliseconds(1000000));
 
-    //     context.wait_for_all_requests();
-    //     env.console.log("End Segment 03: Catch Tutorial", COLOR_GREEN);
-    //     env.console.overlay().add_log("End Segment 03: Catch Tutorial", COLOR_GREEN);
-    //     stats.m_segment++;
-    //     env.update_stats();
-    //     if (ENDPOINT == EndPoint::CATCH_TUTORIAL){
-    //         break;
-    //     }
 
-    // case StartPoint::LEGENDARY_RESCUE:
-    //     context.wait_for_all_requests();
-    //     env.console.log("Start Segment 04: Rescue Legendary", COLOR_ORANGE);
-    //     env.console.overlay().add_log("Start Segment 04: Rescue Legendary", COLOR_ORANGE);
-
-    //     checkpoint_08(env, context, NOTIFICATION_STATUS_UPDATE);
-
-    //     context.wait_for_all_requests();
-    //     env.console.log("End Segment 04: Rescue Legendary", COLOR_GREEN);
-    //     env.console.overlay().add_log("End Segment 04: Rescue Legendary", COLOR_GREEN);
-    //     stats.m_segment++;
-    //     env.update_stats();
-    //     if (ENDPOINT == EndPoint::LEGENDARY_RESCUE){
-    //         break;
-    //     }
-
-    // case StartPoint::ARVEN_FIRST_BATTLE:
-    //     context.wait_for_all_requests();
-    //     env.console.log("Start Segment 05: First Arven Battle", COLOR_ORANGE);
-    //     env.console.overlay().add_log("Start Segment 05: First Arven Battle", COLOR_ORANGE);
-
-    //     checkpoint_09(env, context, NOTIFICATION_STATUS_UPDATE);
-    //     checkpoint_10(env, context, NOTIFICATION_STATUS_UPDATE);
-
-    //     context.wait_for_all_requests();
-    //     env.console.log("End Segment 05: First Arven Battle", COLOR_GREEN);
-    //     env.console.overlay().add_log("End Segment 05: First Arven Battle", COLOR_GREEN);
-    //     stats.m_segment++;
-    //     env.update_stats();
-    //     if (ENDPOINT == EndPoint::ARVEN_FIRST_BATTLE){
-    //         break;
-    //     }
-
-    // case StartPoint::LOS_PLATOS:
-    //     context.wait_for_all_requests();
-    //     env.console.log("Start Segment 06: Go to Los Platos", COLOR_ORANGE);
-    //     env.console.overlay().add_log("Start Segment 06: Go to Los Platos", COLOR_ORANGE);
-
-    //     checkpoint_11(env, context, NOTIFICATION_STATUS_UPDATE);
-
-    //     context.wait_for_all_requests();
-    //     env.console.log("End Segment 06: Go to Los Platos", COLOR_GREEN);
-    //     env.console.overlay().add_log("End Segment 06: Go to Los Platos", COLOR_GREEN);
-    //     stats.m_segment++;
-    //     env.update_stats();
-    //     if (ENDPOINT == EndPoint::LOS_PLATOS){
-    //         break;
-    //     }
-    // case StartPoint::MESAGOZA_SOUTH:
-    //     context.wait_for_all_requests();
-    //     env.console.log("Start Segment 07: Go to Mesagoza South", COLOR_ORANGE);
-    //     env.console.overlay().add_log("Start Segment 07: Go to Mesagoza South", COLOR_ORANGE);
-
-    //     // // Mystery Gift, delete later
-    //     // enter_menu_from_overworld(env.program_info(), env.console, context, 2);
-    //     // pbf_press_button(context, BUTTON_A, 20, 4 * TICKS_PER_SECOND);
-    //     // pbf_press_dpad(context, DPAD_UP, 20, 105);
-    //     // pbf_press_button(context, BUTTON_A, 20, 4 * TICKS_PER_SECOND);
-    //     // pbf_press_dpad(context, DPAD_DOWN, 20, 105);
-    //     // pbf_press_button(context, BUTTON_A, 20, 4 * TICKS_PER_SECOND);
-    //     // pbf_press_button(context, BUTTON_A, 20, 10 * TICKS_PER_SECOND);
-    //     // clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 10);
-
-    //     context.wait_for_all_requests();
-    //     env.console.log("End Segment 07: Go to Mesagoza South", COLOR_GREEN);
-    //     env.console.overlay().add_log("End Segment 07: Go to Mesagoza South", COLOR_GREEN);
-    //     stats.m_segment++;
-    //     env.update_stats();
-    //     if (ENDPOINT == EndPoint::MESAGOZA_SOUTH){
-    //         break;
-    //     }
-    // default:
-    //     break;
-
-    // }
 }
 
 void AutoStory::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
@@ -597,42 +603,18 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
     // Connect controller
     pbf_press_button(context, BUTTON_L, 20, 20);
 
-    // press_Bs_to_back_to_overworld(env.program_info(), env.console, context, 7);
-    // walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 10);
-
-    // context.wait_for(Milliseconds(1000000));
-
-    if (ENABLE_TEST_REALIGN){
-        // clear realign marker
-        // realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 128, 128, 0);
-        realign_player(env.program_info(), env.console, context, REALIGN_MODE, X_REALIGN, Y_REALIGN, REALIGN_DURATION);
-        context.wait_for(Milliseconds(1000000));
+    // test code
+    if (ENABLE_TEST_CHECKPOINTS || ENABLE_TEST_REALIGN || ENABLE_TEST_OVERWORLD_MOVE || TEST_PBF_LEFT_JOYSTICK){
+        test_code(env, context);
+        return;
     }
-
-    if (ENABLE_TEST_OVERWORLD_MOVE){
-        // walk_forward_while_clear_front_path(env.program_info(), env.console, context, FORWARD_TICKS);
-        overworld_navigation(env.program_info(), env.console, context, 
-            NavigationStopCondition::STOP_MARKER, NavigationMovementMode::CLEAR_WITH_LETS_GO, 
-            128, 0, 60, 10, false);
-        context.wait_for(Milliseconds(1000000));
-    }
-
-    if (TEST_PBF_LEFT_JOYSTICK){
-        pbf_move_left_joystick(context, X_MOVE, Y_MOVE, HOLD_TICKS, RELEASE_TICKS);
-        context.wait_for(Milliseconds(1000000));
-    }    
 
     // Set settings. to ensure autosave is off.
     if (CHANGE_SETTINGS){
-        change_settings_prior_to_autostory(env, context, STARTPOINT, LANGUAGE);
+        change_settings_prior_to_autostory(env, context, STARTPOINT_TUTORIAL.index(), LANGUAGE);
     }
 
-    if (ENABLE_TEST_CHECKPOINTS){
-        // test individual checkpoints
-        test_checkpoints(env, env.console, context, START_CHECKPOINT, END_CHECKPOINT, LOOP_CHECKPOINT, START_LOOP, END_LOOP);
-    }else{
-        run_autostory(env, context);
-    }
+    run_autostory(env, context);
     
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
     GO_HOME_WHEN_DONE.run_end_of_program(context);

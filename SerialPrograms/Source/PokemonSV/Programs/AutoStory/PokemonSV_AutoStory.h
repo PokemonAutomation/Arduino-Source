@@ -11,6 +11,7 @@
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "CommonFramework/Options/LanguageOCROption.h"
+#include "CommonFramework/Options/StringSelectOption.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
@@ -19,6 +20,7 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
+
 
 
 class AutoStory_Descriptor : public SingleSwitchProgramDescriptor{
@@ -35,6 +37,8 @@ public:
     AutoStory();
 
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+
+    void test_code(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
     // test the checkpoints from start to end, inclusive
     // test each checkpoints "loop" number of times
@@ -56,19 +60,21 @@ private:
 
 private:
     OCR::LanguageOCROption LANGUAGE;
-    EnumDropdownOption<StartPoint> STARTPOINT;
-
-    enum class EndPoint{
-        INTRO_CUTSCENE,
-        PICK_STARTER,
-        NEMONA_FIRST_BATTLE,
-        CATCH_TUTORIAL,
-        LEGENDARY_RESCUE,
-        ARVEN_FIRST_BATTLE,
-        LOS_PLATOS,
-        MESAGOZA_SOUTH,
+    
+    enum class StorySection{
+        TUTORIAL,
+        MAIN_STORY,
     };
-    EnumDropdownOption<EndPoint> ENDPOINT;
+
+    EnumDropdownOption<StorySection> STORY_SECTION;
+
+    StringSelectOption STARTPOINT_TUTORIAL;
+    StringSelectOption ENDPOINT_TUTORIAL;
+
+    // StringSelectOption STARTPOINT_MAINSTORY;
+    // StringSelectOption ENDPOINT_MAINSTORY;
+
+    StaticTextOption MAINSTORY_NOTE;
 
     StaticTextOption START_DESCRIPTION;
     StaticTextOption END_DESCRIPTION;
