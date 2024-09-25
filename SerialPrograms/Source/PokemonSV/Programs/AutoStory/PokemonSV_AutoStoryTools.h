@@ -82,6 +82,7 @@ struct AutoStoryOptions{
 
 class AutoStory_Segment {
 public:
+    virtual ~AutoStory_Segment() = default;
     virtual std::string name() const = 0;
     virtual std::string start_text() const = 0;
     virtual std::string end_text() const = 0;
