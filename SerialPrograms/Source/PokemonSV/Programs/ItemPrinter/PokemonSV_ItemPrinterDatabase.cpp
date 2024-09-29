@@ -23,7 +23,7 @@ const EnumDatabase<PrebuiltOptions>& PrebuiltOptions_Database(){
         {PrebuiltOptions::BALL_BONUS, "ball-bonus", "Ball Bonus"},
 
         // ordered by category
-        {PrebuiltOptions::ABILITY_PATCH, "ability-patch", "Ability patch"},
+        {PrebuiltOptions::ABILITY_PATCH, "ability-patch", "Ability Patch"},
         {PrebuiltOptions::EXP_CANDY, "exp-candy-xl", "Exp Candy"},
         {PrebuiltOptions::PP_MAX, "pp-max", "PP Max"},
 
@@ -72,7 +72,7 @@ const EnumDatabase<PrebuiltOptions>& PrebuiltOptions_AutoMode_Database(){
     static const EnumDatabase<PrebuiltOptions> database({
 
         // ordered by category
-        {PrebuiltOptions::ABILITY_PATCH, "ability-patch", "Ability patch"},
+        {PrebuiltOptions::ABILITY_PATCH, "ability-patch", "Ability Patch"},
         {PrebuiltOptions::EXP_CANDY, "exp-candy-xl", "Exp Candy"},
         {PrebuiltOptions::PP_MAX, "pp-max", "PP Max"},
 
