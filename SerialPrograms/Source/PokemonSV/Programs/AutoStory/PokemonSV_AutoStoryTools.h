@@ -8,6 +8,8 @@
 #define PokemonAutomation_PokemonSV_AutoStoryTools_H
 
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
+#include "CommonFramework/Tools/StatsTracking.h"
+#include "CommonFramework/Language.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -70,6 +72,24 @@ enum class StarterChoice{
     SPRIGATITO,
     FUECOCO,
     QUAXLY,
+};
+
+struct AutoStoryOptions{
+    Language language;
+    StarterChoice starter_choice;
+    EventNotificationOption& notif_status_update;
+};
+
+class AutoStory_Segment {
+public:
+    virtual ~AutoStory_Segment() = default;
+    virtual std::string name() const = 0;
+    virtual std::string start_text() const = 0;
+    virtual std::string end_text() const = 0;
+    virtual void run_segment(
+        SingleSwitchProgramEnvironment& env, 
+        BotBaseContext& context,
+        AutoStoryOptions options) const = 0;
 };
 
 // spam A button to choose the first move
@@ -138,7 +158,7 @@ void get_on_ride(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
 
 // change the settings prior to Autostory
 // Assumes that `current_segment` represents where we currently are in the story.
-void change_settings_prior_to_autostory(SingleSwitchProgramEnvironment& env, BotBaseContext& context, StartPoint current_segment, Language language);
+void change_settings_prior_to_autostory(SingleSwitchProgramEnvironment& env, BotBaseContext& context, size_t current_segment_num, Language language);
 
 // from within the Settings/Options menu, change the settings
 void change_settings(SingleSwitchProgramEnvironment& env, BotBaseContext& context, Language language, bool use_inference = true);
@@ -146,7 +166,6 @@ void change_settings(SingleSwitchProgramEnvironment& env, BotBaseContext& contex
 
 void checkpoint_save(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EventNotificationOption& notif_status_update);
 
-  
 
 
 }

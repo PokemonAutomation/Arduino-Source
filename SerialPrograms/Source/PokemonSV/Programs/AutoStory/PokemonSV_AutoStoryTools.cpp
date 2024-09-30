@@ -447,42 +447,36 @@ void swap_starter_moves(const ProgramInfo& info, ConsoleHandle& console, BotBase
 }
 
 
-void change_settings_prior_to_autostory(SingleSwitchProgramEnvironment& env, BotBaseContext& context, StartPoint current_segment, Language language){
-    if (current_segment == StartPoint::INTRO_CUTSCENE){
+void change_settings_prior_to_autostory(SingleSwitchProgramEnvironment& env, BotBaseContext& context, size_t current_segment_num, Language language){
+    if (current_segment_num == 0){  // can't change settings in the intro cutscene
         return;
     }
 
-    // get index of `Options` in the Main Menu, depending on where you are in Autostory
-    int8_t index;  
-    switch(current_segment){
-    // case StartPoint::INTRO_CUTSCENE:
-    case StartPoint::PICK_STARTER:
-        index = 0;
-    case StartPoint::NEMONA_FIRST_BATTLE:
-        index = 1;
-    case StartPoint::CATCH_TUTORIAL:
-    case StartPoint::LEGENDARY_RESCUE:
-    case StartPoint::ARVEN_FIRST_BATTLE:
-    case StartPoint::LOS_PLATOS:
-    case StartPoint::MESAGOZA_SOUTH:
-        index = 2;
-    default:
-        index = -1;        
+    // get index of `Options` in the Main Menu, which depends on where you are in Autostory
+    int8_t options_index;  
+    switch(current_segment_num){
+        case 0:
+            options_index = 0;
+            break;
+        case 1:
+            options_index = 1;
+            break;
+        default:
+            options_index = 2;        
+            break;
     }
     
-    if (index < 0){
-        return;
-    }
-    bool has_minimap = current_segment != StartPoint::PICK_STARTER; // and also not equal to StartPoint::INTRO_CUTSCENE:
+    bool has_minimap = current_segment_num > 1;  // the minimap only shows up in segment 2 and beyond
 
-    enter_menu_from_overworld(env.program_info(), env.console, context, index, MenuSide::RIGHT, has_minimap);
+    enter_menu_from_overworld(env.program_info(), env.console, context, options_index, MenuSide::RIGHT, has_minimap);
     change_settings(env, context, language);
-    if(current_segment == StartPoint::PICK_STARTER){
+    if(has_minimap){
         pbf_mash_button(context, BUTTON_B, 2 * TICKS_PER_SECOND);
     }else{
         press_Bs_to_back_to_overworld(env.program_info(), env.console, context);    
     }
 }
+
 
 void change_settings(SingleSwitchProgramEnvironment& env, BotBaseContext& context,  Language language, bool use_inference){
     env.console.log("Update settings.");

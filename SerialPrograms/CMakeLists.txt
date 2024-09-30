@@ -1426,6 +1426,10 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/PokemonSV_Panels.h
     Source/PokemonSV/PokemonSV_Settings.cpp
     Source/PokemonSV/PokemonSV_Settings.h
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_00.cpp
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_00.h    
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory.cpp
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory.h
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStoryTools.cpp
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStoryTools.h
     Source/PokemonSV/Programs/AutoStory/PokemonSV_MenuOption.cpp
