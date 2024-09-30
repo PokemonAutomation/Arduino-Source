@@ -163,7 +163,7 @@ std::map<std::string, MaxLairMon> build_maxlair_mon_database(const std::string& 
         {
             JsonArray& array = obj.get_array_throw("base_stats", filepath);
             if (array.size() != 6){
-                throw FileException(nullptr, PA_CURRENT_FUNCTION, "Base stats should contain 6 elements: " + slug, std::move(path));
+                throw FileException(nullptr, PA_CURRENT_FUNCTION, "Base stats should contain 6 elements: " + slug, std::move(filepath));
             }
             for (int c = 0; c < 6; c++){
                 mon.base_stats[c] = (uint8_t)array[c].to_integer_throw(filepath);
