@@ -16,7 +16,7 @@
 #include "PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV_AutoStory_Segment_00.h"
-// #include "PokemonSV_AutoStory_Segment_01.h"
+#include "PokemonSV_AutoStory_Segment_01.h"
 // #include "PokemonSV_AutoStory_Segment_02.h"
 // #include "PokemonSV_AutoStory_Segment_03.h"
 // #include "PokemonSV_AutoStory_Segment_04.h"
@@ -49,7 +49,7 @@ using namespace Pokemon;
 std::vector<std::unique_ptr<AutoStory_Segment>> make_autoStory_segment_list(){
     std::vector<std::unique_ptr<AutoStory_Segment>> segment_list;
     segment_list.emplace_back(std::make_unique<AutoStory_Segment_00>());
-    // segment_list.emplace_back(std::make_unique<AutoStory_Segment_01>());
+    segment_list.emplace_back(std::make_unique<AutoStory_Segment_01>());
     // segment_list.emplace_back(std::make_unique<AutoStory_Segment_02>());
     // segment_list.emplace_back(std::make_unique<AutoStory_Segment_03>());
     // segment_list.emplace_back(std::make_unique<AutoStory_Segment_04>());
@@ -453,14 +453,14 @@ void AutoStory::test_checkpoints(
     int start, int end, 
     int loop, int start_loop, int end_loop
 ){
-    // EventNotificationOption& notif_status_update = NOTIFICATION_STATUS_UPDATE;
-    // Language language = LANGUAGE;
-    // StarterChoice starter_choice = STARTERCHOICE;
+    EventNotificationOption& notif_status_update = NOTIFICATION_STATUS_UPDATE;
+    Language language = LANGUAGE;
+    StarterChoice starter_choice = STARTERCHOICE;
     std::vector<std::function<void()>> checkpoint_list;
     checkpoint_list.push_back([&](){checkpoint_00(env, context);});
-    // checkpoint_list.push_back([&](){checkpoint_01(env, context, notif_status_update, language);});
-    // checkpoint_list.push_back([&](){checkpoint_02(env, context, notif_status_update);});
-    // checkpoint_list.push_back([&](){checkpoint_03(env, context, notif_status_update, language, starter_choice);});
+    checkpoint_list.push_back([&](){checkpoint_01(env, context, notif_status_update, language);});
+    checkpoint_list.push_back([&](){checkpoint_02(env, context, notif_status_update);});
+    checkpoint_list.push_back([&](){checkpoint_03(env, context, notif_status_update, language, starter_choice);});
     // checkpoint_list.push_back([&](){checkpoint_04(env, context, notif_status_update);});
     // checkpoint_list.push_back([&](){checkpoint_05(env, context, notif_status_update);});
     // checkpoint_list.push_back([&](){checkpoint_06(env, context, notif_status_update);});
