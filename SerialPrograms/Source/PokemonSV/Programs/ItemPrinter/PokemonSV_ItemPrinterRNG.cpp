@@ -118,11 +118,11 @@ ItemPrinterRNG::ItemPrinterRNG()
     , MODE(
         "<b>Item Printer mode:</b><br>",
         {
-            {ItemPrinterMode::AUTO_MODE, "auto", "Auto Mode: Select your desired item and its quantity, and items will be automatically printed."},
             {ItemPrinterMode::STANDARD_MODE, "standard", "Standard Mode: Manually select exactly what is being printed for each print job."},
+            {ItemPrinterMode::AUTO_MODE, "auto", "Auto Mode: Select your desired item and its quantity, and items will be automatically printed."},
         },
         LockMode::LOCK_WHILE_RUNNING,
-        ItemPrinterMode::AUTO_MODE
+        ItemPrinterMode::STANDARD_MODE
     )
     , DESIRED_ITEM_TABLE(
         "<b>Item Table:</b><br>"
