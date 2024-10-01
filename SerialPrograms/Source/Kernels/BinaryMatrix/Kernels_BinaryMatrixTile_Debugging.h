@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_Kernels_BinaryMatrixTile_Debugging_H
 #define PokemonAutomation_Kernels_BinaryMatrixTile_Debugging_H
 
+#include <cstdint>
 #include <string>
 
 #include <iostream>

@@ -9,7 +9,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-2022, macos-12, ubuntu-22.04]
+        os: [windows-2022, macos-15-large, ubuntu-24.04]
         qt_version: ['5.12.12', '6.7.2']
         include:
         - qt_version: '5.12.12'
