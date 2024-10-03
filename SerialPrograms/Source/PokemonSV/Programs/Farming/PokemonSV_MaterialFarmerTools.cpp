@@ -200,7 +200,7 @@ void run_material_farmer(
             console.log("Time's up. Stop the Material farming program.", COLOR_RED);
             break;
         }
-        
+
         // Check time left on sandwich
         if (options.SANDWICH_OPTIONS.enabled()){
             auto sandwich_time_remaining = minutes_remaining(last_sandwich_time, std::chrono::minutes(options.TIME_PER_SANDWICH));

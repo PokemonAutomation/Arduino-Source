@@ -404,7 +404,7 @@ void ShinyHuntScatterbug::run_lets_go_iteration(SingleSwitchProgramEnvironment& 
         pbf_press_button(context, BUTTON_L, 50, 40);
 
         move_forward_with_lets_go(10);
-    }else { // path_id == 1
+    }else{ // path_id == 1
         // move leftward, to the east
         pbf_move_left_joystick(context, 0, 128, 100, 20);
         // Align camera

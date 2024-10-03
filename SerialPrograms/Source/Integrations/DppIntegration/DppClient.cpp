@@ -44,8 +44,7 @@ void Client::connect(){
             m_handler = std::make_unique<commandhandler>(m_bot.get(), false);
             m_bot->cache_policy = { cache_policy_setting_t::cp_lazy, cache_policy_setting_t::cp_lazy, cache_policy_setting_t::cp_aggressive };
             std::thread(&Client::run, this, token).detach();
-        }
-        catch (std::exception& e){
+        }catch (std::exception& e){
             Handler::log_dpp("DPP thew an exception: " + (std::string)e.what(), "connect()", ll_critical);
         }
     }
@@ -59,8 +58,7 @@ void Client::disconnect(){
             m_handler.reset();
             m_bot.reset();
             m_is_connected.store(false, std::memory_order_release);
-        }
-        catch (std::exception& e){
+        }catch (std::exception& e){
             Handler::log_dpp("DPP thew an exception: " + (std::string)e.what(), "disconnect()", ll_critical);
         }
     }
@@ -141,8 +139,7 @@ void Client::run(const std::string& token){
         m_bot->start(st_return);
         m_bot->set_presence(presence(presence_status::ps_online, activity_type::at_game, (std::string)GlobalSettings::instance().DISCORD.integration.game_status));
         m_is_connected.store(true, std::memory_order_release);
-    }
-    catch (std::exception& e){
+    }catch (std::exception& e){
         Handler::log_dpp("DPP thew an exception: " + (std::string)e.what(), "run()", ll_critical);
         m_handler.reset();
         m_bot.reset();

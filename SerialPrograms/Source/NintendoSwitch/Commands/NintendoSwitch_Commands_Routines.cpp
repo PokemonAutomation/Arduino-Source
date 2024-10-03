@@ -53,8 +53,7 @@ void close_game(ConsoleHandle& console, BotBaseContext& context){
             // initial Home button press was dropped
             pbf_press_button(context, BUTTON_HOME, 50, 50);  // - Does nothing.          |  - goes back to home screen, from opened app
         }
-    }
-    else {
+    }else{
         // - wait some time after first Home button press 
         // to avoid triggering zoom
         context.wait_for(std::chrono::milliseconds(1000));   

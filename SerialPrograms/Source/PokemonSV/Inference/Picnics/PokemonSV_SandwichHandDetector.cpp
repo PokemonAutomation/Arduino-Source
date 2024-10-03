@@ -84,8 +84,7 @@ std::pair<double, double> SandwichHandLocator::detect(const ImageViewRGB32& fram
     std::pair<double, double> location = locate_sandwich_hand(frame, m_box);
     if (location.first >= 0.0){
         return location;
-    }
-    else {
+    }else{
         return locate_sandwich_hand(frame, entire_screen);
     }
     

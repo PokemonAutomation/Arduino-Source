@@ -274,7 +274,7 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
             // Nothing found in this iteration
             env.log("Resetting game since nothing found, saving sandwich ingredients.");
             reset_game(env.program_info(), env.console, context);
-        }else { // game_already_resetted == true
+        }else{ // game_already_resetted == true
             env.log("Game resetted back to egg fetching routine.");
         }
 

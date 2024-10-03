@@ -48,8 +48,7 @@ void Handler::initialize(cluster& bot, commandhandler& handler){
             log_dpp("Loaded guild: " + event.created->name + " (" + id + ").", "Guild Create", ll_info);
             std::lock_guard<std::mutex> lg(m_count_lock);
             Utility::get_user_counts(bot, event);
-        }
-        catch (std::exception& e){
+        }catch (std::exception& e){
             log_dpp("Failed to get user counts: " + (std::string)e.what(), "Guild Create", ll_error);
         }
     });
@@ -105,8 +104,7 @@ void Handler::send_message(cluster& bot, embed& embed, const std::string& channe
                 if (path.find(".txt") == std::string::npos){
                     embed.set_image("attachment://" + file->filename());
                 }
-            }
-            catch (dpp::exception e){
+            }catch (dpp::exception e){
                 log_dpp("Exception thrown while reading screenshot data: " + (std::string)e.what(), "send_message()", ll_error);
             }
         }
@@ -131,8 +129,7 @@ void Handler::update_response(const dpp::command_source& src, dpp::embed& embed,
             data = utility::read_file(file->filepath());
             m.add_file(file->filename(), data);
             embed.set_image("attachment://" + file->filename());
-        }
-        catch (dpp::exception e){
+        }catch (dpp::exception e){
             log_dpp("Exception thrown while reading screenshot data: " + (std::string)e.what(), "send_message()", ll_error);
         }
     }

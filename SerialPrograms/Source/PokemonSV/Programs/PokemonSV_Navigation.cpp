@@ -587,7 +587,6 @@ bool fly_to_visible_closest_pokecenter_cur_zoom_level(
     BotBaseContext& context, 
     double push_scale
 ){
-
     if (!detect_closest_pokecenter_and_move_map_cursor_there(info, console, context, push_scale)){
         return false;
     }
@@ -595,8 +594,7 @@ bool fly_to_visible_closest_pokecenter_cur_zoom_level(
     const bool success = fly_to_overworld_from_map(info, console, context, check_fly_menuitem);
     if (success){
         return true;
-    }
-    else {
+    }else{
         // detected pokecenter, but failed to fly there.
         throw OperationFailedException(
             ErrorReport::SEND_ERROR_REPORT, console,
@@ -629,13 +627,12 @@ void fly_to_closest_pokecenter_on_map(const ProgramInfo& info, ConsoleHandle& co
 
             // no visible pokecenters at this zoom level. Move on to part 2.
             break;
-        }
-        catch (OperationFailedException& e){ // pokecenter was detected, but failed to fly there
+        }catch (OperationFailedException& e){ // pokecenter was detected, but failed to fly there
             try_count++;
             if (try_count > max_try_count){
                 throw e;
             }
-            console.log("Failed to find the fly menuitem. Restart the closest Pokecenter travel process.");
+            console.log("Failed to find the fly menu item. Restart the closest Pokecenter travel process.");
             press_Bs_to_back_to_overworld(info, console, context);
             open_map_from_overworld(info, console, context);
         }
@@ -669,8 +666,7 @@ void fly_to_closest_pokecenter_on_map(const ProgramInfo& info, ConsoleHandle& co
             // Now try finding the closest pokecenter at the max warpable level
             if (fly_to_visible_closest_pokecenter_cur_zoom_level(info, console, context, push_scale)){
                 return; // success in finding the closest pokecenter. Return.
-            }
-            else {
+            }else{
                 // Does not detect any pokecenter on map
                 console.overlay().add_log("Still no PokeCenter Found!", COLOR_RED);
                 throw OperationFailedException(
@@ -679,8 +675,7 @@ void fly_to_closest_pokecenter_on_map(const ProgramInfo& info, ConsoleHandle& co
                     true
                 );
             }
-        }
-        catch (OperationFailedException& e){ // pokecenter was detected, but failed to fly there
+        }catch (OperationFailedException& e){ // pokecenter was detected, but failed to fly there
             try_count++;
             if (try_count > max_try_count){
                 throw e;

@@ -55,8 +55,7 @@ void return_to_plaza(const ProgramInfo& info, ConsoleHandle& console, BotBaseCon
 
                 try{
                     open_map_from_overworld(info, console, context);
-                }
-                catch (...){
+                }catch (...){
                     jump_off_wall_until_map_open(info, console, context);
                 }
 
@@ -77,8 +76,7 @@ void return_to_plaza(const ProgramInfo& info, ConsoleHandle& console, BotBaseCon
                     fly_to_closest_pokecenter_on_map(info, console, context);
                     context.wait_for_all_requests();
                     returned_to_pokecenter = true;
-                }
-                catch(...){
+                }catch(...){
                     console.log("Failed to return to Pokecenter. Closing map and retrying.");
                     laggy = true;
                 }
