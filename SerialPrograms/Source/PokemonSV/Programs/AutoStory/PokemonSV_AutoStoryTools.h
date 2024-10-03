@@ -46,7 +46,7 @@ enum class ClearDialogMode{
 };
 
 
-enum class ClearDialogCallback{
+enum class CallbackEnum{
     ADVANCE_DIALOG,
     OVERWORLD,
     PROMPT_DIALOG,
@@ -110,7 +110,7 @@ void clear_tutorial(ConsoleHandle& console, BotBaseContext& context, uint16_t se
 // also throw exception if dialog is never detected.
 void clear_dialog(ConsoleHandle& console, BotBaseContext& context,
     ClearDialogMode mode, uint16_t seconds_timeout = 60,
-    std::vector<ClearDialogCallback> optional_callbacks = {}
+    std::vector<CallbackEnum> optional_callbacks = {}
 );
 
 // move character with ssf left joystick, as per given x, y, until 
