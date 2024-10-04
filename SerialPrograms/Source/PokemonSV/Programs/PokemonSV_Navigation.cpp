@@ -607,13 +607,15 @@ bool fly_to_visible_closest_pokecenter_cur_zoom_level(
 
 
 void fly_to_closest_pokecenter_on_map(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
-    const int max_try_count = 6;
+    const int max_try_count = 17;
     int try_count = 0;
     // Part 1: Tries to detect a pokecenter that is very close to the player
     // Zoom in one level onto the map.
     // If the player character icon or any wild pokemon icon overlaps with the PokeCenter icon, the code cannot
     // detect it. So we zoom in as much as we can to prevent any icon overlap.
-    const std::array<double, max_try_count + 1> adjustment_table =  {1, 1, 1, 1.1, 1.2, 0.9, 0.8};
+
+    // failures to fly to pokecenter are often when the Switch lags. from my testing, a 1.4-1.5 adjustment factor seems to work
+    const std::array<double, max_try_count> adjustment_table =  {1, 1.4, 1, 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0, 0.9, 0.8, 1.4}; // {1, 1.4, 1.5}; 
     
     while(true){
         try {
@@ -628,9 +630,14 @@ void fly_to_closest_pokecenter_on_map(const ProgramInfo& info, ConsoleHandle& co
             // no visible pokecenters at this zoom level. Move on to part 2.
             break;
         }catch (OperationFailedException& e){ // pokecenter was detected, but failed to fly there
+            (void) e;
             try_count++;
-            if (try_count > max_try_count){
-                throw e;
+            if (try_count >= max_try_count){
+                throw OperationFailedException(
+                    ErrorReport::SEND_ERROR_REPORT, console,
+                    "fly_to_closest_pokecenter_on_map(): At min warpable map level, pokecenter was detected, but failed to fly there.",
+                    true
+                );                
             }
             console.log("Failed to find the fly menu item. Restart the closest Pokecenter travel process.");
             press_Bs_to_back_to_overworld(info, console, context);
@@ -676,9 +683,14 @@ void fly_to_closest_pokecenter_on_map(const ProgramInfo& info, ConsoleHandle& co
                 );
             }
         }catch (OperationFailedException& e){ // pokecenter was detected, but failed to fly there
+            (void) e;
             try_count++;
-            if (try_count > max_try_count){
-                throw e;
+            if (try_count >= max_try_count){
+                throw OperationFailedException(
+                    ErrorReport::SEND_ERROR_REPORT, console,
+                    "fly_to_closest_pokecenter_on_map(): At max warpable map level, pokecenter was detected, but failed to fly there.",
+                    true
+                );
             }
             console.log("Failed to find the fly menuitem. Restart the closest Pokecenter travel process.");
             press_Bs_to_back_to_overworld(info, console, context);
