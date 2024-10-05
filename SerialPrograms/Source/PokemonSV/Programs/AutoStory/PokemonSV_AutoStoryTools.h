@@ -10,7 +10,7 @@
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Language.h"
-#include "PokemonSV/Programs/PokemonSV_Navigation.h"
+// #include "PokemonSV/Programs/PokemonSV_Navigation.h"
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
@@ -54,7 +54,10 @@ enum class CallbackEnum{
     DIALOG_ARROW,
     BATTLE,
     TUTORIAL,
-    BLACK_DIALOG_BOX
+    BLACK_DIALOG_BOX,
+    GRADIENT_ARROW,
+    SWAP_MENU,
+    MOVE_SELECT,
 };
 
 enum class StartPoint{
@@ -72,6 +75,25 @@ enum class StarterChoice{
     SPRIGATITO,
     FUECOCO,
     QUAXLY,
+};
+
+enum class PlayerRealignMode{
+    REALIGN_NEW_MARKER,
+    REALIGN_OLD_MARKER,
+    REALIGN_NO_MARKER,
+};
+
+enum class NavigationStopCondition{
+    STOP_DIALOG,
+    STOP_MARKER,
+    STOP_TIME,
+    STOP_BATTLE,
+};
+
+enum class NavigationMovementMode{
+    DIRECTIONAL_ONLY,
+    DIRECTIONAL_SPAM_A,
+    CLEAR_WITH_LETS_GO,
 };
 
 struct AutoStoryOptions{
@@ -97,8 +119,12 @@ public:
 void run_battle_press_A(
     ConsoleHandle& console, 
     BotBaseContext& context,
-    BattleStopCondition stop_condition
+    BattleStopCondition stop_condition,
+    std::vector<CallbackEnum> optional_callbacks = {},
+    bool detect_wipeout = false
 );
+
+void select_top_move(ConsoleHandle& console, BotBaseContext& context, size_t consecutive_move_select);
 
 // press A to clear tutorial screens
 // throw exception if tutorial screen never detected
@@ -113,6 +139,14 @@ void clear_dialog(ConsoleHandle& console, BotBaseContext& context,
     std::vector<CallbackEnum> optional_callbacks = {}
 );
 
+
+// return true if the destination marker is present within the minimap area
+bool confirm_marker_present(
+    const ProgramInfo& info, 
+    ConsoleHandle& console, 
+    BotBaseContext& context
+);
+
 // move character with ssf left joystick, as per given x, y, until 
 // stop_condition is met (e.g. Dialog detected). 
 // throw exception if reaches timeout before detecting stop condition
@@ -121,7 +155,8 @@ void overworld_navigation(const ProgramInfo& info, ConsoleHandle& console, BotBa
     NavigationMovementMode movement_mode,
     uint8_t x, uint8_t y,
     uint16_t seconds_timeout = 60, uint16_t seconds_realign = 60,
-    bool auto_heal = true
+    bool auto_heal = false,
+    bool detect_wipeout = false
 );
 
 void config_option(BotBaseContext& context, int change_option_value);
@@ -131,14 +166,47 @@ void swap_starter_moves(const ProgramInfo& info, ConsoleHandle& console, BotBase
 
 // run the given `action`. if detect a battle, stop the action, and throw exception
 void do_action_and_monitor_for_battles(
-    SingleSwitchProgramEnvironment& env, 
+    const ProgramInfo& info, 
     ConsoleHandle& console,
     BotBaseContext& context,
     std::function<
-        void(SingleSwitchProgramEnvironment& env,
+        void(const ProgramInfo& info, 
         ConsoleHandle& console,
         BotBaseContext& context)
     >&& action
+);
+
+// catch any UnexpectedBattle exceptions from `action`. then use run_battle_press_A until overworld, and re-try the `action`.
+void handle_unexpected_battles(
+    const ProgramInfo& info, 
+    ConsoleHandle& console,
+    BotBaseContext& context,
+    std::function<
+        void(const ProgramInfo& info, 
+        ConsoleHandle& console,
+        BotBaseContext& context)
+    >&& action
+);
+
+// if stationary in overworld for an amount of time (seconds_stationary), run `recovery_action` then try `action` again
+// return once successfully completed `action`
+// throw exception if fails to complete `action` within a certain amount of time (minutes_timeout).
+void handle_when_stationary_in_overworld(
+    const ProgramInfo& info, 
+    ConsoleHandle& console,
+    BotBaseContext& context,
+    std::function<
+        void(const ProgramInfo& info, 
+        ConsoleHandle& console,
+        BotBaseContext& context)
+    >&& action,
+    std::function<
+        void(const ProgramInfo& info, 
+        ConsoleHandle& console,
+        BotBaseContext& context)
+    >&& recovery_action,
+    size_t seconds_stationary = 5,
+    uint16_t minutes_timeout = 5
 );
 
 void wait_for_gradient_arrow(
@@ -147,6 +215,13 @@ void wait_for_gradient_arrow(
     BotBaseContext& context, 
     ImageFloatBox box_area_to_check,
     uint16_t seconds_timeout
+);
+
+void wait_for_overworld(
+    const ProgramInfo& info, 
+    ConsoleHandle& console, 
+    BotBaseContext& context, 
+    uint16_t seconds_timeout = 30
 );
 
 void press_A_until_dialog(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, uint16_t seconds_between_button_presses);
@@ -166,7 +241,47 @@ void change_settings(SingleSwitchProgramEnvironment& env, BotBaseContext& contex
 
 void checkpoint_save(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EventNotificationOption& notif_status_update);
 
+enum class ZoomChange{
+    ZOOM_IN,
+    ZOOM_IN_TWICE,
+    ZOOM_OUT,
+    ZOOM_OUT_TWICE,
+    KEEP_ZOOM,
+};
 
+struct MoveCursor{
+    ZoomChange zoom_change;
+    uint8_t move_x;
+    uint8_t move_y;
+    uint16_t move_duration;
+};
+
+// place a marker on the map, not relative to the current player position, but based on a fixed landmark, such as a pokecenter
+// How this works:
+//  - cursor is moved to a point near the landmark, as per `move_cursor_near_landmark`
+//  - move the cursor onto the landmark using `detect_closest_pokecenter_and_move_map_cursor_there`.
+//  - confirm that the pokecenter is centered within cursor. If not, close map app, and re-try.
+//  - cursor is moved to target location, as per `move_cursor_to_target`. A marker is placed down here.
+void realign_player_from_landmark(
+    const ProgramInfo& info, 
+    ConsoleHandle& console, 
+    BotBaseContext& context,
+    MoveCursor move_cursor_near_landmark,
+    MoveCursor move_cursor_to_target
+);
+
+// confirm that the cursor is centered on the pokecenter, within the map app
+// else throw exception
+void confirm_cursor_centered_on_pokecenter(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
+
+// open map, then move cursor to a point near a flypoint as per `move_cursor_near_flypoint`
+// then fly to the closest pokecenter near the cursor
+void move_cursor_towards_flypoint_and_go_there(
+    const ProgramInfo& info, 
+    ConsoleHandle& console, 
+    BotBaseContext& context,
+    MoveCursor move_cursor_near_flypoint
+);
 
 }
 }

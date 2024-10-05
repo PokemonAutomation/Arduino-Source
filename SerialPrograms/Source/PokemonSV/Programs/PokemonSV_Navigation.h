@@ -13,6 +13,7 @@
 #include <string>
 #include <functional>
 #include "PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
+#include "PokemonSV/Programs/AutoStory/PokemonSV_AutoStoryTools.h"
 
 namespace PokemonAutomation{
     struct ProgramInfo;
@@ -69,6 +70,20 @@ void open_recently_battled_from_pokedex(const ProgramInfo& info, ConsoleHandle& 
 //  From any of the rotom phone apps (Map/Pokédex/Profile) go to overworld.
 void leave_phone_to_overworld(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
 
+bool detect_closest_pokecenter_and_move_map_cursor_there(
+    const ProgramInfo& info,
+    ConsoleHandle& console, 
+    BotBaseContext& context,
+    double push_scale = 0.29
+);
+
+bool fly_to_visible_closest_pokecenter_cur_zoom_level(
+    const ProgramInfo& info, 
+    ConsoleHandle& console, 
+    BotBaseContext& context, 
+    double push_scale = 0.29
+);
+
 //  While on map (default zoom), move to the closest PokeCenter and fly there.
 //  The PokeCenter must be already visited before (so having the little wing icon with it) and not occluded
 //  by other map icons on the most zoomed-in level of the map.
@@ -81,13 +96,9 @@ void jump_off_wall_until_map_open(const ProgramInfo& info, ConsoleHandle& consol
 
 void reset_to_pokecenter(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
 
-enum class PlayerRealignMode{
-    REALIGN_NEW_MARKER,
-    REALIGN_OLD_MARKER,
-    REALIGN_NO_MARKER,
-};
 
 // align player orientation based on the alignment mode
+// if battle detected, propagates UnexpectedBattleException to the calling function
 // The direction is specified by (x, y):
 // x = 0 : left
 // x = 128 : neutral
@@ -103,19 +114,9 @@ enum class PlayerRealignMode{
 // then re-align the camera
 void realign_player(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
     PlayerRealignMode realign_mode,
-    uint8_t move_x = 0, uint8_t move_y = 0, uint8_t move_duration = 0
+    uint8_t move_x = 0, uint8_t move_y = 0, uint16_t move_duration = 0
 );
 
-enum class NavigationStopCondition{
-    STOP_DIALOG,
-    STOP_MARKER,
-};
-
-enum class NavigationMovementMode{
-    DIRECTIONAL_ONLY,
-    DIRECTIONAL_SPAM_A,
-    CLEAR_WITH_LETS_GO,
-};
 
 
 void walk_forward_until_dialog(
@@ -124,6 +125,7 @@ void walk_forward_until_dialog(
     BotBaseContext& context,
     NavigationMovementMode movement_mode,
     uint16_t seconds_timeout = 10,
+    uint8_t x = 128,
     uint8_t y = 0
 );
 
