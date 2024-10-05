@@ -778,7 +778,7 @@ void reset_to_pokecenter(const ProgramInfo& info, ConsoleHandle& console, BotBas
         try {
             open_map_from_overworld(info, console, context);
             fly_to_closest_pokecenter_on_map(info, console, context);
-        }catch (UnexpectedBattleException e){
+        }catch (UnexpectedBattleException& e){
             (void) e;
             run_battle_press_A(console, context, BattleStopCondition::STOP_OVERWORLD);            
         }
@@ -933,7 +933,7 @@ bool attempt_fly_to_overlapping_flypoint(
 
             return fly_to_overworld_from_map(info, console, context, true);            
 
-        }catch (UnexpectedBattleException e){
+        }catch (UnexpectedBattleException& e){
             (void) e;
             run_battle_press_A(console, context, BattleStopCondition::STOP_OVERWORLD);            
         }
