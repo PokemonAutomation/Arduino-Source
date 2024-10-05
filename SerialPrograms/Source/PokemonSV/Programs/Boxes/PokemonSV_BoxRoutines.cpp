@@ -89,7 +89,7 @@ void change_view_to_judge(
     IvJudgeReaderScope iv_checker(console, language);
     OverlayBoxScope name_bar_overlay(console.overlay(), name_bar);
     for (size_t attempts = 0;; attempts++){
-        if (attempts == 5){
+        if (attempts == 10){
             throw OperationFailedException(
                 ErrorReport::SEND_ERROR_REPORT, console,
                 "Unable to change Pokemon view to judge after 10 tries. Have you unlocked it?",
