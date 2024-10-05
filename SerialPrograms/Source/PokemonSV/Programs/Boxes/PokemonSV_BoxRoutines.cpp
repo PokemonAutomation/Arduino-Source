@@ -124,8 +124,6 @@ void change_view_to_judge(
         if (detected < 4){
             pbf_press_button(context, BUTTON_PLUS, 20, 230);
         }
-
-        break;
     }
 }
 
