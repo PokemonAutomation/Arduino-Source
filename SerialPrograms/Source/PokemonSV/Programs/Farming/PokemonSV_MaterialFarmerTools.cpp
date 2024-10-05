@@ -466,7 +466,9 @@ void move_to_start_position_for_letsgo1(
     pbf_move_left_joystick(context, 128, 0, 300, 10);
 
     // look right, towards the start position
-    pbf_move_right_joystick(context, 255, 128, 130, 10);
+    DirectionDetector direction;
+    direction.change_direction(console, context, 5.76);
+    // pbf_move_right_joystick(context, 255, 128, 130, 10);
     pbf_move_left_joystick(context, 128, 0, 10, 10);
 
     // get on ride
@@ -496,7 +498,8 @@ void move_to_start_position_for_letsgo1(
     pbf_press_button(context, BUTTON_B, 50, 10);
 
     // look right
-    pbf_move_right_joystick(context, 255, 128, 20, 10);
+    // pbf_move_right_joystick(context, 255, 128, 20, 10);
+    direction.change_direction(console, context, 5.46);
 
     // move forward slightly
     pbf_move_left_joystick(context, 128, 0, 50, 10);
