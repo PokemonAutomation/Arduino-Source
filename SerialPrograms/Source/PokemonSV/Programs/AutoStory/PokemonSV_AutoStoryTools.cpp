@@ -175,7 +175,7 @@ void run_battle_press_A(
                 "run_battle_press_A(): Lead pokemon fainted.",
                 true
             );        
-        default: // timeout
+        default:
             throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "run_battle_press_A: Unknown callback triggered.");
           
         }
@@ -279,6 +279,8 @@ void clear_dialog(ConsoleHandle& console, BotBaseContext& context,
             case CallbackEnum::BLACK_DIALOG_BOX:
                 callbacks.emplace_back(black_dialog_box);
                 break;              
+            default:
+                throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "clear_dialog: Unknown callback requested.");                
             }
         }
 
