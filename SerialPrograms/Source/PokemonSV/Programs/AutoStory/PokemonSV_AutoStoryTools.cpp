@@ -297,7 +297,8 @@ void overworld_navigation(
     NavigationMovementMode movement_mode,
     uint8_t x, uint8_t y,
     uint16_t seconds_timeout, uint16_t seconds_realign, 
-    bool auto_heal
+    bool auto_heal,
+    bool detect_wipeout
 ){
     bool should_realign = true;
     if (seconds_timeout <= seconds_realign){
@@ -527,11 +528,11 @@ void change_settings(SingleSwitchProgramEnvironment& env, BotBaseContext& contex
 }
 
 void do_action_and_monitor_for_battles(
-    SingleSwitchProgramEnvironment& env,
+    const ProgramInfo& info, 
     ConsoleHandle& console, 
     BotBaseContext& context,
     std::function<
-        void(SingleSwitchProgramEnvironment& env,
+        void(const ProgramInfo& info, 
         ConsoleHandle& console,
         BotBaseContext& context)
     >&& action
@@ -541,7 +542,7 @@ void do_action_and_monitor_for_battles(
         console, context,
         [&](BotBaseContext& context){
             context.wait_for_all_requests();
-            action(env, console, context);
+            action(info, console, context);
         },
         {battle_menu}
     );

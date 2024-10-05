@@ -121,7 +121,8 @@ void overworld_navigation(const ProgramInfo& info, ConsoleHandle& console, BotBa
     NavigationMovementMode movement_mode,
     uint8_t x, uint8_t y,
     uint16_t seconds_timeout = 60, uint16_t seconds_realign = 60,
-    bool auto_heal = true
+    bool auto_heal = false,
+    bool detect_wipeout = false
 );
 
 void config_option(BotBaseContext& context, int change_option_value);
@@ -131,11 +132,11 @@ void swap_starter_moves(const ProgramInfo& info, ConsoleHandle& console, BotBase
 
 // run the given `action`. if detect a battle, stop the action, and throw exception
 void do_action_and_monitor_for_battles(
-    SingleSwitchProgramEnvironment& env, 
+    const ProgramInfo& info, 
     ConsoleHandle& console,
     BotBaseContext& context,
     std::function<
-        void(SingleSwitchProgramEnvironment& env,
+        void(const ProgramInfo& info, 
         ConsoleHandle& console,
         BotBaseContext& context)
     >&& action
