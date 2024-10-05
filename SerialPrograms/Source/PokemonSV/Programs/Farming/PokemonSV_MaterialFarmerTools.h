@@ -109,14 +109,6 @@ WallClock make_sandwich_material_farm(
     MaterialFarmerStats& stats
 );        
 
-WallClock try_make_sandwich_material_farm(
-    ProgramEnvironment& env, 
-    ConsoleHandle& console,
-    BotBaseContext& context, 
-    MaterialFarmerOptions& options,
-    MaterialFarmerStats& stats
-);        
-
 void move_to_start_position_for_letsgo0(ConsoleHandle& console, BotBaseContext& context);
 
 void move_to_start_position_for_letsgo1(ConsoleHandle& console, BotBaseContext& context);
