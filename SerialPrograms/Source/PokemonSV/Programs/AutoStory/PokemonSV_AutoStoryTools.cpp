@@ -457,8 +457,7 @@ void overworld_navigation(
                     if (should_realign){
                         try {
                             realign_player(info, console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
-                        }catch (UnexpectedBattleException& e){
-                            (void) e;
+                        }catch (UnexpectedBattleException&){
                             pbf_wait(context, 30 * TICKS_PER_SECOND);  // catch exception to allow the battle callback to take over.
                         }
                         
@@ -490,8 +489,7 @@ void overworld_navigation(
                 }
 
                 break;
-            }catch (UnexpectedBattleException& e){
-                (void) e;
+            }catch (UnexpectedBattleException&){
                 break;
             }
         case 1: // dialog
@@ -709,8 +707,7 @@ void handle_unexpected_battles(
             context.wait_for_all_requests();
             action(info, console, context);
             return;
-        }catch (UnexpectedBattleException& e){
-            (void) e;
+        }catch (UnexpectedBattleException&){
             run_battle_press_A(console, context, BattleStopCondition::STOP_OVERWORLD);
         }
     }
@@ -855,8 +852,7 @@ bool check_ride_active(const ProgramInfo& info, ConsoleHandle& console, BotBaseC
             }
             return is_ride_active;        
 
-        }catch(UnexpectedBattleException& e){
-            (void) e;
+        }catch(UnexpectedBattleException&){
             run_battle_press_A(console, context, BattleStopCondition::STOP_OVERWORLD);
         }
     }
@@ -975,12 +971,10 @@ void realign_player_from_landmark(
 
             return;      
 
-        }catch (OperationFailedException& e){
-            (void) e;
+        }catch (OperationFailedException&){
             // reset to overworld if failed to center on the pokecenter, and re-try
             leave_phone_to_overworld(info, console, context);
-        }catch (UnexpectedBattleException& e){
-            (void) e;
+        }catch (UnexpectedBattleException&){
             run_battle_press_A(console, context, BattleStopCondition::STOP_OVERWORLD);
         }
     }
@@ -1059,12 +1053,10 @@ void move_cursor_towards_flypoint_and_go_there(
 
             return;      
 
-        }catch (OperationFailedException& e){
-            (void) e;
+        }catch (OperationFailedException&){
             // reset to overworld if failed to center on the pokecenter, and re-try
             leave_phone_to_overworld(info, console, context);
-        }catch (UnexpectedBattleException& e){
-            (void) e;
+        }catch (UnexpectedBattleException&){
             run_battle_press_A(console, context, BattleStopCondition::STOP_OVERWORLD);
         }
     }

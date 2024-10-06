@@ -553,7 +553,7 @@ void leave_phone_to_overworld(const ProgramInfo& info, ConsoleHandle& console, B
             ErrorReport::SEND_ERROR_REPORT, console,
             "leave_phone_to_overworld(): Unknown state after 10 button Y presses.",
             true
-        );         
+        );
     }
 
 }
@@ -778,8 +778,7 @@ void reset_to_pokecenter(const ProgramInfo& info, ConsoleHandle& console, BotBas
         try {
             open_map_from_overworld(info, console, context);
             fly_to_closest_pokecenter_on_map(info, console, context);
-        }catch (UnexpectedBattleException& e){
-            (void) e;
+        }catch (UnexpectedBattleException&){
             run_battle_press_A(console, context, BattleStopCondition::STOP_OVERWORLD);            
         }
     }
@@ -933,8 +932,7 @@ bool attempt_fly_to_overlapping_flypoint(
 
             return fly_to_overworld_from_map(info, console, context, true);            
 
-        }catch (UnexpectedBattleException& e){
-            (void) e;
+        }catch (UnexpectedBattleException&){
             run_battle_press_A(console, context, BattleStopCondition::STOP_OVERWORLD);            
         }
     }
