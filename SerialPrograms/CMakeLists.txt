@@ -313,6 +313,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Exceptions/ProgramFinishedException.h
     Source/CommonFramework/Exceptions/ScreenshotException.cpp
     Source/CommonFramework/Exceptions/ScreenshotException.h
+    Source/CommonFramework/Exceptions/UnexpectedBattleException.cpp
+    Source/CommonFramework/Exceptions/UnexpectedBattleException.h
     Source/CommonFramework/GlobalServices.cpp
     Source/CommonFramework/GlobalServices.h
     Source/CommonFramework/GlobalSettingsPanel.cpp

@@ -7,6 +7,7 @@
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/UnexpectedBattleException.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Tools/StatsTracking.h"
@@ -18,6 +19,7 @@
 #include "PokemonSV/Inference/Battles/PokemonSV_NormalBattleMenus.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
+// #include "PokemonSV/Inference/Overworld/PokemonSV_StationaryOverworldWatcher.h"
 #include "PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
 #include "PokemonSV/Inference/Map/PokemonSV_MapMenuDetector.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
@@ -28,6 +30,7 @@
 #include "PokemonSV/Inference/PokemonSV_TutorialDetector.h"
 #include "PokemonSV/Inference/PokemonSV_PokemonMovesReader.h"
 #include "PokemonSV/Inference/Map/PokemonSV_DestinationMarkerDetector.h"
+#include "PokemonSV/Inference/Map/PokemonSV_MapPokeCenterIconDetector.h"
 #include "PokemonSV_AutoStoryTools.h"
 
 //#include <iostream>
@@ -48,29 +51,81 @@ using namespace Pokemon;
 void run_battle_press_A(
     ConsoleHandle& console, 
     BotBaseContext& context,
-    BattleStopCondition stop_condition
+    BattleStopCondition stop_condition,
+    std::vector<CallbackEnum> enum_optional_callbacks,
+    bool detect_wipeout
 ){
     int16_t num_times_seen_overworld = 0;
+    size_t consecutive_move_select = 0;
     while (true){
         NormalBattleMenuWatcher battle(COLOR_BLUE);
-        // SwapMenuWatcher         fainted(COLOR_PURPLE);
+        SwapMenuWatcher         fainted(COLOR_PURPLE);
         OverworldWatcher        overworld(console, COLOR_CYAN);
         AdvanceDialogWatcher    dialog(COLOR_RED);
+        DialogArrowWatcher dialog_arrow(COLOR_RED, console.overlay(), {0.850, 0.820, 0.020, 0.050}, 0.8365, 0.846);
+        GradientArrowWatcher next_pokemon(COLOR_BLUE, GradientArrowType::RIGHT, {0.50, 0.51, 0.30, 0.10});
+        MoveSelectWatcher move_select_menu(COLOR_YELLOW);
+
+        std::vector<PeriodicInferenceCallback> callbacks; 
+        //  mandatory callbacks: Battle, Overworld, Advance Dialog, Swap menu, Move select
+        std::vector<CallbackEnum> enum_all_callbacks{CallbackEnum::BATTLE, CallbackEnum::OVERWORLD, CallbackEnum::ADVANCE_DIALOG, CallbackEnum::SWAP_MENU, CallbackEnum::MOVE_SELECT}; // mandatory callbacks
+        enum_all_callbacks.insert(enum_all_callbacks.end(), enum_optional_callbacks.begin(), enum_optional_callbacks.end()); // append the mandatory and optional callback vectors together
+        for (const CallbackEnum& enum_callback : enum_all_callbacks){
+            switch(enum_callback){
+            case CallbackEnum::ADVANCE_DIALOG:
+                callbacks.emplace_back(dialog);
+                break;                
+            case CallbackEnum::OVERWORLD:
+                callbacks.emplace_back(overworld);
+                break;
+            case CallbackEnum::DIALOG_ARROW:
+                callbacks.emplace_back(dialog_arrow);
+                break;
+            case CallbackEnum::BATTLE:
+                callbacks.emplace_back(battle);
+                break;
+            case CallbackEnum::GRADIENT_ARROW:
+                callbacks.emplace_back(next_pokemon);
+                break;
+            case CallbackEnum::SWAP_MENU:  
+                callbacks.emplace_back(fainted);
+                break;                     
+            case CallbackEnum::MOVE_SELECT:
+                callbacks.emplace_back(move_select_menu);
+                break;
+            default:
+                throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "run_battle_press_A: Unknown callback requested.");
+            }
+        }        
         context.wait_for_all_requests();
 
         int ret = wait_until(
             console, context,
             std::chrono::seconds(90),
-            {battle, overworld, dialog}
+            callbacks
         );
         context.wait_for(std::chrono::milliseconds(100));
+        if (ret < 0){
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, console,
+                "run_battle_press_A(): Timed out. Did not detect expected stop condition.",
+                true
+            );
+        }        
 
-        switch (ret){
-        case 0: // battle
-            console.log("Detected battle menu, spam first move.");
-            pbf_mash_button(context, BUTTON_A, 3 * TICKS_PER_SECOND);
+        CallbackEnum enum_callback = enum_all_callbacks[ret];
+        switch (enum_callback){
+        case CallbackEnum::BATTLE: // battle
+            console.log("Detected battle menu.");
+            consecutive_move_select = 0;
+            pbf_press_button(context, BUTTON_A, 20, 105);
             break;
-        case 1: // overworld
+        case CallbackEnum::MOVE_SELECT:
+            console.log("Detected move select. Spam first move");
+            consecutive_move_select++;
+            select_top_move(console, context, consecutive_move_select);
+            break;
+        case CallbackEnum::OVERWORLD: // overworld
             console.log("Detected overworld, battle over.");
             num_times_seen_overworld++;
             if (stop_condition == BattleStopCondition::STOP_OVERWORLD){
@@ -84,9 +139,10 @@ void run_battle_press_A(
                 );  
             }            
             break;
-        case 2: // advance dialog
+        case CallbackEnum::ADVANCE_DIALOG: // advance dialog
             console.log("Detected dialog.");
-            {
+
+            if (detect_wipeout){
                 context.wait_for_all_requests();
                 WipeoutDetector wipeout;
                 VideoSnapshot screen = console.video().snapshot();
@@ -105,14 +161,35 @@ void run_battle_press_A(
             }
             pbf_press_button(context, BUTTON_A, 20, 105);
             break;
-        default: // timeout
+        case CallbackEnum::DIALOG_ARROW:  // dialog arrow
+            console.log("run_battle_press_A: Detected dialog arrow.");
+            pbf_press_button(context, BUTTON_A, 20, 105);
+            break;
+        case CallbackEnum::GRADIENT_ARROW:
+            console.log("run_battle_press_A: Detected prompt for bringing in next pokemon. Keep current pokemon.");
+            pbf_mash_button(context, BUTTON_B, 100);
+            break;
+        case CallbackEnum::SWAP_MENU:
             throw OperationFailedException(
                 ErrorReport::SEND_ERROR_REPORT, console,
-                "run_battle_press_A(): Timed out. Did not detect expected stop condition.",
+                "run_battle_press_A(): Lead pokemon fainted.",
                 true
-            );             
+            );        
+        default:
+            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "run_battle_press_A: Unknown callback triggered.");
+          
         }
     }
+}
+
+void select_top_move(ConsoleHandle& console, BotBaseContext& context, size_t consecutive_move_select){
+    if (consecutive_move_select > 3){
+        // to handle case where move is disabled/out of PP/taunted
+        console.log("Failed to select a move 3 times. Choosing a different move.", COLOR_RED);
+        pbf_press_dpad(context, DPAD_DOWN, 20, 40);
+    }
+    pbf_mash_button(context, BUTTON_A, 100);
+
 }
 
 void clear_tutorial(ConsoleHandle& console, BotBaseContext& context, uint16_t seconds_timeout){
@@ -202,6 +279,8 @@ void clear_dialog(ConsoleHandle& console, BotBaseContext& context,
             case CallbackEnum::BLACK_DIALOG_BOX:
                 callbacks.emplace_back(black_dialog_box);
                 break;              
+            default:
+                throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "clear_dialog: Unknown callback requested.");                
             }
         }
 
@@ -279,6 +358,7 @@ void clear_dialog(ConsoleHandle& console, BotBaseContext& context,
             break;
         case CallbackEnum::BLACK_DIALOG_BOX:    
             console.log("clear_dialog: Detected black dialog box.");
+            seen_dialog = true;
             pbf_press_button(context, BUTTON_A, 20, 105);
             break;            
         default:
@@ -289,6 +369,38 @@ void clear_dialog(ConsoleHandle& console, BotBaseContext& context,
     }
 }
 
+bool confirm_marker_present(
+    const ProgramInfo& info, 
+    ConsoleHandle& console, 
+    BotBaseContext& context
+){
+    while (true){
+        DestinationMarkerWatcher marker(COLOR_RED, {0.815, 0.645, 0.180, 0.320}, true);
+        NormalBattleMenuWatcher battle(COLOR_BLUE);
+
+        int ret = wait_until(
+            console, context, 
+            std::chrono::seconds(10),
+            {marker, battle}
+        );
+        switch (ret){
+        case 0: // marker
+            console.log("Confirmed that marker is still present.");
+            return true;
+        case 1: // battle
+            throw UnexpectedBattleException(
+                ErrorReport::SEND_ERROR_REPORT, console,
+                "confirm_marker_present(): Unexpectedly detected battle.",
+                false
+            );
+        default:
+            console.log("Destination marker not detected.");
+            return false;
+        }   
+    }
+
+}
+
 void overworld_navigation(
     const ProgramInfo& info, 
     ConsoleHandle& console, 
@@ -297,7 +409,8 @@ void overworld_navigation(
     NavigationMovementMode movement_mode,
     uint8_t x, uint8_t y,
     uint16_t seconds_timeout, uint16_t seconds_realign, 
-    bool auto_heal
+    bool auto_heal,
+    bool detect_wipeout
 ){
     bool should_realign = true;
     if (seconds_timeout <= seconds_realign){
@@ -307,8 +420,8 @@ void overworld_navigation(
     uint16_t forward_ticks = seconds_realign * TICKS_PER_SECOND;
     // WallClock start = current_time();
 
-    if (movement_mode == NavigationMovementMode::CLEAR_WITH_LETS_GO){
-        context.wait_for(Milliseconds(3000)); // for some reason, the "Destination arrived" notification reappears when you re-assign the marker.
+    if (stop_condition == NavigationStopCondition::STOP_MARKER){
+        context.wait_for(Milliseconds(2000)); // the "Destination arrived" notification can sometimes reappear if you opened the map too quickly after you reached the previous marker.
     }
 
 
@@ -342,7 +455,12 @@ void overworld_navigation(
                         }
                     }
                     if (should_realign){
-                        realign_player(info, console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
+                        try {
+                            realign_player(info, console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
+                        }catch (UnexpectedBattleException&){
+                            pbf_wait(context, 30 * TICKS_PER_SECOND);  // catch exception to allow the battle callback to take over.
+                        }
+                        
                     }
                 }
             },
@@ -353,13 +471,27 @@ void overworld_navigation(
         switch (ret){
         case 0: // battle
             console.log("overworld_navigation: Detected start of battle.");
-            run_battle_press_A(console, context, BattleStopCondition::STOP_OVERWORLD);   
+            if (stop_condition == NavigationStopCondition::STOP_BATTLE){
+                return;
+            }
+
+            run_battle_press_A(console, context, BattleStopCondition::STOP_OVERWORLD, {}, detect_wipeout);   
             if (auto_heal){
                 auto_heal_from_menu_or_overworld(info, console, context, 0, true);
             }
 
-            realign_player(info, console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
-            break;
+            try {
+                realign_player(info, console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
+
+                if (!confirm_marker_present(info, console, context)){  
+                    // if marker not present, don't keep walking forward.
+                    return;
+                }
+
+                break;
+            }catch (UnexpectedBattleException&){
+                break;
+            }
         case 1: // dialog
             console.log("overworld_navigation: Detected dialog.");
             if (stop_condition == NavigationStopCondition::STOP_DIALOG){
@@ -371,7 +503,8 @@ void overworld_navigation(
                     "overworld_navigation(): Unexpectedly detected dialog.",
                     true
                 );
-            }            
+            }          
+            pbf_press_button(context, BUTTON_A, 20, 20);
             break;
         case 2: // marker
             console.log("overworld_navigation: Detected marker.");
@@ -381,6 +514,9 @@ void overworld_navigation(
             break;
         default:
             console.log("overworld_navigation(): Timed out.");
+            if (stop_condition == NavigationStopCondition::STOP_TIME){
+                return;
+            }            
             throw OperationFailedException(
                 ErrorReport::SEND_ERROR_REPORT, console,
                 "overworld_navigation(): Timed out. Did not detect expected stop condition.",
@@ -527,11 +663,11 @@ void change_settings(SingleSwitchProgramEnvironment& env, BotBaseContext& contex
 }
 
 void do_action_and_monitor_for_battles(
-    SingleSwitchProgramEnvironment& env,
+    const ProgramInfo& info, 
     ConsoleHandle& console, 
     BotBaseContext& context,
     std::function<
-        void(SingleSwitchProgramEnvironment& env,
+        void(const ProgramInfo& info, 
         ConsoleHandle& console,
         BotBaseContext& context)
     >&& action
@@ -541,7 +677,7 @@ void do_action_and_monitor_for_battles(
         console, context,
         [&](BotBaseContext& context){
             context.wait_for_all_requests();
-            action(env, console, context);
+            action(info, console, context);
         },
         {battle_menu}
     );
@@ -552,15 +688,77 @@ void do_action_and_monitor_for_battles(
             true
         );
 
-        // console.log("Detected battle. Now running away.", COLOR_PURPLE);
-        // console.overlay().add_log("Detected battle. Now running away.");
-        // try{
-        //     run_from_battle(env.program_info(), console, context);
-        // }catch (OperationFailedException& e){
-        //     throw FatalProgramException(std::move(e));
-        // }
     }
 }
+
+
+void handle_unexpected_battles(
+    const ProgramInfo& info, 
+    ConsoleHandle& console, 
+    BotBaseContext& context,
+    std::function<
+        void(const ProgramInfo& info, 
+        ConsoleHandle& console,
+        BotBaseContext& context)
+    >&& action
+){
+    while (true){
+        try {
+            context.wait_for_all_requests();
+            action(info, console, context);
+            return;
+        }catch (UnexpectedBattleException&){
+            run_battle_press_A(console, context, BattleStopCondition::STOP_OVERWORLD);
+        }
+    }
+}
+
+// void handle_when_stationary_in_overworld(
+//     const ProgramInfo& info, 
+//     ConsoleHandle& console,
+//     BotBaseContext& context,
+//     std::function<
+//         void(const ProgramInfo& info, 
+//         ConsoleHandle& console,
+//         BotBaseContext& context)
+//     >&& action,
+//     std::function<
+//         void(const ProgramInfo& info, 
+//         ConsoleHandle& console,
+//         BotBaseContext& context)
+//     >&& recovery_action,
+//     size_t seconds_stationary,
+//     uint16_t minutes_timeout
+// ){
+//     StationaryOverworldWatcher stationary_overworld(COLOR_RED, {0.865, 0.82, 0.08, 0.1}, seconds_stationary);
+//     WallClock start = current_time();
+//     while (true){
+//         if (current_time() - start > std::chrono::minutes(minutes_timeout)){
+//             throw OperationFailedException(
+//                 ErrorReport::SEND_ERROR_REPORT, console,
+//                 "handle_when_stationary_in_overworld(): Failed to complete action after 5 minutes.",
+//                 true
+//             );
+//         }
+
+//         int ret = run_until(
+//             console, context,
+//             [&](BotBaseContext& context){
+//                 context.wait_for_all_requests();
+//                 action(info, console, context);
+//             },
+//             {stationary_overworld}        
+//         );
+//         if (ret < 0){
+//             // successfully completed action without being stuck in a position where the overworld is stationary.
+//             return;
+//         }else if (ret == 0){
+//             // if stationary in overworld, run recovery action then try action again
+//             context.wait_for_all_requests();
+//             recovery_action(info, console, context);            
+//         }
+//     }
+// }
 
 void wait_for_gradient_arrow(
     const ProgramInfo& info, 
@@ -585,6 +783,31 @@ void wait_for_gradient_arrow(
             true
         );
     }          
+}
+
+void wait_for_overworld(
+    const ProgramInfo& info, 
+    ConsoleHandle& console, 
+    BotBaseContext& context, 
+    uint16_t seconds_timeout
+){
+    context.wait_for_all_requests();
+    OverworldWatcher        overworld(console, COLOR_CYAN);
+    int ret = wait_until(
+        console, context, 
+        Milliseconds(seconds_timeout * 1000),
+        { overworld }
+    );
+    if (ret == 0){
+        console.log("Overworld detected.");
+    }else{
+        throw OperationFailedException(
+            ErrorReport::SEND_ERROR_REPORT, console,
+            "Failed to detect overworld.",
+            true
+        );
+    }     
+
 }
 
 void press_A_until_dialog(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, uint16_t seconds_between_button_presses){
@@ -612,20 +835,28 @@ void press_A_until_dialog(const ProgramInfo& info, ConsoleHandle& console, BotBa
 }
 
 bool check_ride_active(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
-    // open main menu
-    enter_menu_from_overworld(info, console, context, -1, MenuSide::NONE, true);
-    context.wait_for_all_requests();
-    ImageStats ride_indicator = image_stats(extract_box_reference(console.video().snapshot(), ImageFloatBox(0.05, 0.995, 0.25, 0.003)));
+    while (true){
+        try {
+            // open main menu
+            enter_menu_from_overworld(info, console, context, -1, MenuSide::NONE, true);
+            context.wait_for_all_requests();
+            ImageStats ride_indicator = image_stats(extract_box_reference(console.video().snapshot(), ImageFloatBox(0.05, 0.995, 0.25, 0.003)));
 
-    bool is_ride_active = !is_black(ride_indicator); // ride is active if the ride indicator isn't black.
-    pbf_press_button(context, BUTTON_B, 30, 100);
-    press_Bs_to_back_to_overworld(info, console, context, 7);
-    if (is_ride_active){
-        console.log("Ride is active.");
-    }else{
-        console.log("Ride is not active.");
+            bool is_ride_active = !is_black(ride_indicator); // ride is active if the ride indicator isn't black.
+            pbf_press_button(context, BUTTON_B, 30, 100);
+            press_Bs_to_back_to_overworld(info, console, context, 7);
+            if (is_ride_active){
+                console.log("Ride is active.");
+            }else{
+                console.log("Ride is not active.");
+            }
+            return is_ride_active;        
+
+        }catch(UnexpectedBattleException&){
+            run_battle_press_A(console, context, BattleStopCondition::STOP_OVERWORLD);
+        }
     }
-    return is_ride_active;
+
 }
 
 void get_on_ride(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
@@ -651,8 +882,187 @@ void checkpoint_save(SingleSwitchProgramEnvironment& env, BotBaseContext& contex
 }
 
 
+void realign_player_from_landmark(
+    const ProgramInfo& info, 
+    ConsoleHandle& console, 
+    BotBaseContext& context,
+    MoveCursor move_cursor_near_landmark,
+    MoveCursor move_cursor_to_target
+){
+
+    console.log("Realigning player direction, using a landmark...");
+    WallClock start = current_time();
+
+    while (true){
+        if (current_time() - start > std::chrono::minutes(5)){
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, console,
+                "realign_player_from_landmark(): Failed to realign player after 5 minutes.",
+                true
+            );
+        }
+
+        try {
+            open_map_from_overworld(info, console, context, false);
+
+            // move cursor near landmark (pokecenter)
+            switch(move_cursor_near_landmark.zoom_change){
+            case ZoomChange::ZOOM_IN:
+                pbf_press_button(context, BUTTON_ZR, 20, 105);
+                break;
+            case ZoomChange::ZOOM_IN_TWICE:
+                pbf_press_button(context, BUTTON_ZR, 20, 105);
+                pbf_press_button(context, BUTTON_ZR, 20, 105);
+                break;                
+            case ZoomChange::ZOOM_OUT:
+                pbf_press_button(context, BUTTON_ZL, 20, 105);
+                break;    
+            case ZoomChange::ZOOM_OUT_TWICE:
+                pbf_press_button(context, BUTTON_ZL, 20, 105);
+                pbf_press_button(context, BUTTON_ZL, 20, 105);
+                break;                  
+            case ZoomChange::KEEP_ZOOM:
+                break;
+            }
+            uint8_t move_x1 = move_cursor_near_landmark.move_x;
+            uint8_t move_y1 = move_cursor_near_landmark.move_y;
+            uint16_t move_duration1 = move_cursor_near_landmark.move_duration;
+            pbf_move_left_joystick(context, move_x1, move_y1, move_duration1, 1 * TICKS_PER_SECOND);
+
+            // move cursor to pokecenter
+            if (!detect_closest_pokecenter_and_move_map_cursor_there(info, console, context, 0.29)){
+                throw OperationFailedException(
+                    ErrorReport::SEND_ERROR_REPORT, console,
+                    "realign_player_from_landmark(): No visible pokecenter found on map.",
+                    true
+                );         
+            }
+
+            confirm_cursor_centered_on_pokecenter(info, console, context); // throws exception if fails
+
+            // move cursor from landmark to target
+            switch(move_cursor_to_target.zoom_change){
+            case ZoomChange::ZOOM_IN:
+                pbf_press_button(context, BUTTON_ZR, 20, 105);
+                break;
+            case ZoomChange::ZOOM_IN_TWICE:
+                pbf_press_button(context, BUTTON_ZR, 20, 105);
+                pbf_press_button(context, BUTTON_ZR, 20, 105);
+                break;                
+            case ZoomChange::ZOOM_OUT:
+                pbf_press_button(context, BUTTON_ZL, 20, 105);
+                break;    
+            case ZoomChange::ZOOM_OUT_TWICE:
+                pbf_press_button(context, BUTTON_ZL, 20, 105);
+                pbf_press_button(context, BUTTON_ZL, 20, 105);
+                break;                  
+            case ZoomChange::KEEP_ZOOM:
+                break;
+            }
+            uint8_t move_x2 = move_cursor_to_target.move_x;
+            uint8_t move_y2 = move_cursor_to_target.move_y;
+            uint16_t move_duration2 = move_cursor_to_target.move_duration;
+            pbf_move_left_joystick(context, move_x2, move_y2, move_duration2, 1 * TICKS_PER_SECOND);
+
+            // place down marker
+            pbf_press_button(context, BUTTON_A, 20, 105);
+            pbf_press_button(context, BUTTON_A, 20, 105);
+            leave_phone_to_overworld(info, console, context);
+
+            return;      
+
+        }catch (OperationFailedException&){
+            // reset to overworld if failed to center on the pokecenter, and re-try
+            leave_phone_to_overworld(info, console, context);
+        }catch (UnexpectedBattleException&){
+            run_battle_press_A(console, context, BattleStopCondition::STOP_OVERWORLD);
+        }
+    }
+    
+
+}
 
 
+void confirm_cursor_centered_on_pokecenter(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+    context.wait_for_all_requests();
+    context.wait_for(Milliseconds(500));
+    ImageFloatBox center_cursor{0.484, 0.472, 0.030, 0.053};
+    MapPokeCenterIconDetector pokecenter(COLOR_RED, center_cursor);
+    if (!pokecenter.detect(console.video().snapshot())){
+        throw OperationFailedException(
+            ErrorReport::SEND_ERROR_REPORT, console,
+            "confirm_cursor_centered_on_pokecenter(): Cursor is not centered on a pokecenter.",
+            true
+        );            
+    }
+
+    console.log("Confirmed that the cursor is centered on a pokecenter.");
+}
+
+void move_cursor_towards_flypoint_and_go_there(
+    const ProgramInfo& info, 
+    ConsoleHandle& console, 
+    BotBaseContext& context,
+    MoveCursor move_cursor_near_flypoint
+){
+    WallClock start = current_time();
+
+    while (true){
+        if (current_time() - start > std::chrono::minutes(5)){
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, console,
+                "move_cursor_towards_flypoint_and_go_there(): Failed to fly after 5 minutes.",
+                true
+            );
+        }
+
+        try {
+            open_map_from_overworld(info, console, context, false);
+
+            // move cursor near landmark (pokecenter)
+            switch(move_cursor_near_flypoint.zoom_change){
+            case ZoomChange::ZOOM_IN:
+                pbf_press_button(context, BUTTON_ZR, 20, 105);
+                break;
+            case ZoomChange::ZOOM_IN_TWICE:
+                pbf_press_button(context, BUTTON_ZR, 20, 105);
+                pbf_press_button(context, BUTTON_ZR, 20, 105);
+                break;                
+            case ZoomChange::ZOOM_OUT:
+                pbf_press_button(context, BUTTON_ZL, 20, 105);
+                break;    
+            case ZoomChange::ZOOM_OUT_TWICE:
+                pbf_press_button(context, BUTTON_ZL, 20, 105);
+                pbf_press_button(context, BUTTON_ZL, 20, 105);
+                break;                  
+            case ZoomChange::KEEP_ZOOM:
+                break;
+            }
+            uint8_t move_x1 = move_cursor_near_flypoint.move_x;
+            uint8_t move_y1 = move_cursor_near_flypoint.move_y;
+            uint16_t move_duration1 = move_cursor_near_flypoint.move_duration;
+            pbf_move_left_joystick(context, move_x1, move_y1, move_duration1, 1 * TICKS_PER_SECOND);
+
+            if (!fly_to_visible_closest_pokecenter_cur_zoom_level(info, console, context)){
+                throw OperationFailedException(
+                    ErrorReport::SEND_ERROR_REPORT, console,
+                    "move_cursor_towards_flypoint_and_go_there(): No visible pokecenter found on map.",
+                    true
+                );                  
+            }
+
+            return;      
+
+        }catch (OperationFailedException&){
+            // reset to overworld if failed to center on the pokecenter, and re-try
+            leave_phone_to_overworld(info, console, context);
+        }catch (UnexpectedBattleException&){
+            run_battle_press_A(console, context, BattleStopCondition::STOP_OVERWORLD);
+        }
+    }
+    
+
+}
 
 
 }
