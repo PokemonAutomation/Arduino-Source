@@ -12,6 +12,7 @@
 #include "Common/Cpp/Containers/FixedLimitVector.h"
 #include "ClientSource/Connection/BotBase.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
+#include "CommonFramework/Notifications/ProgramInfo.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
@@ -47,6 +48,7 @@ public:
     // given direction in radians (North-clockwise), rotate the camera so N is pointing in the desired direction.
     // mini-map must be unlocked.
     void change_direction(
+        const ProgramInfo& info,
         ConsoleHandle& console, 
         BotBaseContext& context,
         double direction

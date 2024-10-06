@@ -20,6 +20,7 @@
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV_DirectionDetector.h"
+#include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include <cmath>
 #include <iostream>
 //using std::cout;
@@ -138,12 +139,34 @@ double DirectionDetector::current_direction(ConsoleHandle& console, const ImageV
     return direction;
 }
 
+// return true if the given direction is pointing north
+bool is_pointing_north(double direction){
+    return (direction < 0.1 && direction >= 0.0) || (direction <= 2 * PI && direction > 2 * PI - 0.1);
+}
+
+// return true if any of the following:
+// - current_direction is NOT pointing north. if the current direction is not north, then we know the minimap is not locked.
+// - current_diff < initial_diff, where current_diff represents the difference between the current direction and target direction, 
+//  and initial_diff is the difference between the initial direction and target direction. i.e. is there cursor movement towards the target.
+// - target_direction is pointing north. 
+//   - this is to cover the case where both the current and target directions are pointing north. There won't be any significant cursor movement either way. So we can't really tell if the map is unlocked or not. so to be conservative, we say assume it's unlocked. 
+bool is_minimap_unlocked(double initial_diff, double current_diff, double curr_direction, double target_direction){
+    std::cout << !is_pointing_north(curr_direction) << std::endl;
+    std::cout << (current_diff < initial_diff - 0.01) << std::endl;
+    std::cout << is_pointing_north(target_direction) << std::endl;
+    return !is_pointing_north(curr_direction) || current_diff < initial_diff - 0.01 || is_pointing_north(target_direction) ;
+}
+
 void DirectionDetector::change_direction(
+    const ProgramInfo& info,
     ConsoleHandle& console, 
     BotBaseContext& context,
     double direction
 ) const{
-    for (size_t i = 0; i < 10; i++){ // 10 attempts to move the direction to the target
+    double initial_diff = 2 * PI;
+    size_t i = 0;
+    size_t MAX_ATTEMPTS = 10;
+    while (i < MAX_ATTEMPTS){ // 10 attempts to move the direction to the target
         context.wait_for_all_requests();
         VideoSnapshot screen = console.video().snapshot();
         double current = current_direction(console, screen);
@@ -164,9 +187,23 @@ void DirectionDetector::change_direction(
         console.log("current direction: " +  std::to_string(current));
         console.log("target: " +  std::to_string(target) + ", diff: " + std::to_string(diff));
         if (abs_diff < 0.02){
-            // stop the loop when we're close enough to the target
-            break;
+            // return when we're close enough to the target
+            return;
         }
+
+        if (i == 0){
+            initial_diff = abs_diff;
+        }else if (i == 1 && !is_minimap_unlocked(initial_diff, abs_diff, current, target)){
+            console.log("Minimap locked. Try to unlock the minimap. Then try again.");
+            open_map_from_overworld(info, console, context);
+            pbf_press_button(context, BUTTON_RCLICK, 20, 20);
+            pbf_press_button(context, BUTTON_RCLICK, 20, 20);
+            pbf_press_button(context, BUTTON_B, 20, 100);
+            press_Bs_to_back_to_overworld(info, console, context, 7);
+            i = 0;
+            continue;
+        }
+
         uint8_t scale_factor = 80;
 
         uint16_t push_duration = std::max(uint16_t(std::abs(diff * scale_factor)), uint16_t(3));
@@ -175,6 +212,7 @@ void DirectionDetector::change_direction(
         uint8_t push_x = uint8_t(std::max(std::min(int(128 + (push_direction * push_magnitude)), 255), 0));
         console.log("push magnitude: " + std::to_string(push_x) + ", push duration: " +  std::to_string(push_duration));
         pbf_move_right_joystick(context, push_x, 128, push_duration, 100);
+        i++;
     }
     
 }

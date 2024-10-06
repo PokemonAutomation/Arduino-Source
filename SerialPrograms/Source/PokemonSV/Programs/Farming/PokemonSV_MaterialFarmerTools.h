@@ -111,7 +111,7 @@ WallClock make_sandwich_material_farm(
 
 void move_to_start_position_for_letsgo0(ConsoleHandle& console, BotBaseContext& context);
 
-void move_to_start_position_for_letsgo1(ConsoleHandle& console, BotBaseContext& context);
+void move_to_start_position_for_letsgo1(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
 
 void lets_go_movement0(BotBaseContext& context);
 
