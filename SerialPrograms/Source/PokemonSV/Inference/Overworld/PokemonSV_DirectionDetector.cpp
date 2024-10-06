@@ -223,9 +223,9 @@ void DirectionDetector::change_direction(
 
         uint8_t scale_factor = 80;
 
-        uint16_t push_duration = std::max(uint16_t(std::abs(diff * scale_factor)), uint16_t(3));
+        uint16_t push_duration = std::max(uint16_t(std::abs(diff * scale_factor)), uint16_t(8));
         int16_t push_direction = (diff > 0) ? -1 : 1;
-        double push_magnitude = (128 / (i + 1)); // push less with each iteration/attempt
+        double push_magnitude = std::max(double(128 / (i + 1)), double(20)); // push less with each iteration/attempt
         uint8_t push_x = uint8_t(std::max(std::min(int(128 + (push_direction * push_magnitude)), 255), 0));
         console.log("push magnitude: " + std::to_string(push_x) + ", push duration: " +  std::to_string(push_duration));
         pbf_move_right_joystick(context, push_x, 128, push_duration, 100);
