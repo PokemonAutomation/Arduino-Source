@@ -215,7 +215,7 @@ void run_material_farmer(
             );
             if (farming_time_remaining < std::chrono::minutes(0)){
                 console.log("Time's up. Stop the Material farming program.", COLOR_RED);
-                break;
+                return;
             }
 
             // Check time left on sandwich
