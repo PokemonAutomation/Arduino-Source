@@ -45,13 +45,9 @@ public:
     // return -1 if unable to locate the N symbol
     double get_current_direction(ConsoleHandle& console, const ImageViewRGB32& screen) const;
 
-    bool is_minimap_possibly_locked(
-        double initial_diff, 
-        double current_diff, 
-        double curr_direction
-    ) const;
+    bool is_minimap_possibly_locked(double current_direction) const;
 
-    bool is_minimap_definitely_locked(ConsoleHandle& console, BotBaseContext& context, double curr_direction) const;
+    bool is_minimap_definitely_locked(ConsoleHandle& console, BotBaseContext& context, double current_direction) const;
 
     // given direction in radians (North-clockwise), rotate the camera so N is pointing in the desired direction.
     // mini-map must be unlocked.

@@ -144,23 +144,15 @@ bool is_pointing_north(double direction){
     return (direction < 0.1 && direction >= 0.0) || (direction <= 2 * PI && direction > 2 * PI - 0.1);
 }
 
-// return true if current_direction is pointing north and there hasn't been any significant progress towards target.
+// return true if current_direction is pointing north
 // if the above applies, the minimap might be locked. but we will need is_minimap_definitely_locked() to confirm.
-bool DirectionDetector::is_minimap_possibly_locked(
-    double initial_diff, 
-    double current_diff, 
-    double curr_direction
-) const{
-    bool pointing_north = is_pointing_north(curr_direction);
-    bool significant_progress = current_diff < initial_diff - 0.1;
-    std::cout << pointing_north << std::endl;
-    std::cout << significant_progress << std::endl;
-    return pointing_north && !significant_progress;
+bool DirectionDetector::is_minimap_possibly_locked(double current_direction) const{
+    return is_pointing_north(current_direction);
 }
 
 // - push the joystick to change its position. if still pointing North, then we know it's locked.
-bool DirectionDetector::is_minimap_definitely_locked(ConsoleHandle& console, BotBaseContext& context, double curr_direction) const {
-    bool pointing_north = is_pointing_north(curr_direction);
+bool DirectionDetector::is_minimap_definitely_locked(ConsoleHandle& console, BotBaseContext& context, double current_direction) const {
+    bool pointing_north = is_pointing_north(current_direction);
     if (!pointing_north){
         return false;
     }
@@ -177,9 +169,9 @@ void DirectionDetector::change_direction(
     BotBaseContext& context,
     double direction
 ) const{
-    double initial_diff = 2 * PI;
     size_t i = 0;
     size_t MAX_ATTEMPTS = 10;
+    bool is_minimap_definitely_unlocked = false;
     while (i < MAX_ATTEMPTS){ // 10 attempts to move the direction to the target
         context.wait_for_all_requests();
         VideoSnapshot screen = console.video().snapshot();
@@ -200,14 +192,8 @@ void DirectionDetector::change_direction(
         double abs_diff = std::abs(diff);
         console.log("current direction: " +  std::to_string(current));
         console.log("target: " +  std::to_string(target) + ", diff: " + std::to_string(diff));
-        if (abs_diff < 0.02){
-            // return when we're close enough to the target
-            return;
-        }
 
-        if (i == 0){
-            initial_diff = abs_diff;
-        }else if (i == 1 && is_minimap_possibly_locked(initial_diff, abs_diff, current)){
+        if (!is_minimap_definitely_unlocked && is_minimap_possibly_locked(current)){
             console.log("Minimap may be locked. Check if definitely locked.");
             if (is_minimap_definitely_locked(console, context, current)){
                 console.log("Minimap locked. Try to unlock the minimap. Then try again.");
@@ -216,10 +202,20 @@ void DirectionDetector::change_direction(
                 pbf_press_button(context, BUTTON_RCLICK, 20, 20);
                 pbf_press_button(context, BUTTON_B, 20, 100);
                 press_Bs_to_back_to_overworld(info, console, context, 7);
+            }else{
+                console.log("Minimap not locked. Try again");
             }
+            
+            is_minimap_definitely_unlocked = true;
             i = 0; // even if not locked, we reset the attempt counter since the first attempt is most impactful in terms of cursor movement
-            continue;
+            continue;            
         }
+        is_minimap_definitely_unlocked = true;
+
+        if (abs_diff < 0.02){
+            // return when we're close enough to the target
+            return;
+        }        
 
         uint8_t scale_factor = 80;
 
