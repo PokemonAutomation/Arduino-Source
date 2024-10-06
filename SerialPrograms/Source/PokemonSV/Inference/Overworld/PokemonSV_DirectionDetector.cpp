@@ -127,7 +127,7 @@ std::pair<double, double> DirectionDetector::locate_north(Logger& logger, const 
 }
 
 
-double DirectionDetector::current_direction(ConsoleHandle& console, const ImageViewRGB32& screen) const{
+double DirectionDetector::get_current_direction(ConsoleHandle& console, const ImageViewRGB32& screen) const{
     std::pair<double, double> north_location = locate_north(console, screen);
     if (north_location.first == 0 && north_location.second == 0){ // unable to locate north
         return -1;
@@ -144,17 +144,31 @@ bool is_pointing_north(double direction){
     return (direction < 0.1 && direction >= 0.0) || (direction <= 2 * PI && direction > 2 * PI - 0.1);
 }
 
-// return true if any of the following:
-// - current_direction is NOT pointing north. if the current direction is not north, then we know the minimap is not locked.
-// - current_diff < initial_diff, where current_diff represents the difference between the current direction and target direction, 
-//  and initial_diff is the difference between the initial direction and target direction. i.e. is there cursor movement towards the target.
-// - target_direction is pointing north. 
-//   - this is to cover the case where both the current and target directions are pointing north. There won't be any significant cursor movement either way. So we can't really tell if the map is unlocked or not. so to be conservative, we say assume it's unlocked. 
-bool is_minimap_unlocked(double initial_diff, double current_diff, double curr_direction, double target_direction){
-    std::cout << !is_pointing_north(curr_direction) << std::endl;
-    std::cout << (current_diff < initial_diff - 0.01) << std::endl;
-    std::cout << is_pointing_north(target_direction) << std::endl;
-    return !is_pointing_north(curr_direction) || current_diff < initial_diff - 0.01 || is_pointing_north(target_direction) ;
+// return true if current_direction is pointing north and there hasn't been any significant progress towards target.
+// if the above applies, the minimap might be locked. but we will need is_minimap_definitely_locked() to confirm.
+bool DirectionDetector::is_minimap_possibly_locked(
+    double initial_diff, 
+    double current_diff, 
+    double curr_direction
+) const{
+    bool pointing_north = is_pointing_north(curr_direction);
+    bool significant_progress = current_diff < initial_diff - 0.1;
+    std::cout << pointing_north << std::endl;
+    std::cout << significant_progress << std::endl;
+    return pointing_north && !significant_progress;
+}
+
+// - push the joystick to change its position. if still pointing North, then we know it's locked.
+bool DirectionDetector::is_minimap_definitely_locked(ConsoleHandle& console, BotBaseContext& context, double curr_direction) const {
+    bool pointing_north = is_pointing_north(curr_direction);
+    if (!pointing_north){
+        return false;
+    }
+    pbf_move_right_joystick(context, 0, 128, 100, 20);
+    context.wait_for_all_requests();
+    double new_direction = get_current_direction(console, console.video().snapshot());
+
+    return is_pointing_north(new_direction);
 }
 
 void DirectionDetector::change_direction(
@@ -169,7 +183,7 @@ void DirectionDetector::change_direction(
     while (i < MAX_ATTEMPTS){ // 10 attempts to move the direction to the target
         context.wait_for_all_requests();
         VideoSnapshot screen = console.video().snapshot();
-        double current = current_direction(console, screen);
+        double current = get_current_direction(console, screen);
         if (current < 0){ 
             return;
         }
@@ -193,14 +207,17 @@ void DirectionDetector::change_direction(
 
         if (i == 0){
             initial_diff = abs_diff;
-        }else if (i == 1 && !is_minimap_unlocked(initial_diff, abs_diff, current, target)){
-            console.log("Minimap locked. Try to unlock the minimap. Then try again.");
-            open_map_from_overworld(info, console, context);
-            pbf_press_button(context, BUTTON_RCLICK, 20, 20);
-            pbf_press_button(context, BUTTON_RCLICK, 20, 20);
-            pbf_press_button(context, BUTTON_B, 20, 100);
-            press_Bs_to_back_to_overworld(info, console, context, 7);
-            i = 0;
+        }else if (i == 1 && is_minimap_possibly_locked(initial_diff, abs_diff, current)){
+            console.log("Minimap may be locked. Check if definitely locked.");
+            if (is_minimap_definitely_locked(console, context, current)){
+                console.log("Minimap locked. Try to unlock the minimap. Then try again.");
+                open_map_from_overworld(info, console, context);
+                pbf_press_button(context, BUTTON_RCLICK, 20, 20);
+                pbf_press_button(context, BUTTON_RCLICK, 20, 20);
+                pbf_press_button(context, BUTTON_B, 20, 100);
+                press_Bs_to_back_to_overworld(info, console, context, 7);
+            }
+            i = 0; // even if not locked, we reset the attempt counter since the first attempt is most impactful in terms of cursor movement
             continue;
         }
 
