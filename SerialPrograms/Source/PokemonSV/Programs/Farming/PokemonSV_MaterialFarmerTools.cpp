@@ -68,7 +68,7 @@ MaterialFarmerOptions::MaterialFarmerOptions(
     , RUN_TIME_IN_MINUTES(
         "<b>Run Duration:</b><br>Run the material farmer for this many minutes.",
         LockMode::UNLOCK_WHILE_RUNNING,
-        70
+        32
     )
 //    , SAVE_GAME_BEFORE_SANDWICH(
 //        "<b>Save Game before each round:</b>",
@@ -165,7 +165,14 @@ void MaterialFarmerOptions::value_changed(void* object){
 
 }
 
-
+// return new start time, so that minutes remaining is rounded up to a multiple of 32
+WallClock new_start_time_after_reset(WallClock old_start_time, uint16_t run_time_in_minutes){
+    auto farming_time_remaining = minutes_remaining(old_start_time, std::chrono::minutes(run_time_in_minutes));
+    // round up the time to multiple of 32 (30 minutes per sandwich, plus 2 minutes for sandwich making)
+    size_t desired_minutes_remaining = ((farming_time_remaining.count()/32)+1)*32;
+    WallClock new_start_time = current_time() + std::chrono::minutes(desired_minutes_remaining) - std::chrono::minutes(run_time_in_minutes);
+    return new_start_time;
+}
 
 
 void run_material_farmer(
@@ -184,87 +191,127 @@ void run_material_farmer(
     WallClock last_sandwich_time = WallClock::min();
     LetsGoHpWatcher hp_watcher(COLOR_RED);
 
+    // ensure we save before running the material farmer.
+    // but no need to save if already saving prior to each sandwich
+    if (!(options.SANDWICH_OPTIONS.enabled() && options.SANDWICH_OPTIONS.SAVE_GAME_BEFORE_SANDWICH)){
+        save_game_from_overworld(env.program_info(), console, context);
+    }    
+
     /* 
     - Use Let's Go along the path. Fly back to pokecenter when it reaches the end of the path.
     - Keeping repeating this for RUN_TIME_IN_MINUTES minutes
     */
+    size_t consecutive_failures = 0;
+    size_t max_consecutive_failures = 15;     
     while (true){
-        // check time left on material farming
-        auto farming_time_remaining = minutes_remaining(start_time, std::chrono::minutes(options.RUN_TIME_IN_MINUTES));
-        console.log(
-            "Time left in Material Farming: " + 
-            std::to_string(farming_time_remaining.count()) + " min", 
-            COLOR_PURPLE
-        );
-        if (farming_time_remaining < std::chrono::minutes(0)){
-            console.log("Time's up. Stop the Material farming program.", COLOR_RED);
-            break;
-        }
-
-        // Check time left on sandwich
-        if (options.SANDWICH_OPTIONS.enabled()){
-            auto sandwich_time_remaining = minutes_remaining(last_sandwich_time, std::chrono::minutes(options.TIME_PER_SANDWICH));
+    try{
+        while (true){
+            // check time left on material farming
+            auto farming_time_remaining = minutes_remaining(start_time, std::chrono::minutes(options.RUN_TIME_IN_MINUTES));
             console.log(
-                "Time left on sandwich: " + 
-                std::to_string(sandwich_time_remaining.count()) + " min", 
+                "Time left in Material Farming: " + 
+                std::to_string(farming_time_remaining.count()) + " min", 
                 COLOR_PURPLE
-            );                   
-            if (sandwich_time_remaining < std::chrono::minutes(0)){
-                console.log("Sandwich not active. Make a sandwich.");
-                last_sandwich_time = make_sandwich_material_farm(env, console, context, options, stats);
-                console.overlay().add_log("Sandwich made.");
+            );
+            if (farming_time_remaining < std::chrono::minutes(0)){
+                console.log("Time's up. Stop the Material farming program.", COLOR_RED);
+                return;
+            }
 
-                // Log time remaining in Material farming 
-                farming_time_remaining = minutes_remaining(start_time, std::chrono::minutes(options.RUN_TIME_IN_MINUTES));
-                console.log(
-                    "Time left in Material Farming: " + 
-                    std::to_string(farming_time_remaining.count()) + " min", 
-                    COLOR_PURPLE
-                );
-                // Log time remaining on Sandwich
-                sandwich_time_remaining = minutes_remaining(last_sandwich_time, std::chrono::minutes(options.TIME_PER_SANDWICH));
+            // Check time left on sandwich
+            if (options.SANDWICH_OPTIONS.enabled()){
+                auto sandwich_time_remaining = minutes_remaining(last_sandwich_time, std::chrono::minutes(options.TIME_PER_SANDWICH));
                 console.log(
                     "Time left on sandwich: " + 
                     std::to_string(sandwich_time_remaining.count()) + " min", 
                     COLOR_PURPLE
-                );                  
+                );                   
+                if (sandwich_time_remaining < std::chrono::minutes(0)){
+                    console.log("Sandwich not active. Make a sandwich.");
+                    last_sandwich_time = make_sandwich_material_farm(env, console, context, options, stats);
+                    console.overlay().add_log("Sandwich made.");
+
+                    // Log time remaining in Material farming 
+                    farming_time_remaining = minutes_remaining(start_time, std::chrono::minutes(options.RUN_TIME_IN_MINUTES));
+                    console.log(
+                        "Time left in Material Farming: " + 
+                        std::to_string(farming_time_remaining.count()) + " min", 
+                        COLOR_PURPLE
+                    );
+                    // Log time remaining on Sandwich
+                    sandwich_time_remaining = minutes_remaining(last_sandwich_time, std::chrono::minutes(options.TIME_PER_SANDWICH));
+                    console.log(
+                        "Time left on sandwich: " + 
+                        std::to_string(sandwich_time_remaining.count()) + " min", 
+                        COLOR_PURPLE
+                    );                  
+                }
             }
+
+            // heal before starting Let's go
+            console.log("Heal before starting Let's go", COLOR_PURPLE);
+            console.log("Heal threshold: " + tostr_default(options.AUTO_HEAL_PERCENT), COLOR_PURPLE);
+            check_hp(env, console, context, options, hp_watcher, stats);
+
+            /*
+            - Starts from pokemon center.
+            - Flies to start position. Runs a Let's Go iteration. 
+            - Then returns to pokemon center, regardless of whether 
+            it completes the action or gets caught in a battle 
+            */
+            run_from_battles_and_back_to_pokecenter(env, console, context, stats,
+                [&](ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){
+                    // Move to starting position for Let's Go hunting path
+                    console.log("Move to starting position for Let's Go hunting path.", COLOR_PURPLE);
+                    move_to_start_position_for_letsgo1(console, context);
+
+                    // run let's go while updating the HP watcher
+                    console.log("Starting Let's Go hunting path.", COLOR_PURPLE);
+                    run_until(
+                        console, context,
+                        [&](BotBaseContext& context){
+                            run_lets_go_iteration(console, context, encounter_tracker, options.NUM_FORWARD_MOVES_PER_LETS_GO_ITERATION);
+                        },
+                        {hp_watcher}
+                    );
+                } 
+            ); 
+            
+            context.wait_for_all_requests();
+        }
+    }catch (OperationFailedException& e){
+        stats.m_errors++;
+        env.update_stats();
+        e.send_notification(env, options.NOTIFICATION_ERROR_RECOVERABLE);
+
+        // save screenshot after operation failed, 
+        // dump_snapshot(console);
+
+        if (options.SAVE_DEBUG_VIDEO){
+            // Take a video to give more context for debugging
+            pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
+            context.wait_for_all_requests();
         }
 
-        // heal before starting Let's go
-        console.log("Heal before starting Let's go", COLOR_PURPLE);
-        console.log("Heal threshold: " + tostr_default(options.AUTO_HEAL_PERCENT), COLOR_PURPLE);
-        check_hp(env, console, context, options, hp_watcher, stats);
+        consecutive_failures++;
+        if (consecutive_failures >= max_consecutive_failures){
+            throw e;
+        }
 
-        /*
-        - Starts from pokemon center.
-        - Flies to start position. Runs a Let's Go iteration. 
-        - Then returns to pokemon center, regardless of whether 
-        it completes the action or gets caught in a battle 
-        */
-        run_from_battles_and_back_to_pokecenter(env, console, context, stats,
-            [&](ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){
-                // Move to starting position for Let's Go hunting path
-                console.log("Move to starting position for Let's Go hunting path.", COLOR_PURPLE);
-                move_to_start_position_for_letsgo1(console, context);
+        env.log("Reset game to handle recoverable error.");
+        reset_game(env.program_info(), console, context);
+        stats.m_game_resets++;
+        env.update_stats();
 
-                // run let's go while updating the HP watcher
-                console.log("Starting Let's Go hunting path.", COLOR_PURPLE);
-                run_until(
-                    console, context,
-                    [&](BotBaseContext& context){
-                        run_lets_go_iteration(console, context, encounter_tracker, options.NUM_FORWARD_MOVES_PER_LETS_GO_ITERATION);
-                    },
-                    {hp_watcher}
-                );
-            } 
-        ); 
-        
-        context.wait_for_all_requests();
+        // update start time, so that minutes remaining is rounded up to a multiple of 32
+        start_time = new_start_time_after_reset(start_time, options.RUN_TIME_IN_MINUTES);      
+        // also update last sandwich time
+        last_sandwich_time = WallClock::min();
     }
-
-
+    }
 }
+
+
 
 void check_hp(
     ProgramEnvironment& env,
@@ -290,8 +337,8 @@ void check_hp(
 
 
 
-// start at North Province (Area 3) Pokecenter. make sandwich then go back to Pokecenter to reset position
-// return the time that the sandwich was made
+// make sandwich then go back to Pokecenter to reset position
+// if gets caught up in a battle, try again.
 WallClock make_sandwich_material_farm(
     ProgramEnvironment& env,
     ConsoleHandle& console,
@@ -299,60 +346,11 @@ WallClock make_sandwich_material_farm(
     MaterialFarmerOptions& options,
     MaterialFarmerStats& stats
 ){
+
     if (options.SANDWICH_OPTIONS.SAVE_GAME_BEFORE_SANDWICH){
         save_game_from_overworld(env.program_info(), console, context);
     }
 
-    WallClock last_sandwich_time;
-    size_t consecutive_failures = 0;
-    size_t max_consecutive_failures = 10;  
-    while (true){
-        try{
-            last_sandwich_time = try_make_sandwich_material_farm(env, console, context, options, stats);
-            break;
-        }catch(OperationFailedException& e){
-            stats.m_errors++;
-            env.update_stats();
-            e.send_notification(env, options.NOTIFICATION_ERROR_RECOVERABLE);
-
-            // save screenshot after operation failed, 
-            dump_snapshot(console);
-
-            if (options.SAVE_DEBUG_VIDEO){
-                // Take a video to give more context for debugging
-                pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
-                context.wait_for_all_requests();
-            }
-
-            consecutive_failures++;
-            if (consecutive_failures >= max_consecutive_failures){
-                throw OperationFailedException(
-                    ErrorReport::SEND_ERROR_REPORT, console,
-                    "Failed to make sandwich "+ std::to_string(max_consecutive_failures) + " times in a row.",
-                    true
-                );
-            }
-
-            env.log("Failed to make sandwich. Reset game to handle recoverable error.");
-            reset_game(env.program_info(), console, context);
-            stats.m_game_resets++;
-            env.update_stats();
-        }
-    }
-
-    return last_sandwich_time;
-}
-
-
-// make sandwich then go back to Pokecenter to reset position
-// if gets caught up in a battle, try again.
-WallClock try_make_sandwich_material_farm(
-    ProgramEnvironment& env,
-    ConsoleHandle& console,
-    BotBaseContext& context, 
-    MaterialFarmerOptions& options,
-    MaterialFarmerStats& stats
-){
     WallClock last_sandwich_time = WallClock::min();
     while(last_sandwich_time == WallClock::min()){
         run_from_battles_and_back_to_pokecenter(env, console, context, stats,
@@ -373,7 +371,7 @@ WallClock try_make_sandwich_material_farm(
 
                 // make sandwich
                 picnic_from_overworld(env.program_info(), console, context);
-                pbf_move_left_joystick(context, 128, 0, 30, 40);
+                pbf_move_left_joystick(context, 128, 0, 100, 40);  // walk forward to picnic table
                 enter_sandwich_recipe_list(env.program_info(), console, context);
                 make_sandwich_option(env, console, context, options.SANDWICH_OPTIONS);
                 last_sandwich_time = current_time();
@@ -468,7 +466,9 @@ void move_to_start_position_for_letsgo1(
     pbf_move_left_joystick(context, 128, 0, 300, 10);
 
     // look right, towards the start position
-    pbf_move_right_joystick(context, 255, 128, 130, 10);
+    DirectionDetector direction;
+    direction.change_direction(console, context, 5.76);
+    // pbf_move_right_joystick(context, 255, 128, 130, 10);
     pbf_move_left_joystick(context, 128, 0, 10, 10);
 
     // get on ride
@@ -498,7 +498,8 @@ void move_to_start_position_for_letsgo1(
     pbf_press_button(context, BUTTON_B, 50, 10);
 
     // look right
-    pbf_move_right_joystick(context, 255, 128, 20, 10);
+    // pbf_move_right_joystick(context, 255, 128, 20, 10);
+    direction.change_direction(console, context, 5.46);
 
     // move forward slightly
     pbf_move_left_joystick(context, 128, 0, 50, 10);

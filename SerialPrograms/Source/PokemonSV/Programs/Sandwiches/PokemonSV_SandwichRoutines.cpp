@@ -84,6 +84,8 @@ bool enter_sandwich_recipe_list(const ProgramInfo& info, ConsoleHandle& console,
         switch (ret){
         case 0:
             console.log("Detected picnic. Maybe button A press dropped.");
+            // walk forward and press A again
+            pbf_move_left_joystick(context, 128, 0, 100, 40);
             pbf_press_button(context, BUTTON_A, 20, 80);
             continue;
         case 1:
