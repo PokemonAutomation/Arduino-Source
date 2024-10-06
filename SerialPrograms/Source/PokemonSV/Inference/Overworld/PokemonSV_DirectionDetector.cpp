@@ -20,6 +20,7 @@
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV_DirectionDetector.h"
+#include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include <cmath>
 #include <iostream>
 //using std::cout;
@@ -126,7 +127,7 @@ std::pair<double, double> DirectionDetector::locate_north(Logger& logger, const 
 }
 
 
-double DirectionDetector::current_direction(ConsoleHandle& console, const ImageViewRGB32& screen) const{
+double DirectionDetector::get_current_direction(ConsoleHandle& console, const ImageViewRGB32& screen) const{
     std::pair<double, double> north_location = locate_north(console, screen);
     if (north_location.first == 0 && north_location.second == 0){ // unable to locate north
         return -1;
@@ -138,15 +139,43 @@ double DirectionDetector::current_direction(ConsoleHandle& console, const ImageV
     return direction;
 }
 
+// return true if the given direction is pointing north
+bool is_pointing_north(double direction){
+    return (direction < 0.1 && direction >= 0.0) || (direction <= 2 * PI && direction > 2 * PI - 0.1);
+}
+
+// return true if current_direction is pointing north
+// if the above applies, the minimap might be locked. but we will need is_minimap_definitely_locked() to confirm.
+bool DirectionDetector::is_minimap_possibly_locked(double current_direction) const{
+    return is_pointing_north(current_direction);
+}
+
+// - push the joystick to change its position. if still pointing North, then we know it's locked.
+bool DirectionDetector::is_minimap_definitely_locked(ConsoleHandle& console, BotBaseContext& context, double current_direction) const {
+    bool pointing_north = is_pointing_north(current_direction);
+    if (!pointing_north){
+        return false;
+    }
+    pbf_move_right_joystick(context, 0, 128, 100, 20);
+    context.wait_for_all_requests();
+    double new_direction = get_current_direction(console, console.video().snapshot());
+
+    return is_pointing_north(new_direction);
+}
+
 void DirectionDetector::change_direction(
+    const ProgramInfo& info,
     ConsoleHandle& console, 
     BotBaseContext& context,
     double direction
 ) const{
-    for (size_t i = 0; i < 10; i++){ // 10 attempts to move the direction to the target
+    size_t i = 0;
+    size_t MAX_ATTEMPTS = 10;
+    bool is_minimap_definitely_unlocked = false;
+    while (i < MAX_ATTEMPTS){ // 10 attempts to move the direction to the target
         context.wait_for_all_requests();
         VideoSnapshot screen = console.video().snapshot();
-        double current = current_direction(console, screen);
+        double current = get_current_direction(console, screen);
         if (current < 0){ 
             return;
         }
@@ -163,18 +192,40 @@ void DirectionDetector::change_direction(
         double abs_diff = std::abs(diff);
         console.log("current direction: " +  std::to_string(current));
         console.log("target: " +  std::to_string(target) + ", diff: " + std::to_string(diff));
-        if (abs_diff < 0.02){
-            // stop the loop when we're close enough to the target
-            break;
+
+        if (!is_minimap_definitely_unlocked && is_minimap_possibly_locked(current)){
+            console.log("Minimap may be locked. Check if definitely locked.");
+            if (is_minimap_definitely_locked(console, context, current)){
+                console.log("Minimap locked. Try to unlock the minimap. Then try again.");
+                open_map_from_overworld(info, console, context);
+                pbf_press_button(context, BUTTON_RCLICK, 20, 20);
+                pbf_press_button(context, BUTTON_RCLICK, 20, 20);
+                pbf_press_button(context, BUTTON_B, 20, 100);
+                press_Bs_to_back_to_overworld(info, console, context, 7);
+            }else{
+                console.log("Minimap not locked. Try again");
+            }
+            
+            is_minimap_definitely_unlocked = true;
+            i = 0; // even if not locked, we reset the attempt counter since the first attempt is most impactful in terms of cursor movement
+            continue;            
         }
+        is_minimap_definitely_unlocked = true;
+
+        if (abs_diff < 0.02){
+            // return when we're close enough to the target
+            return;
+        }        
+
         uint8_t scale_factor = 80;
 
-        uint16_t push_duration = std::max(uint16_t(std::abs(diff * scale_factor)), uint16_t(3));
+        uint16_t push_duration = std::max(uint16_t(std::abs(diff * scale_factor)), uint16_t(8));
         int16_t push_direction = (diff > 0) ? -1 : 1;
-        double push_magnitude = (128 / (i + 1)); // push less with each iteration/attempt
+        double push_magnitude = std::max(double(128 / (i + 1)), double(20)); // push less with each iteration/attempt
         uint8_t push_x = uint8_t(std::max(std::min(int(128 + (push_direction * push_magnitude)), 255), 0));
         console.log("push magnitude: " + std::to_string(push_x) + ", push duration: " +  std::to_string(push_duration));
         pbf_move_right_joystick(context, push_x, 128, push_duration, 100);
+        i++;
     }
     
 }
