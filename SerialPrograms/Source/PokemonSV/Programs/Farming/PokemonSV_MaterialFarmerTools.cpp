@@ -500,7 +500,7 @@ void move_to_start_position_for_letsgo1(
 
     // look right
     // pbf_move_right_joystick(context, 255, 128, 20, 10);
-    direction.change_direction(info, console, context, 5.46); // 5.3
+    direction.change_direction(info, console, context, 5.3);
 
     // move forward slightly
     pbf_move_left_joystick(context, 128, 0, 50, 10);
