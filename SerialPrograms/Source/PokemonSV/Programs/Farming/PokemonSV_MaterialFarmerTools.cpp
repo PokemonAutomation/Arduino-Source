@@ -263,7 +263,7 @@ void run_material_farmer(
                 [&](ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){
                     // Move to starting position for Let's Go hunting path
                     console.log("Move to starting position for Let's Go hunting path.", COLOR_PURPLE);
-                    move_to_start_position_for_letsgo1(console, context);
+                    move_to_start_position_for_letsgo1(env.program_info(), console, context);
 
                     // run let's go while updating the HP watcher
                     console.log("Starting Let's Go hunting path.", COLOR_PURPLE);
@@ -448,6 +448,7 @@ void move_to_start_position_for_letsgo0(
 
 // from the North Province (Area 3) pokecenter, move to start position for Happiny dust farming
 void move_to_start_position_for_letsgo1(
+    const ProgramInfo& info,
     ConsoleHandle& console, 
     BotBaseContext& context
 ){
@@ -467,7 +468,7 @@ void move_to_start_position_for_letsgo1(
 
     // look right, towards the start position
     DirectionDetector direction;
-    direction.change_direction(console, context, 5.76);
+    direction.change_direction(info, console, context, 5.76);
     // pbf_move_right_joystick(context, 255, 128, 130, 10);
     pbf_move_left_joystick(context, 128, 0, 10, 10);
 
@@ -499,7 +500,7 @@ void move_to_start_position_for_letsgo1(
 
     // look right
     // pbf_move_right_joystick(context, 255, 128, 20, 10);
-    direction.change_direction(console, context, 5.46);
+    direction.change_direction(info, console, context, 5.3);
 
     // move forward slightly
     pbf_move_left_joystick(context, 128, 0, 50, 10);
