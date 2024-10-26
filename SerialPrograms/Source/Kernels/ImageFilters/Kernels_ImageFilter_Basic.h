@@ -109,7 +109,11 @@ void to_blackwhite_rgb32_range(
 
 
 
-
+size_t filter_green(
+    const uint32_t* in, size_t in_bytes_per_row, size_t width, size_t height,
+    uint32_t* out, size_t out_bytes_per_row,
+    uint32_t replacement, uint8_t rgb_gap
+);
 
 
 

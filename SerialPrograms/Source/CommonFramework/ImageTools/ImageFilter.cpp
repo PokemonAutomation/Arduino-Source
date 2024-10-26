@@ -143,6 +143,18 @@ std::vector<std::pair<ImageRGB32, size_t>> to_blackwhite_rgb32_range(
     return ret;
 }
 
+ImageRGB32 filter_green(
+    const ImageViewRGB32& image,    
+    Color replace_with,
+    uint8_t rgb_gap
+){
+    ImageRGB32 ret(image.width(), image.height());
+    Kernels::filter_green(
+        image.data(), image.bytes_per_row(), image.width(), image.height(),
+        ret.data(), ret.bytes_per_row(), (uint32_t)replace_with, rgb_gap
+    );
+    return ret;
+}
 
 
 
