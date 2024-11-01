@@ -119,6 +119,14 @@ std::vector<std::pair<ImageRGB32, size_t>> to_blackwhite_rgb32_range(
 );
 
 
+// keep all pixels where green is the dominant RGB value. otherwise, replace the pixel with `replace_with`
+// `rgb_gap` is the amount that green has to exceed the red or blue value, in order to keep the pixel.
+ImageRGB32 filter_green(
+    const ImageViewRGB32& image,
+    Color replace_with,
+    uint8_t rgb_gap = 0
+);
+
 
 
 }
