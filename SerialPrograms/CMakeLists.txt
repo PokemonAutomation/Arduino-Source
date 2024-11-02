@@ -307,6 +307,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Environment/SystemSleep.h
     Source/CommonFramework/Exceptions/FatalProgramException.cpp
     Source/CommonFramework/Exceptions/FatalProgramException.h
+    Source/CommonFramework/Exceptions/OliveActionFailedException.cpp
+    Source/CommonFramework/Exceptions/OliveActionFailedException.h    
     Source/CommonFramework/Exceptions/OperationFailedException.cpp
     Source/CommonFramework/Exceptions/OperationFailedException.h
     Source/CommonFramework/Exceptions/ProgramFinishedException.cpp
