@@ -71,8 +71,8 @@ private:
     StringSelectOption STARTPOINT_TUTORIAL;
     StringSelectOption ENDPOINT_TUTORIAL;
 
-    // StringSelectOption STARTPOINT_MAINSTORY;
-    // StringSelectOption ENDPOINT_MAINSTORY;
+    StringSelectOption STARTPOINT_MAINSTORY;
+    StringSelectOption ENDPOINT_MAINSTORY;
 
     StaticTextOption MAINSTORY_NOTE;
 
