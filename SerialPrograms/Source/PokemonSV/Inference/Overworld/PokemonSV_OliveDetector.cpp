@@ -341,7 +341,7 @@ uint16_t OliveDetector::walk_up_to_olive(
         double olive_y = olive.second;
 
         uint16_t scale_factor = 2000;
-        uint16_t push_duration = std::max(uint16_t(std::pow((0.57 - olive_y), 2) * scale_factor), uint16_t(20));
+        uint16_t push_duration = std::max(uint16_t((0.57 - olive_y)*(0.57 - olive_y) * scale_factor), uint16_t(20));
         console.log("walk_up_to_olive(): olive_y: " + std::to_string(olive_y));
         if (olive_y > 0.515){
             return ticks_walked;
