@@ -1332,6 +1332,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Inference/Overworld/PokemonSV_LetsGoKillDetector.h
     Source/PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.cpp
     Source/PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h
+    Source/PokemonSV/Inference/Overworld/PokemonSV_StationaryOverworldWatcher.cpp
+    Source/PokemonSV/Inference/Overworld/PokemonSV_StationaryOverworldWatcher.h    
     Source/PokemonSV/Inference/Picnics/PokemonSV_PicnicDetector.cpp
     Source/PokemonSV/Inference/Picnics/PokemonSV_PicnicDetector.h
     Source/PokemonSV/Inference/Picnics/PokemonSV_SandwichHandDetector.cpp
