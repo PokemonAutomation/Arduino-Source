@@ -1330,6 +1330,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Inference/Overworld/PokemonSV_LetsGoHpReader.h
     Source/PokemonSV/Inference/Overworld/PokemonSV_LetsGoKillDetector.cpp
     Source/PokemonSV/Inference/Overworld/PokemonSV_LetsGoKillDetector.h
+    Source/PokemonSV/Inference/Overworld/PokemonSV_NoMinimapDetector.cpp
+    Source/PokemonSV/Inference/Overworld/PokemonSV_NoMinimapDetector.h
     Source/PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.cpp
     Source/PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h
     Source/PokemonSV/Inference/Overworld/PokemonSV_StationaryOverworldWatcher.cpp

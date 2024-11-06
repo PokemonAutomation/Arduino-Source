@@ -665,6 +665,7 @@ SOURCES += \
     Source/PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.cpp \
     Source/PokemonSV/Inference/Overworld/PokemonSV_LetsGoHpReader.cpp \
     Source/PokemonSV/Inference/Overworld/PokemonSV_LetsGoKillDetector.cpp \
+    Source/PokemonSV/Inference/Overworld/PokemonSV_NoMinimapDetector.cpp \
     Source/PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.cpp \
     Source/PokemonSV/Inference/Overworld/PokemonSV_StationaryOverworldWatcher.cpp \
     Source/PokemonSV/Inference/Picnics/PokemonSV_PicnicDetector.cpp \
@@ -1763,6 +1764,7 @@ HEADERS += \
     Source/PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h \
     Source/PokemonSV/Inference/Overworld/PokemonSV_LetsGoHpReader.h \
     Source/PokemonSV/Inference/Overworld/PokemonSV_LetsGoKillDetector.h \
+    Source/PokemonSV/Inference/Overworld/PokemonSV_NoMinimapDetector.h \
     Source/PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h \
     Source/PokemonSV/Inference/Overworld/PokemonSV_StationaryOverworldWatcher.h \
     Source/PokemonSV/Inference/Picnics/PokemonSV_PicnicDetector.h \
