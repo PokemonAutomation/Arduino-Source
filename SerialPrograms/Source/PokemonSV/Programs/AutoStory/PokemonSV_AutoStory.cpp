@@ -25,7 +25,7 @@
 #include "PokemonSV_AutoStory_Segment_07.h"
 #include "PokemonSV_AutoStory_Segment_08.h"
 #include "PokemonSV_AutoStory_Segment_09.h"
-// #include "PokemonSV_AutoStory_Segment_10.h"
+#include "PokemonSV_AutoStory_Segment_10.h"
 // #include "PokemonSV_AutoStory_Segment_11.h"
 // #include "PokemonSV_AutoStory_Segment_12.h"
 // #include "PokemonSV_AutoStory_Segment_13.h"
@@ -45,6 +45,8 @@ namespace PokemonSV{
 
 using namespace Pokemon;
 
+static constexpr size_t INDEX_OF_LAST_TUTORIAL_SEGMENT = 9;
+
 
 std::vector<std::unique_ptr<AutoStory_Segment>> make_autoStory_segment_list(){
     std::vector<std::unique_ptr<AutoStory_Segment>> segment_list;
@@ -58,7 +60,7 @@ std::vector<std::unique_ptr<AutoStory_Segment>> make_autoStory_segment_list(){
     segment_list.emplace_back(std::make_unique<AutoStory_Segment_07>());
     segment_list.emplace_back(std::make_unique<AutoStory_Segment_08>());
     segment_list.emplace_back(std::make_unique<AutoStory_Segment_09>());
-    // segment_list.emplace_back(std::make_unique<AutoStory_Segment_10>());
+    segment_list.emplace_back(std::make_unique<AutoStory_Segment_10>());
     // segment_list.emplace_back(std::make_unique<AutoStory_Segment_11>());
     // segment_list.emplace_back(std::make_unique<AutoStory_Segment_12>());
     // segment_list.emplace_back(std::make_unique<AutoStory_Segment_13>());
@@ -91,7 +93,7 @@ StringSelectDatabase make_tutorial_segments_database(){
     StringSelectDatabase ret;
     const StringSelectDatabase& all_segments = ALL_SEGMENTS_SELECT_DATABASE();
     size_t start = 0;
-    size_t end = all_segments.case_list().size(); // 10. size() is the placeholder value. will be 10 when rest of segments merged.
+    size_t end = INDEX_OF_LAST_TUTORIAL_SEGMENT + 1;
     for (size_t i = start; i < end; i++){
         const auto& segment = all_segments[i];
         ret.add_entry(segment);
@@ -107,7 +109,7 @@ const StringSelectDatabase& TUTORIAL_SEGMENTS_SELECT_DATABASE(){
 StringSelectDatabase make_mainstory_segments_database(){
     StringSelectDatabase ret;
     const StringSelectDatabase& all_segments = ALL_SEGMENTS_SELECT_DATABASE();
-    size_t start = 0; // 10. 0 is the placeholder value. will be 10 when rest of segments merged.
+    size_t start = INDEX_OF_LAST_TUTORIAL_SEGMENT + 1;
     size_t end = all_segments.case_list().size();
     for (size_t i = start; i < end; i++){
         const auto& segment = all_segments[i];
@@ -171,20 +173,20 @@ AutoStory::AutoStory()
         "<b>End Point:</b><br>Program will stop after completing this segment.",
         TUTORIAL_SEGMENTS_SELECT_DATABASE(),
         LockMode::UNLOCK_WHILE_RUNNING,
-        "0"  //"9"
+        "9"
     )   
-    // , STARTPOINT_MAINSTORY(
-    //     "<b>Start Point:</b><br>Program will start with this segment.",
-    //     MAINSTORY_SEGMENTS_SELECT_DATABASE(),
-    //     LockMode::UNLOCK_WHILE_RUNNING,
-    //     "10"
-    // )
-    // , ENDPOINT_MAINSTORY(
-    //     "<b>End Point:</b><br>Program will stop after completing this segment.",
-    //     MAINSTORY_SEGMENTS_SELECT_DATABASE(),
-    //     LockMode::UNLOCK_WHILE_RUNNING,
-    //     "10"
-    // )       
+    , STARTPOINT_MAINSTORY(
+        "<b>Start Point:</b><br>Program will start with this segment.",
+        MAINSTORY_SEGMENTS_SELECT_DATABASE(),
+        LockMode::UNLOCK_WHILE_RUNNING,
+        "10"
+    )
+    , ENDPOINT_MAINSTORY(
+        "<b>End Point:</b><br>Program will stop after completing this segment.",
+        MAINSTORY_SEGMENTS_SELECT_DATABASE(),
+        LockMode::UNLOCK_WHILE_RUNNING,
+        "10"
+    )       
     , MAINSTORY_NOTE{
         "Ensure you have a level 100 Gardevoir with the moves in the following order: Moonblast, Dazzling Gleam, Psychic, Mystical Fire.<br>"
         "Refer to the documentation on github for more details."
@@ -322,10 +324,10 @@ AutoStory::AutoStory()
     PA_ADD_OPTION(STORY_SECTION);
     PA_ADD_OPTION(STARTPOINT_TUTORIAL);
     PA_ADD_OPTION(MAINSTORY_NOTE);
-    // PA_ADD_OPTION(STARTPOINT_MAINSTORY);
+    PA_ADD_OPTION(STARTPOINT_MAINSTORY);
     PA_ADD_OPTION(START_DESCRIPTION);
     PA_ADD_OPTION(ENDPOINT_TUTORIAL);
-    // PA_ADD_OPTION(ENDPOINT_MAINSTORY);
+    PA_ADD_OPTION(ENDPOINT_MAINSTORY);
     PA_ADD_OPTION(END_DESCRIPTION);
     PA_ADD_OPTION(STARTERCHOICE);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
@@ -362,8 +364,8 @@ AutoStory::AutoStory()
     STORY_SECTION.add_listener(*this);
     STARTPOINT_TUTORIAL.add_listener(*this);
     ENDPOINT_TUTORIAL.add_listener(*this);
-    // STARTPOINT_MAINSTORY.add_listener(*this);
-    // ENDPOINT_MAINSTORY.add_listener(*this);    
+    STARTPOINT_MAINSTORY.add_listener(*this);
+    ENDPOINT_MAINSTORY.add_listener(*this);    
     ENABLE_TEST_CHECKPOINTS.add_listener(*this);
     ENABLE_TEST_REALIGN.add_listener(*this);
     ENABLE_TEST_OVERWORLD_MOVE.add_listener(*this);
@@ -380,14 +382,14 @@ void AutoStory::value_changed(void* object){
         STARTPOINT_TUTORIAL.set_visibility(ConfigOptionState::ENABLED);
         ENDPOINT_TUTORIAL.set_visibility(ConfigOptionState::ENABLED);
 
-        // STARTPOINT_MAINSTORY.set_visibility(ConfigOptionState::HIDDEN);
-        // ENDPOINT_MAINSTORY.set_visibility(ConfigOptionState::HIDDEN);
+        STARTPOINT_MAINSTORY.set_visibility(ConfigOptionState::HIDDEN);
+        ENDPOINT_MAINSTORY.set_visibility(ConfigOptionState::HIDDEN);
     }else if (STORY_SECTION == StorySection::MAIN_STORY){
         STARTPOINT_TUTORIAL.set_visibility(ConfigOptionState::HIDDEN);
         ENDPOINT_TUTORIAL.set_visibility(ConfigOptionState::HIDDEN);
 
-        // STARTPOINT_MAINSTORY.set_visibility(ConfigOptionState::ENABLED);
-        // ENDPOINT_MAINSTORY.set_visibility(ConfigOptionState::ENABLED);        
+        STARTPOINT_MAINSTORY.set_visibility(ConfigOptionState::ENABLED);
+        ENDPOINT_MAINSTORY.set_visibility(ConfigOptionState::ENABLED);        
     }
 
     MAINSTORY_NOTE.set_visibility(STORY_SECTION == StorySection::TUTORIAL ? ConfigOptionState::HIDDEN : ConfigOptionState::ENABLED);
@@ -478,9 +480,9 @@ void AutoStory::test_checkpoints(
     checkpoint_list.push_back([&](){checkpoint_18(env, context, notif_status_update);});
     checkpoint_list.push_back([&](){checkpoint_19(env, context, notif_status_update);});
     checkpoint_list.push_back([&](){checkpoint_20(env, context, notif_status_update);});
-    // checkpoint_list.push_back([&](){checkpoint_21(env, context, notif_status_update);});
-    // checkpoint_list.push_back([&](){checkpoint_22(env, context, notif_status_update);});
-    // checkpoint_list.push_back([&](){checkpoint_23(env, context, notif_status_update);});
+    checkpoint_list.push_back([&](){checkpoint_21(env, context, notif_status_update);});
+    checkpoint_list.push_back([&](){checkpoint_22(env, context, notif_status_update);});
+    checkpoint_list.push_back([&](){checkpoint_23(env, context, notif_status_update);});
     // checkpoint_list.push_back([&](){checkpoint_24(env, context, notif_status_update);});
     // checkpoint_list.push_back([&](){checkpoint_25(env, context, notif_status_update);});
     // checkpoint_list.push_back([&](){checkpoint_26(env, context, notif_status_update);});
@@ -527,7 +529,7 @@ std::string AutoStory::start_segment_description(){
     if (STORY_SECTION == StorySection::TUTORIAL){
         segment_index = STARTPOINT_TUTORIAL.index();
     }else if (STORY_SECTION == StorySection::MAIN_STORY){
-        // segment_index = STARTPOINT_MAINSTORY.index() + 10;
+        segment_index = STARTPOINT_MAINSTORY.index() + (INDEX_OF_LAST_TUTORIAL_SEGMENT + 1);
     }
     return ALL_AUTO_STORY_SEGMENT_LIST()[segment_index]->start_text();
 }
@@ -537,7 +539,7 @@ std::string AutoStory::end_segment_description(){
     if (STORY_SECTION == StorySection::TUTORIAL){
         segment_index = ENDPOINT_TUTORIAL.index();
     }else if (STORY_SECTION == StorySection::MAIN_STORY){
-        // segment_index = ENDPOINT_MAINSTORY.index() + 10;
+        segment_index = ENDPOINT_MAINSTORY.index() + (INDEX_OF_LAST_TUTORIAL_SEGMENT + 1);
     }    
     return ALL_AUTO_STORY_SEGMENT_LIST()[segment_index]->end_text();
 }
@@ -552,6 +554,15 @@ void AutoStory::run_autostory(SingleSwitchProgramEnvironment& env, BotBaseContex
 
     size_t start = STARTPOINT_TUTORIAL.index();
     size_t end = ENDPOINT_TUTORIAL.index();
+
+    if (STORY_SECTION == StorySection::TUTORIAL){
+        start = STARTPOINT_TUTORIAL.index();
+        end = ENDPOINT_TUTORIAL.index();
+    }else if (STORY_SECTION == StorySection::MAIN_STORY){
+        start = (INDEX_OF_LAST_TUTORIAL_SEGMENT + 1) + STARTPOINT_MAINSTORY.index();
+        end = (INDEX_OF_LAST_TUTORIAL_SEGMENT + 1) + ENDPOINT_MAINSTORY.index();     
+    }
+
     for (size_t segment_index = start; segment_index <= end; segment_index++){
         ALL_AUTO_STORY_SEGMENT_LIST()[segment_index]->run_segment(env, context, options);
     }

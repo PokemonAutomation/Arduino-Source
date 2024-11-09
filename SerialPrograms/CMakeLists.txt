@@ -1455,7 +1455,9 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_08.cpp
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_08.h
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_09.cpp
-    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_09.h    
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_09.h
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_10.cpp
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_10.h        
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory.cpp
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory.h
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStoryTools.cpp
