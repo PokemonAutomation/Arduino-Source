@@ -2056,8 +2056,8 @@ else() # WIN and Linux:
 endif()
 
 set_target_properties(SerialPrograms PROPERTIES LINKER_LANGUAGE CXX)
-target_link_libraries(SerialPrograms Qt${QT_MAJOR}::Widgets Qt${QT_MAJOR}::SerialPort Qt${QT_MAJOR}::Multimedia Qt${QT_MAJOR}::MultimediaWidgets)
-target_link_libraries(SerialPrograms Threads::Threads)
+target_link_libraries(SerialPrograms PRIVATE Qt${QT_MAJOR}::Widgets Qt${QT_MAJOR}::SerialPort Qt${QT_MAJOR}::Multimedia Qt${QT_MAJOR}::MultimediaWidgets)
+target_link_libraries(SerialPrograms PRIVATE Threads::Threads)
 
 #add defines
 target_compile_definitions(SerialPrograms PRIVATE NOMINMAX)
@@ -2107,7 +2107,7 @@ if (MSVC)
         MAP_IMPORTED_CONFIG_MINSIZEREL      RELEASE
     )
 
-    target_link_libraries(SerialPrograms tesseractPA.lib OpenCV_lib Sleepy.lib dpp_lib)
+    target_link_libraries(SerialPrograms PRIVATE tesseractPA.lib OpenCV_lib Sleepy.lib dpp_lib)
     target_compile_definitions(SerialPrograms PRIVATE PA_TESSERACT PA_SLEEPY PA_DPP _CRT_SECURE_NO_WARNINGS)
 
     target_compile_options(SerialPrograms PRIVATE /FAs /FaAssembly/ /MP /W4 /WX /utf-8)
@@ -2137,7 +2137,7 @@ else()
     # pkg_search_module(OPENCV REQUIRED opencv)
     include_directories(${OpenCV_INCLUDE_DIRS})
     link_directories(${OpenCV_LIBRARY_DIRS})
-    target_link_libraries(SerialPrograms ${OpenCV_LIBS})
+    target_link_libraries(SerialPrograms PRIVATE ${OpenCV_LIBS})
 
     #we hope to use our own Tesseract build in future so we can rid that dependency
     #but right now to run on Linux and Mac we need to use external Tesseract library
@@ -2150,8 +2150,8 @@ else()
         include_directories(${LEPTONICA_INCLUDE_DIRS})
         link_directories(${TESSERACT_LIBRARY_DIRS})
         link_directories(${LEPTONICA_LIBRARY_DIRS})
-        target_link_libraries(SerialPrograms ${TESSERACT_LINK_LIBRARIES})
-        target_link_libraries(SerialPrograms ${LEPTONICA_LINK_LIBRARIES})
+        target_link_libraries(SerialPrograms PRIVATE ${TESSERACT_LINK_LIBRARIES})
+        target_link_libraries(SerialPrograms PRIVATE ${LEPTONICA_LINK_LIBRARIES})
     endif()
 
     # enable dpp integration
@@ -2162,7 +2162,7 @@ else()
             INTERFACE_COMPILE_DEFINITIONS "PA_DPP"
             INTERFACE_LINK_LIBRARIES "-L/opt/homebrew/lib -lssl -lcrypto -lopus -lsodium -lz" # add dpp's deps
         )
-        target_link_libraries(SerialPrograms libdpp)
+        target_link_libraries(SerialPrograms PRIVATE libdpp)
     endif()
 
     # Add -Wno-c11-extensions to avoid clang gives
@@ -2174,7 +2174,7 @@ else()
     if (WIN32)
     elseif (APPLE)
         # on macOS, need this framework to query OS API to control display sleep and system sleep behavior
-        target_link_libraries(SerialPrograms "-framework IOKit -framework CoreFoundation")
+        target_link_libraries(SerialPrograms PRIVATE "-framework IOKit -framework CoreFoundation")
     elseif(UNIX)
     endif()
 
@@ -2271,3 +2271,5 @@ file(GLOB MY_DLLS
 )
 file(COPY ${MY_DLLS} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 endif()
+
+qt_finalize_target(SerialPrograms)
