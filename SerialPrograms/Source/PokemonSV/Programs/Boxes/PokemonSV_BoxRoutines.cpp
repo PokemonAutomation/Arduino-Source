@@ -123,7 +123,7 @@ void change_view_to_judge(
         //  If less than 4 of the IVs are read, assume we're not on the judge screen.
         if (detected < 4){
             pbf_press_button(context, BUTTON_PLUS, 20, 230);
-        }else if (detected == 6){
+        }else{
             break;
         }
     }
