@@ -2034,7 +2034,7 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}../../ FILES ${MAIN_SOURCES})
 
 if (APPLE)
     # TODO: set up the correct application icon
-    # set(SerialPrograms_ICON ${CMAKE_CURRENT_SOURCE_DIR}/../Resources/icon.icns)
+    set(SerialPrograms_ICON ${CMAKE_CURRENT_SOURCE_DIR}/../IconResource/icon.icns)
     # set_source_files_properties(SerialPrograms_ICON PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
 
     # Links on how to create a MacOS app bundle with cmake
@@ -2047,9 +2047,10 @@ if (APPLE)
         MACOSX_BUNDLE_BUNDLE_NAME SerialPrograms
         MACOSX_BUNDLE_BUNDLE_VERSION "0.1"
         MACOSX_BUNDLE_SHORT_VERSION_STRING "0.1"
-        # MACOSX_BUNDLE_ICON_FILE icon
+        MACOSX_BUNDLE_ICON_FILE "icon.icns"
         # MacOSXBundleInfo.plist.in is modified from https://github.com/Kitware/CMake/blob/master/Modules/MacOSXBundleInfo.plist.in
         MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/cmake/MacOSXBundleInfo.plist.in
+        RESOURCE ${SerialPrograms_ICON}
     )
 else() # WIN and Linux:
     add_executable(SerialPrograms WIN32 ${MAIN_SOURCES})
