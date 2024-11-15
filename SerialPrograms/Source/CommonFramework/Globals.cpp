@@ -55,13 +55,22 @@ const std::string PROJECT_SOURCE_URL = "https://github.com/PokemonAutomation/Ard
 
 namespace{
 
+QString get_application_base_dir_path(){
+    QString application_dir_path = qApp->applicationDirPath();
+    if (application_dir_path.endsWith(".app/Contents/MacOS")){
+        // a macOS bundle. Change working directory to the folder that hosts the .app folder.
+        QString app_bundle_path = application_dir_path.chopped(15);
+        QString base_folder_path = QFileInfo(app_bundle_path).dir().absolutePath();
+        return base_folder_path;
+    }
+    return application_dir_path;
+}
 std::string get_resource_path(){
     //  Find the resource directory.
-    QString path = QCoreApplication::applicationDirPath();
+    QString path = get_application_base_dir_path();
     for (size_t c = 0; c < 5; c++){
         QString try_path = path + "/Resources/";
         QFile file(try_path);
-//        cout << path.toUtf8().data() << endl;
         if (file.exists()){
             return try_path.toStdString();
         }
@@ -70,12 +79,11 @@ std::string get_resource_path(){
     return (QCoreApplication::applicationDirPath() + "/../Resources/").toStdString();
 }
 std::string get_training_path(){
-    //  Find the resource directory.
-    QString path = QCoreApplication::applicationDirPath();
+    //  Find the training data directory.
+    QString path = get_application_base_dir_path();
     for (size_t c = 0; c < 5; c++){
         QString try_path = path + "/TrainingData/";
         QFile file(try_path);
-//        cout << path.toUtf8().data() << endl;
         if (file.exists()){
             return try_path.toStdString();
         }
@@ -85,15 +93,13 @@ std::string get_training_path(){
 }
 
 std::string get_runtime_base_path(){
-    QString application_dir_path = qApp->applicationDirPath();
-    if (application_dir_path.endsWith(".app/Contents/MacOS")){
-        // a macOS bundle. Change working directory to the folder that hosts the .app folder.
-        QString app_bundle_path = application_dir_path.chopped(15);
-        QString base_folder_path = QFileInfo(app_bundle_path).dir().absolutePath();
-        return base_folder_path.toStdString() + "/";
+    if (QSysInfo::productType() == "macos" || QSysInfo::productType() == "osx"){
+        QString application_dir_path = get_application_base_dir_path();
+        return application_dir_path.toStdString() + "/";
     }
     return "./";
 }
+
 const std::string& RUNTIME_BASE_PATH(){
     static std::string path = get_runtime_base_path();
     return path;

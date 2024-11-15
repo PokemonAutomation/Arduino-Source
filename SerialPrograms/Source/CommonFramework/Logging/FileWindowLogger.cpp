@@ -7,6 +7,7 @@
 #include <QCoreApplication>
 #include <QMenuBar>
 #include <QDir>
+#include <CommonFramework/Globals.h>
 #include "CommonFramework/Windows/DpiScaler.h"
 #include "CommonFramework/Windows/WindowTracker.h"
 #include "FileWindowLogger.h"
@@ -19,7 +20,7 @@ namespace PokemonAutomation{
 
 
 Logger& global_logger_raw(){
-    static FileWindowLogger logger((QCoreApplication::applicationName() + ".log").toStdString());
+    static FileWindowLogger logger(USER_FILE_PATH() + (QCoreApplication::applicationName() + ".log").toStdString());
     return logger;
 }
 
