@@ -2273,4 +2273,6 @@ file(GLOB MY_DLLS
 file(COPY ${MY_DLLS} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 endif()
 
-qt_finalize_target(SerialPrograms)
+if (QT_MAJOR EQUAL 6)
+    qt_finalize_target(SerialPrograms)
+endif()
