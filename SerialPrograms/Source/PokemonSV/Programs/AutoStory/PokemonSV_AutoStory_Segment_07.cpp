@@ -122,7 +122,9 @@ void checkpoint_12(
             realign_player(info, env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 30, 0, 50);
             walk_forward_while_clear_front_path(info, env.console, context, 1000);
 
-            heal_at_pokecenter(info, env.console, context);
+            fly_to_overlapping_flypoint(info, env.console, context);
+
+            // heal_at_pokecenter(info, env.console, context);
    
         }  
         );
