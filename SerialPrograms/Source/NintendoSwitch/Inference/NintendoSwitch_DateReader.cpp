@@ -8,6 +8,7 @@
 #include "Common/Qt/StringToolsQt.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Exceptions/FatalProgramException.h"
+#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/ImageFilter.h"
@@ -18,6 +19,9 @@
 #include "CommonFramework/OCR/OCR_RawOCR.h"
 #include "CommonFramework/OCR/OCR_NumberReader.h"
 #include "CommonFramework/OCR/OCR_StringNormalization.h"
+#include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
+#include "NintendoSwitch/NintendoSwitch_Settings.h"
+#include "NintendoSwitch/Inference/NintendoSwitch_DetectHome.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch_DateReader.h"
@@ -566,6 +570,54 @@ void DateReader::set_date(
         "Failed to set the hour after 10 attempts.",
         true
     );
+}
+
+void change_date(
+    SingleSwitchProgramEnvironment& env, BotBaseContext& context,
+    const DateTime& date
+){
+    while (true){
+        context.wait_for_all_requests();
+
+        HomeWatcher home;
+        DateChangeWatcher date_reader;
+        int ret = wait_until(
+            env.console, context, std::chrono::seconds(120),
+            {
+                home,
+                date_reader
+            }
+        );
+        switch (ret){
+        case 0:
+            home_to_date_time(context, true, false);
+            pbf_press_button(context, BUTTON_A, 10, 30);
+            context.wait_for_all_requests();
+            continue;
+        case 1:{
+            env.log("Detected date change.");
+
+            // Set the date
+            VideoOverlaySet overlays(env.console.overlay());
+            date_reader.make_overlays(overlays);
+            date_reader.set_date(env.program_info(), env.console, context, date);
+
+            //  Commit the date.
+            pbf_press_button(context, BUTTON_A, 20, 30);
+
+            //  Re-enter the game.
+            pbf_press_button(context, BUTTON_HOME, 20, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
+
+            return;
+        }
+        default:
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT,
+                env.logger(),
+                "Failed to set date"
+            );
+        }
+    }
 }
 
 

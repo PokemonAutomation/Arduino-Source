@@ -12,16 +12,21 @@
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
+#include "CommonFramework/ImageTools/ImageBoxes.h"
+#include "CommonFramework/ImageTools/ImageFilter.h"
+#include "CommonFramework/OCR/OCR_NumberReader.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_SnapshotDumper.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_NormalBattleMenus.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
-// #include "PokemonSV/Inference/Overworld/PokemonSV_StationaryOverworldWatcher.h"
+#include "PokemonSV/Inference/Overworld/PokemonSV_StationaryOverworldWatcher.h"
 #include "PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
 #include "PokemonSV/Inference/Map/PokemonSV_MapMenuDetector.h"
+#include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_SaveGame.h"
@@ -380,7 +385,7 @@ bool confirm_marker_present(
 
         int ret = wait_until(
             console, context, 
-            std::chrono::seconds(10),
+            std::chrono::seconds(5),
             {marker, battle}
         );
         switch (ret){
@@ -454,9 +459,11 @@ void overworld_navigation(
                             }
                         }
                     }
+                    context.wait_for_all_requests();
                     if (should_realign){
                         try {
                             realign_player(info, console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
+                   
                         }catch (UnexpectedBattleException&){
                             pbf_wait(context, 30 * TICKS_PER_SECOND);  // catch exception to allow the battle callback to take over.
                         }
@@ -479,10 +486,9 @@ void overworld_navigation(
             if (auto_heal){
                 auto_heal_from_menu_or_overworld(info, console, context, 0, true);
             }
-
+            context.wait_for_all_requests();
             try {
                 realign_player(info, console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
-
                 if (!confirm_marker_present(info, console, context)){  
                     // if marker not present, don't keep walking forward.
                     return;
@@ -682,7 +688,7 @@ void do_action_and_monitor_for_battles(
         {battle_menu}
     );
     if (ret == 0){ // battle detected
-        throw OperationFailedException(
+        throw UnexpectedBattleException(
             ErrorReport::SEND_ERROR_REPORT, console,
             "do_action_and_monitor_for_battles(): Detected battle. Failed to complete action.",
             true
@@ -713,52 +719,65 @@ void handle_unexpected_battles(
     }
 }
 
-// void handle_when_stationary_in_overworld(
-//     const ProgramInfo& info, 
-//     ConsoleHandle& console,
-//     BotBaseContext& context,
-//     std::function<
-//         void(const ProgramInfo& info, 
-//         ConsoleHandle& console,
-//         BotBaseContext& context)
-//     >&& action,
-//     std::function<
-//         void(const ProgramInfo& info, 
-//         ConsoleHandle& console,
-//         BotBaseContext& context)
-//     >&& recovery_action,
-//     size_t seconds_stationary,
-//     uint16_t minutes_timeout
-// ){
-//     StationaryOverworldWatcher stationary_overworld(COLOR_RED, {0.865, 0.82, 0.08, 0.1}, seconds_stationary);
-//     WallClock start = current_time();
-//     while (true){
-//         if (current_time() - start > std::chrono::minutes(minutes_timeout)){
-//             throw OperationFailedException(
-//                 ErrorReport::SEND_ERROR_REPORT, console,
-//                 "handle_when_stationary_in_overworld(): Failed to complete action after 5 minutes.",
-//                 true
-//             );
-//         }
+void handle_when_stationary_in_overworld(
+    const ProgramInfo& info, 
+    ConsoleHandle& console,
+    BotBaseContext& context,
+    std::function<
+        void(const ProgramInfo& info, 
+        ConsoleHandle& console,
+        BotBaseContext& context)
+    >&& action,
+    std::function<
+        void(const ProgramInfo& info, 
+        ConsoleHandle& console,
+        BotBaseContext& context)
+    >&& recovery_action,
+    size_t seconds_stationary,
+    uint16_t minutes_timeout, 
+    size_t max_failures
+){
+    
+    WallClock start = current_time();
+    size_t num_failures = 0;
+    while (true){
+        if (current_time() - start > std::chrono::minutes(minutes_timeout)){
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT, console,
+                "handle_when_stationary_in_overworld(): Failed to complete action after " + std::to_string(minutes_timeout) + " minutes.",
+                true
+            );
+        }
+        StationaryOverworldWatcher stationary_overworld(COLOR_RED, {0.865, 0.825, 0.08, 0.1}, seconds_stationary);
 
-//         int ret = run_until(
-//             console, context,
-//             [&](BotBaseContext& context){
-//                 context.wait_for_all_requests();
-//                 action(info, console, context);
-//             },
-//             {stationary_overworld}        
-//         );
-//         if (ret < 0){
-//             // successfully completed action without being stuck in a position where the overworld is stationary.
-//             return;
-//         }else if (ret == 0){
-//             // if stationary in overworld, run recovery action then try action again
-//             context.wait_for_all_requests();
-//             recovery_action(info, console, context);            
-//         }
-//     }
-// }
+        int ret = run_until(
+            console, context,
+            [&](BotBaseContext& context){
+                context.wait_for_all_requests();
+                action(info, console, context);
+            },
+            {stationary_overworld}        
+        );
+        if (ret < 0){
+            // successfully completed action without being stuck in a position where the overworld is stationary.
+            return;
+        }else if (ret == 0){
+            // if stationary in overworld, run recovery action then try action again
+            console.log("Detected stationary overworld.");
+            num_failures++;
+            if (num_failures > max_failures){
+                throw OperationFailedException(
+                    ErrorReport::SEND_ERROR_REPORT, console,
+                    "handle_when_stationary_in_overworld(): Failed to complete action within " + std::to_string(max_failures) + " attempts.",
+                    true
+                );                
+            }
+            context.wait_for_all_requests();
+            recovery_action(info, console, context);    
+        }
+    }
+}
+
 
 void wait_for_gradient_arrow(
     const ProgramInfo& info, 
@@ -860,6 +879,8 @@ bool check_ride_active(const ProgramInfo& info, ConsoleHandle& console, BotBaseC
 }
 
 void get_on_ride(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+    pbf_press_button(context, BUTTON_PLUS, 20, 20);
+
     WallClock start = current_time();
     while (!check_ride_active(info, console, context)){
         if (current_time() - start > std::chrono::minutes(3)){
@@ -1063,6 +1084,28 @@ void move_cursor_towards_flypoint_and_go_there(
     
 
 }
+
+
+
+void check_num_sunflora_found(SingleSwitchProgramEnvironment& env, BotBaseContext& context, int expected_number){
+    context.wait_for_all_requests();
+    VideoSnapshot screen = env.console.video().snapshot();
+    ImageFloatBox num_sunflora_box = {0.27, 0.02, 0.04, 0.055};
+    int number = OCR::read_number_waterfill(env.console, extract_box_reference(screen, num_sunflora_box), 0xff000000, 0xff808080);
+
+    if (number != expected_number){
+        throw OperationFailedException(
+            ErrorReport::SEND_ERROR_REPORT,
+            env.logger(),
+            "The number of sunflora found is different than expected."
+        );
+    }else{
+        env.console.log("Number of sunflora found: " + std::to_string(number));
+    }
+
+
+}
+
 
 
 }

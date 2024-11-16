@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonSV_AutoStoryTools_H
 #define PokemonAutomation_PokemonSV_AutoStoryTools_H
 
+#include "Common/Cpp/DateTime.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Language.h"
@@ -191,6 +192,8 @@ void handle_unexpected_battles(
 // if stationary in overworld for an amount of time (seconds_stationary), run `recovery_action` then try `action` again
 // return once successfully completed `action`
 // throw exception if fails to complete `action` within a certain amount of time (minutes_timeout).
+// NOTE: if using this function to wrap overworld_navigation(), keep in mind that 
+// confirm_marker_present() will keep the player still for 5 seconds before moving. Therefore, seconds_stationary should be greater than 5 seconds in this case.
 void handle_when_stationary_in_overworld(
     const ProgramInfo& info, 
     ConsoleHandle& console,
@@ -205,8 +208,9 @@ void handle_when_stationary_in_overworld(
         ConsoleHandle& console,
         BotBaseContext& context)
     >&& recovery_action,
-    size_t seconds_stationary = 5,
-    uint16_t minutes_timeout = 5
+    size_t seconds_stationary = 6,
+    uint16_t minutes_timeout = 5,
+    size_t max_attempts = 2
 );
 
 void wait_for_gradient_arrow(
@@ -282,6 +286,9 @@ void move_cursor_towards_flypoint_and_go_there(
     BotBaseContext& context,
     MoveCursor move_cursor_near_flypoint
 );
+
+
+void check_num_sunflora_found(SingleSwitchProgramEnvironment& env, BotBaseContext& context, int expected_number);
 
 }
 }
