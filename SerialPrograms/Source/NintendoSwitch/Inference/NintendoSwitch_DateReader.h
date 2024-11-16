@@ -11,6 +11,7 @@
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 #include "CommonFramework/Inference/VisualDetector.h"
+#include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
     struct ProgramInfo;
@@ -100,6 +101,14 @@ public:
          : DetectorToFinder("DateChangeWatcher", duration)
     {}
 };
+
+// starting from Home screen, change the date to the desired date
+// then go back to the home screen
+void change_date(
+    SingleSwitchProgramEnvironment& env, 
+    BotBaseContext& context,
+    const DateTime& date
+);
 
 
 

@@ -287,13 +287,6 @@ void move_cursor_towards_flypoint_and_go_there(
     MoveCursor move_cursor_near_flypoint
 );
 
-// starting from Home screen, change the date to the desired date
-// then go back to the home screen
-void change_date(
-    SingleSwitchProgramEnvironment& env, 
-    BotBaseContext& context,
-    const DateTime& date
-);
 
 void check_num_sunflora_found(SingleSwitchProgramEnvironment& env, BotBaseContext& context, int expected_number);
 
