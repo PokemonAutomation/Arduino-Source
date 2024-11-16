@@ -553,7 +553,7 @@ void leave_phone_to_overworld(const ProgramInfo& info, ConsoleHandle& console, B
             ErrorReport::SEND_ERROR_REPORT, console,
             "leave_phone_to_overworld(): Unknown state after 10 button Y presses.",
             true
-        );         
+        );
     }
 
 }
