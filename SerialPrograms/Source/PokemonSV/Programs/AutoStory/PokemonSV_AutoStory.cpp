@@ -26,9 +26,9 @@
 #include "PokemonSV_AutoStory_Segment_08.h"
 #include "PokemonSV_AutoStory_Segment_09.h"
 #include "PokemonSV_AutoStory_Segment_10.h"
-// #include "PokemonSV_AutoStory_Segment_11.h"
-// #include "PokemonSV_AutoStory_Segment_12.h"
-// #include "PokemonSV_AutoStory_Segment_13.h"
+#include "PokemonSV_AutoStory_Segment_11.h"
+#include "PokemonSV_AutoStory_Segment_12.h"
+#include "PokemonSV_AutoStory_Segment_13.h"
 // #include "PokemonSV_AutoStory_Segment_14.h"
 // #include "PokemonSV_AutoStory_Segment_15.h"
 #include "PokemonSV_AutoStory.h"
@@ -61,9 +61,9 @@ std::vector<std::unique_ptr<AutoStory_Segment>> make_autoStory_segment_list(){
     segment_list.emplace_back(std::make_unique<AutoStory_Segment_08>());
     segment_list.emplace_back(std::make_unique<AutoStory_Segment_09>());
     segment_list.emplace_back(std::make_unique<AutoStory_Segment_10>());
-    // segment_list.emplace_back(std::make_unique<AutoStory_Segment_11>());
-    // segment_list.emplace_back(std::make_unique<AutoStory_Segment_12>());
-    // segment_list.emplace_back(std::make_unique<AutoStory_Segment_13>());
+    segment_list.emplace_back(std::make_unique<AutoStory_Segment_11>());
+    segment_list.emplace_back(std::make_unique<AutoStory_Segment_12>());
+    segment_list.emplace_back(std::make_unique<AutoStory_Segment_13>());
     // segment_list.emplace_back(std::make_unique<AutoStory_Segment_14>());
 
     return segment_list;
@@ -483,12 +483,12 @@ void AutoStory::test_checkpoints(
     checkpoint_list.push_back([&](){checkpoint_21(env, context, notif_status_update);});
     checkpoint_list.push_back([&](){checkpoint_22(env, context, notif_status_update);});
     checkpoint_list.push_back([&](){checkpoint_23(env, context, notif_status_update);});
-    // checkpoint_list.push_back([&](){checkpoint_24(env, context, notif_status_update);});
-    // checkpoint_list.push_back([&](){checkpoint_25(env, context, notif_status_update);});
-    // checkpoint_list.push_back([&](){checkpoint_26(env, context, notif_status_update);});
-    // checkpoint_list.push_back([&](){checkpoint_27(env, context, notif_status_update);});
-    // checkpoint_list.push_back([&](){checkpoint_28(env, context, notif_status_update);});
-    // checkpoint_list.push_back([&](){checkpoint_29(env, context, notif_status_update);});
+    checkpoint_list.push_back([&](){checkpoint_24(env, context, notif_status_update);});
+    checkpoint_list.push_back([&](){checkpoint_25(env, context, notif_status_update);});
+    checkpoint_list.push_back([&](){checkpoint_26(env, context, notif_status_update);});
+    checkpoint_list.push_back([&](){checkpoint_27(env, context, notif_status_update);});
+    checkpoint_list.push_back([&](){checkpoint_28(env, context, notif_status_update);});
+    checkpoint_list.push_back([&](){checkpoint_29(env, context, notif_status_update);});
     // checkpoint_list.push_back([&](){checkpoint_30(env, context, notif_status_update);});
     // checkpoint_list.push_back([&](){checkpoint_31(env, context, notif_status_update);});
     // checkpoint_list.push_back([&](){checkpoint_32(env, context, notif_status_update);});
