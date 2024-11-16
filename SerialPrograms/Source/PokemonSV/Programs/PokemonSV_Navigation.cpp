@@ -832,9 +832,10 @@ void walk_forward_until_dialog(
             if (movement_mode == NavigationMovementMode::DIRECTIONAL_ONLY){
                 pbf_wait(context, seconds_timeout * TICKS_PER_SECOND);
             } else if (movement_mode == NavigationMovementMode::DIRECTIONAL_SPAM_A){
-                for (size_t j = 0; j < seconds_timeout; j++){
-                    pbf_press_button(context, BUTTON_A, 20, 105);
-                }
+                pbf_mash_button(context, BUTTON_A, seconds_timeout * TICKS_PER_SECOND);
+                // for (size_t j = 0; j < seconds_timeout; j++){
+                //     pbf_press_button(context, BUTTON_A, 20, 105);
+                // }
             }
         },
         {dialog}

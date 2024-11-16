@@ -94,7 +94,7 @@ std::pair<double, double> OverworldDetector::locate_ball(const ImageViewRGB32& s
 
     // yellow arrow has area of 70-80. the yellow ball, when only partially filled (i.e. only the outer ring is waterfilled), has an area of 200. 
     // when the ball is fully filled in, it has an area of 550
-    const double min_object_size = strict_requirements ? 150.0 : 0;
+    const double min_object_size = strict_requirements ? 150.0 : 50;
     const double rmsd_threshold = strict_requirements ? 35.0 : 50.0;
 
     const double screen_rel_size = (screen.height() / 1080.0);
