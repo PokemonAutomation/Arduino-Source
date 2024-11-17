@@ -691,7 +691,6 @@ file(GLOB MAIN_SOURCES
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_AVX512.cpp
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_SSE42.cpp
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Green_Default.cpp
-    Source/Kernels/ImageFilters/Kernels_ImageFilter_Green_Default.h
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness.cpp
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness.h
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_Default.cpp
@@ -1466,6 +1465,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_12.h
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_13.cpp
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_13.h
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_14.cpp
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_14.h
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory.cpp
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory.h
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStoryTools.cpp

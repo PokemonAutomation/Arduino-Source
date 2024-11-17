@@ -88,6 +88,7 @@ private:
     EventNotificationsOption NOTIFICATIONS;
     
     SectionDividerOption m_advanced_options;
+    SectionDividerOption m_advanced_options_end;
     BooleanCheckBoxOption CHANGE_SETTINGS;    
 
     BooleanCheckBoxOption ENABLE_TEST_CHECKPOINTS;    
@@ -103,7 +104,7 @@ private:
     SimpleIntegerOption<uint16_t> Y_REALIGN;
     SimpleIntegerOption<uint16_t> REALIGN_DURATION;
 
-    BooleanCheckBoxOption ENABLE_TEST_OVERWORLD_MOVE;    
+    BooleanCheckBoxOption ENABLE_MISC_TEST;    
     SimpleIntegerOption<uint16_t> FORWARD_TICKS;
 
     BooleanCheckBoxOption TEST_PBF_LEFT_JOYSTICK;
@@ -111,6 +112,16 @@ private:
     SimpleIntegerOption<uint16_t> Y_MOVE;
     SimpleIntegerOption<uint16_t> HOLD_TICKS;
     SimpleIntegerOption<uint16_t> RELEASE_TICKS;
+
+    BooleanCheckBoxOption TEST_PBF_LEFT_JOYSTICK2;
+    SimpleIntegerOption<uint16_t> X_MOVE2;
+    SimpleIntegerOption<uint16_t> Y_MOVE2;
+    SimpleIntegerOption<uint16_t> HOLD_TICKS2;
+    SimpleIntegerOption<uint16_t> RELEASE_TICKS2;    
+
+    BooleanCheckBoxOption TEST_CURRENT_DIRECTION;
+    BooleanCheckBoxOption TEST_CHANGE_DIRECTION;
+    FloatingPointOption DIR_RADIANS;
 };
 
 

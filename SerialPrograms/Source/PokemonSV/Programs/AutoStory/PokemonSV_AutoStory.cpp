@@ -7,6 +7,8 @@
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/UnexpectedBattleException.h"
+#include "CommonFramework/Exceptions/OliveActionFailedException.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Tools/StatsTracking.h"
@@ -15,6 +17,9 @@
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
+#include "PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h"
+#include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
+#include "PokemonSV/Inference/Overworld/PokemonSV_OliveDetector.h"
 #include "PokemonSV_AutoStory_Segment_00.h"
 #include "PokemonSV_AutoStory_Segment_01.h"
 #include "PokemonSV_AutoStory_Segment_02.h"
@@ -29,13 +34,22 @@
 #include "PokemonSV_AutoStory_Segment_11.h"
 #include "PokemonSV_AutoStory_Segment_12.h"
 #include "PokemonSV_AutoStory_Segment_13.h"
-// #include "PokemonSV_AutoStory_Segment_14.h"
+#include "PokemonSV_AutoStory_Segment_14.h"
 // #include "PokemonSV_AutoStory_Segment_15.h"
+// #include "PokemonSV_AutoStory_Segment_16.h"
+// #include "PokemonSV_AutoStory_Segment_17.h"
+// #include "PokemonSV_AutoStory_Segment_18.h"
+// #include "PokemonSV_AutoStory_Segment_19.h"
+// #include "PokemonSV_AutoStory_Segment_20.h"
+// #include "PokemonSV_AutoStory_Segment_21.h"
+// #include "PokemonSV_AutoStory_Segment_22.h"
+// #include "PokemonSV_AutoStory_Segment_23.h"
+// #include "PokemonSV_AutoStory_Segment_24.h"
 #include "PokemonSV_AutoStory.h"
 
-//#include <iostream>
-//using std::cout;
-//using std::endl;
+// #include <iostream>
+// using std::cout;
+// using std::endl;
 //#include <unordered_map>
 //#include <algorithm>
 
@@ -64,7 +78,17 @@ std::vector<std::unique_ptr<AutoStory_Segment>> make_autoStory_segment_list(){
     segment_list.emplace_back(std::make_unique<AutoStory_Segment_11>());
     segment_list.emplace_back(std::make_unique<AutoStory_Segment_12>());
     segment_list.emplace_back(std::make_unique<AutoStory_Segment_13>());
-    // segment_list.emplace_back(std::make_unique<AutoStory_Segment_14>());
+    segment_list.emplace_back(std::make_unique<AutoStory_Segment_14>());
+    // segment_list.emplace_back(std::make_unique<AutoStory_Segment_15>());
+    // segment_list.emplace_back(std::make_unique<AutoStory_Segment_16>());
+    // segment_list.emplace_back(std::make_unique<AutoStory_Segment_17>());
+    // segment_list.emplace_back(std::make_unique<AutoStory_Segment_18>());
+    // segment_list.emplace_back(std::make_unique<AutoStory_Segment_19>());
+    // segment_list.emplace_back(std::make_unique<AutoStory_Segment_20>());
+    // segment_list.emplace_back(std::make_unique<AutoStory_Segment_21>());
+    // segment_list.emplace_back(std::make_unique<AutoStory_Segment_22>());
+    // segment_list.emplace_back(std::make_unique<AutoStory_Segment_23>());
+    // segment_list.emplace_back(std::make_unique<AutoStory_Segment_24>());
 
     return segment_list;
 };
@@ -218,6 +242,9 @@ AutoStory::AutoStory()
     , m_advanced_options(
         "<font size=4><b>Advanced Options: (developer only)</b></font>"
     )
+    , m_advanced_options_end(
+        ""
+    )    
     , CHANGE_SETTINGS(
         "<b>Change settings at Program Start:</b><br>"
         "This is to ensure the program has the correct settings, particularly with Autosave turned off.",
@@ -284,8 +311,8 @@ AutoStory::AutoStory()
         LockMode::UNLOCK_WHILE_RUNNING,
         0
     )
-    , ENABLE_TEST_OVERWORLD_MOVE(
-        "<b>TEST: walk_forward_while_clear_front_path():</b>",
+    , ENABLE_MISC_TEST(
+        "<b>TEST: Miscellaneous test code:</b>",
         LockMode::UNLOCK_WHILE_RUNNING,
         false
     )       
@@ -318,8 +345,88 @@ AutoStory::AutoStory()
         "--RELEASE_TICKS:",
         LockMode::UNLOCK_WHILE_RUNNING,
         0
-    )             
+    )
+    , TEST_PBF_LEFT_JOYSTICK2(
+        "<b>TEST2: pbf_move_left_joystick():</b>",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        false
+    )     
+    , X_MOVE2(
+        "--X_MOVE:<br>x = 0 : left, x = 128 : neutral, x = 255 : right.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        128
+    )     
+    , Y_MOVE2(
+        "--Y_MOVE:<br>y = 0 : up, y = 128 : neutral, y = 255 : down.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        128
+    )   
+    , HOLD_TICKS2(
+        "--HOLD_TICKS:",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        0
+    )    
+    , RELEASE_TICKS2(
+        "--RELEASE_TICKS:",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        0
+    )    
+    , TEST_CURRENT_DIRECTION(
+        "<b>TEST: get_current_direction():</b>",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        false
+    ) 
+    , TEST_CHANGE_DIRECTION(
+        "<b>TEST: change_direction():</b>",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        false
+    )         
+    , DIR_RADIANS(
+        "direction in radians",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        0
+    )           
 {
+
+    if (PreloadSettings::instance().DEVELOPER_MODE){
+        PA_ADD_OPTION(m_advanced_options);
+        PA_ADD_OPTION(CHANGE_SETTINGS);
+
+        PA_ADD_OPTION(TEST_CURRENT_DIRECTION);
+        PA_ADD_OPTION(TEST_CHANGE_DIRECTION);
+        PA_ADD_OPTION(DIR_RADIANS);    
+
+        PA_ADD_OPTION(TEST_PBF_LEFT_JOYSTICK);
+        PA_ADD_OPTION(X_MOVE);
+        PA_ADD_OPTION(Y_MOVE);
+        PA_ADD_OPTION(HOLD_TICKS);
+        PA_ADD_OPTION(RELEASE_TICKS);  
+
+        PA_ADD_OPTION(TEST_PBF_LEFT_JOYSTICK2);
+        PA_ADD_OPTION(X_MOVE2);
+        PA_ADD_OPTION(Y_MOVE2);
+        PA_ADD_OPTION(HOLD_TICKS2);
+        PA_ADD_OPTION(RELEASE_TICKS2);              
+
+        PA_ADD_OPTION(ENABLE_TEST_CHECKPOINTS);
+        PA_ADD_OPTION(START_CHECKPOINT);
+        PA_ADD_OPTION(END_CHECKPOINT);
+        PA_ADD_OPTION(LOOP_CHECKPOINT);
+        PA_ADD_OPTION(START_LOOP);
+        PA_ADD_OPTION(END_LOOP);
+
+        // PA_ADD_OPTION(ENABLE_TEST_REALIGN);
+        // PA_ADD_OPTION(REALIGN_MODE);
+        // PA_ADD_OPTION(X_REALIGN);
+        // PA_ADD_OPTION(Y_REALIGN);
+        // PA_ADD_OPTION(REALIGN_DURATION);
+
+        PA_ADD_OPTION(ENABLE_MISC_TEST);
+        // PA_ADD_OPTION(FORWARD_TICKS);  
+        PA_ADD_OPTION(m_advanced_options_end);
+    }
+
+
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(STORY_SECTION);
     PA_ADD_OPTION(STARTPOINT_TUTORIAL);
@@ -333,31 +440,6 @@ AutoStory::AutoStory()
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
 
-    if (PreloadSettings::instance().DEVELOPER_MODE){
-        PA_ADD_OPTION(m_advanced_options);
-        PA_ADD_OPTION(CHANGE_SETTINGS);
-        PA_ADD_OPTION(ENABLE_TEST_CHECKPOINTS);
-        PA_ADD_OPTION(START_CHECKPOINT);
-        PA_ADD_OPTION(END_CHECKPOINT);
-        PA_ADD_OPTION(LOOP_CHECKPOINT);
-        PA_ADD_OPTION(START_LOOP);
-        PA_ADD_OPTION(END_LOOP);
-
-        PA_ADD_OPTION(ENABLE_TEST_REALIGN);
-        PA_ADD_OPTION(REALIGN_MODE);
-        PA_ADD_OPTION(X_REALIGN);
-        PA_ADD_OPTION(Y_REALIGN);
-        PA_ADD_OPTION(REALIGN_DURATION);
-
-        PA_ADD_OPTION(ENABLE_TEST_OVERWORLD_MOVE);
-        PA_ADD_OPTION(FORWARD_TICKS);
-
-        PA_ADD_OPTION(TEST_PBF_LEFT_JOYSTICK);
-        PA_ADD_OPTION(X_MOVE);
-        PA_ADD_OPTION(Y_MOVE);
-        PA_ADD_OPTION(HOLD_TICKS);
-        PA_ADD_OPTION(RELEASE_TICKS);
-    }
 
     AutoStory::value_changed(this);
 
@@ -368,8 +450,11 @@ AutoStory::AutoStory()
     ENDPOINT_MAINSTORY.add_listener(*this);    
     ENABLE_TEST_CHECKPOINTS.add_listener(*this);
     ENABLE_TEST_REALIGN.add_listener(*this);
-    ENABLE_TEST_OVERWORLD_MOVE.add_listener(*this);
+    ENABLE_MISC_TEST.add_listener(*this);
     TEST_PBF_LEFT_JOYSTICK.add_listener(*this);
+    TEST_PBF_LEFT_JOYSTICK2.add_listener(*this);
+    TEST_CURRENT_DIRECTION.add_listener(*this);
+    TEST_CHANGE_DIRECTION.add_listener(*this);
 }
 
 void AutoStory::value_changed(void* object){
@@ -422,7 +507,7 @@ void AutoStory::value_changed(void* object){
         REALIGN_DURATION.set_visibility(ConfigOptionState::DISABLED);        
     }
 
-    if (ENABLE_TEST_OVERWORLD_MOVE){
+    if (ENABLE_MISC_TEST){
         FORWARD_TICKS.set_visibility(ConfigOptionState::ENABLED);
     }else{
         FORWARD_TICKS.set_visibility(ConfigOptionState::DISABLED);
@@ -438,7 +523,26 @@ void AutoStory::value_changed(void* object){
         Y_MOVE.set_visibility(ConfigOptionState::DISABLED);
         HOLD_TICKS.set_visibility(ConfigOptionState::DISABLED);
         RELEASE_TICKS.set_visibility(ConfigOptionState::DISABLED);      
-    }    
+    }   
+
+    if (TEST_PBF_LEFT_JOYSTICK2){
+        X_MOVE2.set_visibility(ConfigOptionState::ENABLED);
+        Y_MOVE2.set_visibility(ConfigOptionState::ENABLED);
+        HOLD_TICKS2.set_visibility(ConfigOptionState::ENABLED);
+        RELEASE_TICKS2.set_visibility(ConfigOptionState::ENABLED);
+    }else{
+        X_MOVE2.set_visibility(ConfigOptionState::DISABLED);
+        Y_MOVE2.set_visibility(ConfigOptionState::DISABLED);
+        HOLD_TICKS2.set_visibility(ConfigOptionState::DISABLED);
+        RELEASE_TICKS2.set_visibility(ConfigOptionState::DISABLED);      
+    }     
+
+
+    if (TEST_CHANGE_DIRECTION){
+        DIR_RADIANS.set_visibility(ConfigOptionState::ENABLED);
+    }else{
+        DIR_RADIANS.set_visibility(ConfigOptionState::DISABLED);  
+    }        
 
 
 }
@@ -494,6 +598,21 @@ void AutoStory::test_checkpoints(
     // checkpoint_list.push_back([&](){checkpoint_32(env, context, notif_status_update);});
     // checkpoint_list.push_back([&](){checkpoint_33(env, context, notif_status_update);});
     // checkpoint_list.push_back([&](){checkpoint_34(env, context, notif_status_update);});
+    // checkpoint_list.push_back([&](){checkpoint_35(env, context, notif_status_update);});
+    // checkpoint_list.push_back([&](){checkpoint_36(env, context, notif_status_update);});
+    // checkpoint_list.push_back([&](){checkpoint_37(env, context, notif_status_update);});
+    // checkpoint_list.push_back([&](){checkpoint_38(env, context, notif_status_update);});
+    // checkpoint_list.push_back([&](){checkpoint_39(env, context, notif_status_update);});
+    // checkpoint_list.push_back([&](){checkpoint_40(env, context, notif_status_update);});
+    // checkpoint_list.push_back([&](){checkpoint_41(env, context, notif_status_update);});
+    // checkpoint_list.push_back([&](){checkpoint_42(env, context, notif_status_update);});
+    // checkpoint_list.push_back([&](){checkpoint_43(env, context, notif_status_update);});
+    // checkpoint_list.push_back([&](){checkpoint_44(env, context, notif_status_update);});
+    // checkpoint_list.push_back([&](){checkpoint_45(env, context, notif_status_update);});
+    // checkpoint_list.push_back([&](){checkpoint_46(env, context, notif_status_update);});
+    // checkpoint_list.push_back([&](){checkpoint_47(env, context, notif_status_update);});
+    // checkpoint_list.push_back([&](){checkpoint_48(env, context, notif_status_update);});
+    // checkpoint_list.push_back([&](){checkpoint_49(env, context, notif_status_update);});
 
     for (int checkpoint = start; checkpoint <= end; checkpoint++){
         if (checkpoint == 0){
@@ -511,6 +630,10 @@ void AutoStory::test_checkpoints(
             for (int i = 0; i < loop; i++){
                 if (i > 0){
                     reset_game(env.program_info(), console, context);
+                    enter_menu_from_overworld(env.program_info(), env.console, context, -1);
+                    // we wait 10 seconds then save, so that the initial conditions are slightly different on each reset.
+                    env.log("Wait 10 seconds.");
+                    context.wait_for(Milliseconds(10 * 1000));              
                 }
                 console.log("checkpoint_" + number + ": loop " + std::to_string(i));
                 checkpoint_list[checkpoint]();
@@ -569,6 +692,31 @@ void AutoStory::run_autostory(SingleSwitchProgramEnvironment& env, BotBaseContex
 }
 
 void AutoStory::test_code(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    if (TEST_CURRENT_DIRECTION){
+        DirectionDetector direction;
+        // direction.change_direction(env.program_info(), env.console, context, DIR_RADIANS);
+        VideoSnapshot snapshot = env.console.video().snapshot();
+        env.console.log("current direction: " + std::to_string(direction.get_current_direction(env.console, snapshot)));
+        return;
+    }
+
+    if (TEST_CHANGE_DIRECTION){
+        DirectionDetector direction;
+        direction.change_direction(env.program_info(), env.console, context, DIR_RADIANS);
+        // VideoSnapshot snapshot = env.console.video().snapshot();
+        // env.console.log("current direction: " + std::to_string(direction.get_current_direction(env.console, snapshot)));
+        return;
+    }    
+
+    if (TEST_PBF_LEFT_JOYSTICK){
+        pbf_move_left_joystick(context, X_MOVE, Y_MOVE, HOLD_TICKS, RELEASE_TICKS);
+        return;
+    } 
+
+    if (TEST_PBF_LEFT_JOYSTICK2){
+        pbf_move_left_joystick(context, X_MOVE2, Y_MOVE2, HOLD_TICKS2, RELEASE_TICKS2);
+        return;
+    }            
 
     if (ENABLE_TEST_CHECKPOINTS){
         // test individual checkpoints
@@ -584,23 +732,17 @@ void AutoStory::test_code(SingleSwitchProgramEnvironment& env, BotBaseContext& c
         return;
     }
 
-    if (ENABLE_TEST_OVERWORLD_MOVE){
+    if (ENABLE_MISC_TEST){
         // walk_forward_while_clear_front_path(env.program_info(), env.console, context, FORWARD_TICKS);
 
-        overworld_navigation(env.program_info(), env.console, context, 
-            NavigationStopCondition::STOP_MARKER, NavigationMovementMode::CLEAR_WITH_LETS_GO, 
-            128, 0, 60, 10, false);
-
         // overworld_navigation(env.program_info(), env.console, context, 
-        //     NavigationStopCondition::STOP_TIME, NavigationMovementMode::CLEAR_WITH_LETS_GO, 
-        //     128, 0, 25, 10, false);         
+        //     NavigationStopCondition::STOP_MARKER, NavigationMovementMode::CLEAR_WITH_LETS_GO, 
+        //     128, 0, 60, 10, false);
+
+        DirectionDetector direction;
+
         return;
     }
-
-    if (TEST_PBF_LEFT_JOYSTICK){
-        pbf_move_left_joystick(context, X_MOVE, Y_MOVE, HOLD_TICKS, RELEASE_TICKS);
-        return;
-    }        
 
     // context.wait_for(Milliseconds(1000000));
 
@@ -611,14 +753,15 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
     assert_16_9_720p_min(env.logger(), env.console);
     // AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
 
-    // Connect controller
-    pbf_press_button(context, BUTTON_L, 20, 20);
 
     // test code
-    if (ENABLE_TEST_CHECKPOINTS || ENABLE_TEST_REALIGN || ENABLE_TEST_OVERWORLD_MOVE || TEST_PBF_LEFT_JOYSTICK){
+    if (ENABLE_TEST_CHECKPOINTS || ENABLE_TEST_REALIGN || ENABLE_MISC_TEST || TEST_PBF_LEFT_JOYSTICK || TEST_PBF_LEFT_JOYSTICK2 || TEST_CHANGE_DIRECTION || TEST_CURRENT_DIRECTION){
         test_code(env, context);
         return;
     }
+
+    // Connect controller
+    pbf_press_button(context, BUTTON_L, 20, 20);
 
     // Set settings. to ensure autosave is off.
     if (CHANGE_SETTINGS){
