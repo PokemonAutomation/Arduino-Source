@@ -733,6 +733,8 @@ SOURCES += \
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_12.cpp \
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_13.cpp \
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_14.cpp \
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_15.cpp \
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_16.cpp \
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory.cpp \
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStoryTools.cpp \
     Source/PokemonSV/Programs/AutoStory/PokemonSV_MenuOption.cpp \
@@ -1840,6 +1842,8 @@ HEADERS += \
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_12.h \
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_13.h \
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_14.h \
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_15.h \
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_16.h \
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory.h \
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStoryTools.h \
     Source/PokemonSV/Programs/AutoStory/PokemonSV_MenuOption.h \
