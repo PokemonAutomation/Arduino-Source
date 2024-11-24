@@ -33,7 +33,6 @@ using std::endl;
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
-
 DateReader::DateReader()
     : m_background_top(0.50, 0.02, 0.45, 0.08)
     , m_window_top(0.50, 0.36, 0.45, 0.07)
@@ -92,7 +91,10 @@ bool DateReader::detect(const ImageViewRGB32& screen) const{
 //        cout << "zxcv" << endl;
         return false;
     }
-    if (stats_background_top.average.sum() > stats_window_top.average.sum()){
+//    cout << "stats_background_top: " << stats_background_top.average.sum() << endl;
+//    cout << "stats_window_top: " << stats_window_top.average.sum() << endl;
+    if (std::abs(stats_background_top.average.sum() - stats_window_top.average.sum()) < 50){
+//        cout << "xcvb" << endl;
         return false;
     }
 
@@ -104,6 +106,7 @@ bool DateReader::detect(const ImageViewRGB32& screen) const{
 
     double stddev = stats_us_hours.stddev.sum();
     if (stddev < 80){
+//        cout << "sdfg" << endl;
         return false;
     }
 
@@ -128,8 +131,7 @@ int8_t DateReader::read_hours(Logger& logger, const ImageViewRGB32& screen) cons
     double stddev = stats_us_hours.stddev.sum();
     bool format_us = stddev > 30;
     if (format_us){
-        ImageRGB32 us_hours_filtered = to_blackwhite_rgb32_range(us_hours, 0xff000000, 0xff7f7f7f, white_theme);
-        int hours = OCR::read_number(logger, us_hours_filtered);
+        int hours = read_box(logger, 1, 12, screen, m_us_hour, white_theme);
         if (hours < 1 || hours > 12){
             return -1;
         }
@@ -138,7 +140,7 @@ int8_t DateReader::read_hours(Logger& logger, const ImageViewRGB32& screen) cons
         }
 
         ImageViewRGB32 us_ampm = extract_box_reference(screen, m_us_ampm);
-        ImageRGB32 us_ampm_filtered = to_blackwhite_rgb32_range(us_ampm, 0xff000000, 0xff7f7f7f, white_theme);
+        ImageRGB32 us_ampm_filtered = filter_image(us_ampm, white_theme);
 
         std::string ampm = to_utf8(OCR::normalize_utf32(OCR::ocr_read(Language::English, us_ampm_filtered)));
         if (ampm == "am"){
@@ -150,9 +152,7 @@ int8_t DateReader::read_hours(Logger& logger, const ImageViewRGB32& screen) cons
         }
         return (int8_t)hours;
     }else{
-        ImageViewRGB32 h24_hours = extract_box_reference(screen, m_24_hour);
-        ImageRGB32 h24_hours_filtered = to_blackwhite_rgb32_range(h24_hours, 0xff000000, 0xff7f7f7f, white_theme);
-        int hours = OCR::read_number(logger, h24_hours_filtered);
+        int hours = read_box(logger, 0, 23, screen, m_24_hour, white_theme);
         if (hours < 0 || hours > 23){
             return -1;
         }
@@ -290,20 +290,35 @@ std::pair<DateFormat, DateTime> DateReader::read_date(Logger& logger, std::share
 
     return {DateFormat::EU, read_date_eu(logger, std::move(screen), white_theme)};
 }
+ImageRGB32 DateReader::filter_image(const ImageViewRGB32& image, bool white_theme){
+    ImageRGB32 filtered = to_blackwhite_rgb32_range(
+        image,
+        0xff000000, white_theme ? 0xffff7fff : 0xff7f7f7f,
+        white_theme
+    );
+    return filtered;
+}
 int DateReader::read_box(
     Logger& logger,
     int min, int max,
     const ImageViewRGB32& screen, const ImageFloatBox& box,
     bool white_theme
 ) const{
-    ImageRGB32 filtered = to_blackwhite_rgb32_range(
-        extract_box_reference(screen, box),
-        0xff000000, 0xff7f7fff,
-        white_theme
-    );
-//    extract_box_reference(*screen, m_us_month).save("test0.png");
-//    filtered.save("test1.png");
-    int value = OCR::read_number(logger, filtered);
+    ImageViewRGB32 cropped = extract_box_reference(screen, box);
+
+    int value;
+    if (white_theme){
+        value = OCR::read_number_waterfill(
+            logger, cropped,
+            0xff000000, 0xffff7fff, true
+        );
+    }else{
+        value = OCR::read_number_waterfill(
+            logger, cropped,
+            0xff000000, 0xff7f7f7f, false
+        );
+    }
+
     if (value < min || value > max){
         value = -1;
     }
@@ -322,18 +337,12 @@ DateTime DateReader::read_date_us(Logger& logger, std::shared_ptr<const ImageRGB
     //  Hour
     {
         int hour = read_box(logger, 1, 12, *screen, m_us_hour, white_theme);
-        ImageRGB32 hours_filtered = to_blackwhite_rgb32_range(
-            extract_box_reference(*screen, m_us_hour),
-            0xff000000, 0xff7f7fff,
-            white_theme
-        );
         if (hour == 12){
             hour = 0;
         }
 
-        ImageRGB32 us_ampm_filtered = to_blackwhite_rgb32_range(
+        ImageRGB32 us_ampm_filtered = filter_image(
             extract_box_reference(*screen, m_us_ampm),
-            0xff000000, 0xff7f7fff,
             white_theme
         );
 

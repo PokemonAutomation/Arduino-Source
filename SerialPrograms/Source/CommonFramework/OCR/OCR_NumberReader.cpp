@@ -102,15 +102,20 @@ int read_number(Logger& logger, const ImageViewRGB32& image, Language language){
 
 int read_number_waterfill(
     Logger& logger, const ImageViewRGB32& image,
-    uint32_t rgb32_min, uint32_t rgb32_max
+    uint32_t rgb32_min, uint32_t rgb32_max,
+    bool text_inside_range
 ){
     using namespace Kernels::Waterfill;
 
     //  Direct OCR is unreliable. Instead, we will waterfill each character
     //  to isolate them, then OCR them individually.
 
-    ImageRGB32 filtered = to_blackwhite_rgb32_range(image, rgb32_min, rgb32_max, true);
-    PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(image, rgb32_min, rgb32_max);
+    ImageRGB32 filtered = to_blackwhite_rgb32_range(image, rgb32_min, rgb32_max, text_inside_range);
+
+//    static int c = 0;
+//    filtered.save("test-" + std::to_string(c++) + ".png");
+
+    PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(filtered, 0xff000000, 0xff7f7f7f);
 
     std::map<size_t, WaterfillObject> map;
     {

@@ -28,7 +28,8 @@ int read_number(Logger& logger, const ImageViewRGB32& image, Language language =
 //  end. This requires specifying the color range for the text.
 int read_number_waterfill(
     Logger& logger, const ImageViewRGB32& image,
-    uint32_t rgb32_min, uint32_t rgb32_max
+    uint32_t rgb32_min, uint32_t rgb32_max,
+    bool text_inside_range = true
  );
 
 

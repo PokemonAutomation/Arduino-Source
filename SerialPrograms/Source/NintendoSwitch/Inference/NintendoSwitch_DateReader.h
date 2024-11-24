@@ -54,6 +54,7 @@ public:
     ) const;
 
 private:
+    static ImageRGB32 filter_image(const ImageViewRGB32& image, bool white_theme);
     int read_box(
         Logger& logger,
         int min, int max,
