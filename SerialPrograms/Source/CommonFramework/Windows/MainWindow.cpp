@@ -22,9 +22,9 @@
 #include "MainWindow.h"
 
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 
@@ -119,19 +119,23 @@ MainWindow::MainWindow(QWidget* parent)
         connect(
             about, &QLabel::linkActivated,
             this, [](const QString&){
+                std::string str;
+                str += PROGRAM_NAME + " Computer-Control Programs<br>";
+                str += "Copyright: 2020 - 2025<br>";
+                str += "Version: " + PROGRAM_VERSION + "<br>";
+                str += "<br>";
+                str += "Framwork: Qt " + std::to_string(QT_VERSION_MAJOR);
+                str += "." + std::to_string(QT_VERSION_MINOR);
+                str += "." + std::to_string(QT_VERSION_PATCH);
+                str += "<br>";
+                str += "Compiler: " + COMPILER_VERSION;
+                str += "<br><br>";
+                str += "Made by the " + PROGRAM_NAME + " Discord Server.<br>";
+                str += "<br>";
+                str += "This program uses Qt and dynamically links to unmodified Qt libraries under LGPL.<br>";
+
                 QMessageBox box;
-                box.information(
-                    nullptr,
-                    "About",
-                    QString::fromStdString(
-                        PROGRAM_NAME + " Computer-Control Programs (" + PROGRAM_VERSION + ")<br>" +
-                        "Copyright: 2020 - 2022<br>" +
-                        "<br>"
-                        "Made by the " + PROGRAM_NAME + " Discord Server.<br>"
-                        "<br>"
-                        "This program uses Qt and dynamically links to unmodified Qt libraries under LGPL.<br>"
-                    )
-                );
+                box.information(nullptr, "About", QString::fromStdString(str));
             }
         );
     }

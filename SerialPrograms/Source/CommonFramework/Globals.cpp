@@ -25,7 +25,7 @@ namespace PokemonAutomation{
 const bool IS_BETA_VERSION = true;
 const int PROGRAM_VERSION_MAJOR = 0;
 const int PROGRAM_VERSION_MINOR = 50;
-const int PROGRAM_VERSION_PATCH = 3;
+const int PROGRAM_VERSION_PATCH = 4;
 
 const std::string PROGRAM_VERSION_BASE =
     "v" + std::to_string(PROGRAM_VERSION_MAJOR) +
@@ -51,6 +51,21 @@ const std::string ONLINE_DOC_URL = "https://github.com/PokemonAutomation/";
 const std::string PROJECT_GITHUB = "github.com/PokemonAutomation";
 const std::string PROJECT_GITHUB_URL = "https://github.com/PokemonAutomation/";
 const std::string PROJECT_SOURCE_URL = "https://github.com/PokemonAutomation/Arduino-Source/";
+
+#if 0
+#elif __INTEL_LLVM_COMPILER
+const std::string COMPILER_VERSION = "ICX " + std::to_string(__VERSION__);
+#elif __INTEL_COMPILER
+const std::string COMPILER_VERSION = "ICC " + std::to_string(__INTEL_COMPILER) + "." + std::to_string(__INTEL_COMPILER_UPDATE);
+#elif _MSC_VER
+const std::string COMPILER_VERSION = "MSVC " + std::to_string(_MSC_FULL_VER);
+#elif __clang__
+const std::string COMPILER_VERSION = "Clang " + std::string(__clang_version__);
+#elif __GNUC__
+const std::string COMPILER_VERSION = "GCC " + std::to_string(__GNUC__) + "." + std::to_string(__GNUC_MINOR__);
+#else
+const std::string COMPILER_VERSION = "Unknown Compiler";
+#endif
 
 
 namespace{

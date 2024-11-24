@@ -28,6 +28,8 @@ extern const std::string PROJECT_GITHUB;
 extern const std::string PROJECT_GITHUB_URL;
 extern const std::string PROJECT_SOURCE_URL;
 
+extern const std::string COMPILER_VERSION;
+
 const auto SERIAL_REFRESH_RATE = std::chrono::milliseconds(1000);
 
 // Folder path (end with "/") to hold program setting files.

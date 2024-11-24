@@ -2086,7 +2086,7 @@ endif()
 #extract opencv_world460d.dll from archive on Windows Debug builds
 if (MSVC)
     if (CMAKE_BUILD_TYPE MATCHES "Debug")
-        file(ARCHIVE_EXTRACT INPUT ../3rdPartyBinaries/opencv_world460d.zip DESTINATION ../3rdPartyBinaries/)
+        file(ARCHIVE_EXTRACT INPUT ../../../3rdPartyBinaries/opencv_world460d.zip DESTINATION ../../../3rdPartyBinaries/)
     endif()
 endif()
 
