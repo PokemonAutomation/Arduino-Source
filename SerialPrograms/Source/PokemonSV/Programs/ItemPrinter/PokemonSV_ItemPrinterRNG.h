@@ -44,8 +44,8 @@ private:
     };
 
     enum class ItemPrinterMode{
+        STANDARD_MODE,
         AUTO_MODE,
-        STANDARD_MODE
     };
 
     virtual void value_changed(void* object) override;

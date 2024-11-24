@@ -199,8 +199,8 @@ std::vector<std::string> ItemPrinterDesiredItemTable::make_header() const{
 }
 std::vector<std::unique_ptr<EditableTableRow>> ItemPrinterDesiredItemTable::make_defaults(){
     std::vector<std::unique_ptr<EditableTableRow>> ret;
-    ret.emplace_back(std::make_unique<ItemPrinterDesiredItemRow>(*this, ItemPrinter::PrebuiltOptions::ABILITY_PATCH, 999));
-    ret.emplace_back(std::make_unique<ItemPrinterDesiredItemRow>(*this, ItemPrinter::PrebuiltOptions::EXP_CANDY, 999));
+    ret.emplace_back(std::make_unique<ItemPrinterDesiredItemRow>(*this, ItemPrinter::PrebuiltOptions::ABILITY_PATCH, (uint16_t)999));
+    ret.emplace_back(std::make_unique<ItemPrinterDesiredItemRow>(*this, ItemPrinter::PrebuiltOptions::EXP_CANDY, (uint16_t)999));
     return ret;
 }
 

@@ -324,12 +324,12 @@ SandwichMakerOption::SandwichMakerOption(
         "<b>Sandwich Recipe:</b><br>Select a recipe to make a sandwich with preset ingredients, or select Custom Sandwich to make a sandwich using the table below. "
         "Refer to the documentation for recipe ingredients and valid Herba Mystica combinations.",
         {
-            {BaseRecipe::non_shiny,  "non-shiny",    "Normal Encounter (non-shiny)"},
-            {BaseRecipe::shiny,     "shiny",    "Sparkling + Title + Encounter"},
-            {BaseRecipe::huge,      "huge",     "Sparkling + Title + Humungo"},
-            {BaseRecipe::tiny,      "tiny",     "Sparkling + Title + Teensy"},
-            {BaseRecipe::paradox,   "paradox",  "Title + Encounter + Humungo/Teensy: Paradox-specific"},
-            {BaseRecipe::custom,    "custom",   "Custom Sandwich"},
+            {BaseRecipe::non_shiny, "non-shiny", "Normal Encounter (non-shiny)"},
+            {BaseRecipe::shiny,     "shiny",     "Sparkling + Title + Encounter"},
+            {BaseRecipe::huge,      "huge",      "Sparkling + Title + Humungo"},
+            {BaseRecipe::tiny,      "tiny",      "Sparkling + Title + Teensy"},
+            {BaseRecipe::paradox,   "paradox",   "Title + Encounter + Humungo/Teensy: Paradox-specific"},
+            {BaseRecipe::custom,    "custom",    "Custom Sandwich"},
         },
         LockMode::LOCK_WHILE_RUNNING,
         base_recipe
