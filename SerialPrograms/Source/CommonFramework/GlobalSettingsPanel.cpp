@@ -237,6 +237,9 @@ GlobalSettings::GlobalSettings()
     PA_ADD_OPTION(CHECK_FOR_UPDATES);
     PA_ADD_OPTION(WINDOW_SIZE);
     PA_ADD_OPTION(THEME);
+#ifdef PA_ENABLE_SLEEP_SUPPRESS
+    PA_ADD_OPTION(SLEEP_SUPPRESS);
+#endif
 
     PA_ADD_STATIC(m_discord_settings);
     PA_ADD_OPTION(DISCORD);

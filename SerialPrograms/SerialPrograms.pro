@@ -253,6 +253,7 @@ SOURCES += \
     Source/CommonFramework/OCR/OCR_TextMatcher.cpp \
     Source/CommonFramework/OCR/OCR_TrainingTools.cpp \
     Source/CommonFramework/Options/Environment/ProcessorLevelOption.cpp \
+    Source/CommonFramework/Options/Environment/SleepSuppressOption.cpp \
     Source/CommonFramework/Options/Environment/ThemeSelectorOption.cpp \
     Source/CommonFramework/Options/LabelCellOption.cpp \
     Source/CommonFramework/Options/LanguageOCROption.cpp \
@@ -1247,6 +1248,8 @@ HEADERS += \
     Source/CommonFramework/Environment/HardwareValidation_arm64.tpp \
     Source/CommonFramework/Environment/HardwareValidation_x86.tpp \
     Source/CommonFramework/Environment/SystemSleep.h \
+    Source/CommonFramework/Environment/SystemSleep_Apple.tpp \
+    Source/CommonFramework/Environment/SystemSleep_Windows.tpp \
     Source/CommonFramework/Exceptions/FatalProgramException.h \
     Source/CommonFramework/Exceptions/OliveActionFailedException.h \
     Source/CommonFramework/Exceptions/OperationFailedException.h \
@@ -1330,6 +1333,7 @@ HEADERS += \
     Source/CommonFramework/OCR/OCR_TrainingTools.h \
     Source/CommonFramework/Options/Environment/ProcessPriorityOption.h \
     Source/CommonFramework/Options/Environment/ProcessorLevelOption.h \
+    Source/CommonFramework/Options/Environment/SleepSuppressOption.h \
     Source/CommonFramework/Options/LabelCellOption.h \
     Source/CommonFramework/Options/LanguageOCROption.h \
     Source/CommonFramework/Options/ScreenWatchOption.h \

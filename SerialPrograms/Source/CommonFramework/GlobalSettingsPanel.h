@@ -16,6 +16,7 @@
 #include "CommonFramework/Options/Environment/ProcessPriorityOption.h"
 #include "CommonFramework/Options/Environment/ProcessorLevelOption.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
+#include "CommonFramework/Options/Environment/SleepSuppressOption.h"
 #include "CommonFramework/VideoPipeline/Backends/CameraImplementations.h"
 #include "CommonFramework/Panels/SettingsPanel.h"
 #include "CommonFramework/Panels/PanelTools.h"
@@ -89,6 +90,8 @@ public:
 
     ResolutionOption WINDOW_SIZE;
     ThemeSelectorOption THEME;
+
+    SleepSuppressOptions SLEEP_SUPPRESS;
 
     SectionDividerOption m_discord_settings;
     Integration::DiscordSettingsOption DISCORD;

@@ -94,6 +94,8 @@ void SingleSwitchProgramSession::internal_run_program(){
     GlobalSettings::instance().REALTIME_THREAD_PRIORITY0.set_on_this_thread();
     m_option.options().reset_state();
 
+    SleepSuppressScope sleep_scope(GlobalSettings::instance().SLEEP_SUPPRESS.PROGRAM_RUNNING);
+
     ProgramInfo program_info(
         identifier(),
         m_option.descriptor().category(),

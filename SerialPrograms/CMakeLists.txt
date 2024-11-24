@@ -305,6 +305,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Environment/HardwareValidation_x86.tpp
     Source/CommonFramework/Environment/SystemSleep.cpp
     Source/CommonFramework/Environment/SystemSleep.h
+    Source/CommonFramework/Environment/SystemSleep_Apple.tpp
+    Source/CommonFramework/Environment/SystemSleep_Windows.tpp
     Source/CommonFramework/Exceptions/FatalProgramException.cpp
     Source/CommonFramework/Exceptions/FatalProgramException.h
     Source/CommonFramework/Exceptions/OliveActionFailedException.cpp
@@ -463,6 +465,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Options/Environment/ProcessPriorityOption.h
     Source/CommonFramework/Options/Environment/ProcessorLevelOption.cpp
     Source/CommonFramework/Options/Environment/ProcessorLevelOption.h
+    Source/CommonFramework/Options/Environment/SleepSuppressOption.cpp
+    Source/CommonFramework/Options/Environment/SleepSuppressOption.h
     Source/CommonFramework/Options/Environment/ThemeSelectorOption.cpp
     Source/CommonFramework/Options/Environment/ThemeSelectorOption.h
     Source/CommonFramework/Options/LabelCellOption.cpp
