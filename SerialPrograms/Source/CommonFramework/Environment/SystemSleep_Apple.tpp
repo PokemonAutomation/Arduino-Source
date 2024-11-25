@@ -14,8 +14,8 @@ namespace PokemonAutomation{
 
 
 
-class SystemSleepController::InternalController{
-public:
+struct SystemSleepController::InternalController{
+//public:
     InternalController();
     ~InternalController();
 
@@ -25,7 +25,7 @@ public:
 
     void update_state();
 
-private:
+//private:
     bool disable_sleep();
     bool enable_sleep();
 
@@ -98,6 +98,39 @@ void SystemSleepController::InternalController::update_state(){
 
     //  TODO: Distiguish these two.
     prevent_sleep(screen_on_requests > 0 || no_sleep_requests > 0);
+}
+
+
+
+
+SystemSleepController::SystemSleepController()
+    : m_data(new InternalController())
+{}
+SystemSleepController::~SystemSleepController(){
+    std::lock_guard<std::mutex> lg(m_data->lock);
+    m_data->screen_on_requests = 0;
+    m_data->no_sleep_requests = 0;
+    m_data->update_state();
+}
+void SystemSleepController::push_screen_on(){
+    std::lock_guard<std::mutex> lg(m_data->lock);
+    m_data->screen_on_requests++;
+    m_data->update_state();
+}
+void SystemSleepController::pop_screen_on(){
+    std::lock_guard<std::mutex> lg(m_data->lock);
+    m_data->screen_on_requests--;
+    m_data->update_state();
+}
+void SystemSleepController::push_no_sleep(){
+    std::lock_guard<std::mutex> lg(m_data->lock);
+    m_data->no_sleep_requests++;
+    m_data->update_state();
+}
+void SystemSleepController::pop_no_sleep(){
+    std::lock_guard<std::mutex> lg(m_data->lock);
+    m_data->no_sleep_requests--;
+    m_data->update_state();
 }
 
 

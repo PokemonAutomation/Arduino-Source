@@ -48,6 +48,37 @@ struct SystemSleepController::InternalController{
 
 
 
+SystemSleepController::SystemSleepController()
+    : m_data(new InternalController())
+{}
+SystemSleepController::~SystemSleepController(){
+    std::lock_guard<std::mutex> lg(m_data->lock);
+    m_data->screen_on_requests = 0;
+    m_data->no_sleep_requests = 0;
+    m_data->update_state();
+}
+void SystemSleepController::push_screen_on(){
+    std::lock_guard<std::mutex> lg(m_data->lock);
+    m_data->screen_on_requests++;
+    m_data->update_state();
+}
+void SystemSleepController::pop_screen_on(){
+    std::lock_guard<std::mutex> lg(m_data->lock);
+    m_data->screen_on_requests--;
+    m_data->update_state();
+}
+void SystemSleepController::push_no_sleep(){
+    std::lock_guard<std::mutex> lg(m_data->lock);
+    m_data->no_sleep_requests++;
+    m_data->update_state();
+}
+void SystemSleepController::pop_no_sleep(){
+    std::lock_guard<std::mutex> lg(m_data->lock);
+    m_data->no_sleep_requests--;
+    m_data->update_state();
+}
+
+
 
 
 
