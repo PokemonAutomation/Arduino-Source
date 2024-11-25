@@ -127,7 +127,7 @@
 #include <QPixmap>
 #include <QVideoFrame>
 
-#include <Windows.h>
+//#include <Windows.h>
 #include <iostream>
 using std::cout;
 using std::endl;
