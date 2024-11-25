@@ -82,11 +82,11 @@ private:
     virtual void value_changed(void* object) override;
 
 public:
+    BooleanCheckBoxOption CHECK_FOR_UPDATES;
     BooleanCheckBoxOption SEND_ERROR_REPORTS;
 
     StringOption STATS_FILE;
     BooleanCheckBoxOption ALL_STATS;
-    BooleanCheckBoxOption CHECK_FOR_UPDATES;
 
     ResolutionOption WINDOW_SIZE;
     ThemeSelectorOption THEME;

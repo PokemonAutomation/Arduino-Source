@@ -13,17 +13,42 @@
 namespace PokemonAutomation{
 
 
-struct SystemSleepController::InternalController{
-    std::mutex lock;
-    size_t screen_on_requests = 0;
-    size_t no_sleep_requests = 0;
+class WindowsSleepController : public SystemSleepController{
+public:
+    virtual ~WindowsSleepController(){
+        std::lock_guard<std::mutex> lg(m_lock);
+        m_screen_on_requests = 0;
+        m_no_sleep_requests = 0;
+        update_state();
+    }
+    virtual void push_screen_on() override{
+        std::lock_guard<std::mutex> lg(m_lock);
+        m_screen_on_requests++;
+        update_state();
+    }
+    virtual void pop_screen_on() override{
+        std::lock_guard<std::mutex> lg(m_lock);
+        m_screen_on_requests--;
+        update_state();
+    }
+    virtual void push_no_sleep() override{
+        std::lock_guard<std::mutex> lg(m_lock);
+        m_no_sleep_requests++;
+        update_state();
+    }
+    virtual void pop_no_sleep() override{
+        std::lock_guard<std::mutex> lg(m_lock);
+        m_no_sleep_requests--;
+        update_state();
+    }
 
+private:
     void update_state(){
         //  SetThreadExecutionState(ES_CONTINUOUS) only lasts as long as the
         //  thread is alive. So we redispatch to the main thread.
         queue_on_main_thread([
-            screen_on_requests = screen_on_requests,
-            no_sleep_requests = no_sleep_requests
+            screen_on_requests = m_screen_on_requests,
+            no_sleep_requests = m_no_sleep_requests
         ]{
             EXECUTION_STATE flags = ES_CONTINUOUS;
             if (screen_on_requests > 0){
@@ -44,39 +69,19 @@ struct SystemSleepController::InternalController{
             }
         });
     }
+
+private:
+    std::mutex m_lock;
+    size_t m_screen_on_requests = 0;
+    size_t m_no_sleep_requests = 0;
 };
 
 
+SystemSleepController& SystemSleepController::instance(){
+    static WindowsSleepController controller;
+    return controller;
+}
 
-SystemSleepController::SystemSleepController()
-    : m_data(new InternalController())
-{}
-SystemSleepController::~SystemSleepController(){
-    std::lock_guard<std::mutex> lg(m_data->lock);
-    m_data->screen_on_requests = 0;
-    m_data->no_sleep_requests = 0;
-    m_data->update_state();
-}
-void SystemSleepController::push_screen_on(){
-    std::lock_guard<std::mutex> lg(m_data->lock);
-    m_data->screen_on_requests++;
-    m_data->update_state();
-}
-void SystemSleepController::pop_screen_on(){
-    std::lock_guard<std::mutex> lg(m_data->lock);
-    m_data->screen_on_requests--;
-    m_data->update_state();
-}
-void SystemSleepController::push_no_sleep(){
-    std::lock_guard<std::mutex> lg(m_data->lock);
-    m_data->no_sleep_requests++;
-    m_data->update_state();
-}
-void SystemSleepController::pop_no_sleep(){
-    std::lock_guard<std::mutex> lg(m_data->lock);
-    m_data->no_sleep_requests--;
-    m_data->update_state();
-}
 
 
 

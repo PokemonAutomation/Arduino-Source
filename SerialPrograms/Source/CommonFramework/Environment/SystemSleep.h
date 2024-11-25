@@ -26,14 +26,12 @@ namespace PokemonAutomation{
 //  Useful for running some programs like PokemonSV_VideoFastCodeEntry that require
 //  the screen to be constantly on.
 class SystemSleepController{
-    SystemSleepController();
-    ~SystemSleepController();
+protected:
+    virtual ~SystemSleepController() = default;
+    SystemSleepController() = default;
 
 public:
-    static SystemSleepController& instance(){
-        static SystemSleepController controller;
-        return controller;
-    }
+    static SystemSleepController& instance();
 
     //  Push: Add a request for this type of sleep-disable.
     //  Pop: Remove a request for this type of sleep-disable.
@@ -41,16 +39,12 @@ public:
     //  request is active for that type.
 
     //  Keep the screen on and prevent sleep.
-    void push_screen_on();
-    void pop_screen_on();
+    virtual void push_screen_on(){}
+    virtual void pop_screen_on(){}
 
     //  Allow the screen to turn off, but don't sleep.
-    void push_no_sleep();
-    void pop_no_sleep();
-
-private:
-    struct InternalController;
-    std::unique_ptr<InternalController> m_data;
+    virtual void push_no_sleep(){}
+    virtual void pop_no_sleep(){}
 };
 
 

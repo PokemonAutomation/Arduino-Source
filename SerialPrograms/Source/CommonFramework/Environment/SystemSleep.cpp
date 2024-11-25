@@ -13,12 +13,10 @@
 #include "SystemSleep_Apple.tpp"
 #else
 namespace PokemonAutomation{
-    SystemSleepController(){}
-    ~SystemSleepController(){}
-    void push_screen_on(){}
-    void pop_screen_on(){}
-    void push_no_sleep(){}
-    void pop_no_sleep(){}
+    SystemSleepController& SystemSleepController::instance(){
+        static SystemSleepController controller;
+        return controller;
+    }
 }
 #endif
 

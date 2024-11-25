@@ -14,41 +14,58 @@ namespace PokemonAutomation{
 
 
 
-struct SystemSleepController::InternalController{
-//public:
-    InternalController();
-    ~InternalController();
+class AppleSleepController : public SystemSleepController{
+public:
+    virtual ~AppleSleepController(){
+        std::lock_guard<std::mutex> lg(m_lock);
+        m_screen_on_requests = 0;
+        m_no_sleep_requests = 0;
+        update_state();
+    }
+    virtual void push_screen_on() override{
+        std::lock_guard<std::mutex> lg(m_lock);
+        m_screen_on_requests++;
+        update_state();
+    }
+    virtual void pop_screen_on() override{
+        std::lock_guard<std::mutex> lg(m_lock);
+        m_screen_on_requests--;
+        update_state();
+    }
+    virtual void push_no_sleep() override{
+        std::lock_guard<std::mutex> lg(m_lock);
+        m_no_sleep_requests++;
+        update_state();
+    }
+    virtual void pop_no_sleep() override{
+        std::lock_guard<std::mutex> lg(m_lock);
+        m_no_sleep_requests--;
+        update_state();
+    }
 
+
+private:
     //  Disable/Enable screen saver and OS sleep.
     //  Return whether the setting is successful.
     bool prevent_sleep(bool prevent);
-
     void update_state();
 
-//private:
     bool disable_sleep();
     bool enable_sleep();
 
-    IOReturn m_prevention_succeeded;
-    IOPMAssertionID m_session_id;
+    IOReturn m_prevention_succeeded = kIOReturnError;
+    IOPMAssertionID m_session_id = 0;
 
-
-    std::mutex lock;
-    size_t screen_on_requests = 0;
-    size_t no_sleep_requests = 0;
+    std::mutex m_lock;
+    size_t m_screen_on_requests = 0;
+    size_t m_no_sleep_requests = 0;
 };
 
 
 // Code from https://stackoverflow.com/questions/5596319/how-to-programmatically-prevent-a-mac-from-going-to-sleep/8461182#8461182
 
-SystemSleepController::InternalController::InternalController()
-    : m_prevention_succeeded(kIOReturnError), m_session_id(0) {}
 
-SystemSleepController::InternalController::~InternalController(){
-    enable_sleep();
-}
-
-bool SystemSleepController::InternalController::prevent_sleep(bool prevent){
+bool AppleSleepController::prevent_sleep(bool prevent){
     if (prevent){
         return disable_sleep();
     }else{
@@ -56,7 +73,7 @@ bool SystemSleepController::InternalController::prevent_sleep(bool prevent){
     }
 }
 
-bool SystemSleepController::InternalController::disable_sleep(){
+bool AppleSleepController::disable_sleep(){
     if (m_prevention_succeeded == kIOReturnSuccess){
         return true;
     }
@@ -81,7 +98,7 @@ bool SystemSleepController::InternalController::disable_sleep(){
     return true;
 }
 
-bool SystemSleepController::InternalController::enable_sleep(){
+bool AppleSleepController::enable_sleep(){
     if (m_prevention_succeeded == kIOReturnSuccess){
         IOPMAssertionRelease(m_session_id);
         m_session_id = 0;
@@ -93,45 +110,14 @@ bool SystemSleepController::InternalController::enable_sleep(){
 
 
 
-void SystemSleepController::InternalController::update_state(){
+void AppleSleepController::update_state(){
     //  Must call under lock.
 
     //  TODO: Distiguish these two.
-    prevent_sleep(screen_on_requests > 0 || no_sleep_requests > 0);
+    prevent_sleep(m_screen_on_requests > 0 || m_no_sleep_requests > 0);
 }
 
 
-
-
-SystemSleepController::SystemSleepController()
-    : m_data(new InternalController())
-{}
-SystemSleepController::~SystemSleepController(){
-    std::lock_guard<std::mutex> lg(m_data->lock);
-    m_data->screen_on_requests = 0;
-    m_data->no_sleep_requests = 0;
-    m_data->update_state();
-}
-void SystemSleepController::push_screen_on(){
-    std::lock_guard<std::mutex> lg(m_data->lock);
-    m_data->screen_on_requests++;
-    m_data->update_state();
-}
-void SystemSleepController::pop_screen_on(){
-    std::lock_guard<std::mutex> lg(m_data->lock);
-    m_data->screen_on_requests--;
-    m_data->update_state();
-}
-void SystemSleepController::push_no_sleep(){
-    std::lock_guard<std::mutex> lg(m_data->lock);
-    m_data->no_sleep_requests++;
-    m_data->update_state();
-}
-void SystemSleepController::pop_no_sleep(){
-    std::lock_guard<std::mutex> lg(m_data->lock);
-    m_data->no_sleep_requests--;
-    m_data->update_state();
-}
 
 
 

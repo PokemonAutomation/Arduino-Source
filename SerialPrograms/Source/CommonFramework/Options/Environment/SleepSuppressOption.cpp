@@ -31,7 +31,7 @@ SleepSuppressOptions::~SleepSuppressOptions(){
 }
 SleepSuppressOptions::SleepSuppressOptions()
     : GroupOption(
-        "Suppress Screensaver/Sleep",
+        "Suppress Screensaver/Sleep:",
         LockMode::UNLOCK_WHILE_RUNNING,
         false, true
     )

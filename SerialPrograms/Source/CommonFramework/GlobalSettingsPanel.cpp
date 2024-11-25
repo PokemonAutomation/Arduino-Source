@@ -100,6 +100,11 @@ GlobalSettings::~GlobalSettings(){
 }
 GlobalSettings::GlobalSettings()
     : BatchOption(LockMode::LOCK_WHILE_RUNNING)
+    , CHECK_FOR_UPDATES(
+        "<b>Check for Updates:</b><br>Automatically check for updates.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        true
+    )
     , SEND_ERROR_REPORTS(
         "<b>Send Error Reports:</b><br>"
         "Send error reports to the " + PROGRAM_NAME + " server to help them resolve issues and improve the program.",
@@ -115,11 +120,6 @@ GlobalSettings::GlobalSettings()
     )
     , ALL_STATS(
         "<b>All Stats:</b><br>Include all-time stats for notifications.",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        true
-    )
-    , CHECK_FOR_UPDATES(
-        "<b>Check for Updates:</b><br>Automatically check for updates.",
         LockMode::UNLOCK_WHILE_RUNNING,
         true
     )
@@ -231,10 +231,10 @@ GlobalSettings::GlobalSettings()
         "", ""
     )
 {
+    PA_ADD_OPTION(CHECK_FOR_UPDATES);
     PA_ADD_OPTION(SEND_ERROR_REPORTS);
     PA_ADD_OPTION(STATS_FILE);
     PA_ADD_OPTION(ALL_STATS);
-    PA_ADD_OPTION(CHECK_FOR_UPDATES);
     PA_ADD_OPTION(WINDOW_SIZE);
     PA_ADD_OPTION(THEME);
 #ifdef PA_ENABLE_SLEEP_SUPPRESS
