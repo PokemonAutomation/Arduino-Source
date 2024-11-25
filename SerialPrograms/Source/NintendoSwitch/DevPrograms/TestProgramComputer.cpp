@@ -149,6 +149,7 @@
 #endif
 
 //#include <opencv2/core.hpp>
+#include <random>
 
 
 #include <iostream>
@@ -243,7 +244,14 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
 
 
+    std::random_device rndsource;
+    std::minstd_rand rndgen(rndsource());
+    std::uniform_real_distribution<double> dist(0, 1.0);
 
+    cout << dist(rndgen) << endl;
+    cout << dist(rndgen) << endl;
+    cout << dist(rndgen) << endl;
+    cout << dist(rndgen) << endl;
 
 #if 0
     PokemonSV::DateSeed data = PokemonSV::ItemPrinter::calculate_seed_prizes(2346161588);
