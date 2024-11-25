@@ -118,6 +118,11 @@ void AppleSleepController::update_state(){
 }
 
 
+SystemSleepController& SystemSleepController::instance(){
+    static AppleSleepController controller;
+    return controller;
+}
+
 
 
 

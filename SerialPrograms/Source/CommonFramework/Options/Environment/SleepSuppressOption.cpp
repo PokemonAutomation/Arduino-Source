@@ -15,7 +15,7 @@ SleepSuppressOption::SleepSuppressOption(std::string label, SleepSuppress defaul
         {
            {SleepSuppress::NONE,       "none",         "Do not suppress sleep or screensaver."},
 #ifdef PA_ENABLE_SLEEP_SUPPRESS_NO_SLEEP
-           {SleepSuppress::NO_SLEEP,   "no-sleep",     "Prevent computer from sleeping."},
+           {SleepSuppress::NO_SLEEP,   "no-sleep",     "Prevent computer from sleeping, but allow screen to turn off."},
 #endif
            {SleepSuppress::SCREEN_ON,  "screen-on",    "Keep the screen on."},
         },
