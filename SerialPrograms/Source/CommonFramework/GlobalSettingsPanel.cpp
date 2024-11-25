@@ -105,12 +105,6 @@ GlobalSettings::GlobalSettings()
         LockMode::UNLOCK_WHILE_RUNNING,
         true
     )
-    , SEND_ERROR_REPORTS(
-        "<b>Send Error Reports:</b><br>"
-        "Send error reports to the " + PROGRAM_NAME + " server to help them resolve issues and improve the program.",
-        LockMode::LOCK_WHILE_RUNNING,
-        true
-    )
     , STATS_FILE(
         false,
         "<b>Stats File:</b><br>Use the stats file here. Multiple instances of the program can use the same file.",
@@ -224,6 +218,12 @@ GlobalSettings::GlobalSettings()
         LockMode::UNLOCK_WHILE_RUNNING,
         IS_BETA_VERSION
     )
+    , SEND_ERROR_REPORTS0(
+        "<b>Send Error Reports:</b><br>"
+        "Send error reports to the " + PROGRAM_NAME + " server to help them resolve issues and improve the program.",
+        LockMode::LOCK_WHILE_RUNNING,
+        true
+    )
     , DEVELOPER_TOKEN(
         true,
         "<b>Developer Token:</b><br>Restart application to take full effect after changing this.",
@@ -272,7 +272,7 @@ GlobalSettings::GlobalSettings()
     PA_ADD_OPTION(PROCESSOR_LEVEL0);
 
 #ifdef PA_OFFICIAL
-    PA_ADD_OPTION(SEND_ERROR_REPORTS);
+    PA_ADD_OPTION(SEND_ERROR_REPORTS0);
 #endif
 
     PA_ADD_OPTION(DEVELOPER_TOKEN);

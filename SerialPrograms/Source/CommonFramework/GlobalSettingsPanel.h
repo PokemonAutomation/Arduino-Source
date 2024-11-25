@@ -83,7 +83,6 @@ private:
 
 public:
     BooleanCheckBoxOption CHECK_FOR_UPDATES;
-    BooleanCheckBoxOption SEND_ERROR_REPORTS;
 
     StringOption STATS_FILE;
     BooleanCheckBoxOption ALL_STATS;
@@ -121,6 +120,8 @@ public:
     SimpleIntegerOption<uint8_t> AUTO_RESET_VIDEO_SECONDS;
 
     BooleanCheckBoxOption ENABLE_LIFETIME_SANITIZER;
+
+    BooleanCheckBoxOption SEND_ERROR_REPORTS0;
 
     ProcessorLevelOption PROCESSOR_LEVEL0;
 
