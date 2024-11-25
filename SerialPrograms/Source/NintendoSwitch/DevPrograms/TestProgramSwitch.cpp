@@ -120,13 +120,14 @@
 #include "PokemonSV/Inference/ItemPrinter/PokemonSV_ItemPrinterMaterialDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h"
+//#include "CommonFramework/Environment/SystemSleep.h"
 
 
 
 #include <QPixmap>
 #include <QVideoFrame>
 
-//#include <Windows.h>
+#include <Windows.h>
 #include <iostream>
 using std::cout;
 using std::endl;
@@ -267,7 +268,28 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 //    PokemonLA::ButtonDetector detector(logger, PokemonLA::ButtonType::ButtonA,);
 
-#if 1
+//    while (true){
+//        SystemSleepController::instance().push_screen_on();
+//        scope.wait_for(std::chrono::seconds(10));
+//    }
+
+//    SetThreadExecutionState(ES_CONTINUOUS | ES_DISPLAY_REQUIRED);
+
+//    VideoSnapshot image = feed.snapshot();
+    ImageRGB32 image("screenshot-20241124-135028529403.png");
+
+    DateReader date_reader;
+    date_reader.make_overlays(overlays);
+    auto date = date_reader.read_date(logger, std::make_shared<ImageRGB32>(std::move(image)));
+    cout << "year =  " << (int)date.second.year << endl;
+    cout << "month = " << (int)date.second.month << endl;
+    cout << "day =   " << (int)date.second.day << endl;
+    cout << "hour =  " << (int)date.second.hour << endl;
+    cout << "min =   " << (int)date.second.minute << endl;
+    cout << "secs =  " << (int)date.second.second << endl;
+
+
+#if 0
 
     VideoSnapshot image = feed.snapshot();
     DirectionDetector detector;

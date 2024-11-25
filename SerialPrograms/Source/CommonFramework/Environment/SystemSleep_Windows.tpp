@@ -27,7 +27,7 @@ struct SystemSleepController::InternalController{
         ]{
             EXECUTION_STATE flags = ES_CONTINUOUS;
             if (screen_on_requests > 0){
-                flags |= ES_DISPLAY_REQUIRED;
+                flags |= ES_SYSTEM_REQUIRED | ES_DISPLAY_REQUIRED;
             }
             if (no_sleep_requests > 0){
                 flags |= ES_SYSTEM_REQUIRED | ES_AWAYMODE_REQUIRED;

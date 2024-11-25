@@ -142,14 +142,12 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<RideCloner101_Descriptor, RideCloner101>());
     ret.emplace_back(make_single_switch_program<CloneItems101_Descriptor, CloneItems101>());
 
-    if (PreloadSettings::instance().DEVELOPER_MODE
-        // || IS_BETA_VERSION
-    ){
+    if (PreloadSettings::instance().DEVELOPER_MODE || IS_BETA_VERSION){
         ret.emplace_back("---- Untested/Beta/WIP ----");
-        ret.emplace_back("---- Story Automation ----");
-        ret.emplace_back(make_single_switch_program<AutoStory_Descriptor, AutoStory>());
     }
     if (IS_BETA_VERSION){
+//        ret.emplace_back("---- Story Automation ----");
+        ret.emplace_back(make_single_switch_program<AutoStory_Descriptor, AutoStory>());
     }
     if (PreloadSettings::instance().DEVELOPER_MODE){
 
