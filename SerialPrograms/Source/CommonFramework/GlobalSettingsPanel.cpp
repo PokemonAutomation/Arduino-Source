@@ -109,7 +109,7 @@ GlobalSettings::GlobalSettings()
         "<b>Send Error Reports:</b><br>"
         "Send error reports to the " + PROGRAM_NAME + " server to help them resolve issues and improve the program.",
         LockMode::LOCK_WHILE_RUNNING,
-        IS_BETA_VERSION
+        true
     )
     , STATS_FILE(
         false,
