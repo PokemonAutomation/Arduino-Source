@@ -11,10 +11,12 @@
 #include "ProgramDumper_Windows.tpp"
 
 #else
-void setup_crash_handler(){
-    //  Not supported
-}
-bool program_dump(Logger* logger, const std::string& filename){
+namespace PokemonAutomation{
+    void setup_crash_handler(){
+        //  Not supported
+    }
+    bool program_dump(Logger* logger, const std::string& filename){
 
+    }
 }
 #endif
