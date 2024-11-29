@@ -6,7 +6,8 @@
 
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/Tools/ErrorDumper.h"
+#include "CommonFramework/ErrorReports/ErrorReports.h"
+//#include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "UnexpectedBattleException.h"
@@ -36,7 +37,15 @@ void UnexpectedBattleException::send_notification(ProgramEnvironment& env, Event
     if (!m_message.empty()){
         embeds.emplace_back(std::pair<std::string, std::string>("Message:", m_message));
     }
-    if (m_send_error_report == ErrorReport::SEND_ERROR_REPORT && m_screenshot){
+    if (m_send_error_report == ErrorReport::SEND_ERROR_REPORT){
+        report_error(
+            &env.logger(),
+            env.program_info(),
+            name(),
+            embeds,
+            screenshot()
+        );
+#if 0
         std::string label = name();
         std::string filename = dump_image_alone(env.logger(), env.program_info(), label, *m_screenshot);
         send_program_telemetry(
@@ -46,6 +55,7 @@ void UnexpectedBattleException::send_notification(ProgramEnvironment& env, Event
             embeds,
             filename
         );
+#endif
     }
     send_program_notification(
         env, notification,

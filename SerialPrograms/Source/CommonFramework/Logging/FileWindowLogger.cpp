@@ -25,6 +25,17 @@ Logger& global_logger_raw(){
 }
 
 
+void LastLogTracker::operator+=(std::string line){
+    m_lines.emplace_back(std::move(line));
+    while (m_lines.size() > m_max_lines){
+        m_lines.pop_front();
+    }
+}
+std::vector<std::string> LastLogTracker::snapshot() const{
+    return std::vector<std::string>(m_lines.begin(), m_lines.end());
+}
+
+
 FileWindowLogger::~FileWindowLogger(){
     {
         std::lock_guard<std::mutex> lg(m_lock);
@@ -57,15 +68,21 @@ void FileWindowLogger::operator-=(FileWindowLoggerWindow& widget){
 
 void FileWindowLogger::log(const std::string& msg, Color color){
     std::unique_lock<std::mutex> lg(m_lock);
+    m_last_log_tracker += msg;
     m_cv.wait(lg, [this]{ return m_queue.size() < m_max_queue_size; });
     m_queue.emplace_back(msg, color);
     m_cv.notify_all();
 }
 void FileWindowLogger::log(std::string&& msg, Color color){
     std::unique_lock<std::mutex> lg(m_lock);
+    m_last_log_tracker += msg;
     m_cv.wait(lg, [this]{ return m_queue.size() < m_max_queue_size; });
     m_queue.emplace_back(std::move(msg), color);
     m_cv.notify_all();
+}
+std::vector<std::string> FileWindowLogger::get_last() const{
+    std::unique_lock<std::mutex> lg(m_lock);
+    return m_last_log_tracker.snapshot();
 }
 
 

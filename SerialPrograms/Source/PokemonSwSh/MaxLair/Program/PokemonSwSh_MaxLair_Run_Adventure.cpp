@@ -5,7 +5,7 @@
  */
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/ErrorReports/ErrorReports.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
@@ -162,12 +162,20 @@ void loop_adventures(
         case AdventureResult::START_ERROR:
             restart_count++;
             if (restart_count == 3){
+                report_error(
+                    &env.logger(),
+                    env.program_info(),
+                    "Error",
+                    {{"Message:", "Failed to start adventure 3 times in the row."}}
+                );
+#if 0
                 send_program_telemetry(
                     env.logger(), true, COLOR_RED, env.program_info(),
                     "Error",
                     {{"Message:", "Failed to start adventure 3 times in the row."}},
                     ""
                 );
+#endif
                 throw OperationFailedException(
                     ErrorReport::SEND_ERROR_REPORT, env.logger(),
                     "Failed to start adventure 3 times in the row."

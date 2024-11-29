@@ -10,7 +10,7 @@
 #include "Common/Cpp/ImageResolution.h"
 #include "PersistentSettings.h"
 #include "Tests/CommandLineTests.h"
-#include "CrashDump.h"
+#include "ErrorReports/ProgramDumper.h"
 #include "Environment/HardwareValidation.h"
 #include "Logging/Logger.h"
 #include "Logging/OutputRedirector.h"
@@ -109,6 +109,7 @@ int main(int argc, char *argv[]){
     }
 
     set_working_directory();
+    SendableErrorReport::send_all_unsent_reports(global_logger_tagged());
     
     int ret = 0;
     {

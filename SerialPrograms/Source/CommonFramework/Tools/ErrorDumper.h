@@ -20,19 +20,21 @@ struct VideoSnapshot;
 class ProgramEnvironment;
 struct ProgramInfo;
 
+#if 0
 std::string dump_image_alone(
     Logger& logger,
     const ProgramInfo& program_info, const std::string& label,
     const ImageViewRGB32& image
 );
+#endif
+
 // Dump error image to ./ErrorDumps/ folder. Also send image as telemetry if user allows.
-// Return image path.
-std::string dump_image(
+void dump_image(
     Logger& logger,
     const ProgramInfo& program_info, const std::string& label,
     const ImageViewRGB32& image
 );
-std::string dump_image(
+void dump_image(
     const ProgramInfo& program_info,
     ConsoleHandle& console,
     const std::string& label

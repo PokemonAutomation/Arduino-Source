@@ -13,6 +13,7 @@
 //#include "CommonFramework/Notifications/EventNotificationOption.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/ErrorReports/ErrorReports.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 //#include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "ConsoleHandle.h"
@@ -39,11 +40,19 @@ std::string dump_image_alone(
     image.save(name);
     return name;
 }
-std::string dump_image(
+void dump_image(
     Logger& logger,
     const ProgramInfo& program_info, const std::string& label,
     const ImageViewRGB32& image
 ){
+    report_error(
+        &logger,
+        program_info,
+        label,
+        {},
+        image
+    );
+#if 0
     std::string name = dump_image_alone(logger, program_info, label, image);
     send_program_telemetry(
         logger, true, COLOR_RED,
@@ -53,14 +62,15 @@ std::string dump_image(
         name
     );
     return name;
+#endif
 }
-std::string dump_image(
+void dump_image(
     const ProgramInfo& program_info,
     ConsoleHandle& console,
     const std::string& label
 ){
     auto snapshot = console.video().snapshot();
-    return dump_image(console, program_info, label, snapshot);
+    dump_image(console, program_info, label, snapshot);
 }
 
 #if 0

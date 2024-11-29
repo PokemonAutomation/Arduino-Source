@@ -52,41 +52,44 @@ DiscordWebhookSender& DiscordWebhookSender::instance(){
     return sender;
 }
 
-void DiscordWebhookSender::send_json(
+void DiscordWebhookSender::send(
     Logger& logger,
     const QUrl& url, std::chrono::milliseconds delay,
     const JsonObject& obj,
     std::shared_ptr<PendingFileSend> file
 ){
     cleanup_stuck_requests();
+    std::shared_ptr<JsonValue> json(new JsonValue(obj.clone()));
     m_queue.add_event(
         delay,
-        [this, url, data = QByteArray::fromStdString(obj.dump()), file = std::move(file)]{
+        [this, url, json = std::move(json), file = std::move(file)]{
             throttle();
-            if (!file && !data.isEmpty()){
-                internal_send_json(url, data);
-            }else if (file && !data.isEmpty()){
-                internal_send_image_embed(url, data, file->filepath(), file->filename());
-            }else{
-                internal_send_file(url, file->filepath());
+            std::vector<DiscordFileAttachment> attachments;
+            if (file){
+                attachments.emplace_back(file->filename(), file->filepath());
             }
+            internal_send(url, *json, attachments);
         }
     );
     logger.log("Scheduling Webhook Message... (queue = " + tostr_u_commas(m_queue.size()) + ")", COLOR_PURPLE);
 }
-
-void DiscordWebhookSender::send_file(
+void DiscordWebhookSender::send(
     Logger& logger,
     const QUrl& url, std::chrono::milliseconds delay,
-    std::shared_ptr<PendingFileSend> file
+    const JsonObject& obj,
+    std::vector<std::shared_ptr<PendingFileSend>> files
 ){
     cleanup_stuck_requests();
-//    m_queue.emplace_back(url, file);
+    std::shared_ptr<JsonValue> json(new JsonValue(obj.clone()));
     m_queue.add_event(
         delay,
-        [this, url, file = std::move(file)]{
+        [this, url, json = std::move(json), files = std::move(files)]{
             throttle();
-            internal_send_file(url, file->filepath());
+            std::vector<DiscordFileAttachment> attachments;
+            for (auto& file : files){
+                attachments.emplace_back(file->filename(), file->filepath());
+            }
+            internal_send(url, *json, attachments);
         }
     );
     logger.log("Scheduling Webhook Message... (queue = " + tostr_u_commas(m_queue.size()) + ")", COLOR_PURPLE);
@@ -148,49 +151,48 @@ void DiscordWebhookSender::process_reply(QNetworkReply* reply){
     }
 }
 
-void DiscordWebhookSender::internal_send_json(const QUrl& url, const QByteArray& data){
+void DiscordWebhookSender::internal_send(
+    const QUrl& url, const JsonValue& json,
+    const std::vector<DiscordFileAttachment>& files
+){
     QEventLoop event_loop;
     connect(
         this, &DiscordWebhookSender::stop_event_loop,
         &event_loop, &QEventLoop::quit
     );
 
-    QNetworkRequest request(url);
-    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+    QHttpMultiPart multiPart(QHttpMultiPart::FormDataType);
+    if (!json.is_null()){
+        QHttpPart json_part;
+        json_part.setHeader(
+            QNetworkRequest::ContentDispositionHeader,
+            QVariant("form-data; name=payload_json")
+        );
+        json_part.setBody(QByteArray::fromStdString(json.dump()));
+        multiPart.append(json_part);
+    }
 
-    QNetworkAccessManager manager;
-    event_loop.connect(&manager, SIGNAL(finished(QNetworkReply*)), SLOT(quit()));
-    m_logger.log("Sending Webhook Message...", COLOR_BLUE);
-    std::unique_ptr<QNetworkReply> reply(manager.post(request, data));
-    event_loop.exec();
-    process_reply(reply.get());
-}
-
-void DiscordWebhookSender::internal_send_file(const QUrl& url, const std::string& filename){
-    QEventLoop event_loop;
-    connect(
-        this, &DiscordWebhookSender::stop_event_loop,
-        &event_loop, &QEventLoop::quit
-    );
-
-    QFile file(QString::fromStdString(filename));
-    if (!file.open(QIODevice::ReadOnly)){
-        m_logger.log("File doesn't exist: " + filename, COLOR_RED);
-        return;
+    std::vector<QHttpPart> file_parts;
+    std::deque<QFile> file_readers;
+    file_parts.reserve(files.size());
+    size_t c = 0;
+    for (const auto& file : files){
+        QFile& reader = file_readers.emplace_back(QString::fromStdString(file.filepath));
+        if (!reader.open(QIODevice::ReadOnly)){
+            m_logger.log("File doesn't exist: " + file.filepath, COLOR_RED);
+            continue;
+        }
+        QHttpPart& part = file_parts.emplace_back();
+        part.setHeader(
+            QNetworkRequest::ContentDispositionHeader,
+            QVariant(QString::fromStdString("application/octet-stream; name=file" + std::to_string(c) + "; filename=" + file.name))
+        );
+        part.setBodyDevice(&reader);
+        multiPart.append(part);
+        c++;
     }
 
     QNetworkRequest request(url);
-
-    QHttpPart imagePart;
-    imagePart.setHeader(
-        QNetworkRequest::ContentDispositionHeader,
-        QVariant("form-data; name=\"file1\"; filename=\"" + file.fileName() + "\"")
-    );
-    imagePart.setBodyDevice(&file);
-
-    QHttpMultiPart multiPart(QHttpMultiPart::FormDataType);
-    multiPart.append(imagePart);
-
     QNetworkAccessManager manager;
     event_loop.connect(&manager, SIGNAL(finished(QNetworkReply*)), SLOT(quit()));
     m_logger.log("Sending Webhook Message...", COLOR_BLUE);
@@ -198,48 +200,6 @@ void DiscordWebhookSender::internal_send_file(const QUrl& url, const std::string
     event_loop.exec();
     process_reply(reply.get());
 }
-
-void DiscordWebhookSender::internal_send_image_embed(const QUrl& url, const QByteArray& data, const std::string& filepath, const std::string& filename){
-    QEventLoop event_loop;
-    connect(
-        this, &DiscordWebhookSender::stop_event_loop,
-        &event_loop, &QEventLoop::quit
-    );
-
-    QFile file(QString::fromStdString(filepath));
-    if (!file.open(QIODevice::ReadOnly)){
-        m_logger.log("File doesn't exist: " + filepath, COLOR_RED);
-        return;
-    }
-
-    QNetworkRequest request(url);
-
-    QHttpPart imagePart;
-    imagePart.setHeader(
-        QNetworkRequest::ContentDispositionHeader,
-        QVariant("application/octet-stream; name=file0; filename=" + QString::fromStdString(filename))
-    );
-    imagePart.setBodyDevice(&file);
-
-    QHttpPart jsonPart;
-    jsonPart.setHeader(
-        QNetworkRequest::ContentDispositionHeader,
-        QVariant("form-data; name=payload_json")
-    );
-    jsonPart.setBody(data);
-
-    QHttpMultiPart multiPart(QHttpMultiPart::FormDataType);
-    multiPart.append(imagePart);
-    multiPart.append(jsonPart);
-
-    QNetworkAccessManager manager;
-    event_loop.connect(&manager, SIGNAL(finished(QNetworkReply*)), SLOT(quit()));
-    m_logger.log("Sending Webhook Message...", COLOR_BLUE);
-    std::unique_ptr<QNetworkReply> reply(manager.post(request, &multiPart));
-    event_loop.exec();
-    process_reply(reply.get());
-}
-
 
 
 
@@ -280,7 +240,7 @@ void send_embed(
             json["embeds"] = embeds.clone();
         }
 
-        DiscordWebhookSender::instance().send_json(
+        DiscordWebhookSender::instance().send(
             logger,
             QString::fromStdString(url.url),
             delay,
@@ -290,6 +250,52 @@ void send_embed(
     }
 }
 
+void send_embed(
+    Logger& logger,
+    bool should_ping,
+    const std::vector<std::string>& tags,
+    const JsonArray& embeds,
+    const std::vector<std::shared_ptr<PendingFileSend>>& files
+){
+    DiscordSettingsOption& settings = GlobalSettings::instance().DISCORD;
+    if (!settings.webhooks.enabled()){
+        return;
+    }
+
+    MessageBuilder builder(tags);
+
+    std::vector<std::unique_ptr<DiscordWebhookUrl>> list = settings.webhooks.urls.copy_snapshot();
+    for (size_t c = 0; c < list.size(); c++){
+        const DiscordWebhookUrl& url = *list[c];
+        if (!url.enabled || ((std::string)url.url).empty()){
+            continue;
+        }
+        if (!builder.should_send(EventNotificationOption::parse_tags(url.tags_text))){
+            continue;
+        }
+
+        std::chrono::seconds delay(url.delay);
+
+        JsonObject json;
+        json["content"] = builder.build_message(
+            delay,
+            should_ping && url.ping,
+            settings.message.user_id,
+            settings.message.message
+        );
+        if (!embeds.empty()){
+            json["embeds"] = embeds.clone();
+        }
+
+        DiscordWebhookSender::instance().send(
+            logger,
+            QString::fromStdString(url.url),
+            delay,
+            std::move(json),
+            files
+        );
+    }
+}
 
 
 

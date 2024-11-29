@@ -8,7 +8,6 @@
 #define PokemonAutomation_ExactImageMatcher_H
 
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
-#include "CommonFramework/ImageTools/FloatPixel.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 
 namespace PokemonAutomation{
@@ -26,6 +25,9 @@ class ExactImageMatcher{
     void operator=(const ExactImageMatcher&) = delete;
 
 public:
+    ExactImageMatcher(const std::string& image_template)
+        : ExactImageMatcher(ImageRGB32(image_template))
+    {}
     ExactImageMatcher(ImageRGB32 image_template);
     
     const ImageStats& stats() const{ return m_stats; }

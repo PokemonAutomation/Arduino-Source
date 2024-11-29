@@ -17,6 +17,7 @@
 #include "CommonFramework/Options/Environment/ProcessorLevelOption.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "CommonFramework/Options/Environment/SleepSuppressOption.h"
+#include "CommonFramework/ErrorReports/ErrorReports.h"
 #include "CommonFramework/VideoPipeline/Backends/CameraImplementations.h"
 #include "CommonFramework/Panels/SettingsPanel.h"
 #include "CommonFramework/Panels/PanelTools.h"
@@ -42,7 +43,6 @@ public:
     SimpleIntegerOption<uint32_t> WIDTH;
     SimpleIntegerOption<uint32_t> HEIGHT;
 };
-
 
 
 struct DebugSettings{
@@ -121,7 +121,8 @@ public:
 
     BooleanCheckBoxOption ENABLE_LIFETIME_SANITIZER;
 
-    BooleanCheckBoxOption SEND_ERROR_REPORTS0;
+//    BooleanCheckBoxOption SEND_ERROR_REPORTS0;
+    ErrorReportOption ERROR_REPORTS;
 
     ProcessorLevelOption PROCESSOR_LEVEL0;
 

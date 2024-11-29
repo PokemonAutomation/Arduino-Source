@@ -174,10 +174,11 @@ SOURCES += \
     Source/CommonFramework/ControllerDevices/SerialPortOption.cpp \
     Source/CommonFramework/ControllerDevices/SerialPortSession.cpp \
     Source/CommonFramework/ControllerDevices/SerialPortWidget.cpp \
-    Source/CommonFramework/CrashDump.cpp \
     Source/CommonFramework/Environment/Environment.cpp \
     Source/CommonFramework/Environment/HardwareValidation.cpp \
     Source/CommonFramework/Environment/SystemSleep.cpp \
+    Source/CommonFramework/ErrorReports/ErrorReports.cpp \
+    Source/CommonFramework/ErrorReports/ProgramDumper.cpp \
     Source/CommonFramework/Exceptions/FatalProgramException.cpp \
     Source/CommonFramework/Exceptions/OliveActionFailedException.cpp \
     Source/CommonFramework/Exceptions/OperationFailedException.cpp \
@@ -1234,7 +1235,6 @@ HEADERS += \
     Source/CommonFramework/ControllerDevices/SerialPortOption.h \
     Source/CommonFramework/ControllerDevices/SerialPortSession.h \
     Source/CommonFramework/ControllerDevices/SerialPortWidget.h \
-    Source/CommonFramework/CrashDump.h \
     Source/CommonFramework/Environment/Environment.h \
     Source/CommonFramework/Environment/Environment_Linux.h \
     Source/CommonFramework/Environment/Environment_Linux.tpp \
@@ -1250,6 +1250,9 @@ HEADERS += \
     Source/CommonFramework/Environment/SystemSleep.h \
     Source/CommonFramework/Environment/SystemSleep_Apple.tpp \
     Source/CommonFramework/Environment/SystemSleep_Windows.tpp \
+    Source/CommonFramework/ErrorReports/ErrorReports.h \
+    Source/CommonFramework/ErrorReports/ProgramDumper.h \
+    Source/CommonFramework/ErrorReports/ProgramDumper_Windows.tpp \
     Source/CommonFramework/Exceptions/FatalProgramException.h \
     Source/CommonFramework/Exceptions/OliveActionFailedException.h \
     Source/CommonFramework/Exceptions/OperationFailedException.h \
@@ -2137,10 +2140,12 @@ HEADERS += \
 
 
 
-exists(../../Internal/SerialPrograms/TelemetryURLs.h){
+exists(../../Internal/SerialPrograms/Internal0.cpp){
     DEFINES += PA_OFFICIAL
     SOURCES += ../../Internal/SerialPrograms/NintendoSwitch_TestPrograms.cpp
     HEADERS += ../../Internal/SerialPrograms/NintendoSwitch_TestPrograms.h
+    SOURCES += ../../Internal/SerialPrograms/Internal0.cpp
+    SOURCES += ../../Internal/SerialPrograms/Internal1.cpp
 }
 
 

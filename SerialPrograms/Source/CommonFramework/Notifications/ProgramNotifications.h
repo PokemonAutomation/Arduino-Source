@@ -90,15 +90,5 @@ void send_program_fatal_error_notification(
 
 
 
-
-void send_program_telemetry(
-    Logger& logger, bool is_error, Color color,
-    const ProgramInfo& info,
-    const std::string& title,
-    const std::vector<std::pair<std::string, std::string>>& messages,
-    const std::string& file
-);
-
-
 }
 #endif

@@ -397,20 +397,4 @@ void send_program_fatal_error_notification(
 
 
 
-
-
-
-
-#ifndef PA_OFFICIAL
-void send_program_telemetry(
-    Logger& logger, bool is_error, Color color,
-    const ProgramInfo& info,
-    const std::string& title,
-    const std::vector<std::pair<std::string, std::string>>& messages,
-    const std::string& file
-){}
-#endif
-
-
-
 }

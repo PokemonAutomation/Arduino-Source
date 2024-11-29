@@ -161,7 +161,7 @@ private:
 };
 
 JsonValue parse_json(const std::string& str);
-JsonValue load_json_file(const std::string& str);
+JsonValue load_json_file(const std::string& filename);
 
 
 template <typename Type>

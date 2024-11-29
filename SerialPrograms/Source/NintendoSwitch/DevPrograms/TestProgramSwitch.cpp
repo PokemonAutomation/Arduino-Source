@@ -121,6 +121,7 @@
 #include "PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h"
 //#include "CommonFramework/Environment/SystemSleep.h"
+#include "CommonFramework/ErrorReports/ErrorReports.h"
 
 
 
@@ -275,6 +276,21 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 //    SetThreadExecutionState(ES_CONTINUOUS | ES_DISPLAY_REQUIRED);
 
+
+
+#if 0
+    VideoSnapshot image = feed.snapshot();
+    report_error(
+        &env.logger(),
+        env.program_info(),
+        "testtest",
+        {{"title", "message"}},
+        image,
+        {"test.txt"}
+    );
+#endif
+
+#if 1
     VideoSnapshot image = feed.snapshot();
 //    ImageRGB32 image("screenshot-20241124-135028529403.png");
 
@@ -288,7 +304,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     cout << "hour =  " << (int)date.second.hour << endl;
     cout << "min =   " << (int)date.second.minute << endl;
     cout << "secs =  " << (int)date.second.second << endl;
-
+#endif
 
 #if 0
 

@@ -243,7 +243,35 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     using namespace Pokemon;
     using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
 
+#if 0
+    send_program_notification_with_file(
+        env, NOTIFICATION_PROGRAM_FINISH, COLOR_BLUE,
+        "test notification",
+        {},
+        "",
+        "test.txt"
+    );
+#endif
 
+
+//    ImageRGB32 image("Screenshots/20241128-152424608121.png");
+#if 0
+    send_error_report(
+        env.logger(),
+        env.program_info(),
+        "testtest",
+        {{"title", "message"}},
+        image,
+//        ImageRGB32(),
+        {"test.txt", "test2.txt"}
+    );
+#endif
+
+
+    int* ptr = nullptr;
+    cout << ptr[0] << endl;
+
+#if 0
     std::random_device rndsource;
     std::minstd_rand rndgen(rndsource());
     std::uniform_real_distribution<double> dist(0, 1.0);
@@ -252,6 +280,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     cout << dist(rndgen) << endl;
     cout << dist(rndgen) << endl;
     cout << dist(rndgen) << endl;
+#endif
 
 #if 0
     PokemonSV::DateSeed data = PokemonSV::ItemPrinter::calculate_seed_prizes(2346161588);
