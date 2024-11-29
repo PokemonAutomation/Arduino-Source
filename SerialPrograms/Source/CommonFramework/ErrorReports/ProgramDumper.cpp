@@ -16,7 +16,7 @@ namespace PokemonAutomation{
         //  Not supported
     }
     bool program_dump(Logger* logger, const std::string& filename){
-
+        return false;
     }
 }
 #endif
