@@ -91,7 +91,7 @@ SendableErrorReport::SendableErrorReport()
         : PROGRAM_NAME + " (" + PROGRAM_VERSION + ")"
     )
 {
-    QDir().mkdir(QString::fromStdString(m_directory));
+    QDir().mkpath(QString::fromStdString(m_directory));
 }
 SendableErrorReport::SendableErrorReport(
     Logger* logger,
