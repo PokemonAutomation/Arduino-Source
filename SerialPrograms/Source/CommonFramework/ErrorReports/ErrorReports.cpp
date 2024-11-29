@@ -6,6 +6,7 @@
 
 #include <iostream>
 #include <QDir>
+#include <QMessageBox>
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
@@ -13,6 +14,7 @@
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "ProgramDumper.h"
 #include "ErrorReports.h"
 
@@ -33,9 +35,21 @@ const std::string& ERROR_PATH_SENT = "ErrorReportsSent";
 
 
 ErrorReportOption::ErrorReportOption()
-    : GroupOption("Error Reports", LockMode::UNLOCK_WHILE_RUNNING, true)
+    : GroupOption("Error Reports", LockMode::UNLOCK_WHILE_RUNNING, false)
     , DESCRIPTION(
         "Send error reports to the " + PROGRAM_NAME + " server to help them resolve issues and improve the program."
+    )
+    , SEND_MODE(
+        "<b>When to Send Error Reports:</b>",
+        {
+            {ErrorReportSendMode::SEND_AUTOMATICALLY,       "automatic",    "Send automatically."},
+            {ErrorReportSendMode::PROMPT_WHEN_CONVENIENT,   "prompt",       "Prompt when convenient."},
+            {ErrorReportSendMode::NEVER_SEND_ANYTHING,      "never",        "Never send error reports."},
+        },
+        LockMode::UNLOCK_WHILE_RUNNING,
+        IS_BETA_VERSION
+            ? ErrorReportSendMode::SEND_AUTOMATICALLY
+            : ErrorReportSendMode::PROMPT_WHEN_CONVENIENT
     )
     , SCREENSHOT(
         "<b>Include Screenshots:</b>",
@@ -48,7 +62,7 @@ ErrorReportOption::ErrorReportOption()
         true
     )
     , DUMPS(
-        "<b>Include Dumps:</b><br>This saves stack-trace and related information.",
+        "<b>Include Dumps:</b><br>Include stack-trace and related information.",
         LockMode::UNLOCK_WHILE_RUNNING,
         true
     )
@@ -61,6 +75,7 @@ ErrorReportOption::ErrorReportOption()
 #endif
 {
     PA_ADD_STATIC(DESCRIPTION);
+    PA_ADD_OPTION(SEND_MODE);
     PA_ADD_OPTION(SCREENSHOT);
     PA_ADD_OPTION(LOGS);
     PA_ADD_OPTION(DUMPS);
@@ -233,7 +248,10 @@ std::vector<std::string> SendableErrorReport::get_pending_reports(){
     }
     return ret;
 }
-void SendableErrorReport::send_reports(Logger& logger, const std::vector<std::string>& reports){
+
+
+
+void send_reports(Logger& logger, const std::vector<std::string>& reports){
     for (const std::string& path : reports){
         try{
             SendableErrorReport report(path);
@@ -245,13 +263,50 @@ void SendableErrorReport::send_reports(Logger& logger, const std::vector<std::st
         }
     }
 }
-void SendableErrorReport::send_all_unsent_reports(Logger& logger){
+void send_all_unsent_reports(Logger& logger, bool allow_prompt){
 #ifdef PA_OFFICIAL
-    if (GlobalSettings::instance().ERROR_REPORTS.enabled()){
-        std::vector<std::string> reports = SendableErrorReport::get_pending_reports();
-        global_logger_tagged().log("Found " + std::to_string(reports.size()) + " unsent error reports. Attempting to send...", COLOR_PURPLE);
-        SendableErrorReport::send_reports(global_logger_tagged(), reports);
+    ErrorReportSendMode mode = GlobalSettings::instance().ERROR_REPORTS.SEND_MODE;
+    if (mode == ErrorReportSendMode::NEVER_SEND_ANYTHING){
+        return;
     }
+
+    std::vector<std::string> reports = SendableErrorReport::get_pending_reports();
+    global_logger_tagged().log("Found " + std::to_string(reports.size()) + " unsent error reports.", COLOR_PURPLE);
+
+    if (reports.empty()){
+        return;
+    }
+
+    if (mode == ErrorReportSendMode::PROMPT_WHEN_CONVENIENT){
+        if (!allow_prompt){
+            return;
+        }
+        QMessageBox box;
+        QMessageBox::StandardButton button = box.information(
+            nullptr,
+            "Error Reporting",
+            QString::fromStdString(
+                (reports.size() == 1
+                    ? "There is " + tostr_u_commas(reports.size()) + " error report.<br><br>"
+                      "Would you like to help make this program better by sending it to the developers?<br><br>"
+                    : "There are " + tostr_u_commas(reports.size()) + " error reports.<br><br>"
+                      "Would you like to help make this program better by sending them to the developers?<br><br>"
+                ) +
+                make_text_url(ERROR_PATH_UNSENT, "View unsent error reports.")// + "<br><br>"
+//                "(You can change )"
+            ),
+            QMessageBox::Yes | QMessageBox::No,
+            QMessageBox::StandardButton::Yes
+        );
+        if (button != QMessageBox::StandardButton::Yes){
+            return;
+        }
+//        cout << "asdfasdf" << button_yes << " : " << button_no << " : " << &button << endl; //  REMOVE
+    }
+
+    global_logger_tagged().log("Attempting to send " + std::to_string(reports.size()) + " error reports.", COLOR_PURPLE);
+    send_reports(global_logger_tagged(), reports);
+
 #endif
 }
 
@@ -284,7 +339,7 @@ void report_error(
         report.save(logger);
     }
 
-    SendableErrorReport::send_all_unsent_reports(*logger);
+    send_all_unsent_reports(*logger, false);
 }
 
 

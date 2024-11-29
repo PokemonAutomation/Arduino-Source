@@ -11,6 +11,7 @@
 #include "Common/Cpp/Options/GroupOption.h"
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
+#include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
@@ -24,12 +25,20 @@ extern const std::string& ERROR_PATH_UNSENT;
 extern const std::string& ERROR_PATH_SENT;
 
 
+enum class ErrorReportSendMode{
+    SEND_AUTOMATICALLY,
+    PROMPT_WHEN_CONVENIENT,
+    NEVER_SEND_ANYTHING,
+};
 
 class ErrorReportOption : public GroupOption{
 public:
     ErrorReportOption();
 
     StaticTextOption DESCRIPTION;
+
+    EnumDropdownOption<ErrorReportSendMode> SEND_MODE;
+
     BooleanCheckBoxOption SCREENSHOT;
     BooleanCheckBoxOption LOGS;
     BooleanCheckBoxOption DUMPS;
@@ -65,8 +74,6 @@ public:
     void move_to_sent();
 
     static std::vector<std::string> get_pending_reports();
-    static void send_reports(Logger& logger, const std::vector<std::string>& reports);
-    static void send_all_unsent_reports(Logger& logger);
 
 private:
     std::string m_timestamp;
@@ -82,6 +89,9 @@ private:
 };
 
 
+void send_reports(Logger& logger, const std::vector<std::string>& reports);
+void send_all_unsent_reports(Logger& logger, bool allow_prompt);
+
 
 void report_error(
     Logger* logger = nullptr,
@@ -91,6 +101,11 @@ void report_error(
     const ImageViewRGB32& image = ImageViewRGB32(),
     const std::vector<std::string>& files = {}
 );
+
+
+
+
+
 
 
 }

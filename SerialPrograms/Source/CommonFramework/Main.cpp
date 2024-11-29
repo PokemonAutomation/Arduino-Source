@@ -109,7 +109,7 @@ int main(int argc, char *argv[]){
     }
 
     set_working_directory();
-    SendableErrorReport::send_all_unsent_reports(global_logger_tagged());
+    send_all_unsent_reports(global_logger_tagged(), true);
     
     int ret = 0;
     {
