@@ -66,7 +66,9 @@ void DiscordWebhookSender::send(
             throttle();
             std::vector<DiscordFileAttachment> attachments;
             if (file){
-                attachments.emplace_back(file->filename(), file->filepath());
+                attachments.emplace_back(
+                    DiscordFileAttachment{file->filename(), file->filepath()}
+                );
             }
             internal_send(url, *json, attachments);
         }
