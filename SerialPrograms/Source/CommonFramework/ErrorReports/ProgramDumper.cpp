@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Compiler.h"
 #include "ProgramDumper.h"
 
 
