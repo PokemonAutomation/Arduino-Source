@@ -895,7 +895,6 @@ void mash_button_till_overworld(
     uint16_t button, uint16_t seconds_run
 ){
     OverworldWatcher overworld(console, COLOR_CYAN);
-    NormalBattleMenuWatcher battle(COLOR_BLUE);
     context.wait_for_all_requests();
 
     int ret = run_until(
@@ -904,12 +903,10 @@ void mash_button_till_overworld(
             ssf_mash1_button(context, button, seconds_run * TICKS_PER_SECOND);
             pbf_wait(context, seconds_run * TICKS_PER_SECOND);
         },
-        {overworld, battle}
+        {overworld}
     );
 
-    if (ret == 1){
-        run_battle_press_A(console, context, BattleStopCondition::STOP_OVERWORLD);
-    }else if (ret < 0){
+    if (ret < 0){
         throw OperationFailedException(
             ErrorReport::SEND_ERROR_REPORT, console,
             "mash_button_till_overworld(): Timed out, no recognized state found.",

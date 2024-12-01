@@ -100,9 +100,9 @@ void checkpoint_16(
         context.wait_for_all_requests();
 
         // walk forward
-        pbf_move_left_joystick(context, 128, 0, 300, 100);
+        pbf_move_left_joystick(context, 128, 0, 600, 100);
         // turn left 
-        pbf_move_left_joystick(context, 0, 128, 50, 100);
+        pbf_move_left_joystick(context, 0, 128, 20, 100);
 
         // talk to Arven. stop at overworld. need prompt, overworld, white button A. and book?
         env.console.log("Talk with Arven. Receive Titan questline (Path of Legends).");
@@ -138,7 +138,7 @@ void checkpoint_17(
         context.wait_for_all_requests();
 
         // walk backwards until dialog
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 20, 255);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 20, 128, 255);
         env.console.log("Talk with Cassiopeia.");
         mash_button_till_overworld(env.console, context, BUTTON_A, 360);
 
@@ -290,7 +290,7 @@ void checkpoint_20(
         env.console.log("Leave dorm for schoolyard.");
         mash_button_till_overworld(env.console, context, BUTTON_A, 360);
 
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 60, 0);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 60, 128, 0);
 
         env.console.log("Talk to Nemona, Arven, Cassiopeia.");
         clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 16, 

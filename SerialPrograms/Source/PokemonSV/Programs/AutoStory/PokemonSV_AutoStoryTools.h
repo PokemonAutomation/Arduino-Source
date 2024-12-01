@@ -230,9 +230,14 @@ void wait_for_overworld(
 
 void press_A_until_dialog(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, uint16_t seconds_between_button_presses);
 
-bool check_ride_active(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
+// return true if ride is active. i.e. if you are on your ride
+bool is_ride_active(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
 
 void get_on_ride(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
+
+void get_off_ride(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
+
+void get_on_or_off_ride(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, bool get_on);
 
 
 // change the settings prior to Autostory

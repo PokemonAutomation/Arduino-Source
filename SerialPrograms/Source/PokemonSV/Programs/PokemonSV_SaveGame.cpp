@@ -107,12 +107,15 @@ void save_game_from_menu_or_overworld(
 
 
 void save_game_tutorial(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+    console.log("Save game from tutorial. Open the menu.");
+    context.wait_for_all_requests();
     
     // open the menu.
     MainMenuWatcher menu(COLOR_RED);
     int ret0 = run_until(
         console, context,
         [](BotBaseContext& context){
+            pbf_wait(context, 500); // avoiding pressing X if menu already open
             for (size_t i = 0; i < 10; i++){
                 pbf_press_button(context, BUTTON_X, 20, 500);
             }

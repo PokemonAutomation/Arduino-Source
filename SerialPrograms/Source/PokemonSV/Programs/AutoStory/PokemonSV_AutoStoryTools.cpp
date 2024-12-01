@@ -489,8 +489,8 @@ void overworld_navigation(
             context.wait_for_all_requests();
             try {
                 realign_player(info, console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
-                if (!confirm_marker_present(info, console, context)){  
-                    // if marker not present, don't keep walking forward.
+                if (stop_condition == NavigationStopCondition::STOP_MARKER && !confirm_marker_present(info, console, context)){  
+                    // if marker not present when using marker based navigation, don't keep walking forward.
                     return;
                 }
 
@@ -632,7 +632,7 @@ void change_settings(SingleSwitchProgramEnvironment& env, BotBaseContext& contex
             {MenuOptionItemEnum::GIVE_NICKNAMES, {MenuOptionToggleEnum::OFF}},
             {MenuOptionItemEnum::VERTICAL_CAMERA_CONTROLS, {MenuOptionToggleEnum::REGULAR, MenuOptionToggleEnum::NORMAL}},
             {MenuOptionItemEnum::HORIZONTAL_CAMERA_CONTROLS, {MenuOptionToggleEnum::REGULAR, MenuOptionToggleEnum::NORMAL}},
-            {MenuOptionItemEnum::CAMERA_SUPPORT, {MenuOptionToggleEnum::ON}},
+            {MenuOptionItemEnum::CAMERA_SUPPORT, {MenuOptionToggleEnum::OFF}},
             {MenuOptionItemEnum::CAMERA_INTERPOLATION, {MenuOptionToggleEnum::NORMAL, MenuOptionToggleEnum::AVERAGE}},
             {MenuOptionItemEnum::CAMERA_DISTANCE, {MenuOptionToggleEnum::CLOSE}},
             {MenuOptionItemEnum::AUTOSAVE, {MenuOptionToggleEnum::OFF}},
@@ -650,7 +650,7 @@ void change_settings(SingleSwitchProgramEnvironment& env, BotBaseContext& contex
         config_option(context, 1); // Give Nicknames: Off
         config_option(context, 0); // Vertical Camera Controls: Regular
         config_option(context, 0); // Horiztontal Camera Controls: Regular
-        config_option(context, 0); // Camera Support: On
+        config_option(context, 1); // Camera Support: Off
         config_option(context, 0); // Camera Interpolation: Normal
         config_option(context, 0); // Camera Distance: Close
         config_option(context, 1); // Autosave: Off
@@ -853,7 +853,7 @@ void press_A_until_dialog(const ProgramInfo& info, ConsoleHandle& console, BotBa
     }
 }
 
-bool check_ride_active(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+bool is_ride_active(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
     while (true){
         try {
             // open main menu
@@ -879,14 +879,22 @@ bool check_ride_active(const ProgramInfo& info, ConsoleHandle& console, BotBaseC
 }
 
 void get_on_ride(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+    get_on_or_off_ride(info, console, context, true);
+}
+
+void get_off_ride(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+    get_on_or_off_ride(info, console, context, false);
+}
+
+void get_on_or_off_ride(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, bool get_on){
     pbf_press_button(context, BUTTON_PLUS, 20, 20);
 
     WallClock start = current_time();
-    while (!check_ride_active(info, console, context)){
+    while (get_on != is_ride_active(info, console, context)){
         if (current_time() - start > std::chrono::minutes(3)){
             throw OperationFailedException(
                 ErrorReport::SEND_ERROR_REPORT, console,
-                "get_on_ride(): Failed to get on ride after 3 minutes.",
+                "get_on_or_off_ride(): Failed to get on/off ride after 3 minutes.",
                 true
             );
         }        
