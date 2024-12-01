@@ -81,6 +81,7 @@ CommandRow::CommandRow(
         m_overlay_boxes, &QCheckBox::clicked,
         this, [this](bool checked){ m_session.set_enabled_boxes(checked); }
     );
+#if QT_VERSION < 0x060700
     connect(
         m_overlay_text, &QCheckBox::stateChanged,
         this, [this](bool checked){ m_session.set_enabled_text(checked); }
@@ -93,6 +94,20 @@ CommandRow::CommandRow(
         m_overlay_stats, &QCheckBox::stateChanged,
         this, [this](bool checked){ m_session.set_enabled_stats(checked); }
     );
+#else
+    connect(
+        m_overlay_text, &QCheckBox::checkStateChanged,
+        this, [this](Qt::CheckState state){ m_session.set_enabled_text(state == Qt::Checked); }
+    );
+    connect(
+        m_overlay_log, &QCheckBox::checkStateChanged,
+        this, [this](Qt::CheckState state){ m_session.set_enabled_log(state == Qt::Checked); }
+    );
+    connect(
+        m_overlay_stats, &QCheckBox::checkStateChanged,
+        this, [this](Qt::CheckState state){ m_session.set_enabled_stats(state == Qt::Checked); }
+    );
+#endif
     connect(
         m_load_profile_button, &QPushButton::clicked,
         this, [this](bool) { emit load_profile(); }
