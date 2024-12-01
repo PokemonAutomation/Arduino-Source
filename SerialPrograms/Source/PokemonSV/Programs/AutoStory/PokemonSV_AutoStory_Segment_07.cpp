@@ -16,7 +16,7 @@
 #include "PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_SaveGame.h"
-#include "PokemonSV/Inference/PokemonSV_TutorialDetector.h"
+#include "PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h"
 #include "PokemonSV_AutoStoryTools.h"
 #include "PokemonSV_AutoStory_Segment_07.h"
 
@@ -86,48 +86,42 @@ void checkpoint_12(
     bool first_attempt = true;
     while (true){
     try{
-        do_action_and_monitor_for_battles(env.program_info(), env.console, context,
-        [&](const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){        
+        if (first_attempt){
+            checkpoint_save(env, context, notif_status_update);
+            first_attempt = false;
+        }         
         
-            if (first_attempt){
-                checkpoint_save(env, context, notif_status_update);
-                first_attempt = false;
-            } 
+        fly_to_overlapping_flypoint(env.program_info(), env.console, context);
+        context.wait_for_all_requests();
 
-            context.wait_for_all_requests();
-            
-            fly_to_overlapping_flypoint(info, env.console, context);
+        // re-orient camera
+        pbf_press_button(context, BUTTON_L, 20, 20);
+        do_action_and_monitor_for_battles(env.program_info(), env.console, context,
+            [&](const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+                walk_forward_while_clear_front_path(env.program_info(), env.console, context, 35);
+                
+                // place the marker elsewhere
+                realign_player(info, env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 128, 50);
 
-            // re-orient camera
-            pbf_press_button(context, BUTTON_L, 20, 20);
+                DirectionDetector direction;
+                direction.change_direction(info, env.console, context, 0);
+                walk_forward_while_clear_front_path(info, env.console, context, 3300, 0, 125, 125);
 
-            walk_forward_while_clear_front_path(info, env.console, context, 35);
-            realign_player(info, env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 128, 0, 100);
-            walk_forward_while_clear_front_path(info, env.console, context, 500);
-            realign_player(info, env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 100, 0, 120);
-            walk_forward_while_clear_front_path(info, env.console, context, 2000);
-            realign_player(info, env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 0, 120);
-            walk_forward_while_clear_front_path(info, env.console, context, 1250);
-            
-            // check we're not still at the Los Platos Pokecenter.
-            confirm_no_overlapping_flypoint(info, env.console, context);
+                // check we're not still at the Los Platos Pokecenter.
+                confirm_no_overlapping_flypoint(info, env.console, context);
+                // not stuck at Los Platos Pokecenter
+                pbf_press_button(context, BUTTON_B, 20, 1 * TICKS_PER_SECOND);
+                pbf_press_button(context, BUTTON_B, 20, 1 * TICKS_PER_SECOND);
+                press_Bs_to_back_to_overworld(info, env.console, context, 7);                
 
-            // not stuck at Los Platos Pokecenter
-            pbf_press_button(context, BUTTON_B, 20, 1 * TICKS_PER_SECOND);
-            pbf_press_button(context, BUTTON_B, 20, 1 * TICKS_PER_SECOND);
-            press_Bs_to_back_to_overworld(info, env.console, context, 7);
+                direction.change_direction(info, env.console, context, 0.29);
+                walk_forward_while_clear_front_path(info, env.console, context, 1200, 0, 125, 125);
+                direction.change_direction(info, env.console, context, 0.61);
+                walk_forward_while_clear_front_path(info, env.console, context, 1200, 0, 125, 125);
 
-            realign_player(info, env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 80, 0, 100);
-            walk_forward_while_clear_front_path(info, env.console, context, 1500);
-            realign_player(info, env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 30, 0, 50);
-            walk_forward_while_clear_front_path(info, env.console, context, 1000);
-
-            fly_to_overlapping_flypoint(info, env.console, context);
-
-            // heal_at_pokecenter(info, env.console, context);
-   
-        }  
-        );
+                fly_to_overlapping_flypoint(info, env.console, context);                
+            }
+        );             
 
         env.console.log("Reached Mesagoza (South) Pokecenter.");
         

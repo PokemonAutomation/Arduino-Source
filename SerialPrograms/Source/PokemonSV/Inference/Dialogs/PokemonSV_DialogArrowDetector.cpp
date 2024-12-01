@@ -16,9 +16,9 @@
 #include "CommonFramework/ImageMatch/ExactImageMatcher.h"
 #include "PokemonSV_DialogArrowDetector.h"
 
-// #include <iostream>
-// using std::cout;
-// using std::endl;
+#include <iostream>
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -188,19 +188,24 @@ void DialogArrowWatcher::make_overlays(VideoOverlaySet& items) const{
 // - every time the arrow is above top_line, increment m_num_oscillation_above_top_line. 
 // - likewise for m_num_oscillation_below_bottom_line
 // - we alternate between looking for the arrow being above top_line vs below bottom_line
-// - reset counts whenever the dialog arrow is not detected
+// - reset counts whenever the dialog arrow has not been detected for 10 frames consecutively
 bool DialogArrowWatcher::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     std::pair<double, double> arrow_location = m_detector.locate_dialog_arrow(frame);
     double y_location = arrow_location.second;
     // cout << std::to_string(y_location) << endl;
 
     if (y_location < 0){ // dialog arrow not detected
-        // reset oscillation counts
-        m_num_oscillation_above_top_line = 0;
-        m_num_oscillation_below_bottom_line = 0;
-        return false;
+        m_num_no_detection++;
+        if (m_num_no_detection > 10){
+            // reset oscillation counts
+            m_num_oscillation_above_top_line = 0;
+            m_num_oscillation_below_bottom_line = 0;
+        }
+        return false;        
+    }else{
+        m_num_no_detection = 0;
     }
-
+    
     if (m_num_oscillation_above_top_line >= 5 && m_num_oscillation_below_bottom_line >= 5){
         // we have had 5 oscillations above and below the top and bottom line respectively
         return true;

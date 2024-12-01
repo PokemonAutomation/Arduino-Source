@@ -16,7 +16,7 @@
 #include "PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_SaveGame.h"
-#include "PokemonSV/Inference/PokemonSV_TutorialDetector.h"
+#include "PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h"
 #include "PokemonSV_AutoStoryTools.h"
 #include "PokemonSV_AutoStory_Segment_03.h"
 
@@ -82,11 +82,11 @@ void checkpoint_05(
         }         
         context.wait_for_all_requests();
 
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 40, 160, 60);
-        pbf_move_left_joystick(context, 128, 0, 7 * TICKS_PER_SECOND, 20);
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 40, 84, 60);
-        env.console.log("overworld_navigation: Go to mom at the gate.");
-        overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 0, 20);
+        DirectionDetector direction;
+        direction.change_direction(env.program_info(), env.console, context, 1.92);
+        pbf_move_left_joystick(context, 128, 0, 7 * TICKS_PER_SECOND, 50);        
+        direction.change_direction(env.program_info(), env.console, context, 1.13);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 20);
         
         context.wait_for_all_requests();
         env.console.log("Get mom's sandwich");
@@ -123,7 +123,7 @@ void checkpoint_06(
         pbf_move_left_joystick(context, 128, 0, 6 * TICKS_PER_SECOND, 20);
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 110, 10, 60);
         env.console.log("overworld_navigation: Go to Nemona.");
-        overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 0, 20);
+        overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 0, 20, 20, true, true);
         
         context.wait_for_all_requests();
         env.console.log("clear_dialog: Talk with Nemona to start catch tutorial. Stop when detect battle.");
@@ -171,11 +171,25 @@ void checkpoint_07(
         env.console.log("Move to cliff");
         env.console.overlay().add_log("Move to cliff", COLOR_WHITE);
 
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 240, 60, 80);
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 70, 100);
         env.console.log("overworld_navigation: Go to cliff.");
-        overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 116, 0, 72, 24, true, true);
+        overworld_navigation(env.program_info(), env.console, context, 
+            NavigationStopCondition::STOP_TIME, NavigationMovementMode::DIRECTIONAL_ONLY, 
+            135, 0, 24, 12, true, true);
 
-        env.console.log("clear_dialog: Talk to Nemona at the cliff. Stop when detect overworld.");
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 128, 0, 80);
+        handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
+            [&](const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){           
+                overworld_navigation(env.program_info(), env.console, context, 
+                    NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 
+                    128, 0, 24, 12, true, true);
+            }, 
+            [&](const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){           
+                pbf_move_left_joystick(context, 0, 128, 40, 50);
+                realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
+            }
+        );               
+
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::OVERWORLD});
 
         context.wait_for_all_requests();

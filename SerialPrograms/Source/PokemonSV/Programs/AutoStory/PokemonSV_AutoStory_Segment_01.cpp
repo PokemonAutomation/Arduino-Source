@@ -17,6 +17,7 @@
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_SaveGame.h"
 #include "PokemonSV/Inference/PokemonSV_TutorialDetector.h"
+#include "PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h"
 #include "PokemonSV_AutoStoryTools.h"
 #include "PokemonSV_AutoStory_Segment_01.h"
 
@@ -83,7 +84,6 @@ AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
             stats.m_checkpoint++;
             env.update_stats();
             send_program_status_notification(env, notif_status_update, "Saved at checkpoint.");     
-            first_attempt = false;
         }
         
         context.wait_for_all_requests();
@@ -91,6 +91,7 @@ AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
         enter_menu_from_overworld(env.program_info(), env.console, context, 0, MenuSide::RIGHT, false);
         change_settings(env, context, language, first_attempt);
         pbf_mash_button(context, BUTTON_B, 2 * TICKS_PER_SECOND);
+        context.wait_for_all_requests();
 
         break;  
     }catch(...){
@@ -114,7 +115,7 @@ void checkpoint_02(
     bool first_attempt = true;
     while (true){
     try{
-        if(!first_attempt){
+        if(first_attempt){
             save_game_tutorial(env.program_info(), env.console, context);
             stats.m_checkpoint++;
             env.update_stats();
@@ -180,13 +181,7 @@ void checkpoint_02(
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::OVERWORLD, CallbackEnum::WHITE_A_BUTTON});
 
         context.wait_for_all_requests();
-        env.console.log("Bump into power of science NPC");
-        // console.overlay().add_log("Bump into power of science NPC", COLOR_WHITE);
-        pbf_move_left_joystick(context, 128,   0, 33 * TICKS_PER_SECOND, 20);
-
-        context.wait_for_all_requests();
         env.console.log("Clear map tutorial");
-        // console.overlay().add_log("Clear map tutorial", COLOR_WHITE);
         open_map_from_overworld(env.program_info(), env.console, context, true);
         leave_phone_to_overworld(env.program_info(), env.console, context);
 
@@ -218,11 +213,13 @@ void checkpoint_03(
         }
         
         context.wait_for_all_requests();
-        
-        pbf_move_left_joystick(context, 255, 0, 1 * TICKS_PER_SECOND, 20);
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 156, 1 * TICKS_PER_SECOND);
-        env.console.log("overworld_navigation(): Go to Nemona's house.");
-        overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 0);
+        DirectionDetector direction;
+        direction.change_direction(env.program_info(), env.console, context, 4.62);
+        pbf_move_left_joystick(context, 128, 0, 3600, 50);
+        pbf_move_left_joystick(context, 0, 128, 30, 50);
+
+        direction.change_direction(env.program_info(), env.console, context, 4.62);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 20);
         
         context.wait_for_all_requests();
         env.console.log("Entered Nemona's house");

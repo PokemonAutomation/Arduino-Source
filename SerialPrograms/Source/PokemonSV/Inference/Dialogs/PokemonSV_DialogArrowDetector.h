@@ -55,6 +55,7 @@ protected:
     double m_bottom_line;
     uint16_t m_num_oscillation_above_top_line;
     uint16_t m_num_oscillation_below_bottom_line;
+    uint16_t m_num_no_detection;
     // FixedLimitVector<OverlayBoxScope> m_arrows;
 
 };

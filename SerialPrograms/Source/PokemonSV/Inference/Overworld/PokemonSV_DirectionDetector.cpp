@@ -215,7 +215,7 @@ void DirectionDetector::change_direction(
         }
         is_minimap_definitely_unlocked = true;
 
-        if (abs_diff < 0.01){
+        if (abs_diff < 0.0105){
             // return when we're close enough to the target
             return;
         }        

@@ -228,9 +228,17 @@ void checkpoint_23(
             {ZoomChange::ZOOM_IN, 0, 128, 80},
             {ZoomChange::KEEP_ZOOM, 255, 95, 100}            
         );         
-        overworld_navigation(env.program_info(), env.console, context, 
-            NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-            128, 0, 20, 10);       
+        handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
+            [&](const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){           
+                overworld_navigation(env.program_info(), env.console, context, 
+                    NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
+                    128, 0, 20, 10);
+            }, 
+            [&](const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){           
+                pbf_move_left_joystick(context, 255, 128, 40, 50);
+                realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
+            }
+        );                
 
         // section 3
         realign_player_from_landmark(
@@ -238,9 +246,17 @@ void checkpoint_23(
             {ZoomChange::ZOOM_IN, 0, 128, 80},
             {ZoomChange::KEEP_ZOOM, 255, 75, 65}            
         );              
-        overworld_navigation(env.program_info(), env.console, context, 
-            NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-            128, 0, 20, 10);             
+        handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
+            [&](const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){           
+                overworld_navigation(env.program_info(), env.console, context, 
+                    NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
+                    128, 0, 20, 10);
+            }, 
+            [&](const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){           
+                pbf_move_left_joystick(context, 255, 128, 40, 50);
+                realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
+            }
+        );                     
 
         // section 4
         realign_player_from_landmark(
@@ -248,9 +264,17 @@ void checkpoint_23(
             {ZoomChange::ZOOM_IN, 0, 128, 50},
             {ZoomChange::KEEP_ZOOM, 255, 180, 17}            
         );              
-        overworld_navigation(env.program_info(), env.console, context, 
-            NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-            128, 0, 40, 10);    
+        handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
+            [&](const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){           
+                overworld_navigation(env.program_info(), env.console, context, 
+                    NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
+                    128, 0, 40, 10);
+            }, 
+            [&](const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){           
+                pbf_move_left_joystick(context, 255, 128, 40, 50);
+                realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
+            }
+        );                
 
         // section 5. set marker to pokecenter
         realign_player_from_landmark(
@@ -258,18 +282,26 @@ void checkpoint_23(
             {ZoomChange::ZOOM_IN, 128, 128, 0},
             {ZoomChange::KEEP_ZOOM, 128, 128, 0}            
         );              
-        overworld_navigation(env.program_info(), env.console, context, 
-            NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-            128, 0, 20, 10);     
+        handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
+            [&](const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){           
+                overworld_navigation(env.program_info(), env.console, context, 
+                    NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
+                    128, 0, 20, 10); 
+            }, 
+            [&](const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){           
+                pbf_move_left_joystick(context, 255, 128, 40, 50);
+                realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
+            }
+        );                
 
         // section 6. set marker past pokecenter
         handle_unexpected_battles(env.program_info(), env.console, context,
         [&](const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){                        
             realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 110, 50);
-        });                     
+        });   
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_TIME, NavigationMovementMode::DIRECTIONAL_ONLY, 
-            128, 15, 12, 12);         
+            128, 15, 12, 12);   
 
         fly_to_overlapping_flypoint(env.program_info(), env.console, context);             
        

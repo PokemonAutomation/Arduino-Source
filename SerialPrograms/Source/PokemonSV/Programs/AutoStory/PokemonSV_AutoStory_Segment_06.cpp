@@ -93,7 +93,18 @@ void checkpoint_11(
         );     
 
         env.console.log("overworld_navigation: Go to Los Platos.");
-        overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 0, 75, true, true);
+        handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
+            [&](const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){           
+                overworld_navigation(env.program_info(), env.console, context, 
+                    NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 
+                    128, 0, 75, 75, true, true);
+            }, 
+            [&](const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){           
+                pbf_move_left_joystick(context, 0, 128, 40, 50);
+                realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
+            }
+        );          
+        
 
         env.console.log("clear_dialog: Talk with Nemona at Los Platos. Clear Let's go tutorial. Stop when detect overworld.");
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::TUTORIAL, CallbackEnum::OVERWORLD});
