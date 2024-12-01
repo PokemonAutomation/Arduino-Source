@@ -70,7 +70,12 @@ void PreloadSettings::load(const JsonValue& json){
     const std::string* dev_token = obj->get_string("DEVELOPER_TOKEN");
     if (dev_token){
         QCryptographicHash hash(QCryptographicHash::Algorithm::Sha256);
+#if QT_VERSION < 0x060700
         hash.addData(dev_token->c_str(), (int)dev_token->size());
+#else
+        QByteArrayView dataView(dev_token->data(), dev_token->size());
+        hash.addData(dataView);
+#endif
         DEVELOPER_MODE = TOKENS.find(hash.result().toHex().toStdString()) != TOKENS.end();
     }
 
