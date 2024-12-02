@@ -213,6 +213,24 @@ void handle_when_stationary_in_overworld(
     size_t max_attempts = 2
 );
 
+// do action. if error is thrown, catch the error and try the recovery action
+void handle_failed_action(
+    const ProgramInfo& info, 
+    ConsoleHandle& console,
+    BotBaseContext& context,
+    std::function<
+        void(const ProgramInfo& info, 
+        ConsoleHandle& console,
+        BotBaseContext& context)
+    >&& action,
+    std::function<
+        void(const ProgramInfo& info, 
+        ConsoleHandle& console,
+        BotBaseContext& context)
+    >&& recovery_action,
+    size_t max_failures
+);
+
 void wait_for_gradient_arrow(
     const ProgramInfo& info, 
     ConsoleHandle& console, 
