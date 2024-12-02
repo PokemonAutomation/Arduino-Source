@@ -138,7 +138,7 @@ void start_game_from_home_with_inference(
         context.wait_for_all_requests();
         int ret = wait_until(
             console, context,
-            std::chrono::seconds(10),
+            std::chrono::seconds(30),
             {
                 home,
                 user_select,
@@ -176,7 +176,7 @@ void start_game_from_home_with_inference(
         default:
             throw OperationFailedException(
                 ErrorReport::SEND_ERROR_REPORT, console,
-                "start_game_from_home_with_inference(): No recognizable state after 10 seconds.",
+                "start_game_from_home_with_inference(): No recognizable state after 30 seconds.",
                 true
             );
         }

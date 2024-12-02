@@ -5,8 +5,6 @@
  */
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
-#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
@@ -47,7 +45,7 @@ void goto_professor(Logger& logger, BotBaseContext& context, Camp camp){
         pbf_move_left_joystick(context, 255, 48, 105, 0);
         return;
     case Camp::HIGHLANDS_HIGHLANDS:
-        pbf_move_left_joystick(context, 255, 48, 176, 0);
+        pbf_move_left_joystick(context, 255, 64, 176, 0);
         return;
     case Camp::HIGHLANDS_MOUNTAIN:
         pbf_move_left_joystick(context, 255, 32, 125, 0);
