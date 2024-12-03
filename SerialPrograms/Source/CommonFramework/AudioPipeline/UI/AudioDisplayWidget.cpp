@@ -24,13 +24,13 @@ AudioDisplayWidget::AudioDisplayWidget(QWidget& parent, Logger& logger, AudioSes
     , m_session(session)
     , m_display_type(session.display_type())
 {
-    m_session.add_ui_listener(*this);
+    m_session.add_state_listener(*this);
     m_session.add_spectrum_listener(*this);
 }
 
 AudioDisplayWidget::~AudioDisplayWidget(){
     m_session.remove_spectrum_listener(*this);
-    m_session.remove_ui_listener(*this);
+    m_session.remove_state_listener(*this);
 }
 
 
@@ -45,7 +45,7 @@ void AudioDisplayWidget::state_changed(){
         }, Qt::QueuedConnection
     );
 }
-void AudioDisplayWidget::display_changed(AudioOption::AudioDisplayType display){
+void AudioDisplayWidget::post_display_change(AudioOption::AudioDisplayType display){
 //    cout << "AudioDisplayWidget::display_changed()" << endl;
     QMetaObject::invokeMethod(
         this, [this, display]{

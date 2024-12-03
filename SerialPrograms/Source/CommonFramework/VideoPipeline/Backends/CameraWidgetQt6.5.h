@@ -1,4 +1,4 @@
-/*  Video Widget (Qt6.5)
+/*  Camera Widget (Qt6.5)
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
@@ -30,9 +30,9 @@
 #include "CommonFramework/VideoPipeline/UI/VideoWidget.h"
 #include "CameraImplementations.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 class QCamera;
 class QVideoSink;
@@ -52,18 +52,22 @@ public:
 };
 
 
-struct FrameListener{
-    virtual void new_frame_available() = 0;
-};
+//struct FrameReadyListener{
+//    virtual void new_frame_available() = 0;
+//};
 
 
 
 class CameraSession : public QObject, public PokemonAutomation::CameraSession, private WatchdogCallback{
 public:
-    virtual void add_listener(Listener& listener) override;
-    virtual void remove_listener(Listener& listener) override;
-    void add_listener(FrameListener& listener);
-    void remove_listener(FrameListener& listener);
+    virtual void add_state_listener(StateListener& listener) override;
+    virtual void remove_state_listener(StateListener& listener) override;
+
+//    void add_frame_ready_listener(FrameReadyListener& listener);
+//    void remove_frame_ready_listener(FrameReadyListener& listener);
+
+    virtual void add_frame_listener(VideoFrameListener& listener) override;
+    virtual void remove_frame_listener(VideoFrameListener& listener) override;
 
 
 public:
@@ -141,8 +145,10 @@ private:
     uint64_t m_last_image_seqnum = 0;
     PeriodicStatsReporterI32 m_stats_conversion;
 
-    std::set<Listener*> m_ui_listeners;
-    std::set<FrameListener*> m_frame_listeners;
+    //  Listeners
+    std::set<StateListener*> m_state_listeners;
+//    std::set<FrameReadyListener*> m_frame_ready_listeners;
+    std::set<VideoFrameListener*> m_frame_listeners;
 
     LifetimeSanitizer m_sanitizer;
 };
@@ -177,7 +183,7 @@ public:
 //#define PA_USE_QVideoWidget
 
 
-class VideoDisplayWidget : public PokemonAutomation::VideoWidget, public CameraSession::Listener{
+class VideoDisplayWidget : public PokemonAutomation::VideoWidget, public CameraSession::StateListener{
 public:
     VideoDisplayWidget(QWidget* parent, CameraSession& session);
     virtual ~VideoDisplayWidget();
@@ -189,9 +195,8 @@ private:
 //    virtual void paintEvent(QPaintEvent* event) override;
     virtual void resizeEvent(QResizeEvent* event) override;
 
-    virtual void shutdown() override;
-    virtual void new_source(const CameraInfo& device, Resolution resolution) override;  //  Send after a new camera goes up.
-    virtual void resolution_change(Resolution resolution) override;
+    virtual void pre_shutdown() override;
+    virtual void post_new_source(const CameraInfo& device, Resolution resolution) override;
 
 
 private:

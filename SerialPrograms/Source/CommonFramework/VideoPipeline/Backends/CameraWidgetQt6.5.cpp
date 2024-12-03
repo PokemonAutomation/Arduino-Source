@@ -1,4 +1,4 @@
-﻿/*  Video Widget (Qt6.5)
+﻿/*  Camera Widget (Qt6.5)
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
@@ -17,15 +17,16 @@
 #include <QImageCapture>
 //#include "Common/Cpp/Exceptions.h"
 //#include "Common/Cpp/Time.h"
-//#include "Common/Cpp/PrettyPrint.h"
+#include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/GlobalServices.h"
 #include "CommonFramework/VideoPipeline/CameraOption.h"
+#include "VideoFrameQt.h"
 #include "MediaServicesQt6.h"
 #include "CameraWidgetQt6.5.h"
 
-//using std::cout;
-//using std::endl;
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 namespace CameraQt65QMediaCaptureSession{
@@ -71,22 +72,34 @@ std::unique_ptr<PokemonAutomation::CameraSession> CameraBackend::make_camera(Log
 
 
 
-void CameraSession::add_listener(Listener& listener){
+void CameraSession::add_state_listener(StateListener& listener){
     m_sanitizer.check_usage();
     std::lock_guard<std::mutex> lg(m_lock);
-    m_ui_listeners.insert(&listener);
+    m_state_listeners.insert(&listener);
 }
-void CameraSession::remove_listener(Listener& listener){
+void CameraSession::remove_state_listener(StateListener& listener){
     m_sanitizer.check_usage();
     std::lock_guard<std::mutex> lg(m_lock);
-    m_ui_listeners.erase(&listener);
+    m_state_listeners.erase(&listener);
 }
-void CameraSession::add_listener(FrameListener& listener){
+#if 0
+void CameraSession::add_frame_ready_listener(FrameReadyListener& listener){
+    m_sanitizer.check_usage();
+    std::lock_guard<std::mutex> lg(m_lock);
+    m_frame_ready_listeners.insert(&listener);
+}
+void CameraSession::remove_frame_ready_listener(FrameReadyListener& listener){
+    m_sanitizer.check_usage();
+    std::lock_guard<std::mutex> lg(m_lock);
+    m_frame_ready_listeners.erase(&listener);
+}
+#endif
+void CameraSession::add_frame_listener(VideoFrameListener& listener){
     m_sanitizer.check_usage();
     std::lock_guard<std::mutex> lg(m_lock);
     m_frame_listeners.insert(&listener);
 }
-void CameraSession::remove_listener(FrameListener& listener){
+void CameraSession::remove_frame_listener(VideoFrameListener& listener){
     m_sanitizer.check_usage();
     std::lock_guard<std::mutex> lg(m_lock);
     m_frame_listeners.erase(&listener);
@@ -103,6 +116,7 @@ CameraSession::CameraSession(Logger& logger, Resolution default_resolution)
     , m_last_frame_seqnum(0)
     , m_last_image_timestamp(WallClock::min())
     , m_stats_conversion("ConvertFrame", "ms", 1000, std::chrono::seconds(10))
+//    , m_history(GlobalSettings::instance().VIDEO_HISTORY_SECONDS * 1000000)
 {
     uint8_t watchdog_timeout = GlobalSettings::instance().AUTO_RESET_VIDEO_SECONDS;
     if (watchdog_timeout != 0){
@@ -154,12 +168,15 @@ void CameraSession::set_resolution(Resolution resolution){
             m_logger.log("Resolution not supported.", COLOR_RED);
             return;
         }
+        for (StateListener* listener : m_state_listeners){
+            listener->pre_resolution_change(resolution);
+        }
         m_resolution = resolution;
         m_camera->stop();
         m_camera->setCameraFormat(*iter->second);
         m_camera->start();
-        for (Listener* listener : m_ui_listeners){
-            listener->resolution_change(resolution);
+        for (StateListener* listener : m_state_listeners){
+            listener->post_resolution_change(resolution);
         }
     });
 }
@@ -249,18 +266,25 @@ void CameraSession::connect_video_sink(QVideoSink* sink){
     connect(
         sink, &QVideoSink::videoFrameChanged,
         this, [&](const QVideoFrame& frame){
+            WallClock now = current_time();
             {
-                WallClock now = current_time();
                 WriteSpinLock lg(m_frame_lock);
                 m_last_frame = frame;
                 m_last_frame_timestamp = now;
                 m_last_frame_seqnum++;
+//                m_history.push_frame(frame);
                 m_fps_tracker_source.push_event(now);
             }
 //            cout << now_to_filestring() << endl;
             std::lock_guard<std::mutex> lg(m_lock);
-            for (FrameListener* listener : m_frame_listeners){
+#if 0
+            for (FrameReadyListener* listener : m_frame_ready_listeners){
                 listener->new_frame_available();
+            }
+#endif
+            std::shared_ptr<VideoFrame> frame_ptr(new VideoFrame(now, frame));
+            for (VideoFrameListener* listener : m_frame_listeners){
+                listener->on_frame(frame_ptr);
             }
         }
     );
@@ -297,10 +321,10 @@ void CameraSession::shutdown(){
     }
     m_logger.log("Stopping Camera...");
 
-    m_camera->stop();
-    for (Listener* listener : m_ui_listeners){
-        listener->shutdown();
+    for (StateListener* listener : m_state_listeners){
+        listener->pre_shutdown();
     }
+    m_camera->stop();
     m_capture_session.reset();
 //    m_video_sink.reset();
     m_camera.reset();
@@ -401,8 +425,8 @@ void CameraSession::startup(){
 
     m_camera->start();
 
-    for (Listener* listener : m_ui_listeners){
-        listener->new_source(m_device, m_resolution);
+    for (StateListener* listener : m_state_listeners){
+        listener->post_new_source(m_device, m_resolution);
     }
 }
 
@@ -423,6 +447,9 @@ void CameraSession::on_watchdog_timeout(){
     }
     reset();
 }
+
+
+
 
 
 PokemonAutomation::VideoWidget* CameraSession::make_QtWidget(QWidget* parent){
@@ -462,29 +489,25 @@ VideoDisplayWidget::VideoDisplayWidget(QWidget* parent, CameraSession& camera)
     );
 #endif
 
-
-    m_session.add_listener(*this);
+    m_session.add_state_listener(*this);
 }
 VideoDisplayWidget::~VideoDisplayWidget(){
-    m_session.remove_listener(*this);
+    m_session.remove_state_listener(*this);
 }
 
 //void VideoDisplayWidget::new_frame_available(){
 //    this->update();
 //}
 
-void VideoDisplayWidget::shutdown(){
+void VideoDisplayWidget::pre_shutdown(){
     m_session.clear_video_output();
 }
-void VideoDisplayWidget::new_source(const CameraInfo& device, Resolution resolution){
+void VideoDisplayWidget::post_new_source(const CameraInfo& device, Resolution resolution){
 #ifdef PA_USE_QVideoWidget
     m_session.set_video_output(*m_widget);
 #else
     m_session.set_video_output(m_video);
 #endif
-}
-void VideoDisplayWidget::resolution_change(Resolution resolution){
-
 }
 
 void VideoDisplayWidget::resizeEvent(QResizeEvent* event){

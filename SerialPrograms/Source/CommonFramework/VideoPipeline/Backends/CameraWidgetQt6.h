@@ -1,4 +1,4 @@
-/*  Video Widget (Qt6)
+/*  Camera Widget (Qt6)
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
@@ -40,7 +40,7 @@ public:
 };
 
 
-struct FrameListener{
+struct FrameReadyListener{
     virtual void new_frame_available() = 0;
 };
 
@@ -48,10 +48,14 @@ struct FrameListener{
 
 class CameraSession : public QObject, public PokemonAutomation::CameraSession{
 public:
-    virtual void add_listener(Listener& listener) override;
-    virtual void remove_listener(Listener& listener) override;
-    void add_listener(FrameListener& listener);
-    void remove_listener(FrameListener& listener);
+    virtual void add_state_listener(StateListener& listener) override;
+    virtual void remove_state_listener(StateListener& listener) override;
+
+    void add_listener(FrameReadyListener& listener);
+    void remove_listener(FrameReadyListener& listener);
+
+    virtual void add_frame_listener(VideoFrameListener& listener) override;
+    virtual void remove_frame_listener(VideoFrameListener& listener) override;
 
 
 public:
@@ -70,6 +74,7 @@ public:
     virtual std::vector<Resolution> supported_resolutions() const override;
 
     virtual VideoSnapshot snapshot() override;
+
     virtual double fps_source() override;
     virtual double fps_display() override;
 
@@ -119,8 +124,9 @@ private:
     uint64_t m_last_image_seqnum = 0;
     PeriodicStatsReporterI32 m_stats_conversion;
 
-    std::set<Listener*> m_ui_listeners;
-    std::set<FrameListener*> m_frame_listeners;
+    std::set<StateListener*> m_state_listeners;
+    std::set<FrameReadyListener*> m_frame_ready_listeners;
+    std::set<VideoFrameListener*> m_frame_listeners;
 
     LifetimeSanitizer m_sanitizer;
 };
@@ -128,7 +134,7 @@ private:
 
 
 
-class VideoWidget : public PokemonAutomation::VideoWidget, public FrameListener{
+class VideoWidget : public PokemonAutomation::VideoWidget, public FrameReadyListener{
 public:
     VideoWidget(QWidget* parent, CameraSession& session);
     virtual ~VideoWidget();

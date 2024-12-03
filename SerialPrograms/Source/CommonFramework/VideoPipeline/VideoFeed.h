@@ -46,12 +46,22 @@ struct VideoSnapshot{
 };
 
 
+//  Experimental:
+//  This video frame callback isn't guaranteed to be supported by all
+//  implementations. Unsupported implementations will never fire this callback.
+class VideoFrame;
+struct VideoFrameListener{
+    virtual void on_frame(std::shared_ptr<VideoFrame> frame) = 0;
+};
 
 
 //  Define basic interface of a video feed to be used
 //  by programs.
 class VideoFeed{
 public:
+    virtual void add_frame_listener(VideoFrameListener& listener) = 0;
+    virtual void remove_frame_listener(VideoFrameListener& listener) = 0;
+
     //  Reset the video. Note that this may return early.
     virtual void reset() = 0;
 

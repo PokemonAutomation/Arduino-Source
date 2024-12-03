@@ -25,6 +25,7 @@
 #include "CommonFramework/AudioPipeline/AudioSession.h"
 #include "CommonFramework/VideoPipeline/CameraSession.h"
 #include "CommonFramework/VideoPipeline/VideoOverlaySession.h"
+#include "CommonFramework/Recording/RecentHistory.h"
 #include "Integrations/ProgramTrackerInterfaces.h"
 #include "NintendoSwitch_SwitchSystemOption.h"
 
@@ -84,6 +85,8 @@ private:
     std::unique_ptr<CameraSession> m_camera;
     AudioSession m_audio;
     VideoOverlaySession m_overlay;
+
+    RecentHistorySession m_history;
 
     std::unique_ptr<CpuUtilizationStat> m_cpu_utilization;
     std::unique_ptr<ThreadUtilizationStat> m_main_thread_utilization;

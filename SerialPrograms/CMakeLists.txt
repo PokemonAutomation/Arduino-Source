@@ -514,6 +514,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/PersistentSettings.h
     Source/CommonFramework/ProgramSession.cpp
     Source/CommonFramework/ProgramSession.h
+    Source/CommonFramework/Recording/RecentHistory.cpp
+    Source/CommonFramework/Recording/RecentHistory.h
     Source/CommonFramework/Resources/SpriteDatabase.cpp
     Source/CommonFramework/Resources/SpriteDatabase.h
     Source/CommonFramework/SetupSettings.cpp
@@ -554,6 +556,7 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/VideoPipeline/Backends/CameraWidgetQt6.h
     Source/CommonFramework/VideoPipeline/Backends/MediaServicesQt6.cpp
     Source/CommonFramework/VideoPipeline/Backends/MediaServicesQt6.h
+    Source/CommonFramework/VideoPipeline/Backends/VideoFrameQt.h
     Source/CommonFramework/VideoPipeline/Backends/VideoToolsQt5.cpp
     Source/CommonFramework/VideoPipeline/Backends/VideoToolsQt5.h
     Source/CommonFramework/VideoPipeline/CameraInfo.h

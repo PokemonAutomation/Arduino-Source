@@ -7,7 +7,6 @@
 #ifndef PokemonAutomation_VideoPipeline_CameraImplementations_H
 #define PokemonAutomation_VideoPipeline_CameraImplementations_H
 
-#include <functional>
 #include <vector>
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "CommonFramework/Logging/Logger.h"

@@ -41,7 +41,7 @@ size_t sample_size(AudioSampleFormat format){
 
 
 void AudioStreamToFloat::add_listener(AudioFloatStreamListener& listener){
-    if (listener.samples_per_frame != m_samples_per_frame){
+    if (listener.expected_samples_per_frame != m_samples_per_frame){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Mismatching frame size.");
     }
     m_listeners.insert(&listener);

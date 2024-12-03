@@ -276,7 +276,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 //    SetThreadExecutionState(ES_CONTINUOUS | ES_DISPLAY_REQUIRED);
 
-
+//    feed.save_history("video.mov");
 
 #if 0
     VideoSnapshot image = feed.snapshot();
@@ -290,7 +290,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     );
 #endif
 
-#if 1
+#if 0
     VideoSnapshot image = feed.snapshot();
 //    ImageRGB32 image("screenshot-20241124-135028529403.png");
 

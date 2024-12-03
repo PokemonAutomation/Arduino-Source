@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_AudioPipeline_FFTStreamer_H
 #define PokemonAutomation_AudioPipeline_FFTStreamer_H
 
+#include <memory>
 #include "CommonFramework/AudioPipeline/AudioStream.h"
 
 namespace PokemonAutomation{

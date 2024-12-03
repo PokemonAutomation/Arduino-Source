@@ -21,13 +21,21 @@ namespace PokemonAutomation{
 
 
 
+void AudioPassthroughPairQt::add_listener(AudioFloatStreamListener& listener){
+    WriteSpinLock lg(m_lock);
+    m_stream_listeners.insert(&listener);
+}
+void AudioPassthroughPairQt::remove_listener(AudioFloatStreamListener& listener){
+    WriteSpinLock lg(m_lock);
+    m_stream_listeners.erase(&listener);
+}
 void AudioPassthroughPairQt::add_listener(FFTListener& listener){
     WriteSpinLock lg(m_lock);
-    m_listeners.insert(&listener);
+    m_fft_listeners.insert(&listener);
 }
 void AudioPassthroughPairQt::remove_listener(FFTListener& listener){
     WriteSpinLock lg(m_lock);
-    m_listeners.erase(&listener);
+    m_fft_listeners.erase(&listener);
 }
 
 
@@ -48,6 +56,9 @@ public:
         WriteSpinLock lg(parent.m_lock);
         if (parent.m_writer){
             parent.m_writer->operator AudioFloatStreamListener&().on_samples(data, frames);
+        }
+        for (AudioFloatStreamListener* listener : m_parent.m_stream_listeners){
+            listener->on_samples(data, frames);
         }
         if (parent.m_fft_runner){
             parent.m_fft_runner->on_samples(data, frames);
@@ -72,7 +83,7 @@ public:
     virtual void on_fft(size_t sample_rate, std::shared_ptr<AlignedVector<float>> fft_output) override{
         //  This is already inside the lock.
 //        ReadSpinLock lg(m_parent.m_lock);
-        for (FFTListener* listener : m_parent.m_listeners){
+        for (FFTListener* listener : m_parent.m_fft_listeners){
             listener->on_fft(sample_rate, fft_output);
         }
     }

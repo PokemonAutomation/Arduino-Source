@@ -1,4 +1,4 @@
-﻿/*  Video Widget (Qt6)
+﻿/*  Camera Widget (Qt6)
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
@@ -16,6 +16,7 @@
 //#include "Common/Cpp/Exceptions.h"
 //#include "Common/Cpp/Time.h"
 #include "CommonFramework/VideoPipeline/CameraOption.h"
+#include "VideoFrameQt.h"
 #include "MediaServicesQt6.h"
 #include "CameraWidgetQt6.h"
 
@@ -63,22 +64,32 @@ std::unique_ptr<PokemonAutomation::CameraSession> CameraBackend::make_camera(Log
 
 
 
-void CameraSession::add_listener(Listener& listener){
+void CameraSession::add_state_listener(StateListener& listener){
     m_sanitizer.check_usage();
     std::lock_guard<std::mutex> lg(m_lock);
-    m_ui_listeners.insert(&listener);
+    m_state_listeners.insert(&listener);
 }
-void CameraSession::remove_listener(Listener& listener){
+void CameraSession::remove_state_listener(StateListener& listener){
     m_sanitizer.check_usage();
     std::lock_guard<std::mutex> lg(m_lock);
-    m_ui_listeners.erase(&listener);
+    m_state_listeners.erase(&listener);
 }
-void CameraSession::add_listener(FrameListener& listener){
+void CameraSession::add_listener(FrameReadyListener& listener){
+    m_sanitizer.check_usage();
+    std::lock_guard<std::mutex> lg(m_lock);
+    m_frame_ready_listeners.insert(&listener);
+}
+void CameraSession::remove_listener(FrameReadyListener& listener){
+    m_sanitizer.check_usage();
+    std::lock_guard<std::mutex> lg(m_lock);
+    m_frame_ready_listeners.erase(&listener);
+}
+void CameraSession::add_frame_listener(VideoFrameListener& listener){
     m_sanitizer.check_usage();
     std::lock_guard<std::mutex> lg(m_lock);
     m_frame_listeners.insert(&listener);
 }
-void CameraSession::remove_listener(FrameListener& listener){
+void CameraSession::remove_frame_listener(VideoFrameListener& listener){
     m_sanitizer.check_usage();
     std::lock_guard<std::mutex> lg(m_lock);
     m_frame_listeners.erase(&listener);
@@ -139,12 +150,15 @@ void CameraSession::set_resolution(Resolution resolution){
             m_logger.log("Resolution not supported.", COLOR_RED);
             return;
         }
+        for (StateListener* listener : m_state_listeners){
+            listener->pre_resolution_change(resolution);
+        }
         m_resolution = resolution;
         m_camera->stop();
         m_camera->setCameraFormat(*iter->second);
         m_camera->start();
-        for (Listener* listener : m_ui_listeners){
-            listener->resolution_change(resolution);
+        for (StateListener* listener : m_state_listeners){
+            listener->post_resolution_change(resolution);
         }
     });
 }
@@ -234,8 +248,8 @@ void CameraSession::shutdown(){
     m_logger.log("Stopping Camera...");
 
     m_camera->stop();
-    for (Listener* listener : m_ui_listeners){
-        listener->shutdown();
+    for (StateListener* listener : m_state_listeners){
+        listener->pre_shutdown();
     }
     m_capture.reset();
     m_video_sink.reset();
@@ -327,8 +341,8 @@ void CameraSession::startup(){
     connect(
         m_video_sink.get(), &QVideoSink::videoFrameChanged,
         this, [&](const QVideoFrame& frame){
+            WallClock now = current_time();
             {
-                WallClock now = current_time();
                 SpinLockGuard lg(m_frame_lock);
 //                WallClock start = current_time();
                 m_last_frame = frame;
@@ -339,16 +353,20 @@ void CameraSession::startup(){
             }
 //            cout << now_to_filestring() << endl;
             std::lock_guard<std::mutex> lg(m_lock);
-            for (FrameListener* listener : m_frame_listeners){
+            for (FrameReadyListener* listener : m_frame_ready_listeners){
                 listener->new_frame_available();
+            }
+            std::shared_ptr<VideoFrame> frame_ptr(new VideoFrame(now, frame));
+            for (VideoFrameListener* listener : m_frame_listeners){
+                listener->on_frame(frame_ptr);
             }
         }
     );
 
     m_camera->start();
 
-    for (Listener* listener : m_ui_listeners){
-        listener->new_source(m_device, m_resolution);
+    for (StateListener* listener : m_state_listeners){
+        listener->post_new_source(m_device, m_resolution);
     }
 }
 

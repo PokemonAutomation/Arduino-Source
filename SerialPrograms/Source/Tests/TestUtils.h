@@ -92,10 +92,14 @@ class DummyVideoFeed: public VideoFeed{
 public:
     DummyVideoFeed() {}
 
+    virtual void add_frame_listener(VideoFrameListener& listener) override{}
+    virtual void remove_frame_listener(VideoFrameListener& listener) override{}
+
     //  Can call from anywhere.
     virtual void reset() override{}
 
     virtual VideoSnapshot snapshot() override{ return VideoSnapshot(); }
+
     virtual double fps_source() override{ return 0; }
     virtual double fps_display() override{ return 0; }
 };

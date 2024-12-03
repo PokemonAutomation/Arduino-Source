@@ -193,11 +193,19 @@ GlobalSettings::GlobalSettings()
         LockMode::UNLOCK_WHILE_RUNNING,
         false
     )
+#if QT_VERSION_MAJOR == 5
     , ENABLE_FRAME_SCREENSHOTS(
         "<b>Enable Frame Screenshots:</b><br>"
         "Attempt to use QVideoProbe and QVideoFrame for screenshots.",
         LockMode::UNLOCK_WHILE_RUNNING,
         true
+    )
+#endif
+    , VIDEO_HISTORY_SECONDS(
+        "<b>Video History (seconds):</b><br>"
+        "Keep this many seconds of video feed for video capture and debugging purposes.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        30
     )
     , AUTO_RESET_AUDIO_SECONDS(
         "<b>Audio Auto-Reset:</b><br>"
@@ -264,6 +272,11 @@ GlobalSettings::GlobalSettings()
     PA_ADD_OPTION(VIDEO_BACKEND);
 #if QT_VERSION_MAJOR == 5
     PA_ADD_OPTION(ENABLE_FRAME_SCREENSHOTS);
+#endif
+#if QT_VERSION_MAJOR >= 6
+    if (PreloadSettings::instance().DEVELOPER_MODE){    //  REMOVE
+        PA_ADD_OPTION(VIDEO_HISTORY_SECONDS);
+    }
 #endif
 
     PA_ADD_OPTION(AUTO_RESET_AUDIO_SECONDS);

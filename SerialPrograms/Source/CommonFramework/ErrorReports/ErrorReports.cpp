@@ -18,10 +18,9 @@
 #include "ProgramDumper.h"
 #include "ErrorReports.h"
 
-//  REMOVE
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 
@@ -301,7 +300,6 @@ void send_all_unsent_reports(Logger& logger, bool allow_prompt){
         if (button != QMessageBox::StandardButton::Yes){
             return;
         }
-//        cout << "asdfasdf" << button_yes << " : " << button_no << " : " << &button << endl; //  REMOVE
     }
 
     global_logger_tagged().log("Attempting to send " + std::to_string(reports.size()) + " error reports.", COLOR_PURPLE);

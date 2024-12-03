@@ -114,7 +114,10 @@ public:
     BooleanCheckBoxOption SHOW_RECORD_FREQUENCIES;
 
     VideoBackendOption VIDEO_BACKEND;
+#if QT_VERSION_MAJOR == 5
     BooleanCheckBoxOption ENABLE_FRAME_SCREENSHOTS;
+#endif
+    SimpleIntegerOption<uint16_t> VIDEO_HISTORY_SECONDS;
 
     SimpleIntegerOption<uint8_t> AUTO_RESET_AUDIO_SECONDS;
     SimpleIntegerOption<uint8_t> AUTO_RESET_VIDEO_SECONDS;

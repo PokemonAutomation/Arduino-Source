@@ -23,8 +23,14 @@ namespace NintendoSwitch{
 
 SwitchSystemSession::~SwitchSystemSession(){
     try{
-        m_logger.log("Shutting down session...");
+        m_logger.log("Shutting down SwitchSystemSession...");
     }catch (...){}
+
+    m_camera->remove_frame_listener(m_history);
+    m_camera->remove_state_listener(m_history);
+    m_audio.remove_stream_listener(m_history);
+    m_audio.remove_state_listener(m_history);
+
     ProgramTracker::instance().remove_console(m_console_id);
     m_overlay.remove_stat(*m_main_thread_utilization);
     m_overlay.remove_stat(*m_cpu_utilization);
@@ -43,6 +49,7 @@ SwitchSystemSession::SwitchSystemSession(
     , m_camera(get_camera_backend().make_camera(m_logger, DEFAULT_RESOLUTION))
     , m_audio(m_logger, option.m_audio)
     , m_overlay(option.m_overlay)
+    , m_history(m_logger)
     , m_cpu_utilization(new CpuUtilizationStat())
     , m_main_thread_utilization(new ThreadUtilizationStat(current_thread_handle(), "Main Qt Thread:"))
 {
@@ -51,6 +58,13 @@ SwitchSystemSession::SwitchSystemSession(
     m_console_id = ProgramTracker::instance().add_console(program_id, *this);
     m_overlay.add_stat(*m_cpu_utilization);
     m_overlay.add_stat(*m_main_thread_utilization);
+
+    m_history.start();
+
+    m_audio.add_state_listener(m_history);
+    m_audio.add_stream_listener(m_history);
+    m_camera->add_state_listener(m_history);
+    m_camera->add_frame_listener(m_history);
 }
 
 void SwitchSystemSession::get(SwitchSystemOption& option){

@@ -25,7 +25,7 @@ namespace PokemonAutomation{
 
 
 AudioSelectorWidget::~AudioSelectorWidget(){
-    m_session.remove_ui_listener(*this);
+    m_session.remove_state_listener(*this);
 }
 
 AudioSelectorWidget::AudioSelectorWidget(
@@ -198,7 +198,7 @@ AudioSelectorWidget::AudioSelectorWidget(
         });
     }
 
-    session.add_ui_listener(*this);
+    session.add_state_listener(*this);
 }
 
 
@@ -318,19 +318,19 @@ void AudioSelectorWidget::refresh_display(AudioOption::AudioDisplayType display)
 }
 
 
-void AudioSelectorWidget::input_changed(const std::string& file, const AudioDeviceInfo& device, AudioChannelFormat format){
+void AudioSelectorWidget::post_input_change(const std::string& file, const AudioDeviceInfo& device, AudioChannelFormat format){
 //    cout << "AudioSelectorWidget::input_changed()" << endl;
     QMetaObject::invokeMethod(this, [this, device, file, format]{
         refresh_input_device(file, device);
         refresh_formats(file, device, format);
     });
 }
-void AudioSelectorWidget::output_changed(const AudioDeviceInfo& device){
+void AudioSelectorWidget::post_output_change(const AudioDeviceInfo& device){
     QMetaObject::invokeMethod(this, [this, device]{
         refresh_output_device(device);
     });
 }
-void AudioSelectorWidget::volume_changed(double volume){
+void AudioSelectorWidget::post_volume_change(double volume){
 //    if (m_slider_active.load(std::memory_order_acquire)){
 //        return;
 //    }
@@ -339,7 +339,7 @@ void AudioSelectorWidget::volume_changed(double volume){
         refresh_volume(m_session.output_volume());
     }, Qt::QueuedConnection);   //  Queued due to potential recursive call to the same lock.
 }
-void AudioSelectorWidget::display_changed(AudioOption::AudioDisplayType display){
+void AudioSelectorWidget::post_display_change(AudioOption::AudioDisplayType display){
     QMetaObject::invokeMethod(this, [this]{
         refresh_display(m_session.display_type());
     }, Qt::QueuedConnection);   //  Queued due to potential recursive call to the same lock.

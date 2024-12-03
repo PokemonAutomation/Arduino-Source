@@ -31,17 +31,23 @@ class CameraOption;
 
 class CameraSession : public VideoFeed{
 public:
-    struct Listener{
+    struct StateListener{
         //  Sent before the camera shuts down. Listeners should drop their
         //  references to the internal camera implementation before returning.
-        virtual void shutdown() = 0;
+        virtual void pre_shutdown(){}
 
-        virtual void new_source(const CameraInfo& device, Resolution resolution) = 0;  //  Send after a new camera goes up.
-        virtual void resolution_change(Resolution resolution) = 0;
+        //  Sent before/after a new camera goes up.
+//        virtual void pre_new_source(const CameraInfo& device, Resolution resolution){}
+        virtual void post_new_source(const CameraInfo& device, Resolution resolution){}
+
+        virtual void pre_resolution_change(Resolution resolution){}
+        virtual void post_resolution_change(Resolution resolution){}
     };
-    virtual void add_listener(Listener& listener) = 0;
-    virtual void remove_listener(Listener& listener) = 0;
+    virtual void add_state_listener(StateListener& listener) = 0;
+    virtual void remove_state_listener(StateListener& listener) = 0;
 
+    virtual void add_frame_listener(VideoFrameListener& listener) = 0;
+    virtual void remove_frame_listener(VideoFrameListener& listener) = 0;
 
 public:
     virtual ~CameraSession() = default;
@@ -64,7 +70,6 @@ public:
     //  If "timestamp" is not "WallClock::min()", it will be set to the best
     //  known timestamp of the screenshot that is returned.
     virtual VideoSnapshot snapshot() = 0;
-
 
 public:
     virtual VideoWidget* make_QtWidget(QWidget* parent){ return nullptr; };

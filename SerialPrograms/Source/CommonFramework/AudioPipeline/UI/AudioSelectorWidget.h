@@ -22,7 +22,7 @@ class QPushButton;
 namespace PokemonAutomation{
 
 
-class AudioSelectorWidget : public QWidget, private AudioSession::Listener{
+class AudioSelectorWidget : public QWidget, private AudioSession::StateListener{
 public:
     AudioSelectorWidget(
         QWidget& parent,
@@ -42,10 +42,10 @@ private:
     void refresh_volume(double volume);
     void refresh_display(AudioOption::AudioDisplayType display);
 
-    virtual void input_changed(const std::string& file, const AudioDeviceInfo& device, AudioChannelFormat format) override;
-    virtual void output_changed(const AudioDeviceInfo& device) override;
-    virtual void volume_changed(double volume) override;
-    virtual void display_changed(AudioOption::AudioDisplayType display) override;
+    virtual void post_input_change(const std::string& file, const AudioDeviceInfo& device, AudioChannelFormat format) override;
+    virtual void post_output_change(const AudioDeviceInfo& device) override;
+    virtual void post_volume_change(double volume) override;
+    virtual void post_display_change(AudioOption::AudioDisplayType display) override;
 
 private:
     AudioSession& m_session;

@@ -16,6 +16,14 @@
 namespace PokemonAutomation{
 
 
+void AudioPassthroughPairQtThread::add_listener(AudioFloatStreamListener& listener){
+    AudioPassthroughPairQt* body = m_body.load(std::memory_order_relaxed);
+    body->add_listener(listener);
+}
+void AudioPassthroughPairQtThread::remove_listener(AudioFloatStreamListener& listener){
+    AudioPassthroughPairQt* body = m_body.load(std::memory_order_relaxed);
+    body->remove_listener(listener);
+}
 void AudioPassthroughPairQtThread::add_listener(FFTListener& listener){
     AudioPassthroughPairQt* body = m_body.load(std::memory_order_relaxed);
     body->add_listener(listener);

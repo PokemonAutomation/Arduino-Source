@@ -275,6 +275,7 @@ SOURCES += \
     Source/CommonFramework/Panels/UI/SettingsPanelWidget.cpp \
     Source/CommonFramework/PersistentSettings.cpp \
     Source/CommonFramework/ProgramSession.cpp \
+    Source/CommonFramework/Recording/RecentHistory.cpp \
     Source/CommonFramework/Resources/SpriteDatabase.cpp \
     Source/CommonFramework/SetupSettings.cpp \
     Source/CommonFramework/Tools/BlackBorderCheck.cpp \
@@ -1360,6 +1361,7 @@ HEADERS += \
     Source/CommonFramework/Panels/UI/SettingsPanelWidget.h \
     Source/CommonFramework/PersistentSettings.h \
     Source/CommonFramework/ProgramSession.h \
+    Source/CommonFramework/Recording/RecentHistory.h \
     Source/CommonFramework/Resources/SpriteDatabase.h \
     Source/CommonFramework/SetupSettings.h \
     Source/CommonFramework/Tools/BlackBorderCheck.h \

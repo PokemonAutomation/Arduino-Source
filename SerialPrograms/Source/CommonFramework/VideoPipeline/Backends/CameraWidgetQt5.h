@@ -45,8 +45,11 @@ public:
 
 class CameraSession : public QObject, public PokemonAutomation::CameraSession{
 public:
-    virtual void add_listener(Listener& listener) override;
-    virtual void remove_listener(Listener& listener) override;
+    virtual void add_state_listener(StateListener& listener) override;
+    virtual void remove_state_listener(StateListener& listener) override;
+
+    virtual void add_frame_listener(VideoFrameListener& listener) override;
+    virtual void remove_frame_listener(VideoFrameListener& listener) override;
 
 
 public:
@@ -65,6 +68,7 @@ public:
     virtual std::vector<Resolution> supported_resolutions() const override;
 
     virtual VideoSnapshot snapshot() override;
+
     virtual double fps_source() override;
     virtual double fps_display() override;
 
@@ -131,14 +135,14 @@ private:
     uint64_t m_last_image_seqnum = 0;
     PeriodicStatsReporterI32 m_stats_conversion;
 
-    std::set<Listener*> m_listeners;
+    std::set<StateListener*> m_listeners;
 
     LifetimeSanitizer m_sanitizer;
 };
 
 
 
-class VideoWidget : public PokemonAutomation::VideoWidget, private CameraSession::Listener{
+class VideoWidget : public PokemonAutomation::VideoWidget, private CameraSession::StateListener{
 public:
     VideoWidget(QWidget* parent, CameraSession& session);
     virtual ~VideoWidget();
@@ -146,9 +150,8 @@ public:
     virtual PokemonAutomation::CameraSession& camera() override{ return m_session; }
 
 private:
-    virtual void shutdown() override;
-    virtual void new_source(const CameraInfo& device, Resolution resolution) override;
-    virtual void resolution_change(Resolution resolution) override;
+    virtual void pre_shutdown() override;
+    virtual void post_new_source(const CameraInfo& device, Resolution resolution) override;
 
 //    virtual void resizeEvent(QResizeEvent* event) override;
 

@@ -24,7 +24,7 @@ namespace PokemonAutomation{
 
 CameraSelectorWidget::~CameraSelectorWidget(){
 //    cout << "~CameraSelectorUI()" << endl;
-    m_session.remove_listener(*this);
+    m_session.remove_state_listener(*this);
 }
 CameraSelectorWidget::CameraSelectorWidget(
     CameraSession& session,
@@ -91,7 +91,7 @@ CameraSelectorWidget::CameraSelectorWidget(
         }
     );
 
-    m_session.add_listener(*this);
+    m_session.add_state_listener(*this);
 }
 void CameraSelectorWidget::update_camera_list(){
     m_camera_box->clear();
@@ -155,14 +155,14 @@ void CameraSelectorWidget::update_resolution_list(){
     }
 }
 
-void CameraSelectorWidget::shutdown(){
+void CameraSelectorWidget::pre_shutdown(){
 //    cout << "CameraSelectorWidget::shutdown()" << endl;
     QMetaObject::invokeMethod(this, [&]{
         m_resolution_box->clear();
         m_resolutions.clear();
     }, Qt::QueuedConnection);
 }
-void CameraSelectorWidget::new_source(const CameraInfo& device, Resolution resolution){
+void CameraSelectorWidget::post_new_source(const CameraInfo& device, Resolution resolution){
 //    cout << "CameraSelectorWidget::new_source()" << endl;
     QMetaObject::invokeMethod(this, [&]{
         //  See if it's in the cached list.
@@ -177,7 +177,7 @@ void CameraSelectorWidget::new_source(const CameraInfo& device, Resolution resol
         update_resolution_list();
     }, Qt::QueuedConnection);
 }
-void CameraSelectorWidget::resolution_change(Resolution resolution){
+void CameraSelectorWidget::post_resolution_change(Resolution resolution){
     //  See if it's in the cached list.
     for (size_t c = 0; c < m_resolutions.size(); c++){
         if (m_resolutions[c] == resolution){

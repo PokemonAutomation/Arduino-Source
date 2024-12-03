@@ -21,6 +21,9 @@ class AudioPassthroughPairQt;
 
 class AudioPassthroughPairQtThread : private QThread, public AudioPassthroughPair{
 public:
+    virtual void add_listener(AudioFloatStreamListener& listener) override;
+    virtual void remove_listener(AudioFloatStreamListener& listener) override;
+
     virtual void add_listener(FFTListener& listener) override;
     virtual void remove_listener(FFTListener& listener) override;
 

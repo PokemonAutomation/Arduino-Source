@@ -7,7 +7,6 @@
 #ifndef PokemonAutomation_AudioPipeline_AudioSourceReader_H
 #define PokemonAutomation_AudioPipeline_AudioSourceReader_H
 
-#include <memory>
 #include "Common/Cpp/StreamConverters.h"
 #include "Common/Cpp/Containers/AlignedVector.h"
 #include "AudioInfo.h"
@@ -16,13 +15,13 @@ namespace PokemonAutomation{
 
 
 struct AudioFloatStreamListener{
-    AudioFloatStreamListener(size_t p_samples_per_frame)
-        : samples_per_frame(p_samples_per_frame)
+    AudioFloatStreamListener(size_t p_expected_samples_per_frame)
+        : expected_samples_per_frame(p_expected_samples_per_frame)
     {}
     virtual ~AudioFloatStreamListener() = default;
     virtual void on_samples(const float* data, size_t frames) = 0;
 
-    const size_t samples_per_frame;
+    size_t expected_samples_per_frame;
 };
 
 
