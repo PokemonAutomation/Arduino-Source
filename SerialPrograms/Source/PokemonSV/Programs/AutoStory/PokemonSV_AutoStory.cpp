@@ -20,6 +20,7 @@
 #include "PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OliveDetector.h"
+#include "PokemonSV/Inference/Overworld/PokemonSV_NoMinimapDetector.h"
 #include "PokemonSV_AutoStory_Segment_00.h"
 #include "PokemonSV_AutoStory_Segment_01.h"
 #include "PokemonSV_AutoStory_Segment_02.h"
@@ -47,9 +48,9 @@
 #include "PokemonSV_AutoStory_Segment_24.h"
 #include "PokemonSV_AutoStory.h"
 
-// #include <iostream>
-// using std::cout;
-// using std::endl;
+#include <iostream>
+using std::cout;
+using std::endl;
 //#include <unordered_map>
 //#include <algorithm>
 
@@ -85,7 +86,7 @@ std::vector<std::unique_ptr<AutoStory_Segment>> make_autoStory_segment_list(){
     segment_list.emplace_back(std::make_unique<AutoStory_Segment_18>());
     segment_list.emplace_back(std::make_unique<AutoStory_Segment_19>());
     segment_list.emplace_back(std::make_unique<AutoStory_Segment_20>());
-    // segment_list.emplace_back(std::make_unique<AutoStory_Segment_21>());
+    segment_list.emplace_back(std::make_unique<AutoStory_Segment_21>());
     // segment_list.emplace_back(std::make_unique<AutoStory_Segment_22>());
     // segment_list.emplace_back(std::make_unique<AutoStory_Segment_23>());
     // segment_list.emplace_back(std::make_unique<AutoStory_Segment_24>());
@@ -213,6 +214,7 @@ AutoStory::AutoStory()
     )       
     , MAINSTORY_NOTE{
         "Ensure you have a level 100 Gardevoir with the moves in the following order: Moonblast, Dazzling Gleam, Psychic, Mystical Fire.<br>"
+        "Also, make sure you have two other strong pokemon (e.g. level 100 Talonflames)<br>"
         "Refer to the documentation on github for more details."
     }
     , START_DESCRIPTION(
@@ -620,6 +622,10 @@ void AutoStory::test_checkpoints(
             checkpoint_list[checkpoint]();
             continue;
         }
+        bool has_minimap = true;
+        if (checkpoint < 3){
+            has_minimap = false;
+        }
         
         const size_t DIGITS = 3;
         std::string number = std::to_string(checkpoint);
@@ -629,11 +635,21 @@ void AutoStory::test_checkpoints(
         if (checkpoint >= start_loop && checkpoint <= end_loop){
             for (int i = 0; i < loop; i++){
                 if (i > 0){
-                    reset_game(env.program_info(), console, context);
-                    enter_menu_from_overworld(env.program_info(), env.console, context, -1);
-                    // we wait 10 seconds then save, so that the initial conditions are slightly different on each reset.
-                    env.log("Wait 10 seconds.");
-                    context.wait_for(Milliseconds(10 * 1000));              
+                    try {
+                        reset_game(env.program_info(), console, context);
+                        enter_menu_from_overworld(env.program_info(), env.console, context, -1, MenuSide::NONE, has_minimap);
+                        // we wait 5 seconds then save, so that the initial conditions are slightly different on each reset.
+                        env.log("Wait 5 seconds.");
+                        context.wait_for(Milliseconds(5 * 1000));
+                    }catch(...){
+                        // try one more time
+                        reset_game(env.program_info(), console, context);
+                        enter_menu_from_overworld(env.program_info(), env.console, context, -1, MenuSide::NONE, has_minimap);
+                        // we wait 5 seconds then save, so that the initial conditions are slightly different on each reset.
+                        env.log("Wait 5 seconds.");
+                        context.wait_for(Milliseconds(5 * 1000));                        
+
+                    }
                 }
                 console.log("checkpoint_" + number + ": loop " + std::to_string(i));
                 checkpoint_list[checkpoint]();
@@ -740,7 +756,7 @@ void AutoStory::test_code(SingleSwitchProgramEnvironment& env, BotBaseContext& c
         //     128, 0, 60, 10, false);
 
         DirectionDetector direction;
-
+        
         return;
     }
 
