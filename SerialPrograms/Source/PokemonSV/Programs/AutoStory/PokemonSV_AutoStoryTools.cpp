@@ -779,6 +779,39 @@ void handle_when_stationary_in_overworld(
 }
 
 
+void handle_failed_action(
+    const ProgramInfo& info, 
+    ConsoleHandle& console, 
+    BotBaseContext& context,
+    std::function<
+        void(const ProgramInfo& info, 
+        ConsoleHandle& console,
+        BotBaseContext& context)
+    >&& action,
+    std::function<
+        void(const ProgramInfo& info, 
+        ConsoleHandle& console,
+        BotBaseContext& context)
+    >&& recovery_action,
+    size_t max_failures
+){
+    size_t num_failures = 0;
+    while (true){
+        try {
+            context.wait_for_all_requests();
+            action(info, console, context);
+            return;
+        }catch (OperationFailedException& e){
+            num_failures++;
+            if (num_failures > max_failures){
+                throw e;
+            }
+            recovery_action(info, console, context);
+        }
+    }
+}
+
+
 void wait_for_gradient_arrow(
     const ProgramInfo& info, 
     ConsoleHandle& console, 
