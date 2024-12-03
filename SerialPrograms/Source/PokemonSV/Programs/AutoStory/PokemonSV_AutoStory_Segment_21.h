@@ -31,7 +31,9 @@ public:
         AutoStoryOptions options) const override;
 };
 
-
+// start: Defeated Artazon Gym (Grass). Inside gym building.
+// end: At East Province (Area One) Pokecenter.
+void checkpoint_46(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EventNotificationOption& notif_status_update);  
 
 
 }

@@ -32,6 +32,19 @@ public:
 };
 
 
+// start: At East Province (Area One) Pokecenter.
+// end: 
+void checkpoint_47(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EventNotificationOption& notif_status_update);  
+
+// start: 
+// end: 
+void checkpoint_48(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EventNotificationOption& notif_status_update);  
+
+// start: 
+// end: 
+void checkpoint_49(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EventNotificationOption& notif_status_update);  
+
+
 
 
 }
