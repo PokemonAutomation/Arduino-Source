@@ -59,7 +59,7 @@ SwitchSystemSession::SwitchSystemSession(
     m_overlay.add_stat(*m_cpu_utilization);
     m_overlay.add_stat(*m_main_thread_utilization);
 
-    m_history.start();
+    m_history.start(m_audio.input_format());
 
     m_audio.add_state_listener(m_history);
     m_audio.add_stream_listener(m_history);
@@ -84,6 +84,10 @@ void SwitchSystemSession::set(const SwitchSystemOption& option){
 void SwitchSystemSession::set_allow_user_commands(bool allow){
     m_serial.botbase().set_allow_user_commands(allow);
 }
+void SwitchSystemSession::save_history(const std::string& filename){
+    m_history.save(filename);
+}
+
 
 
 

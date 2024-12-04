@@ -43,12 +43,17 @@ public:
     SimpleIntegerOption<uint32_t> WIDTH;
     SimpleIntegerOption<uint32_t> HEIGHT;
 };
-
-
 struct DebugSettings{
     bool COLOR_CHECK = false;
     bool IMAGE_TEMPLATE_MATCHING = false;
     bool IMAGE_DICTIONARY_MATCHING = false;
+};
+class StreamHistoryOption : public GroupOption{
+public:
+    StreamHistoryOption();
+
+    StaticTextOption DESCRIPTION;
+    SimpleIntegerOption<uint16_t> VIDEO_HISTORY_SECONDS;
 };
 
 
@@ -117,7 +122,8 @@ public:
 #if QT_VERSION_MAJOR == 5
     BooleanCheckBoxOption ENABLE_FRAME_SCREENSHOTS;
 #endif
-    SimpleIntegerOption<uint16_t> VIDEO_HISTORY_SECONDS;
+//    SimpleIntegerOption<uint16_t> VIDEO_HISTORY_SECONDS;
+    StreamHistoryOption STREAM_HISTORY;
 
     SimpleIntegerOption<uint8_t> AUTO_RESET_AUDIO_SECONDS;
     SimpleIntegerOption<uint8_t> AUTO_RESET_VIDEO_SECONDS;

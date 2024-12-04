@@ -51,6 +51,24 @@ ResolutionOption::ResolutionOption(
     PA_ADD_OPTION(HEIGHT);
 }
 
+StreamHistoryOption::StreamHistoryOption()
+    : GroupOption("Stream History", LockMode::LOCK_WHILE_RUNNING, true, false)
+    , DESCRIPTION(
+        "Keep a record of this many seconds of video+audio. This will allow video capture for unexpected events.<br>"
+        "<font color=\"red\">Warning (Developer Only): The current implementation is inefficient and requires "
+        "10 GB of ram to store just 30 seconds of video. This feature is still a work-in-progress."
+        "</font>"
+    )
+    , VIDEO_HISTORY_SECONDS(
+        "<b>Video History (seconds):</b><br>"
+        "Keep this many seconds of video feed for video capture and debugging purposes.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        30
+    )
+{
+    PA_ADD_STATIC(DESCRIPTION);
+    PA_ADD_OPTION(VIDEO_HISTORY_SECONDS);
+}
 
 
 
@@ -201,12 +219,6 @@ GlobalSettings::GlobalSettings()
         true
     )
 #endif
-    , VIDEO_HISTORY_SECONDS(
-        "<b>Video History (seconds):</b><br>"
-        "Keep this many seconds of video feed for video capture and debugging purposes.",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        30
-    )
     , AUTO_RESET_AUDIO_SECONDS(
         "<b>Audio Auto-Reset:</b><br>"
         "Attempt to reset the audio if this many seconds has elapsed since the last audio frame (in order to fix issues with RDP disconnection, etc).",
@@ -275,7 +287,7 @@ GlobalSettings::GlobalSettings()
 #endif
 #if QT_VERSION_MAJOR >= 6
     if (PreloadSettings::instance().DEVELOPER_MODE){    //  REMOVE
-        PA_ADD_OPTION(VIDEO_HISTORY_SECONDS);
+        PA_ADD_OPTION(STREAM_HISTORY);
     }
 #endif
 

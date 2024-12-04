@@ -8,8 +8,9 @@
 #include "Common/Compiler.h"
 #include "PokemonLA_Tests.h"
 #include "TestUtils.h"
-#include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/Language.h"
+#include "CommonFramework/ImageTools/ImageBoxes.h"
+#include "CommonFramework/Recording/StreamHistorySession.h"
 #include "PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.h"
 #include "PokemonLA/Inference/Battles/PokemonLA_BattlePokemonSwitchDetector.h"
 #include "PokemonLA/Inference/Battles/PokemonLA_BattleSpriteWatcher.h"
@@ -490,8 +491,9 @@ int test_pokemonLA_shinySoundDetector(const std::vector<AudioSpectrum>& spectrum
     DummyVideoFeed video_feed;
     DummyVideoOverlay video_overlay;
     DummyAudioFeed audio_feed;
+    StreamHistorySession history(logger);
 
-    ConsoleHandle console(0, logger, &botbase, video_feed, video_overlay, audio_feed);
+    ConsoleHandle console(0, logger, &botbase, video_feed, video_overlay, audio_feed, history);
     ShinySoundDetector detector(console, [&](float error_coefficient) -> bool{
         return true;
     });

@@ -276,7 +276,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 //    SetThreadExecutionState(ES_CONTINUOUS | ES_DISPLAY_REQUIRED);
 
-//    feed.save_history("video.mov");
+    console.save_stream_history("video.mp4");
 
 #if 0
     VideoSnapshot image = feed.snapshot();

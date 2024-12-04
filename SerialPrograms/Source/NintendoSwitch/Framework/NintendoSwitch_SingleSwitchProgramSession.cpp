@@ -112,7 +112,8 @@ void SingleSwitchProgramSession::internal_run_program(){
         m_system.sender().botbase(),
         m_system.video(),
         m_system.overlay(),
-        m_system.audio()
+        m_system.audio(),
+        m_system.stream_history()
     );
 
     try{

@@ -8,6 +8,7 @@
 #include "CommonFramework/VideoPipeline/Stats/ThreadUtilizationStats.h"
 #include "CommonFramework/InferenceInfra/VisualInferencePivot.h"
 #include "CommonFramework/InferenceInfra/AudioInferencePivot.h"
+#include "CommonFramework/Recording/StreamHistorySession.h"
 #include "ConsoleHandle.h"
 
 //#include <iostream>
@@ -32,7 +33,8 @@ ConsoleHandle::ConsoleHandle(
     BotBase* botbase,
     VideoFeed& video,
     VideoOverlay& overlay,
-    AudioFeed& audio
+    AudioFeed& audio,
+    const StreamHistorySession& history
 )
     : m_index(index)
     , m_logger(logger)
@@ -40,9 +42,14 @@ ConsoleHandle::ConsoleHandle(
     , m_video(video)
     , m_overlay(overlay)
     , m_audio(audio)
+    , m_history(history)
     , m_thread_utilization(new ThreadUtilizationStat(current_thread_handle(), "Program Thread:"))
 {
     m_overlay.add_stat(*m_thread_utilization);
+}
+
+void ConsoleHandle::save_stream_history(const std::string& filename){
+    m_history.save(filename);
 }
 
 void ConsoleHandle::initialize_inference_threads(CancellableScope& scope, AsyncDispatcher& dispatcher){

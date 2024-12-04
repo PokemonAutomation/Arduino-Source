@@ -143,7 +143,8 @@ void MultiSwitchProgramSession::internal_run_program(){
             session.sender().botbase(),
             session.video(),
             session.overlay(),
-            session.audio()
+            session.audio(),
+            session.stream_history()
         );
     }
 

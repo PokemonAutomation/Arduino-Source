@@ -25,7 +25,7 @@
 #include "CommonFramework/AudioPipeline/AudioSession.h"
 #include "CommonFramework/VideoPipeline/CameraSession.h"
 #include "CommonFramework/VideoPipeline/VideoOverlaySession.h"
-#include "CommonFramework/Recording/RecentHistory.h"
+#include "CommonFramework/Recording/StreamHistorySession.h"
 #include "Integrations/ProgramTrackerInterfaces.h"
 #include "NintendoSwitch_SwitchSystemOption.h"
 
@@ -58,6 +58,7 @@ public:
     virtual VideoFeed& video() override{ return *m_camera; }
     virtual AudioFeed& audio() override{ return m_audio; }
     VideoOverlay& overlay(){ return m_overlay; }
+    const StreamHistorySession& stream_history() const{ return m_history; }
 
 public:
     void get(SwitchSystemOption& option);
@@ -70,6 +71,7 @@ public:
 
 public:
     void set_allow_user_commands(bool allow);
+    void save_history(const std::string& filename);
 
 private:
     //  The console # within a program.
@@ -86,7 +88,7 @@ private:
     AudioSession m_audio;
     VideoOverlaySession m_overlay;
 
-    RecentHistorySession m_history;
+    StreamHistorySession m_history;
 
     std::unique_ptr<CpuUtilizationStat> m_cpu_utilization;
     std::unique_ptr<ThreadUtilizationStat> m_main_thread_utilization;

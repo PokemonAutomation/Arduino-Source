@@ -19,6 +19,7 @@ class BotBase;
 class VideoFeed;
 class VideoOverlay;
 class AudioFeed;
+class StreamHistorySession;
 class ThreadUtilizationStat;
 class VisualInferencePivot;
 class AudioInferencePivot;
@@ -40,7 +41,8 @@ public:
         BotBase* botbase,
         VideoFeed& video,
         VideoOverlay& overlay,
-        AudioFeed& audio
+        AudioFeed& audio,
+        const StreamHistorySession& history
     );
 
     // log(string-like msg, Color color = Color())
@@ -57,6 +59,7 @@ public:
     VideoFeed& video(){ return m_video; }
     VideoOverlay& overlay(){ return m_overlay; }
     AudioFeed& audio(){ return m_audio; }
+    void save_stream_history(const std::string& filename);
 
     operator Logger&(){ return m_logger; }
     operator VideoFeed&(){ return m_video; }
@@ -77,6 +80,7 @@ private:
     VideoFeed& m_video;
     VideoOverlay& m_overlay;
     AudioFeed& m_audio;
+    const StreamHistorySession& m_history;
     std::unique_ptr<ThreadUtilizationStat> m_thread_utilization;
     std::unique_ptr<VisualInferencePivot> m_video_pivot;
     std::unique_ptr<AudioInferencePivot> m_audio_pivot;
