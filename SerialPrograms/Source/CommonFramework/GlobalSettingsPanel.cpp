@@ -286,7 +286,7 @@ GlobalSettings::GlobalSettings()
     PA_ADD_OPTION(ENABLE_FRAME_SCREENSHOTS);
 #endif
 #if QT_VERSION_MAJOR >= 6
-    if (PreloadSettings::instance().DEVELOPER_MODE){    //  REMOVE
+    if (PreloadSettings::instance().DEVELOPER_MODE){
         PA_ADD_OPTION(STREAM_HISTORY);
     }
 #endif

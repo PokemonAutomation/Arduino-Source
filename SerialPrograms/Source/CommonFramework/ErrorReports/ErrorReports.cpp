@@ -15,6 +15,7 @@
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
+#include "CommonFramework/Tools/ConsoleHandle.h"
 #include "ProgramDumper.h"
 #include "ErrorReports.h"
 
@@ -55,6 +56,11 @@ ErrorReportOption::ErrorReportOption()
         LockMode::UNLOCK_WHILE_RUNNING,
         true
     )
+    , VIDEO(
+        "<b>Include Video:</b><br>Include a video leading up to the error. (if possible)",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        true
+    )
     , LOGS(
         "<b>Include Logs:</b><br>Include the recent log leading up to the error.",
         LockMode::UNLOCK_WHILE_RUNNING,
@@ -65,20 +71,23 @@ ErrorReportOption::ErrorReportOption()
         LockMode::UNLOCK_WHILE_RUNNING,
         true
     )
-#if 0
     , FILES(
         "<b>Include Other Files:</b><br>Include other files that may be helpful for the developers.",
         LockMode::UNLOCK_WHILE_RUNNING,
         true
     )
-#endif
 {
     PA_ADD_STATIC(DESCRIPTION);
     PA_ADD_OPTION(SEND_MODE);
     PA_ADD_OPTION(SCREENSHOT);
+    if (PreloadSettings::instance().DEVELOPER_MODE){
+        PA_ADD_OPTION(VIDEO);
+    }
     PA_ADD_OPTION(LOGS);
     PA_ADD_OPTION(DUMPS);
-//    PA_ADD_OPTION(FILES);
+    if (PreloadSettings::instance().DEVELOPER_MODE){
+        PA_ADD_OPTION(FILES);
+    }
 }
 
 
@@ -97,7 +106,8 @@ SendableErrorReport::SendableErrorReport(
     const ProgramInfo& info,
     std::string title,
     std::vector<std::pair<std::string, std::string>> messages,
-    const ImageViewRGB32& image
+    const ImageViewRGB32& image,
+    ConsoleHandle* console
 )
     : SendableErrorReport()
 {
@@ -126,10 +136,15 @@ SendableErrorReport::SendableErrorReport(
         }
         file.write(log.c_str());
         file.flush();
-        m_files.emplace_back(ERROR_LOGS_NAME);
+        m_logs_name = ERROR_LOGS_NAME;
+    }
+    if (console){
+        if (console->save_stream_history(m_directory + "Video.mp4")){
+            m_video_name = "Video.mp4";
+        }
     }
     if (program_dump(logger, m_directory + ERROR_DUMP_NAME)){
-        m_files.emplace_back(ERROR_DUMP_NAME);
+        m_dump_name = ERROR_DUMP_NAME;
     }
 }
 
@@ -139,11 +154,6 @@ SendableErrorReport::SendableErrorReport(std::string directory)
     if (m_directory.back() != '/'){
         m_directory += '/';
     }
-
-    try{
-        m_image_owner = ImageRGB32(m_directory + "Image.png");
-        m_image = m_image_owner;
-    }catch (FileException&){}
 
     JsonValue json = load_json_file(m_directory + "Report.json");
     const JsonObject& obj = json.to_object_throw();
@@ -163,6 +173,33 @@ SendableErrorReport::SendableErrorReport(std::string directory)
                 item[0].to_string_throw(),
                 item[1].to_string_throw()
             );
+        }
+    }
+    {
+        const std::string* image_name = obj.get_string("Screenshot");
+        if (image_name){
+            try{
+                m_image_owner = ImageRGB32(*image_name);
+                m_image = m_image_owner;
+            }catch (FileException&){}
+        }
+    }
+    {
+        const std::string* video_name = obj.get_string("Video");
+        if (video_name){
+            m_video_name = *video_name;
+        }
+    }
+    {
+        const std::string* dump_name = obj.get_string("Dump");
+        if (dump_name){
+            m_dump_name = *dump_name;
+        }
+    }
+    {
+        const std::string* logs_name = obj.get_string("Logs");
+        if (logs_name){
+            m_logs_name = *logs_name;
         }
     }
     {
@@ -200,8 +237,21 @@ void SendableErrorReport::save(Logger* logger) const{
         }
         report["Messages"] = std::move(messages);
     }
-
-    m_image.save(m_directory + "Image.png");
+    if (m_image){
+        std::string image_name = m_directory + "Screenshot.png";
+        if (m_image.save(image_name)){
+            report["Screenshot"] = std::move(image_name);
+        }
+    }
+    if (!m_video_name.empty()){
+        report["Video"] = m_video_name;
+    }
+    if (!m_dump_name.empty()){
+        report["Dump"] = m_dump_name;
+    }
+    if (!m_logs_name.empty()){
+        report["Logs"] = m_logs_name;
+    }
 
     JsonArray array;
     for (const std::string& file : m_files){
@@ -314,6 +364,7 @@ void report_error(
     std::string title,
     std::vector<std::pair<std::string, std::string>> messages,
     const ImageViewRGB32& image,
+    ConsoleHandle* console,
     const std::vector<std::string>& files
 ){
     if (logger == nullptr){
@@ -326,7 +377,8 @@ void report_error(
             info,
             std::move(title),
             std::move(messages),
-            image
+            image,
+            console
         );
 
         std::vector<std::string> full_file_paths;

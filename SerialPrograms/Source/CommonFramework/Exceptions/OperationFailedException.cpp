@@ -32,39 +32,6 @@ OperationFailedException::OperationFailedException(ErrorReport error_report, Con
 }
 
 
-void OperationFailedException::send_notification(ProgramEnvironment& env, EventNotificationOption& notification) const{
-    std::vector<std::pair<std::string, std::string>> embeds;
-    if (!m_message.empty()){
-        embeds.emplace_back(std::pair<std::string, std::string>("Message:", m_message));
-    }
-    if (m_send_error_report == ErrorReport::SEND_ERROR_REPORT){
-        report_error(
-            &env.logger(),
-            env.program_info(),
-            name(),
-            embeds,
-            screenshot()
-        );
-#if 0
-        std::string label = name();
-        std::string filename = dump_image_alone(env.logger(), env.program_info(), label, *m_screenshot);
-        send_program_telemetry(
-            env.logger(), true, COLOR_RED,
-            env.program_info(),
-            label,
-            embeds,
-            filename
-        );
-#endif
-    }
-    send_program_notification(
-        env, notification,
-        COLOR_RED,
-        "Program Error",
-        std::move(embeds), "",
-        screenshot()
-    );
-}
 
 
 

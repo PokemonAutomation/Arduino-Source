@@ -66,23 +66,29 @@ public:
         , m_tracker(tracker)
         , m_filename(filename)
     {
-        start();
     }
     ~HistorySaverThread(){
         quit();
         wait();
     }
+    bool save(){
+        start();
+        quit();
+        wait();
+        return m_success;
+    }
     virtual void run() override{
-        m_tracker.save(m_logger, m_filename);
+        m_success = m_tracker.save(m_logger, m_filename);
     }
 
 private:
     Logger& m_logger;
     const StreamHistoryTracker& m_tracker;
     const std::string& m_filename;
+    bool m_success = false;
 };
 
-void StreamHistorySession::save(const std::string& filename) const{
+bool StreamHistorySession::save(const std::string& filename) const{
     const Data& data = *m_data;
 
     //  Get an owning reference to the current tracker.
@@ -93,13 +99,14 @@ void StreamHistorySession::save(const std::string& filename) const{
         WriteSpinLock lg(data.m_lock);
         if (!data.m_current){
             data.m_logger.log("Cannot save stream history: Stream history is not enabled.", COLOR_RED);
-            return;
+            return false;
         }
         tracker = data.m_current;
     }
 
 //    tracker->save(m_logger, filename);
     HistorySaverThread saver(data.m_logger, *tracker, filename);
+    return saver.save();
 }
 void StreamHistorySession::on_samples(const float* samples, size_t frames){
     Data& data = *m_data;

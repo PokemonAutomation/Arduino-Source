@@ -57,13 +57,12 @@ public:
         if (parent.m_writer){
             parent.m_writer->operator AudioFloatStreamListener&().on_samples(data, frames);
         }
-        for (AudioFloatStreamListener* listener : m_parent.m_stream_listeners){
-            listener->on_samples(data, frames);
-        }
         if (parent.m_fft_runner){
             parent.m_fft_runner->on_samples(data, frames);
         }
-
+        for (AudioFloatStreamListener* listener : m_parent.m_stream_listeners){
+            listener->on_samples(data, frames);
+        }
     }
 
 private:

@@ -24,9 +24,11 @@
 #include "CommonFramework/VideoPipeline/Backends/VideoFrameQt.h"
 
 
-//#include <iostream>
-//using std::cout;
-//using std::endl;
+//  REMOVE
+#include <iostream>
+using std::cout;
+using std::endl;
+
 
 namespace PokemonAutomation{
 
@@ -54,7 +56,7 @@ public:
     );
     void set_window(std::chrono::seconds window);
 
-    void save(Logger& logger, const std::string& filename) const;
+    bool save(Logger& logger, const std::string& filename) const;
 
 public:
     void on_samples(const float* data, size_t frames);
@@ -161,7 +163,7 @@ void StreamHistoryTracker::clear_old(){
 
 
 
-void StreamHistoryTracker::save(Logger& logger, const std::string& filename) const{
+bool StreamHistoryTracker::save(Logger& logger, const std::string& filename) const{
     logger.log("Saving stream history...", COLOR_BLUE);
 
     std::deque<std::shared_ptr<AudioBlock>> audio;
@@ -170,7 +172,7 @@ void StreamHistoryTracker::save(Logger& logger, const std::string& filename) con
         //  Fast copy the current state of the stream.
         WriteSpinLock lg(m_lock);
         if (m_audio.empty() && m_frames.empty()){
-            return;
+            return false;
         }
         audio = m_audio;
         frames = m_frames;
@@ -213,8 +215,16 @@ void StreamHistoryTracker::save(Logger& logger, const std::string& filename) con
     session.setAudioBufferInput(&audio_input);
     session.setVideoFrameInput(&video_input);
     session.setRecorder(&recorder);
+#if 1
     recorder.setMediaFormat(QMediaFormat::MPEG4);
-    recorder.setQuality(QMediaRecorder::HighQuality);
+#else
+    QMediaFormat video_format;
+    video_format.setAudioCodec(QMediaFormat::AudioCodec::AAC);
+//    video_format.setVideoCodec(QMediaFormat::VideoCodec::H264);
+    video_format.setFileFormat(QMediaFormat::MPEG4);
+    recorder.setMediaFormat(video_format);
+#endif
+    recorder.setQuality(QMediaRecorder::NormalQuality);
 
     QFileInfo file(QString::fromStdString(filename));
     recorder.setOutputLocation(
@@ -225,6 +235,7 @@ void StreamHistoryTracker::save(Logger& logger, const std::string& filename) con
 
     WallClock last_change = current_time();
     QAudioBuffer audio_buffer;
+    bool success = true;
     while (audio_buffer.isValid() || !frames.empty()){
 #if 1
         while (true){
@@ -276,6 +287,7 @@ void StreamHistoryTracker::save(Logger& logger, const std::string& filename) con
 
         if (current_time() - last_change > std::chrono::seconds(10)){
             logger.log("Failed to record stream history: No progress made after 10 seconds.", COLOR_RED);
+            success = false;
             break;
         }
 
@@ -284,10 +296,11 @@ void StreamHistoryTracker::save(Logger& logger, const std::string& filename) con
 
     recorder.stop();
     logger.log("Done saving stream history...", COLOR_BLUE);
+    cout << recorder.duration() << endl;    //  REMOVE
 
 
 //    });
-
+    return success;
 }
 
 

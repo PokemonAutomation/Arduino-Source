@@ -10,18 +10,52 @@
 #define PokemonAutomation_StreamHistoryTracker_RecordOnTheFly_H
 
 #include <mutex>
+#include <QCoreApplication>
 #include <QFileInfo>
 #include <QUrl>
+//#include <QThread>
 #include <QAudioBufferInput>
 #include <QVideoFrameInput>
 #include <QMediaFormat>
 #include <QMediaRecorder>
 #include <QMediaCaptureSession>
+#include "Common/Cpp/LifetimeSanitizer.h"
+#include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/AbstractLogger.h"
+#include "Common/Cpp/Concurrency/SpinPause.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/VideoPipeline/Backends/VideoFrameQt.h"
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
 namespace PokemonAutomation{
+
+
+class RollingStream : public QIODevice{
+public:
+    ~RollingStream(){
+        waitForBytesWritten(-1);
+//        cout << "~RollingStream()" << endl; //  REMOVE
+    }
+    RollingStream(){
+        setOpenMode(QIODeviceBase::WriteOnly);
+    }
+    virtual qint64 readData(char* data, qint64 maxlen){ return 0; }
+    virtual qint64 writeData(const char* data, qint64 len){
+        m_sanitizer.check_usage();
+        m_bytes += len;
+        cout << "total = " << m_bytes << ", current = " << len << endl;
+        return len;
+    }
+
+private:
+    uint64_t m_bytes = 0;
+
+    LifetimeSanitizer m_sanitizer;
+};
+
 
 
 class StreamHistoryTracker{
@@ -34,7 +68,7 @@ public:
     );
     void set_window(std::chrono::seconds window);
 
-    void save(Logger& logger, const std::string& filename) const;
+    bool save(Logger& logger, const std::string& filename) const;
 
 public:
 //    void push_frame(QVideoFrame frame);
@@ -57,16 +91,27 @@ private:
 //    mutable std::mutex m_lock;
 //    std::condition_variable m_cv;
 
+    RollingStream m_stream;
+
     QAudioFormat m_audio_format;
     QAudioBufferInput m_audio_input;
     QVideoFrameInput m_video_input;
     QMediaCaptureSession m_session;
+
     QMediaRecorder m_recorder;
 };
 
 
 StreamHistoryTracker::~StreamHistoryTracker(){
     m_recorder.stop();
+    while (m_recorder.recorderState() != QMediaRecorder::StoppedState){
+//        cout << "StreamHistoryTracker: process" << endl;
+        try{
+            QCoreApplication::processEvents();
+            pause();
+        }catch (...){}
+    }
+//    cout << "~StreamHistoryTracker()" << endl;  //  REMOVE
 }
 StreamHistoryTracker::StreamHistoryTracker(
     size_t audio_samples_per_frame,
@@ -90,10 +135,23 @@ StreamHistoryTracker::StreamHistoryTracker(
     m_recorder.setMediaFormat(QMediaFormat::MPEG4);
     m_recorder.setQuality(QMediaRecorder::HighQuality);
 
-    QFileInfo file(QString::fromStdString("video.mp4"));
+#if 0
+    m_recorder.connect(
+        &m_recorder, &QMediaRecorder::recorderStateChanged,
+        &m_recorder, [](QMediaRecorder::RecorderState state){
+
+        }
+    );
+#endif
+
+    QFileInfo file(QString::fromStdString("capture-" + now_to_filestring() + ".mp4"));
+#if 1
     m_recorder.setOutputLocation(
         QUrl::fromLocalFile(file.absoluteFilePath())
     );
+#else
+    m_recorder.setOutputDevice(&m_stream);
+#endif
 
     m_recorder.record();
 }
@@ -116,11 +174,12 @@ void StreamHistoryTracker::on_frame(std::shared_ptr<VideoFrame> frame){
     m_video_input.sendVideoFrame(frame->frame);
 }
 
-void StreamHistoryTracker::save(Logger& logger, const std::string& filename) const{
+bool StreamHistoryTracker::save(Logger& logger, const std::string& filename) const{
     logger.log("Cannot save stream history: Not implemented.", COLOR_RED);
 
     //  TODO
 
+    return false;
 }
 
 

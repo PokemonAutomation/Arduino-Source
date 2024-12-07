@@ -59,7 +59,7 @@ public:
     VideoFeed& video(){ return m_video; }
     VideoOverlay& overlay(){ return m_overlay; }
     AudioFeed& audio(){ return m_audio; }
-    void save_stream_history(const std::string& filename);
+    bool save_stream_history(const std::string& filename);
 
     operator Logger&(){ return m_logger; }
     operator VideoFeed&(){ return m_video; }

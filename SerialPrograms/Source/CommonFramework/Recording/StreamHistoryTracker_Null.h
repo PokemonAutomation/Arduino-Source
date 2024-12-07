@@ -25,8 +25,9 @@ public:
     ){}
     void set_window(std::chrono::seconds window){}
 
-    void save(Logger& logger, const std::string& filename) const{
+    bool save(Logger& logger, const std::string& filename) const{
         logger.log("Cannot save stream history: Not implemented.", COLOR_RED);
+        return false;
     }
 
 public:

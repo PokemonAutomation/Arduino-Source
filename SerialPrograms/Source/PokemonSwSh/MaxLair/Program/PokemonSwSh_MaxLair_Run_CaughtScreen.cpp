@@ -170,10 +170,11 @@ StateMachineAction run_caught_screen(
             synchronize_caught_screen(console, context, state_tracker);
             StateMachineAction state = mash_A_to_entrance(runtime, console, context, entrance);
             if (state == StateMachineAction::RESET_RECOVER){
-                throw FatalProgramException(
-                    ErrorReport::SEND_ERROR_REPORT,
+                throw_and_log<FatalProgramException>(
                     console,
-                    "Unable to take " + Pokemon::STRING_POKEMON + ". Did you forget to disable nicknames?"
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "Unable to take " + Pokemon::STRING_POKEMON + ". Did you forget to disable nicknames?",
+                    console
                );
             }
             return state;

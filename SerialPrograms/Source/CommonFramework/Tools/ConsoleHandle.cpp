@@ -48,8 +48,8 @@ ConsoleHandle::ConsoleHandle(
     m_overlay.add_stat(*m_thread_utilization);
 }
 
-void ConsoleHandle::save_stream_history(const std::string& filename){
-    m_history.save(filename);
+bool ConsoleHandle::save_stream_history(const std::string& filename){
+    return m_history.save(filename);
 }
 
 void ConsoleHandle::initialize_inference_threads(CancellableScope& scope, AsyncDispatcher& dispatcher){

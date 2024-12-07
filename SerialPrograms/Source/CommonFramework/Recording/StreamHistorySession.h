@@ -26,7 +26,7 @@ class StreamHistorySession
 public:
     StreamHistorySession(Logger& logger);
     void start(AudioChannelFormat format);
-    void save(const std::string& filename) const;
+    bool save(const std::string& filename) const;
 
 public:
     virtual void on_samples(const float* data, size_t frames) override;

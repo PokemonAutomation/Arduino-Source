@@ -19,10 +19,14 @@
 namespace PokemonAutomation{
 
 
+class ConsoleHandle;
+
+
 extern const std::string& ERROR_LOGS_NAME;
 extern const std::string& ERROR_DUMP_NAME;
 extern const std::string& ERROR_PATH_UNSENT;
 extern const std::string& ERROR_PATH_SENT;
+
 
 
 enum class ErrorReportSendMode{
@@ -40,9 +44,10 @@ public:
     EnumDropdownOption<ErrorReportSendMode> SEND_MODE;
 
     BooleanCheckBoxOption SCREENSHOT;
+    BooleanCheckBoxOption VIDEO;
     BooleanCheckBoxOption LOGS;
     BooleanCheckBoxOption DUMPS;
-//    BooleanCheckBoxOption FILES;
+    BooleanCheckBoxOption FILES;
 };
 
 
@@ -57,7 +62,8 @@ public:
         const ProgramInfo& info = ProgramInfo(),
         std::string title = "",
         std::vector<std::pair<std::string, std::string>> messages = {},
-        const ImageViewRGB32& image = ImageViewRGB32()
+        const ImageViewRGB32& image = ImageViewRGB32(),
+        ConsoleHandle* console = nullptr
     );
 
     //  Deserialize from existing report.
@@ -85,6 +91,9 @@ private:
     std::vector<std::pair<std::string, std::string>> m_messages;
     ImageRGB32 m_image_owner;
     ImageViewRGB32 m_image;
+    std::string m_logs_name;
+    std::string m_video_name;
+    std::string m_dump_name;
     std::vector<std::string> m_files;
 };
 
@@ -99,6 +108,7 @@ void report_error(
     std::string title = "",
     std::vector<std::pair<std::string, std::string>> messages = {},
     const ImageViewRGB32& image = ImageViewRGB32(),
+    ConsoleHandle* console = nullptr,
     const std::vector<std::string>& files = {}
 );
 

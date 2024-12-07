@@ -447,8 +447,9 @@ void ShinyHuntAreaZeroPlatform::set_flags_and_run_state(SingleSwitchProgramEnvir
         m_consecutive_failures++;
         e.send_notification(*m_env, NOTIFICATION_ERROR_RECOVERABLE);
         if (m_consecutive_failures >= 3){
-            throw FatalProgramException(
-                ErrorReport::SEND_ERROR_REPORT, console,
+            throw_and_log<FatalProgramException>(
+                console,
+                ErrorReport::SEND_ERROR_REPORT,
                 "Failed 3 times consecutively."
             );
         }

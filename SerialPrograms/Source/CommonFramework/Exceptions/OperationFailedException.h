@@ -19,14 +19,13 @@ class FatalProgramException;
 //  These include recoverable errors which can be consumed by the program.
 class OperationFailedException : public ScreenshotException{
 public:
+    using ScreenshotException::ScreenshotException;
     explicit OperationFailedException(ErrorReport error_report, Logger& logger, std::string message);
     explicit OperationFailedException(ErrorReport error_report, Logger& logger, std::string message, std::shared_ptr<const ImageRGB32> screenshot);
     explicit OperationFailedException(ErrorReport error_report, ConsoleHandle& console, std::string message, bool take_screenshot);
 
     virtual const char* name() const override{ return "OperationFailedException"; }
-    virtual std::string message() const override{ return m_message; }
 
-    virtual void send_notification(ProgramEnvironment& env, EventNotificationOption& notification) const override;
 };
 
 
