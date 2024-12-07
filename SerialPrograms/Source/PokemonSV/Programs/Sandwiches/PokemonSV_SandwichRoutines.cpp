@@ -971,9 +971,8 @@ void run_sandwich_maker(ProgramEnvironment& env, ConsoleHandle& console, BotBase
                     continue;
                 }else{
                     console.log("Read nothing on center plate label.");
-                    throw OperationFailedException(
-                        ErrorReport::SEND_ERROR_REPORT,
-                        console,
+                    OperationFailedException::fire(
+                        console, ErrorReport::SEND_ERROR_REPORT,
                         "No ingredient found on center plate label.",
                         std::move(screen)
                     );
@@ -1019,9 +1018,8 @@ void run_sandwich_maker(ProgramEnvironment& env, ConsoleHandle& console, BotBase
             left_filling = left_plate_detector.detect_filling_name(screen);
 
             if (left_filling.empty()){
-                throw OperationFailedException(
-                    ErrorReport::SEND_ERROR_REPORT,
-                    console,
+                OperationFailedException::fire(
+                    console, ErrorReport::SEND_ERROR_REPORT,
                     "No ingredient label found on remaining plate " + std::to_string(i) + ".",
                     std::move(screen)
                 );
@@ -1041,9 +1039,8 @@ void run_sandwich_maker(ProgramEnvironment& env, ConsoleHandle& console, BotBase
         //If a label fails to read it'll cause issues down the line
         if ((int)plate_order.size() != plates){
             env.log("Found # plate labels " + std::to_string(plate_order.size()) + ", not same as desired # plates " + std::to_string(plates));
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT,
-                console,
+            OperationFailedException::fire(
+                console, ErrorReport::SEND_ERROR_REPORT,
                 "Number of plate labels did not match number of plates.",
                 std::move(screen)
             );
@@ -1152,8 +1149,8 @@ void run_sandwich_maker(ProgramEnvironment& env, ConsoleHandle& console, BotBase
     SandwichHandWatcher grabbing_hand(SandwichHandType::FREE, { 0, 0, 1.0, 1.0 });
     int ret = wait_until(console, context, std::chrono::seconds(30), { grabbing_hand });
     if (ret < 0){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, console,
+        OperationFailedException::fire(
+            console, ErrorReport::SEND_ERROR_REPORT,
             "SandwichMaker: Cannot detect grabing hand when waiting for upper bread.",
             grabbing_hand.last_snapshot()
         );

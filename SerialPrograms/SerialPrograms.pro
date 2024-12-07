@@ -179,12 +179,8 @@ SOURCES += \
     Source/CommonFramework/Environment/SystemSleep.cpp \
     Source/CommonFramework/ErrorReports/ErrorReports.cpp \
     Source/CommonFramework/ErrorReports/ProgramDumper.cpp \
-    Source/CommonFramework/Exceptions/FatalProgramException.cpp \
-    Source/CommonFramework/Exceptions/OliveActionFailedException.cpp \
-    Source/CommonFramework/Exceptions/OperationFailedException.cpp \
     Source/CommonFramework/Exceptions/ProgramFinishedException.cpp \
     Source/CommonFramework/Exceptions/ScreenshotException.cpp \
-    Source/CommonFramework/Exceptions/UnexpectedBattleException.cpp \
     Source/CommonFramework/GlobalServices.cpp \
     Source/CommonFramework/GlobalSettingsPanel.cpp \
     Source/CommonFramework/Globals.cpp \
@@ -730,7 +726,7 @@ SOURCES += \
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_06.cpp \
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_07.cpp \
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_08.cpp \
-    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_09.cpp \ 
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_09.cpp \
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_10.cpp \
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_11.cpp \
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_12.cpp \
@@ -1263,7 +1259,6 @@ HEADERS += \
     Source/CommonFramework/ErrorReports/ProgramDumper.h \
     Source/CommonFramework/ErrorReports/ProgramDumper_Windows.tpp \
     Source/CommonFramework/Exceptions/FatalProgramException.h \
-    Source/CommonFramework/Exceptions/OliveActionFailedException.h \
     Source/CommonFramework/Exceptions/OperationFailedException.h \
     Source/CommonFramework/Exceptions/ProgramFinishedException.h \
     Source/CommonFramework/Exceptions/ScreenshotException.h \
@@ -1471,7 +1466,6 @@ HEADERS += \
     Source/Kernels/BinaryMatrix/Kernels_SparseBinaryMatrixCore.h \
     Source/Kernels/BinaryMatrix/Kernels_SparseBinaryMatrixCore.tpp \
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic.h \
-    Source/Kernels/ImageFilters/Kernels_ImageFilter_Green_Default.h \
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness.h \
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr.h \
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev.h \
@@ -1807,7 +1801,7 @@ HEADERS += \
     Source/PokemonSV/Inference/PokemonSV_ClothingTopDetector.h \
     Source/PokemonSV/Inference/PokemonSV_ESPEmotionDetector.h \
     Source/PokemonSV/Inference/PokemonSV_MainMenuDetector.h \
-    Source/PokemonSV/Inference/PokemonSV_MenuOptionReader.h \    
+    Source/PokemonSV/Inference/PokemonSV_MenuOptionReader.h \
     Source/PokemonSV/Inference/PokemonSV_MoneyReader.h \
     Source/PokemonSV/Inference/PokemonSV_PokemonMovesReader.h \
     Source/PokemonSV/Inference/PokemonSV_PokePortalDetector.h \
@@ -1855,7 +1849,7 @@ HEADERS += \
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_06.h \
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_07.h \
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_08.h \
-    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_09.h \   
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_09.h \
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_10.h \
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_11.h \
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_12.h \
@@ -1875,6 +1869,7 @@ HEADERS += \
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStoryTools.h \
     Source/PokemonSV/Programs/AutoStory/PokemonSV_MenuOption.h \
     Source/PokemonSV/Programs/AutoStory/PokemonSV_MenuOptionDatabase.h \
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_OliveActionFailedException.h \
     Source/PokemonSV/Programs/Battles/PokemonSV_BasicCatcher.h \
     Source/PokemonSV/Programs/Battles/PokemonSV_Battles.h \
     Source/PokemonSV/Programs/Battles/PokemonSV_SinglesBattler.h \

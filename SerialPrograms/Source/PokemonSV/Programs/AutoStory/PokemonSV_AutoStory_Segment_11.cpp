@@ -4,20 +4,20 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OliveActionFailedException.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Tools/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_DateReader.h"
-#include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
+#include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
+#include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_SaveGame.h"
-#include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OliveDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_NoMinimapDetector.h"
+#include "PokemonSV_OliveActionFailedException.h"
 #include "PokemonSV_AutoStoryTools.h"
 #include "PokemonSV_AutoStory_Segment_11.h"
 
@@ -550,10 +550,10 @@ void checkpoint_26(
             {no_minimap}
         );
         if (ret < 0){
-            throw OliveActionFailedException(
-                ErrorReport::SEND_ERROR_REPORT,
-                env.logger(),
-                "Failed to finish Olive roll in the last stretch."
+            throw_and_log<OliveActionFailedException>(
+                env.logger(), ErrorReport::SEND_ERROR_REPORT,
+                "Failed to finish Olive roll in the last stretch.",
+                env.console
             );
         }
         env.log("No minimap seen. Likely finished the Olive roll.");

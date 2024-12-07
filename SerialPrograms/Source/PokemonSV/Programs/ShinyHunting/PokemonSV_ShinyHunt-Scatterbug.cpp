@@ -192,10 +192,9 @@ void ShinyHuntScatterbug::program(SingleSwitchProgramEnvironment& env, BotBaseCo
 
             consecutive_failures++;
             if (consecutive_failures >= 3){
-                throw OperationFailedException(
-                    ErrorReport::SEND_ERROR_REPORT, env.console,
-                    "Failed 3 times in the row.",
-                    true
+                OperationFailedException::fire(
+                    env.console, ErrorReport::SEND_ERROR_REPORT,
+                    "Failed 3 times in the row."
                 );
             }
 

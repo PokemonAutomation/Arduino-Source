@@ -31,14 +31,21 @@ enum class ErrorReport{
 class ScreenshotException : public Exception{
 public:
     ScreenshotException() = default;
+
+    //  Construct exception with a simple message.
     explicit ScreenshotException(ErrorReport error_report, std::string message);
-    explicit ScreenshotException(ErrorReport error_report, std::string message, std::shared_ptr<const ImageRGB32> screenshot);
-    explicit ScreenshotException(ErrorReport error_report, ConsoleHandle& console, std::string message, bool take_screenshot);
+
+    //  Construct exception with message and console information.
+    //  This will take a screenshot and store the console if the stream history if requested later.
     explicit ScreenshotException(
         ErrorReport error_report,
         std::string message,
         ConsoleHandle& console
     );
+
+    //  Construct exception with message with screenshot and (optionally) console information.
+    //  Use the provided screenshot instead of taking one with the console.
+    //  Store the console information (if provided) for stream history if requested later.
     explicit ScreenshotException(
         ErrorReport error_report,
         std::string message,
@@ -52,6 +59,8 @@ public:
         std::shared_ptr<const ImageRGB32> screenshot
     );
 
+    //  Add console information if it isn't already requested.
+    //  This will provide screenshot and stream history if requested later.
     void add_console_if_needed(ConsoleHandle& console);
 
 

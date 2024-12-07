@@ -188,8 +188,8 @@ bool StatsReset::enter_battle(SingleSwitchProgramEnvironment& env, BotBaseContex
 
         return false;
         /*
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, env.console,
+        OperationFailedException::fire(
+            env.console, ErrorReport::SEND_ERROR_REPORT,
             "Failed to enter battle. Are you facing the Pokemon or in a menu?",
             true
         );
@@ -212,10 +212,9 @@ void StatsReset::open_ball_menu(SingleSwitchProgramEnvironment& env, BotBaseCont
             stats.errors++;
             env.update_stats();
             send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
-                "Timed out trying to read ball after 2 minutes.",
-                true
+            OperationFailedException::fire(
+                env.console, ErrorReport::SEND_ERROR_REPORT,
+                "Timed out trying to read ball after 2 minutes."
             );
         }
 
@@ -264,10 +263,9 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext&
                     env.console.log("Unable to find menu_before_throw.");
                     stats.errors++;
                     env.update_stats();
-                    throw OperationFailedException(
-                        ErrorReport::SEND_ERROR_REPORT, env.console,
-                        "Unable to find menu_before_throw.",
-                        true
+                    OperationFailedException::fire(
+                        env.console, ErrorReport::SEND_ERROR_REPORT,
+                        "Unable to find menu_before_throw."
                     );
                 }
 
@@ -285,10 +283,9 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext&
                         env.console.log("Unable to find Quick Ball on turn 1.");
                         stats.errors++;
                         env.update_stats();
-                        throw OperationFailedException(
-                            ErrorReport::SEND_ERROR_REPORT, env.console,
-                            "Unable to find Quick Ball on turn 1.",
-                            true
+                        OperationFailedException::fire(
+                            env.console, ErrorReport::SEND_ERROR_REPORT,
+                            "Unable to find Quick Ball on turn 1."
                         );
                     }
                     if (quantity < 0){
@@ -370,10 +367,9 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext&
                         env.console.log("Battle menu detected early. Out of PP, please check your setup.");
                         stats.errors++;
                         env.update_stats();
-                        throw OperationFailedException(
-                            ErrorReport::SEND_ERROR_REPORT, env.console,
-                            "Battle menu detected early. Out of PP, please check your setup.",
-                            true
+                        OperationFailedException::fire(
+                            env.console, ErrorReport::SEND_ERROR_REPORT,
+                            "Battle menu detected early. Out of PP, please check your setup."
                         );
                     }else{
                         env.log("Move successfully used.");
@@ -453,10 +449,9 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext&
                     env.console.log("Invalid state ret2 run_battle.");
                     stats.errors++;
                     env.update_stats();
-                    throw OperationFailedException(
-                        ErrorReport::SEND_ERROR_REPORT, env.console,
-                        "Invalid state ret2 run_battle.",
-                        true
+                    OperationFailedException::fire(
+                        env.console, ErrorReport::SEND_ERROR_REPORT,
+                        "Invalid state ret2 run_battle."
                     );
                 }
 
@@ -495,10 +490,9 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext&
         env.console.log("Invalid state in run_battle().");
         stats.errors++;
         env.update_stats();
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, env.console,
-            "Invalid state in run_battle().",
-            true
+        OperationFailedException::fire(
+            env.console, ErrorReport::SEND_ERROR_REPORT,
+            "Invalid state in run_battle()."
         );
     }
 
@@ -553,10 +547,9 @@ bool StatsReset::check_stats(SingleSwitchProgramEnvironment& env, BotBaseContext
             env.console.log("Invalid state.");
             stats.errors++;
             env.update_stats();
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
-                "Invalid state.",
-                true
+            OperationFailedException::fire(
+                env.console, ErrorReport::SEND_ERROR_REPORT,
+                "Invalid state."
             );
         }
     }
@@ -594,10 +587,9 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
 
             //Try to start battle 3 times.
             if (c > 2){
-                throw OperationFailedException(
-                    ErrorReport::SEND_ERROR_REPORT, env.console,
-                    "Failed to enter battle after 3 attempts.",
-                    true
+                OperationFailedException::fire(
+                    env.console, ErrorReport::SEND_ERROR_REPORT,
+                    "Failed to enter battle after 3 attempts."
                 );
                 break;
             }

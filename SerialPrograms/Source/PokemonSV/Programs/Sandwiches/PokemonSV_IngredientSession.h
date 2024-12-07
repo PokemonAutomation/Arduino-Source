@@ -77,7 +77,7 @@ private:
 //  Starting from the top of the fillings menu, gather all the ingredients.
 //  When this function returns, the game will be entering the phase where the
 //  user must stack the fillings.
-//  If any ingredient is not found or insuffient, it will throw OperationFailedException.
+//  If any ingredient is not found or insuffient, it will OperationFailedException::fire.
 void add_sandwich_ingredients(
     AsyncDispatcher& dispatcher,
     ConsoleHandle& console, BotBaseContext& context,

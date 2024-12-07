@@ -77,8 +77,8 @@ std::string BlueberryQuestDetector::detect_quest(const ImageViewRGB32& screen) c
     }
 
     if (results.size() > 1){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, m_logger,
+        throw_and_log<OperationFailedException>(
+            m_logger, ErrorReport::SEND_ERROR_REPORT,
             "BlueberryQuestDetector::detect_quest(): Unable to read selected item. Ambiguous or multiple results."
         );
     }

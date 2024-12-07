@@ -100,9 +100,8 @@ void checkpoint_28(
             {no_minimap}
         );
         if (ret < 0){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT,
-                env.logger(),
+            OperationFailedException::fire(
+                env.console, ErrorReport::SEND_ERROR_REPORT,
                 "Failed to enter Cortondo Gym."
             );
         }

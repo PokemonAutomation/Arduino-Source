@@ -120,10 +120,9 @@ void CrobatFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCon
         context.wait_for_all_requests();
     }
     if (error){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, env.console,
-            "Unable to find Wyrdeer after 10 attempts.",
-            true
+        OperationFailedException::fire(
+            env.console, ErrorReport::SEND_ERROR_REPORT,
+            "Unable to find Wyrdeer after 10 attempts."
         );
     }
 

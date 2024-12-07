@@ -102,10 +102,9 @@ void checkpoint_21(
             { black_screen }
         );
         if (ret < 0){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
-                "checkpoint_21(): Failed to jump the East Mesagoza wall.",
-                true
+            OperationFailedException::fire(
+                env.console, ErrorReport::SEND_ERROR_REPORT,
+                "checkpoint_21(): Failed to jump the East Mesagoza wall."
             );
         }
         context.wait_for_all_requests();

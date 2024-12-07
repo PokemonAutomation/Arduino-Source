@@ -168,16 +168,8 @@ void loop_adventures(
                     "Error",
                     {{"Message:", "Failed to start adventure 3 times in the row."}}
                 );
-#if 0
-                send_program_telemetry(
-                    env.logger(), true, COLOR_RED, env.program_info(),
-                    "Error",
-                    {{"Message:", "Failed to start adventure 3 times in the row."}},
-                    ""
-                );
-#endif
-                throw OperationFailedException(
-                    ErrorReport::SEND_ERROR_REPORT, env.logger(),
+                throw_and_log<OperationFailedException>(
+                    env.logger(), ErrorReport::SEND_ERROR_REPORT,
                     "Failed to start adventure 3 times in the row."
                 );
             }

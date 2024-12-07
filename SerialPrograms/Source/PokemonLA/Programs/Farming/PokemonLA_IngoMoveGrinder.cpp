@@ -116,10 +116,9 @@ bool IngoMoveGrinder::start_dialog(ConsoleHandle& console, BotBaseContext& conte
             //  Version 1.1 with new options unlocked.
             break;
         default:
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
-                "Unable to detect options after 10 A presses.",
-                true
+            OperationFailedException::fire(
+                console, ErrorReport::SEND_ERROR_REPORT,
+                "Unable to detect options after 10 A presses."
             );
         }
     }
@@ -141,10 +140,9 @@ bool IngoMoveGrinder::start_dialog(ConsoleHandle& console, BotBaseContext& conte
     case 0:
         return false;
     default:
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, console,
-            "Unable to find opponent list options after 5 A presses.",
-            true
+        OperationFailedException::fire(
+            console, ErrorReport::SEND_ERROR_REPORT,
+            "Unable to find opponent list options after 5 A presses."
         );
     }
 }
@@ -213,10 +211,9 @@ bool IngoMoveGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBase
             env.console.log("Error: Failed to find battle menu after 2 minutes.");
 //            auto snapshot = env.console.video().snapshot();
 //            dump_image(env.logger(), env.program_info(), "BattleMenuNotFound", snapshot);
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
-                "Failed to find battle menu after 2 minutes.",
-                true
+            OperationFailedException::fire(
+                env.console, ErrorReport::SEND_ERROR_REPORT,
+                "Failed to find battle menu after 2 minutes."
             );
         }
 
@@ -352,13 +349,11 @@ void IngoMoveGrinder::go_to_next_move(SingleSwitchProgramEnvironment& env, BotBa
 
 void IngoMoveGrinder::go_to_next_pokemon(SingleSwitchProgramEnvironment& env, BotBaseContext& context)
 {
-    if (cur_pokemon == 4)
-    {
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, env.console,
+    if (cur_pokemon == 4){
+        OperationFailedException::fire(
+            env.console, ErrorReport::SEND_ERROR_REPORT,
             "Abort program. Your 4 first pokemons are done grinding moves, dead or without PP. "
-            "Your fifth pokemon (Arceus) died so no other choice than stopping the program.",
-            true
+            "Your fifth pokemon (Arceus) died so no other choice than stopping the program."
         );
     }
     env.console.log("Switch to next pokemon " + debug_current_info() + debug_move_attempts_info());

@@ -184,10 +184,9 @@ void WildItemFarmer::refresh_pp(SingleSwitchProgramEnvironment& env, BotBaseCont
             continue;
 
         default:
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
-                "No state detected while changing moves after 10 seconds.",
-                true
+            OperationFailedException::fire(
+                env.console, ErrorReport::SEND_ERROR_REPORT,
+                "No state detected while changing moves after 10 seconds."
             );
         }
     }
@@ -218,10 +217,9 @@ bool WildItemFarmer::verify_item_held(SingleSwitchProgramEnvironment& env, BotBa
             break;
 
         default:
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
-                "Unable to detect " + Pokemon::STRING_POKEMON + " select menu.",
-                true
+            OperationFailedException::fire(
+                env.console, ErrorReport::SEND_ERROR_REPORT,
+                "Unable to detect " + Pokemon::STRING_POKEMON + " select menu."
             );
         }
 
@@ -242,10 +240,9 @@ bool WildItemFarmer::verify_item_held(SingleSwitchProgramEnvironment& env, BotBa
             {battle_menu}
         );
         if (ret < 0){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
-                "Unable to back out to battle menu.",
-                true
+            OperationFailedException::fire(
+                env.console, ErrorReport::SEND_ERROR_REPORT,
+                "Unable to back out to battle menu."
             );
         }
     }
@@ -317,10 +314,9 @@ void WildItemFarmer::run_program(SingleSwitchProgramEnvironment& env, BotBaseCon
             if (consecutive_throw_attempts >= MANUVERS.size()){
                 stats.errors++;
                 env.update_stats();
-                throw OperationFailedException(
-                    ErrorReport::NO_ERROR_REPORT, env.console,
-                    "Failed to start battle after " + std::to_string(MANUVERS.size()) + " attempts.",
-                    true
+                OperationFailedException::fire(
+                    env.console, ErrorReport::NO_ERROR_REPORT,
+                    "Failed to start battle after " + std::to_string(MANUVERS.size()) + " attempts."
                 );
             }
 
@@ -360,10 +356,9 @@ void WildItemFarmer::run_program(SingleSwitchProgramEnvironment& env, BotBaseCon
                 }else{
                     stats.failed++;
                     env.update_stats();
-                    throw OperationFailedException(
-                        ErrorReport::NO_ERROR_REPORT, env.console,
-                        "Failed to clone item. Possible incorrect encounter.",
-                        true
+                    OperationFailedException::fire(
+                        env.console, ErrorReport::NO_ERROR_REPORT,
+                        "Failed to clone item. Possible incorrect encounter."
                     );
                 }
             }
@@ -449,10 +444,9 @@ void WildItemFarmer::run_program(SingleSwitchProgramEnvironment& env, BotBaseCon
             continue;
 
         default:
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
-                "No state detected after 120 seconds.",
-                true
+            OperationFailedException::fire(
+                env.console, ErrorReport::SEND_ERROR_REPORT,
+                "No state detected after 120 seconds."
             );
         }
 

@@ -27,15 +27,34 @@ class ConsoleHandle;
 class ProgramFinishedException : public ScreenshotException{
 public:
     ProgramFinishedException();
-    explicit ProgramFinishedException(Logger& logger, std::string message);
-    explicit ProgramFinishedException(Logger& logger, std::string message, std::shared_ptr<const ImageRGB32> screenshot);
-    explicit ProgramFinishedException(ConsoleHandle& console, std::string message, bool take_screenshot);
+    explicit ProgramFinishedException(std::string message);
+
+    //  Construct exception with message and console information.
+    //  This will take a screenshot and store the console if the stream history if requested later.
+    explicit ProgramFinishedException(
+        std::string message,
+        ConsoleHandle& console
+    );
+
+    //  Construct exception with message with screenshot and (optionally) console information.
+    //  Use the provided screenshot instead of taking one with the console.
+    //  Store the console information (if provided) for stream history if requested later.
+    explicit ProgramFinishedException(
+        ErrorReport error_report,
+        std::string message,
+        ConsoleHandle* console,
+        ImageRGB32 screenshot
+    );
+    explicit ProgramFinishedException(
+        std::string message,
+        ConsoleHandle* console,
+        std::shared_ptr<const ImageRGB32> screenshot
+    );
+
 
 public:
+    virtual void log(Logger& logger) const override;
     virtual const char* name() const override{ return "ProgramFinishedException"; }
-    virtual std::string message() const override{ return m_message; }
-
-    virtual void send_notification(ProgramEnvironment& env, EventNotificationOption& notification) const override;
 };
 
 

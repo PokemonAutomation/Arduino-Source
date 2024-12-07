@@ -9,9 +9,7 @@
 #ifndef PokemonAutomation_PokemonSV_Navigation_H
 #define PokemonAutomation_PokemonSV_Navigation_H
 
-//#include <stdint.h>
-#include <string>
-#include <functional>
+#include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
 #include "PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
 #include "PokemonSV/Programs/AutoStory/PokemonSV_AutoStoryTools.h"
 

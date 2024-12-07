@@ -16,7 +16,14 @@ namespace PokemonAutomation{
 class FatalProgramException : public ScreenshotException{
 public:
     using ScreenshotException::ScreenshotException;
-    FatalProgramException(ScreenshotException&& e);
+    FatalProgramException(ScreenshotException&& e)
+        : ScreenshotException(
+            e.m_send_error_report,
+            std::move(e.m_message),
+            e.m_console,
+            std::move(e.m_screenshot)
+        )
+    {}
 
     virtual const char* name() const override{ return "FatalProgramException"; }
 };

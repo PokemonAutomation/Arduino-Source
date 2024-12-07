@@ -141,8 +141,8 @@ int16_t throw_ball(
                 return 0;
             }
             if (attempts >= 3){
-                throw OperationFailedException(
-                    ErrorReport::SEND_ERROR_REPORT, console,
+                OperationFailedException::fire(
+                    console, ErrorReport::SEND_ERROR_REPORT,
                     "Unable to find desired ball after multiple attempts. Did you run out?"
                 );
             }
@@ -278,8 +278,8 @@ CatchResults basic_catcher(
             pbf_press_button(context, BUTTON_B, 20, 230);
             break;
         default:
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
+            OperationFailedException::fire(
+                console, ErrorReport::SEND_ERROR_REPORT,
                 "basic_catcher(): No state detected after 2 minutes."
             );
         }

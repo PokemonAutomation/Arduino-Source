@@ -101,10 +101,9 @@ void change_mount(ConsoleHandle& console, BotBaseContext& context, MountState mo
         }
     }
 
-    throw OperationFailedException(
-        ErrorReport::SEND_ERROR_REPORT, console,
-        std::string("Unable to find ") + MOUNT_STATE_STRINGS[(size_t)mount] + " after 10 attempts.",
-        true
+    OperationFailedException::fire(
+        console, ErrorReport::SEND_ERROR_REPORT,
+        std::string("Unable to find ") + MOUNT_STATE_STRINGS[(size_t)mount] + " after 10 attempts."
     );
 }
 
@@ -135,10 +134,9 @@ void dismount(ConsoleHandle& console, BotBaseContext& context){
         pbf_press_button(context, BUTTON_PLUS, 20, 105);
     }
 
-    throw OperationFailedException(
-        ErrorReport::SEND_ERROR_REPORT, console,
-        "Unable to dismount after 10 attempts.",
-        true
+    OperationFailedException::fire(
+        console, ErrorReport::SEND_ERROR_REPORT,
+        "Unable to dismount after 10 attempts."
     );
 }
 

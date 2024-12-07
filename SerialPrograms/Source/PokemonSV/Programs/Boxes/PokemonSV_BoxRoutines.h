@@ -35,7 +35,7 @@ bool change_view_to_stats_or_judge(
 
 
 //  Assuming the current slot in box system is a pokemon, not egg or empty space,
-//  change the view to the judge. If it fails, it will throw OperationFailedException.
+//  change the view to the judge. If it fails, it will OperationFailedException::fire.
 void change_view_to_judge(
     ConsoleHandle& console, BotBaseContext& context,
     Language language

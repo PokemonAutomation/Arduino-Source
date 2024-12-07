@@ -240,10 +240,9 @@ void checkpoint_33(
         );
         context.wait_for(std::chrono::milliseconds(100));
         if (ret < 0){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
-                "checkpoint_33(): Failed to kill 30 pokemon with Let's go.",
-                true
+            OperationFailedException::fire(
+                env.console, ErrorReport::SEND_ERROR_REPORT,
+                "checkpoint_33(): Failed to kill 30 pokemon with Let's go."
             );            
         }
         clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::BATTLE, CallbackEnum::DIALOG_ARROW});

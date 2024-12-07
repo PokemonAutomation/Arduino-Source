@@ -324,10 +324,9 @@ void TeraMultiFarmer::join_lobby(
 
     for (size_t attempts = 0;; attempts++){
         if (attempts >= 3){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
-                "Failed to join lobby 3 times.",
-                true
+            OperationFailedException::fire(
+                console, ErrorReport::SEND_ERROR_REPORT,
+                "Failed to join lobby 3 times."
             );
         }
 
@@ -364,10 +363,9 @@ void TeraMultiFarmer::join_lobby(
             enter_tera_search(env.program_info(), console, context, HOSTING_MODE == Mode::HOST_ONLINE);
             continue;
         default:
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
-                "Unable to join lobby.",
-                true
+            OperationFailedException::fire(
+                console, ErrorReport::SEND_ERROR_REPORT,
+                "Unable to join lobby."
             );
         }
         break;
@@ -422,10 +420,9 @@ bool TeraMultiFarmer::run_raid(
         std::string code = lobby_reader.raid_code(env.logger(), env.realtime_dispatcher(), host_console.video().snapshot());
         const char* error = normalize_code(lobby_code, code);
         if (error){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, host_console,
-                "Unable to read raid code.",
-                true
+            OperationFailedException::fire(
+                host_console, ErrorReport::SEND_ERROR_REPORT,
+                "Unable to read raid code."
             );
         }
     }catch (OperationFailedException&){

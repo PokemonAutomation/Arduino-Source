@@ -255,10 +255,9 @@ void RamanasCombeeFinder::run_iteration(SingleSwitchProgramEnvironment& env, Bot
             break;
         }
         if (c >= 5){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
-                "Failed to switch to Pokemon selection after 5 attempts.",
-                true
+            OperationFailedException::fire(
+                env.console, ErrorReport::SEND_ERROR_REPORT,
+                "Failed to switch to Pokemon selection after 5 attempts."
             );
         }
         env.console.log("Not on Pokemon selection. Attempting to switch to it...", COLOR_ORANGE);
@@ -304,10 +303,9 @@ void RamanasCombeeFinder::run_iteration(SingleSwitchProgramEnvironment& env, Bot
             pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
             context.wait_for_all_requests();
         }
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, env.console,
-            "Black out.",
-            true
+        OperationFailedException::fire(
+            env.console, ErrorReport::SEND_ERROR_REPORT,
+            "Black out."
         );
     }
 

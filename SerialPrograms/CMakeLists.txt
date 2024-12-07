@@ -310,17 +310,12 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/ErrorReports/ProgramDumper.cpp
     Source/CommonFramework/ErrorReports/ProgramDumper.h
     Source/CommonFramework/ErrorReports/ProgramDumper_Windows.tpp
-    Source/CommonFramework/Exceptions/FatalProgramException.cpp
     Source/CommonFramework/Exceptions/FatalProgramException.h
-    Source/CommonFramework/Exceptions/OliveActionFailedException.cpp
-    Source/CommonFramework/Exceptions/OliveActionFailedException.h    
-    Source/CommonFramework/Exceptions/OperationFailedException.cpp
     Source/CommonFramework/Exceptions/OperationFailedException.h
     Source/CommonFramework/Exceptions/ProgramFinishedException.cpp
     Source/CommonFramework/Exceptions/ProgramFinishedException.h
     Source/CommonFramework/Exceptions/ScreenshotException.cpp
     Source/CommonFramework/Exceptions/ScreenshotException.h
-    Source/CommonFramework/Exceptions/UnexpectedBattleException.cpp
     Source/CommonFramework/Exceptions/UnexpectedBattleException.h
     Source/CommonFramework/GlobalServices.cpp
     Source/CommonFramework/GlobalServices.h
@@ -1508,6 +1503,7 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Programs/AutoStory/PokemonSV_MenuOption.h
     Source/PokemonSV/Programs/AutoStory/PokemonSV_MenuOptionDatabase.cpp
     Source/PokemonSV/Programs/AutoStory/PokemonSV_MenuOptionDatabase.h
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_OliveActionFailedException.h
     Source/PokemonSV/Programs/Battles/PokemonSV_BasicCatcher.cpp
     Source/PokemonSV/Programs/Battles/PokemonSV_BasicCatcher.h
     Source/PokemonSV/Programs/Battles/PokemonSV_Battles.cpp

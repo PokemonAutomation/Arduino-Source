@@ -319,8 +319,8 @@ std::vector<DigitPath> get_codeboard_path(
     for (char ch : code){
         auto iter = POSITION_MAP.find(ch);
         if (iter == POSITION_MAP.end()){
-            throw OperationFailedException(
-                ErrorReport::NO_ERROR_REPORT, logger,
+            throw_and_log<OperationFailedException>(
+                logger, ErrorReport::NO_ERROR_REPORT,
                 "Invalid code character."
             );
         }

@@ -62,8 +62,8 @@ bool ZeroGateWarpPromptDetector::move_cursor(
         if (current < 0){
             consecutive_detection_fails++;
             if (consecutive_detection_fails > 10){
-                throw OperationFailedException(
-                    ErrorReport::SEND_ERROR_REPORT, console,
+                OperationFailedException::fire(
+                    console, ErrorReport::SEND_ERROR_REPORT,
                     "ZeroGateWarpPromptDetector::move_cursor(): Unable to detect cursor.",
                     screen
                 );
@@ -74,8 +74,8 @@ bool ZeroGateWarpPromptDetector::move_cursor(
         consecutive_detection_fails = 0;
 
         if (moves >= 10){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
+            OperationFailedException::fire(
+                console, ErrorReport::SEND_ERROR_REPORT,
                 "Unable to move to target after 10 moves.",
                 screen
             );

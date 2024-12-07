@@ -667,10 +667,9 @@ void fly_from_paldea_to_blueberry_entrance(const ProgramInfo& info, ConsoleHandl
     }
 
     if (!isFlySuccessful){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, console,
-            "Failed to fly to Blueberry academy, five times in a row.",
-            true
+        OperationFailedException::fire(
+            console, ErrorReport::SEND_ERROR_REPORT,
+            "Failed to fly to Blueberry academy, five times in a row."
         );
     }
 }
@@ -736,10 +735,9 @@ void move_from_blueberry_entrance_to_league_club(const ProgramInfo& info, Consol
     }
 
     if (!isSuccessful){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, console,
-            "Failed to enter League club room, five times in a row.",
-            true
+        OperationFailedException::fire(
+            console, ErrorReport::SEND_ERROR_REPORT,
+            "Failed to enter League club room, five times in a row."
         );
     }
 
@@ -786,10 +784,9 @@ void move_from_item_printer_to_blueberry_entrance(const ProgramInfo& info, Conso
         console.log("Blueberry navigation menu detected.");
     }else{
         console.log("Failed to detect Blueberry navigation menu.");
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, console,
-            "Failed to find the exit from the League room.",
-            true
+        OperationFailedException::fire(
+            console, ErrorReport::SEND_ERROR_REPORT,
+            "Failed to find the exit from the League room."
         );
     }
 
@@ -802,10 +799,9 @@ void move_from_item_printer_to_blueberry_entrance(const ProgramInfo& info, Conso
     if (ret == 0){
         console.log("Overworld detected");
     }else{
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, console,
-            "Failed to detect overworld.",
-            true
+        OperationFailedException::fire(
+            console, ErrorReport::SEND_ERROR_REPORT,
+            "Failed to detect overworld."
         );      
     }
 }
@@ -851,10 +847,9 @@ void fly_from_blueberry_to_north_province_3(const ProgramInfo& info, ConsoleHand
 
     if (!isFlySuccessful){
 
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, console,
-            "Failed to fly to North province area 3, ten times in a row.",
-            true
+        OperationFailedException::fire(
+            console, ErrorReport::SEND_ERROR_REPORT,
+            "Failed to fly to North province area 3, ten times in a row."
         );
 
     }

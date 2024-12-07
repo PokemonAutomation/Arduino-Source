@@ -84,10 +84,9 @@ void change_time_of_day_at_tent(ConsoleHandle& console, BotBaseContext& context,
         console, context, std::chrono::seconds(5), {{yellow_arrow_detector}}
     );
     if (ret < 0){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, console,
-            "Did not interact with a tent.",
-            true
+        OperationFailedException::fire(
+            console, ErrorReport::SEND_ERROR_REPORT,
+            "Did not interact with a tent."
         );
     }
 
@@ -117,10 +116,9 @@ void change_time_of_day_at_tent(ConsoleHandle& console, BotBaseContext& context,
         console, context, std::chrono::seconds(30), {{yellow_arrow_detector}}
     );
     if (ret < 0){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, console,
-            "Failed to stand up after resting in a tent.",
-            true
+        OperationFailedException::fire(
+            console, ErrorReport::SEND_ERROR_REPORT,
+            "Failed to stand up after resting in a tent."
         );
     }
 

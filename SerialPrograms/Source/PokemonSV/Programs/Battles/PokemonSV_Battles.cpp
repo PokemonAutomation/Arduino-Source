@@ -31,10 +31,9 @@ void auto_heal_from_menu_or_overworld(
     bool healed = false;
     while (true){
         if (current_time() - start > std::chrono::minutes(5)){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
-                "auto_heal_from_menu(): Failed auto-heal after 5 minutes.",
-                true
+            OperationFailedException::fire(
+                console, ErrorReport::SEND_ERROR_REPORT,
+                "auto_heal_from_menu(): Failed auto-heal after 5 minutes."
             );
         }
 
@@ -73,10 +72,9 @@ void auto_heal_from_menu_or_overworld(
             pbf_press_button(context, BUTTON_B, 20, 105);
             continue;
         default:
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
-                "auto_heal_from_menu(): No state detected after 60 seconds.",
-                true
+            OperationFailedException::fire(
+                console, ErrorReport::SEND_ERROR_REPORT,
+                "auto_heal_from_menu(): No state detected after 60 seconds."
             );
         }
     }
@@ -117,24 +115,21 @@ int run_from_battle(const ProgramInfo& info, ConsoleHandle& console, BotBaseCont
             continue;
         case 2:
             console.log("Detected own " + STRING_POKEMON + " fainted...");
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
-                "Your " + STRING_POKEMON + " fainted while attempting to run away.",
-                true
+            OperationFailedException::fire(
+                console, ErrorReport::SEND_ERROR_REPORT,
+                "Your " + STRING_POKEMON + " fainted while attempting to run away."
             );
         default:
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
-                "run_from_battle(): No state detected after 60 seconds.",
-                true
+            OperationFailedException::fire(
+                console, ErrorReport::SEND_ERROR_REPORT,
+                "run_from_battle(): No state detected after 60 seconds."
             );
         }
     }
 
-    throw OperationFailedException(
-        ErrorReport::SEND_ERROR_REPORT, console,
-        "Failed to run away after 10 attempts.",
-        true
+    OperationFailedException::fire(
+        console, ErrorReport::SEND_ERROR_REPORT,
+        "Failed to run away after 10 attempts."
     );
 }
 

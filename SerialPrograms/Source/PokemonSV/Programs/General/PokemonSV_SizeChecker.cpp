@@ -92,10 +92,9 @@ void SizeChecker::enter_check_mode(SingleSwitchProgramEnvironment& env, BotBaseC
 
     while (true){
         if (current_time() - start > std::chrono::minutes(2)){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
-                "enter_check_mode(): Failed to enter box mode after 2 minutes.",
-                true
+            OperationFailedException::fire(
+                env.console, ErrorReport::SEND_ERROR_REPORT,
+                "enter_check_mode(): Failed to enter box mode after 2 minutes."
             );
         }
         
@@ -124,10 +123,9 @@ void SizeChecker::enter_check_mode(SingleSwitchProgramEnvironment& env, BotBaseC
             return;
 
         default:
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
-                "enter_check_mode(): No recognized state after 60 seconds.",
-                true
+            OperationFailedException::fire(
+                env.console, ErrorReport::SEND_ERROR_REPORT,
+                "enter_check_mode(): No recognized state after 60 seconds."
             );
         }
     }
@@ -143,10 +141,9 @@ void SizeChecker::exit_check_mode(SingleSwitchProgramEnvironment& env, BotBaseCo
 
     while (true){
         if (current_time() - start > std::chrono::minutes(2)){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
-                "exit_check_mode(): Failed to exit box mode after 2 minutes.",
-                true
+            OperationFailedException::fire(
+                env.console, ErrorReport::SEND_ERROR_REPORT,
+                "exit_check_mode(): Failed to exit box mode after 2 minutes."
             );
         }
 
@@ -182,10 +179,9 @@ void SizeChecker::exit_check_mode(SingleSwitchProgramEnvironment& env, BotBaseCo
             return;
 
         default:
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
-                "exit_check_mode(): No recognized state after 60 seconds.",
-                true
+            OperationFailedException::fire(
+                env.console, ErrorReport::SEND_ERROR_REPORT,
+                "exit_check_mode(): No recognized state after 60 seconds."
             );
         }
 
@@ -256,10 +252,9 @@ void SizeChecker::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
                     {dialog}
                 );
                 if (ret < 0){
-                    throw OperationFailedException(
-                        ErrorReport::SEND_ERROR_REPORT, env.console,
-                        "Unable to initiate check after 10 A presses.",
-                        true
+                    OperationFailedException::fire(
+                        env.console, ErrorReport::SEND_ERROR_REPORT,
+                        "Unable to initiate check after 10 A presses."
                     );
                 }
                 context.wait_for_all_requests();

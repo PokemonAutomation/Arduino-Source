@@ -32,8 +32,8 @@ void navigate_to_menu_app(
     auto snapshot = console.video().snapshot();
     const int cur_app_index = menu_arrow_detector.detect(snapshot);
     if (cur_app_index < 0){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, console,
+        OperationFailedException::fire(
+            console, ErrorReport::SEND_ERROR_REPORT,
             "Cannot detect Rotom phone menu.",
             std::move(snapshot)
         );

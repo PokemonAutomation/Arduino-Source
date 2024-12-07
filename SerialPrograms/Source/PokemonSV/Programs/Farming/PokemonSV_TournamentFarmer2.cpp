@@ -192,10 +192,9 @@ void TournamentFarmer2::program(SingleSwitchProgramEnvironment& env, BotBaseCont
             if (ret != 0){
                 stats.errors++;
                 env.update_stats();
-                throw OperationFailedException(
-                    ErrorReport::SEND_ERROR_REPORT, env.console,
-                    "Failed to detect battle start!",
-                    true
+                OperationFailedException::fire(
+                    env.console, ErrorReport::SEND_ERROR_REPORT,
+                    "Failed to detect battle start!"
                 );
             }
         }
@@ -234,10 +233,9 @@ void TournamentFarmer2::program(SingleSwitchProgramEnvironment& env, BotBaseCont
                 env.log("Failed to detect battle menu or dialog prompt!");
                 stats.errors++;
                 env.update_stats();
-                throw OperationFailedException(
-                    ErrorReport::SEND_ERROR_REPORT, env.console,
-                    "Failed to detect battle menu or dialog prompt!",
-                    true
+                OperationFailedException::fire(
+                    env.console, ErrorReport::SEND_ERROR_REPORT,
+                    "Failed to detect battle menu or dialog prompt!"
                 );
             }
 
@@ -261,10 +259,9 @@ void TournamentFarmer2::program(SingleSwitchProgramEnvironment& env, BotBaseCont
                     {overworld} 
                 );
                 if (ret < 0){
-                    throw OperationFailedException(
-                        ErrorReport::SEND_ERROR_REPORT, env.console,
-                        "Failed to return to overworld afer 2 minutes.",
-                        true
+                    OperationFailedException::fire(
+                        env.console, ErrorReport::SEND_ERROR_REPORT,
+                        "Failed to return to overworld afer 2 minutes."
                     );
                 }
                 context.wait_for_all_requests();

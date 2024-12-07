@@ -68,8 +68,8 @@ void MenuOption::set_target_option(const std::vector<MenuOptionToggleEnum>& targ
         pbf_press_dpad(m_context, DPAD_RIGHT, 10, 50);
     }
 
-    throw OperationFailedException(
-        ErrorReport::SEND_ERROR_REPORT, m_console,
+    OperationFailedException::fire(
+        m_console, ErrorReport::SEND_ERROR_REPORT,
         "MenuOption::set_target_option(): Unable to set option to the correct toggle."
     );
 
@@ -79,8 +79,8 @@ int8_t MenuOption::get_selected_index(const ImageViewRGB32& screen) const {
     m_context.wait_for_all_requests();
     ImageFloatBox box;
     if (!m_arrow.detect(box, screen)){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, m_console,
+        OperationFailedException::fire(
+            m_console, ErrorReport::SEND_ERROR_REPORT,
             "MenuOption::get_selected_index(): Unable to find cursor."
         );
     }
@@ -90,8 +90,8 @@ int8_t MenuOption::get_selected_index(const ImageViewRGB32& screen) const {
     int8_t selected_index = (int8_t)(slot + 0.5);
 
     if (selected_index < 0 || selected_index >= 10){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, m_console,
+        OperationFailedException::fire(
+            m_console, ErrorReport::SEND_ERROR_REPORT,
             "MenuOption::get_selected_index(): Invalid cursor slot."
         );
     }
@@ -131,9 +131,8 @@ std::string MenuOption::read_option(const ImageViewRGB32& cropped) const{
     }
 
     if (results.size() > 1){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, 
-            m_console,
+        OperationFailedException::fire(
+            m_console, ErrorReport::SEND_ERROR_REPORT,
             "MenuOption::read_option(): Unable to read item. Ambiguous or multiple results."
         );
     }

@@ -345,10 +345,9 @@ StateMachineAction throw_balls(
     if (balls != 0){
         pbf_press_button(context, BUTTON_A, 10, 125);
     }else{
-        throw OperationFailedException(
-            ErrorReport::NO_ERROR_REPORT, console,
-            "Unable to find appropriate ball. Did you run out?",
-            true
+        OperationFailedException::fire(
+            console, ErrorReport::NO_ERROR_REPORT,
+            "Unable to find appropriate ball. Did you run out?"
         );
     }
 

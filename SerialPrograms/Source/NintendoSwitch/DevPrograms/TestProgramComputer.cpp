@@ -544,8 +544,8 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     OCR::read_number(env.logger(), filtered);
 #endif
 
-//    throw OperationFailedException(env.logger(), "asdf");
-//    throw OperationFailedException(env.logger(), "asdf", std::make_shared<ImageRGB32>("20221118-024539201323.jpg"));
+//    OperationFailedException::fire(env.logger(), "asdf");
+//    OperationFailedException::fire(env.logger(), "asdf", std::make_shared<ImageRGB32>("20221118-024539201323.jpg"));
 //    throw ProgramFinishedException();
 //    throw FatalProgramException(env.logger(), "test");
 

@@ -266,10 +266,9 @@ std::vector<BBQuests> process_quest_list(const ProgramInfo& info, ConsoleHandle&
                 default:
                     //This case is handled in BBQSoloFarmer.
                     console.log("OOEggs is Stop in process_quest_list().");
-                    throw OperationFailedException(
-                        ErrorReport::SEND_ERROR_REPORT, console,
-                        "OOEggs is Stop in process_quest_list().",
-                        true
+                    OperationFailedException::fire(
+                        console, ErrorReport::SEND_ERROR_REPORT,
+                        "OOEggs is Stop in process_quest_list()."
                     );
                     break;
                 }
@@ -305,10 +304,9 @@ std::vector<BBQuests> process_quest_list(const ProgramInfo& info, ConsoleHandle&
     }*/
 
     if (quests_to_do.size() == 0){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, console,
-            "No possible quests! Check language selection.",
-            true
+        OperationFailedException::fire(
+            console, ErrorReport::SEND_ERROR_REPORT,
+            "No possible quests! Check language selection."
         );
     }
 
@@ -368,11 +366,10 @@ bool process_and_do_quest(ProgramEnvironment& env, ConsoleHandle& console, BotBa
             quest_catch(env.program_info(), console, context, BBQ_OPTIONS, current_quest);
             break;
         default:
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
-                    "Unknown quest selection.",
-                    true
-                );
+            OperationFailedException::fire(
+                console, ErrorReport::SEND_ERROR_REPORT,
+                "Unknown quest selection."
+            );
             break;
         }
 
@@ -665,10 +662,9 @@ void quest_sneak_up(const ProgramInfo& info, ConsoleHandle& console, BotBaseCont
                             break;
                         default:
                             console.log("Invalid state quest_sneak_up(). Smoke Ball equipped?");
-                            throw OperationFailedException(
-                                ErrorReport::SEND_ERROR_REPORT, console,
-                                "Invalid state quest_sneak_up(). Smoke Ball equipped?",
-                                true
+                            OperationFailedException::fire(
+                                console, ErrorReport::SEND_ERROR_REPORT,
+                                "Invalid state quest_sneak_up(). Smoke Ball equipped?"
                             );
                         }
                     }
@@ -682,10 +678,9 @@ void quest_sneak_up(const ProgramInfo& info, ConsoleHandle& console, BotBaseCont
                 break;
             default:
                 console.log("Invalid state in run_battle().");
-                throw OperationFailedException(
-                    ErrorReport::SEND_ERROR_REPORT, console,
-                    "Invalid state in run_battle().",
-                    true
+                OperationFailedException::fire(
+                    console, ErrorReport::SEND_ERROR_REPORT,
+                    "Invalid state in run_battle()."
                 );
             }
         }
@@ -1018,11 +1013,10 @@ void quest_sandwich(ProgramEnvironment& env, ConsoleHandle& console, BotBaseCont
         condiments = {{"chili-sauce", (uint8_t)1}};
         break;
     default:
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, console,
-                "Invalid sandwich selection.",
-                true
-            );
+        OperationFailedException::fire(
+            console, ErrorReport::SEND_ERROR_REPORT,
+            "Invalid sandwich selection."
+        );
         break;
     }
 
@@ -1089,10 +1083,9 @@ void quest_tera_raid(ProgramEnvironment& env, ConsoleHandle& console, BotBaseCon
                     return_to_plaza(env.program_info(), console, context);
                 }catch (...){
                     console.log("Unable to flee.");
-                    throw OperationFailedException(
-                        ErrorReport::SEND_ERROR_REPORT, console,
-                        "Unable to flee!",
-                        true
+                    OperationFailedException::fire(
+                        console, ErrorReport::SEND_ERROR_REPORT,
+                        "Unable to flee!"
                     );
                 }
             }

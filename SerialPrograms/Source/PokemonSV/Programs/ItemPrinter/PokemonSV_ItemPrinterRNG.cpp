@@ -434,10 +434,9 @@ ItemPrinterPrizeResult ItemPrinterRNG::run_print_at_date(
         default:
             stats.errors++;
             env.update_stats();
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT,
-                env.logger(),
-                ""
+            OperationFailedException::fire(
+                env.console, ErrorReport::SEND_ERROR_REPORT,
+                "No state detected after 2 minutes."
             );
         }
     }
@@ -609,10 +608,9 @@ void ItemPrinterRNG::print_again(
         default:
             stats.errors++;
             env.update_stats();
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT,
-                env.logger(),
-                ""
+            OperationFailedException::fire(
+                env.console, ErrorReport::SEND_ERROR_REPORT,
+                "No state detected after 2 minutes."
             );
         }
     }
@@ -983,10 +981,9 @@ uint32_t ItemPrinterRNG::check_num_happiny_dust(
         default:
             stats.errors++;
             env.update_stats();
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT,
-                env.logger(),
-                ""
+            OperationFailedException::fire(
+                env.console, ErrorReport::SEND_ERROR_REPORT,
+                "No state detected after 2 minutes."
             );
         }
     }    

@@ -173,10 +173,9 @@ void checkpoint_29(
         WallClock start_to_cross_bridge = current_time();
         while (true){
             if (current_time() - start_to_cross_bridge > std::chrono::minutes(6)){
-                throw OperationFailedException(
-                    ErrorReport::SEND_ERROR_REPORT, env.console,
-                    "checkpoint_26(): Failed to cross bridge after 6 minutes.",
-                    true
+                OperationFailedException::fire(
+                    env.console, ErrorReport::SEND_ERROR_REPORT,
+                    "checkpoint_26(): Failed to cross bridge after 6 minutes."
                 );
             }        
 

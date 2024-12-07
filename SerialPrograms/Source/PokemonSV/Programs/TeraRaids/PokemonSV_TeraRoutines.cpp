@@ -157,10 +157,9 @@ void open_hosting_lobby(
             console.log("Detected overworld.");
             recovery_mode = false;
             if (!open_raid(console, context)){
-                throw OperationFailedException(
-                    ErrorReport::SEND_ERROR_REPORT, console,
-                    "No Tera raid found.",
-                    true
+                OperationFailedException::fire(
+                    console, ErrorReport::SEND_ERROR_REPORT,
+                    "No Tera raid found."
                 );
             }
             continue;
@@ -281,7 +280,11 @@ void stop_if_enough_rare_items(
     size_t sparkly_items = SparklyItemDetector::count_sparkly_items(console, context);
     console.log("Sparkly Items Detected: " + std::to_string(sparkly_items), COLOR_BLUE);
     if (sparkly_items >= stop_on_sparkly_items){
-        throw ProgramFinishedException(console, "Found a raid with " + std::to_string(sparkly_items) + " rare items!", true);
+        throw_and_log<ProgramFinishedException>(
+            console,
+            "Found a raid with " + std::to_string(sparkly_items) + " rare items!",
+            console
+        );
     }
 }
 
@@ -661,10 +664,9 @@ void run_from_tera_battle(const ProgramInfo& info, ConsoleHandle& console, BotBa
     while (true){
         // Having a lot of Abilities activating can take a while, setting 3 minutes to be safe
         if (current_time() - start > std::chrono::minutes(3)){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
-                "run_from_tera_battle(): Failed to run away from tera raid battle after 3 minutes.",
-                true
+            OperationFailedException::fire(
+                console, ErrorReport::SEND_ERROR_REPORT,
+                "run_from_tera_battle(): Failed to run away from tera raid battle after 3 minutes."
             );
         }
 
@@ -690,10 +692,9 @@ void run_from_tera_battle(const ProgramInfo& info, ConsoleHandle& console, BotBa
             console.log("Detected overworld.");
             return;
         default:
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
-                "run_from_tera_battle(): No recognized state after 1 minutes.",
-                true
+            OperationFailedException::fire(
+                console, ErrorReport::SEND_ERROR_REPORT,
+                "run_from_tera_battle(): No recognized state after 1 minutes."
             );
         }
     }

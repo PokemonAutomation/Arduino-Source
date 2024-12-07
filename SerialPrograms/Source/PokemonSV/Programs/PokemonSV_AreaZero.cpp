@@ -36,10 +36,9 @@ void inside_zero_gate_to_station(
             {dialog}
         );
         if (ret < 0){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
-                "Unable to find warp circle.",
-                true
+            OperationFailedException::fire(
+                console, ErrorReport::SEND_ERROR_REPORT,
+                "Unable to find warp circle."
             );
         }
     }
@@ -49,10 +48,9 @@ void inside_zero_gate_to_station(
     WallClock start = current_time();
     while (true){
         if (current_time() - start > std::chrono::seconds(60)){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
-                "Unable to warp to station after 60 seconds.",
-                true
+            OperationFailedException::fire(
+                console, ErrorReport::SEND_ERROR_REPORT,
+                "Unable to warp to station after 60 seconds."
             );
         }
 
@@ -80,10 +78,9 @@ void inside_zero_gate_to_station(
             console.log("Black screen is over. Arrive at station.");
             break;
         default:
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
-                "Unable to find warp to station 2.",
-                true
+            OperationFailedException::fire(
+                console, ErrorReport::SEND_ERROR_REPORT,
+                "Unable to find warp to station 2."
             );
         }
 
@@ -130,10 +127,9 @@ void inside_zero_gate_to_station(
                     continue;
                 }
             default:
-                throw OperationFailedException(
-                    ErrorReport::SEND_ERROR_REPORT, console,
-                    "Heal at station: No state detected after 30 seconds.",
-                    true
+                OperationFailedException::fire(
+                    console, ErrorReport::SEND_ERROR_REPORT,
+                    "Heal at station: No state detected after 30 seconds."
                 );
             }
             break;
@@ -155,10 +151,9 @@ void inside_zero_gate_to_station(
             {black_screen}
         );
         if (ret < 0){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
-                "Unable to exit station after 60 seconds.",
-                true
+            OperationFailedException::fire(
+                console, ErrorReport::SEND_ERROR_REPORT,
+                "Unable to exit station after 60 seconds."
             );
         }
     }
@@ -171,10 +166,9 @@ void inside_zero_gate_to_station(
             {overworld}
         );
         if (ret < 0){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
-                "Unable to load overworld after exiting station for 30 seconds.",
-                true
+            OperationFailedException::fire(
+                console, ErrorReport::SEND_ERROR_REPORT,
+                "Unable to load overworld after exiting station for 30 seconds."
             );
         }
     }
@@ -199,10 +193,9 @@ void return_to_inside_zero_gate(const ProgramInfo& info, ConsoleHandle& console,
         {black_screen}
     );
     if (ret < 0){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, console,
-            "Unable to enter Zero Gate.",
-            true
+        OperationFailedException::fire(
+            console, ErrorReport::SEND_ERROR_REPORT,
+            "Unable to enter Zero Gate."
         );
     }
 
@@ -212,10 +205,9 @@ void return_to_inside_zero_gate(const ProgramInfo& info, ConsoleHandle& console,
         {overworld}
     );
     if (ret < 0){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, console,
-            "Unable to detect overworld inside Zero Gate.",
-            true
+        OperationFailedException::fire(
+            console, ErrorReport::SEND_ERROR_REPORT,
+            "Unable to detect overworld inside Zero Gate."
         );
     }
 }
@@ -231,10 +223,9 @@ void return_to_inside_zero_gate_from_picnic(const ProgramInfo& info, ConsoleHand
         {black_screen}
     );
     if (ret < 0){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, console,
-            "Unable to enter Zero Gate.",
-            true
+        OperationFailedException::fire(
+            console, ErrorReport::SEND_ERROR_REPORT,
+            "Unable to enter Zero Gate."
         );
     }
 
@@ -244,10 +235,9 @@ void return_to_inside_zero_gate_from_picnic(const ProgramInfo& info, ConsoleHand
         {overworld}
     );
     if (ret < 0){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, console,
-            "Unable to detect overworld inside Zero Gate.",
-            true
+        OperationFailedException::fire(
+            console, ErrorReport::SEND_ERROR_REPORT,
+            "Unable to detect overworld inside Zero Gate."
         );
     }
 }

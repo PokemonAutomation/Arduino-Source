@@ -186,10 +186,9 @@ void checkpoint_39(
             {dialog}
         );
         if (ret < 0){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
-                "checkpoint_39(): Failed to run into Great Tusk/Iron Treads.",
-                true
+            OperationFailedException::fire(
+                env.console, ErrorReport::SEND_ERROR_REPORT,
+                "checkpoint_39(): Failed to run into Great Tusk/Iron Treads."
             );            
         }
 

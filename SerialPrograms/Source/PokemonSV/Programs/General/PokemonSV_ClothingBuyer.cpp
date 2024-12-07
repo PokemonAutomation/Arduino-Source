@@ -178,10 +178,9 @@ void ClothingBuyer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
                 break;
             default:
                 env.log("Error looking for wear prompt.");
-                throw OperationFailedException(
-                    ErrorReport::SEND_ERROR_REPORT, env.console,
-                    "Error looking for wear prompt.",
-                    true
+                OperationFailedException::fire(
+                    env.console, ErrorReport::SEND_ERROR_REPORT,
+                    "Error looking for wear prompt."
                 );
                 break;
             }
@@ -189,10 +188,9 @@ void ClothingBuyer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         }
         default:
                 env.log("Error looking for purchase prompt.");
-                throw OperationFailedException(
-                    ErrorReport::SEND_ERROR_REPORT, env.console,
-                    "Error looking for purchase prompt.",
-                    true
+                OperationFailedException::fire(
+                    env.console, ErrorReport::SEND_ERROR_REPORT,
+                    "Error looking for purchase prompt."
                 );
                 break;
         }

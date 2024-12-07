@@ -131,8 +131,8 @@ bool MainMenuDetector::move_cursor(
         if (current.first == MenuSide::NONE){
             consecutive_detection_fails++;
             if (consecutive_detection_fails > 10){
-                throw OperationFailedException(
-                    ErrorReport::SEND_ERROR_REPORT, console,
+                OperationFailedException::fire(
+                    console, ErrorReport::SEND_ERROR_REPORT,
                     "MainMenuDetector::move_cursor(): Unable to detect menu.",
                     screen
                 );

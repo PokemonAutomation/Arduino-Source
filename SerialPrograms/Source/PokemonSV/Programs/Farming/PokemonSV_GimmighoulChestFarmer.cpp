@@ -158,10 +158,9 @@ void GimmighoulChestFarmer::program(SingleSwitchProgramEnvironment& env, BotBase
             if (ret2 != 0){
                 stats.errors++;
                 env.update_stats();
-                throw OperationFailedException(
-                    ErrorReport::SEND_ERROR_REPORT, env.console,
-                    "Failed to return to Overworld after two minutes. Did your attack miss or fail to defeat Gimmighoul in one hit?",
-                    true
+                OperationFailedException::fire(
+                    env.console, ErrorReport::SEND_ERROR_REPORT,
+                    "Failed to return to Overworld after two minutes. Did your attack miss or fail to defeat Gimmighoul in one hit?"
                 );
             }
             stats.pokemon_fainted++;
@@ -210,10 +209,9 @@ void GimmighoulChestFarmer::program(SingleSwitchProgramEnvironment& env, BotBase
                 if (ret2 != 0){
                     stats.errors++;
                     env.update_stats();
-                    throw OperationFailedException(
-                        ErrorReport::SEND_ERROR_REPORT, env.console,
-                        "Failed to return to Overworld after two minutes.",
-                        true
+                    OperationFailedException::fire(
+                        env.console, ErrorReport::SEND_ERROR_REPORT,
+                        "Failed to return to Overworld after two minutes."
                     );
                 }
                 //Don't move map cursor this time

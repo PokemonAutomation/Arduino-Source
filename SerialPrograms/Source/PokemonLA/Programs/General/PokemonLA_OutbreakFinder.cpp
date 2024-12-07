@@ -359,10 +359,9 @@ void OutbreakFinder::goto_region_and_return(SingleSwitchProgramEnvironment& env,
     }
     if (is_wild_land(current_region) == false){
         dump_image(env.console.logger(), env.program_info(), "FindRegion", env.console.video().snapshot());
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, env.console,
-            "Unable to find a wild land.",
-            true
+        OperationFailedException::fire(
+            env.console, ErrorReport::SEND_ERROR_REPORT,
+            "Unable to find a wild land."
         );
     }
 
@@ -478,10 +477,9 @@ std::set<std::string> OutbreakFinder::enter_region_and_read_MMO(
     // Fix zoom level:
     const int zoom_level = read_map_zoom_level(question_mark_image);
     if (zoom_level < 0){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, env.console,
-            "Canot read map zoom level.",
-            true
+        OperationFailedException::fire(
+            env.console, ErrorReport::SEND_ERROR_REPORT,
+            "Canot read map zoom level."
         );
     }
 
@@ -543,10 +541,9 @@ std::set<std::string> OutbreakFinder::enter_region_and_read_MMO(
         EventDialogDetector event_dialog_detector(env.logger(), env.console.overlay(), true);
         int ret = wait_until(env.console, context, std::chrono::seconds(10), {{event_dialog_detector}});
         if (ret < 0){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
-                "Dialog box not detected when waiting for MMO map.",
-                true
+            OperationFailedException::fire(
+                env.console, ErrorReport::SEND_ERROR_REPORT,
+                "Dialog box not detected when waiting for MMO map."
             );
         }
     }
@@ -569,10 +566,9 @@ std::set<std::string> OutbreakFinder::enter_region_and_read_MMO(
             env.console.log("Found revealed map thanks to Munchlax!");
             break;
         default:
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
-                "Map not detected after talking to Mai.",
-                true
+            OperationFailedException::fire(
+                env.console, ErrorReport::SEND_ERROR_REPORT,
+                "Map not detected after talking to Mai."
             );
         }
         break;
@@ -582,8 +578,8 @@ std::set<std::string> OutbreakFinder::enter_region_and_read_MMO(
     MapDetector map_detector;
     ret = wait_until(env.console, context, std::chrono::seconds(5), {{map_detector}});
     if (ret < 0){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, env.console,
+        OperationFailedException::fire(
+            env.console, ErrorReport::SEND_ERROR_REPORT,
             "Map not detected after talking to Mai.",
             true
         );

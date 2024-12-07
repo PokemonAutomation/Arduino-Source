@@ -7,8 +7,7 @@
 #ifndef PokemonAutomation_OliveActionFailedException_H
 #define PokemonAutomation_OliveActionFailedException_H
 
-#include <memory>
-#include "OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 
 namespace PokemonAutomation{
 
@@ -27,10 +26,15 @@ enum class OliveFail{
 //  These include recoverable errors which can be consumed by the program.
 class OliveActionFailedException : public OperationFailedException{
 public:
-    explicit OliveActionFailedException(ErrorReport error_report, Logger& logger, std::string message, OliveFail fail_reason = OliveFail::NONE);
-    explicit OliveActionFailedException(ErrorReport error_report, Logger& logger, std::string message, std::shared_ptr<const ImageRGB32> screenshot, OliveFail fail_reason = OliveFail::NONE);
-    explicit OliveActionFailedException(ErrorReport error_report, ConsoleHandle& console, std::string message, bool take_screenshot, OliveFail fail_reason = OliveFail::NONE);
-
+    OliveActionFailedException(
+        ErrorReport error_report,
+        std::string message,
+        ConsoleHandle& console,
+        OliveFail fail_reason = OliveFail::NONE
+    )
+        : OperationFailedException(error_report, std::move(message), console)
+        , m_fail_reason(fail_reason)
+    {}
     virtual const char* name() const override{ return "OliveActionFailedException"; }
 
 public:

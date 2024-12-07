@@ -243,10 +243,9 @@ CatchResults basic_catcher(
             return results;
         case 1:
             if (results.result == CatchResult::POKEMON_CAUGHT){
-                throw OperationFailedException(
-                    ErrorReport::SEND_ERROR_REPORT, console,
-                    "BasicCatcher: Found receive pokemon screen two times.",
-                    true
+                OperationFailedException::fire(
+                    console, ErrorReport::SEND_ERROR_REPORT,
+                    "BasicCatcher: Found receive pokemon screen two times."
                 );
             }
             console.log("BasicCatcher: The wild " + STRING_POKEMON + " was caught by " + pokeball_str, COLOR_BLUE);
@@ -257,10 +256,9 @@ CatchResults basic_catcher(
             console.log("BasicCatcher: Detected move learn! Don't learn the new move.", COLOR_BLUE);
             num_learned_moves++;
             if (num_learned_moves == 100){
-                throw OperationFailedException(
-                    ErrorReport::SEND_ERROR_REPORT, console,
-                    "BasicCatcher: Learn new move attempts reach 100.",
-                    true
+                OperationFailedException::fire(
+                    console, ErrorReport::SEND_ERROR_REPORT,
+                    "BasicCatcher: Learn new move attempts reach 100."
                 );
             }
             pbf_move_right_joystick(context, 128, 255, 20, 105);

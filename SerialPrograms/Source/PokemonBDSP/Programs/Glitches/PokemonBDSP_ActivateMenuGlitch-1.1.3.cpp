@@ -64,10 +64,9 @@ void ActivateMenuGlitch113::program(SingleSwitchProgramEnvironment& env, BotBase
         {{detector}}
     );
     if (ret < 0){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, console,
-            "Map not detected after 2 seconds.",
-            true
+        OperationFailedException::fire(
+            console, ErrorReport::SEND_ERROR_REPORT,
+            "Map not detected after 2 seconds."
         );
     }else{
         console.log("Detected map!", COLOR_BLUE);

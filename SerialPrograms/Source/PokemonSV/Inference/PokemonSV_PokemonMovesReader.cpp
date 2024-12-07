@@ -76,9 +76,8 @@ std::string PokemonMovesReader::read_move(Logger& logger, const ImageViewRGB32& 
     }
 
     if (results.size() > 1){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, 
-            logger,
+        throw_and_log<OperationFailedException>(
+            logger, ErrorReport::SEND_ERROR_REPORT,
             "MenuOption::read_option(): Unable to read item. Ambiguous or multiple results."
         );
     }

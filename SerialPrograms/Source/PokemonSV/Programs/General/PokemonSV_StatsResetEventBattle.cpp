@@ -347,10 +347,9 @@ bool StatsResetEventBattle::run_battle(SingleSwitchProgramEnvironment& env, BotB
                     env.log("Timed out during battle after 5 minutes.", COLOR_RED);
                     stats.errors++;
                     env.update_stats();
-                    throw OperationFailedException(
-                        ErrorReport::SEND_ERROR_REPORT, env.console,
-                        "Timed out during battle after 5 minutes.",
-                        true
+                    OperationFailedException::fire(
+                        env.console, ErrorReport::SEND_ERROR_REPORT,
+                        "Timed out during battle after 5 minutes."
                     );
                 }
 
@@ -381,10 +380,9 @@ bool StatsResetEventBattle::run_battle(SingleSwitchProgramEnvironment& env, BotB
                     env.log("Timed out during battle. Stuck, crashed, or took more than 90 seconds for a turn.", COLOR_RED);
                     stats.errors++;
                     env.update_stats();
-                    throw OperationFailedException(
-                        ErrorReport::SEND_ERROR_REPORT, env.console,
-                        "Timed out during battle. Stuck, crashed, or took more than 90 seconds for a turn.",
-                        true
+                    OperationFailedException::fire(
+                        env.console, ErrorReport::SEND_ERROR_REPORT,
+                        "Timed out during battle. Stuck, crashed, or took more than 90 seconds for a turn."
                     );
                 }
             }
@@ -400,10 +398,9 @@ bool StatsResetEventBattle::run_battle(SingleSwitchProgramEnvironment& env, BotB
         BattleBallReader reader(env.console, LANGUAGE);
         int quantity = move_to_ball(reader, env.console, context, BALL_SELECT.slug());
         if (quantity == 0){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
-                "Unable to find appropriate ball. Did you run out?",
-                true
+            OperationFailedException::fire(
+                env.console, ErrorReport::SEND_ERROR_REPORT,
+                "Unable to find appropriate ball. Did you run out?"
             );
         }
         if (quantity < 0){
@@ -477,8 +474,8 @@ bool StatsResetEventBattle::check_stats(SingleSwitchProgramEnvironment& env, Bot
             env.console.log("Invalid state.");
             stats.errors++;
             env.update_stats();
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
+            OperationFailedException::fire(
+                env.console, ErrorReport::SEND_ERROR_REPORT,
                 "Invalid state.",
                 true
             );
@@ -600,8 +597,8 @@ bool StatsResetEventBattle::check_stats_after_win(SingleSwitchProgramEnvironment
             StatsResetEventBattle_Descriptor::Stats& stats = env.current_stats<StatsResetEventBattle_Descriptor::Stats>();
             stats.errors++;
             env.update_stats();
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
+            OperationFailedException::fire(
+                env.console, ErrorReport::SEND_ERROR_REPORT,
                 "StatsResetEventBattle::check_stats_after_win(): No state detected after 1 minute."
             );
         }

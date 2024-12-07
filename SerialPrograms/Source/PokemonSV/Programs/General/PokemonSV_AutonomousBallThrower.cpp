@@ -128,7 +128,7 @@ void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, BotBase
             break;
         default:
             throw FatalProgramException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
+                env.console, ErrorReport::SEND_ERROR_REPORT,
                 "Failed to detect battle menu after 60 seconds, did you catch or fail?",
                 true
             );

@@ -110,10 +110,9 @@ void start_game_from_home_with_inference(
         if (ret == 0){
             console.log("Detected Home screen.");
         }else{
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
-                "start_game_from_home_with_inference(): Failed to detect Home screen after 10 seconds.",
-                true
+            OperationFailedException::fire(
+                console, ErrorReport::SEND_ERROR_REPORT,
+                "start_game_from_home_with_inference(): Failed to detect Home screen after 10 seconds."
             );
         }
         context.wait_for(std::chrono::milliseconds(100));
@@ -174,10 +173,9 @@ void start_game_from_home_with_inference(
             console.log("Detected black screen. Game started...");
             return;
         default:
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
-                "start_game_from_home_with_inference(): No recognizable state after 30 seconds.",
-                true
+            OperationFailedException::fire(
+                console, ErrorReport::SEND_ERROR_REPORT,
+                "start_game_from_home_with_inference(): No recognizable state after 30 seconds."
             );
         }
     }

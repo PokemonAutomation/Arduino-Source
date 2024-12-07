@@ -48,16 +48,14 @@ void hatch_egg(ConsoleHandle& console, BotBaseContext& context){
             console.log("Egg is hatching!");
             break;
         case 1:
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
-                "Frozen screen detected!",
-                true
+            OperationFailedException::fire(
+                console, ErrorReport::SEND_ERROR_REPORT,
+                "Frozen screen detected!"
             );
         default:
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
-                "No hatch detected after 8 minutes of spinning.",
-                true
+            OperationFailedException::fire(
+                console, ErrorReport::SEND_ERROR_REPORT,
+                "No hatch detected after 8 minutes of spinning."
             );
         }
     }while (false);
@@ -76,10 +74,9 @@ void hatch_egg(ConsoleHandle& console, BotBaseContext& context){
             {{dialog}}
         );
         if (ret < 0){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
-                "End of hatch not detected after 30 seconds.",
-                true
+            OperationFailedException::fire(
+                console, ErrorReport::SEND_ERROR_REPORT,
+                "End of hatch not detected after 30 seconds."
             );
         }
         console.log("Egg finished hatching.");
@@ -150,10 +147,9 @@ void release(ConsoleHandle& console, BotBaseContext& context){
         }
         pbf_press_button(context, BUTTON_ZL, 20, 105);
     }
-    throw OperationFailedException(
-        ErrorReport::SEND_ERROR_REPORT, console,
-        "Unexpected dialogs when releasing.",
-        true
+    OperationFailedException::fire(
+        console, ErrorReport::SEND_ERROR_REPORT,
+        "Unexpected dialogs when releasing."
     );
 }
 

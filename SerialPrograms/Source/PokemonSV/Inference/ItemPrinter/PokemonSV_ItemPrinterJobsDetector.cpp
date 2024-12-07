@@ -142,10 +142,10 @@ void ItemPrinterJobsDetector::set_print_jobs(
         pbf_press_button(context, BUTTON_R, 20, 30);
     }
 
-    throw OperationFailedException(
-        ErrorReport::SEND_ERROR_REPORT,
-        console,
+    throw_and_log<OperationFailedException>(
+        console, ErrorReport::SEND_ERROR_REPORT,
         "Failed to set jobs after 10 tries.",
+        &console,
         std::move(snapshot.frame)
     );
 }

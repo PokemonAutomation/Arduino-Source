@@ -338,8 +338,8 @@ void AutoMultiSpawn::advance_one_path_step(
             break;
         }
         if (c >= 5){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
+            OperationFailedException::fire(
+                env.console, ErrorReport::SEND_ERROR_REPORT,
                 "Failed to switch to Pokemon selection after 5 attempts.",
                 std::move(snapshot)
             );
@@ -363,11 +363,10 @@ void AutoMultiSpawn::advance_one_path_step(
              + std::to_string(already_removed_pokemon) + " pokemon removed, target total pokemon to remove: " + std::to_string(num_to_despawn)
          );
         if (already_removed_pokemon > num_to_despawn){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
+            OperationFailedException::fire(
+                env.console, ErrorReport::SEND_ERROR_REPORT,
                 "Removed more pokemon than required. Removed "
-                + std::to_string(already_removed_pokemon) + " while target is " + std::to_string(num_to_despawn),
-                true
+                + std::to_string(already_removed_pokemon) + " while target is " + std::to_string(num_to_despawn)
             );
         }
 
@@ -383,10 +382,9 @@ void AutoMultiSpawn::advance_one_path_step(
         }
     }
     if (remained_to_remove > 0){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, env.console,
-            "After trying to start three battles, cannot remove enough pokemon.",
-            true
+        OperationFailedException::fire(
+            env.console, ErrorReport::SEND_ERROR_REPORT,
+            "After trying to start three battles, cannot remove enough pokemon."
         );
     }
 
@@ -422,10 +420,9 @@ size_t AutoMultiSpawn::try_one_battle_to_remove_pokemon(
     }
 
     if (focused_pokemon.name_candidates.size() == 0){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, env.console,
-            "Cannot focus on a pokemon after going to the spawn point  " + std::to_string(num_tries) + " times",
-            true
+        OperationFailedException::fire(
+            env.console, ErrorReport::SEND_ERROR_REPORT,
+            "Cannot focus on a pokemon after going to the spawn point  " + std::to_string(num_tries) + " times"
         );
     }
     
@@ -464,10 +461,9 @@ size_t AutoMultiSpawn::try_one_battle_to_remove_pokemon(
         );
 
         if (ret < 0){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
-                "Cannot detect a battle after 30 seconds.",
-                true
+            OperationFailedException::fire(
+                env.console, ErrorReport::SEND_ERROR_REPORT,
+                "Cannot detect a battle after 30 seconds."
             );
         }
 
@@ -519,10 +515,9 @@ size_t AutoMultiSpawn::try_one_battle_to_remove_pokemon(
             // Oh no, we removed more than needed.
             // XXX can try to reset the game to fix this. But for now let user handles this.
             env.log("Removed more than needed!");
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
-                "Removed more pokemon than needed!",
-                true
+            OperationFailedException::fire(
+                env.console, ErrorReport::SEND_ERROR_REPORT,
+                "Removed more pokemon than needed!"
             );
         }else if (num_removed_pokemon < num_to_despawn){
 
@@ -545,10 +540,9 @@ size_t AutoMultiSpawn::try_one_battle_to_remove_pokemon(
             env.console, context, std::chrono::seconds(30), {{escape_detector}}
         );
         if (ret < 0){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
-                "Cannot detect end of battle when escaping.",
-                true
+            OperationFailedException::fire(
+                env.console, ErrorReport::SEND_ERROR_REPORT,
+                "Cannot detect end of battle when escaping."
             );
         }
     }

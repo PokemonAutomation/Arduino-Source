@@ -227,10 +227,9 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
 
             consecutive_failures++;
             if (consecutive_failures >= 3){
-                throw OperationFailedException(
-                    ErrorReport::SEND_ERROR_REPORT, env.console,
-                    "Failed 3 batches in the row.",
-                    true
+                OperationFailedException::fire(
+                    env.console, ErrorReport::SEND_ERROR_REPORT,
+                    "Failed 3 batches in the row."
                 );
             }
             pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);

@@ -139,10 +139,9 @@ void EggAutonomousState::set(const EggAutonomousState& state){
 
 void EggAutonomousState::process_error(const std::string& name, const char* message){
     m_stats.m_errors++;
-    throw OperationFailedException(
-        ErrorReport::SEND_ERROR_REPORT, m_console,
-        message,
-        true
+    OperationFailedException::fire(
+        m_console, ErrorReport::SEND_ERROR_REPORT,
+        message
     );
 }
 
@@ -408,7 +407,7 @@ void EggAutonomousState::hatch_egg(){
         );
         if (ret < 0){
             process_error("NoHatchEnd", "End of hatch not detected after 30 seconds.");
-//            throw OperationFailedException(m_console, "End of hatch not detected after 30 seconds.");
+//            OperationFailedException::fire(m_console, "End of hatch not detected after 30 seconds.");
         }
         m_console.log("Egg finished hatching.");
         m_stats.m_hatched++;

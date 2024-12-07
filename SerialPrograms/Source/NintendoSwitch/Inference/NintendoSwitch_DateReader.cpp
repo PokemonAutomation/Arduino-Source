@@ -254,10 +254,10 @@ void DateReader::set_hours(
 
 std::pair<DateFormat, DateTime> DateReader::read_date(Logger& logger, std::shared_ptr<const ImageRGB32> screen) const{
     if (!detect(*screen)){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT,
-            logger,
+        throw_and_log<OperationFailedException>(
+            logger, ErrorReport::SEND_ERROR_REPORT,
             "Not on data change screen.",
+            nullptr,
             std::move(screen)
         );
     }
@@ -265,10 +265,10 @@ std::pair<DateFormat, DateTime> DateReader::read_date(Logger& logger, std::share
     ImageStats stats_window_top = image_stats(extract_box_reference(*screen, m_window_top));
 //    cout << stats_window_top.average << stats_window_top.stddev << endl;
     if (stats_window_top.stddev.sum() > 10){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT,
-            logger,
+        throw_and_log<OperationFailedException>(
+            logger, ErrorReport::SEND_ERROR_REPORT,
             "Not on data change screen.",
+            nullptr,
             std::move(screen)
         );
     }
@@ -478,9 +478,10 @@ void DateReader::set_date(
     {
         auto snapshot = console.video().snapshot();
         if (!detect(snapshot)){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
+            throw_and_log<OperationFailedException>(
+                console, ErrorReport::SEND_ERROR_REPORT,
                 "Expected date change menu.",
+                &console,
                 snapshot
             );
         }
@@ -620,9 +621,8 @@ void change_date(
             return;
         }
         default:
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT,
-                env.logger(),
+            OperationFailedException::fire(
+                env.console, ErrorReport::SEND_ERROR_REPORT,
                 "Failed to set date"
             );
         }

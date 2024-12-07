@@ -48,8 +48,8 @@ PageIngredients IngredientSession::read_screen(std::shared_ptr<const ImageRGB32>
     PageIngredients ret;
     ImageFloatBox box;
     if (!m_arrow.detect(box, *screen)){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, m_console,
+        OperationFailedException::fire(
+            m_console, ErrorReport::SEND_ERROR_REPORT,
             "IngredientSession::read_current_page(): Unable to find cursor."
         );
     }
@@ -59,8 +59,8 @@ PageIngredients IngredientSession::read_screen(std::shared_ptr<const ImageRGB32>
     ret.selected = (int8_t)(slot + 0.5);
 //    cout << "slot = " << (int)ret.selected << endl;
     if (ret.selected < 0 || ret.selected >= 10){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, m_console,
+        OperationFailedException::fire(
+            m_console, ErrorReport::SEND_ERROR_REPORT,
             "IngredientSession::read_current_page(): Invalid cursor slot.",
             screen
         );
@@ -111,8 +111,8 @@ PageIngredients IngredientSession::read_screen(std::shared_ptr<const ImageRGB32>
             for(const auto& p : image_result.results){
                 sprite_result.insert(p.second);
             }
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, m_console,
+            OperationFailedException::fire(
+                m_console, ErrorReport::SEND_ERROR_REPORT,
                 "IngredientSession::read_current_page(): Unable to read selected item. OCR and sprite do not agree on any match: ocr "
                 + set_to_str(ocr_result) + ", sprite " + set_to_str(sprite_result),
                 screen
@@ -123,8 +123,8 @@ PageIngredients IngredientSession::read_screen(std::shared_ptr<const ImageRGB32>
             for(const auto& p : image_result.results){
                 sprite_result.insert(p.second);
             }
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, m_console,
+            OperationFailedException::fire(
+                m_console, ErrorReport::SEND_ERROR_REPORT,
                 "IngredientSession::read_current_page(): Unable to read selected item. Ambiguous result: "
                 + set_to_str(ocr_result) + ", " + set_to_str(sprite_result),
                 screen
@@ -263,8 +263,8 @@ void IngredientSession::add_ingredients(
         std::string found = this->move_to_ingredient(remaining);
         if (found.empty()){
             const SandwichIngredientNames& name = get_ingredient_name(*remaining.begin());
-            throw OperationFailedException(
-                ErrorReport::NO_ERROR_REPORT, console,
+            OperationFailedException::fire(
+                console, ErrorReport::NO_ERROR_REPORT,
                 "Unable to find ingredient: \"" + name.display_name() + "\" - Did you run out?"
             );
         }
@@ -297,9 +297,8 @@ void IngredientSession::add_ingredients(
             }
 
             if (!ingredient_added){
-                    throw OperationFailedException(
-                    ErrorReport::SEND_ERROR_REPORT,
-                    console,
+                OperationFailedException::fire(
+                    console, ErrorReport::SEND_ERROR_REPORT,
                     "Unable to add ingredient: \"" + name.display_name() + "\" - Did you run out?"
                 );
             }

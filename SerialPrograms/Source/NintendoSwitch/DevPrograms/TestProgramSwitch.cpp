@@ -332,7 +332,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     for (int i = 1; i < 1000; i++){
        context.wait_for_all_requests();
         if (i != (int)detector.detect_material_quantity(env.inference_dispatcher(), console, context, 2)){
-            throw OperationFailedException(
+            OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 console,
                 "OCR didn't match expected value."
@@ -346,7 +346,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     // for (int i = 999; i > 0; i--){
     //     context.wait_for_all_requests();
     //     if (i != (int)detector.detect_material_quantity(env.inference_dispatcher(), console, context, 2)){
-    //         throw OperationFailedException(
+    //         OperationFailedException::fire(
     //             ErrorReport::SEND_ERROR_REPORT,
     //             console,
     //             "OCR didn't match expected value."
@@ -1087,7 +1087,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     if (error){
 //        pbf_press_button(host_context, BUTTON_B, 20, 230);
 //        pbf_press_button(host_context, BUTTON_A, 20, 230);
-        throw OperationFailedException(env.logger(), "Unable to read raid code.");
+        OperationFailedException::fire(env.logger(), "Unable to read raid code.");
     }
 
     env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){

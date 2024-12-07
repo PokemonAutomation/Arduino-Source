@@ -110,10 +110,9 @@ void AutoItemPrinter::enter_printing_mode(SingleSwitchProgramEnvironment& env, B
             pbf_press_button(context, BUTTON_A, 20, 105);
             continue;
         default:
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
-                "enter_printing_mode(): No recognized state after 120 seconds.",
-                true
+            OperationFailedException::fire(
+                env.console, ErrorReport::SEND_ERROR_REPORT,
+                "enter_printing_mode(): No recognized state after 120 seconds."
             );
         }
     }

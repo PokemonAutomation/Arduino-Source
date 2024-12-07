@@ -166,8 +166,9 @@ void reset_game(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext&
         pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
         context.wait_for_all_requests();
         if (!reset_game_from_home(info, console, context, 5 * TICKS_PER_SECOND)){
-            throw OperationFailedException(ErrorReport::SEND_ERROR_REPORT, console,
-                "Failed to start game.", true
+            OperationFailedException::fire(
+                console, ErrorReport::SEND_ERROR_REPORT,
+                "Failed to start game."
             );
         }
     }catch (OperationFailedException& e){

@@ -59,7 +59,7 @@ std::string download_file(Logger& logger, const std::string& url){
     if (!reply){
         std::string str = "QNetworkReply is null.";
 //        logger.log(str, COLOR_RED);
-        throw OperationFailedException(ErrorReport::NO_ERROR_REPORT, logger, str);
+        throw_and_log<OperationFailedException>(logger, ErrorReport::NO_ERROR_REPORT, str);
     }else if (reply->error() == QNetworkReply::NoError){
 //        QString contents = QString::fromUtf8(reply->readAll());
 //        qDebug() << contents;
@@ -67,7 +67,7 @@ std::string download_file(Logger& logger, const std::string& url){
         QString error_string = reply->errorString();
         std::string str = "Network Error: " + error_string.toStdString();
 //        logger.log(str, COLOR_RED);
-        throw OperationFailedException(ErrorReport::NO_ERROR_REPORT, logger, str);
+        throw_and_log<OperationFailedException>(logger, ErrorReport::NO_ERROR_REPORT, str);
 //        QString err = reply->errorString();
 //        qDebug() << err;
     }

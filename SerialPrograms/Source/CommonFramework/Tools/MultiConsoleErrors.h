@@ -13,11 +13,12 @@
 namespace PokemonAutomation{
 
 class Logger;
+class ConsoleHandle;
 
 
 class MultiConsoleErrorState{
 public:
-    void report_unrecoverable_error(Logger& logger, std::string msg);
+    void report_unrecoverable_error(ConsoleHandle& console, std::string msg);
     void check_unrecoverable_error(Logger& logger);
 
 private:

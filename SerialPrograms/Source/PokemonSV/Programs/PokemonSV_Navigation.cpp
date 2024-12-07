@@ -84,16 +84,15 @@ void press_Bs_to_back_to_overworld(const ProgramInfo& info, ConsoleHandle& conso
         {overworld, battle}
     );
     if (ret == 1){
-        throw UnexpectedBattleException(
-            ErrorReport::SEND_ERROR_REPORT, console,
+        throw_and_log<UnexpectedBattleException>(
+            console, ErrorReport::SEND_ERROR_REPORT,
             "press_Bs_to_back_to_overworld(): Unexpectedly detected battle.",
-            false
+            console
         );         
     }else if (ret < 0){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, console,
-            "press_Bs_to_back_to_overworld(): Unable to detect overworld after 10 button B presses.",
-            true
+        OperationFailedException::fire(
+            console, ErrorReport::SEND_ERROR_REPORT,
+            "press_Bs_to_back_to_overworld(): Unable to detect overworld after 10 button B presses."
         );
     }
 }
@@ -118,16 +117,15 @@ void open_map_from_overworld(
             console.log("Detected overworld.");
             pbf_press_button(context, BUTTON_Y, 20, 105); // open map
         }else if (ret == 1){
-            throw UnexpectedBattleException(
-                ErrorReport::SEND_ERROR_REPORT, console,
+            throw_and_log<UnexpectedBattleException>(
+                console, ErrorReport::SEND_ERROR_REPORT,
                 "open_map_from_overworld(): Unexpectedly detected battle.",
-                false
+                console
             );              
         }else{
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
-                "open_map_from_overworld(): No overworld state found after 10 seconds.",
-                true
+            OperationFailedException::fire(
+                console, ErrorReport::SEND_ERROR_REPORT,
+                "open_map_from_overworld(): No overworld state found after 10 seconds."
             );
         }
     }
@@ -135,10 +133,9 @@ void open_map_from_overworld(
     WallClock start = current_time();
     while (true){
         if (current_time() - start > std::chrono::minutes(2)){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
-                "open_map_from_overworld(): Failed to open map after 2 minutes.",
-                true
+            OperationFailedException::fire(
+                console, ErrorReport::SEND_ERROR_REPORT,
+                "open_map_from_overworld(): Failed to open map after 2 minutes."
             );
         }
 
@@ -184,16 +181,15 @@ void open_map_from_overworld(
             }
         case 4:
             console.log("Detected battle.");
-            throw UnexpectedBattleException(
-                ErrorReport::SEND_ERROR_REPORT, console,
+            throw_and_log<UnexpectedBattleException>(
+                console, ErrorReport::SEND_ERROR_REPORT,
                 "open_map_from_overworld(): Unexpectedly detected battle.",
-                false
+                console
             ); 
         default:
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
-                "open_map_from_overworld(): No recognized state after 30 seconds.",
-                true
+            OperationFailedException::fire(
+                console, ErrorReport::SEND_ERROR_REPORT,
+                "open_map_from_overworld(): No recognized state after 30 seconds."
             );
         }
     }
@@ -207,10 +203,9 @@ bool fly_to_overworld_from_map(const ProgramInfo& info, ConsoleHandle& console, 
     WallClock start = current_time();
     while (true){
         if (current_time() - start > std::chrono::minutes(2)){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
-                "fly_to_overworld_from_map(): Failed to fly from map after 2 minutes.",
-                true
+            OperationFailedException::fire(
+                console, ErrorReport::SEND_ERROR_REPORT,
+                "fly_to_overworld_from_map(): Failed to fly from map after 2 minutes."
             );
         }
 
@@ -255,10 +250,9 @@ bool fly_to_overworld_from_map(const ProgramInfo& info, ConsoleHandle& console, 
             console.overlay().add_log("No fly spot", COLOR_RED);
             return false;
         default:
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
-                "fly_to_overworld_from_map(): No recognized state after 2 minutes.",
-                true
+            OperationFailedException::fire(
+                console, ErrorReport::SEND_ERROR_REPORT,
+                "fly_to_overworld_from_map(): No recognized state after 2 minutes."
             );
         }
     }
@@ -272,10 +266,9 @@ void picnic_from_overworld(const ProgramInfo& info, ConsoleHandle& console, BotB
     bool success = false;
     while (true){
         if (current_time() - start > std::chrono::minutes(3)){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
-                "picnic_from_overworld(): Failed to start picnic after 3 minutes.",
-                true
+            OperationFailedException::fire(
+                console, ErrorReport::SEND_ERROR_REPORT,
+                "picnic_from_overworld(): Failed to start picnic after 3 minutes."
             );
         }
 
@@ -299,10 +292,9 @@ void picnic_from_overworld(const ProgramInfo& info, ConsoleHandle& console, BotB
             console.log("Detected main menu.");
             success = main_menu.move_cursor(info, console, context, MenuSide::RIGHT, 2, fast_mode);
             if (success == false){
-                throw OperationFailedException(
-                    ErrorReport::SEND_ERROR_REPORT, console,
-                    "picnic_from_overworld(): Cannot move menu cursor to picnic.",
-                    true
+                OperationFailedException::fire(
+                    console, ErrorReport::SEND_ERROR_REPORT,
+                    "picnic_from_overworld(): Cannot move menu cursor to picnic."
                 );
             }
             pbf_mash_button(context, BUTTON_A, 125); // mash button A to enter picnic mode
@@ -316,10 +308,9 @@ void picnic_from_overworld(const ProgramInfo& info, ConsoleHandle& console, BotB
             context.wait_for_all_requests();
             return;
         default:
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
-                "picnic_from_overworld(): No recognized state after 30 seconds.",
-                true
+            OperationFailedException::fire(
+                console, ErrorReport::SEND_ERROR_REPORT,
+                "picnic_from_overworld(): No recognized state after 30 seconds."
             );
         }
     }
@@ -346,10 +337,9 @@ void leave_picnic(const ProgramInfo& info, ConsoleHandle& console, BotBaseContex
         }
 
         if (i == 4){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
-                "leave_picnic(): Failed to leave picnic after 5 tries.",
-                true
+            OperationFailedException::fire(
+                console, ErrorReport::SEND_ERROR_REPORT,
+                "leave_picnic(): Failed to leave picnic after 5 tries."
             );
         }
 
@@ -370,10 +360,9 @@ void leave_picnic(const ProgramInfo& info, ConsoleHandle& console, BotBaseContex
         {overworld}
     );
     if (ret < 0){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, console,
-            "leave_picnic(): Failed to detecxt overworld after 20 seconds.",
-            true
+        OperationFailedException::fire(
+            console, ErrorReport::SEND_ERROR_REPORT,
+            "leave_picnic(): Failed to detecxt overworld after 20 seconds."
         );
     }
     // Wait three more seconds to make sure the player character is free to operate:
@@ -388,10 +377,9 @@ void enter_box_system_from_overworld(const ProgramInfo& info, ConsoleHandle& con
     bool success = false;
     while (true){
         if (current_time() - start > std::chrono::minutes(3)){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
-                "enter_box_system_from_overworld(): Failed to enter box system after 3 minutes.",
-                true
+            OperationFailedException::fire(
+                console, ErrorReport::SEND_ERROR_REPORT,
+                "enter_box_system_from_overworld(): Failed to enter box system after 3 minutes."
             );
         }
 
@@ -416,10 +404,9 @@ void enter_box_system_from_overworld(const ProgramInfo& info, ConsoleHandle& con
             console.overlay().add_log("Enter box", COLOR_WHITE);
             success = main_menu.move_cursor(info, console, context, MenuSide::RIGHT, 1, fast_mode);
             if (success == false){
-                throw OperationFailedException(
-                    ErrorReport::SEND_ERROR_REPORT, console,
-                    "enter_box_system_from_overworld(): Cannot move menu cursor to Boxes.",
-                    true
+                OperationFailedException::fire(
+                    console, ErrorReport::SEND_ERROR_REPORT,
+                    "enter_box_system_from_overworld(): Cannot move menu cursor to Boxes."
                 );
             }
             pbf_press_button(context, BUTTON_A, 20, 50);
@@ -429,10 +416,9 @@ void enter_box_system_from_overworld(const ProgramInfo& info, ConsoleHandle& con
             context.wait_for(std::chrono::milliseconds(200));
             return;
         default:
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
-                "enter_box_system_from_overworld(): No recognized state after 30 seconds.",
-                true
+            OperationFailedException::fire(
+                console, ErrorReport::SEND_ERROR_REPORT,
+                "enter_box_system_from_overworld(): No recognized state after 30 seconds."
             );
         }
     }
@@ -451,10 +437,9 @@ void open_pokedex_from_overworld(const ProgramInfo& info, ConsoleHandle& console
     WallClock start = current_time();
     while (true){
         if (current_time() - start > std::chrono::seconds(30)){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
-                "open_pokedex_from_overworld(): Failed to open Pokédex after 30 seconds.",
-                true
+            OperationFailedException::fire(
+                console, ErrorReport::SEND_ERROR_REPORT,
+                "open_pokedex_from_overworld(): Failed to open Pokédex after 30 seconds."
             );
         }
 
@@ -477,10 +462,9 @@ void open_pokedex_from_overworld(const ProgramInfo& info, ConsoleHandle& console
             console.log("Detected Pokédex.");
             return;
         default:
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
-                "open_pokedex_from_overworld(): No recognized state after 30 seconds.",
-                true
+            OperationFailedException::fire(
+                console, ErrorReport::SEND_ERROR_REPORT,
+                "open_pokedex_from_overworld(): No recognized state after 30 seconds."
             );
         }
     }
@@ -506,10 +490,9 @@ void open_recently_battled_from_pokedex(const ProgramInfo& info, ConsoleHandle& 
         pbf_mash_button(context, BUTTON_A, 150);
         pbf_wait(context, 200);
     }else{
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, console,
-            "open_recently_battled_from_pokedex(): Unknown state after 10 dpad down presses.",
-            true
+        OperationFailedException::fire(
+            console, ErrorReport::SEND_ERROR_REPORT,
+            "open_recently_battled_from_pokedex(): Unknown state after 10 dpad down presses."
         );
     }
 }
@@ -535,24 +518,23 @@ void leave_phone_to_overworld(const ProgramInfo& info, ConsoleHandle& console, B
     case 0:
         return;
     case 1:
-        throw UnexpectedBattleException(
-            ErrorReport::SEND_ERROR_REPORT, console,
+        throw_and_log<UnexpectedBattleException>(
+            console, ErrorReport::SEND_ERROR_REPORT,
             "leave_phone_to_overworld(): Unexpectedly detected battle.",
-            false
+            console
         );  
     case 2:
         console.log("Stuck in battle status screen.");
         pbf_mash_button(context, BUTTON_B, 200);
-        throw UnexpectedBattleException(
-            ErrorReport::SEND_ERROR_REPORT, console,
+        throw_and_log<UnexpectedBattleException>(
+            console, ErrorReport::SEND_ERROR_REPORT,
             "leave_phone_to_overworld(): Unexpectedly detected battle.",
-            false
+            console
         ); 
     default:
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, console,
-            "leave_phone_to_overworld(): Unknown state after 10 button Y presses.",
-            true
+        OperationFailedException::fire(
+            console, ErrorReport::SEND_ERROR_REPORT,
+            "leave_phone_to_overworld(): Unknown state after 10 button Y presses."
         );
     }
 
@@ -639,10 +621,9 @@ bool fly_to_visible_closest_pokecenter_cur_zoom_level(
         return true;
     }else{
         // detected pokecenter, but failed to fly there.
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, console,
-            "fly_to_visible_closest_pokecenter_cur_zoom_level(): Detected pokecenter, but failed to fly there as no \"Fly\" menuitem.",
-            true
+        OperationFailedException::fire(
+            console, ErrorReport::SEND_ERROR_REPORT,
+            "fly_to_visible_closest_pokecenter_cur_zoom_level(): Detected pokecenter, but failed to fly there as no \"Fly\" menuitem."
         );
     }
 
@@ -675,10 +656,9 @@ void fly_to_closest_pokecenter_on_map(const ProgramInfo& info, ConsoleHandle& co
         }catch (OperationFailedException&){ // pokecenter was detected, but failed to fly there
             try_count++;
             if (try_count >= MAX_TRY_COUNT){
-                throw OperationFailedException(
-                    ErrorReport::SEND_ERROR_REPORT, console,
-                    "fly_to_closest_pokecenter_on_map(): At min warpable map level, pokecenter was detected, but failed to fly there.",
-                    true
+                OperationFailedException::fire(
+                    console, ErrorReport::SEND_ERROR_REPORT,
+                    "fly_to_closest_pokecenter_on_map(): At min warpable map level, pokecenter was detected, but failed to fly there."
                 );                
             }
             console.log("Failed to find the fly menu item. Restart the closest Pokecenter travel process.");
@@ -718,10 +698,9 @@ void fly_to_closest_pokecenter_on_map(const ProgramInfo& info, ConsoleHandle& co
             }else{
                 // Does not detect any pokecenter on map
                 console.overlay().add_log("Still no PokeCenter Found!", COLOR_RED);
-                throw OperationFailedException(
-                    ErrorReport::SEND_ERROR_REPORT, console,
-                    "fly_to_closest_pokecenter_on_map(): At max warpable map level, still cannot find PokeCenter icon.",
-                    true
+                OperationFailedException::fire(
+                    console, ErrorReport::SEND_ERROR_REPORT,
+                    "fly_to_closest_pokecenter_on_map(): At max warpable map level, still cannot find PokeCenter icon."
                 );
             }
         }catch (OperationFailedException& e){ 
@@ -762,10 +741,9 @@ void jump_off_wall_until_map_open(const ProgramInfo& info, ConsoleHandle& consol
         }
         if (i >= 3){
             console.log("Could not escape wall.");
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
-                "jump_off_wall_until_map_open(): Could not escape wall.",
-                true
+            OperationFailedException::fire(
+                console, ErrorReport::SEND_ERROR_REPORT,
+                "jump_off_wall_until_map_open(): Could not escape wall."
             );
         }
     }
@@ -847,10 +825,9 @@ void walk_forward_until_dialog(
         console.log("walk_forward_until_dialog(): Detected dialog.");
         return;
     default:
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, console,
-            "walk_forward_until_dialog(): Timed out. Did not detect dialog.",
-            true
+        OperationFailedException::fire(
+            console, ErrorReport::SEND_ERROR_REPORT,
+            "walk_forward_until_dialog(): Timed out. Did not detect dialog."
         );
     }
 }
@@ -907,10 +884,9 @@ void mash_button_till_overworld(
     );
 
     if (ret < 0){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, console,
-            "mash_button_till_overworld(): Timed out, no recognized state found.",
-            true
+        OperationFailedException::fire(
+            console, ErrorReport::SEND_ERROR_REPORT,
+            "mash_button_till_overworld(): Timed out, no recognized state found."
         );
     }
 }
@@ -938,20 +914,18 @@ bool attempt_fly_to_overlapping_flypoint(
 
 void fly_to_overlapping_flypoint(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
     if (!attempt_fly_to_overlapping_flypoint(info, console, context)){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, console,
-            "Failed to reset to overlapping Pokecenter.",
-            true
+        OperationFailedException::fire(
+            console, ErrorReport::SEND_ERROR_REPORT,
+            "Failed to reset to overlapping Pokecenter."
         );
     }
 }
 
 void confirm_no_overlapping_flypoint(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
     if (attempt_fly_to_overlapping_flypoint(info, console, context)){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, console,
-            "Overlapping fly detected, when it wasn't expected.",
-            true
+        OperationFailedException::fire(
+            console, ErrorReport::SEND_ERROR_REPORT,
+            "Overlapping fly detected, when it wasn't expected."
         );
     }
 }
@@ -970,10 +944,9 @@ void enter_menu_from_overworld(const ProgramInfo& info, ConsoleHandle& console, 
 
     while (true){
         if (current_time() - start > std::chrono::minutes(3)){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
-                "enter_menu_from_overworld(): Failed to enter specified menu after 3 minutes.",
-                true
+            OperationFailedException::fire(
+                console, ErrorReport::SEND_ERROR_REPORT,
+                "enter_menu_from_overworld(): Failed to enter specified menu after 3 minutes."
             );
         }
 
@@ -1010,25 +983,23 @@ void enter_menu_from_overworld(const ProgramInfo& info, ConsoleHandle& console, 
             }
             success = main_menu.move_cursor(info, console, context, side, menu_index, fast_mode);
             if (success == false){
-                throw OperationFailedException(
-                    ErrorReport::SEND_ERROR_REPORT, console,
-                    "enter_menu_from_overworld(): Cannot move menu cursor to specified menu.",
-                    true
+                OperationFailedException::fire(
+                    console, ErrorReport::SEND_ERROR_REPORT,
+                    "enter_menu_from_overworld(): Cannot move menu cursor to specified menu."
                 );
             }
             pbf_press_button(context, BUTTON_A, 20, 105);
             return;
         case 2:
-            throw UnexpectedBattleException(
-                ErrorReport::SEND_ERROR_REPORT, console,
+            throw_and_log<UnexpectedBattleException>(
+                console, ErrorReport::SEND_ERROR_REPORT,
                 "enter_menu_from_overworld(): Unexpectedly detected battle.",
-                false
+                console
             );            
         default:
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
-                "enter_menu_from_overworld(): No recognized state after 30 seconds.",
-                true
+            OperationFailedException::fire(
+                console, ErrorReport::SEND_ERROR_REPORT,
+                "enter_menu_from_overworld(): No recognized state after 30 seconds."
             );
         }
     }
@@ -1056,10 +1027,9 @@ void press_button_until_gradient_arrow(
     if (ret == 0){
         console.log("Gradient arrow detected.");
     }else{
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, console,
-            "Failed to detect gradient arrow.",
-            true
+        OperationFailedException::fire(
+            console, ErrorReport::SEND_ERROR_REPORT,
+            "Failed to detect gradient arrow."
         );
     }     
 }
@@ -1077,10 +1047,9 @@ void basic_menu_navigation(
 
     int ret = wait_until(console, context, Milliseconds(5000), { arrow_start });
     if (ret < 0){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, console,
-            "basic_menu_navigation: Failed to detect gradient arrow at expected start position.",
-            true
+        OperationFailedException::fire(
+            console, ErrorReport::SEND_ERROR_REPORT,
+            "basic_menu_navigation: Failed to detect gradient arrow at expected start position."
         );        
     }
 
@@ -1103,10 +1072,9 @@ void basic_menu_navigation(
     if (ret == 0){
         console.log("basic_menu_navigation: Desired item selected.");
     }else{
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, console,
-            "basic_menu_navigation: Failed to detect gradient arrow at expected end position.",
-            true
+        OperationFailedException::fire(
+            console, ErrorReport::SEND_ERROR_REPORT,
+            "basic_menu_navigation: Failed to detect gradient arrow at expected end position."
         );        
     }
 }
@@ -1120,10 +1088,9 @@ void heal_at_pokecenter(
     context.wait_for_all_requests();
     
     if (!attempt_fly_to_overlapping_flypoint(info, console, context)){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, console,
-            "Failed to fly to pokecenter.",
-            true
+        OperationFailedException::fire(
+            console, ErrorReport::SEND_ERROR_REPORT,
+            "Failed to fly to pokecenter."
         );  
     }           
     uint16_t seconds_timeout = 60;
@@ -1177,10 +1144,9 @@ void heal_at_pokecenter(
             break;   
         default:
             console.log("heal_at_pokecenter: Timed out.");
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
-                "Failed to heal at pokecenter.",
-                true
+            OperationFailedException::fire(
+                console, ErrorReport::SEND_ERROR_REPORT,
+                "Failed to heal at pokecenter."
             );  
         }
     }

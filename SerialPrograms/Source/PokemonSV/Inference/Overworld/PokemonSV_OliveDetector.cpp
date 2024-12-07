@@ -3,10 +3,10 @@
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
  */
+
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "CommonFramework/Exceptions/OliveActionFailedException.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/ImageMatch/ImageDiff.h"
 #include "CommonFramework/ImageMatch/ExactImageMatcher.h"
@@ -16,8 +16,9 @@
 #include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_SnapshotDumper.h"
-#include "PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h"
+#include "PokemonSV/Programs/AutoStory/PokemonSV_OliveActionFailedException.h"
 #include "PokemonSV_OliveDetector.h"
 
 #include <iostream>
@@ -131,10 +132,10 @@ ImageFloatBox OliveDetector::get_olive_floatbox(ConsoleHandle& console, BotBaseC
     }
 
     // dump_snapshot(console);
-    throw OliveActionFailedException(
-        ErrorReport::SEND_ERROR_REPORT, console,
+    throw_and_log<OliveActionFailedException>(
+        console, ErrorReport::SEND_ERROR_REPORT,
         "get_olive_floatbox(): Olive not detected.",
-        true,
+        console,
         OliveFail::NO_OLIVE_DETECTED
     );
 }
@@ -219,7 +220,7 @@ ImageFloatBox OliveDetector::align_to_olive(
         //     pbf_move_left_joystick(context, 128, 255, 75, 100);  // walk backwards
         //     if (olive_unchanged_count == 2){
         //         throw OliveActionFailedException(
-        //             ErrorReport::SEND_ERROR_REPORT, console,
+        //             console, ErrorReport::SEND_ERROR_REPORT,
         //             "align_to_olive(): Failed to align to olive.",
         //             true,
         //             OliveFail::FAILED_ALIGN_TO_OLIVE
@@ -234,7 +235,7 @@ ImageFloatBox OliveDetector::align_to_olive(
     // don't throw an exception, since sometimes the program has trouble detecting the olive's exact location with the white logo on the olive.
     // so we rely on maxing out the attempts to move on.
     // throw OliveActionFailedException(
-    //     ErrorReport::SEND_ERROR_REPORT, console,
+    //     console, ErrorReport::SEND_ERROR_REPORT,
     //     "align_to_olive(): Failed to align to olive.",
     //     true,
     //     OliveFail::FAILED_ALIGN_TO_OLIVE
@@ -294,10 +295,10 @@ uint16_t OliveDetector::push_olive_forward(
                 push_olive = 200; // run forward more on the next push
 
                 if (j == 2){
-                    throw OliveActionFailedException(
-                        ErrorReport::SEND_ERROR_REPORT, console,
+                    throw_and_log<OliveActionFailedException>(
+                        console, ErrorReport::SEND_ERROR_REPORT,
                         "push_olive_forward(): Olive stuck.",
-                        true,
+                        console,
                         OliveFail::OLIVE_STUCK
                     );                    
                 }
@@ -315,10 +316,10 @@ uint16_t OliveDetector::push_olive_forward(
         
     }
 
-    throw OliveActionFailedException(
-        ErrorReport::SEND_ERROR_REPORT, console,
+    throw_and_log<OliveActionFailedException>(
+        console, ErrorReport::SEND_ERROR_REPORT,
         "push_olive_forward(): Something went wrong. Failed to walk the Olive forward as expected.",
-        true,
+        console,
         OliveFail::FAILED_PUSH_OLIVE_TOTAL_DISTANCE
     );
 
@@ -370,10 +371,10 @@ uint16_t OliveDetector::walk_up_to_olive(
         pbf_move_left_joystick(context, 128, 0, push_duration, wait_ticks);
     }    
 
-    throw OliveActionFailedException(
-        ErrorReport::SEND_ERROR_REPORT, console,
+    throw_and_log<OliveActionFailedException>(
+        console, ErrorReport::SEND_ERROR_REPORT,
         "walk_up_to_olive(): Something went wrong. Failed to walk up to the Olive",
-        true,
+        console,
         OliveFail::FAILED_WALK_TO_OLIVE
     );
 

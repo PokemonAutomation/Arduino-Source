@@ -255,11 +255,10 @@ CameraAngle quest_photo_navi(const ProgramInfo& info, ConsoleHandle& console, Bo
 
             break;
         default:
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
-                "Invalid photo quest.",
-                true
-                );
+            OperationFailedException::fire(
+                console, ErrorReport::SEND_ERROR_REPORT,
+                "Invalid photo quest."
+            );
             break;
     }
 
@@ -345,10 +344,9 @@ void quest_photo(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
                     return_to_plaza(info, console, context);
                 }catch (...){
                     console.log("Unable to flee.");
-                    throw OperationFailedException(
-                        ErrorReport::SEND_ERROR_REPORT, console,
-                        "Unable to flee!",
-                        true
+                    OperationFailedException::fire(
+                        console, ErrorReport::SEND_ERROR_REPORT,
+                        "Unable to flee!"
                     );
                 }
             }
@@ -590,11 +588,10 @@ void quest_catch_navi(const ProgramInfo& info, ConsoleHandle& console, BotBaseCo
 
             break;
         default:
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
-                "Invalid catch quest.",
-                true
-                );
+            OperationFailedException::fire(
+                console, ErrorReport::SEND_ERROR_REPORT,
+                "Invalid catch quest."
+            );
             break;
     }
 
@@ -617,10 +614,9 @@ void quest_catch_throw_ball(const ProgramInfo& info, ConsoleHandle& console, Bot
     while (ball_reader == ""){
         if (current_time() - start > std::chrono::minutes(2)){
             console.log("Timed out trying to read ball after 2 minutes.", COLOR_RED);
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
-                "Timed out trying to read ball after 2 minutes.",
-                true
+            OperationFailedException::fire(
+                console, ErrorReport::SEND_ERROR_REPORT,
+                "Timed out trying to read ball after 2 minutes."
             );
         }
 
@@ -640,10 +636,9 @@ void quest_catch_throw_ball(const ProgramInfo& info, ConsoleHandle& console, Bot
     int quantity = move_to_ball(reader, console, context, selected_ball);
     if (quantity == 0){
         console.log("Unable to find ball.");
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, console,
-            "Unable to find ball.",
-            true
+        OperationFailedException::fire(
+            console, ErrorReport::SEND_ERROR_REPORT,
+            "Unable to find ball."
         );
     }
     if (quantity < 0){
@@ -683,10 +678,9 @@ void quest_catch_handle_battle(const ProgramInfo& info, ConsoleHandle& console, 
                 );
                 if (bMenu < 0){
                     console.log("Unable to find menu_before_throw.");
-                    throw OperationFailedException(
-                        ErrorReport::SEND_ERROR_REPORT, console,
-                        "Unable to find menu_before_throw.",
-                        true
+                    OperationFailedException::fire(
+                        console, ErrorReport::SEND_ERROR_REPORT,
+                        "Unable to find menu_before_throw."
                     );
                 }
                 
@@ -766,10 +760,9 @@ void quest_catch_handle_battle(const ProgramInfo& info, ConsoleHandle& console, 
                         );
                         if (ret3 == 0){
                             console.log("Battle menu detected early. Out of PP/No move in slot, please check your setup.");
-                            throw OperationFailedException(
-                                ErrorReport::SEND_ERROR_REPORT, console,
-                                "Battle menu detected early. Out of PP, please check your setup.",
-                                true
+                            OperationFailedException::fire(
+                                console, ErrorReport::SEND_ERROR_REPORT,
+                                "Battle menu detected early. Out of PP, please check your setup."
                             );
                         }
                     }else{
@@ -804,10 +797,9 @@ void quest_catch_handle_battle(const ProgramInfo& info, ConsoleHandle& console, 
                     break;
                 default:
                     console.log("Invalid state ret2_run. Out of moves?");
-                    throw OperationFailedException(
-                        ErrorReport::SEND_ERROR_REPORT, console,
-                        "Invalid state ret2_run. Out of moves?",
-                        true
+                    OperationFailedException::fire(
+                        console, ErrorReport::SEND_ERROR_REPORT,
+                        "Invalid state ret2_run. Out of moves?"
                     );
                 }
 
@@ -830,10 +822,9 @@ void quest_catch_handle_battle(const ProgramInfo& info, ConsoleHandle& console, 
         break;
     default:
         console.log("Invalid state in run_battle().");
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, console,
-            "Invalid state in run_battle().",
-            true
+        OperationFailedException::fire(
+            console, ErrorReport::SEND_ERROR_REPORT,
+            "Invalid state in run_battle()."
         );
     }
 }
@@ -923,10 +914,9 @@ void wild_battle_tera(const ProgramInfo& info, ConsoleHandle& console, BotBaseCo
             while(true){
                 if (current_time() - start > std::chrono::minutes(5)){
                     console.log("Timed out during battle after 5 minutes.", COLOR_RED);
-                    throw OperationFailedException(
-                        ErrorReport::SEND_ERROR_REPORT, console,
-                        "Timed out during battle after 5 minutes.",
-                        true
+                    OperationFailedException::fire(
+                        console, ErrorReport::SEND_ERROR_REPORT,
+                        "Timed out during battle after 5 minutes."
                     );
                 }
 
@@ -972,11 +962,9 @@ void wild_battle_tera(const ProgramInfo& info, ConsoleHandle& console, BotBaseCo
                     }
                     break;
                 default:
-                    console.log("Timed out during battle. Stuck, crashed, or took more than 90 seconds for a turn.", COLOR_RED);
-                    throw OperationFailedException(
-                        ErrorReport::SEND_ERROR_REPORT, console,
-                        "Timed out during battle. Stuck, crashed, or took more than 90 seconds for a turn.",
-                        true
+                    OperationFailedException::fire(
+                        console, ErrorReport::SEND_ERROR_REPORT,
+                        "Timed out during battle. Stuck, crashed, or took more than 90 seconds for a turn."
                     );
                 }
             }

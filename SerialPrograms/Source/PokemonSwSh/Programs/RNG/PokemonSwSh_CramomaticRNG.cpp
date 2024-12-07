@@ -297,10 +297,9 @@ void CramomaticRNG::choose_apricorn(SingleSwitchProgramEnvironment& env, BotBase
 
     int ret = wait_until(env.console, context, Milliseconds(5000), { bag_arrow_detector });
     if (ret < 0){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, env.console,
-            "Could not detect bag.",
-            true
+        OperationFailedException::fire(
+            env.console, ErrorReport::SEND_ERROR_REPORT,
+            "Could not detect bag."
         );
     }
 
@@ -463,8 +462,8 @@ void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
 
             state_errors++;
             if (state_errors >= 3){
-                throw OperationFailedException(
-                    ErrorReport::SEND_ERROR_REPORT, env.console,
+                OperationFailedException::fire(
+                    env.console, ErrorReport::SEND_ERROR_REPORT,
                     "Detected invalid RNG state three times in a row."
                 );
             }
@@ -493,10 +492,9 @@ void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
 
             apricorn_selection_errors++;
             if (apricorn_selection_errors >= 3){
-                throw OperationFailedException(
-                    ErrorReport::SEND_ERROR_REPORT, env.console,
-                    "Could not detect the bag three times on a row.",
-                    true
+                OperationFailedException::fire(
+                    env.console, ErrorReport::SEND_ERROR_REPORT,
+                    "Could not detect the bag three times on a row."
                 );
             }
             VideoSnapshot screen = env.console.video().snapshot();
@@ -523,7 +521,7 @@ void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
 
         //  Out of apricorns.
         if (!result.first || num_apricorn_one <= 4 || (sport_wanted && num_apricorn_two <= 2)){
-            throw ProgramFinishedException(env.console, "Out of apricorns.");
+            throw_and_log<ProgramFinishedException>(env.console, "Out of apricorns.", env.console);
         }
 
 

@@ -87,10 +87,9 @@ void CaughtPokemonScreen::leave_summary(){
     default:
 //        auto snapshot = m_console.video().snapshot();
 //        dump_image(m_console, m_env.program_info(), "CaughtMenu", snapshot);
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, m_console,
-            "Failed to detect caught menu.",
-            true
+        OperationFailedException::fire(
+            m_console, ErrorReport::SEND_ERROR_REPORT,
+            "Failed to detect caught menu."
         );
     }
 
@@ -118,10 +117,9 @@ void CaughtPokemonScreen::process_detection(Detection detection){
     CaughtPokemon& mon = m_mons[m_current_position];
     switch (detection){
     case SummaryShinySymbolDetector::Detection::NO_DETECTION:
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, m_console,
-            "Failed to detect summary screen.",
-            true
+        OperationFailedException::fire(
+            m_console, ErrorReport::SEND_ERROR_REPORT,
+            "Failed to detect summary screen."
         );
     case SummaryShinySymbolDetector::Detection::NOT_SHINY:
         if (!mon.read){
@@ -129,10 +127,9 @@ void CaughtPokemonScreen::process_detection(Detection detection){
             mon.shiny = false;
             mon.read = true;
         }else if (mon.shiny){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, m_console,
-                "Fatal Inconsistency: Expected to see a non-shiny.",
-                true
+            OperationFailedException::fire(
+                m_console, ErrorReport::SEND_ERROR_REPORT,
+                "Fatal Inconsistency: Expected to see a non-shiny."
             );
         }
         break;
@@ -142,10 +139,9 @@ void CaughtPokemonScreen::process_detection(Detection detection){
             mon.shiny = true;
             mon.read = true;
         }else if (!mon.shiny){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, m_console,
-                "Fatal Inconsistency: Expected to see a shiny.",
-                true
+            OperationFailedException::fire(
+                m_console, ErrorReport::SEND_ERROR_REPORT,
+                "Fatal Inconsistency: Expected to see a shiny."
             );
         }
         break;

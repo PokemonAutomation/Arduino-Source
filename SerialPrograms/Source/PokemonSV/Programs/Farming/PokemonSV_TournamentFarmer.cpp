@@ -287,10 +287,9 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, BotBaseCo
                 stats.errors++;
                 env.update_stats();
                 send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
-                throw OperationFailedException(
-                    ErrorReport::SEND_ERROR_REPORT, env.console,
-                    "Took more than 6 turns to use Memento. Was Zoroark able to faint?",
-                    true
+                OperationFailedException::fire(
+                    env.console, ErrorReport::SEND_ERROR_REPORT,
+                    "Took more than 6 turns to use Memento. Was Zoroark able to faint?"
                 );
             }
 
@@ -301,10 +300,9 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, BotBaseCo
             stats.errors++;
             env.update_stats();
             send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
-                "Timed out after Happy Hour.",
-                true
+            OperationFailedException::fire(
+                env.console, ErrorReport::SEND_ERROR_REPORT,
+                "Timed out after Happy Hour."
             );
         }
 
@@ -327,10 +325,9 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, BotBaseCo
             stats.errors++;
             env.update_stats();
             send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
-                "Could not find battle menu.",
-                true
+            OperationFailedException::fire(
+                env.console, ErrorReport::SEND_ERROR_REPORT,
+                "Could not find battle menu."
             );
         }
 
@@ -361,10 +358,9 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, BotBaseCo
                     stats.errors++;
                     env.update_stats();
                     send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
-                    throw OperationFailedException(
-                        ErrorReport::SEND_ERROR_REPORT, env.console,
-                        "Timed out during battle after 5 minutes.",
-                        true
+                    OperationFailedException::fire(
+                        env.console, ErrorReport::SEND_ERROR_REPORT,
+                        "Timed out during battle after 5 minutes."
                     );
                 }
 
@@ -409,10 +405,9 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, BotBaseCo
                     env.log("Timed out during battle. Stuck, crashed, or took more than 90 seconds for a turn.", COLOR_RED);
                     stats.errors++;
                     env.update_stats();
-                    throw OperationFailedException(
-                        ErrorReport::SEND_ERROR_REPORT, env.console,
-                        "Timed out during battle. Stuck, crashed, or took more than 90 seconds for a turn.",
-                        true
+                    OperationFailedException::fire(
+                        env.console, ErrorReport::SEND_ERROR_REPORT,
+                        "Timed out during battle. Stuck, crashed, or took more than 90 seconds for a turn."
                     );
                 }
             }
@@ -440,10 +435,9 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, BotBaseCo
         stats.errors++;
         env.update_stats();
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, env.console,
-            "Timed out during battle. Stuck, crashed, or took over 30 turns.",
-            true
+        OperationFailedException::fire(
+            env.console, ErrorReport::SEND_ERROR_REPORT,
+            "Timed out during battle. Stuck, crashed, or took over 30 turns."
         );
     }
     context.wait_for_all_requests();
@@ -621,10 +615,9 @@ void go_to_academy_fly_point(SingleSwitchProgramEnvironment& env, BotBaseContext
     }
 
     if(!isFlySuccessful){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, env.console,
-            "Failed to fly back to academy!",
-            true
+        OperationFailedException::fire(
+            env.console, ErrorReport::SEND_ERROR_REPORT,
+            "Failed to fly back to academy!"
         );
     }
 
@@ -732,10 +725,9 @@ void TournamentFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseConte
                 stats.errors++;
                 env.update_stats();
                 send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
-                throw OperationFailedException(
-                    ErrorReport::SEND_ERROR_REPORT, env.console,
-                    "Failed to detect battle menu or dialog prompt!",
-                    true
+                OperationFailedException::fire(
+                    env.console, ErrorReport::SEND_ERROR_REPORT,
+                    "Failed to detect battle menu or dialog prompt!"
                 );
                 break;
             }

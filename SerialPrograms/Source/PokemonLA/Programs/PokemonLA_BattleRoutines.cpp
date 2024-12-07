@@ -34,10 +34,9 @@ void mash_A_until_end_of_battle(ConsoleHandle& console, BotBaseContext& context)
         {{detector}}
     );
     if (ret < 0){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, console,
-            "Failed to return to overworld after 2 minutes.",
-            true
+        OperationFailedException::fire(
+            console, ErrorReport::SEND_ERROR_REPORT,
+            "Failed to return to overworld after 2 minutes."
         );
     }
     console.log("Returned to overworld.");
@@ -47,10 +46,9 @@ void mash_A_until_end_of_battle(ConsoleHandle& console, BotBaseContext& context)
 
 size_t switch_pokemon(ConsoleHandle& console, BotBaseContext& context, size_t pokemon_to_switch_to, size_t max_num_pokemon){
     if (pokemon_to_switch_to >= max_num_pokemon){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, console,
-            "Cannot send any more Pokemon to battle, max: " + std::to_string(max_num_pokemon),
-            true
+        OperationFailedException::fire(
+            console, ErrorReport::SEND_ERROR_REPORT,
+            "Cannot send any more Pokemon to battle, max: " + std::to_string(max_num_pokemon)
         );
     }
     // Move past leading fainted pokemon
@@ -77,10 +75,9 @@ size_t switch_pokemon(ConsoleHandle& console, BotBaseContext& context, size_t po
         // and therefore cannot be used. Try the next pokemon:
         pokemon_to_switch_to++;
         if (pokemon_to_switch_to >= max_num_pokemon){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
-                "Cannot send any more Pokemon to battle, max: " + std::to_string(max_num_pokemon),
-                true
+            OperationFailedException::fire(
+                console, ErrorReport::SEND_ERROR_REPORT,
+                "Cannot send any more Pokemon to battle, max: " + std::to_string(max_num_pokemon)
             );
         }
 
@@ -160,10 +157,9 @@ void use_next_move_with_pp(ConsoleHandle& console, BotBaseContext& context, size
             // Pokemon has zero PP on all moves. This should not happen as it will just use
             // Struggle.
             console.log("No PP on all moves. Abort program.", COLOR_RED);
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
-                "No PP on all moves.",
-                true
+            OperationFailedException::fire(
+                console, ErrorReport::SEND_ERROR_REPORT,
+                "No PP on all moves."
             );
         }
         

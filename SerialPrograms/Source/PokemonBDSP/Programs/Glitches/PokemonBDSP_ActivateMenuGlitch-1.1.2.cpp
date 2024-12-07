@@ -68,10 +68,9 @@ void trigger_menu(ConsoleHandle& console, BotBaseContext& context){
         {{detector}}
     );
     if (ret < 0){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, console,
-            "Map not detected after 60 seconds.",
-            true
+        OperationFailedException::fire(
+            console, ErrorReport::SEND_ERROR_REPORT,
+            "Map not detected after 60 seconds."
         );
     }
     console.log("Detected map!", COLOR_BLUE);
@@ -103,10 +102,9 @@ void trigger_map_overlap(ConsoleHandle& console, BotBaseContext& context){
         pbf_mash_button(context, BUTTON_B, 3 * TICKS_PER_SECOND);
         pbf_press_button(context, BUTTON_R, 20, 230);
     }
-    throw OperationFailedException(
-        ErrorReport::SEND_ERROR_REPORT, console,
-        "Failed to trigger map overlap after 10 attempts.",
-        true
+    OperationFailedException::fire(
+        console, ErrorReport::SEND_ERROR_REPORT,
+        "Failed to trigger map overlap after 10 attempts."
     );
 }
 
@@ -144,10 +142,9 @@ void ActivateMenuGlitch112::program(SingleSwitchProgramEnvironment& env, BotBase
             {{detector}}
         );
         if (ret < 0){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
-                "Unable to leave " + STRING_POKEMON + " center.",
-                true
+            OperationFailedException::fire(
+                console, ErrorReport::SEND_ERROR_REPORT,
+                "Unable to leave " + STRING_POKEMON + " center."
             );
         }
         console.log("Leaving " + STRING_POKEMON + " center detected!", COLOR_BLUE);

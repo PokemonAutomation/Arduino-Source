@@ -116,10 +116,9 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         env.update_stats();
 
         if (consecutive_failures >= 3){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
-                "Failed 3 times in the row.",
-                true
+            OperationFailedException::fire(
+                env.console, ErrorReport::SEND_ERROR_REPORT,
+                "Failed 3 times in the row."
             );
         }
 
