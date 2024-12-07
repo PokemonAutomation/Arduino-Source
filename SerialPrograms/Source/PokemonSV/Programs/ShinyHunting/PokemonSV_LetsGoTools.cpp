@@ -287,10 +287,10 @@ void LetsGoEncounterBotTracker::process_battle(
         case CatchResult::POKEMON_FAINTED:
             break;
         default:
-            throw FatalProgramException(
-                ErrorReport::NO_ERROR_REPORT, m_console,
+            throw_and_log<FatalProgramException>(
+                m_console, ErrorReport::NO_ERROR_REPORT,
                 "Unable to recover from failed catch.",
-                true
+                m_console
             );
         }
 

@@ -169,10 +169,10 @@ void DateReader::set_hours(
     {
         auto snapshot = console.video().snapshot();
         if (!detect(snapshot)){
-            throw FatalProgramException(
-                ErrorReport::SEND_ERROR_REPORT, console,
+            throw_and_log<FatalProgramException>(
+                console, ErrorReport::SEND_ERROR_REPORT,
                 "Expected date change menu.",
-                true
+                console
             );
         }
     }
@@ -189,10 +189,10 @@ void DateReader::set_hours(
         VideoSnapshot snapshot = console.video().snapshot();
         int8_t current_hour = read_hours(console.logger(), snapshot);
         if (current_hour < 0){
-            throw FatalProgramException(
-                ErrorReport::SEND_ERROR_REPORT, console,
+            throw_and_log<FatalProgramException>(
+                console, ErrorReport::SEND_ERROR_REPORT,
                 "Unable to read the hour.",
-                true
+                console
             );
         }
 
@@ -244,10 +244,10 @@ void DateReader::set_hours(
     }
 
 //    auto snapshot = console.video().snapshot();
-    throw FatalProgramException(
-        ErrorReport::SEND_ERROR_REPORT, console,
+    throw_and_log<FatalProgramException>(
+        console, ErrorReport::SEND_ERROR_REPORT,
         "Failed to set the hour after 10 attempts.",
-        true
+        console
     );
 }
 
@@ -574,10 +574,10 @@ void DateReader::set_date(
     }
 
     ssf_flush_pipeline(context);
-    throw FatalProgramException(
-        ErrorReport::SEND_ERROR_REPORT, console,
+    throw_and_log<FatalProgramException>(
+        console, ErrorReport::SEND_ERROR_REPORT,
         "Failed to set the hour after 10 attempts.",
-        true
+        console
     );
 }
 

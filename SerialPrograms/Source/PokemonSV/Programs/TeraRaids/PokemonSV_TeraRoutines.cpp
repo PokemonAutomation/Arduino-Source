@@ -409,10 +409,10 @@ void exit_tera_win_by_catching(
             BattleBallReader reader(console, language);
             int quantity = move_to_ball(reader, console, context, ball_slug);
             if (quantity == 0){
-                throw FatalProgramException(
-                    ErrorReport::NO_ERROR_REPORT, console,
+                throw_and_log<FatalProgramException>(
+                    console, ErrorReport::NO_ERROR_REPORT,
                     "Unable to find appropriate ball. Did you run out?",
-                    true
+                    console
                 );
             }
             if (quantity < 0){
@@ -525,10 +525,10 @@ TeraResult exit_tera_win_by_catching(
             BattleBallReader reader(console, language);
             int quantity = move_to_ball(reader, console, context, ball_slug);
             if (quantity == 0){
-                throw FatalProgramException(
-                    ErrorReport::NO_ERROR_REPORT, console,
+                throw_and_log<FatalProgramException>(
+                    console, ErrorReport::NO_ERROR_REPORT,
                     "Unable to find appropriate ball. Did you run out?",
-                    true
+                    console
                 );
             }
             if (quantity < 0){

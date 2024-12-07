@@ -77,27 +77,6 @@ AutonomousBallThrower::AutonomousBallThrower()
 
 
 
-#if 0
-void AutonomousBallThrower::throw_ball(ConsoleHandle& console, BotBaseContext& context){
-    pbf_press_button(context, BUTTON_X, 20, 100);
-    context.wait_for_all_requests();
-
-    BattleBallReader reader(console, LANGUAGE);
-    int quantity = move_to_ball(reader, console, context, BALL_SELECT.slug());
-    if (quantity == 0){
-        throw FatalProgramException(
-            ErrorReport::NO_ERROR_REPORT, console,
-            "Unable to find appropriate ball. Did you run out?",
-            true
-        );
-    }
-    if (quantity < 0){
-        console.log("Unable to read ball quantity.", COLOR_RED);
-    }
-    pbf_mash_button(context, BUTTON_A, 125);
-    context.wait_for_all_requests();
-}
-#endif
 
 void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     assert_16_9_720p_min(env.logger(), env.console);

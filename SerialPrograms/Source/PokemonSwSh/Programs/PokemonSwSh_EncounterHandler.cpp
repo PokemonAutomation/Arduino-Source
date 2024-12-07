@@ -248,10 +248,10 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
         case CatchResult::POKEMON_FAINTED:
             break;
         default:
-            throw FatalProgramException(
-                ErrorReport::NO_ERROR_REPORT, m_console,
+            throw_and_log<FatalProgramException>(
+                m_console, ErrorReport::NO_ERROR_REPORT,
                 "Unable to recover from failed catch.",
-                true
+                m_console
             );
         }
         return false;
@@ -278,10 +278,10 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
             pbf_mash_button(m_context, BUTTON_B, 2 * TICKS_PER_SECOND);
             break;
         default:
-            throw FatalProgramException(
-                ErrorReport::NO_ERROR_REPORT, m_console,
+            throw_and_log<FatalProgramException>(
+                m_console, ErrorReport::NO_ERROR_REPORT,
                 "Unable to recover from failed catch.",
-                true
+                m_console
             );
         }
         return false;

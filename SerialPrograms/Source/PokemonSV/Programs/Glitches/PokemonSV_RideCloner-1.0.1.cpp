@@ -318,10 +318,10 @@ bool RideCloner101::run_post_win(
             BattleBallReader reader(console, LANGUAGE);
             int quantity = move_to_ball(reader, console, context, BALL_SELECT.slug());
             if (quantity == 0){
-                throw FatalProgramException(
-                    ErrorReport::NO_ERROR_REPORT, console,
+                throw_and_log<FatalProgramException>(
+                    console, ErrorReport::NO_ERROR_REPORT,
                     "Unable to find appropriate ball. Did you run out?",
-                    true
+                    console
                 );
             }
             if (quantity < 0){

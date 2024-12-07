@@ -103,10 +103,10 @@ bool MassPurchase::mass_purchase(ProgramEnvironment& env, ConsoleHandle& console
     case 0:
         env.log("Error - Stuck in Overworld");
         stats.errors++;
-        throw FatalProgramException(
-            ErrorReport::SEND_ERROR_REPORT, console,
+        throw_and_log<FatalProgramException>(
+            console, ErrorReport::SEND_ERROR_REPORT,
             "Stuck in Overworld.",
-            true
+            console
         );
 
     case 1:
@@ -140,10 +140,10 @@ bool MassPurchase::extra_items(ProgramEnvironment& env, ConsoleHandle& console, 
     case 0:
         env.log("Error - Stuck in Overworld");
         stats.errors++;
-        throw FatalProgramException(
-            ErrorReport::SEND_ERROR_REPORT, console,
+        throw_and_log<FatalProgramException>(
+            console, ErrorReport::SEND_ERROR_REPORT,
             "Stuck in Overworld.",
-            true
+            console
         );
 
     case 1:

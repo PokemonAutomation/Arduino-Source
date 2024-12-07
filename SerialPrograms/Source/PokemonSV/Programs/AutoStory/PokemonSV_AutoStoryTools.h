@@ -7,11 +7,13 @@
 #ifndef PokemonAutomation_PokemonSV_AutoStoryTools_H
 #define PokemonAutomation_PokemonSV_AutoStoryTools_H
 
-#include "Common/Cpp/DateTime.h"
-#include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
-#include "CommonFramework/Tools/StatsTracking.h"
+#include <functional>
 #include "CommonFramework/Language.h"
+#include "CommonFramework/ImageTools/ImageBoxes.h"
+#include "CommonFramework/Tools/StatsTracking.h"
+#include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 // #include "PokemonSV/Programs/PokemonSV_Navigation.h"
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
