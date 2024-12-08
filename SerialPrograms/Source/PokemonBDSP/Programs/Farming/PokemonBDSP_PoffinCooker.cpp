@@ -64,16 +64,16 @@ bool turn = true; // True to turn clockwise, false to turn counter-clockwise
 ImageFloatBox box(0.56, 0.724, 0.012, 0.024); // Create a box that contains both green and blue arrows that need to be detected
 
 void TurnClockwiseSlow(BotBaseContext& context){ // One turn of stiring poffin at slow speed (clockwise)
-    pbf_move_right_joystick(context, 128, 255, 4, 0);
-    pbf_move_right_joystick(context, 53, 231, 4, 0);
-    pbf_move_right_joystick(context, 6, 167, 4, 0);
-    pbf_move_right_joystick(context, 6, 88, 4, 0);
-    pbf_move_right_joystick(context, 53, 24, 4, 0);
-    pbf_move_right_joystick(context, 128, 0, 4, 0);
-    pbf_move_right_joystick(context, 202, 24, 4, 0);
-    pbf_move_right_joystick(context, 249, 88, 4, 0);
-    pbf_move_right_joystick(context, 249, 167, 4, 0);
-    pbf_move_right_joystick(context, 202, 231, 4, 0);  
+    pbf_move_right_joystick(context, 128, 255, 5, 0);
+    pbf_move_right_joystick(context, 53, 231, 5, 0);
+    pbf_move_right_joystick(context, 6, 167, 5, 0);
+    pbf_move_right_joystick(context, 6, 88, 5, 0);
+    pbf_move_right_joystick(context, 53, 24, 5, 0);
+    pbf_move_right_joystick(context, 128, 0, 5, 0);
+    pbf_move_right_joystick(context, 202, 24, 5, 0);
+    pbf_move_right_joystick(context, 249, 88, 5, 0);
+    pbf_move_right_joystick(context, 249, 167, 5, 0);
+    pbf_move_right_joystick(context, 202, 231, 5, 0);  
 }
 
 void TurnClockwiseFast(BotBaseContext& context){ // Same as above, but faster for the end of the cooking session
@@ -89,16 +89,16 @@ void TurnClockwiseFast(BotBaseContext& context){ // Same as above, but faster fo
 
 
 void TurnCounterClockwiseSlow(BotBaseContext& context){ // One turn of stiring poffin (counter-clockwise)
-    pbf_move_right_joystick(context, 128, 255, 4, 0);
-    pbf_move_right_joystick(context, 202, 231, 4, 0);
-    pbf_move_right_joystick(context, 249, 167, 4, 0);
-    pbf_move_right_joystick(context, 249, 88, 4, 0);
-    pbf_move_right_joystick(context, 202, 24, 4, 0);
-    pbf_move_right_joystick(context, 128, 0, 4, 0);
-    pbf_move_right_joystick(context, 53, 24, 4, 0);
-    pbf_move_right_joystick(context, 6, 88, 4, 0);
-    pbf_move_right_joystick(context, 6, 167, 4, 0);
-    pbf_move_right_joystick(context, 53, 231, 4, 0);
+    pbf_move_right_joystick(context, 128, 255, 5, 0);
+    pbf_move_right_joystick(context, 202, 231, 5, 0);
+    pbf_move_right_joystick(context, 249, 167, 5, 0);
+    pbf_move_right_joystick(context, 249, 88, 5, 0);
+    pbf_move_right_joystick(context, 202, 24, 5, 0);
+    pbf_move_right_joystick(context, 128, 0, 5, 0);
+    pbf_move_right_joystick(context, 53, 24, 5, 0);
+    pbf_move_right_joystick(context, 6, 88, 5, 0);
+    pbf_move_right_joystick(context, 6, 167, 5, 0);
+    pbf_move_right_joystick(context, 53, 231, 5, 0);
 }
 
 void TurnCounterClockwiseFast(BotBaseContext& context){ // Same as above, but faster for the end of the cooking session
@@ -146,17 +146,17 @@ void PoffinCooker::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         pbf_wait(context, 1050);
         context.wait_for_all_requests();
 
-        env.log("Stir slowly for the first half");
-        for (uint16_t d = 0; d < 85; d++){
+        env.log("Stir slowly for the first part");
+        for (uint16_t d = 0; d < 79; d++){
             // Capture the image on the screen
             VideoSnapshot screen = env.console.video().snapshot();
 
             // Get the stats of the screen's image
             ImageStats IMGstats = image_stats(extract_box_reference(screen, box));
-            if (IMGstats.average.g > 200 && IMGstats.average.r < 100) { // Looking for the green arrow
+            if (IMGstats.average.g > 170 && IMGstats.average.r < 125) { // Looking for the green arrow
                 turn = true;
             }
-            if (IMGstats.average.b > 200 && IMGstats.average.r < 100) { // Looking for the blue arrow
+            if (IMGstats.average.b > 170 && IMGstats.average.r < 125) { // Looking for the blue arrow
                 turn = false;
             }
             if (turn){
@@ -173,10 +173,10 @@ void PoffinCooker::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
 
             // Get the stats of the screen's image
             ImageStats IMGstats = image_stats(extract_box_reference(screen, box));
-            if (IMGstats.average.g > 200 && IMGstats.average.r < 100) { // Looking for the green arrow
+            if (IMGstats.average.g > 170 && IMGstats.average.r < 125) { // Looking for the green arrow
                 turn = true;
             }
-            if (IMGstats.average.b > 200 && IMGstats.average.r < 100) { // Looking for the blue arrow
+            if (IMGstats.average.b > 170 && IMGstats.average.r < 125) { // Looking for the blue arrow
                 turn = false;
             }
             if (turn){
