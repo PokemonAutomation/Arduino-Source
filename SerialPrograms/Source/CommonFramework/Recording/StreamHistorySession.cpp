@@ -38,7 +38,7 @@ struct StreamHistorySession::Data{
 
     Data(Logger& logger)
         : m_logger(logger)
-        , m_window(GlobalSettings::instance().STREAM_HISTORY.VIDEO_HISTORY_SECONDS)
+        , m_window(GlobalSettings::instance().STREAM_HISTORY.HISTORY_SECONDS)
         , m_audio_format(AudioChannelFormat::NONE)
     {}
 };
@@ -62,9 +62,8 @@ void StreamHistorySession::start(AudioChannelFormat format){
 
 class HistorySaverThread : public QThread{
 public:
-    HistorySaverThread(Logger& logger, StreamHistoryTracker& tracker, const std::string& filename)
-        : m_logger(logger)
-        , m_tracker(tracker)
+    HistorySaverThread(StreamHistoryTracker& tracker, const std::string& filename)
+        : m_tracker(tracker)
         , m_filename(filename)
     {
     }
@@ -84,7 +83,6 @@ public:
     }
 
 private:
-    Logger& m_logger;
     StreamHistoryTracker& m_tracker;
     const std::string& m_filename;
     bool m_success = false;
@@ -107,7 +105,7 @@ bool StreamHistorySession::save(const std::string& filename) const{
     }
 
 //    tracker->save(m_logger, filename);
-    HistorySaverThread saver(data.m_logger, *tracker, filename);
+    HistorySaverThread saver(*tracker, filename);
     return saver.save();
 }
 void StreamHistorySession::on_samples(const float* samples, size_t frames){

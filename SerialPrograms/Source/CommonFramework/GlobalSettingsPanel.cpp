@@ -59,22 +59,26 @@ StreamHistoryOption::StreamHistoryOption()
         IS_BETA_VERSION
     )
     , DESCRIPTION(
-        "Keep a record of this many seconds of video+audio. This will allow "
-        "video capture for unexpected events.<br>"
-        "<font color=\"orange\">Warning: The current implementation is inefficient "
-        "and may write a lot of data to disk. "
-        "This feature is still a work-in-progress."
+        "Keep a record of the recent video+audio streams. This will allow video capture "
+        "for unexpected events.<br><br>"
+        "<font color=\"orange\">Warning: This feature is computationally expensive and "
+        "will require a more powerful computer to run (especially for multi-Switch programs).<br>"
+        "Furthermore, the current implementation is inefficient as it will write a lot "
+        "of data to disk. This feature is still a work-in-progress."
         "</font>"
     )
-    , VIDEO_HISTORY_SECONDS(
-        "<b>Video History (seconds):</b><br>"
-        "Keep this many seconds of video feed for video capture and debugging purposes.",
+    , HISTORY_SECONDS(
+        "<b>History (seconds):</b><br>"
+        "Keep this many seconds of video and audio feed for video capture and debugging purposes.<br><br>"
+        "<font color=\"orange\">Do not set this too large as it will consume a lot of memory and may exceed the "
+        "attachment size limit for Discord notifications."
+        "</font>",
         LockMode::UNLOCK_WHILE_RUNNING,
         30
     )
 {
     PA_ADD_STATIC(DESCRIPTION);
-    PA_ADD_OPTION(VIDEO_HISTORY_SECONDS);
+    PA_ADD_OPTION(HISTORY_SECONDS);
 }
 
 
@@ -265,6 +269,11 @@ GlobalSettings::GlobalSettings()
     PA_ADD_OPTION(ALL_STATS);
     PA_ADD_OPTION(WINDOW_SIZE);
     PA_ADD_OPTION(THEME);
+#if (QT_VERSION_MAJOR == 6) && (QT_VERSION_MINOR >= 8)
+    PA_ADD_OPTION(STREAM_HISTORY);
+#else
+    STREAM_HISTORY.set_enabled(false);
+#endif
 #ifdef PA_ENABLE_SLEEP_SUPPRESS
     PA_ADD_OPTION(SLEEP_SUPPRESS);
 #endif
@@ -291,11 +300,6 @@ GlobalSettings::GlobalSettings()
     PA_ADD_OPTION(VIDEO_BACKEND);
 #if QT_VERSION_MAJOR == 5
     PA_ADD_OPTION(ENABLE_FRAME_SCREENSHOTS);
-#endif
-#if (QT_VERSION_MAJOR == 6) && (QT_VERSION_MINOR >= 8)
-    PA_ADD_OPTION(STREAM_HISTORY);
-#else
-    STREAM_HISTORY.set_enabled(false);
 #endif
 
     PA_ADD_OPTION(AUTO_RESET_AUDIO_SECONDS);
