@@ -18,6 +18,7 @@
 #include <QMediaRecorder>
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Concurrency/SpinPause.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/VideoPipeline/Backends/VideoFrameQt.h"
 #include "StreamRecorder.h"
 
@@ -153,8 +154,12 @@ void StreamRecording::internal_run(){
     session.setRecorder(&recorder);
     recorder.setMediaFormat(QMediaFormat::MPEG4);
 //    recorder.setQuality(QMediaRecorder::NormalQuality);
-    recorder.setQuality(QMediaRecorder::LowQuality);
+//    recorder.setQuality(QMediaRecorder::LowQuality);
 //    recorder.setQuality(QMediaRecorder::VeryLowQuality);
+
+    recorder.setVideoResolution(1280, 720);
+    recorder.setVideoBitRate(GlobalSettings::instance().STREAM_HISTORY.VIDEO_BITRATE * 1000);
+    recorder.setEncodingMode(QMediaRecorder::AverageBitRateEncoding);
 
 #ifdef PA_STREAM_HISTORY_LOCAL_BUFFER
     recorder.setOutputDevice(&m_write_buffer);
@@ -165,7 +170,8 @@ void StreamRecording::internal_run(){
     );
 #endif
 
-//    cout << "EncodingMode = " << (int)recorder.encodingMode() << endl;
+//    cout << "Encoding Mode = " << (int)recorder.encodingMode() << endl;
+//    cout << "Bit Rate = " << (int)recorder.videoBitRate() << endl;
 
     recorder.connect(
         &audio_input, &QAudioBufferInput::readyToSendAudioBuffer,

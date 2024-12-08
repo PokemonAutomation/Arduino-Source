@@ -13,12 +13,14 @@
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/FloatingPointOption.h"
 #include "Common/Cpp/Options/StringOption.h"
+#include "CommonFramework/Options/ResolutionOption.h"
 #include "CommonFramework/Options/Environment/ProcessPriorityOption.h"
 #include "CommonFramework/Options/Environment/ProcessorLevelOption.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "CommonFramework/Options/Environment/SleepSuppressOption.h"
 #include "CommonFramework/ErrorReports/ErrorReports.h"
 #include "CommonFramework/VideoPipeline/Backends/CameraImplementations.h"
+#include "CommonFramework/Recording/StreamHistoryOption.h"
 #include "CommonFramework/Panels/SettingsPanel.h"
 #include "CommonFramework/Panels/PanelTools.h"
 #include "Integrations/DiscordSettingsOption.h"
@@ -32,28 +34,10 @@ namespace PokemonAutomation{
 
 
 
-class ResolutionOption : public GroupOption{
-public:
-    ResolutionOption(
-        std::string label, std::string description,
-        int default_width, int default_height
-    );
-
-    StaticTextOption DESCRIPTION;
-    SimpleIntegerOption<uint32_t> WIDTH;
-    SimpleIntegerOption<uint32_t> HEIGHT;
-};
 struct DebugSettings{
     bool COLOR_CHECK = false;
     bool IMAGE_TEMPLATE_MATCHING = false;
     bool IMAGE_DICTIONARY_MATCHING = false;
-};
-class StreamHistoryOption : public GroupOption{
-public:
-    StreamHistoryOption();
-
-    StaticTextOption DESCRIPTION;
-    SimpleIntegerOption<uint16_t> HISTORY_SECONDS;
 };
 
 
@@ -92,8 +76,8 @@ public:
     StringOption STATS_FILE;
     BooleanCheckBoxOption ALL_STATS;
 
-    ResolutionOption WINDOW_SIZE;
     ThemeSelectorOption THEME;
+    ResolutionOption WINDOW_SIZE;
 
     StreamHistoryOption STREAM_HISTORY;
     SleepSuppressOptions SLEEP_SUPPRESS;

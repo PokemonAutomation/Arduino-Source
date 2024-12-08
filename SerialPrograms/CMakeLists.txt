@@ -471,6 +471,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Options/LabelCellOption.h
     Source/CommonFramework/Options/LanguageOCROption.cpp
     Source/CommonFramework/Options/LanguageOCROption.h
+    Source/CommonFramework/Options/ResolutionOption.cpp
+    Source/CommonFramework/Options/ResolutionOption.h
     Source/CommonFramework/Options/ScreenWatchOption.cpp
     Source/CommonFramework/Options/ScreenWatchOption.h
     Source/CommonFramework/Options/ScreenshotFormatOption.h
@@ -509,6 +511,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/PersistentSettings.h
     Source/CommonFramework/ProgramSession.cpp
     Source/CommonFramework/ProgramSession.h
+    Source/CommonFramework/Recording/StreamHistoryOption.cpp
+    Source/CommonFramework/Recording/StreamHistoryOption.h
     Source/CommonFramework/Recording/StreamHistorySession.cpp
     Source/CommonFramework/Recording/StreamHistorySession.h
     Source/CommonFramework/Recording/StreamHistoryTracker_Null.h

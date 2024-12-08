@@ -13,7 +13,6 @@
 #include "Common/Cpp/Json/JsonObject.h"
 #include "CommonFramework/Globals.h"
 //#include "CommonFramework/Environment/Environment.h"
-#include "CommonFramework/Windows/DpiScaler.h"
 #include "GlobalSettingsPanel.h"
 
 // #include <iostream>
@@ -36,50 +35,6 @@ const std::set<std::string> TOKENS{
 };
 
 
-
-ResolutionOption::ResolutionOption(
-    std::string label, std::string description,
-    int default_width, int default_height
-)
-    : GroupOption(std::move(label), LockMode::LOCK_WHILE_RUNNING)
-    , DESCRIPTION(std::move(description))
-    , WIDTH("<b>Width:</b>", LockMode::LOCK_WHILE_RUNNING, scale_dpi_width(default_width))
-    , HEIGHT("<b>Height:</b>", LockMode::LOCK_WHILE_RUNNING, scale_dpi_height(default_height))
-{
-    PA_ADD_STATIC(DESCRIPTION);
-    PA_ADD_OPTION(WIDTH);
-    PA_ADD_OPTION(HEIGHT);
-}
-
-StreamHistoryOption::StreamHistoryOption()
-    : GroupOption(
-        "Stream History",
-        LockMode::LOCK_WHILE_RUNNING,
-        true,
-        IS_BETA_VERSION
-    )
-    , DESCRIPTION(
-        "Keep a record of the recent video+audio streams. This will allow video capture "
-        "for unexpected events.<br><br>"
-        "<font color=\"orange\">Warning: This feature is computationally expensive and "
-        "will require a more powerful computer to run (especially for multi-Switch programs).<br>"
-        "Furthermore, the current implementation is inefficient as it will write a lot "
-        "of data to disk. This feature is still a work-in-progress."
-        "</font>"
-    )
-    , HISTORY_SECONDS(
-        "<b>History (seconds):</b><br>"
-        "Keep this many seconds of video and audio feed for video capture and debugging purposes.<br><br>"
-        "<font color=\"orange\">Do not set this too large as it will consume a lot of memory and may exceed the "
-        "attachment size limit for Discord notifications."
-        "</font>",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        30
-    )
-{
-    PA_ADD_STATIC(DESCRIPTION);
-    PA_ADD_OPTION(HISTORY_SECONDS);
-}
 
 
 
@@ -267,8 +222,8 @@ GlobalSettings::GlobalSettings()
     PA_ADD_OPTION(CHECK_FOR_UPDATES);
     PA_ADD_OPTION(STATS_FILE);
     PA_ADD_OPTION(ALL_STATS);
-    PA_ADD_OPTION(WINDOW_SIZE);
     PA_ADD_OPTION(THEME);
+    PA_ADD_OPTION(WINDOW_SIZE);
 #if (QT_VERSION_MAJOR == 6) && (QT_VERSION_MINOR >= 8)
     PA_ADD_OPTION(STREAM_HISTORY);
 #else
