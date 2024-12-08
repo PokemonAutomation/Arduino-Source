@@ -254,6 +254,7 @@ SOURCES += \
     Source/CommonFramework/Options/Environment/ThemeSelectorOption.cpp \
     Source/CommonFramework/Options/LabelCellOption.cpp \
     Source/CommonFramework/Options/LanguageOCROption.cpp \
+    Source/CommonFramework/Options/ResolutionOption.cpp \
     Source/CommonFramework/Options/ScreenWatchOption.cpp \
     Source/CommonFramework/Options/StringSelectOption.cpp \
     Source/CommonFramework/Options/UI/LabelCellWidget.cpp \
@@ -271,6 +272,7 @@ SOURCES += \
     Source/CommonFramework/Panels/UI/SettingsPanelWidget.cpp \
     Source/CommonFramework/PersistentSettings.cpp \
     Source/CommonFramework/ProgramSession.cpp \
+    Source/CommonFramework/Recording/StreamHistoryOption.cpp \
     Source/CommonFramework/Recording/StreamHistorySession.cpp \
     Source/CommonFramework/Recording/StreamRecorder.cpp \
     Source/CommonFramework/Resources/SpriteDatabase.cpp \
@@ -1344,6 +1346,7 @@ HEADERS += \
     Source/CommonFramework/Options/Environment/SleepSuppressOption.h \
     Source/CommonFramework/Options/LabelCellOption.h \
     Source/CommonFramework/Options/LanguageOCROption.h \
+    Source/CommonFramework/Options/ResolutionOption.h \
     Source/CommonFramework/Options/ScreenWatchOption.h \
     Source/CommonFramework/Options/ScreenshotFormatOption.h \
     Source/CommonFramework/Options/StringSelectOption.h \
@@ -1363,6 +1366,7 @@ HEADERS += \
     Source/CommonFramework/Panels/UI/SettingsPanelWidget.h \
     Source/CommonFramework/PersistentSettings.h \
     Source/CommonFramework/ProgramSession.h \
+    Source/CommonFramework/Recording/StreamHistoryOption.h \
     Source/CommonFramework/Recording/StreamHistorySession.h \
     Source/CommonFramework/Recording/StreamHistoryTracker_RecordOnTheFly.h \
     Source/CommonFramework/Recording/StreamHistoryTracker_SaveFrames.h \
