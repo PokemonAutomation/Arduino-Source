@@ -512,8 +512,11 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Recording/StreamHistorySession.cpp
     Source/CommonFramework/Recording/StreamHistorySession.h
     Source/CommonFramework/Recording/StreamHistoryTracker_Null.h
+    Source/CommonFramework/Recording/StreamHistoryTracker_ParallelStreams.h
     Source/CommonFramework/Recording/StreamHistoryTracker_RecordOnTheFly.h
     Source/CommonFramework/Recording/StreamHistoryTracker_SaveFrames.h
+    Source/CommonFramework/Recording/StreamRecorder.cpp
+    Source/CommonFramework/Recording/StreamRecorder.h
     Source/CommonFramework/Resources/SpriteDatabase.cpp
     Source/CommonFramework/Resources/SpriteDatabase.h
     Source/CommonFramework/SetupSettings.cpp

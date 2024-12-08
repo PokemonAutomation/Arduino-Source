@@ -52,11 +52,18 @@ ResolutionOption::ResolutionOption(
 }
 
 StreamHistoryOption::StreamHistoryOption()
-    : GroupOption("Stream History", LockMode::LOCK_WHILE_RUNNING, true, false)
+    : GroupOption(
+        "Stream History",
+        LockMode::LOCK_WHILE_RUNNING,
+        true,
+        IS_BETA_VERSION
+    )
     , DESCRIPTION(
-        "Keep a record of this many seconds of video+audio. This will allow video capture for unexpected events.<br>"
-        "<font color=\"red\">Warning (Developer Only): The current implementation is inefficient and requires "
-        "10 GB of ram to store just 30 seconds of video. This feature is still a work-in-progress."
+        "Keep a record of this many seconds of video+audio. This will allow "
+        "video capture for unexpected events.<br>"
+        "<font color=\"orange\">Warning: The current implementation is inefficient "
+        "and may write a lot of data to disk. "
+        "This feature is still a work-in-progress."
         "</font>"
     )
     , VIDEO_HISTORY_SECONDS(
@@ -285,10 +292,10 @@ GlobalSettings::GlobalSettings()
 #if QT_VERSION_MAJOR == 5
     PA_ADD_OPTION(ENABLE_FRAME_SCREENSHOTS);
 #endif
-#if QT_VERSION_MAJOR >= 6
-    if (PreloadSettings::instance().DEVELOPER_MODE){
-        PA_ADD_OPTION(STREAM_HISTORY);
-    }
+#if (QT_VERSION_MAJOR == 6) && (QT_VERSION_MINOR >= 8)
+    PA_ADD_OPTION(STREAM_HISTORY);
+#else
+    STREAM_HISTORY.set_enabled(false);
 #endif
 
     PA_ADD_OPTION(AUTO_RESET_AUDIO_SECONDS);

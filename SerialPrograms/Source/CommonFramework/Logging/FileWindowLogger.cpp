@@ -7,7 +7,7 @@
 #include <QCoreApplication>
 #include <QMenuBar>
 #include <QDir>
-#include <CommonFramework/Globals.h>
+#include "CommonFramework/Globals.h"
 #include "CommonFramework/Windows/DpiScaler.h"
 #include "CommonFramework/Windows/WindowTracker.h"
 #include "FileWindowLogger.h"
@@ -46,7 +46,7 @@ FileWindowLogger::~FileWindowLogger(){
 }
 FileWindowLogger::FileWindowLogger(const std::string& path)
     : m_file(QString::fromStdString(path))
-    , m_max_queue_size(10000)
+    , m_max_queue_size(LOG_HISTORY_LINES)
     , m_stopping(false)
     , m_thread(&FileWindowLogger::thread_loop, this)
 {

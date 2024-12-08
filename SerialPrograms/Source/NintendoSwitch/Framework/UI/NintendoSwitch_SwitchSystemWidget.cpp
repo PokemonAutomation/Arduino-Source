@@ -151,6 +151,16 @@ SwitchSystemWidget::SwitchSystemWidget(
             });
         }
     );
+    connect(
+        m_command, &CommandRow::video_requested,
+        m_video_display, [this](){
+            global_dispatcher.dispatch([this]{
+                std::string filename = SCREENSHOTS_PATH() + "video-" + now_to_filestring() + ".mp4";
+                m_session.logger().log("Saving screenshot to: " + filename, COLOR_PURPLE);
+                m_session.save_history(filename);
+            });
+        }
+    );
 }
 
 

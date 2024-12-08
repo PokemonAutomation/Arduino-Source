@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_AudioPipeline_AudioSourceReader_H
 #define PokemonAutomation_AudioPipeline_AudioSourceReader_H
 
+#include "Common/Cpp/Time.h"
 #include "Common/Cpp/StreamConverters.h"
 #include "Common/Cpp/Containers/AlignedVector.h"
 #include "AudioInfo.h"

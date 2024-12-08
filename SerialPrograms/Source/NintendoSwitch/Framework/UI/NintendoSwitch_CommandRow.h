@@ -39,6 +39,7 @@ signals:
     void load_profile();
     void save_profile();
     void screenshot_requested();
+    void video_requested();
 
 public:
     void set_focus(bool focused);
@@ -66,6 +67,7 @@ private:
     QPushButton* m_load_profile_button;
     QPushButton* m_save_profile_button;
     QPushButton* m_screenshot_button;
+    QPushButton* m_video_button;
     bool m_last_known_focus;
 };
 

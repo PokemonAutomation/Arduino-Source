@@ -5,6 +5,7 @@
  */
 
 #include <QHBoxLayout>
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "CommonFramework/VideoPipeline/UI/VideoOverlayWidget.h"
 #include "NintendoSwitch_CommandRow.h"
@@ -103,6 +104,17 @@ CommandRow::CommandRow(
         m_screenshot_button, &QPushButton::clicked,
         this, [this](bool){ emit screenshot_requested(); }
     );
+
+#if (QT_VERSION_MAJOR == 6) && (QT_VERSION_MINOR >= 8)
+    if (GlobalSettings::instance().STREAM_HISTORY.enabled()){
+        m_video_button = new QPushButton("Video Capture", this);
+        command_row->addWidget(m_video_button, 2);
+        connect(
+            m_video_button, &QPushButton::clicked,
+            this, [this](bool){ emit video_requested(); }
+        );
+    }
+#endif
 
     m_session.add_listener(*this);
 }

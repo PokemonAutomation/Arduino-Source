@@ -57,7 +57,7 @@ ErrorReportOption::ErrorReportOption()
         true
     )
     , VIDEO(
-        "<b>Include Video:</b><br>Include a video leading up to the error. (if possible)",
+        "<b>Include Video:</b><br>Include a video leading up to the error. (if available)",
         LockMode::UNLOCK_WHILE_RUNNING,
         true
     )
@@ -80,9 +80,7 @@ ErrorReportOption::ErrorReportOption()
     PA_ADD_STATIC(DESCRIPTION);
     PA_ADD_OPTION(SEND_MODE);
     PA_ADD_OPTION(SCREENSHOT);
-    if (PreloadSettings::instance().DEVELOPER_MODE){
-        PA_ADD_OPTION(VIDEO);
-    }
+    PA_ADD_OPTION(VIDEO);
     PA_ADD_OPTION(LOGS);
     PA_ADD_OPTION(DUMPS);
     if (PreloadSettings::instance().DEVELOPER_MODE){
@@ -179,7 +177,7 @@ SendableErrorReport::SendableErrorReport(std::string directory)
         const std::string* image_name = obj.get_string("Screenshot");
         if (image_name){
             try{
-                m_image_owner = ImageRGB32(*image_name);
+                m_image_owner = ImageRGB32(m_directory + *image_name);
                 m_image = m_image_owner;
             }catch (FileException&){}
         }
@@ -238,9 +236,8 @@ void SendableErrorReport::save(Logger* logger) const{
         report["Messages"] = std::move(messages);
     }
     if (m_image){
-        std::string image_name = m_directory + "Screenshot.png";
-        if (m_image.save(image_name)){
-            report["Screenshot"] = std::move(image_name);
+        if (m_image.save(m_directory + "Screenshot.png")){
+            report["Screenshot"] = "Screenshot.png";
         }
     }
     if (!m_video_name.empty()){

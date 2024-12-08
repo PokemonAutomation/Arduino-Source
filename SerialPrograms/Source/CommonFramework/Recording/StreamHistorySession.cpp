@@ -11,8 +11,9 @@
 #include "CommonFramework/VideoPipeline/Backends/VideoFrameQt.h"
 
 #if (QT_VERSION_MAJOR == 6) && (QT_VERSION_MINOR >= 8)
-#include "StreamHistoryTracker_SaveFrames.h"
+//#include "StreamHistoryTracker_SaveFrames.h"
 //#include "StreamHistoryTracker_RecordOnTheFly.h"
+#include "StreamHistoryTracker_ParallelStreams.h"
 #else
 #include "StreamHistoryTracker_Null.h"
 #endif
@@ -61,7 +62,7 @@ void StreamHistorySession::start(AudioChannelFormat format){
 
 class HistorySaverThread : public QThread{
 public:
-    HistorySaverThread(Logger& logger, const StreamHistoryTracker& tracker, const std::string& filename)
+    HistorySaverThread(Logger& logger, StreamHistoryTracker& tracker, const std::string& filename)
         : m_logger(logger)
         , m_tracker(tracker)
         , m_filename(filename)
@@ -78,12 +79,13 @@ public:
         return m_success;
     }
     virtual void run() override{
-        m_success = m_tracker.save(m_logger, m_filename);
+//        m_success = m_tracker.save(m_logger, m_filename);
+        m_success = m_tracker.save(m_filename);
     }
 
 private:
     Logger& m_logger;
-    const StreamHistoryTracker& m_tracker;
+    StreamHistoryTracker& m_tracker;
     const std::string& m_filename;
     bool m_success = false;
 };
@@ -143,19 +145,19 @@ void StreamHistorySession::initialize(){
     switch (data.m_audio_format){
     case AudioChannelFormat::NONE:
         expected_samples_per_frame = 0;
-        data.m_current.reset(new StreamHistoryTracker(0, 0, data.m_window));
+        data.m_current.reset(new StreamHistoryTracker(data.m_logger, 0, 0, data.m_window));
         return;
     case AudioChannelFormat::MONO_48000:
-        data.m_current.reset(new StreamHistoryTracker(1, 48000, data.m_window));
+        data.m_current.reset(new StreamHistoryTracker(data.m_logger, 1, 48000, data.m_window));
         return;
     case AudioChannelFormat::DUAL_44100:
-        data.m_current.reset(new StreamHistoryTracker(1, 44100, data.m_window));
+        data.m_current.reset(new StreamHistoryTracker(data.m_logger, 1, 44100, data.m_window));
         return;
     case AudioChannelFormat::DUAL_48000:
     case AudioChannelFormat::MONO_96000:
     case AudioChannelFormat::INTERLEAVE_LR_96000:
     case AudioChannelFormat::INTERLEAVE_RL_96000:
-        data.m_current.reset(new StreamHistoryTracker(2, 48000, data.m_window));
+        data.m_current.reset(new StreamHistoryTracker(data.m_logger, 2, 48000, data.m_window));
         return;
     default:
         throw InternalProgramError(

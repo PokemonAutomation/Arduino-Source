@@ -19,14 +19,17 @@ namespace PokemonAutomation{
 class StreamHistoryTracker{
 public:
     StreamHistoryTracker(
+        Logger& logger,
         size_t audio_samples_per_frame,
         size_t audio_frames_per_second,
         std::chrono::seconds window
-    ){}
+    )
+        : m_logger(logger)
+    {}
     void set_window(std::chrono::seconds window){}
 
-    bool save(Logger& logger, const std::string& filename) const{
-        logger.log("Cannot save stream history: Not implemented.", COLOR_RED);
+    bool save(const std::string& filename) const{
+        m_logger.log("Cannot save stream history: Not implemented.", COLOR_RED);
         return false;
     }
 
@@ -35,6 +38,7 @@ public:
     void on_frame(std::shared_ptr<VideoFrame> frame){}
 
 private:
+    Logger& m_logger;
 };
 
 

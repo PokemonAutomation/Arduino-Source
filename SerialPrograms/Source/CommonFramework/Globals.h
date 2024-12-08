@@ -33,6 +33,8 @@ extern const std::string COMPILER_VERSION;
 
 const auto SERIAL_REFRESH_RATE = std::chrono::milliseconds(1000);
 
+extern const size_t LOG_HISTORY_LINES;
+
 // Folder path (end with "/") to hold program setting files.
 const std::string& SETTINGS_PATH();
 
