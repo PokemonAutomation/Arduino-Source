@@ -51,6 +51,7 @@ public:
         std::shared_ptr<const ImageRGB32> screenshot
     );
 
+    virtual Color color() const override{ return COLOR_GREEN; }
 
 public:
     virtual void log(Logger& logger) const override;

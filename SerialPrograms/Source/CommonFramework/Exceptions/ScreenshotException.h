@@ -69,6 +69,7 @@ public:
     virtual std::string message() const override{ return m_message; }
     ImageViewRGB32 screenshot() const;
 
+    virtual Color color() const{ return COLOR_RED; }
     virtual void send_notification(ProgramEnvironment& env, EventNotificationOption& notification) const;
 
 public:
