@@ -139,7 +139,7 @@ private:
                 std::piecewise_construct,
                 std::forward_as_tuple(start_time),
                 std::forward_as_tuple(new StreamRecording(
-                    m_logger, std::chrono::seconds(1),
+                    m_logger, std::chrono::milliseconds(500),
                     m_audio_samples_per_frame,
                     m_audio_frames_per_second,
                     start_time
