@@ -178,7 +178,6 @@ GlobalSettings::GlobalSettings()
     PA_ADD_OPTION(CHECK_FOR_UPDATES);
     PA_ADD_OPTION(STATS_FILE);
     PA_ADD_OPTION(TEMP_FOLDER);
-    PA_ADD_OPTION(ALL_STATS);
     PA_ADD_OPTION(THEME);
     PA_ADD_OPTION(WINDOW_SIZE);
 #if (QT_VERSION_MAJOR == 6) && (QT_VERSION_MINOR >= 8)
@@ -191,6 +190,7 @@ GlobalSettings::GlobalSettings()
 #endif
 
     PA_ADD_STATIC(m_discord_settings);
+    PA_ADD_OPTION(ALL_STATS);
     PA_ADD_OPTION(DISCORD);
 
     PA_ADD_STATIC(m_advanced_options);

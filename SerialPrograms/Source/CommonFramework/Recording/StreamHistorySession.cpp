@@ -48,6 +48,7 @@ struct StreamHistorySession::Data{
 
 
 
+StreamHistorySession::~StreamHistorySession() = default;
 StreamHistorySession::StreamHistorySession(Logger& logger)
     : AudioFloatStreamListener(1)
     , m_data(CONSTRUCT_TOKEN, logger)

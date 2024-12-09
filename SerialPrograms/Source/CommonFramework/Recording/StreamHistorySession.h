@@ -24,6 +24,7 @@ class StreamHistorySession
     , public CameraSession::StateListener
 {
 public:
+    ~StreamHistorySession();
     StreamHistorySession(Logger& logger);
     void start(AudioChannelFormat format);
     bool save(const std::string& filename) const;

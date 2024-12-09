@@ -100,6 +100,7 @@ SendableErrorReport::SendableErrorReport()
         ? PROGRAM_NAME + " (" + PROGRAM_VERSION + "-dev)"
         : PROGRAM_NAME + " (" + PROGRAM_VERSION + ")"
     )
+    , m_program_runtime_millis(0)
 {
     QDir().mkpath(QString::fromStdString(m_directory));
 }
