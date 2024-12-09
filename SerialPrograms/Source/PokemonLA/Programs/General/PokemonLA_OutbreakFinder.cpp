@@ -4,6 +4,7 @@
  *
  */
 
+#include <iterator>
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
