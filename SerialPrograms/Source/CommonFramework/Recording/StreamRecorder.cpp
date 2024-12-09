@@ -45,7 +45,7 @@ StreamRecording::StreamRecording(
     , m_buffer_limit(buffer_limit)
     , m_audio_samples_per_frame(audio_samples_per_frame)
     , m_start_time(start_time)
-    , m_filename("TempFiles/" + now_to_filestring() + ".mp4")
+    , m_filename(GlobalSettings::instance().TEMP_FOLDER)
     , m_state(State::STARTING)
     , m_last_drop(current_time())
 {
@@ -55,8 +55,10 @@ StreamRecording::StreamRecording(
     m_audio_format.setSampleFormat(QAudioFormat::Float);
 
 #ifndef PA_STREAM_HISTORY_LOCAL_BUFFER
-    QDir().mkdir("TempFiles");
+    QDir().mkdir(QString::fromStdString(m_filename));
 #endif
+    m_filename += now_to_filestring() + ".mp4";
+
     start();
 }
 StreamRecording::~StreamRecording(){

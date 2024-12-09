@@ -96,10 +96,12 @@ GlobalSettings::GlobalSettings()
         "UserSettings/PA-Stats.txt",
         "UserSettings/PA-Stats.txt"
     )
-    , ALL_STATS(
-        "<b>All Stats:</b><br>Include all-time stats for notifications.",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        true
+    , TEMP_FOLDER(
+        false,
+        "<b>Temp Folder:</b><br>Place temporary files in this directory.",
+        LockMode::LOCK_WHILE_RUNNING,
+        "TempFiles/",
+        "TempFiles/"
     )
     , WINDOW_SIZE(
         "Window Size:",
@@ -113,6 +115,11 @@ GlobalSettings::GlobalSettings()
             ONLINE_DOC_URL + "ComputerControl/blob/master/Wiki/Software/DiscordIntegration.md",
             "online documentation"
         ) + ")</font>"
+    )
+    , ALL_STATS(
+        "<b>All Stats:</b><br>Include all-time stats for notifications.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        true
     )
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
@@ -221,6 +228,7 @@ GlobalSettings::GlobalSettings()
 {
     PA_ADD_OPTION(CHECK_FOR_UPDATES);
     PA_ADD_OPTION(STATS_FILE);
+    PA_ADD_OPTION(TEMP_FOLDER);
     PA_ADD_OPTION(ALL_STATS);
     PA_ADD_OPTION(THEME);
     PA_ADD_OPTION(WINDOW_SIZE);

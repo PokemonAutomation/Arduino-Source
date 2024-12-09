@@ -38,6 +38,9 @@ public:
 
     virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
 
+protected:
+    virtual void sanitize(std::string& str){}
+
 private:
     struct Data;
     Pimpl<Data> m_data;

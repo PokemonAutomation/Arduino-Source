@@ -71,6 +71,7 @@ StringCell::operator std::string() const{
     return m_data->m_current;
 }
 void StringCell::set(std::string x){
+    sanitize(x);
     {
         WriteSpinLock lg(m_data->m_lock);
         if (m_data->m_current == x){

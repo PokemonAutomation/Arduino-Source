@@ -33,6 +33,17 @@ namespace PokemonAutomation{
 
 
 
+class FolderInputOption : public StringOption{
+public:
+    using StringOption::StringOption;
+
+    virtual void sanitize(std::string& str) override{
+        if (!str.empty() && str.back() != '/'){
+            str += '/';
+        }
+    }
+};
+
 
 struct DebugSettings{
     bool COLOR_CHECK = false;
@@ -74,7 +85,7 @@ public:
     BooleanCheckBoxOption CHECK_FOR_UPDATES;
 
     StringOption STATS_FILE;
-    BooleanCheckBoxOption ALL_STATS;
+    FolderInputOption TEMP_FOLDER;
 
     ThemeSelectorOption THEME;
     ResolutionOption WINDOW_SIZE;
@@ -83,6 +94,7 @@ public:
     SleepSuppressOptions SLEEP_SUPPRESS;
 
     SectionDividerOption m_discord_settings;
+    BooleanCheckBoxOption ALL_STATS;
     Integration::DiscordSettingsOption DISCORD;
 
     SectionDividerOption m_advanced_options;
