@@ -33,6 +33,7 @@ struct GroupOption::Data{
         : m_label(std::move(label))
         , m_enable_mode(enable_mode)
         , m_show_restore_defaults_button(show_restore_defaults_button)
+        , m_enabled(enable_mode != EnableMode::DEFAULT_DISABLED)
     {}
 };
 
