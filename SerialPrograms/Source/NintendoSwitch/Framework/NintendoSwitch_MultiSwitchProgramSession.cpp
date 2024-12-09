@@ -9,9 +9,10 @@
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/Options/Environment/SleepSuppressOption.h"
+#include "CommonFramework/Options/Environment/PerformanceOptions.h"
 #include "CommonFramework/Tools/BlackBorderCheck.h"
 #include "NintendoSwitch_MultiSwitchProgramOption.h"
 #include "NintendoSwitch_MultiSwitchProgramSession.h"
@@ -118,10 +119,10 @@ void MultiSwitchProgramSession::internal_stop_program(){
     }
 }
 void MultiSwitchProgramSession::internal_run_program(){
-    GlobalSettings::instance().REALTIME_THREAD_PRIORITY0.set_on_this_thread();
+    GlobalSettings::instance().PERFORMANCE->REALTIME_THREAD_PRIORITY.set_on_this_thread();
     m_option.options().reset_state();
 
-    SleepSuppressScope sleep_scope(GlobalSettings::instance().SLEEP_SUPPRESS.PROGRAM_RUNNING);
+    SleepSuppressScope sleep_scope(GlobalSettings::instance().SLEEP_SUPPRESS->PROGRAM_RUNNING);
 
     //  Lock the system to prevent the # of Switches from changing.
     std::lock_guard<MultiSwitchSystemSession> lg(m_system);

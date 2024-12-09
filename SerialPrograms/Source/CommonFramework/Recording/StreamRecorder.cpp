@@ -20,6 +20,7 @@
 #include "Common/Cpp/Concurrency/SpinPause.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/VideoPipeline/Backends/VideoFrameQt.h"
+#include "CommonFramework/Recording/StreamHistoryOption.h"
 #include "StreamRecorder.h"
 
 
@@ -159,7 +160,9 @@ void StreamRecording::internal_run(){
 //    recorder.setQuality(QMediaRecorder::LowQuality);
 //    recorder.setQuality(QMediaRecorder::VeryLowQuality);
 
-    switch (GlobalSettings::instance().STREAM_HISTORY.RESOLUTION){
+    const StreamHistoryOption& settings = GlobalSettings::instance().STREAM_HISTORY;
+
+    switch (settings.RESOLUTION){
     case StreamHistoryOption::Resolution::MATCH_INPUT:
         break;
     case StreamHistoryOption::Resolution::FORCE_720p:
@@ -170,9 +173,9 @@ void StreamRecording::internal_run(){
         break;
     }
 
-    switch (GlobalSettings::instance().STREAM_HISTORY.ENCODING_MODE){
+    switch (settings.ENCODING_MODE){
     case StreamHistoryOption::EncodingMode::FIXED_QUALITY:
-        switch (GlobalSettings::instance().STREAM_HISTORY.VIDEO_QUALITY){
+        switch (settings.VIDEO_QUALITY){
         case StreamHistoryOption::VideoQuality::VERY_LOW:
             recorder.setQuality(QMediaRecorder::VeryLowQuality);
             break;
@@ -191,7 +194,7 @@ void StreamRecording::internal_run(){
         }
         break;
     case StreamHistoryOption::EncodingMode::FIXED_BITRATE:
-        recorder.setVideoBitRate(GlobalSettings::instance().STREAM_HISTORY.VIDEO_BITRATE * 1000);
+        recorder.setVideoBitRate(settings.VIDEO_BITRATE * 1000);
         recorder.setEncodingMode(QMediaRecorder::AverageBitRateEncoding);
         break;
     }

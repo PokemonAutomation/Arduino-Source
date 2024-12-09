@@ -8,6 +8,7 @@
 #include "CommonFramework/GlobalServices.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "Backends/AudioPassthroughPairQtThread.h"
+#include "AudioPipelineOptions.h"
 #include "AudioSession.h"
 
 //#include <iostream>
@@ -52,7 +53,7 @@ AudioSession::AudioSession(Logger& logger, AudioOption& option)
     AudioSession::reset();
     m_devices->add_listener(*this);
 
-    uint8_t watchdog_timeout = GlobalSettings::instance().AUTO_RESET_AUDIO_SECONDS;
+    uint8_t watchdog_timeout = GlobalSettings::instance().AUDIO_PIPELINE->AUTO_RESET_SECONDS;
     if (watchdog_timeout != 0){
         global_watchdog().add(*this, std::chrono::seconds(watchdog_timeout));
     }
@@ -292,7 +293,7 @@ void AudioSession::on_watchdog_timeout(){
         return;
     }
 
-    uint8_t watchdog_timeout = GlobalSettings::instance().AUTO_RESET_AUDIO_SECONDS;
+    uint8_t watchdog_timeout = GlobalSettings::instance().AUDIO_PIPELINE->AUTO_RESET_SECONDS;
     m_logger.log("No audio detected for " + std::to_string(watchdog_timeout) + " seconds...", COLOR_RED);
 
     if (watchdog_timeout == 0){

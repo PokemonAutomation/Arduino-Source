@@ -278,8 +278,8 @@ bool move_then_recover_sandwich_hand_position(
 ){
 
     console.log("center the cursor: move towards bottom right, then left slightly.");
-    int num_ticks_to_move_1 = TICKS_PER_SECOND*4;
-    int num_ticks_to_move_2 = 100;
+    uint16_t num_ticks_to_move_1 = TICKS_PER_SECOND*4;
+    uint16_t num_ticks_to_move_2 = 100;
 
     // center the cursor
     if(SandwichHandType::FREE == hand_type){
@@ -292,10 +292,10 @@ bool move_then_recover_sandwich_hand_position(
     else if(SandwichHandType::GRABBING == hand_type){
         // center the cursor while holding the A button, so you don't drop the ingredient.
 
-        int num_ticks_to_move_total = num_ticks_to_move_1 + num_ticks_to_move_2;
-        int num_ticks_to_wait = num_ticks_to_move_total + TICKS_PER_SECOND; // add one extra second of waiting
-        int num_miliseconds_to_wait = (num_ticks_to_wait*1000)/TICKS_PER_SECOND;
-        int num_ticks_to_hold_A = num_ticks_to_wait + TICKS_PER_SECOND*10; // hold A for extra 10 seconds
+        uint16_t num_ticks_to_move_total = num_ticks_to_move_1 + num_ticks_to_move_2;
+        uint16_t num_ticks_to_wait = num_ticks_to_move_total + TICKS_PER_SECOND; // add one extra second of waiting
+        uint16_t num_miliseconds_to_wait = (num_ticks_to_wait*1000)/TICKS_PER_SECOND;
+        uint16_t num_ticks_to_hold_A = num_ticks_to_wait + TICKS_PER_SECOND*10; // hold A for extra 10 seconds
         // the A button hold will be overwritten on the next move_session.dispatch, in the main function
         
         move_session.dispatch([&](BotBaseContext& context){

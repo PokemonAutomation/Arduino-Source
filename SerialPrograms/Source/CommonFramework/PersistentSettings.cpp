@@ -11,6 +11,7 @@
 #include "Common/Cpp/Json/JsonObject.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/Options/Environment/PerformanceOptions.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_VirtualControllerMapping.h"
 #include "PersistentSettings.h"
 
@@ -64,7 +65,7 @@ void PersistentSettings::read(){
     }
 
 //    GlobalSettings::instance().PROCESS_PRIORITY0.update_priority_to_option();
-    GlobalSettings::instance().REALTIME_THREAD_PRIORITY0.set_on_this_thread();
+    GlobalSettings::instance().PERFORMANCE->REALTIME_THREAD_PRIORITY.set_on_this_thread();
 
     {
         const JsonArray* array = obj->get_array("50-SwitchKeyboardMapping");

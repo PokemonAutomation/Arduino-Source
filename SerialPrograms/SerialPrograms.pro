@@ -1221,6 +1221,7 @@ HEADERS += \
     Source/CommonFramework/AudioPipeline/AudioInfo.h \
     Source/CommonFramework/AudioPipeline/AudioOption.h \
     Source/CommonFramework/AudioPipeline/AudioPassthroughPair.h \
+    Source/CommonFramework/AudioPipeline/AudioPipelineOptions.h \
     Source/CommonFramework/AudioPipeline/AudioSession.h \
     Source/CommonFramework/AudioPipeline/AudioStream.h \
     Source/CommonFramework/AudioPipeline/AudioTemplate.h \
@@ -1341,6 +1342,7 @@ HEADERS += \
     Source/CommonFramework/OCR/OCR_StringNormalization.h \
     Source/CommonFramework/OCR/OCR_TextMatcher.h \
     Source/CommonFramework/OCR/OCR_TrainingTools.h \
+    Source/CommonFramework/Options/Environment/PerformanceOptions.h \
     Source/CommonFramework/Options/Environment/ProcessPriorityOption.h \
     Source/CommonFramework/Options/Environment/ProcessorLevelOption.h \
     Source/CommonFramework/Options/Environment/SleepSuppressOption.h \

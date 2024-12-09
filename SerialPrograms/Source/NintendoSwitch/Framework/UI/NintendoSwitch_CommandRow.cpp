@@ -8,6 +8,7 @@
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "CommonFramework/VideoPipeline/UI/VideoOverlayWidget.h"
+#include "CommonFramework/Recording/StreamHistoryOption.h"
 #include "NintendoSwitch_CommandRow.h"
 
 namespace PokemonAutomation{
@@ -106,7 +107,7 @@ CommandRow::CommandRow(
     );
 
 #if (QT_VERSION_MAJOR == 6) && (QT_VERSION_MINOR >= 8)
-    if (GlobalSettings::instance().STREAM_HISTORY.enabled()){
+    if (GlobalSettings::instance().STREAM_HISTORY->enabled()){
         m_video_button = new QPushButton("Video Capture", this);
         command_row->addWidget(m_video_button, 2);
         connect(

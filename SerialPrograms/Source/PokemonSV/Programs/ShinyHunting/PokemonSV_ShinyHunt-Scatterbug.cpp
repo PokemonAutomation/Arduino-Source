@@ -222,10 +222,14 @@ void ShinyHuntScatterbug::program(SingleSwitchProgramEnvironment& env, BotBaseCo
 // Whenever a battle happens, we check shinies and handle battle according to user setting. After battle ends, move
 // back to PokeCenter to start the `action` again.
 // `action` must be an action starting at the PokeCenter
-void ShinyHuntScatterbug::handle_battles_and_back_to_pokecenter(SingleSwitchProgramEnvironment& env, BotBaseContext& context, 
-    std::function<void(SingleSwitchProgramEnvironment& env, BotBaseContext& context)>&& action)
-{
-    assert(m_encounter_tracker != nullptr);
+void ShinyHuntScatterbug::handle_battles_and_back_to_pokecenter(
+    SingleSwitchProgramEnvironment& env,
+    BotBaseContext& context,
+    std::function<void(SingleSwitchProgramEnvironment& env, BotBaseContext& context)>&& action
+){
+    if (m_encounter_tracker == nullptr){
+        throw InternalProgramError(&env.logger(), PA_CURRENT_FUNCTION, "m_encounter_tracker == nullptr");
+    }
 
     bool action_finished = false;
     bool first_iteration = true;

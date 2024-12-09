@@ -6,7 +6,6 @@
 
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonObject.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Environment/Environment.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "ProcessorLevelOption.h"

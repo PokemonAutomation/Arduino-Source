@@ -44,7 +44,7 @@ StreamHistoryOption::StreamHistoryOption()
             {Resolution::FORCE_1080p,   "1080p",    "1920 x 1080"},
         },
         LockMode::UNLOCK_WHILE_RUNNING,
-        Resolution::MATCH_INPUT
+        Resolution::FORCE_720p
     )
     , ENCODING_MODE(
         "<b>Encoding Mode:</b>",

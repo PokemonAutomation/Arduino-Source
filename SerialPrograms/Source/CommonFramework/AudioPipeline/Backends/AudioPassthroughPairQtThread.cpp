@@ -6,6 +6,7 @@
 
 #include "Common/Cpp/Concurrency/SpinPause.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/Options/Environment/PerformanceOptions.h"
 #include "AudioPassthroughPairQt.h"
 #include "AudioPassthroughPairQtThread.h"
 
@@ -51,7 +52,7 @@ AudioPassthroughPairQtThread::~AudioPassthroughPairQtThread(){
     wait();
 }
 void AudioPassthroughPairQtThread::run(){
-    GlobalSettings::instance().REALTIME_THREAD_PRIORITY0.set_on_this_thread();
+    GlobalSettings::instance().PERFORMANCE->REALTIME_THREAD_PRIORITY.set_on_this_thread();
 
     AudioPassthroughPairQt body(m_logger);
     m_body.store(&body, std::memory_order_relaxed);

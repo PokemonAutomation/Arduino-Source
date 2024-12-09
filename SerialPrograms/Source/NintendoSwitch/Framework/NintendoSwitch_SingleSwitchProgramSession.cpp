@@ -8,7 +8,8 @@
 #include "Common/Cpp/Concurrency/SpinPause.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Options/Environment/SleepSuppressOption.h"
+#include "CommonFramework/Options/Environment/PerformanceOptions.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Tools/BlackBorderCheck.h"
@@ -91,10 +92,10 @@ void SingleSwitchProgramSession::internal_stop_program(){
     m_system.serial_session().reset();
 }
 void SingleSwitchProgramSession::internal_run_program(){
-    GlobalSettings::instance().REALTIME_THREAD_PRIORITY0.set_on_this_thread();
+    GlobalSettings::instance().PERFORMANCE->REALTIME_THREAD_PRIORITY.set_on_this_thread();
     m_option.options().reset_state();
 
-    SleepSuppressScope sleep_scope(GlobalSettings::instance().SLEEP_SUPPRESS.PROGRAM_RUNNING);
+    SleepSuppressScope sleep_scope(GlobalSettings::instance().SLEEP_SUPPRESS->PROGRAM_RUNNING);
 
     ProgramInfo program_info(
         identifier(),

@@ -27,6 +27,10 @@
 #include "PokemonLA/Programs/PokemonLA_LeapPokemonActions.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 
+#ifdef _MSC_VER
+#pragma warning(disable:4244)   //  double -> int precision loss
+#endif
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{

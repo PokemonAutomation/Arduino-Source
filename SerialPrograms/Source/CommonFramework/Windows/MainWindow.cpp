@@ -12,10 +12,13 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QMessageBox>
+#include "Common/Cpp/CpuId/CpuId.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Logging/FileWindowLogger.h"
 #include "CommonFramework/NewVersionCheck.h"
+#include "CommonFramework/Options/ResolutionOption.h"
+#include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "PanelLists.h"
 #include "WindowTracker.h"
 #include "ButtonDiagram.h"
@@ -38,7 +41,10 @@ MainWindow::MainWindow(QWidget* parent)
     }
     this->setWindowIcon(QIcon(QString::fromStdString(RESOURCE_PATH() + "icon.png")));
 //    QSize window_size = PERSISTENT_SETTINGS().window_size;
-    resize(GlobalSettings::instance().WINDOW_SIZE.WIDTH, GlobalSettings::instance().WINDOW_SIZE.HEIGHT);
+    resize(
+        GlobalSettings::instance().WINDOW_SIZE->WIDTH,
+        GlobalSettings::instance().WINDOW_SIZE->HEIGHT
+    );
     centralwidget = new QWidget(this);
     centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
     setCentralWidget(centralwidget);
@@ -185,14 +191,14 @@ MainWindow::MainWindow(QWidget* parent)
     // Load the program panel specified in the persistent setting.
     m_program_list->load_persistent_panel();
 
-    GlobalSettings::instance().WINDOW_SIZE.WIDTH.add_listener(*this);
-    GlobalSettings::instance().WINDOW_SIZE.HEIGHT.add_listener(*this);
+    GlobalSettings::instance().WINDOW_SIZE->WIDTH.add_listener(*this);
+    GlobalSettings::instance().WINDOW_SIZE->HEIGHT.add_listener(*this);
 //    cout << "Done constructing" << endl;
 }
 MainWindow::~MainWindow(){
     close_panel();
-    GlobalSettings::instance().WINDOW_SIZE.WIDTH.remove_listener(*this);
-    GlobalSettings::instance().WINDOW_SIZE.HEIGHT.remove_listener(*this);
+    GlobalSettings::instance().WINDOW_SIZE->WIDTH.remove_listener(*this);
+    GlobalSettings::instance().WINDOW_SIZE->HEIGHT.remove_listener(*this);
 }
 
 
@@ -202,8 +208,8 @@ void MainWindow::closeEvent(QCloseEvent* event){
 }
 void MainWindow::resizeEvent(QResizeEvent* event){
     m_pending_resize = true;
-    GlobalSettings::instance().WINDOW_SIZE.WIDTH.set(width());
-    GlobalSettings::instance().WINDOW_SIZE.HEIGHT.set(height());
+    GlobalSettings::instance().WINDOW_SIZE->WIDTH.set(width());
+    GlobalSettings::instance().WINDOW_SIZE->HEIGHT.set(height());
     m_pending_resize = false;
 }
 
@@ -276,7 +282,10 @@ void MainWindow::on_idle(){
 void MainWindow::value_changed(void* object){
     QMetaObject::invokeMethod(this, [this]{
         if (!m_pending_resize){
-            resize(GlobalSettings::instance().WINDOW_SIZE.WIDTH, GlobalSettings::instance().WINDOW_SIZE.HEIGHT);
+            resize(
+                GlobalSettings::instance().WINDOW_SIZE->WIDTH,
+                GlobalSettings::instance().WINDOW_SIZE->HEIGHT
+            );
         }
     });
 }

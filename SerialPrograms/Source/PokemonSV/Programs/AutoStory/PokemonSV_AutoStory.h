@@ -8,12 +8,14 @@
 #define PokemonAutomation_PokemonSV_AutoStory_H
 
 #include <functional>
+#include "Common/Cpp/Options/StaticTextOption.h"
+#include "Common/Cpp/Options/SimpleIntegerOption.h"
+#include "Common/Cpp/Options/FloatingPointOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "CommonFramework/Options/LanguageOCROption.h"
 #include "CommonFramework/Options/StringSelectOption.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
-#include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSV_AutoStoryTools.h"
 
@@ -100,22 +102,22 @@ private:
 
     BooleanCheckBoxOption ENABLE_TEST_REALIGN;    
     EnumDropdownOption<PlayerRealignMode> REALIGN_MODE;
-    SimpleIntegerOption<uint16_t> X_REALIGN;
-    SimpleIntegerOption<uint16_t> Y_REALIGN;
+    SimpleIntegerOption<uint8_t> X_REALIGN;
+    SimpleIntegerOption<uint8_t> Y_REALIGN;
     SimpleIntegerOption<uint16_t> REALIGN_DURATION;
 
     BooleanCheckBoxOption ENABLE_MISC_TEST;    
     SimpleIntegerOption<uint16_t> FORWARD_TICKS;
 
     BooleanCheckBoxOption TEST_PBF_LEFT_JOYSTICK;
-    SimpleIntegerOption<uint16_t> X_MOVE;
-    SimpleIntegerOption<uint16_t> Y_MOVE;
+    SimpleIntegerOption<uint8_t> X_MOVE;
+    SimpleIntegerOption<uint8_t> Y_MOVE;
     SimpleIntegerOption<uint16_t> HOLD_TICKS;
     SimpleIntegerOption<uint16_t> RELEASE_TICKS;
 
     BooleanCheckBoxOption TEST_PBF_LEFT_JOYSTICK2;
-    SimpleIntegerOption<uint16_t> X_MOVE2;
-    SimpleIntegerOption<uint16_t> Y_MOVE2;
+    SimpleIntegerOption<uint8_t> X_MOVE2;
+    SimpleIntegerOption<uint8_t> Y_MOVE2;
     SimpleIntegerOption<uint16_t> HOLD_TICKS2;
     SimpleIntegerOption<uint16_t> RELEASE_TICKS2;    
 

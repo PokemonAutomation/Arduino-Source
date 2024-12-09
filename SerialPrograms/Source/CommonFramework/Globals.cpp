@@ -69,7 +69,7 @@ const std::string COMPILER_VERSION = "Unknown Compiler";
 
 
 
-const size_t LOG_HISTORY_LINES = 2000;
+const size_t LOG_HISTORY_LINES = 10000;
 
 
 namespace{

@@ -922,7 +922,7 @@ uint32_t ItemPrinterRNG::calc_num_jobs_using_happiny_dust(
     num_happiny_dust_can_use = num_happiny_dust_can_use < 0 ? 0 : num_happiny_dust_can_use;
 
     // assume 62% value for Happiny Dust to account for item printer wasteage.
-    uint32_t num_print_jobs = num_happiny_dust_can_use * 0.62; // truncate the float back to int
+    uint32_t num_print_jobs = (uint32_t)(num_happiny_dust_can_use * 0.62); // truncate the float back to int
     env.console.log("Number of Happiny Dust we have: " + std::to_string(num_happiny_dust));
     env.console.log("Number of Happiny Dust we can use (with some safety margins): " + std::to_string(num_happiny_dust_can_use));
     env.console.log("Number of print jobs we can do before material farming: " + std::to_string(num_print_jobs));

@@ -4,12 +4,12 @@
  *
  */
 
-#include <functional>
 #include <deque>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PanicDump.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
+#include "CommonFramework/Options/Environment/PerformanceOptions.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Messages_PushButtons.h"
 #include "NintendoSwitch_VirtualController.h"
 
@@ -165,7 +165,7 @@ bool VirtualController::on_key_release(Qt::Key key){
 
 
 void VirtualController::thread_loop(){
-    GlobalSettings::instance().REALTIME_THREAD_PRIORITY0.set_on_this_thread();
+    GlobalSettings::instance().PERFORMANCE->REALTIME_THREAD_PRIORITY.set_on_this_thread();
 
     VirtualControllerState last;
     bool last_neutral = true;

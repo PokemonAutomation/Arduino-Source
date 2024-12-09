@@ -9,6 +9,7 @@
 
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
@@ -38,7 +39,7 @@ public:
 
 private:
     void enter_check_mode(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-    void exit_check_mode(SingleSwitchProgramEnvironment& env, BotBaseContext& context, struct VideoSnapshot screen);
+    void exit_check_mode(SingleSwitchProgramEnvironment& env, BotBaseContext& context, VideoSnapshot screen);
 
 private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;

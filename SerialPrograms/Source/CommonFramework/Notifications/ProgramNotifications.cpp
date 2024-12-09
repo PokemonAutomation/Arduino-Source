@@ -54,7 +54,7 @@ std::pair<std::string, std::string> make_session_field(
     const ProgramInfo& info,
     const StatsTracker* current_stats, const std::string& current_stats_addendum
 ){
-    const std::string& instance_name = GlobalSettings::instance().DISCORD.message.instance_name;
+    const std::string& instance_name = GlobalSettings::instance().DISCORD->message.instance_name;
     std::string name = instance_name.empty()
         ? "Current Session:"
         : "Current Session: (" + instance_name + ")";
@@ -122,7 +122,7 @@ void send_raw_notification(
     );
 
 #ifdef PA_SLEEPY
-    if (GlobalSettings::instance().DISCORD.integration.library0 == Integration::DiscordIntegrationSettingsOption::Library::SleepyDiscord){
+    if (GlobalSettings::instance().DISCORD->integration.library0 == Integration::DiscordIntegrationSettingsOption::Library::SleepyDiscord){
         Integration::SleepyDiscordRunner::send_embed_sleepy(
             should_ping, tags, std::move(embed),
             hasFile ? file : nullptr
@@ -131,7 +131,7 @@ void send_raw_notification(
 #endif
 
 #ifdef PA_DPP
-    if (GlobalSettings::instance().DISCORD.integration.library0 == Integration::DiscordIntegrationSettingsOption::Library::DPP){
+    if (GlobalSettings::instance().DISCORD->integration.library0 == Integration::DiscordIntegrationSettingsOption::Library::DPP){
         Integration::DppClient::Client::instance().send_embed_dpp(
             should_ping, color, tags, std::move(embed),
             hasFile ? file : nullptr
@@ -175,7 +175,7 @@ void send_raw_notification(
     );
 
 #ifdef PA_SLEEPY
-    if (GlobalSettings::instance().DISCORD.integration.library0 == Integration::DiscordIntegrationSettingsOption::Library::SleepyDiscord){
+    if (GlobalSettings::instance().DISCORD->integration.library0 == Integration::DiscordIntegrationSettingsOption::Library::SleepyDiscord){
         Integration::SleepyDiscordRunner::send_embed_sleepy(
             should_ping, tags, std::move(embed),
             hasFile ? file : nullptr
@@ -184,7 +184,7 @@ void send_raw_notification(
 #endif
 
 #ifdef PA_DPP
-    if (GlobalSettings::instance().DISCORD.integration.library0 == Integration::DiscordIntegrationSettingsOption::Library::DPP){
+    if (GlobalSettings::instance().DISCORD->integration.library0 == Integration::DiscordIntegrationSettingsOption::Library::DPP){
         Integration::DppClient::Client::instance().send_embed_dpp(
             should_ping, color, tags, std::move(embed),
             hasFile ? file : nullptr

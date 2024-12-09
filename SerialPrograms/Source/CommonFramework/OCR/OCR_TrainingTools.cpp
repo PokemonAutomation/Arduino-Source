@@ -9,9 +9,8 @@
 #include "Common/Cpp/Concurrency/ParallelTaskRunner.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
-#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
-#include "CommonFramework/OCR/OCR_RawOCR.h"
-#include "CommonFramework/OCR/OCR_StringNormalization.h"
+#include "CommonFramework/Options/Environment/PerformanceOptions.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "OCR_SmallDictionaryMatcher.h"
 #include "OCR_LargeDictionaryMatcher.h"
 #include "OCR_TrainingTools.h"
@@ -112,7 +111,7 @@ void TrainingSession::generate_small_dictionary(
     OCR::SmallDictionaryMatcher trained(ocr_json_file, !incremental);
 
     ParallelTaskRunner task_runner(
-        [](){ GlobalSettings::instance().COMPUTE_PRIORITY0.set_on_this_thread(); },
+        [](){ GlobalSettings::instance().PERFORMANCE->COMPUTE_PRIORITY.set_on_this_thread(); },
         0, threads
     );
 
@@ -194,7 +193,7 @@ void TrainingSession::generate_large_dictionary(
     OCR::LargeDictionaryMatcher trained(ocr_json_directory + output_prefix, nullptr, !incremental);
 
     ParallelTaskRunner task_runner(
-        [](){ GlobalSettings::instance().COMPUTE_PRIORITY0.set_on_this_thread(); },
+        [](){ GlobalSettings::instance().PERFORMANCE->COMPUTE_PRIORITY.set_on_this_thread(); },
         0, threads
     );
 

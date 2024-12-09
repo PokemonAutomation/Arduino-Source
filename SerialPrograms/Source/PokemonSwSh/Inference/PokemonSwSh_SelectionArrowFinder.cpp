@@ -9,6 +9,7 @@
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
@@ -102,7 +103,7 @@ void SelectionArrowFinder::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_YELLOW, m_box);
 }
 bool SelectionArrowFinder::detect(const ImageViewRGB32& screen){
-    const float screen_scale = screen.height() / 1080.0;
+    const double screen_scale = screen.height() / 1080.0;
     // Smallest arrow takes at least 600 pixels on 1920x1080 screen.
     const size_t min_arrow_area = size_t(600.0 * screen_scale * screen_scale);
     std::vector<ImagePixelBox> arrows = find_selection_arrows(
@@ -187,7 +188,7 @@ RotomPhoneMenuArrowFinder::RotomPhoneMenuArrowFinder(VideoOverlay& overlay)
 }
 
 int RotomPhoneMenuArrowFinder::detect(const ImageViewRGB32& screen){
-    const float screen_scale = screen.height() / 1080.0;
+    const double screen_scale = screen.height() / 1080.0;
     const size_t min_arrow_area = size_t(1400 * screen_scale * screen_scale);
     for (size_t i_row = 0; i_row < 2; i_row++){
         for (size_t j_col = 0; j_col < 5; j_col++){

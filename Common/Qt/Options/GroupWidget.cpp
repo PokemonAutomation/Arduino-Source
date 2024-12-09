@@ -77,9 +77,12 @@ GroupWidget::GroupWidget(QWidget& parent, GroupOption& value)
     }
 
     if (value.restore_defaults_button_enabled()){
-        m_options.back()->widget().setContentsMargins(5, 5, 5, 5);
         m_restore_defaults_button = new QPushButton("Restore Defaults", this);
-        m_options_layout->addWidget(m_restore_defaults_button);
+        m_restore_defaults_button->setContentsMargins(5, 5, 5, 5);
+        QHBoxLayout* row = new QHBoxLayout();
+        m_options_layout->addLayout(row);
+        row->addWidget(m_restore_defaults_button, 1);
+        row->addStretch(3);
         connect(
             m_restore_defaults_button, &QPushButton::clicked,
             this, [this](bool on){

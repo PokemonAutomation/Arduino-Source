@@ -114,7 +114,7 @@ void RamanasCombeeFinder::check_tree_no_stop(SingleSwitchProgramEnvironment& env
     context.wait_for_all_requests();
     disable_shiny_sound(context);
     // Throw pokemon
-    pbf_press_button(context, BUTTON_ZR, (0.5 * TICKS_PER_SECOND), 1.5 * TICKS_PER_SECOND);
+    pbf_press_button(context, BUTTON_ZR, (uint16_t)(0.5 * TICKS_PER_SECOND), (uint16_t)(1.5 * TICKS_PER_SECOND));
     context.wait_for_all_requests();
     env.current_stats<RamanasCombeeFinder_Descriptor::Stats>().trees++;
     env.update_stats();

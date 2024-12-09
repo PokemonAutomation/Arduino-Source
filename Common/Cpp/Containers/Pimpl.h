@@ -40,6 +40,9 @@ public:
 public:
     operator bool() const{ return m_ptr != nullptr; }
 
+    operator const Type&() const{ return *m_ptr; }
+    operator       Type&()      { return *m_ptr; }
+
     const Type& operator*() const   { return *m_ptr; }
           Type& operator*()         { return *m_ptr; }
 

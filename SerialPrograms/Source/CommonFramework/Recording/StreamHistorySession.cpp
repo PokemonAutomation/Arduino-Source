@@ -4,11 +4,13 @@
  *
  */
 
+#include <QThread>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/VideoPipeline/Backends/VideoFrameQt.h"
+#include "CommonFramework/Recording/StreamHistoryOption.h"
 
 #if (QT_VERSION_MAJOR == 6) && (QT_VERSION_MINOR >= 8)
 //#include "StreamHistoryTracker_SaveFrames.h"
@@ -38,7 +40,7 @@ struct StreamHistorySession::Data{
 
     Data(Logger& logger)
         : m_logger(logger)
-        , m_window(GlobalSettings::instance().STREAM_HISTORY.HISTORY_SECONDS)
+        , m_window(GlobalSettings::instance().STREAM_HISTORY->HISTORY_SECONDS)
         , m_audio_format(AudioChannelFormat::NONE)
     {}
 };
@@ -133,7 +135,7 @@ void StreamHistorySession::clear(){
     data.m_audio_format = AudioChannelFormat::NONE;
 }
 void StreamHistorySession::initialize(){
-    if (!GlobalSettings::instance().STREAM_HISTORY.enabled()){
+    if (!GlobalSettings::instance().STREAM_HISTORY->enabled()){
         return;
     }
 

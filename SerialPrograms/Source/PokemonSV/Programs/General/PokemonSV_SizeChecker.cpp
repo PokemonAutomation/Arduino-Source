@@ -7,7 +7,6 @@
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Tools/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -134,7 +133,7 @@ void SizeChecker::enter_check_mode(SingleSwitchProgramEnvironment& env, BotBaseC
 
 
 
-void SizeChecker::exit_check_mode(SingleSwitchProgramEnvironment& env, BotBaseContext& context, struct VideoSnapshot screen){
+void SizeChecker::exit_check_mode(SingleSwitchProgramEnvironment& env, BotBaseContext& context, VideoSnapshot screen){
     SizeChecker_Descriptor::Stats& stats = env.current_stats<SizeChecker_Descriptor::Stats>();
     env.console.log("Check size and exit box mode...");
     WallClock start = current_time();

@@ -4,6 +4,7 @@
 #include <dpp/dpp.h>
 #include <Integrations/DppIntegration/DppUtility.h>
 #include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/Logging/Logger.h"
 
 using namespace dpp;
 namespace PokemonAutomation{

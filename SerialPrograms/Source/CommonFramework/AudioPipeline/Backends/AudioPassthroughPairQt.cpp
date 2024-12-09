@@ -5,7 +5,9 @@
  */
 
 //#include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/AbstractLogger.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/AudioPipeline/AudioPipelineOptions.h"
 //#include "CommonFramework/AudioPipeline/AudioConstants.h"
 //#include "CommonFramework/AudioPipeline/Tools/AudioFormatUtils.h"
 #include "CommonFramework/AudioPipeline/IO/AudioSource.h"
@@ -13,9 +15,9 @@
 #include "CommonFramework/AudioPipeline/Spectrum/FFTStreamer.h"
 #include "AudioPassthroughPairQt.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 
@@ -99,8 +101,8 @@ AudioPassthroughPairQt::~AudioPassthroughPairQt(){}
 
 AudioPassthroughPairQt::AudioPassthroughPairQt(Logger& logger)
     : m_logger(logger)
-    , m_file_input_multiplier((float)GlobalSettings::instance().AUDIO_FILE_VOLUME_SCALE)
-    , m_device_input_multiplier((float)GlobalSettings::instance().AUDIO_DEVICE_VOLUME_SCALE)
+    , m_file_input_multiplier((float)GlobalSettings::instance().AUDIO_PIPELINE->FILE_VOLUME_SCALE)
+    , m_device_input_multiplier((float)GlobalSettings::instance().AUDIO_PIPELINE->DEVICE_VOLUME_SCALE)
 {}
 
 void AudioPassthroughPairQt::reset(

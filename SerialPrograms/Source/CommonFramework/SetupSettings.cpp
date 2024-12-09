@@ -8,10 +8,11 @@
 #include <QMessageBox>
 #include <QApplication>
 #if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
-    #if QT_CONFIG(permissions)
-        #include <QPermissions>
-    #endif
+#if QT_CONFIG(permissions)
+#include <QPermissions>
 #endif
+#endif
+#include "Common/Cpp/AbstractLogger.h"
 #include "Globals.h"
 #include "GlobalSettingsPanel.h"
 #include "SetupSettings.h"

@@ -80,7 +80,7 @@ static RaidLobbyState raid_lobby_wait(
         }
         pbf_wait(
             context,
-            std::min(
+            (uint16_t)std::min(
                 lobby_wait_delay - time_elapsed,
                 (uint32_t)TICKS_PER_SECOND
             )
@@ -100,7 +100,7 @@ static RaidLobbyState raid_lobby_wait(
         }
         pbf_wait(
             context,
-            std::min(
+            (uint16_t)std::min(
                 FULL_LOBBY_TIMER - time_elapsed,
                 (uint32_t)TICKS_PER_SECOND
             )

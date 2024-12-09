@@ -9,6 +9,7 @@
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Tools/StatsTracking.h"
@@ -427,8 +428,8 @@ void EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
         // Check each hatched baby whether they will be kept.
         // If yes, move them to the keep box.
         // Otherwise, release them or move them into box in case we will reset game later.
-        for(int i = 0; i < num_eggs_in_party; i++){
-            process_one_baby(env, context, i, num_eggs_in_party);
+        for(uint8_t i = 0; i < num_eggs_in_party; i++){
+            process_one_baby(env, context, i, (uint8_t)num_eggs_in_party);
         }
 
         // If the auto save mode is AfterStartAndKeep, which allows resetting the game in case no eggs in the box are kept,
@@ -505,11 +506,11 @@ void EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
 
 // While in box system and the current box is egg box, process one baby pokemon in party
 // Return true if the program finds a pokemon to keep
-void EggAutonomous::process_one_baby(SingleSwitchProgramEnvironment& env, BotBaseContext& context, int egg_index, int num_eggs_in_party){
+void EggAutonomous::process_one_baby(SingleSwitchProgramEnvironment& env, BotBaseContext& context, uint8_t egg_index, uint8_t num_eggs_in_party){
     auto& stats = env.current_stats<EggAutonomous_Descriptor::Stats>();
 
     // Check each pokemon from bottom to top. In this way we can reliably detect end of releasing the pokemon.
-    const int party_row = num_eggs_in_party - egg_index + (HAS_CLONE_RIDE_POKEMON ? 1 : 0);
+    uint8_t party_row = num_eggs_in_party - egg_index + (HAS_CLONE_RIDE_POKEMON ? 1 : 0);
     context.wait_for_all_requests();
     move_box_cursor(env.program_info(), env.console, context, BoxCursorLocation::PARTY, party_row, 0);
 

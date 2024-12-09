@@ -203,10 +203,22 @@ std::vector<std::pair<AuctionOffer, ImageFloatBox>> AuctionFarmer::check_offers(
 
     // read dialog bubble
     for (ImageFloatBox dialog_box : dialog_boxes){
+//        std::cout << "dialog_box: ["
+//                << dialog_box.x << "," << dialog_box.y << "] - ["
+//                << dialog_box.width << "," << dialog_box.height << "]" << std::endl;
+
         OverlayBoxScope dialog_overlay(env.console, dialog_box, COLOR_DARK_BLUE);
 
         ImageFloatBox offer_box(0.05, 0.02, 0.90, 0.49);
-        ImageFloatBox translated_offer_box = translate_to_parent(screen, dialog_box, floatbox_to_pixelbox(dialog_box.width, dialog_box.height, offer_box));
+        ImageFloatBox translated_offer_box = translate_to_parent(
+            screen,
+            dialog_box,
+            //  TODO: Fix these casts as they always go to zero.
+            floatbox_to_pixelbox((size_t)dialog_box.width, (size_t)dialog_box.height, offer_box)
+        );
+//        std::cout << "translated_offer_box: ["
+//                << translated_offer_box.x << "," << translated_offer_box.y << "] - ["
+//                << translated_offer_box.width << "," << translated_offer_box.height << "]" << std::endl;
         OverlayBoxScope offer_overlay(env.console, translated_offer_box, COLOR_BLUE);
         
         ImageViewRGB32 dialog = extract_box_reference(screen, dialog_box);
@@ -275,8 +287,8 @@ void AuctionFarmer::move_to_auctioneer(SingleSwitchProgramEnvironment& env, BotB
 // Dialog is the only piece of orientation we have, so the goal is to put it into the center of the screen so we know in which direction the character walks.
 // This is only used for multiple NPCs.
 void AuctionFarmer::move_dialog_to_center(SingleSwitchProgramEnvironment& env, BotBaseContext& context, AuctionOffer wanted){
-    float center_x = 0.0f;
-    float center_y = 0.0f;
+    double center_x = 0.0f;
+    double center_y = 0.0f;
     bool offer_visible = false;
 
     while (center_x < 0.43 || center_x > 0.57){
@@ -298,8 +310,8 @@ void AuctionFarmer::move_dialog_to_center(SingleSwitchProgramEnvironment& env, B
                 break;
             }
 
-            uint8_t distance_x = (uint16_t)((center_x) * 255);
-            uint8_t distance_y = (uint16_t)((center_y * 255));
+            uint8_t distance_x = (uint8_t)(center_x * 255);
+            uint8_t distance_y = (uint8_t)(center_y * 255);
             env.console.log(std::to_string(distance_x));
             env.console.log(std::to_string(distance_y));
 

@@ -4,15 +4,12 @@
  *
  */
 
-//#include <mutex>
-#include <condition_variable>
 #include "Common/Cpp/Containers/Pimpl.tpp"
-#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Concurrency/AsyncDispatcher.h"
-#include "ClientSource/Connection/BotBase.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
-#include "CommonFramework/Notifications/ProgramInfo.h"
 #include "CommonFramework/ProgramSession.h"
+#include "CommonFramework/Notifications/ProgramInfo.h"
+#include "CommonFramework/Options/Environment/PerformanceOptions.h"
 #include "StatsTracking.h"
 #include "ProgramEnvironment.h"
 
@@ -32,13 +29,13 @@ struct ProgramEnvironmentData{
         : m_program_info(program_info)
         , m_realtime_dispatcher(
             [](){
-                GlobalSettings::instance().REALTIME_THREAD_PRIORITY0.set_on_this_thread();
+                GlobalSettings::instance().PERFORMANCE->REALTIME_THREAD_PRIORITY.set_on_this_thread();
             },
             0
         )
         , m_inference_dispatcher(
             [](){
-                GlobalSettings::instance().INFERENCE_PRIORITY0.set_on_this_thread();
+                GlobalSettings::instance().PERFORMANCE->INFERENCE_PRIORITY.set_on_this_thread();
             },
             0
         )

@@ -11,6 +11,7 @@
 #include "PersistentSettings.h"
 #include "Tests/CommandLineTests.h"
 #include "ErrorReports/ProgramDumper.h"
+#include "ErrorReports/ErrorReports.h"
 #include "Environment/HardwareValidation.h"
 #include "Logging/Logger.h"
 #include "Logging/OutputRedirector.h"
@@ -93,7 +94,7 @@ int main(int argc, char *argv[]){
 
     check_new_version(global_logger_tagged());
 
-    Integration::DiscordIntegrationSettingsOption& discord_settings = GlobalSettings::instance().DISCORD.integration;
+    Integration::DiscordIntegrationSettingsOption& discord_settings = GlobalSettings::instance().DISCORD->integration;
     if (discord_settings.run_on_start){
 #ifdef PA_SLEEPY
         if (discord_settings.library0 == Integration::DiscordIntegrationSettingsOption::Library::SleepyDiscord){
@@ -123,12 +124,11 @@ int main(int argc, char *argv[]){
     // Write program settings back to the json file.
     PERSISTENT_SETTINGS().write();
 
-#ifdef PA_SLEEPY
-    Integration::SleepyDiscordRunner::sleepy_terminate();
-#endif
-
 #ifdef PA_DPP
     Integration::DppClient::Client::instance().disconnect();
+#endif
+#ifdef PA_SLEEPY
+    Integration::SleepyDiscordRunner::sleepy_terminate();
 #endif
 
     return ret;

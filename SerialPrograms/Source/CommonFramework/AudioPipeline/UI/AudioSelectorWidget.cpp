@@ -12,6 +12,7 @@
 #include <QFileDialog>
 #include "Common/Qt/NoWheelComboBox.h"
 #include "CommonFramework/AudioPipeline/AudioSession.h"
+#include "CommonFramework/AudioPipeline/AudioPipelineOptions.h"
 #include "AudioDisplayWidget.h"
 #include "AudioSelectorWidget.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
@@ -80,7 +81,7 @@ AudioSelectorWidget::AudioSelectorWidget(
 
         QHBoxLayout* output_layout = new QHBoxLayout();
         row1->addLayout(output_layout, 10);
-        if (GlobalSettings::instance().SHOW_RECORD_FREQUENCIES){
+        if (GlobalSettings::instance().AUDIO_PIPELINE->SHOW_RECORD_FREQUENCIES){
             m_audio_output_box = new NoWheelComboBox(this);
             output_layout->addWidget(m_audio_output_box, 7);
             m_record_button = new QPushButton("Record Frequencies", this);
@@ -186,7 +187,7 @@ AudioSelectorWidget::AudioSelectorWidget(
 
     // only in developer mode:
     // record audio
-    if (GlobalSettings::instance().SHOW_RECORD_FREQUENCIES){
+    if (GlobalSettings::instance().AUDIO_PIPELINE->SHOW_RECORD_FREQUENCIES){
         connect(m_record_button, &QPushButton::clicked, this, [this](bool){
             m_record_is_on = !m_record_is_on;
             m_session.spectrums().saveAudioFrequenciesToDisk(m_record_is_on);

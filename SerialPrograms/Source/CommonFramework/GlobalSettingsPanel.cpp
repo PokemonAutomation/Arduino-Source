@@ -7,11 +7,21 @@
 #include <iostream>
 #include <set>
 #include <QCryptographicHash>
+#include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Common/Cpp/LifetimeSanitizer.h"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "CommonFramework/Globals.h"
+#include "CommonFramework/Options/ResolutionOption.h"
+#include "CommonFramework/Options/Environment/SleepSuppressOption.h"
+#include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
+#include "CommonFramework/Options/Environment/PerformanceOptions.h"
+#include "CommonFramework/Recording/StreamHistoryOption.h"
+#include "CommonFramework/AudioPipeline/AudioPipelineOptions.h"
+#include "CommonFramework/VideoPipeline/VideoPipelineOptions.h"
+#include "CommonFramework/ErrorReports/ErrorReports.h"
+#include "Integrations/DiscordSettingsOption.h"
 //#include "CommonFramework/Environment/Environment.h"
 #include "GlobalSettingsPanel.h"
 
@@ -103,12 +113,16 @@ GlobalSettings::GlobalSettings()
         "TempFiles/",
         "TempFiles/"
     )
+    , THEME(CONSTRUCT_TOKEN)
     , WINDOW_SIZE(
+        CONSTRUCT_TOKEN,
         "Window Size:",
         "Set the size of the window. Takes effect immediately.<br>"
         "Use this to easily set the window to a specific resolution for streaming alignment.",
         1280, 1000
     )
+    , STREAM_HISTORY(CONSTRUCT_TOKEN)
+    , SLEEP_SUPPRESS(CONSTRUCT_TOKEN)
     , m_discord_settings(
         "<font size=4><b>Discord Settings:</b> Integrate with Discord. (" +
         make_text_url(
@@ -121,6 +135,7 @@ GlobalSettings::GlobalSettings()
         LockMode::UNLOCK_WHILE_RUNNING,
         true
     )
+    , DISCORD(CONSTRUCT_TOKEN)
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
@@ -143,82 +158,16 @@ GlobalSettings::GlobalSettings()
         LockMode::UNLOCK_WHILE_RUNNING,
         false
     )
-    , REALTIME_THREAD_PRIORITY0(
-        "<b>Realtime Thread Priority:</b><br>"
-        "Thread priority of real-time threads. (UI thread, audio threads)<br>"
-        "Restart the program for this to fully take effect.",
-        DEFAULT_PRIORITY_REALTIME
-    )
-    , INFERENCE_PRIORITY0(
-        "<b>Inference Priority:</b><br>"
-        "Thread priority of inference threads. (image/sound recognition)",
-        DEFAULT_PRIORITY_INFERENCE
-    )
-    , COMPUTE_PRIORITY0(
-        "<b>Compute Priority:</b><br>"
-        "Thread priority of computation threads.",
-        DEFAULT_PRIORITY_COMPUTE
-    )
-    , AUDIO_FILE_VOLUME_SCALE(
-        "<b>Audio File Input Volume Scale:</b><br>"
-        "Multiply audio file playback by this factor. (This is linear scale. So each factor of 10 is 20dB.)",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        0.31622776601683793320, //  -10dB
-        -10000, 10000
-    )
-    , AUDIO_DEVICE_VOLUME_SCALE(
-        "<b>Audio Device Input Volume Scale:</b><br>"
-        "Multiply audio device input by this factor. (This is linear scale. So each factor of 10 is 20dB.)",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        1.0, -10000, 10000
-    )
-    , SHOW_ALL_AUDIO_DEVICES(
-        "<b>Show all Audio Devices:</b><br>"
-        "Show all audio devices - including duplicates.",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        false
-    )
-    , SHOW_RECORD_FREQUENCIES(
-        "<b>Show Record Frequencies:</b><br>"
-        "Show option to record audio frequencies.",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        false
-    )
-#if QT_VERSION_MAJOR == 5
-    , ENABLE_FRAME_SCREENSHOTS(
-        "<b>Enable Frame Screenshots:</b><br>"
-        "Attempt to use QVideoProbe and QVideoFrame for screenshots.",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        true
-    )
-#endif
-    , AUTO_RESET_AUDIO_SECONDS(
-        "<b>Audio Auto-Reset:</b><br>"
-        "Attempt to reset the audio if this many seconds has elapsed since the last audio frame (in order to fix issues with RDP disconnection, etc).",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        5
-    )
-    , AUTO_RESET_VIDEO_SECONDS(
-        "<b>Video Auto-Reset:</b><br>"
-        "Attempt to reset the video if this many seconds has elapsed since the last video frame (in order to fix issues with RDP disconnection, etc).<br>"
-        "This option is not supported by all video frameworks.",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        5
-    )
+    , PERFORMANCE(CONSTRUCT_TOKEN)
+    , AUDIO_PIPELINE(CONSTRUCT_TOKEN)
+    , VIDEO_PIPELINE(CONSTRUCT_TOKEN)
     , ENABLE_LIFETIME_SANITIZER(
         "<b>Enable Lifetime Sanitizer: (for debugging)</b><br>"
         "Check for C++ object lifetime violations. Terminate program with stack dump if violations are found.",
         LockMode::UNLOCK_WHILE_RUNNING,
         IS_BETA_VERSION
     )
-#if 0
-    , SEND_ERROR_REPORTS0(
-        "<b>Send Error Reports:</b><br>"
-        "Send error reports to the " + PROGRAM_NAME + " server to help them resolve issues and improve the program.",
-        LockMode::LOCK_WHILE_RUNNING,
-        true
-    )
-#endif
+    , ERROR_REPORTS(CONSTRUCT_TOKEN)
     , DEVELOPER_TOKEN(
         true,
         "<b>Developer Token:</b><br>Restart application to take full effect after changing this.",
@@ -235,7 +184,7 @@ GlobalSettings::GlobalSettings()
 #if (QT_VERSION_MAJOR == 6) && (QT_VERSION_MINOR >= 8)
     PA_ADD_OPTION(STREAM_HISTORY);
 #else
-    STREAM_HISTORY.set_enabled(false);
+    STREAM_HISTORY->set_enabled(false);
 #endif
 #ifdef PA_ENABLE_SLEEP_SUPPRESS
     PA_ADD_OPTION(SLEEP_SUPPRESS);
@@ -250,30 +199,14 @@ GlobalSettings::GlobalSettings()
 //    PA_ADD_OPTION(NAUGHTY_MODE);
     PA_ADD_OPTION(HIDE_NOTIF_DISCORD_LINK);
 
-    PA_ADD_OPTION(REALTIME_THREAD_PRIORITY0);
-    PA_ADD_OPTION(INFERENCE_PRIORITY0);
-    PA_ADD_OPTION(COMPUTE_PRIORITY0);
+    PA_ADD_OPTION(PERFORMANCE);
 
-    PA_ADD_OPTION(AUDIO_FILE_VOLUME_SCALE);
-    PA_ADD_OPTION(AUDIO_DEVICE_VOLUME_SCALE);
-    PA_ADD_OPTION(SHOW_ALL_AUDIO_DEVICES);
-    if (PreloadSettings::instance().DEVELOPER_MODE){
-        PA_ADD_OPTION(SHOW_RECORD_FREQUENCIES);
-    }
-    PA_ADD_OPTION(VIDEO_BACKEND);
-#if QT_VERSION_MAJOR == 5
-    PA_ADD_OPTION(ENABLE_FRAME_SCREENSHOTS);
-#endif
-
-    PA_ADD_OPTION(AUTO_RESET_AUDIO_SECONDS);
-    PA_ADD_OPTION(AUTO_RESET_VIDEO_SECONDS);
+    PA_ADD_OPTION(AUDIO_PIPELINE);
+    PA_ADD_OPTION(VIDEO_PIPELINE);
 
     PA_ADD_OPTION(ENABLE_LIFETIME_SANITIZER);
 
-    PA_ADD_OPTION(PROCESSOR_LEVEL0);
-
 #ifdef PA_OFFICIAL
-//    PA_ADD_OPTION(SEND_ERROR_REPORTS0);
     PA_ADD_OPTION(ERROR_REPORTS);
 #endif
 

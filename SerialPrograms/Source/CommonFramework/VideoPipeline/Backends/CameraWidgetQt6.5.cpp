@@ -21,6 +21,7 @@
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/GlobalServices.h"
 #include "CommonFramework/VideoPipeline/CameraOption.h"
+#include "CommonFramework/VideoPipeline/VideoPipelineOptions.h"
 #include "VideoFrameQt.h"
 #include "MediaServicesQt6.h"
 #include "CameraWidgetQt6.5.h"
@@ -118,7 +119,7 @@ CameraSession::CameraSession(Logger& logger, Resolution default_resolution)
     , m_stats_conversion("ConvertFrame", "ms", 1000, std::chrono::seconds(10))
 //    , m_history(GlobalSettings::instance().HISTORY_SECONDS * 1000000)
 {
-    uint8_t watchdog_timeout = GlobalSettings::instance().AUTO_RESET_VIDEO_SECONDS;
+    uint8_t watchdog_timeout = GlobalSettings::instance().VIDEO_PIPELINE->AUTO_RESET_SECONDS;
     if (watchdog_timeout != 0){
         global_watchdog().add(*this, std::chrono::seconds(watchdog_timeout));
     }
@@ -439,7 +440,7 @@ void CameraSession::on_watchdog_timeout(){
         }
     }
 
-    uint8_t watchdog_timeout = GlobalSettings::instance().AUTO_RESET_VIDEO_SECONDS;
+    uint8_t watchdog_timeout = GlobalSettings::instance().VIDEO_PIPELINE->AUTO_RESET_SECONDS;
     m_logger.log("No video detected for " + std::to_string(watchdog_timeout) + " seconds...", COLOR_RED);
 
     if (watchdog_timeout == 0){

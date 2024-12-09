@@ -53,7 +53,7 @@ private:
 
     int picnic_party_to_hatch_party(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
-    void process_one_baby(SingleSwitchProgramEnvironment& env, BotBaseContext& context, int egg_index, int num_eggs_in_party);
+    void process_one_baby(SingleSwitchProgramEnvironment& env, BotBaseContext& context, uint8_t egg_index, uint8_t num_eggs_in_party);
 
     bool move_pokemon_to_keep(SingleSwitchProgramEnvironment& env, BotBaseContext& context, uint8_t pokemon_row_in_party);
 

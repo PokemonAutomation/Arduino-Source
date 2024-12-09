@@ -7,23 +7,15 @@
 #ifndef PokemonAutomation_GlobalSettingsPanel_H
 #define PokemonAutomation_GlobalSettingsPanel_H
 
+#include <vector>
+#include "Common/Cpp/Containers/Pimpl.h"
 #include "Common/Cpp/Options/ConfigOption.h"
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
-#include "Common/Cpp/Options/SimpleIntegerOption.h"
-#include "Common/Cpp/Options/FloatingPointOption.h"
+//#include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/StringOption.h"
-#include "CommonFramework/Options/ResolutionOption.h"
-#include "CommonFramework/Options/Environment/ProcessPriorityOption.h"
-#include "CommonFramework/Options/Environment/ProcessorLevelOption.h"
-#include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
-#include "CommonFramework/Options/Environment/SleepSuppressOption.h"
-#include "CommonFramework/ErrorReports/ErrorReports.h"
-#include "CommonFramework/VideoPipeline/Backends/CameraImplementations.h"
-#include "CommonFramework/Recording/StreamHistoryOption.h"
 #include "CommonFramework/Panels/SettingsPanel.h"
 #include "CommonFramework/Panels/PanelTools.h"
-#include "Integrations/DiscordSettingsOption.h"
 
 //#include <iostream>
 //using std::cout;
@@ -31,6 +23,18 @@
 
 namespace PokemonAutomation{
 
+
+class ThemeSelectorOption;
+class ResolutionOption;
+class StreamHistoryOption;
+class SleepSuppressOptions;
+namespace Integration{
+    class DiscordSettingsOption;
+}
+class PerformanceOptions;
+class AudioPipelineOptions;
+class VideoPipelineOptions;
+class ErrorReportOption;
 
 
 class FolderInputOption : public StringOption{
@@ -43,6 +47,8 @@ public:
         }
     }
 };
+
+
 
 
 struct DebugSettings{
@@ -69,6 +75,7 @@ public:
 
 
 
+
 class GlobalSettings : public BatchOption, private ConfigOption::Listener{
     ~GlobalSettings();
     GlobalSettings();
@@ -87,48 +94,30 @@ public:
     StringOption STATS_FILE;
     FolderInputOption TEMP_FOLDER;
 
-    ThemeSelectorOption THEME;
-    ResolutionOption WINDOW_SIZE;
+    Pimpl<ThemeSelectorOption> THEME;
+    Pimpl<ResolutionOption> WINDOW_SIZE;
 
-    StreamHistoryOption STREAM_HISTORY;
-    SleepSuppressOptions SLEEP_SUPPRESS;
+    Pimpl<StreamHistoryOption> STREAM_HISTORY;
+    Pimpl<SleepSuppressOptions> SLEEP_SUPPRESS;
 
     SectionDividerOption m_discord_settings;
     BooleanCheckBoxOption ALL_STATS;
-    Integration::DiscordSettingsOption DISCORD;
+    Pimpl<Integration::DiscordSettingsOption> DISCORD;
 
     SectionDividerOption m_advanced_options;
 
     BooleanCheckBoxOption LOG_EVERYTHING;
     BooleanCheckBoxOption SAVE_DEBUG_IMAGES;
 //    BooleanCheckBoxOption NAUGHTY_MODE_OPTION;
-
     BooleanCheckBoxOption HIDE_NOTIF_DISCORD_LINK;
 
-//    ProcessPriorityOption PROCESS_PRIORITY0;
-    ThreadPriorityOption REALTIME_THREAD_PRIORITY0;
-    ThreadPriorityOption INFERENCE_PRIORITY0;
-    ThreadPriorityOption COMPUTE_PRIORITY0;
-
-    FloatingPointOption AUDIO_FILE_VOLUME_SCALE;
-    FloatingPointOption AUDIO_DEVICE_VOLUME_SCALE;
-    BooleanCheckBoxOption SHOW_ALL_AUDIO_DEVICES;
-    BooleanCheckBoxOption SHOW_RECORD_FREQUENCIES;
-
-    VideoBackendOption VIDEO_BACKEND;
-#if QT_VERSION_MAJOR == 5
-    BooleanCheckBoxOption ENABLE_FRAME_SCREENSHOTS;
-#endif
-
-    SimpleIntegerOption<uint8_t> AUTO_RESET_AUDIO_SECONDS;
-    SimpleIntegerOption<uint8_t> AUTO_RESET_VIDEO_SECONDS;
+    Pimpl<PerformanceOptions> PERFORMANCE;
+    Pimpl<AudioPipelineOptions> AUDIO_PIPELINE;
+    Pimpl<VideoPipelineOptions> VIDEO_PIPELINE;
 
     BooleanCheckBoxOption ENABLE_LIFETIME_SANITIZER;
 
-//    BooleanCheckBoxOption SEND_ERROR_REPORTS0;
-    ErrorReportOption ERROR_REPORTS;
-
-    ProcessorLevelOption PROCESSOR_LEVEL0;
+    Pimpl<ErrorReportOption> ERROR_REPORTS;
 
     StringOption DEVELOPER_TOKEN;
 

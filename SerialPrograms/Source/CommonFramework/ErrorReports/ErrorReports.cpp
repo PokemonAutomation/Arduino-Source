@@ -315,7 +315,7 @@ void send_reports(Logger& logger, const std::vector<std::string>& reports){
 }
 void send_all_unsent_reports(Logger& logger, bool allow_prompt){
 #ifdef PA_OFFICIAL
-    ErrorReportSendMode mode = GlobalSettings::instance().ERROR_REPORTS.SEND_MODE;
+    ErrorReportSendMode mode = GlobalSettings::instance().ERROR_REPORTS->SEND_MODE;
     if (mode == ErrorReportSendMode::NEVER_SEND_ANYTHING){
         return;
     }

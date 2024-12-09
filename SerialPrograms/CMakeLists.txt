@@ -246,6 +246,7 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/AudioPipeline/AudioOption.cpp
     Source/CommonFramework/AudioPipeline/AudioOption.h
     Source/CommonFramework/AudioPipeline/AudioPassthroughPair.h
+    Source/CommonFramework/AudioPipeline/AudioPipelineOptions.h
     Source/CommonFramework/AudioPipeline/AudioSession.cpp
     Source/CommonFramework/AudioPipeline/AudioSession.h
     Source/CommonFramework/AudioPipeline/AudioStream.cpp
@@ -460,6 +461,7 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/OCR/OCR_TextMatcher.h
     Source/CommonFramework/OCR/OCR_TrainingTools.cpp
     Source/CommonFramework/OCR/OCR_TrainingTools.h
+    Source/CommonFramework/Options/Environment/PerformanceOptions.h
     Source/CommonFramework/Options/Environment/ProcessPriorityOption.h
     Source/CommonFramework/Options/Environment/ProcessorLevelOption.cpp
     Source/CommonFramework/Options/Environment/ProcessorLevelOption.h
@@ -589,6 +591,7 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/VideoPipeline/VideoOverlaySession.h
     Source/CommonFramework/VideoPipeline/VideoOverlayTypes.cpp
     Source/CommonFramework/VideoPipeline/VideoOverlayTypes.h
+    Source/CommonFramework/VideoPipeline/VideoPipelineOptions.h
     Source/CommonFramework/Windows/ButtonDiagram.cpp
     Source/CommonFramework/Windows/ButtonDiagram.h
     Source/CommonFramework/Windows/DpiScaler.cpp

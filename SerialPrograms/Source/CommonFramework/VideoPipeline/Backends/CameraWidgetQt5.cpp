@@ -13,6 +13,7 @@
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/VideoPipeline/CameraOption.h"
+#include "CommonFramework/VideoPipeline/VideoPipelineOptions.h"
 #include "VideoToolsQt5.h"
 #include "CameraWidgetQt5.h"
 
@@ -255,7 +256,7 @@ VideoSnapshot CameraSession::snapshot(){
     std::unique_lock<std::mutex> lg(m_lock);
 
     //  Frame screenshots are disabled.
-    if (!GlobalSettings::instance().ENABLE_FRAME_SCREENSHOTS){
+    if (!GlobalSettings::instance().VIDEO_PIPELINE->ENABLE_FRAME_SCREENSHOTS){
         return snapshot_image();
     }
 
@@ -381,7 +382,7 @@ void CameraSession::startup(){
             this, [this](const QVideoFrame& frame){
                 WallClock now = current_time();
                 SpinLockGuard lg(m_frame_lock);
-                if (GlobalSettings::instance().ENABLE_FRAME_SCREENSHOTS){
+                if (GlobalSettings::instance().VIDEO_PIPELINE->ENABLE_FRAME_SCREENSHOTS){
                     m_last_frame = frame;
                 }
                 m_last_frame_timestamp = now;

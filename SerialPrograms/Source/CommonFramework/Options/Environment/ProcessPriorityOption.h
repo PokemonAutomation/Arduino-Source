@@ -8,6 +8,7 @@
 #define PokemonAutomation_ProcessPriorityOption_H
 
 #include "Common/Cpp/Options/EnumDropdownOption.h"
+#include "Common/Cpp/Options/GroupOption.h"
 #include "CommonFramework/Environment/Environment.h"
 
 namespace PokemonAutomation{
