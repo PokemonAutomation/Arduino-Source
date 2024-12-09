@@ -43,7 +43,7 @@ class MaterialFarmerOptions : public GroupOption, public ConfigOption::Listener{
 public:
     ~MaterialFarmerOptions();
     MaterialFarmerOptions(
-        bool toggleable, bool enabled,
+        GroupOption::EnableMode enable_mode,
         OCR::LanguageOCROption* language_option,
         EventNotificationOption& notif_status_update_option,
         EventNotificationOption& notif_program_finish_option,

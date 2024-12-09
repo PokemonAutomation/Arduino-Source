@@ -44,7 +44,7 @@ std::unique_ptr<StatsTracker> MaterialFarmer_Descriptor::make_stats() const{
 MaterialFarmer::MaterialFarmer()
     : GO_HOME_WHEN_DONE(true)
     , MATERIAL_FARMER_OPTIONS(
-        false, true,
+        GroupOption::EnableMode::ALWAYS_ENABLED,
         nullptr,
         NOTIFICATION_STATUS_UPDATE,
         NOTIFICATION_PROGRAM_FINISH,

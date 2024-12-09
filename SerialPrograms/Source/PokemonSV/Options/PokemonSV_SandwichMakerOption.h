@@ -228,8 +228,7 @@ public:
         OCR::LanguageOCROption* language_option,
         BaseRecipe base_recipe,
         bool show_save_option,
-        bool toggleable,
-        bool enabled
+        GroupOption::EnableMode enable_mode
     );
 
 public:

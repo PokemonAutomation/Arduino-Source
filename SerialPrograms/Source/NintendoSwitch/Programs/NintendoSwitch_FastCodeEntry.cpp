@@ -24,7 +24,11 @@ namespace NintendoSwitch{
 
 
 FastCodeEntrySettingsOption::FastCodeEntrySettingsOption(LockMode lock_while_program_is_running)
-    : GroupOption("Fast Code Entry", lock_while_program_is_running)
+    : GroupOption(
+        "Fast Code Entry",
+        lock_while_program_is_running,
+        GroupOption::EnableMode::ALWAYS_ENABLED, true
+    )
     , KEYBOARD_LAYOUT(
         "<b>Keyboard Layout:</b>",
         {

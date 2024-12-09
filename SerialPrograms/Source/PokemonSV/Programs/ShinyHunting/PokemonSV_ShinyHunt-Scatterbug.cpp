@@ -88,7 +88,13 @@ ShinyHuntScatterbug::ShinyHuntScatterbug()
         LockMode::UNLOCK_WHILE_RUNNING,
         true
     )
-    , SANDWICH_OPTIONS("Sandwich Options", &LANGUAGE, BaseRecipe::shiny, false, false, true)
+    , SANDWICH_OPTIONS(
+        "Sandwich Options",
+        &LANGUAGE,
+        BaseRecipe::shiny,
+        false,
+        GroupOption::EnableMode::ALWAYS_ENABLED
+    )
     , GO_HOME_WHEN_DONE(true)
     , AUTO_HEAL_PERCENT(
         "<b>Auto-Heal %</b><br>Auto-heal if your HP drops below this percentage.",

@@ -296,13 +296,12 @@ SandwichMakerOption::SandwichMakerOption(
     OCR::LanguageOCROption* language_option,
     BaseRecipe base_recipe,
     bool show_save_option,
-    bool toggleable,
-    bool enabled
+    GroupOption::EnableMode enable_mode
 )
     : GroupOption(
         std::move(label),
         LockMode::UNLOCK_WHILE_RUNNING,
-        toggleable, enabled
+        enable_mode
     )
     , m_language_owner(language_option == nullptr
         ? new OCR::LanguageOCROption(

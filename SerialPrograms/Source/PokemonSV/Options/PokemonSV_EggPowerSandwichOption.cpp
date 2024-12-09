@@ -13,11 +13,7 @@ namespace PokemonSV{
 
 
 EggPowerSandwichOption::EggPowerSandwichOption()
-    : GroupOption(
-        "Egg Power Sandwich",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        false, true
-    )
+    : GroupOption("Egg Power Sandwich", LockMode::UNLOCK_WHILE_RUNNING)
     , MAX_NUM_SANDWICHES(
         "<b>Max Sandwiches:</b><br>How many sandwiches you can make before running out of ingredients.",
         LockMode::UNLOCK_WHILE_RUNNING,

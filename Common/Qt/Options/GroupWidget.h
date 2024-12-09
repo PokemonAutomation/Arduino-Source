@@ -13,6 +13,7 @@
 
 class QVBoxLayout;
 class QGroupBox;
+class QPushButton;
 
 namespace PokemonAutomation{
 
@@ -37,6 +38,7 @@ protected:
     QWidget* m_expand_text;
     QWidget* m_options_holder;
     std::vector<ConfigWidget*> m_options;
+    QPushButton* m_restore_defaults_button;
     bool m_expanded = true;
     QVBoxLayout* m_options_layout;
 };

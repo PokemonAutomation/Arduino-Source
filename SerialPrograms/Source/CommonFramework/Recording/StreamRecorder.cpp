@@ -157,9 +157,43 @@ void StreamRecording::internal_run(){
 //    recorder.setQuality(QMediaRecorder::LowQuality);
 //    recorder.setQuality(QMediaRecorder::VeryLowQuality);
 
-    recorder.setVideoResolution(1280, 720);
-    recorder.setVideoBitRate(GlobalSettings::instance().STREAM_HISTORY.VIDEO_BITRATE * 1000);
-    recorder.setEncodingMode(QMediaRecorder::AverageBitRateEncoding);
+    switch (GlobalSettings::instance().STREAM_HISTORY.RESOLUTION){
+    case StreamHistoryOption::Resolution::MATCH_INPUT:
+        break;
+    case StreamHistoryOption::Resolution::FORCE_720p:
+        recorder.setVideoResolution(1280, 720);
+        break;
+    case StreamHistoryOption::Resolution::FORCE_1080p:
+        recorder.setVideoResolution(1920, 1080);
+        break;
+    }
+
+    switch (GlobalSettings::instance().STREAM_HISTORY.ENCODING_MODE){
+    case StreamHistoryOption::EncodingMode::FIXED_QUALITY:
+        switch (GlobalSettings::instance().STREAM_HISTORY.VIDEO_QUALITY){
+        case StreamHistoryOption::VideoQuality::VERY_LOW:
+            recorder.setQuality(QMediaRecorder::VeryLowQuality);
+            break;
+        case StreamHistoryOption::VideoQuality::LOW:
+            recorder.setQuality(QMediaRecorder::LowQuality);
+            break;
+        case StreamHistoryOption::VideoQuality::NORMAL:
+            recorder.setQuality(QMediaRecorder::NormalQuality);
+            break;
+        case StreamHistoryOption::VideoQuality::HIGH:
+            recorder.setQuality(QMediaRecorder::HighQuality);
+            break;
+        case StreamHistoryOption::VideoQuality::VERY_HIGH:
+            recorder.setQuality(QMediaRecorder::VeryHighQuality);
+            break;
+        }
+        break;
+    case StreamHistoryOption::EncodingMode::FIXED_BITRATE:
+        recorder.setVideoBitRate(GlobalSettings::instance().STREAM_HISTORY.VIDEO_BITRATE * 1000);
+        recorder.setEncodingMode(QMediaRecorder::AverageBitRateEncoding);
+        break;
+    }
+
 
 #ifdef PA_STREAM_HISTORY_LOCAL_BUFFER
     recorder.setOutputDevice(&m_write_buffer);

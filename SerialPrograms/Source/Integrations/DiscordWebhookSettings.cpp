@@ -93,7 +93,11 @@ std::vector<std::string> DiscordWebhookSettingsTable::make_header() const{
 
 
 DiscordWebhookSettingsOption::DiscordWebhookSettingsOption()
-    : GroupOption("Discord Webhook Settings", LockMode::LOCK_WHILE_RUNNING, true, false)
+    : GroupOption(
+        "Discord Webhook Settings",
+        LockMode::LOCK_WHILE_RUNNING,
+        GroupOption::EnableMode::DEFAULT_ENABLED, false
+    )
     , sends_per_second(
         "<b>Rate Limit:</b><br>Maximum number of sends per second.",
         LockMode::LOCK_WHILE_RUNNING, 2, 1

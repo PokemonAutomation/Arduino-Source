@@ -28,7 +28,7 @@ DiscordIntegrationSettingsOption::~DiscordIntegrationSettingsOption(){
     this->remove_listener(*this);
 }
 DiscordIntegrationSettingsOption::DiscordIntegrationSettingsOption()
-    : GroupOption("Discord Integration Settings", LockMode::LOCK_WHILE_RUNNING, true, false)
+    : GroupOption("Discord Integration Settings", LockMode::LOCK_WHILE_RUNNING)
 //    , m_integration_enabled(integration_enabled)
     , run_on_start(
         "<b>Run Discord Integration on Launch:</b><br>Automatically connect to Discord as soon as the program is launched.",

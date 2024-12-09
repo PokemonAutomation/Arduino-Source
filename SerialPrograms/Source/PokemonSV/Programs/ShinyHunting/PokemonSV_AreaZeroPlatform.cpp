@@ -36,7 +36,11 @@ PlatformResetSettings::~PlatformResetSettings(){
     WINDOW_IN_MINUTES.remove_listener(*this);
 }
 PlatformResetSettings::PlatformResetSettings()
-    : GroupOption("Platform Reset Conditions", LockMode::UNLOCK_WHILE_RUNNING, true, false)
+    : GroupOption(
+        "Platform Reset Conditions",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        GroupOption::EnableMode::DEFAULT_ENABLED
+    )
     , m_description(
         "A \"Platform Reset\" is when you fly to Zero Gate, then return to the "
         "platform. This is usually done to recover from falling off the "

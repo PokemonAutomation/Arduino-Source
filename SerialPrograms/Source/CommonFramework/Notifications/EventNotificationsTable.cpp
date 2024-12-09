@@ -40,7 +40,11 @@ std::vector<std::string> EventNotificationsTable::make_header() const{
 
 
 EventNotificationsOption::EventNotificationsOption(std::vector<EventNotificationOption*> options)
-    : GroupOption("Discord Notifications", LockMode::UNLOCK_WHILE_RUNNING, true)
+    : GroupOption(
+        "Discord Notifications",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        GroupOption::EnableMode::DEFAULT_ENABLED, false
+    )
     , m_table(std::move(options))
 {
     PA_ADD_OPTION(m_table);

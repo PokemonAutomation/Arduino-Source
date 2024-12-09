@@ -6,7 +6,9 @@
 
 #include <QVBoxLayout>
 #include <QLabel>
+#include <QPushButton>
 #include <QGroupBox>
+#include <QMessageBox>
 //#include "Common/Compiler.h"
 #include "GroupWidget.h"
 
@@ -30,6 +32,7 @@ GroupWidget::GroupWidget(QWidget& parent, GroupOption& value)
     : QWidget(&parent)
     , ConfigWidget(value, *this)
     , m_value(value)
+    , m_restore_defaults_button(nullptr)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
 //    layout->setAlignment(Qt::AlignTop);
@@ -71,6 +74,26 @@ GroupWidget::GroupWidget(QWidget& parent, GroupOption& value)
         m_options.emplace_back(item->make_QtWidget(parent));
         m_options.back()->widget().setContentsMargins(5, 5, 5, 5);
         m_options_layout->addWidget(&m_options.back()->widget());
+    }
+
+    if (value.restore_defaults_button_enabled()){
+        m_options.back()->widget().setContentsMargins(5, 5, 5, 5);
+        m_restore_defaults_button = new QPushButton("Restore Defaults", this);
+        m_options_layout->addWidget(m_restore_defaults_button);
+        connect(
+            m_restore_defaults_button, &QPushButton::clicked,
+            this, [this](bool on){
+                QMessageBox::StandardButton button = QMessageBox::question(
+                    nullptr,
+                    "Restore Defaults",
+                    "Are you sure you wish to restore this section back to defaults?",
+                    QMessageBox::Ok | QMessageBox::Cancel
+                );
+                if (button == QMessageBox::Ok){
+                    m_value.restore_defaults();
+                }
+            }
+        );
     }
 
     connect(

@@ -9,13 +9,14 @@
 
 namespace PokemonAutomation{
 
-
 StreamHistoryOption::StreamHistoryOption()
     : GroupOption(
         "Stream History",
         LockMode::LOCK_WHILE_RUNNING,
-        true,
         IS_BETA_VERSION
+            ? GroupOption::EnableMode::DEFAULT_ENABLED
+            : GroupOption::EnableMode::DEFAULT_DISABLED,
+        true
     )
     , DESCRIPTION(
         "Keep a record of the recent video+audio streams. This will allow video capture "
@@ -35,10 +36,44 @@ StreamHistoryOption::StreamHistoryOption()
         LockMode::UNLOCK_WHILE_RUNNING,
         30
     )
+    , RESOLUTION(
+        "<b>Resolution:</b>",
+        {
+            {Resolution::MATCH_INPUT,   "match",    "Match Input Resolution"},
+            {Resolution::FORCE_720p,    "720p",     "1280 x 720"},
+            {Resolution::FORCE_1080p,   "1080p",    "1920 x 1080"},
+        },
+        LockMode::UNLOCK_WHILE_RUNNING,
+        Resolution::MATCH_INPUT
+    )
+    , ENCODING_MODE(
+        "<b>Encoding Mode:</b>",
+        {
+            {EncodingMode::FIXED_QUALITY, "fixed-quality", "Fixed Quality"},
+            {EncodingMode::FIXED_BITRATE, "fixed-bitrate", "Fixed Bit Rate"},
+        },
+        LockMode::UNLOCK_WHILE_RUNNING,
+        EncodingMode::FIXED_QUALITY
+    )
+    , VIDEO_QUALITY(
+        "<b>Video Quality:</b><br>"
+        "<font color=\"orange\">High quality videos will take more disk space "
+        "and may exceed the attachment size limit for Discord notifications."
+        "</font>",
+        {
+            {VideoQuality::VERY_LOW,    "very-low",     "Very Low"},
+            {VideoQuality::LOW,         "low",          "Low"},
+            {VideoQuality::NORMAL,      "normal",       "Normal"},
+            {VideoQuality::HIGH,        "high",         "High"},
+            {VideoQuality::VERY_HIGH,   "very-high",    "Very High"},
+        },
+        LockMode::UNLOCK_WHILE_RUNNING,
+        VideoQuality::LOW
+    )
     , VIDEO_BITRATE(
         "<b>Video Bit-Rate (kbps):</b><br>"
         "Lower = lower quality, smaller file size.<br>"
-        "Higher = high quality, larger file size.<br><br>"
+        "Higher = high quality, larger file size.<br>"
         "<font color=\"orange\">Large values can exceed the attachment size limit for Discord notifications."
         "</font>",
         LockMode::UNLOCK_WHILE_RUNNING,
@@ -47,8 +82,34 @@ StreamHistoryOption::StreamHistoryOption()
 {
     PA_ADD_STATIC(DESCRIPTION);
     PA_ADD_OPTION(HISTORY_SECONDS);
+    PA_ADD_OPTION(RESOLUTION);
+    PA_ADD_OPTION(ENCODING_MODE);
+    PA_ADD_OPTION(VIDEO_QUALITY);
     PA_ADD_OPTION(VIDEO_BITRATE);
+
+    value_changed(this);
+
+    ENCODING_MODE.add_listener(*this);
 }
+StreamHistoryOption::~StreamHistoryOption(){
+    ENCODING_MODE.remove_listener(*this);
+}
+
+void StreamHistoryOption::value_changed(void* object){
+    switch (ENCODING_MODE){
+    case EncodingMode::FIXED_QUALITY:
+        VIDEO_QUALITY.set_visibility(ConfigOptionState::ENABLED);
+        VIDEO_BITRATE.set_visibility(ConfigOptionState::HIDDEN);
+        break;
+    case EncodingMode::FIXED_BITRATE:
+        VIDEO_QUALITY.set_visibility(ConfigOptionState::HIDDEN);
+        VIDEO_BITRATE.set_visibility(ConfigOptionState::ENABLED);
+        break;
+    }
+}
+
+
+
 
 
 

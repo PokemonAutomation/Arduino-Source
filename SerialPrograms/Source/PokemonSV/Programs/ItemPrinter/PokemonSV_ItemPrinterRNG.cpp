@@ -179,7 +179,7 @@ ItemPrinterRNG::ItemPrinterRNG()
         1, 999
     )
     , MATERIAL_FARMER_OPTIONS(
-        true, false,
+        GroupOption::EnableMode::DEFAULT_DISABLED,
         &LANGUAGE,
         NOTIFICATION_STATUS_UPDATE,
         NOTIFICATION_PROGRAM_FINISH,
@@ -624,7 +624,7 @@ void ItemPrinterRNG::run_item_printer_rng_automode(
     const uint16_t min_happiny_dust = 400;
 
     MaterialFarmerOptions material_farmer_options(
-        true, true,
+        GroupOption::EnableMode::DEFAULT_ENABLED,
         &LANGUAGE,
         NOTIFICATION_STATUS_UPDATE,
         NOTIFICATION_PROGRAM_FINISH,

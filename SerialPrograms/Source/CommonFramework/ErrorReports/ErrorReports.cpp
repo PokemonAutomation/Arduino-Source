@@ -35,7 +35,11 @@ const std::string& ERROR_PATH_SENT = "ErrorReportsSent";
 
 
 ErrorReportOption::ErrorReportOption()
-    : GroupOption("Error Reports", LockMode::UNLOCK_WHILE_RUNNING, false)
+    : GroupOption(
+        "Error Reports",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        GroupOption::EnableMode::ALWAYS_ENABLED, true
+    )
     , DESCRIPTION(
         "Send error reports to the " + PROGRAM_NAME + " server to help them resolve issues and improve the program."
     )

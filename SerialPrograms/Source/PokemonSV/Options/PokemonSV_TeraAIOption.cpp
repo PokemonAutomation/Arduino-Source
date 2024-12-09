@@ -13,11 +13,7 @@ namespace PokemonSV{
 
 
 TeraAIOption::TeraAIOption()
-    : GroupOption(
-        "Battle AI",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        false, true
-    )
+    : GroupOption("Battle AI", LockMode::UNLOCK_WHILE_RUNNING)
     , description(
         "There is no battle AI yet. It will always select the 1st move unless it is blocked by taunt, disable, torment, etc..."
     )

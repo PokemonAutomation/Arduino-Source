@@ -39,7 +39,13 @@ SandwichMaker_Descriptor::SandwichMaker_Descriptor()
 {}
 
 SandwichMaker::SandwichMaker()
-    : SANDWICH_OPTIONS("Sandwich Options", nullptr, BaseRecipe::non_shiny, false, false, true)
+    : SANDWICH_OPTIONS(
+        "Sandwich Options",
+        nullptr,
+        BaseRecipe::non_shiny,
+        false,
+        GroupOption::EnableMode::ALWAYS_ENABLED
+    )
     , GO_HOME_WHEN_DONE(false)
     , NOTIFICATIONS({
         &NOTIFICATION_PROGRAM_FINISH,

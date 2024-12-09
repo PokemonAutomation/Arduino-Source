@@ -18,11 +18,7 @@ using namespace Pokemon;
 
 SinglesAIOption::~SinglesAIOption() = default;
 SinglesAIOption::SinglesAIOption(bool trainer_battle)
-    : GroupOption(
-        "Battle AI",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        false, true
-    )
+    : GroupOption("Battle AI", LockMode::UNLOCK_WHILE_RUNNING)
     , description(
         "Move Tables: Run these sequence of moves for the corresponding " + STRING_POKEMON + " in your party. "
         "When the end of the table is reached, the last entry will be repeated "

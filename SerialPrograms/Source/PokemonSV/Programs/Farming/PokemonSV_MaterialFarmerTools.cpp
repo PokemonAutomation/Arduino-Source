@@ -44,7 +44,7 @@ MaterialFarmerOptions::~MaterialFarmerOptions(){
 }
 
 MaterialFarmerOptions::MaterialFarmerOptions(
-    bool toggleable, bool enabled,
+    GroupOption::EnableMode enable_mode,
     OCR::LanguageOCROption* language_option,
     EventNotificationOption& notif_status_update_option,
     EventNotificationOption& notif_program_finish_option,
@@ -54,7 +54,7 @@ MaterialFarmerOptions::MaterialFarmerOptions(
     : GroupOption(
         "Material Farmer",
         LockMode::UNLOCK_WHILE_RUNNING,
-        toggleable, enabled
+        enable_mode
     )
     , m_language_owner(language_option == nullptr
         ? new OCR::LanguageOCROption(
@@ -78,7 +78,13 @@ MaterialFarmerOptions::MaterialFarmerOptions(
 //    , SAVE_GAME_BEFORE_SANDWICH_STATIC_TEXT("")
 //    , NUM_SANDWICH_ROUNDS_STATIC_TEXT("")
     , LANGUAGE(language_option == nullptr ? *m_language_owner : *language_option)
-    , SANDWICH_OPTIONS("Make a Sandwich", &LANGUAGE, BaseRecipe::non_shiny, true, true, false)
+    , SANDWICH_OPTIONS(
+        "Make a Sandwich",
+        &LANGUAGE,
+        BaseRecipe::non_shiny,
+        true,
+        GroupOption::EnableMode::DEFAULT_DISABLED
+    )
     , AUTO_HEAL_PERCENT(
         "<b>Auto-Heal %</b><br>Auto-heal if your HP drops below this percentage.",
         LockMode::UNLOCK_WHILE_RUNNING,

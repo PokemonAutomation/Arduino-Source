@@ -214,7 +214,11 @@ std::vector<std::string> JoinReportTable::make_header() const{
 
 
 RaidJoinReportOption::RaidJoinReportOption()
-    : GroupOption("Join Reports:", LockMode::UNLOCK_WHILE_RUNNING, true, true)
+    : GroupOption(
+        "Join Reports:",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        GroupOption::EnableMode::DEFAULT_ENABLED
+    )
     , text(
         "Track how many times each IGN has joined and generate a report. "
         "This can be used to help identify people who join too many times for "
