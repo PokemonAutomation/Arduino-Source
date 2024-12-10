@@ -236,6 +236,8 @@ std::set<std::string> OutbreakFinder::read_travel_map_outbreaks(
 ){
     OutbreakFinder_Descriptor::Stats& stats = env.current_stats<OutbreakFinder_Descriptor::Stats>();
 
+    VideoOverlaySet overlays(env.console);
+
     MapRegion start_region = MapRegion::NONE;
 
     MapRegion current_region = detect_selected_region(env.console, context);
@@ -244,10 +246,13 @@ std::set<std::string> OutbreakFinder::read_travel_map_outbreaks(
         return std::set<std::string>();
     }
 
+    OutbreakReader reader(env.console, LANGUAGE, env.console);
+    reader.make_overlays(overlays);
+
     MMOQuestionMarkDetector question_mark_detector(env.logger());
-    VideoOverlaySet mmo_overlay_set(env.console);
+//    VideoOverlaySet mmo_overlay_set(env.console);
     std::array<bool, 5> mmo_appears = question_mark_detector.detect_MMO_on_hisui_map(env.console.video().snapshot());
-    add_hisui_MMO_detection_to_overlay(mmo_appears, mmo_overlay_set);
+    add_hisui_MMO_detection_to_overlay(mmo_appears, overlays);
 
     // If the current region is a wild area, the yellow cursor may overlap with the MMO question marker, causing
     // wrong detection. So we have to check it's location again by moving the cursor to the next location
@@ -259,7 +264,7 @@ std::set<std::string> OutbreakFinder::read_travel_map_outbreaks(
         auto new_mmo_read = question_mark_detector.detect_MMO_on_hisui_map(env.console.video().snapshot());
         mmo_appears[current_wild_area_index] = new_mmo_read[current_wild_area_index];
         if (new_mmo_read[current_wild_area_index]){
-            add_hisui_MMO_detection_to_overlay(mmo_appears, mmo_overlay_set);
+            add_hisui_MMO_detection_to_overlay(mmo_appears, overlays);
         }
         // now mmo_appears should contain correct detection of MMO question marks.
     }
@@ -303,7 +308,6 @@ std::set<std::string> OutbreakFinder::read_travel_map_outbreaks(
             if (mmo_appears[wild_region_index]){
                 env.log(std::string(MAP_REGION_NAMES[(int)current_region]) + " have MMO.", COLOR_ORANGE);
             }else{
-                OutbreakReader reader(env.console, LANGUAGE, env.console);
                 OCR::StringMatchResult result = reader.read(env.console.video().snapshot());
                 if (!result.results.empty()){
                     stats.outbreaks++;

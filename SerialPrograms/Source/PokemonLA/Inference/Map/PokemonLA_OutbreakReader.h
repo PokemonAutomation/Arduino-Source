@@ -23,6 +23,7 @@ class OutbreakReader{
 public:
     OutbreakReader(Logger& logger, Language language, VideoOverlay& overlay);
 
+    void make_overlays(VideoOverlaySet& items) const;
     OCR::StringMatchResult read(const ImageViewRGB32& screen) const;
 
 
