@@ -13,6 +13,10 @@
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
 #include "Kernels_ImageFilter_Basic.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 namespace Kernels{
 
@@ -112,13 +116,13 @@ PA_FORCE_INLINE void to_blackwhite_rbg32(
         const uint32_t* in = image;
         size_t shift = 0;
         size_t lc = width / VECTOR_SIZE;
-        do{
+        while (lc--){
             for (size_t c = 0; c < filter_count; c++){
                 entries[c].process_full(filter[c].data + shift, in);
             }
             in += VECTOR_SIZE;
             shift += VECTOR_SIZE;
-        }while (--lc);
+        }
         size_t left = width % VECTOR_SIZE;
         if (left != 0){
             for (size_t c = 0; c < filter_count; c++){
