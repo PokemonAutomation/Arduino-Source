@@ -105,7 +105,7 @@ AuctionFarmer::AuctionFarmer()
 }
 
 
-std::vector<ImageFloatBox> AuctionFarmer::detect_dialog_boxes(const ImageViewRGB32& screen){
+std::vector<ImagePixelBox> AuctionFarmer::detect_dialog_boxes(const ImageViewRGB32& screen){
     using namespace Kernels::Waterfill;
 
     uint32_t MIN_BORDER_THRESHOLD = 0xffc07000;
@@ -118,7 +118,7 @@ std::vector<ImageFloatBox> AuctionFarmer::detect_dialog_boxes(const ImageViewRGB
     size_t height = screen.height();
 
 
-    std::vector<ImageFloatBox> dialog_boxes;
+    std::vector<ImagePixelBox> dialog_boxes;
     {
         PackedBinaryMatrix border_matrix = compress_rgb32_to_binary_range(screen, MIN_BORDER_THRESHOLD, MAX_BORDER_THRESHOLD);
 
@@ -134,12 +134,16 @@ std::vector<ImageFloatBox> AuctionFarmer::detect_dialog_boxes(const ImageViewRGB
             ){
                 continue;
             }
+            dialog_boxes.emplace_back(object);
 
+//            static int c = 0;
+//            extract_box_reference(screen, object).save("image-" + std::to_string(c++) + ".png");
+
+#if 1
             // check for yellow inside the orange border
             ImagePixelBox border_pixel_box(object);
-            ImageFloatBox border_float_box = pixelbox_to_floatbox(screen, border_pixel_box);
+//            ImageFloatBox border_float_box = pixelbox_to_floatbox(screen, border_pixel_box);
             ImageViewRGB32 dialog = extract_box_reference(screen, border_pixel_box);
-
             PackedBinaryMatrix yellow_matrix = compress_rgb32_to_binary_range(dialog, MIN_YELLOW_THRESHOLD, MAX_YELLOW_THRESHOLD);
 
             std::unique_ptr<WaterfillSession> yellow_session = make_WaterfillSession(yellow_matrix);
@@ -150,11 +154,21 @@ std::vector<ImageFloatBox> AuctionFarmer::detect_dialog_boxes(const ImageViewRGB
                 if (object.width() < width * 0.0925 || object.height() < height * 0.0925){
                     continue;
                 }
-                ImagePixelBox dialog_pixel_box(yellow_object);
+
+//                extract_box_reference(dialog, yellow_object).save("yellow-" + std::to_string(c++) + ".png");
+
+//                ImagePixelBox dialog_pixel_box(yellow_object);
+                ImagePixelBox dialog_pixel_box;
+                dialog_pixel_box.min_x = border_pixel_box.min_x + yellow_object.min_x;
+                dialog_pixel_box.min_y = border_pixel_box.min_y + yellow_object.min_y;
+                dialog_pixel_box.max_x = dialog_pixel_box.min_x + yellow_object.width();
+                dialog_pixel_box.max_y = dialog_pixel_box.min_y + yellow_object.height();
                 
-                ImageFloatBox translated_dialog_box = translate_to_parent(screen, border_float_box, dialog_pixel_box);
-                dialog_boxes.emplace_back(translated_dialog_box);
+//                ImageFloatBox translated_dialog_box = translate_to_parent(screen, border_float_box, dialog_pixel_box);
+//                dialog_boxes.emplace_back(translated_dialog_box);
+                dialog_boxes.emplace_back(dialog_pixel_box);
             }
+#endif
         }
     }
     return dialog_boxes;
@@ -193,7 +207,9 @@ std::vector<std::pair<AuctionOffer, ImageFloatBox>> AuctionFarmer::check_offers(
     context.wait_for_all_requests();
     
     VideoSnapshot screen = env.console.video().snapshot();
-    std::vector<ImageFloatBox> dialog_boxes = detect_dialog_boxes(screen);
+    std::vector<ImagePixelBox> dialog_boxes = detect_dialog_boxes(screen);
+    std::deque<OverlayBoxScope> bubbles_boxes;
+    std::deque<OverlayBoxScope> offer_boxes;
     std::vector<std::pair<AuctionOffer, ImageFloatBox>> offers;
 
     if (dialog_boxes.empty()){
@@ -202,27 +218,34 @@ std::vector<std::pair<AuctionOffer, ImageFloatBox>> AuctionFarmer::check_offers(
     }
 
     // read dialog bubble
-    for (ImageFloatBox dialog_box : dialog_boxes){
+    for (ImagePixelBox dialog_box : dialog_boxes){
 //        std::cout << "dialog_box: ["
-//                << dialog_box.x << "," << dialog_box.y << "] - ["
-//                << dialog_box.width << "," << dialog_box.height << "]" << std::endl;
+//                << dialog_box.min_x << "," << dialog_box.min_y << "] - ["
+//                << dialog_box.max_x << "," << dialog_box.max_y << "]" << std::endl;
 
-        OverlayBoxScope dialog_overlay(env.console, dialog_box, COLOR_DARK_BLUE);
+        ImageFloatBox dialog_float_box = pixelbox_to_floatbox(screen, dialog_box);
+        bubbles_boxes.emplace_back(env.console, dialog_float_box, COLOR_GREEN);
 
+
+//        OverlayBoxScope dialog_overlay(env.console, dialog_box, COLOR_DARK_BLUE);
         ImageFloatBox offer_box(0.05, 0.02, 0.90, 0.49);
         ImageFloatBox translated_offer_box = translate_to_parent(
             screen,
-            dialog_box,
-            //  TODO: Fix these casts as they always go to zero.
-            floatbox_to_pixelbox((size_t)dialog_box.width, (size_t)dialog_box.height, offer_box)
+            dialog_float_box,
+            floatbox_to_pixelbox(dialog_box.width(), dialog_box.height(), offer_box)
         );
 //        std::cout << "translated_offer_box: ["
 //                << translated_offer_box.x << "," << translated_offer_box.y << "] - ["
 //                << translated_offer_box.width << "," << translated_offer_box.height << "]" << std::endl;
-        OverlayBoxScope offer_overlay(env.console, translated_offer_box, COLOR_BLUE);
+
+        offer_boxes.emplace_back(env.console, translated_offer_box, COLOR_BLUE);
+
+//        OverlayBoxScope offer_overlay(env.console, translated_offer_box, COLOR_BLUE);
         
         ImageViewRGB32 dialog = extract_box_reference(screen, dialog_box);
         ImageViewRGB32 offer_image = extract_box_reference(dialog, offer_box);
+
+//        std::cout << offer_image.width() << " x " << offer_image.height() << std::endl;
 
 
         const double LOG10P_THRESHOLD = -1.5;
@@ -240,11 +263,12 @@ std::vector<std::pair<AuctionOffer, ImageFloatBox>> AuctionFarmer::check_offers(
                 best_item = iter->second.token;
 
                 AuctionOffer offer{ best_item };
-                std::pair<AuctionOffer, ImageFloatBox> pair(offer, dialog_box);
+                std::pair<AuctionOffer, ImageFloatBox> pair(offer, dialog_float_box);
                 offers.emplace_back(pair);
             }
         }
     }
+    context.wait_for(std::chrono::seconds(100));
     return offers;
 }
 
@@ -434,6 +458,11 @@ void AuctionFarmer::bid_on_item(SingleSwitchProgramEnvironment& env, BotBaseCont
 void AuctionFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
+#if 0
+    check_offers(env, context);
+    return;
+
+#else
     AuctionFarmer_Descriptor::Stats& stats = env.current_stats<AuctionFarmer_Descriptor::Stats>();
 
     //  Connect the controller.
@@ -501,7 +530,7 @@ void AuctionFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
             context.wait_for_all_requests();
         }
     }
-        
+#endif
 }
 
 

@@ -51,7 +51,7 @@ private:
     SectionDividerOption m_advanced_options;
     BooleanCheckBoxOption ONE_NPC;
 
-    std::vector<ImageFloatBox> detect_dialog_boxes(const ImageViewRGB32& screen);
+    std::vector<ImagePixelBox> detect_dialog_boxes(const ImageViewRGB32& screen);
     void reset_auctions(SingleSwitchProgramEnvironment& env, BotBaseContext& context, bool do_full_reset, uint8_t& year);
     std::vector<std::pair<AuctionOffer, ImageFloatBox>> check_offers(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
     void move_to_auctioneer(SingleSwitchProgramEnvironment& env, BotBaseContext& context, AuctionOffer wanted);
