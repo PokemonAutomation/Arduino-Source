@@ -773,11 +773,22 @@ void jump_off_wall_until_map_open(const ProgramInfo& info, ConsoleHandle& consol
 
 // Open map and teleport back to town pokecenter to reset the hunting path.
 void reset_to_pokecenter(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+    size_t MAX_FAILURES = 5;
+    size_t num_failures = 0;
     while (true){
         try {
             open_map_from_overworld(info, console, context);
             fly_to_closest_pokecenter_on_map(info, console, context);
+            return;
         }catch (UnexpectedBattleException&){
+            num_failures++;
+            if (num_failures > MAX_FAILURES){
+                throw OperationFailedException(
+                    ErrorReport::SEND_ERROR_REPORT, console,
+                    "reset_to_pokecenter(): Failed to reset to pokecenter. Repeatedly stuck in battle.",
+                    true
+                );
+            }
             run_battle_press_A(console, context, BattleStopCondition::STOP_OVERWORLD);            
         }
     }
