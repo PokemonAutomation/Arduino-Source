@@ -755,6 +755,7 @@ void reset_to_pokecenter(const ProgramInfo& info, ConsoleHandle& console, BotBas
         try {
             open_map_from_overworld(info, console, context);
             fly_to_closest_pokecenter_on_map(info, console, context);
+            break;
         }catch (UnexpectedBattleException&){
             run_battle_press_A(console, context, BattleStopCondition::STOP_OVERWORLD);            
         }
