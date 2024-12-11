@@ -102,11 +102,18 @@ bool detect_MMO_question_mark(const PokemonAutomation::ImageViewRGB32 &frame, co
     };
 
     bool detected = match_template_by_waterfill(
-        image, MMOQuestionMarkBackgroundMatcher::instance(),
-        {{combine_rgb(0, 10, 30), combine_rgb(60, 90, 130)}},
-        {scale(min_bg_size), scale(max_bg_size)}, 90,
+        image,
+        MMOQuestionMarkBackgroundMatcher::instance(),
+        {
+            {combine_rgb(0, 0, 0), combine_rgb(127, 127, 127)},
+            {combine_rgb(0, 10, 30), combine_rgb(60, 90, 130)},
+        },
+        {scale(min_bg_size), scale(max_bg_size)},
+        90,
         [](WaterfillObject&) { return true; }
     );
+
+//    cout << "detected = " << detected << endl;
 
     if (detected){
         const size_t min_curve_size = 250;

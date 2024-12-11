@@ -93,7 +93,7 @@ bool match_template_by_waterfill(
 
     bool detected = false;
     bool stop_match = false;
-    for(PokemonAutomation::PackedBinaryMatrix &matrix : matrices){
+    for (PokemonAutomation::PackedBinaryMatrix &matrix : matrices){
         if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
             ImageRGB32 binaryImage = image.copy();
             filter_by_mask(matrix, binaryImage, Color(COLOR_BLACK), true);
