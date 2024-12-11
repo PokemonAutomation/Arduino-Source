@@ -20,6 +20,7 @@ namespace Kernels{
 class ImageFilterByMask_x64_AVX2{
 public:
     static const size_t VECTOR_SIZE = 8;
+    using Mask = PartialWordAccess32_x64_AVX2;
 
 public:
     ImageFilterByMask_x64_AVX2(uint32_t mins, uint32_t maxs, uint32_t replacement, bool invert)
@@ -39,11 +40,10 @@ public:
         pixel = process_word(pixel);
         _mm256_storeu_si256((__m256i*)out, pixel);
     }
-    PA_FORCE_INLINE void process_partial(uint32_t* out, const uint32_t* in, size_t left){
-        PartialWordAccess32_x64_AVX2 loader(left);
-        __m256i pixel = loader.load_i32(in);
+    PA_FORCE_INLINE void process_partial(uint32_t* out, const uint32_t* in, const Mask& mask){
+        __m256i pixel = mask.load_i32(in);
         pixel = process_word(pixel);
-        loader.store(out, pixel);
+        mask.store(out, pixel);
     }
 
 private:
@@ -94,6 +94,7 @@ void filter_rgb32_range_x64_AVX2(
 class ImageFilter_RgbEuclidean_x64_AVX2{
 public:
     static const size_t VECTOR_SIZE = 8;
+    using Mask = PartialWordAccess32_x64_AVX2;
 
 public:
     ImageFilter_RgbEuclidean_x64_AVX2(uint32_t expected, double max_euclidean_distance, uint32_t replacement, bool invert)
@@ -114,11 +115,10 @@ public:
         pixel = process_word(pixel);
         _mm256_storeu_si256((__m256i*)out, pixel);
     }
-    PA_FORCE_INLINE void process_partial(uint32_t* out, const uint32_t* in, size_t left){
-        PartialWordAccess32_x64_AVX2 loader(left);
-        __m256i pixel = loader.load_i32(in);
+    PA_FORCE_INLINE void process_partial(uint32_t* out, const uint32_t* in, const Mask& mask){
+        __m256i pixel = mask.load_i32(in);
         pixel = process_word(pixel);
-        loader.store(out, pixel);
+        mask.store(out, pixel);
     }
 
 private:
@@ -171,6 +171,7 @@ size_t filter_rgb32_euclidean_x64_AVX2(
 class ToBlackWhite_RgbRange_x64_AVX2{
 public:
     static const size_t VECTOR_SIZE = 8;
+    using Mask = PartialWordAccess32_x64_AVX2;
 
 public:
     ToBlackWhite_RgbRange_x64_AVX2(uint32_t mins, uint32_t maxs, bool in_range_black)
@@ -189,11 +190,10 @@ public:
         pixel = process_word(pixel);
         _mm256_storeu_si256((__m256i*)out, pixel);
     }
-    PA_FORCE_INLINE void process_partial(uint32_t* out, const uint32_t* in, size_t left){
-        PartialWordAccess32_x64_AVX2 loader(left);
-        __m256i pixel = loader.load_i32(in);
+    PA_FORCE_INLINE void process_partial(uint32_t* out, const uint32_t* in, const Mask& mask){
+        __m256i pixel = mask.load_i32(in);
         pixel = process_word(pixel);
-        loader.store(out, pixel);
+        mask.store(out, pixel);
     }
 
 private:

@@ -16,9 +16,20 @@ namespace PokemonAutomation{
 namespace Kernels{
 
 
+struct PartialWordMask{
+    __mmask16 m;
+
+    PA_FORCE_INLINE PartialWordMask(size_t left)
+        : m((__mmask16)1 << left)
+    {}
+};
+
+
+
 class ImageFilterByMask_x64_AVX512{
 public:
     static const size_t VECTOR_SIZE = 16;
+    using Mask = PartialWordMask;
 
 public:
     ImageFilterByMask_x64_AVX512(uint32_t mins, uint32_t maxs, uint32_t replacement, bool invert)
@@ -38,11 +49,10 @@ public:
         pixel = process_word(pixel);
         _mm512_storeu_si512((__m512i*)out, pixel);
     }
-    PA_FORCE_INLINE void process_partial(uint32_t* out, const uint32_t* in, size_t left){
-        uint64_t mask = ((uint64_t)1 << left) - 1;
-        __m512i pixel = _mm512_maskz_loadu_epi32((__mmask16)mask, in);
+    PA_FORCE_INLINE void process_partial(uint32_t* out, const uint32_t* in, const Mask& mask){
+        __m512i pixel = _mm512_maskz_loadu_epi32(mask.m, in);
         pixel = process_word(pixel);
-        _mm512_mask_storeu_epi32(out, (__mmask16)mask, pixel);
+        _mm512_mask_storeu_epi32(out, mask.m, pixel);
     }
 
 private:
@@ -97,6 +107,7 @@ void filter_rgb32_range_x64_AVX512(
 class ImageFilter_RgbEuclidean_x64_AVX512{
 public:
     static const size_t VECTOR_SIZE = 16;
+    using Mask = PartialWordMask;
 
 public:
     ImageFilter_RgbEuclidean_x64_AVX512(uint32_t expected, double max_euclidean_distance, uint32_t replacement, bool invert)
@@ -117,11 +128,10 @@ public:
         pixel = process_word(pixel);
         _mm512_storeu_si512((__m512i*)out, pixel);
     }
-    PA_FORCE_INLINE void process_partial(uint32_t* out, const uint32_t* in, size_t left){
-        uint64_t mask = ((uint64_t)1 << left) - 1;
-        __m512i pixel = _mm512_maskz_loadu_epi32((__mmask16)mask, in);
+    PA_FORCE_INLINE void process_partial(uint32_t* out, const uint32_t* in, const Mask& mask){
+        __m512i pixel = _mm512_maskz_loadu_epi32(mask.m, in);
         pixel = process_word(pixel);
-        _mm512_mask_storeu_epi32(out, (__mmask16)mask, pixel);
+        _mm512_mask_storeu_epi32(out, mask.m, pixel);
     }
 
 private:
@@ -177,6 +187,7 @@ size_t filter_rgb32_euclidean_x64_AVX512(
 class ToBlackWhite_RgbRange_x64_AVX512{
 public:
     static const size_t VECTOR_SIZE = 16;
+    using Mask = PartialWordMask;
 
 public:
     ToBlackWhite_RgbRange_x64_AVX512(uint32_t mins, uint32_t maxs, bool in_range_black)
@@ -195,11 +206,10 @@ public:
         pixel = process_word(pixel);
         _mm512_storeu_si512((__m512i*)out, pixel);
     }
-    PA_FORCE_INLINE void process_partial(uint32_t* out, const uint32_t* in, size_t left){
-        uint64_t mask = ((uint64_t)1 << left) - 1;
-        __m512i pixel = _mm512_maskz_loadu_epi32((__mmask16)mask, in);
+    PA_FORCE_INLINE void process_partial(uint32_t* out, const uint32_t* in, const Mask& mask){
+        __m512i pixel = _mm512_maskz_loadu_epi32(mask.m, in);
         pixel = process_word(pixel);
-        _mm512_mask_storeu_epi32(out, (__mmask16)mask, pixel);
+        _mm512_mask_storeu_epi32(out, mask.m, pixel);
     }
 
 private:

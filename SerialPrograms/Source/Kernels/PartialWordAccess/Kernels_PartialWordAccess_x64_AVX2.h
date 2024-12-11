@@ -25,13 +25,13 @@ public:
         );
     }
 
-    PA_FORCE_INLINE __m256i load_i32(const void* ptr){
+    PA_FORCE_INLINE __m256i load_i32(const void* ptr) const{
         return _mm256_maskload_epi32((const int*)ptr, m_mask);
     }
-    PA_FORCE_INLINE __m256 load_f32(const void* ptr){
+    PA_FORCE_INLINE __m256 load_f32(const void* ptr) const{
         return _mm256_maskload_ps((const float*)ptr, m_mask);
     }
-    PA_FORCE_INLINE void store(const void* ptr, __m256i x){
+    PA_FORCE_INLINE void store(const void* ptr, __m256i x) const{
         _mm256_maskstore_epi32((int*)ptr, m_mask, x);
     }
 

@@ -17,9 +17,23 @@ namespace PokemonAutomation{
 namespace Kernels{
 
 
+
+struct PartialWordMask{
+    size_t left;
+    PartialWordAccess_x64_SSE41 loader;
+
+    PA_FORCE_INLINE PartialWordMask(size_t p_left)
+        : left(p_left)
+        , loader(left * sizeof(uint32_t))
+    {}
+};
+
+
+
 class ImageFilter_RgbRange_x64_SSE42{
 public:
     static const size_t VECTOR_SIZE = 4;
+    using Mask = PartialWordMask;
 
 public:
     ImageFilter_RgbRange_x64_SSE42(uint32_t mins, uint32_t maxs, uint32_t replacement, bool invert)
@@ -39,10 +53,10 @@ public:
         pixel = process_word(pixel);
         _mm_storeu_si128((__m128i*)out, pixel);
     }
-    PA_FORCE_INLINE void process_partial(uint32_t* out, const uint32_t* in, size_t left){
-        PartialWordAccess_x64_SSE41 loader(left * sizeof(uint32_t));
-        __m128i pixel = loader.load(in);
+    PA_FORCE_INLINE void process_partial(uint32_t* out, const uint32_t* in, const Mask& mask){
+        __m128i pixel = mask.loader.load(in);
         pixel = process_word(pixel);
+        size_t left = mask.left;
         do{
             out[0] = _mm_cvtsi128_si32(pixel);
             pixel = _mm_srli_si128(pixel, 4);
@@ -98,6 +112,7 @@ void filter_rgb32_range_x64_SSE42(
 class ImageFilter_RgbEuclidean_x64_SSE42{
 public:
     static const size_t VECTOR_SIZE = 4;
+    using Mask = PartialWordMask;
 
 public:
     ImageFilter_RgbEuclidean_x64_SSE42(uint32_t expected, double max_euclidean_distance, uint32_t replacement, bool invert)
@@ -118,10 +133,10 @@ public:
         pixel = process_word(pixel);
         _mm_storeu_si128((__m128i*)out, pixel);
     }
-    PA_FORCE_INLINE void process_partial(uint32_t* out, const uint32_t* in, size_t left){
-        PartialWordAccess_x64_SSE41 loader(left * sizeof(uint32_t));
-        __m128i pixel = loader.load(in);
+    PA_FORCE_INLINE void process_partial(uint32_t* out, const uint32_t* in, const Mask& mask){
+        __m128i pixel = mask.loader.load(in);
         pixel = process_word(pixel);
+        size_t left = mask.left;
         do{
             out[0] = _mm_cvtsi128_si32(pixel);
             pixel = _mm_srli_si128(pixel, 4);
@@ -190,6 +205,7 @@ size_t filter_rgb32_euclidean_x64_SSE42(
 class ToBlackWhite_RgbRange_x64_SSE42{
 public:
     static const size_t VECTOR_SIZE = 4;
+    using Mask = PartialWordMask;
 
 public:
     ToBlackWhite_RgbRange_x64_SSE42(uint32_t mins, uint32_t maxs, bool in_range_black)
@@ -208,10 +224,10 @@ public:
         pixel = process_word(pixel);
         _mm_storeu_si128((__m128i*)out, pixel);
     }
-    PA_FORCE_INLINE void process_partial(uint32_t* out, const uint32_t* in, size_t left){
-        PartialWordAccess_x64_SSE41 loader(left * sizeof(uint32_t));
-        __m128i pixel = loader.load(in);
+    PA_FORCE_INLINE void process_partial(uint32_t* out, const uint32_t* in, const Mask& mask){
+        __m128i pixel = mask.loader.load(in);
         pixel = process_word(pixel);
+        size_t left = mask.left;
         do{
             out[0] = _mm_cvtsi128_si32(pixel);
             pixel = _mm_srli_si128(pixel, 4);
