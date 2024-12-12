@@ -106,39 +106,6 @@ void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, BotBase
         results.balls_used,
         results.result
     );
-
-#if 0
-    while (true)
-    {
-        NormalBattleMenuWatcher battle_menu(COLOR_RED);
-        int ret = wait_until(
-            env.console, context,
-            std::chrono::seconds(120),
-            {
-                battle_menu,
-            }
-        );
-
-        context.wait_for(std::chrono::milliseconds(100));
-        switch (ret){
-        case 0:
-            throw_ball(env.console, context);
-            stats.m_balls++;
-            env.update_stats();
-            break;
-        default:
-            throw FatalProgramException(
-                env.console, ErrorReport::SEND_ERROR_REPORT,
-                "Failed to detect battle menu after 60 seconds, did you catch or fail?",
-                true
-            );
-        }
-
-    }
-#endif
-
-//    env.update_stats();
-//    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 }
 
 

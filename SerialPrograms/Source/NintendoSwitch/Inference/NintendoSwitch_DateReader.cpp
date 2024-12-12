@@ -256,7 +256,7 @@ std::pair<DateFormat, DateTime> DateReader::read_date(Logger& logger, std::share
     if (!detect(*screen)){
         throw_and_log<OperationFailedException>(
             logger, ErrorReport::SEND_ERROR_REPORT,
-            "Not on data change screen.",
+            "Not on date change screen.",
             nullptr,
             std::move(screen)
         );
@@ -267,7 +267,7 @@ std::pair<DateFormat, DateTime> DateReader::read_date(Logger& logger, std::share
     if (stats_window_top.stddev.sum() > 10){
         throw_and_log<OperationFailedException>(
             logger, ErrorReport::SEND_ERROR_REPORT,
-            "Not on data change screen.",
+            "Not on date change screen.",
             nullptr,
             std::move(screen)
         );
@@ -592,7 +592,7 @@ void change_date(
         HomeWatcher home;
         DateChangeWatcher date_reader;
         int ret = wait_until(
-            env.console, context, std::chrono::seconds(120),
+            env.console, context, std::chrono::seconds(10),
             {
                 home,
                 date_reader
