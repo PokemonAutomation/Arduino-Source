@@ -212,21 +212,23 @@ void StreamRecording::internal_run(){
 //    cout << "Encoding Mode = " << (int)recorder.encodingMode() << endl;
 //    cout << "Bit Rate = " << (int)recorder.videoBitRate() << endl;
 
-    recorder.connect(
+    connect(
         &audio_input, &QAudioBufferInput::readyToSendAudioBuffer,
         &recorder, [this](){
             std::lock_guard<std::mutex> lg(m_lock);
             m_cv.notify_all();
-        }
+        },
+        Qt::DirectConnection
     );
-    recorder.connect(
+    connect(
         &video_input, &QVideoFrameInput::readyToSendVideoFrame,
         &recorder, [this](){
             std::lock_guard<std::mutex> lg(m_lock);
             m_cv.notify_all();
-        }
+        },
+        Qt::DirectConnection
     );
-    recorder.connect(
+    connect(
         &recorder, &QMediaRecorder::recorderStateChanged,
         &recorder, [this](QMediaRecorder::RecorderState state){
             if (state == QMediaRecorder::StoppedState){
@@ -235,7 +237,8 @@ void StreamRecording::internal_run(){
                 m_state = State::STOPPING;
                 m_cv.notify_all();
             }
-        }
+        },
+        Qt::DirectConnection
     );
 
 //    cout << "starting recording" << endl;
@@ -312,6 +315,8 @@ void StreamRecording::internal_run(){
         QCoreApplication::processEvents();
         pause();
     }
+
+    exec();
 
 }
 void StreamRecording::run(){

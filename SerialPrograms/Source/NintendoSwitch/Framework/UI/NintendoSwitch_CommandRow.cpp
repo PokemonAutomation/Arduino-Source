@@ -123,17 +123,18 @@ CommandRow::CommandRow(
     );
 
 #if (QT_VERSION_MAJOR == 6) && (QT_VERSION_MINOR >= 8)
-    m_video_button = new QPushButton("Video Capture", this);
-    command_row->addWidget(m_video_button, 2);
-    if (GlobalSettings::instance().STREAM_HISTORY->enabled()){
-//        m_video_button->setToolTip("Save the last few seconds of video to disk. (similar to the Switch's video capture button)");
-        connect(
-            m_video_button, &QPushButton::clicked,
-            this, [this](bool){ emit video_requested(); }
-        );
-    }else{
-        m_video_button->setEnabled(false);
-        m_video_button->setToolTip("Please turn on Stream History to enable video capture.");
+    if (IS_BETA_VERSION || PreloadSettings::instance().DEVELOPER_MODE){
+        m_video_button = new QPushButton("Video Capture", this);
+        command_row->addWidget(m_video_button, 2);
+        if (GlobalSettings::instance().STREAM_HISTORY->enabled()){
+            connect(
+                m_video_button, &QPushButton::clicked,
+                this, [this](bool){ emit video_requested(); }
+            );
+        }else{
+            m_video_button->setEnabled(false);
+            m_video_button->setToolTip("Please turn on Stream History to enable video capture.");
+        }
     }
 #endif
 

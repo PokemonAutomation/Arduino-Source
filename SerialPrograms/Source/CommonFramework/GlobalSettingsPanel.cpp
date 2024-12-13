@@ -186,7 +186,9 @@ GlobalSettings::GlobalSettings()
     PA_ADD_OPTION(THEME);
     PA_ADD_OPTION(WINDOW_SIZE);
 #if (QT_VERSION_MAJOR == 6) && (QT_VERSION_MINOR >= 8)
-    PA_ADD_OPTION(STREAM_HISTORY);
+    if (IS_BETA_VERSION || PreloadSettings::instance().DEVELOPER_MODE){
+        PA_ADD_OPTION(STREAM_HISTORY);
+    }
 #else
     STREAM_HISTORY->set_enabled(false);
 #endif
