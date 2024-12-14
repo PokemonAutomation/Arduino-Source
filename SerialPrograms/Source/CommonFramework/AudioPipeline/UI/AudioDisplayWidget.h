@@ -36,6 +36,8 @@ public:
 
 private:
     virtual void state_changed() override;
+
+//    virtual void pre_input_change() override;
     virtual void post_display_change(AudioOption::AudioDisplayType display) override;
 
 

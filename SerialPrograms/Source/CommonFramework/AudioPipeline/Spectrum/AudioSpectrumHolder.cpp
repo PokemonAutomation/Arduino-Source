@@ -92,6 +92,7 @@ AudioSpectrumHolder::AudioSpectrumHolder()
     // saveAudioFrequenciesToDisk(true);
 
     m_spectrograph.reset(new Spectrograph(blocks, m_num_freq_windows));
+    m_last_spectrum.timestamp = current_time();
     m_last_spectrum.values.resize(blocks);
     m_last_spectrum.colors.resize(blocks);
 }
@@ -120,11 +121,13 @@ void AudioSpectrumHolder::clear(){
         m_spectrums.clear();
 
         m_spectrograph->clear();
+        m_last_spectrum.timestamp = current_time();
         memset(m_last_spectrum.values.data(), 0, m_last_spectrum.values.size() * sizeof(float));
         memset(m_last_spectrum.colors.data(), 0, m_last_spectrum.colors.size() * sizeof(uint32_t));
     }
 
     m_overlay.clear();
+//    cout << "AudioSpectrumHolder::clear()" << endl;
 
     for (Listener* listener : m_listeners){
         listener->state_changed();
@@ -156,6 +159,8 @@ PA_FORCE_INLINE uint32_t jetColorMap(float v){
 }
 
 void AudioSpectrumHolder::push_spectrum(size_t sample_rate, std::shared_ptr<const AlignedVector<float>> fft_output){
+    WallClock timestamp = current_time();
+
     std::lock_guard<std::mutex> lg(m_state_lock);
 
     const AlignedVector<float>& output = *fft_output;
@@ -186,6 +191,7 @@ void AudioSpectrumHolder::push_spectrum(size_t sample_rate, std::shared_ptr<cons
 
     // For one window, use how many blocks to show all frequencies:
     float previous = 0;
+    m_last_spectrum.timestamp = timestamp;
     for (size_t i = 0; i < m_freq_visualization_block_boundaries.size() - 1; i++){
         float mag = 0.0f;
         for(size_t j = m_freq_visualization_block_boundaries[i]; j < m_freq_visualization_block_boundaries[i+1]; j++){
@@ -216,6 +222,7 @@ void AudioSpectrumHolder::push_spectrum(size_t sample_rate, std::shared_ptr<cons
         m_last_spectrum.colors[i] = jetColorMap(mag);
         previous = mag;
     }
+//    cout << "AudioSpectrumHolder::push_spectrum" << endl;
     m_spectrograph->push_spectrum(m_last_spectrum.colors.data());
     m_nextFFTWindowIndex = (m_nextFFTWindowIndex+1) % m_num_freq_windows;
     // std::cout << "Computed FFT! "  << magSum << std::endl;

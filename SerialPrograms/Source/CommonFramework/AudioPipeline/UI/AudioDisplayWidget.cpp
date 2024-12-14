@@ -45,6 +45,17 @@ void AudioDisplayWidget::state_changed(){
         }, Qt::QueuedConnection
     );
 }
+#if 0
+void AudioDisplayWidget::pre_input_change(){
+    QMetaObject::invokeMethod(
+        this, [this]{
+            m_sanitizer.check_usage();
+            update_size();
+            QWidget::update();
+        }, Qt::QueuedConnection
+    );
+}
+#endif
 void AudioDisplayWidget::post_display_change(AudioOption::AudioDisplayType display){
 //    cout << "AudioDisplayWidget::display_changed()" << endl;
     QMetaObject::invokeMethod(
@@ -60,6 +71,8 @@ void AudioDisplayWidget::post_display_change(AudioOption::AudioDisplayType displ
 
 
 void AudioDisplayWidget::render_bars(){
+//    cout << "AudioDisplayWidget::render_bars()" << endl;
+
     QPainter painter(this);
     painter.fillRect(rect(), Qt::black);
 
@@ -67,12 +80,20 @@ void AudioDisplayWidget::render_bars(){
     const int widgetHeight = this->height();
 
     AudioSpectrumHolder::SpectrumSnapshot last_spectrum = m_session.spectrums().get_last_spectrum();
+
+    //  Don't render if it's too old.
+    if (last_spectrum.timestamp < current_time() - std::chrono::milliseconds(500)){
+        return;
+    }
+
     size_t num_buckets = last_spectrum.values.size();
 
-//    for (int c = 0; c < 10; c++){
-//        cout << last_spectrum.values[c] << ", ";
-//    }
-//    cout << endl;
+#if 0
+    for (int c = 0; c < 10; c++){
+        cout << last_spectrum.values[c] << ", ";
+    }
+    cout << endl;
+#endif
 
     const size_t barPlusGapWidth = widgetWidth / num_buckets;
     const size_t barWidth = 0.8 * barPlusGapWidth;

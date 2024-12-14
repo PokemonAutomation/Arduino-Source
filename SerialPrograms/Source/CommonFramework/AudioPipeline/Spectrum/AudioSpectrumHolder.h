@@ -11,6 +11,7 @@
 #include <set>
 #include <mutex>
 #include <fstream>
+#include "Common/Cpp/Time.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/AudioPipeline/AudioFeed.h"
 #include "Spectrograph.h"
@@ -47,6 +48,7 @@ public:
     std::vector<AudioSpectrum> spectrums_latest(size_t num_latest_spectrums);
 
     struct SpectrumSnapshot{
+        WallClock timestamp;
         std::vector<float> values;
         std::vector<uint32_t> colors;
     };
