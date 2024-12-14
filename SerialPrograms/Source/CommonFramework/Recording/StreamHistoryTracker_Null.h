@@ -20,9 +20,10 @@ class StreamHistoryTracker{
 public:
     StreamHistoryTracker(
         Logger& logger,
+        std::chrono::seconds window,
         size_t audio_samples_per_frame,
         size_t audio_frames_per_second,
-        std::chrono::seconds window
+        bool has_video
     )
         : m_logger(logger)
     {}
@@ -35,7 +36,7 @@ public:
 
 public:
     void on_samples(const float* data, size_t frames){}
-    void on_frame(std::shared_ptr<VideoFrame> frame){}
+    void on_frame(std::shared_ptr<const VideoFrame> frame){}
 
 private:
     Logger& m_logger;

@@ -324,7 +324,7 @@ void CameraSession::shutdown(){
         m_last_image_seqnum = m_last_frame_seqnum;
     }
 
-    for (StateListener* listener : m_state_listeners){
+    for (StateListener* listener : m_listeners){
         listener->post_shutdown();
     }
 }
