@@ -24,10 +24,9 @@
 #include "CommonFramework/VideoPipeline/Backends/VideoFrameQt.h"
 
 
-//  REMOVE
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 
 namespace PokemonAutomation{
@@ -116,7 +115,7 @@ void StreamHistoryTracker::on_frame(std::shared_ptr<VideoFrame> frame){
     //  TODO: Find a more efficient way to buffer the frames.
     //  It takes almost 10GB of memory to store 30 seconds of QVideoFrames
     //  due to them caching uncompressed bitmaps.
-//    return;   //  REMOVE
+//    return;   //  TODO
 
     WriteSpinLock lg(m_lock);
 //    cout << "on_frame() = " << m_frames.size() << endl;
@@ -296,7 +295,7 @@ bool StreamHistoryTracker::save(Logger& logger, const std::string& filename) con
 
     recorder.stop();
     logger.log("Done saving stream history...", COLOR_BLUE);
-    cout << recorder.duration() << endl;    //  REMOVE
+//    cout << recorder.duration() << endl;
 
 
 //    });

@@ -332,16 +332,21 @@ void CameraSession::shutdown(){
     m_resolution_map.clear();
     m_formats.clear();
 
-    WriteSpinLock lg(m_frame_lock);
+    {
+        WriteSpinLock lg(m_frame_lock);
 
-    m_last_frame = QVideoFrame();
-    m_last_frame_timestamp = current_time();
-    m_last_frame_seqnum++;
+        m_last_frame = QVideoFrame();
+        m_last_frame_timestamp = current_time();
+        m_last_frame_seqnum++;
 
-    m_last_image = QImage();
-    m_last_image_timestamp = m_last_frame_timestamp;
-    m_last_image_seqnum = m_last_frame_seqnum;
+        m_last_image = QImage();
+        m_last_image_timestamp = m_last_frame_timestamp;
+        m_last_image_seqnum = m_last_frame_seqnum;
+    }
 
+    for (StateListener* listener : m_state_listeners){
+        listener->post_shutdown();
+    }
 }
 void CameraSession::startup(){
     if (!m_device){
@@ -397,6 +402,7 @@ void CameraSession::startup(){
         desired_format = m_resolution_map.rbegin()->second;
     }
 //    cout << "CameraSession::m_resolutions = " << m_resolutions.size() << endl;
+    cout << "desired_format = " << desired_format->minFrameRate() << " - " << desired_format->maxFrameRate() << endl;   //  REMOVE
 
     QSize size = desired_format->resolution();
     m_resolution = Resolution(size.width(), size.height());

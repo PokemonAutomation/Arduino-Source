@@ -37,7 +37,7 @@ class RollingStream : public QIODevice{
 public:
     ~RollingStream(){
         waitForBytesWritten(-1);
-//        cout << "~RollingStream()" << endl; //  REMOVE
+//        cout << "~RollingStream()" << endl;
     }
     RollingStream(){
         setOpenMode(QIODeviceBase::WriteOnly);
@@ -111,7 +111,7 @@ StreamHistoryTracker::~StreamHistoryTracker(){
             pause();
         }catch (...){}
     }
-//    cout << "~StreamHistoryTracker()" << endl;  //  REMOVE
+//    cout << "~StreamHistoryTracker()" << endl;
 }
 StreamHistoryTracker::StreamHistoryTracker(
     size_t audio_samples_per_frame,

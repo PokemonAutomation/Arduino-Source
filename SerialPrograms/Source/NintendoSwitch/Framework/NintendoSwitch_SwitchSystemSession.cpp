@@ -59,7 +59,7 @@ SwitchSystemSession::SwitchSystemSession(
     m_overlay.add_stat(*m_cpu_utilization);
     m_overlay.add_stat(*m_main_thread_utilization);
 
-    m_history.start(m_audio.input_format());
+    m_history.start(m_audio.input_format(), !option.m_camera.info.device_name().empty());
 
     m_audio.add_state_listener(m_history);
     m_audio.add_stream_listener(m_history);

@@ -38,34 +38,53 @@ namespace PokemonAutomation{
 StreamRecording::StreamRecording(
     Logger& logger,
     std::chrono::milliseconds buffer_limit,
+    WallClock start_time,
     size_t audio_samples_per_frame,
     size_t audio_frames_per_second,
-    WallClock start_time
+    bool has_video
 )
     : m_logger(logger)
     , m_buffer_limit(buffer_limit)
-    , m_audio_samples_per_frame(audio_samples_per_frame)
     , m_start_time(start_time)
+    , m_audio_samples_per_frame(audio_samples_per_frame)
+    , m_has_video(has_video)
     , m_filename(GlobalSettings::instance().TEMP_FOLDER)
-    , m_state(State::STARTING)
+    , m_stopping(false)
     , m_last_drop(current_time())
+    , m_last_frame_time(std::numeric_limits<qint64>::min())
 {
-    m_audio_format.setChannelCount((int)audio_samples_per_frame);
-    m_audio_format.setChannelConfig(audio_samples_per_frame == 1 ? QAudioFormat::ChannelConfigMono : QAudioFormat::ChannelConfigStereo);
-    m_audio_format.setSampleRate((int)audio_frames_per_second);
-    m_audio_format.setSampleFormat(QAudioFormat::Float);
+    logger.log(
+        "StreamRecording: Audio = " + std::to_string(audio_samples_per_frame) +
+        ", Video = " + std::to_string(has_video)
+    );
+//    cout << "audio = " << audio_samples_per_frame << ", video = " << has_video << endl;
+
+    if (audio_samples_per_frame == 0 && !has_video){
+        return;
+    }
+
+    if (audio_samples_per_frame > 0){
+        m_audio_format.setChannelCount((int)audio_samples_per_frame);
+        m_audio_format.setChannelConfig(audio_samples_per_frame == 1 ? QAudioFormat::ChannelConfigMono : QAudioFormat::ChannelConfigStereo);
+        m_audio_format.setSampleRate((int)audio_frames_per_second);
+        m_audio_format.setSampleFormat(QAudioFormat::Float);
+    }
 
 #ifndef PA_STREAM_HISTORY_LOCAL_BUFFER
     QDir().mkdir(QString::fromStdString(m_filename));
 #endif
-    m_filename += now_to_filestring() + ".mp4";
+    if (has_video){
+        m_filename += now_to_filestring() + ".mp4";
+    }else{
+        m_filename += now_to_filestring() + ".m4a";
+    }
 
     start();
 }
 StreamRecording::~StreamRecording(){
     {
         std::lock_guard<std::mutex> lg(m_lock);
-        m_state = State::STOPPING;
+        m_stopping = true;
 //        cout << "signalling: ~StreamRecording()" << endl;
         m_cv.notify_all();
     }
@@ -79,7 +98,7 @@ StreamRecording::~StreamRecording(){
 bool StreamRecording::stop_and_save(const std::string& filename){
     {
         std::lock_guard<std::mutex> lg(m_lock);
-        m_state = State::STOPPING;
+        m_stopping = true;
 //        cout << "signalling: stop_and_save()" << endl;
         m_cv.notify_all();
     }
@@ -98,67 +117,103 @@ bool StreamRecording::stop_and_save(const std::string& filename){
 
 void StreamRecording::push_samples(WallClock timestamp, const float* data, size_t frames){
     WallClock now = current_time();
-    if (now < m_start_time){
+    if (m_audio_samples_per_frame == 0 || now < m_start_time){
         return;
     }
     WallClock threshold = timestamp - m_buffer_limit;
 
     std::lock_guard<std::mutex> lg(m_lock);
-    if (m_state != State::ACTIVE){
+    if (m_stopping){
         return;
     }
-    if (m_buffered_audio.empty() || m_buffered_audio.front()->timestamp > threshold){
-        m_buffered_audio.emplace_back(std::make_shared<AudioBlock>(
-            timestamp, data, frames * m_audio_samples_per_frame
-        ));
-        m_cv.notify_all();
-        return;
-    }
-    if (now - m_last_drop > std::chrono::seconds(5)){
-        m_last_drop = now;
-        m_logger.log("Unable to keep up with audio recording. Dropping samples.", COLOR_RED);
-    }
+
+    do{
+        if (m_buffered_audio.empty()){
+            break;
+        }
+
+        //  Too much has been buffered. Drop the block.
+        if (m_buffered_audio.front().timestamp < threshold){
+            //  Throttle the prints.
+            if (now - m_last_drop > std::chrono::seconds(5)){
+                m_last_drop = now;
+                m_logger.log("Unable to keep up with audio recording. Dropping samples.", COLOR_RED);
+            }
+            return;
+        }
+
+    }while (false);
+
+    //  Enqueue the sample block.
+    m_buffered_audio.emplace_back(
+        timestamp,
+        data, frames * m_audio_samples_per_frame
+    );
+    m_cv.notify_all();
 }
-void StreamRecording::push_frame(std::shared_ptr<VideoFrame> frame){
+void StreamRecording::push_frame(std::shared_ptr<const VideoFrame> frame){
     WallClock now = current_time();
-    if (now < m_start_time){
+    if (!m_has_video || now < m_start_time){
         return;
     }
-//        cout << "push_frame()" << endl;
+//    cout << "push_frame(): " << frame->frame.startTime() << " - " << frame->frame.endTime() << endl;
     WallClock threshold = frame->timestamp - m_buffer_limit;
 
     std::lock_guard<std::mutex> lg(m_lock);
-    if (m_state != State::ACTIVE){
+    if (m_stopping){
         return;
     }
-    if (m_buffered_frames.empty() || m_buffered_frames.front()->timestamp > threshold){
-        m_buffered_frames.emplace_back(std::move(frame));
-        m_cv.notify_all();
-        return;
-    }
-    if (now - m_last_drop > std::chrono::seconds(5)){
-        m_last_drop = now;
-        m_logger.log("Unable to keep up with video recording. Dropping samples.", COLOR_RED);
-    }
+
+    qint64 frame_time = frame->frame.startTime();
+    do{
+        if (m_buffered_frames.empty()){
+            break;
+        }
+
+        //  Too much has been buffered. Drop the frame.
+        if (m_buffered_frames.front()->timestamp < threshold){
+            //  Throttle the prints.
+            if (now - m_last_drop > std::chrono::seconds(5)){
+                m_last_drop = now;
+                m_logger.log("Unable to keep up with video recording. Dropping samples.", COLOR_RED);
+            }
+            return;
+        }
+
+        //  Non-increasing timestamp. Drop possible duplicate frame.
+        if (frame_time <= m_last_frame_time){
+            return;
+        }
+    }while (false);
+
+    //  Enqueue the frame.
+    m_buffered_frames.emplace_back(std::move(frame));
+    m_last_frame_time = frame_time;
+    m_cv.notify_all();
 }
 
 
 
-void StreamRecording::internal_run(){
-    QAudioBufferInput audio_input;
-    QVideoFrameInput video_input;
-    m_audio_input = &audio_input;
-    m_video_input = &video_input;
+std::unique_ptr<QAudioBufferInput> StreamRecording::initialize_audio(){
+    std::unique_ptr<QAudioBufferInput> ret(new QAudioBufferInput());
+    m_audio_input = ret.get();
+    m_session->setAudioBufferInput(m_audio_input);
 
-    QMediaCaptureSession session;
-    QMediaRecorder recorder;
-    session.setAudioBufferInput(&audio_input);
-    session.setVideoFrameInput(&video_input);
-    session.setRecorder(&recorder);
-    recorder.setMediaFormat(QMediaFormat::MPEG4);
-//    recorder.setQuality(QMediaRecorder::NormalQuality);
-//    recorder.setQuality(QMediaRecorder::LowQuality);
-//    recorder.setQuality(QMediaRecorder::VeryLowQuality);
+    connect(
+        m_audio_input, &QAudioBufferInput::readyToSendAudioBuffer,
+        m_recorder, [this](){
+            std::lock_guard<std::mutex> lg(m_lock);
+            m_cv.notify_all();
+        },
+        Qt::DirectConnection
+    );
+
+    return ret;
+}
+std::unique_ptr<QVideoFrameInput> StreamRecording::initialize_video(){
+    std::unique_ptr<QVideoFrameInput> ret(new QVideoFrameInput());
+    m_video_input = ret.get();
+    m_session->setVideoFrameInput(m_video_input);
 
     const StreamHistoryOption& settings = GlobalSettings::instance().STREAM_HISTORY;
 
@@ -166,10 +221,10 @@ void StreamRecording::internal_run(){
     case StreamHistoryOption::Resolution::MATCH_INPUT:
         break;
     case StreamHistoryOption::Resolution::FORCE_720p:
-        recorder.setVideoResolution(1280, 720);
+        m_recorder->setVideoResolution(1280, 720);
         break;
     case StreamHistoryOption::Resolution::FORCE_1080p:
-        recorder.setVideoResolution(1920, 1080);
+        m_recorder->setVideoResolution(1920, 1080);
         break;
     }
 
@@ -177,34 +232,79 @@ void StreamRecording::internal_run(){
     case StreamHistoryOption::EncodingMode::FIXED_QUALITY:
         switch (settings.VIDEO_QUALITY){
         case StreamHistoryOption::VideoQuality::VERY_LOW:
-            recorder.setQuality(QMediaRecorder::VeryLowQuality);
+            m_recorder->setQuality(QMediaRecorder::VeryLowQuality);
             break;
         case StreamHistoryOption::VideoQuality::LOW:
-            recorder.setQuality(QMediaRecorder::LowQuality);
+            m_recorder->setQuality(QMediaRecorder::LowQuality);
             break;
         case StreamHistoryOption::VideoQuality::NORMAL:
-            recorder.setQuality(QMediaRecorder::NormalQuality);
+            m_recorder->setQuality(QMediaRecorder::NormalQuality);
             break;
         case StreamHistoryOption::VideoQuality::HIGH:
-            recorder.setQuality(QMediaRecorder::HighQuality);
+            m_recorder->setQuality(QMediaRecorder::HighQuality);
             break;
         case StreamHistoryOption::VideoQuality::VERY_HIGH:
-            recorder.setQuality(QMediaRecorder::VeryHighQuality);
+            m_recorder->setQuality(QMediaRecorder::VeryHighQuality);
             break;
         }
         break;
     case StreamHistoryOption::EncodingMode::FIXED_BITRATE:
-        recorder.setVideoBitRate(settings.VIDEO_BITRATE * 1000);
-        recorder.setEncodingMode(QMediaRecorder::AverageBitRateEncoding);
+        m_recorder->setVideoBitRate(settings.VIDEO_BITRATE * 1000);
+        m_recorder->setEncodingMode(QMediaRecorder::AverageBitRateEncoding);
         break;
     }
 
+    connect(
+        m_video_input, &QVideoFrameInput::readyToSendVideoFrame,
+        m_recorder, [this](){
+            std::lock_guard<std::mutex> lg(m_lock);
+            m_cv.notify_all();
+        },
+        Qt::DirectConnection
+    );
+    connect(
+        m_recorder, &QMediaRecorder::recorderStateChanged,
+        m_recorder, [this](QMediaRecorder::RecorderState state){
+            if (state == QMediaRecorder::StoppedState){
+                std::lock_guard<std::mutex> lg(m_lock);
+//                cout << "signalling: StoppedState" << endl;
+                m_stopping = true;
+                m_cv.notify_all();
+            }
+        },
+        Qt::DirectConnection
+    );
+
+    return ret;
+}
+
+void StreamRecording::internal_run(){
+    QMediaCaptureSession session;
+    QMediaRecorder recorder;
+    m_session = &session;
+    m_recorder = &recorder;
+    m_session->setRecorder(m_recorder);
+
+    std::unique_ptr<QAudioBufferInput> audio;
+    std::unique_ptr<QVideoFrameInput> video;
+
+    //  Only initialize the streams we intend to use.
+    if (m_audio_samples_per_frame > 0){
+        audio = initialize_audio();
+    }
+    if (m_has_video){
+        video = initialize_video();
+    }
+
+    m_recorder->setMediaFormat(QMediaFormat::MPEG4);
+
+
 
 #ifdef PA_STREAM_HISTORY_LOCAL_BUFFER
-    recorder.setOutputDevice(&m_write_buffer);
+    m_recorder->setOutputDevice(&m_write_buffer);
 #else
     QFileInfo file(QString::fromStdString(m_filename));
-    recorder.setOutputLocation(
+    m_recorder->setOutputLocation(
         QUrl::fromLocalFile(file.absoluteFilePath())
     );
 #endif
@@ -212,54 +312,24 @@ void StreamRecording::internal_run(){
 //    cout << "Encoding Mode = " << (int)recorder.encodingMode() << endl;
 //    cout << "Bit Rate = " << (int)recorder.videoBitRate() << endl;
 
-    connect(
-        &audio_input, &QAudioBufferInput::readyToSendAudioBuffer,
-        &recorder, [this](){
-            std::lock_guard<std::mutex> lg(m_lock);
-            m_cv.notify_all();
-        },
-        Qt::DirectConnection
-    );
-    connect(
-        &video_input, &QVideoFrameInput::readyToSendVideoFrame,
-        &recorder, [this](){
-            std::lock_guard<std::mutex> lg(m_lock);
-            m_cv.notify_all();
-        },
-        Qt::DirectConnection
-    );
-    connect(
-        &recorder, &QMediaRecorder::recorderStateChanged,
-        &recorder, [this](QMediaRecorder::RecorderState state){
-            if (state == QMediaRecorder::StoppedState){
-                std::lock_guard<std::mutex> lg(m_lock);
-//                cout << "signalling: StoppedState" << endl;
-                m_state = State::STOPPING;
-                m_cv.notify_all();
-            }
-        },
-        Qt::DirectConnection
-    );
 
 //    cout << "starting recording" << endl;
-    recorder.record();
+    m_recorder->record();
 
-    std::shared_ptr<AudioBlock> current_audio;
-    std::shared_ptr<VideoFrame> current_frame;
+    AudioBlock current_audio;
+    std::shared_ptr<const VideoFrame> current_frame;
     QAudioBuffer audio_buffer;
 
     while (true){
-//        cout << "recording loop" << endl;
         QCoreApplication::processEvents();
 
         {
             std::unique_lock<std::mutex> lg(m_lock);
-            if (m_state == State::STOPPING){
+            if (m_stopping){
                 break;
             }
-            m_state = State::ACTIVE;
 
-            if (!current_audio && !m_buffered_audio.empty()){
+            if (!current_audio.is_valid() && !m_buffered_audio.empty()){
                 current_audio = std::move(m_buffered_audio.front());
                 m_buffered_audio.pop_front();
             }
@@ -268,7 +338,7 @@ void StreamRecording::internal_run(){
                 m_buffered_frames.pop_front();
             }
 
-            if (!current_audio && !current_frame){
+            if (!current_audio.is_valid() && !current_frame){
 //                cout << "sleeping 0..." << endl;
                 m_cv.wait(lg);
 //                cout << "waking 0..." << endl;
@@ -277,27 +347,29 @@ void StreamRecording::internal_run(){
 
         bool progress_made = false;
 
-        if (current_audio){
+        if (current_audio.is_valid()){
             if (!audio_buffer.isValid()){
-                const std::vector<float>& samples = current_audio->samples;
+                const std::vector<float>& samples = current_audio.samples;
                 QByteArray bytes((const char*)samples.data(), samples.size() * sizeof(float));
                 audio_buffer = QAudioBuffer(bytes, m_audio_format);
             }
-            if (audio_buffer.isValid() && audio_input.sendAudioBuffer(audio_buffer)){
-                current_audio.reset();
+            if (audio_buffer.isValid() && m_audio_input->sendAudioBuffer(audio_buffer)){
+                current_audio.clear();
                 audio_buffer = QAudioBuffer();
                 progress_made = true;
             }
         }
-
-        if (current_frame && video_input.sendVideoFrame(current_frame->frame)){
+//        cout << "Before: " << m_video_input << endl;
+        if (current_frame && m_video_input->sendVideoFrame(current_frame->frame)){
+//            cout << "push frame: " << current_frame->frame.startTime() << endl;
             current_frame.reset();
             progress_made = true;
         }
+//        cout << "After: " << m_video_input << endl;
 
         if (!progress_made){
             std::unique_lock<std::mutex> lg(m_lock);
-            if (m_state != State::ACTIVE){
+            if (m_stopping){
                 break;
             }
 //            cout << "sleeping 1..." << endl;
@@ -306,11 +378,11 @@ void StreamRecording::internal_run(){
         }
     }
 
-    recorder.stop();
+    m_recorder->stop();
 //    cout << "recorder.stop()" << endl;
 
 
-    while (recorder.recorderState() != QMediaRecorder::StoppedState){
+    while (m_recorder->recorderState() != QMediaRecorder::StoppedState){
 //        cout << "StreamHistoryTracker: process" << endl;
         QCoreApplication::processEvents();
         pause();
@@ -325,7 +397,7 @@ void StreamRecording::run(){
     }catch (...){
         m_logger.log("Exception thrown out of stream recorder...", COLOR_RED);
         std::lock_guard<std::mutex> lg(m_lock);
-        m_state = State::STOPPING;
+        m_stopping = true;
     }
 }
 

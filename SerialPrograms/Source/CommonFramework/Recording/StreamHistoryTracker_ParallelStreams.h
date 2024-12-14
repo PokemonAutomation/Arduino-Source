@@ -39,14 +39,17 @@ class StreamHistoryTracker{
 public:
     StreamHistoryTracker(
         Logger& logger,
+        std::chrono::seconds window,
         size_t audio_samples_per_frame,
         size_t audio_frames_per_second,
-        std::chrono::seconds window
+        bool has_video
     )
         : m_logger(logger)
-        , m_window(window)
+        , m_window(window)    //  REMOVE
+//        , m_window(100)
         , m_audio_samples_per_frame(audio_samples_per_frame)
         , m_audio_frames_per_second(audio_frames_per_second)
+        , m_has_video(has_video)
     {
         update_streams(current_time());
     }
@@ -84,7 +87,7 @@ public:
         }
         update_streams(now);
     }
-    void on_frame(std::shared_ptr<VideoFrame> frame){
+    void on_frame(std::shared_ptr<const VideoFrame> frame){
         WallClock now = current_time();
         SpinLockGuard lg(m_lock);
         for (auto& item : m_recordings){
@@ -140,9 +143,10 @@ private:
                 std::forward_as_tuple(start_time),
                 std::forward_as_tuple(new StreamRecording(
                     m_logger, std::chrono::milliseconds(500),
+                    start_time,
                     m_audio_samples_per_frame,
                     m_audio_frames_per_second,
-                    start_time
+                    m_has_video
                 ))
             );
         }
@@ -153,9 +157,10 @@ private:
 private:
     Logger& m_logger;
     mutable SpinLock m_lock;
-    std::chrono::seconds m_window;
+    std::chrono::milliseconds m_window;
     const size_t m_audio_samples_per_frame;
     const size_t m_audio_frames_per_second;
+    const bool m_has_video;
     std::map<WallClock, std::unique_ptr<StreamRecording>> m_recordings;
 };
 

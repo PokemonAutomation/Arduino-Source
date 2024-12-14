@@ -35,6 +35,7 @@ public:
         //  Sent before the camera shuts down. Listeners should drop their
         //  references to the internal camera implementation before returning.
         virtual void pre_shutdown(){}
+        virtual void post_shutdown(){}
 
         //  Sent before/after a new camera goes up.
 //        virtual void pre_new_source(const CameraInfo& device, Resolution resolution){}

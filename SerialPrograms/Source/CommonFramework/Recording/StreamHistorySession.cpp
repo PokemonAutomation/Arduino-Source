@@ -36,12 +36,14 @@ struct StreamHistorySession::Data{
     mutable SpinLock m_lock;
     std::chrono::seconds m_window;
     AudioChannelFormat m_audio_format;
+    bool m_has_video;
     std::shared_ptr<StreamHistoryTracker> m_current;
 
     Data(Logger& logger)
         : m_logger(logger)
         , m_window(GlobalSettings::instance().STREAM_HISTORY->HISTORY_SECONDS)
         , m_audio_format(AudioChannelFormat::NONE)
+        , m_has_video(false)
     {}
 };
 
@@ -53,11 +55,12 @@ StreamHistorySession::StreamHistorySession(Logger& logger)
     : AudioFloatStreamListener(1)
     , m_data(CONSTRUCT_TOKEN, logger)
 {}
-void StreamHistorySession::start(AudioChannelFormat format){
+void StreamHistorySession::start(AudioChannelFormat format, bool has_video){
     Data& data = *m_data;
     WriteSpinLock lg(data.m_lock);
     if (!data.m_current){
         data.m_audio_format = format;
+        data.m_has_video = has_video;
         initialize();
     }
 }
@@ -118,7 +121,7 @@ void StreamHistorySession::on_samples(const float* samples, size_t frames){
         data.m_current->on_samples(samples, frames);
     }
 }
-void StreamHistorySession::on_frame(std::shared_ptr<VideoFrame> frame){
+void StreamHistorySession::on_frame(std::shared_ptr<const VideoFrame> frame){
     Data& data = *m_data;
     WriteSpinLock lg(data.m_lock);
     if (data.m_current){
@@ -128,12 +131,15 @@ void StreamHistorySession::on_frame(std::shared_ptr<VideoFrame> frame){
 
 
 void StreamHistorySession::clear(){
+//    cout << "clear()" << endl;
+
     //  Must call under lock.
     Data& data = *m_data;
     data.m_logger.log("Clearing stream history...", COLOR_ORANGE);
     data.m_current.reset();
-    expected_samples_per_frame = 0;
-    data.m_audio_format = AudioChannelFormat::NONE;
+//    expected_samples_per_frame = 0;
+//    data.m_audio_format = AudioChannelFormat::NONE;
+//    data.m_has_video = false;
 }
 void StreamHistorySession::initialize(){
     if (!GlobalSettings::instance().STREAM_HISTORY->enabled()){
@@ -143,22 +149,28 @@ void StreamHistorySession::initialize(){
     //  Must call under lock.
     Data& data = *m_data;
     data.m_logger.log("Starting stream history...", COLOR_ORANGE);
+
+//    cout << "video = " << data.m_has_video << endl;
+
     switch (data.m_audio_format){
     case AudioChannelFormat::NONE:
         expected_samples_per_frame = 0;
-        data.m_current.reset(new StreamHistoryTracker(data.m_logger, 0, 0, data.m_window));
+        data.m_current.reset(new StreamHistoryTracker(data.m_logger, data.m_window, 0, 0, data.m_has_video));
         return;
     case AudioChannelFormat::MONO_48000:
-        data.m_current.reset(new StreamHistoryTracker(data.m_logger, 1, 48000, data.m_window));
+        expected_samples_per_frame = 1;
+        data.m_current.reset(new StreamHistoryTracker(data.m_logger, data.m_window, 1, 48000, data.m_has_video));
         return;
     case AudioChannelFormat::DUAL_44100:
-        data.m_current.reset(new StreamHistoryTracker(data.m_logger, 1, 44100, data.m_window));
+        expected_samples_per_frame = 2;
+        data.m_current.reset(new StreamHistoryTracker(data.m_logger, data.m_window, 1, 44100, data.m_has_video));
         return;
     case AudioChannelFormat::DUAL_48000:
     case AudioChannelFormat::MONO_96000:
     case AudioChannelFormat::INTERLEAVE_LR_96000:
     case AudioChannelFormat::INTERLEAVE_RL_96000:
-        data.m_current.reset(new StreamHistoryTracker(data.m_logger, 2, 48000, data.m_window));
+        expected_samples_per_frame = 2;
+        data.m_current.reset(new StreamHistoryTracker(data.m_logger, data.m_window, 2, 48000, data.m_has_video));
         return;
     default:
         throw InternalProgramError(
@@ -168,32 +180,50 @@ void StreamHistorySession::initialize(){
     }
 }
 void StreamHistorySession::pre_input_change(){
+//    cout << "pre_input_change()" << endl;
     Data& data = *m_data;
     WriteSpinLock lg(data.m_lock);
     clear();
 }
 void StreamHistorySession::post_input_change(const std::string& file, const AudioDeviceInfo& device, AudioChannelFormat format){
+//    cout << "post_input_change()" << endl;
     Data& data = *m_data;
     WriteSpinLock lg(data.m_lock);
-    data.m_audio_format = format;
+    if (device){
+        data.m_audio_format = format;
+    }else{
+        data.m_audio_format = AudioChannelFormat::NONE;
+    }
     initialize();
 }
 void StreamHistorySession::pre_shutdown(){
+//    cout << "pre_shutdown()" << endl;
     Data& data = *m_data;
     WriteSpinLock lg(data.m_lock);
     clear();
 }
-void StreamHistorySession::post_new_source(const CameraInfo& device, Resolution resolution){
+void StreamHistorySession::post_shutdown(){
+//    cout << "post_shutdown()" << endl;
     Data& data = *m_data;
     WriteSpinLock lg(data.m_lock);
+    data.m_has_video = false;
+    initialize();
+}
+void StreamHistorySession::post_new_source(const CameraInfo& device, Resolution resolution){
+//    cout << "post_new_source()" << endl;
+    Data& data = *m_data;
+    WriteSpinLock lg(data.m_lock);
+    data.m_has_video = !device.device_name().empty();
     initialize();
 }
 void StreamHistorySession::pre_resolution_change(Resolution resolution){
+//    cout << "pre_resolution_change()" << endl;
     Data& data = *m_data;
     WriteSpinLock lg(data.m_lock);
     clear();
 }
 void StreamHistorySession::post_resolution_change(Resolution resolution){
+//    cout << "post_resolution_change()" << endl;
     Data& data = *m_data;
     WriteSpinLock lg(data.m_lock);
     initialize();

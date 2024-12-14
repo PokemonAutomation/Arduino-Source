@@ -257,16 +257,21 @@ void CameraSession::shutdown(){
     m_resolution_map.clear();
     m_formats.clear();
 
-    SpinLockGuard lg(m_frame_lock);
+    {
+        SpinLockGuard lg(m_frame_lock);
 
-    m_last_frame = QVideoFrame();
-    m_last_frame_timestamp = current_time();
-    m_last_frame_seqnum++;
+        m_last_frame = QVideoFrame();
+        m_last_frame_timestamp = current_time();
+        m_last_frame_seqnum++;
 
-    m_last_image = QImage();
-    m_last_image_timestamp = m_last_frame_timestamp;
-    m_last_image_seqnum = m_last_frame_seqnum;
+        m_last_image = QImage();
+        m_last_image_timestamp = m_last_frame_timestamp;
+        m_last_image_seqnum = m_last_frame_seqnum;
+    }
 
+    for (StateListener* listener : m_state_listeners){
+        listener->post_shutdown();
+    }
 }
 void CameraSession::startup(){
     if (!m_device){

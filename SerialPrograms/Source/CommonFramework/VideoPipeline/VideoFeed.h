@@ -51,7 +51,7 @@ struct VideoSnapshot{
 //  implementations. Unsupported implementations will never fire this callback.
 class VideoFrame;
 struct VideoFrameListener{
-    virtual void on_frame(std::shared_ptr<VideoFrame> frame) = 0;
+    virtual void on_frame(std::shared_ptr<const VideoFrame> frame) = 0;
 };
 
 
