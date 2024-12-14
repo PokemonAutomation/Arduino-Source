@@ -270,6 +270,12 @@ void CameraSession::connect_video_sink(QVideoSink* sink){
             WallClock now = current_time();
             {
                 WriteSpinLock lg(m_frame_lock);
+
+                //  Skip duplicate frames.
+                if (frame.startTime() <= m_last_frame.startTime()){
+                    return;
+                }
+
                 m_last_frame = frame;
                 m_last_frame_timestamp = now;
                 m_last_frame_seqnum++;
@@ -352,7 +358,7 @@ void CameraSession::startup(){
     if (!m_device){
         return;
     }
-    m_logger.log("Starting Camera: Backend = CameraQt6QVideoSink");
+    m_logger.log("Starting Camera: Backend = CameraQt65QMediaCaptureSession");
 
     auto cameras = QMediaDevices::videoInputs();
     const QCameraDevice* device = nullptr;
@@ -401,8 +407,6 @@ void CameraSession::startup(){
     if (desired_format == nullptr){
         desired_format = m_resolution_map.rbegin()->second;
     }
-//    cout << "CameraSession::m_resolutions = " << m_resolutions.size() << endl;
-    cout << "desired_format = " << desired_format->minFrameRate() << " - " << desired_format->maxFrameRate() << endl;   //  REMOVE
 
     QSize size = desired_format->resolution();
     m_resolution = Resolution(size.width(), size.height());
@@ -431,6 +435,8 @@ void CameraSession::startup(){
     clear_video_output();
 
     m_camera->start();
+
+//    cout << "frame rate = " << m_camera->cameraFormat().minFrameRate() << endl;
 
     for (StateListener* listener : m_state_listeners){
         listener->post_new_source(m_device, m_resolution);
