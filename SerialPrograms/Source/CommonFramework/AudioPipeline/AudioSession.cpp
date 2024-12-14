@@ -128,11 +128,18 @@ void AudioSession::clear_audio_input(){
     std::lock_guard<std::mutex> lg(m_lock);
     m_logger.log("Clearing audio input...");
     signal_pre_input_change();
-    m_spectrum_holder.clear();
     m_devices->clear_audio_source();
     m_option.m_input_file.clear();
     m_option.m_input_device = AudioDeviceInfo();
     signal_post_input_change();
+
+    //  We need to do this at the end.
+    //  The previous line "signal_post_input_change()" is what will shut off the
+    //  audio stream. If we clear the history before that, a race condition can
+    //  add another spectrum to the history before the stream actually stops.
+    //  When this happens, we will be left with a non-empty history which will
+    //  be displayed as a non-moving freq-bars or spectrum instead of black.
+    m_spectrum_holder.clear();
 }
 void AudioSession::set_audio_input(std::string file){
     std::lock_guard<std::mutex> lg(m_lock);
