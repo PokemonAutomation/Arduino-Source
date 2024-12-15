@@ -57,6 +57,16 @@ public:
         , m_logger(logger)
         , m_sink(device, format)
     {
+        m_sink.connect(
+            &m_sink, &NativeAudioSink::stateChanged,
+            &m_sink, [this](QAudio::State state){
+                if (state == QAudio::State::StoppedState){
+                    m_io_device = nullptr;
+                    m_logger.log("AudioOutputDevice has prematurely stopped.", COLOR_RED);
+                }
+            }
+        );
+
         m_io_device = m_sink.start();
         m_sink.setVolume(convertAudioVolumeFromSlider(volume));
         add_listener(*this);
@@ -74,7 +84,9 @@ public:
 
     virtual void on_objects(const void* data, size_t objects) override{
         auto scope_check = m_sanitizer.check_scope();
-        m_io_device->write((const char*)data, objects * object_size);
+        if (m_io_device != nullptr){
+            m_io_device->write((const char*)data, objects * object_size);
+        }
     }
 
 private:

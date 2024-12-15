@@ -116,6 +116,7 @@ bool StreamRecording::stop_and_save(const std::string& filename){
 
 
 void StreamRecording::push_samples(WallClock timestamp, const float* data, size_t frames){
+#if 1
     WallClock now = current_time();
     if (m_audio_samples_per_frame == 0 || now < m_start_time){
         return;
@@ -150,8 +151,10 @@ void StreamRecording::push_samples(WallClock timestamp, const float* data, size_
         data, frames * m_audio_samples_per_frame
     );
     m_cv.notify_all();
+#endif
 }
 void StreamRecording::push_frame(std::shared_ptr<const VideoFrame> frame){
+#if 1
     WallClock now = current_time();
     if (!m_has_video || now < m_start_time){
         return;
@@ -190,6 +193,7 @@ void StreamRecording::push_frame(std::shared_ptr<const VideoFrame> frame){
     m_buffered_frames.emplace_back(std::move(frame));
     m_last_frame_time = frame_time;
     m_cv.notify_all();
+#endif
 }
 
 
@@ -313,6 +317,7 @@ void StreamRecording::internal_run(){
 //    cout << "Bit Rate = " << (int)recorder.videoBitRate() << endl;
 
 
+#if 1
 //    cout << "starting recording" << endl;
     m_recorder->record();
 
@@ -380,6 +385,7 @@ void StreamRecording::internal_run(){
 
     m_recorder->stop();
 //    cout << "recorder.stop()" << endl;
+#endif
 
 
     while (m_recorder->recorderState() != QMediaRecorder::StoppedState){

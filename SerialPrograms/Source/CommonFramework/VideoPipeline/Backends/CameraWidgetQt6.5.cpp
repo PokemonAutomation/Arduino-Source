@@ -9,6 +9,7 @@
 
 #include <chrono>
 #include <iostream>
+//#include <QThread>
 #include <QCamera>
 #include <QPainter>
 #include <QMediaDevices>
@@ -285,6 +286,8 @@ void CameraSession::connect_video_sink(QVideoSink* sink){
                     listener->on_frame(frame_ptr);
                 }
             }
+
+//            cout << QThread::currentThread()->isMainThread() << endl;
 
         },
         Qt::DirectConnection
