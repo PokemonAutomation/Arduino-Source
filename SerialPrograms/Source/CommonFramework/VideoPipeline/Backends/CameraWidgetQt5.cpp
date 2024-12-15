@@ -385,7 +385,7 @@ void CameraSession::startup(){
     if (m_probe){
         connect(
             m_probe, &QVideoProbe::videoFrameProbed,
-            m_camera.get(), [this](const QVideoFrame& frame){
+            m_camera, [this](const QVideoFrame& frame){
                 WallClock now = current_time();
                 SpinLockGuard lg(m_frame_lock);
                 if (GlobalSettings::instance().VIDEO_PIPELINE->ENABLE_FRAME_SCREENSHOTS){
@@ -393,6 +393,7 @@ void CameraSession::startup(){
                 }
                 m_last_frame_timestamp = now;
                 m_last_frame_seqnum++;
+                m_fps_tracker.push_event(now);
             },
             Qt::DirectConnection
         );
