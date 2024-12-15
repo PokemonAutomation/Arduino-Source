@@ -23,7 +23,7 @@ namespace PokemonAutomation{
 class IntegerEnumDatabaseImpl{
 public:
     void add(EnumEntry entry){
-        m_sanitizer.check_usage();
+        auto scope_check = m_sanitizer.check_scope();
         size_t enum_value = entry.enum_value;
         m_list.emplace_back(enum_value);
 
@@ -44,7 +44,7 @@ public:
     }
 
     const EnumEntry* find(size_t value) const{
-        m_sanitizer.check_usage();
+        auto scope_check = m_sanitizer.check_scope();
         auto iter = m_map.find(value);
         if (iter == m_map.end()){
             return nullptr;
@@ -52,7 +52,7 @@ public:
         return &iter->second;
     }
     const EnumEntry* find_slug(const std::string& slug) const{
-        m_sanitizer.check_usage();
+        auto scope_check = m_sanitizer.check_scope();
         auto iter = m_slug_to_enum.find(slug);
         if (iter == m_slug_to_enum.end()){
             return nullptr;
@@ -60,7 +60,7 @@ public:
         return iter->second;
     }
     const EnumEntry* find_display(const std::string& display) const{
-        m_sanitizer.check_usage();
+        auto scope_check = m_sanitizer.check_scope();
         auto iter = m_display_to_enum.find(display);
         if (iter == m_display_to_enum.end()){
             return nullptr;
@@ -69,7 +69,7 @@ public:
     }
 
     FixedLimitVector<size_t> all_values() const{
-        m_sanitizer.check_usage();
+        auto scope_check = m_sanitizer.check_scope();
         FixedLimitVector<size_t> ret(m_map.size());
         for (const auto& item : m_map){
             ret.emplace_back(item.first);

@@ -65,32 +65,32 @@ std::unique_ptr<PokemonAutomation::CameraSession> CameraBackend::make_camera(Log
 
 
 void CameraSession::add_state_listener(StateListener& listener){
-    m_sanitizer.check_usage();
+    auto scope_check = m_sanitizer.check_scope();
     std::lock_guard<std::mutex> lg(m_lock);
     m_state_listeners.insert(&listener);
 }
 void CameraSession::remove_state_listener(StateListener& listener){
-    m_sanitizer.check_usage();
+    auto scope_check = m_sanitizer.check_scope();
     std::lock_guard<std::mutex> lg(m_lock);
     m_state_listeners.erase(&listener);
 }
 void CameraSession::add_listener(FrameReadyListener& listener){
-    m_sanitizer.check_usage();
+    auto scope_check = m_sanitizer.check_scope();
     std::lock_guard<std::mutex> lg(m_lock);
     m_frame_ready_listeners.insert(&listener);
 }
 void CameraSession::remove_listener(FrameReadyListener& listener){
-    m_sanitizer.check_usage();
+    auto scope_check = m_sanitizer.check_scope();
     std::lock_guard<std::mutex> lg(m_lock);
     m_frame_ready_listeners.erase(&listener);
 }
 void CameraSession::add_frame_listener(VideoFrameListener& listener){
-    m_sanitizer.check_usage();
+    auto scope_check = m_sanitizer.check_scope();
     std::lock_guard<std::mutex> lg(m_lock);
     m_frame_listeners.insert(&listener);
 }
 void CameraSession::remove_frame_listener(VideoFrameListener& listener){
-    m_sanitizer.check_usage();
+    auto scope_check = m_sanitizer.check_scope();
     std::lock_guard<std::mutex> lg(m_lock);
     m_frame_listeners.erase(&listener);
 }

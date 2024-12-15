@@ -11,6 +11,7 @@
 #define PokemonAutomation_AudioPipeline_AudioPassthroughPairQtThread_H
 
 #include <QThread>
+#include "Common/Cpp/LifetimeSanitizer.h"
 #include "CommonFramework/AudioPipeline/AudioPassthroughPair.h"
 
 namespace PokemonAutomation{
@@ -55,6 +56,7 @@ private:
 private:
     Logger& m_logger;
     std::atomic<AudioPassthroughPairQt*> m_body;
+    LifetimeSanitizer m_sanitizer;
 };
 
 

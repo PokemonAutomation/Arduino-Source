@@ -41,7 +41,7 @@ void SerialPortSession::add_listener(Listener& listener){
     m_listeners.insert(&listener);
 }
 void SerialPortSession::remove_listener(Listener& listener){
-    m_sanitizer.check_usage();
+    auto scope_check = m_sanitizer.check_scope();
     std::lock_guard<std::mutex> lg(m_lock);
     m_listeners.erase(&listener);
 }

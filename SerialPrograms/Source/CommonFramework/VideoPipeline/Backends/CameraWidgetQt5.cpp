@@ -40,21 +40,21 @@ std::unique_ptr<PokemonAutomation::CameraSession> CameraBackend::make_camera(Log
 
 
 void CameraSession::add_state_listener(StateListener& listener){
-    m_sanitizer.check_usage();
+    auto scope_check = m_sanitizer.check_scope();
     std::lock_guard<std::mutex> lg(m_lock);
     m_listeners.insert(&listener);
 }
 void CameraSession::remove_state_listener(StateListener& listener){
-    m_sanitizer.check_usage();
+    auto scope_check = m_sanitizer.check_scope();
     std::lock_guard<std::mutex> lg(m_lock);
     m_listeners.erase(&listener);
 }
 void CameraSession::add_frame_listener(VideoFrameListener& listener){
-    m_sanitizer.check_usage();
+    auto scope_check = m_sanitizer.check_scope();
 
 }
 void CameraSession::remove_frame_listener(VideoFrameListener& listener){
-    m_sanitizer.check_usage();
+    auto scope_check = m_sanitizer.check_scope();
 
 }
 

@@ -95,7 +95,7 @@ GlobalSettings& GlobalSettings::instance(){
     return settings;
 }
 GlobalSettings::~GlobalSettings(){
-    ENABLE_LIFETIME_SANITIZER.remove_listener(*this);
+    ENABLE_LIFETIME_SANITIZER0.remove_listener(*this);
 }
 GlobalSettings::GlobalSettings()
     : BatchOption(LockMode::LOCK_WHILE_RUNNING)
@@ -166,11 +166,12 @@ GlobalSettings::GlobalSettings()
     , PERFORMANCE(CONSTRUCT_TOKEN)
     , AUDIO_PIPELINE(CONSTRUCT_TOKEN)
     , VIDEO_PIPELINE(CONSTRUCT_TOKEN)
-    , ENABLE_LIFETIME_SANITIZER(
+    , ENABLE_LIFETIME_SANITIZER0(
         "<b>Enable Lifetime Sanitizer: (for debugging)</b><br>"
         "Check for C++ object lifetime violations. Terminate program with stack dump if violations are found.",
         LockMode::UNLOCK_WHILE_RUNNING,
-        IS_BETA_VERSION
+        true
+//        IS_BETA_VERSION
     )
     , ERROR_REPORTS(CONSTRUCT_TOKEN)
     , DEVELOPER_TOKEN(
@@ -211,7 +212,7 @@ GlobalSettings::GlobalSettings()
     PA_ADD_OPTION(AUDIO_PIPELINE);
     PA_ADD_OPTION(VIDEO_PIPELINE);
 
-    PA_ADD_OPTION(ENABLE_LIFETIME_SANITIZER);
+    PA_ADD_OPTION(ENABLE_LIFETIME_SANITIZER0);
 
 #ifdef PA_OFFICIAL
     PA_ADD_OPTION(ERROR_REPORTS);
@@ -220,7 +221,7 @@ GlobalSettings::GlobalSettings()
     PA_ADD_OPTION(DEVELOPER_TOKEN);
 
     GlobalSettings::value_changed(this);
-    ENABLE_LIFETIME_SANITIZER.add_listener(*this);
+    ENABLE_LIFETIME_SANITIZER0.add_listener(*this);
 }
 
 void GlobalSettings::load_json(const JsonValue& json){
@@ -337,7 +338,7 @@ JsonValue GlobalSettings::to_json() const{
 }
 
 void GlobalSettings::value_changed(void* object){
-    bool enabled = ENABLE_LIFETIME_SANITIZER;
+    bool enabled = ENABLE_LIFETIME_SANITIZER0;
     LifetimeSanitizer::set_enabled(enabled);
     if (enabled){
         global_logger_tagged().log("LifeTime Sanitizer: Enabled", COLOR_BLUE);

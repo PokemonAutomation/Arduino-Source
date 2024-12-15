@@ -13,6 +13,7 @@
 
 #include <memory>
 #include <set>
+#include "Common/Cpp/LifetimeSanitizer.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/AudioPipeline/AudioInfo.h"
 #include "CommonFramework/AudioPipeline/AudioStream.h"
@@ -62,6 +63,8 @@ private:
     std::unique_ptr<AudioInputDevice> m_input_device;
 
     std::set<AudioFloatStreamListener*> m_listeners;
+
+    LifetimeSanitizer m_sanitizer;
 };
 
 

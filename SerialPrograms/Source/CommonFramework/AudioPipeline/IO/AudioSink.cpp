@@ -15,6 +15,7 @@ using NativeAudioSink = QAudioSink;
 
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PrettyPrint.h"
+#include "Common/Cpp/LifetimeSanitizer.h"
 #include "CommonFramework/AudioPipeline/Tools/AudioFormatUtils.h"
 #include "AudioSink.h"
 
@@ -65,12 +66,14 @@ public:
     }
 
     void set_volume(double volume){
+        auto scope_check = m_sanitizer.check_scope();
         double absolute = convertAudioVolumeFromSlider(volume);
         m_logger.log("Volume set to: Slider = " + tostr_default(volume) + " -> Absolute = " + tostr_default(absolute));
         m_sink.setVolume(absolute);
     }
 
     virtual void on_objects(const void* data, size_t objects) override{
+        auto scope_check = m_sanitizer.check_scope();
         m_io_device->write((const char*)data, objects * object_size);
     }
 
@@ -78,6 +81,7 @@ private:
     Logger& m_logger;
     NativeAudioSink m_sink;
     QIODevice* m_io_device;
+    LifetimeSanitizer m_sanitizer;
 };
 
 
@@ -141,9 +145,11 @@ AudioSink::AudioSink(Logger& logger, const AudioDeviceInfo& device, AudioChannel
 }
 
 AudioSink::operator AudioFloatStreamListener&(){
+    auto scope_check = m_sanitizer.check_scope();
     return *m_writer;
 }
 void AudioSink::set_volume(double volume){
+    auto scope_check = m_sanitizer.check_scope();
     if (!m_writer){
         return;
     }

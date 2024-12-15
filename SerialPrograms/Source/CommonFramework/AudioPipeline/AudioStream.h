@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_AudioPipeline_AudioSourceReader_H
 #define PokemonAutomation_AudioPipeline_AudioSourceReader_H
 
+#include "Common/Cpp/LifetimeSanitizer.h"
 #include "Common/Cpp/Time.h"
 #include "Common/Cpp/StreamConverters.h"
 #include "Common/Cpp/Containers/AlignedVector.h"
@@ -56,6 +57,8 @@ private:
     size_t m_sample_size;
     size_t m_frame_size;
     std::set<AudioFloatStreamListener*> m_listeners;
+
+    LifetimeSanitizer m_sanitizer;
 };
 
 
@@ -79,6 +82,8 @@ private:
     size_t m_buffer_size;
     AlignedVector<char> m_buffer;
     std::set<StreamListener*> m_listeners;
+
+    LifetimeSanitizer m_sanitizer;
 };
 
 

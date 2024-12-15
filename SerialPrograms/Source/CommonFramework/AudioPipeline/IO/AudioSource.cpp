@@ -119,10 +119,12 @@ private:
 
 
 void AudioSource::add_listener(AudioFloatStreamListener& listener){
+    auto scope_check = m_sanitizer.check_scope();
     WriteSpinLock lg(m_lock);
     m_listeners.insert(&listener);
 }
 void AudioSource::remove_listener(AudioFloatStreamListener& listener){
+    auto scope_check = m_sanitizer.check_scope();
     WriteSpinLock lg(m_lock);
     m_listeners.erase(&listener);
 }
@@ -154,6 +156,7 @@ AudioSource::AudioSource(Logger& logger, const AudioDeviceInfo& device, AudioCha
 }
 
 void AudioSource::init(AudioChannelFormat format, AudioSampleFormat stream_format, float volume_multiplier){
+    auto scope_check = m_sanitizer.check_scope();
     switch (format){
     case AudioChannelFormat::MONO_48000:
         m_sample_rate = 48000;

@@ -63,9 +63,6 @@ public:
     virtual void add_state_listener(StateListener& listener) override;
     virtual void remove_state_listener(StateListener& listener) override;
 
-//    void add_frame_ready_listener(FrameReadyListener& listener);
-//    void remove_frame_ready_listener(FrameReadyListener& listener);
-
     virtual void add_frame_listener(VideoFrameListener& listener) override;
     virtual void remove_frame_listener(VideoFrameListener& listener) override;
 
@@ -116,7 +113,6 @@ private:
 
     //  If you need both locks, acquire "m_lock" first.
     mutable std::mutex m_lock;
-    mutable SpinLock m_frame_lock;
 
     CameraInfo m_device;
     Resolution m_resolution;
@@ -134,6 +130,12 @@ private:
     EventRateTracker m_fps_tracker_source;
     EventRateTracker m_fps_tracker_display;
 
+    PeriodicStatsReporterI32 m_stats_conversion;
+
+private:
+    //  Frame Cache: All accesses must be under this lock.
+    mutable SpinLock m_frame_lock;
+
     //  Last Frame
     QVideoFrame m_last_frame;
     WallClock m_last_frame_timestamp;
@@ -143,8 +145,8 @@ private:
     QImage m_last_image;
     WallClock m_last_image_timestamp;
     uint64_t m_last_image_seqnum = 0;
-    PeriodicStatsReporterI32 m_stats_conversion;
 
+private:
     //  Listeners
     std::set<StateListener*> m_state_listeners;
 //    std::set<FrameReadyListener*> m_frame_ready_listeners;

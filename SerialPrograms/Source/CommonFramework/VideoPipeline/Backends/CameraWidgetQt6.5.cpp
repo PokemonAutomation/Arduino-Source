@@ -74,34 +74,22 @@ std::unique_ptr<PokemonAutomation::CameraSession> CameraBackend::make_camera(Log
 
 
 void CameraSession::add_state_listener(StateListener& listener){
-    m_sanitizer.check_usage();
+    auto scope_check = m_sanitizer.check_scope();
     std::lock_guard<std::mutex> lg(m_lock);
     m_state_listeners.insert(&listener);
 }
 void CameraSession::remove_state_listener(StateListener& listener){
-    m_sanitizer.check_usage();
+    auto scope_check = m_sanitizer.check_scope();
     std::lock_guard<std::mutex> lg(m_lock);
     m_state_listeners.erase(&listener);
 }
-#if 0
-void CameraSession::add_frame_ready_listener(FrameReadyListener& listener){
-    m_sanitizer.check_usage();
-    std::lock_guard<std::mutex> lg(m_lock);
-    m_frame_ready_listeners.insert(&listener);
-}
-void CameraSession::remove_frame_ready_listener(FrameReadyListener& listener){
-    m_sanitizer.check_usage();
-    std::lock_guard<std::mutex> lg(m_lock);
-    m_frame_ready_listeners.erase(&listener);
-}
-#endif
 void CameraSession::add_frame_listener(VideoFrameListener& listener){
-    m_sanitizer.check_usage();
+    auto scope_check = m_sanitizer.check_scope();
     std::lock_guard<std::mutex> lg(m_lock);
     m_frame_listeners.insert(&listener);
 }
 void CameraSession::remove_frame_listener(VideoFrameListener& listener){
-    m_sanitizer.check_usage();
+    auto scope_check = m_sanitizer.check_scope();
     std::lock_guard<std::mutex> lg(m_lock);
     m_frame_listeners.erase(&listener);
 }
@@ -114,9 +102,9 @@ CameraSession::CameraSession(Logger& logger, Resolution default_resolution)
     : m_logger(logger)
     , m_default_resolution(default_resolution)
     , m_resolution(default_resolution)
+    , m_stats_conversion("ConvertFrame", "ms", 1000, std::chrono::seconds(10))
     , m_last_frame_seqnum(0)
     , m_last_image_timestamp(WallClock::min())
-    , m_stats_conversion("ConvertFrame", "ms", 1000, std::chrono::seconds(10))
 //    , m_history(GlobalSettings::instance().HISTORY_SECONDS * 1000000)
 {
     uint8_t watchdog_timeout = GlobalSettings::instance().VIDEO_PIPELINE->AUTO_RESET_SECONDS;
@@ -284,16 +272,16 @@ void CameraSession::connect_video_sink(QVideoSink* sink){
             }
 //            cout << now_to_filestring() << endl;
             std::lock_guard<std::mutex> lg(m_lock);
-#if 0
-            for (FrameReadyListener* listener : m_frame_ready_listeners){
-                listener->new_frame_available();
+
+            if (!m_frame_listeners.empty()){
+                std::shared_ptr<VideoFrame> frame_ptr(new VideoFrame(now, frame));
+                for (VideoFrameListener* listener : m_frame_listeners){
+                    listener->on_frame(frame_ptr);
+                }
             }
-#endif
-            std::shared_ptr<VideoFrame> frame_ptr(new VideoFrame(now, frame));
-            for (VideoFrameListener* listener : m_frame_listeners){
-                listener->on_frame(frame_ptr);
-            }
-        }
+
+        },
+        Qt::DirectConnection
     );
 #endif
 }
