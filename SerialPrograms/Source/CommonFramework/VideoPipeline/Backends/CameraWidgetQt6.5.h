@@ -111,7 +111,10 @@ private:
     Logger& m_logger;
     Resolution m_default_resolution;
 
-    //  If you need both locks, acquire "m_lock" first.
+    //  The general state lock. You must acquire this lock to touch anything in
+    //  this section.
+    //  If you need to acquire both this locks and one of the other ones, you
+    //  must acquire this one first.
     mutable std::mutex m_lock;
 
     CameraInfo m_device;
@@ -130,10 +133,17 @@ private:
     EventRateTracker m_fps_tracker_source;
     EventRateTracker m_fps_tracker_display;
 
+    //  Last Cached Image
+    QImage m_last_image;
+    WallClock m_last_image_timestamp;
+    uint64_t m_last_image_seqnum = 0;
+
     PeriodicStatsReporterI32 m_stats_conversion;
+
 
 private:
     //  Frame Cache: All accesses must be under this lock.
+
     mutable SpinLock m_frame_lock;
 
     //  Last Frame
@@ -141,17 +151,17 @@ private:
     WallClock m_last_frame_timestamp;
     uint64_t m_last_frame_seqnum = 0;
 
-    //  Last Cached Image
-    QImage m_last_image;
-    WallClock m_last_image_timestamp;
-    uint64_t m_last_image_seqnum = 0;
 
 private:
-    //  Listeners
+    //  Listeners: All accesses must be under this lock.
+    mutable SpinLock m_listener_lock;
+
     std::set<StateListener*> m_state_listeners;
 //    std::set<FrameReadyListener*> m_frame_ready_listeners;
     std::set<VideoFrameListener*> m_frame_listeners;
 
+
+private:
     LifetimeSanitizer m_sanitizer;
 };
 
