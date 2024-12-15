@@ -385,7 +385,7 @@ void CameraSession::startup(){
     if (m_probe){
         connect(
             m_probe, &QVideoProbe::videoFrameProbed,
-            this, [this](const QVideoFrame& frame){
+            m_camera.get(), [this](const QVideoFrame& frame){
                 WallClock now = current_time();
                 SpinLockGuard lg(m_frame_lock);
                 if (GlobalSettings::instance().VIDEO_PIPELINE->ENABLE_FRAME_SCREENSHOTS){

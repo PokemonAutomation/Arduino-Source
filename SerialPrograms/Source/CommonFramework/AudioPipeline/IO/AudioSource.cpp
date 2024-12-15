@@ -40,9 +40,12 @@ public:
     {
         logger.log("AudioInputFile(): " + dumpAudioFormat(format));
         m_source = std::make_unique<AudioFileLoader>(nullptr, file, format);
-        connect(m_source.get(), &AudioFileLoader::bufferReady, this, [this](const char* data, size_t len){
-            m_reader.push_bytes(data, len);
-        });
+        connect(
+            m_source.get(), &AudioFileLoader::bufferReady,
+            this, [this](const char* data, size_t len){
+                m_reader.push_bytes(data, len);
+            }
+        );
         m_source->start();
     }
 
