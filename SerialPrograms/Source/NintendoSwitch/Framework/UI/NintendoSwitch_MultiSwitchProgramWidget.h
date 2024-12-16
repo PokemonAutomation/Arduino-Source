@@ -52,6 +52,8 @@ private:
     ConfigWidget* m_options;
     StatsBar* m_stats_bar;
     RunnablePanelActionBar* m_actions_bar;
+
+    LifetimeSanitizer m_sanitizer;
 };
 
 
