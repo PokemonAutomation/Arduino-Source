@@ -62,7 +62,7 @@ public:
             &m_sink, [this](QAudio::State state){
                 if (state == QAudio::State::StoppedState){
                     m_io_device = nullptr;
-                    m_logger.log("AudioOutputDevice has prematurely stopped.", COLOR_RED);
+                    m_logger.log("AudioOutputDevice has stopped.", COLOR_ORANGE);
                 }
             }
         );
