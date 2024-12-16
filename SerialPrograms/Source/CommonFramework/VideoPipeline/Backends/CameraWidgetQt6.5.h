@@ -130,7 +130,6 @@ private:
 
     std::vector<Resolution> m_resolutions;
 
-    EventRateTracker m_fps_tracker_source;
     EventRateTracker m_fps_tracker_display;
 
 private:
@@ -156,6 +155,8 @@ private:
     QVideoFrame m_last_frame;
     WallClock m_last_frame_timestamp;
     std::atomic<uint64_t> m_last_frame_seqnum;
+
+    EventRateTracker m_fps_tracker_source;
 
 
 private:
