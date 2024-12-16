@@ -141,7 +141,7 @@ public:
 
 private:
     virtual void send(const void* data, size_t bytes){
-        SpinLockGuard lg(m_send_lock, "SerialConnection::send()");
+        WriteSpinLock lg(m_send_lock, "SerialConnection::send()");
         bytes = write(m_fd, data, bytes);
     }
 
