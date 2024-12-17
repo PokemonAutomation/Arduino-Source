@@ -57,6 +57,8 @@ bool is_selection_arrow(const ImageViewRGB32& image, const WaterfillObject& obje
     }catch (InternalProgramError&){
         global_logger_tagged().log(
             "Mismatching matrix and image size.\n"
+            "    Image: " + std::to_string(image.width()) + "x" + std::to_string(image.height()) +
+            "    Cropped: " + std::to_string(cropped.width()) + "x" + std::to_string(cropped.height()) +
             "    Matrix: " + std::to_string(matrix_width) + "x" + std::to_string(matrix_height) +
             "    Object: " + std::to_string(object.width()) + "x" + std::to_string(object.height()) +
             "    Object X: " + std::to_string(object.min_x) + "-" + std::to_string(object.max_x) +
