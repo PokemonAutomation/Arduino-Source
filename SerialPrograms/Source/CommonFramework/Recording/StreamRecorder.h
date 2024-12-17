@@ -103,6 +103,11 @@ private:
 
 
 
+
+//
+//  This one works, but it leaks a tiny bit of memory each time QMediaRecorder
+//  is started and stopped.
+//
 class StreamRecording : public QThread{
 public:
     StreamRecording(
@@ -158,8 +163,11 @@ private:
 };
 
 
-
-
+//
+//  This one doesn't work. QMediaRecorder::stop() is an asynchronous operation
+//  that you must execute event loop to finish it. But we cannot call event
+//  loop because it leads to reentrancy issues with the destruction path.
+//
 class StreamRecording2{
 public:
     StreamRecording2(
@@ -210,7 +218,7 @@ private:
     std::unique_ptr<QAudioBufferInput> m_audio_input;
     std::unique_ptr<QVideoFrameInput> m_video_input;
     QMediaCaptureSession m_session;
-    QMediaRecorder m_recorder;
+    std::unique_ptr<QMediaRecorder> m_recorder;
 
     AudioBlock m_current_audio;
     std::shared_ptr<const VideoFrame> m_current_frame;

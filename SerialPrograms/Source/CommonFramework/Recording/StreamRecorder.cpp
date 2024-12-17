@@ -18,6 +18,7 @@
 #include <QMediaRecorder>
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Concurrency/SpinPause.h"
+#include "Common/Qt/Redispatch.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/VideoPipeline/Backends/VideoFrameQt.h"
 #include "CommonFramework/Recording/StreamHistoryOption.h"
@@ -465,7 +466,8 @@ StreamRecording2::StreamRecording2(
         m_filename += now_to_filestring() + ".m4a";
     }
 
-    m_session.setRecorder(&m_recorder);
+    m_recorder.reset(new QMediaRecorder());
+    m_session.setRecorder(m_recorder.get());
 
     //  Only initialize the streams we intend to use.
     if (m_audio_samples_per_frame > 0){
@@ -475,7 +477,7 @@ StreamRecording2::StreamRecording2(
         initialize_video();
     }
 
-    m_recorder.setMediaFormat(QMediaFormat::MPEG4);
+    m_recorder->setMediaFormat(QMediaFormat::MPEG4);
 
 
 
@@ -483,17 +485,31 @@ StreamRecording2::StreamRecording2(
     m_recorder->setOutputDevice(&m_write_buffer);
 #else
     QFileInfo file(QString::fromStdString(m_filename));
-    m_recorder.setOutputLocation(
+    m_recorder->setOutputLocation(
         QUrl::fromLocalFile(file.absoluteFilePath())
     );
 #endif
 
-    m_recorder.record();
+    m_recorder->record();
 }
 StreamRecording2::~StreamRecording2(){
+#if 1
     stop();
+#else
+    {
+        std::unique_lock<std::mutex> lg(m_lock);
+        if (m_stopping){
+            return;
+        }
+        m_stopping = true;
+    }
+
+    m_recorder->stop();
+    m_recorder.reset();
+#endif
+
 #ifndef PA_STREAM_HISTORY_LOCAL_BUFFER
-    QDir().remove(QString::fromStdString(m_filename));
+    cout << QDir().remove(QString::fromStdString(m_filename)) << endl;  //  REMOVE
 #endif
 }
 
@@ -508,20 +524,31 @@ void StreamRecording2::stop(){
         m_stopping = true;
     }
 
-    QEventLoop loop;
-    m_recorder.connect(
-        &m_recorder, &QMediaRecorder::recorderStateChanged,
-        &m_recorder, [&](QMediaRecorder::RecorderState state){
-            if (state == QMediaRecorder::StoppedState){
-                loop.quit();
+#if 0
+    run_on_main_thread_and_wait([this]{
+        QEventLoop loop;
+        m_recorder.connect(
+            &m_recorder, &QMediaRecorder::recorderStateChanged,
+            &m_recorder, [&](QMediaRecorder::RecorderState state){
+                if (state == QMediaRecorder::StoppedState){
+                    loop.quit();
+                }
             }
+        );
+
+        emit m_recorder.stop();
+
+        if (m_recorder.recorderState() != QMediaRecorder::StoppedState){
+            loop.exec();
         }
-    );
+    });
+#endif
 
-    emit m_recorder.stop();
+    m_recorder->stop();
 
-    if (m_recorder.recorderState() != QMediaRecorder::StoppedState){
-        loop.exec();
+    while (m_recorder->recorderState() != QMediaRecorder::StoppedState){
+        cout << "Spin waiting..." << endl;  //  REMOVE
+        pause();
     }
 }
 
@@ -530,9 +557,9 @@ void StreamRecording2::initialize_audio(){
     m_audio_input.reset(new QAudioBufferInput());
     m_session.setAudioBufferInput(m_audio_input.get());
 
-    m_recorder.connect(
+    m_recorder->connect(
         m_audio_input.get(), &QAudioBufferInput::readyToSendAudioBuffer,
-        &m_recorder, [this](){
+        m_recorder.get(), [this](){
 //            cout << "readyToSendAudioBuffer()" << endl;
 //            std::lock_guard<std::mutex> lg(m_lock);
 //            m_cv.notify_all();
@@ -551,10 +578,10 @@ void StreamRecording2::initialize_video(){
     case StreamHistoryOption::Resolution::MATCH_INPUT:
         break;
     case StreamHistoryOption::Resolution::FORCE_720p:
-        m_recorder.setVideoResolution(1280, 720);
+        m_recorder->setVideoResolution(1280, 720);
         break;
     case StreamHistoryOption::Resolution::FORCE_1080p:
-        m_recorder.setVideoResolution(1920, 1080);
+        m_recorder->setVideoResolution(1920, 1080);
         break;
     }
 
@@ -562,31 +589,31 @@ void StreamRecording2::initialize_video(){
     case StreamHistoryOption::EncodingMode::FIXED_QUALITY:
         switch (settings.VIDEO_QUALITY){
         case StreamHistoryOption::VideoQuality::VERY_LOW:
-            m_recorder.setQuality(QMediaRecorder::VeryLowQuality);
+            m_recorder->setQuality(QMediaRecorder::VeryLowQuality);
             break;
         case StreamHistoryOption::VideoQuality::LOW:
-            m_recorder.setQuality(QMediaRecorder::LowQuality);
+            m_recorder->setQuality(QMediaRecorder::LowQuality);
             break;
         case StreamHistoryOption::VideoQuality::NORMAL:
-            m_recorder.setQuality(QMediaRecorder::NormalQuality);
+            m_recorder->setQuality(QMediaRecorder::NormalQuality);
             break;
         case StreamHistoryOption::VideoQuality::HIGH:
-            m_recorder.setQuality(QMediaRecorder::HighQuality);
+            m_recorder->setQuality(QMediaRecorder::HighQuality);
             break;
         case StreamHistoryOption::VideoQuality::VERY_HIGH:
-            m_recorder.setQuality(QMediaRecorder::VeryHighQuality);
+            m_recorder->setQuality(QMediaRecorder::VeryHighQuality);
             break;
         }
         break;
     case StreamHistoryOption::EncodingMode::FIXED_BITRATE:
-        m_recorder.setVideoBitRate(settings.VIDEO_BITRATE * 1000);
-        m_recorder.setEncodingMode(QMediaRecorder::AverageBitRateEncoding);
+        m_recorder->setVideoBitRate(settings.VIDEO_BITRATE * 1000);
+        m_recorder->setEncodingMode(QMediaRecorder::AverageBitRateEncoding);
         break;
     }
 
-    m_recorder.connect(
+    m_recorder->connect(
         m_video_input.get(), &QVideoFrameInput::readyToSendVideoFrame,
-        &m_recorder, [this](){
+        m_recorder.get(), [this](){
 //            cout << "readyToSendVideoFrame()" << endl;
 //            std::lock_guard<std::mutex> lg(m_lock);
 //            m_cv.notify_all();

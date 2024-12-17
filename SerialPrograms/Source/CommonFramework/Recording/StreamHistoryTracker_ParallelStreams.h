@@ -15,6 +15,7 @@
 #include <map>
 #include "Common/Cpp/AbstractLogger.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
+#include "Common/Qt/Redispatch.h"
 #include "CommonFramework/VideoPipeline/Backends/VideoFrameQt.h"
 #include "StreamRecorder.h"
 
@@ -60,7 +61,7 @@ public:
     }
 
     bool save(const std::string& filename){
-        std::unique_ptr<StreamRecording2> recording;
+        std::unique_ptr<StreamRecording> recording;
         {
             SpinLockGuard lg(m_lock);
             if (m_recordings.empty()){
@@ -99,6 +100,11 @@ public:
 
 private:
     void update_streams(WallClock current_time){
+//        dispatch_to_main_thread([this, current_time]{
+            internal_update_streams(current_time);
+//        });
+    }
+    void internal_update_streams(WallClock current_time){
 //        cout << "streams = " << m_recordings.size() << endl;
 
         //  Must call under the lock.
@@ -141,7 +147,7 @@ private:
             m_recordings.emplace(
                 std::piecewise_construct,
                 std::forward_as_tuple(start_time),
-                std::forward_as_tuple(new StreamRecording2(
+                std::forward_as_tuple(new StreamRecording(
                     m_logger, std::chrono::milliseconds(500),
                     start_time,
                     m_audio_samples_per_frame,
@@ -150,7 +156,6 @@ private:
                 ))
             );
         }
-
     }
 
 
@@ -161,7 +166,7 @@ private:
     const size_t m_audio_samples_per_frame;
     const size_t m_audio_frames_per_second;
     const bool m_has_video;
-    std::map<WallClock, std::unique_ptr<StreamRecording2>> m_recordings;
+    std::map<WallClock, std::unique_ptr<StreamRecording>> m_recordings;
 };
 
 
