@@ -60,7 +60,7 @@ public:
     }
 
     bool save(const std::string& filename){
-        std::unique_ptr<StreamRecording> recording;
+        std::unique_ptr<StreamRecording2> recording;
         {
             SpinLockGuard lg(m_lock);
             if (m_recordings.empty()){
@@ -141,7 +141,7 @@ private:
             m_recordings.emplace(
                 std::piecewise_construct,
                 std::forward_as_tuple(start_time),
-                std::forward_as_tuple(new StreamRecording(
+                std::forward_as_tuple(new StreamRecording2(
                     m_logger, std::chrono::milliseconds(500),
                     start_time,
                     m_audio_samples_per_frame,
@@ -161,7 +161,7 @@ private:
     const size_t m_audio_samples_per_frame;
     const size_t m_audio_frames_per_second;
     const bool m_has_video;
-    std::map<WallClock, std::unique_ptr<StreamRecording>> m_recordings;
+    std::map<WallClock, std::unique_ptr<StreamRecording2>> m_recordings;
 };
 
 
