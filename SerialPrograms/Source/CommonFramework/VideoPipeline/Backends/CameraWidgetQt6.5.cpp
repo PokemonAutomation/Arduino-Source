@@ -228,7 +228,7 @@ VideoSnapshot CameraSession::snapshot(){
     }
 
     if (!frame.isValid()){
-        global_logger_tagged().log("QVideoFrame is null.", COLOR_RED);
+        m_logger.log("QVideoFrame is null.", COLOR_RED);
         return VideoSnapshot();
     }
 

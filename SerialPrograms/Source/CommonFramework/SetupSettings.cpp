@@ -150,7 +150,7 @@ void set_permissions(QObject& object){
 #if defined(__APPLE__)
 #if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
 #if QT_CONFIG(permissions)
-    cout << "Chcecking MacOS Permissions..." << endl;
+    cout << "Checking MacOS Permissions..." << endl;
     QCameraPermission camera_permission;
     switch(qApp->checkPermission(camera_permission)){
     case Qt::PermissionStatus::Undetermined:
