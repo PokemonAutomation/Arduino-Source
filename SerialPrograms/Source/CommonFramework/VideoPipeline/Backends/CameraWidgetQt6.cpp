@@ -345,7 +345,7 @@ void CameraSession::startup(){
     });
     connect(
         m_video_sink.get(), &QVideoSink::videoFrameChanged,
-        this, [&](const QVideoFrame& frame){
+        m_camera.get(), [&](const QVideoFrame& frame){
             WallClock now = current_time();
             {
                 SpinLockGuard lg(m_frame_lock);

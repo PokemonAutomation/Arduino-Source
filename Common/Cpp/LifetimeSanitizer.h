@@ -9,6 +9,7 @@
 
 #include <stdint.h>
 #include <atomic>
+#include <string>
 #include "Common/Compiler.h"
 
 #define PA_SANITIZER_ENABLE
@@ -27,9 +28,10 @@ class LifetimeSanitizer{
 public:
     //  Default + Destruct
 
-    LifetimeSanitizer()
+    LifetimeSanitizer(const char* name = "(unnamed class)")
         : m_token(SANITIZER_TOKEN)
         , m_self(this)
+        , m_name(name)
     {
         if (!LifetimeSanitizer_enabled.load(std::memory_order_relaxed)){
             return;
@@ -51,6 +53,7 @@ public:
     LifetimeSanitizer(LifetimeSanitizer&& x)
         : m_token(SANITIZER_TOKEN)
         , m_self(this)
+        , m_name(x.m_name)
     {
         if (!LifetimeSanitizer_enabled.load(std::memory_order_relaxed)){
             return;
@@ -73,6 +76,7 @@ public:
     LifetimeSanitizer(const LifetimeSanitizer& x)
         : m_token(SANITIZER_TOKEN)
         , m_self(this)
+        , m_name(x.m_name)
     {
         if (!LifetimeSanitizer_enabled.load(std::memory_order_relaxed)){
             return;
@@ -127,6 +131,7 @@ private:
 private:
     uint64_t m_token;
     void* m_self;
+    std::string m_name;
 };
 
 

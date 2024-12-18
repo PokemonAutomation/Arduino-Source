@@ -71,6 +71,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<DoublesLeveling_Descriptor, DoublesLeveling>());
     ret.emplace_back(make_single_switch_program<AmitySquarePickUpFarmer_Descriptor, AmitySquarePickUpFarmer>());
     ret.emplace_back(make_single_switch_program<GiftBerryReset_Descriptor, GiftBerryReset>());
+    ret.emplace_back(make_single_switch_program<PoffinCooker_Descriptor, PoffinCooker>());
 
     ret.emplace_back("---- Shiny Hunting ----");
     ret.emplace_back(make_single_switch_program<StarterReset_Descriptor, StarterReset>());
@@ -93,7 +94,6 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
 
     if (IS_BETA_VERSION || PreloadSettings::instance().DEVELOPER_MODE){
         ret.emplace_back("---- Untested/Beta/WIP ----");
-        ret.emplace_back(make_single_switch_program<PoffinCooker_Descriptor, PoffinCooker>());
     }
     if (PreloadSettings::instance().DEVELOPER_MODE){
         ret.emplace_back("---- Developer Tools ----");

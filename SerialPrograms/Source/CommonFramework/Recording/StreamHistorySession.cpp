@@ -66,13 +66,13 @@ void StreamHistorySession::start(AudioChannelFormat format, bool has_video){
 }
 
 
+#if 0
 class HistorySaverThread : public QThread{
 public:
     HistorySaverThread(StreamHistoryTracker& tracker, const std::string& filename)
         : m_tracker(tracker)
         , m_filename(filename)
-    {
-    }
+    {}
     ~HistorySaverThread(){
         quit();
         wait();
@@ -86,6 +86,7 @@ public:
     virtual void run() override{
 //        m_success = m_tracker.save(m_logger, m_filename);
         m_success = m_tracker.save(m_filename);
+        exec();
     }
 
 private:
@@ -93,8 +94,12 @@ private:
     const std::string& m_filename;
     bool m_success = false;
 };
+#endif
 
 bool StreamHistorySession::save(const std::string& filename) const{
+    //  This will be coming in from random threads. It will block until the save
+    //  is finished or failed.
+
     const Data& data = *m_data;
 
     //  Get an owning reference to the current tracker.
@@ -111,8 +116,10 @@ bool StreamHistorySession::save(const std::string& filename) const{
     }
 
 //    tracker->save(m_logger, filename);
-    HistorySaverThread saver(*tracker, filename);
-    return saver.save();
+//    HistorySaverThread saver(*tracker, filename);
+//    return saver.save();
+
+    return tracker->save(filename);
 }
 void StreamHistorySession::on_samples(const float* samples, size_t frames){
     Data& data = *m_data;

@@ -28,19 +28,20 @@ namespace FileDownloader{
 std::string download_file(Logger& logger, const std::string& url){
     QNetworkAccessManager network_access_manager;
     QByteArray downloaded_data;
+    std::unique_ptr<QNetworkReply> reply;
     QEventLoop loop;
 
     QObject::connect(
         &network_access_manager, &QNetworkAccessManager::finished,
         &loop, [&downloaded_data, &loop](QNetworkReply* reply){
             downloaded_data = reply->readAll();
-            reply->deleteLater();
+//            reply->deleteLater();
             loop.exit();
         }
     );
 
     QNetworkRequest request(QUrl(QString::fromStdString(url)));
-    std::unique_ptr<QNetworkReply> reply(network_access_manager.get(request));
+    reply.reset(network_access_manager.get(request));
 
 #if 0
     QTimer timer;

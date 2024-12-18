@@ -122,6 +122,9 @@
 #include "PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h"
 //#include "CommonFramework/Environment/SystemSleep.h"
 #include "CommonFramework/ErrorReports/ErrorReports.h"
+#include "PokemonLA/Inference/Map/PokemonLA_OutbreakReader.h"
+#include "PokemonSV/Programs/Farming/PokemonSV_AuctionFarmer.h"
+#include "PokemonLA/Inference/Objects/PokemonLA_MMOQuestionMarkDetector.h"
 
 
 
@@ -141,6 +144,13 @@ using namespace PokemonAutomation::Kernels::Waterfill;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
+
+
+namespace PokemonSwSh{
+    std::vector<ImagePixelBox> find_selection_arrows(const ImageViewRGB32& image, size_t min_area);
+}
+
+
 
 
 StringSelectDatabase make_database(){
@@ -266,6 +276,37 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     [[maybe_unused]] VideoOverlay& overlay = env.consoles[0];
     BotBaseContext context(scope, console.botbase());
     VideoOverlaySet overlays(overlay);
+
+
+
+//    ImageRGB32 image("Screenshot.png");
+//    PokemonSwSh::find_selection_arrows(image, 10);
+
+
+//    LifetimeSanitizer::terminate_with_dump();
+
+//    PokemonSV::AuctionFarmer farmer;
+//    farmer.check_offers(env);
+//    std::terminate();
+
+#if 0
+    ImageRGB32 image("screenshot-20241210-110029984325.png");
+//    auto image = feed.snapshot();
+
+    MMOQuestionMarkDetector question_mark_detector(logger);
+    question_mark_detector.detect_MMO_on_hisui_map(image);
+#endif
+
+
+#if 0
+    PokemonLA::OutbreakReader reader(logger, Language::English, overlay);
+    reader.make_overlays(overlays);
+
+    ImageRGB32 image("screenshot-20241124-135028529403.png");
+#endif
+
+//    reader.read(feed.snapshot());
+
 
 //    PokemonLA::ButtonDetector detector(logger, PokemonLA::ButtonType::ButtonA,);
 

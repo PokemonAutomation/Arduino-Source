@@ -63,6 +63,8 @@ private:
     std::atomic<CancellableScope*> m_scope;
 
     std::set<Listener*> m_listeners;
+
+    LifetimeSanitizer m_sanitizer;
 };
 
 

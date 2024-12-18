@@ -15,6 +15,7 @@
 #include <map>
 #include "Common/Cpp/AbstractLogger.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
+#include "Common/Qt/Redispatch.h"
 #include "CommonFramework/VideoPipeline/Backends/VideoFrameQt.h"
 #include "StreamRecorder.h"
 
@@ -99,6 +100,11 @@ public:
 
 private:
     void update_streams(WallClock current_time){
+//        dispatch_to_main_thread([this, current_time]{
+            internal_update_streams(current_time);
+//        });
+    }
+    void internal_update_streams(WallClock current_time){
 //        cout << "streams = " << m_recordings.size() << endl;
 
         //  Must call under the lock.
@@ -150,7 +156,6 @@ private:
                 ))
             );
         }
-
     }
 
 

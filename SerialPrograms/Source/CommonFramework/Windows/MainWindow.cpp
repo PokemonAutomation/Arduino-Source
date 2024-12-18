@@ -213,26 +213,26 @@ void MainWindow::resizeEvent(QResizeEvent* event){
     m_pending_resize = false;
 }
 
-void MainWindow::close_panel(){
+void MainWindow::close_panel() noexcept{
+//    cout << "close_panel(): enter: " << m_current_panel_widget << endl;
     //  Must destroy the widget first since it references the instance.
     if (m_current_panel_widget != nullptr){
         m_right_panel_layout->removeWidget(m_current_panel_widget);
-        delete m_current_panel_widget;
+        QWidget* widget = m_current_panel_widget;
         m_current_panel_widget = nullptr;
+        delete widget;
     }
+
+//    cout << "close_panel(): mid: " << m_current_panel_widget << endl;
 
     //  Now it's safe to destroy the instance.
     if (m_current_panel == nullptr){
         return;
     }
 
-    m_current_panel->save_settings();
-#if 0
-    const std::string& identifier = m_current_panel->descriptor().identifier();
-    if (!identifier.empty()){
-        PERSISTENT_SETTINGS().panels[QString::fromStdString(identifier)] = m_current_panel->to_json();
-    }
-#endif
+    try{
+        m_current_panel->save_settings();
+    }catch (...){}
 
     m_current_panel.reset();
     m_current_panel_descriptor.reset();
@@ -256,14 +256,33 @@ void MainWindow::load_panel(
     std::shared_ptr<const PanelDescriptor> descriptor,
     std::unique_ptr<PanelInstance> panel
 ){
+    if (m_panel_transition){
+        global_logger_tagged().log(
+            "Ignoring attempted panel change while existing one is still in progress.",
+            COLOR_RED
+        );
+        return;
+    }
+
+    m_panel_transition = true;
     close_panel();
-    check_new_version();
 
     //  Make new widget.
-    m_current_panel_widget = panel->make_widget(*this, *this);
-    m_current_panel_descriptor = std::move(descriptor);
-    m_current_panel = std::move(panel);
-    m_right_panel_layout->addWidget(m_current_panel_widget);
+    try{
+        check_new_version();
+        m_current_panel_widget = panel->make_widget(*this, *this);
+//        cout << "load_panel() = " << m_current_panel_widget << endl;
+        m_current_panel_descriptor = std::move(descriptor);
+        m_current_panel = std::move(panel);
+        m_right_panel_layout->addWidget(m_current_panel_widget);
+    }catch (...){
+        if (m_current_panel_widget != nullptr){
+            delete m_current_panel_widget;
+        }
+        m_panel_transition = false;
+        throw;
+    }
+    m_panel_transition = false;
 }
 void MainWindow::on_busy(){
     if (m_program_list){

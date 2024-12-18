@@ -19,6 +19,10 @@
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "PokemonSwSh_SelectionArrowFinder.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
@@ -57,6 +61,8 @@ bool is_selection_arrow(const ImageViewRGB32& image, const WaterfillObject& obje
     }catch (InternalProgramError&){
         global_logger_tagged().log(
             "Mismatching matrix and image size.\n"
+            "    Image: " + std::to_string(image.width()) + "x" + std::to_string(image.height()) +
+            "    Cropped: " + std::to_string(cropped.width()) + "x" + std::to_string(cropped.height()) +
             "    Matrix: " + std::to_string(matrix_width) + "x" + std::to_string(matrix_height) +
             "    Object: " + std::to_string(object.width()) + "x" + std::to_string(object.height()) +
             "    Object X: " + std::to_string(object.min_x) + "-" + std::to_string(object.max_x) +
@@ -85,6 +91,7 @@ std::vector<ImagePixelBox> find_selection_arrows(const ImageViewRGB32& image, si
     std::vector<ImagePixelBox> ret;
     WaterfillObject object;
     while (finder->find_next(object, true)){
+//        cout << object.min_x << "-" << object.max_x << ", " << object.min_y << "-" << object.max_y << endl;
         if (is_selection_arrow(image, object)){
             ret.emplace_back(object);
         }
