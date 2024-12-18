@@ -98,7 +98,9 @@ StreamRecording::~StreamRecording(){
     quit();
     wait();
 #ifndef PA_STREAM_HISTORY_LOCAL_BUFFER
-    QDir().remove(QString::fromStdString(m_filename));
+    if (!m_filename.empty()){
+        QDir().remove(QString::fromStdString(m_filename));
+    }
 #endif
 }
 

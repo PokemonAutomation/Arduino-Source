@@ -279,9 +279,8 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 
 
-    ImageRGB32 image("Screenshot.png");
-
-    PokemonSwSh::find_selection_arrows(image, 10);
+//    ImageRGB32 image("Screenshot.png");
+//    PokemonSwSh::find_selection_arrows(image, 10);
 
 
 //    LifetimeSanitizer::terminate_with_dump();
@@ -332,7 +331,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     );
 #endif
 
-#if 0
+#if 1
     VideoSnapshot image = feed.snapshot();
 //    ImageRGB32 image("screenshot-20241124-135028529403.png");
 
