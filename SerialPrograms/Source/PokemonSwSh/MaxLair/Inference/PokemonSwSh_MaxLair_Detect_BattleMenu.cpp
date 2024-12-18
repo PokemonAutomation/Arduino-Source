@@ -372,7 +372,7 @@ void BattleMenuReader::read_hp(Logger& logger, const ImageViewRGB32& screen, Hea
     }
 
     if (bad){
-        dump_image(logger, MODULE_NAME, "BattlePartyReader-ReadHP", screen);
+//        dump_image(logger, MODULE_NAME, "BattlePartyReader-ReadHP", screen);
     }
 }
 void BattleMenuReader::read_own_pp(Logger& logger, const ImageViewRGB32& screen, int8_t pp[4]) const{
@@ -381,7 +381,7 @@ void BattleMenuReader::read_own_pp(Logger& logger, const ImageViewRGB32& screen,
     pp[2] = read_pp_text(logger, extract_box_reference(screen, m_pp2));
     pp[3] = read_pp_text(logger, extract_box_reference(screen, m_pp3));
     if (pp[0] < 0 && pp[1] < 0 && pp[2] < 0 && pp[3] < 0){
-        dump_image(logger, MODULE_NAME, "BattleMenuReader-read_own_pp", screen);
+//        dump_image(logger, MODULE_NAME, "BattleMenuReader-read_own_pp", screen);
         return;
     }
 #if 0
