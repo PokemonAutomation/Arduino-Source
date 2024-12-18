@@ -129,7 +129,7 @@ private:
 
 
     virtual void send(const void* data, size_t bytes){
-        SpinLockGuard lg(m_send_lock, "SerialConnection::send()");
+        WriteSpinLock lg(m_send_lock, "SerialConnection::send()");
 #if 0
         for (size_t c = 0; c < bytes; c++){
             std::cout << "Send: " << (int)((const char*)data)[c] << std::endl;

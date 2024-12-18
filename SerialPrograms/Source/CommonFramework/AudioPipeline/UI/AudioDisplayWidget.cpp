@@ -39,7 +39,7 @@ void AudioDisplayWidget::state_changed(){
 //    cout << "AudioDisplayWidget::state_changed()" << endl;
     QMetaObject::invokeMethod(
         this, [this]{
-            m_sanitizer.check_usage();
+            auto scope_check = m_sanitizer.check_scope();
             update_size();
             QWidget::update();
         }, Qt::QueuedConnection
@@ -49,7 +49,7 @@ void AudioDisplayWidget::state_changed(){
 void AudioDisplayWidget::pre_input_change(){
     QMetaObject::invokeMethod(
         this, [this]{
-            m_sanitizer.check_usage();
+            auto scope_check = m_sanitizer.check_scope();
             update_size();
             QWidget::update();
         }, Qt::QueuedConnection
@@ -60,7 +60,7 @@ void AudioDisplayWidget::post_display_change(AudioOption::AudioDisplayType displ
 //    cout << "AudioDisplayWidget::display_changed()" << endl;
     QMetaObject::invokeMethod(
         this, [this, display]{
-            m_sanitizer.check_usage();
+            auto scope_check = m_sanitizer.check_scope();
             m_display_type = display;
             update_size();
             QWidget::update();

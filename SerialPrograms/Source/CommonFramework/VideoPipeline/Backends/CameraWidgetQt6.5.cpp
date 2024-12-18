@@ -9,6 +9,7 @@
 
 #include <chrono>
 #include <iostream>
+//#include <QThread>
 #include <QCamera>
 #include <QPainter>
 #include <QMediaDevices>
@@ -17,7 +18,7 @@
 #include <QImageCapture>
 //#include "Common/Cpp/Exceptions.h"
 //#include "Common/Cpp/Time.h"
-#include "Common/Cpp/PrettyPrint.h"
+//#include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/GlobalServices.h"
 #include "CommonFramework/VideoPipeline/CameraOption.h"
@@ -74,35 +75,23 @@ std::unique_ptr<PokemonAutomation::CameraSession> CameraBackend::make_camera(Log
 
 
 void CameraSession::add_state_listener(StateListener& listener){
-    m_sanitizer.check_usage();
-    std::lock_guard<std::mutex> lg(m_lock);
+    auto scope_check = m_sanitizer.check_scope();
+    WriteSpinLock lg(m_listener_lock);
     m_state_listeners.insert(&listener);
 }
 void CameraSession::remove_state_listener(StateListener& listener){
-    m_sanitizer.check_usage();
-    std::lock_guard<std::mutex> lg(m_lock);
+    auto scope_check = m_sanitizer.check_scope();
+    WriteSpinLock lg(m_listener_lock);
     m_state_listeners.erase(&listener);
 }
-#if 0
-void CameraSession::add_frame_ready_listener(FrameReadyListener& listener){
-    m_sanitizer.check_usage();
-    std::lock_guard<std::mutex> lg(m_lock);
-    m_frame_ready_listeners.insert(&listener);
-}
-void CameraSession::remove_frame_ready_listener(FrameReadyListener& listener){
-    m_sanitizer.check_usage();
-    std::lock_guard<std::mutex> lg(m_lock);
-    m_frame_ready_listeners.erase(&listener);
-}
-#endif
 void CameraSession::add_frame_listener(VideoFrameListener& listener){
-    m_sanitizer.check_usage();
-    std::lock_guard<std::mutex> lg(m_lock);
+    auto scope_check = m_sanitizer.check_scope();
+    WriteSpinLock lg(m_listener_lock);
     m_frame_listeners.insert(&listener);
 }
 void CameraSession::remove_frame_listener(VideoFrameListener& listener){
-    m_sanitizer.check_usage();
-    std::lock_guard<std::mutex> lg(m_lock);
+    auto scope_check = m_sanitizer.check_scope();
+    WriteSpinLock lg(m_listener_lock);
     m_frame_listeners.erase(&listener);
 }
 
@@ -114,9 +103,9 @@ CameraSession::CameraSession(Logger& logger, Resolution default_resolution)
     : m_logger(logger)
     , m_default_resolution(default_resolution)
     , m_resolution(default_resolution)
-    , m_last_frame_seqnum(0)
     , m_last_image_timestamp(WallClock::min())
     , m_stats_conversion("ConvertFrame", "ms", 1000, std::chrono::seconds(10))
+    , m_last_frame_seqnum(0)
 //    , m_history(GlobalSettings::instance().HISTORY_SECONDS * 1000000)
 {
     uint8_t watchdog_timeout = GlobalSettings::instance().VIDEO_PIPELINE->AUTO_RESET_SECONDS;
@@ -169,15 +158,21 @@ void CameraSession::set_resolution(Resolution resolution){
             m_logger.log("Resolution not supported.", COLOR_RED);
             return;
         }
-        for (StateListener* listener : m_state_listeners){
-            listener->pre_resolution_change(resolution);
+        {
+            ReadSpinLock lg1(m_listener_lock);
+            for (StateListener* listener : m_state_listeners){
+                listener->pre_resolution_change(resolution);
+            }
         }
         m_resolution = resolution;
         m_camera->stop();
         m_camera->setCameraFormat(*iter->second);
         m_camera->start();
-        for (StateListener* listener : m_state_listeners){
-            listener->post_resolution_change(resolution);
+        {
+            ReadSpinLock lg1(m_listener_lock);
+            for (StateListener* listener : m_state_listeners){
+                listener->post_resolution_change(resolution);
+            }
         }
     });
 }
@@ -199,7 +194,7 @@ std::vector<Resolution> CameraSession::supported_resolutions() const{
 }
 std::pair<QVideoFrame, uint64_t> CameraSession::latest_frame(){
     ReadSpinLock lg(m_frame_lock);
-    return {m_last_frame, m_last_frame_seqnum};
+    return {m_last_frame, m_last_frame_seqnum.load(std::memory_order_relaxed)};
 }
 void CameraSession::report_rendered_frame(WallClock timestamp){
     {
@@ -210,32 +205,35 @@ void CameraSession::report_rendered_frame(WallClock timestamp){
 }
 
 VideoSnapshot CameraSession::snapshot(){
-    //  Prevent multiple concurrent screenshots from entering here.
-    std::lock_guard<std::mutex> lg(m_lock);
+    //  This will be coming in from random threads. (not the main thread)
+    //  So we efficiently grab the last frame to unblock the main thread.
+    //  Then we can do any expensive post-processing as needed.
 
-    if (m_camera == nullptr){
-        return VideoSnapshot();
+    std::lock_guard<std::mutex> lg(m_cache_lock);
+
+    //  Check the cached image frame. If it's not stale, return it immediately.
+    uint64_t frame_seqnum = m_last_frame_seqnum.load(std::memory_order_relaxed);
+    if (!m_last_image.isNull() && m_last_image_seqnum == frame_seqnum){
+        return VideoSnapshot(m_last_image, m_last_image_timestamp);
     }
 
-    //  Frame is already cached and is not stale.
+    //  Cached image is stale. Grab the latest frame.
     QVideoFrame frame;
     WallClock frame_timestamp;
-    uint64_t frame_seqnum;
     {
         ReadSpinLock lg0(m_frame_lock);
-        frame_seqnum = m_last_frame_seqnum;
-        if (!m_last_image.isNull() && m_last_image_seqnum == frame_seqnum){
-            return VideoSnapshot(m_last_image, m_last_image_timestamp);
-        }
+        frame_seqnum = m_last_frame_seqnum.load(std::memory_order_relaxed);
         frame = m_last_frame;
         frame_timestamp = m_last_frame_timestamp;
     }
 
     if (!frame.isValid()){
-        global_logger_tagged().log("QVideoFrame is null.", COLOR_RED);
+        m_logger.log("QVideoFrame is null.", COLOR_RED);
         return VideoSnapshot();
     }
 
+    //  Converting the QVideoFrame to QImage is expensive. Time it and
+    //  report performance.
     WallClock time0 = current_time();
 
     QImage image = frame.toImage();
@@ -244,12 +242,13 @@ VideoSnapshot CameraSession::snapshot(){
         image = image.convertToFormat(QImage::Format_ARGB32);
     }
 
+    WallClock time1 = current_time();
+    m_stats_conversion.report_data(m_logger, std::chrono::duration_cast<std::chrono::microseconds>(time1 - time0).count());
+
+    //  Update the cached image.
     m_last_image = std::move(image);
     m_last_image_timestamp = frame_timestamp;
     m_last_image_seqnum = frame_seqnum;
-
-    WallClock time1 = current_time();
-    m_stats_conversion.report_data(m_logger, std::chrono::duration_cast<std::chrono::microseconds>(time1 - time0).count());
 
     return VideoSnapshot(m_last_image, m_last_image_timestamp);
 }
@@ -266,7 +265,11 @@ void CameraSession::connect_video_sink(QVideoSink* sink){
 #if 1
     connect(
         sink, &QVideoSink::videoFrameChanged,
-        this, [&](const QVideoFrame& frame){
+        m_camera.get(), [&](const QVideoFrame& frame){
+            //  This will be on the main thread. So we waste as little time as
+            //  possible. Shallow-copy the frame, update the listeners, and
+            //  return immediately to unblock the main thread.
+
             WallClock now = current_time();
             {
                 WriteSpinLock lg(m_frame_lock);
@@ -278,22 +281,26 @@ void CameraSession::connect_video_sink(QVideoSink* sink){
 
                 m_last_frame = frame;
                 m_last_frame_timestamp = now;
-                m_last_frame_seqnum++;
+                uint64_t seqnum = m_last_frame_seqnum.load(std::memory_order_relaxed);
+                seqnum++;
+                m_last_frame_seqnum.store(seqnum, std::memory_order_relaxed);
 //                m_history.push_frame(frame);
                 m_fps_tracker_source.push_event(now);
             }
 //            cout << now_to_filestring() << endl;
-            std::lock_guard<std::mutex> lg(m_lock);
-#if 0
-            for (FrameReadyListener* listener : m_frame_ready_listeners){
-                listener->new_frame_available();
+
+            ReadSpinLock lg(m_listener_lock);
+            if (!m_frame_listeners.empty()){
+                std::shared_ptr<VideoFrame> frame_ptr(new VideoFrame(now, frame));
+                for (VideoFrameListener* listener : m_frame_listeners){
+                    listener->on_frame(frame_ptr);
+                }
             }
-#endif
-            std::shared_ptr<VideoFrame> frame_ptr(new VideoFrame(now, frame));
-            for (VideoFrameListener* listener : m_frame_listeners){
-                listener->on_frame(frame_ptr);
-            }
-        }
+
+//            cout << QThread::currentThread()->isMainThread() << endl;
+
+        },
+        Qt::DirectConnection
     );
 #endif
 }
@@ -323,13 +330,18 @@ void CameraSession::set_video_output(QGraphicsVideoItem& item){
 }
 
 void CameraSession::shutdown(){
+    //  Must call inside state lock.
+
     if (!m_capture_session){
         return;
     }
     m_logger.log("Stopping Camera...");
 
-    for (StateListener* listener : m_state_listeners){
-        listener->pre_shutdown();
+    {
+        ReadSpinLock lg(m_listener_lock);
+        for (StateListener* listener : m_state_listeners){
+            listener->pre_shutdown();
+        }
     }
     m_camera->stop();
     m_capture_session.reset();
@@ -339,22 +351,30 @@ void CameraSession::shutdown(){
     m_formats.clear();
 
     {
-        WriteSpinLock lg(m_frame_lock);
+        std::lock_guard<std::mutex> lg0(m_cache_lock);
+        WriteSpinLock lg1(m_frame_lock);
 
+        WallClock timestamp = current_time();
         m_last_frame = QVideoFrame();
-        m_last_frame_timestamp = current_time();
-        m_last_frame_seqnum++;
+        m_last_frame_timestamp = timestamp;
+        uint64_t seqnum = m_last_frame_seqnum.load(std::memory_order_relaxed);
+        seqnum++;
+        m_last_frame_seqnum.store(seqnum, std::memory_order_relaxed);
 
         m_last_image = QImage();
-        m_last_image_timestamp = m_last_frame_timestamp;
-        m_last_image_seqnum = m_last_frame_seqnum;
+        m_last_image_timestamp = timestamp;
+        m_last_image_seqnum = seqnum;
     }
-
-    for (StateListener* listener : m_state_listeners){
-        listener->post_shutdown();
+    {
+        ReadSpinLock lg(m_listener_lock);
+        for (StateListener* listener : m_state_listeners){
+            listener->post_shutdown();
+        }
     }
 }
 void CameraSession::startup(){
+    //  Must call inside state lock.
+
     if (!m_device){
         return;
     }
@@ -438,8 +458,11 @@ void CameraSession::startup(){
 
 //    cout << "frame rate = " << m_camera->cameraFormat().minFrameRate() << endl;
 
-    for (StateListener* listener : m_state_listeners){
-        listener->post_new_source(m_device, m_resolution);
+    {
+        ReadSpinLock lg(m_listener_lock);
+        for (StateListener* listener : m_state_listeners){
+            listener->post_new_source(m_device, m_resolution);
+        }
     }
 }
 

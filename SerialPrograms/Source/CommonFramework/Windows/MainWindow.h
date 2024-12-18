@@ -30,7 +30,7 @@ private:
     virtual void closeEvent(QCloseEvent* event) override;
     virtual void resizeEvent(QResizeEvent* event) override;
 
-    void close_panel();
+    void close_panel() noexcept;
 
     virtual bool report_new_panel_intent(const PanelDescriptor& descriptor) override;
     virtual void load_panel(
@@ -65,6 +65,7 @@ private:
     std::unique_ptr<FileWindowLoggerWindow> m_output_window;
 
     bool m_pending_resize = false;
+    bool m_panel_transition = false;
 };
 
 

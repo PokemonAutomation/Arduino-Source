@@ -65,13 +65,13 @@ AsyncCommandSession::~AsyncCommandSession(){
 }
 
 bool AsyncCommandSession::command_is_running(){
-    m_sanitizer.check_usage();
+    auto scope_check = m_sanitizer.check_scope();
     std::lock_guard<std::mutex> lg(m_lock);
     return m_current != nullptr;
 }
 
 void AsyncCommandSession::stop_command(){
-    m_sanitizer.check_usage();
+    auto scope_check = m_sanitizer.check_scope();
 
     std::unique_lock<std::mutex> lg(m_lock);
     if (cancelled()){
@@ -87,7 +87,7 @@ void AsyncCommandSession::stop_command(){
     }
 }
 void AsyncCommandSession::dispatch(std::function<void(BotBaseContext&)>&& lambda){
-    m_sanitizer.check_usage();
+    auto scope_check = m_sanitizer.check_scope();
 
     //  Construct the CommandSet outside the lock.
     //  If a cancellation comes from above while we are holding the lock,
@@ -164,7 +164,7 @@ void AsyncCommandSession::thread_loop(){
         }
     }
 
-    m_sanitizer.check_usage();
+    auto scope_check = m_sanitizer.check_scope();
 }
 
 

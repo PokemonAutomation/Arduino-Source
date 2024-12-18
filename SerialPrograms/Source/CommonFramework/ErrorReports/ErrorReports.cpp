@@ -14,6 +14,7 @@
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/Environment/Environment.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "ProgramDumper.h"
@@ -96,6 +97,7 @@ ErrorReportOption::ErrorReportOption()
 SendableErrorReport::SendableErrorReport()
     : m_timestamp(now_to_filestring())
     , m_directory(ERROR_PATH_UNSENT + "/" + m_timestamp + "/")
+    , m_processor(get_processor_name())
     , m_program(PreloadSettings::instance().DEVELOPER_MODE
         ? PROGRAM_NAME + " (" + PROGRAM_VERSION + "-dev)"
         : PROGRAM_NAME + " (" + PROGRAM_VERSION + ")"
@@ -161,6 +163,7 @@ SendableErrorReport::SendableErrorReport(std::string directory)
     JsonValue json = load_json_file(m_directory + "Report.json");
     const JsonObject& obj = json.to_object_throw();
     m_timestamp = obj.get_string_throw("Timestamp");
+    m_processor = obj.get_string_throw("Processor");
     m_program = obj.get_string_throw("Program");
     m_program_id = obj.get_string_throw("ProgramID");
     m_program_runtime_millis = obj.get_integer_throw("ElapsedTimeMillis");
@@ -226,6 +229,7 @@ void SendableErrorReport::save(Logger* logger) const{
     JsonObject report;
 
     report["Timestamp"] = m_timestamp;
+    report["Processor"] = m_processor;
     report["Program"] = m_program;
     report["ProgramID"] = m_program_id;
     report["ElapsedTimeMillis"] = m_program_runtime_millis;

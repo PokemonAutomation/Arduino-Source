@@ -44,7 +44,7 @@ public:
     }
     virtual qint64 readData(char* data, qint64 maxlen){ return 0; }
     virtual qint64 writeData(const char* data, qint64 len){
-        m_sanitizer.check_usage();
+        auto scope_check = m_sanitizer.check_scope();
         m_bytes += len;
         cout << "total = " << m_bytes << ", current = " << len << endl;
         return len;

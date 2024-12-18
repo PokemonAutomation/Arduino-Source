@@ -23,10 +23,12 @@ namespace NintendoSwitch{
 
 
 void MultiSwitchProgramSession::add_listener(Listener& listener){
+    auto ScopeCheck = m_sanitizer.check_scope();
     WriteSpinLock lg(m_lock);
     m_listeners.insert(&listener);
 }
 void MultiSwitchProgramSession::remove_listener(Listener& listener){
+    auto ScopeCheck = m_sanitizer.check_scope();
     WriteSpinLock lg(m_lock);
     m_listeners.erase(&listener);
 }
@@ -39,6 +41,7 @@ MultiSwitchProgramSession::MultiSwitchProgramSession(MultiSwitchProgramOption& o
     , m_option(option)
     , m_system(option.system(), instance_id())
     , m_scope(nullptr)
+    , m_sanitizer("MultiSwitchProgramSession")
 {
     WriteSpinLock lg(m_lock);
     m_system.add_listener(*this);
@@ -54,6 +57,7 @@ MultiSwitchProgramSession::~MultiSwitchProgramSession(){
 
 
 void MultiSwitchProgramSession::restore_defaults(){
+    auto ScopeCheck = m_sanitizer.check_scope();
     std::lock_guard<std::mutex> lg(program_lock());
     if (current_state() != ProgramState::STOPPED){
         logger().log("Cannot change settings while program is running.", COLOR_RED);
@@ -63,12 +67,14 @@ void MultiSwitchProgramSession::restore_defaults(){
     m_option.restore_defaults();
 }
 std::string MultiSwitchProgramSession::check_validity() const{
+    auto ScopeCheck = m_sanitizer.check_scope();
     return m_option.check_validity();
 }
 
 
 
 void MultiSwitchProgramSession::run_program_instance(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
+    auto ScopeCheck = m_sanitizer.check_scope();
     {
         std::lock_guard<std::mutex> lg(program_lock());
         std::string error = check_validity();
@@ -99,6 +105,7 @@ void MultiSwitchProgramSession::run_program_instance(MultiSwitchProgramEnvironme
     m_scope.store(nullptr, std::memory_order_release);
 }
 void MultiSwitchProgramSession::internal_stop_program(){
+    auto ScopeCheck = m_sanitizer.check_scope();
     WriteSpinLock lg(m_lock);
     size_t consoles = m_system.count();
     for (size_t c = 0; c < consoles; c++){
@@ -119,6 +126,7 @@ void MultiSwitchProgramSession::internal_stop_program(){
     }
 }
 void MultiSwitchProgramSession::internal_run_program(){
+    auto ScopeCheck = m_sanitizer.check_scope();
     GlobalSettings::instance().PERFORMANCE->REALTIME_THREAD_PRIORITY.set_on_this_thread();
     m_option.options().reset_state();
 
@@ -217,9 +225,11 @@ void MultiSwitchProgramSession::internal_run_program(){
 
 
 void MultiSwitchProgramSession::shutdown(){
+    auto ScopeCheck = m_sanitizer.check_scope();
     internal_stop_program();
 }
 void MultiSwitchProgramSession::startup(size_t switch_count){
+    auto ScopeCheck = m_sanitizer.check_scope();
     WriteSpinLock lg(m_lock);
     m_option.instance().update_active_consoles(switch_count);
     for (Listener* listener : m_listeners){

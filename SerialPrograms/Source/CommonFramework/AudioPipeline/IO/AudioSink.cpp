@@ -15,6 +15,7 @@ using NativeAudioSink = QAudioSink;
 
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PrettyPrint.h"
+#include "Common/Cpp/LifetimeSanitizer.h"
 #include "CommonFramework/AudioPipeline/Tools/AudioFormatUtils.h"
 #include "AudioSink.h"
 
@@ -56,6 +57,16 @@ public:
         , m_logger(logger)
         , m_sink(device, format)
     {
+        m_sink.connect(
+            &m_sink, &NativeAudioSink::stateChanged,
+            &m_sink, [this](QAudio::State state){
+                if (state == QAudio::State::StoppedState){
+                    m_io_device = nullptr;
+                    m_logger.log("AudioOutputDevice has stopped.", COLOR_ORANGE);
+                }
+            }
+        );
+
         m_io_device = m_sink.start();
         m_sink.setVolume(convertAudioVolumeFromSlider(volume));
         add_listener(*this);
@@ -65,19 +76,24 @@ public:
     }
 
     void set_volume(double volume){
+        auto scope_check = m_sanitizer.check_scope();
         double absolute = convertAudioVolumeFromSlider(volume);
         m_logger.log("Volume set to: Slider = " + tostr_default(volume) + " -> Absolute = " + tostr_default(absolute));
         m_sink.setVolume(absolute);
     }
 
     virtual void on_objects(const void* data, size_t objects) override{
-        m_io_device->write((const char*)data, objects * object_size);
+        auto scope_check = m_sanitizer.check_scope();
+        if (m_io_device != nullptr){
+            m_io_device->write((const char*)data, objects * object_size);
+        }
     }
 
 private:
     Logger& m_logger;
     NativeAudioSink m_sink;
     QIODevice* m_io_device;
+    LifetimeSanitizer m_sanitizer;
 };
 
 
@@ -141,9 +157,11 @@ AudioSink::AudioSink(Logger& logger, const AudioDeviceInfo& device, AudioChannel
 }
 
 AudioSink::operator AudioFloatStreamListener&(){
+    auto scope_check = m_sanitizer.check_scope();
     return *m_writer;
 }
 void AudioSink::set_volume(double volume){
+    auto scope_check = m_sanitizer.check_scope();
     if (!m_writer){
         return;
     }

@@ -10,6 +10,7 @@
 #include <memory>
 #include <set>
 #include <QObject>
+#include "Common/Cpp/LifetimeSanitizer.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/AudioPipeline/AudioPassthroughPair.h"
 
@@ -84,6 +85,8 @@ private:
 
     std::set<AudioFloatStreamListener*> m_stream_listeners;
     std::set<FFTListener*> m_fft_listeners;
+
+    LifetimeSanitizer m_sanitizer;
 };
 
 

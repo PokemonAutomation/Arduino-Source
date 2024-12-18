@@ -115,7 +115,7 @@ public:
     Pimpl<AudioPipelineOptions> AUDIO_PIPELINE;
     Pimpl<VideoPipelineOptions> VIDEO_PIPELINE;
 
-    BooleanCheckBoxOption ENABLE_LIFETIME_SANITIZER;
+    BooleanCheckBoxOption ENABLE_LIFETIME_SANITIZER0;
 
     Pimpl<ErrorReportOption> ERROR_REPORTS;
 
