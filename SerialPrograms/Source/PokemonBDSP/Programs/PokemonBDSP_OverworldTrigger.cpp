@@ -133,12 +133,12 @@ bool OverworldTrigger::find_encounter(ConsoleHandle& console, BotBaseContext& co
         if (location >= 1 && location <= 3){
             const size_t move_down_times = location;
             for(size_t i = 0; i < move_down_times; ++i){
-                pbf_press_dpad(context, DPAD_DOWN, 1, change_pokemon_delay);
+                pbf_press_dpad(context, DPAD_DOWN, 20, change_pokemon_delay);
             }
         }else if (location >= 1){ // for location 4 and 5
             const size_t move_down_times = 6 - location;
             for (size_t i = 0; i < move_down_times; ++i){
-                pbf_press_dpad(context, DPAD_UP, 1, change_pokemon_delay);
+                pbf_press_dpad(context, DPAD_UP, 20, change_pokemon_delay);
             }
         }
 
@@ -147,7 +147,7 @@ bool OverworldTrigger::find_encounter(ConsoleHandle& console, BotBaseContext& co
         pbf_press_button(context, BUTTON_ZL, 20, pokemon_to_pokemon_menu_delay);
         //  Move down one menuitem to select "Sweet Scent"
         const uint16_t move_pokemon_menu_item_delay = 30;
-        pbf_press_dpad(context, DPAD_DOWN, 1, move_pokemon_menu_item_delay);
+        pbf_press_dpad(context, DPAD_DOWN, 20, move_pokemon_menu_item_delay);
         //  Use sweet scent
         pbf_mash_button(context, BUTTON_ZL, 30);
 
