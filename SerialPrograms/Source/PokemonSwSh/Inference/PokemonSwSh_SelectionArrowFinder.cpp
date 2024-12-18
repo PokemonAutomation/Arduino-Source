@@ -19,6 +19,10 @@
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "PokemonSwSh_SelectionArrowFinder.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
@@ -87,6 +91,7 @@ std::vector<ImagePixelBox> find_selection_arrows(const ImageViewRGB32& image, si
     std::vector<ImagePixelBox> ret;
     WaterfillObject object;
     while (finder->find_next(object, true)){
+//        cout << object.min_x << "-" << object.max_x << ", " << object.min_y << "-" << object.max_y << endl;
         if (is_selection_arrow(image, object)){
             ret.emplace_back(object);
         }
