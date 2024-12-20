@@ -83,7 +83,8 @@ bool is_selection_arrow(const ImageViewRGB32& image, const WaterfillObject& obje
 }
 std::vector<ImagePixelBox> find_selection_arrows(const ImageViewRGB32& image, size_t min_area){
     if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
-        std::cout << "Match SwSh selection arrow by waterfill, size range (" << min_area << ", SIZE_MAX)" << std::endl;
+        std::cout << "Match SwSh selection arrow by waterfill, size range (" << min_area << ", SIZE_MAX) " 
+                  << "input image size " << image.width() << " x " << image.height() << std::endl;
     }
     PackedBinaryMatrix matrix = compress_rgb32_to_binary_max(image, 63, 63, 63);
     auto session = make_WaterfillSession(matrix);
@@ -91,7 +92,9 @@ std::vector<ImagePixelBox> find_selection_arrows(const ImageViewRGB32& image, si
     std::vector<ImagePixelBox> ret;
     WaterfillObject object;
     while (finder->find_next(object, true)){
-//        cout << object.min_x << "-" << object.max_x << ", " << object.min_y << "-" << object.max_y << endl;
+        if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
+            std::cout << "Found object: " << object.min_x << "-" << object.max_x << ", " << object.min_y << "-" << object.max_y << std::endl;
+        }
         if (is_selection_arrow(image, object)){
             ret.emplace_back(object);
         }
