@@ -10,6 +10,7 @@
 #include "Kernels_BinaryImage_BasicFilters_Routines.h"
 #include "Kernels_BinaryImage_BasicFilters_arm64_NEON.h"
 
+
 namespace PokemonAutomation{
 namespace Kernels{
 
@@ -22,6 +23,8 @@ void filter_by_mask_64x8_arm64_NEON(
     FilterByMask_arm64_NEON filter(replacement_color, replace_zero_bits);
     filter_by_mask(static_cast<const PackedBinaryMatrix_64x8_arm64_NEON&>(matrix).get(), image, bytes_per_row, filter);
 }
+
+
 
 
 void compress_rgb32_to_binary_range_64x8_arm64_NEON(
