@@ -254,13 +254,18 @@ std::set<std::string> BattleMenuReader::read_opponent(
 }
 std::set<std::string> BattleMenuReader::read_opponent_in_summary(Logger& logger, const ImageViewRGB32& screen) const{
     ImageViewRGB32 name = extract_box_reference(screen, m_summary_opponent_name);
-    std::set<std::string> slugs = read_pokemon_name(logger, m_language, name);
+
+    //  We can use a weaker threshold here since we are cross-checking with the type.
+    std::set<std::string> slugs = read_pokemon_name(logger, m_language, name, -1.0);
 
     ImageViewRGB32 types = extract_box_reference(screen, m_summary_opponent_types);
     std::multimap<double, std::pair<PokemonType, ImagePixelBox>> candidates = find_symbols(types, 0.2);
-//    for (const auto& item : candidates){
-//        cout << get_type_slug(item.second.first) << ": " << item.first << endl;
-//    }
+
+    std::string type_str = "Type Read Result:\n";
+    for (const auto& item : candidates){
+        type_str += "    " + get_type_slug(item.second.first) + " : " + tostr_default(item.first ) + "\n";
+    }
+    logger.log(type_str);
 
     PokemonType type0 = PokemonType::NONE;
     PokemonType type1 = PokemonType::NONE;
@@ -268,16 +273,17 @@ std::set<std::string> BattleMenuReader::read_opponent_in_summary(Logger& logger,
         auto iter = candidates.begin();
         if (iter != candidates.end()){
             type0 = iter->second.first;
-            iter++;
+            ++iter;
         }
         if (iter != candidates.end()){
             type1 = iter->second.first;
-            iter++;
+            ++iter;
         }
     }
 
     for (auto iter = slugs.begin(); iter != slugs.end();){
         const MaxLairMon& mon = get_maxlair_mon(*iter);
+//        cout << mon.species << endl;
         if ((type0 == mon.type[0] && type1 == mon.type[1]) || (type0 == mon.type[1] && type1 == mon.type[0])){
             ++iter;
         }else{

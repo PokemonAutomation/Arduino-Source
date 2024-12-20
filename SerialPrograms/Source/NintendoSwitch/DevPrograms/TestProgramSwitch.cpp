@@ -125,7 +125,8 @@
 #include "PokemonLA/Inference/Map/PokemonLA_OutbreakReader.h"
 #include "PokemonSV/Programs/Farming/PokemonSV_AuctionFarmer.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_MMOQuestionMarkDetector.h"
-
+//#include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleMenuDetector.h"
+#include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_BattleMenu.h"
 
 
 #include <QPixmap>
@@ -278,8 +279,12 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
+    PokemonSwSh::MaxLairInternal::BattleMenuReader reader(console, Language::Korean);
 
-//    ImageRGB32 image("Screenshot.png");
+    ImageRGB32 image("20241220-161934162025.png");
+
+    reader.read_opponent_in_summary(logger, image);
+
 //    PokemonSwSh::find_selection_arrows(image, 10);
 
 
@@ -331,7 +336,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     );
 #endif
 
-#if 1
+#if 0
     VideoSnapshot image = feed.snapshot();
 //    ImageRGB32 image("screenshot-20241124-135028529403.png");
 
