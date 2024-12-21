@@ -41,41 +41,40 @@ void trade_current_pokemon(
     VideoSnapshot box_image = console.video().snapshot();
     ImageMatchWatcher box_detector(std::move(box_image.frame), {0.02, 0.10, 0.15, 0.80}, 50);
 
-    {
-        pbf_press_button(context, BUTTON_ZL, 20, 0);
+    pbf_press_button(context, BUTTON_ZL, 20, 0);
+
+    while (true){
         context.wait_for_all_requests();
-        SelectionArrowFinder detector(console, {0.50, 0.58, 0.40, 0.10}, COLOR_RED);
+        SelectionArrowFinder detector0(console, {0.50, 0.58, 0.40, 0.10}, COLOR_RED);
+        SelectionArrowFinder detector1(console, {0.50, 0.52, 0.40, 0.10}, COLOR_RED);
         int ret = wait_until(
-            console, context, std::chrono::seconds(120),
-            {{detector}}
+            console, context, std::chrono::seconds(20),
+            {detector0, detector1}
         );
         if (ret < 0){
-            stats.m_errors++;
-            tracker.report_unrecoverable_error(console, "Failed to detect trade select prompt after 2 minutes.");
         }
-        console.log("Detected trade prompt.");
-        context.wait_for(std::chrono::milliseconds(100));
-        tracker.check_unrecoverable_error(console);
-    }
-    {
-        pbf_press_button(context, BUTTON_ZL, 20, 0);
-        context.wait_for_all_requests();
-        SelectionArrowFinder detector(console, {0.50, 0.52, 0.40, 0.10}, COLOR_RED);
-        int ret = wait_until(
-            console, context, std::chrono::seconds(10),
-            {{detector}}
-        );
-        if (ret < 0){
+        switch (ret){
+        case 0:
+            console.log("Detected trade prompt.");
+            context.wait_for(std::chrono::milliseconds(100));
+            tracker.check_unrecoverable_error(console);
+            pbf_press_button(context, BUTTON_ZL, 20, 0);
+            continue;
+        case 1:
+            console.log("Detected trade confirm prompt.");
+            context.wait_for(std::chrono::milliseconds(100));
+            tracker.check_unrecoverable_error(console);
+            pbf_press_button(context, BUTTON_ZL, 20, 0);
+            break;
+        default:
             stats.m_errors++;
-            tracker.report_unrecoverable_error(console, "Failed to detect trade confirm prompt after 10 seconds.");
+            tracker.report_unrecoverable_error(console, "Failed to detect a prompt after 20 minutes.");
         }
-        console.log("Detected trade confirm prompt.");
-        context.wait_for(std::chrono::milliseconds(100));
-        tracker.check_unrecoverable_error(console);
+        break;
     }
 
     //  Start trade.
-    pbf_press_button(context, BUTTON_ZL, 20, 0);
+//    pbf_press_button(context, BUTTON_ZL, 20, 0);
 
     //  Wait for black screen.
     {
