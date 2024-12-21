@@ -127,6 +127,7 @@
 #include "PokemonLA/Inference/Objects/PokemonLA_MMOQuestionMarkDetector.h"
 //#include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleMenuDetector.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_BattleMenu.h"
+#include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonSwapMenu.h"
 
 
 #include <QPixmap>
@@ -279,11 +280,14 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
-    PokemonSwSh::MaxLairInternal::BattleMenuReader reader(console, Language::Korean);
+    PokemonSwSh::MaxLairInternal::PokemonSwapMenuReader reader(console, overlay, Language::English);
 
-    ImageRGB32 image("20241220-161934162025.png");
+    ImageRGB32 image("20241221-123730238930.png");
 
-    reader.read_opponent_in_summary(logger, image);
+    double hp[4];
+    reader.read_hp(image, hp);
+
+//    reader.read_opponent_in_summary(logger, image);
 
 //    PokemonSwSh::find_selection_arrows(image, 10);
 

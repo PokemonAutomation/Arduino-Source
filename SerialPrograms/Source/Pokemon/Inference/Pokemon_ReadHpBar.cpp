@@ -9,6 +9,10 @@
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "Pokemon_ReadHpBar.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 namespace Pokemon{
 
@@ -18,6 +22,11 @@ double read_hp_bar_internal(const ImageViewRGB32& image){
     size_t height = image.height();
     size_t area = width * height;
 
+    //  REMOVE
+    static int i = 0;
+    image.save("test-" + std::to_string(++i) + ".png");
+//    cout << "start: " << i << endl;
+
     ImageStats stats;
     double bar = 0.5;
     for (size_t c = 0;; c++){
@@ -26,7 +35,8 @@ double read_hp_bar_internal(const ImageViewRGB32& image){
         max_color = std::max(max_color, stats.average.r);
         max_color = std::max(max_color, stats.average.g);
         max_color = std::max(max_color, stats.average.b);
-        if (max_color > 128 && stats.stddev.sum() < 50){
+//        cout << "max_color: " << max_color << ", stddev: " << stats.stddev.sum() << endl;
+        if (max_color > 128 && stats.stddev.sum() < 70){
             break;
         }
         bar *= 0.5;
@@ -39,6 +49,7 @@ double read_hp_bar_internal(const ImageViewRGB32& image){
                 : -1;
         }
     }
+//    cout << "end: " << i << endl;
 
     Color color = stats.average.round();
     int bar_R = color.red();
