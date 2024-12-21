@@ -22,9 +22,8 @@ double read_hp_bar_internal(const ImageViewRGB32& image){
     size_t height = image.height();
     size_t area = width * height;
 
-    //  REMOVE
-    static int i = 0;
-    image.save("test-" + std::to_string(++i) + ".png");
+//    static int i = 0;
+//    image.save("test-" + std::to_string(++i) + ".png");
 //    cout << "start: " << i << endl;
 
     ImageStats stats;
