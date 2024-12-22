@@ -125,7 +125,9 @@
 #include "PokemonLA/Inference/Map/PokemonLA_OutbreakReader.h"
 #include "PokemonSV/Programs/Farming/PokemonSV_AuctionFarmer.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_MMOQuestionMarkDetector.h"
-
+//#include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleMenuDetector.h"
+#include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_BattleMenu.h"
+#include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonSwapMenu.h"
 
 
 #include <QPixmap>
@@ -277,9 +279,17 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     BotBaseContext context(scope, console.botbase());
     VideoOverlaySet overlays(overlay);
 
+#if 0
+    PokemonSwSh::MaxLairInternal::PokemonSwapMenuReader reader(console, overlay, Language::English);
 
+    ImageRGB32 image("20241221-123730238930.png");
 
-//    ImageRGB32 image("Screenshot.png");
+    double hp[4];
+    reader.read_hp(image, hp);
+#endif
+
+//    reader.read_opponent_in_summary(logger, image);
+
 //    PokemonSwSh::find_selection_arrows(image, 10);
 
 

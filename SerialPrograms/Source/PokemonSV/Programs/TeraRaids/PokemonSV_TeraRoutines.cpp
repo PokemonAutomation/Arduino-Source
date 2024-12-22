@@ -139,6 +139,7 @@ void open_hosting_lobby(
             recovery_mode = true;
         }
 
+//        AdvanceDialogWatcher dialog(COLOR_GREEN);
         TeraCardWatcher card_detector(COLOR_YELLOW);
         TeraLobbyWatcher lobby(console.logger(), env.realtime_dispatcher(), COLOR_BLUE);
         context.wait_for_all_requests();
@@ -147,6 +148,7 @@ void open_hosting_lobby(
             std::chrono::seconds(30),
             {
                 overworld,
+//                dialog,
                 card_detector,
                 {lobby, std::chrono::milliseconds(500)}
             }
@@ -163,6 +165,12 @@ void open_hosting_lobby(
                 );
             }
             continue;
+#if 0
+        case 1:
+            console.log("Detect possible uncatchable dialog...", COLOR_ORANGE);
+            pbf_press_button(context, BUTTON_B, 20, 230);
+            continue;
+#endif
         case 1:
             console.log("Detected Tera card.");
             if (mode != HostingMode::LOCAL){

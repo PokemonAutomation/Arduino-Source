@@ -108,7 +108,8 @@ std::string read_boss_sprite(ConsoleHandle& console){
 
 std::set<std::string> read_pokemon_name(
     Logger& logger, Language language,
-    const ImageViewRGB32& image
+    const ImageViewRGB32& image,
+    double max_log10p
 ){
     const SpeciesReadDatabase& database = SpeciesReadDatabase::instance();
 
@@ -116,7 +117,9 @@ std::set<std::string> read_pokemon_name(
 //    image.save("test.png");
     OCR::StringMatchResult result = database.name_reader->read_substring(
         logger, language, image,
-        OCR::BLACK_OR_WHITE_TEXT_FILTERS()
+        OCR::BLACK_OR_WHITE_TEXT_FILTERS(),
+        0.01, 0.50,
+        max_log10p
     );
 //    result.log(logger);
     if (result.results.empty()){

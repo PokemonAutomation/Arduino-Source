@@ -131,7 +131,7 @@ private:
 private:
     uint64_t m_token;
     void* m_self;
-    std::string m_name;
+    const char* m_name;
 };
 
 

@@ -39,7 +39,7 @@ public:
 
     //  Read the hours (0 - 23) while on the date change window.
     //  Returns -1 if unable to read.
-    int8_t read_hours(Logger& logger, const ImageViewRGB32& screen) const;
+//    int8_t read_hours(Logger& logger, std::shared_ptr<const ImageRGB32> screen) const;
 
     void set_hours(
         const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,

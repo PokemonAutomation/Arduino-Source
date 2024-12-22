@@ -112,6 +112,7 @@ bool DateReader::detect(const ImageViewRGB32& screen) const{
 
     return true;
 }
+#if 0
 int8_t DateReader::read_hours(Logger& logger, const ImageViewRGB32& screen) const{
     if (!detect(screen)){
         return -1;
@@ -158,7 +159,9 @@ int8_t DateReader::read_hours(Logger& logger, const ImageViewRGB32& screen) cons
         }
         return (int8_t)hours;
     }
+
 }
+#endif
 
 
 void DateReader::set_hours(
@@ -187,7 +190,9 @@ void DateReader::set_hours(
 
         //  Read the hour.
         VideoSnapshot snapshot = console.video().snapshot();
-        int8_t current_hour = read_hours(console.logger(), snapshot);
+//        int8_t current_hour = read_hours(console, snapshot);
+        int8_t current_hour = read_date(console, snapshot).second.hour;
+
         if (current_hour < 0){
             throw_and_log<FatalProgramException>(
                 console, ErrorReport::SEND_ERROR_REPORT,
