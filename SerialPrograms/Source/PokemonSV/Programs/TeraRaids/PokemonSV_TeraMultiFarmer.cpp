@@ -329,9 +329,11 @@ void TeraMultiFarmer::join_lobby(
 //    cout << "Joining Lobby" << endl;
 
     bool seen_code_entry = false;
-    bool seen_dialog = false;
+//    bool seen_dialog = false;
     size_t attempts = 0;
     while (true){
+//        cout << "Looping..." << endl;
+
         if (attempts >= 3){
             OperationFailedException::fire(
                 console, ErrorReport::SEND_ERROR_REPORT,
@@ -341,8 +343,8 @@ void TeraMultiFarmer::join_lobby(
 
         CodeEntryWatcher code_entry(COLOR_GREEN);
         TeraLobbyWatcher lobby(console.logger(), env.realtime_dispatcher(), COLOR_RED);
-        AdvanceDialogWatcher dialog(COLOR_YELLOW, std::chrono::seconds(2));
-        TeraRaidSearchWatcher raid_search(COLOR_CYAN);
+        AdvanceDialogWatcher dialog(COLOR_YELLOW);
+        TeraRaidSearchWatcher raid_search(COLOR_CYAN, std::chrono::seconds(5));
         context.wait_for_all_requests();
         context.wait_for(std::chrono::seconds(3));
         int ret = wait_until(
@@ -376,19 +378,22 @@ void TeraMultiFarmer::join_lobby(
             break;
         case 2:
             console.log("Detected dialog...", COLOR_ORANGE);
-            seen_dialog = true;
+//            seen_dialog = true;
             pbf_press_button(context, BUTTON_B, 20, 230);
             continue;
         case 3:
+#if 0
             if (!seen_dialog){
                 context.wait_for(std::chrono::seconds(1));
                 continue;
             }
+#endif
             console.log("Wrong code! Backing out and trying again...", COLOR_RED);
             stats.m_errors++;
             attempts++;
-//            pbf_press_button(context, BUTTON_B, 20, 230);
+            pbf_press_button(context, BUTTON_B, 20, 230);
             enter_tera_search(env.program_info(), console, context, HOSTING_MODE == Mode::HOST_ONLINE);
+            seen_code_entry = false;
             continue;
         default:
             OperationFailedException::fire(
@@ -446,6 +451,9 @@ bool TeraMultiFarmer::run_raid(
         );
         lobby_start_time = current_time();
         std::string code = lobby_reader.raid_code(env.logger(), env.realtime_dispatcher(), host_console.video().snapshot());
+
+//        code.back() = '0';
+
         const char* error = normalize_code(lobby_code, code);
         if (error){
             OperationFailedException::fire(

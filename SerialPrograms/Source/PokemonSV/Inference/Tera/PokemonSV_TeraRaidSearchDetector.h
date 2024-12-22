@@ -37,8 +37,11 @@ private:
 };
 class TeraRaidSearchWatcher : public DetectorToFinder<TeraRaidSearchDetector>{
 public:
-    TeraRaidSearchWatcher(Color color = COLOR_RED)
-         : DetectorToFinder("TeraRaidSearchWatcher", std::chrono::milliseconds(250), color)
+    TeraRaidSearchWatcher(
+        Color color = COLOR_RED,
+        std::chrono::milliseconds duration = std::chrono::milliseconds(250)
+    )
+         : DetectorToFinder("TeraRaidSearchWatcher",duration, color)
     {}
 };
 
