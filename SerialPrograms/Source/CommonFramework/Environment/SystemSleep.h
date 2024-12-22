@@ -8,7 +8,10 @@
 #define PokemonAutomation_SystemSleep_H
 
 #include <memory>
-
+#include <set>
+#include <atomic>
+#include <mutex>
+#include "Common/Compiler.h"
 
 #if _WIN32
 #define PA_ENABLE_SLEEP_SUPPRESS
@@ -22,16 +25,38 @@
 namespace PokemonAutomation{
 
 
+
+enum class SleepSuppress{
+    NONE,
+    NO_SLEEP,
+    SCREEN_ON,
+};
+
+
 //  Call OS API to prevent screen saver from running and OS from going to sleep.
 //  Useful for running some programs like PokemonSV_VideoFastCodeEntry that require
 //  the screen to be constantly on.
 class SystemSleepController{
+public:
+    struct Listener{
+        virtual void sleep_suppress_state_changed(SleepSuppress new_state) = 0;
+    };
+    void add_listener(Listener& listener);
+    void remove_listener(Listener& listener);
+
+
 protected:
     virtual ~SystemSleepController() = default;
-    SystemSleepController() = default;
+    SystemSleepController();
+
+    //  Must be called under lock.
+    void notify_listeners(SleepSuppress state);
+
 
 public:
     static SystemSleepController& instance();
+
+    SleepSuppress current_state() const;
 
     //  Push: Add a request for this type of sleep-disable.
     //  Pop: Remove a request for this type of sleep-disable.
@@ -45,16 +70,17 @@ public:
     //  Allow the screen to turn off, but don't sleep.
     virtual void push_no_sleep(){}
     virtual void pop_no_sleep(){}
+
+
+protected:
+    std::atomic<SleepSuppress> m_state;
+
+    std::mutex m_lock;
+    std::set<Listener*> m_listeners;
 };
 
 
 
-
-enum class SleepSuppress{
-    NONE,
-    NO_SLEEP,
-    SCREEN_ON,
-};
 
 
 class SleepSuppressScope{
@@ -68,38 +94,11 @@ public:
     SleepSuppressScope(const SleepSuppressScope&) = delete;
     void operator=(const SleepSuppressScope&) = delete;
 
-    void clear(){
-        switch (m_mode){
-        case SleepSuppress::NONE:
-            break;
-        case SleepSuppress::NO_SLEEP:
-            SystemSleepController::instance().pop_no_sleep();
-            break;
-        case SleepSuppress::SCREEN_ON:
-            SystemSleepController::instance().pop_screen_on();
-            break;
-        }
-            m_mode = SleepSuppress::NONE;
-    }
-    void operator=(SleepSuppress mode){
-        clear();
-        set(mode);
-    }
+    void clear();
+    void operator=(SleepSuppress mode);
 
 private:
-    void set(SleepSuppress mode){
-        switch (mode){
-        case SleepSuppress::NONE:
-            break;
-        case SleepSuppress::NO_SLEEP:
-            SystemSleepController::instance().push_no_sleep();
-            break;
-        case SleepSuppress::SCREEN_ON:
-            SystemSleepController::instance().push_screen_on();
-            break;
-        }
-        m_mode = mode;
-    }
+    void set(SleepSuppress mode);
 
 private:
     SleepSuppress m_mode;

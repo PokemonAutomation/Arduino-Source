@@ -41,7 +41,7 @@ public:
         Color color = COLOR_RED,
         std::chrono::milliseconds duration = std::chrono::milliseconds(250)
     )
-         : DetectorToFinder("TeraRaidSearchWatcher",duration, color)
+         : DetectorToFinder("TeraRaidSearchWatcher", duration, color)
     {}
 };
 

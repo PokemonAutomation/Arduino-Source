@@ -9,6 +9,7 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QGroupBox>
+#include <QCheckBox>
 #include <QLabel>
 #include <QPushButton>
 #include <QMessageBox>
@@ -57,7 +58,6 @@ MainWindow::MainWindow(QWidget* parent)
     setWindowTitle(QString::fromStdString(PROGRAM_NAME + " Computer-Control Programs (" + PROGRAM_VERSION + ")"));
 
     QHBoxLayout* hbox = new QHBoxLayout(centralwidget);
-
     QVBoxLayout* left_layout = new QVBoxLayout();
     hbox->addLayout(left_layout, 0);
 
@@ -82,8 +82,32 @@ MainWindow::MainWindow(QWidget* parent)
         QString::fromStdString(PROGRAM_NAME + " " + PROGRAM_VERSION + " (" + PA_ARCH_STRING + ")"),
         centralwidget
     );
+
+
     left_layout->addWidget(support_box);
     QVBoxLayout* support_layout = new QVBoxLayout(support_box);
+
+    {
+        QHBoxLayout* layout = new QHBoxLayout();
+        support_layout->addLayout(layout);
+        layout->setAlignment(Qt::AlignHCenter);
+        layout->setContentsMargins(0, 0, 0, 0);
+        m_sleep_text = new QLabel(support_box);
+        layout->addWidget(m_sleep_text, 2);
+        m_sleep_box = new QCheckBox("Force On", support_box);
+        layout->addWidget(m_sleep_box, 1, Qt::AlignHCenter);
+        sleep_suppress_state_changed(SystemSleepController::instance().current_state());
+        connect(
+            m_sleep_box, &QCheckBox::checkStateChanged,
+            this, [this](Qt::CheckState state){
+                if (state == Qt::CheckState::Checked){
+                    m_sleep_scope.reset(new SleepSuppressScope(SleepSuppress::SCREEN_ON));
+                }else{
+                    m_sleep_scope.reset();
+                }
+            }
+        );
+    }
 
     QHBoxLayout* support = new QHBoxLayout();
     support_layout->addLayout(support);
@@ -91,7 +115,6 @@ MainWindow::MainWindow(QWidget* parent)
 
     QVBoxLayout* links = new QVBoxLayout();
     support->addLayout(links);
-
     {
         QLabel* github = new QLabel(support_box);
         links->addWidget(github);
@@ -148,40 +171,43 @@ MainWindow::MainWindow(QWidget* parent)
 
     QVBoxLayout* buttons = new QVBoxLayout();
     support->addLayout(buttons);
-
-    QPushButton* keyboard = new QPushButton("Keyboard Layout", support_box);
-    buttons->addWidget(keyboard);
-    m_button_diagram.reset(new ButtonDiagram());
-    connect(
-        keyboard, &QPushButton::clicked,
-        this, [button = m_button_diagram.get()](bool){
-            button->show();
-        }
-    );
-
-    m_output_window.reset(new FileWindowLoggerWindow((FileWindowLogger&)global_logger_raw()));
-    QPushButton* output = new QPushButton("Output Window", support_box);
-    buttons->addWidget(output);
-    connect(
-        output, &QPushButton::clicked,
-        this, [this](bool){
-            m_output_window->show();
-            m_output_window->raise(); // bring the window to front on macOS
-            m_output_window->activateWindow(); // bring the window to front on Windows
-        }
-    );
-
-    QPushButton* settings = new QPushButton("Settings", support_box);
-    m_settings = settings;
-    buttons->addWidget(settings);
-    connect(
-        settings, &QPushButton::clicked,
-        this, [this](bool){
-            if (report_new_panel_intent(GlobalSettings_Descriptor::INSTANCE)){
-                load_panel(nullptr, GlobalSettings_Descriptor::INSTANCE.make_panel());
+    {
+        QPushButton* keyboard = new QPushButton("Keyboard Layout", support_box);
+        buttons->addWidget(keyboard);
+        m_button_diagram.reset(new ButtonDiagram());
+        connect(
+            keyboard, &QPushButton::clicked,
+            this, [button = m_button_diagram.get()](bool){
+                button->show();
             }
-        }
-    );
+        );
+    }
+    {
+        m_output_window.reset(new FileWindowLoggerWindow((FileWindowLogger&)global_logger_raw()));
+        QPushButton* output = new QPushButton("Output Window", support_box);
+        buttons->addWidget(output);
+        connect(
+            output, &QPushButton::clicked,
+            this, [this](bool){
+                m_output_window->show();
+                m_output_window->raise(); // bring the window to front on macOS
+                m_output_window->activateWindow(); // bring the window to front on Windows
+            }
+        );
+    }
+    {
+        QPushButton* settings = new QPushButton("Settings", support_box);
+        m_settings = settings;
+        buttons->addWidget(settings);
+        connect(
+            settings, &QPushButton::clicked,
+            this, [this](bool){
+                if (report_new_panel_intent(GlobalSettings_Descriptor::INSTANCE)){
+                    load_panel(nullptr, GlobalSettings_Descriptor::INSTANCE.make_panel());
+                }
+            }
+        );
+    }
 
     QVBoxLayout* right = new QVBoxLayout();
     m_right_panel_layout = right;
@@ -193,10 +219,12 @@ MainWindow::MainWindow(QWidget* parent)
 
     GlobalSettings::instance().WINDOW_SIZE->WIDTH.add_listener(*this);
     GlobalSettings::instance().WINDOW_SIZE->HEIGHT.add_listener(*this);
+    SystemSleepController::instance().add_listener(*this);
 //    cout << "Done constructing" << endl;
 }
 MainWindow::~MainWindow(){
     close_panel();
+    SystemSleepController::instance().remove_listener(*this);
     GlobalSettings::instance().WINDOW_SIZE->WIDTH.remove_listener(*this);
     GlobalSettings::instance().WINDOW_SIZE->HEIGHT.remove_listener(*this);
 }
@@ -305,6 +333,23 @@ void MainWindow::value_changed(void* object){
                 GlobalSettings::instance().WINDOW_SIZE->WIDTH,
                 GlobalSettings::instance().WINDOW_SIZE->HEIGHT
             );
+        }
+    });
+}
+void MainWindow::sleep_suppress_state_changed(SleepSuppress new_state){
+    QMetaObject::invokeMethod(this, [=, this]{
+        switch (new_state){
+        case PokemonAutomation::SleepSuppress::NONE:
+            m_sleep_text->setText("Sleep Suppress: <font color=\"green\">None</font>");
+//            m_sleep_box->setEnabled();
+//            m_sleep_box->setCheckState(Qt::CheckState::Unchecked);
+            break;
+        case PokemonAutomation::SleepSuppress::NO_SLEEP:
+            m_sleep_text->setText("Sleep Suppress: <font color=\"orange\">No Sleep</font>");
+            break;
+        case PokemonAutomation::SleepSuppress::SCREEN_ON:
+            m_sleep_text->setText("Sleep Suppress: <font color=\"red\">Screen On</font>");
+            break;
         }
     });
 }

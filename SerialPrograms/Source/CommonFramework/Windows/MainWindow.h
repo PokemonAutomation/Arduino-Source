@@ -10,10 +10,13 @@
 #include <QMainWindow>
 #include "Common/Cpp/Options/ConfigOption.h"
 #include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Environment/SystemSleep.h"
 #include "CommonFramework/Panels/PanelTools.h"
 #include "PanelLists.h"
 
 class QVBoxLayout;
+class QLabel;
+class QCheckBox;
 
 namespace PokemonAutomation{
 
@@ -21,7 +24,12 @@ class ButtonDiagram;
 class FileWindowLoggerWindow;
 
 
-class MainWindow : public QMainWindow, public PanelHolder, public ConfigOption::Listener{
+class MainWindow :
+    public QMainWindow,
+    public PanelHolder,
+    public ConfigOption::Listener,
+    public SystemSleepController::Listener
+{
 public:
     MainWindow(QWidget* parent = nullptr);
     ~MainWindow();
@@ -43,6 +51,7 @@ private:
     virtual void on_busy() override;
     virtual void on_idle() override;
     virtual void value_changed(void* object) override;
+    virtual void sleep_suppress_state_changed(SleepSuppress new_state) override;
 
 private:
     QWidget* centralwidget;
@@ -63,6 +72,10 @@ private:
 
     std::unique_ptr<ButtonDiagram> m_button_diagram;
     std::unique_ptr<FileWindowLoggerWindow> m_output_window;
+
+    QLabel* m_sleep_text;
+    QCheckBox* m_sleep_box;
+    std::unique_ptr<SleepSuppressScope> m_sleep_scope;
 
     bool m_pending_resize = false;
     bool m_panel_transition = false;
