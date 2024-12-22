@@ -31,6 +31,10 @@
 #include "PokemonSV_AutoHostLobbyWaiter.h"
 #include "PokemonSV_TeraMultiFarmer.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
@@ -322,7 +326,12 @@ void TeraMultiFarmer::join_lobby(
 
     TeraMultiFarmer_Descriptor::Stats& stats = env.current_stats<TeraMultiFarmer_Descriptor::Stats>();
 
-    for (size_t attempts = 0;; attempts++){
+//    cout << "Joining Lobby" << endl;
+
+    bool seen_code_entry = false;
+    bool seen_dialog = false;
+    size_t attempts = 0;
+    while (true){
         if (attempts >= 3){
             OperationFailedException::fire(
                 console, ErrorReport::SEND_ERROR_REPORT,
@@ -330,36 +339,55 @@ void TeraMultiFarmer::join_lobby(
             );
         }
 
-        enter_code(console, context, FastCodeEntrySettings(), normalized_code, false);
-
+        CodeEntryWatcher code_entry(COLOR_GREEN);
         TeraLobbyWatcher lobby(console.logger(), env.realtime_dispatcher(), COLOR_RED);
-        AdvanceDialogWatcher wrong_code(COLOR_YELLOW);
-        CodeEntryWatcher incomplete_code(COLOR_GREEN);
+        AdvanceDialogWatcher dialog(COLOR_YELLOW, std::chrono::seconds(2));
+        TeraRaidSearchWatcher raid_search(COLOR_CYAN);
         context.wait_for_all_requests();
         context.wait_for(std::chrono::seconds(3));
         int ret = wait_until(
             console, context, std::chrono::seconds(60),
             {
-                {lobby, std::chrono::milliseconds(500)},
-                wrong_code,
-                incomplete_code,
+                code_entry,
+                lobby,
+                dialog,
+                raid_search,
             }
         );
         switch (ret){
         case 0:
-            console.log("Entered raid lobby!");
-            pbf_mash_button(context, BUTTON_A, 125);
-            break;
+            console.log("Detected code entry.", COLOR_RED);
+            if (seen_code_entry){
+                console.log("Failed to enter code! Backing out and trying again...", COLOR_RED);
+                stats.m_errors++;
+                attempts++;
+                pbf_press_button(context, BUTTON_X, 20, 480);
+                enter_tera_search(env.program_info(), console, context, HOSTING_MODE == Mode::HOST_ONLINE);
+                seen_code_entry = false;
+                continue;
+            }
+            seen_code_entry = true;
+            enter_code(console, context, FastCodeEntrySettings(), normalized_code, false);
+            context.wait_for(std::chrono::seconds(1));
+            continue;
         case 1:
+            console.log("Entered raid lobby!");
+            pbf_mash_button(context, BUTTON_A, 5 * TICKS_PER_SECOND);
+            break;
+        case 2:
+            console.log("Detected dialog...", COLOR_ORANGE);
+            seen_dialog = true;
+            pbf_press_button(context, BUTTON_B, 20, 230);
+            continue;
+        case 3:
+            if (!seen_dialog){
+                context.wait_for(std::chrono::seconds(1));
+                continue;
+            }
             console.log("Wrong code! Backing out and trying again...", COLOR_RED);
             stats.m_errors++;
-            pbf_press_button(context, BUTTON_B, 20, 230);
-            enter_tera_search(env.program_info(), console, context, HOSTING_MODE == Mode::HOST_ONLINE);
-            continue;
-        case 2:
-            console.log("Failed to enter code! Backing out and trying again...", COLOR_RED);
-            stats.m_errors++;
-            pbf_press_button(context, BUTTON_X, 20, 230);
+            attempts++;
+//            pbf_press_button(context, BUTTON_B, 20, 230);
             enter_tera_search(env.program_info(), console, context, HOSTING_MODE == Mode::HOST_ONLINE);
             continue;
         default:

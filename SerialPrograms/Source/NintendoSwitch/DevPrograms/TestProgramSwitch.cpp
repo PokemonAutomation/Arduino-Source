@@ -279,13 +279,14 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     BotBaseContext context(scope, console.botbase());
     VideoOverlaySet overlays(overlay);
 
-
+#if 0
     PokemonSwSh::MaxLairInternal::PokemonSwapMenuReader reader(console, overlay, Language::English);
 
     ImageRGB32 image("20241221-123730238930.png");
 
     double hp[4];
     reader.read_hp(image, hp);
+#endif
 
 //    reader.read_opponent_in_summary(logger, image);
 
@@ -340,7 +341,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     );
 #endif
 
-#if 0
+#if 1
     VideoSnapshot image = feed.snapshot();
 //    ImageRGB32 image("screenshot-20241124-135028529403.png");
 
