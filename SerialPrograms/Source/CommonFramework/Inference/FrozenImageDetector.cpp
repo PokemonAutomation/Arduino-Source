@@ -42,7 +42,10 @@ bool FrozenImageDetector::process_frame(const VideoSnapshot& frame){
         return false;
     }
 
-    double rmsd = ImageMatch::pixel_RMSD(m_previous, frame);
+    double rmsd = ImageMatch::pixel_RMSD(
+        extract_box_reference(m_previous, m_box),
+        extract_box_reference(frame, m_box)
+    );
 //    cout << "rmsd = " << rmsd << endl;
     if (rmsd > m_rmsd_threshold){
         m_previous = frame;
