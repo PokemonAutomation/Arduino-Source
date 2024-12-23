@@ -97,6 +97,18 @@ MainWindow::MainWindow(QWidget* parent)
         m_sleep_box = new QCheckBox("Force On", support_box);
         layout->addWidget(m_sleep_box, 1, Qt::AlignHCenter);
         sleep_suppress_state_changed(SystemSleepController::instance().current_state());
+#if QT_VERSION < 0x060700
+        connect(
+            m_sleep_box, &QCheckBox::stateChanged,
+            this, [this](int){
+                if (m_sleep_box->isChecked()){
+                    m_sleep_scope.reset(new SleepSuppressScope(SleepSuppress::SCREEN_ON));
+                }else{
+                    m_sleep_scope.reset();
+                }
+            }
+        );
+#else
         connect(
             m_sleep_box, &QCheckBox::checkStateChanged,
             this, [this](Qt::CheckState state){
@@ -107,6 +119,7 @@ MainWindow::MainWindow(QWidget* parent)
                 }
             }
         );
+#endif
     }
 
     QHBoxLayout* support = new QHBoxLayout();
