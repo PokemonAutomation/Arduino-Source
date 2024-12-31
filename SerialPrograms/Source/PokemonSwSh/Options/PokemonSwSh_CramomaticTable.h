@@ -37,6 +37,7 @@ struct CramomaticSelection
 class CramomaticRow : public EditableTableRow{
 public:
     CramomaticRow(EditableTableOption& parent_table);
+    CramomaticRow(EditableTableOption& parent_table, CramomaticBallType p_ball_type, bool p_is_bonus, uint16_t p_priority);
     virtual std::unique_ptr<EditableTableRow> clone() const;
 
 public:
