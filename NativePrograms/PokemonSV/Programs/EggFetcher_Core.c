@@ -10,7 +10,7 @@
 
 void fly_to_gate(void) {
     pbf_press_button(BUTTON_A, 20, 500);
-    pbf_press_button(BUTTON_Y, 20, 800);
+    pbf_press_button(BUTTON_Y, 20, 1000);
     pbf_move_left_joystick(STICK_MAX, STICK_MAX, 6, 500);
     pbf_mash_button(BUTTON_A, 1000);
 };
@@ -47,6 +47,8 @@ int main(void) {
     };
     pbf_press_button(BUTTON_A, 5, 500);
 
+    fly_to_gate();
+    pbf_move_right_joystick(STICK_CENTER, STICK_MIN, 5, 0);
     open_picnic();
     move_to_basket();
 
