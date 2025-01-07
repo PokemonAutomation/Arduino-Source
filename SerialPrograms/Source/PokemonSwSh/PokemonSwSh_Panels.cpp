@@ -47,14 +47,9 @@
 #include "Programs/NonShinyHunting/PokemonSwSh_StatsReset-Moltres.h"
 #include "Programs/NonShinyHunting/PokemonSwSh_StatsReset-Regi.h"
 
-#include "Programs/EggPrograms/PokemonSwSh_EggAutonomous.h"
-#include "Programs/EggPrograms/PokemonSwSh_EggFetcher2.h"
-#include "Programs/EggPrograms/PokemonSwSh_EggFetcherMultiple.h"
-#include "Programs/EggPrograms/PokemonSwSh_EggHatcher.h"
-#include "Programs/EggPrograms/PokemonSwSh_EggCombined2.h"
-#include "Programs/EggPrograms/PokemonSwSh_EggSuperCombined2.h"
-#include "Programs/EggPrograms/PokemonSwSh_GodEggDuplication.h"
-#include "Programs/EggPrograms/PokemonSwSh_GodEggItemDupe.h"
+#include "Programs/RNG/PokemonSwSh_CramomaticRNG.h"
+#include "Programs/RNG/PokemonSwSh_DailyHighlightRNG.h"
+#include "Programs/RNG/PokemonSwSh_SeedFinder.h"
 
 #include "Programs/ShinyHuntUnattended/PokemonSwSh_MultiGameFossil.h"
 #include "Programs/ShinyHuntUnattended/PokemonSwSh_ShinyHuntUnattended-Regi.h"
@@ -74,8 +69,14 @@
 #include "Programs/ShinyHuntAutonomous/PokemonSwSh_ShinyHuntAutonomous-Fishing.h"
 #include "Programs/OverworldBot/PokemonSwSh_ShinyHuntAutonomous-Overworld.h"
 
-#include "Programs/RNG/PokemonSwSh_CramomaticRNG.h"
-#include "Programs/RNG/PokemonSwSh_SeedFinder.h"
+#include "Programs/EggPrograms/PokemonSwSh_EggAutonomous.h"
+#include "Programs/EggPrograms/PokemonSwSh_EggFetcher2.h"
+#include "Programs/EggPrograms/PokemonSwSh_EggFetcherMultiple.h"
+#include "Programs/EggPrograms/PokemonSwSh_EggHatcher.h"
+#include "Programs/EggPrograms/PokemonSwSh_EggCombined2.h"
+#include "Programs/EggPrograms/PokemonSwSh_EggSuperCombined2.h"
+#include "Programs/EggPrograms/PokemonSwSh_GodEggDuplication.h"
+#include "Programs/EggPrograms/PokemonSwSh_GodEggItemDupe.h"
 
 #include "Programs/PokemonSwSh_SynchronizedSpinning.h"
 #include "Programs/PokemonSwSh_RaidItemFarmerOKHO.h"
@@ -179,6 +180,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back("---- RNG ----");
     ret.emplace_back(make_single_switch_program<SeedFinder_Descriptor, SeedFinder>());
     ret.emplace_back(make_single_switch_program<CramomaticRNG_Descriptor, CramomaticRNG>());
+    ret.emplace_back(make_single_switch_program<DailyHighlightRNG_Descriptor, DailyHighlightRNG>());
 
     ret.emplace_back("---- Multi-Switch Programs ----");
     ret.emplace_back(make_multi_switch_program<SynchronizedSpinning_Descriptor, SynchronizedSpinning>());
