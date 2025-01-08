@@ -21,6 +21,9 @@ StreamHistoryOption::StreamHistoryOption()
     , DESCRIPTION(
         "Keep a record of the recent video+audio streams. This will allow video capture "
         "for unexpected events.<br><br>"
+        "<font color=\"red\">Warning: This feature has a known memory leak. It will leak ~3GB per day per "
+        "video stream. You have been warned!</font>"
+        "<br><br>"
         "<font color=\"orange\">Warning: This feature is computationally expensive and "
         "will require a more powerful computer to run (especially for multi-Switch programs).<br>"
         "Furthermore, the current implementation is inefficient as it will write a lot "

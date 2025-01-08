@@ -56,7 +56,6 @@ private:
     IOReturn m_prevention_succeeded = kIOReturnError;
     IOPMAssertionID m_session_id = 0;
 
-    std::mutex m_lock;
     size_t m_screen_on_requests = 0;
     size_t m_no_sleep_requests = 0;
 };
@@ -113,8 +112,22 @@ bool AppleSleepController::enable_sleep(){
 void AppleSleepController::update_state(){
     //  Must call under lock.
 
+    SleepSuppress before_state = m_state.load(std::memory_order_relaxed);
+    SleepSuppress after_state = SleepSuppress::NONE;
+
     //  TODO: Distiguish these two.
-    prevent_sleep(m_screen_on_requests > 0 || m_no_sleep_requests > 0);
+    bool enabled = m_screen_on_requests > 0 || m_no_sleep_requests > 0;
+    prevent_sleep(enabled);
+
+    after_state = enabled
+        ? SleepSuppress::SCREEN_ON
+        : SleepSuppress::NONE,
+
+    m_state.store(after_state, std::memory_order_release);
+
+    if (before_state != after_state){
+        notify_listeners(after_state);
+    }
 }
 
 

@@ -40,7 +40,7 @@ protected:
 
 class OverworldWatcher : public OverworldDetector, public VisualInferenceCallback{
 public:
-    OverworldWatcher(Logger& logger, Color color = COLOR_RED, bool detect_event = false);
+    OverworldWatcher(Logger& logger, Color color = COLOR_RED);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool process_frame(const VideoSnapshot& frame) override;
@@ -54,7 +54,6 @@ private:
     WallClock m_last_ball;
     WallClock m_last_north;
     VideoSnapshot m_start_of_detection;
-    bool m_detect_event;
     DirectionDetector m_direction_detector;
 };
 

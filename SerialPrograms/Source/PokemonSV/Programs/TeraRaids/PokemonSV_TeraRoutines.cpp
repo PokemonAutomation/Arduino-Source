@@ -13,6 +13,7 @@
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
+#include "CommonFramework/Inference/FrozenImageDetector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Pokemon_Notification.h"
@@ -29,6 +30,10 @@
 #include "PokemonSV/Programs/PokemonSV_ConnectToInternet.h"
 #include "PokemonSV/Programs/Battles/PokemonSV_BasicCatcher.h"
 #include "PokemonSV_TeraRoutines.h"
+
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -709,8 +714,17 @@ void run_from_tera_battle(const ProgramInfo& info, ConsoleHandle& console, BotBa
 }
 
 
+
+
 bool is_sparkling_raid(ConsoleHandle& console, BotBaseContext& context){
-    OverworldWatcher static_map(console, COLOR_CYAN, true);
+//    cout << "is_sparkling_raid()" << endl;
+
+    FrozenImageDetector static_map(
+        COLOR_RED,
+        {0.890, 0.800, 0.030, 0.060},
+        std::chrono::seconds(1), 20
+    );
+
     context.wait_for_all_requests();
 
     int ret = wait_until(

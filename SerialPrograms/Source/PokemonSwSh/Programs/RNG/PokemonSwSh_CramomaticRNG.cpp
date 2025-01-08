@@ -488,7 +488,6 @@ void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         }catch (OperationFailedException& e){
             stats.errors++;
             env.update_stats();
-            e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
 
             apricorn_selection_errors++;
             if (apricorn_selection_errors >= 3){
@@ -497,8 +496,7 @@ void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
                     "Could not detect the bag three times on a row."
                 );
             }
-            VideoSnapshot screen = env.console.video().snapshot();
-            send_program_recoverable_error_notification(env, NOTIFICATION_ERROR_RECOVERABLE, "Could not detect the bag.", screen);
+            send_program_recoverable_error_notification(env, NOTIFICATION_ERROR_RECOVERABLE, e.message(), e.screenshot());
             is_state_valid = false;
             recover_from_wrong_state(env, context);
             continue;

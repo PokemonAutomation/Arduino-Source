@@ -20,7 +20,7 @@ struct PartialWordMask{
     __mmask16 m;
 
     PA_FORCE_INLINE PartialWordMask(size_t left)
-        : m((__mmask16)1 << left)
+        : m(((__mmask16)1 << left) - 1)
     {}
 };
 

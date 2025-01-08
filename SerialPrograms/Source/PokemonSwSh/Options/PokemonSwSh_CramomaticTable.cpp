@@ -36,6 +36,15 @@ CramomaticRow::CramomaticRow(EditableTableOption& parent_table)
     PA_ADD_OPTION(is_bonus);
     PA_ADD_OPTION(priority);
 }
+
+CramomaticRow::CramomaticRow(EditableTableOption& parent_table, CramomaticBallType p_ball_type, bool p_is_bonus, uint16_t p_priority)
+    : CramomaticRow(parent_table)
+{
+    ball_type.set(p_ball_type);
+    is_bonus = p_is_bonus;
+    priority.set(p_priority);
+}
+
 std::unique_ptr<EditableTableRow> CramomaticRow::clone() const{
     std::unique_ptr<CramomaticRow> ret(new CramomaticRow(parent()));
     ret->ball_type.set_value(ball_type.current_value());
@@ -79,7 +88,8 @@ std::vector<std::string> CramomaticTable::make_header() const{
 
 std::vector<std::unique_ptr<EditableTableRow>> CramomaticTable::make_defaults(){
     std::vector<std::unique_ptr<EditableTableRow>> ret;
-    ret.emplace_back(std::make_unique<CramomaticRow>(*this));
+    ret.emplace_back(std::make_unique<CramomaticRow>(*this, CramomaticBallType::Apricorn, true, 1));
+    ret.emplace_back(std::make_unique<CramomaticRow>(*this, CramomaticBallType::Apricorn, false, 0));
     return ret;
 }
 

@@ -87,7 +87,7 @@ private:
     std::string m_processor;
     std::string m_program;
     std::string m_program_id;
-    uint64_t m_program_runtime_millis;
+    uint64_t m_program_runtime_millis = 0;
     std::string m_title;
     std::vector<std::pair<std::string, std::string>> m_messages;
     ImageRGB32 m_image_owner;

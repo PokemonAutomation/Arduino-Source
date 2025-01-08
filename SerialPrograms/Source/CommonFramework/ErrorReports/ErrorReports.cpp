@@ -122,7 +122,9 @@ SendableErrorReport::SendableErrorReport(
         std::cout << "Compiling Error Report..." << std::endl;
     }
     m_program_id = info.program_id;
-    m_program_runtime_millis = std::chrono::duration_cast<Milliseconds>(current_time() - info.start_time).count();
+    if (info.start_time != WallClock::min()){
+        m_program_runtime_millis = std::chrono::duration_cast<Milliseconds>(current_time() - info.start_time).count();
+    }
     m_title = std::move(title);
     m_messages = std::move(messages);
     m_image = image;

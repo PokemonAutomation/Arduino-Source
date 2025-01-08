@@ -342,13 +342,13 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 #endif
 
 #if 1
-    VideoSnapshot image = feed.snapshot();
-//    ImageRGB32 image("screenshot-20241124-135028529403.png");
+//    VideoSnapshot image = feed.snapshot();
+    ImageRGB32 image("20250108-151305644248.png");
 
     DateReader date_reader;
     date_reader.make_overlays(overlays);
-    auto date = date_reader.read_date(logger, image);
-//    auto date = date_reader.read_date(logger, std::make_shared<ImageRGB32>(std::move(image)));
+//    auto date = date_reader.read_date(logger, image);
+    auto date = date_reader.read_date(logger, std::make_shared<ImageRGB32>(std::move(image)));
     cout << "year =  " << (int)date.second.year << endl;
     cout << "month = " << (int)date.second.month << endl;
     cout << "day =   " << (int)date.second.day << endl;

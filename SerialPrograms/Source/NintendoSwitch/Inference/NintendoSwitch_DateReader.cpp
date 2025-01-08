@@ -351,12 +351,20 @@ DateTime DateReader::read_date_us(Logger& logger, std::shared_ptr<const ImageRGB
             white_theme
         );
 
-        std::string ampm = to_utf8(OCR::normalize_utf32(OCR::ocr_read(Language::English, us_ampm_filtered)));
+        std::string ampm_ocr = OCR::ocr_read(Language::English, us_ampm_filtered);
+        if (ampm_ocr.back() == '\n'){
+            ampm_ocr.pop_back();
+        }
+        std::string ampm = to_utf8(OCR::normalize_utf32(ampm_ocr));
+
         if (ampm == "am"){
             //  Do nothing.
+            logger.log("OCR Text: \"" + ampm_ocr + "\" -> \"" + ampm + "\" -> AM");
         }else if (ampm == "pm"){
+            logger.log("OCR Text: \"" + ampm_ocr + "\" -> \"" + ampm + "\" -> PM");
             hour += 12;
         }else{
+            logger.log("OCR Text: \"" + ampm_ocr + "\" -> \"" + ampm + "\" -> ??", COLOR_RED);
             hour = -1;
         }
 

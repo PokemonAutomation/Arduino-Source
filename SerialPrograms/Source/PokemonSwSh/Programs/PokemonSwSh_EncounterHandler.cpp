@@ -78,6 +78,9 @@ void StandardEncounterHandler::run_away_and_update_stats(
     uint16_t exit_battle_time,
     const ShinyDetectionResult& result
 ){
+    //  Read the name.
+    const std::set<std::string>* candidates_ptr = encounter.candidates();
+
     //  Initiate the run-away.
     pbf_press_dpad(m_context, DPAD_UP, 10, 0);
     pbf_mash_button(m_context, BUTTON_A, 60);
@@ -85,7 +88,6 @@ void StandardEncounterHandler::run_away_and_update_stats(
 
     update_frequencies(encounter);
 
-    const std::set<std::string>* candidates_ptr = encounter.candidates();
     const std::set<std::string>& candidates = candidates_ptr
         ? *candidates_ptr
         : std::set<std::string>();

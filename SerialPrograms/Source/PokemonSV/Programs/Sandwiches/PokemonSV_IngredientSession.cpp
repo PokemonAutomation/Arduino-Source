@@ -298,7 +298,7 @@ void IngredientSession::add_ingredients(
 
             if (!ingredient_added){
                 OperationFailedException::fire(
-                    console, ErrorReport::SEND_ERROR_REPORT,
+                    console, ErrorReport::NO_ERROR_REPORT,
                     "Unable to add ingredient: \"" + name.display_name() + "\" - Did you run out?"
                 );
             }

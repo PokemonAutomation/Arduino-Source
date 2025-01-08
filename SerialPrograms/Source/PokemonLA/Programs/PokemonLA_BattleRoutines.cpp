@@ -29,14 +29,14 @@ void mash_A_until_end_of_battle(ConsoleHandle& console, BotBaseContext& context)
     int ret = run_until(
         console, context,
         [](BotBaseContext& context){
-            pbf_mash_button(context, BUTTON_A, 120 * TICKS_PER_SECOND);
+            pbf_mash_button(context, BUTTON_A, 180 * TICKS_PER_SECOND);
         },
         {{detector}}
     );
     if (ret < 0){
         OperationFailedException::fire(
             console, ErrorReport::SEND_ERROR_REPORT,
-            "Failed to return to overworld after 2 minutes."
+            "Failed to return to overworld after 3 minutes."
         );
     }
     console.log("Returned to overworld.");
