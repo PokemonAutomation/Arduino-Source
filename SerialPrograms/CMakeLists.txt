@@ -1097,6 +1097,12 @@ file(GLOB MAIN_SOURCES
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_TradeRoutines.h
     Source/PokemonBDSP/Resources/PokemonBDSP_NameDatabase.cpp
     Source/PokemonBDSP/Resources/PokemonBDSP_NameDatabase.h
+    Source/PokemonEmerald/Programs/ShinyHunting/PokemonEmerald_StarterReset.cpp
+    Source/PokemonEmerald/Programs/ShinyHunting/PokemonEmerald_StarterReset.h
+    Source/PokemonEmerald/PokemonEmerald_Panels.cpp
+    Source/PokemonEmerald/PokemonEmerald_Panels.h
+    Source/PokemonEmerald/PokemonEmerald_Settings.cpp
+    Source/PokemonEmerald/PokemonEmerald_Settings.h
     Source/PokemonHome/Inference/PokemonHome_BallReader.cpp
     Source/PokemonHome/Inference/PokemonHome_BallReader.h
     Source/PokemonHome/Inference/PokemonHome_BoxGenderDetector.cpp
