@@ -56,7 +56,12 @@ bool read_battle_menu(
                 break;
             }
         }
-        console.log("Attempting to read from summary.", COLOR_PURPLE);
+        if (state.opponent.size() == 1){
+            console.log("Failed to read opponent from battle. Using previously known value: " + set_to_str(state.opponent), COLOR_ORANGE);
+            break;
+        }
+
+        console.log("Unable to read opponent from battle. Attempting to read from summary.", COLOR_ORANGE);
         pbf_press_button(context, BUTTON_Y, 10, TICKS_PER_SECOND);
         pbf_press_dpad(context, DPAD_UP, 10, 50);
         pbf_press_button(context, BUTTON_A, 10, 2 * TICKS_PER_SECOND);
