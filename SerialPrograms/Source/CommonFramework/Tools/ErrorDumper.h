@@ -32,7 +32,8 @@ std::string dump_image_alone(
 void dump_image(
     Logger& logger,
     const ProgramInfo& program_info, const std::string& label,
-    const ImageViewRGB32& image
+    const ImageViewRGB32& image,
+    ConsoleHandle* console = nullptr
 );
 void dump_image(
     const ProgramInfo& program_info,

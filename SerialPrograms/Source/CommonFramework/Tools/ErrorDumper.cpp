@@ -43,14 +43,16 @@ std::string dump_image_alone(
 void dump_image(
     Logger& logger,
     const ProgramInfo& program_info, const std::string& label,
-    const ImageViewRGB32& image
+    const ImageViewRGB32& image,
+    ConsoleHandle* console
 ){
     report_error(
         &logger,
         program_info,
         label,
         {},
-        image
+        image,
+        console
     );
 }
 void dump_image(

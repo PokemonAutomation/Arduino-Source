@@ -130,7 +130,8 @@ std::set<std::string> StandardEncounterDetection::read_name(const ImageViewRGB32
         dump_image(
             m_console, ProgramInfo(),
             "StandardEncounterDetection-NameOCR-" + language_data(m_language).code,
-            screen
+            screen,
+            &m_console
         );
     }else{
         for (const auto& item : result.results){

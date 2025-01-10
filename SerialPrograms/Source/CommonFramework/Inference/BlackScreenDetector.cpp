@@ -57,44 +57,41 @@ bool WhiteScreenDetector::detect(const ImageViewRGB32& screen) const{
 
 
 
-BlackScreenWatcher::BlackScreenWatcher(
-    Color color, const ImageFloatBox& box,
-    double max_rgb_sum,
-    double max_stddev_sum
-)
-    : BlackScreenDetector(color, box, max_rgb_sum, max_stddev_sum)
-    , VisualInferenceCallback("BlackScreenWatcher")
-{}
-void BlackScreenWatcher::make_overlays(VideoOverlaySet& items) const{
-    BlackScreenDetector::make_overlays(items);
-}
-bool BlackScreenWatcher::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
-    return detect(frame);
-}
-
 
 
 
 BlackScreenOverWatcher::BlackScreenOverWatcher(
     Color color, const ImageFloatBox& box,
     double max_rgb_sum,
-    double max_stddev_sum
+    double max_stddev_sum,
+    std::chrono::milliseconds hold_duration,
+    std::chrono::milliseconds release_duration
 )
     : VisualInferenceCallback("BlackScreenOverWatcher")
-    , m_detector(color, box, max_rgb_sum, max_stddev_sum)
+    , m_on(color, box, max_rgb_sum, max_stddev_sum, BlackScreenWatcher::FinderType::PRESENT, hold_duration)
+    , m_off(color, box, max_rgb_sum, max_stddev_sum, BlackScreenWatcher::FinderType::GONE, release_duration)
 {}
 void BlackScreenOverWatcher::make_overlays(VideoOverlaySet& items) const{
-    m_detector.make_overlays(items);
+    m_on.make_overlays(items);
 }
 bool BlackScreenOverWatcher::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
-    return black_is_over(frame);
-}
-bool BlackScreenOverWatcher::black_is_over(const ImageViewRGB32& frame){
-    if (m_detector.detect(frame)){
-        m_has_been_black = true;
+    if (m_black_is_over.load(std::memory_order_acquire)){
+        return true;
+    }
+    if (!m_has_been_black){
+        m_has_been_black = m_on.process_frame(frame, timestamp);
         return false;
     }
-    return m_has_been_black;
+
+    bool is_over = m_off.process_frame(frame, timestamp);
+    if (!is_over){
+        return false;
+    }
+    m_black_is_over.store(true, std::memory_order_release);
+    return true;
+}
+bool BlackScreenOverWatcher::black_is_over(const ImageViewRGB32& frame){
+    return m_black_is_over.load(std::memory_order_acquire);
 }
 
 
