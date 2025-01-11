@@ -25,7 +25,7 @@ StarterReset_Descriptor::StarterReset_Descriptor()
         "PokemonRSE:StarterReset",
         "Pokemon RSE", "Starter Reset",
         "ComputerControl/blob/master/Wiki/Programs/PokemonRSE/StarterReset.md",
-        "Soft reset for a shiny starter.",
+        "(Audio only) Soft reset for a shiny starter. WIP, audio recognition does not work well.",
         //FeedbackType::VIDEO_AUDIO,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
@@ -62,11 +62,34 @@ StarterReset::StarterReset()
         LockMode::LOCK_WHILE_RUNNING,
         Target::treecko
     )
+    , POOCH_WAIT(
+        "<b>Battle start wait:</b><br>Time for battle to start and for Poochyena to appear. Make sure to add extra time in case the Poochyena is shiny.",
+        LockMode::LOCK_WHILE_RUNNING,
+        TICKS_PER_SECOND,
+        "6 * TICKS_PER_SECOND"
+    )
+    , STARTER_WAIT(
+        "<b>Send out starter wait:</b><br>After pressing A to send out your selected starter, wait this long for the animation. Make sure to add extra time in case it is shiny.",
+        LockMode::LOCK_WHILE_RUNNING,
+        TICKS_PER_SECOND,
+        "6 * TICKS_PER_SECOND"
+    )
+    , NOTIFICATION_SHINY_POOCH(
+        "Shiny Poochyena",
+        false, false,
+        {"Notifs"}
+    )
+    , NOTIFICATION_SHINY_STARTER(
+        "Shiny Starter",
+        true, false,
+        {"Notifs", "Showcase"}
+    )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
+        &NOTIFICATION_SHINY_POOCH,
+        &NOTIFICATION_SHINY_STARTER,
         &NOTIFICATION_STATUS_UPDATE,
         &NOTIFICATION_PROGRAM_FINISH,
-        // &NOTIFICATION_ERROR_FATAL,
         })
 {
     PA_ADD_OPTION(TARGET);
@@ -78,74 +101,51 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
     StarterReset_Descriptor::Stats& stats = env.current_stats<StarterReset_Descriptor::Stats>();
 
     /*
-    * Stand in front of birch's bag.
+    * Settings: Text Speed fast.
+    * Setup: Stand in front of the Professor's bag and save the game.
     * 
-    * text speed fast
+    * Required to fight, so have to do the SR method instead of run away
+    * Soft reset programs are only for Ruby/Sapphire, as Emerald has the 0 seed issue.
     * 
-    * have to do the SR method instead of run away
-    * 
-    * ONLY FOR RS, emerald has rng anyway
-    * 
-    * This assumes no dry battery. If you have a dry battery, just do RNG.
-    */
-
-    /*
-    start at birch bag
-
-    starter selection
-
-    wild pooch appears, shiny check (audio?)
-
-    go starter
-
-    now shiny check
-
-    track starter shiny, zig shiny, number of attempts, errors
-
-    if not shiny, soft reset
-
-    soft reset checks for dry battery and returns true or false!
-    
+    * This also assumes no dry battery.
     */
 
     bool shiny_starter = false;
     while (!shiny_starter) {
 
-        float shiny_coefficient = 1.0;
         ShinySoundDetector pooch_detector(env.console, [&](float error_coefficient) -> bool{
-            //  Warning: This callback will be run from a different thread than this function.
-            shiny_coefficient = error_coefficient;
             return true;
         });
+
+        env.log("Opening bag and selecting starter.");
+        pbf_press_button(context, BUTTON_A, 40, 180);
+
+        switch (TARGET) {
+        case Target::treecko:
+            pbf_press_dpad(context, DPAD_LEFT, 40, 100);
+            break;
+        case Target::torchic:
+            //Default cursor position, do nothing.
+            break;
+        case Target::mudkip:
+            pbf_press_dpad(context, DPAD_RIGHT, 40, 100);
+            break;
+        default:
+            OperationFailedException::fire(
+                env.console, ErrorReport::SEND_ERROR_REPORT,
+                "StarterReset: Invalid target."
+            );
+            break;
+        }
+        pbf_mash_button(context, BUTTON_A, 540);
+        env.log("Starter selected. Checking for shiny Poochyena.");
+
 
         int ret = run_until(
             env.console, context,
             [&](BotBaseContext& context){
-                env.log("Opening bag and selecting starter.");
-                pbf_press_button(context, BUTTON_A, 40, 180);
-
-                switch (TARGET) {
-                case Target::treecko:
-                    pbf_press_dpad(context, DPAD_LEFT, 40, 100);
-                    break;
-                case Target::torchic:
-                    //Default cursor position, do nothing.
-                    break;
-                case Target::mudkip:
-                    pbf_press_dpad(context, DPAD_RIGHT, 40, 100);
-                    break;
-                default:
-                    OperationFailedException::fire(
-                        env.console, ErrorReport::SEND_ERROR_REPORT,
-                        "StarterReset: Invalid target."
-                    );
-                    break;
-                }
-                pbf_mash_button(context, BUTTON_A, 540);
-                env.log("Starter selected. Checking for shiny Poochyena.");
-
                 //Wait for battle to start and for Pooch battle cry
-                pbf_wait(context, 400);
+                pbf_wait(context, POOCH_WAIT);
 
                 context.wait_for_all_requests();
 
@@ -156,20 +156,26 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         if (ret == 0){
             env.log("Shiny Poochyena detected!");
             stats.poochyena++;
+            send_program_status_notification(env, NOTIFICATION_SHINY_POOCH, "Shiny Poochyena found.");
+        }
+        else {
+            env.log("Poochyena is not shiny.");
         }
 
         ShinySoundDetector starter_detector(env.console, [&](float error_coefficient) -> bool{
-            //  Warning: This callback will be run from a different thread than this function.
-            shiny_coefficient = error_coefficient;
             return true;
         });
+
+        //Press A to send out your selected starter
+        env.log("Sending out selected starter.");
+        pbf_press_button(context, BUTTON_A, 40, 40);
 
         int ret2 = run_until(
             env.console, context,
             [&](BotBaseContext& context){
-                env.log("Sending out selected starter.");
-                //Press A to send out your selected starter
-                pbf_press_button(context, BUTTON_A, 40, 400);
+                env.log("Wait for starter to come out.");
+                pbf_wait(context, STARTER_WAIT);
+                context.wait_for_all_requests();
             },
             {{starter_detector}}
         );
@@ -177,12 +183,21 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         if (ret2 == 0){
             env.log("Shiny starter detected!");
             stats.shinystarter++;
+
+            send_program_status_notification(env, NOTIFICATION_SHINY_STARTER, "Shiny starter found!");
+
             shiny_starter = true;
             break;
-
+        }
+        else {
+            env.log("Starter is not shiny.");
         }
 
         env.log("Soft resetting.");
+        send_program_status_notification(
+            env, NOTIFICATION_STATUS_UPDATE,
+            "Soft resetting."
+        );
         soft_reset(env.program_info(), env.console, context);
         stats.resets++;
     }

@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonRSE_StarterReset_H
 
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
+#include "Common/Cpp/Options/TimeExpressionOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
@@ -35,6 +36,11 @@ private:
     };
     EnumDropdownOption<Target> TARGET;
 
+    TimeExpressionOption<uint16_t> POOCH_WAIT;
+    TimeExpressionOption<uint16_t> STARTER_WAIT;
+
+    EventNotificationOption NOTIFICATION_SHINY_POOCH;
+    EventNotificationOption NOTIFICATION_SHINY_STARTER;
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;
 };

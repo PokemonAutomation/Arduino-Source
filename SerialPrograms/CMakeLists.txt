@@ -1295,6 +1295,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonRSE/Inference/Sounds/PokemonRSE_ShinySoundDetector.h
     Source/PokemonRSE/Programs/ShinyHunting/PokemonRSE_StarterReset.cpp
     Source/PokemonRSE/Programs/ShinyHunting/PokemonRSE_StarterReset.h
+    Source/PokemonRSE/Programs/TestPrograms/PokemonRSE_SoundListener.cpp
+    Source/PokemonRSE/Programs/TestPrograms/PokemonRSE_SoundListener.h
     Source/PokemonRSE/PokemonRSE_Navigation.cpp
     Source/PokemonRSE/PokemonRSE_Navigation.h
     Source/PokemonRSE/PokemonRSE_Panels.cpp
