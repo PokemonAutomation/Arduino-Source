@@ -19,6 +19,7 @@
 namespace PokemonAutomation{
 
 
+class AsyncTask;
 class ConsoleHandle;
 
 
@@ -100,7 +101,7 @@ private:
 
 
 void send_reports(Logger& logger, const std::vector<std::string>& reports);
-void send_all_unsent_reports(Logger& logger, bool allow_prompt);
+std::unique_ptr<AsyncTask> send_all_unsent_reports(Logger& logger, bool allow_prompt);
 
 
 void report_error(

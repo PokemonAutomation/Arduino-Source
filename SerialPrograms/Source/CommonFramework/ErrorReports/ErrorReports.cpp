@@ -10,8 +10,10 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
+#include "Common/Cpp/Concurrency/AsyncDispatcher.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/GlobalServices.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Environment/Environment.h"
@@ -165,56 +167,63 @@ SendableErrorReport::SendableErrorReport(std::string directory)
     JsonValue json = load_json_file(m_directory + "Report.json");
     const JsonObject& obj = json.to_object_throw();
     m_timestamp = obj.get_string_throw("Timestamp");
-    m_processor = obj.get_string_throw("Processor");
-    m_program = obj.get_string_throw("Program");
-    m_program_id = obj.get_string_throw("ProgramID");
-    m_program_runtime_millis = obj.get_integer_throw("ElapsedTimeMillis");
-    m_title = obj.get_string_throw("Title");
-    {
-        const JsonArray& messages = obj.get_array_throw("Messages");
-        for (const JsonValue& message : messages){
-            const JsonArray& item = message.to_array_throw();
-            if (item.size() != 2){
-                throw ParseException("Expected 2 values for message.");
+
+    //  If we error from this point on, we'll just move it to the sent folder.
+    try{
+        m_processor = obj.get_string_throw("Processor");
+        m_program = obj.get_string_throw("Program");
+        m_program_id = obj.get_string_throw("ProgramID");
+        m_program_runtime_millis = obj.get_integer_throw("ElapsedTimeMillis");
+        m_title = obj.get_string_throw("Title");
+        {
+            const JsonArray& messages = obj.get_array_throw("Messages");
+            for (const JsonValue& message : messages){
+                const JsonArray& item = message.to_array_throw();
+                if (item.size() != 2){
+                    throw ParseException("Expected 2 values for message.");
+                }
+                m_messages.emplace_back(
+                    item[0].to_string_throw(),
+                    item[1].to_string_throw()
+                );
             }
-            m_messages.emplace_back(
-                item[0].to_string_throw(),
-                item[1].to_string_throw()
-            );
         }
-    }
-    {
-        const std::string* image_name = obj.get_string("Screenshot");
-        if (image_name){
-            try{
-                m_image_owner = ImageRGB32(m_directory + *image_name);
-                m_image = m_image_owner;
-            }catch (FileException&){}
+        {
+            const std::string* image_name = obj.get_string("Screenshot");
+            if (image_name){
+                try{
+                    m_image_owner = ImageRGB32(m_directory + *image_name);
+                    m_image = m_image_owner;
+                }catch (FileException&){}
+            }
         }
-    }
-    {
-        const std::string* video_name = obj.get_string("Video");
-        if (video_name){
-            m_video_name = *video_name;
+        {
+            const std::string* video_name = obj.get_string("Video");
+            if (video_name){
+                m_video_name = *video_name;
+            }
         }
-    }
-    {
-        const std::string* dump_name = obj.get_string("Dump");
-        if (dump_name){
-            m_dump_name = *dump_name;
+        {
+            const std::string* dump_name = obj.get_string("Dump");
+            if (dump_name){
+                m_dump_name = *dump_name;
+            }
         }
-    }
-    {
-        const std::string* logs_name = obj.get_string("Logs");
-        if (logs_name){
-            m_logs_name = *logs_name;
+        {
+            const std::string* logs_name = obj.get_string("Logs");
+            if (logs_name){
+                m_logs_name = *logs_name;
+            }
         }
-    }
-    {
-        const JsonArray& files = obj.get_array_throw("Files");
-        for (const JsonValue& file : files){
-            m_files.emplace_back(file.to_string_throw());
+        {
+            const JsonArray& files = obj.get_array_throw("Files");
+            for (const JsonValue& file : files){
+                m_files.emplace_back(file.to_string_throw());
+            }
         }
+    }catch (...){
+        move_to_sent();
+        throw;
     }
 }
 void SendableErrorReport::add_file(std::string filename){
@@ -283,10 +292,15 @@ void SendableErrorReport::move_to_sent(){
     std::string new_directory = ERROR_PATH_SENT + "/" + m_timestamp + "/";
 //    cout << "old: " << m_directory << endl;
 //    cout << "new: " << new_directory << endl;
-    QDir().rename(
+    bool success = QDir().rename(
         QString::fromStdString(m_directory),
         QString::fromStdString(new_directory)
     );
+    if (success){
+        global_logger_tagged().log("Moved error report " + m_timestamp + ".");
+    }else{
+        global_logger_tagged().log("Unable to move error report " + m_timestamp + ".", COLOR_RED);
+    }
     m_directory = std::move(new_directory);
 }
 
@@ -311,6 +325,8 @@ std::vector<std::string> SendableErrorReport::get_pending_reports(){
 void send_reports(Logger& logger, const std::vector<std::string>& reports){
     for (const std::string& path : reports){
         try{
+//            static int c = 0;
+//            cout << "Sending... " << c++ << endl;
             SendableErrorReport report(path);
             report.send(logger);
         }catch (Exception& e){
@@ -320,23 +336,23 @@ void send_reports(Logger& logger, const std::vector<std::string>& reports){
         }
     }
 }
-void send_all_unsent_reports(Logger& logger, bool allow_prompt){
+std::unique_ptr<AsyncTask> send_all_unsent_reports(Logger& logger, bool allow_prompt){
 #ifdef PA_OFFICIAL
     ErrorReportSendMode mode = GlobalSettings::instance().ERROR_REPORTS->SEND_MODE;
     if (mode == ErrorReportSendMode::NEVER_SEND_ANYTHING){
-        return;
+        return nullptr;
     }
 
     std::vector<std::string> reports = SendableErrorReport::get_pending_reports();
     global_logger_tagged().log("Found " + std::to_string(reports.size()) + " unsent error reports.", COLOR_PURPLE);
 
     if (reports.empty()){
-        return;
+        return nullptr;
     }
 
     if (mode == ErrorReportSendMode::PROMPT_WHEN_CONVENIENT){
         if (!allow_prompt){
-            return;
+            return nullptr;
         }
         QMessageBox box;
         QMessageBox::StandardButton button = box.information(
@@ -356,12 +372,15 @@ void send_all_unsent_reports(Logger& logger, bool allow_prompt){
             QMessageBox::StandardButton::Yes
         );
         if (button != QMessageBox::StandardButton::Yes){
-            return;
+            return nullptr;
         }
     }
 
     global_logger_tagged().log("Attempting to send " + std::to_string(reports.size()) + " error reports.", COLOR_PURPLE);
-    send_reports(global_logger_tagged(), reports);
+
+    return global_async_dispatcher().dispatch([reports = std::move(reports)]{
+        send_reports(global_logger_tagged(), reports);
+    });
 
 #endif
 }

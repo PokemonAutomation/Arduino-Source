@@ -149,6 +149,7 @@ void mash_A_to_enter_sub_area(
 void mash_A_to_change_region(
     ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context
 ){
+    console.log("Waiting for loading screen...");
     BlackScreenOverWatcher black_screen0;
     int ret = run_until(
         console, context,
@@ -165,6 +166,7 @@ void mash_A_to_change_region(
     }
     context.wait_for(std::chrono::milliseconds(1000));
 
+    console.log("Waiting for end of loading screen...");
     BlackScreenOverWatcher black_screen1a(COLOR_RED, {0.20, 0.02, 0.60, 0.05}, 150);
     BlackScreenOverWatcher black_screen1b(COLOR_RED, {0.20, 0.93, 0.60, 0.05}, 150);
     ret = wait_until(
