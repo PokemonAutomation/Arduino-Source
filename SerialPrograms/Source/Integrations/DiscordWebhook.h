@@ -75,9 +75,12 @@ signals:
 
 private:
     TaggedLogger m_logger;
-    bool m_stopping;
+    std::atomic<bool> m_stopping;
     std::mutex m_lock;
     std::condition_variable m_cv;
+
+    std::mutex m_send_lock;
+    std::unique_ptr<QEventLoop> m_event_loop;
 
     std::deque<WallClock> m_sent;
     AsyncDispatcher m_dispatcher;
