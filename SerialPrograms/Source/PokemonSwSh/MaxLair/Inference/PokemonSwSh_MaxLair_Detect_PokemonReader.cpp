@@ -322,9 +322,9 @@ std::string read_pokemon_name_sprite(
     }
     bool ocr_hit = !ocr_slugs.empty();
     bool ocr_unique = ocr_hit && ocr_slugs.size() == 1;
-    if (!ocr_hit){
-        dump_image(logger, MODULE_NAME, "MaxLair-read_name_sprite", screen);
-    }
+//    if (!ocr_hit){
+//        dump_image(logger, MODULE_NAME, "MaxLair-read_name_sprite", screen);
+//    }
 
     ImageMatch::ImageMatchResult result = read_pokemon_sprite_set(
         logger,
@@ -334,9 +334,9 @@ std::string read_pokemon_name_sprite(
     );
     auto iter = result.results.begin();
     bool sprite_hit = iter != result.results.end() && iter->first <= SpeciesReadDatabase::CROPPED_MAX_ALPHA;
-    if (!sprite_hit || result.results.size() > 1){
-        dump_image(logger, MODULE_NAME, "MaxLair-read_name_sprite", screen);
-    }
+//    if (!sprite_hit || result.results.size() > 1){
+//        dump_image(logger, MODULE_NAME, "MaxLair-read_name_sprite", screen);
+//    }
 
     //  No hit on sprite. Use OCR.
     if (!sprite_hit){
