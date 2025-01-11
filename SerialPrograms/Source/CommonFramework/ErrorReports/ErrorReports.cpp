@@ -381,7 +381,8 @@ std::unique_ptr<AsyncTask> send_all_unsent_reports(Logger& logger, bool allow_pr
     return global_async_dispatcher().dispatch([reports = std::move(reports)]{
         send_reports(global_logger_tagged(), reports);
     });
-
+#else
+    return nullptr;
 #endif
 }
 
