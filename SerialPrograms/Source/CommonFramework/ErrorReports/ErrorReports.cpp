@@ -279,12 +279,6 @@ void SendableErrorReport::save(Logger* logger) const{
     report.dump(m_directory + "Report.json");
 }
 
-#ifndef PA_OFFICIAL
-bool SendableErrorReport::send(Logger& logger){
-    return false;
-}
-#endif
-
 void SendableErrorReport::move_to_sent(){
 //    cout << "move_to_sent()" << endl;
     QDir().mkdir(QString::fromStdString(ERROR_PATH_SENT));
@@ -320,15 +314,22 @@ std::vector<std::string> SendableErrorReport::get_pending_reports(){
     return ret;
 }
 
+#ifndef PA_OFFICIAL
+void SendableErrorReport::send(Logger& logger, std::shared_ptr<SendableErrorReport> report){}
+#endif
 
 
+
+//  Send all the reports. This function will return early and all the reports
+//  will be sent asynchronously in the background.
 void send_reports(Logger& logger, const std::vector<std::string>& reports){
     for (const std::string& path : reports){
         try{
 //            static int c = 0;
 //            cout << "Sending... " << c++ << endl;
-            SendableErrorReport report(path);
-            report.send(logger);
+            //  std:::shared_ptr because it needs to take ownership for
+            //  destruction at a later time.
+            SendableErrorReport::send(logger, std::make_shared<SendableErrorReport>(path));
         }catch (Exception& e){
             logger.log("Unable to send report: " + path + ", Message: " + e.to_str(), COLOR_RED);
         }catch (...){

@@ -78,10 +78,10 @@ public:
     void add_file(std::string filename);
 
     void save(Logger* logger) const;
-    bool send(Logger& logger);
     void move_to_sent();
 
     static std::vector<std::string> get_pending_reports();
+    static void send(Logger& logger, std::shared_ptr<SendableErrorReport> report);
 
 private:
     std::string m_timestamp;

@@ -60,13 +60,21 @@ void DiscordWebhookSender::send(
     Logger& logger,
     const QUrl& url, std::chrono::milliseconds delay,
     const JsonObject& obj,
-    std::shared_ptr<PendingFileSend> file
+    std::shared_ptr<PendingFileSend> file,
+    std::function<void()> finish_callback
 ){
     cleanup_stuck_requests();
     std::shared_ptr<JsonValue> json(new JsonValue(obj.clone()));
+//    cout << "Scheduling Webhook Message... (queue = " + tostr_u_commas(m_queue.size()) + ")" << endl;
+    logger.log("Scheduling Webhook Message... (queue = " + tostr_u_commas(m_queue.size()) + ")", COLOR_PURPLE);
     m_queue.add_event(
         delay,
-        [this, url, json = std::move(json), file = std::move(file)]{
+        [
+            this, url,
+            json = std::move(json),
+            file = std::move(file),
+            finish_callback = std::move(finish_callback)
+        ]{
             throttle();
             std::vector<DiscordFileAttachment> attachments;
             if (file){
@@ -75,22 +83,31 @@ void DiscordWebhookSender::send(
                 );
             }
             internal_send(url, *json, attachments);
+            if (finish_callback){
+                finish_callback();
+            }
         }
     );
-//    cout << "Scheduling Webhook Message... (queue = " + tostr_u_commas(m_queue.size()) + ")" << endl;
-    logger.log("Scheduling Webhook Message... (queue = " + tostr_u_commas(m_queue.size()) + ")", COLOR_PURPLE);
 }
 void DiscordWebhookSender::send(
     Logger& logger,
     const QUrl& url, std::chrono::milliseconds delay,
     const JsonObject& obj,
-    std::vector<std::shared_ptr<PendingFileSend>> files
+    std::vector<std::shared_ptr<PendingFileSend>> files,
+    std::function<void()> finish_callback
 ){
     cleanup_stuck_requests();
     std::shared_ptr<JsonValue> json(new JsonValue(obj.clone()));
+//    cout << "Scheduling Webhook Message... (queue = " + tostr_u_commas(m_queue.size()) + ")" << endl;
+    logger.log("Scheduling Webhook Message... (queue = " + tostr_u_commas(m_queue.size()) + ")", COLOR_PURPLE);
     m_queue.add_event(
         delay,
-        [this, url, json = std::move(json), files = std::move(files)]{
+        [
+            this, url,
+            json = std::move(json),
+            files = std::move(files),
+            finish_callback = std::move(finish_callback)
+        ]{
             throttle();
             std::vector<DiscordFileAttachment> attachments;
             for (auto& file : files){
@@ -99,10 +116,11 @@ void DiscordWebhookSender::send(
                 );
             }
             internal_send(url, *json, attachments);
+            if (finish_callback){
+                finish_callback();
+            }
         }
     );
-//    cout << "Scheduling Webhook Message... (queue = " + tostr_u_commas(m_queue.size()) + ")" << endl;
-    logger.log("Scheduling Webhook Message... (queue = " + tostr_u_commas(m_queue.size()) + ")", COLOR_PURPLE);
 }
 
 void DiscordWebhookSender::cleanup_stuck_requests(){
