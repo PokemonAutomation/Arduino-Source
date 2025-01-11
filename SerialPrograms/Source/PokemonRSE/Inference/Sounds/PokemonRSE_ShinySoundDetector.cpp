@@ -4,9 +4,9 @@
  *
  */
 
-#include "CommonTools/Audio/AudioTemplateCache.h"
-#include "CommonTools/Audio/SpectrogramMatcher.h"
-#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
+#include "CommonFramework/Inference/SpectrogramMatcher.h"
+#include "CommonFramework/Inference/AudioTemplateCache.h"
+#include "CommonFramework/Tools/ConsoleHandle.h"
 #include "PokemonRSE/PokemonRSE_Settings.h"
 #include "PokemonRSE_ShinySoundDetector.h"
 
@@ -15,15 +15,9 @@ namespace NintendoSwitch{
 namespace PokemonRSE{
 
 
-ShinySoundDetector::ShinySoundDetector(Logger& logger, DetectedCallback detected_callback)
+ShinySoundDetector::ShinySoundDetector(ConsoleHandle& console, DetectedCallback detected_callback)
     // Use a yellow as the detection color because the shiny animation is yellow.
-    : AudioPerSpectrumDetectorBase(
-        logger,
-        "ShinySoundDetector",
-        "Shiny sound",
-        COLOR_YELLOW,
-        detected_callback
-    )
+    : AudioPerSpectrumDetectorBase("ShinySoundDetector", "Shiny sound", COLOR_YELLOW, console, detected_callback)
 {}
 
 
