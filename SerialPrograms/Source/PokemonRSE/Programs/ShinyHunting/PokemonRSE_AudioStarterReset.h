@@ -26,7 +26,7 @@ public:
 class AudioStarterReset : public SingleSwitchProgramInstance{
 public:
     AudioStarterReset();
-    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
     enum class Target{
@@ -35,6 +35,9 @@ private:
         mudkip,
     };
     EnumDropdownOption<Target> TARGET;
+
+    TimeExpressionOption<uint16_t> POOCH_WAIT;
+    TimeExpressionOption<uint16_t> STARTER_WAIT;
 
     EventNotificationOption NOTIFICATION_SHINY_POOCH;
     EventNotificationOption NOTIFICATION_SHINY_STARTER;

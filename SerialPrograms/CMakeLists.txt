@@ -1293,8 +1293,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Resources/PokemonLA_WeatherAndTimeIcons.h
     Source/PokemonRSE/Inference/Sounds/PokemonRSE_ShinySoundDetector.cpp
     Source/PokemonRSE/Inference/Sounds/PokemonRSE_ShinySoundDetector.h
-    Source/PokemonRSE/Programs/ShinyHunting/PokemonRSE_StarterReset.cpp
-    Source/PokemonRSE/Programs/ShinyHunting/PokemonRSE_StarterReset.h
+    Source/PokemonRSE/Programs/ShinyHunting/PokemonRSE_AudioStarterReset.cpp
+    Source/PokemonRSE/Programs/ShinyHunting/PokemonRSE_AudioStarterReset.h
     Source/PokemonRSE/Programs/TestPrograms/PokemonRSE_SoundListener.cpp
     Source/PokemonRSE/Programs/TestPrograms/PokemonRSE_SoundListener.h
     Source/PokemonRSE/PokemonRSE_Navigation.cpp

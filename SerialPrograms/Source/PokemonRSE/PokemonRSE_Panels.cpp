@@ -10,7 +10,7 @@
 
 #include "PokemonRSE_Settings.h"
 
-#include "Programs/ShinyHunting/PokemonRSE_StarterReset.h"
+#include "Programs/ShinyHunting/PokemonRSE_AudioStarterReset.h"
 #include "Programs/TestPrograms/PokemonRSE_SoundListener.h"
 
 namespace PokemonAutomation{
@@ -20,7 +20,7 @@ namespace PokemonRSE{
 
 
 PanelListFactory::PanelListFactory()
-    : PanelListDescriptor("Pokemon Ruby, Sapphire, and Emerald")
+    : PanelListDescriptor("Pokemon Ruby and Sapphire, Pokemon Emerald")
 {}
 
 std::vector<PanelEntry> PanelListFactory::make_panels() const{
@@ -35,8 +35,8 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     
 
     if (PreloadSettings::instance().DEVELOPER_MODE){
-        ret.emplace("---- WIP: Shiny Hunting (Audio only) ----");
-        ret.emplace_back(make_single_switch_program<StarterReset_Descriptor, StarterReset>());
+        ret.emplace_back("---- WIP: Shiny Hunting (Audio only) ----");
+        ret.emplace_back(make_single_switch_program<AudioStarterReset_Descriptor, AudioStarterReset>());
 
         ret.emplace_back("---- Developer Tools ----");
         ret.emplace_back(make_single_switch_program<SoundListener_Descriptor, SoundListener>());

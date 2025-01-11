@@ -4,14 +4,14 @@
  *
  */
 
+#include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "CommonFramework/ProgramStats/StatsTracking.h"
-#include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonTools/Async/InferenceRoutines.h"
+#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/Tools/VideoResolutionCheck.h"
+#include "CommonFramework/Tools/StatsTracking.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "Pokemon/Pokemon_Strings.h"
-#include "PokemonRSE/Inference/Dialogs/PokemonRSE_DialogDetector.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "PokemonRSE/Inference/Sounds/PokemonRSE_ShinySoundDetector.h"
 #include "PokemonRSE/PokemonRSE_Navigation.h"
 #include "PokemonRSE_AudioStarterReset.h"
@@ -23,12 +23,12 @@ namespace PokemonRSE{
 AudioStarterReset_Descriptor::AudioStarterReset_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonRSE:AudioStarterReset",
-        Pokemon::STRING_POKEMON + " RSE", "Starter Reset (Ruby/Sapphire)",
+        "Pokemon RSE", "[RS] Starter Reset - Audio only",
         "ComputerControl/blob/master/Wiki/Programs/PokemonRSE/AudioStarterReset.md",
-        "Soft reset for a shiny starter. Ruby and Sapphire only.",
-        FeedbackType::VIDEO_AUDIO,
+        "Soft reset for a shiny starter. Ruby and Sapphire only. WIP, audio recognition does not work well.",
+        FeedbackType::AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        PABotBaseLevel::PABOTBASE_12KB
     )
 {}
 
@@ -61,14 +61,26 @@ AudioStarterReset::AudioStarterReset()
         LockMode::LOCK_WHILE_RUNNING,
         Target::treecko
     )
+    , POOCH_WAIT(
+        "<b>Battle start wait:</b><br>Time for battle to start and for Poochyena to appear. Make sure to add extra time in case the Poochyena is shiny.",
+        LockMode::LOCK_WHILE_RUNNING,
+        TICKS_PER_SECOND,
+        "6 * TICKS_PER_SECOND"
+    )
+    , STARTER_WAIT(
+        "<b>Send out starter wait:</b><br>After pressing A to send out your selected starter, wait this long for the animation. Make sure to add extra time in case it is shiny.",
+        LockMode::LOCK_WHILE_RUNNING,
+        TICKS_PER_SECOND,
+        "6 * TICKS_PER_SECOND"
+    )
     , NOTIFICATION_SHINY_POOCH(
         "Shiny Poochyena",
-        false, false, ImageAttachmentMode::JPG,
+        false, false,
         {"Notifs"}
     )
     , NOTIFICATION_SHINY_STARTER(
         "Shiny Starter",
-        true, true, ImageAttachmentMode::JPG,
+        true, false,
         {"Notifs", "Showcase"}
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
@@ -83,14 +95,12 @@ AudioStarterReset::AudioStarterReset()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void AudioStarterReset::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void AudioStarterReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    //assert_16_9_720p_min(env.logger(), env.console);
     AudioStarterReset_Descriptor::Stats& stats = env.current_stats<AudioStarterReset_Descriptor::Stats>();
 
     /*
     * Settings: Text Speed fast.
-    * Full screen, no filter? The device I'm using to test has similar looking output, but I don't have switch online+.
-    * If on a retro handheld, make sure the screen matches that of NSO+.
-    * 
     * Setup: Stand in front of the Professor's bag and save the game.
     * 
     * Required to fight, so have to do the SR method instead of run away
@@ -101,9 +111,8 @@ void AudioStarterReset::program(SingleSwitchProgramEnvironment& env, SwitchContr
 
     bool shiny_starter = false;
     while (!shiny_starter) {
-        float shiny_coefficient = 1.0;
+
         ShinySoundDetector pooch_detector(env.console, [&](float error_coefficient) -> bool{
-            shiny_coefficient = error_coefficient;
             return true;
         });
 
@@ -122,95 +131,77 @@ void AudioStarterReset::program(SingleSwitchProgramEnvironment& env, SwitchContr
             break;
         default:
             OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
-                "AudioStarterReset: Invalid target.",
-                env.console
+                env.console, ErrorReport::SEND_ERROR_REPORT,
+                "AudioStarterReset: Invalid target."
             );
             break;
         }
         pbf_mash_button(context, BUTTON_A, 540);
-        context.wait_for_all_requests();
-
         env.log("Starter selected. Checking for shiny Poochyena.");
-        AdvanceBattleDialogWatcher pooch_appeared(COLOR_YELLOW);
 
-        int res = run_until<SwitchControllerContext>(
+
+        int ret = run_until(
             env.console, context,
-            [&](SwitchControllerContext& context) {
-                int ret = wait_until(
-                    env.console, context,
-                    std::chrono::seconds(20),
-                    {{pooch_appeared}}
-                );
-                if (ret == 0) {
-                    env.log("Advance arrow detected.");
-                }
-                pbf_wait(context, 125);
+            [&](BotBaseContext& context){
+                //Wait for battle to start and for Pooch battle cry
+                pbf_wait(context, POOCH_WAIT);
+
                 context.wait_for_all_requests();
+
             },
             {{pooch_detector}}
         );
         pooch_detector.throw_if_no_sound();
-        if (res == 0){
+        if (ret == 0){
             env.log("Shiny Poochyena detected!");
             stats.poochyena++;
-            env.update_stats();
-            send_program_notification(env, NOTIFICATION_SHINY_POOCH, COLOR_YELLOW, "Shiny Poochyena found", {}, "", env.console.video().snapshot(), true);
+            send_program_status_notification(env, NOTIFICATION_SHINY_POOCH, "Shiny Poochyena found.");
         }
         else {
             env.log("Poochyena is not shiny.");
         }
-        context.wait_for_all_requests();
 
-        float shiny_coefficient2 = 1.0;
         ShinySoundDetector starter_detector(env.console, [&](float error_coefficient) -> bool{
-            shiny_coefficient2 = error_coefficient;
             return true;
         });
 
-        BattleMenuWatcher battle_menu(COLOR_RED);
-        int res2 = run_until<SwitchControllerContext>(
-            env.console, context,
-            [&](SwitchControllerContext& context) {
-                env.log("Sending out selected starter.");
-                pbf_press_button(context, BUTTON_A, 40, 40);
+        //Press A to send out your selected starter
+        env.log("Sending out selected starter.");
+        pbf_press_button(context, BUTTON_A, 40, 40);
 
-                int ret = wait_until(
-                    env.console, context,
-                    std::chrono::seconds(20),
-                    {{battle_menu}}
-                );
-                if (ret == 0) {
-                    env.log("Battle menu detecteed!");
-                }
-                pbf_wait(context, 125);
+        int ret2 = run_until(
+            env.console, context,
+            [&](BotBaseContext& context){
+                env.log("Wait for starter to come out.");
+                pbf_wait(context, STARTER_WAIT);
                 context.wait_for_all_requests();
             },
             {{starter_detector}}
         );
         starter_detector.throw_if_no_sound();
-        context.wait_for_all_requests();
-        if (res2 == 0){
+        if (ret2 == 0){
             env.log("Shiny starter detected!");
             stats.shinystarter++;
-            env.update_stats();
-            send_program_notification(env, NOTIFICATION_SHINY_STARTER, COLOR_YELLOW, "Shiny starter found!", {}, "", env.console.video().snapshot(), true);
+
+            send_program_status_notification(env, NOTIFICATION_SHINY_STARTER, "Shiny starter found!");
+
             shiny_starter = true;
+            break;
         }
         else {
             env.log("Starter is not shiny.");
-            env.log("Soft resetting.");
-            send_program_status_notification(
-                env, NOTIFICATION_STATUS_UPDATE,
-                "Soft resetting."
-            );
-            stats.resets++;
-            env.update_stats();
-            soft_reset(env.program_info(), env.console, context);
         }
+
+        env.log("Soft resetting.");
+        send_program_status_notification(
+            env, NOTIFICATION_STATUS_UPDATE,
+            "Soft resetting."
+        );
+        soft_reset(env.program_info(), env.console, context);
+        stats.resets++;
     }
 
-    //if system set to nintendo switch, have go home when done option?
+    //TODO: if system set to nintendo switch, have go home when done option
 
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 }

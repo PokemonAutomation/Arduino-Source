@@ -69,6 +69,7 @@ enum class FeedbackType{
     NONE,
     OPTIONAL_,  //  Naming conflict with macro.
     REQUIRED,
+    AUDIO,
     VIDEO_AUDIO,
 };
 
