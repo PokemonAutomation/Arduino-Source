@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_ErrorReports_H
 #define PokemonAutomation_ErrorReports_H
 
+#include <memory>
 #include "Common/Cpp/AbstractLogger.h"
 #include "Common/Cpp/Options/GroupOption.h"
 #include "Common/Cpp/Options/StaticTextOption.h"
