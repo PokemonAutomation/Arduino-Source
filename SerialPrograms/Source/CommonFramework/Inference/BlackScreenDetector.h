@@ -66,7 +66,7 @@ public:
         double max_rgb_sum = 100,
         double max_stddev_sum = 10,
         FinderType finder_type = FinderType::PRESENT,
-        std::chrono::milliseconds duration = std::chrono::milliseconds(250)
+        std::chrono::milliseconds duration = std::chrono::milliseconds(100)
     )
         : DetectorToFinder("BlackScreenWatcher", finder_type, duration, color, box, max_rgb_sum, max_stddev_sum)
     {}
@@ -80,8 +80,8 @@ public:
         const ImageFloatBox& box = {0.1, 0.1, 0.8, 0.8},
         double max_rgb_sum = 100,
         double max_stddev_sum = 10,
-        std::chrono::milliseconds hold_duration = std::chrono::milliseconds(250),
-        std::chrono::milliseconds release_duration = std::chrono::milliseconds(250)
+        std::chrono::milliseconds hold_duration = std::chrono::milliseconds(100),
+        std::chrono::milliseconds release_duration = std::chrono::milliseconds(100)
     );
 
     bool black_is_over(const ImageViewRGB32& frame);
