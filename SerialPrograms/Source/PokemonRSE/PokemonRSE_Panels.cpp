@@ -27,7 +27,7 @@ PanelListFactory::PanelListFactory()
 std::vector<PanelEntry> PanelListFactory::make_panels() const{
     std::vector<PanelEntry> ret;
     
-    ret.emplace_back("---- Settings ----"); //TODO: Add device selection?
+    ret.emplace_back("---- Settings ----");
     ret.emplace_back(make_settings<GameSettings_Descriptor, GameSettingsPanel>());
 
     //ret.emplace_back("---- General ----");
