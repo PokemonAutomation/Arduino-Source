@@ -9,11 +9,12 @@
 
 #include <chrono>
 #include <atomic>
+//#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonTools/VisualDetector.h"
-#include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
+#include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
+#include "CommonFramework/Inference/VisualDetector.h"
 
 namespace PokemonAutomation{
     class CancellableScope;
@@ -22,7 +23,7 @@ namespace NintendoSwitch{
 namespace PokemonRSE{
 
 /*
-// TODO: Detect that a dialog box is on screen by looking for the white of the box
+// Detect that a dialog box is on screen by looking for the white of the box
 class DialogDetector : public StaticScreenDetector{
 public:
     DialogDetector(Color color);
@@ -40,7 +41,8 @@ public:
         : DetectorToFinder("DialogWatcher", std::chrono::milliseconds(250), color)
     {}
 };
-*/
+
+
 
 // Battle dialog boxes are teal
 class BattleDialogDetector : public StaticScreenDetector{
@@ -60,10 +62,10 @@ public:
         : DetectorToFinder("BattleDialogWatcher", std::chrono::milliseconds(250), color)
     {}
 };
+*/
 
 
-// Battle menu is up when it is white on the right and teal on the left
-// For emerald the text is more flush to the left, so we target the right of the battle menu box
+// Battle menu is up when it is white on the left and teal on the right
 class BattleMenuDetector : public StaticScreenDetector{
 public:
     BattleMenuDetector(Color color);
@@ -84,30 +86,10 @@ public:
 
 
 
-// Detect the red advancement arrow by filtering for red.
-// This works for now, I don't think there's colored text?
-// TODO: Change this to detect that the dialog arrow is in the dialog box by filtering for the red arrow
-class AdvanceBattleDialogDetector : public StaticScreenDetector{
-public:
-    AdvanceBattleDialogDetector(Color color);
+// advancedialogdetector Detect that the dialog arrow is in the dialog box by filtering for the red arrow
 
-    virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool detect(const ImageViewRGB32& screen) const override;
+// when given a choice popup, there is no advance arrow
 
-private:
-    ImageFloatBox m_dialog_box;
-    ImageFloatBox m_left_box;
-    ImageFloatBox m_right_box;
-};
-class AdvanceBattleDialogWatcher : public DetectorToFinder<AdvanceBattleDialogDetector>{
-public:
-    AdvanceBattleDialogWatcher(Color color)
-        : DetectorToFinder("AdvanceBattleDialogWatcher", std::chrono::milliseconds(250), color)
-    {}
-};
-
-// Future note: when given a choice popup, there is no advance arrow.
-// FRLG doesn't have an advance arrow, that's a future issue.
 
 
 }

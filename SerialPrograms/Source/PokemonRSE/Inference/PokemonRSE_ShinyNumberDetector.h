@@ -16,12 +16,11 @@ namespace PokemonRSE{
 
 // In the summary screen, the dex number will be yellow if a shiny, white if not.
 // Additionally, the background behind the sprite will be white if shiny, grey if not.
-// Number is easier to check as the background is scan lines.
+// Number is easier to check as background as scan lines.
 class ShinyNumberDetector{
 public:
-    ShinyNumberDetector(Color color);
+    ShinyNumberDetector();
 
-    virtual void make_overlays(VideoOverlaySet& items) const;
     bool read(Logger& logger, const ImageViewRGB32& frame);
 
 private:

@@ -11,6 +11,7 @@
 #include "PokemonRSE_Settings.h"
 
 #include "Programs/ShinyHunting/PokemonRSE_AudioStarterReset.h"
+#include "Programs/ShinyHunting/PokemonRSE_StarterReset.h"
 #include "Programs/TestPrograms/PokemonRSE_SoundListener.h"
 
 namespace PokemonAutomation{
@@ -31,7 +32,8 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
 
     //ret.emplace_back("---- General ----");
 
-    //ret.emplace_back("---- Shiny Hunting ----");
+    ret.emplace_back("---- Shiny Hunting ----");
+    ret.emplace_back(make_single_switch_program<StarterReset_Descriptor, StarterReset>());
     
 
     if (PreloadSettings::instance().DEVELOPER_MODE){
