@@ -128,6 +128,7 @@
 //#include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleMenuDetector.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_BattleMenu.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonSwapMenu.h"
+#include "PokemonBDSP/Inference/PokemonBDSP_SelectionArrow.h"
 
 
 #include <QPixmap>
@@ -279,6 +280,18 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     BotBaseContext context(scope, console.botbase());
     VideoOverlaySet overlays(overlay);
 
+
+    ImageRGB32 image("20250112-194339635973.png");
+
+    PokemonBDSP::SelectionArrowFinder detector0(console, {0.50, 0.58, 0.40, 0.10}, COLOR_RED);
+    PokemonBDSP::SelectionArrowFinder detector1(console, {0.50, 0.52, 0.40, 0.10}, COLOR_RED);
+
+    cout << detector0.detect(image) << endl;
+    cout << detector1.detect(image) << endl;
+
+
+
+
 #if 0
     PokemonSwSh::MaxLairInternal::PokemonSwapMenuReader reader(console, overlay, Language::English);
 
@@ -341,7 +354,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     );
 #endif
 
-#if 1
+#if 0
 //    VideoSnapshot image = feed.snapshot();
     ImageRGB32 image("20250108-151305644248.png");
 
