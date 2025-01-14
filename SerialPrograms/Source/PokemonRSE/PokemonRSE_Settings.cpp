@@ -33,7 +33,7 @@ GameSettings::GameSettings()
         "<b>1. Start Button Mash:</b><br>Mash Start for this long after a soft reset to get to the main menu.",
         LockMode::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
-        "4 * TICKS_PER_SECOND"
+        "5 * TICKS_PER_SECOND"
     )
     , ENTER_GAME_WAIT(
         "<b>2. Enter Game Wait:</b><br>Wait this long for the game to load.",

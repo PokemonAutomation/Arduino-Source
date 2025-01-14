@@ -19,7 +19,7 @@ namespace NintendoSwitch{
 namespace PokemonRSE{
 
 // Press A+B+Select+Start at the same time to soft reset, then re-enters the game.
-// This assumes no dry battery. Adding detection for that is a TODO.
+// This assumes no dry battery.
 void soft_reset(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
 
 

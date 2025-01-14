@@ -9,6 +9,7 @@
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Exceptions/UnexpectedBattleException.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
+#include "CommonFramework/Inference/BlackScreenDetector.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
@@ -30,7 +31,17 @@ void soft_reset(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext&
 	pbf_press_button(context, BUTTON_A, 20, 40);
 
 	//Wait for game to load in
-	pbf_wait(context, GameSettings::instance().ENTER_GAME_WAIT);
+	BlackScreenOverWatcher detector(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
+    int ret = wait_until(
+        console, context,
+        std::chrono::milliseconds(GameSettings::instance().ENTER_GAME_WAIT * (1000 / TICKS_PER_SECOND)),
+        {{detector}}
+    );
+    if (ret == 0){
+        console.log("Entered game!");
+    }else{
+        console.log("Timed out waiting to enter game.", COLOR_RED);
+    }
 	context.wait_for_all_requests();
 }
 

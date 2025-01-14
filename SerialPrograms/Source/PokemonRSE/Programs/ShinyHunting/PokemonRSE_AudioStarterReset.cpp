@@ -86,7 +86,7 @@ AudioStarterReset::AudioStarterReset()
 }
 
 void AudioStarterReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    //assert_16_9_720p_min(env.logger(), env.console);
+    assert_16_9_720p_min(env.logger(), env.console);
     AudioStarterReset_Descriptor::Stats& stats = env.current_stats<AudioStarterReset_Descriptor::Stats>();
 
     /*
@@ -95,7 +95,6 @@ void AudioStarterReset::program(SingleSwitchProgramEnvironment& env, BotBaseCont
     * If on a retro handheld, make sure the screen matches that of NSO+ and that there is an overlay to avoid the black border check.
     * 
     * Setup: Stand in front of the Professor's bag and save the game.
-    * 
     * 
     * Required to fight, so have to do the SR method instead of run away
     * Soft reset programs are only for Ruby/Sapphire, as Emerald has the 0 seed issue.
@@ -207,9 +206,9 @@ void AudioStarterReset::program(SingleSwitchProgramEnvironment& env, BotBaseCont
                 env, NOTIFICATION_STATUS_UPDATE,
                 "Soft resetting."
             );
-            soft_reset(env.program_info(), env.console, context);
             stats.resets++;
             env.update_stats();
+            soft_reset(env.program_info(), env.console, context);
         }
     }
 

@@ -387,6 +387,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Inference/AudioTemplateCache.h
     Source/CommonFramework/Inference/BlackBorderDetector.cpp
     Source/CommonFramework/Inference/BlackBorderDetector.h
+    Source/CommonFramework/Inference/BlackBorderGBADetector.cpp
+    Source/CommonFramework/Inference/BlackBorderGBADetector.h
     Source/CommonFramework/Inference/BlackScreenDetector.cpp
     Source/CommonFramework/Inference/BlackScreenDetector.h
     Source/CommonFramework/Inference/DetectionDebouncer.h
