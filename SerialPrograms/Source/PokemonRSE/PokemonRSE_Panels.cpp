@@ -38,7 +38,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
 
     if (PreloadSettings::instance().DEVELOPER_MODE){
         ret.emplace_back("---- Test ----");
-        ret.emplace_back(make_single_switch_program<StarterReset_Descriptor, StarterReset>());
+        ret.emplace_back(make_single_switch_program<StarterReset_Descriptor, StarterReset>()); //outdated early test program
 
         ret.emplace_back("---- Developer Tools ----");
         ret.emplace_back(make_single_switch_program<SoundListener_Descriptor, SoundListener>());

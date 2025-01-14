@@ -89,7 +89,7 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
     /*
     * Settings: Text Speed fast.
     * Full screen, no filter? The device I'm using to test has similar looking output, but I don't have switch online+.
-    * If on a retro handheld, make sure the screen matches that of NSO+ and that there is an overlay to avoid the black border check.
+    * If on a retro handheld, make sure the screen matches that of NSO+.
     * 
     * Setup: Stand in front of the Professor's bag and save the game.
     * 

@@ -25,7 +25,7 @@ namespace PokemonRSE{
 AudioStarterReset_Descriptor::AudioStarterReset_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonRSE:AudioStarterReset",
-        "Pokemon RSE", "[RS] Starter Reset",
+        "Pokemon RSE", "Starter Reset (Ruby/Sapphire)",
         "ComputerControl/blob/master/Wiki/Programs/PokemonRSE/AudioStarterReset.md",
         "Soft reset for a shiny starter. Ruby and Sapphire only.",
         FeedbackType::VIDEO_AUDIO_GBA,
@@ -92,7 +92,7 @@ void AudioStarterReset::program(SingleSwitchProgramEnvironment& env, BotBaseCont
     /*
     * Settings: Text Speed fast.
     * Full screen, no filter? The device I'm using to test has similar looking output, but I don't have switch online+.
-    * If on a retro handheld, make sure the screen matches that of NSO+ and that there is an overlay to avoid the black border check.
+    * If on a retro handheld, make sure the screen matches that of NSO+.
     * 
     * Setup: Stand in front of the Professor's bag and save the game.
     * 
@@ -157,7 +157,7 @@ void AudioStarterReset::program(SingleSwitchProgramEnvironment& env, BotBaseCont
             env.log("Shiny Poochyena detected!");
             stats.poochyena++;
             env.update_stats();
-            send_program_status_notification(env, NOTIFICATION_SHINY_POOCH, "Shiny Poochyena found.", env.console.video().snapshot(), false);
+            send_program_notification(env, NOTIFICATION_SHINY_POOCH, COLOR_YELLOW, "Shiny Poochyena found", {}, "", env.console.video().snapshot(), true);
         }
         else {
             env.log("Poochyena is not shiny.");
@@ -196,7 +196,7 @@ void AudioStarterReset::program(SingleSwitchProgramEnvironment& env, BotBaseCont
             env.log("Shiny starter detected!");
             stats.shinystarter++;
             env.update_stats();
-            send_program_status_notification(env, NOTIFICATION_SHINY_STARTER, "Shiny starter found!", env.console.video().snapshot(), true);
+            send_program_notification(env, NOTIFICATION_SHINY_STARTER, COLOR_YELLOW, "Shiny starter found!", {}, "", env.console.video().snapshot(), true);
             shiny_starter = true;
         }
         else {
