@@ -85,7 +85,7 @@ void trade_current_pokemon(
         int ret = run_until(
             console, context,
             [](BotBaseContext& context){
-                pbf_mash_button(context, BUTTON_ZL, 20 * TICKS_PER_SECOND);
+                pbf_mash_button(context, BUTTON_ZL, 120 * TICKS_PER_SECOND);
             },
             {{black_screen}}
         );
