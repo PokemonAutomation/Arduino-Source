@@ -59,7 +59,7 @@ bool BattleDialogDetector::detect(const ImageViewRGB32& screen) const{
 
 
 BattleMenuDetector::BattleMenuDetector(Color color)
-    : m_left_box(0.155, 0.727, 0.015, 0.168)
+    : m_left_box(0.439, 0.717, 0.021, 0.192)
     , m_right_box(0.821, 0.725, 0.030, 0.181)
 {}
 void BattleMenuDetector::make_overlays(VideoOverlaySet& items) const{

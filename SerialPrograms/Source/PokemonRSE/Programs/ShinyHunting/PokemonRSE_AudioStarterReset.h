@@ -36,9 +36,6 @@ private:
     };
     EnumDropdownOption<Target> TARGET;
 
-    TimeExpressionOption<uint16_t> POOCH_WAIT;
-    TimeExpressionOption<uint16_t> STARTER_WAIT;
-
     EventNotificationOption NOTIFICATION_SHINY_POOCH;
     EventNotificationOption NOTIFICATION_SHINY_STARTER;
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;

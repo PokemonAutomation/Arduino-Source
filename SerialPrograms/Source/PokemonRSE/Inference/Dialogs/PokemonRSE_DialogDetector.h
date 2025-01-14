@@ -64,6 +64,7 @@ public:
 
 
 // Battle menu is up when it is white on the right and teal on the left
+// For emerald the test is more flush to the left, so we target the right of the battle menu box
 class BattleMenuDetector : public StaticScreenDetector{
 public:
     BattleMenuDetector(Color color);

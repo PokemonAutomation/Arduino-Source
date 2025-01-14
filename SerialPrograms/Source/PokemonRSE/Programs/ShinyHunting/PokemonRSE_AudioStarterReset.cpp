@@ -10,6 +10,7 @@
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Tools/VideoResolutionCheck.h"
 #include "CommonFramework/Tools/StatsTracking.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "PokemonRSE/Inference/Dialogs/PokemonRSE_DialogDetector.h"
@@ -62,26 +63,14 @@ AudioStarterReset::AudioStarterReset()
         LockMode::LOCK_WHILE_RUNNING,
         Target::treecko
     )
-    , POOCH_WAIT(
-        "<b>Battle start wait:</b><br>Time for battle to start and for Poochyena to appear. Make sure to add extra time in case the Poochyena is shiny.",
-        LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "6 * TICKS_PER_SECOND"
-    )
-    , STARTER_WAIT(
-        "<b>Send out starter wait:</b><br>After pressing A to send out your selected starter, wait this long for the animation. Make sure to add extra time in case it is shiny.",
-        LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "6 * TICKS_PER_SECOND"
-    )
     , NOTIFICATION_SHINY_POOCH(
         "Shiny Poochyena",
-        false, false,
+        false, false, ImageAttachmentMode::JPG,
         {"Notifs"}
     )
     , NOTIFICATION_SHINY_STARTER(
         "Shiny Starter",
-        true, false,
+        true, true, ImageAttachmentMode::JPG,
         {"Notifs", "Showcase"}
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
@@ -116,8 +105,9 @@ void AudioStarterReset::program(SingleSwitchProgramEnvironment& env, BotBaseCont
 
     bool shiny_starter = false;
     while (!shiny_starter) {
-
+        float shiny_coefficient = 1.0;
         ShinySoundDetector pooch_detector(env.console, [&](float error_coefficient) -> bool{
+            shiny_coefficient = error_coefficient;
             return true;
         });
 
@@ -143,71 +133,84 @@ void AudioStarterReset::program(SingleSwitchProgramEnvironment& env, BotBaseCont
         }
         pbf_mash_button(context, BUTTON_A, 540);
         context.wait_for_all_requests();
-        env.log("Starter selected. Checking for shiny Poochyena.");
 
+        env.log("Starter selected. Checking for shiny Poochyena.");
         AdvanceDialogWatcher pooch_appeared(COLOR_YELLOW);
+
         int res = run_until(
             env.console, context,
             [&](BotBaseContext& context) {
                 int ret = wait_until(
                     env.console, context,
                     std::chrono::seconds(20),
-                    {{pooch_detector}}
+                    {{pooch_appeared}}
                 );
-                pooch_detector.throw_if_no_sound();
-                if (ret == 0){
-                    env.log("Shiny Poochyena detected!");
-                    stats.poochyena++;
-                    send_program_status_notification(env, NOTIFICATION_SHINY_POOCH, "Shiny Poochyena found.");
+                if (ret == 0) {
+                    env.log("Advance arrow detected.");
                 }
-                else {
-                    env.log("Poochyena is not shiny.");
-                }
+                pbf_wait(context, 125);
+                context.wait_for_all_requests();
             },
-            {{pooch_appeared}}
+            {{pooch_detector}}
         );
-        if (res == 0) {
-            env.log("Advance arrow detected. Pressing A.");
-        } //res != if pooch is shiny
+        pooch_detector.throw_if_no_sound();
+        if (res == 0){
+            env.log("Shiny Poochyena detected!");
+            stats.poochyena++;
+            env.update_stats();
+            send_program_status_notification(env, NOTIFICATION_SHINY_POOCH, "Shiny Poochyena found.", env.console.video().snapshot(), false);
+        }
+        else {
+            env.log("Poochyena is not shiny.");
+        }
+        context.wait_for_all_requests();
 
+        float shiny_coefficient2 = 1.0;
         ShinySoundDetector starter_detector(env.console, [&](float error_coefficient) -> bool{
+            shiny_coefficient2 = error_coefficient;
             return true;
         });
 
-        //Press A to send out your selected starter
-        env.log("Sending out selected starter.");
-        pbf_press_button(context, BUTTON_A, 40, 40);
-
-        int ret2 = run_until(
+        BattleMenuWatcher battle_menu(COLOR_RED);
+        int res2 = run_until(
             env.console, context,
-            [&](BotBaseContext& context){
-                env.log("Wait for starter to come out.");
-                pbf_wait(context, STARTER_WAIT);
+            [&](BotBaseContext& context) {
+                env.log("Sending out selected starter.");
+                pbf_press_button(context, BUTTON_A, 40, 40);
+
+                int ret = wait_until(
+                    env.console, context,
+                    std::chrono::seconds(20),
+                    {{battle_menu}}
+                );
+                if (ret == 0) {
+                    env.log("Battle menu detecteed!");
+                }
+                pbf_wait(context, 125);
                 context.wait_for_all_requests();
             },
             {{starter_detector}}
         );
         starter_detector.throw_if_no_sound();
-        if (ret2 == 0){
+        context.wait_for_all_requests();
+        if (res2 == 0){
             env.log("Shiny starter detected!");
             stats.shinystarter++;
-
-            send_program_status_notification(env, NOTIFICATION_SHINY_STARTER, "Shiny starter found!");
-
+            env.update_stats();
+            send_program_status_notification(env, NOTIFICATION_SHINY_STARTER, "Shiny starter found!", env.console.video().snapshot(), true);
             shiny_starter = true;
-            break;
         }
         else {
             env.log("Starter is not shiny.");
+            env.log("Soft resetting.");
+            send_program_status_notification(
+                env, NOTIFICATION_STATUS_UPDATE,
+                "Soft resetting."
+            );
+            soft_reset(env.program_info(), env.console, context);
+            stats.resets++;
+            env.update_stats();
         }
-
-        env.log("Soft resetting.");
-        send_program_status_notification(
-            env, NOTIFICATION_STATUS_UPDATE,
-            "Soft resetting."
-        );
-        soft_reset(env.program_info(), env.console, context);
-        stats.resets++;
     }
 
     //if system set to nintendo switch, have go home when done option?
