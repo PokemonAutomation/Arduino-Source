@@ -19,8 +19,9 @@ namespace PokemonRSE{
 // Number is easier to check as background as scan lines.
 class ShinyNumberDetector{
 public:
-    ShinyNumberDetector();
+    ShinyNumberDetector(Color color);
 
+    virtual void make_overlays(VideoOverlaySet& items) const;
     bool read(Logger& logger, const ImageViewRGB32& frame);
 
 private:

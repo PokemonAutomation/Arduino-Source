@@ -12,6 +12,7 @@
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
+#include "PokemonRSE/Inference/Dialogs/PokemonRSE_DialogDetector.h"
 #include "PokemonRSE/Inference/Sounds/PokemonRSE_ShinySoundDetector.h"
 #include "PokemonRSE/PokemonRSE_Navigation.h"
 #include "PokemonRSE_AudioStarterReset.h"
@@ -23,10 +24,10 @@ namespace PokemonRSE{
 AudioStarterReset_Descriptor::AudioStarterReset_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonRSE:AudioStarterReset",
-        "Pokemon RSE", "[RS] Starter Reset - Audio only",
+        "Pokemon RSE", "[RS] Starter Reset",
         "ComputerControl/blob/master/Wiki/Programs/PokemonRSE/AudioStarterReset.md",
-        "Soft reset for a shiny starter. Ruby and Sapphire only. WIP, audio recognition does not work well.",
-        FeedbackType::AUDIO,
+        "Soft reset for a shiny starter. Ruby and Sapphire only.",
+        FeedbackType::VIDEO_AUDIO_GBA,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB
     )
@@ -101,7 +102,11 @@ void AudioStarterReset::program(SingleSwitchProgramEnvironment& env, BotBaseCont
 
     /*
     * Settings: Text Speed fast.
+    * Full screen, no filter? The device I'm using to test has similar looking output, but I don't have switch online+.
+    * If on a retro handheld, make sure the screen matches that of NSO+ and that there is an overlay to avoid the black border check.
+    * 
     * Setup: Stand in front of the Professor's bag and save the game.
+    * 
     * 
     * Required to fight, so have to do the SR method instead of run away
     * Soft reset programs are only for Ruby/Sapphire, as Emerald has the 0 seed issue.
@@ -137,29 +142,33 @@ void AudioStarterReset::program(SingleSwitchProgramEnvironment& env, BotBaseCont
             break;
         }
         pbf_mash_button(context, BUTTON_A, 540);
+        context.wait_for_all_requests();
         env.log("Starter selected. Checking for shiny Poochyena.");
 
-
-        int ret = run_until(
+        AdvanceDialogWatcher pooch_appeared(COLOR_YELLOW);
+        int res = run_until(
             env.console, context,
-            [&](BotBaseContext& context){
-                //Wait for battle to start and for Pooch battle cry
-                pbf_wait(context, POOCH_WAIT);
-
-                context.wait_for_all_requests();
-
+            [&](BotBaseContext& context) {
+                int ret = wait_until(
+                    env.console, context,
+                    std::chrono::seconds(20),
+                    {{pooch_detector}}
+                );
+                pooch_detector.throw_if_no_sound();
+                if (ret == 0){
+                    env.log("Shiny Poochyena detected!");
+                    stats.poochyena++;
+                    send_program_status_notification(env, NOTIFICATION_SHINY_POOCH, "Shiny Poochyena found.");
+                }
+                else {
+                    env.log("Poochyena is not shiny.");
+                }
             },
-            {{pooch_detector}}
+            {{pooch_appeared}}
         );
-        pooch_detector.throw_if_no_sound();
-        if (ret == 0){
-            env.log("Shiny Poochyena detected!");
-            stats.poochyena++;
-            send_program_status_notification(env, NOTIFICATION_SHINY_POOCH, "Shiny Poochyena found.");
-        }
-        else {
-            env.log("Poochyena is not shiny.");
-        }
+        if (res == 0) {
+            env.log("Advance arrow detected. Pressing A.");
+        } //res != if pooch is shiny
 
         ShinySoundDetector starter_detector(env.console, [&](float error_coefficient) -> bool{
             return true;
@@ -201,7 +210,7 @@ void AudioStarterReset::program(SingleSwitchProgramEnvironment& env, BotBaseCont
         stats.resets++;
     }
 
-    //TODO: if system set to nintendo switch, have go home when done option
+    //if system set to nintendo switch, have go home when done option?
 
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 }

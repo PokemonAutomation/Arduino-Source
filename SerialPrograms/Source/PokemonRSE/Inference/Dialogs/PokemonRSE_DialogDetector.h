@@ -41,8 +41,7 @@ public:
         : DetectorToFinder("DialogWatcher", std::chrono::milliseconds(250), color)
     {}
 };
-
-
+*/
 
 // Battle dialog boxes are teal
 class BattleDialogDetector : public StaticScreenDetector{
@@ -62,10 +61,9 @@ public:
         : DetectorToFinder("BattleDialogWatcher", std::chrono::milliseconds(250), color)
     {}
 };
-*/
 
 
-// Battle menu is up when it is white on the left and teal on the right
+// Battle menu is up when it is white on the right and teal on the left
 class BattleMenuDetector : public StaticScreenDetector{
 public:
     BattleMenuDetector(Color color);
@@ -86,10 +84,27 @@ public:
 
 
 
-// advancedialogdetector Detect that the dialog arrow is in the dialog box by filtering for the red arrow
+// Detect the red advancement arrow by filtering for red.
+// This works for now, I don't think there's colored text?
+// TODO: Change this to detect that the dialog arrow is in the dialog box by filtering for the red arrow
+class AdvanceDialogDetector : public StaticScreenDetector{
+public:
+    AdvanceDialogDetector(Color color);
+
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+    virtual bool detect(const ImageViewRGB32& screen) const override;
+
+private:
+    ImageFloatBox m_dialog_box;
+};
+class AdvanceDialogWatcher : public DetectorToFinder<AdvanceDialogDetector>{
+public:
+    AdvanceDialogWatcher(Color color)
+        : DetectorToFinder("AdvanceDialogWatcher", std::chrono::milliseconds(250), color)
+    {}
+};
 
 // when given a choice popup, there is no advance arrow
-
 
 
 }

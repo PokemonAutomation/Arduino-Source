@@ -25,10 +25,10 @@ namespace PokemonRSE{
 StarterReset_Descriptor::StarterReset_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonRSE:StarterReset",
-        "Pokemon RSE", "[RS] Starter Reset",
+        "Pokemon RSE", "[RS] Starter Reset - Video only",
         "ComputerControl/blob/master/Wiki/Programs/PokemonRSE/StarterReset.md",
         "Soft reset for a shiny starter. Ruby and Sapphire only.",
-        FeedbackType::REQUIRED,
+        FeedbackType::VIDEO_AUDIO_GBA,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         PABotBaseLevel::PABOTBASE_12KB
     )
@@ -88,6 +88,9 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
 
     /*
     * Settings: Text Speed fast.
+    * Full screen, no filter? The device I'm using to test has similar looking output, but I don't have switch online+.
+    * If on a retro handheld, make sure the screen matches that of NSO+ and that there is an overlay to avoid the black border check.
+    * 
     * Setup: Stand in front of the Professor's bag and save the game.
     * 
     * Required to fight, so have to do the SR method instead of run away
@@ -147,13 +150,14 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         pbf_press_dpad(context, DPAD_DOWN, 40, 80);
         pbf_press_button(context, BUTTON_A, 40, 80);
 
+        //Check second party member - used for testing with hacked in shiny starter
         //pbf_press_dpad(context, DPAD_DOWN, 40, 80);
 
         pbf_wait(context, 125);
         context.wait_for_all_requests();
 
         VideoSnapshot screen = env.console.video().snapshot();
-        ShinyNumberDetector shiny_checker;
+        ShinyNumberDetector shiny_checker(COLOR_YELLOW);
         shiny_starter = shiny_checker.read(env.console.logger(), screen);
 
         if (shiny_starter) {
@@ -173,7 +177,7 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         }
     }
 
-    //TODO: if system set to nintendo switch, have go home when done option
+    //if system set to nintendo switch, have go home when done option?
 
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 }

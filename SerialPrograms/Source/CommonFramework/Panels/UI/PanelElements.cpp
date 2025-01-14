@@ -80,13 +80,8 @@ CollapsibleGroupBox* make_panel_header(
             header
         );
         break;
-    case FeedbackType::AUDIO:
-        text = new QLabel(
-            "<font color=\"green\">(This program requires audio feedback. Please make sure you choose the correct audio device.)</font>",
-            header
-        );
-        break;
     case FeedbackType::VIDEO_AUDIO:
+    case FeedbackType::VIDEO_AUDIO_GBA:
         text = new QLabel(
             "<font color=\"green\">(This program requires video and audio feedback. Please make sure you choose the correct capture device, as well as the correct audio device.)</font>",
             header

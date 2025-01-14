@@ -13,18 +13,20 @@
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "PokemonRSE_ShinyNumberDetector.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonRSE{
 
-ShinyNumberDetector::ShinyNumberDetector()
+ShinyNumberDetector::ShinyNumberDetector(Color color)
     : m_box_number(0.136, 0.156, 0.123, 0.072)
 {}
-
+void ShinyNumberDetector::make_overlays(VideoOverlaySet& items) const{
+    items.add(COLOR_RED, m_box_number);
+}
 bool ShinyNumberDetector::read(Logger& logger, const ImageViewRGB32& frame){
     const bool replace_color_within_range = true;
 
