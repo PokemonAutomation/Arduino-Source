@@ -269,8 +269,8 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     using namespace Pokemon;
 //    using namespace PokemonSwSh;
 //    using namespace PokemonBDSP;
-    using namespace PokemonLA;
-//    using namespace PokemonSV;
+//    using namespace PokemonLA;
+    using namespace PokemonSV;
 
     [[maybe_unused]] Logger& logger = env.logger();
     [[maybe_unused]] ConsoleHandle& console = env.consoles[0];
@@ -281,6 +281,16 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
+//    ImageRGB32 image("screenshot-20250113-214042699528.png");
+    ImageRGB32 image("raidecho1.jpg");
+//    auto image = feed.snapshot();
+
+    TeraCardReader reader;
+    cout << (int)reader.stars(logger, env.program_info(), image) << endl;
+
+
+
+#if 0
     ImageRGB32 image("20250112-194339635973.png");
 
     PokemonBDSP::SelectionArrowFinder detector0(console, {0.50, 0.58, 0.40, 0.10}, COLOR_RED);
@@ -288,7 +298,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
     cout << detector0.detect(image) << endl;
     cout << detector1.detect(image) << endl;
-
+#endif
 
 
 
