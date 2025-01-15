@@ -226,18 +226,8 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
                 true, true, {{{"starly"}, ShinyType::UNKNOWN_SHINY}}, result_wild.alpha,
                 result_wild.get_best_screenshot()
             );
-        }else{
-#if 0
-            send_encounter_notification(
-                env.console,
-                NOTIFICATION_NONSHINY,
-                NOTIFICATION_SHINY,
-                env.program_info(),
-                true, false, {{{"starly"}, ShinyType::NOT_SHINY}}, result_wild.alpha,
-                result_wild.get_best_screenshot(),
-                &stats
-            );
-#endif
+            pbf_wait(context, 5 * TICKS_PER_SECOND);
+            pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
         }
 
         bool your_shiny = is_likely_shiny(result_own.shiny_type);
@@ -250,6 +240,8 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
                 true, true, {{{starter}, ShinyType::UNKNOWN_SHINY}}, result_own.alpha,
                 result_own.get_best_screenshot()
             );
+            pbf_wait(context, 5 * TICKS_PER_SECOND);
+            pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
             break;
         }else{
             stats.add_non_shiny();
@@ -261,12 +253,6 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
                 result_own.get_best_screenshot()
             );
         }
-
-        if ((wild_shiny || your_shiny) && VIDEO_ON_SHINY){
-            pbf_wait(context, 5 * TICKS_PER_SECOND);
-            pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
-        }
-
     }
 
     env.update_stats();

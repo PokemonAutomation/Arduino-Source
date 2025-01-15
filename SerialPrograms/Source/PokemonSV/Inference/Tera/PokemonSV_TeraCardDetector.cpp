@@ -133,7 +133,7 @@ uint8_t TeraCardReader::stars(
     ImageStats background_stats = image_stats(background);
     Color background_average = background_stats.average.round();
 
-    //  Iterate through several difference distance filters and find how many
+    //  Iterate through multiple distance filters and find how many
     //  possible stars are in each one. Then do a majority vote.
     const std::vector<double> DISTANCES{70, 80, 90, 100, 110, 120, 130};
 
