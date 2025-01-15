@@ -17,7 +17,6 @@ class ImageRGB32;
 class EventNotificationOption;
 struct ProgramInfo;
 class ProgramEnvironment;
-class ConsoleHandle;
 
 
 

@@ -8,7 +8,7 @@
 #include "CommonFramework/ErrorReports/ErrorReports.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
+#include "CommonFramework/VideoPipeline/VideoStream.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "ScreenshotException.h"
 

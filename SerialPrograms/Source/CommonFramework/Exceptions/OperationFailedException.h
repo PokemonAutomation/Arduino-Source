@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_OperationFailedException_H
 #define PokemonAutomation_OperationFailedException_H
 
-#include "CommonFramework/Tools/ConsoleHandle.h"
+#include "CommonFramework/VideoPipeline/VideoStream.h"
 #include "ScreenshotException.h"
 
 namespace PokemonAutomation{

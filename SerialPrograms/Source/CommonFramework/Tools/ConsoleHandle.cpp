@@ -36,7 +36,7 @@ ConsoleHandle::ConsoleHandle(
     AudioFeed& audio,
     const StreamHistorySession& history
 )
-    : VideoStream(logger, audio, video, history)
+    : VideoStream({logger, audio, video, history, overlay})
     , m_index(index)
 //    , m_logger(logger)
     , m_botbase(botbase)

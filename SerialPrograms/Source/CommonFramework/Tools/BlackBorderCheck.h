@@ -12,10 +12,11 @@
 
 namespace PokemonAutomation{
 
+class VideoStream;
 class ConsoleHandle;
 
 
-void start_program_video_check(ConsoleHandle& console, FeedbackType feedback);
+void start_program_video_check(VideoStream& stream, FeedbackType feedback);
 void start_program_video_check(FixedLimitVector<ConsoleHandle>& consoles, FeedbackType feedback);
 
 

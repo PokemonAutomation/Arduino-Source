@@ -16,7 +16,6 @@
 #include "CommonFramework/ErrorReports/ErrorReports.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 //#include "CommonFramework/VideoPipeline/VideoOverlay.h"
-#include "ConsoleHandle.h"
 #include "ErrorDumper.h"
 //#include "ProgramEnvironment.h"
 namespace PokemonAutomation{
@@ -68,7 +67,7 @@ void dump_image(
 
 void dump_image_and_throw_recoverable_exception(
     const ProgramInfo& program_info,
-    ConsoleHandle& console,
+    VideoStream& stream,
     const std::string& error_name,
     const std::string& error_message,
     const ImageViewRGB32& screenshot
@@ -76,7 +75,7 @@ void dump_image_and_throw_recoverable_exception(
     OperationFailedException::fire(
         ErrorReport::SEND_ERROR_REPORT,
         error_message,
-        console
+        stream
     );
 }
 

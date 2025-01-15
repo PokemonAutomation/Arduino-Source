@@ -13,13 +13,16 @@ class Logger;
 class AudioFeed;
 class VideoFeed;
 class StreamHistorySession;
+class VideoOverlay;
 
 
-struct VideoStream{
+class VideoStream{
+public:
     Logger& logger;
     AudioFeed& audio;
     VideoFeed& video;
     const StreamHistorySession& video_history;
+    VideoOverlay& overlay;
 };
 
 

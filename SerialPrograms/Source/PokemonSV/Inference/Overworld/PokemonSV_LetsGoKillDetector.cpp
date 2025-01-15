@@ -192,11 +192,12 @@ bool LetsGoKillWatcher::process_frame(const ImageViewRGB32& frame, WallClock tim
 
 
 
-LetsGoKillSoundDetector::LetsGoKillSoundDetector(ConsoleHandle& console, DetectedCallback detected_callback)
+LetsGoKillSoundDetector::LetsGoKillSoundDetector(Logger& logger, DetectedCallback detected_callback)
     : AudioPerSpectrumDetectorBase(
+        logger,
         "LetsGoKillSoundDetector",
         "Let's Go Kill Sound",
-        COLOR_RED, console,
+        COLOR_RED,
         [this, callback = std::move(detected_callback)](float error_coefficient){
             m_last_detected = current_time();
             return callback != nullptr ? callback(error_coefficient) : false;

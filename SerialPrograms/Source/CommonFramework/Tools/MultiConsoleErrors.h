@@ -13,12 +13,12 @@
 namespace PokemonAutomation{
 
 class Logger;
-class ConsoleHandle;
+class VideoStream;
 
 
 class MultiConsoleErrorState{
 public:
-    void report_unrecoverable_error(ConsoleHandle& console, std::string msg);
+    void report_unrecoverable_error(VideoStream& stream, std::string msg);
     void check_unrecoverable_error(Logger& logger);
 
 private:

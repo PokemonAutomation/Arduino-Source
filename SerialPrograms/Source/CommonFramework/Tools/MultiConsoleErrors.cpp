@@ -5,20 +5,19 @@
  */
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
 #include "MultiConsoleErrors.h"
 
 namespace PokemonAutomation{
 
 
 
-void MultiConsoleErrorState::report_unrecoverable_error(ConsoleHandle& console, std::string msg){
-    console.log(msg, COLOR_RED);
+void MultiConsoleErrorState::report_unrecoverable_error(VideoStream& stream, std::string msg){
+    stream.logger.log(msg, COLOR_RED);
     bool expected = false;
     if (m_unrecoverable_error.compare_exchange_strong(expected, true)){
         m_message = msg;
     }
-    OperationFailedException::fire(ErrorReport::NO_ERROR_REPORT, std::move(msg), console);
+    OperationFailedException::fire(ErrorReport::NO_ERROR_REPORT, std::move(msg), stream);
 }
 void MultiConsoleErrorState::check_unrecoverable_error(Logger& logger){
     if (m_unrecoverable_error.load(std::memory_order_acquire)){

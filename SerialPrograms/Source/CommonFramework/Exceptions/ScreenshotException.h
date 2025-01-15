@@ -15,7 +15,7 @@ namespace PokemonAutomation{
 class ImageViewRGB32;
 class ImageRGB32;
 class EventNotificationOption;
-struct VideoStream;
+class VideoStream;
 struct ProgramInfo;
 class ProgramEnvironment;
 

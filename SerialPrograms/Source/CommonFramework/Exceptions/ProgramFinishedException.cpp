@@ -6,8 +6,6 @@
 
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/Tools/ProgramEnvironment.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
 #include "ProgramFinishedException.h"
 
 namespace PokemonAutomation{

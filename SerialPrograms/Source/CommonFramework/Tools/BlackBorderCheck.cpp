@@ -5,7 +5,7 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/ImageTypes/ImageRGB32.h"
+//#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
@@ -15,26 +15,26 @@
 namespace PokemonAutomation{
 
 
-void start_program_video_check(ConsoleHandle& console, FeedbackType feedback){
+void start_program_video_check(VideoStream& stream, FeedbackType feedback){
     if (feedback == FeedbackType::NONE){
         return;
     }
 
-    VideoSnapshot screen = console.video().snapshot();
+    VideoSnapshot screen = stream.video.snapshot();
 
     if (!screen){
         if (feedback == FeedbackType::REQUIRED || feedback == FeedbackType::VIDEO_AUDIO){
-            throw UserSetupError(console, "This program requires video feedback. Please make sure the video is working.");
+            throw UserSetupError(stream.logger, "This program requires video feedback. Please make sure the video is working.");
         }
         return;
     }
 
     BlackBorderDetector detector;
-    VideoOverlaySet set(console);
+    VideoOverlaySet set(stream.overlay);
     detector.make_overlays(set);
 
     if (detector.detect(screen)){
-        throw UserSetupError(console, "Black border detected! Please set your screen size to 100% in the TV Settings on your Nintendo Switch.");
+        throw UserSetupError(stream.logger, "Black border detected! Please set your screen size to 100% in the TV Settings on your Nintendo Switch.");
     }
 }
 void start_program_video_check(FixedLimitVector<ConsoleHandle>& consoles, FeedbackType feedback){

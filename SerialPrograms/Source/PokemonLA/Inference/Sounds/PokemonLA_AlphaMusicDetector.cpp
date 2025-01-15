@@ -18,7 +18,13 @@ namespace PokemonLA{
 
 AlphaMusicDetector::AlphaMusicDetector(ConsoleHandle& console, DetectedCallback detected_callback)
     // Use a red as the detection color because the alpha symbol is red.
-    : AudioPerSpectrumDetectorBase("AlphaMusicDetector", "Alpha music", COLOR_RED, console, detected_callback)
+    : AudioPerSpectrumDetectorBase(
+        console,
+        "AlphaMusicDetector",
+        "Alpha music",
+        COLOR_RED,
+        detected_callback
+    )
 {}
 
 float AlphaMusicDetector::get_score_threshold() const{

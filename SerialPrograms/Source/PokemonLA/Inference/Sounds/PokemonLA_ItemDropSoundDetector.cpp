@@ -17,7 +17,13 @@ namespace PokemonLA{
 
 ItemDropSoundDetector::ItemDropSoundDetector(ConsoleHandle& console, DetectedCallback detected_callback)
     // Use a green as the detection color because the shiny symbol in LA is green.
-    : AudioPerSpectrumDetectorBase("ItemDropSoundDetector", "Item drop sound", COLOR_DARKGREEN, console, detected_callback)
+    : AudioPerSpectrumDetectorBase(
+        console,
+        "ItemDropSoundDetector",
+        "Item drop sound",
+        COLOR_DARKGREEN,
+        detected_callback
+    )
 {}
 
 
