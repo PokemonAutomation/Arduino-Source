@@ -267,10 +267,10 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     using namespace OCR;
     using namespace NintendoSwitch;
     using namespace Pokemon;
-//    using namespace PokemonSwSh;
+    using namespace PokemonSwSh;
 //    using namespace PokemonBDSP;
 //    using namespace PokemonLA;
-    using namespace PokemonSV;
+//    using namespace PokemonSV;
 
     [[maybe_unused]] Logger& logger = env.logger();
     [[maybe_unused]] ConsoleHandle& console = env.consoles[0];
@@ -281,12 +281,15 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
-//    ImageRGB32 image("screenshot-20250113-214042699528.png");
-    ImageRGB32 image("raidecho1.jpg");
+    ImageRGB32 image("20250115-110356822901.png");
+//    ImageRGB32 image("raidecho1.jpg");
 //    auto image = feed.snapshot();
 
-    TeraCardReader reader;
-    cout << (int)reader.stars(logger, env.program_info(), image) << endl;
+    MaxLairInternal::BattleMenuReader reader(overlay, Language::English);
+    reader.read_opponent_in_summary(logger, image);
+
+//    TeraCardReader reader;
+//    cout << (int)reader.stars(logger, env.program_info(), image) << endl;
 
 
 

@@ -12,17 +12,9 @@
 
 namespace PokemonAutomation{
 
-class CancellableScope;
-class AsyncDispatcher;
 class ThreadHandle;
 class BotBase;
-class VideoFeed;
-class VideoOverlay;
-class AudioFeed;
-class StreamHistorySession;
 class ThreadUtilizationStat;
-class VisualInferencePivot;
-class AudioInferencePivot;
 
 
 class ConsoleHandle : public VideoStream{

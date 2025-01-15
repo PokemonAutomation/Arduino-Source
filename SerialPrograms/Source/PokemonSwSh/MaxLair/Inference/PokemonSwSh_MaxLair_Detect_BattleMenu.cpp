@@ -282,9 +282,14 @@ std::set<std::string> BattleMenuReader::read_opponent_in_summary(Logger& logger,
         }
     }
 
+//    cout << get_type_slug(type0) << endl;
+//    cout << get_type_slug(type1) << endl;
+
     for (auto iter = slugs.begin(); iter != slugs.end();){
         const MaxLairMon& mon = get_maxlair_mon(*iter);
 //        cout << mon.species << endl;
+//        cout << get_type_slug(mon.type[0]) << endl;
+//        cout << get_type_slug(mon.type[1]) << endl;
         if ((type0 == mon.type[0] && type1 == mon.type[1]) || (type0 == mon.type[1] && type1 == mon.type[0])){
             ++iter;
         }else{
@@ -308,6 +313,7 @@ std::set<std::string> BattleMenuReader::read_opponent_in_summary(Logger& logger,
         "basculin-red-striped",
         "lycanroc-midday",
         "lycanroc-midnight",
+        "stunfisk-galar",   //  After using terrain pulse.
     };
     bool error = true;
     for (const std::string& slug : slugs){
