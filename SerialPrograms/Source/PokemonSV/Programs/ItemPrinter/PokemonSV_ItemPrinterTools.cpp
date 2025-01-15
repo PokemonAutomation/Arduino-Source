@@ -7,6 +7,7 @@
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/Tools/ConsoleHandle.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"

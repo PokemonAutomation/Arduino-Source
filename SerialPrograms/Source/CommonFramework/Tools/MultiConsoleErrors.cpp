@@ -12,7 +12,7 @@ namespace PokemonAutomation{
 
 
 void MultiConsoleErrorState::report_unrecoverable_error(VideoStream& stream, std::string msg){
-    stream.logger.log(msg, COLOR_RED);
+    stream.log(msg, COLOR_RED);
     bool expected = false;
     if (m_unrecoverable_error.compare_exchange_strong(expected, true)){
         m_message = msg;

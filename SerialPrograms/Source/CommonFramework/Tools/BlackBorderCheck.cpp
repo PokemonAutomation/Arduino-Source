@@ -8,8 +8,8 @@
 //#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
 #include "CommonFramework/Inference/BlackBorderDetector.h"
+#include "CommonFramework/Tools/VideoStream.h"
 #include "BlackBorderCheck.h"
 
 namespace PokemonAutomation{
@@ -20,26 +20,21 @@ void start_program_video_check(VideoStream& stream, FeedbackType feedback){
         return;
     }
 
-    VideoSnapshot screen = stream.video.snapshot();
+    VideoSnapshot screen = stream.video().snapshot();
 
     if (!screen){
         if (feedback == FeedbackType::REQUIRED || feedback == FeedbackType::VIDEO_AUDIO){
-            throw UserSetupError(stream.logger, "This program requires video feedback. Please make sure the video is working.");
+            throw UserSetupError(stream.logger(), "This program requires video feedback. Please make sure the video is working.");
         }
         return;
     }
 
     BlackBorderDetector detector;
-    VideoOverlaySet set(stream.overlay);
+    VideoOverlaySet set(stream.overlay());
     detector.make_overlays(set);
 
     if (detector.detect(screen)){
-        throw UserSetupError(stream.logger, "Black border detected! Please set your screen size to 100% in the TV Settings on your Nintendo Switch.");
-    }
-}
-void start_program_video_check(FixedLimitVector<ConsoleHandle>& consoles, FeedbackType feedback){
-    for (ConsoleHandle& console : consoles){
-        start_program_video_check(console, feedback);
+        throw UserSetupError(stream.logger(), "Black border detected! Please set your screen size to 100% in the TV Settings on your Nintendo Switch.");
     }
 }
 

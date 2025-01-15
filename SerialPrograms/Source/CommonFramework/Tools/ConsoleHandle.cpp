@@ -20,46 +20,28 @@ namespace PokemonAutomation{
 
 ConsoleHandle::ConsoleHandle(ConsoleHandle&& x) = default;
 ConsoleHandle::~ConsoleHandle(){
-    m_overlay.remove_stat(*m_audio_pivot);
-    m_overlay.remove_stat(*m_video_pivot);
-    m_overlay.remove_stat(*m_thread_utilization);
+    overlay().remove_stat(*m_thread_utilization);
 }
 
 
 ConsoleHandle::ConsoleHandle(
     size_t index,
     Logger& logger,
-//    ThreadHandle& handle,
     BotBase* botbase,
     VideoFeed& video,
     VideoOverlay& overlay,
     AudioFeed& audio,
     const StreamHistorySession& history
 )
-    : VideoStream({logger, audio, video, history, overlay})
+    : VideoStream(logger, audio, video, history, overlay)
     , m_index(index)
-//    , m_logger(logger)
     , m_botbase(botbase)
-//    , m_stream(logger, audio, video, history)
-//    , m_video(video)
-    , m_overlay(overlay)
-//    , m_audio(audio)
-//    , m_history(history)
     , m_thread_utilization(new ThreadUtilizationStat(current_thread_handle(), "Program Thread:"))
 {
-    m_overlay.add_stat(*m_thread_utilization);
+    overlay.add_stat(*m_thread_utilization);
 }
 
-bool ConsoleHandle::save_stream_history(const std::string& filename){
-    return video_history.save(filename);
-}
 
-void ConsoleHandle::initialize_inference_threads(CancellableScope& scope, AsyncDispatcher& dispatcher){
-    m_video_pivot = std::make_unique<VisualInferencePivot>(scope, VideoStream::video, dispatcher);
-    m_audio_pivot = std::make_unique<AudioInferencePivot>(scope, VideoStream::audio, dispatcher);
-    m_overlay.add_stat(*m_video_pivot);
-    m_overlay.add_stat(*m_audio_pivot);
-}
 
 
 

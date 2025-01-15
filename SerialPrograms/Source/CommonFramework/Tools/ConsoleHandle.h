@@ -8,8 +8,7 @@
 #define PokemonAutomation_ConsoleHandle_H
 
 #include <memory>
-#include "Common/Cpp/AbstractLogger.h"
-#include "CommonFramework/VideoPipeline/VideoStream.h"
+#include "VideoStream.h"
 
 namespace PokemonAutomation{
 
@@ -38,7 +37,6 @@ public:
     ConsoleHandle(
         size_t index,
         Logger& logger,
-//        ThreadHandle& handle,
         BotBase* botbase,
         VideoFeed& video,
         VideoOverlay& overlay,
@@ -46,52 +44,23 @@ public:
         const StreamHistorySession& history
     );
 
-    // log(string-like msg, Color color = Color())
-    // string-like can be const char* or std::string
-    template <class... Args>
-    void log(Args&&... args){
-        VideoStream::logger.log(std::forward<Args>(args)...);
-    }
-
     size_t index() const{ return m_index; }
 
-    Logger& logger(){ return VideoStream::logger; }
     BotBase& botbase(){ return *m_botbase; }
-    VideoFeed& video(){ return VideoStream::video; }
-    VideoOverlay& overlay(){ return m_overlay; }
-    AudioFeed& audio(){ return VideoStream::audio; }
-    const StreamHistorySession& stream_history() const{ return VideoStream::video_history; };
-    bool save_stream_history(const std::string& filename);
 
 
-    operator Logger&(){ return VideoStream::logger; }
-    operator VideoFeed&(){ return VideoStream::video; }
-    operator VideoOverlay&(){ return m_overlay; }
-    operator AudioFeed&() { return VideoStream::audio; }
-    operator const StreamHistorySession&() const{ return VideoStream::video_history; }
+    operator Logger&(){ return logger(); }
+    operator VideoFeed&(){ return video(); }
+    operator VideoOverlay&(){ return overlay(); }
+    operator AudioFeed&() { return audio(); }
+    operator const StreamHistorySession&() const{ return history(); }
 
-    VisualInferencePivot& video_inference_pivot(){ return *m_video_pivot; }
-    AudioInferencePivot& audio_inference_pivot(){ return *m_audio_pivot; }
-
-
-public:
-    void initialize_inference_threads(CancellableScope& scope, AsyncDispatcher& dispatcher);
 
 private:
     size_t m_index;
-//    Logger& m_logger;
     BotBase* m_botbase;
 
-//    VideoStream m_stream;
-//    VideoFeed& m_video;
-    VideoOverlay& m_overlay;
-//    AudioFeed& m_audio;
-//    const StreamHistorySession& m_history;
-
-
     std::unique_ptr<ThreadUtilizationStat> m_thread_utilization;
-    std::unique_ptr<VisualInferencePivot> m_video_pivot;
-    std::unique_ptr<AudioInferencePivot> m_audio_pivot;
 };
 
 

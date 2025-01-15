@@ -13,6 +13,7 @@
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
+#include "CommonFramework/Tools/ConsoleHandle.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"

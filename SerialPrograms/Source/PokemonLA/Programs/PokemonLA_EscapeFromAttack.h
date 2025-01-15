@@ -13,6 +13,7 @@
 #include "PokemonLA/Inference/Objects/PokemonLA_ButtonDetector.h"
 
 namespace PokemonAutomation{
+    class ConsoleHandle;
 namespace NintendoSwitch{
 namespace PokemonLA{
 

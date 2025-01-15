@@ -17,7 +17,7 @@
 namespace PokemonAutomation{
 
 class Cancellable;
-class ConsoleHandle;
+class VideoStream;
 
 
 
@@ -40,16 +40,8 @@ class ConsoleHandle;
 //
 class InferenceSession{
 public:
-#if 0
     InferenceSession(
-        Cancellable& scope, ConsoleHandle& console,
-        const std::vector<InferenceCallback*>& callbacks,
-        std::chrono::milliseconds default_video_period = std::chrono::milliseconds(50),
-        std::chrono::milliseconds default_audio_period = std::chrono::milliseconds(20)
-    );
-#endif
-    InferenceSession(
-        Cancellable& scope, ConsoleHandle& console,
+        Cancellable& scope, VideoStream& stream,
         const std::vector<PeriodicInferenceCallback>& callbacks,
         std::chrono::milliseconds default_video_period = std::chrono::milliseconds(50),
         std::chrono::milliseconds default_audio_period = std::chrono::milliseconds(20)
@@ -65,7 +57,7 @@ private:
 
 
 private:
-    ConsoleHandle& m_console;
+    VideoStream& m_stream;
     VideoOverlaySet m_overlays;
     std::map<InferenceCallback*, size_t> m_map;
     std::atomic<InferenceCallback*> m_triggered;

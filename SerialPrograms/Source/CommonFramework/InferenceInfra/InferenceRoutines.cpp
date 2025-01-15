@@ -5,9 +5,9 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-#include "Common/Cpp/Concurrency/AsyncDispatcher.h"
+//#include "Common/Cpp/Concurrency/AsyncDispatcher.h"
 #include "ClientSource/Connection/BotBase.h"
-#include "CommonFramework/Tools/ProgramEnvironment.h"
+//#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "InferenceSession.h"
 #include "InferenceRoutines.h"
 
@@ -20,7 +20,7 @@ namespace PokemonAutomation{
 
 
 int wait_until(
-    ConsoleHandle& console, CancellableScope& scope,
+    VideoStream& stream, CancellableScope& scope,
     WallClock deadline,
     const std::vector<PeriodicInferenceCallback>& callbacks,
     std::chrono::milliseconds default_video_period,
@@ -28,7 +28,7 @@ int wait_until(
 ){
     CancellableHolder<CancellableScope> subscope(scope);
     InferenceSession session(
-        subscope, console,
+        subscope, stream,
         callbacks,
         default_video_period, default_audio_period
     );
@@ -47,15 +47,15 @@ int wait_until(
 
 
 int run_until(
-    ConsoleHandle& console, BotBaseContext& context,
+    VideoStream& stream, BotBaseContext& context,
     std::function<void(BotBaseContext& context)>&& command,
     const std::vector<PeriodicInferenceCallback>& callbacks,
     std::chrono::milliseconds default_video_period,
     std::chrono::milliseconds default_audio_period
 ){
-    BotBaseContext subcontext(context, console.botbase());
+    BotBaseContext subcontext(context, context.botbase());
     InferenceSession session(
-        subcontext, console,
+        subcontext, stream,
         callbacks,
         default_video_period, default_audio_period
     );
@@ -75,17 +75,18 @@ int run_until(
 
 
 
+#if 0
 int run_until_with_time_limit(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ProgramEnvironment& env, VideoStream& stream, BotBaseContext& context,
     WallClock deadline,
     std::function<void(BotBaseContext& context)>&& command,
     const std::vector<PeriodicInferenceCallback>& callbacks,
     std::chrono::milliseconds default_video_period,
     std::chrono::milliseconds default_audio_period
 ){
-    BotBaseContext subcontext(context, console.botbase());
+    BotBaseContext subcontext(context, context.botbase());
     InferenceSession session(
-        subcontext, console,
+        subcontext, stream,
         callbacks,
         default_video_period, default_audio_period
     );
@@ -110,7 +111,7 @@ int run_until_with_time_limit(
 
     return timed_out ? -2 : session.triggered_index();
 }
-
+#endif
 
 
 

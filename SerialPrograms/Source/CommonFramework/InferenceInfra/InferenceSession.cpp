@@ -5,7 +5,7 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
+#include "CommonFramework/Tools/VideoStream.h"
 #include "InferenceCallback.h"
 #include "VisualInferenceCallback.h"
 #include "AudioInferenceCallback.h"
@@ -16,62 +16,14 @@
 namespace PokemonAutomation{
 
 
-
-
-#if 0
 InferenceSession::InferenceSession(
-    Cancellable& scope, ConsoleHandle& console,
-    const std::vector<InferenceCallback*>& callbacks,
-    std::chrono::milliseconds default_video_period,
-    std::chrono::milliseconds default_audio_period
-)
-    : m_console(console)
-    , m_overlays(console.overlay())
-    , m_triggered(nullptr)
-{
-    try{
-        for (size_t c = 0; c < callbacks.size(); c++){
-            InferenceCallback* callback = callbacks[c];
-            if (callback == nullptr){
-                continue;
-            }
-            if (!m_map.emplace(callback, c).second){
-                throw InternalProgramError(&console.logger(), PA_CURRENT_FUNCTION, "Attempted to add the same callback twice.");
-            }
-            switch (callback->type()){
-            case InferenceType::VISUAL:{
-                VisualInferenceCallback& visual_callback = static_cast<VisualInferenceCallback&>(*callback);
-                console.video_inference_pivot().add_callback(
-                    scope, &m_triggered,
-                    visual_callback,
-                    default_video_period
-                );
-                visual_callback.make_overlays(m_overlays);
-                break;
-            }
-            case InferenceType::AUDIO:
-                console.audio_inference_pivot().add_callback(
-                    scope, &m_triggered,
-                    static_cast<AudioInferenceCallback&>(*callback),
-                    default_audio_period
-                );
-                break;
-            }
-        }
-    }catch (...){
-        clear();
-        throw;
-    }
-}
-#endif
-InferenceSession::InferenceSession(
-    Cancellable& scope, ConsoleHandle& console,
+    Cancellable& scope, VideoStream& stream,
     const std::vector<PeriodicInferenceCallback>& callbacks,
     std::chrono::milliseconds default_video_period,
     std::chrono::milliseconds default_audio_period
 )
-    : m_console(console)
-    , m_overlays(console.overlay())
+    : m_stream(stream)
+    , m_overlays(stream.overlay())
     , m_triggered(nullptr)
 {
     try{
@@ -81,12 +33,12 @@ InferenceSession::InferenceSession(
                 continue;
             }
             if (!m_map.emplace(callback.callback, c).second){
-                throw InternalProgramError(&console.logger(), PA_CURRENT_FUNCTION, "Attempted to add the same callback twice.");
+                throw InternalProgramError(&stream.logger(), PA_CURRENT_FUNCTION, "Attempted to add the same callback twice.");
             }
             switch (callback.callback->type()){
             case InferenceType::VISUAL:{
                 VisualInferenceCallback& visual_callback = static_cast<VisualInferenceCallback&>(*callback.callback);
-                console.video_inference_pivot().add_callback(
+                stream.video_inference_pivot().add_callback(
                     scope, &m_triggered,
                     visual_callback,
                     callback.period > std::chrono::milliseconds(0) ? callback.period : default_video_period
@@ -95,7 +47,7 @@ InferenceSession::InferenceSession(
                 break;
             }
             case InferenceType::AUDIO:
-                console.audio_inference_pivot().add_callback(
+                stream.audio_inference_pivot().add_callback(
                     scope, &m_triggered,
                     static_cast<AudioInferenceCallback&>(*callback.callback),
                     callback.period > std::chrono::milliseconds(0) ? callback.period : default_audio_period
@@ -131,16 +83,16 @@ void InferenceSession::clear() noexcept{
     for (auto& item : m_map){
         switch (item.first->type()){
         case InferenceType::VISUAL:{
-            StatAccumulatorI32 stats = m_console.video_inference_pivot().remove_callback(static_cast<VisualInferenceCallback&>(*item.first));
+            StatAccumulatorI32 stats = m_stream.video_inference_pivot().remove_callback(static_cast<VisualInferenceCallback&>(*item.first));
             try{
-                stats.log(m_console, item.first->label(), UNITS, DIVIDER);
+                stats.log(m_stream.logger(), item.first->label(), UNITS, DIVIDER);
             }catch (...){}
             break;
         }
         case InferenceType::AUDIO:{
-            StatAccumulatorI32 stats = m_console.audio_inference_pivot().remove_callback(static_cast<AudioInferenceCallback&>(*item.first));
+            StatAccumulatorI32 stats = m_stream.audio_inference_pivot().remove_callback(static_cast<AudioInferenceCallback&>(*item.first));
             try{
-                stats.log(m_console, item.first->label(), UNITS, DIVIDER);
+                stats.log(m_stream.logger(), item.first->label(), UNITS, DIVIDER);
             }catch (...){}
             break;
         }

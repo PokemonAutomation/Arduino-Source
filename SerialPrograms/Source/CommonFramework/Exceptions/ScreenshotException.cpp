@@ -8,7 +8,7 @@
 #include "CommonFramework/ErrorReports/ErrorReports.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/VideoPipeline/VideoStream.h"
+#include "CommonFramework/Tools/VideoStream.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "ScreenshotException.h"
 
@@ -31,10 +31,10 @@ ScreenshotException::ScreenshotException(
     : m_send_error_report(error_report)
     , m_message(std::move(message))
     , m_stream(&stream)
-    , m_screenshot(stream.video.snapshot().frame)
+    , m_screenshot(stream.video().snapshot().frame)
 {
     if (m_screenshot == nullptr || !*m_screenshot){
-        stream.logger.log("Camera returned empty screenshot. Is the camera frozen?", COLOR_RED);
+        stream.log("Camera returned empty screenshot. Is the camera frozen?", COLOR_RED);
     }
 }
 ScreenshotException::ScreenshotException(
@@ -66,9 +66,9 @@ void ScreenshotException::add_stream_if_needed(VideoStream& stream){
         m_stream = &stream;
     }
     if (!m_screenshot){
-        m_screenshot = stream.video.snapshot();
+        m_screenshot = stream.video().snapshot();
         if (m_screenshot == nullptr || !*m_screenshot){
-            stream.logger.log("Camera returned empty screenshot. Is the camera frozen?", COLOR_RED);
+            stream.log("Camera returned empty screenshot. Is the camera frozen?", COLOR_RED);
         }
     }
 }
@@ -95,7 +95,7 @@ void ScreenshotException::send_notification(ProgramEnvironment& env, EventNotifi
             name(),
             embeds,
             screenshot(),
-            m_stream ? &m_stream->video_history : nullptr
+            m_stream ? &m_stream->history() : nullptr
         );
     }
 
