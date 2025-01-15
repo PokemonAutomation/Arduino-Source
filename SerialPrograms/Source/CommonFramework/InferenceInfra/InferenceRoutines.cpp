@@ -5,9 +5,7 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-//#include "Common/Cpp/Concurrency/AsyncDispatcher.h"
 #include "ClientSource/Connection/BotBase.h"
-//#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "InferenceSession.h"
 #include "InferenceRoutines.h"
 
@@ -46,6 +44,31 @@ int wait_until(
 
 
 
+int run_until(
+    VideoStream& stream, CancellableScope& scope,
+    std::function<void(CancellableScope& scope)>&& command,
+    const std::vector<PeriodicInferenceCallback>& callbacks,
+    std::chrono::milliseconds default_video_period,
+    std::chrono::milliseconds default_audio_period
+){
+    CancellableHolder<CancellableScope> subscope(scope);
+    InferenceSession session(
+        subscope, stream,
+        callbacks,
+        default_video_period, default_audio_period
+    );
+
+    try{
+        if (command){
+            command(subscope);
+        }
+    }catch (OperationCancelledException&){}
+
+    subscope.throw_if_cancelled_with_exception();
+    scope.throw_if_cancelled();
+
+    return session.triggered_index();
+}
 int run_until(
     VideoStream& stream, BotBaseContext& context,
     std::function<void(BotBaseContext& context)>&& command,

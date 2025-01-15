@@ -61,6 +61,13 @@ inline int wait_until(
 //  Exceptions thrown in either the commands or the callbacks will stop
 //  everything and will be propagated out of this function.
 int run_until(
+    VideoStream& stream, CancellableScope& scope,
+    std::function<void(CancellableScope& scope)>&& command,
+    const std::vector<PeriodicInferenceCallback>& callbacks,
+    std::chrono::milliseconds default_video_period = std::chrono::milliseconds(50),
+    std::chrono::milliseconds default_audio_period = std::chrono::milliseconds(20)
+);
+int run_until(
     VideoStream& stream, BotBaseContext& context,
     std::function<void(BotBaseContext& context)>&& command,
     const std::vector<PeriodicInferenceCallback>& callbacks,
