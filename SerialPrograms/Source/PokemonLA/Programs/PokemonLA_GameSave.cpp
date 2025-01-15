@@ -96,7 +96,7 @@ bool save_game_from_overworld(ProgramEnvironment& env, ConsoleHandle& console, B
     }
 
     ArcPhoneDetector detector(console, console, std::chrono::milliseconds(100), true);
-    int ret = run_until(
+    int ret = run_until<BotBaseContext>(
         console, context,
         [&](BotBaseContext& context){
             for (size_t c = 0; c < 10; c++){

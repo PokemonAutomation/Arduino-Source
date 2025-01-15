@@ -96,7 +96,7 @@ void checkpoint_08(
         GradientArrowWatcher arrow(COLOR_RED, GradientArrowType::RIGHT, {0.104, 0.312, 0.043, 0.08});
         context.wait_for_all_requests();
 
-        int ret = run_until(
+        int ret = run_until<BotBaseContext>(
             env.console, context,
             [](BotBaseContext& context){
                 for (int i = 0; i < 10; i++){

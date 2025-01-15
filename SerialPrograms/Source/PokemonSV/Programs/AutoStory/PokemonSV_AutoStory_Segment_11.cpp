@@ -517,7 +517,7 @@ void checkpoint_26(
         // section 4.2 past second NPC and into the finish line
         NoMinimapWatcher no_minimap(env.console, COLOR_RED, Milliseconds(5000));
         size_t MAX_ATTEMPTS_SECTION_4 = 3;
-        int ret = run_until(
+        int ret = run_until<BotBaseContext>(
             env.console, context,
             [&](BotBaseContext& context){
                 for (size_t i = 0; i < MAX_ATTEMPTS_SECTION_4; i++){

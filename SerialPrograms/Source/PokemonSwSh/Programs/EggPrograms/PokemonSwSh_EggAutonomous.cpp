@@ -320,7 +320,7 @@ bool EggAutonomous::run_batch(SingleSwitchProgramEnvironment& env, BotBaseContex
             }else{
                 env.console.overlay().add_log("Loop " + std::to_string(bike_loop_count+1), COLOR_WHITE);
             }
-            int ret = run_until(
+            int ret = run_until<BotBaseContext>(
                 env.console, context,
                 [](BotBaseContext& context){
                     travel_to_spin_location(context);
@@ -346,7 +346,7 @@ bool EggAutonomous::run_batch(SingleSwitchProgramEnvironment& env, BotBaseContex
                     break;
                 }
                 // Now we see if we can hatch one more egg.
-                ret = run_until(
+                ret = run_until<BotBaseContext>(
                     env.console, context,
                     [](BotBaseContext& context){
                         // Try move a little to hatch more:
@@ -471,7 +471,7 @@ void EggAutonomous::wait_for_egg_hatched(SingleSwitchProgramEnvironment& env, Bo
     env.console.overlay().add_log("Egg hatching " + std::to_string(num_hatched_eggs) + "/5", COLOR_GREEN);
     const bool y_comm_visible_at_end_of_egg_hatching = true;
     YCommIconDetector end_egg_hatching_detector(y_comm_visible_at_end_of_egg_hatching);
-    const int ret = run_until(
+    const int ret = run_until<BotBaseContext>(
         env.console, context,
         [](BotBaseContext& context){
             pbf_mash_button(context, BUTTON_B, 60 * TICKS_PER_SECOND);
@@ -500,7 +500,7 @@ size_t EggAutonomous::talk_to_lady_to_fetch_egg(
     RetrieveEggArrowFinder egg_arrow_detector(env.console);
     CheckNurseryArrowFinder no_egg_arrow_detector(env.console);
 
-    int ret = run_until(
+    int ret = run_until<BotBaseContext>(
         env.console, context,
         [](BotBaseContext& context){
             for (size_t i_hatched = 0; i_hatched < 2; i_hatched++){
@@ -525,7 +525,7 @@ size_t EggAutonomous::talk_to_lady_to_fetch_egg(
         // Press A to get the egg
         ssf_press_button1(context, BUTTON_A, 10);
 
-        ret = run_until(
+        ret = run_until<BotBaseContext>(
             env.console, context,
             [](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, TICKS_PER_SECOND * 30);
@@ -535,7 +535,7 @@ size_t EggAutonomous::talk_to_lady_to_fetch_egg(
     }else if (ret == 1){
         env.log("No egg");
         env.console.overlay().add_log("No egg", COLOR_WHITE);
-        ret = run_until(
+        ret = run_until<BotBaseContext>(
             env.console, context,
             [](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, TICKS_PER_SECOND * 30);
@@ -810,7 +810,7 @@ bool EggAutonomous::process_hatched_pokemon(SingleSwitchProgramEnvironment& env,
         // Leave menu, go back to overworld
         const bool y_comm_visible = true;
         YCommIconDetector y_comm_detector(y_comm_visible);
-        const int ret = run_until(
+        const int ret = run_until<BotBaseContext>(
             env.console, context,
             [](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 5 * TICKS_PER_SECOND);

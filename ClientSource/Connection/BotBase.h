@@ -75,6 +75,7 @@ class BotBaseContext final : public CancellableScope{
 public:
     BotBaseContext(BotBase& botbase);
     BotBaseContext(CancellableScope& parent, BotBase& botbase);
+    BotBaseContext(CancellableScope& parent, BotBaseContext& context);
     virtual ~BotBaseContext();
 
 

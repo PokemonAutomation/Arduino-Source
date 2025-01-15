@@ -56,7 +56,7 @@ void run_professor_swap(
     //  Wait until we exit the window.
     {
         BlackScreenWatcher detector;
-        int result = run_until(
+        int result = run_until<BotBaseContext>(
             console, context,
             [&](BotBaseContext& context){
                 pbf_mash_button(context, swap ? BUTTON_A : BUTTON_B, 30 * TICKS_PER_SECOND);

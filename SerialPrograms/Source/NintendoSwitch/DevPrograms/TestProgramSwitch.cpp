@@ -1058,7 +1058,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
         NormalBattleMenuWatcher battle_menu(COLOR_RED);
         AreaZeroSkyTracker sky_tracker(overlay);
         context.wait_for_all_requests();
-        int ret = run_until(
+        int ret = run_until<BotBaseContext>(
             console, context,
             [&](BotBaseContext& context){
                 while (true){

@@ -104,7 +104,7 @@ bool DoublesLeveling::battle(SingleSwitchProgramEnvironment& env, BotBaseContext
         EndBattleWatcher end_battle;
         SelectionArrowFinder learn_move(env.console, {0.50, 0.62, 0.40, 0.18}, COLOR_YELLOW);
         FrozenImageDetector overworld(std::chrono::seconds(5), 10);
-        int ret = run_until(
+        int ret = run_until<BotBaseContext>(
             env.console, context,
             [](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);

@@ -127,7 +127,7 @@ void FroslassFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseC
             return on_shiny_callback(env, env.console, *action, error_coefficient);
         });
 
-        int ret = run_until(
+        int ret = run_until<BotBaseContext>(
             env.console, context,
             [&](BotBaseContext& context){
                 //  Route to cave entrance

@@ -244,7 +244,7 @@ void ShinyHuntCustomPath::run_path(SingleSwitchProgramEnvironment& env, BotBaseC
         return on_shiny_callback(env, env.console, *shiny_action, error_coefficient);
     });
 
-    int ret = run_until(
+    int ret = run_until<BotBaseContext>(
         env.console, context,
         [&](BotBaseContext& context){
             for (const std::unique_ptr<CustomPathTableRow2>& row : table){

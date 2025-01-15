@@ -98,7 +98,7 @@ bool IngoBattleGrinder::start_dialog(ConsoleHandle& console, BotBaseContext& con
         ButtonDetector button0(console, console, ButtonType::ButtonA, {0.50, 0.408, 0.40, 0.042}, std::chrono::milliseconds(100), true);
         ButtonDetector button1(console, console, ButtonType::ButtonA, {0.50, 0.450, 0.40, 0.042}, std::chrono::milliseconds(100), true);
         ButtonDetector button2(console, console, ButtonType::ButtonA, {0.50, 0.492, 0.40, 0.042}, std::chrono::milliseconds(100), true);
-        int ret = run_until(
+        int ret = run_until<BotBaseContext>(
             console, context,
             [&](BotBaseContext& context){
                 for (size_t c = 0; c < 10; c++){
@@ -134,7 +134,7 @@ bool IngoBattleGrinder::start_dialog(ConsoleHandle& console, BotBaseContext& con
     context.wait_for_all_requests();
 
     ButtonDetector button2(console, console, ButtonType::ButtonA, {0.50, 0.350, 0.40, 0.400}, std::chrono::milliseconds(100), true);
-    int ret = run_until(
+    int ret = run_until<BotBaseContext>(
         console, context,
         [&](BotBaseContext& context){
             for (size_t c = 0; c < 5; c++){

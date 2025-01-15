@@ -249,7 +249,7 @@ void BurmyFinder::enable_shiny_sound(BotBaseContext& context){
 void BurmyFinder::go_to_height_camp(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     const bool stop_on_detected = true;
     BattleMenuDetector battle_menu_detector(env.console, env.console, stop_on_detected);
-    int ret = run_until(
+    int ret = run_until<BotBaseContext>(
         env.console, context,
         [&](BotBaseContext& context){
             goto_any_camp_from_overworld(env, env.console, context, TravelLocations::instance().Fieldlands_Heights);
@@ -285,7 +285,7 @@ size_t BurmyFinder::grouped_path(SingleSwitchProgramEnvironment& env, BotBaseCon
 
     BattleMenuDetector battle_menu_detector(env.console, env.console, true);
 
-    int ret = run_until(
+    int ret = run_until<BotBaseContext>(
         env.console, context,
         [&](BotBaseContext& context){
             switch (path){
@@ -743,7 +743,7 @@ void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
 
     goto_camp_from_jubilife(env, env.console, context, TravelLocations::instance().Fieldlands_Heights);
 
-    int ret = run_until(
+    int ret = run_until<BotBaseContext>(
         env.console, context,
         [&](BotBaseContext& context){
 

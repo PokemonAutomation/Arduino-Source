@@ -261,7 +261,7 @@ StateMachineAction run_move_select(
 
         //  Back out and look for battle menu. This indicates that the move wasn't selectable.
         BattleMenuDetector detector;
-        int result = run_until(
+        int result = run_until<BotBaseContext>(
             console, context,
             [](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 5 * TICKS_PER_SECOND);

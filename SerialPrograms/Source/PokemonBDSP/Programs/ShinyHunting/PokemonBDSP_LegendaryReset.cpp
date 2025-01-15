@@ -98,7 +98,7 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext
         StartBattleDetector start_battle(env.console);
         BattleMenuWatcher battle_menu(BattleType::STANDARD);
 
-        int ret = run_until(
+        int ret = run_until<BotBaseContext>(
             env.console, context,
             [this](BotBaseContext& context){
                 size_t stop = WALK_UP ? 30 : 60;

@@ -48,7 +48,7 @@ bool open_raid(ConsoleHandle& console, BotBaseContext& context){
     while (true){
         TeraCardWatcher card_detector(COLOR_RED);
         AdvanceDialogWatcher dialog(COLOR_YELLOW);
-        int ret = run_until(
+        int ret = run_until<BotBaseContext>(
             console, context,
             [](BotBaseContext& context){
                 //  Do 2 presses in quick succession in case one drops or is
@@ -130,7 +130,7 @@ void open_hosting_lobby(
         OverworldWatcher overworld(console, COLOR_RED);
         if (recovery_mode){
             context.wait_for_all_requests();
-            int ret = run_until(
+            int ret = run_until<BotBaseContext>(
                 console, context,
                 [](BotBaseContext& context){
                     pbf_press_button(context, BUTTON_B, 20, 980);

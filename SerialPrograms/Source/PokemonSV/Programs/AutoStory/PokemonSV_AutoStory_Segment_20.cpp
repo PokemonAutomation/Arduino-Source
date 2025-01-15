@@ -451,7 +451,7 @@ void checkpoint_44(
         direction.change_direction(env.program_info(), env.console, context, 5.53);
 
         NoMinimapWatcher no_minimap(env.console, COLOR_RED, Milliseconds(5000));
-        int ret = run_until(
+        int ret = run_until<BotBaseContext>(
             env.console, context,
             [&](BotBaseContext& context){
                 pbf_move_left_joystick(context, 128, 0, 30 * TICKS_PER_SECOND, 100);

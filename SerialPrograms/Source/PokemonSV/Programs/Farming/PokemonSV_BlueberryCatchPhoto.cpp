@@ -272,7 +272,7 @@ void quest_photo(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
 
     while(!took_photo){
         EncounterWatcher encounter_watcher(console, COLOR_RED);
-        int ret = run_until(
+        int ret = run_until<BotBaseContext>(
             console, context,
             [&](BotBaseContext& context){
 
@@ -306,7 +306,7 @@ void quest_photo(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
                 }
 
                 //Mash B until overworld
-                int exit = run_until(
+                int exit = run_until<BotBaseContext>(
                     console, context,
                     [&](BotBaseContext& context){
                         pbf_mash_button(context, BUTTON_B, 2000);
@@ -670,7 +670,7 @@ void quest_catch_handle_battle(const ProgramInfo& info, ConsoleHandle& console, 
     bool tera_target = false;
     bool use_quickball = BBQ_OPTIONS.QUICKBALL;
 
-    int ret2 = run_until(
+    int ret2 = run_until<BotBaseContext>(
         console, context,
         [&](BotBaseContext& context){
             while (true){
@@ -734,7 +734,7 @@ void quest_catch_handle_battle(const ProgramInfo& info, ConsoleHandle& console, 
                         MoveSelectWatcher move_watcher(COLOR_BLUE);
                         MoveSelectDetector move_select(COLOR_BLUE);
 
-                        int ret_move_select = run_until(
+                        int ret_move_select = run_until<BotBaseContext>(
                             console, context,
                             [&](BotBaseContext& context){
                                 pbf_press_button(context, BUTTON_A, 10, 50);
@@ -842,7 +842,7 @@ void quest_catch(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
     EncounterWatcher encounter_watcher(console, COLOR_RED);
 
     //Navigate to target and start battle
-    int ret = run_until(
+    int ret = run_until<BotBaseContext>(
         console, context,
         [&](BotBaseContext& context){
             
@@ -894,7 +894,7 @@ void quest_catch(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
     pbf_mash_button(context, BUTTON_A, 300);
     context.wait_for_all_requests();
 
-    int exit = run_until(
+    int exit = run_until<BotBaseContext>(
         console, context,
         [&](BotBaseContext& context){
             pbf_mash_button(context, BUTTON_B, 2000);
@@ -917,7 +917,7 @@ void wild_battle_tera(const ProgramInfo& info, ConsoleHandle& console, BotBaseCo
     uint8_t switch_party_slot = 1;
     bool first_turn = true;
 
-    int ret2 = run_until(
+    int ret2 = run_until<BotBaseContext>(
         console, context,
         [&](BotBaseContext& context){
             while(true){

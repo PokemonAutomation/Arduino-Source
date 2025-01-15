@@ -234,7 +234,7 @@ bool WildItemFarmer::verify_item_held(SingleSwitchProgramEnvironment& env, BotBa
     bool item_held = !is_solid(stats, {0.550405, 0.449595, 0.}, 0.20);
 
     {
-        int ret = run_until(
+        int ret = run_until<BotBaseContext>(
             env.console, context,
             [](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 500);

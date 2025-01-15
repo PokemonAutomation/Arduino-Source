@@ -260,7 +260,7 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, BotBaseCo
             context.wait_for_all_requests();
 
             //Try six times, in case of paralysis (only applies to Pachirisu's Nuzzle) preventing use of Memento.
-            int retF = run_until(
+            int retF = run_until<BotBaseContext>(
                 env.console, context,
                 [&](BotBaseContext& context){
                     for (size_t c = 0; c < 6; c++){
@@ -352,7 +352,7 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, BotBaseCo
     AdvanceDialogWatcher end_of_battle(COLOR_YELLOW);
     WallClock start = current_time();
     uint8_t switch_party_slot = HHH_ZOROARK ? 2: 1;
-    int ret_black = run_until(
+    int ret_black = run_until<BotBaseContext>(
         env.console, context,
         [&](BotBaseContext& context){
             for(size_t c = 0; c < 30; c++) { //Sylveon build has 16 PP at max, and Chi-Yu build has 24.
@@ -506,7 +506,7 @@ void TournamentFarmer::handle_end_of_tournament(SingleSwitchProgramEnvironment& 
 
     //One more black screen when done to load the academy
     BlackScreenOverWatcher black_screen(COLOR_RED, { 0.2, 0.2, 0.6, 0.6 });
-    int ret_black_won = run_until(
+    int ret_black_won = run_until<BotBaseContext>(
         env.console, context,
         [](BotBaseContext& context){
             pbf_mash_button(context, BUTTON_B, 10000);
@@ -536,7 +536,7 @@ void TournamentFarmer::handle_end_of_tournament(SingleSwitchProgramEnvironment& 
 
     //Clear remaining dialog
     OverworldWatcher overworld(env.console, COLOR_CYAN);
-    int ret_over = run_until(
+    int ret_over = run_until<BotBaseContext>(
         env.console, context,
         [](BotBaseContext& context){
             pbf_mash_button(context, BUTTON_B, 700);
@@ -574,7 +574,7 @@ void return_to_academy_after_loss(SingleSwitchProgramEnvironment& env, BotBaseCo
     pbf_press_button(context, BUTTON_B, 50, 40);
 
     BlackScreenOverWatcher black_screen(COLOR_RED, { 0.2, 0.2, 0.6, 0.6 });
-    int ret_black_lost = run_until(
+    int ret_black_lost = run_until<BotBaseContext>(
         env.console, context,
         [](BotBaseContext& context){
             pbf_move_left_joystick(context, 128, 0, 5000, 0);
@@ -690,7 +690,7 @@ void TournamentFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseConte
         context.wait_for_all_requests();
 
         NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
-        int ret_battle = run_until(
+        int ret_battle = run_until<BotBaseContext>(
             env.console, context,
             [](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 10000); //it takes a while to load and start
@@ -706,7 +706,7 @@ void TournamentFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseConte
         for (uint16_t battles = 0; battles < 4; battles++){
             NormalBattleMenuWatcher battle_menu2(COLOR_YELLOW); //Next battle started
             OverworldWatcher overworld(env.console, COLOR_CYAN); //Previous battle was lost
-            int ret_battle2 = run_until(
+            int ret_battle2 = run_until<BotBaseContext>(
                 env.console, context,
                 [](BotBaseContext& context){
                     pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);

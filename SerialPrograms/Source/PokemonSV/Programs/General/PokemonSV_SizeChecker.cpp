@@ -245,7 +245,7 @@ void SizeChecker::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
 
                 // Initiate size checking prompt.
                 DialogBoxWatcher dialog(COLOR_GREEN, true, std::chrono::milliseconds(250), DialogType::DIALOG_WHITE);
-                int ret = run_until(
+                int ret = run_until<BotBaseContext>(
                     env.console, context,
                     [](BotBaseContext& context){
                         for (size_t c = 0; c < 10; c++){

@@ -36,12 +36,12 @@ void return_to_plaza(const ProgramInfo& info, ConsoleHandle& console, BotBaseCon
 
     while(!returned_to_pokecenter){
         EncounterWatcher encounter_watcher(console, COLOR_RED);
-        int ret = run_until(
+        int ret = run_until<BotBaseContext>(
             console, context,
             [&](BotBaseContext& context){
                 //Exit any dialogs (ex. Cyrano upgrading BBQs)
                 OverworldWatcher overworld(console, COLOR_RED);
-                int ret_overworld = run_until(
+                int ret_overworld = run_until<BotBaseContext>(
                     console, context,
                     [&](BotBaseContext& context){
                         pbf_mash_button(context, BUTTON_B, 10000);

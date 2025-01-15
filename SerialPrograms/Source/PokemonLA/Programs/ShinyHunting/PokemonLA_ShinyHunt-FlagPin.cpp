@@ -148,7 +148,7 @@ void ShinyHuntFlagPin::run_iteration(SingleSwitchProgramEnvironment& env, BotBas
             return on_shiny_callback(env, env.console, *shiny_action, error_coefficient);
         });
 
-        int ret = run_until(
+        int ret = run_until<BotBaseContext>(
             env.console, context,
             [&](BotBaseContext& context){
                 goto_camp_from_jubilife(env, env.console, context, TRAVEL_LOCATION);

@@ -249,7 +249,7 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext&
     bool out_of_balls = false;
     bool quickball_thrown = false;
 
-    int ret = run_until(
+    int ret = run_until<BotBaseContext>(
         env.console, context,
         [&](BotBaseContext& context){
             while (true){
@@ -335,7 +335,7 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext&
                     }
 
                     //Select and use move
-                    int ret_move_select = run_until(
+                    int ret_move_select = run_until<BotBaseContext>(
                     env.console, context,
                     [&](BotBaseContext& context){
                         pbf_press_button(context, BUTTON_A, 10, 50);
@@ -609,7 +609,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
             //Close all the dex entry and caught menus
             //If the player lost, this closes all dialog from Joy
             OverworldWatcher overworld(env.console);
-            int retOver = run_until(
+            int retOver = run_until<BotBaseContext>(
                 env.console, context,
                 [](BotBaseContext& context){
                     pbf_mash_button(context, BUTTON_B, 10000);

@@ -5,7 +5,7 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-#include "ClientSource/Connection/BotBase.h"
+#include "Common/Cpp/CancellableScope.h"
 #include "InferenceSession.h"
 #include "InferenceRoutines.h"
 
@@ -69,6 +69,7 @@ int run_until(
 
     return session.triggered_index();
 }
+#if 0
 int run_until(
     VideoStream& stream, BotBaseContext& context,
     std::function<void(BotBaseContext& context)>&& command,
@@ -95,6 +96,7 @@ int run_until(
 
     return session.triggered_index();
 }
+#endif
 
 
 

@@ -402,7 +402,7 @@ void OutbreakFinder::goto_region_and_return(SingleSwitchProgramEnvironment& env,
             ButtonType::ButtonA, ImageFloatBox(0.50, 0.50, 0.30, 0.30),
             std::chrono::milliseconds(200), true
         );
-        int ret = run_until(
+        int ret = run_until<BotBaseContext>(
             env.console, context,
             [](BotBaseContext& context){
                 for (size_t c = 0; c < 10; c++){

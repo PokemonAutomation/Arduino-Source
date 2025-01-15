@@ -52,7 +52,7 @@ ActivateMenuGlitch112::ActivateMenuGlitch112()
 void trigger_menu(ConsoleHandle& console, BotBaseContext& context){
     context.wait_for_all_requests();
     MapWatcher detector;
-    int ret = run_until(
+    int ret = run_until<BotBaseContext>(
         console, context,
         [](BotBaseContext& context){
             for (size_t i = 0; i < 12; i++){
@@ -133,7 +133,7 @@ void ActivateMenuGlitch112::program(SingleSwitchProgramEnvironment& env, BotBase
     {
         context.wait_for_all_requests();
         BlackScreenWatcher detector;
-        int ret = run_until(
+        int ret = run_until<BotBaseContext>(
             console, context,
             [](BotBaseContext& context){
                 for (size_t c = 0; c < 5; c++){

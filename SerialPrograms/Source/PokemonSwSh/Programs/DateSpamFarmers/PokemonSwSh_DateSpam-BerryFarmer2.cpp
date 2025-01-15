@@ -170,7 +170,7 @@ BerryFarmer2::Rustling BerryFarmer2::check_rustling(SingleSwitchProgramEnvironme
     StartBattleWatcher start_battle_detector;
 
     Rustling result = Rustling::No;
-    int ret = run_until(
+    int ret = run_until<BotBaseContext>(
         env.console, context,
         [&](BotBaseContext& context){
             pbf_wait(context, RUSTLING_TIMEOUT);
@@ -184,7 +184,7 @@ BerryFarmer2::Rustling BerryFarmer2::check_rustling(SingleSwitchProgramEnvironme
         WallClock initial_rustling_time = current_time();
         result = Rustling::Slow;
 
-        int ret1 = run_until(
+        int ret1 = run_until<BotBaseContext>(
             env.console, context,
             [&](BotBaseContext& context){
                 pbf_wait(context, RUSTLING_TIMEOUT);

@@ -109,7 +109,7 @@ void checkpoint_39(
         DialogBoxWatcher        dialog(COLOR_RED, true);
 
         // section 4
-        int ret = run_until(
+        int ret = run_until<BotBaseContext>(
             env.console, context,
             [&](BotBaseContext& context){
                 // run around in circles until you run into the titan

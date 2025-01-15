@@ -234,7 +234,7 @@ bool ShinyHuntAutonomousOverworld::find_encounter(
             StandardBattleMenuWatcher battle_menu_detector(false);
             StartBattleWatcher start_battle_detector;
 
-            int result = run_until(
+            int result = run_until<BotBaseContext>(
                 console, context,
                 [&](BotBaseContext& context){
                     trigger->run(context);
@@ -326,7 +326,7 @@ bool ShinyHuntAutonomousOverworld::charge_at_target(
         MAX_TARGET_ALPHA
     );
 
-    int result = run_until(
+    int result = run_until<BotBaseContext>(
         console, context,
         [&](BotBaseContext& context){
             //  Move to target.

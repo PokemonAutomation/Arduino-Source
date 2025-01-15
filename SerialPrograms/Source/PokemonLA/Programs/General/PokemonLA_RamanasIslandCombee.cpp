@@ -175,7 +175,7 @@ void RamanasCombeeFinder::grouped_path(SingleSwitchProgramEnvironment& env, BotB
 
     BattleMenuDetector battle_menu_detector(env.console, env.console, true);
 
-    int ret = run_until(
+    int ret = run_until<BotBaseContext>(
         env.console, context,
         [&](BotBaseContext& context){
 
@@ -281,7 +281,7 @@ void RamanasCombeeFinder::run_iteration(SingleSwitchProgramEnvironment& env, Bot
 
     goto_camp_from_jubilife(env, env.console, context, TravelLocations::instance().Fieldlands_Heights);
 
-    int ret = run_until(
+    int ret = run_until<BotBaseContext>(
         env.console, context,
         [&](BotBaseContext& context){
             grouped_path(env, context);

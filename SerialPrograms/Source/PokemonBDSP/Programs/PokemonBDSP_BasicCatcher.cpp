@@ -218,7 +218,7 @@ CatchResults basic_catcher(
         SelectionArrowFinder learn_move(console, {0.50, 0.62, 0.40, 0.18}, COLOR_YELLOW);
         //  Look for the pokemon caught screen.
         ReceivePokemonDetector caught_detector;
-        int ret = run_until(
+        int ret = run_until<BotBaseContext>(
             console, context,
             [](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);

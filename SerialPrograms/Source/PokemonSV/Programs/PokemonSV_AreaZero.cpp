@@ -28,7 +28,7 @@ void inside_zero_gate_to_station(
 ){
     {
         AdvanceDialogWatcher dialog(COLOR_GREEN);
-        int ret = run_until(
+        int ret = run_until<BotBaseContext>(
             console, context,
             [](BotBaseContext& context){
                 pbf_move_left_joystick(context, 128, 0, 10 * TICKS_PER_SECOND, 0);
@@ -143,7 +143,7 @@ void inside_zero_gate_to_station(
     console.log("Exiting station. Waiting for black screen...");
     {
         BlackScreenOverWatcher black_screen(COLOR_RED);
-        int ret = run_until(
+        int ret = run_until<BotBaseContext>(
             console, context,
             [=](BotBaseContext& context){
                 if (heal_at_station){
@@ -189,7 +189,7 @@ void return_to_inside_zero_gate(const ProgramInfo& info, ConsoleHandle& console,
     return_to_outside_zero_gate(info, console, context);
 
     BlackScreenOverWatcher black_screen;
-    int ret = run_until(
+    int ret = run_until<BotBaseContext>(
         console, context,
         [](BotBaseContext& context){
             pbf_move_left_joystick(context, 255, 32, 20, 105);
@@ -221,7 +221,7 @@ void return_to_inside_zero_gate(const ProgramInfo& info, ConsoleHandle& console,
 }
 void return_to_inside_zero_gate_from_picnic(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
     BlackScreenOverWatcher black_screen;
-    int ret = run_until(
+    int ret = run_until<BotBaseContext>(
         console, context,
         [](BotBaseContext& context){
             pbf_move_left_joystick(context, 128, 255, 100, 40);

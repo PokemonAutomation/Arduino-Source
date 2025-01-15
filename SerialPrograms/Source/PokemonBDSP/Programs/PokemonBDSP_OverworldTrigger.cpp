@@ -103,10 +103,10 @@ bool OverworldTrigger::find_encounter(ConsoleHandle& console, BotBaseContext& co
     BattleMenuWatcher battle_menu_detector(BattleType::STANDARD);
     StartBattleDetector start_battle_detector(console);
 
-    int result = 0;
+    int ret = 0;
     if (TRIGGER_METHOD != TriggerMethod::SWEET_SCENT){
         //  Move character back and forth to trigger encounter.
-        result = run_until(
+        ret = run_until<BotBaseContext>(
             console, context,
             [&](BotBaseContext& context){
                 while (true){
@@ -151,14 +151,14 @@ bool OverworldTrigger::find_encounter(ConsoleHandle& console, BotBaseContext& co
         //  Use sweet scent
         pbf_mash_button(context, BUTTON_ZL, 30);
 
-        result = wait_until(
+        ret = wait_until(
             console, context, std::chrono::seconds(30),
             {
                 {battle_menu_detector},
                 {start_battle_detector},
             }
         );
-        if (result < 0){
+        if (ret < 0){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Battle not detected after Sweet Scent for 30 seconds.",
@@ -167,7 +167,7 @@ bool OverworldTrigger::find_encounter(ConsoleHandle& console, BotBaseContext& co
         }
     }
 
-    switch (result){
+    switch (ret){
     case 0:
         console.log("Unexpected Battle.", COLOR_RED);
         return false;

@@ -225,7 +225,7 @@ void ESPTraining::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
 
         //Program done, mash B until overworld detected
         OverworldWatcher overworld(env.console, COLOR_CYAN);
-        int ret = run_until(
+        int ret = run_until<BotBaseContext>(
             env.console, context,
             [](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 700);

@@ -116,7 +116,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
         context.wait_for_all_requests();
         {
             BlackScreenOverWatcher detector;
-            int result = run_until(
+            int result = run_until<BotBaseContext>(
                 env.console, context,
                 [this](BotBaseContext& context){
                     if (POKEMON == GiftPokemon::TypeNull){

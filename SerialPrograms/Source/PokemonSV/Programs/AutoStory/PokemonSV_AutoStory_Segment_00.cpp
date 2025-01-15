@@ -61,7 +61,7 @@ void checkpoint_00(SingleSwitchProgramEnvironment& env, BotBaseContext& context)
     // Mash A through intro cutscene, until the L stick button is detected
     WhiteButtonWatcher leftstick(COLOR_GREEN, WhiteButton::ButtonLStick, {0.435, 0.912, 0.046, 0.047});
     context.wait_for_all_requests();
-    run_until(
+    run_until<BotBaseContext>(
         env.console, context,
         [](BotBaseContext& context){
             pbf_mash_button(context, BUTTON_A, 240 * TICKS_PER_SECOND);

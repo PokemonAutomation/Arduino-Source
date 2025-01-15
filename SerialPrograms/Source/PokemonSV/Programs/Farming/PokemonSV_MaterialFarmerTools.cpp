@@ -273,7 +273,7 @@ void run_material_farmer(
 
                     // run let's go while updating the HP watcher
                     console.log("Starting Let's Go hunting path.", COLOR_PURPLE);
-                    run_until(
+                    run_until<BotBaseContext>(
                         console, context,
                         [&](BotBaseContext& context){
                             run_lets_go_iteration(console, context, encounter_tracker, options.NUM_FORWARD_MOVES_PER_LETS_GO_ITERATION);
@@ -593,7 +593,7 @@ void run_from_battles_and_back_to_pokecenter(
     bool returned_to_pokecenter = false;
     while(returned_to_pokecenter == false){
         NormalBattleMenuWatcher battle_menu(COLOR_RED);
-        int ret = run_until(
+        int ret = run_until<BotBaseContext>(
             console, context,
             [&](BotBaseContext& context){
                 if (!attempted_action){ // We still need to carry out `action`

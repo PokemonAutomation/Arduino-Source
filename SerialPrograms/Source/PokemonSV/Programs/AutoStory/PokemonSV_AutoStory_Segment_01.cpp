@@ -250,7 +250,7 @@ void checkpoint_03(
         env.console.log("Clear auto heal tutorial.");
         // Press X until Auto heal tutorial shows up
         TutorialWatcher tutorial;
-        int ret = run_until(
+        int ret = run_until<BotBaseContext>(
             env.console, context,
             [](BotBaseContext& context){
                 for (int i = 0; i < 10; i++){

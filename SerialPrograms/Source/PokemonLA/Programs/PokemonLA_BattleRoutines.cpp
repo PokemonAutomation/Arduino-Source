@@ -26,7 +26,7 @@ namespace PokemonLA{
 
 void mash_A_until_end_of_battle(ConsoleHandle& console, BotBaseContext& context){
     OverworldDetector detector(console, console);
-    int ret = run_until(
+    int ret = run_until<BotBaseContext>(
         console, context,
         [](BotBaseContext& context){
             pbf_mash_button(context, BUTTON_A, 180 * TICKS_PER_SECOND);

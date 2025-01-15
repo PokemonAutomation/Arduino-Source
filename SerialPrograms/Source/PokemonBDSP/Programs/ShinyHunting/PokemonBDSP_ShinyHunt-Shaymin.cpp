@@ -78,7 +78,7 @@ bool ShinyHuntShaymin::start_encounter(SingleSwitchProgramEnvironment& env, BotB
     {
         BattleMenuWatcher battle_menu_detector(BattleType::STANDARD);
         ShortDialogWatcher dialog_detector;
-        int result = run_until(
+        int ret = run_until<BotBaseContext>(
             env.console, context,
             [&](BotBaseContext& context){
                 while (true){
@@ -93,7 +93,7 @@ bool ShinyHuntShaymin::start_encounter(SingleSwitchProgramEnvironment& env, BotB
                 {dialog_detector},
             }
         );
-        switch (result){
+        switch (ret){
         case 0:
             env.console.log("Unexpected Battle.", COLOR_RED);
             return false;
@@ -105,7 +105,7 @@ bool ShinyHuntShaymin::start_encounter(SingleSwitchProgramEnvironment& env, BotB
     {
         BattleMenuWatcher battle_menu_detector(BattleType::STANDARD);
         StartBattleDetector start_battle_detector(env.console);
-        int result = run_until(
+        int ret = run_until<BotBaseContext>(
             env.console, context,
             [&](BotBaseContext& context){
                 while (true){
@@ -120,7 +120,7 @@ bool ShinyHuntShaymin::start_encounter(SingleSwitchProgramEnvironment& env, BotB
                 {start_battle_detector},
             }
         );
-        switch (result){
+        switch (ret){
         case 0:
             env.console.log("Unexpected Battle.", COLOR_RED);
             return false;

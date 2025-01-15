@@ -295,7 +295,7 @@ void clear_dialog(ConsoleHandle& console, BotBaseContext& context,
             std::chrono::seconds(seconds_timeout),
             callbacks
         );
-        // int ret = run_until(
+        // int ret = run_until<BotBaseContext>(
         //     console, context,
         //     [&](BotBaseContext& context){
         //         for (size_t j = 0; j < seconds_timeout/3; j++){
@@ -442,7 +442,7 @@ void overworld_navigation(
         // uint16_t ticks_passed = std::chrono::duration_cast<std::chrono::milliseconds>(current_time() - start).count() * TICKS_PER_SECOND / 1000;
         // forward_ticks = seconds_realign * TICKS_PER_SECOND - ticks_passed;
 
-        int ret = run_until(
+        int ret = run_until<BotBaseContext>(
             console, context,
             [&](BotBaseContext& context){
 
@@ -679,7 +679,7 @@ void do_action_and_monitor_for_battles(
     >&& action
 ){
     NormalBattleMenuWatcher battle_menu(COLOR_RED);
-    int ret = run_until(
+    int ret = run_until<BotBaseContext>(
         console, context,
         [&](BotBaseContext& context){
             context.wait_for_all_requests();
@@ -750,7 +750,7 @@ void handle_when_stationary_in_overworld(
         }
         StationaryOverworldWatcher stationary_overworld(COLOR_RED, {0.865, 0.825, 0.08, 0.1}, seconds_stationary);
 
-        int ret = run_until(
+        int ret = run_until<BotBaseContext>(
             console, context,
             [&](BotBaseContext& context){
                 context.wait_for_all_requests();
@@ -865,7 +865,7 @@ void wait_for_overworld(
 void press_A_until_dialog(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, uint16_t seconds_between_button_presses){
     context.wait_for_all_requests();
     AdvanceDialogWatcher advance_dialog(COLOR_RED);
-    int ret = run_until(
+    int ret = run_until<BotBaseContext>(
         console, context,
         [seconds_between_button_presses](BotBaseContext& context){
             pbf_wait(context, seconds_between_button_presses * TICKS_PER_SECOND); // avoiding pressing A if dialog already present

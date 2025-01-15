@@ -86,7 +86,7 @@ void from_professor_return_to_jubilife(
     );
     while (true){
         context.wait_for_all_requests();
-        int ret = run_until(
+        int ret = run_until<BotBaseContext>(
             console, context,
             [](BotBaseContext& context){
                 for (size_t c = 0; c < 20; c++){
@@ -128,7 +128,7 @@ void mash_A_to_enter_sub_area(
     ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context
 ){
     BlackScreenOverWatcher black_screen0(COLOR_RED, {0.2, 0.2, 0.6, 0.6}, 100, 10);
-    int ret = run_until(
+    int ret = run_until<BotBaseContext>(
         console, context,
         [](BotBaseContext& context){
             pbf_mash_button(context, BUTTON_A, 7 * TICKS_PER_SECOND);
@@ -154,7 +154,7 @@ void mash_A_to_change_region(
 #if 0
     console.log("Waiting for loading screen...");
     BlackScreenOverWatcher black_screen0;
-    int ret = run_until(
+    int ret = run_until<BotBaseContext>(
         console, context,
         [](BotBaseContext& context){
             pbf_mash_button(context, BUTTON_A, GameSettings::instance().LOAD_REGION_TIMEOUT);
@@ -173,7 +173,7 @@ void mash_A_to_change_region(
     console.log("Waiting for end of loading screen...");
     BlackScreenOverWatcher black_screen1a(COLOR_RED, {0.20, 0.02, 0.60, 0.05}, 150);
     BlackScreenOverWatcher black_screen1b(COLOR_RED, {0.20, 0.93, 0.60, 0.05}, 150);
-    int ret = run_until(
+    int ret = run_until<BotBaseContext>(
         console, context,
         [](BotBaseContext& context){
             pbf_mash_button(context, BUTTON_A, GameSettings::instance().LOAD_REGION_TIMEOUT);
@@ -200,7 +200,7 @@ void open_travel_map_from_jubilife(
 ){
     pbf_move_left_joystick(context, 128, 255, 200, 0);
     MapDetector detector;
-    int ret = run_until(
+    int ret = run_until<BotBaseContext>(
         console, context,
         [](BotBaseContext& context){
             for (size_t c = 0; c < 10; c++){

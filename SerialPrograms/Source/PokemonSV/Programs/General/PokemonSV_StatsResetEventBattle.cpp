@@ -219,7 +219,7 @@ void StatsResetEventBattle::enter_battle_ursaluna(SingleSwitchProgramEnvironment
     context.wait_for_all_requests();
 
     //Mash B until next dialog select
-    int retPrompt = run_until(
+    int retPrompt = run_until<BotBaseContext>(
         env.console, context,
         [](BotBaseContext& context){
             pbf_mash_button(context, BUTTON_B, 10000);
@@ -239,7 +239,7 @@ void StatsResetEventBattle::enter_battle_ursaluna(SingleSwitchProgramEnvironment
 
     //Mash B until next dialog select (again)
     //PromptDialogWatcher prompt_detector2(COLOR_YELLOW);
-    int retPrompt2 = run_until(
+    int retPrompt2 = run_until<BotBaseContext>(
         env.console, context,
         [](BotBaseContext& context){
             pbf_mash_button(context, BUTTON_B, 10000);
@@ -258,7 +258,7 @@ void StatsResetEventBattle::enter_battle_ursaluna(SingleSwitchProgramEnvironment
     context.wait_for_all_requests();
 
     //Now keep going until the battle starts
-    int ret_battle = run_until(
+    int ret_battle = run_until<BotBaseContext>(
         env.console, context,
         [](BotBaseContext& context){
             pbf_mash_button(context, BUTTON_B, 10000);
@@ -303,7 +303,7 @@ void StatsResetEventBattle::enter_battle_pecharunt(SingleSwitchProgramEnvironmen
 
     //Mash B until the battle starts
     //Note - Sending out Ogerpon/Loyal Three during battle adds time, but the below is more than enough.
-    int ret_battle = run_until(
+    int ret_battle = run_until<BotBaseContext>(
         env.console, context,
         [](BotBaseContext& context){
             pbf_mash_button(context, BUTTON_B, 10000);
@@ -339,7 +339,7 @@ bool StatsResetEventBattle::run_battle(SingleSwitchProgramEnvironment& env, BotB
     WallClock start = current_time();
     uint8_t switch_party_slot = 1;
 
-    int ret = run_until(
+    int ret = run_until<BotBaseContext>(
         env.console, context,
         [&](BotBaseContext& context){
             while(true){
@@ -493,7 +493,7 @@ bool StatsResetEventBattle::check_stats_after_win(SingleSwitchProgramEnvironment
 #if 0
     //  Clear out dialog until we're free
     OverworldWatcher overworld(console, COLOR_YELLOW);
-    int retOverworld = run_until(
+    int retOverworld = run_until<BotBaseContext>(
         env.console, context,
         [](BotBaseContext& context){
             pbf_mash_button(context, BUTTON_B, 10000);

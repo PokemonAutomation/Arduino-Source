@@ -198,7 +198,7 @@ bool AutoHost::start_raid(
         WhiteScreenOverWatcher start_raid(COLOR_BLUE);
         TeraBattleMenuWatcher battle_menu(COLOR_CYAN);
         context.wait_for_all_requests();
-        int ret = run_until(
+        int ret = run_until<BotBaseContext>(
             env.console, context,
             [start_time](BotBaseContext& context){
                 while (true){

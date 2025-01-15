@@ -33,7 +33,7 @@ void hatch_egg(ConsoleHandle& console, BotBaseContext& context){
             break;
         }
 
-        int ret = run_until(
+        int ret = run_until<BotBaseContext>(
             console, context,
             [](BotBaseContext& context){
                 egg_spin(context, 480 * TICKS_PER_SECOND);

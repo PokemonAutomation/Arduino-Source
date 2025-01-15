@@ -112,7 +112,7 @@ void save_game_tutorial(const ProgramInfo& info, ConsoleHandle& console, BotBase
     
     // open the menu.
     MainMenuWatcher menu(COLOR_RED);
-    int ret0 = run_until(
+    int ret0 = run_until<BotBaseContext>(
         console, context,
         [](BotBaseContext& context){
             pbf_wait(context, 500); // avoiding pressing X if menu already open

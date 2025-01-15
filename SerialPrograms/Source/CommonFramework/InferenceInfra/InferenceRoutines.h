@@ -16,7 +16,6 @@
 
 namespace PokemonAutomation{
 
-class BotBaseContext;
 class ProgramEnvironment;
 
 
@@ -67,13 +66,25 @@ int run_until(
     std::chrono::milliseconds default_video_period = std::chrono::milliseconds(50),
     std::chrono::milliseconds default_audio_period = std::chrono::milliseconds(20)
 );
+template <typename ContextType>
 int run_until(
-    VideoStream& stream, BotBaseContext& context,
-    std::function<void(BotBaseContext& context)>&& command,
+    VideoStream& stream, ContextType& context,
+    std::function<void(ContextType& context)>&& command,
     const std::vector<PeriodicInferenceCallback>& callbacks,
     std::chrono::milliseconds default_video_period = std::chrono::milliseconds(50),
     std::chrono::milliseconds default_audio_period = std::chrono::milliseconds(20)
-);
+){
+    return run_until(
+        stream, context,
+        [&](CancellableScope& scope){
+            ContextType subcontext(scope, context);
+            command(subcontext);
+        },
+        callbacks,
+        default_video_period,
+        default_audio_period
+    );
+}
 
 
 #if 0

@@ -499,7 +499,7 @@ ImageFloatBox move_sandwich_hand(
 void finish_sandwich_eating(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
     console.overlay().add_log("Eating", COLOR_WHITE);
     PicnicWatcher picnic_watcher;
-    int ret = run_until(
+    int ret = run_until<BotBaseContext>(
         console, context,
         [](BotBaseContext& context){
             for(int i = 0; i < 20; i++){

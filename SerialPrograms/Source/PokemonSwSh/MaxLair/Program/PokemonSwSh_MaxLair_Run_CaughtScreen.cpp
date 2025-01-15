@@ -40,7 +40,7 @@ StateMachineAction mash_A_to_entrance(
 ){
     EntranceDetector entrance_detector(entrance);
 
-    int result = run_until(
+    int result = run_until<BotBaseContext>(
         console, context,
         [&](BotBaseContext& context){
             pbf_mash_button(context, BUTTON_A, 60 * TICKS_PER_SECOND);

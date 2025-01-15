@@ -73,7 +73,7 @@ void press_Bs_to_back_to_overworld(const ProgramInfo& info, ConsoleHandle& conso
     context.wait_for_all_requests();
     OverworldWatcher overworld(console, COLOR_RED);
     NormalBattleMenuWatcher battle(COLOR_BLUE);
-    int ret = run_until(
+    int ret = run_until<BotBaseContext>(
         console, context,
         [seconds_between_b_presses](BotBaseContext& context){
             pbf_wait(context, seconds_between_b_presses * TICKS_PER_SECOND); // avoiding pressing B if already in overworld
@@ -492,7 +492,7 @@ void open_recently_battled_from_pokedex(const ProgramInfo& info, ConsoleHandle& 
     LetsGoKillWatcher menu(console.logger(), COLOR_RED, true, {0.23, 0.23, 0.04, 0.20});
     context.wait_for_all_requests();
 
-    int ret = run_until(
+    int ret = run_until<BotBaseContext>(
         console, context,
         [](BotBaseContext& context){
             for (size_t i = 0; i < 10; i++){
@@ -522,7 +522,7 @@ void leave_phone_to_overworld(const ProgramInfo& info, ConsoleHandle& console, B
     GradientArrowWatcher arrow(COLOR_RED, GradientArrowType::DOWN, {0.475, 0.465, 0.05, 0.085});
     context.wait_for_all_requests();
 
-    int ret = run_until(
+    int ret = run_until<BotBaseContext>(
         console, context,
         [](BotBaseContext& context){
             for (size_t i = 0; i < 10; i++){
@@ -826,7 +826,7 @@ void walk_forward_until_dialog(
 
     DialogBoxWatcher        dialog(COLOR_RED, true);
     context.wait_for_all_requests();
-    int ret = run_until(
+    int ret = run_until<BotBaseContext>(
         console, context,
         [&](BotBaseContext& context){
             ssf_press_left_joystick(context, 128, y, 0, seconds_timeout * TICKS_PER_SECOND);
@@ -898,7 +898,7 @@ void mash_button_till_overworld(
     OverworldWatcher overworld(console, COLOR_CYAN);
     context.wait_for_all_requests();
 
-    int ret = run_until(
+    int ret = run_until<BotBaseContext>(
         console, context,
         [button, seconds_run](BotBaseContext& context){
             ssf_mash1_button(context, button, seconds_run * TICKS_PER_SECOND);
@@ -983,7 +983,7 @@ void enter_menu_from_overworld(const ProgramInfo& info, ConsoleHandle& console, 
         NormalBattleMenuWatcher battle(COLOR_RED);
         context.wait_for_all_requests();
 
-        int ret = run_until(
+        int ret = run_until<BotBaseContext>(
             console, context,
             [has_minimap](BotBaseContext& context){
                 for (int i = 0; i < 10; i++){
@@ -1044,7 +1044,7 @@ void press_button_until_gradient_arrow(
     GradientArrowType arrow_type
 ){
     GradientArrowWatcher arrow(COLOR_RED, arrow_type, box_area_to_check);
-    int ret = run_until(
+    int ret = run_until<BotBaseContext>(
         console, context,
         [button](BotBaseContext& context){
             pbf_wait(context, 3 * TICKS_PER_SECOND); // avoid pressing button if arrow already detected
@@ -1090,7 +1090,7 @@ void basic_menu_navigation(
     }
 
     GradientArrowWatcher arrow_end(COLOR_RED, GradientArrowType::RIGHT, arrow_box_end);
-    ret = run_until(
+    ret = run_until<BotBaseContext>(
         console,
         context,
         [dpad_button](BotBaseContext& context){

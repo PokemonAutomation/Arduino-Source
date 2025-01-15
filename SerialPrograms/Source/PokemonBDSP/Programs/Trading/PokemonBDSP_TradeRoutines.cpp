@@ -48,7 +48,7 @@ void trade_current_pokemon(
         context.wait_for_all_requests();
         SelectionArrowFinder detector0(console, {0.50, 0.58, 0.40, 0.10}, COLOR_RED);
         SelectionArrowFinder detector1(console, {0.50, 0.52, 0.40, 0.10}, COLOR_RED);
-        int ret = run_until(
+        int ret = run_until<BotBaseContext>(
             console, context,
             [](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_ZL, 20 * TICKS_PER_SECOND);
@@ -82,7 +82,7 @@ void trade_current_pokemon(
     //  Wait for black screen.
     {
         BlackScreenOverWatcher black_screen;
-        int ret = run_until(
+        int ret = run_until<BotBaseContext>(
             console, context,
             [](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_ZL, 120 * TICKS_PER_SECOND);
@@ -101,7 +101,7 @@ void trade_current_pokemon(
     //  Mash B until 2nd black screen.
     {
         BlackScreenWatcher black_screen;
-        int ret = run_until(
+        int ret = run_until<BotBaseContext>(
             console, context,
             [](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);

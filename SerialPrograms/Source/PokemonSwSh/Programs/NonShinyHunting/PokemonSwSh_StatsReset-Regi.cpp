@@ -130,7 +130,7 @@ void StatsResetRegi::program(SingleSwitchProgramEnvironment& env, BotBaseContext
             context.wait_for_all_requests();
             {
                 StandardBattleMenuWatcher fight_detector(false);
-                int result = run_until(
+                int result = run_until<BotBaseContext>(
                     env.console, context,
                     [](BotBaseContext& context){
                         while (true){

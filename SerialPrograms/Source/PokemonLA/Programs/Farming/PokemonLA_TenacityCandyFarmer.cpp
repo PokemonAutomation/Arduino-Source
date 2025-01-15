@@ -115,7 +115,7 @@ bool TenacityCandyFarmer::run_iteration(SingleSwitchProgramEnvironment& env, Bot
     {
         context.wait_for_all_requests();
         ButtonDetector button(env.console, env.console, ButtonType::ButtonA, {0.56, 0.46, 0.33, 0.27}, std::chrono::milliseconds(100), true);
-        int ret = run_until(
+        int ret = run_until<BotBaseContext>(
             env.console, context,
             [&](BotBaseContext& context){
                 for (size_t c = 0; c < 10; c++){
@@ -199,7 +199,7 @@ bool TenacityCandyFarmer::run_iteration(SingleSwitchProgramEnvironment& env, Bot
             // All three battles are now finished, wait for ArcPhoneDetector
             const bool stop_on_detected = true;
             ArcPhoneDetector arc_phone_detector(env.console, env.console, std::chrono::milliseconds(200), stop_on_detected);
-            int ret = run_until(
+            int ret = run_until<BotBaseContext>(
                 env.console, context, [](BotBaseContext& context){
                     pbf_mash_button(context, BUTTON_B, 20 * TICKS_PER_SECOND);
                 },
