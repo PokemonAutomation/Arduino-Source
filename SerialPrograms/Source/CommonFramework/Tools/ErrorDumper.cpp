@@ -44,7 +44,7 @@ void dump_image(
     Logger& logger,
     const ProgramInfo& program_info, const std::string& label,
     const ImageViewRGB32& image,
-    ConsoleHandle* console
+    const StreamHistorySession* stream_history
 ){
     report_error(
         &logger,
@@ -52,16 +52,17 @@ void dump_image(
         label,
         {},
         image,
-        console
+        stream_history
     );
 }
 void dump_image(
+    Logger& logger,
     const ProgramInfo& program_info,
-    ConsoleHandle& console,
+    VideoFeed& video,
     const std::string& label
 ){
-    auto snapshot = console.video().snapshot();
-    dump_image(console, program_info, label, snapshot);
+    auto snapshot = video.snapshot();
+    dump_image(logger, program_info, label, snapshot);
 }
 
 
@@ -73,8 +74,9 @@ void dump_image_and_throw_recoverable_exception(
     const ImageViewRGB32& screenshot
 ){
     OperationFailedException::fire(
-        console, ErrorReport::SEND_ERROR_REPORT,
-        error_message
+        ErrorReport::SEND_ERROR_REPORT,
+        error_message,
+        console
     );
 }
 

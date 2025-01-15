@@ -267,8 +267,9 @@ std::vector<BBQuests> process_quest_list(const ProgramInfo& info, ConsoleHandle&
                     //This case is handled in BBQSoloFarmer.
                     console.log("OOEggs is Stop in process_quest_list().");
                     OperationFailedException::fire(
-                        console, ErrorReport::SEND_ERROR_REPORT,
-                        "OOEggs is Stop in process_quest_list()."
+                        ErrorReport::SEND_ERROR_REPORT,
+                        "OOEggs is Stop in process_quest_list().",
+                        console
                     );
                     break;
                 }
@@ -305,8 +306,9 @@ std::vector<BBQuests> process_quest_list(const ProgramInfo& info, ConsoleHandle&
 
     if (quests_to_do.size() == 0){
         OperationFailedException::fire(
-            console, ErrorReport::SEND_ERROR_REPORT,
-            "No possible quests! Check language selection."
+            ErrorReport::SEND_ERROR_REPORT,
+            "No possible quests! Check language selection.",
+            console
         );
     }
 
@@ -367,8 +369,9 @@ bool process_and_do_quest(ProgramEnvironment& env, ConsoleHandle& console, BotBa
             break;
         default:
             OperationFailedException::fire(
-                console, ErrorReport::SEND_ERROR_REPORT,
-                "Unknown quest selection."
+                ErrorReport::SEND_ERROR_REPORT,
+                "Unknown quest selection.",
+                console
             );
             break;
         }
@@ -663,8 +666,9 @@ void quest_sneak_up(const ProgramInfo& info, ConsoleHandle& console, BotBaseCont
                         default:
                             console.log("Invalid state quest_sneak_up(). Smoke Ball equipped?");
                             OperationFailedException::fire(
-                                console, ErrorReport::SEND_ERROR_REPORT,
-                                "Invalid state quest_sneak_up(). Smoke Ball equipped?"
+                                ErrorReport::SEND_ERROR_REPORT,
+                                "Invalid state quest_sneak_up(). Smoke Ball equipped?",
+                                console
                             );
                         }
                     }
@@ -679,8 +683,9 @@ void quest_sneak_up(const ProgramInfo& info, ConsoleHandle& console, BotBaseCont
             default:
                 console.log("Invalid state in run_battle().");
                 OperationFailedException::fire(
-                    console, ErrorReport::SEND_ERROR_REPORT,
-                    "Invalid state in run_battle()."
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "Invalid state in run_battle().",
+                    console
                 );
             }
         }
@@ -1014,8 +1019,9 @@ void quest_sandwich(ProgramEnvironment& env, ConsoleHandle& console, BotBaseCont
         break;
     default:
         OperationFailedException::fire(
-            console, ErrorReport::SEND_ERROR_REPORT,
-            "Invalid sandwich selection."
+            ErrorReport::SEND_ERROR_REPORT,
+            "Invalid sandwich selection.",
+            console
         );
         break;
     }
@@ -1084,8 +1090,9 @@ void quest_tera_raid(ProgramEnvironment& env, ConsoleHandle& console, BotBaseCon
                 }catch (...){
                     console.log("Unable to flee.");
                     OperationFailedException::fire(
-                        console, ErrorReport::SEND_ERROR_REPORT,
-                        "Unable to flee!"
+                        ErrorReport::SEND_ERROR_REPORT,
+                        "Unable to flee!",
+                        console
                     );
                 }
             }

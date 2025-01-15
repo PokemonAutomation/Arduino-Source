@@ -18,7 +18,7 @@
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Environment/Environment.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
+#include "CommonFramework/Recording/StreamHistorySession.h"
 #include "ProgramDumper.h"
 #include "ErrorReports.h"
 
@@ -114,7 +114,7 @@ SendableErrorReport::SendableErrorReport(
     std::string title,
     std::vector<std::pair<std::string, std::string>> messages,
     const ImageViewRGB32& image,
-    ConsoleHandle* console
+    const StreamHistorySession* stream_history
 )
     : SendableErrorReport()
 {
@@ -147,8 +147,8 @@ SendableErrorReport::SendableErrorReport(
         file.flush();
         m_logs_name = ERROR_LOGS_NAME;
     }
-    if (console){
-        if (console->save_stream_history(m_directory + "Video.mp4")){
+    if (stream_history){
+        if (stream_history->save(m_directory + "Video.mp4")){
             m_video_name = "Video.mp4";
         }
     }
@@ -393,7 +393,7 @@ void report_error(
     std::string title,
     std::vector<std::pair<std::string, std::string>> messages,
     const ImageViewRGB32& image,
-    ConsoleHandle* console,
+    const StreamHistorySession* stream_history,
     const std::vector<std::string>& files
 ){
     if (logger == nullptr){
@@ -407,7 +407,7 @@ void report_error(
             std::move(title),
             std::move(messages),
             image,
-            console
+            stream_history
         );
 
         std::vector<std::string> full_file_paths;

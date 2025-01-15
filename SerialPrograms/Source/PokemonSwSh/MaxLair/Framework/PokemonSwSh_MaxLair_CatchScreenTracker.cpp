@@ -88,8 +88,9 @@ void CaughtPokemonScreen::leave_summary(){
 //        auto snapshot = m_console.video().snapshot();
 //        dump_image(m_console, m_env.program_info(), "CaughtMenu", snapshot);
         OperationFailedException::fire(
-            m_console, ErrorReport::SEND_ERROR_REPORT,
-            "Failed to detect caught menu."
+            ErrorReport::SEND_ERROR_REPORT,
+            "Failed to detect caught menu.",
+            m_console
         );
     }
 
@@ -118,8 +119,9 @@ void CaughtPokemonScreen::process_detection(Detection detection){
     switch (detection){
     case SummaryShinySymbolDetector::Detection::NO_DETECTION:
         OperationFailedException::fire(
-            m_console, ErrorReport::SEND_ERROR_REPORT,
-            "Failed to detect summary screen."
+            ErrorReport::SEND_ERROR_REPORT,
+            "Failed to detect summary screen.",
+            m_console
         );
     case SummaryShinySymbolDetector::Detection::NOT_SHINY:
         if (!mon.read){
@@ -128,8 +130,9 @@ void CaughtPokemonScreen::process_detection(Detection detection){
             mon.read = true;
         }else if (mon.shiny){
             OperationFailedException::fire(
-                m_console, ErrorReport::SEND_ERROR_REPORT,
-                "Fatal Inconsistency: Expected to see a non-shiny."
+                ErrorReport::SEND_ERROR_REPORT,
+                "Fatal Inconsistency: Expected to see a non-shiny.",
+                m_console
             );
         }
         break;
@@ -140,8 +143,9 @@ void CaughtPokemonScreen::process_detection(Detection detection){
             mon.read = true;
         }else if (!mon.shiny){
             OperationFailedException::fire(
-                m_console, ErrorReport::SEND_ERROR_REPORT,
-                "Fatal Inconsistency: Expected to see a shiny."
+                ErrorReport::SEND_ERROR_REPORT,
+                "Fatal Inconsistency: Expected to see a shiny.",
+                m_console
             );
         }
         break;

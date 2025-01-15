@@ -261,8 +261,9 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
             consecutive_failures++;
             if (consecutive_failures >= 3){
                 OperationFailedException::fire(
-                    env.console, ErrorReport::SEND_ERROR_REPORT,
-                    "Failed 3 batches in the row."
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "Failed 3 batches in the row.",
+                    env.console
                 );
             }
             pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
@@ -387,8 +388,9 @@ bool EggAutonomous::run_batch(SingleSwitchProgramEnvironment& env, BotBaseContex
             context.wait_for_all_requests();
 
             OperationFailedException::fire(
-                env.console, ErrorReport::SEND_ERROR_REPORT,
-                "Max number of loops reached. Not enough eggs in party?"
+                ErrorReport::SEND_ERROR_REPORT,
+                "Max number of loops reached. Not enough eggs in party?",
+                env.console
             );
         }
         
@@ -478,8 +480,9 @@ void EggAutonomous::wait_for_egg_hatched(SingleSwitchProgramEnvironment& env, Bo
     );
     if (ret > 0){
         OperationFailedException::fire(
-            env.console, ErrorReport::SEND_ERROR_REPORT,
-            "Cannot detect egg hatching ends."
+            ErrorReport::SEND_ERROR_REPORT,
+            "Cannot detect egg hatching ends.",
+            env.console
         );
     }
 }
@@ -541,15 +544,17 @@ size_t EggAutonomous::talk_to_lady_to_fetch_egg(
         );
     }else{
         OperationFailedException::fire(
-            env.console, ErrorReport::SEND_ERROR_REPORT,
-            "Cannot detect dialog selection arrow when talking to Nursery lady."
+            ErrorReport::SEND_ERROR_REPORT,
+            "Cannot detect dialog selection arrow when talking to Nursery lady.",
+            env.console
         );
     }
     // If dialog over is not detected:
     if (ret < 0){
         OperationFailedException::fire(
-            env.console, ErrorReport::SEND_ERROR_REPORT,
-            "Cannot detect end of Nursery lady dialog. No Y-Comm mark found."
+            ErrorReport::SEND_ERROR_REPORT,
+            "Cannot detect end of Nursery lady dialog. No Y-Comm mark found.",
+            env.console
         );
     }
 
@@ -710,8 +715,9 @@ bool EggAutonomous::process_hatched_pokemon(SingleSwitchProgramEnvironment& env,
                 );
                 if (ret != 0){
                     OperationFailedException::fire(
-                        env.console, ErrorReport::SEND_ERROR_REPORT,
-                        "Cannot detect pokemon menu in storage box."
+                        ErrorReport::SEND_ERROR_REPORT,
+                        "Cannot detect pokemon menu in storage box.",
+                        env.console
                     );
                 }
 
@@ -738,8 +744,9 @@ bool EggAutonomous::process_hatched_pokemon(SingleSwitchProgramEnvironment& env,
                 );
                 if (ret != 0){
                     OperationFailedException::fire(
-                        env.console, ErrorReport::SEND_ERROR_REPORT,
-                        "Miss second dialog when releasing pokemon."
+                        ErrorReport::SEND_ERROR_REPORT,
+                        "Miss second dialog when releasing pokemon.",
+                        env.console
                     );
                 }
                 pbf_press_button(context, BUTTON_A, 20, 100);
@@ -755,8 +762,9 @@ bool EggAutonomous::process_hatched_pokemon(SingleSwitchProgramEnvironment& env,
                 }
                 if (dialog_count == max_dialog_count){
                     OperationFailedException::fire(
-                        env.console, ErrorReport::SEND_ERROR_REPORT,
-                        "Unexpected dialogs when releasing pokemon."
+                        ErrorReport::SEND_ERROR_REPORT,
+                        "Unexpected dialogs when releasing pokemon.",
+                        env.console
                     );
                 }
                 break;
@@ -811,8 +819,9 @@ bool EggAutonomous::process_hatched_pokemon(SingleSwitchProgramEnvironment& env,
         );
         if (ret > 0){
             OperationFailedException::fire(
-                env.console, ErrorReport::SEND_ERROR_REPORT,
-                "Cannot detect Y-Comm after leaving menu."
+                ErrorReport::SEND_ERROR_REPORT,
+                "Cannot detect Y-Comm after leaving menu.",
+                env.console
             );
         }
     }
@@ -830,8 +839,9 @@ void EggAutonomous::wait_for_y_comm_icon(SingleSwitchProgramEnvironment& env, Bo
     );
     if (ret != 0){
         OperationFailedException::fire(
-            env.console, ErrorReport::SEND_ERROR_REPORT,
-            error_msg + " No Y-Comm mark found."
+            ErrorReport::SEND_ERROR_REPORT,
+            error_msg + " No Y-Comm mark found.",
+            env.console
         );
     }
 }

@@ -132,8 +132,9 @@ void GiftBerryReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext
         VideoSnapshot screen = env.console.video().snapshot();
         if (!dialog_detector.detect(screen)){
             OperationFailedException::fire(
-                env.console, ErrorReport::SEND_ERROR_REPORT,
-                "No npc dialog box found when reading berry name"
+                ErrorReport::SEND_ERROR_REPORT,
+                "No npc dialog box found when reading berry name",
+                env.console
             );
         }
 
@@ -145,8 +146,9 @@ void GiftBerryReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext
         );
         if (result.results.empty()){
             OperationFailedException::fire(
-                env.console, ErrorReport::SEND_ERROR_REPORT,
-                "No berry name found in dialog box"
+                ErrorReport::SEND_ERROR_REPORT,
+                "No berry name found in dialog box",
+                env.console
             );
         }
         bool found_berry = false;
@@ -171,8 +173,9 @@ void GiftBerryReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext
         pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
         if (!reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST)){
             OperationFailedException::fire(
-                env.console, ErrorReport::SEND_ERROR_REPORT,
-                "Error resetting game"
+                ErrorReport::SEND_ERROR_REPORT,
+                "Error resetting game",
+                env.console
             );
         }
     }

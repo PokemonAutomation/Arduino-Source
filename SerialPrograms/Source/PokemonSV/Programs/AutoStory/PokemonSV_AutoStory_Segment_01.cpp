@@ -261,8 +261,9 @@ void checkpoint_03(
         );
         if (ret < 0){
             OperationFailedException::fire(
-                env.console, ErrorReport::SEND_ERROR_REPORT,
-                "Stuck trying to clear auto heal tutorial."
+                ErrorReport::SEND_ERROR_REPORT,
+                "Stuck trying to clear auto heal tutorial.",
+                env.console
             );  
         }
         clear_tutorial(env.console, context);

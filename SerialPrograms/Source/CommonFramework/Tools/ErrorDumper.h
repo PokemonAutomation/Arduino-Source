@@ -12,6 +12,8 @@
 
 namespace PokemonAutomation{
 
+class VideoFeed;
+class StreamHistorySession;
 class ConsoleHandle;
 class EventNotificationOption;
 class ImageViewRGB32;
@@ -33,11 +35,12 @@ void dump_image(
     Logger& logger,
     const ProgramInfo& program_info, const std::string& label,
     const ImageViewRGB32& image,
-    ConsoleHandle* console = nullptr
+    const StreamHistorySession* stream_history = nullptr
 );
 void dump_image(
+    Logger& logger,
     const ProgramInfo& program_info,
-    ConsoleHandle& console,
+    VideoFeed& video,
     const std::string& label
 );
 

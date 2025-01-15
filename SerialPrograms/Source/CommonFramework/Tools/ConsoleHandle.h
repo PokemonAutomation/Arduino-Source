@@ -9,6 +9,7 @@
 
 #include <memory>
 #include "Common/Cpp/AbstractLogger.h"
+#include "CommonFramework/VideoPipeline/VideoStream.h"
 
 namespace PokemonAutomation{
 
@@ -25,7 +26,7 @@ class VisualInferencePivot;
 class AudioInferencePivot;
 
 
-class ConsoleHandle{
+class ConsoleHandle : public VideoStream{
 public:
     ConsoleHandle(ConsoleHandle&& x);
     void operator=(ConsoleHandle&& x) = delete;
@@ -49,22 +50,25 @@ public:
     // string-like can be const char* or std::string
     template <class... Args>
     void log(Args&&... args){
-        m_logger.log(std::forward<Args>(args)...);
+        VideoStream::logger.log(std::forward<Args>(args)...);
     }
 
     size_t index() const{ return m_index; }
 
-    Logger& logger(){ return m_logger; }
+    Logger& logger(){ return VideoStream::logger; }
     BotBase& botbase(){ return *m_botbase; }
-    VideoFeed& video(){ return m_video; }
+    VideoFeed& video(){ return VideoStream::video; }
     VideoOverlay& overlay(){ return m_overlay; }
-    AudioFeed& audio(){ return m_audio; }
+    AudioFeed& audio(){ return VideoStream::audio; }
+    const StreamHistorySession& stream_history() const{ return VideoStream::video_history; };
     bool save_stream_history(const std::string& filename);
 
-    operator Logger&(){ return m_logger; }
-    operator VideoFeed&(){ return m_video; }
+
+    operator Logger&(){ return VideoStream::logger; }
+    operator VideoFeed&(){ return VideoStream::video; }
     operator VideoOverlay&(){ return m_overlay; }
-    operator AudioFeed&() { return m_audio; }
+    operator AudioFeed&() { return VideoStream::audio; }
+    operator const StreamHistorySession&() const{ return VideoStream::video_history; }
 
     VisualInferencePivot& video_inference_pivot(){ return *m_video_pivot; }
     AudioInferencePivot& audio_inference_pivot(){ return *m_audio_pivot; }
@@ -75,12 +79,16 @@ public:
 
 private:
     size_t m_index;
-    Logger& m_logger;
+//    Logger& m_logger;
     BotBase* m_botbase;
-    VideoFeed& m_video;
+
+//    VideoStream m_stream;
+//    VideoFeed& m_video;
     VideoOverlay& m_overlay;
-    AudioFeed& m_audio;
-    const StreamHistorySession& m_history;
+//    AudioFeed& m_audio;
+//    const StreamHistorySession& m_history;
+
+
     std::unique_ptr<ThreadUtilizationStat> m_thread_utilization;
     std::unique_ptr<VisualInferencePivot> m_video_pivot;
     std::unique_ptr<AudioInferencePivot> m_audio_pivot;

@@ -86,7 +86,7 @@ bool read_battle_menu(
 
     if (state.wins != 3 && is_boss(opponent)){
         console.log("Boss found before 3 wins. Something is seriously out-of-sync.", COLOR_RED);
-        dump_image(MODULE_NAME, console, "BossBeforeEnd");
+        dump_image(console, MODULE_NAME, console, "BossBeforeEnd");
 //        send_program_telemetry(
 //            env.logger(), true, COLOR_RED, MODULE_NAME,
 //            "Error",
@@ -351,8 +351,9 @@ StateMachineAction throw_balls(
         pbf_press_button(context, BUTTON_A, 10, 125);
     }else{
         OperationFailedException::fire(
-            console, ErrorReport::NO_ERROR_REPORT,
-            "Unable to find appropriate ball. Did you run out?"
+            ErrorReport::NO_ERROR_REPORT,
+            "Unable to find appropriate ball. Did you run out?",
+            console
         );
     }
 

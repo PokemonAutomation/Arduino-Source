@@ -107,8 +107,9 @@ void checkpoint_08(
         );
         if (ret < 0){
             OperationFailedException::fire(
-                env.console, ErrorReport::SEND_ERROR_REPORT,
-                "Failed to feed mom's sandwich."
+                ErrorReport::SEND_ERROR_REPORT,
+                "Failed to feed mom's sandwich.",
+                env.console
             );  
         }
 

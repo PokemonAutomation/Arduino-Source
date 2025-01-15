@@ -674,8 +674,9 @@ void fly_from_paldea_to_blueberry_entrance(const ProgramInfo& info, ConsoleHandl
 
     if (!isFlySuccessful){
         OperationFailedException::fire(
-            console, ErrorReport::SEND_ERROR_REPORT,
-            "Failed to fly to Blueberry academy, five times in a row."
+            ErrorReport::SEND_ERROR_REPORT,
+            "Failed to fly to Blueberry academy, five times in a row.",
+            console
         );
     }
 }
@@ -742,8 +743,9 @@ void move_from_blueberry_entrance_to_league_club(const ProgramInfo& info, Consol
 
     if (!isSuccessful){
         OperationFailedException::fire(
-            console, ErrorReport::SEND_ERROR_REPORT,
-            "Failed to enter League club room, five times in a row."
+            ErrorReport::SEND_ERROR_REPORT,
+            "Failed to enter League club room, five times in a row.",
+            console
         );
     }
 
@@ -791,8 +793,9 @@ void move_from_item_printer_to_blueberry_entrance(const ProgramInfo& info, Conso
     }else{
         console.log("Failed to detect Blueberry navigation menu.");
         OperationFailedException::fire(
-            console, ErrorReport::SEND_ERROR_REPORT,
-            "Failed to find the exit from the League room."
+            ErrorReport::SEND_ERROR_REPORT,
+            "Failed to find the exit from the League room.",
+            console
         );
     }
 
@@ -806,8 +809,9 @@ void move_from_item_printer_to_blueberry_entrance(const ProgramInfo& info, Conso
         console.log("Overworld detected");
     }else{
         OperationFailedException::fire(
-            console, ErrorReport::SEND_ERROR_REPORT,
-            "Failed to detect overworld."
+            ErrorReport::SEND_ERROR_REPORT,
+            "Failed to detect overworld.",
+            console
         );      
     }
 }
@@ -854,8 +858,9 @@ void fly_from_blueberry_to_north_province_3(const ProgramInfo& info, ConsoleHand
     if (!isFlySuccessful){
 
         OperationFailedException::fire(
-            console, ErrorReport::SEND_ERROR_REPORT,
-            "Failed to fly to North province area 3, ten times in a row."
+            ErrorReport::SEND_ERROR_REPORT,
+            "Failed to fly to North province area 3, ten times in a row.",
+            console
         );
 
     }

@@ -256,8 +256,9 @@ CameraAngle quest_photo_navi(const ProgramInfo& info, ConsoleHandle& console, Bo
             break;
         default:
             OperationFailedException::fire(
-                console, ErrorReport::SEND_ERROR_REPORT,
-                "Invalid photo quest."
+                ErrorReport::SEND_ERROR_REPORT,
+                "Invalid photo quest.",
+                console
             );
             break;
     }
@@ -345,8 +346,9 @@ void quest_photo(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
                 }catch (...){
                     console.log("Unable to flee.");
                     OperationFailedException::fire(
-                        console, ErrorReport::SEND_ERROR_REPORT,
-                        "Unable to flee!"
+                        ErrorReport::SEND_ERROR_REPORT,
+                        "Unable to flee!",
+                        console
                     );
                 }
             }
@@ -589,8 +591,9 @@ void quest_catch_navi(const ProgramInfo& info, ConsoleHandle& console, BotBaseCo
             break;
         default:
             OperationFailedException::fire(
-                console, ErrorReport::SEND_ERROR_REPORT,
-                "Invalid catch quest."
+                ErrorReport::SEND_ERROR_REPORT,
+                "Invalid catch quest.",
+                console
             );
             break;
     }
@@ -615,8 +618,9 @@ void quest_catch_throw_ball(const ProgramInfo& info, ConsoleHandle& console, Bot
         if (current_time() - start > std::chrono::minutes(2)){
             console.log("Timed out trying to read ball after 2 minutes.", COLOR_RED);
             OperationFailedException::fire(
-                console, ErrorReport::SEND_ERROR_REPORT,
-                "Timed out trying to read ball after 2 minutes."
+                ErrorReport::SEND_ERROR_REPORT,
+                "Timed out trying to read ball after 2 minutes.",
+                console
             );
         }
 
@@ -637,8 +641,9 @@ void quest_catch_throw_ball(const ProgramInfo& info, ConsoleHandle& console, Bot
     if (quantity == 0){
         console.log("Unable to find ball.");
         OperationFailedException::fire(
-            console, ErrorReport::SEND_ERROR_REPORT,
-            "Unable to find ball."
+            ErrorReport::SEND_ERROR_REPORT,
+            "Unable to find ball.",
+            console
         );
     }
     if (quantity < 0){
@@ -679,8 +684,9 @@ void quest_catch_handle_battle(const ProgramInfo& info, ConsoleHandle& console, 
                 if (bMenu < 0){
                     console.log("Unable to find menu_before_throw.");
                     OperationFailedException::fire(
-                        console, ErrorReport::SEND_ERROR_REPORT,
-                        "Unable to find menu_before_throw."
+                        ErrorReport::SEND_ERROR_REPORT,
+                        "Unable to find menu_before_throw.",
+                        console
                     );
                 }
                 
@@ -761,8 +767,9 @@ void quest_catch_handle_battle(const ProgramInfo& info, ConsoleHandle& console, 
                         if (ret3 == 0){
                             console.log("Battle menu detected early. Out of PP/No move in slot, please check your setup.");
                             OperationFailedException::fire(
-                                console, ErrorReport::SEND_ERROR_REPORT,
-                                "Battle menu detected early. Out of PP, please check your setup."
+                                ErrorReport::SEND_ERROR_REPORT,
+                                "Battle menu detected early. Out of PP, please check your setup.",
+                                console
                             );
                         }
                     }else{
@@ -798,8 +805,9 @@ void quest_catch_handle_battle(const ProgramInfo& info, ConsoleHandle& console, 
                 default:
                     console.log("Invalid state ret2_run. Out of moves?");
                     OperationFailedException::fire(
-                        console, ErrorReport::SEND_ERROR_REPORT,
-                        "Invalid state ret2_run. Out of moves?"
+                        ErrorReport::SEND_ERROR_REPORT,
+                        "Invalid state ret2_run. Out of moves?",
+                        console
                     );
                 }
 
@@ -823,8 +831,9 @@ void quest_catch_handle_battle(const ProgramInfo& info, ConsoleHandle& console, 
     default:
         console.log("Invalid state in run_battle().");
         OperationFailedException::fire(
-            console, ErrorReport::SEND_ERROR_REPORT,
-            "Invalid state in run_battle()."
+            ErrorReport::SEND_ERROR_REPORT,
+            "Invalid state in run_battle().",
+            console
         );
     }
 }
@@ -915,8 +924,9 @@ void wild_battle_tera(const ProgramInfo& info, ConsoleHandle& console, BotBaseCo
                 if (current_time() - start > std::chrono::minutes(5)){
                     console.log("Timed out during battle after 5 minutes.", COLOR_RED);
                     OperationFailedException::fire(
-                        console, ErrorReport::SEND_ERROR_REPORT,
-                        "Timed out during battle after 5 minutes."
+                        ErrorReport::SEND_ERROR_REPORT,
+                        "Timed out during battle after 5 minutes.",
+                        console
                     );
                 }
 
@@ -963,8 +973,9 @@ void wild_battle_tera(const ProgramInfo& info, ConsoleHandle& console, BotBaseCo
                     break;
                 default:
                     OperationFailedException::fire(
-                        console, ErrorReport::SEND_ERROR_REPORT,
-                        "Timed out during battle. Stuck, crashed, or took more than 90 seconds for a turn."
+                        ErrorReport::SEND_ERROR_REPORT,
+                        "Timed out during battle. Stuck, crashed, or took more than 90 seconds for a turn.",
+                        console
                     );
                 }
             }

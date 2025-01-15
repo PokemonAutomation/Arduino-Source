@@ -190,8 +190,9 @@ void BoxReorderNationalDex::program(SingleSwitchProgramEnvironment& env, BotBase
             std::stringstream os;
             os << "Failed to read pokemon name at box " << box << " row " << row << " col " << col;
             OperationFailedException::fire(
-                env.console, ErrorReport::SEND_ERROR_REPORT,
-                os.str()
+                ErrorReport::SEND_ERROR_REPORT,
+                os.str(),
+                env.console
             );
         }
     }

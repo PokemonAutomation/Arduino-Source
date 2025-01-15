@@ -130,7 +130,7 @@ void SingleSwitchProgramSession::internal_run_program(){
     }catch (InvalidConnectionStateException&){
     }catch (ScreenshotException& e){
         logger().log("Program stopped with an exception!", COLOR_RED);
-        e.add_console_if_needed(env.console);
+        e.add_stream_if_needed(env.console);
         std::string message = e.message();
         if (message.empty()){
             message = e.name();

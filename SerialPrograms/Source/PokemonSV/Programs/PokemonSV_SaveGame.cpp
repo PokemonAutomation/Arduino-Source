@@ -43,8 +43,9 @@ void save_game_from_menu_or_overworld(
     while (true){
         if (current_time() - start > std::chrono::minutes(5)){
             OperationFailedException::fire(
-                console, ErrorReport::SEND_ERROR_REPORT,
-                "save_game_from_menu_or_overworld(): Failed to save game after 5 minutes."
+                ErrorReport::SEND_ERROR_REPORT,
+                "save_game_from_menu_or_overworld(): Failed to save game after 5 minutes.",
+                console
             );
         }
 
@@ -90,8 +91,9 @@ void save_game_from_menu_or_overworld(
             continue;
         default:
             OperationFailedException::fire(
-                console, ErrorReport::SEND_ERROR_REPORT,
-                "save_game_from_menu_or_overworld(): No recognized state after 60 seconds."
+                ErrorReport::SEND_ERROR_REPORT,
+                "save_game_from_menu_or_overworld(): No recognized state after 60 seconds.",
+                console
             );
         }
 
@@ -122,8 +124,9 @@ void save_game_tutorial(const ProgramInfo& info, ConsoleHandle& console, BotBase
     );
     if (ret0 != 0){
         OperationFailedException::fire(
-            console, ErrorReport::SEND_ERROR_REPORT,
-            "Failed to open menu!"
+            ErrorReport::SEND_ERROR_REPORT,
+            "Failed to open menu!",
+            console
         );
     }    
 

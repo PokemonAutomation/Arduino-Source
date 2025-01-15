@@ -348,8 +348,9 @@ bool StatsResetEventBattle::run_battle(SingleSwitchProgramEnvironment& env, BotB
                     stats.errors++;
                     env.update_stats();
                     OperationFailedException::fire(
-                        env.console, ErrorReport::SEND_ERROR_REPORT,
-                        "Timed out during battle after 5 minutes."
+                        ErrorReport::SEND_ERROR_REPORT,
+                        "Timed out during battle after 5 minutes.",
+                        env.console
                     );
                 }
 
@@ -381,8 +382,9 @@ bool StatsResetEventBattle::run_battle(SingleSwitchProgramEnvironment& env, BotB
                     stats.errors++;
                     env.update_stats();
                     OperationFailedException::fire(
-                        env.console, ErrorReport::SEND_ERROR_REPORT,
-                        "Timed out during battle. Stuck, crashed, or took more than 90 seconds for a turn."
+                        ErrorReport::SEND_ERROR_REPORT,
+                        "Timed out during battle. Stuck, crashed, or took more than 90 seconds for a turn.",
+                        env.console
                     );
                 }
             }
@@ -399,8 +401,9 @@ bool StatsResetEventBattle::run_battle(SingleSwitchProgramEnvironment& env, BotB
         int quantity = move_to_ball(reader, env.console, context, BALL_SELECT.slug());
         if (quantity == 0){
             OperationFailedException::fire(
-                env.console, ErrorReport::SEND_ERROR_REPORT,
-                "Unable to find appropriate ball. Did you run out?"
+                ErrorReport::SEND_ERROR_REPORT,
+                "Unable to find appropriate ball. Did you run out?",
+                env.console
             );
         }
         if (quantity < 0){
@@ -598,8 +601,9 @@ bool StatsResetEventBattle::check_stats_after_win(SingleSwitchProgramEnvironment
             stats.errors++;
             env.update_stats();
             OperationFailedException::fire(
-                env.console, ErrorReport::SEND_ERROR_REPORT,
-                "StatsResetEventBattle::check_stats_after_win(): No state detected after 1 minute."
+                ErrorReport::SEND_ERROR_REPORT,
+                "StatsResetEventBattle::check_stats_after_win(): No state detected after 1 minute.",
+                env.console
             );
         }
     }

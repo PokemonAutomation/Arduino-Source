@@ -128,8 +128,9 @@ bool TenacityCandyFarmer::run_iteration(SingleSwitchProgramEnvironment& env, Bot
         );
         if (ret != 0){
             OperationFailedException::fire(
-                env.console, ErrorReport::SEND_ERROR_REPORT,
-                "Unable to detect Tenacity path menu after 10 A presses."
+                ErrorReport::SEND_ERROR_REPORT,
+                "Unable to detect Tenacity path menu after 10 A presses.",
+                env.console
             );
         }
     }
@@ -206,8 +207,9 @@ bool TenacityCandyFarmer::run_iteration(SingleSwitchProgramEnvironment& env, Bot
             );
             if (ret < 0){
                 OperationFailedException::fire(
-                    env.console, ErrorReport::SEND_ERROR_REPORT,
-                    "Failed to find Arc phone after 20 seconds when the last battle ends."
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "Failed to find Arc phone after 20 seconds when the last battle ends.",
+                    env.console
                 );
             }
             env.log("Found Arc Phone. End of one path.");
@@ -239,8 +241,9 @@ bool TenacityCandyFarmer::run_iteration(SingleSwitchProgramEnvironment& env, Bot
             env.console.log("Error: Failed to find battle menu after 2 minutes.");
 //            return true;
             OperationFailedException::fire(
-                env.console, ErrorReport::SEND_ERROR_REPORT,
-                "Failed to find battle menu after 2 minutes."
+                ErrorReport::SEND_ERROR_REPORT,
+                "Failed to find battle menu after 2 minutes.",
+                env.console
             );
         }
 

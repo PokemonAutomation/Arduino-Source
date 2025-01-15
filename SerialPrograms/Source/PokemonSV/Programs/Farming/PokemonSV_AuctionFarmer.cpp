@@ -303,8 +303,9 @@ void AuctionFarmer::move_to_auctioneer(SingleSwitchProgramEnvironment& env, BotB
         tries++;
     }
     OperationFailedException::fire(
-        env.console, ErrorReport::SEND_ERROR_REPORT,
-        "Too many attempts to talk to the NPC."
+        ErrorReport::SEND_ERROR_REPORT,
+        "Too many attempts to talk to the NPC.",
+        env.console
     );
 }
 
@@ -346,8 +347,9 @@ void AuctionFarmer::move_dialog_to_center(SingleSwitchProgramEnvironment& env, B
 
         if (!offer_visible){
             OperationFailedException::fire(
-                env.console, ErrorReport::SEND_ERROR_REPORT,
-                "Lost offer dialog for wanted item."
+                ErrorReport::SEND_ERROR_REPORT,
+                "Lost offer dialog for wanted item.",
+                env.console
             );
         }
     }
@@ -507,8 +509,9 @@ void AuctionFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
                             send_program_recoverable_error_notification(env, NOTIFICATION_ERROR_RECOVERABLE, e.message(), screen);
                         }else{
                             OperationFailedException::fire(
-                                env.console, ErrorReport::SEND_ERROR_REPORT,
-                                "Failed to talk to the NPC!"
+                                ErrorReport::SEND_ERROR_REPORT,
+                                "Failed to talk to the NPC!",
+                                env.console
                             );
                         }
                         break;

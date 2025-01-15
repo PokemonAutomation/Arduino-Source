@@ -33,7 +33,7 @@ public:
     //  This will take a screenshot and store the console if the stream history if requested later.
     explicit ProgramFinishedException(
         std::string message,
-        ConsoleHandle& console
+        VideoStream& stream
     );
 
     //  Construct exception with message with screenshot and (optionally) console information.
@@ -42,12 +42,12 @@ public:
     explicit ProgramFinishedException(
         ErrorReport error_report,
         std::string message,
-        ConsoleHandle* console,
+        VideoStream* stream,
         ImageRGB32 screenshot
     );
     explicit ProgramFinishedException(
         std::string message,
-        ConsoleHandle* console,
+        VideoStream* stream,
         std::shared_ptr<const ImageRGB32> screenshot
     );
 

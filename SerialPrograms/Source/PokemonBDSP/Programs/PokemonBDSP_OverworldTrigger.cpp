@@ -160,8 +160,9 @@ bool OverworldTrigger::find_encounter(ConsoleHandle& console, BotBaseContext& co
         );
         if (result < 0){
             OperationFailedException::fire(
-                console, ErrorReport::SEND_ERROR_REPORT,
-                "Battle not detected after Sweet Scent for 30 seconds."
+                ErrorReport::SEND_ERROR_REPORT,
+                "Battle not detected after Sweet Scent for 30 seconds.",
+                console
             );
         }
     }

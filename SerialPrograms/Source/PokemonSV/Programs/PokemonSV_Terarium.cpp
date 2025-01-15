@@ -106,8 +106,9 @@ void return_to_plaza(const ProgramInfo& info, ConsoleHandle& console, BotBaseCon
                 }catch (...){
                     console.log("Unable to flee.");
                     OperationFailedException::fire(
-                        console, ErrorReport::SEND_ERROR_REPORT,
-                        "Unable to flee!"
+                        ErrorReport::SEND_ERROR_REPORT,
+                        "Unable to flee!",
+                        console
                     );
                 }
             }
@@ -132,8 +133,9 @@ void map_move_cursor_fly(const ProgramInfo& info, ConsoleHandle& console, BotBas
             press_Bs_to_back_to_overworld(info, console, context);
             if (i == 2){
                 OperationFailedException::fire(
-                    console, ErrorReport::SEND_ERROR_REPORT,
-                    "Unable to fly to " + location + "!"
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "Unable to fly to " + location + "!",
+                    console
                 );
             }
         }

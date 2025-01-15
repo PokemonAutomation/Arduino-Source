@@ -115,8 +115,9 @@ bool run_battle_menu(
         }
     }
     OperationFailedException::fire(
-        console, ErrorReport::SEND_ERROR_REPORT,
-        "Invalid SinglesMoveType: " + std::to_string((int)move.type)
+        ErrorReport::SEND_ERROR_REPORT,
+        "Invalid SinglesMoveType: " + std::to_string((int)move.type),
+        console
     );
 }
 
@@ -234,8 +235,9 @@ bool run_pokemon(
             consecutive_timeouts++;
             if (consecutive_timeouts == 3){
                 OperationFailedException::fire(
-                    console, ErrorReport::SEND_ERROR_REPORT,
-                    "No state detected after 6 minutes."
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "No state detected after 6 minutes.",
+                    console
                 );
             }
             console.log("Unable to detect any state for 2 minutes. Mashing B...", COLOR_RED);
@@ -307,8 +309,9 @@ bool run_singles_battle(
                 continue;
             default:
                 OperationFailedException::fire(
-                    console, ErrorReport::SEND_ERROR_REPORT,
-                    "Unable to send in a " + STRING_POKEMON + "."
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "Unable to send in a " + STRING_POKEMON + ".",
+                    console
                 );
             }
             break;

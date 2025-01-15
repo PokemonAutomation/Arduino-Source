@@ -183,7 +183,7 @@ void MultiSwitchProgramSession::internal_run_program(){
 
         //  If the exception doesn't already have console information,
         //  attach the 1st console here.
-        e.add_console_if_needed(env.consoles[0]);
+        e.add_stream_if_needed(env.consoles[0]);
 
         std::string message = e.message();
         if (message.empty()){

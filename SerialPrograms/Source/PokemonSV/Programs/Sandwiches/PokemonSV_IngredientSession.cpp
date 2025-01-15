@@ -49,8 +49,9 @@ PageIngredients IngredientSession::read_screen(std::shared_ptr<const ImageRGB32>
     ImageFloatBox box;
     if (!m_arrow.detect(box, *screen)){
         OperationFailedException::fire(
-            m_console, ErrorReport::SEND_ERROR_REPORT,
-            "IngredientSession::read_current_page(): Unable to find cursor."
+            ErrorReport::SEND_ERROR_REPORT,
+            "IngredientSession::read_current_page(): Unable to find cursor.",
+            m_console
         );
     }
 
@@ -60,8 +61,9 @@ PageIngredients IngredientSession::read_screen(std::shared_ptr<const ImageRGB32>
 //    cout << "slot = " << (int)ret.selected << endl;
     if (ret.selected < 0 || ret.selected >= 10){
         OperationFailedException::fire(
-            m_console, ErrorReport::SEND_ERROR_REPORT,
+            ErrorReport::SEND_ERROR_REPORT,
             "IngredientSession::read_current_page(): Invalid cursor slot.",
+            m_console,
             screen
         );
     }
@@ -112,9 +114,10 @@ PageIngredients IngredientSession::read_screen(std::shared_ptr<const ImageRGB32>
                 sprite_result.insert(p.second);
             }
             OperationFailedException::fire(
-                m_console, ErrorReport::SEND_ERROR_REPORT,
+                ErrorReport::SEND_ERROR_REPORT,
                 "IngredientSession::read_current_page(): Unable to read selected item. OCR and sprite do not agree on any match: ocr "
                 + set_to_str(ocr_result) + ", sprite " + set_to_str(sprite_result),
+                m_console,
                 screen
             );
         }
@@ -124,9 +127,10 @@ PageIngredients IngredientSession::read_screen(std::shared_ptr<const ImageRGB32>
                 sprite_result.insert(p.second);
             }
             OperationFailedException::fire(
-                m_console, ErrorReport::SEND_ERROR_REPORT,
+                ErrorReport::SEND_ERROR_REPORT,
                 "IngredientSession::read_current_page(): Unable to read selected item. Ambiguous result: "
                 + set_to_str(ocr_result) + ", " + set_to_str(sprite_result),
+                m_console,
                 screen
             );
         }
@@ -264,8 +268,9 @@ void IngredientSession::add_ingredients(
         if (found.empty()){
             const SandwichIngredientNames& name = get_ingredient_name(*remaining.begin());
             OperationFailedException::fire(
-                console, ErrorReport::NO_ERROR_REPORT,
-                "Unable to find ingredient: \"" + name.display_name() + "\" - Did you run out?"
+                ErrorReport::NO_ERROR_REPORT,
+                "Unable to find ingredient: \"" + name.display_name() + "\" - Did you run out?",
+                console
             );
         }
 
@@ -298,8 +303,9 @@ void IngredientSession::add_ingredients(
 
             if (!ingredient_added){
                 OperationFailedException::fire(
-                    console, ErrorReport::NO_ERROR_REPORT,
-                    "Unable to add ingredient: \"" + name.display_name() + "\" - Did you run out?"
+                    ErrorReport::NO_ERROR_REPORT,
+                    "Unable to add ingredient: \"" + name.display_name() + "\" - Did you run out?",
+                    console
                 );
             }
         }

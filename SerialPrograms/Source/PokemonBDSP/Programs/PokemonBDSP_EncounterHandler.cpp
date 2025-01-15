@@ -106,8 +106,9 @@ bool StandardEncounterHandler::handle_standard_encounter(const DoublesShinyDetec
         m_consecutive_failures++;
         if (m_consecutive_failures >= 3){
             OperationFailedException::fire(
-                m_console, ErrorReport::SEND_ERROR_REPORT,
-                "3 consecutive failed encounter detections."
+                ErrorReport::SEND_ERROR_REPORT,
+                "3 consecutive failed encounter detections.",
+                m_console
             );
         }
         return false;
@@ -168,8 +169,9 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
         m_consecutive_failures++;
         if (m_consecutive_failures >= 3){
             OperationFailedException::fire(
-                m_console, ErrorReport::SEND_ERROR_REPORT,
-                "3 consecutive failed encounter detections."
+                ErrorReport::SEND_ERROR_REPORT,
+                "3 consecutive failed encounter detections.",
+                m_console
             );
         }
         return false;

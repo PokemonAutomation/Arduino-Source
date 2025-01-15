@@ -39,8 +39,9 @@ bool heal_by_global_room(ConsoleHandle& console, BotBaseContext& context){
     );
     if (ret < 0){
         OperationFailedException::fire(
-            console, ErrorReport::SEND_ERROR_REPORT,
-            "No selection arrow detected when using Global Room."
+            ErrorReport::SEND_ERROR_REPORT,
+            "No selection arrow detected when using Global Room.",
+            console
         );
     }
 

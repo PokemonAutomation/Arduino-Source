@@ -117,8 +117,9 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
 
         if (consecutive_failures >= 3){
             OperationFailedException::fire(
-                env.console, ErrorReport::SEND_ERROR_REPORT,
-                "Failed 3 times in the row."
+                ErrorReport::SEND_ERROR_REPORT,
+                "Failed 3 times in the row.",
+                env.console
             );
         }
 
@@ -150,7 +151,7 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
             env.log("Timed out waiting for briefcase.", COLOR_RED);
             stats.add_error();
             consecutive_failures++;
-            dump_image(env.program_info(), env.console, "Briefcase");
+            dump_image(env.console, env.program_info(), env.console, "Briefcase");
             continue;
         }
 
@@ -211,7 +212,7 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         if (result_own.shiny_type == ShinyType::UNKNOWN){
             stats.add_error();
             consecutive_failures++;
-            dump_image(env.program_info(), env.console, "UnknownShinyDetection");
+            dump_image(env.console, env.program_info(), env.console, "UnknownShinyDetection");
         }else{
             consecutive_failures = 0;
         }

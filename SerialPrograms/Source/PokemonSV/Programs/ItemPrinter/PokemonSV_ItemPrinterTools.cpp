@@ -67,8 +67,9 @@ void item_printer_start_print(
         }
         default:
             OperationFailedException::fire(
-                console, ErrorReport::SEND_ERROR_REPORT,
-                "start_print(): No recognized state after 120 seconds."
+                ErrorReport::SEND_ERROR_REPORT,
+                "start_print(): No recognized state after 120 seconds.",
+                console
             );
         }
     }
@@ -128,8 +129,9 @@ ItemPrinterPrizeResult item_printer_finish_print(
         }
         default:
             OperationFailedException::fire(
-                console, ErrorReport::SEND_ERROR_REPORT,
-                "finish_print(): No recognized state after 120 seconds."
+                ErrorReport::SEND_ERROR_REPORT,
+                "finish_print(): No recognized state after 120 seconds.",
+                console
             );
         }
     }

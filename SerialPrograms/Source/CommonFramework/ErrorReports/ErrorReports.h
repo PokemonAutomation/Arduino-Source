@@ -21,7 +21,7 @@ namespace PokemonAutomation{
 
 
 class AsyncTask;
-class ConsoleHandle;
+class StreamHistorySession;
 
 
 extern const std::string& ERROR_LOGS_NAME;
@@ -65,7 +65,7 @@ public:
         std::string title = "",
         std::vector<std::pair<std::string, std::string>> messages = {},
         const ImageViewRGB32& image = ImageViewRGB32(),
-        ConsoleHandle* console = nullptr
+        const StreamHistorySession* stream_history = nullptr
     );
 
     //  Deserialize from existing report.
@@ -111,7 +111,7 @@ void report_error(
     std::string title = "",
     std::vector<std::pair<std::string, std::string>> messages = {},
     const ImageViewRGB32& image = ImageViewRGB32(),
-    ConsoleHandle* console = nullptr,
+    const StreamHistorySession* stream_history = nullptr,
     const std::vector<std::string>& files = {}
 );
 

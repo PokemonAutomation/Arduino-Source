@@ -717,8 +717,9 @@ void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
         }
         if (c >= 5){
             OperationFailedException::fire(
-                env.console, ErrorReport::SEND_ERROR_REPORT,
+                ErrorReport::SEND_ERROR_REPORT,
                 "Failed to switch to Pokemon selection after 5 attempts.",
+                env.console,
                 std::move(snapshot)
             );
         }
@@ -772,8 +773,9 @@ void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
             context.wait_for_all_requests();
         }
         OperationFailedException::fire(
-            env.console, ErrorReport::SEND_ERROR_REPORT,
-            "Black out."
+            ErrorReport::SEND_ERROR_REPORT,
+            "Black out.",
+            env.console
         );
     }
 

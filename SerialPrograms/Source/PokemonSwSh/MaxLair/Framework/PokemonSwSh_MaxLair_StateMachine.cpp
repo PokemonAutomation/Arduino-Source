@@ -147,7 +147,7 @@ StateMachineAction run_state_iteration(
         return StateMachineAction::RESET_RECOVER;
     default:
         console.log("Program hang. No state detected after 5 minutes.", COLOR_RED);
-        dump_image(MODULE_NAME, console, "ProgramHang");
+        dump_image(console, MODULE_NAME, console, "ProgramHang");
         global_state.mark_as_dead(console_index);
         return StateMachineAction::RESET_RECOVER;
     }

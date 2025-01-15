@@ -112,8 +112,9 @@ void run_battle_press_A(
         context.wait_for(std::chrono::milliseconds(100));
         if (ret < 0){
             OperationFailedException::fire(
-                console, ErrorReport::SEND_ERROR_REPORT,
-                "run_battle_press_A(): Timed out. Did not detect expected stop condition."
+                ErrorReport::SEND_ERROR_REPORT,
+                "run_battle_press_A(): Timed out. Did not detect expected stop condition.",
+                console
             );
         }        
 
@@ -137,8 +138,9 @@ void run_battle_press_A(
             }
             if(num_times_seen_overworld > 30){
                 OperationFailedException::fire(
-                    console, ErrorReport::SEND_ERROR_REPORT,
-                    "run_battle_press_A(): Stuck in overworld. Did not detect expected stop condition."
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "run_battle_press_A(): Stuck in overworld. Did not detect expected stop condition.",
+                    console
                 );  
             }            
             break;
@@ -152,8 +154,9 @@ void run_battle_press_A(
                 // dump_snapshot(console);
                 if (wipeout.detect(screen)){
                     OperationFailedException::fire(
-                        console, ErrorReport::SEND_ERROR_REPORT,
-                        "run_battle_press_A(): Detected wipeout. All pokemon fainted."
+                        ErrorReport::SEND_ERROR_REPORT,
+                        "run_battle_press_A(): Detected wipeout. All pokemon fainted.",
+                        console
                     );                
                 }
             }
@@ -173,8 +176,9 @@ void run_battle_press_A(
             break;
         case CallbackEnum::SWAP_MENU:
             OperationFailedException::fire(
-                console, ErrorReport::SEND_ERROR_REPORT,
-                "run_battle_press_A(): Lead pokemon fainted."
+                ErrorReport::SEND_ERROR_REPORT,
+                "run_battle_press_A(): Lead pokemon fainted.",
+                console
             );        
         default:
             throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "run_battle_press_A: Unknown callback triggered.");
@@ -216,8 +220,9 @@ void clear_tutorial(ConsoleHandle& console, BotBaseContext& context, uint16_t se
             console.log("clear_tutorial: Timed out.");
             if(!seen_tutorial){
                 OperationFailedException::fire(
-                    console, ErrorReport::SEND_ERROR_REPORT,
-                    "clear_tutorial(): Tutorial screen never detected."
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "clear_tutorial(): Tutorial screen never detected.",
+                    console
                 );                
             }
             return;
@@ -234,8 +239,9 @@ void clear_dialog(ConsoleHandle& console, BotBaseContext& context,
     while (true){
         if (current_time() - start > std::chrono::minutes(3)){
             OperationFailedException::fire(
-                console, ErrorReport::SEND_ERROR_REPORT,
-                "clear_dialog(): Failed to clear dialog after 3 minutes."
+                ErrorReport::SEND_ERROR_REPORT,
+                "clear_dialog(): Failed to clear dialog after 3 minutes.",
+                console
             );
         }
 
@@ -305,8 +311,9 @@ void clear_dialog(ConsoleHandle& console, BotBaseContext& context,
                 return;
             }
             OperationFailedException::fire(
-                console, ErrorReport::SEND_ERROR_REPORT,
-                "clear_dialog(): Timed out. Did not detect dialog or did not detect the expected stop condition."
+                ErrorReport::SEND_ERROR_REPORT,
+                "clear_dialog(): Timed out. Did not detect dialog or did not detect the expected stop condition.",
+                console
             );
         }
 
@@ -498,8 +505,9 @@ void overworld_navigation(
             }
             if (stop_condition == NavigationStopCondition::STOP_MARKER){
                 OperationFailedException::fire(
-                    console, ErrorReport::SEND_ERROR_REPORT,
-                    "overworld_navigation(): Unexpectedly detected dialog."
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "overworld_navigation(): Unexpectedly detected dialog.",
+                    console
                 );
             }          
             pbf_press_button(context, BUTTON_A, 20, 20);
@@ -516,8 +524,9 @@ void overworld_navigation(
                 return;
             }
             OperationFailedException::fire(
-                console, ErrorReport::SEND_ERROR_REPORT,
-                "overworld_navigation(): Timed out. Did not detect expected stop condition."
+                ErrorReport::SEND_ERROR_REPORT,
+                "overworld_navigation(): Timed out. Did not detect expected stop condition.",
+                console
             );
         }
     }
@@ -535,8 +544,9 @@ void swap_starter_moves(const ProgramInfo& info, ConsoleHandle& console, BotBase
     while (true){
         if (current_time() - start > std::chrono::minutes(3)){
             OperationFailedException::fire(
-                console, ErrorReport::SEND_ERROR_REPORT,
-                "swap_starter_moves(): Failed to swap the starter moves after 3 minutes."
+                ErrorReport::SEND_ERROR_REPORT,
+                "swap_starter_moves(): Failed to swap the starter moves after 3 minutes.",
+                console
             );
         }
         // start in the overworld
@@ -733,8 +743,9 @@ void handle_when_stationary_in_overworld(
     while (true){
         if (current_time() - start > std::chrono::minutes(minutes_timeout)){
             OperationFailedException::fire(
-                console, ErrorReport::SEND_ERROR_REPORT,
-                "handle_when_stationary_in_overworld(): Failed to complete action after " + std::to_string(minutes_timeout) + " minutes."
+                ErrorReport::SEND_ERROR_REPORT,
+                "handle_when_stationary_in_overworld(): Failed to complete action after " + std::to_string(minutes_timeout) + " minutes.",
+                console
             );
         }
         StationaryOverworldWatcher stationary_overworld(COLOR_RED, {0.865, 0.825, 0.08, 0.1}, seconds_stationary);
@@ -756,8 +767,9 @@ void handle_when_stationary_in_overworld(
             num_failures++;
             if (num_failures > max_failures){
                 OperationFailedException::fire(
-                    console, ErrorReport::SEND_ERROR_REPORT,
-                    "handle_when_stationary_in_overworld(): Failed to complete action within " + std::to_string(max_failures) + " attempts."
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "handle_when_stationary_in_overworld(): Failed to complete action within " + std::to_string(max_failures) + " attempts.",
+                    console
                 );                
             }
             context.wait_for_all_requests();
@@ -818,8 +830,9 @@ void wait_for_gradient_arrow(
         console.log("Gradient arrow detected.");
     }else{
         OperationFailedException::fire(
-            console, ErrorReport::SEND_ERROR_REPORT,
-            "Failed to detect gradient arrow."
+            ErrorReport::SEND_ERROR_REPORT,
+            "Failed to detect gradient arrow.",
+            console
         );
     }          
 }
@@ -841,8 +854,9 @@ void wait_for_overworld(
         console.log("Overworld detected.");
     }else{
         OperationFailedException::fire(
-            console, ErrorReport::SEND_ERROR_REPORT,
-            "Failed to detect overworld."
+            ErrorReport::SEND_ERROR_REPORT,
+            "Failed to detect overworld.",
+            console
         );
     }     
 
@@ -865,8 +879,9 @@ void press_A_until_dialog(const ProgramInfo& info, ConsoleHandle& console, BotBa
         console.log("press_A_until_dialog: Detected dialog.");
     }else{
         OperationFailedException::fire(
-            console, ErrorReport::SEND_ERROR_REPORT,
-            "press_A_until_dialog(): Unable to detect dialog after 10 button presses."
+            ErrorReport::SEND_ERROR_REPORT,
+            "press_A_until_dialog(): Unable to detect dialog after 10 button presses.",
+            console
         );
     }
 }
@@ -911,8 +926,9 @@ void get_on_or_off_ride(const ProgramInfo& info, ConsoleHandle& console, BotBase
     while (get_on != is_ride_active(info, console, context)){
         if (current_time() - start > std::chrono::minutes(3)){
             OperationFailedException::fire(
-                console, ErrorReport::SEND_ERROR_REPORT,
-                "get_on_or_off_ride(): Failed to get on/off ride after 3 minutes."
+                ErrorReport::SEND_ERROR_REPORT,
+                "get_on_or_off_ride(): Failed to get on/off ride after 3 minutes.",
+                console
             );
         }        
         pbf_press_button(context, BUTTON_PLUS, 30, 100);
@@ -942,8 +958,9 @@ void realign_player_from_landmark(
     while (true){
         if (current_time() - start > std::chrono::minutes(5)){
             OperationFailedException::fire(
-                console, ErrorReport::SEND_ERROR_REPORT,
-                "realign_player_from_landmark(): Failed to realign player after 5 minutes."
+                ErrorReport::SEND_ERROR_REPORT,
+                "realign_player_from_landmark(): Failed to realign player after 5 minutes.",
+                console
             );
         }
 
@@ -977,8 +994,9 @@ void realign_player_from_landmark(
             // move cursor to pokecenter
             if (!detect_closest_pokecenter_and_move_map_cursor_there(info, console, context, 0.29)){
                 OperationFailedException::fire(
-                    console, ErrorReport::SEND_ERROR_REPORT,
-                    "realign_player_from_landmark(): No visible pokecenter found on map."
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "realign_player_from_landmark(): No visible pokecenter found on map.",
+                    console
                 );         
             }
 
@@ -1034,8 +1052,9 @@ void confirm_cursor_centered_on_pokecenter(const ProgramInfo& info, ConsoleHandl
     MapPokeCenterIconDetector pokecenter(COLOR_RED, center_cursor);
     if (!pokecenter.detect(console.video().snapshot())){
         OperationFailedException::fire(
-            console, ErrorReport::SEND_ERROR_REPORT,
-            "confirm_cursor_centered_on_pokecenter(): Cursor is not centered on a pokecenter."
+            ErrorReport::SEND_ERROR_REPORT,
+            "confirm_cursor_centered_on_pokecenter(): Cursor is not centered on a pokecenter.",
+            console
         );            
     }
 
@@ -1053,8 +1072,9 @@ void move_cursor_towards_flypoint_and_go_there(
     while (true){
         if (current_time() - start > std::chrono::minutes(5)){
             OperationFailedException::fire(
-                console, ErrorReport::SEND_ERROR_REPORT,
-                "move_cursor_towards_flypoint_and_go_there(): Failed to fly after 5 minutes."
+                ErrorReport::SEND_ERROR_REPORT,
+                "move_cursor_towards_flypoint_and_go_there(): Failed to fly after 5 minutes.",
+                console
             );
         }
 
@@ -1087,8 +1107,9 @@ void move_cursor_towards_flypoint_and_go_there(
 
             if (!fly_to_visible_closest_pokecenter_cur_zoom_level(info, console, context)){
                 OperationFailedException::fire(
-                    console, ErrorReport::SEND_ERROR_REPORT,
-                    "move_cursor_towards_flypoint_and_go_there(): No visible pokecenter found on map."
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "move_cursor_towards_flypoint_and_go_there(): No visible pokecenter found on map.",
+                    console
                 );                  
             }
 
@@ -1115,8 +1136,9 @@ void check_num_sunflora_found(SingleSwitchProgramEnvironment& env, BotBaseContex
 
     if (number != expected_number){
         OperationFailedException::fire(
-            env.console, ErrorReport::SEND_ERROR_REPORT,
-            "The number of sunflora found is different than expected."
+            ErrorReport::SEND_ERROR_REPORT,
+            "The number of sunflora found is different than expected.",
+            env.console
         );
     }else{
         env.console.log("Number of sunflora found: " + std::to_string(number));

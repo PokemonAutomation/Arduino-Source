@@ -134,8 +134,9 @@ bool FlyingTrialFarmer::run_rewards(SingleSwitchProgramEnvironment& env, BotBase
             return trial_failed;
         default:
             OperationFailedException::fire(
-                env.console, ErrorReport::SEND_ERROR_REPORT,
-                "No recognized state after 80 seconds."
+                ErrorReport::SEND_ERROR_REPORT,
+                "No recognized state after 80 seconds.",
+                env.console
             );
         }
     }

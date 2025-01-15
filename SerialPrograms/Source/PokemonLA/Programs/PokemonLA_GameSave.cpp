@@ -89,8 +89,9 @@ bool save_game_from_overworld(ProgramEnvironment& env, ConsoleHandle& console, B
     }
     if (!found){
         OperationFailedException::fire(
-            console, ErrorReport::SEND_ERROR_REPORT,
-            "Unable to find save menu."
+            ErrorReport::SEND_ERROR_REPORT,
+            "Unable to find save menu.",
+            console
         );
     }
 
@@ -106,8 +107,9 @@ bool save_game_from_overworld(ProgramEnvironment& env, ConsoleHandle& console, B
     );
     if (ret < 0){
         OperationFailedException::fire(
-            console, ErrorReport::SEND_ERROR_REPORT,
-            "Unable to return to overworld."
+            ErrorReport::SEND_ERROR_REPORT,
+            "Unable to return to overworld.",
+            console
         );
     }
     console.log("Saving game... Done.");

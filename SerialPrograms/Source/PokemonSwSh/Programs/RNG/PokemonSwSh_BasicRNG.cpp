@@ -34,8 +34,9 @@ Xoroshiro128PlusState find_rng_state(
         switch (detection){
         case OrbeetleAttackAnimationDetector::NO_DETECTION:
             OperationFailedException::fire(
-                console, ErrorReport::SEND_ERROR_REPORT,
-                "Attack animation could not be detected."
+                ErrorReport::SEND_ERROR_REPORT,
+                "Attack animation could not be detected.",
+                console
             );
         case OrbeetleAttackAnimationDetector::SPECIAL:
             text += " : Special";
@@ -94,8 +95,9 @@ Xoroshiro128PlusState refind_rng_state(
         switch (detection){
         case OrbeetleAttackAnimationDetector::NO_DETECTION:
             OperationFailedException::fire(
-                console, ErrorReport::SEND_ERROR_REPORT,
-                "Attack animation could not be detected."
+                ErrorReport::SEND_ERROR_REPORT,
+                "Attack animation could not be detected.",
+                console
             );
         case OrbeetleAttackAnimationDetector::SPECIAL:
             text += " : Special";
@@ -122,8 +124,9 @@ Xoroshiro128PlusState refind_rng_state(
     }
     if (possible_indices == 0){
         OperationFailedException::fire(
-            console, ErrorReport::SEND_ERROR_REPORT,
-            "Detected sequence of attack motions does not exist in expected range."
+            ErrorReport::SEND_ERROR_REPORT,
+            "Detected sequence of attack motions does not exist in expected range.",
+            console
         );
     }
 

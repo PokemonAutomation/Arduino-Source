@@ -213,8 +213,9 @@ void StatsReset::open_ball_menu(SingleSwitchProgramEnvironment& env, BotBaseCont
             env.update_stats();
             send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
             OperationFailedException::fire(
-                env.console, ErrorReport::SEND_ERROR_REPORT,
-                "Timed out trying to read ball after 2 minutes."
+                ErrorReport::SEND_ERROR_REPORT,
+                "Timed out trying to read ball after 2 minutes.",
+                env.console
             );
         }
 
@@ -264,8 +265,9 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext&
                     stats.errors++;
                     env.update_stats();
                     OperationFailedException::fire(
-                        env.console, ErrorReport::SEND_ERROR_REPORT,
-                        "Unable to find menu_before_throw."
+                        ErrorReport::SEND_ERROR_REPORT,
+                        "Unable to find menu_before_throw.",
+                        env.console
                     );
                 }
 
@@ -284,8 +286,9 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext&
                         stats.errors++;
                         env.update_stats();
                         OperationFailedException::fire(
-                            env.console, ErrorReport::SEND_ERROR_REPORT,
-                            "Unable to find Quick Ball on turn 1."
+                            ErrorReport::SEND_ERROR_REPORT,
+                            "Unable to find Quick Ball on turn 1.",
+                            env.console
                         );
                     }
                     if (quantity < 0){
@@ -368,8 +371,9 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext&
                         stats.errors++;
                         env.update_stats();
                         OperationFailedException::fire(
-                            env.console, ErrorReport::SEND_ERROR_REPORT,
-                            "Battle menu detected early. Out of PP, please check your setup."
+                            ErrorReport::SEND_ERROR_REPORT,
+                            "Battle menu detected early. Out of PP, please check your setup.",
+                            env.console
                         );
                     }else{
                         env.log("Move successfully used.");
@@ -450,8 +454,9 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext&
                     stats.errors++;
                     env.update_stats();
                     OperationFailedException::fire(
-                        env.console, ErrorReport::SEND_ERROR_REPORT,
-                        "Invalid state ret2 run_battle."
+                        ErrorReport::SEND_ERROR_REPORT,
+                        "Invalid state ret2 run_battle.",
+                        env.console
                     );
                 }
 
@@ -491,8 +496,9 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext&
         stats.errors++;
         env.update_stats();
         OperationFailedException::fire(
-            env.console, ErrorReport::SEND_ERROR_REPORT,
-            "Invalid state in run_battle()."
+            ErrorReport::SEND_ERROR_REPORT,
+            "Invalid state in run_battle().",
+            env.console
         );
     }
 
@@ -548,8 +554,9 @@ bool StatsReset::check_stats(SingleSwitchProgramEnvironment& env, BotBaseContext
             stats.errors++;
             env.update_stats();
             OperationFailedException::fire(
-                env.console, ErrorReport::SEND_ERROR_REPORT,
-                "Invalid state."
+                ErrorReport::SEND_ERROR_REPORT,
+                "Invalid state.",
+                env.console
             );
         }
     }
@@ -588,8 +595,9 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
             //Try to start battle 3 times.
             if (c > 2){
                 OperationFailedException::fire(
-                    env.console, ErrorReport::SEND_ERROR_REPORT,
-                    "Failed to enter battle after 3 attempts."
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "Failed to enter battle after 3 attempts.",
+                    env.console
                 );
                 break;
             }

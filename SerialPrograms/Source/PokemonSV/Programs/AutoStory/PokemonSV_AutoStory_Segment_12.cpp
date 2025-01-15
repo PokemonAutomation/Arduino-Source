@@ -101,8 +101,9 @@ void checkpoint_28(
         );
         if (ret < 0){
             OperationFailedException::fire(
-                env.console, ErrorReport::SEND_ERROR_REPORT,
-                "Failed to enter Cortondo Gym."
+                ErrorReport::SEND_ERROR_REPORT,
+                "Failed to enter Cortondo Gym.",
+                env.console
             );
         }
 

@@ -460,8 +460,9 @@ void checkpoint_44(
         );
         if (ret < 0){
             OperationFailedException::fire(
-                env.console, ErrorReport::SEND_ERROR_REPORT,
-                "Failed to finish reach the Sunflora NPC."
+                ErrorReport::SEND_ERROR_REPORT,
+                "Failed to finish reach the Sunflora NPC.",
+                env.console
             );
         }
         env.log("No minimap seen. Likely finished the Artazon gym challenge.");

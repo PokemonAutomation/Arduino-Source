@@ -142,8 +142,9 @@ int16_t throw_ball(
             }
             if (attempts >= 3){
                 OperationFailedException::fire(
-                    console, ErrorReport::SEND_ERROR_REPORT,
-                    "Unable to find desired ball after multiple attempts. Did you run out?"
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "Unable to find desired ball after multiple attempts. Did you run out?",
+                    console
                 );
             }
             attempts++;
@@ -279,8 +280,9 @@ CatchResults basic_catcher(
             break;
         default:
             OperationFailedException::fire(
-                console, ErrorReport::SEND_ERROR_REPORT,
-                "basic_catcher(): No state detected after 2 minutes."
+                ErrorReport::SEND_ERROR_REPORT,
+                "basic_catcher(): No state detected after 2 minutes.",
+                console
             );
         }
 

@@ -115,8 +115,9 @@ void from_professor_return_to_jubilife(
             break;
         default:
             OperationFailedException::fire(
-                console, ErrorReport::SEND_ERROR_REPORT,
-                "Did not detect option to return to Jubilife."
+                ErrorReport::SEND_ERROR_REPORT,
+                "Did not detect option to return to Jubilife.",
+                console
             );
         }
     }
@@ -136,8 +137,9 @@ void mash_A_to_enter_sub_area(
     );
     if (ret < 0){
         OperationFailedException::fire(
-            console, ErrorReport::SEND_ERROR_REPORT,
-            "Failed to load into sub area after 7 seconds."
+            ErrorReport::SEND_ERROR_REPORT,
+            "Failed to load into sub area after 7 seconds.",
+            console
         );
     }
 
@@ -183,8 +185,9 @@ void mash_A_to_change_region(
     );
     if (ret < 0){
         OperationFailedException::fire(
-            console, ErrorReport::SEND_ERROR_REPORT,
-            "Failed to load into region after timeout."
+            ErrorReport::SEND_ERROR_REPORT,
+            "Failed to load into region after timeout.",
+            console
         );
     }
     console.log("Loaded into map...");
@@ -208,8 +211,9 @@ void open_travel_map_from_jubilife(
     );
     if (ret < 0){
         OperationFailedException::fire(
-            console, ErrorReport::SEND_ERROR_REPORT,
-            "Map not detected after 10 x A presses."
+            ErrorReport::SEND_ERROR_REPORT,
+            "Map not detected after 10 x A presses.",
+            console
         );
     }
     console.log("Found map!");
@@ -239,8 +243,9 @@ void goto_camp_from_jubilife(
     }
     if (current_region != location.region){
         OperationFailedException::fire(
-            console, ErrorReport::SEND_ERROR_REPORT,
-            std::string("Unable to find: ") + location.display
+            ErrorReport::SEND_ERROR_REPORT,
+            std::string("Unable to find: ") + location.display,
+            console
         );
     }
 
@@ -274,8 +279,9 @@ void goto_camp_from_jubilife(
         );
         if (ret < 0){
             OperationFailedException::fire(
-                console, ErrorReport::SEND_ERROR_REPORT,
-                "Map not detected after 5 seconds."
+                ErrorReport::SEND_ERROR_REPORT,
+                "Map not detected after 5 seconds.",
+                console
             );
         }
         console.log("Found map!");
@@ -298,8 +304,9 @@ void goto_camp_from_jubilife(
         );
         if (ret < 0){
             OperationFailedException::fire(
-                console, ErrorReport::SEND_ERROR_REPORT,
-                "Unable to fly. Are you under attack?"
+                ErrorReport::SEND_ERROR_REPORT,
+                "Unable to fly. Are you under attack?",
+                console
             );
         }
     }
@@ -318,8 +325,9 @@ void goto_camp_from_jubilife(
     );
     if (ret < 0){
         OperationFailedException::fire(
-            console, ErrorReport::SEND_ERROR_REPORT,
-            "Failed to fly to camp after 20 seconds."
+            ErrorReport::SEND_ERROR_REPORT,
+            "Failed to fly to camp after 20 seconds.",
+            console
         );
     }
     console.log("Arrived at sub-camp...");
@@ -352,8 +360,9 @@ void goto_camp_from_overworld(
 
         if (current_time() - start > std::chrono::seconds(60)){
             OperationFailedException::fire(
-                console, ErrorReport::NO_ERROR_REPORT,
-                "Unable to escape from being attacked."
+                ErrorReport::NO_ERROR_REPORT,
+                "Unable to escape from being attacked.",
+                console
             );
         }
 
@@ -412,8 +421,9 @@ void goto_camp_from_overworld(
     );
     if (ret < 0){
         OperationFailedException::fire(
-            console, ErrorReport::SEND_ERROR_REPORT,
-            "Failed to fly to camp after 20 seconds."
+            ErrorReport::SEND_ERROR_REPORT,
+            "Failed to fly to camp after 20 seconds.",
+            console
         );
     }
     console.log("Arrived at camp...");
@@ -438,8 +448,9 @@ void goto_any_camp_from_overworld(
 
         if (current_time() - start > std::chrono::seconds(60)){
             OperationFailedException::fire(
-                console, ErrorReport::NO_ERROR_REPORT,
-                "Unable to escape from being attacked."
+                ErrorReport::NO_ERROR_REPORT,
+                "Unable to escape from being attacked.",
+                console
             );
         }
 
@@ -454,8 +465,9 @@ void goto_any_camp_from_overworld(
             );
             if (ret < 0){
                 OperationFailedException::fire(
-                    console, ErrorReport::SEND_ERROR_REPORT,
-                    "Map not detected after 5 seconds."
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "Map not detected after 5 seconds.",
+                    console
                 );
             }
             console.log("Found map!");
@@ -504,8 +516,9 @@ void goto_any_camp_from_overworld(
     );
     if (ret < 0){
         OperationFailedException::fire(
-            console, ErrorReport::SEND_ERROR_REPORT,
-            "Failed to fly to camp after 20 seconds."
+            ErrorReport::SEND_ERROR_REPORT,
+            "Failed to fly to camp after 20 seconds.",
+            console
         );
     }
     console.log("Arrived at camp...");

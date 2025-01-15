@@ -32,8 +32,9 @@ void auto_heal_from_menu_or_overworld(
     while (true){
         if (current_time() - start > std::chrono::minutes(5)){
             OperationFailedException::fire(
-                console, ErrorReport::SEND_ERROR_REPORT,
-                "auto_heal_from_menu(): Failed auto-heal after 5 minutes."
+                ErrorReport::SEND_ERROR_REPORT,
+                "auto_heal_from_menu(): Failed auto-heal after 5 minutes.",
+                console
             );
         }
 
@@ -73,8 +74,9 @@ void auto_heal_from_menu_or_overworld(
             continue;
         default:
             OperationFailedException::fire(
-                console, ErrorReport::SEND_ERROR_REPORT,
-                "auto_heal_from_menu(): No state detected after 60 seconds."
+                ErrorReport::SEND_ERROR_REPORT,
+                "auto_heal_from_menu(): No state detected after 60 seconds.",
+                console
             );
         }
     }
@@ -116,20 +118,23 @@ int run_from_battle(const ProgramInfo& info, ConsoleHandle& console, BotBaseCont
         case 2:
             console.log("Detected own " + STRING_POKEMON + " fainted...");
             OperationFailedException::fire(
-                console, ErrorReport::SEND_ERROR_REPORT,
-                "Your " + STRING_POKEMON + " fainted while attempting to run away."
+                ErrorReport::SEND_ERROR_REPORT,
+                "Your " + STRING_POKEMON + " fainted while attempting to run away.",
+                console
             );
         default:
             OperationFailedException::fire(
-                console, ErrorReport::SEND_ERROR_REPORT,
-                "run_from_battle(): No state detected after 60 seconds."
+                ErrorReport::SEND_ERROR_REPORT,
+                "run_from_battle(): No state detected after 60 seconds.",
+                console
             );
         }
     }
 
     OperationFailedException::fire(
-        console, ErrorReport::SEND_ERROR_REPORT,
-        "Failed to run away after 10 attempts."
+        ErrorReport::SEND_ERROR_REPORT,
+        "Failed to run away after 10 attempts.",
+        console
     );
 }
 

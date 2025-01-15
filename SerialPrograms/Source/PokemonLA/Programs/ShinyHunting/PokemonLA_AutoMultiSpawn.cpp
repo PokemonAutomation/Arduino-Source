@@ -339,8 +339,9 @@ void AutoMultiSpawn::advance_one_path_step(
         }
         if (c >= 5){
             OperationFailedException::fire(
-                env.console, ErrorReport::SEND_ERROR_REPORT,
+                ErrorReport::SEND_ERROR_REPORT,
                 "Failed to switch to Pokemon selection after 5 attempts.",
+                env.console,
                 std::move(snapshot)
             );
         }
@@ -364,9 +365,10 @@ void AutoMultiSpawn::advance_one_path_step(
          );
         if (already_removed_pokemon > num_to_despawn){
             OperationFailedException::fire(
-                env.console, ErrorReport::SEND_ERROR_REPORT,
+                ErrorReport::SEND_ERROR_REPORT,
                 "Removed more pokemon than required. Removed "
-                + std::to_string(already_removed_pokemon) + " while target is " + std::to_string(num_to_despawn)
+                + std::to_string(already_removed_pokemon) + " while target is " + std::to_string(num_to_despawn),
+                env.console
             );
         }
 
@@ -383,8 +385,9 @@ void AutoMultiSpawn::advance_one_path_step(
     }
     if (remained_to_remove > 0){
         OperationFailedException::fire(
-            env.console, ErrorReport::SEND_ERROR_REPORT,
-            "After trying to start three battles, cannot remove enough pokemon."
+            ErrorReport::SEND_ERROR_REPORT,
+            "After trying to start three battles, cannot remove enough pokemon.",
+            env.console
         );
     }
 
@@ -421,8 +424,9 @@ size_t AutoMultiSpawn::try_one_battle_to_remove_pokemon(
 
     if (focused_pokemon.name_candidates.size() == 0){
         OperationFailedException::fire(
-            env.console, ErrorReport::SEND_ERROR_REPORT,
-            "Cannot focus on a pokemon after going to the spawn point  " + std::to_string(num_tries) + " times"
+            ErrorReport::SEND_ERROR_REPORT,
+            "Cannot focus on a pokemon after going to the spawn point  " + std::to_string(num_tries) + " times",
+            env.console
         );
     }
     
@@ -462,8 +466,9 @@ size_t AutoMultiSpawn::try_one_battle_to_remove_pokemon(
 
         if (ret < 0){
             OperationFailedException::fire(
-                env.console, ErrorReport::SEND_ERROR_REPORT,
-                "Cannot detect a battle after 30 seconds."
+                ErrorReport::SEND_ERROR_REPORT,
+                "Cannot detect a battle after 30 seconds.",
+                env.console
             );
         }
 
@@ -516,8 +521,9 @@ size_t AutoMultiSpawn::try_one_battle_to_remove_pokemon(
             // XXX can try to reset the game to fix this. But for now let user handles this.
             env.log("Removed more than needed!");
             OperationFailedException::fire(
-                env.console, ErrorReport::SEND_ERROR_REPORT,
-                "Removed more pokemon than needed!"
+                ErrorReport::SEND_ERROR_REPORT,
+                "Removed more pokemon than needed!",
+                env.console
             );
         }else if (num_removed_pokemon < num_to_despawn){
 
@@ -541,8 +547,9 @@ size_t AutoMultiSpawn::try_one_battle_to_remove_pokemon(
         );
         if (ret < 0){
             OperationFailedException::fire(
-                env.console, ErrorReport::SEND_ERROR_REPORT,
-                "Cannot detect end of battle when escaping."
+                ErrorReport::SEND_ERROR_REPORT,
+                "Cannot detect end of battle when escaping.",
+                env.console
             );
         }
     }
