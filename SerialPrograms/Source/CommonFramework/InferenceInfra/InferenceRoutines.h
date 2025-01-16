@@ -78,7 +78,10 @@ int run_until(
         stream, context,
         [&](CancellableScope& scope){
             ContextType subcontext(scope, context);
-            command(subcontext);
+            if (command){
+                command(subcontext);
+            }
+//            subcontext.wait_for_all_requests();
         },
         callbacks,
         default_video_period,
