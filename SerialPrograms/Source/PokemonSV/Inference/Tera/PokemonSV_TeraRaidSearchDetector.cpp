@@ -10,7 +10,7 @@
 #include "CommonFramework/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.h"
 #include "PokemonSV_TeraRaidSearchDetector.h"

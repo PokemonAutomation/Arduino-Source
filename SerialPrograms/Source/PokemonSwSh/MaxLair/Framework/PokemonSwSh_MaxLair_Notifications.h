@@ -8,8 +8,8 @@
 #define PokemonAutomation_PokemonSwSh_MaxLair_Notifications_H
 
 #include "CommonFramework/Logging/Logger.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h"
 #include "PokemonSwSh/Options/PokemonSwSh_AutoHostNotification.h"
 #include "PokemonSwSh_MaxLair_Stats.h"

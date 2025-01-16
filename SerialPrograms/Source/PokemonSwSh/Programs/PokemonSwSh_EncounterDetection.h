@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_EncounterTracker_H
 
 #include "CommonFramework/Language.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "Pokemon/Pokemon_EncounterStats.h"
 #include "PokemonSwSh/ShinyHuntTracker.h"
 #include "PokemonSwSh/Options/EncounterFilter/PokemonSwSh_EncounterFilterOption.h"

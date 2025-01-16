@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonLA_MountChange_H
 
 #include "ClientSource/Connection/BotBase.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "PokemonLA/Inference/PokemonLA_MountDetector.h"
 
 namespace PokemonAutomation{

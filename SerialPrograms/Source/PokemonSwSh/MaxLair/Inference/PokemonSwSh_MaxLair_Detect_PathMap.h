@@ -10,7 +10,7 @@
 #include <deque>
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "Pokemon/Pokemon_Types.h"
 #include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_State.h"
 

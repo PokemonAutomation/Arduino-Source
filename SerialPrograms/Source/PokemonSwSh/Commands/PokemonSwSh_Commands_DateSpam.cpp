@@ -4,9 +4,8 @@
  * 
  */
 
-#include <sstream>
 #include "ClientSource/Libraries/MessageConverter.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "PokemonSwSh_Commands_GameEntry.h"

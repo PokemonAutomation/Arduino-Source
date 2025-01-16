@@ -12,7 +12,7 @@
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 //#include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/Inference/VisualDetector.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "Pokemon/Inference/Pokemon_PokeballNameReader.h"
 
 namespace PokemonAutomation{

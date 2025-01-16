@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonBDSP_EggFeedback_H
 #define PokemonAutomation_PokemonBDSP_EggFeedback_H
 
-#include "CommonFramework/Tools/ConsoleHandle.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 
 namespace PokemonAutomation{
     class BotBaseContext;

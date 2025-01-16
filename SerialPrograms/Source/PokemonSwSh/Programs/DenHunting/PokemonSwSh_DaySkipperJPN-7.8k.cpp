@@ -4,10 +4,10 @@
  *
  */
 
-#include "Common/Cpp/PrettyPrint.h"
+//#include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
-#include "NintendoSwitch/FixedInterval.h"
+//#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
+#include "NintendoSwitch/NintendoSwitch_FixedInterval.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DaySkippers.h"
 #include "PokemonSwSh_DaySkipperStats.h"

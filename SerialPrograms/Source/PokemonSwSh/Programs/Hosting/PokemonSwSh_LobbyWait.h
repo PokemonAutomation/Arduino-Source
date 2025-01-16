@@ -8,8 +8,8 @@
 #define PokemonAutomation_PokemonSwSh_LobbyWait_H
 
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"

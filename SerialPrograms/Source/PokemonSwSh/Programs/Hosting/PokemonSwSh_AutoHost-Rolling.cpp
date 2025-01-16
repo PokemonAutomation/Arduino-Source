@@ -6,10 +6,10 @@
 
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
+//#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Routines.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
-#include "NintendoSwitch/FixedInterval.h"
+#include "NintendoSwitch/NintendoSwitch_FixedInterval.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"

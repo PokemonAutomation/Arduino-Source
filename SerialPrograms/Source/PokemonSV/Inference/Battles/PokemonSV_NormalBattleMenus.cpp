@@ -9,6 +9,7 @@
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/DebugDumper.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonSV_NormalBattleMenus.h"

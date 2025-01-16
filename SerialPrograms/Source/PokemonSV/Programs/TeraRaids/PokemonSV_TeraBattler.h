@@ -8,8 +8,8 @@
 #define PokemonAutomation_PokemonSV_TeraBattler_H
 
 #include "ClientSource/Connection/BotBase.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "PokemonSV/Options/PokemonSV_TeraAIOption.h"
 
 namespace PokemonAutomation{

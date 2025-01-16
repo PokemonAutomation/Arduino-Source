@@ -14,7 +14,7 @@
 #include "CommonFramework/Notifications/EventNotificationOption.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "PokemonSV/Options/PokemonSV_PlayerList.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV_JoinTracker.h"

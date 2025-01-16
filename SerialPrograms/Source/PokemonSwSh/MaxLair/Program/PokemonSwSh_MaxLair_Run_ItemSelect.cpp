@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Tools/InterruptableCommands.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"

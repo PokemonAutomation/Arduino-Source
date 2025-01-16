@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_NintendoSwitch_GameEntry_H
 #define PokemonAutomation_NintendoSwitch_GameEntry_H
 
-#include "CommonFramework/Tools/ConsoleHandle.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 
 namespace PokemonAutomation{
     class BotBaseContext;

@@ -9,8 +9,8 @@
 
 #include <string>
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
 #include "CommonFramework/ImageMatch/CroppedImageDictionaryMatcher.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

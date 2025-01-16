@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonBDSP_GlobalRoomHeal_H
 #define PokemonAutomation_PokemonBDSP_GlobalRoomHeal_H
 
-#include "CommonFramework/Tools/ConsoleHandle.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 
 namespace PokemonAutomation{
     class BotBaseContext;

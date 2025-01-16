@@ -9,7 +9,7 @@
 
 #include <chrono>
 #include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 
 namespace PokemonAutomation{
     class BotBaseContext;

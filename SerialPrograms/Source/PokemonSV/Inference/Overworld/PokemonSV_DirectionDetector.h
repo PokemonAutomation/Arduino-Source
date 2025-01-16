@@ -7,16 +7,16 @@
 #ifndef PokemonAutomation_PokemonSV_DirectionDetector_H
 #define PokemonAutomation_PokemonSV_DirectionDetector_H
 
-#include <vector>
+//#include <vector>
 #include "Common/Cpp/Color.h"
-#include "Common/Cpp/Containers/FixedLimitVector.h"
+//#include "Common/Cpp/Containers/FixedLimitVector.h"
 #include "ClientSource/Connection/BotBase.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+//#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 #include "CommonFramework/Inference/VisualDetector.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 
 namespace PokemonAutomation{
 

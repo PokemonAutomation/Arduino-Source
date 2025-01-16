@@ -7,9 +7,9 @@
 #ifndef PokemonAutomation_PokemonBDSP_EncounterHandler_H
 #define PokemonAutomation_PokemonBDSP_EncounterHandler_H
 
-#include "CommonFramework/Tools/ConsoleHandle.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "Pokemon/Pokemon_Notification.h"
-#include "Pokemon/Options/Pokemon_EncounterBotOptions.h"
+//#include "Pokemon/Options/Pokemon_EncounterBotOptions.h"
 #include "PokemonSwSh/ShinyHuntTracker.h"
 #include "PokemonBDSP/Options/PokemonBDSP_EncounterBotCommon.h"
 #include "PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinyEncounterDetector.h"

@@ -4,8 +4,8 @@
  *
  */
 
-#include "CommonFramework/Tools/ConsoleHandle.h"
 #include "CommonFramework/Tools/InterruptableCommands.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonLA_EscapeFromAttack.h"
 

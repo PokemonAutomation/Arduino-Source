@@ -66,10 +66,10 @@ int run_until(
     std::chrono::milliseconds default_video_period = std::chrono::milliseconds(50),
     std::chrono::milliseconds default_audio_period = std::chrono::milliseconds(20)
 );
-template <typename ContextType>
+template <typename CommandContext>
 int run_until(
-    VideoStream& stream, ContextType& context,
-    std::function<void(ContextType& context)>&& command,
+    VideoStream& stream, CommandContext& context,
+    std::function<void(CommandContext& context)>&& command,
     const std::vector<PeriodicInferenceCallback>& callbacks,
     std::chrono::milliseconds default_video_period = std::chrono::milliseconds(50),
     std::chrono::milliseconds default_audio_period = std::chrono::milliseconds(20)
@@ -77,7 +77,7 @@ int run_until(
     return run_until(
         stream, context,
         [&](CancellableScope& scope){
-            ContextType subcontext(scope, context);
+            CommandContext subcontext(scope, context);
             if (command){
                 command(subcontext);
             }

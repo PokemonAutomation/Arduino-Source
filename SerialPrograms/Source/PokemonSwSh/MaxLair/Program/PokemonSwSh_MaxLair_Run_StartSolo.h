@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_MaxLair_Run_StartSolo_H
 
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_QuantityReader.h"
 #include "PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options_Hosting.h"
 #include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_Stats.h"

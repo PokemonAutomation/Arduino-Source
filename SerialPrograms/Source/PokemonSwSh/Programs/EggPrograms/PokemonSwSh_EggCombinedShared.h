@@ -7,8 +7,8 @@
 #ifndef PokemonAutomation_PokemonSwSh_EggCombinedShared_H
 #define PokemonAutomation_PokemonSwSh_EggCombinedShared_H
 
-#include "CommonFramework/Tools/ConsoleHandle.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_EggRoutines.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_GameEntry.h"

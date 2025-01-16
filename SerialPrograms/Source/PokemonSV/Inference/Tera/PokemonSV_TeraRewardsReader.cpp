@@ -8,7 +8,7 @@
 #include "CommonFramework/ImageMatch/ImageDiff.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "PokemonSV_TeraRewardsReader.h"
 
 namespace PokemonAutomation{

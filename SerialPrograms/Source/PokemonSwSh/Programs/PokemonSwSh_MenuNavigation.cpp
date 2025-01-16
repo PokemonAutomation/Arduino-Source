@@ -7,11 +7,11 @@
 
 #include "ClientSource/Connection/BotBase.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 //#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "NintendoSwitch/FixedInterval.h"
+#include "NintendoSwitch/NintendoSwitch_FixedInterval.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_SelectionArrowFinder.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh_MenuNavigation.h"

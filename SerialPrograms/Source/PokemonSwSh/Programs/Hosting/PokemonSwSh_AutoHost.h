@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_AutoHost_H
 
 #include "Common/Cpp/Options/RandomCodeOption.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "PokemonSwSh/Options/PokemonSwSh_Catchability.h"
 #include "PokemonSwSh/Options/PokemonSwSh_AutoHostNotification.h"
 #include "PokemonSwSh/Inference/Dens/PokemonSwSh_DenMonReader.h"

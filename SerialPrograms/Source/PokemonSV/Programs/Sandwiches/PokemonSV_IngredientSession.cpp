@@ -10,13 +10,14 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "PokemonSV/Resources/PokemonSV_Ingredients.h"
 #include "PokemonSV_IngredientSession.h"
 #include "Common/Cpp/PrettyPrint.h"
-#include <iostream>
-using std::cout;
-using std::endl;
+
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

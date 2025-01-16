@@ -149,7 +149,7 @@ void MultiSwitchProgramSession::internal_run_program(){
         handles.emplace_back(
             c,
             session.logger(),
-            session.sender().botbase(),
+            *session.sender().botbase(),
             session.video(),
             session.overlay(),
             session.audio(),

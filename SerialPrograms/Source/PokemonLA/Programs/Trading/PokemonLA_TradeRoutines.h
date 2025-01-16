@@ -10,8 +10,8 @@
 #include "CommonFramework/Language.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/Tools/StatsTracking.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
 #include "CommonFramework/Tools/MultiConsoleErrors.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 
 namespace PokemonAutomation{
     class BotBaseContext;

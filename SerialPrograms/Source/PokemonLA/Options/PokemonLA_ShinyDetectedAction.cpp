@@ -10,7 +10,7 @@
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Notification.h"
 #include "PokemonLA/PokemonLA_Settings.h"

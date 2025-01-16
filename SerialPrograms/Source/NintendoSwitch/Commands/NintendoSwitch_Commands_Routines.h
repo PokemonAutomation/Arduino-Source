@@ -8,7 +8,7 @@
 #define PokemonAutomation_NintendoSwitch_Commands_Routines_H
 
 #include "ClientSource/Connection/BotBase.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

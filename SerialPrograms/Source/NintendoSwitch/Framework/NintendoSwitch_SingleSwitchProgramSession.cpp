@@ -110,7 +110,7 @@ void SingleSwitchProgramSession::internal_run_program(){
         *this,
         current_stats_tracker(), historical_stats_tracker(),
         m_system.logger(),
-        m_system.sender().botbase(),
+        *m_system.sender().botbase(),
         m_system.video(),
         m_system.overlay(),
         m_system.audio(),

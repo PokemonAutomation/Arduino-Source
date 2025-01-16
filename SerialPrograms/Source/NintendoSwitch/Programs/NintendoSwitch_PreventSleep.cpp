@@ -5,7 +5,7 @@
  */
 
 #include "Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h"
-#include "NintendoSwitch/FixedInterval.h"
+#include "NintendoSwitch/NintendoSwitch_FixedInterval.h"
 #include "NintendoSwitch_PreventSleep.h"
 
 namespace PokemonAutomation{

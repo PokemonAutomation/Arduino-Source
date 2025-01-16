@@ -4,13 +4,13 @@
  *
  */
 
-#include "Common/Cpp/Exceptions.h"
+//#include "Common/Cpp/Exceptions.h"
 #include "ClientSource/Connection/BotBase.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
+//#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 //#include "CommonFramework/Tools/DebugDumper.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/Inference/Tera/PokemonSV_TeraCardDetector.h"
 #include "PokemonSV/Programs/TeraRaids/PokemonSV_TeraRoutines.h"

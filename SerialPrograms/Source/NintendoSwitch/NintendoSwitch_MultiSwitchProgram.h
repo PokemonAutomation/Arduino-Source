@@ -15,8 +15,8 @@
 #include "CommonFramework/Notifications/EventNotificationOption.h"
 #include "CommonFramework/ControllerDevices/SerialPortGlobals.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
 #include "CommonFramework/Panels/ProgramDescriptor.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 
 namespace PokemonAutomation{
     class BotBaseContext;

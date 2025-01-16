@@ -7,7 +7,7 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Routines.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
-#include "NintendoSwitch/FixedInterval.h"
+#include "NintendoSwitch/NintendoSwitch_FixedInterval.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"

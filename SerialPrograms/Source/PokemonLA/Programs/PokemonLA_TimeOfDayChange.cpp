@@ -5,9 +5,9 @@
  */
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_DialogueYellowArrowDetector.h"
 #include "PokemonLA_TimeOfDayChange.h"

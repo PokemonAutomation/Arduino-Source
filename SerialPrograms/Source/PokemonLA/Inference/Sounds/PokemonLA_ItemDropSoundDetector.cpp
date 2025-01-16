@@ -6,7 +6,7 @@
 
 #include "CommonFramework/Inference/SpectrogramMatcher.h"
 #include "CommonFramework/Inference/AudioTemplateCache.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "PokemonLA/PokemonLA_Settings.h"
 #include "PokemonLA_ItemDropSoundDetector.h"
 

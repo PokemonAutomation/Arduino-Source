@@ -4,7 +4,7 @@
  *
  */
 
-#include "NintendoSwitch/FixedInterval.h"
+#include "NintendoSwitch/NintendoSwitch_FixedInterval.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"

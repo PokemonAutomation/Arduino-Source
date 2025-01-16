@@ -13,9 +13,9 @@
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/OCR/OCR_NumberReader.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "PokemonSV_ItemPrinterJobsDetector.h"
 
 namespace PokemonAutomation{

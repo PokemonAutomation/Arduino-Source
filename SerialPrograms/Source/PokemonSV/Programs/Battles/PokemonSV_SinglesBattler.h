@@ -8,8 +8,8 @@
 #define PokemonAutomation_PokemonSV_SinglesBattler_H
 
 #include "ClientSource/Connection/BotBase.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "PokemonSV/Options/PokemonSV_SinglesMoveTable.h"
 #include "PokemonSV/Options/PokemonSV_SinglesAIOption.h"
 

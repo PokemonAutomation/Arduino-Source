@@ -4,16 +4,14 @@
  *
  */
 
-#include <algorithm>
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
+#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
+#include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "PokemonSV_PokemonMovesReader.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

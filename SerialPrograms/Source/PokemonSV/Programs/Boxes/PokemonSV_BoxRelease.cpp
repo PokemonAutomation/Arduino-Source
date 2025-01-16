@@ -7,7 +7,7 @@
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV_BoxRoutines.h"

@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_MaxLair_Run_EnterLobby_H
 
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_StateMachine.h"
 
 namespace PokemonAutomation{

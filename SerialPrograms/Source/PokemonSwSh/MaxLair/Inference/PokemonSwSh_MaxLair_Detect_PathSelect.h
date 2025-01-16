@@ -7,11 +7,11 @@
 #ifndef PokemonAutomation_PokemonSwSh_MaxLair_Detect_PathSelect_H
 #define PokemonAutomation_PokemonSwSh_MaxLair_Detect_PathSelect_H
 
-#include "CommonFramework/Logging/Logger.h"
+//#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_State.h"
 
 namespace PokemonAutomation{

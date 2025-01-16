@@ -9,12 +9,11 @@
 
 #include <vector>
 #include "Common/Cpp/Color.h"
-#include "Common/Cpp/Containers/FixedLimitVector.h"
+//#include "Common/Cpp/Containers/FixedLimitVector.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 #include "CommonFramework/Inference/VisualDetector.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

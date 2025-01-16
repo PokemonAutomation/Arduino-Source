@@ -531,8 +531,6 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Tools/BlackBorderCheck.h
     Source/CommonFramework/Tools/BotBaseHandle.cpp
     Source/CommonFramework/Tools/BotBaseHandle.h
-    Source/CommonFramework/Tools/ConsoleHandle.cpp
-    Source/CommonFramework/Tools/ConsoleHandle.h
     Source/CommonFramework/Tools/DebugDumper.cpp
     Source/CommonFramework/Tools/DebugDumper.h
     Source/CommonFramework/Tools/ErrorDumper.cpp
@@ -799,7 +797,6 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/DevPrograms/TestProgramComputer.h
     Source/NintendoSwitch/DevPrograms/TestProgramSwitch.cpp
     Source/NintendoSwitch/DevPrograms/TestProgramSwitch.h
-    Source/NintendoSwitch/FixedInterval.h
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramOption.cpp
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramOption.h
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramSession.cpp
@@ -836,6 +833,9 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Inference/NintendoSwitch_DateReader.h
     Source/NintendoSwitch/Inference/NintendoSwitch_DetectHome.cpp
     Source/NintendoSwitch/Inference/NintendoSwitch_DetectHome.h
+    Source/NintendoSwitch/NintendoSwitch_ConsoleHandle.cpp
+    Source/NintendoSwitch/NintendoSwitch_ConsoleHandle.h
+    Source/NintendoSwitch/NintendoSwitch_FixedInterval.h
     Source/NintendoSwitch/NintendoSwitch_MultiSwitchProgram.cpp
     Source/NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h
     Source/NintendoSwitch/NintendoSwitch_Panels.cpp

@@ -10,7 +10,7 @@
 #include "CommonFramework/Inference/BlackScreenDetector.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
-#include "NintendoSwitch/FixedInterval.h"
+#include "NintendoSwitch/NintendoSwitch_FixedInterval.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_GameEntry.h"

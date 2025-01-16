@@ -10,7 +10,9 @@
 #include "Common/Cpp/Color.h"
 #include "ClientSource/Connection/BotBase.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/Notifications/ProgramInfo.h"
+#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

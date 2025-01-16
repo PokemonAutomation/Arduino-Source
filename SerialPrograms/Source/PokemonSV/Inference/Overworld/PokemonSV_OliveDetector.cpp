@@ -4,18 +4,14 @@
  *
  */
 
-#include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
-#include "CommonFramework/Globals.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "CommonFramework/ImageMatch/ImageDiff.h"
-#include "CommonFramework/ImageMatch/ExactImageMatcher.h"
-#include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "CommonFramework/ImageTools/WaterfillUtilities.h"
 #include "CommonFramework/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonFramework/ImageTools/ImageFilter.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
-#include "NintendoSwitch/Programs/NintendoSwitch_SnapshotDumper.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h"
 #include "PokemonSV/Programs/AutoStory/PokemonSV_OliveActionFailedException.h"

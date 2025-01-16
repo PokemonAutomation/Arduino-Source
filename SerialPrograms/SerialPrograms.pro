@@ -279,7 +279,6 @@ SOURCES += \
     Source/CommonFramework/SetupSettings.cpp \
     Source/CommonFramework/Tools/BlackBorderCheck.cpp \
     Source/CommonFramework/Tools/BotBaseHandle.cpp \
-    Source/CommonFramework/Tools/ConsoleHandle.cpp \
     Source/CommonFramework/Tools/DebugDumper.cpp \
     Source/CommonFramework/Tools/ErrorDumper.cpp \
     Source/CommonFramework/Tools/FileDownloader.cpp \
@@ -417,6 +416,7 @@ SOURCES += \
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_SwitchSystemWidget.cpp \
     Source/NintendoSwitch/Inference/NintendoSwitch_DateReader.cpp \
     Source/NintendoSwitch/Inference/NintendoSwitch_DetectHome.cpp \
+    Source/NintendoSwitch/NintendoSwitch_ConsoleHandle.cpp \
     Source/NintendoSwitch/NintendoSwitch_MultiSwitchProgram.cpp \
     Source/NintendoSwitch/NintendoSwitch_Panels.cpp \
     Source/NintendoSwitch/NintendoSwitch_Settings.cpp \
@@ -1378,7 +1378,6 @@ HEADERS += \
     Source/CommonFramework/SetupSettings.h \
     Source/CommonFramework/Tools/BlackBorderCheck.h \
     Source/CommonFramework/Tools/BotBaseHandle.h \
-    Source/CommonFramework/Tools/ConsoleHandle.h \
     Source/CommonFramework/Tools/DebugDumper.h \
     Source/CommonFramework/Tools/ErrorDumper.h \
     Source/CommonFramework/Tools/FileDownloader.h \
@@ -1520,7 +1519,8 @@ HEADERS += \
     Source/NintendoSwitch/DevPrograms/BoxDraw.h \
     Source/NintendoSwitch/DevPrograms/TestProgramComputer.h \
     Source/NintendoSwitch/DevPrograms/TestProgramSwitch.h \
-    Source/NintendoSwitch/FixedInterval.h \
+    Source/NintendoSwitch/NintendoSwitch_ConsoleHandle.h \
+    Source/NintendoSwitch/NintendoSwitch_FixedInterval.h \
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramOption.h \
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramSession.h \
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchSystemOption.h \

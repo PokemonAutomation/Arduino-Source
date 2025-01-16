@@ -5,11 +5,11 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSV_MainMenuDetector.h"
 
 //#include <iostream>

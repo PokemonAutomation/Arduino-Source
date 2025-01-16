@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_MaxLair_CatchScreenTracker_H
 #define PokemonAutomation_PokemonSwSh_MaxLair_CatchScreenTracker_H
 
-#include "CommonFramework/Tools/ConsoleHandle.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_SummaryShinySymbolDetector.h"
 
 namespace PokemonAutomation{

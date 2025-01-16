@@ -10,8 +10,8 @@
 #include "Common/Cpp/Options/GroupOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/TimeExpressionOption.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

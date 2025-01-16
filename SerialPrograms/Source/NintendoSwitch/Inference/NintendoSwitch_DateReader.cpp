@@ -15,20 +15,20 @@
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
 #include "CommonFramework/OCR/OCR_RawOCR.h"
 #include "CommonFramework/OCR/OCR_NumberReader.h"
 #include "CommonFramework/OCR/OCR_StringNormalization.h"
-#include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
-#include "NintendoSwitch/Inference/NintendoSwitch_DetectHome.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
+#include "NintendoSwitch/Inference/NintendoSwitch_DetectHome.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "NintendoSwitch_DateReader.h"
+#include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

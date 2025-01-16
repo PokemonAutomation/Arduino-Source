@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_MaxLair_Run_ProfessorSwap_H
 #define PokemonAutomation_PokemonSwSh_MaxLair_Run_ProfessorSwap_H
 
-#include "CommonFramework/Tools/ConsoleHandle.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_StateTracker.h"
 #include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_StateMachine.h"
 

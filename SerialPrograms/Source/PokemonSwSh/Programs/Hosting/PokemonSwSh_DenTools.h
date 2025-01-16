@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_DenTools_H
 #define PokemonAutomation_PokemonSwSh_DenTools_H
 
-#include "CommonFramework/Tools/ConsoleHandle.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "PokemonSwSh/Options/PokemonSwSh_Catchability.h"
 
 namespace PokemonAutomation{

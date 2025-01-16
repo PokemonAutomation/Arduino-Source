@@ -4,10 +4,9 @@
  * 
  */
 
-#include <sstream>
 #include "ClientSource/Libraries/MessageConverter.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"

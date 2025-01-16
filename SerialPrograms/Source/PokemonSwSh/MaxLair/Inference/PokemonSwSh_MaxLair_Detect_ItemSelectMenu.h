@@ -8,8 +8,8 @@
 #define PokemonAutomation_PokemonSwSh_MaxLair_Detect_ItemSelectMenu_H
 
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

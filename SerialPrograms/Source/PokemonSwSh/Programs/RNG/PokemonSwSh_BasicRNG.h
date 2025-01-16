@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Tools/ConsoleHandle.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "Pokemon/Pokemon_Xoroshiro128Plus.h"
 
 namespace PokemonAutomation{

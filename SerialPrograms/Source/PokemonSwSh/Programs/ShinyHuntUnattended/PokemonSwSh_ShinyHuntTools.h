@@ -7,7 +7,8 @@
 #ifndef PokemonAutomation_PokemonSwSh_ShinyHuntingTools_H
 #define PokemonAutomation_PokemonSwSh_ShinyHuntingTools_H
 
-#include "CommonFramework/Tools/ConsoleHandle.h"
+#include "ClientSource/Connection/BotBase.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

@@ -8,8 +8,8 @@
 #define PokemonAutomation_PokemonSwSh_EggHelpers_H
 
 #include "Common/Compiler.h"
+#include "NintendoSwitch/NintendoSwitch_FixedInterval.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
-#include "NintendoSwitch/FixedInterval.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

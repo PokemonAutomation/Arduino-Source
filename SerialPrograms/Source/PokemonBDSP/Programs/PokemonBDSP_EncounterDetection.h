@@ -8,9 +8,9 @@
 #define PokemonAutomation_PokemonBDSP_EncounterTracker_H
 
 #include "CommonFramework/Language.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
-#include "Pokemon/Pokemon_EncounterStats.h"
-#include "PokemonSwSh/ShinyHuntTracker.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
+//#include "Pokemon/Pokemon_EncounterStats.h"
+//#include "PokemonSwSh/ShinyHuntTracker.h"
 #include "PokemonBDSP/Options/EncounterFilter/PokemonBDSP_EncounterFilterOption.h"
 #include "PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinyEncounterDetector.h"
 

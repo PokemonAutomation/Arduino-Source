@@ -14,7 +14,7 @@
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Tools/FileDownloader.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "PokemonSV/Options/PokemonSV_AutoHostOptions.h"
 #include "PokemonSV_AutoHostTools.h"
 

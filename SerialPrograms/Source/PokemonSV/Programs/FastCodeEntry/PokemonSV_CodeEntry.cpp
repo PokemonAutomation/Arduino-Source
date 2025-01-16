@@ -5,7 +5,7 @@
  */
 
 #include <map>
-#include "CommonFramework/Tools/ConsoleHandle.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.h"
 #include "NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h"

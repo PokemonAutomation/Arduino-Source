@@ -8,10 +8,9 @@
 #define PokemonAutomation_PokemonSwSh_BattleBallInventoryReader_H
 
 #include <string>
-#include "CommonFramework/Options/StringSelectOption.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
 #include "CommonFramework/ImageMatch/ExactImageDictionaryMatcher.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "Pokemon/Inference/Pokemon_PokeballNameReader.h"
 
 namespace PokemonAutomation{

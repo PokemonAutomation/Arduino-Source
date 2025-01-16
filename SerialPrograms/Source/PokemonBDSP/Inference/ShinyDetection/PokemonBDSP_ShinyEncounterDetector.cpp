@@ -4,18 +4,17 @@
  *
  */
 
-#include <sstream>
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
-#include "CommonFramework/Notifications/ProgramInfo.h"
+//#include "CommonFramework/Notifications/ProgramInfo.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "PokemonBDSP/PokemonBDSP_Settings.h"
 #include "PokemonBDSP/Inference/Sounds/PokemonBDSP_ShinySoundDetector.h"
 #include "PokemonBDSP_ShinyEncounterDetector.h"

@@ -10,7 +10,7 @@
 #include "CommonFramework/Language.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

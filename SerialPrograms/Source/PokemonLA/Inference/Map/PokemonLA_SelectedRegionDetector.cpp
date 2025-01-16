@@ -10,7 +10,7 @@
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "PokemonLA_SelectedRegionDetector.h"
 
 namespace PokemonAutomation{

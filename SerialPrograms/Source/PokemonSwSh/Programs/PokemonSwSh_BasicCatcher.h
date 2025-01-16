@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_BasicCatcher_H
 
 #include "CommonFramework/Language.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "Pokemon/Pokemon_Notification.h"
 #include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleBallReader.h"
 

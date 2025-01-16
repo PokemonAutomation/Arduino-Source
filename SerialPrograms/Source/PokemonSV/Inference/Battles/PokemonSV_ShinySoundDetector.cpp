@@ -6,7 +6,6 @@
 
 #include "CommonFramework/Inference/SpectrogramMatcher.h"
 #include "CommonFramework/Inference/AudioTemplateCache.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
 #include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSV_ShinySoundDetector.h"
 
