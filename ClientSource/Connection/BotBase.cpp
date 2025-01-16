@@ -28,17 +28,7 @@ BotBaseContext::BotBaseContext(CancellableScope& parent, BotBaseContext& context
     attach(parent);
 }
 BotBaseContext::~BotBaseContext(){
-    m_lifetime_sanitizer.check_usage();
     detach();
-    try{
-        m_botbase.wait_for_all_requests(this);
-    }catch (...){
-//        cout << "canceled with exception: " << this << endl;
-        CancellableScope* parent = scope();
-        if (parent){
-            parent->cancel(std::current_exception());
-        }
-    }
 }
 
 void BotBaseContext::wait_for_all_requests() const{
