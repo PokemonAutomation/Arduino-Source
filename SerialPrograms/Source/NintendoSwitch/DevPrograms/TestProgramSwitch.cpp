@@ -281,12 +281,12 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
-    ImageRGB32 image("20250115-110356822901.png");
+//    ImageRGB32 image("20250115-110356822901.png");
 //    ImageRGB32 image("raidecho1.jpg");
 //    auto image = feed.snapshot();
 
-    MaxLairInternal::BattleMenuReader reader(overlay, Language::English);
-    reader.read_opponent_in_summary(logger, image);
+//    MaxLairInternal::BattleMenuReader reader(overlay, Language::English);
+//    reader.read_opponent_in_summary(logger, image);
 
 //    TeraCardReader reader;
 //    cout << (int)reader.stars(logger, env.program_info(), image) << endl;
@@ -367,14 +367,14 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     );
 #endif
 
-#if 0
-//    VideoSnapshot image = feed.snapshot();
-    ImageRGB32 image("20250108-151305644248.png");
+#if 1
+    VideoSnapshot image = feed.snapshot();
+//    ImageRGB32 image("20250108-151305644248.png");
 
     DateReader date_reader;
     date_reader.make_overlays(overlays);
-//    auto date = date_reader.read_date(logger, image);
-    auto date = date_reader.read_date(logger, std::make_shared<ImageRGB32>(std::move(image)));
+    auto date = date_reader.read_date(logger, image);
+//    auto date = date_reader.read_date(logger, std::make_shared<ImageRGB32>(std::move(image)));
     cout << "year =  " << (int)date.second.year << endl;
     cout << "month = " << (int)date.second.month << endl;
     cout << "day =   " << (int)date.second.day << endl;

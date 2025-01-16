@@ -88,8 +88,8 @@ std::vector<std::string> CramomaticTable::make_header() const{
 
 std::vector<std::unique_ptr<EditableTableRow>> CramomaticTable::make_defaults(){
     std::vector<std::unique_ptr<EditableTableRow>> ret;
-    ret.emplace_back(std::make_unique<CramomaticRow>(*this, CramomaticBallType::Apricorn, true, 1));
-    ret.emplace_back(std::make_unique<CramomaticRow>(*this, CramomaticBallType::Apricorn, false, 0));
+    ret.emplace_back(std::make_unique<CramomaticRow>(*this, CramomaticBallType::Apricorn, true, (uint16_t)1));
+    ret.emplace_back(std::make_unique<CramomaticRow>(*this, CramomaticBallType::Apricorn, false, (uint16_t)0));
     return ret;
 }
 
