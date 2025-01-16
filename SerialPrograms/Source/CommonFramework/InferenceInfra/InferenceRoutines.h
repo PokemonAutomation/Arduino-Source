@@ -81,7 +81,7 @@ int run_until(
             if (command){
                 command(subcontext);
             }
-//            subcontext.wait_for_all_requests();
+            subcontext.wait_for_all_requests();
         },
         callbacks,
         default_video_period,
