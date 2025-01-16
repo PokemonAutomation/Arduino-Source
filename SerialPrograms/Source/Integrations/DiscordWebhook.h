@@ -47,13 +47,15 @@ public:
         Logger& logger,
         const QUrl& url, std::chrono::milliseconds delay,
         const JsonObject& obj,
-        std::shared_ptr<PendingFileSend> file
+        std::shared_ptr<PendingFileSend> file,
+        std::function<void()> finish_callback = nullptr
     );
     void send(
         Logger& logger,
         const QUrl& url, std::chrono::milliseconds delay,
         const JsonObject& obj,
-        std::vector<std::shared_ptr<PendingFileSend>> files
+        std::vector<std::shared_ptr<PendingFileSend>> files,
+        std::function<void()> finish_callback = nullptr
     );
 
     static DiscordWebhookSender& instance();
@@ -70,14 +72,14 @@ private:
         const std::vector<DiscordFileAttachment>& files
     );
 
-signals:
-    void stop_event_loop();
-
 private:
     TaggedLogger m_logger;
-    bool m_stopping;
+    std::atomic<bool> m_stopping;
     std::mutex m_lock;
     std::condition_variable m_cv;
+
+    std::mutex m_send_lock;
+    std::unique_ptr<QEventLoop> m_event_loop;
 
     std::deque<WallClock> m_sent;
     AsyncDispatcher m_dispatcher;

@@ -14,6 +14,7 @@
 #include "PokemonLA/Inference/PokemonLA_MountDetector.h"
 
 namespace PokemonAutomation{
+    class ConsoleHandle;
 namespace NintendoSwitch{
 namespace PokemonLA{
 

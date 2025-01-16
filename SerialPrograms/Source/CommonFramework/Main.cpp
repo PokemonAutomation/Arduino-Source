@@ -110,8 +110,10 @@ int main(int argc, char *argv[]){
     }
 
     set_working_directory();
-    send_all_unsent_reports(global_logger_tagged(), true);
-    
+
+    //  Run this asynchronously to we don't block startup.
+    std::unique_ptr<AsyncTask> task = send_all_unsent_reports(global_logger_tagged(), true);
+
     int ret = 0;
     {
         MainWindow w;

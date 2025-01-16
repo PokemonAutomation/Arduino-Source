@@ -21,7 +21,7 @@ namespace PokemonBDSP{
 
 
 
-
+#if 0
 EndBattleWatcher::EndBattleWatcher(const ImageFloatBox& box, Color color)
     : VisualInferenceCallback("EndBattleWatcher")
     , m_color(color)
@@ -50,6 +50,7 @@ bool EndBattleWatcher::battle_is_over(const ImageViewRGB32& frame){
     }
     return true;
 }
+#endif
 
 
 

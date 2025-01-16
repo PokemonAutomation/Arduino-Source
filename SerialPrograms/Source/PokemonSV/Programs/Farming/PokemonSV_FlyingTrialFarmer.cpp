@@ -117,7 +117,7 @@ bool FlyingTrialFarmer::run_rewards(SingleSwitchProgramEnvironment& env, BotBase
         OverworldWatcher overworld(env.console, COLOR_CYAN);
         context.wait_for_all_requests();
 
-        int ret_finish = run_until(
+        int ret_finish = run_until<BotBaseContext>(
             env.console, context,
             [](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 10000);
@@ -134,8 +134,9 @@ bool FlyingTrialFarmer::run_rewards(SingleSwitchProgramEnvironment& env, BotBase
             return trial_failed;
         default:
             OperationFailedException::fire(
-                env.console, ErrorReport::SEND_ERROR_REPORT,
-                "No recognized state after 80 seconds."
+                ErrorReport::SEND_ERROR_REPORT,
+                "No recognized state after 80 seconds.",
+                env.console
             );
         }
     }
@@ -161,7 +162,7 @@ void FlyingTrialFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseCont
         BlackScreenOverWatcher black_screen(COLOR_RED, { 0.2, 0.2, 0.6, 0.6 });
         context.wait_for_all_requests();
 
-        int ret_entry = run_until(
+        int ret_entry = run_until<BotBaseContext>(
             env.console, context,
             [](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_A, 10000);

@@ -7,6 +7,7 @@
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
+#include "CommonFramework/Inference/FrozenImageDetector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSwSh/ShinyHuntTracker.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_SelectionArrow.h"
@@ -102,15 +103,17 @@ bool DoublesLeveling::battle(SingleSwitchProgramEnvironment& env, BotBaseContext
         BattleMenuWatcher battle_menu(BattleType::STANDARD);
         EndBattleWatcher end_battle;
         SelectionArrowFinder learn_move(env.console, {0.50, 0.62, 0.40, 0.18}, COLOR_YELLOW);
-        int ret = run_until(
+        FrozenImageDetector overworld(std::chrono::seconds(5), 10);
+        int ret = run_until<BotBaseContext>(
             env.console, context,
             [](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
             },
             {
-                {battle_menu},
-                {end_battle},
-                {learn_move},
+                battle_menu,
+                end_battle,
+                learn_move,
+                overworld,
             }
         );
         switch (ret){
@@ -131,19 +134,25 @@ bool DoublesLeveling::battle(SingleSwitchProgramEnvironment& env, BotBaseContext
                 break;
             }
             return true;
+        case 3:
+            env.log("Detected possible overworld!", COLOR_BLUE);
+            pbf_mash_button(context, BUTTON_B, 250);
+            return false;
         default:
             env.log("Timed out.", COLOR_RED);
             stats.add_error();
             OperationFailedException::fire(
-                env.console, ErrorReport::SEND_ERROR_REPORT,
-                "Timed out after 2 minutes."
+                ErrorReport::SEND_ERROR_REPORT,
+                "Timed out after 2 minutes.",
+                env.console
             );
         }
     }
 
     OperationFailedException::fire(
-        env.console, ErrorReport::SEND_ERROR_REPORT,
-        "No progress detected after 5 battle menus. Are you out of PP?"
+        ErrorReport::SEND_ERROR_REPORT,
+        "No progress detected after 5 battle menus. Are you out of PP?",
+        env.console
     );
 }
 

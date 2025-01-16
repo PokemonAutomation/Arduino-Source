@@ -28,7 +28,7 @@ bool heal_by_global_room(ConsoleHandle& console, BotBaseContext& context){
     // Press ZL until we are at:
     // - "Would you like to enter the Global Room?" To select: "Yes" and other options.
     SelectionArrowFinder arrow(console, {0.50, 0.45, 0.20, 0.20}, COLOR_GREEN);
-    int ret = run_until(
+    int ret = run_until<BotBaseContext>(
         console, context,
         [](BotBaseContext& context){
             for (int i = 0; i < 5; i++){
@@ -39,8 +39,9 @@ bool heal_by_global_room(ConsoleHandle& console, BotBaseContext& context){
     );
     if (ret < 0){
         OperationFailedException::fire(
-            console, ErrorReport::SEND_ERROR_REPORT,
-            "No selection arrow detected when using Global Room."
+            ErrorReport::SEND_ERROR_REPORT,
+            "No selection arrow detected when using Global Room.",
+            console
         );
     }
 

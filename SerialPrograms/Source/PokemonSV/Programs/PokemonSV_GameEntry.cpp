@@ -137,7 +137,7 @@ bool reset_game_from_home(
     ok &= reset_game_to_gamemenu(console, context);
     ok &= gamemenu_to_ingame(console, context);
     if (!ok){
-        dump_image(info, console, "StartGame");
+        dump_image(console, info, console, "StartGame");
     }
     console.log("Entered game! Waiting out grace period.");
     pbf_wait(context, post_wait_time);
@@ -167,8 +167,9 @@ void reset_game(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext&
         context.wait_for_all_requests();
         if (!reset_game_from_home(info, console, context, 5 * TICKS_PER_SECOND)){
             OperationFailedException::fire(
-                console, ErrorReport::SEND_ERROR_REPORT,
-                "Failed to start game."
+                ErrorReport::SEND_ERROR_REPORT,
+                "Failed to start game.",
+                console
             );
         }
     }catch (OperationFailedException& e){

@@ -40,7 +40,7 @@ StateMachineAction mash_A_to_entrance(
 ){
     EntranceDetector entrance_detector(entrance);
 
-    int result = run_until(
+    int result = run_until<BotBaseContext>(
         console, context,
         [&](BotBaseContext& context){
             pbf_mash_button(context, BUTTON_A, 60 * TICKS_PER_SECOND);
@@ -52,7 +52,7 @@ StateMachineAction mash_A_to_entrance(
     if (result < 0){
         console.log("Failed to detect entrance.", COLOR_RED);
         runtime.session_stats.add_error();
-        dump_image(MODULE_NAME, console, "FailedToDetectEntrance");
+        dump_image(console, MODULE_NAME, console, "FailedToDetectEntrance");
         return StateMachineAction::RESET_RECOVER;
     }
     return StateMachineAction::KEEP_GOING;

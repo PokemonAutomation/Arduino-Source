@@ -16,9 +16,9 @@
 
 namespace PokemonAutomation{
 
-class ProgramEnvironment;
-class ConsoleHandle;
 class BotBaseContext;
+class ProgramEnvironment;
+class VideoStream;
 class AsyncCommandSession;
 class AudioInferenceCallback;
 class VisualInferenceCallback;
@@ -47,7 +47,7 @@ public:
 protected:
     //  Construction
     SuperControlSession(
-        ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+        ProgramEnvironment& env, VideoStream& stream, BotBaseContext& context,
         std::chrono::milliseconds state_period = std::chrono::milliseconds(100),
         std::chrono::milliseconds visual_period = std::chrono::milliseconds(50),
         std::chrono::milliseconds audio_period = std::chrono::milliseconds(20)
@@ -76,7 +76,7 @@ protected:
 
 protected:
     ProgramEnvironment& m_env;
-    ConsoleHandle& m_console;
+    VideoStream& m_stream;
     BotBaseContext& m_context;
     std::unique_ptr<AsyncCommandSession> m_active_command;
 

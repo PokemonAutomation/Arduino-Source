@@ -118,7 +118,7 @@ void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, BotBase
         env.log("Wait for a pokemon to attack you.", COLOR_PURPLE);
         {
             BattleMenuWatcher fight_detector(BattleType::STANDARD);
-            int result = run_until(
+            int ret = run_until<BotBaseContext>(
                 env.console, context,
                 [](BotBaseContext& context){
                     while (true){
@@ -130,7 +130,7 @@ void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, BotBase
                 },
                 {{fight_detector}}
             );
-            if (result == 0){
+            if (ret == 0){
                 env.log("New fight detected.", COLOR_PURPLE);
                 pbf_mash_button(context, BUTTON_B, 1 * TICKS_PER_SECOND);
             }

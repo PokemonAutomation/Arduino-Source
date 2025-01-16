@@ -135,8 +135,9 @@ int8_t ItemPrinterMaterialDetector::find_happiny_dust_row_index(
     }
 
     OperationFailedException::fire(
-        console, ErrorReport::SEND_ERROR_REPORT,
-        "Failed to find Happiny dust after 10 tries."
+        ErrorReport::SEND_ERROR_REPORT,
+        "Failed to find Happiny dust after 10 tries.",
+        console
     );
 
 }
@@ -171,8 +172,9 @@ std::string ItemPrinterMaterialDetector::detect_material_name(
 
     if (results.size() > 1){
         OperationFailedException::fire(
-            console, ErrorReport::SEND_ERROR_REPORT,
-            "ItemPrinterMaterialDetector::detect_material_name(): Unable to read selected item. Ambiguous or multiple results."
+            ErrorReport::SEND_ERROR_REPORT,
+            "ItemPrinterMaterialDetector::detect_material_name(): Unable to read selected item. Ambiguous or multiple results.",
+            console
         );
     }
 

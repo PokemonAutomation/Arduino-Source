@@ -151,7 +151,7 @@ void ShinyHuntLakeTrio::program(SingleSwitchProgramEnvironment& env, BotBaseCont
                 {0, 0, 1, 1},
                 {{arcs, true}}
             );
-            int ret = run_until(
+            int ret = run_until<BotBaseContext>(
                 env.console, context,
                 [](BotBaseContext& context){
                     pbf_mash_button(context, BUTTON_B, 60 * TICKS_PER_SECOND);
@@ -174,8 +174,9 @@ void ShinyHuntLakeTrio::program(SingleSwitchProgramEnvironment& env, BotBaseCont
                 consecutive_errors++;
                 if (consecutive_errors >= 3){
                     OperationFailedException::fire(
-                        env.console, ErrorReport::SEND_ERROR_REPORT,
-                        "Failed to detect an encounter 3 times in the row."
+                        ErrorReport::SEND_ERROR_REPORT,
+                        "Failed to detect an encounter 3 times in the row.",
+                        env.console
                     );
                 }
                 continue;
@@ -191,7 +192,7 @@ void ShinyHuntLakeTrio::program(SingleSwitchProgramEnvironment& env, BotBaseCont
                 {{arcs, false}}
             );
             ShinySymbolWaiter shiny_symbol(env.console, SHINY_SYMBOL_BOX_BOTTOM);
-            int ret = run_until(
+            int ret = run_until<BotBaseContext>(
                 env.console, context,
                 [](BotBaseContext& context){
                     pbf_press_button(context, BUTTON_ZL, 3 * TICKS_PER_SECOND, 0);

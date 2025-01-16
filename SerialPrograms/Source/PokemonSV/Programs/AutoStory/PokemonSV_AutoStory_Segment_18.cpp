@@ -109,7 +109,7 @@ void checkpoint_39(
         DialogBoxWatcher        dialog(COLOR_RED, true);
 
         // section 4
-        int ret = run_until(
+        int ret = run_until<BotBaseContext>(
             env.console, context,
             [&](BotBaseContext& context){
                 // run around in circles until you run into the titan
@@ -187,8 +187,9 @@ void checkpoint_39(
         );
         if (ret < 0){
             OperationFailedException::fire(
-                env.console, ErrorReport::SEND_ERROR_REPORT,
-                "checkpoint_39(): Failed to run into Great Tusk/Iron Treads."
+                ErrorReport::SEND_ERROR_REPORT,
+                "checkpoint_39(): Failed to run into Great Tusk/Iron Treads.",
+                env.console
             );            
         }
 

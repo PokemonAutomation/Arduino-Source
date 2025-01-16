@@ -22,7 +22,16 @@ BotBaseContext::BotBaseContext(CancellableScope& parent, BotBase& botbase)
 {
     attach(parent);
 }
+BotBaseContext::BotBaseContext(CancellableScope& parent, BotBaseContext& context)
+    : m_botbase(context.botbase())
+{
+    attach(parent);
+}
 BotBaseContext::~BotBaseContext(){
+    m_lifetime_sanitizer.check_usage();
+    try{
+        m_botbase.wait_for_all_requests(this);
+    }catch (...){}
     detach();
 }
 

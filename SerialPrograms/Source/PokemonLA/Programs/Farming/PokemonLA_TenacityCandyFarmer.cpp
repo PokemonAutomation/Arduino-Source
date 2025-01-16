@@ -115,7 +115,7 @@ bool TenacityCandyFarmer::run_iteration(SingleSwitchProgramEnvironment& env, Bot
     {
         context.wait_for_all_requests();
         ButtonDetector button(env.console, env.console, ButtonType::ButtonA, {0.56, 0.46, 0.33, 0.27}, std::chrono::milliseconds(100), true);
-        int ret = run_until(
+        int ret = run_until<BotBaseContext>(
             env.console, context,
             [&](BotBaseContext& context){
                 for (size_t c = 0; c < 10; c++){
@@ -128,8 +128,9 @@ bool TenacityCandyFarmer::run_iteration(SingleSwitchProgramEnvironment& env, Bot
         );
         if (ret != 0){
             OperationFailedException::fire(
-                env.console, ErrorReport::SEND_ERROR_REPORT,
-                "Unable to detect Tenacity path menu after 10 A presses."
+                ErrorReport::SEND_ERROR_REPORT,
+                "Unable to detect Tenacity path menu after 10 A presses.",
+                env.console
             );
         }
     }
@@ -198,7 +199,7 @@ bool TenacityCandyFarmer::run_iteration(SingleSwitchProgramEnvironment& env, Bot
             // All three battles are now finished, wait for ArcPhoneDetector
             const bool stop_on_detected = true;
             ArcPhoneDetector arc_phone_detector(env.console, env.console, std::chrono::milliseconds(200), stop_on_detected);
-            int ret = run_until(
+            int ret = run_until<BotBaseContext>(
                 env.console, context, [](BotBaseContext& context){
                     pbf_mash_button(context, BUTTON_B, 20 * TICKS_PER_SECOND);
                 },
@@ -206,8 +207,9 @@ bool TenacityCandyFarmer::run_iteration(SingleSwitchProgramEnvironment& env, Bot
             );
             if (ret < 0){
                 OperationFailedException::fire(
-                    env.console, ErrorReport::SEND_ERROR_REPORT,
-                    "Failed to find Arc phone after 20 seconds when the last battle ends."
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "Failed to find Arc phone after 20 seconds when the last battle ends.",
+                    env.console
                 );
             }
             env.log("Found Arc Phone. End of one path.");
@@ -239,8 +241,9 @@ bool TenacityCandyFarmer::run_iteration(SingleSwitchProgramEnvironment& env, Bot
             env.console.log("Error: Failed to find battle menu after 2 minutes.");
 //            return true;
             OperationFailedException::fire(
-                env.console, ErrorReport::SEND_ERROR_REPORT,
-                "Failed to find battle menu after 2 minutes."
+                ErrorReport::SEND_ERROR_REPORT,
+                "Failed to find battle menu after 2 minutes.",
+                env.console
             );
         }
 

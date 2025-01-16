@@ -7,7 +7,6 @@
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
 #include "VideoResolutionCheck.h"
 
 namespace PokemonAutomation{
@@ -25,8 +24,8 @@ void assert_16_9_720p_min(Logger& logger, const ImageViewRGB32& frame){
         throw UserSetupError(logger, "Video aspect ratio must be 16:9.");
     }
 }
-void assert_16_9_720p_min(Logger& logger, ConsoleHandle& console){
-    assert_16_9_720p_min(logger, console.video().snapshot());
+void assert_16_9_720p_min(Logger& logger, VideoFeed& video){
+    assert_16_9_720p_min(logger, video.snapshot());
 }
 
 void assert_16_9_1080p_min(Logger& logger, const ImageViewRGB32& frame){
@@ -41,8 +40,8 @@ void assert_16_9_1080p_min(Logger& logger, const ImageViewRGB32& frame){
         throw UserSetupError(logger, "Video aspect ratio must be 16:9.");
     }
 }
-void assert_16_9_1080p_min(Logger& logger, ConsoleHandle& console){
-    assert_16_9_1080p_min(logger, console.video().snapshot());
+void assert_16_9_1080p_min(Logger& logger, VideoFeed& video){
+    assert_16_9_1080p_min(logger, video.snapshot());
 }
 
 

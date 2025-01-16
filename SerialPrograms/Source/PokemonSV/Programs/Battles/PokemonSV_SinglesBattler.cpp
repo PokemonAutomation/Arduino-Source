@@ -115,8 +115,9 @@ bool run_battle_menu(
         }
     }
     OperationFailedException::fire(
-        console, ErrorReport::SEND_ERROR_REPORT,
-        "Invalid SinglesMoveType: " + std::to_string((int)move.type)
+        ErrorReport::SEND_ERROR_REPORT,
+        "Invalid SinglesMoveType: " + std::to_string((int)move.type),
+        console
     );
 }
 
@@ -148,7 +149,7 @@ bool run_pokemon(
         AdvanceDialogWatcher dialog(COLOR_CYAN);
         OverworldWatcher overworld(console, COLOR_GREEN);
         context.wait_for_all_requests();
-        int ret = run_until(
+        int ret = run_until<BotBaseContext>(
             console, context,
             [](BotBaseContext& context){
                 for (size_t c = 0; c < 4; c++){
@@ -234,8 +235,9 @@ bool run_pokemon(
             consecutive_timeouts++;
             if (consecutive_timeouts == 3){
                 OperationFailedException::fire(
-                    console, ErrorReport::SEND_ERROR_REPORT,
-                    "No state detected after 6 minutes."
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "No state detected after 6 minutes.",
+                    console
                 );
             }
             console.log("Unable to detect any state for 2 minutes. Mashing B...", COLOR_RED);
@@ -307,8 +309,9 @@ bool run_singles_battle(
                 continue;
             default:
                 OperationFailedException::fire(
-                    console, ErrorReport::SEND_ERROR_REPORT,
-                    "Unable to send in a " + STRING_POKEMON + "."
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "Unable to send in a " + STRING_POKEMON + ".",
+                    console
                 );
             }
             break;

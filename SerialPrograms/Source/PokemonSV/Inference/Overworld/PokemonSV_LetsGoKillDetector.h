@@ -62,7 +62,7 @@ private:
 
 class LetsGoKillSoundDetector : public AudioPerSpectrumDetectorBase{
 public:
-    LetsGoKillSoundDetector(ConsoleHandle& console, DetectedCallback detected_callback);
+    LetsGoKillSoundDetector(Logger& logger, DetectedCallback detected_callback);
 
     virtual float get_score_threshold() const override;
 

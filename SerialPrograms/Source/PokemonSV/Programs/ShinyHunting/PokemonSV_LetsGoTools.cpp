@@ -322,7 +322,7 @@ bool use_lets_go_to_clear_in_front(
 //    cout << calls++ << endl;
 
     SweatBubbleWatcher bubble(COLOR_GREEN);
-    int ret = run_until(
+    int ret = run_until<BotBaseContext>(
         console, context,
         [](BotBaseContext& context){
             pbf_press_button(context, BUTTON_R, 20, 200);

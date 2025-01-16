@@ -13,6 +13,7 @@
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
+#include "CommonFramework/Tools/ConsoleHandle.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -40,8 +41,9 @@ bool change_view_to_stats_or_judge(
         if (throw_exception){
             if (attempts == 10){
                 OperationFailedException::fire(
-                    console, ErrorReport::SEND_ERROR_REPORT,
-                    "Unable to change Pokemon view after 10 tries."
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "Unable to change Pokemon view after 10 tries.",
+                    console
                 );
             }
         }else{
@@ -90,8 +92,9 @@ void change_view_to_judge(
     for (size_t attempts = 0;; attempts++){
         if (attempts == 10){
             OperationFailedException::fire(
-                console, ErrorReport::SEND_ERROR_REPORT,
-                "Unable to change Pokemon view to judge after 10 tries. Have you unlocked it?"
+                ErrorReport::SEND_ERROR_REPORT,
+                "Unable to change Pokemon view to judge after 10 tries. Have you unlocked it?",
+                console
             );
         }
 

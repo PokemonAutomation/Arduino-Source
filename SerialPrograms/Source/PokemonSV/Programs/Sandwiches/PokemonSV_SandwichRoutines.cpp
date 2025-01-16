@@ -499,7 +499,7 @@ ImageFloatBox move_sandwich_hand(
 void finish_sandwich_eating(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
     console.overlay().add_log("Eating", COLOR_WHITE);
     PicnicWatcher picnic_watcher;
-    int ret = run_until(
+    int ret = run_until<BotBaseContext>(
         console, context,
         [](BotBaseContext& context){
             for(int i = 0; i < 20; i++){
@@ -972,8 +972,9 @@ void run_sandwich_maker(ProgramEnvironment& env, ConsoleHandle& console, BotBase
                 }else{
                     console.log("Read nothing on center plate label.");
                     OperationFailedException::fire(
-                        console, ErrorReport::SEND_ERROR_REPORT,
+                        ErrorReport::SEND_ERROR_REPORT,
                         "No ingredient found on center plate label.",
+                        console,
                         std::move(screen)
                     );
                 }
@@ -1019,8 +1020,9 @@ void run_sandwich_maker(ProgramEnvironment& env, ConsoleHandle& console, BotBase
 
             if (left_filling.empty()){
                 OperationFailedException::fire(
-                    console, ErrorReport::SEND_ERROR_REPORT,
+                    ErrorReport::SEND_ERROR_REPORT,
                     "No ingredient label found on remaining plate " + std::to_string(i) + ".",
+                    console,
                     std::move(screen)
                 );
             }
@@ -1040,8 +1042,9 @@ void run_sandwich_maker(ProgramEnvironment& env, ConsoleHandle& console, BotBase
         if ((int)plate_order.size() != plates){
             env.log("Found # plate labels " + std::to_string(plate_order.size()) + ", not same as desired # plates " + std::to_string(plates));
             OperationFailedException::fire(
-                console, ErrorReport::SEND_ERROR_REPORT,
+                ErrorReport::SEND_ERROR_REPORT,
                 "Number of plate labels did not match number of plates.",
+                console,
                 std::move(screen)
             );
         }
@@ -1150,8 +1153,9 @@ void run_sandwich_maker(ProgramEnvironment& env, ConsoleHandle& console, BotBase
     int ret = wait_until(console, context, std::chrono::seconds(30), { grabbing_hand });
     if (ret < 0){
         OperationFailedException::fire(
-            console, ErrorReport::SEND_ERROR_REPORT,
+            ErrorReport::SEND_ERROR_REPORT,
             "SandwichMaker: Cannot detect grabing hand when waiting for upper bread.",
+            console,
             grabbing_hand.last_snapshot()
         );
     }

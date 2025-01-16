@@ -98,7 +98,7 @@ bool IngoBattleGrinder::start_dialog(ConsoleHandle& console, BotBaseContext& con
         ButtonDetector button0(console, console, ButtonType::ButtonA, {0.50, 0.408, 0.40, 0.042}, std::chrono::milliseconds(100), true);
         ButtonDetector button1(console, console, ButtonType::ButtonA, {0.50, 0.450, 0.40, 0.042}, std::chrono::milliseconds(100), true);
         ButtonDetector button2(console, console, ButtonType::ButtonA, {0.50, 0.492, 0.40, 0.042}, std::chrono::milliseconds(100), true);
-        int ret = run_until(
+        int ret = run_until<BotBaseContext>(
             console, context,
             [&](BotBaseContext& context){
                 for (size_t c = 0; c < 10; c++){
@@ -123,8 +123,9 @@ bool IngoBattleGrinder::start_dialog(ConsoleHandle& console, BotBaseContext& con
             break;
         default:
             OperationFailedException::fire(
-                console, ErrorReport::SEND_ERROR_REPORT,
-                "Unable to detect options after 10 A presses."
+                ErrorReport::SEND_ERROR_REPORT,
+                "Unable to detect options after 10 A presses.",
+                console
             );
         }
     }
@@ -133,7 +134,7 @@ bool IngoBattleGrinder::start_dialog(ConsoleHandle& console, BotBaseContext& con
     context.wait_for_all_requests();
 
     ButtonDetector button2(console, console, ButtonType::ButtonA, {0.50, 0.350, 0.40, 0.400}, std::chrono::milliseconds(100), true);
-    int ret = run_until(
+    int ret = run_until<BotBaseContext>(
         console, context,
         [&](BotBaseContext& context){
             for (size_t c = 0; c < 5; c++){
@@ -147,8 +148,9 @@ bool IngoBattleGrinder::start_dialog(ConsoleHandle& console, BotBaseContext& con
         return false;
     default:
         OperationFailedException::fire(
-            console, ErrorReport::SEND_ERROR_REPORT,
-            "Unable to find opponent list options after 5 A presses."
+            ErrorReport::SEND_ERROR_REPORT,
+            "Unable to find opponent list options after 5 A presses.",
+            console
         );
     }
 }
@@ -244,8 +246,9 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBa
         if (ret < 0){
             env.console.log("Error: Failed to find battle menu after 2 minutes.");
             OperationFailedException::fire(
-                env.console, ErrorReport::SEND_ERROR_REPORT,
-                "Failed to find battle menu after 2 minutes."
+                ErrorReport::SEND_ERROR_REPORT,
+                "Failed to find battle menu after 2 minutes.",
+                env.console
             );
         }
 
@@ -289,8 +292,9 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBa
                         // Struggle.
                         env.console.log("No PP on all moves. Abort program.", COLOR_RED);
                         OperationFailedException::fire(
-                            env.console, ErrorReport::SEND_ERROR_REPORT,
-                            "No PP on all moves."
+                            ErrorReport::SEND_ERROR_REPORT,
+                            "No PP on all moves.",
+                            env.console
                         );
                     }
                     

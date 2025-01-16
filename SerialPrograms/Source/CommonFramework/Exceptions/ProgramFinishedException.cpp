@@ -6,8 +6,6 @@
 
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/Tools/ProgramEnvironment.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
 #include "ProgramFinishedException.h"
 
 namespace PokemonAutomation{
@@ -21,24 +19,24 @@ ProgramFinishedException::ProgramFinishedException(std::string message)
 
 ProgramFinishedException::ProgramFinishedException(
     std::string message,
-    ConsoleHandle& console
+    VideoStream& stream
 )
-    : ScreenshotException(ErrorReport::NO_ERROR_REPORT, std::move(message), console)
+    : ScreenshotException(ErrorReport::NO_ERROR_REPORT, std::move(message), stream)
 {}
 ProgramFinishedException::ProgramFinishedException(
     ErrorReport error_report,
     std::string message,
-    ConsoleHandle* console,
+    VideoStream* stream,
     ImageRGB32 screenshot
 )
-    : ScreenshotException(ErrorReport::NO_ERROR_REPORT, std::move(message), console, std::move(screenshot))
+    : ScreenshotException(ErrorReport::NO_ERROR_REPORT, std::move(message), stream, std::move(screenshot))
 {}
 ProgramFinishedException::ProgramFinishedException(
     std::string message,
-    ConsoleHandle* console,
+    VideoStream* stream,
     std::shared_ptr<const ImageRGB32> screenshot
 )
-    : ScreenshotException(ErrorReport::NO_ERROR_REPORT, std::move(message), console, std::move(screenshot))
+    : ScreenshotException(ErrorReport::NO_ERROR_REPORT, std::move(message), stream, std::move(screenshot))
 {}
 
 void ProgramFinishedException::log(Logger& logger) const{

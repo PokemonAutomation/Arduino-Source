@@ -10,7 +10,6 @@
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/AudioPipeline/AudioFeed.h"
 #include "CommonFramework/Inference/SpectrogramMatcher.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
 #include "AudioPerSpectrumDetectorBase.h"
 
 #include <iostream>
@@ -21,13 +20,16 @@ namespace PokemonAutomation{
 
 
 AudioPerSpectrumDetectorBase::AudioPerSpectrumDetectorBase(
-    std::string label, std::string audio_name, Color detection_color,
-    ConsoleHandle& console, DetectedCallback detected_callback
+    Logger& logger,
+    std::string label,
+    std::string audio_name,
+    Color detection_color,
+    DetectedCallback detected_callback
 )
     : AudioInferenceCallback(std::move(label))
     , m_audio_name(std::move(audio_name))
     , m_detection_color(detection_color)
-    , m_console(console)
+    , m_logger(logger)
     , m_detected_callback(std::move(detected_callback))
     , m_start_timestamp(current_time())
     , m_spectrums_processed(0)
@@ -47,14 +49,14 @@ void AudioPerSpectrumDetectorBase::throw_if_no_sound(std::chrono::milliseconds m
     if (m_spectrums_processed > 0){
         return;
     }
-    throw UserSetupError(m_console, "No sound detected.");
+    throw UserSetupError(m_logger, "No sound detected.");
 }
 
 void AudioPerSpectrumDetectorBase::log_results(){
     if (m_last_timestamp != WallClock::min()){
-        m_console.log(m_audio_name + " detected! Error Coefficient = " + tostr_default(m_lowest_error), COLOR_BLUE);
+        m_logger.log(m_audio_name + " detected! Error Coefficient = " + tostr_default(m_lowest_error), COLOR_BLUE);
     }else{
-        m_console.log(m_audio_name + " not detected. Error Coefficient = " + tostr_default(m_lowest_error), COLOR_PURPLE);
+        m_logger.log(m_audio_name + " not detected. Error Coefficient = " + tostr_default(m_lowest_error), COLOR_PURPLE);
     }
 
 #if 0
@@ -66,7 +68,7 @@ void AudioPerSpectrumDetectorBase::log_results(){
         for (const auto& error : m_errors){
             ss << "[" << error.first << ":" << error.second << "]";
         }
-//        m_console.log(ss.str(), COLOR_RED);
+//        m_logger.log(ss.str(), COLOR_RED);
         cout << ss.str() << endl;
     }
  #endif
@@ -95,7 +97,7 @@ bool AudioPerSpectrumDetectorBase::process_spectrums(
     const size_t sample_rate = new_spectrums[0].sample_rate;
     // Lazy intialization of the spectrogram matcher.
     if (m_matcher == nullptr || m_matcher->sample_rate() != sample_rate){
-        m_console.log("Loading spectrogram...");
+        m_logger.log("Loading spectrogram...");
         m_matcher = build_spectrogram_matcher(sample_rate);
     }
 
@@ -156,7 +158,7 @@ bool AudioPerSpectrumDetectorBase::process_spectrums(
 
             std::ostringstream os;
             os << m_audio_name << " found, score " << matcher_score << "/" << threshold << ", scale: " << m_matcher->lastMatchedScale();
-            m_console.log(os.str(), COLOR_BLUE);
+            m_logger.log(os.str(), COLOR_BLUE);
             audio_feed.add_overlay(curStamp+1-m_matcher->numMatchedWindows(), curStamp+1, m_detection_color);
 
             // Since the target audio is found, no need to check detection on the rest of the spectrums in `new_spectrums`.

@@ -140,8 +140,9 @@ void EggAutonomousState::set(const EggAutonomousState& state){
 void EggAutonomousState::process_error(const std::string& name, const char* message){
     m_stats.m_errors++;
     OperationFailedException::fire(
-        m_console, ErrorReport::SEND_ERROR_REPORT,
-        message
+        ErrorReport::SEND_ERROR_REPORT,
+        message,
+        m_console
     );
 }
 
@@ -309,7 +310,7 @@ void EggAutonomousState::fetch_egg(){
     m_console.log("Attempting to fetch an egg.");
     {
         ShortDialogWatcher dialog;
-        int ret = run_until(
+        int ret = run_until<BotBaseContext>(
             m_console, m_context,
             [](BotBaseContext& context){
                 pbf_move_left_joystick(context, 0, 255, 125, 0);
@@ -332,7 +333,7 @@ void EggAutonomousState::fetch_egg(){
     m_console.log("Going to daycare man.");
     {
         ShortDialogWatcher dialog;
-        int ret = run_until(
+        int ret = run_until<BotBaseContext>(
             m_console, m_context,
             [](BotBaseContext& context){
                 pbf_move_left_joystick(context, 0, 255, 30, 0);
@@ -349,7 +350,7 @@ void EggAutonomousState::fetch_egg(){
     //  Talk to daycare man.
     {
         ShortDialogWatcher dialog;
-        int ret = run_until(
+        int ret = run_until<BotBaseContext>(
             m_console, m_context,
             [](BotBaseContext& context){
                 pbf_press_button(context, BUTTON_ZL, 20, 230);
@@ -364,7 +365,7 @@ void EggAutonomousState::fetch_egg(){
 
     {
         EggReceivedDetector received;
-        run_until(
+        run_until<BotBaseContext>(
             m_console, m_context,
             [](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_ZL, 500);
@@ -453,7 +454,7 @@ void EggAutonomousState::hatch_rest_of_party(){
         dump();
         ShortDialogWatcher dialog;
         FrozenImageDetector frozen(COLOR_CYAN, {0, 0, 1, 0.5}, std::chrono::seconds(60), 20);
-        int ret = run_until(
+        int ret = run_until<BotBaseContext>(
             m_console, m_context,
             [&](BotBaseContext& context){
                 egg_spin(context, 480 * TICKS_PER_SECOND);
@@ -482,7 +483,7 @@ void EggAutonomousState::spin_until_fetch_or_hatch(){
     m_context.wait_for_all_requests();
     m_console.log("Looking for more eggs...");
     ShortDialogWatcher dialog;
-    int ret = run_until(
+    int ret = run_until<BotBaseContext>(
         m_console, m_context,
         [&](BotBaseContext& context){
             egg_spin(context, m_travel_time_per_fetch);

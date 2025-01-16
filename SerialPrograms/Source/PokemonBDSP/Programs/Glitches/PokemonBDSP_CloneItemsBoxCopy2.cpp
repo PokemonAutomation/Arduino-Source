@@ -176,8 +176,9 @@ void CloneItemsBoxCopy2::program(SingleSwitchProgramEnvironment& env, BotBaseCon
         if (!matcher.detect(env.console.video().snapshot())){
             stats.m_errors++;
             OperationFailedException::fire(
-                env.console, ErrorReport::SEND_ERROR_REPORT,
-                "Failed to return to starting position. Something is wrong."
+                ErrorReport::SEND_ERROR_REPORT,
+                "Failed to return to starting position. Something is wrong.",
+                env.console
             );
         }
 

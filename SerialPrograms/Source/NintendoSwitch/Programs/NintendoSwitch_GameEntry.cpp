@@ -100,7 +100,7 @@ void start_game_from_home_with_inference(
     context.wait_for_all_requests();
     {
         HomeWatcher detector;
-        int ret = run_until(
+        int ret = run_until<BotBaseContext>(
             console, context,
             [](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);
@@ -111,8 +111,9 @@ void start_game_from_home_with_inference(
             console.log("Detected Home screen.");
         }else{
             OperationFailedException::fire(
-                console, ErrorReport::SEND_ERROR_REPORT,
-                "start_game_from_home_with_inference(): Failed to detect Home screen after 10 seconds."
+                ErrorReport::SEND_ERROR_REPORT,
+                "start_game_from_home_with_inference(): Failed to detect Home screen after 10 seconds.",
+                console
             );
         }
         context.wait_for(std::chrono::milliseconds(100));
@@ -174,8 +175,9 @@ void start_game_from_home_with_inference(
             return;
         default:
             OperationFailedException::fire(
-                console, ErrorReport::SEND_ERROR_REPORT,
-                "start_game_from_home_with_inference(): No recognizable state after 30 seconds."
+                ErrorReport::SEND_ERROR_REPORT,
+                "start_game_from_home_with_inference(): No recognizable state after 30 seconds.",
+                console
             );
         }
     }

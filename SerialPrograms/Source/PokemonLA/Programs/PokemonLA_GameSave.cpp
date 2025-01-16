@@ -89,13 +89,14 @@ bool save_game_from_overworld(ProgramEnvironment& env, ConsoleHandle& console, B
     }
     if (!found){
         OperationFailedException::fire(
-            console, ErrorReport::SEND_ERROR_REPORT,
-            "Unable to find save menu."
+            ErrorReport::SEND_ERROR_REPORT,
+            "Unable to find save menu.",
+            console
         );
     }
 
     ArcPhoneDetector detector(console, console, std::chrono::milliseconds(100), true);
-    int ret = run_until(
+    int ret = run_until<BotBaseContext>(
         console, context,
         [&](BotBaseContext& context){
             for (size_t c = 0; c < 10; c++){
@@ -106,8 +107,9 @@ bool save_game_from_overworld(ProgramEnvironment& env, ConsoleHandle& console, B
     );
     if (ret < 0){
         OperationFailedException::fire(
-            console, ErrorReport::SEND_ERROR_REPORT,
-            "Unable to return to overworld."
+            ErrorReport::SEND_ERROR_REPORT,
+            "Unable to return to overworld.",
+            console
         );
     }
     console.log("Saving game... Done.");

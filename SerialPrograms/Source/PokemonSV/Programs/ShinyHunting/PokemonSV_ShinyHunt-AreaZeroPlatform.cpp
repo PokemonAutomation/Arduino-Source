@@ -521,7 +521,7 @@ void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, Bot
         try{
             env.console.log("Starting encounter loop...", COLOR_PURPLE);
             EncounterWatcher encounter_watcher(env.console, COLOR_RED);
-            run_until(
+            run_until<BotBaseContext>(
                 env.console, context,
                 [&](BotBaseContext& context){
                     //  Inner program loop that runs the state machine.

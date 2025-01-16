@@ -117,7 +117,7 @@ bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, BotBaseCon
 
     {
         StartBattleDetector detector(env.console);
-        int ret = run_until(
+        int ret = run_until<BotBaseContext>(
             env.console, context,
             [](BotBaseContext& context){
                 pbf_press_button(context, BUTTON_ZL, 10, 10);
@@ -149,7 +149,7 @@ bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, BotBaseCon
         BattleMenuWatcher battle_menu(BattleType::TRAINER);
         EndBattleWatcher end_battle;
         SelectionArrowFinder learn_move(env.console, {0.50, 0.62, 0.40, 0.18}, COLOR_YELLOW);
-        int ret = run_until(
+        int ret = run_until<BotBaseContext>(
             env.console, context,
             [](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
@@ -175,8 +175,9 @@ bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, BotBaseCon
                 }
                 if (slot == 4){
                     OperationFailedException::fire(
-                        env.console, ErrorReport::SEND_ERROR_REPORT,
-                        "Ran out of PP in a battle."
+                        ErrorReport::SEND_ERROR_REPORT,
+                        "Ran out of PP in a battle.",
+                        env.console
                     );
                 }
 
@@ -198,8 +199,9 @@ bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, BotBaseCon
                 }
                 if (slot == 4){
                     OperationFailedException::fire(
-                        env.console, ErrorReport::SEND_ERROR_REPORT,
-                        "Ran out of PP in a battle."
+                        ErrorReport::SEND_ERROR_REPORT,
+                        "Ran out of PP in a battle.",
+                        env.console
                     );
                 }
 
@@ -227,15 +229,17 @@ bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, BotBaseCon
         default:
             stats.m_errors++;
             OperationFailedException::fire(
-                env.console, ErrorReport::SEND_ERROR_REPORT,
-                "Timed out after 2 minutes."
+                ErrorReport::SEND_ERROR_REPORT,
+                "Timed out after 2 minutes.",
+                env.console
             );
         }
     }
 
     OperationFailedException::fire(
-        env.console, ErrorReport::SEND_ERROR_REPORT,
-        "No progress detected after 5 battle menus. Are you out of PP?"
+        ErrorReport::SEND_ERROR_REPORT,
+        "No progress detected after 5 battle menus. Are you out of PP?",
+        env.console
     );
 }
 
@@ -376,7 +380,7 @@ void MoneyFarmerRoute210::program(SingleSwitchProgramEnvironment& env, BotBaseCo
         std::vector<ImagePixelBox> bubbles;
         {
             VSSeekerReactionTracker tracker(env.console, {0.20, 0.20, 0.60, 0.60});
-            run_until(
+            run_until<BotBaseContext>(
                 env.console, context,
                 [this](BotBaseContext& context){
                     SHORTCUT.run(context, TICKS_PER_SECOND);

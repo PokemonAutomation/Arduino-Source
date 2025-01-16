@@ -85,8 +85,9 @@ void change_time_of_day_at_tent(ConsoleHandle& console, BotBaseContext& context,
     );
     if (ret < 0){
         OperationFailedException::fire(
-            console, ErrorReport::SEND_ERROR_REPORT,
-            "Did not interact with a tent."
+            ErrorReport::SEND_ERROR_REPORT,
+            "Did not interact with a tent.",
+            console
         );
     }
 
@@ -117,8 +118,9 @@ void change_time_of_day_at_tent(ConsoleHandle& console, BotBaseContext& context,
     );
     if (ret < 0){
         OperationFailedException::fire(
-            console, ErrorReport::SEND_ERROR_REPORT,
-            "Failed to stand up after resting in a tent."
+            ErrorReport::SEND_ERROR_REPORT,
+            "Failed to stand up after resting in a tent.",
+            console
         );
     }
 

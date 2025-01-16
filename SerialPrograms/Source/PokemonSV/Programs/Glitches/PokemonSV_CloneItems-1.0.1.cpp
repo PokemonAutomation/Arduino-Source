@@ -289,7 +289,7 @@ void CloneItems101::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         OverworldWatcher overworld(env.console, COLOR_RED);
         MainMenuWatcher main_menu(COLOR_YELLOW);
         context.wait_for_all_requests();
-        int ret = run_until(
+        int ret = run_until<BotBaseContext>(
             env.console, context,
             [](BotBaseContext& context){
                 for (size_t c = 0; c < 10; c++){

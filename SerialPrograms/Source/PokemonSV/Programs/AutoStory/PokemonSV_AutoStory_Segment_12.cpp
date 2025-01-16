@@ -84,7 +84,7 @@ void checkpoint_28(
         direction.change_direction(env.program_info(), env.console, context, 2.73);
 
         NoMinimapWatcher no_minimap(env.console, COLOR_RED, Milliseconds(2000));
-        int ret = run_until(
+        int ret = run_until<BotBaseContext>(
             env.console, context,
             [&](BotBaseContext& context){
                 handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
@@ -101,8 +101,9 @@ void checkpoint_28(
         );
         if (ret < 0){
             OperationFailedException::fire(
-                env.console, ErrorReport::SEND_ERROR_REPORT,
-                "Failed to enter Cortondo Gym."
+                ErrorReport::SEND_ERROR_REPORT,
+                "Failed to enter Cortondo Gym.",
+                env.console
             );
         }
 

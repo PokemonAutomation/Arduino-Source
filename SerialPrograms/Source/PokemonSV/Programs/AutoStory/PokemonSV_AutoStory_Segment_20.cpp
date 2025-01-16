@@ -451,7 +451,7 @@ void checkpoint_44(
         direction.change_direction(env.program_info(), env.console, context, 5.53);
 
         NoMinimapWatcher no_minimap(env.console, COLOR_RED, Milliseconds(5000));
-        int ret = run_until(
+        int ret = run_until<BotBaseContext>(
             env.console, context,
             [&](BotBaseContext& context){
                 pbf_move_left_joystick(context, 128, 0, 30 * TICKS_PER_SECOND, 100);
@@ -460,8 +460,9 @@ void checkpoint_44(
         );
         if (ret < 0){
             OperationFailedException::fire(
-                env.console, ErrorReport::SEND_ERROR_REPORT,
-                "Failed to finish reach the Sunflora NPC."
+                ErrorReport::SEND_ERROR_REPORT,
+                "Failed to finish reach the Sunflora NPC.",
+                env.console
             );
         }
         env.log("No minimap seen. Likely finished the Artazon gym challenge.");

@@ -109,7 +109,7 @@ void trade_current_pokemon(
     //  Mash B until 2nd black screen.
     {
         BlackScreenWatcher black_screen;
-        int ret = run_until(
+        int ret = run_until<BotBaseContext>(
             console, context,
             [](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);

@@ -7,6 +7,7 @@
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/Tools/ConsoleHandle.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
@@ -67,8 +68,9 @@ void item_printer_start_print(
         }
         default:
             OperationFailedException::fire(
-                console, ErrorReport::SEND_ERROR_REPORT,
-                "start_print(): No recognized state after 120 seconds."
+                ErrorReport::SEND_ERROR_REPORT,
+                "start_print(): No recognized state after 120 seconds.",
+                console
             );
         }
     }
@@ -128,8 +130,9 @@ ItemPrinterPrizeResult item_printer_finish_print(
         }
         default:
             OperationFailedException::fire(
-                console, ErrorReport::SEND_ERROR_REPORT,
-                "finish_print(): No recognized state after 120 seconds."
+                ErrorReport::SEND_ERROR_REPORT,
+                "finish_print(): No recognized state after 120 seconds.",
+                console
             );
         }
     }

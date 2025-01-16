@@ -160,7 +160,7 @@ void checkpoint_33(
 
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::OVERWORLD, CallbackEnum::PROMPT_DIALOG, CallbackEnum::TUTORIAL});
         AdvanceDialogWatcher    dialog(COLOR_RED);
-        int ret = run_until(
+        int ret = run_until<BotBaseContext>(
             env.console, context,
             [&](BotBaseContext& context){
 
@@ -241,8 +241,9 @@ void checkpoint_33(
         context.wait_for(std::chrono::milliseconds(100));
         if (ret < 0){
             OperationFailedException::fire(
-                env.console, ErrorReport::SEND_ERROR_REPORT,
-                "checkpoint_33(): Failed to kill 30 pokemon with Let's go."
+                ErrorReport::SEND_ERROR_REPORT,
+                "checkpoint_33(): Failed to kill 30 pokemon with Let's go.",
+                env.console
             );            
         }
         clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::BATTLE, CallbackEnum::DIALOG_ARROW});

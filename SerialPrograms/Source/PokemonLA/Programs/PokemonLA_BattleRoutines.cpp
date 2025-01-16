@@ -26,7 +26,7 @@ namespace PokemonLA{
 
 void mash_A_until_end_of_battle(ConsoleHandle& console, BotBaseContext& context){
     OverworldDetector detector(console, console);
-    int ret = run_until(
+    int ret = run_until<BotBaseContext>(
         console, context,
         [](BotBaseContext& context){
             pbf_mash_button(context, BUTTON_A, 180 * TICKS_PER_SECOND);
@@ -35,8 +35,9 @@ void mash_A_until_end_of_battle(ConsoleHandle& console, BotBaseContext& context)
     );
     if (ret < 0){
         OperationFailedException::fire(
-            console, ErrorReport::SEND_ERROR_REPORT,
-            "Failed to return to overworld after 3 minutes."
+            ErrorReport::SEND_ERROR_REPORT,
+            "Failed to return to overworld after 3 minutes.",
+            console
         );
     }
     console.log("Returned to overworld.");
@@ -47,8 +48,9 @@ void mash_A_until_end_of_battle(ConsoleHandle& console, BotBaseContext& context)
 size_t switch_pokemon(ConsoleHandle& console, BotBaseContext& context, size_t pokemon_to_switch_to, size_t max_num_pokemon){
     if (pokemon_to_switch_to >= max_num_pokemon){
         OperationFailedException::fire(
-            console, ErrorReport::SEND_ERROR_REPORT,
-            "Cannot send any more Pokemon to battle, max: " + std::to_string(max_num_pokemon)
+            ErrorReport::SEND_ERROR_REPORT,
+            "Cannot send any more Pokemon to battle, max: " + std::to_string(max_num_pokemon),
+            console
         );
     }
     // Move past leading fainted pokemon
@@ -76,8 +78,9 @@ size_t switch_pokemon(ConsoleHandle& console, BotBaseContext& context, size_t po
         pokemon_to_switch_to++;
         if (pokemon_to_switch_to >= max_num_pokemon){
             OperationFailedException::fire(
-                console, ErrorReport::SEND_ERROR_REPORT,
-                "Cannot send any more Pokemon to battle, max: " + std::to_string(max_num_pokemon)
+                ErrorReport::SEND_ERROR_REPORT,
+                "Cannot send any more Pokemon to battle, max: " + std::to_string(max_num_pokemon),
+                console
             );
         }
 
@@ -158,8 +161,9 @@ void use_next_move_with_pp(ConsoleHandle& console, BotBaseContext& context, size
             // Struggle.
             console.log("No PP on all moves. Abort program.", COLOR_RED);
             OperationFailedException::fire(
-                console, ErrorReport::SEND_ERROR_REPORT,
-                "No PP on all moves."
+                ErrorReport::SEND_ERROR_REPORT,
+                "No PP on all moves.",
+                console
             );
         }
         

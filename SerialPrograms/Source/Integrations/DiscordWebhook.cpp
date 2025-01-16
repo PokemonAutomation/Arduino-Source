@@ -40,10 +40,14 @@ DiscordWebhookSender::DiscordWebhookSender()
 {}
 
 DiscordWebhookSender::~DiscordWebhookSender(){
+    m_stopping.store(true, std::memory_order_release);
     {
         std::lock_guard<std::mutex> lg(m_lock);
-        m_stopping = true;
         m_cv.notify_all();
+    }
+    std::lock_guard<std::mutex> lg(m_send_lock);
+    if (m_event_loop){
+        m_event_loop->exit();
     }
 }
 
@@ -56,13 +60,21 @@ void DiscordWebhookSender::send(
     Logger& logger,
     const QUrl& url, std::chrono::milliseconds delay,
     const JsonObject& obj,
-    std::shared_ptr<PendingFileSend> file
+    std::shared_ptr<PendingFileSend> file,
+    std::function<void()> finish_callback
 ){
     cleanup_stuck_requests();
     std::shared_ptr<JsonValue> json(new JsonValue(obj.clone()));
+//    cout << "Scheduling Webhook Message... (queue = " + tostr_u_commas(m_queue.size()) + ")" << endl;
+    logger.log("Scheduling Webhook Message... (queue = " + tostr_u_commas(m_queue.size()) + ")", COLOR_PURPLE);
     m_queue.add_event(
         delay,
-        [this, url, json = std::move(json), file = std::move(file)]{
+        [
+            this, url,
+            json = std::move(json),
+            file = std::move(file),
+            finish_callback = std::move(finish_callback)
+        ]{
             throttle();
             std::vector<DiscordFileAttachment> attachments;
             if (file){
@@ -71,21 +83,31 @@ void DiscordWebhookSender::send(
                 );
             }
             internal_send(url, *json, attachments);
+            if (finish_callback){
+                finish_callback();
+            }
         }
     );
-    logger.log("Scheduling Webhook Message... (queue = " + tostr_u_commas(m_queue.size()) + ")", COLOR_PURPLE);
 }
 void DiscordWebhookSender::send(
     Logger& logger,
     const QUrl& url, std::chrono::milliseconds delay,
     const JsonObject& obj,
-    std::vector<std::shared_ptr<PendingFileSend>> files
+    std::vector<std::shared_ptr<PendingFileSend>> files,
+    std::function<void()> finish_callback
 ){
     cleanup_stuck_requests();
     std::shared_ptr<JsonValue> json(new JsonValue(obj.clone()));
+//    cout << "Scheduling Webhook Message... (queue = " + tostr_u_commas(m_queue.size()) + ")" << endl;
+    logger.log("Scheduling Webhook Message... (queue = " + tostr_u_commas(m_queue.size()) + ")", COLOR_PURPLE);
     m_queue.add_event(
         delay,
-        [this, url, json = std::move(json), files = std::move(files)]{
+        [
+            this, url,
+            json = std::move(json),
+            files = std::move(files),
+            finish_callback = std::move(finish_callback)
+        ]{
             throttle();
             std::vector<DiscordFileAttachment> attachments;
             for (auto& file : files){
@@ -94,23 +116,32 @@ void DiscordWebhookSender::send(
                 );
             }
             internal_send(url, *json, attachments);
+            if (finish_callback){
+                finish_callback();
+            }
         }
     );
-    logger.log("Scheduling Webhook Message... (queue = " + tostr_u_commas(m_queue.size()) + ")", COLOR_PURPLE);
 }
 
 void DiscordWebhookSender::cleanup_stuck_requests(){
-    std::lock_guard<std::mutex> lg(m_lock);
-    WallClock next = m_queue.next_event();
-    if (next == WallClock::max()){
-        return;
+    {
+        std::lock_guard<std::mutex> lg(m_lock);
+        WallClock next = m_queue.next_event();
+        if (next == WallClock::max()){
+            return;
+        }
+
+        WallClock now = current_time();
+        WallClock threshold = now - std::chrono::seconds(60);
+        if (next >= threshold){
+            return;
+        }
     }
 
-    WallClock now = current_time();
-    WallClock threshold = now - std::chrono::seconds(60);
-    if (next < threshold){
-        m_logger.log("Purging request that appears to be stuck.", COLOR_RED);
-        emit stop_event_loop();
+    m_logger.log("Purging request that appears to be stuck.", COLOR_RED);
+    std::lock_guard<std::mutex> lg(m_send_lock);
+    if (m_event_loop){
+        m_event_loop->exit();
     }
 }
 void DiscordWebhookSender::throttle(){
@@ -125,9 +156,9 @@ void DiscordWebhookSender::throttle(){
         std::unique_lock<std::mutex> lg(m_lock);
         m_cv.wait_for(
             lg, duration,
-            [&]{ return m_stopping || m_sent.empty() || m_sent[0] + duration < now; }
+            [&]{ return m_stopping.load(std::memory_order_relaxed) || m_sent.empty() || m_sent[0] + duration < now; }
         );
-        if (m_stopping){
+        if (m_stopping.load(std::memory_order_relaxed)){
             return;
         }
         m_sent.clear();
@@ -159,50 +190,70 @@ void DiscordWebhookSender::internal_send(
     const QUrl& url, const JsonValue& json,
     const std::vector<DiscordFileAttachment>& files
 ){
-    QEventLoop event_loop;
-    connect(
-        this, &DiscordWebhookSender::stop_event_loop,
-        &event_loop, &QEventLoop::quit
-    );
-
-    QHttpMultiPart multiPart(QHttpMultiPart::FormDataType);
-    if (!json.is_null()){
-        QHttpPart json_part;
-        json_part.setHeader(
-            QNetworkRequest::ContentDispositionHeader,
-            QVariant("form-data; name=payload_json")
-        );
-        json_part.setBody(QByteArray::fromStdString(json.dump()));
-        multiPart.append(json_part);
+    if (m_stopping.load(std::memory_order_acquire)){
+        return;
     }
 
-    std::vector<QHttpPart> file_parts;
-    std::deque<QFile> file_readers;
-    file_parts.reserve(files.size());
-    size_t c = 0;
-    for (const auto& file : files){
-        QFile& reader = file_readers.emplace_back(QString::fromStdString(file.filepath));
-        if (!reader.open(QIODevice::ReadOnly)){
-            m_logger.log("File doesn't exist: " + file.filepath, COLOR_RED);
-            continue;
+    {
+        std::lock_guard<std::mutex> lg(m_send_lock);
+        m_event_loop.reset(new QEventLoop);
+    }
+
+    try{
+        QHttpMultiPart multiPart(QHttpMultiPart::FormDataType);
+        if (!json.is_null()){
+            QHttpPart json_part;
+            json_part.setHeader(
+                QNetworkRequest::ContentDispositionHeader,
+                QVariant("form-data; name=payload_json")
+            );
+            json_part.setBody(QByteArray::fromStdString(json.dump()));
+            multiPart.append(json_part);
         }
-        QHttpPart& part = file_parts.emplace_back();
-        part.setHeader(
-            QNetworkRequest::ContentDispositionHeader,
-            QVariant(QString::fromStdString("application/octet-stream; name=file" + std::to_string(c) + "; filename=" + file.name))
-        );
-        part.setBodyDevice(&reader);
-        multiPart.append(part);
-        c++;
+
+        std::vector<QHttpPart> file_parts;
+        std::deque<QFile> file_readers;
+        file_parts.reserve(files.size());
+        size_t c = 0;
+        for (const auto& file : files){
+            QFile& reader = file_readers.emplace_back(QString::fromStdString(file.filepath));
+            if (!reader.open(QIODevice::ReadOnly)){
+                m_logger.log("File doesn't exist: " + file.filepath, COLOR_RED);
+                continue;
+            }
+            QHttpPart& part = file_parts.emplace_back();
+            part.setHeader(
+                QNetworkRequest::ContentDispositionHeader,
+                QVariant(QString::fromStdString("application/octet-stream; name=file" + std::to_string(c) + "; filename=" + file.name))
+            );
+            part.setBodyDevice(&reader);
+            multiPart.append(part);
+            c++;
+        }
+
+        QNetworkRequest request(url);
+        QNetworkAccessManager manager;
+        m_event_loop->connect(&manager, SIGNAL(finished(QNetworkReply*)), SLOT(quit()));
+//        cout << "Sending Webhook Message... (queue = " + tostr_u_commas(m_queue.size()) + ")" << endl;
+        m_logger.log("Sending Webhook Message... (queue = " + tostr_u_commas(m_queue.size()) + ")", COLOR_BLUE);
+        std::unique_ptr<QNetworkReply> reply(manager.post(request, &multiPart));
+
+        if (!m_stopping.load(std::memory_order_acquire)){
+//            cout << "internal_send() - exec" << endl;
+
+            m_event_loop->exec();
+            process_reply(reply.get());
+
+//            cout << "internal_send() - end" << endl;
+        }
+    }catch (...){
+        std::lock_guard<std::mutex> lg(m_send_lock);
+        m_event_loop.reset();
+        throw;
     }
 
-    QNetworkRequest request(url);
-    QNetworkAccessManager manager;
-    event_loop.connect(&manager, SIGNAL(finished(QNetworkReply*)), SLOT(quit()));
-    m_logger.log("Sending Webhook Message...", COLOR_BLUE);
-    std::unique_ptr<QNetworkReply> reply(manager.post(request, &multiPart));
-    event_loop.exec();
-    process_reply(reply.get());
+    std::lock_guard<std::mutex> lg(m_send_lock);
+    m_event_loop.reset();
 }
 
 

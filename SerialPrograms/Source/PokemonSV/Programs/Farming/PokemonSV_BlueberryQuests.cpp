@@ -141,7 +141,7 @@ BBQuests BBQuests_string_to_enum(const std::string& token){
 
 int read_BP(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
     WhiteButtonWatcher right_panel(COLOR_BLUE, WhiteButton::ButtonB, {0.484, 0.117, 0.022, 0.037});
-    int result = run_until(
+    int result = run_until<BotBaseContext>(
         console, context,
         [&](BotBaseContext& context){
             for (int i = 0; i < 6; i++) { //try 6 times
@@ -175,7 +175,7 @@ std::vector<BBQuests> read_quests(const ProgramInfo& info, ConsoleHandle& consol
 
     //Open quest list. Wait for it to open.
     WhiteButtonWatcher right_panel(COLOR_BLUE, WhiteButton::ButtonB, {0.484, 0.117, 0.022, 0.037});
-    int result = run_until(
+    int result = run_until<BotBaseContext>(
         console, context,
         [&](BotBaseContext& context){
             for (int i = 0; i < 6; i++) { //try 6 times
@@ -235,7 +235,7 @@ std::vector<BBQuests> process_quest_list(const ProgramInfo& info, ConsoleHandle&
                     //console.log("Warning: This does not handle/check being out of BP!", COLOR_RED);
 
                     WhiteButtonWatcher right_panel(COLOR_BLUE, WhiteButton::ButtonB, {0.484, 0.117, 0.022, 0.037});
-                    int result = run_until(
+                    int result = run_until<BotBaseContext>(
                         console, context,
                         [&](BotBaseContext& context){
                             for (int i = 0; i < 6; i++){
@@ -267,8 +267,9 @@ std::vector<BBQuests> process_quest_list(const ProgramInfo& info, ConsoleHandle&
                     //This case is handled in BBQSoloFarmer.
                     console.log("OOEggs is Stop in process_quest_list().");
                     OperationFailedException::fire(
-                        console, ErrorReport::SEND_ERROR_REPORT,
-                        "OOEggs is Stop in process_quest_list()."
+                        ErrorReport::SEND_ERROR_REPORT,
+                        "OOEggs is Stop in process_quest_list().",
+                        console
                     );
                     break;
                 }
@@ -305,8 +306,9 @@ std::vector<BBQuests> process_quest_list(const ProgramInfo& info, ConsoleHandle&
 
     if (quests_to_do.size() == 0){
         OperationFailedException::fire(
-            console, ErrorReport::SEND_ERROR_REPORT,
-            "No possible quests! Check language selection."
+            ErrorReport::SEND_ERROR_REPORT,
+            "No possible quests! Check language selection.",
+            console
         );
     }
 
@@ -367,8 +369,9 @@ bool process_and_do_quest(ProgramEnvironment& env, ConsoleHandle& console, BotBa
             break;
         default:
             OperationFailedException::fire(
-                console, ErrorReport::SEND_ERROR_REPORT,
-                "Unknown quest selection."
+                ErrorReport::SEND_ERROR_REPORT,
+                "Unknown quest selection.",
+                console
             );
             break;
         }
@@ -411,7 +414,7 @@ void quest_make_tm(const ProgramInfo& info, ConsoleHandle& console, BotBaseConte
     pbf_move_left_joystick(context, 255, 0, 100, 20);
     pbf_press_button(context, BUTTON_L, 10, 50);
 
-    int enter_machine = run_until(
+    int enter_machine = run_until<BotBaseContext>(
         console, context,
         [&](BotBaseContext& context){
             for (int i = 0; i < 10; i++){
@@ -427,7 +430,7 @@ void quest_make_tm(const ProgramInfo& info, ConsoleHandle& console, BotBaseConte
     if (enter_machine == 0){
         console.log("TM machine entered. Finding TM to make.");
 
-        int make_tm = run_until(
+        int make_tm = run_until<BotBaseContext>(
             console, context,
             [&](BotBaseContext& context){
                 for (int i = 0; i < 229; i++) { //229 is max number of TMs
@@ -459,7 +462,7 @@ void quest_make_tm(const ProgramInfo& info, ConsoleHandle& console, BotBaseConte
         console.log("Failed to enter TM machine!");
     }
     
-    int exit = run_until(
+    int exit = run_until<BotBaseContext>(
         console, context,
         [&](BotBaseContext& context){
             pbf_mash_button(context, BUTTON_B, 2000);
@@ -507,7 +510,7 @@ void quest_tera_self_defeat(const ProgramInfo& info, ConsoleHandle& console, Bot
     EncounterWatcher encounter_watcher(console, COLOR_RED);
     console.log("Quest: Tera-self and defeat any wild.");
     //Navigate to target and start battle
-    int ret = run_until(
+    int ret = run_until<BotBaseContext>(
         console, context,
         [&](BotBaseContext& context){
             central_to_canyon_plaza(info, console, context);
@@ -571,7 +574,7 @@ void quest_tera_self_defeat(const ProgramInfo& info, ConsoleHandle& console, Bot
     pbf_mash_button(context, BUTTON_A, 300);
     context.wait_for_all_requests();
 
-    int exit = run_until(
+    int exit = run_until<BotBaseContext>(
         console, context,
         [&](BotBaseContext& context){
             pbf_mash_button(context, BUTTON_B, 2000);
@@ -590,7 +593,7 @@ void quest_sneak_up(const ProgramInfo& info, ConsoleHandle& console, BotBaseCont
     EncounterWatcher encounter_watcher(console, COLOR_RED);
     console.log("Quest: Sneak up.");
     //Navigate to target and start battle
-    int ret = run_until(
+    int ret = run_until<BotBaseContext>(
         console, context,
         [&](BotBaseContext& context){
             //Savanna Plaza - Pride Rock
@@ -644,7 +647,7 @@ void quest_sneak_up(const ProgramInfo& info, ConsoleHandle& console, BotBaseCont
         }else{
             OverworldWatcher overworld(console, COLOR_BLUE);
 
-            int ret2 = run_until(
+            int ret2 = run_until<BotBaseContext>(
                 console, context,
                 [&](BotBaseContext& context){
                     while (true){
@@ -663,8 +666,9 @@ void quest_sneak_up(const ProgramInfo& info, ConsoleHandle& console, BotBaseCont
                         default:
                             console.log("Invalid state quest_sneak_up(). Smoke Ball equipped?");
                             OperationFailedException::fire(
-                                console, ErrorReport::SEND_ERROR_REPORT,
-                                "Invalid state quest_sneak_up(). Smoke Ball equipped?"
+                                ErrorReport::SEND_ERROR_REPORT,
+                                "Invalid state quest_sneak_up(). Smoke Ball equipped?",
+                                console
                             );
                         }
                     }
@@ -679,8 +683,9 @@ void quest_sneak_up(const ProgramInfo& info, ConsoleHandle& console, BotBaseCont
             default:
                 console.log("Invalid state in run_battle().");
                 OperationFailedException::fire(
-                    console, ErrorReport::SEND_ERROR_REPORT,
-                    "Invalid state in run_battle()."
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "Invalid state in run_battle().",
+                    console
                 );
             }
         }
@@ -699,7 +704,7 @@ void quest_wild_tera(const ProgramInfo& info, ConsoleHandle& console, BotBaseCon
     EncounterWatcher encounter_watcher(console, COLOR_RED);
     console.log("Quest: Defeat a wild tera.");
     //Navigate to target and start battle
-    int ret = run_until(
+    int ret = run_until<BotBaseContext>(
         console, context,
         [&](BotBaseContext& context){
             //Canyon Rest Area
@@ -769,7 +774,7 @@ void quest_wild_tera(const ProgramInfo& info, ConsoleHandle& console, BotBaseCon
     pbf_mash_button(context, BUTTON_A, 300);
     context.wait_for_all_requests();
 
-    int exit = run_until(
+    int exit = run_until<BotBaseContext>(
         console, context,
         [&](BotBaseContext& context){
             pbf_mash_button(context, BUTTON_B, 2000);
@@ -850,7 +855,7 @@ void quest_wash_pokemon(const ProgramInfo& info, ConsoleHandle& console, BotBase
 
     WhiteButtonWatcher rinse_done(COLOR_BLUE, WhiteButton::ButtonY, {0.028, 0.923, 0.020, 0.034});
     WallClock start2 = current_time();
-    int ret3 = run_until(
+    int ret3 = run_until<BotBaseContext>(
         console, context,
         [&](BotBaseContext& context){
             while (true){
@@ -1014,8 +1019,9 @@ void quest_sandwich(ProgramEnvironment& env, ConsoleHandle& console, BotBaseCont
         break;
     default:
         OperationFailedException::fire(
-            console, ErrorReport::SEND_ERROR_REPORT,
-            "Invalid sandwich selection."
+            ErrorReport::SEND_ERROR_REPORT,
+            "Invalid sandwich selection.",
+            console
         );
         break;
     }
@@ -1035,7 +1041,7 @@ void quest_tera_raid(ProgramEnvironment& env, ConsoleHandle& console, BotBaseCon
     bool started_tera_raid = false;
     while (!started_tera_raid){
         EncounterWatcher encounter_watcher(console, COLOR_RED);
-        int ret = run_until(
+        int ret = run_until<BotBaseContext>(
             console, context,
             [&](BotBaseContext& context){
                 //Target is a tera raid crystal near the canyon plaza
@@ -1084,8 +1090,9 @@ void quest_tera_raid(ProgramEnvironment& env, ConsoleHandle& console, BotBaseCon
                 }catch (...){
                     console.log("Unable to flee.");
                     OperationFailedException::fire(
-                        console, ErrorReport::SEND_ERROR_REPORT,
-                        "Unable to flee!"
+                        ErrorReport::SEND_ERROR_REPORT,
+                        "Unable to flee!",
+                        console
                     );
                 }
             }
@@ -1175,7 +1182,7 @@ void quest_auto_battle(ProgramEnvironment& env, ConsoleHandle& console, BotBaseC
         pbf_mash_button(context, BUTTON_A, 300);
         context.wait_for_all_requests();
 
-        int exit = run_until(
+        int exit = run_until<BotBaseContext>(
             console, context,
             [&](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 2000);

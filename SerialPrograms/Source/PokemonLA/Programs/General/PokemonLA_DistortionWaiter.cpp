@@ -95,7 +95,7 @@ void DistortionWaiter::program(SingleSwitchProgramEnvironment& env, BotBaseConte
     while (true){
         env.update_stats();
 
-        int ret = run_until(
+        int ret = run_until<BotBaseContext>(
             env.console, context,
             [&](BotBaseContext& context){
                 for (size_t c = 0; c < 60; c++){
@@ -114,8 +114,9 @@ void DistortionWaiter::program(SingleSwitchProgramEnvironment& env, BotBaseConte
         if (ret < 0){
             stats.errors++;
             OperationFailedException::fire(
-                env.console, ErrorReport::SEND_ERROR_REPORT,
-                "No distortion found after one hour."
+                ErrorReport::SEND_ERROR_REPORT,
+                "No distortion found after one hour.",
+                env.console
             );
         }
 

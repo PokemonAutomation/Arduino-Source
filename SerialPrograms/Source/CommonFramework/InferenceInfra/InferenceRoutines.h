@@ -11,12 +11,11 @@
 #include <chrono>
 #include <vector>
 #include "Common/Cpp/Time.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
+#include "CommonFramework/Tools/VideoStream.h"
 #include "InferenceCallback.h"
 
 namespace PokemonAutomation{
 
-class BotBaseContext;
 class ProgramEnvironment;
 
 
@@ -29,21 +28,21 @@ class ProgramEnvironment;
 //  Exceptions thrown in either the commands or the callbacks will stop
 //  everything and will be propagated out of this function.
 int wait_until(
-    ConsoleHandle& console, CancellableScope& scope,
+    VideoStream& stream, CancellableScope& scope,
     WallClock deadline,
     const std::vector<PeriodicInferenceCallback>& callbacks,
     std::chrono::milliseconds default_video_period = std::chrono::milliseconds(50),
     std::chrono::milliseconds default_audio_period = std::chrono::milliseconds(20)
 );
 inline int wait_until(
-    ConsoleHandle& console, CancellableScope& scope,
+    VideoStream& stream, CancellableScope& scope,
     std::chrono::milliseconds timeout,
     const std::vector<PeriodicInferenceCallback>& callbacks,
     std::chrono::milliseconds default_video_period = std::chrono::milliseconds(50),
     std::chrono::milliseconds default_audio_period = std::chrono::milliseconds(20)
 ){
     return wait_until(
-        console, scope,
+        stream, scope,
         current_time() + timeout,
         callbacks,
         default_video_period, default_audio_period
@@ -61,14 +60,34 @@ inline int wait_until(
 //  Exceptions thrown in either the commands or the callbacks will stop
 //  everything and will be propagated out of this function.
 int run_until(
-    ConsoleHandle& console, BotBaseContext& context,
-    std::function<void(BotBaseContext& context)>&& command,
+    VideoStream& stream, CancellableScope& scope,
+    std::function<void(CancellableScope& scope)>&& command,
     const std::vector<PeriodicInferenceCallback>& callbacks,
     std::chrono::milliseconds default_video_period = std::chrono::milliseconds(50),
     std::chrono::milliseconds default_audio_period = std::chrono::milliseconds(20)
 );
+template <typename ContextType>
+int run_until(
+    VideoStream& stream, ContextType& context,
+    std::function<void(ContextType& context)>&& command,
+    const std::vector<PeriodicInferenceCallback>& callbacks,
+    std::chrono::milliseconds default_video_period = std::chrono::milliseconds(50),
+    std::chrono::milliseconds default_audio_period = std::chrono::milliseconds(20)
+){
+    return run_until(
+        stream, context,
+        [&](CancellableScope& scope){
+            ContextType subcontext(scope, context);
+            command(subcontext);
+        },
+        callbacks,
+        default_video_period,
+        default_audio_period
+    );
+}
 
 
+#if 0
 //  Same as "run_until()", but will cancel the commands and return if a timeout
 //  is reached.
 //
@@ -78,14 +97,14 @@ int run_until(
 //      -   -2 if timed out. Nothing triggered, and command did not finish.
 //
 int run_until_with_time_limit(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ProgramEnvironment& env, VideoStream& stream, BotBaseContext& context,
     WallClock deadline,
     std::function<void(BotBaseContext& context)>&& command,
     const std::vector<PeriodicInferenceCallback>& callbacks,
     std::chrono::milliseconds default_video_period,
     std::chrono::milliseconds default_audio_period
 );
-
+#endif
 
 
 

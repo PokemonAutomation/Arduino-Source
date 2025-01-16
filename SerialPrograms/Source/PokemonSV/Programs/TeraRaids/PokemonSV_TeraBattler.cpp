@@ -41,7 +41,7 @@ BattleMenuResult run_battle_menu(
     console.log("Current Move Selection: " + move.to_str());
     switch (move.type){
     case TeraMoveType::Wait:{
-        int ret = run_until(
+        int ret = run_until<BotBaseContext>(
             console, context,
             [&](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, move.seconds * TICKS_PER_SECOND);
@@ -228,7 +228,7 @@ bool run_tera_battle(
         TeraCatchWatcher catch_menu(COLOR_BLUE);
         OverworldWatcher overworld(console, COLOR_GREEN);
         context.wait_for_all_requests();
-        int ret = run_until(
+        int ret = run_until<BotBaseContext>(
             console, context,
             [](BotBaseContext& context){
                 for (size_t c = 0; c < 4; c++){
@@ -333,8 +333,9 @@ bool run_tera_battle(
             consecutive_timeouts++;
             if (consecutive_timeouts == 3){
                 OperationFailedException::fire(
-                    console, ErrorReport::SEND_ERROR_REPORT,
-                    "No state detected after 6 minutes."
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "No state detected after 6 minutes.",
+                    console
                 );
             }
             console.log("Unable to detect any state for 2 minutes. Mashing B...", COLOR_RED);

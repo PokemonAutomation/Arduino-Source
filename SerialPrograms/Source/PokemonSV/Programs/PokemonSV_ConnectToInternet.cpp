@@ -76,8 +76,9 @@ void connect_to_internet_from_menu(const ProgramInfo& info, ConsoleHandle& conso
     while (true){
         if (current_time() - start > std::chrono::minutes(5)){
             OperationFailedException::fire(
-                console, ErrorReport::SEND_ERROR_REPORT,
-                "connect_to_internet_from_menu(): Failed to connect to internet after 5 minutes."
+                ErrorReport::SEND_ERROR_REPORT,
+                "connect_to_internet_from_menu(): Failed to connect to internet after 5 minutes.",
+                console
             );
         }
 
@@ -125,13 +126,15 @@ void connect_to_internet_from_menu(const ProgramInfo& info, ConsoleHandle& conso
         case 5:
             console.log("Detected battle menu...");
             OperationFailedException::fire(
-                console, ErrorReport::NO_ERROR_REPORT,
-                "connect_to_internet_from_menu(): Looks like you got attacked."
+                ErrorReport::NO_ERROR_REPORT,
+                "connect_to_internet_from_menu(): Looks like you got attacked.",
+                console
             );
         default:
             OperationFailedException::fire(
-                console, ErrorReport::SEND_ERROR_REPORT,
-                "connect_to_internet_from_menu(): No recognized state after 60 seconds."
+                ErrorReport::SEND_ERROR_REPORT,
+                "connect_to_internet_from_menu(): No recognized state after 60 seconds.",
+                console
             );
         }
     }
@@ -142,8 +145,9 @@ void connect_to_internet_from_overworld(const ProgramInfo& info, ConsoleHandle& 
     while (true){
         if (current_time() - start > std::chrono::minutes(5)){
             OperationFailedException::fire(
-                console, ErrorReport::SEND_ERROR_REPORT,
-                "connect_to_internet_from_overworld(): Failed to connect to internet after 5 minutes."
+                ErrorReport::SEND_ERROR_REPORT,
+                "connect_to_internet_from_overworld(): Failed to connect to internet after 5 minutes.",
+                console
             );
         }
 
@@ -195,13 +199,15 @@ void connect_to_internet_from_overworld(const ProgramInfo& info, ConsoleHandle& 
         case 5:
             console.log("Detected battle menu...");
             OperationFailedException::fire(
-                console, ErrorReport::NO_ERROR_REPORT,
-                "connect_to_internet_from_overworld(): Looks like you got attacked."
+                ErrorReport::NO_ERROR_REPORT,
+                "connect_to_internet_from_overworld(): Looks like you got attacked.",
+                console
             );
         default:
             OperationFailedException::fire(
-                console, ErrorReport::SEND_ERROR_REPORT,
-                "connect_to_internet_from_overworld(): No recognized state after 60 seconds."
+                ErrorReport::SEND_ERROR_REPORT,
+                "connect_to_internet_from_overworld(): No recognized state after 60 seconds.",
+                console
             );
         }
     }

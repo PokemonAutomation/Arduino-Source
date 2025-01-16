@@ -28,7 +28,7 @@ void inside_zero_gate_to_station(
 ){
     {
         AdvanceDialogWatcher dialog(COLOR_GREEN);
-        int ret = run_until(
+        int ret = run_until<BotBaseContext>(
             console, context,
             [](BotBaseContext& context){
                 pbf_move_left_joystick(context, 128, 0, 10 * TICKS_PER_SECOND, 0);
@@ -37,8 +37,9 @@ void inside_zero_gate_to_station(
         );
         if (ret < 0){
             OperationFailedException::fire(
-                console, ErrorReport::SEND_ERROR_REPORT,
-                "Unable to find warp circle."
+                ErrorReport::SEND_ERROR_REPORT,
+                "Unable to find warp circle.",
+                console
             );
         }
     }
@@ -49,8 +50,9 @@ void inside_zero_gate_to_station(
     while (true){
         if (current_time() - start > std::chrono::seconds(60)){
             OperationFailedException::fire(
-                console, ErrorReport::SEND_ERROR_REPORT,
-                "Unable to warp to station after 60 seconds."
+                ErrorReport::SEND_ERROR_REPORT,
+                "Unable to warp to station after 60 seconds.",
+                console
             );
         }
 
@@ -79,8 +81,9 @@ void inside_zero_gate_to_station(
             break;
         default:
             OperationFailedException::fire(
-                console, ErrorReport::SEND_ERROR_REPORT,
-                "Unable to find warp to station 2."
+                ErrorReport::SEND_ERROR_REPORT,
+                "Unable to find warp to station 2.",
+                console
             );
         }
 
@@ -128,8 +131,9 @@ void inside_zero_gate_to_station(
                 }
             default:
                 OperationFailedException::fire(
-                    console, ErrorReport::SEND_ERROR_REPORT,
-                    "Heal at station: No state detected after 30 seconds."
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "Heal at station: No state detected after 30 seconds.",
+                    console
                 );
             }
             break;
@@ -139,7 +143,7 @@ void inside_zero_gate_to_station(
     console.log("Exiting station. Waiting for black screen...");
     {
         BlackScreenOverWatcher black_screen(COLOR_RED);
-        int ret = run_until(
+        int ret = run_until<BotBaseContext>(
             console, context,
             [=](BotBaseContext& context){
                 if (heal_at_station){
@@ -152,8 +156,9 @@ void inside_zero_gate_to_station(
         );
         if (ret < 0){
             OperationFailedException::fire(
-                console, ErrorReport::SEND_ERROR_REPORT,
-                "Unable to exit station after 60 seconds."
+                ErrorReport::SEND_ERROR_REPORT,
+                "Unable to exit station after 60 seconds.",
+                console
             );
         }
     }
@@ -167,8 +172,9 @@ void inside_zero_gate_to_station(
         );
         if (ret < 0){
             OperationFailedException::fire(
-                console, ErrorReport::SEND_ERROR_REPORT,
-                "Unable to load overworld after exiting station for 30 seconds."
+                ErrorReport::SEND_ERROR_REPORT,
+                "Unable to load overworld after exiting station for 30 seconds.",
+                console
             );
         }
     }
@@ -183,7 +189,7 @@ void return_to_inside_zero_gate(const ProgramInfo& info, ConsoleHandle& console,
     return_to_outside_zero_gate(info, console, context);
 
     BlackScreenOverWatcher black_screen;
-    int ret = run_until(
+    int ret = run_until<BotBaseContext>(
         console, context,
         [](BotBaseContext& context){
             pbf_move_left_joystick(context, 255, 32, 20, 105);
@@ -194,8 +200,9 @@ void return_to_inside_zero_gate(const ProgramInfo& info, ConsoleHandle& console,
     );
     if (ret < 0){
         OperationFailedException::fire(
-            console, ErrorReport::SEND_ERROR_REPORT,
-            "Unable to enter Zero Gate."
+            ErrorReport::SEND_ERROR_REPORT,
+            "Unable to enter Zero Gate.",
+            console
         );
     }
 
@@ -206,14 +213,15 @@ void return_to_inside_zero_gate(const ProgramInfo& info, ConsoleHandle& console,
     );
     if (ret < 0){
         OperationFailedException::fire(
-            console, ErrorReport::SEND_ERROR_REPORT,
-            "Unable to detect overworld inside Zero Gate."
+            ErrorReport::SEND_ERROR_REPORT,
+            "Unable to detect overworld inside Zero Gate.",
+            console
         );
     }
 }
 void return_to_inside_zero_gate_from_picnic(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
     BlackScreenOverWatcher black_screen;
-    int ret = run_until(
+    int ret = run_until<BotBaseContext>(
         console, context,
         [](BotBaseContext& context){
             pbf_move_left_joystick(context, 128, 255, 100, 40);
@@ -224,8 +232,9 @@ void return_to_inside_zero_gate_from_picnic(const ProgramInfo& info, ConsoleHand
     );
     if (ret < 0){
         OperationFailedException::fire(
-            console, ErrorReport::SEND_ERROR_REPORT,
-            "Unable to enter Zero Gate."
+            ErrorReport::SEND_ERROR_REPORT,
+            "Unable to enter Zero Gate.",
+            console
         );
     }
 
@@ -236,8 +245,9 @@ void return_to_inside_zero_gate_from_picnic(const ProgramInfo& info, ConsoleHand
     );
     if (ret < 0){
         OperationFailedException::fire(
-            console, ErrorReport::SEND_ERROR_REPORT,
-            "Unable to detect overworld inside Zero Gate."
+            ErrorReport::SEND_ERROR_REPORT,
+            "Unable to detect overworld inside Zero Gate.",
+            console
         );
     }
 }

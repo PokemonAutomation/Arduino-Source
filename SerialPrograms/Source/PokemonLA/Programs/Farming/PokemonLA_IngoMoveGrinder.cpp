@@ -92,7 +92,7 @@ bool IngoMoveGrinder::start_dialog(ConsoleHandle& console, BotBaseContext& conte
         ButtonDetector button0(console, console, ButtonType::ButtonA, {0.50, 0.408, 0.40, 0.042}, std::chrono::milliseconds(100), true);
         ButtonDetector button1(console, console, ButtonType::ButtonA, {0.50, 0.450, 0.40, 0.042}, std::chrono::milliseconds(100), true);
         ButtonDetector button2(console, console, ButtonType::ButtonA, {0.50, 0.492, 0.40, 0.042}, std::chrono::milliseconds(100), true);
-        int ret = run_until(
+        int ret = run_until<BotBaseContext>(
             console, context,
             [&](BotBaseContext& context){
                 for (size_t c = 0; c < 10; c++){
@@ -117,8 +117,9 @@ bool IngoMoveGrinder::start_dialog(ConsoleHandle& console, BotBaseContext& conte
             break;
         default:
             OperationFailedException::fire(
-                console, ErrorReport::SEND_ERROR_REPORT,
-                "Unable to detect options after 10 A presses."
+                ErrorReport::SEND_ERROR_REPORT,
+                "Unable to detect options after 10 A presses.",
+                console
             );
         }
     }
@@ -127,7 +128,7 @@ bool IngoMoveGrinder::start_dialog(ConsoleHandle& console, BotBaseContext& conte
     context.wait_for_all_requests();
 
     ButtonDetector button2(console, console, ButtonType::ButtonA, {0.50, 0.350, 0.40, 0.400}, std::chrono::milliseconds(100), true);
-    int ret = run_until(
+    int ret = run_until<BotBaseContext>(
         console, context,
         [&](BotBaseContext& context){
             for (size_t c = 0; c < 5; c++){
@@ -141,8 +142,9 @@ bool IngoMoveGrinder::start_dialog(ConsoleHandle& console, BotBaseContext& conte
         return false;
     default:
         OperationFailedException::fire(
-            console, ErrorReport::SEND_ERROR_REPORT,
-            "Unable to find opponent list options after 5 A presses."
+            ErrorReport::SEND_ERROR_REPORT,
+            "Unable to find opponent list options after 5 A presses.",
+            console
         );
     }
 }
@@ -212,8 +214,9 @@ bool IngoMoveGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBase
 //            auto snapshot = env.console.video().snapshot();
 //            dump_image(env.logger(), env.program_info(), "BattleMenuNotFound", snapshot);
             OperationFailedException::fire(
-                env.console, ErrorReport::SEND_ERROR_REPORT,
-                "Failed to find battle menu after 2 minutes."
+                ErrorReport::SEND_ERROR_REPORT,
+                "Failed to find battle menu after 2 minutes.",
+                env.console
             );
         }
 
@@ -351,9 +354,10 @@ void IngoMoveGrinder::go_to_next_pokemon(SingleSwitchProgramEnvironment& env, Bo
 {
     if (cur_pokemon == 4){
         OperationFailedException::fire(
-            env.console, ErrorReport::SEND_ERROR_REPORT,
+            ErrorReport::SEND_ERROR_REPORT,
             "Abort program. Your 4 first pokemons are done grinding moves, dead or without PP. "
-            "Your fifth pokemon (Arceus) died so no other choice than stopping the program."
+            "Your fifth pokemon (Arceus) died so no other choice than stopping the program.",
+            env.console
         );
     }
     env.console.log("Switch to next pokemon " + debug_current_info() + debug_move_attempts_info());

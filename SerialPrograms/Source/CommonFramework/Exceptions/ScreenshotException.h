@@ -15,9 +15,9 @@ namespace PokemonAutomation{
 class ImageViewRGB32;
 class ImageRGB32;
 class EventNotificationOption;
+class VideoStream;
 struct ProgramInfo;
 class ProgramEnvironment;
-class ConsoleHandle;
 
 
 enum class ErrorReport{
@@ -40,7 +40,7 @@ public:
     explicit ScreenshotException(
         ErrorReport error_report,
         std::string message,
-        ConsoleHandle& console
+        VideoStream& stream
     );
 
     //  Construct exception with message with screenshot and (optionally) console information.
@@ -49,19 +49,19 @@ public:
     explicit ScreenshotException(
         ErrorReport error_report,
         std::string message,
-        ConsoleHandle* console,
+        VideoStream* stream,
         ImageRGB32 screenshot
     );
     explicit ScreenshotException(
         ErrorReport error_report,
         std::string message,
-        ConsoleHandle* console,
+        VideoStream* stream,
         std::shared_ptr<const ImageRGB32> screenshot
     );
 
     //  Add console information if it isn't already requested.
     //  This will provide screenshot and stream history if requested later.
-    void add_console_if_needed(ConsoleHandle& console);
+    void add_stream_if_needed(VideoStream& stream);
 
 
 public:
@@ -75,7 +75,7 @@ public:
 public:
     ErrorReport m_send_error_report;
     std::string m_message;
-    ConsoleHandle* m_console = nullptr;
+    VideoStream* m_stream = nullptr;
     std::shared_ptr<const ImageRGB32> m_screenshot;
 };
 

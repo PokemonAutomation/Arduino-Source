@@ -199,8 +199,9 @@ void ShinyHuntScatterbug::program(SingleSwitchProgramEnvironment& env, BotBaseCo
             consecutive_failures++;
             if (consecutive_failures >= 3){
                 OperationFailedException::fire(
-                    env.console, ErrorReport::SEND_ERROR_REPORT,
-                    "Failed 3 times in the row."
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "Failed 3 times in the row.",
+                    env.console
                 );
             }
 
@@ -238,7 +239,7 @@ void ShinyHuntScatterbug::handle_battles_and_back_to_pokecenter(
     while(action_finished == false || returned_to_pokecenter == false){
         // env.console.overlay().add_log("Calculate what to do next");
         EncounterWatcher encounter_watcher(env.console, COLOR_RED);
-        int ret = run_until(
+        int ret = run_until<BotBaseContext>(
             env.console, context,
             [&](BotBaseContext& context){
                 if (action_finished){
@@ -363,7 +364,7 @@ void ShinyHuntScatterbug::run_one_sandwich_iteration(SingleSwitchProgramEnvironm
 
         handle_battles_and_back_to_pokecenter(env, context, 
             [this, &path_id, &hp_watcher](SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-                run_until(
+                run_until<BotBaseContext>(
                     env.console, context,
                     [&](BotBaseContext& context){
                         run_lets_go_iteration(env, context, path_id);

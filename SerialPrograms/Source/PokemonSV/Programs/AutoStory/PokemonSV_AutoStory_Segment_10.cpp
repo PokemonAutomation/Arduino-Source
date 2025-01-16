@@ -103,8 +103,9 @@ void checkpoint_21(
         );
         if (ret < 0){
             OperationFailedException::fire(
-                env.console, ErrorReport::SEND_ERROR_REPORT,
-                "checkpoint_21(): Failed to jump the East Mesagoza wall."
+                ErrorReport::SEND_ERROR_REPORT,
+                "checkpoint_21(): Failed to jump the East Mesagoza wall.",
+                env.console
             );
         }
         context.wait_for_all_requests();

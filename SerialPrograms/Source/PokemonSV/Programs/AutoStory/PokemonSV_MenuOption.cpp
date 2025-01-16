@@ -69,8 +69,9 @@ void MenuOption::set_target_option(const std::vector<MenuOptionToggleEnum>& targ
     }
 
     OperationFailedException::fire(
-        m_console, ErrorReport::SEND_ERROR_REPORT,
-        "MenuOption::set_target_option(): Unable to set option to the correct toggle."
+        ErrorReport::SEND_ERROR_REPORT,
+        "MenuOption::set_target_option(): Unable to set option to the correct toggle.",
+        m_console
     );
 
 }
@@ -80,8 +81,9 @@ int8_t MenuOption::get_selected_index(const ImageViewRGB32& screen) const {
     ImageFloatBox box;
     if (!m_arrow.detect(box, screen)){
         OperationFailedException::fire(
-            m_console, ErrorReport::SEND_ERROR_REPORT,
-            "MenuOption::get_selected_index(): Unable to find cursor."
+            ErrorReport::SEND_ERROR_REPORT,
+            "MenuOption::get_selected_index(): Unable to find cursor.",
+            m_console
         );
     }
 
@@ -91,8 +93,9 @@ int8_t MenuOption::get_selected_index(const ImageViewRGB32& screen) const {
 
     if (selected_index < 0 || selected_index >= 10){
         OperationFailedException::fire(
-            m_console, ErrorReport::SEND_ERROR_REPORT,
-            "MenuOption::get_selected_index(): Invalid cursor slot."
+            ErrorReport::SEND_ERROR_REPORT,
+            "MenuOption::get_selected_index(): Invalid cursor slot.",
+            m_console
         );
     }
     // cout << "selected index:" + std::to_string(selected_index) << endl;
@@ -103,7 +106,8 @@ int8_t MenuOption::get_selected_index(const ImageViewRGB32& screen) const {
 std::string MenuOption::read_option(const ImageViewRGB32& cropped) const{
     // cropped.save("test.png");
     const auto ocr_result = MenuOptionReader::instance().read_substring(
-        m_console, m_language, 
+        m_console,
+        m_language,
         cropped, OCR::BLACK_TEXT_FILTERS()
     );
 
@@ -132,8 +136,9 @@ std::string MenuOption::read_option(const ImageViewRGB32& cropped) const{
 
     if (results.size() > 1){
         OperationFailedException::fire(
-            m_console, ErrorReport::SEND_ERROR_REPORT,
-            "MenuOption::read_option(): Unable to read item. Ambiguous or multiple results."
+            ErrorReport::SEND_ERROR_REPORT,
+            "MenuOption::read_option(): Unable to read item. Ambiguous or multiple results.",
+            m_console
         );
     }
 

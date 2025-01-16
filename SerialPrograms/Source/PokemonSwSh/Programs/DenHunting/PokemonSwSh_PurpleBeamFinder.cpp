@@ -138,7 +138,7 @@ bool PurpleBeamFinder::run(SingleSwitchProgramEnvironment& env, BotBaseContext& 
     PurpleBeamFinder_Descriptor::Stats& stats = env.current_stats<PurpleBeamFinder_Descriptor::Stats>();
 
     SelectionArrowFinder arrow_detector(env.console.overlay(), {0.5, 0.5, 0.3, 0.3});
-    int ret = run_until(
+    int ret = run_until<BotBaseContext>(
         env.console, context,
         [](BotBaseContext& context){
             pbf_mash_button(context, BUTTON_A, 1000);
@@ -156,7 +156,7 @@ bool PurpleBeamFinder::run(SingleSwitchProgramEnvironment& env, BotBaseContext& 
     pbf_wait(context, 100);
     context.wait_for_all_requests();
 
-    ret = run_until(
+    ret = run_until<BotBaseContext>(
         env.console, context,
         [](BotBaseContext& context){
             pbf_press_button(context, BUTTON_A, 10, 300);

@@ -58,8 +58,9 @@ void SkipToFullMoon::program(SingleSwitchProgramEnvironment& env, BotBaseContext
 
         if (compatibility == ItemCompatibility::NONE){
             OperationFailedException::fire(
-                env.console, ErrorReport::SEND_ERROR_REPORT,
-                "Unable to detect item compatibility."
+                ErrorReport::SEND_ERROR_REPORT,
+                "Unable to detect item compatibility.",
+                env.console
             );
         }
 
@@ -104,7 +105,7 @@ void SkipToFullMoon::program(SingleSwitchProgramEnvironment& env, BotBaseContext
 
 
         ArcPhoneDetector arc_phone_detector(env.console, env.console, std::chrono::milliseconds(100), stop_on_detected);
-        run_until(
+        run_until<BotBaseContext>(
             env.console, context,
             [](BotBaseContext& local_context){
                 // pbf_mash_button(local_context, BUTTON_B, 7 * TICKS_PER_SECOND);

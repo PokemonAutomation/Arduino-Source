@@ -56,7 +56,12 @@ bool read_battle_menu(
                 break;
             }
         }
-        console.log("Attempting to read from summary.", COLOR_PURPLE);
+        if (state.opponent.size() == 1){
+            console.log("Failed to read opponent from battle. Using previously known value: " + set_to_str(state.opponent), COLOR_ORANGE);
+            break;
+        }
+
+        console.log("Unable to read opponent from battle. Attempting to read from summary.", COLOR_ORANGE);
         pbf_press_button(context, BUTTON_Y, 10, TICKS_PER_SECOND);
         pbf_press_dpad(context, DPAD_UP, 10, 50);
         pbf_press_button(context, BUTTON_A, 10, 2 * TICKS_PER_SECOND);
@@ -81,7 +86,7 @@ bool read_battle_menu(
 
     if (state.wins != 3 && is_boss(opponent)){
         console.log("Boss found before 3 wins. Something is seriously out-of-sync.", COLOR_RED);
-        dump_image(MODULE_NAME, console, "BossBeforeEnd");
+        dump_image(console, MODULE_NAME, console, "BossBeforeEnd");
 //        send_program_telemetry(
 //            env.logger(), true, COLOR_RED, MODULE_NAME,
 //            "Error",
@@ -256,7 +261,7 @@ StateMachineAction run_move_select(
 
         //  Back out and look for battle menu. This indicates that the move wasn't selectable.
         BattleMenuDetector detector;
-        int result = run_until(
+        int result = run_until<BotBaseContext>(
             console, context,
             [](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 5 * TICKS_PER_SECOND);
@@ -346,8 +351,9 @@ StateMachineAction throw_balls(
         pbf_press_button(context, BUTTON_A, 10, 125);
     }else{
         OperationFailedException::fire(
-            console, ErrorReport::NO_ERROR_REPORT,
-            "Unable to find appropriate ball. Did you run out?"
+            ErrorReport::NO_ERROR_REPORT,
+            "Unable to find appropriate ball. Did you run out?",
+            console
         );
     }
 

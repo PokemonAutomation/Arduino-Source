@@ -34,7 +34,7 @@ void run_away(
     uint16_t exit_battle_time
 ){
     BlackScreenOverWatcher black_screen_detector;
-    run_until(
+    run_until<BotBaseContext>(
         console, context,
         [exit_battle_time](BotBaseContext& context){
             pbf_press_dpad(context, DPAD_UP, 10, 0);
@@ -102,7 +102,7 @@ void StandardEncounterHandler::run_away_and_update_stats(
     );
 
     BlackScreenOverWatcher black_screen_detector;
-    int ret = run_until(
+    int ret = run_until<BotBaseContext>(
         m_console, m_context,
         [exit_battle_time](BotBaseContext& context){
             pbf_mash_button(context, BUTTON_A, TICKS_PER_SECOND);
@@ -125,8 +125,9 @@ bool StandardEncounterHandler::handle_standard_encounter(const ShinyDetectionRes
         m_consecutive_failures++;
         if (m_consecutive_failures >= 3){
             OperationFailedException::fire(
-                m_console, ErrorReport::SEND_ERROR_REPORT,
-                "3 consecutive failed encounter detections."
+                ErrorReport::SEND_ERROR_REPORT,
+                "3 consecutive failed encounter detections.",
+                m_console
             );
         }
         return false;
@@ -180,8 +181,9 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
         m_consecutive_failures++;
         if (m_consecutive_failures >= 3){
             OperationFailedException::fire(
-                m_console, ErrorReport::SEND_ERROR_REPORT,
-                "3 consecutive failed encounter detections."
+                ErrorReport::SEND_ERROR_REPORT,
+                "3 consecutive failed encounter detections.",
+                m_console
             );
         }
         return false;

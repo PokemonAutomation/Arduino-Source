@@ -7,16 +7,14 @@
 #ifndef PokemonAutomation_CommonFramework_BlackBorderCheck_H
 #define PokemonAutomation_CommonFramework_BlackBorderCheck_H
 
-#include "Common/Cpp/Containers/FixedLimitVector.h"
 #include "CommonFramework/Globals.h"
 
 namespace PokemonAutomation{
 
-class ConsoleHandle;
+class VideoStream;
 
 
-void start_program_video_check(ConsoleHandle& console, FeedbackType feedback);
-void start_program_video_check(FixedLimitVector<ConsoleHandle>& consoles, FeedbackType feedback);
+void start_program_video_check(VideoStream& stream, FeedbackType feedback);
 
 
 }

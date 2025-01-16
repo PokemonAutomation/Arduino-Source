@@ -218,7 +218,7 @@ CatchResults basic_catcher(
         SelectionArrowFinder learn_move(console, {0.50, 0.62, 0.40, 0.18}, COLOR_YELLOW);
         //  Look for the pokemon caught screen.
         ReceivePokemonDetector caught_detector;
-        int ret = run_until(
+        int ret = run_until<BotBaseContext>(
             console, context,
             [](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
@@ -244,8 +244,9 @@ CatchResults basic_catcher(
         case 1:
             if (results.result == CatchResult::POKEMON_CAUGHT){
                 OperationFailedException::fire(
-                    console, ErrorReport::SEND_ERROR_REPORT,
-                    "BasicCatcher: Found receive pokemon screen two times."
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "BasicCatcher: Found receive pokemon screen two times.",
+                    console
                 );
             }
             console.log("BasicCatcher: The wild " + STRING_POKEMON + " was caught by " + pokeball_str, COLOR_BLUE);
@@ -257,8 +258,9 @@ CatchResults basic_catcher(
             num_learned_moves++;
             if (num_learned_moves == 100){
                 OperationFailedException::fire(
-                    console, ErrorReport::SEND_ERROR_REPORT,
-                    "BasicCatcher: Learn new move attempts reach 100."
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "BasicCatcher: Learn new move attempts reach 100.",
+                    console
                 );
             }
             pbf_move_right_joystick(context, 128, 255, 20, 105);

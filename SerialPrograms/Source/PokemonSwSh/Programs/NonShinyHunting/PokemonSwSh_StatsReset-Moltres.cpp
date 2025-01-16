@@ -109,7 +109,7 @@ void StatsResetMoltres::program(SingleSwitchProgramEnvironment& env, BotBaseCont
         env.log("Wait for moltres to attack you.", COLOR_PURPLE);
         {
             StandardBattleMenuWatcher fight_detector(false);
-            int result = run_until(
+            int result = run_until<BotBaseContext>(
                 env.console, context,
                 [](BotBaseContext& context){
                     while (true){
@@ -128,8 +128,9 @@ void StatsResetMoltres::program(SingleSwitchProgramEnvironment& env, BotBaseCont
         CatchResults result = basic_catcher(env.console, context, LANGUAGE, "master-ball", 999);
         if (result.result != CatchResult::POKEMON_CAUGHT){
             OperationFailedException::fire(
-                env.console, ErrorReport::SEND_ERROR_REPORT,
-                "Unable to catch Moltres."
+                ErrorReport::SEND_ERROR_REPORT,
+                "Unable to catch Moltres.",
+                env.console
             );
         }
 
@@ -175,7 +176,7 @@ void StatsResetMoltres::program(SingleSwitchProgramEnvironment& env, BotBaseCont
             env.log("Wait for moltres to attack you.", COLOR_PURPLE);
             {
                 StandardBattleMenuWatcher fight_detector(false);
-                int ret = run_until(
+                int ret = run_until<BotBaseContext>(
                     env.console, context,
                     [](BotBaseContext& context){
                         while (true){

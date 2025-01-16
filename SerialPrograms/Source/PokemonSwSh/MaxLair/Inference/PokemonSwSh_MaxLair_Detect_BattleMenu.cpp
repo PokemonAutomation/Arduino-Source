@@ -238,6 +238,7 @@ std::set<std::string> BattleMenuReader::read_opponent(
     VideoFeed& feed
 ) const{
     std::set<std::string> result;
+
     VideoSnapshot screen;
     for (size_t c = 0; c < 3; c++){
         screen = feed.snapshot();
@@ -249,7 +250,7 @@ std::set<std::string> BattleMenuReader::read_opponent(
         logger.log("Failed to read opponent name. Retrying in 1 second...", COLOR_ORANGE);
         scope.wait_for(std::chrono::seconds(1));
     }
-    dump_image(logger, MODULE_NAME, "MaxLair-read_opponent", screen);
+//    dump_image(logger, MODULE_NAME, "MaxLair-read_opponent", screen);
     return result;
 }
 std::set<std::string> BattleMenuReader::read_opponent_in_summary(Logger& logger, const ImageViewRGB32& screen) const{
@@ -281,9 +282,14 @@ std::set<std::string> BattleMenuReader::read_opponent_in_summary(Logger& logger,
         }
     }
 
+//    cout << get_type_slug(type0) << endl;
+//    cout << get_type_slug(type1) << endl;
+
     for (auto iter = slugs.begin(); iter != slugs.end();){
         const MaxLairMon& mon = get_maxlair_mon(*iter);
 //        cout << mon.species << endl;
+//        cout << get_type_slug(mon.type[0]) << endl;
+//        cout << get_type_slug(mon.type[1]) << endl;
         if ((type0 == mon.type[0] && type1 == mon.type[1]) || (type0 == mon.type[1] && type1 == mon.type[0])){
             ++iter;
         }else{
@@ -307,6 +313,7 @@ std::set<std::string> BattleMenuReader::read_opponent_in_summary(Logger& logger,
         "basculin-red-striped",
         "lycanroc-midday",
         "lycanroc-midnight",
+        "stunfisk-galar",   //  After using terrain pulse.
     };
     bool error = true;
     for (const std::string& slug : slugs){

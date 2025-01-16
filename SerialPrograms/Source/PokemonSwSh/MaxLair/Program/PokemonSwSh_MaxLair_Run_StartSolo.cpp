@@ -104,7 +104,7 @@ bool start_adventure(
 
     //  Press A until you're not in the lobby anymore.
     LobbyDetector lobby_detector(true);
-    int result = run_until(
+    int result = run_until<BotBaseContext>(
         console, context,
         [](BotBaseContext& context){
             for (size_t c = 0; c < 180; c++){

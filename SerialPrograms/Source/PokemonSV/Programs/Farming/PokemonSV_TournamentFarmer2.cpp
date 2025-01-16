@@ -182,7 +182,7 @@ void TournamentFarmer2::program(SingleSwitchProgramEnvironment& env, BotBaseCont
         }
         {
             NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
-            int ret = run_until(
+            int ret = run_until<BotBaseContext>(
                 env.console, context,
                 [](BotBaseContext& context){
                     pbf_mash_button(context, BUTTON_B, 10000); //it takes a while to load and start
@@ -193,8 +193,9 @@ void TournamentFarmer2::program(SingleSwitchProgramEnvironment& env, BotBaseCont
                 stats.errors++;
                 env.update_stats();
                 OperationFailedException::fire(
-                    env.console, ErrorReport::SEND_ERROR_REPORT,
-                    "Failed to detect battle start!"
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "Failed to detect battle start!",
+                    env.console
                 );
             }
         }
@@ -207,7 +208,7 @@ void TournamentFarmer2::program(SingleSwitchProgramEnvironment& env, BotBaseCont
         for (uint16_t battles = 0; battles < 4; battles++){
             NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);  //  Next battle started
             OverworldWatcher overworld(env.console, COLOR_CYAN);             //  Previous battle was lost
-            int ret = run_until(
+            int ret = run_until<BotBaseContext>(
                 env.console, context,
                 [](BotBaseContext& context){
                     pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
@@ -234,8 +235,9 @@ void TournamentFarmer2::program(SingleSwitchProgramEnvironment& env, BotBaseCont
                 stats.errors++;
                 env.update_stats();
                 OperationFailedException::fire(
-                    env.console, ErrorReport::SEND_ERROR_REPORT,
-                    "Failed to detect battle menu or dialog prompt!"
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "Failed to detect battle menu or dialog prompt!",
+                    env.console
                 );
             }
 
@@ -251,7 +253,7 @@ void TournamentFarmer2::program(SingleSwitchProgramEnvironment& env, BotBaseCont
                   - if win: Fast Travel will be detected
                   - if lose: will time out.
                 */
-                ret = run_until(
+                ret = run_until<BotBaseContext>(
                     env.console, context,
                     [](BotBaseContext& context){
                         pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
@@ -260,14 +262,15 @@ void TournamentFarmer2::program(SingleSwitchProgramEnvironment& env, BotBaseCont
                 );
                 if (ret < 0){
                     OperationFailedException::fire(
-                        env.console, ErrorReport::SEND_ERROR_REPORT,
-                        "Failed to return to overworld afer 2 minutes."
+                        ErrorReport::SEND_ERROR_REPORT,
+                        "Failed to return to overworld afer 2 minutes.",
+                        env.console
                     );
                 }
                 context.wait_for_all_requests();
 
                 FastTravelWatcher fast_travel(COLOR_YELLOW, env.console.overlay(), MINIMAP_AREA);
-                ret = run_until(
+                ret = run_until<BotBaseContext>(
                     env.console, context,
                     [](BotBaseContext& context){
                         pbf_mash_button(context, BUTTON_B, 5 * TICKS_PER_SECOND);

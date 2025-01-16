@@ -36,7 +36,7 @@
 
 namespace PokemonAutomation{
 
-class ConsoleHandle;
+class Logger;
 class SpectrogramMatcher;
 
 // A virtual base class for audio detectors to match an audio template starting at each incoming
@@ -56,8 +56,11 @@ public:
     // function. If it returns true, the inference session will stop (by returning true from 
     // AudioPerSpectrumDetectorBase::process_spectrums()).
     AudioPerSpectrumDetectorBase(
-        std::string label, std::string audio_name, Color detection_color,
-        ConsoleHandle& console, DetectedCallback detected_callback
+        Logger& logger,
+        std::string label,
+        std::string audio_name,
+        Color detection_color,
+        DetectedCallback detected_callback
     );
 
     virtual ~AudioPerSpectrumDetectorBase();
@@ -93,7 +96,7 @@ protected:
     // Color of the box to visualize the detection in the audio spectrogram UI.
     Color m_detection_color;
     
-    ConsoleHandle& m_console;
+    Logger& m_logger;
     // Callback function to determine whether to stop the inference session when the target audio
     // is detected.
     DetectedCallback m_detected_callback;

@@ -273,7 +273,7 @@ void run_material_farmer(
 
                     // run let's go while updating the HP watcher
                     console.log("Starting Let's Go hunting path.", COLOR_PURPLE);
-                    run_until(
+                    run_until<BotBaseContext>(
                         console, context,
                         [&](BotBaseContext& context){
                             run_lets_go_iteration(console, context, encounter_tracker, options.NUM_FORWARD_MOVES_PER_LETS_GO_ITERATION);
@@ -593,7 +593,7 @@ void run_from_battles_and_back_to_pokecenter(
     bool returned_to_pokecenter = false;
     while(returned_to_pokecenter == false){
         NormalBattleMenuWatcher battle_menu(COLOR_RED);
-        int ret = run_until(
+        int ret = run_until<BotBaseContext>(
             console, context,
             [&](BotBaseContext& context){
                 if (!attempted_action){ // We still need to carry out `action`
@@ -674,8 +674,9 @@ void fly_from_paldea_to_blueberry_entrance(const ProgramInfo& info, ConsoleHandl
 
     if (!isFlySuccessful){
         OperationFailedException::fire(
-            console, ErrorReport::SEND_ERROR_REPORT,
-            "Failed to fly to Blueberry academy, five times in a row."
+            ErrorReport::SEND_ERROR_REPORT,
+            "Failed to fly to Blueberry academy, five times in a row.",
+            console
         );
     }
 }
@@ -742,8 +743,9 @@ void move_from_blueberry_entrance_to_league_club(const ProgramInfo& info, Consol
 
     if (!isSuccessful){
         OperationFailedException::fire(
-            console, ErrorReport::SEND_ERROR_REPORT,
-            "Failed to enter League club room, five times in a row."
+            ErrorReport::SEND_ERROR_REPORT,
+            "Failed to enter League club room, five times in a row.",
+            console
         );
     }
 
@@ -791,8 +793,9 @@ void move_from_item_printer_to_blueberry_entrance(const ProgramInfo& info, Conso
     }else{
         console.log("Failed to detect Blueberry navigation menu.");
         OperationFailedException::fire(
-            console, ErrorReport::SEND_ERROR_REPORT,
-            "Failed to find the exit from the League room."
+            ErrorReport::SEND_ERROR_REPORT,
+            "Failed to find the exit from the League room.",
+            console
         );
     }
 
@@ -806,8 +809,9 @@ void move_from_item_printer_to_blueberry_entrance(const ProgramInfo& info, Conso
         console.log("Overworld detected");
     }else{
         OperationFailedException::fire(
-            console, ErrorReport::SEND_ERROR_REPORT,
-            "Failed to detect overworld."
+            ErrorReport::SEND_ERROR_REPORT,
+            "Failed to detect overworld.",
+            console
         );      
     }
 }
@@ -854,8 +858,9 @@ void fly_from_blueberry_to_north_province_3(const ProgramInfo& info, ConsoleHand
     if (!isFlySuccessful){
 
         OperationFailedException::fire(
-            console, ErrorReport::SEND_ERROR_REPORT,
-            "Failed to fly to North province area 3, ten times in a row."
+            ErrorReport::SEND_ERROR_REPORT,
+            "Failed to fly to North province area 3, ten times in a row.",
+            console
         );
 
     }

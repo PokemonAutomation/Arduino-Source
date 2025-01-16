@@ -169,7 +169,7 @@ CatchResults basic_catcher(
     {
         console.log("Waiting for black screen end...");
         BlackScreenOverWatcher black_screen_detector;
-        run_until(
+        run_until<BotBaseContext>(
             console, context,
             [](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
@@ -185,7 +185,7 @@ CatchResults basic_catcher(
     {
         ReceivePokemonDetector caught_detector(true);
 
-        int result = run_until(
+        int result = run_until<BotBaseContext>(
             console, context,
             [](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 4 * TICKS_PER_SECOND);
@@ -209,7 +209,7 @@ CatchResults basic_catcher(
     {
         console.log("Waiting for black screen end...");
         BlackScreenOverWatcher black_screen_detector;
-        run_until(
+        run_until<BotBaseContext>(
             console, context,
             [](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);

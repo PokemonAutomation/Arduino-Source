@@ -15,9 +15,15 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 
-ShinySoundDetector::ShinySoundDetector(ConsoleHandle& console, DetectedCallback detected_callback)
+ShinySoundDetector::ShinySoundDetector(Logger& logger, DetectedCallback detected_callback)
     // Use a yellow as the detection color because the shiny animation is yellow.
-    : AudioPerSpectrumDetectorBase("ShinySoundDetector", "Shiny sound", COLOR_YELLOW, console, detected_callback)
+    : AudioPerSpectrumDetectorBase(
+        logger,
+        "ShinySoundDetector",
+        "Shiny sound",
+        COLOR_YELLOW,
+        detected_callback
+    )
 {}
 float ShinySoundDetector::get_score_threshold() const{
     return (float)GameSettings::instance().SHINY_SOUND_THRESHOLD2;

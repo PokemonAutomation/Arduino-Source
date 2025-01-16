@@ -128,6 +128,7 @@
 //#include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleMenuDetector.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_BattleMenu.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonSwapMenu.h"
+#include "PokemonBDSP/Inference/PokemonBDSP_SelectionArrow.h"
 
 
 #include <QPixmap>
@@ -266,9 +267,9 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     using namespace OCR;
     using namespace NintendoSwitch;
     using namespace Pokemon;
-//    using namespace PokemonSwSh;
+    using namespace PokemonSwSh;
 //    using namespace PokemonBDSP;
-    using namespace PokemonLA;
+//    using namespace PokemonLA;
 //    using namespace PokemonSV;
 
     [[maybe_unused]] Logger& logger = env.logger();
@@ -278,6 +279,31 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     [[maybe_unused]] VideoOverlay& overlay = env.consoles[0];
     BotBaseContext context(scope, console.botbase());
     VideoOverlaySet overlays(overlay);
+
+
+//    ImageRGB32 image("20250115-110356822901.png");
+//    ImageRGB32 image("raidecho1.jpg");
+//    auto image = feed.snapshot();
+
+//    MaxLairInternal::BattleMenuReader reader(overlay, Language::English);
+//    reader.read_opponent_in_summary(logger, image);
+
+//    TeraCardReader reader;
+//    cout << (int)reader.stars(logger, env.program_info(), image) << endl;
+
+
+
+#if 0
+    ImageRGB32 image("20250112-194339635973.png");
+
+    PokemonBDSP::SelectionArrowFinder detector0(console, {0.50, 0.58, 0.40, 0.10}, COLOR_RED);
+    PokemonBDSP::SelectionArrowFinder detector1(console, {0.50, 0.52, 0.40, 0.10}, COLOR_RED);
+
+    cout << detector0.detect(image) << endl;
+    cout << detector1.detect(image) << endl;
+#endif
+
+
 
 #if 0
     PokemonSwSh::MaxLairInternal::PokemonSwapMenuReader reader(console, overlay, Language::English);
@@ -342,13 +368,13 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 #endif
 
 #if 1
-//    VideoSnapshot image = feed.snapshot();
-    ImageRGB32 image("20250108-151305644248.png");
+    VideoSnapshot image = feed.snapshot();
+//    ImageRGB32 image("20250108-151305644248.png");
 
     DateReader date_reader;
     date_reader.make_overlays(overlays);
-//    auto date = date_reader.read_date(logger, image);
-    auto date = date_reader.read_date(logger, std::make_shared<ImageRGB32>(std::move(image)));
+    auto date = date_reader.read_date(logger, image);
+//    auto date = date_reader.read_date(logger, std::make_shared<ImageRGB32>(std::move(image)));
     cout << "year =  " << (int)date.second.year << endl;
     cout << "month = " << (int)date.second.month << endl;
     cout << "day =   " << (int)date.second.day << endl;
@@ -1035,7 +1061,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
         NormalBattleMenuWatcher battle_menu(COLOR_RED);
         AreaZeroSkyTracker sky_tracker(overlay);
         context.wait_for_all_requests();
-        int ret = run_until(
+        int ret = run_until<BotBaseContext>(
             console, context,
             [&](BotBaseContext& context){
                 while (true){

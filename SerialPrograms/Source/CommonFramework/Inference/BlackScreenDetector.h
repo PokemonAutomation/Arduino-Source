@@ -11,6 +11,7 @@
 #ifndef PokemonAutomation_CommonFramework_BlackScreenDetector_H
 #define PokemonAutomation_CommonFramework_BlackScreenDetector_H
 
+#include <atomic>
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
@@ -57,17 +58,18 @@ private:
 };
 
 
-class BlackScreenWatcher : public BlackScreenDetector, public VisualInferenceCallback{
+class BlackScreenWatcher : public DetectorToFinder<BlackScreenDetector>{
 public:
     BlackScreenWatcher(
         Color color = COLOR_RED,
         const ImageFloatBox& box = {0.1, 0.1, 0.8, 0.8},
         double max_rgb_sum = 100,
-        double max_stddev_sum = 10
-    );
-
-    virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
+        double max_stddev_sum = 10,
+        FinderType finder_type = FinderType::PRESENT,
+        std::chrono::milliseconds duration = std::chrono::milliseconds(100)
+    )
+        : DetectorToFinder("BlackScreenWatcher", finder_type, duration, color, box, max_rgb_sum, max_stddev_sum)
+    {}
 };
 
 // Detect when a period of black screen is over
@@ -77,7 +79,9 @@ public:
         Color color = COLOR_RED,
         const ImageFloatBox& box = {0.1, 0.1, 0.8, 0.8},
         double max_rgb_sum = 100,
-        double max_stddev_sum = 10
+        double max_stddev_sum = 10,
+        std::chrono::milliseconds hold_duration = std::chrono::milliseconds(100),
+        std::chrono::milliseconds release_duration = std::chrono::milliseconds(100)
     );
 
     bool black_is_over(const ImageViewRGB32& frame);
@@ -87,8 +91,10 @@ public:
     virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
 
 private:
-    BlackScreenDetector m_detector;
+    BlackScreenWatcher m_on;
+    BlackScreenWatcher m_off;
     bool m_has_been_black = false;
+    std::atomic<bool> m_black_is_over = false;
 };
 
 

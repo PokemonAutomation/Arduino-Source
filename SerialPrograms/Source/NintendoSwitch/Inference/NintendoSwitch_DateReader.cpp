@@ -635,8 +635,9 @@ void change_date(
         }
         default:
             OperationFailedException::fire(
-                env.console, ErrorReport::SEND_ERROR_REPORT,
-                "Failed to set date"
+                ErrorReport::SEND_ERROR_REPORT,
+                "Failed to set date",
+                env.console
             );
         }
     }

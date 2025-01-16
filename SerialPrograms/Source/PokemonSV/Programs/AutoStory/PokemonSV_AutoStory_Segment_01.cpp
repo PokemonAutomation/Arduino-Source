@@ -250,7 +250,7 @@ void checkpoint_03(
         env.console.log("Clear auto heal tutorial.");
         // Press X until Auto heal tutorial shows up
         TutorialWatcher tutorial;
-        int ret = run_until(
+        int ret = run_until<BotBaseContext>(
             env.console, context,
             [](BotBaseContext& context){
                 for (int i = 0; i < 10; i++){
@@ -261,8 +261,9 @@ void checkpoint_03(
         );
         if (ret < 0){
             OperationFailedException::fire(
-                env.console, ErrorReport::SEND_ERROR_REPORT,
-                "Stuck trying to clear auto heal tutorial."
+                ErrorReport::SEND_ERROR_REPORT,
+                "Stuck trying to clear auto heal tutorial.",
+                env.console
             );  
         }
         clear_tutorial(env.console, context);

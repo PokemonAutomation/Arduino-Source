@@ -92,8 +92,9 @@ void SizeChecker::enter_check_mode(SingleSwitchProgramEnvironment& env, BotBaseC
     while (true){
         if (current_time() - start > std::chrono::minutes(2)){
             OperationFailedException::fire(
-                env.console, ErrorReport::SEND_ERROR_REPORT,
-                "enter_check_mode(): Failed to enter box mode after 2 minutes."
+                ErrorReport::SEND_ERROR_REPORT,
+                "enter_check_mode(): Failed to enter box mode after 2 minutes.",
+                env.console
             );
         }
         
@@ -123,8 +124,9 @@ void SizeChecker::enter_check_mode(SingleSwitchProgramEnvironment& env, BotBaseC
 
         default:
             OperationFailedException::fire(
-                env.console, ErrorReport::SEND_ERROR_REPORT,
-                "enter_check_mode(): No recognized state after 60 seconds."
+                ErrorReport::SEND_ERROR_REPORT,
+                "enter_check_mode(): No recognized state after 60 seconds.",
+                env.console
             );
         }
     }
@@ -141,8 +143,9 @@ void SizeChecker::exit_check_mode(SingleSwitchProgramEnvironment& env, BotBaseCo
     while (true){
         if (current_time() - start > std::chrono::minutes(2)){
             OperationFailedException::fire(
-                env.console, ErrorReport::SEND_ERROR_REPORT,
-                "exit_check_mode(): Failed to exit box mode after 2 minutes."
+                ErrorReport::SEND_ERROR_REPORT,
+                "exit_check_mode(): Failed to exit box mode after 2 minutes.",
+                env.console
             );
         }
 
@@ -179,8 +182,9 @@ void SizeChecker::exit_check_mode(SingleSwitchProgramEnvironment& env, BotBaseCo
 
         default:
             OperationFailedException::fire(
-                env.console, ErrorReport::SEND_ERROR_REPORT,
-                "exit_check_mode(): No recognized state after 60 seconds."
+                ErrorReport::SEND_ERROR_REPORT,
+                "exit_check_mode(): No recognized state after 60 seconds.",
+                env.console
             );
         }
 
@@ -241,7 +245,7 @@ void SizeChecker::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
 
                 // Initiate size checking prompt.
                 DialogBoxWatcher dialog(COLOR_GREEN, true, std::chrono::milliseconds(250), DialogType::DIALOG_WHITE);
-                int ret = run_until(
+                int ret = run_until<BotBaseContext>(
                     env.console, context,
                     [](BotBaseContext& context){
                         for (size_t c = 0; c < 10; c++){
@@ -252,8 +256,9 @@ void SizeChecker::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
                 );
                 if (ret < 0){
                     OperationFailedException::fire(
-                        env.console, ErrorReport::SEND_ERROR_REPORT,
-                        "Unable to initiate check after 10 A presses."
+                        ErrorReport::SEND_ERROR_REPORT,
+                        "Unable to initiate check after 10 A presses.",
+                        env.console
                     );
                 }
                 context.wait_for_all_requests();

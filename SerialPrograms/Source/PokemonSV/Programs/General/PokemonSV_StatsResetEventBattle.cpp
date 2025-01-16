@@ -219,7 +219,7 @@ void StatsResetEventBattle::enter_battle_ursaluna(SingleSwitchProgramEnvironment
     context.wait_for_all_requests();
 
     //Mash B until next dialog select
-    int retPrompt = run_until(
+    int retPrompt = run_until<BotBaseContext>(
         env.console, context,
         [](BotBaseContext& context){
             pbf_mash_button(context, BUTTON_B, 10000);
@@ -239,7 +239,7 @@ void StatsResetEventBattle::enter_battle_ursaluna(SingleSwitchProgramEnvironment
 
     //Mash B until next dialog select (again)
     //PromptDialogWatcher prompt_detector2(COLOR_YELLOW);
-    int retPrompt2 = run_until(
+    int retPrompt2 = run_until<BotBaseContext>(
         env.console, context,
         [](BotBaseContext& context){
             pbf_mash_button(context, BUTTON_B, 10000);
@@ -258,7 +258,7 @@ void StatsResetEventBattle::enter_battle_ursaluna(SingleSwitchProgramEnvironment
     context.wait_for_all_requests();
 
     //Now keep going until the battle starts
-    int ret_battle = run_until(
+    int ret_battle = run_until<BotBaseContext>(
         env.console, context,
         [](BotBaseContext& context){
             pbf_mash_button(context, BUTTON_B, 10000);
@@ -303,7 +303,7 @@ void StatsResetEventBattle::enter_battle_pecharunt(SingleSwitchProgramEnvironmen
 
     //Mash B until the battle starts
     //Note - Sending out Ogerpon/Loyal Three during battle adds time, but the below is more than enough.
-    int ret_battle = run_until(
+    int ret_battle = run_until<BotBaseContext>(
         env.console, context,
         [](BotBaseContext& context){
             pbf_mash_button(context, BUTTON_B, 10000);
@@ -339,7 +339,7 @@ bool StatsResetEventBattle::run_battle(SingleSwitchProgramEnvironment& env, BotB
     WallClock start = current_time();
     uint8_t switch_party_slot = 1;
 
-    int ret = run_until(
+    int ret = run_until<BotBaseContext>(
         env.console, context,
         [&](BotBaseContext& context){
             while(true){
@@ -348,8 +348,9 @@ bool StatsResetEventBattle::run_battle(SingleSwitchProgramEnvironment& env, BotB
                     stats.errors++;
                     env.update_stats();
                     OperationFailedException::fire(
-                        env.console, ErrorReport::SEND_ERROR_REPORT,
-                        "Timed out during battle after 5 minutes."
+                        ErrorReport::SEND_ERROR_REPORT,
+                        "Timed out during battle after 5 minutes.",
+                        env.console
                     );
                 }
 
@@ -381,8 +382,9 @@ bool StatsResetEventBattle::run_battle(SingleSwitchProgramEnvironment& env, BotB
                     stats.errors++;
                     env.update_stats();
                     OperationFailedException::fire(
-                        env.console, ErrorReport::SEND_ERROR_REPORT,
-                        "Timed out during battle. Stuck, crashed, or took more than 90 seconds for a turn."
+                        ErrorReport::SEND_ERROR_REPORT,
+                        "Timed out during battle. Stuck, crashed, or took more than 90 seconds for a turn.",
+                        env.console
                     );
                 }
             }
@@ -399,8 +401,9 @@ bool StatsResetEventBattle::run_battle(SingleSwitchProgramEnvironment& env, BotB
         int quantity = move_to_ball(reader, env.console, context, BALL_SELECT.slug());
         if (quantity == 0){
             OperationFailedException::fire(
-                env.console, ErrorReport::SEND_ERROR_REPORT,
-                "Unable to find appropriate ball. Did you run out?"
+                ErrorReport::SEND_ERROR_REPORT,
+                "Unable to find appropriate ball. Did you run out?",
+                env.console
             );
         }
         if (quantity < 0){
@@ -490,7 +493,7 @@ bool StatsResetEventBattle::check_stats_after_win(SingleSwitchProgramEnvironment
 #if 0
     //  Clear out dialog until we're free
     OverworldWatcher overworld(console, COLOR_YELLOW);
-    int retOverworld = run_until(
+    int retOverworld = run_until<BotBaseContext>(
         env.console, context,
         [](BotBaseContext& context){
             pbf_mash_button(context, BUTTON_B, 10000);
@@ -598,8 +601,9 @@ bool StatsResetEventBattle::check_stats_after_win(SingleSwitchProgramEnvironment
             stats.errors++;
             env.update_stats();
             OperationFailedException::fire(
-                env.console, ErrorReport::SEND_ERROR_REPORT,
-                "StatsResetEventBattle::check_stats_after_win(): No state detected after 1 minute."
+                ErrorReport::SEND_ERROR_REPORT,
+                "StatsResetEventBattle::check_stats_after_win(): No state detected after 1 minute.",
+                env.console
             );
         }
     }

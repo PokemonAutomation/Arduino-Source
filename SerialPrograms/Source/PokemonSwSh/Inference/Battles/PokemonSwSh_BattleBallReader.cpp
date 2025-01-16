@@ -63,7 +63,11 @@ std::string BattleBallReader::read_ball(const ImageViewRGB32& screen) const{
         }
     }
     if (sprite_result.results.empty()){
-        dump_image(m_console, ProgramInfo(), "BattleBallReader-Sprite", screen);
+        ImageViewRGB32 sprite = extract_box_reference(screen, m_box_sprite);
+        ImageStats stats = image_stats(sprite);
+        if (stats.stddev.sum() > 20){
+            dump_image(m_console, ProgramInfo(), "BattleBallReader-Sprite", screen);
+        }
     }
 
     OCR::StringMatchResult name_result;

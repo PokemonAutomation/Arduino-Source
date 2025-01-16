@@ -48,7 +48,7 @@ bool open_raid(ConsoleHandle& console, BotBaseContext& context){
     while (true){
         TeraCardWatcher card_detector(COLOR_RED);
         AdvanceDialogWatcher dialog(COLOR_YELLOW);
-        int ret = run_until(
+        int ret = run_until<BotBaseContext>(
             console, context,
             [](BotBaseContext& context){
                 //  Do 2 presses in quick succession in case one drops or is
@@ -130,7 +130,7 @@ void open_hosting_lobby(
         OverworldWatcher overworld(console, COLOR_RED);
         if (recovery_mode){
             context.wait_for_all_requests();
-            int ret = run_until(
+            int ret = run_until<BotBaseContext>(
                 console, context,
                 [](BotBaseContext& context){
                     pbf_press_button(context, BUTTON_B, 20, 980);
@@ -165,8 +165,9 @@ void open_hosting_lobby(
             recovery_mode = false;
             if (!open_raid(console, context)){
                 OperationFailedException::fire(
-                    console, ErrorReport::SEND_ERROR_REPORT,
-                    "No Tera raid found."
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "No Tera raid found.",
+                    console
                 );
             }
             continue;
@@ -678,8 +679,9 @@ void run_from_tera_battle(const ProgramInfo& info, ConsoleHandle& console, BotBa
         // Having a lot of Abilities activating can take a while, setting 3 minutes to be safe
         if (current_time() - start > std::chrono::minutes(3)){
             OperationFailedException::fire(
-                console, ErrorReport::SEND_ERROR_REPORT,
-                "run_from_tera_battle(): Failed to run away from tera raid battle after 3 minutes."
+                ErrorReport::SEND_ERROR_REPORT,
+                "run_from_tera_battle(): Failed to run away from tera raid battle after 3 minutes.",
+                console
             );
         }
 
@@ -706,8 +708,9 @@ void run_from_tera_battle(const ProgramInfo& info, ConsoleHandle& console, BotBa
             return;
         default:
             OperationFailedException::fire(
-                console, ErrorReport::SEND_ERROR_REPORT,
-                "run_from_tera_battle(): No recognized state after 1 minutes."
+                ErrorReport::SEND_ERROR_REPORT,
+                "run_from_tera_battle(): No recognized state after 1 minutes.",
+                console
             );
         }
     }
