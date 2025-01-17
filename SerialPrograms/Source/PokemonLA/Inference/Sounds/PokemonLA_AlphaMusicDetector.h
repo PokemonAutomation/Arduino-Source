@@ -7,9 +7,7 @@
 #ifndef PokemonAutomation_PokemonLA_AlphaMusicDetector_H
 #define PokemonAutomation_PokemonLA_AlphaMusicDetector_H
 
-#include "Common/Cpp/Concurrency/SpinLock.h"
-#include "CommonFramework/Logging/Logger.h"
-#include "CommonFramework/Inference/AudioPerSpectrumDetectorBase.h"
+#include "CommonTools/AudioTools/AudioPerSpectrumDetectorBase.h"
 
 #include <memory>
 

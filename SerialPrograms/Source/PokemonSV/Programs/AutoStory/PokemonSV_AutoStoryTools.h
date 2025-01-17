@@ -10,7 +10,7 @@
 #include <functional>
 #include "CommonFramework/Language.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonFramework/Tools/StatsTracking.h"
+#include "CommonTools/ProgramStats/StatsTracking.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 // #include "PokemonSV/Programs/PokemonSV_Navigation.h"
 

@@ -4,8 +4,8 @@
  *
  */
 
-#include "CommonFramework/Inference/SpectrogramMatcher.h"
-#include "CommonFramework/Inference/AudioTemplateCache.h"
+#include "CommonTools/AudioTools/SpectrogramMatcher.h"
+#include "CommonTools/AudioTools/AudioTemplateCache.h"
 #include "PokemonLA/PokemonLA_Settings.h"
 #include "PokemonLA_ShinySoundDetector.h"
 

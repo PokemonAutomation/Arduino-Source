@@ -9,7 +9,7 @@
 
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonFramework/Inference/BlackScreenDetector.h"
+#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

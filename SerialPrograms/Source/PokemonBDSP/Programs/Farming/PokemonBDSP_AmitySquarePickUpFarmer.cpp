@@ -4,11 +4,11 @@
  *
  */
 
-#include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonTools/ProgramStats/StatsTracking.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
-#include "PokemonBDSP/PokemonBDSP_Settings.h"
+//#include "PokemonBDSP/PokemonBDSP_Settings.h"
 #include "PokemonBDSP_AmitySquarePickUpFarmer.h"
 
 namespace PokemonAutomation{

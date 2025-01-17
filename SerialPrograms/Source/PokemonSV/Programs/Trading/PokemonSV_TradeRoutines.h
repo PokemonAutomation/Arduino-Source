@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSV_TradeRoutines_H
 #define PokemonAutomation_PokemonSV_TradeRoutines_H
 
-#include "CommonFramework/Tools/StatsTracking.h"
+#include "CommonTools/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Tools/MultiConsoleErrors.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h"

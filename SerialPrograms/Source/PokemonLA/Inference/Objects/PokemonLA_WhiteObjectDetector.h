@@ -8,7 +8,6 @@
 #define PokemonAutomation_PokemonLA_WhiteObjectDetector_H
 
 #include <vector>
-#include <list>
 #include <set>
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"

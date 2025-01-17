@@ -5,8 +5,8 @@
  */
 
 
-#include "CommonFramework/Inference/SpectrogramMatcher.h"
-#include "CommonFramework/Inference/AudioTemplateCache.h"
+#include "CommonTools/AudioTools/SpectrogramMatcher.h"
+#include "CommonTools/AudioTools/AudioTemplateCache.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "PokemonSwSh_BerryTreeRustlingSoundDetector.h"
 

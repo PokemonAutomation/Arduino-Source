@@ -11,9 +11,8 @@
 #include "CommonFramework/ImageMatch/CroppedImageDictionaryMatcher.h"
 #include "CommonFramework/ImageMatch/ImageMatchResult.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonFramework/Inference/VisualDetector.h"
 #include "CommonFramework/OCR/OCR_SmallDictionaryMatcher.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
+#include "CommonTools/VisualDetector.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.h"
 
 #include <array>

@@ -10,8 +10,8 @@
 #include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "CommonFramework/ImageMatch/ExactImageMatcher.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "CommonFramework/Inference/SpectrogramMatcher.h"
-#include "CommonFramework/Inference/AudioTemplateCache.h"
+#include "CommonTools/AudioTools/SpectrogramMatcher.h"
+#include "CommonTools/AudioTools/AudioTemplateCache.h"
 #include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSV_LetsGoKillDetector.h"
 

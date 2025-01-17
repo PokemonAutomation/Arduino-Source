@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSV_ClothingTop_H
 #define PokemonAutomation_PokemonSV_ClothingTop_H
 
-#include "CommonFramework/Inference/VisualDetector.h"
+#include "CommonTools/VisualDetector.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.h"
 
 namespace PokemonAutomation{

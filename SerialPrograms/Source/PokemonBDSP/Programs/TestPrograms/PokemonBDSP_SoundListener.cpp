@@ -15,17 +15,12 @@
 #include "CommonFramework/AudioPipeline/AudioFeed.h"
 #include "CommonFramework/AudioPipeline/AudioTemplate.h"
 #include "CommonFramework/InferenceInfra/InferenceSession.h"
-#include "CommonFramework/Inference/AudioTemplateCache.h"
-#include "CommonFramework/Inference/SpectrogramMatcher.h"
-#include "CommonFramework/Tools/StatsTracking.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "NintendoSwitch/NintendoSwitch_Settings.h"
+#include "CommonTools/AudioTools/AudioTemplateCache.h"
+#include "CommonTools/AudioTools/SpectrogramMatcher.h"
 #include "Pokemon/Pokemon_Strings.h"
-#include "PokemonBDSP/PokemonBDSP_Settings.h"
 #include "PokemonBDSP/Inference/Sounds/PokemonBDSP_ShinySoundDetector.h"
 #include "PokemonBDSP_SoundListener.h"
 
-#include <QMessageBox>
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

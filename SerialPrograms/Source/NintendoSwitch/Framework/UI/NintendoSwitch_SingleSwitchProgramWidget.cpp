@@ -13,7 +13,7 @@
 #include "CommonFramework/Startup/NewVersionCheck.h"
 #include "CommonFramework/Panels/PanelTools.h"
 #include "CommonFramework/Panels/UI/PanelElements.h"
-#include "CommonFramework/Tools/StatsTracking.h"
+#include "CommonTools/ProgramStats/StatsTracking.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgramOption.h"
 #include "NintendoSwitch_SingleSwitchProgramWidget.h"
 

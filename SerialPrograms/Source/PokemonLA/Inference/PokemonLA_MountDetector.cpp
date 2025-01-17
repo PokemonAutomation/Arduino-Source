@@ -4,12 +4,10 @@
  *
  */
 
-#include <sstream>
 #include "Common/Cpp/Exceptions.h"
-//#include "Kernels/ImageFilters/Kernels_ImageFilter_Basic.h"
-//#include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/Globals.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"

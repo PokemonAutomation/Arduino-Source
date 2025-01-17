@@ -5,17 +5,15 @@
  */
 
 #include <cmath>
-#include "Common/Compiler.h"
-#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
-#include "CommonFramework/Inference/FrozenImageDetector.h"
-#include "CommonFramework/Inference/ImageMatchDetector.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
+#include "CommonTools/VisualDetectors/FrozenImageDetector.h"
+#include "CommonTools/VisualDetectors/ImageMatchDetector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Notification.h"
 #include "PokemonBDSP/PokemonBDSP_Settings.h"

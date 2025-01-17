@@ -10,7 +10,7 @@
 //#include "Common/Compiler.h"
 #include "CommonFramework/Language.h"
 #include "CommonFramework/Notifications/EventNotificationOption.h"
-#include "CommonFramework/Tools/StatsTracking.h"
+#include "CommonTools/ProgramStats/StatsTracking.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "Pokemon/Options/Pokemon_StatsHuntFilter.h"
 #include "PokemonBDSP/Options/PokemonBDSP_ShortcutDirection.h"

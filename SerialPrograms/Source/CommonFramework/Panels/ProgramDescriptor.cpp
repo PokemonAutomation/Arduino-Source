@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Tools/StatsTracking.h"
+#include "CommonTools/ProgramStats/StatsTracking.h"
 #include "ProgramDescriptor.h"
 
 namespace PokemonAutomation{

@@ -10,7 +10,7 @@
 #include "CommonFramework/ProgramSession.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
 #include "CommonFramework/Options/Environment/PerformanceOptions.h"
-#include "StatsTracking.h"
+#include "CommonTools/ProgramStats/StatsTracking.h"
 #include "ProgramEnvironment.h"
 
 

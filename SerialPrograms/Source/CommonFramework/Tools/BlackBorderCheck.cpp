@@ -8,8 +8,8 @@
 //#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "CommonFramework/Inference/BlackBorderDetector.h"
 #include "CommonFramework/Tools/VideoStream.h"
+#include "CommonTools/VisualDetectors/BlackBorderDetector.h"
 #include "BlackBorderCheck.h"
 
 namespace PokemonAutomation{

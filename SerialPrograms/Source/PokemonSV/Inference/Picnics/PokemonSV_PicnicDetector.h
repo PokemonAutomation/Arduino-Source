@@ -10,7 +10,7 @@
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
-#include "CommonFramework/Inference/VisualDetector.h"
+#include "CommonTools/VisualDetector.h"
 #include "PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h"
 
 namespace PokemonAutomation{

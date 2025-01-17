@@ -8,9 +8,8 @@
 #define PokemonAutomation_PokemonSV_ItemPrinterJobsDetector_H
 
 #include "Common/Cpp/Color.h"
-#include "CommonFramework/Language.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonFramework/Inference/VisualDetector.h"
+#include "CommonTools/VisualDetector.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 
 namespace PokemonAutomation{

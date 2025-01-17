@@ -5,28 +5,18 @@
  */
 
 #include <cmath>
-#include <set>
-#include <sstream>
-#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
-//#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
-#include "CommonFramework/Inference/VisualDetector.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
-//#include "CommonFramework/Tools/DebugDumper.h"
-//#include "CommonFramework/Tools/ErrorDumper.h"
-#include "CommonFramework/Tools/StatsTracking.h"
+#include "CommonTools/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Tools/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Pokemon_Notification.h"
 #include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxShinyDetector.h"
-#include "PokemonSV/Inference/Tera/PokemonSV_TeraCardDetector.h"
-//#include "PokemonSV/Inference/Tera/PokemonSV_TeraSilhouetteReader.h"
-//#include "PokemonSV/Inference/Tera/PokemonSV_TeraTypeReader.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_SaveGame.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"

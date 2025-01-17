@@ -12,7 +12,7 @@
 #include "Common/Cpp/Time.h"
 #include "CommonFramework/Options/LanguageOCROption.h"
 #include "CommonFramework/InferenceInfra/InferenceSession.h"
-#include "CommonFramework/Tools/StatsTracking.h"
+#include "CommonTools/ProgramStats/StatsTracking.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 #include "Pokemon/Pokemon_EncounterStats.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_LetsGoKillDetector.h"

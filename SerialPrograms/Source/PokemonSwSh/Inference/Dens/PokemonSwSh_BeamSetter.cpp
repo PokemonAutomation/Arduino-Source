@@ -7,16 +7,15 @@
  *
  */
 
-#include "Common/Compiler.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageMatch/ImageDiff.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Inference/ImageTools.h"
-#include "CommonFramework/Inference/InferenceThrottler.h"
 #include "CommonFramework/Inference/StatAccumulator.h"
-#include "CommonFramework/Inference/TimeWindowStatTracker.h"
+#include "CommonTools/InferenceThrottler.h"
+#include "CommonTools/TrendInference/TimeWindowStatTracker.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSwSh_BeamSetter.h"
 

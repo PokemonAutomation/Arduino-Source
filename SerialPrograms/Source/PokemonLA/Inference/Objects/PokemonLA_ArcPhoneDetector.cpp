@@ -4,12 +4,13 @@
  *
  */
 
+#include "Common/Cpp/AbstractLogger.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "PokemonLA_ArcPhoneDetector.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

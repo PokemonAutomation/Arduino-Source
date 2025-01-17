@@ -15,12 +15,12 @@
 #include "CommonFramework/Options/StringSelectOption.h"
 #include "CommonFramework/Options/LanguageOCROption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
+#include "CommonTools/ProgramStats/StatsTracking.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h"
 #include "PokemonSwSh/Options/PokemonSwSh_BallSelectOption.h"
 #include "PokemonSwSh/Options/EncounterFilter/PokemonSwSh_EncounterFilterOption.h"
 #include "PokemonSV/Options/PokemonSV_PlayerList.h"
-#include "CommonFramework/Tools/StatsTracking.h"
 #include "PokemonSV/Options/PokemonSV_SinglesAIOption.h"
 
 namespace PokemonAutomation{

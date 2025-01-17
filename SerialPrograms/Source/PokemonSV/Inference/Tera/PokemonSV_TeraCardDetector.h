@@ -7,13 +7,11 @@
 #ifndef PokemonAutomation_PokemonSV_TeraCardDetector_H
 #define PokemonAutomation_PokemonSV_TeraCardDetector_H
 
-#include <atomic>
-#include <mutex>
 #include "Common/Cpp/Color.h"
 #include "Common/Cpp/AbstractLogger.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonFramework/Inference/VisualDetector.h"
 //#include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
+#include "CommonTools/VisualDetector.h"
 #include "PokemonSV/Options/PokemonSV_PlayerList.h"
 #include "PokemonSV_TeraTypeReader.h"
 #include "PokemonSV_TeraSilhouetteReader.h"

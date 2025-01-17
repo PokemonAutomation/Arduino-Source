@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_BerryTreeRustlingSoundDetector_H
 #define PokemonAutomation_PokemonSwSh_BerryTreeRustlingSoundDetector_H
 
-#include "CommonFramework/Inference/AudioPerSpectrumDetectorBase.h"
+#include "CommonTools/AudioTools/AudioPerSpectrumDetectorBase.h"
 
 namespace PokemonAutomation{
     class SpectrogramMatcher;

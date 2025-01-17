@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSV_TeraBattleMenus_H
 #define PokemonAutomation_PokemonSV_TeraBattleMenus_H
 
-#include "CommonFramework/Inference/VisualDetector.h"
+#include "CommonTools/VisualDetector.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 #include "PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.h"

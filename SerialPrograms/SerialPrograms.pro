@@ -211,15 +211,7 @@ SOURCES += \
     Source/CommonFramework/ImageTypes/ImageViewHSV32.cpp \
     Source/CommonFramework/ImageTypes/ImageViewPlanar32.cpp \
     Source/CommonFramework/ImageTypes/ImageViewRGB32.cpp \
-    Source/CommonFramework/Inference/AnomalyDetector.cpp \
-    Source/CommonFramework/Inference/AudioPerSpectrumDetectorBase.cpp \
-    Source/CommonFramework/Inference/AudioTemplateCache.cpp \
-    Source/CommonFramework/Inference/BlackBorderDetector.cpp \
-    Source/CommonFramework/Inference/BlackScreenDetector.cpp \
-    Source/CommonFramework/Inference/FrozenImageDetector.cpp \
-    Source/CommonFramework/Inference/ImageMatchDetector.cpp \
     Source/CommonFramework/Inference/ImageTools.cpp \
-    Source/CommonFramework/Inference/SpectrogramMatcher.cpp \
     Source/CommonFramework/Inference/StatAccumulator.cpp \
     Source/CommonFramework/InferenceInfra/AudioInferencePivot.cpp \
     Source/CommonFramework/InferenceInfra/InferenceRoutines.cpp \
@@ -285,8 +277,6 @@ SOURCES += \
     Source/CommonFramework/Tools/InterruptableCommands.tpp \
     Source/CommonFramework/Tools/MultiConsoleErrors.cpp \
     Source/CommonFramework/Tools/ProgramEnvironment.cpp \
-    Source/CommonFramework/Tools/StatsDatabase.cpp \
-    Source/CommonFramework/Tools/StatsTracking.cpp \
     Source/CommonFramework/Tools/VideoResolutionCheck.cpp \
     Source/CommonFramework/Tools/VideoStream.cpp \
     Source/CommonFramework/VideoPipeline/Backends/CameraImplementations.cpp \
@@ -306,6 +296,16 @@ SOURCES += \
     Source/CommonFramework/Windows/DpiScaler.cpp \
     Source/CommonFramework/Windows/MainWindow.cpp \
     Source/CommonFramework/Windows/WindowTracker.cpp \
+    Source/CommonTools/AudioTools/AudioPerSpectrumDetectorBase.cpp \
+    Source/CommonTools/AudioTools/AudioTemplateCache.cpp \
+    Source/CommonTools/AudioTools/SpectrogramMatcher.cpp \
+    Source/CommonTools/ProgramStats/StatsDatabase.cpp \
+    Source/CommonTools/ProgramStats/StatsTracking.cpp \
+    Source/CommonTools/TrendInference/AnomalyDetector.cpp \
+    Source/CommonTools/VisualDetectors/BlackBorderDetector.cpp \
+    Source/CommonTools/VisualDetectors/BlackScreenDetector.cpp \
+    Source/CommonTools/VisualDetectors/FrozenImageDetector.cpp \
+    Source/CommonTools/VisualDetectors/ImageMatchDetector.cpp \
     Source/ComputerPrograms/ComputerProgram.cpp \
     Source/ComputerPrograms/Framework/ComputerProgramOption.cpp \
     Source/ComputerPrograms/Framework/ComputerProgramSession.cpp \
@@ -1299,20 +1299,8 @@ HEADERS += \
     Source/CommonFramework/ImageTypes/ImageViewHSV32.h \
     Source/CommonFramework/ImageTypes/ImageViewPlanar32.h \
     Source/CommonFramework/ImageTypes/ImageViewRGB32.h \
-    Source/CommonFramework/Inference/AnomalyDetector.h \
-    Source/CommonFramework/Inference/AudioPerSpectrumDetectorBase.h \
-    Source/CommonFramework/Inference/AudioTemplateCache.h \
-    Source/CommonFramework/Inference/BlackBorderDetector.h \
-    Source/CommonFramework/Inference/BlackScreenDetector.h \
-    Source/CommonFramework/Inference/DetectionDebouncer.h \
-    Source/CommonFramework/Inference/FrozenImageDetector.h \
-    Source/CommonFramework/Inference/ImageMatchDetector.h \
     Source/CommonFramework/Inference/ImageTools.h \
-    Source/CommonFramework/Inference/InferenceThrottler.h \
-    Source/CommonFramework/Inference/SpectrogramMatcher.h \
     Source/CommonFramework/Inference/StatAccumulator.h \
-    Source/CommonFramework/Inference/TimeWindowStatTracker.h \
-    Source/CommonFramework/Inference/VisualDetector.h \
     Source/CommonFramework/InferenceInfra/AudioInferenceCallback.h \
     Source/CommonFramework/InferenceInfra/AudioInferencePivot.h \
     Source/CommonFramework/InferenceInfra/InferenceCallback.h \
@@ -1385,8 +1373,6 @@ HEADERS += \
     Source/CommonFramework/Tools/InterruptableCommands.tpp \
     Source/CommonFramework/Tools/MultiConsoleErrors.h \
     Source/CommonFramework/Tools/ProgramEnvironment.h \
-    Source/CommonFramework/Tools/StatsDatabase.h \
-    Source/CommonFramework/Tools/StatsTracking.h \
     Source/CommonFramework/Tools/SuperControlSession.h \
     Source/CommonFramework/Tools/SuperControlSession.tpp \
     Source/CommonFramework/Tools/VideoResolutionCheck.h \
@@ -1415,6 +1401,20 @@ HEADERS += \
     Source/CommonFramework/Windows/DpiScaler.h \
     Source/CommonFramework/Windows/MainWindow.h \
     Source/CommonFramework/Windows/WindowTracker.h \
+    Source/CommonTools/AudioTools/AudioPerSpectrumDetectorBase.h \
+    Source/CommonTools/AudioTools/AudioTemplateCache.h \
+    Source/CommonTools/AudioTools/SpectrogramMatcher.h \
+    Source/CommonTools/DetectionDebouncer.h \
+    Source/CommonTools/InferenceThrottler.h \
+    Source/CommonTools/ProgramStats/StatsDatabase.h \
+    Source/CommonTools/ProgramStats/StatsTracking.h \
+    Source/CommonTools/TrendInference/AnomalyDetector.h \
+    Source/CommonTools/TrendInference/TimeWindowStatTracker.h \
+    Source/CommonTools/VisualDetector.h \
+    Source/CommonTools/VisualDetectors/BlackBorderDetector.h \
+    Source/CommonTools/VisualDetectors/BlackScreenDetector.h \
+    Source/CommonTools/VisualDetectors/FrozenImageDetector.h \
+    Source/CommonTools/VisualDetectors/ImageMatchDetector.h \
     Source/ComputerPrograms/ComputerProgram.h \
     Source/ComputerPrograms/Framework/ComputerProgramOption.h \
     Source/ComputerPrograms/Framework/ComputerProgramSession.h \

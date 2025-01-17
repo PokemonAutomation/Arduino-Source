@@ -7,9 +7,9 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PanicDump.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
-#include "CommonFramework/Tools/StatsDatabase.h"
 #include "CommonFramework/Panels/ProgramDescriptor.h"
 #include "CommonFramework/ProgramSession.h"
+#include "CommonTools/ProgramStats/StatsDatabase.h"
 #include "Integrations/ProgramTracker.h"
 
 namespace PokemonAutomation{

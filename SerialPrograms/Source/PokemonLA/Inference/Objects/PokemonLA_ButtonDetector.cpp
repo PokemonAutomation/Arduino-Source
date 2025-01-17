@@ -4,11 +4,12 @@
  *
  */
 
+#include "Common/Cpp/AbstractLogger.h"
 #include "PokemonLA_ButtonDetector.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

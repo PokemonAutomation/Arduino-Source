@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSV_ShinySoundDetector_H
 #define PokemonAutomation_PokemonSV_ShinySoundDetector_H
 
-#include "CommonFramework/Inference/AudioPerSpectrumDetectorBase.h"
+#include "CommonTools/AudioTools/AudioPerSpectrumDetectorBase.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
