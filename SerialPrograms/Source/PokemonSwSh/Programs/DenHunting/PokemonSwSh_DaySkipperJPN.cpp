@@ -65,7 +65,7 @@ DaySkipperJPN::DaySkipperJPN()
     PA_ADD_OPTION(CORRECTION_SKIPS);
 }
 
-void DaySkipperJPN::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void DaySkipperJPN::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     SkipperStats& stats = env.current_stats<SkipperStats>();
     stats.total_skips = SKIPS;
     stats.runs++;

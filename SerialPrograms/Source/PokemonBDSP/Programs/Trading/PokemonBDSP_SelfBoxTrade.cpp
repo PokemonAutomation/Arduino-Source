@@ -60,7 +60,7 @@ void SelfBoxTrade::program(MultiSwitchProgramEnvironment& env, CancellableScope&
 
     for (uint8_t box = 0; box < BOXES_TO_TRADE; box++){
         if (box != 0){
-            env.run_in_parallel(scope, [](ConsoleHandle& console, BotBaseContext& context){
+            env.run_in_parallel(scope, [](ConsoleHandle& console, ControllerContext& context){
                 pbf_press_button(context, BUTTON_R, 20, GameSettings::instance().BOX_CHANGE_DELAY_0);
             });
         }

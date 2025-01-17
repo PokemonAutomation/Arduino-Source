@@ -30,11 +30,11 @@ public:
 class StarterReset : public SingleSwitchProgramInstance{
 public:
     StarterReset();
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ControllerContext& context) override;
 
 
 private:
-    void run_trigger(BotBaseContext& context) const;
+    void run_trigger(ControllerContext& context) const;
     bool find_encounter(SingleSwitchProgramEnvironment& env) const;
 
 private:

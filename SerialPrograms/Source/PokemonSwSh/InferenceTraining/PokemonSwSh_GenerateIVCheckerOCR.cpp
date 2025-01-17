@@ -64,7 +64,7 @@ GenerateIVCheckerOCR::GenerateIVCheckerOCR()
 }
 
 
-void GenerateIVCheckerOCR::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void GenerateIVCheckerOCR::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     IvJudgeReaderScope reader(env.console, LANGUAGE);
 
     std::string path = "IVCheckerOCR/";

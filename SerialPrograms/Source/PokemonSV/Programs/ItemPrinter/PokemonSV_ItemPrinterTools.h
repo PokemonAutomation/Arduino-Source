@@ -8,12 +8,12 @@
 #define PokemonAutomation_PokemonSV_ItemPrinterTools_H
 
 #include <array>
-#include "CommonFramework/Language.h"
 #include "Common/Cpp/EnumDatabase.h"
+#include "CommonFramework/Language.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 
 namespace PokemonAutomation{
     class AsyncDispatcher;
-    class BotBaseContext;
 namespace NintendoSwitch{
     class ConsoleHandle;
 namespace PokemonSV{
@@ -34,12 +34,12 @@ struct ItemPrinterPrizeResult{
 
 void item_printer_start_print(
     AsyncDispatcher& dispatcher,
-    ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, ControllerContext& context,
     Language language, ItemPrinterJobs jobs
 );
 ItemPrinterPrizeResult item_printer_finish_print(
     AsyncDispatcher& dispatcher,
-    ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, ControllerContext& context,
     Language language
 );
 

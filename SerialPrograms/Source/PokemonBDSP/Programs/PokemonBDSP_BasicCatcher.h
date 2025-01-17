@@ -12,7 +12,6 @@
 #include "Pokemon/Pokemon_Notification.h"
 
 namespace PokemonAutomation{
-    class BotBaseContext;
 namespace NintendoSwitch{
 namespace PokemonBDSP{
 
@@ -34,7 +33,7 @@ struct CatchResults{
 //
 // Don't handle the case that own pokemon evolving or black out to Pokecenter.
 CatchResults basic_catcher(
-    ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, ControllerContext& context,
     Language language,
     const std::string& ball_slug, uint16_t ball_limit
 );

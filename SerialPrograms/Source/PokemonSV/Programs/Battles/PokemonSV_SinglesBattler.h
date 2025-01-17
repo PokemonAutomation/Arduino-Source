@@ -7,7 +7,6 @@
 #ifndef PokemonAutomation_PokemonSV_SinglesBattler_H
 #define PokemonAutomation_PokemonSV_SinglesBattler_H
 
-#include "ClientSource/Connection/BotBase.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "PokemonSV/Options/PokemonSV_SinglesMoveTable.h"
@@ -24,7 +23,7 @@ namespace PokemonSV{
 //};
 
 bool run_pokemon(
-    ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, ControllerContext& context,
     const std::vector<SinglesMoveEntry>& move_table,
     bool trainer_battle, bool& terastallized
 );
@@ -33,7 +32,7 @@ bool run_pokemon(
 //  Run a singles battle until it is over (for whatever reason).
 bool run_singles_battle(
     ProgramEnvironment& env,
-    ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, ControllerContext& context,
     SinglesAIOption& battle_AI,
     bool trainer_battle
 );

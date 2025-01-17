@@ -9,7 +9,6 @@
 
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
-#include "ClientSource/Connection/BotBase.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Notifications/EventNotificationOption.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
@@ -29,7 +28,7 @@ class TeraLobbyWaiter{
 public:
     TeraLobbyWaiter(
         ProgramEnvironment& env,
-        ConsoleHandle& console, BotBaseContext& context,
+        ConsoleHandle& console, ControllerContext& context,
         uint8_t host_players,
         const std::string& lobby_code, WallClock start_time,
         SimpleIntegerOption<uint16_t>& LOBBY_WAIT_DELAY,
@@ -73,7 +72,7 @@ private:
 private:
     ProgramEnvironment& m_env;
     ConsoleHandle& m_console;
-    BotBaseContext& m_context;
+    ControllerContext& m_context;
     uint8_t m_host_players;
 
     const std::string& m_lobby_code;

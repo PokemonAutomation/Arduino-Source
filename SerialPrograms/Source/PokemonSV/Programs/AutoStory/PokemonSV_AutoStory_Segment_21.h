@@ -27,13 +27,13 @@ public:
     virtual std::string end_text() const override;
     virtual void run_segment(
         SingleSwitchProgramEnvironment& env, 
-        BotBaseContext& context,
+        ControllerContext& context,
         AutoStoryOptions options) const override;
 };
 
 // start: Defeated Artazon Gym (Grass). Inside gym building.
 // end: At East Province (Area One) Pokecenter.
-void checkpoint_46(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EventNotificationOption& notif_status_update);  
+void checkpoint_46(SingleSwitchProgramEnvironment& env, ControllerContext& context, EventNotificationOption& notif_status_update);  
 
 
 }

@@ -45,7 +45,7 @@ SkipToFullMoon::SkipToFullMoon()
 }
 
 
-void SkipToFullMoon::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void SkipToFullMoon::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     //  Connect the controller.
     pbf_press_button(context, BUTTON_LCLICK, 5, 5);
 
@@ -105,9 +105,9 @@ void SkipToFullMoon::program(SingleSwitchProgramEnvironment& env, BotBaseContext
 
 
         ArcPhoneDetector arc_phone_detector(env.console, env.console, std::chrono::milliseconds(100), stop_on_detected);
-        run_until<BotBaseContext>(
+        run_until<ControllerContext>(
             env.console, context,
-            [](BotBaseContext& local_context){
+            [](ControllerContext& local_context){
                 // pbf_mash_button(local_context, BUTTON_B, 7 * TICKS_PER_SECOND);
                 for(size_t i = 0; i < 15; i++){
                      pbf_press_button(local_context, BUTTON_B, 20, 80);

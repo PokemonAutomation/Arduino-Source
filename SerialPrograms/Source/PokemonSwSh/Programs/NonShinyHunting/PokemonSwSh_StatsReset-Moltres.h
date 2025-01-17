@@ -34,7 +34,7 @@ public:
 class StatsResetMoltres : public SingleSwitchProgramInstance{
 public:
     StatsResetMoltres();
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ControllerContext& context) override;
 
 private:
     StartInGripOrGameOption START_LOCATION;

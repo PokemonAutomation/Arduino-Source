@@ -80,7 +80,7 @@ AutoItemPrinter::AutoItemPrinter()
 }
 
 
-void AutoItemPrinter::enter_printing_mode(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void AutoItemPrinter::enter_printing_mode(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     env.console.log("Entering printing mode...");
 
     while (true){
@@ -122,7 +122,7 @@ void AutoItemPrinter::enter_printing_mode(SingleSwitchProgramEnvironment& env, B
 
 
 
-void AutoItemPrinter::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void AutoItemPrinter::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
     AutoItemPrinter_Descriptor::Stats& stats = env.current_stats<AutoItemPrinter_Descriptor::Stats>();

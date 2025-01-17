@@ -21,10 +21,10 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 
-void return_to_academy_after_loss(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+void return_to_academy_after_loss(SingleSwitchProgramEnvironment& env, ControllerContext& context);
 
 // attempt to fly back to academy fly point from the West Mesogoza Pokecenter. Will attempt maxAttempts times.
-void go_to_academy_fly_point(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+void go_to_academy_fly_point(SingleSwitchProgramEnvironment& env, ControllerContext& context);
 
 class TournamentFarmer_Descriptor : public SingleSwitchProgramDescriptor{
 public:
@@ -37,7 +37,7 @@ class TournamentFarmer : public SingleSwitchProgramInstance, public ButtonListen
 public:
     ~TournamentFarmer();
     TournamentFarmer();
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ControllerContext& context) override;
     virtual void on_press() override;
 
 private:
@@ -65,10 +65,10 @@ private:
 
     std::atomic<bool> m_stop_after_current;
 
-    void check_money(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-    void run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-    void check_prize(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-    void handle_end_of_tournament(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    void check_money(SingleSwitchProgramEnvironment& env, ControllerContext& context);
+    void run_battle(SingleSwitchProgramEnvironment& env, ControllerContext& context);
+    void check_prize(SingleSwitchProgramEnvironment& env, ControllerContext& context);
+    void handle_end_of_tournament(SingleSwitchProgramEnvironment& env, ControllerContext& context);
 };
 
 }

@@ -33,11 +33,11 @@ public:
 class LeapGrinder : public SingleSwitchProgramInstance{
 public:
     LeapGrinder();
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ControllerContext& context) override;
 
 private:
-    bool run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-    bool quick_check(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    bool run_iteration(SingleSwitchProgramEnvironment& env, ControllerContext& context);
+    bool quick_check(SingleSwitchProgramEnvironment& env, ControllerContext& context);
 
 private:
     class RunRoute;

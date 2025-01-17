@@ -74,7 +74,7 @@ const std::set<std::string> WILD_NEARBY_POKEMON[] = {
 // Otherwise, it returns the details of the pokemon thrown at.
 std::pair<bool, PokemonDetails> control_focus_to_throw(
     SingleSwitchProgramEnvironment& env,
-    BotBaseContext& context, 
+    ControllerContext& context, 
     const std::set<std::string>& target_pokemon,
     const std::set<std::string>& nearby_pokemon,
     Language language
@@ -88,7 +88,7 @@ std::pair<bool, PokemonDetails> control_focus_to_throw(
     );
 
     // First, let controller press ZL non-stop to start focusing on a pokemon
-    session.dispatch([](BotBaseContext& context){
+    session.dispatch([](ControllerContext& context){
         pbf_press_button(context, BUTTON_ZL, 10000, 0);
     });
 
@@ -147,7 +147,7 @@ std::pair<bool, PokemonDetails> control_focus_to_throw(
             // We are focusing on a target pokemon
             // Press ZR to throw sth.
             // Dispatch a new series of commands that overwrites the last ones
-            session.dispatch([](BotBaseContext& context){
+            session.dispatch([](ControllerContext& context){
                 pbf_press_button(context, BUTTON_ZL | BUTTON_ZR, 30, 0);
                 pbf_press_button(context, BUTTON_ZL, 50, 0);
             });
@@ -182,7 +182,7 @@ std::pair<bool, PokemonDetails> control_focus_to_throw(
         if (focus_index < max_focus_change_attempt){
             // We focused onto a pokemon that is not the target pokemon, but there are other pokemon that can be focused.
             // Press A to change focus.
-            session.dispatch([](BotBaseContext& context){
+            session.dispatch([](ControllerContext& context){
                 pbf_press_button(context, BUTTON_ZL | BUTTON_A, 30, 0);
                 pbf_press_button(context, BUTTON_ZL, 10000, 0);
             });
@@ -276,7 +276,7 @@ std::vector<int> parse_multispawn_path(SingleSwitchProgramEnvironment& env, cons
 }
 
 
-void AutoMultiSpawn::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void AutoMultiSpawn::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     //  Connect the controller.
     pbf_press_button(context, BUTTON_LCLICK, 5, 5);
 
@@ -329,7 +329,7 @@ void AutoMultiSpawn::program(SingleSwitchProgramEnvironment& env, BotBaseContext
 
 void AutoMultiSpawn::advance_one_path_step(
     SingleSwitchProgramEnvironment& env,
-    BotBaseContext& context,
+    ControllerContext& context,
     size_t num_spawned_pokemon,
     size_t num_to_despawn,
     TimeOfDay cur_time,
@@ -404,7 +404,7 @@ void AutoMultiSpawn::advance_one_path_step(
 // From camp, go to spawn, do one battle to remove pokemon. If no error, return camp
 size_t AutoMultiSpawn::try_one_battle_to_remove_pokemon(
     SingleSwitchProgramEnvironment& env,
-    BotBaseContext& context,
+    ControllerContext& context,
     size_t num_left,
     size_t num_to_despawn
 ){
@@ -566,7 +566,7 @@ size_t AutoMultiSpawn::try_one_battle_to_remove_pokemon(
 
 PokemonDetails AutoMultiSpawn::go_to_spawn_point_and_try_focusing_pokemon(
     SingleSwitchProgramEnvironment& env,
-    BotBaseContext& context,
+    ControllerContext& context,
     size_t nun_pokemon_left
 ){
     // From camp fly to the spawn point, focus on a target pokemon and start a battle

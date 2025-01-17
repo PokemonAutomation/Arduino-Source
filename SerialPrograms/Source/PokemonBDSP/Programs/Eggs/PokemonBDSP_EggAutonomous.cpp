@@ -147,7 +147,7 @@ EggAutonomous::EggAutonomous()
 
 
 bool EggAutonomous::run_batch(
-    SingleSwitchProgramEnvironment& env, BotBaseContext& context,
+    SingleSwitchProgramEnvironment& env, ControllerContext& context,
     EggAutonomousState& saved_state,
     EggAutonomousState& current_state
 ){
@@ -177,7 +177,7 @@ bool EggAutonomous::run_batch(
     return current_state.process_batch();
 }
 
-void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void EggAutonomous::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     EggAutonomousStats& stats = env.current_stats<EggAutonomousStats>();
     env.update_stats();
 

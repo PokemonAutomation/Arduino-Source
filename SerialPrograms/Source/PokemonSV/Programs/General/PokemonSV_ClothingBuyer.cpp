@@ -64,7 +64,7 @@ ClothingBuyer::ClothingBuyer()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void ClothingBuyer::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void ClothingBuyer::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
     /*

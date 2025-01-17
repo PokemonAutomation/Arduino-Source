@@ -35,14 +35,14 @@ TurboMacro::TurboMacro()
     PA_ADD_OPTION(MACRO);
 }
 
-void TurboMacro::run_macro(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void TurboMacro::run_macro(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     std::vector<std::unique_ptr<TurboMacroRow>> table = MACRO.copy_snapshot();
     for (const std::unique_ptr<TurboMacroRow>& row : table){
         execute_action(env.console, context, *row);
     }
 }
 
-void TurboMacro::execute_action(ConsoleHandle& console, BotBaseContext& context, const TurboMacroRow& row){
+void TurboMacro::execute_action(ConsoleHandle& console, ControllerContext& context, const TurboMacroRow& row){
     console.log("Execute action " + row.action.current_display());
     const TurboMacroCell& cell = row.parameters;
     switch(row.action){
@@ -107,7 +107,7 @@ void TurboMacro::execute_action(ConsoleHandle& console, BotBaseContext& context,
     }
 }
 
-void TurboMacro::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void TurboMacro::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
 
     //  Connect the controller.
     //pbf_press_button(context, BUTTON_LCLICK, 5, 5);

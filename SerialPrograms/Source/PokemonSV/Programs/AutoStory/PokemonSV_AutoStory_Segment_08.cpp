@@ -38,7 +38,7 @@ std::string AutoStory_Segment_08::end_text() const{
     return "End: Battled Team Star, talked to Jacq, standing in classroom.";
 }
 
-void AutoStory_Segment_08::run_segment(SingleSwitchProgramEnvironment& env, BotBaseContext& context, AutoStoryOptions options) const{
+void AutoStory_Segment_08::run_segment(SingleSwitchProgramEnvironment& env, ControllerContext& context, AutoStoryOptions options) const{
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
 
     context.wait_for_all_requests();
@@ -59,7 +59,7 @@ void AutoStory_Segment_08::run_segment(SingleSwitchProgramEnvironment& env, BotB
 
 void checkpoint_13(
     SingleSwitchProgramEnvironment& env, 
-    BotBaseContext& context, 
+    ControllerContext& context, 
     EventNotificationOption& notif_status_update
 ){
     // reset rate: 0%. 0 resets out of 70.
@@ -68,7 +68,7 @@ void checkpoint_13(
     while (true){
     try{
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
-        [&](const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){        
+        [&](const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context){        
         
             if (first_attempt){
                 checkpoint_save(env, context, notif_status_update);
@@ -110,7 +110,7 @@ void checkpoint_13(
 
 void checkpoint_14(
     SingleSwitchProgramEnvironment& env, 
-    BotBaseContext& context, 
+    ControllerContext& context, 
     EventNotificationOption& notif_status_update
 ){
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
@@ -168,7 +168,7 @@ void checkpoint_14(
 
 void checkpoint_15(
     SingleSwitchProgramEnvironment& env, 
-    BotBaseContext& context, 
+    ControllerContext& context, 
     EventNotificationOption& notif_status_update
 ){
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();

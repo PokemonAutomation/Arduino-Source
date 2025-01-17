@@ -231,7 +231,7 @@ OutbreakFinder::OutbreakFinder()
 
 
 std::set<std::string> OutbreakFinder::read_travel_map_outbreaks(
-    SingleSwitchProgramEnvironment& env, BotBaseContext& context,
+    SingleSwitchProgramEnvironment& env, ControllerContext& context,
     const std::set<std::string>& desired_events
 ){
     OutbreakFinder_Descriptor::Stats& stats = env.current_stats<OutbreakFinder_Descriptor::Stats>();
@@ -332,7 +332,7 @@ std::set<std::string> OutbreakFinder::read_travel_map_outbreaks(
 }
 
 
-void OutbreakFinder::goto_region_and_return(SingleSwitchProgramEnvironment& env, BotBaseContext& context, 
+void OutbreakFinder::goto_region_and_return(SingleSwitchProgramEnvironment& env, ControllerContext& context, 
     bool inside_travel_map
 ){
     OutbreakFinder_Descriptor::Stats& stats = env.current_stats<OutbreakFinder_Descriptor::Stats>();
@@ -402,9 +402,9 @@ void OutbreakFinder::goto_region_and_return(SingleSwitchProgramEnvironment& env,
             ButtonType::ButtonA, ImageFloatBox(0.50, 0.50, 0.30, 0.30),
             std::chrono::milliseconds(200), true
         );
-        int ret = run_until<BotBaseContext>(
+        int ret = run_until<ControllerContext>(
             env.console, context,
-            [](BotBaseContext& context){
+            [](ControllerContext& context){
                 for (size_t c = 0; c < 10; c++){
                     pbf_press_button(context, BUTTON_A, 20, 125);
                 }
@@ -425,7 +425,7 @@ void OutbreakFinder::goto_region_and_return(SingleSwitchProgramEnvironment& env,
 }
 
 std::set<std::string> OutbreakFinder::enter_region_and_read_MMO(
-    SingleSwitchProgramEnvironment& env, BotBaseContext& context,
+    SingleSwitchProgramEnvironment& env, ControllerContext& context,
     const std::string& mmo_name,
     const std::set<std::string>& desired_MMOs,
     const std::set<std::string>& desired_star_MMOs
@@ -664,7 +664,7 @@ std::set<std::string> OutbreakFinder::enter_region_and_read_MMO(
 
 
 bool OutbreakFinder::run_iteration(
-    SingleSwitchProgramEnvironment& env, BotBaseContext& context,
+    SingleSwitchProgramEnvironment& env, ControllerContext& context,
     const std::set<std::string>& desired_hisui_map_events,
     const std::set<std::string>& desired_outbreaks,
     const std::set<std::string>& desired_MMOs,
@@ -759,7 +759,7 @@ std::set<std::string> OutbreakFinder::to_set(const StringSelectTableOption& opti
     return ret;
 }
 
-void OutbreakFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void OutbreakFinder::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
 //    OutbreakFinder_Descriptor::Stats& stats = env.current_stats<OutbreakFinder_Descriptor::Stats>();
 
     // goto_Mai_from_camp(env.logger(), context, Camp::HIGHLANDS_HIGHLANDS);

@@ -38,7 +38,7 @@ std::string AutoStory_Segment_00::end_text() const{
     return "End: Finished cutscene.";
 }
 
-void AutoStory_Segment_00::run_segment(SingleSwitchProgramEnvironment& env, BotBaseContext& context, AutoStoryOptions options) const{
+void AutoStory_Segment_00::run_segment(SingleSwitchProgramEnvironment& env, ControllerContext& context, AutoStoryOptions options) const{
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
 
     context.wait_for_all_requests();
@@ -55,15 +55,15 @@ void AutoStory_Segment_00::run_segment(SingleSwitchProgramEnvironment& env, BotB
 }
 
 
-void checkpoint_00(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void checkpoint_00(SingleSwitchProgramEnvironment& env, ControllerContext& context){
 
 
     // Mash A through intro cutscene, until the L stick button is detected
     WhiteButtonWatcher leftstick(COLOR_GREEN, WhiteButton::ButtonLStick, {0.435, 0.912, 0.046, 0.047});
     context.wait_for_all_requests();
-    run_until<BotBaseContext>(
+    run_until<ControllerContext>(
         env.console, context,
-        [](BotBaseContext& context){
+        [](ControllerContext& context){
             pbf_mash_button(context, BUTTON_A, 240 * TICKS_PER_SECOND);
         },
         {leftstick}

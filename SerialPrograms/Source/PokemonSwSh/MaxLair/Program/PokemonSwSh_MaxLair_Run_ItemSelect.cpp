@@ -21,7 +21,7 @@ namespace MaxLairInternal{
 
 
 void run_item_select(
-    ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, ControllerContext& context,
     GlobalStateTracker& state_tracker
 ){
     size_t console_index = console.index();

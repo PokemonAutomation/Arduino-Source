@@ -172,7 +172,7 @@ CramomaticRNG::CramomaticRNG()
     PA_ADD_OPTION(LOG_VALUES);
 }
 
-void CramomaticRNG::navigate_to_party(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void CramomaticRNG::navigate_to_party(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     pbf_press_button(context, BUTTON_X, 10, 125);
     pbf_press_button(context, BUTTON_A, 10, 10);
     pbf_wait(context, 2 * TICKS_PER_SECOND);
@@ -280,7 +280,7 @@ CramomaticTarget CramomaticRNG::calculate_target(SingleSwitchProgramEnvironment&
     return possible_targets[0];
 }
 
-void CramomaticRNG::leave_to_overworld_and_interact(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void CramomaticRNG::leave_to_overworld_and_interact(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     pbf_press_button(context, BUTTON_B, 2 * TICKS_PER_SECOND, 5);
     pbf_press_button(context, BUTTON_B, 10, 70);
 
@@ -288,7 +288,7 @@ void CramomaticRNG::leave_to_overworld_and_interact(SingleSwitchProgramEnvironme
     pbf_wait(context, 125);
 }
 
-void CramomaticRNG::choose_apricorn(SingleSwitchProgramEnvironment& env, BotBaseContext& context, bool sport){
+void CramomaticRNG::choose_apricorn(SingleSwitchProgramEnvironment& env, ControllerContext& context, bool sport){
     // check whether the bag is open
     context.wait_for_all_requests();
     VideoOverlaySet boxes(env.console);
@@ -320,7 +320,7 @@ void CramomaticRNG::choose_apricorn(SingleSwitchProgramEnvironment& env, BotBase
     pbf_mash_button(context, BUTTON_A, 5 * TICKS_PER_SECOND);
 }
 
-std::pair<bool, std::string> CramomaticRNG::receive_ball(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+std::pair<bool, std::string> CramomaticRNG::receive_ball(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     // receive ball and refuse to use the cram-o-matic again
     VideoOverlaySet boxes(env.console);
 
@@ -371,7 +371,7 @@ std::pair<bool, std::string> CramomaticRNG::receive_ball(SingleSwitchProgramEnvi
     return {arrow_detected, best_ball};
 }
 
-void CramomaticRNG::recover_from_wrong_state(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void CramomaticRNG::recover_from_wrong_state(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     // Mash the B button to exit potential menus or dialog boxes
     pbf_mash_button(context, BUTTON_B, 30 * TICKS_PER_SECOND);
 
@@ -382,7 +382,7 @@ void CramomaticRNG::recover_from_wrong_state(SingleSwitchProgramEnvironment& env
 }
 
 
-void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     CramomaticRNG_Descriptor::Stats& stats = env.current_stats<CramomaticRNG_Descriptor::Stats>();
     env.update_stats();
 

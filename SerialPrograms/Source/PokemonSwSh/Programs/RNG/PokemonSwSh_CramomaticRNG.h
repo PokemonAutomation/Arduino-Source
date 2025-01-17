@@ -41,7 +41,7 @@ class CramomaticRNG : public SingleSwitchProgramInstance{
 public:
     CramomaticRNG();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ControllerContext& context) override;
 
 private:
     StartInGripOrGameOption START_LOCATION;
@@ -64,12 +64,12 @@ private:
     BooleanCheckBoxOption SAVE_SCREENSHOTS;
     BooleanCheckBoxOption LOG_VALUES;
 
-    void navigate_to_party(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    void navigate_to_party(SingleSwitchProgramEnvironment& env, ControllerContext& context);
     CramomaticTarget calculate_target(SingleSwitchProgramEnvironment& env, Xoroshiro128PlusState state, std::vector<CramomaticSelection> wanted_balls);
-    void leave_to_overworld_and_interact(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-    void choose_apricorn(SingleSwitchProgramEnvironment& env, BotBaseContext& context, bool sport);
-    std::pair<bool, std::string> receive_ball(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-    void recover_from_wrong_state(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    void leave_to_overworld_and_interact(SingleSwitchProgramEnvironment& env, ControllerContext& context);
+    void choose_apricorn(SingleSwitchProgramEnvironment& env, ControllerContext& context, bool sport);
+    std::pair<bool, std::string> receive_ball(SingleSwitchProgramEnvironment& env, ControllerContext& context);
+    void recover_from_wrong_state(SingleSwitchProgramEnvironment& env, ControllerContext& context);
 };
 
 

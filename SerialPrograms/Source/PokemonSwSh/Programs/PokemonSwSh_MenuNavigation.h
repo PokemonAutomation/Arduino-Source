@@ -8,9 +8,9 @@
 #define PokemonAutomation_PokemonSwSh_MenuNavigation_H
 
 #include <stddef.h>
+#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 
 namespace PokemonAutomation{
-    class BotBaseContext;
     class EventNotificationOption;
     class ProgramEnvironment;
 namespace NintendoSwitch{
@@ -25,10 +25,10 @@ namespace PokemonSwSh{
 void navigate_to_menu_app(
     ProgramEnvironment& env,
     ConsoleHandle& console,
-    BotBaseContext& context,
+    ControllerContext& context,
     size_t app_index,
     EventNotificationOption& notification_option
-    );
+);
 
 
 }

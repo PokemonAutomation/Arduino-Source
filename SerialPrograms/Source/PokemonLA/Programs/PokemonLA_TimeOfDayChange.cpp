@@ -21,7 +21,7 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-void change_time_of_day_at_tent(ConsoleHandle& console, BotBaseContext& context, TimeOfDay target_time, Camp camp){
+void change_time_of_day_at_tent(ConsoleHandle& console, ControllerContext& context, TimeOfDay target_time, Camp camp){
     console.overlay().add_log("Change time to " + std::string(TIME_OF_DAY_NAMES[int(target_time)]), COLOR_WHITE);
     // Move to the tent
     switch (camp)

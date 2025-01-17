@@ -38,14 +38,14 @@ public:
 class RideCloner101 : public SingleSwitchProgramInstance{
 public:
     RideCloner101();
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ControllerContext& context) override;
 
 private:
-    void setup(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
+    void setup(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context);
     bool run_post_win(
         ProgramEnvironment& env,
         ConsoleHandle& console,
-        BotBaseContext& context
+        ControllerContext& context
     );
 
 private:

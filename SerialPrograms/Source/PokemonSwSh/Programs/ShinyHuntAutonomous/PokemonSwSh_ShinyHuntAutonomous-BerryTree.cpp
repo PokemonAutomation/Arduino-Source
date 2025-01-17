@@ -74,7 +74,7 @@ ShinyHuntAutonomousBerryTree::ShinyHuntAutonomousBerryTree()
 
 
 
-void ShinyHuntAutonomousBerryTree::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void ShinyHuntAutonomousBerryTree::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
         resume_game_no_interact(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
@@ -106,9 +106,9 @@ void ShinyHuntAutonomousBerryTree::program(SingleSwitchProgramEnvironment& env, 
             StandardBattleMenuWatcher battle_menu_detector(false);
             StartBattleWatcher start_battle_detector;
 
-            int result = run_until<BotBaseContext>(
+            int result = run_until<ControllerContext>(
                 env.console, context,
-                [](BotBaseContext& context){
+                [](ControllerContext& context){
                     pbf_mash_button(context, BUTTON_A, 60 * TICKS_PER_SECOND);
                 },
                 {

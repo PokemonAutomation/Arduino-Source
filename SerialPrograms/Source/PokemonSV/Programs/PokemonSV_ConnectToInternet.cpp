@@ -70,7 +70,7 @@ public:
 
 
 
-void connect_to_internet_from_menu(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+void connect_to_internet_from_menu(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context){
     WallClock start = current_time();
     bool connected = false;
     while (true){
@@ -139,7 +139,7 @@ void connect_to_internet_from_menu(const ProgramInfo& info, ConsoleHandle& conso
         }
     }
 }
-void connect_to_internet_from_overworld(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+void connect_to_internet_from_overworld(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context){
     WallClock start = current_time();
     bool connected = false;
     while (true){

@@ -222,7 +222,7 @@ bool BoxDetector::to_coordinates(int& x, int& y, BoxCursorLocation side, uint8_t
     }
     return true;
 }
-void BoxDetector::move_vertical(BotBaseContext& context, int current, int desired) const{
+void BoxDetector::move_vertical(ControllerContext& context, int current, int desired) const{
     int diff = (current - desired + 7) % 7;
 //    cout << "diff = " << diff << endl;
     if (diff <= 3){
@@ -235,7 +235,7 @@ void BoxDetector::move_vertical(BotBaseContext& context, int current, int desire
         }
     }
 }
-void BoxDetector::move_horizontal(BotBaseContext& context, int current, int desired) const{
+void BoxDetector::move_horizontal(ControllerContext& context, int current, int desired) const{
     int diff = (current - desired + 7) % 7;
     if (diff <= 3){
         for (int c = 0; c < diff; c++){
@@ -250,7 +250,7 @@ void BoxDetector::move_horizontal(BotBaseContext& context, int current, int desi
 
 
 void BoxDetector::move_cursor(
-    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context,
     BoxCursorLocation side, uint8_t row, uint8_t col
 ) const{
     int desired_x = 0, desired_y = 0;

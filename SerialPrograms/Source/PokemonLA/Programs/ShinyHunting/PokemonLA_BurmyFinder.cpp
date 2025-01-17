@@ -147,7 +147,7 @@ struct BurmyFinder::TreeCounter{
     }
 };
 
-bool BurmyFinder::handle_battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+bool BurmyFinder::handle_battle(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     BurmyFinder_Descriptor::Stats& stats = env.current_stats<BurmyFinder_Descriptor::Stats>();
 
     PokemonDetails pokemon = get_pokemon_details(env.console, context, LANGUAGE);
@@ -206,7 +206,7 @@ bool BurmyFinder::handle_battle(SingleSwitchProgramEnvironment& env, BotBaseCont
 }
 
 
-bool BurmyFinder::check_tree(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+bool BurmyFinder::check_tree(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     context.wait_for_all_requests();
 
     disable_shiny_sound(context);
@@ -226,7 +226,7 @@ bool BurmyFinder::check_tree(SingleSwitchProgramEnvironment& env, BotBaseContext
     return ret;
 }
 
-void BurmyFinder::check_tree_no_stop(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void BurmyFinder::check_tree_no_stop(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     context.wait_for_all_requests();
     disable_shiny_sound(context);
     // Throw pokemon
@@ -237,21 +237,21 @@ void BurmyFinder::check_tree_no_stop(SingleSwitchProgramEnvironment& env, BotBas
 //    enable_shiny_sound(context);
 }
 
-void BurmyFinder::disable_shiny_sound(BotBaseContext& context){
+void BurmyFinder::disable_shiny_sound(ControllerContext& context){
     context.wait_for_all_requests();
     m_enable_shiny_sound.store(false, std::memory_order_release);
 }
-void BurmyFinder::enable_shiny_sound(BotBaseContext& context){
+void BurmyFinder::enable_shiny_sound(ControllerContext& context){
     context.wait_for_all_requests();
     m_enable_shiny_sound.store(true, std::memory_order_release);
 }
 
-void BurmyFinder::go_to_height_camp(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void BurmyFinder::go_to_height_camp(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     const bool stop_on_detected = true;
     BattleMenuDetector battle_menu_detector(env.console, env.console, stop_on_detected);
-    int ret = run_until<BotBaseContext>(
+    int ret = run_until<ControllerContext>(
         env.console, context,
-        [&](BotBaseContext& context){
+        [&](ControllerContext& context){
             goto_any_camp_from_overworld(env, env.console, context, TravelLocations::instance().Fieldlands_Heights);
         },
         {
@@ -273,7 +273,7 @@ void BurmyFinder::go_to_height_camp(SingleSwitchProgramEnvironment& env, BotBase
     }
 }
 
-size_t BurmyFinder::grouped_path(SingleSwitchProgramEnvironment& env, BotBaseContext& context, size_t path, TreeCounter& tree_counter){
+size_t BurmyFinder::grouped_path(SingleSwitchProgramEnvironment& env, ControllerContext& context, size_t path, TreeCounter& tree_counter){
 
     size_t last_checked_tree = 0;
 
@@ -285,9 +285,9 @@ size_t BurmyFinder::grouped_path(SingleSwitchProgramEnvironment& env, BotBaseCon
 
     BattleMenuDetector battle_menu_detector(env.console, env.console, true);
 
-    int ret = run_until<BotBaseContext>(
+    int ret = run_until<ControllerContext>(
         env.console, context,
-        [&](BotBaseContext& context){
+        [&](ControllerContext& context){
             switch (path){
             case 0:
                 //============ Tree 0=============//
@@ -517,7 +517,7 @@ size_t BurmyFinder::grouped_path(SingleSwitchProgramEnvironment& env, BotBaseCon
     return last_checked_tree;
 }
 
-void BurmyFinder::single_path(SingleSwitchProgramEnvironment& env, BotBaseContext& context, size_t path, size_t last_tree, TreeCounter& tree_counter){
+void BurmyFinder::single_path(SingleSwitchProgramEnvironment& env, ControllerContext& context, size_t path, size_t last_tree, TreeCounter& tree_counter){
     env.console.log("Last tree was: " + std::to_string(last_tree));
 
     switch (path){
@@ -703,7 +703,7 @@ void BurmyFinder::single_path(SingleSwitchProgramEnvironment& env, BotBaseContex
 
 }
 
-void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context, TreeCounter& tree_counter){
+void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, ControllerContext& context, TreeCounter& tree_counter){
     BurmyFinder_Descriptor::Stats& stats = env.current_stats<BurmyFinder_Descriptor::Stats>();
     stats.attempts++;
     env.update_stats();
@@ -743,9 +743,9 @@ void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
 
     goto_camp_from_jubilife(env, env.console, context, TravelLocations::instance().Fieldlands_Heights);
 
-    int ret = run_until<BotBaseContext>(
+    int ret = run_until<ControllerContext>(
         env.console, context,
-        [&](BotBaseContext& context){
+        [&](ControllerContext& context){
 
             for (int path = 0; path < 4; path++){
                 size_t last_tree = grouped_path(env, context, path, tree_counter);
@@ -782,7 +782,7 @@ void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
     from_professor_return_to_jubilife(env, env.console, context);
 }
 
-void BurmyFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void BurmyFinder::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     BurmyFinder_Descriptor::Stats& stats = env.current_stats<BurmyFinder_Descriptor::Stats>();
 
     //  Connect the controller.

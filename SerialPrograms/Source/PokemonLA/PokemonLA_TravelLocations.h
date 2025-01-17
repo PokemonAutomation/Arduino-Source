@@ -12,8 +12,7 @@
 #include <vector>
 #include <map>
 #include "Common/Cpp/EnumDatabase.h"
-#include "ClientSource/Connection/BotBase.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 #include "PokemonLA_Locations.h"
 
 namespace PokemonAutomation{
@@ -32,13 +31,13 @@ struct TravelLocation{
     uint8_t warp_sub_slot; // which menu slot to warp the region map, if the location is a settlement or arena that requires an in-region warp.
     bool reverse_sub_menu_direction; // whether it is faster to go upwards in the in-region warp map to reach the destination slot.
 
-    std::function<void(ConsoleHandle& console, BotBaseContext& context)> post_arrival_maneuver;
+    std::function<void(ConsoleHandle& console, ControllerContext& context)> post_arrival_maneuver;
 
     TravelLocation(
         const char* p_slug, const char* p_display,
         MapRegion p_region,
         uint8_t p_warp_slot, uint8_t p_warp_sub_slot,
-        std::function<void(ConsoleHandle& console, BotBaseContext& context)>&& p_post_arrival_maneuver,
+        std::function<void(ConsoleHandle& console, ControllerContext& context)>&& p_post_arrival_maneuver,
         bool reverse_sub_menu_direction = false
     );
 };

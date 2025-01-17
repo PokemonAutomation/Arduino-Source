@@ -10,18 +10,17 @@
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 
 namespace PokemonAutomation{
-    class BotBaseContext;
 namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 
-void hatch_egg(ConsoleHandle& console, BotBaseContext& context);
-void hatch_party(ConsoleHandle& console, BotBaseContext& context, size_t eggs = 5);
+void hatch_egg(ConsoleHandle& console, ControllerContext& context);
+void hatch_party(ConsoleHandle& console, ControllerContext& context, size_t eggs = 5);
 
-void withdraw_1st_column_from_overworld(ConsoleHandle& console, BotBaseContext& context);
+void withdraw_1st_column_from_overworld(ConsoleHandle& console, ControllerContext& context);
 
 
-void release(ConsoleHandle& console, BotBaseContext& context);
+void release(ConsoleHandle& console, ControllerContext& context);
 
 
 

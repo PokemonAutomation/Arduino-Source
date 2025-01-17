@@ -29,12 +29,12 @@ public:
 class MagikarpMoveGrinder : public SingleSwitchProgramInstance{
 public:
     MagikarpMoveGrinder();
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ControllerContext& context) override;
 
 private:
-    void battle_magikarp(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    void battle_magikarp(SingleSwitchProgramEnvironment& env, ControllerContext& context);
 
-    void grind_mimic(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    void grind_mimic(SingleSwitchProgramEnvironment& env, ControllerContext& context);
 
 private:
     OneMoveBattlePokemonActionTable POKEMON_ACTIONS;

@@ -38,12 +38,12 @@ enum class LeapPokemon
     Bergimite
 };
 
-void setup(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context);
-void route(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, LeapPokemon pokemon);
-bool check_tree_or_ore_for_battle(ConsoleHandle& console, BotBaseContext& context);
-void exit_battle(ConsoleHandle& console, BotBaseContext& context, ExitBattleMethod exit_method);
-void return_to_jubilife(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, LeapPokemon pokemon);
-PokemonDetails get_pokemon_details(ConsoleHandle& console, BotBaseContext& context, Language language);
+void setup(ProgramEnvironment& env, ConsoleHandle& console, ControllerContext& context);
+void route(ProgramEnvironment& env, ConsoleHandle& console, ControllerContext& context, LeapPokemon pokemon);
+bool check_tree_or_ore_for_battle(ConsoleHandle& console, ControllerContext& context);
+void exit_battle(ConsoleHandle& console, ControllerContext& context, ExitBattleMethod exit_method);
+void return_to_jubilife(ProgramEnvironment& env, ConsoleHandle& console, ControllerContext& context, LeapPokemon pokemon);
+PokemonDetails get_pokemon_details(ConsoleHandle& console, ControllerContext& context, Language language);
 
 
 }

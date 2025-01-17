@@ -5,7 +5,6 @@
  */
 
 //#include "Common/Cpp/Exceptions.h"
-#include "ClientSource/Connection/BotBase.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 //#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 //#include "CommonFramework/Tools/DebugDumper.h"
@@ -75,7 +74,7 @@ std::string TeraRollFilter::check_validity() const{
 }
 
 TeraRollFilter::FilterResult TeraRollFilter::run_filter(
-    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context,
     TeraRaidData& data
 ) const{
     uint8_t min_stars = MIN_STARS;

@@ -110,7 +110,7 @@ RamanasCombeeFinder:: RamanasCombeeFinder()
 }
 
 
-void RamanasCombeeFinder::check_tree_no_stop(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void RamanasCombeeFinder::check_tree_no_stop(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     context.wait_for_all_requests();
     disable_shiny_sound(context);
     // Throw pokemon
@@ -120,7 +120,7 @@ void RamanasCombeeFinder::check_tree_no_stop(SingleSwitchProgramEnvironment& env
     env.update_stats();
 }
 
-bool RamanasCombeeFinder::check_tree(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+bool RamanasCombeeFinder::check_tree(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     context.wait_for_all_requests();
 
     disable_shiny_sound(context);
@@ -141,16 +141,16 @@ bool RamanasCombeeFinder::check_tree(SingleSwitchProgramEnvironment& env, BotBas
 }
 
 
-void RamanasCombeeFinder::disable_shiny_sound(BotBaseContext& context){
+void RamanasCombeeFinder::disable_shiny_sound(ControllerContext& context){
     context.wait_for_all_requests();
     m_enable_shiny_sound.store(false, std::memory_order_release);
 }
-void RamanasCombeeFinder::enable_shiny_sound(BotBaseContext& context){
+void RamanasCombeeFinder::enable_shiny_sound(ControllerContext& context){
     context.wait_for_all_requests();
     m_enable_shiny_sound.store(true, std::memory_order_release);
 }
 
-bool RamanasCombeeFinder::handle_battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+bool RamanasCombeeFinder::handle_battle(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     RamanasCombeeFinder_Descriptor::Stats& stats = env.current_stats<RamanasCombeeFinder_Descriptor::Stats>();
 
     PokemonDetails pokemon = get_pokemon_details(env.console, context, LANGUAGE);
@@ -171,13 +171,13 @@ bool RamanasCombeeFinder::handle_battle(SingleSwitchProgramEnvironment& env, Bot
     return true;
 }
 
-void RamanasCombeeFinder::grouped_path(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void RamanasCombeeFinder::grouped_path(SingleSwitchProgramEnvironment& env, ControllerContext& context){
 
     BattleMenuDetector battle_menu_detector(env.console, env.console, true);
 
-    int ret = run_until<BotBaseContext>(
+    int ret = run_until<ControllerContext>(
         env.console, context,
-        [&](BotBaseContext& context){
+        [&](ControllerContext& context){
 
             env.console.log("Checking Tree 1");
             change_mount(env.console,context,MountState::BRAVIARY_ON);
@@ -243,7 +243,7 @@ void RamanasCombeeFinder::grouped_path(SingleSwitchProgramEnvironment& env, BotB
 
 }
 
-void RamanasCombeeFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void RamanasCombeeFinder::run_iteration(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     RamanasCombeeFinder_Descriptor::Stats& stats = env.current_stats<RamanasCombeeFinder_Descriptor::Stats>();
     stats.attempts++;
     env.update_stats();
@@ -281,9 +281,9 @@ void RamanasCombeeFinder::run_iteration(SingleSwitchProgramEnvironment& env, Bot
 
     goto_camp_from_jubilife(env, env.console, context, TravelLocations::instance().Fieldlands_Heights);
 
-    int ret = run_until<BotBaseContext>(
+    int ret = run_until<ControllerContext>(
         env.console, context,
-        [&](BotBaseContext& context){
+        [&](ControllerContext& context){
             grouped_path(env, context);
             context.wait_for_all_requests();
             goto_camp_from_overworld(env, env.console, context);
@@ -314,7 +314,7 @@ void RamanasCombeeFinder::run_iteration(SingleSwitchProgramEnvironment& env, Bot
     from_professor_return_to_jubilife(env, env.console, context);
 }
 
-void RamanasCombeeFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void RamanasCombeeFinder::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     RamanasCombeeFinder_Descriptor::Stats& stats = env.current_stats<RamanasCombeeFinder_Descriptor::Stats>();
 
     //  Connect the controller.

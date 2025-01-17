@@ -35,14 +35,14 @@ namespace MaxLairInternal{
 
 StateMachineAction mash_A_to_entrance(
     AdventureRuntime& runtime,
-    ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, ControllerContext& context,
     const ImageViewRGB32& entrance
 ){
     EntranceDetector entrance_detector(entrance);
 
-    int result = run_until<BotBaseContext>(
+    int result = run_until<ControllerContext>(
         console, context,
-        [&](BotBaseContext& context){
+        [&](ControllerContext& context){
             pbf_mash_button(context, BUTTON_A, 60 * TICKS_PER_SECOND);
         },
         {{entrance_detector}},
@@ -60,7 +60,7 @@ StateMachineAction mash_A_to_entrance(
 
 
 void synchronize_caught_screen(
-    ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, ControllerContext& context,
     GlobalStateTracker& state_tracker
 ){
     context.wait_for_all_requests();
@@ -70,7 +70,7 @@ void synchronize_caught_screen(
 
 StateMachineAction run_caught_screen(
     AdventureRuntime& runtime,
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ProgramEnvironment& env, ConsoleHandle& console, ControllerContext& context,
     GlobalStateTracker& state_tracker,
     const EndBattleDecider& decider,
     const ImageViewRGB32& entrance

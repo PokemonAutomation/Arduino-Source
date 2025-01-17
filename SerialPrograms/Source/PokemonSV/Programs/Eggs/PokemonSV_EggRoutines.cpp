@@ -38,7 +38,7 @@ namespace{
 
 
 void clear_mons_in_front(
-    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context
+    const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context
 ){
     console.log("Waiting for all " + STRING_POKEMON + " in front of you to get out of the way...");
     WhiteButtonWatcher button(
@@ -46,9 +46,9 @@ void clear_mons_in_front(
         {0.020, 0.590, 0.035, 0.060},
         WhiteButtonWatcher::FinderType::GONE
     );
-    int ret = run_until<BotBaseContext>(
+    int ret = run_until<ControllerContext>(
         console, context,
-        [&](BotBaseContext& context){
+        [&](ControllerContext& context){
             for (size_t c = 0; c < 40; c++){
                 context.wait_for_all_requests();
                 context.wait_for(std::chrono::seconds(30));
@@ -79,15 +79,15 @@ void clear_mons_in_front(
 // Call this function when an egg hatching dialog is detected.
 // This function presses A to finish the egg hatching dialogs and updates logs and calls callback functions.
 // egg_idx: currently which egg in the party is hatching. 0-indexed.
-void handle_egg_hatching(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+void handle_egg_hatching(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context,
     uint8_t num_eggs_in_party, uint8_t egg_idx, std::function<void(uint8_t)> egg_hatched_callback)
 {
     console.log("Detect hatching dialog: " + std::to_string(egg_idx+1) + "/" + std::to_string(num_eggs_in_party));
     console.overlay().add_log("Hatched " + std::to_string(egg_idx+1) + "/" + std::to_string(num_eggs_in_party), COLOR_GREEN);
     OverworldWatcher overworld(console, COLOR_CYAN);
-    int ret = run_until<BotBaseContext>(
+    int ret = run_until<ControllerContext>(
         console, context,
-        [](BotBaseContext& context){
+        [](ControllerContext& context){
             ssf_press_right_joystick(context, 0, 128, 0, 95);
             for(int i = 0; i < 60; i++){
                 pbf_mash_button(context, BUTTON_A, 125);
@@ -110,12 +110,12 @@ void handle_egg_hatching(const ProgramInfo& info, ConsoleHandle& console, BotBas
 // Turning right to do circullar motion to hatch eggs.
 // Function returns when a dialog is detected, meaning an egg is hatching.
 // Throw exception when no egg hatching detected after 10 minutes.
-void do_egg_cycle_motion(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context)
+void do_egg_cycle_motion(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context)
 {
     AdvanceDialogWatcher dialog(COLOR_RED);
-    int ret = run_until<BotBaseContext>(
+    int ret = run_until<ControllerContext>(
         console, context,
-        [&](BotBaseContext& context){
+        [&](ControllerContext& context){
             // hatch circle:
             // Left joystick forward, right joystick right
             // click left joystick
@@ -137,7 +137,7 @@ void do_egg_cycle_motion(const ProgramInfo& info, ConsoleHandle& console, BotBas
 
 } // annoymous namespace
 
-void order_compote_du_fils(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+void order_compote_du_fils(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context){
     // We start this function when we enter the restaurant without pressing any button.
 
     // Se we first press A to clear a dialog:
@@ -195,9 +195,9 @@ void order_compote_du_fils(const ProgramInfo& info, ConsoleHandle& console, BotB
 
     { // Now wait for eating animation to finish.
         AdvanceDialogWatcher dialog_watcher(COLOR_RED, std::chrono::milliseconds(100));
-        int ret = run_until<BotBaseContext>(
+        int ret = run_until<ControllerContext>(
             console, context,
-            [](BotBaseContext& context){
+            [](ControllerContext& context){
                 for(int i = 0; i < 60; i++){
                     pbf_press_button(context, BUTTON_A, 25, 100);
                 }
@@ -235,7 +235,7 @@ void order_compote_du_fils(const ProgramInfo& info, ConsoleHandle& console, BotB
     }
 }
 
-void picnic_at_zero_gate(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+void picnic_at_zero_gate(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context){
     // Orient camera to look at same direction as player character
     // This is needed because when save-load the game, the camera is reset
     // to this location.
@@ -252,7 +252,7 @@ void picnic_at_zero_gate(const ProgramInfo& info, ConsoleHandle& console, BotBas
 }
 
 bool eat_egg_sandwich_at_picnic(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ProgramEnvironment& env, ConsoleHandle& console, ControllerContext& context,
     EggSandwichType sandwich_type, Language language
 ){
     // Move forward to table to make sandwich
@@ -295,7 +295,7 @@ bool eat_egg_sandwich_at_picnic(
 }
 
 void collect_eggs_after_sandwich(
-    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context,
     size_t basket_wait_seconds, size_t max_eggs, size_t& num_eggs_collected,
     std::function<void(size_t new_eggs)> basket_check_callback
 ){
@@ -377,7 +377,7 @@ void collect_eggs_after_sandwich(
 }
 
 void check_basket_to_collect_eggs(
-    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context,
     size_t max_eggs, size_t& num_eggs_collected
 ){
     bool checked = false;
@@ -486,7 +486,7 @@ void check_basket_to_collect_eggs(
 }
 
 
-std::pair<uint8_t, uint8_t> check_egg_party_column(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+std::pair<uint8_t, uint8_t> check_egg_party_column(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context){
     context.wait_for_all_requests();
     BoxEggPartyColumnWatcher egg_column_watcher;
     int ret = wait_until(
@@ -501,7 +501,7 @@ std::pair<uint8_t, uint8_t> check_egg_party_column(const ProgramInfo& info, Cons
     return {egg_column_watcher.num_eggs_found(), egg_column_watcher.num_non_egg_pokemon_found()};
 }
 
-uint8_t check_non_eggs_count_in_party(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, uint8_t expected_non_eggs_count_in_party){
+uint8_t check_non_eggs_count_in_party(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context, uint8_t expected_non_eggs_count_in_party){
     auto counts = check_egg_party_column(info, console, context);
     if (counts.second != expected_non_eggs_count_in_party){
         dump_image_and_throw_recoverable_exception(info, console, "NonEggPokemonInParty",
@@ -510,7 +510,7 @@ uint8_t check_non_eggs_count_in_party(const ProgramInfo& info, ConsoleHandle& co
     return counts.first;
 }
 
-void hatch_eggs_at_zero_gate(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+void hatch_eggs_at_zero_gate(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context,
     uint8_t num_eggs_in_party, std::function<void(uint8_t)> egg_hatched_callback)
 {
     bool got_off_ramp = false;
@@ -528,9 +528,9 @@ void hatch_eggs_at_zero_gate(const ProgramInfo& info, ConsoleHandle& console, Bo
         if (got_off_ramp == false){
             AdvanceDialogWatcher dialog(COLOR_RED);
             // first, get off ramp to the empty field for circling motions
-            int ret = run_until<BotBaseContext>(
+            int ret = run_until<ControllerContext>(
                 console, context,
-                [&](BotBaseContext& context){
+                [&](ControllerContext& context){
                     if (egg_idx == 0){
                         // At beginning, ride on Koraidon/Miradon and go off ramp:
                         pbf_press_button(context, BUTTON_PLUS, 50, 100);
@@ -563,7 +563,7 @@ void hatch_eggs_at_zero_gate(const ProgramInfo& info, ConsoleHandle& console, Bo
 }
 
 void hatch_eggs_anywhere(
-    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context,
     bool already_on_ride, uint8_t num_eggs_in_party, std::function<void(uint8_t)> egg_hatched_callback)
 {
     if (!already_on_ride){
@@ -591,7 +591,7 @@ void hatch_eggs_anywhere(
 }
 
 
-void reset_position_at_zero_gate(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+void reset_position_at_zero_gate(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context){
     console.log("Open map and reset location to Zero Gate.");
     // Use map to fly back to the flying spot
     open_map_from_overworld(info, console, context);
@@ -603,7 +603,7 @@ void reset_position_at_zero_gate(const ProgramInfo& info, ConsoleHandle& console
 
 
 bool check_baby_info(
-    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context,
     OCR::LanguageOCROption& LANGUAGE, Pokemon::StatsHuntIvJudgeFilterTable& FILTERS,
     Pokemon::StatsHuntAction& action
 ){

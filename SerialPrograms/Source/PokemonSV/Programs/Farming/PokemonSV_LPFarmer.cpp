@@ -85,7 +85,7 @@ LPFarmer::LPFarmer()
 
 
 
-void LPFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void LPFarmer::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
     LPFarmer_Descriptor::Stats& stats = env.current_stats<LPFarmer_Descriptor::Stats>();

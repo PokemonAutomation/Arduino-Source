@@ -167,7 +167,7 @@ RideCloner101::RideCloner101()
 
 //  Start from the overworld with 5 (non-ride legendary) Pokemon in your
 //  party. Move your ride legendary into the 6th slot in your party.
-void RideCloner101::setup(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+void RideCloner101::setup(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context){
     console.log("Running setup...");
 
     bool in_party = false;
@@ -250,7 +250,7 @@ void RideCloner101::setup(const ProgramInfo& info, ConsoleHandle& console, BotBa
 bool RideCloner101::run_post_win(
     ProgramEnvironment& env,
     ConsoleHandle& console,
-    BotBaseContext& context
+    ControllerContext& context
 ){
     console.log("Running post-win...");
 
@@ -416,7 +416,7 @@ bool RideCloner101::run_post_win(
 
 
 
-void RideCloner101::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void RideCloner101::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
     RideCloner101_Descriptor::Stats& stats = env.current_stats<RideCloner101_Descriptor::Stats>();

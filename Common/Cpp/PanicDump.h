@@ -7,9 +7,7 @@
 #ifndef PokemonAutomation_PanicDumping_H
 #define PokemonAutomation_PanicDumping_H
 
-#include <string>
 #include <functional>
-#include "ClientSource/Connection/BotBase.h"
 
 namespace PokemonAutomation{
 

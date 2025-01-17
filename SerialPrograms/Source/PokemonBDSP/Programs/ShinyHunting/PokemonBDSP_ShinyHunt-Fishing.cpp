@@ -92,7 +92,7 @@ ShinyHuntFishing::ShinyHuntFishing()
 
 
 
-void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     ShinyHuntFishing_Descriptor::Stats& stats = env.current_stats<ShinyHuntFishing_Descriptor::Stats>();
 
     StandardEncounterHandler handler(
@@ -117,9 +117,9 @@ void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env, BotBaseConte
             MarkDetector mark_detector(env.console, {0.4, 0.2, 0.2, 0.5});
             StartBattleDetector battle(env.console);
             BattleMenuWatcher battle_menu(BattleType::STANDARD);
-            int ret = run_until<BotBaseContext>(
+            int ret = run_until<ControllerContext>(
                 env.console, context,
-                [this](BotBaseContext& context){
+                [this](ControllerContext& context){
                     SHORTCUT.run(context, 30 * TICKS_PER_SECOND);
                 },
                 {

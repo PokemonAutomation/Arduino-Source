@@ -43,7 +43,7 @@ std::string AutoStory_Segment_01::end_text() const{
     return "End: Picked the starter.";
 }
 
-void AutoStory_Segment_01::run_segment(SingleSwitchProgramEnvironment& env, BotBaseContext& context, AutoStoryOptions options) const{
+void AutoStory_Segment_01::run_segment(SingleSwitchProgramEnvironment& env, ControllerContext& context, AutoStoryOptions options) const{
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
 
     context.wait_for_all_requests();
@@ -65,7 +65,7 @@ void AutoStory_Segment_01::run_segment(SingleSwitchProgramEnvironment& env, BotB
 
 void checkpoint_01(
     SingleSwitchProgramEnvironment& env, 
-    BotBaseContext& context, 
+    ControllerContext& context, 
     EventNotificationOption& notif_status_update, 
     Language language
 ){
@@ -102,7 +102,7 @@ AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
 
 void checkpoint_02(
     SingleSwitchProgramEnvironment& env, 
-    BotBaseContext& context, 
+    ControllerContext& context, 
     EventNotificationOption& notif_status_update
 ){
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
@@ -192,7 +192,7 @@ void checkpoint_02(
 
 void checkpoint_03(
     SingleSwitchProgramEnvironment& env, 
-    BotBaseContext& context, 
+    ControllerContext& context, 
     EventNotificationOption& notif_status_update,
     Language language,
     StarterChoice starter_choice
@@ -250,9 +250,9 @@ void checkpoint_03(
         env.console.log("Clear auto heal tutorial.");
         // Press X until Auto heal tutorial shows up
         TutorialWatcher tutorial;
-        int ret = run_until<BotBaseContext>(
+        int ret = run_until<ControllerContext>(
             env.console, context,
-            [](BotBaseContext& context){
+            [](ControllerContext& context){
                 for (int i = 0; i < 10; i++){
                     pbf_press_button(context, BUTTON_X, 20, 250);
                 }

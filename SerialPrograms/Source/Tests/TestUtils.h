@@ -53,7 +53,7 @@ bool load_slug_list(const std::string& filepath, std::vector<std::string>& sprit
 
 // Implement the dummy interface of BotBase so that we can run the test code
 // that relies on a BotBase.
-class DummyBotBase: public BotBaseController{
+class DummyBotBase : public BotBaseController{
 public:
     DummyBotBase(Logger& logger) : m_logger(logger) {}
     

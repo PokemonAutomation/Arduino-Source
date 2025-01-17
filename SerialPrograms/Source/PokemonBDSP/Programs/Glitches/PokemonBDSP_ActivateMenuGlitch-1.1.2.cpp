@@ -49,12 +49,12 @@ ActivateMenuGlitch112::ActivateMenuGlitch112()
 
 
 
-void trigger_menu(ConsoleHandle& console, BotBaseContext& context){
+void trigger_menu(ConsoleHandle& console, ControllerContext& context){
     context.wait_for_all_requests();
     MapWatcher detector;
-    int ret = run_until<BotBaseContext>(
+    int ret = run_until<ControllerContext>(
         console, context,
-        [](BotBaseContext& context){
+        [](ControllerContext& context){
             for (size_t i = 0; i < 12; i++){
                 for (size_t c = 0; c < 42; c++){
                     pbf_controller_state(context, BUTTON_ZL, DPAD_NONE, 128, 128, 128, 128, 1);
@@ -84,7 +84,7 @@ void trigger_menu(ConsoleHandle& console, BotBaseContext& context){
         context.wait_for_all_requests();
     }
 }
-void trigger_map_overlap(ConsoleHandle& console, BotBaseContext& context){
+void trigger_map_overlap(ConsoleHandle& console, ControllerContext& context){
     for (size_t c = 0; c < 10; c++){
         trigger_menu(console, context);
 
@@ -112,7 +112,7 @@ void trigger_map_overlap(ConsoleHandle& console, BotBaseContext& context){
 
 
 
-void ActivateMenuGlitch112::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void ActivateMenuGlitch112::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     ConsoleHandle& console = env.console;
 
     trigger_map_overlap(console, context);
@@ -133,9 +133,9 @@ void ActivateMenuGlitch112::program(SingleSwitchProgramEnvironment& env, BotBase
     {
         context.wait_for_all_requests();
         BlackScreenWatcher detector;
-        int ret = run_until<BotBaseContext>(
+        int ret = run_until<ControllerContext>(
             console, context,
-            [](BotBaseContext& context){
+            [](ControllerContext& context){
                 for (size_t c = 0; c < 5; c++){
                     pbf_press_dpad(context, DPAD_LEFT, 20, 105);
                     pbf_press_dpad(context, DPAD_DOWN, 20, 105);

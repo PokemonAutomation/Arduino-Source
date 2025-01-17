@@ -11,6 +11,7 @@
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 #include "CommonFramework/Inference/VisualDetector.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 
 namespace PokemonAutomation{
 namespace Kernels{
@@ -18,7 +19,6 @@ namespace Waterfill{
     class WaterfillObject;
 }
 }
-class BotBaseContext;
 class ProgramEnvironment;
 namespace NintendoSwitch{
     class ConsoleHandle;
@@ -54,7 +54,7 @@ private:
 
 
 void find_and_center_on_sky(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context
+    ProgramEnvironment& env, ConsoleHandle& console, ControllerContext& context
 );
 
 

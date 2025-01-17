@@ -98,7 +98,7 @@ FroslassFinder::FroslassFinder()
 }
 
 
-void FroslassFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void FroslassFinder::run_iteration(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     FroslassFinder_Descriptor::Stats& stats = env.current_stats<FroslassFinder_Descriptor::Stats>();
 
     stats.attempts++;
@@ -127,9 +127,9 @@ void FroslassFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseC
             return on_shiny_callback(env, env.console, *action, error_coefficient);
         });
 
-        int ret = run_until<BotBaseContext>(
+        int ret = run_until<ControllerContext>(
             env.console, context,
-            [&](BotBaseContext& context){
+            [&](ControllerContext& context){
                 //  Route to cave entrance
                 pbf_press_button(context, BUTTON_B, (uint16_t)(2 * TICKS_PER_SECOND), 10);  //Get some distance from the moutain
                 pbf_press_button(context, BUTTON_Y, (uint16_t)(4 * TICKS_PER_SECOND), 10);  //Descend
@@ -162,7 +162,7 @@ void FroslassFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseC
 }
 
 
-void FroslassFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void FroslassFinder::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     FroslassFinder_Descriptor::Stats& stats = env.current_stats<FroslassFinder_Descriptor::Stats>();
 
     //  Connect the controller.

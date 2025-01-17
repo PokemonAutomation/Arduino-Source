@@ -15,7 +15,6 @@
 #include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_State.h"
 
 namespace PokemonAutomation{
-    class BotBaseContext;
     class ProgramEnvironment;
 namespace NintendoSwitch{
 namespace PokemonSwSh{
@@ -34,7 +33,7 @@ bool read_type_array(
 
 
 bool read_path(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ProgramEnvironment& env, ConsoleHandle& console, ControllerContext& context,
     PathMap& path,
     const ImageFloatBox& box
 );

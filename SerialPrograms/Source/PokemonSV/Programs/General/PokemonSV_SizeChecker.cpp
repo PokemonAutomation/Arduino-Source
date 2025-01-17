@@ -85,7 +85,7 @@ SizeChecker::SizeChecker()
 
 
 
-void SizeChecker::enter_check_mode(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void SizeChecker::enter_check_mode(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     env.console.log("Enter box mode to check size...");
     WallClock start = current_time();
 
@@ -135,7 +135,7 @@ void SizeChecker::enter_check_mode(SingleSwitchProgramEnvironment& env, BotBaseC
 
 
 
-void SizeChecker::exit_check_mode(SingleSwitchProgramEnvironment& env, BotBaseContext& context, VideoSnapshot screen){
+void SizeChecker::exit_check_mode(SingleSwitchProgramEnvironment& env, ControllerContext& context, VideoSnapshot screen){
     SizeChecker_Descriptor::Stats& stats = env.current_stats<SizeChecker_Descriptor::Stats>();
     env.console.log("Check size and exit box mode...");
     WallClock start = current_time();
@@ -194,7 +194,7 @@ void SizeChecker::exit_check_mode(SingleSwitchProgramEnvironment& env, BotBaseCo
 
 
 
-void SizeChecker::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void SizeChecker::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
     SizeChecker_Descriptor::Stats& stats = env.current_stats<SizeChecker_Descriptor::Stats>();
@@ -245,9 +245,9 @@ void SizeChecker::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
 
                 // Initiate size checking prompt.
                 DialogBoxWatcher dialog(COLOR_GREEN, true, std::chrono::milliseconds(250), DialogType::DIALOG_WHITE);
-                int ret = run_until<BotBaseContext>(
+                int ret = run_until<ControllerContext>(
                     env.console, context,
-                    [](BotBaseContext& context){
+                    [](ControllerContext& context){
                         for (size_t c = 0; c < 10; c++){
                             pbf_press_button(context, BUTTON_A, 20, 105);
                         }

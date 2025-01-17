@@ -27,7 +27,7 @@ class MultiGameFossil : public SingleSwitchProgramInstance{
 public:
     MultiGameFossil();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ControllerContext& context) override;
 
 private:
     StartInGripOrClosedOption START_LOCATION;

@@ -36,7 +36,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
 
-CameraAngle quest_photo_navi(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, const BBQOption& BBQ_OPTIONS, BBQuests current_quest){
+CameraAngle quest_photo_navi(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context, const BBQOption& BBQ_OPTIONS, BBQuests current_quest){
     CameraAngle angle = CameraAngle::none;
 
     //Navigate to target
@@ -266,15 +266,15 @@ CameraAngle quest_photo_navi(const ProgramInfo& info, ConsoleHandle& console, Bo
     return angle;
 }
 
-void quest_photo(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, const BBQOption& BBQ_OPTIONS, BBQuests current_quest){
+void quest_photo(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context, const BBQOption& BBQ_OPTIONS, BBQuests current_quest){
     bool took_photo = false;
     CameraAngle move_camera = CameraAngle::none;
 
     while(!took_photo){
         EncounterWatcher encounter_watcher(console, COLOR_RED);
-        int ret = run_until<BotBaseContext>(
+        int ret = run_until<ControllerContext>(
             console, context,
-            [&](BotBaseContext& context){
+            [&](ControllerContext& context){
 
                 move_camera = quest_photo_navi(info, console, context, BBQ_OPTIONS, current_quest);
 
@@ -306,9 +306,9 @@ void quest_photo(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
                 }
 
                 //Mash B until overworld
-                int exit = run_until<BotBaseContext>(
+                int exit = run_until<ControllerContext>(
                     console, context,
-                    [&](BotBaseContext& context){
+                    [&](ControllerContext& context){
                         pbf_mash_button(context, BUTTON_B, 2000);
                     },
                     {{ overworld }}
@@ -358,7 +358,7 @@ void quest_photo(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
     return_to_plaza(info, console, context);
 }
 
-void quest_catch_navi(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, const BBQOption& BBQ_OPTIONS, BBQuests current_quest){
+void quest_catch_navi(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context, const BBQOption& BBQ_OPTIONS, BBQuests current_quest){
     switch (current_quest){
         case BBQuests::catch_any: case BBQuests::catch_normal: case BBQuests::catch_fire:
             console.log("Catch: Any/Normal/Fire");
@@ -608,7 +608,7 @@ void quest_catch_navi(const ProgramInfo& info, ConsoleHandle& console, BotBaseCo
 
 }
 
-void quest_catch_throw_ball(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, Language language, const std::string& selected_ball){
+void quest_catch_throw_ball(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context, Language language, const std::string& selected_ball){
     BattleBallReader reader(console, language);
     std::string ball_reader = "";
     WallClock start = current_time();
@@ -659,7 +659,7 @@ void quest_catch_throw_ball(const ProgramInfo& info, ConsoleHandle& console, Bot
     context.wait_for_all_requests();
 }
 
-void quest_catch_handle_battle(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, const BBQOption& BBQ_OPTIONS, BBQuests current_quest){
+void quest_catch_handle_battle(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context, const BBQOption& BBQ_OPTIONS, BBQuests current_quest){
     console.log("Catching Pokemon.");
     AdvanceDialogWatcher advance_dialog(COLOR_MAGENTA);
     PromptDialogWatcher add_to_party(COLOR_PURPLE);
@@ -670,9 +670,9 @@ void quest_catch_handle_battle(const ProgramInfo& info, ConsoleHandle& console, 
     bool tera_target = false;
     bool use_quickball = BBQ_OPTIONS.QUICKBALL;
 
-    int ret2 = run_until<BotBaseContext>(
+    int ret2 = run_until<ControllerContext>(
         console, context,
-        [&](BotBaseContext& context){
+        [&](ControllerContext& context){
             while (true){
                 //Check that battle menu appears - this is in case of swapping pokemon
                 NormalBattleMenuWatcher menu_before_throw(COLOR_YELLOW);
@@ -734,9 +734,9 @@ void quest_catch_handle_battle(const ProgramInfo& info, ConsoleHandle& console, 
                         MoveSelectWatcher move_watcher(COLOR_BLUE);
                         MoveSelectDetector move_select(COLOR_BLUE);
 
-                        int ret_move_select = run_until<BotBaseContext>(
+                        int ret_move_select = run_until<ControllerContext>(
                             console, context,
-                            [&](BotBaseContext& context){
+                            [&](ControllerContext& context){
                                 pbf_press_button(context, BUTTON_A, 10, 50);
                                 pbf_wait(context, 100);
                                 context.wait_for_all_requests();
@@ -838,13 +838,13 @@ void quest_catch_handle_battle(const ProgramInfo& info, ConsoleHandle& console, 
     }
 }
 
-void quest_catch(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, const BBQOption& BBQ_OPTIONS, BBQuests current_quest){
+void quest_catch(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context, const BBQOption& BBQ_OPTIONS, BBQuests current_quest){
     EncounterWatcher encounter_watcher(console, COLOR_RED);
 
     //Navigate to target and start battle
-    int ret = run_until<BotBaseContext>(
+    int ret = run_until<ControllerContext>(
         console, context,
-        [&](BotBaseContext& context){
+        [&](ControllerContext& context){
             
             quest_catch_navi(info, console, context, BBQ_OPTIONS, current_quest);
             context.wait_for_all_requests();
@@ -894,9 +894,9 @@ void quest_catch(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
     pbf_mash_button(context, BUTTON_A, 300);
     context.wait_for_all_requests();
 
-    int exit = run_until<BotBaseContext>(
+    int exit = run_until<ControllerContext>(
         console, context,
-        [&](BotBaseContext& context){
+        [&](ControllerContext& context){
             pbf_mash_button(context, BUTTON_B, 2000);
         },
         {{ done_healing }}
@@ -910,16 +910,16 @@ void quest_catch(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext
     context.wait_for_all_requests();
 }
 
-void wild_battle_tera(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, bool& tera_self){
+void wild_battle_tera(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context, bool& tera_self){
     AdvanceDialogWatcher lost(COLOR_YELLOW);
     OverworldWatcher overworld(console, COLOR_RED);
     WallClock start = current_time();
     uint8_t switch_party_slot = 1;
     bool first_turn = true;
 
-    int ret2 = run_until<BotBaseContext>(
+    int ret2 = run_until<ControllerContext>(
         console, context,
-        [&](BotBaseContext& context){
+        [&](ControllerContext& context){
             while(true){
                 if (current_time() - start > std::chrono::minutes(5)){
                     console.log("Timed out during battle after 5 minutes.", COLOR_RED);

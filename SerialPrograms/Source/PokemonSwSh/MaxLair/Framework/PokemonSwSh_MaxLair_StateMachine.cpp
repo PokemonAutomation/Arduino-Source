@@ -40,7 +40,7 @@ namespace MaxLairInternal{
 
 StateMachineAction run_state_iteration(
     AdventureRuntime& runtime, size_t console_index,
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ProgramEnvironment& env, ConsoleHandle& console, ControllerContext& context,
     bool save_path,
     GlobalStateTracker& global_state,
     const EndBattleDecider& decider,

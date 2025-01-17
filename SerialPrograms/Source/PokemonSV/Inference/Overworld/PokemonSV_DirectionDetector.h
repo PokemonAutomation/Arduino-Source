@@ -10,7 +10,6 @@
 //#include <vector>
 #include "Common/Cpp/Color.h"
 //#include "Common/Cpp/Containers/FixedLimitVector.h"
-#include "ClientSource/Connection/BotBase.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 //#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
@@ -47,14 +46,14 @@ public:
 
     bool is_minimap_possibly_locked(double current_direction) const;
 
-    bool is_minimap_definitely_locked(ConsoleHandle& console, BotBaseContext& context, double current_direction) const;
+    bool is_minimap_definitely_locked(ConsoleHandle& console, ControllerContext& context, double current_direction) const;
 
     // given direction in radians (North-clockwise), rotate the camera so N is pointing in the desired direction.
     // mini-map must be unlocked.
     void change_direction(
         const ProgramInfo& info,
         ConsoleHandle& console, 
-        BotBaseContext& context,
+        ControllerContext& context,
         double direction
     ) const;
 

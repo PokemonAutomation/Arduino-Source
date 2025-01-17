@@ -8,10 +8,10 @@
 #define PokemonAutomation_PokemonSV_ZeroGateWarpPromptDetector_H
 
 #include "Common/Cpp/Color.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.h"
 
 namespace PokemonAutomation{
-    class BotBaseContext;
     struct ProgramInfo;
 namespace NintendoSwitch{
     class ConsoleHandle;
@@ -28,7 +28,7 @@ public:
     int detect_location(const ImageViewRGB32& screen) const;
 
     bool move_cursor(
-        const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+        const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context,
         int row
     ) const;
 

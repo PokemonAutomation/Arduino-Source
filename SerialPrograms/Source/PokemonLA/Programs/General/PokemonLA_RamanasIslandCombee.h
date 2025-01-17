@@ -30,16 +30,16 @@ public:
 class RamanasCombeeFinder: public SingleSwitchProgramInstance{
 public:
     RamanasCombeeFinder();
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ControllerContext& context) override;
 
 private:
-    void run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-    void grouped_path(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-    void check_tree_no_stop(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-    bool check_tree(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-    bool handle_battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-    void disable_shiny_sound(BotBaseContext& context);
-    void enable_shiny_sound(BotBaseContext& context);
+    void run_iteration(SingleSwitchProgramEnvironment& env, ControllerContext& context);
+    void grouped_path(SingleSwitchProgramEnvironment& env, ControllerContext& context);
+    void check_tree_no_stop(SingleSwitchProgramEnvironment& env, ControllerContext& context);
+    bool check_tree(SingleSwitchProgramEnvironment& env, ControllerContext& context);
+    bool handle_battle(SingleSwitchProgramEnvironment& env, ControllerContext& context);
+    void disable_shiny_sound(ControllerContext& context);
+    void enable_shiny_sound(ControllerContext& context);
 
 private:
     class RunRoute;

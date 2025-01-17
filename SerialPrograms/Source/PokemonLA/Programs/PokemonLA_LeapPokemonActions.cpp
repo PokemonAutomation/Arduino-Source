@@ -6,9 +6,8 @@
 
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
-#include "Pokemon/Inference/Pokemon_NameReader.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonLA/Resources/PokemonLA_PokemonInfo.h"
-#include "PokemonLA/Inference/PokemonLA_OverworldDetector.h"
 #include "PokemonLA/Inference/PokemonLA_StatusInfoScreenDetector.h"
 #include "PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.h"
 #include "PokemonLA_MountChange.h"
@@ -21,7 +20,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
 
-void route(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, LeapPokemon pokemon){
+void route(ProgramEnvironment& env, ConsoleHandle& console, ControllerContext& context, LeapPokemon pokemon){
     switch (pokemon){
     case LeapPokemon::Aipom:
         goto_camp_from_jubilife(env, console, context, TravelLocations::instance().Coastlands_Beachside);
@@ -156,7 +155,7 @@ void route(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& cont
     context.wait_for_all_requests();
 }
 
-void return_to_jubilife(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, LeapPokemon pokemon){
+void return_to_jubilife(ProgramEnvironment& env, ConsoleHandle& console, ControllerContext& context, LeapPokemon pokemon){
     goto_camp_from_overworld(env, console, context);
     switch (pokemon){
     case LeapPokemon::Aipom:
@@ -189,7 +188,7 @@ void return_to_jubilife(ProgramEnvironment& env, ConsoleHandle& console, BotBase
     context.wait_for_all_requests();
 }
 
-bool check_tree_or_ore_for_battle(ConsoleHandle& console, BotBaseContext& context){
+bool check_tree_or_ore_for_battle(ConsoleHandle& console, ControllerContext& context){
     pbf_press_button(context, BUTTON_ZR, (uint16_t)(0.5 * TICKS_PER_SECOND), 20); //throw pokemon
     pbf_wait(context, (uint16_t)(4.5 * TICKS_PER_SECOND));
     context.wait_for_all_requests();
@@ -234,7 +233,7 @@ bool check_tree_or_ore_for_battle(ConsoleHandle& console, BotBaseContext& contex
     return false;
 }
 
-void exit_battle(ConsoleHandle& console, BotBaseContext& context, ExitBattleMethod exit_method){
+void exit_battle(ConsoleHandle& console, ControllerContext& context, ExitBattleMethod exit_method){
 //    pbf_press_button(context, BUTTON_B, 20, 225);
 
     if (exit_method == ExitBattleMethod::RunAway){
@@ -250,7 +249,7 @@ void exit_battle(ConsoleHandle& console, BotBaseContext& context, ExitBattleMeth
     mash_A_until_end_of_battle(console, context);
 }
 
-PokemonDetails get_pokemon_details(ConsoleHandle& console, BotBaseContext& context, Language language){
+PokemonDetails get_pokemon_details(ConsoleHandle& console, ControllerContext& context, Language language){
     //  Open Info Screen
     pbf_wait(context, (1 * TICKS_PER_SECOND));
     pbf_press_button(context, BUTTON_PLUS, 20, 20);

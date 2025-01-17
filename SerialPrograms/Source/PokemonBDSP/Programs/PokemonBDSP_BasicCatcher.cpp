@@ -24,7 +24,7 @@ namespace PokemonBDSP{
 //  Returns the # of slots scrolled. Returns -1 if not found.
 int move_to_ball(
     const BattleBallReader& reader,
-    ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, ControllerContext& context,
     const std::string& ball_slug,
     bool forward, int attempts, uint16_t delay
 ){
@@ -56,7 +56,7 @@ int move_to_ball(
 //  Returns -1 if unable to read.
 int16_t move_to_ball(
     const BattleBallReader& reader,
-    ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, ControllerContext& context,
     const std::string& ball_slug
 ){
     //  Search forward at high speed.
@@ -89,7 +89,7 @@ int16_t move_to_ball(
 
 
 CatchResults throw_balls(
-    ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, ControllerContext& context,
     Language language,
     const std::string& ball_slug, uint16_t ball_limit
 ){
@@ -167,7 +167,7 @@ CatchResults throw_balls(
 
 
 CatchResults basic_catcher(
-    ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, ControllerContext& context,
     Language language,
     const std::string& ball_slug, uint16_t ball_limit
 ){
@@ -218,9 +218,9 @@ CatchResults basic_catcher(
         SelectionArrowFinder learn_move(console, {0.50, 0.62, 0.40, 0.18}, COLOR_YELLOW);
         //  Look for the pokemon caught screen.
         ReceivePokemonDetector caught_detector;
-        int ret = run_until<BotBaseContext>(
+        int ret = run_until<ControllerContext>(
             console, context,
-            [](BotBaseContext& context){
+            [](ControllerContext& context){
                 pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
             },
             {

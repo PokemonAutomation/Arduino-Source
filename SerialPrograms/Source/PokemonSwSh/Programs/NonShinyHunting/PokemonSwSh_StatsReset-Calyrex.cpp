@@ -138,7 +138,7 @@ StatsResetCalyrex::StatsResetCalyrex()
 
 
 
-void StatsResetCalyrex::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void StatsResetCalyrex::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
         resume_game_back_out(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);
@@ -157,9 +157,9 @@ void StatsResetCalyrex::program(SingleSwitchProgramEnvironment& env, BotBaseCont
             context.wait_for_all_requests();
             {
                 StandardBattleMenuWatcher fight_detector(false);
-                int result = run_until<BotBaseContext>(
+                int result = run_until<ControllerContext>(
                     env.console, context,
-                    [](BotBaseContext& context){
+                    [](ControllerContext& context){
                         while (true){
                             pbf_press_button(context, BUTTON_A, 10, 1 * TICKS_PER_SECOND);
                         }

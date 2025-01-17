@@ -82,7 +82,7 @@ MagikarpMoveGrinder::MagikarpMoveGrinder()
 
 
 
-void MagikarpMoveGrinder::grind_mimic(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void MagikarpMoveGrinder::grind_mimic(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     MagikarpMoveGrinder_Descriptor::Stats& stats = env.current_stats<MagikarpMoveGrinder_Descriptor::Stats>();
     env.log("Special case: grinding Mimic...");
 
@@ -156,7 +156,7 @@ void MagikarpMoveGrinder::grind_mimic(SingleSwitchProgramEnvironment& env, BotBa
     }
 }
 
-void MagikarpMoveGrinder::battle_magikarp(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void MagikarpMoveGrinder::battle_magikarp(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     MagikarpMoveGrinder_Descriptor::Stats& stats = env.current_stats<MagikarpMoveGrinder_Descriptor::Stats>();
 
     // Which pokemon in the party is not fainted
@@ -233,7 +233,7 @@ void MagikarpMoveGrinder::battle_magikarp(SingleSwitchProgramEnvironment& env, B
 
 
 
-void MagikarpMoveGrinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void MagikarpMoveGrinder::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     MagikarpMoveGrinder_Descriptor::Stats& stats = env.current_stats<MagikarpMoveGrinder_Descriptor::Stats>();
 
     if (POKEMON_ACTIONS.num_pokemon() == 0){

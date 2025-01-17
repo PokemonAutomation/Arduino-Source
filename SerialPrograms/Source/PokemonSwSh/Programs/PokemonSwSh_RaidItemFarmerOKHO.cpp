@@ -103,12 +103,12 @@ RaidItemFarmerOHKO::RaidItemFarmerOHKO()
 }
 
 void RaidItemFarmerOHKO::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
-    BotBaseContext host(scope, env.consoles[0].controller());
+    ControllerContext host(scope, env.consoles[0].controller());
     size_t switches = env.consoles.size();
 
     env.run_in_parallel(
         scope,
-        [](ConsoleHandle& console, BotBaseContext& context){
+        [](ConsoleHandle& console, ControllerContext& context){
             grip_menu_connect_go_home(context);
         }
     );
@@ -120,7 +120,7 @@ void RaidItemFarmerOHKO::program(MultiSwitchProgramEnvironment& env, Cancellable
     }
     env.run_in_parallel(
         scope,
-        [](ConsoleHandle& console, BotBaseContext& context){
+        [](ConsoleHandle& console, ControllerContext& context){
             if (console.index() == 0){
                 resume_game_front_of_den_nowatts(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
             }else{
@@ -136,7 +136,7 @@ void RaidItemFarmerOHKO::program(MultiSwitchProgramEnvironment& env, Cancellable
         host.wait_for_all_requests();
         env.run_in_parallel(
             scope,
-            [&](ConsoleHandle& console, BotBaseContext& context){
+            [&](ConsoleHandle& console, ControllerContext& context){
                 if (console.index() == 0){
                     enter_den(context, 0, false, false);
                 }else{
@@ -153,7 +153,7 @@ void RaidItemFarmerOHKO::program(MultiSwitchProgramEnvironment& env, Cancellable
         host.wait_for_all_requests();
         env.run_in_parallel(
             scope, 1, switches,
-            [&](ConsoleHandle& console, BotBaseContext& context){
+            [&](ConsoleHandle& console, ControllerContext& context){
                 pbf_wait(context, WAIT_FOR_STAMP_DELAY);
                 pbf_press_button(context, BUTTON_X, 10, 10);
                 pbf_press_dpad(context, DPAD_RIGHT, 10, 10);
@@ -167,7 +167,7 @@ void RaidItemFarmerOHKO::program(MultiSwitchProgramEnvironment& env, Cancellable
         host.wait_for_all_requests();
         env.run_in_parallel(
             scope,
-            [&](ConsoleHandle& console, BotBaseContext& context){
+            [&](ConsoleHandle& console, ControllerContext& context){
                 pbf_mash_button(context, BUTTON_A, RAID_START_MASH_DURATION);
                 pbf_wait(context, RAID_START_TO_ATTACK_DELAY);
                 pbf_mash_button(context, BUTTON_A, 5 * TICKS_PER_SECOND);

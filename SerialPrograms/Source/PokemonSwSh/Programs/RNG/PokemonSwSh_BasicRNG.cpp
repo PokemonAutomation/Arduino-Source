@@ -17,7 +17,7 @@ namespace PokemonSwSh{
 
 Xoroshiro128PlusState find_rng_state(
     ConsoleHandle& console,
-    BotBaseContext& context,
+    ControllerContext& context,
     bool save_screenshots,
     bool log_image_values
 ){
@@ -69,7 +69,7 @@ Xoroshiro128PlusState find_rng_state(
 
 Xoroshiro128PlusState refind_rng_state(
     ConsoleHandle& console,
-    BotBaseContext& context,
+    ControllerContext& context,
     Xoroshiro128PlusState last_known_state,
     size_t min_advances,
     size_t max_advances,
@@ -143,7 +143,7 @@ Xoroshiro128PlusState refind_rng_state(
 }
 
 
-void do_rng_advances(ConsoleHandle& console, BotBaseContext& context, Xoroshiro128Plus& rng, size_t advances, uint16_t press_duration, uint16_t release_duration){
+void do_rng_advances(ConsoleHandle& console, ControllerContext& context, Xoroshiro128Plus& rng, size_t advances, uint16_t press_duration, uint16_t release_duration){
     for (size_t i = 0; i < advances; i++){
         if ((i + 1) % 10 == 0){
             std::string text = std::to_string(i + 1) + "/" + std::to_string(advances);

@@ -68,7 +68,7 @@ LegendaryReset::LegendaryReset()
 
 
 
-void LegendaryReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void LegendaryReset::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     PokemonSwSh::ShinyHuntTracker& stats = env.current_stats<PokemonSwSh::ShinyHuntTracker>();
 
     StandardEncounterHandler handler(
@@ -98,9 +98,9 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext
         StartBattleDetector start_battle(env.console);
         BattleMenuWatcher battle_menu(BattleType::STANDARD);
 
-        int ret = run_until<BotBaseContext>(
+        int ret = run_until<ControllerContext>(
             env.console, context,
-            [this](BotBaseContext& context){
+            [this](ControllerContext& context){
                 size_t stop = WALK_UP ? 30 : 60;
                 for (size_t c = 0; c < stop; c++){
                     if (WALK_UP){

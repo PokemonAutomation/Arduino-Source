@@ -61,7 +61,7 @@ EggFetcherMultiple::EggFetcherMultiple()
 
 
 void EggFetcherMultiple::run_eggfetcher(
-    Logger& logger, BotBaseContext& context,
+    Logger& logger, ControllerContext& context,
     bool deposit_automatically,
     uint16_t attempts
 ) const{
@@ -92,7 +92,7 @@ void EggFetcherMultiple::run_eggfetcher(
     }
 }
 
-void EggFetcherMultiple::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void EggFetcherMultiple::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
         resume_game_back_out(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 400);

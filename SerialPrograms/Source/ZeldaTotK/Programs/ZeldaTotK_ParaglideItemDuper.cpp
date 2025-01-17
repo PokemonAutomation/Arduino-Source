@@ -66,7 +66,7 @@ ParaglideItemDuper::ParaglideItemDuper()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void ParaglideItemDuper::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void ParaglideItemDuper::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     ParaglideItemDuper_Descriptor::Stats& stats = env.current_stats<ParaglideItemDuper_Descriptor::Stats>();
 
     /*

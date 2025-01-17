@@ -28,10 +28,10 @@ public:
 class CrobatFinder : public SingleSwitchProgramInstance{
 public:
     CrobatFinder();
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ControllerContext& context) override;
 
 private:
-    void run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    void run_iteration(SingleSwitchProgramEnvironment& env, ControllerContext& context);
 
 private:
     ShinyRequiresAudioText SHINY_REQUIRES_AUDIO;

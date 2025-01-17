@@ -12,9 +12,9 @@
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 #include "CommonFramework/Inference/VisualDetector.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 
 namespace PokemonAutomation{
-    class BotBaseContext;
     struct ProgramInfo;
 namespace NintendoSwitch{
     class ConsoleHandle;
@@ -30,7 +30,7 @@ public:
     virtual bool detect(const ImageViewRGB32& screen) const override;
 
     bool detect_search_location(ImageFloatBox& box, const ImageViewRGB32& screen) const;
-    bool move_cursor_to_search(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context) const;
+    bool move_cursor_to_search(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context) const;
 
 private:
     Color m_color;

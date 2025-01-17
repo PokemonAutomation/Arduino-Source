@@ -311,7 +311,7 @@ bool ItemPrinterRNG::overlapping_bonus(){
 
 
 ItemPrinterPrizeResult ItemPrinterRNG::run_print_at_date(
-    SingleSwitchProgramEnvironment& env, BotBaseContext& context,
+    SingleSwitchProgramEnvironment& env, ControllerContext& context,
     const DateTime& date, ItemPrinterJobs jobs
 ){
     ItemPrinterRNG_Descriptor::Stats& stats = env.current_stats<ItemPrinterRNG_Descriptor::Stats>();
@@ -562,7 +562,7 @@ bool ItemPrinterRNG::results_approximately_match(
 }
 
 void ItemPrinterRNG::print_again(
-    SingleSwitchProgramEnvironment& env, BotBaseContext& context,
+    SingleSwitchProgramEnvironment& env, ControllerContext& context,
     ItemPrinterJobs jobs
 ) const{
     ItemPrinterRNG_Descriptor::Stats& stats = env.current_stats<ItemPrinterRNG_Descriptor::Stats>();
@@ -620,7 +620,7 @@ void ItemPrinterRNG::print_again(
 
 void ItemPrinterRNG::run_item_printer_rng_automode(
     SingleSwitchProgramEnvironment& env, 
-    BotBaseContext& context, 
+    ControllerContext& context, 
     ItemPrinterRNG_Descriptor::Stats& stats
 ){
     const uint16_t min_happiny_dust = 400;
@@ -740,7 +740,7 @@ int16_t ItemPrinterRNG::check_obtained_quantity(std::map<std::string, uint16_t> 
 
 void ItemPrinterRNG::run_material_farming_then_return_to_item_printer(
     SingleSwitchProgramEnvironment& env, 
-    BotBaseContext& context, 
+    ControllerContext& context, 
     ItemPrinterRNG_Descriptor::Stats& stats,
     MaterialFarmerOptions& material_farmer_options
 ){
@@ -807,7 +807,7 @@ ItemPrinter::PrebuiltOptions ItemPrinterRNG::get_bonus_type(ItemPrinter::Prebuil
 
 
 void ItemPrinterRNG::run_item_printer_rng(
-    SingleSwitchProgramEnvironment& env, BotBaseContext& context, 
+    SingleSwitchProgramEnvironment& env, ControllerContext& context, 
     ItemPrinterRNG_Descriptor::Stats& stats
 ){
     //  For each job that we print, we increment jobs_counter.
@@ -914,7 +914,7 @@ void ItemPrinterRNG::run_item_printer_rng(
 // and how low we allow the Happiny dust to go (min_happiny_dust)
 uint32_t ItemPrinterRNG::calc_num_jobs_using_happiny_dust(
     SingleSwitchProgramEnvironment& env, 
-    BotBaseContext& context,
+    ControllerContext& context,
     uint16_t min_happiny_dust
 ){
     uint32_t num_happiny_dust = check_num_happiny_dust(env, context);
@@ -932,7 +932,7 @@ uint32_t ItemPrinterRNG::calc_num_jobs_using_happiny_dust(
 }
 
 uint32_t ItemPrinterRNG::check_num_happiny_dust(
-    SingleSwitchProgramEnvironment& env, BotBaseContext& context
+    SingleSwitchProgramEnvironment& env, ControllerContext& context
 ){
     ItemPrinterRNG_Descriptor::Stats& stats = env.current_stats<ItemPrinterRNG_Descriptor::Stats>();
     env.log("Check how much Happiny Dust we have.");
@@ -994,7 +994,7 @@ uint32_t ItemPrinterRNG::check_num_happiny_dust(
     return 0;
 }
 
-void ItemPrinterRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void ItemPrinterRNG::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
     ItemPrinterRNG_Descriptor::Stats& stats = env.current_stats<ItemPrinterRNG_Descriptor::Stats>();
     env.update_stats();

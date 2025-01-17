@@ -10,6 +10,7 @@
 #include "CommonFramework/Language.h"
 #include "CommonFramework/Inference/VisualDetector.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 #include "PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
@@ -17,7 +18,6 @@
 
 
 namespace PokemonAutomation{
-    class BotBaseContext;
     struct ProgramInfo;
 namespace NintendoSwitch{
     class ConsoleHandle;
@@ -34,7 +34,7 @@ public:
 
     //  Returns -1 if not found.
     int8_t detect_slot(const ImageViewRGB32& screen) const;
-    bool move_to_slot(ConsoleHandle& console, BotBaseContext& context, uint8_t slot) const;
+    bool move_to_slot(ConsoleHandle& console, ControllerContext& context, uint8_t slot) const;
 
 private:
     WhiteButtonDetector m_status_button;
@@ -48,7 +48,7 @@ public:
 };
 
 std::set<std::string> read_singles_opponent(
-    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context,
     Language language
 );
 
@@ -63,7 +63,7 @@ public:
 
     //  Returns -1 if not found.
     int8_t detect_slot(const ImageViewRGB32& screen) const;
-    bool move_to_slot(ConsoleHandle& console, BotBaseContext& context, uint8_t slot) const;
+    bool move_to_slot(ConsoleHandle& console, ControllerContext& context, uint8_t slot) const;
 
 private:
     WhiteButtonDetector m_info_button;
@@ -101,7 +101,7 @@ public:
 
     //  Returns -1 if not found.
     int8_t detect_slot(const ImageViewRGB32& screen) const;
-    bool move_to_slot(ConsoleHandle& console, BotBaseContext& context, uint8_t slot) const;
+    bool move_to_slot(ConsoleHandle& console, ControllerContext& context, uint8_t slot) const;
 
 private:
     GradientArrowDetector m_arrow;

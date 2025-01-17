@@ -94,7 +94,7 @@ EggHatcher::EggHatcher()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void EggHatcher::hatch_one_box(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void EggHatcher::hatch_one_box(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     EggHatcher_Descriptor::Stats& stats = env.current_stats<EggHatcher_Descriptor::Stats>();
 
     for(uint8_t column_index = 0; column_index < 6; column_index++){
@@ -173,7 +173,7 @@ void EggHatcher::hatch_one_box(SingleSwitchProgramEnvironment& env, BotBaseConte
     context.wait_for_all_requests();
 }
 
-void EggHatcher::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void EggHatcher::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
     EggHatcher_Descriptor::Stats& stats = env.current_stats<EggHatcher_Descriptor::Stats>();

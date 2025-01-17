@@ -77,7 +77,7 @@ int PokePortalDetector::detect_location(const ImageViewRGB32& screen) const{
 
 
 bool PokePortalDetector::move_cursor(
-    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context,
     int row
 ) const{
     if (row < 0 || row >= 7){

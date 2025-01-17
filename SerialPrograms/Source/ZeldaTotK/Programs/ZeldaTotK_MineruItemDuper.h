@@ -28,7 +28,7 @@ public:
 class MineruItemDuper : public SingleSwitchProgramInstance{
 public:
     MineruItemDuper();
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ControllerContext& context) override;
 
 private:
     SimpleIntegerOption<uint32_t> AMOUNT;

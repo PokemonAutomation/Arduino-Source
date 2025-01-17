@@ -98,7 +98,7 @@ UnownFinder::UnownFinder()
 }
 
 
-void ruins_entrance_route(BotBaseContext& context){
+void ruins_entrance_route(ControllerContext& context){
     pbf_wait(context, (uint16_t)(0.5 * TICKS_PER_SECOND));
     pbf_move_left_joystick(context, 139, 120, 10, 10);
     pbf_wait(context, (uint16_t)(1.3 * TICKS_PER_SECOND));
@@ -111,7 +111,7 @@ void ruins_entrance_route(BotBaseContext& context){
     pbf_press_button(context, BUTTON_PLUS, 10, 10);
 }
 
-void enter_ruins(BotBaseContext& context){
+void enter_ruins(ControllerContext& context){
     pbf_press_button(context, BUTTON_B, (uint16_t)(4 * TICKS_PER_SECOND), 10);
     pbf_wait(context, (uint16_t)(1.5 * TICKS_PER_SECOND));
     pbf_move_left_joystick(context, 128, 255, 10, 0);
@@ -119,7 +119,7 @@ void enter_ruins(BotBaseContext& context){
 }
 
 
-void UnownFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void UnownFinder::run_iteration(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     UnownFinder_Descriptor::Stats& stats = env.current_stats<UnownFinder_Descriptor::Stats>();
 
     stats.attempts++;
@@ -142,9 +142,9 @@ void UnownFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
             return on_shiny_callback(env, env.console, *action, error_coefficient);
         });
 
-        int ret = run_until<BotBaseContext>(
+        int ret = run_until<ControllerContext>(
             env.console, context,
-            [&](BotBaseContext& context){
+            [&](ControllerContext& context){
                 ruins_entrance_route(context);
 
                 context.wait_for_all_requests();
@@ -169,7 +169,7 @@ void UnownFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
 }
 
 
-void UnownFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void UnownFinder::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     UnownFinder_Descriptor::Stats& stats = env.current_stats<UnownFinder_Descriptor::Stats>();
 
     //  Connect the controller.

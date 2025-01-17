@@ -29,7 +29,7 @@ namespace MaxLairInternal{
 
 bool read_battle_menu(
     ProgramEnvironment& env,
-    ConsoleHandle& console, BotBaseContext& context, size_t player_index,
+    ConsoleHandle& console, ControllerContext& context, size_t player_index,
     GlobalState& state,
     const ConsoleSpecificOptions& settings,
     bool currently_dmaxed, bool cheer_only
@@ -194,7 +194,7 @@ bool read_battle_menu(
 
 StateMachineAction run_move_select(
     ProgramEnvironment& env,
-    ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, ControllerContext& context,
     GlobalStateTracker& state_tracker,
     const ConsoleSpecificOptions& settings,
     bool currently_dmaxed, bool cheer_only
@@ -261,9 +261,9 @@ StateMachineAction run_move_select(
 
         //  Back out and look for battle menu. This indicates that the move wasn't selectable.
         BattleMenuDetector detector;
-        int result = run_until<BotBaseContext>(
+        int result = run_until<ControllerContext>(
             console, context,
-            [](BotBaseContext& context){
+            [](ControllerContext& context){
                 pbf_mash_button(context, BUTTON_B, 5 * TICKS_PER_SECOND);
             },
             {{detector}},
@@ -314,7 +314,7 @@ StateMachineAction run_move_select(
 
 StateMachineAction throw_balls(
     AdventureRuntime& runtime,
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ProgramEnvironment& env, ConsoleHandle& console, ControllerContext& context,
     Language language,
     GlobalStateTracker& state_tracker,
     const EndBattleDecider& decider

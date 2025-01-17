@@ -16,7 +16,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-void home_to_date_time(BotBaseContext& context, bool to_date_change, bool fast){
+void home_to_date_time(ControllerContext& context, bool to_date_change, bool fast){
 #if 0
     context.issue_request(
         DeviceRequest_home_to_date_time(to_date_change, fast)
@@ -76,7 +76,7 @@ void home_to_date_time(BotBaseContext& context, bool to_date_change, bool fast){
 
 namespace PokemonSwSh{
 
-void neutral_date_skip(BotBaseContext& context){
+void neutral_date_skip(ControllerContext& context){
 #if 0
     context.issue_request(
         DeviceRequest_neutral_date_skip()
@@ -100,7 +100,7 @@ void neutral_date_skip(BotBaseContext& context){
     ssf_issue_scroll(context, SSF_SCROLL_DOWN, 0);
 #endif
 }
-void roll_date_forward_1(BotBaseContext& context, bool fast){
+void roll_date_forward_1(ControllerContext& context, bool fast){
 #if 0
     context.issue_request(
         DeviceRequest_roll_date_forward_1(fast)
@@ -124,7 +124,7 @@ void roll_date_forward_1(BotBaseContext& context, bool fast){
     ssf_press_button(context, BUTTON_A, 20, 10);
 #endif
 }
-void roll_date_backward_N(BotBaseContext& context, uint8_t skips, bool fast){
+void roll_date_backward_N(ControllerContext& context, uint8_t skips, bool fast){
 #if 0
     context.issue_request(
         DeviceRequest_roll_date_backward_N(skips, fast)
@@ -161,7 +161,7 @@ void roll_date_backward_N(BotBaseContext& context, uint8_t skips, bool fast){
     ssf_press_button(context, BUTTON_A, 20, 10);
 #endif
 }
-void home_roll_date_enter_game_autorollback(ConsoleHandle& console, BotBaseContext& context, uint8_t& year){
+void home_roll_date_enter_game_autorollback(ConsoleHandle& console, ControllerContext& context, uint8_t& year){
     //  This version automatically handles the 2060 roll-back.
     if (year >= MAX_YEAR){
         home_roll_date_enter_game(console, context, true);
@@ -171,7 +171,7 @@ void home_roll_date_enter_game_autorollback(ConsoleHandle& console, BotBaseConte
     }
     year++;
 }
-void home_roll_date_enter_game(ConsoleHandle& console, BotBaseContext& context, bool rollback_year){
+void home_roll_date_enter_game(ConsoleHandle& console, ControllerContext& context, bool rollback_year){
 #if 0
     context.issue_request(
         DeviceRequest_home_roll_date_enter_game(rollback_year)
@@ -201,7 +201,7 @@ void home_roll_date_enter_game(ConsoleHandle& console, BotBaseContext& context, 
 
     resume_game_from_home(console, context, true);
 }
-void touch_date_from_home(BotBaseContext& context, uint16_t settings_to_home_delay){
+void touch_date_from_home(ControllerContext& context, uint16_t settings_to_home_delay){
 #if 0
     context.issue_request(
         DeviceRequest_touch_date_from_home(settings_to_home_delay)
@@ -230,7 +230,7 @@ void touch_date_from_home(BotBaseContext& context, uint16_t settings_to_home_del
     ssf_press_button(context, BUTTON_HOME, settings_to_home_delay, 10);
 #endif
 }
-void rollback_hours_from_home(BotBaseContext& context, uint8_t hours, uint16_t settings_to_home_delay){
+void rollback_hours_from_home(ControllerContext& context, uint8_t hours, uint16_t settings_to_home_delay){
 #if 0
     context.issue_request(
         DeviceRequest_rollback_hours_from_home(hours, settings_to_home_delay)

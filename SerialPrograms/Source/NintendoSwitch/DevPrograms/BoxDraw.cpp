@@ -5,7 +5,6 @@
  */
 
 #include <mutex>
-#include "ClientSource/Connection/BotBase.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "BoxDraw.h"
 
@@ -76,7 +75,7 @@ private:
     std::mutex m_lock;
 };
 
-void BoxDraw::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void BoxDraw::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     Overlay overlay(*this, env.console.overlay());
     overlay.value_changed(this);
     context.wait_until_cancel();

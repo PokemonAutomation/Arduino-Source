@@ -381,7 +381,7 @@ void BotBaseHandle::thread_body(){
         }
     });
 
-    BotBaseContext context(*m_botbase);
+    BotBaseControllerContext context(*m_botbase);
     while (true){
         if (m_state.load(std::memory_order_acquire) != State::READY){
             break;

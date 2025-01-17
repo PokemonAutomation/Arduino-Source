@@ -27,18 +27,18 @@ public:
     virtual std::string end_text() const override;
     virtual void run_segment(
         SingleSwitchProgramEnvironment& env, 
-        BotBaseContext& context,
+        ControllerContext& context,
         AutoStoryOptions options) const override;
 };
 
 
 // start: Defeated Cascarrafa Gym (Water). At Cascarrafa Gym.
 // end: Defeated Great Tusk/Iron Treads. 
-void checkpoint_39(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EventNotificationOption& notif_status_update);  
+void checkpoint_39(SingleSwitchProgramEnvironment& env, ControllerContext& context, EventNotificationOption& notif_status_update);  
 
 // start: Defeated Great Tusk/Iron Treads. 
 // end: At South Province (Area Three) Pokecenter.
-void checkpoint_40(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EventNotificationOption& notif_status_update);  
+void checkpoint_40(SingleSwitchProgramEnvironment& env, ControllerContext& context, EventNotificationOption& notif_status_update);  
 
 
 

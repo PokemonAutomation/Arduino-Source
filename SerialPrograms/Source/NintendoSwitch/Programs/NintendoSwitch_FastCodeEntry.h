@@ -18,7 +18,6 @@
 
 namespace PokemonAutomation{
     class Logger;
-    class BotBaseContext;
 namespace NintendoSwitch{
 
 
@@ -65,7 +64,7 @@ DigitPath get_codeboard_digit_path(
     CodeboardPosition source, CodeboardPosition destination,
     uint8_t scroll_delay, uint8_t wrap_delay, bool reordering
 );
-void move_codeboard(BotBaseContext& context, const DigitPath& path);
+void move_codeboard(ControllerContext& context, const DigitPath& path);
 
 
 
@@ -83,7 +82,7 @@ struct FastCodeEntrySettings{
 };
 void enter_alphanumeric_code(
     Logger& logger,
-    BotBaseContext& context,
+    ControllerContext& context,
     const FastCodeEntrySettings& settings,
     const std::string& code
 );

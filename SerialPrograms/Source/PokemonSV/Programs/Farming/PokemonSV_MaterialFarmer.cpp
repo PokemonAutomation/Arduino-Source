@@ -65,7 +65,7 @@ MaterialFarmer::MaterialFarmer()
 }
 
 
-void MaterialFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void MaterialFarmer::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
     //  Connect the controller.

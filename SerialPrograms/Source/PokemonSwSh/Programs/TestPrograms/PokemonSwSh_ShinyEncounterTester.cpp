@@ -5,7 +5,6 @@
  */
 
 #include "Common/Cpp/PrettyPrint.h"
-#include "ClientSource/Connection/BotBase.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyEncounterDetector.h"
 #include "PokemonSwSh_ShinyEncounterTester.h"
@@ -43,7 +42,7 @@ ShinyEncounterTester::ShinyEncounterTester()
 }
 
 
-void ShinyEncounterTester::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void ShinyEncounterTester::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     ShinyDetectionResult result = detect_shiny_battle(
         env.console, context,
         ENCOUNTER_TYPE == EncounterType::Wild ? SHINY_BATTLE_REGULAR : SHINY_BATTLE_RAID,

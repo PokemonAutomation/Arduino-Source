@@ -19,7 +19,7 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-void resume_game_no_interact_old(BotBaseContext& context, bool tolerate_update_menu){
+void resume_game_no_interact_old(ControllerContext& context, bool tolerate_update_menu){
     uint16_t HOME_TO_GAME_DELAY = GameSettings::instance().HOME_TO_GAME_DELAY;
     if (tolerate_update_menu){
         pbf_press_button(context, BUTTON_HOME, 10, HOME_TO_GAME_DELAY);
@@ -30,7 +30,7 @@ void resume_game_no_interact_old(BotBaseContext& context, bool tolerate_update_m
         pbf_press_button(context, BUTTON_HOME, 10, HOME_TO_GAME_DELAY);
     }
 }
-void resume_game_back_out_old(BotBaseContext& context, bool tolerate_update_menu, uint16_t mash_B_time){
+void resume_game_back_out_old(ControllerContext& context, bool tolerate_update_menu, uint16_t mash_B_time){
     uint16_t HOME_TO_GAME_DELAY = GameSettings::instance().HOME_TO_GAME_DELAY;
     if (tolerate_update_menu){
         pbf_press_button(context, BUTTON_HOME, 10, HOME_TO_GAME_DELAY);
@@ -42,12 +42,12 @@ void resume_game_back_out_old(BotBaseContext& context, bool tolerate_update_menu
         pbf_press_button(context, BUTTON_HOME, 10, HOME_TO_GAME_DELAY);
     }
 }
-void resume_game_front_of_den_nowatts(BotBaseContext& context, bool tolerate_update_menu){
+void resume_game_front_of_den_nowatts(ControllerContext& context, bool tolerate_update_menu){
     resume_game_back_out_old(context, tolerate_update_menu, 400);
 }
 
 void fast_reset_game(
-    BotBaseContext& context,
+    ControllerContext& context,
     uint16_t start_game_mash, uint16_t start_game_wait,
     uint16_t enter_game_mash, uint16_t enter_game_wait
 ){
@@ -72,7 +72,7 @@ void fast_reset_game(
 #endif
 }
 
-void reset_game_from_home(ConsoleHandle& console, BotBaseContext& context, bool tolerate_update_menu){
+void reset_game_from_home(ConsoleHandle& console, ControllerContext& context, bool tolerate_update_menu){
     if (!ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET && !tolerate_update_menu){
         fast_reset_game(
             context,
@@ -85,7 +85,7 @@ void reset_game_from_home(ConsoleHandle& console, BotBaseContext& context, bool 
     close_game(console, context);
     start_game_from_home(context, tolerate_update_menu, 0, 0, false);
 }
-void settings_to_enter_game(BotBaseContext& context, bool fast){
+void settings_to_enter_game(ControllerContext& context, bool fast){
     if (fast){
         //  100 ticks for the first press isn't enough to finish the animation.
         //  But since the HOME button has delayed effect, we start pressing the 2nd
@@ -98,7 +98,7 @@ void settings_to_enter_game(BotBaseContext& context, bool fast){
     }
 }
 void settings_to_enter_game_den_lobby(
-    BotBaseContext& context,
+    ControllerContext& context,
     bool tolerate_update_menu, bool fast,
     uint16_t enter_switch_pokemon_delay,
     uint16_t exit_switch_pokemon_delay
@@ -137,7 +137,7 @@ void settings_to_enter_game_den_lobby(
     }
 #endif
 }
-void start_game_from_home(BotBaseContext& context, bool tolerate_update_menu, uint8_t game_slot, uint8_t user_slot, bool backup_save){
+void start_game_from_home(ControllerContext& context, bool tolerate_update_menu, uint8_t game_slot, uint8_t user_slot, bool backup_save){
     //  Start the game with the specified "game_slot" and "user_slot".
     //  If "game_slot" is zero, it uses whatever the cursor is on.
     //  If "user_slot" is zero, it uses whatever the cursor is on.
@@ -190,7 +190,7 @@ void start_game_from_home(BotBaseContext& context, bool tolerate_update_menu, ui
     enter_game(context, backup_save, GameSettings::instance().ENTER_GAME_MASH, GameSettings::instance().ENTER_GAME_WAIT);
 }
 
-void enter_game(BotBaseContext& context, bool backup_save, uint16_t enter_game_mash, uint16_t enter_game_wait){
+void enter_game(ControllerContext& context, bool backup_save, uint16_t enter_game_mash, uint16_t enter_game_wait){
 #if 0
     context.issue_request(
         DeviceRequest_enter_game(backup_save, enter_game_mash, enter_game_wait)

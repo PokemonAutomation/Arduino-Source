@@ -66,7 +66,7 @@ struct EggCombinedSession{
 
         return block;
     }
-    void withdraw_column_shiftR(BotBaseContext& context, uint8_t column){
+    void withdraw_column_shiftR(ControllerContext& context, uint8_t column){
         menu_to_box(context, false);
         party_to_column(context, column);
         pickup_column(context, false);
@@ -75,7 +75,7 @@ struct EggCombinedSession{
         ssf_press_button2(context, BUTTON_A, GameSettings::instance().BOX_PICKUP_DROP_DELAY, EGG_BUTTON_HOLD_DELAY);
         box_to_menu(context);
     }
-    void deposit_column_shiftL(BotBaseContext& context, uint8_t column){
+    void deposit_column_shiftL(ControllerContext& context, uint8_t column){
         menu_to_box(context, true);
         pickup_column(context, true);
         party_to_column(context, column);
@@ -83,7 +83,7 @@ struct EggCombinedSession{
         ssf_press_button2(context, BUTTON_A, GameSettings::instance().BOX_PICKUP_DROP_DELAY, EGG_BUTTON_HOLD_DELAY);
         box_to_menu(context);
     }
-    uint8_t swap_party_shift(BotBaseContext& context, uint8_t column){
+    uint8_t swap_party_shift(ControllerContext& context, uint8_t column){
         menu_to_box(context, true);
         pickup_column(context, true);
 
@@ -125,7 +125,7 @@ struct EggCombinedSession{
 #define TRAVEL_BACK_TO_LADY_DURATION    (30 + 260 + (620) + 120 + 120 * 0)
 
     void eggcombined2_run_batch(
-        BotBaseContext& context,
+        ControllerContext& context,
         uint16_t INCUBATION_DELAY_LOWER,
         uint16_t remaining_travel_duration,
         uint8_t column,
@@ -207,7 +207,7 @@ struct EggCombinedSession{
         ssf_press_button2(context, BUTTON_B, GameSettings::instance().MENU_TO_OVERWORLD_DELAY, 20);
     }
 
-    void eggcombined2_body(ConsoleHandle& console, BotBaseContext& context){
+    void eggcombined2_body(ConsoleHandle& console, ControllerContext& context){
         if (BOXES_TO_HATCH == 0){
             ssf_press_button2(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE, 10);
             return;

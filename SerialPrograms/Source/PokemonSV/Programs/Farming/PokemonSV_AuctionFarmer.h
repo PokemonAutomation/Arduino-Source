@@ -38,7 +38,7 @@ public:
 class AuctionFarmer : public SingleSwitchProgramInstance{
 public:
     AuctionFarmer();
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ControllerContext& context) override;
 
 private:
     OCR::LanguageOCROption LANGUAGE;
@@ -52,13 +52,13 @@ private:
     BooleanCheckBoxOption ONE_NPC;
 
     std::vector<ImagePixelBox> detect_dialog_boxes(const ImageViewRGB32& screen);
-    void reset_auctions(SingleSwitchProgramEnvironment& env, BotBaseContext& context, bool do_full_reset, uint8_t& year);
-    std::vector<std::pair<AuctionOffer, ImageFloatBox>> check_offers(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-    void move_to_auctioneer(SingleSwitchProgramEnvironment& env, BotBaseContext& context, AuctionOffer wanted);
-    void move_dialog_to_center(SingleSwitchProgramEnvironment& env, BotBaseContext& context, AuctionOffer offer);
-    void bid_on_item(SingleSwitchProgramEnvironment& env, BotBaseContext& context, AuctionOffer offer);
+    void reset_auctions(SingleSwitchProgramEnvironment& env, ControllerContext& context, bool do_full_reset, uint8_t& year);
+    std::vector<std::pair<AuctionOffer, ImageFloatBox>> check_offers(SingleSwitchProgramEnvironment& env, ControllerContext& context);
+    void move_to_auctioneer(SingleSwitchProgramEnvironment& env, ControllerContext& context, AuctionOffer wanted);
+    void move_dialog_to_center(SingleSwitchProgramEnvironment& env, ControllerContext& context, AuctionOffer offer);
+    void bid_on_item(SingleSwitchProgramEnvironment& env, ControllerContext& context, AuctionOffer offer);
     bool is_good_offer(AuctionOffer);
-    void reset_position(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    void reset_position(SingleSwitchProgramEnvironment& env, ControllerContext& context);
 };
 
 

@@ -27,18 +27,18 @@ public:
     virtual std::string end_text() const override;
     virtual void run_segment(
         SingleSwitchProgramEnvironment& env, 
-        BotBaseContext& context,
+        ControllerContext& context,
         AutoStoryOptions options) const override;
 };
 
 
 // start: At Cascarrafa (West) Pokecenter.
 // end: At Cascarrafa Gym. Received Kofu's wallet.
-void checkpoint_35(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EventNotificationOption& notif_status_update);   
+void checkpoint_35(SingleSwitchProgramEnvironment& env, ControllerContext& context, EventNotificationOption& notif_status_update);   
 
 // start: At Cascarrafa Gym. Received Kofu's wallet.
 // end: At Porto Marinada Pokecenter.
-void checkpoint_36(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EventNotificationOption& notif_status_update);             
+void checkpoint_36(SingleSwitchProgramEnvironment& env, ControllerContext& context, EventNotificationOption& notif_status_update);             
 
 
 

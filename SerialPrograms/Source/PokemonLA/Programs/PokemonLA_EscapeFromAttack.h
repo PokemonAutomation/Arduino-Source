@@ -22,7 +22,7 @@ namespace PokemonLA{
 class EscapeFromAttack : public SuperControlSession<Controller>{
 public:
     EscapeFromAttack(
-        ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+        ProgramEnvironment& env, ConsoleHandle& console, ControllerContext& context,
         std::chrono::seconds time_min,
         std::chrono::seconds time_limit
     );

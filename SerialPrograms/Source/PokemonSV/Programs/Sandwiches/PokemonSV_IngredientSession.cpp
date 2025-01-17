@@ -27,7 +27,7 @@ IngredientSession::~IngredientSession() = default;
 
 IngredientSession::IngredientSession(
     AsyncDispatcher& dispatcher,
-    ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, ControllerContext& context,
     Language language, SandwichIngredientType type
 )
     : m_dispatcher(dispatcher)
@@ -253,7 +253,7 @@ std::string IngredientSession::move_to_ingredient(const std::set<std::string>& i
 
 
 void IngredientSession::add_ingredients(
-    ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, ControllerContext& context,
     std::map<std::string, uint8_t>&& ingredients
 ){
     //  "ingredients" will be what we still need.
@@ -318,7 +318,7 @@ void IngredientSession::add_ingredients(
 
 void add_sandwich_ingredients(
     AsyncDispatcher& dispatcher,
-    ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, ControllerContext& context,
     Language language,
     std::map<std::string, uint8_t>&& fillings,
     std::map<std::string, uint8_t>&& condiments

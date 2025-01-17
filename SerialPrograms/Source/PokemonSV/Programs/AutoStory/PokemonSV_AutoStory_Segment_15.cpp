@@ -41,7 +41,7 @@ std::string AutoStory_Segment_15::end_text() const{
     return "End: Defeated Team Star (Dark). At Cascarrafa (West) Pokecenter.";
 }
 
-void AutoStory_Segment_15::run_segment(SingleSwitchProgramEnvironment& env, BotBaseContext& context, AutoStoryOptions options) const{
+void AutoStory_Segment_15::run_segment(SingleSwitchProgramEnvironment& env, ControllerContext& context, AutoStoryOptions options) const{
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
 
     context.wait_for_all_requests();
@@ -63,7 +63,7 @@ void AutoStory_Segment_15::run_segment(SingleSwitchProgramEnvironment& env, BotB
 
 void checkpoint_32(
     SingleSwitchProgramEnvironment& env, 
-    BotBaseContext& context, 
+    ControllerContext& context, 
     EventNotificationOption& notif_status_update
 ){
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
@@ -139,7 +139,7 @@ void checkpoint_32(
 
 void checkpoint_33(
     SingleSwitchProgramEnvironment& env, 
-    BotBaseContext& context, 
+    ControllerContext& context, 
     EventNotificationOption& notif_status_update
 ){
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
@@ -160,9 +160,9 @@ void checkpoint_33(
 
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::OVERWORLD, CallbackEnum::PROMPT_DIALOG, CallbackEnum::TUTORIAL});
         AdvanceDialogWatcher    dialog(COLOR_RED);
-        int ret = run_until<BotBaseContext>(
+        int ret = run_until<ControllerContext>(
             env.console, context,
-            [&](BotBaseContext& context){
+            [&](ControllerContext& context){
 
                 DirectionDetector direction;
                 uint16_t seconds_wait = 6;
@@ -265,7 +265,7 @@ void checkpoint_33(
 
 void checkpoint_34(
     SingleSwitchProgramEnvironment& env, 
-    BotBaseContext& context, 
+    ControllerContext& context, 
     EventNotificationOption& notif_status_update
 ){
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();

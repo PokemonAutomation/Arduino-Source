@@ -24,7 +24,7 @@ namespace MaxLairInternal{
 
 
 bool wait_for_a_player(
-    ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, ControllerContext& context,
     const ImageViewRGB32& entrance,
     WallClock time_limit
 ){
@@ -60,7 +60,7 @@ bool wait_for_a_player(
 }
 
 bool wait_for_lobby_ready(
-    ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, ControllerContext& context,
     const ImageViewRGB32& entrance,
     size_t min_players,
     size_t start_players,
@@ -93,7 +93,7 @@ bool wait_for_lobby_ready(
     return true;
 }
 bool start_adventure(
-    ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, ControllerContext& context,
     size_t consoles
 ){
     LobbyMinReadyDetector ready_detector(consoles, true);
@@ -104,9 +104,9 @@ bool start_adventure(
 
     //  Press A until you're not in the lobby anymore.
     LobbyDetector lobby_detector(true);
-    int result = run_until<BotBaseContext>(
+    int result = run_until<ControllerContext>(
         console, context,
-        [](BotBaseContext& context){
+        [](ControllerContext& context){
             for (size_t c = 0; c < 180; c++){
                 pbf_press_button(context, BUTTON_A, 10, 115);
                 context.wait_for_all_requests();
@@ -128,7 +128,7 @@ bool start_adventure(
 
 
 bool start_raid_self_solo(
-    ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, ControllerContext& context,
     GlobalStateTracker& state_tracker,
     std::shared_ptr<const ImageRGB32>& entrance, size_t boss_slot,
     ReadableQuantity999& ore
@@ -155,7 +155,7 @@ bool start_raid_self_solo(
 }
 
 bool start_raid_host_solo(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ProgramEnvironment& env, ConsoleHandle& console, ControllerContext& context,
     GlobalStateTracker& state_tracker,
     std::shared_ptr<const ImageRGB32>& entrance, size_t boss_slot,
     HostingSettings& settings,

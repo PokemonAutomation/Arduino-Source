@@ -107,7 +107,7 @@ MoneyFarmerRoute212::MoneyFarmerRoute212()
 
 
 
-bool MoneyFarmerRoute212::battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context, uint8_t pp[4], bool man){
+bool MoneyFarmerRoute212::battle(SingleSwitchProgramEnvironment& env, ControllerContext& context, uint8_t pp[4], bool man){
     MoneyFarmerRoute212_Descriptor::Stats& stats = env.current_stats<MoneyFarmerRoute212_Descriptor::Stats>();
     context.wait_for_all_requests();
     if (man){
@@ -129,9 +129,9 @@ bool MoneyFarmerRoute212::battle(SingleSwitchProgramEnvironment& env, BotBaseCon
         BattleMenuWatcher battle_menu(BattleType::TRAINER);
         EndBattleWatcher end_battle;
         SelectionArrowFinder learn_move(env.console, {0.50, 0.62, 0.40, 0.18}, COLOR_YELLOW);
-        int ret = run_until<BotBaseContext>(
+        int ret = run_until<ControllerContext>(
             env.console, context,
-            [](BotBaseContext& context){
+            [](ControllerContext& context){
                 pbf_mash_button(context, BUTTON_B, 30 * TICKS_PER_SECOND);
             },
             {
@@ -208,7 +208,7 @@ bool MoneyFarmerRoute212::battle(SingleSwitchProgramEnvironment& env, BotBaseCon
 }
 
 
-void MoneyFarmerRoute212::heal_at_center_and_return(ConsoleHandle& console, BotBaseContext& context, uint8_t pp[4]){
+void MoneyFarmerRoute212::heal_at_center_and_return(ConsoleHandle& console, ControllerContext& context, uint8_t pp[4]){
     console.overlay().add_log("Heal at " + STRING_POKEMON + " Center", COLOR_WHITE);
     console.log("Healing " + STRING_POKEMON + " at Hearthome City " + STRING_POKEMON + " Center.");
     pbf_move_left_joystick(context, 125, 0, 6 * TICKS_PER_SECOND, 0);
@@ -245,7 +245,7 @@ void MoneyFarmerRoute212::heal_at_center_and_return(ConsoleHandle& console, BotB
 }
 
 
-void MoneyFarmerRoute212::fly_to_center_heal_and_return(ConsoleHandle& console, BotBaseContext& context, uint8_t pp[4]){
+void MoneyFarmerRoute212::fly_to_center_heal_and_return(ConsoleHandle& console, ControllerContext& context, uint8_t pp[4]){
     console.log("Flying back to Hearthome City to heal.");
     console.overlay().add_log("Fly to Hearthome City", COLOR_WHITE);
     pbf_press_button(context, BUTTON_X, 10, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
@@ -257,7 +257,7 @@ void MoneyFarmerRoute212::fly_to_center_heal_and_return(ConsoleHandle& console, 
 }
 
 bool MoneyFarmerRoute212::heal_after_battle_and_return(
-    ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, ControllerContext& context,
     uint8_t pp[4])
 {
     if (HEALING_METHOD == HealMethod::Hearthome){
@@ -276,7 +276,7 @@ bool MoneyFarmerRoute212::heal_after_battle_and_return(
     }
 }
 
-void MoneyFarmerRoute212::charge_vs_seeker(BotBaseContext& context){
+void MoneyFarmerRoute212::charge_vs_seeker(ControllerContext& context){
     for (size_t c = 0; c < 5; c++){
         pbf_move_left_joystick(context, 0, 128, 180, 0);
         pbf_move_left_joystick(context, 255, 128, 180, 0);
@@ -294,7 +294,7 @@ size_t MoneyFarmerRoute212::total_pp(uint8_t pp[4]){
 }
 
 
-void MoneyFarmerRoute212::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void MoneyFarmerRoute212::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     MoneyFarmerRoute212_Descriptor::Stats& stats = env.current_stats<MoneyFarmerRoute212_Descriptor::Stats>();
 
     uint8_t pp[4] = {
@@ -340,9 +340,9 @@ void MoneyFarmerRoute212::program(SingleSwitchProgramEnvironment& env, BotBaseCo
         {
             env.console.overlay().add_log("Using Vs. Seeker", COLOR_WHITE);
             VSSeekerReactionTracker tracker(env.console, {0.23, 0.30, 0.35, 0.30});
-            run_until<BotBaseContext>(
+            run_until<ControllerContext>(
                 env.console, context,
-                [this](BotBaseContext& context){
+                [this](ControllerContext& context){
                     SHORTCUT.run(context, TICKS_PER_SECOND);
 
                 },

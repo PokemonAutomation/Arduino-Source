@@ -29,9 +29,9 @@ class GodEggDuplication : public SingleSwitchProgramInstance{
 public:
     GodEggDuplication();
 
-    void collect_godegg(BotBaseContext& context, uint8_t party_slot) const;
-    void run_program(Logger& logger, BotBaseContext& context, uint16_t attempts) const;
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    void collect_godegg(ControllerContext& context, uint8_t party_slot) const;
+    void run_program(Logger& logger, ControllerContext& context, uint16_t attempts) const;
+    virtual void program(SingleSwitchProgramEnvironment& env, ControllerContext& context) override;
 
 private:
     StartInGripOrGameOption START_LOCATION;

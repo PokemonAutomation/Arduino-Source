@@ -36,7 +36,7 @@ public:
 class EggFetcher : public SingleSwitchProgramInstance{
 public:
     EggFetcher();
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ControllerContext& context) override;
 
 private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;

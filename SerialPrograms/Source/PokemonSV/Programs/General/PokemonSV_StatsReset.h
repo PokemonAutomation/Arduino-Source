@@ -30,7 +30,7 @@ public:
 class StatsReset : public SingleSwitchProgramInstance{
 public:
     StatsReset();
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ControllerContext& context) override;
 
 private:
     //Can expand targets assuming there's anything else not locked in the DLC
@@ -52,10 +52,10 @@ private:
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;
 
-    bool enter_battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-    void open_ball_menu(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-    bool run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-    bool check_stats(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    bool enter_battle(SingleSwitchProgramEnvironment& env, ControllerContext& context);
+    void open_ball_menu(SingleSwitchProgramEnvironment& env, ControllerContext& context);
+    bool run_battle(SingleSwitchProgramEnvironment& env, ControllerContext& context);
+    bool check_stats(SingleSwitchProgramEnvironment& env, ControllerContext& context);
 };
 
 }

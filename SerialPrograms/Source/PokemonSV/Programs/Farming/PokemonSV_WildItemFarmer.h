@@ -31,12 +31,12 @@ public:
 class WildItemFarmer : public SingleSwitchProgramInstance{
 public:
     WildItemFarmer();
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ControllerContext& context) override;
 
 private:
-    void refresh_pp(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-    bool verify_item_held(SingleSwitchProgramEnvironment& env, BotBaseContext& context, NormalBattleMenuWatcher& battle_menu);
-    void run_program(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    void refresh_pp(SingleSwitchProgramEnvironment& env, ControllerContext& context);
+    bool verify_item_held(SingleSwitchProgramEnvironment& env, ControllerContext& context, NormalBattleMenuWatcher& battle_menu);
+    void run_program(SingleSwitchProgramEnvironment& env, ControllerContext& context);
 
 private:
     SimpleIntegerOption<uint16_t> ITEMS_TO_CLONE;

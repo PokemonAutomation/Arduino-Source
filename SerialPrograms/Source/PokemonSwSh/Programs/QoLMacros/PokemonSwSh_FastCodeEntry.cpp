@@ -48,7 +48,7 @@ FastCodeEntry::FastCodeEntry()
     PA_ADD_OPTION(INITIAL_DELAY);
 }
 
-void FastCodeEntry::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void FastCodeEntry::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     uint8_t code[8];
     RAID_CODE.to_str(code);
 

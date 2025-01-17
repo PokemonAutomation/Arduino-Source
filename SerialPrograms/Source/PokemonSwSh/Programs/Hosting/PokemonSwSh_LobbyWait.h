@@ -22,7 +22,7 @@ namespace PokemonSwSh{
 
 
 static RaidLobbyState raid_lobby_wait(
-    ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, ControllerContext& context,
     bool HOST_ONLINE,
     uint8_t accept_FR_slot,
     uint16_t lobby_wait_delay

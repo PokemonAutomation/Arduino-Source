@@ -66,7 +66,7 @@ class GenerateDexModelSession{
 
 public:
     GenerateDexModelSession(
-        ConsoleHandle& console, BotBaseContext& context,
+        ConsoleHandle& console, ControllerContext& context,
         size_t horizontal_frames = 10,
         size_t animation_frames = 2
     )
@@ -89,7 +89,7 @@ public:
 
 private:
     ConsoleHandle& m_console;
-    BotBaseContext& m_context;
+    ControllerContext& m_context;
 
     std::string m_path;
 
@@ -228,7 +228,7 @@ void GenerateDexModelSession::iterate_dex(){
 
 
 
-void GeneratePokedexSprites::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void GeneratePokedexSprites::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     GenerateDexModelSession session(env.console, context);
     session.iterate_dex();
 }

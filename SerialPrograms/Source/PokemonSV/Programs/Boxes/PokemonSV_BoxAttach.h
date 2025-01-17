@@ -8,10 +8,10 @@
 #define PokemonAutomation_PokemonSV_BoxAttach_H
 
 #include <stdint.h>
+#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 
 namespace PokemonAutomation{
     struct ProgramInfo;
-    class BotBaseContext;
 namespace NintendoSwitch{
     class ConsoleHandle;
 namespace PokemonSV{
@@ -20,14 +20,14 @@ namespace PokemonSV{
 //  With the cursor over the item you want to attach, attach to the current
 //  Pokemon, replacing if neccessary.
 void attach_item_from_bag(
-    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context,
     size_t& errors
 );
 
 //  With the cursor over the pokemon you want to attach the item to.
 //  Make sure you are in the item view.
 void attach_item_from_box(
-    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context,
     size_t category_index,
     size_t& errors
 );

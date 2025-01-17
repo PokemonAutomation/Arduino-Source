@@ -537,7 +537,7 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Tools/ErrorDumper.h
     Source/CommonFramework/Tools/FileDownloader.cpp
     Source/CommonFramework/Tools/FileDownloader.h
-    Source/CommonFramework/Tools/InterruptableCommands.cpp
+    Source/CommonFramework/Tools/InterruptableCommands.tpp
     Source/CommonFramework/Tools/InterruptableCommands.h
     Source/CommonFramework/Tools/MultiConsoleErrors.cpp
     Source/CommonFramework/Tools/MultiConsoleErrors.h
@@ -547,7 +547,7 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Tools/StatsDatabase.h
     Source/CommonFramework/Tools/StatsTracking.cpp
     Source/CommonFramework/Tools/StatsTracking.h
-    Source/CommonFramework/Tools/SuperControlSession.cpp
+    Source/CommonFramework/Tools/SuperControlSession.tpp
     Source/CommonFramework/Tools/SuperControlSession.h
     Source/CommonFramework/Tools/VideoResolutionCheck.cpp
     Source/CommonFramework/Tools/VideoResolutionCheck.h
@@ -791,6 +791,7 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_Device.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_PushButtons.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_Superscalar.h
+    Source/NintendoSwitch/Controllers/NintendoSwitch_Controller.cpp
     Source/NintendoSwitch/Controllers/NintendoSwitch_Controller.h
     Source/NintendoSwitch/DevPrograms/BoxDraw.cpp
     Source/NintendoSwitch/DevPrograms/BoxDraw.h

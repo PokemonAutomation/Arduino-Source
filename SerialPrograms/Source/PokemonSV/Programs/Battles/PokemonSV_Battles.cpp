@@ -22,7 +22,7 @@ using namespace Pokemon;
 
 
 void auto_heal_from_menu_or_overworld(
-    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context,
     uint8_t party_slot,
     bool return_to_overworld
 ){
@@ -85,7 +85,7 @@ void auto_heal_from_menu_or_overworld(
 
 
 
-int run_from_battle(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+int run_from_battle(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context){
     console.log("Attempting to run away...");
 
     int attempts = 0;

@@ -4,12 +4,12 @@
  * 
  */
 
-#include <sstream>
+//#include <sstream>
 #include "ClientSource/Libraries/MessageConverter.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_DetectHome.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
+//#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch_Commands_Routines.h"
 #include "NintendoSwitch_Commands_PushButtons.h"
 //#include "NintendoSwitch_Messages_Routines.h"
@@ -18,7 +18,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-void close_game(ConsoleHandle& console, BotBaseContext& context){
+void close_game(ConsoleHandle& console, ControllerContext& context){
 #if 0
     context.issue_request(
         DeviceRequest_close_game()

@@ -10,7 +10,6 @@
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 
 namespace PokemonAutomation{
-    class BotBaseContext;
 namespace NintendoSwitch{
 namespace PokemonBDSP{
 
@@ -20,7 +19,7 @@ namespace PokemonBDSP{
 // Return true if a black screen is detected, false if not detected after
 // `exit_battle_time` of ticks have passed. 
 bool run_from_battle(
-    ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, ControllerContext& context,
     uint16_t exit_battle_time
 );
 

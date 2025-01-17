@@ -42,31 +42,31 @@ public:
 class EggAutonomous : public SingleSwitchProgramInstance{
 public:
     EggAutonomous();
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ControllerContext& context) override;
 
 private:
-    int fetch_eggs_full_routine(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    int fetch_eggs_full_routine(SingleSwitchProgramEnvironment& env, ControllerContext& context);
 
-    void hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env, BotBaseContext& context, int num_eggs_in_party);
+    void hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env, ControllerContext& context, int num_eggs_in_party);
 
-    void reset_position_to_flying_spot(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    void reset_position_to_flying_spot(SingleSwitchProgramEnvironment& env, ControllerContext& context);
 
-    int picnic_party_to_hatch_party(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    int picnic_party_to_hatch_party(SingleSwitchProgramEnvironment& env, ControllerContext& context);
 
-    void process_one_baby(SingleSwitchProgramEnvironment& env, BotBaseContext& context, uint8_t egg_index, uint8_t num_eggs_in_party);
+    void process_one_baby(SingleSwitchProgramEnvironment& env, ControllerContext& context, uint8_t egg_index, uint8_t num_eggs_in_party);
 
-    bool move_pokemon_to_keep(SingleSwitchProgramEnvironment& env, BotBaseContext& context, uint8_t pokemon_row_in_party);
+    bool move_pokemon_to_keep(SingleSwitchProgramEnvironment& env, ControllerContext& context, uint8_t pokemon_row_in_party);
 
-    void save_game(SingleSwitchProgramEnvironment& env, BotBaseContext& context, bool from_overworld);
+    void save_game(SingleSwitchProgramEnvironment& env, ControllerContext& context, bool from_overworld);
 
     void handle_recoverable_error(
-        SingleSwitchProgramEnvironment& env, BotBaseContext& context,
+        SingleSwitchProgramEnvironment& env, ControllerContext& context,
         EventNotificationOption& notification,
         OperationFailedException& e,
         size_t& consecutive_failures
     );
 
-    // void call_with_debug_dump(SingleSwitchProgramEnvironment& env, BotBaseContext& context, std::function<void())
+    // void call_with_debug_dump(SingleSwitchProgramEnvironment& env, ControllerContext& context, std::function<void())
 
 private:
     // Will need this to preserve raid den

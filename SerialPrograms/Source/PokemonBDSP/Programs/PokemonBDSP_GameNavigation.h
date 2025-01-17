@@ -10,27 +10,26 @@
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 
 namespace PokemonAutomation{
-    class BotBaseContext;
 namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 
 //  Non-Feedback
 
-void save_game(BotBaseContext& context);
+void save_game(ControllerContext& context);
 
-void menu_to_box(BotBaseContext& context);
-void overworld_to_box(BotBaseContext& context);
-void box_to_overworld(BotBaseContext& context);
+void menu_to_box(ControllerContext& context);
+void overworld_to_box(ControllerContext& context);
+void box_to_overworld(ControllerContext& context);
 
 
 //  Feedback
 
-void overworld_to_menu(ConsoleHandle& console, BotBaseContext& context);
-void save_game(ConsoleHandle& console, BotBaseContext& context);
+void overworld_to_menu(ConsoleHandle& console, ControllerContext& context);
+void save_game(ConsoleHandle& console, ControllerContext& context);
 
-void overworld_to_box(ConsoleHandle& console, BotBaseContext& context);
-void box_to_overworld(ConsoleHandle& console, BotBaseContext& context);
+void overworld_to_box(ConsoleHandle& console, ControllerContext& context);
+void box_to_overworld(ConsoleHandle& console, ControllerContext& context);
 
 
 }

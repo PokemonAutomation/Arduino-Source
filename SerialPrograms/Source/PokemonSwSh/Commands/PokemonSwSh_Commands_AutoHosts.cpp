@@ -21,7 +21,7 @@ namespace PokemonSwSh{
 
 
 void connect_to_internet(
-    BotBaseContext& context,
+    ControllerContext& context,
     uint16_t open_ycomm_delay,
     uint16_t connect_to_internet_delay
 ){
@@ -46,7 +46,7 @@ void connect_to_internet(
 #endif
 }
 void home_to_add_friends(
-    BotBaseContext& context,
+    ControllerContext& context,
     uint8_t user_slot,
     uint8_t scroll_down,
     bool fix_cursor
@@ -86,7 +86,7 @@ void home_to_add_friends(
 #endif
 }
 void accept_FRs(
-    ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, ControllerContext& context,
     uint8_t slot, bool fix_cursor,
     uint16_t game_to_home_delay_safe,
     uint16_t auto_fr_duration,

@@ -5,7 +5,6 @@
  */
 
 //#include "Common/Cpp/Exceptions.h"
-#include "ClientSource/Connection/BotBase.h"
 #include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
@@ -16,9 +15,9 @@
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonBDSP_EncounterDetection.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -26,7 +25,7 @@ namespace PokemonBDSP{
 
 
 StandardEncounterDetection::StandardEncounterDetection(
-    ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, ControllerContext& context,
     Language language,
     const EncounterFilterOption2& filter,
     const DoublesShinyDetection& shininess,

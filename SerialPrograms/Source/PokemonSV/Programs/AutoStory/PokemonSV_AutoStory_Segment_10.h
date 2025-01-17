@@ -27,22 +27,22 @@ public:
     virtual std::string end_text() const override;
     virtual void run_segment(
         SingleSwitchProgramEnvironment& env, 
-        BotBaseContext& context,
+        ControllerContext& context,
         AutoStoryOptions options) const override;
 };
 
 
 // start: After the break, with level 100 Gardevoir. At Mesagoza West pokecenter.
 // end: At Mesagoza West gate flypoint
-void checkpoint_21(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EventNotificationOption& notif_status_update);   
+void checkpoint_21(SingleSwitchProgramEnvironment& env, ControllerContext& context, EventNotificationOption& notif_status_update);   
 
 // start: At Mesagoza West gate flypoint
 // end: At South Province Area Two Pokecenter.
-void checkpoint_22(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EventNotificationOption& notif_status_update);   
+void checkpoint_22(SingleSwitchProgramEnvironment& env, ControllerContext& context, EventNotificationOption& notif_status_update);   
 
 // start: At South Province Area Two Pokecenter.
 // end: At Cortondo East Pokecenter
-void checkpoint_23(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EventNotificationOption& notif_status_update);   
+void checkpoint_23(SingleSwitchProgramEnvironment& env, ControllerContext& context, EventNotificationOption& notif_status_update);   
 
 
 }

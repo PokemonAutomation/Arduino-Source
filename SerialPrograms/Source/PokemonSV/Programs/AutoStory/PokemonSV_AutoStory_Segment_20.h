@@ -27,22 +27,22 @@ public:
     virtual std::string end_text() const override;
     virtual void run_segment(
         SingleSwitchProgramEnvironment& env, 
-        BotBaseContext& context,
+        ControllerContext& context,
         AutoStoryOptions options) const override;
 };
 
 
 // start: Defeated Klawf. At Artazon (West) Pokecenter.
 // end: At Artazon Gym building. Battled Nemona. Received Sunflora gym challenge.
-void checkpoint_43(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EventNotificationOption& notif_status_update);  
+void checkpoint_43(SingleSwitchProgramEnvironment& env, ControllerContext& context, EventNotificationOption& notif_status_update);  
 
 // start: At Artazon Gym building. Battled Nemona. Received Sunflora gym challenge.
 // end: Finished Sunflora gym challenge.
-void checkpoint_44(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EventNotificationOption& notif_status_update);  
+void checkpoint_44(SingleSwitchProgramEnvironment& env, ControllerContext& context, EventNotificationOption& notif_status_update);  
 
 // start: Finished Sunflora gym challenge.
 // end: Defeated Artazon Gym (Grass). Inside gym building.
-void checkpoint_45(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EventNotificationOption& notif_status_update); 
+void checkpoint_45(SingleSwitchProgramEnvironment& env, ControllerContext& context, EventNotificationOption& notif_status_update); 
 
 
 

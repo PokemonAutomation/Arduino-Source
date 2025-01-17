@@ -27,7 +27,7 @@ using namespace Pokemon;
 //  Run a single move for a single turn.
 //  Returns true if move is successfully selected.
 bool run_move_select(
-    ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, ControllerContext& context,
     MoveSelectWatcher& move_select_menu,
     SinglesMoveEntry& move, size_t consecutive_move_select
 ){
@@ -86,7 +86,7 @@ bool run_move_select(
 
 
 bool run_battle_menu(
-    ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, ControllerContext& context,
     NormalBattleMenuWatcher& battle_menu,
     const SinglesMoveEntry& move
 ){
@@ -124,7 +124,7 @@ bool run_battle_menu(
 
 //  Run a battle using the current Pokemon. Returns false if it fainted.
 bool run_pokemon(
-    ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, ControllerContext& context,
     const std::vector<SinglesMoveEntry>& move_table,
     bool trainer_battle, bool& terastallized
 ){
@@ -149,9 +149,9 @@ bool run_pokemon(
         AdvanceDialogWatcher dialog(COLOR_CYAN);
         OverworldWatcher overworld(console, COLOR_GREEN);
         context.wait_for_all_requests();
-        int ret = run_until<BotBaseContext>(
+        int ret = run_until<ControllerContext>(
             console, context,
-            [](BotBaseContext& context){
+            [](ControllerContext& context){
                 for (size_t c = 0; c < 4; c++){
                     pbf_wait(context, 30 * TICKS_PER_SECOND);
                     pbf_press_button(context, BUTTON_B, 20, 0);
@@ -259,7 +259,7 @@ bool run_pokemon(
 
 bool run_singles_battle(
     ProgramEnvironment& env,
-    ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, ControllerContext& context,
     SinglesAIOption& battle_AI,
     bool trainer_battle
 ){

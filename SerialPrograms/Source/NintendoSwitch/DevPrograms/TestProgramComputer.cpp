@@ -103,7 +103,6 @@
 #include "PokemonSV/Inference/Picnics/PokemonSV_SandwichHandDetector.h"
 #include "CommonFramework/Inference/StatAccumulator.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
-#include "ClientSource/Connection/BotBase.h"
 #include "CommonFramework/Environment/Environment.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_LetsGoKillDetector.h"
 #include "PokemonSV/Inference/PokemonSV_SweatBubbleDetector.h"

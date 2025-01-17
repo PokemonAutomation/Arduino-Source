@@ -15,13 +15,13 @@ namespace PokemonAutomation{
 class Logger;
 struct BotBaseMessage;
 class BotBaseRequest;
-class BotBaseContext;
+class BotBaseControllerContext;
 
 
 
 class BotBaseController{
 public:
-    using ContextType = BotBaseContext;
+    using ContextType = BotBaseControllerContext;
 
     enum class State{
         RUNNING,
@@ -82,20 +82,20 @@ public:
 
 
 //  A wrapper for BotBase that allows for asynchronous cancelling.
-class BotBaseContext final : public ControllerContext{
+class BotBaseControllerContext final : public ControllerContext{
 public:
     using ControllerType = BotBaseController;
 
 public:
-    BotBaseContext(BotBaseController& botbase)
+    BotBaseControllerContext(BotBaseController& botbase)
         : m_controller(botbase)
     {}
-    BotBaseContext(CancellableScope& parent, BotBaseController& botbase)
+    BotBaseControllerContext(CancellableScope& parent, BotBaseController& botbase)
         : m_controller(botbase)
     {
         attach(parent);
     }
-    virtual ~BotBaseContext(){
+    virtual ~BotBaseControllerContext(){
         detach();
     }
 

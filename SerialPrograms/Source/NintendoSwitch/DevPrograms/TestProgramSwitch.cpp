@@ -14,7 +14,6 @@
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
 #include "Common/Cpp/Concurrency/AsyncDispatcher.h"
 #include "Common/Cpp/Concurrency/PeriodicScheduler.h"
-#include "ClientSource/Connection/BotBase.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/InferenceInfra/InferenceSession.h"
 #include "CommonFramework/OCR/OCR_RawOCR.h"
@@ -277,7 +276,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 //    [[maybe_unused]] BotBase& botbase = env.consoles[0];
     [[maybe_unused]] VideoFeed& feed = env.consoles[0];
     [[maybe_unused]] VideoOverlay& overlay = env.consoles[0];
-    BotBaseContext context(scope, console.controller());
+    ControllerContext context(scope, console.controller());
     VideoOverlaySet overlays(overlay);
 
 
@@ -1061,9 +1060,9 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
         NormalBattleMenuWatcher battle_menu(COLOR_RED);
         AreaZeroSkyTracker sky_tracker(overlay);
         context.wait_for_all_requests();
-        int ret = run_until<BotBaseContext>(
+        int ret = run_until<ControllerContext>(
             console, context,
-            [&](BotBaseContext& context){
+            [&](ControllerContext& context){
                 while (true){
                     switch (count++ % 2){
                     case 0:
@@ -1148,7 +1147,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     ConsoleHandle& host = env.consoles[host_index];
     BotBaseContext host_context(scope, host.botbase());
 
-    env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
+    env.run_in_parallel(scope, [&](ConsoleHandle& console, ControllerContext& context){
         if (console.index() == host_index){
             open_raid(console, context);
         }else{
@@ -1167,7 +1166,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
         OperationFailedException::fire(env.logger(), "Unable to read raid code.");
     }
 
-    env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
+    env.run_in_parallel(scope, [&](ConsoleHandle& console, ControllerContext& context){
         if (console.index() == host_index){
             return;
         }
@@ -1434,12 +1433,12 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 #if 0
     AsyncCommandSession session(scope, logger, env.realtime_dispatcher(), context.botbase());
-    session.dispatch([](BotBaseContext& context){
+    session.dispatch([](ControllerContext& context){
 //        pbf_controller_state(context, 0, DPAD_NONE, 128, 0, 128, 128, 255);
         pbf_press_button(context, BUTTON_A, 255, 0);
     });
     context.wait_for(std::chrono::seconds(2));
-    session.dispatch([](BotBaseContext& context){
+    session.dispatch([](ControllerContext& context){
 //        pbf_controller_state(context, BUTTON_B, DPAD_NONE, 128, 0, 128, 128, 255);
         pbf_press_button(context, BUTTON_B, 255, 0);
     });
@@ -1666,7 +1665,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     TradeStats stats;
     env.run_in_parallel(
         scope,
-        [&](ConsoleHandle& console, BotBaseContext& context){
+        [&](ConsoleHandle& console, ControllerContext& context){
             trade_current_pokemon(console, context, state, stats);
         }
     );

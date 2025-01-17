@@ -27,7 +27,7 @@ namespace PokemonBDSP{
 
 
 bool gamemenu_to_ingame(
-    ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, ControllerContext& context,
     uint16_t mash_duration, uint16_t enter_game_timeout
 ){
     console.log("Mashing A to enter game...");
@@ -49,7 +49,7 @@ bool gamemenu_to_ingame(
     }
 }
 bool openedgame_to_ingame(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ProgramEnvironment& env, ConsoleHandle& console, ControllerContext& context,
     uint16_t load_game_timeout,
     uint16_t mash_duration, uint16_t enter_game_timeout,
     uint16_t post_wait_time
@@ -70,7 +70,7 @@ bool openedgame_to_ingame(
 
 
 bool reset_game_from_home(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ProgramEnvironment& env, ConsoleHandle& console, ControllerContext& context,
     bool tolerate_update_menu,
     uint16_t post_wait_time
 ){

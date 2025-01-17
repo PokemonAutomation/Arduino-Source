@@ -51,7 +51,7 @@ public:
 public:
     GenerateIVCheckerOCR();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ControllerContext& context) override;
 
 private:
     OCR::LanguageOCROption LANGUAGE;

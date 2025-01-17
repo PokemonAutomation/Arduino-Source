@@ -35,7 +35,7 @@ public:
 class StatsReset : public SingleSwitchProgramInstance{
 public:
     StatsReset();
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ControllerContext& context) override;
 
 private:
     StartInGripOrGameOption START_LOCATION;

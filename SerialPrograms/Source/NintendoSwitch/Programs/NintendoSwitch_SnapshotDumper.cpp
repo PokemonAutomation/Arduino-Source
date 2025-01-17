@@ -5,9 +5,7 @@
  */
 
 #include <QDir>
-#include "Common/Cpp/Time.h"
 #include "Common/Cpp/PrettyPrint.h"
-#include "ClientSource/Connection/BotBase.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "NintendoSwitch_SnapshotDumper.h"
@@ -50,7 +48,7 @@ SnapshotDumper::SnapshotDumper()
     PA_ADD_OPTION(FORMAT);
 }
 
-void SnapshotDumper::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void SnapshotDumper::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     std::string folder_path = USER_FILE_PATH() + "ScreenshotDumper/";
     QDir().mkpath(folder_path.c_str());
     while (true){

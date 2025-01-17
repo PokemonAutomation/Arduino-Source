@@ -4,7 +4,6 @@
  *
  */
 
-#include "ClientSource/Connection/BotBase.h"
 #include "CommonFramework/Options/LanguageOCROption.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
@@ -20,7 +19,7 @@ namespace PokemonSV{
 
 
 bool check_stats_reset_info(
-    ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, ControllerContext& context,
     OCR::LanguageOCROption& LANGUAGE, Pokemon::StatsHuntIvJudgeFilterTable& FILTERS,
     Pokemon::StatsHuntAction& action
 ){

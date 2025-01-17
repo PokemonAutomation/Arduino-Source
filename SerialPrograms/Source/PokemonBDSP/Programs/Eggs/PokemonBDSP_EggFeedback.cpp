@@ -24,7 +24,7 @@ namespace PokemonBDSP{
 
 
 
-void hatch_egg(ConsoleHandle& console, BotBaseContext& context){
+void hatch_egg(ConsoleHandle& console, ControllerContext& context){
     //  Spin until egg starts hatching.
     do{
         ShortDialogWatcher dialog;
@@ -33,9 +33,9 @@ void hatch_egg(ConsoleHandle& console, BotBaseContext& context){
             break;
         }
 
-        int ret = run_until<BotBaseContext>(
+        int ret = run_until<ControllerContext>(
             console, context,
-            [](BotBaseContext& context){
+            [](ControllerContext& context){
                 egg_spin(context, 480 * TICKS_PER_SECOND);
             },
             {
@@ -114,13 +114,13 @@ void hatch_egg(ConsoleHandle& console, BotBaseContext& context){
         }
     }
 }
-void hatch_party(ConsoleHandle& console, BotBaseContext& context, size_t eggs){
+void hatch_party(ConsoleHandle& console, ControllerContext& context, size_t eggs){
     for (size_t c = 0; c < eggs; c++){
         hatch_egg(console, context);
     }
 }
 
-void withdraw_1st_column_from_overworld(ConsoleHandle& console, BotBaseContext& context){
+void withdraw_1st_column_from_overworld(ConsoleHandle& console, ControllerContext& context){
     const uint16_t BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY_0;
     const uint16_t BOX_PICKUP_DROP_DELAY = GameSettings::instance().BOX_PICKUP_DROP_DELAY;
     overworld_to_box(console, context);
@@ -135,7 +135,7 @@ void withdraw_1st_column_from_overworld(ConsoleHandle& console, BotBaseContext& 
 
 
 
-void release(ConsoleHandle& console, BotBaseContext& context){
+void release(ConsoleHandle& console, ControllerContext& context){
     pbf_press_button(context, BUTTON_ZL, 20, 50);
     pbf_move_right_joystick(context, 128, 0, 20, 10);
     pbf_move_right_joystick(context, 128, 0, 20, 10);

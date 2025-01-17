@@ -18,7 +18,7 @@ namespace MaxLairInternal{
 
 
 void run_item_select(
-    ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, ControllerContext& context,
     GlobalStateTracker& state_tracker
 );
 

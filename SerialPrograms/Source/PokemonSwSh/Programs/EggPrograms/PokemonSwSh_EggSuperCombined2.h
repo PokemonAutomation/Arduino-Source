@@ -33,7 +33,7 @@ class EggSuperCombined2 : public SingleSwitchProgramInstance{
 public:
     EggSuperCombined2();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ControllerContext& context) override;
 
 private:
     StartInGripOrGameOption START_LOCATION;

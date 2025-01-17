@@ -29,7 +29,7 @@ public:
 class DistortionWaiter : public SingleSwitchProgramInstance{
 public:
     DistortionWaiter();
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ControllerContext& context) override;
 
 
 private:

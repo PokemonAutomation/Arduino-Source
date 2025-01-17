@@ -7,11 +7,11 @@
 #ifndef PokemonAutomation_PokemonSwSh_MaxLair_CatchScreenTracker_H
 #define PokemonAutomation_PokemonSwSh_MaxLair_CatchScreenTracker_H
 
+#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_SummaryShinySymbolDetector.h"
 
 namespace PokemonAutomation{
-    class BotBaseContext;
     class ProgramEnvironment;
 namespace NintendoSwitch{
 namespace PokemonSwSh{
@@ -27,7 +27,7 @@ class CaughtPokemonScreen{
     using Detection = SummaryShinySymbolDetector::Detection;
 
 public:
-    CaughtPokemonScreen(ConsoleHandle& console, BotBaseContext& context);
+    CaughtPokemonScreen(ConsoleHandle& console, ControllerContext& context);
 
     size_t total() const;
     const CaughtPokemon& operator[](size_t position) const;
@@ -45,7 +45,7 @@ private:
 
 private:
     ConsoleHandle& m_console;
-    BotBaseContext& m_context;
+    ControllerContext& m_context;
     size_t m_total;
     size_t m_current_position = 0;
     bool m_in_summary = false;

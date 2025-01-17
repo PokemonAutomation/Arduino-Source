@@ -11,11 +11,11 @@
 #include "CommonFramework/Language.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/Inference/VisualDetector.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 
 namespace PokemonAutomation{
     class Logger;
     class AsyncDispatcher;
-    class BotBaseContext;
 namespace NintendoSwitch{
     class ConsoleHandle;
 namespace PokemonSV{
@@ -30,7 +30,7 @@ public:
     //  "jobs" jobs must be 1, 5, or 10.
     void set_print_jobs(
         AsyncDispatcher& dispatcher,
-        ConsoleHandle& console, BotBaseContext& context, uint8_t jobs
+        ConsoleHandle& console, ControllerContext& context, uint8_t jobs
     ) const;
 
 

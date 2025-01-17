@@ -29,7 +29,7 @@ public:
 class GimmighoulChestFarmer : public SingleSwitchProgramInstance{
 public:
     GimmighoulChestFarmer();
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ControllerContext& context) override;
 
 private:
     enum class StartLocation{
@@ -45,7 +45,7 @@ private:
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;
 
-    void navigate_to_gimmi(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    void navigate_to_gimmi(SingleSwitchProgramEnvironment& env, ControllerContext& context);
 };
 
 }

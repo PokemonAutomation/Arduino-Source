@@ -66,7 +66,7 @@ MassRelease::MassRelease()
 
 
 
-void MassRelease::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void MassRelease::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     MassRelease_Descriptor::Stats& stats = env.current_stats<MassRelease_Descriptor::Stats>();
     env.update_stats();
 

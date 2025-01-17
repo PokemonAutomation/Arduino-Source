@@ -164,7 +164,7 @@ ShinyHuntAutonomousOverworld::ShinyHuntAutonomousOverworld()
 
 
 bool ShinyHuntAutonomousOverworld::find_encounter(
-    ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, ControllerContext& context,
     ShinyHuntAutonomousOverworld_Descriptor::Stats& stats,
     WallClock expiration
 ) const{
@@ -234,9 +234,9 @@ bool ShinyHuntAutonomousOverworld::find_encounter(
             StandardBattleMenuWatcher battle_menu_detector(false);
             StartBattleWatcher start_battle_detector;
 
-            int result = run_until<BotBaseContext>(
+            int result = run_until<ControllerContext>(
                 console, context,
-                [&](BotBaseContext& context){
+                [&](ControllerContext& context){
                     trigger->run(context);
                 },
                 {
@@ -286,7 +286,7 @@ bool ShinyHuntAutonomousOverworld::find_encounter(
 
 
 bool ShinyHuntAutonomousOverworld::charge_at_target(
-    ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, ControllerContext& context,
     const std::pair<double, OverworldTarget>& target
 ) const{
     OverlayBoxScope target_box(console, target.second.box, COLOR_YELLOW);
@@ -326,9 +326,9 @@ bool ShinyHuntAutonomousOverworld::charge_at_target(
         MAX_TARGET_ALPHA
     );
 
-    int result = run_until<BotBaseContext>(
+    int result = run_until<ControllerContext>(
         console, context,
-        [&](BotBaseContext& context){
+        [&](ControllerContext& context){
             //  Move to target.
             pbf_move_left_joystick(
                 context,
@@ -372,7 +372,7 @@ bool ShinyHuntAutonomousOverworld::charge_at_target(
 
 
 
-void ShinyHuntAutonomousOverworld::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void ShinyHuntAutonomousOverworld::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     srand((unsigned)time(nullptr));
 
     if (START_LOCATION.start_in_grip_menu()){

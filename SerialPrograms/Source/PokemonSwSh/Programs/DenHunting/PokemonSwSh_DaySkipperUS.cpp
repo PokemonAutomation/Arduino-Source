@@ -69,7 +69,7 @@ DaySkipperUS::DaySkipperUS()
 }
 
 
-void DaySkipperUS::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void DaySkipperUS::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     SkipperStats& stats = env.current_stats<SkipperStats>();
     stats.total_skips = SKIPS;
     stats.runs++;

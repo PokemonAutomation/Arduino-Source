@@ -38,7 +38,7 @@ std::string AutoStory_Segment_07::end_text() const{
     return "End: At Mesagoza South Pokecenter.";
 }
 
-void AutoStory_Segment_07::run_segment(SingleSwitchProgramEnvironment& env, BotBaseContext& context, AutoStoryOptions options) const{
+void AutoStory_Segment_07::run_segment(SingleSwitchProgramEnvironment& env, ControllerContext& context, AutoStoryOptions options) const{
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
 
     context.wait_for_all_requests();
@@ -67,7 +67,7 @@ void AutoStory_Segment_07::run_segment(SingleSwitchProgramEnvironment& env, BotB
 
 void checkpoint_12(
     SingleSwitchProgramEnvironment& env, 
-    BotBaseContext& context, 
+    ControllerContext& context, 
     EventNotificationOption& notif_status_update
 ){
     // reset rate: ~25%. 12 resets out of 52. 
@@ -88,7 +88,7 @@ void checkpoint_12(
         // re-orient camera
         pbf_press_button(context, BUTTON_L, 20, 20);
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
-            [&](const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+            [&](const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context){
                 walk_forward_while_clear_front_path(env.program_info(), env.console, context, 35);
                 
                 // place the marker elsewhere

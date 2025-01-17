@@ -143,7 +143,7 @@ BerryFarmer2::BerryFarmer2()
 }
 
 
-BerryFarmer2::Rustling BerryFarmer2::check_rustling(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+BerryFarmer2::Rustling BerryFarmer2::check_rustling(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     BerryFarmer2_Descriptor::Stats& stats = env.current_stats<BerryFarmer2_Descriptor::Stats>();
 
     // wait some time in order to not detect rustling from previous fetch attempt
@@ -170,9 +170,9 @@ BerryFarmer2::Rustling BerryFarmer2::check_rustling(SingleSwitchProgramEnvironme
     StartBattleWatcher start_battle_detector;
 
     Rustling result = Rustling::No;
-    int ret = run_until<BotBaseContext>(
+    int ret = run_until<ControllerContext>(
         env.console, context,
-        [&](BotBaseContext& context){
+        [&](ControllerContext& context){
             pbf_wait(context, RUSTLING_TIMEOUT);
             context.wait_for_all_requests();
         },
@@ -184,9 +184,9 @@ BerryFarmer2::Rustling BerryFarmer2::check_rustling(SingleSwitchProgramEnvironme
         WallClock initial_rustling_time = current_time();
         result = Rustling::Slow;
 
-        int ret1 = run_until<BotBaseContext>(
+        int ret1 = run_until<ControllerContext>(
             env.console, context,
-            [&](BotBaseContext& context){
+            [&](ControllerContext& context){
                 pbf_wait(context, RUSTLING_TIMEOUT);
                 context.wait_for_all_requests();
             },
@@ -244,7 +244,7 @@ BerryFarmer2::Rustling BerryFarmer2::check_rustling(SingleSwitchProgramEnvironme
     return result;
 }
 
-uint16_t BerryFarmer2::do_secondary_attempts(SingleSwitchProgramEnvironment& env, BotBaseContext& context, Rustling rustling){
+uint16_t BerryFarmer2::do_secondary_attempts(SingleSwitchProgramEnvironment& env, ControllerContext& context, Rustling rustling){
     BerryFarmer2_Descriptor::Stats& stats = env.current_stats<BerryFarmer2_Descriptor::Stats>();
 
     uint8_t no_rustling = (rustling == Rustling::No) ? 1 : 0;
@@ -285,7 +285,7 @@ uint16_t BerryFarmer2::do_secondary_attempts(SingleSwitchProgramEnvironment& env
     return attempts;
 }
 
-void BerryFarmer2::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void BerryFarmer2::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
     }else{

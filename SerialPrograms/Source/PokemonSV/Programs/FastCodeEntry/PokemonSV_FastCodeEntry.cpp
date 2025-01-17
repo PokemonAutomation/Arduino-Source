@@ -128,7 +128,7 @@ void FastCodeEntry::program(MultiSwitchProgramEnvironment& env, CancellableScope
     }
 
     //  Connect the controller.
-    env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
+    env.run_in_parallel(scope, [&](ConsoleHandle& console, ControllerContext& context){
         pbf_press_button(context, BUTTON_R | BUTTON_L, 5, 3);
     });
 

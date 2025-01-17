@@ -4,7 +4,6 @@
  *
  */
 
-#include "ClientSource/Connection/BotBase.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
@@ -139,7 +138,7 @@ LeapGrinder::LeapGrinder()
 }
 
 
-bool LeapGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+bool LeapGrinder::run_iteration(SingleSwitchProgramEnvironment& env, ControllerContext& context){
 
     LeapGrinder_Descriptor::Stats& stats = env.current_stats<LeapGrinder_Descriptor::Stats>();
     stats.attempts++;
@@ -170,9 +169,9 @@ bool LeapGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
         return on_shiny_callback(env, env.console, SHINY_DETECTED_ENROUTE, error_coefficient);
     });
 
-    int ret = run_until<BotBaseContext>(
+    int ret = run_until<ControllerContext>(
         env.console, context,
-        [&](BotBaseContext& context){
+        [&](ControllerContext& context){
             route(env, env.console, context, (LeapPokemon)POKEMON.index());
         },
         {{shiny_detector}}
@@ -260,7 +259,7 @@ bool LeapGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
     return false;
 }
 
-void LeapGrinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void LeapGrinder::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     LeapGrinder_Descriptor::Stats& stats = env.current_stats<LeapGrinder_Descriptor::Stats>();
 
     //  Connect the controller.

@@ -200,7 +200,7 @@ StatsResetEventBattle::StatsResetEventBattle()
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
-void StatsResetEventBattle::enter_battle_ursaluna(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void StatsResetEventBattle::enter_battle_ursaluna(SingleSwitchProgramEnvironment& env, ControllerContext& context){
 
     AdvanceDialogWatcher advance_detector(COLOR_YELLOW);
     PromptDialogWatcher prompt_detector(COLOR_YELLOW);
@@ -219,9 +219,9 @@ void StatsResetEventBattle::enter_battle_ursaluna(SingleSwitchProgramEnvironment
     context.wait_for_all_requests();
 
     //Mash B until next dialog select
-    int retPrompt = run_until<BotBaseContext>(
+    int retPrompt = run_until<ControllerContext>(
         env.console, context,
-        [](BotBaseContext& context){
+        [](ControllerContext& context){
             pbf_mash_button(context, BUTTON_B, 10000);
         },
         { prompt_detector }
@@ -239,9 +239,9 @@ void StatsResetEventBattle::enter_battle_ursaluna(SingleSwitchProgramEnvironment
 
     //Mash B until next dialog select (again)
     //PromptDialogWatcher prompt_detector2(COLOR_YELLOW);
-    int retPrompt2 = run_until<BotBaseContext>(
+    int retPrompt2 = run_until<ControllerContext>(
         env.console, context,
-        [](BotBaseContext& context){
+        [](ControllerContext& context){
             pbf_mash_button(context, BUTTON_B, 10000);
         },
         { prompt_detector }
@@ -258,9 +258,9 @@ void StatsResetEventBattle::enter_battle_ursaluna(SingleSwitchProgramEnvironment
     context.wait_for_all_requests();
 
     //Now keep going until the battle starts
-    int ret_battle = run_until<BotBaseContext>(
+    int ret_battle = run_until<ControllerContext>(
         env.console, context,
-        [](BotBaseContext& context){
+        [](ControllerContext& context){
             pbf_mash_button(context, BUTTON_B, 10000);
         },
         { battle_menu }
@@ -273,7 +273,7 @@ void StatsResetEventBattle::enter_battle_ursaluna(SingleSwitchProgramEnvironment
     context.wait_for_all_requests();
 }
 
-void StatsResetEventBattle::enter_battle_pecharunt(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void StatsResetEventBattle::enter_battle_pecharunt(SingleSwitchProgramEnvironment& env, ControllerContext& context){
 
     AdvanceDialogWatcher advance_detector(COLOR_YELLOW);
     AdvanceDialogWatcher advance_detector2(COLOR_YELLOW);
@@ -303,9 +303,9 @@ void StatsResetEventBattle::enter_battle_pecharunt(SingleSwitchProgramEnvironmen
 
     //Mash B until the battle starts
     //Note - Sending out Ogerpon/Loyal Three during battle adds time, but the below is more than enough.
-    int ret_battle = run_until<BotBaseContext>(
+    int ret_battle = run_until<ControllerContext>(
         env.console, context,
-        [](BotBaseContext& context){
+        [](ControllerContext& context){
             pbf_mash_button(context, BUTTON_B, 10000);
         },
         { battle_menu }
@@ -318,7 +318,7 @@ void StatsResetEventBattle::enter_battle_pecharunt(SingleSwitchProgramEnvironmen
     context.wait_for_all_requests();
 }
 
-bool StatsResetEventBattle::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+bool StatsResetEventBattle::run_battle(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     StatsResetEventBattle_Descriptor::Stats& stats = env.current_stats<StatsResetEventBattle_Descriptor::Stats>();
 
     //Assuming the player has a charged orb
@@ -339,9 +339,9 @@ bool StatsResetEventBattle::run_battle(SingleSwitchProgramEnvironment& env, BotB
     WallClock start = current_time();
     uint8_t switch_party_slot = 1;
 
-    int ret = run_until<BotBaseContext>(
+    int ret = run_until<ControllerContext>(
         env.console, context,
-        [&](BotBaseContext& context){
+        [&](ControllerContext& context){
             while(true){
                 if (current_time() - start > std::chrono::minutes(5)){
                     env.log("Timed out during battle after 5 minutes.", COLOR_RED);
@@ -431,7 +431,7 @@ bool StatsResetEventBattle::run_battle(SingleSwitchProgramEnvironment& env, BotB
 }
 
 #if 0
-bool StatsResetEventBattle::check_stats(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+bool StatsResetEventBattle::check_stats(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     StatsResetEventBattle_Descriptor::Stats& stats = env.current_stats<StatsResetEventBattle_Descriptor::Stats>();
     bool match = false;
 
@@ -489,13 +489,13 @@ bool StatsResetEventBattle::check_stats(SingleSwitchProgramEnvironment& env, Bot
 }
 #endif
 
-bool StatsResetEventBattle::check_stats_after_win(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+bool StatsResetEventBattle::check_stats_after_win(SingleSwitchProgramEnvironment& env, ControllerContext& context){
 #if 0
     //  Clear out dialog until we're free
     OverworldWatcher overworld(console, COLOR_YELLOW);
-    int retOverworld = run_until<BotBaseContext>(
+    int retOverworld = run_until<ControllerContext>(
         env.console, context,
-        [](BotBaseContext& context){
+        [](ControllerContext& context){
             pbf_mash_button(context, BUTTON_B, 10000);
         },
         { overworld }
@@ -611,7 +611,7 @@ bool StatsResetEventBattle::check_stats_after_win(SingleSwitchProgramEnvironment
 #endif
 }
 
-void StatsResetEventBattle::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void StatsResetEventBattle::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
     StatsResetEventBattle_Descriptor::Stats& stats = env.current_stats<StatsResetEventBattle_Descriptor::Stats>();
 

@@ -105,7 +105,7 @@ AutonomousBallThrower::AutonomousBallThrower()
 
 
 
-void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     AutonomousBallThrower_Descriptor::Stats& stats = env.current_stats<AutonomousBallThrower_Descriptor::Stats>();
     env.update_stats();
 
@@ -118,9 +118,9 @@ void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, BotBase
         env.log("Wait for a pokemon to attack you.", COLOR_PURPLE);
         {
             BattleMenuWatcher fight_detector(BattleType::STANDARD);
-            int ret = run_until<BotBaseContext>(
+            int ret = run_until<ControllerContext>(
                 env.console, context,
-                [](BotBaseContext& context){
+                [](ControllerContext& context){
                     while (true){
                         //TODO edit here for what to do
                         //pbf_wait(context, 1 * TICKS_PER_SECOND);

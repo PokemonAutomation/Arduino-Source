@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonBDSP_EncounterTracker_H
 
 #include "CommonFramework/Language.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 //#include "Pokemon/Pokemon_EncounterStats.h"
 //#include "PokemonSwSh/ShinyHuntTracker.h"
@@ -29,7 +30,7 @@ struct PokemonDetection{
 class StandardEncounterDetection{
 public:
     StandardEncounterDetection(
-        ConsoleHandle& console, BotBaseContext& context,
+        ConsoleHandle& console, ControllerContext& context,
         Language language,
         const EncounterFilterOption2& filter,
         const DoublesShinyDetection& shininess,

@@ -72,7 +72,7 @@ EggFetcher::EggFetcher()
 }
 
 
-void EggFetcher::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void EggFetcher::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     EggFetcher_Descriptor::Stats& stats = env.current_stats<EggFetcher_Descriptor::Stats>();
     env.update_stats();
 

@@ -282,12 +282,11 @@ SOURCES += \
     Source/CommonFramework/Tools/DebugDumper.cpp \
     Source/CommonFramework/Tools/ErrorDumper.cpp \
     Source/CommonFramework/Tools/FileDownloader.cpp \
-    Source/CommonFramework/Tools/InterruptableCommands.cpp \
+    Source/CommonFramework/Tools/InterruptableCommands.tpp \
     Source/CommonFramework/Tools/MultiConsoleErrors.cpp \
     Source/CommonFramework/Tools/ProgramEnvironment.cpp \
     Source/CommonFramework/Tools/StatsDatabase.cpp \
     Source/CommonFramework/Tools/StatsTracking.cpp \
-    Source/CommonFramework/Tools/SuperControlSession.cpp \
     Source/CommonFramework/Tools/VideoResolutionCheck.cpp \
     Source/CommonFramework/Tools/VideoStream.cpp \
     Source/CommonFramework/VideoPipeline/Backends/CameraImplementations.cpp \
@@ -395,6 +394,7 @@ SOURCES += \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.cpp \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Routines.cpp \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.cpp \
+    Source/NintendoSwitch/Controllers/NintendoSwitch_Controller.cpp \
     Source/NintendoSwitch/DevPrograms/BoxDraw.cpp \
     Source/NintendoSwitch/DevPrograms/TestProgramComputer.cpp \
     Source/NintendoSwitch/DevPrograms/TestProgramSwitch.cpp \
@@ -1382,11 +1382,13 @@ HEADERS += \
     Source/CommonFramework/Tools/ErrorDumper.h \
     Source/CommonFramework/Tools/FileDownloader.h \
     Source/CommonFramework/Tools/InterruptableCommands.h \
+    Source/CommonFramework/Tools/InterruptableCommands.tpp \
     Source/CommonFramework/Tools/MultiConsoleErrors.h \
     Source/CommonFramework/Tools/ProgramEnvironment.h \
     Source/CommonFramework/Tools/StatsDatabase.h \
     Source/CommonFramework/Tools/StatsTracking.h \
     Source/CommonFramework/Tools/SuperControlSession.h \
+    Source/CommonFramework/Tools/SuperControlSession.tpp \
     Source/CommonFramework/Tools/VideoResolutionCheck.h \
     Source/CommonFramework/Tools/VideoStream.h \
     Source/CommonFramework/VideoPipeline/Backends/CameraImplementations.h \

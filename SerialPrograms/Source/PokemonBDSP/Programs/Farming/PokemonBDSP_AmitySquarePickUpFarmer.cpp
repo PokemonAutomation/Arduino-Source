@@ -83,7 +83,7 @@ AmitySquarePickUpFarmer::AmitySquarePickUpFarmer()
 
 
 
-void AmitySquarePickUpFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void AmitySquarePickUpFarmer::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     AmitySquarePickUpFarmer_Descriptor::Stats& stats = env.current_stats<AmitySquarePickUpFarmer_Descriptor::Stats>();
     env.update_stats();
 

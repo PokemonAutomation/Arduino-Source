@@ -4,7 +4,6 @@
  *
  */
 
-#include "ClientSource/Connection/BotBase.h"
 //#include "CommonFramework/InferenceInfra/VisualInferenceRoutines.h"
 #include "CommonFramework/InferenceInfra/InferenceSession.h"
 #include "Pokemon/Pokemon_Strings.h"
@@ -36,7 +35,7 @@ OverworldWatcher_Descriptor::OverworldWatcher_Descriptor()
 OverworldWatcher::OverworldWatcher(){}
 
 
-void OverworldWatcher::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void OverworldWatcher::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     BubbleDetector bubbles;
     ArcDetector arcs;
     QuestMarkDetector quest_marks;

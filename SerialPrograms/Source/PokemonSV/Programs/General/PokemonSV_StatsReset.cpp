@@ -139,7 +139,7 @@ StatsReset::StatsReset()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-bool StatsReset::enter_battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+bool StatsReset::enter_battle(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     StatsReset_Descriptor::Stats& stats = env.current_stats<StatsReset_Descriptor::Stats>();
 
     //Press A to talk to target
@@ -198,7 +198,7 @@ bool StatsReset::enter_battle(SingleSwitchProgramEnvironment& env, BotBaseContex
     return true;
 }
 
-void StatsReset::open_ball_menu(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void StatsReset::open_ball_menu(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     StatsReset_Descriptor::Stats& stats = env.current_stats<StatsReset_Descriptor::Stats>();
 
     BattleBallReader reader(env.console, LANGUAGE);
@@ -234,7 +234,7 @@ void StatsReset::open_ball_menu(SingleSwitchProgramEnvironment& env, BotBaseCont
 
 //Returns target_fainted. If overworld is detected then the target fainted.
 //Otherwise if AdvanceDialog is detected the Pokemon was caught or the player lost.
-bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     StatsReset_Descriptor::Stats& stats = env.current_stats<StatsReset_Descriptor::Stats>();
 
     AdvanceDialogWatcher advance_dialog(COLOR_MAGENTA);
@@ -249,9 +249,9 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext&
     bool out_of_balls = false;
     bool quickball_thrown = false;
 
-    int ret = run_until<BotBaseContext>(
+    int ret = run_until<ControllerContext>(
         env.console, context,
-        [&](BotBaseContext& context){
+        [&](ControllerContext& context){
             while (true){
                 //Check that battle menu appears - this is in case of swapping pokemon
                 NormalBattleMenuWatcher menu_before_throw(COLOR_YELLOW);
@@ -335,9 +335,9 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext&
                     }
 
                     //Select and use move
-                    int ret_move_select = run_until<BotBaseContext>(
+                    int ret_move_select = run_until<ControllerContext>(
                     env.console, context,
-                    [&](BotBaseContext& context){
+                    [&](ControllerContext& context){
                         pbf_press_button(context, BUTTON_A, 10, 50);
                         pbf_wait(context, 100);
                         context.wait_for_all_requests();
@@ -505,7 +505,7 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext&
     return target_fainted;
 }
 
-bool StatsReset::check_stats(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+bool StatsReset::check_stats(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     StatsReset_Descriptor::Stats& stats = env.current_stats<StatsReset_Descriptor::Stats>();
     bool match = false;
 
@@ -564,7 +564,7 @@ bool StatsReset::check_stats(SingleSwitchProgramEnvironment& env, BotBaseContext
     return match;
 }
 
-void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void StatsReset::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     //This will only work for Pokemon that you press A to talk to.
     //Regular static spawns will have the same stats, resetting won't work.
     //Won't apply to the former titan pokemon or the box legends + ogrepon either, as their IVs are locked.
@@ -609,9 +609,9 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
             //Close all the dex entry and caught menus
             //If the player lost, this closes all dialog from Joy
             OverworldWatcher overworld(env.console);
-            int retOver = run_until<BotBaseContext>(
+            int retOver = run_until<ControllerContext>(
                 env.console, context,
-                [](BotBaseContext& context){
+                [](ControllerContext& context){
                     pbf_mash_button(context, BUTTON_B, 10000);
                 },
                 { overworld }

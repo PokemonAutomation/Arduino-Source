@@ -72,7 +72,7 @@ PokedexTasksReader_Descriptor::PokedexTasksReader_Descriptor()
 PokedexTasksReader::PokedexTasksReader(){}
 
 
-void PokedexTasksReader::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void PokedexTasksReader::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     //  Connect the controller.
     pbf_press_button(context, BUTTON_LCLICK, 5, 5);
 

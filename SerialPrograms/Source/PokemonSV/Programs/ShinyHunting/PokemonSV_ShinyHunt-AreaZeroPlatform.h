@@ -45,7 +45,7 @@ public:
     ~ShinyHuntAreaZeroPlatform();
     ShinyHuntAreaZeroPlatform();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ControllerContext& context) override;
 
 private:
     virtual std::string check_validity() const override;
@@ -66,11 +66,11 @@ private:
 //    };
 
     void set_flags(SingleSwitchProgramEnvironment& env);
-    void run_state(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-    void set_flags_and_run_state(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    void run_state(SingleSwitchProgramEnvironment& env, ControllerContext& context);
+    void set_flags_and_run_state(SingleSwitchProgramEnvironment& env, ControllerContext& context);
 
     //  Returns true on success.
-    bool run_traversal(BotBaseContext& context);
+    bool run_traversal(ControllerContext& context);
 
 
 private:

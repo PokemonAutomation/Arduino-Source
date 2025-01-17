@@ -165,7 +165,7 @@ int8_t DateReader::read_hours(Logger& logger, const ImageViewRGB32& screen) cons
 
 
 void DateReader::set_hours(
-    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context,
     uint8_t hour
 ) const{
     context.wait_for_all_requests();
@@ -401,7 +401,7 @@ DateTime DateReader::read_date_jp(Logger& logger, std::shared_ptr<const ImageRGB
 }
 
 
-void DateReader::move_cursor(BotBaseContext& context, int current, int desired){
+void DateReader::move_cursor(ControllerContext& context, int current, int desired){
     while (current < desired){
         ssf_issue_scroll(context, SSF_SCROLL_UP, 3);
         current++;
@@ -411,7 +411,7 @@ void DateReader::move_cursor(BotBaseContext& context, int current, int desired){
         current--;
     }
 }
-void DateReader::adjust_year(BotBaseContext& context, int current, int desired){
+void DateReader::adjust_year(ControllerContext& context, int current, int desired){
     while (current < desired){
         ssf_issue_scroll(context, SSF_SCROLL_UP, 3);
         current++;
@@ -421,7 +421,7 @@ void DateReader::adjust_year(BotBaseContext& context, int current, int desired){
         current--;
     }
 }
-void DateReader::adjust_month(BotBaseContext& context, int current, int desired){
+void DateReader::adjust_month(ControllerContext& context, int current, int desired){
     int diff = desired - current;
     if ((diff >= 0 && diff <= 6) || (diff < 0 && diff < -6)){
         while (current != desired){
@@ -441,7 +441,7 @@ void DateReader::adjust_month(BotBaseContext& context, int current, int desired)
         }
     }
 }
-void DateReader::adjust_hour_24(BotBaseContext& context, int current, int desired){
+void DateReader::adjust_hour_24(ControllerContext& context, int current, int desired){
     int diff = desired - current;
     if ((diff >= 0 && diff <= 12) || (diff < 0 && diff < -12)){
         while (current != desired){
@@ -461,7 +461,7 @@ void DateReader::adjust_hour_24(BotBaseContext& context, int current, int desire
         }
     }
 }
-void DateReader::adjust_minute(BotBaseContext& context, int current, int desired){
+void DateReader::adjust_minute(ControllerContext& context, int current, int desired){
     int diff = desired - current;
     if ((diff >= 0 && diff <= 30) || (diff < 0 && diff < -30)){
         while (current != desired){
@@ -483,7 +483,7 @@ void DateReader::adjust_minute(BotBaseContext& context, int current, int desired
 }
 
 void DateReader::set_date(
-    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context,
     const DateTime& date
 ) const{
     context.wait_for_all_requests();
@@ -596,7 +596,7 @@ void DateReader::set_date(
 }
 
 void change_date(
-    SingleSwitchProgramEnvironment& env, BotBaseContext& context,
+    SingleSwitchProgramEnvironment& env, ControllerContext& context,
     const DateTime& date
 ){
     while (true){

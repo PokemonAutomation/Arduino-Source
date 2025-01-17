@@ -8,12 +8,12 @@
 #define PokemonAutomation_PokemonSV_BoxDetection_H
 
 #include "Common/Cpp/Containers/FixedLimitVector.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.h"
 #include "PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h"
 
 namespace PokemonAutomation{
-    class BotBaseContext;
     struct ProgramInfo;
 namespace NintendoSwitch{
     class ConsoleHandle;
@@ -104,14 +104,14 @@ public:
 
     //  While in the box system view, move the cursor to the desired slot.
     void move_cursor(
-        const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+        const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context,
         BoxCursorLocation side, uint8_t row, uint8_t col
     ) const;
 
 private:
     bool to_coordinates(int& x, int& y, BoxCursorLocation side, uint8_t row, uint8_t col) const;
-    void move_vertical(BotBaseContext& context, int current, int desired) const;
-    void move_horizontal(BotBaseContext& context, int current, int desired) const;
+    void move_vertical(ControllerContext& context, int current, int desired) const;
+    void move_horizontal(ControllerContext& context, int current, int desired) const;
 
 private:
     Color m_color;

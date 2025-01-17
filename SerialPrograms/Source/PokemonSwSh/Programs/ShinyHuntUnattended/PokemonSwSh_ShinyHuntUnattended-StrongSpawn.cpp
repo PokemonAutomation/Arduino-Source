@@ -56,7 +56,7 @@ ShinyHuntUnattendedStrongSpawn::ShinyHuntUnattendedStrongSpawn()
 
 
 
-void ShinyHuntUnattendedStrongSpawn::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void ShinyHuntUnattendedStrongSpawn::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
     }else{

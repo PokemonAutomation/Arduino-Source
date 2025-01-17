@@ -25,7 +25,7 @@ class BoxDraw : public SingleSwitchProgramInstance{
 public:
     BoxDraw();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ControllerContext& context) override;
 
 private:
     class Overlay;

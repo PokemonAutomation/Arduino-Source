@@ -23,7 +23,7 @@ namespace PokemonLA{
 class FlagNavigationAir : public SuperControlSession<Controller>{
 public:
     FlagNavigationAir(
-        ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+        ProgramEnvironment& env, ConsoleHandle& console, ControllerContext& context,
         uint16_t stop_radius,
         double flag_reached_delay,
         std::chrono::seconds navigate_timeout

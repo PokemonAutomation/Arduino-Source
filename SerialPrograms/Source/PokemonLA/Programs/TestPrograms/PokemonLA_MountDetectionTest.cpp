@@ -4,7 +4,6 @@
  *
  */
 
-#include "ClientSource/Connection/BotBase.h"
 #include "CommonFramework/InferenceInfra/InferenceSession.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLA/Inference/PokemonLA_MountDetector.h"
@@ -33,7 +32,7 @@ MountDetectionTest::MountDetectionTest(){
 }
 
 
-void MountDetectionTest::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void MountDetectionTest::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     MountTracker tracker(env.console, FAILED_ACTION);
     InferenceSession session(
         context, env.console,

@@ -27,7 +27,7 @@ namespace PokemonLA{
 
 
 bool reset_game_to_gamemenu(
-    ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, ControllerContext& context,
     bool tolerate_update_menu
 ){
     bool video_available = (bool)console.video().snapshot();
@@ -53,7 +53,7 @@ bool reset_game_to_gamemenu(
 }
 
 bool gamemenu_to_ingame(
-    ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, ControllerContext& context,
     uint16_t mash_duration, uint16_t enter_game_timeout
 ){
     console.log("Mashing A to enter game...");
@@ -76,7 +76,7 @@ bool gamemenu_to_ingame(
 }
 
 bool reset_game_from_home(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ProgramEnvironment& env, ConsoleHandle& console, ControllerContext& context,
     bool tolerate_update_menu,
     uint16_t post_wait_time
 ){

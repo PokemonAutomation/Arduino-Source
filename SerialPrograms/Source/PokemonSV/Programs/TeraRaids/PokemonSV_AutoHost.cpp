@@ -5,15 +5,11 @@
  */
 
 #include "Common/Cpp/PrettyPrint.h"
-#include "ClientSource/Connection/BotBase.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
-//#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-//#include "CommonFramework/InferenceInfra/InferenceSession.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
-//#include "CommonFramework/OCR/OCR_StringNormalization.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Tools/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -133,7 +129,7 @@ AutoHost::AutoHost()
 
 
 WallClock AutoHost::wait_for_lobby_open(
-    SingleSwitchProgramEnvironment& env, BotBaseContext& context,
+    SingleSwitchProgramEnvironment& env, ControllerContext& context,
     std::string& lobby_code
 ){
     VideoOverlaySet overlays(env.console.overlay());
@@ -185,7 +181,7 @@ void AutoHost::update_stats_on_raid_start(SingleSwitchProgramEnvironment& env, u
     stats.m_raiders += player_count - 1;
 }
 bool AutoHost::start_raid(
-    SingleSwitchProgramEnvironment& env, BotBaseContext& context,
+    SingleSwitchProgramEnvironment& env, ControllerContext& context,
     WallClock start_time,
     uint8_t player_count
 ){
@@ -198,9 +194,9 @@ bool AutoHost::start_raid(
         WhiteScreenOverWatcher start_raid(COLOR_BLUE);
         TeraBattleMenuWatcher battle_menu(COLOR_CYAN);
         context.wait_for_all_requests();
-        int ret = run_until<BotBaseContext>(
+        int ret = run_until<ControllerContext>(
             env.console, context,
-            [start_time](BotBaseContext& context){
+            [start_time](ControllerContext& context){
                 while (true){
                     pbf_press_button(context, BUTTON_A, 20, 105);
                     context.wait_for_all_requests();
@@ -237,7 +233,7 @@ bool AutoHost::start_raid(
 
 
 bool AutoHost::run_lobby(
-    SingleSwitchProgramEnvironment& env, BotBaseContext& context,
+    SingleSwitchProgramEnvironment& env, ControllerContext& context,
     std::string& lobby_code,
     std::array<std::map<Language, std::string>, 4>& player_names
 ){
@@ -269,7 +265,7 @@ bool AutoHost::run_lobby(
     return start_raid(env, context, start_time, waiter.last_known_players());
 }
 
-void AutoHost::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void AutoHost::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
     AutoHost_Descriptor::Stats& stats = env.current_stats<AutoHost_Descriptor::Stats>();

@@ -35,11 +35,11 @@ public:
 class DoublesLeveling : public SingleSwitchProgramInstance{
 public:
     DoublesLeveling();
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ControllerContext& context) override;
 
 
 private:
-    bool battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    bool battle(SingleSwitchProgramEnvironment& env, ControllerContext& context);
 
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 

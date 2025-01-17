@@ -12,14 +12,13 @@
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 
 namespace PokemonAutomation{
-    class BotBaseContext;
     class ProgramEnvironment;
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
 bool connect_to_internet_with_inference(
-    ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, ControllerContext& context,
     std::chrono::milliseconds post_wait_time = std::chrono::seconds(3),
     uint16_t timeout_ticks = 120 * TICKS_PER_SECOND
 );

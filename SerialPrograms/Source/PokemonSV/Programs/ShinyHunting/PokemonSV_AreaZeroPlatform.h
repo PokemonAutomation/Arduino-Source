@@ -12,10 +12,10 @@
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/TimeExpressionOption.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 
 namespace PokemonAutomation{
     struct ProgramInfo;
-    class BotBaseContext;
     class ProgramEnvironment;
 namespace NintendoSwitch{
     class ConsoleHandle;
@@ -56,7 +56,7 @@ public:
 };
 
 void inside_zero_gate_to_platform(
-    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context,
     bool flying_unlocked,
     NavigatePlatformSettings& settings
 );
@@ -75,7 +75,7 @@ bool read_platform_center(
 // It tracks the kill chain by sound detection from `tracker`. The function does not handle any pokemon
 // battle encounters (turn-based battles).
 void area_zero_platform_run_path0(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ProgramEnvironment& env, ConsoleHandle& console, ControllerContext& context,
     LetsGoEncounterBotTracker& tracker,
     uint64_t iteration_count
 );
@@ -83,7 +83,7 @@ void area_zero_platform_run_path0(
 // It tracks the kill chain by sound detection from `tracker`. The function does not handle any pokemon
 // battle encounters (turn-based battles).
 void area_zero_platform_run_path1(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ProgramEnvironment& env, ConsoleHandle& console, ControllerContext& context,
     LetsGoEncounterBotTracker& tracker,
     uint64_t iteration_count
 );
@@ -91,7 +91,7 @@ void area_zero_platform_run_path1(
 // It tracks the kill chain by sound detection from `tracker`. The function does not handle any pokemon
 // battle encounters (turn-based battles).
 void area_zero_platform_run_path2(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ProgramEnvironment& env, ConsoleHandle& console, ControllerContext& context,
     LetsGoEncounterBotTracker& tracker,
     uint64_t iteration_count
 );

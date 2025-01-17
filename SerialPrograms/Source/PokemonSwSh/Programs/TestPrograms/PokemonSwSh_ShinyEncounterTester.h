@@ -24,7 +24,7 @@ class ShinyEncounterTester : public SingleSwitchProgramInstance{
 public:
     ShinyEncounterTester();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ControllerContext& context) override;
 
 private:
     enum class EncounterType{

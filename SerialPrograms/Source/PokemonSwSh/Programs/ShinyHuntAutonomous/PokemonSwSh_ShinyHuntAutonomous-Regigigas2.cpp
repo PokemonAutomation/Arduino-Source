@@ -82,7 +82,7 @@ ShinyHuntAutonomousRegigigas2::ShinyHuntAutonomousRegigigas2()
 
 
 
-bool ShinyHuntAutonomousRegigigas2::kill_and_return(ConsoleHandle& console, BotBaseContext& context) const{
+bool ShinyHuntAutonomousRegigigas2::kill_and_return(ConsoleHandle& console, ControllerContext& context) const{
     pbf_mash_button(context, BUTTON_A, 4 * TICKS_PER_SECOND);
 
     RaidCatchDetector detector(console);
@@ -101,7 +101,7 @@ bool ShinyHuntAutonomousRegigigas2::kill_and_return(ConsoleHandle& console, BotB
         return false;
     }
 }
-void ShinyHuntAutonomousRegigigas2::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void ShinyHuntAutonomousRegigigas2::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
         resume_game_back_out(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 500);

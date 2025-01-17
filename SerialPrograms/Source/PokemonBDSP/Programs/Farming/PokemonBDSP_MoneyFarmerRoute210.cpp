@@ -110,16 +110,16 @@ MoneyFarmerRoute210::MoneyFarmerRoute210()
 
 
 
-bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context, uint8_t pp0[4], uint8_t pp1[4]){
+bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, ControllerContext& context, uint8_t pp0[4], uint8_t pp1[4]){
     MoneyFarmerRoute210_Descriptor::Stats& stats = env.current_stats<MoneyFarmerRoute210_Descriptor::Stats>();
 
     env.log("Starting battle!");
 
     {
         StartBattleDetector detector(env.console);
-        int ret = run_until<BotBaseContext>(
+        int ret = run_until<ControllerContext>(
             env.console, context,
-            [](BotBaseContext& context){
+            [](ControllerContext& context){
                 pbf_press_button(context, BUTTON_ZL, 10, 10);
                 for (size_t c = 0; c < 17; c++){
                     pbf_press_dpad(context, DPAD_UP, 5, 10);
@@ -149,9 +149,9 @@ bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, BotBaseCon
         BattleMenuWatcher battle_menu(BattleType::TRAINER);
         EndBattleWatcher end_battle;
         SelectionArrowFinder learn_move(env.console, {0.50, 0.62, 0.40, 0.18}, COLOR_YELLOW);
-        int ret = run_until<BotBaseContext>(
+        int ret = run_until<ControllerContext>(
             env.console, context,
-            [](BotBaseContext& context){
+            [](ControllerContext& context){
                 pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
             },
             {
@@ -243,7 +243,7 @@ bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, BotBaseCon
     );
 }
 
-void MoneyFarmerRoute210::heal_at_center_and_return(Logger& logger, BotBaseContext& context, uint8_t pp0[4], uint8_t pp1[4]){
+void MoneyFarmerRoute210::heal_at_center_and_return(Logger& logger, ControllerContext& context, uint8_t pp0[4], uint8_t pp1[4]){
     logger.log("Healing " + STRING_POKEMON + " Celestic Town " + STRING_POKEMON + " Center.");
     pbf_move_left_joystick(context, 125, 0, 6 * TICKS_PER_SECOND, 0);
     pbf_mash_button(context, BUTTON_ZL, 3 * TICKS_PER_SECOND);
@@ -281,7 +281,7 @@ void MoneyFarmerRoute210::heal_at_center_and_return(Logger& logger, BotBaseConte
     pp1[2] = MON1_MOVE3_PP;
     pp1[3] = MON1_MOVE4_PP;
 }
-void MoneyFarmerRoute210::fly_to_center_heal_and_return(Logger& logger, BotBaseContext& context, uint8_t pp0[4], uint8_t pp1[4]){
+void MoneyFarmerRoute210::fly_to_center_heal_and_return(Logger& logger, ControllerContext& context, uint8_t pp0[4], uint8_t pp1[4]){
     logger.log("Flying back to Hearthome City to heal.");
     pbf_press_button(context, BUTTON_X, 10, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
     pbf_press_button(context, BUTTON_PLUS, 10, 240);
@@ -292,7 +292,7 @@ void MoneyFarmerRoute210::fly_to_center_heal_and_return(Logger& logger, BotBaseC
 }
 
 bool MoneyFarmerRoute210::heal_after_battle_and_return(
-    SingleSwitchProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    SingleSwitchProgramEnvironment& env, ConsoleHandle& console, ControllerContext& context,
     uint8_t pp0[4], uint8_t pp1[4])
 {
     if (HEALING_METHOD == HealMethod::CelesticTown){
@@ -328,7 +328,7 @@ bool MoneyFarmerRoute210::has_pp(uint8_t pp0[4], uint8_t pp1[4]){
 
 
 
-void MoneyFarmerRoute210::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void MoneyFarmerRoute210::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     MoneyFarmerRoute210_Descriptor::Stats& stats = env.current_stats<MoneyFarmerRoute210_Descriptor::Stats>();
 
     uint8_t pp0[4] = {
@@ -380,9 +380,9 @@ void MoneyFarmerRoute210::program(SingleSwitchProgramEnvironment& env, BotBaseCo
         std::vector<ImagePixelBox> bubbles;
         {
             VSSeekerReactionTracker tracker(env.console, {0.20, 0.20, 0.60, 0.60});
-            run_until<BotBaseContext>(
+            run_until<ControllerContext>(
                 env.console, context,
-                [this](BotBaseContext& context){
+                [this](ControllerContext& context){
                     SHORTCUT.run(context, TICKS_PER_SECOND);
                 },
                 {{tracker}}

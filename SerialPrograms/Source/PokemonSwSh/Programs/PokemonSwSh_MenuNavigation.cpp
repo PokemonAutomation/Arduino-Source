@@ -5,7 +5,6 @@
  */
 
 
-#include "ClientSource/Connection/BotBase.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
@@ -23,7 +22,7 @@ namespace PokemonSwSh{
 void navigate_to_menu_app(
     ProgramEnvironment& env,
     ConsoleHandle& console,
-    BotBaseContext& context,
+    ControllerContext& context,
     size_t target_app_index,
     EventNotificationOption& notification_option
 ){

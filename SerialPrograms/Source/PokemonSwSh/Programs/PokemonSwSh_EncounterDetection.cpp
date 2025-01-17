@@ -25,7 +25,7 @@ namespace PokemonSwSh{
 
 
 StandardEncounterDetection::StandardEncounterDetection(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ProgramEnvironment& env, ConsoleHandle& console, ControllerContext& context,
     Language language,
     const EncounterFilterOption2& filter,
     ShinyType shininess,

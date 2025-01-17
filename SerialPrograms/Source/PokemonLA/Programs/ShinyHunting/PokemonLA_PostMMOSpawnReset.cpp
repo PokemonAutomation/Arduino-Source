@@ -97,7 +97,7 @@ PostMMOSpawnReset::PostMMOSpawnReset()
 
 
 
-void PostMMOSpawnReset::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void PostMMOSpawnReset::run_iteration(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     PostMMOSpawnReset_Descriptor::Stats& stats = env.current_stats<PostMMOSpawnReset_Descriptor::Stats>();
 
     // From game to Switch Home
@@ -111,9 +111,9 @@ void PostMMOSpawnReset::run_iteration(SingleSwitchProgramEnvironment& env, BotBa
             return on_shiny_callback(env, env.console, SHINY_DETECTED, error_coefficient);
         });
 
-        int ret = run_until<BotBaseContext>(
+        int ret = run_until<ControllerContext>(
             env.console, context,
-            [this, &env](BotBaseContext& context){
+            [this, &env](ControllerContext& context){
                 reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
                 env.console.log("Entered game! Checking shiny sound...");
 
@@ -143,7 +143,7 @@ void PostMMOSpawnReset::run_iteration(SingleSwitchProgramEnvironment& env, BotBa
 }
 
 
-void PostMMOSpawnReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void PostMMOSpawnReset::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     PostMMOSpawnReset_Descriptor::Stats& stats = env.current_stats<PostMMOSpawnReset_Descriptor::Stats>();
 
     //  Connect the controller.

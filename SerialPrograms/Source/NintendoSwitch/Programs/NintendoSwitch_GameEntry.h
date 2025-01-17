@@ -10,20 +10,19 @@
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 
 namespace PokemonAutomation{
-    class BotBaseContext;
 namespace NintendoSwitch{
 
 
 void resume_game_from_home(
     ConsoleHandle& console,
-    BotBaseContext& context,
+    ControllerContext& context,
     bool skip_home_press = false
 );
 
 
 void start_game_from_home(
     ConsoleHandle& console,
-    BotBaseContext& context,
+    ControllerContext& context,
     bool tolerate_update_menu,
     uint8_t game_slot,
     uint8_t user_slot,
@@ -31,7 +30,7 @@ void start_game_from_home(
 );
 
 bool openedgame_to_gamemenu(
-    ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, ControllerContext& context,
     uint16_t timeout
 );
 

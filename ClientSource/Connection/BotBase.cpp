@@ -15,22 +15,22 @@ namespace PokemonAutomation{
 
 
 
-void BotBaseContext::wait_for_all_requests() const{
+void BotBaseControllerContext::wait_for_all_requests() const{
     m_lifetime_sanitizer.check_usage();
     m_controller.wait_for_all_requests(this);
 }
-void BotBaseContext::cancel_now(){
+void BotBaseControllerContext::cancel_now(){
     m_lifetime_sanitizer.check_usage();
     CancellableScope::cancel(nullptr);
     m_controller.stop_all_commands();
 }
-void BotBaseContext::cancel_lazy(){
+void BotBaseControllerContext::cancel_lazy(){
     m_lifetime_sanitizer.check_usage();
     CancellableScope::cancel(nullptr);
     m_controller.next_command_interrupt();
 }
 
-bool BotBaseContext::cancel(std::exception_ptr exception) noexcept{
+bool BotBaseControllerContext::cancel(std::exception_ptr exception) noexcept{
     m_lifetime_sanitizer.check_usage();
     if (CancellableScope::cancel(std::move(exception))){
         return true;
@@ -41,16 +41,16 @@ bool BotBaseContext::cancel(std::exception_ptr exception) noexcept{
     return false;
 }
 
-bool BotBaseContext::try_issue_request(const BotBaseRequest& request) const{
+bool BotBaseControllerContext::try_issue_request(const BotBaseRequest& request) const{
     m_lifetime_sanitizer.check_usage();
     return m_controller.try_issue_request(request, this);
 }
-void BotBaseContext::issue_request(const BotBaseRequest& request) const{
+void BotBaseControllerContext::issue_request(const BotBaseRequest& request) const{
     m_lifetime_sanitizer.check_usage();
     m_controller.issue_request(request, this);
 }
 
-BotBaseMessage BotBaseContext::issue_request_and_wait(const BotBaseRequest& request) const{
+BotBaseMessage BotBaseControllerContext::issue_request_and_wait(const BotBaseRequest& request) const{
     m_lifetime_sanitizer.check_usage();
     return m_controller.issue_request_and_wait(request, this);
 }

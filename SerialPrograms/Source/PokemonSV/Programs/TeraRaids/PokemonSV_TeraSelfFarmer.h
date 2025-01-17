@@ -52,11 +52,11 @@ class TeraSelfFarmer : public SingleSwitchProgramInstance, public ConfigOption::
 public:
     ~TeraSelfFarmer();
     TeraSelfFarmer();
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ControllerContext& context) override;
 
 private:
     virtual void value_changed(void* object) override;
-    bool run_raid(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    bool run_raid(SingleSwitchProgramEnvironment& env, ControllerContext& context);
 
 private:
     friend class TeraFarmerCatchOnWin;

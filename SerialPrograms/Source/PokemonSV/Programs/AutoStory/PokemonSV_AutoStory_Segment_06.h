@@ -27,14 +27,14 @@ public:
     virtual std::string end_text() const override;
     virtual void run_segment(
         SingleSwitchProgramEnvironment& env, 
-        BotBaseContext& context,
+        ControllerContext& context,
         AutoStoryOptions options) const override;
 };
 
 
 // start: Talked to Nemona at the Lighthouse.
 // end: Arrived at Los Platos pokecenter. Cleared Let's go tutorial.
-void checkpoint_11(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EventNotificationOption& notif_status_update);
+void checkpoint_11(SingleSwitchProgramEnvironment& env, ControllerContext& context, EventNotificationOption& notif_status_update);
 
 }
 }

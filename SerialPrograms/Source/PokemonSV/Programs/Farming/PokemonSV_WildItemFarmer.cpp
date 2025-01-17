@@ -116,7 +116,7 @@ WildItemFarmer::WildItemFarmer()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void WildItemFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void WildItemFarmer::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     try{
         run_program(env, context);
     }catch (...){
@@ -125,7 +125,7 @@ void WildItemFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
     }
 }
 
-void WildItemFarmer::refresh_pp(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void WildItemFarmer::refresh_pp(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     int move_overwrites = 0;
     bool move_selected = false;
     while (true){
@@ -193,7 +193,7 @@ void WildItemFarmer::refresh_pp(SingleSwitchProgramEnvironment& env, BotBaseCont
     }
 }
 
-bool WildItemFarmer::verify_item_held(SingleSwitchProgramEnvironment& env, BotBaseContext& context, NormalBattleMenuWatcher& battle_menu){
+bool WildItemFarmer::verify_item_held(SingleSwitchProgramEnvironment& env, ControllerContext& context, NormalBattleMenuWatcher& battle_menu){
     env.log("Verifying that item has been taken...");
 
     while (true){
@@ -234,9 +234,9 @@ bool WildItemFarmer::verify_item_held(SingleSwitchProgramEnvironment& env, BotBa
     bool item_held = !is_solid(stats, {0.550405, 0.449595, 0.}, 0.20);
 
     {
-        int ret = run_until<BotBaseContext>(
+        int ret = run_until<ControllerContext>(
             env.console, context,
-            [](BotBaseContext& context){
+            [](ControllerContext& context){
                 pbf_mash_button(context, BUTTON_B, 500);
             },
             {battle_menu}
@@ -254,7 +254,7 @@ bool WildItemFarmer::verify_item_held(SingleSwitchProgramEnvironment& env, BotBa
 }
 
 
-void WildItemFarmer::run_program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void WildItemFarmer::run_program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
     WildItemFarmer_Descriptor::Stats& stats = env.current_stats<WildItemFarmer_Descriptor::Stats>();
 

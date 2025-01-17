@@ -11,7 +11,6 @@
 
 namespace PokemonAutomation{
     class AsyncDispatcher;
-    class BotBaseContext;
 namespace NintendoSwitch{
     class ConsoleHandle;
 namespace PokemonSV{

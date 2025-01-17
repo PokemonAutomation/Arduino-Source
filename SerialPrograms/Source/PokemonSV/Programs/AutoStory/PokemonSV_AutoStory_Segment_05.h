@@ -27,18 +27,18 @@ public:
     virtual std::string end_text() const override;
     virtual void run_segment(
         SingleSwitchProgramEnvironment& env, 
-        BotBaseContext& context,
+        ControllerContext& context,
         AutoStoryOptions options) const override;
 };
 
 
 // start: Rescued Koraidon/Miraidon and escaped from the Houndoom Cave.
 // end: Battled Arven and received Legendary's Pokeball.
-void checkpoint_09(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EventNotificationOption& notif_status_update);
+void checkpoint_09(SingleSwitchProgramEnvironment& env, ControllerContext& context, EventNotificationOption& notif_status_update);
 
 // start: Battled Arven and received Legendary's Pokeball.
 // end: Talked to Nemona at the Lighthouse.
-void checkpoint_10(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EventNotificationOption& notif_status_update);
+void checkpoint_10(SingleSwitchProgramEnvironment& env, ControllerContext& context, EventNotificationOption& notif_status_update);
 
 }
 }

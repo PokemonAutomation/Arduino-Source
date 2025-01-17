@@ -38,21 +38,21 @@ public:
     ~AutoStory();
     AutoStory();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ControllerContext& context) override;
 
-    void test_code(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    void test_code(SingleSwitchProgramEnvironment& env, ControllerContext& context);
 
     // test the checkpoints from start to end, inclusive
     // test each checkpoints "loop" number of times
     void test_checkpoints(
         SingleSwitchProgramEnvironment& env,
         ConsoleHandle& console, 
-        BotBaseContext& context,
+        ControllerContext& context,
         int start, int end, 
         int loop, int start_loop, int end_loop
     );
 
-    void run_autostory(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    void run_autostory(SingleSwitchProgramEnvironment& env, ControllerContext& context);
 
 private:
     virtual void value_changed(void* object) override;

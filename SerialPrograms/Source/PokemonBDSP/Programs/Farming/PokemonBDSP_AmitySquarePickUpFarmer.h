@@ -30,7 +30,7 @@ public:
 class AmitySquarePickUpFarmer : public SingleSwitchProgramInstance{
 public:
     AmitySquarePickUpFarmer();
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ControllerContext& context) override;
 
 private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;

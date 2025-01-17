@@ -9,8 +9,6 @@
 
 #include "CommonFramework/Language.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
-#include "Pokemon/Pokemon_EncounterStats.h"
-#include "PokemonSwSh/ShinyHuntTracker.h"
 #include "PokemonSwSh/Options/EncounterFilter/PokemonSwSh_EncounterFilterOption.h"
 #include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyEncounterDetector.h"
 
@@ -23,7 +21,7 @@ namespace PokemonSwSh{
 class StandardEncounterDetection{
 public:
     StandardEncounterDetection(
-        ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+        ProgramEnvironment& env, ConsoleHandle& console, ControllerContext& context,
         Language language,
         const EncounterFilterOption2& filter,
         ShinyType shininess,
@@ -42,7 +40,7 @@ public:
 private:
     ProgramEnvironment& m_env;
     ConsoleHandle& m_console;
-    BotBaseContext& m_context;
+    ControllerContext& m_context;
 
     const Language m_language;
 

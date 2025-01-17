@@ -7,17 +7,17 @@
 #ifndef PokemonAutomation_PokemonSV_ItemPrinterMaterialDetector_H
 #define PokemonAutomation_PokemonSV_ItemPrinterMaterialDetector_H
 
+#include <array>
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/Language.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/Inference/VisualDetector.h"
 #include "CommonFramework/OCR/OCR_SmallDictionaryMatcher.h"
-#include <array>
+#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 
 namespace PokemonAutomation{
     class Logger;
     class AsyncDispatcher;
-    class BotBaseContext;
 namespace NintendoSwitch{
     class ConsoleHandle;
 namespace PokemonSV{
@@ -51,26 +51,26 @@ public:
 
     int8_t find_happiny_dust_row_index(
         AsyncDispatcher& dispatcher,
-        ConsoleHandle& console, BotBaseContext& context
+        ConsoleHandle& console, ControllerContext& context
     ) const;
 
     std::vector<int8_t> find_material_value_row_index(
         AsyncDispatcher& dispatcher,
         ConsoleHandle& console, 
-        BotBaseContext& context,
+        ControllerContext& context,
         int16_t material_value
     ) const;
 
     int16_t detect_material_quantity(
         AsyncDispatcher& dispatcher,
         ConsoleHandle& console, 
-        BotBaseContext& context,
+        ControllerContext& context,
         int8_t row_index
     ) const;
 
     std::string detect_material_name(
         ConsoleHandle& console, 
-        BotBaseContext& context,
+        ControllerContext& context,
         int8_t row_index
     ) const;    
 

@@ -30,7 +30,7 @@ public:
 class GiftBerryReset : public SingleSwitchProgramInstance{
 public:
     GiftBerryReset();
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ControllerContext& context) override;
 
 private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;

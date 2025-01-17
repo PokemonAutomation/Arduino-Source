@@ -24,11 +24,11 @@ namespace PokemonLA{
 
 
 
-void mash_A_until_end_of_battle(ConsoleHandle& console, BotBaseContext& context){
+void mash_A_until_end_of_battle(ConsoleHandle& console, ControllerContext& context){
     OverworldDetector detector(console, console);
-    int ret = run_until<BotBaseContext>(
+    int ret = run_until<ControllerContext>(
         console, context,
-        [](BotBaseContext& context){
+        [](ControllerContext& context){
             pbf_mash_button(context, BUTTON_A, 180 * TICKS_PER_SECOND);
         },
         {{detector}}
@@ -45,7 +45,7 @@ void mash_A_until_end_of_battle(ConsoleHandle& console, BotBaseContext& context)
 
 
 
-size_t switch_pokemon(ConsoleHandle& console, BotBaseContext& context, size_t pokemon_to_switch_to, size_t max_num_pokemon){
+size_t switch_pokemon(ConsoleHandle& console, ControllerContext& context, size_t pokemon_to_switch_to, size_t max_num_pokemon){
     if (pokemon_to_switch_to >= max_num_pokemon){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
@@ -94,7 +94,7 @@ size_t switch_pokemon(ConsoleHandle& console, BotBaseContext& context, size_t po
 }
 
 
-void use_move_blindly(ConsoleHandle& console, BotBaseContext& context, MoveStyle style, size_t cur_pokemon, size_t cur_move){
+void use_move_blindly(ConsoleHandle& console, ControllerContext& context, MoveStyle style, size_t cur_pokemon, size_t cur_move){
     // Select move styles
     if (style == MoveStyle::Agile){
         // Agile style
@@ -117,7 +117,7 @@ void use_move_blindly(ConsoleHandle& console, BotBaseContext& context, MoveStyle
 }
 
 
-bool use_move(ConsoleHandle& console, BotBaseContext& context, size_t cur_pokemon, size_t cur_move, MoveStyle style, bool check_success){
+bool use_move(ConsoleHandle& console, ControllerContext& context, size_t cur_pokemon, size_t cur_move, MoveStyle style, bool check_success){
     if (check_success == false){
         use_move_blindly(console, context, style, cur_pokemon, cur_move);
         return true;
@@ -152,7 +152,7 @@ bool use_move(ConsoleHandle& console, BotBaseContext& context, size_t cur_pokemo
     return still_on_move_screen == false;
 }
 
-void use_next_move_with_pp(ConsoleHandle& console, BotBaseContext& context, size_t cur_pokemon, size_t& cur_move){
+void use_next_move_with_pp(ConsoleHandle& console, ControllerContext& context, size_t cur_pokemon, size_t& cur_move){
     const bool check_move_success = true;
     while (use_move(console, context, cur_pokemon, cur_move, MoveStyle::NoStyle, check_move_success) == false){
         // We are still on the move selection screen. No PP.

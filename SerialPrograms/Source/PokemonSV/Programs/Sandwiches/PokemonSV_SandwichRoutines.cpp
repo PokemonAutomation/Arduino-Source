@@ -16,6 +16,7 @@
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 //#include "CommonFramework/ImageTools/ImageFilter.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
@@ -43,7 +44,7 @@ namespace{
     const ImageFloatBox HAND_INITIAL_BOX{0.440, 0.455, 0.112, 0.179};
     const ImageFloatBox INGREDIENT_BOX{0.455, 0.130, 0.090, 0.030};
 
-void wait_for_initial_hand(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+void wait_for_initial_hand(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context){
      SandwichHandWatcher free_hand(SandwichHandType::FREE, HAND_INITIAL_BOX);
     int ret = wait_until(console, context, std::chrono::seconds(30), {free_hand});
     if (ret < 0){
@@ -54,7 +55,7 @@ void wait_for_initial_hand(const ProgramInfo& info, ConsoleHandle& console, BotB
 
 } // anonymous namespace
 
-bool enter_sandwich_recipe_list(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+bool enter_sandwich_recipe_list(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context){
     context.wait_for_all_requests();
     console.log("Opening sandwich menu at picnic table.");
 
@@ -116,7 +117,7 @@ bool enter_sandwich_recipe_list(const ProgramInfo& info, ConsoleHandle& console,
 }
 
 
-bool select_sandwich_recipe(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, size_t target_sandwich_ID){
+bool select_sandwich_recipe(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context, size_t target_sandwich_ID){
     context.wait_for_all_requests();
     console.log("Choosing sandwich recipe: " + std::to_string(target_sandwich_ID));
     console.overlay().add_log("Search recipe " + std::to_string(target_sandwich_ID), COLOR_WHITE);
@@ -273,7 +274,7 @@ update the location of the sandwich hand
 - return true if successful. else throw an exception
 */
 bool move_then_recover_sandwich_hand_position(
-    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, 
+    const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context, 
     SandwichHandType& hand_type, SandwichHandWatcher& hand_watcher,
     AsyncCommandSession<Controller>& move_session
 ){
@@ -299,7 +300,7 @@ bool move_then_recover_sandwich_hand_position(
         uint16_t num_ticks_to_hold_A = num_ticks_to_wait + TICKS_PER_SECOND*10; // hold A for extra 10 seconds
         // the A button hold will be overwritten on the next move_session.dispatch, in the main function
         
-        move_session.dispatch([&](BotBaseContext& context){
+        move_session.dispatch([&](ControllerContext& context){
             // move to bottom right corner, while holding A
             pbf_controller_state(context, BUTTON_A, DPAD_NONE, 255, 255, 128, 128, num_ticks_to_move_1);
 
@@ -344,7 +345,7 @@ ImageFloatBox move_sandwich_hand(
     const ProgramInfo& info,
     AsyncDispatcher& dispatcher,
     ConsoleHandle& console,
-    BotBaseContext& context,
+    ControllerContext& context,
     SandwichHandType hand_type,
     bool pressing_A,
     const ImageFloatBox& start_box,
@@ -368,7 +369,7 @@ ImageFloatBox move_sandwich_hand(
     );
     
     if (pressing_A){
-        move_session.dispatch([](BotBaseContext& context){
+        move_session.dispatch([](ControllerContext& context){
             pbf_controller_state(context, BUTTON_A, DPAD_NONE, 128, 128, 128, 128, 3000);
         });
     }
@@ -483,7 +484,7 @@ ImageFloatBox move_sandwich_hand(
         // console.log("joystick push " + std::to_string(joystick_x) + ", " + std::to_string(joystick_y));
 
         // Dispatch a new series of commands that overwrites the last ones
-        move_session.dispatch([&](BotBaseContext& context){
+        move_session.dispatch([&](ControllerContext& context){
             if (pressing_A){
                 // Note: joystick_x and joystick_y must be defined to outlive `move_session`.
 //                pbf_controller_state(context, BUTTON_A, DPAD_NONE, joystick_x, joystick_y, 128, 128, 20);
@@ -502,12 +503,12 @@ ImageFloatBox move_sandwich_hand(
 
 } // end anonymous namesapce
 
-void finish_sandwich_eating(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+void finish_sandwich_eating(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context){
     console.overlay().add_log("Eating", COLOR_WHITE);
     PicnicWatcher picnic_watcher;
-    int ret = run_until<BotBaseContext>(
+    int ret = run_until<ControllerContext>(
         console, context,
-        [](BotBaseContext& context){
+        [](ControllerContext& context){
             for(int i = 0; i < 20; i++){
                 pbf_press_button(context, BUTTON_A, 20, 3*TICKS_PER_SECOND - 20);
             }
@@ -526,7 +527,7 @@ void finish_sandwich_eating(const ProgramInfo& info, ConsoleHandle& console, Bot
 namespace{
 
 void repeat_press_until(
-    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context,
     std::function<void()> button_press,
     const std::vector<PeriodicInferenceCallback>& callbacks,
     const std::string &error_name, const std::string &error_message,
@@ -550,7 +551,7 @@ void repeat_press_until(
 }
 
 void repeat_button_press_until(
-    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context,
     uint16_t button, uint16_t hold_ticks, uint16_t release_ticks,
     const std::vector<PeriodicInferenceCallback>& callbacks,
     const std::string &error_name, const std::string &error_message,
@@ -568,7 +569,7 @@ void repeat_button_press_until(
 }
 
 void repeat_dpad_press_until(
-    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context,
     uint8_t dpad_position, uint16_t hold_ticks, uint16_t release_ticks,
     const std::vector<PeriodicInferenceCallback>& callbacks,
     const std::string &error_name, const std::string &error_message,
@@ -589,7 +590,7 @@ void repeat_dpad_press_until(
 } // anonymous namespace
 
 
-void enter_custom_sandwich_mode(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+void enter_custom_sandwich_mode(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context){
     context.wait_for_all_requests();
     console.log("Entering custom sandwich mode.");
     console.overlay().add_log("Custom sandwich", COLOR_WHITE);
@@ -604,7 +605,7 @@ void enter_custom_sandwich_mode(const ProgramInfo& info, ConsoleHandle& console,
 namespace{
 
 void finish_two_herbs_sandwich(
-    const ProgramInfo& info, AsyncDispatcher& dispatcher, ConsoleHandle& console, BotBaseContext& context
+    const ProgramInfo& info, AsyncDispatcher& dispatcher, ConsoleHandle& console, ControllerContext& context
 ){
     console.log("Finish determining ingredients for two-sweet-herb sandwich.");
     console.overlay().add_log("Finish picking ingredients", COLOR_WHITE);
@@ -623,7 +624,7 @@ void finish_two_herbs_sandwich(
 } // anonymous namesapce
 
 void make_two_herbs_sandwich(
-    const ProgramInfo& info, AsyncDispatcher& dispatcher, ConsoleHandle& console, BotBaseContext& context,
+    const ProgramInfo& info, AsyncDispatcher& dispatcher, ConsoleHandle& console, ControllerContext& context,
     EggSandwichType sandwich_type, size_t sweet_herb_index_last, size_t salty_herb_index_last, size_t bitter_herb_index_last
 ){
     // The game has at most 5 herbs, in the order of sweet, salty, sour, bitter, spicy:
@@ -727,7 +728,7 @@ void make_two_herbs_sandwich(
 }
 
 void make_two_herbs_sandwich(
-    const ProgramInfo& info, AsyncDispatcher& dispatcher, ConsoleHandle& console, BotBaseContext& context,
+    const ProgramInfo& info, AsyncDispatcher& dispatcher, ConsoleHandle& console, ControllerContext& context,
     EggSandwichType sandwich_type, Language language
 ){
     std::map<std::string, uint8_t> fillings = {{"lettuce", (uint8_t)1}};
@@ -751,7 +752,7 @@ void make_two_herbs_sandwich(
     finish_two_herbs_sandwich(info, dispatcher, console, context);
 }
 
-void make_sandwich_option(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, SandwichMakerOption& SANDWICH_OPTIONS){
+void make_sandwich_option(ProgramEnvironment& env, ConsoleHandle& console, ControllerContext& context, SandwichMakerOption& SANDWICH_OPTIONS){
     const Language language = SANDWICH_OPTIONS.LANGUAGE;
     if (language == Language::None){
         throw UserSetupError(console.logger(), "Must set game language option to read ingredient lists.");
@@ -860,7 +861,7 @@ void make_sandwich_option(ProgramEnvironment& env, ConsoleHandle& console, BotBa
     make_sandwich_preset(env, console, context, SANDWICH_OPTIONS.LANGUAGE, fillings, condiments);
 }
 
-void make_sandwich_preset(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, Language language, std::map<std::string, uint8_t>& fillings, std::map<std::string, uint8_t>& condiments){
+void make_sandwich_preset(ProgramEnvironment& env, ConsoleHandle& console, ControllerContext& context, Language language, std::map<std::string, uint8_t>& fillings, std::map<std::string, uint8_t>& condiments){
     //Sort the fillings by priority for building (ex. large items on bottom, cherry tomatoes on top)
     //std::vector<std::string> fillings_game_order = {"lettuce", "tomato", "cherry-tomatoes", "cucumber", "pickle", "onion", "red-onion", "green-bell-pepper", "red-bell-pepper",
     //    "yellow-bell-pepper", "avocado", "bacon", "ham", "prosciutto", "chorizo", "herbed-sausage", "hamburger", "klawf-stick", "smoked-fillet", "fried-fillet", "egg", "potato-tortilla",
@@ -942,7 +943,7 @@ void make_sandwich_preset(ProgramEnvironment& env, ConsoleHandle& console, BotBa
     run_sandwich_maker(env, console, context, language, fillings, fillings_sorted, plates);
 }
 
-void run_sandwich_maker(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, Language language, std::map<std::string, uint8_t>& fillings, std::vector<std::string>& fillings_sorted, int& plates){
+void run_sandwich_maker(ProgramEnvironment& env, ConsoleHandle& console, ControllerContext& context, Language language, std::map<std::string, uint8_t>& fillings, std::vector<std::string>& fillings_sorted, int& plates){
 
     wait_for_initial_hand(env.program_info(), console, context);
 

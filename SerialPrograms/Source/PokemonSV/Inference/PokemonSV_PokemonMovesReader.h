@@ -7,15 +7,14 @@
 #ifndef PokemonAutomation_PokemonSV_PokemonMovesReader_H
 #define PokemonAutomation_PokemonSV_PokemonMovesReader_H
 
-#include <map>
 #include <array>
 #include "CommonFramework/Language.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/OCR/OCR_SmallDictionaryMatcher.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 
 namespace PokemonAutomation{
     class AsyncDispatcher;
-    class BotBaseContext;
 namespace NintendoSwitch{
     class ConsoleHandle;
 namespace PokemonSV{

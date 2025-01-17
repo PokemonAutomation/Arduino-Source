@@ -101,7 +101,7 @@ enum class OverworldState{
     TurningRight,
 };
 void find_and_center_on_sky(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context
+    ProgramEnvironment& env, ConsoleHandle& console, ControllerContext& context
 ){
     context.wait_for_all_requests();
     console.log("Looking for the sky...");
@@ -140,7 +140,7 @@ void find_and_center_on_sky(
         if (!sky){
             if (state != OverworldState::FindingSky){
                 console.log("Sky not detected. Attempting to find the sky...", COLOR_ORANGE);
-                session.dispatch([](BotBaseContext& context){
+                session.dispatch([](ControllerContext& context){
                     pbf_move_right_joystick(context, 128, 0, 250, 0);
                     pbf_move_right_joystick(context, 0, 0, 10 * TICKS_PER_SECOND, 0);
                 });
@@ -156,7 +156,7 @@ void find_and_center_on_sky(
                 console.log("Centering the sky... Moving left.");
                 uint8_t magnitude = (uint8_t)((0.5 - sky_x) * 96 + 31);
                 uint16_t duration = (uint16_t)((0.5 - sky_x) * 125 + 20);
-                session.dispatch([=](BotBaseContext& context){
+                session.dispatch([=](ControllerContext& context){
                     pbf_move_right_joystick(context, 128 - magnitude, 128, duration, 0);
                 });
                 state = OverworldState::TurningLeft;
@@ -168,7 +168,7 @@ void find_and_center_on_sky(
                 console.log("Centering the sky... Moving Right.");
                 uint8_t magnitude = (uint8_t)((sky_x - 0.5) * 96 + 31);
                 uint16_t duration = (uint16_t)((sky_x - 0.5) * 125 + 20);
-                session.dispatch([=](BotBaseContext& context){
+                session.dispatch([=](ControllerContext& context){
                     pbf_move_right_joystick(context, 128 + magnitude, 128, duration, 0);
                 });
                 state = OverworldState::TurningRight;

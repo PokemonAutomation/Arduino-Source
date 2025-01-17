@@ -32,7 +32,7 @@ enum class BattleMenuResult{
     BATTLE_LOST,
 };
 BattleMenuResult run_battle_menu(
-    ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, ControllerContext& context,
     TeraBattleMenuDetector& battle_menu,
     TeraCatchWatcher& catch_menu,
     OverworldWatcher& overworld,
@@ -41,9 +41,9 @@ BattleMenuResult run_battle_menu(
     console.log("Current Move Selection: " + move.to_str());
     switch (move.type){
     case TeraMoveType::Wait:{
-        int ret = run_until<BotBaseContext>(
+        int ret = run_until<ControllerContext>(
             console, context,
-            [&](BotBaseContext& context){
+            [&](ControllerContext& context){
                 pbf_mash_button(context, BUTTON_B, move.seconds * TICKS_PER_SECOND);
             },
             {catch_menu, overworld}
@@ -73,7 +73,7 @@ BattleMenuResult run_battle_menu(
     return BattleMenuResult::RESUME_CURRENT_TURN;
 }
 bool run_cheer_select(
-    ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, ControllerContext& context,
     CheerSelectDetector& cheer_select_menu,
     TeraMoveEntry& move
 ){
@@ -100,7 +100,7 @@ bool run_cheer_select(
     return true;
 }
 bool run_move_select(
-    ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, ControllerContext& context,
     TeraAIOption& battle_AI,
     TerastallizingDetector& terastallizing,
     MoveSelectWatcher& move_select_menu,
@@ -161,7 +161,7 @@ bool run_move_select(
     return true;
 }
 bool run_target_select(
-    ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, ControllerContext& context,
     TeraTargetSelectDetector& target_select_menu,
     TeraMoveEntry& move
 ){
@@ -187,7 +187,7 @@ bool run_target_select(
 
 bool run_tera_battle(
     ProgramEnvironment& env,
-    ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, ControllerContext& context,
     TeraAIOption& battle_AI
 ){
     console.log("Starting tera battle routine...");
@@ -228,9 +228,9 @@ bool run_tera_battle(
         TeraCatchWatcher catch_menu(COLOR_BLUE);
         OverworldWatcher overworld(console, COLOR_GREEN);
         context.wait_for_all_requests();
-        int ret = run_until<BotBaseContext>(
+        int ret = run_until<ControllerContext>(
             console, context,
-            [](BotBaseContext& context){
+            [](ControllerContext& context){
                 for (size_t c = 0; c < 4; c++){
                     pbf_wait(context, 30 * TICKS_PER_SECOND);
                     pbf_press_button(context, BUTTON_B, 20, 0);

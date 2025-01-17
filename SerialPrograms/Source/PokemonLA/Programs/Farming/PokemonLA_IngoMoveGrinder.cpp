@@ -83,7 +83,7 @@ IngoMoveGrinder::IngoMoveGrinder()
 }
 
 
-bool IngoMoveGrinder::start_dialog(ConsoleHandle& console, BotBaseContext& context){
+bool IngoMoveGrinder::start_dialog(ConsoleHandle& console, ControllerContext& context){
     // First press A to start talking with Ingo.
     pbf_press_button(context, BUTTON_A, 20, 150);
     context.wait_for_all_requests();
@@ -92,9 +92,9 @@ bool IngoMoveGrinder::start_dialog(ConsoleHandle& console, BotBaseContext& conte
         ButtonDetector button0(console, console, ButtonType::ButtonA, {0.50, 0.408, 0.40, 0.042}, std::chrono::milliseconds(100), true);
         ButtonDetector button1(console, console, ButtonType::ButtonA, {0.50, 0.450, 0.40, 0.042}, std::chrono::milliseconds(100), true);
         ButtonDetector button2(console, console, ButtonType::ButtonA, {0.50, 0.492, 0.40, 0.042}, std::chrono::milliseconds(100), true);
-        int ret = run_until<BotBaseContext>(
+        int ret = run_until<ControllerContext>(
             console, context,
-            [&](BotBaseContext& context){
+            [&](ControllerContext& context){
                 for (size_t c = 0; c < 10; c++){
                     pbf_press_button(context, BUTTON_A, 20, 150);
                 }
@@ -128,9 +128,9 @@ bool IngoMoveGrinder::start_dialog(ConsoleHandle& console, BotBaseContext& conte
     context.wait_for_all_requests();
 
     ButtonDetector button2(console, console, ButtonType::ButtonA, {0.50, 0.350, 0.40, 0.400}, std::chrono::milliseconds(100), true);
-    int ret = run_until<BotBaseContext>(
+    int ret = run_until<ControllerContext>(
         console, context,
-        [&](BotBaseContext& context){
+        [&](ControllerContext& context){
             for (size_t c = 0; c < 5; c++){
                 pbf_press_button(context, BUTTON_A, 20, 150);
             }
@@ -149,7 +149,7 @@ bool IngoMoveGrinder::start_dialog(ConsoleHandle& console, BotBaseContext& conte
     }
 }
 
-bool IngoMoveGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+bool IngoMoveGrinder::run_iteration(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     IngoMoveGrinder_Descriptor::Stats& stats = env.current_stats<IngoMoveGrinder_Descriptor::Stats>();
 
     env.console.log("Starting battle...");
@@ -305,7 +305,7 @@ bool IngoMoveGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBase
 
 
 
-void IngoMoveGrinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void IngoMoveGrinder::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     IngoMoveGrinder_Descriptor::Stats& stats = env.current_stats<IngoMoveGrinder_Descriptor::Stats>();
 
     //  Connect the controller.
@@ -335,7 +335,7 @@ void IngoMoveGrinder::program(SingleSwitchProgramEnvironment& env, BotBaseContex
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 }
 
-void IngoMoveGrinder::go_to_next_move(SingleSwitchProgramEnvironment& env, BotBaseContext& context)
+void IngoMoveGrinder::go_to_next_move(SingleSwitchProgramEnvironment& env, ControllerContext& context)
 {
     env.console.log("Switch to next move " + debug_current_info() + debug_move_attempts_info());
     pbf_press_button(context, BUTTON_A, 10, 125);
@@ -350,7 +350,7 @@ void IngoMoveGrinder::go_to_next_move(SingleSwitchProgramEnvironment& env, BotBa
     context.wait_for_all_requests();
 }
 
-void IngoMoveGrinder::go_to_next_pokemon(SingleSwitchProgramEnvironment& env, BotBaseContext& context)
+void IngoMoveGrinder::go_to_next_pokemon(SingleSwitchProgramEnvironment& env, ControllerContext& context)
 {
     if (cur_pokemon == 4){
         OperationFailedException::fire(

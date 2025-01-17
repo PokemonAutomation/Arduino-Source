@@ -16,44 +16,44 @@
 #define PokemonAutomation_NintendoSwitch_Commands_Superscalar_H
 
 #include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
-#include "ClientSource/Connection/BotBase.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-void ssf_flush_pipeline (BotBaseContext& context);
-void ssf_do_nothing     (BotBaseContext& context, uint16_t ticks);
+void ssf_flush_pipeline (ControllerContext& context);
+void ssf_do_nothing     (ControllerContext& context, uint16_t ticks);
 
 
 
 void ssf_press_button(
-    BotBaseContext& context,
+    ControllerContext& context,
     Button button,
     uint16_t delay, uint16_t hold = 5, uint8_t cool = 3
 );
 void ssf_press_dpad(
-    BotBaseContext& context,
+    ControllerContext& context,
     DpadPosition position,
     uint16_t delay, uint16_t hold = 5, uint8_t cool = 3
 );
 
 
 void ssf_press_left_joystick(
-    BotBaseContext& context,
+    ControllerContext& context,
     uint8_t x, uint8_t y,
     uint16_t delay, uint16_t hold, uint8_t cool = 0
 );
 void ssf_press_right_joystick(
-    BotBaseContext& context,
+    ControllerContext& context,
     uint8_t x, uint8_t y,
     uint16_t delay, uint16_t hold, uint8_t cool = 0
 );
 
 
-void ssf_mash1_button   (BotBaseContext& context, Button button, uint16_t ticks);
-void ssf_mash2_button   (BotBaseContext& context, Button button0, Button button1, uint16_t ticks);
-void ssf_mash_AZs       (BotBaseContext& context, uint16_t ticks);
+void ssf_mash1_button   (ControllerContext& context, Button button, uint16_t ticks);
+void ssf_mash2_button   (ControllerContext& context, Button button0, Button button1, uint16_t ticks);
+void ssf_mash_AZs       (ControllerContext& context, uint16_t ticks);
 
 
 #define ssf_ScrollDirection     uint16_t
@@ -62,7 +62,7 @@ void ssf_mash_AZs       (BotBaseContext& context, uint16_t ticks);
 #define SSF_SCROLL_DOWN         4
 #define SSF_SCROLL_LEFT         6
 void ssf_issue_scroll(
-    BotBaseContext& context,
+    ControllerContext& context,
     ssf_ScrollDirection direction,
     uint16_t delay, uint16_t hold = 5, uint8_t cool = 3
 );

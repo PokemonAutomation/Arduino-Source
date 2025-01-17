@@ -129,7 +129,7 @@ uint8_t ItemPrinterJobsDetector::detect_jobs(Logger& logger, AsyncDispatcher& di
 
 void ItemPrinterJobsDetector::set_print_jobs(
     AsyncDispatcher& dispatcher,
-    ConsoleHandle& console, BotBaseContext& context, uint8_t jobs
+    ConsoleHandle& console, ControllerContext& context, uint8_t jobs
 ) const{
     VideoSnapshot snapshot;
     for (size_t c = 0; c < 10; c++){

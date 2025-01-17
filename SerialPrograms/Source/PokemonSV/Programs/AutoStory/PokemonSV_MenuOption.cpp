@@ -25,7 +25,7 @@ MenuOption::~MenuOption() = default;
 
 MenuOption::MenuOption(
     ConsoleHandle& console, 
-    BotBaseContext& context,
+    ControllerContext& context,
     Language language
 )
     : m_console(console)

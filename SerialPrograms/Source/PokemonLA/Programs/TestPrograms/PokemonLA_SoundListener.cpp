@@ -14,7 +14,6 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Containers/AlignedVector.h"
 #include "Common/Cpp/Containers/AlignedVector.tpp"
-#include "ClientSource/Connection/BotBase.h"
 #include "CommonFramework/AudioPipeline/AudioFeed.h"
 #include "CommonFramework/AudioPipeline/AudioTemplate.h"
 #include "CommonFramework/InferenceInfra/InferenceSession.h"
@@ -71,7 +70,7 @@ SoundListener::SoundListener()
 
 // void search_alpha_roar_from_audio_dump();
 
-void SoundListener::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void SoundListener::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     //  Connect the controller.
     // pbf_move_right_joystick(context, 0, 255, 10, 0);
 

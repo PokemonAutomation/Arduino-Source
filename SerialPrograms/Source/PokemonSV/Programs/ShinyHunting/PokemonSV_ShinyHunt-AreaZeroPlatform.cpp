@@ -190,7 +190,7 @@ void ShinyHuntAreaZeroPlatform::value_changed(void* object){
 
 
 
-bool ShinyHuntAreaZeroPlatform::run_traversal(BotBaseContext& context){
+bool ShinyHuntAreaZeroPlatform::run_traversal(ControllerContext& context){
     ShinyHuntAreaZeroPlatform_Descriptor::Stats& stats = m_env->current_stats<ShinyHuntAreaZeroPlatform_Descriptor::Stats>();
 
     const ProgramInfo& info = m_env->program_info();
@@ -334,7 +334,7 @@ void ShinyHuntAreaZeroPlatform::set_flags(SingleSwitchProgramEnvironment& env){
     );
 
 }
-void ShinyHuntAreaZeroPlatform::run_state(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void ShinyHuntAreaZeroPlatform::run_state(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     ShinyHuntAreaZeroPlatform_Descriptor::Stats& stats = m_env->current_stats<ShinyHuntAreaZeroPlatform_Descriptor::Stats>();
     const ProgramInfo& info = m_env->program_info();
     ConsoleHandle& console = m_env->console;
@@ -438,7 +438,7 @@ void ShinyHuntAreaZeroPlatform::run_state(SingleSwitchProgramEnvironment& env, B
         return;
     }
 }
-void ShinyHuntAreaZeroPlatform::set_flags_and_run_state(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void ShinyHuntAreaZeroPlatform::set_flags_and_run_state(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     set_flags(env);
 
     ShinyHuntAreaZeroPlatform_Descriptor::Stats& stats = m_env->current_stats<ShinyHuntAreaZeroPlatform_Descriptor::Stats>();
@@ -462,7 +462,7 @@ void ShinyHuntAreaZeroPlatform::set_flags_and_run_state(SingleSwitchProgramEnvir
     }
 }
 
-void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
     m_env = &env;
 
     ShinyHuntAreaZeroPlatform_Descriptor::Stats& stats = env.current_stats<ShinyHuntAreaZeroPlatform_Descriptor::Stats>();
@@ -521,9 +521,9 @@ void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, Bot
         try{
             env.console.log("Starting encounter loop...", COLOR_PURPLE);
             EncounterWatcher encounter_watcher(env.console, COLOR_RED);
-            run_until<BotBaseContext>(
+            run_until<ControllerContext>(
                 env.console, context,
-                [&](BotBaseContext& context){
+                [&](ControllerContext& context){
                     //  Inner program loop that runs the state machine.
                     while (true){
                         set_flags_and_run_state(env, context);

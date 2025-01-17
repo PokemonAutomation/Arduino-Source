@@ -27,14 +27,14 @@ public:
     virtual std::string end_text() const override;
     virtual void run_segment(
         SingleSwitchProgramEnvironment& env, 
-        BotBaseContext& context,
+        ControllerContext& context,
         AutoStoryOptions options) const override;
 };
 
 
 // start: Moved to cliff. Heard mystery cry.
 // end: Rescued Koraidon/Miraidon and escaped from the Houndoom Cave.
-void checkpoint_08(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EventNotificationOption& notif_status_update);
+void checkpoint_08(SingleSwitchProgramEnvironment& env, ControllerContext& context, EventNotificationOption& notif_status_update);
 
 
 }

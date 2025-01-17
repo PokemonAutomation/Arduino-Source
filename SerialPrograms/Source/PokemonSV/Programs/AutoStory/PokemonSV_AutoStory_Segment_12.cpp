@@ -42,7 +42,7 @@ std::string AutoStory_Segment_12::end_text() const{
 }
 
 
-void AutoStory_Segment_12::run_segment(SingleSwitchProgramEnvironment& env, BotBaseContext& context, AutoStoryOptions options) const{
+void AutoStory_Segment_12::run_segment(SingleSwitchProgramEnvironment& env, ControllerContext& context, AutoStoryOptions options) const{
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
 
     context.wait_for_all_requests();
@@ -60,7 +60,7 @@ void AutoStory_Segment_12::run_segment(SingleSwitchProgramEnvironment& env, BotB
 
 void checkpoint_28(
     SingleSwitchProgramEnvironment& env, 
-    BotBaseContext& context, 
+    ControllerContext& context, 
     EventNotificationOption& notif_status_update
 ){
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
@@ -74,7 +74,7 @@ void checkpoint_28(
         context.wait_for_all_requests();
         DirectionDetector direction;
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
-            [&](const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+            [&](const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context){
                 direction.change_direction(env.program_info(), env.console, context, 2.71);
                 pbf_move_left_joystick(context, 128, 0, 375, 100);
                 direction.change_direction(env.program_info(), env.console, context, 1.26);
@@ -84,14 +84,14 @@ void checkpoint_28(
         direction.change_direction(env.program_info(), env.console, context, 2.73);
 
         NoMinimapWatcher no_minimap(env.console, COLOR_RED, Milliseconds(2000));
-        int ret = run_until<BotBaseContext>(
+        int ret = run_until<ControllerContext>(
             env.console, context,
-            [&](BotBaseContext& context){
+            [&](ControllerContext& context){
                 handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
-                    [&](const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){           
+                    [&](const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context){           
                         pbf_move_left_joystick(context, 128, 0, 10 * TICKS_PER_SECOND, 100);
                     }, 
-                    [&](const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){           
+                    [&](const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context){           
                         pbf_move_left_joystick(context, 0, 0, 100, 20);
                     },
                     5, 3

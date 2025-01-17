@@ -9,12 +9,13 @@
 
 #include <mutex>
 #include <condition_variable>
+#include "Common/Cpp/CancellableScope.h"
 #include "Common/Cpp/Concurrency/AsyncDispatcher.h"
-#include "ClientSource/Connection/BotBase.h"
 
 
 namespace PokemonAutomation{
 
+class Logger;
 class ProgramEnvironment;
 
 

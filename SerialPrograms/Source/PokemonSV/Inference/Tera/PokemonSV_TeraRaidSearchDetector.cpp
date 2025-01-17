@@ -75,7 +75,7 @@ bool TeraRaidSearchDetector::detect_search_location(ImageFloatBox& box, const Im
 
     return false;
 }
-bool TeraRaidSearchDetector::move_cursor_to_search(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context) const{
+bool TeraRaidSearchDetector::move_cursor_to_search(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context) const{
     GradientArrowDetector arrow(m_color, GradientArrowType::DOWN, {0, 0, 1, 1});
 
     size_t consecutive_detection_fails = 0;
