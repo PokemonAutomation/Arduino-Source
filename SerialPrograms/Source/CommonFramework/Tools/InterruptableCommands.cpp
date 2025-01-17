@@ -15,35 +15,38 @@ namespace PokemonAutomation{
 
 
 
-struct AsyncCommandSession::CommandSet{
+template <typename ControllerType>
+struct AsyncCommandSession<ControllerType>::CommandSet{
     CommandSet(
-        CancellableScope& parent, BotBase& botbase,
-        std::function<void(BotBaseContext&)>&& lambda
+        CancellableScope& parent, ControllerType& controller,
+        std::function<void(ControllerContextType&)>&& lambda
     );
     CancellableHolder<CancellableScope> scope;
-    BotBaseContext context;
-    std::function<void(BotBaseContext&)> commands;
+    ControllerContextType context;
+    std::function<void(ControllerContextType&)> commands;
 };
 
 
 
-AsyncCommandSession::CommandSet::CommandSet(
-    CancellableScope& parent, BotBase& botbase,
-    std::function<void(BotBaseContext&)>&& lambda
+template <typename ControllerType>
+AsyncCommandSession<ControllerType>::CommandSet::CommandSet(
+    CancellableScope& parent, ControllerType& controller,
+    std::function<void(ControllerContextType&)>&& lambda
 )
     : scope(parent)
-    , context(scope, botbase)
+    , context(scope, controller)
     , commands(std::move(lambda))
 {}
 
 
 
-AsyncCommandSession::AsyncCommandSession(
+template <typename ControllerType>
+AsyncCommandSession<ControllerType>::AsyncCommandSession(
     CancellableScope& scope, Logger& logger, AsyncDispatcher& dispatcher,
-    BotBase& botbase
+    ControllerType& controller
 )
     : m_logger(logger)
-    , m_botbase(botbase)
+    , m_controller(controller)
 {
     //  Attach first. If scope is already cancelled, we exit here with nothing
     //  to clean up.
@@ -52,7 +55,8 @@ AsyncCommandSession::AsyncCommandSession(
     //  Now start the thread. Destructor is guaranteed to run if this succeeds.
     m_thread = dispatcher.dispatch([this]{ thread_loop(); });
 }
-AsyncCommandSession::~AsyncCommandSession(){
+template <typename ControllerType>
+AsyncCommandSession<ControllerType>::~AsyncCommandSession(){
 //    cout << "~AsyncCommandSession()" << endl;
     if (!cancelled() && std::uncaught_exceptions() == 0){
         m_logger.log("AsyncCommandSession::stop_session() not called before normal destruction.", COLOR_RED);
@@ -64,13 +68,15 @@ AsyncCommandSession::~AsyncCommandSession(){
     m_thread.reset();
 }
 
-bool AsyncCommandSession::command_is_running(){
+template <typename ControllerType>
+bool AsyncCommandSession<ControllerType>::command_is_running(){
     auto scope_check = m_sanitizer.check_scope();
     std::lock_guard<std::mutex> lg(m_lock);
     return m_current != nullptr;
 }
 
-void AsyncCommandSession::stop_command(){
+template <typename ControllerType>
+void AsyncCommandSession<ControllerType>::stop_command(){
     auto scope_check = m_sanitizer.check_scope();
 
     std::unique_lock<std::mutex> lg(m_lock);
@@ -86,7 +92,8 @@ void AsyncCommandSession::stop_command(){
         });
     }
 }
-void AsyncCommandSession::dispatch(std::function<void(BotBaseContext&)>&& lambda){
+template <typename ControllerType>
+void AsyncCommandSession<ControllerType>::dispatch(std::function<void(ControllerContextType&)>&& lambda){
     auto scope_check = m_sanitizer.check_scope();
 
     //  Construct the CommandSet outside the lock.
@@ -94,7 +101,7 @@ void AsyncCommandSession::dispatch(std::function<void(BotBaseContext&)>&& lambda
     //  it will deadlock.
     std::unique_ptr<CommandSet> pending(new CommandSet(
         *this->scope(),
-        m_botbase, std::move(lambda)
+        m_controller, std::move(lambda)
     ));
 
     std::unique_lock<std::mutex> lg(m_lock);
@@ -118,7 +125,8 @@ void AsyncCommandSession::dispatch(std::function<void(BotBaseContext&)>&& lambda
 }
 
 
-bool AsyncCommandSession::cancel(std::exception_ptr exception) noexcept{
+template <typename ControllerType>
+bool AsyncCommandSession<ControllerType>::cancel(std::exception_ptr exception) noexcept{
     if (Cancellable::cancel(exception)){
         return true;
     }
@@ -127,13 +135,14 @@ bool AsyncCommandSession::cancel(std::exception_ptr exception) noexcept{
         m_current->context.cancel(std::move(exception));
     }else{
         try{
-            m_botbase.stop_all_commands();
+            m_controller.stop_all_commands();
         }catch (...){}
     }
     m_cv.notify_all();
     return false;
 }
-void AsyncCommandSession::thread_loop(){
+template <typename ControllerType>
+void AsyncCommandSession<ControllerType>::thread_loop(){
     while (true){
         CommandSet* current;
         {
@@ -170,6 +179,7 @@ void AsyncCommandSession::thread_loop(){
 
 
 #if 0
+template <typename ControllerType>
 void AsyncCommandSession::stop_commands(){
     std::lock_guard<std::mutex> lg(m_lock);
     if (m_current){
@@ -177,7 +187,8 @@ void AsyncCommandSession::stop_commands(){
     }
 }
 #endif
-void AsyncCommandSession::wait(){
+template <typename ControllerType>
+void AsyncCommandSession<ControllerType>::wait(){
     std::unique_lock<std::mutex> lg(m_lock);
 //    cout << "wait() - start" << endl;
     m_cv.wait(lg, [this]{
@@ -185,13 +196,16 @@ void AsyncCommandSession::wait(){
     });
 //    cout << "wait() - done" << endl;
 }
-void AsyncCommandSession::stop_session_and_rethrow(){
+template <typename ControllerType>
+void AsyncCommandSession<ControllerType>::stop_session_and_rethrow(){
     cancel(nullptr);
     m_thread->wait_and_rethrow_exceptions();
     throw_if_cancelled_with_exception();
 }
 
 
+
+template class AsyncCommandSession<BotBase>;
 
 
 

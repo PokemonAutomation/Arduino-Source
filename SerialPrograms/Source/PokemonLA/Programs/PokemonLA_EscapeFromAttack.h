@@ -18,7 +18,7 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-class EscapeFromAttack : public SuperControlSession{
+class EscapeFromAttack : public SuperControlSession<BotBase>{
 public:
     EscapeFromAttack(
         ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
@@ -52,10 +52,10 @@ private:
         return SuperControlSession::run_state_action((size_t)state);
     }
 
-    virtual bool run_state(AsyncCommandSession& commands, WallClock timestamp) override;
+    virtual bool run_state(AsyncCommandSession<BotBase>& commands, WallClock timestamp) override;
 
-    bool run_flying(AsyncCommandSession& commands, WallClock timestamp);
-    bool run_climbing(AsyncCommandSession& commands, WallClock timestamp);
+    bool run_flying(AsyncCommandSession<BotBase>& commands, WallClock timestamp);
+    bool run_climbing(AsyncCommandSession<BotBase>& commands, WallClock timestamp);
 
 private:
     static const uint16_t GET_ON_MOUNT_TIME = 125;

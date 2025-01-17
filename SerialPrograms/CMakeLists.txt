@@ -426,8 +426,6 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Logging/QueuedLogger.cpp
     Source/CommonFramework/Logging/QueuedLogger.h
     Source/CommonFramework/Main.cpp
-    Source/CommonFramework/NewVersionCheck.cpp
-    Source/CommonFramework/NewVersionCheck.h
     Source/CommonFramework/Notifications/EventNotificationOption.cpp
     Source/CommonFramework/Notifications/EventNotificationOption.h
     Source/CommonFramework/Notifications/EventNotificationsTable.cpp
@@ -525,8 +523,10 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Recording/StreamRecorder.h
     Source/CommonFramework/Resources/SpriteDatabase.cpp
     Source/CommonFramework/Resources/SpriteDatabase.h
-    Source/CommonFramework/SetupSettings.cpp
-    Source/CommonFramework/SetupSettings.h
+    Source/CommonFramework/Startup/NewVersionCheck.cpp
+    Source/CommonFramework/Startup/NewVersionCheck.h
+    Source/CommonFramework/Startup/SetupSettings.cpp
+    Source/CommonFramework/Startup/SetupSettings.h
     Source/CommonFramework/Tools/BlackBorderCheck.cpp
     Source/CommonFramework/Tools/BlackBorderCheck.h
     Source/CommonFramework/Tools/BotBaseHandle.cpp
@@ -2160,7 +2160,14 @@ if (MSVC)
     )
 
     target_link_libraries(SerialPrograms PRIVATE tesseractPA.lib OpenCV_lib Sleepy.lib dpp_lib)
-    target_compile_definitions(SerialPrograms PRIVATE PA_TESSERACT PA_SLEEPY PA_DPP _CRT_SECURE_NO_WARNINGS)
+    target_compile_definitions(
+        SerialPrograms PRIVATE
+        _CRT_SECURE_NO_WARNINGS
+        _DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR
+        PA_TESSERACT
+        PA_SLEEPY
+        PA_DPP
+    )
 
     target_compile_options(SerialPrograms PRIVATE /FAs /FaAssembly/ /MP /W4 /WX /utf-8)
     target_compile_options(SerialPrograms PRIVATE /wd5054)  # Deprecated enum arithemtic

@@ -15,11 +15,14 @@ namespace PokemonAutomation{
 class Logger;
 struct BotBaseMessage;
 class BotBaseRequest;
+class BotBaseContext;
 
 
 
 class BotBase{
 public:
+    using ContextType = BotBaseContext;
+
     enum class State{
         RUNNING,
         STOPPING,
@@ -70,22 +73,40 @@ public:
 
 
 
-//  A wrapper for BotBase that allows for asynchronous cancelling.
-class BotBaseContext final : public CancellableScope{
+class ControllerContext : public CancellableScope{
 public:
-    BotBaseContext(BotBase& botbase);
-    BotBaseContext(CancellableScope& parent, BotBase& botbase);
-    BotBaseContext(CancellableScope& parent, BotBaseContext& context);
-    virtual ~BotBaseContext();
+    virtual void wait_for_all_requests() const = 0;
+    virtual void cancel_now() = 0;
+    virtual void cancel_lazy() = 0;
+};
 
 
-    void wait_for_all_requests() const;
+//  A wrapper for BotBase that allows for asynchronous cancelling.
+class BotBaseContext final : public ControllerContext{
+public:
+    using ControllerType = BotBase;
 
-    //  Don't use this unless you really need to.
-    BotBase& botbase() const{ return m_botbase; }
+public:
+    BotBaseContext(BotBase& botbase)
+        : m_botbase(botbase)
+    {}
+    BotBaseContext(CancellableScope& parent, BotBase& botbase)
+        : m_botbase(botbase)
+    {
+        attach(parent);
+    }
+    virtual ~BotBaseContext(){
+        detach();
+    }
+
+
+    virtual void wait_for_all_requests() const override;
+
+    operator BotBase&() const{ return m_botbase; }
+    BotBase& controller() const{ return m_botbase; }
 
     //  Stop all commands in this context now.
-    void cancel_now();
+    virtual void cancel_now() override;
 
     //  Stop the commands in this context, but do it lazily.
     //  Still will stop new commands from being issued to the device,
@@ -93,7 +114,7 @@ public:
     //  should replace the command queue.
     //  This cancel is used when you need continuity from an ongoing
     //  sequence.
-    void cancel_lazy();
+    virtual void cancel_lazy() override;
 
 
     virtual bool cancel(std::exception_ptr exception) noexcept override;

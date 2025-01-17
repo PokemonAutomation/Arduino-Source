@@ -12,7 +12,7 @@
 #include "Common/Qt/CollapsibleGroupBox.h"
 #include "Common/Qt/Options/ConfigWidget.h"
 //#include "Common/Qt/Options/BatchWidget.h"
-#include "CommonFramework/NewVersionCheck.h"
+#include "CommonFramework/Startup/NewVersionCheck.h"
 #include "CommonFramework/Panels/PanelTools.h"
 #include "CommonFramework/Panels/UI/PanelElements.h"
 #include "CommonFramework/Tools/StatsTracking.h"

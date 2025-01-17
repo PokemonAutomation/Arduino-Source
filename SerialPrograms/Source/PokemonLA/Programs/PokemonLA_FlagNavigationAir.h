@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonLA_FlagNavigation_H
 #define PokemonAutomation_PokemonLA_FlagNavigation_H
 
+#include "ClientSource/Connection/BotBase.h"
 #include "CommonFramework/Tools/SuperControlSession.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_FlagTracker.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_ButtonDetector.h"
@@ -19,7 +20,7 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-class FlagNavigationAir : public SuperControlSession{
+class FlagNavigationAir : public SuperControlSession<BotBase>{
 public:
     FlagNavigationAir(
         ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
@@ -32,10 +33,10 @@ public:
 
 
 private:
-    virtual bool run_state(AsyncCommandSession& commands, WallClock timestamp) override;
+    virtual bool run_state(AsyncCommandSession<BotBase>& commands, WallClock timestamp) override;
 
-    bool run_flying(AsyncCommandSession& commands, WallClock timestamp);
-    bool run_climbing(AsyncCommandSession& commands, WallClock timestamp);
+    bool run_flying(AsyncCommandSession<BotBase>& commands, WallClock timestamp);
+    bool run_climbing(AsyncCommandSession<BotBase>& commands, WallClock timestamp);
 
 
 private:

@@ -20,10 +20,12 @@
 namespace PokemonAutomation{
 
 
-SuperControlSession::~SuperControlSession(){}
+template <typename ControllerType>
+SuperControlSession<ControllerType>::~SuperControlSession() = default;
 
-SuperControlSession::SuperControlSession(
-    ProgramEnvironment& env, VideoStream& stream, BotBaseContext& context,
+template <typename ControllerType>
+SuperControlSession<ControllerType>::SuperControlSession(
+    ProgramEnvironment& env, VideoStream& stream, ControllerContextType& context,
         std::chrono::milliseconds state_period,
         std::chrono::milliseconds visual_period,
         std::chrono::milliseconds audio_period
@@ -38,20 +40,24 @@ SuperControlSession::SuperControlSession(
     , m_last_state_change(current_time())
 {}
 
-void SuperControlSession::operator+=(VisualInferenceCallback& callback){
+template <typename ControllerType>
+void SuperControlSession<ControllerType>::operator+=(VisualInferenceCallback& callback){
     m_visual_callbacks.emplace_back(&callback);
 }
-void SuperControlSession::operator+=(AudioInferenceCallback& callback){
+template <typename ControllerType>
+void SuperControlSession<ControllerType>::operator+=(AudioInferenceCallback& callback){
     m_audio_callbacks.emplace_back(&callback);
 }
-void SuperControlSession::register_state_command(size_t state, std::function<bool()>&& action){
+template <typename ControllerType>
+void SuperControlSession<ControllerType>::register_state_command(size_t state, std::function<bool()>&& action){
     auto iter = m_state_actions.find(state);
     if (iter != m_state_actions.end()){
         throw InternalProgramError(&m_stream.logger(), PA_CURRENT_FUNCTION, "Duplicate State Enum: " + std::to_string(state));
     }
     m_state_actions.emplace(state, std::move(action));
 }
-bool SuperControlSession::run_state_action(size_t state){
+template <typename ControllerType>
+bool SuperControlSession<ControllerType>::run_state_action(size_t state){
     auto iter = m_state_actions.find(state);
     if (iter == m_state_actions.end()){
         throw InternalProgramError(&m_stream.logger(), PA_CURRENT_FUNCTION, "Unknown State Enum: " + std::to_string(state));
@@ -73,13 +79,14 @@ bool SuperControlSession::run_state_action(size_t state){
     return iter->second();
 }
 
-void SuperControlSession::run_session(){
+template <typename ControllerType>
+void SuperControlSession<ControllerType>::run_session(){
     m_start_time = current_time();
 
     m_active_command.reset(
-        new AsyncCommandSession(
+        new AsyncCommandSession<ControllerType>(
             m_context, m_env.logger(), m_env.realtime_dispatcher(),
-            m_context.botbase()
+            m_context.controller()
         )
     );
 
@@ -121,6 +128,11 @@ void SuperControlSession::run_session(){
 
     m_active_command->stop_session_and_rethrow();
 }
+
+
+
+template class SuperControlSession<BotBase>;
+
 
 
 

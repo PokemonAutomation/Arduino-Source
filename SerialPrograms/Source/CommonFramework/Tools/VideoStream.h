@@ -2,6 +2,9 @@
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
+ *      Represents a single video stream. Includes video, audio, as well
+ *  as their inference pivots.
+ *
  */
 
 #ifndef PokemonAutomation_VideoStream_H

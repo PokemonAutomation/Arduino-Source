@@ -66,10 +66,10 @@ int run_until(
     std::chrono::milliseconds default_video_period = std::chrono::milliseconds(50),
     std::chrono::milliseconds default_audio_period = std::chrono::milliseconds(20)
 );
-template <typename CommandContext>
+template <typename ControllerContext>
 int run_until(
-    VideoStream& stream, CommandContext& context,
-    std::function<void(CommandContext& context)>&& command,
+    VideoStream& stream, ControllerContext& context,
+    std::function<void(ControllerContext& context)>&& command,
     const std::vector<PeriodicInferenceCallback>& callbacks,
     std::chrono::milliseconds default_video_period = std::chrono::milliseconds(50),
     std::chrono::milliseconds default_audio_period = std::chrono::milliseconds(20)
@@ -77,10 +77,8 @@ int run_until(
     return run_until(
         stream, context,
         [&](CancellableScope& scope){
-            CommandContext subcontext(scope, context);
-            if (command){
-                command(subcontext);
-            }
+            ControllerContext subcontext(scope, context);
+            command(subcontext);
             subcontext.wait_for_all_requests();
         },
         callbacks,
@@ -90,7 +88,7 @@ int run_until(
 }
 
 
-#if 0
+#if 1
 //  Same as "run_until()", but will cancel the commands and return if a timeout
 //  is reached.
 //
@@ -100,9 +98,9 @@ int run_until(
 //      -   -2 if timed out. Nothing triggered, and command did not finish.
 //
 int run_until_with_time_limit(
-    ProgramEnvironment& env, VideoStream& stream, BotBaseContext& context,
+    ProgramEnvironment& env, VideoStream& stream, CancellableScope& scope,
     WallClock deadline,
-    std::function<void(BotBaseContext& context)>&& command,
+    std::function<void(CancellableScope& scope)>&& command,
     const std::vector<PeriodicInferenceCallback>& callbacks,
     std::chrono::milliseconds default_video_period,
     std::chrono::milliseconds default_audio_period

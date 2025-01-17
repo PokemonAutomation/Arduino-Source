@@ -274,7 +274,7 @@ update the location of the sandwich hand
 bool move_then_recover_sandwich_hand_position(
     const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, 
     SandwichHandType& hand_type, SandwichHandWatcher& hand_watcher,
-    AsyncCommandSession& move_session
+    AsyncCommandSession<BotBase>& move_session
 ){
 
     console.log("center the cursor: move towards bottom right, then left slightly.");
@@ -359,7 +359,12 @@ ImageFloatBox move_sandwich_hand(
     SandwichHandWatcher hand_watcher(hand_type, start_box);
 
     // A session that creates a new thread to send button commands to controller
-    AsyncCommandSession move_session(context, console.logger(), dispatcher, console.botbase());
+    AsyncCommandSession<BotBase> move_session(
+        context,
+        console.logger(),
+        dispatcher,
+        console.botbase()
+    );
     
     if (pressing_A){
         move_session.dispatch([](BotBaseContext& context){

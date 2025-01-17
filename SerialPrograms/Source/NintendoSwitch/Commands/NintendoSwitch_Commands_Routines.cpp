@@ -56,7 +56,7 @@ void close_game(ConsoleHandle& console, BotBaseContext& context){
     }else{
         // - wait some time after first Home button press 
         // to avoid triggering zoom
-        context.wait_for(std::chrono::milliseconds(1000));   
+        context.wait_for(std::chrono::milliseconds(1000));
         pbf_press_button(context, BUTTON_HOME, 50, 50);      // - Does nothing.          |  - Press Home a second time in case we drop one.
     }
 

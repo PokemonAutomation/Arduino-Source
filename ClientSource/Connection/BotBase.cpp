@@ -14,22 +14,6 @@
 namespace PokemonAutomation{
 
 
-BotBaseContext::BotBaseContext(BotBase& botbase)
-    : m_botbase(botbase)
-{}
-BotBaseContext::BotBaseContext(CancellableScope& parent, BotBase& botbase)
-    : m_botbase(botbase)
-{
-    attach(parent);
-}
-BotBaseContext::BotBaseContext(CancellableScope& parent, BotBaseContext& context)
-    : m_botbase(context.botbase())
-{
-    attach(parent);
-}
-BotBaseContext::~BotBaseContext(){
-    detach();
-}
 
 void BotBaseContext::wait_for_all_requests() const{
     m_lifetime_sanitizer.check_usage();

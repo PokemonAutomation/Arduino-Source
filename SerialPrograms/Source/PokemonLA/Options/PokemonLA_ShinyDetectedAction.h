@@ -21,7 +21,7 @@ namespace PokemonAutomation{
     class StatsTracker;
     class ProgramEnvironment;
     class ConsoleHandle;
-    class AsyncCommandSession;
+//    class AsyncCommandSession;
 namespace NintendoSwitch{
 namespace PokemonLA{
 

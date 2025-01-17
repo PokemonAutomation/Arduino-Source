@@ -232,7 +232,6 @@ SOURCES += \
     Source/CommonFramework/Logging/OutputRedirector.cpp \
     Source/CommonFramework/Logging/QueuedLogger.cpp \
     Source/CommonFramework/Main.cpp \
-    Source/CommonFramework/NewVersionCheck.cpp \
     Source/CommonFramework/Notifications/EventNotificationOption.cpp \
     Source/CommonFramework/Notifications/EventNotificationsTable.cpp \
     Source/CommonFramework/Notifications/MessageAttachment.cpp \
@@ -276,7 +275,8 @@ SOURCES += \
     Source/CommonFramework/Recording/StreamHistorySession.cpp \
     Source/CommonFramework/Recording/StreamRecorder.cpp \
     Source/CommonFramework/Resources/SpriteDatabase.cpp \
-    Source/CommonFramework/SetupSettings.cpp \
+    Source/CommonFramework/Startup/NewVersionCheck.cpp \
+    Source/CommonFramework/Startup/SetupSettings.cpp \
     Source/CommonFramework/Tools/BlackBorderCheck.cpp \
     Source/CommonFramework/Tools/BotBaseHandle.cpp \
     Source/CommonFramework/Tools/DebugDumper.cpp \
@@ -1325,7 +1325,6 @@ HEADERS += \
     Source/CommonFramework/Logging/Logger.h \
     Source/CommonFramework/Logging/OutputRedirector.h \
     Source/CommonFramework/Logging/QueuedLogger.h \
-    Source/CommonFramework/NewVersionCheck.h \
     Source/CommonFramework/Notifications/EventNotificationOption.h \
     Source/CommonFramework/Notifications/EventNotificationsTable.h \
     Source/CommonFramework/Notifications/MessageAttachment.h \
@@ -1375,7 +1374,8 @@ HEADERS += \
     Source/CommonFramework/Recording/StreamHistoryTracker_SaveFrames.h \
     Source/CommonFramework/Recording/StreamRecorder.h \
     Source/CommonFramework/Resources/SpriteDatabase.h \
-    Source/CommonFramework/SetupSettings.h \
+    Source/CommonFramework/Startup/NewVersionCheck.h \
+    Source/CommonFramework/Startup/SetupSettings.h \
     Source/CommonFramework/Tools/BlackBorderCheck.h \
     Source/CommonFramework/Tools/BotBaseHandle.h \
     Source/CommonFramework/Tools/DebugDumper.h \

@@ -17,7 +17,7 @@
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Logging/FileWindowLogger.h"
-#include "CommonFramework/NewVersionCheck.h"
+#include "CommonFramework/Startup/NewVersionCheck.h"
 #include "CommonFramework/Options/ResolutionOption.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "PanelLists.h"

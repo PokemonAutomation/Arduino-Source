@@ -20,8 +20,8 @@
 #include "Globals.h"
 #include "GlobalSettingsPanel.h"
 //#include "Windows/DpiScaler.h"
-#include "SetupSettings.h"
-#include "NewVersionCheck.h"
+#include "Startup/SetupSettings.h"
+#include "Startup/NewVersionCheck.h"
 #include "Windows/MainWindow.h"
 
 

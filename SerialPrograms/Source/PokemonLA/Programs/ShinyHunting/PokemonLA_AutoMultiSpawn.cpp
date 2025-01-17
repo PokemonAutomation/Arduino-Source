@@ -79,7 +79,12 @@ std::pair<bool, PokemonDetails> control_focus_to_throw(
     Language language
 ){
     // A session that creates a new thread to send button commands to controller
-    AsyncCommandSession session(context, env.console.logger(), env.realtime_dispatcher(), env.console.botbase());
+    AsyncCommandSession<BotBase> session(
+        context,
+        env.console.logger(),
+        env.realtime_dispatcher(),
+        env.console.botbase()
+    );
 
     // First, let controller press ZL non-stop to start focusing on a pokemon
     session.dispatch([](BotBaseContext& context){

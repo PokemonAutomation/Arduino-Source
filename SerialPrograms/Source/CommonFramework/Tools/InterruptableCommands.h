@@ -18,12 +18,14 @@ namespace PokemonAutomation{
 class ProgramEnvironment;
 
 
-
+template <typename ControllerType>
 class AsyncCommandSession final : private Cancellable{
+    using ControllerContextType = typename ControllerType::ContextType;
+
 public:
     AsyncCommandSession(
         CancellableScope& scope, Logger& logger, AsyncDispatcher& dispatcher,
-        BotBase& botbase
+        ControllerType& controller
     );
     virtual ~AsyncCommandSession();
 
@@ -49,7 +51,7 @@ public:
 
     //  Dispath the following lambda. If something is already running, it will be
     //  stopped and replaced with this one.
-    void dispatch(std::function<void(BotBaseContext&)>&& lambda);
+    void dispatch(std::function<void(ControllerContextType&)>&& lambda);
 
     //  Wait for currently running command to finish.
     void wait();
@@ -64,7 +66,7 @@ private:
     struct CommandSet;
 
     Logger& m_logger;
-    BotBase& m_botbase;
+    ControllerType& m_controller;
     std::unique_ptr<CommandSet> m_current;
 
     std::mutex m_lock;

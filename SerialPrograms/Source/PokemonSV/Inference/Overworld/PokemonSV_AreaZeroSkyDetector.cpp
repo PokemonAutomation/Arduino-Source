@@ -111,7 +111,7 @@ void find_and_center_on_sky(
         {sky_tracker}
     );
 
-    AsyncCommandSession session(context, console, env.realtime_dispatcher(), context.botbase());
+    AsyncCommandSession<BotBase> session(context, console, env.realtime_dispatcher(), context.controller());
     OverworldState state = OverworldState::None;
     WallClock start = current_time();
     while (true){

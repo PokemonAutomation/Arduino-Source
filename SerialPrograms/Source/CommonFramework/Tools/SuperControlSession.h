@@ -16,10 +16,9 @@
 
 namespace PokemonAutomation{
 
-class BotBaseContext;
 class ProgramEnvironment;
 class VideoStream;
-class AsyncCommandSession;
+template <typename ControllerType> class AsyncCommandSession;
 class AudioInferenceCallback;
 class VisualInferenceCallback;
 
@@ -39,7 +38,10 @@ class VisualInferenceCallback;
 //  with a registered enum/action.
 //
 
+template <typename ControllerType>
 class SuperControlSession{
+    using ControllerContextType = typename ControllerType::ContextType;
+
 public:
     ~SuperControlSession();
     void run_session();
@@ -47,7 +49,7 @@ public:
 protected:
     //  Construction
     SuperControlSession(
-        ProgramEnvironment& env, VideoStream& stream, BotBaseContext& context,
+        ProgramEnvironment& env, VideoStream& stream, ControllerContextType& context,
         std::chrono::milliseconds state_period = std::chrono::milliseconds(100),
         std::chrono::milliseconds visual_period = std::chrono::milliseconds(50),
         std::chrono::milliseconds audio_period = std::chrono::milliseconds(20)
@@ -66,7 +68,7 @@ protected:
     WallClock last_state_change() const{ return m_last_state_change; }
 
     //  Return true if we should stop.
-    virtual bool run_state(AsyncCommandSession& commands, WallClock timestamp) = 0;
+    virtual bool run_state(AsyncCommandSession<ControllerType>& commands, WallClock timestamp) = 0;
 
     //  Run the specified state. This is debounced such that the registered
     //  command will only run if we're not already in the state and the command
@@ -77,8 +79,8 @@ protected:
 protected:
     ProgramEnvironment& m_env;
     VideoStream& m_stream;
-    BotBaseContext& m_context;
-    std::unique_ptr<AsyncCommandSession> m_active_command;
+    ControllerContextType& m_context;
+    std::unique_ptr<AsyncCommandSession<ControllerType>> m_active_command;
 
 private:
     const std::chrono::milliseconds m_state_period;
