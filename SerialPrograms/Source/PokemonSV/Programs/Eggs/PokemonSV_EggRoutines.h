@@ -16,7 +16,6 @@ namespace PokemonAutomation{
 
     struct ProgramInfo;
     class AsyncDispatcher;
-    class ConsoleHandle;
     class BotBaseContext;
     class ImageViewRGB32;
 
@@ -29,6 +28,7 @@ namespace PokemonAutomation{
     }
 
 namespace NintendoSwitch{
+    class ConsoleHandle;
 namespace PokemonSV{
 
 // While entering Gastronome En Famille, order the dish Compote du Fils.

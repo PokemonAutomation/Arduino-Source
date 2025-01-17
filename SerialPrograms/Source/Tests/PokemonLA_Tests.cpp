@@ -11,6 +11,7 @@
 #include "CommonFramework/Language.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/Recording/StreamHistorySession.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.h"
 #include "PokemonLA/Inference/Battles/PokemonLA_BattlePokemonSwitchDetector.h"
 #include "PokemonLA/Inference/Battles/PokemonLA_BattleSpriteWatcher.h"
@@ -49,6 +50,7 @@ using std::endl;
 
 namespace PokemonAutomation{
 
+using namespace NintendoSwitch;
 using namespace NintendoSwitch::PokemonLA;
 
 int test_pokemonLA_BattleMenuDetector(const ImageViewRGB32& image, bool target){

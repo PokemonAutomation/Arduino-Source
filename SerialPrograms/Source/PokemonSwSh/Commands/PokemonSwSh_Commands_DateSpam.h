@@ -10,8 +10,9 @@
 #include "ClientSource/Connection/BotBase.h"
 
 namespace PokemonAutomation{
-    class ConsoleHandle;
 namespace NintendoSwitch{
+
+class ConsoleHandle;
 
 
 constexpr uint8_t MAX_YEAR = 60;

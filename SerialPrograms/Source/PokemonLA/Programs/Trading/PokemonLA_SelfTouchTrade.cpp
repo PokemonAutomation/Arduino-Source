@@ -168,7 +168,7 @@ void SelfTouchTrade::program(MultiSwitchProgramEnvironment& env, CancellableScop
     uint8_t col = 0;
 
     bool host0 = HOSTING_SWITCH == HostingSwitch::Switch0;
-    BotBaseContext host_context(scope, (host0 ? env.consoles[0] : env.consoles[1]).botbase());
+    BotBaseContext host_context(scope, (host0 ? env.consoles[0] : env.consoles[1]).controller());
     ConsoleHandle& host = host0 ? env.consoles[0] : env.consoles[1];
     ConsoleHandle& recv = host0 ? env.consoles[1] : env.consoles[0];
 

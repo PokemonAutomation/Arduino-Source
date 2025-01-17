@@ -19,7 +19,7 @@ class BotBaseContext;
 
 
 
-class BotBase{
+class BotBaseController{
 public:
     using ContextType = BotBaseContext;
 
@@ -31,7 +31,7 @@ public:
     };
 
 public:
-    virtual ~BotBase() = default;
+    virtual ~BotBaseController() = default;
 
     virtual Logger& logger() = 0;
     virtual State state() const = 0;
@@ -84,14 +84,14 @@ public:
 //  A wrapper for BotBase that allows for asynchronous cancelling.
 class BotBaseContext final : public ControllerContext{
 public:
-    using ControllerType = BotBase;
+    using ControllerType = BotBaseController;
 
 public:
-    BotBaseContext(BotBase& botbase)
-        : m_botbase(botbase)
+    BotBaseContext(BotBaseController& botbase)
+        : m_controller(botbase)
     {}
-    BotBaseContext(CancellableScope& parent, BotBase& botbase)
-        : m_botbase(botbase)
+    BotBaseContext(CancellableScope& parent, BotBaseController& botbase)
+        : m_controller(botbase)
     {
         attach(parent);
     }
@@ -102,8 +102,8 @@ public:
 
     virtual void wait_for_all_requests() const override;
 
-    operator BotBase&() const{ return m_botbase; }
-    BotBase& controller() const{ return m_botbase; }
+    operator BotBaseController&() const{ return m_controller; }
+    BotBaseController& controller() const{ return m_controller; }
 
     //  Stop all commands in this context now.
     virtual void cancel_now() override;
@@ -127,7 +127,7 @@ public:
 
 
 private:
-    BotBase& m_botbase;
+    BotBaseController& m_controller;
     LifetimeSanitizer m_lifetime_sanitizer;
 };
 

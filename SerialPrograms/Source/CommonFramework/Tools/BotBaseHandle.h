@@ -52,7 +52,7 @@ public:
 public:
     //  Not thread-safe with stop() or reset(). The returned pointer
     //  will only be valid until the next call to stop()/reset().
-    BotBase* botbase();
+    BotBaseController* botbase();
 
     //  Safe to call anywhere anytime. If called asynchronously with
     //  stop()/reset(), the result may be immediately out-of-date.

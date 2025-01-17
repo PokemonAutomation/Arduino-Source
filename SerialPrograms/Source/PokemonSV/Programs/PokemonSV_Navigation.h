@@ -15,11 +15,11 @@
 
 namespace PokemonAutomation{
     struct ProgramInfo;
-    class ConsoleHandle;
     class BotBaseContext;
 //    class ProgramEnvironment;
 //    class EventNotificationOption;
 namespace NintendoSwitch{
+    class ConsoleHandle;
 namespace PokemonSV{
 
 

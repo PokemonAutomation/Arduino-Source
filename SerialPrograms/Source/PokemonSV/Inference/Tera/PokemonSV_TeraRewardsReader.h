@@ -14,8 +14,8 @@
 
 namespace PokemonAutomation{
     class CancellableScope;
-    class ConsoleHandle;
 namespace NintendoSwitch{
+    class ConsoleHandle;
 namespace PokemonSV{
 
 

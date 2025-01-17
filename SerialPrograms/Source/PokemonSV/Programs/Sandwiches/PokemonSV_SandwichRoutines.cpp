@@ -15,6 +15,7 @@
 #include "CommonFramework/Tools/InterruptableCommands.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 //#include "CommonFramework/ImageTools/ImageFilter.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
@@ -274,7 +275,7 @@ update the location of the sandwich hand
 bool move_then_recover_sandwich_hand_position(
     const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, 
     SandwichHandType& hand_type, SandwichHandWatcher& hand_watcher,
-    AsyncCommandSession<BotBase>& move_session
+    AsyncCommandSession<Controller>& move_session
 ){
 
     console.log("center the cursor: move towards bottom right, then left slightly.");
@@ -359,11 +360,11 @@ ImageFloatBox move_sandwich_hand(
     SandwichHandWatcher hand_watcher(hand_type, start_box);
 
     // A session that creates a new thread to send button commands to controller
-    AsyncCommandSession<BotBase> move_session(
+    AsyncCommandSession<Controller> move_session(
         context,
         console.logger(),
         dispatcher,
-        console.botbase()
+        console.controller()
     );
     
     if (pressing_A){

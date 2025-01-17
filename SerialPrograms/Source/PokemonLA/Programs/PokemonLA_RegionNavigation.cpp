@@ -523,7 +523,7 @@ void goto_any_camp_from_overworld(
     }
     console.log("Arrived at camp...");
     context.wait_for(std::chrono::milliseconds((uint64_t)(GameSettings::instance().POST_WARP_DELAY * 1000)));
-    console.botbase().wait_for_all_requests();
+    console.controller().wait_for_all_requests();
 }
 
 

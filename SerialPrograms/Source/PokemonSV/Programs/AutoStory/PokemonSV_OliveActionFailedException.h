@@ -8,8 +8,11 @@
 #define PokemonAutomation_OliveActionFailedException_H
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 
 namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace PokemonSV{
 
 class FatalProgramException;
 
@@ -45,6 +48,7 @@ public:
 
 
 
-
+}
+}
 }
 #endif

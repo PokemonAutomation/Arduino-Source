@@ -12,6 +12,7 @@
 #include "CommonFramework/Tools/InterruptableCommands.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSV_AreaZeroSkyDetector.h"
 
@@ -111,7 +112,11 @@ void find_and_center_on_sky(
         {sky_tracker}
     );
 
-    AsyncCommandSession<BotBase> session(context, console, env.realtime_dispatcher(), context.controller());
+    AsyncCommandSession<Controller> session(
+        context, console,
+        env.realtime_dispatcher(),
+        context.controller()
+    );
     OverworldState state = OverworldState::None;
     WallClock start = current_time();
     while (true){

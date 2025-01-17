@@ -10,8 +10,8 @@
 #include "ClientSource/Connection/BotBase.h"
 
 namespace PokemonAutomation{
-    class ConsoleHandle;
 namespace NintendoSwitch{
+    class ConsoleHandle;
 namespace PokemonSwSh{
 
 

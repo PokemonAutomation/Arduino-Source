@@ -16,9 +16,9 @@
 namespace PokemonAutomation{
     struct ProgramInfo;
     class BotBaseContext;
-    class ConsoleHandle;
     class ProgramEnvironment;
 namespace NintendoSwitch{
+    class ConsoleHandle;
 namespace PokemonSV{
 
 class LetsGoEncounterBotTracker;

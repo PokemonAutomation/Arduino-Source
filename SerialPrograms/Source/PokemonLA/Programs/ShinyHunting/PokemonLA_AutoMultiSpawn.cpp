@@ -4,14 +4,21 @@
  *
  */
 
+#include <set>
+//#include <atomic>
+#include <chrono>
+//#include <thread>
+#include <iterator>
+#include <sstream>
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "CommonFramework/ImageTypes/ImageRGB32.h"
+//#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Tools/DebugDumper.h"
 #include "CommonFramework/Tools/InterruptableCommands.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "Pokemon/Pokemon_Strings.h"
@@ -30,12 +37,6 @@
 #include "PokemonLA_AutoMultiSpawn.h"
 
 #include <iostream>
-#include <sstream>
-#include <set>
-#include <atomic>
-#include <chrono>
-#include <thread>
-#include <iterator>
 using std::cout;
 using std::endl;
 
@@ -79,11 +80,11 @@ std::pair<bool, PokemonDetails> control_focus_to_throw(
     Language language
 ){
     // A session that creates a new thread to send button commands to controller
-    AsyncCommandSession<BotBase> session(
+    AsyncCommandSession<Controller> session(
         context,
         env.console.logger(),
         env.realtime_dispatcher(),
-        env.console.botbase()
+        env.console.controller()
     );
 
     // First, let controller press ZL non-stop to start focusing on a pokemon

@@ -12,8 +12,8 @@
 
 namespace PokemonAutomation{
     class CancellableScope;
-    class ConsoleHandle;
 namespace NintendoSwitch{
+    class ConsoleHandle;
 namespace PokemonLA{
 
 // On the map that you see when you leave village, detect which region the cursor is currently

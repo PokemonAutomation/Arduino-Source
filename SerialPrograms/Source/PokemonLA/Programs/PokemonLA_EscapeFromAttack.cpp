@@ -130,7 +130,7 @@ EscapeFromAttack::EscapeFromAttack(
         return false;
     });
 }
-bool EscapeFromAttack::run_state(AsyncCommandSession<BotBase>& commands, WallClock timestamp){
+bool EscapeFromAttack::run_state(AsyncCommandSession<Controller>& commands, WallClock timestamp){
     if (timestamp > m_deadline){
         return true;
     }
@@ -164,13 +164,13 @@ bool EscapeFromAttack::run_state(AsyncCommandSession<BotBase>& commands, WallClo
     m_stream.log("No state handler for current state.", COLOR_RED);
     return false;
 }
-bool EscapeFromAttack::run_flying(AsyncCommandSession<BotBase>& commands, WallClock timestamp){
+bool EscapeFromAttack::run_flying(AsyncCommandSession<Controller>& commands, WallClock timestamp){
     if (m_centerA.detected() && timestamp - last_state_change() > std::chrono::seconds(3)){
         return run_state_action(State::GET_ON_SNEASLER);
     }
     return run_state_action(State::DASH_FORWARD);
 }
-bool EscapeFromAttack::run_climbing(AsyncCommandSession<BotBase>& commands, WallClock timestamp){
+bool EscapeFromAttack::run_climbing(AsyncCommandSession<Controller>& commands, WallClock timestamp){
     //  Can't jump off means you're able to stand. Switch back to Braviary.
     if (!m_leftB.detected()){
         return run_state_action(State::SNEASLER_OFF);

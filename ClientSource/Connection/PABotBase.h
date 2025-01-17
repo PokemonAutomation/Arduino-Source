@@ -40,7 +40,7 @@
 namespace PokemonAutomation{
 
 
-class PABotBase : public BotBase, private PABotBaseConnection{
+class PABotBase : public BotBaseController, private PABotBaseConnection{
 //    static const size_t MAX_PENDING_REQUESTS = PABB_DEVICE_QUEUE_SIZE;
     static const seqnum_t MAX_SEQNUM_GAP = (seqnum_t)-1 >> 2;
 
@@ -89,9 +89,9 @@ public:
 public:
     //  For Command Implementations
 
-//    using BotBase::try_issue_request;
-    using BotBase::issue_request;
-    using BotBase::issue_request_and_wait;
+//    using BotBaseController::try_issue_request;
+    using BotBaseController::issue_request;
+    using BotBaseController::issue_request_and_wait;
 
 
 private:

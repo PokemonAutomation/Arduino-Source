@@ -20,10 +20,10 @@ namespace PokemonAutomation{
     struct ProgramInfo;
     class AsyncDispatcher;
     class ProgramEnvironment;
-    class ConsoleHandle;
     class BotBaseContext;
 
 namespace NintendoSwitch{
+    class ConsoleHandle;
 namespace PokemonSV{
 
 // Assuming at picnic table, press A to start making sandwich.

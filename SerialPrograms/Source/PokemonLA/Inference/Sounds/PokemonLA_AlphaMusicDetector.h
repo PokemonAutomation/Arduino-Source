@@ -14,11 +14,9 @@
 #include <memory>
 
 namespace PokemonAutomation{
-
-class ConsoleHandle;
-class SpectrogramMatcher;
-
+    class SpectrogramMatcher;
 namespace NintendoSwitch{
+    class ConsoleHandle;
 namespace PokemonLA{
 
 

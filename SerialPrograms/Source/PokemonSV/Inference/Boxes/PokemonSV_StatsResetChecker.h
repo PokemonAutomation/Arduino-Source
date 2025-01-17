@@ -11,7 +11,6 @@
 
 namespace PokemonAutomation{
     struct ProgramInfo;
-    class ConsoleHandle;
     class BotBaseContext;
     class ImageViewRGB32;
 
@@ -24,6 +23,7 @@ class StatsHuntIvJudgeFilterTable;
 }
 
 namespace NintendoSwitch{
+    class ConsoleHandle;
 namespace PokemonSV{
 
 

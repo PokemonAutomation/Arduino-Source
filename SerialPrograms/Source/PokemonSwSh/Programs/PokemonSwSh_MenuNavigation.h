@@ -11,10 +11,10 @@
 
 namespace PokemonAutomation{
     class BotBaseContext;
-    class ConsoleHandle;
     class EventNotificationOption;
     class ProgramEnvironment;
 namespace NintendoSwitch{
+    class ConsoleHandle;
 namespace PokemonSwSh{
 
 // When Rotom Phone menu is opened, move the cursor to the target app.

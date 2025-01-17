@@ -16,9 +16,10 @@
 namespace PokemonAutomation{
     struct ProgramInfo;
     class Logger;
-    class ConsoleHandle;
     class BotBaseContext;
 namespace NintendoSwitch{
+
+class ConsoleHandle;
 
 
 enum class DateFormat{

@@ -14,8 +14,8 @@
 
 namespace PokemonAutomation{
     class BotBaseContext;
-    class ConsoleHandle;
 namespace NintendoSwitch{
+    class ConsoleHandle;
 namespace PokemonLA{
 
 

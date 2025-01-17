@@ -10,9 +10,9 @@
 
 namespace PokemonAutomation{
     struct ProgramInfo;
-    class ConsoleHandle;
     class BotBaseContext;
 namespace NintendoSwitch{
+    class ConsoleHandle;
 namespace PokemonSV{
 
 

@@ -108,8 +108,8 @@ BotBaseHandle::~BotBaseHandle(){
     emit on_not_connected("");
 }
 
-BotBase* BotBaseHandle::botbase(){
-    BotBase* ret = m_botbase.get();
+BotBaseController* BotBaseHandle::botbase(){
+    BotBaseController* ret = m_botbase.get();
     if (ret == nullptr){
         m_logger.log("BotBaseHandle::botbase() called with null botbase...", COLOR_RED);
     }

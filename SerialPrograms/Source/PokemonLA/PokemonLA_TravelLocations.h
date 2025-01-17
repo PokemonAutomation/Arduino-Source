@@ -17,8 +17,8 @@
 #include "PokemonLA_Locations.h"
 
 namespace PokemonAutomation{
-    class ConsoleHandle;
 namespace NintendoSwitch{
+    class ConsoleHandle;
 namespace PokemonLA{
 
 

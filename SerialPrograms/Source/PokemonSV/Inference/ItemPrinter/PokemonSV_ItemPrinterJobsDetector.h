@@ -15,9 +15,9 @@
 namespace PokemonAutomation{
     class Logger;
     class AsyncDispatcher;
-    class ConsoleHandle;
     class BotBaseContext;
 namespace NintendoSwitch{
+    class ConsoleHandle;
 namespace PokemonSV{
 
 class ItemPrinterJobsDetector{

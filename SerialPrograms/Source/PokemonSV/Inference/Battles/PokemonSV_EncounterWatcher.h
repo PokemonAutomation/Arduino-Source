@@ -15,8 +15,8 @@
 #include "PokemonSV_ShinySoundDetector.h"
 
 namespace PokemonAutomation{
-    class ConsoleHandle;
 namespace NintendoSwitch{
+    class ConsoleHandle;
 namespace PokemonSV{
 
 

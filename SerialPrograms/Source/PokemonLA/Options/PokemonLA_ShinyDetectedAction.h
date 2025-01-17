@@ -20,9 +20,9 @@ namespace PokemonAutomation{
     class EventNotificationOption;
     class StatsTracker;
     class ProgramEnvironment;
-    class ConsoleHandle;
 //    class AsyncCommandSession;
 namespace NintendoSwitch{
+    class ConsoleHandle;
 namespace PokemonLA{
 
 

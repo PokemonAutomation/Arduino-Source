@@ -9,7 +9,7 @@
 
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 #include "Pokemon/Pokemon_DataTypes.h"
-#include "Pokemon/Options/Pokemon_EncounterBotOptions.h"
+//#include "Pokemon/Options/Pokemon_EncounterBotOptions.h"
 #include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleMenuDetector.h"
 #include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleDialogDetector.h"
 #include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleDialogTracker.h"
@@ -18,9 +18,10 @@
 namespace PokemonAutomation{
     class CancellableScope;
     class BotBaseContext;
-    class ConsoleHandle;
 namespace NintendoSwitch{
+    class ConsoleHandle;
 namespace PokemonSwSh{
+
 using namespace Pokemon;
 
 

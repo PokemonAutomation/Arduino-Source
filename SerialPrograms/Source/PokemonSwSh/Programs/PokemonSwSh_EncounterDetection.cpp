@@ -4,14 +4,15 @@
  *
  */
 
-#include "Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h"
-#include "CommonFramework/Globals.h"
+//#include "Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h"
+//#include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/InterruptableCommands.h"
-#include "CommonFramework/Inference/BlackScreenDetector.h"
+//#include "CommonFramework/Inference/BlackScreenDetector.h"
+#include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonSwSh_EncounterDetection.h"
 
 //#include <iostream>

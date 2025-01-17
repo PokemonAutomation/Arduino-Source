@@ -414,7 +414,7 @@ bool TeraMultiFarmer::run_raid(
     TeraMultiFarmer_Descriptor::Stats& stats = env.current_stats<TeraMultiFarmer_Descriptor::Stats>();
     size_t host_index = HOSTING_SWITCH.current_value();
     ConsoleHandle& host_console = env.consoles[host_index];
-    BotBaseContext host_context(scope, host_console.botbase());
+    BotBaseContext host_context(scope, host_console.controller());
 
     //  Get everyone ready.
     env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){

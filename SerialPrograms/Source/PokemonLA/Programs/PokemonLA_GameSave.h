@@ -8,10 +8,11 @@
 #define PokemonAutomation_PokemonLA_GameSave_H
 
 namespace PokemonAutomation{
-    class ConsoleHandle;
     class BotBaseContext;
     class ProgramEnvironment;
+    class ImageViewRGB32;
 namespace NintendoSwitch{
+    class ConsoleHandle;
 namespace PokemonLA{
 
 // Whether the current tab is the save game tab

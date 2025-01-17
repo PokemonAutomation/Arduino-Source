@@ -20,8 +20,8 @@ namespace Waterfill{
 }
 class BotBaseContext;
 class ProgramEnvironment;
-class ConsoleHandle;
 namespace NintendoSwitch{
+    class ConsoleHandle;
 namespace PokemonSV{
 
 

@@ -13,8 +13,8 @@
 
 namespace PokemonAutomation{
     class ProgramEnvironment;
-    class ConsoleHandle;
 namespace NintendoSwitch{
+    class ConsoleHandle;
 namespace PokemonLA{
 
 struct TravelLocation;

@@ -11,11 +11,10 @@
 #include "CommonFramework/Tools/VideoStream.h"
 
 namespace PokemonAutomation{
-
-class ThreadHandle;
-class BotBase;
-class ThreadUtilizationStat;
-
+    class ThreadHandle;
+    class BotBaseController;
+    class ThreadUtilizationStat;
+namespace NintendoSwitch{
 
 class ConsoleHandle : public VideoStream{
 public:
@@ -29,7 +28,7 @@ public:
     ConsoleHandle(
         size_t index,
         Logger& logger,
-        BotBase& botbase,
+        BotBaseController& controller,
         VideoFeed& video,
         VideoOverlay& overlay,
         AudioFeed& audio,
@@ -38,7 +37,7 @@ public:
 
     size_t index() const{ return m_index; }
 
-    BotBase& botbase(){ return m_botbase; }
+    BotBaseController& controller(){ return m_controller; }
 
 
     operator Logger&(){ return logger(); }
@@ -50,7 +49,7 @@ public:
 
 private:
     size_t m_index;
-    BotBase& m_botbase;
+    BotBaseController& m_controller;
 
     std::unique_ptr<ThreadUtilizationStat> m_thread_utilization;
 };
@@ -58,7 +57,7 @@ private:
 
 
 
-
+}
 }
 #endif
 

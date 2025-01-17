@@ -131,7 +131,7 @@ void SuperControlSession<ControllerType>::run_session(){
 
 
 
-template class SuperControlSession<BotBase>;
+template class SuperControlSession<BotBaseController>;
 
 
 

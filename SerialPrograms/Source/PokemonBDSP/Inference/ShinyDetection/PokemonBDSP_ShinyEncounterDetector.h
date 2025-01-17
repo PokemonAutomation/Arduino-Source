@@ -7,10 +7,10 @@
 #ifndef PokemonAutomation_PokemonBDSP_ShinyEncounterDetector_H
 #define PokemonAutomation_PokemonBDSP_ShinyEncounterDetector_H
 
-#include "CommonFramework/Notifications/ProgramInfo.h"
+//#include "CommonFramework/Notifications/ProgramInfo.h"
 #include "CommonFramework/Notifications/EventNotificationOption.h"
 #include "Pokemon/Pokemon_DataTypes.h"
-#include "Pokemon/Options/Pokemon_EncounterBotOptions.h"
+//#include "Pokemon/Options/Pokemon_EncounterBotOptions.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_DialogDetector.h"
 #include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleDialogTracker.h"
 #include "PokemonBDSP/Inference/Battles/PokemonBDSP_BattleMenuDetector.h"
@@ -19,10 +19,11 @@
 namespace PokemonAutomation{
     class CancellableScope;
     class BotBaseContext;
-    class ConsoleHandle;
     class ProgramEnvironment;
 namespace NintendoSwitch{
+    class ConsoleHandle;
 namespace PokemonBDSP{
+
 using namespace Pokemon;
 
 

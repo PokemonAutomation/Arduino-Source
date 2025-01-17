@@ -14,9 +14,9 @@
 #include <stdint.h>
 
 namespace PokemonAutomation{
-    class ConsoleHandle;
     class BotBaseContext;
 namespace NintendoSwitch{
+    class ConsoleHandle;
 namespace PokemonLA{
 
 // From a camp teleport location, move to the tent and change time of day.

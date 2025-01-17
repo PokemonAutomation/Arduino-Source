@@ -205,7 +205,7 @@ void AsyncCommandSession<ControllerType>::stop_session_and_rethrow(){
 
 
 
-template class AsyncCommandSession<BotBase>;
+template class AsyncCommandSession<BotBaseController>;
 
 
 

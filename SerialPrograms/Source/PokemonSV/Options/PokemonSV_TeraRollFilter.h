@@ -15,10 +15,10 @@
 namespace PokemonAutomation{
     class Logger;
     class ImageViewRGB32;
-    class ConsoleHandle;
     class BotBaseContext;
     struct ProgramInfo;
 namespace NintendoSwitch{
+    class ConsoleHandle;
 namespace PokemonSV{
 
 class TeraCardReader;

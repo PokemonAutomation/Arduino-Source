@@ -7,20 +7,20 @@
 #ifndef PokemonAutomation_PokemonLA_FlagNavigation_H
 #define PokemonAutomation_PokemonLA_FlagNavigation_H
 
-#include "ClientSource/Connection/BotBase.h"
 #include "CommonFramework/Tools/SuperControlSession.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_FlagTracker.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_ButtonDetector.h"
 #include "PokemonLA/Inference/PokemonLA_DialogDetector.h"
 #include "PokemonLA/Inference/PokemonLA_MountDetector.h"
 
 namespace PokemonAutomation{
-    class ConsoleHandle;
 namespace NintendoSwitch{
+    class ConsoleHandle;
 namespace PokemonLA{
 
 
-class FlagNavigationAir : public SuperControlSession<BotBase>{
+class FlagNavigationAir : public SuperControlSession<Controller>{
 public:
     FlagNavigationAir(
         ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
@@ -33,10 +33,10 @@ public:
 
 
 private:
-    virtual bool run_state(AsyncCommandSession<BotBase>& commands, WallClock timestamp) override;
+    virtual bool run_state(AsyncCommandSession<Controller>& commands, WallClock timestamp) override;
 
-    bool run_flying(AsyncCommandSession<BotBase>& commands, WallClock timestamp);
-    bool run_climbing(AsyncCommandSession<BotBase>& commands, WallClock timestamp);
+    bool run_flying(AsyncCommandSession<Controller>& commands, WallClock timestamp);
+    bool run_climbing(AsyncCommandSession<Controller>& commands, WallClock timestamp);
 
 
 private:

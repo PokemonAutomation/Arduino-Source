@@ -13,10 +13,10 @@
 #include "PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h"
 
 namespace PokemonAutomation{
-    class ConsoleHandle;
     class BotBaseContext;
     struct ProgramInfo;
 namespace NintendoSwitch{
+    class ConsoleHandle;
 namespace PokemonSV{
 
 

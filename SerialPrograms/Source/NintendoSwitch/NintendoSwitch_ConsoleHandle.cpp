@@ -16,6 +16,7 @@
 //using std::endl;
 
 namespace PokemonAutomation{
+namespace NintendoSwitch{
 
 
 ConsoleHandle::ConsoleHandle(ConsoleHandle&& x) = default;
@@ -27,7 +28,7 @@ ConsoleHandle::~ConsoleHandle(){
 ConsoleHandle::ConsoleHandle(
     size_t index,
     Logger& logger,
-    BotBase& botbase,
+    BotBaseController& controller,
     VideoFeed& video,
     VideoOverlay& overlay,
     AudioFeed& audio,
@@ -35,7 +36,7 @@ ConsoleHandle::ConsoleHandle(
 )
     : VideoStream(logger, audio, video, history, overlay)
     , m_index(index)
-    , m_botbase(botbase)
+    , m_controller(controller)
     , m_thread_utilization(new ThreadUtilizationStat(current_thread_handle(), "Program Thread:"))
 {
     overlay.add_stat(*m_thread_utilization);
@@ -45,5 +46,5 @@ ConsoleHandle::ConsoleHandle(
 
 
 
-
+}
 }

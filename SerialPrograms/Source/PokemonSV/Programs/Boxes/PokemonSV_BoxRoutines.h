@@ -16,10 +16,10 @@ namespace PokemonAutomation{
     struct ProgramInfo;
     class ProgramEnvironment;
     class EventNotificationOption;
-    class ConsoleHandle;
     class BotBaseContext;
 
 namespace NintendoSwitch{
+    class ConsoleHandle;
 namespace PokemonSV{
 
 enum class BoxCursorLocation;

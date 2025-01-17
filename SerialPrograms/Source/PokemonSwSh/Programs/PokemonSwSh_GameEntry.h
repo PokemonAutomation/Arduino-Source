@@ -10,9 +10,9 @@
 #include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
 
 namespace PokemonAutomation{
-    class ConsoleHandle;
     class BotBaseContext;
 namespace NintendoSwitch{
+    class ConsoleHandle;
 namespace PokemonSwSh{
 
 

@@ -7,10 +7,13 @@
 //#include "Common/Cpp/Exceptions.h"
 #include "ClientSource/Connection/BotBase.h"
 #include "CommonFramework/Exceptions/FatalProgramException.h"
+#include "CommonFramework/Notifications/ProgramInfo.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
+#include "Pokemon/Pokemon_Strings.h"
+#include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonBDSP_EncounterDetection.h"
 
 #include <iostream>

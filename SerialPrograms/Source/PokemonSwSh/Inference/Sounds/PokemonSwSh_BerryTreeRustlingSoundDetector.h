@@ -10,11 +10,9 @@
 #include "CommonFramework/Inference/AudioPerSpectrumDetectorBase.h"
 
 namespace PokemonAutomation{
-
-class ConsoleHandle;
-class SpectrogramMatcher;
-
+    class SpectrogramMatcher;
 namespace NintendoSwitch{
+    class ConsoleHandle;
 namespace PokemonSwSh{
 
 

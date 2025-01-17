@@ -96,7 +96,7 @@ void MultiSwitchProgramSession::run_program_instance(MultiSwitchProgramEnvironme
     try{
         m_option.instance().program(env, scope);
         for (size_t c = 0; c < consoles; c++){
-            env.consoles[c].botbase().wait_for_all_requests();
+            env.consoles[c].controller().wait_for_all_requests();
         }
     }catch (...){
         m_scope.store(nullptr, std::memory_order_release);

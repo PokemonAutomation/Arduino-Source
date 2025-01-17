@@ -15,13 +15,13 @@
 //#include "CommonFramework/Tools/StatsTracking.h"
 
 namespace PokemonAutomation{
-    class ConsoleHandle;
     class BotBaseContext;
     class ProgramEnvironment;
     class EventNotificationOption;
     class ImageViewRGB32;
     struct ProgramInfo;
 namespace NintendoSwitch{
+    class ConsoleHandle;
 namespace PokemonSV{
 
 

@@ -10,11 +10,11 @@
 #include <stdint.h>
 
 namespace PokemonAutomation{
-    class ConsoleHandle;
     class BotBaseContext;
     struct ProgramInfo;
     class ProgramEnvironment;
 namespace NintendoSwitch{
+    class ConsoleHandle;
 namespace PokemonSV{
 
 

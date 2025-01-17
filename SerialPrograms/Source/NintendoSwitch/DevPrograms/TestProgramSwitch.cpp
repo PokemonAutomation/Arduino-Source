@@ -277,7 +277,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 //    [[maybe_unused]] BotBase& botbase = env.consoles[0];
     [[maybe_unused]] VideoFeed& feed = env.consoles[0];
     [[maybe_unused]] VideoOverlay& overlay = env.consoles[0];
-    BotBaseContext context(scope, console.botbase());
+    BotBaseContext context(scope, console.controller());
     VideoOverlaySet overlays(overlay);
 
 

@@ -14,10 +14,10 @@
 #include "CommonFramework/Inference/VisualDetector.h"
 
 namespace PokemonAutomation{
-    class ConsoleHandle;
     class BotBaseContext;
     struct ProgramInfo;
 namespace NintendoSwitch{
+    class ConsoleHandle;
 namespace PokemonSV{
 
 
