@@ -14,8 +14,8 @@
 #include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/ImageTools/ImageManip.h"
 #include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
-#include "CommonFramework/ImageMatch/ExactImageMatcher.h"
-#include "CommonFramework/OCR/OCR_RawOCR.h"
+#include "CommonTools/ImageMatch/ExactImageMatcher.h"
+#include "CommonTools/OCR/OCR_RawOCR.h"
 #include "PokemonSV_TeraCodeReader.h"
 
 //#define PA_ENABLE_CODE_DEBUG

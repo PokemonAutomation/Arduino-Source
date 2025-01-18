@@ -10,18 +10,18 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
-#include "CommonFramework/ImageMatch/ImageDiff.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Inference/StatAccumulator.h"
 #include "CommonTools/InferenceThrottler.h"
 #include "CommonTools/Images/ImageTools.h"
+#include "CommonTools/ImageMatch/ImageDiff.h"
 #include "CommonTools/TrendInference/TimeWindowStatTracker.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSwSh_BeamSetter.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

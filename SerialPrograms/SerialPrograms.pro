@@ -184,17 +184,6 @@ SOURCES += \
     Source/CommonFramework/GlobalServices.cpp \
     Source/CommonFramework/GlobalSettingsPanel.cpp \
     Source/CommonFramework/Globals.cpp \
-    Source/CommonFramework/ImageMatch/CroppedImageDictionaryMatcher.cpp \
-    Source/CommonFramework/ImageMatch/ExactImageDictionaryMatcher.cpp \
-    Source/CommonFramework/ImageMatch/ExactImageMatcher.cpp \
-    Source/CommonFramework/ImageMatch/FilterToAlpha.cpp \
-    Source/CommonFramework/ImageMatch/ImageCropper.cpp \
-    Source/CommonFramework/ImageMatch/ImageDiff.cpp \
-    Source/CommonFramework/ImageMatch/ImageMatchOption.cpp \
-    Source/CommonFramework/ImageMatch/ImageMatchResult.cpp \
-    Source/CommonFramework/ImageMatch/SilhouetteDictionaryMatcher.cpp \
-    Source/CommonFramework/ImageMatch/SubObjectTemplateMatcher.cpp \
-    Source/CommonFramework/ImageMatch/WaterfillTemplateMatcher.cpp \
     Source/CommonFramework/ImageTools/BinaryImage_FilterRgb32.cpp \
     Source/CommonFramework/ImageTools/FloatPixel.cpp \
     Source/CommonFramework/ImageTools/ImageBoxes.cpp \
@@ -220,17 +209,6 @@ SOURCES += \
     Source/CommonFramework/Notifications/MessageAttachment.cpp \
     Source/CommonFramework/Notifications/ProgramNotifications.cpp \
     Source/CommonFramework/Notifications/SenderNotificationTable.cpp \
-    Source/CommonFramework/OCR/OCR_DictionaryMatcher.cpp \
-    Source/CommonFramework/OCR/OCR_DictionaryOCR.cpp \
-    Source/CommonFramework/OCR/OCR_LargeDictionaryMatcher.cpp \
-    Source/CommonFramework/OCR/OCR_NumberReader.cpp \
-    Source/CommonFramework/OCR/OCR_RawOCR.cpp \
-    Source/CommonFramework/OCR/OCR_Routines.cpp \
-    Source/CommonFramework/OCR/OCR_SmallDictionaryMatcher.cpp \
-    Source/CommonFramework/OCR/OCR_StringMatchResult.cpp \
-    Source/CommonFramework/OCR/OCR_StringNormalization.cpp \
-    Source/CommonFramework/OCR/OCR_TextMatcher.cpp \
-    Source/CommonFramework/OCR/OCR_TrainingTools.cpp \
     Source/CommonFramework/Options/Environment/ProcessorLevelOption.cpp \
     Source/CommonFramework/Options/Environment/SleepSuppressOption.cpp \
     Source/CommonFramework/Options/Environment/ThemeSelectorOption.cpp \
@@ -282,6 +260,17 @@ SOURCES += \
     Source/CommonTools/Audio/AudioPerSpectrumDetectorBase.cpp \
     Source/CommonTools/Audio/AudioTemplateCache.cpp \
     Source/CommonTools/Audio/SpectrogramMatcher.cpp \
+    Source/CommonTools/ImageMatch/CroppedImageDictionaryMatcher.cpp \
+    Source/CommonTools/ImageMatch/ExactImageDictionaryMatcher.cpp \
+    Source/CommonTools/ImageMatch/ExactImageMatcher.cpp \
+    Source/CommonTools/ImageMatch/FilterToAlpha.cpp \
+    Source/CommonTools/ImageMatch/ImageCropper.cpp \
+    Source/CommonTools/ImageMatch/ImageDiff.cpp \
+    Source/CommonTools/ImageMatch/ImageMatchOption.cpp \
+    Source/CommonTools/ImageMatch/ImageMatchResult.cpp \
+    Source/CommonTools/ImageMatch/SilhouetteDictionaryMatcher.cpp \
+    Source/CommonTools/ImageMatch/SubObjectTemplateMatcher.cpp \
+    Source/CommonTools/ImageMatch/WaterfillTemplateMatcher.cpp \
     Source/CommonTools/Images/ColorClustering.cpp \
     Source/CommonTools/Images/ImageGradient.cpp \
     Source/CommonTools/Images/ImageTools.cpp \
@@ -290,6 +279,17 @@ SOURCES += \
     Source/CommonTools/InferencePivots/AudioInferencePivot.cpp \
     Source/CommonTools/InferencePivots/VisualInferencePivot.cpp \
     Source/CommonTools/MultiConsoleErrors.cpp \
+    Source/CommonTools/OCR/OCR_DictionaryMatcher.cpp \
+    Source/CommonTools/OCR/OCR_DictionaryOCR.cpp \
+    Source/CommonTools/OCR/OCR_LargeDictionaryMatcher.cpp \
+    Source/CommonTools/OCR/OCR_NumberReader.cpp \
+    Source/CommonTools/OCR/OCR_RawOCR.cpp \
+    Source/CommonTools/OCR/OCR_Routines.cpp \
+    Source/CommonTools/OCR/OCR_SmallDictionaryMatcher.cpp \
+    Source/CommonTools/OCR/OCR_StringMatchResult.cpp \
+    Source/CommonTools/OCR/OCR_StringNormalization.cpp \
+    Source/CommonTools/OCR/OCR_TextMatcher.cpp \
+    Source/CommonTools/OCR/OCR_TrainingTools.cpp \
     Source/CommonTools/Options/LanguageOCROption.cpp \
     Source/CommonTools/Options/QtWidgets/LanguageOCRWidget.cpp \
     Source/CommonTools/Options/QtWidgets/ScreenWatchWidget.cpp \
@@ -1270,17 +1270,6 @@ HEADERS += \
     Source/CommonFramework/GlobalServices.h \
     Source/CommonFramework/GlobalSettingsPanel.h \
     Source/CommonFramework/Globals.h \
-    Source/CommonFramework/ImageMatch/CroppedImageDictionaryMatcher.h \
-    Source/CommonFramework/ImageMatch/ExactImageDictionaryMatcher.h \
-    Source/CommonFramework/ImageMatch/ExactImageMatcher.h \
-    Source/CommonFramework/ImageMatch/FilterToAlpha.h \
-    Source/CommonFramework/ImageMatch/ImageCropper.h \
-    Source/CommonFramework/ImageMatch/ImageDiff.h \
-    Source/CommonFramework/ImageMatch/ImageMatchOption.h \
-    Source/CommonFramework/ImageMatch/ImageMatchResult.h \
-    Source/CommonFramework/ImageMatch/SilhouetteDictionaryMatcher.h \
-    Source/CommonFramework/ImageMatch/SubObjectTemplateMatcher.h \
-    Source/CommonFramework/ImageMatch/WaterfillTemplateMatcher.h \
     Source/CommonFramework/ImageTools/BinaryImage_FilterRgb32.h \
     Source/CommonFramework/ImageTools/FloatPixel.h \
     Source/CommonFramework/ImageTools/ImageBoxes.h \
@@ -1306,17 +1295,6 @@ HEADERS += \
     Source/CommonFramework/Notifications/ProgramInfo.h \
     Source/CommonFramework/Notifications/ProgramNotifications.h \
     Source/CommonFramework/Notifications/SenderNotificationTable.h \
-    Source/CommonFramework/OCR/OCR_DictionaryMatcher.h \
-    Source/CommonFramework/OCR/OCR_DictionaryOCR.h \
-    Source/CommonFramework/OCR/OCR_LargeDictionaryMatcher.h \
-    Source/CommonFramework/OCR/OCR_NumberReader.h \
-    Source/CommonFramework/OCR/OCR_RawOCR.h \
-    Source/CommonFramework/OCR/OCR_Routines.h \
-    Source/CommonFramework/OCR/OCR_SmallDictionaryMatcher.h \
-    Source/CommonFramework/OCR/OCR_StringMatchResult.h \
-    Source/CommonFramework/OCR/OCR_StringNormalization.h \
-    Source/CommonFramework/OCR/OCR_TextMatcher.h \
-    Source/CommonFramework/OCR/OCR_TrainingTools.h \
     Source/CommonFramework/Options/Environment/PerformanceOptions.h \
     Source/CommonFramework/Options/Environment/ProcessPriorityOption.h \
     Source/CommonFramework/Options/Environment/ProcessorLevelOption.h \
@@ -1385,6 +1363,17 @@ HEADERS += \
     Source/CommonTools/Audio/AudioTemplateCache.h \
     Source/CommonTools/Audio/SpectrogramMatcher.h \
     Source/CommonTools/DetectionDebouncer.h \
+    Source/CommonTools/ImageMatch/CroppedImageDictionaryMatcher.h \
+    Source/CommonTools/ImageMatch/ExactImageDictionaryMatcher.h \
+    Source/CommonTools/ImageMatch/ExactImageMatcher.h \
+    Source/CommonTools/ImageMatch/FilterToAlpha.h \
+    Source/CommonTools/ImageMatch/ImageCropper.h \
+    Source/CommonTools/ImageMatch/ImageDiff.h \
+    Source/CommonTools/ImageMatch/ImageMatchOption.h \
+    Source/CommonTools/ImageMatch/ImageMatchResult.h \
+    Source/CommonTools/ImageMatch/SilhouetteDictionaryMatcher.h \
+    Source/CommonTools/ImageMatch/SubObjectTemplateMatcher.h \
+    Source/CommonTools/ImageMatch/WaterfillTemplateMatcher.h \
     Source/CommonTools/Images/ColorClustering.h \
     Source/CommonTools/Images/DistanceToLine.h \
     Source/CommonTools/Images/ImageGradient.h \
@@ -1394,10 +1383,20 @@ HEADERS += \
     Source/CommonTools/InferenceCallbacks/InferenceCallback.h \
     Source/CommonTools/InferenceCallbacks/VisualInferenceCallback.h \
     Source/CommonTools/InferencePivots/AudioInferencePivot.h \
-    Source/CommonTools/InferencePivots/InferenceCallback.h \
     Source/CommonTools/InferencePivots/VisualInferencePivot.h \
     Source/CommonTools/InferenceThrottler.h \
     Source/CommonTools/MultiConsoleErrors.h \
+    Source/CommonTools/OCR/OCR_DictionaryMatcher.h \
+    Source/CommonTools/OCR/OCR_DictionaryOCR.h \
+    Source/CommonTools/OCR/OCR_LargeDictionaryMatcher.h \
+    Source/CommonTools/OCR/OCR_NumberReader.h \
+    Source/CommonTools/OCR/OCR_RawOCR.h \
+    Source/CommonTools/OCR/OCR_Routines.h \
+    Source/CommonTools/OCR/OCR_SmallDictionaryMatcher.h \
+    Source/CommonTools/OCR/OCR_StringMatchResult.h \
+    Source/CommonTools/OCR/OCR_StringNormalization.h \
+    Source/CommonTools/OCR/OCR_TextMatcher.h \
+    Source/CommonTools/OCR/OCR_TrainingTools.h \
     Source/CommonTools/Options/LanguageOCROption.h \
     Source/CommonTools/Options/QtWidgets/LanguageOCRWidget.h \
     Source/CommonTools/Options/QtWidgets/ScreenWatchWidget.h \

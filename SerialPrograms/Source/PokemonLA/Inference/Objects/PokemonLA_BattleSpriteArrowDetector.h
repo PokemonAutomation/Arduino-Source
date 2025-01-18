@@ -9,7 +9,7 @@
 #ifndef PokemonAutomation_PokemonLA_BattleSpriteArrowDetector_H
 #define PokemonAutomation_PokemonLA_BattleSpriteArrowDetector_H
 
-#include "CommonFramework/ImageMatch/WaterfillTemplateMatcher.h"
+#include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 #include "CommonTools/DetectionDebouncer.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_WhiteObjectDetector.h"

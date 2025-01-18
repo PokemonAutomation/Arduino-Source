@@ -4,11 +4,11 @@
  *
  */
 
-#include "CommonFramework/ImageMatch/WaterfillTemplateMatcher.h"
+#include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/WaterfillUtilities.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
+#include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonTools/Images/SolidColorTest.h"
 #include "PokemonSwSh_YCommDetector.h"
 

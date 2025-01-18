@@ -4,6 +4,7 @@
  *
  */
 
+#include <algorithm>
 #include <sstream>
 #include <map>
 #include "CommonFramework/Language.h"
@@ -11,7 +12,6 @@
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "CommonFramework/OCR/OCR_TextMatcher.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Resources/Pokemon_PokemonSlugs.h"
@@ -28,7 +28,7 @@ namespace PokemonSwSh{
 
 namespace{
 
-constexpr uint16_t k_wait_after_move = TICKS_PER_SECOND / 1.5;
+constexpr uint16_t k_wait_after_move = (uint16_t)(TICKS_PER_SECOND / 1.5);
 constexpr std::chrono::milliseconds k_wait_after_read = std::chrono::milliseconds(200);
 
 // A location can be represented as a uint16_t, meaning the order of the location starting at the first box.
@@ -215,7 +215,7 @@ void BoxReorderNationalDex::program(SingleSwitchProgramEnvironment& env, Control
 
         const auto it = std::find(current_order.begin() + index, current_order.end(), sorted_order[index]);
         // Where the pokemon should be moved from
-        const uint16_t unsorted_location = it - current_order.begin();
+        const uint16_t unsorted_location = (uint16_t)(it - current_order.begin());
         // Where the pokemon should be moved to
         const uint16_t sorted_location = index;
 

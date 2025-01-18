@@ -4,21 +4,20 @@
  *
  */
 
-#include "Common/Cpp/Containers/FixedLimitVector.tpp"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
-#include "CommonFramework/ImageMatch/WaterfillTemplateMatcher.h"
-#include "CommonFramework/ImageTools/WaterfillUtilities.h"
 #include "CommonFramework/Globals.h"
+#include "CommonFramework/ImageTools/WaterfillUtilities.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTypes/BinaryImage.h"
 #include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "CommonFramework/ImageMatch/ExactImageMatcher.h"
+#include "CommonTools/ImageMatch/ExactImageMatcher.h"
+#include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "PokemonSV_DialogArrowDetector.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

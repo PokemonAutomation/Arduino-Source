@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSV_AuctionItemNameReader_H
 #define PokemonAutomation_PokemonSV_AuctionItemNameReader_H
 
-#include "CommonFramework/OCR/OCR_SmallDictionaryMatcher.h"
+#include "CommonTools/OCR/OCR_SmallDictionaryMatcher.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

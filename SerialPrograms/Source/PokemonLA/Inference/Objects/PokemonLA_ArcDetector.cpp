@@ -7,7 +7,7 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
-#include "CommonFramework/ImageMatch/SubObjectTemplateMatcher.h"
+#include "CommonTools/ImageMatch/SubObjectTemplateMatcher.h"
 #include "PokemonLA_ArcDetector.h"
 
 namespace PokemonAutomation{

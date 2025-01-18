@@ -4,14 +4,13 @@
  *
  */
 
-#include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
+#include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "CommonFramework/ImageMatch/ImageDiff.h"
-#include "CommonFramework/ImageMatch/ExactImageMatcher.h"
-#include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "CommonFramework/ImageTools/WaterfillUtilities.h"
-#include "CommonFramework/ImageMatch/WaterfillTemplateMatcher.h"
+#include "CommonTools/ImageMatch/ImageDiff.h"
+#include "CommonTools/ImageMatch/ExactImageMatcher.h"
+#include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "PokemonSV_OverworldDetector.h"
 
 //#include <iostream>

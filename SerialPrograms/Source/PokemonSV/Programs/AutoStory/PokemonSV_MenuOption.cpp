@@ -8,7 +8,7 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/OCR/OCR_NumberReader.h"
+#include "CommonTools/OCR/OCR_NumberReader.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "PokemonSV_MenuOption.h"
 #include "PokemonSV/Inference/PokemonSV_MenuOptionReader.h"

@@ -8,7 +8,7 @@
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
-#include "CommonFramework/ImageMatch/SubObjectTemplateMatcher.h"
+#include "CommonTools/ImageMatch/SubObjectTemplateMatcher.h"
 #include "PokemonLA_ShinySymbolDetector.h"
 
 namespace PokemonAutomation{

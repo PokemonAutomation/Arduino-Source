@@ -10,8 +10,7 @@
 #include <array>
 #include "CommonFramework/Language.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "CommonFramework/OCR/OCR_SmallDictionaryMatcher.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
+#include "CommonTools/OCR/OCR_SmallDictionaryMatcher.h"
 
 namespace PokemonAutomation{
     class AsyncDispatcher;

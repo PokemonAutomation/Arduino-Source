@@ -4,8 +4,8 @@
  *
  */
 
-#include "CommonFramework/ImageMatch/ImageCropper.h"
 #include "CommonFramework/ImageTools/ImageFilter.h"
+#include "CommonTools/ImageMatch/ImageCropper.h"
 #include "PokemonSV/Resources/PokemonSV_PokemonSprites.h"
 
 #include "PokemonSV_TeraTypeReader.h"

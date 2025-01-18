@@ -8,10 +8,10 @@
 #define PokemonAutomation_PokemonSV_TeraTypeReader_H
 
 #include "Common/Cpp/Color.h"
-#include "CommonFramework/ImageMatch/ImageMatchResult.h"
-#include "CommonFramework/ImageMatch/SilhouetteDictionaryMatcher.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "CommonTools/ImageMatch/ImageMatchResult.h"
+#include "CommonTools/ImageMatch/SilhouetteDictionaryMatcher.h"
 
 namespace PokemonAutomation{
     struct ProgramInfo;

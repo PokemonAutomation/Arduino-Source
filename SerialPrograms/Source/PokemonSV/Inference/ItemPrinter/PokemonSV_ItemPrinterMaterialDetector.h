@@ -11,7 +11,7 @@
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/Language.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonFramework/OCR/OCR_SmallDictionaryMatcher.h"
+#include "CommonTools/OCR/OCR_SmallDictionaryMatcher.h"
 #include "CommonTools/VisualDetector.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 

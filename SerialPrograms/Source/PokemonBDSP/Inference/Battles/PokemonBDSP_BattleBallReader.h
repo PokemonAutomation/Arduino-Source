@@ -9,7 +9,7 @@
 
 #include <string>
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "CommonFramework/ImageMatch/CroppedImageDictionaryMatcher.h"
+#include "CommonTools/ImageMatch/CroppedImageDictionaryMatcher.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "Pokemon/Inference/Pokemon_PokeballNameReader.h"
 

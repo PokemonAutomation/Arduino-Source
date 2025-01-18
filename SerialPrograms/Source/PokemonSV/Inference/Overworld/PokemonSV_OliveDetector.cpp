@@ -5,21 +5,21 @@
  */
 
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
-#include "CommonFramework/ImageMatch/ImageDiff.h"
 #include "CommonFramework/ImageTools/WaterfillUtilities.h"
-#include "CommonFramework/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "CommonTools/ImageMatch/ImageDiff.h"
+#include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h"
 #include "PokemonSV/Programs/AutoStory/PokemonSV_OliveActionFailedException.h"
 #include "PokemonSV_OliveDetector.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

@@ -8,7 +8,7 @@
 #include "Common/Cpp/Json/JsonObject.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonFramework/ImageMatch/ImageCropper.h"
+#include "CommonTools/ImageMatch/ImageCropper.h"
 #include "SpriteDatabase.h"
 
 namespace PokemonAutomation{

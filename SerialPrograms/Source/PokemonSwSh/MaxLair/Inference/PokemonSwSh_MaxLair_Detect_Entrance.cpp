@@ -4,15 +4,14 @@
  *
  */
 
-#include "Common/Compiler.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonFramework/ImageMatch/ImageDiff.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "CommonTools/ImageMatch/ImageDiff.h"
 #include "PokemonSwSh_MaxLair_Detect_Entrance.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

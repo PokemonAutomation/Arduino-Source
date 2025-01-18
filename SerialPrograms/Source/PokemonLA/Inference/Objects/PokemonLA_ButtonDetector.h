@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonLA_ButtonDetector_H
 
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
-#include "CommonFramework/ImageMatch/WaterfillTemplateMatcher.h"
+#include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 #include "CommonTools/DetectionDebouncer.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_WhiteObjectDetector.h"

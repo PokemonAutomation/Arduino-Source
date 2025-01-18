@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonSV_MenuOptionReader_H
 
 #include "CommonFramework/Language.h"
-#include "CommonFramework/OCR/OCR_SmallDictionaryMatcher.h"
+#include "CommonTools/OCR/OCR_SmallDictionaryMatcher.h"
 
 namespace PokemonAutomation{
     class AsyncDispatcher;

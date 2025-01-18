@@ -4,20 +4,16 @@
  *
  */
 
-#include <functional>
-#include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
-#include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "CommonFramework/ImageTools/WaterfillUtilities.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "PokemonLA_MMOQuestionMarkDetector.h"
 #include "PokemonLA/PokemonLA_Locations.h"
 
-#include <sstream>
-#include <iostream>
-#include <iomanip>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

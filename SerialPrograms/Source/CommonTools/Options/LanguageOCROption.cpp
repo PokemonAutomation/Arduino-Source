@@ -7,7 +7,7 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "CommonFramework/Logging/Logger.h"
-#include "CommonFramework/OCR/OCR_RawOCR.h"
+#include "CommonTools/OCR/OCR_RawOCR.h"
 #include "LanguageOCROption.h"
 
 //#include <iostream>

@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/OCR/OCR_RawOCR.h"
+#include "CommonTools/OCR/OCR_RawOCR.h"
 #include "Pokemon_PokeballNameReader.h"
 
 namespace PokemonAutomation{

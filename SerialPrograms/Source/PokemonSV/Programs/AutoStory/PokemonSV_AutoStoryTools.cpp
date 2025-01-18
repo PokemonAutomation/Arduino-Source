@@ -8,8 +8,8 @@
 #include "CommonFramework/Exceptions/UnexpectedBattleException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonFramework/OCR/OCR_NumberReader.h"
 #include "CommonTools/Images/SolidColorTest.h"
+#include "CommonTools/OCR/OCR_NumberReader.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
@@ -32,8 +32,6 @@
 //#include <iostream>
 //using std::cout;
 //using std::endl;
-//#include <unordered_map>
-//#include <algorithm>
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonLA_ArcPhoneDetector_H
 
 #include "Common/Cpp/Concurrency/SpinLock.h"
-#include "CommonFramework/ImageMatch/WaterfillTemplateMatcher.h"
+#include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 #include "CommonTools/DetectionDebouncer.h"
 #include "PokemonLA_WhiteObjectDetector.h"

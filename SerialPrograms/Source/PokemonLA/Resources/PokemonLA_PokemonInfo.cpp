@@ -6,7 +6,7 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Globals.h"
-#include "CommonFramework/ImageMatch/ImageCropper.h"
+#include "CommonTools/ImageMatch/ImageCropper.h"
 #include "PokemonLA_PokemonInfo.h"
 
 namespace PokemonAutomation{

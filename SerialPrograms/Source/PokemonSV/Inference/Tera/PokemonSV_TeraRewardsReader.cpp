@@ -5,8 +5,8 @@
  */
 
 #include "CommonFramework/ImageTools/ImageFilter.h"
-#include "CommonFramework/ImageMatch/ImageDiff.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "CommonTools/ImageMatch/ImageDiff.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "PokemonSV_TeraRewardsReader.h"

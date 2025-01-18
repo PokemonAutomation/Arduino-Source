@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_Pokemon_PokemonNameReader_H
 #define PokemonAutomation_Pokemon_PokemonNameReader_H
 
-#include "CommonFramework/OCR/OCR_LargeDictionaryMatcher.h"
+#include "CommonTools/OCR/OCR_LargeDictionaryMatcher.h"
 
 namespace PokemonAutomation{
 namespace Pokemon{

@@ -7,8 +7,8 @@
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
-#include "CommonFramework/OCR/OCR_NumberReader.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
+#include "CommonTools/OCR/OCR_NumberReader.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_PokeballSpriteMatcher.h"
 #include "PokemonBDSP_BattleBallReader.h"
 
