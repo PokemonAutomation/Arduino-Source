@@ -143,7 +143,7 @@ int register_message_converters_ssf(){
         PABB_MSG_COMMAND_SSF_DO_NOTHING,
         [](const std::string& body){
             std::ostringstream ss;
-            ss << "ssf_press_button() - ";
+            ss << "ssf_do_nothing() - ";
             if (body.size() != sizeof(pabb_ssf_do_nothing)){ ss << "(invalid size)" << std::endl; return ss.str(); }
             const auto* params = (const pabb_ssf_do_nothing*)body.c_str();
             ss << "seqnum = " << (uint64_t)params->seqnum;

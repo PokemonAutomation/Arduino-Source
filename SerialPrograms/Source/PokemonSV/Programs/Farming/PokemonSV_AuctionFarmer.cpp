@@ -266,7 +266,7 @@ std::vector<std::pair<AuctionOffer, ImageFloatBox>> AuctionFarmer::check_offers(
             }
         }
     }
-    context.wait_for(std::chrono::seconds(100));
+//    context.wait_for(std::chrono::seconds(100));
     return offers;
 }
 
