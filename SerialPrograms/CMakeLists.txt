@@ -281,13 +281,6 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/AudioPipeline/UI/AudioDisplayWidget.h
     Source/CommonFramework/AudioPipeline/UI/AudioSelectorWidget.cpp
     Source/CommonFramework/AudioPipeline/UI/AudioSelectorWidget.h
-    Source/CommonFramework/ControllerDevices/SerialPortGlobals.h
-    Source/CommonFramework/ControllerDevices/SerialPortOption.cpp
-    Source/CommonFramework/ControllerDevices/SerialPortOption.h
-    Source/CommonFramework/ControllerDevices/SerialPortSession.cpp
-    Source/CommonFramework/ControllerDevices/SerialPortSession.h
-    Source/CommonFramework/ControllerDevices/SerialPortWidget.cpp
-    Source/CommonFramework/ControllerDevices/SerialPortWidget.h
     Source/CommonFramework/Environment/Environment.cpp
     Source/CommonFramework/Environment/Environment.h
     Source/CommonFramework/Environment/Environment_Linux.h
@@ -422,8 +415,6 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Startup/NewVersionCheck.h
     Source/CommonFramework/Startup/SetupSettings.cpp
     Source/CommonFramework/Startup/SetupSettings.h
-    Source/CommonFramework/Tools/BotBaseHandle.cpp
-    Source/CommonFramework/Tools/BotBaseHandle.h
     Source/CommonFramework/Tools/DebugDumper.cpp
     Source/CommonFramework/Tools/DebugDumper.h
     Source/CommonFramework/Tools/ErrorDumper.cpp
@@ -608,6 +599,15 @@ file(GLOB MAIN_SOURCES
     Source/ComputerPrograms/Framework/ComputerProgramSession.h
     Source/ComputerPrograms/Framework/ComputerProgramWidget.cpp
     Source/ComputerPrograms/Framework/ComputerProgramWidget.h
+    Source/Controllers/SerialPABotBase/SerialPABotBase_Globals.h
+    Source/Controllers/SerialPABotBase/SerialPABotBase_Handle.cpp
+    Source/Controllers/SerialPABotBase/SerialPABotBase_Handle.h
+    Source/Controllers/SerialPABotBase/SerialPABotBase_Option.cpp
+    Source/Controllers/SerialPABotBase/SerialPABotBase_Option.h
+    Source/Controllers/SerialPABotBase/SerialPABotBase_Session.cpp
+    Source/Controllers/SerialPABotBase/SerialPABotBase_Session.h
+    Source/Controllers/SerialPABotBase/SerialPABotBase_Widget.cpp
+    Source/Controllers/SerialPABotBase/SerialPABotBase_Widget.h
     Source/Integrations/DiscordIntegrationSettings.cpp
     Source/Integrations/DiscordIntegrationSettings.h
     Source/Integrations/DiscordIntegrationTable.cpp

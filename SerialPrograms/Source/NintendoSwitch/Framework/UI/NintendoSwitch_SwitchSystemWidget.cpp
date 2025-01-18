@@ -14,10 +14,10 @@
 #include "Common/Qt/CollapsibleGroupBox.h"
 #include "CommonFramework/AudioPipeline/UI/AudioSelectorWidget.h"
 #include "CommonFramework/AudioPipeline/UI/AudioDisplayWidget.h"
-#include "CommonFramework/ControllerDevices/SerialPortWidget.h"
 #include "CommonFramework/VideoPipeline/UI/CameraSelectorWidget.h"
 #include "CommonFramework/VideoPipeline/UI/VideoDisplayWidget.h"
 #include "CommonFramework/Globals.h"
+#include "Controllers/SerialPABotBase/SerialPABotBase_Widget.h"
 #include "NintendoSwitch_CommandRow.h"
 #include "NintendoSwitch_SwitchSystemWidget.h"
 

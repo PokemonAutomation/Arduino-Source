@@ -9,12 +9,11 @@
 
 #include <deque>
 #include <set>
-#include <map>
 #include <thread>
 #include <Qt>
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/Globals.h"
-#include "CommonFramework/Tools/BotBaseHandle.h"
+#include "Controllers/SerialPABotBase/SerialPABotBase_Handle.h"
 #include "NintendoSwitch_VirtualControllerMapping.h"
 
 namespace PokemonAutomation{

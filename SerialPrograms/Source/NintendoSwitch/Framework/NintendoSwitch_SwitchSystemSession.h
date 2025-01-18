@@ -21,11 +21,11 @@
 #define PokemonAutomation_NintendoSwitch_SwitchSystemSession_H
 
 #include "CommonFramework/Logging/Logger.h"
-#include "CommonFramework/ControllerDevices/SerialPortSession.h"
 #include "CommonFramework/AudioPipeline/AudioSession.h"
 #include "CommonFramework/VideoPipeline/CameraSession.h"
 #include "CommonFramework/VideoPipeline/VideoOverlaySession.h"
 #include "CommonFramework/Recording/StreamHistorySession.h"
+#include "Controllers/SerialPABotBase/SerialPABotBase_Session.h"
 #include "Integrations/ProgramTrackerInterfaces.h"
 #include "NintendoSwitch_SwitchSystemOption.h"
 

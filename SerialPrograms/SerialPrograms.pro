@@ -171,9 +171,6 @@ SOURCES += \
     Source/CommonFramework/AudioPipeline/Tools/TimeSampleBufferReader.cpp \
     Source/CommonFramework/AudioPipeline/UI/AudioDisplayWidget.cpp \
     Source/CommonFramework/AudioPipeline/UI/AudioSelectorWidget.cpp \
-    Source/CommonFramework/ControllerDevices/SerialPortOption.cpp \
-    Source/CommonFramework/ControllerDevices/SerialPortSession.cpp \
-    Source/CommonFramework/ControllerDevices/SerialPortWidget.cpp \
     Source/CommonFramework/Environment/Environment.cpp \
     Source/CommonFramework/Environment/HardwareValidation.cpp \
     Source/CommonFramework/Environment/SystemSleep.cpp \
@@ -229,7 +226,6 @@ SOURCES += \
     Source/CommonFramework/Recording/StreamRecorder.cpp \
     Source/CommonFramework/Startup/NewVersionCheck.cpp \
     Source/CommonFramework/Startup/SetupSettings.cpp \
-    Source/CommonFramework/Tools/BotBaseHandle.cpp \
     Source/CommonFramework/Tools/DebugDumper.cpp \
     Source/CommonFramework/Tools/ErrorDumper.cpp \
     Source/CommonFramework/Tools/FileDownloader.cpp \
@@ -309,6 +305,10 @@ SOURCES += \
     Source/ComputerPrograms/Framework/ComputerProgramOption.cpp \
     Source/ComputerPrograms/Framework/ComputerProgramSession.cpp \
     Source/ComputerPrograms/Framework/ComputerProgramWidget.cpp \
+    Source/Controllers/SerialPABotBase/SerialPABotBase_Handle.cpp \
+    Source/Controllers/SerialPABotBase/SerialPABotBase_Option.cpp \
+    Source/Controllers/SerialPABotBase/SerialPABotBase_Session.cpp \
+    Source/Controllers/SerialPABotBase/SerialPABotBase_Widget.cpp \
     Source/Integrations/DiscordIntegrationSettings.cpp \
     Source/Integrations/DiscordIntegrationTable.cpp \
     Source/Integrations/DiscordSettingsOption.cpp \
@@ -1240,10 +1240,6 @@ HEADERS += \
     Source/CommonFramework/AudioPipeline/Tools/TimeSampleWriter.h \
     Source/CommonFramework/AudioPipeline/UI/AudioDisplayWidget.h \
     Source/CommonFramework/AudioPipeline/UI/AudioSelectorWidget.h \
-    Source/CommonFramework/ControllerDevices/SerialPortGlobals.h \
-    Source/CommonFramework/ControllerDevices/SerialPortOption.h \
-    Source/CommonFramework/ControllerDevices/SerialPortSession.h \
-    Source/CommonFramework/ControllerDevices/SerialPortWidget.h \
     Source/CommonFramework/Environment/Environment.h \
     Source/CommonFramework/Environment/Environment_Linux.h \
     Source/CommonFramework/Environment/Environment_Linux.tpp \
@@ -1320,7 +1316,6 @@ HEADERS += \
     Source/CommonFramework/Recording/StreamRecorder.h \
     Source/CommonFramework/Startup/NewVersionCheck.h \
     Source/CommonFramework/Startup/SetupSettings.h \
-    Source/CommonFramework/Tools/BotBaseHandle.h \
     Source/CommonFramework/Tools/DebugDumper.h \
     Source/CommonFramework/Tools/ErrorDumper.h \
     Source/CommonFramework/Tools/FileDownloader.h \
@@ -1420,6 +1415,11 @@ HEADERS += \
     Source/ComputerPrograms/Framework/ComputerProgramOption.h \
     Source/ComputerPrograms/Framework/ComputerProgramSession.h \
     Source/ComputerPrograms/Framework/ComputerProgramWidget.h \
+    Source/Controllers/SerialPABotBase/SerialPABotBase_Globals.h \
+    Source/Controllers/SerialPABotBase/SerialPABotBase_Handle.h \
+    Source/Controllers/SerialPABotBase/SerialPABotBase_Option.h \
+    Source/Controllers/SerialPABotBase/SerialPABotBase_Session.h \
+    Source/Controllers/SerialPABotBase/SerialPABotBase_Widget.h \
     Source/Integrations/DiscordIntegrationSettings.h \
     Source/Integrations/DiscordIntegrationTable.h \
     Source/Integrations/DiscordSettingsOption.h \

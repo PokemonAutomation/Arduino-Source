@@ -11,7 +11,7 @@
 #include <QLabel>
 #include "Common/Qt/CollapsibleGroupBox.h"
 #include "CommonFramework/Globals.h"
-#include "CommonFramework/ControllerDevices/SerialPortGlobals.h"
+#include "Controllers/SerialPABotBase/SerialPABotBase_Globals.h"
 
 class QPushButton;
 

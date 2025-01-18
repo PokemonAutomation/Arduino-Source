@@ -7,13 +7,12 @@
 #ifndef PokemonAutomation_NintendoSwitch_SingleSwitchProgram_H
 #define PokemonAutomation_NintendoSwitch_SingleSwitchProgram_H
 
-#include "Common/Compiler.h"
 #include "Common/Cpp/Options/BatchOption.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Notifications/EventNotificationOption.h"
-#include "CommonFramework/ControllerDevices/SerialPortGlobals.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Panels/ProgramDescriptor.h"
+#include "Controllers/SerialPABotBase/SerialPABotBase_Globals.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 

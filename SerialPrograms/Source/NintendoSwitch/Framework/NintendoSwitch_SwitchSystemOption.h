@@ -18,9 +18,9 @@
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/AudioPipeline/AudioOption.h"
-#include "CommonFramework/ControllerDevices/SerialPortOption.h"
 #include "CommonFramework/VideoPipeline/CameraOption.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayOption.h"
+#include "Controllers/SerialPABotBase/SerialPABotBase_Option.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
