@@ -8,11 +8,9 @@
 #include <cmath>
 #include "Common/Cpp/PrettyPrint.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
-//#include "CommonFramework/Exceptions/OperationFailedException.h"
-//#include "CommonFramework/ImageTools/ImageFilter.h"
-#include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
+#include "CommonTools/Images/BinaryImage_FilterRgb32.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"

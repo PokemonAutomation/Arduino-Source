@@ -7,9 +7,9 @@
 #include <cmath>
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
+#include "CommonFramework/ImageTools/ImageDiff.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
-#include "CommonTools/ImageMatch/ImageDiff.h"
 #include "ImageMatchDetector.h"
 
 //#include <iostream>

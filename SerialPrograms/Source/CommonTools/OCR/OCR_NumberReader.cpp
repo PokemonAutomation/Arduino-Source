@@ -4,17 +4,16 @@
  *
  */
 
-#include <vector>
 #include <map>
+#include "Common/Cpp/AbstractLogger.h"
 #include "Common/Qt/StringToolsQt.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/Language.h"
-#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonFramework/ImageTools/ImageFilter.h"
-#include "CommonFramework/ImageTools/ImageManip.h"
-#include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
+#include "CommonTools/Images/ImageManip.h"
+#include "CommonTools/Images/ImageFilter.h"
+#include "CommonTools/Images/BinaryImage_FilterRgb32.h"
 #include "OCR_RawOCR.h"
 #include "OCR_NumberReader.h"
 

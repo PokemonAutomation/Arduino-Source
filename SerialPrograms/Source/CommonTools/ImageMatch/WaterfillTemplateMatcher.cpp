@@ -8,9 +8,9 @@
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
-#include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Tools/DebugDumper.h"
+#include "CommonTools/Images/BinaryImage_FilterRgb32.h"
 #include "WaterfillTemplateMatcher.h"
 
 #include <iostream>

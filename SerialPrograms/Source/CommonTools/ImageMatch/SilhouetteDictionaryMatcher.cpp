@@ -4,16 +4,15 @@
  *
  */
 
-#include <cmath>
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
+#include "CommonFramework/ImageTools/ImageDiff.h"
 #include "ImageCropper.h"
-#include "ImageDiff.h"
 #include "SilhouetteDictionaryMatcher.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace ImageMatch{

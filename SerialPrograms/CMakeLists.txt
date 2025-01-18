@@ -324,20 +324,14 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/GlobalSettingsPanel.h
     Source/CommonFramework/Globals.cpp
     Source/CommonFramework/Globals.h
-    Source/CommonFramework/ImageTools/BinaryImage_FilterRgb32.cpp
-    Source/CommonFramework/ImageTools/BinaryImage_FilterRgb32.h
     Source/CommonFramework/ImageTools/FloatPixel.cpp
     Source/CommonFramework/ImageTools/FloatPixel.h
     Source/CommonFramework/ImageTools/ImageBoxes.cpp
     Source/CommonFramework/ImageTools/ImageBoxes.h
-    Source/CommonFramework/ImageTools/ImageFilter.cpp
-    Source/CommonFramework/ImageTools/ImageFilter.h
-    Source/CommonFramework/ImageTools/ImageManip.cpp
-    Source/CommonFramework/ImageTools/ImageManip.h
+    Source/CommonFramework/ImageTools/ImageDiff.cpp
+    Source/CommonFramework/ImageTools/ImageDiff.h
     Source/CommonFramework/ImageTools/ImageStats.cpp
     Source/CommonFramework/ImageTools/ImageStats.h
-    Source/CommonFramework/ImageTools/WaterfillUtilities.cpp
-    Source/CommonFramework/ImageTools/WaterfillUtilities.h
     Source/CommonFramework/ImageTypes/BinaryImage.cpp
     Source/CommonFramework/ImageTypes/BinaryImage.h
     Source/CommonFramework/ImageTypes/ImageHSV32.cpp
@@ -350,8 +344,6 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/ImageTypes/ImageViewPlanar32.h
     Source/CommonFramework/ImageTypes/ImageViewRGB32.cpp
     Source/CommonFramework/ImageTypes/ImageViewRGB32.h
-    Source/CommonFramework/Inference/StatAccumulator.cpp
-    Source/CommonFramework/Inference/StatAccumulator.h
     Source/CommonFramework/Language.cpp
     Source/CommonFramework/Language.h
     Source/CommonFramework/Logging/FileWindowLogger.cpp
@@ -438,6 +430,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Tools/FileDownloader.h
     Source/CommonFramework/Tools/ProgramEnvironment.cpp
     Source/CommonFramework/Tools/ProgramEnvironment.h
+    Source/CommonFramework/Tools/StatAccumulator.cpp
+    Source/CommonFramework/Tools/StatAccumulator.h
     Source/CommonFramework/Tools/VideoStream.cpp
     Source/CommonFramework/Tools/VideoStream.h
     Source/CommonFramework/VideoPipeline/Backends/CameraImplementations.cpp
@@ -512,8 +506,6 @@ file(GLOB MAIN_SOURCES
     Source/CommonTools/ImageMatch/FilterToAlpha.h
     Source/CommonTools/ImageMatch/ImageCropper.cpp
     Source/CommonTools/ImageMatch/ImageCropper.h
-    Source/CommonTools/ImageMatch/ImageDiff.cpp
-    Source/CommonTools/ImageMatch/ImageDiff.h
     Source/CommonTools/ImageMatch/ImageMatchOption.cpp
     Source/CommonTools/ImageMatch/ImageMatchOption.h
     Source/CommonTools/ImageMatch/ImageMatchResult.cpp
@@ -524,15 +516,23 @@ file(GLOB MAIN_SOURCES
     Source/CommonTools/ImageMatch/SubObjectTemplateMatcher.h
     Source/CommonTools/ImageMatch/WaterfillTemplateMatcher.cpp
     Source/CommonTools/ImageMatch/WaterfillTemplateMatcher.h
+    Source/CommonTools/Images/BinaryImage_FilterRgb32.cpp
+    Source/CommonTools/Images/BinaryImage_FilterRgb32.h
     Source/CommonTools/Images/ColorClustering.cpp
     Source/CommonTools/Images/ColorClustering.h
     Source/CommonTools/Images/DistanceToLine.h
+    Source/CommonTools/Images/ImageFilter.cpp
+    Source/CommonTools/Images/ImageFilter.h
     Source/CommonTools/Images/ImageGradient.cpp
     Source/CommonTools/Images/ImageGradient.h
+    Source/CommonTools/Images/ImageManip.cpp
+    Source/CommonTools/Images/ImageManip.h
     Source/CommonTools/Images/ImageTools.cpp
     Source/CommonTools/Images/ImageTools.h
     Source/CommonTools/Images/SolidColorTest.cpp
     Source/CommonTools/Images/SolidColorTest.h
+    Source/CommonTools/Images/WaterfillUtilities.cpp
+    Source/CommonTools/Images/WaterfillUtilities.h
     Source/CommonTools/InferenceCallbacks/AudioInferenceCallback.h
     Source/CommonTools/InferenceCallbacks/InferenceCallback.h
     Source/CommonTools/InferenceCallbacks/VisualInferenceCallback.cpp

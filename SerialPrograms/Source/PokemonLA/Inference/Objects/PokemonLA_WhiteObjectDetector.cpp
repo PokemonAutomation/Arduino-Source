@@ -6,7 +6,7 @@
 
 #include <map>
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
-#include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
+#include "CommonTools/Images/BinaryImage_FilterRgb32.h"
 #include "PokemonLA_WhiteObjectDetector.h"
 
 //#include <iostream>

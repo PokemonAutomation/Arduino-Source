@@ -4,17 +4,16 @@
  *
  */
 
+#include <cfloat>
 #include <cmath>
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
-#include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonFramework/ImageTools/WaterfillUtilities.h"
+#include "CommonTools/Images/BinaryImage_FilterRgb32.h"
+#include "CommonTools/Images/WaterfillUtilities.h"
 #include "PokemonLA_MapMarkerLocator.h"
-#include "PokemonLA/PokemonLA_Locations.h"
 
-#include <cfloat>
 #include <iostream>
 using std::cout;
 using std::endl;

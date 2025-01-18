@@ -4,16 +4,13 @@
  *
  */
 
-
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
-#include "PokemonSV/Inference/PokemonSV_BlueberryQuestReader.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "CommonFramework/ImageTools/ImageFilter.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonTools/Images/ImageFilter.h"
+#include "PokemonSV/Inference/PokemonSV_BlueberryQuestReader.h"
 #include "PokemonSV_BlueberryQuestDetector.h"
-
-#include <iostream>
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

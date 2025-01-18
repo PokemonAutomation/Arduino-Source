@@ -5,10 +5,9 @@
  */
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonTools/ProgramStats/StatsTracking.h"
+#include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"

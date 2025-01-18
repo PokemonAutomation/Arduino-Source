@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/ImageTools/ImageFilter.h"
+#include "CommonTools/Images/ImageFilter.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "PokemonSV_EncounterWatcher.h"
 

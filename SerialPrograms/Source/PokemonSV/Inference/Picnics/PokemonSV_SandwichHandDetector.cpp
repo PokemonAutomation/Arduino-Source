@@ -7,7 +7,7 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "CommonFramework/ImageTools/WaterfillUtilities.h"
+#include "CommonTools/Images/WaterfillUtilities.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "PokemonSV_SandwichHandDetector.h"
 

@@ -5,11 +5,11 @@
  */
 
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
-#include "CommonFramework/ImageTools/WaterfillUtilities.h"
-#include "CommonFramework/ImageTools/ImageFilter.h"
+#include "CommonFramework/ImageTools/ImageDiff.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "CommonTools/ImageMatch/ImageDiff.h"
+#include "CommonTools/Images/ImageFilter.h"
+#include "CommonTools/Images/WaterfillUtilities.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"

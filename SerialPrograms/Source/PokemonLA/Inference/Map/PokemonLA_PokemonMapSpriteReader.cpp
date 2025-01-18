@@ -19,14 +19,14 @@
 #include <map>
 #include "Common/Compiler.h"
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/ImageTools/ImageStats.h"
-#include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTypes/ImageHSV32.h"
+#include "CommonFramework/ImageTools/ImageStats.h"
+#include "CommonFramework/ImageTools/ImageBoxes.h"
+#include "CommonFramework/ImageTools/ImageDiff.h"
 #include "CommonFramework/Resources/SpriteDatabase.h"
 #include "CommonFramework/Tools/DebugDumper.h"
-#include "CommonTools/ImageMatch/ImageDiff.h"
+#include "CommonTools/Images/ImageFilter.h"
 #include "PokemonLA_PokemonMapSpriteReader.h"
 #include "PokemonLA/Resources/PokemonLA_AvailablePokemon.h"
 

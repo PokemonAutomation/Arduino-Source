@@ -4,13 +4,13 @@
  *
  */
 
+#include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
-#include "CommonFramework/ImageTools/WaterfillUtilities.h"
 #include "CommonFramework/Tools/DebugDumper.h"
+#include "CommonTools/Images/WaterfillUtilities.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV_DirectionDetector.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"

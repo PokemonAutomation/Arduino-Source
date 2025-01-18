@@ -8,8 +8,8 @@
 #include <sstream>
 #include "Common/Cpp/AbstractLogger.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
+#include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/ImageMatch/ImageCropper.h"
 #include "CommonTools/ImageMatch/SilhouetteDictionaryMatcher.h"
 #include "PokemonLA/Resources/PokemonLA_WeatherAndTimeIcons.h"

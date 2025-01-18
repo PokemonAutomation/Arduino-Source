@@ -9,8 +9,8 @@
 
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Common/Cpp/Concurrency/PeriodicScheduler.h"
+#include "CommonFramework/Tools/StatAccumulator.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayTypes.h"
-#include "CommonFramework/Inference/StatAccumulator.h"
 #include "CommonTools/InferenceCallbacks/AudioInferenceCallback.h"
 
 namespace PokemonAutomation{

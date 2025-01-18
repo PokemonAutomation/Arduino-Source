@@ -4,9 +4,10 @@
  *
  */
 
+#include <sstream>
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
-#include "CommonFramework/ImageTools/WaterfillUtilities.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "CommonTools/Images/WaterfillUtilities.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "PokemonLA_MMOQuestionMarkDetector.h"
 #include "PokemonLA/PokemonLA_Locations.h"

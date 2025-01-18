@@ -5,7 +5,7 @@
  */
 
 #include <opencv2/imgproc.hpp>
-#include "CommonFramework/ImageTools/ImageFilter.h"
+#include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/ImageMatch/ImageCropper.h"
 #include "PokemonSV/Resources/PokemonSV_PokemonSprites.h"
 #include "PokemonSV_TeraSilhouetteReader.h"

@@ -5,9 +5,9 @@
  */
 
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
-#include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
+#include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/OCR/OCR_NumberReader.h"
 #include "PokemonSwSh/Resources/PokemonSwSh_PokeballSprites.h"
 #include "PokemonSwSh_BattleBallReader.h"

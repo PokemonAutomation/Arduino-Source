@@ -7,10 +7,10 @@
 #include <opencv2/imgproc.hpp>
 #include "Common/Cpp/AbstractLogger.h"
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
-#include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/OCR/OCR_NumberReader.h"
 #include "PokemonSV_SandwichRecipeDetector.h"
 

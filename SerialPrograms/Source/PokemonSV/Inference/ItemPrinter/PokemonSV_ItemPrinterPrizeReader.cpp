@@ -6,9 +6,9 @@
 
 #include "Common/Cpp/Concurrency/AsyncDispatcher.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
-#include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/OCR/OCR_RawOCR.h"
 #include "CommonTools/OCR/OCR_SmallDictionaryMatcher.h"
 #include "CommonTools/OCR/OCR_NumberReader.h"

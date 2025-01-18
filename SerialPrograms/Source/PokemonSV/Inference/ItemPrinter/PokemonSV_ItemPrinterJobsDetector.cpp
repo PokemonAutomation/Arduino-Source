@@ -7,15 +7,15 @@
 #include <map>
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Common/Cpp/Concurrency/AsyncDispatcher.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
-#include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/OCR/OCR_NumberReader.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSV_ItemPrinterJobsDetector.h"
 
 namespace PokemonAutomation{

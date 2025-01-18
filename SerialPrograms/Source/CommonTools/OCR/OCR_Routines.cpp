@@ -5,7 +5,7 @@
  */
 
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
-#include "CommonFramework/ImageTools/ImageFilter.h"
+#include "CommonTools/Images/ImageFilter.h"
 #include "OCR_RawOCR.h"
 #include "OCR_DictionaryMatcher.h"
 #include "OCR_Routines.h"

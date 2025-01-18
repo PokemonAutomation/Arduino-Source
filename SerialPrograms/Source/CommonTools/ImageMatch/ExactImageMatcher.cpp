@@ -6,7 +6,7 @@
 
 #include <cmath>
 #include "Common/Cpp/Exceptions.h"
-#include "ImageDiff.h"
+#include "CommonFramework/ImageTools/ImageDiff.h"
 #include "ExactImageMatcher.h"
 
 //#include <iostream>

@@ -4,15 +4,14 @@
  *
  */
 
-#include "Common/Cpp/Exceptions.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "CommonFramework/Globals.h"
-#include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
+#include "CommonTools/Images/BinaryImage_FilterRgb32.h"
 #include "SubObjectTemplateMatcher.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace ImageMatch{

@@ -6,11 +6,11 @@
 
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/Globals.h"
-#include "CommonFramework/ImageTools/WaterfillUtilities.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTypes/BinaryImage.h"
-#include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "CommonTools/Images/BinaryImage_FilterRgb32.h"
+#include "CommonTools/Images/WaterfillUtilities.h"
 #include "CommonTools/ImageMatch/ExactImageMatcher.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "PokemonSV_DialogArrowDetector.h"

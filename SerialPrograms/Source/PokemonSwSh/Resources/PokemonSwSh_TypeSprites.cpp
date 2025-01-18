@@ -9,7 +9,7 @@
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
-#include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
+#include "CommonTools/Images/BinaryImage_FilterRgb32.h"
 #include "PokemonSwSh_TypeSprites.h"
 
 //#include <iostream>

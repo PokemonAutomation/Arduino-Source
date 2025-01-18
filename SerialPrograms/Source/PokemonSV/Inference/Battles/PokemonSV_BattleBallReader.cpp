@@ -4,8 +4,8 @@
  *
  */
 
-#include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
+#include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/OCR/OCR_NumberReader.h"
 #include "PokemonSV_BattleBallReader.h"
 

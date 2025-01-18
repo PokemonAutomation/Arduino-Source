@@ -6,8 +6,8 @@
 
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
+#include "CommonTools/Images/BinaryImage_FilterRgb32.h"
 #include "CommonTools/Async/InterruptableCommands.h"
 #include "CommonTools/Async/InferenceSession.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"

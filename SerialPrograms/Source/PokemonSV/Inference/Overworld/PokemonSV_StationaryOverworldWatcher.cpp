@@ -4,9 +4,9 @@
  *
  */
 
+#include "CommonFramework/ImageTools/ImageDiff.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "CommonFramework/ImageTools/WaterfillUtilities.h"
-#include "CommonTools/ImageMatch/ImageDiff.h"
+#include "CommonTools/Images/WaterfillUtilities.h"
 #include "PokemonSV_StationaryOverworldWatcher.h"
 
 //#include <iostream>

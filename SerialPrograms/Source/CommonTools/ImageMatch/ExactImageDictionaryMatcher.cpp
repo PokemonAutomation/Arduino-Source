@@ -9,7 +9,7 @@
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "ImageDiff.h"
+#include "CommonFramework/ImageTools/ImageDiff.h"
 #include "ExactImageDictionaryMatcher.h"
 
 #include <iostream>

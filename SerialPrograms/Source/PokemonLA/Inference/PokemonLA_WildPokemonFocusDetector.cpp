@@ -4,10 +4,10 @@
  *
  */
 
-#include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/Tools/DebugDumper.h"
+#include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/Images/ImageGradient.h"
 #include "CommonTools/OCR/OCR_Routines.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"

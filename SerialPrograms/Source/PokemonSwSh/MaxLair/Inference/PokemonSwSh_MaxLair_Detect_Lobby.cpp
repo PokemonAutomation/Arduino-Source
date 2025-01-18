@@ -5,9 +5,9 @@
  */
 
 #include "CommonFramework/ImageTools/ImageStats.h"
+#include "CommonFramework/ImageTools/ImageDiff.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/SolidColorTest.h"
-#include "CommonTools/ImageMatch/ImageDiff.h"
 #include "PokemonSwSh_MaxLair_Detect_Lobby.h"
 
 //#include <iostream>

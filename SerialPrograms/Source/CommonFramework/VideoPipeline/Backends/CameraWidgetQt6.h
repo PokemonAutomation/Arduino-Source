@@ -18,7 +18,7 @@
 #include "Common/Cpp/EventRateTracker.h"
 #include "Common/Cpp/LifetimeSanitizer.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
-#include "CommonFramework/Inference/StatAccumulator.h"
+#include "CommonFramework/Tools/StatAccumulator.h"
 #include "CommonFramework/VideoPipeline/CameraInfo.h"
 #include "CommonFramework/VideoPipeline/CameraSession.h"
 #include "CommonFramework/VideoPipeline/UI/VideoWidget.h"

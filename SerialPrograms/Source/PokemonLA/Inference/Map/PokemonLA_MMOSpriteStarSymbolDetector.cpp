@@ -5,7 +5,7 @@
  */
 
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
-#include "CommonTools/ImageMatch/ImageDiff.h"
+#include "CommonFramework/ImageTools/ImageDiff.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "PokemonLA_MMOSpriteStarSymbolDetector.h"
 

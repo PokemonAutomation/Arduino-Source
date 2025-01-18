@@ -6,14 +6,12 @@
 
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
-#include "CommonFramework/ImageTools/WaterfillUtilities.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonTools/Images/SolidColorTest.h"
+#include "CommonTools/Images/WaterfillUtilities.h"
+#include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "PokemonSwSh_YCommDetector.h"
 
-//#include <utility>
-//#include <vector>
 //#include <iostream>
 //using std::cout;
 //using std::endl;

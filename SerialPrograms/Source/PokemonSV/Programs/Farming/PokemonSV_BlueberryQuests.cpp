@@ -5,10 +5,10 @@
  */
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
+#include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/OCR/OCR_NumberReader.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
