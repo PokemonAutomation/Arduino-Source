@@ -210,7 +210,7 @@ SOURCES += \
     Source/CommonFramework/Options/Environment/ThemeSelectorOption.cpp \
     Source/CommonFramework/Options/LabelCellOption.cpp \
     Source/CommonFramework/Options/ResolutionOption.cpp \
-    Source/CommonFramework/Options/UI/LabelCellWidget.cpp \
+    Source/CommonFramework/Options/QtWidget/LabelCellWidget.cpp \
     Source/CommonFramework/Panels/PanelDescriptor.cpp \
     Source/CommonFramework/Panels/PanelInstance.cpp \
     Source/CommonFramework/Panels/PanelList.cpp \
@@ -222,10 +222,11 @@ SOURCES += \
     Source/CommonFramework/Panels/UI/SettingsPanelWidget.cpp \
     Source/CommonFramework/PersistentSettings.cpp \
     Source/CommonFramework/ProgramSession.cpp \
+    Source/CommonFramework/ProgramStats/StatsDatabase.cpp \
+    Source/CommonFramework/ProgramStats/StatsTracking.cpp \
     Source/CommonFramework/Recording/StreamHistoryOption.cpp \
     Source/CommonFramework/Recording/StreamHistorySession.cpp \
     Source/CommonFramework/Recording/StreamRecorder.cpp \
-    Source/CommonFramework/Resources/SpriteDatabase.cpp \
     Source/CommonFramework/Startup/NewVersionCheck.cpp \
     Source/CommonFramework/Startup/SetupSettings.cpp \
     Source/CommonFramework/Tools/BotBaseHandle.cpp \
@@ -296,8 +297,7 @@ SOURCES += \
     Source/CommonTools/Options/QtWidgets/StringSelectWidget.cpp \
     Source/CommonTools/Options/ScreenWatchOption.cpp \
     Source/CommonTools/Options/StringSelectOption.cpp \
-    Source/CommonTools/ProgramStats/StatsDatabase.cpp \
-    Source/CommonTools/ProgramStats/StatsTracking.cpp \
+    Source/CommonTools/Resources/SpriteDatabase.cpp \
     Source/CommonTools/StartupChecks/BlackBorderCheck.cpp \
     Source/CommonTools/StartupChecks/VideoResolutionCheck.cpp \
     Source/CommonTools/TrendInference/AnomalyDetector.cpp \
@@ -1298,7 +1298,7 @@ HEADERS += \
     Source/CommonFramework/Options/LabelCellOption.h \
     Source/CommonFramework/Options/ResolutionOption.h \
     Source/CommonFramework/Options/ScreenshotFormatOption.h \
-    Source/CommonFramework/Options/UI/LabelCellWidget.h \
+    Source/CommonFramework/Options/QtWidget/LabelCellWidget.h \
     Source/CommonFramework/Panels/PanelDescriptor.h \
     Source/CommonFramework/Panels/PanelInstance.h \
     Source/CommonFramework/Panels/PanelList.h \
@@ -1311,12 +1311,13 @@ HEADERS += \
     Source/CommonFramework/Panels/UI/SettingsPanelWidget.h \
     Source/CommonFramework/PersistentSettings.h \
     Source/CommonFramework/ProgramSession.h \
+    Source/CommonFramework/ProgramStats/StatsDatabase.h \
+    Source/CommonFramework/ProgramStats/StatsTracking.h \
     Source/CommonFramework/Recording/StreamHistoryOption.h \
     Source/CommonFramework/Recording/StreamHistorySession.h \
     Source/CommonFramework/Recording/StreamHistoryTracker_RecordOnTheFly.h \
     Source/CommonFramework/Recording/StreamHistoryTracker_SaveFrames.h \
     Source/CommonFramework/Recording/StreamRecorder.h \
-    Source/CommonFramework/Resources/SpriteDatabase.h \
     Source/CommonFramework/Startup/NewVersionCheck.h \
     Source/CommonFramework/Startup/SetupSettings.h \
     Source/CommonFramework/Tools/BotBaseHandle.h \
@@ -1405,8 +1406,7 @@ HEADERS += \
     Source/CommonTools/Options/StringSelectOption.h \
     Source/CommonTools/Options/StringSelectTableOption.h \
     Source/CommonTools/Options/TrainOCRModeOption.h \
-    Source/CommonTools/ProgramStats/StatsDatabase.h \
-    Source/CommonTools/ProgramStats/StatsTracking.h \
+    Source/CommonTools/Resources/SpriteDatabase.h \
     Source/CommonTools/StartupChecks/BlackBorderCheck.h \
     Source/CommonTools/StartupChecks/VideoResolutionCheck.h \
     Source/CommonTools/TrendInference/AnomalyDetector.h \

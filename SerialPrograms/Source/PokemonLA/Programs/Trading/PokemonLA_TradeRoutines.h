@@ -8,8 +8,8 @@
 #define PokemonAutomation_PokemonLA_TradeRoutines_H
 
 #include "CommonFramework/Language.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "CommonTools/ProgramStats/StatsTracking.h"
 #include "CommonTools/MultiConsoleErrors.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 

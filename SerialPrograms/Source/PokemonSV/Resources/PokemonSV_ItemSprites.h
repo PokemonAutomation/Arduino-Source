@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSV_ItemSprites_H
 #define PokemonAutomation_PokemonSV_ItemSprites_H
 
-#include "CommonFramework/Resources/SpriteDatabase.h"
+#include "CommonTools/Resources/SpriteDatabase.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

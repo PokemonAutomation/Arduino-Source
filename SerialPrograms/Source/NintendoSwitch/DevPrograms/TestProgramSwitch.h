@@ -13,7 +13,7 @@
 #include "Common/Cpp/Options/ButtonOption.h"
 #include "Common/Cpp/Options/DateOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
-#include "CommonTools/ProgramStats/StatsTracking.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonTools/Options/LanguageOCROption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h"

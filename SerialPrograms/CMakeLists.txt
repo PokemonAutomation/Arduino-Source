@@ -379,8 +379,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Options/ResolutionOption.cpp
     Source/CommonFramework/Options/ResolutionOption.h
     Source/CommonFramework/Options/ScreenshotFormatOption.h
-    Source/CommonFramework/Options/UI/LabelCellWidget.cpp
-    Source/CommonFramework/Options/UI/LabelCellWidget.h
+    Source/CommonFramework/Options/QtWidget/LabelCellWidget.cpp
+    Source/CommonFramework/Options/QtWidget/LabelCellWidget.h
     Source/CommonFramework/Panels/PanelDescriptor.cpp
     Source/CommonFramework/Panels/PanelDescriptor.h
     Source/CommonFramework/Panels/PanelInstance.cpp
@@ -404,6 +404,10 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/PersistentSettings.h
     Source/CommonFramework/ProgramSession.cpp
     Source/CommonFramework/ProgramSession.h
+    Source/CommonFramework/ProgramStats/StatsDatabase.cpp
+    Source/CommonFramework/ProgramStats/StatsDatabase.h
+    Source/CommonFramework/ProgramStats/StatsTracking.cpp
+    Source/CommonFramework/ProgramStats/StatsTracking.h
     Source/CommonFramework/Recording/StreamHistoryOption.cpp
     Source/CommonFramework/Recording/StreamHistoryOption.h
     Source/CommonFramework/Recording/StreamHistorySession.cpp
@@ -414,8 +418,6 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Recording/StreamHistoryTracker_SaveFrames.h
     Source/CommonFramework/Recording/StreamRecorder.cpp
     Source/CommonFramework/Recording/StreamRecorder.h
-    Source/CommonFramework/Resources/SpriteDatabase.cpp
-    Source/CommonFramework/Resources/SpriteDatabase.h
     Source/CommonFramework/Startup/NewVersionCheck.cpp
     Source/CommonFramework/Startup/NewVersionCheck.h
     Source/CommonFramework/Startup/SetupSettings.cpp
@@ -578,15 +580,13 @@ file(GLOB MAIN_SOURCES
     Source/CommonTools/Options/QtWidgets/StringSelectWidget.cpp
     Source/CommonTools/Options/QtWidgets/StringSelectWidget.h
     Source/CommonTools/Options/TrainOCRModeOption.h
-    Source/CommonTools/ProgramStats/StatsDatabase.cpp
-    Source/CommonTools/ProgramStats/StatsDatabase.h
-    Source/CommonTools/ProgramStats/StatsTracking.cpp
-    Source/CommonTools/ProgramStats/StatsTracking.h
     Source/CommonTools/MultiConsoleErrors.cpp
     Source/CommonTools/MultiConsoleErrors.h
     Source/CommonTools/TrendInference/AnomalyDetector.cpp
     Source/CommonTools/TrendInference/AnomalyDetector.h
     Source/CommonTools/TrendInference/TimeWindowStatTracker.h
+    Source/CommonTools/Resources/SpriteDatabase.cpp
+    Source/CommonTools/Resources/SpriteDatabase.h
     Source/CommonTools/StartupChecks/BlackBorderCheck.cpp
     Source/CommonTools/StartupChecks/BlackBorderCheck.h
     Source/CommonTools/StartupChecks/VideoResolutionCheck.cpp

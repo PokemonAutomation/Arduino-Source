@@ -9,7 +9,7 @@
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Panels/ProgramDescriptor.h"
 #include "CommonFramework/ProgramSession.h"
-#include "CommonTools/ProgramStats/StatsDatabase.h"
+#include "CommonFramework/ProgramStats/StatsDatabase.h"
 #include "Integrations/ProgramTracker.h"
 
 namespace PokemonAutomation{

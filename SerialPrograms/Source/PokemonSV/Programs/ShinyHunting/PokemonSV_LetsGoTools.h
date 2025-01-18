@@ -10,7 +10,7 @@
 #include <deque>
 #include <atomic>
 #include "Common/Cpp/Time.h"
-#include "CommonTools/ProgramStats/StatsTracking.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonTools/Async/InferenceSession.h"
 #include "CommonTools/Options/LanguageOCROption.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"

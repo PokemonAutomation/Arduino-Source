@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_AutoHostStats_H
 #define PokemonAutomation_PokemonSwSh_AutoHostStats_H
 
-#include "CommonTools/ProgramStats/StatsTracking.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

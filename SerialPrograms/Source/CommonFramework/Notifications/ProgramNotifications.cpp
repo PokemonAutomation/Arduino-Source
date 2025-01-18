@@ -14,7 +14,7 @@
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
-#include "CommonTools/ProgramStats/StatsTracking.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "Integrations/DiscordWebhook.h"
 #include "Integrations/SleepyDiscordRunner.h"
 #include "ProgramNotifications.h"

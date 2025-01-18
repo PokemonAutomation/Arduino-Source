@@ -8,7 +8,7 @@
 #define PokemonAutomation_Pokemon_PokemonNameSelectWidget_H
 
 #include "Common/Qt/NoWheelComboBox.h"
-#include "CommonFramework/Resources/SpriteDatabase.h"
+#include "CommonTools/Resources/SpriteDatabase.h"
 
 namespace PokemonAutomation{
 namespace Pokemon{
