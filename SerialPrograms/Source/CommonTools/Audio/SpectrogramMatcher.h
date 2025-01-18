@@ -5,7 +5,7 @@
  */
 
 #ifndef PokemonAutomation_CommonTools_SpectrogramMatcher_H
-#define PokemonAutomation_CommonToolsSpectrogramMatcher_H
+#define PokemonAutomation_CommonTools_SpectrogramMatcher_H
 
 #include <cstddef>
 #include <array>
