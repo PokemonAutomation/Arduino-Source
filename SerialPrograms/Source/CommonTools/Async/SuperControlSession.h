@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_CommonFramework_SuperControlSession_H
-#define PokemonAutomation_CommonFramework_SuperControlSession_H
+#ifndef PokemonAutomation_CommonTools_SuperControlSession_H
+#define PokemonAutomation_CommonTools_SuperControlSession_H
 
 #include <memory>
 #include <vector>

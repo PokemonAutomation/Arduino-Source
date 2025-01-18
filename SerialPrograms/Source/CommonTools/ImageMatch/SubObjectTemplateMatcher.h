@@ -12,8 +12,8 @@
  *
  */
 
-#ifndef PokemonAutomation_CommonFramework_SubObjectTemplateMatcher_H
-#define PokemonAutomation_CommonFramework_SubObjectTemplateMatcher_H
+#ifndef PokemonAutomation_CommonTools_SubObjectTemplateMatcher_H
+#define PokemonAutomation_CommonTools_SubObjectTemplateMatcher_H
 
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/ImageTypes/BinaryImage.h"

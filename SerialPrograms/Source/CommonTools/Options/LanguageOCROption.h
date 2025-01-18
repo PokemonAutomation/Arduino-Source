@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_Options_LanguageOCROption_H
-#define PokemonAutomation_Options_LanguageOCROption_H
+#ifndef PokemonAutomation_CommonTools_Options_LanguageOCROption_H
+#define PokemonAutomation_CommonTools_Options_LanguageOCROption_H
 
 #include <atomic>
 #include <vector>

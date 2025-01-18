@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_CommonFramework_AudioTemplateCache_H
-#define PokemonAutomation_CommonFramework_AudioTemplateCache_H
+#ifndef PokemonAutomation_CommonTools_AudioTemplateCache_H
+#define PokemonAutomation_CommonTools_AudioTemplateCache_H
 
 #include <string>
 #include <map>

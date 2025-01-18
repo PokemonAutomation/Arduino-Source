@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_CommonFramework_ImageCropper_H
-#define PokemonAutomation_CommonFramework_ImageCropper_H
+#ifndef PokemonAutomation_CommonTools_ImageCropper_H
+#define PokemonAutomation_CommonTools_ImageCropper_H
 
 #include <functional>
 #include "Common/Cpp/Color.h"

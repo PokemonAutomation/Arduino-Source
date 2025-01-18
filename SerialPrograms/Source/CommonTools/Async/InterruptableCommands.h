@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_InterruptableCommands_H
-#define PokemonAutomation_InterruptableCommands_H
+#ifndef PokemonAutomation_CommonTools_InterruptableCommands_H
+#define PokemonAutomation_CommonTools_InterruptableCommands_H
 
 #include <mutex>
 #include <condition_variable>

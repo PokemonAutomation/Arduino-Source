@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_Options_LanguageOCRWidget_H
-#define PokemonAutomation_Options_LanguageOCRWidget_H
+#ifndef PokemonAutomation_CommonTools_Options_LanguageOCRWidget_H
+#define PokemonAutomation_CommonTools_Options_LanguageOCRWidget_H
 
 #include <QWidget>
 #include "Common/Qt/Options/ConfigWidget.h"

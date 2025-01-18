@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_CommonFramework_ImageManip_H
-#define PokemonAutomation_CommonFramework_ImageManip_H
+#ifndef PokemonAutomation_CommonTools_ImageManip_H
+#define PokemonAutomation_CommonTools_ImageManip_H
 
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 

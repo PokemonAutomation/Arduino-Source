@@ -4,15 +4,13 @@
  *
  */
 
-#ifndef PokemonAutomation_OCR_TextMatcher_H
-#define PokemonAutomation_OCR_TextMatcher_H
+#ifndef PokemonAutomation_CommonTools_OCR_TextMatcher_H
+#define PokemonAutomation_CommonTools_OCR_TextMatcher_H
 
 #include <string>
-#include <vector>
 #include <set>
 #include <map>
 #include <QString>
-#include "CommonFramework/Logging/Logger.h"
 #include "OCR_StringMatchResult.h"
 
 namespace PokemonAutomation{

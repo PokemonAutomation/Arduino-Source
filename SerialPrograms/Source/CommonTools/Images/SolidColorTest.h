@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_CommonFramework_SolidColorTest_H
-#define PokemonAutomation_CommonFramework_SolidColorTest_H
+#ifndef PokemonAutomation_CommonTools_SolidColorTest_H
+#define PokemonAutomation_CommonTools_SolidColorTest_H
 
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTools/ImageStats.h"

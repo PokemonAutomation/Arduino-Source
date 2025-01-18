@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_CommonFramework_SilhouetteDictionaryMatcher_H
-#define PokemonAutomation_CommonFramework_SilhouetteDictionaryMatcher_H
+#ifndef PokemonAutomation_CommonTools_SilhouetteDictionaryMatcher_H
+#define PokemonAutomation_CommonTools_SilhouetteDictionaryMatcher_H
 
 //#include "Common/Compiler.h"
 //#include "CommonFramework/ImageTools/FloatPixel.h"

@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_CommonFramework_InferenceThrottler_H
-#define PokemonAutomation_CommonFramework_InferenceThrottler_H
+#ifndef PokemonAutomation_CommonTools_InferenceThrottler_H
+#define PokemonAutomation_CommonTools_InferenceThrottler_H
 
 #include <chrono>
 #include "Common/Cpp/CancellableScope.h"

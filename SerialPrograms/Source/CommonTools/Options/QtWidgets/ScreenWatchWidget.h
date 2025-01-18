@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_Options_ScreenWatchWidget_H
-#define PokemonAutomation_Options_ScreenWatchWidget_H
+#ifndef PokemonAutomation_CommonTools_Options_ScreenWatchWidget_H
+#define PokemonAutomation_CommonTools_Options_ScreenWatchWidget_H
 
 #include <mutex>
 #include <condition_variable>

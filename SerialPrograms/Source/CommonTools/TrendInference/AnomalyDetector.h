@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_CommonFramework_DifferentialAnomalyDetector_H
-#define PokemonAutomation_CommonFramework_DifferentialAnomalyDetector_H
+#ifndef PokemonAutomation_CommonTools_DifferentialAnomalyDetector_H
+#define PokemonAutomation_CommonTools_DifferentialAnomalyDetector_H
 
 #include <deque>
 #include "Common/Cpp/Time.h"

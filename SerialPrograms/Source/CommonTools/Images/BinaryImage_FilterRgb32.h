@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_CommonFramework_BinaryImage_FilterRgb32_H
-#define PokemonAutomation_CommonFramework_BinaryImage_FilterRgb32_H
+#ifndef PokemonAutomation_CommonTools_BinaryImage_FilterRgb32_H
+#define PokemonAutomation_CommonTools_BinaryImage_FilterRgb32_H
 
 #include <stdint.h>
 #include <vector>

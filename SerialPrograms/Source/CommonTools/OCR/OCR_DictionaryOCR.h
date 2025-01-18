@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_OCR_DictionaryOCR_H
-#define PokemonAutomation_OCR_DictionaryOCR_H
+#ifndef PokemonAutomation_CommonTools_OCR_DictionaryOCR_H
+#define PokemonAutomation_CommonTools_OCR_DictionaryOCR_H
 
 #include <vector>
 #include <set>

@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_CommonFramework_InferenceCallback_H
-#define PokemonAutomation_CommonFramework_InferenceCallback_H
+#ifndef PokemonAutomation_CommonTools_InferenceCallback_H
+#define PokemonAutomation_CommonTools_InferenceCallback_H
 
 #include <string>
 #include <chrono>

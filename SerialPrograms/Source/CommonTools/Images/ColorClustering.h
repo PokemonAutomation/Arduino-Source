@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_CommonFramework_ColorClustering_H
-#define PokemonAutomation_CommonFramework_ColorClustering_H
+#ifndef PokemonAutomation_CommonTools_ColorClustering_H
+#define PokemonAutomation_CommonTools_ColorClustering_H
 
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTools/FloatPixel.h"

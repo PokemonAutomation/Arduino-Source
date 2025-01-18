@@ -25,8 +25,8 @@
  *  audio matching and the matching algorithm can tolerate a few spectrums off on time axis.
  */
 
-#ifndef PokemonAutomation_CommonFramework_AudioPerSpectrumDetectorBase_H
-#define PokemonAutomation_CommonFramework_AudioPerSpectrumDetectorBase_H
+#ifndef PokemonAutomation_CommonTools_AudioPerSpectrumDetectorBase_H
+#define PokemonAutomation_CommonTools_AudioPerSpectrumDetectorBase_H
 
 #include <string>
 #include <functional>

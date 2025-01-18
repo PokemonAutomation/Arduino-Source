@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_Resources_SpriteCompositeImage_H
-#define PokemonAutomation_Resources_SpriteCompositeImage_H
+#ifndef PokemonAutomation_CommonTools_Resources_SpriteCompositeImage_H
+#define PokemonAutomation_CommonTools_Resources_SpriteCompositeImage_H
 
 #include <map>
 #include "CommonFramework/ImageTypes/ImageRGB32.h"

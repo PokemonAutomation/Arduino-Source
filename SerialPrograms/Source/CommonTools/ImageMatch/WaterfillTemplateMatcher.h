@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_CommonFramework_WaterfillTemplateMatcher_H
-#define PokemonAutomation_CommonFramework_WaterfillTemplateMatcher_H
+#ifndef PokemonAutomation_CommonTools_WaterfillTemplateMatcher_H
+#define PokemonAutomation_CommonTools_WaterfillTemplateMatcher_H
 
 #include <memory>
 #include "Common/Cpp/Color.h"

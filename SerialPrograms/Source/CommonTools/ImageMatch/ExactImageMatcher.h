@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_ExactImageMatcher_H
-#define PokemonAutomation_ExactImageMatcher_H
+#ifndef PokemonAutomation_CommonTools_ExactImageMatcher_H
+#define PokemonAutomation_CommonTools_ExactImageMatcher_H
 
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTools/ImageStats.h"

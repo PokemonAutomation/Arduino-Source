@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_CommonFramework_CroppedImageDictionaryMatcher_H
-#define PokemonAutomation_CommonFramework_CroppedImageDictionaryMatcher_H
+#ifndef PokemonAutomation_CommonTools_CroppedImageDictionaryMatcher_H
+#define PokemonAutomation_CommonTools_CroppedImageDictionaryMatcher_H
 
 #include <vector>
 #include "ImageMatchResult.h"

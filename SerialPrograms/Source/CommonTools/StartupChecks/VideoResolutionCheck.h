@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_VideoResolutionCheck_H
-#define PokemonAutomation_VideoResolutionCheck_H
+#ifndef PokemonAutomation_CommonTools_VideoResolutionCheck_H
+#define PokemonAutomation_CommonTools_VideoResolutionCheck_H
 
 namespace PokemonAutomation{
 

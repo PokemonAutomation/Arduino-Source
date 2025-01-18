@@ -6,8 +6,8 @@
  *
  */
 
-#ifndef PokemonAutomation_Options_StringSelectTableOption_H
-#define PokemonAutomation_Options_StringSelectTableOption_H
+#ifndef PokemonAutomation_CommonTools_Options_StringSelectTableOption_H
+#define PokemonAutomation_CommonTools_Options_StringSelectTableOption_H
 
 #include "Common/Cpp/Options/EditableTableOption.h"
 #include "StringSelectOption.h"

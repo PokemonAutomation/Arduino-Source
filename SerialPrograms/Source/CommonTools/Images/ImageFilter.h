@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_CommonFramework_ImageFilter_H
-#define PokemonAutomation_CommonFramework_ImageFilter_H
+#ifndef PokemonAutomation_CommonTools_ImageFilter_H
+#define PokemonAutomation_CommonTools_ImageFilter_H
 
 #include <cstddef>
 #include <vector>

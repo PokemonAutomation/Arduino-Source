@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_OCR_NumberReader_H
-#define PokemonAutomation_OCR_NumberReader_H
+#ifndef PokemonAutomation_CommonTools_OCR_NumberReader_H
+#define PokemonAutomation_CommonTools_OCR_NumberReader_H
 
 #include <stdint.h>
 #include "CommonFramework/Language.h"

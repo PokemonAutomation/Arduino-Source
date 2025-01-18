@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_ImageMatchOption_H
-#define PokemonAutomation_ImageMatchOption_H
+#ifndef PokemonAutomation_CommonTools_ImageMatchOption_H
+#define PokemonAutomation_CommonTools_ImageMatchOption_H
 
 #include "Common/Cpp/Options/ConfigOption.h"
 

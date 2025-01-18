@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_Options_TrainOCRModeOption_H
-#define PokemonAutomation_Options_TrainOCRModeOption_H
+#ifndef PokemonAutomation_CommonTools_Options_TrainOCRModeOption_H
+#define PokemonAutomation_CommonTools_Options_TrainOCRModeOption_H
 
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 

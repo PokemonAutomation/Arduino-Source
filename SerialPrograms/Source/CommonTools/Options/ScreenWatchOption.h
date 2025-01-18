@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_Options_ScreenWatchOption_H
-#define PokemonAutomation_Options_ScreenWatchOption_H
+#ifndef PokemonAutomation_CommonTools_Options_ScreenWatchOption_H
+#define PokemonAutomation_CommonTools_Options_ScreenWatchOption_H
 
 #include "Common/Cpp/Options/GroupOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"

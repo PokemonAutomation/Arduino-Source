@@ -5,8 +5,8 @@
  *  Header for various image gradient related functions, mostly for visual inferences
  */
 
-#ifndef PokemonAutomation_CommonFramework_ImageGradient_H
-#define PokemonAutomation_CommonFramework_ImageGradient_H
+#ifndef PokemonAutomation_CommonTools_ImageGradient_H
+#define PokemonAutomation_CommonTools_ImageGradient_H
 
 #include <cstddef>
 #include <vector>

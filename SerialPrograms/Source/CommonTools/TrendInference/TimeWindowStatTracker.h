@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_CommonFramework_TimeWindowStatTracker_H
-#define PokemonAutomation_CommonFramework_TimeWindowStatTracker_H
+#ifndef PokemonAutomation_CommonTools_TimeWindowStatTracker_H
+#define PokemonAutomation_CommonTools_TimeWindowStatTracker_H
 
 #include <chrono>
 #include <map>

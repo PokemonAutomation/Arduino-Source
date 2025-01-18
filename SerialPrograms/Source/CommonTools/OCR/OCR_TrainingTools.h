@@ -4,15 +4,15 @@
  *
  */
 
-#ifndef PokemonAutomation_OCR_TrainingTools_H
-#define PokemonAutomation_OCR_TrainingTools_H
+#ifndef PokemonAutomation_CommonTools_OCR_TrainingTools_H
+#define PokemonAutomation_CommonTools_OCR_TrainingTools_H
 
 #include <string>
 #include <vector>
 #include <map>
+#include "Common/Cpp/AbstractLogger.h"
 #include "Common/Cpp/CancellableScope.h"
 #include "CommonFramework/Language.h"
-#include "CommonFramework/Logging/Logger.h"
 #include "OCR_Routines.h"
 
 namespace PokemonAutomation{

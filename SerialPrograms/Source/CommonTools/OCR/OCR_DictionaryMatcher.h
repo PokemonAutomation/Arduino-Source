@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_OCR_DictionaryMatcher_H
-#define PokemonAutomation_OCR_DictionaryMatcher_H
+#ifndef PokemonAutomation_CommonTools_OCR_DictionaryMatcher_H
+#define PokemonAutomation_CommonTools_OCR_DictionaryMatcher_H
 
 #include <map>
 #include "Common/Cpp/Concurrency/SpinLock.h"

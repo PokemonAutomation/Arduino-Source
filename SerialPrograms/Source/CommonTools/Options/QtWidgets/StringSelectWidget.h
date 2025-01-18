@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_Options_StringSelectWidget_H
-#define PokemonAutomation_Options_StringSelectWidget_H
+#ifndef PokemonAutomation_CommonTools_Options_StringSelectWidget_H
+#define PokemonAutomation_CommonTools_Options_StringSelectWidget_H
 
 #include <QWidget>
 #include "Common/Qt/NoWheelComboBox.h"

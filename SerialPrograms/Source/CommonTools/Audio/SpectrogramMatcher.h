@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_CommonFramework_SpectrogramMatcher_H
-#define PokemonAutomation_CommonFramework_SpectrogramMatcher_H
+#ifndef PokemonAutomation_CommonTools_SpectrogramMatcher_H
+#define PokemonAutomation_CommonToolsSpectrogramMatcher_H
 
 #include <cstddef>
 #include <array>

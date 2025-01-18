@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_CommonFramework_ImageMatchDetector_H
-#define PokemonAutomation_CommonFramework_ImageMatchDetector_H
+#ifndef PokemonAutomation_CommonTools_ImageMatchDetector_H
+#define PokemonAutomation_CommonTools_ImageMatchDetector_H
 
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"

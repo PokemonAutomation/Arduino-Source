@@ -5,8 +5,8 @@
  *  Detect if the entire screen is frozen.
  */
 
-#ifndef PokemonAutomation_CommonFramework_FrozenImageDetector_H
-#define PokemonAutomation_CommonFramework_FrozenImageDetector_H
+#ifndef PokemonAutomation_CommonTools_FrozenImageDetector_H
+#define PokemonAutomation_CommonTools_FrozenImageDetector_H
 
 #include "Common/Cpp/Color.h"
 //#include "CommonFramework/ImageTypes/ImageRGB32.h"

@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_CommonFramework_VisualInferenceCallback_H
-#define PokemonAutomation_CommonFramework_VisualInferenceCallback_H
+#ifndef PokemonAutomation_CommonTools_VisualInferenceCallback_H
+#define PokemonAutomation_CommonTools_VisualInferenceCallback_H
 
 #include <memory>
 #include <string>

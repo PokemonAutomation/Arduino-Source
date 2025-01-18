@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_CommonFramework_DetectionDebouncer_H
-#define PokemonAutomation_CommonFramework_DetectionDebouncer_H
+#ifndef PokemonAutomation_CommonTools_DetectionDebouncer_H
+#define PokemonAutomation_CommonTools_DetectionDebouncer_H
 
 #include <functional>
 #include <atomic>

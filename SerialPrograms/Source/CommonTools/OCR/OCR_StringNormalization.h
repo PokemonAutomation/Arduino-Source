@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_OCR_StringNormalization_H
-#define PokemonAutomation_OCR_StringNormalization_H
+#ifndef PokemonAutomation_CommonTools_OCR_StringNormalization_H
+#define PokemonAutomation_CommonTools_OCR_StringNormalization_H
 
 #include <string>
 

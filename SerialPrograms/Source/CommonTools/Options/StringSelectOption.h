@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_Options_StringSelectOption_H
-#define PokemonAutomation_Options_StringSelectOption_H
+#ifndef PokemonAutomation_CommonTools_Options_StringSelectOption_H
+#define PokemonAutomation_CommonTools_Options_StringSelectOption_H
 
 #include <vector>
 #include "Common/Cpp/Color.h"

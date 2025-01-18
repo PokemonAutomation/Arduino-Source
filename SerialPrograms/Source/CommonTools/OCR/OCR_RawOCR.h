@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_OCR_RawOCR_H
-#define PokemonAutomation_OCR_RawOCR_H
+#ifndef PokemonAutomation_CommonTools_OCR_RawOCR_H
+#define PokemonAutomation_CommonTools_OCR_RawOCR_H
 
 #include <string>
 #include "CommonFramework/Language.h"

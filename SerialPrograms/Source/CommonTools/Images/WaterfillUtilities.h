@@ -5,8 +5,8 @@
  *  Util functions that process waterfill objects and matrices.
  */
 
-#ifndef PokemonAutomation_CommonFramework_WaterfillUtilities_H
-#define PokemonAutomation_CommonFramework_WaterfillUtilities_H
+#ifndef PokemonAutomation_CommonTools_WaterfillUtilities_H
+#define PokemonAutomation_CommonTools_WaterfillUtilities_H
 
 #include <functional>
 #include <utility>

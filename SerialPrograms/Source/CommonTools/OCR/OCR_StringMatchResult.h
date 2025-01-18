@@ -4,14 +4,12 @@
  *
  */
 
-#ifndef PokemonAutomation_OCR_StringMatchResult_H
-#define PokemonAutomation_OCR_StringMatchResult_H
+#ifndef PokemonAutomation_CommonTools_OCR_StringMatchResult_H
+#define PokemonAutomation_CommonTools_OCR_StringMatchResult_H
 
 #include <string>
-#include <vector>
-#include <set>
 #include <map>
-#include "CommonFramework/Logging/Logger.h"
+#include "Common/Cpp/AbstractLogger.h"
 
 namespace PokemonAutomation{
 namespace OCR{

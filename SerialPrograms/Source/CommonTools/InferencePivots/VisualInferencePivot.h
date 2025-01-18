@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_CommonFramework_VisualInferencePivot_H
-#define PokemonAutomation_CommonFramework_VisualInferencePivot_H
+#ifndef PokemonAutomation_CommonTools_VisualInferencePivot_H
+#define PokemonAutomation_CommonTools_VisualInferencePivot_H
 
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Common/Cpp/Concurrency/PeriodicScheduler.h"

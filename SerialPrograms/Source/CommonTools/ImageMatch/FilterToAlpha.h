@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_CommonFramework_FilterToAlpha_H
-#define PokemonAutomation_CommonFramework_FilterToAlpha_H
+#ifndef PokemonAutomation_CommonTools_FilterToAlpha_H
+#define PokemonAutomation_CommonTools_FilterToAlpha_H
 
 #include <stdint.h>
 

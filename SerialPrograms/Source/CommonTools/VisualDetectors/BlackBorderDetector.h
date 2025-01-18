@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_CommonFramework_BlackBorderDetector_H
-#define PokemonAutomation_CommonFramework_BlackBorderDetector_H
+#ifndef PokemonAutomation_CommonTools_BlackBorderDetector_H
+#define PokemonAutomation_CommonTools_BlackBorderDetector_H
 
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonTools/VisualDetector.h"

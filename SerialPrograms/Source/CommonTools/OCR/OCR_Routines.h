@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_OCR_Routines_H
-#define PokemonAutomation_OCR_Routines_H
+#ifndef PokemonAutomation_CommonTools_OCR_Routines_H
+#define PokemonAutomation_CommonTools_OCR_Routines_H
 
 #include <cstdint>
 #include <vector>

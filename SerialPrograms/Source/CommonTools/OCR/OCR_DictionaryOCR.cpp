@@ -8,13 +8,14 @@
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Qt/StringToolsQt.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "OCR_StringNormalization.h"
 #include "OCR_TextMatcher.h"
 #include "OCR_DictionaryOCR.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace OCR{

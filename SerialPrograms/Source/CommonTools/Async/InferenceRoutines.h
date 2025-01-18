@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_CommonFramework_InferenceRoutines_H
-#define PokemonAutomation_CommonFramework_InferenceRoutines_H
+#ifndef PokemonAutomation_CommonTools_InferenceRoutines_H
+#define PokemonAutomation_CommonTools_InferenceRoutines_H
 
 #include <functional>
 #include <chrono>

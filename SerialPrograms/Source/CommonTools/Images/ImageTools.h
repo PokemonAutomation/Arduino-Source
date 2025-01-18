@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_CommonFramework_ImageTools_H
-#define PokemonAutomation_CommonFramework_ImageTools_H
+#ifndef PokemonAutomation_CommonTools_ImageTools_H
+#define PokemonAutomation_CommonTools_ImageTools_H
 
 
 namespace PokemonAutomation{

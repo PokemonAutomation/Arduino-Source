@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_CommonFramework_InferenceSession_H
-#define PokemonAutomation_CommonFramework_InferenceSession_H
+#ifndef PokemonAutomation_CommonTools_InferenceSession_H
+#define PokemonAutomation_CommonTools_InferenceSession_H
 
 #include <chrono>
 #include <vector>

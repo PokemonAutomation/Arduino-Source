@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_CommonFramework_AudioInferenceCallback_H
-#define PokemonAutomation_CommonFramework_AudioInferenceCallback_H
+#ifndef PokemonAutomation_CommonTools_AudioInferenceCallback_H
+#define PokemonAutomation_CommonTools_AudioInferenceCallback_H
 
 #include <memory>
 #include <vector>

@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_CommonFramework_MultiConsoleErrors_H
-#define PokemonAutomation_CommonFramework_MultiConsoleErrors_H
+#ifndef PokemonAutomation_CommonTools_MultiConsoleErrors_H
+#define PokemonAutomation_CommonTools_MultiConsoleErrors_H
 
 #include <string>
 #include <atomic>

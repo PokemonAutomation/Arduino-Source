@@ -7,8 +7,8 @@
  *
  */
 
-#ifndef PokemonAutomation_CommonFramework_DistanceToLine_H
-#define PokemonAutomation_CommonFramework_DistanceToLine_H
+#ifndef PokemonAutomation_CommonTools_DistanceToLine_H
+#define PokemonAutomation_CommonTools_DistanceToLine_H
 
 #include <cstddef>
 

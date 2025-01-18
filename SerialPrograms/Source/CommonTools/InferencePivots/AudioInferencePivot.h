@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_CommonFramework_AudioInferencePivot_H
-#define PokemonAutomation_CommonFramework_AudioInferencePivot_H
+#ifndef PokemonAutomation_CommonTools_AudioInferencePivot_H
+#define PokemonAutomation_CommonTools_AudioInferencePivot_H
 
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Common/Cpp/Concurrency/PeriodicScheduler.h"

@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_CommonFramework_BlackBorderCheck_H
-#define PokemonAutomation_CommonFramework_BlackBorderCheck_H
+#ifndef PokemonAutomation_CommonTools_BlackBorderCheck_H
+#define PokemonAutomation_CommonTools_BlackBorderCheck_H
 
 #include "CommonFramework/Globals.h"
 

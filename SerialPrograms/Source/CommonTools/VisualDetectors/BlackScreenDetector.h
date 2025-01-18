@@ -8,8 +8,8 @@
  *
  */
 
-#ifndef PokemonAutomation_CommonFramework_BlackScreenDetector_H
-#define PokemonAutomation_CommonFramework_BlackScreenDetector_H
+#ifndef PokemonAutomation_CommonTools_BlackScreenDetector_H
+#define PokemonAutomation_CommonTools_BlackScreenDetector_H
 
 #include <atomic>
 #include "Common/Cpp/Color.h"

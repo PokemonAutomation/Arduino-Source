@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_OCR_SmallDictionaryMatcher_H
-#define PokemonAutomation_OCR_SmallDictionaryMatcher_H
+#ifndef PokemonAutomation_CommonTools_OCR_SmallDictionaryMatcher_H
+#define PokemonAutomation_CommonTools_OCR_SmallDictionaryMatcher_H
 
 #include "OCR_DictionaryMatcher.h"
 
