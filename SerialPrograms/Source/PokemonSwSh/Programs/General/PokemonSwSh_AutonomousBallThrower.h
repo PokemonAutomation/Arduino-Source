@@ -7,8 +7,8 @@
 #ifndef PokemonAutomation_PokemonSwSh_AutonomousStatsReset_H
 #define PokemonAutomation_PokemonSwSh_AutonomousStatsReset_H
 
-#include "CommonFramework/Options/LanguageOCROption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
+#include "CommonTools/Options/LanguageOCROption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"

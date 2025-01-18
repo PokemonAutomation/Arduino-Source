@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSV_SandwichIngredientsOption_H
 #define PokemonAutomation_PokemonSV_SandwichIngredientsOption_H
 
-#include "CommonFramework/Options/StringSelectOption.h"
+#include "CommonTools/Options/StringSelectOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

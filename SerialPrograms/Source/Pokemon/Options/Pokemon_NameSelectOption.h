@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_Pokemon_PokemonNameSelect_H
 #define PokemonAutomation_Pokemon_PokemonNameSelect_H
 
-#include "CommonFramework/Options/StringSelectOption.h"
+#include "CommonTools/Options/StringSelectOption.h"
 
 namespace PokemonAutomation{
 namespace Pokemon{

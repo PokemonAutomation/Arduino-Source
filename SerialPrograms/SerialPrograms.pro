@@ -196,14 +196,11 @@ SOURCES += \
     Source/CommonFramework/ImageMatch/SubObjectTemplateMatcher.cpp \
     Source/CommonFramework/ImageMatch/WaterfillTemplateMatcher.cpp \
     Source/CommonFramework/ImageTools/BinaryImage_FilterRgb32.cpp \
-    Source/CommonFramework/ImageTools/ColorClustering.cpp \
     Source/CommonFramework/ImageTools/FloatPixel.cpp \
     Source/CommonFramework/ImageTools/ImageBoxes.cpp \
     Source/CommonFramework/ImageTools/ImageFilter.cpp \
-    Source/CommonFramework/ImageTools/ImageGradient.cpp \
     Source/CommonFramework/ImageTools/ImageManip.cpp \
     Source/CommonFramework/ImageTools/ImageStats.cpp \
-    Source/CommonFramework/ImageTools/SolidColorTest.cpp \
     Source/CommonFramework/ImageTools/WaterfillUtilities.cpp \
     Source/CommonFramework/ImageTypes/BinaryImage.cpp \
     Source/CommonFramework/ImageTypes/ImageHSV32.cpp \
@@ -211,13 +208,7 @@ SOURCES += \
     Source/CommonFramework/ImageTypes/ImageViewHSV32.cpp \
     Source/CommonFramework/ImageTypes/ImageViewPlanar32.cpp \
     Source/CommonFramework/ImageTypes/ImageViewRGB32.cpp \
-    Source/CommonFramework/Inference/ImageTools.cpp \
     Source/CommonFramework/Inference/StatAccumulator.cpp \
-    Source/CommonFramework/InferenceInfra/AudioInferencePivot.cpp \
-    Source/CommonFramework/InferenceInfra/InferenceRoutines.cpp \
-    Source/CommonFramework/InferenceInfra/InferenceSession.cpp \
-    Source/CommonFramework/InferenceInfra/VisualInferenceCallback.cpp \
-    Source/CommonFramework/InferenceInfra/VisualInferencePivot.cpp \
     Source/CommonFramework/Language.cpp \
     Source/CommonFramework/Logging/FileWindowLogger.cpp \
     Source/CommonFramework/Logging/Logger.cpp \
@@ -244,14 +235,8 @@ SOURCES += \
     Source/CommonFramework/Options/Environment/SleepSuppressOption.cpp \
     Source/CommonFramework/Options/Environment/ThemeSelectorOption.cpp \
     Source/CommonFramework/Options/LabelCellOption.cpp \
-    Source/CommonFramework/Options/LanguageOCROption.cpp \
     Source/CommonFramework/Options/ResolutionOption.cpp \
-    Source/CommonFramework/Options/ScreenWatchOption.cpp \
-    Source/CommonFramework/Options/StringSelectOption.cpp \
     Source/CommonFramework/Options/UI/LabelCellWidget.cpp \
-    Source/CommonFramework/Options/UI/LanguageOCRWidget.cpp \
-    Source/CommonFramework/Options/UI/ScreenWatchWidget.cpp \
-    Source/CommonFramework/Options/UI/StringSelectWidget.cpp \
     Source/CommonFramework/Panels/PanelDescriptor.cpp \
     Source/CommonFramework/Panels/PanelInstance.cpp \
     Source/CommonFramework/Panels/PanelList.cpp \
@@ -269,15 +254,11 @@ SOURCES += \
     Source/CommonFramework/Resources/SpriteDatabase.cpp \
     Source/CommonFramework/Startup/NewVersionCheck.cpp \
     Source/CommonFramework/Startup/SetupSettings.cpp \
-    Source/CommonFramework/Tools/BlackBorderCheck.cpp \
     Source/CommonFramework/Tools/BotBaseHandle.cpp \
     Source/CommonFramework/Tools/DebugDumper.cpp \
     Source/CommonFramework/Tools/ErrorDumper.cpp \
     Source/CommonFramework/Tools/FileDownloader.cpp \
-    Source/CommonFramework/Tools/InterruptableCommands.tpp \
-    Source/CommonFramework/Tools/MultiConsoleErrors.cpp \
     Source/CommonFramework/Tools/ProgramEnvironment.cpp \
-    Source/CommonFramework/Tools/VideoResolutionCheck.cpp \
     Source/CommonFramework/Tools/VideoStream.cpp \
     Source/CommonFramework/VideoPipeline/Backends/CameraImplementations.cpp \
     Source/CommonFramework/VideoPipeline/Backends/CameraWidgetQt5.cpp \
@@ -296,11 +277,29 @@ SOURCES += \
     Source/CommonFramework/Windows/DpiScaler.cpp \
     Source/CommonFramework/Windows/MainWindow.cpp \
     Source/CommonFramework/Windows/WindowTracker.cpp \
-    Source/CommonTools/AudioTools/AudioPerSpectrumDetectorBase.cpp \
-    Source/CommonTools/AudioTools/AudioTemplateCache.cpp \
-    Source/CommonTools/AudioTools/SpectrogramMatcher.cpp \
+    Source/CommonTools/Async/InferenceRoutines.cpp \
+    Source/CommonTools/Async/InferenceSession.cpp \
+    Source/CommonTools/Audio/AudioPerSpectrumDetectorBase.cpp \
+    Source/CommonTools/Audio/AudioTemplateCache.cpp \
+    Source/CommonTools/Audio/SpectrogramMatcher.cpp \
+    Source/CommonTools/Images/ColorClustering.cpp \
+    Source/CommonTools/Images/ImageGradient.cpp \
+    Source/CommonTools/Images/ImageTools.cpp \
+    Source/CommonTools/Images/SolidColorTest.cpp \
+    Source/CommonTools/InferenceCallbacks/VisualInferenceCallback.cpp \
+    Source/CommonTools/InferencePivots/AudioInferencePivot.cpp \
+    Source/CommonTools/InferencePivots/VisualInferencePivot.cpp \
+    Source/CommonTools/MultiConsoleErrors.cpp \
+    Source/CommonTools/Options/LanguageOCROption.cpp \
+    Source/CommonTools/Options/QtWidgets/LanguageOCRWidget.cpp \
+    Source/CommonTools/Options/QtWidgets/ScreenWatchWidget.cpp \
+    Source/CommonTools/Options/QtWidgets/StringSelectWidget.cpp \
+    Source/CommonTools/Options/ScreenWatchOption.cpp \
+    Source/CommonTools/Options/StringSelectOption.cpp \
     Source/CommonTools/ProgramStats/StatsDatabase.cpp \
     Source/CommonTools/ProgramStats/StatsTracking.cpp \
+    Source/CommonTools/StartupChecks/BlackBorderCheck.cpp \
+    Source/CommonTools/StartupChecks/VideoResolutionCheck.cpp \
     Source/CommonTools/TrendInference/AnomalyDetector.cpp \
     Source/CommonTools/VisualDetectors/BlackBorderDetector.cpp \
     Source/CommonTools/VisualDetectors/BlackScreenDetector.cpp \
@@ -1283,15 +1282,11 @@ HEADERS += \
     Source/CommonFramework/ImageMatch/SubObjectTemplateMatcher.h \
     Source/CommonFramework/ImageMatch/WaterfillTemplateMatcher.h \
     Source/CommonFramework/ImageTools/BinaryImage_FilterRgb32.h \
-    Source/CommonFramework/ImageTools/ColorClustering.h \
-    Source/CommonFramework/ImageTools/DistanceToLine.h \
     Source/CommonFramework/ImageTools/FloatPixel.h \
     Source/CommonFramework/ImageTools/ImageBoxes.h \
     Source/CommonFramework/ImageTools/ImageFilter.h \
-    Source/CommonFramework/ImageTools/ImageGradient.h \
     Source/CommonFramework/ImageTools/ImageManip.h \
     Source/CommonFramework/ImageTools/ImageStats.h \
-    Source/CommonFramework/ImageTools/SolidColorTest.h \
     Source/CommonFramework/ImageTools/WaterfillUtilities.h \
     Source/CommonFramework/ImageTypes/BinaryImage.h \
     Source/CommonFramework/ImageTypes/ImageHSV32.h \
@@ -1299,15 +1294,7 @@ HEADERS += \
     Source/CommonFramework/ImageTypes/ImageViewHSV32.h \
     Source/CommonFramework/ImageTypes/ImageViewPlanar32.h \
     Source/CommonFramework/ImageTypes/ImageViewRGB32.h \
-    Source/CommonFramework/Inference/ImageTools.h \
     Source/CommonFramework/Inference/StatAccumulator.h \
-    Source/CommonFramework/InferenceInfra/AudioInferenceCallback.h \
-    Source/CommonFramework/InferenceInfra/AudioInferencePivot.h \
-    Source/CommonFramework/InferenceInfra/InferenceCallback.h \
-    Source/CommonFramework/InferenceInfra/InferenceRoutines.h \
-    Source/CommonFramework/InferenceInfra/InferenceSession.h \
-    Source/CommonFramework/InferenceInfra/VisualInferenceCallback.h \
-    Source/CommonFramework/InferenceInfra/VisualInferencePivot.h \
     Source/CommonFramework/Language.h \
     Source/CommonFramework/Logging/FileWindowLogger.h \
     Source/CommonFramework/Logging/Logger.h \
@@ -1335,15 +1322,9 @@ HEADERS += \
     Source/CommonFramework/Options/Environment/ProcessorLevelOption.h \
     Source/CommonFramework/Options/Environment/SleepSuppressOption.h \
     Source/CommonFramework/Options/LabelCellOption.h \
-    Source/CommonFramework/Options/LanguageOCROption.h \
     Source/CommonFramework/Options/ResolutionOption.h \
-    Source/CommonFramework/Options/ScreenWatchOption.h \
     Source/CommonFramework/Options/ScreenshotFormatOption.h \
-    Source/CommonFramework/Options/StringSelectOption.h \
     Source/CommonFramework/Options/UI/LabelCellWidget.h \
-    Source/CommonFramework/Options/UI/LanguageOCRWidget.h \
-    Source/CommonFramework/Options/UI/ScreenWatchWidget.h \
-    Source/CommonFramework/Options/UI/StringSelectWidget.h \
     Source/CommonFramework/Panels/PanelDescriptor.h \
     Source/CommonFramework/Panels/PanelInstance.h \
     Source/CommonFramework/Panels/PanelList.h \
@@ -1364,18 +1345,11 @@ HEADERS += \
     Source/CommonFramework/Resources/SpriteDatabase.h \
     Source/CommonFramework/Startup/NewVersionCheck.h \
     Source/CommonFramework/Startup/SetupSettings.h \
-    Source/CommonFramework/Tools/BlackBorderCheck.h \
     Source/CommonFramework/Tools/BotBaseHandle.h \
     Source/CommonFramework/Tools/DebugDumper.h \
     Source/CommonFramework/Tools/ErrorDumper.h \
     Source/CommonFramework/Tools/FileDownloader.h \
-    Source/CommonFramework/Tools/InterruptableCommands.h \
-    Source/CommonFramework/Tools/InterruptableCommands.tpp \
-    Source/CommonFramework/Tools/MultiConsoleErrors.h \
     Source/CommonFramework/Tools/ProgramEnvironment.h \
-    Source/CommonFramework/Tools/SuperControlSession.h \
-    Source/CommonFramework/Tools/SuperControlSession.tpp \
-    Source/CommonFramework/Tools/VideoResolutionCheck.h \
     Source/CommonFramework/Tools/VideoStream.h \
     Source/CommonFramework/VideoPipeline/Backends/CameraImplementations.h \
     Source/CommonFramework/VideoPipeline/Backends/CameraWidgetQt5.h \
@@ -1401,13 +1375,41 @@ HEADERS += \
     Source/CommonFramework/Windows/DpiScaler.h \
     Source/CommonFramework/Windows/MainWindow.h \
     Source/CommonFramework/Windows/WindowTracker.h \
-    Source/CommonTools/AudioTools/AudioPerSpectrumDetectorBase.h \
-    Source/CommonTools/AudioTools/AudioTemplateCache.h \
-    Source/CommonTools/AudioTools/SpectrogramMatcher.h \
+    Source/CommonTools/Async/InferenceRoutines.h \
+    Source/CommonTools/Async/InferenceSession.h \
+    Source/CommonTools/Async/InterruptableCommands.h \
+    Source/CommonTools/Async/InterruptableCommands.tpp \
+    Source/CommonTools/Async/SuperControlSession.h \
+    Source/CommonTools/Async/SuperControlSession.tpp \
+    Source/CommonTools/Audio/AudioPerSpectrumDetectorBase.h \
+    Source/CommonTools/Audio/AudioTemplateCache.h \
+    Source/CommonTools/Audio/SpectrogramMatcher.h \
     Source/CommonTools/DetectionDebouncer.h \
+    Source/CommonTools/Images/ColorClustering.h \
+    Source/CommonTools/Images/DistanceToLine.h \
+    Source/CommonTools/Images/ImageGradient.h \
+    Source/CommonTools/Images/ImageTools.h \
+    Source/CommonTools/Images/SolidColorTest.h \
+    Source/CommonTools/InferenceCallbacks/AudioInferenceCallback.h \
+    Source/CommonTools/InferenceCallbacks/InferenceCallback.h \
+    Source/CommonTools/InferenceCallbacks/VisualInferenceCallback.h \
+    Source/CommonTools/InferencePivots/AudioInferencePivot.h \
+    Source/CommonTools/InferencePivots/InferenceCallback.h \
+    Source/CommonTools/InferencePivots/VisualInferencePivot.h \
     Source/CommonTools/InferenceThrottler.h \
+    Source/CommonTools/MultiConsoleErrors.h \
+    Source/CommonTools/Options/LanguageOCROption.h \
+    Source/CommonTools/Options/QtWidgets/LanguageOCRWidget.h \
+    Source/CommonTools/Options/QtWidgets/ScreenWatchWidget.h \
+    Source/CommonTools/Options/QtWidgets/StringSelectWidget.h \
+    Source/CommonTools/Options/ScreenWatchOption.h \
+    Source/CommonTools/Options/StringSelectOption.h \
+    Source/CommonTools/Options/StringSelectTableOption.h \
+    Source/CommonTools/Options/TrainOCRModeOption.h \
     Source/CommonTools/ProgramStats/StatsDatabase.h \
     Source/CommonTools/ProgramStats/StatsTracking.h \
+    Source/CommonTools/StartupChecks/BlackBorderCheck.h \
+    Source/CommonTools/StartupChecks/VideoResolutionCheck.h \
     Source/CommonTools/TrendInference/AnomalyDetector.h \
     Source/CommonTools/TrendInference/TimeWindowStatTracker.h \
     Source/CommonTools/VisualDetector.h \

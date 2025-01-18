@@ -6,8 +6,8 @@
 
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/VideoPipeline/Stats/ThreadUtilizationStats.h"
-#include "CommonFramework/InferenceInfra/VisualInferencePivot.h"
-#include "CommonFramework/InferenceInfra/AudioInferencePivot.h"
+#include "CommonTools/InferencePivots/VisualInferencePivot.h"
+#include "CommonTools/InferencePivots/AudioInferencePivot.h"
 #include "CommonFramework/Recording/StreamHistorySession.h"
 #include "NintendoSwitch_ConsoleHandle.h"
 

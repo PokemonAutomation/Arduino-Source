@@ -11,7 +11,7 @@
 #define PokemonAutomation_PokemonLA_DialogueEllipseDetector_H
 
 #include "CommonFramework/ImageMatch/WaterfillTemplateMatcher.h"
-#include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
+#include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 #include "CommonTools/DetectionDebouncer.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_WhiteObjectDetector.h"
 

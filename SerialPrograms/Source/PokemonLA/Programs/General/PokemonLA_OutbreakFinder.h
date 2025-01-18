@@ -7,13 +7,11 @@
 #ifndef PokemonAutomation_PokemonLA_OutbreakFinder_H
 #define PokemonAutomation_PokemonLA_OutbreakFinder_H
 
-#include "CommonFramework/Options/StringSelectOption.h"
-#include "CommonFramework/Options/LanguageOCROption.h"
-#include "CommonFramework/Options/StringSelectTableOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
+#include "CommonTools/Options/StringSelectTableOption.h"
+#include "CommonTools/Options/LanguageOCROption.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
-#include "PokemonLA/PokemonLA_TravelLocations.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

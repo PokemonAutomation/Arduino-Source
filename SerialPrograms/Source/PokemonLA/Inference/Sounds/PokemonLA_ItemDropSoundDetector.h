@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonLA_ItemDropSoundDetector_H
 
 #include <memory>
-#include "CommonTools/AudioTools/AudioPerSpectrumDetectorBase.h"
+#include "CommonTools/Audio/AudioPerSpectrumDetectorBase.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 
 namespace PokemonAutomation{

@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonBDSP_BattleWonDetector_H
 #define PokemonAutomation_PokemonBDSP_BattleWonDetector_H
 
-#include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
+#include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 #include "CommonTools/VisualDetector.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_DialogDetector.h"
 

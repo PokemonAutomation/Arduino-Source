@@ -13,7 +13,7 @@
 #include "Common/Cpp/Options/StringOption.h"
 #include "Common/Cpp/Options/GroupOption.h"
 #include "Common/Cpp/Options/EditableTableOption.h"
-#include "CommonFramework/Options/LanguageOCROption.h"
+#include "CommonTools/Options/LanguageOCROption.h"
 
 namespace PokemonAutomation{
     class Logger;

@@ -9,8 +9,8 @@
 
 #include "CommonFramework/Language.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "CommonFramework/Tools/MultiConsoleErrors.h"
 #include "CommonTools/ProgramStats/StatsTracking.h"
+#include "CommonTools/MultiConsoleErrors.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 
 namespace PokemonAutomation{

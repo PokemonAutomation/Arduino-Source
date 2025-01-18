@@ -7,9 +7,9 @@
 #ifndef PokemonAutomation_PokemonLA_AlphaMusicDetector_H
 #define PokemonAutomation_PokemonLA_AlphaMusicDetector_H
 
-#include "CommonTools/AudioTools/AudioPerSpectrumDetectorBase.h"
-
 #include <memory>
+#include "CommonTools/Audio/AudioPerSpectrumDetectorBase.h"
+
 
 namespace PokemonAutomation{
     class SpectrogramMatcher;

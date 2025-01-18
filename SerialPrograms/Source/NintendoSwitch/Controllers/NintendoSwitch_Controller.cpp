@@ -4,8 +4,8 @@
  *
  */
 
-#include "CommonFramework/Tools/InterruptableCommands.tpp"
-#include "CommonFramework/Tools/SuperControlSession.tpp"
+#include "CommonTools/Async/InterruptableCommands.tpp"
+#include "CommonTools/Async/SuperControlSession.tpp"
 #include "NintendoSwitch_Controller.h"
 
 namespace PokemonAutomation{

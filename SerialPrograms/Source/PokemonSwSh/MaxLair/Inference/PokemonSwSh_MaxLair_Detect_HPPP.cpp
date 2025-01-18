@@ -7,10 +7,10 @@
 #include "Common/Qt/StringToolsQt.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
-#include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/OCR/OCR_StringNormalization.h"
 #include "CommonFramework/OCR/OCR_RawOCR.h"
+#include "CommonTools/Images/SolidColorTest.h"
 #include "Pokemon/Inference/Pokemon_ReadHpBar.h"
 #include "PokemonSwSh_MaxLair_Detect_HPPP.h"
 

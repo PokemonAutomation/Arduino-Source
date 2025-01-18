@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_CommonFramework_VisualDetector_H
 #define PokemonAutomation_CommonFramework_VisualDetector_H
 
-#include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
+#include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 
 namespace PokemonAutomation{
 

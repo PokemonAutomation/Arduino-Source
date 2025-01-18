@@ -17,9 +17,6 @@
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "CommonFramework/ImageTools/WaterfillUtilities.h"
-//#include "CommonFramework/ImageTools/ImageFilter.h"
-//#include "CommonFramework/ImageTools/SolidColorTest.h"
-//#include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "PokemonLA_BerryTreeDetector.h"
 #include "PokemonLA/PokemonLA_Locations.h"
 

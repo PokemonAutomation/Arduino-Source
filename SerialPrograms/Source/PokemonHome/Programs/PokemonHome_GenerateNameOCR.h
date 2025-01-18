@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonHome_GenerateNameOCR_H
 
 #include "Common/Cpp/Options/TimeExpressionOption.h"
-#include "CommonFramework/Options/LanguageOCROption.h"
+#include "CommonTools/Options/LanguageOCROption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
 namespace PokemonAutomation{

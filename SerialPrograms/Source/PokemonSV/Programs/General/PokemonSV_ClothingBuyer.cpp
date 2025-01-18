@@ -4,15 +4,12 @@
  *
  */
 
-#include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "CommonFramework/Tools/VideoResolutionCheck.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
-#include "Pokemon/Pokemon_Strings.h"
-#include "NintendoSwitch/NintendoSwitch_Settings.h"
+#include "CommonTools/Async/InferenceRoutines.h"
+#include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "PokemonSV/PokemonSV_Settings.h"
+#include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/PokemonSV_ClothingTopDetector.h"
 #include "PokemonSV_ClothingBuyer.h"

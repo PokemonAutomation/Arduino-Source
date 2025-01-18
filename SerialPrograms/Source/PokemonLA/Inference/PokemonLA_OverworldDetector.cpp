@@ -5,7 +5,6 @@
  */
 
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
-//#include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "PokemonLA_OverworldDetector.h"
 

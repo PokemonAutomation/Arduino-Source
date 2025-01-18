@@ -9,12 +9,12 @@
 
 #include <stdint.h>
 #include <string>
-#include <vector>
 #include "Common/Cpp/Options/GroupOption.h"
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/TimeExpressionOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 
 namespace PokemonAutomation{
     class Logger;

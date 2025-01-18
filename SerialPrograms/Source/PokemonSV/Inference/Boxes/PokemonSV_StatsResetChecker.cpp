@@ -4,11 +4,10 @@
  *
  */
 
-#include "CommonFramework/Options/LanguageOCROption.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonTools/Options/LanguageOCROption.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "Pokemon/Options/Pokemon_StatsHuntFilter.h"
-//#include "Pokemon/Options/Pokemon_StatsResetFilter.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_IvJudgeReader.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxNatureDetector.h"
 #include "PokemonSV/Programs/Boxes/PokemonSV_BoxRoutines.h"

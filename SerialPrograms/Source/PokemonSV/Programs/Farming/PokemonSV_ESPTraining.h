@@ -7,14 +7,10 @@
 #ifndef PokemonAutomation_PokemonSV_ESPTraining_H
 #define PokemonAutomation_PokemonSV_ESPTraining_H
 
-#include "CommonFramework/Notifications/EventNotificationsTable.h"
-#include "CommonFramework/Options/LanguageOCROption.h"
-#include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
-#include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
-#include "Common/Cpp/Options/TextEditOption.h"
-#include "PokemonSV/Inference/PokemonSV_ESPEmotionDetector.h"
+#include "CommonFramework/Notifications/EventNotificationsTable.h"
+#include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 
 namespace PokemonAutomation{

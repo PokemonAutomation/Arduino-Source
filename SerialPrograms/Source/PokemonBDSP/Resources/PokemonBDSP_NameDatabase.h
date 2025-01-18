@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonBDSP_NameDatabase_H
 #define PokemonAutomation_PokemonBDSP_NameDatabase_H
 
-#include "CommonFramework/Options/StringSelectOption.h"
+#include "CommonTools/Options/StringSelectOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

@@ -9,7 +9,7 @@
 #ifndef PokemonAutomation_PokemonLA_TransparentDialogueDetector_H
 #define PokemonAutomation_PokemonLA_TransparentDialogueDetector_H
 
-#include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
+#include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_DialogueEllipseDetector.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_DialogueYellowArrowDetector.h"
 

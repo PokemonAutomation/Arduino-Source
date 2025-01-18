@@ -9,8 +9,8 @@
 
 #include <string>
 #include "CommonFramework/ImageMatch/ImageMatchResult.h"
-#include "CommonFramework/Options/StringSelectOption.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "CommonTools/Options/StringSelectOption.h"
 
 namespace PokemonAutomation{
     namespace ImageMatch{

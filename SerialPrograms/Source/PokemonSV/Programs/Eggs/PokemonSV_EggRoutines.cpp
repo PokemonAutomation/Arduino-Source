@@ -4,13 +4,12 @@
  *
  */
 
-#include "Common/Cpp/Concurrency/AsyncDispatcher.h"
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
-#include "CommonFramework/Options/LanguageOCROption.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
+#include "CommonTools/Options/LanguageOCROption.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "Pokemon/Options/Pokemon_StatsHuntFilter.h"

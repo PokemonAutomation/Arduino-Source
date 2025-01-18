@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonLA_AlphaRoarDetector_H
 #define PokemonAutomation_PokemonLA_AlphaRoarDetector_H
 
-#include "CommonTools/AudioTools/AudioPerSpectrumDetectorBase.h"
+#include "CommonTools/Audio/AudioPerSpectrumDetectorBase.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 
 namespace PokemonAutomation{

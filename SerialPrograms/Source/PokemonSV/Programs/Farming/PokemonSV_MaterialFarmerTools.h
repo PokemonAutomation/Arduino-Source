@@ -10,8 +10,7 @@
 #include <functional>
 #include "Common/Cpp/Options/FloatingPointOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
-#include "CommonFramework/Options/LanguageOCROption.h"
-#include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
+#include "CommonTools/Options/LanguageOCROption.h"
 #include "PokemonSV/Options/PokemonSV_SandwichMakerOption.h"
 #include "PokemonSV/Programs/ShinyHunting/PokemonSV_LetsGoTools.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_LetsGoHpReader.h"

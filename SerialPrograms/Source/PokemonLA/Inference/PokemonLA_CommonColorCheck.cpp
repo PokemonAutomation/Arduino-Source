@@ -4,7 +4,6 @@
  *
  */
 
-// #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "PokemonLA_CommonColorCheck.h"
 

@@ -7,12 +7,8 @@
 #ifndef PokemonAutomation_PokemonBDSP_StartBattleDetector_H
 #define PokemonAutomation_PokemonBDSP_StartBattleDetector_H
 
-#include <functional>
 #include <atomic>
-#include <chrono>
-#include <thread>
-#include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
+#include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_DialogDetector.h"
 
 namespace PokemonAutomation{

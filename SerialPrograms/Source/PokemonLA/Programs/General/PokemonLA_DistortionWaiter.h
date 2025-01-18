@@ -7,9 +7,8 @@
 #ifndef PokemonAutomation_PokemonLA_DistortionWaiter_H
 #define PokemonAutomation_PokemonLA_DistortionWaiter_H
 
-#include "CommonFramework/Options/LanguageOCROption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
-//#include "NintendoSwitch/Options/GoHomeWhenDoneOption.h"
+#include "CommonTools/Options/LanguageOCROption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
 namespace PokemonAutomation{

@@ -10,9 +10,9 @@
 #include <deque>
 #include <atomic>
 #include "Common/Cpp/Time.h"
-#include "CommonFramework/Options/LanguageOCROption.h"
-#include "CommonFramework/InferenceInfra/InferenceSession.h"
 #include "CommonTools/ProgramStats/StatsTracking.h"
+#include "CommonTools/Async/InferenceSession.h"
+#include "CommonTools/Options/LanguageOCROption.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 #include "Pokemon/Pokemon_EncounterStats.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_LetsGoKillDetector.h"

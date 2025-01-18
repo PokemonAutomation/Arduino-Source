@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonLA_EscapeFromAttack_H
 #define PokemonAutomation_PokemonLA_EscapeFromAttack_H
 
-#include "CommonFramework/Tools/SuperControlSession.h"
+#include "CommonTools/Async/SuperControlSession.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 #include "PokemonLA/Inference/PokemonLA_UnderAttackDetector.h"
 #include "PokemonLA/Inference/PokemonLA_MountDetector.h"

@@ -6,9 +6,8 @@
 
 #include <iostream>
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/InferenceInfra/InferenceSession.h"
+#include "CommonTools/Async/InferenceSession.h"
 #include "Pokemon/Pokemon_Strings.h"
-//#include "PokemonLA/PokemonLA_Settings.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_ShinySoundDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_LetsGoKillDetector.h"
 #include "PokemonSV_SoundListener.h"

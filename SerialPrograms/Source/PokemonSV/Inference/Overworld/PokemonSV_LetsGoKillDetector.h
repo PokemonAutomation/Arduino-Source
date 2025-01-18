@@ -8,10 +8,9 @@
 #define PokemonAutomation_PokemonSV_LetsGoKillDetector_H
 
 #include <functional>
-#include <atomic>
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonTools/AudioTools/AudioPerSpectrumDetectorBase.h"
+#include "CommonTools/Audio/AudioPerSpectrumDetectorBase.h"
 #include "CommonTools/VisualDetector.h"
 
 namespace PokemonAutomation{

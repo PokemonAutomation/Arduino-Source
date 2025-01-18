@@ -10,7 +10,7 @@
 #include <chrono>
 #include <atomic>
 #include "Common/Cpp/AbstractLogger.h"
-#include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
+#include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 #include "CommonTools/VisualDetector.h"
 
 namespace PokemonAutomation{

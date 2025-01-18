@@ -11,9 +11,9 @@
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
-#include "CommonFramework/Options/LanguageOCROption.h"
-#include "PokemonSV/Options/PokemonSV_AuctionItemTable.h"
+#include "CommonTools/Options/LanguageOCROption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
+#include "PokemonSV/Options/PokemonSV_AuctionItemTable.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

@@ -10,8 +10,7 @@
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
-#include "CommonFramework/Tools/InterruptableCommands.h"
-//#include "CommonFramework/Inference/BlackScreenDetector.h"
+#include "CommonTools/Async/InterruptableCommands.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonSwSh_EncounterDetection.h"
 

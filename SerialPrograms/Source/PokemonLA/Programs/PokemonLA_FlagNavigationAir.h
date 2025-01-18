@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonLA_FlagNavigation_H
 #define PokemonAutomation_PokemonLA_FlagNavigation_H
 
-#include "CommonFramework/Tools/SuperControlSession.h"
+#include "CommonTools/Async/SuperControlSession.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_FlagTracker.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_ButtonDetector.h"

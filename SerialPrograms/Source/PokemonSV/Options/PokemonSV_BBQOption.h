@@ -7,14 +7,12 @@
 #ifndef PokemonAutomation_PokemonSV_BBQOption_H
 #define PokemonAutomation_PokemonSV_BBQOption_H
 
-#include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/GroupOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
-#include "CommonFramework/Options/LanguageOCROption.h"
+#include "CommonTools/Options/LanguageOCROption.h"
 #include "PokemonSwSh/Options/PokemonSwSh_BallSelectOption.h"
-#include "PokemonSV/Options/PokemonSV_BattleMoveTable.h"
 #include "PokemonSV/Options/PokemonSV_TeraAIOption.h"
 #include "PokemonSV/Options/PokemonSV_TeraCatchOnWinOption.h"
 

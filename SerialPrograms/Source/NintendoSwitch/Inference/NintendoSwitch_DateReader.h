@@ -9,7 +9,7 @@
 
 #include "Common/Cpp/DateTime.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
+#include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 #include "CommonTools/VisualDetector.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 

@@ -4,25 +4,20 @@
  *
  */
 
-#include "CommonFramework/GlobalSettingsPanel.h"
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
-#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTools/WaterfillUtilities.h"
-#include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
-#include "CommonFramework/ImageTools/ImageManip.h"
-#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Tools/DebugDumper.h"
-#include "CommonFramework/Tools/VideoResolutionCheck.h"
+#include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV_DirectionDetector.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include <cmath>
-#include <iostream>
+
+//#include <iostream>
 //using std::cout;
 //using std::endl;
 

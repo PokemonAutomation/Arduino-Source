@@ -11,7 +11,7 @@
 #define PokemonAutomation_PokemonLA_DialogueYellowArrowDetector_H
 
 #include <atomic>
-#include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
+#include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 
 namespace PokemonAutomation{
     class Logger;

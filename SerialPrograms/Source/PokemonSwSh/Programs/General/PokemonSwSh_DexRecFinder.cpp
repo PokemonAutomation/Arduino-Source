@@ -22,6 +22,8 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
+using namespace Pokemon;
+
 
 
 DexRecFinder_Descriptor::DexRecFinder_Descriptor()

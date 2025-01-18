@@ -4,8 +4,8 @@
  *
  */
 
-#include "CommonTools/AudioTools/SpectrogramMatcher.h"
-#include "CommonTools/AudioTools/AudioTemplateCache.h"
+#include "CommonTools/Audio/SpectrogramMatcher.h"
+#include "CommonTools/Audio/AudioTemplateCache.h"
 #include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSV_ShinySoundDetector.h"
 

@@ -7,8 +7,8 @@
 #ifndef PokemonAutomation_PokemonBDSP_TradeRoutines_H
 #define PokemonAutomation_PokemonBDSP_TradeRoutines_H
 
-#include "CommonFramework/Tools/MultiConsoleErrors.h"
 #include "CommonTools/ProgramStats/StatsTracking.h"
+#include "CommonTools/MultiConsoleErrors.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h"
 

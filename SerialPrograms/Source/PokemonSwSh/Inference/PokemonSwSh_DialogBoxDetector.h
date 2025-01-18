@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_DialogBoxDetector_H
 
 #include <atomic>
-#include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
+#include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

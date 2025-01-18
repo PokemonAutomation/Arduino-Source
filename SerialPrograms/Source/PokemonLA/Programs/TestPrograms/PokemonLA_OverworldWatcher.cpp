@@ -4,8 +4,7 @@
  *
  */
 
-//#include "CommonFramework/InferenceInfra/VisualInferenceRoutines.h"
-#include "CommonFramework/InferenceInfra/InferenceSession.h"
+#include "CommonTools/Async/InferenceSession.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_BubbleDetector.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_ArcDetector.h"
