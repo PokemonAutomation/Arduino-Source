@@ -75,7 +75,7 @@ JsonValue ControllerOption::to_json() const{
     JsonObject obj;
     obj["DeviceType"] = m_current->type_name();
     obj["Parameters"] = m_current->to_json();
-    return std::move(obj);
+    return obj;
 }
 
 
