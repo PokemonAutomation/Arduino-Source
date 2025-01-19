@@ -14,6 +14,8 @@
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonTools/StartupChecks/BlackBorderCheck.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase_Handle.h"
+#include "Controllers/SerialPABotBase/SerialPABotBase_Connection.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 #include "NintendoSwitch_SingleSwitchProgramOption.h"
 #include "NintendoSwitch_SingleSwitchProgramSession.h"
 
@@ -110,13 +112,16 @@ void SingleSwitchProgramSession::internal_run_program(){
         timestamp()
     );
     CancellableHolder<CancellableScope> scope;
+    ControllerConnection& connection = m_system.controller_session().controller();
+    SerialPABotBase::SerialConnection* serial_connection = dynamic_cast<SerialPABotBase::SerialConnection*>(&connection);
+    NintendoSwitch::SwitchController* switch_controller = serial_connection->handle().botbase();
     SingleSwitchProgramEnvironment env(
         program_info,
         scope,
         *this,
         current_stats_tracker(), historical_stats_tracker(),
         m_system.logger(),
-        *m_system.sender().botbase(),
+        *switch_controller,
         m_system.video(),
         m_system.overlay(),
         m_system.audio(),

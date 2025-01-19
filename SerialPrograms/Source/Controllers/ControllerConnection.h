@@ -9,7 +9,7 @@
 
 #include "Common/Cpp/ListenerSet.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
-#include "Controllers.h"
+#include "ControllerDescriptor.h"
 
 namespace PokemonAutomation{
 

@@ -79,7 +79,7 @@ std::pair<bool, PokemonDetails> control_focus_to_throw(
     Language language
 ){
     // A session that creates a new thread to send button commands to controller
-    AsyncCommandSession<Controller> session(
+    AsyncCommandSession<SwitchController> session(
         context,
         env.console.logger(),
         env.realtime_dispatcher(),

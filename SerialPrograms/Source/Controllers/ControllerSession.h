@@ -9,7 +9,7 @@
 
 #include <mutex>
 #include "Common/Cpp/ListenerSet.h"
-#include "Controllers.h"
+#include "ControllerDescriptor.h"
 #include "ControllerConnection.h"
 
 namespace PokemonAutomation{
@@ -47,9 +47,7 @@ public:
     const ControllerOption& option() const{
         return m_option;
     }
-    ControllerConnection& controller() const{
-        return *m_connection;
-    }
+    ControllerConnection& controller() const;
 
 
 public:

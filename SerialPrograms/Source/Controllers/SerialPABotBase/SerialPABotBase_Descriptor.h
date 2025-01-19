@@ -8,7 +8,7 @@
 #define PokemonAutomation_Controllers_SerialPABotBase_Descriptor_H
 
 #include <QSerialPortInfo>
-#include "Controllers/Controllers.h"
+#include "Controllers/ControllerDescriptor.h"
 
 namespace PokemonAutomation{
 namespace SerialPABotBase{

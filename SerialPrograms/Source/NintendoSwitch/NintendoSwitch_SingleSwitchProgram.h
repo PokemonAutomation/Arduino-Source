@@ -12,7 +12,7 @@
 #include "CommonFramework/Notifications/EventNotificationOption.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Panels/ProgramDescriptor.h"
-#include "Controllers/ControllerCapabilities.h"
+#include "Controllers/ControllerCapability.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase_Globals.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"

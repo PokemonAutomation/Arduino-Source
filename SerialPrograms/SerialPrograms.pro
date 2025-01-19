@@ -308,7 +308,7 @@ SOURCES += \
     Source/Controllers/ControllerConnection.cpp \
     Source/Controllers/ControllerSelectorWidget.cpp \
     Source/Controllers/ControllerSession.cpp \
-    Source/Controllers/Controllers.cpp \
+    Source/Controllers/ControllerDescriptor.cpp \
     Source/Controllers/SerialPABotBase/SerialPABotBase_Connection.cpp \
     Source/Controllers/SerialPABotBase/SerialPABotBase_Descriptor.cpp \
     Source/Controllers/SerialPABotBase/SerialPABotBase_Handle.cpp \
@@ -1419,11 +1419,11 @@ HEADERS += \
     Source/ComputerPrograms/Framework/ComputerProgramOption.h \
     Source/ComputerPrograms/Framework/ComputerProgramSession.h \
     Source/ComputerPrograms/Framework/ComputerProgramWidget.h \
-    Source/Controllers/ControllerCapabilities.h \
+    Source/Controllers/ControllerCapability.h \
     Source/Controllers/ControllerConnection.h \
     Source/Controllers/ControllerSelectorWidget.h \
     Source/Controllers/ControllerSession.h \
-    Source/Controllers/Controllers.h \
+    Source/Controllers/ControllerDescriptor.h \
     Source/Controllers/SerialPABotBase/SerialPABotBase_Connection.h \
     Source/Controllers/SerialPABotBase/SerialPABotBase_Descriptor.h \
     Source/Controllers/SerialPABotBase/SerialPABotBase_Globals.h \

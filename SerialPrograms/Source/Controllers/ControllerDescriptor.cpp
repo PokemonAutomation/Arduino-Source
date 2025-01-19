@@ -6,7 +6,7 @@
 
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonObject.h"
-#include "Controllers.h"
+#include "ControllerDescriptor.h"
 
 #include "Controllers/SerialPABotBase/SerialPABotBase_Descriptor.h"
 #include "ControllerConnection.h"

@@ -28,7 +28,7 @@ public:
     ConsoleHandle(
         size_t index,
         Logger& logger,
-        Controller& controller,
+        SwitchController& controller,
         VideoFeed& video,
         VideoOverlay& overlay,
         AudioFeed& audio,
@@ -37,7 +37,7 @@ public:
 
     size_t index() const{ return m_index; }
 
-    Controller& controller(){ return m_controller; }
+    SwitchController& controller(){ return m_controller; }
 
 
     operator Logger&(){ return logger(); }
@@ -49,7 +49,7 @@ public:
 
 private:
     size_t m_index;
-    Controller& m_controller;
+    SwitchController& m_controller;
 
     std::unique_ptr<ThreadUtilizationStat> m_thread_utilization;
 };

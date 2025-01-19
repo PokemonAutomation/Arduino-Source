@@ -20,7 +20,7 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-class FlagNavigationAir : public SuperControlSession<Controller>{
+class FlagNavigationAir : public SuperControlSession<SwitchController>{
 public:
     FlagNavigationAir(
         ProgramEnvironment& env, ConsoleHandle& console, ControllerContext& context,
@@ -33,10 +33,10 @@ public:
 
 
 private:
-    virtual bool run_state(AsyncCommandSession<Controller>& commands, WallClock timestamp) override;
+    virtual bool run_state(AsyncCommandSession<SwitchController>& commands, WallClock timestamp) override;
 
-    bool run_flying(AsyncCommandSession<Controller>& commands, WallClock timestamp);
-    bool run_climbing(AsyncCommandSession<Controller>& commands, WallClock timestamp);
+    bool run_flying(AsyncCommandSession<SwitchController>& commands, WallClock timestamp);
+    bool run_climbing(AsyncCommandSession<SwitchController>& commands, WallClock timestamp);
 
 
 private:

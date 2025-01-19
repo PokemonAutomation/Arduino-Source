@@ -15,6 +15,8 @@
 #include "CommonFramework/Options/Environment/PerformanceOptions.h"
 #include "CommonTools/StartupChecks/BlackBorderCheck.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase_Handle.h"
+#include "Controllers/SerialPABotBase/SerialPABotBase_Connection.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 #include "NintendoSwitch_MultiSwitchProgramOption.h"
 #include "NintendoSwitch_MultiSwitchProgramSession.h"
 
@@ -151,11 +153,13 @@ void MultiSwitchProgramSession::internal_run_program(){
             report_error("Cannot Start: The controller is not ready.");
             return;
         }
-        BotBaseController* botbase = session.sender().botbase();
+        ControllerConnection& connection = session.controller_session().controller();
+        SerialPABotBase::SerialConnection* serial_connection = dynamic_cast<SerialPABotBase::SerialConnection*>(&connection);
+        NintendoSwitch::SwitchController* switch_controller = serial_connection->handle().botbase();
         handles.emplace_back(
             c,
             session.logger(),
-            *botbase,
+            *switch_controller,
             session.video(),
             session.overlay(),
             session.audio(),

@@ -13,7 +13,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-using Controller = BotBaseController;
+using SwitchController = BotBaseController;
 using ControllerContext = BotBaseControllerContext;
 
 

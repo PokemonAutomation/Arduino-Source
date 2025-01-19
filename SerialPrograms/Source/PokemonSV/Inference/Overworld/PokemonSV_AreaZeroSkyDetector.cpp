@@ -111,7 +111,7 @@ void find_and_center_on_sky(
         {sky_tracker}
     );
 
-    AsyncCommandSession<Controller> session(
+    AsyncCommandSession<SwitchController> session(
         context, console,
         env.realtime_dispatcher(),
         context.controller()

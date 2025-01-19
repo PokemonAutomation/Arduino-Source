@@ -20,6 +20,7 @@
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
+#include "SerialPABotBase_Globals.h"
 #include "SerialPABotBase_Handle.h"
 #include "SerialPABotBase_Descriptor.h"
 

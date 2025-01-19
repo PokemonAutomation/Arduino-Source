@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Cpp/Exceptions.h"
 #include "ControllerSession.h"
 
 //#include <iostream>
@@ -81,6 +82,12 @@ std::string ControllerSession::status_text() const{
         return "<font color=\"red\">No controller selected.</font>";
     }
     return m_connection->status_text();
+}
+ControllerConnection& ControllerSession::controller() const{
+    if (m_connection){
+        return *m_connection;
+    }
+    throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Controller is null.");
 }
 
 

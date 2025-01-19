@@ -11,8 +11,8 @@
 namespace PokemonAutomation{
 
 //  Instantiate some template helper classes.
-template class AsyncCommandSession<NintendoSwitch::Controller>;
-template class SuperControlSession<NintendoSwitch::Controller>;
+template class AsyncCommandSession<NintendoSwitch::SwitchController>;
+template class SuperControlSession<NintendoSwitch::SwitchController>;
 
 namespace NintendoSwitch{
 

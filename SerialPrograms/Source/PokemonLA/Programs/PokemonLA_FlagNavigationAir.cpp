@@ -285,7 +285,7 @@ void FlagNavigationAir::set_distance_callback(std::function<void(double distance
     m_flag_callback = std::move(flag_callback);
 }
 
-bool FlagNavigationAir::run_state(AsyncCommandSession<Controller>& commands, WallClock timestamp){
+bool FlagNavigationAir::run_state(AsyncCommandSession<SwitchController>& commands, WallClock timestamp){
     if (last_state_change() + std::chrono::seconds(60) < timestamp){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
@@ -407,7 +407,7 @@ bool FlagNavigationAir::run_state(AsyncCommandSession<Controller>& commands, Wal
     m_stream.log("No state handler for current state.", COLOR_RED);
     return false;
 }
-bool FlagNavigationAir::run_flying(AsyncCommandSession<Controller>& commands, WallClock timestamp){
+bool FlagNavigationAir::run_flying(AsyncCommandSession<SwitchController>& commands, WallClock timestamp){
     //  Need to get on Sneasler.
     if (m_centerA.detected() && last_state_change() + std::chrono::seconds(2) < timestamp){
         return run_state_action(State::GET_ON_SNEASLER);
@@ -502,7 +502,7 @@ bool FlagNavigationAir::run_flying(AsyncCommandSession<Controller>& commands, Wa
     return run_state_action(State::DIVE_STRAIGHT);
 #endif
 }
-bool FlagNavigationAir::run_climbing(AsyncCommandSession<Controller>& commands, WallClock timestamp){
+bool FlagNavigationAir::run_climbing(AsyncCommandSession<SwitchController>& commands, WallClock timestamp){
     //  Can't jump off means you're able to stand. Switch back to Braviary.
     if (!m_leftB.detected()){
         return run_state_action(State::SNEASLER_ON);

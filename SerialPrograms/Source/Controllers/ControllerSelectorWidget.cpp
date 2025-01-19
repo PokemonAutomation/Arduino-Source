@@ -81,6 +81,10 @@ void ControllerSelectorWidget::refresh(){
     m_devices_dropdown->clear();
 
     m_device_list.emplace_back(new NullControllerDescriptor());
+
+    //  TODO: Apply the requirements filter here to decide which set of devices
+    //  to actually add to the list.
+    //  Also, move this logic into ControllerSession since it isn't UI.
     if (true){
         std::vector<std::unique_ptr<const ControllerDescriptor>> serial = SerialPABotBase::get_all_devices();
         std::move(serial.begin(), serial.end(), std::back_inserter(m_device_list));
@@ -102,7 +106,9 @@ void ControllerSelectorWidget::refresh(){
 
 
 void ControllerSelectorWidget::controller_changed(const std::shared_ptr<const ControllerDescriptor>& descriptor){
-    refresh();
+    QMetaObject::invokeMethod(this, [this]{
+        refresh();
+    });
 }
 void ControllerSelectorWidget::status_text_changed(const std::string& text){
 //    cout << "ControllerSelectorWidget::status_text_changed(): " << text << endl;

@@ -13,11 +13,6 @@
 namespace PokemonAutomation{
 
 
-enum class AllowCommandsWhenRunning{
-    DISABLE_COMMANDS,
-    ENABLE_COMMANDS,
-};
-
 
 enum class PABotBaseLevel{
     NOT_PABOTBASE = 0,
@@ -47,6 +42,10 @@ inline const char* program_id_to_string(uint8_t id){
     }
     return STRINGS[id];
 }
+
+
+//class SerialPABotBase
+
 
 
 

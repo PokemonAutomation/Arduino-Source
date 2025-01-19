@@ -600,9 +600,9 @@ file(GLOB MAIN_SOURCES
     Source/ComputerPrograms/Framework/ComputerProgramSession.h
     Source/ComputerPrograms/Framework/ComputerProgramWidget.cpp
     Source/ComputerPrograms/Framework/ComputerProgramWidget.h
-    Source/Controllers/ControllerCapabilities.h
-    Source/Controllers/Controllers.cpp
-    Source/Controllers/Controllers.h
+    Source/Controllers/ControllerCapability.h
+    Source/Controllers/ControllerDescriptor.cpp
+    Source/Controllers/ControllerDescriptor.h
     Source/Controllers/ControllerConnection.cpp
     Source/Controllers/ControllerConnection.h
     Source/Controllers/ControllerSession.cpp

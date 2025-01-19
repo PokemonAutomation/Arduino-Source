@@ -275,7 +275,7 @@ update the location of the sandwich hand
 bool move_then_recover_sandwich_hand_position(
     const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context, 
     SandwichHandType& hand_type, SandwichHandWatcher& hand_watcher,
-    AsyncCommandSession<Controller>& move_session
+    AsyncCommandSession<SwitchController>& move_session
 ){
 
     console.log("center the cursor: move towards bottom right, then left slightly.");
@@ -360,7 +360,7 @@ ImageFloatBox move_sandwich_hand(
     SandwichHandWatcher hand_watcher(hand_type, start_box);
 
     // A session that creates a new thread to send button commands to controller
-    AsyncCommandSession<Controller> move_session(
+    AsyncCommandSession<SwitchController> move_session(
         context,
         console.logger(),
         dispatcher,

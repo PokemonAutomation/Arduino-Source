@@ -20,9 +20,8 @@
 #include "CommonFramework/AudioPipeline/AudioOption.h"
 #include "CommonFramework/VideoPipeline/CameraOption.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayOption.h"
-#include "Controllers/ControllerCapabilities.h"
-#include "Controllers/Controllers.h"
-#include "Controllers/SerialPABotBase/SerialPABotBase_Globals.h"
+#include "Controllers/ControllerCapability.h"
+#include "Controllers/ControllerDescriptor.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
