@@ -10,6 +10,7 @@
 #include <memory>
 #include <set>
 #include <QObject>
+#include "Common/Cpp/ListenerSet.h"
 #include "Common/Cpp/LifetimeSanitizer.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/AudioPipeline/AudioPassthroughPair.h"
@@ -83,8 +84,8 @@ private:
     std::unique_ptr<AudioFloatToFFT> m_fft_runner;
     std::unique_ptr<InternalFFTListener> m_fft_listener;    //  Attaches to m_fft_runner"".
 
-    std::set<AudioFloatStreamListener*> m_stream_listeners;
-    std::set<FFTListener*> m_fft_listeners;
+    ListenerSet<AudioFloatStreamListener> m_stream_listeners;
+    ListenerSet<FFTListener> m_fft_listeners;
 
     LifetimeSanitizer m_sanitizer;
 };

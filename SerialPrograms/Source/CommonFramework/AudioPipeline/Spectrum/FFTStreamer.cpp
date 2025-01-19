@@ -36,10 +36,10 @@ std::unique_ptr<AudioFloatToFFT> make_FFT_streamer(AudioChannelFormat format){
 
 
 void AudioFloatToFFT::add_listener(FFTListener& listener){
-    m_listeners.insert(&listener);
+    m_listeners.add(listener);
 }
 void AudioFloatToFFT::remove_listener(FFTListener& listener){
-    m_listeners.erase(&listener);
+    m_listeners.remove(listener);
 }
 
 AudioFloatToFFT::AudioFloatToFFT(
@@ -115,9 +115,10 @@ void AudioFloatToFFT::run_fft(){
     }
     std::shared_ptr<AlignedVector<float>> out = std::make_unique<AlignedVector<float>>(NUM_FFT_SAMPLES / 2);
     Kernels::AbsFFT::fft_abs(FFT_LENGTH_POWER_OF_TWO, out->data(), m_fft_input.data());
-    for (FFTListener* listener : m_listeners){
-        listener->on_fft(m_sample_rate, out);
-    }
+    m_listeners.run_method_unique(
+        &FFTListener::on_fft,
+        m_sample_rate, out
+    );
 }
 void AudioFloatToFFT::drop_from_front(size_t frames){
     if (frames >= m_buffered){

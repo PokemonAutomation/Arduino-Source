@@ -108,11 +108,10 @@ public:
 private:
     virtual void on_samples(const float* data, size_t objects) override{
 //        cout << "objects = " << objects << endl;
-        ReadSpinLock lg(m_parent.m_lock);
-        for (AudioFloatStreamListener* listener : m_parent.m_listeners){
-//            listener->on_samples(data, objects * m_parent.m_multiplier);
-            listener->on_samples(data, objects);
-        }
+        m_parent.m_listeners.run_method_unique(
+            &AudioFloatStreamListener::on_samples,
+            data, objects
+        );
     }
 
     AudioSource& m_parent;
@@ -123,13 +122,11 @@ private:
 
 void AudioSource::add_listener(AudioFloatStreamListener& listener){
     auto scope_check = m_sanitizer.check_scope();
-    WriteSpinLock lg(m_lock);
-    m_listeners.insert(&listener);
+    m_listeners.add(listener);
 }
 void AudioSource::remove_listener(AudioFloatStreamListener& listener){
     auto scope_check = m_sanitizer.check_scope();
-    WriteSpinLock lg(m_lock);
-    m_listeners.erase(&listener);
+    m_listeners.remove(listener);
 }
 
 

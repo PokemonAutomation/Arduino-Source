@@ -29,11 +29,7 @@ AudioSelectorWidget::~AudioSelectorWidget(){
     m_session.remove_state_listener(*this);
 }
 
-AudioSelectorWidget::AudioSelectorWidget(
-    QWidget& parent,
-    Logger& logger,
-    AudioSession& session
-)
+AudioSelectorWidget::AudioSelectorWidget(QWidget& parent, AudioSession& session)
     : QWidget(&parent)
     , m_session(session)
 //    , m_slider_active(false)

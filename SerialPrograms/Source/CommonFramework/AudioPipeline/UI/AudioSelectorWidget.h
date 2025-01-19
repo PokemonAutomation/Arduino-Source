@@ -9,7 +9,6 @@
 
 #include <string>
 #include <vector>
-#include <atomic>
 #include <mutex>
 #include <QWidget>
 #include <QSlider>
@@ -24,11 +23,7 @@ namespace PokemonAutomation{
 
 class AudioSelectorWidget : public QWidget, private AudioSession::StateListener{
 public:
-    AudioSelectorWidget(
-        QWidget& parent,
-        Logger& logger,
-        AudioSession& session
-    );
+    AudioSelectorWidget(QWidget& parent, AudioSession& session);
     ~AudioSelectorWidget();
 
 private:

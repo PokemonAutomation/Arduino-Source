@@ -16,6 +16,7 @@
 #ifndef PokemonAutomation_AudioPipeline_AudioSession_H
 #define PokemonAutomation_AudioPipeline_AudioSession_H
 
+#include "Common/Cpp/ListenerSet.h"
 #include "Common/Cpp/Concurrency/Watchdog.h"
 #include "AudioFeed.h"
 #include "AudioPassthroughPair.h"
@@ -82,7 +83,7 @@ public:
 
 
 private:
-    virtual void on_fft(size_t sample_rate, std::shared_ptr<AlignedVector<float>> fft_output) override;
+    virtual void on_fft(size_t sample_rate, std::shared_ptr<const AlignedVector<float>> fft_output) override;
     virtual void on_watchdog_timeout() override;
 
     bool sanitize_format();
@@ -99,7 +100,9 @@ private:
     std::unique_ptr<AudioPassthroughPair> m_devices;
 
     mutable std::mutex m_lock;
-    std::set<StateListener*> m_listeners;
+
+    ListenerSet<StateListener> m_listeners;
+
 };
 
 

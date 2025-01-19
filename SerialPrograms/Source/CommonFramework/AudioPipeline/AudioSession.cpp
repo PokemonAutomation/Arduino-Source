@@ -23,12 +23,10 @@ namespace PokemonAutomation{
 
 
 void AudioSession::add_state_listener(StateListener& listener){
-    std::lock_guard<std::mutex> lg(m_lock);
-    m_listeners.insert(&listener);
+    m_listeners.add(listener);
 }
 void AudioSession::remove_state_listener(StateListener& listener){
-    std::lock_guard<std::mutex> lg(m_lock);
-    m_listeners.erase(&listener);
+    m_listeners.remove(listener);
 }
 void AudioSession::add_stream_listener(AudioFloatStreamListener& listener){
     m_devices->add_listener(listener);
@@ -74,33 +72,33 @@ void AudioSession::get(AudioOption& option){
     option.m_display_type   = m_option.m_display_type;
 }
 void AudioSession::set(const AudioOption& option){
-    std::lock_guard<std::mutex> lg(m_lock);
-    signal_pre_input_change();
+    {
+        std::lock_guard<std::mutex> lg(m_lock);
+        signal_pre_input_change();
 
-    m_option.m_input_file       = option.m_input_file;
-    m_option.m_input_device     = option.m_input_device;
-    m_option.m_input_format     = option.m_input_format;
-    m_option.m_output_device    = option.m_output_device;
-    m_option.m_volume           = option.m_volume;
-    m_option.m_display_type     = option.m_display_type;
+        m_option.m_input_file       = option.m_input_file;
+        m_option.m_input_device     = option.m_input_device;
+        m_option.m_input_format     = option.m_input_format;
+        m_option.m_output_device    = option.m_output_device;
+        m_option.m_volume           = option.m_volume;
+        m_option.m_display_type     = option.m_display_type;
 
-    if (!m_option.m_input_file.empty()){
-        sanitize_format();
-        m_devices->set_audio_source(m_option.m_input_file);
-    }else if (sanitize_format()){
-        m_devices->set_audio_source(m_option.m_input_device, m_option.m_input_format);
-    }else{
-        m_devices->clear_audio_source();
+        if (!m_option.m_input_file.empty()){
+            sanitize_format();
+            m_devices->set_audio_source(m_option.m_input_file);
+        }else if (sanitize_format()){
+            m_devices->set_audio_source(m_option.m_input_device, m_option.m_input_format);
+        }else{
+            m_devices->clear_audio_source();
+        }
+
+        m_devices->set_audio_sink(m_option.m_output_device, m_option.m_volume);
     }
-
-    m_devices->set_audio_sink(m_option.m_output_device, m_option.m_volume);
 
     signal_post_input_change();
     signal_post_output_change();
-    for (StateListener* listener : m_listeners){
-        listener->post_volume_change(m_option.volume());
-        listener->post_display_change(m_option.m_display_type);
-    }
+    m_listeners.run_method_unique(&StateListener::post_volume_change, m_option.volume());
+    m_listeners.run_method_unique(&StateListener::post_display_change, m_option.m_display_type);
 }
 std::pair<std::string, AudioDeviceInfo> AudioSession::input_device() const{
     std::lock_guard<std::mutex> lg(m_lock);
@@ -193,25 +191,25 @@ void AudioSession::set_audio_output(AudioDeviceInfo info){
     signal_post_output_change();
 }
 void AudioSession::set_volume(double volume){
-    std::lock_guard<std::mutex> lg(m_lock);
-    if (m_option.m_volume == volume){
-        return;
+    {
+        std::lock_guard<std::mutex> lg(m_lock);
+        if (m_option.m_volume == volume){
+            return;
+        }
+        m_devices->set_sink_volume(volume);
+        m_option.m_volume = volume;
     }
-    m_devices->set_sink_volume(volume);
-    m_option.m_volume = volume;
-    for (StateListener* listener : m_listeners){
-        listener->post_volume_change(m_option.volume());
-    }
+    m_listeners.run_method_unique(&StateListener::post_volume_change, m_option.volume());
 }
 void AudioSession::set_display(AudioOption::AudioDisplayType display){
-    std::lock_guard<std::mutex> lg(m_lock);
-    if (m_option.m_display_type == display){
-        return;
+    {
+        std::lock_guard<std::mutex> lg(m_lock);
+        if (m_option.m_display_type == display){
+            return;
+        }
+        m_option.m_display_type = display;
     }
-    m_option.m_display_type = display;
-    for (StateListener* listener : m_listeners){
-        listener->post_display_change(m_option.m_display_type);
-    }
+    m_listeners.run_method_unique(&StateListener::post_display_change, m_option.m_display_type);
 }
 
 bool AudioSession::sanitize_format(){
@@ -243,19 +241,18 @@ bool AudioSession::sanitize_format(){
     return true;
 }
 void AudioSession::signal_pre_input_change(){
-    for (StateListener* listener : m_listeners){
-        listener->pre_input_change();
-    }
+    m_listeners.run_method_unique(&StateListener::pre_input_change);
 }
 void AudioSession::signal_post_input_change(){
-    for (StateListener* listener : m_listeners){
-        listener->post_input_change(m_option.input_file(), m_option.input_device(), m_option.input_format());
-    }
+    m_listeners.run_method_unique(
+        &StateListener::post_input_change,
+        m_option.input_file(),
+        m_option.input_device(),
+        m_option.input_format()
+    );
 }
 void AudioSession::signal_post_output_change(){
-    for (StateListener* listener : m_listeners){
-        listener->post_output_change(m_option.output_device());
-    }
+    m_listeners.run_method_unique(&StateListener::post_output_change, m_option.output_device());
 }
 
 
@@ -290,7 +287,7 @@ void AudioSession::add_overlay(uint64_t starting_seqnum, size_t end_seqnum, Colo
 }
 
 
-void AudioSession::on_fft(size_t sample_rate, std::shared_ptr<AlignedVector<float>> fft_output){
+void AudioSession::on_fft(size_t sample_rate, std::shared_ptr<const AlignedVector<float>> fft_output){
     m_spectrum_holder.push_spectrum(sample_rate, std::move(fft_output));
     global_watchdog().delay(*this);
 }

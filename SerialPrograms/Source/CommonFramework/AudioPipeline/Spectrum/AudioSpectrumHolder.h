@@ -12,6 +12,7 @@
 #include <mutex>
 #include <fstream>
 #include "Common/Cpp/Time.h"
+#include "Common/Cpp/ListenerSet.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/AudioPipeline/AudioFeed.h"
 #include "Spectrograph.h"
@@ -108,7 +109,7 @@ private:
     std::list<std::tuple<size_t, size_t, Color>> m_overlay;
 
     mutable std::mutex m_state_lock;
-    std::set<Listener*> m_listeners;
+    ListenerSet<Listener> m_listeners;
 };
 
 

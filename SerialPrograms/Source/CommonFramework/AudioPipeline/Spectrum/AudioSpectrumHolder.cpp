@@ -99,39 +99,37 @@ AudioSpectrumHolder::AudioSpectrumHolder()
 
 
 void AudioSpectrumHolder::add_listener(Listener& listener){
-    std::lock_guard<std::mutex> lg(m_state_lock);
-    m_listeners.insert(&listener);
+    m_listeners.add(listener);
 }
 void AudioSpectrumHolder::remove_listener(Listener& listener){
-    std::lock_guard<std::mutex> lg(m_state_lock);
-    m_listeners.erase(&listener);
+    m_listeners.remove(listener);
 }
 
 void AudioSpectrumHolder::clear(){
-    std::lock_guard<std::mutex> lg(m_state_lock);
-
-    m_freqVisStamps.assign(m_freqVisStamps.size(), SIZE_MAX);
-
     {
-        // update m_spectrum_stamp_start in case the audio widget is used
-        // again to store new spectrums.
-        if (m_spectrums.size() > 0){
-            m_spectrum_stamp_start = m_spectrums.front().stamp + 1;
+        std::lock_guard<std::mutex> lg(m_state_lock);
+
+        m_freqVisStamps.assign(m_freqVisStamps.size(), SIZE_MAX);
+
+        {
+            // update m_spectrum_stamp_start in case the audio widget is used
+            // again to store new spectrums.
+            if (m_spectrums.size() > 0){
+                m_spectrum_stamp_start = m_spectrums.front().stamp + 1;
+            }
+            m_spectrums.clear();
+
+            m_spectrograph->clear();
+            m_last_spectrum.timestamp = current_time();
+            memset(m_last_spectrum.values.data(), 0, m_last_spectrum.values.size() * sizeof(float));
+            memset(m_last_spectrum.colors.data(), 0, m_last_spectrum.colors.size() * sizeof(uint32_t));
         }
-        m_spectrums.clear();
 
-        m_spectrograph->clear();
-        m_last_spectrum.timestamp = current_time();
-        memset(m_last_spectrum.values.data(), 0, m_last_spectrum.values.size() * sizeof(float));
-        memset(m_last_spectrum.colors.data(), 0, m_last_spectrum.colors.size() * sizeof(uint32_t));
+        m_overlay.clear();
+//        cout << "AudioSpectrumHolder::clear()" << endl;
     }
 
-    m_overlay.clear();
-//    cout << "AudioSpectrumHolder::clear()" << endl;
-
-    for (Listener* listener : m_listeners){
-        listener->state_changed();
-    }
+    m_listeners.run_method_unique(&Listener::state_changed);
 }
 
 //void AudioSpectrumHolder::reset(){}
@@ -161,104 +159,102 @@ PA_FORCE_INLINE uint32_t jetColorMap(float v){
 void AudioSpectrumHolder::push_spectrum(size_t sample_rate, std::shared_ptr<const AlignedVector<float>> fft_output){
     WallClock timestamp = current_time();
 
-    std::lock_guard<std::mutex> lg(m_state_lock);
-
-    const AlignedVector<float>& output = *fft_output;
-
     {
-        const size_t stamp = (m_spectrums.size() > 0) ? m_spectrums.front().stamp + 1 : m_spectrum_stamp_start;
-        m_spectrums.emplace_front(stamp, sample_rate, fft_output);
-        if (m_spectrums.size() > m_spectrum_history_length){
-            m_spectrums.pop_back();
+        std::lock_guard<std::mutex> lg(m_state_lock);
+
+        const AlignedVector<float>& output = *fft_output;
+
+        {
+            const size_t stamp = (m_spectrums.size() > 0) ? m_spectrums.front().stamp + 1 : m_spectrum_stamp_start;
+            m_spectrums.emplace_front(stamp, sample_rate, fft_output);
+            if (m_spectrums.size() > m_spectrum_history_length){
+                m_spectrums.pop_back();
+            }
+
+            // std::cout << "Load FFT output , stamp " << spectrum->stamp << std::endl;
+            m_freqVisStamps[m_nextFFTWindowIndex] = stamp;
         }
 
-        // std::cout << "Load FFT output , stamp " << spectrum->stamp << std::endl;
-        m_freqVisStamps[m_nextFFTWindowIndex] = stamp;
-    }
+        //  Scale the by the square root of the transform length.
+        //  For random noise input, the frequency domain will have an average
+        //  magnitude of sqrt(transform length).
+        float scale = std::sqrt(0.25f / (float)output.size());
 
-    //  Scale the by the square root of the transform length.
-    //  For random noise input, the frequency domain will have an average
-    //  magnitude of sqrt(transform length).
-    float scale = std::sqrt(0.25f / (float)output.size());
+//        //  Divide by output size. Since samples can never be larger than 1.0, the
+//        //  frequency domain can never be larger than the FFT length. So we scale by
+//        //  the FFT length to guarantee that it also stays less than 1.0.
+//        float scale = 0.5f / (float)output.size();
 
-//    //  Divide by output size. Since samples can never be larger than 1.0, the
-//    //  frequency domain can never be larger than the FFT length. So we scale by
-//    //  the FFT length to guarantee that it also stays less than 1.0.
-//    float scale = 0.5f / (float)output.size();
+//        float skew_factor = 999.;
+//        float skew_scale = 1.f / (float)std::log1pf(skew_factor);
 
-//    float skew_factor = 999.;
-//    float skew_scale = 1.f / (float)std::log1pf(skew_factor);
+        // For one window, use how many blocks to show all frequencies:
+        float previous = 0;
+        m_last_spectrum.timestamp = timestamp;
+        for (size_t i = 0; i < m_freq_visualization_block_boundaries.size() - 1; i++){
+            float mag = 0.0f;
+            for(size_t j = m_freq_visualization_block_boundaries[i]; j < m_freq_visualization_block_boundaries[i+1]; j++){
+                mag += output[j];
+            }
 
-    // For one window, use how many blocks to show all frequencies:
-    float previous = 0;
-    m_last_spectrum.timestamp = timestamp;
-    for (size_t i = 0; i < m_freq_visualization_block_boundaries.size() - 1; i++){
-        float mag = 0.0f;
-        for(size_t j = m_freq_visualization_block_boundaries[i]; j < m_freq_visualization_block_boundaries[i+1]; j++){
-            mag += output[j];
+            size_t width = m_freq_visualization_block_boundaries[i+1] - m_freq_visualization_block_boundaries[i];
+
+            if (width == 0){
+                mag = previous;
+            }else{
+                mag /= width;
+                mag *= scale;
+
+                mag = std::sqrt(mag);
+//                mag = std::log1pf(mag * skew_factor) * skew_scale;
+//                mag = std::log1pf(std::sqrtf(mag)) * std::log1pf(1);
+//                mag = std::sqrt(2*mag - mag*mag);
+//                float m1 = 1 - mag;
+//                mag = std::sqrtf(1 - m1*m1);
+
+                // Clamp to [0.0, 1.0]
+                mag = std::min(mag, 1.0f);
+                mag = std::max(mag, 0.0f);
+            }
+
+            m_last_spectrum.values[i] = mag;
+            m_last_spectrum.colors[i] = jetColorMap(mag);
+            previous = mag;
         }
+//        cout << "AudioSpectrumHolder::push_spectrum" << endl;
+        m_spectrograph->push_spectrum(m_last_spectrum.colors.data());
+        m_nextFFTWindowIndex = (m_nextFFTWindowIndex+1) % m_num_freq_windows;
+//        std::cout << "Computed FFT! "  << magSum << std::endl;
 
-        size_t width = m_freq_visualization_block_boundaries[i+1] - m_freq_visualization_block_boundaries[i];
-
-        if (width == 0){
-            mag = previous;
-        }else{
-            mag /= width;
-            mag *= scale;
-
-            mag = std::sqrt(mag);
-//            mag = std::log1pf(mag * skew_factor) * skew_scale;
-//            mag = std::log1pf(std::sqrtf(mag)) * std::log1pf(1);
-//            mag = std::sqrt(2*mag - mag*mag);
-//            float m1 = 1 - mag;
-//            mag = std::sqrtf(1 - m1*m1);
-
-            // Clamp to [0.0, 1.0]
-            mag = std::min(mag, 1.0f);
-            mag = std::max(mag, 0.0f);
+        if (m_saveFreqToDisk){
+            for(size_t i = 0; i < m_num_freqs; i++){
+                m_freqStream << output[i] << " ";
+            }
+            m_freqStream << std::endl;
         }
-
-        m_last_spectrum.values[i] = mag;
-        m_last_spectrum.colors[i] = jetColorMap(mag);
-        previous = mag;
     }
-//    cout << "AudioSpectrumHolder::push_spectrum" << endl;
-    m_spectrograph->push_spectrum(m_last_spectrum.colors.data());
-    m_nextFFTWindowIndex = (m_nextFFTWindowIndex+1) % m_num_freq_windows;
-    // std::cout << "Computed FFT! "  << magSum << std::endl;
-
-    if (m_saveFreqToDisk){
-        for(size_t i = 0; i < m_num_freqs; i++){
-            m_freqStream << output[i] << " ";
-        }
-        m_freqStream << std::endl;
-    }
-
-    for (Listener* listener : m_listeners){
-        listener->state_changed();
-    }
+    m_listeners.run_method_unique(&Listener::state_changed);
 }
 void AudioSpectrumHolder::add_overlay(uint64_t starting_stamp, uint64_t end_stamp, Color color){
-    std::lock_guard<std::mutex> lg(m_state_lock);
+    {
+        std::lock_guard<std::mutex> lg(m_state_lock);
 
-    m_overlay.emplace_front(std::forward_as_tuple(starting_stamp, end_stamp, color));
+        m_overlay.emplace_front(std::forward_as_tuple(starting_stamp, end_stamp, color));
 
-    // Now try to remove old overlays that are no longer showed on the spectrogram view.
+        // Now try to remove old overlays that are no longer showed on the spectrogram view.
 
-    // get the timestamp of the oldest window in the display history.
-    uint64_t oldestStamp = m_freqVisStamps[m_nextFFTWindowIndex];
-    // SIZE_MAX means this slot is not yet assigned an FFT window
-    if (oldestStamp != SIZE_MAX){
-        // Note: in this file we never consider the case that stamp may overflow.
-        // It requires on the order of 1e10 years to overflow if we have about 25ms per stamp.
-        while(!m_overlay.empty() && std::get<1>(m_overlay.back()) <= oldestStamp){
-            m_overlay.pop_back();
+        // get the timestamp of the oldest window in the display history.
+        uint64_t oldestStamp = m_freqVisStamps[m_nextFFTWindowIndex];
+        // SIZE_MAX means this slot is not yet assigned an FFT window
+        if (oldestStamp != SIZE_MAX){
+            // Note: in this file we never consider the case that stamp may overflow.
+            // It requires on the order of 1e10 years to overflow if we have about 25ms per stamp.
+            while(!m_overlay.empty() && std::get<1>(m_overlay.back()) <= oldestStamp){
+                m_overlay.pop_back();
+            }
         }
     }
-
-    for (Listener* listener : m_listeners){
-        listener->state_changed();
-    }
+    m_listeners.run_method_unique(&Listener::state_changed);
 }
 
 std::vector<AudioSpectrum> AudioSpectrumHolder::spectrums_since(uint64_t starting_stamp){

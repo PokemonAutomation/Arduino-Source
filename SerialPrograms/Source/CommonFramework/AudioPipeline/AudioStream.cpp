@@ -141,11 +141,11 @@ void AudioFloatToStream::add_listener(StreamListener& listener){
     if (listener.object_size != m_frame_size){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Mismatching frame size.");
     }
-    m_listeners.insert(&listener);
+    m_listeners.add(listener);
 }
 void AudioFloatToStream::remove_listener(StreamListener& listener){
     auto scope_check = m_sanitizer.check_scope();
-    m_listeners.erase(&listener);
+    m_listeners.remove(listener);
 }
 
 AudioFloatToStream::AudioFloatToStream(AudioSampleFormat output_format, size_t samples_per_frame)
@@ -171,9 +171,10 @@ void AudioFloatToStream::on_samples(const float* data, size_t frames){
         return;
     }
     if (m_format == AudioSampleFormat::FLOAT32){
-        for (StreamListener* listener : m_listeners){
-            listener->on_objects(data, frames);
-        }
+        m_listeners.run_method_unique(
+            &StreamListener::on_objects,
+            data, frames
+        );
         return;
     }
 
@@ -195,9 +196,10 @@ void AudioFloatToStream::on_samples(const float* data, size_t frames){
         default:
             return;
         }
-        for (StreamListener* listener : m_listeners){
-            listener->on_objects(m_buffer.data(), block);
-        }
+        m_listeners.run_method_unique(
+            &StreamListener::on_objects,
+            m_buffer.data(), block
+        );
         data = (const float*)((const char*)data + block * m_frame_size);
         frames -= block;
     }

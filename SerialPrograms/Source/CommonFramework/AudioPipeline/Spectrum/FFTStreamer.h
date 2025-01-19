@@ -8,6 +8,7 @@
 #define PokemonAutomation_AudioPipeline_FFTStreamer_H
 
 #include <memory>
+#include "Common/Cpp/ListenerSet.h"
 #include "CommonFramework/AudioPipeline/AudioStream.h"
 
 namespace PokemonAutomation{
@@ -15,7 +16,7 @@ namespace PokemonAutomation{
 
 
 struct FFTListener{
-    virtual void on_fft(size_t sample_rate, std::shared_ptr<AlignedVector<float>> fft_output) = 0;
+    virtual void on_fft(size_t sample_rate, std::shared_ptr<const AlignedVector<float>> fft_output) = 0;
 };
 
 
@@ -52,7 +53,7 @@ private:
 
     AlignedVector<float> m_fft_input;
 
-    std::set<FFTListener*> m_listeners;
+    ListenerSet<FFTListener> m_listeners;
 };
 
 
