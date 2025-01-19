@@ -12,12 +12,12 @@
 #include "Common/Cpp/Concurrency/FireForgetDispatcher.h"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Qt/CollapsibleGroupBox.h"
+#include "CommonFramework/Globals.h"
 #include "CommonFramework/AudioPipeline/UI/AudioSelectorWidget.h"
 #include "CommonFramework/AudioPipeline/UI/AudioDisplayWidget.h"
 #include "CommonFramework/VideoPipeline/UI/CameraSelectorWidget.h"
 #include "CommonFramework/VideoPipeline/UI/VideoDisplayWidget.h"
-#include "CommonFramework/Globals.h"
-#include "Controllers/SerialPABotBase/SerialPABotBase_Widget.h"
+#include "Controllers/ControllerSelectorWidget.h"
 #include "NintendoSwitch_CommandRow.h"
 #include "NintendoSwitch_SwitchSystemWidget.h"
 
@@ -27,14 +27,12 @@ namespace NintendoSwitch{
 
 
 SwitchSystemWidget::~SwitchSystemWidget(){
-    m_serial_widget->stop();
-
     //  Delete all the UI elements first since they reference the states.
     delete m_audio_display;
     delete m_audio_widget;
     delete m_video_display;
     delete m_camera_widget;
-    delete m_serial_widget;
+    delete m_controller;
 }
 
 SwitchSystemWidget::SwitchSystemWidget(
@@ -59,8 +57,8 @@ SwitchSystemWidget::SwitchSystemWidget(
         group_layout->setAlignment(Qt::AlignTop);
         group_layout->setContentsMargins(0, 0, 0, 0);
 
-        m_serial_widget = new SerialPortWidget(*this, m_session.serial_session(), m_session.logger());
-        group_layout->addWidget(m_serial_widget);
+        m_controller = new ControllerSelectorWidget(*this, m_session.controller_session());
+        group_layout->addWidget(m_controller);
 
         m_audio_display = new AudioDisplayWidget(*this, m_session.logger(), m_session.audio_session());
         layout->addWidget(m_audio_display);
@@ -84,12 +82,12 @@ SwitchSystemWidget::SwitchSystemWidget(
         );
         group_layout->addWidget(m_camera_widget);
 
-        m_audio_widget = new AudioSelectorWidget(*widget, m_session.logger(), m_session.audio_session());
+        m_audio_widget = new AudioSelectorWidget(*widget, m_session.audio_session());
         group_layout->addWidget(m_audio_widget);
 
         m_command = new CommandRow(
             *widget,
-            m_serial_widget->botbase(),
+            m_session.controller_session(),
             m_session.overlay_session(),
             m_session.allow_commands_while_running()
         );
@@ -99,12 +97,12 @@ SwitchSystemWidget::SwitchSystemWidget(
     setFocusPolicy(Qt::StrongFocus);
 
 
-    connect(
-        m_serial_widget, &SerialPortWidget::signal_on_ready,
-        m_command, [this](bool ready){
-            m_command->update_ui();
-        }
-    );
+//    connect(
+//        m_serial_widget, &SerialPortWidget::signal_on_ready,
+//        m_command, [this](bool ready){
+//            m_command->update_ui();
+//        }
+//    );
     connect(
         m_command, &CommandRow::load_profile,
         m_command, [this](){
@@ -113,7 +111,10 @@ SwitchSystemWidget::SwitchSystemWidget(
                 return;
             }
 
-            SwitchSystemOption option(m_session.min_pabotbase(), m_session.allow_commands_while_running());
+            SwitchSystemOption option(
+                m_session.requirements(),
+                m_session.allow_commands_while_running()
+            );
 
             //  Deserialize into this local option instance.
             option.load_json(load_json_file(path));
@@ -129,8 +130,11 @@ SwitchSystemWidget::SwitchSystemWidget(
                 return;
             }
 
-            // Create a copy of option, to be able to serialize it later on
-            SwitchSystemOption option(m_session.min_pabotbase(), m_session.allow_commands_while_running());
+            //  Create a copy of option, to be able to serialize it later on
+            SwitchSystemOption option(
+                m_session.requirements(),
+                m_session.allow_commands_while_running()
+            );
 
             m_session.get(option);
 
@@ -165,21 +169,30 @@ SwitchSystemWidget::SwitchSystemWidget(
 
 
 void SwitchSystemWidget::update_ui(ProgramState state){
+#if 0
     if (!m_session.allow_commands_while_running()){
-        m_session.set_allow_user_commands(state == ProgramState::STOPPED);
+        m_session.set_allow_user_commands(
+            state == ProgramState::STOPPED
+                ? ""
+                : "<font color=\"orange\">Program is not ready.</font>"
+        );
     }
     switch (state){
     case ProgramState::NOT_READY:
-        m_serial_widget->set_options_enabled(false);
+        m_session.set_allow_user_commands("<font color=\"orange\">Program is not ready.</font>");
+//        m_serial_widget->set_options_enabled(false);
         break;
     case ProgramState::STOPPED:
-        m_serial_widget->set_options_enabled(true);
+        m_session.set_allow_user_commands(true);
+//        m_serial_widget->set_options_enabled(true);
         break;
     case ProgramState::RUNNING:
     case ProgramState::STOPPING:
-        m_serial_widget->set_options_enabled(false);
+        m_session.set_allow_user_commands(false);
+//        m_serial_widget->set_options_enabled(false);
         break;
     }
+#endif
     m_command->on_state_changed(state);
 }
 

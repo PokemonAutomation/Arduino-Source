@@ -59,18 +59,18 @@ FileWindowLogger::FileWindowLogger(const std::string& path)
     m_thread = std::thread(&FileWindowLogger::thread_loop, this);
 }
 void FileWindowLogger::operator+=(FileWindowLoggerWindow& widget){
-    auto scope_check = m_sanitizer.check_scope();
+//    auto scope_check = m_sanitizer.check_scope();
     std::lock_guard<std::mutex> lg(m_lock);
     m_windows.insert(&widget);
 }
 void FileWindowLogger::operator-=(FileWindowLoggerWindow& widget){
-    auto scope_check = m_sanitizer.check_scope();
+//    auto scope_check = m_sanitizer.check_scope();
     std::lock_guard<std::mutex> lg(m_lock);
     m_windows.erase(&widget);
 }
 
 void FileWindowLogger::log(const std::string& msg, Color color){
-    auto scope_check = m_sanitizer.check_scope();
+//    auto scope_check = m_sanitizer.check_scope();
     std::unique_lock<std::mutex> lg(m_lock);
     m_last_log_tracker += msg;
     m_cv.wait(lg, [this]{ return m_queue.size() < m_max_queue_size; });
@@ -78,7 +78,7 @@ void FileWindowLogger::log(const std::string& msg, Color color){
     m_cv.notify_all();
 }
 void FileWindowLogger::log(std::string&& msg, Color color){
-    auto scope_check = m_sanitizer.check_scope();
+//    auto scope_check = m_sanitizer.check_scope();
     std::unique_lock<std::mutex> lg(m_lock);
     m_last_log_tracker += msg;
     m_cv.wait(lg, [this]{ return m_queue.size() < m_max_queue_size; });
@@ -86,7 +86,7 @@ void FileWindowLogger::log(std::string&& msg, Color color){
     m_cv.notify_all();
 }
 std::vector<std::string> FileWindowLogger::get_last() const{
-    auto scope_check = m_sanitizer.check_scope();
+//    auto scope_check = m_sanitizer.check_scope();
     std::unique_lock<std::mutex> lg(m_lock);
     return m_last_log_tracker.snapshot();
 }
@@ -160,7 +160,7 @@ QString FileWindowLogger::to_window_str(const std::string& msg, Color color){
     return QString::fromStdString(str);
 }
 void FileWindowLogger::internal_log(const std::string& msg, Color color){
-    auto scope_check = m_sanitizer.check_scope();
+//    auto scope_check = m_sanitizer.check_scope();
     std::string line = normalize_newlines(msg);
     {
         if (!m_windows.empty()){
@@ -176,7 +176,7 @@ void FileWindowLogger::internal_log(const std::string& msg, Color color){
     }
 }
 void FileWindowLogger::thread_loop(){
-    auto scope_check = m_sanitizer.check_scope();
+//    auto scope_check = m_sanitizer.check_scope();
     std::unique_lock<std::mutex> lg(m_lock);
     while (true){
         m_cv.wait(lg, [&]{

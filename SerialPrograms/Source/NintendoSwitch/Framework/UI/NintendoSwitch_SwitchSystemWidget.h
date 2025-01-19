@@ -25,6 +25,7 @@
 namespace PokemonAutomation{
     class CollapsibleGroupBox;
     class AudioFeed;
+    class ControllerSelectorWidget;
     class CameraSelectorWidget;
     class VideoDisplayWidget;
     class AudioDisplayWidget;
@@ -67,7 +68,7 @@ private:
 
     CollapsibleGroupBox* m_group_box;
 
-    SerialPortWidget* m_serial_widget = nullptr;
+    ControllerSelectorWidget* m_controller = nullptr;
 
     VideoDisplayWidget* m_video_display = nullptr;
     AudioDisplayWidget* m_audio_display;

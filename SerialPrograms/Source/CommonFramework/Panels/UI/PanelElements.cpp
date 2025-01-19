@@ -55,8 +55,7 @@ CollapsibleGroupBox* make_panel_header(
     const std::string& display_name,
     const std::string& doc_link,
     const std::string& description,
-    FeedbackType feedback,
-    PABotBaseLevel serial_level
+    FeedbackType feedback
 ){
     CollapsibleGroupBox* header = make_panel_header(parent, display_name, doc_link, description);
     QLayout* layout = header->widget()->layout();
@@ -91,6 +90,7 @@ CollapsibleGroupBox* make_panel_header(
     text->setWordWrap(true);
     layout->addWidget(text);
 
+#if 0
     switch (serial_level){
     case PABotBaseLevel::NOT_PABOTBASE:
         break;
@@ -114,6 +114,7 @@ CollapsibleGroupBox* make_panel_header(
         break;
     }
     }
+#endif
     return header;
 }
 

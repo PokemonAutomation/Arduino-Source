@@ -7,6 +7,7 @@
 #include "CommonFramework/VideoPipeline/Stats/CpuUtilizationStats.h"
 #include "CommonFramework/VideoPipeline/Stats/ThreadUtilizationStats.h"
 #include "CommonFramework/VideoPipeline/Backends/CameraImplementations.h"
+#include "Controllers/SerialPABotBase/SerialPABotBase_Connection.h"
 #include "Integrations/ProgramTracker.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch_SwitchSystemOption.h"
@@ -45,7 +46,8 @@ SwitchSystemSession::SwitchSystemSession(
     : m_console_number(console_number)
     , m_logger(global_logger_raw(), "Console " + std::to_string(console_number))
     , m_option(option)
-    , m_serial(m_logger, option.m_serial)
+    , m_controller(m_logger, option.m_controller, option.m_requirements)
+//    , m_serial(m_logger, option.m_serial)
     , m_camera(get_camera_backend().make_camera(m_logger, DEFAULT_RESOLUTION))
     , m_audio(m_logger, option.m_audio)
     , m_overlay(option.m_overlay)
@@ -67,22 +69,27 @@ SwitchSystemSession::SwitchSystemSession(
     m_camera->add_frame_listener(m_history);
 }
 
+
+BotBaseHandle& SwitchSystemSession::sender(){
+    //  TODO: Don't do this.
+    return static_cast<SerialPABotBase::SerialConnection&>(m_controller.controller()).handle();
+}
+
 void SwitchSystemSession::get(SwitchSystemOption& option){
-    option.m_serial.set_port(m_serial.get());
+    m_controller.get(option.m_controller);
     m_camera->get(option.m_camera);
     m_audio.get(option.m_audio);
     m_overlay.get(option.m_overlay);
 }
 void SwitchSystemSession::set(const SwitchSystemOption& option){
-    m_serial.set(option.m_serial.port());
-//    m_serial.botbase().reset(option.m_serial.port());
+    m_controller.set(option.m_controller);
     m_camera->set(option.m_camera);
     m_audio.set(option.m_audio);
     m_overlay.set(option.m_overlay);
 }
 
-void SwitchSystemSession::set_allow_user_commands(bool allow){
-    m_serial.botbase().set_allow_user_commands(allow);
+void SwitchSystemSession::set_allow_user_commands(std::string disallow_reason){
+    m_controller.set_user_input_blocked(std::move(disallow_reason));
 }
 void SwitchSystemSession::save_history(const std::string& filename){
     m_history.save(filename);

@@ -36,6 +36,18 @@ inline PABotBaseLevel program_id_to_botbase_level(uint8_t id){
     return PABotBaseLevel::NOT_PABOTBASE;
 }
 
+inline const char* program_id_to_string(uint8_t id){
+    static const char* STRINGS[] = {
+        "PABotBase-Protocol",
+        "PABotBase-12KB",
+        "PABotBase-31KB",
+    };
+    if (id >= sizeof(STRINGS) / sizeof(const char*)){
+        return "";
+    }
+    return STRINGS[id];
+}
+
 
 
 }

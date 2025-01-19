@@ -13,6 +13,7 @@
 #include <Qt>
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/Globals.h"
+#include "Controllers/ControllerSession.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase_Handle.h"
 #include "NintendoSwitch_VirtualControllerMapping.h"
 
@@ -51,7 +52,7 @@ private:
 class VirtualController{
 public:
     VirtualController(
-        BotBaseHandle& botbase,
+        ControllerSession& session,
         bool allow_commands_while_running
     );
     ~VirtualController();
@@ -70,11 +71,15 @@ public:
     void on_state_changed(ProgramState state);
 
 private:
+    bool try_stop_commands();
+    bool try_next_interrupt();
+    bool try_send_request(const BotBaseRequest& request);
+
     void thread_loop();
 
 private:
     // Logger& m_logger;
-    BotBaseHandle& m_botbase;
+    ControllerSession& m_session;
     const bool m_allow_commands_while_running;
 
     //  Keyboard State

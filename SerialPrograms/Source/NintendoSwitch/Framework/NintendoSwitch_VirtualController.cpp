@@ -89,11 +89,11 @@ WallClock KeyboardDebouncer::get_current_state(VirtualControllerState& state){
 
 
 VirtualController::VirtualController(
-    BotBaseHandle& botbase,
+    ControllerSession& session,
     bool allow_commands_while_running
 )
     // : m_logger(logger)
-    : m_botbase(botbase)
+    : m_session(session)
     , m_allow_commands_while_running(allow_commands_while_running)
     , m_last_known_state(ProgramState::STOPPED)
     , m_stop(false)
@@ -163,6 +163,16 @@ bool VirtualController::on_key_release(Qt::Key key){
 }
 
 
+bool VirtualController::try_stop_commands(){
+    return m_session.stop_pending_commands().empty();
+}
+bool VirtualController::try_next_interrupt(){
+    return m_session.set_next_command_replace().empty();
+}
+bool VirtualController::try_send_request(const BotBaseRequest& request){
+    return m_session.send_request(request).empty();
+}
+
 
 void VirtualController::thread_loop(){
     GlobalSettings::instance().PERFORMANCE->REALTIME_THREAD_PRIORITY.set_on_this_thread();
@@ -210,7 +220,7 @@ void VirtualController::thread_loop(){
 
                 //  If state is neutral, just issue a stop.
                 if (neutral){
-                    if (m_botbase.try_stop_commands() == nullptr){
+                    if (try_stop_commands()){
                         last = VirtualControllerState();
                         last_neutral = true;
                         last_press = now;
@@ -222,7 +232,7 @@ void VirtualController::thread_loop(){
 
                 //  If the new state is different, set next interrupt so the new
                 //  new command can replace the current one without gaps.
-                if (!last_neutral && current != last && m_botbase.try_next_interrupt() != nullptr){
+                if (!last_neutral && current != last && !try_next_interrupt()){
                     next_wake = now + std::chrono::milliseconds(PABB_RETRANSMIT_DELAY_MILLIS);
                     break;
                 }
@@ -237,7 +247,7 @@ void VirtualController::thread_loop(){
                     state.right_y,
                     255
                 );
-                if (m_botbase.try_send_request(request) != nullptr){
+                if (!try_send_request(request)){
                     next_wake = now + std::chrono::milliseconds(PABB_RETRANSMIT_DELAY_MILLIS);
                     break;
                 }

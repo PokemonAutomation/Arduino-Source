@@ -305,10 +305,13 @@ SOURCES += \
     Source/ComputerPrograms/Framework/ComputerProgramOption.cpp \
     Source/ComputerPrograms/Framework/ComputerProgramSession.cpp \
     Source/ComputerPrograms/Framework/ComputerProgramWidget.cpp \
+    Source/Controllers/ControllerConnection.cpp \
+    Source/Controllers/ControllerSelectorWidget.cpp \
+    Source/Controllers/ControllerSession.cpp \
+    Source/Controllers/Controllers.cpp \
+    Source/Controllers/SerialPABotBase/SerialPABotBase_Connection.cpp \
+    Source/Controllers/SerialPABotBase/SerialPABotBase_Descriptor.cpp \
     Source/Controllers/SerialPABotBase/SerialPABotBase_Handle.cpp \
-    Source/Controllers/SerialPABotBase/SerialPABotBase_Option.cpp \
-    Source/Controllers/SerialPABotBase/SerialPABotBase_Session.cpp \
-    Source/Controllers/SerialPABotBase/SerialPABotBase_Widget.cpp \
     Source/Integrations/DiscordIntegrationSettings.cpp \
     Source/Integrations/DiscordIntegrationTable.cpp \
     Source/Integrations/DiscordSettingsOption.cpp \
@@ -1147,6 +1150,7 @@ HEADERS += \
     ../Common/Cpp/Json/JsonTools.h \
     ../Common/Cpp/Json/JsonValue.h \
     ../Common/Cpp/LifetimeSanitizer.h \
+    ../Common/Cpp/ListenerSet.h \
     ../Common/Cpp/Options/BatchOption.h \
     ../Common/Cpp/Options/BooleanCheckBoxOption.h \
     ../Common/Cpp/Options/ButtonOption.h \
@@ -1415,11 +1419,15 @@ HEADERS += \
     Source/ComputerPrograms/Framework/ComputerProgramOption.h \
     Source/ComputerPrograms/Framework/ComputerProgramSession.h \
     Source/ComputerPrograms/Framework/ComputerProgramWidget.h \
+    Source/Controllers/ControllerCapabilities.h \
+    Source/Controllers/ControllerConnection.h \
+    Source/Controllers/ControllerSelectorWidget.h \
+    Source/Controllers/ControllerSession.h \
+    Source/Controllers/Controllers.h \
+    Source/Controllers/SerialPABotBase/SerialPABotBase_Connection.h \
+    Source/Controllers/SerialPABotBase/SerialPABotBase_Descriptor.h \
     Source/Controllers/SerialPABotBase/SerialPABotBase_Globals.h \
     Source/Controllers/SerialPABotBase/SerialPABotBase_Handle.h \
-    Source/Controllers/SerialPABotBase/SerialPABotBase_Option.h \
-    Source/Controllers/SerialPABotBase/SerialPABotBase_Session.h \
-    Source/Controllers/SerialPABotBase/SerialPABotBase_Widget.h \
     Source/Integrations/DiscordIntegrationSettings.h \
     Source/Integrations/DiscordIntegrationTable.h \
     Source/Integrations/DiscordSettingsOption.h \

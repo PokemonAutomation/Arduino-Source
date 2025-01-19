@@ -15,50 +15,43 @@ namespace NintendoSwitch{
 
     // constexpr Color COLOR_GREEN2(0xff00aa00);
 
-Color pick_color(FeedbackType feedback, PABotBaseLevel size){
-    switch (size){
-    case PABotBaseLevel::NOT_PABOTBASE:
-        return Color();
-    case PABotBaseLevel::PABOTBASE_12KB:
-        if (feedback == FeedbackType::REQUIRED){
-            return COLOR_DARKGREEN;
-        }else if (feedback == FeedbackType::VIDEO_AUDIO){
-            return COLOR_GREEN2;
-        }else{
-            return COLOR_BLUE;
-        }
-    case PABotBaseLevel::PABOTBASE_31KB:
-        return (feedback == FeedbackType::REQUIRED || feedback == FeedbackType::VIDEO_AUDIO) ? COLOR_PURPLE : COLOR_RED;
+Color pick_color(FeedbackType feedback){
+    switch (feedback){
+    case FeedbackType::NONE:
+        return COLOR_BLUE;
+    case FeedbackType::OPTIONAL_:
+        return COLOR_PURPLE;
+    case FeedbackType::REQUIRED:
+        return COLOR_DARKGREEN;
+    case FeedbackType::VIDEO_AUDIO:
+        return COLOR_RED;
     }
     return Color();
 }
 
 
 
-const std::string SwitchSystemOption::JSON_SERIAL  = "Serial";
+const std::string SwitchSystemOption::JSON_CONTROLLER  = "Controller";
 const std::string SwitchSystemOption::JSON_CAMERA  = "Camera";
 const std::string SwitchSystemOption::JSON_AUDIO   = "Audio";
 const std::string SwitchSystemOption::JSON_OVERLAY = "Overlay";
 
 
 SwitchSystemOption::SwitchSystemOption(
-    PABotBaseLevel min_pabotbase,
+    const ControllerRequirements& requirements,
     bool allow_commands_while_running
 )
-    : m_allow_commands_while_running(allow_commands_while_running)
-    , m_serial(min_pabotbase)
+    : m_requirements(requirements)
+    , m_allow_commands_while_running(allow_commands_while_running)
     , m_camera(DEFAULT_RESOLUTION)
 //    , m_audio()
 {}
 SwitchSystemOption::SwitchSystemOption(
-    PABotBaseLevel min_pabotbase,
+    const ControllerRequirements& requirements,
     bool allow_commands_while_running,
     const JsonValue& json
 )
-    : SwitchSystemOption(
-          min_pabotbase,
-          allow_commands_while_running
-     )
+    : SwitchSystemOption(requirements, allow_commands_while_running)
 {
     load_json(json);
 }
@@ -69,9 +62,9 @@ void SwitchSystemOption::load_json(const JsonValue& json){
     }
 //    json_get_bool(m_settings_visible, obj, "SettingsVisible");
     const JsonValue* value;
-    value = obj->get_value(JSON_SERIAL);
+    value = obj->get_value(JSON_CONTROLLER);
     if (value){
-        m_serial.load_json(*value);
+        m_controller.load_json(*value);
     }
     value = obj->get_value(JSON_CAMERA);
     if (value){
@@ -89,7 +82,7 @@ void SwitchSystemOption::load_json(const JsonValue& json){
 JsonValue SwitchSystemOption::to_json() const{
     JsonObject root;
 //    root.insert("SettingsVisible", m_settings_visible);
-    root[JSON_SERIAL] = m_serial.to_json();
+    root[JSON_CONTROLLER] = m_controller.to_json();
     root[JSON_CAMERA] = m_camera.to_json();
     root[JSON_AUDIO] = m_audio.to_json();
     root[JSON_OVERLAY] = m_overlay.to_json();

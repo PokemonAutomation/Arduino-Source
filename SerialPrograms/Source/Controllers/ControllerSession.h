@@ -1,0 +1,100 @@
+/*  Controller Session
+ *
+ *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *
+ */
+
+#ifndef PokemonAutomation_Controllers_ControllerSession_H
+#define PokemonAutomation_Controllers_ControllerSession_H
+
+#include <mutex>
+#include "Common/Cpp/ListenerSet.h"
+#include "Controllers.h"
+#include "ControllerConnection.h"
+
+namespace PokemonAutomation{
+
+
+
+class ControllerSession{
+public:
+    struct Listener : ControllerConnection::StatusListener{
+        virtual void ready_changed(bool ready){}
+        virtual void controller_changed(const std::shared_ptr<const ControllerDescriptor>& descriptor){}
+        virtual void status_text_changed(const std::string& text){}
+        virtual void options_locked(bool locked){}
+    };
+
+    void add_listener(Listener& listener);
+    void remove_listener(Listener& listener);
+
+
+public:
+    ~ControllerSession();
+    ControllerSession(
+        Logger& logger,
+        ControllerOption& option,
+        const ControllerRequirements& requirements
+    );
+
+    void get(ControllerOption& option);
+    void set(const ControllerOption& option);
+
+    bool ready() const;
+    std::shared_ptr<const ControllerDescriptor> descriptor() const;
+    std::string status_text() const;
+
+    const ControllerOption& option() const{
+        return m_option;
+    }
+    ControllerConnection& controller() const{
+        return *m_connection;
+    }
+
+
+public:
+    //  Empty String: User input is allowed.
+    //  Non-empty String: User input is blocked. The string is the reason.
+    std::string user_input_blocked() const;
+    void set_user_input_blocked(std::string disallow_reason);
+
+    bool options_locked() const;
+    void set_options_locked(bool locked);
+
+public:
+    bool set_device(const std::shared_ptr<const ControllerDescriptor>& device);
+
+public:
+    //  Returns empty string on success. Otherwise returns error message.
+    std::string reset();
+    std::string stop_pending_commands();
+    std::string set_next_command_replace();
+    std::string send_request(const BotBaseRequest& request);    //  REMOVE
+
+
+private:
+    void signal_ready_changed(bool ready);
+    void signal_controller_changed(const std::shared_ptr<const ControllerDescriptor>& descriptor);
+    void signal_status_text_changed(const std::string& text);
+    void signal_options_locked(bool locked);
+
+
+private:
+    Logger& m_logger;
+    const ControllerRequirements& m_requirements;
+    ControllerOption& m_option;
+
+    mutable std::mutex m_state_lock;
+    bool m_options_locked;
+    std::string m_user_input_disallow_reason;
+    std::shared_ptr<const ControllerDescriptor> m_descriptor;
+    std::unique_ptr<ControllerConnection> m_connection;
+
+    ListenerSet<Listener> m_listeners;
+};
+
+
+
+
+}
+#endif

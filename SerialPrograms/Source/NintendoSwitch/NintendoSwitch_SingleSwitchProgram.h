@@ -12,6 +12,7 @@
 #include "CommonFramework/Notifications/EventNotificationOption.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Panels/ProgramDescriptor.h"
+#include "Controllers/ControllerCapabilities.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase_Globals.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
@@ -49,7 +50,7 @@ private:
 
 class SingleSwitchProgramDescriptor : public ProgramDescriptor{
 public:
-    SingleSwitchProgramDescriptor(
+    SingleSwitchProgramDescriptor(  //  Deprecated
         std::string identifier,
         std::string category, std::string display_name,
         std::string doc_link,
@@ -58,9 +59,18 @@ public:
         AllowCommandsWhenRunning allow_commands_while_running,
         PABotBaseLevel min_pabotbase_level
     );
+    SingleSwitchProgramDescriptor(
+        std::string identifier,
+        std::string category, std::string display_name,
+        std::string doc_link,
+        std::string description,
+        FeedbackType feedback,
+        AllowCommandsWhenRunning allow_commands_while_running,
+        ControllerRequirements requirements
+    );
 
     FeedbackType feedback() const{ return m_feedback; }
-    PABotBaseLevel min_pabotbase_level() const{ return m_min_pabotbase_level; }
+    const ControllerRequirements& requirements() const{ return m_requirements; }
     bool allow_commands_while_running() const{ return m_allow_commands_while_running; }
 
     virtual std::unique_ptr<PanelInstance> make_panel() const override;
@@ -68,7 +78,7 @@ public:
 
 private:
     const FeedbackType m_feedback;
-    const PABotBaseLevel m_min_pabotbase_level;
+    const ControllerRequirements m_requirements;
     const bool m_allow_commands_while_running;
 };
 

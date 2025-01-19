@@ -5,6 +5,7 @@
  */
 
 #include "Common/Cpp/Json/JsonValue.h"
+#include "Controllers/SerialPABotBase/SerialPABotBase_Descriptor.h"
 #include "NintendoSwitch_SingleSwitchProgram.h"
 #include "Framework/NintendoSwitch_SingleSwitchProgramOption.h"
 
@@ -23,14 +24,37 @@ SingleSwitchProgramDescriptor::SingleSwitchProgramDescriptor(
     PABotBaseLevel min_pabotbase_level
 )
     : ProgramDescriptor(
-        pick_color(feedback, min_pabotbase_level),
+        pick_color(feedback),
         std::move(identifier),
         std::move(category), std::move(display_name),
         std::move(doc_link),
         std::move(description)
     )
     , m_feedback(feedback)
-    , m_min_pabotbase_level(min_pabotbase_level)
+    , m_requirements({{
+        SerialPABotBase::SerialDescriptor::TYPENAME,
+        {program_id_to_string((uint8_t)min_pabotbase_level)}
+    }})
+    , m_allow_commands_while_running(allow_commands_while_running == AllowCommandsWhenRunning::ENABLE_COMMANDS)
+{}
+SingleSwitchProgramDescriptor::SingleSwitchProgramDescriptor(
+    std::string identifier,
+    std::string category, std::string display_name,
+    std::string doc_link,
+    std::string description,
+    FeedbackType feedback,
+    AllowCommandsWhenRunning allow_commands_while_running,
+    ControllerRequirements requirements
+)
+    : ProgramDescriptor(
+        pick_color(feedback),
+        std::move(identifier),
+        std::move(category), std::move(display_name),
+        std::move(doc_link),
+        std::move(description)
+    )
+    , m_feedback(feedback)
+    , m_requirements(std::move(requirements))
     , m_allow_commands_while_running(allow_commands_while_running == AllowCommandsWhenRunning::ENABLE_COMMANDS)
 {}
 std::unique_ptr<PanelInstance> SingleSwitchProgramDescriptor::make_panel() const{

@@ -21,6 +21,7 @@
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
 #include "SerialPABotBase_Handle.h"
+#include "SerialPABotBase_Descriptor.h"
 
 //#include <iostream>
 //using std::cout;
@@ -30,19 +31,17 @@ namespace PokemonAutomation{
 
 
 
-void process_device_protocol(
-    uint32_t& version,
-    uint8_t& program_id,
-    PABotBaseLevel& level,
-    Logger& logger, PABotBase& botbase, PABotBaseLevel minimum_pabotbase
-){
+void BotBaseHandle::process_device_protocol(uint32_t& version, uint8_t& program_id){
     static const std::set<uint32_t> COMPATIBLE_PROTOCOLS{
         20210526,   //  Old version
         20231219,   //  Fewer RPCs, has queue size.
     };
 
+    Logger& logger = m_logger;
+
+
     logger.log("Checking device protocol compatibility...");
-    uint32_t protocol = Microcontroller::protocol_version(botbase);
+    uint32_t protocol = Microcontroller::protocol_version(*m_botbase);
     logger.log("Checking device protocol compatibility... Protocol = " + std::to_string(protocol));
     if (!COMPATIBLE_PROTOCOLS.contains(protocol / 100)){
         throw SerialProtocolException(
@@ -54,10 +53,16 @@ void process_device_protocol(
 
     //  PABotBase Level
     logger.log("Checking Program ID...");
-    program_id = Microcontroller::program_id(botbase);
+    program_id = Microcontroller::program_id(*m_botbase);
     logger.log("Checking Program ID... Program ID = " + std::to_string(program_id));
-    level = program_id_to_botbase_level(program_id);
-    if (level < minimum_pabotbase){
+    PABotBaseLevel level = program_id_to_botbase_level(program_id);
+    for (uint8_t c = 0; c <= (uint8_t)level; c++){
+        m_capabilities.insert(program_id_to_string(c));
+    }
+
+//    cout << "m_requirements.size() = " << m_requirements.map().size() << endl;
+
+    if (!m_requirements.is_compatible_with(SerialPABotBase::SerialDescriptor::TYPENAME, m_capabilities)){
         throw SerialProtocolException(
             logger, PA_CURRENT_FUNCTION,
             "PABotBase level not met. (" + program_name(program_id) + ")"
@@ -66,7 +71,7 @@ void process_device_protocol(
 
     //  Program Version
     logger.log("Checking Firmware Version...");
-    version = Microcontroller::program_version(botbase);
+    version = Microcontroller::program_version(*m_botbase);
     logger.log("Checking Firmware Version... Version = " + std::to_string(version));
 
     //  Queue Size
@@ -74,9 +79,9 @@ void process_device_protocol(
         (protocol / 100 == 20231219)
     ){
         logger.log("Device supports queue size. Requesting queue size...", COLOR_BLUE);
-        uint8_t queue_limit = Microcontroller::device_queue_size(botbase);
+        uint8_t queue_limit = Microcontroller::device_queue_size(*m_botbase);
         logger.log("Setting queue size to: " + std::to_string(queue_limit), COLOR_BLUE);
-        botbase.set_queue_limit(queue_limit);
+        m_botbase->set_queue_limit(queue_limit);
     }else{
         logger.log("Queue size not supported. Defaulting to size 4.", COLOR_RED);
     }
@@ -89,12 +94,11 @@ void process_device_protocol(
 BotBaseHandle::BotBaseHandle(
     SerialLogger& logger,
     const QSerialPortInfo* port,
-    PABotBaseLevel minimum_pabotbase
+    const ControllerRequirements& requirements
 )
     : m_logger(logger)
     , m_port(port)
-    , m_minimum_pabotbase(minimum_pabotbase)
-    , m_current_pabotbase(PABotBaseLevel::NOT_PABOTBASE)
+    , m_requirements(requirements)
     , m_state(State::NOT_CONNECTED)
     , m_allow_user_commands(true)
     , m_label("<font color=\"red\">Not Connected</font>")
@@ -105,7 +109,7 @@ BotBaseHandle::~BotBaseHandle(){
     stop();
     m_botbase.reset();
     m_state.store(State::NOT_CONNECTED, std::memory_order_release);
-    emit on_not_connected("");
+    emit on_not_connected("<font color=\"orange\">Disconnecting...</font>");
 }
 
 BotBaseController* BotBaseHandle::botbase(){
@@ -120,8 +124,7 @@ BotBaseHandle::State BotBaseHandle::state() const{
     return m_state.load(std::memory_order_acquire);
 }
 bool BotBaseHandle::accepting_commands() const{
-    return state() == State::READY &&
-        m_current_pabotbase.load(std::memory_order_acquire) > PABotBaseLevel::NOT_PABOTBASE;
+    return state() == State::READY;
 }
 std::string BotBaseHandle::label() const{
     std::lock_guard<std::mutex> lg(m_lock);
@@ -136,9 +139,6 @@ const char* BotBaseHandle::check_accepting_commands(){
     //  Must call under the lock.
     if (state() != State::READY){
         return "Console is not accepting commands right now.";
-    }
-    if (m_current_pabotbase.load(std::memory_order_acquire) <= PABotBaseLevel::NOT_PABOTBASE){
-        return "Device is not running PABotBase.";
     }
     if (!m_allow_user_commands.load(std::memory_order_acquire)){
         return "Handle is not accepting commands right now.";
@@ -203,6 +203,8 @@ const char* BotBaseHandle::try_next_interrupt(){
 }
 
 void BotBaseHandle::stop_unprotected(){
+    m_capabilities.clear();
+
     {
         State state = m_state.load(std::memory_order_acquire);
         if (state == State::NOT_CONNECTED){
@@ -229,7 +231,7 @@ void BotBaseHandle::stop_unprotected(){
 
     m_state.store(State::NOT_CONNECTED, std::memory_order_release);
     m_label = "<font color=\"red\">Not Connected</font>";
-    emit on_not_connected("");
+    emit on_not_connected(m_label);
 }
 void BotBaseHandle::reset_unprotected(const QSerialPortInfo* port){
     using namespace PokemonAutomation;
@@ -262,7 +264,7 @@ void BotBaseHandle::reset_unprotected(const QSerialPortInfo* port){
     try{
         std::unique_ptr<SerialConnection> connection(new SerialConnection(name, PABB_BAUD_RATE));
         m_botbase.reset(new PABotBase(m_logger, std::move(connection), nullptr));
-        m_current_pabotbase.store(PABotBaseLevel::NOT_PABOTBASE, std::memory_order_release);
+        m_capabilities.insert(program_id_to_string(0));
     }catch (const ConnectionException& e){
         error = e.message();
     }catch (const SerialProtocolException& e){
@@ -326,14 +328,9 @@ void BotBaseHandle::thread_body(){
     {
         uint32_t version = 0;
         uint8_t program_id = 0;
-        PABotBaseLevel level;
         std::string error;
         try{
-            process_device_protocol(
-                version, program_id, level,
-                m_logger, *m_botbase, m_minimum_pabotbase
-            );
-            m_current_pabotbase.store(level, std::memory_order_release);
+            process_device_protocol(version, program_id);
         }catch (InvalidConnectionStateException&){
             return;
         }catch (SerialProtocolException& e){
@@ -345,6 +342,7 @@ void BotBaseHandle::thread_body(){
             m_state.store(State::READY, std::memory_order_release);
             std::string text = "Program: " + program_name(program_id) + " (" + std::to_string(version) + ")";
             m_label = html_color_text(text, theme_friendly_darkblue());
+//            cout << "on_ready(): " << m_label << endl;
             emit on_ready(m_label);
         }else{
             m_state.store(State::STOPPED, std::memory_order_release);

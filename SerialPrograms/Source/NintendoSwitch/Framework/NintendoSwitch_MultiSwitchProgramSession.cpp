@@ -14,6 +14,7 @@
 #include "CommonFramework/Options/Environment/SleepSuppressOption.h"
 #include "CommonFramework/Options/Environment/PerformanceOptions.h"
 #include "CommonTools/StartupChecks/BlackBorderCheck.h"
+#include "Controllers/SerialPABotBase/SerialPABotBase_Handle.h"
 #include "NintendoSwitch_MultiSwitchProgramOption.h"
 #include "NintendoSwitch_MultiSwitchProgramSession.h"
 
@@ -85,7 +86,7 @@ void MultiSwitchProgramSession::run_program_instance(MultiSwitchProgramEnvironme
 
     size_t consoles = m_system.count();
     for (size_t c = 0; c < consoles; c++){
-        if (!m_system[c].serial_session().is_ready()){
+        if (!m_system[c].controller_session().ready()){
             throw UserSetupError(m_system[c].logger(), "Cannot Start: Serial connection not ready.");
         }
         start_program_video_check(env.consoles[c], m_option.descriptor().feedback());
@@ -107,10 +108,10 @@ void MultiSwitchProgramSession::run_program_instance(MultiSwitchProgramEnvironme
 void MultiSwitchProgramSession::internal_stop_program(){
     auto ScopeCheck = m_sanitizer.check_scope();
     WriteSpinLock lg(m_lock);
-    size_t consoles = m_system.count();
-    for (size_t c = 0; c < consoles; c++){
-        m_system[c].serial_session().stop();
-    }
+//    size_t consoles = m_system.count();
+//    for (size_t c = 0; c < consoles; c++){
+//        m_system[c].serial_session().stop();
+//    }
     CancellableScope* scope = m_scope.load(std::memory_order_acquire);
     if (scope != nullptr){
         scope->cancel(std::make_exception_ptr(ProgramCancelledException()));
@@ -121,9 +122,9 @@ void MultiSwitchProgramSession::internal_stop_program(){
         pause();
     }
 
-    for (size_t c = 0; c < consoles; c++){
-        m_system[c].serial_session().reset();
-    }
+//    for (size_t c = 0; c < consoles; c++){
+//        m_system[c].serial_session().reset();
+//    }
 }
 void MultiSwitchProgramSession::internal_run_program(){
     auto ScopeCheck = m_sanitizer.check_scope();
@@ -146,10 +147,15 @@ void MultiSwitchProgramSession::internal_run_program(){
     FixedLimitVector<ConsoleHandle> handles(consoles);
     for (size_t c = 0; c < consoles; c++){
         SwitchSystemSession& session = m_system[c];
+        if (!session.controller_session().ready()){
+            report_error("Cannot Start: The controller is not ready.");
+            return;
+        }
+        BotBaseController* botbase = session.sender().botbase();
         handles.emplace_back(
             c,
             session.logger(),
-            *session.sender().botbase(),
+            *botbase,
             session.video(),
             session.overlay(),
             session.audio(),

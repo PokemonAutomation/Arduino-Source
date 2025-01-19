@@ -15,8 +15,8 @@
 #include <QFile>
 #include <QTextEdit>
 #include <QMainWindow>
-#include "Common/Cpp/LifetimeSanitizer.h"
-#include "Logger.h"
+#include "Common/Cpp/AbstractLogger.h"
+//#include "Common/Cpp/LifetimeSanitizer.h"
 
 namespace PokemonAutomation{
 
@@ -68,7 +68,7 @@ private:
     std::set<FileWindowLoggerWindow*> m_windows;
     std::thread m_thread;
 
-    LifetimeSanitizer m_sanitizer;
+//    LifetimeSanitizer m_sanitizer;
 };
 
 

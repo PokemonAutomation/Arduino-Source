@@ -25,7 +25,7 @@
 #include "CommonFramework/VideoPipeline/CameraSession.h"
 #include "CommonFramework/VideoPipeline/VideoOverlaySession.h"
 #include "CommonFramework/Recording/StreamHistorySession.h"
-#include "Controllers/SerialPABotBase/SerialPABotBase_Session.h"
+#include "Controllers/ControllerSession.h"
 #include "Integrations/ProgramTrackerInterfaces.h"
 #include "NintendoSwitch_SwitchSystemOption.h"
 
@@ -49,12 +49,12 @@ public:
     );
 
 public:
-    PABotBaseLevel min_pabotbase() const{ return m_serial.min_pabotbase(); }
     size_t console_number() const{ return m_console_number; }
+    const ControllerRequirements& requirements() const{ return m_option.m_requirements; }
     bool allow_commands_while_running() const{ return m_option.m_allow_commands_while_running; }
 
     Logger& logger(){ return m_logger; }
-    virtual BotBaseHandle& sender() override{ return m_serial.botbase(); }
+    virtual BotBaseHandle& sender() override;
     virtual VideoFeed& video() override{ return *m_camera; }
     virtual AudioFeed& audio() override{ return m_audio; }
     VideoOverlay& overlay(){ return m_overlay; }
@@ -64,13 +64,13 @@ public:
     void get(SwitchSystemOption& option);
     void set(const SwitchSystemOption& option);
 
-    SerialPortSession& serial_session(){ return m_serial; }
+    ControllerSession& controller_session(){ return m_controller; }
     CameraSession& camera_session(){ return *m_camera; }
     AudioSession& audio_session(){ return m_audio; }
     VideoOverlaySession& overlay_session(){ return m_overlay; }
 
 public:
-    void set_allow_user_commands(bool allow);
+    void set_allow_user_commands(std::string disallow_reason);
     void save_history(const std::string& filename);
 
 private:
@@ -83,7 +83,7 @@ private:
     TaggedLogger m_logger;
     SwitchSystemOption& m_option;
 
-    SerialPortSession m_serial;
+    ControllerSession m_controller;
     std::unique_ptr<CameraSession> m_camera;
     AudioSession m_audio;
     VideoOverlaySession m_overlay;

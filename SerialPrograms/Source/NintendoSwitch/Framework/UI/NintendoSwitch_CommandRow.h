@@ -19,14 +19,19 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-class CommandRow : public QWidget, public VirtualController, public VideoOverlaySession::Listener{
+class CommandRow :
+    public QWidget,
+    public VirtualController,
+    public VideoOverlaySession::Listener,
+    public ControllerSession::Listener
+{
     Q_OBJECT
 
 public:
     ~CommandRow();
     CommandRow(
         QWidget& parent,
-        BotBaseHandle& botbase,
+        ControllerSession& controller,
         VideoOverlaySession& session,
         bool allow_commands_while_running
     );
@@ -51,9 +56,10 @@ private:
     virtual void enabled_text (bool enabled) override;
     virtual void enabled_log  (bool enabled) override;
     virtual void enabled_stats(bool enabled) override;
+    virtual void ready_changed(bool ready) override;
 
 private:
-    BotBaseHandle& m_botbase;
+    ControllerSession& m_controller;
     VideoOverlaySession& m_session;
     bool m_allow_commands_while_running;
     QComboBox* m_command_box;

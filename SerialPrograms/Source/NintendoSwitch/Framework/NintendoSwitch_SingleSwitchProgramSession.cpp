@@ -13,6 +13,7 @@
 #include "CommonFramework/Notifications/ProgramInfo.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonTools/StartupChecks/BlackBorderCheck.h"
+#include "Controllers/SerialPABotBase/SerialPABotBase_Handle.h"
 #include "NintendoSwitch_SingleSwitchProgramOption.h"
 #include "NintendoSwitch_SingleSwitchProgramSession.h"
 
@@ -58,7 +59,7 @@ void SingleSwitchProgramSession::run_program_instance(SingleSwitchProgramEnviron
         }
     }
 
-    if (!m_system.serial_session().is_ready()){
+    if (!m_system.controller_session().ready()){
         throw UserSetupError(m_system.logger(), "Cannot Start: Serial connection not ready.");
     }
 
@@ -78,7 +79,7 @@ void SingleSwitchProgramSession::run_program_instance(SingleSwitchProgramEnviron
 }
 void SingleSwitchProgramSession::internal_stop_program(){
     WriteSpinLock lg(m_lock);
-    m_system.serial_session().stop();
+//    m_system.serial_session().stop();
     CancellableScope* scope = m_scope.load(std::memory_order_acquire);
     if (scope != nullptr){
         scope->cancel(std::make_exception_ptr(ProgramCancelledException()));
@@ -89,11 +90,16 @@ void SingleSwitchProgramSession::internal_stop_program(){
         pause();
     }
 
-    m_system.serial_session().reset();
+//    m_system.serial_session().reset();
 }
 void SingleSwitchProgramSession::internal_run_program(){
     GlobalSettings::instance().PERFORMANCE->REALTIME_THREAD_PRIORITY.set_on_this_thread();
     m_option.options().reset_state();
+
+    if (!m_system.controller_session().ready()){
+        report_error("Cannot Start: The controller is not ready.");
+        return;
+    }
 
     SleepSuppressScope sleep_scope(GlobalSettings::instance().SLEEP_SUPPRESS->PROGRAM_RUNNING);
 
@@ -120,7 +126,6 @@ void SingleSwitchProgramSession::internal_run_program(){
     try{
         logger().log("<b>Starting Program: " + identifier() + "</b>");
         run_program_instance(env, scope);
-//        m_setup->wait_for_all_requests();
         logger().log("Program finished normally!", COLOR_BLUE);
     }catch (OperationCancelledException&){
     }catch (ProgramCancelledException&){

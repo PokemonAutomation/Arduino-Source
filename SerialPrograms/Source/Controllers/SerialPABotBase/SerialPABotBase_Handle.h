@@ -15,6 +15,7 @@
 #include <QSerialPortInfo>
 #include "ClientSource/Connection/BotBase.h"
 #include "ClientSource/Connection/MessageLogger.h"
+#include "Controllers/ControllerCapabilities.h"
 #include "SerialPABotBase_Globals.h"
 
 namespace PokemonAutomation{
@@ -40,7 +41,7 @@ public:
     BotBaseHandle(
         SerialLogger& logger,
         const QSerialPortInfo* port,
-        PABotBaseLevel minimum_pabotbase
+        const ControllerRequirements& requirements
     );
     ~BotBaseHandle();
 
@@ -60,8 +61,10 @@ public:
     bool accepting_commands() const;
 
     std::string label() const;
-    std::string status() const;
-    PABotBaseLevel min_pabotbase() const{ return m_minimum_pabotbase; }
+    const std::set<std::string>& capabilities() const{
+        return m_capabilities;
+    }
+
 
 public:
     //  Async external requests. (typically from integration commands)
@@ -80,6 +83,8 @@ signals:
     void uptime_status(std::string status);
 
 private:
+    void process_device_protocol(uint32_t& version, uint8_t& program_id);
+
     const char* check_accepting_commands();
 
     void stop_unprotected();
@@ -92,8 +97,9 @@ private:
     SerialLogger& m_logger;
 
     const QSerialPortInfo* m_port;
-    PABotBaseLevel m_minimum_pabotbase;
-    std::atomic<PABotBaseLevel> m_current_pabotbase;
+    const ControllerRequirements& m_requirements;
+    std::set<std::string> m_capabilities;
+
     std::atomic<State> m_state;
     std::atomic<bool> m_allow_user_commands;
 

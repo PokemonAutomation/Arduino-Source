@@ -29,7 +29,7 @@ public:
 
 public:
     MultiSwitchSystemOption(
-        PABotBaseLevel min_pabotbase,
+        const ControllerRequirements& requirements,
         FeedbackType feedback,
         AllowCommandsWhenRunning allow_commands_while_running,
         size_t min_switches,
@@ -37,7 +37,7 @@ public:
         size_t switches
     );
     MultiSwitchSystemOption(
-        PABotBaseLevel min_pabotbase,
+        const ControllerRequirements& requirements,
         FeedbackType feedback,
         AllowCommandsWhenRunning allow_commands_while_running,
         size_t min_switches,
@@ -60,7 +60,7 @@ public:
 private:
     friend class MultiSwitchSystemWidget;
 
-    const PABotBaseLevel m_min_pabotbase;
+    const ControllerRequirements& m_requirements;
     const bool m_allow_commands_while_running;
 
     const size_t m_min_switches;

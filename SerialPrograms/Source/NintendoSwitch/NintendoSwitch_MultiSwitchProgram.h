@@ -15,6 +15,7 @@
 #include "CommonFramework/Notifications/EventNotificationOption.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Panels/ProgramDescriptor.h"
+#include "Controllers/ControllerCapabilities.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase_Globals.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 
@@ -57,7 +58,7 @@ public:
 
 class MultiSwitchProgramDescriptor : public ProgramDescriptor{
 public:
-    MultiSwitchProgramDescriptor(
+    MultiSwitchProgramDescriptor(   //  Deprecated
         std::string identifier,
         std::string category, std::string display_name,
         std::string doc_link,
@@ -69,9 +70,21 @@ public:
         size_t max_switches,
         size_t default_switches
     );
+    MultiSwitchProgramDescriptor(
+        std::string identifier,
+        std::string category, std::string display_name,
+        std::string doc_link,
+        std::string description,
+        FeedbackType feedback,
+        AllowCommandsWhenRunning allow_commands_while_running,
+        ControllerRequirements m_requirements,
+        size_t min_switches,
+        size_t max_switches,
+        size_t default_switches
+    );
 
     FeedbackType feedback() const{ return m_feedback; }
-    PABotBaseLevel min_pabotbase_level() const{ return m_min_pabotbase_level; }
+    const ControllerRequirements& requirements() const{ return m_requirements; }
     bool allow_commands_while_running() const{ return m_allow_commands_while_running; }
 
     size_t min_switches() const{ return m_min_switches; }
@@ -83,7 +96,7 @@ public:
 
 private:
     const FeedbackType m_feedback;
-    const PABotBaseLevel m_min_pabotbase_level;
+    const ControllerRequirements m_requirements;
     const bool m_allow_commands_while_running;
 
     const size_t m_min_switches;

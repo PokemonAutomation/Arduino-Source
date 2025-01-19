@@ -8,6 +8,7 @@
 #include <QScrollArea>
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Qt/CollapsibleGroupBox.h"
+#include "Controllers/SerialPABotBase/SerialPABotBase_Descriptor.h"
 #include "NintendoSwitch/Framework/UI/NintendoSwitch_MultiSwitchSystemWidget.h"
 #include "NintendoSwitch_SwitchViewer.h"
 
@@ -23,6 +24,9 @@ SwitchViewer_Descriptor::SwitchViewer_Descriptor()
         "ComputerControl/blob/master/Wiki/Programs/NintendoSwitch/SwitchViewer.md",
         "View status information from one or more running programs."
     )
+    , m_requirements({
+        {SerialPABotBase::SerialDescriptor::TYPENAME, {"PABotBase-Protocol"}}
+    })
 {}
 
 
@@ -30,7 +34,7 @@ SwitchViewer_Descriptor::SwitchViewer_Descriptor()
 SwitchViewer::SwitchViewer(const SwitchViewer_Descriptor& descriptor)
     : PanelInstance(descriptor)
     , m_switches(
-        PABotBaseLevel::NOT_PABOTBASE,
+        descriptor.requirements(),
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         1, 4, 1

@@ -9,6 +9,7 @@
 #include "Common/Cpp/Concurrency/AsyncDispatcher.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/VideoPipeline/Stats/ThreadUtilizationStats.h"
+#include "Controllers/SerialPABotBase/SerialPABotBase_Descriptor.h"
 #include "NintendoSwitch_MultiSwitchProgram.h"
 #include "Framework/NintendoSwitch_MultiSwitchProgramOption.h"
 
@@ -77,14 +78,43 @@ MultiSwitchProgramDescriptor::MultiSwitchProgramDescriptor(
     size_t default_switches
 )
     : ProgramDescriptor(
-        pick_color(feedback, min_pabotbase_level),
+        pick_color(feedback),
         std::move(identifier),
         std::move(category), std::move(display_name),
         std::move(doc_link),
         std::move(description)
     )
     , m_feedback(feedback)
-    , m_min_pabotbase_level(min_pabotbase_level)
+    , m_requirements({{
+        SerialPABotBase::SerialDescriptor::TYPENAME,
+        {program_id_to_string((uint8_t)min_pabotbase_level)}
+    }})
+    , m_allow_commands_while_running(allow_commands_while_running == AllowCommandsWhenRunning::ENABLE_COMMANDS)
+    , m_min_switches(min_switches)
+    , m_max_switches(max_switches)
+    , m_default_switches(default_switches)
+{}
+MultiSwitchProgramDescriptor::MultiSwitchProgramDescriptor(
+    std::string identifier,
+    std::string category, std::string display_name,
+    std::string doc_link,
+    std::string description,
+    FeedbackType feedback,
+    AllowCommandsWhenRunning allow_commands_while_running,
+    ControllerRequirements requirements,
+    size_t min_switches,
+    size_t max_switches,
+    size_t default_switches
+)
+    : ProgramDescriptor(
+        pick_color(feedback),
+        std::move(identifier),
+        std::move(category), std::move(display_name),
+        std::move(doc_link),
+        std::move(description)
+    )
+    , m_feedback(feedback)
+    , m_requirements(std::move(requirements))
     , m_allow_commands_while_running(allow_commands_while_running == AllowCommandsWhenRunning::ENABLE_COMMANDS)
     , m_min_switches(min_switches)
     , m_max_switches(max_switches)
