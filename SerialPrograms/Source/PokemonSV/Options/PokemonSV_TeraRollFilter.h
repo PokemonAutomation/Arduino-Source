@@ -55,7 +55,7 @@ public:
     };
 
     FilterResult run_filter(
-        const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context,
+        const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context,
         TeraRaidData& data
     ) const;
 

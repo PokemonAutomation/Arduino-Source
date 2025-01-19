@@ -14,24 +14,24 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-void resume_game_no_interact_old        (ControllerContext& device, bool tolerate_update_menu);
-void resume_game_back_out_old           (ControllerContext& device, bool tolerate_update_menu, uint16_t mash_B_time);
-void resume_game_front_of_den_nowatts   (ControllerContext& device, bool tolerate_update_menu);
-void settings_to_enter_game             (ControllerContext& device, bool fast);
+void resume_game_no_interact_old        (SwitchControllerContext& device, bool tolerate_update_menu);
+void resume_game_back_out_old           (SwitchControllerContext& device, bool tolerate_update_menu, uint16_t mash_B_time);
+void resume_game_front_of_den_nowatts   (SwitchControllerContext& device, bool tolerate_update_menu);
+void settings_to_enter_game             (SwitchControllerContext& device, bool fast);
 void settings_to_enter_game_den_lobby   (
-    ControllerContext& device,
+    SwitchControllerContext& device,
     bool tolerate_update_menu, bool fast,
     uint16_t enter_switch_pokemon_delay,
     uint16_t exit_switch_pokemon_delay
 );
-void enter_game                         (ControllerContext& device, bool backup_save, uint16_t enter_game_mash, uint16_t enter_game_wait);
-void start_game_from_home               (ControllerContext& device, bool tolerate_update_menu, uint8_t game_slot, uint8_t user_slot, bool backup_save);
+void enter_game                         (SwitchControllerContext& device, bool backup_save, uint16_t enter_game_mash, uint16_t enter_game_wait);
+void start_game_from_home               (SwitchControllerContext& device, bool tolerate_update_menu, uint8_t game_slot, uint8_t user_slot, bool backup_save);
 void fast_reset_game(
-    ControllerContext& device,
+    SwitchControllerContext& device,
     uint16_t start_game_mash, uint16_t start_game_wait,
     uint16_t enter_game_mash, uint16_t enter_game_wait
 );
-void reset_game_from_home               (ConsoleHandle& console, ControllerContext& device, bool tolerate_update_menu);
+void reset_game_from_home               (ConsoleHandle& console, SwitchControllerContext& device, bool tolerate_update_menu);
 
 
 

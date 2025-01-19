@@ -27,11 +27,11 @@ public:
     //  Return false if an unexpected battle happens where the battle menu is detected but
     //  not the starting animation.
     //  Throw exception if inference times out after Sweet Scent is used.
-    bool find_encounter(ConsoleHandle& console, ControllerContext& context) const;
+    bool find_encounter(ConsoleHandle& console, SwitchControllerContext& context) const;
 
 private:
     //  Move character up and down or left and right once.
-    void run_trigger(ControllerContext& context) const;
+    void run_trigger(SwitchControllerContext& context) const;
 
 public:
     enum class TriggerMethod{

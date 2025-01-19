@@ -42,14 +42,14 @@ public:
 //    int8_t read_hours(Logger& logger, std::shared_ptr<const ImageRGB32> screen) const;
 
     void set_hours(
-        const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context,
+        const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context,
         uint8_t hour    //  0 - 23
     ) const;
 
 
     std::pair<DateFormat, DateTime> read_date(Logger& logger, std::shared_ptr<const ImageRGB32> screen) const;
     void set_date(
-        const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context,
+        const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context,
         const DateTime& date    //  Seconds is ignored.
     ) const;
 
@@ -66,11 +66,11 @@ private:
     DateTime read_date_eu(Logger& logger, std::shared_ptr<const ImageRGB32> screen, bool white_theme) const;
     DateTime read_date_jp(Logger& logger, std::shared_ptr<const ImageRGB32> screen, bool white_theme) const;
 
-    static void move_cursor(ControllerContext& context, int current, int desired);
-    static void adjust_year(ControllerContext& context, int current, int desired);
-    static void adjust_month(ControllerContext& context, int current, int desired);
-    static void adjust_hour_24(ControllerContext& context, int current, int desired);
-    static void adjust_minute(ControllerContext& context, int current, int desired);
+    static void move_cursor(SwitchControllerContext& context, int current, int desired);
+    static void adjust_year(SwitchControllerContext& context, int current, int desired);
+    static void adjust_month(SwitchControllerContext& context, int current, int desired);
+    static void adjust_hour_24(SwitchControllerContext& context, int current, int desired);
+    static void adjust_minute(SwitchControllerContext& context, int current, int desired);
 
 private:
     ImageFloatBox m_background_top;
@@ -107,7 +107,7 @@ public:
 // then go back to the home screen
 void change_date(
     SingleSwitchProgramEnvironment& env, 
-    ControllerContext& context,
+    SwitchControllerContext& context,
     const DateTime& date
 );
 

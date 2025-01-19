@@ -28,7 +28,7 @@ public:
 class ESPTraining : public SingleSwitchProgramInstance{
 public:
     ESPTraining();
-    virtual void program(SingleSwitchProgramEnvironment& env, ControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
     SimpleIntegerOption<uint32_t> ROUNDS;

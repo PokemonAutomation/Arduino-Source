@@ -74,7 +74,7 @@ std::string TeraRollFilter::check_validity() const{
 }
 
 TeraRollFilter::FilterResult TeraRollFilter::run_filter(
-    const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context,
+    const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context,
     TeraRaidData& data
 ) const{
     uint8_t min_stars = MIN_STARS;

@@ -36,7 +36,7 @@ struct EggAutonomousStats : public StatsTracker{
 class EggAutonomousState{
 public:
     EggAutonomousState(
-        ProgramEnvironment& env, ConsoleHandle& console, ControllerContext& context,
+        ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context,
         EggAutonomousStats& stats,
         EventNotificationOption& notification_nonshiny_keep,
         EventNotificationOption& notification_shiny,
@@ -80,7 +80,7 @@ private:
 private:
     ProgramEnvironment& m_env;
     ConsoleHandle& m_console;
-    ControllerContext& m_context;
+    SwitchControllerContext& m_context;
     EggAutonomousStats& m_stats;
     static EventNotificationOption m_notification_noop;
     EventNotificationOption& m_notification_nonshiny_keep;

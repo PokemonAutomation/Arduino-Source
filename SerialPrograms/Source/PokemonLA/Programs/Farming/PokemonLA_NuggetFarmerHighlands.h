@@ -28,10 +28,10 @@ public:
 class NuggetFarmerHighlands : public SingleSwitchProgramInstance{
 public:
     NuggetFarmerHighlands();
-    virtual void program(SingleSwitchProgramEnvironment& env, ControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
-    bool run_iteration(SingleSwitchProgramEnvironment& env, ControllerContext& context);
+    bool run_iteration(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
 
 private:
     class RunRoute;

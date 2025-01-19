@@ -27,10 +27,10 @@ public:
 class UnownFinder : public SingleSwitchProgramInstance{
 public:
     UnownFinder();
-    virtual void program(SingleSwitchProgramEnvironment& env, ControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
-    void run_iteration(SingleSwitchProgramEnvironment& env, ControllerContext& context);
+    void run_iteration(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
 
 private:
     class RunRoute;

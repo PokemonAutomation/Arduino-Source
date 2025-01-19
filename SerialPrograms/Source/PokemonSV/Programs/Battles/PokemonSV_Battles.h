@@ -20,7 +20,7 @@ namespace PokemonSV{
 
 
 void auto_heal_from_menu_or_overworld(
-    const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context,
+    const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context,
     uint8_t party_slot, //  0 - 5
     bool return_to_overworld
 );
@@ -28,7 +28,7 @@ void auto_heal_from_menu_or_overworld(
 
 
 //  Returns the # of attempts it took to run.
-int run_from_battle(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context);
+int run_from_battle(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context);
 
 
 

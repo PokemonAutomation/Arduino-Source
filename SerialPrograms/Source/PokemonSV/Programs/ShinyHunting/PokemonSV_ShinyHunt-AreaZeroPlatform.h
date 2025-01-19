@@ -45,7 +45,7 @@ public:
     ~ShinyHuntAreaZeroPlatform();
     ShinyHuntAreaZeroPlatform();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, ControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
     virtual std::string check_validity() const override;
@@ -66,11 +66,11 @@ private:
 //    };
 
     void set_flags(SingleSwitchProgramEnvironment& env);
-    void run_state(SingleSwitchProgramEnvironment& env, ControllerContext& context);
-    void set_flags_and_run_state(SingleSwitchProgramEnvironment& env, ControllerContext& context);
+    void run_state(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
+    void set_flags_and_run_state(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
 
     //  Returns true on success.
-    bool run_traversal(ControllerContext& context);
+    bool run_traversal(SwitchControllerContext& context);
 
 
 private:

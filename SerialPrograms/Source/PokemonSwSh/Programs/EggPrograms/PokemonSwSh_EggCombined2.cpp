@@ -74,7 +74,7 @@ EggCombined2::EggCombined2()
     PA_ADD_OPTION(HATCH_DELAY);
 }
 
-void EggCombined2::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
+void EggCombined2::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     EggCombinedSession session{
         BOXES_TO_HATCH,
         STEPS_TO_HATCH,

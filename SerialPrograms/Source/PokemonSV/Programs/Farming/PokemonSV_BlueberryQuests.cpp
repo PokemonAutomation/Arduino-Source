@@ -139,11 +139,11 @@ BBQuests BBQuests_string_to_enum(const std::string& token){
     return iter->second;
 }
 
-int read_BP(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context){
+int read_BP(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context){
     WhiteButtonWatcher right_panel(COLOR_BLUE, WhiteButton::ButtonB, {0.484, 0.117, 0.022, 0.037});
-    int result = run_until<ControllerContext>(
+    int result = run_until<SwitchControllerContext>(
         console, context,
-        [&](ControllerContext& context){
+        [&](SwitchControllerContext& context){
             for (int i = 0; i < 6; i++) { //try 6 times
                 pbf_press_dpad(context, DPAD_RIGHT, 50, 20);
                 pbf_wait(context, 200);
@@ -170,14 +170,14 @@ int read_BP(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& 
     return OCR::read_number(console, BP_value);
 }
 
-std::vector<BBQuests> read_quests(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context, const BBQOption& BBQ_OPTIONS){
+std::vector<BBQuests> read_quests(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context, const BBQOption& BBQ_OPTIONS){
     std::vector<BBQuests> quest_list;
 
     //Open quest list. Wait for it to open.
     WhiteButtonWatcher right_panel(COLOR_BLUE, WhiteButton::ButtonB, {0.484, 0.117, 0.022, 0.037});
-    int result = run_until<ControllerContext>(
+    int result = run_until<SwitchControllerContext>(
         console, context,
-        [&](ControllerContext& context){
+        [&](SwitchControllerContext& context){
             for (int i = 0; i < 6; i++) { //try 6 times
                 pbf_press_dpad(context, DPAD_RIGHT, 50, 20);
                 pbf_wait(context, 200);
@@ -215,7 +215,7 @@ std::vector<BBQuests> read_quests(const ProgramInfo& info, ConsoleHandle& consol
     return quest_list;
 }
 
-std::vector<BBQuests> process_quest_list(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context, const BBQOption& BBQ_OPTIONS, std::vector<BBQuests>& quest_list, uint8_t& eggs_hatched){
+std::vector<BBQuests> process_quest_list(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context, const BBQOption& BBQ_OPTIONS, std::vector<BBQuests>& quest_list, uint8_t& eggs_hatched){
     std::vector<BBQuests> quests_to_do;
 
     console.log("Processing quests.");
@@ -235,9 +235,9 @@ std::vector<BBQuests> process_quest_list(const ProgramInfo& info, ConsoleHandle&
                     //console.log("Warning: This does not handle/check being out of BP!", COLOR_RED);
 
                     WhiteButtonWatcher right_panel(COLOR_BLUE, WhiteButton::ButtonB, {0.484, 0.117, 0.022, 0.037});
-                    int result = run_until<ControllerContext>(
+                    int result = run_until<SwitchControllerContext>(
                         console, context,
-                        [&](ControllerContext& context){
+                        [&](SwitchControllerContext& context){
                             for (int i = 0; i < 6; i++){
                                 pbf_press_dpad(context, DPAD_RIGHT, 50, 20);
                                 pbf_wait(context, 200);
@@ -315,7 +315,7 @@ std::vector<BBQuests> process_quest_list(const ProgramInfo& info, ConsoleHandle&
     return quests_to_do;
 }
 
-bool process_and_do_quest(ProgramEnvironment& env, ConsoleHandle& console, ControllerContext& context, BBQOption& BBQ_OPTIONS, BBQuests current_quest, uint8_t& eggs_hatched){
+bool process_and_do_quest(ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context, BBQOption& BBQ_OPTIONS, BBQuests current_quest, uint8_t& eggs_hatched){
     bool quest_completed = false;
     int quest_attempts = 0;
 
@@ -399,7 +399,7 @@ bool process_and_do_quest(ProgramEnvironment& env, ConsoleHandle& console, Contr
     return quest_completed;
 }
 
-void quest_make_tm(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context){
+void quest_make_tm(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context){
     console.log("Quest: Make TM");
 
     //Mount and then dismount in case you're crouched
@@ -414,9 +414,9 @@ void quest_make_tm(const ProgramInfo& info, ConsoleHandle& console, ControllerCo
     pbf_move_left_joystick(context, 255, 0, 100, 20);
     pbf_press_button(context, BUTTON_L, 10, 50);
 
-    int enter_machine = run_until<ControllerContext>(
+    int enter_machine = run_until<SwitchControllerContext>(
         console, context,
-        [&](ControllerContext& context){
+        [&](SwitchControllerContext& context){
             for (int i = 0; i < 10; i++){
                 pbf_press_button(context, BUTTON_A, 20, 50);
                 pbf_wait(context, 200);
@@ -430,9 +430,9 @@ void quest_make_tm(const ProgramInfo& info, ConsoleHandle& console, ControllerCo
     if (enter_machine == 0){
         console.log("TM machine entered. Finding TM to make.");
 
-        int make_tm = run_until<ControllerContext>(
+        int make_tm = run_until<SwitchControllerContext>(
             console, context,
-            [&](ControllerContext& context){
+            [&](SwitchControllerContext& context){
                 for (int i = 0; i < 229; i++) { //229 is max number of TMs
                     //click on tm
                     pbf_press_button(context, BUTTON_A, 20, 50);
@@ -462,9 +462,9 @@ void quest_make_tm(const ProgramInfo& info, ConsoleHandle& console, ControllerCo
         console.log("Failed to enter TM machine!");
     }
     
-    int exit = run_until<ControllerContext>(
+    int exit = run_until<SwitchControllerContext>(
         console, context,
-        [&](ControllerContext& context){
+        [&](SwitchControllerContext& context){
             pbf_mash_button(context, BUTTON_B, 2000);
         },
         {{ overworld }}
@@ -480,7 +480,7 @@ void quest_make_tm(const ProgramInfo& info, ConsoleHandle& console, ControllerCo
     context.wait_for_all_requests();
 }
 
-void quest_travel_500(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context){
+void quest_travel_500(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context){
     console.log("Quest: Travel 500 meters.");
 
     //Mount and then dismount in case you're crouched
@@ -506,13 +506,13 @@ void quest_travel_500(const ProgramInfo& info, ConsoleHandle& console, Controlle
     context.wait_for_all_requests();
 }
 
-void quest_tera_self_defeat(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context, const BBQOption& BBQ_OPTIONS){
+void quest_tera_self_defeat(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context, const BBQOption& BBQ_OPTIONS){
     EncounterWatcher encounter_watcher(console, COLOR_RED);
     console.log("Quest: Tera-self and defeat any wild.");
     //Navigate to target and start battle
-    int ret = run_until<ControllerContext>(
+    int ret = run_until<SwitchControllerContext>(
         console, context,
-        [&](ControllerContext& context){
+        [&](SwitchControllerContext& context){
             central_to_canyon_plaza(info, console, context);
 
             pbf_move_left_joystick(context, 205, 64, 20, 105);
@@ -574,9 +574,9 @@ void quest_tera_self_defeat(const ProgramInfo& info, ConsoleHandle& console, Con
     pbf_mash_button(context, BUTTON_A, 300);
     context.wait_for_all_requests();
 
-    int exit = run_until<ControllerContext>(
+    int exit = run_until<SwitchControllerContext>(
         console, context,
-        [&](ControllerContext& context){
+        [&](SwitchControllerContext& context){
             pbf_mash_button(context, BUTTON_B, 2000);
         },
         {{ done_healing }}
@@ -589,13 +589,13 @@ void quest_tera_self_defeat(const ProgramInfo& info, ConsoleHandle& console, Con
     fly_to_overworld_from_map(info, console, context);
 }
 
-void quest_sneak_up(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context, const BBQOption& BBQ_OPTIONS){
+void quest_sneak_up(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context, const BBQOption& BBQ_OPTIONS){
     EncounterWatcher encounter_watcher(console, COLOR_RED);
     console.log("Quest: Sneak up.");
     //Navigate to target and start battle
-    int ret = run_until<ControllerContext>(
+    int ret = run_until<SwitchControllerContext>(
         console, context,
-        [&](ControllerContext& context){
+        [&](SwitchControllerContext& context){
             //Savanna Plaza - Pride Rock
             central_to_savanna_plaza(info, console, context);
 
@@ -647,9 +647,9 @@ void quest_sneak_up(const ProgramInfo& info, ConsoleHandle& console, ControllerC
         }else{
             OverworldWatcher overworld(console, COLOR_BLUE);
 
-            int ret2 = run_until<ControllerContext>(
+            int ret2 = run_until<SwitchControllerContext>(
                 console, context,
-                [&](ControllerContext& context){
+                [&](SwitchControllerContext& context){
                     while (true){
                         //Flee immediately. Keep trying to flee.
                         NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
@@ -700,13 +700,13 @@ void quest_sneak_up(const ProgramInfo& info, ConsoleHandle& console, ControllerC
     context.wait_for_all_requests();
 }
 
-void quest_wild_tera(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context, const BBQOption& BBQ_OPTIONS){
+void quest_wild_tera(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context, const BBQOption& BBQ_OPTIONS){
     EncounterWatcher encounter_watcher(console, COLOR_RED);
     console.log("Quest: Defeat a wild tera.");
     //Navigate to target and start battle
-    int ret = run_until<ControllerContext>(
+    int ret = run_until<SwitchControllerContext>(
         console, context,
-        [&](ControllerContext& context){
+        [&](SwitchControllerContext& context){
             //Canyon Rest Area
             central_to_canyon_rest(info, console, context);
 
@@ -774,9 +774,9 @@ void quest_wild_tera(const ProgramInfo& info, ConsoleHandle& console, Controller
     pbf_mash_button(context, BUTTON_A, 300);
     context.wait_for_all_requests();
 
-    int exit = run_until<ControllerContext>(
+    int exit = run_until<SwitchControllerContext>(
         console, context,
-        [&](ControllerContext& context){
+        [&](SwitchControllerContext& context){
             pbf_mash_button(context, BUTTON_B, 2000);
         },
         {{ done_healing }}
@@ -789,7 +789,7 @@ void quest_wild_tera(const ProgramInfo& info, ConsoleHandle& console, Controller
     fly_to_overworld_from_map(info, console, context);
 }
 
-void quest_wash_pokemon(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context){
+void quest_wash_pokemon(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context){
     console.log("Quest: Give your pokemon a bath!");
 
     //Fly to savanna plaza
@@ -855,9 +855,9 @@ void quest_wash_pokemon(const ProgramInfo& info, ConsoleHandle& console, Control
 
     WhiteButtonWatcher rinse_done(COLOR_BLUE, WhiteButton::ButtonY, {0.028, 0.923, 0.020, 0.034});
     WallClock start2 = current_time();
-    int ret3 = run_until<ControllerContext>(
+    int ret3 = run_until<SwitchControllerContext>(
         console, context,
-        [&](ControllerContext& context){
+        [&](SwitchControllerContext& context){
             while (true){
                 if (current_time() - start2 > std::chrono::minutes(1)){
                     console.log("Failed to finish rinse after 1 minute.", COLOR_RED);
@@ -891,7 +891,7 @@ void quest_wash_pokemon(const ProgramInfo& info, ConsoleHandle& console, Control
     context.wait_for_all_requests();
 }
 
-void quest_hatch_egg(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context, const BBQOption& BBQ_OPTIONS){
+void quest_hatch_egg(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context, const BBQOption& BBQ_OPTIONS){
     console.log("Quest: Hatch an Egg");
 
     //Fix time before hatching
@@ -968,7 +968,7 @@ void quest_hatch_egg(const ProgramInfo& info, ConsoleHandle& console, Controller
     }
 }
 
-void quest_sandwich(ProgramEnvironment& env, ConsoleHandle& console, ControllerContext& context, const BBQOption& BBQ_OPTIONS, BBQuests current_quest){
+void quest_sandwich(ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context, const BBQOption& BBQ_OPTIONS, BBQuests current_quest){
     console.log("Quest: Make a singleplayer sandwich");
 
     //Polar Plaza - egg basket gets stuck under table in Savanna/Canyon Plaza
@@ -1035,15 +1035,15 @@ void quest_sandwich(ProgramEnvironment& env, ConsoleHandle& console, ControllerC
 
 }
 
-void quest_tera_raid(ProgramEnvironment& env, ConsoleHandle& console, ControllerContext& context, BBQOption& BBQ_OPTIONS){
+void quest_tera_raid(ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context, BBQOption& BBQ_OPTIONS){
     console.log("Quest: Tera Raid");
 
     bool started_tera_raid = false;
     while (!started_tera_raid){
         EncounterWatcher encounter_watcher(console, COLOR_RED);
-        int ret = run_until<ControllerContext>(
+        int ret = run_until<SwitchControllerContext>(
             console, context,
-            [&](ControllerContext& context){
+            [&](SwitchControllerContext& context){
                 //Target is a tera raid crystal near the canyon plaza
                 console.log("Navigating to tera crystal.");
 
@@ -1141,7 +1141,7 @@ void quest_tera_raid(ProgramEnvironment& env, ConsoleHandle& console, Controller
     day_skip_from_overworld(console, context);
 }
 
-void quest_auto_battle(ProgramEnvironment& env, ConsoleHandle& console, ControllerContext& context, const BBQOption& BBQ_OPTIONS, BBQuests current_quest){
+void quest_auto_battle(ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context, const BBQOption& BBQ_OPTIONS, BBQuests current_quest){
     console.log("Quest: Auto Battle 10/30");
 
     LetsGoEncounterBotStats stats;
@@ -1167,7 +1167,7 @@ void quest_auto_battle(ProgramEnvironment& env, ConsoleHandle& console, Controll
         pbf_move_left_joystick(context, 255, 128, 180, 50);
         pbf_press_button(context, BUTTON_L, 20, 50);
 
-        use_lets_go_to_clear_in_front(console, context, tracker, false, [&](ControllerContext& context){
+        use_lets_go_to_clear_in_front(console, context, tracker, false, [&](SwitchControllerContext& context){
             pbf_move_left_joystick(context, 128, 255, 180, 50);
             pbf_wait(context, 1500);
             context.wait_for_all_requests();
@@ -1182,9 +1182,9 @@ void quest_auto_battle(ProgramEnvironment& env, ConsoleHandle& console, Controll
         pbf_mash_button(context, BUTTON_A, 300);
         context.wait_for_all_requests();
 
-        int exit = run_until<ControllerContext>(
+        int exit = run_until<SwitchControllerContext>(
             console, context,
-            [&](ControllerContext& context){
+            [&](SwitchControllerContext& context){
                 pbf_mash_button(context, BUTTON_B, 2000);
             },
             { { done_healing } }

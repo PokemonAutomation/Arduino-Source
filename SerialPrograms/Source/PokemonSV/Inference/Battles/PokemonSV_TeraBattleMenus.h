@@ -29,7 +29,7 @@ public:
 
     //  Returns -1 if not found.
     int8_t detect_slot(const ImageViewRGB32& screen) const;
-    bool move_to_slot(ConsoleHandle& console, ControllerContext& context, uint8_t slot) const;
+    bool move_to_slot(ConsoleHandle& console, SwitchControllerContext& context, uint8_t slot) const;
 
 private:
     WhiteButtonDetector m_callouts_button;
@@ -54,7 +54,7 @@ public:
 
     //  Returns -1 if not found.
     int8_t detect_slot(const ImageViewRGB32& screen) const;
-    bool move_to_slot(ConsoleHandle& console, ControllerContext& context, uint8_t slot) const;
+    bool move_to_slot(ConsoleHandle& console, SwitchControllerContext& context, uint8_t slot) const;
 
 private:
     WhiteButtonDetector m_info_button;
@@ -81,7 +81,7 @@ public:
     //  Returns 1 if left-most player.
     //  Returns 4 if right-most player.
     int8_t detect_slot(const ImageViewRGB32& screen) const;
-    bool move_to_slot(ConsoleHandle& console, ControllerContext& context, uint8_t slot) const;
+    bool move_to_slot(ConsoleHandle& console, SwitchControllerContext& context, uint8_t slot) const;
 
 private:
     GradientArrowDetector m_opponent;
@@ -106,7 +106,7 @@ public:
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) const override;
 
-    bool move_to_slot(ConsoleHandle& console, ControllerContext& context, uint8_t slot) const;
+    bool move_to_slot(ConsoleHandle& console, SwitchControllerContext& context, uint8_t slot) const;
 
 private:
     bool detect_slot(const ImageViewRGB32& screen, size_t index) const;

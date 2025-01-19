@@ -105,14 +105,14 @@ DenRoller::DenRoller()
 
 
 
-void DenRoller::ring_bell(ControllerContext& context, int count) const{
+void DenRoller::ring_bell(SwitchControllerContext& context, int count) const{
     for (int c = 0; c < count; c++){
         pbf_press_button(context, BUTTON_LCLICK, 5, 10);
     }
     pbf_wait(context, 200);
 }
 
-void DenRoller::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
+void DenRoller::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     DenRoller_Descriptor::Stats& stats = env.current_stats<DenRoller_Descriptor::Stats>();
 
     if (START_LOCATION.start_in_grip_menu()){

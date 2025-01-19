@@ -46,7 +46,7 @@ ActivateMenuGlitch113::ActivateMenuGlitch113()
 
 
 
-void ActivateMenuGlitch113::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
+void ActivateMenuGlitch113::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     ConsoleHandle& console = env.console;
 
     //  Enable Strength

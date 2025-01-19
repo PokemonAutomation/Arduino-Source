@@ -39,7 +39,7 @@ std::string AutoStory_Segment_14::end_text() const{
     return "End: Defeated Bombirder. At West Province Area One North Pokecenter";
 }
 
-void AutoStory_Segment_14::run_segment(SingleSwitchProgramEnvironment& env, ControllerContext& context, AutoStoryOptions options) const{
+void AutoStory_Segment_14::run_segment(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, AutoStoryOptions options) const{
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
 
     context.wait_for_all_requests();
@@ -59,7 +59,7 @@ void AutoStory_Segment_14::run_segment(SingleSwitchProgramEnvironment& env, Cont
 
 void checkpoint_30(
     SingleSwitchProgramEnvironment& env, 
-    ControllerContext& context, 
+    SwitchControllerContext& context, 
     EventNotificationOption& notif_status_update
 ){
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
@@ -243,7 +243,7 @@ void checkpoint_30(
 
 void checkpoint_31(
     SingleSwitchProgramEnvironment& env, 
-    ControllerContext& context, 
+    SwitchControllerContext& context, 
     EventNotificationOption& notif_status_update
 ){
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
@@ -285,7 +285,7 @@ void checkpoint_31(
 
         // section 4. set marker past pokecenter
         handle_unexpected_battles(env.program_info(), env.console, context,
-        [&](const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context){                        
+        [&](const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context){                        
             realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 60, 40);
         });
         overworld_navigation(env.program_info(), env.console, context, 

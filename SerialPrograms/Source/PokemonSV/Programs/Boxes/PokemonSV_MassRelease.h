@@ -34,11 +34,11 @@ public:
 class MassRelease : public SingleSwitchProgramInstance{
 public:
     MassRelease();
-    virtual void program(SingleSwitchProgramEnvironment& env, ControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
-    void release_one(BoxDetector& box_detector, SingleSwitchProgramEnvironment& env, ControllerContext& context);
-    void release_box(BoxDetector& box_detector, SingleSwitchProgramEnvironment& env, ControllerContext& context);
+    void release_one(BoxDetector& box_detector, SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
+    void release_box(BoxDetector& box_detector, SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
 
 private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;

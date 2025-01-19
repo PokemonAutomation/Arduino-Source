@@ -173,7 +173,7 @@ std::vector<ImagePixelBox> AuctionFarmer::detect_dialog_boxes(const ImageViewRGB
 }
 
 
-void AuctionFarmer::reset_auctions(SingleSwitchProgramEnvironment& env, ControllerContext& context, bool do_full_reset, uint8_t& year){
+void AuctionFarmer::reset_auctions(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, bool do_full_reset, uint8_t& year){
     try{
         if (do_full_reset){
             if (year == MAX_YEAR){
@@ -198,7 +198,7 @@ void AuctionFarmer::reset_auctions(SingleSwitchProgramEnvironment& env, Controll
     }
 }
 
-std::vector<std::pair<AuctionOffer, ImageFloatBox>> AuctionFarmer::check_offers(SingleSwitchProgramEnvironment& env, ControllerContext& context){
+std::vector<std::pair<AuctionOffer, ImageFloatBox>> AuctionFarmer::check_offers(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     AuctionFarmer_Descriptor::Stats& stats = env.current_stats<AuctionFarmer_Descriptor::Stats>();
 
     pbf_wait(context, 2 * TICKS_PER_SECOND);
@@ -282,7 +282,7 @@ bool AuctionFarmer::is_good_offer(AuctionOffer offer){
 }
 
 // Move to auctioneer and interact
-void AuctionFarmer::move_to_auctioneer(SingleSwitchProgramEnvironment& env, ControllerContext& context, AuctionOffer offer){
+void AuctionFarmer::move_to_auctioneer(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, AuctionOffer offer){
     AdvanceDialogWatcher advance_detector(COLOR_YELLOW);
 
     size_t tries = 0;
@@ -309,7 +309,7 @@ void AuctionFarmer::move_to_auctioneer(SingleSwitchProgramEnvironment& env, Cont
 
 // Dialog is the only piece of orientation we have, so the goal is to put it into the center of the screen so we know in which direction the character walks.
 // This is only used for multiple NPCs.
-void AuctionFarmer::move_dialog_to_center(SingleSwitchProgramEnvironment& env, ControllerContext& context, AuctionOffer wanted){
+void AuctionFarmer::move_dialog_to_center(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, AuctionOffer wanted){
     double center_x = 0.0f;
     double center_y = 0.0f;
     bool offer_visible = false;
@@ -353,7 +353,7 @@ void AuctionFarmer::move_dialog_to_center(SingleSwitchProgramEnvironment& env, C
     }
 }
 
-void AuctionFarmer::reset_position(SingleSwitchProgramEnvironment& env, ControllerContext& context){
+void AuctionFarmer::reset_position(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     if (ONE_NPC){
         // No movement, player character should always be directly in front of an auctioneer.
         return;
@@ -365,7 +365,7 @@ void AuctionFarmer::reset_position(SingleSwitchProgramEnvironment& env, Controll
 }
 
 
-uint64_t read_next_bid(ConsoleHandle& console, ControllerContext& context, bool high){
+uint64_t read_next_bid(ConsoleHandle& console, SwitchControllerContext& context, bool high){
     float box_y = high ? 0.42f : 0.493f;
     OverlayBoxScope box(console, { 0.73, box_y, 0.17, 0.048 });
     std::unordered_map<uint64_t, size_t> read_bids;
@@ -393,7 +393,7 @@ uint64_t read_next_bid(ConsoleHandle& console, ControllerContext& context, bool 
     return read_value;
 }
 
-void AuctionFarmer::bid_on_item(SingleSwitchProgramEnvironment& env, ControllerContext& context, AuctionOffer offer){
+void AuctionFarmer::bid_on_item(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, AuctionOffer offer){
     AuctionFarmer_Descriptor::Stats& stats = env.current_stats<AuctionFarmer_Descriptor::Stats>();
 
     VideoSnapshot offer_screen = env.console.video().snapshot();
@@ -455,7 +455,7 @@ void AuctionFarmer::bid_on_item(SingleSwitchProgramEnvironment& env, ControllerC
     return;
 }
 
-void AuctionFarmer::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
+void AuctionFarmer::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
 #if 0

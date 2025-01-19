@@ -19,24 +19,24 @@ namespace PokemonSV{
 
 //  After just entering the Zero Gate, go to the specified station.
 void inside_zero_gate_to_station(
-    const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context,
+    const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context,
     int station,    //  1 - 4
     bool heal_at_station
 );
 
 //  You are inside Area Zero having traveled there via the Zero Gate. Return to
 //  the zero gate fly spot.
-void return_to_outside_zero_gate(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context);
+void return_to_outside_zero_gate(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context);
 
 //  You are inside Area Zero having traveled there via the Zero Gate. Return to
 //  inside the zero gate to setup for a subsequent call to "inside_zero_gate_to_station()".
-void return_to_inside_zero_gate(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context);
-void return_to_inside_zero_gate_from_picnic(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context);
+void return_to_inside_zero_gate(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context);
+void return_to_inside_zero_gate_from_picnic(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context);
 
 
 
 void inside_zero_gate_to_secret_cave_entrance(
-    const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context,
+    const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context,
     bool heal_at_station
 );
 

@@ -28,10 +28,10 @@ public:
     EventBeamFinder();
 
 
-    void goto_near_den(ControllerContext& context) const;
-    void goto_far_den(ControllerContext& context) const;
-    void drop_wishing_piece(ControllerContext& context) const;
-    virtual void program(SingleSwitchProgramEnvironment& env, ControllerContext& context) override;
+    void goto_near_den(SwitchControllerContext& context) const;
+    void goto_far_den(SwitchControllerContext& context) const;
+    void drop_wishing_piece(SwitchControllerContext& context) const;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
     StartInGripOrGameOption START_LOCATION;

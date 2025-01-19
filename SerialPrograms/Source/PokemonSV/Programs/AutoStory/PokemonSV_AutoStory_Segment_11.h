@@ -20,26 +20,26 @@ public:
     virtual std::string end_text() const override;
     virtual void run_segment(
         SingleSwitchProgramEnvironment& env, 
-        ControllerContext& context,
+        SwitchControllerContext& context,
         AutoStoryOptions options) const override;
 };
 
 
 // start: At Cortondo East Pokecenter
 // end: Spoke to Cortondo Gym reception. At Cortondo West Pokecenter.
-void checkpoint_24(SingleSwitchProgramEnvironment& env, ControllerContext& context, EventNotificationOption& notif_status_update);   
+void checkpoint_24(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, EventNotificationOption& notif_status_update);   
 
 // start: Spoke to Cortondo Gym reception. At Cortondo West Pokecenter.
 // end: Defeated the trainers at Olive Roll, but left Olive unmoved. Then backed out, standing in front of the Olive Roll NPC.
-void checkpoint_25(SingleSwitchProgramEnvironment& env, ControllerContext& context, EventNotificationOption& notif_status_update);  
+void checkpoint_25(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, EventNotificationOption& notif_status_update);  
 
 // start: Defeated the trainers at Olive Roll, but left Olive unmoved. Then backed out, standing in front of the Olive Roll NPC.
 // end: Completed Olive roll gym challenge.
-void checkpoint_26(SingleSwitchProgramEnvironment& env, ControllerContext& context, EventNotificationOption& notif_status_update);  
+void checkpoint_26(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, EventNotificationOption& notif_status_update);  
 
 // start: Completed Olive roll gym challenge. 
 // end: At Cortondo East Pokecenter.
-void checkpoint_27(SingleSwitchProgramEnvironment& env, ControllerContext& context, EventNotificationOption& notif_status_update);  
+void checkpoint_27(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, EventNotificationOption& notif_status_update);  
 
 
 

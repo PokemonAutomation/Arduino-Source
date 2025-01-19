@@ -28,10 +28,10 @@ namespace PokemonSV{
 
 
 //  While in the overworld, attempt to enter a raid in front of you.
-bool open_raid(ConsoleHandle& console, ControllerContext& context);
+bool open_raid(ConsoleHandle& console, SwitchControllerContext& context);
 
 //  While viewing a raid card, close and return to the overworld.
-void close_raid(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context);
+void close_raid(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context);
 
 
 enum class HostingMode{
@@ -40,14 +40,14 @@ enum class HostingMode{
     ONLINE_EVERYONE,
 };
 void open_hosting_lobby(
-    ProgramEnvironment& env, ConsoleHandle& console, ControllerContext& context,
+    ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context,
     HostingMode mode
 );
 
 
 //  From overworld or main menu => Code entry for tera raid.
 void enter_tera_search(
-    const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context,
+    const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context,
     bool connect_to_internet
 );
 
@@ -60,7 +60,7 @@ void enter_tera_search(
 //  Upon returning, you will be in the overworld.
 void exit_tera_win_without_catching(
     const ProgramInfo& info,
-    ConsoleHandle& console, ControllerContext& context,
+    ConsoleHandle& console, SwitchControllerContext& context,
     size_t stop_on_sparkly_items
 );
 
@@ -70,7 +70,7 @@ void exit_tera_win_without_catching(
 //  Does not check for shininess.
 void exit_tera_win_by_catching(
     ProgramEnvironment& env,
-    ConsoleHandle& console, ControllerContext& context,
+    ConsoleHandle& console, SwitchControllerContext& context,
     Language language,
     const std::string& ball_slug,
     size_t stop_on_sparkly_items
@@ -91,7 +91,7 @@ enum class TeraResult{
 //  "stop_on_shiny == true', then you will be in the summary of the shiny.
 TeraResult exit_tera_win_by_catching(
     ProgramEnvironment& env,
-    ConsoleHandle& console, ControllerContext& context,
+    ConsoleHandle& console, SwitchControllerContext& context,
     Language language,
     const std::string& ball_slug,
     EventNotificationOption& notification_nonshiny,
@@ -105,7 +105,7 @@ TeraResult exit_tera_win_by_catching(
 TeraResult run_tera_summary(
     ProgramEnvironment& env,
     ConsoleHandle& console,
-    ControllerContext& context,
+    SwitchControllerContext& context,
     EventNotificationOption& notification_nonshiny,
     EventNotificationOption& notification_shiny,
     bool stop_on_shiny, const ImageViewRGB32& battle_screenshot,
@@ -113,9 +113,9 @@ TeraResult run_tera_summary(
 );
 
 //  Run away from tera battle.
-void run_from_tera_battle(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context);
+void run_from_tera_battle(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context);
 
-bool is_sparkling_raid(ConsoleHandle& console, ControllerContext& context);
+bool is_sparkling_raid(ConsoleHandle& console, SwitchControllerContext& context);
 
 
 }

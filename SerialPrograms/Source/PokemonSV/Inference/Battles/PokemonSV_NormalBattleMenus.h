@@ -34,7 +34,7 @@ public:
 
     //  Returns -1 if not found.
     int8_t detect_slot(const ImageViewRGB32& screen) const;
-    bool move_to_slot(ConsoleHandle& console, ControllerContext& context, uint8_t slot) const;
+    bool move_to_slot(ConsoleHandle& console, SwitchControllerContext& context, uint8_t slot) const;
 
 private:
     WhiteButtonDetector m_status_button;
@@ -48,7 +48,7 @@ public:
 };
 
 std::set<std::string> read_singles_opponent(
-    const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context,
+    const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context,
     Language language
 );
 
@@ -63,7 +63,7 @@ public:
 
     //  Returns -1 if not found.
     int8_t detect_slot(const ImageViewRGB32& screen) const;
-    bool move_to_slot(ConsoleHandle& console, ControllerContext& context, uint8_t slot) const;
+    bool move_to_slot(ConsoleHandle& console, SwitchControllerContext& context, uint8_t slot) const;
 
 private:
     WhiteButtonDetector m_info_button;
@@ -101,7 +101,7 @@ public:
 
     //  Returns -1 if not found.
     int8_t detect_slot(const ImageViewRGB32& screen) const;
-    bool move_to_slot(ConsoleHandle& console, ControllerContext& context, uint8_t slot) const;
+    bool move_to_slot(ConsoleHandle& console, SwitchControllerContext& context, uint8_t slot) const;
 
 private:
     GradientArrowDetector m_arrow;

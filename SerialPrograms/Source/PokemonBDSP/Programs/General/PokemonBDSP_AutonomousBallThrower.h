@@ -31,7 +31,7 @@ public:
 class AutonomousBallThrower : public SingleSwitchProgramInstance{
 public:
     AutonomousBallThrower();
-    virtual void program(SingleSwitchProgramEnvironment& env, ControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
 

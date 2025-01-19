@@ -70,7 +70,7 @@ void SingleSwitchProgramSession::run_program_instance(SingleSwitchProgramEnviron
     m_scope.store(&scope, std::memory_order_release);
 
     try{
-        ControllerContext context(scope, env.console.controller());
+        SwitchControllerContext context(scope, env.console.controller());
         m_option.instance().program(env, context);
         context.wait_for_all_requests();
     }catch (...){

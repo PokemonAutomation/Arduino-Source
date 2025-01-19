@@ -56,7 +56,7 @@ int8_t TeraBattleMenuDetector::detect_slot(const ImageViewRGB32& screen) const{
 //    cout << "slot = " << slot << endl;
     return (int8_t)(slot + 0.5);
 }
-bool TeraBattleMenuDetector::move_to_slot(ConsoleHandle& console, ControllerContext& context, uint8_t slot) const{
+bool TeraBattleMenuDetector::move_to_slot(ConsoleHandle& console, SwitchControllerContext& context, uint8_t slot) const{
     if (slot > 2){
         return false;
     }
@@ -128,7 +128,7 @@ int8_t CheerSelectDetector::detect_slot(const ImageViewRGB32& screen) const{
 
     return (int8_t)(y + 0.5);
 }
-bool CheerSelectDetector::move_to_slot(ConsoleHandle& console, ControllerContext& context, uint8_t slot) const{
+bool CheerSelectDetector::move_to_slot(ConsoleHandle& console, SwitchControllerContext& context, uint8_t slot) const{
     if (slot > 2){
         return false;
     }
@@ -213,7 +213,7 @@ int8_t TeraTargetSelectDetector::detect_slot(const ImageViewRGB32& screen) const
     }
     return -1;
 }
-bool TeraTargetSelectDetector::move_to_slot(ConsoleHandle& console, ControllerContext& context, uint8_t slot) const{
+bool TeraTargetSelectDetector::move_to_slot(ConsoleHandle& console, SwitchControllerContext& context, uint8_t slot) const{
     if (slot > 4){
         return false;
     }
@@ -311,7 +311,7 @@ bool TeraCatchDetector::detect(const ImageViewRGB32& screen) const{
     return detect_slot(screen, 0) || detect_slot(screen, 1);
 }
 
-bool TeraCatchDetector::move_to_slot(ConsoleHandle& console, ControllerContext& context, uint8_t slot) const{
+bool TeraCatchDetector::move_to_slot(ConsoleHandle& console, SwitchControllerContext& context, uint8_t slot) const{
     if (slot > 1){
         return false;
     }

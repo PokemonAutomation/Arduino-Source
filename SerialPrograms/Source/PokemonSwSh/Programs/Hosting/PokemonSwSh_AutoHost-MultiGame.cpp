@@ -119,7 +119,7 @@ AutoHostMultiGame::AutoHostMultiGame()
 
 
 
-void AutoHostMultiGame::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
+void AutoHostMultiGame::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     uint16_t start_raid_delay = HOST_ONLINE
         ? OPEN_ONLINE_DEN_LOBBY_DELAY
         : GameSettings::instance().OPEN_LOCAL_DEN_LOBBY_DELAY;

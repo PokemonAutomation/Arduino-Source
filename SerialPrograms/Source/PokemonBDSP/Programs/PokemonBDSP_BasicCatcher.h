@@ -33,7 +33,7 @@ struct CatchResults{
 //
 // Don't handle the case that own pokemon evolving or black out to Pokecenter.
 CatchResults basic_catcher(
-    ConsoleHandle& console, ControllerContext& context,
+    ConsoleHandle& console, SwitchControllerContext& context,
     Language language,
     const std::string& ball_slug, uint16_t ball_limit
 );

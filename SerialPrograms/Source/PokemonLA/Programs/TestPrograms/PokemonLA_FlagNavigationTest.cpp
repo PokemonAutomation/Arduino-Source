@@ -55,7 +55,7 @@ FlagNavigationTest::FlagNavigationTest()
 }
 
 
-void FlagNavigationTest::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
+void FlagNavigationTest::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
 
     FlagNavigationAir session(
         env, env.console, context,

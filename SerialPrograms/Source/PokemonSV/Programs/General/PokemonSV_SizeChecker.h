@@ -35,11 +35,11 @@ public:
 class SizeChecker : public SingleSwitchProgramInstance{
 public:
     SizeChecker();
-    virtual void program(SingleSwitchProgramEnvironment& env, ControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
-    void enter_check_mode(SingleSwitchProgramEnvironment& env, ControllerContext& context);
-    void exit_check_mode(SingleSwitchProgramEnvironment& env, ControllerContext& context, VideoSnapshot screen);
+    void enter_check_mode(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
+    void exit_check_mode(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, VideoSnapshot screen);
 
 private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;

@@ -18,7 +18,7 @@ class GoHomeWhenDoneOption : public BooleanCheckBoxOption{
 public:
     GoHomeWhenDoneOption(bool default_value);
 
-    void run_end_of_program(ControllerContext& context);
+    void run_end_of_program(SwitchControllerContext& context);
 };
 
 

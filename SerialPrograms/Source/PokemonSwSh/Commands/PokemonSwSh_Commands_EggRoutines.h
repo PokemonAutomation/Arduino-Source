@@ -15,11 +15,11 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-void eggfetcher_loop        (ControllerContext& context);
-void move_while_mashing_B   (ControllerContext& context, uint16_t duration);
-void spin_and_mash_A        (ControllerContext& context, uint16_t duration);
-void travel_to_spin_location(ControllerContext& context);
-void travel_back_to_lady    (ControllerContext& context);
+void eggfetcher_loop        (SwitchControllerContext& context);
+void move_while_mashing_B   (SwitchControllerContext& context, uint16_t duration);
+void spin_and_mash_A        (SwitchControllerContext& context, uint16_t duration);
+void travel_to_spin_location(SwitchControllerContext& context);
+void travel_back_to_lady    (SwitchControllerContext& context);
 
 
 

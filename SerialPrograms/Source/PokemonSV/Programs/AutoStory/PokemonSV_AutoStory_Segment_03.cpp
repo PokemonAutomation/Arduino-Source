@@ -39,7 +39,7 @@ std::string AutoStory_Segment_03::end_text() const{
     return "End: Finished catch tutorial. Walked to the cliff and heard mystery cry.";
 }
 
-void AutoStory_Segment_03::run_segment(SingleSwitchProgramEnvironment& env, ControllerContext& context, AutoStoryOptions options) const{
+void AutoStory_Segment_03::run_segment(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, AutoStoryOptions options) const{
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
 
     context.wait_for_all_requests();
@@ -61,7 +61,7 @@ void AutoStory_Segment_03::run_segment(SingleSwitchProgramEnvironment& env, Cont
 
 void checkpoint_05(
     SingleSwitchProgramEnvironment& env, 
-    ControllerContext& context, 
+    SwitchControllerContext& context, 
     EventNotificationOption& notif_status_update
 ){
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
@@ -97,7 +97,7 @@ void checkpoint_05(
 
 void checkpoint_06(
     SingleSwitchProgramEnvironment& env, 
-    ControllerContext& context, 
+    SwitchControllerContext& context, 
     EventNotificationOption& notif_status_update
 ){
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
@@ -147,7 +147,7 @@ void checkpoint_06(
 
 void checkpoint_07(
     SingleSwitchProgramEnvironment& env, 
-    ControllerContext& context, 
+    SwitchControllerContext& context, 
     EventNotificationOption& notif_status_update
 ){
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
@@ -171,12 +171,12 @@ void checkpoint_07(
 
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 128, 0, 80);
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
-            [&](const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context){           
+            [&](const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context){           
                 overworld_navigation(env.program_info(), env.console, context, 
                     NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 
                     128, 0, 24, 12, true, true);
             }, 
-            [&](const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context){           
+            [&](const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context){           
                 pbf_move_left_joystick(context, 0, 128, 40, 50);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }

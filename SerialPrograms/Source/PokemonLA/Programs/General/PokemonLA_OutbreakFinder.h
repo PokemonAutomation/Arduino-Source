@@ -30,7 +30,7 @@ public:
 class OutbreakFinder : public SingleSwitchProgramInstance{
 public:
     OutbreakFinder();
-    virtual void program(SingleSwitchProgramEnvironment& env, ControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 
 private:
@@ -46,7 +46,7 @@ private:
     // - desired_MMO_pokemon: user desired MMO pokemon selected by `DESIRED_MMO_SLUGS`.
     //   User selected MMO pokemon with star symbols, `DESIRED_STAR_MMO_SLUGS` do not affect `desired_MMO_pokemon`. 
     // - desired_star_MMO_pokemon: user desired MMO pokemon with star symbols.
-    bool run_iteration(SingleSwitchProgramEnvironment& env, ControllerContext& context,
+    bool run_iteration(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context,
         const std::set<std::string>& desired_hisui_map_events,
         const std::set<std::string>& desired_outbreaks,
         const std::set<std::string>& desired_MMO_pokemon,
@@ -56,14 +56,14 @@ private:
     //  Return true if program should stop (match found).
     //  desired_events: the desired set of pokemon slugs and MMO events.
     std::set<std::string> read_travel_map_outbreaks(
-        SingleSwitchProgramEnvironment& env, ControllerContext& context,
+        SingleSwitchProgramEnvironment& env, SwitchControllerContext& context,
         const std::set<std::string>& desired_events
     );
 
     // Enter a map with MMO and read names of the pokemon appearing in the MMO.
     // - mmo_name: MMO event slug, e.g. "fieldlands-mmo"
     std::set<std::string> enter_region_and_read_MMO(
-        SingleSwitchProgramEnvironment& env, ControllerContext& context,
+        SingleSwitchProgramEnvironment& env, SwitchControllerContext& context,
         const std::string& mmo_name,
         const std::set<std::string>& desired_MMOs,
         const std::set<std::string>& desired_star_MMOs
@@ -73,7 +73,7 @@ private:
     // If `inside_map` is true, the function is called when the game is inside the travel map.
     // Otherwise, the function is called when the player character is standing at the program start location.
     void goto_region_and_return(
-        SingleSwitchProgramEnvironment& env, ControllerContext& context,
+        SingleSwitchProgramEnvironment& env, SwitchControllerContext& context,
         bool inside_map
     );
 

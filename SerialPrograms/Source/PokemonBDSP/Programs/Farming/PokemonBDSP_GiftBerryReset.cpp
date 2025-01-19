@@ -101,7 +101,7 @@ GiftBerryReset::GiftBerryReset()
 
 
 
-void GiftBerryReset::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
+void GiftBerryReset::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     GiftBerryReset_Descriptor::Stats& stats = env.current_stats<GiftBerryReset_Descriptor::Stats>();
     env.update_stats();
 

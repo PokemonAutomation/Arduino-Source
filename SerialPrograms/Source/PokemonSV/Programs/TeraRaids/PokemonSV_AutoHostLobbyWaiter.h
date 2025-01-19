@@ -28,7 +28,7 @@ class TeraLobbyWaiter{
 public:
     TeraLobbyWaiter(
         ProgramEnvironment& env,
-        ConsoleHandle& console, ControllerContext& context,
+        ConsoleHandle& console, SwitchControllerContext& context,
         uint8_t host_players,
         const std::string& lobby_code, WallClock start_time,
         SimpleIntegerOption<uint16_t>& LOBBY_WAIT_DELAY,
@@ -72,7 +72,7 @@ private:
 private:
     ProgramEnvironment& m_env;
     ConsoleHandle& m_console;
-    ControllerContext& m_context;
+    SwitchControllerContext& m_context;
     uint8_t m_host_players;
 
     const std::string& m_lobby_code;

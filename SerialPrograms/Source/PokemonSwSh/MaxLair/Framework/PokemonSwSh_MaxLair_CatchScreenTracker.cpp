@@ -18,7 +18,7 @@ namespace PokemonSwSh{
 namespace MaxLairInternal{
 
 
-CaughtPokemonScreen::CaughtPokemonScreen(ConsoleHandle& console, ControllerContext& context)
+CaughtPokemonScreen::CaughtPokemonScreen(ConsoleHandle& console, SwitchControllerContext& context)
     : m_console(console)
     , m_context(context)
     , m_total(count_catches(console, console.video().snapshot()))

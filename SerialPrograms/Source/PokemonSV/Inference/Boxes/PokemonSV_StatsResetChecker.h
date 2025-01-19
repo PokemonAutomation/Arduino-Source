@@ -29,7 +29,7 @@ namespace PokemonSV{
 
 //This is a similar to check_baby_info, except for Stats Reset
 bool check_stats_reset_info(
-    ConsoleHandle& console, ControllerContext& context,
+    ConsoleHandle& console, SwitchControllerContext& context,
     OCR::LanguageOCROption& LANGUAGE, Pokemon::StatsHuntIvJudgeFilterTable& FILTERS,
     Pokemon::StatsHuntAction& action
 );

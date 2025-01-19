@@ -20,7 +20,7 @@ public:
     virtual std::string end_text() const override;
     virtual void run_segment(
         SingleSwitchProgramEnvironment& env, 
-        ControllerContext& context,
+        SwitchControllerContext& context,
         AutoStoryOptions options) const override;
 };
 

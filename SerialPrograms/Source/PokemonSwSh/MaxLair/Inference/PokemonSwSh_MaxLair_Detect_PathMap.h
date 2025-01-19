@@ -33,7 +33,7 @@ bool read_type_array(
 
 
 bool read_path(
-    ProgramEnvironment& env, ConsoleHandle& console, ControllerContext& context,
+    ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context,
     PathMap& path,
     const ImageFloatBox& box
 );

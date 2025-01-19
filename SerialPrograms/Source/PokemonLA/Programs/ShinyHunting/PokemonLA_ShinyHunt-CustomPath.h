@@ -37,14 +37,14 @@ public:
 class ShinyHuntCustomPath : public SingleSwitchProgramInstance{
 public:
     ShinyHuntCustomPath();
-    virtual void program(SingleSwitchProgramEnvironment& env, ControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
     // Run the custom path on overworld.
-    void run_path(SingleSwitchProgramEnvironment& env, ControllerContext& context);
+    void run_path(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
 
     // Do one action (while ignoring listen-related actions)
-    void do_non_listen_action(ConsoleHandle& console, ControllerContext& context, const CustomPathTableRow2& row);
+    void do_non_listen_action(ConsoleHandle& console, SwitchControllerContext& context, const CustomPathTableRow2& row);
 
 private:
     ShinyRequiresAudioText SHINY_REQUIRES_AUDIO;

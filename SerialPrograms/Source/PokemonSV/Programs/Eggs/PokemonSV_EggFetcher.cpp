@@ -84,7 +84,7 @@ EggFetcher::EggFetcher()
 }
 
 
-void EggFetcher::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
+void EggFetcher::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
     EggFetcher_Descriptor::Stats& stats = env.current_stats<EggFetcher_Descriptor::Stats>();

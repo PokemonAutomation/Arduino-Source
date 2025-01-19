@@ -30,17 +30,17 @@ public:
 class IngoMoveGrinder : public SingleSwitchProgramInstance{
 public:
     IngoMoveGrinder();
-    virtual void program(SingleSwitchProgramEnvironment& env, ControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
-    bool run_iteration(SingleSwitchProgramEnvironment& env, ControllerContext& context);
+    bool run_iteration(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
 
     //  Returns true if version 1.0.
-    bool start_dialog(ConsoleHandle& console, ControllerContext& context);
+    bool start_dialog(ConsoleHandle& console, SwitchControllerContext& context);
 
 private:
-    void go_to_next_move(SingleSwitchProgramEnvironment& env, ControllerContext& context);
-    void go_to_next_pokemon(SingleSwitchProgramEnvironment& env, ControllerContext& context);
+    void go_to_next_move(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
+    void go_to_next_pokemon(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
     size_t get_next_move_to_switch_to() const;
     size_t get_next_pokemon_to_switch_to() const;
     std::string debug_current_info() const;

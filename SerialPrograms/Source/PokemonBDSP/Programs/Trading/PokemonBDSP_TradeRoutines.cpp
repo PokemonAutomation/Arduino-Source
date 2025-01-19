@@ -30,7 +30,7 @@ TradeStats::TradeStats()
 
 
 void trade_current_pokemon(
-    ConsoleHandle& console, ControllerContext& context,
+    ConsoleHandle& console, SwitchControllerContext& context,
     MultiConsoleErrorState& tracker,
     TradeStats& stats
 ){
@@ -47,9 +47,9 @@ void trade_current_pokemon(
         context.wait_for_all_requests();
         SelectionArrowFinder detector0(console, {0.50, 0.58, 0.40, 0.10}, COLOR_RED);
         SelectionArrowFinder detector1(console, {0.50, 0.52, 0.40, 0.10}, COLOR_RED);
-        int ret = run_until<ControllerContext>(
+        int ret = run_until<SwitchControllerContext>(
             console, context,
-            [](ControllerContext& context){
+            [](SwitchControllerContext& context){
                 pbf_mash_button(context, BUTTON_ZL, 20 * TICKS_PER_SECOND);
             },
             {detector0, detector1}
@@ -81,9 +81,9 @@ void trade_current_pokemon(
     //  Wait for black screen.
     {
         BlackScreenOverWatcher black_screen;
-        int ret = run_until<ControllerContext>(
+        int ret = run_until<SwitchControllerContext>(
             console, context,
-            [](ControllerContext& context){
+            [](SwitchControllerContext& context){
                 pbf_mash_button(context, BUTTON_ZL, 120 * TICKS_PER_SECOND);
             },
             {{black_screen}}
@@ -100,9 +100,9 @@ void trade_current_pokemon(
     //  Mash B until 2nd black screen.
     {
         BlackScreenWatcher black_screen;
-        int ret = run_until<ControllerContext>(
+        int ret = run_until<SwitchControllerContext>(
             console, context,
-            [](ControllerContext& context){
+            [](SwitchControllerContext& context){
                 pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
             },
             {{black_screen}}
@@ -143,7 +143,7 @@ void trade_current_box(
             send_program_status_notification(env, notifications);
 
             MultiConsoleErrorState error_state;
-            env.run_in_parallel(scope, [&](ConsoleHandle& console, ControllerContext& context){
+            env.run_in_parallel(scope, [&](ConsoleHandle& console, SwitchControllerContext& context){
                 uint16_t box_scroll_delay = GameSettings::instance().BOX_SCROLL_DELAY_0;
                 for (size_t r = 0; r < row; r++){
                     pbf_move_right_joystick(context, 128, 255, 20, box_scroll_delay);

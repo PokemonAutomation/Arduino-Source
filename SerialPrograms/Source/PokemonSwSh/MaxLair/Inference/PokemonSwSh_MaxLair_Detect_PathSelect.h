@@ -77,7 +77,7 @@ public:
     ) const;
 
 
-    void read_path(ProgramEnvironment& env, ConsoleHandle& console, ControllerContext& context, GlobalState& state);
+    void read_path(ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context, GlobalState& state);
 
 
     //  Determine which side you're on (left or right) in the path.

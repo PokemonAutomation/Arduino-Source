@@ -26,7 +26,7 @@ class MenuOption{
 public:
     ~MenuOption();
     MenuOption(
-        ConsoleHandle& console, ControllerContext& context,
+        ConsoleHandle& console, SwitchControllerContext& context,
         Language language
     );
 
@@ -65,7 +65,7 @@ private:
 
 private:
     ConsoleHandle& m_console;
-    ControllerContext& m_context;
+    SwitchControllerContext& m_context;
     Language m_language;
     VideoOverlaySet m_overlays;
     GradientArrowDetector m_arrow;

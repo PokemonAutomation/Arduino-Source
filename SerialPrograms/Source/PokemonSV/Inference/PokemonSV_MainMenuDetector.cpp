@@ -92,7 +92,7 @@ std::pair<MenuSide, int> MainMenuDetector::detect_location(const ImageViewRGB32&
 
 
 bool MainMenuDetector::move_cursor(
-    const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context,
+    const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context,
     MenuSide side, int row, bool fast
 ) const{
     if (side == MenuSide::NONE){

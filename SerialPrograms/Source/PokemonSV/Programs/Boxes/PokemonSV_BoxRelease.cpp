@@ -20,7 +20,7 @@ namespace PokemonSV{
 
 
 void release_one_pokemon(
-    const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context,
+    const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context,
     size_t& errors
 ){
     bool release_attempted = false;
@@ -134,7 +134,7 @@ void release_one_pokemon(
 }
 
 void release_box(
-    const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context,
+    const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context,
     size_t& errors, uint8_t start_row
 ){
     context.wait_for_all_requests();

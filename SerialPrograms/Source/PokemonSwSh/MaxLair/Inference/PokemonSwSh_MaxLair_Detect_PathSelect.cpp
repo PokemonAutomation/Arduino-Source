@@ -239,7 +239,7 @@ void PathReader::read_hp(
 
 
 
-void PathReader::read_path(ProgramEnvironment& env, ConsoleHandle& console, ControllerContext& context, GlobalState& state){
+void PathReader::read_path(ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context, GlobalState& state){
     PathMap path;
     if (MaxLairInternal::read_path(env, console, context, path, m_path)){
         console.log("Path Detection:\n" + path.dump(), COLOR_BLUE);

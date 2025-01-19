@@ -36,13 +36,13 @@ MultiSwitchProgramEnvironment::MultiSwitchProgramEnvironment(
 
 void MultiSwitchProgramEnvironment::run_in_parallel(
     CancellableScope& scope,
-    const std::function<void(ConsoleHandle& console, ControllerContext& context)>& func
+    const std::function<void(ConsoleHandle& console, SwitchControllerContext& context)>& func
 ){
     run_in_parallel(scope, 0, consoles.size(), func);
 }
 void MultiSwitchProgramEnvironment::run_in_parallel(
     CancellableScope& scope, size_t s, size_t e,
-    const std::function<void(ConsoleHandle& console, ControllerContext& context)>& func
+    const std::function<void(ConsoleHandle& console, SwitchControllerContext& context)>& func
 ){
     realtime_dispatcher().run_in_parallel(
         s, e,
@@ -51,7 +51,7 @@ void MultiSwitchProgramEnvironment::run_in_parallel(
             ThreadUtilizationStat stat(current_thread_handle(), "Program Thread " + std::to_string(index) + ":");
             console.overlay().add_stat(stat);
             try{
-                ControllerContext context(scope, consoles[index].controller());
+                SwitchControllerContext context(scope, consoles[index].controller());
                 func(console, context);
                 context.wait_for_all_requests();
                 console.overlay().remove_stat(stat);

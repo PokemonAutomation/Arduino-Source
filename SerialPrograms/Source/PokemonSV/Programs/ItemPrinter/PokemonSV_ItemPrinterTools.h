@@ -34,12 +34,12 @@ struct ItemPrinterPrizeResult{
 
 void item_printer_start_print(
     AsyncDispatcher& dispatcher,
-    ConsoleHandle& console, ControllerContext& context,
+    ConsoleHandle& console, SwitchControllerContext& context,
     Language language, ItemPrinterJobs jobs
 );
 ItemPrinterPrizeResult item_printer_finish_print(
     AsyncDispatcher& dispatcher,
-    ConsoleHandle& console, ControllerContext& context,
+    ConsoleHandle& console, SwitchControllerContext& context,
     Language language
 );
 

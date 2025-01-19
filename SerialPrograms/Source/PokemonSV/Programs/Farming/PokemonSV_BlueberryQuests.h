@@ -67,49 +67,49 @@ const std::set<BBQuests> not_possible_quests = {
 
 
 // Open the BBQ panel and read the current amount of BP
-int read_BP(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context);
+int read_BP(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context);
 
 //Open the quest panel and read in the current quests.
 //Currently only supports singleplayer.
 //For multiplayer, we will want keep track of which quest are gold/red and scroll cursor down until all of the current player's blue quests are in.
-std::vector<BBQuests> read_quests(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context, const BBQOption& BBQ_OPTIONS);
+std::vector<BBQuests> read_quests(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context, const BBQOption& BBQ_OPTIONS);
 
 //Determine which quests are possible and which quests are not. (ex. no eggs, reroll egg hatcher.)
 //Quests not possible are removed from the list. If the list is empty, then reroll all items.
-std::vector<BBQuests> process_quest_list(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context, const BBQOption& BBQ_OPTIONS, std::vector<BBQuests>& quest_list, uint8_t& eggs_hatched);
+std::vector<BBQuests> process_quest_list(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context, const BBQOption& BBQ_OPTIONS, std::vector<BBQuests>& quest_list, uint8_t& eggs_hatched);
 
 //Take the current quest and calls the function to do it, then checks the quest was successful. Returns true if so.
-bool process_and_do_quest(ProgramEnvironment& env, ConsoleHandle& console, ControllerContext& context, BBQOption& BBQ_OPTIONS, BBQuests current_quest, uint8_t& eggs_hatched);
+bool process_and_do_quest(ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context, BBQOption& BBQ_OPTIONS, BBQuests current_quest, uint8_t& eggs_hatched);
 
 //Iterate through TMs until a craftable one is found. Make the TM and return to position.
-void quest_make_tm(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context);
+void quest_make_tm(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context);
 
 //Do laps in central plaza.
-void quest_travel_500(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context);
+void quest_travel_500(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context);
 
 //Run around until you encounter a pokemon. Tera, then defeat it by spamming your first move.
-void quest_tera_self_defeat(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context, const BBQOption& BBQ_OPTIONS);
+void quest_tera_self_defeat(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context, const BBQOption& BBQ_OPTIONS);
 
 //Sneak up on a pokemon
-void quest_sneak_up(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context, const BBQOption& BBQ_OPTIONS);
+void quest_sneak_up(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context, const BBQOption& BBQ_OPTIONS);
 
 //Kill a tera pokemon
-void quest_wild_tera(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context, const BBQOption& BBQ_OPTIONS);
+void quest_wild_tera(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context, const BBQOption& BBQ_OPTIONS);
 
 //Give bath
-void quest_wash_pokemon(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context);
+void quest_wash_pokemon(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context);
 
 //Withdraw and hatch an egg
-void quest_hatch_egg(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context, const BBQOption& BBQ_OPTIONS);
+void quest_hatch_egg(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context, const BBQOption& BBQ_OPTIONS);
 
 //Make a sandwich of type flavor
-void quest_sandwich(ProgramEnvironment& env, ConsoleHandle& console, ControllerContext& context, const BBQOption& BBQ_OPTIONS, BBQuests current_quest);
+void quest_sandwich(ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context, const BBQOption& BBQ_OPTIONS, BBQuests current_quest);
 
 //Complete a tera raid battle
-void quest_tera_raid(ProgramEnvironment& env, ConsoleHandle& console, ControllerContext& context, BBQOption& BBQ_OPTIONS);
+void quest_tera_raid(ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context, BBQOption& BBQ_OPTIONS);
 
 //Defeat 10/30 pokemon in autobattle
-void quest_auto_battle(ProgramEnvironment& env, ConsoleHandle& console, ControllerContext& context, const BBQOption& BBQ_OPTIONS, BBQuests current_quest);
+void quest_auto_battle(ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context, const BBQOption& BBQ_OPTIONS, BBQuests current_quest);
 
 }
 }

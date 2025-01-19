@@ -122,7 +122,7 @@ CloneItems101::CloneItems101()
 
 
 
-bool CloneItems101::clone_item(ProgramEnvironment& env, ConsoleHandle& console, ControllerContext& context){
+bool CloneItems101::clone_item(ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context){
     CloneItems101_Descriptor::Stats& stats = env.current_stats<CloneItems101_Descriptor::Stats>();
 
     bool item_held = false;
@@ -259,7 +259,7 @@ bool CloneItems101::clone_item(ProgramEnvironment& env, ConsoleHandle& console, 
     }
 }
 
-void CloneItems101::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
+void CloneItems101::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
     CloneItems101_Descriptor::Stats& stats = env.current_stats<CloneItems101_Descriptor::Stats>();
@@ -289,9 +289,9 @@ void CloneItems101::program(SingleSwitchProgramEnvironment& env, ControllerConte
         OverworldWatcher overworld(env.console, COLOR_RED);
         MainMenuWatcher main_menu(COLOR_YELLOW);
         context.wait_for_all_requests();
-        int ret = run_until<ControllerContext>(
+        int ret = run_until<SwitchControllerContext>(
             env.console, context,
-            [](ControllerContext& context){
+            [](SwitchControllerContext& context){
                 for (size_t c = 0; c < 10; c++){
                     pbf_press_button(context, BUTTON_B, 20, 230);
                 }

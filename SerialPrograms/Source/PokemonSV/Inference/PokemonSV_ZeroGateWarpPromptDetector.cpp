@@ -43,7 +43,7 @@ int ZeroGateWarpPromptDetector::detect_location(const ImageViewRGB32& screen) co
     return index;
 }
 bool ZeroGateWarpPromptDetector::move_cursor(
-    const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context,
+    const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context,
     int row
 ) const{
     VideoOverlaySet overlays(console.overlay());

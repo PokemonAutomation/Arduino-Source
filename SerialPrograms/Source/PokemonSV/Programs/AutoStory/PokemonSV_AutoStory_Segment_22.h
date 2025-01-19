@@ -20,22 +20,22 @@ public:
     virtual std::string end_text() const override;
     virtual void run_segment(
         SingleSwitchProgramEnvironment& env, 
-        ControllerContext& context,
+        SwitchControllerContext& context,
         AutoStoryOptions options) const override;
 };
 
 
 // start: At East Province (Area One) Pokecenter.
 // end: 
-void checkpoint_47(SingleSwitchProgramEnvironment& env, ControllerContext& context, EventNotificationOption& notif_status_update);  
+void checkpoint_47(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, EventNotificationOption& notif_status_update);  
 
 // start: 
 // end: 
-void checkpoint_48(SingleSwitchProgramEnvironment& env, ControllerContext& context, EventNotificationOption& notif_status_update);  
+void checkpoint_48(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, EventNotificationOption& notif_status_update);  
 
 // start: 
 // end: 
-void checkpoint_49(SingleSwitchProgramEnvironment& env, ControllerContext& context, EventNotificationOption& notif_status_update);  
+void checkpoint_49(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, EventNotificationOption& notif_status_update);  
 
 
 

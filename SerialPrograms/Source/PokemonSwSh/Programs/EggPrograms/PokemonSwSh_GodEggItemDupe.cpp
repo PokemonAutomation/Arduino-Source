@@ -58,7 +58,7 @@ GodEggItemDupe::GodEggItemDupe()
 
 
 void GodEggItemDupe::collect_godegg(
-    ControllerContext& context,
+    SwitchControllerContext& context,
     uint8_t party_slot,
     bool map_to_pokemon,
     bool pokemon_to_map
@@ -127,7 +127,7 @@ void GodEggItemDupe::collect_godegg(
         pbf_mash_button(context, BUTTON_B, 700);
     }
 }
-void GodEggItemDupe::run_program(Logger& logger, ControllerContext& context, uint16_t attempts) const{
+void GodEggItemDupe::run_program(Logger& logger, SwitchControllerContext& context, uint16_t attempts) const{
     if (attempts == 0){
         return;
     }
@@ -164,7 +164,7 @@ void GodEggItemDupe::run_program(Logger& logger, ControllerContext& context, uin
     }
 }
 
-void GodEggItemDupe::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
+void GodEggItemDupe::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
         resume_game_back_out(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 400);

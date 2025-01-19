@@ -163,7 +163,7 @@ void TeraSelfFarmer::value_changed(void* object){
 }
 
 
-bool TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, ControllerContext& context){
+bool TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     env.console.log("Running raid...");
 
     TeraSelfFarmer_Descriptor::Stats& stats = env.current_stats<TeraSelfFarmer_Descriptor::Stats>();
@@ -212,7 +212,7 @@ bool TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, ControllerCon
 }
 
 
-void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
+void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
     TeraSelfFarmer_Descriptor::Stats& stats = env.current_stats<TeraSelfFarmer_Descriptor::Stats>();

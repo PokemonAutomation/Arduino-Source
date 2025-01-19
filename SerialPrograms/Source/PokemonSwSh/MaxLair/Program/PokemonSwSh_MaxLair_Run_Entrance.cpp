@@ -18,7 +18,7 @@ namespace MaxLairInternal{
 
 void run_entrance(
     AdventureRuntime& runtime,
-    ProgramEnvironment& env, ConsoleHandle& console, ControllerContext& context,
+    ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context,
     bool save_path,
     GlobalStateTracker& state_tracker
 ){

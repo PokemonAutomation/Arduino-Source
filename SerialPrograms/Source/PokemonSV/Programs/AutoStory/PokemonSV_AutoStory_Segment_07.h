@@ -20,14 +20,14 @@ public:
     virtual std::string end_text() const override;
     virtual void run_segment(
         SingleSwitchProgramEnvironment& env, 
-        ControllerContext& context,
+        SwitchControllerContext& context,
         AutoStoryOptions options) const override;
 };
 
 
 // start: Arrived at Los Platos pokecenter. Cleared Let's go tutorial.
 // end: Arrived at Mesagoza (South) Pokecenter
-void checkpoint_12(SingleSwitchProgramEnvironment& env, ControllerContext& context, EventNotificationOption& notif_status_update);
+void checkpoint_12(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, EventNotificationOption& notif_status_update);
 
 }
 }

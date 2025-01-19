@@ -139,7 +139,7 @@ LeapGrinder::LeapGrinder()
 }
 
 
-bool LeapGrinder::run_iteration(SingleSwitchProgramEnvironment& env, ControllerContext& context){
+bool LeapGrinder::run_iteration(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
 
     LeapGrinder_Descriptor::Stats& stats = env.current_stats<LeapGrinder_Descriptor::Stats>();
     stats.attempts++;
@@ -170,9 +170,9 @@ bool LeapGrinder::run_iteration(SingleSwitchProgramEnvironment& env, ControllerC
         return on_shiny_callback(env, env.console, SHINY_DETECTED_ENROUTE, error_coefficient);
     });
 
-    int ret = run_until<ControllerContext>(
+    int ret = run_until<SwitchControllerContext>(
         env.console, context,
-        [&](ControllerContext& context){
+        [&](SwitchControllerContext& context){
             route(env, env.console, context, (LeapPokemon)POKEMON.index());
         },
         {{shiny_detector}}
@@ -260,7 +260,7 @@ bool LeapGrinder::run_iteration(SingleSwitchProgramEnvironment& env, ControllerC
     return false;
 }
 
-void LeapGrinder::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
+void LeapGrinder::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     LeapGrinder_Descriptor::Stats& stats = env.current_stats<LeapGrinder_Descriptor::Stats>();
 
     //  Connect the controller.

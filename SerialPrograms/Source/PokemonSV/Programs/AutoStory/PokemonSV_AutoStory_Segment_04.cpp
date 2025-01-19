@@ -41,7 +41,7 @@ std::string AutoStory_Segment_04::end_text() const{
     return "End: Saved the Legendary. Escaped from the Houndoom cave.";
 }
 
-void AutoStory_Segment_04::run_segment(SingleSwitchProgramEnvironment& env, ControllerContext& context, AutoStoryOptions options) const{
+void AutoStory_Segment_04::run_segment(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, AutoStoryOptions options) const{
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
 
     context.wait_for_all_requests();
@@ -60,7 +60,7 @@ void AutoStory_Segment_04::run_segment(SingleSwitchProgramEnvironment& env, Cont
 
 void checkpoint_08(
     SingleSwitchProgramEnvironment& env, 
-    ControllerContext& context, 
+    SwitchControllerContext& context, 
     EventNotificationOption& notif_status_update
 ){
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
@@ -97,9 +97,9 @@ void checkpoint_08(
         GradientArrowWatcher arrow(COLOR_RED, GradientArrowType::RIGHT, {0.104, 0.312, 0.043, 0.08});
         context.wait_for_all_requests();
 
-        int ret = run_until<ControllerContext>(
+        int ret = run_until<SwitchControllerContext>(
             env.console, context,
-            [](ControllerContext& context){
+            [](SwitchControllerContext& context){
                 for (int i = 0; i < 10; i++){
                     pbf_press_dpad(context, DPAD_UP, 20, 250);
                 }
@@ -127,7 +127,7 @@ void checkpoint_08(
         env.console.log("Enter cave");
         env.console.overlay().add_log("Enter cave", COLOR_WHITE);
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
-            [&](const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context){
+            [&](const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context){
                 pbf_move_left_joystick(context, 128, 0, 600, 50);
                 realign_player(env.program_info(), console, context, PlayerRealignMode::REALIGN_NO_MARKER, 150, 20, 20);
                 pbf_move_left_joystick(context, 128, 0, 1000, 50);
@@ -142,7 +142,7 @@ void checkpoint_08(
         clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 10, {CallbackEnum::PROMPT_DIALOG});
 
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
-            [&](const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context){
+            [&](const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context){
                 // Legendary rock break
                 context.wait_for_all_requests();
                 console.log("Rock break");

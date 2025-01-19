@@ -34,11 +34,11 @@ class EggAutonomous : public SingleSwitchProgramInstance{
 public:
     EggAutonomous();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, ControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
     bool run_batch(
-        SingleSwitchProgramEnvironment& env, ControllerContext& context,
+        SingleSwitchProgramEnvironment& env, SwitchControllerContext& context,
         EggAutonomousState& saved_state,
         EggAutonomousState& current_state
     );

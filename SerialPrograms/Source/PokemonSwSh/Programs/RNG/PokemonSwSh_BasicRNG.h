@@ -16,7 +16,7 @@ using namespace Pokemon;
 // Performs 128 Orbeetle attack animations. 
 // Returns the state after those animations.
 Xoroshiro128PlusState find_rng_state(
-    ConsoleHandle& console, ControllerContext& context,
+    ConsoleHandle& console, SwitchControllerContext& context,
     bool save_screenshots, bool log_values
 );
 
@@ -24,7 +24,7 @@ Xoroshiro128PlusState find_rng_state(
 // Returns the state after those animations.
 Xoroshiro128PlusState refind_rng_state(
     ConsoleHandle& console,
-    ControllerContext& context,
+    SwitchControllerContext& context,
     Xoroshiro128PlusState last_known_state,
     size_t min_advances,
     size_t max_advances,
@@ -33,7 +33,7 @@ Xoroshiro128PlusState refind_rng_state(
 );
 
 void do_rng_advances(
-    ConsoleHandle& env, ControllerContext& context,
+    ConsoleHandle& env, SwitchControllerContext& context,
     Xoroshiro128Plus& rng,
     size_t advances,
     uint16_t press_duration = 10,

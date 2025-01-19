@@ -14,10 +14,10 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-void move_in_circle_up(ControllerContext& context, bool counter_clockwise);
-void move_in_circle_down(ControllerContext& context, bool counter_clockwise);
-void circle_in_place(ControllerContext& context, bool counter_clockwise);
-void move_in_line(ControllerContext& context, bool horizontal);
+void move_in_circle_up(SwitchControllerContext& context, bool counter_clockwise);
+void move_in_circle_down(SwitchControllerContext& context, bool counter_clockwise);
+void circle_in_place(SwitchControllerContext& context, bool counter_clockwise);
+void move_in_line(SwitchControllerContext& context, bool horizontal);
 
 }
 }

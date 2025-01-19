@@ -129,7 +129,7 @@ AutoHost::AutoHost()
 
 
 WallClock AutoHost::wait_for_lobby_open(
-    SingleSwitchProgramEnvironment& env, ControllerContext& context,
+    SingleSwitchProgramEnvironment& env, SwitchControllerContext& context,
     std::string& lobby_code
 ){
     VideoOverlaySet overlays(env.console.overlay());
@@ -181,7 +181,7 @@ void AutoHost::update_stats_on_raid_start(SingleSwitchProgramEnvironment& env, u
     stats.m_raiders += player_count - 1;
 }
 bool AutoHost::start_raid(
-    SingleSwitchProgramEnvironment& env, ControllerContext& context,
+    SingleSwitchProgramEnvironment& env, SwitchControllerContext& context,
     WallClock start_time,
     uint8_t player_count
 ){
@@ -194,9 +194,9 @@ bool AutoHost::start_raid(
         WhiteScreenOverWatcher start_raid(COLOR_BLUE);
         TeraBattleMenuWatcher battle_menu(COLOR_CYAN);
         context.wait_for_all_requests();
-        int ret = run_until<ControllerContext>(
+        int ret = run_until<SwitchControllerContext>(
             env.console, context,
-            [start_time](ControllerContext& context){
+            [start_time](SwitchControllerContext& context){
                 while (true){
                     pbf_press_button(context, BUTTON_A, 20, 105);
                     context.wait_for_all_requests();
@@ -233,7 +233,7 @@ bool AutoHost::start_raid(
 
 
 bool AutoHost::run_lobby(
-    SingleSwitchProgramEnvironment& env, ControllerContext& context,
+    SingleSwitchProgramEnvironment& env, SwitchControllerContext& context,
     std::string& lobby_code,
     std::array<std::map<Language, std::string>, 4>& player_names
 ){
@@ -265,7 +265,7 @@ bool AutoHost::run_lobby(
     return start_raid(env, context, start_time, waiter.last_known_players());
 }
 
-void AutoHost::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
+void AutoHost::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
     AutoHost_Descriptor::Stats& stats = env.current_stats<AutoHost_Descriptor::Stats>();

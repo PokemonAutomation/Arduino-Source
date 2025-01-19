@@ -30,7 +30,7 @@ class GenerateNameOCRDataPokedex : public SingleSwitchProgramInstance{
 public:
     GenerateNameOCRDataPokedex();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, ControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
     void read(

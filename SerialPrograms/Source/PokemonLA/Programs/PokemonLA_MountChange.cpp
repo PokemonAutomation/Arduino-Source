@@ -52,7 +52,7 @@ bool get_mount_coordinates(size_t& index, MountState mount){
     }
 }
 
-void change_mount(ConsoleHandle& console, ControllerContext& context, MountState mount){
+void change_mount(ConsoleHandle& console, SwitchControllerContext& context, MountState mount){
     size_t desired_index;
     bool desired_on = get_mount_coordinates(desired_index, mount);
 
@@ -108,7 +108,7 @@ void change_mount(ConsoleHandle& console, ControllerContext& context, MountState
     );
 }
 
-void dismount(ConsoleHandle& console, ControllerContext& context){
+void dismount(ConsoleHandle& console, SwitchControllerContext& context){
     MountDetector mount_detector;
     for (size_t c = 0; c < 10; c++){
         context.wait_for_all_requests();

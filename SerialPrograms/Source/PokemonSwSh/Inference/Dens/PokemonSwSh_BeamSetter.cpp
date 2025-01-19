@@ -28,7 +28,7 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-BeamSetter::BeamSetter(ProgramEnvironment& /*env*/, ConsoleHandle& console, ControllerContext& context)
+BeamSetter::BeamSetter(ProgramEnvironment& /*env*/, ConsoleHandle& console, SwitchControllerContext& context)
     // : m_env(env)
     : m_console(console)
     , m_context(context)

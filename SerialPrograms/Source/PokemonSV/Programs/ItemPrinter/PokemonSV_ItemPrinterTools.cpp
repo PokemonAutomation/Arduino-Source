@@ -33,7 +33,7 @@ const EnumDatabase<ItemPrinterJobs>& ItemPrinterJobs_Database(){
 
 void item_printer_start_print(
     AsyncDispatcher& dispatcher,
-    ConsoleHandle& console, ControllerContext& context,
+    ConsoleHandle& console, SwitchControllerContext& context,
     Language language, ItemPrinterJobs jobs
 ){
     console.log("Starting print...");
@@ -77,7 +77,7 @@ void item_printer_start_print(
 }
 ItemPrinterPrizeResult item_printer_finish_print(
     AsyncDispatcher& dispatcher,
-    ConsoleHandle& console, ControllerContext& context,
+    ConsoleHandle& console, SwitchControllerContext& context,
     Language language
 ){
     console.log("Finishing print...");

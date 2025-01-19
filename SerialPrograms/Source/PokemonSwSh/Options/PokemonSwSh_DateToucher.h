@@ -49,7 +49,7 @@ public:
     virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
 
     bool ok_to_touch_now();
-    void touch_now_from_home_if_needed(ControllerContext& context);
+    void touch_now_from_home_if_needed(SwitchControllerContext& context);
 
 private:
     SimpleIntegerOption<uint8_t> m_hours;

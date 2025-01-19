@@ -36,7 +36,7 @@ std::string AutoStory_Segment_22::end_text() const{
     return "End: ";
 }
 
-void AutoStory_Segment_22::run_segment(SingleSwitchProgramEnvironment& env, ControllerContext& context, AutoStoryOptions options) const{
+void AutoStory_Segment_22::run_segment(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, AutoStoryOptions options) const{
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
 
     context.wait_for_all_requests();
@@ -55,7 +55,7 @@ void AutoStory_Segment_22::run_segment(SingleSwitchProgramEnvironment& env, Cont
 // todo: uncomment checkpoint_save
 void checkpoint_47(
     SingleSwitchProgramEnvironment& env, 
-    ControllerContext& context, 
+    SwitchControllerContext& context, 
     EventNotificationOption& notif_status_update
 ){
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
@@ -93,7 +93,7 @@ void checkpoint_47(
 // todo: uncomment checkpoint_save
 void checkpoint_48(
     SingleSwitchProgramEnvironment& env, 
-    ControllerContext& context, 
+    SwitchControllerContext& context, 
     EventNotificationOption& notif_status_update
 ){
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
@@ -131,7 +131,7 @@ void checkpoint_48(
 // todo: uncomment checkpoint_save
 void checkpoint_49(
     SingleSwitchProgramEnvironment& env, 
-    ControllerContext& context, 
+    SwitchControllerContext& context, 
     EventNotificationOption& notif_status_update
 ){
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();

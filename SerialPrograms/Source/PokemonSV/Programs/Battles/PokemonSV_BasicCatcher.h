@@ -21,7 +21,7 @@ using namespace Pokemon;
 //  Returns the quantity of the ball.
 //  Returns -1 if unable to read.
 int16_t move_to_ball(
-    const BattleBallReader& reader, ConsoleHandle& console, ControllerContext& context,
+    const BattleBallReader& reader, ConsoleHandle& console, SwitchControllerContext& context,
     const std::string& ball_slug
 );
 
@@ -29,7 +29,7 @@ int16_t move_to_ball(
 //  Returns the quantity prior to throwing the ball.
 //  If ball is not found, returns zero.
 int16_t throw_ball(
-    ConsoleHandle& console, ControllerContext& context,
+    ConsoleHandle& console, SwitchControllerContext& context,
     Language language, const std::string& ball_slug
 );
 
@@ -40,7 +40,7 @@ struct CatchResults{
     uint16_t balls_used;
 };
 CatchResults basic_catcher(
-    ConsoleHandle& console, ControllerContext& context,
+    ConsoleHandle& console, SwitchControllerContext& context,
     Language language,
     const std::string& ball_slug, uint16_t ball_limit,
     bool use_first_move_if_cant_throw,

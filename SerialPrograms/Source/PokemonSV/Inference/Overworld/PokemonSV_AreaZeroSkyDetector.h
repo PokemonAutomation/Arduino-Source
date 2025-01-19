@@ -54,7 +54,7 @@ private:
 
 
 void find_and_center_on_sky(
-    ProgramEnvironment& env, ConsoleHandle& console, ControllerContext& context
+    ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context
 );
 
 

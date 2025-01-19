@@ -49,7 +49,7 @@ GodEggDuplication::GodEggDuplication()
 }
 
 
-void GodEggDuplication::collect_godegg(ControllerContext& context, uint8_t party_slot) const{
+void GodEggDuplication::collect_godegg(SwitchControllerContext& context, uint8_t party_slot) const{
     pbf_wait(context, 50);
     ssf_press_button1(context, BUTTON_B, 100);
     ssf_press_button1(context, BUTTON_B, 100);
@@ -74,7 +74,7 @@ void GodEggDuplication::collect_godegg(ControllerContext& context, uint8_t party
     ssf_press_button1(context, BUTTON_A, 300);
     pbf_mash_button(context, BUTTON_B, 500);
 }
-void GodEggDuplication::run_program(Logger& logger, ControllerContext& context, uint16_t attempts) const{
+void GodEggDuplication::run_program(Logger& logger, SwitchControllerContext& context, uint16_t attempts) const{
     if (attempts == 0){
         return;
     }
@@ -111,7 +111,7 @@ void GodEggDuplication::run_program(Logger& logger, ControllerContext& context, 
     }
 }
 
-void GodEggDuplication::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
+void GodEggDuplication::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
         resume_game_back_out(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 400);

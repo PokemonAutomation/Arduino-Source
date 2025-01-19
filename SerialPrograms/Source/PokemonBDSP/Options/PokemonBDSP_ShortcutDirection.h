@@ -32,7 +32,7 @@ class ShortcutDirectionOption : public EnumDropdownOption<ShortcutDirection>{
 public:
     ShortcutDirectionOption(std::string label);
 
-    void run(ControllerContext& context, uint16_t delay);
+    void run(SwitchControllerContext& context, uint16_t delay);
 
 };
 

@@ -28,7 +28,7 @@ namespace PokemonSV{
 // The function returns when the game shows the sandwich recipe menu.
 // Return true if it enters the recipe menu. Return false if there is no ingredients on the plyaer character so
 // no sandwich can be made.
-bool enter_sandwich_recipe_list(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context);
+bool enter_sandwich_recipe_list(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context);
 
 // Starting at sandwich recipe selection menu, select the desired sandwich recipe and press A to enter
 // the making sandwich mini game. It will use the first sandwich pick in the sandwich pick selection list.
@@ -36,13 +36,13 @@ bool enter_sandwich_recipe_list(const ProgramInfo& info, ConsoleHandle& console,
 // Return true if it successfully finds and starts the recipe.
 // Return false if the function fails to find the recipe. This could be that ingredients are not enough, and therefore
 // the recipe cell is semi-transparent, failed to be detected.
-bool select_sandwich_recipe(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context, size_t sandwich_index);
+bool select_sandwich_recipe(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context, size_t sandwich_index);
 
 // Assuming sandwich is made, press A repeatedly to finish eating animation until returning to picnic
-void finish_sandwich_eating(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context);
+void finish_sandwich_eating(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context);
 
 // Assuming at sanwich recipe list, press X to enter custom sandwich mode
-void enter_custom_sandwich_mode(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context);
+void enter_custom_sandwich_mode(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context);
 
 enum class EggSandwichType{
     GREAT_PEANUT_BUTTER,
@@ -59,7 +59,7 @@ enum class EggSandwichType{
 // It will use the first sandwich pick in the sandwich pick selection list.
 // After entering sandiwich mini game, it will drop the filling to quickly make a two-herb only sandwich to gain egg power lv 3.
 void make_two_herbs_sandwich(
-    const ProgramInfo& info, AsyncDispatcher& dispatcher, ConsoleHandle& console, ControllerContext& context,
+    const ProgramInfo& info, AsyncDispatcher& dispatcher, ConsoleHandle& console, SwitchControllerContext& context,
     EggSandwichType sandwich_type, size_t sweet_herb_index_last, size_t salty_herb_index_last, size_t bitter_herb_index_last
 );
 // Assuming starting at the custom sandwich mode,
@@ -67,25 +67,25 @@ void make_two_herbs_sandwich(
 // It will use the first sandwich pick in the sandwich pick selection list.
 // After entering sandiwich mini game, it will drop the filling to quickly make a two-herb only sandwich to gain egg power lv 3.
 void make_two_herbs_sandwich(
-    const ProgramInfo& info, AsyncDispatcher& dispatcher, ConsoleHandle& console, ControllerContext& context,
+    const ProgramInfo& info, AsyncDispatcher& dispatcher, ConsoleHandle& console, SwitchControllerContext& context,
     EggSandwichType sandwich_type, Language language
 );
 
 // Assuming starting at the sandwich recipe list,
 // Process sandwich options and make a custom sandwich by calling make_sandwich_preset
-void make_sandwich_option(ProgramEnvironment& env, ConsoleHandle& console, ControllerContext& context, SandwichMakerOption& SANDWICH_OPTIONS);
+void make_sandwich_option(ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context, SandwichMakerOption& SANDWICH_OPTIONS);
 
 // Assuming starting at the sandwich recipe list, make a sandwich given a preset ingredient/filling list
 // calls run_sandwich_maker() when done
 // ex. fillings = {{"apple", (uint8_t)1}}; condiments = {{"marmalade", (uint8_t)1}};
 // make_sandwich_preset(env, context, language, fillings, condiments);
-void make_sandwich_preset(ProgramEnvironment& env, ConsoleHandle& console, ControllerContext& context, Language language, std::map<std::string, uint8_t>& fillings, std::map<std::string, uint8_t>& condiments);
+void make_sandwich_preset(ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context, Language language, std::map<std::string, uint8_t>& fillings, std::map<std::string, uint8_t>& condiments);
 
 // Assuming starting waiting for sandwich hand,
 // Take a list of ingredients and make a sandwich
 // Not meant to be run directly, use make_sandwich_option() or make_sandwich_preset() instead
 // make great pb sandwich does call this directly, as it skips the custom sandwich menu
-void run_sandwich_maker(ProgramEnvironment& env, ConsoleHandle& console, ControllerContext& context, Language language, std::map<std::string, uint8_t>& fillings, std::vector<std::string>& fillings_sorted, int& plates);
+void run_sandwich_maker(ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context, Language language, std::map<std::string, uint8_t>& fillings, std::vector<std::string>& fillings_sorted, int& plates);
 
 }
 }

@@ -145,7 +145,7 @@ ShinyHuntScatterbug::ShinyHuntScatterbug()
 }
 
 
-void ShinyHuntScatterbug::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
+void ShinyHuntScatterbug::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     ShinyHuntScatterbug_Descriptor::Stats& stats = env.current_stats<ShinyHuntScatterbug_Descriptor::Stats>();
 
     //  Connect the controller.
@@ -224,8 +224,8 @@ void ShinyHuntScatterbug::program(SingleSwitchProgramEnvironment& env, Controlle
 // `action` must be an action starting at the PokeCenter
 void ShinyHuntScatterbug::handle_battles_and_back_to_pokecenter(
     SingleSwitchProgramEnvironment& env,
-    ControllerContext& context,
-    std::function<void(SingleSwitchProgramEnvironment& env, ControllerContext& context)>&& action
+    SwitchControllerContext& context,
+    std::function<void(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context)>&& action
 ){
     if (m_encounter_tracker == nullptr){
         throw InternalProgramError(&env.logger(), PA_CURRENT_FUNCTION, "m_encounter_tracker == nullptr");
@@ -238,9 +238,9 @@ void ShinyHuntScatterbug::handle_battles_and_back_to_pokecenter(
     while(action_finished == false || returned_to_pokecenter == false){
         // env.console.overlay().add_log("Calculate what to do next");
         EncounterWatcher encounter_watcher(env.console, COLOR_RED);
-        int ret = run_until<ControllerContext>(
+        int ret = run_until<SwitchControllerContext>(
             env.console, context,
-            [&](ControllerContext& context){
+            [&](SwitchControllerContext& context){
                 if (action_finished){
                     // `action` is already finished. Now we just try to get back to pokecenter:
                     reset_to_pokecenter(env.program_info(), env.console, context);
@@ -292,7 +292,7 @@ void ShinyHuntScatterbug::handle_battles_and_back_to_pokecenter(
 
 // Start at Mesagoza South Gate pokecenter, make a sandwich, then use let's go repeatedly until 30 min passes.
 // If 
-void ShinyHuntScatterbug::run_one_sandwich_iteration(SingleSwitchProgramEnvironment& env, ControllerContext& context){
+void ShinyHuntScatterbug::run_one_sandwich_iteration(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     ShinyHuntScatterbug_Descriptor::Stats& stats = env.current_stats<ShinyHuntScatterbug_Descriptor::Stats>();
 
     bool saved_after_this_sandwich = false;
@@ -308,7 +308,7 @@ void ShinyHuntScatterbug::run_one_sandwich_iteration(SingleSwitchProgramEnvironm
     };
 
     handle_battles_and_back_to_pokecenter(env, context, 
-        [this, &last_sandwich_time](SingleSwitchProgramEnvironment& env, ControllerContext& context){
+        [this, &last_sandwich_time](SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
             // Orient camera to look at same direction as player character
             // This is needed because when save-load the game, the camera is reset
             // to this location.
@@ -362,10 +362,10 @@ void ShinyHuntScatterbug::run_one_sandwich_iteration(SingleSwitchProgramEnvironm
         }
 
         handle_battles_and_back_to_pokecenter(env, context, 
-            [this, &path_id, &hp_watcher](SingleSwitchProgramEnvironment& env, ControllerContext& context){
-                run_until<ControllerContext>(
+            [this, &path_id, &hp_watcher](SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+                run_until<SwitchControllerContext>(
                     env.console, context,
-                    [&](ControllerContext& context){
+                    [&](SwitchControllerContext& context){
                         run_lets_go_iteration(env, context, path_id);
                     },
                     {hp_watcher}
@@ -386,7 +386,7 @@ void ShinyHuntScatterbug::run_one_sandwich_iteration(SingleSwitchProgramEnvironm
 
 // One iteration of the hunt: 
 // start at Mesagoza South Gate pokecenter, go out and use Let's Go to battle Scatterbug, 
-void ShinyHuntScatterbug::run_lets_go_iteration(SingleSwitchProgramEnvironment& env, ControllerContext& context, size_t path_id){
+void ShinyHuntScatterbug::run_lets_go_iteration(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, size_t path_id){
     auto& console = env.console;
     // Orient camera to look at same direction as player character
     // This is needed because when save-load the game, the camera is reset
@@ -398,7 +398,7 @@ void ShinyHuntScatterbug::run_lets_go_iteration(SingleSwitchProgramEnvironment& 
     auto move_forward_with_lets_go = [&](int num_iterations){
         context.wait_for_all_requests();
         for(int i = 0; i < num_iterations; i++){
-            use_lets_go_to_clear_in_front(console, context, *m_encounter_tracker, throw_ball_if_bubble, [&](ControllerContext& context){
+            use_lets_go_to_clear_in_front(console, context, *m_encounter_tracker, throw_ball_if_bubble, [&](SwitchControllerContext& context){
                 // Do the following movement while the Let's Go pokemon clearing wild pokemon.
                 // Slowly Moving forward
                 pbf_move_left_joystick(context, 128, 105, 800, 0);

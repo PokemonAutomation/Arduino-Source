@@ -79,14 +79,14 @@ bool on_shiny_callback(
 
 //  Call this after the session ends. Only if the session stopped on the shiny.
 void on_shiny_sound(
-    ProgramEnvironment& env, ConsoleHandle& console, ControllerContext& context,
+    ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context,
     ShinyDetectedActionOption& options,
     float error_coefficient
 );
 
 // Alternative for matches (shiny/alphas) not found by sound.
 void on_match_found(
-    ProgramEnvironment& env, ConsoleHandle& console, ControllerContext& context,
+    ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context,
     ShinyDetectedActionOption& options, bool is_match
 );
 

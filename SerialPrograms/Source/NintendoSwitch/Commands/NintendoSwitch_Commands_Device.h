@@ -13,8 +13,8 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-uint32_t system_clock   (ControllerContext& context);
-void set_leds           (ControllerContext& context, bool on);
+uint32_t system_clock   (SwitchControllerContext& context);
+void set_leds           (SwitchControllerContext& context, bool on);
 
 
 

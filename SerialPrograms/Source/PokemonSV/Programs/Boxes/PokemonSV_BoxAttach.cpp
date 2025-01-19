@@ -24,7 +24,7 @@ namespace PokemonSV{
 //  With the cursor over the item you want to attach, attach to the current
 //  Pokemon, replacing if neccessary.
 void attach_item_from_bag(
-    const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context,
+    const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context,
     size_t& errors
 ){
 //    bool attach_attempted = false;
@@ -103,7 +103,7 @@ void attach_item_from_bag(
 
 
 void attach_item_from_box(
-    const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context,
+    const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context,
     size_t category_index,
     size_t& errors
 ){

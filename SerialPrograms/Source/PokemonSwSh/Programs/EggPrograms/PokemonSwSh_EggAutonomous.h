@@ -36,7 +36,7 @@ class EggAutonomous : public SingleSwitchProgramInstance{
 public:
     EggAutonomous();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, ControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
     // Run one iteration of the egg loop:
@@ -44,22 +44,22 @@ private:
     // - Check if pokemon needs to be kept. Keep them if needed.
     // - Put five eggs from storage to party. Save game if needed.
     // Return true if the egg loop should stop.
-    bool run_batch(SingleSwitchProgramEnvironment& env, ControllerContext& context, EggAutonomous_Descriptor::Stats& stats);
+    bool run_batch(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, EggAutonomous_Descriptor::Stats& stats);
 
-    void save_game(SingleSwitchProgramEnvironment& env, ControllerContext& context);
+    void save_game(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
 
     // Call flying taxi to reset player character position to Nursery front door.
     // fly_from_overworld: if true, the game is in the overworld while calling this function. If false, the game is in the menu.
     // Note: the cursor in the menu must already be at Town Map.
-    void call_flying_taxi(SingleSwitchProgramEnvironment& env, ControllerContext& context, bool fly_from_overworld);
+    void call_flying_taxi(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, bool fly_from_overworld);
 
     // After detecting egg hatching, call this function to wait entil the end of the hatching.
     // num_hatched_eggs: how many eggs hatched (including the current hatching one)
-    void wait_for_egg_hatched(SingleSwitchProgramEnvironment& env, ControllerContext& context, EggAutonomous_Descriptor::Stats& stats, size_t num_hatched_eggs);
+    void wait_for_egg_hatched(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, EggAutonomous_Descriptor::Stats& stats, size_t num_hatched_eggs);
 
     // Call this function when standing in front of the lady to fetch one egg.
     // Return updated `num_eggs_retrieved` to reflect change in fetched eggs.
-    size_t talk_to_lady_to_fetch_egg(SingleSwitchProgramEnvironment& env, ControllerContext& context, EggAutonomous_Descriptor::Stats& stats, size_t num_eggs_retrieved);
+    size_t talk_to_lady_to_fetch_egg(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, EggAutonomous_Descriptor::Stats& stats, size_t num_eggs_retrieved);
 
     // After all five eggs hatched and another five eggs deposit into the first column of the box,
     // call this function to:
@@ -68,11 +68,11 @@ private:
     // - Retrieve the stored egg column to the party.
     // - Call flying taxi to reset player location if needed
     // Return true if the program should stop
-    bool process_hatched_pokemon(SingleSwitchProgramEnvironment& env, ControllerContext& context, EggAutonomous_Descriptor::Stats& stats, bool need_taxi);
+    bool process_hatched_pokemon(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, EggAutonomous_Descriptor::Stats& stats, bool need_taxi);
 
     // Used to wait until Y-Comm icon shows up.
     // Throw error if it does not find it after 10 sec.
-    void wait_for_y_comm_icon(SingleSwitchProgramEnvironment& env, ControllerContext& context, const std::string& error_msg);
+    void wait_for_y_comm_icon(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, const std::string& error_msg);
 
     StartInGripOrGameOption START_LOCATION;
     TouchDateIntervalOption TOUCH_DATE_INTERVAL;

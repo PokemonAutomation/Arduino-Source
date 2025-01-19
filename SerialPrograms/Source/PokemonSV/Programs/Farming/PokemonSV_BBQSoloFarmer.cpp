@@ -67,7 +67,7 @@ BBQSoloFarmer::BBQSoloFarmer()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void BBQSoloFarmer::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
+void BBQSoloFarmer::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
     BBQSoloFarmer_Descriptor::Stats& stats = env.current_stats<BBQSoloFarmer_Descriptor::Stats>();
     

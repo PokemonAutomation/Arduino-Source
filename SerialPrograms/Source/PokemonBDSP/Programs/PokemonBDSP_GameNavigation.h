@@ -16,20 +16,20 @@ namespace PokemonBDSP{
 
 //  Non-Feedback
 
-void save_game(ControllerContext& context);
+void save_game(SwitchControllerContext& context);
 
-void menu_to_box(ControllerContext& context);
-void overworld_to_box(ControllerContext& context);
-void box_to_overworld(ControllerContext& context);
+void menu_to_box(SwitchControllerContext& context);
+void overworld_to_box(SwitchControllerContext& context);
+void box_to_overworld(SwitchControllerContext& context);
 
 
 //  Feedback
 
-void overworld_to_menu(ConsoleHandle& console, ControllerContext& context);
-void save_game(ConsoleHandle& console, ControllerContext& context);
+void overworld_to_menu(ConsoleHandle& console, SwitchControllerContext& context);
+void save_game(ConsoleHandle& console, SwitchControllerContext& context);
 
-void overworld_to_box(ConsoleHandle& console, ControllerContext& context);
-void box_to_overworld(ConsoleHandle& console, ControllerContext& context);
+void overworld_to_box(ConsoleHandle& console, SwitchControllerContext& context);
+void box_to_overworld(ConsoleHandle& console, SwitchControllerContext& context);
 
 
 }

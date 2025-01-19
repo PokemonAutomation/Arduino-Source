@@ -18,7 +18,7 @@ namespace PokemonLA{
 
 // From a camp teleport location, move to the tent and change time of day.
 // if `target_time` is TimeOfDay::NONE, it resets for only a while, healing the pokemon but no change of time.
-void change_time_of_day_at_tent(ConsoleHandle& console, ControllerContext& context, TimeOfDay target_time, Camp camp);
+void change_time_of_day_at_tent(ConsoleHandle& console, SwitchControllerContext& context, TimeOfDay target_time, Camp camp);
 
 
 

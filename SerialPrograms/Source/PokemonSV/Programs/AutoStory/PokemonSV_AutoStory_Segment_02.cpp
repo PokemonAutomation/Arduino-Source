@@ -40,7 +40,7 @@ std::string AutoStory_Segment_02::end_text() const{
     return "End: Battled Nemona on the beach.";
 }
 
-void AutoStory_Segment_02::run_segment(SingleSwitchProgramEnvironment& env, ControllerContext& context, AutoStoryOptions options) const{
+void AutoStory_Segment_02::run_segment(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, AutoStoryOptions options) const{
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
 
     context.wait_for_all_requests();
@@ -60,7 +60,7 @@ void AutoStory_Segment_02::run_segment(SingleSwitchProgramEnvironment& env, Cont
 
 void checkpoint_04(
     SingleSwitchProgramEnvironment& env, 
-    ControllerContext& context, 
+    SwitchControllerContext& context, 
     EventNotificationOption& notif_status_update
 ){
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();

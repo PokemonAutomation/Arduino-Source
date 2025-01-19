@@ -104,7 +104,7 @@ GimmighoulChestFarmer::GimmighoulChestFarmer()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void GimmighoulChestFarmer::navigate_to_gimmi(SingleSwitchProgramEnvironment& env, ControllerContext& context) {
+void GimmighoulChestFarmer::navigate_to_gimmi(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) {
     //Cursor is already in position
     fly_to_overworld_from_map(env.program_info(), env.console, context);
     pbf_move_left_joystick(context, 0, 0, 158, 0);
@@ -127,7 +127,7 @@ void GimmighoulChestFarmer::navigate_to_gimmi(SingleSwitchProgramEnvironment& en
     context.wait_for_all_requests();
 }
 
-void GimmighoulChestFarmer::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
+void GimmighoulChestFarmer::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
     GimmighoulChestFarmer_Descriptor::Stats& stats = env.current_stats<GimmighoulChestFarmer_Descriptor::Stats>();
 

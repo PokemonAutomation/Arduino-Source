@@ -34,7 +34,7 @@ public:
     //  While sitting on the menu, move the cursor to the desired slot.
     //  Returns true if success.
     bool move_cursor(
-        const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context,
+        const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context,
         int row
     ) const;
 

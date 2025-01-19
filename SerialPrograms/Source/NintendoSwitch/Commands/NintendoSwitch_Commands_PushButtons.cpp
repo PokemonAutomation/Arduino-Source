@@ -16,7 +16,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-void pbf_wait(ControllerContext& context, uint16_t ticks){
+void pbf_wait(SwitchControllerContext& context, uint16_t ticks){
 #if 0
     context.issue_request(
         DeviceRequest_pbf_wait(ticks)
@@ -25,7 +25,7 @@ void pbf_wait(ControllerContext& context, uint16_t ticks){
     ssf_do_nothing(context, ticks);
 #endif
 }
-void pbf_press_button(ControllerContext& context, Button button, uint16_t hold_ticks, uint16_t release_ticks){
+void pbf_press_button(SwitchControllerContext& context, Button button, uint16_t hold_ticks, uint16_t release_ticks){
 #if 0
     context.issue_request(
         DeviceRequest_pbf_press_button(button, hold_ticks, release_ticks)
@@ -40,7 +40,7 @@ void pbf_press_button(ControllerContext& context, Button button, uint16_t hold_t
     }
 #endif
 }
-void pbf_press_dpad(ControllerContext& context, DpadPosition position, uint16_t hold_ticks, uint16_t release_ticks){
+void pbf_press_dpad(SwitchControllerContext& context, DpadPosition position, uint16_t hold_ticks, uint16_t release_ticks){
 #if 0
     context.issue_request(
         DeviceRequest_pbf_press_dpad(position, hold_ticks, release_ticks)
@@ -55,7 +55,7 @@ void pbf_press_dpad(ControllerContext& context, DpadPosition position, uint16_t 
     }
 #endif
 }
-void pbf_move_left_joystick(ControllerContext& context, uint8_t x, uint8_t y, uint16_t hold_ticks, uint16_t release_ticks){
+void pbf_move_left_joystick(SwitchControllerContext& context, uint8_t x, uint8_t y, uint16_t hold_ticks, uint16_t release_ticks){
 #if 0
     context.issue_request(
         DeviceRequest_pbf_move_left_joystick(x, y, hold_ticks, release_ticks)
@@ -70,7 +70,7 @@ void pbf_move_left_joystick(ControllerContext& context, uint8_t x, uint8_t y, ui
     }
 #endif
 }
-void pbf_move_right_joystick(ControllerContext& context, uint8_t x, uint8_t y, uint16_t hold_ticks, uint16_t release_ticks){
+void pbf_move_right_joystick(SwitchControllerContext& context, uint8_t x, uint8_t y, uint16_t hold_ticks, uint16_t release_ticks){
 #if 0
     context.issue_request(
         DeviceRequest_pbf_move_right_joystick(x, y, hold_ticks, release_ticks)
@@ -85,7 +85,7 @@ void pbf_move_right_joystick(ControllerContext& context, uint8_t x, uint8_t y, u
     }
 #endif
 }
-void pbf_mash_button(ControllerContext& context, Button button, uint16_t ticks){
+void pbf_mash_button(SwitchControllerContext& context, Button button, uint16_t ticks){
 #if 0
     context.issue_request(
         DeviceRequest_pbf_mash_button(button, ticks)
@@ -95,7 +95,7 @@ void pbf_mash_button(ControllerContext& context, Button button, uint16_t ticks){
 #endif
 }
 
-void start_program_flash(ControllerContext& context, uint16_t ticks){
+void start_program_flash(SwitchControllerContext& context, uint16_t ticks){
     for (uint16_t c = 0; c < ticks; c += 50){
         set_leds(context, true);
         pbf_wait(context, 25);
@@ -103,14 +103,14 @@ void start_program_flash(ControllerContext& context, uint16_t ticks){
         pbf_wait(context, 25);
     }
 }
-void grip_menu_connect_go_home(ControllerContext& context){
+void grip_menu_connect_go_home(SwitchControllerContext& context){
     pbf_press_button(context, BUTTON_L | BUTTON_R, 10, 40);
     pbf_press_button(context, BUTTON_A, 10, 140);
     pbf_press_button(context, BUTTON_HOME, 10, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
 }
 
 // void pbf_controller_state(
-//     ControllerContext& context,
+//     SwitchControllerContext& context,
 //     Button button,
 //     DpadPosition position,
 //     uint8_t left_x, uint8_t left_y,
@@ -124,7 +124,7 @@ void grip_menu_connect_go_home(ControllerContext& context){
 
 
 void pbf_controller_state(
-    ControllerContext& context,
+    SwitchControllerContext& context,
     Button button,
     DpadPosition position,
     uint8_t left_x, uint8_t left_y,

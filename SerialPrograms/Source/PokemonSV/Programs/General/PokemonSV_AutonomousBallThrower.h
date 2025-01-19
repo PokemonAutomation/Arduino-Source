@@ -33,10 +33,10 @@ public:
 class AutonomousBallThrower : public SingleSwitchProgramInstance{
 public:
     AutonomousBallThrower();
-    virtual void program(SingleSwitchProgramEnvironment& env, ControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
-    void throw_ball(ConsoleHandle& console, ControllerContext& context);
+    void throw_ball(ConsoleHandle& console, SwitchControllerContext& context);
 
     OCR::LanguageOCROption LANGUAGE;
     PokemonSwSh::PokemonBallSelectOption BALL_SELECT;

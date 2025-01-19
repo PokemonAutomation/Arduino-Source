@@ -249,7 +249,7 @@ std::ostream& operator<<(std::ostream& os, const std::optional<Pokemon>& pokemon
     return os;
 }
 
-bool go_to_first_slot(SingleSwitchProgramEnvironment& env, ControllerContext& context, uint16_t VIDEO_DELAY){
+bool go_to_first_slot(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, uint16_t VIDEO_DELAY){
 
     ImageFloatBox cursor_check(0.07, 0.15, 0.01, 0.01); //cursor position of the first slot of the box
     VideoSnapshot screen = env.console.video().snapshot();
@@ -299,7 +299,7 @@ bool go_to_first_slot(SingleSwitchProgramEnvironment& env, ControllerContext& co
 }
 
 //Move the cursor to the given coordinates, knowing current pos via the cursor struct
-[[nodiscard]] Cursor move_cursor_to(SingleSwitchProgramEnvironment& env, ControllerContext& context, const Cursor& cur_cursor, const Cursor& dest_cursor, uint16_t GAME_DELAY){
+[[nodiscard]] Cursor move_cursor_to(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, const Cursor& cur_cursor, const Cursor& dest_cursor, uint16_t GAME_DELAY){
 
     std::ostringstream ss;
     ss << "Moving cursor from " << cur_cursor << " to " << dest_cursor;
@@ -392,7 +392,7 @@ void output_boxes_data_json(const std::vector<std::optional<Pokemon>>& boxes_dat
 
 void do_sort(
     SingleSwitchProgramEnvironment& env,
-    ControllerContext& context,
+    SwitchControllerContext& context,
     std::vector<std::optional<Pokemon>> boxes_data,
     std::vector<std::optional<Pokemon>> boxes_sorted,
     BoxSorting_Descriptor::Stats& stats,
@@ -446,7 +446,7 @@ void do_sort(
     }
 }
 
-void BoxSorting::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
+void BoxSorting::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
 
     std::vector<BoxSortingSelection> sort_preferences = SORT_TABLE.preferences();
     if (sort_preferences.empty()){

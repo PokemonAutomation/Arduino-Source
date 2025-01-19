@@ -36,7 +36,7 @@ std::string AutoStory_Segment_09::end_text() const{
     return "End: Finished tutorial. Acquired all 3 questlines. Got on ride for first time.";
 }
 
-void AutoStory_Segment_09::run_segment(SingleSwitchProgramEnvironment& env, ControllerContext& context, AutoStoryOptions options) const{
+void AutoStory_Segment_09::run_segment(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, AutoStoryOptions options) const{
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
 
     context.wait_for_all_requests();
@@ -60,7 +60,7 @@ void AutoStory_Segment_09::run_segment(SingleSwitchProgramEnvironment& env, Cont
 
 void checkpoint_16(
     SingleSwitchProgramEnvironment& env, 
-    ControllerContext& context, 
+    SwitchControllerContext& context, 
     EventNotificationOption& notif_status_update
 ){
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
@@ -113,7 +113,7 @@ void checkpoint_16(
 
 void checkpoint_17(
     SingleSwitchProgramEnvironment& env, 
-    ControllerContext& context, 
+    SwitchControllerContext& context, 
     EventNotificationOption& notif_status_update
 ){
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
@@ -167,7 +167,7 @@ void checkpoint_17(
 
 void checkpoint_18(
     SingleSwitchProgramEnvironment& env, 
-    ControllerContext& context, 
+    SwitchControllerContext& context, 
     EventNotificationOption& notif_status_update
 ){
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
@@ -213,7 +213,7 @@ void checkpoint_18(
 
 void checkpoint_19(
     SingleSwitchProgramEnvironment& env, 
-    ControllerContext& context, 
+    SwitchControllerContext& context, 
     EventNotificationOption& notif_status_update
 ){
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
@@ -258,7 +258,7 @@ void checkpoint_19(
 
 void checkpoint_20(
     SingleSwitchProgramEnvironment& env, 
-    ControllerContext& context, 
+    SwitchControllerContext& context, 
     EventNotificationOption& notif_status_update
 ){
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();

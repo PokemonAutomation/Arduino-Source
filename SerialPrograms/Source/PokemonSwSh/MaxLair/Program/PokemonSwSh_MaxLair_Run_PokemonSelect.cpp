@@ -17,7 +17,7 @@ namespace MaxLairInternal{
 
 
 void run_select_pokemon(
-    ConsoleHandle& console, ControllerContext& context,
+    ConsoleHandle& console, SwitchControllerContext& context,
     GlobalStateTracker& state_tracker,
     const ConsoleSpecificOptions& settings
 ){

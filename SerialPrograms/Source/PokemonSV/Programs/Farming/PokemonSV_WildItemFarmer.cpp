@@ -115,7 +115,7 @@ WildItemFarmer::WildItemFarmer()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void WildItemFarmer::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
+void WildItemFarmer::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     try{
         run_program(env, context);
     }catch (...){
@@ -124,7 +124,7 @@ void WildItemFarmer::program(SingleSwitchProgramEnvironment& env, ControllerCont
     }
 }
 
-void WildItemFarmer::refresh_pp(SingleSwitchProgramEnvironment& env, ControllerContext& context){
+void WildItemFarmer::refresh_pp(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     int move_overwrites = 0;
     bool move_selected = false;
     while (true){
@@ -192,7 +192,7 @@ void WildItemFarmer::refresh_pp(SingleSwitchProgramEnvironment& env, ControllerC
     }
 }
 
-bool WildItemFarmer::verify_item_held(SingleSwitchProgramEnvironment& env, ControllerContext& context, NormalBattleMenuWatcher& battle_menu){
+bool WildItemFarmer::verify_item_held(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, NormalBattleMenuWatcher& battle_menu){
     env.log("Verifying that item has been taken...");
 
     while (true){
@@ -233,9 +233,9 @@ bool WildItemFarmer::verify_item_held(SingleSwitchProgramEnvironment& env, Contr
     bool item_held = !is_solid(stats, {0.550405, 0.449595, 0.}, 0.20);
 
     {
-        int ret = run_until<ControllerContext>(
+        int ret = run_until<SwitchControllerContext>(
             env.console, context,
-            [](ControllerContext& context){
+            [](SwitchControllerContext& context){
                 pbf_mash_button(context, BUTTON_B, 500);
             },
             {battle_menu}
@@ -253,7 +253,7 @@ bool WildItemFarmer::verify_item_held(SingleSwitchProgramEnvironment& env, Contr
 }
 
 
-void WildItemFarmer::run_program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
+void WildItemFarmer::run_program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
     WildItemFarmer_Descriptor::Stats& stats = env.current_stats<WildItemFarmer_Descriptor::Stats>();
 

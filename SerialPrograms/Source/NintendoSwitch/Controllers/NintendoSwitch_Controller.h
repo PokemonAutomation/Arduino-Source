@@ -14,7 +14,7 @@ namespace NintendoSwitch{
 
 
 using SwitchController = BotBaseController;
-using ControllerContext = BotBaseControllerContext;
+using SwitchControllerContext = BotBaseControllerContext;
 
 
 

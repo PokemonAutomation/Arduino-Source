@@ -71,7 +71,7 @@ TurboButton::TurboButton()
     PA_ADD_OPTION(RELEASE_DURATION);
     PA_ADD_OPTION(TOTAL_PRESSES);
 }
-void TurboButton::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
+void TurboButton::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     if (TOTAL_PRESSES == 0){
         while (true){
             pbf_press_button(context, (Button)BUTTON.current_value(), PRESS_DURATION, RELEASE_DURATION);

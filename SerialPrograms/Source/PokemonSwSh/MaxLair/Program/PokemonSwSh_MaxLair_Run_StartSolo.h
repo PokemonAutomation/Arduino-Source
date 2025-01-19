@@ -22,32 +22,32 @@ namespace MaxLairInternal{
 
 
 bool wait_for_a_player(
-    ConsoleHandle& console, ControllerContext& context,
+    ConsoleHandle& console, SwitchControllerContext& context,
     const ImageViewRGB32& entrance,
     WallClock time_limit
 );
 bool wait_for_lobby_ready(
-    ConsoleHandle& console, ControllerContext& context,
+    ConsoleHandle& console, SwitchControllerContext& context,
     const ImageViewRGB32& entrance,
     size_t min_players,
     size_t start_players,
     WallClock time_limit
 );
 bool start_adventure(
-    ConsoleHandle& console, ControllerContext& context,
+    ConsoleHandle& console, SwitchControllerContext& context,
     size_t consoles
 );
 
 
 bool start_raid_self_solo(
-    ConsoleHandle& console, ControllerContext& context,
+    ConsoleHandle& console, SwitchControllerContext& context,
     GlobalStateTracker& state_tracker,
     std::shared_ptr<const ImageRGB32>& entrance, size_t boss_slot,
     ReadableQuantity999& ore
 );
 
 bool start_raid_host_solo(
-    ProgramEnvironment& env, ConsoleHandle& console, ControllerContext& context,
+    ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context,
     GlobalStateTracker& state_tracker,
     std::shared_ptr<const ImageRGB32>& entrance, size_t boss_slot,
     HostingSettings& settings,

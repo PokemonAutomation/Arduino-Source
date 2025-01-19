@@ -30,7 +30,7 @@ namespace PokemonSV{
 //  Returns the # of slots scrolled. Returns -1 if not found.
 int move_to_ball(
     const BattleBallReader& reader,
-    ConsoleHandle& console, ControllerContext& context,
+    ConsoleHandle& console, SwitchControllerContext& context,
     const std::string& ball_slug,
     bool forward, int attempts, uint16_t delay
 ){
@@ -62,7 +62,7 @@ int move_to_ball(
 //  Returns the quantity of the ball.
 //  Returns -1 if unable to read.
 int16_t move_to_ball(
-    const BattleBallReader& reader, ConsoleHandle& console, ControllerContext& context,
+    const BattleBallReader& reader, ConsoleHandle& console, SwitchControllerContext& context,
     const std::string& ball_slug
 ){
     //  Search forward at high speed.
@@ -96,7 +96,7 @@ int16_t move_to_ball(
 //  Throw a ball. If error or not found, throw an exception.
 //  Returns the quantity prior to throwing the ball.
 int16_t throw_ball(
-    ConsoleHandle& console, ControllerContext& context,
+    ConsoleHandle& console, SwitchControllerContext& context,
     Language language, const std::string& ball_slug
 ){
     BattleBallReader reader(console, language, COLOR_RED);
@@ -108,8 +108,8 @@ int16_t throw_ball(
         MoveSelectWatcher move_select_menu(COLOR_BLUE);
         TeraCatchWatcher tera_catch_detector(COLOR_GREEN);
         int16_t quantity = 0;
-        int ret = run_until<ControllerContext>(
-            console, context, [&](ControllerContext& context){
+        int ret = run_until<SwitchControllerContext>(
+            console, context, [&](SwitchControllerContext& context){
                 quantity = move_to_ball(reader, console, context, ball_slug);
             },
             {normal_battle_menu, move_select_menu, tera_catch_detector}
@@ -162,7 +162,7 @@ int16_t throw_ball(
 
 
 CatchResults basic_catcher(
-    ConsoleHandle& console, ControllerContext& context,
+    ConsoleHandle& console, SwitchControllerContext& context,
     Language language,
     const std::string& ball_slug, uint16_t ball_limit,
     bool use_first_move_if_cant_throw,

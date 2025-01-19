@@ -30,11 +30,11 @@ class MassPurchase : public SingleSwitchProgramInstance{
 public:
     MassPurchase();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, ControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
-    bool mass_purchase(ProgramEnvironment& env, ConsoleHandle& console, ControllerContext& context);
-    bool extra_items(ProgramEnvironment& env, ConsoleHandle& console, ControllerContext& context);
+    bool mass_purchase(ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context);
+    bool extra_items(ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context);
     
 private:
     SimpleIntegerOption<uint16_t> ITEMS;

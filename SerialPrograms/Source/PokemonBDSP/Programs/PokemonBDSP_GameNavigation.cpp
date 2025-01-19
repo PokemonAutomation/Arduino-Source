@@ -19,12 +19,12 @@ namespace PokemonBDSP{
 
 //  Non-Feedback
 
-void save_game(ControllerContext& context){
+void save_game(SwitchControllerContext& context){
     pbf_press_button(context, BUTTON_X, 10, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
     pbf_press_button(context, BUTTON_R, 10, 2 * TICKS_PER_SECOND);
     pbf_press_button(context, BUTTON_ZL, 10, 5 * TICKS_PER_SECOND);
 }
-void menu_to_box(ControllerContext& context){
+void menu_to_box(SwitchControllerContext& context){
     uint16_t MENU_TO_POKEMON_DELAY = GameSettings::instance().MENU_TO_POKEMON_DELAY;
     pbf_mash_button(context, BUTTON_ZL, 30);
     if (MENU_TO_POKEMON_DELAY > 30){
@@ -33,13 +33,13 @@ void menu_to_box(ControllerContext& context){
 
     pbf_press_button(context, BUTTON_R, 20, GameSettings::instance().POKEMON_TO_BOX_DELAY0);
 }
-void overworld_to_box(ControllerContext& context){
+void overworld_to_box(SwitchControllerContext& context){
     pbf_press_button(context, BUTTON_X, 20, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
 //    pbf_press_button(context, BUTTON_ZL, 20, GameSettings::instance().MENU_TO_POKEMON_DELAY);
 
     menu_to_box(context);
 }
-void box_to_overworld(ControllerContext& context){
+void box_to_overworld(SwitchControllerContext& context){
     //  There are two states here which need to be merged:
     //      1.  The depositing column was empty. The party has been swapped and
     //          it's sitting in the box with no held pokemon.
@@ -63,7 +63,7 @@ void box_to_overworld(ControllerContext& context){
 
 //  Feedback
 
-void overworld_to_menu(ConsoleHandle& console, ControllerContext& context){
+void overworld_to_menu(ConsoleHandle& console, SwitchControllerContext& context){
     pbf_press_button(context, BUTTON_X, 20, 105);
     context.wait_for_all_requests();
     {
@@ -84,13 +84,13 @@ void overworld_to_menu(ConsoleHandle& console, ControllerContext& context){
     context.wait_for(std::chrono::milliseconds(100));
 }
 
-void save_game(ConsoleHandle& console, ControllerContext& context){
+void save_game(ConsoleHandle& console, SwitchControllerContext& context){
     overworld_to_menu(console, context);
     pbf_press_button(context, BUTTON_R, 10, 2 * TICKS_PER_SECOND);
     pbf_press_button(context, BUTTON_ZL, 10, 5 * TICKS_PER_SECOND);
 }
 
-void overworld_to_box(ConsoleHandle& console, ControllerContext& context){
+void overworld_to_box(ConsoleHandle& console, SwitchControllerContext& context){
     //  Open menu.
     overworld_to_menu(console, context);
 
@@ -125,7 +125,7 @@ void overworld_to_box(ConsoleHandle& console, ControllerContext& context){
     }
     context.wait_for(std::chrono::milliseconds(500));
 }
-void box_to_overworld(ConsoleHandle& console, ControllerContext& context){
+void box_to_overworld(ConsoleHandle& console, SwitchControllerContext& context){
     //  There are two states here which need to be merged:
     //      1.  The depositing column was empty. The party has been swapped and
     //          it's sitting in the box with no held pokemon.

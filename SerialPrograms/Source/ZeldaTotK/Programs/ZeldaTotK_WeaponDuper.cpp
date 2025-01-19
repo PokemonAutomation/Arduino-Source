@@ -75,7 +75,7 @@ WeaponDuper::WeaponDuper()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void WeaponDuper::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
+void WeaponDuper::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     WeaponDuper_Descriptor::Stats& stats = env.current_stats<WeaponDuper_Descriptor::Stats>();
 
     uint32_t c = 0;

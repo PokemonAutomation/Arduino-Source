@@ -55,7 +55,7 @@ GenerateNameOCRData::GenerateNameOCRData()
 }
 
 
-void GenerateNameOCRData::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
+void GenerateNameOCRData::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     std::string resource_path = RESOURCE_PATH() + "Pokemon/Pokedex/Pokedex-National.json";
     JsonValue json = load_json_file(resource_path);
     JsonArray& array = json.to_array_throw(resource_path);

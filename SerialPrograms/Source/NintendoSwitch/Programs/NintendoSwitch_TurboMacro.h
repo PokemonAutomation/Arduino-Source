@@ -25,12 +25,12 @@ class TurboMacro : public SingleSwitchProgramInstance{
 public:
     TurboMacro();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, ControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
-    void run_macro(SingleSwitchProgramEnvironment& env, ControllerContext& context);
+    void run_macro(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
 
-    void execute_action(ConsoleHandle& console, ControllerContext& context, const TurboMacroRow& row);
+    void execute_action(ConsoleHandle& console, SwitchControllerContext& context, const TurboMacroRow& row);
 
 private:
     SimpleIntegerOption<uint32_t> LOOP;

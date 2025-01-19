@@ -15,13 +15,13 @@ namespace NintendoSwitch{
 
 
 #if 0
-void mash_A(ControllerContext& context, uint16_t ticks){
+void mash_A(SwitchControllerContext& context, uint16_t ticks){
     context.issue_request(
         DeviceRequest_mash_A(ticks)
     );
 }
 #endif
-void IoA_backout(ControllerContext& context, uint16_t pokemon_to_menu_delay){
+void IoA_backout(SwitchControllerContext& context, uint16_t pokemon_to_menu_delay){
 #if 0
     context.issue_request(
         DeviceRequest_IoA_backout(pokemon_to_menu_delay)

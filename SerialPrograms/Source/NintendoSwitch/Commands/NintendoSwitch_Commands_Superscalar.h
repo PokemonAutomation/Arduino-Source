@@ -22,38 +22,38 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-void ssf_flush_pipeline (ControllerContext& context);
-void ssf_do_nothing     (ControllerContext& context, uint16_t ticks);
+void ssf_flush_pipeline (SwitchControllerContext& context);
+void ssf_do_nothing     (SwitchControllerContext& context, uint16_t ticks);
 
 
 
 void ssf_press_button(
-    ControllerContext& context,
+    SwitchControllerContext& context,
     Button button,
     uint16_t delay, uint16_t hold = 5, uint8_t cool = 3
 );
 void ssf_press_dpad(
-    ControllerContext& context,
+    SwitchControllerContext& context,
     DpadPosition position,
     uint16_t delay, uint16_t hold = 5, uint8_t cool = 3
 );
 
 
 void ssf_press_left_joystick(
-    ControllerContext& context,
+    SwitchControllerContext& context,
     uint8_t x, uint8_t y,
     uint16_t delay, uint16_t hold, uint8_t cool = 0
 );
 void ssf_press_right_joystick(
-    ControllerContext& context,
+    SwitchControllerContext& context,
     uint8_t x, uint8_t y,
     uint16_t delay, uint16_t hold, uint8_t cool = 0
 );
 
 
-void ssf_mash1_button   (ControllerContext& context, Button button, uint16_t ticks);
-void ssf_mash2_button   (ControllerContext& context, Button button0, Button button1, uint16_t ticks);
-void ssf_mash_AZs       (ControllerContext& context, uint16_t ticks);
+void ssf_mash1_button   (SwitchControllerContext& context, Button button, uint16_t ticks);
+void ssf_mash2_button   (SwitchControllerContext& context, Button button0, Button button1, uint16_t ticks);
+void ssf_mash_AZs       (SwitchControllerContext& context, uint16_t ticks);
 
 
 #define ssf_ScrollDirection     uint16_t
@@ -62,7 +62,7 @@ void ssf_mash_AZs       (ControllerContext& context, uint16_t ticks);
 #define SSF_SCROLL_DOWN         4
 #define SSF_SCROLL_LEFT         6
 void ssf_issue_scroll(
-    ControllerContext& context,
+    SwitchControllerContext& context,
     ssf_ScrollDirection direction,
     uint16_t delay, uint16_t hold = 5, uint8_t cool = 3
 );

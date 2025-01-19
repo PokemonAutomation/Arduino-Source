@@ -23,7 +23,7 @@ namespace PokemonSV{
 //};
 
 bool run_pokemon(
-    ConsoleHandle& console, ControllerContext& context,
+    ConsoleHandle& console, SwitchControllerContext& context,
     const std::vector<SinglesMoveEntry>& move_table,
     bool trainer_battle, bool& terastallized
 );
@@ -32,7 +32,7 @@ bool run_pokemon(
 //  Run a singles battle until it is over (for whatever reason).
 bool run_singles_battle(
     ProgramEnvironment& env,
-    ConsoleHandle& console, ControllerContext& context,
+    ConsoleHandle& console, SwitchControllerContext& context,
     SinglesAIOption& battle_AI,
     bool trainer_battle
 );

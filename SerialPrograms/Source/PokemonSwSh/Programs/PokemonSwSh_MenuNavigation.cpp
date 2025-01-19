@@ -22,7 +22,7 @@ namespace PokemonSwSh{
 void navigate_to_menu_app(
     ProgramEnvironment& env,
     ConsoleHandle& console,
-    ControllerContext& context,
+    SwitchControllerContext& context,
     size_t target_app_index,
     EventNotificationOption& notification_option
 ){

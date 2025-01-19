@@ -164,7 +164,7 @@ ShinyHuntAutonomousOverworld::ShinyHuntAutonomousOverworld()
 
 
 bool ShinyHuntAutonomousOverworld::find_encounter(
-    ConsoleHandle& console, ControllerContext& context,
+    ConsoleHandle& console, SwitchControllerContext& context,
     ShinyHuntAutonomousOverworld_Descriptor::Stats& stats,
     WallClock expiration
 ) const{
@@ -234,9 +234,9 @@ bool ShinyHuntAutonomousOverworld::find_encounter(
             StandardBattleMenuWatcher battle_menu_detector(false);
             StartBattleWatcher start_battle_detector;
 
-            int result = run_until<ControllerContext>(
+            int result = run_until<SwitchControllerContext>(
                 console, context,
-                [&](ControllerContext& context){
+                [&](SwitchControllerContext& context){
                     trigger->run(context);
                 },
                 {
@@ -286,7 +286,7 @@ bool ShinyHuntAutonomousOverworld::find_encounter(
 
 
 bool ShinyHuntAutonomousOverworld::charge_at_target(
-    ConsoleHandle& console, ControllerContext& context,
+    ConsoleHandle& console, SwitchControllerContext& context,
     const std::pair<double, OverworldTarget>& target
 ) const{
     OverlayBoxScope target_box(console, target.second.box, COLOR_YELLOW);
@@ -326,9 +326,9 @@ bool ShinyHuntAutonomousOverworld::charge_at_target(
         MAX_TARGET_ALPHA
     );
 
-    int result = run_until<ControllerContext>(
+    int result = run_until<SwitchControllerContext>(
         console, context,
-        [&](ControllerContext& context){
+        [&](SwitchControllerContext& context){
             //  Move to target.
             pbf_move_left_joystick(
                 context,
@@ -372,7 +372,7 @@ bool ShinyHuntAutonomousOverworld::charge_at_target(
 
 
 
-void ShinyHuntAutonomousOverworld::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
+void ShinyHuntAutonomousOverworld::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     srand((unsigned)time(nullptr));
 
     if (START_LOCATION.start_in_grip_menu()){

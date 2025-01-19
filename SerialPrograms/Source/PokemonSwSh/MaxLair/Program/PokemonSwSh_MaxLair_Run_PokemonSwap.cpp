@@ -21,7 +21,7 @@ namespace MaxLairInternal{
 
 void run_swap_pokemon(
     AdventureRuntime& runtime,
-    ConsoleHandle& console, ControllerContext& context,
+    ConsoleHandle& console, SwitchControllerContext& context,
     GlobalStateTracker& state_tracker,
     const ConsoleSpecificOptions& settings
 ){
@@ -80,9 +80,9 @@ void run_swap_pokemon(
     //  Wait until we exit the window.
     {
         BlackScreenWatcher detector;
-        int result = run_until<ControllerContext>(
+        int result = run_until<SwitchControllerContext>(
             console, context,
-            [&](ControllerContext& context){
+            [&](SwitchControllerContext& context){
                 pbf_mash_button(context, swap ? BUTTON_A : BUTTON_B, 30 * TICKS_PER_SECOND);
             },
             {{detector}}

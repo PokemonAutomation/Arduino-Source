@@ -16,7 +16,7 @@ namespace PokemonBDSP{
 
 
 
-bool heal_by_global_room(ConsoleHandle& console, ControllerContext& context){
+bool heal_by_global_room(ConsoleHandle& console, SwitchControllerContext& context){
     console.overlay().add_log("Heal by Global Room", COLOR_WHITE);
     // Go to union room menu.
     const uint16_t overworld_to_room_delay = 125;
@@ -28,9 +28,9 @@ bool heal_by_global_room(ConsoleHandle& console, ControllerContext& context){
     // Press ZL until we are at:
     // - "Would you like to enter the Global Room?" To select: "Yes" and other options.
     SelectionArrowFinder arrow(console, {0.50, 0.45, 0.20, 0.20}, COLOR_GREEN);
-    int ret = run_until<ControllerContext>(
+    int ret = run_until<SwitchControllerContext>(
         console, context,
-        [](ControllerContext& context){
+        [](SwitchControllerContext& context){
             for (int i = 0; i < 5; i++){
                 pbf_press_button(context, BUTTON_ZL, 10, 125);
             }

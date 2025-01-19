@@ -110,16 +110,16 @@ FlyingTrialFarmer::FlyingTrialFarmer()
 
 
 
-bool FlyingTrialFarmer::run_rewards(SingleSwitchProgramEnvironment& env, ControllerContext& context){
+bool FlyingTrialFarmer::run_rewards(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     bool trial_failed = true;
     while (true){
         DialogBoxWatcher dialog(COLOR_GREEN, true, std::chrono::milliseconds(250), DialogType::DIALOG_BLACK);
         OverworldWatcher overworld(env.console, COLOR_CYAN);
         context.wait_for_all_requests();
 
-        int ret_finish = run_until<ControllerContext>(
+        int ret_finish = run_until<SwitchControllerContext>(
             env.console, context,
-            [](ControllerContext& context){
+            [](SwitchControllerContext& context){
                 pbf_mash_button(context, BUTTON_B, 10000);
             },
             { dialog, overworld }
@@ -150,7 +150,7 @@ uint8_t FlyingTrialFarmer::get_final_y_axis(int8_t delta_y){
     }
 }
 
-void FlyingTrialFarmer::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
+void FlyingTrialFarmer::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
     FlyingTrialFarmer_Descriptor::Stats& stats = env.current_stats<FlyingTrialFarmer_Descriptor::Stats>();
@@ -162,9 +162,9 @@ void FlyingTrialFarmer::program(SingleSwitchProgramEnvironment& env, ControllerC
         BlackScreenOverWatcher black_screen(COLOR_RED, { 0.2, 0.2, 0.6, 0.6 });
         context.wait_for_all_requests();
 
-        int ret_entry = run_until<ControllerContext>(
+        int ret_entry = run_until<SwitchControllerContext>(
             env.console, context,
-            [](ControllerContext& context){
+            [](SwitchControllerContext& context){
                 pbf_mash_button(context, BUTTON_A, 10000);
             },
             { black_screen }

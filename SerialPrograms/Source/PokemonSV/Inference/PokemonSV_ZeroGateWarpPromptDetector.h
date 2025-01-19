@@ -28,7 +28,7 @@ public:
     int detect_location(const ImageViewRGB32& screen) const;
 
     bool move_cursor(
-        const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context,
+        const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context,
         int row
     ) const;
 

@@ -49,7 +49,7 @@ DailyHighlightFarmer::DailyHighlightFarmer()
     PA_ADD_OPTION(SAVE_ITERATIONS);
 }
 
-void DailyHighlightFarmer::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
+void DailyHighlightFarmer::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
     }else{

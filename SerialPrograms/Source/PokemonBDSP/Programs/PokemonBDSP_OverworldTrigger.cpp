@@ -63,7 +63,7 @@ OverworldTrigger::OverworldTrigger()
 }
 
 
-void OverworldTrigger::run_trigger(ControllerContext& context) const{
+void OverworldTrigger::run_trigger(SwitchControllerContext& context) const{
     switch (TRIGGER_METHOD){
     case TriggerMethod::HORIZONTAL_NO_BIAS:
         pbf_controller_state(context, BUTTON_B, DPAD_NONE, 0, 128, 128, 128, MOVE_DURATION);
@@ -99,16 +99,16 @@ void OverworldTrigger::run_trigger(ControllerContext& context) const{
     }
 }
 
-bool OverworldTrigger::find_encounter(ConsoleHandle& console, ControllerContext& context) const{
+bool OverworldTrigger::find_encounter(ConsoleHandle& console, SwitchControllerContext& context) const{
     BattleMenuWatcher battle_menu_detector(BattleType::STANDARD);
     StartBattleDetector start_battle_detector(console);
 
     int ret = 0;
     if (TRIGGER_METHOD != TriggerMethod::SWEET_SCENT){
         //  Move character back and forth to trigger encounter.
-        ret = run_until<ControllerContext>(
+        ret = run_until<SwitchControllerContext>(
             console, context,
-            [&](ControllerContext& context){
+            [&](SwitchControllerContext& context){
                 while (true){
                     run_trigger(context);
                 }

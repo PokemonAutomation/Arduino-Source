@@ -29,7 +29,7 @@ public:
     //  "jobs" jobs must be 1, 5, or 10.
     void set_print_jobs(
         AsyncDispatcher& dispatcher,
-        ConsoleHandle& console, ControllerContext& context, uint8_t jobs
+        ConsoleHandle& console, SwitchControllerContext& context, uint8_t jobs
     ) const;
 
 

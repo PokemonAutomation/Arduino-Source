@@ -27,7 +27,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
 
-void return_to_plaza(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context){
+void return_to_plaza(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context){
     console.log("Attempting to return to Central Plaza.");
     //Modified version of handle_battles_and_back_to_pokecenter()
     bool returned_to_pokecenter = false;
@@ -35,14 +35,14 @@ void return_to_plaza(const ProgramInfo& info, ConsoleHandle& console, Controller
 
     while(!returned_to_pokecenter){
         EncounterWatcher encounter_watcher(console, COLOR_RED);
-        int ret = run_until<ControllerContext>(
+        int ret = run_until<SwitchControllerContext>(
             console, context,
-            [&](ControllerContext& context){
+            [&](SwitchControllerContext& context){
                 //Exit any dialogs (ex. Cyrano upgrading BBQs)
                 OverworldWatcher overworld(console, COLOR_RED);
-                int ret_overworld = run_until<ControllerContext>(
+                int ret_overworld = run_until<SwitchControllerContext>(
                     console, context,
-                    [&](ControllerContext& context){
+                    [&](SwitchControllerContext& context){
                         pbf_mash_button(context, BUTTON_B, 10000);
                     },
                     { overworld }
@@ -116,7 +116,7 @@ void return_to_plaza(const ProgramInfo& info, ConsoleHandle& console, Controller
     context.wait_for_all_requests();
 }
 
-void map_move_cursor_fly(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context, uint8_t x, uint8_t y, uint8_t hold, uint8_t release, std::string location){
+void map_move_cursor_fly(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context, uint8_t x, uint8_t y, uint8_t hold, uint8_t release, std::string location){
     console.log("Attempting to fly to " + location + ".");
 
     for (int i = 0; i < 3; i++){
@@ -141,43 +141,43 @@ void map_move_cursor_fly(const ProgramInfo& info, ConsoleHandle& console, Contro
     }
 }
 
-void central_to_polar_rest(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context){
+void central_to_polar_rest(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context){
     map_move_cursor_fly(info, console, context, 75, 0, 230, 20, "Polar Rest Area");
 }
 
-void central_to_polar_class1(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context){
+void central_to_polar_class1(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context){
     map_move_cursor_fly(info, console, context, 0, 20, 150, 20, "Polar Classroom 1");
 }
 
-void central_to_polar_plaza(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context){
+void central_to_polar_plaza(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context){
     map_move_cursor_fly(info, console, context, 20, 25, 245, 20, "Polar Plaza");
 }
 
-void central_to_coastal_plaza(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context){
+void central_to_coastal_plaza(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context){
     map_move_cursor_fly(info, console, context, 180, 0, 210, 20, "Coastal Plaza");
 }
 
-void central_to_canyon_plaza(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context){
+void central_to_canyon_plaza(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context){
     map_move_cursor_fly(info, console, context, 0, 255, 215, 20, "Canyon Plaza");
 }
 
-void central_to_savanna_plaza(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context){
+void central_to_savanna_plaza(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context){
     map_move_cursor_fly(info, console, context, 165, 255, 180, 20, "Savanna Plaza");
 }
 
-void central_to_canyon_rest(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context){
+void central_to_canyon_rest(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context){
     map_move_cursor_fly(info, console, context, 0, 140, 160, 20, "Canyon Rest Area");
 }
 
-void central_to_savanna_class(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context){
+void central_to_savanna_class(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context){
     map_move_cursor_fly(info, console, context, 255, 220, 140, 20, "Savanna Classroom");
 }
 
-void central_to_chargestone(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context){
+void central_to_chargestone(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context){
     map_move_cursor_fly(info, console, context, 0, 135, 130, 20, "Chargestone Cavern");
 }
 
-void jump_glide_fly(ConsoleHandle& console, ControllerContext& context, bool inverted_flight, uint16_t hold_up, uint16_t flight_wait, uint16_t drop_time){
+void jump_glide_fly(ConsoleHandle& console, SwitchControllerContext& context, bool inverted_flight, uint16_t hold_up, uint16_t flight_wait, uint16_t drop_time){
     console.log("Jump, glide, fly.");
 
     ssf_press_button(context, BUTTON_B, 0, 100);

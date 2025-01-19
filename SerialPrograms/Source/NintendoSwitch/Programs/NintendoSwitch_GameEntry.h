@@ -15,14 +15,14 @@ namespace NintendoSwitch{
 
 void resume_game_from_home(
     ConsoleHandle& console,
-    ControllerContext& context,
+    SwitchControllerContext& context,
     bool skip_home_press = false
 );
 
 
 void start_game_from_home(
     ConsoleHandle& console,
-    ControllerContext& context,
+    SwitchControllerContext& context,
     bool tolerate_update_menu,
     uint8_t game_slot,
     uint8_t user_slot,
@@ -30,7 +30,7 @@ void start_game_from_home(
 );
 
 bool openedgame_to_gamemenu(
-    ConsoleHandle& console, ControllerContext& context,
+    ConsoleHandle& console, SwitchControllerContext& context,
     uint16_t timeout
 );
 

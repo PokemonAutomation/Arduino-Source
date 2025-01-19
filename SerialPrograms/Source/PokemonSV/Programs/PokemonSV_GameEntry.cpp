@@ -61,7 +61,7 @@ private:
 };
 
 
-bool reset_game_to_gamemenu(ConsoleHandle& console, ControllerContext& context){
+bool reset_game_to_gamemenu(ConsoleHandle& console, SwitchControllerContext& context){
     close_game(console, context);
     start_game_from_home(
         console,
@@ -105,7 +105,7 @@ bool reset_game_to_gamemenu(ConsoleHandle& console, ControllerContext& context){
     return true;
 }
 
-bool gamemenu_to_ingame(ConsoleHandle& console, ControllerContext& context){
+bool gamemenu_to_ingame(ConsoleHandle& console, SwitchControllerContext& context){
     console.log("Mashing A to enter game...");
     BlackScreenOverWatcher detector(COLOR_RED, {0.2, 0.2, 0.6, 0.6});
     pbf_mash_button(context, BUTTON_A, GameSettings::instance().ENTER_GAME_MASH);
@@ -126,7 +126,7 @@ bool gamemenu_to_ingame(ConsoleHandle& console, ControllerContext& context){
 }
 
 bool reset_game_from_home(
-    const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context,
+    const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context,
     uint16_t post_wait_time
 ){
     console.log("Resetting game from home...");
@@ -143,7 +143,7 @@ bool reset_game_from_home(
     return ok;
 }
 bool reset_game_from_home_zoom_out(
-    const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context,
+    const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context,
     uint16_t post_wait_time
 ){
     bool ret = reset_game_from_home(info, console, context, post_wait_time);
@@ -159,7 +159,7 @@ bool reset_game_from_home_zoom_out(
     return ret;
 }
 
-void reset_game(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context){
+void reset_game(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context){
     try{
         pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
         context.wait_for_all_requests();

@@ -27,7 +27,7 @@ class GeneratePokedexSprites : public SingleSwitchProgramInstance{
 public:
     GeneratePokedexSprites();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, ControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 
 private:

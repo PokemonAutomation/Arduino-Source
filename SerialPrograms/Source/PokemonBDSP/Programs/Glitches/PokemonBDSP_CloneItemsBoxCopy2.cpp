@@ -81,7 +81,7 @@ CloneItemsBoxCopy2::CloneItemsBoxCopy2()
 
 
 
-void CloneItemsBoxCopy2::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
+void CloneItemsBoxCopy2::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     CloneItemsBoxCopy2_Descriptor::Stats& stats = env.current_stats<CloneItemsBoxCopy2_Descriptor::Stats>();
 
 //    uint16_t MENU_TO_POKEMON_DELAY = GameSettings::instance().MENU_TO_POKEMON_DELAY;

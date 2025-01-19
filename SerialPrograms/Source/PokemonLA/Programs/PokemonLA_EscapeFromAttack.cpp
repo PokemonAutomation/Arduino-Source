@@ -16,7 +16,7 @@ namespace PokemonLA{
 
 
 EscapeFromAttack::EscapeFromAttack(
-    ProgramEnvironment& env, ConsoleHandle& console, ControllerContext& context,
+    ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context,
     std::chrono::seconds time_min,
     std::chrono::seconds time_limit
 )
@@ -38,14 +38,14 @@ EscapeFromAttack::EscapeFromAttack(
 
     register_state_command(State::UNKNOWN, [this](){
         m_stream.log("Unknown state. Moving foward...");
-        m_active_command->dispatch([](ControllerContext& context){
+        m_active_command->dispatch([](SwitchControllerContext& context){
             pbf_move_left_joystick(context, 128, 0, 300 * TICKS_PER_SECOND, 0);
         });
         return false;
     });
     register_state_command(State::WYRDEER_BASCULEGION_OFF, [this](){
         m_stream.log("Switching from Wyrdeer/Basculegion (off) to Braviary (on)...");
-        m_active_command->dispatch([](ControllerContext& context){
+        m_active_command->dispatch([](SwitchControllerContext& context){
             pbf_press_dpad(context, DPAD_RIGHT, 20, 50);
             pbf_press_button(context, BUTTON_PLUS, 20, GET_ON_BRAVIARY_TIME);
         });
@@ -53,14 +53,14 @@ EscapeFromAttack::EscapeFromAttack(
     });
     register_state_command(State::WYRDEER_BASCULEGION_ON, [this](){
         m_stream.log("Switching from Wyrdeer/Basculegion (on) to Braviary (on)...");
-        m_active_command->dispatch([](ControllerContext& context){
+        m_active_command->dispatch([](SwitchControllerContext& context){
             pbf_press_dpad(context, DPAD_RIGHT, 20, GET_ON_BRAVIARY_TIME);
         });
         return false;
     });
     register_state_command(State::URSALUNA_OFF, [this](){
         m_stream.log("Switching from Ursaluna (off) to Braviary (on)...");
-        m_active_command->dispatch([](ControllerContext& context){
+        m_active_command->dispatch([](SwitchControllerContext& context){
             pbf_press_dpad(context, DPAD_RIGHT, 20, 50);
             pbf_press_dpad(context, DPAD_RIGHT, 20, 50);
             pbf_press_button(context, BUTTON_PLUS, 20, GET_ON_BRAVIARY_TIME);
@@ -69,7 +69,7 @@ EscapeFromAttack::EscapeFromAttack(
     });
     register_state_command(State::URSALUNA_ON, [this](){
         m_stream.log("Switching from Ursaluna (on) to Braviary (on)...");
-        m_active_command->dispatch([](ControllerContext& context){
+        m_active_command->dispatch([](SwitchControllerContext& context){
             pbf_press_dpad(context, DPAD_RIGHT, 20, 50);
             pbf_press_dpad(context, DPAD_RIGHT, 20, GET_ON_BRAVIARY_TIME);
         });
@@ -77,7 +77,7 @@ EscapeFromAttack::EscapeFromAttack(
     });
     register_state_command(State::SNEASLER_OFF, [this](){
         m_stream.log("Switching from Sneasler (off) to Braviary (on)...");
-        m_active_command->dispatch([](ControllerContext& context){
+        m_active_command->dispatch([](SwitchControllerContext& context){
             pbf_press_dpad(context, DPAD_LEFT, 20, 50);
             pbf_press_button(context, BUTTON_PLUS, 20, GET_ON_BRAVIARY_TIME);
         });
@@ -85,7 +85,7 @@ EscapeFromAttack::EscapeFromAttack(
     });
     register_state_command(State::SNEASLER_ON, [this](){
         m_stream.log("Switching from Sneasler (on) to Braviary (on)...");
-        m_active_command->dispatch([](ControllerContext& context){
+        m_active_command->dispatch([](SwitchControllerContext& context){
             pbf_move_left_joystick(context, 128, 0, 125, 0);
             pbf_press_dpad(context, DPAD_LEFT, 20, GET_ON_BRAVIARY_TIME);
         });
@@ -93,7 +93,7 @@ EscapeFromAttack::EscapeFromAttack(
     });
     register_state_command(State::BRAVIARY_OFF, [this](){
         m_stream.log("Switching from Braviary (off) to Braviary (on)...");
-        m_active_command->dispatch([](ControllerContext& context){
+        m_active_command->dispatch([](SwitchControllerContext& context){
             pbf_press_button(context, BUTTON_PLUS, 20, GET_ON_BRAVIARY_TIME);
         });
         return false;
@@ -106,7 +106,7 @@ EscapeFromAttack::EscapeFromAttack(
         }else{
             m_stream.log("Dashing forward...");
         }
-        m_active_command->dispatch([delay_dash](ControllerContext& context){
+        m_active_command->dispatch([delay_dash](SwitchControllerContext& context){
             if (delay_dash){
                 pbf_move_left_joystick(context, 128, 0, 125, 0);
             }
@@ -116,7 +116,7 @@ EscapeFromAttack::EscapeFromAttack(
     });
     register_state_command(State::GET_ON_SNEASLER, [this](){
         m_stream.log("Getting on Sneasler...");
-        m_active_command->dispatch([](ControllerContext& context){
+        m_active_command->dispatch([](SwitchControllerContext& context){
             pbf_press_button(context, BUTTON_A, 20, 230);
         });
         m_get_on_sneasler_time = current_time();
@@ -124,7 +124,7 @@ EscapeFromAttack::EscapeFromAttack(
     });
     register_state_command(State::CLIMBING, [this](){
         m_stream.log("Climbing wall...");
-        m_active_command->dispatch([](ControllerContext& context){
+        m_active_command->dispatch([](SwitchControllerContext& context){
             pbf_move_left_joystick(context, 128, 0, 300 * TICKS_PER_SECOND, 0);
         });
         return false;

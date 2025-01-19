@@ -18,7 +18,7 @@ namespace PokemonSV{
 
 
 bool check_stats_reset_info(
-    ConsoleHandle& console, ControllerContext& context,
+    ConsoleHandle& console, SwitchControllerContext& context,
     OCR::LanguageOCROption& LANGUAGE, Pokemon::StatsHuntIvJudgeFilterTable& FILTERS,
     Pokemon::StatsHuntAction& action
 ){

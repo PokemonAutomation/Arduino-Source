@@ -84,7 +84,7 @@ std::shared_ptr<const ImageRGB32> read_type_array_retry(
 
 
 bool read_path(
-    ProgramEnvironment& env, ConsoleHandle& console, ControllerContext& context,
+    ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context,
     PathMap& path,
     const ImageFloatBox& box
 ){

@@ -45,7 +45,7 @@ SkipToFullMoon::SkipToFullMoon()
 }
 
 
-void SkipToFullMoon::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
+void SkipToFullMoon::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     //  Connect the controller.
     pbf_press_button(context, BUTTON_LCLICK, 5, 5);
 
@@ -105,9 +105,9 @@ void SkipToFullMoon::program(SingleSwitchProgramEnvironment& env, ControllerCont
 
 
         ArcPhoneDetector arc_phone_detector(env.console, env.console, std::chrono::milliseconds(100), stop_on_detected);
-        run_until<ControllerContext>(
+        run_until<SwitchControllerContext>(
             env.console, context,
-            [](ControllerContext& local_context){
+            [](SwitchControllerContext& local_context){
                 // pbf_mash_button(local_context, BUTTON_B, 7 * TICKS_PER_SECOND);
                 for(size_t i = 0; i < 15; i++){
                      pbf_press_button(local_context, BUTTON_B, 20, 80);

@@ -17,26 +17,26 @@ namespace NintendoSwitch{
 
 // Hold button for `hold` ticks, then release `duration - hold` ticks.
 // If `duration` is smaller than `hold`, release 0 tick.
-inline void ssf_press_button2(ControllerContext& context, Button button, uint16_t duration, uint16_t hold){
+inline void ssf_press_button2(SwitchControllerContext& context, Button button, uint16_t duration, uint16_t hold){
     ssf_press_button(context, button, duration, hold);
 //    pbf_press_button(context, button, hold, duration < hold ? 0 : duration - hold);
 }
 // Hold button for 5 ticks, then release for `duration` ticks.
-inline void ssf_press_button1(ControllerContext& context, Button button, uint16_t duration){
+inline void ssf_press_button1(SwitchControllerContext& context, Button button, uint16_t duration){
     ssf_press_button(context, button, duration);
 //    ssf_press_button2(context, button, duration, 5);
 }
 // Hold D-PAD button for `hold` ticks, then release `duration - hold` ticks.
 // If `duration` is smaller than `hold`, release 0 tick.
-inline void ssf_press_dpad2(ControllerContext& context, DpadPosition dpad, uint16_t duration, uint16_t hold){
+inline void ssf_press_dpad2(SwitchControllerContext& context, DpadPosition dpad, uint16_t duration, uint16_t hold){
     ssf_press_dpad(context, dpad, duration, hold);
 //    pbf_press_dpad(context, dpad, hold, duration < hold ? 0 : duration - hold);
 }
-inline void ssf_press_dpad1(ControllerContext& context, DpadPosition dpad, uint16_t duration){
+inline void ssf_press_dpad1(SwitchControllerContext& context, DpadPosition dpad, uint16_t duration){
     ssf_press_dpad(context, dpad, duration);
 //    ssf_press_dpad2(context, dpad, duration, 5);
 }
-inline void ssf_press_joystick2(ControllerContext& context, bool left, uint8_t x, uint8_t y, uint16_t duration, uint16_t hold){
+inline void ssf_press_joystick2(SwitchControllerContext& context, bool left, uint8_t x, uint8_t y, uint16_t duration, uint16_t hold){
     if (left){
         ssf_press_left_joystick(context, x, y, duration, hold);
 //        pbf_move_left_joystick(context, x, y, hold, duration < hold ? 0 : duration - hold);
@@ -45,7 +45,7 @@ inline void ssf_press_joystick2(ControllerContext& context, bool left, uint8_t x
 //        pbf_move_right_joystick(context, x, y, hold, duration < hold ? 0 : duration - hold);
     }
 }
-inline void ssf_hold_joystick1(ControllerContext& context, bool left, uint8_t x, uint8_t y, uint16_t hold){
+inline void ssf_hold_joystick1(SwitchControllerContext& context, bool left, uint8_t x, uint8_t y, uint16_t hold){
 //    ssf_press_joystick2(context, left, x, y, hold, hold);
     if (left){
         ssf_press_left_joystick(context, x, y, hold, hold);

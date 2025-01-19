@@ -24,7 +24,7 @@ namespace MaxLairInternal{
 
 
 void run_path_select(
-    ProgramEnvironment& env, ConsoleHandle& console, ControllerContext& context,
+    ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context,
     GlobalStateTracker& state_tracker
 ){
     size_t console_index = console.index();

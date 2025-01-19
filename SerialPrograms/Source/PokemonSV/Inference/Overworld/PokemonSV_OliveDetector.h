@@ -23,11 +23,11 @@ public:
 
     void make_overlays(VideoOverlaySet& items) const;
 
-    std::pair<double, double> olive_location(ConsoleHandle& console, ControllerContext& context, ImageFloatBox box = {0, 0.15, 1, 0.7});
+    std::pair<double, double> olive_location(ConsoleHandle& console, SwitchControllerContext& context, ImageFloatBox box = {0, 0.15, 1, 0.7});
 
     ImageFloatBox get_olive_floatbox(
         const ImageViewRGB32& screen, 
-        ControllerContext& context, 
+        SwitchControllerContext& context, 
         uint8_t rgb_gap,
         ImageFloatBox box
     );
@@ -35,7 +35,7 @@ public:
     // return ImageFloatBox of the of the Olive, based on the largest blob of green
     ImageFloatBox get_olive_floatbox(
         ConsoleHandle& console, 
-        ControllerContext& context, 
+        SwitchControllerContext& context, 
         uint8_t rgb_gap,
         ImageFloatBox box
     );
@@ -43,7 +43,7 @@ public:
     ImageFloatBox align_to_olive(
         const ProgramInfo& info, 
         ConsoleHandle& console, 
-        ControllerContext& context, 
+        SwitchControllerContext& context, 
         double direction_facing, 
         uint8_t rgb_gap = 20,
         ImageFloatBox area_to_check = {0, 0.3, 1.0, 0.40}
@@ -56,7 +56,7 @@ public:
     uint16_t push_olive_forward(
         const ProgramInfo& info, 
         ConsoleHandle& console, 
-        ControllerContext& context, 
+        SwitchControllerContext& context, 
         double direction_facing, 
         uint16_t total_forward_distance,
         uint16_t push_olive = 75,
@@ -67,7 +67,7 @@ public:
     uint16_t walk_up_to_olive(
         const ProgramInfo& info, 
         ConsoleHandle& console, 
-        ControllerContext& context, 
+        SwitchControllerContext& context, 
         double direction_facing, 
         uint8_t rgb_gap = 20,
         ImageFloatBox area_to_check = {0, 0.3, 1.0, 0.40}

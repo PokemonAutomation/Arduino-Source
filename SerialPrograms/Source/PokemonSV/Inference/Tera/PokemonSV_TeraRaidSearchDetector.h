@@ -30,7 +30,7 @@ public:
     virtual bool detect(const ImageViewRGB32& screen) const override;
 
     bool detect_search_location(ImageFloatBox& box, const ImageViewRGB32& screen) const;
-    bool move_cursor_to_search(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context) const;
+    bool move_cursor_to_search(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context) const;
 
 private:
     Color m_color;

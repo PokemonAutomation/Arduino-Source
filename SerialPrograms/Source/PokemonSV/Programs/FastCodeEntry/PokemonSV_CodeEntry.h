@@ -23,7 +23,7 @@ namespace PokemonSV{
 const char* normalize_code(std::string& normalized_code, const std::string& code, bool override_mode = false);
 
 void enter_code(
-    Logger& logger, ControllerContext& context,
+    Logger& logger, SwitchControllerContext& context,
     const FastCodeEntrySettings& settings, const std::string& normalized_code,
     bool connect_controller_press,
     bool override_mode = false

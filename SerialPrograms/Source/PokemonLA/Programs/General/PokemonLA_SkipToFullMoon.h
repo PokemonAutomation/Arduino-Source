@@ -25,7 +25,7 @@ class SkipToFullMoon : public SingleSwitchProgramInstance{
 public:
     SkipToFullMoon();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, ControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
 

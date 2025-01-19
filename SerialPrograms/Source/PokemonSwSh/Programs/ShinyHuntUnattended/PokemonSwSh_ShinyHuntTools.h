@@ -14,9 +14,9 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-void run_away_with_lights(ControllerContext& context);
-void enter_summary(ControllerContext& context, bool regi_move_right);
-void close_game_if_overworld(ConsoleHandle& console, ControllerContext& context, bool touch_date, uint8_t rollback_hours);
+void run_away_with_lights(SwitchControllerContext& context);
+void enter_summary(SwitchControllerContext& context, bool regi_move_right);
+void close_game_if_overworld(ConsoleHandle& console, SwitchControllerContext& context, bool touch_date, uint8_t rollback_hours);
 
 
 

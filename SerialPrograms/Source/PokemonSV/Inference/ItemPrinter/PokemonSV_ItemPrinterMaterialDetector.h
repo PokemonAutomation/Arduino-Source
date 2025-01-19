@@ -51,26 +51,26 @@ public:
 
     int8_t find_happiny_dust_row_index(
         AsyncDispatcher& dispatcher,
-        ConsoleHandle& console, ControllerContext& context
+        ConsoleHandle& console, SwitchControllerContext& context
     ) const;
 
     std::vector<int8_t> find_material_value_row_index(
         AsyncDispatcher& dispatcher,
         ConsoleHandle& console, 
-        ControllerContext& context,
+        SwitchControllerContext& context,
         int16_t material_value
     ) const;
 
     int16_t detect_material_quantity(
         AsyncDispatcher& dispatcher,
         ConsoleHandle& console, 
-        ControllerContext& context,
+        SwitchControllerContext& context,
         int8_t row_index
     ) const;
 
     std::string detect_material_name(
         ConsoleHandle& console, 
-        ControllerContext& context,
+        SwitchControllerContext& context,
         int8_t row_index
     ) const;    
 

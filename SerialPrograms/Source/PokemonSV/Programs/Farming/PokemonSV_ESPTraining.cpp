@@ -87,7 +87,7 @@ ESPTraining::ESPTraining()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void ESPTraining::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
+void ESPTraining::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
     ESPTraining_Descriptor::Stats& stats = env.current_stats<ESPTraining_Descriptor::Stats>();
 
@@ -223,9 +223,9 @@ void ESPTraining::program(SingleSwitchProgramEnvironment& env, ControllerContext
 
         //Program done, mash B until overworld detected
         OverworldWatcher overworld(env.console, COLOR_CYAN);
-        int ret = run_until<ControllerContext>(
+        int ret = run_until<SwitchControllerContext>(
             env.console, context,
-            [](ControllerContext& context){
+            [](SwitchControllerContext& context){
                 pbf_mash_button(context, BUTTON_B, 700);
             },
             {overworld}

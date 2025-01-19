@@ -29,12 +29,12 @@ public:
 class WildItemFarmer : public SingleSwitchProgramInstance{
 public:
     WildItemFarmer();
-    virtual void program(SingleSwitchProgramEnvironment& env, ControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
-    void refresh_pp(SingleSwitchProgramEnvironment& env, ControllerContext& context);
-    bool verify_item_held(SingleSwitchProgramEnvironment& env, ControllerContext& context, NormalBattleMenuWatcher& battle_menu);
-    void run_program(SingleSwitchProgramEnvironment& env, ControllerContext& context);
+    void refresh_pp(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
+    bool verify_item_held(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, NormalBattleMenuWatcher& battle_menu);
+    void run_program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
 
 private:
     SimpleIntegerOption<uint16_t> ITEMS_TO_CLONE;

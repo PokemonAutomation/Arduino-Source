@@ -27,7 +27,7 @@ namespace PokemonSwSh{
 
 
 bool connect_to_internet(
-    ConsoleHandle& console, ControllerContext& context,
+    ConsoleHandle& console, SwitchControllerContext& context,
     bool host_online,
     uint16_t connect_to_internet_delay
 ){
@@ -125,7 +125,7 @@ void send_raid_notification(
 
 
 void run_autohost(
-    ProgramEnvironment& env, ConsoleHandle& console, ControllerContext& context,
+    ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context,
     Catchability catchability, uint8_t skips,
     const RandomCodeOption* raid_code, uint16_t lobby_wait_delay,
     bool host_online, uint8_t accept_FR_slot,

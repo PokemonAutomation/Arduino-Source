@@ -46,7 +46,7 @@ public:
 class DexRecFinder : public SingleSwitchProgramInstance{
 public:
     DexRecFinder();
-    virtual void program(SingleSwitchProgramEnvironment& env, ControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
     void read_line(

@@ -21,19 +21,19 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 
-void set_time_to_12am_from_home(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context);
+void set_time_to_12am_from_home(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context);
 
 //  Perform a No-op day skip that rolls over all the outbreaks and raids.
-void day_skip_from_overworld(ConsoleHandle& console, ControllerContext& context);
+void day_skip_from_overworld(ConsoleHandle& console, SwitchControllerContext& context);
 
 // Press B to return to the overworld
-void press_Bs_to_back_to_overworld(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context, uint16_t seconds_between_b_presses = 3);
+void press_Bs_to_back_to_overworld(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context, uint16_t seconds_between_b_presses = 3);
 
 //  From overworld, open map. Will change map view from rotated to fixed if not already fixed.
 void open_map_from_overworld(
     const ProgramInfo& info,
     ConsoleHandle& console, 
-    ControllerContext& context,
+    SwitchControllerContext& context,
     bool clear_tutorial = false
 );
 
@@ -43,54 +43,54 @@ void open_map_from_overworld(
 //  check_fly_menuitem == false: will use GradientArrowDetector to check if a map menu is opened. No "Fly" menuitem check.
 //    The function always returns true. It throws an error in the case of no "Fly" menuitem. But the error message will be about
 //    timeout running the function.
-bool fly_to_overworld_from_map(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context, bool check_fly_menuitem = false);
+bool fly_to_overworld_from_map(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context, bool check_fly_menuitem = false);
 
 //  Assume the user can set up picnic at current location, start picnic from overworld.
-void picnic_from_overworld(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context);
+void picnic_from_overworld(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context);
 
 //  While in picnic, stop picnic and back to overworld.
-void leave_picnic(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context);
+void leave_picnic(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context);
 
 //  Enter box system from overworld.
-void enter_box_system_from_overworld(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context);
+void enter_box_system_from_overworld(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context);
 
 //  From box system go to overworld.
-void leave_box_system_to_overworld(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context);
+void leave_box_system_to_overworld(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context);
 
 //  From overworld, open Pokédex.
-void open_pokedex_from_overworld(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context);
+void open_pokedex_from_overworld(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context);
 
 //  From Pokédex, open Recently Battled.
-void open_recently_battled_from_pokedex(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context);
+void open_recently_battled_from_pokedex(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context);
 
 //  From any of the rotom phone apps (Map/Pokédex/Profile) go to overworld.
-void leave_phone_to_overworld(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context);
+void leave_phone_to_overworld(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context);
 
 bool detect_closest_pokecenter_and_move_map_cursor_there(
     const ProgramInfo& info,
     ConsoleHandle& console, 
-    ControllerContext& context,
+    SwitchControllerContext& context,
     double push_scale = 0.29
 );
 
 bool fly_to_visible_closest_pokecenter_cur_zoom_level(
     const ProgramInfo& info, 
     ConsoleHandle& console, 
-    ControllerContext& context, 
+    SwitchControllerContext& context, 
     double push_scale = 0.29
 );
 
 //  While on map (default zoom), move to the closest PokeCenter and fly there.
 //  The PokeCenter must be already visited before (so having the little wing icon with it) and not occluded
 //  by other map icons on the most zoomed-in level of the map.
-void fly_to_closest_pokecenter_on_map(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context);
+void fly_to_closest_pokecenter_on_map(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context);
 
 // Attempt to escape being stuck on a wall.
 // Repeatedly center camera and try to backwards jump off.
 // Finishes when map is successfully open.
-void jump_off_wall_until_map_open(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context);
+void jump_off_wall_until_map_open(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context);
 
-void reset_to_pokecenter(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context);
+void reset_to_pokecenter(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context);
 
 
 // align player orientation based on the alignment mode
@@ -108,7 +108,7 @@ void reset_to_pokecenter(const ProgramInfo& info, ConsoleHandle& console, Contro
 // which will align the player towards the marker
 // - REALIGN_NO_MARKER: move player towards in the direction set by move_x, move_y, move_duration
 // then re-align the camera
-void realign_player(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context,
+void realign_player(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context,
     PlayerRealignMode realign_mode,
     uint8_t move_x = 0, uint8_t move_y = 0, uint16_t move_duration = 0
 );
@@ -118,7 +118,7 @@ void realign_player(const ProgramInfo& info, ConsoleHandle& console, ControllerC
 void walk_forward_until_dialog(
     const ProgramInfo& info, 
     ConsoleHandle& console, 
-    ControllerContext& context,
+    SwitchControllerContext& context,
     NavigationMovementMode movement_mode,
     uint16_t seconds_timeout = 10,
     uint8_t x = 128,
@@ -133,7 +133,7 @@ void walk_forward_until_dialog(
 void walk_forward_while_clear_front_path(
     const ProgramInfo& info, 
     ConsoleHandle& console, 
-    ControllerContext& context,
+    SwitchControllerContext& context,
     uint16_t forward_ticks,
     uint8_t y = 0,
     uint16_t ticks_between_lets_go = 125,
@@ -143,7 +143,7 @@ void walk_forward_while_clear_front_path(
 // mashes A button by default
 void mash_button_till_overworld(
     ConsoleHandle& console, 
-    ControllerContext& context, 
+    SwitchControllerContext& context, 
     uint16_t button = BUTTON_A, uint16_t seconds_run = 360
 );
 
@@ -152,19 +152,19 @@ void mash_button_till_overworld(
 bool attempt_fly_to_overlapping_flypoint(
     const ProgramInfo& info, 
     ConsoleHandle& console, 
-    ControllerContext& context
+    SwitchControllerContext& context
 );
 
 // fly to the pokecenter that overlaps with the player on the map
 // throw exception if unsuccessful
-void fly_to_overlapping_flypoint(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context);
+void fly_to_overlapping_flypoint(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context);
 
 // throw exception if there is a fly point/pokecenter that overlaps with the player on the map
-void confirm_no_overlapping_flypoint(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context);
+void confirm_no_overlapping_flypoint(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context);
 
 // enter menu and move the cursor the given side, and index. then press the A button
 // if menu_index is -1, return once the menu is detected.
-void enter_menu_from_overworld(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context,
+void enter_menu_from_overworld(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context,
     int menu_index,
     MenuSide side = MenuSide::RIGHT,
     bool has_minimap = true
@@ -174,7 +174,7 @@ void enter_menu_from_overworld(const ProgramInfo& info, ConsoleHandle& console, 
 void press_button_until_gradient_arrow(
     const ProgramInfo& info, 
     ConsoleHandle& console, 
-    ControllerContext& context,
+    SwitchControllerContext& context,
     ImageFloatBox box_area_to_check,
     uint16_t button = BUTTON_A,
     GradientArrowType arrow_type = GradientArrowType::RIGHT
@@ -189,7 +189,7 @@ void press_button_until_gradient_arrow(
 void basic_menu_navigation(
     const ProgramInfo& info, 
     ConsoleHandle& console, 
-    ControllerContext& context,
+    SwitchControllerContext& context,
     ImageFloatBox arrow_box_start,
     ImageFloatBox arrow_box_end,
     uint8_t dpad_button,
@@ -201,7 +201,7 @@ void basic_menu_navigation(
 void heal_at_pokecenter(
     const ProgramInfo& info, 
     ConsoleHandle& console, 
-    ControllerContext& context
+    SwitchControllerContext& context
 );
 
 

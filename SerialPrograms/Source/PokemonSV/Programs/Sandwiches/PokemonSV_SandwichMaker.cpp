@@ -51,7 +51,7 @@ SandwichMaker::SandwichMaker()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void SandwichMaker::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
+void SandwichMaker::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
     #if 0

@@ -62,7 +62,7 @@ bool turn = true; // True to turn clockwise, false to turn counter-clockwise
 
 ImageFloatBox box(0.56, 0.724, 0.012, 0.024); // Create a box that contains both green and blue arrows that need to be detected
 
-void TurnClockwiseSlow(ControllerContext& context){ // One turn of stiring poffin at slow speed (clockwise)
+void TurnClockwiseSlow(SwitchControllerContext& context){ // One turn of stiring poffin at slow speed (clockwise)
     pbf_move_right_joystick(context, 128, 255, 5, 0);
     pbf_move_right_joystick(context, 53, 231, 5, 0);
     pbf_move_right_joystick(context, 6, 167, 5, 0);
@@ -75,7 +75,7 @@ void TurnClockwiseSlow(ControllerContext& context){ // One turn of stiring poffi
     pbf_move_right_joystick(context, 202, 231, 5, 0);  
 }
 
-void TurnClockwiseFast(ControllerContext& context){ // Same as above, but faster for the end of the cooking session
+void TurnClockwiseFast(SwitchControllerContext& context){ // Same as above, but faster for the end of the cooking session
     pbf_move_right_joystick(context, 128, 255, 5, 0);
     pbf_move_right_joystick(context, 38, 218, 5, 0);
     pbf_move_right_joystick(context, 0, 128, 5, 0);
@@ -87,7 +87,7 @@ void TurnClockwiseFast(ControllerContext& context){ // Same as above, but faster
 }
 
 
-void TurnCounterClockwiseSlow(ControllerContext& context){ // One turn of stiring poffin (counter-clockwise)
+void TurnCounterClockwiseSlow(SwitchControllerContext& context){ // One turn of stiring poffin (counter-clockwise)
     pbf_move_right_joystick(context, 128, 255, 5, 0);
     pbf_move_right_joystick(context, 202, 231, 5, 0);
     pbf_move_right_joystick(context, 249, 167, 5, 0);
@@ -100,7 +100,7 @@ void TurnCounterClockwiseSlow(ControllerContext& context){ // One turn of stirin
     pbf_move_right_joystick(context, 53, 231, 5, 0);
 }
 
-void TurnCounterClockwiseFast(ControllerContext& context){ // Same as above, but faster for the end of the cooking session
+void TurnCounterClockwiseFast(SwitchControllerContext& context){ // Same as above, but faster for the end of the cooking session
     pbf_move_right_joystick(context, 128, 255, 5, 0);
     pbf_move_right_joystick(context, 218, 218, 5, 0); 
     pbf_move_right_joystick(context, 255, 128, 5, 0);
@@ -112,7 +112,7 @@ void TurnCounterClockwiseFast(ControllerContext& context){ // Same as above, but
 }
 
 
-void PoffinCooker::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
+void PoffinCooker::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     PoffinCooker_Descriptor::Stats& stats = env.current_stats<PoffinCooker_Descriptor::Stats>();
     env.update_stats();
 

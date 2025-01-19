@@ -29,14 +29,14 @@ public:
     };
 
 public:
-    OrbeetleAttackAnimationDetector(ConsoleHandle& console, ControllerContext& context);
+    OrbeetleAttackAnimationDetector(ConsoleHandle& console, SwitchControllerContext& context);
 
     Detection run(bool save_screenshot, bool log_values);
 
 
 private:
     ConsoleHandle& m_console;
-    ControllerContext& m_context;
+    SwitchControllerContext& m_context;
     OverlayBoxScope m_box;
 };
 

@@ -18,7 +18,7 @@ namespace MaxLairInternal{
 
 
 std::shared_ptr<const ImageRGB32> enter_lobby(
-    ConsoleHandle& console, ControllerContext& context,
+    ConsoleHandle& console, SwitchControllerContext& context,
     size_t boss_slot, bool connect_to_internet,
     ReadableQuantity999& ore
 );

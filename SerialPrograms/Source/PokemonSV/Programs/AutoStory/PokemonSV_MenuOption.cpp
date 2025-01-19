@@ -25,7 +25,7 @@ MenuOption::~MenuOption() = default;
 
 MenuOption::MenuOption(
     ConsoleHandle& console, 
-    ControllerContext& context,
+    SwitchControllerContext& context,
     Language language
 )
     : m_console(console)

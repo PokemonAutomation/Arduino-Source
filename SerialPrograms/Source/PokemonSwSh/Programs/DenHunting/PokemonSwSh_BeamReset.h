@@ -28,7 +28,7 @@ class BeamReset : public SingleSwitchProgramInstance{
 public:
     BeamReset();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, ControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
     StartInGripOrGameOption START_LOCATION;

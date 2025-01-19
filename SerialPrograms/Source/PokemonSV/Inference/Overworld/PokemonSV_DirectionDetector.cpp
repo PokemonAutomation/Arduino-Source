@@ -145,7 +145,7 @@ bool DirectionDetector::is_minimap_possibly_locked(double current_direction) con
 }
 
 // - push the joystick to change its position. if still pointing North, then we know it's locked.
-bool DirectionDetector::is_minimap_definitely_locked(ConsoleHandle& console, ControllerContext& context, double current_direction) const {
+bool DirectionDetector::is_minimap_definitely_locked(ConsoleHandle& console, SwitchControllerContext& context, double current_direction) const {
     bool pointing_north = is_pointing_north(current_direction);
     if (!pointing_north){
         return false;
@@ -160,7 +160,7 @@ bool DirectionDetector::is_minimap_definitely_locked(ConsoleHandle& console, Con
 void DirectionDetector::change_direction(
     const ProgramInfo& info,
     ConsoleHandle& console, 
-    ControllerContext& context,
+    SwitchControllerContext& context,
     double direction
 ) const{
     size_t i = 0;

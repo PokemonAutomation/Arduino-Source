@@ -112,7 +112,7 @@ std::set<std::string> read_name(
 
 
 
-void ShinyHuntLakeTrio::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
+void ShinyHuntLakeTrio::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     PokemonSwSh::ShinyHuntTracker& stats = env.current_stats<PokemonSwSh::ShinyHuntTracker>();
 
 
@@ -151,9 +151,9 @@ void ShinyHuntLakeTrio::program(SingleSwitchProgramEnvironment& env, ControllerC
                 {0, 0, 1, 1},
                 {{arcs, true}}
             );
-            int ret = run_until<ControllerContext>(
+            int ret = run_until<SwitchControllerContext>(
                 env.console, context,
-                [](ControllerContext& context){
+                [](SwitchControllerContext& context){
                     pbf_mash_button(context, BUTTON_B, 60 * TICKS_PER_SECOND);
                 },
                 {{watcher}}
@@ -192,9 +192,9 @@ void ShinyHuntLakeTrio::program(SingleSwitchProgramEnvironment& env, ControllerC
                 {{arcs, false}}
             );
             ShinySymbolWaiter shiny_symbol(env.console, SHINY_SYMBOL_BOX_BOTTOM);
-            int ret = run_until<ControllerContext>(
+            int ret = run_until<SwitchControllerContext>(
                 env.console, context,
-                [](ControllerContext& context){
+                [](SwitchControllerContext& context){
                     pbf_press_button(context, BUTTON_ZL, 3 * TICKS_PER_SECOND, 0);
                 },
                 {

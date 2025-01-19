@@ -24,7 +24,7 @@ class PokedexTasksReader : public SingleSwitchProgramInstance{
 public:
     PokedexTasksReader();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, ControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 };
 
 

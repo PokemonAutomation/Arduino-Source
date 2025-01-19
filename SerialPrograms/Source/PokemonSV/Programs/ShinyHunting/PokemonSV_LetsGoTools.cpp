@@ -151,7 +151,7 @@ void DiscontiguousTimeTracker::add_block(WallClock start, WallClock end){
 
 
 LetsGoEncounterBotTracker::LetsGoEncounterBotTracker(
-    ProgramEnvironment& env, ConsoleHandle& console, ControllerContext& context,
+    ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context,
     LetsGoEncounterBotStats& stats,
     OCR::LanguageOCROption& language
 )
@@ -308,10 +308,10 @@ void LetsGoEncounterBotTracker::process_battle(
 
 
 bool use_lets_go_to_clear_in_front(
-    ConsoleHandle& console, ControllerContext& context,
+    ConsoleHandle& console, SwitchControllerContext& context,
     LetsGoEncounterBotTracker& tracker,
     bool throw_ball_if_bubble,
-    std::function<void(ControllerContext& context)>&& command
+    std::function<void(SwitchControllerContext& context)>&& command
 ){
 //    ShinyHuntAreaZeroPlatform_Descriptor::Stats& stats = env.current_stats<ShinyHuntAreaZeroPlatform_Descriptor::Stats>();
 
@@ -320,9 +320,9 @@ bool use_lets_go_to_clear_in_front(
 //    cout << calls++ << endl;
 
     SweatBubbleWatcher bubble(COLOR_GREEN);
-    int ret = run_until<ControllerContext>(
+    int ret = run_until<SwitchControllerContext>(
         console, context,
-        [](ControllerContext& context){
+        [](SwitchControllerContext& context){
             pbf_press_button(context, BUTTON_R, 20, 200);
         },
         {bubble}

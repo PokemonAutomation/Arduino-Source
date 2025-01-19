@@ -91,7 +91,7 @@ SeedFinder::SeedFinder()
 
 
 
-void SeedFinder::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
+void SeedFinder::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     Xoroshiro128PlusState state(0, 0);
     // sanitize STATE_0 and STATE_1 and make ints
     if (UPDATE_STATE){

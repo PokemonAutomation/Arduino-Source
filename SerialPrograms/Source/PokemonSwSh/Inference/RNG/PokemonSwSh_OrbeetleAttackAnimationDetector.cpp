@@ -20,7 +20,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
-OrbeetleAttackAnimationDetector::OrbeetleAttackAnimationDetector(ConsoleHandle& console, ControllerContext& context)
+OrbeetleAttackAnimationDetector::OrbeetleAttackAnimationDetector(ConsoleHandle& console, SwitchControllerContext& context)
     : m_console(console)
     , m_context(context)
     , m_box(console, {0.86, 0.2, 0.1, 0.15})

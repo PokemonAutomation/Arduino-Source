@@ -32,7 +32,7 @@ MountDetectionTest::MountDetectionTest(){
 }
 
 
-void MountDetectionTest::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
+void MountDetectionTest::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     MountTracker tracker(env.console, FAILED_ACTION);
     InferenceSession session(
         context, env.console,

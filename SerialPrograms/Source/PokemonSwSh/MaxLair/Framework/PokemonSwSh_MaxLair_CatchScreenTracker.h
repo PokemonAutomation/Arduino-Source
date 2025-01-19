@@ -27,7 +27,7 @@ class CaughtPokemonScreen{
     using Detection = SummaryShinySymbolDetector::Detection;
 
 public:
-    CaughtPokemonScreen(ConsoleHandle& console, ControllerContext& context);
+    CaughtPokemonScreen(ConsoleHandle& console, SwitchControllerContext& context);
 
     size_t total() const;
     const CaughtPokemon& operator[](size_t position) const;
@@ -45,7 +45,7 @@ private:
 
 private:
     ConsoleHandle& m_console;
-    ControllerContext& m_context;
+    SwitchControllerContext& m_context;
     size_t m_total;
     size_t m_current_position = 0;
     bool m_in_summary = false;

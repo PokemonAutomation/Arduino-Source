@@ -101,7 +101,7 @@ StarterReset::StarterReset()
 
 
 
-void StarterReset::program(SingleSwitchProgramEnvironment& env, ControllerContext& context){
+void StarterReset::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     StarterReset_Descriptor::Stats& stats = env.current_stats<StarterReset_Descriptor::Stats>();
 
     std::shared_ptr<const ImageRGB32> briefcase = std::make_shared<const ImageRGB32>(RESOURCE_PATH() + "PokemonBDSP/StarterBriefcase.png");
@@ -138,9 +138,9 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, ControllerContex
 
         //  Mash B until we see the briefcase.
         ImageMatchWatcher detector(briefcase, {0.5, 0.1, 0.5, 0.7}, 100, true);
-        int ret = run_until<ControllerContext>(
+        int ret = run_until<SwitchControllerContext>(
             env.console, context,
-            [](ControllerContext& context){
+            [](SwitchControllerContext& context){
                 pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
             },
             {{detector}}

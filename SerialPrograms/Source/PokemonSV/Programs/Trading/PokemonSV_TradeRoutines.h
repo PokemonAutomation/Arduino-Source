@@ -28,7 +28,7 @@ struct TradeStats : public StatsTracker{
 
 
 void trade_current_pokemon(
-    ConsoleHandle& console, ControllerContext& context,
+    ConsoleHandle& console, SwitchControllerContext& context,
     MultiConsoleErrorState& tracker,
     TradeStats& stats
 );

@@ -86,7 +86,7 @@ public:
 void run_material_farmer(
     ProgramEnvironment& env,
     ConsoleHandle& console,
-    ControllerContext& context,
+    SwitchControllerContext& context,
     MaterialFarmerOptions& options,
     MaterialFarmerStats& stats
 );
@@ -94,7 +94,7 @@ void run_material_farmer(
 void check_hp(
     ProgramEnvironment& env,
     ConsoleHandle& console,
-    ControllerContext& context,
+    SwitchControllerContext& context,
     MaterialFarmerOptions& options,
     LetsGoHpWatcher& hp_watcher,
     MaterialFarmerStats& stats
@@ -103,24 +103,24 @@ void check_hp(
 WallClock make_sandwich_material_farm(
     ProgramEnvironment& env, 
     ConsoleHandle& console,
-    ControllerContext& context, 
+    SwitchControllerContext& context, 
     MaterialFarmerOptions& options,
     MaterialFarmerStats& stats
 );        
 
-void move_to_start_position_for_letsgo0(ConsoleHandle& console, ControllerContext& context);
+void move_to_start_position_for_letsgo0(ConsoleHandle& console, SwitchControllerContext& context);
 
-void move_to_start_position_for_letsgo1(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context);
+void move_to_start_position_for_letsgo1(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context);
 
-void lets_go_movement0(ControllerContext& context);
+void lets_go_movement0(SwitchControllerContext& context);
 
-void lets_go_movement1(ControllerContext& context);
+void lets_go_movement1(SwitchControllerContext& context);
 
 std::chrono::minutes minutes_remaining(WallClock start_time, std::chrono::minutes minutes_duration);
 
 void run_lets_go_iteration(
     ConsoleHandle& console,
-    ControllerContext& context,
+    SwitchControllerContext& context,
     LetsGoEncounterBotTracker& encounter_tracker,
     int num_forward_moves_per_lets_go_iteration
 );
@@ -128,32 +128,32 @@ void run_lets_go_iteration(
 void run_from_battles_and_back_to_pokecenter(
     ProgramEnvironment& env, 
     ConsoleHandle& console,
-    ControllerContext& context,
+    SwitchControllerContext& context,
     MaterialFarmerStats& stats,
     std::function<
         void(ProgramEnvironment& env,
         ConsoleHandle& console,
-        ControllerContext& context)
+        SwitchControllerContext& context)
     >&& action
 );
 
 
 
-void move_from_material_farming_to_item_printer(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context);
+void move_from_material_farming_to_item_printer(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context);
 
-void fly_from_paldea_to_blueberry_entrance(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context);
+void fly_from_paldea_to_blueberry_entrance(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context);
 
-void move_from_blueberry_entrance_to_league_club(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context);
+void move_from_blueberry_entrance_to_league_club(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context);
 
-void move_from_league_club_entrance_to_item_printer(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context);
+void move_from_league_club_entrance_to_item_printer(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context);
 
 
 
-void move_from_item_printer_to_material_farming(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context);
+void move_from_item_printer_to_material_farming(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context);
 
-void move_from_item_printer_to_blueberry_entrance(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context);
+void move_from_item_printer_to_blueberry_entrance(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context);
 
-void fly_from_blueberry_to_north_province_3(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context);
+void fly_from_blueberry_to_north_province_3(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context);
 
 
 

@@ -339,7 +339,7 @@ std::vector<DigitPath> get_codeboard_path(
 }
 
 
-void move_codeboard(ControllerContext& context, const DigitPath& path){
+void move_codeboard(SwitchControllerContext& context, const DigitPath& path){
     uint16_t delay = 3;
     if (path.length > 0){
         size_t last = (size_t)path.length - 1;
@@ -362,7 +362,7 @@ void move_codeboard(ControllerContext& context, const DigitPath& path){
     ssf_press_button(context, BUTTON_A, delay);
 }
 
-void run_codeboard_path(ControllerContext& context, const std::vector<DigitPath>& path){
+void run_codeboard_path(SwitchControllerContext& context, const std::vector<DigitPath>& path){
     for (const DigitPath& digit : path){
         move_codeboard(context, digit);
         if (digit.left_cursor){
@@ -384,7 +384,7 @@ FastCodeEntrySettings::FastCodeEntrySettings(const FastCodeEntrySettingsOption& 
 
 void enter_alphanumeric_code(
     Logger& logger,
-    ControllerContext& context,
+    SwitchControllerContext& context,
     const FastCodeEntrySettings& settings,
     const std::string& code
 ){

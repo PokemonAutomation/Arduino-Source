@@ -42,14 +42,14 @@ using namespace Pokemon;
 
 
 
-bool open_raid(ConsoleHandle& console, ControllerContext& context){
+bool open_raid(ConsoleHandle& console, SwitchControllerContext& context){
     console.log("Opening raid...");
     while (true){
         TeraCardWatcher card_detector(COLOR_RED);
         AdvanceDialogWatcher dialog(COLOR_YELLOW);
-        int ret = run_until<ControllerContext>(
+        int ret = run_until<SwitchControllerContext>(
             console, context,
-            [](ControllerContext& context){
+            [](SwitchControllerContext& context){
                 //  Do 2 presses in quick succession in case one drops or is
                 //  needed to connect the controller.
                 pbf_press_button(context, BUTTON_A, 5, 5);
@@ -74,7 +74,7 @@ bool open_raid(ConsoleHandle& console, ControllerContext& context){
         }
     }
 }
-void close_raid(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context){
+void close_raid(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context){
     console.log("Closing raid...");
 
     WallClock start = current_time();
@@ -112,7 +112,7 @@ void close_raid(const ProgramInfo& info, ConsoleHandle& console, ControllerConte
 
 
 void open_hosting_lobby(
-    ProgramEnvironment& env, ConsoleHandle& console, ControllerContext& context,
+    ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context,
     HostingMode mode
 ){
     bool recovery_mode = false;
@@ -129,9 +129,9 @@ void open_hosting_lobby(
         OverworldWatcher overworld(console, COLOR_RED);
         if (recovery_mode){
             context.wait_for_all_requests();
-            int ret = run_until<ControllerContext>(
+            int ret = run_until<SwitchControllerContext>(
                 console, context,
-                [](ControllerContext& context){
+                [](SwitchControllerContext& context){
                     pbf_press_button(context, BUTTON_B, 20, 980);
                 },
                 {overworld}
@@ -202,7 +202,7 @@ void open_hosting_lobby(
 
 
 void enter_tera_search(
-    const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context,
+    const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context,
     bool connect_to_internet
 ){
     WallClock start = current_time();
@@ -284,7 +284,7 @@ void enter_tera_search(
 
 
 void stop_if_enough_rare_items(
-    ConsoleHandle& console, ControllerContext& context,
+    ConsoleHandle& console, SwitchControllerContext& context,
     size_t stop_on_sparkly_items
 ){
     if (stop_on_sparkly_items == 0){
@@ -304,7 +304,7 @@ void stop_if_enough_rare_items(
 
 void exit_tera_win_without_catching(
     const ProgramInfo& info,
-    ConsoleHandle& console, ControllerContext& context,
+    ConsoleHandle& console, SwitchControllerContext& context,
     size_t stop_on_sparkly_items
 ){
     console.log("Exiting raid without catching...");
@@ -367,7 +367,7 @@ void exit_tera_win_without_catching(
 
 void exit_tera_win_by_catching(
     ProgramEnvironment& env,
-    ConsoleHandle& console, ControllerContext& context,
+    ConsoleHandle& console, SwitchControllerContext& context,
     Language language,
     const std::string& ball_slug,
     size_t stop_on_sparkly_items
@@ -475,7 +475,7 @@ void exit_tera_win_by_catching(
 
 TeraResult exit_tera_win_by_catching(
     ProgramEnvironment& env,
-    ConsoleHandle& console, ControllerContext& context,
+    ConsoleHandle& console, SwitchControllerContext& context,
     Language language,
     const std::string& ball_slug,
     EventNotificationOption& notification_nonshiny,
@@ -629,7 +629,7 @@ TeraResult exit_tera_win_by_catching(
 TeraResult run_tera_summary(
     ProgramEnvironment& env,
     ConsoleHandle& console,
-    ControllerContext& context,
+    SwitchControllerContext& context,
     EventNotificationOption& notification_nonshiny,
     EventNotificationOption& notification_shiny,
     bool stop_on_shiny, const ImageViewRGB32& battle_screenshot,
@@ -670,7 +670,7 @@ TeraResult run_tera_summary(
 }
 
 
-void run_from_tera_battle(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context){
+void run_from_tera_battle(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context){
     console.log("Running away from tera raid battle...");
 
     WallClock start = current_time();
@@ -718,7 +718,7 @@ void run_from_tera_battle(const ProgramInfo& info, ConsoleHandle& console, Contr
 
 
 
-bool is_sparkling_raid(ConsoleHandle& console, ControllerContext& context){
+bool is_sparkling_raid(ConsoleHandle& console, SwitchControllerContext& context){
 //    cout << "is_sparkling_raid()" << endl;
 
     FrozenImageDetector static_map(

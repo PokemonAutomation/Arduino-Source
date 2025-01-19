@@ -32,11 +32,11 @@ class MassAttachItems : public SingleSwitchProgramInstance{
 public:
     MassAttachItems();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, ControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
-    void attach_one(BoxDetector& box_detector, SingleSwitchProgramEnvironment& env, ControllerContext& context);
-    void attach_box(BoxDetector& box_detector, SingleSwitchProgramEnvironment& env, ControllerContext& context);
+    void attach_one(BoxDetector& box_detector, SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
+    void attach_box(BoxDetector& box_detector, SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
 
 private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;

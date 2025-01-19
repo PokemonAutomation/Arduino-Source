@@ -94,7 +94,7 @@ EventNotificationOption EggAutonomousState::m_notification_noop("", false, false
 
 
 EggAutonomousState::EggAutonomousState(
-    ProgramEnvironment& env, ConsoleHandle& console, ControllerContext& context,
+    ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context,
     EggAutonomousStats& stats,
     EventNotificationOption& notification_nonshiny_keep,
     EventNotificationOption& notification_shiny,
@@ -308,9 +308,9 @@ void EggAutonomousState::fetch_egg(){
     m_console.log("Attempting to fetch an egg.");
     {
         ShortDialogWatcher dialog;
-        int ret = run_until<ControllerContext>(
+        int ret = run_until<SwitchControllerContext>(
             m_console, m_context,
-            [](ControllerContext& context){
+            [](SwitchControllerContext& context){
                 pbf_move_left_joystick(context, 0, 255, 125, 0);
             },
             {{dialog}}
@@ -331,9 +331,9 @@ void EggAutonomousState::fetch_egg(){
     m_console.log("Going to daycare man.");
     {
         ShortDialogWatcher dialog;
-        int ret = run_until<ControllerContext>(
+        int ret = run_until<SwitchControllerContext>(
             m_console, m_context,
-            [](ControllerContext& context){
+            [](SwitchControllerContext& context){
                 pbf_move_left_joystick(context, 0, 255, 30, 0);
                 pbf_move_left_joystick(context, 128, 0, 35, 0);
                 pbf_move_left_joystick(context, 255, 128, 60, 125);
@@ -348,9 +348,9 @@ void EggAutonomousState::fetch_egg(){
     //  Talk to daycare man.
     {
         ShortDialogWatcher dialog;
-        int ret = run_until<ControllerContext>(
+        int ret = run_until<SwitchControllerContext>(
             m_console, m_context,
-            [](ControllerContext& context){
+            [](SwitchControllerContext& context){
                 pbf_press_button(context, BUTTON_ZL, 20, 230);
             },
             {{dialog}}
@@ -363,9 +363,9 @@ void EggAutonomousState::fetch_egg(){
 
     {
         EggReceivedDetector received;
-        run_until<ControllerContext>(
+        run_until<SwitchControllerContext>(
             m_console, m_context,
-            [](ControllerContext& context){
+            [](SwitchControllerContext& context){
                 pbf_mash_button(context, BUTTON_ZL, 500);
                 pbf_mash_button(context, BUTTON_B, 500);
             },
@@ -452,9 +452,9 @@ void EggAutonomousState::hatch_rest_of_party(){
         dump();
         ShortDialogWatcher dialog;
         FrozenImageDetector frozen(COLOR_CYAN, {0, 0, 1, 0.5}, std::chrono::seconds(60), 20);
-        int ret = run_until<ControllerContext>(
+        int ret = run_until<SwitchControllerContext>(
             m_console, m_context,
-            [&](ControllerContext& context){
+            [&](SwitchControllerContext& context){
                 egg_spin(context, 480 * TICKS_PER_SECOND);
 //                egg_spin(context, 5 * TICKS_PER_SECOND);
             },
@@ -481,9 +481,9 @@ void EggAutonomousState::spin_until_fetch_or_hatch(){
     m_context.wait_for_all_requests();
     m_console.log("Looking for more eggs...");
     ShortDialogWatcher dialog;
-    int ret = run_until<ControllerContext>(
+    int ret = run_until<SwitchControllerContext>(
         m_console, m_context,
-        [&](ControllerContext& context){
+        [&](SwitchControllerContext& context){
             egg_spin(context, m_travel_time_per_fetch);
         },
         {{dialog}}

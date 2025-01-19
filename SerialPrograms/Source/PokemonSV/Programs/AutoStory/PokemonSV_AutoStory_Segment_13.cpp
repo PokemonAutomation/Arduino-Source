@@ -38,7 +38,7 @@ std::string AutoStory_Segment_13::end_text() const{
     return "End: At West Province Area One Central Pokecenter";
 }
 
-void AutoStory_Segment_13::run_segment(SingleSwitchProgramEnvironment& env, ControllerContext& context, AutoStoryOptions options) const{
+void AutoStory_Segment_13::run_segment(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, AutoStoryOptions options) const{
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
 
     context.wait_for_all_requests();
@@ -56,7 +56,7 @@ void AutoStory_Segment_13::run_segment(SingleSwitchProgramEnvironment& env, Cont
 // todo: shift all checkpoint numbers to make space for the Cortondo checkpoints
 void checkpoint_29(
     SingleSwitchProgramEnvironment& env, 
-    ControllerContext& context, 
+    SwitchControllerContext& context, 
     EventNotificationOption& notif_status_update
 ){
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
@@ -216,7 +216,7 @@ void checkpoint_29(
         confirm_no_overlapping_flypoint(env.program_info(), env.console, context);
         pbf_press_button(context, BUTTON_B, 20, 100);
         handle_unexpected_battles(env.program_info(), env.console, context,
-        [&](const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context){           
+        [&](const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context){           
             press_Bs_to_back_to_overworld(env.program_info(), env.console, context);
         });
 
@@ -287,7 +287,7 @@ void checkpoint_29(
 
         // align for post-bridge section 6. set marker past pokecenter
         handle_unexpected_battles(env.program_info(), env.console, context,
-        [&](const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context){                        
+        [&](const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context){                        
             realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 200, 30);
         });
                 // realign_player_from_landmark(

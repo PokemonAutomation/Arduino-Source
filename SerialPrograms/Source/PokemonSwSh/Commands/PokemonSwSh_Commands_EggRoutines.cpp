@@ -13,7 +13,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-void eggfetcher_loop(ControllerContext& context){
+void eggfetcher_loop(SwitchControllerContext& context){
 #if 0
     context.issue_request(
         DeviceRequest_eggfetcher_loop()
@@ -31,7 +31,7 @@ void eggfetcher_loop(ControllerContext& context){
     ssf_press_left_joystick(context, STICK_MAX, STICK_MIN, 120, 120);
 #endif
 }
-void move_while_mashing_B(ControllerContext& context, uint16_t duration){
+void move_while_mashing_B(SwitchControllerContext& context, uint16_t duration){
 #if 0
     context.issue_request(
         DeviceRequest_move_while_mashing_B(duration)
@@ -44,7 +44,7 @@ void move_while_mashing_B(ControllerContext& context, uint16_t duration){
     ssf_mash1_button(context, BUTTON_B, duration);
 #endif
 }
-void spin_and_mash_A(ControllerContext& context, uint16_t duration){
+void spin_and_mash_A(SwitchControllerContext& context, uint16_t duration){
 #if 0
     context.issue_request(
         DeviceRequest_spin_and_mash_A(duration)
@@ -69,7 +69,7 @@ void spin_and_mash_A(ControllerContext& context, uint16_t duration){
     }
 #endif
 }
-void travel_to_spin_location(ControllerContext& context){
+void travel_to_spin_location(SwitchControllerContext& context){
 #if 0
     context.issue_request(
         DeviceRequest_travel_to_spin_location()
@@ -81,7 +81,7 @@ void travel_to_spin_location(ControllerContext& context){
     ssf_press_left_joystick(context, STICK_MAX, STICK_MAX, 50, 50);
 #endif
 }
-void travel_back_to_lady(ControllerContext& context){
+void travel_back_to_lady(SwitchControllerContext& context){
 #if 0
     context.issue_request(
         DeviceRequest_travel_back_to_lady()

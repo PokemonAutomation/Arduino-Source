@@ -20,21 +20,21 @@ public:
     virtual std::string end_text() const override;
     virtual void run_segment(
         SingleSwitchProgramEnvironment& env, 
-        ControllerContext& context,
+        SwitchControllerContext& context,
         AutoStoryOptions options) const override;
 };
 
 // start: Arrived at Mesagoza (South) Pokecenter
 // end: Battled Nemona at Mesagoza gate. Entered Mesagoza.
-void checkpoint_13(SingleSwitchProgramEnvironment& env, ControllerContext& context, EventNotificationOption& notif_status_update);
+void checkpoint_13(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, EventNotificationOption& notif_status_update);
 
 // start: Battled Nemona at Mesagoza gate. Entered Mesagoza.
 // end: Battled Team Star at school entrance.
-void checkpoint_14(SingleSwitchProgramEnvironment& env, ControllerContext& context, EventNotificationOption& notif_status_update);
+void checkpoint_14(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, EventNotificationOption& notif_status_update);
 
 // start: Battled Team Star at school entrance.
 // end: Talked to Jacq in classroom. Standing in classroom.
-void checkpoint_15(SingleSwitchProgramEnvironment& env, ControllerContext& context, EventNotificationOption& notif_status_update);
+void checkpoint_15(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, EventNotificationOption& notif_status_update);
 
 
 

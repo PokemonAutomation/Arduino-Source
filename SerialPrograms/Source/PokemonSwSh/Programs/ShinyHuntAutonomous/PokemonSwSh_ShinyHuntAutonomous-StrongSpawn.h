@@ -35,7 +35,7 @@ public:
 class ShinyHuntAutonomousStrongSpawn : public SingleSwitchProgramInstance{
 public:
     ShinyHuntAutonomousStrongSpawn();
-    virtual void program(SingleSwitchProgramEnvironment& env, ControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
     StartInGripOrClosedOption START_LOCATION;

@@ -28,8 +28,8 @@ class EggFetcherMultiple : public SingleSwitchProgramInstance{
 public:
     EggFetcherMultiple();
 
-    void run_eggfetcher(Logger& logger, ControllerContext& context, bool deposit_automatically, uint16_t attempts) const;
-    virtual void program(SingleSwitchProgramEnvironment& env, ControllerContext& context) override;
+    void run_eggfetcher(Logger& logger, SwitchControllerContext& context, bool deposit_automatically, uint16_t attempts) const;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
     StartInGripOrGameOption START_LOCATION;

@@ -29,7 +29,7 @@ enum class BoxCursorLocation;
 //  If it can't land on either stats or judge and `throw_exception` is true, it will throw an exception.
 //  Return true if it successfully changed view to judge (or stats if judege is not found)
 bool change_view_to_stats_or_judge(
-    ConsoleHandle& console, ControllerContext& context,
+    ConsoleHandle& console, SwitchControllerContext& context,
     bool throw_exception = true
 );
 
@@ -37,26 +37,26 @@ bool change_view_to_stats_or_judge(
 //  Assuming the current slot in box system is a pokemon, not egg or empty space,
 //  change the view to the judge. If it fails, it will OperationFailedException::fire.
 void change_view_to_judge(
-    ConsoleHandle& console, ControllerContext& context,
+    ConsoleHandle& console, SwitchControllerContext& context,
     Language language
 );
 
 
 //  Press button L to move to the box on the left
-void move_to_left_box(ControllerContext& context);
+void move_to_left_box(SwitchControllerContext& context);
 
 //  Press button R to move to the box on the right
-void move_to_right_box(ControllerContext& context);
+void move_to_right_box(SwitchControllerContext& context);
 
 
 
 //  In box system, check how many slots in the party are empty
-uint8_t check_empty_slots_in_party(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context);
+uint8_t check_empty_slots_in_party(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context);
 
 //  In box system, assuming the party is empty, load one column in the current box onto party.
 //  if has_clone_ride_pokemon is true, skip loading the first row of the box.
 void load_one_column_to_party(
-    ProgramEnvironment& env, ConsoleHandle& console, ControllerContext& context,
+    ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context,
     EventNotificationOption& notification,
     uint8_t column_index, bool has_clone_ride_pokemon
 );
@@ -64,19 +64,19 @@ void load_one_column_to_party(
 //  In box system, assuming the target column is empty, unload party (after the lead) to the target column.
 //  if has_clone_ride_pokemon is true, skip unloading the second row of the party.
 void unload_one_column_from_party(
-    ProgramEnvironment& env, ConsoleHandle& console, ControllerContext& context,
+    ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context,
     EventNotificationOption& notification,
     uint8_t column_index, bool has_clone_ride_pokemon
 );
 
 //  In box system, move the cursor to the desired slot.
-void move_box_cursor(const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context,
+void move_box_cursor(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context,
     const BoxCursorLocation& side, uint8_t row, uint8_t col);
 
 //  In box system, use button Y to swap two slots.
 //  The source slot must not be empty, while the target slot can be empty.
 void swap_two_box_slots(
-    const ProgramInfo& info, ConsoleHandle& console, ControllerContext& context,
+    const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context,
     const BoxCursorLocation& source_side, uint8_t source_row, uint8_t source_col,
     const BoxCursorLocation& target_side, uint8_t target_row, uint8_t target_col
 );

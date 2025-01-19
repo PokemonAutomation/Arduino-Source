@@ -13,8 +13,8 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-void enter_digits_str   (ControllerContext& context, uint8_t count, const char* digits);
-void enter_digits       (ControllerContext& context, uint8_t count, const uint8_t* digits);
+void enter_digits_str   (SwitchControllerContext& context, uint8_t count, const char* digits);
+void enter_digits       (SwitchControllerContext& context, uint8_t count, const uint8_t* digits);
 
 
 

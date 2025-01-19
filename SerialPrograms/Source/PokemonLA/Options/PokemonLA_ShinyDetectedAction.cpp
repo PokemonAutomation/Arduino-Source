@@ -115,7 +115,7 @@ bool on_shiny_callback(
     return false;
 }
 void on_shiny_sound(
-    ProgramEnvironment& env, ConsoleHandle& console, ControllerContext& context,
+    ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context,
     ShinyDetectedActionOption& options,
     float error_coefficient
 ){
@@ -150,7 +150,7 @@ void on_shiny_sound(
 }
 
 void on_match_found(
-    ProgramEnvironment& env, ConsoleHandle& console, ControllerContext& context,
+    ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context,
     ShinyDetectedActionOption& options, bool stop_program
 ){
     std::vector<std::pair<std::string, std::string>> embeds;

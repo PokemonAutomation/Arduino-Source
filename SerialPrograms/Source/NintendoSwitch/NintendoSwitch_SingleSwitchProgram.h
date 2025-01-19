@@ -118,7 +118,7 @@ public:
         const std::vector<std::string>& error_notification_tags = {"Notifs"}
     );
 
-    virtual void program(SingleSwitchProgramEnvironment& env, ControllerContext& context) = 0;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) = 0;
 
 
 public:

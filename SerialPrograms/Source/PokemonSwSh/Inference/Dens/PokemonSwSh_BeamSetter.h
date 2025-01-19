@@ -31,7 +31,7 @@ public:
     };
 
 public:
-    BeamSetter(ProgramEnvironment& env, ConsoleHandle& console, ControllerContext& context);
+    BeamSetter(ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context);
 
     Detection run(
         bool save_screenshot,
@@ -45,7 +45,7 @@ public:
 
 private:
     ConsoleHandle& m_console;
-    ControllerContext& m_context;
+    SwitchControllerContext& m_context;
     OverlayBoxScope m_text_box0;
     OverlayBoxScope m_text_box1;
     OverlayBoxScope m_box;

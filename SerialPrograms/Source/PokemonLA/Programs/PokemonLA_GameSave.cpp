@@ -59,7 +59,7 @@ bool save_tab_disabled(const ImageViewRGB32 &screen){
 }
 
 
-bool save_game_from_overworld(ProgramEnvironment& env, ConsoleHandle& console, ControllerContext& context){
+bool save_game_from_overworld(ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context){
     OverlayBoxScope tab_box_scope(console, tab_box);
     OverlayBoxScope icon_box_scope(console, save_icon_box);
     console.log("Saving game...");
@@ -96,9 +96,9 @@ bool save_game_from_overworld(ProgramEnvironment& env, ConsoleHandle& console, C
     }
 
     ArcPhoneDetector detector(console, console, std::chrono::milliseconds(100), true);
-    int ret = run_until<ControllerContext>(
+    int ret = run_until<SwitchControllerContext>(
         console, context,
-        [&](ControllerContext& context){
+        [&](SwitchControllerContext& context){
             for (size_t c = 0; c < 10; c++){
                 pbf_press_button(context, BUTTON_B, 20, 230);
             }

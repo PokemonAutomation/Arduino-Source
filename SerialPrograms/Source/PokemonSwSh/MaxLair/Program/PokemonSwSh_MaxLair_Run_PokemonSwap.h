@@ -21,7 +21,7 @@ namespace MaxLairInternal{
 
 void run_swap_pokemon(
     AdventureRuntime& runtime,
-    ConsoleHandle& console, ControllerContext& context,
+    ConsoleHandle& console, SwitchControllerContext& context,
     GlobalStateTracker& state_tracker,
     const ConsoleSpecificOptions& settings
 );

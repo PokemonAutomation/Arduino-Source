@@ -38,7 +38,7 @@ public:
 class AutoHostMultiGame : public SingleSwitchProgramInstance{
 public:
     AutoHostMultiGame();
-    virtual void program(SingleSwitchProgramEnvironment& env, ControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
     StartInGripOrClosedOption START_LOCATION;
