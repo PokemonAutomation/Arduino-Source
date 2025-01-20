@@ -239,13 +239,17 @@ void PathReader::read_hp(
 
 
 
-void PathReader::read_path(ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context, GlobalState& state){
+void PathReader::read_path(
+    ProgramEnvironment& env,
+    VideoStream& stream, SwitchControllerContext& context,
+    GlobalState& state
+){
     PathMap path;
-    if (MaxLairInternal::read_path(env, console, context, path, m_path)){
-        console.log("Path Detection:\n" + path.dump(), COLOR_BLUE);
+    if (MaxLairInternal::read_path(env, stream, context, path, m_path)){
+        stream.log("Path Detection:\n" + path.dump(), COLOR_BLUE);
         state.path = path;
     }else{
-        console.log("Path Detection: Failed", COLOR_RED);
+        stream.log("Path Detection: Failed", COLOR_RED);
     }
 }
 

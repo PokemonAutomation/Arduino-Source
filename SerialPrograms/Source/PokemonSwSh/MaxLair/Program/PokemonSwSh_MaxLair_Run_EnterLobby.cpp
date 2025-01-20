@@ -63,25 +63,25 @@ private:
 
 
 std::shared_ptr<const ImageRGB32> enter_lobby(
-    ConsoleHandle& console, SwitchControllerContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     size_t boss_slot, bool connect_to_internet,
     ReadableQuantity999& ore
 ){
     pbf_mash_button(context, BUTTON_B, 2 * TICKS_PER_SECOND);
 
     if (connect_to_internet){
-        connect_to_internet_with_inference(console, context);
+        connect_to_internet_with_inference(stream, context);
     }
 
-    VideoOverlaySet boxes(console);
-    SelectionArrowFinder arrow_detector(console, ImageFloatBox(0.350, 0.450, 0.500, 0.400));
+    VideoOverlaySet boxes(stream.overlay());
+    SelectionArrowFinder arrow_detector(stream.overlay(), ImageFloatBox(0.350, 0.450, 0.500, 0.400));
     GreyDialogDetector dialog_detector;
     arrow_detector.make_overlays(boxes);
     dialog_detector.make_overlays(boxes);
 
-//    OverlayBoxScope ore_box(console, {0.900, 0.015, 0.020, 0.040});
-    OverlayBoxScope ore_box(console, {0.930, 0.050, 0.065, 0.010});
-    OverlayBoxScope ore_quantity(console, {0.945, 0.010, 0.0525, 0.050});
+//    OverlayBoxScope ore_box(stream.overlay(), {0.900, 0.015, 0.020, 0.040});
+    OverlayBoxScope ore_box(stream.overlay(), {0.930, 0.050, 0.065, 0.010});
+    OverlayBoxScope ore_quantity(stream.overlay(), {0.945, 0.010, 0.0525, 0.050});
 
     size_t presses = 0;
     size_t arrow_count = 0;
@@ -91,20 +91,20 @@ std::shared_ptr<const ImageRGB32> enter_lobby(
         pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
         context.wait_for_all_requests();
 
-        VideoSnapshot screen = console.video().snapshot();
+        VideoSnapshot screen = stream.video().snapshot();
         if (!arrow_detector.detect(screen)){
             continue;
         }
 
         arrow_count++;
 
-        console.log("Detected dialog prompt.");
+        stream.log("Detected dialog prompt.");
 //        screen.save("test.png");
 
         //  We need to pay ore.
         ImageStats ore_stats = image_stats(extract_box_reference(screen, ore_box));
         if (is_solid(ore_stats, {0.594724, 0.405276, 0.})){
-            console.log("Need to pay ore.", COLOR_PURPLE);
+            stream.log("Need to pay ore.", COLOR_PURPLE);
 
             arrow_count = 0;
             ImageRGB32 image = to_blackwhite_rgb32_range(
@@ -112,13 +112,13 @@ std::shared_ptr<const ImageRGB32> enter_lobby(
                 0xff808080, 0xffffffff, true
             );
             ImageRGB32 filtered = pad_image(image, 10, 0xffffffff);
-            ore.update_with_ocr(console.logger(), filtered);
+            ore.update_with_ocr(stream.logger(), filtered);
 
             if (ore.quantity < 20){
                 OperationFailedException::fire(
                     ErrorReport::NO_ERROR_REPORT,
                     "You have less than 20 ore. Program stopped. (Quantity: " + ore.to_str() + ")",
-                    console
+                    stream
                 );
             }
 
@@ -127,7 +127,7 @@ std::shared_ptr<const ImageRGB32> enter_lobby(
                 OperationFailedException::fire(
                     ErrorReport::NO_ERROR_REPORT,
                     "Unable to start adventure. Are you out of ore? (Quantity: " + ore.to_str() + ")",
-                    console
+                    stream
                 );
             }
 
@@ -136,9 +136,9 @@ std::shared_ptr<const ImageRGB32> enter_lobby(
 
         //  Detected save dialog.
         if (dialog_detector.detect(screen)){
-            console.log("Detected save dialog.");
+            stream.log("Detected save dialog.");
             context.wait_for_all_requests();
-            VideoSnapshot entrance = console.video().snapshot();
+            VideoSnapshot entrance = stream.video().snapshot();
             pbf_press_button(context, BUTTON_A, 10, 5 * TICKS_PER_SECOND);
             context.wait_for_all_requests();
             return std::move(entrance.frame);
@@ -146,7 +146,7 @@ std::shared_ptr<const ImageRGB32> enter_lobby(
 
         //  Select a boss.
         if (arrow_count == 2){
-            console.log("Detected boss selection.");
+            stream.log("Detected boss selection.");
             if (boss_slot > 0){
                 for (size_t c = 1; c < boss_slot; c++){
                     pbf_press_dpad(context, DPAD_DOWN, 10, 50);

@@ -9,6 +9,7 @@
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
+#include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh/Inference/Battles/PokemonSwSh_StartBattleDetector.h"
 #include "PokemonSwSh/Inference/Dens/PokemonSwSh_RaidCatchDetector.h"
@@ -82,12 +83,12 @@ ShinyHuntAutonomousRegigigas2::ShinyHuntAutonomousRegigigas2()
 
 
 
-bool ShinyHuntAutonomousRegigigas2::kill_and_return(ConsoleHandle& console, SwitchControllerContext& context) const{
+bool ShinyHuntAutonomousRegigigas2::kill_and_return(VideoStream& stream, SwitchControllerContext& context) const{
     pbf_mash_button(context, BUTTON_A, 4 * TICKS_PER_SECOND);
 
-    RaidCatchDetector detector(console);
+    RaidCatchDetector detector(stream.overlay());
     int result = wait_until(
-        console, context,
+        stream, context,
         std::chrono::seconds(30),
         {{detector}}
     );
@@ -97,7 +98,7 @@ bool ShinyHuntAutonomousRegigigas2::kill_and_return(ConsoleHandle& console, Swit
         pbf_press_button(context, BUTTON_A, 10, CATCH_TO_OVERWORLD_DELAY);
         return true;
     default:
-        console.log("Raid Catch Menu not found.", COLOR_RED);
+        stream.log("Raid Catch Menu not found.", COLOR_RED);
         return false;
     }
 }

@@ -7,11 +7,11 @@
 #ifndef PokemonAutomation_PokemonSwSh_Commands_AutoHosts_H
 #define PokemonAutomation_PokemonSwSh_Commands_AutoHosts_H
 
+#include "CommonFramework/Tools/VideoStream.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
-    class ConsoleHandle;
 namespace PokemonSwSh{
 
 
@@ -27,7 +27,7 @@ void home_to_add_friends(
     bool fix_cursor
 );
 void accept_FRs(
-    ConsoleHandle& console, SwitchControllerContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     uint8_t slot, bool fix_cursor,
     uint16_t game_to_home_delay_safe,
     uint16_t auto_fr_duration,

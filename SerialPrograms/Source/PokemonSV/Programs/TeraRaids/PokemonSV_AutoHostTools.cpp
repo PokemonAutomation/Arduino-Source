@@ -14,7 +14,6 @@
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Tools/FileDownloader.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
-#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "PokemonSV/Options/PokemonSV_AutoHostOptions.h"
 #include "PokemonSV_AutoHostTools.h"
 
@@ -25,7 +24,7 @@ namespace PokemonSV{
 
 
 void send_host_announcement(
-    ProgramEnvironment& env, ConsoleHandle& host_console,
+    ProgramEnvironment& env, VideoStream& host_console,
     const std::string& lobby_code, bool show_raid_code,
     const std::string& description,
     EventNotificationOption& NOTIFICATION_RAID_POST

@@ -36,7 +36,7 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
-    void throw_ball(ConsoleHandle& console, SwitchControllerContext& context);
+//    void throw_ball(VideoStream& stream, SwitchControllerContext& context);
 
     OCR::LanguageOCROption LANGUAGE;
     PokemonSwSh::PokemonBallSelectOption BALL_SELECT;

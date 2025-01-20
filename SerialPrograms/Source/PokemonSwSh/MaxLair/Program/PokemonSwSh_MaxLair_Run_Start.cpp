@@ -35,14 +35,14 @@ bool abort_if_error(MultiSwitchProgramEnvironment& env, CancellableScope& scope,
 }
 
 bool wait_for_all_join(
-    ConsoleHandle& console, SwitchControllerContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     const ImageViewRGB32& entrance,
     size_t start_players
 ){
     LobbyJoinedDetector joined_detector(start_players, false);
     EntranceDetector entrance_detector(entrance);
     int result = wait_until(
-        console, context,
+        stream, context,
         std::chrono::seconds(10),
         {
             {joined_detector},
@@ -52,15 +52,15 @@ bool wait_for_all_join(
     );
     switch (result){
     case 0:
-        console.log("Detected " + std::to_string(start_players) + " players in lobby!");
+        stream.log("Detected " + std::to_string(start_players) + " players in lobby!");
         return true;
     case 1:
-        console.log("Detected entrance... Did you get disconnected?", COLOR_RED);
-//        dump_image(console, MODULE_NAME, "wait_for_all_join", console.video().snapshot());
+        stream.log("Detected entrance... Did you get disconnected?", COLOR_RED);
+//        dump_image(stream, MODULE_NAME, "wait_for_all_join", stream.video().snapshot());
         return false;
     default:
-        console.log("Timed out waiting for everyone to join.", COLOR_RED);
-//        dump_image(console, MODULE_NAME, "wait_for_all_join", console.video().snapshot());
+        stream.log("Timed out waiting for everyone to join.", COLOR_RED);
+//        dump_image(stream, MODULE_NAME, "wait_for_all_join", stream.video().snapshot());
         return false;
     }
 }

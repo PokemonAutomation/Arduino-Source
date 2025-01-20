@@ -9,7 +9,8 @@
 
 #include <chrono>
 #include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
-#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
+#include "CommonFramework/Tools/VideoStream.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 
 namespace PokemonAutomation{
     class ProgramEnvironment;
@@ -18,7 +19,7 @@ namespace PokemonSwSh{
 
 
 bool connect_to_internet_with_inference(
-    ConsoleHandle& console, SwitchControllerContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     std::chrono::milliseconds post_wait_time = std::chrono::seconds(3),
     uint16_t timeout_ticks = 120 * TICKS_PER_SECOND
 );

@@ -41,10 +41,10 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
-    void setup(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context);
+    void setup(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context);
     bool run_post_win(
         ProgramEnvironment& env,
-        ConsoleHandle& console,
+        VideoStream& stream,
         SwitchControllerContext& context
     );
 

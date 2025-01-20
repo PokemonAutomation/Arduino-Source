@@ -12,8 +12,9 @@
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Notifications/EventNotificationOption.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
+#include "CommonFramework/Tools/VideoStream.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
-#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 #include "PokemonSV/Options/PokemonSV_PlayerList.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV_JoinTracker.h"
@@ -28,7 +29,7 @@ class TeraLobbyWaiter{
 public:
     TeraLobbyWaiter(
         ProgramEnvironment& env,
-        ConsoleHandle& console, SwitchControllerContext& context,
+        VideoStream& stream, SwitchControllerContext& context,
         uint8_t host_players,
         const std::string& lobby_code, WallClock start_time,
         SimpleIntegerOption<uint16_t>& LOBBY_WAIT_DELAY,
@@ -71,7 +72,7 @@ private:
 
 private:
     ProgramEnvironment& m_env;
-    ConsoleHandle& m_console;
+    VideoStream& m_stream;
     SwitchControllerContext& m_context;
     uint8_t m_host_players;
 

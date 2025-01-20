@@ -11,7 +11,6 @@
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
-#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "Pokemon/Pokemon_Strings.h"
@@ -141,11 +140,12 @@ NavigatePlatformSettings::NavigatePlatformSettings()
 
 
 void inside_zero_gate_to_platform(
-    const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context,
+    const ProgramInfo& info,
+    VideoStream& stream, SwitchControllerContext& context,
     bool flying_unlocked,
     NavigatePlatformSettings& settings
 ){
-    inside_zero_gate_to_station(info, console, context, 2, settings.HEAL_AT_STATION);
+    inside_zero_gate_to_station(info, stream, context, 2, settings.HEAL_AT_STATION);
 
     context.wait_for(std::chrono::seconds(settings.STATION_ARRIVE_PAUSE_SECONDS));
 
@@ -245,11 +245,11 @@ void inside_zero_gate_to_platform(
 
 bool read_platform_center(
     double& x, double& y,
-    const ProgramInfo& info, ConsoleHandle& console
+    const ProgramInfo& info, VideoStream& stream
 ){
     using namespace Kernels::Waterfill;
 
-    VideoSnapshot screen = console.video().snapshot();
+    VideoSnapshot screen = stream.video().snapshot();
     if (!screen){
         return false;
     }
@@ -287,34 +287,35 @@ bool read_platform_center(
 
 
 void area_zero_platform_run_path0(
-    ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context,
+    ProgramEnvironment& env,
+    VideoStream& stream, SwitchControllerContext& context,
     LetsGoEncounterBotTracker& tracker,
     uint64_t iteration_count
 ){
     //  Go back to the wall.
-    console.log("Go back to wall...");
-    use_lets_go_to_clear_in_front(console, context, tracker, false, [&](SwitchControllerContext& context){
-        find_and_center_on_sky(env, console, context);
+    stream.log("Go back to wall...");
+    use_lets_go_to_clear_in_front(stream, context, tracker, false, [&](SwitchControllerContext& context){
+        find_and_center_on_sky(env, stream, context);
         pbf_move_right_joystick(context, 128, 255, 80, 0);
         pbf_move_left_joystick(context, 176, 255, 30, 0);
         pbf_press_button(context, BUTTON_L, 20, 50);
     });
 
-    use_lets_go_to_clear_in_front(console, context, tracker, false, [&](SwitchControllerContext& context){
+    use_lets_go_to_clear_in_front(stream, context, tracker, false, [&](SwitchControllerContext& context){
         //  Move to wall.
         pbf_move_left_joystick(context, 128, 0, 4 * TICKS_PER_SECOND, 0);
 
         //  Turn around.
-        console.log("Turning towards sky...");
+        stream.log("Turning towards sky...");
         pbf_move_left_joystick(context, 128, 255, 30, 95);
         pbf_press_button(context, BUTTON_L, 20, 50);
     });
 
     //  Move forward and kill everything in your path.
-    console.log("Moving towards sky and killing everything...");
+    stream.log("Moving towards sky and killing everything...");
     uint16_t duration = 325;
-    use_lets_go_to_clear_in_front(console, context, tracker, true, [&](SwitchControllerContext& context){
-        find_and_center_on_sky(env, console, context);
+    use_lets_go_to_clear_in_front(stream, context, tracker, true, [&](SwitchControllerContext& context){
+        find_and_center_on_sky(env, stream, context);
         pbf_move_right_joystick(context, 128, 255, 70, 0);
 
         uint8_t x = 128;
@@ -337,28 +338,29 @@ void area_zero_platform_run_path0(
         ssf_press_button(context, BUTTON_L, 0, 20);
         pbf_move_left_joystick(context, x, 0, duration, 0);
     });
-    use_lets_go_to_clear_in_front(console, context, tracker, true, [&](SwitchControllerContext& context){
+    use_lets_go_to_clear_in_front(stream, context, tracker, true, [&](SwitchControllerContext& context){
         pbf_move_left_joystick(context, 128, 255, duration, 4 * TICKS_PER_SECOND);
     });
 }
 void area_zero_platform_run_path1(
-    ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context,
+    ProgramEnvironment& env,
+    VideoStream& stream, SwitchControllerContext& context,
     LetsGoEncounterBotTracker& tracker,
     uint64_t iteration_count
 ){
     //  Go back to the wall.
-    console.log("Go back to wall...");
+    stream.log("Go back to wall...");
     pbf_press_button(context, BUTTON_L, 20, 105);
-    use_lets_go_to_clear_in_front(console, context, tracker, true, [&](SwitchControllerContext& context){
-        find_and_center_on_sky(env, console, context);
+    use_lets_go_to_clear_in_front(stream, context, tracker, true, [&](SwitchControllerContext& context){
+        find_and_center_on_sky(env, stream, context);
         pbf_move_right_joystick(context, 128, 255, 80, 0);
         pbf_move_left_joystick(context, 192, 255, 60, 0);
     });
 
     //  Clear path to the wall.
-    console.log("Clear path to the wall...");
+    stream.log("Clear path to the wall...");
     pbf_press_button(context, BUTTON_L, 20, 50);
-    use_lets_go_to_clear_in_front(console, context, tracker, false, [&](SwitchControllerContext& context){
+    use_lets_go_to_clear_in_front(stream, context, tracker, false, [&](SwitchControllerContext& context){
         pbf_move_left_joystick(context, 128, 0, 5 * TICKS_PER_SECOND, 0);
 
         //  Turn right.
@@ -367,14 +369,14 @@ void area_zero_platform_run_path1(
     });
 
     //  Clear the wall.
-    console.log("Clear the wall...");
+    stream.log("Clear the wall...");
     uint16_t duration = 325;
-    use_lets_go_to_clear_in_front(console, context, tracker, true, [&](SwitchControllerContext& context){
+    use_lets_go_to_clear_in_front(stream, context, tracker, true, [&](SwitchControllerContext& context){
         pbf_move_left_joystick(context, 255, 128, 125, 0);
         pbf_press_button(context, BUTTON_L, 20, 50);
         context.wait_for_all_requests();
 
-        find_and_center_on_sky(env, console, context);
+        find_and_center_on_sky(env, stream, context);
         pbf_move_left_joystick(context, 128, 0, 50, 0);
         pbf_press_button(context, BUTTON_L, 20, 30);
 
@@ -400,8 +402,8 @@ void area_zero_platform_run_path1(
         pbf_move_left_joystick(context, x, 0, duration, 0);
     });
 
-    console.log("Run backwards and wait...");
-    use_lets_go_to_clear_in_front(console, context, tracker, true, [&](SwitchControllerContext& context){
+    stream.log("Run backwards and wait...");
+    use_lets_go_to_clear_in_front(stream, context, tracker, true, [&](SwitchControllerContext& context){
 //        pbf_move_left_joystick(context, 64, 0, 125, 0);
 //        pbf_press_button(context, BUTTON_L, 20, 105);
         pbf_move_left_joystick(context, 128, 255, duration, 4 * TICKS_PER_SECOND);
@@ -451,21 +453,22 @@ void turn_angle(SwitchControllerContext& context, double angle_radians){
 }
 
 void area_zero_platform_run_path2(
-    ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context,
+    ProgramEnvironment& env,
+    VideoStream& stream, SwitchControllerContext& context,
     LetsGoEncounterBotTracker& tracker,
     uint64_t iteration_count
 ){
-    console.log("Look forward and fire...");
+    stream.log("Look forward and fire...");
     pbf_mash_button(context, BUTTON_L, 60);
 
     double platform_x, platform_y;
     uint16_t duration;
     uint8_t move_x, move_y;
-    use_lets_go_to_clear_in_front(console, context, tracker, true, [&](SwitchControllerContext& context){
+    use_lets_go_to_clear_in_front(stream, context, tracker, true, [&](SwitchControllerContext& context){
 
-        console.log("Find the sky, turn around and fire.");
+        stream.log("Find the sky, turn around and fire.");
         pbf_move_right_joystick(context, 128, 0, 60, 0);
-        find_and_center_on_sky(env, console, context);
+        find_and_center_on_sky(env, stream, context);
         context.wait_for(std::chrono::seconds(1));
         pbf_move_left_joystick(context, 128, 255, 40, 85);
         pbf_mash_button(context, BUTTON_L, 60);
@@ -473,21 +476,21 @@ void area_zero_platform_run_path2(
         pbf_move_right_joystick(context, 128, 255, 250, 0);
         context.wait_for_all_requests();
 
-        console.log("Finding center of platform...");
-        if (!read_platform_center(platform_x, platform_y, env.program_info(), console)){
-            console.log("Unable to find center of platform.", COLOR_RED);
+        stream.log("Finding center of platform...");
+        if (!read_platform_center(platform_x, platform_y, env.program_info(), stream)){
+            stream.log("Unable to find center of platform.", COLOR_RED);
             return;
         }
-        console.log("Platform center at: x = " + tostr_default(platform_x) + ", y = " + tostr_default(platform_y), COLOR_BLUE);
+        stream.log("Platform center at: x = " + tostr_default(platform_x) + ", y = " + tostr_default(platform_y), COLOR_BLUE);
 
-        choose_path(console, move_x, move_y, duration, platform_x, platform_y);
+        choose_path(stream.logger(), move_x, move_y, duration, platform_x, platform_y);
 
         pbf_move_left_joystick(context, move_x, move_y, 40, 20);
         pbf_mash_button(context, BUTTON_L, 60);
 //        pbf_wait(context, 1250);
     });
-    use_lets_go_to_clear_in_front(console, context, tracker, duration > 100, [&](SwitchControllerContext& context){
-        console.log("Making location correction...");
+    use_lets_go_to_clear_in_front(stream, context, tracker, duration > 100, [&](SwitchControllerContext& context){
+        stream.log("Making location correction...");
         pbf_move_left_joystick(context, 128, 0, duration, 0);
 
         //  Optimization, calculate angle to aim you back at the sky.
@@ -496,35 +499,35 @@ void area_zero_platform_run_path2(
         double angle1 = angle0 >= 0 ? 6.2831853071795864769 - angle0 : -6.2831853071795864769 - angle0;
         turn_angle(context, angle1);
 
-        find_and_center_on_sky(env, console, context);
+        find_and_center_on_sky(env, stream, context);
         pbf_move_left_joystick(context, 96, 0, 40, 0);
         pbf_mash_button(context, BUTTON_L, 60);
     });
 
     //  One in every 4 iterations: Clear wall of spawns.
     if (iteration_count % 4 == 0){
-        console.log("Turning along wall...");
+        stream.log("Turning along wall...");
         pbf_move_left_joystick(context, 0, 255, 20, 20);
         pbf_mash_button(context, BUTTON_L, 60);
-        use_lets_go_to_clear_in_front(console, context, tracker, true, [&](SwitchControllerContext& context){
+        use_lets_go_to_clear_in_front(stream, context, tracker, true, [&](SwitchControllerContext& context){
             context.wait_for(std::chrono::milliseconds(1000));
 
-            console.log("Turning back to sky.");
+            stream.log("Turning back to sky.");
             pbf_move_left_joystick(context, 255, 255, 20, 20);
             pbf_mash_button(context, BUTTON_L, 60);
-            find_and_center_on_sky(env, console, context);
+            find_and_center_on_sky(env, stream, context);
             pbf_move_left_joystick(context, 96, 0, 40, 0);
             pbf_mash_button(context, BUTTON_L, 60);
         });
     }
 
     if (platform_x < 0.5 || platform_y < 0.5){
-        console.log("Not close enough to desired spot. Skipping forward attack...", COLOR_ORANGE);
+        stream.log("Not close enough to desired spot. Skipping forward attack...", COLOR_ORANGE);
         return;
     }
 
-    use_lets_go_to_clear_in_front(console, context, tracker, true, [&](SwitchControllerContext& context){
-        console.log("Move forward, fire, and retreat.");
+    use_lets_go_to_clear_in_front(stream, context, tracker, true, [&](SwitchControllerContext& context){
+        stream.log("Move forward, fire, and retreat.");
         switch (iteration_count % 3){
         case 0:
             pbf_move_left_joystick(context, 108, 0, 300, 0);
@@ -538,7 +541,7 @@ void area_zero_platform_run_path2(
         }
     });
 
-    use_lets_go_to_clear_in_front(console, context, tracker, true, [&](SwitchControllerContext& context){
+    use_lets_go_to_clear_in_front(stream, context, tracker, true, [&](SwitchControllerContext& context){
         pbf_move_left_joystick(context, 128, 255, 4 * TICKS_PER_SECOND, 0);
         pbf_move_left_joystick(context, 128, 0, 60, 4 * TICKS_PER_SECOND);
     });

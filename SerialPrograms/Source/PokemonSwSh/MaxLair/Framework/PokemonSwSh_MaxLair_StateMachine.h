@@ -7,9 +7,10 @@
 #ifndef PokemonAutomation_PokemonSwSh_MaxLair_StateMachine_H
 #define PokemonAutomation_PokemonSwSh_MaxLair_StateMachine_H
 
+#include "CommonFramework/Tools/VideoStream.h"
+#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
-#include "CommonFramework/ImageTypes/ImageRGB32.h"
-#include "NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_QuantityReader.h"
 #include "PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options.h"
 #include "PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options_Consoles.h"
@@ -96,7 +97,8 @@ struct AdventureRuntime{
 //  Return true if done.
 StateMachineAction run_state_iteration(
     AdventureRuntime& runtime, size_t console_index,
-    ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context,
+    ProgramEnvironment& env,
+    VideoStream& stream, SwitchControllerContext& context,
     bool save_path,
     GlobalStateTracker& state_tracker,
     const EndBattleDecider& boss_action,

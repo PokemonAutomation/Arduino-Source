@@ -5,7 +5,6 @@
  */
 
 #include "ClientSource/Libraries/MessageConverter.h"
-#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "PokemonSwSh_Commands_GameEntry.h"
@@ -161,17 +160,23 @@ void roll_date_backward_N(SwitchControllerContext& context, uint8_t skips, bool 
     ssf_press_button(context, BUTTON_A, 20, 10);
 #endif
 }
-void home_roll_date_enter_game_autorollback(ConsoleHandle& console, SwitchControllerContext& context, uint8_t& year){
+void home_roll_date_enter_game_autorollback(
+    VideoStream& stream, SwitchControllerContext& context,
+    uint8_t& year
+){
     //  This version automatically handles the 2060 roll-back.
     if (year >= MAX_YEAR){
-        home_roll_date_enter_game(console, context, true);
+        home_roll_date_enter_game(stream, context, true);
         year = 0;
     }else{
-        home_roll_date_enter_game(console, context, false);
+        home_roll_date_enter_game(stream, context, false);
     }
     year++;
 }
-void home_roll_date_enter_game(ConsoleHandle& console, SwitchControllerContext& context, bool rollback_year){
+void home_roll_date_enter_game(
+    VideoStream& stream, SwitchControllerContext& context,
+    bool rollback_year
+){
 #if 0
     context.issue_request(
         DeviceRequest_home_roll_date_enter_game(rollback_year)
@@ -199,7 +204,7 @@ void home_roll_date_enter_game(ConsoleHandle& console, SwitchControllerContext& 
     settings_to_enter_game(context, true);
 #endif
 
-    resume_game_from_home(console, context, true);
+    resume_game_from_home(stream, context, true);
 }
 void touch_date_from_home(SwitchControllerContext& context, uint16_t settings_to_home_delay){
 #if 0

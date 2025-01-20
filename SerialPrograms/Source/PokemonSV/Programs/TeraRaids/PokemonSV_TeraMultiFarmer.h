@@ -84,8 +84,8 @@ public:
     virtual void value_changed(void* object) override;
 
 private:
-    void reset_host(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context);
-    void reset_joiner(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context);
+    void reset_host(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context);
+    void reset_joiner(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context);
 
     bool run_raid_host(ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context);
     void run_raid_joiner(ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context);

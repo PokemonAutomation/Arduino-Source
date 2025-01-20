@@ -46,13 +46,13 @@ public:
 
 private:
     bool find_encounter(
-        ConsoleHandle& console, SwitchControllerContext& context,
+        VideoStream& stream, SwitchControllerContext& context,
         ShinyHuntAutonomousOverworld_Descriptor::Stats& stats,
         WallClock expiration
     ) const;
 
     bool charge_at_target(
-        ConsoleHandle& console, SwitchControllerContext& context,
+        VideoStream& stream, SwitchControllerContext& context,
         const std::pair<double, OverworldTarget>& target
     ) const;
 

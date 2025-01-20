@@ -12,13 +12,13 @@
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/TimeExpressionOption.h"
+#include "CommonFramework/Tools/VideoStream.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 
 namespace PokemonAutomation{
     struct ProgramInfo;
     class ProgramEnvironment;
 namespace NintendoSwitch{
-    class ConsoleHandle;
 namespace PokemonSV{
 
 class LetsGoEncounterBotTracker;
@@ -56,7 +56,8 @@ public:
 };
 
 void inside_zero_gate_to_platform(
-    const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context,
+    const ProgramInfo& info,
+    VideoStream& stream, SwitchControllerContext& context,
     bool flying_unlocked,
     NavigatePlatformSettings& settings
 );
@@ -66,7 +67,7 @@ void inside_zero_gate_to_platform(
 
 bool read_platform_center(
     double& x, double& y,
-    const ProgramInfo& info, ConsoleHandle& console
+    const ProgramInfo& info, VideoStream& stream
 );
 
 
@@ -75,7 +76,8 @@ bool read_platform_center(
 // It tracks the kill chain by sound detection from `tracker`. The function does not handle any pokemon
 // battle encounters (turn-based battles).
 void area_zero_platform_run_path0(
-    ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context,
+    ProgramEnvironment& env,
+    VideoStream& stream, SwitchControllerContext& context,
     LetsGoEncounterBotTracker& tracker,
     uint64_t iteration_count
 );
@@ -83,7 +85,8 @@ void area_zero_platform_run_path0(
 // It tracks the kill chain by sound detection from `tracker`. The function does not handle any pokemon
 // battle encounters (turn-based battles).
 void area_zero_platform_run_path1(
-    ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context,
+    ProgramEnvironment& env,
+    VideoStream& stream, SwitchControllerContext& context,
     LetsGoEncounterBotTracker& tracker,
     uint64_t iteration_count
 );
@@ -91,7 +94,8 @@ void area_zero_platform_run_path1(
 // It tracks the kill chain by sound detection from `tracker`. The function does not handle any pokemon
 // battle encounters (turn-based battles).
 void area_zero_platform_run_path2(
-    ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context,
+    ProgramEnvironment& env,
+    VideoStream& stream, SwitchControllerContext& context,
     LetsGoEncounterBotTracker& tracker,
     uint64_t iteration_count
 );

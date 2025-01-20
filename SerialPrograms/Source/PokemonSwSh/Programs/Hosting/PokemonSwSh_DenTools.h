@@ -7,7 +7,8 @@
 #ifndef PokemonAutomation_PokemonSwSh_DenTools_H
 #define PokemonAutomation_PokemonSwSh_DenTools_H
 
-#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
+#include "CommonFramework/Tools/VideoStream.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 #include "PokemonSwSh/Options/PokemonSwSh_Catchability.h"
 
 namespace PokemonAutomation{
@@ -19,7 +20,7 @@ void enter_den(SwitchControllerContext& context, uint16_t ENTER_ONLINE_DEN_DELAY
 void enter_lobby(SwitchControllerContext& context, uint16_t OPEN_ONLINE_DEN_LOBBY_DELAY, bool online, Catchability catchability);
 
 void roll_den(
-    ConsoleHandle& console, SwitchControllerContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     uint16_t ENTER_ONLINE_DEN_DELAY,
     uint16_t OPEN_ONLINE_DEN_LOBBY_DELAY,
     uint8_t skips, Catchability catchability

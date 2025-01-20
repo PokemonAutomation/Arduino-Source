@@ -27,19 +27,19 @@ namespace PokemonSwSh{
 
 
 bool connect_to_internet(
-    ConsoleHandle& console, SwitchControllerContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     bool host_online,
     uint16_t connect_to_internet_delay
 ){
     if (!host_online){
         return true;
     }
-    if (!console.video().snapshot()){
+    if (!stream.video().snapshot()){
         connect_to_internet(context, GameSettings::instance().OPEN_YCOMM_DELAY, connect_to_internet_delay);
         return true;
     }
     if (connect_to_internet_with_inference(
-        console, context,
+        stream, context,
         std::chrono::seconds(5), connect_to_internet_delay
     )){
         return true;
@@ -49,7 +49,7 @@ bool connect_to_internet(
 
 void send_raid_notification(
     ProgramEnvironment& env,
-    ConsoleHandle& console,
+    VideoStream& stream,
     AutoHostNotificationOption& settings,
     bool has_code, uint8_t code[8],
     const ImageViewRGB32& screenshot,
@@ -125,7 +125,7 @@ void send_raid_notification(
 
 
 void run_autohost(
-    ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context,
+    ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context,
     Catchability catchability, uint8_t skips,
     const RandomCodeOption* raid_code, uint16_t lobby_wait_delay,
     bool host_online, uint8_t accept_FR_slot,
@@ -140,7 +140,7 @@ void run_autohost(
     AutoHostStats& stats = env.current_stats<AutoHostStats>();
 
     roll_den(
-        console, context,
+        stream, context,
         enter_online_den_delay,
         open_online_den_lobby_delay,
         skips,
@@ -149,7 +149,7 @@ void run_autohost(
     context.wait_for_all_requests();
 
     if (!connect_to_internet(
-        console, context,
+        stream, context,
         host_online,
         connect_to_internet_delay
     )){
@@ -159,12 +159,12 @@ void run_autohost(
     }
 
     {
-        DenMonReader reader(console, console);
+        DenMonReader reader(stream.logger(), stream.overlay());
         enter_den(context, enter_online_den_delay, skips != 0, host_online);
         context.wait_for_all_requests();
 
         //  Make sure we're actually in a den.
-        VideoSnapshot screen = console.video().snapshot();
+        VideoSnapshot screen = stream.video().snapshot();
         DenMonReadResults results;
         if (screen){
             results = reader.read(screen);
@@ -173,7 +173,7 @@ void run_autohost(
             case DenMonReadResults::PURPLE_BEAM:
                 break;
             default:
-                console.log("Failed to detect den lobby. Skipping raid.", COLOR_RED);
+                stream.log("Failed to detect den lobby. Skipping raid.", COLOR_RED);
                 return;
             }
         }
@@ -193,10 +193,10 @@ void run_autohost(
         }
         context.wait_for_all_requests();
 
-        screen = console.video().snapshot();
+        screen = stream.video().snapshot();
         send_raid_notification(
             env,
-            console,
+            stream,
             notifications,
             has_code, code,
             screen, results, stats
@@ -207,7 +207,7 @@ void run_autohost(
 
     //  Accept friend requests while we wait.
     RaidLobbyState raid_state = raid_lobby_wait(
-        console, context,
+        stream, context,
         host_online,
         accept_FR_slot,
         lobby_wait_delay
@@ -226,7 +226,7 @@ void run_autohost(
         BlackScreenOverWatcher black_screen;
         uint32_t now = start;
         while (true){
-            if (black_screen.black_is_over(console.video().snapshot())){
+            if (black_screen.black_is_over(stream.video().snapshot())){
                 env.log("Raid has Started!", COLOR_BLUE);
                 stats.add_raid(raid_state.raiders());
                 break;

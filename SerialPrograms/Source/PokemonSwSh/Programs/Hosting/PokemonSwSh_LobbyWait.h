@@ -8,8 +8,9 @@
 #define PokemonAutomation_PokemonSwSh_LobbyWait_H
 
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/Tools/VideoStream.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
-#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
@@ -22,7 +23,7 @@ namespace PokemonSwSh{
 
 
 static RaidLobbyState raid_lobby_wait(
-    ConsoleHandle& console, SwitchControllerContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     bool HOST_ONLINE,
     uint8_t accept_FR_slot,
     uint16_t lobby_wait_delay
@@ -34,12 +35,12 @@ static RaidLobbyState raid_lobby_wait(
 
     context.wait_for_all_requests();
     uint32_t start = system_clock(context);
-    RaidLobbyReader inference(console, console);
+    RaidLobbyReader inference(stream.logger(), stream.overlay());
     RaidLobbyState state;
 
     if (HOST_ONLINE && accept_FR_slot > 0){
         accept_FRs(
-            console, context,
+            stream, context,
             accept_FR_slot - 1, true,
             GAME_TO_HOME_DELAY_SAFE,
             AUTO_FR_DURATION,
@@ -50,7 +51,7 @@ static RaidLobbyState raid_lobby_wait(
         uint32_t delay = time_elapsed;
 
         while (true){
-            state = inference.read(console.video().snapshot());
+            state = inference.read(stream.video().snapshot());
             if (state.valid && state.raid_is_full() && state.raiders_are_ready()){
                 return state;
             }
@@ -59,7 +60,7 @@ static RaidLobbyState raid_lobby_wait(
                 break;
             }
             accept_FRs(
-                console, context,
+                stream, context,
                 accept_FR_slot - 1, false,
                 GAME_TO_HOME_DELAY_SAFE,
                 AUTO_FR_DURATION,
@@ -70,7 +71,7 @@ static RaidLobbyState raid_lobby_wait(
     }
 
     while (true){
-        state = inference.read(console.video().snapshot());
+        state = inference.read(stream.video().snapshot());
         if (state.valid && state.raid_is_full() && state.raiders_are_ready()){
             return state;
         }
@@ -106,7 +107,7 @@ static RaidLobbyState raid_lobby_wait(
             )
         );
         context.wait_for_all_requests();
-        state = inference.read(console.video().snapshot());
+        state = inference.read(stream.video().snapshot());
     }
 }
 

@@ -8,9 +8,8 @@
 #define PokemonAutomation_PokemonSwSh_MaxLair_Detect_PokemonReader_H
 
 #include "CommonFramework/Language.h"
-#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
+#include "CommonFramework/Tools/VideoStream.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -18,7 +17,7 @@ namespace PokemonSwSh{
 namespace MaxLairInternal{
 
 
-std::string read_boss_sprite(ConsoleHandle& console);
+std::string read_boss_sprite(VideoStream& stream);
 
 
 //  OCR the Pokemon name and return all possible candidates.

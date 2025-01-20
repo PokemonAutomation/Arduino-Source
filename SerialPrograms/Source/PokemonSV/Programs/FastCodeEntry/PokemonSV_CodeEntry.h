@@ -15,7 +15,6 @@ namespace PokemonAutomation{
     class BotBaseContext;
     class ProgramEnvironment;
 namespace NintendoSwitch{
-    class ConsoleHandle;
     class MultiSwitchProgramEnvironment;
 namespace PokemonSV{
 

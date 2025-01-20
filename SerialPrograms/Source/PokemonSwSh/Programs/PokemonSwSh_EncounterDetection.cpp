@@ -24,14 +24,15 @@ namespace PokemonSwSh{
 
 
 StandardEncounterDetection::StandardEncounterDetection(
-    ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context,
+    ProgramEnvironment& env,
+    VideoStream& stream, SwitchControllerContext& context,
     Language language,
     const EncounterFilterOption2& filter,
     ShinyType shininess,
     std::chrono::milliseconds read_name_delay
 )
     : m_env(env)
-    , m_console(console)
+    , m_stream(stream)
     , m_context(context)
     , m_language(language)
     , m_filter(filter)
@@ -61,19 +62,19 @@ const std::set<std::string>* StandardEncounterDetection::candidates(){
         return &m_candidates;
     }
 
-    OverlayBoxScope box(m_console, ImageFloatBox(0.76, 0.04, 0.15, 0.044));
+    OverlayBoxScope box(m_stream.overlay(), ImageFloatBox(0.76, 0.04, 0.15, 0.044));
     m_context.wait_for(m_read_name_delay);
 
-    VideoSnapshot screen = m_console.video().snapshot();
+    VideoSnapshot screen = m_stream.video().snapshot();
     ImageViewRGB32 frame = extract_box_reference(screen, box);
 
     OCR::StringMatchResult result = PokemonNameReader::instance().read_substring(
-        m_console, m_language, frame,
+        m_stream.logger(), m_language, frame,
         OCR::BLACK_TEXT_FILTERS()
     );
     if (result.results.empty()){
         dump_image(
-            m_console, m_env.program_info(),
+            m_stream.logger(), m_env.program_info(),
             "StandardEncounterDetection-NameOCR-" + language_data(m_language).code,
             screen
         );

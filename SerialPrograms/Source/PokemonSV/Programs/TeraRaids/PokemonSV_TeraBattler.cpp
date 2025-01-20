@@ -32,17 +32,17 @@ enum class BattleMenuResult{
     BATTLE_LOST,
 };
 BattleMenuResult run_battle_menu(
-    ConsoleHandle& console, SwitchControllerContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     TeraBattleMenuDetector& battle_menu,
     TeraCatchWatcher& catch_menu,
     OverworldWatcher& overworld,
     const TeraMoveEntry& move
 ){
-    console.log("Current Move Selection: " + move.to_str());
+    stream.log("Current Move Selection: " + move.to_str());
     switch (move.type){
     case TeraMoveType::Wait:{
         int ret = run_until<SwitchControllerContext>(
-            console, context,
+            stream, context,
             [&](SwitchControllerContext& context){
                 pbf_mash_button(context, BUTTON_B, move.seconds * TICKS_PER_SECOND);
             },
@@ -58,14 +58,14 @@ BattleMenuResult run_battle_menu(
     case TeraMoveType::Move2:
     case TeraMoveType::Move3:
     case TeraMoveType::Move4:
-        if (battle_menu.move_to_slot(console, context, 0)){
+        if (battle_menu.move_to_slot(stream, context, 0)){
             pbf_press_button(context, BUTTON_A, 20, 10);
         }
         break;
     case TeraMoveType::Cheer_AllOut:
     case TeraMoveType::Cheer_HangTough:
     case TeraMoveType::Cheer_HealUp:
-        if (battle_menu.move_to_slot(console, context, 1)){
+        if (battle_menu.move_to_slot(stream, context, 1)){
             pbf_press_button(context, BUTTON_A, 20, 10);
         }
         break;
@@ -73,7 +73,7 @@ BattleMenuResult run_battle_menu(
     return BattleMenuResult::RESUME_CURRENT_TURN;
 }
 bool run_cheer_select(
-    ConsoleHandle& console, SwitchControllerContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     CheerSelectDetector& cheer_select_menu,
     TeraMoveEntry& move
 ){
@@ -92,7 +92,7 @@ bool run_cheer_select(
         pbf_press_button(context, BUTTON_B, 20, 10);
         return false;
     }
-    if (cheer_select_menu.move_to_slot(console, context, index)){
+    if (cheer_select_menu.move_to_slot(stream, context, index)){
         std::lock_guard<std::mutex> lg(tera_battle_throttle_lock);
         pbf_press_button(context, BUTTON_A, 20, 40);
         context.wait_for_all_requests();
@@ -100,7 +100,7 @@ bool run_cheer_select(
     return true;
 }
 bool run_move_select(
-    ConsoleHandle& console, SwitchControllerContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     TeraAIOption& battle_AI,
     TerastallizingDetector& terastallizing,
     MoveSelectWatcher& move_select_menu,
@@ -128,7 +128,7 @@ bool run_move_select(
     //  If we end up here consecutively too many times, the move is
     //  probably disabled. Select a different move.
     if (consecutive_move_select > 3){
-        console.log("Failed to select a move 3 times. Choosing a different move.", COLOR_RED);
+        stream.log("Failed to select a move 3 times. Choosing a different move.", COLOR_RED);
 //        pbf_press_dpad(context, DPAD_DOWN, 20, 40);
         index++;
         if (index >= 4){
@@ -139,29 +139,29 @@ bool run_move_select(
 
     do{
         if (!battle_AI.TRY_TO_TERASTILLIZE){
-            console.log("Skipping Terastallization. Reason: Disabled by settings.");
+            stream.log("Skipping Terastallization. Reason: Disabled by settings.");
             break;
         }
         if (consecutive_move_select > 1){
-            console.log("Skipping Terastallization. Reason: Previously failed move select.");
+            stream.log("Skipping Terastallization. Reason: Previously failed move select.");
             break;
         }
-        if (!terastallizing.detect(console.video().snapshot())){
-            console.log("Skipping Terastallization. Reason: Not ready.");
+        if (!terastallizing.detect(stream.video().snapshot())){
+            stream.log("Skipping Terastallization. Reason: Not ready.");
             break;
         }
 
-        console.log("Attempting to Terastallize...");
+        stream.log("Attempting to Terastallize...");
         pbf_press_button(context, BUTTON_R, 20, 4 * TICKS_PER_SECOND);
     }while (false);
 
-    if (move_select_menu.move_to_slot(console, context, index)){
+    if (move_select_menu.move_to_slot(stream, context, index)){
         pbf_press_button(context, BUTTON_A, 20, 10);
     }
     return true;
 }
 bool run_target_select(
-    ConsoleHandle& console, SwitchControllerContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     TeraTargetSelectDetector& target_select_menu,
     TeraMoveEntry& move
 ){
@@ -170,7 +170,7 @@ bool run_target_select(
     case TeraMoveType::Move2:
     case TeraMoveType::Move3:
     case TeraMoveType::Move4:{
-        target_select_menu.move_to_slot(console, context, (uint8_t)move.target);
+        target_select_menu.move_to_slot(stream, context, (uint8_t)move.target);
         std::lock_guard<std::mutex> lg(tera_battle_throttle_lock);
         pbf_press_button(context, BUTTON_A, 20, 40);
         context.wait_for_all_requests();
@@ -187,10 +187,10 @@ bool run_target_select(
 
 bool run_tera_battle(
     ProgramEnvironment& env,
-    ConsoleHandle& console, SwitchControllerContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     TeraAIOption& battle_AI
 ){
-    console.log("Starting tera battle routine...");
+    stream.log("Starting tera battle routine...");
 
     size_t turn = 0;
     std::vector<TeraMoveEntry> move_table = battle_AI.MOVE_TABLE.snapshot();
@@ -206,7 +206,7 @@ bool run_tera_battle(
     while (true){
         // Warning, this terastallizing detector isn't used in the wait_until() below.
         TerastallizingDetector terastallizing(COLOR_ORANGE);
-        VideoOverlaySet overlay_set(console);
+        VideoOverlaySet overlay_set(stream.overlay());
         terastallizing.make_overlays(overlay_set);
 
         TeraBattleMenuWatcher battle_menu(COLOR_RED);
@@ -226,10 +226,10 @@ bool run_tera_battle(
             std::chrono::seconds(battle_menu_seen ? 5 : 180)
         );
         TeraCatchWatcher catch_menu(COLOR_BLUE);
-        OverworldWatcher overworld(console, COLOR_GREEN);
+        OverworldWatcher overworld(stream.logger(), COLOR_GREEN);
         context.wait_for_all_requests();
         int ret = run_until<SwitchControllerContext>(
-            console, context,
+            stream, context,
             [](SwitchControllerContext& context){
                 for (size_t c = 0; c < 4; c++){
                     pbf_wait(context, 30 * TICKS_PER_SECOND);
@@ -249,12 +249,12 @@ bool run_tera_battle(
         context.wait_for(std::chrono::milliseconds(100));
         switch (ret){
         case 0:{
-            console.log("Detected battle menu.");
+            stream.log("Detected battle menu.");
             battle_menu_seen = true;
 
             //  If we enter here, we advance to the next turn.
             if (next_turn_on_battle_menu){
-                console.log("Detected battle menu. Turn: " + std::to_string(turn));
+                stream.log("Detected battle menu. Turn: " + std::to_string(turn));
                 turn++;
                 //  Reset the move to the table entry in case we were forced to
                 //  change moves due to move being unselectable.
@@ -268,9 +268,9 @@ bool run_tera_battle(
                 next_turn_on_battle_menu = false;
             }
 
-            console.log("Current Move Selection: " + current_move.to_str());
+            stream.log("Current Move Selection: " + current_move.to_str());
             BattleMenuResult battle_menu_result = run_battle_menu(
-                console, context,
+                stream, context,
                 battle_menu,
                 catch_menu,
                 overworld,
@@ -283,26 +283,26 @@ bool run_tera_battle(
                 next_turn_on_battle_menu = true;
                 continue;
             case BattleMenuResult::BATTLE_WON:
-                console.log("Detected a win!", COLOR_BLUE);
+                stream.log("Detected a win!", COLOR_BLUE);
                 pbf_mash_button(context, BUTTON_B, 30);
                 return true;
             case BattleMenuResult::BATTLE_LOST:
-                console.log("Detected a loss!", COLOR_ORANGE);
+                stream.log("Detected a loss!", COLOR_ORANGE);
                 return false;
             }
         }
         case 1:{
-            console.log("Detected cheer select. Turn: " + std::to_string(turn));
-            if (run_cheer_select(console, context, cheer_select_menu, current_move)){
+            stream.log("Detected cheer select. Turn: " + std::to_string(turn));
+            if (run_cheer_select(stream, context, cheer_select_menu, current_move)){
                 next_turn_on_battle_menu = true;
             }
             continue;
         }
         case 2:{
-            console.log("Detected move select. Turn: " + std::to_string(turn));
+            stream.log("Detected move select. Turn: " + std::to_string(turn));
             consecutive_move_select++;
             run_move_select(
-                console, context,
+                stream, context,
                 battle_AI,
                 terastallizing,
                 move_select_menu,
@@ -312,22 +312,22 @@ bool run_tera_battle(
             continue;
         }
         case 3:
-            console.log("Detected target select. Turn: " + std::to_string(turn));
+            stream.log("Detected target select. Turn: " + std::to_string(turn));
             consecutive_move_select = 0;
-            if (run_target_select(console, context, target_select_menu, current_move)){
+            if (run_target_select(stream, context, target_select_menu, current_move)){
                 next_turn_on_battle_menu = true;
             }
             continue;
         case 4:
-            console.log("Detected item rewards menu!", COLOR_BLUE);
+            stream.log("Detected item rewards menu!", COLOR_BLUE);
             pbf_mash_button(context, BUTTON_B, 30);
             return true;
         case 5:
-            console.log("Detected catch menu!", COLOR_BLUE);
+            stream.log("Detected catch menu!", COLOR_BLUE);
             pbf_mash_button(context, BUTTON_B, 30);
             return true;
         case 6:
-            console.log("Detected a loss!", COLOR_ORANGE);
+            stream.log("Detected a loss!", COLOR_ORANGE);
             return false;
         default:
             consecutive_timeouts++;
@@ -335,10 +335,10 @@ bool run_tera_battle(
                 OperationFailedException::fire(
                     ErrorReport::SEND_ERROR_REPORT,
                     "No state detected after 6 minutes.",
-                    console
+                    stream
                 );
             }
-            console.log("Unable to detect any state for 2 minutes. Mashing B...", COLOR_RED);
+            stream.log("Unable to detect any state for 2 minutes. Mashing B...", COLOR_RED);
             pbf_mash_button(context, BUTTON_B, 250);
         }
     }

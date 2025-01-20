@@ -18,7 +18,6 @@
 namespace PokemonAutomation{
     struct ProgramInfo;
 namespace NintendoSwitch{
-    class ConsoleHandle;
 namespace PokemonSV{
 
 
@@ -109,7 +108,9 @@ void reset_to_pokecenter(const ProgramInfo& info, VideoStream& stream, SwitchCon
 // which will align the player towards the marker
 // - REALIGN_NO_MARKER: move player towards in the direction set by move_x, move_y, move_duration
 // then re-align the camera
-void realign_player(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context,
+void realign_player(
+    const ProgramInfo& info,
+    VideoStream& stream, SwitchControllerContext& context,
     PlayerRealignMode realign_mode,
     uint8_t move_x = 0, uint8_t move_y = 0, uint16_t move_duration = 0
 );

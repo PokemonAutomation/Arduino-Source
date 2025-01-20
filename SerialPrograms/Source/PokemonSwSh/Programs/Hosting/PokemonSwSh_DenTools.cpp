@@ -83,7 +83,7 @@ void enter_lobby(SwitchControllerContext& context, uint16_t OPEN_ONLINE_DEN_LOBB
 
 
 void roll_den(
-    ConsoleHandle& console, SwitchControllerContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     uint16_t ENTER_ONLINE_DEN_DELAY,
     uint16_t OPEN_ONLINE_DEN_LOBBY_DELAY,
     uint8_t skips, Catchability catchability
@@ -101,12 +101,12 @@ void roll_den(
         roll_date_forward_1(context, false);
 
         //  Enter game
-        if (console.video().snapshot()){
-            console.log("Entering game using inference...");
+        if (stream.video().snapshot()){
+            stream.log("Entering game using inference...");
             pbf_press_button(context, BUTTON_HOME, 10, 90);
-            NintendoSwitch::resume_game_from_home(console, context);
+            NintendoSwitch::resume_game_from_home(stream, context);
         }else{
-            console.log("Entering game without inference...", COLOR_RED);
+            stream.log("Entering game without inference...", COLOR_RED);
             settings_to_enter_game_den_lobby(
                 context,
                 ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_SLOW, true,

@@ -180,13 +180,13 @@ WallClock new_start_time_after_reset(WallClock old_start_time, uint16_t run_time
 
 void run_material_farmer(
     ProgramEnvironment& env,
-    ConsoleHandle& console,
+    VideoStream& stream,
     SwitchControllerContext& context,
     MaterialFarmerOptions& options,
     MaterialFarmerStats& stats
 ){
     LetsGoEncounterBotTracker encounter_tracker(
-        env, console, context,
+        env, stream, context,
         stats,
         options.LANGUAGE
     );
@@ -197,7 +197,7 @@ void run_material_farmer(
     // ensure we save before running the material farmer.
     // but no need to save if already saving prior to each sandwich
     if (!(options.SANDWICH_OPTIONS.enabled() && options.SANDWICH_OPTIONS.SAVE_GAME_BEFORE_SANDWICH)){
-        save_game_from_overworld(env.program_info(), console, context);
+        save_game_from_overworld(env.program_info(), stream, context);
     }    
 
     /* 
@@ -211,39 +211,39 @@ void run_material_farmer(
         while (true){
             // check time left on material farming
             auto farming_time_remaining = minutes_remaining(start_time, std::chrono::minutes(options.RUN_TIME_IN_MINUTES));
-            console.log(
+            stream.log(
                 "Time left in Material Farming: " + 
                 std::to_string(farming_time_remaining.count()) + " min", 
                 COLOR_PURPLE
             );
             if (farming_time_remaining < std::chrono::minutes(0)){
-                console.log("Time's up. Stop the Material farming program.", COLOR_RED);
+                stream.log("Time's up. Stop the Material farming program.", COLOR_RED);
                 return;
             }
 
             // Check time left on sandwich
             if (options.SANDWICH_OPTIONS.enabled()){
                 auto sandwich_time_remaining = minutes_remaining(last_sandwich_time, std::chrono::minutes(options.TIME_PER_SANDWICH));
-                console.log(
+                stream.log(
                     "Time left on sandwich: " + 
                     std::to_string(sandwich_time_remaining.count()) + " min", 
                     COLOR_PURPLE
                 );                   
                 if (sandwich_time_remaining < std::chrono::minutes(0)){
-                    console.log("Sandwich not active. Make a sandwich.");
-                    last_sandwich_time = make_sandwich_material_farm(env, console, context, options, stats);
-                    console.overlay().add_log("Sandwich made.");
+                    stream.log("Sandwich not active. Make a sandwich.");
+                    last_sandwich_time = make_sandwich_material_farm(env, stream, context, options, stats);
+                    stream.overlay().add_log("Sandwich made.");
 
                     // Log time remaining in Material farming 
                     farming_time_remaining = minutes_remaining(start_time, std::chrono::minutes(options.RUN_TIME_IN_MINUTES));
-                    console.log(
+                    stream.log(
                         "Time left in Material Farming: " + 
                         std::to_string(farming_time_remaining.count()) + " min", 
                         COLOR_PURPLE
                     );
                     // Log time remaining on Sandwich
                     sandwich_time_remaining = minutes_remaining(last_sandwich_time, std::chrono::minutes(options.TIME_PER_SANDWICH));
-                    console.log(
+                    stream.log(
                         "Time left on sandwich: " + 
                         std::to_string(sandwich_time_remaining.count()) + " min", 
                         COLOR_PURPLE
@@ -252,9 +252,9 @@ void run_material_farmer(
             }
 
             // heal before starting Let's go
-            console.log("Heal before starting Let's go", COLOR_PURPLE);
-            console.log("Heal threshold: " + tostr_default(options.AUTO_HEAL_PERCENT), COLOR_PURPLE);
-            check_hp(env, console, context, options, hp_watcher, stats);
+            stream.log("Heal before starting Let's go", COLOR_PURPLE);
+            stream.log("Heal threshold: " + tostr_default(options.AUTO_HEAL_PERCENT), COLOR_PURPLE);
+            check_hp(env, stream, context, options, hp_watcher, stats);
 
             /*
             - Starts from pokemon center.
@@ -262,18 +262,18 @@ void run_material_farmer(
             - Then returns to pokemon center, regardless of whether 
             it completes the action or gets caught in a battle 
             */
-            run_from_battles_and_back_to_pokecenter(env, console, context, stats,
-                [&](ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context){
+            run_from_battles_and_back_to_pokecenter(env, stream, context, stats,
+                [&](ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context){
                     // Move to starting position for Let's Go hunting path
-                    console.log("Move to starting position for Let's Go hunting path.", COLOR_PURPLE);
-                    move_to_start_position_for_letsgo1(env.program_info(), console, context);
+                    stream.log("Move to starting position for Let's Go hunting path.", COLOR_PURPLE);
+                    move_to_start_position_for_letsgo1(env.program_info(), stream, context);
 
                     // run let's go while updating the HP watcher
-                    console.log("Starting Let's Go hunting path.", COLOR_PURPLE);
+                    stream.log("Starting Let's Go hunting path.", COLOR_PURPLE);
                     run_until<SwitchControllerContext>(
-                        console, context,
+                        stream, context,
                         [&](SwitchControllerContext& context){
-                            run_lets_go_iteration(console, context, encounter_tracker, options.NUM_FORWARD_MOVES_PER_LETS_GO_ITERATION);
+                            run_lets_go_iteration(stream, context, encounter_tracker, options.NUM_FORWARD_MOVES_PER_LETS_GO_ITERATION);
                         },
                         {hp_watcher}
                     );
@@ -302,7 +302,7 @@ void run_material_farmer(
         }
 
         env.log("Reset game to handle recoverable error.");
-        reset_game(env.program_info(), console, context);
+        reset_game(env.program_info(), stream, context);
         stats.m_game_resets++;
         env.update_stats();
 
@@ -318,7 +318,7 @@ void run_material_farmer(
 
 void check_hp(
     ProgramEnvironment& env,
-    ConsoleHandle& console,
+    VideoStream& stream,
     SwitchControllerContext& context,
     MaterialFarmerOptions& options,
     LetsGoHpWatcher& hp_watcher,
@@ -326,12 +326,12 @@ void check_hp(
 ){
     double hp = hp_watcher.last_known_value() * 100;
     if (0 < hp){
-        console.log("Last Known HP: " + tostr_default(hp) + "%", COLOR_BLUE);
+        stream.log("Last Known HP: " + tostr_default(hp) + "%", COLOR_BLUE);
     }else{
-        console.log("Last Known HP: ?", COLOR_RED);
+        stream.log("Last Known HP: ?", COLOR_RED);
     }
     if (0 < hp && hp < options.AUTO_HEAL_PERCENT){
-        auto_heal_from_menu_or_overworld(env.program_info(), console, context, 0, true);
+        auto_heal_from_menu_or_overworld(env.program_info(), stream, context, 0, true);
         stats.m_autoheals++;
         env.update_stats();
         send_program_status_notification(env, options.NOTIFICATION_STATUS_UPDATE);
@@ -344,20 +344,20 @@ void check_hp(
 // if gets caught up in a battle, try again.
 WallClock make_sandwich_material_farm(
     ProgramEnvironment& env,
-    ConsoleHandle& console,
+    VideoStream& stream,
     SwitchControllerContext& context, 
     MaterialFarmerOptions& options,
     MaterialFarmerStats& stats
 ){
 
     if (options.SANDWICH_OPTIONS.SAVE_GAME_BEFORE_SANDWICH){
-        save_game_from_overworld(env.program_info(), console, context);
+        save_game_from_overworld(env.program_info(), stream, context);
     }
 
     WallClock last_sandwich_time = WallClock::min();
     while(last_sandwich_time == WallClock::min()){
-        run_from_battles_and_back_to_pokecenter(env, console, context, stats,
-            [&](ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context){
+        run_from_battles_and_back_to_pokecenter(env, stream, context, stats,
+            [&](ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context){
                 // Orient camera to look at same direction as player character
                 // - This is needed because when save-load the game, 
                 // the camera angle is different than when just flying to pokecenter
@@ -373,12 +373,12 @@ WallClock make_sandwich_material_farm(
                 pbf_move_left_joystick(context, 128, 0, 300, 0);
 
                 // make sandwich
-                picnic_from_overworld(env.program_info(), console, context);
+                picnic_from_overworld(env.program_info(), stream, context);
                 pbf_move_left_joystick(context, 128, 0, 100, 40);  // walk forward to picnic table
-                enter_sandwich_recipe_list(env.program_info(), console, context);
-                make_sandwich_option(env, console, context, options.SANDWICH_OPTIONS);
+                enter_sandwich_recipe_list(env.program_info(), stream, context);
+                make_sandwich_option(env, stream, context, options.SANDWICH_OPTIONS);
                 last_sandwich_time = current_time();
-                leave_picnic(env.program_info(), console, context);
+                leave_picnic(env.program_info(), stream, context);
 
                 stats.m_sandwiches++;
                 env.update_stats();
@@ -398,7 +398,7 @@ std::chrono::minutes minutes_remaining(WallClock start_time, std::chrono::minute
 
 // from the North Province (Area 3) pokecenter, move to start position for Happiny dust farming
 void move_to_start_position_for_letsgo0(    
-    ConsoleHandle& console, 
+    VideoStream& stream,
     SwitchControllerContext& context
 ){
     // Orient camera to look at same direction as player character
@@ -444,7 +444,7 @@ void move_to_start_position_for_letsgo0(
     pbf_move_right_joystick(context, 255, 128, 30, 10);
     pbf_move_left_joystick(context, 128, 0, 50, 10);
 
-    console.log("Arrived at Let's go start position", COLOR_PURPLE);
+    stream.log("Arrived at Let's go start position", COLOR_PURPLE);
     
 
 }
@@ -452,7 +452,7 @@ void move_to_start_position_for_letsgo0(
 // from the North Province (Area 3) pokecenter, move to start position for Happiny dust farming
 void move_to_start_position_for_letsgo1(
     const ProgramInfo& info,
-    ConsoleHandle& console, 
+    VideoStream& stream,
     SwitchControllerContext& context
 ){
     // Orient camera to look at same direction as player character
@@ -471,7 +471,7 @@ void move_to_start_position_for_letsgo1(
 
     // look right, towards the start position
     DirectionDetector direction;
-    direction.change_direction(info, console, context, 5.76);
+    direction.change_direction(info, stream, context, 5.76);
     // pbf_move_right_joystick(context, 255, 128, 130, 10);
     pbf_move_left_joystick(context, 128, 0, 10, 10);
 
@@ -503,12 +503,12 @@ void move_to_start_position_for_letsgo1(
 
     // look right
     // pbf_move_right_joystick(context, 255, 128, 20, 10);
-    direction.change_direction(info, console, context, 5.3);
+    direction.change_direction(info, stream, context, 5.3);
 
     // move forward slightly
     pbf_move_left_joystick(context, 128, 0, 50, 10);
 
-    console.log("Arrived at Let's go start position", COLOR_PURPLE);
+    stream.log("Arrived at Let's go start position", COLOR_PURPLE);
 }
 
 
@@ -533,7 +533,7 @@ void lets_go_movement1(SwitchControllerContext& context){
 move forward again to repeat the cycle. It does this as many times as per num_forward_moves_per_lets_go_iteration.
  */
 void run_lets_go_iteration(
-    ConsoleHandle& console, 
+    VideoStream& stream,
     SwitchControllerContext& context,
     LetsGoEncounterBotTracker& encounter_tracker,
     int num_forward_moves_per_lets_go_iteration
@@ -552,9 +552,9 @@ void run_lets_go_iteration(
 
     context.wait_for_all_requests();
     for(int i = 0; i < total_iterations; i++){
-        use_lets_go_to_clear_in_front(console, context, encounter_tracker, throw_ball_if_bubble, [&](SwitchControllerContext& context){
+        use_lets_go_to_clear_in_front(stream, context, encounter_tracker, throw_ball_if_bubble, [&](SwitchControllerContext& context){
             // Do the following movement while the Let's Go pokemon clearing wild pokemon.
-            console.log("Move-forward iteration number: " + std::to_string(i + 1) + "/" + std::to_string(total_iterations), COLOR_PURPLE);
+            stream.log("Move-forward iteration number: " + std::to_string(i + 1) + "/" + std::to_string(total_iterations), COLOR_PURPLE);
 
             lets_go_movement1(context);
         });
@@ -576,12 +576,12 @@ only gives you one attempt before returning to the Pokecenter
 */
 void run_from_battles_and_back_to_pokecenter(
     ProgramEnvironment& env,
-    ConsoleHandle& console, 
+    VideoStream& stream,
     SwitchControllerContext& context,
     MaterialFarmerStats& stats,
     std::function<
         void(ProgramEnvironment& env,
-        ConsoleHandle& console,
+        VideoStream& stream,
         SwitchControllerContext& context)
     >&& action
 ){
@@ -591,19 +591,19 @@ void run_from_battles_and_back_to_pokecenter(
     while(returned_to_pokecenter == false){
         NormalBattleMenuWatcher battle_menu(COLOR_RED);
         int ret = run_until<SwitchControllerContext>(
-            console, context,
+            stream, context,
             [&](SwitchControllerContext& context){
                 if (!attempted_action){ // We still need to carry out `action`
                     attempted_action = true;
                     context.wait_for_all_requests();
-                    action(env, console, context);
+                    action(env, stream, context);
                     context.wait_for_all_requests();                    
                 }
 
                 // we have already attempted the action,
                 // so reset to the Pokecenter
-                console.log("Go back to PokeCenter.");
-                reset_to_pokecenter(env.program_info(), console, context);
+                stream.log("Go back to PokeCenter.");
+                reset_to_pokecenter(env.program_info(), stream, context);
                 returned_to_pokecenter = true;
             },
             {battle_menu}
@@ -611,10 +611,10 @@ void run_from_battles_and_back_to_pokecenter(
         if (ret == 0){ // battle detected
             stats.m_encounters++;
             env.update_stats();
-            console.log("Detected battle. Now running away.", COLOR_PURPLE);
-            console.overlay().add_log("Detected battle. Now running away.");
+            stream.log("Detected battle. Now running away.", COLOR_PURPLE);
+            stream.overlay().add_log("Detected battle. Now running away.");
             try{
-                run_from_battle(env.program_info(), console, context);
+                run_from_battle(env.program_info(), stream, context);
             }catch (OperationFailedException& e){
                 throw FatalProgramException(std::move(e));
             }
@@ -625,14 +625,14 @@ void run_from_battles_and_back_to_pokecenter(
 
 
 
-void move_from_material_farming_to_item_printer(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context){
-    console.log("Start moving from material farming to item printer.");
-    fly_from_paldea_to_blueberry_entrance(info, console, context);
-    move_from_blueberry_entrance_to_league_club(info, console, context);
-    move_from_league_club_entrance_to_item_printer(info, console, context);
+void move_from_material_farming_to_item_printer(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+    stream.log("Start moving from material farming to item printer.");
+    fly_from_paldea_to_blueberry_entrance(info, stream, context);
+    move_from_blueberry_entrance_to_league_club(info, stream, context);
+    move_from_league_club_entrance_to_item_printer(info, stream, context);
 }
 
-void fly_from_paldea_to_blueberry_entrance(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context){
+void fly_from_paldea_to_blueberry_entrance(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
     int numAttempts = 0;
     const int maxAttempts = 11;
     bool isFlySuccessful = false;
@@ -648,7 +648,7 @@ void fly_from_paldea_to_blueberry_entrance(const ProgramInfo& info, ConsoleHandl
 
         numAttempts++;
 
-        open_map_from_overworld(info, console, context);
+        open_map_from_overworld(info, stream, context);
 
         // change from Paldea map to Blueberry map
         pbf_press_button(context, BUTTON_L, 50, 300);
@@ -662,10 +662,10 @@ void fly_from_paldea_to_blueberry_entrance(const ProgramInfo& info, ConsoleHandl
         pbf_move_left_joystick(context, 0, 0, (uint16_t)push_magnitude, 50);
 
         // press A to fly to Blueberry academy
-        isFlySuccessful = fly_to_overworld_from_map(info, console, context, true);
+        isFlySuccessful = fly_to_overworld_from_map(info, stream, context, true);
         if (!isFlySuccessful){
-            console.log("Failed to fly to Blueberry academy.");
-            // dump_snapshot(console);
+            stream.log("Failed to fly to Blueberry academy.");
+            // dump_snapshot(stream);
         }
     }
 
@@ -673,12 +673,12 @@ void fly_from_paldea_to_blueberry_entrance(const ProgramInfo& info, ConsoleHandl
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Failed to fly to Blueberry academy, five times in a row.",
-            console
+            stream
         );
     }
 }
 
-void move_from_blueberry_entrance_to_league_club(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context){
+void move_from_blueberry_entrance_to_league_club(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
 
     int numAttempts = 0;
     int maxAttempts = 5;
@@ -687,8 +687,8 @@ void move_from_blueberry_entrance_to_league_club(const ProgramInfo& info, Consol
     while (!isSuccessful && numAttempts < maxAttempts){
         if (numAttempts > 0){ // failed at least once
             pbf_mash_button(context, BUTTON_B, 100);
-            open_map_from_overworld(info, console, context);
-            fly_to_overworld_from_map(info, console, context, false);
+            open_map_from_overworld(info, stream, context);
+            fly_to_overworld_from_map(info, stream, context, false);
         }
 
         numAttempts++;
@@ -701,11 +701,11 @@ void move_from_blueberry_entrance_to_league_club(const ProgramInfo& info, Consol
         // Wait for detection of Blueberry navigation menu
         ImageFloatBox select_entrance_box(0.031, 0.193, 0.047, 0.078);
         GradientArrowWatcher select_entrance(COLOR_RED, GradientArrowType::RIGHT, select_entrance_box);
-        int ret = wait_until(console, context, Milliseconds(5000), { select_entrance });
+        int ret = wait_until(stream, context, Milliseconds(5000), { select_entrance });
         if (ret == 0){
-            console.log("Blueberry navigation menu detected.");
+            stream.log("Blueberry navigation menu detected.");
         }else{
-            console.log("Failed to detect Blueberry navigation menu.");
+            stream.log("Failed to detect Blueberry navigation menu.");
             continue;
         }
 
@@ -715,23 +715,23 @@ void move_from_blueberry_entrance_to_league_club(const ProgramInfo& info, Consol
         // Confirm to League club room is selected
         ImageFloatBox select_league_club_box(0.038, 0.785, 0.043, 0.081);
         GradientArrowWatcher select_league_club(COLOR_RED, GradientArrowType::RIGHT, select_league_club_box, Milliseconds(1000));
-        ret = wait_until(console, context, Milliseconds(5000), { select_league_club });
+        ret = wait_until(stream, context, Milliseconds(5000), { select_league_club });
         if (ret == 0){
-            console.log("League club room selected.");
+            stream.log("League club room selected.");
         }else{
-            console.log("Failed to select League club room in navigation menu.");
+            stream.log("Failed to select League club room in navigation menu.");
             continue;            
         }
         // press A
         pbf_mash_button(context, BUTTON_A, 100);
 
         // check for overworld
-        OverworldWatcher overworld(console, COLOR_CYAN);  
-        ret = wait_until(console, context, Milliseconds(10000), { overworld });
+        OverworldWatcher overworld(stream.logger(), COLOR_CYAN);
+        ret = wait_until(stream, context, Milliseconds(10000), { overworld });
         if (ret == 0){
-            console.log("Entered League club room.");
+            stream.log("Entered League club room.");
         }else{
-            console.log("Failed to enter League club room from menu selection.");
+            stream.log("Failed to enter League club room from menu selection.");
             continue;            
         }
 
@@ -742,13 +742,13 @@ void move_from_blueberry_entrance_to_league_club(const ProgramInfo& info, Consol
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Failed to enter League club room, five times in a row.",
-            console
+            stream
         );
     }
 
 }
 
-void move_from_league_club_entrance_to_item_printer(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context){
+void move_from_league_club_entrance_to_item_printer(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
     context.wait_for_all_requests();
 
     // move forwards towards table next to item printer
@@ -758,14 +758,14 @@ void move_from_league_club_entrance_to_item_printer(const ProgramInfo& info, Con
     pbf_move_left_joystick(context, 0, 128, 10, 50);
 }
 
-void move_from_item_printer_to_material_farming(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context){
-    console.log("Start moving from item printer to material farming.");
-    move_from_item_printer_to_blueberry_entrance(info, console, context);
-    fly_from_blueberry_to_north_province_3(info, console, context);
+void move_from_item_printer_to_material_farming(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+    stream.log("Start moving from item printer to material farming.");
+    move_from_item_printer_to_blueberry_entrance(info, stream, context);
+    fly_from_blueberry_to_north_province_3(info, stream, context);
 }
 
 // assumes you start in the position in front of the item printer, as if you finished using it.
-void move_from_item_printer_to_blueberry_entrance(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context){
+void move_from_item_printer_to_blueberry_entrance(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
     context.wait_for_all_requests();
 
     // look left towards door
@@ -779,20 +779,20 @@ void move_from_item_printer_to_blueberry_entrance(const ProgramInfo& info, Conso
 
     context.wait_for_all_requests();
 
-    console.log("Wait for detection of Blueberry navigation menu.");
+    stream.log("Wait for detection of Blueberry navigation menu.");
 
     // Wait for detection of Blueberry navigation menu
     ImageFloatBox select_entrance_box(0.031, 0.193, 0.047, 0.078);
     GradientArrowWatcher select_entrance(COLOR_RED, GradientArrowType::RIGHT, select_entrance_box);
-    int ret = wait_until(console, context, Milliseconds(5000), { select_entrance }, Milliseconds(1000));
+    int ret = wait_until(stream, context, Milliseconds(5000), { select_entrance }, Milliseconds(1000));
     if (ret == 0){
-        console.log("Blueberry navigation menu detected.");
+        stream.log("Blueberry navigation menu detected.");
     }else{
-        console.log("Failed to detect Blueberry navigation menu.");
+        stream.log("Failed to detect Blueberry navigation menu.");
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Failed to find the exit from the League room.",
-            console
+            stream
         );
     }
 
@@ -800,21 +800,21 @@ void move_from_item_printer_to_blueberry_entrance(const ProgramInfo& info, Conso
     pbf_mash_button(context, BUTTON_A, 100);    
 
     // check for overworld
-    OverworldWatcher overworld(console, COLOR_CYAN);  
-    ret = wait_until(console, context, std::chrono::seconds(30), { overworld });
+    OverworldWatcher overworld(stream.logger(), COLOR_CYAN);
+    ret = wait_until(stream, context, std::chrono::seconds(30), { overworld });
     if (ret == 0){
-        console.log("Overworld detected");
+        stream.log("Overworld detected");
     }else{
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Failed to detect overworld.",
-            console
+            stream
         );      
     }
 }
 
 
-void fly_from_blueberry_to_north_province_3(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context){
+void fly_from_blueberry_to_north_province_3(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
     int numAttempts = 0;
     const int maxAttempts = 11;
     bool isFlySuccessful = false;
@@ -830,7 +830,7 @@ void fly_from_blueberry_to_north_province_3(const ProgramInfo& info, ConsoleHand
         // close all menus
         pbf_mash_button(context, BUTTON_B, 100);
 
-        open_map_from_overworld(info, console, context);
+        open_map_from_overworld(info, stream, context);
 
         // change from Blueberry map to Paldea map
         pbf_press_button(context, BUTTON_R, 50, 300);
@@ -844,10 +844,10 @@ void fly_from_blueberry_to_north_province_3(const ProgramInfo& info, ConsoleHand
         pbf_move_left_joystick(context, 112, 0, (uint16_t)push_magnitude, 50);
 
         // press A to fly to North province area 3
-        isFlySuccessful = fly_to_overworld_from_map(info, console, context, true);
+        isFlySuccessful = fly_to_overworld_from_map(info, stream, context, true);
 
         if (!isFlySuccessful){
-            console.log("Failed to fly to North province area 3.");
+            stream.log("Failed to fly to North province area 3.");
             // dump_snapshot(console);
         }
     }
@@ -857,7 +857,7 @@ void fly_from_blueberry_to_north_province_3(const ProgramInfo& info, ConsoleHand
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Failed to fly to North province area 3, ten times in a row.",
-            console
+            stream
         );
 
     }

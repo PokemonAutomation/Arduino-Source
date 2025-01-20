@@ -4,7 +4,8 @@
  *
  */
 
-#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
+#include "CommonFramework/Tools/VideoStream.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 #include "Pokemon/Pokemon_Xoroshiro128Plus.h"
 
 namespace PokemonAutomation{
@@ -16,14 +17,14 @@ using namespace Pokemon;
 // Performs 128 Orbeetle attack animations. 
 // Returns the state after those animations.
 Xoroshiro128PlusState find_rng_state(
-    ConsoleHandle& console, SwitchControllerContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     bool save_screenshots, bool log_values
 );
 
 // Performs Orbeetle attack animations until only one possible state is left.
 // Returns the state after those animations.
 Xoroshiro128PlusState refind_rng_state(
-    ConsoleHandle& console,
+    VideoStream& stream,
     SwitchControllerContext& context,
     Xoroshiro128PlusState last_known_state,
     size_t min_advances,
@@ -33,7 +34,7 @@ Xoroshiro128PlusState refind_rng_state(
 );
 
 void do_rng_advances(
-    ConsoleHandle& env, SwitchControllerContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     Xoroshiro128Plus& rng,
     size_t advances,
     uint16_t press_duration = 10,

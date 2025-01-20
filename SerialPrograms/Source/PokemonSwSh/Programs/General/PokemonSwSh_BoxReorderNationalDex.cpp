@@ -90,19 +90,22 @@ uint16_t move_to_location(Logger& logger, SwitchControllerContext& context, uint
 // A slug is a unique name used in a program, different than the name that is displayed to user on UI.
 // In most cases, a pokemon slug is the lower-case version of the Pokemon name, but there are some cases
 // like the slug of the Pokemon Mr. Mime is "mr-mime".
-std::string read_selected_pokemon(ConsoleHandle& console, SwitchControllerContext& context, Language language){
+std::string read_selected_pokemon(
+    VideoStream& stream, SwitchControllerContext& context,
+    Language language
+){
     context.wait_for_all_requests();
-    OverlayBoxScope box(console, ImageFloatBox(0.76, 0.08, 0.15, 0.064));
+    OverlayBoxScope box(stream.overlay(), ImageFloatBox(0.76, 0.08, 0.15, 0.064));
     context.wait_for(k_wait_after_read);
 
-    VideoSnapshot screen = console.video().snapshot();
+    VideoSnapshot screen = stream.video().snapshot();
     ImageViewRGB32 frame = extract_box_reference(screen, box);
 
     OCR::StringMatchResult result = PokemonNameReader::instance().read_substring(
-        console, language, frame,
+        stream.logger(), language, frame,
         OCR::BLACK_TEXT_FILTERS()
     );
-    result.log(console, PokemonNameReader::MAX_LOG10P);
+    result.log(stream.logger(), PokemonNameReader::MAX_LOG10P);
 //        assert(result.results.size() == 1);
     if (result.results.size() != 1){
         return "";
@@ -112,12 +115,17 @@ std::string read_selected_pokemon(ConsoleHandle& console, SwitchControllerContex
 
 // Move through some pokemon according to the box location order and read their names.
 // Return a list of pokemon slugs.
-std::vector<std::string> read_all_pokemon(Logger& logger, ConsoleHandle& console, SwitchControllerContext& context, uint16_t pokemon_count, Language language){
+std::vector<std::string> read_all_pokemon(
+    Logger& logger,
+    VideoStream& stream, SwitchControllerContext& context,
+    uint16_t pokemon_count,
+    Language language
+){
     std::vector<std::string> pokemons;
     uint16_t current_location = 0;
     for (uint16_t i = 0; i < pokemon_count; ++i){
         current_location = move_to_location(logger, context, current_location, i);
-        pokemons.push_back(read_selected_pokemon(console, context, language));
+        pokemons.push_back(read_selected_pokemon(stream, context, language));
     }
     return pokemons;
 }

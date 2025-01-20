@@ -27,7 +27,7 @@ using namespace Pokemon;
 //  Run a single move for a single turn.
 //  Returns true if move is successfully selected.
 bool run_move_select(
-    ConsoleHandle& console, SwitchControllerContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     MoveSelectWatcher& move_select_menu,
     SinglesMoveEntry& move, size_t consecutive_move_select
 ){
@@ -53,7 +53,7 @@ bool run_move_select(
     //  If we end up here consecutively too many times, the move is
     //  probably disabled. Select a different move.
     if (consecutive_move_select > 3){
-        console.log("Failed to select a move 3 times. Choosing a different move.", COLOR_RED);
+        stream.log("Failed to select a move 3 times. Choosing a different move.", COLOR_RED);
 //        pbf_press_dpad(context, DPAD_DOWN, 20, 40);
         index++;
         if (index >= 4){
@@ -64,21 +64,21 @@ bool run_move_select(
 
     do{
         if (!move.terastallize){
-            console.log("Skipping Terastallization. Reason: Not requested.");
+            stream.log("Skipping Terastallization. Reason: Not requested.");
             break;
         }
         if (consecutive_move_select > 1){
-            console.log("Skipping Terastallization. Reason: Previously failed move select.");
+            stream.log("Skipping Terastallization. Reason: Previously failed move select.");
             break;
         }
 
-        console.log("Attempting to Terastallize...");
+        stream.log("Attempting to Terastallize...");
         pbf_press_button(context, BUTTON_R, 20, 1 * TICKS_PER_SECOND);
     }while (false);
 
     context.wait_for_all_requests();
 
-    if (move_select_menu.move_to_slot(console, context, index)){
+    if (move_select_menu.move_to_slot(stream, context, index)){
         pbf_press_button(context, BUTTON_A, 20, 10);
     }
     return true;
@@ -86,30 +86,30 @@ bool run_move_select(
 
 
 bool run_battle_menu(
-    ConsoleHandle& console, SwitchControllerContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     NormalBattleMenuWatcher& battle_menu,
     const SinglesMoveEntry& move
 ){
-    console.log("Current Move Selection: " + move.to_str());
+    stream.log("Current Move Selection: " + move.to_str());
     switch (move.type){
     case SinglesMoveType::Move1:
     case SinglesMoveType::Move2:
     case SinglesMoveType::Move3:
     case SinglesMoveType::Move4:
-        if (battle_menu.move_to_slot(console, context, 0)){
+        if (battle_menu.move_to_slot(stream, context, 0)){
             pbf_press_button(context, BUTTON_A, 20, 10);
             return true;
         }else{
-            console.log("Unable to move to battle slot.", COLOR_RED);
+            stream.log("Unable to move to battle slot.", COLOR_RED);
             pbf_mash_button(context, BUTTON_B, 125);
             return false;
         }
     case SinglesMoveType::Run:
-        if (battle_menu.move_to_slot(console, context, 3)){
+        if (battle_menu.move_to_slot(stream, context, 3)){
             pbf_press_button(context, BUTTON_A, 20, 10);
             return true;
         }else{
-            console.log("Unable to move to run option.", COLOR_RED);
+            stream.log("Unable to move to run option.", COLOR_RED);
             pbf_mash_button(context, BUTTON_B, 125);
             return false;
         }
@@ -117,18 +117,18 @@ bool run_battle_menu(
     OperationFailedException::fire(
         ErrorReport::SEND_ERROR_REPORT,
         "Invalid SinglesMoveType: " + std::to_string((int)move.type),
-        console
+        stream
     );
 }
 
 
 //  Run a battle using the current Pokemon. Returns false if it fainted.
 bool run_pokemon(
-    ConsoleHandle& console, SwitchControllerContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     const std::vector<SinglesMoveEntry>& move_table,
     bool trainer_battle, bool& terastallized
 ){
-    console.log("Starting singles battle routine for one " + STRING_POKEMON + "...");
+    stream.log("Starting singles battle routine for one " + STRING_POKEMON + "...");
 
     size_t turn = 0;
     SinglesMoveEntry current_move{SinglesMoveType::Move1, false};
@@ -147,10 +147,10 @@ bool run_pokemon(
         GradientArrowWatcher next_pokemon(COLOR_BLUE, GradientArrowType::RIGHT, {0.50, 0.51, 0.30, 0.10});
         SwapMenuWatcher swap_menu(COLOR_BLUE);
         AdvanceDialogWatcher dialog(COLOR_CYAN);
-        OverworldWatcher overworld(console, COLOR_GREEN);
+        OverworldWatcher overworld(stream.logger(), COLOR_GREEN);
         context.wait_for_all_requests();
         int ret = run_until<SwitchControllerContext>(
-            console, context,
+            stream, context,
             [](SwitchControllerContext& context){
                 for (size_t c = 0; c < 4; c++){
                     pbf_wait(context, 30 * TICKS_PER_SECOND);
@@ -172,13 +172,13 @@ bool run_pokemon(
         context.wait_for(std::chrono::milliseconds(100));
         switch (ret){
         case 0:{
-            console.log("Detected battle menu.");
+            stream.log("Detected battle menu.");
             consecutive_move_select = 0;
 //            battle_menu_seen = true;
 
             //  If we enter here, we advance to the next turn.
             if (next_turn_on_battle_menu){
-                console.log("Detected battle menu. Turn: " + std::to_string(turn));
+                stream.log("Detected battle menu. Turn: " + std::to_string(turn));
                 turn++;
                 //  Reset the move to the table entry in case we were forced to
                 //  change moves due to move being unselectable.
@@ -193,20 +193,20 @@ bool run_pokemon(
             }
 
             if (terastallized){
-                console.log("Already used terastallization. Cannot use again.", COLOR_ORANGE);
+                stream.log("Already used terastallization. Cannot use again.", COLOR_ORANGE);
                 current_move.terastallize = false;
             }
-            next_turn_on_battle_menu = run_battle_menu(console, context, battle_menu, current_move);
+            next_turn_on_battle_menu = run_battle_menu(stream, context, battle_menu, current_move);
             if (current_move.terastallize){
                 terastallized = true;
             }
             continue;
         }
         case 1:{
-            console.log("Detected move select. Turn: " + std::to_string(turn));
+            stream.log("Detected move select. Turn: " + std::to_string(turn));
             consecutive_move_select++;
             run_move_select(
-                console, context,
+                stream, context,
                 move_select_menu,
                 current_move,
                 consecutive_move_select
@@ -215,21 +215,21 @@ bool run_pokemon(
         }
         case 2:
             if (trainer_battle){
-                console.log("Detected switch prompt...", COLOR_BLUE);
+                stream.log("Detected switch prompt...", COLOR_BLUE);
                 pbf_press_button(context, BUTTON_B, 20, 10);
             }else{
-                console.log("Detected own " + STRING_POKEMON + " fainted...", COLOR_ORANGE);
+                stream.log("Detected own " + STRING_POKEMON + " fainted...", COLOR_ORANGE);
                 pbf_press_button(context, BUTTON_A, 20, 10);
             }
             continue;
         case 3:
-            console.log("Detected switch " + STRING_POKEMON + " menu...", COLOR_ORANGE);
+            stream.log("Detected switch " + STRING_POKEMON + " menu...", COLOR_ORANGE);
             return false;
         case 4:
-            console.log("Detected advance dialog!", COLOR_ORANGE);
+            stream.log("Detected advance dialog!", COLOR_ORANGE);
             return true;
         case 5:
-            console.log("Detected overworld!", COLOR_ORANGE);
+            stream.log("Detected overworld!", COLOR_ORANGE);
             return true;
         default:
             consecutive_timeouts++;
@@ -237,10 +237,10 @@ bool run_pokemon(
                 OperationFailedException::fire(
                     ErrorReport::SEND_ERROR_REPORT,
                     "No state detected after 6 minutes.",
-                    console
+                    stream
                 );
             }
-            console.log("Unable to detect any state for 2 minutes. Mashing B...", COLOR_RED);
+            stream.log("Unable to detect any state for 2 minutes. Mashing B...", COLOR_RED);
             pbf_mash_button(context, BUTTON_B, 250);
         }
 
@@ -259,17 +259,17 @@ bool run_pokemon(
 
 bool run_singles_battle(
     ProgramEnvironment& env,
-    ConsoleHandle& console, SwitchControllerContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     SinglesAIOption& battle_AI,
     bool trainer_battle
 ){
-    console.log("Starting singles battle routine...");
+    stream.log("Starting singles battle routine...");
 
     bool terastallized = false;
     size_t faint_counter = 0;
     while (true){
         bool win = run_pokemon(
-            console, context,
+            stream, context,
             battle_AI.MOVE_TABLES[std::min<size_t>(faint_counter, 5)].snapshot(),
             trainer_battle, terastallized
         );
@@ -287,20 +287,20 @@ bool run_singles_battle(
         while (true){
             context.wait_for_all_requests();
             int ret = wait_until(
-                console, context,
+                stream, context,
                 std::chrono::seconds(120),
                 {battle_menu, dialog, swap_menu}
             );
             context.wait_for(std::chrono::milliseconds(100));
             switch (ret){
             case 0:
-                console.log("Detected battle menu. Calling battle routine...");
+                stream.log("Detected battle menu. Calling battle routine...");
                 break;
             case 1:
-                console.log("Detected advance dialog. Battle has been expectedly won already.", COLOR_RED);
+                stream.log("Detected advance dialog. Battle has been expectedly won already.", COLOR_RED);
                 return true;
             case 2:
-                console.log("Attempting to send in next " + STRING_POKEMON + "...");
+                stream.log("Attempting to send in next " + STRING_POKEMON + "...");
                 pbf_press_dpad(context, DPAD_DOWN, 20, 105);
                 pbf_press_button(context, BUTTON_A, 20, 105);
                 pbf_press_button(context, BUTTON_A, 20, 105);
@@ -311,7 +311,7 @@ bool run_singles_battle(
                 OperationFailedException::fire(
                     ErrorReport::SEND_ERROR_REPORT,
                     "Unable to send in a " + STRING_POKEMON + ".",
-                    console
+                    stream
                 );
             }
             break;

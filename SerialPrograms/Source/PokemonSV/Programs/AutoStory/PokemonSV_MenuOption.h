@@ -10,6 +10,7 @@
 #include <array>
 #include "CommonFramework/Language.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "CommonFramework/Tools/VideoStream.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.h"
 #include "PokemonSV_MenuOptionDatabase.h"
@@ -17,7 +18,6 @@
 namespace PokemonAutomation{
     class AsyncDispatcher;
 namespace NintendoSwitch{
-    class ConsoleHandle;
 namespace PokemonSV{
 
 
@@ -26,7 +26,7 @@ class MenuOption{
 public:
     ~MenuOption();
     MenuOption(
-        ConsoleHandle& console, SwitchControllerContext& context,
+        VideoStream& stream, SwitchControllerContext& context,
         Language language
     );
 
@@ -64,7 +64,7 @@ private:
     
 
 private:
-    ConsoleHandle& m_console;
+    VideoStream& m_stream;
     SwitchControllerContext& m_context;
     Language m_language;
     VideoOverlaySet m_overlays;

@@ -16,19 +16,19 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 Xoroshiro128PlusState find_rng_state(
-    ConsoleHandle& console,
+    VideoStream& stream,
     SwitchControllerContext& context,
     bool save_screenshots,
     bool log_image_values
 ){
-    OrbeetleAttackAnimationDetector detector(console, context);
+    OrbeetleAttackAnimationDetector detector(stream, context);
     uint64_t last_bits0 = 0;
     uint64_t last_bits1 = 0;
 
     for (size_t i = 0; i < 128; i++){
         context.wait_for_all_requests();
         std::string text = std::to_string(i + 1) + "/128";
-        console.log("RNG: Attack animation " + text);
+        stream.log("RNG: Attack animation " + text);
         OrbeetleAttackAnimationDetector::Detection detection = detector.run(save_screenshots, log_image_values);
         uint64_t last_bit = 0;
         switch (detection){
@@ -36,7 +36,7 @@ Xoroshiro128PlusState find_rng_state(
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Attack animation could not be detected.",
-                console
+                stream
             );
         case OrbeetleAttackAnimationDetector::SPECIAL:
             text += " : Special";
@@ -47,7 +47,7 @@ Xoroshiro128PlusState find_rng_state(
             last_bit = 0;
             break;
         }
-        console.overlay().add_log(text, COLOR_BLUE);
+        stream.overlay().add_log(text, COLOR_BLUE);
         pbf_wait(context, 180);
 
         if (i < 64){
@@ -61,26 +61,27 @@ Xoroshiro128PlusState find_rng_state(
     for (size_t j = 0; j < 128; j++){
         rng.next();
     }
-    console.log("RNG: state[0] = " + tostr_hex(rng.get_state().s0));
-    console.log("RNG: state[1] = " + tostr_hex(rng.get_state().s1));
+    stream.log("RNG: state[0] = " + tostr_hex(rng.get_state().s0));
+    stream.log("RNG: state[1] = " + tostr_hex(rng.get_state().s1));
     return rng.get_state();
 }
 
 
 Xoroshiro128PlusState refind_rng_state(
-    ConsoleHandle& console,
+    VideoStream& stream,
     SwitchControllerContext& context,
     Xoroshiro128PlusState last_known_state,
     size_t min_advances,
     size_t max_advances,
     bool save_screenshots,
-    bool log_image_values)
+    bool log_image_values
+)
 {
     Xoroshiro128Plus rng(last_known_state.s0, last_known_state.s1);
     for (size_t i = 0; i < min_advances; i++){
         rng.next();
     }
-    OrbeetleAttackAnimationDetector detector(console, context);
+    OrbeetleAttackAnimationDetector detector(stream, context);
     size_t possible_indices = SIZE_MAX;
     std::vector<bool> sequence = {};
     std::vector<bool> last_bit_sequence = rng.generate_last_bit_sequence(max_advances - min_advances);
@@ -97,7 +98,7 @@ Xoroshiro128PlusState refind_rng_state(
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Attack animation could not be detected.",
-                console
+                stream
             );
         case OrbeetleAttackAnimationDetector::SPECIAL:
             text += " : Special";
@@ -108,7 +109,7 @@ Xoroshiro128PlusState refind_rng_state(
             sequence.emplace_back(false);
             break;
         }
-        console.overlay().add_log(text, COLOR_BLUE);
+        stream.overlay().add_log(text, COLOR_BLUE);
         pbf_wait(context, 180);
 
         std::vector<bool>::iterator last_bit_start = std::search(last_bit_sequence.begin(), last_bit_sequence.end(), sequence.begin(), sequence.end());
@@ -126,29 +127,35 @@ Xoroshiro128PlusState refind_rng_state(
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Detected sequence of attack motions does not exist in expected range.",
-            console
+            stream
         );
     }
 
     distance += sequence.size();
-    console.log("RNG: needed " + std::to_string(sequence.size()) + " animations.");
-    console.log("RNG: new state is " + std::to_string(distance + min_advances) + " advances from last known state.");
+    stream.log("RNG: needed " + std::to_string(sequence.size()) + " animations.");
+    stream.log("RNG: new state is " + std::to_string(distance + min_advances) + " advances from last known state.");
     for (size_t advance = 0; advance < distance; advance++){
         rng.next();
     }
-    console.log("RNG: state[0] = " + tostr_hex(rng.get_state().s0));
-    console.log("RNG: state[1] = " + tostr_hex(rng.get_state().s1));
+    stream.log("RNG: state[0] = " + tostr_hex(rng.get_state().s0));
+    stream.log("RNG: state[1] = " + tostr_hex(rng.get_state().s1));
 
     return rng.get_state();
 }
 
 
-void do_rng_advances(ConsoleHandle& console, SwitchControllerContext& context, Xoroshiro128Plus& rng, size_t advances, uint16_t press_duration, uint16_t release_duration){
+void do_rng_advances(
+    VideoStream& stream, SwitchControllerContext& context,
+    Xoroshiro128Plus& rng,
+    size_t advances,
+    uint16_t press_duration,
+    uint16_t release_duration
+){
     for (size_t i = 0; i < advances; i++){
         if ((i + 1) % 10 == 0){
             std::string text = std::to_string(i + 1) + "/" + std::to_string(advances);
-            console.log("RNG advance: " + text);
-            console.overlay().add_log("Advancing: " + text, COLOR_GREEN);
+            stream.log("RNG advance: " + text);
+            stream.overlay().add_log("Advancing: " + text, COLOR_GREEN);
         }
         pbf_press_button(context, BUTTON_RCLICK, press_duration, release_duration);
         rng.next();

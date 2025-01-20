@@ -75,9 +75,9 @@ struct SpeciesReadDatabase{
 
 
 
-std::string read_boss_sprite(ConsoleHandle& console){
-    DenMonReader reader(console, console);
-    DenMonReadResults results = reader.read(console.video().snapshot());
+std::string read_boss_sprite(VideoStream& stream){
+    DenMonReader reader(stream.logger(), stream.overlay());
+    DenMonReadResults results = reader.read(stream.video().snapshot());
 
     std::string sprite_slug;
     {
@@ -92,13 +92,13 @@ std::string read_boss_sprite(ConsoleHandle& console){
     auto iter = database.sprite_map.find(sprite_slug);
     if (iter == database.sprite_map.end()){
         throw InternalProgramError(
-            &console.logger(), PA_CURRENT_FUNCTION,
+            &stream.logger(), PA_CURRENT_FUNCTION,
             "Slug doesn't exist in sprite map: " + sprite_slug
         );
     }
     if (iter->second.empty()){
         throw InternalProgramError(
-            &console.logger(), PA_CURRENT_FUNCTION,
+            &stream.logger(), PA_CURRENT_FUNCTION,
             "Sprite map is empty for slug: " + sprite_slug
         );
     }

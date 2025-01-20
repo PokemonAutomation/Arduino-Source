@@ -365,17 +365,17 @@ void AuctionFarmer::reset_position(SingleSwitchProgramEnvironment& env, SwitchCo
 }
 
 
-uint64_t read_next_bid(ConsoleHandle& console, SwitchControllerContext& context, bool high){
+uint64_t read_next_bid(VideoStream& stream, SwitchControllerContext& context, bool high){
     float box_y = high ? 0.42f : 0.493f;
-    OverlayBoxScope box(console, { 0.73, box_y, 0.17, 0.048 });
+    OverlayBoxScope box(stream.overlay(), { 0.73, box_y, 0.17, 0.048 });
     std::unordered_map<uint64_t, size_t> read_bids;
     size_t highest_read = 0;
     uint64_t read_value = 0;
 
     // read next bid multiple times since the selection arrow sometimes blocks the first digit
     for (size_t i = 0; i < 10; i++){
-        VideoSnapshot screen = console.video().snapshot();
-        uint64_t read_bid = OCR::read_number(console.logger(), extract_box_reference(screen, box));
+        VideoSnapshot screen = stream.video().snapshot();
+        uint64_t read_bid = OCR::read_number(stream.logger(), extract_box_reference(screen, box));
 
         if (read_bids.find(read_bid) == read_bids.end()){
             read_bids[read_bid] = 0;
@@ -389,7 +389,7 @@ uint64_t read_next_bid(ConsoleHandle& console, SwitchControllerContext& context,
         context.wait_for(Milliseconds(20));
     }
 
-    console.log("Next bid: " + std::to_string(read_value));
+    stream.log("Next bid: " + std::to_string(read_value));
     return read_value;
 }
 

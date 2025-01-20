@@ -7,8 +7,8 @@
 #ifndef PokemonAutomation_PokemonSwSh_MaxLair_CatchScreenTracker_H
 #define PokemonAutomation_PokemonSwSh_MaxLair_CatchScreenTracker_H
 
+#include "CommonFramework/Tools/VideoStream.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
-#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_SummaryShinySymbolDetector.h"
 
 namespace PokemonAutomation{
@@ -27,7 +27,7 @@ class CaughtPokemonScreen{
     using Detection = SummaryShinySymbolDetector::Detection;
 
 public:
-    CaughtPokemonScreen(ConsoleHandle& console, SwitchControllerContext& context);
+    CaughtPokemonScreen(VideoStream& stream, SwitchControllerContext& context);
 
     size_t total() const;
     const CaughtPokemon& operator[](size_t position) const;
@@ -44,7 +44,7 @@ private:
     void process_detection(Detection detection);
 
 private:
-    ConsoleHandle& m_console;
+    VideoStream& m_stream;
     SwitchControllerContext& m_context;
     size_t m_total;
     size_t m_current_position = 0;

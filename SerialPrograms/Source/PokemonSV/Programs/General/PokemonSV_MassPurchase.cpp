@@ -83,14 +83,14 @@ MassPurchase::MassPurchase()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-bool MassPurchase::mass_purchase(ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context){
+bool MassPurchase::mass_purchase(ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context){
     MassPurchase_Descriptor::Stats& stats = env.current_stats<MassPurchase_Descriptor::Stats>();
 
-    OverworldWatcher overworld(console, COLOR_RED);
+    OverworldWatcher overworld(stream.logger(), COLOR_RED);
     AdvanceDialogWatcher dialog(COLOR_CYAN);
     context.wait_for_all_requests();
     int ret = wait_until(
-        console, context,
+        stream, context,
         std::chrono::seconds(2),
         {
             overworld,
@@ -104,9 +104,9 @@ bool MassPurchase::mass_purchase(ProgramEnvironment& env, ConsoleHandle& console
         env.log("Error - Stuck in Overworld");
         stats.errors++;
         throw_and_log<FatalProgramException>(
-            console, ErrorReport::SEND_ERROR_REPORT,
+            stream.logger(), ErrorReport::SEND_ERROR_REPORT,
             "Stuck in Overworld.",
-            console
+            stream
         );
 
     case 1:
@@ -120,14 +120,14 @@ bool MassPurchase::mass_purchase(ProgramEnvironment& env, ConsoleHandle& console
     }
 };
     
-bool MassPurchase::extra_items(ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context){
+bool MassPurchase::extra_items(ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context){
     MassPurchase_Descriptor::Stats& stats = env.current_stats<MassPurchase_Descriptor::Stats>();
 
-    OverworldWatcher overworld(console, COLOR_RED);
+    OverworldWatcher overworld(stream.logger(), COLOR_RED);
     AdvanceDialogWatcher dialog(COLOR_CYAN);
     context.wait_for_all_requests();
     int ret = wait_until(
-        console, context,
+        stream, context,
         std::chrono::seconds(2),
         {
             overworld,
@@ -141,9 +141,9 @@ bool MassPurchase::extra_items(ProgramEnvironment& env, ConsoleHandle& console, 
         env.log("Error - Stuck in Overworld");
         stats.errors++;
         throw_and_log<FatalProgramException>(
-            console, ErrorReport::SEND_ERROR_REPORT,
+            stream.logger(), ErrorReport::SEND_ERROR_REPORT,
             "Stuck in Overworld.",
-            console
+            stream
         );
 
     case 1:

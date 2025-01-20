@@ -39,7 +39,7 @@ MultiGameFossil::MultiGameFossil(){
 }
 
 void run_fossil_batch(
-    ConsoleHandle& console, 
+    VideoStream& stream,
     Logger& logger,
     SwitchControllerContext& context,
     const FossilGame& batch,
@@ -135,7 +135,7 @@ void run_fossil_batch(
 
     //  Exit game.
     ssf_press_button2(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE, 10);
-    close_game(console, context);
+    close_game(stream, context);
 }
 
 

@@ -7,7 +7,8 @@
 #ifndef PokemonAutomation_PokemonSwSh_Commands_GameEntry_H
 #define PokemonAutomation_PokemonSwSh_Commands_GameEntry_H
 
-#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
+#include "CommonFramework/Tools/VideoStream.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -31,7 +32,7 @@ void fast_reset_game(
     uint16_t start_game_mash, uint16_t start_game_wait,
     uint16_t enter_game_mash, uint16_t enter_game_wait
 );
-void reset_game_from_home               (ConsoleHandle& console, SwitchControllerContext& device, bool tolerate_update_menu);
+void reset_game_from_home               (VideoStream& stream, SwitchControllerContext& device, bool tolerate_update_menu);
 
 
 

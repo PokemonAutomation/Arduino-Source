@@ -6,7 +6,6 @@
 
 #include "ClientSource/Libraries/MessageConverter.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
@@ -86,7 +85,7 @@ void home_to_add_friends(
 #endif
 }
 void accept_FRs(
-    ConsoleHandle& console, SwitchControllerContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     uint8_t slot, bool fix_cursor,
     uint16_t game_to_home_delay_safe,
     uint16_t auto_fr_duration,
@@ -105,12 +104,12 @@ void accept_FRs(
     pbf_mash_button(context, BUTTON_A, auto_fr_duration);
 
     //  Return to Switch Home menu. (or game)
-    if (console.video().snapshot()){
-        console.log("Entering game using inference...");
+    if (stream.video().snapshot()){
+        stream.log("Entering game using inference...");
         pbf_press_button(context, BUTTON_HOME, 10, 190);
-        NintendoSwitch::resume_game_from_home(console, context);
+        NintendoSwitch::resume_game_from_home(stream, context);
     }else{
-        console.log("Entering game without inference...", COLOR_RED);
+        stream.log("Entering game without inference...", COLOR_RED);
         settings_to_enter_game_den_lobby(
             context,
             tolerate_system_update_window_slow, false,

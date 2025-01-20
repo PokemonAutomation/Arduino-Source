@@ -38,7 +38,7 @@ public:
 
 private:
     //  Returns true on success.
-    bool clone_item(ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context);
+    bool clone_item(ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context);
 
 private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;

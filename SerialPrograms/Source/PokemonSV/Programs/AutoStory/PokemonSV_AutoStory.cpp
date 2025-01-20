@@ -12,8 +12,10 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h"
-#include "PokemonSV/Programs/PokemonSV_GameEntry.h"
+#include "PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h"
+#include "PokemonSV/Programs/PokemonSV_GameEntry.h"
+#include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSV_AutoStory_Segment_00.h"
 #include "PokemonSV_AutoStory_Segment_01.h"
 #include "PokemonSV_AutoStory_Segment_02.h"
@@ -549,7 +551,7 @@ void AutoStory::value_changed(void* object){
 
 void AutoStory::test_checkpoints(
     SingleSwitchProgramEnvironment& env,
-    ConsoleHandle& console, 
+    VideoStream& stream,
     SwitchControllerContext& context,
     int start, int end, 
     int loop, int start_loop, int end_loop
@@ -611,7 +613,7 @@ void AutoStory::test_checkpoints(
 
     for (int checkpoint = start; checkpoint <= end; checkpoint++){
         if (checkpoint == 0){
-            console.log("checkpoint_0");
+            stream.log("checkpoint_0");
             checkpoint_list[checkpoint]();
             continue;
         }
@@ -629,14 +631,14 @@ void AutoStory::test_checkpoints(
             for (int i = 0; i < loop; i++){
                 if (i > 0){
                     try {
-                        reset_game(env.program_info(), console, context);
+                        reset_game(env.program_info(), stream, context);
                         enter_menu_from_overworld(env.program_info(), env.console, context, -1, MenuSide::NONE, has_minimap);
                         // we wait 5 seconds then save, so that the initial conditions are slightly different on each reset.
                         env.log("Wait 5 seconds.");
                         context.wait_for(Milliseconds(5 * 1000));
                     }catch(...){
                         // try one more time
-                        reset_game(env.program_info(), console, context);
+                        reset_game(env.program_info(), stream, context);
                         enter_menu_from_overworld(env.program_info(), env.console, context, -1, MenuSide::NONE, has_minimap);
                         // we wait 5 seconds then save, so that the initial conditions are slightly different on each reset.
                         env.log("Wait 5 seconds.");
@@ -644,11 +646,11 @@ void AutoStory::test_checkpoints(
 
                     }
                 }
-                console.log("checkpoint_" + number + ": loop " + std::to_string(i));
+                stream.log("checkpoint_" + number + ": loop " + std::to_string(i));
                 checkpoint_list[checkpoint]();
             } 
         }else{
-            console.log("checkpoint_" + number + ".");
+            stream.log("checkpoint_" + number + ".");
             checkpoint_list[checkpoint]();            
         }
        

@@ -16,31 +16,64 @@ using namespace std;
 namespace PokemonAutomation{
     struct ProgramInfo;
 namespace NintendoSwitch{
-    class ConsoleHandle;
 namespace PokemonSV{
 
 //Navigate to a photo target
-CameraAngle quest_photo_navi(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context, const BBQOption& BBQ_OPTIONS, BBQuests current_quest);
+CameraAngle quest_photo_navi(
+    const ProgramInfo& info,
+    VideoStream& stream, SwitchControllerContext& context,
+    const BBQOption& BBQ_OPTIONS,
+    BBQuests current_quest
+);
 
 //Take picture of a pokemon/location
-void quest_photo(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context, const BBQOption& BBQ_OPTIONS, BBQuests current_quest);
+void quest_photo(
+    const ProgramInfo& info,
+    VideoStream& stream, SwitchControllerContext& context,
+    const BBQOption& BBQ_OPTIONS,
+    BBQuests current_quest
+);
 
 
 //Navigate to a catch target
-void quest_catch_navi(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context, const BBQOption& BBQ_OPTIONS, BBQuests current_quest);
+void quest_catch_navi(
+    const ProgramInfo& info,
+    VideoStream& stream, SwitchControllerContext& context,
+    const BBQOption& BBQ_OPTIONS,
+    BBQuests current_quest
+);
 
 //Select and throw ball
-void quest_catch_throw_ball(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context, Language language, const std::string& selected_ball);
+void quest_catch_throw_ball(
+    const ProgramInfo& info,
+    VideoStream& stream, SwitchControllerContext& context,
+    Language language,
+    const std::string& selected_ball
+);
 
 //Handle catching the target
-void quest_catch_handle_battle(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context, const BBQOption& BBQ_OPTIONS, BBQuests current_quest);
+void quest_catch_handle_battle(
+    const ProgramInfo& info,
+    VideoStream& stream, SwitchControllerContext& context,
+    const BBQOption& BBQ_OPTIONS,
+    BBQuests current_quest
+);
 
 //Catch a pokemon
-void quest_catch(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context, const BBQOption& BBQ_OPTIONS, BBQuests current_quest);
+void quest_catch(
+    const ProgramInfo& info,
+    VideoStream& stream, SwitchControllerContext& context,
+    const BBQOption& BBQ_OPTIONS,
+    BBQuests current_quest
+);
 
 
 //Handle battles for tera-self/defeat-wild-tera. Use first attack until victory.
-void wild_battle_tera(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context, bool& tera_self);
+void wild_battle_tera(
+    const ProgramInfo& info,
+    VideoStream& stream, SwitchControllerContext& context,
+    bool& tera_self
+);
 
 }
 }

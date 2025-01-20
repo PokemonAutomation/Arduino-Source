@@ -7,14 +7,13 @@
 #ifndef PokemonAutomation_PokemonSwSh_MenuNavigation_H
 #define PokemonAutomation_PokemonSwSh_MenuNavigation_H
 
-#include <stddef.h>
+#include "CommonFramework/Tools/VideoStream.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 
 namespace PokemonAutomation{
     class EventNotificationOption;
     class ProgramEnvironment;
 namespace NintendoSwitch{
-    class ConsoleHandle;
 namespace PokemonSwSh{
 
 // When Rotom Phone menu is opened, move the cursor to the target app.
@@ -24,7 +23,7 @@ namespace PokemonSwSh{
 // Will OperationFailedException::fire when failed to detect menu
 void navigate_to_menu_app(
     ProgramEnvironment& env,
-    ConsoleHandle& console,
+    VideoStream& stream,
     SwitchControllerContext& context,
     size_t app_index,
     EventNotificationOption& notification_option

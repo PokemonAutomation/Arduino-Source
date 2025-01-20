@@ -4,6 +4,10 @@
  *
  */
 
+#include <cmath>
+#include <algorithm>
+#include <sstream>
+#include <unordered_map>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Concurrency/AsyncDispatcher.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
@@ -14,8 +18,6 @@
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonTools/Async/InterruptableCommands.h"
 #include "CommonTools/Async/InferenceRoutines.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
-#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
@@ -30,10 +32,6 @@
 #include "PokemonSV/Programs/Sandwiches/PokemonSV_IngredientSession.h"
 #include "PokemonSV/Inference/Picnics/PokemonSV_SandwichPlateDetector.h"
 
-#include <cmath>
-#include <algorithm>
-#include <sstream>
-#include <unordered_map>
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -43,20 +41,28 @@ namespace{
     const ImageFloatBox HAND_INITIAL_BOX{0.440, 0.455, 0.112, 0.179};
     const ImageFloatBox INGREDIENT_BOX{0.455, 0.130, 0.090, 0.030};
 
-void wait_for_initial_hand(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context){
+void wait_for_initial_hand(
+    const ProgramInfo& info,
+    VideoStream& stream, SwitchControllerContext& context
+){
      SandwichHandWatcher free_hand(SandwichHandType::FREE, HAND_INITIAL_BOX);
-    int ret = wait_until(console, context, std::chrono::seconds(30), {free_hand});
+    int ret = wait_until(stream, context, std::chrono::seconds(30), {free_hand});
     if (ret < 0){
-        dump_image_and_throw_recoverable_exception(info, console, "FreeHandNotDetected",
-            "Cannot detect hand at start of making a sandwich.");
+        dump_image_and_throw_recoverable_exception(
+            info, stream, "FreeHandNotDetected",
+            "Cannot detect hand at start of making a sandwich."
+        );
     }
 }
 
 } // anonymous namespace
 
-bool enter_sandwich_recipe_list(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context){
+bool enter_sandwich_recipe_list(
+    const ProgramInfo& info,
+    VideoStream& stream, SwitchControllerContext& context
+){
     context.wait_for_all_requests();
-    console.log("Opening sandwich menu at picnic table.");
+    stream.log("Opening sandwich menu at picnic table.");
 
     // Firt, try pressing button A to bring up the menu to make sandwich
     pbf_press_button(context, BUTTON_A, 20, 80);
@@ -67,7 +73,7 @@ bool enter_sandwich_recipe_list(const ProgramInfo& info, ConsoleHandle& console,
         context.wait_for_all_requests();
         if (current_time() - start > std::chrono::minutes(1)){
             dump_image_and_throw_recoverable_exception(
-                info, console, "FailToSandwich",
+                info, stream, "FailToSandwich",
                 "enter_sandwich_recipe_list(): Failed to open sandwich menu after 1 minute."
             );
         }
@@ -78,53 +84,57 @@ bool enter_sandwich_recipe_list(const ProgramInfo& info, ConsoleHandle& console,
         AdvanceDialogWatcher dialog_watcher(COLOR_RED);
 
         const int ret = wait_until(
-            console, context,
+            stream, context,
             std::chrono::seconds(30),
             {picnic_watcher, sandwich_arrow, recipe_arrow, dialog_watcher}
         );
         switch (ret){
         case 0:
-            console.log("Detected picnic. Maybe button A press dropped.");
+            stream.log("Detected picnic. Maybe button A press dropped.");
             // walk forward and press A again
             pbf_move_left_joystick(context, 128, 0, 100, 40);
             pbf_press_button(context, BUTTON_A, 20, 80);
             continue;
         case 1:
-            console.log("Detected \"make a sandwich\" menu item selection arrrow.");
-            console.overlay().add_log("Open sandwich recipes", COLOR_WHITE);
+            stream.log("Detected \"make a sandwich\" menu item selection arrrow.");
+            stream.overlay().add_log("Open sandwich recipes", COLOR_WHITE);
             opened_table_menu = true;
             pbf_press_button(context, BUTTON_A, 20, 100);
             continue;
         case 2:
-            console.log("Detected recipe selection arrow.");
+            stream.log("Detected recipe selection arrow.");
             context.wait_for(std::chrono::seconds(1)); // wait one second to make sure the menu is fully loaded.
             return true;
         case 3:
-            console.log("Detected advance dialog.");
+            stream.log("Detected advance dialog.");
             if (opened_table_menu){
-                console.log("Advance dialog after \"make a sandwich\" menu item. No ingredients.", COLOR_RED);
-                console.overlay().add_log("No ingredient!", COLOR_RED);
+                stream.log("Advance dialog after \"make a sandwich\" menu item. No ingredients.", COLOR_RED);
+                stream.overlay().add_log("No ingredient!", COLOR_RED);
                 return false;
             }
             pbf_press_button(context, BUTTON_A, 20, 80);
             continue;
         default:
-            dump_image_and_throw_recoverable_exception(info, console, "NotEnterSandwichList",
+            dump_image_and_throw_recoverable_exception(info, stream, "NotEnterSandwichList",
                 "enter_sandwich_recipe_list(): No recognized state after 60 seconds.");
         }
     }
 }
 
 
-bool select_sandwich_recipe(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context, size_t target_sandwich_ID){
+bool select_sandwich_recipe(
+    const ProgramInfo& info,
+    VideoStream& stream, SwitchControllerContext& context,
+    size_t target_sandwich_ID
+){
     context.wait_for_all_requests();
-    console.log("Choosing sandwich recipe: " + std::to_string(target_sandwich_ID));
-    console.overlay().add_log("Search recipe " + std::to_string(target_sandwich_ID), COLOR_WHITE);
+    stream.log("Choosing sandwich recipe: " + std::to_string(target_sandwich_ID));
+    stream.overlay().add_log("Search recipe " + std::to_string(target_sandwich_ID), COLOR_WHITE);
 
-    SandwichRecipeNumberDetector recipe_detector(console.logger());
+    SandwichRecipeNumberDetector recipe_detector(stream.logger());
     SandwichRecipeSelectionWatcher selection_watcher;
 
-    VideoOverlaySet overlay_set(console.overlay());
+    VideoOverlaySet overlay_set(stream.overlay());
     recipe_detector.make_overlays(overlay_set);
     selection_watcher.make_overlays(overlay_set);
 
@@ -134,7 +144,7 @@ bool select_sandwich_recipe(const ProgramInfo& info, ConsoleHandle& console, Swi
         context.wait_for(std::chrono::milliseconds(200));
         context.wait_for_all_requests();
 
-        auto snapshot = console.video().snapshot();
+        auto snapshot = stream.video().snapshot();
         size_t recipe_IDs[6] = {0, 0, 0, 0, 0, 0};
         recipe_detector.detect_recipes(snapshot, recipe_IDs);
         {
@@ -143,7 +153,7 @@ bool select_sandwich_recipe(const ProgramInfo& info, ConsoleHandle& console, Swi
             for(int i = 0; i < 6; i++){
                 os << recipe_IDs[i] << ", ";
             }
-            console.log(os.str());
+            stream.log(os.str());
         }
 
         size_t min_ID = 300;
@@ -156,7 +166,7 @@ bool select_sandwich_recipe(const ProgramInfo& info, ConsoleHandle& console, Swi
             min_ID = 0; // set case of no recipe ID detected to be 0 min_ID
         }
         size_t max_ID = *std::max_element(recipe_IDs, recipe_IDs+6);
-        console.log("min, max IDs " + std::to_string(min_ID) + ", " + std::to_string(max_ID));
+        stream.log("min, max IDs " + std::to_string(min_ID) + ", " + std::to_string(max_ID));
 
         if (0 < min_ID && min_ID <= target_sandwich_ID && target_sandwich_ID <= max_ID){
             // target is in this page!
@@ -169,30 +179,32 @@ bool select_sandwich_recipe(const ProgramInfo& info, ConsoleHandle& console, Swi
                 }
             }
             if (target_cell == -1){ // not targe recipe found in this page, probably not enough ingredients
-                console.log("Not enough ingredients for target recipe.", COLOR_RED);
-                console.overlay().add_log("Not enough ingredients", COLOR_RED);
+                stream.log("Not enough ingredients for target recipe.", COLOR_RED);
+                stream.overlay().add_log("Not enough ingredients", COLOR_RED);
                 return false;
             }
 
-            console.log("found recipe in the current page, cell " + std::to_string(target_cell));
+            stream.log("found recipe in the current page, cell " + std::to_string(target_cell));
             
-            int ret = wait_until(console, context, std::chrono::seconds(10), {selection_watcher});
+            int ret = wait_until(stream, context, std::chrono::seconds(10), {selection_watcher});
             int selected_cell = selection_watcher.selected_recipe_cell();
             if (ret < 0 || selected_cell < 0){
-                dump_image_and_throw_recoverable_exception(info, console, "RecipeSelectionArrowNotDetected",
-                    "select_sandwich_recipe(): Cannot detect recipe selection arrow.");
+                dump_image_and_throw_recoverable_exception(
+                    info, stream, "RecipeSelectionArrowNotDetected",
+                    "select_sandwich_recipe(): Cannot detect recipe selection arrow."
+                );
             }
 
-            console.log("Current selected cell " + std::to_string(selected_cell));
+            stream.log("Current selected cell " + std::to_string(selected_cell));
 
             if (target_cell == selected_cell){
                 // Selected target recipe!
-                console.log("Found recipe at cell " + std::to_string(selected_cell));
-                console.overlay().add_log("Found recipe", COLOR_WHITE);
+                stream.log("Found recipe at cell " + std::to_string(selected_cell));
+                stream.overlay().add_log("Found recipe", COLOR_WHITE);
                 found_recipe = true;
                 break;
             }else if (target_cell == selected_cell + 1){
-                console.log("Move to the right column.");
+                stream.log("Move to the right column.");
                 // Target is in a different column
                 // Move cursor right.
                 pbf_press_dpad(context, DPAD_RIGHT, 10, 50);
@@ -217,20 +229,20 @@ bool select_sandwich_recipe(const ProgramInfo& info, ConsoleHandle& console, Swi
         while(true){
             context.wait_for_all_requests();
             int ret = wait_until(
-                console, context, std::chrono::seconds(3),
+                stream, context, std::chrono::seconds(3),
                 {selection_watcher, pick_selection}
             );
 
             if (ret == 0){
-                console.log("Detected recipe selection. Dropped Button A?");
+                stream.log("Detected recipe selection. Dropped Button A?");
                 pbf_press_button(context, BUTTON_A, 30, 100);
                 continue;
             }else if (ret == 1){
-                console.log("Detected pick selection.");
+                stream.log("Detected pick selection.");
                 pbf_press_button(context, BUTTON_A, 30, 100);
                 continue;
             }else{
-                console.log("Entered sandwich minigame.");
+                stream.log("Entered sandwich minigame.");
                 break;
             }
         }
@@ -238,8 +250,8 @@ bool select_sandwich_recipe(const ProgramInfo& info, ConsoleHandle& console, Swi
     }
 
     // we cannot find the receipt
-    console.log("Max list travese attempt reached. Target recipe not found", COLOR_RED);
-    console.overlay().add_log("Recipe not found", COLOR_RED);
+    stream.log("Max list travese attempt reached. Target recipe not found", COLOR_RED);
+    stream.overlay().add_log("Recipe not found", COLOR_RED);
 
     return false;
 }
@@ -273,12 +285,14 @@ update the location of the sandwich hand
 - return true if successful. else throw an exception
 */
 bool move_then_recover_sandwich_hand_position(
-    const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context,
-    SandwichHandType& hand_type, SandwichHandWatcher& hand_watcher,
+    const ProgramInfo& info,
+    VideoStream& stream, SwitchControllerContext& context,
+    SandwichHandType& hand_type,
+    SandwichHandWatcher& hand_watcher,
     AsyncCommandSession<SwitchController>& move_session
 ){
 
-    console.log("center the cursor: move towards bottom right, then left slightly.");
+    stream.log("center the cursor: move towards bottom right, then left slightly.");
     uint16_t num_ticks_to_move_1 = TICKS_PER_SECOND*4;
     uint16_t num_ticks_to_move_2 = 100;
 
@@ -318,8 +332,8 @@ bool move_then_recover_sandwich_hand_position(
         context.wait_for(Milliseconds(num_miliseconds_to_wait));
     }
     
-    const VideoSnapshot& frame = console.video().snapshot();
-    console.log("Try to recover sandwich hand location.");
+    const VideoSnapshot& frame = stream.video().snapshot();
+    stream.log("Try to recover sandwich hand location.");
     if(hand_watcher.recover_sandwich_hand_position(frame)){
         // sandwich hand detected.
         return true;
@@ -327,7 +341,7 @@ bool move_then_recover_sandwich_hand_position(
 
     // if still can't find the sandwich hand, throw a exception
     dump_image_and_throw_recoverable_exception(
-        info, console,
+        info, stream,
         SANDWICH_HAND_TYPE_NAMES(hand_type) + "SandwichHandNotDetected",
         "move_sandwich_hand(): Cannot detect " + SANDWICH_HAND_TYPE_NAMES(hand_type) + " hand."
     );
@@ -343,7 +357,7 @@ Then moves the sandwich hand closer towards end_box.
 ImageFloatBox move_sandwich_hand(
     const ProgramInfo& info,
     AsyncDispatcher& dispatcher,
-    ConsoleHandle& console,
+    VideoStream& stream,
     SwitchControllerContext& context,
     SandwichHandType hand_type,
     bool pressing_A,
@@ -351,7 +365,7 @@ ImageFloatBox move_sandwich_hand(
     const ImageFloatBox& end_box
 ){
     context.wait_for_all_requests();
-    console.log("Start moving sandwich hand: " + SANDWICH_HAND_TYPE_NAMES(hand_type)
+    stream.log("Start moving sandwich hand: " + SANDWICH_HAND_TYPE_NAMES(hand_type)
         + " start box " + box_to_string(start_box) + " end box " + box_to_string(end_box));
 
     uint8_t joystick_x = 128;
@@ -362,9 +376,9 @@ ImageFloatBox move_sandwich_hand(
     // A session that creates a new thread to send button commands to controller
     AsyncCommandSession<SwitchController> move_session(
         context,
-        console.logger(),
+        stream.logger(),
         dispatcher,
-        console.controller()
+        context.controller()
     );
     
     if (pressing_A){
@@ -378,7 +392,7 @@ ImageFloatBox move_sandwich_hand(
     std::pair<double, double> last_loc(-1, -1);
     std::pair<double, double> speed(-1, -1);
     WallClock cur_time, last_time;
-    VideoOverlaySet overlay_set(console.overlay());
+    VideoOverlaySet overlay_set(stream.overlay());
 
     if (PreloadSettings::instance().DEVELOPER_MODE){
         #if 0
@@ -408,23 +422,24 @@ ImageFloatBox move_sandwich_hand(
     }
 
     while(true){
-        int ret = wait_until(console, context, std::chrono::seconds(5), {hand_watcher});
+        int ret = wait_until(stream, context, std::chrono::seconds(5), {hand_watcher});
         if (ret < 0){
             // - the sandwich hand might be at the edge of the screen, so move it to the middle
             // and try searching the entire screen again
             // - move hand to bottom-right, then to the middle
-            console.log(
+            stream.log(
                 "Failed to detect sandwich hand. It may be at the screen's edge. " 
-                "Try moving the hand to the middle of the screen and try searching again.");
+                "Try moving the hand to the middle of the screen and try searching again."
+            );
 
-            if(move_then_recover_sandwich_hand_position(info, console, context, hand_type, hand_watcher, move_session)){
+            if(move_then_recover_sandwich_hand_position(info, stream, context, hand_type, hand_watcher, move_session)){
                 continue;
             }
 
         }
 
         auto cur_loc = hand_watcher.location();
-        console.log("Hand location: " + std::to_string(cur_loc.first) + ", " + std::to_string(cur_loc.second));
+        stream.log("Hand location: " + std::to_string(cur_loc.first) + ", " + std::to_string(cur_loc.second));
         cur_time = current_time();
 
         const ImageFloatBox hand_bb = hand_location_to_box(cur_loc); 
@@ -438,7 +453,7 @@ ImageFloatBox move_sandwich_hand(
         std::pair<double, double> dif(target_loc.first - cur_loc.first, target_loc.second - cur_loc.second);
         // console.log("float diff to target: " + std::to_string(dif.first) + ", " + std::to_string(dif.second));
         if (std::fabs(dif.first) < end_box.width/2 && std::fabs(dif.second) < end_box.height/2){
-            console.log(SANDWICH_HAND_TYPE_NAMES(hand_type) + " hand reached target.");
+            stream.log(SANDWICH_HAND_TYPE_NAMES(hand_type) + " hand reached target.");
             move_session.stop_session_and_rethrow(); // Stop the commands
             if (hand_type == SandwichHandType::GRABBING){
                 // wait for some time to let hand release ingredient
@@ -492,7 +507,7 @@ ImageFloatBox move_sandwich_hand(
             pbf_move_left_joystick(context, joystick_x, joystick_y, 20, 0);
         });
         
-        console.log("Moved joystick");
+        stream.log("Moved joystick");
 
         last_loc = cur_loc;
         last_time = cur_time;
@@ -502,11 +517,14 @@ ImageFloatBox move_sandwich_hand(
 
 } // end anonymous namesapce
 
-void finish_sandwich_eating(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context){
-    console.overlay().add_log("Eating", COLOR_WHITE);
+void finish_sandwich_eating(
+    const ProgramInfo& info,
+    VideoStream& stream, SwitchControllerContext& context
+){
+    stream.overlay().add_log("Eating", COLOR_WHITE);
     PicnicWatcher picnic_watcher;
     int ret = run_until<SwitchControllerContext>(
-        console, context,
+        stream, context,
         [](SwitchControllerContext& context){
             for(int i = 0; i < 20; i++){
                 pbf_press_button(context, BUTTON_A, 20, 3*TICKS_PER_SECOND - 20);
@@ -515,18 +533,21 @@ void finish_sandwich_eating(const ProgramInfo& info, ConsoleHandle& console, Swi
         {picnic_watcher}
     );
     if (ret < 0){
-        dump_image_and_throw_recoverable_exception(info, console, "PicnicNotDetected",
-            "finish_sandwich_eating(): cannot detect picnic after 60 seconds.");
+        dump_image_and_throw_recoverable_exception(
+            info, stream, "PicnicNotDetected",
+            "finish_sandwich_eating(): cannot detect picnic after 60 seconds."
+        );
     }
-    console.overlay().add_log("Finish eating", COLOR_WHITE);
-    console.log("Finished eating sandwich. Back at picnic.");
+    stream.overlay().add_log("Finish eating", COLOR_WHITE);
+    stream.log("Finished eating sandwich. Back at picnic.");
     context.wait_for(std::chrono::seconds(1));
 }
 
 namespace{
 
 void repeat_press_until(
-    const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context,
+    const ProgramInfo& info,
+    VideoStream& stream, SwitchControllerContext& context,
     std::function<void()> button_press,
     const std::vector<PeriodicInferenceCallback>& callbacks,
     const std::string &error_name, const std::string &error_message,
@@ -538,19 +559,22 @@ void repeat_press_until(
     button_press();
     for(size_t i_try = 0; i_try < max_presses; i_try++){
         context.wait_for_all_requests();
-        const int ret = wait_until(console, context, detection_timeout, callbacks);
+        const int ret = wait_until(stream, context, detection_timeout, callbacks);
         if (ret >= 0){
             return;
         }
         button_press();
     }
 
-    dump_image_and_throw_recoverable_exception(info, console, "IngredientListNotDetected",
-        "enter_custom_sandwich_mode(): cannot detect ingredient list after 50 seconds.");
+    dump_image_and_throw_recoverable_exception(
+        info, stream, "IngredientListNotDetected",
+        "enter_custom_sandwich_mode(): cannot detect ingredient list after 50 seconds."
+    );
 }
 
 void repeat_button_press_until(
-    const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context,
+    const ProgramInfo& info,
+    VideoStream& stream, SwitchControllerContext& context,
     uint16_t button, uint16_t hold_ticks, uint16_t release_ticks,
     const std::vector<PeriodicInferenceCallback>& callbacks,
     const std::string &error_name, const std::string &error_message,
@@ -560,7 +584,8 @@ void repeat_button_press_until(
     std::chrono::milliseconds default_audio_period = std::chrono::milliseconds(20)
 ){
     const std::chrono::milliseconds button_time = std::chrono::milliseconds((hold_ticks + release_ticks) * (1000 / TICKS_PER_SECOND));
-    repeat_press_until(info, console, context,
+    repeat_press_until(
+        info, stream, context,
         [&](){ pbf_press_button(context, button, hold_ticks, release_ticks); },
         callbacks, error_name, error_message, iteration_length - button_time, max_presses,
         default_video_period, default_audio_period
@@ -568,7 +593,7 @@ void repeat_button_press_until(
 }
 
 void repeat_dpad_press_until(
-    const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context,
+    const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context,
     uint8_t dpad_position, uint16_t hold_ticks, uint16_t release_ticks,
     const std::vector<PeriodicInferenceCallback>& callbacks,
     const std::string &error_name, const std::string &error_message,
@@ -578,7 +603,8 @@ void repeat_dpad_press_until(
     std::chrono::milliseconds default_audio_period = std::chrono::milliseconds(20)
 ){
     const std::chrono::milliseconds button_time = std::chrono::milliseconds((hold_ticks + release_ticks) * (1000 / TICKS_PER_SECOND));
-    repeat_press_until(info, console, context,
+    repeat_press_until(
+        info, stream, context,
         [&](){ pbf_press_dpad(context, dpad_position, hold_ticks, release_ticks); },
         callbacks, error_name, error_message, iteration_length - button_time, max_presses, 
         default_video_period, default_audio_period
@@ -589,14 +615,17 @@ void repeat_dpad_press_until(
 } // anonymous namespace
 
 
-void enter_custom_sandwich_mode(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context){
+void enter_custom_sandwich_mode(
+    const ProgramInfo& info,
+    VideoStream& stream, SwitchControllerContext& context
+){
     context.wait_for_all_requests();
-    console.log("Entering custom sandwich mode.");
-    console.overlay().add_log("Custom sandwich", COLOR_WHITE);
+    stream.log("Entering custom sandwich mode.");
+    stream.overlay().add_log("Custom sandwich", COLOR_WHITE);
 
     SandwichIngredientArrowWatcher ingredient_selection_arrow(0, COLOR_YELLOW);
     repeat_button_press_until(
-        info, console, context, BUTTON_X, 40, 80, {ingredient_selection_arrow},
+        info, stream, context, BUTTON_X, 40, 80, {ingredient_selection_arrow},
         "IngredientListNotDetected", "enter_custom_sandwich_mode(): cannot detect ingredient list after 50 seconds."
     );
 }
@@ -604,56 +633,67 @@ void enter_custom_sandwich_mode(const ProgramInfo& info, ConsoleHandle& console,
 namespace{
 
 void finish_two_herbs_sandwich(
-    const ProgramInfo& info, AsyncDispatcher& dispatcher, ConsoleHandle& console, SwitchControllerContext& context
+    const ProgramInfo& info, AsyncDispatcher& dispatcher,
+    VideoStream& stream, SwitchControllerContext& context
 ){
-    console.log("Finish determining ingredients for two-sweet-herb sandwich.");
-    console.overlay().add_log("Finish picking ingredients", COLOR_WHITE);
+    stream.log("Finish determining ingredients for two-sweet-herb sandwich.");
+    stream.overlay().add_log("Finish picking ingredients", COLOR_WHITE);
 
-    wait_for_initial_hand(info, console, context);
+    wait_for_initial_hand(info, stream, context);
 
-    console.overlay().add_log("Start making sandwich", COLOR_WHITE);
-    move_sandwich_hand(info, dispatcher, console, context, SandwichHandType::FREE, false, HAND_INITIAL_BOX, INGREDIENT_BOX);
+    stream.overlay().add_log("Start making sandwich", COLOR_WHITE);
+    move_sandwich_hand(info, dispatcher, stream, context, SandwichHandType::FREE, false, HAND_INITIAL_BOX, INGREDIENT_BOX);
     // Mash button A to pick and drop ingredients, upper bread and pick.
     // Egg Power 3 is applied with only two sweet herb condiments!
     pbf_mash_button(context, BUTTON_A, 8 * TICKS_PER_SECOND);
     context.wait_for_all_requests();
-    console.overlay().add_log("Built sandwich", COLOR_WHITE);
+    stream.overlay().add_log("Built sandwich", COLOR_WHITE);
 }
 
 } // anonymous namesapce
 
 void make_two_herbs_sandwich(
-    const ProgramInfo& info, AsyncDispatcher& dispatcher, ConsoleHandle& console, SwitchControllerContext& context,
+    const ProgramInfo& info, AsyncDispatcher& dispatcher, VideoStream& stream, SwitchControllerContext& context,
     EggSandwichType sandwich_type, size_t sweet_herb_index_last, size_t salty_herb_index_last, size_t bitter_herb_index_last
 ){
     // The game has at most 5 herbs, in the order of sweet, salty, sour, bitter, spicy:
     if (sweet_herb_index_last >= 5){ // sweet index can only be: 0, 1, 2, 3, 4
-        throw InternalProgramError(&console.logger(), PA_CURRENT_FUNCTION,
-            "Invalid sweet herb index: " + std::to_string(sweet_herb_index_last));
+        throw InternalProgramError(
+            &stream.logger(), PA_CURRENT_FUNCTION,
+            "Invalid sweet herb index: " + std::to_string(sweet_herb_index_last)
+        );
     }
     if (salty_herb_index_last >= 4){ // 0, 1, 2, 3
-        throw InternalProgramError(&console.logger(), PA_CURRENT_FUNCTION,
-            "Invalid salty herb index: " + std::to_string(salty_herb_index_last));
+        throw InternalProgramError(
+            &stream.logger(), PA_CURRENT_FUNCTION,
+            "Invalid salty herb index: " + std::to_string(salty_herb_index_last)
+        );
     }
     if (bitter_herb_index_last >= 2){ // 0, 1
-        throw InternalProgramError(&console.logger(), PA_CURRENT_FUNCTION,
-            "Invalid bitter herb index: " + std::to_string(bitter_herb_index_last));
+        throw InternalProgramError(
+            &stream.logger(), PA_CURRENT_FUNCTION,
+            "Invalid bitter herb index: " + std::to_string(bitter_herb_index_last)
+        );
     }
 
     if (sandwich_type == EggSandwichType::SALTY_SWEET_HERBS && salty_herb_index_last >= sweet_herb_index_last){
-        throw InternalProgramError(&console.logger(), PA_CURRENT_FUNCTION,
-            "Invalid salty and sweet herb indices: " + std::to_string(salty_herb_index_last) + ", " + std::to_string(sweet_herb_index_last));
+        throw InternalProgramError(
+            &stream.logger(), PA_CURRENT_FUNCTION,
+            "Invalid salty and sweet herb indices: " + std::to_string(salty_herb_index_last) + ", " + std::to_string(sweet_herb_index_last)
+        );
     }
     if (sandwich_type == EggSandwichType::BITTER_SWEET_HERBS && bitter_herb_index_last >= sweet_herb_index_last){
-        throw InternalProgramError(&console.logger(), PA_CURRENT_FUNCTION,
-            "Invalid bitter and sweet herb indices: " + std::to_string(bitter_herb_index_last) + ", " + std::to_string(sweet_herb_index_last));
+        throw InternalProgramError(
+            &stream.logger(), PA_CURRENT_FUNCTION,
+            "Invalid bitter and sweet herb indices: " + std::to_string(bitter_herb_index_last) + ", " + std::to_string(sweet_herb_index_last)
+        );
     }
 
     {
         // Press button A to add first filling, assumed to be lettuce
         DeterminedSandwichIngredientWatcher filling_watcher(SandwichIngredientType::FILLING, 0);
         repeat_button_press_until(
-            info, console, context, BUTTON_A, 40, 50, {filling_watcher},
+            info, stream, context, BUTTON_A, 40, 50, {filling_watcher},
             "DeterminedIngredientNotDetected", "make_two_herbs_sandwich(): cannot detect determined lettuce after 50 seconds."
         );
     }
@@ -662,7 +702,7 @@ void make_two_herbs_sandwich(
         // Press button + to go to condiments page
         SandwichCondimentsPageWatcher condiments_page_watcher;
         repeat_button_press_until(
-            info, console, context, BUTTON_PLUS, 40, 60, {condiments_page_watcher},
+            info, stream, context, BUTTON_PLUS, 40, 60, {condiments_page_watcher},
             "CondimentsPageNotDetected", "make_two_herbs_sandwich(): cannot detect condiments page after 50 seconds."
         );
     }
@@ -679,14 +719,14 @@ void make_two_herbs_sandwich(
         first_herb_index_last = bitter_herb_index_last;
         break;
     default:
-        throw InternalProgramError(&console.logger(), PA_CURRENT_FUNCTION,
+        throw InternalProgramError(&stream.logger(), PA_CURRENT_FUNCTION,
             "Invalid EggSandwichType for make_two_herbs_sandwich()");
     }
 
     auto move_one_up_to_row = [&](size_t row){
-        console.log("Move arrow to row " + std::to_string(row));
+        stream.log("Move arrow to row " + std::to_string(row));
         SandwichIngredientArrowWatcher arrow(row);
-        repeat_dpad_press_until(info, console, context, DPAD_UP, 10, 30, {arrow}, "IngredientArrowNotDetected",
+        repeat_dpad_press_until(info, stream, context, DPAD_UP, 10, 30, {arrow}, "IngredientArrowNotDetected",
             "make_two_herbs_sandwich(): cannot detect ingredient selection arrow at row " + std::to_string(row) + " after 50 seconds."
         );
     };
@@ -694,7 +734,7 @@ void make_two_herbs_sandwich(
     auto press_a_to_determine_herb = [&](size_t herb_index){
         DeterminedSandwichIngredientWatcher herb_watcher(SandwichIngredientType::CONDIMENT, herb_index);
         repeat_button_press_until(
-            info, console, context, BUTTON_A, 40, 60, {herb_watcher}, "CondimentsPageNotDetected",
+            info, stream, context, BUTTON_A, 40, 60, {herb_watcher}, "CondimentsPageNotDetected",
             "make_two_herbs_sandwich(): cannot detect detemined herb at cell " + std::to_string(herb_index) + " after 50 seconds."
         );
     };
@@ -714,7 +754,7 @@ void make_two_herbs_sandwich(
         // Press button + to go to picks page
         SandwichPicksPageWatcher picks_page_watcher;
         repeat_button_press_until(
-            info, console, context, BUTTON_PLUS, 40, 60, {picks_page_watcher},
+            info, stream, context, BUTTON_PLUS, 40, 60, {picks_page_watcher},
             "CondimentsPageNotDetected", "make_two_herbs_sandwich(): cannot detect picks page after 50 seconds."
         );
     }
@@ -723,11 +763,11 @@ void make_two_herbs_sandwich(
     pbf_mash_button(context, BUTTON_A, 80);
     context.wait_for_all_requests();
 
-    finish_two_herbs_sandwich(info, dispatcher, console, context);
+    finish_two_herbs_sandwich(info, dispatcher, stream, context);
 }
 
 void make_two_herbs_sandwich(
-    const ProgramInfo& info, AsyncDispatcher& dispatcher, ConsoleHandle& console, SwitchControllerContext& context,
+    const ProgramInfo& info, AsyncDispatcher& dispatcher, VideoStream& stream, SwitchControllerContext& context,
     EggSandwichType sandwich_type, Language language
 ){
     std::map<std::string, uint8_t> fillings = {{"lettuce", (uint8_t)1}};
@@ -743,18 +783,26 @@ void make_two_herbs_sandwich(
         condiments["bitter-herba-mystica"] = 1;
         break;
     default:
-        throw InternalProgramError(&console.logger(), PA_CURRENT_FUNCTION,
-            "Invalid EggSandwichType for make_two_herbs_sandwich()");
+        throw InternalProgramError(
+            &stream.logger(), PA_CURRENT_FUNCTION,
+            "Invalid EggSandwichType for make_two_herbs_sandwich()"
+        );
     }
-    add_sandwich_ingredients(dispatcher, console, context, language, std::move(fillings), std::move(condiments));
+    add_sandwich_ingredients(
+        dispatcher,
+        stream, context,
+        language,
+        std::move(fillings),
+        std::move(condiments)
+    );
 
-    finish_two_herbs_sandwich(info, dispatcher, console, context);
+    finish_two_herbs_sandwich(info, dispatcher, stream, context);
 }
 
-void make_sandwich_option(ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context, SandwichMakerOption& SANDWICH_OPTIONS){
+void make_sandwich_option(ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context, SandwichMakerOption& SANDWICH_OPTIONS){
     const Language language = SANDWICH_OPTIONS.LANGUAGE;
     if (language == Language::None){
-        throw UserSetupError(console.logger(), "Must set game language option to read ingredient lists.");
+        throw UserSetupError(stream.logger(), "Must set game language option to read ingredient lists.");
     }
 
     int num_fillings = 0;
@@ -764,8 +812,8 @@ void make_sandwich_option(ProgramEnvironment& env, ConsoleHandle& console, Switc
 
     //Add the selected ingredients to the maps if set to custom
     if (SANDWICH_OPTIONS.BASE_RECIPE == BaseRecipe::custom){
-        console.log("Custom sandwich selected. Validating ingredients.", COLOR_BLACK);
-        console.overlay().add_log("Custom sandwich selected.");
+        stream.log("Custom sandwich selected. Validating ingredients.", COLOR_BLACK);
+        stream.overlay().add_log("Custom sandwich selected.");
 
         std::vector<std::unique_ptr<SandwichIngredientsTableRow>> table = SANDWICH_OPTIONS.SANDWICH_INGREDIENTS.copy_snapshot();
 
@@ -780,24 +828,24 @@ void make_sandwich_option(ProgramEnvironment& env, ConsoleHandle& console, Switc
                     num_condiments++;
                 }
             }else{
-                console.log("Skipping baguette as it is unobtainable.");
-                console.overlay().add_log("Skipping baguette as it is unobtainable.", COLOR_WHITE);
+                stream.log("Skipping baguette as it is unobtainable.");
+                stream.overlay().add_log("Skipping baguette as it is unobtainable.", COLOR_WHITE);
             }
         }
 
         if (num_fillings == 0 || num_condiments == 0){
-            throw UserSetupError(console.logger(), "Must have at least one filling and at least one condiment.");
+            throw UserSetupError(stream.logger(), "Must have at least one filling and at least one condiment.");
         }
 
         if (num_fillings > 6 || num_condiments > 4){
-            throw UserSetupError(console.logger(), "Number of fillings exceed 6 and/or number of condiments exceed 4.");
+            throw UserSetupError(stream.logger(), "Number of fillings exceed 6 and/or number of condiments exceed 4.");
         }
-        console.log("Ingredients validated.", COLOR_BLACK);
-        console.overlay().add_log("Ingredients validated.", COLOR_WHITE);
+        stream.log("Ingredients validated.", COLOR_BLACK);
+        stream.overlay().add_log("Ingredients validated.", COLOR_WHITE);
     }
-    else if(SANDWICH_OPTIONS.BASE_RECIPE == BaseRecipe::non_shiny){
-        console.log("Preset sandwich selected.", COLOR_BLACK);
-        console.overlay().add_log("Preset sandwich selected.");
+else if(SANDWICH_OPTIONS.BASE_RECIPE == BaseRecipe::non_shiny){
+        stream.log("Preset sandwich selected.", COLOR_BLACK);
+        stream.overlay().add_log("Preset sandwich selected.");
 
         // std::vector<std::string> table = SANDWICH_OPTIONS.get_premade_ingredients(
         //     SANDWICH_OPTIONS.get_premade_sandwich_recipe(SANDWICH_OPTIONS.BASE_RECIPE, SANDWICH_OPTIONS.TYPE, SANDWICH_OPTIONS.PARADOX));
@@ -817,8 +865,8 @@ void make_sandwich_option(ProgramEnvironment& env, ConsoleHandle& console, Switc
     }
     //Otherwise get the preset ingredients
     else{
-        console.log("Preset sandwich selected.", COLOR_BLACK);
-        console.overlay().add_log("Preset sandwich selected.");
+        stream.log("Preset sandwich selected.", COLOR_BLACK);
+        stream.overlay().add_log("Preset sandwich selected.");
 
         std::vector<std::string> table = SANDWICH_OPTIONS.get_premade_ingredients(
             SANDWICH_OPTIONS.get_premade_sandwich_recipe(SANDWICH_OPTIONS.BASE_RECIPE, SANDWICH_OPTIONS.TYPE, SANDWICH_OPTIONS.PARADOX));
@@ -857,10 +905,10 @@ void make_sandwich_option(ProgramEnvironment& env, ConsoleHandle& console, Switc
     }
     */
 
-    make_sandwich_preset(env, console, context, SANDWICH_OPTIONS.LANGUAGE, fillings, condiments);
+    make_sandwich_preset(env, stream, context, SANDWICH_OPTIONS.LANGUAGE, fillings, condiments);
 }
 
-void make_sandwich_preset(ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context, Language language, std::map<std::string, uint8_t>& fillings, std::map<std::string, uint8_t>& condiments){
+void make_sandwich_preset(ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context, Language language, std::map<std::string, uint8_t>& fillings, std::map<std::string, uint8_t>& condiments){
     //Sort the fillings by priority for building (ex. large items on bottom, cherry tomatoes on top)
     //std::vector<std::string> fillings_game_order = {"lettuce", "tomato", "cherry-tomatoes", "cucumber", "pickle", "onion", "red-onion", "green-bell-pepper", "red-bell-pepper",
     //    "yellow-bell-pepper", "avocado", "bacon", "ham", "prosciutto", "chorizo", "herbed-sausage", "hamburger", "klawf-stick", "smoked-fillet", "fried-fillet", "egg", "potato-tortilla",
@@ -919,8 +967,8 @@ void make_sandwich_preset(ProgramEnvironment& env, ConsoleHandle& console, Switc
     }
     //cout << "Number of plates: " << plates << endl;
     int plates_string = plates;
-    console.log("Number of plates: " + std::to_string(plates_string), COLOR_BLACK);
-    console.overlay().add_log("Number of plates: " + std::to_string(plates_string), COLOR_WHITE);
+    stream.log("Number of plates: " + std::to_string(plates_string), COLOR_BLACK);
+    stream.overlay().add_log("Number of plates: " + std::to_string(plates_string), COLOR_WHITE);
     for (const auto& filling: fillings){
         env.log("Require filling " + filling.first + " x" + std::to_string(int(filling.second)));
     }
@@ -930,40 +978,40 @@ void make_sandwich_preset(ProgramEnvironment& env, ConsoleHandle& console, Switc
 
     //Player must be on default sandwich menu
     std::map<std::string, uint8_t> fillings_copy(fillings); //Making a copy as we need the map for later
-    enter_custom_sandwich_mode(env.program_info(), console, context);
+    enter_custom_sandwich_mode(env.program_info(), stream, context);
     add_sandwich_ingredients(
         env.realtime_dispatcher(),
-        console, context,
+        stream, context,
         language,
         std::move(fillings_copy),
         std::move(condiments)
     );
 
-    run_sandwich_maker(env, console, context, language, fillings, fillings_sorted, plates);
+    run_sandwich_maker(env, stream, context, language, fillings, fillings_sorted, plates);
 }
 
-void run_sandwich_maker(ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context, Language language, std::map<std::string, uint8_t>& fillings, std::vector<std::string>& fillings_sorted, int& plates){
+void run_sandwich_maker(ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context, Language language, std::map<std::string, uint8_t>& fillings, std::vector<std::string>& fillings_sorted, int& plates){
 
-    wait_for_initial_hand(env.program_info(), console, context);
+    wait_for_initial_hand(env.program_info(), stream, context);
 
     //Wait for labels to appear
-    console.log("Waiting for labels to appear.", COLOR_BLACK);
-    console.overlay().add_log("Waiting for labels to appear.", COLOR_WHITE);
+    stream.log("Waiting for labels to appear.", COLOR_BLACK);
+    stream.overlay().add_log("Waiting for labels to appear.", COLOR_WHITE);
     pbf_wait(context, 300);
     context.wait_for_all_requests();
 
     //Now read in plate labels and store which plate has what
-    console.log("Reading plate labels.", COLOR_BLACK);
-    console.overlay().add_log("Reading plate labels.", COLOR_WHITE);
+    stream.log("Reading plate labels.", COLOR_BLACK);
+    stream.overlay().add_log("Reading plate labels.", COLOR_WHITE);
 
     std::vector<std::string> plate_order;
 
-    SandwichPlateDetector left_plate_detector(console.logger(), COLOR_RED, language, SandwichPlateDetector::Side::LEFT);
-    SandwichPlateDetector middle_plate_detector(console.logger(), COLOR_RED, language, SandwichPlateDetector::Side::MIDDLE);
-    SandwichPlateDetector right_plate_detector(console.logger(), COLOR_RED, language, SandwichPlateDetector::Side::RIGHT);
+    SandwichPlateDetector left_plate_detector(stream.logger(), COLOR_RED, language, SandwichPlateDetector::Side::LEFT);
+    SandwichPlateDetector middle_plate_detector(stream.logger(), COLOR_RED, language, SandwichPlateDetector::Side::MIDDLE);
+    SandwichPlateDetector right_plate_detector(stream.logger(), COLOR_RED, language, SandwichPlateDetector::Side::RIGHT);
 
     {
-        VideoSnapshot screen = console.video().snapshot();
+        VideoSnapshot screen = stream.video().snapshot();
 
         const int max_read_label_tries = 4;
         for (int read_label_try_count = 0; read_label_try_count < max_read_label_tries; ++read_label_try_count){
@@ -973,20 +1021,20 @@ void run_sandwich_maker(ProgramEnvironment& env, ConsoleHandle& console, SwitchC
                     // Wait more time
                     pbf_wait(context, TICKS_PER_SECOND * 2);
                     context.wait_for_all_requests();
-                    screen = console.video().snapshot();
+                    screen = stream.video().snapshot();
                     continue;
                 }else{
-                    console.log("Read nothing on center plate label.");
+                    stream.log("Read nothing on center plate label.");
                     OperationFailedException::fire(
                         ErrorReport::SEND_ERROR_REPORT,
                         "No ingredient found on center plate label.",
-                        console,
+                        stream,
                         std::move(screen)
                     );
                 }
             }
-            console.log("Read center plate label: " + center_filling);
-            console.overlay().add_log("Center plate: " + center_filling);
+            stream.log("Read center plate label: " + center_filling);
+            stream.overlay().add_log("Center plate: " + center_filling);
             plate_order.push_back(center_filling);
             break;
         }
@@ -994,22 +1042,22 @@ void run_sandwich_maker(ProgramEnvironment& env, ConsoleHandle& console, SwitchC
         //Get left (2nd) ingredient
         std::string left_filling = left_plate_detector.detect_filling_name(screen);
         if (left_filling.empty()){
-            console.log("No ingredient found on left label.");
-            console.overlay().add_log("No left plate");
+            stream.log("No ingredient found on left label.");
+            stream.overlay().add_log("No left plate");
         }else{
-            console.log("Read left plate label: " + left_filling);
-            console.overlay().add_log("Left plate: " + left_filling);
+            stream.log("Read left plate label: " + left_filling);
+            stream.overlay().add_log("Left plate: " + left_filling);
             plate_order.push_back(left_filling);
         }
 
         //Get right (3rd) ingredient
         std::string right_filling = right_plate_detector.detect_filling_name(screen);
         if (right_filling.empty()){
-            console.log("No ingredient found on right label.");
-            console.overlay().add_log("No right plate");
+            stream.log("No ingredient found on right label.");
+            stream.overlay().add_log("No right plate");
         }else{
-            console.log("Read right plate label: " + right_filling);
-            console.overlay().add_log("Right plate: " + right_filling);
+            stream.log("Read right plate label: " + right_filling);
+            stream.overlay().add_log("Right plate: " + right_filling);
             plate_order.push_back(right_filling);
         }
 
@@ -1021,25 +1069,25 @@ void run_sandwich_maker(ProgramEnvironment& env, ConsoleHandle& console, SwitchC
             pbf_press_button(context, BUTTON_R, 20, 180);
             context.wait_for_all_requests();
 
-            screen = console.video().snapshot();
+            screen = stream.video().snapshot();
             left_filling = left_plate_detector.detect_filling_name(screen);
 
             if (left_filling.empty()){
                 OperationFailedException::fire(
                     ErrorReport::SEND_ERROR_REPORT,
                     "No ingredient label found on remaining plate " + std::to_string(i) + ".",
-                    console,
+                    stream,
                     std::move(screen)
                 );
             }
-            console.log("Read remaining plate " + std::to_string(i) + " label: " + left_filling);
-            console.overlay().add_log("Remaining plate " + std::to_string(i) + ": " + left_filling);
+            stream.log("Read remaining plate " + std::to_string(i) + " label: " + left_filling);
+            stream.overlay().add_log("Remaining plate " + std::to_string(i) + ": " + left_filling);
             plate_order.push_back(left_filling);
         }
 
         //Now re-center plates
-        console.log("Re-centering plates if needed.");
-        console.overlay().add_log("Re-centering plates if needed.");
+        stream.log("Re-centering plates if needed.");
+        stream.overlay().add_log("Re-centering plates if needed.");
         for (int i = 0; i < (plates - 3); i++){
             pbf_press_button(context, BUTTON_L, 20, 80);
         }
@@ -1050,15 +1098,15 @@ void run_sandwich_maker(ProgramEnvironment& env, ConsoleHandle& console, SwitchC
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Number of plate labels did not match number of plates.",
-                console,
+                stream,
                 std::move(screen)
             );
         }
     }
 
     //Finally.
-    console.log("Start making sandwich", COLOR_BLACK);
-    console.overlay().add_log("Start making sandwich.", COLOR_WHITE);
+    stream.log("Start making sandwich", COLOR_BLACK);
+    stream.overlay().add_log("Start making sandwich.", COLOR_WHITE);
 
     const ImageFloatBox center_plate{ 0.455, 0.130, 0.090, 0.030 };
     const ImageFloatBox left_plate{ 0.190, 0.136, 0.096, 0.031 };
@@ -1066,20 +1114,34 @@ void run_sandwich_maker(ProgramEnvironment& env, ConsoleHandle& console, SwitchC
 
     ImageFloatBox target_plate = center_plate;
     //Initial position handling
-    auto end_box = move_sandwich_hand(env.program_info(), env.realtime_dispatcher(), console, context, SandwichHandType::FREE, false, HAND_INITIAL_BOX, HAND_INITIAL_BOX);
-    move_sandwich_hand(env.program_info(), env.realtime_dispatcher(), console, context, SandwichHandType::GRABBING, true, { 0, 0, 1.0, 1.0 }, HAND_INITIAL_BOX);
+    auto end_box = move_sandwich_hand(
+        env.program_info(), env.realtime_dispatcher(),
+        stream, context,
+        SandwichHandType::FREE,
+        false,
+        HAND_INITIAL_BOX,
+        HAND_INITIAL_BOX
+    );
+    move_sandwich_hand(
+        env.program_info(), env.realtime_dispatcher(),
+        stream, context,
+        SandwichHandType::GRABBING,
+        true,
+        { 0, 0, 1.0, 1.0 },
+        HAND_INITIAL_BOX
+    );
     context.wait_for_all_requests();
 
     //Find fillings and add them in order
     for (const std::string& i : fillings_sorted){
         //cout << "Placing " << i << endl;
-        console.overlay().add_log("Placing " + i, COLOR_WHITE);
+        stream.overlay().add_log("Placing " + i, COLOR_WHITE);
 
         int times_to_place = (int)(FillingsCoordinates::instance().get_filling_information(i).piecesPerServing) * (fillings.find(i)->second);
         int placement_number = 0;
 
         //cout << "Times to place: " << times_to_place << endl;
-        console.overlay().add_log("Times to place: " + std::to_string(times_to_place), COLOR_WHITE);
+        stream.overlay().add_log("Times to place: " + std::to_string(times_to_place), COLOR_WHITE);
 
         std::vector<int> plate_index;
         //Get the plates we want to go to
@@ -1093,7 +1155,7 @@ void run_sandwich_maker(ProgramEnvironment& env, ConsoleHandle& console, SwitchC
         for (int j = 0; j < (int)plate_index.size(); j++){
             //Navigate to plate and set target plate
             //cout << "Target plate: " << plate_index.at(j) << endl;
-            console.overlay().add_log("Target plate: " + std::to_string(plate_index.at(j)), COLOR_WHITE);
+            stream.overlay().add_log("Target plate: " + std::to_string(plate_index.at(j)), COLOR_WHITE);
             switch (plate_index.at(j)){
             case 0:
                 target_plate = center_plate;
@@ -1122,20 +1184,32 @@ void run_sandwich_maker(ProgramEnvironment& env, ConsoleHandle& console, SwitchC
                     break;
                 }
 
-                end_box = move_sandwich_hand(env.program_info(), env.realtime_dispatcher(), console, context, SandwichHandType::FREE,
-                    false, { 0, 0, 1.0, 1.0 }, target_plate);
+                end_box = move_sandwich_hand(
+                    env.program_info(), env.realtime_dispatcher(),
+                    stream, context,
+                    SandwichHandType::FREE,
+                    false,
+                    { 0, 0, 1.0, 1.0 },
+                    target_plate
+                );
                 context.wait_for_all_requests();
 
                 //Get placement location
                 ImageFloatBox placement_target = FillingsCoordinates::instance().get_filling_information(i).placementCoordinates.at(
                     (int)fillings.find(i)->second).at(placement_number);
 
-                end_box = move_sandwich_hand(env.program_info(), env.realtime_dispatcher(), console, context, SandwichHandType::GRABBING,
-                    true, expand_box(end_box), placement_target);
+                end_box = move_sandwich_hand(
+                    env.program_info(), env.realtime_dispatcher(),
+                    stream, context,
+                    SandwichHandType::GRABBING,
+                    true,
+                    expand_box(end_box),
+                    placement_target
+                );
                 context.wait_for_all_requests();
 
                 //If any of the labels are yellow continue. Otherwise assume plate is empty move on to the next.
-                auto screen = console.video().snapshot();
+                auto screen = stream.video().snapshot();
 
                 //The label check is needed for ingredients with multiple plates as we don't know which plate has what amount
                 if (!left_plate_detector.is_label_yellow(screen) && !middle_plate_detector.is_label_yellow(screen)
@@ -1156,28 +1230,35 @@ void run_sandwich_maker(ProgramEnvironment& env, ConsoleHandle& console, SwitchC
     }
     // Handle top slice by tossing it away
     SandwichHandWatcher grabbing_hand(SandwichHandType::FREE, { 0, 0, 1.0, 1.0 });
-    int ret = wait_until(console, context, std::chrono::seconds(30), { grabbing_hand });
+    int ret = wait_until(stream, context, std::chrono::seconds(30), { grabbing_hand });
     if (ret < 0){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "SandwichMaker: Cannot detect grabing hand when waiting for upper bread.",
-            console,
+            stream,
             grabbing_hand.last_snapshot()
         );
     }
 
     auto hand_box = hand_location_to_box(grabbing_hand.location());
 
-    end_box = move_sandwich_hand(env.program_info(), env.realtime_dispatcher(), console, context, SandwichHandType::GRABBING, false, expand_box(hand_box), center_plate);
+    end_box = move_sandwich_hand(
+        env.program_info(), env.realtime_dispatcher(),
+        stream, context,
+        SandwichHandType::GRABBING,
+        false,
+        expand_box(hand_box),
+        center_plate
+    );
     pbf_mash_button(context, BUTTON_A, 125 * 5);
 
     env.log("Hand end box " + box_to_string(end_box));
     env.log("Built sandwich", COLOR_BLACK);
     // env.console.overlay().add_log("Hand end box " + box_to_string(end_box), COLOR_WHITE);
-    console.overlay().add_log("Built sandwich.", COLOR_WHITE);
+    stream.overlay().add_log("Built sandwich.", COLOR_WHITE);
     context.wait_for_all_requests();
 
-    finish_sandwich_eating(env.program_info(), console, context);
+    finish_sandwich_eating(env.program_info(), stream, context);
 }
 
 }
