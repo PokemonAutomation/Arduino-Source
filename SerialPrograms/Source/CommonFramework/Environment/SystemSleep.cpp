@@ -29,17 +29,13 @@ SystemSleepController::SystemSleepController()
 {}
 
 void SystemSleepController::add_listener(Listener& listener){
-    std::lock_guard<std::mutex> lg(m_lock);
-    m_listeners.insert(&listener);
+    m_listeners.add(listener);
 }
 void SystemSleepController::remove_listener(Listener& listener){
-    std::lock_guard<std::mutex> lg(m_lock);
-    m_listeners.erase(&listener);
+    m_listeners.remove(listener);
 }
 void SystemSleepController::notify_listeners(SleepSuppress state){
-    for (Listener* listener : m_listeners){
-        listener->sleep_suppress_state_changed(state);
-    }
+    m_listeners.run_method_unique(&Listener::sleep_suppress_state_changed, state);
 }
 
 SleepSuppress SystemSleepController::current_state() const{

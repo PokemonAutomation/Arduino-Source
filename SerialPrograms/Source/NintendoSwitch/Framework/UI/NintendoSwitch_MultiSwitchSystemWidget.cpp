@@ -53,11 +53,6 @@ MultiSwitchSystemWidget::MultiSwitchSystemWidget(
     row->addWidget(m_console_count_box, 1);
     row->addStretch(2);
 
-    //  Acquire the lock now and attach listener. This will block the session
-    //  from changing the # of switches while we draw everything.
-    std::lock_guard<std::mutex> lg(m_lock);
-    m_session.add_listener(*this);
-
     for (size_t c = session.min_switches(); c <= session.max_switches(); c++){
         m_console_count_box->addItem(QString::number(c));
     }
@@ -73,7 +68,18 @@ MultiSwitchSystemWidget::MultiSwitchSystemWidget(
         }
     );
 
+
+#if 0
+    //  Acquire the lock now and attach listener. This will block the session
+    //  from changing the # of switches while we draw everything.
+    std::lock_guard<std::mutex> lg(m_lock);
+    m_session.add_listener(*this);
+
+    m_console_count_box->setCurrentIndex((int)(m_session.count() - m_session.min_switches()));
+
     redraw_videos(m_session.count());
+#endif
+    m_session.add_listener(*this);
 }
 
 void MultiSwitchSystemWidget::shutdown(){
@@ -100,6 +106,12 @@ void MultiSwitchSystemWidget::redraw_videos(size_t count){
 //    }
     if (m_shutting_down){
         return;
+    }
+
+    int old_index = m_console_count_box->currentIndex();
+    int new_index = (int)(m_session.count() - m_session.min_switches());
+    if (new_index != old_index){
+        m_console_count_box->setCurrentIndex(new_index);
     }
 
     QVBoxLayout* layout = static_cast<QVBoxLayout*>(this->layout());
