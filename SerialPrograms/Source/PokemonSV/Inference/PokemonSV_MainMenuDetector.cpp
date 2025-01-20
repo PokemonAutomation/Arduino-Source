@@ -8,7 +8,6 @@
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Images/SolidColorTest.h"
-#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSV_MainMenuDetector.h"
 
@@ -92,12 +91,13 @@ std::pair<MenuSide, int> MainMenuDetector::detect_location(const ImageViewRGB32&
 
 
 bool MainMenuDetector::move_cursor(
-    const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context,
+    const ProgramInfo& info,
+    VideoStream& stream, SwitchControllerContext& context,
     MenuSide side, int row, bool fast
 ) const{
     if (side == MenuSide::NONE){
         throw InternalProgramError(
-            &console.logger(), PA_CURRENT_FUNCTION,
+            &stream.logger(), PA_CURRENT_FUNCTION,
             "MainMenuDetector::move_cursor() called with MenuSide::NONE."
         );
     }
@@ -107,7 +107,7 @@ bool MainMenuDetector::move_cursor(
     bool target_reached = false;
     while (true){
         context.wait_for_all_requests();
-        VideoSnapshot screen = console.video().snapshot();
+        VideoSnapshot screen = stream.video().snapshot();
         std::pair<MenuSide, int> current = this->detect_location(screen);
 
         {
@@ -124,7 +124,7 @@ bool MainMenuDetector::move_cursor(
                 break;
             }
             text += " " + std::to_string(current.second);
-            console.log(text);
+            stream.log(text);
         }
 
         //  Failed to detect menu.
@@ -134,7 +134,7 @@ bool MainMenuDetector::move_cursor(
                 OperationFailedException::fire(
                     ErrorReport::SEND_ERROR_REPORT,
                     "MainMenuDetector::move_cursor(): Unable to detect menu.",
-                    console,
+                    stream,
                     screen
                 );
             }
@@ -144,7 +144,7 @@ bool MainMenuDetector::move_cursor(
         consecutive_detection_fails = 0;
 
         if (moves >= 20){
-            console.log("Unable to move to target after 20 moves.", COLOR_RED);
+            stream.log("Unable to move to target after 20 moves.", COLOR_RED);
             return false;
         }
 

@@ -9,14 +9,10 @@
 
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
-#include "Common/Cpp/Options/FloatingPointOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
-#include "PokemonLA/PokemonLA_Locations.h"
-#include "PokemonLA/PokemonLA_TravelLocations.h"
 #include "PokemonLA/Options/PokemonLA_MiscOptions.h"
 #include "PokemonLA/Options/PokemonLA_ShinyDetectedAction.h"
-#include "PokemonLA/Options/PokemonLA_TravelLocation.h"
 #include "PokemonLA/Options/PokemonLA_CustomPathTable.h"
 
 namespace PokemonAutomation{
@@ -44,7 +40,10 @@ private:
     void run_path(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
 
     // Do one action (while ignoring listen-related actions)
-    void do_non_listen_action(ConsoleHandle& console, SwitchControllerContext& context, const CustomPathTableRow2& row);
+    void do_non_listen_action(
+        VideoStream& stream, SwitchControllerContext& context,
+        const CustomPathTableRow2& row
+    );
 
 private:
     ShinyRequiresAudioText SHINY_REQUIRES_AUDIO;

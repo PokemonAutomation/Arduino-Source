@@ -10,7 +10,6 @@
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
-#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Routines.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
@@ -27,17 +26,17 @@ namespace PokemonLA{
 
 
 bool reset_game_to_gamemenu(
-    ConsoleHandle& console, SwitchControllerContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     bool tolerate_update_menu
 ){
-    bool video_available = (bool)console.video().snapshot();
+    bool video_available = (bool)stream.video().snapshot();
     if (video_available ||
         ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET ||
         tolerate_update_menu
     ){
-        close_game(console, context);
+        close_game(stream, context);
         start_game_from_home(
-            console,
+            stream,
             context,
             tolerate_update_menu,
             0, 0,
@@ -49,44 +48,44 @@ bool reset_game_to_gamemenu(
     }
 
     // Now the game has opened:
-    return openedgame_to_gamemenu(console, context, GameSettings::instance().START_GAME_WAIT0);
+    return openedgame_to_gamemenu(stream, context, GameSettings::instance().START_GAME_WAIT0);
 }
 
 bool gamemenu_to_ingame(
-    ConsoleHandle& console, SwitchControllerContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     uint16_t mash_duration, uint16_t enter_game_timeout
 ){
-    console.log("Mashing A to enter game...");
+    stream.log("Mashing A to enter game...");
     BlackScreenOverWatcher detector(COLOR_RED, {0.2, 0.2, 0.6, 0.6});
     pbf_mash_button(context, BUTTON_A, mash_duration);
     context.wait_for_all_requests();
-    console.log("Waiting to enter game...");
+    stream.log("Waiting to enter game...");
     int ret = wait_until(
-        console, context,
+        stream, context,
         std::chrono::milliseconds(enter_game_timeout * (1000 / TICKS_PER_SECOND)),
         {{detector}}
     );
     if (ret == 0){
-        console.log("Entered game!");
+        stream.log("Entered game!");
         return true;
     }else{
-        console.log("Timed out waiting to enter game.", COLOR_RED);
+        stream.log("Timed out waiting to enter game.", COLOR_RED);
         return false;
     }
 }
 
 bool reset_game_from_home(
-    ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context,
+    ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context,
     bool tolerate_update_menu,
     uint16_t post_wait_time
 ){
     bool ok = true;
-    ok &= reset_game_to_gamemenu(console, context, tolerate_update_menu);
-    ok &= gamemenu_to_ingame(console, context, GameSettings::instance().ENTER_GAME_MASH, GameSettings::instance().ENTER_GAME_WAIT);
+    ok &= reset_game_to_gamemenu(stream, context, tolerate_update_menu);
+    ok &= gamemenu_to_ingame(stream, context, GameSettings::instance().ENTER_GAME_MASH, GameSettings::instance().ENTER_GAME_WAIT);
     if (!ok){
-        dump_image(console, env.program_info(), console, "StartGame");
+        dump_image(stream.logger(), env.program_info(), stream.video(), "StartGame");
     }
-    console.log("Entered game! Waiting out grace period.");
+    stream.log("Entered game! Waiting out grace period.");
     pbf_wait(context, post_wait_time);
     context.wait_for_all_requests();
     return ok;

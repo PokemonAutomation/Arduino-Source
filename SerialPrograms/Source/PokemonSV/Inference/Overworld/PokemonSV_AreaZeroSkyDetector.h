@@ -9,6 +9,7 @@
 
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "CommonFramework/Tools/VideoStream.h"
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 #include "CommonTools/VisualDetector.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
@@ -21,7 +22,6 @@ namespace Waterfill{
 }
 class ProgramEnvironment;
 namespace NintendoSwitch{
-    class ConsoleHandle;
 namespace PokemonSV{
 
 
@@ -54,7 +54,7 @@ private:
 
 
 void find_and_center_on_sky(
-    ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context
+    ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context
 );
 
 

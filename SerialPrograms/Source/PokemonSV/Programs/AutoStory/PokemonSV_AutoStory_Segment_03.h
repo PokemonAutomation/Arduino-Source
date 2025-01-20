@@ -27,15 +27,27 @@ public:
 
 // start: Battled Nemona on the beach.
 // end: Met mom at gate. Received mom's sandwich.
-void checkpoint_05(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, EventNotificationOption& notif_status_update);
+void checkpoint_05(
+    SingleSwitchProgramEnvironment& env,
+    SwitchControllerContext& context,
+    EventNotificationOption& notif_status_update
+);
 
 // start: Met mom at gate. Received mom's sandwich.
 // end: Cleared catch tutorial.
-void checkpoint_06(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, EventNotificationOption& notif_status_update);
+void checkpoint_06(
+    SingleSwitchProgramEnvironment& env,
+    SwitchControllerContext& context,
+    EventNotificationOption& notif_status_update
+);
 
 // start: Cleared catch tutorial.
 // end: Moved to cliff. Heard mystery cry.
-void checkpoint_07(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, EventNotificationOption& notif_status_update);
+void checkpoint_07(
+    SingleSwitchProgramEnvironment& env,
+    SwitchControllerContext& context,
+    EventNotificationOption& notif_status_update
+);
 
 
 }

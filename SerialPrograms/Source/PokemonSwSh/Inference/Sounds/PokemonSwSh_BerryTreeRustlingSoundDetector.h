@@ -7,12 +7,12 @@
 #ifndef PokemonAutomation_PokemonSwSh_BerryTreeRustlingSoundDetector_H
 #define PokemonAutomation_PokemonSwSh_BerryTreeRustlingSoundDetector_H
 
+#include "CommonFramework/Tools/VideoStream.h"
 #include "CommonTools/Audio/AudioPerSpectrumDetectorBase.h"
 
 namespace PokemonAutomation{
     class SpectrogramMatcher;
 namespace NintendoSwitch{
-    class ConsoleHandle;
 namespace PokemonSwSh{
 
 
@@ -20,7 +20,7 @@ class BerryTreeRustlingSoundDetector : public AudioPerSpectrumDetectorBase{
 public:
     //  Warning: The callback will be called from the audio inference thread.
     BerryTreeRustlingSoundDetector(
-        ConsoleHandle& console,
+        VideoStream& stream,
         DetectedCallback detected_callback,
         float threshold
     );

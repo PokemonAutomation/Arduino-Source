@@ -21,17 +21,26 @@ public:
     virtual void run_segment(
         SingleSwitchProgramEnvironment& env, 
         SwitchControllerContext& context,
-        AutoStoryOptions options) const override;
+        AutoStoryOptions options
+    ) const override;
 };
 
 
 // start: At Porto Marinada Pokecenter.
 // end: Won auction at Porto Marinada, passed Gym challenge.
-void checkpoint_37(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, EventNotificationOption& notif_status_update);  
+void checkpoint_37(
+    SingleSwitchProgramEnvironment& env,
+    SwitchControllerContext& context,
+    EventNotificationOption& notif_status_update
+);
 
 // start: Won auction at Porto Marinada, passed Gym challenge.
 // end: Defeat Cascarrafa Gym
-void checkpoint_38(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, EventNotificationOption& notif_status_update);  
+void checkpoint_38(
+    SingleSwitchProgramEnvironment& env,
+    SwitchControllerContext& context,
+    EventNotificationOption& notif_status_update
+);
 
 
 

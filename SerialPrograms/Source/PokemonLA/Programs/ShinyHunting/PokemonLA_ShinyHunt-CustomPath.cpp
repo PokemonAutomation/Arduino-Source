@@ -112,8 +112,11 @@ ShinyHuntCustomPath::ShinyHuntCustomPath()
 }
 
 
-void ShinyHuntCustomPath::do_non_listen_action(ConsoleHandle& console, SwitchControllerContext& context, const CustomPathTableRow2& row){
-    console.log("Execute action " + row.action.current_display());
+void ShinyHuntCustomPath::do_non_listen_action(
+    VideoStream& stream, SwitchControllerContext& context,
+    const CustomPathTableRow2& row
+){
+    stream.log("Execute action " + row.action.current_display());
     switch(row.action){
     case PathAction::CHANGE_MOUNT:
     {
@@ -139,9 +142,9 @@ void ShinyHuntCustomPath::do_non_listen_action(ConsoleHandle& console, SwitchCon
         }
 
         if (mountState == MountState::NOTHING){
-            dismount(console, context);
+            dismount(stream, context);
         }else{
-            change_mount(console, context, mountState);
+            change_mount(stream, context, mountState);
         }
         break;
     }

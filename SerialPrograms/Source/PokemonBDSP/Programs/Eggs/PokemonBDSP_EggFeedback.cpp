@@ -23,17 +23,17 @@ namespace PokemonBDSP{
 
 
 
-void hatch_egg(ConsoleHandle& console, SwitchControllerContext& context){
+void hatch_egg(VideoStream& stream, SwitchControllerContext& context){
     //  Spin until egg starts hatching.
     do{
         ShortDialogWatcher dialog;
         FrozenImageDetector frozen(COLOR_CYAN, {0, 0, 1, 0.5}, std::chrono::seconds(10), 20);
-        if (dialog.detect(console.video().snapshot())){
+        if (dialog.detect(stream.video().snapshot())){
             break;
         }
 
         int ret = run_until<SwitchControllerContext>(
-            console, context,
+            stream, context,
             [](SwitchControllerContext& context){
                 egg_spin(context, 480 * TICKS_PER_SECOND);
             },
@@ -44,26 +44,26 @@ void hatch_egg(ConsoleHandle& console, SwitchControllerContext& context){
         );
         switch (ret){
         case 0:
-            console.log("Egg is hatching!");
+            stream.log("Egg is hatching!");
             break;
         case 1:
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Frozen screen detected!",
-                console
+                stream
             );
         default:
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "No hatch detected after 8 minutes of spinning.",
-                console
+                stream
             );
         }
     }while (false);
 
 
     //  Hatch the egg.
-    VideoSnapshot overworld = console.video().snapshot();
+    VideoSnapshot overworld = stream.video().snapshot();
 //    overworld.save("test-0.png");
     {
         pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);
@@ -71,17 +71,17 @@ void hatch_egg(ConsoleHandle& console, SwitchControllerContext& context){
 
         ShortDialogWatcher dialog;
         int ret = wait_until(
-            console, context, std::chrono::seconds(30),
+            stream, context, std::chrono::seconds(30),
             {{dialog}}
         );
         if (ret < 0){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "End of hatch not detected after 30 seconds.",
-                console
+                stream
             );
         }
-        console.log("Egg finished hatching.");
+        stream.log("Egg finished hatching.");
         pbf_mash_button(context, BUTTON_B, 1 * TICKS_PER_SECOND);
     }
 
@@ -92,9 +92,9 @@ void hatch_egg(ConsoleHandle& console, SwitchControllerContext& context){
         //  Wait for steady state and read it again.
         context.wait_for(std::chrono::milliseconds(200));
         ImageMatchWatcher matcher(overworld.frame, {0.10, 0.10, 0.80, 0.60}, 100);
-        SelectionArrowFinder arrow(console, {0.50, 0.60, 0.30, 0.20}, COLOR_GREEN);
+        SelectionArrowFinder arrow(stream.overlay(), {0.50, 0.60, 0.30, 0.20}, COLOR_GREEN);
         int ret = wait_until(
-            console, context, std::chrono::seconds(30),
+            stream, context, std::chrono::seconds(30),
             {
                 {matcher},
                 {arrow},
@@ -102,39 +102,39 @@ void hatch_egg(ConsoleHandle& console, SwitchControllerContext& context){
         );
         switch (ret){
         case 0:
-            console.log("Returned to overworld.");
+            stream.log("Returned to overworld.");
             return;
         case 1:
-            throw UserSetupError(console, "Detected prompt. Please turn off nicknaming.");
+            throw UserSetupError(stream.logger(), "Detected prompt. Please turn off nicknaming.");
         default:
-            console.log("Failed to detect overworld after 30 seconds. Did day/night change?", COLOR_RED);
+            stream.log("Failed to detect overworld after 30 seconds. Did day/night change?", COLOR_RED);
 //            pbf_mash_button(context, BUTTON_ZL, 30 * TICKS_PER_SECOND);
             return;
         }
     }
 }
-void hatch_party(ConsoleHandle& console, SwitchControllerContext& context, size_t eggs){
+void hatch_party(VideoStream& stream, SwitchControllerContext& context, size_t eggs){
     for (size_t c = 0; c < eggs; c++){
-        hatch_egg(console, context);
+        hatch_egg(stream, context);
     }
 }
 
-void withdraw_1st_column_from_overworld(ConsoleHandle& console, SwitchControllerContext& context){
+void withdraw_1st_column_from_overworld(VideoStream& stream, SwitchControllerContext& context){
     const uint16_t BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY_0;
     const uint16_t BOX_PICKUP_DROP_DELAY = GameSettings::instance().BOX_PICKUP_DROP_DELAY;
-    overworld_to_box(console, context);
+    overworld_to_box(stream, context);
     pbf_press_button(context, BUTTON_Y, 20, 50);
     pbf_press_button(context, BUTTON_Y, 20, 50);
     pickup_column(context);
     pbf_move_right_joystick(context, 0, 128, 20, BOX_SCROLL_DELAY);
     pbf_move_right_joystick(context, 128, 255, 20, BOX_SCROLL_DELAY);
     pbf_press_button(context, BUTTON_ZL, 20, BOX_PICKUP_DROP_DELAY);
-    box_to_overworld(console, context);
+    box_to_overworld(stream, context);
 }
 
 
 
-void release(ConsoleHandle& console, SwitchControllerContext& context){
+void release(VideoStream& stream, SwitchControllerContext& context){
     pbf_press_button(context, BUTTON_ZL, 20, 50);
     pbf_move_right_joystick(context, 128, 0, 20, 10);
     pbf_move_right_joystick(context, 128, 0, 20, 10);
@@ -144,7 +144,7 @@ void release(ConsoleHandle& console, SwitchControllerContext& context){
     ShortDialogDetector detector;
     for (size_t c = 0; c < 3; c++){
         context.wait_for_all_requests();
-        if (!detector.detect(console.video().snapshot())){
+        if (!detector.detect(stream.video().snapshot())){
             return;
         }
         pbf_press_button(context, BUTTON_ZL, 20, 105);
@@ -152,7 +152,7 @@ void release(ConsoleHandle& console, SwitchControllerContext& context){
     OperationFailedException::fire(
         ErrorReport::SEND_ERROR_REPORT,
         "Unexpected dialogs when releasing.",
-        console
+        stream
     );
 }
 

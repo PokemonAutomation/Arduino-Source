@@ -19,7 +19,6 @@
 namespace PokemonAutomation{
     struct ProgramInfo;
 namespace NintendoSwitch{
-    class ConsoleHandle;
 namespace PokemonSV{
 
 //  Detect the selection arrow in the sandwich ingredient list (the list of fillings, condiments and picks).

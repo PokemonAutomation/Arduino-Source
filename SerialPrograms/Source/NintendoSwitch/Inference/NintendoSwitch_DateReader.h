@@ -18,8 +18,6 @@ namespace PokemonAutomation{
     class Logger;
 namespace NintendoSwitch{
 
-class ConsoleHandle;
-
 
 enum class DateFormat{
     US,
@@ -42,14 +40,14 @@ public:
 //    int8_t read_hours(Logger& logger, std::shared_ptr<const ImageRGB32> screen) const;
 
     void set_hours(
-        const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context,
+        const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context,
         uint8_t hour    //  0 - 23
     ) const;
 
 
     std::pair<DateFormat, DateTime> read_date(Logger& logger, std::shared_ptr<const ImageRGB32> screen) const;
     void set_date(
-        const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context,
+        const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context,
         const DateTime& date    //  Seconds is ignored.
     ) const;
 

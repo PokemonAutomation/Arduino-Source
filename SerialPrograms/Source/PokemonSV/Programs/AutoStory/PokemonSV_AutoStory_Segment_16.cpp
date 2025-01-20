@@ -38,7 +38,11 @@ std::string AutoStory_Segment_16::end_text() const{
     return "End: Received Kofu's wallet. At Porto Marinada Pokecenter.";
 }
 
-void AutoStory_Segment_16::run_segment(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, AutoStoryOptions options) const{
+void AutoStory_Segment_16::run_segment(
+    SingleSwitchProgramEnvironment& env,
+    SwitchControllerContext& context,
+    AutoStoryOptions options
+) const{
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
 
     context.wait_for_all_requests();
@@ -71,7 +75,7 @@ void checkpoint_35(
         context.wait_for_all_requests();
         DirectionDetector direction;
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
-            [&](const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context){
+            [&](const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
                 direction.change_direction(env.program_info(), env.console, context, 0.3491);
                 pbf_move_left_joystick(context, 128, 0, 400, 100);
                 direction.change_direction(env.program_info(), env.console, context, 5.075911);

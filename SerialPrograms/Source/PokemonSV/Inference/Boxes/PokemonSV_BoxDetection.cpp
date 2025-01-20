@@ -9,7 +9,6 @@
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Images/SolidColorTest.h"
-#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSV_BoxDetection.h"
 
@@ -250,13 +249,13 @@ void BoxDetector::move_horizontal(SwitchControllerContext& context, int current,
 
 
 void BoxDetector::move_cursor(
-    const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context,
+    const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context,
     BoxCursorLocation side, uint8_t row, uint8_t col
 ) const{
     int desired_x = 0, desired_y = 0;
     if (!to_coordinates(desired_x, desired_y, side, row, col)){
         throw InternalProgramError(
-            &console.logger(), PA_CURRENT_FUNCTION,
+            &stream.logger(), PA_CURRENT_FUNCTION,
             "BoxDetector::move_cursor() called with BoxCursorLocation::NONE."
         );
     }
@@ -267,20 +266,20 @@ void BoxDetector::move_cursor(
     while (true){
         if (current_time() - start > std::chrono::seconds(60)){
             dump_image_and_throw_recoverable_exception(
-                info, console, "BoxMoveCursor",
+                info, stream, "BoxMoveCursor",
                 "Failed to move cursor to desired location after 1 minute."
             );
         }
 
         context.wait_for_all_requests();
-        VideoSnapshot screen = console.video().snapshot();
+        VideoSnapshot screen = stream.video().snapshot();
         std::pair<BoxCursorLocation, BoxCursorCoordinates> current = this->detect_location(screen);
 
         int current_x = 0, current_y = 0;
         if (!to_coordinates(current_x, current_y, current.first, current.second.row, current.second.col)){
             consecutive_fails++;
             if (consecutive_fails > 100){
-                dump_image_and_throw_recoverable_exception(info, console, "BoxSystemNotDetected", "move_cursor(): Unable to detect box system.");
+                dump_image_and_throw_recoverable_exception(info, stream, "BoxSystemNotDetected", "move_cursor(): Unable to detect box system.");
             }
             context.wait_for(std::chrono::milliseconds(100));
             continue;

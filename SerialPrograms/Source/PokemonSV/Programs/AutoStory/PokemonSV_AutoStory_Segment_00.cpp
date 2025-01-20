@@ -34,7 +34,11 @@ std::string AutoStory_Segment_00::end_text() const{
     return "End: Finished cutscene.";
 }
 
-void AutoStory_Segment_00::run_segment(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, AutoStoryOptions options) const{
+void AutoStory_Segment_00::run_segment(
+    SingleSwitchProgramEnvironment& env,
+    SwitchControllerContext& context,
+    AutoStoryOptions options
+) const{
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
 
     context.wait_for_all_requests();

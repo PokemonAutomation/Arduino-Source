@@ -8,7 +8,6 @@
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonTools/Async/InterruptableCommands.h"
-#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonLA_FlagNavigationAir.h"
 
@@ -22,20 +21,20 @@ namespace PokemonLA{
 
 
 FlagNavigationAir::FlagNavigationAir(
-    ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context,
+    ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context,
     uint16_t stop_radius,
     double flag_reached_delay,
     std::chrono::seconds navigate_timeout
 )
-    : SuperControlSession(env, console, context)
+    : SuperControlSession(env, stream, context)
     , m_stop_radius(stop_radius)
     , m_flag_reached_delay(std::chrono::milliseconds((uint64_t)(flag_reached_delay * 1000)))
     , m_navigate_timeout(navigate_timeout)
-    , m_flag(console, console)
-    , m_mount(console)
-    , m_centerA(console, console, ButtonType::ButtonA, {0.40, 0.50, 0.40, 0.50}, std::chrono::milliseconds(200), false)
-    , m_leftB(console, console, ButtonType::ButtonB, {0.02, 0.40, 0.05, 0.20}, std::chrono::milliseconds(200), false)
-    , m_dialog_detector(console, console, false)
+    , m_flag(stream.logger(), stream.overlay())
+    , m_mount(stream.logger())
+    , m_centerA(stream.logger(), stream.overlay(), ButtonType::ButtonA, {0.40, 0.50, 0.40, 0.50}, std::chrono::milliseconds(200), false)
+    , m_leftB(stream.logger(), stream.overlay(), ButtonType::ButtonB, {0.02, 0.40, 0.05, 0.20}, std::chrono::milliseconds(200), false)
+    , m_dialog_detector(stream.logger(), stream.overlay(), false)
     , m_looking_straight_ahead(false)
     , m_looking_straight_ahead_timestamp(WallClock::min())
 //    , m_last_good_state(WallClock::min())

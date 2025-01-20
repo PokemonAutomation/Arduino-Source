@@ -9,7 +9,8 @@
 
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonTools/MultiConsoleErrors.h"
-#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
+#include "CommonFramework/Tools/VideoStream.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 #include "NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h"
 
 namespace PokemonAutomation{
@@ -28,7 +29,7 @@ struct TradeStats : public StatsTracker{
 
 
 void trade_current_pokemon(
-    ConsoleHandle& console, SwitchControllerContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     MultiConsoleErrorState& tracker,
     TradeStats& stats
 );

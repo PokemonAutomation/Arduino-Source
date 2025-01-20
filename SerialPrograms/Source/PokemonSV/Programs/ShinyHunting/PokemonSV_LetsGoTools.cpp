@@ -151,23 +151,24 @@ void DiscontiguousTimeTracker::add_block(WallClock start, WallClock end){
 
 
 LetsGoEncounterBotTracker::LetsGoEncounterBotTracker(
-    ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context,
+    ProgramEnvironment& env,
+    VideoStream& stream, SwitchControllerContext& context,
     LetsGoEncounterBotStats& stats,
     OCR::LanguageOCROption& language
 )
     : m_env(env)
-    , m_console(console)
+    , m_stream(stream)
     , m_context(context)
     , m_stats(stats)
     , m_language(language)
-    , m_kill_sound(console, [&](float){
-        console.log("Detected kill.");
+    , m_kill_sound(stream.logger(), [&](float){
+        stream.log("Detected kill.");
         m_encounter_rate.report_kill();
         stats.m_kills++;
         env.update_stats();
         return false;
     })
-    , m_session(context, console, {m_kill_sound})
+    , m_session(context, stream, {m_kill_sound})
 {}
 void LetsGoEncounterBotTracker::process_battle(
     bool& caught, bool& should_save,
@@ -180,7 +181,7 @@ void LetsGoEncounterBotTracker::process_battle(
 
     std::set<std::string> slugs;
     if (language != Language::None){
-        slugs = read_singles_opponent(m_env.program_info(), m_console, m_context, language);
+        slugs = read_singles_opponent(m_env.program_info(), m_stream, m_context, language);
         m_encounter_frequencies += slugs;
         m_env.log(m_encounter_frequencies.dump_sorted_map("Encounter Stats:\n"));
     }
@@ -217,7 +218,7 @@ void LetsGoEncounterBotTracker::process_battle(
     //  set the action to be what specified in the entry.
     for (EncounterActionsEntry& entry : settings.ACTIONS_TABLE.snapshot()){
         if (language == Language::None){
-            throw UserSetupError(m_console, "You must set the game language to use the actions table.");
+            throw UserSetupError(m_stream.logger(), "You must set the game language to use the actions table.");
         }
 
         //  See if Pokemon name matches.
@@ -248,7 +249,7 @@ void LetsGoEncounterBotTracker::process_battle(
     switch (action.action){
     case EncounterActionsAction::RUN_AWAY:
         try{
-            run_from_battle(m_env.program_info(), m_console, m_context);
+            run_from_battle(m_env.program_info(), m_stream, m_context);
         }catch (OperationFailedException& e){
             throw FatalProgramException(std::move(e));
         }
@@ -257,15 +258,15 @@ void LetsGoEncounterBotTracker::process_battle(
         return;
     case EncounterActionsAction::STOP_PROGRAM:
         throw ProgramFinishedException();
-//        throw ProgramFinishedException(m_console, "", true);
+//        throw ProgramFinishedException(m_stream, "", true);
     case EncounterActionsAction::THROW_BALLS:
     case EncounterActionsAction::THROW_BALLS_AND_SAVE:
         if (language == Language::None){
-            throw InternalProgramError(&m_console.logger(), PA_CURRENT_FUNCTION, "Language is not set.");
+            throw InternalProgramError(&m_stream.logger(), PA_CURRENT_FUNCTION, "Language is not set.");
         }
 
         CatchResults result = basic_catcher(
-            m_console, m_context,
+            m_stream, m_context,
             language,
             action.ball, action.ball_limit,
             settings.USE_FIRST_MOVE_IF_CANNOT_THROW_BALL
@@ -286,9 +287,9 @@ void LetsGoEncounterBotTracker::process_battle(
             break;
         default:
             throw_and_log<FatalProgramException>(
-                m_console, ErrorReport::NO_ERROR_REPORT,
+                m_stream.logger(), ErrorReport::NO_ERROR_REPORT,
                 "Unable to recover from failed catch.",
-                m_console
+                m_stream
             );
         }
 
@@ -308,7 +309,7 @@ void LetsGoEncounterBotTracker::process_battle(
 
 
 bool use_lets_go_to_clear_in_front(
-    ConsoleHandle& console, SwitchControllerContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     LetsGoEncounterBotTracker& tracker,
     bool throw_ball_if_bubble,
     std::function<void(SwitchControllerContext& context)>&& command
@@ -316,12 +317,12 @@ bool use_lets_go_to_clear_in_front(
 //    ShinyHuntAreaZeroPlatform_Descriptor::Stats& stats = env.current_stats<ShinyHuntAreaZeroPlatform_Descriptor::Stats>();
 
 //    static int calls = 0;
-    console.log("Clearing what's in front with Let's Go...");
+    stream.log("Clearing what's in front with Let's Go...");
 //    cout << calls++ << endl;
 
     SweatBubbleWatcher bubble(COLOR_GREEN);
     int ret = run_until<SwitchControllerContext>(
-        console, context,
+        stream, context,
         [](SwitchControllerContext& context){
             pbf_press_button(context, BUTTON_R, 20, 200);
         },
@@ -330,13 +331,13 @@ bool use_lets_go_to_clear_in_front(
 //    cout << "asdf" << endl;
     if (ret == 0){
         if (throw_ball_if_bubble){
-            console.log("Detected sweat bubble. Throwing ball...");
+            stream.log("Detected sweat bubble. Throwing ball...");
             pbf_mash_button(context, BUTTON_ZR, 5 * TICKS_PER_SECOND);
         }else{
-            console.log("Detected sweat bubble. Will not throw ball.");
+            stream.log("Detected sweat bubble. Will not throw ball.");
         }
     }else{
-        console.log("Did not detect sweat bubble.");
+        stream.log("Did not detect sweat bubble.");
     }
 
     WallClock last_kill = tracker.last_kill();
@@ -360,7 +361,7 @@ bool use_lets_go_to_clear_in_front(
 //        cout << "found kill" << endl;
         last_kill = tracker.last_kill();
     }
-    console.log("Nothing left to clear...");
+    stream.log("Nothing left to clear...");
     tracker.throw_if_no_sound();
     return tracker.last_kill() != WallClock::min();
 }

@@ -94,7 +94,7 @@ EventNotificationOption EggAutonomousState::m_notification_noop("", false, false
 
 
 EggAutonomousState::EggAutonomousState(
-    ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context,
+    ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context,
     EggAutonomousStats& stats,
     EventNotificationOption& notification_nonshiny_keep,
     EventNotificationOption& notification_shiny,
@@ -106,7 +106,7 @@ EggAutonomousState::EggAutonomousState(
     uint8_t max_keepers,
     uint8_t existing_eggs_in_columns
 )
-    : m_env(env), m_console(console), m_context(context)
+    : m_env(env), m_stream(stream), m_context(context)
     , m_stats(stats)
     , m_notification_nonshiny_keep(notification_nonshiny_keep)
     , m_notification_shiny(notification_shiny)
@@ -126,7 +126,7 @@ void EggAutonomousState::dump() const{
     str += "\n    Box Column: " + std::to_string(m_eggs_in_column);
     str += "\n    Party Eggs: " + std::to_string(m_eggs_in_party);
     str += "\n    Babies Saved: " + std::to_string(m_babies_saved);
-    m_console.log(str);
+    m_stream.log(str);
 }
 void EggAutonomousState::set(const EggAutonomousState& state){
     m_on_bike = state.m_on_bike;
@@ -140,7 +140,7 @@ void EggAutonomousState::process_error(const std::string& name, const char* mess
     OperationFailedException::fire(
         ErrorReport::SEND_ERROR_REPORT,
         message,
-        m_console
+        m_stream
     );
 }
 
@@ -159,7 +159,7 @@ void EggAutonomousState::process_shiny(const ImageViewRGB32& screen){
 
 
 void EggAutonomousState::withdraw_egg_column(){
-    m_console.log("Withdrawing column from box to your party...");
+    m_stream.log("Withdrawing column from box to your party...");
 
     const uint16_t BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY_0;
     const uint16_t BOX_PICKUP_DROP_DELAY = GameSettings::instance().BOX_PICKUP_DROP_DELAY;
@@ -175,7 +175,7 @@ void EggAutonomousState::withdraw_egg_column(){
     m_eggs_in_party = 5;
 }
 bool EggAutonomousState::process_party(){
-    m_console.log("Processing party...");
+    m_stream.log("Processing party...");
 
     const uint16_t BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY_0;
 //    std::chrono::milliseconds SCROLL_TO_READ_DELAY((uint64_t)m_scroll_to_read_delay * 1000 / TICKS_PER_SECOND);
@@ -187,14 +187,14 @@ bool EggAutonomousState::process_party(){
 //    m_env.wait_for(SCROLL_TO_READ_DELAY);
 
     BoxShinyDetector shiny_reader;
-    IvJudgeReaderScope iv_reader(m_console, m_language);
-    BoxNatureDetector nature_detector(m_console.overlay(), m_language);
+    IvJudgeReaderScope iv_reader(m_stream.overlay(), m_language);
+    BoxNatureDetector nature_detector(m_stream.overlay(), m_language);
 
-    VideoOverlaySet set(m_console);
+    VideoOverlaySet set(m_stream.overlay());
     shiny_reader.make_overlays(set);
 
     //  Make sure the stats menu is up.
-    VideoSnapshot screen = m_console.video().snapshot();
+    VideoSnapshot screen = m_stream.video().snapshot();
     if (!shiny_reader.is_panel(screen)){
         process_error("StatsPanel", "Stats panel not detected.");
     }
@@ -208,7 +208,7 @@ bool EggAutonomousState::process_party(){
             m_context.wait_for_all_requests();
 //            m_env.wait_for(SCROLL_TO_READ_DELAY);
 
-            screen = m_console.video().snapshot();
+            screen = m_stream.video().snapshot();
             if (!shiny_reader.is_panel(screen)){
                 process_error("StatsPanel", "Stats panel not detected.");
             }
@@ -217,20 +217,20 @@ bool EggAutonomousState::process_party(){
 
         bool shiny = shiny_reader.detect(screen);
         if (shiny){
-            m_console.log("Pokemon " + std::to_string(c) + " is shiny!", COLOR_BLUE);
+            m_stream.log("Pokemon " + std::to_string(c) + " is shiny!", COLOR_BLUE);
             process_shiny(screen);
         }else{
-            m_console.log("Pokemon " + std::to_string(c) + " is not shiny.", COLOR_PURPLE);
+            m_stream.log("Pokemon " + std::to_string(c) + " is not shiny.", COLOR_PURPLE);
         }
-        IvJudgeReader::Results IVs = iv_reader.read(m_console, screen);
-        StatsHuntGenderFilter gender = read_gender_from_box(m_console, m_console, screen);
-        NatureReader::Results nature = nature_detector.read(m_console.logger(), screen);
+        IvJudgeReader::Results IVs = iv_reader.read(m_stream.logger(), screen);
+        StatsHuntGenderFilter gender = read_gender_from_box(m_stream.logger(), m_stream.overlay(), screen);
+        NatureReader::Results nature = nature_detector.read(m_stream.logger(), screen);
 
         StatsHuntAction action = m_filters.get_action(shiny, gender, nature.nature, IVs);
 
         switch (action){
         case StatsHuntAction::StopProgram:
-            m_console.log("Program stop requested...");
+            m_stream.log("Program stop requested...");
             if (!shiny){
                 send_encounter_notification(
                     m_env,
@@ -242,7 +242,7 @@ bool EggAutonomousState::process_party(){
             }
             return true;
         case StatsHuntAction::Keep:
-            m_console.log("Moving Pokemon to keep box...", COLOR_BLUE);
+            m_stream.log("Moving Pokemon to keep box...", COLOR_BLUE);
             if (!shiny){
                 send_encounter_notification(
                     m_env,
@@ -271,13 +271,13 @@ bool EggAutonomousState::process_party(){
             pbf_move_right_joystick(m_context, 128, 255, 20, 105);
             m_babies_saved++;
             if (m_babies_saved >= m_max_keepers){
-                m_console.log("Max keepers reached. Stopping program...");
+                m_stream.log("Max keepers reached. Stopping program...");
                 return true;
             }
             break;
         case StatsHuntAction::Discard:
-            m_console.log("Releasing Pokemon...", COLOR_PURPLE);
-            release(m_console, m_context);
+            m_stream.log("Releasing Pokemon...", COLOR_PURPLE);
+            release(m_stream, m_context);
         }
     }
 
@@ -286,12 +286,12 @@ bool EggAutonomousState::process_party(){
     return false;
 }
 bool EggAutonomousState::process_batch(){
-    overworld_to_box(m_console, m_context);
+    overworld_to_box(m_stream, m_context);
     if (process_party()){
         return true;
     }
     withdraw_egg_column();
-    box_to_overworld(m_console, m_context);
+    box_to_overworld(m_stream, m_context);
     return false;
 }
 
@@ -305,11 +305,11 @@ void EggAutonomousState::fetch_egg(){
 
     //  Move to corner.
     m_context.wait_for_all_requests();
-    m_console.log("Attempting to fetch an egg.");
+    m_stream.log("Attempting to fetch an egg.");
     {
         ShortDialogWatcher dialog;
         int ret = run_until<SwitchControllerContext>(
-            m_console, m_context,
+            m_stream, m_context,
             [](SwitchControllerContext& context){
                 pbf_move_left_joystick(context, 0, 255, 125, 0);
             },
@@ -321,18 +321,18 @@ void EggAutonomousState::fetch_egg(){
     }
     m_context.wait_for(std::chrono::milliseconds(200));
 
-    m_console.log("Getting off bike.");
+    m_stream.log("Getting off bike.");
     if (m_on_bike){
         m_shortcut.run(m_context, 100);
         m_context.wait_for_all_requests();
         m_on_bike = false;
     }
 
-    m_console.log("Going to daycare man.");
+    m_stream.log("Going to daycare man.");
     {
         ShortDialogWatcher dialog;
         int ret = run_until<SwitchControllerContext>(
-            m_console, m_context,
+            m_stream, m_context,
             [](SwitchControllerContext& context){
                 pbf_move_left_joystick(context, 0, 255, 30, 0);
                 pbf_move_left_joystick(context, 128, 0, 35, 0);
@@ -349,7 +349,7 @@ void EggAutonomousState::fetch_egg(){
     {
         ShortDialogWatcher dialog;
         int ret = run_until<SwitchControllerContext>(
-            m_console, m_context,
+            m_stream, m_context,
             [](SwitchControllerContext& context){
                 pbf_press_button(context, BUTTON_ZL, 20, 230);
             },
@@ -358,13 +358,13 @@ void EggAutonomousState::fetch_egg(){
         if (ret < 0){
             process_error("DaycareMan", "Unable to find daycare man.");
         }
-        m_console.log("Found daycare man!");
+        m_stream.log("Found daycare man!");
     }
 
     {
         EggReceivedDetector received;
         run_until<SwitchControllerContext>(
-            m_console, m_context,
+            m_stream, m_context,
             [](SwitchControllerContext& context){
                 pbf_mash_button(context, BUTTON_ZL, 500);
                 pbf_mash_button(context, BUTTON_B, 500);
@@ -375,14 +375,14 @@ void EggAutonomousState::fetch_egg(){
         if (received.fetched()){
             m_eggs_in_column++;
             m_stats.m_fetch_success++;
-            m_console.log("Fetched an egg!", COLOR_BLUE);
+            m_stream.log("Fetched an egg!", COLOR_BLUE);
         }else{
-            m_console.log("No egg fetched.", COLOR_ORANGE);
+            m_stream.log("No egg fetched.", COLOR_ORANGE);
         }
         m_env.update_stats();
     }
 
-    m_console.log("Getting back on bike.");
+    m_stream.log("Getting back on bike.");
     m_shortcut.run(m_context, 100);
     m_on_bike = true;
     pbf_move_left_joystick(m_context, 0, 255, 125, 0);
@@ -393,7 +393,7 @@ void EggAutonomousState::hatch_egg(){
     }
 
     //  Hatch the egg.
-    VideoSnapshot overworld = m_console.video().snapshot();
+    VideoSnapshot overworld = m_stream.video().snapshot();
 //    overworld.save("test-0.png");
     {
         pbf_mash_button(m_context, BUTTON_B, 10 * TICKS_PER_SECOND);
@@ -401,14 +401,14 @@ void EggAutonomousState::hatch_egg(){
 
         ShortDialogWatcher dialog;
         int ret = wait_until(
-            m_console, m_context, std::chrono::seconds(30),
+            m_stream, m_context, std::chrono::seconds(30),
             {{dialog}}
         );
         if (ret < 0){
             process_error("NoHatchEnd", "End of hatch not detected after 30 seconds.");
 //            OperationFailedException::fire(m_console, "End of hatch not detected after 30 seconds.");
         }
-        m_console.log("Egg finished hatching.");
+        m_stream.log("Egg finished hatching.");
         m_stats.m_hatched++;
         m_env.update_stats();
         pbf_mash_button(m_context, BUTTON_B, 1 * TICKS_PER_SECOND);
@@ -421,9 +421,9 @@ void EggAutonomousState::hatch_egg(){
         //  Wait for steady state and read it again.
         m_context.wait_for(std::chrono::milliseconds(200));
         ImageMatchWatcher matcher(overworld.frame, {0.10, 0.10, 0.80, 0.60}, 100);
-        ShortDialogPromptDetector prompt(m_console, {0.50, 0.60, 0.30, 0.20}, COLOR_GREEN);
+        ShortDialogPromptDetector prompt(m_stream.overlay(), {0.50, 0.60, 0.30, 0.20}, COLOR_GREEN);
         int ret = wait_until(
-            m_console, m_context, std::chrono::seconds(30),
+            m_stream, m_context, std::chrono::seconds(30),
             {
                 {matcher},
                 {prompt},
@@ -431,15 +431,15 @@ void EggAutonomousState::hatch_egg(){
         );
         switch (ret){
         case 0:
-            m_console.log("Returned to overworld.");
+            m_stream.log("Returned to overworld.");
             m_eggs_in_party--;
             return;
         case 1:
-            m_console.log("Detected prompt. Please turn off nicknaming.", COLOR_RED);
+            m_stream.log("Detected prompt. Please turn off nicknaming.", COLOR_RED);
             m_stats.m_errors++;
-            throw UserSetupError(m_console, "Please turn off nicknaming.");
+            throw UserSetupError(m_stream.logger(), "Please turn off nicknaming.");
         default:
-            m_console.log("Failed to detect overworld after 30 seconds. Did day/night change?", COLOR_RED);
+            m_stream.log("Failed to detect overworld after 30 seconds. Did day/night change?", COLOR_RED);
 //            pbf_mash_button(context, BUTTON_ZL, 30 * TICKS_PER_SECOND);
             return;
         }
@@ -447,13 +447,13 @@ void EggAutonomousState::hatch_egg(){
 }
 
 void EggAutonomousState::hatch_rest_of_party(){
-    m_console.log("Hatching rest of party without fetching...");
+    m_stream.log("Hatching rest of party without fetching...");
     while (m_eggs_in_party > 0){
         dump();
         ShortDialogWatcher dialog;
         FrozenImageDetector frozen(COLOR_CYAN, {0, 0, 1, 0.5}, std::chrono::seconds(60), 20);
         int ret = run_until<SwitchControllerContext>(
-            m_console, m_context,
+            m_stream, m_context,
             [&](SwitchControllerContext& context){
                 egg_spin(context, 480 * TICKS_PER_SECOND);
 //                egg_spin(context, 5 * TICKS_PER_SECOND);
@@ -465,7 +465,7 @@ void EggAutonomousState::hatch_rest_of_party(){
         );
         switch (ret){
         case 0:
-            m_console.log("Egg is hatching!");
+            m_stream.log("Egg is hatching!");
             m_context.wait_for_all_requests();
             hatch_egg();
             break;
@@ -479,10 +479,10 @@ void EggAutonomousState::hatch_rest_of_party(){
 }
 void EggAutonomousState::spin_until_fetch_or_hatch(){
     m_context.wait_for_all_requests();
-    m_console.log("Looking for more eggs...");
+    m_stream.log("Looking for more eggs...");
     ShortDialogWatcher dialog;
     int ret = run_until<SwitchControllerContext>(
-        m_console, m_context,
+        m_stream, m_context,
         [&](SwitchControllerContext& context){
             egg_spin(context, m_travel_time_per_fetch);
         },
@@ -490,10 +490,10 @@ void EggAutonomousState::spin_until_fetch_or_hatch(){
     );
     m_context.wait_for(std::chrono::milliseconds(200));
     if (ret < 0){
-//        m_console.log("Attempting to fetch an egg.");
+//        m_stream.log("Attempting to fetch an egg.");
         fetch_egg();
     }else{
-//        m_console.log("Egg is hatching!");
+//        m_stream.log("Egg is hatching!");
 //        hatch_egg();
     }
 }
@@ -505,8 +505,8 @@ bool EggAutonomousState::overworld_detect_and_run_state(){
     dump();
 
     //  Egg is hatching. Handle that now.
-    if (dialog.detect(m_console.video().snapshot())){
-        m_console.log("Egg is hatching!");
+    if (dialog.detect(m_stream.video().snapshot())){
+        m_stream.log("Egg is hatching!");
         hatch_egg();
         return false;
     }

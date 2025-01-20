@@ -70,7 +70,7 @@ public:
 
 
 
-void connect_to_internet_from_menu(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context){
+void connect_to_internet_from_menu(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
     WallClock start = current_time();
     bool connected = false;
     while (true){
@@ -78,11 +78,11 @@ void connect_to_internet_from_menu(const ProgramInfo& info, ConsoleHandle& conso
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "connect_to_internet_from_menu(): Failed to connect to internet after 5 minutes.",
-                console
+                stream
             );
         }
 
-        OverworldWatcher overworld(console, COLOR_RED);
+        OverworldWatcher overworld(stream.logger(), COLOR_RED);
         MainMenuWatcher main_menu(COLOR_YELLOW);
         AdvanceDialogWatcher dialog(COLOR_GREEN);
         PromptDialogWatcher prompt(COLOR_CYAN);
@@ -90,18 +90,18 @@ void connect_to_internet_from_menu(const ProgramInfo& info, ConsoleHandle& conso
         NormalBattleMenuWatcher battle_menu(COLOR_MAGENTA);
         context.wait_for_all_requests();
         int ret = wait_until(
-            console, context,
+            stream, context,
             std::chrono::seconds(60),
             {overworld, main_menu, dialog, prompt, news, battle_menu}
         );
         context.wait_for(std::chrono::milliseconds(100));
         switch (ret){
         case 0:
-            console.log("Detected overworld. (unexpected)", COLOR_RED);
+            stream.log("Detected overworld. (unexpected)", COLOR_RED);
             pbf_press_button(context, BUTTON_X, 20, 105);
             continue;
         case 1:
-            console.log("Detected main menu.");
+            stream.log("Detected main menu.");
             if (connected){
                 return;
             }else{
@@ -109,37 +109,37 @@ void connect_to_internet_from_menu(const ProgramInfo& info, ConsoleHandle& conso
             }
             continue;
         case 2:
-            console.log("Detected dialog.");
+            stream.log("Detected dialog.");
             connected = true;
             pbf_press_button(context, BUTTON_B, 20, 105);
             continue;
         case 3:
-            console.log("Already connected to internet.");
+            stream.log("Already connected to internet.");
             connected = true;
             pbf_press_button(context, BUTTON_B, 20, 105);
             continue;
         case 4:
-            console.log("Detected news menu...");
+            stream.log("Detected news menu...");
             connected = true;
             pbf_press_button(context, BUTTON_B, 20, 105);
             continue;
         case 5:
-            console.log("Detected battle menu...");
+            stream.log("Detected battle menu...");
             OperationFailedException::fire(
                 ErrorReport::NO_ERROR_REPORT,
                 "connect_to_internet_from_menu(): Looks like you got attacked.",
-                console
+                stream
             );
         default:
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "connect_to_internet_from_menu(): No recognized state after 60 seconds.",
-                console
+                stream
             );
         }
     }
 }
-void connect_to_internet_from_overworld(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context){
+void connect_to_internet_from_overworld(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
     WallClock start = current_time();
     bool connected = false;
     while (true){
@@ -147,11 +147,11 @@ void connect_to_internet_from_overworld(const ProgramInfo& info, ConsoleHandle& 
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "connect_to_internet_from_overworld(): Failed to connect to internet after 5 minutes.",
-                console
+                stream
             );
         }
 
-        OverworldWatcher overworld(console, COLOR_RED);
+        OverworldWatcher overworld(stream.logger(), COLOR_RED);
         MainMenuWatcher main_menu(COLOR_YELLOW);
         AdvanceDialogWatcher dialog(COLOR_GREEN);
         PromptDialogWatcher prompt(COLOR_CYAN);
@@ -159,14 +159,14 @@ void connect_to_internet_from_overworld(const ProgramInfo& info, ConsoleHandle& 
         NormalBattleMenuWatcher battle_menu(COLOR_MAGENTA);
         context.wait_for_all_requests();
         int ret = wait_until(
-            console, context,
+            stream, context,
             std::chrono::seconds(60),
             {overworld, main_menu, dialog, prompt, news, battle_menu}
         );
         context.wait_for(std::chrono::milliseconds(100));
         switch (ret){
         case 0:
-            console.log("Detected overworld.");
+            stream.log("Detected overworld.");
             if (connected){
                 return;
             }else{
@@ -174,7 +174,7 @@ void connect_to_internet_from_overworld(const ProgramInfo& info, ConsoleHandle& 
                 continue;
             }
         case 1:
-            console.log("Detected main menu.");
+            stream.log("Detected main menu.");
             if (connected){
                 pbf_press_button(context, BUTTON_B, 20, 105);
             }else{
@@ -182,32 +182,32 @@ void connect_to_internet_from_overworld(const ProgramInfo& info, ConsoleHandle& 
             }
             continue;
         case 2:
-            console.log("Detected dialog.");
+            stream.log("Detected dialog.");
             connected = true;
             pbf_press_button(context, BUTTON_B, 20, 105);
             continue;
         case 3:
-            console.log("Already connected to internet.");
+            stream.log("Already connected to internet.");
             connected = true;
             pbf_press_button(context, BUTTON_B, 20, 105);
             continue;
         case 4:
-            console.log("Detected news menu...");
+            stream.log("Detected news menu...");
             connected = true;
             pbf_press_button(context, BUTTON_B, 20, 105);
             continue;
         case 5:
-            console.log("Detected battle menu...");
+            stream.log("Detected battle menu...");
             OperationFailedException::fire(
                 ErrorReport::NO_ERROR_REPORT,
                 "connect_to_internet_from_overworld(): Looks like you got attacked.",
-                console
+                stream
             );
         default:
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "connect_to_internet_from_overworld(): No recognized state after 60 seconds.",
-                console
+                stream
             );
         }
     }

@@ -25,18 +25,18 @@ namespace PokemonLA{
 
 class PokemonTasksReader{
 public:
-    PokemonTasksReader(ConsoleHandle& console)
-        : m_console(console)
+    PokemonTasksReader(VideoStream& stream)
+        : m_stream(stream)
         , m_tasks_box{
-            OverlayBoxScope(console, {0.400, 0.190, 0.040, 0.045}),
-            OverlayBoxScope(console, {0.400, 0.244, 0.040, 0.045}),
-            OverlayBoxScope(console, {0.400, 0.298, 0.040, 0.045}),
-            OverlayBoxScope(console, {0.400, 0.353, 0.040, 0.045}),
-            OverlayBoxScope(console, {0.400, 0.406, 0.040, 0.045}),
-            OverlayBoxScope(console, {0.400, 0.460, 0.040, 0.045}),
-            OverlayBoxScope(console, {0.400, 0.514, 0.040, 0.045}),
-            OverlayBoxScope(console, {0.400, 0.568, 0.040, 0.045}),
-            OverlayBoxScope(console, {0.400, 0.622, 0.040, 0.045})
+            OverlayBoxScope(stream.overlay(), {0.400, 0.190, 0.040, 0.045}),
+            OverlayBoxScope(stream.overlay(), {0.400, 0.244, 0.040, 0.045}),
+            OverlayBoxScope(stream.overlay(), {0.400, 0.298, 0.040, 0.045}),
+            OverlayBoxScope(stream.overlay(), {0.400, 0.353, 0.040, 0.045}),
+            OverlayBoxScope(stream.overlay(), {0.400, 0.406, 0.040, 0.045}),
+            OverlayBoxScope(stream.overlay(), {0.400, 0.460, 0.040, 0.045}),
+            OverlayBoxScope(stream.overlay(), {0.400, 0.514, 0.040, 0.045}),
+            OverlayBoxScope(stream.overlay(), {0.400, 0.568, 0.040, 0.045}),
+            OverlayBoxScope(stream.overlay(), {0.400, 0.622, 0.040, 0.045})
         }
     {}
 
@@ -46,13 +46,13 @@ public:
         for (size_t i = 0; i < m_tasks_box.size(); ++i)
         {
             ImageRGB32 image = to_blackwhite_rgb32_range(extract_box_reference(screen, m_tasks_box[i]), 0xff808080, 0xffffffff, false);
-            tasks[i] = OCR::read_number(m_console, image);
+            tasks[i] = OCR::read_number(m_stream.logger(), image);
         }
         return tasks;
     }
 
 private:
-    ConsoleHandle& m_console;
+    VideoStream& m_stream;
     std::array<OverlayBoxScope, 9> m_tasks_box;
 };
 

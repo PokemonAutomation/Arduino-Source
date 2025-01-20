@@ -21,20 +21,36 @@ public:
     virtual void run_segment(
         SingleSwitchProgramEnvironment& env, 
         SwitchControllerContext& context,
-        AutoStoryOptions options) const override;
+        AutoStoryOptions options
+    ) const override;
 };
 
 // start: stood up from chair. Walked to left side of room.
 // end: standing in room. updated settings
-void checkpoint_01(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, EventNotificationOption& notif_status_update, Language language);
+void checkpoint_01(
+    SingleSwitchProgramEnvironment& env,
+    SwitchControllerContext& context,
+    EventNotificationOption& notif_status_update,
+    Language language
+);
 
 // start: standing in room. updated settings
 // end: standing in front of power of science NPC. Cleared map tutorial.
-void checkpoint_02(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, EventNotificationOption& notif_status_update);
+void checkpoint_02(
+    SingleSwitchProgramEnvironment& env,
+    SwitchControllerContext& context,
+    EventNotificationOption& notif_status_update
+);
 
 // start: standing in front of power of science NPC. Cleared map tutorial.
 // end: received starter, changed move order
-void checkpoint_03(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, EventNotificationOption& notif_status_update, Language language, StarterChoice starter_choice);
+void checkpoint_03(
+    SingleSwitchProgramEnvironment& env,
+    SwitchControllerContext& context,
+    EventNotificationOption& notif_status_update,
+    Language language,
+    StarterChoice starter_choice
+);
 
 
 }

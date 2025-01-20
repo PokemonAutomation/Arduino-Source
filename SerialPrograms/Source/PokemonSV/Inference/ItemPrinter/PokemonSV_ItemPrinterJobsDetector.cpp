@@ -14,7 +14,6 @@
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/OCR/OCR_NumberReader.h"
-#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSV_ItemPrinterJobsDetector.h"
 
@@ -129,13 +128,13 @@ uint8_t ItemPrinterJobsDetector::detect_jobs(Logger& logger, AsyncDispatcher& di
 
 void ItemPrinterJobsDetector::set_print_jobs(
     AsyncDispatcher& dispatcher,
-    ConsoleHandle& console, SwitchControllerContext& context, uint8_t jobs
+    VideoStream& stream, SwitchControllerContext& context, uint8_t jobs
 ) const{
     VideoSnapshot snapshot;
     for (size_t c = 0; c < 10; c++){
         context.wait_for_all_requests();
-        snapshot = console.video().snapshot();
-        uint8_t current_jobs = detect_jobs(console, dispatcher, snapshot);
+        snapshot = stream.video().snapshot();
+        uint8_t current_jobs = detect_jobs(stream.logger(), dispatcher, snapshot);
         if (current_jobs == jobs){
             return;
         }
@@ -143,9 +142,9 @@ void ItemPrinterJobsDetector::set_print_jobs(
     }
 
     throw_and_log<OperationFailedException>(
-        console, ErrorReport::SEND_ERROR_REPORT,
+        stream.logger(), ErrorReport::SEND_ERROR_REPORT,
         "Failed to set jobs after 10 tries.",
-        &console,
+        &stream,
         std::move(snapshot.frame)
     );
 }

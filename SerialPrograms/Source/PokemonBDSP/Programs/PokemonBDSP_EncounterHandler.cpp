@@ -33,14 +33,14 @@ void take_video(SwitchControllerContext& context){
 
 
 StandardEncounterHandler::StandardEncounterHandler(
-    ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context,
+    ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context,
     Language language,
     EncounterBotCommonOptions& settings,
     PokemonSwSh::ShinyHuntTracker& session_stats
 )
     : m_env(env)
     , m_context(context)
-    , m_console(console)
+    , m_stream(stream)
     , m_language(language)
     , m_settings(settings)
     , m_session_stats(session_stats)
@@ -66,7 +66,7 @@ void StandardEncounterHandler::run_away_due_to_error(uint16_t exit_battle_time){
     pbf_press_dpad(m_context, DPAD_DOWN, 3 * TICKS_PER_SECOND, 0);
     m_context.wait_for_all_requests();
 
-    run_from_battle(m_console, m_context, exit_battle_time);
+    run_from_battle(m_stream, m_context, exit_battle_time);
 }
 
 std::vector<EncounterResult> StandardEncounterHandler::results(StandardEncounterDetection& encounter){
@@ -101,14 +101,14 @@ void StandardEncounterHandler::update_frequencies(StandardEncounterDetection& en
 
 bool StandardEncounterHandler::handle_standard_encounter(const DoublesShinyDetection& result){
     if (result.shiny_type == ShinyType::UNKNOWN){
-        m_console.log("Unable to determine result of battle.", COLOR_RED);
+        m_stream.log("Unable to determine result of battle.", COLOR_RED);
         m_session_stats.add_error();
         m_consecutive_failures++;
         if (m_consecutive_failures >= 3){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "3 consecutive failed encounter detections.",
-                m_console
+                m_stream
             );
         }
         return false;
@@ -116,7 +116,7 @@ bool StandardEncounterHandler::handle_standard_encounter(const DoublesShinyDetec
     m_consecutive_failures = 0;
 
     StandardEncounterDetection encounter(
-        m_console, m_context,
+        m_stream, m_context,
         m_language,
         m_settings.FILTER,
         result
@@ -164,14 +164,14 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
     uint16_t exit_battle_time
 ){
     if (result.shiny_type == ShinyType::UNKNOWN){
-        m_console.log("Unable to determine result of battle.", COLOR_RED);
+        m_stream.log("Unable to determine result of battle.", COLOR_RED);
         m_session_stats.add_error();
         m_consecutive_failures++;
         if (m_consecutive_failures >= 3){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "3 consecutive failed encounter detections.",
-                m_console
+                m_stream
             );
         }
         return false;
@@ -179,7 +179,7 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
     m_consecutive_failures = 0;
 
     StandardEncounterDetection encounter(
-        m_console, m_context,
+        m_stream, m_context,
         m_language,
         m_settings.FILTER,
         result
@@ -228,7 +228,7 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
         }
         os << ")";
     }
-    m_console.overlay().add_log(os.str(), COLOR_WHITE);
+    m_stream.overlay().add_log(os.str(), COLOR_WHITE);
 
     update_frequencies(encounter);
     send_encounter_notification(
@@ -250,13 +250,13 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
         pbf_press_dpad(m_context, DPAD_UP, 20, 0);
         m_context.wait_for_all_requests();
 
-        run_from_battle(m_console, m_context, exit_battle_time);
+        run_from_battle(m_stream, m_context, exit_battle_time);
         return false;
 
     case EncounterAction::ThrowBalls:
     case EncounterAction::ThrowBallsAndSave:{
         CatchResults catch_result = basic_catcher(
-            m_console, m_context,
+            m_stream, m_context,
             m_language,
             action.pokeball_slug,
             action.ball_limit
@@ -276,7 +276,7 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
             m_env.update_stats();
             if (action.action == EncounterAction::ThrowBallsAndSave){
                 //  Save the game
-                save_game(m_console, m_context);
+                save_game(m_stream, m_context);
             }
             break;
         case CatchResult::POKEMON_FAINTED:
@@ -284,9 +284,9 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
             break;
         default:
             throw_and_log<FatalProgramException>(
-                m_console, ErrorReport::NO_ERROR_REPORT,
+                m_stream.logger(), ErrorReport::NO_ERROR_REPORT,
                 "Unable to recover from failed catch.",
-                m_console
+                m_stream
             );
         }
         return false;

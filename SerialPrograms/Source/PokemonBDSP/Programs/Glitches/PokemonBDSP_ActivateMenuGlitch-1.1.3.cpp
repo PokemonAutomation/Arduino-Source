@@ -47,7 +47,7 @@ ActivateMenuGlitch113::ActivateMenuGlitch113()
 
 
 void ActivateMenuGlitch113::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
-    ConsoleHandle& console = env.console;
+    VideoStream& stream = env.console;
 
     //  Enable Strength
     pbf_mash_button(context, BUTTON_ZL, 2 * TICKS_PER_SECOND);
@@ -60,17 +60,17 @@ void ActivateMenuGlitch113::program(SingleSwitchProgramEnvironment& env, SwitchC
     context.wait_for_all_requests();
     MapWatcher detector;
     int ret = wait_until(
-        console, context, std::chrono::seconds(2),
+        stream, context, std::chrono::seconds(2),
         {{detector}}
     );
     if (ret < 0){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Map not detected after 2 seconds.",
-            console
+            stream
         );
     }else{
-        console.log("Detected map!", COLOR_BLUE);
+        stream.log("Detected map!", COLOR_BLUE);
     }
 
     context.wait_for(std::chrono::seconds(1));

@@ -21,17 +21,26 @@ public:
     virtual void run_segment(
         SingleSwitchProgramEnvironment& env, 
         SwitchControllerContext& context,
-        AutoStoryOptions options) const override;
+        AutoStoryOptions options
+    ) const override;
 };
 
 
 // start: Rescued Koraidon/Miraidon and escaped from the Houndoom Cave.
 // end: Battled Arven and received Legendary's Pokeball.
-void checkpoint_09(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, EventNotificationOption& notif_status_update);
+void checkpoint_09(
+    SingleSwitchProgramEnvironment& env,
+    SwitchControllerContext& context,
+    EventNotificationOption& notif_status_update
+);
 
 // start: Battled Arven and received Legendary's Pokeball.
 // end: Talked to Nemona at the Lighthouse.
-void checkpoint_10(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, EventNotificationOption& notif_status_update);
+void checkpoint_10(
+    SingleSwitchProgramEnvironment& env,
+    SwitchControllerContext& context,
+    EventNotificationOption& notif_status_update
+);
 
 }
 }

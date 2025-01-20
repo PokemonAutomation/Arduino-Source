@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonSV_StatsResetChecker_H
 #define PokemonAutomation_PokemonSV_StatsResetChecker_H
 
+#include "CommonFramework/Tools/VideoStream.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 
 namespace PokemonAutomation{
@@ -22,14 +23,13 @@ class StatsHuntIvJudgeFilterTable;
 }
 
 namespace NintendoSwitch{
-    class ConsoleHandle;
 namespace PokemonSV{
 
 
 
 //This is a similar to check_baby_info, except for Stats Reset
 bool check_stats_reset_info(
-    ConsoleHandle& console, SwitchControllerContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     OCR::LanguageOCROption& LANGUAGE, Pokemon::StatsHuntIvJudgeFilterTable& FILTERS,
     Pokemon::StatsHuntAction& action
 );

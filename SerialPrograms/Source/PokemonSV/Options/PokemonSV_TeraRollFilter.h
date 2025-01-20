@@ -11,6 +11,7 @@
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
+#include "CommonFramework/Tools/VideoStream.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 
 namespace PokemonAutomation{
@@ -18,7 +19,6 @@ namespace PokemonAutomation{
     class ImageViewRGB32;
     struct ProgramInfo;
 namespace NintendoSwitch{
-    class ConsoleHandle;
 namespace PokemonSV{
 
 class TeraCardReader;
@@ -55,14 +55,14 @@ public:
     };
 
     FilterResult run_filter(
-        const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context,
+        const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context,
         TeraRaidData& data
     ) const;
 
 
 private:
     void read_card(
-        const ProgramInfo& info, ConsoleHandle& console, const ImageViewRGB32& screen,
+        const ProgramInfo& info, VideoStream& stream, const ImageViewRGB32& screen,
         TeraCardReader& reader, TeraRaidData& data
     ) const;
     bool check_herba(const std::string& pokemon_slug) const;

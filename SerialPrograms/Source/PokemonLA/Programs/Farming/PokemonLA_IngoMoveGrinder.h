@@ -36,7 +36,7 @@ private:
     bool run_iteration(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
 
     //  Returns true if version 1.0.
-    bool start_dialog(ConsoleHandle& console, SwitchControllerContext& context);
+    bool start_dialog(VideoStream& stream, SwitchControllerContext& context);
 
 private:
     void go_to_next_move(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);

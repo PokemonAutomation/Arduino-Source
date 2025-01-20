@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_ShinyEncounterDetector_H
 #define PokemonAutomation_PokemonSwSh_ShinyEncounterDetector_H
 
+#include "CommonFramework/Tools/VideoStream.h"
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 #include "Pokemon/Pokemon_DataTypes.h"
 #include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleMenuDetector.h"
@@ -17,7 +18,6 @@
 namespace PokemonAutomation{
     class CancellableScope;
 namespace NintendoSwitch{
-    class ConsoleHandle;
 namespace PokemonSwSh{
 
 using namespace Pokemon;
@@ -79,7 +79,7 @@ ShinyType determine_shiny_status(
 
 
 ShinyDetectionResult detect_shiny_battle(
-    ConsoleHandle& console, CancellableScope& scope,
+    VideoStream& stream, CancellableScope& scope,
     const ShinyDetectionBattle& battle_settings,
     std::chrono::seconds timeout
 );

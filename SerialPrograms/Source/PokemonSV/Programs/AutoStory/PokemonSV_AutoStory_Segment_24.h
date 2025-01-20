@@ -21,7 +21,8 @@ public:
     virtual void run_segment(
         SingleSwitchProgramEnvironment& env, 
         SwitchControllerContext& context,
-        AutoStoryOptions options) const override;
+        AutoStoryOptions options
+    ) const override;
 };
 
 

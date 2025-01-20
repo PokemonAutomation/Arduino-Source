@@ -8,7 +8,6 @@
 #define PokemonAutomation_OliveActionFailedException_H
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -32,10 +31,10 @@ public:
     OliveActionFailedException(
         ErrorReport error_report,
         std::string message,
-        ConsoleHandle& console,
+        VideoStream& stream,
         OliveFail fail_reason = OliveFail::NONE
     )
-        : OperationFailedException(error_report, std::move(message), console)
+        : OperationFailedException(error_report, std::move(message), stream)
         , m_fail_reason(fail_reason)
     {}
     virtual const char* name() const override{ return "OliveActionFailedException"; }

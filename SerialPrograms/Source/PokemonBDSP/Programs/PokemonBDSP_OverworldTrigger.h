@@ -10,8 +10,8 @@
 #include "Common/Cpp/Options/GroupOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/TimeExpressionOption.h"
-#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
-#include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
+#include "CommonFramework/Tools/VideoStream.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -27,7 +27,7 @@ public:
     //  Return false if an unexpected battle happens where the battle menu is detected but
     //  not the starting animation.
     //  Throw exception if inference times out after Sweet Scent is used.
-    bool find_encounter(ConsoleHandle& console, SwitchControllerContext& context) const;
+    bool find_encounter(VideoStream& stream, SwitchControllerContext& context) const;
 
 private:
     //  Move character up and down or left and right once.

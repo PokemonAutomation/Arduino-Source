@@ -10,6 +10,7 @@
 #include <string>
 #include <atomic>
 #include "CommonFramework/Language.h"
+#include "CommonFramework/Tools/VideoStream.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 
 namespace PokemonAutomation{
@@ -19,7 +20,6 @@ namespace PokemonAutomation{
     class ImageViewRGB32;
     struct ProgramInfo;
 namespace NintendoSwitch{
-    class ConsoleHandle;
 namespace PokemonSV{
 
 
@@ -28,10 +28,10 @@ namespace PokemonSV{
 
 
 //  While in the overworld, attempt to enter a raid in front of you.
-bool open_raid(ConsoleHandle& console, SwitchControllerContext& context);
+bool open_raid(VideoStream& stream, SwitchControllerContext& context);
 
 //  While viewing a raid card, close and return to the overworld.
-void close_raid(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context);
+void close_raid(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context);
 
 
 enum class HostingMode{
@@ -40,14 +40,14 @@ enum class HostingMode{
     ONLINE_EVERYONE,
 };
 void open_hosting_lobby(
-    ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context,
+    ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context,
     HostingMode mode
 );
 
 
 //  From overworld or main menu => Code entry for tera raid.
 void enter_tera_search(
-    const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context,
+    const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context,
     bool connect_to_internet
 );
 
@@ -60,7 +60,7 @@ void enter_tera_search(
 //  Upon returning, you will be in the overworld.
 void exit_tera_win_without_catching(
     const ProgramInfo& info,
-    ConsoleHandle& console, SwitchControllerContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     size_t stop_on_sparkly_items
 );
 
@@ -70,7 +70,7 @@ void exit_tera_win_without_catching(
 //  Does not check for shininess.
 void exit_tera_win_by_catching(
     ProgramEnvironment& env,
-    ConsoleHandle& console, SwitchControllerContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     Language language,
     const std::string& ball_slug,
     size_t stop_on_sparkly_items
@@ -91,7 +91,7 @@ enum class TeraResult{
 //  "stop_on_shiny == true', then you will be in the summary of the shiny.
 TeraResult exit_tera_win_by_catching(
     ProgramEnvironment& env,
-    ConsoleHandle& console, SwitchControllerContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     Language language,
     const std::string& ball_slug,
     EventNotificationOption& notification_nonshiny,
@@ -104,7 +104,7 @@ TeraResult exit_tera_win_by_catching(
 
 TeraResult run_tera_summary(
     ProgramEnvironment& env,
-    ConsoleHandle& console,
+    VideoStream& stream,
     SwitchControllerContext& context,
     EventNotificationOption& notification_nonshiny,
     EventNotificationOption& notification_shiny,
@@ -113,9 +113,9 @@ TeraResult run_tera_summary(
 );
 
 //  Run away from tera battle.
-void run_from_tera_battle(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context);
+void run_from_tera_battle(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context);
 
-bool is_sparkling_raid(ConsoleHandle& console, SwitchControllerContext& context);
+bool is_sparkling_raid(VideoStream& stream, SwitchControllerContext& context);
 
 
 }

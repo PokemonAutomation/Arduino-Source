@@ -15,7 +15,6 @@
 namespace PokemonAutomation{
     class CancellableScope;
 namespace NintendoSwitch{
-    class ConsoleHandle;
 namespace PokemonSV{
 
 
@@ -26,7 +25,7 @@ class SparklyItemDetector : public VisualInferenceCallback{
 public:
     SparklyItemDetector(Color color = COLOR_RED);
 
-    static size_t count_sparkly_items(ConsoleHandle& console, CancellableScope& scope);
+    static size_t count_sparkly_items(VideoStream& stream, CancellableScope& scope);
 
     size_t sparkly_items() const;
 

@@ -16,14 +16,14 @@
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
-    class ConsoleHandle;
 namespace PokemonLA{
 
 
 class FlagNavigationAir : public SuperControlSession<SwitchController>{
 public:
     FlagNavigationAir(
-        ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context,
+        ProgramEnvironment& env,
+        VideoStream& stream, SwitchControllerContext& context,
         uint16_t stop_radius,
         double flag_reached_delay,
         std::chrono::seconds navigate_timeout

@@ -6,7 +6,6 @@
 
 #include "CommonTools/Audio/SpectrogramMatcher.h"
 #include "CommonTools/Audio/AudioTemplateCache.h"
-#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "PokemonLA/PokemonLA_Settings.h"
 #include "PokemonLA_ItemDropSoundDetector.h"
 
@@ -15,10 +14,10 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-ItemDropSoundDetector::ItemDropSoundDetector(ConsoleHandle& console, DetectedCallback detected_callback)
+ItemDropSoundDetector::ItemDropSoundDetector(VideoStream& stream, DetectedCallback detected_callback)
     // Use a green as the detection color because the shiny symbol in LA is green.
     : AudioPerSpectrumDetectorBase(
-        console,
+        stream.logger(),
         "ItemDropSoundDetector",
         "Item drop sound",
         COLOR_DARKGREEN,

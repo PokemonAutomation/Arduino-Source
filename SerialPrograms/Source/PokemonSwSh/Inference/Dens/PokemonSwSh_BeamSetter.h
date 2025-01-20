@@ -12,8 +12,8 @@
 
 #include <vector>
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "CommonFramework/Tools/VideoStream.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
-#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 
 namespace PokemonAutomation{
     class ProgramEnvironment;
@@ -31,7 +31,10 @@ public:
     };
 
 public:
-    BeamSetter(ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context);
+    BeamSetter(
+        ProgramEnvironment& env,
+        VideoStream& stream, SwitchControllerContext& context
+    );
 
     Detection run(
         bool save_screenshot,
@@ -44,7 +47,7 @@ public:
 
 
 private:
-    ConsoleHandle& m_console;
+    VideoStream& m_stream;
     SwitchControllerContext& m_context;
     OverlayBoxScope m_text_box0;
     OverlayBoxScope m_text_box1;

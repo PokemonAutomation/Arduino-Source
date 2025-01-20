@@ -6,7 +6,6 @@
 
 #include "CommonTools/Audio/SpectrogramMatcher.h"
 #include "CommonTools/Audio/AudioTemplateCache.h"
-#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "PokemonLA/PokemonLA_Settings.h"
 #include "PokemonLA_AlphaRoarDetector.h"
 
@@ -16,10 +15,16 @@ namespace PokemonLA{
 
 
 
-AlphaRoarDetector::AlphaRoarDetector(ConsoleHandle& console, DetectedCallback detected_callback)
+AlphaRoarDetector::AlphaRoarDetector(VideoStream& stream, DetectedCallback detected_callback)
     // Use a purple as the detection color because the alpha symbol is red. To differentiate with the
     // detection color of alpha music, the roar (which is loud -> heavy -> darker color) uses purple.
-    : AudioPerSpectrumDetectorBase(console, "AlphaRoarDetector", "Alpha roar", COLOR_PURPLE, detected_callback)
+    : AudioPerSpectrumDetectorBase(
+        stream.logger(),
+        "AlphaRoarDetector",
+        "Alpha roar",
+        COLOR_PURPLE,
+        detected_callback
+    )
 {}
 
 float AlphaRoarDetector::get_score_threshold() const{

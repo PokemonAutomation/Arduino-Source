@@ -7,8 +7,8 @@
 #ifndef PokemonAutomation_PokemonLA_AlphaRoarDetector_H
 #define PokemonAutomation_PokemonLA_AlphaRoarDetector_H
 
+#include "CommonFramework/Tools/VideoStream.h"
 #include "CommonTools/Audio/AudioPerSpectrumDetectorBase.h"
-#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -17,7 +17,7 @@ namespace PokemonLA{
 
 class AlphaRoarDetector : public AudioPerSpectrumDetectorBase{
 public:
-    AlphaRoarDetector(ConsoleHandle& console, DetectedCallback detected_callback);
+    AlphaRoarDetector(VideoStream& stream, DetectedCallback detected_callback);
 
     // Implement AudioPerSpectrumDetectorBase::get_score_threshold()
     virtual float get_score_threshold() const override;

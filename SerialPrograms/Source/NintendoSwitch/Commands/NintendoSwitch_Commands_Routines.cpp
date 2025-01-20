@@ -17,7 +17,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-void close_game(ConsoleHandle& console, SwitchControllerContext& context){
+void close_game(VideoStream& stream, SwitchControllerContext& context){
 #if 0
     context.issue_request(
         DeviceRequest_close_game()
@@ -38,16 +38,16 @@ void close_game(ConsoleHandle& console, SwitchControllerContext& context){
     context.wait_for_all_requests();
 
     // send a second Home button press, if the first one is dropped
-    bool video_available = (bool)console.video().snapshot();
+    bool video_available = (bool)stream.video().snapshot();
     if (video_available){
         HomeWatcher detector;
         int ret = wait_until(
-            console, context,
+            stream, context,
             std::chrono::milliseconds(5000),
             { detector }
         );
         if (ret == 0){
-            console.log("Detected Home screen.");
+            stream.log("Detected Home screen.");
         }else{                                               // if game initially open.  |  if game initially closed
             // initial Home button press was dropped
             pbf_press_button(context, BUTTON_HOME, 50, 50);  // - Does nothing.          |  - goes back to home screen, from opened app

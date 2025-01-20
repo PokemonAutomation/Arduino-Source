@@ -21,13 +21,18 @@ public:
     virtual void run_segment(
         SingleSwitchProgramEnvironment& env, 
         SwitchControllerContext& context,
-        AutoStoryOptions options) const override;
+        AutoStoryOptions options
+    ) const override;
 };
 
 
 // start: At Cortondo West Pokecenter.
 // end: At West Province Area One Central Pokecenter
-void checkpoint_29(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, EventNotificationOption& notif_status_update);   
+void checkpoint_29(
+    SingleSwitchProgramEnvironment& env,
+    SwitchControllerContext& context,
+    EventNotificationOption& notif_status_update
+);
 
 
 

@@ -9,8 +9,8 @@
 
 #include <string>
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "CommonFramework/Tools/VideoStream.h"
 #include "CommonTools/ImageMatch/ExactImageDictionaryMatcher.h"
-#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "Pokemon/Inference/Pokemon_PokeballNameReader.h"
 
 namespace PokemonAutomation{
@@ -25,7 +25,7 @@ class BattleBallReader{
 
 public:
     BattleBallReader(
-        ConsoleHandle& console,
+        VideoStream& stream,
         Language language
     );
 
@@ -37,7 +37,7 @@ private:
     const ImageMatch::ExactImageDictionaryMatcher& m_matcher;
     const PokeballNameReader& m_name_reader;
     Language m_language;
-    ConsoleHandle& m_console;
+    VideoStream& m_stream;
     OverlayBoxScope m_box_sprite;
     OverlayBoxScope m_box_name;
     OverlayBoxScope m_box_quantity;

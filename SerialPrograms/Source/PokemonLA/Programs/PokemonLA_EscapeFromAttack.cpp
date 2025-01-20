@@ -4,8 +4,8 @@
  *
  */
 
+#include "CommonFramework/Tools/VideoStream.h"
 #include "CommonTools/Async/InterruptableCommands.h"
-#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonLA_EscapeFromAttack.h"
 
@@ -16,17 +16,30 @@ namespace PokemonLA{
 
 
 EscapeFromAttack::EscapeFromAttack(
-    ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context,
+    ProgramEnvironment& env,
+    VideoStream& stream, SwitchControllerContext& context,
     std::chrono::seconds time_min,
     std::chrono::seconds time_limit
 )
-    : SuperControlSession(env, console, context)
+    : SuperControlSession(env, stream, context)
     , m_min_stop(current_time() + time_min)
     , m_deadline(current_time() + time_limit)
-    , m_attacked(console)
-    , m_mount(console)
-    , m_centerA(console, console, ButtonType::ButtonA, {0.40, 0.50, 0.40, 0.50}, std::chrono::milliseconds(200), false)
-    , m_leftB(console, console, ButtonType::ButtonB, {0.02, 0.40, 0.05, 0.20}, std::chrono::milliseconds(200), false)
+    , m_attacked(stream.logger())
+    , m_mount(stream.logger())
+    , m_centerA(
+        stream.logger(), stream.overlay(),
+        ButtonType::ButtonA,
+        {0.40, 0.50, 0.40, 0.50},
+        std::chrono::milliseconds(200),
+        false
+    )
+    , m_leftB(
+        stream.logger(), stream.overlay(),
+        ButtonType::ButtonB,
+        {0.02, 0.40, 0.05, 0.20},
+        std::chrono::milliseconds(200),
+        false
+    )
     , m_get_on_sneasler_time(WallClock::min())
 {
     *this += m_attacked;

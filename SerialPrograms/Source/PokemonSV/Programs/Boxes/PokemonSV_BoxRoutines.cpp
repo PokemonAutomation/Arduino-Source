@@ -15,7 +15,6 @@
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
 #include "CommonTools/Async/InferenceRoutines.h"
-#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 //#include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.h"
@@ -32,18 +31,18 @@ namespace PokemonSV{
 
 
 bool change_view_to_stats_or_judge(
-    ConsoleHandle& console, SwitchControllerContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     bool throw_exception
 ){
     ImageFloatBox name_bar(0.66, 0.08, 0.52, 0.04);
-    OverlayBoxScope name_bar_overlay(console.overlay(), name_bar);
+    OverlayBoxScope name_bar_overlay(stream.overlay(), name_bar);
     for (size_t attempts = 0;; attempts++){
         if (throw_exception){
             if (attempts == 10){
                 OperationFailedException::fire(
                     ErrorReport::SEND_ERROR_REPORT,
                     "Unable to change Pokemon view after 10 tries.",
-                    console
+                    stream
                 );
             }
         }else{
@@ -53,14 +52,14 @@ bool change_view_to_stats_or_judge(
         }
 
         context.wait_for_all_requests();
-        VideoSnapshot screen = console.video().snapshot();
+        VideoSnapshot screen = stream.video().snapshot();
         ImageStats stats = image_stats(extract_box_reference(screen, name_bar));
 //        cout << stats.stddev << endl;
         if (stats.stddev.sum() > 50){
             break;
         }
 
-        console.log("Unable to detect stats menu. Attempting to correct.", COLOR_RED);
+        stream.log("Unable to detect stats menu. Attempting to correct.", COLOR_RED);
 
 //        //  Alternate one and two + presses. If IV checker is enabled, we should
 //        //  land on the IV checker. Otherwise, it will land us back to nothing.
@@ -76,42 +75,42 @@ bool change_view_to_stats_or_judge(
 
 
 void change_view_to_judge(
-    ConsoleHandle& console, SwitchControllerContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     Language language
 ){
     if (language == Language::None){
         throw InternalProgramError(
-            &console.logger(), PA_CURRENT_FUNCTION,
+            &stream.logger(), PA_CURRENT_FUNCTION,
             "change_view_to_judge() called with no language."
         );
     }
 
     ImageFloatBox name_bar(0.66, 0.08, 0.52, 0.04);
-    IvJudgeReaderScope iv_checker(console, language);
-    OverlayBoxScope name_bar_overlay(console.overlay(), name_bar);
+    IvJudgeReaderScope iv_checker(stream.overlay(), language);
+    OverlayBoxScope name_bar_overlay(stream.overlay(), name_bar);
     for (size_t attempts = 0;; attempts++){
         if (attempts == 10){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Unable to change Pokemon view to judge after 10 tries. Have you unlocked it?",
-                console
+                stream
             );
         }
 
         context.wait_for_all_requests();
-        VideoSnapshot screen = console.video().snapshot();
+        VideoSnapshot screen = stream.video().snapshot();
         ImageStats stats = image_stats(extract_box_reference(screen, name_bar));
 //        cout << stats.stddev << endl;
 
         //  Check if we're even on a stats screen.
         if (stats.stddev.sum() < 50){
-            console.log("Unable to detect stats menu. Attempting to correct.", COLOR_RED);
+            stream.log("Unable to detect stats menu. Attempting to correct.", COLOR_RED);
             pbf_press_button(context, BUTTON_PLUS, 20, 105);
             continue;
         }
 
         //  See if we're on the judge screen.
-        IvJudgeReader::Results ivs = iv_checker.read(console, screen);
+        IvJudgeReader::Results ivs = iv_checker.read(stream.logger(), screen);
 
         size_t detected = 0;
         if (ivs.hp      != IvJudgeValue::UnableToDetect) detected++;
@@ -150,7 +149,7 @@ namespace{
 // `button_operation()` repeatedly until the mode is observed.
 // If `enter_mode` is false, the program will assume it is in the mode, and leave the mode by calling
 // `button_operation()` repeatedly until it confirms to have left the mode.
-void change_held_mode(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context,
+void change_held_mode(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context,
     std::function<void()> button_operation, bool enter_mode,
     const char* time_out_error_name, const char* time_out_error_message)
 {
@@ -161,12 +160,12 @@ void change_held_mode(const ProgramInfo& info, ConsoleHandle& console, SwitchCon
     while (true){
         if (current_time() - start > std::chrono::seconds(60)){
             dump_image_and_throw_recoverable_exception(
-                info, console, time_out_error_name, time_out_error_message
+                info, stream, time_out_error_name, time_out_error_message
             );
         }
         BoxSelectionBoxModeWatcher watcher;
         context.wait_for_all_requests();
-        if (wait_until(console, context, std::chrono::seconds(10), {watcher}) == 0){
+        if (wait_until(stream, context, std::chrono::seconds(10), {watcher}) == 0){
             if (watcher.in_box_selection_mode() == enter_mode){
                 break;
             }
@@ -176,7 +175,7 @@ void change_held_mode(const ProgramInfo& info, ConsoleHandle& console, SwitchCon
         }
         // Cannot detect box selection mode after 10 secs
         dump_image_and_throw_recoverable_exception(
-            info, console, "NoStateBoxSelectionMode", "Cannot determine box selection mode for 10 seconds."
+            info, stream, "NoStateBoxSelectionMode", "Cannot determine box selection mode for 10 seconds."
         );
     }
 }
@@ -186,13 +185,13 @@ void change_held_mode(const ProgramInfo& info, ConsoleHandle& console, SwitchCon
 // Use box selection mode to hold one column of pokemon.
 // Use visual feedback to ensure button Minus is pressed to turn on box selection mode/
 // But no feedback on the button A press to make sure the selection is complete.
-void hold_one_column(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context){
+void hold_one_column(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
     context.wait_for_all_requests();
-    console.log("Holding one column.");
+    stream.log("Holding one column.");
     // Press Minus to draw selection box
     const bool to_enter_selection = true;
     change_held_mode(
-        info, console, context,
+        info, stream, context,
         [&context](){ pbf_press_button(context, BUTTON_MINUS, 50, 40); },
         to_enter_selection,
         "TimeoutHoldingColumn", "Failed to enter box selection mode after 1 minute of Button Minus pressing."
@@ -212,12 +211,12 @@ void hold_one_column(const ProgramInfo& info, ConsoleHandle& console, SwitchCont
 }
 
 // Assuming already holding one or more pokemon, press A to drop them.
-void drop_held_pokemon(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context){
+void drop_held_pokemon(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
     context.wait_for_all_requests();
-    console.log("Drop held pokemon.");
+    stream.log("Drop held pokemon.");
     const bool to_enter_selection = false;
     change_held_mode(
-        info, console, context,
+        info, stream, context,
         [&context](){ pbf_press_button(context, BUTTON_A, 60, 60); },
         to_enter_selection,
         "TimeoutDroppingPokemon", "Failed to drop pokemon after 1 minute of Button A pressing."
@@ -225,12 +224,12 @@ void drop_held_pokemon(const ProgramInfo& info, ConsoleHandle& console, SwitchCo
 }
 
 // Assuming already holding one or more pokemon, press B to cancel the holding.
-void cancel_held_pokemon(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context){
+void cancel_held_pokemon(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
     context.wait_for_all_requests();
-    console.log("Cancel pokemon holding.");
+    stream.log("Cancel pokemon holding.");
     const bool to_enter_selection = false;
     change_held_mode(
-        info, console, context,
+        info, stream, context,
         [&context](){ pbf_press_button(context, BUTTON_B, 60, 60); },
         to_enter_selection,
         "TimeoutCancellingHolding", "Failed to cancel holding pokemon after 1 minute of Button B pressing."
@@ -238,12 +237,12 @@ void cancel_held_pokemon(const ProgramInfo& info, ConsoleHandle& console, Switch
 }
 
 // Assuming the current slot is not empy, press button Y to hold the current pokemon
-void press_y_to_hold_pokemon(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context){
+void press_y_to_hold_pokemon(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
     context.wait_for_all_requests();
-    console.log("Press button Y to hold pokemon for swapping.");
+    stream.log("Press button Y to hold pokemon for swapping.");
     const bool to_enter_selection = true;
     change_held_mode(
-        info, console, context,
+        info, stream, context,
         [&context](){ pbf_press_button(context, BUTTON_Y, 60, 60); },
         to_enter_selection,
         "TimeoutHoldingPokemonByButtonY", "Failed to hold a pokemon by button Y after 1 minute of trying."
@@ -252,17 +251,17 @@ void press_y_to_hold_pokemon(const ProgramInfo& info, ConsoleHandle& console, Sw
 
 
 
-uint8_t check_empty_slots_in_party(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context){
+uint8_t check_empty_slots_in_party(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
     context.wait_for_all_requests();
     BoxEmptyPartyWatcher watcher;
     int ret = wait_until(
-        console, context,
+        stream, context,
         std::chrono::seconds(10),
         {watcher}
     );
     if (ret < 0){
         dump_image_and_throw_recoverable_exception(
-            info, console, "ReadSlotEmptinessFailed", "check_empty_slots_in_party(): Cannot read party emptiness in box system."
+            info, stream, "ReadSlotEmptinessFailed", "check_empty_slots_in_party(): Cannot read party emptiness in box system."
         );
     }
 
@@ -270,135 +269,135 @@ uint8_t check_empty_slots_in_party(const ProgramInfo& info, ConsoleHandle& conso
 }
 
 void load_one_column_to_party(
-    ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context,
+    ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context,
     EventNotificationOption& notification,
     uint8_t column_index, bool has_clone_ride_pokemon
 ){
     context.wait_for_all_requests();
-    console.log("Load column " + std::to_string(column_index) + " to party.");
-    console.overlay().add_log("Load column " + std::to_string(column_index+1), COLOR_WHITE);
+    stream.log("Load column " + std::to_string(column_index) + " to party.");
+    stream.overlay().add_log("Load column " + std::to_string(column_index+1), COLOR_WHITE);
 
     size_t fail_count = 0;
     while (true){
         // Move cursor to the target column
-        move_box_cursor(env.program_info(), console, context, BoxCursorLocation::SLOTS, has_clone_ride_pokemon ? 1 : 0, column_index);
-        hold_one_column(env.program_info(), console, context);
+        move_box_cursor(env.program_info(), stream, context, BoxCursorLocation::SLOTS, has_clone_ride_pokemon ? 1 : 0, column_index);
+        hold_one_column(env.program_info(), stream, context);
         try{
             // Move the held column to party
-            move_box_cursor(env.program_info(), console, context, BoxCursorLocation::PARTY, has_clone_ride_pokemon ? 2 : 1, 0);
+            move_box_cursor(env.program_info(), stream, context, BoxCursorLocation::PARTY, has_clone_ride_pokemon ? 2 : 1, 0);
         }catch (OperationFailedException& e){
             e.send_notification(env, notification);
 
             if (++fail_count == 10){
                 dump_image_and_throw_recoverable_exception(
-                    env.program_info(), console, "ConsecutiveColumnMoveFailure",
+                    env.program_info(), stream, "ConsecutiveColumnMoveFailure",
                     "load_one_column_to_party(): consecutive failure of moving column around."
                 );
             }
-            console.log("Failed to move column around. Cancelling box selection and try again.");
+            stream.log("Failed to move column around. Cancelling box selection and try again.");
             // Cannot move column to party. It could be that the game dropped the button A press that is expected to finish
             // the column selection.
             // We can press B to back out and try again.
-            cancel_held_pokemon(env.program_info(), console, context);
+            cancel_held_pokemon(env.program_info(), stream, context);
             continue;
         }
         break;
     }
 
     // Drop the column to party
-    drop_held_pokemon(env.program_info(), console, context);
+    drop_held_pokemon(env.program_info(), stream, context);
 
     context.wait_for_all_requests();
-    console.log("Loaded column " + std::to_string(column_index) + " to party.");
+    stream.log("Loaded column " + std::to_string(column_index) + " to party.");
 }
 
 void unload_one_column_from_party(
-    ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context,
+    ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context,
     EventNotificationOption& notification,
     uint8_t column_index, bool has_clone_ride_pokemon
 ){
     context.wait_for_all_requests();
-    console.log("Unload party to column " + std::to_string(column_index) + ".");
-    console.overlay().add_log("Unload to column " + std::to_string(column_index+1), COLOR_WHITE);
+    stream.log("Unload party to column " + std::to_string(column_index) + ".");
+    stream.overlay().add_log("Unload to column " + std::to_string(column_index+1), COLOR_WHITE);
 
     size_t fail_count = 0;
     while (true){
         // Move cursor to party column
-        move_box_cursor(env.program_info(), console, context, BoxCursorLocation::PARTY, has_clone_ride_pokemon ? 2 : 1, 0);
-        hold_one_column(env.program_info(), console, context);
+        move_box_cursor(env.program_info(), stream, context, BoxCursorLocation::PARTY, has_clone_ride_pokemon ? 2 : 1, 0);
+        hold_one_column(env.program_info(), stream, context);
 
         try{
             // Move the held column to target
-            move_box_cursor(env.program_info(), console, context, BoxCursorLocation::SLOTS, has_clone_ride_pokemon ? 1 : 0, column_index);
+            move_box_cursor(env.program_info(), stream, context, BoxCursorLocation::SLOTS, has_clone_ride_pokemon ? 1 : 0, column_index);
         }catch (OperationFailedException& e){
             e.send_notification(env, notification);
 
             if (++fail_count == 10){
                 dump_image_and_throw_recoverable_exception(
-                    env.program_info(), console, "ConsecutiveColumnMoveFailure",
+                    env.program_info(), stream, "ConsecutiveColumnMoveFailure",
                     "unload_one_column_from_party(): consecutive failure of moving column around."
                 );
             }
-            console.log("Failed to move column around. Cancelling box selection and try again.");
+            stream.log("Failed to move column around. Cancelling box selection and try again.");
             // Cannot move column to party. It could be that the game dropped the button A press that is expected to finish
             // the column selection.
             // We can press B to back out and try again.
-            cancel_held_pokemon(env.program_info(), console, context);
+            cancel_held_pokemon(env.program_info(), stream, context);
             continue;
         }
         break;
     }
     // Drop the column
-    drop_held_pokemon(env.program_info(), console, context);
+    drop_held_pokemon(env.program_info(), stream, context);
 
     context.wait_for_all_requests();
-    console.log("Unloaded party to column " + std::to_string(column_index) + ".");
+    stream.log("Unloaded party to column " + std::to_string(column_index) + ".");
 }
 
-void move_box_cursor(const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context,
+void move_box_cursor(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context,
     const BoxCursorLocation& side, uint8_t row, uint8_t col)
 {
     context.wait_for_all_requests();
-    console.log("Move cursor to " + BOX_LOCATION_STRING(side, row, col) + ".");
+    stream.log("Move cursor to " + BOX_LOCATION_STRING(side, row, col) + ".");
     BoxDetector detector;
-    VideoOverlaySet overlay_set(console.overlay());
+    VideoOverlaySet overlay_set(stream.overlay());
     detector.make_overlays(overlay_set);
-    detector.move_cursor(info, console, context, side, row, col);
-    console.log("Cursor moved.");
+    detector.move_cursor(info, stream, context, side, row, col);
+    stream.log("Cursor moved.");
 }
 
 void swap_two_box_slots(
-    const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context,
+    const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context,
     const BoxCursorLocation& source_side, uint8_t source_row, uint8_t source_col,
     const BoxCursorLocation& target_side, uint8_t target_row, uint8_t target_col
 )
 {
     context.wait_for_all_requests();
-    console.log("Swap two slots " + BOX_LOCATION_STRING(source_side, source_row, source_col)
+    stream.log("Swap two slots " + BOX_LOCATION_STRING(source_side, source_row, source_col)
         + " and " + BOX_LOCATION_STRING(target_side, target_row, target_col) + ".");
-    console.overlay().add_log("Swap slots", COLOR_WHITE);
+    stream.overlay().add_log("Swap slots", COLOR_WHITE);
 
     BoxDetector detector;
-    VideoOverlaySet overlay_set(console.overlay());
+    VideoOverlaySet overlay_set(stream.overlay());
     detector.make_overlays(overlay_set);
 
-    detector.move_cursor(info, console, context, source_side, source_row, source_col);
+    detector.move_cursor(info, stream, context, source_side, source_row, source_col);
 
     {
         const bool stop_on_exists = true;
         SomethingInBoxSlotWatcher exists(COLOR_BLUE, stop_on_exists);
-        if (wait_until(console, context, std::chrono::seconds(3), {exists}) < 0){
-            dump_image_and_throw_recoverable_exception(info, console, "EmptySourceSwap", "Swapping an empty slot.");
+        if (wait_until(stream, context, std::chrono::seconds(3), {exists}) < 0){
+            dump_image_and_throw_recoverable_exception(info, stream, "EmptySourceSwap", "Swapping an empty slot.");
         }
     }
 
-    press_y_to_hold_pokemon(info, console, context);
+    press_y_to_hold_pokemon(info, stream, context);
 
-    detector.move_cursor(info, console, context, target_side, target_row, target_col);
+    detector.move_cursor(info, stream, context, target_side, target_row, target_col);
 
-    drop_held_pokemon(info, console, context);
+    drop_held_pokemon(info, stream, context);
 
-    console.log("Swapped slots.");
+    stream.log("Swapped slots.");
 }
 
 }

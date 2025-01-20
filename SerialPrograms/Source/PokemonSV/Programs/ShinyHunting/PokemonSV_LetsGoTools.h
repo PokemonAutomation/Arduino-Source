@@ -111,7 +111,8 @@ public:
 class LetsGoEncounterBotTracker{
 public:
     LetsGoEncounterBotTracker(
-        ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context,
+        ProgramEnvironment& env,
+        VideoStream& stream, SwitchControllerContext& context,
         LetsGoEncounterBotStats& stats,
         OCR::LanguageOCROption& language
     );
@@ -150,7 +151,7 @@ public:
 
 private:
     ProgramEnvironment& m_env;
-    ConsoleHandle& m_console;
+    VideoStream& m_stream;
     SwitchControllerContext& m_context;
     LetsGoEncounterBotStats& m_stats;
 
@@ -172,7 +173,7 @@ private:
 //  The function tracks kill chain by sound detection from `tracker`. The function
 //  does not handle any pokemon battle encounters (turn-based battles).
 bool use_lets_go_to_clear_in_front(
-    ConsoleHandle& console, SwitchControllerContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     LetsGoEncounterBotTracker& tracker,
     bool throw_ball_if_bubble,
     std::function<void(SwitchControllerContext& context)>&& command

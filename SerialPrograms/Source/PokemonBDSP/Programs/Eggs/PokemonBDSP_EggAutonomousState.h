@@ -11,7 +11,7 @@
 #include "CommonFramework/Language.h"
 #include "CommonFramework/Notifications/EventNotificationOption.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
-#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
+#include "CommonFramework/Tools/VideoStream.h"
 #include "Pokemon/Options/Pokemon_StatsHuntFilter.h"
 #include "PokemonBDSP/Options/PokemonBDSP_ShortcutDirection.h"
 
@@ -36,7 +36,7 @@ struct EggAutonomousStats : public StatsTracker{
 class EggAutonomousState{
 public:
     EggAutonomousState(
-        ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context,
+        ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context,
         EggAutonomousStats& stats,
         EventNotificationOption& notification_nonshiny_keep,
         EventNotificationOption& notification_shiny,
@@ -79,7 +79,7 @@ private:
 
 private:
     ProgramEnvironment& m_env;
-    ConsoleHandle& m_console;
+    VideoStream& m_stream;
     SwitchControllerContext& m_context;
     EggAutonomousStats& m_stats;
     static EventNotificationOption m_notification_noop;

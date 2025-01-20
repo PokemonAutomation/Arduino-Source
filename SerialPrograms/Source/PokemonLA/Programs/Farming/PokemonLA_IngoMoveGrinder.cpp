@@ -81,17 +81,35 @@ IngoMoveGrinder::IngoMoveGrinder()
 }
 
 
-bool IngoMoveGrinder::start_dialog(ConsoleHandle& console, SwitchControllerContext& context){
+bool IngoMoveGrinder::start_dialog(VideoStream& stream, SwitchControllerContext& context){
     // First press A to start talking with Ingo.
     pbf_press_button(context, BUTTON_A, 20, 150);
     context.wait_for_all_requests();
 
     {
-        ButtonDetector button0(console, console, ButtonType::ButtonA, {0.50, 0.408, 0.40, 0.042}, std::chrono::milliseconds(100), true);
-        ButtonDetector button1(console, console, ButtonType::ButtonA, {0.50, 0.450, 0.40, 0.042}, std::chrono::milliseconds(100), true);
-        ButtonDetector button2(console, console, ButtonType::ButtonA, {0.50, 0.492, 0.40, 0.042}, std::chrono::milliseconds(100), true);
+        ButtonDetector button0(
+            stream.logger(), stream.overlay(),
+            ButtonType::ButtonA,
+            {0.50, 0.408, 0.40, 0.042},
+            std::chrono::milliseconds(100),
+            true
+        );
+        ButtonDetector button1(
+            stream.logger(), stream.overlay(),
+            ButtonType::ButtonA,
+            {0.50, 0.450, 0.40, 0.042},
+            std::chrono::milliseconds(100),
+            true
+        );
+        ButtonDetector button2(
+            stream.logger(), stream.overlay(),
+            ButtonType::ButtonA,
+            {0.50, 0.492, 0.40, 0.042},
+            std::chrono::milliseconds(100),
+            true
+        );
         int ret = run_until<SwitchControllerContext>(
-            console, context,
+            stream, context,
             [&](SwitchControllerContext& context){
                 for (size_t c = 0; c < 10; c++){
                     pbf_press_button(context, BUTTON_A, 20, 150);
@@ -117,7 +135,7 @@ bool IngoMoveGrinder::start_dialog(ConsoleHandle& console, SwitchControllerConte
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Unable to detect options after 10 A presses.",
-                console
+                stream
             );
         }
     }
@@ -125,9 +143,15 @@ bool IngoMoveGrinder::start_dialog(ConsoleHandle& console, SwitchControllerConte
     pbf_press_button(context, BUTTON_A, 20, 150);
     context.wait_for_all_requests();
 
-    ButtonDetector button2(console, console, ButtonType::ButtonA, {0.50, 0.350, 0.40, 0.400}, std::chrono::milliseconds(100), true);
+    ButtonDetector button2(
+        stream.logger(), stream.overlay(),
+        ButtonType::ButtonA,
+        {0.50, 0.350, 0.40, 0.400},
+        std::chrono::milliseconds(100),
+        true
+    );
     int ret = run_until<SwitchControllerContext>(
-        console, context,
+        stream, context,
         [&](SwitchControllerContext& context){
             for (size_t c = 0; c < 5; c++){
                 pbf_press_button(context, BUTTON_A, 20, 150);
@@ -142,7 +166,7 @@ bool IngoMoveGrinder::start_dialog(ConsoleHandle& console, SwitchControllerConte
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Unable to find opponent list options after 5 A presses.",
-            console
+            stream
         );
     }
 }

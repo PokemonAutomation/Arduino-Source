@@ -15,14 +15,14 @@
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
-    class ConsoleHandle;
 namespace PokemonLA{
 
 
 class EscapeFromAttack : public SuperControlSession<SwitchController>{
 public:
     EscapeFromAttack(
-        ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context,
+        ProgramEnvironment& env,
+        VideoStream& stream, SwitchControllerContext& context,
         std::chrono::seconds time_min,
         std::chrono::seconds time_limit
     );

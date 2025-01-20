@@ -63,36 +63,36 @@ void box_to_overworld(SwitchControllerContext& context){
 
 //  Feedback
 
-void overworld_to_menu(ConsoleHandle& console, SwitchControllerContext& context){
+void overworld_to_menu(VideoStream& stream, SwitchControllerContext& context){
     pbf_press_button(context, BUTTON_X, 20, 105);
     context.wait_for_all_requests();
     {
         MenuWatcher detector;
         int ret = wait_until(
-            console, context, std::chrono::seconds(10),
+            stream, context, std::chrono::seconds(10),
             {{detector}}
         );
         if (ret < 0){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Menu not detected after 10 seconds.",
-                console
+                stream
             );
         }
-        console.log("Detected menu.");
+        stream.log("Detected menu.");
     }
     context.wait_for(std::chrono::milliseconds(100));
 }
 
-void save_game(ConsoleHandle& console, SwitchControllerContext& context){
-    overworld_to_menu(console, context);
+void save_game(VideoStream& stream, SwitchControllerContext& context){
+    overworld_to_menu(stream, context);
     pbf_press_button(context, BUTTON_R, 10, 2 * TICKS_PER_SECOND);
     pbf_press_button(context, BUTTON_ZL, 10, 5 * TICKS_PER_SECOND);
 }
 
-void overworld_to_box(ConsoleHandle& console, SwitchControllerContext& context){
+void overworld_to_box(VideoStream& stream, SwitchControllerContext& context){
     //  Open menu.
-    overworld_to_menu(console, context);
+    overworld_to_menu(stream, context);
 
     //  Enter Pokemon
     uint16_t MENU_TO_POKEMON_DELAY = GameSettings::instance().MENU_TO_POKEMON_DELAY;
@@ -111,21 +111,21 @@ void overworld_to_box(ConsoleHandle& console, SwitchControllerContext& context){
     {
         BoxWatcher detector;
         int ret = wait_until(
-            console, context, std::chrono::seconds(10),
+            stream, context, std::chrono::seconds(10),
             {{detector}}
         );
         if (ret < 0){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Box system not detected after 10 seconds.",
-                console
+                stream
             );
         }
-        console.log("Detected box system.");
+        stream.log("Detected box system.");
     }
     context.wait_for(std::chrono::milliseconds(500));
 }
-void box_to_overworld(ConsoleHandle& console, SwitchControllerContext& context){
+void box_to_overworld(VideoStream& stream, SwitchControllerContext& context){
     //  There are two states here which need to be merged:
     //      1.  The depositing column was empty. The party has been swapped and
     //          it's sitting in the box with no held pokemon.
@@ -146,17 +146,17 @@ void box_to_overworld(ConsoleHandle& console, SwitchControllerContext& context){
     {
         MenuWatcher detector;
         int ret = wait_until(
-            console, context, std::chrono::seconds(10),
+            stream, context, std::chrono::seconds(10),
             {{detector}}
         );
         if (ret < 0){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Menu not detected after 10 seconds.",
-                console
+                stream
             );
         }
-        console.log("Detected menu.");
+        stream.log("Detected menu.");
     }
 
     //  To overworld.

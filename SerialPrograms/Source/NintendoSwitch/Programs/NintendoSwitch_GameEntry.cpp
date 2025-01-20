@@ -28,8 +28,7 @@ namespace NintendoSwitch{
 
 
 void resume_game_from_home(
-    ConsoleHandle& console,
-    SwitchControllerContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     bool skip_home_press
 ){
     if (!skip_home_press){
@@ -41,12 +40,12 @@ void resume_game_from_home(
         {
             UpdateMenuWatcher update_detector;
             int ret = wait_until(
-                console, context,
+                stream, context,
                 std::chrono::milliseconds(1000),
                 { update_detector }
             );
             if (ret == 0){
-                console.log("Detected update window.", COLOR_RED);
+                stream.log("Detected update window.", COLOR_RED);
 
                 pbf_press_dpad(context, DPAD_UP, 5, 0);
                 pbf_press_button(context, BUTTON_A, 10, 500);
@@ -57,8 +56,8 @@ void resume_game_from_home(
 
         //  In case we failed to enter the game.
         HomeWatcher home_detector;
-        if (home_detector.detect(console.video().snapshot())){
-            console.log("Failed to re-enter game. Trying again...", COLOR_RED);
+        if (home_detector.detect(stream.video().snapshot())){
+            stream.log("Failed to re-enter game. Trying again...", COLOR_RED);
             pbf_press_button(context, BUTTON_HOME, 10, 10);
             continue;
         }else{
@@ -91,8 +90,7 @@ void move_to_user(SwitchControllerContext& context, uint8_t user_slot){
 
 
 void start_game_from_home_with_inference(
-    ConsoleHandle& console,
-    SwitchControllerContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     uint8_t game_slot,
     uint8_t user_slot,
     uint16_t start_game_wait
@@ -101,19 +99,19 @@ void start_game_from_home_with_inference(
     {
         HomeWatcher detector;
         int ret = run_until<SwitchControllerContext>(
-            console, context,
+            stream, context,
             [](SwitchControllerContext& context){
                 pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);
             },
             { detector }
         );
         if (ret == 0){
-            console.log("Detected Home screen.");
+            stream.log("Detected Home screen.");
         }else{
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "start_game_from_home_with_inference(): Failed to detect Home screen after 10 seconds.",
-                console
+                stream
             );
         }
         context.wait_for(std::chrono::milliseconds(100));
@@ -137,7 +135,7 @@ void start_game_from_home_with_inference(
         BlackScreenWatcher black_screen(COLOR_BLUE);
         context.wait_for_all_requests();
         int ret = wait_until(
-            console, context,
+            stream, context,
             std::chrono::seconds(30),
             {
                 home,
@@ -153,31 +151,31 @@ void start_game_from_home_with_inference(
 
         switch (ret){
         case 0:
-            console.log("Detected home screen (again).", COLOR_RED);
+            stream.log("Detected home screen (again).", COLOR_RED);
             pbf_press_button(context, BUTTON_A, 20, 105);
             break;
         case 1:
-            console.log("Detected user-select screen.");
+            stream.log("Detected user-select screen.");
             move_to_user(context, user_slot);
             pbf_press_button(context, BUTTON_A, 10, start_game_wait);
             break;
         case 2:
-            console.log("Detected update menu.", COLOR_RED);
+            stream.log("Detected update menu.", COLOR_RED);
             pbf_press_dpad(context, DPAD_UP, 5, 0);
             pbf_press_button(context, BUTTON_A, 20, 105);
             break;
         case 3:
-            console.log("Detected check online.", COLOR_RED);
+            stream.log("Detected check online.", COLOR_RED);
             context.wait_for(std::chrono::seconds(1));
             break;
         case 4:
-            console.log("Detected black screen. Game started...");
+            stream.log("Detected black screen. Game started...");
             return;
         default:
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "start_game_from_home_with_inference(): No recognizable state after 30 seconds.",
-                console
+                stream
             );
         }
     }
@@ -185,20 +183,19 @@ void start_game_from_home_with_inference(
 
 
 void start_game_from_home(
-    ConsoleHandle& console,
-    SwitchControllerContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     bool tolerate_update_menu,
     uint8_t game_slot,
     uint8_t user_slot,
     uint16_t start_game_mash
 ){
     context.wait_for_all_requests();
-    if (console.video().snapshot()){
-        console.log("start_game_from_home(): Video capture available. Using inference...");
-        start_game_from_home_with_inference(console, context, game_slot, user_slot, start_game_mash);
+    if (stream.video().snapshot()){
+        stream.log("start_game_from_home(): Video capture available. Using inference...");
+        start_game_from_home_with_inference(stream, context, game_slot, user_slot, start_game_mash);
         return;
     }else{
-        console.log("start_game_from_home(): Video capture not available.", COLOR_RED);
+        stream.log("start_game_from_home(): Video capture not available.", COLOR_RED);
     }
 
     if (game_slot != 0){
@@ -211,7 +208,7 @@ void start_game_from_home(
     if (tolerate_update_menu){
         if (ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET){
             throw UserSetupError(
-                console.logger(),
+                stream.logger(),
                 "Cannot have both \"Tolerate Update Menu\" and \"Start Game Requires Internet\" enabled at the same time without video feedback."
             );
         }
@@ -279,32 +276,32 @@ private:
 
 
 bool openedgame_to_gamemenu(
-    ConsoleHandle& console, SwitchControllerContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     uint16_t timeout
 ){
     {
-        console.log("Waiting to load game...");
+        stream.log("Waiting to load game...");
         GameLoadingDetector detector(false);
         int ret = wait_until(
-            console, context,
+            stream, context,
             std::chrono::milliseconds(timeout * (1000 / TICKS_PER_SECOND)),
             {{detector}}
         );
         if (ret < 0){
-            console.log("Timed out waiting to enter game.", COLOR_RED);
+            stream.log("Timed out waiting to enter game.", COLOR_RED);
             return false;
         }
     }
     {
-        console.log("Waiting for game menu...");
+        stream.log("Waiting for game menu...");
         GameLoadingDetector detector(true);
         int ret = wait_until(
-            console, context,
+            stream, context,
             std::chrono::milliseconds(timeout * (1000 / TICKS_PER_SECOND)),
             {{detector}}
         );
         if (ret < 0){
-            console.log("Timed out waiting for game menu.", COLOR_RED);
+            stream.log("Timed out waiting for game menu.", COLOR_RED);
             return false;
         }
     }

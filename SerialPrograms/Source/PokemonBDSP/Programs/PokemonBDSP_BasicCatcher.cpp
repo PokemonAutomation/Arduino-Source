@@ -25,11 +25,11 @@ namespace PokemonBDSP{
 //  Returns the # of slots scrolled. Returns -1 if not found.
 int move_to_ball(
     const BattleBallReader& reader,
-    ConsoleHandle& console, SwitchControllerContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     const std::string& ball_slug,
     bool forward, int attempts, uint16_t delay
 ){
-    std::string first_ball = reader.read_ball(console.video().snapshot());
+    std::string first_ball = reader.read_ball(stream.video().snapshot());
     if (first_ball == ball_slug){
         return 0;
     }
@@ -38,7 +38,7 @@ int move_to_ball(
     for (int c = 1; c < attempts; c++){
         pbf_press_dpad(context, forward ? DPAD_RIGHT : DPAD_LEFT, 10, delay);
         context.wait_for_all_requests();
-        std::string current_ball = reader.read_ball(console.video().snapshot());
+        std::string current_ball = reader.read_ball(stream.video().snapshot());
         if (current_ball == ball_slug){
             return c;
         }
@@ -57,16 +57,16 @@ int move_to_ball(
 //  Returns -1 if unable to read.
 int16_t move_to_ball(
     const BattleBallReader& reader,
-    ConsoleHandle& console, SwitchControllerContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     const std::string& ball_slug
 ){
     //  Search forward at high speed.
-    int ret = move_to_ball(reader, console, context, ball_slug, true, 50, 30);
+    int ret = move_to_ball(reader, stream, context, ball_slug, true, 50, 30);
     if (ret < 0){
         return 0;
     }
     if (ret == 0){
-        uint16_t quantity = reader.read_quantity(console.video().snapshot());
+        uint16_t quantity = reader.read_quantity(stream.video().snapshot());
         return quantity == 0 ? -1 : quantity;
     }
 
@@ -76,21 +76,21 @@ int16_t move_to_ball(
 
     //  Now try again in reverse at a lower speed in case we overshot.
     //  This will return immediately if we got it right the first time.
-    ret = move_to_ball(reader, console, context, ball_slug, false, 5, TICKS_PER_SECOND);
+    ret = move_to_ball(reader, stream, context, ball_slug, false, 5, TICKS_PER_SECOND);
     if (ret < 0){
         return 0;
     }
     if (ret > 0){
-        console.log("BasicCatcher: Fast ball scrolling overshot by " +
+        stream.log("BasicCatcher: Fast ball scrolling overshot by " +
             std::to_string(ret) + " slot(s).", COLOR_RED);
     }
-    uint16_t quantity = reader.read_quantity(console.video().snapshot());
+    uint16_t quantity = reader.read_quantity(stream.video().snapshot());
     return quantity == 0 ? -1 : quantity;
 }
 
 
 CatchResults throw_balls(
-    ConsoleHandle& console, SwitchControllerContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     Language language,
     const std::string& ball_slug, uint16_t ball_limit
 ){
@@ -104,22 +104,22 @@ CatchResults throw_balls(
         if (0)
 #endif
         {
-            BattleBallReader reader(console, language);
+            BattleBallReader reader(stream, language);
 
             pbf_press_button(context, BUTTON_X, 20, 105);
             context.wait_for_all_requests();
 
-            const int16_t num_balls = move_to_ball(reader, console, context, ball_slug);
+            const int16_t num_balls = move_to_ball(reader, stream, context, ball_slug);
             if (num_balls < 0){
-                console.log("BasicCatcher: Unable to read quantity of ball " + ball_slug + ".");
+                stream.log("BasicCatcher: Unable to read quantity of ball " + ball_slug + ".");
             }
             if (num_balls == 0){
-                console.log("BasicCatcher: No ball " + ball_slug +
+                stream.log("BasicCatcher: No ball " + ball_slug +
                     " found in bag or used them all during catching.");
                 return {CatchResult::OUT_OF_BALLS, balls_used};
             }
 
-            console.log(
+            stream.log(
                 "BasicCatcher: Found " + ball_slug + " with amount " +
                 std::to_string(num_balls)
             );
@@ -132,9 +132,9 @@ CatchResults throw_balls(
 
         BattleMenuWatcher menu_detector(BattleType::STANDARD);
         ExperienceGainWatcher experience_detector;
-        SelectionArrowFinder own_fainted_detector(console, {0.18, 0.64, 0.46, 0.3}, COLOR_YELLOW);
+        SelectionArrowFinder own_fainted_detector(stream.overlay(), {0.18, 0.64, 0.46, 0.3}, COLOR_YELLOW);
         int result = wait_until(
-            console, context,
+            stream, context,
             std::chrono::seconds(60),
             {
                 {menu_detector},
@@ -147,14 +147,14 @@ CatchResults throw_balls(
             if (current_time() < start + std::chrono::seconds(5)){
                 return {CatchResult::CANNOT_THROW_BALL, balls_used};
             }
-            console.log("BasicCatcher: Failed to catch.", COLOR_ORANGE);
+            stream.log("BasicCatcher: Failed to catch.", COLOR_ORANGE);
             if (balls_used >= ball_limit){
-                console.log("Reached the limit of " + std::to_string(ball_limit) + " balls.", COLOR_RED);
+                stream.log("Reached the limit of " + std::to_string(ball_limit) + " balls.", COLOR_RED);
                 return {CatchResult::BALL_LIMIT_REACHED, balls_used};
             }
             continue;
         case 1:
-            console.log("BasicCatcher: End of battle detected.", COLOR_PURPLE);
+            stream.log("BasicCatcher: End of battle detected.", COLOR_PURPLE);
             // It's actually fainted or caught. The logic to find out which one
             // is in basic_catcher().
             return {CatchResult::POKEMON_FAINTED, balls_used};
@@ -168,32 +168,32 @@ CatchResults throw_balls(
 
 
 CatchResults basic_catcher(
-    ConsoleHandle& console, SwitchControllerContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     Language language,
     const std::string& ball_slug, uint16_t ball_limit
 ){
     context.wait_for_all_requests();
-    console.log("Attempting to catch with: " + ball_slug);
+    stream.log("Attempting to catch with: " + ball_slug);
 
-    CatchResults results = throw_balls(console, context, language, ball_slug, ball_limit);
+    CatchResults results = throw_balls(stream, context, language, ball_slug, ball_limit);
     const std::string s = (results.balls_used <= 1 ? "" : "s");
     const std::string pokeball_str = std::to_string(results.balls_used) + " " + ball_slug + s;
 
     switch (results.result){
     case CatchResult::OUT_OF_BALLS:
-        console.log("BasicCatcher: Out of balls after throwing " + pokeball_str, COLOR_RED);
+        stream.log("BasicCatcher: Out of balls after throwing " + pokeball_str, COLOR_RED);
         return results;
     case CatchResult::CANNOT_THROW_BALL:
-        console.log("BasicCatcher: Unable to throw a ball.", COLOR_RED);
+        stream.log("BasicCatcher: Unable to throw a ball.", COLOR_RED);
         return results;
     case CatchResult::BALL_LIMIT_REACHED:
-        console.log("BasicCatcher: Ball limit reached.", COLOR_RED);
+        stream.log("BasicCatcher: Ball limit reached.", COLOR_RED);
         return results;
     case CatchResult::OWN_FAINTED:
-        console.log("BasicCatcher: Wwn " + Pokemon::STRING_POKEMON + " fainted after throwing " + pokeball_str, COLOR_RED);
+        stream.log("BasicCatcher: Wwn " + Pokemon::STRING_POKEMON + " fainted after throwing " + pokeball_str, COLOR_RED);
         return results;
     case CatchResult::TIMED_OUT:
-        console.log("BasicCatcher: Timed out.", COLOR_RED);
+        stream.log("BasicCatcher: Timed out.", COLOR_RED);
         return results;
     default:;
     }
@@ -216,11 +216,11 @@ CatchResults basic_catcher(
         // BlackScreenOverWatcher black_screen_detector;
         EndBattleWatcher end_battle;
         //  Look for a pokemon learning a new move.
-        SelectionArrowFinder learn_move(console, {0.50, 0.62, 0.40, 0.18}, COLOR_YELLOW);
+        SelectionArrowFinder learn_move(stream.overlay(), {0.50, 0.62, 0.40, 0.18}, COLOR_YELLOW);
         //  Look for the pokemon caught screen.
         ReceivePokemonDetector caught_detector;
         int ret = run_until<SwitchControllerContext>(
-            console, context,
+            stream, context,
             [](SwitchControllerContext& context){
                 pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
             },
@@ -233,12 +233,12 @@ CatchResults basic_catcher(
         switch (ret){
         case 0:
             if (results.result == CatchResult::POKEMON_FAINTED){
-                console.log(
+                stream.log(
                     "BasicCatcher: The wild " + STRING_POKEMON + " fainted after " +
                     pokeball_str, COLOR_RED
                 );
             }
-            console.log("BasicCatcher: Battle finished!", COLOR_BLUE);
+            stream.log("BasicCatcher: Battle finished!", COLOR_BLUE);
             pbf_wait(context, TICKS_PER_SECOND);
             context.wait_for_all_requests();
             return results;
@@ -247,21 +247,21 @@ CatchResults basic_catcher(
                 OperationFailedException::fire(
                     ErrorReport::SEND_ERROR_REPORT,
                     "BasicCatcher: Found receive pokemon screen two times.",
-                    console
+                    stream
                 );
             }
-            console.log("BasicCatcher: The wild " + STRING_POKEMON + " was caught by " + pokeball_str, COLOR_BLUE);
+            stream.log("BasicCatcher: The wild " + STRING_POKEMON + " was caught by " + pokeball_str, COLOR_BLUE);
             pbf_wait(context, 50);
             results.result = CatchResult::POKEMON_CAUGHT;
             break; //  Continue the loop.
         case 2:
-            console.log("BasicCatcher: Detected move learn! Don't learn the new move.", COLOR_BLUE);
+            stream.log("BasicCatcher: Detected move learn! Don't learn the new move.", COLOR_BLUE);
             num_learned_moves++;
             if (num_learned_moves == 100){
                 OperationFailedException::fire(
                     ErrorReport::SEND_ERROR_REPORT,
                     "BasicCatcher: Learn new move attempts reach 100.",
-                    console
+                    stream
                 );
             }
             pbf_move_right_joystick(context, 128, 255, 20, 105);
@@ -269,7 +269,7 @@ CatchResults basic_catcher(
             break; //  Continue the loop.
 
         default:
-            console.log("BasicCatcher: Timed out.", COLOR_RED);
+            stream.log("BasicCatcher: Timed out.", COLOR_RED);
             results.result = CatchResult::TIMED_OUT;
             return results;
         }

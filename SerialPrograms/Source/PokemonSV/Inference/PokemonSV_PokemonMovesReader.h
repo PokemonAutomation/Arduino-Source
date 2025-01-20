@@ -15,7 +15,6 @@
 namespace PokemonAutomation{
     class AsyncDispatcher;
 namespace NintendoSwitch{
-    class ConsoleHandle;
 namespace PokemonSV{
 
 class PokemonMovesOCR : public OCR::SmallDictionaryMatcher{

@@ -5,7 +5,6 @@
  */
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonBDSP/PokemonBDSP_Settings.h"
@@ -13,7 +12,6 @@
 #include "PokemonBDSP/Inference/Battles/PokemonBDSP_StartBattleDetector.h"
 #include "PokemonBDSP_OverworldTrigger.h"
 #include "PokemonBDSP_GameNavigation.h"
-#include <iostream>
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -99,15 +97,15 @@ void OverworldTrigger::run_trigger(SwitchControllerContext& context) const{
     }
 }
 
-bool OverworldTrigger::find_encounter(ConsoleHandle& console, SwitchControllerContext& context) const{
+bool OverworldTrigger::find_encounter(VideoStream& stream, SwitchControllerContext& context) const{
     BattleMenuWatcher battle_menu_detector(BattleType::STANDARD);
-    StartBattleDetector start_battle_detector(console);
+    StartBattleDetector start_battle_detector(stream.overlay());
 
     int ret = 0;
     if (TRIGGER_METHOD != TriggerMethod::SWEET_SCENT){
         //  Move character back and forth to trigger encounter.
         ret = run_until<SwitchControllerContext>(
-            console, context,
+            stream, context,
             [&](SwitchControllerContext& context){
                 while (true){
                     run_trigger(context);
@@ -119,9 +117,9 @@ bool OverworldTrigger::find_encounter(ConsoleHandle& console, SwitchControllerCo
             }
         );
     }else{
-        console.overlay().add_log("Using Sweet Scent", COLOR_CYAN);
+        stream.overlay().add_log("Using Sweet Scent", COLOR_CYAN);
         //  Use Sweet Scent to trigger encounter.
-        overworld_to_menu(console, context);
+        overworld_to_menu(stream, context);
 
         //  Go to pokemon page
         const uint16_t MENU_TO_POKEMON_DELAY = GameSettings::instance().MENU_TO_POKEMON_DELAY;
@@ -152,7 +150,7 @@ bool OverworldTrigger::find_encounter(ConsoleHandle& console, SwitchControllerCo
         pbf_mash_button(context, BUTTON_ZL, 30);
 
         ret = wait_until(
-            console, context, std::chrono::seconds(30),
+            stream, context, std::chrono::seconds(30),
             {
                 {battle_menu_detector},
                 {start_battle_detector},
@@ -162,17 +160,17 @@ bool OverworldTrigger::find_encounter(ConsoleHandle& console, SwitchControllerCo
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Battle not detected after Sweet Scent for 30 seconds.",
-                console
+                stream
             );
         }
     }
 
     switch (ret){
     case 0:
-        console.log("Unexpected Battle.", COLOR_RED);
+        stream.log("Unexpected Battle.", COLOR_RED);
         return false;
     case 1:
-        console.log("Battle started!");
+        stream.log("Battle started!");
         return true;
     }
     return false;

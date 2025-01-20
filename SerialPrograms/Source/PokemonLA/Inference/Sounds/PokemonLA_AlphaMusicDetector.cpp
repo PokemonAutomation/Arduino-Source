@@ -6,7 +6,6 @@
 
 #include "CommonTools/Audio/SpectrogramMatcher.h"
 #include "CommonTools/Audio/AudioTemplateCache.h"
-#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "PokemonLA/PokemonLA_Settings.h"
 #include "PokemonLA_AlphaMusicDetector.h"
 
@@ -16,10 +15,10 @@ namespace PokemonLA{
 
 
 
-AlphaMusicDetector::AlphaMusicDetector(ConsoleHandle& console, DetectedCallback detected_callback)
+AlphaMusicDetector::AlphaMusicDetector(VideoStream& stream, DetectedCallback detected_callback)
     // Use a red as the detection color because the alpha symbol is red.
     : AudioPerSpectrumDetectorBase(
-        console,
+        stream.logger(),
         "AlphaMusicDetector",
         "Alpha music",
         COLOR_RED,

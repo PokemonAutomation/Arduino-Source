@@ -22,7 +22,6 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_DetectHome.h"
-#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "NintendoSwitch_DateReader.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 
@@ -165,17 +164,17 @@ int8_t DateReader::read_hours(Logger& logger, const ImageViewRGB32& screen) cons
 
 
 void DateReader::set_hours(
-    const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context,
+    const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context,
     uint8_t hour
 ) const{
     context.wait_for_all_requests();
     {
-        auto snapshot = console.video().snapshot();
+        auto snapshot = stream.video().snapshot();
         if (!detect(snapshot)){
             throw_and_log<FatalProgramException>(
-                console, ErrorReport::SEND_ERROR_REPORT,
+                stream.logger(), ErrorReport::SEND_ERROR_REPORT,
                 "Expected date change menu.",
-                console
+                stream
             );
         }
     }
@@ -189,15 +188,15 @@ void DateReader::set_hours(
         context.wait_for(std::chrono::milliseconds(250));
 
         //  Read the hour.
-        VideoSnapshot snapshot = console.video().snapshot();
-//        int8_t current_hour = read_hours(console, snapshot);
-        int8_t current_hour = read_date(console, snapshot).second.hour;
+        VideoSnapshot snapshot = stream.video().snapshot();
+//        int8_t current_hour = read_hours(stream, snapshot);
+        int8_t current_hour = read_date(stream.logger(), snapshot).second.hour;
 
         if (current_hour < 0){
             throw_and_log<FatalProgramException>(
-                console, ErrorReport::SEND_ERROR_REPORT,
+                stream.logger(), ErrorReport::SEND_ERROR_REPORT,
                 "Unable to read the hour.",
-                console
+                stream
             );
         }
 
@@ -250,9 +249,9 @@ void DateReader::set_hours(
 
 //    auto snapshot = console.video().snapshot();
     throw_and_log<FatalProgramException>(
-        console, ErrorReport::SEND_ERROR_REPORT,
+        stream.logger(), ErrorReport::SEND_ERROR_REPORT,
         "Failed to set the hour after 10 attempts.",
-        console
+        stream
     );
 }
 
@@ -483,18 +482,18 @@ void DateReader::adjust_minute(SwitchControllerContext& context, int current, in
 }
 
 void DateReader::set_date(
-    const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context,
+    const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context,
     const DateTime& date
 ) const{
     context.wait_for_all_requests();
 
     {
-        auto snapshot = console.video().snapshot();
+        auto snapshot = stream.video().snapshot();
         if (!detect(snapshot)){
             throw_and_log<OperationFailedException>(
-                console, ErrorReport::SEND_ERROR_REPORT,
+                stream.logger(), ErrorReport::SEND_ERROR_REPORT,
                 "Expected date change menu.",
-                &console,
+                &stream,
                 snapshot
             );
         }
@@ -507,8 +506,8 @@ void DateReader::set_date(
         context.wait_for_all_requests();
         context.wait_for(std::chrono::milliseconds(250));
 
-        auto snapshot = console.video().snapshot();
-        std::pair<DateFormat, DateTime> current = read_date(console, snapshot);
+        auto snapshot = stream.video().snapshot();
+        std::pair<DateFormat, DateTime> current = read_date(stream.logger(), snapshot);
         if (current.second.year == date.year &&
             current.second.month == date.month &&
             current.second.day == date.day &&
@@ -589,9 +588,9 @@ void DateReader::set_date(
 
     ssf_flush_pipeline(context);
     throw_and_log<FatalProgramException>(
-        console, ErrorReport::SEND_ERROR_REPORT,
+        stream.logger(), ErrorReport::SEND_ERROR_REPORT,
         "Failed to set the hour after 10 attempts.",
-        console
+        stream
     );
 }
 

@@ -9,7 +9,6 @@
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/DebugDumper.h"
 #include "CommonTools/Async/InferenceRoutines.h"
-#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonSV_NormalBattleMenus.h"
@@ -59,22 +58,22 @@ int8_t NormalBattleMenuDetector::detect_slot(const ImageViewRGB32& screen) const
 //    cout << "slot = " << slot << endl;
     return (int8_t)(slot + 0.5);
 }
-bool NormalBattleMenuDetector::move_to_slot(ConsoleHandle& console, SwitchControllerContext& context, uint8_t slot) const{
+bool NormalBattleMenuDetector::move_to_slot(VideoStream& stream, SwitchControllerContext& context, uint8_t slot) const{
     if (slot > 3){
         return false;
     }
     for (size_t attempts = 0;; attempts++){
         if (attempts > 10){
-            console.log("NormalBattleMenuDetector::move_to_slot(): Failed to move slot after 10 attempts.", COLOR_RED);
+            stream.log("NormalBattleMenuDetector::move_to_slot(): Failed to move slot after 10 attempts.", COLOR_RED);
             return false;
         }
 
         context.wait_for_all_requests();
 
-        VideoSnapshot screen = console.video().snapshot();
+        VideoSnapshot screen = stream.video().snapshot();
         int8_t current_slot = detect_slot(screen);
         if (current_slot < 0 || current_slot > 3){
-            console.log("NormalBattleMenuDetector::move_to_slot(): Unable to detect slot.", COLOR_RED);
+            stream.log("NormalBattleMenuDetector::move_to_slot(): Unable to detect slot.", COLOR_RED);
             context.wait_for(std::chrono::milliseconds(500));
             continue;
 //            static int c = 0;
@@ -105,10 +104,10 @@ bool NormalBattleMenuDetector::move_to_slot(ConsoleHandle& console, SwitchContro
 
 
 std::set<std::string> read_singles_opponent(
-    const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context,
+    const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context,
     Language language
 ){
-    VideoOverlaySet overlay(console);
+    VideoOverlaySet overlay = stream.overlay();
 
     ImageFloatBox name(0.422, 0.131, 0.120, 0.050);
     overlay.add(COLOR_RED, name);
@@ -122,7 +121,7 @@ std::set<std::string> read_singles_opponent(
         GradientArrowWatcher arrow(COLOR_BLUE, GradientArrowType::DOWN, {0.4, 0.1, 0.2, 0.5});
         context.wait_for_all_requests();
         int ret = wait_until(
-            console, context, std::chrono::seconds(5),
+            stream, context, std::chrono::seconds(5),
             {battle_menu, arrow}
         );
         context.wait_for(std::chrono::milliseconds(500));
@@ -130,28 +129,28 @@ std::set<std::string> read_singles_opponent(
         switch (ret){
         case 0:
             if (status_opened){
-                console.log("Detected battle menu...");
+                stream.log("Detected battle menu...");
                 return slugs;
             }
-            console.log("Detected battle menu. Opening status...");
+            stream.log("Detected battle menu. Opening status...");
             battle_menu_seen = true;
             pbf_press_button(context, BUTTON_Y, 20, 105);
             continue;
 
         case 1:
             if (!battle_menu_seen){
-                console.log("Detected status menu before pressing Y...", COLOR_RED);
-//                dump_image(console, info, "BattleMenuNotSeen", arrow.last_detected());
+                stream.log("Detected status menu before pressing Y...", COLOR_RED);
+//                dump_image(stream, info, "BattleMenuNotSeen", arrow.last_detected());
                 continue;
             }
             if (status_opened){
-                console.log("Detected status menu (again)...", COLOR_RED);
+                stream.log("Detected status menu (again)...", COLOR_RED);
             }else{
-                console.log("Detected status menu. Reading name...");
+                stream.log("Detected status menu. Reading name...");
                 status_opened = true;
-                VideoSnapshot screen = console.video().snapshot();
+                VideoSnapshot screen = stream.video().snapshot();
                 OCR::StringMatchResult result = Pokemon::PokemonNameReader::instance().read_substring(
-                    console, language,
+                    stream.logger(), language,
                     extract_box_reference(screen, name),
                     OCR::WHITE_TEXT_FILTERS()
                 );
@@ -159,7 +158,7 @@ std::set<std::string> read_singles_opponent(
                     slugs.insert(std::move(item.second.token));
                 }
                 if (slugs.empty()){
-                    dump_image(console, info, "UnableToReadName", screen);
+                    dump_image(stream.logger(), info, "UnableToReadName", screen);
                 }
             }
 
@@ -167,7 +166,7 @@ std::set<std::string> read_singles_opponent(
             continue;
 
         default:
-            console.log("No recognized state. Mashing B...", COLOR_RED);
+            stream.log("No recognized state. Mashing B...", COLOR_RED);
             pbf_mash_button(context, BUTTON_B, 250);
         }
     }
@@ -175,7 +174,7 @@ std::set<std::string> read_singles_opponent(
     OperationFailedException::fire(
         ErrorReport::SEND_ERROR_REPORT,
         "Unable to open status menu to read opponent name.",
-        console
+        stream
     );
 }
 
@@ -220,20 +219,20 @@ int8_t MoveSelectDetector::detect_slot(const ImageViewRGB32& screen) const{
 
     return (int8_t)(y + 0.5);
 }
-bool MoveSelectDetector::move_to_slot(ConsoleHandle& console, SwitchControllerContext& context, uint8_t slot) const{
+bool MoveSelectDetector::move_to_slot(VideoStream& stream, SwitchControllerContext& context, uint8_t slot) const{
     if (slot > 3){
         return false;
     }
     for (size_t attempts = 0;; attempts++){
         context.wait_for_all_requests();
-        VideoSnapshot screen = console.video().snapshot();
+        VideoSnapshot screen = stream.video().snapshot();
         int8_t current_slot = detect_slot(screen);
         if (current_slot < 0 || current_slot > 3){
-            console.log("MoveSelectDetector::move_to_slot(): Unable to detect slot.", COLOR_RED);
+            stream.log("MoveSelectDetector::move_to_slot(): Unable to detect slot.", COLOR_RED);
             return false;
         }
         if (attempts > 10){
-            console.log("MoveSelectDetector::move_to_slot(): Failed to move slot after 10 attempts.", COLOR_RED);
+            stream.log("MoveSelectDetector::move_to_slot(): Failed to move slot after 10 attempts.", COLOR_RED);
             return false;
         }
 
@@ -305,20 +304,20 @@ int8_t SwapMenuDetector::detect_slot(const ImageViewRGB32& screen) const{
     //cout << "slot = " << slot << endl;
     return (int8_t)slot;
 }
-bool SwapMenuDetector::move_to_slot(ConsoleHandle& console, SwitchControllerContext& context, uint8_t slot) const{
+bool SwapMenuDetector::move_to_slot(VideoStream& stream, SwitchControllerContext& context, uint8_t slot) const{
     if (slot > 5){
         return false;
     }
     for (size_t attempts = 0;; attempts++){
         context.wait_for_all_requests();
-        VideoSnapshot screen = console.video().snapshot();
+        VideoSnapshot screen = stream.video().snapshot();
         int8_t current_slot = detect_slot(screen);
         if (current_slot < 0 || current_slot > 5){
-            console.log("SwapMenuDetector::move_to_slot(): Unable to detect slot.", COLOR_RED);
+            stream.log("SwapMenuDetector::move_to_slot(): Unable to detect slot.", COLOR_RED);
             return false;
         }
         if (attempts > 20){
-            console.log("SwapMenuDetector::move_to_slot(): Failed to move slot after 20 attempts.", COLOR_RED);
+            stream.log("SwapMenuDetector::move_to_slot(): Failed to move slot after 20 attempts.", COLOR_RED);
             return false;
         }
 

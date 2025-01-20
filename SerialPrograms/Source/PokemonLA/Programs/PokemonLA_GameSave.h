@@ -7,7 +7,8 @@
 #ifndef PokemonAutomation_PokemonLA_GameSave_H
 #define PokemonAutomation_PokemonLA_GameSave_H
 
-#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
+#include "CommonFramework/Tools/VideoStream.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 
 namespace PokemonAutomation{
     class ProgramEnvironment;
@@ -24,7 +25,10 @@ bool save_tab_disabled(const ImageViewRGB32 &screen);
 // Open menu to save game. Return true if success.
 // Return false if in current state the game cannot be saved. This can happen if the player character is in the air
 // or is rolling or falling.
-bool save_game_from_overworld(ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context);
+bool save_game_from_overworld(
+    ProgramEnvironment& env,
+    VideoStream& stream, SwitchControllerContext& context
+);
 
 
 

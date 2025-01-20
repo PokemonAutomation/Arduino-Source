@@ -7,22 +7,21 @@
 #ifndef PokemonAutomation_NintendoSwitch_GameEntry_H
 #define PokemonAutomation_NintendoSwitch_GameEntry_H
 
-#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
+#include "CommonFramework/Tools/VideoStream.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
 void resume_game_from_home(
-    ConsoleHandle& console,
-    SwitchControllerContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     bool skip_home_press = false
 );
 
 
 void start_game_from_home(
-    ConsoleHandle& console,
-    SwitchControllerContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     bool tolerate_update_menu,
     uint8_t game_slot,
     uint8_t user_slot,
@@ -30,7 +29,7 @@ void start_game_from_home(
 );
 
 bool openedgame_to_gamemenu(
-    ConsoleHandle& console, SwitchControllerContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     uint16_t timeout
 );
 

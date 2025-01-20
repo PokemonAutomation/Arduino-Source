@@ -243,7 +243,10 @@ bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, SwitchCont
     );
 }
 
-void MoneyFarmerRoute210::heal_at_center_and_return(Logger& logger, SwitchControllerContext& context, uint8_t pp0[4], uint8_t pp1[4]){
+void MoneyFarmerRoute210::heal_at_center_and_return(
+    Logger& logger, SwitchControllerContext& context,
+    uint8_t pp0[4], uint8_t pp1[4]
+){
     logger.log("Healing " + STRING_POKEMON + " Celestic Town " + STRING_POKEMON + " Center.");
     pbf_move_left_joystick(context, 125, 0, 6 * TICKS_PER_SECOND, 0);
     pbf_mash_button(context, BUTTON_ZL, 3 * TICKS_PER_SECOND);
@@ -281,7 +284,10 @@ void MoneyFarmerRoute210::heal_at_center_and_return(Logger& logger, SwitchContro
     pp1[2] = MON1_MOVE3_PP;
     pp1[3] = MON1_MOVE4_PP;
 }
-void MoneyFarmerRoute210::fly_to_center_heal_and_return(Logger& logger, SwitchControllerContext& context, uint8_t pp0[4], uint8_t pp1[4]){
+void MoneyFarmerRoute210::fly_to_center_heal_and_return(
+    Logger& logger, SwitchControllerContext& context,
+    uint8_t pp0[4], uint8_t pp1[4]
+){
     logger.log("Flying back to Hearthome City to heal.");
     pbf_press_button(context, BUTTON_X, 10, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
     pbf_press_button(context, BUTTON_PLUS, 10, 240);
@@ -292,16 +298,17 @@ void MoneyFarmerRoute210::fly_to_center_heal_and_return(Logger& logger, SwitchCo
 }
 
 bool MoneyFarmerRoute210::heal_after_battle_and_return(
-    SingleSwitchProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context,
+    SingleSwitchProgramEnvironment& env,
+    VideoStream& stream, SwitchControllerContext& context,
     uint8_t pp0[4], uint8_t pp1[4])
 {
     if (HEALING_METHOD == HealMethod::CelesticTown){
         // Go to Celestic Town Pokecenter to heal the party.
-        fly_to_center_heal_and_return(console, context, pp0, pp1);
+        fly_to_center_heal_and_return(stream.logger(), context, pp0, pp1);
         return false;
     }else{
         // Use Global Room to heal the party.
-        heal_by_global_room(console, context);
+        heal_by_global_room(stream, context);
 
         pp0[0] = MON0_MOVE1_PP;
         pp0[1] = MON0_MOVE2_PP;

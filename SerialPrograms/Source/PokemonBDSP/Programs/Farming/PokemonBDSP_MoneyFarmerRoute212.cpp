@@ -208,16 +208,16 @@ bool MoneyFarmerRoute212::battle(SingleSwitchProgramEnvironment& env, SwitchCont
 }
 
 
-void MoneyFarmerRoute212::heal_at_center_and_return(ConsoleHandle& console, SwitchControllerContext& context, uint8_t pp[4]){
-    console.overlay().add_log("Heal at " + STRING_POKEMON + " Center", COLOR_WHITE);
-    console.log("Healing " + STRING_POKEMON + " at Hearthome City " + STRING_POKEMON + " Center.");
+void MoneyFarmerRoute212::heal_at_center_and_return(VideoStream& stream, SwitchControllerContext& context, uint8_t pp[4]){
+    stream.overlay().add_log("Heal at " + STRING_POKEMON + " Center", COLOR_WHITE);
+    stream.log("Healing " + STRING_POKEMON + " at Hearthome City " + STRING_POKEMON + " Center.");
     pbf_move_left_joystick(context, 125, 0, 6 * TICKS_PER_SECOND, 0);
     pbf_mash_button(context, BUTTON_ZL, 3 * TICKS_PER_SECOND);
     pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);
     context.wait_for_all_requests();
-    console.overlay().add_log("Heal complete", COLOR_WHITE);
-    console.overlay().add_log("To rich couple", COLOR_WHITE);
-    console.log("Returning to rich couple location...");
+    stream.overlay().add_log("Heal complete", COLOR_WHITE);
+    stream.overlay().add_log("To rich couple", COLOR_WHITE);
+    stream.log("Returning to rich couple location...");
     pbf_move_left_joystick(context, 128, 255, 8 * TICKS_PER_SECOND, 0);
     pbf_move_left_joystick(context, 255, 128, 380, 0);
     pbf_move_left_joystick(context, 128, 255, 300, 0);
@@ -245,28 +245,28 @@ void MoneyFarmerRoute212::heal_at_center_and_return(ConsoleHandle& console, Swit
 }
 
 
-void MoneyFarmerRoute212::fly_to_center_heal_and_return(ConsoleHandle& console, SwitchControllerContext& context, uint8_t pp[4]){
-    console.log("Flying back to Hearthome City to heal.");
-    console.overlay().add_log("Fly to Hearthome City", COLOR_WHITE);
+void MoneyFarmerRoute212::fly_to_center_heal_and_return(VideoStream& stream, SwitchControllerContext& context, uint8_t pp[4]){
+    stream.log("Flying back to Hearthome City to heal.");
+    stream.overlay().add_log("Fly to Hearthome City", COLOR_WHITE);
     pbf_press_button(context, BUTTON_X, 10, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
     pbf_press_button(context, BUTTON_PLUS, 10, 240);
     pbf_press_dpad(context, DPAD_UP, 10, 60);
     pbf_press_dpad(context, DPAD_UP, 10, 60);
     pbf_mash_button(context, BUTTON_ZL, 12 * TICKS_PER_SECOND);
-    heal_at_center_and_return(console, context, pp);
+    heal_at_center_and_return(stream, context, pp);
 }
 
 bool MoneyFarmerRoute212::heal_after_battle_and_return(
-    ConsoleHandle& console, SwitchControllerContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     uint8_t pp[4])
 {
     if (HEALING_METHOD == HealMethod::Hearthome){
         // Go to Hearhome City Pokecenter to heal the party.
-        fly_to_center_heal_and_return(console, context, pp);
+        fly_to_center_heal_and_return(stream, context, pp);
         return false;
     }else{
         // Use Global Room to heal the party.
-        heal_by_global_room(console, context);
+        heal_by_global_room(stream, context);
 
         pp[0] = MOVE1_PP;
         pp[1] = MOVE2_PP;

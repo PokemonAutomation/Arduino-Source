@@ -25,27 +25,27 @@ namespace PokemonBDSP{
 
 
 StandardEncounterDetection::StandardEncounterDetection(
-    ConsoleHandle& console, SwitchControllerContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     Language language,
     const EncounterFilterOption2& filter,
     const DoublesShinyDetection& shininess,
     std::chrono::milliseconds read_name_delay
 )
-    : m_console(console)
+    : m_stream(stream)
     , m_language(language)
     , m_filter(filter)
     , m_shininess(shininess)
     , m_double_battle(false)
 {
-//    InferenceBoxScope left_mon_white(console, {0.685, 0.065, 0.025, 0.040});
-    OverlayBoxScope left_mon_white(console, {0.708, 0.070, 0.005, 0.028});
-    OverlayBoxScope left_mon_hp(console, {0.500, 0.120, 0.18, 0.005});
-    OverlayBoxScope left_name(console, {0.467, 0.06, 0.16, 0.050});
-    OverlayBoxScope right_name(console, {0.740, 0.06, 0.16, 0.050});
+//    InferenceBoxScope left_mon_white(stream, {0.685, 0.065, 0.025, 0.040});
+    OverlayBoxScope left_mon_white(stream.overlay(), {0.708, 0.070, 0.005, 0.028});
+    OverlayBoxScope left_mon_hp(stream.overlay(), {0.500, 0.120, 0.18, 0.005});
+    OverlayBoxScope left_name(stream.overlay(), {0.467, 0.06, 0.16, 0.050});
+    OverlayBoxScope right_name(stream.overlay(), {0.740, 0.06, 0.16, 0.050});
 
     context.wait_for_all_requests();
     context.wait_for(std::chrono::milliseconds(100));
-    VideoSnapshot screen = console.video().snapshot();
+    VideoSnapshot screen = stream.video().snapshot();
 
     //  Check if it's a double battle.
     do{
@@ -125,15 +125,15 @@ std::set<std::string> StandardEncounterDetection::read_name(const ImageViewRGB32
     std::set<std::string> ret;
 
     OCR::StringMatchResult result = PokemonNameReader::instance().read_substring(
-        m_console, m_language, image,
+        m_stream.logger(), m_language, image,
         OCR::BLACK_TEXT_FILTERS()
     );
     if (result.results.empty()){
         dump_image(
-            m_console, ProgramInfo(),
+            m_stream.logger(), ProgramInfo(),
             "StandardEncounterDetection-NameOCR-" + language_data(m_language).code,
             screen,
-            &m_console.history()
+            &m_stream.history()
         );
     }else{
         for (const auto& item : result.results){
@@ -183,9 +183,9 @@ bool StandardEncounterDetection::run_overrides(
         if (shiny == ShinyType::MAYBE_SHINY){
 //            actions.emplace_back(EncounterAction::StopProgram, "");
             throw_and_log<FatalProgramException>(
-                m_console, ErrorReport::SEND_ERROR_REPORT,
+                m_stream.logger(), ErrorReport::SEND_ERROR_REPORT,
                 "Cannot run encounter actions due to low confidence shiny detection.",
-                m_console
+                m_stream
             );
         }
 
@@ -216,7 +216,7 @@ EncounterActionFull StandardEncounterDetection::get_action_singles(){
         run_overrides(default_action, overrides, m_pokemon_right, m_shininess_right);
     }
 
-    m_console.log("Action: " + default_action.to_str());
+    m_stream.log("Action: " + default_action.to_str());
 
     return default_action;
 }
@@ -241,14 +241,14 @@ EncounterActionFull StandardEncounterDetection::get_action_doubles(){
 
     std::string str_left = "Left " + STRING_POKEMON + ": " + action_left.to_str();
     std::string str_right = "Right " + STRING_POKEMON + ": " + action_right.to_str();
-    m_console.log(str_left);
-    m_console.log(str_right);
+    m_stream.log(str_left);
+    m_stream.log(str_right);
 
     if (action_left != action_right){
         throw_and_log<FatalProgramException>(
-            m_console, ErrorReport::NO_ERROR_REPORT,
+            m_stream.logger(), ErrorReport::NO_ERROR_REPORT,
             "Conflicting actions requested.\n" + str_left + "\n" + str_right,
-            m_console
+            m_stream
         );
     }
 
@@ -261,9 +261,9 @@ EncounterActionFull StandardEncounterDetection::get_action_doubles(){
     //  Double battle and someone is set to auto-catch.
     if (auto_catch && m_double_battle){
         throw_and_log<FatalProgramException>(
-            m_console, ErrorReport::NO_ERROR_REPORT,
+            m_stream.logger(), ErrorReport::NO_ERROR_REPORT,
             "Cannot auto-catch in a double battle.",
-            m_console
+            m_stream
         );
     }
 

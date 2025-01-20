@@ -7,20 +7,19 @@
 #ifndef PokemonAutomation_PokemonLA_AlphaMusicDetector_H
 #define PokemonAutomation_PokemonLA_AlphaMusicDetector_H
 
-#include <memory>
+#include "CommonFramework/Tools/VideoStream.h"
 #include "CommonTools/Audio/AudioPerSpectrumDetectorBase.h"
 
 
 namespace PokemonAutomation{
     class SpectrogramMatcher;
 namespace NintendoSwitch{
-    class ConsoleHandle;
 namespace PokemonLA{
 
 
 class AlphaMusicDetector : public AudioPerSpectrumDetectorBase{
 public:
-    AlphaMusicDetector(ConsoleHandle& console, DetectedCallback detected_callback);
+    AlphaMusicDetector(VideoStream& stream, DetectedCallback detected_callback);
 
     // Implement AudioPerSpectrumDetectorBase::get_score_threshold()
     virtual float get_score_threshold() const override;

@@ -15,7 +15,6 @@
 namespace PokemonAutomation{
     struct ProgramInfo;
 namespace NintendoSwitch{
-    class ConsoleHandle;
 namespace PokemonSV{
 
 

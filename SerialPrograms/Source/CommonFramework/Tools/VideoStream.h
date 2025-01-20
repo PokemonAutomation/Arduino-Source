@@ -3,7 +3,14 @@
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
  *      Represents a single video stream. Includes video, audio, as well
- *  as their inference pivots.
+ *  as their inference pivots. Also includes a logger and the video overlay.
+ *
+ *  This is the class that should be passed into inference modules as it
+ *  provides all the information needed for inference.
+ *
+ *  This class has been separated from ConsoleHandle which used to take this
+ *  role. But 95% of the uses don't require the controller. And the controller
+ *  is messy due to being heterogeneous.
  *
  */
 

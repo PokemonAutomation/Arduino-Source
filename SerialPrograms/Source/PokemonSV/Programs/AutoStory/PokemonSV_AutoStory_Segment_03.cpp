@@ -170,13 +170,13 @@ void checkpoint_07(
             135, 0, 24, 12, true, true);
 
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 128, 0, 80);
-        handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
-            [&](const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context){           
+        handle_when_stationary_in_overworld(env.program_info(), env.console, context,
+            [&](const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
                 overworld_navigation(env.program_info(), env.console, context, 
                     NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 
                     128, 0, 24, 12, true, true);
             }, 
-            [&](const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context){           
+            [&](const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
                 pbf_move_left_joystick(context, 0, 128, 40, 50);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }

@@ -21,13 +21,18 @@ public:
     virtual void run_segment(
         SingleSwitchProgramEnvironment& env, 
         SwitchControllerContext& context,
-        AutoStoryOptions options) const override;
+        AutoStoryOptions options
+    ) const override;
 };
 
 
 // start: Moved to cliff. Heard mystery cry.
 // end: Rescued Koraidon/Miraidon and escaped from the Houndoom Cave.
-void checkpoint_08(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, EventNotificationOption& notif_status_update);
+void checkpoint_08(
+    SingleSwitchProgramEnvironment& env,
+    SwitchControllerContext& context,
+    EventNotificationOption& notif_status_update
+);
 
 
 }

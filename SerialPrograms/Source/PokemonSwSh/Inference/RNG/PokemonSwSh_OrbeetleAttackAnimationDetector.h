@@ -11,8 +11,8 @@
 #define PokemonAutomation_PokemonSwSh_OrbeetleAttackAnimationDetector_H
 
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "CommonFramework/Tools/VideoStream.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
-#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 
 namespace PokemonAutomation{
 class ProgramEnvironment;
@@ -29,13 +29,13 @@ public:
     };
 
 public:
-    OrbeetleAttackAnimationDetector(ConsoleHandle& console, SwitchControllerContext& context);
+    OrbeetleAttackAnimationDetector(VideoStream& stream, SwitchControllerContext& context);
 
     Detection run(bool save_screenshot, bool log_values);
 
 
 private:
-    ConsoleHandle& m_console;
+    VideoStream& m_stream;
     SwitchControllerContext& m_context;
     OverlayBoxScope m_box;
 };

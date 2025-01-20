@@ -10,9 +10,10 @@
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
+#include "CommonFramework/Tools/VideoStream.h"
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 #include "CommonTools/VisualDetector.h"
-#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 
 namespace PokemonAutomation{
 
@@ -39,17 +40,17 @@ public:
 
     // return the direction of the N symbol, in radians, using North-clockwise convention. [0, 2pi)
     // return -1 if unable to locate the N symbol
-    double get_current_direction(ConsoleHandle& console, const ImageViewRGB32& screen) const;
+    double get_current_direction(VideoStream& stream, const ImageViewRGB32& screen) const;
 
     bool is_minimap_possibly_locked(double current_direction) const;
 
-    bool is_minimap_definitely_locked(ConsoleHandle& console, SwitchControllerContext& context, double current_direction) const;
+    bool is_minimap_definitely_locked(VideoStream& stream, SwitchControllerContext& context, double current_direction) const;
 
     // given direction in radians (North-clockwise), rotate the camera so N is pointing in the desired direction.
     // mini-map must be unlocked.
     void change_direction(
         const ProgramInfo& info,
-        ConsoleHandle& console, 
+        VideoStream& stream,
         SwitchControllerContext& context,
         double direction
     ) const;

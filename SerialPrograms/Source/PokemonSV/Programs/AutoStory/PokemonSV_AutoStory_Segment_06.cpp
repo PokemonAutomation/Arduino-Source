@@ -39,7 +39,11 @@ std::string AutoStory_Segment_06::end_text() const{
     return "End: At Los Platos Pokecenter.";
 }
 
-void AutoStory_Segment_06::run_segment(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, AutoStoryOptions options) const{
+void AutoStory_Segment_06::run_segment(
+    SingleSwitchProgramEnvironment& env,
+    SwitchControllerContext& context,
+    AutoStoryOptions options
+) const{
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
 
     context.wait_for_all_requests();
@@ -74,24 +78,24 @@ void checkpoint_11(
 
         context.wait_for_all_requests();
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
-            [&](const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context){
-                realign_player(info, console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 100, 210, 100);
+            [&](const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+                realign_player(info, stream, context, PlayerRealignMode::REALIGN_NEW_MARKER, 100, 210, 100);
                 pbf_move_left_joystick(context, 128, 0, 187, 20);
                 pbf_move_left_joystick(context, 0, 128, 30, 8 * TICKS_PER_SECOND);
                 pbf_move_left_joystick(context, 128, 0, 1 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
 
-                realign_player(info, console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 100, 60, 200);                
+                realign_player(info, stream, context, PlayerRealignMode::REALIGN_NEW_MARKER, 100, 60, 200);
             }
         );     
 
         env.console.log("overworld_navigation: Go to Los Platos.");
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
-            [&](const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context){           
+            [&](const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
                 overworld_navigation(env.program_info(), env.console, context, 
                     NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 
                     128, 0, 75, 75, true, true);
             }, 
-            [&](const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context){           
+            [&](const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
                 pbf_move_left_joystick(context, 0, 128, 40, 50);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }

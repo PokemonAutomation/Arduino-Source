@@ -7,7 +7,8 @@
 #ifndef PokemonAutomation_PokemonBDSP_GameNavigation_H
 #define PokemonAutomation_PokemonBDSP_GameNavigation_H
 
-#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
+#include "CommonFramework/Tools/VideoStream.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -25,11 +26,11 @@ void box_to_overworld(SwitchControllerContext& context);
 
 //  Feedback
 
-void overworld_to_menu(ConsoleHandle& console, SwitchControllerContext& context);
-void save_game(ConsoleHandle& console, SwitchControllerContext& context);
+void overworld_to_menu(VideoStream& stream, SwitchControllerContext& context);
+void save_game(VideoStream& stream, SwitchControllerContext& context);
 
-void overworld_to_box(ConsoleHandle& console, SwitchControllerContext& context);
-void box_to_overworld(ConsoleHandle& console, SwitchControllerContext& context);
+void overworld_to_box(VideoStream& stream, SwitchControllerContext& context);
+void box_to_overworld(VideoStream& stream, SwitchControllerContext& context);
 
 
 }

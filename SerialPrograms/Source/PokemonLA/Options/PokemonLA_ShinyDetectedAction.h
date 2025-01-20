@@ -12,15 +12,14 @@
 #include "Common/Cpp/Options/TimeExpressionOption.h"
 #include "Common/Cpp/Options/GroupOption.h"
 #include "CommonFramework/Notifications/EventNotificationOption.h"
+#include "CommonFramework/Tools/VideoStream.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 
 namespace PokemonAutomation{
     class EventNotificationOption;
     class StatsTracker;
     class ProgramEnvironment;
-//    class AsyncCommandSession;
 namespace NintendoSwitch{
-    class ConsoleHandle;
 namespace PokemonLA{
 
 
@@ -72,21 +71,21 @@ public:
 //  Call this inside the ShinySoundDetector callback.
 //  Returns true if session should stop.
 bool on_shiny_callback(
-    ProgramEnvironment& env, ConsoleHandle& console,
+    ProgramEnvironment& env, VideoStream& stream,
     ShinyDetectedActionOption& options,
     float error_coefficient
 );
 
 //  Call this after the session ends. Only if the session stopped on the shiny.
 void on_shiny_sound(
-    ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context,
+    ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context,
     ShinyDetectedActionOption& options,
     float error_coefficient
 );
 
 // Alternative for matches (shiny/alphas) not found by sound.
 void on_match_found(
-    ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context,
+    ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context,
     ShinyDetectedActionOption& options, bool is_match
 );
 

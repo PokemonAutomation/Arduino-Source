@@ -37,7 +37,7 @@ private:
     bool run_iteration(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, std::map<size_t, size_t>& pokemon_move_attempts);
 
     //  Returns true if version 1.0.
-    bool start_dialog(ConsoleHandle& console, SwitchControllerContext& context);
+    bool start_dialog(VideoStream& stream, SwitchControllerContext& context);
 
 private:
     IngoOpponentOption OPPONENT;

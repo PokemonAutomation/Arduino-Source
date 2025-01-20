@@ -29,8 +29,10 @@ public:
 
 private:
     void run_macro(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
-
-    void execute_action(ConsoleHandle& console, SwitchControllerContext& context, const TurboMacroRow& row);
+    void execute_action(
+        VideoStream& stream, SwitchControllerContext& context,
+        const TurboMacroRow& row
+    );
 
 private:
     SimpleIntegerOption<uint32_t> LOOP;

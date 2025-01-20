@@ -42,8 +42,11 @@ void TurboMacro::run_macro(SingleSwitchProgramEnvironment& env, SwitchController
     }
 }
 
-void TurboMacro::execute_action(ConsoleHandle& console, SwitchControllerContext& context, const TurboMacroRow& row){
-    console.log("Execute action " + row.action.current_display());
+void TurboMacro::execute_action(
+    VideoStream& stream, SwitchControllerContext& context,
+    const TurboMacroRow& row
+){
+    stream.log("Execute action " + row.action.current_display());
     const TurboMacroCell& cell = row.parameters;
     switch(row.action){
     case TurboMacroAction::LEFT_JOYSTICK:

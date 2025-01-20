@@ -37,7 +37,11 @@ std::string AutoStory_Segment_08::end_text() const{
     return "End: Battled Team Star, talked to Jacq, standing in classroom.";
 }
 
-void AutoStory_Segment_08::run_segment(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, AutoStoryOptions options) const{
+void AutoStory_Segment_08::run_segment(
+    SingleSwitchProgramEnvironment& env,
+    SwitchControllerContext& context,
+    AutoStoryOptions options
+) const{
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
 
     context.wait_for_all_requests();
@@ -67,7 +71,7 @@ void checkpoint_13(
     while (true){
     try{
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
-        [&](const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context){        
+        [&](const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
         
             if (first_attempt){
                 checkpoint_save(env, context, notif_status_update);

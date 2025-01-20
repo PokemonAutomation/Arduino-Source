@@ -67,10 +67,10 @@ void SnapshotDumper::program(SingleSwitchProgramEnvironment& env, SwitchControll
     }
 }
 
-void dump_snapshot(ConsoleHandle& console, std::string folder_name){
+void dump_snapshot(VideoStream& stream, std::string folder_name){
     std::string folder_path = USER_FILE_PATH() + folder_name + "/";
     QDir().mkpath(folder_path.c_str());
-    VideoSnapshot last = console.video().snapshot();
+    VideoSnapshot last = stream.video().snapshot();
     std::string filename = folder_path + now_to_filestring() + ".png";
     last->save(filename);
 }

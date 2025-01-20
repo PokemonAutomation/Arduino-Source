@@ -43,7 +43,11 @@ std::string AutoStory_Segment_12::end_text() const{
 }
 
 
-void AutoStory_Segment_12::run_segment(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, AutoStoryOptions options) const{
+void AutoStory_Segment_12::run_segment(
+    SingleSwitchProgramEnvironment& env,
+    SwitchControllerContext& context,
+    AutoStoryOptions options
+) const{
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
 
     context.wait_for_all_requests();
@@ -75,7 +79,7 @@ void checkpoint_28(
         context.wait_for_all_requests();
         DirectionDetector direction;
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
-            [&](const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context){
+            [&](const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
                 direction.change_direction(env.program_info(), env.console, context, 2.71);
                 pbf_move_left_joystick(context, 128, 0, 375, 100);
                 direction.change_direction(env.program_info(), env.console, context, 1.26);
@@ -89,10 +93,10 @@ void checkpoint_28(
             env.console, context,
             [&](SwitchControllerContext& context){
                 handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
-                    [&](const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context){           
+                    [&](const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
                         pbf_move_left_joystick(context, 128, 0, 10 * TICKS_PER_SECOND, 100);
                     }, 
-                    [&](const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context){           
+                    [&](const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
                         pbf_move_left_joystick(context, 0, 0, 100, 20);
                     },
                     5, 3

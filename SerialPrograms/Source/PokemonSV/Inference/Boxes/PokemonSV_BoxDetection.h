@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonSV_BoxDetection_H
 
 #include "Common/Cpp/Containers/FixedLimitVector.h"
+#include "CommonFramework/Tools/VideoStream.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.h"
@@ -16,7 +17,6 @@
 namespace PokemonAutomation{
     struct ProgramInfo;
 namespace NintendoSwitch{
-    class ConsoleHandle;
 namespace PokemonSV{
 
 
@@ -104,7 +104,7 @@ public:
 
     //  While in the box system view, move the cursor to the desired slot.
     void move_cursor(
-        const ProgramInfo& info, ConsoleHandle& console, SwitchControllerContext& context,
+        const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context,
         BoxCursorLocation side, uint8_t row, uint8_t col
     ) const;
 

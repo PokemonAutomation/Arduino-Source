@@ -13,7 +13,6 @@
 namespace PokemonAutomation{
     class AsyncDispatcher;
 namespace NintendoSwitch{
-    class ConsoleHandle;
 namespace PokemonSV{
 
 class MenuOptionReader : public OCR::SmallDictionaryMatcher{

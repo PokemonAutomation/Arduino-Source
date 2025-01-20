@@ -21,22 +21,35 @@ public:
     virtual void run_segment(
         SingleSwitchProgramEnvironment& env, 
         SwitchControllerContext& context,
-        AutoStoryOptions options) const override;
+        AutoStoryOptions options
+    ) const override;
 };
 
 
 
 // start: At West Province Area One North Pokecenter
 // end: Defeated Team Star (Dark) grunts at base entrance
-void checkpoint_32(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, EventNotificationOption& notif_status_update);   
+void checkpoint_32(
+    SingleSwitchProgramEnvironment& env,
+    SwitchControllerContext& context,
+    EventNotificationOption& notif_status_update
+);
 
 // start: Defeated Team star dark grunts at base entrance
 // end: Defeated Team Star (Dark) boss
-void checkpoint_33(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, EventNotificationOption& notif_status_update);   
+void checkpoint_33(
+    SingleSwitchProgramEnvironment& env,
+    SwitchControllerContext& context,
+    EventNotificationOption& notif_status_update
+);
 
 // start: Defeated Team Star (Dark) boss
 // end: At Cascarrafa (West) Pokecenter.
-void checkpoint_34(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, EventNotificationOption& notif_status_update);  
+void checkpoint_34(
+    SingleSwitchProgramEnvironment& env,
+    SwitchControllerContext& context,
+    EventNotificationOption& notif_status_update
+);
 
 
 

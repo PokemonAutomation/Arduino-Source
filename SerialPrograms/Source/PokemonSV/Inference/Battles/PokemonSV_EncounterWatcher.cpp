@@ -5,7 +5,6 @@
  */
 
 #include "CommonTools/Images/ImageFilter.h"
-#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "PokemonSV_EncounterWatcher.h"
 
 namespace PokemonAutomation{
@@ -13,11 +12,11 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 
-EncounterWatcher::EncounterWatcher(ConsoleHandle& console, Color color)
+EncounterWatcher::EncounterWatcher(VideoStream& stream, Color color)
     : VisualInferenceCallback("EncounterWatcher (video)")
     , AudioInferenceCallback("EncounterWatcher (audio)")
     , m_battle_menu(color)
-    , m_shiny_sound(console, [](float){ return true; })
+    , m_shiny_sound(stream.logger(), [](float){ return true; })
 {}
 void EncounterWatcher::make_overlays(VideoOverlaySet& items) const{
     m_battle_menu.make_overlays(items);
