@@ -76,6 +76,7 @@ public:
     const TravelLocation Icelands_Snowfields;
     const TravelLocation Icelands_Icepeak;
     const TravelLocation Icelands_PearlSettlement;
+    const TravelLocation Icelands_PearlSettlement_SW;
     const TravelLocation Icelands_Arena;
 
 

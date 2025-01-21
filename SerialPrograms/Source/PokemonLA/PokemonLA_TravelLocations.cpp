@@ -151,6 +151,15 @@ TravelLocations::TravelLocations()
         "Alabaster Icelands - Pearl Settlement",
         MapRegion::ICELANDS, 0, 2, nullptr
     )
+    , Icelands_PearlSettlement_SW(
+        "icelands-settlement-sw",
+        "Alabaster Icelands - Pearl Settlement (SW of landing spot)",
+        MapRegion::ICELANDS, 0, 2, [](VideoStream& stream, SwitchControllerContext& context){
+            change_mount(stream, context, MountState::BRAVIARY_ON);
+            pbf_move_left_joystick(context, 192, 255, 160, 0);
+            pbf_mash_button(context, BUTTON_B, 2 * TICKS_PER_SECOND);
+        }
+    )
     , Icelands_Arena(
         "icelands-arena",
         "Alabaster Icelands - Icepeak Arena",
@@ -179,6 +188,7 @@ TravelLocations::TravelLocations()
     add_location(Icelands_Snowfields);
     add_location(Icelands_Icepeak);
     add_location(Icelands_PearlSettlement);
+    add_location(Icelands_PearlSettlement_SW);
     add_location(Icelands_Arena);
 }
 
