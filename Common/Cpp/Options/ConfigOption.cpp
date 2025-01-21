@@ -4,6 +4,7 @@
  *
  */
 
+#include <atomic>
 #include "Common/Cpp/ListenerSet.h"
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Common/Cpp/Json/JsonValue.h"
