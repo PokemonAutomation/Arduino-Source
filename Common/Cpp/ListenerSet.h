@@ -17,6 +17,10 @@ namespace PokemonAutomation{
 template <typename ListenerType>
 class ListenerSet{
 public:
+    bool empty() const{
+        std::lock_guard<std::mutex> lg(m_lock);
+        return m_listeners.empty();
+    }
     size_t count_unique() const{
         std::lock_guard<std::mutex> lg(m_lock);
         return m_listeners.size();
