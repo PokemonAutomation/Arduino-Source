@@ -28,7 +28,7 @@ ClothingBuyer_Descriptor::ClothingBuyer_Descriptor()
         "Buy all the clothing in a store.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_SERIAL_DEFAULT}
     )
 {}
 

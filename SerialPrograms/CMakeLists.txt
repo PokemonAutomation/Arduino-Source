@@ -609,12 +609,13 @@ file(GLOB MAIN_SOURCES
     Source/Controllers/ControllerSession.h
     Source/Controllers/ControllerSelectorWidget.cpp
     Source/Controllers/ControllerSelectorWidget.h
+    Source/Controllers/SerialPABotBase/SerialPABotBase.cpp
+    Source/Controllers/SerialPABotBase/SerialPABotBase.h
     Source/Controllers/SerialPABotBase/SerialPABotBase_Connection.cpp
     Source/Controllers/SerialPABotBase/SerialPABotBase_Connection.h
     Source/Controllers/SerialPABotBase/SerialPABotBase_Descriptor.cpp
     Source/Controllers/SerialPABotBase/SerialPABotBase_Descriptor.h
     Source/Controllers/SerialPABotBase/SerialPABotBase_Handle.cpp
-    Source/Controllers/SerialPABotBase/SerialPABotBase_Globals.h
     Source/Controllers/SerialPABotBase/SerialPABotBase_Handle.cpp
     Source/Controllers/SerialPABotBase/SerialPABotBase_Handle.h
     Source/Integrations/DiscordIntegrationSettings.cpp

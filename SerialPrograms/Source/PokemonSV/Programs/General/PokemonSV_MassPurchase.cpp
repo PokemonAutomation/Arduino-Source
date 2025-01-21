@@ -30,7 +30,7 @@ MassPurchase_Descriptor::MassPurchase_Descriptor()
         "Purchase a specified amount of items from a shop.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_SERIAL_DEFAULT}
     )
 {}
 

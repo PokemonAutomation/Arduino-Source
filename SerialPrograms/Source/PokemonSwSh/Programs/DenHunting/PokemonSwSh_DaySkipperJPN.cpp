@@ -28,7 +28,13 @@ DaySkipperJPN_Descriptor::DaySkipperJPN_Descriptor()
         "A day skipper for Japanese date format. (7600 skips/hour)",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_31KB
+        {{
+            SerialPABotBase::INTERFACE_NAME, {
+                to_string(SerialPABotBase::Features::TickPrecise),
+                to_string(SerialPABotBase::Features::NintendoSwitch_Basic),
+                to_string(SerialPABotBase::Features::NintendoSwitch_DateSkip),
+            }
+        }}
     )
 {}
 

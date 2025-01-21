@@ -33,7 +33,7 @@ CrobatFinder_Descriptor::CrobatFinder_Descriptor()
         "Constantly reset the cave to find Shiny Alpha Crobat.",
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_SERIAL_DEFAULT}
     )
 {}
 class CrobatFinder_Descriptor::Stats : public StatsTracker, public ShinyStatIncrementer{

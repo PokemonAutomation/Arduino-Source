@@ -23,7 +23,7 @@ FlagNavigationTest_Descriptor::FlagNavigationTest_Descriptor()
         "Navigate to the flag pin.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_SERIAL_DEFAULT}
     )
 {}
 

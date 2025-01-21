@@ -25,7 +25,7 @@ EventBeamFinder_Descriptor::EventBeamFinder_Descriptor()
         "Drop wishing pieces until you find an event den.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_SERIAL_DEFAULT}
     )
 {}
 

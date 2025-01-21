@@ -25,7 +25,13 @@ DaySkipperEU_Descriptor::DaySkipperEU_Descriptor()
         "A day skipper for EU date format that.  (~7500 skips/hour)",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_31KB
+        {{
+            SerialPABotBase::INTERFACE_NAME, {
+                to_string(SerialPABotBase::Features::TickPrecise),
+                to_string(SerialPABotBase::Features::NintendoSwitch_Basic),
+                to_string(SerialPABotBase::Features::NintendoSwitch_DateSkip),
+            }
+        }}
     )
 {}
 std::unique_ptr<StatsTracker> DaySkipperEU_Descriptor::make_stats() const{

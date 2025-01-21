@@ -27,7 +27,7 @@ ShinyHuntShaymin_Descriptor::ShinyHuntShaymin_Descriptor()
         "Shiny hunt Shaymin using the runaway method.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_SERIAL_DEFAULT}
     )
 {}
 std::unique_ptr<StatsTracker> ShinyHuntShaymin_Descriptor::make_stats() const{

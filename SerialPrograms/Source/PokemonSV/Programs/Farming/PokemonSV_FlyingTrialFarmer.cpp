@@ -35,7 +35,7 @@ FlyingTrialFarmer_Descriptor::FlyingTrialFarmer_Descriptor()
         "Farm the flying trial for BP.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_SERIAL_DEFAULT}
     )
 {}
 struct FlyingTrialFarmer_Descriptor::Stats : public StatsTracker{

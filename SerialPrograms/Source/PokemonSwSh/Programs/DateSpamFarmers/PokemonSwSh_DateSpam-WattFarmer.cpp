@@ -27,7 +27,7 @@ WattFarmer_Descriptor::WattFarmer_Descriptor()
         "Farm watts. (7.2 seconds/fetch, 1 million watts/hour)",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_SERIAL_DEFAULT}
     )
 {}
 

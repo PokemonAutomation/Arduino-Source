@@ -39,7 +39,7 @@ StatsReset_Descriptor::StatsReset_Descriptor()
         "Repeatedly catch static encounters until you get the stats you want.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_SERIAL_DEFAULT}
     )
 {}
 struct StatsReset_Descriptor::Stats : public StatsTracker{

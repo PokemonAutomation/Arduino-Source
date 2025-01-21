@@ -42,7 +42,7 @@ TeraRoller_Descriptor::TeraRoller_Descriptor()
         "Roll Tera raids to find shiny " + STRING_POKEMON + ".",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_SERIAL_DEFAULT}
     )
 {}
 struct TeraRoller_Descriptor::Stats : public StatsTracker{

@@ -5,6 +5,7 @@
  */
 
 #include "Common/Cpp/Json/JsonValue.h"
+#include "SerialPABotBase.h"
 #include "SerialPABotBase_Descriptor.h"
 #include "SerialPABotBase_Connection.h"
 
@@ -14,9 +15,6 @@
 
 namespace PokemonAutomation{
 namespace SerialPABotBase{
-
-
-const char SerialDescriptor::TYPENAME[] = "SerialPort";
 
 
 std::unique_ptr<ControllerDescriptor> SerialDescriptor::clone() const{
@@ -31,13 +29,14 @@ bool SerialDescriptor::operator==(const ControllerDescriptor& x) const{
 
 
 const char* SerialDescriptor::type_name() const{
-    return TYPENAME;
+    return INTERFACE_NAME;
 }
 std::string SerialDescriptor::display_name() const{
     if (m_port.isNull()){
         return "";
     }
     return m_port.portName().toStdString() + " - " + m_port.description().toStdString();
+//    return "Serial (PABotBase): " + m_port.portName().toStdString() + " - " + m_port.description().toStdString();;
 }
 void SerialDescriptor::load_json(const JsonValue& json){
     const std::string* name = json.to_string();

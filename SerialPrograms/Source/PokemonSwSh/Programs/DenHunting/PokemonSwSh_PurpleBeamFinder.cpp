@@ -33,7 +33,7 @@ PurpleBeamFinder_Descriptor::PurpleBeamFinder_Descriptor()
         "Automatically reset for a purple beam.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_SERIAL_DEFAULT}
     )
 {}
 struct PurpleBeamFinder_Descriptor::Stats : public StatsTracker{

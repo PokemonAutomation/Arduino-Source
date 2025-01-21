@@ -22,7 +22,7 @@ SnapshotDumper_Descriptor::SnapshotDumper_Descriptor()
         "Periodically take screenshots.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::ENABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_SERIAL_DEFAULT}
     )
 {}
 

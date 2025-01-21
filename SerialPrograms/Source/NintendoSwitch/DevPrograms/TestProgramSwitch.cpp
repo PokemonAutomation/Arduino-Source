@@ -162,7 +162,7 @@ TestProgram_Descriptor::TestProgram_Descriptor()
         "Test Program (Switch)",
         FeedbackType::OPTIONAL_,
         AllowCommandsWhenRunning::ENABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB,
+        {SerialPABotBase::OLD_SERIAL_DEFAULT},
         1, 4, 1
     )
 {}

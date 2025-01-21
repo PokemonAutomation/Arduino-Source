@@ -30,7 +30,7 @@ MaxLairBossFinder_Descriptor::MaxLairBossFinder_Descriptor()
         "Auto Max Lair 2.0 - Run adventures until you find the boss you want. Once you find your boss, switch to the other programs to shiny hunt it.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB,
+        {SerialPABotBase::OLD_SERIAL_DEFAULT},
         1, 4, 1
     )
 {}

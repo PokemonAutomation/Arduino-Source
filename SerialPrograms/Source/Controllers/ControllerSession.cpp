@@ -83,11 +83,11 @@ std::string ControllerSession::status_text() const{
     }
     return m_connection->status_text();
 }
-ControllerConnection& ControllerSession::controller() const{
+ControllerConnection& ControllerSession::connection() const{
     if (m_connection){
         return *m_connection;
     }
-    throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Controller is null.");
+    throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Connection is null.");
 }
 
 

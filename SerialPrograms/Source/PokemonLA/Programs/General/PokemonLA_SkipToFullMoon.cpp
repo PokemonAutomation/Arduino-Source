@@ -30,7 +30,7 @@ SkipToFullMoon_Descriptor::SkipToFullMoon_Descriptor()
         "Skip nights until full moon.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_SERIAL_DEFAULT}
     )
 {}
 

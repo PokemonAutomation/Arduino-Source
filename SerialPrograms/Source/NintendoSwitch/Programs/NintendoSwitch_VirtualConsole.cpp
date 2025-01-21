@@ -8,7 +8,7 @@
 #include <QScrollArea>
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Qt/CollapsibleGroupBox.h"
-#include "Controllers/SerialPABotBase/SerialPABotBase_Descriptor.h"
+#include "Controllers/SerialPABotBase/SerialPABotBase.h"
 #include "NintendoSwitch/Framework/UI/NintendoSwitch_SwitchSystemWidget.h"
 #include "NintendoSwitch_VirtualConsole.h"
 
@@ -24,7 +24,7 @@ VirtualConsole_Descriptor::VirtualConsole_Descriptor()
         "Play your Switch from your computer. Device logging is logged to the output window."
     )
     , m_requirements({
-        {SerialPABotBase::SerialDescriptor::TYPENAME, {"PABotBase-Protocol"}}
+        {SerialPABotBase::INTERFACE_NAME, {to_string(SerialPABotBase::Features::NintendoSwitch_Basic)}}
     })
 {}
 

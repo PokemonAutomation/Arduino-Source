@@ -154,7 +154,7 @@ void MultiSwitchProgramSession::internal_run_program(){
             report_error("Cannot Start: The controller is not ready.");
             return;
         }
-        ControllerConnection& connection = session.controller_session().controller();
+        ControllerConnection& connection = session.controller_session().connection();
         SerialPABotBase::SerialConnection* serial_connection = dynamic_cast<SerialPABotBase::SerialConnection*>(&connection);
         NintendoSwitch::SwitchControllerSerialPABotBase switch_controller(*serial_connection->handle().botbase());
         handles.emplace_back(

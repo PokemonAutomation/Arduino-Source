@@ -26,7 +26,7 @@ EggHatcher_Descriptor::EggHatcher_Descriptor()
         "Hatch eggs from boxes.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_SERIAL_DEFAULT}
     )
 {}
 

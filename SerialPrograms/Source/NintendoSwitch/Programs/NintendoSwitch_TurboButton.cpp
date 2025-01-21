@@ -20,7 +20,7 @@ TurboButton_Descriptor::TurboButton_Descriptor()
         "Mash a controller button. (similar to turbo controller)",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_SERIAL_DEFAULT}
     )
 {}
 

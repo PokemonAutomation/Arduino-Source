@@ -29,7 +29,7 @@ ClipboardFastCodeEntry_Descriptor::ClipboardFastCodeEntry_Descriptor()
         "Automatically enter a 4, 6, or 8 digit link code from your clipboard.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB,
+        {SerialPABotBase::OLD_SERIAL_DEFAULT},
         1, 4, 1
     )
 {}

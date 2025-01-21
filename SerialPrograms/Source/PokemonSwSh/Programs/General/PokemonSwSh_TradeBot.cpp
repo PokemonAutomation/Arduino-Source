@@ -26,7 +26,7 @@ TradeBot_Descriptor::TradeBot_Descriptor()
         "Surprise trade with a code for hosting giveaways.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_SERIAL_DEFAULT}
     )
 {}
 

@@ -36,7 +36,7 @@ LeapGrinder_Descriptor::LeapGrinder_Descriptor()
         "Shake trees and ores to grind tasks",
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_SERIAL_DEFAULT}
     )
 {}
 class LeapGrinder_Descriptor::Stats : public StatsTracker{

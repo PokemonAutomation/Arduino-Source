@@ -26,7 +26,7 @@ BerryFarmer_Descriptor::BerryFarmer_Descriptor()
         "Farm berries.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_SERIAL_DEFAULT}
     )
 {}
 

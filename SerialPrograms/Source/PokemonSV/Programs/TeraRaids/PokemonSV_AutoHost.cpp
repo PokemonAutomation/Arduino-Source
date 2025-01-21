@@ -47,7 +47,7 @@ AutoHost_Descriptor::AutoHost_Descriptor()
         "Auto-host a Tera raid.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_SERIAL_DEFAULT}
     )
 {}
 struct AutoHost_Descriptor::Stats : public StatsTracker{

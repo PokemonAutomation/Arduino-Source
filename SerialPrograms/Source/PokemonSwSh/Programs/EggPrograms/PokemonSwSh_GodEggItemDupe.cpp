@@ -27,7 +27,7 @@ GodEggItemDupe_Descriptor::GodEggItemDupe_Descriptor()
         "Mass duplicate items with the God Egg.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_SERIAL_DEFAULT}
     )
 {}
 

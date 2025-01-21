@@ -35,7 +35,7 @@ MaxLairStrongBoss_Descriptor::MaxLairStrongBoss_Descriptor()
         "Auto Max Lair 2.0 - Run Dynamax Adventures and intelligently reset to keep paths that have high win rates.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB,
+        {SerialPABotBase::OLD_SERIAL_DEFAULT},
         1, 4, 1
     )
 {}

@@ -32,7 +32,7 @@ ShinyHuntAutonomousFishing_Descriptor::ShinyHuntAutonomousFishing_Descriptor()
         "Automatically hunt for shiny fishing " + STRING_POKEMON + " using video feedback.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_SERIAL_DEFAULT}
     )
 {}
 struct ShinyHuntAutonomousFishing_Descriptor::Stats : public ShinyHuntTracker{

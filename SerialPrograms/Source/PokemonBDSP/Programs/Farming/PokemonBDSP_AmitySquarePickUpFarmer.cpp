@@ -25,7 +25,7 @@ AmitySquarePickUpFarmer_Descriptor::AmitySquarePickUpFarmer_Descriptor()
         "Automatically fetch berries and stickers from the walking pokemon in Amity Square.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_SERIAL_DEFAULT}
     )
 {}
 struct AmitySquarePickUpFarmer_Descriptor::Stats : public StatsTracker{

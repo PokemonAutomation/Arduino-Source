@@ -48,7 +48,7 @@ RideCloner101_Descriptor::RideCloner101_Descriptor()
         "Clone your ride legendary (and its item) using the add-to-party glitch.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_SERIAL_DEFAULT}
     )
 {}
 struct RideCloner101_Descriptor::Stats : public StatsTracker{

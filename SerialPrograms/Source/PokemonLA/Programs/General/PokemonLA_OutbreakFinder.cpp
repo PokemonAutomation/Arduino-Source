@@ -140,7 +140,7 @@ OutbreakFinder_Descriptor::OutbreakFinder_Descriptor()
         "Search for an outbreak for a specific " + STRING_POKEMON,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_SERIAL_DEFAULT}
     )
 {}
 class OutbreakFinder_Descriptor::Stats : public StatsTracker{

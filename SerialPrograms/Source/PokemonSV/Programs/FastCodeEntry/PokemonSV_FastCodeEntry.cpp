@@ -33,7 +33,7 @@ FastCodeEntry_Descriptor::FastCodeEntry_Descriptor()
         "Quickly enter a 4, 6, or 8 digit link code.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB,
+        {SerialPABotBase::OLD_SERIAL_DEFAULT},
         1, 4, 1
     )
 {}

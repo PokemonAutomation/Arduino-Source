@@ -9,15 +9,13 @@
 
 #include <QSerialPortInfo>
 #include "Controllers/ControllerDescriptor.h"
+//#include "SerialPABotBase.h"
 
 namespace PokemonAutomation{
 namespace SerialPABotBase{
 
 
 class SerialDescriptor : public ControllerDescriptor{
-public:
-    static const char TYPENAME[];
-
 public:
     virtual std::unique_ptr<ControllerDescriptor> clone() const override;
     virtual bool operator==(const ControllerDescriptor& x) const override;

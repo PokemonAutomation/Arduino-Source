@@ -64,7 +64,7 @@ PokedexTasksReader_Descriptor::PokedexTasksReader_Descriptor()
         "Read all the tasks in your " + STRING_POKEDEX + " and output a file with the tasks you did.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_SERIAL_DEFAULT}
     )
 {}
 

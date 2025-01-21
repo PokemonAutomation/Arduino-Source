@@ -72,7 +72,7 @@ SwitchSystemSession::SwitchSystemSession(
 
 BotBaseHandle& SwitchSystemSession::sender(){
     //  TODO: Don't do this.
-    return static_cast<SerialPABotBase::SerialConnection&>(m_controller.controller()).handle();
+    return static_cast<SerialPABotBase::SerialConnection&>(m_controller.connection()).handle();
 }
 
 void SwitchSystemSession::get(SwitchSystemOption& option){

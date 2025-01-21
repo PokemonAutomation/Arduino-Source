@@ -36,7 +36,7 @@ AutoItemPrinter_Descriptor::AutoItemPrinter_Descriptor()
         "Automate the Item Printer for rare items.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_SERIAL_DEFAULT}
     )
 {}
 struct AutoItemPrinter_Descriptor::Stats : public StatsTracker{

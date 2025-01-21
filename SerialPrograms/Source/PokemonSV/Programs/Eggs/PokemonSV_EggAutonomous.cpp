@@ -44,7 +44,7 @@ EggAutonomous_Descriptor::EggAutonomous_Descriptor()
         "Automatically get meal power, fetch eggs from a picnic and hatch them.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_SERIAL_DEFAULT}
     )
 {}
 struct EggAutonomous_Descriptor::Stats : public StatsTracker{

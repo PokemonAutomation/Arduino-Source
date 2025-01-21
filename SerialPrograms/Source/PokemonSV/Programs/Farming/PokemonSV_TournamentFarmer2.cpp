@@ -35,7 +35,7 @@ TournamentFarmer2_Descriptor::TournamentFarmer2_Descriptor()
         "Farm the Academy Ace Tournament for money and prizes. (version 2)",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_SERIAL_DEFAULT}
     )
 {}
 

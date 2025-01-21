@@ -23,7 +23,7 @@ SurfItemDuper_Descriptor::SurfItemDuper_Descriptor()
         "Use the Shield Surfing Menu Sort glitch to duplicate items.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_SERIAL_DEFAULT}
     )
 {}
 

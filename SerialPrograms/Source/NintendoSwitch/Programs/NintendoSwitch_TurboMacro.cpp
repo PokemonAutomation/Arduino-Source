@@ -20,7 +20,7 @@ TurboMacro_Descriptor::TurboMacro_Descriptor()
         "Create macros",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_SERIAL_DEFAULT}
     )
 {}
 

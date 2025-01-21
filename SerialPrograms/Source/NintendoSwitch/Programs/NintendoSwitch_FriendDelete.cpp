@@ -20,7 +20,7 @@ FriendDelete_Descriptor::FriendDelete_Descriptor()
         "Mass delete/block all those unwanted friends.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_SERIAL_DEFAULT}
     )
 {}
 

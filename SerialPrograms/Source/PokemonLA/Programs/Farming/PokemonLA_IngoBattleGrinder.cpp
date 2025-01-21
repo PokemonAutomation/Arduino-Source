@@ -40,7 +40,7 @@ IngoBattleGrinder_Descriptor::IngoBattleGrinder_Descriptor()
         "Attend Ingo's battles to grind exp and move related " + STRING_POKEDEX + " research tasks. Less effective than Ingo Move Grinder for " + STRING_POKEDEX + " research tasks but more effective for everything else.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_SERIAL_DEFAULT}
     )
 {}
 class IngoBattleGrinder_Descriptor::Stats : public StatsTracker{

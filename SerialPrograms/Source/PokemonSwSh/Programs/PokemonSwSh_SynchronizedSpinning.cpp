@@ -21,7 +21,7 @@ SynchronizedSpinning_Descriptor::SynchronizedSpinning_Descriptor()
         "Don't ask... seriously, don't ask...",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB,
+        {SerialPABotBase::OLD_SERIAL_DEFAULT},
         1, 4, 1
     )
 {}

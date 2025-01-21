@@ -47,7 +47,7 @@ AuctionFarmer_Descriptor::AuctionFarmer_Descriptor()
         "Check auctions and bid on items.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_SERIAL_DEFAULT}
     )
 {}
 

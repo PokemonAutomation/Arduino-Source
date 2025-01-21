@@ -35,7 +35,7 @@ SoundListener_Descriptor::SoundListener_Descriptor()
         "",
         "Test sound detectors listening to audio stream.",
         FeedbackType::REQUIRED, AllowCommandsWhenRunning::ENABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_SERIAL_DEFAULT}
     )
 {}
 

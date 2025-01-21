@@ -40,7 +40,7 @@ CloneItems101_Descriptor::CloneItems101_Descriptor()
         "Clone items using the add-to-party glitch.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_SERIAL_DEFAULT}
     )
 {}
 struct CloneItems101_Descriptor::Stats : public StatsTracker{

@@ -38,7 +38,7 @@ GimmighoulChestFarmer_Descriptor::GimmighoulChestFarmer_Descriptor()
         "Farm Chest Gimmighoul for coins.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_SERIAL_DEFAULT}
     )
 {}
 

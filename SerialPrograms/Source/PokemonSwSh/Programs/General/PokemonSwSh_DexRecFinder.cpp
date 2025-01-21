@@ -34,7 +34,7 @@ DexRecFinder_Descriptor::DexRecFinder_Descriptor()
         "Search for a " + STRING_POKEDEX + " recommendation by date-spamming.",
         FeedbackType::OPTIONAL_,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_SERIAL_DEFAULT}
     )
 {}
 struct DexRecFinder_Descriptor::Stats : public StatsTracker{

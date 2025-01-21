@@ -32,7 +32,7 @@ MoneyFarmerRoute212_Descriptor::MoneyFarmerRoute212_Descriptor()
         "Farm money by using VS Seeker to rebattle the rich couple on Route 212.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_SERIAL_DEFAULT}
     )
 {}
 struct MoneyFarmerRoute212_Descriptor::Stats : public StatsTracker{

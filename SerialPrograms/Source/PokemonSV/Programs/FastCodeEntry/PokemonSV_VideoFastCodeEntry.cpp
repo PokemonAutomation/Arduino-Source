@@ -126,7 +126,7 @@ VideoFastCodeEntry_Descriptor::VideoFastCodeEntry_Descriptor()
         "Read a 4, 6, or 8 digit link code from someone on your screen and enter it as quickly as possible.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB,
+        {SerialPABotBase::OLD_SERIAL_DEFAULT},
         1, 4, 1
     )
 {}

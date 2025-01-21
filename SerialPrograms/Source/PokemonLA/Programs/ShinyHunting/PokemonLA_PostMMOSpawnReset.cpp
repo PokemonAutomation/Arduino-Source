@@ -31,7 +31,7 @@ PostMMOSpawnReset_Descriptor::PostMMOSpawnReset_Descriptor()
         "Constantly reset the spawn after MMO finishes.",
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_SERIAL_DEFAULT}
     )
 {}
 class PostMMOSpawnReset_Descriptor::Stats : public StatsTracker, public ShinyStatIncrementer{

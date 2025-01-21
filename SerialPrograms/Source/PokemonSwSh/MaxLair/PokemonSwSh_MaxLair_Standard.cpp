@@ -34,7 +34,7 @@ MaxLairStandard_Descriptor::MaxLairStandard_Descriptor()
         "Auto Max Lair 2.0 - Run Dynamax Adventures until a shiny legendary is found.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB,
+        {SerialPABotBase::OLD_SERIAL_DEFAULT},
         1, 4, 1
     )
 {}

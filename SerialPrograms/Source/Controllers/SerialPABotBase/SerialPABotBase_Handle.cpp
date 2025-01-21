@@ -22,7 +22,7 @@
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Messages_Device.h"
-#include "SerialPABotBase_Globals.h"
+#include "SerialPABotBase.h"
 #include "SerialPABotBase_Handle.h"
 #include "SerialPABotBase_Descriptor.h"
 
@@ -32,6 +32,7 @@
 
 namespace PokemonAutomation{
 
+using namespace SerialPABotBase;
 
 
 void BotBaseHandle::process_device_protocol(uint32_t& version, uint8_t& program_id){
@@ -58,19 +59,30 @@ void BotBaseHandle::process_device_protocol(uint32_t& version, uint8_t& program_
     logger.log("Checking Program ID...");
     program_id = Microcontroller::program_id(*m_botbase);
     logger.log("Checking Program ID... Program ID = " + std::to_string(program_id));
-    PABotBaseLevel level = program_id_to_botbase_level(program_id);
-    for (uint8_t c = 0; c <= (uint8_t)level; c++){
-        m_capabilities.insert(program_id_to_string(c));
-    }
+//    PABotBaseLevel level = program_id_to_botbase_level(program_id);
+//    for (uint8_t c = 0; c <= (uint8_t)level; c++){
+//        m_capabilities.insert(program_id_to_string(c));
+//    }
+    m_capabilities = program_id_to_features(program_id);
 
 //    cout << "m_requirements.size() = " << m_requirements.map().size() << endl;
 
-    if (!m_requirements.is_compatible_with(SerialPABotBase::SerialDescriptor::TYPENAME, m_capabilities)){
+    std::string missing_feature = m_requirements.check_compatibility(
+        SerialPABotBase::INTERFACE_NAME,
+        m_capabilities
+    );
+    if (!missing_feature.empty()){
         throw SerialProtocolException(
             logger, PA_CURRENT_FUNCTION,
-            "PABotBase level not met. (" + program_name(program_id) + ")"
+            "Missing Feature: " + missing_feature
         );
     }
+//    if (!m_requirements.is_compatible_with(SerialPABotBase::INTERFACE_NAME, m_capabilities)){
+//        throw SerialProtocolException(
+//            logger, PA_CURRENT_FUNCTION,
+//            "PABotBase level not met. (" + program_name(program_id) + ")"
+//        );
+//    }
 
     //  Program Version
     logger.log("Checking Firmware Version...");
@@ -267,7 +279,7 @@ void BotBaseHandle::reset_unprotected(const QSerialPortInfo* port){
     try{
         std::unique_ptr<SerialConnection> connection(new SerialConnection(name, PABB_BAUD_RATE));
         m_botbase.reset(new PABotBase(m_logger, std::move(connection), nullptr));
-        m_capabilities.insert(program_id_to_string(0));
+//        m_capabilities.insert(program_id_to_string(0));
     }catch (const ConnectionException& e){
         error = e.message();
     }catch (const SerialProtocolException& e){

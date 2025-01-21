@@ -31,7 +31,7 @@ GalladeFinder_Descriptor::GalladeFinder_Descriptor()
         "Constantly reset the Snowpoint Temple to find Shiny Alpha Gallade.",
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_SERIAL_DEFAULT}
     )
 {}
 class GalladeFinder_Descriptor::Stats : public StatsTracker, public ShinyStatIncrementer{

@@ -33,7 +33,7 @@ ApplyGrits_Descriptor::ApplyGrits_Descriptor()
         "Use Grits items on " + STRING_POKEMON,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_SERIAL_DEFAULT}
     )
 {}
 

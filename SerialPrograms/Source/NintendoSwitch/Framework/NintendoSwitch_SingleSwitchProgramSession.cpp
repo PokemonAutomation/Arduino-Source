@@ -113,7 +113,7 @@ void SingleSwitchProgramSession::internal_run_program(){
         timestamp()
     );
     CancellableHolder<CancellableScope> scope;
-    ControllerConnection& connection = m_system.controller_session().controller();
+    ControllerConnection& connection = m_system.controller_session().connection();
     SerialPABotBase::SerialConnection* serial_connection = dynamic_cast<SerialPABotBase::SerialConnection*>(&connection);
     NintendoSwitch::SwitchControllerSerialPABotBase switch_controller(*serial_connection->handle().botbase());
     SingleSwitchProgramEnvironment env(

@@ -8,6 +8,7 @@
 #include "Common/Cpp/Json/JsonObject.h"
 #include "ControllerDescriptor.h"
 
+#include "Controllers/SerialPABotBase/SerialPABotBase.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase_Descriptor.h"
 #include "ControllerConnection.h"
 
@@ -59,14 +60,14 @@ void ControllerOption::load_json(const JsonValue& json){
         m_current = std::move(descriptor);
         return;
     }
-    if (type == SerialPABotBase::SerialDescriptor::TYPENAME){
+    if (type == SerialPABotBase::INTERFACE_NAME){
         auto descriptor = std::make_unique<SerialPABotBase::SerialDescriptor>();
         descriptor->load_json(params);
         m_current = std::move(descriptor);
         return;
     }
 
-    throw ParseException("Invalid Device Connection Type: " + type);
+    m_current.reset(new NullControllerDescriptor());
 }
 JsonValue ControllerOption::to_json() const{
     if (!m_current){

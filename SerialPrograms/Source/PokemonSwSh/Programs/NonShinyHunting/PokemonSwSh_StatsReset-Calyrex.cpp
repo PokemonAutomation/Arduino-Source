@@ -31,7 +31,7 @@ StatsResetCalyrex_Descriptor::StatsResetCalyrex_Descriptor()
         "Repeatedly catch calyrex (and its horse) until you get the stats you want.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_SERIAL_DEFAULT}
     )
 {}
 struct StatsResetCalyrex_Descriptor::Stats : public StatsTracker{

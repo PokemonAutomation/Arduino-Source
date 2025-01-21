@@ -20,7 +20,7 @@ PushJoySticks_Descriptor::PushJoySticks_Descriptor()
         "Push Joy Sticks continously.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_SERIAL_DEFAULT}
     )
 {}
 

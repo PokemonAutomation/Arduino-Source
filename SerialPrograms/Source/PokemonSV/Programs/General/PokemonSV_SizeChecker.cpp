@@ -34,7 +34,7 @@ SizeChecker_Descriptor::SizeChecker_Descriptor()
         "Check boxes of " + STRING_POKEMON + " for size marks.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_SERIAL_DEFAULT}
     )
 {}
 struct SizeChecker_Descriptor::Stats : public StatsTracker{

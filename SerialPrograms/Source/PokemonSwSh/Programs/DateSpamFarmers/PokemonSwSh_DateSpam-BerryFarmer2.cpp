@@ -35,7 +35,7 @@ BerryFarmer2_Descriptor::BerryFarmer2_Descriptor()
         "Farm berries using Feedback.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_SERIAL_DEFAULT}
     )
 {}
 

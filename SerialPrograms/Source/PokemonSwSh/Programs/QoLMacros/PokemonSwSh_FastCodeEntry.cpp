@@ -25,7 +25,7 @@ FastCodeEntry_Descriptor::FastCodeEntry_Descriptor()
         "Force your way into raids by entering 8-digit codes in under 1 second.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_SERIAL_DEFAULT}
     )
 {}
 

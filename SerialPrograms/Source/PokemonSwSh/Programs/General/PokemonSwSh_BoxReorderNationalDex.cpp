@@ -140,7 +140,7 @@ BoxReorderNationalDex_Descriptor::BoxReorderNationalDex_Descriptor()
         "Order boxes of " + STRING_POKEMON + ".",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_SERIAL_DEFAULT}
     )
 {}
 

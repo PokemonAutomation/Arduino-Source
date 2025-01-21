@@ -61,21 +61,28 @@ public:
         return m_map;
     }
 
-    bool is_compatible_with(const std::string& device, const std::set<std::string>& features) const{
+    bool contains_device(const std::string& device) const{
+        auto scope_check = m_sanitizer.check_scope();
+        return m_map.find(device) != m_map.end();
+    }
+
+    //  Check compatibility. If compatible, returns empty string. Otherwise
+    //  returns one of the missing features.
+    std::string check_compatibility(const std::string& device, const std::set<std::string>& features) const{
         auto scope_check = m_sanitizer.check_scope();
 
         auto iter0 = m_map.find(device);
         if (iter0 == m_map.end()){
-            return false;
+            return device;
         }
 
         const std::set<std::string>& required = iter0->second;
         for (const std::string& feature : required){
             if (features.find(feature) == features.end()){
-                return false;
+                return feature;
             }
         }
-        return true;
+        return "";
     }
 
 

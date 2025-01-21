@@ -50,7 +50,7 @@ ItemPrinterRNG_Descriptor::ItemPrinterRNG_Descriptor()
         "Farm the Item Printer using RNG Manipulation.",
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_SERIAL_DEFAULT}
     )
 {}
 

@@ -26,7 +26,7 @@ LotoFarmer_Descriptor::LotoFarmer_Descriptor()
         "Farm the Loto ID.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_SERIAL_DEFAULT}
     )
 {}
 

@@ -28,7 +28,7 @@ PokeJobsFarmer_Descriptor::PokeJobsFarmer_Descriptor()
           "Farm " + STRING_POKEJOB + "s.",
           FeedbackType::NONE,
           AllowCommandsWhenRunning::DISABLE_COMMANDS,
-          PABotBaseLevel::PABOTBASE_12KB)
+          {SerialPABotBase::OLD_SERIAL_DEFAULT})
 {
 }
 

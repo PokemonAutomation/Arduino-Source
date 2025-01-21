@@ -28,9 +28,6 @@ void ssf_press_button(
     uint16_t delay, uint16_t hold, uint8_t cool
 ){
     context->send_buttons(context, button, delay, hold, cool);
-//    context.issue_request(
-//        DeviceRequest_ssf_press_button(button, delay, hold, cool)
-//    );
 }
 void ssf_press_dpad(
     SwitchControllerContext& context,
@@ -38,9 +35,6 @@ void ssf_press_dpad(
     uint16_t delay, uint16_t hold, uint8_t cool
 ){
     context->send_dpad(context, position, delay, hold, cool);
-//    context.issue_request(
-//        DeviceRequest_ssf_press_dpad(position, delay, hold, cool)
-//    );
 }
 void ssf_press_left_joystick(
     SwitchControllerContext& context,
@@ -48,9 +42,6 @@ void ssf_press_left_joystick(
     uint16_t delay, uint16_t hold, uint8_t cool
 ){
     context->send_left_joystick(context, x, y, delay, hold, cool);
-//    context.issue_request(
-//        DeviceRequest_ssf_press_joystick(true, x, y, delay, hold, cool)
-//    );
 }
 void ssf_press_right_joystick(
     SwitchControllerContext& context,
@@ -58,30 +49,18 @@ void ssf_press_right_joystick(
     uint16_t delay, uint16_t hold, uint8_t cool
 ){
     context->send_right_joystick(context, x, y, delay, hold, cool);
-//    context.issue_request(
-//        DeviceRequest_ssf_press_joystick(false, x, y, delay, hold, cool)
-//    );
 }
 
 
 
 void ssf_mash1_button(SwitchControllerContext& context, Button button, uint16_t ticks){
     context->send_mash_button(context, button, ticks);
-//    context.issue_request(
-//        DeviceRequest_ssf_mash1_button(button, ticks)
-//    );
 }
 void ssf_mash2_button(SwitchControllerContext& context, Button button0, Button button1, uint16_t ticks){
     context->send_mash_button(context, button0, button1, ticks);
-//    context.issue_request(
-//        DeviceRequest_ssf_mash2_button(button0, button1, ticks)
-//    );
 }
 void ssf_mash_AZs(SwitchControllerContext& context, uint16_t ticks){
     context->send_mash_AZs(context, ticks);
-//    context.issue_request(
-//        DeviceRequest_ssf_mash_AZs(ticks)
-//    );
 }
 void ssf_issue_scroll(
     SwitchControllerContext& context,
@@ -89,9 +68,6 @@ void ssf_issue_scroll(
     uint16_t delay, uint16_t hold, uint8_t cool
 ){
     context->send_system_scroll(context, (DpadPosition)direction, delay, hold, cool);
-//    context.issue_request(
-//        DeviceRequest_ssf_issue_scroll(direction, delay, hold, cool)
-//    );
 }
 
 

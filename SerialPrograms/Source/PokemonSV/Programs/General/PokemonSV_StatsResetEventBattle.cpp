@@ -77,7 +77,7 @@ StatsResetEventBattle_Descriptor::StatsResetEventBattle_Descriptor()
         "Repeatedly catch Bloodmoon Ursaluna or Pecharunt until you get the stats you want.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_SERIAL_DEFAULT}
     )
 {}
 struct StatsResetEventBattle_Descriptor::Stats : public StatsTracker{

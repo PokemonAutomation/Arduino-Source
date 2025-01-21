@@ -27,7 +27,7 @@ MultiGameFossil_Descriptor::MultiGameFossil_Descriptor()
         "Revive fossils. Supports multiple saves so you can go afk for longer than 5 hours.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_SERIAL_DEFAULT}
     )
 {}
 

@@ -30,7 +30,7 @@ SelfBoxTrade_Descriptor::SelfBoxTrade_Descriptor()
         "Trade boxes across two Switches.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB,
+        {SerialPABotBase::OLD_SERIAL_DEFAULT},
         2, 2, 2
     )
 {}

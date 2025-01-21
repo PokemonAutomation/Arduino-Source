@@ -44,7 +44,7 @@ TeraSelfFarmer_Descriptor::TeraSelfFarmer_Descriptor()
         "Farm items and " + STRING_POKEMON + " from Tera raids. Can also hunt for shiny and high reward raids.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_SERIAL_DEFAULT}
     )
 {}
 struct TeraSelfFarmer_Descriptor::Stats : public StatsTracker{

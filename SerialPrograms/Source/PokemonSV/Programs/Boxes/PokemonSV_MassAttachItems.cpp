@@ -32,7 +32,7 @@ MassAttachItems_Descriptor::MassAttachItems_Descriptor()
         "Mass attach items to " + STRING_POKEMON + ".",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_SERIAL_DEFAULT}
     )
 {}
 struct MassAttachItems_Descriptor::Stats : public StatsTracker{

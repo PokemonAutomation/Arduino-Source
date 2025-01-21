@@ -35,7 +35,7 @@ UnownFinder_Descriptor::UnownFinder_Descriptor()
         "Constantly reset to find a Shiny Unown or any Shiny in the path.",
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_SERIAL_DEFAULT}
     )
 {}
 class UnownFinder_Descriptor::Stats : public StatsTracker, public ShinyStatIncrementer{

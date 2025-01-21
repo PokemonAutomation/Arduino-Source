@@ -111,7 +111,7 @@ TeraMultiFarmer_Descriptor::TeraMultiFarmer_Descriptor()
         "Farm items and " + STRING_POKEMON + " from your own Tera raid using multiple Switches.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB,
+        {SerialPABotBase::OLD_SERIAL_DEFAULT},
         2, 4, 2
     )
 {}

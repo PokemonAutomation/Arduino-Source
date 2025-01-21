@@ -28,7 +28,7 @@ SeedFinder_Descriptor::SeedFinder_Descriptor()
         "Finds the current state to be used for manual RNG manipulation.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_SERIAL_DEFAULT}
     )
 {}
 

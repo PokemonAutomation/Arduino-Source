@@ -31,7 +31,7 @@ SelfTouchTrade_Descriptor::SelfTouchTrade_Descriptor()
         "Repeatedly trade " + STRING_POKEMON + " between two local Switches to fill up research.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB,
+        {SerialPABotBase::OLD_SERIAL_DEFAULT},
         2, 2, 2
     )
 {}

@@ -21,7 +21,7 @@ TurboA_Descriptor::TurboA_Descriptor()
         "Endlessly mash A.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_SERIAL_DEFAULT}
     )
 {}
 

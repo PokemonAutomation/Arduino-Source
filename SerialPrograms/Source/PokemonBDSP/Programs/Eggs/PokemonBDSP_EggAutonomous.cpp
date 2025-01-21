@@ -33,7 +33,7 @@ EggAutonomous_Descriptor::EggAutonomous_Descriptor()
         "Automatically fetch+hatch eggs and keep all shinies.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_SERIAL_DEFAULT}
     )
 {}
 std::unique_ptr<StatsTracker> EggAutonomous_Descriptor::make_stats() const{

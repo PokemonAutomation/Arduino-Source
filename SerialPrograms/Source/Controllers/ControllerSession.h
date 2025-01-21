@@ -37,6 +37,10 @@ public:
         const ControllerRequirements& requirements
     );
 
+    const ControllerRequirements& requirements(){
+        return m_requirements;
+    }
+
     void get(ControllerOption& option);
     void set(const ControllerOption& option);
 
@@ -47,7 +51,7 @@ public:
     const ControllerOption& option() const{
         return m_option;
     }
-    ControllerConnection& controller() const;
+    ControllerConnection& connection() const;
 
 
 public:

@@ -25,7 +25,7 @@ FriendSearchDisconnect_Descriptor::FriendSearchDisconnect_Descriptor()
         "Disconnect from the internet using the friend search method.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_SERIAL_DEFAULT}
     )
 {}
 

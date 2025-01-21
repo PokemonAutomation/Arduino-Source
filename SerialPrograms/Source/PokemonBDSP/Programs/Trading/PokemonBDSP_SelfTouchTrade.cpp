@@ -26,7 +26,7 @@ SelfTouchTrade_Descriptor::SelfTouchTrade_Descriptor()
         "Touch trade boxes of " + STRING_POKEMON + " between two local Switches.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB,
+        {SerialPABotBase::OLD_SERIAL_DEFAULT},
         2, 2, 2
     )
 {}

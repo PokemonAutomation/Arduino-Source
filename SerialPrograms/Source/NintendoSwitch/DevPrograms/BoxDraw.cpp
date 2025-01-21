@@ -20,7 +20,7 @@ BoxDraw_Descriptor::BoxDraw_Descriptor()
         "",
         "Test box coordinates for development.",
         FeedbackType::NONE, AllowCommandsWhenRunning::ENABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_SERIAL_DEFAULT}
     )
 {}
 

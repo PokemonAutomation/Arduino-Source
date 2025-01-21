@@ -30,7 +30,7 @@ DistortionWaiter_Descriptor::DistortionWaiter_Descriptor()
         "Wait for a distortion to appear.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_SERIAL_DEFAULT}
     )
 {}
 class DistortionWaiter_Descriptor::Stats : public StatsTracker{

@@ -6,7 +6,9 @@
 
 #include <QHBoxLayout>
 #include "Common/Qt/NoWheelComboBox.h"
+#include "Controllers/ControllerCapability.h"
 #include "ControllerSelectorWidget.h"
+#include "SerialPABotBase/SerialPABotBase.h"
 #include "SerialPABotBase/SerialPABotBase_Descriptor.h"
 
 //#include <iostream>
@@ -80,15 +82,19 @@ void ControllerSelectorWidget::refresh(){
     m_device_list.clear();
     m_devices_dropdown->clear();
 
+
+    //  Add the "no selection" option.
     m_device_list.emplace_back(new NullControllerDescriptor());
 
-    //  TODO: Apply the requirements filter here to decide which set of devices
-    //  to actually add to the list.
-    //  Also, move this logic into ControllerSession since it isn't UI.
-    if (true){
+    //  If SerialPABotBase is supported, add them to the list.
+    if (m_session.requirements().contains_device(SerialPABotBase::INTERFACE_NAME)){
         std::vector<std::unique_ptr<const ControllerDescriptor>> serial = SerialPABotBase::get_all_devices();
         std::move(serial.begin(), serial.end(), std::back_inserter(m_device_list));
     }
+
+    //  If we add new interfaces, add them here.
+
+
 
     std::shared_ptr<const ControllerDescriptor> current = m_session.descriptor();
 

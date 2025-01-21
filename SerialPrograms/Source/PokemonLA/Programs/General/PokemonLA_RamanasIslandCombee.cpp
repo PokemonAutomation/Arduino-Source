@@ -40,7 +40,7 @@ RamanasCombeeFinder_Descriptor::RamanasCombeeFinder_Descriptor()
         "Check Ramanas Island Tree until a Combee is found",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_SERIAL_DEFAULT}
     )
 {}
 class RamanasCombeeFinder_Descriptor::Stats : public StatsTracker{

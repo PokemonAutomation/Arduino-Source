@@ -20,7 +20,7 @@ PreventSleep_Descriptor::PreventSleep_Descriptor()
         "Press B every 15 seconds to keep the Switch from sleeping.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_SERIAL_DEFAULT}
     )
 {}
 

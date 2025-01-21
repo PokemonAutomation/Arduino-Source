@@ -27,7 +27,7 @@ PoffinCooker_Descriptor::PoffinCooker_Descriptor()
         "Cook Poffins.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_SERIAL_DEFAULT}
     )
 {}
 struct PoffinCooker_Descriptor::Stats : public StatsTracker{

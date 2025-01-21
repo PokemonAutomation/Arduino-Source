@@ -28,7 +28,7 @@ SandwichMaker_Descriptor::SandwichMaker_Descriptor()
         "Make a sandwich of your choice.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_SERIAL_DEFAULT}
     )
 {}
 

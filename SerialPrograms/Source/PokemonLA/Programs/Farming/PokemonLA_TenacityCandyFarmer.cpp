@@ -36,7 +36,7 @@ TenacityCandyFarmer_Descriptor::TenacityCandyFarmer_Descriptor()
         "Attend Ingo's Path of Tenacity battles leading with a stats fully upgraded, max level, Modest nature Arceus with Legend Plate applied to grind exp, exp candies XL and evolution items.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_SERIAL_DEFAULT}
     )
 {}
 class TenacityCandyFarmer_Descriptor::Stats : public StatsTracker{

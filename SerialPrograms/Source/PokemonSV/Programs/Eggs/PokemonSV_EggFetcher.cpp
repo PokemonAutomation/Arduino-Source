@@ -30,7 +30,7 @@ EggFetcher_Descriptor::EggFetcher_Descriptor()
         "Automatically fetch eggs from a picnic.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_SERIAL_DEFAULT}
     )
 {}
 struct EggFetcher_Descriptor::Stats : public StatsTracker{

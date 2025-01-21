@@ -16,7 +16,7 @@
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Panels/ProgramDescriptor.h"
 #include "Controllers/ControllerCapability.h"
-#include "Controllers/SerialPABotBase/SerialPABotBase_Globals.h"
+#include "Controllers/SerialPABotBase/SerialPABotBase.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 
 namespace PokemonAutomation{
@@ -58,18 +58,6 @@ public:
 
 class MultiSwitchProgramDescriptor : public ProgramDescriptor{
 public:
-    MultiSwitchProgramDescriptor(   //  Deprecated
-        std::string identifier,
-        std::string category, std::string display_name,
-        std::string doc_link,
-        std::string description,
-        FeedbackType feedback,
-        AllowCommandsWhenRunning allow_commands_while_running,
-        PABotBaseLevel min_pabotbase_level,
-        size_t min_switches,
-        size_t max_switches,
-        size_t default_switches
-    );
     MultiSwitchProgramDescriptor(
         std::string identifier,
         std::string category, std::string display_name,
