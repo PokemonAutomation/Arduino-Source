@@ -16,10 +16,12 @@
 #include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
 #include "ClientSource/Libraries/MessageConverter.h"
 #include "ClientSource/Connection/SerialConnection.h"
+//#include "ClientSource/Connection/BotBase.h"
 #include "ClientSource/Connection/PABotBase.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Messages_Device.h"
 #include "SerialPABotBase_Globals.h"
 #include "SerialPABotBase_Handle.h"
 #include "SerialPABotBase_Descriptor.h"
@@ -380,7 +382,9 @@ void BotBaseHandle::thread_body(){
         }
     });
 
+    //  REMOVE
     BotBaseControllerContext context(*m_botbase);
+
     while (true){
         if (m_state.load(std::memory_order_acquire) != State::READY){
             break;
@@ -390,7 +394,13 @@ void BotBaseHandle::thread_body(){
         std::string error;
         try{
 //            cout << "system_clock()" << endl;
-            uint32_t wallclock = NintendoSwitch::system_clock(context);
+            pabb_MsgAckRequestI32 response;
+            context.issue_request_and_wait(
+                NintendoSwitch::DeviceRequest_system_clock()
+            ).convert<PABB_MSG_ACK_REQUEST_I32>(context.controller().logger(), response);
+            uint32_t wallclock = response.data;
+
+//            uint32_t wallclock = NintendoSwitch::system_clock(context);
 //            cout << "system_clock() - done" << endl;
             str = ticks_to_time(TICKS_PER_SECOND, wallclock);
         }catch (InvalidConnectionStateException&){

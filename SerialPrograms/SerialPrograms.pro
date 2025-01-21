@@ -397,6 +397,7 @@ SOURCES += \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Routines.cpp \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.cpp \
     Source/NintendoSwitch/Controllers/NintendoSwitch_Controller.cpp \
+    Source/NintendoSwitch/Controllers/NintendoSwitch_SerialPABotBase.cpp \
     Source/NintendoSwitch/DevPrograms/BoxDraw.cpp \
     Source/NintendoSwitch/DevPrograms/TestProgramComputer.cpp \
     Source/NintendoSwitch/DevPrograms/TestProgramSwitch.cpp \
@@ -1528,6 +1529,7 @@ HEADERS += \
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_PushButtons.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_Superscalar.h \
     Source/NintendoSwitch/Controllers/NintendoSwitch_Controller.h \
+    Source/NintendoSwitch/Controllers/NintendoSwitch_SerialPABotBase.h \
     Source/NintendoSwitch/DevPrograms/BoxDraw.h \
     Source/NintendoSwitch/DevPrograms/TestProgramComputer.h \
     Source/NintendoSwitch/DevPrograms/TestProgramSwitch.h \

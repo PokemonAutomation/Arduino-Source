@@ -19,10 +19,10 @@ namespace PokemonSwSh{
 
 
 void run_away_with_lights(SwitchControllerContext& context){
-    set_leds(context, true);
+//    set_leds(context, true);
     pbf_press_dpad(context, DPAD_UP, 10, 0);
     pbf_press_button(context, BUTTON_A, 10, 3 * TICKS_PER_SECOND);
-    set_leds(context, false);
+//    set_leds(context, false);
 }
 void enter_summary(SwitchControllerContext& context, bool regi_move_right){
     pbf_press_dpad(context, DPAD_DOWN, 10, 0);

@@ -802,6 +802,8 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_Superscalar.h
     Source/NintendoSwitch/Controllers/NintendoSwitch_Controller.cpp
     Source/NintendoSwitch/Controllers/NintendoSwitch_Controller.h
+    Source/NintendoSwitch/Controllers/NintendoSwitch_SerialPABotBase.cpp
+    Source/NintendoSwitch/Controllers/NintendoSwitch_SerialPABotBase.h
     Source/NintendoSwitch/DevPrograms/BoxDraw.cpp
     Source/NintendoSwitch/DevPrograms/BoxDraw.h
     Source/NintendoSwitch/DevPrograms/TestProgramComputer.cpp

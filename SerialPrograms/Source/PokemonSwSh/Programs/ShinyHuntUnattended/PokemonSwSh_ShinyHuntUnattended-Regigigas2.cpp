@@ -89,9 +89,9 @@ void ShinyHuntUnattendedRegigigas2::program(SingleSwitchProgramEnvironment& env,
             pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
             pbf_press_button(context, BUTTON_A, 10, START_TO_ATTACK_DELAY);
 
-            set_leds(context, true);
+//            set_leds(context, true);
             pbf_press_button(context, BUTTON_A, 10, 2 * TICKS_PER_SECOND);
-            set_leds(context, false);
+//            set_leds(context, false);
 
             //  Enter Pokemon menu if shiny.
             pbf_press_dpad(context, DPAD_DOWN, 10, 0);

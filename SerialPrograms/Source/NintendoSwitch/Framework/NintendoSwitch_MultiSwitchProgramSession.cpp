@@ -17,6 +17,7 @@
 #include "Controllers/SerialPABotBase/SerialPABotBase_Handle.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase_Connection.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_SerialPABotBase.h"
 #include "NintendoSwitch_MultiSwitchProgramOption.h"
 #include "NintendoSwitch_MultiSwitchProgramSession.h"
 
@@ -99,7 +100,7 @@ void MultiSwitchProgramSession::run_program_instance(MultiSwitchProgramEnvironme
     try{
         m_option.instance().program(env, scope);
         for (size_t c = 0; c < consoles; c++){
-            env.consoles[c].controller().wait_for_all_requests();
+            env.consoles[c].controller().wait_for_all(scope);
         }
     }catch (...){
         m_scope.store(nullptr, std::memory_order_release);
@@ -155,11 +156,11 @@ void MultiSwitchProgramSession::internal_run_program(){
         }
         ControllerConnection& connection = session.controller_session().controller();
         SerialPABotBase::SerialConnection* serial_connection = dynamic_cast<SerialPABotBase::SerialConnection*>(&connection);
-        NintendoSwitch::SwitchController* switch_controller = serial_connection->handle().botbase();
+        NintendoSwitch::SwitchControllerSerialPABotBase switch_controller(*serial_connection->handle().botbase());
         handles.emplace_back(
             c,
             session.logger(),
-            *switch_controller,
+            switch_controller,
             session.video(),
             session.overlay(),
             session.audio(),

@@ -11,6 +11,7 @@
 #include "CommonFramework/Language.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/Recording/StreamHistorySession.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_SerialPABotBase.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.h"
 #include "PokemonLA/Inference/Battles/PokemonLA_BattlePokemonSwitchDetector.h"
@@ -490,12 +491,13 @@ int test_pokemonLA_SaveScreenDetector(const ImageViewRGB32& image, const std::ve
 int test_pokemonLA_shinySoundDetector(const std::vector<AudioSpectrum>& spectrums, bool target){
     auto& logger = global_logger_command_line();
     DummyBotBase botbase(logger);
+    SwitchControllerSerialPABotBase controller(botbase);
     DummyVideoFeed video_feed;
     DummyVideoOverlay video_overlay;
     DummyAudioFeed audio_feed;
     StreamHistorySession history(logger);
 
-    ConsoleHandle console(0, logger, botbase, video_feed, video_overlay, audio_feed, history);
+    ConsoleHandle console(0, logger, controller, video_feed, video_overlay, audio_feed, history);
     ShinySoundDetector detector(console, [&](float error_coefficient) -> bool{
         return true;
     });

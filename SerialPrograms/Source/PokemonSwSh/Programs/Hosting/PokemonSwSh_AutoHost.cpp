@@ -7,6 +7,7 @@
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.h"
@@ -217,28 +218,54 @@ void run_autohost(
     pbf_press_dpad(context, DPAD_UP, 5, 45);
 
     //  Mash A until it's time to close the game.
-    {
+    if (stream.video().snapshot()){
+//        WallDuration raid_start_to_exit_delay0 = std::chrono::duration_cast<WallDuration>(
+//            std::chrono::milliseconds((uint64_t)raid_start_to_exit_delay * 1000 / TICKS_PER_SECOND)
+//        );
+
+        BlackScreenOverWatcher black_screen;
+        int ret = run_until<SwitchControllerContext>(
+            stream, context,
+            [&](SwitchControllerContext& context){
+                pbf_mash_button(context, BUTTON_A, raid_start_to_exit_delay);
+            },
+            {black_screen}
+        );
+        if (ret == 0){
+            env.log("Raid has Started!", COLOR_BLUE);
+            stats.add_raid(raid_state.raiders());
+        }else{
+            env.log("Timed out waiting for raid to start.", COLOR_RED);
+            stats.add_timeout();
+        }
+
+#if 0
         context.wait_for_all_requests();
-        uint32_t start = system_clock(context);
+        WallClock start = current_time();
+//        uint32_t start = system_clock(context);
         pbf_mash_button(context, BUTTON_A, 3 * TICKS_PER_SECOND);
         context.wait_for_all_requests();
 
-        BlackScreenOverWatcher black_screen;
-        uint32_t now = start;
+        WallClock now = start;
+//        uint32_t now = start;
         while (true){
             if (black_screen.black_is_over(stream.video().snapshot())){
                 env.log("Raid has Started!", COLOR_BLUE);
                 stats.add_raid(raid_state.raiders());
                 break;
             }
-            if (now - start >= raid_start_to_exit_delay){
+            if (now - start >= raid_start_to_exit_delay0){
                 stats.add_timeout();
                 break;
             }
             pbf_mash_button(context, BUTTON_A, TICKS_PER_SECOND);
             context.wait_for_all_requests();
-            now = system_clock(context);
+            now = current_time();
+//            now = system_clock(context);
         }
+#endif
+    }else{
+        pbf_mash_button(context, BUTTON_A, raid_start_to_exit_delay);
     }
 
     //  Select a move.

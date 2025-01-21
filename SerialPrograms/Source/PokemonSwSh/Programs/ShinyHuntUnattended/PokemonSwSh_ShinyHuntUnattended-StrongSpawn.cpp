@@ -64,8 +64,10 @@ void ShinyHuntUnattendedStrongSpawn::program(SingleSwitchProgramEnvironment& env
         pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_FAST);
     }
 
-    const uint32_t PERIOD = (uint32_t)TIME_ROLLBACK_HOURS * 3600 * TICKS_PER_SECOND;
-    uint32_t last_touch = system_clock(context);
+    WallDuration PERIOD = std::chrono::hours(TIME_ROLLBACK_HOURS);
+    WallClock last_touch = current_time();
+//    const uint32_t PERIOD = (uint32_t)TIME_ROLLBACK_HOURS * 3600 * TICKS_PER_SECOND;
+//    uint32_t last_touch = system_clock(context);
     for (uint32_t c = 0; ; c++){
 
         //  If the update menu isn't there, these will get swallowed by the opening
@@ -102,7 +104,8 @@ void ShinyHuntUnattendedStrongSpawn::program(SingleSwitchProgramEnvironment& env
 
         //  Touch the date and conditional close game.
 //        if (true){
-        if (TIME_ROLLBACK_HOURS > 0 && system_clock(context) - last_touch >= PERIOD){
+        if (TIME_ROLLBACK_HOURS > 0 && current_time() - last_touch >= PERIOD){
+//        if (TIME_ROLLBACK_HOURS > 0 && system_clock(context) - last_touch >= PERIOD){
             last_touch += PERIOD;
             close_game_if_overworld(env.console, context, false, TIME_ROLLBACK_HOURS);
         }else{

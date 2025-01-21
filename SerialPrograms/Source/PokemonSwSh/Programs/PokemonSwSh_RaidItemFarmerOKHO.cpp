@@ -106,6 +106,8 @@ void RaidItemFarmerOHKO::program(MultiSwitchProgramEnvironment& env, Cancellable
     SwitchControllerContext host(scope, env.consoles[0].controller());
     size_t switches = env.consoles.size();
 
+    WallDuration TOUCH_DATE_INTERVAL0 = std::chrono::milliseconds(TOUCH_DATE_INTERVAL * 1000 / TICKS_PER_SECOND);
+
     env.run_in_parallel(
         scope,
         [](ConsoleHandle& console, SwitchControllerContext& context){
@@ -113,10 +115,12 @@ void RaidItemFarmerOHKO::program(MultiSwitchProgramEnvironment& env, Cancellable
         }
     );
 
-    uint32_t last_touch = 0;
+    WallClock last_touch = current_time();
+//    uint32_t last_touch = 0;
     if (TOUCH_DATE_INTERVAL > 0){
         touch_date_from_home(host, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
-        last_touch = system_clock(host);
+        last_touch = current_time();
+//        last_touch = system_clock(host);
     }
     env.run_in_parallel(
         scope,
@@ -180,9 +184,11 @@ void RaidItemFarmerOHKO::program(MultiSwitchProgramEnvironment& env, Cancellable
                     close_game(console, context);
 
                     //  Touch the date.
-                    if (TOUCH_DATE_INTERVAL > 0 && system_clock(context) - last_touch >= TOUCH_DATE_INTERVAL){
+                    if (TOUCH_DATE_INTERVAL > 0 && current_time() - last_touch >= TOUCH_DATE_INTERVAL0){
+//                    if (TOUCH_DATE_INTERVAL > 0 && system_clock(context) - last_touch >= TOUCH_DATE_INTERVAL){
                         touch_date_from_home(context, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
-                        last_touch += TOUCH_DATE_INTERVAL;
+                        last_touch += TOUCH_DATE_INTERVAL0;
+//                        last_touch += TOUCH_DATE_INTERVAL;
                     }
                     start_game_from_home_with_inference(
                         console, context,

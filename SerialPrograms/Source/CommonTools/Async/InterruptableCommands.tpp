@@ -134,9 +134,10 @@ bool AsyncCommandSession<ControllerType>::cancel(std::exception_ptr exception) n
     if (m_current != nullptr){
         m_current->context.cancel(std::move(exception));
     }else{
-        try{
-            m_controller.stop_all_commands();
-        }catch (...){}
+        //  REMOVE: Check that this can actually be deleted.
+//        try{
+//            m_controller.stop_all_commands();
+//        }catch (...){}
     }
     m_cv.notify_all();
     return false;

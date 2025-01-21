@@ -28,7 +28,7 @@ ConsoleHandle::~ConsoleHandle(){
 ConsoleHandle::ConsoleHandle(
     size_t index,
     Logger& logger,
-    BotBaseController& controller,
+    SwitchController& controller,
     VideoFeed& video,
     VideoOverlay& overlay,
     AudioFeed& audio,

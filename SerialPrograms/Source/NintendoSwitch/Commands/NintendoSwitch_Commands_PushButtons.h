@@ -57,7 +57,7 @@ void pbf_move_right_joystick    (SwitchControllerContext& context, uint8_t x, ui
 //  The buttons also include clicking joysticks: BUTTON_LCLICK, BUTTON_RCLICK.
 void pbf_mash_button            (SwitchControllerContext& context, Button button, uint16_t ticks);
 
-void start_program_flash        (SwitchControllerContext& context, uint16_t ticks);
+//void start_program_flash        (SwitchControllerContext& context, uint16_t ticks);
 void grip_menu_connect_go_home  (SwitchControllerContext& context);
 
 

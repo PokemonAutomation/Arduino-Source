@@ -53,7 +53,7 @@ void FastCodeEntry::program(SingleSwitchProgramEnvironment& env, SwitchControlle
     RAID_CODE.to_str(code);
 
     if (INITIAL_DELAY != 0){
-        start_program_flash(context, INITIAL_DELAY);
+        pbf_wait(context, INITIAL_DELAY);
     }
 
     pbf_press_button(context, BUTTON_PLUS, 5, 5);

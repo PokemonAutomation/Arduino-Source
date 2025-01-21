@@ -95,6 +95,7 @@ void pbf_mash_button(SwitchControllerContext& context, Button button, uint16_t t
 #endif
 }
 
+#if 0
 void start_program_flash(SwitchControllerContext& context, uint16_t ticks){
     for (uint16_t c = 0; c < ticks; c += 50){
         set_leds(context, true);
@@ -103,6 +104,7 @@ void start_program_flash(SwitchControllerContext& context, uint16_t ticks){
         pbf_wait(context, 25);
     }
 }
+#endif
 void grip_menu_connect_go_home(SwitchControllerContext& context){
     pbf_press_button(context, BUTTON_L | BUTTON_R, 10, 40);
     pbf_press_button(context, BUTTON_A, 10, 140);
@@ -131,6 +133,8 @@ void pbf_controller_state(
     uint8_t right_x, uint8_t right_y,
     uint16_t ticks
 ){
+    context->send_controller_state(context, button, position, left_x, left_y, right_x, right_y, ticks);
+#if 0
     // divide the controller state into smaller chunks of 255 ticks
     while (ticks > 0){
         uint16_t curr_ticks = std::min(ticks, (uint16_t)255);
@@ -139,6 +143,7 @@ void pbf_controller_state(
         );
         ticks -= curr_ticks;
     } // end while loop, and function 
+#endif
 }
 
 static std::string button_to_string(Button button){

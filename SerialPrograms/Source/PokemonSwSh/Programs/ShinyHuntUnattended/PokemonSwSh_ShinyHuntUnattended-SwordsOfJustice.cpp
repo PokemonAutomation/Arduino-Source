@@ -75,11 +75,14 @@ void ShinyHuntUnattendedSwordsOfJustice::program(SingleSwitchProgramEnvironment&
         pbf_press_button(context, BUTTON_B, 5, 5);
     }
 
-    const uint32_t PERIOD = (uint32_t)TIME_ROLLBACK_HOURS * 3600 * TICKS_PER_SECOND;
-    uint32_t last_touch = system_clock(context);
+    WallDuration PERIOD = std::chrono::hours(TIME_ROLLBACK_HOURS);
+    WallClock last_touch = current_time();
+//    const uint32_t PERIOD = (uint32_t)TIME_ROLLBACK_HOURS * 3600 * TICKS_PER_SECOND;
+//    uint32_t last_touch = system_clock(context);
     for (uint32_t c = 0; ; c++){
         //  Touch the date.
-        if (TIME_ROLLBACK_HOURS > 0 && system_clock(context) - last_touch >= PERIOD){
+        if (TIME_ROLLBACK_HOURS > 0 && current_time() - last_touch >= PERIOD){
+//        if (TIME_ROLLBACK_HOURS > 0 && system_clock(context) - last_touch >= PERIOD){
             pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
             rollback_hours_from_home(context, TIME_ROLLBACK_HOURS, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
             resume_game_no_interact(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);

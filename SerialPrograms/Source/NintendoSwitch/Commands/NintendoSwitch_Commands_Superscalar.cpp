@@ -14,14 +14,10 @@ namespace NintendoSwitch{
 
 
 void ssf_flush_pipeline(SwitchControllerContext& context){
-    context.issue_request(
-        DeviceRequest_ssf_flush_pipeline()
-    );
+    context->send_wait_for_pending(context);
 }
 void ssf_do_nothing(SwitchControllerContext& context, uint16_t ticks){
-    context.issue_request(
-        DeviceRequest_ssf_do_nothing(ticks)
-    );
+    context->send_wait(context, ticks);
 }
 
 
@@ -31,63 +27,71 @@ void ssf_press_button(
     Button button,
     uint16_t delay, uint16_t hold, uint8_t cool
 ){
-    context.issue_request(
-        DeviceRequest_ssf_press_button(button, delay, hold, cool)
-    );
+    context->send_buttons(context, button, delay, hold, cool);
+//    context.issue_request(
+//        DeviceRequest_ssf_press_button(button, delay, hold, cool)
+//    );
 }
 void ssf_press_dpad(
     SwitchControllerContext& context,
     DpadPosition position,
     uint16_t delay, uint16_t hold, uint8_t cool
 ){
-    context.issue_request(
-        DeviceRequest_ssf_press_dpad(position, delay, hold, cool)
-    );
+    context->send_dpad(context, position, delay, hold, cool);
+//    context.issue_request(
+//        DeviceRequest_ssf_press_dpad(position, delay, hold, cool)
+//    );
 }
 void ssf_press_left_joystick(
     SwitchControllerContext& context,
     uint8_t x, uint8_t y,
     uint16_t delay, uint16_t hold, uint8_t cool
 ){
-    context.issue_request(
-        DeviceRequest_ssf_press_joystick(true, x, y, delay, hold, cool)
-    );
+    context->send_left_joystick(context, x, y, delay, hold, cool);
+//    context.issue_request(
+//        DeviceRequest_ssf_press_joystick(true, x, y, delay, hold, cool)
+//    );
 }
 void ssf_press_right_joystick(
     SwitchControllerContext& context,
     uint8_t x, uint8_t y,
     uint16_t delay, uint16_t hold, uint8_t cool
 ){
-    context.issue_request(
-        DeviceRequest_ssf_press_joystick(false, x, y, delay, hold, cool)
-    );
+    context->send_right_joystick(context, x, y, delay, hold, cool);
+//    context.issue_request(
+//        DeviceRequest_ssf_press_joystick(false, x, y, delay, hold, cool)
+//    );
 }
 
 
 
 void ssf_mash1_button(SwitchControllerContext& context, Button button, uint16_t ticks){
-    context.issue_request(
-        DeviceRequest_ssf_mash1_button(button, ticks)
-    );
+    context->send_mash_button(context, button, ticks);
+//    context.issue_request(
+//        DeviceRequest_ssf_mash1_button(button, ticks)
+//    );
 }
 void ssf_mash2_button(SwitchControllerContext& context, Button button0, Button button1, uint16_t ticks){
-    context.issue_request(
-        DeviceRequest_ssf_mash2_button(button0, button1, ticks)
-    );
+    context->send_mash_button(context, button0, button1, ticks);
+//    context.issue_request(
+//        DeviceRequest_ssf_mash2_button(button0, button1, ticks)
+//    );
 }
 void ssf_mash_AZs(SwitchControllerContext& context, uint16_t ticks){
-    context.issue_request(
-        DeviceRequest_ssf_mash_AZs(ticks)
-    );
+    context->send_mash_AZs(context, ticks);
+//    context.issue_request(
+//        DeviceRequest_ssf_mash_AZs(ticks)
+//    );
 }
 void ssf_issue_scroll(
     SwitchControllerContext& context,
     ssf_ScrollDirection direction,
     uint16_t delay, uint16_t hold, uint8_t cool
 ){
-    context.issue_request(
-        DeviceRequest_ssf_issue_scroll(direction, delay, hold, cool)
-    );
+    context->send_system_scroll(context, (DpadPosition)direction, delay, hold, cool);
+//    context.issue_request(
+//        DeviceRequest_ssf_issue_scroll(direction, delay, hold, cool)
+//    );
 }
 
 

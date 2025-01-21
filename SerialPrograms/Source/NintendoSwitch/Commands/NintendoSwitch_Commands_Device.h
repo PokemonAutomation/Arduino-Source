@@ -7,14 +7,14 @@
 #ifndef PokemonAutomation_NintendoSwitch_Commands_Device_H
 #define PokemonAutomation_NintendoSwitch_Commands_Device_H
 
-#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
+#include "ClientSource/Connection/BotBase.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-uint32_t system_clock   (SwitchControllerContext& context);
-void set_leds           (SwitchControllerContext& context, bool on);
+uint32_t system_clock   (BotBaseControllerContext& context);
+void set_leds           (BotBaseControllerContext& context, bool on);
 
 
 

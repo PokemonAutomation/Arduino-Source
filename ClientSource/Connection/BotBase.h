@@ -73,7 +73,7 @@ public:
 
 
 
-class ControllerContext : public CancellableScope{
+class ControllerContext0 : public CancellableScope{
 public:
     virtual void wait_for_all_requests() const = 0;
     virtual void cancel_now() = 0;
@@ -82,7 +82,7 @@ public:
 
 
 //  A wrapper for BotBase that allows for asynchronous cancelling.
-class BotBaseControllerContext final : public ControllerContext{
+class BotBaseControllerContext final : public ControllerContext0{
 public:
     using ControllerType = BotBaseController;
 

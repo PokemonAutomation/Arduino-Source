@@ -15,9 +15,7 @@
 #define PokemonAutomation_PABotBaseConnection_H
 
 #include <memory>
-#include <string>
 #include <deque>
-#include "Common/Compiler.h"
 #include "Common/Microcontroller/MessageProtocol.h"
 #include "BotBase.h"
 #include "MessageSniffer.h"

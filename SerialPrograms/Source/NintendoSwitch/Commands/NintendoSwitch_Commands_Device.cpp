@@ -11,15 +11,15 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-uint32_t system_clock(SwitchControllerContext& context){
+uint32_t system_clock(BotBaseControllerContext& context){
     pabb_MsgAckRequestI32 response;
     context.issue_request_and_wait(
         DeviceRequest_system_clock()
     ).convert<PABB_MSG_ACK_REQUEST_I32>(context.controller().logger(), response);
     return response.data;
 }
-void set_leds(SwitchControllerContext& context, bool on){
-    context.issue_request(DeviceRequest_set_leds(on));
+void set_leds(BotBaseControllerContext& context, bool on){
+    context.issue_request_and_wait(DeviceRequest_set_leds(on));
 }
 
 
