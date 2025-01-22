@@ -6,18 +6,19 @@
 
 #include "Common/Cpp/Json/JsonValue.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
+#include "Controllers/ControllerDescriptor.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Messages_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Messages_Superscalar.h"
 #include "NintendoSwitch_SerialPABotBase.h"
 
 namespace PokemonAutomation{
-namespace NintendoSwitch{
 
 
-
-std::vector<std::unique_ptr<const ControllerDescriptor>> SwitchController_SerialPABotBase_Descriptor::get_all_devices(){
-    std::vector<std::unique_ptr<const ControllerDescriptor>> ret;
+template <>
+std::vector<std::shared_ptr<const ControllerDescriptor>>
+ControllerType_t<NintendoSwitch::SwitchController_SerialPABotBase_Descriptor>::list() const{
+    std::vector<std::shared_ptr<const ControllerDescriptor>> ret;
     for (QSerialPortInfo& port : QSerialPortInfo::availablePorts()){
 #ifdef _WIN32
         //  COM1 is never the correct port on Windows.
@@ -25,10 +26,22 @@ std::vector<std::unique_ptr<const ControllerDescriptor>> SwitchController_Serial
             continue;
         }
 #endif
-        ret.emplace_back(new SwitchController_SerialPABotBase_Descriptor(port));
+        ret.emplace_back(new NintendoSwitch::SwitchController_SerialPABotBase_Descriptor(port));
     }
     return ret;
 }
+template class ControllerType_t<NintendoSwitch::SwitchController_SerialPABotBase_Descriptor>;
+
+
+
+
+namespace NintendoSwitch{
+
+
+
+
+
+const char* SwitchController_SerialPABotBase_Descriptor::TYPENAME = SerialPABotBase::NintendoSwitch_Basic;
 
 
 
@@ -41,7 +54,7 @@ bool SwitchController_SerialPABotBase_Descriptor::operator==(const ControllerDes
 
 
 const char* SwitchController_SerialPABotBase_Descriptor::type_name() const{
-    return SerialPABotBase::NintendoSwitch_Basic;
+    return TYPENAME;
 }
 std::string SwitchController_SerialPABotBase_Descriptor::display_name() const{
     if (m_port.isNull()){

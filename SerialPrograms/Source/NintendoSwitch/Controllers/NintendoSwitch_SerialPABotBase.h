@@ -22,7 +22,7 @@ namespace NintendoSwitch{
 
 class SwitchController_SerialPABotBase_Descriptor : public ControllerDescriptor{
 public:
-    static std::vector<std::unique_ptr<const ControllerDescriptor>> get_all_devices();
+    static const char* TYPENAME;
 
 public:
     SwitchController_SerialPABotBase_Descriptor() = default;

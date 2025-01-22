@@ -6,10 +6,8 @@
 
 #include <QHBoxLayout>
 #include "Common/Qt/NoWheelComboBox.h"
-#include "Controllers/ControllerCapability.h"
+#include "Controllers/NullController.h"
 #include "ControllerSelectorWidget.h"
-#include "SerialPABotBase/SerialPABotBase.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_SerialPABotBase.h"
 
 //#include <iostream>
 //using std::cout;
@@ -82,20 +80,9 @@ void ControllerSelectorWidget::refresh(){
     m_device_list.clear();
     m_devices_dropdown->clear();
 
-
-    //  Add the "no selection" option.
-    m_device_list.emplace_back(new NullControllerDescriptor());
-
-    //  If SerialPABotBase is supported, add them to the list.
-    if (m_session.requirements().contains_device(SerialPABotBase::NintendoSwitch_Basic)){  //  REMOVE
-        std::vector<std::unique_ptr<const ControllerDescriptor>> serial =
-            NintendoSwitch::SwitchController_SerialPABotBase_Descriptor::get_all_devices();
-        std::move(serial.begin(), serial.end(), std::back_inserter(m_device_list));
-    }
-
-    //  If we add new interfaces, add them here.
-
-
+    //  Rebuild the device list.
+    m_device_list = get_compatible_descriptors(m_session.requirements());
+    m_device_list.insert(m_device_list.begin(), std::make_unique<NullControllerDescriptor>());
 
     std::shared_ptr<const ControllerDescriptor> current = m_session.descriptor();
 

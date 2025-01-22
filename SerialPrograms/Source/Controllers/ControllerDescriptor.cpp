@@ -4,37 +4,59 @@
  *
  */
 
+#include <iterator>
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonObject.h"
+#include "ControllerCapability.h"
 #include "ControllerDescriptor.h"
-#include "Controllers/SerialPABotBase/SerialPABotBase.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_SerialPABotBase.h"
-#include "ControllerConnection.h"
+#include "NullController.h"
+
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 
 
-bool NullControllerDescriptor::operator==(const ControllerDescriptor& x) const{
-    return typeid(*this) == typeid(x);
-}
-const char* NullControllerDescriptor::type_name() const{
-    return "None";
-}
-std::string NullControllerDescriptor::display_name() const{
-    return "(none)";
-}
-void NullControllerDescriptor::load_json(const JsonValue& json){
+//
+//  Here we store a map of all controller types in the program.
+//
+std::map<std::string, std::unique_ptr<ControllerType>> CONTROLLER_TYPES;
 
+
+void ControllerType::register_factory(
+    const std::string& name,
+    std::unique_ptr<ControllerType> factory
+){
+    auto ret = CONTROLLER_TYPES.emplace(name, std::move(factory));
+    if (!ret.second){
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Duplicate Factory Name: " + name);
+    }
 }
-JsonValue NullControllerDescriptor::to_json() const{
-    return JsonValue();
+
+
+
+std::vector<std::shared_ptr<const ControllerDescriptor>>
+get_compatible_descriptors(const ControllerRequirements& requirements){
+    std::vector<std::shared_ptr<const ControllerDescriptor>> ret;
+
+    //  Find all the devices in common between the supported list and the
+    //  required list. For each of those, enumerate all the descriptors and
+    //  combine them into a single list.
+    for (const auto& device : requirements.map()){
+        auto iter = CONTROLLER_TYPES.find(device.first);
+        if (iter != CONTROLLER_TYPES.end()){
+            std::vector<std::shared_ptr<const ControllerDescriptor>> list = iter->second->list();
+            std::move(list.begin(), list.end(), std::back_inserter(ret));
+        }
+    }
+
+    return ret;
 }
-std::unique_ptr<ControllerConnection> NullControllerDescriptor::open(
-    Logger& logger,
-    const ControllerRequirements& requirements
-) const{
-    return nullptr;
-}
+
+
+
 
 
 
@@ -51,19 +73,13 @@ void ControllerOption::load_json(const JsonValue& json){
     const std::string& type = obj.get_string_throw("DeviceType");
     const JsonValue& params = obj.get_value_throw("Parameters");
 
-    if (type == "None"){
-        auto descriptor = std::make_unique<NullControllerDescriptor>();
-        m_current = std::move(descriptor);
-        return;
-    }
-    if (type == SerialPABotBase::NintendoSwitch_Basic){
-        auto descriptor = std::make_unique<NintendoSwitch::SwitchController_SerialPABotBase_Descriptor>();
-        descriptor->load_json(params);
-        m_current = std::move(descriptor);
+    auto iter = CONTROLLER_TYPES.find(type);
+    if (iter == CONTROLLER_TYPES.end()){
+        m_current.reset(new NullControllerDescriptor());
         return;
     }
 
-    m_current.reset(new NullControllerDescriptor());
+    m_current = iter->second->make(params);
 }
 JsonValue ControllerOption::to_json() const{
     if (!m_current){

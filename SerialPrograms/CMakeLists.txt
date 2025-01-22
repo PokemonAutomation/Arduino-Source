@@ -609,6 +609,8 @@ file(GLOB MAIN_SOURCES
     Source/Controllers/ControllerSession.h
     Source/Controllers/ControllerSelectorWidget.cpp
     Source/Controllers/ControllerSelectorWidget.h
+    Source/Controllers/NullController.cpp
+    Source/Controllers/NullController.h
     Source/Controllers/SerialPABotBase/SerialPABotBase.cpp
     Source/Controllers/SerialPABotBase/SerialPABotBase.h
     Source/Controllers/SerialPABotBase/SerialPABotBase_Handle.cpp

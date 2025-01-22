@@ -13,7 +13,6 @@
 #include "ClientSource/Connection/BotBaseMessage.h"
 
 namespace PokemonAutomation{
-    class Cancellable;
 namespace NintendoSwitch{
 
 

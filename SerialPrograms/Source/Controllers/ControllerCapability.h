@@ -59,8 +59,8 @@ public:
         return m_map.find(device) != m_map.end();
     }
 
-    //  Check compatibility. If compatible, returns empty string. Otherwise
-    //  returns one of the missing features.
+    //  Check compatibility. If compatible, returns empty string.
+    //  Otherwise returns one of the missing features.
     std::string check_compatibility(const std::string& device, const std::set<std::string>& features) const{
         auto scope_check = m_sanitizer.check_scope();
 
