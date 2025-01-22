@@ -33,7 +33,7 @@ MagikarpMoveGrinder_Descriptor::MagikarpMoveGrinder_Descriptor()
         "grind status moves with any style against a Magikarp to finish " + STRING_POKEDEX + " research tasks.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_SERIAL_DEFAULT}
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 class MagikarpMoveGrinder_Descriptor::Stats : public StatsTracker{

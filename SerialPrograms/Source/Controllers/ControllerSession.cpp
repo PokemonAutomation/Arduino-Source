@@ -176,30 +176,6 @@ std::string ControllerSession::reset(){
 
     return "";
 }
-std::string ControllerSession::stop_pending_commands(){
-    std::lock_guard<std::mutex> lg(m_state_lock);
-//    cout << "ControllerSession::stop_pending_commands() = " << m_connection.get() << endl;
-    if (!m_connection){
-        return "No controller set.";
-    }
-    return m_connection->stop_pending_commands();
-}
-std::string ControllerSession::set_next_command_replace(){
-    std::lock_guard<std::mutex> lg(m_state_lock);
-//    cout << "ControllerSession::stop_pending_commands() = " << m_connection.get() << endl;
-    if (!m_connection){
-        return "No controller set.";
-    }
-    return m_connection->set_next_command_replace();
-}
-std::string ControllerSession::send_request(const BotBaseRequest& request){
-    std::lock_guard<std::mutex> lg(m_state_lock);
-//    cout << "ControllerSession::stop_pending_commands() = " << m_connection.get() << endl;
-    if (!m_connection){
-        return "No controller set.";
-    }
-    return m_connection->send_request(request);
-}
 
 
 

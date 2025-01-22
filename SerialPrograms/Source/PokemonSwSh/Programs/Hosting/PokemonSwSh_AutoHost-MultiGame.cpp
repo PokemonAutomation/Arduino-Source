@@ -33,7 +33,7 @@ AutoHostMultiGame_Descriptor::AutoHostMultiGame_Descriptor()
         "Run AutoHost-Rolling across multiple game saves. (Up to 16 dens!)",
         FeedbackType::OPTIONAL_,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_SERIAL_DEFAULT}
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 std::unique_ptr<StatsTracker> AutoHostMultiGame_Descriptor::make_stats() const{

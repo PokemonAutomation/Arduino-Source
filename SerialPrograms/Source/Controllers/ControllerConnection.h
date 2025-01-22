@@ -13,8 +13,6 @@
 
 namespace PokemonAutomation{
 
-class BotBaseRequest;   //  REMOVE
-
 
 class ControllerConnection{
 public:
@@ -34,14 +32,10 @@ public:
     std::string status_text() const;
 
 
-public:
-    virtual std::string stop_pending_commands() = 0;
-    virtual std::string set_next_command_replace() = 0;
-    virtual std::string send_request(const BotBaseRequest& request) = 0;    //  REMOVE
-
 protected:
     void signal_ready_changed(bool ready);
     void signal_status_text_changed(const std::string& text);
+
 
 protected:
     std::atomic<bool> m_ready;

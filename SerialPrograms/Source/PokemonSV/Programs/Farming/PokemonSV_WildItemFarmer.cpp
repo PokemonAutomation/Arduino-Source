@@ -35,7 +35,7 @@ WildItemFarmer_Descriptor::WildItemFarmer_Descriptor()
         "Farm an item held by a wild " + Pokemon::STRING_POKEMON + ".",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_SERIAL_DEFAULT}
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 

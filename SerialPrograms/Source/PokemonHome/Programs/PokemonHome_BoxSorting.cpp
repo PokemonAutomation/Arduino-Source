@@ -62,7 +62,7 @@ BoxSorting_Descriptor::BoxSorting_Descriptor()
         "Order boxes of " + STRING_POKEMON + ".",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_SERIAL_DEFAULT}
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
         )
 {}
 struct BoxSorting_Descriptor::Stats : public StatsTracker{

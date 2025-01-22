@@ -25,7 +25,7 @@ BeamReset_Descriptor::BeamReset_Descriptor()
         "Reset a beam until you see a purple beam.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_SERIAL_DEFAULT}
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 

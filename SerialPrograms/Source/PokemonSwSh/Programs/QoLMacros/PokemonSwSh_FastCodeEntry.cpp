@@ -25,7 +25,7 @@ FastCodeEntry_Descriptor::FastCodeEntry_Descriptor()
         "Force your way into raids by entering 8-digit codes in under 1 second.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_SERIAL_DEFAULT}
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 

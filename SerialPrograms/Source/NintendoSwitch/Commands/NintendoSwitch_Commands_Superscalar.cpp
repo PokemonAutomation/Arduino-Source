@@ -14,10 +14,10 @@ namespace NintendoSwitch{
 
 
 void ssf_flush_pipeline(SwitchControllerContext& context){
-    context->send_wait_for_pending(context);
+    context->send_wait_for_pending(&context);
 }
 void ssf_do_nothing(SwitchControllerContext& context, uint16_t ticks){
-    context->send_wait(context, ticks);
+    context->send_wait(&context, ticks);
 }
 
 
@@ -27,47 +27,47 @@ void ssf_press_button(
     Button button,
     uint16_t delay, uint16_t hold, uint8_t cool
 ){
-    context->send_buttons(context, button, delay, hold, cool);
+    context->send_buttons(&context, button, delay, hold, cool);
 }
 void ssf_press_dpad(
     SwitchControllerContext& context,
     DpadPosition position,
     uint16_t delay, uint16_t hold, uint8_t cool
 ){
-    context->send_dpad(context, position, delay, hold, cool);
+    context->send_dpad(&context, position, delay, hold, cool);
 }
 void ssf_press_left_joystick(
     SwitchControllerContext& context,
     uint8_t x, uint8_t y,
     uint16_t delay, uint16_t hold, uint8_t cool
 ){
-    context->send_left_joystick(context, x, y, delay, hold, cool);
+    context->send_left_joystick(&context, x, y, delay, hold, cool);
 }
 void ssf_press_right_joystick(
     SwitchControllerContext& context,
     uint8_t x, uint8_t y,
     uint16_t delay, uint16_t hold, uint8_t cool
 ){
-    context->send_right_joystick(context, x, y, delay, hold, cool);
+    context->send_right_joystick(&context, x, y, delay, hold, cool);
 }
 
 
 
 void ssf_mash1_button(SwitchControllerContext& context, Button button, uint16_t ticks){
-    context->send_mash_button(context, button, ticks);
+    context->send_mash_button(&context, button, ticks);
 }
 void ssf_mash2_button(SwitchControllerContext& context, Button button0, Button button1, uint16_t ticks){
-    context->send_mash_button(context, button0, button1, ticks);
+    context->send_mash_button(&context, button0, button1, ticks);
 }
 void ssf_mash_AZs(SwitchControllerContext& context, uint16_t ticks){
-    context->send_mash_AZs(context, ticks);
+    context->send_mash_AZs(&context, ticks);
 }
 void ssf_issue_scroll(
     SwitchControllerContext& context,
     ssf_ScrollDirection direction,
     uint16_t delay, uint16_t hold, uint8_t cool
 ){
-    context->send_system_scroll(context, (DpadPosition)direction, delay, hold, cool);
+    context->send_system_scroll(&context, (DpadPosition)direction, delay, hold, cool);
 }
 
 

@@ -9,7 +9,7 @@
 #include "Controllers/ControllerCapability.h"
 #include "ControllerSelectorWidget.h"
 #include "SerialPABotBase/SerialPABotBase.h"
-#include "SerialPABotBase/SerialPABotBase_Descriptor.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_SerialPABotBase.h"
 
 //#include <iostream>
 //using std::cout;
@@ -87,8 +87,9 @@ void ControllerSelectorWidget::refresh(){
     m_device_list.emplace_back(new NullControllerDescriptor());
 
     //  If SerialPABotBase is supported, add them to the list.
-    if (m_session.requirements().contains_device(SerialPABotBase::INTERFACE_NAME)){
-        std::vector<std::unique_ptr<const ControllerDescriptor>> serial = SerialPABotBase::get_all_devices();
+    if (m_session.requirements().contains_device(SerialPABotBase::NintendoSwitch_Basic)){  //  REMOVE
+        std::vector<std::unique_ptr<const ControllerDescriptor>> serial =
+            NintendoSwitch::SwitchController_SerialPABotBase_Descriptor::get_all_devices();
         std::move(serial.begin(), serial.end(), std::back_inserter(m_device_list));
     }
 

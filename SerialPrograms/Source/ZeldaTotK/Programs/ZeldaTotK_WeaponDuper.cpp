@@ -22,7 +22,7 @@ WeaponDuper_Descriptor::WeaponDuper_Descriptor()
         "Use a glitch to duplicate your weapons (Bows, Shields and Swords)",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_SERIAL_DEFAULT}
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 

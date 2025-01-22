@@ -10,6 +10,7 @@
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/Options/Environment/PerformanceOptions.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Messages_PushButtons.h"
 #include "NintendoSwitch_VirtualController.h"
 
@@ -164,13 +165,19 @@ bool VirtualController::on_key_release(Qt::Key key){
 
 
 bool VirtualController::try_stop_commands(){
-    return m_session.stop_pending_commands().empty();
+    return m_session.try_run<SwitchController>([](SwitchController& controller){
+        controller.cancel_all(nullptr);
+    });
 }
 bool VirtualController::try_next_interrupt(){
-    return m_session.set_next_command_replace().empty();
+    return m_session.try_run<SwitchController>([](SwitchController& controller){
+        controller.replace_on_next_command(nullptr);
+    });
 }
 bool VirtualController::try_send_request(const BotBaseRequest& request){
-    return m_session.send_request(request).empty();
+    return m_session.try_run<SwitchController>([&](SwitchController& controller){
+        controller.send_botbase_request(nullptr, request);
+    });
 }
 
 
@@ -247,7 +254,19 @@ void VirtualController::thread_loop(){
                     state.right_y,
                     255
                 );
-                if (!try_send_request(request)){
+                bool success = m_session.try_run<SwitchController>([=](SwitchController& controller){
+                    controller.send_controller_state(
+                        nullptr,
+                        state.buttons,
+                        state.dpad,
+                        state.left_x,
+                        state.left_y,
+                        state.right_x,
+                        state.right_y,
+                        255
+                    );
+                });
+                if (!success){
                     next_wake = now + std::chrono::milliseconds(PABB_RETRANSMIT_DELAY_MILLIS);
                     break;
                 }

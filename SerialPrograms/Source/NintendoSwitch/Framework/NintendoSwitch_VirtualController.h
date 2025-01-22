@@ -20,6 +20,8 @@
 #include "NintendoSwitch_VirtualControllerMapping.h"
 
 namespace PokemonAutomation{
+    class BotBaseRequest;
+
 namespace NintendoSwitch{
 
 

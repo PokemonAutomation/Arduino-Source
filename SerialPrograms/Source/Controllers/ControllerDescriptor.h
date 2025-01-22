@@ -22,7 +22,6 @@ class ControllerConnection;
 class ControllerDescriptor{
 public:
     virtual ~ControllerDescriptor() = default;
-    virtual std::unique_ptr<ControllerDescriptor> clone() const = 0;
     virtual bool operator==(const ControllerDescriptor& x) const = 0;
 
     virtual const char* type_name() const = 0;
@@ -39,7 +38,6 @@ public:
 
 class NullControllerDescriptor : public ControllerDescriptor{
 public:
-    virtual std::unique_ptr<ControllerDescriptor> clone() const override;
     virtual bool operator==(const ControllerDescriptor& x) const override;
     virtual const char* type_name() const override;
     virtual std::string display_name() const override;

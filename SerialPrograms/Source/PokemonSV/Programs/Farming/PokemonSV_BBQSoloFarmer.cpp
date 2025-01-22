@@ -33,7 +33,7 @@ BBQSoloFarmer_Descriptor::BBQSoloFarmer_Descriptor()
         "Farm Blueberry Quests in the Terarium for BP.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_SERIAL_DEFAULT}
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 struct BBQSoloFarmer_Descriptor::Stats : public StatsTracker{

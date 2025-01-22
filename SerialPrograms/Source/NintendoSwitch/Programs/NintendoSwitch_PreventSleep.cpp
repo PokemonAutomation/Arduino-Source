@@ -4,7 +4,6 @@
  *
  */
 
-#include "Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h"
 #include "NintendoSwitch/NintendoSwitch_FixedInterval.h"
 #include "NintendoSwitch_PreventSleep.h"
 
@@ -20,7 +19,7 @@ PreventSleep_Descriptor::PreventSleep_Descriptor()
         "Press B every 15 seconds to keep the Switch from sleeping.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_SERIAL_DEFAULT}
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 

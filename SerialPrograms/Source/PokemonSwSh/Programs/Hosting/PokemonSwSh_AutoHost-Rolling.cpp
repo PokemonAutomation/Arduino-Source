@@ -35,7 +35,7 @@ AutoHostRolling_Descriptor::AutoHostRolling_Descriptor()
         "Roll N days, host, SR and repeat. Also supports hard-locks and soft-locks.",
         FeedbackType::OPTIONAL_,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_SERIAL_DEFAULT}
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 std::unique_ptr<StatsTracker> AutoHostRolling_Descriptor::make_stats() const{

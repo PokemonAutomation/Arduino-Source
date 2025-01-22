@@ -24,6 +24,9 @@ class SwitchControllerContext;
 //  This is the generic interface a Switch controller that encapsulates all
 //  Switch controllers.
 //
+//  Implementations must inherit from both this class ControllerConnection as
+//  the framework will cross-cast from ControllerConnection to SwitchController.
+//
 //  Currently we only have one implementation (SerialPABotBase). But we expect
 //  to add more in the future.
 //
@@ -38,15 +41,15 @@ public:
     //  General Control
 
     //  Wait for all unfinished commands to finish.
-    virtual void wait_for_all(const Cancellable& cancellable) = 0;
+    virtual void wait_for_all(const Cancellable* cancellable) = 0;
 
     //  Cancel all commands. This returns the controller to the neutral button
     //  state and clears the command queue.
-    virtual void cancel_all(const Cancellable& cancellable) = 0;
+    virtual void cancel_all(const Cancellable* cancellable) = 0;
 
     //  Declare that the next command will replace the current command stream
     //  with no gaps.
-    virtual void replace_on_next_command(const Cancellable& cancellable) = 0;
+    virtual void replace_on_next_command(const Cancellable* cancellable) = 0;
 
 
 public:
@@ -77,12 +80,12 @@ public:
     //  overlapping of buttons across this call.
     //  Note that this is a device-side wait. This function itself will still
     //  return immediately if the FIFO isn't full.
-    virtual void send_wait_for_pending(const Cancellable& cancellable) = 0;
+    virtual void send_wait_for_pending(const Cancellable* cancellable) = 0;
 
     //  Wait for this many ticks.
     //  Note that this is a device-side wait. This function itself will still
     //  return immediately if the FIFO isn't full.
-    virtual void send_wait(const Cancellable& cancellable, uint16_t ticks) = 0;
+    virtual void send_wait(const Cancellable* cancellable, uint16_t ticks) = 0;
 
     //
     //  Press all the following buttons/joysticks simultaneously for the
@@ -106,7 +109,7 @@ public:
     //  overloads to this and gate them behind features.
     //
     virtual void send_controller_state(
-        const Cancellable& cancellable,
+        const Cancellable* cancellable,
         Button button,
         DpadPosition position,
         uint8_t left_x, uint8_t left_y,
@@ -117,11 +120,11 @@ public:
     //  Temporary for refactor: Send custom requests for PABotBase's advanced
     //  RPCs.
     virtual void send_botbase_request(
-        const Cancellable& cancellable,
+        const Cancellable* cancellable,
         const BotBaseRequest& request
     ) = 0;
     virtual BotBaseMessage send_botbase_request_and_wait(
-        const Cancellable& cancellable,
+        const Cancellable* cancellable,
         const BotBaseRequest& request
     ) = 0;
 
@@ -158,26 +161,26 @@ public:
     //  This command will wait until all the selected buttons are ready to
     //  ensure that they are all dispatched simultaneously.
     virtual void send_buttons(
-        const Cancellable& cancellable,
+        const Cancellable* cancellable,
         Button button,
         uint16_t delay, uint16_t hold, uint8_t cooldown
     ) = 0;
 
     //  Dpad
     virtual void send_dpad(
-        const Cancellable& cancellable,
+        const Cancellable* cancellable,
         DpadPosition position,
         uint16_t delay, uint16_t hold, uint8_t cooldown
     ) = 0;
 
     //  Joysticks
     virtual void send_left_joystick(
-        const Cancellable& cancellable,
+        const Cancellable* cancellable,
         uint8_t x, uint8_t y,
         uint16_t delay, uint16_t hold, uint8_t cooldown
     ) = 0;
     virtual void send_right_joystick(
-        const Cancellable& cancellable,
+        const Cancellable* cancellable,
         uint8_t x, uint8_t y,
         uint16_t delay, uint16_t hold, uint8_t cooldown
     ) = 0;
@@ -199,7 +202,7 @@ public:
 
     //  Mash a button as quickly as possible.
     virtual void send_mash_button(
-        const Cancellable& cancellable,
+        const Cancellable* cancellable,
         Button button, uint16_t ticks
     ) = 0;
 
@@ -207,7 +210,7 @@ public:
     //  "button0" will always be pressed first.
     //  Both buttons will be pressed at least once.
     virtual void send_mash_button(
-        const Cancellable& cancellable,
+        const Cancellable* cancellable,
         Button button0, Button button1, uint16_t ticks
     ) = 0;
 
@@ -215,7 +218,7 @@ public:
     //  them to logically mash A much faster than is possible with just one
     //  button.
     virtual void send_mash_AZs(
-        const Cancellable& cancellable,
+        const Cancellable* cancellable,
         uint16_t ticks
     ) = 0;
 
@@ -230,7 +233,7 @@ public:
     //  time.
     //
     virtual void send_system_scroll(
-        const Cancellable& cancellable,
+        const Cancellable* cancellable,
         DpadPosition direction, //  Diagonals not allowed.
         uint16_t delay, uint16_t hold, uint8_t cooldown
     ) = 0;
@@ -271,7 +274,7 @@ public:
 #if 1   //  REMOVE
     void wait_for_all_requests() const{
         m_lifetime_sanitizer.check_usage();
-        m_controller.wait_for_all(*this);
+        m_controller.wait_for_all(this);
     }
 #endif
 
@@ -279,19 +282,21 @@ public:
     void cancel_now(){
         m_lifetime_sanitizer.check_usage();
         CancellableScope::cancel(nullptr);
-        m_controller.cancel_all(*this);
+        m_controller.cancel_all(this);
     }
 
     //  Stop the commands in this context, but do it lazily.
-    //  Still will stop new commands from being issued to the device,
-    //  and will tell the device that the next command that is issued
-    //  should replace the command queue.
+    //
+    //  1.  Stop new commands from being issued to the device from this context.
+    //  2.  Tell the device that the next command that is issued should replace
+    //      the command queue.
+    //
     //  This cancel is used when you need continuity from an ongoing
     //  sequence.
     void cancel_lazy(){
         m_lifetime_sanitizer.check_usage();
         CancellableScope::cancel(nullptr);
-        m_controller.replace_on_next_command(*this);
+        m_controller.replace_on_next_command(this);
     }
 
     virtual bool cancel(std::exception_ptr exception) noexcept override{
@@ -300,7 +305,7 @@ public:
             return true;
         }
         try{
-            m_controller.cancel_all(*this);
+            m_controller.cancel_all(this);
         }catch (...){}
         return false;
     }

@@ -44,13 +44,6 @@ namespace PokemonAutomation{
 //
 class ControllerRequirements{
 public:
-#if 0
-    template <class... Args>
-    ControllerRequirements(Args&&... args)
-        : m_map(std::forward<Args>(args)...)
-        , m_sanitizer("ControllerRequirements")
-    {}
-#endif
     ControllerRequirements(std::initializer_list<std::map<std::string, std::set<std::string>>::value_type> args)
         : m_map(std::move(args))
         , m_sanitizer("ControllerRequirements")

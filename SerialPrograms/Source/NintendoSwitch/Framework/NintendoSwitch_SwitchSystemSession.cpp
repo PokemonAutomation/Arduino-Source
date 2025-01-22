@@ -7,9 +7,9 @@
 #include "CommonFramework/VideoPipeline/Stats/CpuUtilizationStats.h"
 #include "CommonFramework/VideoPipeline/Stats/ThreadUtilizationStats.h"
 #include "CommonFramework/VideoPipeline/Backends/CameraImplementations.h"
-#include "Controllers/SerialPABotBase/SerialPABotBase_Connection.h"
 #include "Integrations/ProgramTracker.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_SerialPABotBase.h"
 #include "NintendoSwitch_SwitchSystemOption.h"
 #include "NintendoSwitch_SwitchSystemSession.h"
 
@@ -71,8 +71,8 @@ SwitchSystemSession::SwitchSystemSession(
 
 
 BotBaseHandle& SwitchSystemSession::sender(){
-    //  TODO: Don't do this.
-    return static_cast<SerialPABotBase::SerialConnection&>(m_controller.connection()).handle();
+    //  TODO: Don't do this.    REMOVE
+    return static_cast<SwitchController_SerialPABotBase&>(m_controller.connection()).handle();
 }
 
 void SwitchSystemSession::get(SwitchSystemOption& option){

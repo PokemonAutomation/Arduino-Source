@@ -34,7 +34,7 @@ FroslassFinder_Descriptor::FroslassFinder_Descriptor()
         "Constantly reset to find a Alpha Froslass or any Shiny in the path.",
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_SERIAL_DEFAULT}
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 class FroslassFinder_Descriptor::Stats : public StatsTracker, public ShinyStatIncrementer{

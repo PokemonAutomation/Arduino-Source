@@ -25,7 +25,7 @@ SwitchViewer_Descriptor::SwitchViewer_Descriptor()
         "View status information from one or more running programs."
     )
     , m_requirements({
-        {SerialPABotBase::INTERFACE_NAME, {to_string(SerialPABotBase::Features::NintendoSwitch_Basic)}}
+        {SerialPABotBase::NintendoSwitch_Basic, {to_string(SerialPABotBase::Features::NintendoSwitch_Basic)}}
     })
 {}
 

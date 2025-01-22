@@ -27,7 +27,7 @@ GodEggItemDupe_Descriptor::GodEggItemDupe_Descriptor()
         "Mass duplicate items with the God Egg.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_SERIAL_DEFAULT}
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 

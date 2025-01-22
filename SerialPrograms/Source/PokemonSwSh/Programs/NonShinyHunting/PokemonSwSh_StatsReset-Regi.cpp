@@ -31,7 +31,7 @@ StatsResetRegi_Descriptor::StatsResetRegi_Descriptor()
         "Repeatedly catch regi until you get the stats you want.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_SERIAL_DEFAULT}
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 struct StatsResetRegi_Descriptor::Stats : public StatsTracker{

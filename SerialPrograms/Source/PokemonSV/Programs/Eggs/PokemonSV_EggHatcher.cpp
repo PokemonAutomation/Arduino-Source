@@ -32,7 +32,7 @@ EggHatcher_Descriptor::EggHatcher_Descriptor()
         "Automatically hatch eggs from boxes.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_SERIAL_DEFAULT}
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 struct EggHatcher_Descriptor::Stats : public StatsTracker{

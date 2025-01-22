@@ -162,7 +162,7 @@ TestProgram_Descriptor::TestProgram_Descriptor()
         "Test Program (Switch)",
         FeedbackType::OPTIONAL_,
         AllowCommandsWhenRunning::ENABLE_COMMANDS,
-        {SerialPABotBase::OLD_SERIAL_DEFAULT},
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS},
         1, 4, 1
     )
 {}

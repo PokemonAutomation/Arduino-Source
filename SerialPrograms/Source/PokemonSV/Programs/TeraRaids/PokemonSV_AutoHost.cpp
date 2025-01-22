@@ -47,7 +47,7 @@ AutoHost_Descriptor::AutoHost_Descriptor()
         "Auto-host a Tera raid.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_SERIAL_DEFAULT}
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 struct AutoHost_Descriptor::Stats : public StatsTracker{

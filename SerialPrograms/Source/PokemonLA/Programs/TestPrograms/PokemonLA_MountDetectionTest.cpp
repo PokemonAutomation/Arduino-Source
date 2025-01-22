@@ -22,7 +22,7 @@ MountDetectionTest_Descriptor::MountDetectionTest_Descriptor()
         "",
         "Test the mount detection in the bottom right corner.",
         FeedbackType::REQUIRED, AllowCommandsWhenRunning::ENABLE_COMMANDS,
-        {SerialPABotBase::OLD_SERIAL_DEFAULT}
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 

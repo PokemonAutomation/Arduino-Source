@@ -32,7 +32,7 @@ MoneyFarmerRoute210_Descriptor::MoneyFarmerRoute210_Descriptor()
         "Farm money by using VS Seeker to rebattle the Ace Trainer couple on Route 210.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_SERIAL_DEFAULT}
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 struct MoneyFarmerRoute210_Descriptor::Stats : public StatsTracker{

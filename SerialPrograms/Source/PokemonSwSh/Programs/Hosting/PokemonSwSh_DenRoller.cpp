@@ -32,7 +32,7 @@ DenRoller_Descriptor::DenRoller_Descriptor()
         "Roll den to the N'th day, SR and repeat.",
         FeedbackType::OPTIONAL_,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_SERIAL_DEFAULT}
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 struct DenRoller_Descriptor::Stats : public StatsTracker{

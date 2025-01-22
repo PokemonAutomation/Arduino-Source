@@ -24,7 +24,7 @@ ClothingBuyer_Descriptor::ClothingBuyer_Descriptor()
         "Buy out all the clothing in a store.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_SERIAL_DEFAULT}
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 

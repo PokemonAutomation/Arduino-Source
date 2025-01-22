@@ -7,17 +7,13 @@
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "ControllerDescriptor.h"
-
 #include "Controllers/SerialPABotBase/SerialPABotBase.h"
-#include "Controllers/SerialPABotBase/SerialPABotBase_Descriptor.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_SerialPABotBase.h"
 #include "ControllerConnection.h"
 
 namespace PokemonAutomation{
 
 
-std::unique_ptr<ControllerDescriptor> NullControllerDescriptor::clone() const{
-    return std::unique_ptr<ControllerDescriptor>(new NullControllerDescriptor());
-}
 bool NullControllerDescriptor::operator==(const ControllerDescriptor& x) const{
     return typeid(*this) == typeid(x);
 }
@@ -60,8 +56,8 @@ void ControllerOption::load_json(const JsonValue& json){
         m_current = std::move(descriptor);
         return;
     }
-    if (type == SerialPABotBase::INTERFACE_NAME){
-        auto descriptor = std::make_unique<SerialPABotBase::SerialDescriptor>();
+    if (type == SerialPABotBase::NintendoSwitch_Basic){
+        auto descriptor = std::make_unique<NintendoSwitch::SwitchController_SerialPABotBase_Descriptor>();
         descriptor->load_json(params);
         m_current = std::move(descriptor);
         return;

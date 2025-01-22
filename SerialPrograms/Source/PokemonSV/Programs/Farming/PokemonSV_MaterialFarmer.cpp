@@ -32,7 +32,7 @@ MaterialFarmer_Descriptor::MaterialFarmer_Descriptor()
         "Farm materials - Happiny dust from Chanseys/Blisseys, for Item Printer.",
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_SERIAL_DEFAULT}
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 

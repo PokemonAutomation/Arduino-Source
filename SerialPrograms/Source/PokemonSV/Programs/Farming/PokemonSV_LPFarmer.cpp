@@ -31,7 +31,7 @@ LPFarmer_Descriptor::LPFarmer_Descriptor()
         "Farm LP by day skipping Tera raids.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_SERIAL_DEFAULT}
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 struct LPFarmer_Descriptor::Stats : public StatsTracker{

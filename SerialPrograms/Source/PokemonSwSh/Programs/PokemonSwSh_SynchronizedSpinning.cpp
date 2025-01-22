@@ -21,7 +21,7 @@ SynchronizedSpinning_Descriptor::SynchronizedSpinning_Descriptor()
         "Don't ask... seriously, don't ask...",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_SERIAL_DEFAULT},
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS},
         1, 4, 1
     )
 {}

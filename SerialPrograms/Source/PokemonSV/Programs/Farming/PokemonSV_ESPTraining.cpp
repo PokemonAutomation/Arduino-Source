@@ -31,7 +31,7 @@ ESPTraining_Descriptor::ESPTraining_Descriptor()
         "Clear the ESP Training to farm EV berries.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_SERIAL_DEFAULT}
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 struct ESPTraining_Descriptor::Stats : public StatsTracker{

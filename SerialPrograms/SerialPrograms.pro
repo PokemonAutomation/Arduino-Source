@@ -310,8 +310,6 @@ SOURCES += \
     Source/Controllers/ControllerSession.cpp \
     Source/Controllers/ControllerDescriptor.cpp \
     Source/Controllers/SerialPABotBase/SerialPABotBase.cpp \
-    Source/Controllers/SerialPABotBase/SerialPABotBase_Connection.cpp \
-    Source/Controllers/SerialPABotBase/SerialPABotBase_Descriptor.cpp \
     Source/Controllers/SerialPABotBase/SerialPABotBase_Handle.cpp \
     Source/Integrations/DiscordIntegrationSettings.cpp \
     Source/Integrations/DiscordIntegrationTable.cpp \
@@ -1427,8 +1425,6 @@ HEADERS += \
     Source/Controllers/ControllerSession.h \
     Source/Controllers/ControllerDescriptor.h \
     Source/Controllers/SerialPABotBase/SerialPABotBase.h \
-    Source/Controllers/SerialPABotBase/SerialPABotBase_Connection.h \
-    Source/Controllers/SerialPABotBase/SerialPABotBase_Descriptor.h \
     Source/Controllers/SerialPABotBase/SerialPABotBase_Handle.h \
     Source/Integrations/DiscordIntegrationSettings.h \
     Source/Integrations/DiscordIntegrationTable.h \

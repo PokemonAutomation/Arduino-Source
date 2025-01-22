@@ -48,7 +48,7 @@ CramomaticRNG_Descriptor::CramomaticRNG_Descriptor()
         "Perform RNG manipulation to get rare balls from the Cram-o-matic.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_SERIAL_DEFAULT}
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 

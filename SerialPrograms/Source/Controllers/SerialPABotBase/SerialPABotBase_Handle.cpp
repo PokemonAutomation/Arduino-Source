@@ -20,11 +20,9 @@
 #include "ClientSource/Connection/PABotBase.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Messages_Device.h"
 #include "SerialPABotBase.h"
 #include "SerialPABotBase_Handle.h"
-#include "SerialPABotBase_Descriptor.h"
 
 //#include <iostream>
 //using std::cout;
@@ -33,6 +31,7 @@
 namespace PokemonAutomation{
 
 using namespace SerialPABotBase;
+
 
 
 void BotBaseHandle::process_device_protocol(uint32_t& version, uint8_t& program_id){
@@ -68,7 +67,7 @@ void BotBaseHandle::process_device_protocol(uint32_t& version, uint8_t& program_
 //    cout << "m_requirements.size() = " << m_requirements.map().size() << endl;
 
     std::string missing_feature = m_requirements.check_compatibility(
-        SerialPABotBase::INTERFACE_NAME,
+        SerialPABotBase::NintendoSwitch_Basic,
         m_capabilities
     );
     if (!missing_feature.empty()){

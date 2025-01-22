@@ -47,7 +47,7 @@ BurmyFinder_Descriptor::BurmyFinder_Descriptor()
         "Check nearby trees for a possible Shiny, Alpha or Alpha Shiny Burmy",
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_SERIAL_DEFAULT}
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 class BurmyFinder_Descriptor::Stats : public StatsTracker{

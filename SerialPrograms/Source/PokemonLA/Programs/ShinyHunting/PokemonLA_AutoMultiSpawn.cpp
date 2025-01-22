@@ -207,7 +207,7 @@ AutoMultiSpawn_Descriptor::AutoMultiSpawn_Descriptor()
         "Advance a path in MultiSpawn shiny hunting method.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_SERIAL_DEFAULT}
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 

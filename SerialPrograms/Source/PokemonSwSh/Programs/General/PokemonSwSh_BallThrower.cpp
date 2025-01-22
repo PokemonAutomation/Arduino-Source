@@ -24,7 +24,7 @@ BallThrower_Descriptor::BallThrower_Descriptor()
         "Blindly throw balls at the opposing " + STRING_POKEMON + " until it catches.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_SERIAL_DEFAULT}
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 

@@ -4,10 +4,8 @@
  *
  */
 
-//#include "Common/Cpp/PrettyPrint.h"
-//#include "Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-//#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
+#include "Controllers/SerialPABotBase/SerialPABotBase.h"
 #include "NintendoSwitch/NintendoSwitch_FixedInterval.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DaySkippers.h"
@@ -29,7 +27,7 @@ DaySkipperJPN_Descriptor::DaySkipperJPN_Descriptor()
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         {{
-            SerialPABotBase::INTERFACE_NAME, {
+            SerialPABotBase::NintendoSwitch_Basic, {
                 to_string(SerialPABotBase::Features::TickPrecise),
                 to_string(SerialPABotBase::Features::NintendoSwitch_Basic),
                 to_string(SerialPABotBase::Features::NintendoSwitch_DateSkip),

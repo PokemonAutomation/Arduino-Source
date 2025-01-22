@@ -30,7 +30,7 @@ MassPurchase_Descriptor::MassPurchase_Descriptor()
         "Purchase a specified amount of items from a shop.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_SERIAL_DEFAULT}
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 

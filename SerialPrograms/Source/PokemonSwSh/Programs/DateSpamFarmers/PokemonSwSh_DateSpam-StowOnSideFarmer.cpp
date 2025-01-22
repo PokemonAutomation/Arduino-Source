@@ -26,7 +26,7 @@ StowOnSideFarmer_Descriptor::StowOnSideFarmer_Descriptor()
         "Farm the Stow-on-Side items dealer.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_SERIAL_DEFAULT}
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 

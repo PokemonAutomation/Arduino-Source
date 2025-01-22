@@ -14,10 +14,7 @@
 #include "CommonFramework/Options/Environment/SleepSuppressOption.h"
 #include "CommonFramework/Options/Environment/PerformanceOptions.h"
 #include "CommonTools/StartupChecks/BlackBorderCheck.h"
-#include "Controllers/SerialPABotBase/SerialPABotBase_Handle.h"
-#include "Controllers/SerialPABotBase/SerialPABotBase_Connection.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_SerialPABotBase.h"
 #include "NintendoSwitch_MultiSwitchProgramOption.h"
 #include "NintendoSwitch_MultiSwitchProgramSession.h"
 
@@ -100,7 +97,7 @@ void MultiSwitchProgramSession::run_program_instance(MultiSwitchProgramEnvironme
     try{
         m_option.instance().program(env, scope);
         for (size_t c = 0; c < consoles; c++){
-            env.consoles[c].controller().wait_for_all(scope);
+            env.consoles[c].controller().wait_for_all(&scope);
         }
     }catch (...){
         m_scope.store(nullptr, std::memory_order_release);
@@ -155,8 +152,7 @@ void MultiSwitchProgramSession::internal_run_program(){
             return;
         }
         ControllerConnection& connection = session.controller_session().connection();
-        SerialPABotBase::SerialConnection* serial_connection = dynamic_cast<SerialPABotBase::SerialConnection*>(&connection);
-        NintendoSwitch::SwitchControllerSerialPABotBase switch_controller(*serial_connection->handle().botbase());
+        SwitchController& switch_controller = dynamic_cast<SwitchController&>(connection);
         handles.emplace_back(
             c,
             session.logger(),

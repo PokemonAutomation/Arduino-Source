@@ -24,7 +24,7 @@ BowItemDuper_Descriptor::BowItemDuper_Descriptor()
         "Use the Bow Swap Glitch to farm any fusable items.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_SERIAL_DEFAULT}
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 

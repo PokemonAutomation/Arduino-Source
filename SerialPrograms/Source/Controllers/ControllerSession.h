@@ -9,6 +9,7 @@
 
 #include <mutex>
 #include "Common/Cpp/ListenerSet.h"
+#include "Common/Cpp/Exceptions.h"
 #include "ControllerDescriptor.h"
 #include "ControllerConnection.h"
 
@@ -66,12 +67,31 @@ public:
 public:
     bool set_device(const std::shared_ptr<const ControllerDescriptor>& device);
 
+
 public:
     //  Returns empty string on success. Otherwise returns error message.
     std::string reset();
-    std::string stop_pending_commands();
-    std::string set_next_command_replace();
-    std::string send_request(const BotBaseRequest& request);    //  REMOVE
+
+    //  Try to run the following lambda on the underlying controller type.
+    //  Returns true if successful.
+    template <typename ControllerType, typename Lambda>
+    bool try_run(Lambda&& function){
+        std::lock_guard<std::mutex> lg(m_state_lock);
+        if (!m_connection){
+            return false;
+        }
+
+        //  This will be a cross-cast in most cases.
+        ControllerType* child = dynamic_cast<ControllerType*>(m_connection.get());
+        if (child == nullptr){
+            throw InternalProgramError(
+                &m_logger, PA_CURRENT_FUNCTION,
+                "Incompatible controller type cast."
+            );
+        }
+        function(*child);
+        return true;
+    }
 
 
 private:

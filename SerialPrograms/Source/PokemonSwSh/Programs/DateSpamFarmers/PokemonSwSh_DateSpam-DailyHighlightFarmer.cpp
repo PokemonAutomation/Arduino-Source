@@ -26,7 +26,7 @@ DailyHighlightFarmer_Descriptor::DailyHighlightFarmer_Descriptor()
         "Farm the daily highlight watt trader in Crown Tundra.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_SERIAL_DEFAULT}
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 

@@ -74,7 +74,7 @@ void pbf_controller_state(
     uint8_t right_x, uint8_t right_y,
     uint16_t ticks
 ){
-    context->send_controller_state(context, button, position, left_x, left_y, right_x, right_y, ticks);
+    context->send_controller_state(&context, button, position, left_x, left_y, right_x, right_y, ticks);
 }
 
 static std::string button_to_string(Button button){

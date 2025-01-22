@@ -33,7 +33,7 @@ FastCodeEntry_Descriptor::FastCodeEntry_Descriptor()
         "Quickly enter a 4, 6, or 8 digit link code.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_SERIAL_DEFAULT},
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS},
         1, 4, 1
     )
 {}
