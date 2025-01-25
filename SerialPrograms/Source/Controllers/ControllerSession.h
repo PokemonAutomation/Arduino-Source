@@ -38,6 +38,9 @@ public:
         const ControllerRequirements& requirements
     );
 
+    Logger& logger(){
+        return m_logger;
+    }
     const ControllerRequirements& requirements(){
         return m_requirements;
     }
@@ -75,21 +78,22 @@ public:
     //  Try to run the following lambda on the underlying controller type.
     //  Returns true if successful.
     template <typename ControllerType, typename Lambda>
-    bool try_run(Lambda&& function){
+    bool try_run(Lambda&& function) noexcept{
         std::lock_guard<std::mutex> lg(m_state_lock);
         if (!m_connection){
             return false;
         }
-
-        //  This will be a cross-cast in most cases.
-        ControllerType* child = dynamic_cast<ControllerType*>(m_connection.get());
-        if (child == nullptr){
-            throw InternalProgramError(
-                &m_logger, PA_CURRENT_FUNCTION,
-                "Incompatible controller type cast."
-            );
+        try{
+            //  This will be a cross-cast in most cases.
+            ControllerType* child = dynamic_cast<ControllerType*>(m_connection.get());
+            if (child == nullptr){
+                m_logger.log("ControllerSession::try_run(): Incompatible controller type cast.", COLOR_RED);
+                return false;
+            }
+            function(*child);
+        }catch (...){
+            return false;
         }
-        function(*child);
         return true;
     }
 

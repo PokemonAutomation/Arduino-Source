@@ -19,6 +19,9 @@ namespace NintendoSwitch{
 void pbf_wait(SwitchControllerContext& context, uint16_t ticks){
     ssf_do_nothing(context, ticks);
 }
+void pbf_wait(SwitchControllerContext& context, Milliseconds duration){
+    ssf_do_nothing(context, duration);
+}
 void pbf_press_button(SwitchControllerContext& context, Button button, uint16_t hold_ticks, uint16_t release_ticks){
     uint32_t delay = (uint32_t)hold_ticks + release_ticks;
     if ((uint16_t)delay == delay){
@@ -27,6 +30,9 @@ void pbf_press_button(SwitchControllerContext& context, Button button, uint16_t 
         ssf_press_button(context, button, hold_ticks, hold_ticks, 0);
         ssf_do_nothing(context, release_ticks);
     }
+}
+void pbf_press_button(SwitchControllerContext& context, Button button, Milliseconds hold, Milliseconds release){
+    ssf_press_button(context, button, hold + release, hold, 0ms);
 }
 void pbf_press_dpad(SwitchControllerContext& context, DpadPosition position, uint16_t hold_ticks, uint16_t release_ticks){
     uint32_t delay = (uint32_t)hold_ticks + release_ticks;
@@ -37,6 +43,9 @@ void pbf_press_dpad(SwitchControllerContext& context, DpadPosition position, uin
         ssf_do_nothing(context, release_ticks);
     }
 }
+void pbf_press_dpad(SwitchControllerContext& context, DpadPosition position, Milliseconds hold, Milliseconds release){
+    ssf_press_dpad(context, position, hold + release, hold, 0ms);
+}
 void pbf_move_left_joystick(SwitchControllerContext& context, uint8_t x, uint8_t y, uint16_t hold_ticks, uint16_t release_ticks){
     uint32_t delay = (uint32_t)hold_ticks + release_ticks;
     if ((uint16_t)delay == delay){
@@ -45,6 +54,9 @@ void pbf_move_left_joystick(SwitchControllerContext& context, uint8_t x, uint8_t
         ssf_press_left_joystick(context, x, y, hold_ticks, hold_ticks, 0);
         ssf_do_nothing(context, release_ticks);
     }
+}
+void pbf_move_left_joystick (SwitchControllerContext& context, uint8_t x, uint8_t y, Milliseconds hold, Milliseconds release){
+    ssf_press_left_joystick(context, x, y, hold + release, hold, 0ms);
 }
 void pbf_move_right_joystick(SwitchControllerContext& context, uint8_t x, uint8_t y, uint16_t hold_ticks, uint16_t release_ticks){
     uint32_t delay = (uint32_t)hold_ticks + release_ticks;
@@ -55,8 +67,14 @@ void pbf_move_right_joystick(SwitchControllerContext& context, uint8_t x, uint8_
         ssf_do_nothing(context, release_ticks);
     }
 }
+void pbf_move_right_joystick (SwitchControllerContext& context, uint8_t x, uint8_t y, Milliseconds hold, Milliseconds release){
+    ssf_press_right_joystick(context, x, y, hold + release, hold, 0ms);
+}
 void pbf_mash_button(SwitchControllerContext& context, Button button, uint16_t ticks){
     ssf_mash1_button(context, button, ticks);
+}
+void pbf_mash_button(SwitchControllerContext& context, Button button, Milliseconds duration){
+    ssf_mash1_button(context, button, duration);
 }
 
 void grip_menu_connect_go_home(SwitchControllerContext& context){
@@ -74,9 +92,32 @@ void pbf_controller_state(
     uint8_t right_x, uint8_t right_y,
     uint16_t ticks
 ){
-    context->send_controller_state(&context, button, position, left_x, left_y, right_x, right_y, ticks);
+    context->issue_controller_state(
+        &context,
+        button, position,
+        left_x, left_y,
+        right_x, right_y,
+        ticks*8ms
+    );
+}
+void pbf_controller_state(
+    SwitchControllerContext& context,
+    Button button,
+    DpadPosition position,
+    uint8_t left_x, uint8_t left_y,
+    uint8_t right_x, uint8_t right_y,
+    Milliseconds duration
+){
+    context->issue_controller_state(
+        &context,
+        button, position,
+        left_x, left_y,
+        right_x, right_y,
+        duration
+    );
 }
 
+#if 0
 static std::string button_to_string(Button button){
     std::string str;
     if (button & BUTTON_Y) str += " BUTTON_Y ";
@@ -95,7 +136,6 @@ static std::string button_to_string(Button button){
     if (button & BUTTON_CAPTURE) str += " BUTTON_CAPTURE ";
     return str;
 }
-
 static std::string dpad_to_string(Button dpad){
     switch (dpad){
     case DPAD_UP            : return "DPAD_UP";
@@ -110,6 +150,7 @@ static std::string dpad_to_string(Button dpad){
     }
     return "UNKNOWN_DPAD";
 }
+#endif
 
 int register_message_converters_push_button_framework(){
     register_message_converter(

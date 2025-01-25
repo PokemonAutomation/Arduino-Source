@@ -6,7 +6,8 @@
 
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase.h"
-#include "NintendoSwitch/NintendoSwitch_FixedInterval.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DaySkippers.h"
 #include "PokemonSwSh_DaySkipperStats.h"

@@ -6,7 +6,8 @@
 
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
-#include "NintendoSwitch/NintendoSwitch_FixedInterval.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_GameEntry.h"

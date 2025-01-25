@@ -19,6 +19,50 @@ namespace NintendoSwitch{
 
 class SwitchControllerContext;
 
+
+
+inline std::string button_to_string(Button button){
+    std::string str;
+    if (button & BUTTON_Y) str += "Y ";
+    if (button & BUTTON_B) str += "B ";
+    if (button & BUTTON_A) str += "A ";
+    if (button & BUTTON_X) str += "X ";
+    if (button & BUTTON_L) str += "L ";
+    if (button & BUTTON_R) str += "R ";
+    if (button & BUTTON_ZL) str += "ZL ";
+    if (button & BUTTON_ZR) str += "ZR ";
+    if (button & BUTTON_MINUS) str += "- ";
+    if (button & BUTTON_PLUS) str += "+ ";
+    if (button & BUTTON_LCLICK) str += "LJ ";
+    if (button & BUTTON_RCLICK) str += "RJ ";
+    if (button & BUTTON_HOME) str += "HOME ";
+    if (button & BUTTON_CAPTURE) str += "CAPTURE ";
+    if (str.back() == ' '){
+        str.pop_back();
+    }
+    if (str.empty()){
+        str = "none";
+    }
+    return str;
+}
+inline std::string dpad_to_string(DpadPosition dpad){
+    switch (dpad){
+    case DPAD_UP            : return "up";
+    case DPAD_UP_RIGHT      : return "up-right";
+    case DPAD_RIGHT         : return "right";
+    case DPAD_DOWN_RIGHT    : return "down-right";
+    case DPAD_DOWN          : return "down";
+    case DPAD_DOWN_LEFT     : return "down-left";
+    case DPAD_LEFT          : return "left";
+    case DPAD_UP_LEFT       : return "up-left";
+    case DPAD_NONE          : return "none";
+    }
+    return "unknown";
+}
+
+
+
+
 //
 //  This is the generic interface a Switch controller that encapsulates all
 //  Switch controllers.
@@ -54,6 +98,9 @@ public:
 public:
     //  Basic Commands
 
+    //  Required Feature Flags:
+    //    - NintendoSwitch_Basic
+
     //
     //  All commands are enqueued into a FIFO that the controller will execute
     //  in order preserving the timing semantics as closely as possible
@@ -66,25 +113,13 @@ public:
     //  implementation of this at this time, we do not expect it to be able to
     //  preserve timing.
     //
-    //  Whether a controller supports exact timing may become a feature that
-    //  programs can request.
+    //  Whether a controller supports exact timings is controlled by the feature
+    //  flag "TickPrecise".
     //
 
     //  The following functions are asynchronous. They will return immediately
     //  if the command can be enqueued into the FIFO. Otherwise, they will block
     //  until there is space in the FIFO.
-
-    //  Wait for all pending commands to finish. This does not include
-    //  unfinished cooldowns. This serves as an instruction barrier to prevent
-    //  overlapping of buttons across this call.
-    //  Note that this is a device-side wait. This function itself will still
-    //  return immediately if the FIFO isn't full.
-    virtual void send_wait_for_pending(const Cancellable* cancellable) = 0;
-
-    //  Wait for this many ticks.
-    //  Note that this is a device-side wait. This function itself will still
-    //  return immediately if the FIFO isn't full.
-    virtual void send_wait(const Cancellable* cancellable, uint16_t ticks) = 0;
 
     //
     //  Press all the following buttons/joysticks simultaneously for the
@@ -107,13 +142,13 @@ public:
     //  (such as Joycon gyro or new stuff in Switch 2), we can simply add
     //  overloads to this and gate them behind features.
     //
-    virtual void send_controller_state(
+    virtual void issue_controller_state(
         const Cancellable* cancellable,
         Button button,
         DpadPosition position,
         uint8_t left_x, uint8_t left_y,
         uint8_t right_x, uint8_t right_y,
-        uint16_t ticks
+        Milliseconds milliseconds
     ) = 0;
 
     //  Temporary for refactor: Send custom requests for PABotBase's advanced
@@ -131,6 +166,18 @@ public:
 public:
     //  Superscalar Commands (the "ssf" framework)
 
+    //  Required Feature Flags:
+    //    - NintendoSwitch_SSF
+
+    //  Tell the scheduler to wait for all pending commands to finish
+    //  (including cooldowns) before executing further instructions.
+    //  This is used to prevent hanging commands from overlapping with new
+    //  commands issued after this barrier.
+    virtual void issue_barrier(const Cancellable* cancellable) = 0;
+
+    //  Do nothing for this many ticks.
+    virtual void issue_nop(const Cancellable* cancellable, Milliseconds duration) = 0;
+
     //
     //  delay       The # of ticks to wait before moving onto the next command.
     //  hold        The # of ticks to hold the button/stick down for.
@@ -144,8 +191,11 @@ public:
     //  If the button is busy (due to still being held down or is waiting out
     //  the cooldown), the command will block until the button is ready.
     //
-    //  By setting (delay < hold), the command will "return" and move onto the
-    //  next command while the button is still being held down.
+    //  By setting (delay < hold), the command will "return" early and move onto
+    //  the next command while the button is still being held down.
+    //
+    //  If a command returns before it is finished (delay < hold + cooldown),
+    //  it is considered a "hanging" command.
     //
     //  This allows you to overlap buttons. But is confusing to use because it
     //  implies a non-trivial controller state with pending button presses that
@@ -159,34 +209,40 @@ public:
     //  Press all the buttons set in the bitfield simultaneously.
     //  This command will wait until all the selected buttons are ready to
     //  ensure that they are all dispatched simultaneously.
-    virtual void send_buttons(
+    virtual void issue_buttons(
         const Cancellable* cancellable,
         Button button,
-        uint16_t delay, uint16_t hold, uint8_t cooldown
+        Milliseconds delay, Milliseconds hold, Milliseconds cooldown
     ) = 0;
 
     //  Dpad
-    virtual void send_dpad(
+    virtual void issue_dpad(
         const Cancellable* cancellable,
         DpadPosition position,
-        uint16_t delay, uint16_t hold, uint8_t cooldown
+        Milliseconds delay, Milliseconds hold, Milliseconds cooldown
     ) = 0;
 
     //  Joysticks
-    virtual void send_left_joystick(
+    virtual void issue_left_joystick(
         const Cancellable* cancellable,
         uint8_t x, uint8_t y,
-        uint16_t delay, uint16_t hold, uint8_t cooldown
+        Milliseconds delay, Milliseconds hold, Milliseconds cooldown
     ) = 0;
-    virtual void send_right_joystick(
+    virtual void issue_right_joystick(
         const Cancellable* cancellable,
         uint8_t x, uint8_t y,
-        uint16_t delay, uint16_t hold, uint8_t cooldown
+        Milliseconds delay, Milliseconds hold, Milliseconds cooldown
     ) = 0;
 
 
 public:
     //  High speed RPCs.
+
+    //  Required Feature Flags:
+    //    - NintendoSwitch_Macros
+    //
+    //  Almost everything uses these. So it might be worth moving these to
+    //  "NintendoSwitch_Basic" instead.
 
     //
     //  It is currently unclear if these can be properly executed over wireless.
@@ -200,25 +256,25 @@ public:
     //
 
     //  Mash a button as quickly as possible.
-    virtual void send_mash_button(
+    virtual void issue_mash_button(
         const Cancellable* cancellable,
-        Button button, uint16_t ticks
+        Button button, Milliseconds duration
     ) = 0;
 
     //  Alternate pressing "button0" and "button1" as quickly as possible.
     //  "button0" will always be pressed first.
     //  Both buttons will be pressed at least once.
-    virtual void send_mash_button(
+    virtual void issue_mash_button(
         const Cancellable* cancellable,
-        Button button0, Button button1, uint16_t ticks
+        Button button0, Button button1, Milliseconds dutation
     ) = 0;
 
     //  In situations where A, ZL, and RL all do the same thing, use all 3 of
     //  them to logically mash A much faster than is possible with just one
     //  button.
-    virtual void send_mash_AZs(
+    virtual void issue_mash_AZs(
         const Cancellable* cancellable,
-        uint16_t ticks
+        Milliseconds duration
     ) = 0;
 
     //
@@ -231,10 +287,10 @@ public:
     //  where all 3 buttons have the same effect and can be used at the same
     //  time.
     //
-    virtual void send_system_scroll(
+    virtual void issue_system_scroll(
         const Cancellable* cancellable,
         DpadPosition direction, //  Diagonals not allowed.
-        uint16_t delay, uint16_t hold, uint8_t cooldown
+        Milliseconds delay, Milliseconds hold, Milliseconds cooldown
     ) = 0;
 
 };

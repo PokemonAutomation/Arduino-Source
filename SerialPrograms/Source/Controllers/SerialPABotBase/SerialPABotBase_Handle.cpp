@@ -393,7 +393,6 @@ void BotBaseHandle::thread_body(){
         }
     });
 
-    //  REMOVE
     BotBaseControllerContext context(*m_botbase);
 
     while (true){

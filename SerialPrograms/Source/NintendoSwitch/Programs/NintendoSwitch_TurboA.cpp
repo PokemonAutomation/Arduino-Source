@@ -5,6 +5,7 @@
  */
 
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_GameEntry.h"
 #include "NintendoSwitch_TurboA.h"
@@ -37,7 +38,7 @@ void TurboA::program(SingleSwitchProgramEnvironment& env, SwitchControllerContex
     }
 
     while (true){
-        pbf_press_button(context, BUTTON_A, 5, 5);
+        ssf_mash1_button(context, BUTTON_A, 10000ms);
     }
 }
 

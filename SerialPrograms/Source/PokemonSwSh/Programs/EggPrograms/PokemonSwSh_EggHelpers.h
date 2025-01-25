@@ -7,8 +7,8 @@
 #ifndef PokemonAutomation_PokemonSwSh_EggHelpers_H
 #define PokemonAutomation_PokemonSwSh_EggHelpers_H
 
-#include "Common/Compiler.h"
-#include "NintendoSwitch/NintendoSwitch_FixedInterval.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 
 namespace PokemonAutomation{

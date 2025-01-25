@@ -4,7 +4,7 @@
  *
  */
 
-#include "NintendoSwitch/NintendoSwitch_FixedInterval.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch_PreventSleep.h"
 
 namespace PokemonAutomation{

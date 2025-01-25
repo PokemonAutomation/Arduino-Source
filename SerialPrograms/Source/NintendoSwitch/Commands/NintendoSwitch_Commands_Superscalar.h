@@ -18,12 +18,16 @@
 #include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
+
+using namespace std::chrono_literals;
 
 
 void ssf_flush_pipeline (SwitchControllerContext& context);
 void ssf_do_nothing     (SwitchControllerContext& context, uint16_t ticks);
+void ssf_do_nothing     (SwitchControllerContext& context, Milliseconds duration);
 
 
 
@@ -32,10 +36,21 @@ void ssf_press_button(
     Button button,
     uint16_t delay, uint16_t hold = 5, uint8_t cool = 3
 );
+void ssf_press_button(
+    SwitchControllerContext& context,
+    Button button,
+    Milliseconds delay, Milliseconds hold = 5*8ms, Milliseconds cool = 3*8ms
+);
+
 void ssf_press_dpad(
     SwitchControllerContext& context,
     DpadPosition position,
     uint16_t delay, uint16_t hold = 5, uint8_t cool = 3
+);
+void ssf_press_dpad(
+    SwitchControllerContext& context,
+    DpadPosition position,
+    Milliseconds delay, Milliseconds hold = 5*8ms, Milliseconds cool = 3*8ms
 );
 
 
@@ -44,16 +59,31 @@ void ssf_press_left_joystick(
     uint8_t x, uint8_t y,
     uint16_t delay, uint16_t hold, uint8_t cool = 0
 );
+void ssf_press_left_joystick(
+    SwitchControllerContext& context,
+    uint8_t x, uint8_t y,
+    Milliseconds delay, Milliseconds hold = 5*8ms, Milliseconds cool = 3*8ms
+);
 void ssf_press_right_joystick(
     SwitchControllerContext& context,
     uint8_t x, uint8_t y,
     uint16_t delay, uint16_t hold, uint8_t cool = 0
 );
+void ssf_press_right_joystick(
+    SwitchControllerContext& context,
+    uint8_t x, uint8_t y,
+    Milliseconds delay, Milliseconds hold = 5*8ms, Milliseconds cool = 3*8ms
+);
 
 
 void ssf_mash1_button   (SwitchControllerContext& context, Button button, uint16_t ticks);
+void ssf_mash1_button   (SwitchControllerContext& context, Button button, Milliseconds duration);
+
 void ssf_mash2_button   (SwitchControllerContext& context, Button button0, Button button1, uint16_t ticks);
+void ssf_mash2_button   (SwitchControllerContext& context, Button button0, Button button1, Milliseconds duration);
+
 void ssf_mash_AZs       (SwitchControllerContext& context, uint16_t ticks);
+void ssf_mash_AZs       (SwitchControllerContext& context, Milliseconds duration);
 
 
 #define ssf_ScrollDirection     uint16_t
@@ -66,6 +96,71 @@ void ssf_issue_scroll(
     ssf_ScrollDirection direction,
     uint16_t delay, uint16_t hold = 5, uint8_t cool = 3
 );
+void ssf_issue_scroll(
+    SwitchControllerContext& context,
+    ssf_ScrollDirection direction,
+    Milliseconds delay, Milliseconds hold = 5*8ms, Milliseconds cool = 3*8ms
+);
+
+
+
+
+
+
+
+
+
+
+//
+//  The C API used by the MC programs. (no overloading allowed there)
+//
+
+inline void ssf_press_button2(
+    SwitchControllerContext& context,
+    Button button, uint16_t duration, uint16_t hold
+){
+    ssf_press_button(context, button, duration, hold);
+}
+inline void ssf_press_button1(
+    SwitchControllerContext& context,
+    Button button, uint16_t duration
+){
+    ssf_press_button(context, button, duration);
+}
+inline void ssf_press_dpad2(
+    SwitchControllerContext& context,
+    DpadPosition dpad, uint16_t duration, uint16_t hold
+){
+    ssf_press_dpad(context, dpad, duration, hold);
+}
+inline void ssf_press_dpad1(
+    SwitchControllerContext& context,
+    DpadPosition dpad, uint16_t duration
+){
+    ssf_press_dpad(context, dpad, duration);
+}
+inline void ssf_press_joystick2(
+    SwitchControllerContext& context,
+    bool left, uint8_t x, uint8_t y,
+    uint16_t duration, uint16_t hold
+){
+    if (left){
+        ssf_press_left_joystick(context, x, y, duration, hold);
+    }else{
+        ssf_press_right_joystick(context, x, y, duration, hold);
+    }
+}
+inline void ssf_hold_joystick1(
+    SwitchControllerContext& context,
+    bool left, uint8_t x, uint8_t y,
+    uint16_t hold
+){
+    if (left){
+        ssf_press_left_joystick(context, x, y, hold, hold);
+    }else{
+        ssf_press_right_joystick(context, x, y, hold, hold);
+    }
+}
 
 
 

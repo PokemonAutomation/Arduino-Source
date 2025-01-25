@@ -312,6 +312,7 @@ SOURCES += \
     Source/Controllers/NullController.cpp \
     Source/Controllers/SerialPABotBase/SerialPABotBase.cpp \
     Source/Controllers/SerialPABotBase/SerialPABotBase_Handle.cpp \
+    Source/Controllers/SuperscalarScheduler.cpp \
     Source/Integrations/DiscordIntegrationSettings.cpp \
     Source/Integrations/DiscordIntegrationTable.cpp \
     Source/Integrations/DiscordSettingsOption.cpp \
@@ -1428,6 +1429,7 @@ HEADERS += \
     Source/Controllers/NullController.h \
     Source/Controllers/SerialPABotBase/SerialPABotBase.h \
     Source/Controllers/SerialPABotBase/SerialPABotBase_Handle.h \
+    Source/Controllers/SuperscalarScheduler.h \
     Source/Integrations/DiscordIntegrationSettings.h \
     Source/Integrations/DiscordIntegrationTable.h \
     Source/Integrations/DiscordSettingsOption.h \
@@ -1533,7 +1535,6 @@ HEADERS += \
     Source/NintendoSwitch/DevPrograms/TestProgramComputer.h \
     Source/NintendoSwitch/DevPrograms/TestProgramSwitch.h \
     Source/NintendoSwitch/NintendoSwitch_ConsoleHandle.h \
-    Source/NintendoSwitch/NintendoSwitch_FixedInterval.h \
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramOption.h \
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramSession.h \
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchSystemOption.h \

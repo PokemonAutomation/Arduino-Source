@@ -56,6 +56,7 @@ private:
 class VirtualController{
 public:
     VirtualController(
+        Logger& logger,
         ControllerSession& session,
         bool allow_commands_while_running
     );
@@ -77,12 +78,11 @@ public:
 private:
     bool try_stop_commands();
     bool try_next_interrupt();
-    bool try_send_request(const BotBaseRequest& request);
 
     void thread_loop();
 
 private:
-    // Logger& m_logger;
+    Logger& m_logger;
     ControllerSession& m_session;
     const bool m_allow_commands_while_running;
 

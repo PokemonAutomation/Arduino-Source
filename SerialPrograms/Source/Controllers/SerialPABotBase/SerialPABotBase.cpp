@@ -20,6 +20,7 @@ const char* to_string(Features feature){
     switch (feature){
     case Features::TickPrecise:             return "TickPrecise";
     case Features::NintendoSwitch_Basic:    return "NintendoSwitch_Basic";
+    case Features::NintendoSwitch_SSF:      return "NintendoSwitch_SSF";
     case Features::NintendoSwitch_Macros:   return "NintendoSwitch_Macros";
     case Features::NintendoSwitch_DateSkip: return "NintendoSwitch_DateSkip";
     }
@@ -33,7 +34,8 @@ const std::pair<std::string, std::set<std::string>> OLD_NINTENDO_SWITCH_DEFAULT_
     {
         to_string(SerialPABotBase::Features::TickPrecise),
         to_string(SerialPABotBase::Features::NintendoSwitch_Basic),
-        to_string(SerialPABotBase::Features::NintendoSwitch_Macros),
+//        to_string(SerialPABotBase::Features::NintendoSwitch_SSF),
+//        to_string(SerialPABotBase::Features::NintendoSwitch_Macros),
         to_string(SerialPABotBase::Features::NintendoSwitch_DateSkip),
     }
 };
@@ -46,6 +48,7 @@ std::set<std::string> program_id_to_features(uint8_t id){
         return {
             to_string(Features::TickPrecise),
             to_string(Features::NintendoSwitch_Basic),
+            to_string(Features::NintendoSwitch_SSF),
             to_string(Features::NintendoSwitch_Macros),
 //            to_string(Features::NintendoSwitch_DateSkip),
         };
@@ -53,6 +56,7 @@ std::set<std::string> program_id_to_features(uint8_t id){
         return {
             to_string(Features::TickPrecise),
             to_string(Features::NintendoSwitch_Basic),
+            to_string(Features::NintendoSwitch_SSF),
             to_string(Features::NintendoSwitch_Macros),
             to_string(Features::NintendoSwitch_DateSkip),
         };

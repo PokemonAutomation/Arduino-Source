@@ -10,6 +10,7 @@
 
 #include <QSerialPortInfo>
 #include "ClientSource/Connection/BotBase.h"
+#include "Controllers/SuperscalarScheduler.h"
 #include "Controllers/ControllerDescriptor.h"
 #include "Controllers/ControllerConnection.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase_Handle.h"
@@ -53,9 +54,39 @@ private:
 
 
 
+template <typename Type>
+PA_FORCE_INLINE Type milliseconds_to_ticks_8ms(Type milliseconds){
+    return milliseconds / 8 + (milliseconds % 8 + 7) / 8;
+}
+
+
+
+
+
+struct SwitchButton_Dpad : public ExecutionResource{
+    DpadPosition position;
+};
+struct SwitchButton_Joystick : public ExecutionResource{
+    uint8_t x;
+    uint8_t y;
+};
+
+struct SwitchControllerState{
+    ExecutionResource m_buttons[14];
+    SwitchButton_Dpad m_dpad;
+    SwitchButton_Joystick m_left_joystick;
+    SwitchButton_Joystick m_right_joystick;
+};
+
+
+
+
+
 class SwitchController_SerialPABotBase :
     public ControllerConnection,
-    public SwitchController
+    public SwitchController,
+    private SwitchControllerState,
+    private SuperscalarScheduler
 {
 public:
     using ContextType = SwitchControllerContext;
@@ -84,15 +115,13 @@ public:
 public:
     //  Basic Commands
 
-    virtual void send_wait_for_pending(const Cancellable* cancellable) override;
-    virtual void send_wait(const Cancellable* cancellable, uint16_t ticks) override;
-    virtual void send_controller_state(
+    virtual void issue_controller_state(
         const Cancellable* cancellable,
         Button button,
         DpadPosition position,
         uint8_t left_x, uint8_t left_y,
         uint8_t right_x, uint8_t right_y,
-        uint16_t ticks
+        Milliseconds duration
     ) override;
     virtual void send_botbase_request(
         const Cancellable* cancellable,
@@ -107,52 +136,70 @@ public:
 public:
     //  Superscalar Commands (the "ssf" framework)
 
-    virtual void send_buttons(
+    virtual void issue_barrier(const Cancellable* cancellable) override;
+    virtual void issue_nop(const Cancellable* cancellable, Milliseconds duration) override;
+    virtual void issue_buttons(
         const Cancellable* cancellable,
         Button button,
-        uint16_t delay, uint16_t hold, uint8_t cooldown
+        Milliseconds delay, Milliseconds hold, Milliseconds cooldown
     ) override;
-    virtual void send_dpad(
+    virtual void issue_dpad(
         const Cancellable* cancellable,
         DpadPosition position,
-        uint16_t delay, uint16_t hold, uint8_t cooldown
+        Milliseconds delay, Milliseconds hold, Milliseconds cooldown
     ) override;
-    virtual void send_left_joystick(
+    virtual void issue_left_joystick(
         const Cancellable* cancellable,
         uint8_t x, uint8_t y,
-        uint16_t delay, uint16_t hold, uint8_t cooldown
+        Milliseconds delay, Milliseconds hold, Milliseconds cooldown
     ) override;
-    virtual void send_right_joystick(
+    virtual void issue_right_joystick(
         const Cancellable* cancellable,
         uint8_t x, uint8_t y,
-        uint16_t delay, uint16_t hold, uint8_t cooldown
+        Milliseconds delay, Milliseconds hold, Milliseconds cooldown
     ) override;
 
 
 public:
     //  High speed RPCs.
 
-    virtual void send_mash_button(
+    virtual void issue_mash_button(
         const Cancellable* cancellable,
-        Button button, uint16_t ticks
+        Button button, Milliseconds duration
     ) override;
-    virtual void send_mash_button(
+    virtual void issue_mash_button(
         const Cancellable* cancellable,
-        Button button0, Button button1, uint16_t ticks
+        Button button0, Button button1, Milliseconds duration
     ) override;
-    virtual void send_mash_AZs(
+    virtual void issue_mash_AZs(
         const Cancellable* cancellable,
-        uint16_t ticks
+        Milliseconds duration
     ) override;
-    virtual void send_system_scroll(
+    virtual void issue_system_scroll(
         const Cancellable* cancellable,
         DpadPosition direction, //  Diagonals not allowed.
-        uint16_t delay, uint16_t hold, uint8_t cooldown
+        Milliseconds delay, Milliseconds hold, Milliseconds cooldown
     ) override;
 
 
 private:
+    virtual void push_state(const Cancellable* cancellable, WallDuration duration) override;
+
     void update_status_string();
+
+    class LoggingSuppressScope{
+    public:
+        LoggingSuppressScope(std::atomic<size_t>& counter)
+            : m_counter(counter)
+        {
+            m_counter++;
+        }
+        ~LoggingSuppressScope(){
+            m_counter--;
+        }
+    private:
+        std::atomic<size_t>& m_counter;
+    };
 
 
 private:
@@ -164,6 +211,7 @@ private:
 
     BotBaseController& m_serial;
 
+    std::atomic<size_t> m_logging_suppress;
 };
 
 

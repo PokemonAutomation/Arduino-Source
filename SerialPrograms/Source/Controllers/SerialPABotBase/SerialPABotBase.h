@@ -23,6 +23,7 @@ extern const char NintendoSwitch_Basic[];
 enum class Features{
     TickPrecise,
     NintendoSwitch_Basic,
+    NintendoSwitch_SSF,
     NintendoSwitch_Macros,
     NintendoSwitch_DateSkip,
 };

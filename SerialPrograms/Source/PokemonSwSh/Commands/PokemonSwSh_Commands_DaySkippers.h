@@ -15,6 +15,9 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
+//  Required Feature Flags:
+//    - NintendoSwitch_DateSkip
+
 void skipper_init_view              (SwitchControllerContext& context);
 void skipper_auto_recovery          (SwitchControllerContext& context);
 void skipper_rollback_year_full     (SwitchControllerContext& context, bool date_us);

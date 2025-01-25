@@ -213,6 +213,7 @@ void MoneyFarmerRoute212::heal_at_center_and_return(VideoStream& stream, SwitchC
     stream.log("Healing " + STRING_POKEMON + " at Hearthome City " + STRING_POKEMON + " Center.");
     pbf_move_left_joystick(context, 125, 0, 6 * TICKS_PER_SECOND, 0);
     pbf_mash_button(context, BUTTON_ZL, 3 * TICKS_PER_SECOND);
+//    ssf_mash_AZs(context, 3 * TICKS_PER_SECOND);
     pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);
     context.wait_for_all_requests();
     stream.overlay().add_log("Heal complete", COLOR_WHITE);

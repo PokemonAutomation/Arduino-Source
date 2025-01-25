@@ -611,6 +611,8 @@ file(GLOB MAIN_SOURCES
     Source/Controllers/ControllerSelectorWidget.h
     Source/Controllers/NullController.cpp
     Source/Controllers/NullController.h
+    Source/Controllers/SuperscalarScheduler.cpp
+    Source/Controllers/SuperscalarScheduler.h
     Source/Controllers/SerialPABotBase/SerialPABotBase.cpp
     Source/Controllers/SerialPABotBase/SerialPABotBase.h
     Source/Controllers/SerialPABotBase/SerialPABotBase_Handle.cpp
@@ -847,7 +849,6 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Inference/NintendoSwitch_DetectHome.h
     Source/NintendoSwitch/NintendoSwitch_ConsoleHandle.cpp
     Source/NintendoSwitch/NintendoSwitch_ConsoleHandle.h
-    Source/NintendoSwitch/NintendoSwitch_FixedInterval.h
     Source/NintendoSwitch/NintendoSwitch_MultiSwitchProgram.cpp
     Source/NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h
     Source/NintendoSwitch/NintendoSwitch_Panels.cpp

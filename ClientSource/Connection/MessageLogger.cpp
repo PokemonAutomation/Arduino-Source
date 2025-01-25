@@ -31,11 +31,12 @@ void MessageLogger::on_send(const BotBaseMessage& message, bool is_retransmit){
         if (message.type == PABB_MSG_REQUEST_CLOCK){
             print = false;
         }
-#if 0
+#if 1
         if (message.type == PABB_MSG_CONTROLLER_STATE){
-            pabb_controller_state body;
-            memcpy(&body, message.body.c_str(), sizeof(pabb_controller_state));
-            print = body.ticks >= 5;
+//            pabb_controller_state body;
+//            memcpy(&body, message.body.c_str(), sizeof(pabb_controller_state));
+//            print = body.ticks >= 5;
+            print = false;
         }
 #endif
 

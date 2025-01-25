@@ -30,7 +30,7 @@ CommandRow::CommandRow(
     bool allow_commands_while_running
 )
     : QWidget(&parent)
-    , VirtualController(controller, allow_commands_while_running)
+    , VirtualController(controller.logger(), controller, allow_commands_while_running)
     , m_controller(controller)
     , m_session(session)
     , m_allow_commands_while_running(allow_commands_while_running)

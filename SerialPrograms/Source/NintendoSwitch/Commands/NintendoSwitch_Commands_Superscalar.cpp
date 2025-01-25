@@ -4,22 +4,24 @@
  *
  */
 
-#include <sstream>
+//#include <sstream>
 #include "ClientSource/Libraries/MessageConverter.h"
 #include "NintendoSwitch_Commands_Superscalar.h"
-#include "NintendoSwitch_Messages_Superscalar.h"
+//#include "NintendoSwitch_Messages_Superscalar.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
 void ssf_flush_pipeline(SwitchControllerContext& context){
-    context->send_wait_for_pending(&context);
+    context->issue_barrier(&context);
 }
 void ssf_do_nothing(SwitchControllerContext& context, uint16_t ticks){
-    context->send_wait(&context, ticks);
+    context->issue_nop(&context, ticks*8ms);
 }
-
+void ssf_do_nothing(SwitchControllerContext& context, Milliseconds duration){
+    context->issue_nop(&context, duration);
+}
 
 
 void ssf_press_button(
@@ -27,86 +29,113 @@ void ssf_press_button(
     Button button,
     uint16_t delay, uint16_t hold, uint8_t cool
 ){
-    context->send_buttons(&context, button, delay, hold, cool);
+    context->issue_buttons(
+        &context, button,
+        delay*8ms, hold*8ms, cool*8ms
+    );
 }
+void ssf_press_button(
+    SwitchControllerContext& context,
+    Button button,
+    Milliseconds delay, Milliseconds hold, Milliseconds cool
+){
+    context->issue_buttons(&context, button, delay, hold, cool);
+}
+
 void ssf_press_dpad(
     SwitchControllerContext& context,
     DpadPosition position,
     uint16_t delay, uint16_t hold, uint8_t cool
 ){
-    context->send_dpad(&context, position, delay, hold, cool);
+    context->issue_dpad(
+        &context, position,
+        delay*8ms, hold*8ms, cool*8ms
+    );
 }
+void ssf_press_dpad(
+    SwitchControllerContext& context,
+    DpadPosition position,
+    Milliseconds delay, Milliseconds hold, Milliseconds cool
+){
+    context->issue_dpad(&context, position, delay, hold, cool);
+}
+
 void ssf_press_left_joystick(
     SwitchControllerContext& context,
     uint8_t x, uint8_t y,
     uint16_t delay, uint16_t hold, uint8_t cool
 ){
-    context->send_left_joystick(&context, x, y, delay, hold, cool);
+    context->issue_left_joystick(
+        &context, x, y,
+        delay*8ms, hold*8ms, cool*8ms
+    );
+}
+void ssf_press_left_joystick(
+    SwitchControllerContext& context,
+    uint8_t x, uint8_t y,
+    Milliseconds delay, Milliseconds hold, Milliseconds cool
+){
+    context->issue_left_joystick(&context, x, y, delay, hold, cool);
 }
 void ssf_press_right_joystick(
     SwitchControllerContext& context,
     uint8_t x, uint8_t y,
     uint16_t delay, uint16_t hold, uint8_t cool
 ){
-    context->send_right_joystick(&context, x, y, delay, hold, cool);
+    context->issue_right_joystick(
+        &context, x, y,
+        delay*8ms, hold*8ms, cool*8ms
+    );
+}
+void ssf_press_right_joystick(
+    SwitchControllerContext& context,
+    uint8_t x, uint8_t y,
+    Milliseconds delay, Milliseconds hold, Milliseconds cool
+){
+    context->issue_right_joystick(&context, x, y, delay, hold, cool);
 }
 
 
 
 void ssf_mash1_button(SwitchControllerContext& context, Button button, uint16_t ticks){
-    context->send_mash_button(&context, button, ticks);
+    context->issue_mash_button(&context, button, ticks*8ms);
+}
+void ssf_mash1_button(SwitchControllerContext& context, Button button, Milliseconds duration){
+    context->issue_mash_button(&context, button, duration);
 }
 void ssf_mash2_button(SwitchControllerContext& context, Button button0, Button button1, uint16_t ticks){
-    context->send_mash_button(&context, button0, button1, ticks);
+    context->issue_mash_button(&context, button0, button1, ticks*8ms);
+}
+void ssf_mash2_button(SwitchControllerContext& context, Button button0, Button button1, Milliseconds duration){
+    context->issue_mash_button(&context, button0, button1, duration);
 }
 void ssf_mash_AZs(SwitchControllerContext& context, uint16_t ticks){
-    context->send_mash_AZs(&context, ticks);
+    context->issue_mash_AZs(&context, ticks*8ms);
+}
+void ssf_mash_AZs(SwitchControllerContext& context, Milliseconds duration){
+    context->issue_mash_AZs(&context, duration);
 }
 void ssf_issue_scroll(
     SwitchControllerContext& context,
     ssf_ScrollDirection direction,
     uint16_t delay, uint16_t hold, uint8_t cool
 ){
-    context->send_system_scroll(&context, (DpadPosition)direction, delay, hold, cool);
+    context->issue_system_scroll(
+        &context, (DpadPosition)direction,
+        delay*8ms, hold*8ms, cool*8ms
+    );
+}
+void ssf_issue_scroll(
+    SwitchControllerContext& context,
+    ssf_ScrollDirection direction,
+    Milliseconds delay, Milliseconds hold, Milliseconds cool
+){
+    context->issue_system_scroll(&context, (DpadPosition)direction, delay, hold, cool);
 }
 
 
 
-static std::string button_to_string(Button button){
-    std::string str;
-    if (button & BUTTON_Y) str += " BUTTON_Y ";
-    if (button & BUTTON_B) str += " BUTTON_B ";
-    if (button & BUTTON_A) str += " BUTTON_A ";
-    if (button & BUTTON_X) str += " BUTTON_X ";
-    if (button & BUTTON_L) str += " BUTTON_L ";
-    if (button & BUTTON_R) str += " BUTTON_R ";
-    if (button & BUTTON_ZL) str += " BUTTON_ZL ";
-    if (button & BUTTON_ZR) str += " BUTTON_ZR ";
-    if (button & BUTTON_MINUS) str += " BUTTON_MINUS ";
-    if (button & BUTTON_PLUS) str += " BUTTON_PLUS ";
-    if (button & BUTTON_LCLICK) str += " BUTTON_LCLICK ";
-    if (button & BUTTON_RCLICK) str += " BUTTON_RCLICK ";
-    if (button & BUTTON_HOME) str += " BUTTON_HOME ";
-    if (button & BUTTON_CAPTURE) str += " BUTTON_CAPTURE ";
-    return str;
-}
-
-static std::string dpad_to_string(Button dpad){
-    switch (dpad){
-    case DPAD_UP            : return "DPAD_UP";
-    case DPAD_UP_RIGHT      : return "DPAD_UP_RIGHT";
-    case DPAD_RIGHT         : return "DPAD_RIGHT";
-    case DPAD_DOWN_RIGHT    : return "DPAD_DOWN_RIGHT";
-    case DPAD_DOWN          : return "DPAD_DOWN";
-    case DPAD_DOWN_LEFT     : return "DPAD_DOWN_LEFT";
-    case DPAD_LEFT          : return "DPAD_LEFT";
-    case DPAD_UP_LEFT       : return "DPAD_UP_LEFT";
-    case DPAD_NONE          : return "DPAD_NONE";
-    }
-    return "UNKNOWN_DPAD";
-}
-
-
+#if 0
 int register_message_converters_ssf(){
     register_message_converter(
         PABB_MSG_COMMAND_SSF_FLUSH_PIPELINE,
@@ -249,7 +278,7 @@ int register_message_converters_ssf(){
     return 0;
 }
 int init_ssf = register_message_converters_ssf();
-
+#endif
 
 
 

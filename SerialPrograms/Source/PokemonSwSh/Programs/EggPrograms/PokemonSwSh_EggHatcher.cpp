@@ -6,7 +6,7 @@
 
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "Pokemon/Pokemon_Strings.h"
-#include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
+//#include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_EggRoutines.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_GameEntry.h"
 #include "PokemonSwSh_EggHelpers.h"

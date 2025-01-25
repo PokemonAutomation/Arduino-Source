@@ -18,7 +18,7 @@
 #include <QMediaRecorder>
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Concurrency/SpinPause.h"
-#include "Common/Qt/Redispatch.h"
+//#include "Common/Qt/Redispatch.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/VideoPipeline/Backends/VideoFrameQt.h"
 #include "CommonFramework/Recording/StreamHistoryOption.h"

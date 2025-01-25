@@ -21,6 +21,8 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
+using namespace std::chrono_literals;
+
 
 void KeyboardDebouncer::clear(){
     WriteSpinLock lg(m_lock);
@@ -90,11 +92,12 @@ WallClock KeyboardDebouncer::get_current_state(VirtualControllerState& state){
 
 
 VirtualController::VirtualController(
+    Logger& logger,
     ControllerSession& session,
     bool allow_commands_while_running
 )
-    // : m_logger(logger)
-    : m_session(session)
+    : m_logger(logger)
+    , m_session(session)
     , m_allow_commands_while_running(allow_commands_while_running)
     , m_last_known_state(ProgramState::STOPPED)
     , m_stop(false)
@@ -174,11 +177,6 @@ bool VirtualController::try_next_interrupt(){
         controller.replace_on_next_command(nullptr);
     });
 }
-bool VirtualController::try_send_request(const BotBaseRequest& request){
-    return m_session.try_run<SwitchController>([&](SwitchController& controller){
-        controller.send_botbase_request(nullptr, request);
-    });
-}
 
 
 void VirtualController::thread_loop(){
@@ -245,17 +243,17 @@ void VirtualController::thread_loop(){
                 }
 
                 //  Send the command.
-                DeviceRequest_controller_state request(
-                    state.buttons,
-                    state.dpad,
-                    state.left_x,
-                    state.left_y,
-                    state.right_x,
-                    state.right_y,
-                    255
+                m_logger.log(
+                    "VirtualController: (" + button_to_string(state.buttons) +
+                    "), dpad(" + dpad_to_string(state.dpad) +
+                    "), LJ(" + std::to_string(state.left_x) + "," + std::to_string(state.left_y) +
+                    "), RJ(" + std::to_string(state.right_x) + "," + std::to_string(state.right_y) +
+                    ")",
+                    COLOR_DARKGREEN
                 );
-                bool success = m_session.try_run<SwitchController>([=](SwitchController& controller){
-                    controller.send_controller_state(
+                bool success = false;
+                success = m_session.try_run<SwitchController>([=](SwitchController& controller){
+                    controller.issue_controller_state(
                         nullptr,
                         state.buttons,
                         state.dpad,
@@ -263,7 +261,7 @@ void VirtualController::thread_loop(){
                         state.left_y,
                         state.right_x,
                         state.right_y,
-                        255
+                        255*8ms
                     );
                 });
                 if (!success){

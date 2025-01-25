@@ -265,6 +265,11 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     SwitchControllerContext context(scope, console.controller());
     VideoOverlaySet overlays(overlay);
 
+    ssf_press_button(context, BUTTON_A, 0, 1000, 0);
+    pbf_move_left_joystick(context, 0, 0, 20, 0);
+
+
+
 
 //    ImageRGB32 image("20250115-110356822901.png");
 //    ImageRGB32 image("raidecho1.jpg");
@@ -352,7 +357,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     );
 #endif
 
-#if 1
+#if 0
     VideoSnapshot image = feed.snapshot();
 //    ImageRGB32 image("20250108-151305644248.png");
 

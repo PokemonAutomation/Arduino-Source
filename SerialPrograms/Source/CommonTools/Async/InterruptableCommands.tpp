@@ -127,6 +127,7 @@ void AsyncCommandSession<ControllerType>::dispatch(std::function<void(Controller
 
 template <typename ControllerType>
 bool AsyncCommandSession<ControllerType>::cancel(std::exception_ptr exception) noexcept{
+//    cout << "AsyncCommandSession::cancel()" << endl;
     if (Cancellable::cancel(exception)){
         return true;
     }
@@ -134,6 +135,7 @@ bool AsyncCommandSession<ControllerType>::cancel(std::exception_ptr exception) n
     if (m_current != nullptr){
         m_current->context.cancel(std::move(exception));
     }else{
+//        cout << "AsyncCommandSession::cancel() - already cancelled" << endl;
         //  REMOVE: Check that this can actually be deleted.
 //        try{
 //            m_controller.stop_all_commands();
