@@ -320,10 +320,23 @@ std::set<std::string> BattleMenuReader::read_opponent_in_summary(Logger& logger,
         auto iter = KNOWN_BAD_SLUGS.find(slug);
         if (iter != KNOWN_BAD_SLUGS.end()){
             error = false;
-            logger.log("Known case that cannot be disambiguated. Skipping error report.", COLOR_RED);
+            logger.log("Known case that cannot be disambiguated: (" + slug + ") Skipping error report.", COLOR_RED);
             break;
         }
     }
+
+    //  Special case: Korean Clefairy.
+    //  Reason: Korean OCR cannot read the character: 삐
+    if (m_language == Language::Korean &&
+        slugs.empty() &&
+        type0 == PokemonType::FAIRY &&
+        type1 == PokemonType::NONE
+    ){
+        logger.log("Known case that cannot be read: Korean Clefairy", COLOR_RED);
+        return {"clefairy"};
+    }
+
+    //  At this point we're out of options.
     if (error){
         dump_image(logger, MODULE_NAME, "DisambiguateBoss", screen);
     }
