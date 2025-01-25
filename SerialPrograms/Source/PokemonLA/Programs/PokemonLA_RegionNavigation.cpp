@@ -151,6 +151,8 @@ void mash_A_to_enter_sub_area(
 void mash_A_to_change_region(
     ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context
 ){
+    context.wait_for_all_requests();
+
 #if 0
     stream.log("Waiting for loading screen...");
     BlackScreenOverWatcher black_screen0;
@@ -171,8 +173,8 @@ void mash_A_to_change_region(
 #endif
 
     stream.log("Waiting for end of loading screen...");
-    BlackScreenOverWatcher black_screen1a(COLOR_RED, {0.20, 0.02, 0.60, 0.05}, 150);
-    BlackScreenOverWatcher black_screen1b(COLOR_RED, {0.20, 0.93, 0.60, 0.05}, 150);
+    BlackScreenOverWatcher black_screen1a(COLOR_RED, {0.20, 0.02, 0.60, 0.05});
+    BlackScreenOverWatcher black_screen1b(COLOR_RED, {0.20, 0.93, 0.60, 0.05});
     int ret = run_until<SwitchControllerContext>(
         stream, context,
         [](SwitchControllerContext& context){
