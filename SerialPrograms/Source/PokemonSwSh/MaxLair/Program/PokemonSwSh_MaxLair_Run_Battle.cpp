@@ -140,51 +140,56 @@ bool read_battle_menu(
     if (health[3].hp >= 0) state.players[3].health = health[3];
 
 
-    //  Enter move selection to read PP.
-    pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
-    context.wait_for_all_requests();
-
-
-    //  Clear move blocked status.
-    player.move_blocked[0] = false;
-    player.move_blocked[1] = false;
-    player.move_blocked[2] = false;
-    player.move_blocked[3] = false;
-
-
-    screen = stream.video().snapshot();
-
-    int8_t pp[4] = {-1, -1, -1, -1};
-    reader.read_own_pp(stream.logger(), screen, pp);
-    player.pp[0] = pp[0];
-    player.pp[1] = pp[1];
-    player.pp[2] = pp[2];
-    player.pp[3] = pp[3];
-
-    player.can_dmax = reader.can_dmax(screen);
-
-    //  Read move slot.
-//    int8_t move_slot = arrow_finder.get_slot();
-    int8_t move_slot = arrow_finder.detect(screen);
-    if (move_slot < 0){
-        stream.log("Unable to detect move slot.", COLOR_RED);
-        dump_image(stream.logger(), MODULE_NAME, "MoveSlot", screen);
+    for (size_t attempts = 0; attempts < 5; attempts++){
+        //  Enter move selection to read PP.
         pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
-        pbf_press_dpad(context, DPAD_RIGHT, 2 * TICKS_PER_SECOND, 0);
-        pbf_press_dpad(context, DPAD_UP, 2 * TICKS_PER_SECOND, 0);
-        move_slot = 0;
-    }else{
-        stream.log("Current Move Slot: " + std::to_string(move_slot), COLOR_BLUE);
-    }
-    if (move_slot != state.move_slot){
-        stream.log(
-            "Move Slot Mismatch: Expected = " + std::to_string(state.move_slot) + ", Actual = " + std::to_string(move_slot),
-            COLOR_RED
-        );
-    }
-    state.move_slot = move_slot;
+        context.wait_for_all_requests();
 
-//    inference.stop();
+
+        //  Clear move blocked status.
+        player.move_blocked[0] = false;
+        player.move_blocked[1] = false;
+        player.move_blocked[2] = false;
+        player.move_blocked[3] = false;
+
+        screen = stream.video().snapshot();
+
+        int8_t pp[4] = {-1, -1, -1, -1};
+        reader.read_own_pp(stream.logger(), screen, pp);
+        player.pp[0] = pp[0];
+        player.pp[1] = pp[1];
+        player.pp[2] = pp[2];
+        player.pp[3] = pp[3];
+
+        player.can_dmax = reader.can_dmax(screen);
+
+        //  Read move slot.
+    //    int8_t move_slot = arrow_finder.get_slot();
+        int8_t move_slot = arrow_finder.detect(screen);
+        if (move_slot < 0){
+            stream.log("Unable to detect move slot.", COLOR_RED);
+//            dump_image(stream.logger(), MODULE_NAME, "MoveSlot", screen);
+//            pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
+//            pbf_press_dpad(context, DPAD_RIGHT, 2 * TICKS_PER_SECOND, 0);
+//            pbf_press_dpad(context, DPAD_UP, 2 * TICKS_PER_SECOND, 0);
+//            move_slot = 0;
+            pbf_mash_button(context, BUTTON_B, 1 * TICKS_PER_SECOND);
+            continue;
+        }else{
+            stream.log("Current Move Slot: " + std::to_string(move_slot), COLOR_BLUE);
+        }
+        if (move_slot != state.move_slot){
+            stream.log(
+                "Move Slot Mismatch: Expected = " + std::to_string(state.move_slot) + ", Actual = " + std::to_string(move_slot),
+                COLOR_RED
+            );
+        }
+        state.move_slot = move_slot;
+
+        return true;
+    }
+
+    dump_image(stream.logger(), MODULE_NAME, "MoveSlot", screen);
     return true;
 }
 
