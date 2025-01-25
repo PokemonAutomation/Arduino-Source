@@ -265,8 +265,17 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     SwitchControllerContext context(scope, console.controller());
     VideoOverlaySet overlays(overlay);
 
-    ssf_press_button(context, BUTTON_A, 0, 1000, 0);
-    pbf_move_left_joystick(context, 0, 0, 20, 0);
+
+
+
+    ImageRGB32 image("20250126-022538815397.png");
+    MaxLairInternal::BattleMenuReader reader(overlay, Language::Korean);
+    reader.read_opponent_in_summary(logger, image);
+
+
+
+//    ssf_press_button(context, BUTTON_A, 0, 1000, 0);
+//    pbf_move_left_joystick(context, 0, 0, 20, 0);
 
 
 
@@ -280,6 +289,9 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 //    TeraCardReader reader;
 //    cout << (int)reader.stars(logger, env.program_info(), image) << endl;
+
+
+
 
 
 

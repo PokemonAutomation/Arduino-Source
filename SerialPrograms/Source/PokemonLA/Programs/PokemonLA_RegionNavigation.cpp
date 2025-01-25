@@ -10,9 +10,10 @@
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "PokemonLA/Inference/Objects/PokemonLA_ButtonDetector.h"
+#include "PokemonLA/Inference/Objects/PokemonLA_ArcPhoneDetector.h"
 #include "PokemonLA/Inference/Map/PokemonLA_MapDetector.h"
 #include "PokemonLA/Inference/Map/PokemonLA_SelectedRegionDetector.h"
-#include "PokemonLA/Inference/Objects/PokemonLA_ButtonDetector.h"
 #include "PokemonLA/PokemonLA_Settings.h"
 #include "PokemonLA/PokemonLA_TravelLocations.h"
 #include "PokemonLA/Programs/PokemonLA_EscapeFromAttack.h"
@@ -172,26 +173,45 @@ void mash_A_to_change_region(
     context.wait_for(std::chrono::milliseconds(1000));
 #endif
 
-    stream.log("Waiting for end of loading screen...");
-    BlackScreenOverWatcher black_screen1a(COLOR_RED, {0.20, 0.02, 0.60, 0.05});
-    BlackScreenOverWatcher black_screen1b(COLOR_RED, {0.20, 0.93, 0.60, 0.05});
-    int ret = run_until<SwitchControllerContext>(
-        stream, context,
-        [](SwitchControllerContext& context){
-            pbf_mash_button(context, BUTTON_A, GameSettings::instance().LOAD_REGION_TIMEOUT);
-        },
-        {
-            {black_screen1a},
-            {black_screen1b},
-        }
-    );
-    if (ret < 0){
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
-            "Failed to load into region after timeout.",
-            stream
+    {
+        stream.log("Waiting for end of loading screen...");
+        BlackScreenOverWatcher black_screen1a(COLOR_RED, {0.20, 0.02, 0.60, 0.05});
+        BlackScreenOverWatcher black_screen1b(COLOR_RED, {0.20, 0.93, 0.60, 0.05});
+        int ret = run_until<SwitchControllerContext>(
+            stream, context,
+            [](SwitchControllerContext& context){
+                pbf_mash_button(context, BUTTON_A, GameSettings::instance().LOAD_REGION_TIMEOUT);
+            },
+            {
+                {black_screen1a},
+                {black_screen1b},
+            }
         );
+        if (ret < 0){
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "Failed to load into region after timeout.",
+                stream
+            );
+        }
     }
+    {
+        stream.log("Waiting for overworld...");
+        ArcPhoneDetector phone(stream.logger(), stream.overlay(), std::chrono::milliseconds(250), true);
+        int ret = wait_until(
+            stream, context,
+            Milliseconds(GameSettings::instance().LOAD_REGION_TIMEOUT * 1000 /  TICKS_PER_SECOND),
+            {phone}
+        );
+        if (ret < 0){
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "Failed to load into region after timeout.",
+                stream
+            );
+        }
+    }
+
     stream.log("Loaded into map...");
     context.wait_for(std::chrono::milliseconds((uint64_t)(GameSettings::instance().POST_WARP_DELAY * 1000)));
 }
