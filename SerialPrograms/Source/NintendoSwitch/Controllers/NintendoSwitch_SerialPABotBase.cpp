@@ -231,7 +231,10 @@ void SwitchController_SerialPABotBase::update_status_string(){
 
 void SwitchController_SerialPABotBase::wait_for_all(const Cancellable* cancellable){
 //    cout << "wait_for_all() - enter" << endl;
-    this->issue_wait_for_all(cancellable);
+    {
+        WriteSpinLock lg(m_lock);
+        this->issue_wait_for_all(cancellable);
+    }
     m_serial.wait_for_all_requests(cancellable);
 //    cout << "wait_for_all() - exit" << endl;
 }
@@ -279,6 +282,7 @@ void SwitchController_SerialPABotBase::issue_barrier(const Cancellable* cancella
     if (m_logging_suppress.load(std::memory_order_relaxed) == 0){
         m_logger.log("issue_barrier()", COLOR_DARKGREEN);
     }
+    WriteSpinLock lg(m_lock);
     this->issue_wait_for_all(cancellable);
 }
 void SwitchController_SerialPABotBase::issue_nop(const Cancellable* cancellable, Milliseconds duration){
@@ -291,6 +295,7 @@ void SwitchController_SerialPABotBase::issue_nop(const Cancellable* cancellable,
             COLOR_DARKGREEN
         );
     }
+    WriteSpinLock lg(m_lock);
     this->SuperscalarScheduler::issue_nop(cancellable, WallDuration(duration));
 }
 void SwitchController_SerialPABotBase::issue_buttons(
@@ -310,6 +315,7 @@ void SwitchController_SerialPABotBase::issue_buttons(
             COLOR_DARKGREEN
         );
     }
+    WriteSpinLock lg(m_lock);
     for (size_t c = 0; c < 14; c++){
         uint16_t mask = (uint16_t)1 << c;
         if (button & mask){
@@ -325,7 +331,7 @@ void SwitchController_SerialPABotBase::issue_buttons(
             );
         }
     }
-    this->issue_nop(cancellable, delay);
+    this->SuperscalarScheduler::issue_nop(cancellable, delay);
 }
 void SwitchController_SerialPABotBase::issue_dpad(
     const Cancellable* cancellable,
@@ -344,6 +350,7 @@ void SwitchController_SerialPABotBase::issue_dpad(
             COLOR_DARKGREEN
         );
     }
+    WriteSpinLock lg(m_lock);
     this->wait_for_resource(cancellable, m_dpad);
     m_dpad.position = position;
     this->issue_to_resource(cancellable, m_dpad, delay, hold, cooldown);
@@ -365,6 +372,7 @@ void SwitchController_SerialPABotBase::issue_left_joystick(
             COLOR_DARKGREEN
         );
     }
+    WriteSpinLock lg(m_lock);
     this->wait_for_resource(cancellable, m_left_joystick);
     m_left_joystick.x = x;
     m_left_joystick.y = y;
@@ -388,6 +396,7 @@ void SwitchController_SerialPABotBase::issue_right_joystick(
             COLOR_DARKGREEN
         );
     }
+    WriteSpinLock lg(m_lock);
     this->wait_for_resource(cancellable, m_right_joystick);
     m_right_joystick.x = x;
     m_right_joystick.y = y;

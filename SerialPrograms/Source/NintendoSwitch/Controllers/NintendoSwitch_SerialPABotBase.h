@@ -212,6 +212,7 @@ private:
     BotBaseController& m_serial;
 
     std::atomic<size_t> m_logging_suppress;
+    SpinLock m_lock;
 };
 
 

@@ -11,7 +11,6 @@
 #include <atomic>
 #include "Common/Cpp/AbstractLogger.h"
 #include "Common/Cpp/CancellableScope.h"
-#include "Common/Cpp/Concurrency/SpinLock.h"
 
 namespace PokemonAutomation{
 
@@ -72,7 +71,7 @@ public:
     //  returned to the ready state.
     void issue_wait_for_all(const Cancellable* cancellable);
 
-    //  Issue a no-nothing command for the specified delay.
+    //  Issue a do-nothing command for the specified delay.
     //  This will advance the issue timestamp.
     void issue_nop(const Cancellable* cancellable, WallDuration delay);
 
@@ -106,8 +105,6 @@ private:
     const WallDuration m_flush_threshold;
 
     std::atomic<bool> m_pending_clear;
-
-    SpinLock m_lock;
 
     //  The construction time of this object. This is only used for debugging
     //  purposes since it lets you print wall times relative to this.
