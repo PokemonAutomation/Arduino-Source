@@ -196,7 +196,7 @@ DigitPath get_codeboard_digit_path(
             break;
         }
 
-        uint8_t direction;
+        DpadPosition direction;
         if (destination.col > col){
             if (destination.col - col <= 6){
                 direction = DPAD_RIGHT;

@@ -117,20 +117,20 @@ void ssf_mash_AZs(SwitchControllerContext& context, Milliseconds duration){
 }
 void ssf_issue_scroll(
     SwitchControllerContext& context,
-    ssf_ScrollDirection direction,
+    DpadPosition direction,
     uint16_t delay, uint16_t hold, uint8_t cool
 ){
     context->issue_system_scroll(
-        &context, (DpadPosition)direction,
+        &context, direction,
         delay*8ms, hold*8ms, cool*8ms
     );
 }
 void ssf_issue_scroll(
     SwitchControllerContext& context,
-    ssf_ScrollDirection direction,
+    DpadPosition direction,
     Milliseconds delay, Milliseconds hold, Milliseconds cool
 ){
-    context->issue_system_scroll(&context, (DpadPosition)direction, delay, hold, cool);
+    context->issue_system_scroll(&context, direction, delay, hold, cool);
 }
 
 

@@ -51,8 +51,8 @@ public:
 
 public:
     //  Nintendo Switch
-    std::string nsw_press_button        (uint64_t console_id, Button button, uint16_t ticks);
-    std::string nsw_press_dpad          (uint64_t console_id, DpadPosition position, uint16_t ticks);
+    std::string nsw_press_button        (uint64_t console_id, NintendoSwitch::Button button, uint16_t ticks);
+    std::string nsw_press_dpad          (uint64_t console_id, NintendoSwitch::DpadPosition position, uint16_t ticks);
     std::string nsw_press_left_joystick (uint64_t console_id, uint8_t x, uint8_t y, uint16_t ticks);
     std::string nsw_press_right_joystick(uint64_t console_id, uint8_t x, uint8_t y, uint16_t ticks);
 

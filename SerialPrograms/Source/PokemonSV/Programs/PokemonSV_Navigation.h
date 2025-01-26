@@ -194,7 +194,7 @@ void basic_menu_navigation(
     SwitchControllerContext& context,
     ImageFloatBox arrow_box_start,
     ImageFloatBox arrow_box_end,
-    uint8_t dpad_button,
+    DpadPosition dpad_button,
     uint16_t num_button_presses
 );
 

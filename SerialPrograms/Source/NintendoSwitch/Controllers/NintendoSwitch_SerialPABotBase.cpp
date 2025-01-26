@@ -510,6 +510,10 @@ void SwitchController_SerialPABotBase::issue_system_scroll(
     uint8_t x = 128;
     uint8_t y = 128;
     switch (direction){
+    case DPAD_NONE:
+        x = 128;
+        y = 128;
+        break;
     case DPAD_UP:
         x = 128;
         y = 0;
@@ -525,6 +529,24 @@ void SwitchController_SerialPABotBase::issue_system_scroll(
     case DPAD_LEFT:
         x = 0;
         y = 128;
+        break;
+
+    //  These diagonal ones probably don't work.
+    case DPAD_UP_RIGHT:
+        x = 255;
+        y = 0;
+        break;
+    case DPAD_DOWN_RIGHT:
+        x = 255;
+        y = 255;
+        break;
+    case DPAD_DOWN_LEFT:
+        x = 0;
+        y = 255;
+        break;
+    case DPAD_UP_LEFT:
+        x = 0;
+        y = 0;
         break;
     }
 

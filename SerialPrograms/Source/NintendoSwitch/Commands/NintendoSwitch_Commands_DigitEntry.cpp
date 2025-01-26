@@ -37,7 +37,7 @@ namespace NintendoSwitch{
 const uint8_t XCORD[] = {1, 0, 1, 2, 0, 1, 2, 0, 1, 2};
 const uint8_t YCORD[] = {3, 0, 0, 0, 1, 1, 1, 2, 2, 2};
 
-void code_entry_scroll(SwitchControllerContext& context, ssf_ScrollDirection direction){
+void code_entry_scroll(SwitchControllerContext& context, DpadPosition direction){
     pbf_wait(context, CODE_DELAY);
     ssf_issue_scroll(context, direction, 0);
 }

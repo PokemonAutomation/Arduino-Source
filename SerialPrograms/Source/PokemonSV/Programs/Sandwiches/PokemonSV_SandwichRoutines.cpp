@@ -594,7 +594,7 @@ void repeat_button_press_until(
 
 void repeat_dpad_press_until(
     const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context,
-    uint8_t dpad_position, uint16_t hold_ticks, uint16_t release_ticks,
+    DpadPosition dpad_position, uint16_t hold_ticks, uint16_t release_ticks,
     const std::vector<PeriodicInferenceCallback>& callbacks,
     const std::string &error_name, const std::string &error_message,
     std::chrono::milliseconds iteration_length = std::chrono::seconds(5),

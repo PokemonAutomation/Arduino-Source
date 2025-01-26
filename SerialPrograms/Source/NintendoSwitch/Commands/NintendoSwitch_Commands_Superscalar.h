@@ -86,19 +86,20 @@ void ssf_mash_AZs       (SwitchControllerContext& context, uint16_t ticks);
 void ssf_mash_AZs       (SwitchControllerContext& context, Milliseconds duration);
 
 
-#define ssf_ScrollDirection     uint16_t
-#define SSF_SCROLL_UP           0   //  Diagonal scrolling seems to count as
-#define SSF_SCROLL_RIGHT        2   //  seperate events for each direction.
-#define SSF_SCROLL_DOWN         4
-#define SSF_SCROLL_LEFT         6
+//  Diagonal scrolling seems to count as seperate events for each direction.
+//  In other words, they don't work.
+#define SSF_SCROLL_UP           DPAD_UP
+#define SSF_SCROLL_RIGHT        DPAD_RIGHT
+#define SSF_SCROLL_DOWN         DPAD_DOWN
+#define SSF_SCROLL_LEFT         DPAD_LEFT
 void ssf_issue_scroll(
     SwitchControllerContext& context,
-    ssf_ScrollDirection direction,
+    DpadPosition direction,
     uint16_t delay, uint16_t hold = 5, uint8_t cool = 3
 );
 void ssf_issue_scroll(
     SwitchControllerContext& context,
-    ssf_ScrollDirection direction,
+    DpadPosition direction,
     Milliseconds delay, Milliseconds hold = 5*8ms, Milliseconds cool = 3*8ms
 );
 

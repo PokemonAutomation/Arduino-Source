@@ -412,7 +412,7 @@ void BotBaseHandle::thread_body(){
 
 //            uint32_t wallclock = NintendoSwitch::system_clock(context);
 //            cout << "system_clock() - done" << endl;
-            str = ticks_to_time(TICKS_PER_SECOND, wallclock);
+            str = ticks_to_time(NintendoSwitch::TICKS_PER_SECOND, wallclock);
         }catch (InvalidConnectionStateException&){
             break;
         }catch (SerialProtocolException& e){

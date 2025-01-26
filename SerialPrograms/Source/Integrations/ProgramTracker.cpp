@@ -108,7 +108,7 @@ std::string ProgramTracker::stop_program(uint64_t program_id){
     iter->second->program.async_stop();
     return "";
 }
-std::string ProgramTracker::nsw_press_button(uint64_t console_id, Button button, uint16_t ticks){
+std::string ProgramTracker::nsw_press_button(uint64_t console_id, NintendoSwitch::Button button, uint16_t ticks){
     std::string header = "press_button(ID = " + std::to_string(console_id) + ")";
     std::lock_guard<std::mutex> lg(m_lock);
     auto iter = m_consoles.find(console_id);
@@ -129,7 +129,7 @@ std::string ProgramTracker::nsw_press_button(uint64_t console_id, Button button,
         return "";
     }
 }
-std::string ProgramTracker::nsw_press_dpad(uint64_t console_id, DpadPosition position, uint16_t ticks){
+std::string ProgramTracker::nsw_press_dpad(uint64_t console_id, NintendoSwitch::DpadPosition position, uint16_t ticks){
     std::string header = "press_dpad(ID = " + std::to_string(console_id) + ")";
     std::lock_guard<std::mutex> lg(m_lock);
     auto iter = m_consoles.find(console_id);

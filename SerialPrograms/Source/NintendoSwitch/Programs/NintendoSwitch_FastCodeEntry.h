@@ -51,10 +51,10 @@ struct CodeboardPosition{
     uint8_t col;
 };
 struct CodeboardScroll{
-    uint8_t direction : 4;
-    uint8_t delay : 4;
+    DpadPosition direction;
+    uint8_t delay;
 };
-static_assert(sizeof(CodeboardScroll) == sizeof(uint8_t));
+//static_assert(sizeof(CodeboardScroll) == sizeof(uint8_t));
 struct DigitPath{
     uint8_t length = 0;
     bool left_cursor = false;

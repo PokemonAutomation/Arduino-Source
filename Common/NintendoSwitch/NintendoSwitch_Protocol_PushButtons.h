@@ -21,6 +21,12 @@
 #endif
 
 
+#ifdef __cplusplus
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+#endif
+
+
 #define PABB_MSG_COMMAND_PBF_WAIT                   0x90
 typedef struct{
     seqnum_t seqnum;
@@ -71,6 +77,12 @@ typedef struct{
     uint8_t right_joystick_y;
     uint8_t ticks;
 } PABB_PACK pabb_controller_state;
+
+
+#ifdef __cplusplus
+}
+}
+#endif
 
 
 #if _WIN32

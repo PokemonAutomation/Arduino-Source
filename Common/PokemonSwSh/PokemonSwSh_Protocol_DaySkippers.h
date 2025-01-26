@@ -26,6 +26,10 @@
 #else
 #define PABB_PACK   __attribute__((packed))
 #endif
+#ifdef __cplusplus
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+#endif
 ////////////////////////////////////////////////////////////////////////////////
 
 #define PABB_MSG_COMMAND_SKIPPER_INIT_VIEW                      0xbd
@@ -72,6 +76,10 @@ typedef struct{
 } PABB_PACK pabb_skipper_increment_all_rollback;
 
 ////////////////////////////////////////////////////////////////////////////////
+#ifdef __cplusplus
+}
+}
+#endif
 #if _WIN32
 #pragma pack(pop)
 #endif
