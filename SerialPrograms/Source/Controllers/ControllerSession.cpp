@@ -7,10 +7,9 @@
 #include "Common/Cpp/Exceptions.h"
 #include "ControllerSession.h"
 
-//  REMOVE
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 
@@ -160,22 +159,24 @@ bool ControllerSession::set_device(const std::shared_ptr<const ControllerDescrip
 
 
 std::string ControllerSession::reset(){
-    std::lock_guard<std::mutex> lg(m_state_lock);
-    if (!m_connection){
-        return "No controller set.";
-    }
-    if (m_options_locked){
-        return "Options are locked.";
-    }
+    {
+        std::lock_guard<std::mutex> lg(m_state_lock);
+        if (!m_connection){
+            return "No controller set.";
+        }
+        if (m_options_locked){
+            return "Options are locked.";
+        }
 
-    m_connection.reset();
-    m_connection = m_descriptor->open(m_logger, m_requirements);
-    if (m_connection){
-        m_listeners.run_lambda_with_duplicates([&](Listener& listener){
-            m_connection->add_status_listener(listener);
-        });
+        m_connection.reset();
+        m_connection = m_descriptor->open(m_logger, m_requirements);
+        if (m_connection){
+            m_listeners.run_lambda_with_duplicates([&](Listener& listener){
+                m_connection->add_status_listener(listener);
+            });
+        }
     }
-
+    signal_status_text_changed(status_text());
     return "";
 }
 

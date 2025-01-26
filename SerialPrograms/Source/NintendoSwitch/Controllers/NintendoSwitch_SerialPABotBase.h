@@ -101,7 +101,6 @@ public:
     virtual Logger& logger() override{
         return m_serial.logger();
     }
-    BotBaseHandle& handle(){ return m_handle; } //  REMOVE
 
 
 public:

@@ -56,7 +56,6 @@ public:
     Logger& logger(){ return m_logger; }
     virtual VideoFeed& video() override{ return *m_camera; }
     virtual AudioFeed& audio() override{ return m_audio; }
-    virtual BotBaseHandle& sender() override;
     virtual ControllerSession& controller() override{ return m_controller; };
     VideoOverlay& overlay(){ return m_overlay; }
     const StreamHistorySession& stream_history() const{ return m_history; }

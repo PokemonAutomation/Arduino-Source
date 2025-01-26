@@ -9,7 +9,6 @@
 #include "CommonFramework/VideoPipeline/Backends/CameraImplementations.h"
 #include "Integrations/ProgramTracker.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_SerialPABotBase.h"
 #include "NintendoSwitch_SwitchSystemOption.h"
 #include "NintendoSwitch_SwitchSystemSession.h"
 
@@ -69,11 +68,6 @@ SwitchSystemSession::SwitchSystemSession(
     m_camera->add_frame_listener(m_history);
 }
 
-
-BotBaseHandle& SwitchSystemSession::sender(){
-    //  TODO: Don't do this.    REMOVE
-    return static_cast<SwitchController_SerialPABotBase&>(m_controller.connection()).handle();
-}
 
 void SwitchSystemSession::get(SwitchSystemOption& option){
     m_controller.get(option.m_controller);
