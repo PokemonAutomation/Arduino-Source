@@ -579,8 +579,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonTools/TrendInference/TimeWindowStatTracker.h
     Source/CommonTools/Resources/SpriteDatabase.cpp
     Source/CommonTools/Resources/SpriteDatabase.h
-    Source/CommonTools/StartupChecks/BlackBorderCheck.cpp
-    Source/CommonTools/StartupChecks/BlackBorderCheck.h
+    Source/CommonTools/StartupChecks/StartProgramChecks.cpp
+    Source/CommonTools/StartupChecks/StartProgramChecks.h
     Source/CommonTools/StartupChecks/VideoResolutionCheck.cpp
     Source/CommonTools/StartupChecks/VideoResolutionCheck.h
     Source/CommonTools/VisualDetector.h

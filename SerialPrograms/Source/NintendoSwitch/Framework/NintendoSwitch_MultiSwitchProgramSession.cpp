@@ -13,7 +13,6 @@
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Options/Environment/SleepSuppressOption.h"
 #include "CommonFramework/Options/Environment/PerformanceOptions.h"
-#include "CommonTools/StartupChecks/BlackBorderCheck.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 #include "NintendoSwitch_MultiSwitchProgramOption.h"
 #include "NintendoSwitch_MultiSwitchProgramSession.h"
@@ -84,12 +83,22 @@ void MultiSwitchProgramSession::run_program_instance(MultiSwitchProgramEnvironme
         }
     }
 
+    //  Startup Checks
     size_t consoles = m_system.count();
     for (size_t c = 0; c < consoles; c++){
-        if (!m_system[c].controller_session().ready()){
-            throw UserSetupError(m_system[c].logger(), "Cannot Start: Serial connection not ready.");
-        }
-        start_program_video_check(env.consoles[c], m_option.descriptor().feedback());
+        m_option.instance().start_program_controller_check(
+            scope,
+            m_system[c].controller_session(), c
+        );
+        m_option.instance().start_program_feedback_check(
+            scope,
+            env.consoles[c], c,
+            m_option.descriptor().feedback()
+        );
+        m_option.instance().start_program_border_check(
+            scope,
+            env.consoles[c], c
+        );
     }
 
     m_scope.store(&scope, std::memory_order_release);
@@ -163,6 +172,7 @@ void MultiSwitchProgramSession::internal_run_program(){
             session.stream_history()
         );
     }
+
 
 
     CancellableHolder<CancellableScope> scope;

@@ -20,6 +20,7 @@
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 
 namespace PokemonAutomation{
+    class ControllerSession;
 namespace NintendoSwitch{
 
 
@@ -127,6 +128,24 @@ public:
     );
 
     virtual void program(MultiSwitchProgramEnvironment& env, CancellableScope& scope) = 0;
+
+
+public:
+    //  Startup Checks: Feel free to override to change behavior.
+
+    virtual void start_program_controller_check(
+        CancellableScope& scope,
+        ControllerSession& session, size_t console_index
+    );
+    virtual void start_program_feedback_check(
+        CancellableScope& scope,
+        VideoStream& stream, size_t console_index,
+        FeedbackType feedback_type
+    );
+    virtual void start_program_border_check(
+        CancellableScope& scope,
+        VideoStream& stream, size_t console_index
+    );
 
 
 public:

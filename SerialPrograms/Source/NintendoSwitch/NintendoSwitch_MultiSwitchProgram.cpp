@@ -9,6 +9,8 @@
 #include "Common/Cpp/Concurrency/AsyncDispatcher.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/VideoPipeline/Stats/ThreadUtilizationStats.h"
+#include "CommonTools/StartupChecks/StartProgramChecks.h"
+#include "Controllers/ControllerSession.h"
 #include "NintendoSwitch_MultiSwitchProgram.h"
 #include "Framework/NintendoSwitch_MultiSwitchProgramOption.h"
 
@@ -121,6 +123,31 @@ MultiSwitchProgramInstance::MultiSwitchProgramInstance(
         error_notification_tags
     )
 {}
+
+
+void MultiSwitchProgramInstance::start_program_controller_check(
+    CancellableScope& scope,
+    ControllerSession& session, size_t console_index
+){
+    if (!session.ready()){
+        throw UserSetupError(session.logger(), "Cannot Start: Controller is not ready.");
+    }
+}
+void MultiSwitchProgramInstance::start_program_feedback_check(
+    CancellableScope& scope,
+    VideoStream& stream, size_t console_index,
+    FeedbackType feedback_type
+){
+    StartProgramChecks::check_feedback(stream, feedback_type);
+}
+void MultiSwitchProgramInstance::start_program_border_check(
+    CancellableScope& scope,
+    VideoStream& stream, size_t console_index
+){
+    StartProgramChecks::check_border(stream);
+}
+
+
 void MultiSwitchProgramInstance::add_option(ConfigOption& option, std::string serialization_string){
     m_options.add_option(option, std::move(serialization_string));
 }
