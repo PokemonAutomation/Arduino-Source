@@ -42,6 +42,7 @@ const std::set<std::string> TOKENS{
     "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08", //  jw's token.
     "e8d168bc482e96553ea9f9ecaea5a817474dbccc2a6a228a6bde67f2b2aa2889", //  James' token.
     "7555b7c63481cad42306718c67e7f9def5bfd1da8f6cd299ccd3d7dc95f307ae", //  Kuro's token.
+    "3d475b46d121fc24559d100de2426feaa53cd6578aac2817c4857a610ccde2dd", //  kichi's token.
 };
 
 
