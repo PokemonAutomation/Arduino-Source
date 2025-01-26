@@ -12,9 +12,9 @@
 #include "Common/Cpp/Json/JsonObject.h"
 #include "NintendoSwitch_VirtualControllerMapping.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

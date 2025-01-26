@@ -14,7 +14,6 @@
 #include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 
 namespace PokemonAutomation{
-    class BotBaseContext;
     class ProgramEnvironment;
     class EventNotificationOption;
     class ImageViewRGB32;

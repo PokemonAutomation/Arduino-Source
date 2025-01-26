@@ -13,7 +13,6 @@
 #include "PokemonSV/Options/PokemonSV_BBQOption.h"
 
 namespace PokemonAutomation{
-    class BotBaseContext;
     struct ProgramInfo;
 namespace NintendoSwitch{
 namespace PokemonSV{

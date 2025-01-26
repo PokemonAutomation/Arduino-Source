@@ -12,7 +12,6 @@
 
 namespace PokemonAutomation{
     class CancellableScope;
-    class BotBaseContext;
     class ProgramEnvironment;
 namespace NintendoSwitch{
     class MultiSwitchProgramEnvironment;

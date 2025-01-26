@@ -15,13 +15,9 @@
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/Globals.h"
 #include "Controllers/ControllerSession.h"
-//#include "Controllers/SerialPABotBase/SerialPABotBase_Handle.h"
-//#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 #include "NintendoSwitch_VirtualControllerMapping.h"
 
 namespace PokemonAutomation{
-    class BotBaseRequest;
-
 namespace NintendoSwitch{
 
 
@@ -34,7 +30,7 @@ public:
 
     void add_event(bool press, VirtualControllerState state);
 
-    //  Returns when the consumer thread should wakt up again.
+    //  Returns when the consumer thread should wake up again.
     WallClock get_current_state(VirtualControllerState& state);
 
 
