@@ -25,6 +25,12 @@ public:
 
     std::shared_ptr<AsyncTask> dispatch(std::function<void()>&& func);
 
+    void run_in_parallel(
+        const std::function<void(size_t index)>& func,
+        size_t start, size_t end,
+        size_t block_size = 0
+    );
+
 
 private:
 //    void dispatch_task(AsyncTask& task);

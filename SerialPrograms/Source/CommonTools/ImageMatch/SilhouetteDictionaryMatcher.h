@@ -47,6 +47,7 @@ public:
 
 private:
     std::map<std::string, ExactImageMatcher> m_database;
+    std::vector<const std::pair<const std::string, ExactImageMatcher>*> m_database_vector;
 };
 
 

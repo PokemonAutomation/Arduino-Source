@@ -173,9 +173,7 @@ file(GLOB MAIN_SOURCES
     ../Common/Microcontroller/DeviceRoutines.h
     ../Common/Microcontroller/MessageProtocol.h
     ../Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h
-    ../Common/NintendoSwitch/NintendoSwitch_Protocol_DigitEntry.h
     ../Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h
-    ../Common/NintendoSwitch/NintendoSwitch_Protocol_Routines.h
     ../Common/NintendoSwitch/NintendoSwitch_Protocol_Superscalar.h
     ../Common/NintendoSwitch/NintendoSwitch_SlotDatabase.h
     ../Common/PokemonSwSh/PokemonProgramIDs.h
@@ -535,6 +533,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonTools/InferencePivots/AudioInferencePivot.h
     Source/CommonTools/InferencePivots/VisualInferencePivot.cpp
     Source/CommonTools/InferencePivots/VisualInferencePivot.h
+    Source/CommonTools/GlobalInferenceRunner.cpp
+    Source/CommonTools/GlobalInferenceRunner.h
     Source/CommonTools/InferenceThrottler.h
     Source/CommonTools/OCR/OCR_DictionaryMatcher.cpp
     Source/CommonTools/OCR/OCR_DictionaryMatcher.h

@@ -254,6 +254,7 @@ SOURCES += \
     Source/CommonTools/Audio/AudioPerSpectrumDetectorBase.cpp \
     Source/CommonTools/Audio/AudioTemplateCache.cpp \
     Source/CommonTools/Audio/SpectrogramMatcher.cpp \
+    Source/CommonTools/GlobalInferenceRunner.cpp \
     Source/CommonTools/ImageMatch/CroppedImageDictionaryMatcher.cpp \
     Source/CommonTools/ImageMatch/ExactImageDictionaryMatcher.cpp \
     Source/CommonTools/ImageMatch/ExactImageMatcher.cpp \
@@ -1184,9 +1185,7 @@ HEADERS += \
     ../Common/Microcontroller/DeviceRoutines.h \
     ../Common/Microcontroller/MessageProtocol.h \
     ../Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h \
-    ../Common/NintendoSwitch/NintendoSwitch_Protocol_DigitEntry.h \
     ../Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h \
-    ../Common/NintendoSwitch/NintendoSwitch_Protocol_Routines.h \
     ../Common/NintendoSwitch/NintendoSwitch_Protocol_Superscalar.h \
     ../Common/NintendoSwitch/NintendoSwitch_SlotDatabase.h \
     ../Common/PokemonSwSh/PokemonProgramIDs.h \
@@ -1362,6 +1361,7 @@ HEADERS += \
     Source/CommonTools/Audio/AudioTemplateCache.h \
     Source/CommonTools/Audio/SpectrogramMatcher.h \
     Source/CommonTools/DetectionDebouncer.h \
+    Source/CommonTools/GlobalInferenceRunner.h \
     Source/CommonTools/ImageMatch/CroppedImageDictionaryMatcher.h \
     Source/CommonTools/ImageMatch/ExactImageDictionaryMatcher.h \
     Source/CommonTools/ImageMatch/ExactImageMatcher.h \
