@@ -15,9 +15,10 @@
 
 namespace PokemonAutomation{
 
-class BotBaseHandle;
 class VideoFeed;
 class AudioFeed;
+class ControllerSession;
+class BotBaseHandle;
 
 
 class TrackableConsole{
@@ -25,6 +26,7 @@ public:
     virtual BotBaseHandle& sender() = 0;
     virtual VideoFeed& video() = 0;
     virtual AudioFeed& audio() = 0;
+    virtual ControllerSession& controller() = 0;
 };
 
 class TrackableProgram{

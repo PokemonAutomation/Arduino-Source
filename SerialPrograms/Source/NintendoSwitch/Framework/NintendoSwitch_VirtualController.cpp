@@ -168,14 +168,16 @@ bool VirtualController::on_key_release(Qt::Key key){
 
 
 bool VirtualController::try_stop_commands(){
-    return m_session.try_run<SwitchController>([](SwitchController& controller){
+    std::string error = m_session.try_run<SwitchController>([](SwitchController& controller){
         controller.cancel_all(nullptr);
     });
+    return error.empty();
 }
 bool VirtualController::try_next_interrupt(){
-    return m_session.try_run<SwitchController>([](SwitchController& controller){
+    std::string error = m_session.try_run<SwitchController>([](SwitchController& controller){
         controller.replace_on_next_command(nullptr);
     });
+    return error.empty();
 }
 
 
@@ -251,8 +253,7 @@ void VirtualController::thread_loop(){
                     ")",
                     COLOR_DARKGREEN
                 );
-                bool success = false;
-                success = m_session.try_run<SwitchController>([=](SwitchController& controller){
+                std::string error = m_session.try_run<SwitchController>([=](SwitchController& controller){
                     controller.issue_controller_state(
                         nullptr,
                         state.buttons,
@@ -264,7 +265,7 @@ void VirtualController::thread_loop(){
                         255*8ms
                     );
                 });
-                if (!success){
+                if (!error.empty()){
                     next_wake = now + std::chrono::milliseconds(PABB_RETRANSMIT_DELAY_MILLIS);
                     break;
                 }

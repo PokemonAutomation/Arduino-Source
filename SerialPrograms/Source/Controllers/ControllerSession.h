@@ -8,8 +8,9 @@
 #define PokemonAutomation_Controllers_ControllerSession_H
 
 #include <mutex>
-#include "Common/Cpp/ListenerSet.h"
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/ListenerSet.h"
+//#include "Common/Cpp/Exceptions.h"
 #include "ControllerDescriptor.h"
 #include "ControllerConnection.h"
 
@@ -76,25 +77,30 @@ public:
     std::string reset();
 
     //  Try to run the following lambda on the underlying controller type.
-    //  Returns true if successful.
+    //  Returns empty string if successful. Otherwise returns error message.
     template <typename ControllerType, typename Lambda>
-    bool try_run(Lambda&& function) noexcept{
+    std::string try_run(Lambda&& function) noexcept{
         std::lock_guard<std::mutex> lg(m_state_lock);
         if (!m_connection){
-            return false;
+            return "Connection is null.";
         }
         try{
             //  This will be a cross-cast in most cases.
             ControllerType* child = dynamic_cast<ControllerType*>(m_connection.get());
             if (child == nullptr){
                 m_logger.log("ControllerSession::try_run(): Incompatible controller type cast.", COLOR_RED);
-                return false;
+                return "Incompatible controller type cast.";
+            }
+            if (!m_user_input_disallow_reason.empty()){
+                return m_user_input_disallow_reason;
             }
             function(*child);
+        }catch (Exception& e){
+            return e.to_str();
         }catch (...){
-            return false;
+            return "Unknown exception.";
         }
-        return true;
+        return "";
     }
 
 

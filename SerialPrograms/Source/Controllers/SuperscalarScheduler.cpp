@@ -52,7 +52,9 @@ void SuperscalarScheduler::clear() noexcept{
 }
 
 bool SuperscalarScheduler::iterate_schedule(const Cancellable* cancellable){
-    cancellable->throw_if_cancelled();
+    if (cancellable){
+        cancellable->throw_if_cancelled();
+    }
 
     if (m_state_changes.empty()){
         m_device_sent_time = m_device_issue_time;

@@ -169,30 +169,22 @@ SwitchSystemWidget::SwitchSystemWidget(
 
 
 void SwitchSystemWidget::update_ui(ProgramState state){
-#if 0
-    if (!m_session.allow_commands_while_running()){
-        m_session.set_allow_user_commands(
-            state == ProgramState::STOPPED
-                ? ""
-                : "<font color=\"orange\">Program is not ready.</font>"
-        );
+    if (m_session.allow_commands_while_running()){
+        m_session.set_allow_user_commands("");
+    }else{
+        switch (state){
+        case ProgramState::NOT_READY:
+            m_session.set_allow_user_commands("Program is not ready.");
+            break;
+        case ProgramState::STOPPED:
+            m_session.set_allow_user_commands("");
+            break;
+        case ProgramState::RUNNING:
+        case ProgramState::STOPPING:
+            m_session.set_allow_user_commands("Program is running.");
+            break;
+        }
     }
-    switch (state){
-    case ProgramState::NOT_READY:
-        m_session.set_allow_user_commands("<font color=\"orange\">Program is not ready.</font>");
-//        m_serial_widget->set_options_enabled(false);
-        break;
-    case ProgramState::STOPPED:
-        m_session.set_allow_user_commands(true);
-//        m_serial_widget->set_options_enabled(true);
-        break;
-    case ProgramState::RUNNING:
-    case ProgramState::STOPPING:
-        m_session.set_allow_user_commands(false);
-//        m_serial_widget->set_options_enabled(false);
-        break;
-    }
-#endif
     m_command->on_state_changed(state);
 }
 

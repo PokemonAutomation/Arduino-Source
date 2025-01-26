@@ -7,9 +7,10 @@
 #include "Common/Cpp/Exceptions.h"
 #include "ControllerSession.h"
 
-//#include <iostream>
-//using std::cout;
-//using std::endl;
+//  REMOVE
+#include <iostream>
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 
@@ -105,6 +106,7 @@ std::string ControllerSession::user_input_blocked() const{
 }
 void ControllerSession::set_user_input_blocked(std::string disallow_reason){
     std::lock_guard<std::mutex> lg(m_state_lock);
+//    cout << "set_user_input_blocked() = " << disallow_reason << endl;
     m_user_input_disallow_reason = std::move(disallow_reason);
 }
 

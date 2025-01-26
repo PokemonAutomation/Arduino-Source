@@ -377,7 +377,7 @@ void SwitchController_SerialPABotBase::issue_left_joystick(
     m_left_joystick.x = x;
     m_left_joystick.y = y;
     this->issue_to_resource(cancellable, m_left_joystick, delay, hold, cooldown);
-//    cout << "(" << (unsigned)x << "," << (unsigned)y << "), hold = " << hold / 8 << endl;  //  REMOVE
+//    cout << "(" << (unsigned)x << "," << (unsigned)y << "), hold = " << hold / 8 << endl;
 }
 void SwitchController_SerialPABotBase::issue_right_joystick(
     const Cancellable* cancellable,
