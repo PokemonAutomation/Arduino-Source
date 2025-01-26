@@ -77,7 +77,6 @@ ImageMatch::ImageMatchResult TeraSilhouetteReader::read(const ImageViewRGB32& sc
             preprocessed_image,
             // The filter is a lambda function that returns true on black silhouette pixels.
             [=](Color pixel){
-//                return (uint32_t)pixel.red() + pixel.green() + pixel.blue() < 200;
                 return (uint32_t)pixel.red() + pixel.green() + pixel.blue() < threshold;
             }
         );

@@ -270,10 +270,13 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
     ImageRGB32 image("20250125-232444699636.png");
 
-    TeraSilhouetteReader reader;
-    ImageMatch::ImageMatchResult results = reader.read(image);
-    results.log(logger, 110);
+//    TeraSilhouetteReader reader;
+//    ImageMatch::ImageMatchResult results = reader.read(image);
+//    results.log(logger, 110);
 
+    TeraTypeReader reader;
+    ImageMatch::ImageMatchResult results = reader.read(image);
+    results.log(logger, 100);
 
 
 #if 0
