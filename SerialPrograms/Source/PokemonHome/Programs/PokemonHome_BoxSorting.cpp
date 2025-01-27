@@ -686,7 +686,7 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, SwitchControllerCo
                         // nature_box
                         std::string nature = OCR::ocr_read(Language::English, extract_box_reference(screen, nature_box));
                         if (nature.empty()) {
-                            dump_image(env.console, ProgramInfo(), "ReadSummary_Language", screen);
+                            dump_image(env.console, ProgramInfo(), "ReadSummary_Nature", screen);
                             env.console.log("Failed to read nature from the box.", COLOR_RED);
                         } else {
                             nature.erase(nature.find_last_not_of(" \n\r\t") + 1);
@@ -697,7 +697,7 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, SwitchControllerCo
                         // ability_box
                         std::string ability = OCR::ocr_read(Language::English, extract_box_reference(screen, ability_box));
                         if (language.empty()) {
-                            dump_image(env.console, ProgramInfo(), "ReadSummary_Language", screen);
+                            dump_image(env.console, ProgramInfo(), "ReadSummary_Ability", screen);
                             env.console.log("Failed to read ability from the box.", COLOR_RED);
                         } else {
                             ability.erase(ability.find_last_not_of(" \n\r\t") + 1);
