@@ -12,11 +12,13 @@
 #include "CommonFramework/PersistentSettings.h"
 #include "CommonFramework/Windows/DpiScaler.h"
 #include "CommonFramework/Panels/UI/PanelListWidget.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "NintendoSwitch/NintendoSwitch_Panels.h"
 #include "PokemonSwSh/PokemonSwSh_Panels.h"
 #include "PokemonHome/PokemonHome_Panels.h"
 #include "PokemonBDSP/PokemonBDSP_Panels.h"
 #include "PokemonLA/PokemonLA_Panels.h"
+#include "PokemonRSE/PokemonRSE_Panels.h"
 #include "PokemonSV/PokemonSV_Panels.h"
 #include "ZeldaTotK/ZeldaTotK_Panels.h"
 #include "PanelLists.h"
@@ -47,6 +49,9 @@ ProgramSelect::ProgramSelect(QWidget& parent, PanelHolder& holder)
     add(std::make_unique<NintendoSwitch::PokemonBDSP::PanelListFactory>());
     add(std::make_unique<NintendoSwitch::PokemonLA::PanelListFactory>());
     add(std::make_unique<NintendoSwitch::PokemonSV::PanelListFactory>());
+    if (PreloadSettings::instance().DEVELOPER_MODE) {
+        add(std::make_unique<NintendoSwitch::PokemonRSE::PanelListFactory>());
+    }
     add(std::make_unique<NintendoSwitch::ZeldaTotK::PanelListFactory>());
 
 
