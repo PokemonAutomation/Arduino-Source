@@ -1309,6 +1309,10 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Resources/PokemonLA_PokemonSprites.h
     Source/PokemonLA/Resources/PokemonLA_WeatherAndTimeIcons.cpp
     Source/PokemonLA/Resources/PokemonLA_WeatherAndTimeIcons.h
+    Source/PokemonRSE/PokemonRSE_Panels.cpp
+    Source/PokemonRSE/PokemonRSE_Panels.h
+    Source/PokemonRSE/PokemonRSE_Settings.cpp
+    Source/PokemonRSE/PokemonRSE_Settings.h
     Source/PokemonSV/Inference/Battles/PokemonSV_BattleBallReader.cpp
     Source/PokemonSV/Inference/Battles/PokemonSV_BattleBallReader.h
     Source/PokemonSV/Inference/Battles/PokemonSV_EncounterWatcher.cpp
