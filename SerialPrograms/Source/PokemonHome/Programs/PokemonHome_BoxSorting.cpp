@@ -38,6 +38,7 @@ language
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonTools/OCR/OCR_NumberReader.h"
+#include "CommonTools/OCR/OCR_RawOCR.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonHome/Inference/PokemonHome_BoxGenderDetector.h"
@@ -173,6 +174,10 @@ struct Pokemon{
     StatsHuntGenderFilter gender = StatsHuntGenderFilter::Genderless;
     uint32_t ot_id = 0;
     uint32_t level = 0;
+    std::string origin = "";
+    std::string language = "";
+    std::string nature = "";
+    std::string ability = "";
 };
 
 bool operator==(const Pokemon& lhs, const Pokemon& rhs){
@@ -181,7 +186,12 @@ bool operator==(const Pokemon& lhs, const Pokemon& rhs){
            lhs.shiny == rhs.shiny &&
            lhs.gmax == rhs.gmax &&
            lhs.ball_slug == rhs.ball_slug &&
-           lhs.gender == rhs.gender;
+           lhs.gender == rhs.gender &&
+           lhs.level == rhs.level &&
+           lhs.origin == rhs.origin &&
+           lhs.language == rhs.language &&
+           lhs.nature == rhs.nature &&
+           lhs.ability == rhs.ability;
 }
 
 bool operator<(const std::optional<Pokemon>& lhs, const std::optional<Pokemon>& rhs){
@@ -244,6 +254,10 @@ std::ostream& operator<<(std::ostream& os, const std::optional<Pokemon>& pokemon
         os << "gender:" << gender_to_string(pokemon->gender) << " ";
         os << "ot_id:" << pokemon->ot_id << " ";
         os << "level:" << pokemon->level << " ";
+        os << "language:" << pokemon->language << " ";
+        os << "origin:" << pokemon->origin << " ";
+        os << "nature:" << pokemon->nature << " ";
+        os << "ability:" << pokemon->ability << " ";
         os << ")";
     }else{
         os << "(empty)";
@@ -387,6 +401,10 @@ void output_boxes_data_json(const std::vector<std::optional<Pokemon>>& boxes_dat
             pokemon["gender"] = gender_to_string(current_pokemon->gender);
             pokemon["ot_id"] = current_pokemon->ot_id;
             pokemon["level"] = current_pokemon->level;
+            pokemon["language"] = current_pokemon->language;
+            pokemon["origin"] = current_pokemon->origin;
+            pokemon["nature"] = current_pokemon->nature;
+            pokemon["ability"] = current_pokemon->ability;
         }
         pokemon_data.push_back(std::move(pokemon));
     }
@@ -469,6 +487,7 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, SwitchControllerCo
     ImageFloatBox ot_box(0.492, 0.719, 0.165, 0.049); // OT box
     ImageFloatBox nature_box(0.157, 0.783, 0.212, 0.042); // Nature box
     ImageFloatBox ability_box(0.158, 0.838, 0.213, 0.042); // Ability box
+    ImageFloatBox language_box(0.030, 0.175, 0.05, 0.035); // Language box
 
 
     // vector that will store data for each slot
@@ -607,6 +626,7 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, SwitchControllerCo
             box_render.add(COLOR_RED, ot_box);
             box_render.add(COLOR_RED, nature_box);
             box_render.add(COLOR_RED, ability_box);
+            box_render.add(COLOR_RED, language_box);
 
             //cycle through each summary of the current box and fill pokemon information
             for (size_t row = 0; row < MAX_ROWS; row++){
@@ -653,10 +673,43 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, SwitchControllerCo
                         boxes_data[get_index(box_nb, row, column)]->level = (uint16_t)level;
                         env.console.log("Level: " + std::to_string(level), COLOR_GREEN);
 
+                        // language
+                        std::string language = OCR::ocr_read(Language::English, extract_box_reference(screen, language_box));
+                        if (language.empty()) {
+                            dump_image(env.console, ProgramInfo(), "ReadSummary_Language", screen);
+                            env.console.log("Failed to read language from the box.", COLOR_RED);
+                        } else {
+                            language.erase(language.find_last_not_of(" \n\r\t") + 1);
+                            boxes_data[get_index(box_nb, row, column)]->language = language;
+                            env.console.log("Detected Language: " + language, COLOR_GREEN);
+                        }
+                        // nature_box
+                        std::string nature = OCR::ocr_read(Language::English, extract_box_reference(screen, nature_box));
+                        if (nature.empty()) {
+                            dump_image(env.console, ProgramInfo(), "ReadSummary_Language", screen);
+                            env.console.log("Failed to read nature from the box.", COLOR_RED);
+                        } else {
+                            nature.erase(nature.find_last_not_of(" \n\r\t") + 1);
+                            boxes_data[get_index(box_nb, row, column)]->nature = nature;
+                            env.console.log("Detected Nature: " + nature, COLOR_GREEN);
+                        }
+
+                        // ability_box
+                        std::string ability = OCR::ocr_read(Language::English, extract_box_reference(screen, ability_box));
+                        if (language.empty()) {
+                            dump_image(env.console, ProgramInfo(), "ReadSummary_Language", screen);
+                            env.console.log("Failed to read ability from the box.", COLOR_RED);
+                        } else {
+                            ability.erase(ability.find_last_not_of(" \n\r\t") + 1);
+                            boxes_data[get_index(box_nb, row, column)]->ability = ability;
+                            env.console.log("Detected Ability: " + ability, COLOR_GREEN);
+                        }
+                        //origin_symbol_box
+
+
+
                         // NOTE edit when adding new struct members (detections go here likely)
                         // ot_box
-                        // nature_box
-                        // ability_box
 
                         pbf_press_button(context, BUTTON_R, 10, VIDEO_DELAY+15);
                         context.wait_for_all_requests();
