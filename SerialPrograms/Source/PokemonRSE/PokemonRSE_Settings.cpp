@@ -21,22 +21,15 @@ GameSettings& GameSettings::instance(){
 }
 GameSettings::GameSettings()
     : BatchOption(LockMode::LOCK_WHILE_RUNNING)
-    , m_menu_navigation("<font size=4><b>Menu Navigation Timings:</b></font>")
-    , GAME_TO_HOME_DELAY(
-        "<b>Game to Home Delay:</b><br>Delay from pressing home to entering the the Switch home menu.",
-        LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "125"
-    )
     , m_soft_reset_timings("<font size=4><b>Soft Reset Timings:</b></font>")
     , START_BUTTON_MASH(
-        "<b>1. Start Button Mash:</b><br>Mash Start for this long after a soft reset to get to the main menu.",
+        "<b>Start Button Mash:</b><br>Mash Start for this long after a soft reset to get to the main menu.",
         LockMode::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "5 * TICKS_PER_SECOND"
     )
     , ENTER_GAME_WAIT(
-        "<b>2. Enter Game Wait:</b><br>Wait this long for the game to load.",
+        "<b>Enter Game Wait:</b><br>Wait this long for the game to load.",
         LockMode::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
         "3 * TICKS_PER_SECOND"

@@ -23,9 +23,6 @@ class GameSettings : public BatchOption{
 public:
     static GameSettings& instance();
 
-    SectionDividerOption m_menu_navigation;
-    TimeExpressionOption<uint16_t> GAME_TO_HOME_DELAY;
-
     SectionDividerOption m_soft_reset_timings;
     TimeExpressionOption<uint16_t> START_BUTTON_MASH;
     TimeExpressionOption<uint16_t> ENTER_GAME_WAIT;
