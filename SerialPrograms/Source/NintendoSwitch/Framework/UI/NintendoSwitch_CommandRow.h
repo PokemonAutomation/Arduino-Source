@@ -37,8 +37,8 @@ public:
     );
 
     //  Returns false if key is not handled. (pass it up to next handler)
-    bool on_key_press(Qt::Key key);
-    bool on_key_release(Qt::Key key);
+    bool on_key_press(const QKeyEvent& key);
+    bool on_key_release(const QKeyEvent& key);
 
 signals:
     void load_profile();

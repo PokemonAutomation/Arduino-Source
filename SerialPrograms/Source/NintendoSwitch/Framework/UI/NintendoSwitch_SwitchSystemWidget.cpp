@@ -21,6 +21,10 @@
 #include "NintendoSwitch_CommandRow.h"
 #include "NintendoSwitch_SwitchSystemWidget.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
@@ -189,11 +193,13 @@ void SwitchSystemWidget::update_ui(ProgramState state){
 }
 
 bool SwitchSystemWidget::key_press(QKeyEvent* event){
-    return m_command->on_key_press((Qt::Key)event->key());
+//    cout << "press:   " << event->nativeVirtualKey() << endl;
+    return m_command->on_key_press(*event);
 }
 
 bool SwitchSystemWidget::key_release(QKeyEvent* event){
-    return m_command->on_key_release((Qt::Key)event->key());
+//    cout << "release: " << event->nativeVirtualKey() << endl;
+    return m_command->on_key_release(*event);
 }
 
 void SwitchSystemWidget::focus_in(QFocusEvent* event){

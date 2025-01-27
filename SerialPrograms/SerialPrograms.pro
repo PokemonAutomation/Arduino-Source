@@ -310,6 +310,7 @@ SOURCES += \
     Source/Controllers/ControllerSelectorWidget.cpp \
     Source/Controllers/ControllerSession.cpp \
     Source/Controllers/ControllerDescriptor.cpp \
+    Source/Controllers/GlobalQtKeyMap.cpp \
     Source/Controllers/NullController.cpp \
     Source/Controllers/SerialPABotBase/SerialPABotBase.cpp \
     Source/Controllers/SerialPABotBase/SerialPABotBase_Handle.cpp \
@@ -1426,6 +1427,8 @@ HEADERS += \
     Source/Controllers/ControllerSelectorWidget.h \
     Source/Controllers/ControllerSession.h \
     Source/Controllers/ControllerDescriptor.h \
+    Source/Controllers/GlobalQtKeyMap.h \
+    Source/Controllers/KeyboardStateTracker.h \
     Source/Controllers/NullController.h \
     Source/Controllers/SerialPABotBase/SerialPABotBase.h \
     Source/Controllers/SerialPABotBase/SerialPABotBase_Handle.h \

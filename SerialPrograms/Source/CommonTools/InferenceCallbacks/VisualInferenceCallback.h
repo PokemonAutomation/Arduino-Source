@@ -7,9 +7,7 @@
 #ifndef PokemonAutomation_CommonTools_VisualInferenceCallback_H
 #define PokemonAutomation_CommonTools_VisualInferenceCallback_H
 
-#include <memory>
 #include <string>
-#include "Common/Compiler.h"
 #include "Common/Cpp/Time.h"
 #include "InferenceCallback.h"
 

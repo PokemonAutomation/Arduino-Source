@@ -4,14 +4,15 @@
  *
  */
 
-#include <deque>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PanicDump.h"
+#include "Common/Microcontroller/MessageProtocol.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/Options/Environment/PerformanceOptions.h"
+#include "Controllers/GlobalQtKeyMap.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Messages_PushButtons.h"
+#include "NintendoSwitch_VirtualControllerMapping.h"
 #include "NintendoSwitch_VirtualController.h"
 
 //#include <iostream>
@@ -22,70 +23,6 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 using namespace std::chrono_literals;
-
-
-void KeyboardDebouncer::clear(){
-    WriteSpinLock lg(m_lock);
-    m_last = VirtualControllerState();
-    m_history.clear();
-}
-
-void KeyboardDebouncer::add_event(bool press, VirtualControllerState state){
-    WallClock now = current_time();
-    WriteSpinLock lg(m_lock);
-    while (!m_history.empty()){
-        if (m_history.front().timestamp + std::chrono::seconds(1) < now){
-            m_history.pop_front();
-        }else{
-            break;
-        }
-    }
-    m_history.emplace_back(Entry{now, press, state});
-//    cout << "add event" << endl;
-}
-WallClock KeyboardDebouncer::get_current_state(VirtualControllerState& state){
-    WallClock now = current_time();
-
-    const std::chrono::milliseconds RELEASE_DELAY(10);
-
-    WriteSpinLock lg(m_lock);
-
-    if (m_history.empty()){
-//        cout << "empty" << endl;
-        state = m_last;
-        return WallClock::max();
-    }
-
-    auto iter = m_history.end();
-
-    //  Iterate the history backwards until we find an event that can be used.
-    //  Everything can be used except for key releases that are too new in
-    //  order to debounce them.
-    while (true){
-        if (iter == m_history.begin()){
-            break;
-        }
-        --iter;
-
-        const Entry& entry = *iter;
-
-        //  Key release that isn't old enough.
-        if (entry.press || entry.timestamp + RELEASE_DELAY <= now){
-            m_last = entry.state;
-            ++iter;
-            break;
-        }
-    }
-
-    //  Clear the history that we don't need anymore.
-    m_history.erase(m_history.begin(), iter);
-//    cout << "remove event: " << m_history.size() << endl;
-
-    state = m_last;
-    return m_history.empty()
-        ? WallClock::max()
-        : m_history.begin()->timestamp + RELEASE_DELAY;
-}
 
 
 
@@ -112,54 +49,34 @@ VirtualController::~VirtualController(){
     m_thread.join();
 }
 void VirtualController::clear_state(){
-//    cout << "clear_state" << endl;
-    m_controller_state = VirtualControllerState();
-    m_pressed_buttons.clear();
-    m_history.clear();
+    {
+        WriteSpinLock lg(m_state_lock);
+        m_state_tracker.clear();
+    }
 
     std::lock_guard<std::mutex> lg(m_sleep_lock);
     m_cv.notify_all();
 }
 
-bool VirtualController::on_key_press(Qt::Key key){
-//    cout << "press: " << key << endl;
-
-    const ControllerButton* button = button_lookup(key);
-    if (button == nullptr){
-        return false;
+bool VirtualController::on_key_press(const QKeyEvent& key){
+//    cout << "press: " << key.key() << ", native = " << key.nativeVirtualKey() << endl;
+    QtKeyMap::instance().record(key);
+    {
+        WriteSpinLock lg(m_state_lock);
+        m_state_tracker.press(key.nativeVirtualKey());
     }
-
-    //  Suppress if key is already pressed.
-    auto iter = m_pressed_buttons.find(button);
-    if (iter != m_pressed_buttons.end()){
-        return true;
-    }
-    button->press(m_controller_state);
-
-    m_pressed_buttons.insert(button);
-    m_history.add_event(true, m_controller_state);
 
     std::lock_guard<std::mutex> lg(m_sleep_lock);
     m_cv.notify_all();
     return true;
 }
-bool VirtualController::on_key_release(Qt::Key key){
-//    cout << "release" << endl;
-
-    const ControllerButton* button = button_lookup(key);
-    if (button == nullptr){
-        return false;
+bool VirtualController::on_key_release(const QKeyEvent& key){
+//    cout << "release: " << key.key() << ", native = " << key.nativeVirtualKey() << endl;
+    QtKeyMap::instance().record(key);
+    {
+        WriteSpinLock lg(m_state_lock);
+        m_state_tracker.release(key.nativeVirtualKey());
     }
-
-    //  Suppress if key is not pressed.
-    auto iter = m_pressed_buttons.find(button);
-    if (iter == m_pressed_buttons.end()){
-        return true;
-    }
-    button->release(m_controller_state);
-
-    m_pressed_buttons.erase(button);
-    m_history.add_event(false, m_controller_state);
 
     std::lock_guard<std::mutex> lg(m_sleep_lock);
     m_cv.notify_all();
@@ -205,9 +122,43 @@ void VirtualController::thread_loop(){
             continue;
         }
 
+        //  Get the raw keyboard state.
+        std::set<uint32_t> pressed_native_keys;
+        WallClock next_wake;
+        {
+            ReadSpinLock lg(m_state_lock);
+            pressed_native_keys = m_state_tracker.get_currently_pressed();
+            next_wake = m_state_tracker.next_state_change();
+        }
+
+#if 0
+        //  REMOVE
+        std::string str = "state: ";
+        for (uint32_t native_key : pressed_native_keys){
+            str += std::to_string(native_key);
+            str += " ";
+        }
+        cout << str << endl;    //  REMOVE
+#endif
+
+        //  Convert the raw keyboard state to controller state.
         VirtualControllerState current;
-        WallClock next_wake = m_history.get_current_state(current);
-//        current.print();
+        {
+            const QtKeyMap& qkey_map = QtKeyMap::instance();
+            for (uint32_t native_key : pressed_native_keys){
+                const std::set<Qt::Key>& qkeys = qkey_map.get_QtKeys(native_key);
+                for (Qt::Key qkey : qkeys){
+                    const ControllerButton* button = button_lookup(qkey);
+                    if (button != nullptr){
+                        button->press(current);
+                    }
+                }
+            }
+        }
+        ControllerState state;
+        bool neutral = current.to_state(state);
+//        cout << "neutral = " << neutral << endl;
+
 
         //  Send the command.
         WallClock now;
@@ -220,10 +171,6 @@ void VirtualController::thread_loop(){
                     break;
                 }
 
-                //  Convert the state.
-                ControllerState state;
-                bool neutral = current.to_state(state);
-//                cout << "neutral = " << neutral << endl;
 
                 //  If state is neutral, just issue a stop.
                 if (neutral){

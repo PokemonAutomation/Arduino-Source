@@ -9,6 +9,7 @@
 
 #include <vector>
 #include <set>
+#include "Common/Compiler.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"

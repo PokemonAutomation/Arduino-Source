@@ -147,13 +147,13 @@ CommandRow::CommandRow(
     m_controller.add_listener(*this);
 }
 
-bool CommandRow::on_key_press(Qt::Key key){
+bool CommandRow::on_key_press(const QKeyEvent& key){
     if (m_last_known_focus){
         return VirtualController::on_key_press(key);
     }
     return false;
 }
-bool CommandRow::on_key_release(Qt::Key key){
+bool CommandRow::on_key_release(const QKeyEvent& key){
     if (m_last_known_focus){
         return VirtualController::on_key_release(key);
     }

@@ -609,6 +609,9 @@ file(GLOB MAIN_SOURCES
     Source/Controllers/ControllerSession.h
     Source/Controllers/ControllerSelectorWidget.cpp
     Source/Controllers/ControllerSelectorWidget.h
+    Source/Controllers/GlobalQtKeyMap.cpp
+    Source/Controllers/GlobalQtKeyMap.h
+    Source/Controllers/KeyboardStateTracker.h
     Source/Controllers/NullController.cpp
     Source/Controllers/NullController.h
     Source/Controllers/SuperscalarScheduler.cpp
