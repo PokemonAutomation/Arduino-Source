@@ -1306,6 +1306,14 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Resources/PokemonLA_PokemonSprites.h
     Source/PokemonLA/Resources/PokemonLA_WeatherAndTimeIcons.cpp
     Source/PokemonLA/Resources/PokemonLA_WeatherAndTimeIcons.h
+    Source/PokemonRSE/Inference/Dialogs/PokemonRSE_DialogDetector.cpp
+    Source/PokemonRSE/Inference/Dialogs/PokemonRSE_DialogDetector.h
+    Source/PokemonRSE/Inference/Sounds/PokemonRSE_ShinySoundDetector.cpp
+    Source/PokemonRSE/Inference/Sounds/PokemonRSE_ShinySoundDetector.h
+    Source/PokemonRSE/Inference/PokemonRSE_ShinyNumberDetector.cpp
+    Source/PokemonRSE/Inference/PokemonRSE_ShinyNumberDetector.h
+    Source/PokemonRSE/Programs/TestPrograms/PokemonRSE_SoundListener.cpp
+    Source/PokemonRSE/Programs/TestPrograms/PokemonRSE_SoundListener.h
     Source/PokemonRSE/PokemonRSE_Panels.cpp
     Source/PokemonRSE/PokemonRSE_Panels.h
     Source/PokemonRSE/PokemonRSE_Settings.cpp
