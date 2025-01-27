@@ -172,6 +172,7 @@ struct Pokemon{
     std::string ball_slug = "";
     StatsHuntGenderFilter gender = StatsHuntGenderFilter::Genderless;
     uint32_t ot_id = 0;
+    uint32_t level = 0;
 };
 
 bool operator==(const Pokemon& lhs, const Pokemon& rhs){
@@ -242,6 +243,7 @@ std::ostream& operator<<(std::ostream& os, const std::optional<Pokemon>& pokemon
         os << "ball_slug:" << pokemon->ball_slug << " ";
         os << "gender:" << gender_to_string(pokemon->gender) << " ";
         os << "ot_id:" << pokemon->ot_id << " ";
+        os << "level:" << pokemon->level << " ";
         os << ")";
     }else{
         os << "(empty)";
@@ -384,6 +386,7 @@ void output_boxes_data_json(const std::vector<std::optional<Pokemon>>& boxes_dat
             pokemon["ball_slug"] = current_pokemon->ball_slug;
             pokemon["gender"] = gender_to_string(current_pokemon->gender);
             pokemon["ot_id"] = current_pokemon->ot_id;
+            pokemon["level"] = current_pokemon->level;
         }
         pokemon_data.push_back(std::move(pokemon));
     }
@@ -642,9 +645,15 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, SwitchControllerCo
                         }
                         boxes_data[get_index(box_nb, row, column)]->ot_id = ot_id;
 
-                        // NOTE edit when adding new struct members (detections go here likely)
-
                         // level_box
+                        int level = OCR::read_number_waterfill(env.console, extract_box_reference(screen, level_box), 0xff000000, 0xff7f7f7f);
+                        if (level < 0 || level > 100) {
+                            dump_image(env.console, ProgramInfo(), "ReadSummary_Level", screen);
+                        }
+                        boxes_data[get_index(box_nb, row, column)]->level = (uint16_t)level;
+                        env.console.log("Level: " + std::to_string(level), COLOR_GREEN);
+
+                        // NOTE edit when adding new struct members (detections go here likely)
                         // ot_box
                         // nature_box
                         // ability_box
