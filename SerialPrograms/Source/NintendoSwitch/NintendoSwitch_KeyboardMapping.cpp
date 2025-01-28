@@ -113,8 +113,8 @@ KeyboardMappingTable::KeyboardMappingTable()
         "Advanced users are free to edit the rest of the table. You can create "
         "new mappings or mappings that result in multiple buttons. "
         "For example, there is a special mapping for pressing A + R "
-        "simultaneously that is useful for CFW who are remotely controlling the "
-        "program over Team Viewer.",
+        "simultaneously that is useful for CFW users who are remotely "
+        "controlling the program over Team Viewer.",
         LockMode::UNLOCK_WHILE_RUNNING,
         true,
         make_defaults()
