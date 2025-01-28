@@ -15,6 +15,7 @@
 #include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 #include "NintendoSwitch_SingleSwitchProgramOption.h"
 #include "NintendoSwitch_SingleSwitchProgramSession.h"
+#include "Pokemon/Pokemon_Strings.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -61,7 +62,10 @@ void SingleSwitchProgramSession::run_program_instance(SingleSwitchProgramEnviron
     //  Startup Checks
     m_option.instance().start_program_controller_check(scope, m_system.controller_session());
     m_option.instance().start_program_feedback_check(scope, env.console, m_option.descriptor().feedback());
-    m_option.instance().start_program_border_check(scope, env.console);
+    if (m_option.descriptor().category() != Pokemon::STRING_POKEMON + " RSE"
+        && m_option.descriptor().category() != Pokemon::STRING_POKEMON + " FRLG"){
+        m_option.instance().start_program_border_check(scope, env.console);
+    }
 
     m_scope.store(&scope, std::memory_order_release);
 
