@@ -43,18 +43,6 @@ StringCell::StringCell(
     : ConfigOption(lock_while_program_is_running)
     , m_data(CONSTRUCT_TOKEN, is_password, std::move(default_value), std::move(placeholder_text))
 {}
-#if 0
-std::unique_ptr<ConfigOption> StringCell::clone() const{
-    std::unique_ptr<StringCell> ret(new StringCell(
-        m_is_password,
-        m_label,
-        m_default,
-        m_placeholder_text
-    ));
-    ret->m_current = m_current;
-    return ret;
-}
-#endif
 
 bool StringCell::is_password() const{
     return m_data->m_is_password;
