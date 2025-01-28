@@ -20,24 +20,30 @@ struct ControllerState{
     uint8_t left_y = 128;
     uint8_t right_x = 128;
     uint8_t right_y = 128;
+
+    bool operator==(const ControllerState& x) const;
+    bool operator!=(const ControllerState& x) const;
 };
 
 
-struct VirtualControllerState{
+struct ControllerDeltas{
     Button buttons = 0;
     int dpad_x = 0;
     int dpad_y = 0;
-    int left_joystick_x = 0;
-    int left_joystick_y = 0;
-    int right_joystick_x = 0;
-    int right_joystick_y = 0;
+    int left_x = 0;
+    int left_y = 0;
+    int right_x = 0;
+    int right_y = 0;
 
-    void print() const;
-    bool operator==(const VirtualControllerState& x) const;
-    bool operator!=(const VirtualControllerState& x) const;
+    void operator+=(const ControllerDeltas& x);
+
+    //  Returns true if neutral.
     bool to_state(ControllerState& state) const;
-
 };
+
+
+
+
 
 
 

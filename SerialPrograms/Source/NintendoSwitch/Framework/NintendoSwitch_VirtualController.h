@@ -13,6 +13,7 @@
 #include "CommonFramework/Globals.h"
 #include "Controllers/ControllerSession.h"
 #include "Controllers/KeyboardStateTracker.h"
+#include "NintendoSwitch_VirtualControllerState.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -53,6 +54,8 @@ private:
     Logger& m_logger;
     ControllerSession& m_session;
     const bool m_allow_commands_while_running;
+
+    std::map<Qt::Key, ControllerDeltas> m_mapping;
 
     //  Controller State
     SpinLock m_state_lock;

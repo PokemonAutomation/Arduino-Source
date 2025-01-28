@@ -18,6 +18,10 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
+//extern std::map<Qt::Key, ControllerDeltas> DELTAS_MAP;
+
+
+#if 0
 struct ControllerButton{
     virtual void press(VirtualControllerState& state) const = 0;
     virtual void release(VirtualControllerState& state) const = 0;
@@ -30,7 +34,7 @@ const ControllerButton* button_lookup(Qt::Key key);
 
 JsonArray read_keyboard_mapping();
 void set_keyboard_mapping(const JsonArray& json);
-
+#endif
 
 
 }

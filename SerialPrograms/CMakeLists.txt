@@ -138,6 +138,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/Options/GroupOption.h
     ../Common/Cpp/Options/IntegerRangeOption.cpp
     ../Common/Cpp/Options/IntegerRangeOption.h
+    ../Common/Cpp/Options/KeyBindingOption.cpp
+    ../Common/Cpp/Options/KeyBindingOption.h
     ../Common/Cpp/Options/RandomCodeOption.cpp
     ../Common/Cpp/Options/RandomCodeOption.h
     ../Common/Cpp/Options/SimpleIntegerOption.cpp
@@ -214,6 +216,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Qt/Options/GroupWidget.h
     ../Common/Qt/Options/IntegerRangeWidget.cpp
     ../Common/Qt/Options/IntegerRangeWidget.h
+    ../Common/Qt/Options/KeyBindingWidget.cpp
+    ../Common/Qt/Options/KeyBindingWidget.h
     ../Common/Qt/Options/RandomCodeWidget.cpp
     ../Common/Qt/Options/RandomCodeWidget.h
     ../Common/Qt/Options/SimpleIntegerWidget.cpp
@@ -832,8 +836,6 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Framework/NintendoSwitch_SwitchSystemSession.h
     Source/NintendoSwitch/Framework/NintendoSwitch_VirtualController.cpp
     Source/NintendoSwitch/Framework/NintendoSwitch_VirtualController.h
-    Source/NintendoSwitch/Framework/NintendoSwitch_VirtualControllerMapping.cpp
-    Source/NintendoSwitch/Framework/NintendoSwitch_VirtualControllerMapping.h
     Source/NintendoSwitch/Framework/NintendoSwitch_VirtualControllerState.cpp
     Source/NintendoSwitch/Framework/NintendoSwitch_VirtualControllerState.h
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_CommandRow.cpp
@@ -852,6 +854,8 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Inference/NintendoSwitch_DetectHome.h
     Source/NintendoSwitch/NintendoSwitch_ConsoleHandle.cpp
     Source/NintendoSwitch/NintendoSwitch_ConsoleHandle.h
+    Source/NintendoSwitch/NintendoSwitch_KeyboardMapping.cpp
+    Source/NintendoSwitch/NintendoSwitch_KeyboardMapping.h
     Source/NintendoSwitch/NintendoSwitch_MultiSwitchProgram.cpp
     Source/NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h
     Source/NintendoSwitch/NintendoSwitch_Panels.cpp

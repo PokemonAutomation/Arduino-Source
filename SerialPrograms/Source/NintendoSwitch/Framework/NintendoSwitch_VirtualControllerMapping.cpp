@@ -20,6 +20,107 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
+#if 0
+const ControllerDeltas DELTA_BUTTON_Y       {.buttons = BUTTON_Y};
+const ControllerDeltas DELTA_BUTTON_B       {.buttons = BUTTON_B};
+const ControllerDeltas DELTA_BUTTON_A       {.buttons = BUTTON_A};
+const ControllerDeltas DELTA_BUTTON_X       {.buttons = BUTTON_X};
+const ControllerDeltas DELTA_BUTTON_L       {.buttons = BUTTON_L};
+const ControllerDeltas DELTA_BUTTON_R       {.buttons = BUTTON_R};
+const ControllerDeltas DELTA_BUTTON_ZL      {.buttons = BUTTON_ZL};
+const ControllerDeltas DELTA_BUTTON_ZR      {.buttons = BUTTON_ZR};
+const ControllerDeltas DELTA_BUTTON_MINUS   {.buttons = BUTTON_MINUS};
+const ControllerDeltas DELTA_BUTTON_PLUS    {.buttons = BUTTON_PLUS};
+const ControllerDeltas DELTA_BUTTON_LCLICK  {.buttons = BUTTON_LCLICK};
+const ControllerDeltas DELTA_BUTTON_RCLICK  {.buttons = BUTTON_RCLICK};
+const ControllerDeltas DELTA_BUTTON_HOME    {.buttons = BUTTON_HOME};
+const ControllerDeltas DELTA_BUTTON_CAPTURE {.buttons = BUTTON_CAPTURE};
+const ControllerDeltas DELTA_BUTTON_AR      {.buttons = BUTTON_A | BUTTON_R};
+
+const ControllerDeltas DELTA_DPAD_UP        {.dpad_x =  0, .dpad_y = -1};
+const ControllerDeltas DELTA_DPAD_UPRIGHT   {.dpad_x = +1, .dpad_y = -1};
+const ControllerDeltas DELTA_DPAD_RIGHT     {.dpad_x = +1, .dpad_y =  0};
+const ControllerDeltas DELTA_DPAD_DOWNRIGHT {.dpad_x = +1, .dpad_y = +1};
+const ControllerDeltas DELTA_DPAD_DOWN      {.dpad_x =  0, .dpad_y = +1};
+const ControllerDeltas DELTA_DPAD_DOWNLEFT  {.dpad_x = -1, .dpad_y = +1};
+const ControllerDeltas DELTA_DPAD_LEFT      {.dpad_x = -1, .dpad_y =  0};
+const ControllerDeltas DELTA_DPAD_UPLEFT    {.dpad_x = -1, .dpad_y = -1};
+
+const ControllerDeltas DELTA_LEFT_UP        {.left_x =  0, .left_y = -1};
+const ControllerDeltas DELTA_LEFT_RIGHT     {.left_x = +1, .left_y =  0};
+const ControllerDeltas DELTA_LEFT_DOWN      {.left_x =  0, .left_y = +1};
+const ControllerDeltas DELTA_LEFT_LEFT      {.left_x = -1, .left_y =  0};
+
+const ControllerDeltas DELTA_RIGHT_UP       {.right_x =  0, .right_y = -1};
+const ControllerDeltas DELTA_RIGHT_RIGHT    {.right_x = +1, .right_y =  0};
+const ControllerDeltas DELTA_RIGHT_DOWN     {.right_x =  0, .right_y = +1};
+const ControllerDeltas DELTA_RIGHT_LEFT     {.right_x = -1, .right_y =  0};
+
+std::map<Qt::Key, ControllerDeltas> DELTAS_MAP{
+    {Qt::Key::Key_8,            DELTA_DPAD_UP},
+    {Qt::Key::Key_9,            DELTA_DPAD_UPRIGHT},
+    {Qt::Key::Key_6,            DELTA_DPAD_RIGHT},
+    {Qt::Key::Key_3,            DELTA_DPAD_DOWNRIGHT},
+    {Qt::Key::Key_2,            DELTA_DPAD_DOWN},
+    {Qt::Key::Key_1,            DELTA_DPAD_DOWNLEFT},
+    {Qt::Key::Key_4,            DELTA_DPAD_LEFT},
+    {Qt::Key::Key_7,            DELTA_DPAD_UPLEFT},
+
+    {Qt::Key::Key_W,            DELTA_LEFT_UP},
+    {Qt::Key::Key_D,            DELTA_LEFT_RIGHT},
+    {Qt::Key::Key_S,            DELTA_LEFT_DOWN},
+    {Qt::Key::Key_A,            DELTA_LEFT_LEFT},
+
+    {Qt::Key::Key_Up,           DELTA_RIGHT_UP},
+    {Qt::Key::Key_Right,        DELTA_RIGHT_RIGHT},
+    {Qt::Key::Key_Down,         DELTA_RIGHT_DOWN},
+    {Qt::Key::Key_Left,         DELTA_RIGHT_LEFT},
+
+    {Qt::Key::Key_Slash,        DELTA_BUTTON_Y},
+    {Qt::Key::Key_Question,     DELTA_BUTTON_Y},
+    {Qt::Key::Key_Shift,        DELTA_BUTTON_B},
+    {Qt::Key::Key_Control,      DELTA_BUTTON_B},
+    {Qt::Key::Key_Enter,        DELTA_BUTTON_A},
+    {Qt::Key::Key_Return,       DELTA_BUTTON_A},
+    {Qt::Key::Key_Apostrophe,   DELTA_BUTTON_X},
+    {Qt::Key::Key_QuoteDbl,     DELTA_BUTTON_X},
+
+    {Qt::Key::Key_Q,            DELTA_BUTTON_L},
+    {Qt::Key::Key_E,            DELTA_BUTTON_R},
+    {Qt::Key::Key_R,            DELTA_BUTTON_ZL},
+    {Qt::Key::Key_Backslash,    DELTA_BUTTON_ZR},
+    {Qt::Key::Key_Bar,          DELTA_BUTTON_ZR},
+
+    {Qt::Key::Key_Minus,        DELTA_BUTTON_MINUS},
+    {Qt::Key::Key_Underscore,   DELTA_BUTTON_MINUS},
+    {Qt::Key::Key_Plus,         DELTA_BUTTON_PLUS},
+    {Qt::Key::Key_Equal,        DELTA_BUTTON_PLUS},
+
+    {Qt::Key::Key_C,            DELTA_BUTTON_LCLICK},
+    {Qt::Key::Key_0,            DELTA_BUTTON_RCLICK},
+
+    {Qt::Key::Key_Home,         DELTA_BUTTON_HOME},
+    {Qt::Key::Key_Escape,       DELTA_BUTTON_HOME},
+    {Qt::Key::Key_H,            DELTA_BUTTON_HOME},
+
+    {Qt::Key::Key_Insert,       DELTA_BUTTON_CAPTURE},
+
+    {Qt::Key::Key_Y,            DELTA_BUTTON_AR},
+};
+#endif
+
+
+
+
+
+
+
+
+
+
+
+#if 0
+
 struct ControllerButton_Dpad : public ControllerButton{
     int delta_x;
     int delta_y;
@@ -299,7 +400,7 @@ void set_keyboard_mapping(const JsonArray& json){
     set_keyboard_mapping(std::move(mapping));
 }
 
-
+#endif
 
 
 

@@ -63,6 +63,7 @@ ConsoleSettings::ConsoleSettings()
         LockMode::LOCK_WHILE_RUNNING,
         false
     )
+    , KEYBOARD_SECTION("<font size=4><b>Keyboard to Controller Mappings:</b></font>")
 {
     PA_ADD_OPTION(CONNECT_CONTROLLER_DELAY);
     PA_ADD_OPTION(SETTINGS_TO_HOME_DELAY);
@@ -70,6 +71,8 @@ ConsoleSettings::ConsoleSettings()
     PA_ADD_OPTION(START_GAME_INTERNET_CHECK_DELAY);
     PA_ADD_OPTION(TOLERATE_SYSTEM_UPDATE_MENU_FAST);
     PA_ADD_OPTION(TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
+    PA_ADD_STATIC(KEYBOARD_SECTION);
+    PA_ADD_OPTION(KEYBOARD_MAPPINGS);
 }
 
 

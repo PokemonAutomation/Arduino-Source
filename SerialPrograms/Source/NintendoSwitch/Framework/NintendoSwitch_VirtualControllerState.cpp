@@ -14,58 +14,42 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-void VirtualControllerState::print() const{
-    cout << "dpad = (" << dpad_x << "," << dpad_y
-         << "), left = (" << left_joystick_x << "," << left_joystick_y
-         << "), right = (" << right_joystick_x << "," << right_joystick_y
-         << "), buttons = (";
-    if (buttons & BUTTON_Y) cout << " Y";
-    if (buttons & BUTTON_B) cout << " B";
-    if (buttons & BUTTON_A) cout << " A";
-    if (buttons & BUTTON_X) cout << " X";
-    if (buttons & BUTTON_L) cout << " L";
-    if (buttons & BUTTON_R) cout << " R";
-    if (buttons & BUTTON_ZL) cout << " ZL";
-    if (buttons & BUTTON_ZR) cout << " ZR";
-    if (buttons & BUTTON_PLUS) cout << " +";
-    if (buttons & BUTTON_MINUS) cout << " -";
-    if (buttons & BUTTON_LCLICK) cout << " LC";
-    if (buttons & BUTTON_RCLICK) cout << " RC";
-    if (buttons & BUTTON_HOME) cout << " Home";
-    if (buttons & BUTTON_CAPTURE) cout << " Screen";
-    cout << ")" << endl;
-}
 
-bool VirtualControllerState::operator==(const VirtualControllerState& x) const{
+bool ControllerState::operator==(const ControllerState& x) const{
     if (buttons != x.buttons){
         return false;
     }
-    if (dpad_x != x.dpad_x){
+    if (dpad != x.dpad){
         return false;
     }
-    if (dpad_y != x.dpad_y){
+    if (left_x != x.left_x){
         return false;
     }
-    if (left_joystick_x != x.left_joystick_x){
+    if (left_y != x.left_y){
         return false;
     }
-    if (left_joystick_y != x.left_joystick_y){
+    if (right_x != x.right_x){
         return false;
     }
-    if (right_joystick_x != x.right_joystick_x){
-        return false;
-    }
-    if (right_joystick_y != x.right_joystick_y){
+    if (right_y != x.right_y){
         return false;
     }
     return true;
 }
-bool VirtualControllerState::operator!=(const VirtualControllerState& x) const{
+bool ControllerState::operator!=(const ControllerState& x) const{
     return !(*this == x);
 }
 
-
-bool VirtualControllerState::to_state(ControllerState& state) const{
+void ControllerDeltas::operator+=(const ControllerDeltas& x){
+    buttons |= x.buttons;
+    dpad_x += x.dpad_x;
+    dpad_y += x.dpad_y;
+    left_x += x.left_x;
+    left_y += x.left_y;
+    right_x += x.right_x;
+    right_y += x.right_y;
+}
+bool ControllerDeltas::to_state(ControllerState& state) const{
     bool neutral;
 
     state.buttons = buttons;
@@ -104,28 +88,34 @@ bool VirtualControllerState::to_state(ControllerState& state) const{
 
     state.left_x = 128;
     state.left_y = 128;
-    if (left_joystick_x != 0 || left_joystick_y != 0){
+    if (left_x != 0 || left_y != 0){
         neutral = false;
-        int mag = std::abs(left_joystick_x) > std::abs(left_joystick_y)
-            ? std::abs(left_joystick_x)
-            : std::abs(left_joystick_y);
-        state.left_x = (uint8_t)std::min(128 * left_joystick_x / mag + 128, 255);
-        state.left_y = (uint8_t)std::min(128 * left_joystick_y / mag + 128, 255);
+        int mag = std::abs(left_x) > std::abs(left_y)
+            ? std::abs(left_x)
+            : std::abs(left_y);
+        state.left_x = (uint8_t)std::min(128 * left_x / mag + 128, 255);
+        state.left_y = (uint8_t)std::min(128 * left_y / mag + 128, 255);
     }
 
     state.right_x = 128;
     state.right_y = 128;
-    if (right_joystick_x != 0 || right_joystick_y != 0){
+    if (right_x != 0 || right_y != 0){
         neutral = false;
-        int mag = std::abs(right_joystick_x) > std::abs(right_joystick_y)
-            ? std::abs(right_joystick_x)
-            : std::abs(right_joystick_y);
-        state.right_x = (uint8_t)std::min(128 * right_joystick_x / mag + 128, 255);
-        state.right_y = (uint8_t)std::min(128 * right_joystick_y / mag + 128, 255);
+        int mag = std::abs(right_x) > std::abs(right_y)
+            ? std::abs(right_x)
+            : std::abs(right_y);
+        state.right_x = (uint8_t)std::min(128 * right_x / mag + 128, 255);
+        state.right_y = (uint8_t)std::min(128 * right_y / mag + 128, 255);
     }
 
     return neutral;
 }
+
+
+
+
+
+
 
 
 

@@ -12,7 +12,6 @@
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Options/Environment/PerformanceOptions.h"
-#include "NintendoSwitch/Framework/NintendoSwitch_VirtualControllerMapping.h"
 #include "PersistentSettings.h"
 
 // #include <iostream>
@@ -37,7 +36,7 @@ void PersistentSettings::write() const{
     JsonObject root;
 
     root["20-GlobalSettings"] = GlobalSettings::instance().to_json();
-    root["50-SwitchKeyboardMapping"] = NintendoSwitch::read_keyboard_mapping();
+//    root["50-SwitchKeyboardMapping"] = NintendoSwitch::read_keyboard_mapping();
 
     root["99-Panels"] = panels.clone();
 
@@ -67,12 +66,14 @@ void PersistentSettings::read(){
 //    GlobalSettings::instance().PROCESS_PRIORITY0.update_priority_to_option();
     GlobalSettings::instance().PERFORMANCE->REALTIME_THREAD_PRIORITY.set_on_this_thread();
 
+#if 0
     {
         const JsonArray* array = obj->get_array("50-SwitchKeyboardMapping");
         if (array){
             NintendoSwitch::set_keyboard_mapping(*array);
         }
     }
+#endif
     {
         JsonObject* value = obj->get_object("99-Panels");
         if (value){

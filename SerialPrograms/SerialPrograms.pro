@@ -110,6 +110,7 @@ SOURCES += \
     ../Common/Cpp/Options/FloatingPointOption.cpp \
     ../Common/Cpp/Options/GroupOption.cpp \
     ../Common/Cpp/Options/IntegerRangeOption.cpp \
+    ../Common/Cpp/Options/KeyBindingOption.cpp \
     ../Common/Cpp/Options/RandomCodeOption.cpp \
     ../Common/Cpp/Options/SimpleIntegerOption.cpp \
     ../Common/Cpp/Options/StaticTableOption.cpp \
@@ -141,6 +142,7 @@ SOURCES += \
     ../Common/Qt/Options/FloatingPointWidget.cpp \
     ../Common/Qt/Options/GroupWidget.cpp \
     ../Common/Qt/Options/IntegerRangeWidget.cpp \
+    ../Common/Qt/Options/KeyBindingWidget.cpp \
     ../Common/Qt/Options/RandomCodeWidget.cpp \
     ../Common/Qt/Options/SimpleIntegerWidget.cpp \
     ../Common/Qt/Options/StaticTableWidget.cpp \
@@ -413,7 +415,6 @@ SOURCES += \
     Source/NintendoSwitch/Framework/NintendoSwitch_SwitchSystemOption.cpp \
     Source/NintendoSwitch/Framework/NintendoSwitch_SwitchSystemSession.cpp \
     Source/NintendoSwitch/Framework/NintendoSwitch_VirtualController.cpp \
-    Source/NintendoSwitch/Framework/NintendoSwitch_VirtualControllerMapping.cpp \
     Source/NintendoSwitch/Framework/NintendoSwitch_VirtualControllerState.cpp \
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_CommandRow.cpp \
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_MultiSwitchProgramWidget.cpp \
@@ -423,6 +424,7 @@ SOURCES += \
     Source/NintendoSwitch/Inference/NintendoSwitch_DateReader.cpp \
     Source/NintendoSwitch/Inference/NintendoSwitch_DetectHome.cpp \
     Source/NintendoSwitch/NintendoSwitch_ConsoleHandle.cpp \
+    Source/NintendoSwitch/NintendoSwitch_KeyboardMapping.cpp \
     Source/NintendoSwitch/NintendoSwitch_MultiSwitchProgram.cpp \
     Source/NintendoSwitch/NintendoSwitch_Panels.cpp \
     Source/NintendoSwitch/NintendoSwitch_Settings.cpp \
@@ -646,6 +648,8 @@ SOURCES += \
     Source/PokemonLA/Resources/PokemonLA_NameDatabase.cpp \
     Source/PokemonLA/Resources/PokemonLA_PokemonSprites.cpp \
     Source/PokemonLA/Resources/PokemonLA_WeatherAndTimeIcons.cpp \
+    Source/PokemonRSE/PokemonRSE_Panels.cpp \
+    Source/PokemonRSE/PokemonRSE_Settings.cpp \
     Source/PokemonSV/Inference/Battles/PokemonSV_BattleBallReader.cpp \
     Source/PokemonSV/Inference/Battles/PokemonSV_EncounterWatcher.cpp \
     Source/PokemonSV/Inference/Battles/PokemonSV_NormalBattleMenus.cpp \
@@ -1166,6 +1170,7 @@ HEADERS += \
     ../Common/Cpp/Options/FloatingPointOption.h \
     ../Common/Cpp/Options/GroupOption.h \
     ../Common/Cpp/Options/IntegerRangeOption.h \
+    ../Common/Cpp/Options/KeyBindingOption.h \
     ../Common/Cpp/Options/RandomCodeOption.h \
     ../Common/Cpp/Options/SimpleIntegerOption.h \
     ../Common/Cpp/Options/StaticTableOption.h \
@@ -1210,6 +1215,7 @@ HEADERS += \
     ../Common/Qt/Options/FloatingPointWidget.h \
     ../Common/Qt/Options/GroupWidget.h \
     ../Common/Qt/Options/IntegerRangeWidget.h \
+    ../Common/Qt/Options/KeyBindingWidget.h \
     ../Common/Qt/Options/RandomCodeWidget.h \
     ../Common/Qt/Options/SimpleIntegerWidget.h \
     ../Common/Qt/Options/StaticTableWidget.h \
@@ -1547,7 +1553,6 @@ HEADERS += \
     Source/NintendoSwitch/Framework/NintendoSwitch_SwitchSystemOption.h \
     Source/NintendoSwitch/Framework/NintendoSwitch_SwitchSystemSession.h \
     Source/NintendoSwitch/Framework/NintendoSwitch_VirtualController.h \
-    Source/NintendoSwitch/Framework/NintendoSwitch_VirtualControllerMapping.h \
     Source/NintendoSwitch/Framework/NintendoSwitch_VirtualControllerState.h \
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_CommandRow.h \
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_MultiSwitchProgramWidget.h \
@@ -1556,6 +1561,7 @@ HEADERS += \
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_SwitchSystemWidget.h \
     Source/NintendoSwitch/Inference/NintendoSwitch_DateReader.h \
     Source/NintendoSwitch/Inference/NintendoSwitch_DetectHome.h \
+    Source/NintendoSwitch/NintendoSwitch_KeyboardMapping.h \
     Source/NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h \
     Source/NintendoSwitch/NintendoSwitch_Panels.h \
     Source/NintendoSwitch/NintendoSwitch_Settings.h \
@@ -1784,6 +1790,8 @@ HEADERS += \
     Source/PokemonLA/Resources/PokemonLA_NameDatabase.h \
     Source/PokemonLA/Resources/PokemonLA_PokemonSprites.h \
     Source/PokemonLA/Resources/PokemonLA_WeatherAndTimeIcons.h \
+    Source/PokemonRSE/PokemonRSE_Panels.h \
+    Source/PokemonRSE/PokemonRSE_Settings.h \
     Source/PokemonSV/Inference/Battles/PokemonSV_BattleBallReader.h \
     Source/PokemonSV/Inference/Battles/PokemonSV_EncounterWatcher.h \
     Source/PokemonSV/Inference/Battles/PokemonSV_NormalBattleMenus.h \

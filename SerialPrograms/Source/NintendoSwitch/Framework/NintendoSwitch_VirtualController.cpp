@@ -11,8 +11,8 @@
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/Options/Environment/PerformanceOptions.h"
 #include "Controllers/GlobalQtKeyMap.h"
+#include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
-#include "NintendoSwitch_VirtualControllerMapping.h"
 #include "NintendoSwitch_VirtualController.h"
 
 //#include <iostream>
@@ -38,8 +38,15 @@ VirtualController::VirtualController(
     , m_allow_commands_while_running(allow_commands_while_running)
     , m_last_known_state(ProgramState::STOPPED)
     , m_stop(false)
-    , m_thread(run_with_catch, "VirtualController::thread_loop()", [this]{ thread_loop(); })
-{}
+{
+    std::vector<std::shared_ptr<EditableTableRow>> mapping = ConsoleSettings::instance().KEYBOARD_MAPPINGS.current_refs();
+    for (const auto& deltas : mapping){
+        const KeyMapTableRow& row = static_cast<const KeyMapTableRow&>(*deltas);
+        m_mapping[(Qt::Key)(uint32_t)row.key] += row.snapshot();
+    }
+
+    m_thread = std::thread(run_with_catch, "VirtualController::thread_loop()", [this]{ thread_loop(); });
+}
 VirtualController::~VirtualController(){
     m_stop.store(true, std::memory_order_release);
     {
@@ -60,6 +67,10 @@ void VirtualController::clear_state(){
 
 bool VirtualController::on_key_press(const QKeyEvent& key){
 //    cout << "press: " << key.key() << ", native = " << key.nativeVirtualKey() << endl;
+
+//    QKeySequence seq((Qt::Key)key.key());
+//    cout << "button: " << seq.toString().toStdString() << endl;
+
     QtKeyMap::instance().record(key);
     {
         WriteSpinLock lg(m_state_lock);
@@ -101,7 +112,7 @@ bool VirtualController::try_next_interrupt(){
 void VirtualController::thread_loop(){
     GlobalSettings::instance().PERFORMANCE->REALTIME_THREAD_PRIORITY.set_on_this_thread();
 
-    VirtualControllerState last;
+    ControllerState last;
     bool last_neutral = true;
     WallClock last_press = current_time();
     while (true){
@@ -113,7 +124,7 @@ void VirtualController::thread_loop(){
         if (!m_allow_commands_while_running &&
             m_last_known_state.load(std::memory_order_acquire) != ProgramState::STOPPED
         ){
-            last = VirtualControllerState();
+            last = ControllerState();
             std::unique_lock<std::mutex> lg(m_sleep_lock);
             if (m_stop.load(std::memory_order_acquire)){
                 return;
@@ -131,33 +142,24 @@ void VirtualController::thread_loop(){
             next_wake = m_state_tracker.next_state_change();
         }
 
-#if 0
-        //  REMOVE
-        std::string str = "state: ";
-        for (uint32_t native_key : pressed_native_keys){
-            str += std::to_string(native_key);
-            str += " ";
-        }
-        cout << str << endl;    //  REMOVE
-#endif
-
         //  Convert the raw keyboard state to controller state.
-        VirtualControllerState current;
+        bool neutral;
+        ControllerState current;
         {
+            ControllerDeltas deltas;
             const QtKeyMap& qkey_map = QtKeyMap::instance();
             for (uint32_t native_key : pressed_native_keys){
                 const std::set<Qt::Key>& qkeys = qkey_map.get_QtKeys(native_key);
                 for (Qt::Key qkey : qkeys){
-                    const ControllerButton* button = button_lookup(qkey);
-                    if (button != nullptr){
-                        button->press(current);
+                    auto iter = m_mapping.find(qkey);
+                    if (iter != m_mapping.end()){
+                        deltas += iter->second;
+                        break;
                     }
                 }
             }
+            neutral = deltas.to_state(current);
         }
-        ControllerState state;
-        bool neutral = current.to_state(state);
-//        cout << "neutral = " << neutral << endl;
 
 
         //  Send the command.
@@ -175,7 +177,7 @@ void VirtualController::thread_loop(){
                 //  If state is neutral, just issue a stop.
                 if (neutral){
                     if (try_stop_commands()){
-                        last = VirtualControllerState();
+                        last = ControllerState();
                         last_neutral = true;
                         last_press = now;
                     }else{
@@ -193,22 +195,22 @@ void VirtualController::thread_loop(){
 
                 //  Send the command.
                 m_logger.log(
-                    "VirtualController: (" + button_to_string(state.buttons) +
-                    "), dpad(" + dpad_to_string(state.dpad) +
-                    "), LJ(" + std::to_string(state.left_x) + "," + std::to_string(state.left_y) +
-                    "), RJ(" + std::to_string(state.right_x) + "," + std::to_string(state.right_y) +
+                    "VirtualController: (" + button_to_string(current.buttons) +
+                    "), dpad(" + dpad_to_string(current.dpad) +
+                    "), LJ(" + std::to_string(current.left_x) + "," + std::to_string(current.left_y) +
+                    "), RJ(" + std::to_string(current.right_x) + "," + std::to_string(current.right_y) +
                     ")",
                     COLOR_DARKGREEN
                 );
                 std::string error = m_session.try_run<SwitchController>([=](SwitchController& controller){
                     controller.issue_controller_state(
                         nullptr,
-                        state.buttons,
-                        state.dpad,
-                        state.left_x,
-                        state.left_y,
-                        state.right_x,
-                        state.right_y,
+                        current.buttons,
+                        current.dpad,
+                        current.left_x,
+                        current.left_y,
+                        current.right_x,
+                        current.right_y,
                         255*8ms
                     );
                 });
