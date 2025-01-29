@@ -21,7 +21,7 @@ namespace PokemonRSE{
 
 
 PanelListFactory::PanelListFactory()
-    : PanelListDescriptor("Pokemon Ruby and Sapphire, Pokemon Emerald")
+    : PanelListDescriptor(Pokemon::STRING_POKEMON + " Ruby, Sapphire, and Emerald")
 {}
 
 std::vector<PanelEntry> PanelListFactory::make_panels() const{

@@ -648,8 +648,12 @@ SOURCES += \
     Source/PokemonLA/Resources/PokemonLA_NameDatabase.cpp \
     Source/PokemonLA/Resources/PokemonLA_PokemonSprites.cpp \
     Source/PokemonLA/Resources/PokemonLA_WeatherAndTimeIcons.cpp \
+    Source/PokemonRSE/Inference/Dialogs/PokemonRSE_DialogDetector.cpp \
+    Source/PokemonRSE/Inference/PokemonRSE_ShinyNumberDetector.cpp \
+    Source/PokemonRSE/Inference/Sounds/PokemonRSE_ShinySoundDetector.cpp \
     Source/PokemonRSE/PokemonRSE_Panels.cpp \
     Source/PokemonRSE/PokemonRSE_Settings.cpp \
+    Source/PokemonRSE/Programs/TestPrograms/PokemonRSE_SoundListener.cpp \
     Source/PokemonSV/Inference/Battles/PokemonSV_BattleBallReader.cpp \
     Source/PokemonSV/Inference/Battles/PokemonSV_EncounterWatcher.cpp \
     Source/PokemonSV/Inference/Battles/PokemonSV_NormalBattleMenus.cpp \
@@ -1790,8 +1794,12 @@ HEADERS += \
     Source/PokemonLA/Resources/PokemonLA_NameDatabase.h \
     Source/PokemonLA/Resources/PokemonLA_PokemonSprites.h \
     Source/PokemonLA/Resources/PokemonLA_WeatherAndTimeIcons.h \
+    Source/PokemonRSE/Inference/Dialogs/PokemonRSE_DialogDetector.h \
+    Source/PokemonRSE/Inference/PokemonRSE_ShinyNumberDetector.h \
+    Source/PokemonRSE/Inference/Sounds/PokemonRSE_ShinySoundDetector.h \
     Source/PokemonRSE/PokemonRSE_Panels.h \
     Source/PokemonRSE/PokemonRSE_Settings.h \
+    Source/PokemonRSE/Programs/TestPrograms/PokemonRSE_SoundListener.h \
     Source/PokemonSV/Inference/Battles/PokemonSV_BattleBallReader.h \
     Source/PokemonSV/Inference/Battles/PokemonSV_EncounterWatcher.h \
     Source/PokemonSV/Inference/Battles/PokemonSV_NormalBattleMenus.h \
