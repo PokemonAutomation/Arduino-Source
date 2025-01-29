@@ -22,6 +22,7 @@ public:
 
     virtual void update_value() override;
     virtual void value_changed(void* object) override;
+    virtual void visibility_changed() override;
 
 private:
     StringCell& m_value;
@@ -36,6 +37,7 @@ public:
 
     virtual void update_value() override;
     virtual void value_changed(void* object) override;
+    virtual void visibility_changed() override;
 
 private:
     StringOption& m_value;

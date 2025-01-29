@@ -17,6 +17,8 @@ struct StringCell::Data{
     const std::string m_default;
     const std::string m_placeholder_text;
 
+    std::atomic<bool> m_locked;
+
     mutable SpinLock m_lock;
     std::string m_current;
 
@@ -53,6 +55,19 @@ const std::string& StringCell::placeholder_text() const{
 const std::string StringCell::default_value() const{
     return m_data->m_default;
 }
+
+
+bool StringCell::is_locked() const{
+    return m_data->m_locked.load(std::memory_order_relaxed);
+}
+void StringCell::set_locked(bool locked){
+    if (locked == is_locked()){
+        return;
+    }
+    m_data->m_locked.store(locked, std::memory_order_relaxed);
+    report_visibility_changed();
+}
+
 
 StringCell::operator std::string() const{
     ReadSpinLock lg(m_data->m_lock);

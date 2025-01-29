@@ -10,6 +10,10 @@
 #include <map>
 #include <mutex>
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 
 

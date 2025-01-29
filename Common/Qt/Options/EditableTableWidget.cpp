@@ -41,12 +41,14 @@ EditableTableWidget::EditableTableWidget(QWidget& parent, EditableTableOption& v
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
 
-    QLabel* label = new QLabel(QString::fromStdString(value.label()), this);
-    label->setWordWrap(true);
-    label->setTextFormat(Qt::RichText);
-    label->setTextInteractionFlags(Qt::TextBrowserInteraction);
-    label->setOpenExternalLinks(true);
-    layout->addWidget(label);
+    if (!value.label().empty()){
+        QLabel* label = new QLabel(QString::fromStdString(value.label()), this);
+        label->setWordWrap(true);
+        label->setTextFormat(Qt::RichText);
+        label->setTextInteractionFlags(Qt::TextBrowserInteraction);
+        label->setOpenExternalLinks(true);
+        layout->addWidget(label);
+    }
 
     m_table = new AutoHeightTableWidget(this);
     layout->addWidget(m_table, 0, Qt::AlignTop);

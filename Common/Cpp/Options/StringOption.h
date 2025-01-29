@@ -27,6 +27,9 @@ public:
     const std::string& placeholder_text() const;
     const std::string default_value() const;
 
+    bool is_locked() const;
+    void set_locked(bool locked);
+
     operator std::string() const;
     void set(std::string x);
 

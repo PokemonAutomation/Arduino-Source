@@ -121,6 +121,13 @@ public:
         }
         return ret;
     }
+    template <typename RowType, typename Lambda>
+    void run_on_all_rows(Lambda function){
+        ReadSpinLock lg(m_current_lock);
+        for (auto& item : m_current){
+            function(static_cast<RowType&>(*item));
+        }
+    }
 
     void clear();
 
@@ -168,6 +175,10 @@ public:
     template <typename RowSnapshotType>
     std::vector<RowSnapshotType> snapshot() const{
         return EditableTableOption::snapshot<RowType, RowSnapshotType>();
+    }
+    template <typename Lambda>
+    void run_on_all_rows(Lambda function){
+        EditableTableOption::run_on_all_rows<RowType>(std::move(function));
     }
 
     virtual std::unique_ptr<EditableTableRow> make_row() override{
