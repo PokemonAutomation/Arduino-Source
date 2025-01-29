@@ -73,7 +73,7 @@ void TeraFailTracker::on_raid_start(){
     if (m_consecutive_failures > 0 && !m_completed_one){
         throw_and_log<FatalProgramException>(
             m_env.logger(),
-            ErrorReport::SEND_ERROR_REPORT,
+            ErrorReport::NO_ERROR_REPORT,
             "Failed 1st raid attempt. Will not retry due to risk of ban."
         );
     }
@@ -83,7 +83,7 @@ void TeraFailTracker::on_raid_start(){
         if (minutes == 0){
             throw_and_log<FatalProgramException>(
                 m_env.logger(),
-                ErrorReport::SEND_ERROR_REPORT,
+                ErrorReport::NO_ERROR_REPORT,
                 "Failed " + std::to_string(fail_threshold) +  " raid(s) in the row. "
                 "Stopping to prevent possible ban."
             );
