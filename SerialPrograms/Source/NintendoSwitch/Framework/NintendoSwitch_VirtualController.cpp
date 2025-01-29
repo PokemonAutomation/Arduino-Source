@@ -39,7 +39,8 @@ VirtualController::VirtualController(
     , m_last_known_state(ProgramState::STOPPED)
     , m_stop(false)
 {
-    std::vector<std::shared_ptr<EditableTableRow>> mapping = ConsoleSettings::instance().KEYBOARD_MAPPINGS.current_refs();
+    std::vector<std::shared_ptr<EditableTableRow>> mapping =
+        ConsoleSettings::instance().KEYBOARD_MAPPINGS.TABLE.current_refs();
     for (const auto& deltas : mapping){
         const KeyMapTableRow& row = static_cast<const KeyMapTableRow&>(*deltas);
         m_mapping[(Qt::Key)(uint32_t)row.key] += row.snapshot();

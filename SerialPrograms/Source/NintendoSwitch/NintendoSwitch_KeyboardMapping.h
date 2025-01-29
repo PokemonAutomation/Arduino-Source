@@ -8,6 +8,9 @@
 #define PokemonAutomation_NintendoSwitch_KeyboardMapping_H
 
 #include <Qt>
+#include "Common/Cpp/Options/BatchOption.h"
+#include "Common/Cpp/Options/StaticTextOption.h"
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/StringOption.h"
 #include "Common/Cpp/Options/EditableTableOption.h"
@@ -23,10 +26,10 @@ struct ControllerDeltas;
 
 class KeyMapTableRow : public EditableTableRow{
 public:
-    ~KeyMapTableRow();
     KeyMapTableRow(EditableTableOption& parent_table);
     KeyMapTableRow(
         EditableTableOption& parent_table,
+        bool advanced_mode,
         std::string description,
         Qt::Key key,
         const ControllerDeltas& deltas
@@ -34,7 +37,12 @@ public:
     virtual std::unique_ptr<EditableTableRow> clone() const override;
     ControllerDeltas snapshot() const;
 
+    void set_advanced_mode(bool enabled);
+
 //    virtual void value_changed(void* object) override;
+
+private:
+    std::atomic<bool> m_advanced_mode;
 
 public:
     StringCell label;
@@ -55,14 +63,35 @@ public:
     KeyboardMappingTable();
     virtual std::vector<std::string> make_header() const override;
 
+    bool advanced_mode() const{ return m_advanced_mode.load(std::memory_order_relaxed); }
+    void set_advanced_mode(bool enabled);
+
     std::unique_ptr<EditableTableRow> make_mapping(
         std::string description,
         Qt::Key key,
         const ControllerDeltas& deltas
     );
     std::vector<std::unique_ptr<EditableTableRow>> make_defaults();
+
+private:
+    std::atomic<bool> m_advanced_mode;
 };
 
+
+class KeyboardMappingOption : public BatchOption, private ConfigOption::Listener{
+public:
+    ~KeyboardMappingOption();
+    KeyboardMappingOption();
+
+private:
+    virtual void load_json(const JsonValue& json) override;
+    virtual void value_changed(void* object) override;
+
+public:
+    StaticTextOption DESCRIPTION;
+    BooleanCheckBoxOption ADVANCED_MODE;
+    KeyboardMappingTable TABLE;
+};
 
 
 

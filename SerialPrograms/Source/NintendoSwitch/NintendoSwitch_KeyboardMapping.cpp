@@ -19,8 +19,6 @@ namespace NintendoSwitch{
 KeyMapTableRow::KeyMapTableRow(EditableTableOption& parent_table)
     : EditableTableRow(parent_table)
     , label(false, LockMode::UNLOCK_WHILE_RUNNING, "", "")
-//    , qt_key(LockMode::UNLOCK_WHILE_RUNNING, 0)
-//    , key(false, LockMode::READ_ONLY, "", "")
     , key(LockMode::UNLOCK_WHILE_RUNNING)
     , buttons(LockMode::UNLOCK_WHILE_RUNNING, 0, 0, ((uint16_t)1 << 14) - 1)
     , dpad_x(LockMode::UNLOCK_WHILE_RUNNING, 0, -1, 1)
@@ -31,7 +29,6 @@ KeyMapTableRow::KeyMapTableRow(EditableTableOption& parent_table)
     , right_stick_y(LockMode::UNLOCK_WHILE_RUNNING, 0, -1, 1)
 {
     add_option(label, "Description");
-//    add_option(qt_key, "Qt::Key");
     add_option(key, "Key");
     add_option(buttons, "Button Bit-Field");
     add_option(dpad_x, "Dpad x");
@@ -40,13 +37,11 @@ KeyMapTableRow::KeyMapTableRow(EditableTableOption& parent_table)
     add_option(left_stick_y, "Left-Stick y");
     add_option(right_stick_x, "Right-Stick x");
     add_option(right_stick_y, "Right-Stick y");
-//    qt_key.add_listener(*this);
-}
-KeyMapTableRow::~KeyMapTableRow(){
-//    qt_key.remove_listener(*this);
+    set_advanced_mode(static_cast<KeyboardMappingTable&>(parent_table).advanced_mode());
 }
 KeyMapTableRow::KeyMapTableRow(
     EditableTableOption& parent_table,
+    bool advanced_mode,
     std::string description,
     Qt::Key key,
     const ControllerDeltas& deltas
@@ -54,7 +49,6 @@ KeyMapTableRow::KeyMapTableRow(
     : KeyMapTableRow(parent_table)
 {
     label.set(std::move(description));
-//    qt_key.set(key);
     this->key.set(key);
     buttons.set(deltas.buttons);
     dpad_x.set(deltas.dpad_x);
@@ -63,11 +57,11 @@ KeyMapTableRow::KeyMapTableRow(
     left_stick_y.set(deltas.left_y);
     right_stick_x.set(deltas.right_x);
     right_stick_y.set(deltas.right_y);
+    set_advanced_mode(advanced_mode);
 }
 std::unique_ptr<EditableTableRow> KeyMapTableRow::clone() const{
     std::unique_ptr<KeyMapTableRow> ret(new KeyMapTableRow(parent()));
     ret->label.set(label);
-//    ret->qt_key.set(qt_key);
     ret->key.set((uint32_t)key);
     ret->buttons.set(buttons);
     ret->dpad_x.set(dpad_x);
@@ -76,6 +70,7 @@ std::unique_ptr<EditableTableRow> KeyMapTableRow::clone() const{
     ret->left_stick_y.set(left_stick_y);
     ret->right_stick_x.set(right_stick_x);
     ret->right_stick_y.set(right_stick_y);
+    ret->set_advanced_mode(m_advanced_mode.load(std::memory_order_relaxed));
     return ret;
 }
 ControllerDeltas KeyMapTableRow::snapshot() const{
@@ -89,10 +84,28 @@ ControllerDeltas KeyMapTableRow::snapshot() const{
         .right_y = right_stick_y,
     };
 }
-//void KeyMapTableRow::value_changed(void* object){
-//    QKeySequence seq((Qt::Key)qt_key.current_value());
-//    key.set(seq.toString().toStdString());
-//}
+void KeyMapTableRow::set_advanced_mode(bool enabled){
+    m_advanced_mode.store(enabled, std::memory_order_relaxed);
+    if (enabled){
+        label.set_locked(false);
+        buttons.set_visibility(ConfigOptionState::ENABLED);
+        dpad_x.set_visibility(ConfigOptionState::ENABLED);
+        dpad_y.set_visibility(ConfigOptionState::ENABLED);
+        left_stick_x.set_visibility(ConfigOptionState::ENABLED);
+        left_stick_y.set_visibility(ConfigOptionState::ENABLED);
+        right_stick_x.set_visibility(ConfigOptionState::ENABLED);
+        right_stick_y.set_visibility(ConfigOptionState::ENABLED);
+    }else{
+        label.set_locked(true);
+        buttons.set_visibility(ConfigOptionState::DISABLED);
+        dpad_x.set_visibility(ConfigOptionState::DISABLED);
+        dpad_y.set_visibility(ConfigOptionState::DISABLED);
+        left_stick_x.set_visibility(ConfigOptionState::DISABLED);
+        left_stick_y.set_visibility(ConfigOptionState::DISABLED);
+        right_stick_x.set_visibility(ConfigOptionState::DISABLED);
+        right_stick_y.set_visibility(ConfigOptionState::DISABLED);
+    }
+}
 
 
 
@@ -100,25 +113,12 @@ ControllerDeltas KeyMapTableRow::snapshot() const{
 
 KeyboardMappingTable::KeyboardMappingTable()
     : EditableTableOption_t<KeyMapTableRow>(
-        "The following table is the mapping of keyboard keys to Switch controller presses. "
-        "If you wish to remap a key, click on the cell in the \"Key\" column and press the desired key. "
-        "You do not need to edit any of the other columns.<br><br>"
-        "<font color=\"orange\">Note for keys that change behavior when combined with "
-        "SHIFT or CTRL, you should include all of those combinations as well. "
-        "For example, the default mapping for the Y button is both '/' and '?' "
-        "because they are treated as different keys depending on whether SHIFT "
-        "is held down. Letters are exempt from this as both lower and upper case "
-        "letters are considered the same.</font>"
-        "<br><br>"
-        "Advanced users are free to edit the rest of the table. You can create "
-        "new mappings or mappings that result in multiple buttons. "
-        "For example, there is a special mapping for pressing A + R "
-        "simultaneously that is useful for CFW users who are remotely "
-        "controlling the program over Team Viewer.",
+        "",
         LockMode::UNLOCK_WHILE_RUNNING,
         true,
         make_defaults()
     )
+    , m_advanced_mode(false)
 {}
 std::vector<std::string> KeyboardMappingTable::make_header() const{
     return std::vector<std::string>{
@@ -133,6 +133,12 @@ std::vector<std::string> KeyboardMappingTable::make_header() const{
         "Right-Stick y",
     };
 }
+void KeyboardMappingTable::set_advanced_mode(bool enabled){
+    m_advanced_mode.store(enabled, std::memory_order_relaxed);
+    run_on_all_rows([enabled](KeyMapTableRow& row){
+        row.set_advanced_mode(enabled);
+    });
+}
 
 
 std::unique_ptr<EditableTableRow> KeyboardMappingTable::make_mapping(
@@ -142,6 +148,7 @@ std::unique_ptr<EditableTableRow> KeyboardMappingTable::make_mapping(
 ){
     return std::make_unique<KeyMapTableRow>(
         *this,
+        m_advanced_mode.load(std::memory_order_relaxed),
         std::move(description),
         key,
         deltas
@@ -204,6 +211,56 @@ std::vector<std::unique_ptr<EditableTableRow>> KeyboardMappingTable::make_defaul
 
     return ret;
 }
+
+
+
+
+KeyboardMappingOption::~KeyboardMappingOption(){
+    ADVANCED_MODE.remove_listener(*this);
+}
+KeyboardMappingOption::KeyboardMappingOption()
+    : BatchOption(LockMode::UNLOCK_WHILE_RUNNING)
+    , DESCRIPTION(
+        "The following table is the mapping of keyboard keys to Switch controller presses. "
+        "If you wish to remap a key, click on the cell in the \"Key\" column and press the desired key. "
+        "You do not need to edit any of the other columns.<br><br>"
+        "<font color=\"orange\">Note for keys that change behavior when combined with "
+        "SHIFT or CTRL, you should include all of those combinations as well. "
+        "For example, the default mapping for the Y button is both '/' and '?' "
+        "because they are treated as different keys depending on whether SHIFT "
+        "is held down. Letters are exempt from this as both lower and upper case "
+        "letters are considered the same.</font>"
+        "<br><br>"
+        "Advanced users are free to edit the rest of the table. You can create "
+        "new mappings or mappings that result in multiple buttons. "
+        "For example, there is a special mapping for pressing A + R "
+        "simultaneously that is useful for CFW users who are remotely "
+        "controlling the program over Team Viewer."
+    )
+    , ADVANCED_MODE(
+        "Unlock entire table (Advanced Mode):",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        false
+    )
+{
+    PA_ADD_STATIC(DESCRIPTION);
+    PA_ADD_OPTION(ADVANCED_MODE);
+    PA_ADD_OPTION(TABLE);
+    ADVANCED_MODE.add_listener(*this);
+}
+
+
+void KeyboardMappingOption::load_json(const JsonValue& json){
+    BatchOption::load_json(json);
+    KeyboardMappingOption::value_changed(this);
+}
+void KeyboardMappingOption::value_changed(void* object){
+    TABLE.set_advanced_mode(ADVANCED_MODE);
+}
+
+
+
+
 
 
 

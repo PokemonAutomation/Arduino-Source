@@ -36,7 +36,7 @@ public:
     BooleanCheckBoxOption TOLERATE_SYSTEM_UPDATE_MENU_SLOW;
 
     SectionDividerOption KEYBOARD_SECTION;
-    KeyboardMappingTable KEYBOARD_MAPPINGS;
+    KeyboardMappingOption KEYBOARD_MAPPINGS;
 
 };
 
