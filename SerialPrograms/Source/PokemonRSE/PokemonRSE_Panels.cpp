@@ -12,7 +12,7 @@
 
 //#include "Programs/ShinyHunting/PokemonRSE_AudioStarterReset.h"
 //#include "Programs/ShinyHunting/PokemonRSE_StarterReset.h"
-//#include "Programs/TestPrograms/PokemonRSE_SoundListener.h"
+#include "Programs/TestPrograms/PokemonRSE_SoundListener.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -41,7 +41,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
         //ret.emplace_back(make_single_switch_program<StarterReset_Descriptor, StarterReset>()); //outdated early test program
 
         ret.emplace_back("---- Developer Tools ----");
-        //ret.emplace_back(make_single_switch_program<SoundListener_Descriptor, SoundListener>());
+        ret.emplace_back(make_single_switch_program<SoundListener_Descriptor, SoundListener>());
     }
 
     return ret;
