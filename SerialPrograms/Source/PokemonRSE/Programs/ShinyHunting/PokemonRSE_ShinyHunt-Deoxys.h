@@ -35,7 +35,6 @@ private:
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;
 
-    void walk_down(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
     void solve_puzzle(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
 };
 
