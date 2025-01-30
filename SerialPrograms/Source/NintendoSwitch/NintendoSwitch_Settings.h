@@ -13,7 +13,7 @@
 //#include "Common/Cpp/Options/StringOption.h"
 #include "Common/Cpp/Options/TimeExpressionOption.h"
 #include "CommonFramework/Panels/SettingsPanel.h"
-#include "NintendoSwitch_KeyboardMapping.h"
+#include "Controllers/NintendoSwitch_KeyboardMapping.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

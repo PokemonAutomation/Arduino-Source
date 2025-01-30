@@ -5,7 +5,7 @@
  */
 
 #include <QKeySequence>
-#include "Framework/NintendoSwitch_VirtualControllerState.h"
+#include "NintendoSwitch_VirtualControllerState.h"
 #include "NintendoSwitch_KeyboardMapping.h"
 
 //#include <iostream>

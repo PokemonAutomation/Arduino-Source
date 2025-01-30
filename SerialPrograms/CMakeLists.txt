@@ -812,8 +812,14 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_Superscalar.h
     Source/NintendoSwitch/Controllers/NintendoSwitch_Controller.cpp
     Source/NintendoSwitch/Controllers/NintendoSwitch_Controller.h
+    Source/NintendoSwitch/Controllers/NintendoSwitch_KeyboardInput.cpp
+    Source/NintendoSwitch/Controllers/NintendoSwitch_KeyboardInput.h
+    Source/NintendoSwitch/Controllers/NintendoSwitch_KeyboardMapping.cpp
+    Source/NintendoSwitch/Controllers/NintendoSwitch_KeyboardMapping.h
     Source/NintendoSwitch/Controllers/NintendoSwitch_SerialPABotBase.cpp
     Source/NintendoSwitch/Controllers/NintendoSwitch_SerialPABotBase.h
+    Source/NintendoSwitch/Controllers/NintendoSwitch_VirtualControllerState.cpp
+    Source/NintendoSwitch/Controllers/NintendoSwitch_VirtualControllerState.h
     Source/NintendoSwitch/DevPrograms/BoxDraw.cpp
     Source/NintendoSwitch/DevPrograms/BoxDraw.h
     Source/NintendoSwitch/DevPrograms/TestProgramComputer.cpp
@@ -836,10 +842,6 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Framework/NintendoSwitch_SwitchSystemOption.h
     Source/NintendoSwitch/Framework/NintendoSwitch_SwitchSystemSession.cpp
     Source/NintendoSwitch/Framework/NintendoSwitch_SwitchSystemSession.h
-    Source/NintendoSwitch/Framework/NintendoSwitch_KeyboardInput.cpp
-    Source/NintendoSwitch/Framework/NintendoSwitch_KeyboardInput.h
-    Source/NintendoSwitch/Framework/NintendoSwitch_VirtualControllerState.cpp
-    Source/NintendoSwitch/Framework/NintendoSwitch_VirtualControllerState.h
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_CommandRow.cpp
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_CommandRow.h
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_MultiSwitchProgramWidget.cpp
@@ -856,8 +858,6 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Inference/NintendoSwitch_DetectHome.h
     Source/NintendoSwitch/NintendoSwitch_ConsoleHandle.cpp
     Source/NintendoSwitch/NintendoSwitch_ConsoleHandle.h
-    Source/NintendoSwitch/NintendoSwitch_KeyboardMapping.cpp
-    Source/NintendoSwitch/NintendoSwitch_KeyboardMapping.h
     Source/NintendoSwitch/NintendoSwitch_MultiSwitchProgram.cpp
     Source/NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h
     Source/NintendoSwitch/NintendoSwitch_Panels.cpp

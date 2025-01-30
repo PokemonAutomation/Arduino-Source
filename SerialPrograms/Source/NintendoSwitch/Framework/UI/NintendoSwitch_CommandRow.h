@@ -13,7 +13,7 @@
 #include <QCheckBox>
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/VideoPipeline/VideoOverlaySession.h"
-#include "NintendoSwitch/Framework/NintendoSwitch_KeyboardInput.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_KeyboardInput.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

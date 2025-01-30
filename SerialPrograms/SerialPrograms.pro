@@ -403,11 +403,13 @@ SOURCES += \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Routines.cpp \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.cpp \
     Source/NintendoSwitch/Controllers/NintendoSwitch_Controller.cpp \
+    Source/NintendoSwitch/Controllers/NintendoSwitch_KeyboardInput.cpp \
+    Source/NintendoSwitch/Controllers/NintendoSwitch_KeyboardMapping.cpp \
     Source/NintendoSwitch/Controllers/NintendoSwitch_SerialPABotBase.cpp \
+    Source/NintendoSwitch/Controllers/NintendoSwitch_VirtualControllerState.cpp \
     Source/NintendoSwitch/DevPrograms/BoxDraw.cpp \
     Source/NintendoSwitch/DevPrograms/TestProgramComputer.cpp \
     Source/NintendoSwitch/DevPrograms/TestProgramSwitch.cpp \
-    Source/NintendoSwitch/Framework/NintendoSwitch_KeyboardInput.cpp \
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramOption.cpp \
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramSession.cpp \
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchSystemOption.cpp \
@@ -416,7 +418,6 @@ SOURCES += \
     Source/NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgramSession.cpp \
     Source/NintendoSwitch/Framework/NintendoSwitch_SwitchSystemOption.cpp \
     Source/NintendoSwitch/Framework/NintendoSwitch_SwitchSystemSession.cpp \
-    Source/NintendoSwitch/Framework/NintendoSwitch_VirtualControllerState.cpp \
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_CommandRow.cpp \
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_MultiSwitchProgramWidget.cpp \
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_MultiSwitchSystemWidget.cpp \
@@ -425,7 +426,6 @@ SOURCES += \
     Source/NintendoSwitch/Inference/NintendoSwitch_DateReader.cpp \
     Source/NintendoSwitch/Inference/NintendoSwitch_DetectHome.cpp \
     Source/NintendoSwitch/NintendoSwitch_ConsoleHandle.cpp \
-    Source/NintendoSwitch/NintendoSwitch_KeyboardMapping.cpp \
     Source/NintendoSwitch/NintendoSwitch_MultiSwitchProgram.cpp \
     Source/NintendoSwitch/NintendoSwitch_Panels.cpp \
     Source/NintendoSwitch/NintendoSwitch_Settings.cpp \
@@ -1548,12 +1548,14 @@ HEADERS += \
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_PushButtons.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_Superscalar.h \
     Source/NintendoSwitch/Controllers/NintendoSwitch_Controller.h \
+    Source/NintendoSwitch/Controllers/NintendoSwitch_KeyboardInput.h \
+    Source/NintendoSwitch/Controllers/NintendoSwitch_KeyboardMapping.h \
     Source/NintendoSwitch/Controllers/NintendoSwitch_SerialPABotBase.h \
+    Source/NintendoSwitch/Controllers/NintendoSwitch_VirtualControllerState.h \
     Source/NintendoSwitch/DevPrograms/BoxDraw.h \
     Source/NintendoSwitch/DevPrograms/TestProgramComputer.h \
     Source/NintendoSwitch/DevPrograms/TestProgramSwitch.h \
     Source/NintendoSwitch/NintendoSwitch_ConsoleHandle.h \
-    Source/NintendoSwitch/Framework/NintendoSwitch_KeyboardInput.h \
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramOption.h \
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramSession.h \
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchSystemOption.h \
@@ -1562,7 +1564,6 @@ HEADERS += \
     Source/NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgramSession.h \
     Source/NintendoSwitch/Framework/NintendoSwitch_SwitchSystemOption.h \
     Source/NintendoSwitch/Framework/NintendoSwitch_SwitchSystemSession.h \
-    Source/NintendoSwitch/Framework/NintendoSwitch_VirtualControllerState.h \
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_CommandRow.h \
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_MultiSwitchProgramWidget.h \
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_MultiSwitchSystemWidget.h \
@@ -1570,7 +1571,6 @@ HEADERS += \
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_SwitchSystemWidget.h \
     Source/NintendoSwitch/Inference/NintendoSwitch_DateReader.h \
     Source/NintendoSwitch/Inference/NintendoSwitch_DetectHome.h \
-    Source/NintendoSwitch/NintendoSwitch_KeyboardMapping.h \
     Source/NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h \
     Source/NintendoSwitch/NintendoSwitch_Panels.h \
     Source/NintendoSwitch/NintendoSwitch_Settings.h \
