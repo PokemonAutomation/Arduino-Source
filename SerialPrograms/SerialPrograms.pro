@@ -312,7 +312,8 @@ SOURCES += \
     Source/Controllers/ControllerSelectorWidget.cpp \
     Source/Controllers/ControllerSession.cpp \
     Source/Controllers/ControllerDescriptor.cpp \
-    Source/Controllers/GlobalQtKeyMap.cpp \
+    Source/Controllers/KeyboardInput/GlobalQtKeyMap.cpp \
+    Source/Controllers/KeyboardInput/KeyboardInput.cpp \
     Source/Controllers/NullController.cpp \
     Source/Controllers/SerialPABotBase/SerialPABotBase.cpp \
     Source/Controllers/SerialPABotBase/SerialPABotBase_Handle.cpp \
@@ -406,6 +407,7 @@ SOURCES += \
     Source/NintendoSwitch/DevPrograms/BoxDraw.cpp \
     Source/NintendoSwitch/DevPrograms/TestProgramComputer.cpp \
     Source/NintendoSwitch/DevPrograms/TestProgramSwitch.cpp \
+    Source/NintendoSwitch/Framework/NintendoSwitch_KeyboardInput.cpp \
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramOption.cpp \
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramSession.cpp \
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchSystemOption.cpp \
@@ -414,7 +416,6 @@ SOURCES += \
     Source/NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgramSession.cpp \
     Source/NintendoSwitch/Framework/NintendoSwitch_SwitchSystemOption.cpp \
     Source/NintendoSwitch/Framework/NintendoSwitch_SwitchSystemSession.cpp \
-    Source/NintendoSwitch/Framework/NintendoSwitch_VirtualController.cpp \
     Source/NintendoSwitch/Framework/NintendoSwitch_VirtualControllerState.cpp \
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_CommandRow.cpp \
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_MultiSwitchProgramWidget.cpp \
@@ -1437,8 +1438,9 @@ HEADERS += \
     Source/Controllers/ControllerSelectorWidget.h \
     Source/Controllers/ControllerSession.h \
     Source/Controllers/ControllerDescriptor.h \
-    Source/Controllers/GlobalQtKeyMap.h \
-    Source/Controllers/KeyboardStateTracker.h \
+    Source/Controllers/KeyboardInput/GlobalQtKeyMap.h \
+    Source/Controllers/KeyboardInput/KeyboardInput.h \
+    Source/Controllers/KeyboardInput/KeyboardStateTracker.h \
     Source/Controllers/NullController.h \
     Source/Controllers/SerialPABotBase/SerialPABotBase.h \
     Source/Controllers/SerialPABotBase/SerialPABotBase_Handle.h \
@@ -1548,6 +1550,7 @@ HEADERS += \
     Source/NintendoSwitch/DevPrograms/TestProgramComputer.h \
     Source/NintendoSwitch/DevPrograms/TestProgramSwitch.h \
     Source/NintendoSwitch/NintendoSwitch_ConsoleHandle.h \
+    Source/NintendoSwitch/Framework/NintendoSwitch_KeyboardInput.h \
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramOption.h \
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramSession.h \
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchSystemOption.h \
@@ -1556,7 +1559,6 @@ HEADERS += \
     Source/NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgramSession.h \
     Source/NintendoSwitch/Framework/NintendoSwitch_SwitchSystemOption.h \
     Source/NintendoSwitch/Framework/NintendoSwitch_SwitchSystemSession.h \
-    Source/NintendoSwitch/Framework/NintendoSwitch_VirtualController.h \
     Source/NintendoSwitch/Framework/NintendoSwitch_VirtualControllerState.h \
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_CommandRow.h \
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_MultiSwitchProgramWidget.h \

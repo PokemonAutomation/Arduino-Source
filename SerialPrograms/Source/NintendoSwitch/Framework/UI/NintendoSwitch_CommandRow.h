@@ -13,7 +13,7 @@
 #include <QCheckBox>
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/VideoPipeline/VideoOverlaySession.h"
-#include "NintendoSwitch/Framework/NintendoSwitch_VirtualController.h"
+#include "NintendoSwitch/Framework/NintendoSwitch_KeyboardInput.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -36,9 +36,8 @@ public:
         bool allow_commands_while_running
     );
 
-    //  Returns false if key is not handled. (pass it up to next handler)
-    bool on_key_press(const QKeyEvent& key);
-    bool on_key_release(const QKeyEvent& key);
+    void on_key_press(const QKeyEvent& key);
+    void on_key_release(const QKeyEvent& key);
 
 signals:
     void load_profile();

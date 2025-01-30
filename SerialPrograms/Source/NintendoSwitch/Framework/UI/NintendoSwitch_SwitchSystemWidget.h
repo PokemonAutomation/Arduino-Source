@@ -50,9 +50,8 @@ public:
     //  The public versions of the private QWidget key and focus event handling functions.
     //  They are needed to accept key and focus passed from CommonFramework/VideoPipeline/UI:VideoDisplayWindow.
 
-    //  Returns false if key is not handled. (pass it up to next handler)
-    virtual bool key_press(QKeyEvent* event) override;
-    virtual bool key_release(QKeyEvent* event) override;
+    virtual void key_press(QKeyEvent* event) override;
+    virtual void key_release(QKeyEvent* event) override;
 
     virtual void focus_in(QFocusEvent* event) override;
     virtual void focus_out(QFocusEvent* event) override;

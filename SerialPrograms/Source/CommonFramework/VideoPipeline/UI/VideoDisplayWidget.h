@@ -22,9 +22,8 @@ class VideoDisplayWindow;
 //  Interface for forwarding keyboard commands from the VideoDisplayWidget to
 //  whatever thing under it handles it.
 struct CommandReceiver{
-    //  Returns false if key is not handled. (pass it up to next handler)
-    virtual bool key_press(QKeyEvent* event) = 0;
-    virtual bool key_release(QKeyEvent* event) = 0;
+    virtual void key_press(QKeyEvent* event) = 0;
+    virtual void key_release(QKeyEvent* event) = 0;
 
     virtual void focus_in(QFocusEvent* event) = 0;
     virtual void focus_out(QFocusEvent* event) = 0;

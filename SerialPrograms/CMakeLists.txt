@@ -613,9 +613,11 @@ file(GLOB MAIN_SOURCES
     Source/Controllers/ControllerSession.h
     Source/Controllers/ControllerSelectorWidget.cpp
     Source/Controllers/ControllerSelectorWidget.h
-    Source/Controllers/GlobalQtKeyMap.cpp
-    Source/Controllers/GlobalQtKeyMap.h
-    Source/Controllers/KeyboardStateTracker.h
+    Source/Controllers/KeyboardInput/GlobalQtKeyMap.cpp
+    Source/Controllers/KeyboardInput/GlobalQtKeyMap.h
+    Source/Controllers/KeyboardInput/KeyboardInput.cpp
+    Source/Controllers/KeyboardInput/KeyboardInput.h
+    Source/Controllers/KeyboardInput/KeyboardStateTracker.h
     Source/Controllers/NullController.cpp
     Source/Controllers/NullController.h
     Source/Controllers/SuperscalarScheduler.cpp
@@ -834,8 +836,8 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Framework/NintendoSwitch_SwitchSystemOption.h
     Source/NintendoSwitch/Framework/NintendoSwitch_SwitchSystemSession.cpp
     Source/NintendoSwitch/Framework/NintendoSwitch_SwitchSystemSession.h
-    Source/NintendoSwitch/Framework/NintendoSwitch_VirtualController.cpp
-    Source/NintendoSwitch/Framework/NintendoSwitch_VirtualController.h
+    Source/NintendoSwitch/Framework/NintendoSwitch_KeyboardInput.cpp
+    Source/NintendoSwitch/Framework/NintendoSwitch_KeyboardInput.h
     Source/NintendoSwitch/Framework/NintendoSwitch_VirtualControllerState.cpp
     Source/NintendoSwitch/Framework/NintendoSwitch_VirtualControllerState.h
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_CommandRow.cpp
