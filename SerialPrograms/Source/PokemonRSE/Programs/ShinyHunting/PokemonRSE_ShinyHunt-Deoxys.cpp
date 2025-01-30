@@ -51,10 +51,10 @@ std::unique_ptr<StatsTracker> ShinyHuntDeoxys_Descriptor::make_stats() const{
 
 ShinyHuntDeoxys::ShinyHuntDeoxys()
     : WALK_UP_DOWN_TIME(
-        "<b>Walk up/down time</b><br>Spend this long to walk up to the triangle rock.",
+        "<b>Walk up/down time</b><br>Spend this long to run up to the triangle rock.",
         LockMode::LOCK_WHILE_RUNNING,
         TICKS_PER_SECOND,
-        "5 * TICKS_PER_SECOND"
+        "440"
     )
     , NOTIFICATION_SHINY(
         "Shiny Found",
@@ -77,11 +77,11 @@ void ShinyHuntDeoxys::solve_puzzle(SingleSwitchProgramEnvironment& env, SwitchCo
     pbf_press_button(context, BUTTON_A, 20, 40);
 
     env.log("Step 2: 5 Left, 1 Down.");
-    pbf_press_dpad(context, DPAD_LEFT, 10, 80);
-    pbf_press_dpad(context, DPAD_LEFT, 10, 80);
-    pbf_press_dpad(context, DPAD_LEFT, 10, 80);
-    pbf_press_dpad(context, DPAD_LEFT, 10, 80);
-    pbf_press_dpad(context, DPAD_LEFT, 10, 80);
+    pbf_press_dpad(context, DPAD_LEFT, 10, 50);
+    pbf_press_dpad(context, DPAD_LEFT, 10, 50);
+    pbf_press_dpad(context, DPAD_LEFT, 10, 50);
+    pbf_press_dpad(context, DPAD_LEFT, 10, 50);
+    pbf_press_dpad(context, DPAD_LEFT, 10, 50);
 
     pbf_press_dpad(context, DPAD_DOWN, 10, 80);
 
@@ -89,82 +89,90 @@ void ShinyHuntDeoxys::solve_puzzle(SingleSwitchProgramEnvironment& env, SwitchCo
     context.wait_for_all_requests();
 
     env.log("Step 3: 5 Right, 5 Up.");
-    pbf_press_dpad(context, DPAD_RIGHT, 10, 80);
-    pbf_press_dpad(context, DPAD_RIGHT, 10, 80);
-    pbf_press_dpad(context, DPAD_RIGHT, 10, 80);
-    pbf_press_dpad(context, DPAD_RIGHT, 10, 80);
-    pbf_press_dpad(context, DPAD_RIGHT, 10, 80);
+    pbf_press_dpad(context, DPAD_RIGHT, 10, 50);
+    pbf_press_dpad(context, DPAD_RIGHT, 10, 50);
+    pbf_press_dpad(context, DPAD_RIGHT, 10, 50);
+    pbf_press_dpad(context, DPAD_RIGHT, 10, 50);
+    pbf_press_dpad(context, DPAD_RIGHT, 10, 50);
 
-    pbf_press_dpad(context, DPAD_UP, 125, 80);
+    ssf_press_button(context, BUTTON_B, 0, 90);
+    pbf_press_dpad(context, DPAD_UP, 90, 50);
 
     pbf_press_button(context, BUTTON_A, 20, 40);
     context.wait_for_all_requests();
 
     env.log("Step 4: 5 Right, 5 Down");
-    pbf_press_dpad(context, DPAD_RIGHT, 10, 80);
-    pbf_press_dpad(context, DPAD_RIGHT, 10, 80);
-    pbf_press_dpad(context, DPAD_RIGHT, 10, 80);
-    pbf_press_dpad(context, DPAD_RIGHT, 10, 80);
-    pbf_press_dpad(context, DPAD_RIGHT, 10, 80);
+    pbf_press_dpad(context, DPAD_RIGHT, 10, 50);
+    pbf_press_dpad(context, DPAD_RIGHT, 10, 50);
+    pbf_press_dpad(context, DPAD_RIGHT, 10, 50);
+    pbf_press_dpad(context, DPAD_RIGHT, 10, 50);
+    pbf_press_dpad(context, DPAD_RIGHT, 10, 50);
 
-    pbf_press_dpad(context, DPAD_DOWN, 125, 80);
+    ssf_press_button(context, BUTTON_B, 0, 90);
+    pbf_press_dpad(context, DPAD_DOWN, 90, 50);
 
     pbf_press_button(context, BUTTON_A, 20, 40);
     context.wait_for_all_requests();
 
     env.log("Step 5: 3 Up, 7 Left");
-    pbf_press_dpad(context, DPAD_UP, 10, 80);
-    pbf_press_dpad(context, DPAD_UP, 10, 80);
-    pbf_press_dpad(context, DPAD_UP, 10, 80);
+    pbf_press_dpad(context, DPAD_UP, 10, 50);
+    pbf_press_dpad(context, DPAD_UP, 10, 50);
+    pbf_press_dpad(context, DPAD_UP, 10, 50);
 
-    pbf_press_dpad(context, DPAD_LEFT, 200, 80);
+    ssf_press_button(context, BUTTON_B, 0, 115);
+    pbf_press_dpad(context, DPAD_LEFT, 115, 50);
 
     pbf_press_button(context, BUTTON_A, 20, 40);
     context.wait_for_all_requests();
 
     env.log("Step 6: 5 Right.");
-    pbf_press_dpad(context, DPAD_RIGHT, 125, 80);
+    ssf_press_button(context, BUTTON_B, 0, 100);
+    pbf_press_dpad(context, DPAD_RIGHT, 100, 50);
 
     pbf_press_button(context, BUTTON_A, 20, 40);
     context.wait_for_all_requests();
 
     env.log("Step 7: 3 Left, 2 Down.");
-    pbf_press_dpad(context, DPAD_LEFT, 10, 80);
-    pbf_press_dpad(context, DPAD_LEFT, 10, 80);
-    pbf_press_dpad(context, DPAD_LEFT, 10, 80);
+    pbf_press_dpad(context, DPAD_LEFT, 10, 50);
+    pbf_press_dpad(context, DPAD_LEFT, 10, 50);
+    pbf_press_dpad(context, DPAD_LEFT, 10, 50);
 
-    pbf_press_dpad(context, DPAD_DOWN, 80, 80);
+    ssf_press_button(context, BUTTON_B, 0, 60);
+    pbf_press_dpad(context, DPAD_DOWN, 60, 50);
 
     pbf_press_button(context, BUTTON_A, 20, 40);
     context.wait_for_all_requests();
 
     env.log("Step 8: 1 Down, 4 Left.");
-    pbf_press_dpad(context, DPAD_DOWN, 10, 80);
+    pbf_press_dpad(context, DPAD_DOWN, 10, 50);
 
-    pbf_press_dpad(context, DPAD_LEFT, 125, 80);
+    ssf_press_button(context, BUTTON_B, 0, 80);
+    pbf_press_dpad(context, DPAD_LEFT, 80, 50);
 
     pbf_press_button(context, BUTTON_A, 20, 40);
     context.wait_for_all_requests();
 
     env.log("Step 8: 7 Right.");
-    pbf_press_dpad(context, DPAD_RIGHT, 200, 80);
+    ssf_press_button(context, BUTTON_B, 0, 115);
+    pbf_press_dpad(context, DPAD_RIGHT, 115, 50);
 
     pbf_press_button(context, BUTTON_A, 20, 40);
     context.wait_for_all_requests();
 
     env.log("Step 9: 4 Left, Down 1.");
-    pbf_press_dpad(context, DPAD_LEFT, 10, 80);
-    pbf_press_dpad(context, DPAD_LEFT, 10, 80);
-    pbf_press_dpad(context, DPAD_LEFT, 10, 80);
-    pbf_press_dpad(context, DPAD_LEFT, 10, 80);
+    pbf_press_dpad(context, DPAD_LEFT, 10, 50);
+    pbf_press_dpad(context, DPAD_LEFT, 10, 50);
+    pbf_press_dpad(context, DPAD_LEFT, 10, 50);
+    pbf_press_dpad(context, DPAD_LEFT, 10, 50);
 
-    pbf_press_dpad(context, DPAD_DOWN, 10, 80);
+    pbf_press_dpad(context, DPAD_DOWN, 10, 50);
 
     pbf_press_button(context, BUTTON_A, 20, 40);
     context.wait_for_all_requests();
 
     env.log("Step 10: 4 Up.");
-    pbf_press_dpad(context, DPAD_UP, 125, 80);
+    ssf_press_button(context, BUTTON_B, 0, 80);
+    pbf_press_dpad(context, DPAD_UP, 80, 80);
     context.wait_for_all_requests();
 }
 
@@ -191,6 +199,7 @@ void ShinyHuntDeoxys::program(SingleSwitchProgramEnvironment& env, SwitchControl
     while (true) {
         env.log("Walking up to Deoxys.");
         //Walk up to the triangle rock from the ship. No bike allowed.
+        ssf_press_button(context, BUTTON_B, 0, WALK_UP_DOWN_TIME);
         pbf_press_dpad(context, DPAD_UP, WALK_UP_DOWN_TIME, 20);
         context.wait_for_all_requests();
 
@@ -214,6 +223,7 @@ void ShinyHuntDeoxys::program(SingleSwitchProgramEnvironment& env, SwitchControl
         context.wait_for_all_requests();
         
         //Walk down from the triangle rock to the ship.
+        ssf_press_button(context, BUTTON_B, 0, WALK_UP_DOWN_TIME);
         pbf_press_dpad(context, DPAD_DOWN, WALK_UP_DOWN_TIME, 20);
         context.wait_for_all_requests();
 
