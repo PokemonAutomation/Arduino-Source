@@ -21,7 +21,6 @@ namespace NintendoSwitch{
 class VirtualController : public KeyboardInputController{
 public:
     VirtualController(
-        Logger& logger,
         ControllerSession& session,
         bool allow_commands_while_running
     );

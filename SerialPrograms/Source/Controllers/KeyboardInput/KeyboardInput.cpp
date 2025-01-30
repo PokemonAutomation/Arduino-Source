@@ -17,12 +17,10 @@ namespace PokemonAutomation{
 
 KeyboardInputController::~KeyboardInputController() = default;
 KeyboardInputController::KeyboardInputController(
-    Logger& logger,
     bool allow_commands_while_running,
     std::chrono::milliseconds retry_delay
 )
-    : m_logger(logger)
-    , m_allow_commands_while_running(allow_commands_while_running)
+    : m_allow_commands_while_running(allow_commands_while_running)
     , m_retry_delay(retry_delay)
     , m_last_known_state(ProgramState::STOPPED)
     , m_stop(false)

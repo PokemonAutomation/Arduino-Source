@@ -23,11 +23,10 @@ using namespace std::chrono_literals;
 
 
 VirtualController::VirtualController(
-    Logger& logger,
     ControllerSession& session,
     bool allow_commands_while_running
 )
-    : KeyboardInputController(logger, allow_commands_while_running)
+    : KeyboardInputController(allow_commands_while_running)
     , m_session(session)
 {
     std::vector<std::shared_ptr<EditableTableRow>> mapping =

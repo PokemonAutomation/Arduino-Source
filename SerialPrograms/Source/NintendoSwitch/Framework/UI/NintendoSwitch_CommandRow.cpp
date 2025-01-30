@@ -7,7 +7,6 @@
 #include <QHBoxLayout>
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
-#include "CommonFramework/VideoPipeline/UI/VideoOverlayWidget.h"
 #include "CommonFramework/Recording/StreamHistoryOption.h"
 #include "NintendoSwitch_CommandRow.h"
 
@@ -30,7 +29,7 @@ CommandRow::CommandRow(
     bool allow_commands_while_running
 )
     : QWidget(&parent)
-    , VirtualController(controller.logger(), controller, allow_commands_while_running)
+    , VirtualController(controller, allow_commands_while_running)
     , m_controller(controller)
     , m_session(session)
     , m_allow_commands_while_running(allow_commands_while_running)

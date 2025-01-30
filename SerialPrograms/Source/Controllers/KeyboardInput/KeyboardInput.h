@@ -43,7 +43,6 @@ public:
 class KeyboardInputController{
 public:
     KeyboardInputController(
-        Logger& logger,
         bool allow_commands_while_running,
         std::chrono::milliseconds retry_delay = std::chrono::milliseconds(10)
     );
@@ -78,7 +77,6 @@ private:
 
 
 private:
-    Logger& m_logger;
     const bool m_allow_commands_while_running;
     const std::chrono::milliseconds m_retry_delay;
 
