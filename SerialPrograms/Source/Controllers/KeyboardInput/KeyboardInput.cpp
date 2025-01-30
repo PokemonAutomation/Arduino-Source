@@ -132,7 +132,7 @@ void KeyboardInputController::thread_loop(){
             now = current_time();
             try{
 //                current.print();
-                if (current == last && last_press + std::chrono::milliseconds(1000) > now){
+                if (*current == *last && last_press + std::chrono::milliseconds(1000) > now){
 //                    cout << "No state change." << endl;
                     break;
                 }
