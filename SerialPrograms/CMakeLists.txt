@@ -1323,6 +1323,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonRSE/Inference/PokemonRSE_ShinyNumberDetector.h
     Source/PokemonRSE/Programs/ShinyHunting/PokemonRSE_AudioStarterReset.cpp
     Source/PokemonRSE/Programs/ShinyHunting/PokemonRSE_AudioStarterReset.h
+    Source/PokemonRSE/Programs/ShinyHunting/PokemonRSE_ShinyHunt-Deoxys.cpp
+    Source/PokemonRSE/Programs/ShinyHunting/PokemonRSE_ShinyHunt-Deoxys.h
     Source/PokemonRSE/Programs/ShinyHunting/PokemonRSE_StarterReset.cpp
     Source/PokemonRSE/Programs/ShinyHunting/PokemonRSE_StarterReset.h
     Source/PokemonRSE/Programs/TestPrograms/PokemonRSE_SoundListener.cpp
