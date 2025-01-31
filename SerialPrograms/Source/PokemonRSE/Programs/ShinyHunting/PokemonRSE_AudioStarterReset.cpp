@@ -23,7 +23,7 @@ namespace PokemonRSE{
 AudioStarterReset_Descriptor::AudioStarterReset_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonRSE:AudioStarterReset",
-        Pokemon::STRING_POKEMON + " RSE", "Starter Reset (Ruby/Sapphire)",
+        Pokemon::STRING_POKEMON + " RSE", "Starter Reset",
         "ComputerControl/blob/master/Wiki/Programs/PokemonRSE/AudioStarterReset.md",
         "Soft reset for a shiny starter. Ruby and Sapphire only.",
         FeedbackType::VIDEO_AUDIO,
