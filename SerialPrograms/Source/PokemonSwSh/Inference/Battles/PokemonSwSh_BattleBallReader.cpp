@@ -17,7 +17,7 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-const double BattleBallReader::MAX_ALPHA = 0.28;
+const double BattleBallReader::MAX_ALPHA = 0.29;
 const double BattleBallReader::ALPHA_SPREAD = 0.02;
 
 

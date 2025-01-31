@@ -267,7 +267,13 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 
 
+    ImageRGB32 image("20250131-170450792229.png");
 
+    PokemonSwSh::BattleBallReader reader(console, Language::Korean);
+    reader.read_ball(image);
+
+
+#if 0
     ImageRGB32 image("20250125-232444699636.png");
 
 //    TeraSilhouetteReader reader;
@@ -277,7 +283,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     TeraTypeReader reader;
     ImageMatch::ImageMatchResult results = reader.read(image);
     results.log(logger, 100);
-
+#endif
 
 #if 0
     ImageRGB32 image("20250125-224044294692.png");
