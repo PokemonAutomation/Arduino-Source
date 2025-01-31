@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Cpp/Containers/FixedLimitVector.tpp"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
@@ -34,6 +35,35 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 namespace MaxLairInternal{
+
+
+
+AdventureRuntime::~AdventureRuntime() = default;
+AdventureRuntime::AdventureRuntime(
+    FixedLimitVector<ConsoleHandle>& consoles,
+    const size_t p_host_index,
+    const Consoles& p_console_settings,
+    const EndBattleDecider& p_actions,
+    const bool p_go_home_when_done,
+    HostingSettings& p_hosting_settings,
+    EventNotificationOption& p_notification_status,
+    EventNotificationOption& p_notification_shiny,
+    Stats& p_session_stats
+)
+    : host_index(p_host_index)
+    , console_settings(p_console_settings)
+    , actions(p_actions)
+    , go_home_when_done(p_go_home_when_done)
+    , hosting_settings(p_hosting_settings)
+    , notification_status(p_notification_status)
+    , notification_shiny(p_notification_shiny)
+    , ocr_watchdog(p_console_settings.active_consoles())
+    , session_stats(p_session_stats)
+{
+    for (size_t c = 0; c < p_console_settings.active_consoles(); c++){
+        ocr_watchdog.emplace_back(consoles[c].logger());
+    }
+}
 
 
 StateMachineAction run_state_iteration(
@@ -94,6 +124,7 @@ StateMachineAction run_state_iteration(
                 console_index,
                 stream, context,
                 global_state,
+                runtime.ocr_watchdog[console_index],
                 runtime.console_settings[console_index]
             );
             return StateMachineAction::KEEP_GOING;
@@ -124,7 +155,9 @@ StateMachineAction run_state_iteration(
         stream.log("Current State: Move Select");
         return run_move_select(
             env, console_index,
-            stream, context, global_state,
+            stream, context,
+            runtime.ocr_watchdog[console_index],
+            global_state,
             runtime.console_settings[console_index],
             battle_menu.dmaxed(),
             battle_menu.cheer()
@@ -136,6 +169,7 @@ StateMachineAction run_state_iteration(
             env, console_index,
             stream, context,
             runtime.console_settings[console_index].language,
+            runtime.ocr_watchdog[console_index],
             global_state,
             decider
         );

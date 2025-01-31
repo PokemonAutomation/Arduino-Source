@@ -130,6 +130,7 @@ void loop_adventures(
     Stats& stats = env.current_stats<Stats>();
 
     AdventureRuntime runtime(
+        env.consoles,
         host_index,
         consoles,
         decider,

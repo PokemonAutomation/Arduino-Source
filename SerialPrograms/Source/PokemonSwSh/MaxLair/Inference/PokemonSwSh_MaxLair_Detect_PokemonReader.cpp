@@ -108,6 +108,7 @@ std::string read_boss_sprite(VideoStream& stream){
 
 std::set<std::string> read_pokemon_name(
     Logger& logger, Language language,
+    OcrFailureWatchdog& ocr_watchdog,
     const ImageViewRGB32& image,
     double max_log10p
 ){
@@ -123,8 +124,10 @@ std::set<std::string> read_pokemon_name(
     );
 //    result.log(logger);
     if (result.results.empty()){
+        ocr_watchdog.push_result(false);
         return {};
     }
+    ocr_watchdog.push_result(true);
 
     //  Convert OCR slugs to MaxLair name slugs.
     std::set<std::string> ret;
@@ -301,6 +304,7 @@ std::string read_pokemon_sprite_with_item(
 
 std::string read_pokemon_name_sprite(
     Logger& logger,
+    OcrFailureWatchdog& ocr_watchdog,
     const ImageViewRGB32& screen,
     const ImageFloatBox& sprite_box,
     const ImageFloatBox& name_box, Language language,
@@ -313,7 +317,7 @@ std::string read_pokemon_name_sprite(
     ImageViewRGB32 image = extract_box_reference(screen, name_box);
 
     std::set<std::string> ocr_slugs;
-    for (const std::string& slug : read_pokemon_name(logger, language, image)){
+    for (const std::string& slug : read_pokemon_name(logger, language, ocr_watchdog, image)){
         //  Only include candidates that are valid rental Pokemon.
         auto iter = RENTALS.find(slug);
         if (iter != RENTALS.end()){

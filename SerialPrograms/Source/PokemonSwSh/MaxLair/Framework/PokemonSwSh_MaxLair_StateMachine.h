@@ -7,10 +7,12 @@
 #ifndef PokemonAutomation_PokemonSwSh_MaxLair_StateMachine_H
 #define PokemonAutomation_PokemonSwSh_MaxLair_StateMachine_H
 
+#include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/Tools/VideoStream.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
-#include "Common/Cpp/Concurrency/SpinLock.h"
+#include "CommonTools/FailureWatchdog.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_QuantityReader.h"
 #include "PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options.h"
 #include "PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options_Consoles.h"
@@ -52,7 +54,9 @@ struct ConsoleRuntime{
 };
 
 struct AdventureRuntime{
+    ~AdventureRuntime();
     AdventureRuntime(
+        FixedLimitVector<ConsoleHandle>& consoles,
         const size_t p_host_index,
         const Consoles& p_console_settings,
         const EndBattleDecider& p_actions,
@@ -61,16 +65,7 @@ struct AdventureRuntime{
         EventNotificationOption& p_notification_status,
         EventNotificationOption& p_notification_shiny,
         Stats& p_session_stats
-    )
-        : host_index(p_host_index)
-        , console_settings(p_console_settings)
-        , actions(p_actions)
-        , go_home_when_done(p_go_home_when_done)
-        , hosting_settings(p_hosting_settings)
-        , notification_status(p_notification_status)
-        , notification_shiny(p_notification_shiny)
-        , session_stats(p_session_stats)
-    {}
+    );
 
     const size_t host_index;
     const Consoles& console_settings;
@@ -79,6 +74,9 @@ struct AdventureRuntime{
     HostingSettings& hosting_settings;
     EventNotificationOption& notification_status;
     EventNotificationOption& notification_shiny;
+
+    FixedLimitVector<OcrFailureWatchdog> ocr_watchdog;
+
     Stats& session_stats;
 
     PathStats path_stats;

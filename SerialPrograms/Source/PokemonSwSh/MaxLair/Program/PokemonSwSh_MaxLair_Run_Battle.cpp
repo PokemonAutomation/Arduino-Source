@@ -27,6 +27,7 @@ namespace MaxLairInternal{
 bool read_battle_menu(
     ProgramEnvironment& env,
     VideoStream& stream, SwitchControllerContext& context, size_t player_index,
+    OcrFailureWatchdog& ocr_watchdog,
     GlobalState& state,
     const ConsoleSpecificOptions& settings,
     bool currently_dmaxed, bool cheer_only
@@ -34,7 +35,7 @@ bool read_battle_menu(
     PlayerState& player = state.players[player_index];
 
     VideoOverlaySet boxes(stream.overlay());
-    BattleMenuReader reader(stream.overlay(), settings.language);
+    BattleMenuReader reader(stream.overlay(), settings.language, ocr_watchdog);
     BattleMoveArrowFinder arrow_finder(stream.overlay());
     arrow_finder.make_overlays(boxes);
 
@@ -197,6 +198,7 @@ bool read_battle_menu(
 StateMachineAction run_move_select(
     ProgramEnvironment& env, size_t console_index,
     VideoStream& stream, SwitchControllerContext& context,
+    OcrFailureWatchdog& ocr_watchdog,
     GlobalStateTracker& state_tracker,
     const ConsoleSpecificOptions& settings,
     bool currently_dmaxed, bool cheer_only
@@ -208,6 +210,7 @@ StateMachineAction run_move_select(
 
     if (!read_battle_menu(
         env, stream, context, player_index,
+        ocr_watchdog,
         state, settings,
         currently_dmaxed, cheer_only
     )){
@@ -318,6 +321,7 @@ StateMachineAction throw_balls(
     ProgramEnvironment& env, size_t console_index,
     VideoStream& stream, SwitchControllerContext& context,
     Language language,
+    OcrFailureWatchdog& ocr_watchdog,
     GlobalStateTracker& state_tracker,
     const EndBattleDecider& decider
 ){

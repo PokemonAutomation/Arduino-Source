@@ -37,7 +37,8 @@ void run_swap_pokemon(
 
     PokemonSwapMenuReader reader(
         stream.logger(), stream.overlay(),
-        settings.language
+        settings.language,
+        runtime.ocr_watchdog[console_index]
     );
     PokemonSwapMenuDetector menu(false);
 

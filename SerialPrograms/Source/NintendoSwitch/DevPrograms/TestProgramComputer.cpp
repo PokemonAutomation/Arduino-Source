@@ -219,10 +219,6 @@ class WatchdogTest1 : public WatchdogCallback{
 
 
 
-
-
-
-
 void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& scope){
     using namespace Kernels;
     using namespace NintendoSwitch;

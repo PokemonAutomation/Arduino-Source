@@ -137,7 +137,6 @@ void KeyboardInputController::thread_loop(){
                     break;
                 }
 
-
                 //  If state is neutral, just issue a stop.
                 if (neutral){
                     if (try_stop_commands()){

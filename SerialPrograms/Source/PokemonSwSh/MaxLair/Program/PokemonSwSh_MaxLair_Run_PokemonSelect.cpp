@@ -20,6 +20,7 @@ void run_select_pokemon(
     size_t console_index,
     VideoStream& stream, SwitchControllerContext& context,
     GlobalStateTracker& state_tracker,
+    OcrFailureWatchdog& ocr_watchdog,
     const ConsoleSpecificOptions& settings
 ){
     GlobalState& state = state_tracker[console_index];
@@ -35,7 +36,8 @@ void run_select_pokemon(
     PokemonSelectMenuReader reader(
         stream.logger(),
         stream.overlay(),
-        settings.language
+        settings.language,
+        ocr_watchdog
     );
 
 

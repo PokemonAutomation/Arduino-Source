@@ -492,6 +492,7 @@ file(GLOB MAIN_SOURCES
     Source/CommonTools/Audio/SpectrogramMatcher.cpp
     Source/CommonTools/Audio/SpectrogramMatcher.h
     Source/CommonTools/DetectionDebouncer.h
+    Source/CommonTools/FailureWatchdog.h
     Source/CommonTools/ImageMatch/CroppedImageDictionaryMatcher.cpp
     Source/CommonTools/ImageMatch/CroppedImageDictionaryMatcher.h
     Source/CommonTools/ImageMatch/ExactImageDictionaryMatcher.cpp

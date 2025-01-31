@@ -211,8 +211,13 @@ bool BattleMenuDetector::detect(const ImageViewRGB32& screen){
 
 
 
-BattleMenuReader::BattleMenuReader(VideoOverlay& overlay, Language language)
+BattleMenuReader::BattleMenuReader(
+    VideoOverlay& overlay,
+    Language language,
+    OcrFailureWatchdog& ocr_watchdog
+)
     : m_language(language)
+    , m_ocr_watchdog(ocr_watchdog)
     , m_opponent_name(overlay, {0.3, 0.010, 0.4, 0.10}, COLOR_BLUE)
     , m_summary_opponent_name(overlay, {0.200, 0.100, 0.300, 0.065}, COLOR_BLUE)
     , m_summary_opponent_types(overlay, {0.200, 0.170, 0.300, 0.050}, COLOR_BLUE)
@@ -243,7 +248,7 @@ std::set<std::string> BattleMenuReader::read_opponent(
     for (size_t c = 0; c < 3; c++){
         screen = feed.snapshot();
         ImageViewRGB32 image = extract_box_reference(screen, m_opponent_name);
-        result = read_pokemon_name(logger, m_language, image);
+        result = read_pokemon_name(logger, m_language, m_ocr_watchdog, image);
         if (!result.empty()){
             return result;
         }
@@ -316,7 +321,7 @@ std::set<std::string> BattleMenuReader::read_opponent_in_summary(Logger& logger,
         ImageViewRGB32 name = extract_box_reference(screen, m_summary_opponent_name);
 
         //  We can use a weaker threshold here since we are cross-checking with the type.
-        name_slugs = read_pokemon_name(logger, m_language, name, -1.0);
+        name_slugs = read_pokemon_name(logger, m_language, m_ocr_watchdog, name, -1.0);
     }
 
     //  See if there's anything in common between the slugs that match the type
@@ -381,6 +386,7 @@ std::set<std::string> BattleMenuReader::read_opponent_in_summary(Logger& logger,
 std::string BattleMenuReader::read_own_mon(Logger& logger, const ImageViewRGB32& screen) const{
     return read_pokemon_name_sprite(
         logger,
+        m_ocr_watchdog,
         screen,
         m_own_sprite,
         m_own_name, m_language,
