@@ -5,15 +5,13 @@
  */
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
-#include "CommonFramework/VideoPipeline/VideoOverlay.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonBDSP/PokemonBDSP_Settings.h"
 #include "PokemonBDSP/Inference/Battles/PokemonBDSP_BattleMenuDetector.h"
 #include "PokemonBDSP/Inference/Battles/PokemonBDSP_StartBattleDetector.h"
 #include "PokemonBDSP_OverworldTrigger.h"
 #include "PokemonBDSP_GameNavigation.h"
-#include <iostream>
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -63,7 +61,7 @@ OverworldTrigger::OverworldTrigger()
 }
 
 
-void OverworldTrigger::run_trigger(BotBaseContext& context) const{
+void OverworldTrigger::run_trigger(SwitchControllerContext& context) const{
     switch (TRIGGER_METHOD){
     case TriggerMethod::HORIZONTAL_NO_BIAS:
         pbf_controller_state(context, BUTTON_B, DPAD_NONE, 0, 128, 128, 128, MOVE_DURATION);
@@ -99,16 +97,16 @@ void OverworldTrigger::run_trigger(BotBaseContext& context) const{
     }
 }
 
-bool OverworldTrigger::find_encounter(ConsoleHandle& console, BotBaseContext& context) const{
+bool OverworldTrigger::find_encounter(VideoStream& stream, SwitchControllerContext& context) const{
     BattleMenuWatcher battle_menu_detector(BattleType::STANDARD);
-    StartBattleDetector start_battle_detector(console);
+    StartBattleDetector start_battle_detector(stream.overlay());
 
-    int result = 0;
+    int ret = 0;
     if (TRIGGER_METHOD != TriggerMethod::SWEET_SCENT){
         //  Move character back and forth to trigger encounter.
-        result = run_until(
-            console, context,
-            [&](BotBaseContext& context){
+        ret = run_until<SwitchControllerContext>(
+            stream, context,
+            [&](SwitchControllerContext& context){
                 while (true){
                     run_trigger(context);
                 }
@@ -119,9 +117,9 @@ bool OverworldTrigger::find_encounter(ConsoleHandle& console, BotBaseContext& co
             }
         );
     }else{
-        console.overlay().add_log("Using Sweet Scent", COLOR_CYAN);
+        stream.overlay().add_log("Using Sweet Scent", COLOR_CYAN);
         //  Use Sweet Scent to trigger encounter.
-        overworld_to_menu(console, context);
+        overworld_to_menu(stream, context);
 
         //  Go to pokemon page
         const uint16_t MENU_TO_POKEMON_DELAY = GameSettings::instance().MENU_TO_POKEMON_DELAY;
@@ -133,12 +131,12 @@ bool OverworldTrigger::find_encounter(ConsoleHandle& console, BotBaseContext& co
         if (location >= 1 && location <= 3){
             const size_t move_down_times = location;
             for(size_t i = 0; i < move_down_times; ++i){
-                pbf_press_dpad(context, DPAD_DOWN, 1, change_pokemon_delay);
+                pbf_press_dpad(context, DPAD_DOWN, 20, change_pokemon_delay);
             }
         }else if (location >= 1){ // for location 4 and 5
             const size_t move_down_times = 6 - location;
             for (size_t i = 0; i < move_down_times; ++i){
-                pbf_press_dpad(context, DPAD_UP, 1, change_pokemon_delay);
+                pbf_press_dpad(context, DPAD_UP, 20, change_pokemon_delay);
             }
         }
 
@@ -147,32 +145,32 @@ bool OverworldTrigger::find_encounter(ConsoleHandle& console, BotBaseContext& co
         pbf_press_button(context, BUTTON_ZL, 20, pokemon_to_pokemon_menu_delay);
         //  Move down one menuitem to select "Sweet Scent"
         const uint16_t move_pokemon_menu_item_delay = 30;
-        pbf_press_dpad(context, DPAD_DOWN, 1, move_pokemon_menu_item_delay);
+        pbf_press_dpad(context, DPAD_DOWN, 20, move_pokemon_menu_item_delay);
         //  Use sweet scent
         pbf_mash_button(context, BUTTON_ZL, 30);
 
-        result = wait_until(
-            console, context, std::chrono::seconds(30),
+        ret = wait_until(
+            stream, context, std::chrono::seconds(30),
             {
                 {battle_menu_detector},
                 {start_battle_detector},
             }
         );
-        if (result < 0){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
+        if (ret < 0){
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
                 "Battle not detected after Sweet Scent for 30 seconds.",
-                true
+                stream
             );
         }
     }
 
-    switch (result){
+    switch (ret){
     case 0:
-        console.log("Unexpected Battle.", COLOR_RED);
+        stream.log("Unexpected Battle.", COLOR_RED);
         return false;
     case 1:
-        console.log("Battle started!");
+        stream.log("Battle started!");
         return true;
     }
     return false;

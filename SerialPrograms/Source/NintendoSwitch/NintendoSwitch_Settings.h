@@ -8,10 +8,12 @@
 #define PokemonAutomation_NintendoSwitch_Settings_H
 
 #include "Common/Cpp/ImageResolution.h"
+#include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
-#include "Common/Cpp/Options/StringOption.h"
+//#include "Common/Cpp/Options/StringOption.h"
 #include "Common/Cpp/Options/TimeExpressionOption.h"
 #include "CommonFramework/Panels/SettingsPanel.h"
+#include "Controllers/NintendoSwitch_KeyboardMapping.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -32,6 +34,10 @@ public:
     TimeExpressionOption<uint16_t> START_GAME_INTERNET_CHECK_DELAY;
     BooleanCheckBoxOption TOLERATE_SYSTEM_UPDATE_MENU_FAST;
     BooleanCheckBoxOption TOLERATE_SYSTEM_UPDATE_MENU_SLOW;
+
+    SectionDividerOption KEYBOARD_SECTION;
+    KeyboardMappingOption KEYBOARD_MAPPINGS;
+
 };
 
 

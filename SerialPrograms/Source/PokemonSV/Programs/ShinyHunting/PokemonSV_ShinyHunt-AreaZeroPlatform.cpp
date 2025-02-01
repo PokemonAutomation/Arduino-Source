@@ -5,16 +5,15 @@
  */
 
 #include <atomic>
-#include <sstream>
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
-#include "CommonFramework/Tools/StatsTracking.h"
-#include "CommonFramework/Tools/VideoResolutionCheck.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
+#include "CommonTools/Async/InferenceRoutines.h"
+#include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/PokemonSV_Settings.h"
@@ -34,8 +33,6 @@
 //#include <iostream>
 //using std::cout;
 //using std::endl;
-#include <unordered_map>
-#include <algorithm>
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -51,7 +48,7 @@ ShinyHuntAreaZeroPlatform_Descriptor::ShinyHuntAreaZeroPlatform_Descriptor()
         "Shiny hunt the isolated platform at the bottom of Area Zero.",
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 struct ShinyHuntAreaZeroPlatform_Descriptor::Stats : public LetsGoEncounterBotStats{
@@ -125,7 +122,13 @@ ShinyHuntAreaZeroPlatform::ShinyHuntAreaZeroPlatform()
         LockMode::UNLOCK_WHILE_RUNNING,
         35
     )
-    , SANDWICH_OPTIONS("Sandwich Options", &LANGUAGE, BaseRecipe::paradox, false, false, true)
+    , SANDWICH_OPTIONS(
+        "Sandwich Options",
+        &LANGUAGE,
+        BaseRecipe::paradox,
+        false,
+        GroupOption::EnableMode::ALWAYS_ENABLED
+    )
     , GO_HOME_WHEN_DONE(true)
     , AUTO_HEAL_PERCENT(
         "<b>Auto-Heal %</b><br>Auto-heal if your HP drops below this percentage.",
@@ -184,11 +187,11 @@ void ShinyHuntAreaZeroPlatform::value_changed(void* object){
 
 
 
-bool ShinyHuntAreaZeroPlatform::run_traversal(BotBaseContext& context){
+bool ShinyHuntAreaZeroPlatform::run_traversal(SwitchControllerContext& context){
     ShinyHuntAreaZeroPlatform_Descriptor::Stats& stats = m_env->current_stats<ShinyHuntAreaZeroPlatform_Descriptor::Stats>();
 
     const ProgramInfo& info = m_env->program_info();
-    ConsoleHandle& console = m_env->console;
+    VideoStream& stream = m_env->console;
 
 //    if (m_pending_save){
 //        save_game_from_overworld(info, console, context);
@@ -198,12 +201,12 @@ bool ShinyHuntAreaZeroPlatform::run_traversal(BotBaseContext& context){
 
     double hp = m_hp_watcher->last_known_value() * 100;
     if (0 < hp){
-        console.log("Last Known HP: " + tostr_default(hp) + "%", COLOR_BLUE);
+        stream.log("Last Known HP: " + tostr_default(hp) + "%", COLOR_BLUE);
     }else{
-        console.log("Last Known HP: ?", COLOR_RED);
+        stream.log("Last Known HP: ?", COLOR_RED);
     }
     if (0 < hp && hp < AUTO_HEAL_PERCENT){
-        auto_heal_from_menu_or_overworld(info, console, context, 0, true);
+        auto_heal_from_menu_or_overworld(info, stream, context, 0, true);
         stats.m_autoheals++;
         m_env->update_stats();
     }
@@ -217,7 +220,7 @@ bool ShinyHuntAreaZeroPlatform::run_traversal(BotBaseContext& context){
     std::chrono::seconds window_seconds;
     bool enough_time;
     if (window == WallDuration::zero()){
-//        console.log("Debug Reset Timer: Window not initialized.", COLOR_RED);
+//        stream.log("Debug Reset Timer: Window not initialized.", COLOR_RED);
 
         //  Not enough history.
         enough_time = false;
@@ -227,14 +230,14 @@ bool ShinyHuntAreaZeroPlatform::run_traversal(BotBaseContext& context){
             kills, encounters, window_seconds
         );
     }else{
-//        console.log("Debug Reset Timer: Window started.", COLOR_RED);
+//        stream.log("Debug Reset Timer: Window started.", COLOR_RED);
 
         window_seconds = std::chrono::duration_cast<Seconds>(window);
         enough_time = m_encounter_tracker->get_encounters_in_window(
             kills, encounters, window_seconds
         );
     }
-    console.log(
+    stream.log(
         "Starting Traversal Iteration: " + tostr_u_commas(m_iterations) +
         "\n    Time Window (Seconds): " + std::to_string(window_seconds.count()) +
         "\n    Kills: " + std::to_string(kills) +
@@ -244,23 +247,23 @@ bool ShinyHuntAreaZeroPlatform::run_traversal(BotBaseContext& context){
     // Check we want to do a platform reset first:
     do{
         if (!PLATFORM_RESET.enabled()){
-            console.log("Platform Reset: Disabled", COLOR_ORANGE);
+            stream.log("Platform Reset: Disabled", COLOR_ORANGE);
             break;
         }
         if (!enough_time){
-            console.log("Platform Reset: Not enough time has elapsed.", COLOR_ORANGE);
+            stream.log("Platform Reset: Not enough time has elapsed.", COLOR_ORANGE);
             break;
         }
         if (kills >= PLATFORM_RESET.KILLS_IN_WINDOW0){
-            console.log("Platform Reset: Enough kills in window.", COLOR_ORANGE);
+            stream.log("Platform Reset: Enough kills in window.", COLOR_ORANGE);
             break;
         }
         if (encounters >= PLATFORM_RESET.ENCOUNTERS_IN_WINDOW){
-            console.log("Platform Reset: Enough encounters in window.", COLOR_ORANGE);
+            stream.log("Platform Reset: Enough encounters in window.", COLOR_ORANGE);
             break;
         }
 
-        console.log("Conditions met for platform reset.");
+        stream.log("Conditions met for platform reset.");
         m_pending_platform_reset = true;
 //        m_state = State::LEAVE_AND_RETURN;
         return false;
@@ -271,13 +274,13 @@ bool ShinyHuntAreaZeroPlatform::run_traversal(BotBaseContext& context){
     try{
         switch (PATH0){
         case Path::PATH0:
-            area_zero_platform_run_path0(*m_env, console, context, *m_encounter_tracker, m_iterations);
+            area_zero_platform_run_path0(*m_env, stream, context, *m_encounter_tracker, m_iterations);
             break;
         case Path::PATH1:
-            area_zero_platform_run_path1(*m_env, console, context, *m_encounter_tracker, m_iterations);
+            area_zero_platform_run_path1(*m_env, stream, context, *m_encounter_tracker, m_iterations);
             break;
         case Path::PATH2:
-            area_zero_platform_run_path2(*m_env, console, context, *m_encounter_tracker, m_iterations);
+            area_zero_platform_run_path2(*m_env, stream, context, *m_encounter_tracker, m_iterations);
             break;
         }
         m_iterations++;
@@ -298,7 +301,7 @@ struct ResetException{};
 void ShinyHuntAreaZeroPlatform::set_flags(SingleSwitchProgramEnvironment& env){
 //    ShinyHuntAreaZeroPlatform_Descriptor::Stats& stats = m_env->current_stats<ShinyHuntAreaZeroPlatform_Descriptor::Stats>();
 //    const ProgramInfo& info = m_env->program_info();
-    ConsoleHandle& console = m_env->console;
+    VideoStream& stream = m_env->console;
 
     send_program_notification(
         *m_env, NOTIFICATION_STATUS_UPDATE,
@@ -311,12 +314,12 @@ void ShinyHuntAreaZeroPlatform::set_flags(SingleSwitchProgramEnvironment& env){
     if (MODE == Mode::MAKE_SANDWICH &&
         m_last_sandwich + std::chrono::minutes(SANDWICH_RESET_IN_MINUTES) < now
     ){
-        console.log("Enough time has elapsed. Time to reset sandwich...");
+        stream.log("Enough time has elapsed. Time to reset sandwich...");
         m_pending_sandwich = true;
     }
 
     int64_t seconds_on_sandwich = std::chrono::duration_cast<std::chrono::seconds>(now - m_last_sandwich).count();
-    console.log(
+    stream.log(
         std::string("State:\n") +
         "    Time on Sandwich: " + (m_last_sandwich == WallClock::min()
             ? "N/A"
@@ -328,25 +331,25 @@ void ShinyHuntAreaZeroPlatform::set_flags(SingleSwitchProgramEnvironment& env){
     );
 
 }
-void ShinyHuntAreaZeroPlatform::run_state(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void ShinyHuntAreaZeroPlatform::run_state(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     ShinyHuntAreaZeroPlatform_Descriptor::Stats& stats = m_env->current_stats<ShinyHuntAreaZeroPlatform_Descriptor::Stats>();
     const ProgramInfo& info = m_env->program_info();
-    ConsoleHandle& console = m_env->console;
+    VideoStream& stream = m_env->console;
 
     if (m_pending_save){
-        console.log("Executing: Pending Save...");
+        stream.log("Executing: Pending Save...");
         if (m_current_location != Location::ZERO_GATE_FLY_SPOT && m_current_location != Location::AREA_ZERO){
-            return_to_outside_zero_gate(info, console, context);
+            return_to_outside_zero_gate(info, stream, context);
             m_current_location = Location::ZERO_GATE_FLY_SPOT;
         }
-        save_game_from_overworld(info, console, context);
+        save_game_from_overworld(info, stream, context);
         m_saved_location = m_current_location;
         m_pending_save = false;
         return;
     }
 
     if (m_pending_sandwich){
-        console.log("Executing: Pending Sandwich...");
+        stream.log("Executing: Pending Sandwich...");
 
         //  If we need to reset, do so now.
         if (m_reset_on_next_sandwich){
@@ -355,7 +358,7 @@ void ShinyHuntAreaZeroPlatform::run_state(SingleSwitchProgramEnvironment& env, B
 
         //  If we're not at Zero Gate, go there now.
         if (m_current_location != Location::ZERO_GATE_FLY_SPOT){
-            return_to_outside_zero_gate(info, console, context);
+            return_to_outside_zero_gate(info, stream, context);
             m_current_location = Location::ZERO_GATE_FLY_SPOT;
             m_pending_platform_reset = false;
         }
@@ -364,24 +367,24 @@ void ShinyHuntAreaZeroPlatform::run_state(SingleSwitchProgramEnvironment& env, B
 
         //  If we're not saved at Zero Gate, do it now.
         if (m_saved_location != Location::ZERO_GATE_FLY_SPOT){
-            save_game_from_overworld(info, console, context);
+            save_game_from_overworld(info, stream, context);
             m_saved_location = m_current_location;
         }
 
-        picnic_at_zero_gate(info, console, context);
+        picnic_at_zero_gate(info, stream, context);
         pbf_move_left_joystick(context, 128, 0, 70, 0);
-        enter_sandwich_recipe_list(info, console, context);
-        make_sandwich_option(env, console, context, SANDWICH_OPTIONS);
+        enter_sandwich_recipe_list(info, stream, context);
+        make_sandwich_option(env, stream, context, SANDWICH_OPTIONS);
 
-        console.log("Sandwich Reset: Starting new sandwich timer...");
+        stream.log("Sandwich Reset: Starting new sandwich timer...");
         m_last_sandwich = current_time();
 
         stats.m_sandwiches++;
         m_env->update_stats();
 
-        leave_picnic(info, console, context);
-        return_to_inside_zero_gate_from_picnic(info, console, context);
-        inside_zero_gate_to_platform(info, console, context, FLYING_UNLOCKED, NAVIGATE_TO_PLATFORM);
+        leave_picnic(info, stream, context);
+        return_to_inside_zero_gate_from_picnic(info, stream, context);
+        inside_zero_gate_to_platform(info, stream, context, FLYING_UNLOCKED, NAVIGATE_TO_PLATFORM);
         m_current_location = Location::AREA_ZERO;
 
         m_pending_sandwich = false;
@@ -393,9 +396,9 @@ void ShinyHuntAreaZeroPlatform::run_state(SingleSwitchProgramEnvironment& env, B
     }
 
     if (m_pending_platform_reset){
-        console.log("Executing: Platform Reset");
-        return_to_inside_zero_gate(info, console, context);
-        inside_zero_gate_to_platform(info, console, context, FLYING_UNLOCKED, NAVIGATE_TO_PLATFORM);
+        stream.log("Executing: Platform Reset");
+        return_to_inside_zero_gate(info, stream, context);
+        inside_zero_gate_to_platform(info, stream, context, FLYING_UNLOCKED, NAVIGATE_TO_PLATFORM);
         m_current_location = Location::AREA_ZERO;
 
         stats.m_platform_resets++;
@@ -411,16 +414,16 @@ void ShinyHuntAreaZeroPlatform::run_state(SingleSwitchProgramEnvironment& env, B
     case Location::UNKNOWN:
     case Location::ZERO_GATE_FLY_SPOT:
     case Location::TRAVELING_TO_PLATFORM:
-        console.log("Executing: Platform Reset (state-based)...");
-        return_to_inside_zero_gate(info, console, context);
-        inside_zero_gate_to_platform(info, console, context, FLYING_UNLOCKED, NAVIGATE_TO_PLATFORM);
+        stream.log("Executing: Platform Reset (state-based)...");
+        return_to_inside_zero_gate(info, stream, context);
+        inside_zero_gate_to_platform(info, stream, context, FLYING_UNLOCKED, NAVIGATE_TO_PLATFORM);
         m_current_location = Location::AREA_ZERO;
         m_pending_platform_reset = false;
         m_encounter_tracker->reset_rate_tracker_start_time();
         m_consecutive_failures = 0;
         return;
     case Location::AREA_ZERO:
-        console.log("Executing: Traversal...");
+        stream.log("Executing: Traversal...");
         try{
             run_traversal(context);
         }catch (OperationFailedException&){
@@ -432,12 +435,12 @@ void ShinyHuntAreaZeroPlatform::run_state(SingleSwitchProgramEnvironment& env, B
         return;
     }
 }
-void ShinyHuntAreaZeroPlatform::set_flags_and_run_state(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void ShinyHuntAreaZeroPlatform::set_flags_and_run_state(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     set_flags(env);
 
     ShinyHuntAreaZeroPlatform_Descriptor::Stats& stats = m_env->current_stats<ShinyHuntAreaZeroPlatform_Descriptor::Stats>();
 //    const ProgramInfo& info = m_env->program_info();
-    ConsoleHandle& console = m_env->console;
+    VideoStream& stream = m_env->console;
 
     try{
         run_state(env, context);
@@ -447,15 +450,16 @@ void ShinyHuntAreaZeroPlatform::set_flags_and_run_state(SingleSwitchProgramEnvir
         m_consecutive_failures++;
         e.send_notification(*m_env, NOTIFICATION_ERROR_RECOVERABLE);
         if (m_consecutive_failures >= 3){
-            throw FatalProgramException(
-                ErrorReport::SEND_ERROR_REPORT, console,
+            throw_and_log<FatalProgramException>(
+                stream.logger(),
+                ErrorReport::SEND_ERROR_REPORT,
                 "Failed 3 times consecutively."
             );
         }
     }
 }
 
-void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     m_env = &env;
 
     ShinyHuntAreaZeroPlatform_Descriptor::Stats& stats = env.current_stats<ShinyHuntAreaZeroPlatform_Descriptor::Stats>();
@@ -514,9 +518,9 @@ void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, Bot
         try{
             env.console.log("Starting encounter loop...", COLOR_PURPLE);
             EncounterWatcher encounter_watcher(env.console, COLOR_RED);
-            run_until(
+            run_until<SwitchControllerContext>(
                 env.console, context,
-                [&](BotBaseContext& context){
+                [&](SwitchControllerContext& context){
                     //  Inner program loop that runs the state machine.
                     while (true){
                         set_flags_and_run_state(env, context);

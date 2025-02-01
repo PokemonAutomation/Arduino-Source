@@ -28,7 +28,7 @@ private:
 public:
     ImageRGB32();
     ImageRGB32(size_t width, size_t height);
-    ImageRGB32(const std::string& filename);
+    explicit ImageRGB32(const std::string& filename);
 
     //  Fill the entire image with the specified pixel.
     using ImageViewPlanar32::fill;

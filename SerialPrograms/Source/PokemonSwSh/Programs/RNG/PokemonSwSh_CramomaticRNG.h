@@ -11,7 +11,7 @@
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
-#include "CommonFramework/Options/LanguageOCROption.h"
+#include "CommonTools/Options/LanguageOCROption.h"
 #include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "Pokemon/Pokemon_Xoroshiro128Plus.h"
@@ -41,7 +41,7 @@ class CramomaticRNG : public SingleSwitchProgramInstance{
 public:
     CramomaticRNG();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
     StartInGripOrGameOption START_LOCATION;
@@ -64,12 +64,12 @@ private:
     BooleanCheckBoxOption SAVE_SCREENSHOTS;
     BooleanCheckBoxOption LOG_VALUES;
 
-    void navigate_to_party(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    void navigate_to_party(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
     CramomaticTarget calculate_target(SingleSwitchProgramEnvironment& env, Xoroshiro128PlusState state, std::vector<CramomaticSelection> wanted_balls);
-    void leave_to_overworld_and_interact(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-    void choose_apricorn(SingleSwitchProgramEnvironment& env, BotBaseContext& context, bool sport);
-    std::pair<bool, std::string> receive_ball(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-    void recover_from_wrong_state(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    void leave_to_overworld_and_interact(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
+    void choose_apricorn(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, bool sport);
+    std::pair<bool, std::string> receive_ball(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
+    void recover_from_wrong_state(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
 };
 
 

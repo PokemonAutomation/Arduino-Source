@@ -10,7 +10,6 @@
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Notification.h"
 #include "PokemonLA/PokemonLA_Settings.h"
@@ -80,14 +79,14 @@ bool ShinyDetectedActionOption::stop_on_shiny() const{
 
 
 bool on_shiny_callback(
-    ProgramEnvironment& env, ConsoleHandle& console,
+    ProgramEnvironment& env, VideoStream& stream,
     ShinyDetectedActionOption& options,
     float error_coefficient
 ){
     {
         std::ostringstream ss;
         ss << "Detected Shiny Sound! (error coefficient = " << error_coefficient << ")";
-        console.log(ss.str(), COLOR_BLUE);
+        stream.log(ss.str(), COLOR_BLUE);
 
         //  If we're not ignoring the shiny, return now. Actions will be deferred
         //  until after the session ends.
@@ -97,7 +96,7 @@ bool on_shiny_callback(
         }
     }
 
-    console.log("Ignoring shiny per user settings...", COLOR_RED);
+    stream.log("Ignoring shiny per user settings...", COLOR_RED);
 
     std::vector<std::pair<std::string, std::string>> embeds;
 
@@ -110,12 +109,12 @@ bool on_shiny_callback(
         Pokemon::COLOR_STAR_SHINY,
         "Detected Shiny Sound",
         embeds, "",
-        console.video().snapshot(), true
+        stream.video().snapshot(), true
     );
     return false;
 }
 void on_shiny_sound(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context,
     ShinyDetectedActionOption& options,
     float error_coefficient
 ){
@@ -136,7 +135,7 @@ void on_shiny_sound(
         Pokemon::COLOR_STAR_SHINY,
         "Detected Shiny Sound",
         embeds, "",
-        console.video().snapshot(), true
+        stream.video().snapshot(), true
     );
 
     ShinyDetectedAction action = options.ACTION;
@@ -150,7 +149,7 @@ void on_shiny_sound(
 }
 
 void on_match_found(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context,
     ShinyDetectedActionOption& options, bool stop_program
 ){
     std::vector<std::pair<std::string, std::string>> embeds;
@@ -163,7 +162,7 @@ void on_match_found(
         Pokemon::COLOR_STAR_SHINY,
         "Match Found",
         embeds, "",
-        console.video().snapshot(), true
+        stream.video().snapshot(), true
     );
 
     ShinyDetectedAction action = options.ACTION;
@@ -172,13 +171,13 @@ void on_match_found(
     }
 
     if (stop_program){
-        console.log("Stopping...");
+        stream.log("Stopping...");
 //        pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
         context.wait_for_all_requests();
         throw ProgramFinishedException();
     }
 
-    console.log("Continuing...");
+    stream.log("Continuing...");
 }
 
 

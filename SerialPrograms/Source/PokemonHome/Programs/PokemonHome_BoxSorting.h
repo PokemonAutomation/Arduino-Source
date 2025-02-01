@@ -32,7 +32,7 @@ class BoxSorting : public SingleSwitchProgramInstance{
 public:
     BoxSorting();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
     SimpleIntegerOption<uint16_t> BOX_NUMBER;

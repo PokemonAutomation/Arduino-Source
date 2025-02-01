@@ -7,9 +7,8 @@
 #ifndef PokemonAutomation_PokemonSwSh_MaxLair_Notifications_H
 #define PokemonAutomation_PokemonSwSh_MaxLair_Notifications_H
 
-#include "CommonFramework/Logging/Logger.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/Tools/VideoStream.h"
 #include "NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h"
 #include "PokemonSwSh/Options/PokemonSwSh_AutoHostNotification.h"
 #include "PokemonSwSh_MaxLair_Stats.h"
@@ -32,7 +31,7 @@ void send_status_notification(
 
 void send_raid_notification(
     ProgramEnvironment& env,
-    ConsoleHandle& console,
+    VideoStream& stream,
     AutoHostNotificationOption& settings,
     bool has_code, uint8_t code[8],
     const std::string& slug,

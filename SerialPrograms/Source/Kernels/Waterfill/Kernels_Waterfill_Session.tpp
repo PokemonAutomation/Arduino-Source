@@ -16,9 +16,9 @@
 #include "Kernels/BinaryMatrix/Kernels_SparseBinaryMatrixCore.h"
 #include "Kernels_Waterfill_Session.h"
 
-//#include <iostream>
-//using std::cout;
-//using std::endl;
+// #include <iostream>
+// using std::cout;
+// using std::endl;
 
 namespace PokemonAutomation{
 namespace Kernels{

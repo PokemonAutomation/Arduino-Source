@@ -7,8 +7,6 @@
 #ifndef PokemonAutomation_PokemonSwSh_MaxLair_Run_PokemonSwap_H
 #define PokemonAutomation_PokemonSwSh_MaxLair_Run_PokemonSwap_H
 
-#include "CommonFramework/Tools/ConsoleHandle.h"
-#include "PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options.h"
 #include "PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options_Consoles.h"
 #include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_StateTracker.h"
 #include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_StateMachine.h"
@@ -20,8 +18,9 @@ namespace MaxLairInternal{
 
 
 void run_swap_pokemon(
+    size_t console_index,
     AdventureRuntime& runtime,
-    ConsoleHandle& console, BotBaseContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     GlobalStateTracker& state_tracker,
     const ConsoleSpecificOptions& settings
 );

@@ -5,8 +5,8 @@
  */
 
 
-#include "CommonFramework/Inference/SpectrogramMatcher.h"
-#include "CommonFramework/Inference/AudioTemplateCache.h"
+#include "CommonTools/Audio/SpectrogramMatcher.h"
+#include "CommonTools/Audio/AudioTemplateCache.h"
 #include "PokemonSwSh_BerryTreeRustlingSoundDetector.h"
 
 namespace PokemonAutomation{
@@ -15,12 +15,18 @@ namespace PokemonSwSh{
 
 
 BerryTreeRustlingSoundDetector::BerryTreeRustlingSoundDetector(
-    ConsoleHandle& console,
+    VideoStream& stream,
     DetectedCallback detected_callback,
     float threshold
 )
     // Use a red as the detection color because the Levelball is made using red apricorns.
-    : AudioPerSpectrumDetectorBase("BerryTreeRustlingSoundDetector", "Berry tree rustling sound", COLOR_RED, console, detected_callback)
+    : AudioPerSpectrumDetectorBase(
+        stream.logger(),
+        "BerryTreeRustlingSoundDetector",
+        "Berry tree rustling sound",
+        COLOR_RED,
+        detected_callback
+    )
     , m_threshold(threshold)
 {}
 

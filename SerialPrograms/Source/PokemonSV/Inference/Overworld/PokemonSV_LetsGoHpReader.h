@@ -11,7 +11,7 @@
 #include "Common/Cpp/Color.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
+#include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 
 namespace PokemonAutomation{
     class Logger;

@@ -4,20 +4,17 @@
  *
  */
 
-#include <functional>
-#include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
+#include <sstream>
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
-#include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
-#include "CommonFramework/ImageTools/WaterfillUtilities.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "CommonTools/Images/WaterfillUtilities.h"
+#include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "PokemonLA_MMOQuestionMarkDetector.h"
 #include "PokemonLA/PokemonLA_Locations.h"
 
-#include <sstream>
-#include <iostream>
-#include <iomanip>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -102,11 +99,18 @@ bool detect_MMO_question_mark(const PokemonAutomation::ImageViewRGB32 &frame, co
     };
 
     bool detected = match_template_by_waterfill(
-        image, MMOQuestionMarkBackgroundMatcher::instance(),
-        {{combine_rgb(0, 10, 30), combine_rgb(60, 90, 130)}},
-        {scale(min_bg_size), scale(max_bg_size)}, 90,
+        image,
+        MMOQuestionMarkBackgroundMatcher::instance(),
+        {
+            {combine_rgb(0, 0, 0), combine_rgb(127, 127, 127)},
+            {combine_rgb(0, 10, 30), combine_rgb(60, 90, 130)},
+        },
+        {scale(min_bg_size), scale(max_bg_size)},
+        90,
         [](WaterfillObject&) { return true; }
     );
+
+//    cout << "detected = " << detected << endl;
 
     if (detected){
         const size_t min_curve_size = 250;

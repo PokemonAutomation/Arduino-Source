@@ -5,16 +5,15 @@
  */
 
 #include <atomic>
-#include <sstream>
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
-#include "CommonFramework/Tools/StatsTracking.h"
-#include "CommonFramework/Tools/VideoResolutionCheck.h"
+#include "CommonTools/Async/InferenceRoutines.h"
+#include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_LetsGoHpReader.h"
@@ -48,7 +47,7 @@ ShinyHuntScatterbug_Descriptor::ShinyHuntScatterbug_Descriptor()
         "Shiny hunt Scatterbug.",
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 struct ShinyHuntScatterbug_Descriptor::Stats : public LetsGoEncounterBotStats{
@@ -88,7 +87,13 @@ ShinyHuntScatterbug::ShinyHuntScatterbug()
         LockMode::UNLOCK_WHILE_RUNNING,
         true
     )
-    , SANDWICH_OPTIONS("Sandwich Options", &LANGUAGE, BaseRecipe::shiny, false, false, true)
+    , SANDWICH_OPTIONS(
+        "Sandwich Options",
+        &LANGUAGE,
+        BaseRecipe::shiny,
+        false,
+        GroupOption::EnableMode::ALWAYS_ENABLED
+    )
     , GO_HOME_WHEN_DONE(true)
     , AUTO_HEAL_PERCENT(
         "<b>Auto-Heal %</b><br>Auto-heal if your HP drops below this percentage.",
@@ -140,7 +145,7 @@ ShinyHuntScatterbug::ShinyHuntScatterbug()
 }
 
 
-void ShinyHuntScatterbug::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void ShinyHuntScatterbug::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     ShinyHuntScatterbug_Descriptor::Stats& stats = env.current_stats<ShinyHuntScatterbug_Descriptor::Stats>();
 
     //  Connect the controller.
@@ -192,10 +197,10 @@ void ShinyHuntScatterbug::program(SingleSwitchProgramEnvironment& env, BotBaseCo
 
             consecutive_failures++;
             if (consecutive_failures >= 3){
-                throw OperationFailedException(
-                    ErrorReport::SEND_ERROR_REPORT, env.console,
+                OperationFailedException::fire(
+                    ErrorReport::SEND_ERROR_REPORT,
                     "Failed 3 times in the row.",
-                    true
+                    env.console
                 );
             }
 
@@ -217,10 +222,14 @@ void ShinyHuntScatterbug::program(SingleSwitchProgramEnvironment& env, BotBaseCo
 // Whenever a battle happens, we check shinies and handle battle according to user setting. After battle ends, move
 // back to PokeCenter to start the `action` again.
 // `action` must be an action starting at the PokeCenter
-void ShinyHuntScatterbug::handle_battles_and_back_to_pokecenter(SingleSwitchProgramEnvironment& env, BotBaseContext& context, 
-    std::function<void(SingleSwitchProgramEnvironment& env, BotBaseContext& context)>&& action)
-{
-    assert(m_encounter_tracker != nullptr);
+void ShinyHuntScatterbug::handle_battles_and_back_to_pokecenter(
+    SingleSwitchProgramEnvironment& env,
+    SwitchControllerContext& context,
+    std::function<void(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context)>&& action
+){
+    if (m_encounter_tracker == nullptr){
+        throw InternalProgramError(&env.logger(), PA_CURRENT_FUNCTION, "m_encounter_tracker == nullptr");
+    }
 
     bool action_finished = false;
     bool first_iteration = true;
@@ -229,9 +238,9 @@ void ShinyHuntScatterbug::handle_battles_and_back_to_pokecenter(SingleSwitchProg
     while(action_finished == false || returned_to_pokecenter == false){
         // env.console.overlay().add_log("Calculate what to do next");
         EncounterWatcher encounter_watcher(env.console, COLOR_RED);
-        int ret = run_until(
+        int ret = run_until<SwitchControllerContext>(
             env.console, context,
-            [&](BotBaseContext& context){
+            [&](SwitchControllerContext& context){
                 if (action_finished){
                     // `action` is already finished. Now we just try to get back to pokecenter:
                     reset_to_pokecenter(env.program_info(), env.console, context);
@@ -283,7 +292,7 @@ void ShinyHuntScatterbug::handle_battles_and_back_to_pokecenter(SingleSwitchProg
 
 // Start at Mesagoza South Gate pokecenter, make a sandwich, then use let's go repeatedly until 30 min passes.
 // If 
-void ShinyHuntScatterbug::run_one_sandwich_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void ShinyHuntScatterbug::run_one_sandwich_iteration(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     ShinyHuntScatterbug_Descriptor::Stats& stats = env.current_stats<ShinyHuntScatterbug_Descriptor::Stats>();
 
     bool saved_after_this_sandwich = false;
@@ -299,7 +308,7 @@ void ShinyHuntScatterbug::run_one_sandwich_iteration(SingleSwitchProgramEnvironm
     };
 
     handle_battles_and_back_to_pokecenter(env, context, 
-        [this, &last_sandwich_time](SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+        [this, &last_sandwich_time](SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
             // Orient camera to look at same direction as player character
             // This is needed because when save-load the game, the camera is reset
             // to this location.
@@ -353,10 +362,10 @@ void ShinyHuntScatterbug::run_one_sandwich_iteration(SingleSwitchProgramEnvironm
         }
 
         handle_battles_and_back_to_pokecenter(env, context, 
-            [this, &path_id, &hp_watcher](SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-                run_until(
+            [this, &path_id, &hp_watcher](SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+                run_until<SwitchControllerContext>(
                     env.console, context,
-                    [&](BotBaseContext& context){
+                    [&](SwitchControllerContext& context){
                         run_lets_go_iteration(env, context, path_id);
                     },
                     {hp_watcher}
@@ -377,7 +386,7 @@ void ShinyHuntScatterbug::run_one_sandwich_iteration(SingleSwitchProgramEnvironm
 
 // One iteration of the hunt: 
 // start at Mesagoza South Gate pokecenter, go out and use Let's Go to battle Scatterbug, 
-void ShinyHuntScatterbug::run_lets_go_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context, size_t path_id){
+void ShinyHuntScatterbug::run_lets_go_iteration(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, size_t path_id){
     auto& console = env.console;
     // Orient camera to look at same direction as player character
     // This is needed because when save-load the game, the camera is reset
@@ -389,7 +398,7 @@ void ShinyHuntScatterbug::run_lets_go_iteration(SingleSwitchProgramEnvironment& 
     auto move_forward_with_lets_go = [&](int num_iterations){
         context.wait_for_all_requests();
         for(int i = 0; i < num_iterations; i++){
-            use_lets_go_to_clear_in_front(console, context, *m_encounter_tracker, throw_ball_if_bubble, [&](BotBaseContext& context){
+            use_lets_go_to_clear_in_front(console, context, *m_encounter_tracker, throw_ball_if_bubble, [&](SwitchControllerContext& context){
                 // Do the following movement while the Let's Go pokemon clearing wild pokemon.
                 // Slowly Moving forward
                 pbf_move_left_joystick(context, 128, 105, 800, 0);

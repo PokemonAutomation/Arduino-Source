@@ -6,7 +6,8 @@
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
+#include "CommonTools/Async/InferenceRoutines.h"
+#include "CommonTools/VisualDetectors/FrozenImageDetector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSwSh/ShinyHuntTracker.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_SelectionArrow.h"
@@ -29,7 +30,7 @@ DoublesLeveling_Descriptor::DoublesLeveling_Descriptor()
         "Level up your party by spamming spread moves in a double battle with a partner that heals you forever.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 struct DoublesLeveling_Descriptor::Stats : public PokemonSwSh::ShinyHuntTracker{
@@ -90,7 +91,7 @@ DoublesLeveling::DoublesLeveling()
 
 
 
-bool DoublesLeveling::battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+bool DoublesLeveling::battle(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     DoublesLeveling_Descriptor::Stats& stats = env.current_stats<DoublesLeveling_Descriptor::Stats>();
 
     env.log("Starting battle!");
@@ -102,15 +103,17 @@ bool DoublesLeveling::battle(SingleSwitchProgramEnvironment& env, BotBaseContext
         BattleMenuWatcher battle_menu(BattleType::STANDARD);
         EndBattleWatcher end_battle;
         SelectionArrowFinder learn_move(env.console, {0.50, 0.62, 0.40, 0.18}, COLOR_YELLOW);
-        int ret = run_until(
+        FrozenImageDetector overworld(std::chrono::seconds(5), 10);
+        int ret = run_until<SwitchControllerContext>(
             env.console, context,
-            [](BotBaseContext& context){
+            [](SwitchControllerContext& context){
                 pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
             },
             {
-                {battle_menu},
-                {end_battle},
-                {learn_move},
+                battle_menu,
+                end_battle,
+                learn_move,
+                overworld,
             }
         );
         switch (ret){
@@ -131,27 +134,31 @@ bool DoublesLeveling::battle(SingleSwitchProgramEnvironment& env, BotBaseContext
                 break;
             }
             return true;
+        case 3:
+            env.log("Detected possible overworld!", COLOR_BLUE);
+            pbf_mash_button(context, BUTTON_B, 250);
+            return false;
         default:
             env.log("Timed out.", COLOR_RED);
             stats.add_error();
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
                 "Timed out after 2 minutes.",
-                true
+                env.console
             );
         }
     }
 
-    throw OperationFailedException(
-        ErrorReport::SEND_ERROR_REPORT, env.console,
+    OperationFailedException::fire(
+        ErrorReport::SEND_ERROR_REPORT,
         "No progress detected after 5 battle menus. Are you out of PP?",
-        true
+        env.console
     );
 }
 
 
 
-void DoublesLeveling::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void DoublesLeveling::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     DoublesLeveling_Descriptor::Stats& stats = env.current_stats<DoublesLeveling_Descriptor::Stats>();
     env.update_stats();
 

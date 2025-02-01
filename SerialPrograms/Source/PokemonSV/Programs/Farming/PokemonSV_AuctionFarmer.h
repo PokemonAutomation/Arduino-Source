@@ -11,9 +11,9 @@
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
-#include "CommonFramework/Options/LanguageOCROption.h"
-#include "PokemonSV/Options/PokemonSV_AuctionItemTable.h"
+#include "CommonTools/Options/LanguageOCROption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
+#include "PokemonSV/Options/PokemonSV_AuctionItemTable.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -38,7 +38,7 @@ public:
 class AuctionFarmer : public SingleSwitchProgramInstance{
 public:
     AuctionFarmer();
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
     OCR::LanguageOCROption LANGUAGE;
@@ -51,14 +51,14 @@ private:
     SectionDividerOption m_advanced_options;
     BooleanCheckBoxOption ONE_NPC;
 
-    std::vector<ImageFloatBox> detect_dialog_boxes(const ImageViewRGB32& screen);
-    void reset_auctions(SingleSwitchProgramEnvironment& env, BotBaseContext& context, bool do_full_reset, uint8_t& year);
-    std::vector<std::pair<AuctionOffer, ImageFloatBox>> check_offers(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-    void move_to_auctioneer(SingleSwitchProgramEnvironment& env, BotBaseContext& context, AuctionOffer wanted);
-    void move_dialog_to_center(SingleSwitchProgramEnvironment& env, BotBaseContext& context, AuctionOffer offer);
-    void bid_on_item(SingleSwitchProgramEnvironment& env, BotBaseContext& context, AuctionOffer offer);
+    std::vector<ImagePixelBox> detect_dialog_boxes(const ImageViewRGB32& screen);
+    void reset_auctions(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, bool do_full_reset, uint8_t& year);
+    std::vector<std::pair<AuctionOffer, ImageFloatBox>> check_offers(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
+    void move_to_auctioneer(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, AuctionOffer wanted);
+    void move_dialog_to_center(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, AuctionOffer offer);
+    void bid_on_item(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, AuctionOffer offer);
     bool is_good_offer(AuctionOffer);
-    void reset_position(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    void reset_position(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
 };
 
 

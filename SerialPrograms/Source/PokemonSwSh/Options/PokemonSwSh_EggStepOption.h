@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_EggStepOption_H
 #define PokemonAutomation_PokemonSwSh_EggStepOption_H
 
-#include "CommonFramework/Options/StringSelectOption.h"
+#include "CommonTools/Options/StringSelectOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

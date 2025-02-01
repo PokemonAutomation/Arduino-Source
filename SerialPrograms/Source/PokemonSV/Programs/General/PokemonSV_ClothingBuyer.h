@@ -28,7 +28,7 @@ class ClothingBuyer : public SingleSwitchProgramInstance{
 public:
     ClothingBuyer();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
     BooleanCheckBoxOption USE_LP;

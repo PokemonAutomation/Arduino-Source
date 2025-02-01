@@ -10,7 +10,7 @@
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/EditableTableOption.h"
-#include "CommonFramework/Options/StringSelectOption.h"
+#include "CommonTools/Options/StringSelectOption.h"
 #include "PokemonSwSh/Options/PokemonSwSh_BallSelectOption.h"
 
 namespace PokemonAutomation{

@@ -9,10 +9,9 @@
 #define PokemonAutomation_PokemonLA_OutbreakReader_H
 
 #include "CommonFramework/Language.h"
-#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "CommonFramework/OCR/OCR_StringMatchResult.h"
+#include "CommonTools/OCR/OCR_StringMatchResult.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -23,6 +22,7 @@ class OutbreakReader{
 public:
     OutbreakReader(Logger& logger, Language language, VideoOverlay& overlay);
 
+    void make_overlays(VideoOverlaySet& items) const;
     OCR::StringMatchResult read(const ImageViewRGB32& screen) const;
 
 

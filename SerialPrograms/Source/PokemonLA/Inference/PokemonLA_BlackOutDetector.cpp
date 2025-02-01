@@ -4,12 +4,10 @@
  *
  */
 
-#include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "CommonTools/Images/SolidColorTest.h"
 #include "PokemonLA_BlackOutDetector.h"
 
-#include <array>
-#include <sstream>
 #include <iostream>
 using std::cout;
 using std::endl;

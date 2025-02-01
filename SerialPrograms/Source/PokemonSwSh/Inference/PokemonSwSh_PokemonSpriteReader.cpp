@@ -6,13 +6,13 @@
 
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
-#include "CommonFramework/ImageMatch/ImageCropper.h"
+#include "CommonTools/ImageMatch/ImageCropper.h"
 #include "PokemonSwSh/Resources/PokemonSwSh_PokemonSprites.h"
 #include "PokemonSwSh_PokemonSpriteReader.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

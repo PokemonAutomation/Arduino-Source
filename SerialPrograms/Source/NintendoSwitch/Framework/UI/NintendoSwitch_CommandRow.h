@@ -13,32 +13,37 @@
 #include <QCheckBox>
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/VideoPipeline/VideoOverlaySession.h"
-#include "NintendoSwitch/Framework/NintendoSwitch_VirtualController.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_KeyboardInput.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-class CommandRow : public QWidget, public VirtualController, public VideoOverlaySession::Listener{
+class CommandRow :
+    public QWidget,
+    public VirtualController,
+    public VideoOverlaySession::Listener,
+    public ControllerSession::Listener
+{
     Q_OBJECT
 
 public:
     ~CommandRow();
     CommandRow(
         QWidget& parent,
-        BotBaseHandle& botbase,
+        ControllerSession& controller,
         VideoOverlaySession& session,
         bool allow_commands_while_running
     );
 
-    //  Returns false if key is not handled. (pass it up to next handler)
-    bool on_key_press(Qt::Key key);
-    bool on_key_release(Qt::Key key);
+    void on_key_press(const QKeyEvent& key);
+    void on_key_release(const QKeyEvent& key);
 
 signals:
     void load_profile();
     void save_profile();
     void screenshot_requested();
+    void video_requested();
 
 public:
     void set_focus(bool focused);
@@ -50,9 +55,10 @@ private:
     virtual void enabled_text (bool enabled) override;
     virtual void enabled_log  (bool enabled) override;
     virtual void enabled_stats(bool enabled) override;
+    virtual void ready_changed(bool ready) override;
 
 private:
-    BotBaseHandle& m_botbase;
+    ControllerSession& m_controller;
     VideoOverlaySession& m_session;
     bool m_allow_commands_while_running;
     QComboBox* m_command_box;
@@ -66,6 +72,7 @@ private:
     QPushButton* m_load_profile_button;
     QPushButton* m_save_profile_button;
     QPushButton* m_screenshot_button;
+    QPushButton* m_video_button;
     bool m_last_known_focus;
 };
 

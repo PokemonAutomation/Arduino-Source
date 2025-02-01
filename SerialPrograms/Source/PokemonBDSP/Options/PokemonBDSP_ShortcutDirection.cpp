@@ -44,7 +44,7 @@ ShortcutDirectionOption::ShortcutDirectionOption(std::string label)
     )
 {}
 
-void ShortcutDirectionOption::run(BotBaseContext& context, uint16_t delay){
+void ShortcutDirectionOption::run(SwitchControllerContext& context, uint16_t delay){
     uint8_t shortcut_x = 128;
     uint8_t shortcut_y = 128;
     switch (this->get()){

@@ -29,7 +29,7 @@ public:
 class DaySkipperEU : public SingleSwitchProgramInstance{
 public:
     DaySkipperEU();
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
     SimpleIntegerOption<uint32_t> SKIPS;

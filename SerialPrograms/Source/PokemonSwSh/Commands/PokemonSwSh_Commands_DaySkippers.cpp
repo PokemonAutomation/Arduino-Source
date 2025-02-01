@@ -5,7 +5,7 @@
  */
 
 #include <sstream>
-//#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 #include "ClientSource/Libraries/MessageConverter.h"
 #include "PokemonSwSh_Commands_DaySkippers.h"
 #include "PokemonSwSh_Messages_DaySkippers.h"
@@ -14,43 +14,51 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-void skipper_init_view(BotBaseContext& context){
-    context.issue_request(
+void skipper_init_view(SwitchControllerContext& context){
+    context->send_botbase_request(
+        &context,
         DeviceRequest_skipper_init_view()
     );
 }
-void skipper_auto_recovery(BotBaseContext& context){
-    context.issue_request(
+void skipper_auto_recovery(SwitchControllerContext& context){
+    context->send_botbase_request(
+        &context,
         DeviceRequest_skipper_auto_recovery()
     );
 }
-void skipper_rollback_year_full(BotBaseContext& context, bool date_us){
-    context.issue_request(
+void skipper_rollback_year_full(SwitchControllerContext& context, bool date_us){
+    context->send_botbase_request(
+        &context,
         DeviceRequest_skipper_rollback_year_full(date_us)
     );
 }
-void skipper_rollback_year_sync(BotBaseContext& context){
-    context.issue_request(
+void skipper_rollback_year_sync(SwitchControllerContext& context){
+    context->send_botbase_request(
+        &context,
         DeviceRequest_skipper_rollback_year_sync()
     );
 }
-void skipper_increment_day(BotBaseContext& context, bool date_us){
-    context.issue_request(
+void skipper_increment_day(SwitchControllerContext& context, bool date_us){
+    context->send_botbase_request(
+        &context,
         DeviceRequest_skipper_increment_day(date_us)
     );
 }
-void skipper_increment_month(BotBaseContext& context, uint8_t days){
-    context.issue_request(
+void skipper_increment_month(SwitchControllerContext& context, uint8_t days){
+    context->send_botbase_request(
+        &context,
         DeviceRequest_skipper_increment_month(days)
     );
 }
-void skipper_increment_all(BotBaseContext& context){
-    context.issue_request(
+void skipper_increment_all(SwitchControllerContext& context){
+    context->send_botbase_request(
+        &context,
         DeviceRequest_skipper_increment_all()
     );
 }
-void skipper_increment_all_rollback(BotBaseContext& context){
-    context.issue_request(
+void skipper_increment_all_rollback(SwitchControllerContext& context){
+    context->send_botbase_request(
+        &context,
         DeviceRequest_skipper_increment_all_rollback()
     );
 }

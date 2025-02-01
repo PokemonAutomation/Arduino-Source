@@ -28,7 +28,7 @@ public:
 class LPFarmer : public SingleSwitchProgramInstance{
 public:
     LPFarmer();
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;

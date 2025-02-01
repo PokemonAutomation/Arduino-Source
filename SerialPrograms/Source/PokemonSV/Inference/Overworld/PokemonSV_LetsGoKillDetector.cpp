@@ -7,11 +7,11 @@
 #include "Common/Cpp/AbstractLogger.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/Globals.h"
-#include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
-#include "CommonFramework/ImageMatch/ExactImageMatcher.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "CommonFramework/Inference/SpectrogramMatcher.h"
-#include "CommonFramework/Inference/AudioTemplateCache.h"
+#include "CommonTools/Images/BinaryImage_FilterRgb32.h"
+#include "CommonTools/ImageMatch/ExactImageMatcher.h"
+#include "CommonTools/Audio/SpectrogramMatcher.h"
+#include "CommonTools/Audio/AudioTemplateCache.h"
 #include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSV_LetsGoKillDetector.h"
 
@@ -192,11 +192,12 @@ bool LetsGoKillWatcher::process_frame(const ImageViewRGB32& frame, WallClock tim
 
 
 
-LetsGoKillSoundDetector::LetsGoKillSoundDetector(ConsoleHandle& console, DetectedCallback detected_callback)
+LetsGoKillSoundDetector::LetsGoKillSoundDetector(Logger& logger, DetectedCallback detected_callback)
     : AudioPerSpectrumDetectorBase(
+        logger,
         "LetsGoKillSoundDetector",
         "Let's Go Kill Sound",
-        COLOR_RED, console,
+        COLOR_RED,
         [this, callback = std::move(detected_callback)](float error_coefficient){
             m_last_detected = current_time();
             return callback != nullptr ? callback(error_coefficient) : false;

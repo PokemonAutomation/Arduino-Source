@@ -9,8 +9,8 @@
 
 #include <string>
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
-#include "CommonFramework/ImageMatch/CroppedImageDictionaryMatcher.h"
+#include "CommonTools/ImageMatch/CroppedImageDictionaryMatcher.h"
+#include "CommonFramework/Tools/VideoStream.h"
 #include "Pokemon/Inference/Pokemon_PokeballNameReader.h"
 
 namespace PokemonAutomation{
@@ -24,7 +24,7 @@ class BattleBallReader{
     static const double ALPHA_SPREAD;
 
 public:
-    BattleBallReader(ConsoleHandle& console, Language language);
+    BattleBallReader(VideoStream& stream, Language language);
 
 public:
     std::string read_ball(const ImageViewRGB32& screen) const;
@@ -34,7 +34,7 @@ private:
     const ImageMatch::CroppedImageDictionaryMatcher& m_matcher;
     const PokeballNameReader& m_name_reader;
     Language m_language;
-    ConsoleHandle& m_console;
+    VideoStream& m_stream;
     OverlayBoxScope m_box_sprite;
     OverlayBoxScope m_box_name;
     OverlayBoxScope m_box_quantity;

@@ -7,9 +7,9 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PanicDump.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
-#include "CommonFramework/Tools/StatsDatabase.h"
 #include "CommonFramework/Panels/ProgramDescriptor.h"
 #include "CommonFramework/ProgramSession.h"
+#include "CommonFramework/ProgramStats/StatsDatabase.h"
 #include "Integrations/ProgramTracker.h"
 
 namespace PokemonAutomation{
@@ -17,12 +17,10 @@ namespace PokemonAutomation{
 
 
 void ProgramSession::add_listener(Listener& listener){
-    std::lock_guard<std::mutex> lg(m_lock);
-    m_listeners.insert(&listener);
+    m_listeners.add(listener);
 }
 void ProgramSession::remove_listener(Listener& listener){
-    std::lock_guard<std::mutex> lg(m_lock);
-    m_listeners.erase(&listener);
+    m_listeners.remove(listener);
 }
 
 
@@ -99,19 +97,17 @@ void ProgramSession::set_state(ProgramState state){
         break;
     }
     m_state.store(state, std::memory_order_relaxed);
-    for (Listener* listener : m_listeners){
-        listener->state_change(state);
-    }
+    m_listeners.run_method_unique(&Listener::state_change, state);
 }
 void ProgramSession::push_stats(){
-    for (Listener* listener : m_listeners){
-        listener->stats_update(m_current_stats.get(), m_historical_stats.get());
-    }
+    m_listeners.run_method_unique(
+        &Listener::stats_update,
+        m_current_stats.get(),
+        m_historical_stats.get()
+    );
 }
 void ProgramSession::push_error(const std::string& message){
-    for (Listener* listener : m_listeners){
-        listener->error(message);
-    }
+    m_listeners.run_method_unique(&Listener::error, message);
 }
 
 void ProgramSession::load_historical_stats(){

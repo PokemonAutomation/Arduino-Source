@@ -4,8 +4,8 @@
  *
  */
 
-#include "CommonFramework/Tools/StatsTracking.h"
-#include "CommonFramework/Tools/VideoResolutionCheck.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
+#include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "Pokemon/Pokemon_Strings.h"
@@ -27,7 +27,7 @@ AutonomousBallThrower_Descriptor::AutonomousBallThrower_Descriptor()
         "Repeatedly throw a ball until you catch the pokemon.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 struct AutonomousBallThrower_Descriptor::Stats : public StatsTracker{
@@ -77,29 +77,8 @@ AutonomousBallThrower::AutonomousBallThrower()
 
 
 
-#if 0
-void AutonomousBallThrower::throw_ball(ConsoleHandle& console, BotBaseContext& context){
-    pbf_press_button(context, BUTTON_X, 20, 100);
-    context.wait_for_all_requests();
 
-    BattleBallReader reader(console, LANGUAGE);
-    int quantity = move_to_ball(reader, console, context, BALL_SELECT.slug());
-    if (quantity == 0){
-        throw FatalProgramException(
-            ErrorReport::NO_ERROR_REPORT, console,
-            "Unable to find appropriate ball. Did you run out?",
-            true
-        );
-    }
-    if (quantity < 0){
-        console.log("Unable to read ball quantity.", COLOR_RED);
-    }
-    pbf_mash_button(context, BUTTON_A, 125);
-    context.wait_for_all_requests();
-}
-#endif
-
-void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
     AutonomousBallThrower_Descriptor::Stats& stats = env.current_stats<AutonomousBallThrower_Descriptor::Stats>();
@@ -127,39 +106,6 @@ void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, BotBase
         results.balls_used,
         results.result
     );
-
-#if 0
-    while (true)
-    {
-        NormalBattleMenuWatcher battle_menu(COLOR_RED);
-        int ret = wait_until(
-            env.console, context,
-            std::chrono::seconds(120),
-            {
-                battle_menu,
-            }
-        );
-
-        context.wait_for(std::chrono::milliseconds(100));
-        switch (ret){
-        case 0:
-            throw_ball(env.console, context);
-            stats.m_balls++;
-            env.update_stats();
-            break;
-        default:
-            throw FatalProgramException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
-                "Failed to detect battle menu after 60 seconds, did you catch or fail?",
-                true
-            );
-        }
-
-    }
-#endif
-
-//    env.update_stats();
-//    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 }
 
 

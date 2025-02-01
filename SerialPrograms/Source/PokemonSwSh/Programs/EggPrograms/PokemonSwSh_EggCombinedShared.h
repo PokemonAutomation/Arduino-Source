@@ -7,8 +7,9 @@
 #ifndef PokemonAutomation_PokemonSwSh_EggCombinedShared_H
 #define PokemonAutomation_PokemonSwSh_EggCombinedShared_H
 
-#include "CommonFramework/Tools/ConsoleHandle.h"
+#include "CommonFramework/Tools/VideoStream.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_EggRoutines.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_GameEntry.h"
@@ -66,7 +67,7 @@ struct EggCombinedSession{
 
         return block;
     }
-    void withdraw_column_shiftR(BotBaseContext& context, uint8_t column){
+    void withdraw_column_shiftR(SwitchControllerContext& context, uint8_t column){
         menu_to_box(context, false);
         party_to_column(context, column);
         pickup_column(context, false);
@@ -75,7 +76,7 @@ struct EggCombinedSession{
         ssf_press_button2(context, BUTTON_A, GameSettings::instance().BOX_PICKUP_DROP_DELAY, EGG_BUTTON_HOLD_DELAY);
         box_to_menu(context);
     }
-    void deposit_column_shiftL(BotBaseContext& context, uint8_t column){
+    void deposit_column_shiftL(SwitchControllerContext& context, uint8_t column){
         menu_to_box(context, true);
         pickup_column(context, true);
         party_to_column(context, column);
@@ -83,7 +84,7 @@ struct EggCombinedSession{
         ssf_press_button2(context, BUTTON_A, GameSettings::instance().BOX_PICKUP_DROP_DELAY, EGG_BUTTON_HOLD_DELAY);
         box_to_menu(context);
     }
-    uint8_t swap_party_shift(BotBaseContext& context, uint8_t column){
+    uint8_t swap_party_shift(SwitchControllerContext& context, uint8_t column){
         menu_to_box(context, true);
         pickup_column(context, true);
 
@@ -125,7 +126,7 @@ struct EggCombinedSession{
 #define TRAVEL_BACK_TO_LADY_DURATION    (30 + 260 + (620) + 120 + 120 * 0)
 
     void eggcombined2_run_batch(
-        BotBaseContext& context,
+        SwitchControllerContext& context,
         uint16_t INCUBATION_DELAY_LOWER,
         uint16_t remaining_travel_duration,
         uint8_t column,
@@ -207,7 +208,7 @@ struct EggCombinedSession{
         ssf_press_button2(context, BUTTON_B, GameSettings::instance().MENU_TO_OVERWORLD_DELAY, 20);
     }
 
-    void eggcombined2_body(ConsoleHandle& console, BotBaseContext& context){
+    void eggcombined2_body(VideoStream& stream, SwitchControllerContext& context){
         if (BOXES_TO_HATCH == 0){
             ssf_press_button2(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE, 10);
             return;
@@ -237,10 +238,10 @@ struct EggCombinedSession{
             for (uint8_t column = 0; column < 6; column++){
                 //  Touch the date.
                 if (TOUCH_DATE_INTERVAL.ok_to_touch_now()){
-                    console.log("Touching date to prevent rollover.");
+                    stream.log("Touching date to prevent rollover.");
                     pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
                     touch_date_from_home(context, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
-                    resume_game_no_interact(console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+                    resume_game_no_interact(stream, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
                 }
 
                 fetch_residual += fetches_per_batch;

@@ -7,11 +7,11 @@
 #include <cmath>
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/CancellableScope.h"
-#include "CommonFramework/ImageTools/SolidColorTest.h"
-#include "CommonFramework/ImageTools/ColorClustering.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
+#include "CommonTools/Images/SolidColorTest.h"
+#include "CommonTools/Images/ColorClustering.h"
 #include "Pokemon/Inference/Pokemon_ReadHpBar.h"
 #include "PokemonSwSh/Resources/PokemonSwSh_MaxLairDatabase.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_TypeSymbolFinder.h"
@@ -20,9 +20,9 @@
 #include "PokemonSwSh_MaxLair_Detect_HPPP.h"
 #include "PokemonSwSh_MaxLair_Detect_BattleMenu.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -211,8 +211,13 @@ bool BattleMenuDetector::detect(const ImageViewRGB32& screen){
 
 
 
-BattleMenuReader::BattleMenuReader(VideoOverlay& overlay, Language language)
+BattleMenuReader::BattleMenuReader(
+    VideoOverlay& overlay,
+    Language language,
+    OcrFailureWatchdog& ocr_watchdog
+)
     : m_language(language)
+    , m_ocr_watchdog(ocr_watchdog)
     , m_opponent_name(overlay, {0.3, 0.010, 0.4, 0.10}, COLOR_BLUE)
     , m_summary_opponent_name(overlay, {0.200, 0.100, 0.300, 0.065}, COLOR_BLUE)
     , m_summary_opponent_types(overlay, {0.200, 0.170, 0.300, 0.050}, COLOR_BLUE)
@@ -238,88 +243,150 @@ std::set<std::string> BattleMenuReader::read_opponent(
     VideoFeed& feed
 ) const{
     std::set<std::string> result;
+
     VideoSnapshot screen;
     for (size_t c = 0; c < 3; c++){
         screen = feed.snapshot();
         ImageViewRGB32 image = extract_box_reference(screen, m_opponent_name);
-        result = read_pokemon_name(logger, m_language, image);
+        result = read_pokemon_name(logger, m_language, m_ocr_watchdog, image);
         if (!result.empty()){
             return result;
         }
         logger.log("Failed to read opponent name. Retrying in 1 second...", COLOR_ORANGE);
         scope.wait_for(std::chrono::seconds(1));
     }
-    dump_image(logger, MODULE_NAME, "MaxLair-read_opponent", screen);
+//    dump_image(logger, MODULE_NAME, "MaxLair-read_opponent", screen);
     return result;
 }
 std::set<std::string> BattleMenuReader::read_opponent_in_summary(Logger& logger, const ImageViewRGB32& screen) const{
-    ImageViewRGB32 name = extract_box_reference(screen, m_summary_opponent_name);
-    std::set<std::string> slugs = read_pokemon_name(logger, m_language, name);
+    //  Start by reading the types.
+    PokemonType type0, type1;
+    {
+        ImageViewRGB32 types = extract_box_reference(screen, m_summary_opponent_types);
+        std::multimap<double, std::pair<PokemonType, ImagePixelBox>> candidates = find_symbols(types, 0.2);
 
-    ImageViewRGB32 types = extract_box_reference(screen, m_summary_opponent_types);
-    std::multimap<double, std::pair<PokemonType, ImagePixelBox>> candidates = find_symbols(types, 0.2);
-//    for (const auto& item : candidates){
-//        cout << get_type_slug(item.second.first) << ": " << item.first << endl;
+        std::string type_str = "Type Read Result:\n";
+        for (const auto& item : candidates){
+            type_str += "    " + get_type_slug(item.second.first) + " : " + tostr_default(item.first ) + "\n";
+        }
+        logger.log(type_str);
+
+        type0 = PokemonType::NONE;
+        type1 = PokemonType::NONE;
+        {
+            auto iter = candidates.begin();
+            if (iter != candidates.end()){
+                type0 = iter->second.first;
+                ++iter;
+            }
+            if (iter != candidates.end()){
+                type1 = iter->second.first;
+                ++iter;
+            }
+        }
+    }
+
+    //  Compile a list of all possible mons that match the type.
+    std::set<std::string> allowed_slugs;
+    for (const auto& item : maxlair_slugs()){
+        const MaxLairMon& mon = get_maxlair_mon(item.first);
+        if ((type0 == mon.type[0] && type1 == mon.type[1]) ||
+            (type0 == mon.type[1] && type1 == mon.type[0])
+        ){
+            allowed_slugs.insert(item.first);
+        }
+    }
+
+    //  Special case for stunfisk-galar which changes types.
+    if (type1 == PokemonType::NONE){
+        switch (type0){
+        case PokemonType::ELECTRIC:
+        case PokemonType::GRASS:
+        case PokemonType::FAIRY:
+        case PokemonType::PSYCHIC:
+            allowed_slugs.insert("stunfisk-galar");
+            break;
+        default:;
+        }
+    }
+
+    if (allowed_slugs.size() == 1){
+        return allowed_slugs;
+    }
+
+
+    //  Now we read the name.
+    std::set<std::string> name_slugs;
+    {
+        ImageViewRGB32 name = extract_box_reference(screen, m_summary_opponent_name);
+
+        //  We can use a weaker threshold here since we are cross-checking with the type.
+        name_slugs = read_pokemon_name(logger, m_language, m_ocr_watchdog, name, -1.0);
+    }
+
+    //  See if there's anything in common between the slugs that match the type
+    //  and the slugs that match the OCR'ed name.
+    std::set<std::string> common_slugs;
+    for (const std::string& slug : name_slugs){
+        if (allowed_slugs.find(slug) != allowed_slugs.end()){
+            common_slugs.insert(slug);
+        }
+    }
+
+//    for (const auto& slug : allowed_slugs){
+//        cout << "allowed_slugs = " << slug << endl;
+//    }
+//    for (const auto& slug : name_slugs){
+//        cout << "name_slugs = " << slug << endl;
 //    }
 
-    PokemonType type0 = PokemonType::NONE;
-    PokemonType type1 = PokemonType::NONE;
-    {
-        auto iter = candidates.begin();
-        if (iter != candidates.end()){
-            type0 = iter->second.first;
-            iter++;
-        }
-        if (iter != candidates.end()){
-            type1 = iter->second.first;
-            iter++;
-        }
+    if (common_slugs.size() == 1){
+        logger.log("Disambiguation succeeded: " + *common_slugs.begin(), COLOR_BLUE);
+        return common_slugs;
     }
 
-    for (auto iter = slugs.begin(); iter != slugs.end();){
-        const MaxLairMon& mon = get_maxlair_mon(*iter);
-        if ((type0 == mon.type[0] && type1 == mon.type[1]) || (type0 == mon.type[1] && type1 == mon.type[0])){
-            ++iter;
-        }else{
-            iter = slugs.erase(iter);
-        }
+
+    //  Special case: Korean Clefairy
+    //  Reason: Korean OCR cannot read the character: 삐
+    if (m_language == Language::Korean &&
+        name_slugs.empty() &&
+        type0 == PokemonType::FAIRY &&
+        type1 == PokemonType::NONE
+    ){
+        logger.log("Known case that cannot be read: Korean Clefairy", COLOR_RED);
+        return {"clefairy"};
     }
 
-    if (slugs.size() == 1){
-        logger.log("Disambiguation succeeded: " + *slugs.begin(), COLOR_BLUE);
-        return slugs;
-    }
 
-    if (slugs.empty()){
-        logger.log("Disambiguation failed. No results.", COLOR_RED);
-    }else{
-        logger.log("Disambiguation failed. Still have multiple results: " + set_to_str(slugs), COLOR_RED);
-    }
 
     static std::set<std::string> KNOWN_BAD_SLUGS{
         "basculin-blue-striped",
         "basculin-red-striped",
         "lycanroc-midday",
         "lycanroc-midnight",
+//        "stunfisk-galar",   //  After using terrain pulse.
     };
     bool error = true;
-    for (const std::string& slug : slugs){
+    for (const std::string& slug : common_slugs){
         auto iter = KNOWN_BAD_SLUGS.find(slug);
         if (iter != KNOWN_BAD_SLUGS.end()){
             error = false;
-            logger.log("Known case that cannot be disambiguated. Skipping error report.", COLOR_RED);
+            logger.log("Known case that cannot be disambiguated: (" + slug + ") Skipping error report.", COLOR_RED);
             break;
         }
     }
+
+    //  At this point we're out of options.
     if (error){
         dump_image(logger, MODULE_NAME, "DisambiguateBoss", screen);
     }
 
-    return slugs;
+    return common_slugs;
 }
 std::string BattleMenuReader::read_own_mon(Logger& logger, const ImageViewRGB32& screen) const{
     return read_pokemon_name_sprite(
         logger,
+        m_ocr_watchdog,
         screen,
         m_own_sprite,
         m_own_name, m_language,
@@ -372,7 +439,7 @@ void BattleMenuReader::read_hp(Logger& logger, const ImageViewRGB32& screen, Hea
     }
 
     if (bad){
-        dump_image(logger, MODULE_NAME, "BattlePartyReader-ReadHP", screen);
+//        dump_image(logger, MODULE_NAME, "BattlePartyReader-ReadHP", screen);
     }
 }
 void BattleMenuReader::read_own_pp(Logger& logger, const ImageViewRGB32& screen, int8_t pp[4]) const{
@@ -381,7 +448,7 @@ void BattleMenuReader::read_own_pp(Logger& logger, const ImageViewRGB32& screen,
     pp[2] = read_pp_text(logger, extract_box_reference(screen, m_pp2));
     pp[3] = read_pp_text(logger, extract_box_reference(screen, m_pp3));
     if (pp[0] < 0 && pp[1] < 0 && pp[2] < 0 && pp[3] < 0){
-        dump_image(logger, MODULE_NAME, "BattleMenuReader-read_own_pp", screen);
+//        dump_image(logger, MODULE_NAME, "BattleMenuReader-read_own_pp", screen);
         return;
     }
 #if 0

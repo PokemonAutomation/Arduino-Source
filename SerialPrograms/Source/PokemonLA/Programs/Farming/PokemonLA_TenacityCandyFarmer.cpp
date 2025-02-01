@@ -5,11 +5,10 @@
  */
 
 #include <chrono>
-#include <iostream>
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/Tools/StatsTracking.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.h"
@@ -37,7 +36,7 @@ TenacityCandyFarmer_Descriptor::TenacityCandyFarmer_Descriptor()
         "Attend Ingo's Path of Tenacity battles leading with a stats fully upgraded, max level, Modest nature Arceus with Legend Plate applied to grind exp, exp candies XL and evolution items.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 class TenacityCandyFarmer_Descriptor::Stats : public StatsTracker{
@@ -94,7 +93,7 @@ TenacityCandyFarmer::TenacityCandyFarmer()
 
 
 
-bool TenacityCandyFarmer::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+bool TenacityCandyFarmer::run_iteration(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     TenacityCandyFarmer_Descriptor::Stats& stats = env.current_stats<TenacityCandyFarmer_Descriptor::Stats>();
 
     env.console.log("Starting battle...");
@@ -115,9 +114,9 @@ bool TenacityCandyFarmer::run_iteration(SingleSwitchProgramEnvironment& env, Bot
     {
         context.wait_for_all_requests();
         ButtonDetector button(env.console, env.console, ButtonType::ButtonA, {0.56, 0.46, 0.33, 0.27}, std::chrono::milliseconds(100), true);
-        int ret = run_until(
+        int ret = run_until<SwitchControllerContext>(
             env.console, context,
-            [&](BotBaseContext& context){
+            [&](SwitchControllerContext& context){
                 for (size_t c = 0; c < 10; c++){
                     pbf_press_button(context, BUTTON_A, 20, 150);
                 }
@@ -127,10 +126,10 @@ bool TenacityCandyFarmer::run_iteration(SingleSwitchProgramEnvironment& env, Bot
             }
         );
         if (ret != 0){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
                 "Unable to detect Tenacity path menu after 10 A presses.",
-                true
+                env.console
             );
         }
     }
@@ -199,17 +198,17 @@ bool TenacityCandyFarmer::run_iteration(SingleSwitchProgramEnvironment& env, Bot
             // All three battles are now finished, wait for ArcPhoneDetector
             const bool stop_on_detected = true;
             ArcPhoneDetector arc_phone_detector(env.console, env.console, std::chrono::milliseconds(200), stop_on_detected);
-            int ret = run_until(
-                env.console, context, [](BotBaseContext& context){
+            int ret = run_until<SwitchControllerContext>(
+                env.console, context, [](SwitchControllerContext& context){
                     pbf_mash_button(context, BUTTON_B, 20 * TICKS_PER_SECOND);
                 },
                 {{arc_phone_detector}}
             );
             if (ret < 0){
-                throw OperationFailedException(
-                    ErrorReport::SEND_ERROR_REPORT, env.console,
+                OperationFailedException::fire(
+                    ErrorReport::SEND_ERROR_REPORT,
                     "Failed to find Arc phone after 20 seconds when the last battle ends.",
-                    true
+                    env.console
                 );
             }
             env.log("Found Arc Phone. End of one path.");
@@ -240,10 +239,10 @@ bool TenacityCandyFarmer::run_iteration(SingleSwitchProgramEnvironment& env, Bot
         if (ret < 0){
             env.console.log("Error: Failed to find battle menu after 2 minutes.");
 //            return true;
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
                 "Failed to find battle menu after 2 minutes.",
-                true
+                env.console
             );
         }
 
@@ -342,7 +341,7 @@ bool TenacityCandyFarmer::run_iteration(SingleSwitchProgramEnvironment& env, Bot
 
 
 
-void TenacityCandyFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void TenacityCandyFarmer::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     TenacityCandyFarmer_Descriptor::Stats& stats = env.current_stats<TenacityCandyFarmer_Descriptor::Stats>();
 
     //  Connect the controller.

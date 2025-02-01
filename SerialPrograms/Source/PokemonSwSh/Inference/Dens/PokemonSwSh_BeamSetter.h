@@ -12,10 +12,10 @@
 
 #include <vector>
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
+#include "CommonFramework/Tools/VideoStream.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 
 namespace PokemonAutomation{
-    class BotBaseContext;
     class ProgramEnvironment;
 namespace NintendoSwitch{
 namespace PokemonSwSh{
@@ -31,7 +31,10 @@ public:
     };
 
 public:
-    BeamSetter(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context);
+    BeamSetter(
+        ProgramEnvironment& env,
+        VideoStream& stream, SwitchControllerContext& context
+    );
 
     Detection run(
         bool save_screenshot,
@@ -44,9 +47,8 @@ public:
 
 
 private:
-    // ProgramEnvironment& m_env;
-    ConsoleHandle& m_console;
-    BotBaseContext& m_context;
+    VideoStream& m_stream;
+    SwitchControllerContext& m_context;
     OverlayBoxScope m_text_box0;
     OverlayBoxScope m_text_box1;
     OverlayBoxScope m_box;

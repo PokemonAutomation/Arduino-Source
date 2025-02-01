@@ -5,11 +5,11 @@
  */
 
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
-#include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/OCR/OCR_NumberReader.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "CommonTools/Images/ImageFilter.h"
+#include "CommonTools/OCR/OCR_NumberReader.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLA_PokedexTasksReader.h"
@@ -25,18 +25,18 @@ namespace PokemonLA{
 
 class PokemonTasksReader{
 public:
-    PokemonTasksReader(ConsoleHandle& console)
-        : m_console(console)
+    PokemonTasksReader(VideoStream& stream)
+        : m_stream(stream)
         , m_tasks_box{
-            OverlayBoxScope(console, {0.400, 0.190, 0.040, 0.045}),
-            OverlayBoxScope(console, {0.400, 0.244, 0.040, 0.045}),
-            OverlayBoxScope(console, {0.400, 0.298, 0.040, 0.045}),
-            OverlayBoxScope(console, {0.400, 0.353, 0.040, 0.045}),
-            OverlayBoxScope(console, {0.400, 0.406, 0.040, 0.045}),
-            OverlayBoxScope(console, {0.400, 0.460, 0.040, 0.045}),
-            OverlayBoxScope(console, {0.400, 0.514, 0.040, 0.045}),
-            OverlayBoxScope(console, {0.400, 0.568, 0.040, 0.045}),
-            OverlayBoxScope(console, {0.400, 0.622, 0.040, 0.045})
+            OverlayBoxScope(stream.overlay(), {0.400, 0.190, 0.040, 0.045}),
+            OverlayBoxScope(stream.overlay(), {0.400, 0.244, 0.040, 0.045}),
+            OverlayBoxScope(stream.overlay(), {0.400, 0.298, 0.040, 0.045}),
+            OverlayBoxScope(stream.overlay(), {0.400, 0.353, 0.040, 0.045}),
+            OverlayBoxScope(stream.overlay(), {0.400, 0.406, 0.040, 0.045}),
+            OverlayBoxScope(stream.overlay(), {0.400, 0.460, 0.040, 0.045}),
+            OverlayBoxScope(stream.overlay(), {0.400, 0.514, 0.040, 0.045}),
+            OverlayBoxScope(stream.overlay(), {0.400, 0.568, 0.040, 0.045}),
+            OverlayBoxScope(stream.overlay(), {0.400, 0.622, 0.040, 0.045})
         }
     {}
 
@@ -46,13 +46,13 @@ public:
         for (size_t i = 0; i < m_tasks_box.size(); ++i)
         {
             ImageRGB32 image = to_blackwhite_rgb32_range(extract_box_reference(screen, m_tasks_box[i]), 0xff808080, 0xffffffff, false);
-            tasks[i] = OCR::read_number(m_console, image);
+            tasks[i] = OCR::read_number(m_stream.logger(), image);
         }
         return tasks;
     }
 
 private:
-    ConsoleHandle& m_console;
+    VideoStream& m_stream;
     std::array<OverlayBoxScope, 9> m_tasks_box;
 };
 
@@ -64,7 +64,7 @@ PokedexTasksReader_Descriptor::PokedexTasksReader_Descriptor()
         "Read all the tasks in your " + STRING_POKEDEX + " and output a file with the tasks you did.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 
@@ -72,7 +72,7 @@ PokedexTasksReader_Descriptor::PokedexTasksReader_Descriptor()
 PokedexTasksReader::PokedexTasksReader(){}
 
 
-void PokedexTasksReader::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void PokedexTasksReader::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     //  Connect the controller.
     pbf_press_button(context, BUTTON_LCLICK, 5, 5);
 

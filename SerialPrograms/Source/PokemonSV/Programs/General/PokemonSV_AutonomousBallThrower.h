@@ -9,7 +9,7 @@
 
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
-#include "CommonFramework/Options/LanguageOCROption.h"
+#include "CommonTools/Options/LanguageOCROption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonSwSh/Options/PokemonSwSh_BallSelectOption.h"
 
@@ -33,10 +33,10 @@ public:
 class AutonomousBallThrower : public SingleSwitchProgramInstance{
 public:
     AutonomousBallThrower();
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
-    void throw_ball(ConsoleHandle& console, BotBaseContext& context);
+//    void throw_ball(VideoStream& stream, SwitchControllerContext& context);
 
     OCR::LanguageOCROption LANGUAGE;
     PokemonSwSh::PokemonBallSelectOption BALL_SELECT;

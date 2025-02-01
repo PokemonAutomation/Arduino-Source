@@ -4,8 +4,7 @@
  *
  */
 
-//#include "Common/Compiler.h"
-// #include "PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxGenderDetector.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "Pokemon_StatsHuntFilter.h"
 
 //#include <iostream>

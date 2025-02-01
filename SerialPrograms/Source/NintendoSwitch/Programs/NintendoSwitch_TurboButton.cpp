@@ -20,7 +20,7 @@ TurboButton_Descriptor::TurboButton_Descriptor()
         "Mash a controller button. (similar to turbo controller)",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 
@@ -71,7 +71,7 @@ TurboButton::TurboButton()
     PA_ADD_OPTION(RELEASE_DURATION);
     PA_ADD_OPTION(TOTAL_PRESSES);
 }
-void TurboButton::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void TurboButton::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     if (TOTAL_PRESSES == 0){
         while (true){
             pbf_press_button(context, (Button)BUTTON.current_value(), PRESS_DURATION, RELEASE_DURATION);

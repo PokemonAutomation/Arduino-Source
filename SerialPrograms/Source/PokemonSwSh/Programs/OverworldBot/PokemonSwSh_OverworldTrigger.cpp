@@ -18,7 +18,7 @@ namespace PokemonSwSh{
 OverworldTrigger::OverworldTrigger(OverworldTargetTracker& target_tracker)
     : m_target_tracker(target_tracker)
 {}
-void OverworldTrigger::whistle(BotBaseContext& context, bool rotate){
+void OverworldTrigger::whistle(SwitchControllerContext& context, bool rotate){
     context.wait_for_all_requests();
     m_target_tracker.set_stop_on_target(false);
 
@@ -41,7 +41,7 @@ void OverworldTrigger::whistle(BotBaseContext& context, bool rotate){
 }
 
 
-void OverworldTrigger_Whistle::run(BotBaseContext& context){
+void OverworldTrigger_Whistle::run(SwitchControllerContext& context){
     whistle(context, !m_first_after_battle);
     m_first_after_battle = false;
 }
@@ -58,7 +58,7 @@ OverworldTrigger_WhistleStaticAction::OverworldTrigger_WhistleStaticAction(
     , m_whistle_count(whistle_count)
     , m_action_count(action_count)
 {}
-void OverworldTrigger_WhistleStaticAction::run(BotBaseContext& context){
+void OverworldTrigger_WhistleStaticAction::run(SwitchControllerContext& context){
     if (m_whistle_first){
         whistle_loop(context);
         action_loop(context);
@@ -67,13 +67,13 @@ void OverworldTrigger_WhistleStaticAction::run(BotBaseContext& context){
         whistle_loop(context);
     }
 }
-void OverworldTrigger_WhistleStaticAction::whistle_loop(BotBaseContext& context){
+void OverworldTrigger_WhistleStaticAction::whistle_loop(SwitchControllerContext& context){
     for (size_t c = 0; c < m_whistle_count; c++){
         whistle(context, !m_first_after_battle);
         m_first_after_battle = false;
     }
 }
-void OverworldTrigger_WhistleStaticAction::action_loop(BotBaseContext& context){
+void OverworldTrigger_WhistleStaticAction::action_loop(SwitchControllerContext& context){
     m_target_tracker.set_stop_on_target(true);
     context.wait_for_all_requests();
     for (size_t c = 0; c < m_action_count; c++){
@@ -85,13 +85,13 @@ void OverworldTrigger_WhistleStaticAction::action_loop(BotBaseContext& context){
 }
 
 
-void OverworldTrigger_WhistleCircle::action(BotBaseContext& context){
+void OverworldTrigger_WhistleCircle::action(SwitchControllerContext& context){
     circle_in_place(context, rand() % 2);
 }
-void OverworldTrigger_WhistleHorizontal::action(BotBaseContext& context){
+void OverworldTrigger_WhistleHorizontal::action(SwitchControllerContext& context){
     move_in_line(context, true);
 }
-void OverworldTrigger_WhistleVertical::action(BotBaseContext& context){
+void OverworldTrigger_WhistleVertical::action(SwitchControllerContext& context){
     move_in_line(context, false);
 }
 

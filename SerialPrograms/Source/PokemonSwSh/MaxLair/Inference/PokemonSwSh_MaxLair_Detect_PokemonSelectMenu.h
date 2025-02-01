@@ -7,10 +7,11 @@
 #ifndef PokemonAutomation_PokemonSwSh_MaxLair_Detect_PokemonSelectMenu_H
 #define PokemonAutomation_PokemonSwSh_MaxLair_Detect_PokemonSelectMenu_H
 
+#include "Common/Cpp/AbstractLogger.h"
 #include "CommonFramework/Language.h"
-#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
+#include "CommonTools/FailureWatchdog.h"
+#include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 
 namespace PokemonAutomation{
     struct ImageStats;
@@ -63,7 +64,8 @@ public:
     PokemonSelectMenuReader(
         Logger& logger,
         VideoOverlay& overlay,
-        Language language
+        Language language,
+        OcrFailureWatchdog& ocr_watchdog
     );
 
     int8_t who_is_selecting(const ImageViewRGB32& screen) const;
@@ -75,6 +77,7 @@ public:
 private:
     Logger& m_logger;
     Language m_language;
+    OcrFailureWatchdog& m_ocr_watchdog;
     OverlayBoxScope m_sprite0;
     OverlayBoxScope m_sprite1;
     OverlayBoxScope m_sprite2;

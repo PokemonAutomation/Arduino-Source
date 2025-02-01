@@ -6,19 +6,13 @@
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/Tools/StatsTracking.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
-#include "CommonFramework/Inference/BlackScreenDetector.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLA/PokemonLA_Settings.h"
 #include "PokemonLA/PokemonLA_TravelLocations.h"
-#include "PokemonLA/Inference/Objects/PokemonLA_ButtonDetector.h"
-#include "PokemonLA/Inference/Map/PokemonLA_MapDetector.h"
-#include "PokemonLA/Inference/PokemonLA_DialogDetector.h"
-#include "PokemonLA/Inference/PokemonLA_OverworldDetector.h"
-#include "PokemonLA/Inference/PokemonLA_UnderAttackDetector.h"
 #include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
 #include "PokemonLA/Programs/PokemonLA_MountChange.h"
 #include "PokemonLA/Programs/PokemonLA_GameEntry.h"
@@ -41,7 +35,7 @@ UnownFinder_Descriptor::UnownFinder_Descriptor()
         "Constantly reset to find a Shiny Unown or any Shiny in the path.",
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 class UnownFinder_Descriptor::Stats : public StatsTracker, public ShinyStatIncrementer{
@@ -98,7 +92,7 @@ UnownFinder::UnownFinder()
 }
 
 
-void ruins_entrance_route(BotBaseContext& context){
+void ruins_entrance_route(SwitchControllerContext& context){
     pbf_wait(context, (uint16_t)(0.5 * TICKS_PER_SECOND));
     pbf_move_left_joystick(context, 139, 120, 10, 10);
     pbf_wait(context, (uint16_t)(1.3 * TICKS_PER_SECOND));
@@ -111,7 +105,7 @@ void ruins_entrance_route(BotBaseContext& context){
     pbf_press_button(context, BUTTON_PLUS, 10, 10);
 }
 
-void enter_ruins(BotBaseContext& context){
+void enter_ruins(SwitchControllerContext& context){
     pbf_press_button(context, BUTTON_B, (uint16_t)(4 * TICKS_PER_SECOND), 10);
     pbf_wait(context, (uint16_t)(1.5 * TICKS_PER_SECOND));
     pbf_move_left_joystick(context, 128, 255, 10, 0);
@@ -119,7 +113,7 @@ void enter_ruins(BotBaseContext& context){
 }
 
 
-void UnownFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void UnownFinder::run_iteration(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     UnownFinder_Descriptor::Stats& stats = env.current_stats<UnownFinder_Descriptor::Stats>();
 
     stats.attempts++;
@@ -142,9 +136,9 @@ void UnownFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
             return on_shiny_callback(env, env.console, *action, error_coefficient);
         });
 
-        int ret = run_until(
+        int ret = run_until<SwitchControllerContext>(
             env.console, context,
-            [&](BotBaseContext& context){
+            [&](SwitchControllerContext& context){
                 ruins_entrance_route(context);
 
                 context.wait_for_all_requests();
@@ -169,7 +163,7 @@ void UnownFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
 }
 
 
-void UnownFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void UnownFinder::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     UnownFinder_Descriptor::Stats& stats = env.current_stats<UnownFinder_Descriptor::Stats>();
 
     //  Connect the controller.

@@ -6,8 +6,8 @@
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/Tools/StatsTracking.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
@@ -34,7 +34,7 @@ FroslassFinder_Descriptor::FroslassFinder_Descriptor()
         "Constantly reset to find a Alpha Froslass or any Shiny in the path.",
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 class FroslassFinder_Descriptor::Stats : public StatsTracker, public ShinyStatIncrementer{
@@ -98,7 +98,7 @@ FroslassFinder::FroslassFinder()
 }
 
 
-void FroslassFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void FroslassFinder::run_iteration(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     FroslassFinder_Descriptor::Stats& stats = env.current_stats<FroslassFinder_Descriptor::Stats>();
 
     stats.attempts++;
@@ -127,9 +127,9 @@ void FroslassFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseC
             return on_shiny_callback(env, env.console, *action, error_coefficient);
         });
 
-        int ret = run_until(
+        int ret = run_until<SwitchControllerContext>(
             env.console, context,
-            [&](BotBaseContext& context){
+            [&](SwitchControllerContext& context){
                 //  Route to cave entrance
                 pbf_press_button(context, BUTTON_B, (uint16_t)(2 * TICKS_PER_SECOND), 10);  //Get some distance from the moutain
                 pbf_press_button(context, BUTTON_Y, (uint16_t)(4 * TICKS_PER_SECOND), 10);  //Descend
@@ -162,7 +162,7 @@ void FroslassFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseC
 }
 
 
-void FroslassFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void FroslassFinder::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     FroslassFinder_Descriptor::Stats& stats = env.current_stats<FroslassFinder_Descriptor::Stats>();
 
     //  Connect the controller.

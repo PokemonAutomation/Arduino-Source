@@ -33,11 +33,11 @@ class ShinyHuntShaymin : public SingleSwitchProgramInstance{
 public:
     ShinyHuntShaymin();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 
 private:
-    bool start_encounter(SingleSwitchProgramEnvironment& env, BotBaseContext& context) const;
+    bool start_encounter(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) const;
 
 private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;

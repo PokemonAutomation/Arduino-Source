@@ -5,19 +5,19 @@
  */
 
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
-#include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
+#include "CommonTools/Images/SolidColorTest.h"
 #include "Pokemon/Inference/Pokemon_ReadHpBar.h"
 #include "PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_HPPP.h"
 #include "PokemonSwSh_MaxLair_Detect_PokemonReader.h"
 #include "PokemonSwSh_MaxLair_Detect_PokemonSwapMenu.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -94,10 +94,11 @@ bool PokemonSwapMenuDetector::detect(const ImageViewRGB32& screen) const{
 PokemonSwapMenuReader::PokemonSwapMenuReader(
     Logger& logger,
     VideoOverlay& overlay,
-    Language language
+    Language language,
+    OcrFailureWatchdog& ocr_watchdog
 )
     : m_logger(logger)
-    , m_language(language)
+    , m_language(language), m_ocr_watchdog(ocr_watchdog)
     , m_sprite0(overlay, {0.481, 0.235 + 0*0.258, 0.071, 0.103})
     , m_sprite1(overlay, {0.481, 0.235 + 1*0.258, 0.071, 0.103})
     , m_name0(overlay, {0.485, 0.335 + 0*0.258, 0.180, 0.045})
@@ -121,8 +122,8 @@ bool PokemonSwapMenuReader::my_turn(const ImageViewRGB32& screen){
     return false;
 }
 void PokemonSwapMenuReader::read_options(const ImageViewRGB32& screen, std::string option[2]){
-    option[0] = read_pokemon_name_sprite(m_logger, screen, m_sprite0, m_name0, m_language, true);
-    option[1] = read_pokemon_name_sprite(m_logger, screen, m_sprite1, m_name1, m_language, true);
+    option[0] = read_pokemon_name_sprite(m_logger, m_ocr_watchdog, screen, m_sprite0, m_name0, m_language, true);
+    option[1] = read_pokemon_name_sprite(m_logger, m_ocr_watchdog, screen, m_sprite1, m_name1, m_language, true);
 }
 
 void PokemonSwapMenuReader::read_hp(const ImageViewRGB32& screen, double hp[4]){

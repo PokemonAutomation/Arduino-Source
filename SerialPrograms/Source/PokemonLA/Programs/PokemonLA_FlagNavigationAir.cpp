@@ -7,14 +7,13 @@
 #include <sstream>
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
-#include "CommonFramework/Tools/InterruptableCommands.h"
+#include "CommonTools/Async/InterruptableCommands.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonLA_FlagNavigationAir.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -22,20 +21,20 @@ namespace PokemonLA{
 
 
 FlagNavigationAir::FlagNavigationAir(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context,
     uint16_t stop_radius,
     double flag_reached_delay,
     std::chrono::seconds navigate_timeout
 )
-    : SuperControlSession(env, console, context)
+    : SuperControlSession(env, stream, context)
     , m_stop_radius(stop_radius)
     , m_flag_reached_delay(std::chrono::milliseconds((uint64_t)(flag_reached_delay * 1000)))
     , m_navigate_timeout(navigate_timeout)
-    , m_flag(console, console)
-    , m_mount(console)
-    , m_centerA(console, console, ButtonType::ButtonA, {0.40, 0.50, 0.40, 0.50}, std::chrono::milliseconds(200), false)
-    , m_leftB(console, console, ButtonType::ButtonB, {0.02, 0.40, 0.05, 0.20}, std::chrono::milliseconds(200), false)
-    , m_dialog_detector(console, console, false)
+    , m_flag(stream.logger(), stream.overlay())
+    , m_mount(stream.logger())
+    , m_centerA(stream.logger(), stream.overlay(), ButtonType::ButtonA, {0.40, 0.50, 0.40, 0.50}, std::chrono::milliseconds(200), false)
+    , m_leftB(stream.logger(), stream.overlay(), ButtonType::ButtonB, {0.02, 0.40, 0.05, 0.20}, std::chrono::milliseconds(200), false)
+    , m_dialog_detector(stream.logger(), stream.overlay(), false)
     , m_looking_straight_ahead(false)
     , m_looking_straight_ahead_timestamp(WallClock::min())
 //    , m_last_good_state(WallClock::min())
@@ -54,7 +53,7 @@ FlagNavigationAir::FlagNavigationAir(
     *this += m_leftB;
     *this += m_dialog_detector;
 
-    auto find_flag = [this](BotBaseContext& context){
+    auto find_flag = [this](SwitchControllerContext& context){
         uint8_t turn = m_flag_x <= 0.5 ? 0 : 255;
         for (size_t c = 0; c < 2; c++){
             pbf_mash_button(context, BUTTON_ZL, 2 * TICKS_PER_SECOND);
@@ -69,29 +68,29 @@ FlagNavigationAir::FlagNavigationAir(
     };
 
     register_state_command(State::UNKNOWN, [this, find_flag](){
-        m_console.log("Unknown state. Moving camera around...");
+        m_stream.log("Unknown state. Moving camera around...");
         m_active_command->dispatch(find_flag);
         m_looking_straight_ahead.store(false, std::memory_order_release);
         return false;
     });
     register_state_command(State::WYRDEER_BASCULEGION_OFF, [this](){
-        m_console.log("Switching from Wyrdeer/Basculegion (off) to Braviary (on)...");
-        m_active_command->dispatch([](BotBaseContext& context){
+        m_stream.log("Switching from Wyrdeer/Basculegion (off) to Braviary (on)...");
+        m_active_command->dispatch([](SwitchControllerContext& context){
             pbf_press_dpad(context, DPAD_RIGHT, 20, 50);
             pbf_press_button(context, BUTTON_PLUS, 20, GET_ON_BRAVIARY_TIME);
         });
         return false;
     });
     register_state_command(State::WYRDEER_BASCULEGION_ON, [this](){
-        m_console.log("Switching from Wyrdeer/Basculegion (on) to Braviary (on)...");
-        m_active_command->dispatch([](BotBaseContext& context){
+        m_stream.log("Switching from Wyrdeer/Basculegion (on) to Braviary (on)...");
+        m_active_command->dispatch([](SwitchControllerContext& context){
             pbf_press_dpad(context, DPAD_RIGHT, 20, GET_ON_BRAVIARY_TIME);
         });
         return false;
     });
     register_state_command(State::URSALUNA_OFF, [this](){
-        m_console.log("Switching from Ursaluna (off) to Braviary (on)...");
-        m_active_command->dispatch([](BotBaseContext& context){
+        m_stream.log("Switching from Ursaluna (off) to Braviary (on)...");
+        m_active_command->dispatch([](SwitchControllerContext& context){
             pbf_press_dpad(context, DPAD_RIGHT, 20, 50);
 //            pbf_press_dpad(context, DPAD_RIGHT, 20, 50);
 //            pbf_press_button(context, BUTTON_PLUS, 20, GET_ON_BRAVIARY_TIME);
@@ -99,58 +98,58 @@ FlagNavigationAir::FlagNavigationAir(
         return false;
     });
     register_state_command(State::URSALUNA_ON, [this](){
-        m_console.log("Switching from Ursaluna (on) to Braviary (on)...");
-        m_active_command->dispatch([](BotBaseContext& context){
+        m_stream.log("Switching from Ursaluna (on) to Braviary (on)...");
+        m_active_command->dispatch([](SwitchControllerContext& context){
             pbf_press_dpad(context, DPAD_RIGHT, 20, 50);
 //            pbf_press_dpad(context, DPAD_RIGHT, 20, GET_ON_BRAVIARY_TIME);
         });
         return false;
     });
     register_state_command(State::SNEASLER_OFF, [this](){
-        m_console.log("Switching from Sneasler (off) to Braviary (on)...");
-        m_active_command->dispatch([](BotBaseContext& context){
+        m_stream.log("Switching from Sneasler (off) to Braviary (on)...");
+        m_active_command->dispatch([](SwitchControllerContext& context){
             pbf_press_dpad(context, DPAD_LEFT, 20, 50);
             pbf_press_button(context, BUTTON_PLUS, 20, GET_ON_BRAVIARY_TIME);
         });
         return false;
     });
     register_state_command(State::SNEASLER_ON, [this](){
-        m_console.log("Switching from Sneasler (on) to Braviary (on)...");
+        m_stream.log("Switching from Sneasler (on) to Braviary (on)...");
         m_looking_straight_ahead.store(false, std::memory_order_release);
-        m_active_command->dispatch([](BotBaseContext& context){
+        m_active_command->dispatch([](SwitchControllerContext& context){
             pbf_move_left_joystick(context, 128, 0, 125, 0);
             pbf_press_dpad(context, DPAD_LEFT, 20, GET_ON_BRAVIARY_TIME);
         });
         return false;
     });
     register_state_command(State::BRAVIARY_OFF, [this](){
-        m_console.log("Switching from Braviary (off) to Braviary (on)...");
+        m_stream.log("Switching from Braviary (off) to Braviary (on)...");
         m_looking_straight_ahead.store(false, std::memory_order_release);
-        m_active_command->dispatch([](BotBaseContext& context){
+        m_active_command->dispatch([](SwitchControllerContext& context){
             pbf_press_button(context, BUTTON_PLUS, 20, GET_ON_BRAVIARY_TIME);
         });
         return false;
     });
     register_state_command(State::GET_ON_SNEASLER, [this](){
-        m_console.log("Getting on Sneasler...");
+        m_stream.log("Getting on Sneasler...");
         m_looking_straight_ahead.store(false, std::memory_order_release);
-        m_active_command->dispatch([](BotBaseContext& context){
+        m_active_command->dispatch([](SwitchControllerContext& context){
             pbf_press_button(context, BUTTON_A, 20, 230);
         });
         return false;
     });
     register_state_command(State::CLIMBING, [this](){
-        m_console.log("Climbing wall...");
+        m_stream.log("Climbing wall...");
         m_looking_straight_ahead.store(false, std::memory_order_release);
-        m_active_command->dispatch([](BotBaseContext& context){
+        m_active_command->dispatch([](SwitchControllerContext& context){
             pbf_move_left_joystick(context, 128, 0, 300 * TICKS_PER_SECOND, 0);
         });
         return false;
     });
 
     register_state_command(State::DASH_FORWARD_MASH_B, [this](){
-        m_console.log("Dashing forward (mash B)...");
-        m_active_command->dispatch([this](BotBaseContext& context){
+        m_stream.log("Dashing forward (mash B)...");
+        m_active_command->dispatch([this](SwitchControllerContext& context){
             //  Move forward to straighten out direction.
             if (!m_looking_straight_ahead.load(std::memory_order_acquire)){
                 pbf_move_left_joystick(context, 128, 0, 160, 0);
@@ -164,8 +163,8 @@ FlagNavigationAir::FlagNavigationAir(
         return false;
     });
     register_state_command(State::DASH_FORWARD_HOLD_B, [this](){
-        m_console.log("Dashing forward (hold B)...");
-        m_active_command->dispatch([this](BotBaseContext& context){
+        m_stream.log("Dashing forward (hold B)...");
+        m_active_command->dispatch([this](SwitchControllerContext& context){
             //  Move forward to straighten out direction.
             if (!m_looking_straight_ahead.load(std::memory_order_acquire)){
                 pbf_move_left_joystick(context, 128, 0, 160, 0);
@@ -180,8 +179,8 @@ FlagNavigationAir::FlagNavigationAir(
     });
 
     auto dash_turn = [this](){
-        m_console.log("Dashing Turn...");
-        m_active_command->dispatch([this](BotBaseContext& context){
+        m_stream.log("Dashing Turn...");
+        m_active_command->dispatch([this](SwitchControllerContext& context){
             //  Move forward to straighten out direction.
             if (!m_looking_straight_ahead.load(std::memory_order_acquire)){
                 pbf_move_left_joystick(context, 128, 0, 160, 0);
@@ -206,8 +205,8 @@ FlagNavigationAir::FlagNavigationAir(
     register_state_command(State::DASH_RIGHT, dash_turn);
 
     register_state_command(State::DIVE_STRAIGHT, [this](){
-        m_console.log("Diving Straight...");
-        m_active_command->dispatch([this](BotBaseContext& context){
+        m_stream.log("Diving Straight...");
+        m_active_command->dispatch([this](SwitchControllerContext& context){
             //  Move forward to straighten out direction.
             if (!m_looking_straight_ahead.load(std::memory_order_acquire)){
                 pbf_move_left_joystick(context, 128, 0, 160, 0);
@@ -222,8 +221,8 @@ FlagNavigationAir::FlagNavigationAir(
     });
 
     auto dive_turn = [this](){
-        m_console.log("Diving Turn...");
-        m_active_command->dispatch([this](BotBaseContext& context){
+        m_stream.log("Diving Turn...");
+        m_active_command->dispatch([this](SwitchControllerContext& context){
             //  Move forward to straighten out direction.
             if (!m_looking_straight_ahead.load(std::memory_order_acquire)){
                 pbf_move_left_joystick(context, 128, 0, 160, 0);
@@ -248,8 +247,8 @@ FlagNavigationAir::FlagNavigationAir(
     register_state_command(State::DIVE_RIGHT, dive_turn);
 
     register_state_command(State::TURN_LEFT, [this](){
-        m_console.log("Turning Left...");
-        m_active_command->dispatch([this](BotBaseContext& context){
+        m_stream.log("Turning Left...");
+        m_active_command->dispatch([this](SwitchControllerContext& context){
             pbf_wait(context, 150);
             context.wait_for_all_requests();
             double distance, flag_x, flag_y;
@@ -261,8 +260,8 @@ FlagNavigationAir::FlagNavigationAir(
         return false;
     });
     register_state_command(State::TURN_RIGHT, [this](){
-        m_console.log("Turning Right...");
-        m_active_command->dispatch([this](BotBaseContext& context){
+        m_stream.log("Turning Right...");
+        m_active_command->dispatch([this](SwitchControllerContext& context){
             pbf_wait(context, 150);
             context.wait_for_all_requests();
             double distance, flag_x, flag_y;
@@ -275,7 +274,7 @@ FlagNavigationAir::FlagNavigationAir(
     });
 
     register_state_command(State::FIND_FLAG, [this, find_flag](){
-        m_console.log("Looking for flag...");
+        m_stream.log("Looking for flag...");
         m_active_command->dispatch(find_flag);
         m_looking_straight_ahead.store(false, std::memory_order_release);
         return false;
@@ -285,33 +284,33 @@ void FlagNavigationAir::set_distance_callback(std::function<void(double distance
     m_flag_callback = std::move(flag_callback);
 }
 
-bool FlagNavigationAir::run_state(AsyncCommandSession& commands, WallClock timestamp){
+bool FlagNavigationAir::run_state(AsyncCommandSession<SwitchController>& commands, WallClock timestamp){
     if (last_state_change() + std::chrono::seconds(60) < timestamp){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, m_console,
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
             "No state change detected after 60 seconds.",
-            true
+            m_stream
         );
     }
     if (start_time() + m_navigate_timeout < timestamp){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, m_console,
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
             "Unable to reach flag after timeout period.",
-            true
+            m_stream
         );
     }
     if (m_dialog_detector.detected()){
-        throw OperationFailedException(
-            ErrorReport::NO_ERROR_REPORT, m_console,
+        OperationFailedException::fire(
+            ErrorReport::NO_ERROR_REPORT,
             "Potential ambush by Miss Fortune sister.",
-            true
+            m_stream
         );
     }
     if (m_find_flag_failed.load(std::memory_order_acquire)){
-        throw OperationFailedException(
-            ErrorReport::NO_ERROR_REPORT, m_console,
+        OperationFailedException::fire(
+            ErrorReport::NO_ERROR_REPORT,
             "Unable to find flag.",
-            true
+            m_stream
         );
     }
 
@@ -334,7 +333,7 @@ bool FlagNavigationAir::run_state(AsyncCommandSession& commands, WallClock times
         std::ostringstream ss;
         ss << "Flag: Distance = " << (m_flag_distance < 0 ? "?" : std::to_string(m_flag_distance))
            << ", x = " << m_flag_x << ", y = " << m_flag_y << std::endl;
-        m_console.log(ss.str(), COLOR_PURPLE);
+        m_stream.log(ss.str(), COLOR_PURPLE);
         m_last_flag_print = timestamp;
     }
 #endif
@@ -347,12 +346,12 @@ bool FlagNavigationAir::run_state(AsyncCommandSession& commands, WallClock times
             m_flag_reached_time = WallClock::max();
         }else if (m_flag_distance <= m_stop_radius && m_flag_reached_time == WallClock::max()){
             //  If we've reached the flag, start timer if we haven't already.
-            m_console.log("Target reached. Waiting out grace period...");
+            m_stream.log("Target reached. Waiting out grace period...");
             m_flag_reached_time = timestamp;
         }
     }
     if (m_flag_reached_time <= timestamp - m_flag_reached_delay){
-        m_console.log("Grace period finished. Stopping flag navigation...");
+        m_stream.log("Grace period finished. Stopping flag navigation...");
         return true;
     }
 
@@ -361,7 +360,7 @@ bool FlagNavigationAir::run_state(AsyncCommandSession& commands, WallClock times
     if (mount != MountState::NOTHING){
         m_last_known_mount = mount;
     }else{
-        m_console.log(
+        m_stream.log(
             std::string("Unable to detect mount. Assuming last known mount: ") +
             MOUNT_STATE_STRINGS[(size_t)m_last_known_mount]
         );
@@ -404,10 +403,10 @@ bool FlagNavigationAir::run_state(AsyncCommandSession& commands, WallClock times
         return run_flying(commands, timestamp);
     }
 
-    m_console.log("No state handler for current state.", COLOR_RED);
+    m_stream.log("No state handler for current state.", COLOR_RED);
     return false;
 }
-bool FlagNavigationAir::run_flying(AsyncCommandSession& commands, WallClock timestamp){
+bool FlagNavigationAir::run_flying(AsyncCommandSession<SwitchController>& commands, WallClock timestamp){
     //  Need to get on Sneasler.
     if (m_centerA.detected() && last_state_change() + std::chrono::seconds(2) < timestamp){
         return run_state_action(State::GET_ON_SNEASLER);
@@ -431,7 +430,7 @@ bool FlagNavigationAir::run_flying(AsyncCommandSession& commands, WallClock time
 #endif
 
 //    if (m_last_flag_detection + std::chrono::seconds(20) < timestamp){
-//        throw OperationFailedException(m_console, "Flag not detected after 20 seconds.", true);
+//        OperationFailedException::fire(m_console, "Flag not detected after 20 seconds.", true);
 //    }
 //    double flag_age = std::chrono::duration_cast<std::chrono::milliseconds>(timestamp - m_last_flag_detection).count() / 1000.;
 //    if (flag_age > 0){
@@ -502,7 +501,7 @@ bool FlagNavigationAir::run_flying(AsyncCommandSession& commands, WallClock time
     return run_state_action(State::DIVE_STRAIGHT);
 #endif
 }
-bool FlagNavigationAir::run_climbing(AsyncCommandSession& commands, WallClock timestamp){
+bool FlagNavigationAir::run_climbing(AsyncCommandSession<SwitchController>& commands, WallClock timestamp){
     //  Can't jump off means you're able to stand. Switch back to Braviary.
     if (!m_leftB.detected()){
         return run_state_action(State::SNEASLER_ON);

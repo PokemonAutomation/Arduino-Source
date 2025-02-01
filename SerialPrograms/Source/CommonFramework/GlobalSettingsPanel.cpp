@@ -7,13 +7,22 @@
 #include <iostream>
 #include <set>
 #include <QCryptographicHash>
+#include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Common/Cpp/LifetimeSanitizer.h"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "CommonFramework/Globals.h"
+#include "CommonFramework/Options/ResolutionOption.h"
+#include "CommonFramework/Options/Environment/SleepSuppressOption.h"
+#include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
+#include "CommonFramework/Options/Environment/PerformanceOptions.h"
+#include "CommonFramework/Recording/StreamHistoryOption.h"
+#include "CommonFramework/AudioPipeline/AudioPipelineOptions.h"
+#include "CommonFramework/VideoPipeline/VideoPipelineOptions.h"
+#include "CommonFramework/ErrorReports/ErrorReports.h"
+#include "Integrations/DiscordSettingsOption.h"
 //#include "CommonFramework/Environment/Environment.h"
-#include "CommonFramework/Windows/DpiScaler.h"
 #include "GlobalSettingsPanel.h"
 
 // #include <iostream>
@@ -33,23 +42,9 @@ const std::set<std::string> TOKENS{
     "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08", //  jw's token.
     "e8d168bc482e96553ea9f9ecaea5a817474dbccc2a6a228a6bde67f2b2aa2889", //  James' token.
     "7555b7c63481cad42306718c67e7f9def5bfd1da8f6cd299ccd3d7dc95f307ae", //  Kuro's token.
+    "3d475b46d121fc24559d100de2426feaa53cd6578aac2817c4857a610ccde2dd", //  kichi's token.
 };
 
-
-
-ResolutionOption::ResolutionOption(
-    std::string label, std::string description,
-    int default_width, int default_height
-)
-    : GroupOption(std::move(label), LockMode::LOCK_WHILE_RUNNING)
-    , DESCRIPTION(std::move(description))
-    , WIDTH("<b>Width:</b>", LockMode::LOCK_WHILE_RUNNING, scale_dpi_width(default_width))
-    , HEIGHT("<b>Height:</b>", LockMode::LOCK_WHILE_RUNNING, scale_dpi_height(default_height))
-{
-    PA_ADD_STATIC(DESCRIPTION);
-    PA_ADD_OPTION(WIDTH);
-    PA_ADD_OPTION(HEIGHT);
-}
 
 
 
@@ -76,7 +71,12 @@ void PreloadSettings::load(const JsonValue& json){
     const std::string* dev_token = obj->get_string("DEVELOPER_TOKEN");
     if (dev_token){
         QCryptographicHash hash(QCryptographicHash::Algorithm::Sha256);
+#if QT_VERSION < 0x060700
         hash.addData(dev_token->c_str(), (int)dev_token->size());
+#else
+        QByteArrayView dataView(dev_token->data(), dev_token->size());
+        hash.addData(dataView);
+#endif
         DEVELOPER_MODE = TOKENS.find(hash.result().toHex().toStdString()) != TOKENS.end();
     }
 
@@ -96,15 +96,14 @@ GlobalSettings& GlobalSettings::instance(){
     return settings;
 }
 GlobalSettings::~GlobalSettings(){
-    ENABLE_LIFETIME_SANITIZER.remove_listener(*this);
+    ENABLE_LIFETIME_SANITIZER0.remove_listener(*this);
 }
 GlobalSettings::GlobalSettings()
     : BatchOption(LockMode::LOCK_WHILE_RUNNING)
-    , SEND_ERROR_REPORTS(
-        "<b>Send Error Reports:</b><br>"
-        "Send error reports to the " + PROGRAM_NAME + " server to help them resolve issues and improve the program.",
-        LockMode::LOCK_WHILE_RUNNING,
-        IS_BETA_VERSION
+    , CHECK_FOR_UPDATES(
+        "<b>Check for Updates:</b><br>Automatically check for updates.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        true
     )
     , STATS_FILE(
         false,
@@ -113,22 +112,23 @@ GlobalSettings::GlobalSettings()
         "UserSettings/PA-Stats.txt",
         "UserSettings/PA-Stats.txt"
     )
-    , ALL_STATS(
-        "<b>All Stats:</b><br>Include all-time stats for notifications.",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        true
+    , TEMP_FOLDER(
+        false,
+        "<b>Temp Folder:</b><br>Place temporary files in this directory.",
+        LockMode::LOCK_WHILE_RUNNING,
+        "TempFiles/",
+        "TempFiles/"
     )
-    , CHECK_FOR_UPDATES(
-        "<b>Check for Updates:</b><br>Automatically check for updates.",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        true
-    )
+    , THEME(CONSTRUCT_TOKEN)
     , WINDOW_SIZE(
+        CONSTRUCT_TOKEN,
         "Window Size:",
         "Set the size of the window. Takes effect immediately.<br>"
         "Use this to easily set the window to a specific resolution for streaming alignment.",
         1280, 1000
     )
+    , STREAM_HISTORY(CONSTRUCT_TOKEN)
+    , SLEEP_SUPPRESS(CONSTRUCT_TOKEN)
     , m_discord_settings(
         "<font size=4><b>Discord Settings:</b> Integrate with Discord. (" +
         make_text_url(
@@ -136,6 +136,12 @@ GlobalSettings::GlobalSettings()
             "online documentation"
         ) + ")</font>"
     )
+    , ALL_STATS(
+        "<b>All Stats:</b><br>Include all-time stats for notifications.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        true
+    )
+    , DISCORD(CONSTRUCT_TOKEN)
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
@@ -158,72 +164,17 @@ GlobalSettings::GlobalSettings()
         LockMode::UNLOCK_WHILE_RUNNING,
         false
     )
-    , REALTIME_THREAD_PRIORITY0(
-        "<b>Realtime Thread Priority:</b><br>"
-        "Thread priority of real-time threads. (UI thread, audio threads)<br>"
-        "Restart the program for this to fully take effect.",
-        DEFAULT_PRIORITY_REALTIME
-    )
-    , INFERENCE_PRIORITY0(
-        "<b>Inference Priority:</b><br>"
-        "Thread priority of inference threads. (image/sound recognition)",
-        DEFAULT_PRIORITY_INFERENCE
-    )
-    , COMPUTE_PRIORITY0(
-        "<b>Compute Priority:</b><br>"
-        "Thread priority of computation threads.",
-        DEFAULT_PRIORITY_COMPUTE
-    )
-    , AUDIO_FILE_VOLUME_SCALE(
-        "<b>Audio File Input Volume Scale:</b><br>"
-        "Multiply audio file playback by this factor. (This is linear scale. So each factor of 10 is 20dB.)",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        0.31622776601683793320, //  -10dB
-        -10000, 10000
-    )
-    , AUDIO_DEVICE_VOLUME_SCALE(
-        "<b>Audio Device Input Volume Scale:</b><br>"
-        "Multiply audio device input by this factor. (This is linear scale. So each factor of 10 is 20dB.)",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        1.0, -10000, 10000
-    )
-    , SHOW_ALL_AUDIO_DEVICES(
-        "<b>Show all Audio Devices:</b><br>"
-        "Show all audio devices - including duplicates.",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        false
-    )
-    , SHOW_RECORD_FREQUENCIES(
-        "<b>Show Record Frequencies:</b><br>"
-        "Show option to record audio frequencies.",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        false
-    )
-    , ENABLE_FRAME_SCREENSHOTS(
-        "<b>Enable Frame Screenshots:</b><br>"
-        "Attempt to use QVideoProbe and QVideoFrame for screenshots.",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        true
-    )
-    , AUTO_RESET_AUDIO_SECONDS(
-        "<b>Audio Auto-Reset:</b><br>"
-        "Attempt to reset the audio if this many seconds has elapsed since the last audio frame (in order to fix issues with RDP disconnection, etc).",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        5
-    )
-    , AUTO_RESET_VIDEO_SECONDS(
-        "<b>Video Auto-Reset:</b><br>"
-        "Attempt to reset the video if this many seconds has elapsed since the last video frame (in order to fix issues with RDP disconnection, etc).<br>"
-        "This option is not supported by all video frameworks.",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        5
-    )
-    , ENABLE_LIFETIME_SANITIZER(
+    , PERFORMANCE(CONSTRUCT_TOKEN)
+    , AUDIO_PIPELINE(CONSTRUCT_TOKEN)
+    , VIDEO_PIPELINE(CONSTRUCT_TOKEN)
+    , ENABLE_LIFETIME_SANITIZER0(
         "<b>Enable Lifetime Sanitizer: (for debugging)</b><br>"
         "Check for C++ object lifetime violations. Terminate program with stack dump if violations are found.",
         LockMode::UNLOCK_WHILE_RUNNING,
-        IS_BETA_VERSION
+        true
+//        IS_BETA_VERSION
     )
+    , ERROR_REPORTS(CONSTRUCT_TOKEN)
     , DEVELOPER_TOKEN(
         true,
         "<b>Developer Token:</b><br>Restart application to take full effect after changing this.",
@@ -231,14 +182,24 @@ GlobalSettings::GlobalSettings()
         "", ""
     )
 {
-    PA_ADD_OPTION(SEND_ERROR_REPORTS);
-    PA_ADD_OPTION(STATS_FILE);
-    PA_ADD_OPTION(ALL_STATS);
     PA_ADD_OPTION(CHECK_FOR_UPDATES);
-    PA_ADD_OPTION(WINDOW_SIZE);
+    PA_ADD_OPTION(STATS_FILE);
+    PA_ADD_OPTION(TEMP_FOLDER);
     PA_ADD_OPTION(THEME);
+    PA_ADD_OPTION(WINDOW_SIZE);
+#if (QT_VERSION_MAJOR == 6) && (QT_VERSION_MINOR >= 8)
+    if (IS_BETA_VERSION || PreloadSettings::instance().DEVELOPER_MODE){
+        PA_ADD_OPTION(STREAM_HISTORY);
+    }
+#else
+    STREAM_HISTORY->set_enabled(false);
+#endif
+#ifdef PA_ENABLE_SLEEP_SUPPRESS
+    PA_ADD_OPTION(SLEEP_SUPPRESS);
+#endif
 
     PA_ADD_STATIC(m_discord_settings);
+    PA_ADD_OPTION(ALL_STATS);
     PA_ADD_OPTION(DISCORD);
 
     PA_ADD_STATIC(m_advanced_options);
@@ -247,32 +208,21 @@ GlobalSettings::GlobalSettings()
 //    PA_ADD_OPTION(NAUGHTY_MODE);
     PA_ADD_OPTION(HIDE_NOTIF_DISCORD_LINK);
 
-    PA_ADD_OPTION(REALTIME_THREAD_PRIORITY0);
-    PA_ADD_OPTION(INFERENCE_PRIORITY0);
-    PA_ADD_OPTION(COMPUTE_PRIORITY0);
+    PA_ADD_OPTION(PERFORMANCE);
 
-    PA_ADD_OPTION(AUDIO_FILE_VOLUME_SCALE);
-    PA_ADD_OPTION(AUDIO_DEVICE_VOLUME_SCALE);
-    PA_ADD_OPTION(SHOW_ALL_AUDIO_DEVICES);
-    if (PreloadSettings::instance().DEVELOPER_MODE){
-        PA_ADD_OPTION(SHOW_RECORD_FREQUENCIES);
-    }
-    PA_ADD_OPTION(VIDEO_BACKEND);
-#if QT_VERSION_MAJOR == 5
-    PA_ADD_OPTION(ENABLE_FRAME_SCREENSHOTS);
+    PA_ADD_OPTION(AUDIO_PIPELINE);
+    PA_ADD_OPTION(VIDEO_PIPELINE);
+
+    PA_ADD_OPTION(ENABLE_LIFETIME_SANITIZER0);
+
+#ifdef PA_OFFICIAL
+    PA_ADD_OPTION(ERROR_REPORTS);
 #endif
-
-    PA_ADD_OPTION(AUTO_RESET_AUDIO_SECONDS);
-    PA_ADD_OPTION(AUTO_RESET_VIDEO_SECONDS);
-
-    PA_ADD_OPTION(ENABLE_LIFETIME_SANITIZER);
-
-    PA_ADD_OPTION(PROCESSOR_LEVEL0);
 
     PA_ADD_OPTION(DEVELOPER_TOKEN);
 
     GlobalSettings::value_changed(this);
-    ENABLE_LIFETIME_SANITIZER.add_listener(*this);
+    ENABLE_LIFETIME_SANITIZER0.add_listener(*this);
 }
 
 void GlobalSettings::load_json(const JsonValue& json){
@@ -389,7 +339,7 @@ JsonValue GlobalSettings::to_json() const{
 }
 
 void GlobalSettings::value_changed(void* object){
-    bool enabled = ENABLE_LIFETIME_SANITIZER;
+    bool enabled = ENABLE_LIFETIME_SANITIZER0;
     LifetimeSanitizer::set_enabled(enabled);
     if (enabled){
         global_logger_tagged().log("LifeTime Sanitizer: Enabled", COLOR_BLUE);

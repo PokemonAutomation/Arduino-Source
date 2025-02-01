@@ -7,14 +7,11 @@
 #ifndef PokemonAutomation_PokemonSwSh_TournamentFarmer2_H
 #define PokemonAutomation_PokemonSwSh_TournamentFarmer2_H
 
-//#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/ButtonOption.h"
-//#include "CommonFramework/Options/LanguageOCROption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
-//#include "PokemonSV/Options/PokemonSV_TournamentPrizeTable.h"
 #include "PokemonSV/Options/PokemonSV_SinglesAIOption.h"
 
 namespace PokemonAutomation{
@@ -33,7 +30,7 @@ class TournamentFarmer2 : public SingleSwitchProgramInstance, public ButtonListe
 public:
     ~TournamentFarmer2();
     TournamentFarmer2();
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
     virtual void on_press() override;
 
 private:

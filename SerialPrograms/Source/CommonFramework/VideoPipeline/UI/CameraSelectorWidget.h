@@ -30,7 +30,7 @@ class VideoDisplayWidget;
 //  VideoDisplayWidget, the video feed UI, when the video state
 //  is changed. The VideoDisplayWidget is passed in the constructor
 //  too.
-class CameraSelectorWidget : public QWidget, public CameraSession::Listener{
+class CameraSelectorWidget : public QWidget, public CameraSession::StateListener{
     //  Need to define this Q_OBJECT to use Qt's extra features
     //  like signals and slots on this class.
     Q_OBJECT
@@ -46,9 +46,9 @@ private:
     void update_camera_list();
     void update_resolution_list();
 
-    virtual void shutdown() override;
-    virtual void new_source(const CameraInfo& device, Resolution resolution) override;
-    virtual void resolution_change(Resolution resolution) override;
+    virtual void pre_shutdown() override;
+    virtual void post_new_source(const CameraInfo& device, Resolution resolution) override;
+    virtual void post_resolution_change(Resolution resolution) override;
 
 private:
     Logger& m_logger;

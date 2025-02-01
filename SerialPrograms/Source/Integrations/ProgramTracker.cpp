@@ -7,8 +7,9 @@
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-//#include "CommonFramework/AudioPipeline/AudioFeed.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Messages_PushButtons.h"
+#include "Controllers/ControllerSession.h"
+#include "Controllers/SerialPABotBase/SerialPABotBase_Handle.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Messages_Superscalar.h"
 #include "ProgramTracker.h"
 
@@ -17,6 +18,8 @@ using std::cout;
 using std::endl;
 
 namespace PokemonAutomation{
+
+using namespace std::chrono_literals;
 
 
 ProgramTracker& ProgramTracker::instance(){
@@ -84,8 +87,8 @@ std::string ProgramTracker::reset_serial(uint64_t console_id){
         global_logger_tagged().log("SwitchProgramTracker::" + error, COLOR_RED);
         return error;
     }
-    const char* msg = iter->second.first->sender().try_reset();
-    return msg == nullptr ? "Serial connection was reset." : msg;
+    std::string error = iter->second.first->controller().reset();
+    return error.empty() ? "Serial connection was reset." : error;
 }
 std::string ProgramTracker::start_program(uint64_t program_id){
     std::lock_guard<std::mutex> lg(m_lock);
@@ -109,7 +112,8 @@ std::string ProgramTracker::stop_program(uint64_t program_id){
     iter->second->program.async_stop();
     return "";
 }
-std::string ProgramTracker::nsw_press_button(uint64_t console_id, Button button, uint16_t ticks){
+std::string ProgramTracker::nsw_press_button(uint64_t console_id, NintendoSwitch::Button button, uint16_t ticks){
+    using namespace NintendoSwitch;
     std::string header = "press_button(ID = " + std::to_string(console_id) + ")";
     std::lock_guard<std::mutex> lg(m_lock);
     auto iter = m_consoles.find(console_id);
@@ -118,19 +122,28 @@ std::string ProgramTracker::nsw_press_button(uint64_t console_id, Button button,
         global_logger_tagged().log("SwitchProgramTracker::" + error, COLOR_RED);
         return error;
     }
-    const char* err = iter->second.first->sender().try_send_request(
-//        NintendoSwitch::DeviceRequest_pbf_press_button(button, ticks, 0)
-        NintendoSwitch::DeviceRequest_ssf_press_button(button, ticks, ticks, 0)
-    );
-    if (err){
-        global_logger_tagged().log("SwitchProgramTracker::" + header + ": " + err, COLOR_RED);
-        return err;
-    }else{
+    Milliseconds duration = ticks * 8ms;
+    std::string err;
+    try{
+        err = iter->second.first->controller().try_run<SwitchController>(
+            [=](SwitchController& controller){
+                controller.issue_buttons(nullptr, button, duration, duration, 0ms);
+            }
+        );
+    }catch (Exception& e){
+        e.log(global_logger_tagged());
+        err = e.to_str();
+    }
+    if (err.empty()){
         global_logger_tagged().log("SwitchProgramTracker::" + header, COLOR_BLUE);
         return "";
+    }else{
+        global_logger_tagged().log("SwitchProgramTracker::" + header + ": " + err, COLOR_RED);
+        return err;
     }
 }
-std::string ProgramTracker::nsw_press_dpad(uint64_t console_id, DpadPosition position, uint16_t ticks){
+std::string ProgramTracker::nsw_press_dpad(uint64_t console_id, NintendoSwitch::DpadPosition position, uint16_t ticks){
+    using namespace NintendoSwitch;
     std::string header = "press_dpad(ID = " + std::to_string(console_id) + ")";
     std::lock_guard<std::mutex> lg(m_lock);
     auto iter = m_consoles.find(console_id);
@@ -139,19 +152,28 @@ std::string ProgramTracker::nsw_press_dpad(uint64_t console_id, DpadPosition pos
         global_logger_tagged().log("SwitchProgramTracker::" + error, COLOR_RED);
         return error;
     }
-    const char* err = iter->second.first->sender().try_send_request(
-//        NintendoSwitch::DeviceRequest_pbf_press_dpad(position, ticks, 0)
-        NintendoSwitch::DeviceRequest_ssf_press_dpad(position, ticks, ticks, 0)
-    );
-    if (err){
-        global_logger_tagged().log("SwitchProgramTracker::" + header + ": " + err, COLOR_RED);
-        return err;
-    }else{
+    Milliseconds duration = ticks * 8ms;
+    std::string err;
+    try{
+        err = iter->second.first->controller().try_run<SwitchController>(
+            [=](SwitchController& controller){
+                controller.issue_dpad(nullptr, position, duration, duration, 0ms);
+            }
+        );
+    }catch (Exception& e){
+        e.log(global_logger_tagged());
+        err = e.to_str();
+    }
+    if (err.empty()){
         global_logger_tagged().log("SwitchProgramTracker::" + header, COLOR_BLUE);
         return "";
+    }else{
+        global_logger_tagged().log("SwitchProgramTracker::" + header + ": " + err, COLOR_RED);
+        return err;
     }
 }
 std::string ProgramTracker::nsw_press_left_joystick(uint64_t console_id, uint8_t x, uint8_t y, uint16_t ticks){
+    using namespace NintendoSwitch;
     std::string header = "press_left_joystick(ID = " + std::to_string(console_id) + ")";
     std::lock_guard<std::mutex> lg(m_lock);
     auto iter = m_consoles.find(console_id);
@@ -160,19 +182,28 @@ std::string ProgramTracker::nsw_press_left_joystick(uint64_t console_id, uint8_t
         global_logger_tagged().log("SwitchProgramTracker::" + error, COLOR_RED);
         return error;
     }
-    const char* err = iter->second.first->sender().try_send_request(
-//        NintendoSwitch::DeviceRequest_pbf_move_left_joystick(x, y, ticks, 0)
-        NintendoSwitch::DeviceRequest_ssf_press_joystick(true, x, y, ticks, ticks, 0)
-    );
-    if (err){
-        global_logger_tagged().log("SwitchProgramTracker::" + header + ": " + err, COLOR_RED);
-        return err;
-    }else{
+    Milliseconds duration = ticks * 8ms;
+    std::string err;
+    try{
+        err = iter->second.first->controller().try_run<SwitchController>(
+            [=](SwitchController& controller){
+                controller.issue_left_joystick(nullptr, x, y, duration, duration, 0ms);
+            }
+        );
+    }catch (Exception& e){
+        e.log(global_logger_tagged());
+        err = e.to_str();
+    }
+    if (err.empty()){
         global_logger_tagged().log("SwitchProgramTracker::" + header, COLOR_BLUE);
         return "";
+    }else{
+        global_logger_tagged().log("SwitchProgramTracker::" + header + ": " + err, COLOR_RED);
+        return err;
     }
 }
 std::string ProgramTracker::nsw_press_right_joystick(uint64_t console_id, uint8_t x, uint8_t y, uint16_t ticks){
+    using namespace NintendoSwitch;
     std::string header = "press_right_joystick(ID = " + std::to_string(console_id) + ")";
     std::lock_guard<std::mutex> lg(m_lock);
     auto iter = m_consoles.find(console_id);
@@ -181,16 +212,24 @@ std::string ProgramTracker::nsw_press_right_joystick(uint64_t console_id, uint8_
         global_logger_tagged().log("SwitchProgramTracker::" + error, COLOR_RED);
         return error;
     }
-    const char* err = iter->second.first->sender().try_send_request(
-//        NintendoSwitch::DeviceRequest_pbf_move_right_joystick(x, y, ticks, 0)
-        NintendoSwitch::DeviceRequest_ssf_press_joystick(false, x, y, ticks, ticks, 0)
-    );
-    if (err){
-        global_logger_tagged().log("SwitchProgramTracker::" + header + ": " + err, COLOR_RED);
-        return err;
-    }else{
+    Milliseconds duration = ticks * 8ms;
+    std::string err;
+    try{
+        err = iter->second.first->controller().try_run<SwitchController>(
+            [=](SwitchController& controller){
+                controller.issue_right_joystick(nullptr, x, y, duration, duration, 0ms);
+            }
+        );
+    }catch (Exception& e){
+        e.log(global_logger_tagged());
+        err = e.to_str();
+    }
+    if (err.empty()){
         global_logger_tagged().log("SwitchProgramTracker::" + header, COLOR_BLUE);
         return "";
+    }else{
+        global_logger_tagged().log("SwitchProgramTracker::" + header + ": " + err, COLOR_RED);
+        return err;
     }
 }
 

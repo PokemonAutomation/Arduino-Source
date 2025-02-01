@@ -5,6 +5,10 @@
  */
 
 #include "Common/Cpp/Json/JsonValue.h"
+//#include "CommonFramework/VideoPipeline/VideoFeed.h"
+//#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "CommonTools/StartupChecks/StartProgramChecks.h"
+#include "Controllers/ControllerSession.h"
 #include "NintendoSwitch_SingleSwitchProgram.h"
 #include "Framework/NintendoSwitch_SingleSwitchProgramOption.h"
 
@@ -20,17 +24,17 @@ SingleSwitchProgramDescriptor::SingleSwitchProgramDescriptor(
     std::string description,
     FeedbackType feedback,
     AllowCommandsWhenRunning allow_commands_while_running,
-    PABotBaseLevel min_pabotbase_level
+    ControllerRequirements requirements
 )
     : ProgramDescriptor(
-        pick_color(feedback, min_pabotbase_level),
+        pick_color(feedback),
         std::move(identifier),
         std::move(category), std::move(display_name),
         std::move(doc_link),
         std::move(description)
     )
     , m_feedback(feedback)
-    , m_min_pabotbase_level(min_pabotbase_level)
+    , m_requirements(std::move(requirements))
     , m_allow_commands_while_running(allow_commands_while_running == AllowCommandsWhenRunning::ENABLE_COMMANDS)
 {}
 std::unique_ptr<PanelInstance> SingleSwitchProgramDescriptor::make_panel() const{
@@ -64,6 +68,31 @@ SingleSwitchProgramInstance::SingleSwitchProgramInstance(
         error_notification_tags
     )
 {}
+
+
+void SingleSwitchProgramInstance::start_program_controller_check(
+    CancellableScope& scope,
+    ControllerSession& session
+){
+    if (!session.ready()){
+        throw UserSetupError(session.logger(), "Cannot Start: Controller is not ready.");
+    }
+}
+void SingleSwitchProgramInstance::start_program_feedback_check(
+    CancellableScope& scope,
+    VideoStream& stream,
+    FeedbackType feedback_type
+){
+    StartProgramChecks::check_feedback(stream, feedback_type);
+}
+void SingleSwitchProgramInstance::start_program_border_check(
+    CancellableScope& scope,
+    VideoStream& stream
+){
+    StartProgramChecks::check_border(stream);
+}
+
+
 void SingleSwitchProgramInstance::add_option(ConfigOption& option, std::string serialization_string){
     m_options.add_option(option, std::move(serialization_string));
 }

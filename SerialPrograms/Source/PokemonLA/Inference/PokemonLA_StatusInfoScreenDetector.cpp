@@ -6,8 +6,8 @@
 
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
-#include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "CommonTools/Images/SolidColorTest.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonLA_CommonColorCheck.h"
 #include "PokemonLA_StatusInfoScreenDetector.h"

@@ -10,6 +10,7 @@
 #include <QScrollBar>
 #include <QLabel>
 #include <QPushButton>
+#include <QMessageBox>
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Qt/AutoHeightTable.h"
 #include "EditableTableWidget.h"
@@ -40,12 +41,14 @@ EditableTableWidget::EditableTableWidget(QWidget& parent, EditableTableOption& v
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
 
-    QLabel* label = new QLabel(QString::fromStdString(value.label()), this);
-    label->setWordWrap(true);
-    label->setTextFormat(Qt::RichText);
-    label->setTextInteractionFlags(Qt::TextBrowserInteraction);
-    label->setOpenExternalLinks(true);
-    layout->addWidget(label);
+    if (!value.label().empty()){
+        QLabel* label = new QLabel(QString::fromStdString(value.label()), this);
+        label->setWordWrap(true);
+        label->setTextFormat(Qt::RichText);
+        label->setTextInteractionFlags(Qt::TextBrowserInteraction);
+        label->setOpenExternalLinks(true);
+        layout->addWidget(label);
+    }
 
     m_table = new AutoHeightTableWidget(this);
     layout->addWidget(m_table, 0, Qt::AlignTop);
@@ -94,10 +97,10 @@ EditableTableWidget::EditableTableWidget(QWidget& parent, EditableTableOption& v
         QHBoxLayout* buttons = new QHBoxLayout();
         layout->addLayout(buttons);
         {
-            QPushButton* load_button = new QPushButton("Load Table", this);
-            buttons->addWidget(load_button, 1);
+            QPushButton* button = new QPushButton("Load Table", this);
+            buttons->addWidget(button, 1);
             connect(
-                load_button, &QPushButton::clicked,
+                button, &QPushButton::clicked,
                 this, [this, &value](bool){
                     std::string path = QFileDialog::getOpenFileName(
                         this,
@@ -111,10 +114,10 @@ EditableTableWidget::EditableTableWidget(QWidget& parent, EditableTableOption& v
             );
         }
         {
-            QPushButton* save_button = new QPushButton("Save Table", this);
-            buttons->addWidget(save_button, 1);
+            QPushButton* button = new QPushButton("Save Table", this);
+            buttons->addWidget(button, 1);
             connect(
-                save_button, &QPushButton::clicked,
+                button, &QPushButton::clicked,
                 this, [this, &value](bool){
                     std::string path = QFileDialog::getSaveFileName(
                         this,
@@ -125,6 +128,24 @@ EditableTableWidget::EditableTableWidget(QWidget& parent, EditableTableOption& v
                     }
                     JsonValue json = value.to_json();
                     json.dump(path);
+                }
+            );
+        }
+        {
+            QPushButton* button = new QPushButton("Restore Defaults", this);
+            buttons->addWidget(button, 1);
+            connect(
+                button, &QPushButton::clicked,
+                this, [&value](bool){
+                    QMessageBox::StandardButton button = QMessageBox::question(
+                        nullptr,
+                        "Restore Defaults",
+                        "Are you sure you wish to this table back to defaults? This will wipe the current table.",
+                        QMessageBox::Ok | QMessageBox::Cancel
+                    );
+                    if (button == QMessageBox::Ok){
+                        value.restore_defaults();
+                    }
                 }
             );
         }

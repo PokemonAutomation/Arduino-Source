@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_ShinyHuntTracker_H
 #define PokemonAutomation_ShinyHuntTracker_H
 
-#include "CommonFramework/Tools/StatsTracking.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "Pokemon/Pokemon_DataTypes.h"
 
 namespace PokemonAutomation{

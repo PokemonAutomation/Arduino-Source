@@ -5,19 +5,18 @@
  */
 
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
-#include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
-#include "CommonFramework/ImageTools/SolidColorTest.h"
-#include "CommonFramework/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
+#include "CommonTools/Images/SolidColorTest.h"
+#include "CommonTools/Images/BinaryImage_FilterRgb32.h"
+#include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.h"
 #include "PokemonSV_TeraRaidSearchDetector.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -75,7 +74,10 @@ bool TeraRaidSearchDetector::detect_search_location(ImageFloatBox& box, const Im
 
     return false;
 }
-bool TeraRaidSearchDetector::move_cursor_to_search(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context) const{
+bool TeraRaidSearchDetector::move_cursor_to_search(
+    const ProgramInfo& info,
+    VideoStream& stream, SwitchControllerContext& context
+) const{
     GradientArrowDetector arrow(m_color, GradientArrowType::DOWN, {0, 0, 1, 1});
 
     size_t consecutive_detection_fails = 0;
@@ -83,7 +85,7 @@ bool TeraRaidSearchDetector::move_cursor_to_search(const ProgramInfo& info, Cons
     bool target_reached = false;
     while (true){
         context.wait_for_all_requests();
-        VideoSnapshot screen = console.video().snapshot();
+        VideoSnapshot screen = stream.video().snapshot();
 
         ImageFloatBox search_location;
         ImageFloatBox arrow_location;
@@ -96,7 +98,7 @@ bool TeraRaidSearchDetector::move_cursor_to_search(const ProgramInfo& info, Cons
         if (!ok){
             consecutive_detection_fails++;
             if (consecutive_detection_fails > 10){
-                dump_image_and_throw_recoverable_exception(info, console, "UnableToDetectTeraSearch", "Unable to detect Tera Raid Search menu.");
+                dump_image_and_throw_recoverable_exception(info, stream, "UnableToDetectTeraSearch", "Unable to detect Tera Raid Search menu.");
             }
             context.wait_for(std::chrono::milliseconds(1000));
             continue;
@@ -104,7 +106,7 @@ bool TeraRaidSearchDetector::move_cursor_to_search(const ProgramInfo& info, Cons
 
 
         if (moves >= 10){
-            console.log("Unable to move to target after 10 moves.", COLOR_RED);
+            stream.log("Unable to move to target after 10 moves.", COLOR_RED);
             return false;
         }
         moves++;

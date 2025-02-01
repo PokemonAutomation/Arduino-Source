@@ -8,15 +8,12 @@
 #define PokemonAutomation_PokemonLA_LeapGrinder_H
 
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
-#include "CommonFramework/Options/LanguageOCROption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
+#include "CommonTools/Options/StringSelectOption.h"
+#include "CommonTools/Options/LanguageOCROption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonLA/Options/PokemonLA_MiscOptions.h"
 #include "PokemonLA/Options/PokemonLA_ShinyDetectedAction.h"
-#include "PokemonLA/Inference/PokemonLA_MountDetector.h"
-#include "PokemonLA/Inference/PokemonLA_UnderAttackDetector.h"
-#include "PokemonLA/Programs/PokemonLA_LeapPokemonActions.h"
-#include "Pokemon/Options/Pokemon_NameSelectOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -33,11 +30,11 @@ public:
 class LeapGrinder : public SingleSwitchProgramInstance{
 public:
     LeapGrinder();
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
-    bool run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-    bool quick_check(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    bool run_iteration(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
+    bool quick_check(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
 
 private:
     class RunRoute;

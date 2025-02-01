@@ -4,8 +4,8 @@
  *
  */
 
-#include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonBDSP_EggRoutines.h"
@@ -26,7 +26,7 @@ EggFetcher_Descriptor::EggFetcher_Descriptor()
         "Automatically fetch eggs from the daycare man.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 struct EggFetcher_Descriptor::Stats : public StatsTracker{
@@ -72,7 +72,7 @@ EggFetcher::EggFetcher()
 }
 
 
-void EggFetcher::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void EggFetcher::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     EggFetcher_Descriptor::Stats& stats = env.current_stats<EggFetcher_Descriptor::Stats>();
     env.update_stats();
 

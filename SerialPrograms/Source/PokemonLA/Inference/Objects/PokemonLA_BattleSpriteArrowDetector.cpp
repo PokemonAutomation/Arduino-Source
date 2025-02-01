@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Cpp/AbstractLogger.h"
 #include "PokemonLA_BattleSpriteArrowDetector.h"
 
 namespace PokemonAutomation{

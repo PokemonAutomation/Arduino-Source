@@ -26,7 +26,7 @@ class SandwichMaker : public SingleSwitchProgramInstance{
 public:
     SandwichMaker();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
     SandwichMakerOption SANDWICH_OPTIONS;

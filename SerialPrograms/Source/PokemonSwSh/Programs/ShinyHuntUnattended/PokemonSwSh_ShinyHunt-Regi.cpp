@@ -14,7 +14,7 @@ namespace PokemonSwSh{
 
 
 void move_to_corner(
-    Logger& logger, BotBaseContext& context,
+    Logger& logger, SwitchControllerContext& context,
     bool correction, uint16_t TRANSITION_DELAY
 ){
     if (correction){
@@ -34,7 +34,7 @@ void move_to_corner(
 }
 
 
-void regirock(BotBaseContext& context){
+void regirock(SwitchControllerContext& context){
     pbf_move_left_joystick(context, 0, 232, 169, 0);
     pbf_move_left_joystick(context, 128, 255, 135, 0);
     pbf_move_left_joystick(context, 0, 128, 109, 0);
@@ -44,7 +44,7 @@ void regirock(BotBaseContext& context){
     pbf_mash_button(context, BUTTON_A, 5 * TICKS_PER_SECOND);
     pbf_move_left_joystick(context, 128, 0, 200, 0);
 }
-void regice(BotBaseContext& context){
+void regice(SwitchControllerContext& context){
     pbf_move_left_joystick(context, 80, 255, 182, 0);
     pbf_move_left_joystick(context, 0, 128, 114, 0);
     pbf_move_left_joystick(context, 128, 255, 56, 0);
@@ -55,7 +55,7 @@ void regice(BotBaseContext& context){
     pbf_mash_button(context, BUTTON_A, 5 * TICKS_PER_SECOND - 20);
     pbf_move_left_joystick(context, 128, 0, 170, 0);
 }
-void registeel(BotBaseContext& context){
+void registeel(SwitchControllerContext& context){
     pbf_move_left_joystick(context, 0, 232, 169, 0);
     pbf_move_left_joystick(context, 192, 255, 64, 0);
     pbf_move_left_joystick(context, 64, 255, 64, 0);
@@ -67,7 +67,7 @@ void registeel(BotBaseContext& context){
     pbf_mash_button(context, BUTTON_A, 5 * TICKS_PER_SECOND);
     pbf_move_left_joystick(context, 128, 0, 250, 0);
 }
-void regieleki(BotBaseContext& context){
+void regieleki(SwitchControllerContext& context){
     pbf_move_left_joystick(context, 16, 255, 162, 0);
     pbf_move_left_joystick(context, 64, 255, 52, 0);
     pbf_move_left_joystick(context, 200, 255, 52, 0);
@@ -78,7 +78,7 @@ void regieleki(BotBaseContext& context){
     pbf_mash_button(context, BUTTON_A, 5 * TICKS_PER_SECOND);
     pbf_move_left_joystick(context, 216, 0, 170, 0);
 }
-void regidrago(BotBaseContext& context){
+void regidrago(SwitchControllerContext& context){
     pbf_move_left_joystick(context, 16, 255, 160, 0);
     pbf_move_left_joystick(context, 72, 255, 50, 0);
     pbf_move_left_joystick(context, 48, 255, 104, 0);
@@ -91,7 +91,7 @@ void regidrago(BotBaseContext& context){
 }
 
 void run_regi_light_puzzle(
-    Logger& logger, BotBaseContext& context,
+    Logger& logger, SwitchControllerContext& context,
     RegiGolem regi, uint64_t encounter
 ){
     switch (regi){

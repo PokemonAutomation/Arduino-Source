@@ -7,14 +7,16 @@
 #ifndef PokemonAutomation_PokemonSwSh_GenerateIVCheckerOCR_H
 #define PokemonAutomation_PokemonSwSh_GenerateIVCheckerOCR_H
 
-#include "Common/Cpp/Options/EnumDropdownOption.h"
-#include "CommonFramework/Options/LanguageOCROption.h"
-#include "PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h"
+#include "CommonTools/Options/LanguageOCROption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
+#include "Pokemon/Pokemon_IvJudge.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
+
+using namespace Pokemon;
+
 
 
 class IVCheckerOptionOCR : public EnumDropdownOption<IvJudgeValue>{
@@ -51,7 +53,7 @@ public:
 public:
     GenerateIVCheckerOCR();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
     OCR::LanguageOCROption LANGUAGE;

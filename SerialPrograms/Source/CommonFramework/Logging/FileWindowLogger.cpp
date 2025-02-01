@@ -7,7 +7,7 @@
 #include <QCoreApplication>
 #include <QMenuBar>
 #include <QDir>
-#include <CommonFramework/Globals.h>
+#include "CommonFramework/Globals.h"
 #include "CommonFramework/Windows/DpiScaler.h"
 #include "CommonFramework/Windows/WindowTracker.h"
 #include "FileWindowLogger.h"
@@ -25,6 +25,17 @@ Logger& global_logger_raw(){
 }
 
 
+void LastLogTracker::operator+=(std::string line){
+    m_lines.emplace_back(std::move(line));
+    while (m_lines.size() > m_max_lines){
+        m_lines.pop_front();
+    }
+}
+std::vector<std::string> LastLogTracker::snapshot() const{
+    return std::vector<std::string>(m_lines.begin(), m_lines.end());
+}
+
+
 FileWindowLogger::~FileWindowLogger(){
     {
         std::lock_guard<std::mutex> lg(m_lock);
@@ -35,9 +46,8 @@ FileWindowLogger::~FileWindowLogger(){
 }
 FileWindowLogger::FileWindowLogger(const std::string& path)
     : m_file(QString::fromStdString(path))
-    , m_max_queue_size(10000)
+    , m_max_queue_size(LOG_HISTORY_LINES)
     , m_stopping(false)
-    , m_thread(&FileWindowLogger::thread_loop, this)
 {
     bool exists = m_file.exists();
     m_file.open(QIODevice::WriteOnly | QIODevice::Append);
@@ -45,27 +55,40 @@ FileWindowLogger::FileWindowLogger(const std::string& path)
         std::string bom = "\xef\xbb\xbf";
         m_file.write(bom.c_str(), bom.size());
     }
+
+    m_thread = std::thread(&FileWindowLogger::thread_loop, this);
 }
 void FileWindowLogger::operator+=(FileWindowLoggerWindow& widget){
+//    auto scope_check = m_sanitizer.check_scope();
     std::lock_guard<std::mutex> lg(m_lock);
     m_windows.insert(&widget);
 }
 void FileWindowLogger::operator-=(FileWindowLoggerWindow& widget){
+//    auto scope_check = m_sanitizer.check_scope();
     std::lock_guard<std::mutex> lg(m_lock);
     m_windows.erase(&widget);
 }
 
 void FileWindowLogger::log(const std::string& msg, Color color){
+//    auto scope_check = m_sanitizer.check_scope();
     std::unique_lock<std::mutex> lg(m_lock);
+    m_last_log_tracker += msg;
     m_cv.wait(lg, [this]{ return m_queue.size() < m_max_queue_size; });
     m_queue.emplace_back(msg, color);
     m_cv.notify_all();
 }
 void FileWindowLogger::log(std::string&& msg, Color color){
+//    auto scope_check = m_sanitizer.check_scope();
     std::unique_lock<std::mutex> lg(m_lock);
+    m_last_log_tracker += msg;
     m_cv.wait(lg, [this]{ return m_queue.size() < m_max_queue_size; });
     m_queue.emplace_back(std::move(msg), color);
     m_cv.notify_all();
+}
+std::vector<std::string> FileWindowLogger::get_last() const{
+//    auto scope_check = m_sanitizer.check_scope();
+    std::unique_lock<std::mutex> lg(m_lock);
+    return m_last_log_tracker.snapshot();
 }
 
 
@@ -137,6 +160,7 @@ QString FileWindowLogger::to_window_str(const std::string& msg, Color color){
     return QString::fromStdString(str);
 }
 void FileWindowLogger::internal_log(const std::string& msg, Color color){
+//    auto scope_check = m_sanitizer.check_scope();
     std::string line = normalize_newlines(msg);
     {
         if (!m_windows.empty()){
@@ -152,6 +176,7 @@ void FileWindowLogger::internal_log(const std::string& msg, Color color){
     }
 }
 void FileWindowLogger::thread_loop(){
+//    auto scope_check = m_sanitizer.check_scope();
     std::unique_lock<std::mutex> lg(m_lock);
     while (true){
         m_cv.wait(lg, [&]{

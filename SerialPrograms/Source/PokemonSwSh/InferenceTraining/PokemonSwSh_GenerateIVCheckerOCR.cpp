@@ -9,6 +9,7 @@
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh_GenerateIVCheckerOCR.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -35,7 +36,7 @@ GenerateIVCheckerOCR_Descriptor::GenerateIVCheckerOCR_Descriptor()
         "Generate IV Checker OCR Data",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 
@@ -64,7 +65,7 @@ GenerateIVCheckerOCR::GenerateIVCheckerOCR()
 }
 
 
-void GenerateIVCheckerOCR::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void GenerateIVCheckerOCR::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     IvJudgeReaderScope reader(env.console, LANGUAGE);
 
     std::string path = "IVCheckerOCR/";

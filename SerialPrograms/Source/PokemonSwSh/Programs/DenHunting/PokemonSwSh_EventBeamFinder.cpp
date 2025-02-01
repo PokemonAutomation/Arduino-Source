@@ -5,7 +5,8 @@
  */
 
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
-#include "NintendoSwitch/FixedInterval.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_GameEntry.h"
@@ -25,7 +26,7 @@ EventBeamFinder_Descriptor::EventBeamFinder_Descriptor()
         "Drop wishing pieces until you find an event den.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 
@@ -44,7 +45,7 @@ EventBeamFinder::EventBeamFinder()
 }
 
 
-void EventBeamFinder::goto_near_den(BotBaseContext& context) const{
+void EventBeamFinder::goto_near_den(SwitchControllerContext& context) const{
     ssf_hold_joystick1(context, true, STICK_CENTER, STICK_MIN, 375);
     pbf_wait(context, 50);
     ssf_press_button1(context, BUTTON_PLUS, 100);
@@ -53,7 +54,7 @@ void EventBeamFinder::goto_near_den(BotBaseContext& context) const{
     ssf_press_button1(context, BUTTON_PLUS, 100);
     ssf_hold_joystick1(context, true, STICK_CENTER, STICK_MIN, 370);
 }
-void EventBeamFinder::goto_far_den(BotBaseContext& context) const{
+void EventBeamFinder::goto_far_den(SwitchControllerContext& context) const{
     ssf_hold_joystick1(context, true, STICK_CENTER, STICK_MIN, 992);
     pbf_wait(context, 50);
     ssf_press_button1(context, BUTTON_PLUS, 100);
@@ -62,7 +63,7 @@ void EventBeamFinder::goto_far_den(BotBaseContext& context) const{
     ssf_press_button1(context, BUTTON_PLUS, 100);
     ssf_hold_joystick1(context, true, STICK_CENTER, STICK_MIN, 300);
 }
-void EventBeamFinder::drop_wishing_piece(BotBaseContext& context) const{
+void EventBeamFinder::drop_wishing_piece(SwitchControllerContext& context) const{
     ssf_press_button2(context, BUTTON_A, 200, 10);
     ssf_press_button2(context, BUTTON_A, 150, 10);
     ssf_press_button1(context, BUTTON_A, 5);
@@ -70,7 +71,7 @@ void EventBeamFinder::drop_wishing_piece(BotBaseContext& context) const{
     ssf_press_button2(context, BUTTON_A, WAIT_TIME_IN_DEN + 100, 10);
     pbf_mash_button(context, BUTTON_B, 600);
 }
-void EventBeamFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void EventBeamFinder::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
         resume_game_no_interact(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);

@@ -31,7 +31,7 @@ public:
 class FlyingTrialFarmer : public SingleSwitchProgramInstance{
 public:
     FlyingTrialFarmer();
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
@@ -50,7 +50,7 @@ private:
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;
 
-    bool run_rewards(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    bool run_rewards(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
     uint8_t get_final_y_axis(int8_t delta_y);
 };
 

@@ -4,14 +4,12 @@
  *
  */
 
-#include "Common/Cpp/Containers/FixedLimitVector.tpp"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 //#include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTypes/BinaryImage.h"
-#include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-//#include "CommonFramework/ImageMatch/ExactImageMatcher.h"
+#include "CommonTools/Images/BinaryImage_FilterRgb32.h"
 #include "PokemonSV_WhiteButtonDetector.h"
 
 //#include <iostream>

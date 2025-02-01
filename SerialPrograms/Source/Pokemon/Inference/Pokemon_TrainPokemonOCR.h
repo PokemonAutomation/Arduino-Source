@@ -9,8 +9,7 @@
 
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/StringOption.h"
-#include "Common/Cpp/Options/EnumDropdownOption.h"
-#include "CommonFramework/Options/TrainOCRModeOption.h"
+#include "CommonTools/Options/TrainOCRModeOption.h"
 #include "ComputerPrograms/ComputerProgram.h"
 
 namespace PokemonAutomation{

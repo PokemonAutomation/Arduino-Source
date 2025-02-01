@@ -30,7 +30,7 @@ GenerateNameOCRData_Descriptor::GenerateNameOCRData_Descriptor()
         "Generate " + STRING_POKEMON + " Name OCR data by iterating the National " + STRING_POKEDEX + ".",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 
@@ -55,7 +55,7 @@ GenerateNameOCRData::GenerateNameOCRData()
 }
 
 
-void GenerateNameOCRData::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void GenerateNameOCRData::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     std::string resource_path = RESOURCE_PATH() + "Pokemon/Pokedex/Pokedex-National.json";
     JsonValue json = load_json_file(resource_path);
     JsonArray& array = json.to_array_throw(resource_path);

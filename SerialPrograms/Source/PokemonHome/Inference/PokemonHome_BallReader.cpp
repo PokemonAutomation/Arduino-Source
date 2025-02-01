@@ -27,10 +27,10 @@ const PokemonBDSP::PokeballSpriteMatcher& BALL_SPRITE_MATCHER(){
 
 
 
-BallReader::BallReader(ConsoleHandle& console)
+BallReader::BallReader(VideoStream& stream)
     : m_matcher(BALL_SPRITE_MATCHER())
-    , m_console(console)
-    , m_box_sprite(console, {0.228, 0.095, 0.030, 0.049})
+    , m_stream(stream)
+    , m_box_sprite(stream.overlay(), {0.228, 0.095, 0.030, 0.049})
 {}
 
 
@@ -44,14 +44,14 @@ std::string BallReader::read_ball(const ImageViewRGB32& screen) const{
     {
         ImageViewRGB32 image = extract_box_reference(screen, m_box_sprite);
         sprite_result = m_matcher.match(image, ALPHA_SPREAD);
-        sprite_result.log(m_console, 0.50);
+        sprite_result.log(m_stream.logger(), 0.50);
         if (!sprite_result.results.empty() && sprite_result.results.begin()->first > MAX_ALPHA){
             sprite_result.results.clear();
         }
     }
 
     if (sprite_result.results.size() != 1){
-        dump_image(m_console, ProgramInfo(), "BallReader", screen);
+        dump_image(m_stream.logger(), ProgramInfo(), "BallReader", screen);
     }
     if (sprite_result.results.empty()){
         return "";

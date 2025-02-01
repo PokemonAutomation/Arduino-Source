@@ -7,12 +7,11 @@
 #ifndef PokemonAutomation_PokemonSV_BoxRelease_H
 #define PokemonAutomation_PokemonSV_BoxRelease_H
 
-#include <stdint.h>
+#include "CommonFramework/Tools/VideoStream.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 
 namespace PokemonAutomation{
     struct ProgramInfo;
-    class ConsoleHandle;
-    class BotBaseContext;
 namespace NintendoSwitch{
 namespace PokemonSV{
 
@@ -24,7 +23,8 @@ namespace PokemonSV{
 //  The # of errors are stored into "errors". These are usually dropped button
 //  presses that the function recovered from.
 void release_one_pokemon(
-    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    const ProgramInfo& info,
+    VideoStream& stream, SwitchControllerContext& context,
     size_t& errors
 );
 
@@ -33,7 +33,8 @@ void release_one_pokemon(
 //  The # of errors are stored into "errors". These are usually dropped button
 //  presses that the function recovered from.
 void release_box(
-    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    const ProgramInfo& info,
+    VideoStream& stream, SwitchControllerContext& context,
     size_t& errors,
     uint8_t start_row = 0   //  Start from this row. (skip te first "start_row" rows)
 );

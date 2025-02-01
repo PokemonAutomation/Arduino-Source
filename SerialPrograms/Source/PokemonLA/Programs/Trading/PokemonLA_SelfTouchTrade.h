@@ -9,8 +9,8 @@
 
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
-#include "CommonFramework/Options/LanguageOCROption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
+#include "CommonTools/Options/LanguageOCROption.h"
 #include "PokemonLA/Options/PokemonLA_TradeCountTable.h"
 #include "NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h"
 
@@ -37,7 +37,7 @@ private:
         MultiSwitchProgramEnvironment& env, CancellableScope& scope,
         std::map<std::string, uint8_t>& trades_left
     );
-    bool move_to_next(Logger& logger, BotBaseContext& host, uint8_t& row, uint8_t& col);
+    bool move_to_next(Logger& logger, SwitchControllerContext& host, uint8_t& row, uint8_t& col);
 
 private:
     OCR::LanguageOCROption LANGUAGE;

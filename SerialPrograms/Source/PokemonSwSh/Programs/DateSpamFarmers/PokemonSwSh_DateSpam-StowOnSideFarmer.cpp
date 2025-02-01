@@ -26,7 +26,7 @@ StowOnSideFarmer_Descriptor::StowOnSideFarmer_Descriptor()
         "Farm the Stow-on-Side items dealer.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 
@@ -49,7 +49,7 @@ StowOnSideFarmer::StowOnSideFarmer()
     PA_ADD_OPTION(SAVE_ITERATIONS);
 }
 
-void StowOnSideFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void StowOnSideFarmer::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
     }else{

@@ -9,8 +9,8 @@
 
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
-#include "CommonFramework/Options/ScreenWatchOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
+#include "CommonTools/Options/ScreenWatchOption.h"
 #include "NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_FastCodeEntry.h"
 

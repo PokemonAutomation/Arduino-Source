@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonReader.h"
@@ -24,7 +24,7 @@ namespace MaxLairInternal{
 
 
 bool wait_for_a_player(
-    ConsoleHandle& console, BotBaseContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     const ImageViewRGB32& entrance,
     WallClock time_limit
 ){
@@ -33,7 +33,7 @@ bool wait_for_a_player(
     PokemonSelectMenuDetector false_start_detector(false);
 
     int result = wait_until(
-        console, context,
+        stream, context,
         time_limit,
         {
             {done_connecting_detector},
@@ -44,23 +44,23 @@ bool wait_for_a_player(
     );
     switch (result){
     case 0:
-        console.log("Connected to lobby.");
+        stream.log("Connected to lobby.");
         break;
     case 1:
-        console.log("Detected entrance... Did you get disconnected?", COLOR_RED);
+        stream.log("Detected entrance... Did you get disconnected?", COLOR_RED);
         return false;
     case 2:
-        console.log("Detected false start. Did you join the wrong lobby?", COLOR_RED);
+        stream.log("Detected false start. Did you join the wrong lobby?", COLOR_RED);
         return false;
     default:
-        console.log("Timed out connecting to lobby.", COLOR_RED);
+        stream.log("Timed out connecting to lobby.", COLOR_RED);
         return false;
     }
     return true;
 }
 
 bool wait_for_lobby_ready(
-    ConsoleHandle& console, BotBaseContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     const ImageViewRGB32& entrance,
     size_t min_players,
     size_t start_players,
@@ -71,7 +71,7 @@ bool wait_for_lobby_ready(
     PokemonSelectMenuDetector false_start_detector(false);
 
     int result = wait_until(
-        console, context,
+        stream, context,
         time_limit,
         {
             {ready_detector},
@@ -81,32 +81,32 @@ bool wait_for_lobby_ready(
     );
     switch (result){
     case 0:
-        console.log("Detected lobby ready...");
+        stream.log("Detected lobby ready...");
         return true;
     case 1:
-        console.log("Detected entrance... Did you get disconnected?", COLOR_RED);
+        stream.log("Detected entrance... Did you get disconnected?", COLOR_RED);
         return false;
     case 2:
-        console.log("Detected false start. Did you join the wrong lobby?", COLOR_RED);
+        stream.log("Detected false start. Did you join the wrong lobby?", COLOR_RED);
         return false;
     }
     return true;
 }
 bool start_adventure(
-    ConsoleHandle& console, BotBaseContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     size_t consoles
 ){
     LobbyMinReadyDetector ready_detector(consoles, true);
-    if (ready_detector.ready_players(console.video().snapshot()) < consoles){
-        console.log("Number of players less than expected. Did someone join the wrong lobby?", COLOR_RED);
+    if (ready_detector.ready_players(stream.video().snapshot()) < consoles){
+        stream.log("Number of players less than expected. Did someone join the wrong lobby?", COLOR_RED);
         return false;
     }
 
     //  Press A until you're not in the lobby anymore.
     LobbyDetector lobby_detector(true);
-    int result = run_until(
-        console, context,
-        [](BotBaseContext& context){
+    int result = run_until<SwitchControllerContext>(
+        stream, context,
+        [](SwitchControllerContext& context){
             for (size_t c = 0; c < 180; c++){
                 pbf_press_button(context, BUTTON_A, 10, 115);
                 context.wait_for_all_requests();
@@ -119,7 +119,7 @@ bool start_adventure(
     case 0:
         return true;
     default:
-        console.log("Timed out starting raid.", COLOR_RED);
+        stream.log("Timed out starting raid.", COLOR_RED);
         return false;
     }
 }
@@ -128,23 +128,23 @@ bool start_adventure(
 
 
 bool start_raid_self_solo(
-    ConsoleHandle& console, BotBaseContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     GlobalStateTracker& state_tracker,
     std::shared_ptr<const ImageRGB32>& entrance, size_t boss_slot,
     ReadableQuantity999& ore
 ){
-    console.log("Entering lobby...");
+    stream.log("Entering lobby...");
 
     GlobalState& state = state_tracker[0];
 
     //  Enter lobby.
-    entrance = enter_lobby(console, context, boss_slot, false, ore);
+    entrance = enter_lobby(stream, context, boss_slot, false, ore);
     if (!*entrance){
         return false;
     }
 
     //  Read boss.
-    state.boss = read_boss_sprite(console);
+    state.boss = read_boss_sprite(stream);
 
     //  Start raid.
     pbf_press_dpad(context, DPAD_DOWN, 10, 50);
@@ -155,7 +155,7 @@ bool start_raid_self_solo(
 }
 
 bool start_raid_host_solo(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context,
     GlobalStateTracker& state_tracker,
     std::shared_ptr<const ImageRGB32>& entrance, size_t boss_slot,
     HostingSettings& settings,
@@ -163,7 +163,7 @@ bool start_raid_host_solo(
     const StatsTracker& session_stats,
     ReadableQuantity999& ore
 ){
-    console.log("Entering lobby...");
+    stream.log("Entering lobby...");
 
     GlobalState& state = state_tracker[0];
 
@@ -172,7 +172,7 @@ bool start_raid_host_solo(
 
     //  Enter lobby.
     entrance = enter_lobby(
-        console, context, boss_slot,
+        stream, context, boss_slot,
         settings.MODE == HostingMode::HOST_ONLINE,
         ore
     );
@@ -181,7 +181,7 @@ bool start_raid_host_solo(
     }
 
     //  Read boss.
-    state.boss = read_boss_sprite(console);
+    state.boss = read_boss_sprite(stream);
 
     //  Enter code.
     uint8_t code[8];
@@ -196,7 +196,7 @@ bool start_raid_host_solo(
 
     send_raid_notification(
         env,
-        console,
+        stream,
         settings.NOTIFICATIONS,
         has_code, code,
         state.boss,
@@ -210,9 +210,9 @@ bool start_raid_host_solo(
     auto time_limit = current_time() +
         std::chrono::milliseconds(settings.LOBBY_WAIT_DELAY * 1000 / TICKS_PER_SECOND);
 
-    if (!wait_for_a_player(console, context, *entrance, time_limit)){
+    if (!wait_for_a_player(stream, context, *entrance, time_limit)){
         pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);
-        return start_raid_self_solo(console, context, state_tracker, entrance, boss_slot, ore);
+        return start_raid_self_solo(stream, context, state_tracker, entrance, boss_slot, ore);
     }
 
     //  Ready up.
@@ -221,14 +221,14 @@ bool start_raid_host_solo(
     context.wait_for_all_requests();
 
     //  Wait
-    if (!wait_for_lobby_ready(console, context, *entrance, 1, 4, time_limit)){
+    if (!wait_for_lobby_ready(stream, context, *entrance, 1, 4, time_limit)){
         pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);
         return false;
     }
 
     //  Start
     context.wait_for_all_requests();
-    if (!start_adventure(console, context, 1)){
+    if (!start_adventure(stream, context, 1)){
         pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);
         return false;
     }

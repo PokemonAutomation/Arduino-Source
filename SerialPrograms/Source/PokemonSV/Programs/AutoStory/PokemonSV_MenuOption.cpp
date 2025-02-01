@@ -5,18 +5,14 @@
  */
 
 #include <algorithm>
-#include "Common/Cpp/Containers/FixedLimitVector.tpp"
-#include "Common/Cpp/Concurrency/AsyncDispatcher.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
-#include "CommonFramework/OCR/OCR_NumberReader.h"
+#include "CommonTools/OCR/OCR_NumberReader.h"
 #include "PokemonSV_MenuOption.h"
 #include "PokemonSV/Inference/PokemonSV_MenuOptionReader.h"
 
-#include "Common/Cpp/PrettyPrint.h"
-#include <iostream>
+//#include <iostream>
 // using std::cout;
 // using std::endl;
 
@@ -27,14 +23,14 @@ namespace PokemonSV{
 MenuOption::~MenuOption() = default;
 
 MenuOption::MenuOption(
-    ConsoleHandle& console, 
-    BotBaseContext& context,
+    VideoStream& stream,
+    SwitchControllerContext& context,
     Language language
 )
-    : m_console(console)
+    : m_stream(stream)
     , m_context(context)
     , m_language(language)
-    , m_overlays(console.overlay())
+    , m_overlays(stream.overlay())
     , m_arrow(COLOR_CYAN, GradientArrowType::RIGHT, {0.02, 0.10, 0.05, 0.80})
 {
     // reader.make_overlays(m_overlays);
@@ -68,9 +64,10 @@ void MenuOption::set_target_option(const std::vector<MenuOptionToggleEnum>& targ
         pbf_press_dpad(m_context, DPAD_RIGHT, 10, 50);
     }
 
-    throw OperationFailedException(
-        ErrorReport::SEND_ERROR_REPORT, m_console,
-        "MenuOption::set_target_option(): Unable to set option to the correct toggle."
+    OperationFailedException::fire(
+        ErrorReport::SEND_ERROR_REPORT,
+        "MenuOption::set_target_option(): Unable to set option to the correct toggle.",
+        m_stream
     );
 
 }
@@ -79,9 +76,10 @@ int8_t MenuOption::get_selected_index(const ImageViewRGB32& screen) const {
     m_context.wait_for_all_requests();
     ImageFloatBox box;
     if (!m_arrow.detect(box, screen)){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, m_console,
-            "MenuOption::get_selected_index(): Unable to find cursor."
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "MenuOption::get_selected_index(): Unable to find cursor.",
+            m_stream
         );
     }
 
@@ -90,9 +88,10 @@ int8_t MenuOption::get_selected_index(const ImageViewRGB32& screen) const {
     int8_t selected_index = (int8_t)(slot + 0.5);
 
     if (selected_index < 0 || selected_index >= 10){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, m_console,
-            "MenuOption::get_selected_index(): Invalid cursor slot."
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "MenuOption::get_selected_index(): Invalid cursor slot.",
+            m_stream
         );
     }
     // cout << "selected index:" + std::to_string(selected_index) << endl;
@@ -103,7 +102,8 @@ int8_t MenuOption::get_selected_index(const ImageViewRGB32& screen) const {
 std::string MenuOption::read_option(const ImageViewRGB32& cropped) const{
     // cropped.save("test.png");
     const auto ocr_result = MenuOptionReader::instance().read_substring(
-        m_console, m_language, 
+        m_stream.logger(),
+        m_language,
         cropped, OCR::BLACK_TEXT_FILTERS()
     );
 
@@ -117,7 +117,7 @@ std::string MenuOption::read_option(const ImageViewRGB32& cropped) const{
     if (results.empty()){
         if (m_language == Language::German){
             // German Menu Option uses numbers for text speed settings, which string OCR has trouble with detecting.
-            int16_t number = read_number(m_console, cropped);
+            int16_t number = read_number(m_stream.logger(), cropped);
             switch (number){
                 case 1:
                     return "slow";
@@ -131,10 +131,10 @@ std::string MenuOption::read_option(const ImageViewRGB32& cropped) const{
     }
 
     if (results.size() > 1){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, 
-            m_console,
-            "MenuOption::read_option(): Unable to read item. Ambiguous or multiple results."
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "MenuOption::read_option(): Unable to read item. Ambiguous or multiple results.",
+            m_stream
         );
     }
 
@@ -156,7 +156,7 @@ int16_t MenuOption::read_number(
 
 std::string MenuOption::read_option_item() const{
     m_context.wait_for_all_requests();
-    VideoSnapshot screen = m_console.video().snapshot();
+    VideoSnapshot screen = m_stream.video().snapshot();
     
     ImageFloatBox selected_box = m_boxes_item[get_selected_index(screen)];
     ImageViewRGB32 cropped = extract_box_reference(screen, selected_box);
@@ -166,7 +166,7 @@ std::string MenuOption::read_option_item() const{
 
 std::string MenuOption::read_option_toggle() const{
     m_context.wait_for_all_requests();
-    VideoSnapshot screen = m_console.video().snapshot();
+    VideoSnapshot screen = m_stream.video().snapshot();
 
     ImageFloatBox selected_box = m_boxes_toggle[get_selected_index(screen)];
     ImageViewRGB32 cropped = extract_box_reference(screen, selected_box);

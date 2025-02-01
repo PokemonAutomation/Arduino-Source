@@ -9,8 +9,6 @@
 
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
-//#include "Common/Cpp/Options/EnumDropdownOption.h"
-//#include "CommonFramework/Options/LanguageOCROption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
@@ -31,12 +29,12 @@ public:
 class WildItemFarmer : public SingleSwitchProgramInstance{
 public:
     WildItemFarmer();
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
-    void refresh_pp(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-    bool verify_item_held(SingleSwitchProgramEnvironment& env, BotBaseContext& context, NormalBattleMenuWatcher& battle_menu);
-    void run_program(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    void refresh_pp(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
+    bool verify_item_held(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, NormalBattleMenuWatcher& battle_menu);
+    void run_program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
 
 private:
     SimpleIntegerOption<uint16_t> ITEMS_TO_CLONE;

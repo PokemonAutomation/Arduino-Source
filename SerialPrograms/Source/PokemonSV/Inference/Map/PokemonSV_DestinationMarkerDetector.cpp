@@ -4,12 +4,11 @@
  *
  */
 
-#include "Common/Cpp/Containers/FixedLimitVector.tpp"
-#include "CommonFramework/ImageMatch/WaterfillTemplateMatcher.h"
-#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
-#include "CommonFramework/ImageTools/WaterfillUtilities.h"
-#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
+#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
+#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "CommonTools/Images/WaterfillUtilities.h"
+#include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "PokemonSV_DestinationMarkerDetector.h"
 
 // #include <iostream>
@@ -88,7 +87,7 @@ std::vector<ImageFloatBox> DestinationMarkerDetector::detect_all(const ImageView
     };
 
 
-    const double rmsd_threshold = 80.0;  // from my testing: RMSD is 15 at 1080p, 60 at 720p
+    const double rmsd_threshold = 65.0;  // from my testing: RMSD is 15 at 1080p, 60 at 720p
     const double min_object_size = 150.0;
 
     const double screen_rel_size = (screen.height() / 1080.0);
@@ -123,7 +122,7 @@ std::vector<ImageFloatBox> DestinationMarkerDetector::detect_all_yellow(const Im
     };
 
 
-    const double rmsd_threshold = 80.0;  // from my testing, RMSD ranges from 15-50, even at 720p
+    const double rmsd_threshold = 60.0;  // from my testing, RMSD ranges from 15-50, even at 720p
     /* 
     - min object size restrictions also helps to filter out false positives
     at pokemon centers

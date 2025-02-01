@@ -75,9 +75,9 @@ struct SpeciesReadDatabase{
 
 
 
-std::string read_boss_sprite(ConsoleHandle& console){
-    DenMonReader reader(console, console);
-    DenMonReadResults results = reader.read(console.video().snapshot());
+std::string read_boss_sprite(VideoStream& stream){
+    DenMonReader reader(stream.logger(), stream.overlay());
+    DenMonReadResults results = reader.read(stream.video().snapshot());
 
     std::string sprite_slug;
     {
@@ -92,13 +92,13 @@ std::string read_boss_sprite(ConsoleHandle& console){
     auto iter = database.sprite_map.find(sprite_slug);
     if (iter == database.sprite_map.end()){
         throw InternalProgramError(
-            &console.logger(), PA_CURRENT_FUNCTION,
+            &stream.logger(), PA_CURRENT_FUNCTION,
             "Slug doesn't exist in sprite map: " + sprite_slug
         );
     }
     if (iter->second.empty()){
         throw InternalProgramError(
-            &console.logger(), PA_CURRENT_FUNCTION,
+            &stream.logger(), PA_CURRENT_FUNCTION,
             "Sprite map is empty for slug: " + sprite_slug
         );
     }
@@ -108,7 +108,9 @@ std::string read_boss_sprite(ConsoleHandle& console){
 
 std::set<std::string> read_pokemon_name(
     Logger& logger, Language language,
-    const ImageViewRGB32& image
+    OcrFailureWatchdog& ocr_watchdog,
+    const ImageViewRGB32& image,
+    double max_log10p
 ){
     const SpeciesReadDatabase& database = SpeciesReadDatabase::instance();
 
@@ -116,12 +118,16 @@ std::set<std::string> read_pokemon_name(
 //    image.save("test.png");
     OCR::StringMatchResult result = database.name_reader->read_substring(
         logger, language, image,
-        OCR::BLACK_OR_WHITE_TEXT_FILTERS()
+        OCR::BLACK_OR_WHITE_TEXT_FILTERS(),
+        0.01, 0.50,
+        max_log10p
     );
 //    result.log(logger);
     if (result.results.empty()){
+        ocr_watchdog.push_result(false);
         return {};
     }
+    ocr_watchdog.push_result(true);
 
     //  Convert OCR slugs to MaxLair name slugs.
     std::set<std::string> ret;
@@ -298,6 +304,7 @@ std::string read_pokemon_sprite_with_item(
 
 std::string read_pokemon_name_sprite(
     Logger& logger,
+    OcrFailureWatchdog& ocr_watchdog,
     const ImageViewRGB32& screen,
     const ImageFloatBox& sprite_box,
     const ImageFloatBox& name_box, Language language,
@@ -310,7 +317,7 @@ std::string read_pokemon_name_sprite(
     ImageViewRGB32 image = extract_box_reference(screen, name_box);
 
     std::set<std::string> ocr_slugs;
-    for (const std::string& slug : read_pokemon_name(logger, language, image)){
+    for (const std::string& slug : read_pokemon_name(logger, language, ocr_watchdog, image)){
         //  Only include candidates that are valid rental Pokemon.
         auto iter = RENTALS.find(slug);
         if (iter != RENTALS.end()){
@@ -319,9 +326,9 @@ std::string read_pokemon_name_sprite(
     }
     bool ocr_hit = !ocr_slugs.empty();
     bool ocr_unique = ocr_hit && ocr_slugs.size() == 1;
-    if (!ocr_hit){
-        dump_image(logger, MODULE_NAME, "MaxLair-read_name_sprite", screen);
-    }
+//    if (!ocr_hit){
+//        dump_image(logger, MODULE_NAME, "MaxLair-read_name_sprite", screen);
+//    }
 
     ImageMatch::ImageMatchResult result = read_pokemon_sprite_set(
         logger,
@@ -331,9 +338,9 @@ std::string read_pokemon_name_sprite(
     );
     auto iter = result.results.begin();
     bool sprite_hit = iter != result.results.end() && iter->first <= SpeciesReadDatabase::CROPPED_MAX_ALPHA;
-    if (!sprite_hit || result.results.size() > 1){
-        dump_image(logger, MODULE_NAME, "MaxLair-read_name_sprite", screen);
-    }
+//    if (!sprite_hit || result.results.size() > 1){
+//        dump_image(logger, MODULE_NAME, "MaxLair-read_name_sprite", screen);
+//    }
 
     //  No hit on sprite. Use OCR.
     if (!sprite_hit){

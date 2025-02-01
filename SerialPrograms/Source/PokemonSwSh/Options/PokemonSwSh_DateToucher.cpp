@@ -71,7 +71,7 @@ bool TouchDateIntervalOption::ok_to_touch_now(){
     m_last_touch = now;
     return true;
 }
-void TouchDateIntervalOption::touch_now_from_home_if_needed(BotBaseContext& context){
+void TouchDateIntervalOption::touch_now_from_home_if_needed(SwitchControllerContext& context){
     if (!ok_to_touch_now()){
         return;
     }

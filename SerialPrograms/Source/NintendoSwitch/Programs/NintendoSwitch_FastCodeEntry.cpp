@@ -24,7 +24,11 @@ namespace NintendoSwitch{
 
 
 FastCodeEntrySettingsOption::FastCodeEntrySettingsOption(LockMode lock_while_program_is_running)
-    : GroupOption("Fast Code Entry", lock_while_program_is_running)
+    : GroupOption(
+        "Fast Code Entry",
+        lock_while_program_is_running,
+        GroupOption::EnableMode::ALWAYS_ENABLED, true
+    )
     , KEYBOARD_LAYOUT(
         "<b>Keyboard Layout:</b>",
         {
@@ -192,7 +196,7 @@ DigitPath get_codeboard_digit_path(
             break;
         }
 
-        uint8_t direction;
+        DpadPosition direction;
         if (destination.col > col){
             if (destination.col - col <= 6){
                 direction = DPAD_RIGHT;
@@ -319,8 +323,8 @@ std::vector<DigitPath> get_codeboard_path(
     for (char ch : code){
         auto iter = POSITION_MAP.find(ch);
         if (iter == POSITION_MAP.end()){
-            throw OperationFailedException(
-                ErrorReport::NO_ERROR_REPORT, logger,
+            throw_and_log<OperationFailedException>(
+                logger, ErrorReport::NO_ERROR_REPORT,
                 "Invalid code character."
             );
         }
@@ -335,7 +339,7 @@ std::vector<DigitPath> get_codeboard_path(
 }
 
 
-void move_codeboard(BotBaseContext& context, const DigitPath& path){
+void move_codeboard(SwitchControllerContext& context, const DigitPath& path){
     uint16_t delay = 3;
     if (path.length > 0){
         size_t last = (size_t)path.length - 1;
@@ -358,7 +362,7 @@ void move_codeboard(BotBaseContext& context, const DigitPath& path){
     ssf_press_button(context, BUTTON_A, delay);
 }
 
-void run_codeboard_path(BotBaseContext& context, const std::vector<DigitPath>& path){
+void run_codeboard_path(SwitchControllerContext& context, const std::vector<DigitPath>& path){
     for (const DigitPath& digit : path){
         move_codeboard(context, digit);
         if (digit.left_cursor){
@@ -380,7 +384,7 @@ FastCodeEntrySettings::FastCodeEntrySettings(const FastCodeEntrySettingsOption& 
 
 void enter_alphanumeric_code(
     Logger& logger,
-    BotBaseContext& context,
+    SwitchControllerContext& context,
     const FastCodeEntrySettings& settings,
     const std::string& code
 ){

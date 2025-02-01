@@ -109,7 +109,7 @@ void pai_nsw_press_button(DllSafeString& error, uint64_t console_id, uint16_t bu
     error = ProgramTracker::instance().nsw_press_button(console_id, button, ticks);
 }
 void pai_nsw_press_dpad(DllSafeString& error, uint64_t console_id, uint8_t position, uint16_t ticks){
-    error = ProgramTracker::instance().nsw_press_dpad(console_id, position, ticks);
+    error = ProgramTracker::instance().nsw_press_dpad(console_id, (NintendoSwitch::DpadPosition)position, ticks);
 }
 void pai_nsw_press_left_joystick(DllSafeString& error, uint64_t console_id, uint8_t x, uint8_t y, uint16_t ticks){
     error = ProgramTracker::instance().nsw_press_left_joystick(console_id, x, y, ticks);

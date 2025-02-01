@@ -4,7 +4,7 @@
  *
  */
 
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
+#include "Controllers/SerialPABotBase/SerialPABotBase.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch_FriendDelete.h"
 
@@ -20,7 +20,7 @@ FriendDelete_Descriptor::FriendDelete_Descriptor()
         "Mass delete/block all those unwanted friends.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 
@@ -61,7 +61,7 @@ FriendDelete::FriendDelete()
     PA_ADD_OPTION(DELETE_FRIEND_DELAY);
     PA_ADD_OPTION(FINISH_DELETE_DELAY);
 }
-void FriendDelete::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void FriendDelete::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     pbf_press_button(context, BUTTON_A, 5, 5);
 
     for (uint16_t c = 0; c < FRIENDS_TO_DELETE; c++){

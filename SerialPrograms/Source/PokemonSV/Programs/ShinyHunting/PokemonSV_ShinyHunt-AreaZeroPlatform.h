@@ -12,8 +12,8 @@
 //#include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/FloatingPointOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
-#include "CommonFramework/Options/LanguageOCROption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
+#include "CommonTools/Options/LanguageOCROption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "PokemonSV/Options/PokemonSV_EncounterBotCommon.h"
@@ -45,7 +45,7 @@ public:
     ~ShinyHuntAreaZeroPlatform();
     ShinyHuntAreaZeroPlatform();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
     virtual std::string check_validity() const override;
@@ -66,11 +66,11 @@ private:
 //    };
 
     void set_flags(SingleSwitchProgramEnvironment& env);
-    void run_state(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-    void set_flags_and_run_state(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    void run_state(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
+    void set_flags_and_run_state(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
 
     //  Returns true on success.
-    bool run_traversal(BotBaseContext& context);
+    bool run_traversal(SwitchControllerContext& context);
 
 
 private:

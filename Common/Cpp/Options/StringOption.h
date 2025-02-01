@@ -22,11 +22,13 @@ public:
         std::string default_value,
         std::string placeholder_text
     );
-//    virtual std::unique_ptr<ConfigOption> clone() const override;
 
     bool is_password() const;
     const std::string& placeholder_text() const;
     const std::string default_value() const;
+
+    bool is_locked() const;
+    void set_locked(bool locked);
 
     operator std::string() const;
     void set(std::string x);
@@ -37,6 +39,9 @@ public:
     virtual void restore_defaults() override;
 
     virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
+
+protected:
+    virtual void sanitize(std::string& str){}
 
 private:
     struct Data;

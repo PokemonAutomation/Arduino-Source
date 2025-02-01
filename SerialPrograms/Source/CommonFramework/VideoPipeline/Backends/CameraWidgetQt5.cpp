@@ -13,6 +13,7 @@
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/VideoPipeline/CameraOption.h"
+#include "CommonFramework/VideoPipeline/VideoPipelineOptions.h"
 #include "VideoToolsQt5.h"
 #include "CameraWidgetQt5.h"
 
@@ -38,15 +39,23 @@ std::unique_ptr<PokemonAutomation::CameraSession> CameraBackend::make_camera(Log
 
 
 
-void CameraSession::add_listener(Listener& listener){
-    m_sanitizer.check_usage();
+void CameraSession::add_state_listener(StateListener& listener){
+    auto scope_check = m_sanitizer.check_scope();
     std::lock_guard<std::mutex> lg(m_lock);
     m_listeners.insert(&listener);
 }
-void CameraSession::remove_listener(Listener& listener){
-    m_sanitizer.check_usage();
+void CameraSession::remove_state_listener(StateListener& listener){
+    auto scope_check = m_sanitizer.check_scope();
     std::lock_guard<std::mutex> lg(m_lock);
     m_listeners.erase(&listener);
+}
+void CameraSession::add_frame_listener(VideoFrameListener& listener){
+    auto scope_check = m_sanitizer.check_scope();
+
+}
+void CameraSession::remove_frame_listener(VideoFrameListener& listener){
+    auto scope_check = m_sanitizer.check_scope();
+
 }
 
 CameraSession::~CameraSession(){
@@ -108,12 +117,15 @@ void CameraSession::set_resolution(Resolution resolution){
             m_logger.log("Resolution not supported.", COLOR_RED);
             return;
         }
+        for (StateListener* listener : m_listeners){
+            listener->pre_resolution_change(resolution);
+        }
         m_resolution = resolution;
         QCameraViewfinderSettings settings = m_camera->viewfinderSettings();
         settings.setResolution(QSize((int)resolution.width, (int)resolution.height));
         m_camera->setViewfinderSettings(settings);
-        for (Listener* listener : m_listeners){
-            listener->resolution_change(resolution);
+        for (StateListener* listener : m_listeners){
+            listener->post_resolution_change(resolution);
         }
     });
 }
@@ -244,7 +256,7 @@ VideoSnapshot CameraSession::snapshot(){
     std::unique_lock<std::mutex> lg(m_lock);
 
     //  Frame screenshots are disabled.
-    if (!GlobalSettings::instance().ENABLE_FRAME_SCREENSHOTS){
+    if (!GlobalSettings::instance().VIDEO_PIPELINE->ENABLE_FRAME_SCREENSHOTS){
         return snapshot_image();
     }
 
@@ -288,8 +300,8 @@ void CameraSession::shutdown(){
     m_logger.log("Stopping Camera...");
 
     m_camera->stop();
-    for (Listener* listener : m_listeners){
-        listener->shutdown();
+    for (StateListener* listener : m_listeners){
+        listener->pre_shutdown();
     }
 
     m_screenshotter.reset();
@@ -302,13 +314,19 @@ void CameraSession::shutdown(){
     m_last_frame_timestamp = current_time();
     m_last_frame_seqnum++;
 
-    SpinLockGuard lg(m_frame_lock);
+    {
+        SpinLockGuard lg(m_frame_lock);
 
-    m_last_frame = QVideoFrame();
-    m_last_frame_timestamp = current_time();
-    m_last_frame_seqnum++;
+        m_last_frame = QVideoFrame();
+        m_last_frame_timestamp = current_time();
+        m_last_frame_seqnum++;
 
-    m_last_image_seqnum = m_last_frame_seqnum;
+        m_last_image_seqnum = m_last_frame_seqnum;
+    }
+
+    for (StateListener* listener : m_listeners){
+        listener->post_shutdown();
+    }
 }
 void CameraSession::startup(){
     if (!m_device){
@@ -367,21 +385,22 @@ void CameraSession::startup(){
     if (m_probe){
         connect(
             m_probe, &QVideoProbe::videoFrameProbed,
-            this, [this](const QVideoFrame& frame){
+            m_camera, [this](const QVideoFrame& frame){
                 WallClock now = current_time();
                 SpinLockGuard lg(m_frame_lock);
-                if (GlobalSettings::instance().ENABLE_FRAME_SCREENSHOTS){
+                if (GlobalSettings::instance().VIDEO_PIPELINE->ENABLE_FRAME_SCREENSHOTS){
                     m_last_frame = frame;
                 }
                 m_last_frame_timestamp = now;
                 m_last_frame_seqnum++;
+                m_fps_tracker.push_event(now);
             },
             Qt::DirectConnection
         );
     }
 
-    for (Listener* listener : m_listeners){
-        listener->new_source(m_device, m_resolution);
+    for (StateListener* listener : m_listeners){
+        listener->post_new_source(m_device, m_resolution);
     }
 }
 
@@ -414,29 +433,26 @@ VideoWidget::VideoWidget(QWidget* parent, CameraSession& session)
         session.m_camera->setViewfinder(m_camera_view);
     }
 
-    session.add_listener(*this);
+    session.add_state_listener(*this);
 }
 VideoWidget::~VideoWidget(){
-    m_session.remove_listener(*this);
+    m_session.add_state_listener(*this);
     if (m_session.m_camera){
         m_session.m_camera->setViewfinder((QCameraViewfinder*)nullptr);
     }
 }
 
 
-void VideoWidget::shutdown(){
+void VideoWidget::pre_shutdown(){
 //    cout << "VideoWidget::shutdown() - start" << endl;
     if (m_session.m_camera){
         m_session.m_camera->setViewfinder((QCameraViewfinder*)nullptr);
     }
 //    cout << "VideoWidget::shutdown() - end" << endl;
 }
-void VideoWidget::new_source(const CameraInfo& device, Resolution resolution){
+void VideoWidget::post_new_source(const CameraInfo& device, Resolution resolution){
 //    cout << "VideoWidget::new_source" << endl;
     m_session.m_camera->setViewfinder(m_camera_view);
-}
-void VideoWidget::resolution_change(Resolution resolution){
-
 }
 //void VideoWidget::resizeEvent(QResizeEvent* event){
 //    cout << "VideoWidget: " << this->width() << " x " << this->height() << endl;

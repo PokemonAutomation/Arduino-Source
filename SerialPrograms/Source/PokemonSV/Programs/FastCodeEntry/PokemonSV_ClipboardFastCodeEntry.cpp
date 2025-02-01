@@ -29,7 +29,7 @@ ClipboardFastCodeEntry_Descriptor::ClipboardFastCodeEntry_Descriptor()
         "Automatically enter a 4, 6, or 8 digit link code from your clipboard.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB,
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS},
         1, 4, 1
     )
 {}
@@ -43,7 +43,7 @@ ClipboardFastCodeEntry::ClipboardFastCodeEntry()
 
 void ClipboardFastCodeEntry::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
     //  Connect the controller.
-    env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
+    env.run_in_parallel(scope, [&](ConsoleHandle& console, SwitchControllerContext& context){
         pbf_press_button(context, BUTTON_R | BUTTON_L, 5, 3);
     });
 

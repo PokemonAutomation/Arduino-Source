@@ -4,18 +4,15 @@
  *
  */
 
-#include <sstream>
 #include "Common/Cpp/Exceptions.h"
-//#include "Kernels/ImageFilters/Kernels_ImageFilter_Basic.h"
-//#include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/Globals.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
-#include "CommonFramework/ImageTools/ImageFilter.h"
-#include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
-#include "CommonFramework/ImageMatch/WaterfillTemplateMatcher.h"
-//#include "CommonFramework/ImageMatch/SubObjectTemplateMatcher.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
+#include "CommonTools/Images/ImageFilter.h"
+#include "CommonTools/Images/BinaryImage_FilterRgb32.h"
+#include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_ButtonDetector.h"
 #include "PokemonLA_MountDetector.h"
 

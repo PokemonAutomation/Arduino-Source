@@ -4,21 +4,22 @@
  *
  */
 
+#include <iterator>
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
-//#include "CommonFramework/ImageMatch/ImageCropper.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
-#include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Resources/Pokemon_PokemonNames.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
+#include "PokemonLA/PokemonLA_TravelLocations.h"
 #include "PokemonLA/Inference/PokemonLA_DialogDetector.h"
 #include "PokemonLA/Inference/Map/PokemonLA_MapDetector.h"
 #include "PokemonLA/Inference/Map/PokemonLA_SelectedRegionDetector.h"
@@ -139,7 +140,7 @@ OutbreakFinder_Descriptor::OutbreakFinder_Descriptor()
         "Search for an outbreak for a specific " + STRING_POKEMON,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 class OutbreakFinder_Descriptor::Stats : public StatsTracker{
@@ -230,10 +231,12 @@ OutbreakFinder::OutbreakFinder()
 
 
 std::set<std::string> OutbreakFinder::read_travel_map_outbreaks(
-    SingleSwitchProgramEnvironment& env, BotBaseContext& context,
+    SingleSwitchProgramEnvironment& env, SwitchControllerContext& context,
     const std::set<std::string>& desired_events
 ){
     OutbreakFinder_Descriptor::Stats& stats = env.current_stats<OutbreakFinder_Descriptor::Stats>();
+
+    VideoOverlaySet overlays(env.console);
 
     MapRegion start_region = MapRegion::NONE;
 
@@ -243,10 +246,13 @@ std::set<std::string> OutbreakFinder::read_travel_map_outbreaks(
         return std::set<std::string>();
     }
 
+    OutbreakReader reader(env.console, LANGUAGE, env.console);
+    reader.make_overlays(overlays);
+
     MMOQuestionMarkDetector question_mark_detector(env.logger());
-    VideoOverlaySet mmo_overlay_set(env.console);
+//    VideoOverlaySet mmo_overlay_set(env.console);
     std::array<bool, 5> mmo_appears = question_mark_detector.detect_MMO_on_hisui_map(env.console.video().snapshot());
-    add_hisui_MMO_detection_to_overlay(mmo_appears, mmo_overlay_set);
+    add_hisui_MMO_detection_to_overlay(mmo_appears, overlays);
 
     // If the current region is a wild area, the yellow cursor may overlap with the MMO question marker, causing
     // wrong detection. So we have to check it's location again by moving the cursor to the next location
@@ -258,7 +264,7 @@ std::set<std::string> OutbreakFinder::read_travel_map_outbreaks(
         auto new_mmo_read = question_mark_detector.detect_MMO_on_hisui_map(env.console.video().snapshot());
         mmo_appears[current_wild_area_index] = new_mmo_read[current_wild_area_index];
         if (new_mmo_read[current_wild_area_index]){
-            add_hisui_MMO_detection_to_overlay(mmo_appears, mmo_overlay_set);
+            add_hisui_MMO_detection_to_overlay(mmo_appears, overlays);
         }
         // now mmo_appears should contain correct detection of MMO question marks.
     }
@@ -302,7 +308,6 @@ std::set<std::string> OutbreakFinder::read_travel_map_outbreaks(
             if (mmo_appears[wild_region_index]){
                 env.log(std::string(MAP_REGION_NAMES[(int)current_region]) + " have MMO.", COLOR_ORANGE);
             }else{
-                OutbreakReader reader(env.console, LANGUAGE, env.console);
                 OCR::StringMatchResult result = reader.read(env.console.video().snapshot());
                 if (!result.results.empty()){
                     stats.outbreaks++;
@@ -327,7 +332,7 @@ std::set<std::string> OutbreakFinder::read_travel_map_outbreaks(
 }
 
 
-void OutbreakFinder::goto_region_and_return(SingleSwitchProgramEnvironment& env, BotBaseContext& context, 
+void OutbreakFinder::goto_region_and_return(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, 
     bool inside_travel_map
 ){
     OutbreakFinder_Descriptor::Stats& stats = env.current_stats<OutbreakFinder_Descriptor::Stats>();
@@ -359,10 +364,10 @@ void OutbreakFinder::goto_region_and_return(SingleSwitchProgramEnvironment& env,
     }
     if (is_wild_land(current_region) == false){
         dump_image(env.console.logger(), env.program_info(), "FindRegion", env.console.video().snapshot());
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, env.console,
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
             "Unable to find a wild land.",
-            true
+            env.console
         );
     }
 
@@ -397,9 +402,9 @@ void OutbreakFinder::goto_region_and_return(SingleSwitchProgramEnvironment& env,
             ButtonType::ButtonA, ImageFloatBox(0.50, 0.50, 0.30, 0.30),
             std::chrono::milliseconds(200), true
         );
-        int ret = run_until(
+        int ret = run_until<SwitchControllerContext>(
             env.console, context,
-            [](BotBaseContext& context){
+            [](SwitchControllerContext& context){
                 for (size_t c = 0; c < 10; c++){
                     pbf_press_button(context, BUTTON_A, 20, 125);
                 }
@@ -420,7 +425,7 @@ void OutbreakFinder::goto_region_and_return(SingleSwitchProgramEnvironment& env,
 }
 
 std::set<std::string> OutbreakFinder::enter_region_and_read_MMO(
-    SingleSwitchProgramEnvironment& env, BotBaseContext& context,
+    SingleSwitchProgramEnvironment& env, SwitchControllerContext& context,
     const std::string& mmo_name,
     const std::set<std::string>& desired_MMOs,
     const std::set<std::string>& desired_star_MMOs
@@ -478,10 +483,10 @@ std::set<std::string> OutbreakFinder::enter_region_and_read_MMO(
     // Fix zoom level:
     const int zoom_level = read_map_zoom_level(question_mark_image);
     if (zoom_level < 0){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, env.console,
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
             "Canot read map zoom level.",
-            true
+            env.console
         );
     }
 
@@ -543,10 +548,10 @@ std::set<std::string> OutbreakFinder::enter_region_and_read_MMO(
         EventDialogDetector event_dialog_detector(env.logger(), env.console.overlay(), true);
         int ret = wait_until(env.console, context, std::chrono::seconds(10), {{event_dialog_detector}});
         if (ret < 0){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
                 "Dialog box not detected when waiting for MMO map.",
-                true
+                env.console
             );
         }
     }
@@ -569,10 +574,10 @@ std::set<std::string> OutbreakFinder::enter_region_and_read_MMO(
             env.console.log("Found revealed map thanks to Munchlax!");
             break;
         default:
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
                 "Map not detected after talking to Mai.",
-                true
+                env.console
             );
         }
         break;
@@ -582,8 +587,8 @@ std::set<std::string> OutbreakFinder::enter_region_and_read_MMO(
     MapDetector map_detector;
     ret = wait_until(env.console, context, std::chrono::seconds(5), {{map_detector}});
     if (ret < 0){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, env.console,
+        OperationFailedException::fire(
+            env.console, ErrorReport::SEND_ERROR_REPORT,
             "Map not detected after talking to Mai.",
             true
         );
@@ -659,7 +664,7 @@ std::set<std::string> OutbreakFinder::enter_region_and_read_MMO(
 
 
 bool OutbreakFinder::run_iteration(
-    SingleSwitchProgramEnvironment& env, BotBaseContext& context,
+    SingleSwitchProgramEnvironment& env, SwitchControllerContext& context,
     const std::set<std::string>& desired_hisui_map_events,
     const std::set<std::string>& desired_outbreaks,
     const std::set<std::string>& desired_MMOs,
@@ -754,7 +759,7 @@ std::set<std::string> OutbreakFinder::to_set(const StringSelectTableOption& opti
     return ret;
 }
 
-void OutbreakFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void OutbreakFinder::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
 //    OutbreakFinder_Descriptor::Stats& stats = env.current_stats<OutbreakFinder_Descriptor::Stats>();
 
     // goto_Mai_from_camp(env.logger(), context, Camp::HIGHLANDS_HIGHLANDS);

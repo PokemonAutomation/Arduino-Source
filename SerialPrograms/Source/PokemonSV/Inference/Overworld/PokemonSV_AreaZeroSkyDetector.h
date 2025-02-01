@@ -9,8 +9,10 @@
 
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
-#include "CommonFramework/Inference/VisualDetector.h"
+#include "CommonFramework/Tools/VideoStream.h"
+#include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
+#include "CommonTools/VisualDetector.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 
 namespace PokemonAutomation{
 namespace Kernels{
@@ -18,9 +20,7 @@ namespace Waterfill{
     class WaterfillObject;
 }
 }
-class BotBaseContext;
 class ProgramEnvironment;
-class ConsoleHandle;
 namespace NintendoSwitch{
 namespace PokemonSV{
 
@@ -54,7 +54,7 @@ private:
 
 
 void find_and_center_on_sky(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context
+    ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context
 );
 
 

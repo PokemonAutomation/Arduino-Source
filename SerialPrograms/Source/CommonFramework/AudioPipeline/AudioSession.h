@@ -16,6 +16,7 @@
 #ifndef PokemonAutomation_AudioPipeline_AudioSession_H
 #define PokemonAutomation_AudioPipeline_AudioSession_H
 
+#include "Common/Cpp/ListenerSet.h"
 #include "Common/Cpp/Concurrency/Watchdog.h"
 #include "AudioFeed.h"
 #include "AudioPassthroughPair.h"
@@ -30,14 +31,19 @@ class Logger;
 
 class AudioSession final : public AudioFeed, private FFTListener, private WatchdogCallback{
 public:
-    struct Listener{
-        virtual void input_changed(const std::string& file, const AudioDeviceInfo& device, AudioChannelFormat format){}
-        virtual void output_changed(const AudioDeviceInfo& device){}
-        virtual void volume_changed(double volume){}
-        virtual void display_changed(AudioOption::AudioDisplayType display){}
+    struct StateListener{
+        virtual void pre_input_change(){}
+        virtual void post_input_change(const std::string& file, const AudioDeviceInfo& device, AudioChannelFormat format){}
+        virtual void post_output_change(const AudioDeviceInfo& device){}
+        virtual void post_volume_change(double volume){}
+        virtual void post_display_change(AudioOption::AudioDisplayType display){}
     };
-    void add_ui_listener(Listener& listener);
-    void remove_ui_listener(Listener& listener);
+    void add_state_listener(StateListener& listener);
+    void remove_state_listener(StateListener& listener);
+
+    void add_stream_listener(AudioFloatStreamListener& listener);
+    void remove_stream_listener(AudioFloatStreamListener& listener);
+
     void add_spectrum_listener(AudioSpectrumHolder::Listener& listener);
     void remove_spectrum_listener(AudioSpectrumHolder::Listener& listener);
 
@@ -77,12 +83,14 @@ public:
 
 
 private:
-    virtual void on_fft(size_t sample_rate, std::shared_ptr<AlignedVector<float>> fft_output) override;
+    virtual void on_fft(size_t sample_rate, std::shared_ptr<const AlignedVector<float>> fft_output) override;
     virtual void on_watchdog_timeout() override;
 
     bool sanitize_format();
-    void push_input_changed();
-    void push_output_changed();
+
+    void signal_pre_input_change();
+    void signal_post_input_change();
+    void signal_post_output_change();
 
 
 private:
@@ -92,7 +100,9 @@ private:
     std::unique_ptr<AudioPassthroughPair> m_devices;
 
     mutable std::mutex m_lock;
-    std::set<Listener*> m_listeners;
+
+    ListenerSet<StateListener> m_listeners;
+
 };
 
 

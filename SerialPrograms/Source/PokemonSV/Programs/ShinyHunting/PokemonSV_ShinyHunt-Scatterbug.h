@@ -10,8 +10,8 @@
 #include <functional>
 #include "Common/Cpp/Options/FloatingPointOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
-#include "CommonFramework/Options/LanguageOCROption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
+#include "CommonTools/Options/LanguageOCROption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "PokemonSV/Options/PokemonSV_EncounterBotCommon.h"
@@ -38,15 +38,15 @@ class ShinyHuntScatterbug : public SingleSwitchProgramInstance{
 public:
     ShinyHuntScatterbug();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
-    void run_one_sandwich_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    void run_one_sandwich_iteration(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
     
-    void run_lets_go_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context, size_t path_id);
+    void run_lets_go_iteration(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, size_t path_id);
 
-    void handle_battles_and_back_to_pokecenter(SingleSwitchProgramEnvironment& env, BotBaseContext& context, 
-        std::function<void(SingleSwitchProgramEnvironment& env, BotBaseContext& context)>&& action);
+    void handle_battles_and_back_to_pokecenter(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, 
+        std::function<void(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context)>&& action);
 
     BooleanCheckBoxOption SAVE_GAME_AT_START;
     

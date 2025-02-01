@@ -11,9 +11,7 @@
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/GroupOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
-//#include "PokemonSV/Resources/PokemonSV_Ingredients.h"
-#include "CommonFramework/Options/LanguageOCROption.h"
-//#include "PokemonSV_SandwichIngredientsOption.h"
+#include "CommonTools/Options/LanguageOCROption.h"
 #include "PokemonSV_SandwichIngredientsTable.h"
 
 namespace PokemonAutomation{
@@ -228,8 +226,7 @@ public:
         OCR::LanguageOCROption* language_option,
         BaseRecipe base_recipe,
         bool show_save_option,
-        bool toggleable,
-        bool enabled
+        GroupOption::EnableMode enable_mode
     );
 
 public:

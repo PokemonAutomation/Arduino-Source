@@ -5,8 +5,8 @@
  */
 
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV_BoxRoutines.h"
@@ -19,7 +19,8 @@ namespace PokemonSV{
 
 
 void release_one_pokemon(
-    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    const ProgramInfo& info,
+    VideoStream& stream, SwitchControllerContext& context,
     size_t& errors
 ){
     bool release_attempted = false;
@@ -29,7 +30,7 @@ void release_one_pokemon(
     while (true){
         if (current_time() - start > std::chrono::seconds(60)){
             dump_image_and_throw_recoverable_exception(
-                info, console, "ReleaseFailed",
+                info, stream, "ReleaseFailed",
                 "Failed to release " + Pokemon::STRING_POKEMON + " after 1 minute."
             );
         }
@@ -42,7 +43,7 @@ void release_one_pokemon(
 
         context.wait_for_all_requests();
         int ret = wait_until(
-            console, context,
+            stream, context,
             std::chrono::seconds(10),
             {
                 box_detector,
@@ -54,7 +55,7 @@ void release_one_pokemon(
         context.wait_for(std::chrono::milliseconds(50));
         if (ret == 3){
             //  Make sure we're not mistakening this for the other dialogs.
-            auto screenshot = console.video().snapshot();
+            auto screenshot = stream.video().snapshot();
             if (selected.detect(screenshot)){
                 ret = 1;
             }else if (confirm.detect(screenshot)){
@@ -65,12 +66,12 @@ void release_one_pokemon(
         switch (ret){
         case 0:{
             if (ret == expected){
-                console.log("Detected box neutral.");
+                stream.log("Detected box neutral.");
             }else{
-                console.log("Detected box neutral. (unexpected)", COLOR_RED);
+                stream.log("Detected box neutral. (unexpected)", COLOR_RED);
                 errors++;
             }
-            auto screenshot = console.video().snapshot();
+            auto screenshot = stream.video().snapshot();
             if (exists.detect(screenshot)){
                 if (release_attempted && release_completed){
                     return;
@@ -81,15 +82,15 @@ void release_one_pokemon(
                 expected = 1;
                 continue;
             }else{
-                console.log("Slot is empty.");
+                stream.log("Slot is empty.");
                 return;
             }
         }
         case 1:
             if (ret == expected){
-                console.log("Detected selection. Releasing...");
+                stream.log("Detected selection. Releasing...");
             }else{
-                console.log("Detected selection. Releasing... (unexpected)", COLOR_RED);
+                stream.log("Detected selection. Releasing... (unexpected)", COLOR_RED);
                 errors++;
             }
             pbf_press_dpad(context, DPAD_UP, 10, 10);
@@ -103,9 +104,9 @@ void release_one_pokemon(
             continue;
         case 2:
             if (ret == expected){
-                console.log("Detected release confirmation.");
+                stream.log("Detected release confirmation.");
             }else{
-                console.log("Detected release confirmation. (unexpected)", COLOR_RED);
+                stream.log("Detected release confirmation. (unexpected)", COLOR_RED);
                 errors++;
             }
             pbf_press_dpad(context, DPAD_UP, 10, 10);
@@ -115,9 +116,9 @@ void release_one_pokemon(
             continue;
         case 3:
             if (ret == expected){
-                console.log("Detected advance dialog.");
+                stream.log("Detected advance dialog.");
             }else{
-                console.log("Detected advance dialog. (unexpected)", COLOR_RED);
+                stream.log("Detected advance dialog. (unexpected)", COLOR_RED);
                 errors++;
             }
             pbf_press_button(context, BUTTON_A, 20, 20);
@@ -126,25 +127,26 @@ void release_one_pokemon(
             continue;
         default:
             dump_image_and_throw_recoverable_exception(
-                info, console, "NoStateReleasingPokemon", "No recognized state while releasing a pokemon after 10 seconds."
+                info, stream, "NoStateReleasingPokemon", "No recognized state while releasing a pokemon after 10 seconds."
             );
         }
     }
 }
 
 void release_box(
-    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    const ProgramInfo& info,
+    VideoStream& stream, SwitchControllerContext& context,
     size_t& errors, uint8_t start_row
 ){
     context.wait_for_all_requests();
-    console.log("Release one box.");
-    console.overlay().add_log("Release box", COLOR_WHITE);
+    stream.log("Release one box.");
+    stream.overlay().add_log("Release box", COLOR_WHITE);
     for (uint8_t row = start_row; row < 5; row++){
         for (uint8_t j_col = 0; j_col < 6; j_col++){
             // Go through slots in a Z-shape pattern
             uint8_t col = (row % 2 == 0 ? j_col : 5 - j_col);
-            move_box_cursor(info, console, context, BoxCursorLocation::SLOTS, row, col);
-            release_one_pokemon(info, console, context, errors);
+            move_box_cursor(info, stream, context, BoxCursorLocation::SLOTS, row, col);
+            release_one_pokemon(info, stream, context, errors);
         }
     }
 }

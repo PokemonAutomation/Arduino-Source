@@ -22,6 +22,10 @@ class SwitchSystemWidget;
 class VirtualConsole_Descriptor : public PanelDescriptor{
 public:
     VirtualConsole_Descriptor();
+    const ControllerRequirements& requirements() const{ return m_requirements; }
+
+private:
+    const ControllerRequirements m_requirements;
 };
 
 

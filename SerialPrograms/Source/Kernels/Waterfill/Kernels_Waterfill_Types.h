@@ -11,6 +11,7 @@
 #include <stdint.h>
 //#include <map>
 //#include <iostream>
+#include "Common/Cpp/Rectangle.h"
 #include "Kernels/BinaryMatrix/Kernels_BinaryMatrix.h"
 
 namespace PokemonAutomation{
@@ -55,6 +56,10 @@ public:
 
     double aspect_ratio() const{ return (double)width() / height(); }
     double area_ratio() const{ return (double)area / (width() * height()); }
+
+    Rectangle<size_t> rectangle() const{
+        return Rectangle<size_t>(min_x, min_y, max_x, max_y);
+    }
 
     // Note: `object` must be constructed before calling this function.
     std::unique_ptr<PackedBinaryMatrix_IB> packed_matrix() const{

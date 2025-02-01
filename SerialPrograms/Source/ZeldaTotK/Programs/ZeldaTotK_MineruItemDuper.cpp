@@ -6,7 +6,7 @@
 
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/Tools/StatsTracking.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "ZeldaTotK_MineruItemDuper.h"
@@ -23,7 +23,7 @@ MineruItemDuper_Descriptor::MineruItemDuper_Descriptor()
         "Use the Mineru Menu Sort glitch to duplicate items.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 
@@ -64,7 +64,7 @@ MineruItemDuper::MineruItemDuper()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void MineruItemDuper::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void MineruItemDuper::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     MineruItemDuper_Descriptor::Stats& stats = env.current_stats<MineruItemDuper_Descriptor::Stats>();
 
     /*

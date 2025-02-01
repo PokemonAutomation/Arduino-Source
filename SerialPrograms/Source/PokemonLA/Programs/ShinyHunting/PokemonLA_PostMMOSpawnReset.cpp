@@ -6,8 +6,8 @@
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/Tools/StatsTracking.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
@@ -31,7 +31,7 @@ PostMMOSpawnReset_Descriptor::PostMMOSpawnReset_Descriptor()
         "Constantly reset the spawn after MMO finishes.",
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 class PostMMOSpawnReset_Descriptor::Stats : public StatsTracker, public ShinyStatIncrementer{
@@ -97,7 +97,7 @@ PostMMOSpawnReset::PostMMOSpawnReset()
 
 
 
-void PostMMOSpawnReset::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void PostMMOSpawnReset::run_iteration(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     PostMMOSpawnReset_Descriptor::Stats& stats = env.current_stats<PostMMOSpawnReset_Descriptor::Stats>();
 
     // From game to Switch Home
@@ -111,9 +111,9 @@ void PostMMOSpawnReset::run_iteration(SingleSwitchProgramEnvironment& env, BotBa
             return on_shiny_callback(env, env.console, SHINY_DETECTED, error_coefficient);
         });
 
-        int ret = run_until(
+        int ret = run_until<SwitchControllerContext>(
             env.console, context,
-            [this, &env](BotBaseContext& context){
+            [this, &env](SwitchControllerContext& context){
                 reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
                 env.console.log("Entered game! Checking shiny sound...");
 
@@ -143,7 +143,7 @@ void PostMMOSpawnReset::run_iteration(SingleSwitchProgramEnvironment& env, BotBa
 }
 
 
-void PostMMOSpawnReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void PostMMOSpawnReset::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     PostMMOSpawnReset_Descriptor::Stats& stats = env.current_stats<PostMMOSpawnReset_Descriptor::Stats>();
 
     //  Connect the controller.

@@ -41,18 +41,18 @@ public:
 class ShinyHuntAutonomousOverworld : public SingleSwitchProgramInstance{
 public:
     ShinyHuntAutonomousOverworld();
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 
 private:
     bool find_encounter(
-        ConsoleHandle& console, BotBaseContext& context,
+        VideoStream& stream, SwitchControllerContext& context,
         ShinyHuntAutonomousOverworld_Descriptor::Stats& stats,
         WallClock expiration
     ) const;
 
     bool charge_at_target(
-        ConsoleHandle& console, BotBaseContext& context,
+        VideoStream& stream, SwitchControllerContext& context,
         const std::pair<double, OverworldTarget>& target
     ) const;
 

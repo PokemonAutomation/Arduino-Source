@@ -11,8 +11,8 @@
 #include <atomic>
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonFramework/Inference/VisualDetector.h"
-#include "CommonFramework/Inference/AudioPerSpectrumDetectorBase.h"
+#include "CommonTools/Audio/AudioPerSpectrumDetectorBase.h"
+#include "CommonTools/VisualDetector.h"
 
 namespace PokemonAutomation{
     class Logger;
@@ -62,7 +62,7 @@ private:
 
 class LetsGoKillSoundDetector : public AudioPerSpectrumDetectorBase{
 public:
-    LetsGoKillSoundDetector(ConsoleHandle& console, DetectedCallback detected_callback);
+    LetsGoKillSoundDetector(Logger& logger, DetectedCallback detected_callback);
 
     virtual float get_score_threshold() const override;
 

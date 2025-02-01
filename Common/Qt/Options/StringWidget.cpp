@@ -9,6 +9,10 @@
 #include <QLineEdit>
 #include "StringWidget.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 
 
@@ -32,7 +36,7 @@ StringCellWidget::StringCellWidget(QWidget& parent, StringCell& value)
 {
     this->setPlaceholderText(QString::fromStdString(value.placeholder_text()));
 
-    this->setReadOnly(value.lock_mode() == LockMode::READ_ONLY);
+    this->setReadOnly(value.lock_mode() == LockMode::READ_ONLY || m_value.is_locked());
     if (m_value.is_password()){
         this->setEchoMode(QLineEdit::PasswordEchoOnEdit);
     }
@@ -52,6 +56,11 @@ void StringCellWidget::update_value(){
 void StringCellWidget::value_changed(void* object){
     QMetaObject::invokeMethod(this, [this]{
         update_value();
+    }, Qt::QueuedConnection);
+}
+void StringCellWidget::visibility_changed(){
+    QMetaObject::invokeMethod(this, [this]{
+        setReadOnly(m_value.lock_mode() == LockMode::READ_ONLY || m_value.is_locked());
     }, Qt::QueuedConnection);
 }
 
@@ -98,7 +107,11 @@ void StringOptionWidget::value_changed(void* object){
         update_value();
     }, Qt::QueuedConnection);
 }
-
+void StringOptionWidget::visibility_changed(){
+    QMetaObject::invokeMethod(m_box, [this]{
+        m_box->setReadOnly(m_value.is_locked());
+    }, Qt::QueuedConnection);
+}
 
 
 

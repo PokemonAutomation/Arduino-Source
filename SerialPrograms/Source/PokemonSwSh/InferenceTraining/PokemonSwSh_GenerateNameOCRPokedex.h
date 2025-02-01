@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_GenerateNameOCRData_H
 
 #include "Common/Cpp/Options/EnumDropdownOption.h"
-#include "CommonFramework/Options/LanguageOCROption.h"
+#include "CommonTools/Options/LanguageOCROption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
 
@@ -30,7 +30,7 @@ class GenerateNameOCRDataPokedex : public SingleSwitchProgramInstance{
 public:
     GenerateNameOCRDataPokedex();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
     void read(

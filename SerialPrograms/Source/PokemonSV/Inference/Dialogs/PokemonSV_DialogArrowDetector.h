@@ -9,12 +9,10 @@
 
 #include <vector>
 #include "Common/Cpp/Color.h"
-#include "Common/Cpp/Containers/FixedLimitVector.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
-#include "CommonFramework/Inference/VisualDetector.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
+#include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
+#include "CommonTools/VisualDetector.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -55,6 +53,7 @@ protected:
     double m_bottom_line;
     uint16_t m_num_oscillation_above_top_line;
     uint16_t m_num_oscillation_below_bottom_line;
+    uint16_t m_num_no_detection;
     // FixedLimitVector<OverlayBoxScope> m_arrows;
 
 };

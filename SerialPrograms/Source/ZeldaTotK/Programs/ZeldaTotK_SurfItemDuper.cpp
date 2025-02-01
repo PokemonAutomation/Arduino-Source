@@ -6,7 +6,7 @@
 
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/Tools/StatsTracking.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "ZeldaTotK_SurfItemDuper.h"
@@ -23,7 +23,7 @@ SurfItemDuper_Descriptor::SurfItemDuper_Descriptor()
         "Use the Shield Surfing Menu Sort glitch to duplicate items.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 
@@ -58,7 +58,7 @@ SurfItemDuper::SurfItemDuper()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void SurfItemDuper::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void SurfItemDuper::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     SurfItemDuper_Descriptor::Stats& stats = env.current_stats<SurfItemDuper_Descriptor::Stats>();
 
     /*

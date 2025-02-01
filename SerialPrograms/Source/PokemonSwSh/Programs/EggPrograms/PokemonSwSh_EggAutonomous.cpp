@@ -7,12 +7,12 @@
 #include <cmath>
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
-#include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "Pokemon/Pokemon_Notification.h"
 #include "Pokemon/Pokemon_Strings.h"
@@ -56,7 +56,7 @@ EggAutonomous_Descriptor::EggAutonomous_Descriptor()
         "Automatically fetch+hatch eggs and keep all shinies.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 
@@ -193,7 +193,7 @@ EggAutonomous::EggAutonomous()
     }
 }
 
-void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void EggAutonomous::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     auto& stats = env.current_stats<EggAutonomous_Descriptor::Stats>();
     env.update_stats();
 
@@ -260,10 +260,10 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
 
             consecutive_failures++;
             if (consecutive_failures >= 3){
-                throw OperationFailedException(
-                    ErrorReport::SEND_ERROR_REPORT, env.console,
+                OperationFailedException::fire(
+                    ErrorReport::SEND_ERROR_REPORT,
                     "Failed 3 batches in the row.",
-                    true
+                    env.console
                 );
             }
             pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
@@ -288,7 +288,7 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
 // - Check if pokemon needs to be kept. Keep them if needed.
 // - Put five eggs from storage to party. Save game if needed.
 // Return true if the egg loop should stop.
-bool EggAutonomous::run_batch(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EggAutonomous_Descriptor::Stats& stats){
+bool EggAutonomous::run_batch(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, EggAutonomous_Descriptor::Stats& stats){
     env.update_stats();
     send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
 
@@ -320,9 +320,9 @@ bool EggAutonomous::run_batch(SingleSwitchProgramEnvironment& env, BotBaseContex
             }else{
                 env.console.overlay().add_log("Loop " + std::to_string(bike_loop_count+1), COLOR_WHITE);
             }
-            int ret = run_until(
+            int ret = run_until<SwitchControllerContext>(
                 env.console, context,
-                [](BotBaseContext& context){
+                [](SwitchControllerContext& context){
                     travel_to_spin_location(context);
                     travel_back_to_lady(context);
                 },
@@ -346,9 +346,9 @@ bool EggAutonomous::run_batch(SingleSwitchProgramEnvironment& env, BotBaseContex
                     break;
                 }
                 // Now we see if we can hatch one more egg.
-                ret = run_until(
+                ret = run_until<SwitchControllerContext>(
                     env.console, context,
-                    [](BotBaseContext& context){
+                    [](SwitchControllerContext& context){
                         // Try move a little to hatch more:
                         // We move toward lower-left so that it wont hit the lady or enter the Nursory.
                         pbf_move_left_joystick(context, 0, 255, 100, 10);
@@ -387,10 +387,10 @@ bool EggAutonomous::run_batch(SingleSwitchProgramEnvironment& env, BotBaseContex
             ssf_press_button2(context, BUTTON_A, GameSettings::instance().MENU_TO_POKEMON_DELAY, EGG_BUTTON_HOLD_DELAY);
             context.wait_for_all_requests();
 
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
                 "Max number of loops reached. Not enough eggs in party?",
-                true
+                env.console
             );
         }
         
@@ -442,7 +442,7 @@ bool EggAutonomous::run_batch(SingleSwitchProgramEnvironment& env, BotBaseContex
     return false;
 }
 
-void EggAutonomous::save_game(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void EggAutonomous::save_game(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     context.wait_for_all_requests();
     env.log("Save game.");
     env.console.overlay().add_log("Save game", COLOR_WHITE);
@@ -452,7 +452,7 @@ void EggAutonomous::save_game(SingleSwitchProgramEnvironment& env, BotBaseContex
     wait_for_y_comm_icon(env, context, "Cannot detect end of saving game.");
 }
 
-void EggAutonomous::call_flying_taxi(SingleSwitchProgramEnvironment& env, BotBaseContext& context, bool fly_from_overworld){
+void EggAutonomous::call_flying_taxi(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, bool fly_from_overworld){
     context.wait_for_all_requests();
     env.log("Fly to reset position");
     env.console.overlay().add_log("Call Flying Taxi", COLOR_WHITE);
@@ -467,29 +467,29 @@ void EggAutonomous::call_flying_taxi(SingleSwitchProgramEnvironment& env, BotBas
     wait_for_y_comm_icon(env, context, "Cannot detect end of flying taxi animation.");
 }
 
-void EggAutonomous::wait_for_egg_hatched(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EggAutonomous_Descriptor::Stats& stats, size_t num_hatched_eggs){
+void EggAutonomous::wait_for_egg_hatched(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, EggAutonomous_Descriptor::Stats& stats, size_t num_hatched_eggs){
     env.console.overlay().add_log("Egg hatching " + std::to_string(num_hatched_eggs) + "/5", COLOR_GREEN);
     const bool y_comm_visible_at_end_of_egg_hatching = true;
     YCommIconDetector end_egg_hatching_detector(y_comm_visible_at_end_of_egg_hatching);
-    const int ret = run_until(
+    const int ret = run_until<SwitchControllerContext>(
         env.console, context,
-        [](BotBaseContext& context){
+        [](SwitchControllerContext& context){
             pbf_mash_button(context, BUTTON_B, 60 * TICKS_PER_SECOND);
         },
         {{end_egg_hatching_detector}}
     );
     if (ret > 0){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, env.console,
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
             "Cannot detect egg hatching ends.",
-            true
+            env.console
         );
     }
 }
 
 size_t EggAutonomous::talk_to_lady_to_fetch_egg(
     SingleSwitchProgramEnvironment& env,
-    BotBaseContext& context,
+    SwitchControllerContext& context,
     EggAutonomous_Descriptor::Stats& stats,
     size_t num_eggs_retrieved
 ){
@@ -500,9 +500,9 @@ size_t EggAutonomous::talk_to_lady_to_fetch_egg(
     RetrieveEggArrowFinder egg_arrow_detector(env.console);
     CheckNurseryArrowFinder no_egg_arrow_detector(env.console);
 
-    int ret = run_until(
+    int ret = run_until<SwitchControllerContext>(
         env.console, context,
-        [](BotBaseContext& context){
+        [](SwitchControllerContext& context){
             for (size_t i_hatched = 0; i_hatched < 2; i_hatched++){
                 pbf_press_button(context, BUTTON_A, 20, 150);
             }
@@ -525,9 +525,9 @@ size_t EggAutonomous::talk_to_lady_to_fetch_egg(
         // Press A to get the egg
         ssf_press_button1(context, BUTTON_A, 10);
 
-        ret = run_until(
+        ret = run_until<SwitchControllerContext>(
             env.console, context,
-            [](BotBaseContext& context){
+            [](SwitchControllerContext& context){
                 pbf_mash_button(context, BUTTON_B, TICKS_PER_SECOND * 30);
             },
             {{dialog_over_detector}}
@@ -535,26 +535,26 @@ size_t EggAutonomous::talk_to_lady_to_fetch_egg(
     }else if (ret == 1){
         env.log("No egg");
         env.console.overlay().add_log("No egg", COLOR_WHITE);
-        ret = run_until(
+        ret = run_until<SwitchControllerContext>(
             env.console, context,
-            [](BotBaseContext& context){
+            [](SwitchControllerContext& context){
                 pbf_mash_button(context, BUTTON_B, TICKS_PER_SECOND * 30);
             },
             {{dialog_over_detector}}
         );
     }else{
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, env.console,
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
             "Cannot detect dialog selection arrow when talking to Nursery lady.",
-            true
+            env.console
         );
     }
     // If dialog over is not detected:
     if (ret < 0){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, env.console,
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
             "Cannot detect end of Nursery lady dialog. No Y-Comm mark found.",
-            true
+            env.console
         );
     }
 
@@ -568,7 +568,7 @@ size_t EggAutonomous::talk_to_lady_to_fetch_egg(
 // - Retrieve the stored egg column to the party.
 // - Call flying taxi to reset player location if needed
 // Return true if the program should stop
-bool EggAutonomous::process_hatched_pokemon(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EggAutonomous_Descriptor::Stats& stats, bool need_taxi){
+bool EggAutonomous::process_hatched_pokemon(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, EggAutonomous_Descriptor::Stats& stats, bool need_taxi){
     env.log("Checking hatched pokemon.");
     env.console.overlay().add_log("Checking hatched pokemon", COLOR_WHITE);
 
@@ -714,10 +714,10 @@ bool EggAutonomous::process_hatched_pokemon(SingleSwitchProgramEnvironment& env,
                     {{pokemon_menu_detector}}
                 );
                 if (ret != 0){
-                    throw OperationFailedException(
-                        ErrorReport::SEND_ERROR_REPORT, env.console,
+                    OperationFailedException::fire(
+                        ErrorReport::SEND_ERROR_REPORT,
                         "Cannot detect pokemon menu in storage box.",
-                        true
+                        env.console
                     );
                 }
 
@@ -743,10 +743,10 @@ bool EggAutonomous::process_hatched_pokemon(SingleSwitchProgramEnvironment& env,
                     {{dialog_detector}}
                 );
                 if (ret != 0){
-                    throw OperationFailedException(
-                        ErrorReport::SEND_ERROR_REPORT, env.console,
+                    OperationFailedException::fire(
+                        ErrorReport::SEND_ERROR_REPORT,
                         "Miss second dialog when releasing pokemon.",
-                        true
+                        env.console
                     );
                 }
                 pbf_press_button(context, BUTTON_A, 20, 100);
@@ -761,10 +761,10 @@ bool EggAutonomous::process_hatched_pokemon(SingleSwitchProgramEnvironment& env,
                     pbf_press_button(context, BUTTON_A, 20, 100);
                 }
                 if (dialog_count == max_dialog_count){
-                    throw OperationFailedException(
-                        ErrorReport::SEND_ERROR_REPORT, env.console,
+                    OperationFailedException::fire(
+                        ErrorReport::SEND_ERROR_REPORT,
                         "Unexpected dialogs when releasing pokemon.",
-                        true
+                        env.console
                     );
                 }
                 break;
@@ -810,18 +810,18 @@ bool EggAutonomous::process_hatched_pokemon(SingleSwitchProgramEnvironment& env,
         // Leave menu, go back to overworld
         const bool y_comm_visible = true;
         YCommIconDetector y_comm_detector(y_comm_visible);
-        const int ret = run_until(
+        const int ret = run_until<SwitchControllerContext>(
             env.console, context,
-            [](BotBaseContext& context){
+            [](SwitchControllerContext& context){
                 pbf_mash_button(context, BUTTON_B, 5 * TICKS_PER_SECOND);
             },
             {{y_comm_detector}}
         );
         if (ret > 0){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
                 "Cannot detect Y-Comm after leaving menu.",
-                true
+                env.console
             );
         }
     }
@@ -829,7 +829,7 @@ bool EggAutonomous::process_hatched_pokemon(SingleSwitchProgramEnvironment& env,
     return false;
 }
 
-void EggAutonomous::wait_for_y_comm_icon(SingleSwitchProgramEnvironment& env, BotBaseContext& context, const std::string& error_msg){
+void EggAutonomous::wait_for_y_comm_icon(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, const std::string& error_msg){
     context.wait_for_all_requests();
     const bool y_comm_visible = true;
     YCommIconDetector y_comm_detector(y_comm_visible);
@@ -838,10 +838,10 @@ void EggAutonomous::wait_for_y_comm_icon(SingleSwitchProgramEnvironment& env, Bo
         {{y_comm_detector}}
     );
     if (ret != 0){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, env.console,
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
             error_msg + " No Y-Comm mark found.",
-            true
+            env.console
         );
     }
 }

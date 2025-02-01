@@ -11,6 +11,7 @@
 #include <array>
 #include <set>
 #include <map>
+#include <mutex>
 #include "CommonFramework/Language.h"
 #include "Common/Cpp/Options/GroupOption.h"
 #include "Common/Cpp/Options/StaticTextOption.h"

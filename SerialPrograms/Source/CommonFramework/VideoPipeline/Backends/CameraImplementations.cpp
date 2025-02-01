@@ -7,6 +7,7 @@
 #include <QtGlobal>
 //#include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/VideoPipeline/VideoPipelineOptions.h"
 #include "CameraImplementations.h"
 
 //#include <iostream>
@@ -106,7 +107,7 @@ VideoBackendOption::VideoBackendOption()
 
 
 const CameraBackend& get_camera_backend(){
-    size_t index = GlobalSettings::instance().VIDEO_BACKEND.current_value();
+    size_t index = GlobalSettings::instance().VIDEO_PIPELINE->VIDEO_BACKEND.current_value();
     return *CameraBackends::instance().m_backends[index].backend;
 }
 

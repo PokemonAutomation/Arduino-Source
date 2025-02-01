@@ -5,12 +5,15 @@
  */
 
 #include <opencv2/imgproc.hpp>
-
-#include "CommonFramework/ImageMatch/ImageCropper.h"
-#include "CommonFramework/ImageTools/ImageFilter.h"
+#include "CommonFramework/Logging/Logger.h"
+#include "CommonTools/Images/ImageFilter.h"
+#include "CommonTools/ImageMatch/ImageCropper.h"
 #include "PokemonSV/Resources/PokemonSV_PokemonSprites.h"
-
 #include "PokemonSV_TeraSilhouetteReader.h"
+
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -48,32 +51,61 @@ ImageMatch::ImageMatchResult TeraSilhouetteReader::read(const ImageViewRGB32& sc
     static constexpr double MAX_ALPHA = 110;
     static constexpr double ALPHA_SPREAD = 20;
 
-    // Get a loose crop of the silhouette icon
-    ImageViewRGB32 cropped_image = extract_box_reference(screen, m_box);
-    //cropped_image.save("cropped_image.png");
+    const std::vector<uint32_t> BRIGHTNESS_THRESHOLDS{
+        200,
+        150,
+        100,
+        125,
+        175,
+        225,
+    };
 
-    ImageRGB32 preprocessed_image(cropped_image.width(), cropped_image.height());
-    cv::medianBlur(cropped_image.to_opencv_Mat(), preprocessed_image.to_opencv_Mat(), 5);
-    //preprocessed_image.save("preprocessed_image.png");
+    for (uint32_t threshold : BRIGHTNESS_THRESHOLDS){
+//        cout << "check0" << endl;
+        //  Get a loose crop of the silhouette icon
+        ImageViewRGB32 cropped_image = extract_box_reference(screen, m_box);
+//        cropped_image.save("tera_cropped_image.png");
 
-    // Get a tight crop
-    const ImagePixelBox tight_box = ImageMatch::enclosing_rectangle_with_pixel_filter(
-        preprocessed_image,
-        // The filter is a lambda function that returns true on black silhouette pixels.
-        [](Color pixel){
-            return (uint32_t)pixel.red() + pixel.green() + pixel.blue() < 200;
+//        cout << "check1" << endl;
+        ImageRGB32 preprocessed_image(cropped_image.width(), cropped_image.height());
+        cv::medianBlur(cropped_image.to_opencv_Mat(), preprocessed_image.to_opencv_Mat(), 5);
+//        preprocessed_image.save("tera_blurred_image.png");
+
+        //  Get a tight crop
+//        cout << "check2" << endl;
+        const ImagePixelBox tight_box = ImageMatch::enclosing_rectangle_with_pixel_filter(
+            preprocessed_image,
+            // The filter is a lambda function that returns true on black silhouette pixels.
+            [=](Color pixel){
+                return (uint32_t)pixel.red() + pixel.green() + pixel.blue() < threshold;
+            }
+        );
+
+        if (tight_box.area() == 0){
+            global_logger_tagged().log("TeraSilhouetteReader::read(): Cropped image is empty.", COLOR_RED);
+            return ImageMatch::ImageMatchResult();
         }
-    );
-    ImageRGB32 processed_image = extract_box_reference(preprocessed_image, tight_box).copy();
-    // processed_image.save("processed_image.png");
 
-    ImageRGB32 filtered_image = to_blackwhite_rgb32_range(processed_image, 0xff000000, 0xff5f5f5f, true);
-    // filtered_image.save("filtered_image.png");
+//        cout << "check3" << endl;
+        ImageRGB32 processed_image = extract_box_reference(preprocessed_image, tight_box).copy();
+//        processed_image.save("tera_processed_image.png");
 
-    ImageMatch::ImageMatchResult slugs = TERA_RAID_SILHOUETTE_MATCHER().match(filtered_image, ALPHA_SPREAD);
-    slugs.clear_beyond_alpha(MAX_ALPHA);
+//        cout << "check4" << endl;
+        ImageRGB32 filtered_image = to_blackwhite_rgb32_range(processed_image, 0xff000000, 0xff5f5f5f, true);
+//        filtered_image.save("tera_filtered_image.png");
 
-    return slugs;
+//        cout << "check5" << endl;
+        ImageMatch::ImageMatchResult slugs = TERA_RAID_SILHOUETTE_MATCHER().match(filtered_image, ALPHA_SPREAD);
+        slugs.clear_beyond_alpha(MAX_ALPHA);
+
+//        slugs.log(global_logger_tagged(), MAX_ALPHA);
+
+        if (slugs.results.size() == 1){
+            return slugs;
+        }
+    }
+
+    return ImageMatch::ImageMatchResult();
 }
 
 

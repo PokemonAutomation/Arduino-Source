@@ -4,13 +4,11 @@
  *
  */
 
-#include "Common/Compiler.h"
 #include "Common/Cpp/CancellableScope.h"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
-#include "CommonFramework/ImageTools/ImageStats.h"
-#include "CommonFramework/ImageTools/SolidColorTest.h"
-#include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "CommonFramework/ImageTools/ImageStats.h"
+#include "CommonTools/Images/BinaryImage_FilterRgb32.h"
 #include "PokemonSwSh_TypeSymbolFinder.h"
 
 #include <iostream>

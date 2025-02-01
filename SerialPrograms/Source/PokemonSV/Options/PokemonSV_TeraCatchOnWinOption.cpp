@@ -13,7 +13,13 @@ namespace PokemonSV{
 
 
 TeraFarmerCatchOnWin::TeraFarmerCatchOnWin(bool enabled)
-    : GroupOption("Catch on Win", LockMode::UNLOCK_WHILE_RUNNING, true, enabled)
+    : GroupOption(
+        "Catch on Win",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        enabled
+            ? GroupOption::EnableMode::DEFAULT_ENABLED
+            : GroupOption::EnableMode::DEFAULT_DISABLED
+    )
     , BALL_SELECT(
         "<b>Ball Select:</b>",
         LockMode::UNLOCK_WHILE_RUNNING,

@@ -24,6 +24,10 @@ OutbreakReader::OutbreakReader(Logger& logger, Language language, VideoOverlay& 
     , m_text_box(overlay, {0.050, 0.177, 0.200, 0.038})
 {}
 
+void OutbreakReader::make_overlays(VideoOverlaySet& items) const{
+    items.add(COLOR_RED, m_dialog_box0);
+    items.add(COLOR_RED, m_dialog_box1);
+}
 OCR::StringMatchResult OutbreakReader::read(const ImageViewRGB32& screen) const{
     OCR::StringMatchResult result;
     ImageStats box0 = image_stats(extract_box_reference(screen, m_dialog_box0));

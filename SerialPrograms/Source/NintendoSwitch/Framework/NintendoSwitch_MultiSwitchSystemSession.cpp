@@ -15,6 +15,7 @@ namespace NintendoSwitch{
 void MultiSwitchSystemSession::add_listener(Listener& listener){
     std::lock_guard<std::mutex> lg(m_lock);
     m_listeners.insert(&listener);
+    listener.startup(m_consoles.size());
 }
 void MultiSwitchSystemSession::remove_listener(Listener& listener){
     std::lock_guard<std::mutex> lg(m_lock);

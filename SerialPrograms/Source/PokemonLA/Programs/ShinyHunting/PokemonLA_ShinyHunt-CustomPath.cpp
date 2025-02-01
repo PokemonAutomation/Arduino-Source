@@ -6,8 +6,8 @@
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
-#include "CommonFramework/Tools/StatsTracking.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
@@ -37,7 +37,7 @@ ShinyHuntCustomPath_Descriptor::ShinyHuntCustomPath_Descriptor()
         "Repeatedly travel on a custom path to shiny hunt " + STRING_POKEMON + " around it.",
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 class ShinyHuntCustomPath_Descriptor::Stats : public StatsTracker, public ShinyStatIncrementer{
@@ -112,8 +112,11 @@ ShinyHuntCustomPath::ShinyHuntCustomPath()
 }
 
 
-void ShinyHuntCustomPath::do_non_listen_action(ConsoleHandle& console, BotBaseContext& context, const CustomPathTableRow2& row){
-    console.log("Execute action " + row.action.current_display());
+void ShinyHuntCustomPath::do_non_listen_action(
+    VideoStream& stream, SwitchControllerContext& context,
+    const CustomPathTableRow2& row
+){
+    stream.log("Execute action " + row.action.current_display());
     switch(row.action){
     case PathAction::CHANGE_MOUNT:
     {
@@ -139,9 +142,9 @@ void ShinyHuntCustomPath::do_non_listen_action(ConsoleHandle& console, BotBaseCo
         }
 
         if (mountState == MountState::NOTHING){
-            dismount(console, context);
+            dismount(stream, context);
         }else{
-            change_mount(console, context, mountState);
+            change_mount(stream, context, mountState);
         }
         break;
     }
@@ -209,7 +212,7 @@ void ShinyHuntCustomPath::do_non_listen_action(ConsoleHandle& console, BotBaseCo
 }
 
 
-void ShinyHuntCustomPath::run_path(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void ShinyHuntCustomPath::run_path(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
 
     std::vector<std::unique_ptr<CustomPathTableRow2>> table = PATH.PATH.copy_snapshot();
 
@@ -244,9 +247,9 @@ void ShinyHuntCustomPath::run_path(SingleSwitchProgramEnvironment& env, BotBaseC
         return on_shiny_callback(env, env.console, *shiny_action, error_coefficient);
     });
 
-    int ret = run_until(
+    int ret = run_until<SwitchControllerContext>(
         env.console, context,
-        [&](BotBaseContext& context){
+        [&](SwitchControllerContext& context){
             for (const std::unique_ptr<CustomPathTableRow2>& row : table){
                 if (row->action == PathAction::START_LISTEN){
                     listen_for_shiny.store(true, std::memory_order_release);
@@ -269,7 +272,7 @@ void ShinyHuntCustomPath::run_path(SingleSwitchProgramEnvironment& env, BotBaseC
 }
 
 
-void ShinyHuntCustomPath::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void ShinyHuntCustomPath::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     ShinyHuntCustomPath_Descriptor::Stats& stats = env.current_stats<ShinyHuntCustomPath_Descriptor::Stats>();
 
     //  Connect the controller.

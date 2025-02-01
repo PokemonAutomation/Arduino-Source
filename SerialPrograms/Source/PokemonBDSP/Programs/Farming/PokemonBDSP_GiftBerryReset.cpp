@@ -10,7 +10,7 @@
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/Tools/StatsTracking.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "Pokemon/Pokemon_Strings.h"
@@ -58,7 +58,7 @@ GiftBerryReset_Descriptor::GiftBerryReset_Descriptor()
         "Reset the game in front of the NPC that gives rare berries in Pastoria City until a desired berry is received.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 struct GiftBerryReset_Descriptor::Stats : public StatsTracker{
@@ -101,7 +101,7 @@ GiftBerryReset::GiftBerryReset()
 
 
 
-void GiftBerryReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void GiftBerryReset::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     GiftBerryReset_Descriptor::Stats& stats = env.current_stats<GiftBerryReset_Descriptor::Stats>();
     env.update_stats();
 
@@ -131,10 +131,10 @@ void GiftBerryReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext
         // dialog_detector.make_overlays(set);
         VideoSnapshot screen = env.console.video().snapshot();
         if (!dialog_detector.detect(screen)){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
                 "No npc dialog box found when reading berry name",
-                true
+                env.console
             );
         }
 
@@ -145,10 +145,10 @@ void GiftBerryReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext
             OCR::BLACK_TEXT_FILTERS()
         );
         if (result.results.empty()){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
                 "No berry name found in dialog box",
-                true
+                env.console
             );
         }
         bool found_berry = false;
@@ -172,10 +172,10 @@ void GiftBerryReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext
         // Reset game:
         pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
         if (!reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST)){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
                 "Error resetting game",
-                true
+                env.console
             );
         }
     }

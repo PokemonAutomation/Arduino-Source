@@ -29,7 +29,7 @@ ShinyHuntAutonomousIoATrade_Descriptor::ShinyHuntAutonomousIoATrade_Descriptor()
         "Hunt for shiny Isle of Armor trade using video feedback.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 std::unique_ptr<StatsTracker> ShinyHuntAutonomousIoATrade_Descriptor::make_stats() const{
@@ -93,7 +93,7 @@ ShinyHuntAutonomousIoATrade::ShinyHuntAutonomousIoATrade()
 }
 
 
-void ShinyHuntAutonomousIoATrade::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void ShinyHuntAutonomousIoATrade::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
         resume_game_back_out(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 500);

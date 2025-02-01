@@ -57,8 +57,8 @@ private:
 
 
 
-// A text as part of the video overlay.
-// It handles its own life time on video overlay: once it's destroyed, it removes itself from VideoOverlay.
+//  A text as part of the video overlay.
+//  It handles its own life time on video overlay: once it's destroyed, it removes itself from VideoOverlay.
 class OverlayTextScope : public OverlayText{
     OverlayTextScope(const OverlayTextScope&) = delete;
     void operator=(const OverlayTextScope&) = delete;

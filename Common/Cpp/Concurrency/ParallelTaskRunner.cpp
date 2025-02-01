@@ -10,6 +10,10 @@
 #include "Common/Cpp/PanicDump.h"
 #include "ParallelTaskRunner.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 
 
@@ -70,6 +74,37 @@ std::shared_ptr<AsyncTask> ParallelTaskRunner::dispatch(std::function<void()>&& 
 
     return task;
 }
+
+
+void ParallelTaskRunner::run_in_parallel(
+    const std::function<void(size_t index)>& func,
+    size_t start, size_t end,
+    size_t block_size
+){
+    if (start >= end){
+        return;
+    }
+    size_t total = end - start;
+    size_t blocks = (total + block_size - 1) / block_size;
+
+    std::vector<std::shared_ptr<AsyncTask>> tasks;
+    for (size_t c = 0; c < blocks; c++){
+        tasks.emplace_back(dispatch([=, &func]{
+            size_t s = start + c * block_size;
+            size_t e = std::min(s + block_size, end);
+//            cout << "Running: [" << s << "," << e << ")" << endl;
+            for (; s < e; s++){
+                func(s);
+            }
+        }));
+    }
+
+    for (std::shared_ptr<AsyncTask>& task : tasks){
+        task->wait_and_rethrow_exceptions();
+    }
+}
+
+
 
 
 void ParallelTaskRunner::thread_loop(){

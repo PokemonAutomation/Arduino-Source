@@ -6,8 +6,8 @@
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/Tools/StatsTracking.h"
-#include "CommonFramework/Tools/VideoResolutionCheck.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
+#include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_IvJudgeReader.h"
@@ -30,7 +30,7 @@ EggFetcher_Descriptor::EggFetcher_Descriptor()
         "Automatically fetch eggs from a picnic.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 struct EggFetcher_Descriptor::Stats : public StatsTracker{
@@ -84,7 +84,7 @@ EggFetcher::EggFetcher()
 }
 
 
-void EggFetcher::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void EggFetcher::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
     EggFetcher_Descriptor::Stats& stats = env.current_stats<EggFetcher_Descriptor::Stats>();

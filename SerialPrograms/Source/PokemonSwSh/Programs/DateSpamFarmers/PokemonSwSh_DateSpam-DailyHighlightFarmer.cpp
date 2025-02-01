@@ -26,7 +26,7 @@ DailyHighlightFarmer_Descriptor::DailyHighlightFarmer_Descriptor()
         "Farm the daily highlight watt trader in Crown Tundra.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 
@@ -49,7 +49,7 @@ DailyHighlightFarmer::DailyHighlightFarmer()
     PA_ADD_OPTION(SAVE_ITERATIONS);
 }
 
-void DailyHighlightFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void DailyHighlightFarmer::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
     }else{

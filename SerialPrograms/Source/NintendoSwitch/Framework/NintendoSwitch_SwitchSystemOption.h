@@ -18,41 +18,44 @@
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/AudioPipeline/AudioOption.h"
-#include "CommonFramework/ControllerDevices/SerialPortOption.h"
 #include "CommonFramework/VideoPipeline/CameraOption.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayOption.h"
+#include "Controllers/ControllerCapability.h"
+#include "Controllers/ControllerDescriptor.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-Color pick_color(FeedbackType feedback, PABotBaseLevel size);
+Color pick_color(FeedbackType feedback);
 
 
 class SwitchSystemOption{
-    static const std::string JSON_SERIAL;
+    static const std::string JSON_CONTROLLER;
     static const std::string JSON_CAMERA;
     static const std::string JSON_AUDIO;
     static const std::string JSON_OVERLAY;
 
 public:
     SwitchSystemOption(
-        PABotBaseLevel min_pabotbase,
+        const ControllerRequirements& requirements,
         bool allow_commands_while_running
     );
     SwitchSystemOption(
-        PABotBaseLevel min_pabotbase,
+        const ControllerRequirements& requirements,
         bool allow_commands_while_running,
         const JsonValue& json
     );
+
     void load_json(const JsonValue& json);
     JsonValue to_json() const;
 
 
 public:
+    const ControllerRequirements& m_requirements;
     const bool m_allow_commands_while_running;
 
-    SerialPortOption m_serial;
+    ControllerOption m_controller;
     CameraOption m_camera;
     AudioOption m_audio;
     VideoOverlayOption m_overlay;

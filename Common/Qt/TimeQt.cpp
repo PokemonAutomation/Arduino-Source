@@ -5,6 +5,7 @@
  */
 
 #include <QDateTime>
+#include <QTimeZone>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "TimeQt.h"
@@ -45,7 +46,7 @@ std::string to_utc_time_str(WallClock time){
 #endif
 
     int64_t secs_since_epoch = std::chrono::duration_cast<std::chrono::seconds>(time.time_since_epoch()).count();
-    QDateTime qdatetime = QDateTime::fromSecsSinceEpoch(secs_since_epoch, Qt::UTC);
+    QDateTime qdatetime = QDateTime::fromSecsSinceEpoch(secs_since_epoch, QTimeZone::utc());
     QDate qdate = qdatetime.date();
     QTime qtime = qdatetime.time();
     std::string str;
@@ -142,7 +143,7 @@ WallClock parse_utc_time_str(const std::string& str){
         throw ParseException("Invalid time.");
     }
 
-    QDateTime qdatetime(qdate, qtime, Qt::UTC);
+    QDateTime qdatetime(qdate, qtime, QTimeZone::utc());
     int64_t secs_since_epoch = qdatetime.toSecsSinceEpoch();
 
     return WallClock{} + std::chrono::seconds(secs_since_epoch);
@@ -153,12 +154,12 @@ WallClock parse_utc_time_str(const std::string& str){
 int64_t to_seconds_since_epoch(const DateTime& date){
     QDate qdate(date.year, date.month, date.day);
     QTime qtime(date.hour, date.minute, date.second);
-    QDateTime qdatetime(qdate, qtime, Qt::UTC);
+    QDateTime qdatetime(qdate, qtime, QTimeZone::utc());
     int64_t secs_since_epoch = qdatetime.toSecsSinceEpoch();
     return secs_since_epoch;
 }
 DateTime from_seconds_since_epoch(int64_t seconds_since_epoch){
-    QDateTime qdatetime = QDateTime::fromSecsSinceEpoch(seconds_since_epoch, Qt::UTC);
+    QDateTime qdatetime = QDateTime::fromSecsSinceEpoch(seconds_since_epoch, QTimeZone::utc());
     QDate qdate = qdatetime.date();
     QTime qtime = qdatetime.time();
     return DateTime{

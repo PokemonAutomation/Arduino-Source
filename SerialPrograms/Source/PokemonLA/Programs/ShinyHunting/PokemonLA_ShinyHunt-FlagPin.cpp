@@ -6,8 +6,8 @@
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/Tools/StatsTracking.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
@@ -33,7 +33,7 @@ ShinyHuntFlagPin_Descriptor::ShinyHuntFlagPin_Descriptor()
         "Repeatedly travel to a flag pin to shiny hunt " + STRING_POKEMON + " around it.",
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 class ShinyHuntFlagPin_Descriptor::Stats : public StatsTracker, public ShinyStatIncrementer{
@@ -126,7 +126,7 @@ ShinyHuntFlagPin::ShinyHuntFlagPin()
 
 
 
-void ShinyHuntFlagPin::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void ShinyHuntFlagPin::run_iteration(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     ShinyHuntFlagPin_Descriptor::Stats& stats = env.current_stats<ShinyHuntFlagPin_Descriptor::Stats>();
     stats.attempts++;
 
@@ -148,9 +148,9 @@ void ShinyHuntFlagPin::run_iteration(SingleSwitchProgramEnvironment& env, BotBas
             return on_shiny_callback(env, env.console, *shiny_action, error_coefficient);
         });
 
-        int ret = run_until(
+        int ret = run_until<SwitchControllerContext>(
             env.console, context,
-            [&](BotBaseContext& context){
+            [&](SwitchControllerContext& context){
                 goto_camp_from_jubilife(env, env.console, context, TRAVEL_LOCATION);
                 FlagNavigationAir session(
                     env, env.console, context,
@@ -184,7 +184,7 @@ void ShinyHuntFlagPin::run_iteration(SingleSwitchProgramEnvironment& env, BotBas
 }
 
 
-void ShinyHuntFlagPin::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void ShinyHuntFlagPin::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     ShinyHuntFlagPin_Descriptor::Stats& stats = env.current_stats<ShinyHuntFlagPin_Descriptor::Stats>();
 
     //  Connect the controller.

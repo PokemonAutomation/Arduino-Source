@@ -5,7 +5,7 @@
  */
 
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
@@ -30,7 +30,7 @@ ShinyHuntAutonomousBerryTree_Descriptor::ShinyHuntAutonomousBerryTree_Descriptor
         "Automatically hunt for shiny berry tree " + STRING_POKEMON + " using video feedback.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 std::unique_ptr<StatsTracker> ShinyHuntAutonomousBerryTree_Descriptor::make_stats() const{
@@ -74,7 +74,7 @@ ShinyHuntAutonomousBerryTree::ShinyHuntAutonomousBerryTree()
 
 
 
-void ShinyHuntAutonomousBerryTree::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void ShinyHuntAutonomousBerryTree::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
         resume_game_no_interact(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
@@ -106,9 +106,9 @@ void ShinyHuntAutonomousBerryTree::program(SingleSwitchProgramEnvironment& env, 
             StandardBattleMenuWatcher battle_menu_detector(false);
             StartBattleWatcher start_battle_detector;
 
-            int result = run_until(
+            int result = run_until<SwitchControllerContext>(
                 env.console, context,
-                [](BotBaseContext& context){
+                [](SwitchControllerContext& context){
                     pbf_mash_button(context, BUTTON_A, 60 * TICKS_PER_SECOND);
                 },
                 {

@@ -28,7 +28,7 @@ SeedFinder_Descriptor::SeedFinder_Descriptor()
         "Finds the current state to be used for manual RNG manipulation.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 
@@ -91,7 +91,7 @@ SeedFinder::SeedFinder()
 
 
 
-void SeedFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void SeedFinder::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     Xoroshiro128PlusState state(0, 0);
     // sanitize STATE_0 and STATE_1 and make ints
     if (UPDATE_STATE){

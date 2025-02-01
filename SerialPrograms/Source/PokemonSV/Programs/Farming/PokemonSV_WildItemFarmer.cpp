@@ -4,13 +4,12 @@
  *
  */
 
-//#include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/ImageTools/SolidColorTest.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
-#include "CommonFramework/Tools/StatsTracking.h"
-#include "CommonFramework/Tools/VideoResolutionCheck.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
+#include "CommonTools/Images/SolidColorTest.h"
+#include "CommonTools/Async/InferenceRoutines.h"
+#include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h"
@@ -36,7 +35,7 @@ WildItemFarmer_Descriptor::WildItemFarmer_Descriptor()
         "Farm an item held by a wild " + Pokemon::STRING_POKEMON + ".",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 
@@ -116,7 +115,7 @@ WildItemFarmer::WildItemFarmer()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void WildItemFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void WildItemFarmer::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     try{
         run_program(env, context);
     }catch (...){
@@ -125,7 +124,7 @@ void WildItemFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext
     }
 }
 
-void WildItemFarmer::refresh_pp(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void WildItemFarmer::refresh_pp(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     int move_overwrites = 0;
     bool move_selected = false;
     while (true){
@@ -184,16 +183,16 @@ void WildItemFarmer::refresh_pp(SingleSwitchProgramEnvironment& env, BotBaseCont
             continue;
 
         default:
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
                 "No state detected while changing moves after 10 seconds.",
-                true
+                env.console
             );
         }
     }
 }
 
-bool WildItemFarmer::verify_item_held(SingleSwitchProgramEnvironment& env, BotBaseContext& context, NormalBattleMenuWatcher& battle_menu){
+bool WildItemFarmer::verify_item_held(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, NormalBattleMenuWatcher& battle_menu){
     env.log("Verifying that item has been taken...");
 
     while (true){
@@ -218,10 +217,10 @@ bool WildItemFarmer::verify_item_held(SingleSwitchProgramEnvironment& env, BotBa
             break;
 
         default:
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
                 "Unable to detect " + Pokemon::STRING_POKEMON + " select menu.",
-                true
+                env.console
             );
         }
 
@@ -234,18 +233,18 @@ bool WildItemFarmer::verify_item_held(SingleSwitchProgramEnvironment& env, BotBa
     bool item_held = !is_solid(stats, {0.550405, 0.449595, 0.}, 0.20);
 
     {
-        int ret = run_until(
+        int ret = run_until<SwitchControllerContext>(
             env.console, context,
-            [](BotBaseContext& context){
+            [](SwitchControllerContext& context){
                 pbf_mash_button(context, BUTTON_B, 500);
             },
             {battle_menu}
         );
         if (ret < 0){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
                 "Unable to back out to battle menu.",
-                true
+                env.console
             );
         }
     }
@@ -254,7 +253,7 @@ bool WildItemFarmer::verify_item_held(SingleSwitchProgramEnvironment& env, BotBa
 }
 
 
-void WildItemFarmer::run_program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void WildItemFarmer::run_program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
     WildItemFarmer_Descriptor::Stats& stats = env.current_stats<WildItemFarmer_Descriptor::Stats>();
 
@@ -317,10 +316,10 @@ void WildItemFarmer::run_program(SingleSwitchProgramEnvironment& env, BotBaseCon
             if (consecutive_throw_attempts >= MANUVERS.size()){
                 stats.errors++;
                 env.update_stats();
-                throw OperationFailedException(
-                    ErrorReport::NO_ERROR_REPORT, env.console,
+                OperationFailedException::fire(
+                    ErrorReport::NO_ERROR_REPORT,
                     "Failed to start battle after " + std::to_string(MANUVERS.size()) + " attempts.",
-                    true
+                    env.console
                 );
             }
 
@@ -360,10 +359,10 @@ void WildItemFarmer::run_program(SingleSwitchProgramEnvironment& env, BotBaseCon
                 }else{
                     stats.failed++;
                     env.update_stats();
-                    throw OperationFailedException(
-                        ErrorReport::NO_ERROR_REPORT, env.console,
+                    OperationFailedException::fire(
+                        ErrorReport::NO_ERROR_REPORT,
                         "Failed to clone item. Possible incorrect encounter.",
-                        true
+                        env.console
                     );
                 }
             }
@@ -449,10 +448,10 @@ void WildItemFarmer::run_program(SingleSwitchProgramEnvironment& env, BotBaseCon
             continue;
 
         default:
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
                 "No state detected after 120 seconds.",
-                true
+                env.console
             );
         }
 

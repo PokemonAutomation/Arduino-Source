@@ -7,9 +7,9 @@
 #ifndef PokemonAutomation_PokemonSV_TeraBattler_H
 #define PokemonAutomation_PokemonSV_TeraBattler_H
 
-#include "ClientSource/Connection/BotBase.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
+#include "CommonFramework/Tools/VideoStream.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 #include "PokemonSV/Options/PokemonSV_TeraAIOption.h"
 
 namespace PokemonAutomation{
@@ -20,7 +20,7 @@ namespace PokemonSV{
 //  Run a tera battle until you either win or lose.
 bool run_tera_battle(
     ProgramEnvironment& env,
-    ConsoleHandle& console, BotBaseContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     TeraAIOption& battle_AI
 );
 

@@ -4,8 +4,8 @@
  *
  */
 
-#include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonBDSP/PokemonBDSP_Settings.h"
@@ -26,7 +26,7 @@ MassRelease_Descriptor::MassRelease_Descriptor()
         "Mass release boxes of " + STRING_POKEMON + ".",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 struct MassRelease_Descriptor::Stats : public StatsTracker{
@@ -66,7 +66,7 @@ MassRelease::MassRelease()
 
 
 
-void MassRelease::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void MassRelease::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     MassRelease_Descriptor::Stats& stats = env.current_stats<MassRelease_Descriptor::Stats>();
     env.update_stats();
 

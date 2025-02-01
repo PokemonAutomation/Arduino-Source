@@ -6,7 +6,8 @@
 
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
-#include "NintendoSwitch/FixedInterval.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_GameEntry.h"
@@ -26,7 +27,7 @@ TradeBot_Descriptor::TradeBot_Descriptor()
         "Surprise trade with a code for hosting giveaways.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 
@@ -103,7 +104,7 @@ TradeBot::TradeBot()
 }
 
 
-void TradeBot::trade_slot(BotBaseContext& context, const uint8_t code[8], uint8_t slot) const{
+void TradeBot::trade_slot(SwitchControllerContext& context, const uint8_t code[8], uint8_t slot) const{
     ssf_press_button2(context, BUTTON_Y, GameSettings::instance().OPEN_YCOMM_DELAY, 50);
     ssf_press_button2(context, BUTTON_A, 150, 20);
     ssf_press_dpad1(context, DPAD_DOWN, 10);
@@ -154,7 +155,7 @@ void TradeBot::trade_slot(BotBaseContext& context, const uint8_t code[8], uint8_
     }
 }
 
-void TradeBot::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void TradeBot::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     uint8_t code[8];
     TRADE_CODE.to_str(code);
 

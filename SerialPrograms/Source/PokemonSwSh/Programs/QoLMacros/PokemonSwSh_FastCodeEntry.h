@@ -27,7 +27,7 @@ class FastCodeEntry : public SingleSwitchProgramInstance{
 public:
     FastCodeEntry();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
     FixedCodeOption RAID_CODE;

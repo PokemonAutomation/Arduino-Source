@@ -5,7 +5,8 @@
  */
 
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
-#include "NintendoSwitch/FixedInterval.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_GameEntry.h"
@@ -25,7 +26,7 @@ SurpriseTrade_Descriptor::SurpriseTrade_Descriptor()
         "Surprise trade away boxes of " + STRING_POKEMON,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 
@@ -69,7 +70,7 @@ SurpriseTrade::SurpriseTrade()
 }
 
 
-void SurpriseTrade::trade_slot(BotBaseContext& context, uint8_t slot, bool next_box) const{
+void SurpriseTrade::trade_slot(SwitchControllerContext& context, uint8_t slot, bool next_box) const{
     ssf_press_button2(context, BUTTON_Y, GameSettings::instance().OPEN_YCOMM_DELAY, 50);
     ssf_press_dpad1(context, DPAD_DOWN, 10);
     ssf_press_button2(context, BUTTON_A, 280, 20);
@@ -103,7 +104,7 @@ void SurpriseTrade::trade_slot(BotBaseContext& context, uint8_t slot, bool next_
     pbf_mash_button(context, BUTTON_B, TRADE_ANIMATION);
 }
 
-void SurpriseTrade::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void SurpriseTrade::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
         resume_game_no_interact(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);

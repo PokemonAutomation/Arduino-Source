@@ -4,13 +4,13 @@
  *
  */
 
-#include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
+#include "CommonTools/Images/SolidColorTest.h"
 #include "PokemonBDSP_DialogDetector.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

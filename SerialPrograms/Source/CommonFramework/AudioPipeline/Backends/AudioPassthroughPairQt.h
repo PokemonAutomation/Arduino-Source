@@ -10,6 +10,8 @@
 #include <memory>
 #include <set>
 #include <QObject>
+#include "Common/Cpp/ListenerSet.h"
+#include "Common/Cpp/LifetimeSanitizer.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/AudioPipeline/AudioPassthroughPair.h"
 
@@ -23,6 +25,9 @@ class AudioFloatToFFT;
 
 class AudioPassthroughPairQt final : public QObject, public AudioPassthroughPair{
 public:
+    virtual void add_listener(AudioFloatStreamListener& listener) override;
+    virtual void remove_listener(AudioFloatStreamListener& listener) override;
+
     virtual void add_listener(FFTListener& listener) override;
     virtual void remove_listener(FFTListener& listener) override;
 
@@ -79,7 +84,10 @@ private:
     std::unique_ptr<AudioFloatToFFT> m_fft_runner;
     std::unique_ptr<InternalFFTListener> m_fft_listener;    //  Attaches to m_fft_runner"".
 
-    std::set<FFTListener*> m_listeners;
+    ListenerSet<AudioFloatStreamListener> m_stream_listeners;
+    ListenerSet<FFTListener> m_fft_listeners;
+
+    LifetimeSanitizer m_sanitizer;
 };
 
 

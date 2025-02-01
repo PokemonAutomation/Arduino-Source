@@ -6,7 +6,7 @@
 
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
-#include "NintendoSwitch/FixedInterval.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
@@ -18,7 +18,7 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-void enter_den(BotBaseContext& context, uint16_t ENTER_ONLINE_DEN_DELAY, bool watts, bool online){
+void enter_den(SwitchControllerContext& context, uint16_t ENTER_ONLINE_DEN_DELAY, bool watts, bool online){
     if (!online){
         if (!watts){
             ssf_press_button2(context, BUTTON_A, GameSettings::instance().ENTER_OFFLINE_DEN_DELAY, 10);
@@ -39,7 +39,7 @@ void enter_den(BotBaseContext& context, uint16_t ENTER_ONLINE_DEN_DELAY, bool wa
 }
 
 
-void enter_lobby(BotBaseContext& context, uint16_t OPEN_ONLINE_DEN_LOBBY_DELAY, bool online, Catchability catchability){
+void enter_lobby(SwitchControllerContext& context, uint16_t OPEN_ONLINE_DEN_LOBBY_DELAY, bool online, Catchability catchability){
     if (online){
         switch (catchability){
         case Catchability::ALWAYS_CATCHABLE:
@@ -83,7 +83,7 @@ void enter_lobby(BotBaseContext& context, uint16_t OPEN_ONLINE_DEN_LOBBY_DELAY, 
 
 
 void roll_den(
-    ConsoleHandle& console, BotBaseContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     uint16_t ENTER_ONLINE_DEN_DELAY,
     uint16_t OPEN_ONLINE_DEN_LOBBY_DELAY,
     uint8_t skips, Catchability catchability
@@ -101,12 +101,12 @@ void roll_den(
         roll_date_forward_1(context, false);
 
         //  Enter game
-        if (console.video().snapshot()){
-            console.log("Entering game using inference...");
+        if (stream.video().snapshot()){
+            stream.log("Entering game using inference...");
             pbf_press_button(context, BUTTON_HOME, 10, 90);
-            NintendoSwitch::resume_game_from_home(console, context);
+            NintendoSwitch::resume_game_from_home(stream, context);
         }else{
-            console.log("Entering game without inference...", COLOR_RED);
+            stream.log("Entering game without inference...", COLOR_RED);
             settings_to_enter_game_den_lobby(
                 context,
                 ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_SLOW, true,
@@ -119,7 +119,7 @@ void roll_den(
         ssf_press_button2(context, BUTTON_A, GameSettings::instance().REENTER_DEN_DELAY, 50);
     }
 }
-void rollback_date_from_home(BotBaseContext& context, uint8_t skips){
+void rollback_date_from_home(SwitchControllerContext& context, uint8_t skips){
     if (skips == 0){
         return;
     }

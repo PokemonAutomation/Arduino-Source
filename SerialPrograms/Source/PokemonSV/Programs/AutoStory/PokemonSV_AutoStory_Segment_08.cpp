@@ -4,19 +4,11 @@
  *
  */
 
-#include "CommonFramework/GlobalSettingsPanel.h"
-#include "CommonFramework/Exceptions/FatalProgramException.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
-#include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/Tools/StatsTracking.h"
-#include "CommonFramework/Tools/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "Pokemon/Pokemon_Strings.h"
-#include "PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h"
+#include "PokemonSV/Inference/PokemonSV_TutorialDetector.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_SaveGame.h"
-#include "PokemonSV/Inference/PokemonSV_TutorialDetector.h"
+#include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSV_AutoStoryTools.h"
 #include "PokemonSV_AutoStory_Segment_08.h"
 
@@ -29,8 +21,6 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
-
-using namespace Pokemon;
 
 
 
@@ -47,7 +37,11 @@ std::string AutoStory_Segment_08::end_text() const{
     return "End: Battled Team Star, talked to Jacq, standing in classroom.";
 }
 
-void AutoStory_Segment_08::run_segment(SingleSwitchProgramEnvironment& env, BotBaseContext& context, AutoStoryOptions options) const{
+void AutoStory_Segment_08::run_segment(
+    SingleSwitchProgramEnvironment& env,
+    SwitchControllerContext& context,
+    AutoStoryOptions options
+) const{
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
 
     context.wait_for_all_requests();
@@ -68,7 +62,7 @@ void AutoStory_Segment_08::run_segment(SingleSwitchProgramEnvironment& env, BotB
 
 void checkpoint_13(
     SingleSwitchProgramEnvironment& env, 
-    BotBaseContext& context, 
+    SwitchControllerContext& context, 
     EventNotificationOption& notif_status_update
 ){
     // reset rate: 0%. 0 resets out of 70.
@@ -77,7 +71,7 @@ void checkpoint_13(
     while (true){
     try{
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
-        [&](const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){        
+        [&](const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
         
             if (first_attempt){
                 checkpoint_save(env, context, notif_status_update);
@@ -119,7 +113,7 @@ void checkpoint_13(
 
 void checkpoint_14(
     SingleSwitchProgramEnvironment& env, 
-    BotBaseContext& context, 
+    SwitchControllerContext& context, 
     EventNotificationOption& notif_status_update
 ){
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
@@ -177,7 +171,7 @@ void checkpoint_14(
 
 void checkpoint_15(
     SingleSwitchProgramEnvironment& env, 
-    BotBaseContext& context, 
+    SwitchControllerContext& context, 
     EventNotificationOption& notif_status_update
 ){
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();

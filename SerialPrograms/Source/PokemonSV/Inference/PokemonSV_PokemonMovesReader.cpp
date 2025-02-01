@@ -4,16 +4,14 @@
  *
  */
 
-#include <algorithm>
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
+#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
+#include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "PokemonSV_PokemonMovesReader.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -76,9 +74,8 @@ std::string PokemonMovesReader::read_move(Logger& logger, const ImageViewRGB32& 
     }
 
     if (results.size() > 1){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, 
-            logger,
+        throw_and_log<OperationFailedException>(
+            logger, ErrorReport::SEND_ERROR_REPORT,
             "MenuOption::read_option(): Unable to read item. Ambiguous or multiple results."
         );
     }

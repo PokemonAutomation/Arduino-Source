@@ -4,23 +4,20 @@
  *
  */
 
-#include "CommonFramework/ImageTools/ImageFilter.h"
-#include "CommonFramework/ImageTools/ImageGradient.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
-#include "CommonFramework/ImageTools/SolidColorTest.h"
-#include "CommonFramework/ImageTypes/ImageRGB32.h"
-#include "CommonFramework/OCR/OCR_Routines.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
+#include "CommonFramework/Tools/DebugDumper.h"
+#include "CommonTools/Images/ImageFilter.h"
+#include "CommonTools/Images/ImageGradient.h"
+#include "CommonTools/OCR/OCR_Routines.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_ButtonDetector.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_ShinySymbolDetector.h"
 #include "PokemonLA_WildPokemonFocusDetector.h"
-#include "CommonFramework/Tools/DebugDumper.h"
 
-#include <sstream>
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

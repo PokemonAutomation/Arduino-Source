@@ -9,8 +9,7 @@
 #define PokemonAutomation_PokemonLA_BlackOutDetector_H
 
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
-// #include "PokemonLA/Inference/Objects/PokemonLA_ButtonDetector.h"
+#include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_DialogueYellowArrowDetector.h"
 
 namespace PokemonAutomation{

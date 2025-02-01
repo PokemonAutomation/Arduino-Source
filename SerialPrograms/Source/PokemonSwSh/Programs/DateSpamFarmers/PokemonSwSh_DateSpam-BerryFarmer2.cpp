@@ -4,14 +4,13 @@
  *
  */
 
-//#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Time.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
@@ -36,7 +35,7 @@ BerryFarmer2_Descriptor::BerryFarmer2_Descriptor()
         "Farm berries using Feedback.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 
@@ -143,7 +142,7 @@ BerryFarmer2::BerryFarmer2()
 }
 
 
-BerryFarmer2::Rustling BerryFarmer2::check_rustling(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+BerryFarmer2::Rustling BerryFarmer2::check_rustling(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     BerryFarmer2_Descriptor::Stats& stats = env.current_stats<BerryFarmer2_Descriptor::Stats>();
 
     // wait some time in order to not detect rustling from previous fetch attempt
@@ -170,9 +169,9 @@ BerryFarmer2::Rustling BerryFarmer2::check_rustling(SingleSwitchProgramEnvironme
     StartBattleWatcher start_battle_detector;
 
     Rustling result = Rustling::No;
-    int ret = run_until(
+    int ret = run_until<SwitchControllerContext>(
         env.console, context,
-        [&](BotBaseContext& context){
+        [&](SwitchControllerContext& context){
             pbf_wait(context, RUSTLING_TIMEOUT);
             context.wait_for_all_requests();
         },
@@ -184,9 +183,9 @@ BerryFarmer2::Rustling BerryFarmer2::check_rustling(SingleSwitchProgramEnvironme
         WallClock initial_rustling_time = current_time();
         result = Rustling::Slow;
 
-        int ret1 = run_until(
+        int ret1 = run_until<SwitchControllerContext>(
             env.console, context,
-            [&](BotBaseContext& context){
+            [&](SwitchControllerContext& context){
                 pbf_wait(context, RUSTLING_TIMEOUT);
                 context.wait_for_all_requests();
             },
@@ -244,7 +243,7 @@ BerryFarmer2::Rustling BerryFarmer2::check_rustling(SingleSwitchProgramEnvironme
     return result;
 }
 
-uint16_t BerryFarmer2::do_secondary_attempts(SingleSwitchProgramEnvironment& env, BotBaseContext& context, Rustling rustling){
+uint16_t BerryFarmer2::do_secondary_attempts(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, Rustling rustling){
     BerryFarmer2_Descriptor::Stats& stats = env.current_stats<BerryFarmer2_Descriptor::Stats>();
 
     uint8_t no_rustling = (rustling == Rustling::No) ? 1 : 0;
@@ -285,7 +284,7 @@ uint16_t BerryFarmer2::do_secondary_attempts(SingleSwitchProgramEnvironment& env
     return attempts;
 }
 
-void BerryFarmer2::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void BerryFarmer2::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
     }else{

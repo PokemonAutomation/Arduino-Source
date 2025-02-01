@@ -8,15 +8,14 @@
 #define PokemonAutomation_PokemonSV_ItemPrinterJobsDetector_H
 
 #include "Common/Cpp/Color.h"
-#include "CommonFramework/Language.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonFramework/Inference/VisualDetector.h"
+#include "CommonFramework/Tools/VideoStream.h"
+#include "CommonTools/VisualDetector.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 
 namespace PokemonAutomation{
     class Logger;
     class AsyncDispatcher;
-    class ConsoleHandle;
-    class BotBaseContext;
 namespace NintendoSwitch{
 namespace PokemonSV{
 
@@ -30,7 +29,7 @@ public:
     //  "jobs" jobs must be 1, 5, or 10.
     void set_print_jobs(
         AsyncDispatcher& dispatcher,
-        ConsoleHandle& console, BotBaseContext& context, uint8_t jobs
+        VideoStream& stream, SwitchControllerContext& context, uint8_t jobs
     ) const;
 
 

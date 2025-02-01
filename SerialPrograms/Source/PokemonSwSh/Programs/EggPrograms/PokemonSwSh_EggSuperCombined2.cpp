@@ -25,7 +25,7 @@ EggSuperCombined2_Descriptor::EggSuperCombined2_Descriptor()
         "Fetch and hatch eggs at the same time. (Fastest - 1700 eggs/day for 5120-step)",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 
@@ -88,7 +88,7 @@ EggSuperCombined2::EggSuperCombined2()
     PA_ADD_OPTION(HATCH_DELAY);
 }
 
-void EggSuperCombined2::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void EggSuperCombined2::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     EggCombinedSession session{
         BOXES_TO_HATCH,
         STEPS_TO_HATCH,

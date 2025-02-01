@@ -5,7 +5,7 @@
  */
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/ErrorReports/ErrorReports.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
@@ -54,7 +54,7 @@ AdventureResult run_adventure(
     std::atomic<bool> stop(false);
     std::atomic<bool> error(false);
 
-    env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
+    env.run_in_parallel(scope, [&](ConsoleHandle& console, SwitchControllerContext& context){
         StateMachineAction action;
         while (true){
             //  Dump current state, but don't spam if nothing has changed.
@@ -130,6 +130,7 @@ void loop_adventures(
     Stats& stats = env.current_stats<Stats>();
 
     AdventureRuntime runtime(
+        env.consoles,
         host_index,
         consoles,
         decider,
@@ -144,7 +145,7 @@ void loop_adventures(
     while (true){
         //  Touch the date.
         if (TOUCH_DATE_INTERVAL.ok_to_touch_now()){
-            env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
+            env.run_in_parallel(scope, [&](ConsoleHandle& console, SwitchControllerContext& context){
                 env.log("Touching date to prevent rollover.");
                 pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
                 touch_date_from_home(context, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
@@ -162,19 +163,19 @@ void loop_adventures(
         case AdventureResult::START_ERROR:
             restart_count++;
             if (restart_count == 3){
-                send_program_telemetry(
-                    env.logger(), true, COLOR_RED, env.program_info(),
+                report_error(
+                    &env.logger(),
+                    env.program_info(),
                     "Error",
-                    {{"Message:", "Failed to start adventure 3 times in the row."}},
-                    ""
+                    {{"Message:", "Failed to start adventure 3 times in the row."}}
                 );
-                throw OperationFailedException(
-                    ErrorReport::SEND_ERROR_REPORT, env.logger(),
+                throw_and_log<OperationFailedException>(
+                    env.logger(), ErrorReport::SEND_ERROR_REPORT,
                     "Failed to start adventure 3 times in the row."
                 );
             }
             env.log("Failed to start adventure. Resetting all Switches...", COLOR_RED);
-            env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
+            env.run_in_parallel(scope, [&](ConsoleHandle& console, SwitchControllerContext& context){
                 pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
                 reset_game_from_home_with_inference(console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
             });

@@ -4,10 +4,9 @@
  *
  */
 
-#include "Common/Compiler.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
-#include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "CommonTools/Images/SolidColorTest.h"
 #include "PokemonBDSP_MenuDetector.h"
 
 namespace PokemonAutomation{

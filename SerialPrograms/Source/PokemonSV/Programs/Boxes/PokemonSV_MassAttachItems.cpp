@@ -6,17 +6,15 @@
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-//#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
-#include "CommonFramework/Tools/StatsTracking.h"
-#include "CommonFramework/Tools/VideoResolutionCheck.h"
-//#include "CommonFramework/Tools/ErrorDumper.h"
+#include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxEggDetector.h"
-#include "PokemonSV/Programs/Boxes/PokemonSV_BoxRoutines.h"
 #include "PokemonSV/Programs/Boxes/PokemonSV_BoxAttach.h"
+#include "PokemonSV/Programs/Boxes/PokemonSV_BoxRoutines.h"
 #include "PokemonSV_MassAttachItems.h"
 
 namespace PokemonAutomation{
@@ -34,7 +32,7 @@ MassAttachItems_Descriptor::MassAttachItems_Descriptor()
         "Mass attach items to " + STRING_POKEMON + ".",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 struct MassAttachItems_Descriptor::Stats : public StatsTracker{
@@ -101,7 +99,7 @@ MassAttachItems::MassAttachItems()
 
 
 
-void MassAttachItems::attach_one(BoxDetector& box_detector, SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void MassAttachItems::attach_one(BoxDetector& box_detector, SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     MassAttachItems_Descriptor::Stats& stats = env.current_stats<MassAttachItems_Descriptor::Stats>();
 
     env.log("Selecting " + STRING_POKEMON + "...");
@@ -135,7 +133,7 @@ void MassAttachItems::attach_one(BoxDetector& box_detector, SingleSwitchProgramE
         throw;
     }
 }
-void MassAttachItems::attach_box(BoxDetector& box_detector, SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void MassAttachItems::attach_box(BoxDetector& box_detector, SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     for (uint8_t row = 0; row < 5; row++){
         for (uint8_t j_col = 0; j_col < 6; j_col++){
             // Go through slots in a Z-shape pattern
@@ -149,7 +147,7 @@ void MassAttachItems::attach_box(BoxDetector& box_detector, SingleSwitchProgramE
 
 
 
-void MassAttachItems::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void MassAttachItems::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
     MassAttachItems_Descriptor::Stats& stats = env.current_stats<MassAttachItems_Descriptor::Stats>();

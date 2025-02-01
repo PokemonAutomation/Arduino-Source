@@ -29,15 +29,14 @@
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonFramework/ImageTools/ImageFilter.h"
-#include "CommonFramework/OCR/OCR_RawOCR.h"
-#include "CommonFramework/OCR/OCR_Routines.h"
+#include "CommonTools/OCR/OCR_RawOCR.h"
+#include "CommonTools/OCR/OCR_Routines.h"
 #include "PokemonSV/Inference/Tera/PokemonSV_TeraCodeReader.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_BattleMenu.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PathSelect.h"
 #include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_State.h"
 #include "PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI.h"
-#include "CommonFramework/ImageMatch/ExactImageMatcher.h"
+#include "CommonTools/ImageMatch/ExactImageMatcher.h"
 #include "TestProgramComputer.h"
 #include "ClientSource/Libraries/Logging.h"
 #include "Common/Cpp/Containers/Pimpl.tpp"
@@ -48,14 +47,11 @@
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_MarkFinder.h"
-#include "CommonFramework/Inference/ImageMatchDetector.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_SelectionArrowFinder.h"
 #include "Common/Cpp/Containers/AlignedVector.tpp"
 #include "CommonFramework/Tools/FileDownloader.h"
-#include "CommonFramework/Inference/BlackScreenDetector.h"
-#include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "PokemonLA/Inference/PokemonLA_MountDetector.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_ArcPhoneDetector.h"
@@ -84,8 +80,6 @@
 #include "PokemonSwSh/Options/EncounterFilter/PokemonSwSh_EncounterFilterEnums.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_Lobby.h"
 
-#include "CommonFramework/ImageTools/ImageFilter.h"
-#include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogArrowDetector.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.h"
@@ -95,27 +89,21 @@
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "Integrations/DiscordWebhook.h"
 #include "PokemonSV/Programs/TeraRaids/PokemonSV_JoinTracker.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.h"
 #include "CommonFramework/Environment/Environment.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Qt/TimeQt.h"
 #include "PokemonSV/Inference/Picnics/PokemonSV_SandwichHandDetector.h"
-#include "CommonFramework/Inference/StatAccumulator.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
-#include "ClientSource/Connection/BotBase.h"
 #include "CommonFramework/Environment/Environment.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_LetsGoKillDetector.h"
 #include "PokemonSV/Inference/PokemonSV_SweatBubbleDetector.h"
 #include "Pokemon/Resources/Pokemon_PokemonSlugs.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_NormalBattleMenus.h"
 #include "Pokemon/Resources/Pokemon_PokemonNames.h"
-#include "CommonFramework/OCR/OCR_NumberReader.h"
-#include "CommonFramework/ImageTools/ImageManip.h"
+#include "CommonTools/OCR/OCR_NumberReader.h"
 #include "PokemonSV/Resources/PokemonSV_Ingredients.h"
 #include "Kernels/ImageStats/Kernels_ImagePixelSumSqr.h"
-#include "CommonFramework/ImageMatch/ImageDiff.h"
-#include "CommonFramework/Inference/BlackBorderDetector.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.h"
 #include "Common/Cpp/Concurrency/Watchdog.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_TeraBattleMenus.h"
@@ -149,6 +137,7 @@
 #endif
 
 //#include <opencv2/core.hpp>
+#include <random>
 
 
 #include <iostream>
@@ -230,10 +219,6 @@ class WatchdogTest1 : public WatchdogCallback{
 
 
 
-
-
-
-
 void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& scope){
     using namespace Kernels;
     using namespace NintendoSwitch;
@@ -242,8 +227,44 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     using namespace Pokemon;
     using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
 
+#if 0
+    send_program_notification_with_file(
+        env, NOTIFICATION_PROGRAM_FINISH, COLOR_BLUE,
+        "test notification",
+        {},
+        "",
+        "test.txt"
+    );
+#endif
 
 
+//    ImageRGB32 image("Screenshots/20241128-152424608121.png");
+#if 0
+    send_error_report(
+        env.logger(),
+        env.program_info(),
+        "testtest",
+        {{"title", "message"}},
+        image,
+//        ImageRGB32(),
+        {"test.txt", "test2.txt"}
+    );
+#endif
+
+
+    int* ptr = nullptr;
+    cout << ptr[0] << endl;
+
+#if 0
+    std::random_device rndsource;
+    std::minstd_rand rndgen(rndsource());
+    std::uniform_real_distribution<double> dist(0, 1.0);
+
+    cout << dist(rndgen) << endl;
+    cout << dist(rndgen) << endl;
+    cout << dist(rndgen) << endl;
+    cout << dist(rndgen) << endl;
+#endif
 
 #if 0
     PokemonSV::DateSeed data = PokemonSV::ItemPrinter::calculate_seed_prizes(2346161588);
@@ -507,8 +528,8 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     OCR::read_number(env.logger(), filtered);
 #endif
 
-//    throw OperationFailedException(env.logger(), "asdf");
-//    throw OperationFailedException(env.logger(), "asdf", std::make_shared<ImageRGB32>("20221118-024539201323.jpg"));
+//    OperationFailedException::fire(env.logger(), "asdf");
+//    OperationFailedException::fire(env.logger(), "asdf", std::make_shared<ImageRGB32>("20221118-024539201323.jpg"));
 //    throw ProgramFinishedException();
 //    throw FatalProgramException(env.logger(), "test");
 

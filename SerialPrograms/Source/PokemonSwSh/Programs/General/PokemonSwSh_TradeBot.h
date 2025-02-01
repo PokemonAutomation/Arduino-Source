@@ -31,10 +31,10 @@ class TradeBot : public SingleSwitchProgramInstance{
 public:
     TradeBot();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
-    void trade_slot(BotBaseContext& context, const uint8_t code[8], uint8_t slot) const;
+    void trade_slot(SwitchControllerContext& context, const uint8_t code[8], uint8_t slot) const;
 
 private:
     StartInGripOrGameOption START_LOCATION;

@@ -19,10 +19,8 @@
 #include <set>
 #include <map>
 #include <deque>
-#include "Common/Compiler.h"
 #include "Common/Cpp/Color.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
-#include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "VideoOverlay.h"
 #include "VideoOverlayOption.h"
 
@@ -56,14 +54,17 @@ public:
         //  change the structure of the list itself, you must first call this
         //  with null to remove it from all the listeners. Then add the updated
         //  one back when you're done.
+        //  This is called immediately when attaching a listener to give the
+        //  current stats. The listener must drop all references to the stats
+        //  before detaching.
         virtual void update_stats(const std::list<OverlayStat*>* stats){}
 
     };
 
-    // Add a UI class to listen to any overlay change. The UI class needs to inherit Listener.
-    // Must call `remove_listener()` before listener is destroyed.
+    //  Add a UI class to listen to any overlay change. The UI class needs to inherit Listener.
+    //  Must call `remove_listener()` before listener is destroyed.
     void add_listener(Listener& listener);
-    // remove a UI class that listens to the overlay change, added by `add_listener()`.
+    //  Remove a UI class that listens to the overlay change, added by `add_listener()`.
     void remove_listener(Listener& listener);
 
 public:

@@ -10,7 +10,7 @@
 
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
+#include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_ButtonDetector.h"
 
 namespace PokemonAutomation{

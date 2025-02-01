@@ -4,20 +4,15 @@
  *
  */
 
-#include "CommonFramework/GlobalSettingsPanel.h"
-#include "CommonFramework/Exceptions/FatalProgramException.h"
+#include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
-#include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/Tools/StatsTracking.h"
-#include "CommonFramework/Tools/VideoResolutionCheck.h"
+#include "CommonTools/Async/InferenceRoutines.h"
+#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "Pokemon/Pokemon_Strings.h"
-#include "PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h"
+#include "PokemonSV/Inference/PokemonSV_TutorialDetector.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_SaveGame.h"
-#include "PokemonSV/Inference/PokemonSV_TutorialDetector.h"
-#include "CommonFramework/Inference/BlackScreenDetector.h"
+#include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSV_AutoStoryTools.h"
 #include "PokemonSV_AutoStory_Segment_10.h"
 
@@ -30,8 +25,6 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
-
-using namespace Pokemon;
 
 
 
@@ -48,7 +41,11 @@ std::string AutoStory_Segment_10::end_text() const{
     return "End: At Cortondo East Pokecenter.";
 }
 
-void AutoStory_Segment_10::run_segment(SingleSwitchProgramEnvironment& env, BotBaseContext& context, AutoStoryOptions options) const{
+void AutoStory_Segment_10::run_segment(
+    SingleSwitchProgramEnvironment& env,
+    SwitchControllerContext& context,
+    AutoStoryOptions options
+) const{
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
 
     context.wait_for_all_requests();
@@ -67,7 +64,7 @@ void AutoStory_Segment_10::run_segment(SingleSwitchProgramEnvironment& env, BotB
 
 void checkpoint_21(
     SingleSwitchProgramEnvironment& env, 
-    BotBaseContext& context, 
+    SwitchControllerContext& context, 
     EventNotificationOption& notif_status_update
 ){
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
@@ -110,10 +107,10 @@ void checkpoint_21(
             { black_screen }
         );
         if (ret < 0){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
                 "checkpoint_21(): Failed to jump the East Mesagoza wall.",
-                true
+                env.console
             );
         }
         context.wait_for_all_requests();
@@ -133,7 +130,7 @@ void checkpoint_21(
 
 void checkpoint_22(
     SingleSwitchProgramEnvironment& env, 
-    BotBaseContext& context, 
+    SwitchControllerContext& context, 
     EventNotificationOption& notif_status_update
 ){
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
@@ -177,7 +174,7 @@ void checkpoint_22(
 
         // section 3. set marker past pokecenter
         handle_unexpected_battles(env.program_info(), env.console, context,
-        [&](const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){                        
+        [&](const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
             realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 70, 30);
         });            
         overworld_navigation(env.program_info(), env.console, context, 
@@ -202,7 +199,7 @@ void checkpoint_22(
 
 void checkpoint_23(
     SingleSwitchProgramEnvironment& env, 
-    BotBaseContext& context, 
+    SwitchControllerContext& context, 
     EventNotificationOption& notif_status_update
 ){
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
@@ -228,9 +225,17 @@ void checkpoint_23(
             {ZoomChange::ZOOM_IN, 0, 128, 80},
             {ZoomChange::KEEP_ZOOM, 255, 95, 100}            
         );         
-        overworld_navigation(env.program_info(), env.console, context, 
-            NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-            128, 0, 20, 10);       
+        handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
+            [&](const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+                overworld_navigation(env.program_info(), env.console, context, 
+                    NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
+                    128, 0, 20, 10);
+            }, 
+            [&](const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+                pbf_move_left_joystick(context, 255, 128, 40, 50);
+                realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
+            }
+        );                
 
         // section 3
         realign_player_from_landmark(
@@ -238,9 +243,17 @@ void checkpoint_23(
             {ZoomChange::ZOOM_IN, 0, 128, 80},
             {ZoomChange::KEEP_ZOOM, 255, 75, 65}            
         );              
-        overworld_navigation(env.program_info(), env.console, context, 
-            NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-            128, 0, 20, 10);             
+        handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
+            [&](const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+                overworld_navigation(env.program_info(), env.console, context, 
+                    NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
+                    128, 0, 20, 10);
+            }, 
+            [&](const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+                pbf_move_left_joystick(context, 255, 128, 40, 50);
+                realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
+            }
+        );                     
 
         // section 4
         realign_player_from_landmark(
@@ -248,9 +261,17 @@ void checkpoint_23(
             {ZoomChange::ZOOM_IN, 0, 128, 50},
             {ZoomChange::KEEP_ZOOM, 255, 180, 17}            
         );              
-        overworld_navigation(env.program_info(), env.console, context, 
-            NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-            128, 0, 40, 10);    
+        handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
+            [&](const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+                overworld_navigation(env.program_info(), env.console, context, 
+                    NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
+                    128, 0, 40, 10);
+            }, 
+            [&](const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+                pbf_move_left_joystick(context, 255, 128, 40, 50);
+                realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
+            }
+        );                
 
         // section 5. set marker to pokecenter
         realign_player_from_landmark(
@@ -258,18 +279,26 @@ void checkpoint_23(
             {ZoomChange::ZOOM_IN, 128, 128, 0},
             {ZoomChange::KEEP_ZOOM, 128, 128, 0}            
         );              
-        overworld_navigation(env.program_info(), env.console, context, 
-            NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-            128, 0, 20, 10);     
+        handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
+            [&](const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+                overworld_navigation(env.program_info(), env.console, context, 
+                    NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
+                    128, 0, 20, 10); 
+            }, 
+            [&](const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+                pbf_move_left_joystick(context, 255, 128, 40, 50);
+                realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
+            }
+        );                
 
         // section 6. set marker past pokecenter
         handle_unexpected_battles(env.program_info(), env.console, context,
-        [&](const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){                        
+        [&](const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
             realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 110, 50);
-        });                     
+        });   
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_TIME, NavigationMovementMode::DIRECTIONAL_ONLY, 
-            128, 15, 12, 12);         
+            128, 15, 12, 12);   
 
         fly_to_overlapping_flypoint(env.program_info(), env.console, context);             
        

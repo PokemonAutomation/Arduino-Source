@@ -7,10 +7,19 @@
 #ifndef PokemonAutomation_Exceptions_H
 #define PokemonAutomation_Exceptions_H
 
+#include <utility>
 #include "Common/Compiler.h"
 #include "AbstractLogger.h"
 
 namespace PokemonAutomation{
+
+
+template <typename ExceptionType, class... Args>
+[[noreturn]] void throw_and_log(Logger& logger, Args&&... args){
+    ExceptionType exception(std::forward<Args>(args)...);
+    exception.log(logger);
+    throw exception;
+}
 
 
 //  Definitions:
@@ -22,6 +31,8 @@ namespace PokemonAutomation{
 class Exception{
 public:
     virtual ~Exception() = default;
+
+    virtual void log(Logger& logger) const;
     virtual const char* name() const = 0;
     virtual std::string message() const;
     virtual std::string to_str() const;

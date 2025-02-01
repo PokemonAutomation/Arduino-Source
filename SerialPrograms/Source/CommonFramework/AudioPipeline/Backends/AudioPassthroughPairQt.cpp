@@ -5,7 +5,9 @@
  */
 
 //#include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/AbstractLogger.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/AudioPipeline/AudioPipelineOptions.h"
 //#include "CommonFramework/AudioPipeline/AudioConstants.h"
 //#include "CommonFramework/AudioPipeline/Tools/AudioFormatUtils.h"
 #include "CommonFramework/AudioPipeline/IO/AudioSource.h"
@@ -13,21 +15,31 @@
 #include "CommonFramework/AudioPipeline/Spectrum/FFTStreamer.h"
 #include "AudioPassthroughPairQt.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 
 
 
+void AudioPassthroughPairQt::add_listener(AudioFloatStreamListener& listener){
+    auto scope_check = m_sanitizer.check_scope();
+    m_stream_listeners.add(listener);
+}
+void AudioPassthroughPairQt::remove_listener(AudioFloatStreamListener& listener){
+    auto scope_check = m_sanitizer.check_scope();
+    m_stream_listeners.remove(listener);
+}
 void AudioPassthroughPairQt::add_listener(FFTListener& listener){
+    auto scope_check = m_sanitizer.check_scope();
     WriteSpinLock lg(m_lock);
-    m_listeners.insert(&listener);
+    m_fft_listeners.add(listener);
 }
 void AudioPassthroughPairQt::remove_listener(FFTListener& listener){
+    auto scope_check = m_sanitizer.check_scope();
     WriteSpinLock lg(m_lock);
-    m_listeners.erase(&listener);
+    m_fft_listeners.remove(listener);
 }
 
 
@@ -44,15 +56,20 @@ public:
         m_parent.m_reader->remove_listener(*this);
     }
     virtual void on_samples(const float* data, size_t frames) override{
-        AudioPassthroughPairQt& parent = m_parent;
-        WriteSpinLock lg(parent.m_lock);
-        if (parent.m_writer){
-            parent.m_writer->operator AudioFloatStreamListener&().on_samples(data, frames);
+        {
+            AudioPassthroughPairQt& parent = m_parent;
+            WriteSpinLock lg(parent.m_lock);
+            if (parent.m_writer){
+                parent.m_writer->operator AudioFloatStreamListener&().on_samples(data, frames);
+            }
+            if (parent.m_fft_runner){
+                parent.m_fft_runner->on_samples(data, frames);
+            }
         }
-        if (parent.m_fft_runner){
-            parent.m_fft_runner->on_samples(data, frames);
-        }
-
+        m_parent.m_stream_listeners.run_method_unique(
+            &AudioFloatStreamListener::on_samples,
+            data, frames
+        );
     }
 
 private:
@@ -69,12 +86,11 @@ public:
     ~InternalFFTListener(){
         m_parent.m_fft_runner->remove_listener(*this);
     }
-    virtual void on_fft(size_t sample_rate, std::shared_ptr<AlignedVector<float>> fft_output) override{
-        //  This is already inside the lock.
-//        ReadSpinLock lg(m_parent.m_lock);
-        for (FFTListener* listener : m_parent.m_listeners){
-            listener->on_fft(sample_rate, fft_output);
-        }
+    virtual void on_fft(size_t sample_rate, std::shared_ptr<const AlignedVector<float>> fft_output) override{
+        m_parent.m_fft_listeners.run_method_unique(
+            &FFTListener::on_fft,
+            sample_rate, fft_output
+        );
     }
 
 private:
@@ -89,15 +105,17 @@ AudioPassthroughPairQt::~AudioPassthroughPairQt(){}
 
 AudioPassthroughPairQt::AudioPassthroughPairQt(Logger& logger)
     : m_logger(logger)
-    , m_file_input_multiplier((float)GlobalSettings::instance().AUDIO_FILE_VOLUME_SCALE)
-    , m_device_input_multiplier((float)GlobalSettings::instance().AUDIO_DEVICE_VOLUME_SCALE)
+    , m_file_input_multiplier((float)GlobalSettings::instance().AUDIO_PIPELINE->FILE_VOLUME_SCALE)
+    , m_device_input_multiplier((float)GlobalSettings::instance().AUDIO_PIPELINE->DEVICE_VOLUME_SCALE)
 {}
 
 void AudioPassthroughPairQt::reset(
     const std::string& file,
     const AudioDeviceInfo& output, double output_volume
 ){
+    auto scope_check = m_sanitizer.check_scope();
     QMetaObject::invokeMethod(this, [this, file, output, output_volume]{
+        auto scope_check = m_sanitizer.check_scope();
         WriteSpinLock lg(m_lock);
         if (m_reader){
             m_fft_listener.reset();
@@ -121,8 +139,10 @@ void AudioPassthroughPairQt::reset(
     const AudioDeviceInfo& input, AudioChannelFormat format,
     const AudioDeviceInfo& output, double output_volume
 ){
+    auto scope_check = m_sanitizer.check_scope();
 //    cout << "AudioPassthroughPairQt::reset(): " << output.display_name() << endl;
     QMetaObject::invokeMethod(this, [this, format, output, output_volume, input]{
+        auto scope_check = m_sanitizer.check_scope();
         WriteSpinLock lg(m_lock);
         if (m_reader){
             m_fft_listener.reset();
@@ -145,7 +165,9 @@ void AudioPassthroughPairQt::reset(
     });
 }
 void AudioPassthroughPairQt::clear_audio_source(){
+    auto scope_check = m_sanitizer.check_scope();
     QMetaObject::invokeMethod(this, [this]{
+        auto scope_check = m_sanitizer.check_scope();
         WriteSpinLock lg(m_lock);
         if (m_reader){
             m_fft_listener.reset();
@@ -157,7 +179,9 @@ void AudioPassthroughPairQt::clear_audio_source(){
     });
 }
 void AudioPassthroughPairQt::set_audio_source(const std::string& file){
+    auto scope_check = m_sanitizer.check_scope();
     QMetaObject::invokeMethod(this, [this, file]{
+        auto scope_check = m_sanitizer.check_scope();
         WriteSpinLock lg(m_lock);
         if (m_reader){
             m_fft_listener.reset();
@@ -176,7 +200,9 @@ void AudioPassthroughPairQt::set_audio_source(const std::string& file){
     });
 }
 void AudioPassthroughPairQt::set_audio_source(const AudioDeviceInfo& device, AudioChannelFormat format){
+    auto scope_check = m_sanitizer.check_scope();
     QMetaObject::invokeMethod(this, [this, format, device]{
+        auto scope_check = m_sanitizer.check_scope();
         WriteSpinLock lg(m_lock);
         if (m_reader){
             m_fft_listener.reset();
@@ -198,14 +224,18 @@ void AudioPassthroughPairQt::set_audio_source(const AudioDeviceInfo& device, Aud
 }
 
 void AudioPassthroughPairQt::clear_audio_sink(){
+    auto scope_check = m_sanitizer.check_scope();
     QMetaObject::invokeMethod(this, [this]{
+        auto scope_check = m_sanitizer.check_scope();
         WriteSpinLock lg(m_lock);
         m_writer.reset();
         m_output_device = AudioDeviceInfo();
     });
 }
 void AudioPassthroughPairQt::set_audio_sink(const AudioDeviceInfo& device, double volume){
+    auto scope_check = m_sanitizer.check_scope();
     QMetaObject::invokeMethod(this, [this, device, volume]{
+        auto scope_check = m_sanitizer.check_scope();
         WriteSpinLock lg(m_lock);
         m_writer.reset();
         m_output_device = device;
@@ -214,8 +244,10 @@ void AudioPassthroughPairQt::set_audio_sink(const AudioDeviceInfo& device, doubl
     });
 }
 void AudioPassthroughPairQt::init_audio_sink(){
+    auto scope_check = m_sanitizer.check_scope();
 //    cout << "AudioPassthroughPairQt::init_audio_sink()" << endl;
     QMetaObject::invokeMethod(this, [this]{
+        auto scope_check = m_sanitizer.check_scope();
         if (!m_output_device){
 //            cout << "AudioPassthroughPairQt::init_audio_sink() - early out" << endl;
             return;
@@ -244,7 +276,9 @@ void AudioPassthroughPairQt::init_audio_sink(){
 
 
 void AudioPassthroughPairQt::set_sink_volume(double volume){
+    auto scope_check = m_sanitizer.check_scope();
     QMetaObject::invokeMethod(this, [this, volume]{
+        auto scope_check = m_sanitizer.check_scope();
         WriteSpinLock lg(m_lock);
         m_output_volume = volume;
         if (m_writer){

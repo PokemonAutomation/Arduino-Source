@@ -6,12 +6,11 @@
 
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
-#include "CommonFramework/InferenceInfra/InferenceSession.h"
-//#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
-#include "CommonFramework/Tools/InterruptableCommands.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
+#include "CommonTools/Images/BinaryImage_FilterRgb32.h"
+#include "CommonTools/Async/InterruptableCommands.h"
+#include "CommonTools/Async/InferenceSession.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSV_AreaZeroSkyDetector.h"
 
@@ -100,26 +99,30 @@ enum class OverworldState{
     TurningRight,
 };
 void find_and_center_on_sky(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context
+    ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context
 ){
     context.wait_for_all_requests();
-    console.log("Looking for the sky...");
+    stream.log("Looking for the sky...");
 
-    AreaZeroSkyTracker sky_tracker(console);
+    AreaZeroSkyTracker sky_tracker(stream.overlay());
     InferenceSession inference_session(
-        context, console,
+        context, stream,
         {sky_tracker}
     );
 
-    AsyncCommandSession session(context, console, env.realtime_dispatcher(), context.botbase());
+    AsyncCommandSession<SwitchController> session(
+        context, stream.logger(),
+        env.realtime_dispatcher(),
+        context.controller()
+    );
     OverworldState state = OverworldState::None;
     WallClock start = current_time();
     while (true){
         if (current_time() - start > std::chrono::minutes(1)){
-            throw OperationFailedException(
-                ErrorReport::NO_ERROR_REPORT, console,
+            OperationFailedException::fire(
+                ErrorReport::NO_ERROR_REPORT,
                 "Failed to find the sky after 1 minute. (state = " + std::to_string((int)state) + ")",
-                true
+                stream
             );
         }
 
@@ -134,8 +137,8 @@ void find_and_center_on_sky(
 
         if (!sky){
             if (state != OverworldState::FindingSky){
-                console.log("Sky not detected. Attempting to find the sky...", COLOR_ORANGE);
-                session.dispatch([](BotBaseContext& context){
+                stream.log("Sky not detected. Attempting to find the sky...", COLOR_ORANGE);
+                session.dispatch([](SwitchControllerContext& context){
                     pbf_move_right_joystick(context, 128, 0, 250, 0);
                     pbf_move_right_joystick(context, 0, 0, 10 * TICKS_PER_SECOND, 0);
                 });
@@ -148,10 +151,10 @@ void find_and_center_on_sky(
 
         if (sky_x < 0.45){
             if (state != OverworldState::TurningLeft){
-                console.log("Centering the sky... Moving left.");
+                stream.log("Centering the sky... Moving left.");
                 uint8_t magnitude = (uint8_t)((0.5 - sky_x) * 96 + 31);
                 uint16_t duration = (uint16_t)((0.5 - sky_x) * 125 + 20);
-                session.dispatch([=](BotBaseContext& context){
+                session.dispatch([=](SwitchControllerContext& context){
                     pbf_move_right_joystick(context, 128 - magnitude, 128, duration, 0);
                 });
                 state = OverworldState::TurningLeft;
@@ -160,10 +163,10 @@ void find_and_center_on_sky(
         }
         if (sky_x > 0.55){
             if (state != OverworldState::TurningRight){
-                console.log("Centering the sky... Moving Right.");
+                stream.log("Centering the sky... Moving Right.");
                 uint8_t magnitude = (uint8_t)((sky_x - 0.5) * 96 + 31);
                 uint16_t duration = (uint16_t)((sky_x - 0.5) * 125 + 20);
-                session.dispatch([=](BotBaseContext& context){
+                session.dispatch([=](SwitchControllerContext& context){
                     pbf_move_right_joystick(context, 128 + magnitude, 128, duration, 0);
                 });
                 state = OverworldState::TurningRight;
@@ -171,7 +174,7 @@ void find_and_center_on_sky(
             continue;
         }
 
-        console.log("Found the sky!", COLOR_ORANGE);
+        stream.log("Found the sky!", COLOR_ORANGE);
         break;
     }
 

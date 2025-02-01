@@ -10,11 +10,10 @@
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
+#include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 
 namespace PokemonAutomation{
     class CancellableScope;
-    class ConsoleHandle;
 namespace NintendoSwitch{
 namespace PokemonSV{
 
@@ -26,7 +25,7 @@ class SparklyItemDetector : public VisualInferenceCallback{
 public:
     SparklyItemDetector(Color color = COLOR_RED);
 
-    static size_t count_sparkly_items(ConsoleHandle& console, CancellableScope& scope);
+    static size_t count_sparkly_items(VideoStream& stream, CancellableScope& scope);
 
     size_t sparkly_items() const;
 

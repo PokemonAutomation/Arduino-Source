@@ -4,11 +4,11 @@
  *
  */
 
-#include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
-#include "PokemonBDSP/PokemonBDSP_Settings.h"
+//#include "PokemonBDSP/PokemonBDSP_Settings.h"
 #include "PokemonBDSP_AmitySquarePickUpFarmer.h"
 
 namespace PokemonAutomation{
@@ -25,7 +25,7 @@ AmitySquarePickUpFarmer_Descriptor::AmitySquarePickUpFarmer_Descriptor()
         "Automatically fetch berries and stickers from the walking pokemon in Amity Square.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 struct AmitySquarePickUpFarmer_Descriptor::Stats : public StatsTracker{
@@ -83,7 +83,7 @@ AmitySquarePickUpFarmer::AmitySquarePickUpFarmer()
 
 
 
-void AmitySquarePickUpFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void AmitySquarePickUpFarmer::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     AmitySquarePickUpFarmer_Descriptor::Stats& stats = env.current_stats<AmitySquarePickUpFarmer_Descriptor::Stats>();
     env.update_stats();
 

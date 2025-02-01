@@ -33,7 +33,7 @@ FastCodeEntry_Descriptor::FastCodeEntry_Descriptor()
         "Quickly enter a 4, 6, or 8 digit link code.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB,
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS},
         1, 4, 1
     )
 {}
@@ -128,7 +128,7 @@ void FastCodeEntry::program(MultiSwitchProgramEnvironment& env, CancellableScope
     }
 
     //  Connect the controller.
-    env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
+    env.run_in_parallel(scope, [&](ConsoleHandle& console, SwitchControllerContext& context){
         pbf_press_button(context, BUTTON_R | BUTTON_L, 5, 3);
     });
 

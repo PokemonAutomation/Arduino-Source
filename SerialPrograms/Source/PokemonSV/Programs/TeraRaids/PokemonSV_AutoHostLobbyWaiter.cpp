@@ -6,8 +6,8 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/OCR/OCR_StringNormalization.h"
-#include "CommonFramework/InferenceInfra/InferenceSession.h"
+#include "CommonTools/OCR/OCR_StringNormalization.h"
+#include "CommonTools/Async/InferenceSession.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSV_AutoHostLobbyWaiter.h"
 
@@ -22,7 +22,7 @@ namespace PokemonSV{
 
 TeraLobbyWaiter::TeraLobbyWaiter(
     ProgramEnvironment& env,
-    ConsoleHandle& console, BotBaseContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     uint8_t host_players,
     const std::string& lobby_code, WallClock start_time,
     SimpleIntegerOption<uint16_t>& LOBBY_WAIT_DELAY,
@@ -32,7 +32,7 @@ TeraLobbyWaiter::TeraLobbyWaiter(
     RaidJoinReportOption& JOIN_REPORT
 )
     : m_env(env)
-    , m_console(console), m_context(context)
+    , m_stream(stream), m_context(context)
     , m_host_players(host_players)
     , m_lobby_code(lobby_code), m_start_time(start_time)
     , m_lobby_wait_delay(LOBBY_WAIT_DELAY)
@@ -40,12 +40,12 @@ TeraLobbyWaiter::TeraLobbyWaiter(
     , m_notification_raid_start(NOTIFICATION_RAID_START)
     , m_dialog(COLOR_YELLOW)
     , m_start_raid(COLOR_BLUE)
-    , m_join_watcher(console.logger(), env.realtime_dispatcher(), COLOR_RED, host_players)
-    , m_name_watcher(console.logger(), env.realtime_dispatcher(), COLOR_RED, JOIN_REPORT, BAN_LIST, host_players)
+    , m_join_watcher(stream.logger(), env.realtime_dispatcher(), COLOR_RED, host_players)
+    , m_name_watcher(stream.logger(), env.realtime_dispatcher(), COLOR_RED, JOIN_REPORT, BAN_LIST, host_players)
 {}
 
 VideoSnapshot TeraLobbyWaiter::synchronize_state(){
-    VideoSnapshot snapshot = m_console.video().snapshot();
+    VideoSnapshot snapshot = m_stream.video().snapshot();
     m_join_watcher.process_frame(snapshot, snapshot.timestamp);
     m_name_watcher.process_frame(snapshot, snapshot.timestamp);
     m_total_players = m_join_watcher.last_known_total_players();
@@ -152,7 +152,7 @@ bool TeraLobbyWaiter::process_hat_trick(const ImageViewRGB32& snapshot){
     if (name.empty()){
         return false;
     }
-    m_console.log(name + " with the Hat Trick!", COLOR_BLUE);
+    m_stream.log(name + " with the Hat Trick!", COLOR_BLUE);
     send_program_notification(
         m_env, m_notification_raid_start,
         COLOR_PURPLE,
@@ -229,7 +229,7 @@ bool TeraLobbyWaiter::process_enough_players(const ImageViewRGB32& snapshot){
         return false;
     }
 
-    m_console.log("Enough players are ready, attempting to start raid!", COLOR_BLUE);
+    m_stream.log("Enough players are ready, attempting to start raid!", COLOR_BLUE);
     send_program_notification(
         m_env, m_notification_raid_start,
         COLOR_GREEN,
@@ -249,7 +249,7 @@ bool TeraLobbyWaiter::process_enough_players(const ImageViewRGB32& snapshot){
 TeraLobbyWaiter::LobbyResult TeraLobbyWaiter::run_lobby(){
     CancellableHolder<CancellableScope> subcontext(static_cast<CancellableScope&>(m_context));
     InferenceSession session(
-        subcontext, m_console,
+        subcontext, m_stream,
         {
             m_dialog,
             m_start_raid,
@@ -313,7 +313,7 @@ TeraLobbyWaiter::LobbyResult TeraLobbyWaiter::run_lobby(){
 
         //  Almost out of time.
         if (end_time < snapshot.timestamp){
-            m_console.log("Clock running down, attempting to start raid!", COLOR_BLUE);
+            m_stream.log("Clock running down, attempting to start raid!", COLOR_BLUE);
             send_program_notification(
                 m_env, m_notification_raid_start,
                 COLOR_GREEN,
@@ -332,7 +332,7 @@ TeraLobbyWaiter::LobbyResult TeraLobbyWaiter::run_lobby(){
         //  Otherwise, resume looping.
     }
 
-    VideoSnapshot snapshot = m_console.video().snapshot();
+    VideoSnapshot snapshot = m_stream.video().snapshot();
     if (ret == 0){
         m_env.log("Raid timed out!", COLOR_ORANGE);
         send_program_notification(
@@ -361,7 +361,7 @@ TeraLobbyWaiter::LobbyResult TeraLobbyWaiter::run_lobby(){
         return LobbyResult::RAID_STARTED;
     }
 
-    throw InternalProgramError(&m_console.logger(), PA_CURRENT_FUNCTION, "Invalid session return code.");
+    throw InternalProgramError(&m_stream.logger(), PA_CURRENT_FUNCTION, "Invalid session return code.");
 }
 
 

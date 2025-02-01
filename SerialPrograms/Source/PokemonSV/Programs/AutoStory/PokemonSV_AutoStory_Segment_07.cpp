@@ -4,19 +4,12 @@
  *
  */
 
-#include "CommonFramework/GlobalSettingsPanel.h"
-#include "CommonFramework/Exceptions/FatalProgramException.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
-#include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/Tools/StatsTracking.h"
-#include "CommonFramework/Tools/VideoResolutionCheck.h"
+#include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "Pokemon/Pokemon_Strings.h"
-#include "PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h"
+#include "PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_SaveGame.h"
-#include "PokemonSV/Inference/PokemonSV_TutorialDetector.h"
+#include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSV_AutoStoryTools.h"
 #include "PokemonSV_AutoStory_Segment_07.h"
 
@@ -29,8 +22,6 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
-
-using namespace Pokemon;
 
 
 
@@ -47,7 +38,11 @@ std::string AutoStory_Segment_07::end_text() const{
     return "End: At Mesagoza South Pokecenter.";
 }
 
-void AutoStory_Segment_07::run_segment(SingleSwitchProgramEnvironment& env, BotBaseContext& context, AutoStoryOptions options) const{
+void AutoStory_Segment_07::run_segment(
+    SingleSwitchProgramEnvironment& env,
+    SwitchControllerContext& context,
+    AutoStoryOptions options
+) const{
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
 
     context.wait_for_all_requests();
@@ -76,7 +71,7 @@ void AutoStory_Segment_07::run_segment(SingleSwitchProgramEnvironment& env, BotB
 
 void checkpoint_12(
     SingleSwitchProgramEnvironment& env, 
-    BotBaseContext& context, 
+    SwitchControllerContext& context, 
     EventNotificationOption& notif_status_update
 ){
     // reset rate: ~25%. 12 resets out of 52. 
@@ -85,58 +80,54 @@ void checkpoint_12(
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
     bool first_attempt = true;
     while (true){
-    try{
-        do_action_and_monitor_for_battles(env.program_info(), env.console, context,
-        [&](const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){        
-        
+        try{
             if (first_attempt){
                 checkpoint_save(env, context, notif_status_update);
                 first_attempt = false;
-            } 
+            }
 
+            fly_to_overlapping_flypoint(env.program_info(), env.console, context);
             context.wait_for_all_requests();
-            
-            fly_to_overlapping_flypoint(info, env.console, context);
 
             // re-orient camera
             pbf_press_button(context, BUTTON_L, 20, 20);
+            do_action_and_monitor_for_battles(env.program_info(), env.console, context,
+                [&](const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+                    walk_forward_while_clear_front_path(env.program_info(), env.console, context, 35);
 
-            walk_forward_while_clear_front_path(info, env.console, context, 35);
-            realign_player(info, env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 128, 0, 100);
-            walk_forward_while_clear_front_path(info, env.console, context, 500);
-            realign_player(info, env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 100, 0, 120);
-            walk_forward_while_clear_front_path(info, env.console, context, 2000);
-            realign_player(info, env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 0, 120);
-            walk_forward_while_clear_front_path(info, env.console, context, 1250);
-            
-            // check we're not still at the Los Platos Pokecenter.
-            confirm_no_overlapping_flypoint(info, env.console, context);
+                    // place the marker elsewhere
+                    realign_player(info, env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 128, 50);
 
-            // not stuck at Los Platos Pokecenter
-            pbf_press_button(context, BUTTON_B, 20, 1 * TICKS_PER_SECOND);
-            pbf_press_button(context, BUTTON_B, 20, 1 * TICKS_PER_SECOND);
-            press_Bs_to_back_to_overworld(info, env.console, context, 7);
+                    DirectionDetector direction;
+                    direction.change_direction(info, env.console, context, 0);
+                    walk_forward_while_clear_front_path(info, env.console, context, 3300, 0, 125, 125);
 
-            realign_player(info, env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 80, 0, 100);
-            walk_forward_while_clear_front_path(info, env.console, context, 1500);
-            realign_player(info, env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 30, 0, 50);
-            walk_forward_while_clear_front_path(info, env.console, context, 1000);
+                    // check we're not still at the Los Platos Pokecenter.
+                    confirm_no_overlapping_flypoint(info, env.console, context);
+                    // not stuck at Los Platos Pokecenter
+                    pbf_press_button(context, BUTTON_B, 20, 1 * TICKS_PER_SECOND);
+                    pbf_press_button(context, BUTTON_B, 20, 1 * TICKS_PER_SECOND);
+                    press_Bs_to_back_to_overworld(info, env.console, context, 7);
 
-            heal_at_pokecenter(info, env.console, context);
-   
-        }  
-        );
+                    direction.change_direction(info, env.console, context, 0.29);
+                    walk_forward_while_clear_front_path(info, env.console, context, 1200, 0, 125, 125);
+                    direction.change_direction(info, env.console, context, 0.61);
+                    walk_forward_while_clear_front_path(info, env.console, context, 1200, 0, 125, 125);
 
-        env.console.log("Reached Mesagoza (South) Pokecenter.");
-        
-        break;
-    }catch(...){
-        context.wait_for_all_requests();
-        env.console.log("Resetting from checkpoint.");
-        reset_game(env.program_info(), env.console, context);
-        stats.m_reset++;
-        env.update_stats();
-    }             
+                    fly_to_overlapping_flypoint(info, env.console, context);
+                }
+            );
+
+            env.console.log("Reached Mesagoza (South) Pokecenter.");
+
+            break;
+        }catch(...){
+            context.wait_for_all_requests();
+            env.console.log("Resetting from checkpoint.");
+            reset_game(env.program_info(), env.console, context);
+            stats.m_reset++;
+            env.update_stats();
+        }
     }
 
 }

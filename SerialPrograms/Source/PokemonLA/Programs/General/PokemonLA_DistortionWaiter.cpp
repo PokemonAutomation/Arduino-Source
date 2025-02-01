@@ -7,8 +7,8 @@
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
-#include "CommonFramework/Tools/StatsTracking.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
@@ -30,7 +30,7 @@ DistortionWaiter_Descriptor::DistortionWaiter_Descriptor()
         "Wait for a distortion to appear.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 class DistortionWaiter_Descriptor::Stats : public StatsTracker{
@@ -81,7 +81,7 @@ DistortionWaiter::DistortionWaiter()
 
 
 
-void DistortionWaiter::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void DistortionWaiter::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     DistortionWaiter_Descriptor::Stats& stats = env.current_stats<DistortionWaiter_Descriptor::Stats>();
 
 
@@ -95,9 +95,9 @@ void DistortionWaiter::program(SingleSwitchProgramEnvironment& env, BotBaseConte
     while (true){
         env.update_stats();
 
-        int ret = run_until(
+        int ret = run_until<SwitchControllerContext>(
             env.console, context,
-            [&](BotBaseContext& context){
+            [&](SwitchControllerContext& context){
                 for (size_t c = 0; c < 60; c++){
                     pbf_press_button(context, BUTTON_LCLICK, 20, 60 * TICKS_PER_SECOND - 20);
                     context.wait_for_all_requests();
@@ -113,10 +113,10 @@ void DistortionWaiter::program(SingleSwitchProgramEnvironment& env, BotBaseConte
         );
         if (ret < 0){
             stats.errors++;
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
                 "No distortion found after one hour.",
-                true
+                env.console
             );
         }
 

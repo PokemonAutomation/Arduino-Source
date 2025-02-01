@@ -4,9 +4,8 @@
  *
  */
 
-#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSwSh/ShinyHuntTracker.h"
@@ -31,7 +30,7 @@ LegendaryReset_Descriptor::LegendaryReset_Descriptor()
         "Shiny hunt a standing legendary " + STRING_POKEMON + ".",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 std::unique_ptr<StatsTracker> LegendaryReset_Descriptor::make_stats() const{
@@ -68,7 +67,7 @@ LegendaryReset::LegendaryReset()
 
 
 
-void LegendaryReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void LegendaryReset::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     PokemonSwSh::ShinyHuntTracker& stats = env.current_stats<PokemonSwSh::ShinyHuntTracker>();
 
     StandardEncounterHandler handler(
@@ -98,9 +97,9 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext
         StartBattleDetector start_battle(env.console);
         BattleMenuWatcher battle_menu(BattleType::STANDARD);
 
-        int ret = run_until(
+        int ret = run_until<SwitchControllerContext>(
             env.console, context,
-            [this](BotBaseContext& context){
+            [this](SwitchControllerContext& context){
                 size_t stop = WALK_UP ? 30 : 60;
                 for (size_t c = 0; c < stop; c++){
                     if (WALK_UP){

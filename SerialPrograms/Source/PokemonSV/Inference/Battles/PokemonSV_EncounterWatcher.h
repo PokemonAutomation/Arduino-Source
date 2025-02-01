@@ -15,14 +15,13 @@
 #include "PokemonSV_ShinySoundDetector.h"
 
 namespace PokemonAutomation{
-    class ConsoleHandle;
 namespace NintendoSwitch{
 namespace PokemonSV{
 
 
 class EncounterWatcher : public VisualInferenceCallback, public AudioInferenceCallback{
 public:
-    EncounterWatcher(ConsoleHandle& console, Color color = COLOR_RED);
+    EncounterWatcher(VideoStream& stream, Color color = COLOR_RED);
 
     const NormalBattleMenuDetector& battle_menu_detector() const{ return m_battle_menu; }
 

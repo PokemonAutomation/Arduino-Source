@@ -10,11 +10,12 @@
 #include <QScrollArea>
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
 #include "Common/Qt/CollapsibleGroupBox.h"
-#include "Common/Qt/Options/BatchWidget.h"
-#include "CommonFramework/NewVersionCheck.h"
+#include "Common/Qt/Options/ConfigWidget.h"
+//#include "Common/Qt/Options/BatchWidget.h"
+#include "CommonFramework/Startup/NewVersionCheck.h"
 #include "CommonFramework/Panels/PanelTools.h"
 #include "CommonFramework/Panels/UI/PanelElements.h"
-#include "CommonFramework/Tools/StatsTracking.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramOption.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramSession.h"
 #include "NintendoSwitch_MultiSwitchProgramWidget.h"
@@ -29,6 +30,7 @@ namespace NintendoSwitch{
 
 
 MultiSwitchProgramWidget2::~MultiSwitchProgramWidget2(){
+    auto ScopeCheck = m_sanitizer.check_scope();
     m_session.ProgramSession::remove_listener(*this);
     m_session.remove_listener(*this);
     delete m_actions_bar;
@@ -46,6 +48,7 @@ MultiSwitchProgramWidget2::MultiSwitchProgramWidget2(
     : QWidget(&parent)
     , m_holder(holder)
     , m_session(option)
+    , m_sanitizer("MultiSwitchProgramWidget2")
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
@@ -57,8 +60,7 @@ MultiSwitchProgramWidget2::MultiSwitchProgramWidget2(
         descriptor.display_name(),
         descriptor.doc_link(),
         descriptor.description(),
-        descriptor.feedback(),
-        descriptor.min_pabotbase_level()
+        descriptor.feedback()
     );
     layout->addWidget(header);
 
@@ -124,6 +126,7 @@ MultiSwitchProgramWidget2::MultiSwitchProgramWidget2(
 
 
 void MultiSwitchProgramWidget2::state_change(ProgramState state){
+    auto ScopeCheck = m_sanitizer.check_scope();
     QMetaObject::invokeMethod(this, [this, state]{
         m_system->update_ui(state);
         m_options->option().report_program_state(state != ProgramState::STOPPED);
@@ -141,6 +144,7 @@ void MultiSwitchProgramWidget2::state_change(ProgramState state){
     });
 }
 void MultiSwitchProgramWidget2::stats_update(const StatsTracker* current_stats, const StatsTracker* historical_stats){
+    auto ScopeCheck = m_sanitizer.check_scope();
     QMetaObject::invokeMethod(this, [this, current_stats, historical_stats]{
         m_stats_bar->set_stats(
             current_stats == nullptr ? "" : current_stats->to_str(StatsTracker::DISPLAY_ON_SCREEN),
@@ -149,6 +153,7 @@ void MultiSwitchProgramWidget2::stats_update(const StatsTracker* current_stats, 
     });
 }
 void MultiSwitchProgramWidget2::error(const std::string& message){
+    auto ScopeCheck = m_sanitizer.check_scope();
     QMetaObject::invokeMethod(this, [message]{
         QMessageBox box;
         box.critical(nullptr, "Error", QString::fromStdString(message));
@@ -156,6 +161,7 @@ void MultiSwitchProgramWidget2::error(const std::string& message){
 }
 
 void MultiSwitchProgramWidget2::redraw_options(){
+    auto ScopeCheck = m_sanitizer.check_scope();
     QMetaObject::invokeMethod(this, [this]{
         m_options->update_all(false);
     });

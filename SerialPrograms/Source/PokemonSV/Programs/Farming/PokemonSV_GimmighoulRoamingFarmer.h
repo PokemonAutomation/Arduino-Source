@@ -27,7 +27,7 @@ class GimmighoulRoamingFarmer : public SingleSwitchProgramInstance{
 public:
     GimmighoulRoamingFarmer();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
     SimpleIntegerOption<uint32_t> SKIPS;

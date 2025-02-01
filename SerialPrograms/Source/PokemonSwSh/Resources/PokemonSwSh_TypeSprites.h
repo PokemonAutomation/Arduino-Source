@@ -8,13 +8,14 @@
 #define PokemonAutomation_PokemonSwSh_TypeSprites_H
 
 #include <memory>
-#include "CommonFramework/ImageTools/FloatPixel.h"
-#include "CommonFramework/ImageMatch/ExactImageMatcher.h"
-#include "PokemonSwSh_TypeMatchup.h"
+#include "CommonTools/ImageMatch/ExactImageMatcher.h"
+#include "Pokemon/Pokemon_Types.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
+
+using namespace Pokemon;
 
 
 class TypeSprite{

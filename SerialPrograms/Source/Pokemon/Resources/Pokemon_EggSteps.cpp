@@ -9,7 +9,7 @@
 #include "Common/Cpp/Json/JsonObject.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Logging/Logger.h"
-#include "CommonFramework/Resources/SpriteDatabase.h"
+#include "CommonTools/Resources/SpriteDatabase.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Resources/Pokemon_PokemonSlugs.h"
 #include "Pokemon/Resources/Pokemon_PokemonNames.h"

@@ -20,25 +20,25 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
-OrbeetleAttackAnimationDetector::OrbeetleAttackAnimationDetector(ConsoleHandle& console, BotBaseContext& context)
-    : m_console(console)
+OrbeetleAttackAnimationDetector::OrbeetleAttackAnimationDetector(VideoStream& stream, SwitchControllerContext& context)
+    : m_stream(stream)
     , m_context(context)
-    , m_box(console, {0.86, 0.2, 0.1, 0.15})
+    , m_box(stream.overlay(), {0.86, 0.2, 0.1, 0.15})
 {}
 
 
 OrbeetleAttackAnimationDetector::Detection OrbeetleAttackAnimationDetector::run(bool save_screenshot, bool log_values)
 {
     //  Grab baseline image.
-    VideoSnapshot baseline_image = m_console.video().snapshot();
+    VideoSnapshot baseline_image = m_stream.video().snapshot();
     if (!baseline_image){
-        m_console.log("Orbeetle Attack Animation: Screenshot failed.", COLOR_PURPLE);
+        m_stream.log("Orbeetle Attack Animation: Screenshot failed.", COLOR_PURPLE);
         return Detection::NO_DETECTION;
     }
 
     if (save_screenshot){
         //baseline_image->save("orbeetle-baseline-" + now_to_filestring() + ".png");
-        dump_debug_image(m_console.logger(), "rng", "orbeetle-baseline", baseline_image);
+        dump_debug_image(m_stream.logger(), "rng", "orbeetle-baseline", baseline_image);
     }
 
     FloatPixel baseline_values = image_average(extract_box_reference(baseline_image, m_box));
@@ -51,9 +51,9 @@ OrbeetleAttackAnimationDetector::Detection OrbeetleAttackAnimationDetector::run(
 
 
     //  Grab the animation image.
-    VideoSnapshot animation_image = m_console.video().snapshot();
+    VideoSnapshot animation_image = m_stream.video().snapshot();
     if (!animation_image){
-        m_console.log("Orbeetle Attack Animation: Screenshot failed.", COLOR_PURPLE);
+        m_stream.log("Orbeetle Attack Animation: Screenshot failed.", COLOR_PURPLE);
         return Detection::NO_DETECTION;
     }
 
@@ -61,19 +61,19 @@ OrbeetleAttackAnimationDetector::Detection OrbeetleAttackAnimationDetector::run(
     FloatPixel animation_ratios = animation_values / animation_values.sum();
 
     if (log_values){
-        m_console.log("Orbeetle baseline value red: " + std::to_string(baseline_values.r));
-        m_console.log("Orbeetle attack value red: " + std::to_string(animation_values.r));
-        m_console.log("Orbeetle baseline value green: " + std::to_string(baseline_values.g));
-        m_console.log("Orbeetle attack value green: " + std::to_string(animation_values.g));
-        m_console.log("Orbeetle baseline value blue: " + std::to_string(baseline_values.b));
-        m_console.log("Orbeetle attack value blue: " + std::to_string(animation_values.b));
+        m_stream.log("Orbeetle baseline value red: " + std::to_string(baseline_values.r));
+        m_stream.log("Orbeetle attack value red: " + std::to_string(animation_values.r));
+        m_stream.log("Orbeetle baseline value green: " + std::to_string(baseline_values.g));
+        m_stream.log("Orbeetle attack value green: " + std::to_string(animation_values.g));
+        m_stream.log("Orbeetle baseline value blue: " + std::to_string(baseline_values.b));
+        m_stream.log("Orbeetle attack value blue: " + std::to_string(animation_values.b));
 
-        m_console.log("Orbeetle baseline ratio red: " + std::to_string(baseline_ratios.r));
-        m_console.log("Orbeetle attack ratio red: " + std::to_string(animation_ratios.r));
-        m_console.log("Orbeetle baseline ratio green: " + std::to_string(baseline_ratios.g));
-        m_console.log("Orbeetle attack ratio green: " + std::to_string(animation_ratios.g));
-        m_console.log("Orbeetle baseline ratio blue: " + std::to_string(baseline_ratios.b));
-        m_console.log("Orbeetle attack ratio blue: " + std::to_string(animation_ratios.b));
+        m_stream.log("Orbeetle baseline ratio red: " + std::to_string(baseline_ratios.r));
+        m_stream.log("Orbeetle attack ratio red: " + std::to_string(animation_ratios.r));
+        m_stream.log("Orbeetle baseline ratio green: " + std::to_string(baseline_ratios.g));
+        m_stream.log("Orbeetle attack ratio green: " + std::to_string(animation_ratios.g));
+        m_stream.log("Orbeetle baseline ratio blue: " + std::to_string(baseline_ratios.b));
+        m_stream.log("Orbeetle attack ratio blue: " + std::to_string(animation_ratios.b));
     }
 
     if ((animation_ratios.r >= 1.4 * baseline_ratios.r)
@@ -83,16 +83,16 @@ OrbeetleAttackAnimationDetector::Detection OrbeetleAttackAnimationDetector::run(
     {
         if (save_screenshot){
             //animation_image->save("orbeetle-attack-special-" + now_to_filestring() + ".png");
-            dump_debug_image(m_console.logger(), "rng", "orbeetle-special", animation_image);
+            dump_debug_image(m_stream.logger(), "rng", "orbeetle-special", animation_image);
         }
-        m_console.log("Orbeetle Attack Animation: Special animation detected.");
+        m_stream.log("Orbeetle Attack Animation: Special animation detected.");
         return Detection::SPECIAL;
     }
     if (save_screenshot){
         animation_image->save("orbeetle-attack-physical-" + now_to_filestring() + ".png");
-        dump_debug_image(m_console.logger(), "rng", "orbeetle-physical", animation_image);
+        dump_debug_image(m_stream.logger(), "rng", "orbeetle-physical", animation_image);
     }
-    m_console.log("Orbeetle Attack Animation: Physical animation detected.");
+    m_stream.log("Orbeetle Attack Animation: Physical animation detected.");
     return Detection::PHYSICAL;
 }
 

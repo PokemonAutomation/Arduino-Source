@@ -9,6 +9,7 @@
 
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
@@ -34,11 +35,11 @@ public:
 class SizeChecker : public SingleSwitchProgramInstance{
 public:
     SizeChecker();
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
-    void enter_check_mode(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-    void exit_check_mode(SingleSwitchProgramEnvironment& env, BotBaseContext& context, struct VideoSnapshot screen);
+    void enter_check_mode(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
+    void exit_check_mode(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, VideoSnapshot screen);
 
 private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;

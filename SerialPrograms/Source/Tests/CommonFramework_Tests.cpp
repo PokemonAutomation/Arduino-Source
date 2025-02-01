@@ -5,19 +5,16 @@
  */
 
 
-#include "Common/Compiler.h"
-#include "Common/Cpp/Time.h"
-#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
-#include "CommonFramework/Inference/BlackBorderDetector.h"
+#include "CommonTools/VisualDetectors/BlackBorderDetector.h"
 #include "CommonFramework_Tests.h"
 #include "TestUtils.h"
 
 
-#include <iostream>
-using std::cout;
-using std::cerr;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::cerr;
+//using std::endl;
 
 namespace PokemonAutomation{
 

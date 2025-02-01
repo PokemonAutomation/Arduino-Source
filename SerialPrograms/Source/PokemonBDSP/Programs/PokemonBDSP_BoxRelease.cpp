@@ -11,7 +11,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonBDSP{
 
-void detach(BotBaseContext& context){
+void detach(SwitchControllerContext& context){
     pbf_press_button(context, BUTTON_ZL, 20, 50);
     pbf_move_right_joystick(context, 128, 255, 20, 10);
     pbf_press_button(context, BUTTON_ZL, 20, 85);
@@ -19,7 +19,7 @@ void detach(BotBaseContext& context){
 //    pbf_move_right_joystick(context, 128, 255, 20, 0);
     pbf_press_button(context, BUTTON_B, 20, 85);
 }
-void detach_box(BotBaseContext& context, uint16_t box_scroll_delay){
+void detach_box(SwitchControllerContext& context, uint16_t box_scroll_delay){
     for (uint8_t row = 0; row < 5; row++){
         if (row != 0){
             pbf_move_right_joystick(context, 128, 255, 20, box_scroll_delay);
@@ -41,7 +41,7 @@ void detach_box(BotBaseContext& context, uint16_t box_scroll_delay){
 
 
 
-void release(BotBaseContext& context){
+void release(SwitchControllerContext& context){
     pbf_press_button(context, BUTTON_ZL, 20, 50);
     pbf_move_right_joystick(context, 128, 0, 20, 10);
     pbf_move_right_joystick(context, 128, 0, 20, 10);
@@ -50,7 +50,7 @@ void release(BotBaseContext& context){
     pbf_mash_button(context, BUTTON_ZL, 120);
     pbf_wait(context, 30);
 }
-void release_box(BotBaseContext& context, uint16_t box_scroll_delay){
+void release_box(SwitchControllerContext& context, uint16_t box_scroll_delay){
     for (uint8_t row = 0; row < 5; row++){
         if (row != 0){
             pbf_move_right_joystick(context, 128, 255, 20, box_scroll_delay);
@@ -68,7 +68,7 @@ void release_box(BotBaseContext& context, uint16_t box_scroll_delay){
     }
 }
 void release_boxes(
-    BotBaseContext& context,
+    SwitchControllerContext& context,
     uint8_t boxes,
     uint16_t box_scroll_delay,
     uint16_t box_change_delay

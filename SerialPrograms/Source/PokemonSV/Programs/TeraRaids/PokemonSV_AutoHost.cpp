@@ -5,17 +5,13 @@
  */
 
 #include "Common/Cpp/PrettyPrint.h"
-#include "ClientSource/Connection/BotBase.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
-//#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-//#include "CommonFramework/InferenceInfra/InferenceSession.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
-#include "CommonFramework/Inference/BlackScreenDetector.h"
-//#include "CommonFramework/OCR/OCR_StringNormalization.h"
-#include "CommonFramework/Tools/StatsTracking.h"
-#include "CommonFramework/Tools/VideoResolutionCheck.h"
+#include "CommonTools/Async/InferenceRoutines.h"
+#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
+#include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/PokemonSV_Settings.h"
@@ -51,7 +47,7 @@ AutoHost_Descriptor::AutoHost_Descriptor()
         "Auto-host a Tera raid.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 struct AutoHost_Descriptor::Stats : public StatsTracker{
@@ -133,7 +129,7 @@ AutoHost::AutoHost()
 
 
 WallClock AutoHost::wait_for_lobby_open(
-    SingleSwitchProgramEnvironment& env, BotBaseContext& context,
+    SingleSwitchProgramEnvironment& env, SwitchControllerContext& context,
     std::string& lobby_code
 ){
     VideoOverlaySet overlays(env.console.overlay());
@@ -147,10 +143,10 @@ WallClock AutoHost::wait_for_lobby_open(
         {{lobby, std::chrono::milliseconds(500)}}
     );
     if (ret < 0){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, env.console,
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
             "Unable to detect Tera lobby after 60 seconds.",
-            true
+            env.console
         );
     }
     WallClock start_time = current_time();
@@ -185,7 +181,7 @@ void AutoHost::update_stats_on_raid_start(SingleSwitchProgramEnvironment& env, u
     stats.m_raiders += player_count - 1;
 }
 bool AutoHost::start_raid(
-    SingleSwitchProgramEnvironment& env, BotBaseContext& context,
+    SingleSwitchProgramEnvironment& env, SwitchControllerContext& context,
     WallClock start_time,
     uint8_t player_count
 ){
@@ -198,9 +194,9 @@ bool AutoHost::start_raid(
         WhiteScreenOverWatcher start_raid(COLOR_BLUE);
         TeraBattleMenuWatcher battle_menu(COLOR_CYAN);
         context.wait_for_all_requests();
-        int ret = run_until(
+        int ret = run_until<SwitchControllerContext>(
             env.console, context,
-            [start_time](BotBaseContext& context){
+            [start_time](SwitchControllerContext& context){
                 while (true){
                     pbf_press_button(context, BUTTON_A, 20, 105);
                     context.wait_for_all_requests();
@@ -226,10 +222,10 @@ bool AutoHost::start_raid(
             update_stats_on_raid_start(env, player_count);
             return true;
         default:
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
                 "Stuck in lobby for 4 minutes.",
-                true
+                env.console
             );
         }
     }
@@ -237,7 +233,7 @@ bool AutoHost::start_raid(
 
 
 bool AutoHost::run_lobby(
-    SingleSwitchProgramEnvironment& env, BotBaseContext& context,
+    SingleSwitchProgramEnvironment& env, SwitchControllerContext& context,
     std::string& lobby_code,
     std::array<std::map<Language, std::string>, 4>& player_names
 ){
@@ -269,7 +265,7 @@ bool AutoHost::run_lobby(
     return start_raid(env, context, start_time, waiter.last_known_players());
 }
 
-void AutoHost::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void AutoHost::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
     AutoHost_Descriptor::Stats& stats = env.current_stats<AutoHost_Descriptor::Stats>();

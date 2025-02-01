@@ -4,11 +4,9 @@
  *
  */
 
-#include "CommonFramework/Notifications/ProgramInfo.h"
-#include "CommonFramework/ImageTypes/ImageRGB32.h"
-#include "CommonFramework/ImageTools/ImageFilter.h"
-#include "CommonFramework/OCR/OCR_NumberReader.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
+#include "CommonTools/Images/ImageFilter.h"
+#include "CommonTools/OCR/OCR_NumberReader.h"
 #include "PokemonSV_BattleBallReader.h"
 
 namespace PokemonAutomation{
@@ -16,13 +14,13 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 
-BattleBallReader::BattleBallReader(ConsoleHandle& console, Language language, Color color)
+BattleBallReader::BattleBallReader(VideoStream& stream, Language language, Color color)
     : m_name_reader(PokeballNameReader::instance())
     , m_language(language)
-    , m_logger(console)
-    , m_name(console.overlay(), {0.380, 0.687, 0.240, 0.050}, color)
-    , m_sprite(console.overlay(), {0.480, 0.764, 0.040, 0.060}, color)
-    , m_quantity(console.overlay(), {0.480, 0.830, 0.040, 0.035}, color)
+    , m_logger(stream.logger())
+    , m_name(stream.overlay(), {0.380, 0.687, 0.240, 0.050}, color)
+    , m_sprite(stream.overlay(), {0.480, 0.764, 0.040, 0.060}, color)
+    , m_quantity(stream.overlay(), {0.480, 0.830, 0.040, 0.035}, color)
 {}
 
 

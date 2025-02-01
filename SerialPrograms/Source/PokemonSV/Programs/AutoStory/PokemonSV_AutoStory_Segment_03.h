@@ -7,13 +7,6 @@
 #ifndef PokemonAutomation_PokemonSV_AutoStory_Segment_03_H
 #define PokemonAutomation_PokemonSV_AutoStory_Segment_03_H
 
-#include <functional>
-#include "Common/Cpp/Options/EnumDropdownOption.h"
-#include "CommonFramework/Notifications/EventNotificationsTable.h"
-#include "CommonFramework/Options/LanguageOCROption.h"
-#include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
-#include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
-#include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSV_AutoStoryTools.h"
 
 namespace PokemonAutomation{
@@ -27,22 +20,34 @@ public:
     virtual std::string end_text() const override;
     virtual void run_segment(
         SingleSwitchProgramEnvironment& env, 
-        BotBaseContext& context,
+        SwitchControllerContext& context,
         AutoStoryOptions options) const override;
 };
 
 
 // start: Battled Nemona on the beach.
 // end: Met mom at gate. Received mom's sandwich.
-void checkpoint_05(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EventNotificationOption& notif_status_update);
+void checkpoint_05(
+    SingleSwitchProgramEnvironment& env,
+    SwitchControllerContext& context,
+    EventNotificationOption& notif_status_update
+);
 
 // start: Met mom at gate. Received mom's sandwich.
 // end: Cleared catch tutorial.
-void checkpoint_06(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EventNotificationOption& notif_status_update);
+void checkpoint_06(
+    SingleSwitchProgramEnvironment& env,
+    SwitchControllerContext& context,
+    EventNotificationOption& notif_status_update
+);
 
 // start: Cleared catch tutorial.
 // end: Moved to cliff. Heard mystery cry.
-void checkpoint_07(SingleSwitchProgramEnvironment& env, BotBaseContext& context, EventNotificationOption& notif_status_update);
+void checkpoint_07(
+    SingleSwitchProgramEnvironment& env,
+    SwitchControllerContext& context,
+    EventNotificationOption& notif_status_update
+);
 
 
 }

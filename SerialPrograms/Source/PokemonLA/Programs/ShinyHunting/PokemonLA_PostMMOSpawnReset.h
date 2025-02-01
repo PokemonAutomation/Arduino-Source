@@ -29,10 +29,10 @@ public:
 class PostMMOSpawnReset : public SingleSwitchProgramInstance{
 public:
     PostMMOSpawnReset();
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
-    void run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    void run_iteration(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
 
 private:
     ShinyRequiresAudioText SHINY_REQUIRES_AUDIO;

@@ -6,9 +6,9 @@
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
-#include "CommonFramework/Tools/StatsTracking.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "Pokemon/Pokemon_Strings.h"
@@ -34,7 +34,7 @@ StatsResetMoltres_Descriptor::StatsResetMoltres_Descriptor()
         "Repeatedly catch moltres until you get the stats you want.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 struct StatsResetMoltres_Descriptor::Stats : public StatsTracker{
@@ -94,7 +94,7 @@ StatsResetMoltres::StatsResetMoltres()
 
 
 
-void StatsResetMoltres::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void StatsResetMoltres::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
         resume_game_back_out(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);
@@ -109,9 +109,9 @@ void StatsResetMoltres::program(SingleSwitchProgramEnvironment& env, BotBaseCont
         env.log("Wait for moltres to attack you.", COLOR_PURPLE);
         {
             StandardBattleMenuWatcher fight_detector(false);
-            int result = run_until(
+            int result = run_until<SwitchControllerContext>(
                 env.console, context,
-                [](BotBaseContext& context){
+                [](SwitchControllerContext& context){
                     while (true){
                         pbf_wait(context, 1 * TICKS_PER_SECOND);
                     }
@@ -127,10 +127,10 @@ void StatsResetMoltres::program(SingleSwitchProgramEnvironment& env, BotBaseCont
         context.wait_for_all_requests();
         CatchResults result = basic_catcher(env.console, context, LANGUAGE, "master-ball", 999);
         if (result.result != CatchResult::POKEMON_CAUGHT){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
                 "Unable to catch Moltres.",
-                true
+                env.console
             );
         }
 
@@ -176,9 +176,9 @@ void StatsResetMoltres::program(SingleSwitchProgramEnvironment& env, BotBaseCont
             env.log("Wait for moltres to attack you.", COLOR_PURPLE);
             {
                 StandardBattleMenuWatcher fight_detector(false);
-                int ret = run_until(
+                int ret = run_until<SwitchControllerContext>(
                     env.console, context,
-                    [](BotBaseContext& context){
+                    [](SwitchControllerContext& context){
                         while (true){
                             pbf_wait(context, 1 * TICKS_PER_SECOND);
                         }

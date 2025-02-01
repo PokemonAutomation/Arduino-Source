@@ -7,14 +7,17 @@
 #include <map>
 #include <QtGlobal>
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/Time.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/AudioPipeline/AudioPipelineOptions.h"
 #include "AudioInfo.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 
 #if QT_VERSION_MAJOR == 5
@@ -312,7 +315,8 @@ std::vector<AudioDeviceInfo> AudioDeviceInfo::all_input_devices(){
     double seconds = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() / 1000.;
     global_logger_tagged().log("Done querying audio inputs... " + tostr_fixed(seconds, 3) + " seconds", COLOR_CYAN);
 
-    if (GlobalSettings::instance().SHOW_ALL_AUDIO_DEVICES){
+    bool show_all_devices = GlobalSettings::instance().AUDIO_PIPELINE->SHOW_ALL_DEVICES;
+    if (show_all_devices){
         return list;
     }
 
@@ -335,7 +339,7 @@ std::vector<AudioDeviceInfo> AudioDeviceInfo::all_input_devices(){
         if (device.preferred_format_index() >= 0){
             current_score += 100;
         }
-        if (current_score >= best_score || GlobalSettings::instance().SHOW_ALL_AUDIO_DEVICES){
+        if (current_score >= best_score || show_all_devices){
             ret.emplace_back(std::move(device));
         }
     }

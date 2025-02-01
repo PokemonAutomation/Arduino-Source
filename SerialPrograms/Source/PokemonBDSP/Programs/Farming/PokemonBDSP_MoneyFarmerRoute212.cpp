@@ -5,9 +5,9 @@
  */
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonBDSP/PokemonBDSP_Settings.h"
@@ -32,7 +32,7 @@ MoneyFarmerRoute212_Descriptor::MoneyFarmerRoute212_Descriptor()
         "Farm money by using VS Seeker to rebattle the rich couple on Route 212.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 struct MoneyFarmerRoute212_Descriptor::Stats : public StatsTracker{
@@ -107,7 +107,7 @@ MoneyFarmerRoute212::MoneyFarmerRoute212()
 
 
 
-bool MoneyFarmerRoute212::battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context, uint8_t pp[4], bool man){
+bool MoneyFarmerRoute212::battle(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, uint8_t pp[4], bool man){
     MoneyFarmerRoute212_Descriptor::Stats& stats = env.current_stats<MoneyFarmerRoute212_Descriptor::Stats>();
     context.wait_for_all_requests();
     if (man){
@@ -129,9 +129,9 @@ bool MoneyFarmerRoute212::battle(SingleSwitchProgramEnvironment& env, BotBaseCon
         BattleMenuWatcher battle_menu(BattleType::TRAINER);
         EndBattleWatcher end_battle;
         SelectionArrowFinder learn_move(env.console, {0.50, 0.62, 0.40, 0.18}, COLOR_YELLOW);
-        int ret = run_until(
+        int ret = run_until<SwitchControllerContext>(
             env.console, context,
-            [](BotBaseContext& context){
+            [](SwitchControllerContext& context){
                 pbf_mash_button(context, BUTTON_B, 30 * TICKS_PER_SECOND);
             },
             {
@@ -155,10 +155,10 @@ bool MoneyFarmerRoute212::battle(SingleSwitchProgramEnvironment& env, BotBaseCon
                 }
             }
             if (slot == 4){
-                throw OperationFailedException(
-                    ErrorReport::SEND_ERROR_REPORT, env.console,
+                OperationFailedException::fire(
+                    ErrorReport::SEND_ERROR_REPORT,
                     "Ran out of PP in a battle.",
-                    true
+                    env.console
                 );
             }
 
@@ -192,32 +192,33 @@ bool MoneyFarmerRoute212::battle(SingleSwitchProgramEnvironment& env, BotBaseCon
 
         default:
             stats.m_errors++;
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
                 "Timed out after 30 seconds.",
-                true
+                env.console
             );
         }
     }
 
-    throw OperationFailedException(
-        ErrorReport::SEND_ERROR_REPORT, env.console,
+    OperationFailedException::fire(
+        ErrorReport::SEND_ERROR_REPORT,
         "No progress detected after 5 battle menus. Are you out of PP?",
-        true
+        env.console
     );
 }
 
 
-void MoneyFarmerRoute212::heal_at_center_and_return(ConsoleHandle& console, BotBaseContext& context, uint8_t pp[4]){
-    console.overlay().add_log("Heal at " + STRING_POKEMON + " Center", COLOR_WHITE);
-    console.log("Healing " + STRING_POKEMON + " at Hearthome City " + STRING_POKEMON + " Center.");
+void MoneyFarmerRoute212::heal_at_center_and_return(VideoStream& stream, SwitchControllerContext& context, uint8_t pp[4]){
+    stream.overlay().add_log("Heal at " + STRING_POKEMON + " Center", COLOR_WHITE);
+    stream.log("Healing " + STRING_POKEMON + " at Hearthome City " + STRING_POKEMON + " Center.");
     pbf_move_left_joystick(context, 125, 0, 6 * TICKS_PER_SECOND, 0);
     pbf_mash_button(context, BUTTON_ZL, 3 * TICKS_PER_SECOND);
+//    ssf_mash_AZs(context, 3 * TICKS_PER_SECOND);
     pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);
     context.wait_for_all_requests();
-    console.overlay().add_log("Heal complete", COLOR_WHITE);
-    console.overlay().add_log("To rich couple", COLOR_WHITE);
-    console.log("Returning to rich couple location...");
+    stream.overlay().add_log("Heal complete", COLOR_WHITE);
+    stream.overlay().add_log("To rich couple", COLOR_WHITE);
+    stream.log("Returning to rich couple location...");
     pbf_move_left_joystick(context, 128, 255, 8 * TICKS_PER_SECOND, 0);
     pbf_move_left_joystick(context, 255, 128, 380, 0);
     pbf_move_left_joystick(context, 128, 255, 300, 0);
@@ -245,28 +246,28 @@ void MoneyFarmerRoute212::heal_at_center_and_return(ConsoleHandle& console, BotB
 }
 
 
-void MoneyFarmerRoute212::fly_to_center_heal_and_return(ConsoleHandle& console, BotBaseContext& context, uint8_t pp[4]){
-    console.log("Flying back to Hearthome City to heal.");
-    console.overlay().add_log("Fly to Hearthome City", COLOR_WHITE);
+void MoneyFarmerRoute212::fly_to_center_heal_and_return(VideoStream& stream, SwitchControllerContext& context, uint8_t pp[4]){
+    stream.log("Flying back to Hearthome City to heal.");
+    stream.overlay().add_log("Fly to Hearthome City", COLOR_WHITE);
     pbf_press_button(context, BUTTON_X, 10, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
     pbf_press_button(context, BUTTON_PLUS, 10, 240);
     pbf_press_dpad(context, DPAD_UP, 10, 60);
     pbf_press_dpad(context, DPAD_UP, 10, 60);
     pbf_mash_button(context, BUTTON_ZL, 12 * TICKS_PER_SECOND);
-    heal_at_center_and_return(console, context, pp);
+    heal_at_center_and_return(stream, context, pp);
 }
 
 bool MoneyFarmerRoute212::heal_after_battle_and_return(
-    ConsoleHandle& console, BotBaseContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     uint8_t pp[4])
 {
     if (HEALING_METHOD == HealMethod::Hearthome){
         // Go to Hearhome City Pokecenter to heal the party.
-        fly_to_center_heal_and_return(console, context, pp);
+        fly_to_center_heal_and_return(stream, context, pp);
         return false;
     }else{
         // Use Global Room to heal the party.
-        heal_by_global_room(console, context);
+        heal_by_global_room(stream, context);
 
         pp[0] = MOVE1_PP;
         pp[1] = MOVE2_PP;
@@ -276,7 +277,7 @@ bool MoneyFarmerRoute212::heal_after_battle_and_return(
     }
 }
 
-void MoneyFarmerRoute212::charge_vs_seeker(BotBaseContext& context){
+void MoneyFarmerRoute212::charge_vs_seeker(SwitchControllerContext& context){
     for (size_t c = 0; c < 5; c++){
         pbf_move_left_joystick(context, 0, 128, 180, 0);
         pbf_move_left_joystick(context, 255, 128, 180, 0);
@@ -294,7 +295,7 @@ size_t MoneyFarmerRoute212::total_pp(uint8_t pp[4]){
 }
 
 
-void MoneyFarmerRoute212::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void MoneyFarmerRoute212::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     MoneyFarmerRoute212_Descriptor::Stats& stats = env.current_stats<MoneyFarmerRoute212_Descriptor::Stats>();
 
     uint8_t pp[4] = {
@@ -340,9 +341,9 @@ void MoneyFarmerRoute212::program(SingleSwitchProgramEnvironment& env, BotBaseCo
         {
             env.console.overlay().add_log("Using Vs. Seeker", COLOR_WHITE);
             VSSeekerReactionTracker tracker(env.console, {0.23, 0.30, 0.35, 0.30});
-            run_until(
+            run_until<SwitchControllerContext>(
                 env.console, context,
-                [this](BotBaseContext& context){
+                [this](SwitchControllerContext& context){
                     SHORTCUT.run(context, TICKS_PER_SECOND);
 
                 },

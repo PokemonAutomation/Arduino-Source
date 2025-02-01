@@ -27,7 +27,7 @@ WattFarmer_Descriptor::WattFarmer_Descriptor()
         "Farm watts. (7.2 seconds/fetch, 1 million watts/hour)",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 
@@ -57,7 +57,7 @@ WattFarmer::WattFarmer()
     PA_ADD_OPTION(SAVE_ITERATIONS);
 }
 
-void WattFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void WattFarmer::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
         pbf_wait(context, GRIP_MENU_WAIT);

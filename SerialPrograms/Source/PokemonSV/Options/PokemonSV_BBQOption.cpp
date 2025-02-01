@@ -13,11 +13,7 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 BBQOption::BBQOption(OCR::LanguageOCROption* language_option)
-    : GroupOption(
-        "Blueberry Quests",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        false, true
-    )
+    : GroupOption("Blueberry Quests", LockMode::UNLOCK_WHILE_RUNNING)
     , m_language_owner(language_option == nullptr
         ? new OCR::LanguageOCROption(
             "<b>Game Language:</b><br>This is required to read quests.",

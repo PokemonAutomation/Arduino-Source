@@ -5,8 +5,8 @@
  */
 
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/Tools/StatsTracking.h"
-#include "CommonFramework/Tools/VideoResolutionCheck.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
+#include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/PokemonSV_Settings.h"
@@ -31,7 +31,7 @@ LPFarmer_Descriptor::LPFarmer_Descriptor()
         "Farm LP by day skipping Tera raids.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 struct LPFarmer_Descriptor::Stats : public StatsTracker{
@@ -85,7 +85,7 @@ LPFarmer::LPFarmer()
 
 
 
-void LPFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void LPFarmer::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
     LPFarmer_Descriptor::Stats& stats = env.current_stats<LPFarmer_Descriptor::Stats>();

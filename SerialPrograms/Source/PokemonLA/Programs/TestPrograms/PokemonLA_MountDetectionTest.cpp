@@ -4,8 +4,7 @@
  *
  */
 
-#include "ClientSource/Connection/BotBase.h"
-#include "CommonFramework/InferenceInfra/InferenceSession.h"
+#include "CommonTools/Async/InferenceSession.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLA/Inference/PokemonLA_MountDetector.h"
 #include "PokemonLA_MountDetectionTest.h"
@@ -23,7 +22,7 @@ MountDetectionTest_Descriptor::MountDetectionTest_Descriptor()
         "",
         "Test the mount detection in the bottom right corner.",
         FeedbackType::REQUIRED, AllowCommandsWhenRunning::ENABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 
@@ -33,7 +32,7 @@ MountDetectionTest::MountDetectionTest(){
 }
 
 
-void MountDetectionTest::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void MountDetectionTest::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     MountTracker tracker(env.console, FAILED_ACTION);
     InferenceSession session(
         context, env.console,

@@ -38,12 +38,21 @@ BooleanCheckBoxCellWidget::BooleanCheckBoxCellWidget(QWidget& parent, BooleanChe
     m_box = new QCheckBox(this);
     m_box->setChecked(m_value);
     layout->addWidget(m_box);
+#if QT_VERSION < 0x060700
     connect(
         m_box, &QCheckBox::stateChanged,
         this, [this](int){
             m_value = m_box->isChecked();
         }
     );
+#else
+    connect(
+        m_box, &QCheckBox::checkStateChanged,
+        this, [this](Qt::CheckState){
+            m_value = m_box->isChecked();
+        }
+    );
+#endif
     value.add_listener(*this);
 }
 void BooleanCheckBoxCellWidget::update_value(){
@@ -81,12 +90,21 @@ BooleanCheckBoxOptionWidget::BooleanCheckBoxOptionWidget(QWidget& parent, Boolea
     m_box = new QCheckBox(this);
     m_box->setChecked(m_value);
     layout->addWidget(m_box, 1);
+#if QT_VERSION < 0x060700
     connect(
         m_box, &QCheckBox::stateChanged,
         this, [this](int){
             m_value = m_box->isChecked();
         }
     );
+#else
+    connect(
+        m_box, &QCheckBox::checkStateChanged,
+        this, [this](int){
+            m_value = m_box->isChecked();
+        }
+    );
+#endif
     value.add_listener(*this);
 }
 void BooleanCheckBoxOptionWidget::update_value(){

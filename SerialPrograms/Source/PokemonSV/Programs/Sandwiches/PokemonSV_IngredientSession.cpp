@@ -10,13 +10,13 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
 #include "PokemonSV/Resources/PokemonSV_Ingredients.h"
 #include "PokemonSV_IngredientSession.h"
 #include "Common/Cpp/PrettyPrint.h"
-#include <iostream>
-using std::cout;
-using std::endl;
+
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -26,14 +26,14 @@ IngredientSession::~IngredientSession() = default;
 
 IngredientSession::IngredientSession(
     AsyncDispatcher& dispatcher,
-    ConsoleHandle& console, BotBaseContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     Language language, SandwichIngredientType type
 )
     : m_dispatcher(dispatcher)
-    , m_console(console)
+    , m_stream(stream)
     , m_context(context)
     , m_language(language)
-    , m_overlays(console.overlay())
+    , m_overlays(stream.overlay())
     , m_type(type)
     , m_num_confirmed(0)
     , m_arrow(COLOR_CYAN, GradientArrowType::RIGHT, {0.02, 0.15, 0.05, 0.80})
@@ -48,9 +48,10 @@ PageIngredients IngredientSession::read_screen(std::shared_ptr<const ImageRGB32>
     PageIngredients ret;
     ImageFloatBox box;
     if (!m_arrow.detect(box, *screen)){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, m_console,
-            "IngredientSession::read_current_page(): Unable to find cursor."
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "IngredientSession::read_current_page(): Unable to find cursor.",
+            m_stream
         );
     }
 
@@ -59,9 +60,10 @@ PageIngredients IngredientSession::read_screen(std::shared_ptr<const ImageRGB32>
     ret.selected = (int8_t)(slot + 0.5);
 //    cout << "slot = " << (int)ret.selected << endl;
     if (ret.selected < 0 || ret.selected >= 10){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, m_console,
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
             "IngredientSession::read_current_page(): Invalid cursor slot.",
+            m_stream,
             screen
         );
     }
@@ -72,7 +74,7 @@ PageIngredients IngredientSession::read_screen(std::shared_ptr<const ImageRGB32>
     m_dispatcher.run_in_parallel(0, SandwichIngredientReader::INGREDIENT_PAGE_LINES + 1, [&](size_t index){
         if (index < SandwichIngredientReader::INGREDIENT_PAGE_LINES){
             // Read text at line `index`
-            OCR::StringMatchResult result = reader.read_ingredient_page_with_ocr(*screen, m_console, m_language, index);
+            OCR::StringMatchResult result = reader.read_ingredient_page_with_ocr(*screen, m_stream.logger(), m_language, index);
             result.clear_beyond_log10p(SandwichFillingOCR::MAX_LOG10P);
             result.clear_beyond_spread(SandwichFillingOCR::MAX_LOG10P_SPREAD);
             for (auto& item : result.results){
@@ -82,7 +84,7 @@ PageIngredients IngredientSession::read_screen(std::shared_ptr<const ImageRGB32>
             // Read current selected icon
             image_result = reader.read_ingredient_page_with_icon_matcher(*screen, ret.selected);
             image_result.clear_beyond_spread(SandwichIngredientReader::ALPHA_SPREAD);
-            image_result.log(m_console, SandwichIngredientReader::MAX_ALPHA);
+            image_result.log(m_stream.logger(), SandwichIngredientReader::MAX_ALPHA);
             image_result.clear_beyond_alpha(SandwichIngredientReader::MAX_ALPHA);
         }
     });
@@ -111,10 +113,11 @@ PageIngredients IngredientSession::read_screen(std::shared_ptr<const ImageRGB32>
             for(const auto& p : image_result.results){
                 sprite_result.insert(p.second);
             }
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, m_console,
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
                 "IngredientSession::read_current_page(): Unable to read selected item. OCR and sprite do not agree on any match: ocr "
                 + set_to_str(ocr_result) + ", sprite " + set_to_str(sprite_result),
+                m_stream,
                 screen
             );
         }
@@ -123,10 +126,11 @@ PageIngredients IngredientSession::read_screen(std::shared_ptr<const ImageRGB32>
             for(const auto& p : image_result.results){
                 sprite_result.insert(p.second);
             }
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, m_console,
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
                 "IngredientSession::read_current_page(): Unable to read selected item. Ambiguous result: "
                 + set_to_str(ocr_result) + ", " + set_to_str(sprite_result),
+                m_stream,
                 screen
             );
         }
@@ -139,7 +143,7 @@ PageIngredients IngredientSession::read_screen(std::shared_ptr<const ImageRGB32>
 
 }
 PageIngredients IngredientSession::read_current_page() const{
-    return read_screen(m_console.video().snapshot());
+    return read_screen(m_stream.video().snapshot());
 }
 
 //  Returns true if a desired ingredient is found somewhere on the page.
@@ -176,12 +180,12 @@ bool IngredientSession::run_move_iteration(
 
     //  Cursor is already on matching ingredient.
     if (current_index == target_line_index){
-        m_console.log("Desired ingredient " + item + " is selected!", COLOR_BLUE);
+        m_stream.log("Desired ingredient " + item + " is selected!", COLOR_BLUE);
         slug = item;
         return true;
     }
 
-    m_console.log("Found desired ingredient " + item + " on current page. Moving towards it...", COLOR_BLUE);
+    m_stream.log("Found desired ingredient " + item + " on current page. Moving towards it...", COLOR_BLUE);
 
     //  Move to it.
     while (current_index < target_line_index){
@@ -201,7 +205,7 @@ bool IngredientSession::run_move_iteration(
 
 std::string IngredientSession::move_to_ingredient(const std::set<std::string>& ingredients) const{
     if (ingredients.empty()){
-        m_console.log("No desired ingredients.", COLOR_RED);
+        m_stream.log("No desired ingredients.", COLOR_RED);
         return "";
     }
 
@@ -222,15 +226,15 @@ std::string IngredientSession::move_to_ingredient(const std::set<std::string>& i
         if (current == SandwichIngredientReader::INGREDIENT_PAGE_LINES - 1){
             not_found_count++;
             if (not_found_count >= 2){
-                m_console.log("Ingredient not found anywhere.", COLOR_RED);
+                m_stream.log("Ingredient not found anywhere.", COLOR_RED);
                 return "";
             }else{
-                m_console.log("End of page reached without finding ingredient. Wrapping back to beginning.", COLOR_ORANGE);
+                m_stream.log("End of page reached without finding ingredient. Wrapping back to beginning.", COLOR_ORANGE);
                 pbf_press_dpad(m_context, DPAD_DOWN, 20, 105);
             }
         }
 
-        m_console.log("Ingredient not found on current page. Scrolling down.", COLOR_ORANGE);
+        m_stream.log("Ingredient not found on current page. Scrolling down.", COLOR_ORANGE);
 
         //  Not found on page. Scroll to next screen
         pbf_press_dpad(m_context, DPAD_RIGHT, 10, 30);
@@ -248,7 +252,7 @@ std::string IngredientSession::move_to_ingredient(const std::set<std::string>& i
 
 
 void IngredientSession::add_ingredients(
-    ConsoleHandle& console, BotBaseContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     std::map<std::string, uint8_t>&& ingredients
 ){
     //  "ingredients" will be what we still need.
@@ -263,14 +267,15 @@ void IngredientSession::add_ingredients(
         std::string found = this->move_to_ingredient(remaining);
         if (found.empty()){
             const SandwichIngredientNames& name = get_ingredient_name(*remaining.begin());
-            throw OperationFailedException(
-                ErrorReport::NO_ERROR_REPORT, console,
-                "Unable to find ingredient: \"" + name.display_name() + "\" - Did you run out?"
+            OperationFailedException::fire(
+                ErrorReport::NO_ERROR_REPORT,
+                "Unable to find ingredient: \"" + name.display_name() + "\" - Did you run out?",
+                stream
             );
         }
 
         const SandwichIngredientNames& name = get_ingredient_name(found);
-        console.log("Add " + name.display_name() + " as ingredient", COLOR_BLUE);
+        stream.log("Add " + name.display_name() + " as ingredient", COLOR_BLUE);
 
         //  If you don't have enough ingredient, it errors out instead of proceeding 
         //  with less than the desired quantity.
@@ -281,14 +286,14 @@ void IngredientSession::add_ingredients(
             for (int attempt = 0; attempt < 5; attempt++){
                 pbf_press_button(context, BUTTON_A, 20, 105);
                 context.wait_for_all_requests();
-                VideoSnapshot image = console.video().snapshot();
+                VideoSnapshot image = stream.video().snapshot();
                 ImageMatch::ImageMatchResult image_result = 
                     reader.read_confirmed_list_with_icon_matcher(image, m_num_confirmed);
                 image_result.clear_beyond_spread(SandwichIngredientReader::ALPHA_SPREAD);
                 image_result.clear_beyond_alpha(SandwichIngredientReader::MAX_ALPHA);
-                image_result.log(console, SandwichIngredientReader::MAX_ALPHA);                
+                image_result.log(stream.logger(), SandwichIngredientReader::MAX_ALPHA);
                 if (image_result.results.size() > 0){ // confirmed that the ingredient was added
-                    console.overlay().add_log("Added " + name.display_name());
+                    stream.overlay().add_log("Added " + name.display_name());
                     m_num_confirmed++;
                     ingredient_added = true;
                     iter->second--;
@@ -297,10 +302,10 @@ void IngredientSession::add_ingredients(
             }
 
             if (!ingredient_added){
-                    throw OperationFailedException(
-                    ErrorReport::SEND_ERROR_REPORT,
-                    console,
-                    "Unable to add ingredient: \"" + name.display_name() + "\" - Did you run out?"
+                OperationFailedException::fire(
+                    ErrorReport::NO_ERROR_REPORT,
+                    "Unable to add ingredient: \"" + name.display_name() + "\" - Did you run out?",
+                    stream
                 );
             }
         }
@@ -312,24 +317,24 @@ void IngredientSession::add_ingredients(
 
 void add_sandwich_ingredients(
     AsyncDispatcher& dispatcher,
-    ConsoleHandle& console, BotBaseContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     Language language,
     std::map<std::string, uint8_t>&& fillings,
     std::map<std::string, uint8_t>&& condiments
 ){
     {
-        IngredientSession session(dispatcher, console, context, language, SandwichIngredientType::FILLING);
-        session.add_ingredients(console, context, std::move(fillings));
+        IngredientSession session(dispatcher, stream, context, language, SandwichIngredientType::FILLING);
+        session.add_ingredients(stream, context, std::move(fillings));
         pbf_press_button(context, BUTTON_PLUS, 20, 230);
     }
 
     {
-        IngredientSession session(dispatcher, console, context, language, SandwichIngredientType::CONDIMENT);
+        IngredientSession session(dispatcher, stream, context, language, SandwichIngredientType::CONDIMENT);
         // If there are herbs, we search first from bottom
         if (std::any_of(condiments.begin(), condiments.end(), [&](const auto& p){return p.first.find("herba") != std::string::npos;})){
             pbf_press_dpad(context, DPAD_UP, 20, 105);
         }
-        session.add_ingredients(console, context, std::move(condiments));
+        session.add_ingredients(stream, context, std::move(condiments));
         pbf_press_button(context, BUTTON_PLUS, 20, 230);
     }
 

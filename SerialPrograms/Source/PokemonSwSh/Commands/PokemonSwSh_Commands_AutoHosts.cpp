@@ -4,10 +4,8 @@
  * 
  */
 
-#include <sstream>
 #include "ClientSource/Libraries/MessageConverter.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
@@ -22,15 +20,10 @@ namespace PokemonSwSh{
 
 
 void connect_to_internet(
-    BotBaseContext& context,
+    SwitchControllerContext& context,
     uint16_t open_ycomm_delay,
     uint16_t connect_to_internet_delay
 ){
-#if 0
-    context.issue_request(
-        DeviceRequest_connect_to_internet(open_ycomm_delay, connect_to_internet_delay)
-    );
-#else
     ssf_press_button(context, BUTTON_Y, open_ycomm_delay, 10);
 
     //  Move the cursor as far away from Link Trade and Surprise Trade as possible.
@@ -44,19 +37,13 @@ void connect_to_internet(
 
     //  Mash B to get out of YCOMM.
     ssf_mash1_button(context, BUTTON_B, connect_to_internet_delay);
-#endif
 }
 void home_to_add_friends(
-    BotBaseContext& context,
+    SwitchControllerContext& context,
     uint8_t user_slot,
     uint8_t scroll_down,
     bool fix_cursor
 ){
-#if 0
-    context.issue_request(
-        DeviceRequest_home_to_add_friends(user_slot, scroll_down, fix_cursor)
-    );
-#else
     //  Scroll to correct user.
     //  Do 2 up-scrolls instead of one. In the event that an error leaves you in
     //  the game instead of the Switch Home, these button presses will actually
@@ -84,10 +71,9 @@ void home_to_add_friends(
     while (scroll_down--){
         ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
     }
-#endif
 }
 void accept_FRs(
-    ConsoleHandle& console, BotBaseContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     uint8_t slot, bool fix_cursor,
     uint16_t game_to_home_delay_safe,
     uint16_t auto_fr_duration,
@@ -106,12 +92,12 @@ void accept_FRs(
     pbf_mash_button(context, BUTTON_A, auto_fr_duration);
 
     //  Return to Switch Home menu. (or game)
-    if (console.video().snapshot()){
-        console.log("Entering game using inference...");
+    if (stream.video().snapshot()){
+        stream.log("Entering game using inference...");
         pbf_press_button(context, BUTTON_HOME, 10, 190);
-        NintendoSwitch::resume_game_from_home(console, context);
+        NintendoSwitch::resume_game_from_home(stream, context);
     }else{
-        console.log("Entering game without inference...", COLOR_RED);
+        stream.log("Entering game without inference...", COLOR_RED);
         settings_to_enter_game_den_lobby(
             context,
             tolerate_system_update_window_slow, false,
@@ -122,39 +108,6 @@ void accept_FRs(
 }
 
 
-
-#if 0
-int register_message_converters_pokemon_autohosting(){
-    register_message_converter(
-        PABB_MSG_COMMAND_CONNECT_TO_INTERNET,
-        [](const std::string& body){
-            std::ostringstream ss;
-            ss << "connect_to_internet() - ";
-            if (body.size() != sizeof(pabb_connect_to_internet)){ ss << "(invalid size)" << std::endl; return ss.str(); }
-            const auto* params = (const pabb_connect_to_internet*)body.c_str();
-            ss << "seqnum = " << (uint64_t)params->seqnum;
-            ss << ", open_ycomm_delay = " << params->open_ycomm_delay;
-            ss << ", connect_to_internet_delay = " << params->connect_to_internet_delay;
-            return ss.str();
-        }
-    );
-    register_message_converter(
-        PABB_MSG_COMMAND_HOME_TO_ADD_FRIENDS,
-        [](const std::string& body){
-            std::ostringstream ss;
-            ss << "home_to_add_friends() - ";
-            if (body.size() != sizeof(pabb_home_to_add_friends)){ ss << "(invalid size)" << std::endl; return ss.str(); }
-            const auto* params = (const pabb_home_to_add_friends*)body.c_str();
-            ss << "seqnum = " << (uint64_t)params->seqnum;
-            ss << ", user_slot = " << (unsigned)params->user_slot;
-            ss << ", fix_cursor = " << params->fix_cursor;
-            return ss.str();
-        }
-    );
-    return 0;
-}
-int init_PokemonSwShAutoHosts = register_message_converters_pokemon_autohosting();
-#endif
 
 
 }

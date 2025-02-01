@@ -4,32 +4,27 @@
  *
  */
 
-#include <cmath>
 #include <array>
+#include <list>
 #include <map>
 #include "Common/Cpp/PrettyPrint.h"
-//#include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTypes/BinaryImage.h"
-#include "CommonFramework/ImageTools/SolidColorTest.h"
-#include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
-//#include "CommonFramework/ImageTools/ImageManip.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-//#include "CommonFramework/ImageTools/ImageFilter.h"
-#include "CommonFramework/OCR/OCR_RawOCR.h"
-//#include "CommonFramework/OCR/OCR_NumberReader.h"
 #include "CommonFramework/Tools/DebugDumper.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
-//#include "CommonFramework/OCR/OCR_Routines.h"
+#include "CommonTools/Images/SolidColorTest.h"
+#include "CommonTools/Images/BinaryImage_FilterRgb32.h"
+#include "CommonTools/OCR/OCR_RawOCR.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.h"
 #include "PokemonSV_TeraCodeReader.h"
 #include "PokemonSV_TeraCardDetector.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -127,25 +122,80 @@ uint8_t TeraCardReader::stars(
 
     ImageViewRGB32 cropped = extract_box_reference(screen, m_stars);
 
-    {
-        ImageStats background = image_stats(extract_box_reference(screen, ImageFloatBox{0.55, 0.62, 0.20, 0.03}));
-        Color background_average = background.average.round();
+    ImageViewRGB32 background = extract_box_reference(screen, ImageFloatBox{0.55, 0.62, 0.20, 0.03});
+//        background.save("background.png");
+    ImageStats background_stats = image_stats(background);
+    Color background_average = background_stats.average.round();
 
-        PackedBinaryMatrix matrix = compress_rgb32_to_binary_euclidean(cropped, (uint32_t)background_average, 100);
+    //  Iterate through multiple distance filters and find how many
+    //  possible stars are in each one. Then do a majority vote.
+    const std::vector<double> DISTANCES{70, 80, 90, 100, 110, 120, 130};
+
+    std::map<size_t, size_t> count_map;
+
+    for (double distance : DISTANCES){
+        PackedBinaryMatrix matrix = compress_rgb32_to_binary_euclidean(cropped, (uint32_t)background_average, distance);
 
         matrix.invert();
 //        cout << matrix.dump() << endl;
         std::unique_ptr<WaterfillSession> session = make_WaterfillSession(matrix);
         auto iter = session->make_iterator(100);
         WaterfillObject object;
-        size_t count = 0;
+
+        std::list<ImagePixelBox> objects;
         while (iter->find_next(object, false)){
-//            extract_box_reference(cropped, object).save("test-" + std::to_string(count) + ".png");
-            count++;
+            //  Attempt to merge with existing objects.
+            ImagePixelBox current(object);
+            bool changed;
+            do{
+                changed = false;
+                for (auto iter1 = objects.begin(); iter1 != objects.end();){
+                    if (current.overlaps_with(*iter1)){
+                        changed = true;
+                        current.merge_with(*iter1);
+                        objects.erase(iter1);
+                        break;
+                    }else{
+                        ++iter1;
+                    }
+                }
+            }while (changed);
+            objects.emplace_back(std::move(current));
         }
-        if (1 <= count && count <= 7){
-            return (uint8_t)count;
+
+#if 0
+        static size_t count = 0;
+        for (const ImagePixelBox& obj : objects){
+            extract_box_reference(cropped, obj).save("test-" + std::to_string(count++) + ".png");
         }
+        cout << "objects.size() = " << objects.size() << endl;
+#endif
+
+
+        count_map[objects.size()]++;
+    }
+
+    count_map.erase(0);
+
+    if (count_map.empty()){
+        dump_image(logger, info, "ReadStarsFailed", screen);
+        return 0;
+    }
+
+    auto best = count_map.begin();
+    for (auto iter = count_map.begin(); iter != count_map.end(); ++iter){
+        if (iter->first == 0){
+            continue;
+        }
+        if (iter->second > best->second){
+            best = iter;
+        }
+    }
+
+    size_t stars = best->first;
+
+    if (1 <= stars && stars <= 7){
+        return (uint8_t)stars;
     }
 
     dump_image(logger, info, "ReadStarsFailed", screen);

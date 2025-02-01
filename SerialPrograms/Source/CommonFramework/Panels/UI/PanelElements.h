@@ -11,7 +11,6 @@
 #include <QLabel>
 #include "Common/Qt/CollapsibleGroupBox.h"
 #include "CommonFramework/Globals.h"
-#include "CommonFramework/ControllerDevices/SerialPortGlobals.h"
 
 class QPushButton;
 
@@ -30,8 +29,7 @@ CollapsibleGroupBox* make_panel_header(
     const std::string& display_name,
     const std::string& doc_link,
     const std::string& description,
-    FeedbackType feedback,
-    PABotBaseLevel serial_level
+    FeedbackType feedback
 );
 
 

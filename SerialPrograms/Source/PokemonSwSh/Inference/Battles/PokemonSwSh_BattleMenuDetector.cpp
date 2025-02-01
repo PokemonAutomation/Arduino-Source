@@ -4,15 +4,14 @@
  *
  */
 
-#include "Common/Compiler.h"
-#include "CommonFramework/ImageTools/SolidColorTest.h"
-#include "CommonFramework/ImageTools/ColorClustering.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "CommonTools/Images/SolidColorTest.h"
+#include "CommonTools/Images/ColorClustering.h"
 #include "PokemonSwSh_BattleMenuDetector.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 //#define DEBUG_StandardBattleMenuDetector
 

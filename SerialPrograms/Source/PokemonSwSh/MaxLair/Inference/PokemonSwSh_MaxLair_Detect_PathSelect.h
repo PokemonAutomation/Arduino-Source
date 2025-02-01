@@ -7,15 +7,14 @@
 #ifndef PokemonAutomation_PokemonSwSh_MaxLair_Detect_PathSelect_H
 #define PokemonAutomation_PokemonSwSh_MaxLair_Detect_PathSelect_H
 
-#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
+#include "CommonFramework/Tools/VideoStream.h"
+#include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 #include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_State.h"
 
 namespace PokemonAutomation{
-    class BotBaseContext;
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 namespace MaxLairInternal{
@@ -78,7 +77,11 @@ public:
     ) const;
 
 
-    void read_path(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, GlobalState& state);
+    void read_path(
+        ProgramEnvironment& env,
+        VideoStream& stream, SwitchControllerContext& context,
+        GlobalState& state
+    );
 
 
     //  Determine which side you're on (left or right) in the path.

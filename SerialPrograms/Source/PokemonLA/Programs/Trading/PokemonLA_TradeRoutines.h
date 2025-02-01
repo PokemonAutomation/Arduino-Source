@@ -8,13 +8,13 @@
 #define PokemonAutomation_PokemonLA_TradeRoutines_H
 
 #include "CommonFramework/Language.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "CommonFramework/Tools/StatsTracking.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
-#include "CommonFramework/Tools/MultiConsoleErrors.h"
+#include "CommonFramework/Tools/VideoStream.h"
+#include "CommonTools/MultiConsoleErrors.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 
 namespace PokemonAutomation{
-    class BotBaseContext;
     class ProgramEnvironment;
 namespace NintendoSwitch{
 namespace PokemonLA{
@@ -28,7 +28,7 @@ struct TradeStats : public StatsTracker{
 
 
 void trade_current_pokemon(
-    ConsoleHandle& console, BotBaseContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     MultiConsoleErrorState& tracker,
     TradeStats& stats
 );

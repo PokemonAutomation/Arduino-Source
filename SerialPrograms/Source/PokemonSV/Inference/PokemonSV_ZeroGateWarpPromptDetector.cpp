@@ -6,7 +6,6 @@
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSV_ZeroGateWarpPromptDetector.h"
 
@@ -43,10 +42,10 @@ int ZeroGateWarpPromptDetector::detect_location(const ImageViewRGB32& screen) co
     return index;
 }
 bool ZeroGateWarpPromptDetector::move_cursor(
-    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context,
     int row
 ) const{
-    VideoOverlaySet overlays(console.overlay());
+    VideoOverlaySet overlays(stream.overlay());
     make_overlays(overlays);
 
     size_t consecutive_detection_fails = 0;
@@ -54,17 +53,18 @@ bool ZeroGateWarpPromptDetector::move_cursor(
     bool target_reached = false;
     while (true){
         context.wait_for_all_requests();
-        VideoSnapshot screen = console.video().snapshot();
+        VideoSnapshot screen = stream.video().snapshot();
         int current = this->detect_location(screen);
 
-        console.log("Current Location: " + std::to_string(current));
+        stream.log("Current Location: " + std::to_string(current));
 
         if (current < 0){
             consecutive_detection_fails++;
             if (consecutive_detection_fails > 10){
-                throw OperationFailedException(
-                    ErrorReport::SEND_ERROR_REPORT, console,
+                OperationFailedException::fire(
+                    ErrorReport::SEND_ERROR_REPORT,
                     "ZeroGateWarpPromptDetector::move_cursor(): Unable to detect cursor.",
+                    stream,
                     screen
                 );
             }
@@ -74,9 +74,10 @@ bool ZeroGateWarpPromptDetector::move_cursor(
         consecutive_detection_fails = 0;
 
         if (moves >= 10){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
                 "Unable to move to target after 10 moves.",
+                stream,
                 screen
             );
         }

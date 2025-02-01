@@ -26,7 +26,7 @@ class TurboButton : public SingleSwitchProgramInstance{
 public:
     TurboButton();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
     IntegerEnumDropdownOption BUTTON;

@@ -15,11 +15,26 @@
 #include <QFile>
 #include <QTextEdit>
 #include <QMainWindow>
-#include "Logger.h"
+#include "Common/Cpp/AbstractLogger.h"
+//#include "Common/Cpp/LifetimeSanitizer.h"
 
 namespace PokemonAutomation{
 
 class FileWindowLoggerWindow;
+
+
+class LastLogTracker{
+public:
+    LastLogTracker(size_t max_lines = 10000)
+        : m_max_lines(max_lines)
+    {}
+    void operator+=(std::string line);
+    std::vector<std::string> snapshot() const;
+
+private:
+    size_t m_max_lines;
+    std::deque<std::string> m_lines;
+};
 
 
 class FileWindowLogger : public Logger{
@@ -32,6 +47,7 @@ public:
 
     virtual void log(const std::string& msg, Color color = Color()) override;
     virtual void log(std::string&& msg, Color color = Color()) override;
+    virtual std::vector<std::string> get_last() const override;
 
 private:
     static std::string normalize_newlines(const std::string& msg);
@@ -44,12 +60,15 @@ private:
 private:
     QFile m_file;
     size_t m_max_queue_size;
-    std::mutex m_lock;
+    mutable std::mutex m_lock;
     std::condition_variable m_cv;
+    LastLogTracker m_last_log_tracker;
     bool m_stopping;
     std::deque<std::pair<std::string, Color>> m_queue;
     std::set<FileWindowLoggerWindow*> m_windows;
     std::thread m_thread;
+
+//    LifetimeSanitizer m_sanitizer;
 };
 
 

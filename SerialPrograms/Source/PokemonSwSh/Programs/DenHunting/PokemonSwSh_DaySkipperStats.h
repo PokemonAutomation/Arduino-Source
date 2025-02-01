@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_DaySkipperStats_H
 
 #include "Common/Cpp/PrettyPrint.h"
-#include "CommonFramework/Tools/StatsTracking.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

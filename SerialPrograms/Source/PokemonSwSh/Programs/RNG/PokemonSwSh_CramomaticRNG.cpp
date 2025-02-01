@@ -12,13 +12,13 @@
 #include <set>
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "CommonFramework/ImageTools/ImageStats.h"
-#include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
+#include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Tools/DebugDumper.h"
+#include "CommonTools/Images/SolidColorTest.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "Pokemon/Pokemon_Strings.h"
@@ -48,7 +48,7 @@ CramomaticRNG_Descriptor::CramomaticRNG_Descriptor()
         "Perform RNG manipulation to get rare balls from the Cram-o-matic.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 
@@ -172,7 +172,7 @@ CramomaticRNG::CramomaticRNG()
     PA_ADD_OPTION(LOG_VALUES);
 }
 
-void CramomaticRNG::navigate_to_party(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void CramomaticRNG::navigate_to_party(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     pbf_press_button(context, BUTTON_X, 10, 125);
     pbf_press_button(context, BUTTON_A, 10, 10);
     pbf_wait(context, 2 * TICKS_PER_SECOND);
@@ -280,7 +280,7 @@ CramomaticTarget CramomaticRNG::calculate_target(SingleSwitchProgramEnvironment&
     return possible_targets[0];
 }
 
-void CramomaticRNG::leave_to_overworld_and_interact(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void CramomaticRNG::leave_to_overworld_and_interact(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     pbf_press_button(context, BUTTON_B, 2 * TICKS_PER_SECOND, 5);
     pbf_press_button(context, BUTTON_B, 10, 70);
 
@@ -288,7 +288,7 @@ void CramomaticRNG::leave_to_overworld_and_interact(SingleSwitchProgramEnvironme
     pbf_wait(context, 125);
 }
 
-void CramomaticRNG::choose_apricorn(SingleSwitchProgramEnvironment& env, BotBaseContext& context, bool sport){
+void CramomaticRNG::choose_apricorn(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, bool sport){
     // check whether the bag is open
     context.wait_for_all_requests();
     VideoOverlaySet boxes(env.console);
@@ -297,10 +297,10 @@ void CramomaticRNG::choose_apricorn(SingleSwitchProgramEnvironment& env, BotBase
 
     int ret = wait_until(env.console, context, Milliseconds(5000), { bag_arrow_detector });
     if (ret < 0){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, env.console,
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
             "Could not detect bag.",
-            true
+            env.console
         );
     }
 
@@ -320,7 +320,7 @@ void CramomaticRNG::choose_apricorn(SingleSwitchProgramEnvironment& env, BotBase
     pbf_mash_button(context, BUTTON_A, 5 * TICKS_PER_SECOND);
 }
 
-std::pair<bool, std::string> CramomaticRNG::receive_ball(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+std::pair<bool, std::string> CramomaticRNG::receive_ball(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     // receive ball and refuse to use the cram-o-matic again
     VideoOverlaySet boxes(env.console);
 
@@ -371,7 +371,7 @@ std::pair<bool, std::string> CramomaticRNG::receive_ball(SingleSwitchProgramEnvi
     return {arrow_detected, best_ball};
 }
 
-void CramomaticRNG::recover_from_wrong_state(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void CramomaticRNG::recover_from_wrong_state(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     // Mash the B button to exit potential menus or dialog boxes
     pbf_mash_button(context, BUTTON_B, 30 * TICKS_PER_SECOND);
 
@@ -382,7 +382,7 @@ void CramomaticRNG::recover_from_wrong_state(SingleSwitchProgramEnvironment& env
 }
 
 
-void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     CramomaticRNG_Descriptor::Stats& stats = env.current_stats<CramomaticRNG_Descriptor::Stats>();
     env.update_stats();
 
@@ -463,9 +463,10 @@ void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
 
             state_errors++;
             if (state_errors >= 3){
-                throw OperationFailedException(
-                    ErrorReport::SEND_ERROR_REPORT, env.console,
-                    "Detected invalid RNG state three times in a row."
+                OperationFailedException::fire(
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "Detected invalid RNG state three times in a row.",
+                    env.console
                 );
             }
             VideoSnapshot screen = env.console.video().snapshot();
@@ -489,18 +490,16 @@ void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         }catch (OperationFailedException& e){
             stats.errors++;
             env.update_stats();
-            e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
 
             apricorn_selection_errors++;
             if (apricorn_selection_errors >= 3){
-                throw OperationFailedException(
-                    ErrorReport::SEND_ERROR_REPORT, env.console,
+                OperationFailedException::fire(
+                    ErrorReport::SEND_ERROR_REPORT,
                     "Could not detect the bag three times on a row.",
-                    true
+                env.console
                 );
             }
-            VideoSnapshot screen = env.console.video().snapshot();
-            send_program_recoverable_error_notification(env, NOTIFICATION_ERROR_RECOVERABLE, "Could not detect the bag.", screen);
+            send_program_recoverable_error_notification(env, NOTIFICATION_ERROR_RECOVERABLE, e.message(), e.screenshot());
             is_state_valid = false;
             recover_from_wrong_state(env, context);
             continue;
@@ -523,7 +522,7 @@ void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
 
         //  Out of apricorns.
         if (!result.first || num_apricorn_one <= 4 || (sport_wanted && num_apricorn_two <= 2)){
-            throw ProgramFinishedException(env.console, "Out of apricorns.");
+            throw_and_log<ProgramFinishedException>(env.console, "Out of apricorns.", env.console);
         }
 
 

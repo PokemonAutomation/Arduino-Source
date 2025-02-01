@@ -10,6 +10,10 @@
 #include "JsonObject.h"
 #include "JsonTools.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 
 
@@ -365,8 +369,9 @@ bool JsonValue::read_string(std::string& value) const{
 JsonValue parse_json(const std::string& str){
     return from_nlohmann(nlohmann::json::parse(str, nullptr, false));
 }
-JsonValue load_json_file(const std::string& str){
-    return parse_json(file_to_string(str));
+JsonValue load_json_file(const std::string& filename){
+    std::string str = file_to_string(filename);
+    return parse_json(str);
 }
 std::string JsonValue::dump(int indent) const{
     return to_nlohmann(*this).dump(indent);

@@ -4,10 +4,9 @@
  *
  */
 
-#include "Common/Compiler.h"
-#include "CommonFramework/ImageTools/SolidColorTest.h"
-#include "CommonFramework/ImageTools/ColorClustering.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "CommonTools/Images/SolidColorTest.h"
+#include "CommonTools/Images/ColorClustering.h"
 #include "PokemonSwSh_RaidCatchDetector.h"
 
 namespace PokemonAutomation{

@@ -12,7 +12,7 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
-#include "CommonFramework/ImageMatch/ImageDiff.h"
+#include "CommonFramework/ImageTools/ImageDiff.h"
 #include "VideoToolsQt5.h"
 
 #include <iostream>

@@ -4,18 +4,16 @@
  *
  */
 
-#include "Common/Compiler.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
-#include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
-#include "Pokemon/Inference/Pokemon_NameReader.h"
+#include "CommonTools/Images/SolidColorTest.h"
 #include "PokemonSwSh_MaxLair_Detect_PokemonReader.h"
 #include "PokemonSwSh_MaxLair_Detect_PokemonSelectMenu.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -94,10 +92,12 @@ bool PokemonSelectMenuDetector::process_frame(const ImageViewRGB32& frame, WallC
 PokemonSelectMenuReader::PokemonSelectMenuReader(
     Logger& logger,
     VideoOverlay& overlay,
-    Language language
+    Language language,
+    OcrFailureWatchdog& ocr_watchdog
 )
     : m_logger(logger)
     , m_language(language)
+    , m_ocr_watchdog(ocr_watchdog)
     , m_sprite0(overlay, {0.481, 0.178 + 0*0.258, 0.071, 0.103})
     , m_sprite1(overlay, {0.481, 0.178 + 1*0.258, 0.071, 0.103})
     , m_sprite2(overlay, {0.481, 0.178 + 2*0.258, 0.071, 0.103})
@@ -123,9 +123,9 @@ int8_t PokemonSelectMenuReader::who_is_selecting(const ImageViewRGB32& screen) c
 }
 std::string PokemonSelectMenuReader::read_option(const ImageViewRGB32& screen, size_t index){
     switch (index){
-    case 0: return read_pokemon_name_sprite(m_logger, screen, m_sprite0, m_name0, m_language, true);
-    case 1: return read_pokemon_name_sprite(m_logger, screen, m_sprite1, m_name1, m_language, true);
-    case 2: return read_pokemon_name_sprite(m_logger, screen, m_sprite2, m_name2, m_language, true);
+    case 0: return read_pokemon_name_sprite(m_logger, m_ocr_watchdog, screen, m_sprite0, m_name0, m_language, true);
+    case 1: return read_pokemon_name_sprite(m_logger, m_ocr_watchdog, screen, m_sprite1, m_name1, m_language, true);
+    case 2: return read_pokemon_name_sprite(m_logger, m_ocr_watchdog, screen, m_sprite2, m_name2, m_language, true);
     }
     return "";
 }

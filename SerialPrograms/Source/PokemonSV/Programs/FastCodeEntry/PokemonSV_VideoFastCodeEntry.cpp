@@ -6,12 +6,11 @@
 
 #include "Common/Cpp/CancellableScope.h"
 #include "Common/Cpp/Concurrency/AsyncDispatcher.h"
-//#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/ImageTools/ImageFilter.h"
-#include "CommonFramework/ImageMatch/ImageDiff.h"
+#include "CommonFramework/ImageTools/ImageDiff.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/OCR/OCR_RawOCR.h"
+#include "CommonTools/Images/ImageFilter.h"
+#include "CommonTools/OCR/OCR_RawOCR.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/Inference/Tera/PokemonSV_TeraCodeReader.h"
@@ -127,7 +126,7 @@ VideoFastCodeEntry_Descriptor::VideoFastCodeEntry_Descriptor()
         "Read a 4, 6, or 8 digit link code from someone on your screen and enter it as quickly as possible.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB,
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS},
         1, 4, 1
     )
 {}
@@ -180,7 +179,7 @@ void VideoFastCodeEntry::program(MultiSwitchProgramEnvironment& env, Cancellable
     }
 
     //  Connect the controller.
-    env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
+    env.run_in_parallel(scope, [&](ConsoleHandle& console, SwitchControllerContext& context){
         pbf_press_button(context, BUTTON_PLUS, 5, 3);
     });
 

@@ -14,12 +14,11 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Containers/AlignedVector.h"
 #include "Common/Cpp/Containers/AlignedVector.tpp"
-#include "ClientSource/Connection/BotBase.h"
 #include "CommonFramework/AudioPipeline/AudioFeed.h"
 #include "CommonFramework/AudioPipeline/AudioTemplate.h"
-#include "CommonFramework/InferenceInfra/InferenceSession.h"
-#include "CommonFramework/Inference/AudioTemplateCache.h"
-#include "CommonFramework/Inference/SpectrogramMatcher.h"
+#include "CommonTools/Audio/AudioTemplateCache.h"
+#include "CommonTools/Audio/SpectrogramMatcher.h"
+#include "CommonTools/Async/InferenceSession.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLA/Inference/Sounds/PokemonLA_AlphaMusicDetector.h"
 #include "PokemonLA/Inference/Sounds/PokemonLA_AlphaRoarDetector.h"
@@ -42,7 +41,7 @@ SoundListener_Descriptor::SoundListener_Descriptor()
         "",
         "Test sound detectors listening to audio stream.",
         FeedbackType::REQUIRED, AllowCommandsWhenRunning::ENABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 
@@ -71,7 +70,7 @@ SoundListener::SoundListener()
 
 // void search_alpha_roar_from_audio_dump();
 
-void SoundListener::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void SoundListener::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     //  Connect the controller.
     // pbf_move_right_joystick(context, 0, 255, 10, 0);
 

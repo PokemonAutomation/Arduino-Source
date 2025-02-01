@@ -7,8 +7,8 @@
 #include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/Tools/StatsTracking.h"
-#include "CommonFramework/Tools/VideoResolutionCheck.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
+#include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.h"
@@ -32,7 +32,7 @@ EggHatcher_Descriptor::EggHatcher_Descriptor()
         "Automatically hatch eggs from boxes.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 struct EggHatcher_Descriptor::Stats : public StatsTracker{
@@ -94,7 +94,7 @@ EggHatcher::EggHatcher()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void EggHatcher::hatch_one_box(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void EggHatcher::hatch_one_box(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     EggHatcher_Descriptor::Stats& stats = env.current_stats<EggHatcher_Descriptor::Stats>();
 
     for(uint8_t column_index = 0; column_index < 6; column_index++){
@@ -102,10 +102,10 @@ void EggHatcher::hatch_one_box(SingleSwitchProgramEnvironment& env, BotBaseConte
         {
             const uint8_t expected_empty_slots_in_party = HAS_CLONE_RIDE_POKEMON ? 4 : 5;
             if (check_empty_slots_in_party(env.program_info(), env.console, context) != expected_empty_slots_in_party){
-                throw FatalProgramException(
-                    ErrorReport::SEND_ERROR_REPORT, env.console,
+                throw_and_log<FatalProgramException>(
+                    env.console, ErrorReport::SEND_ERROR_REPORT,
                     "Your party should have " + std::to_string(expected_empty_slots_in_party) + " " + STRING_POKEMON + ".",
-                    true
+                    env.console
                 );
             }
         }
@@ -160,10 +160,10 @@ void EggHatcher::hatch_one_box(SingleSwitchProgramEnvironment& env, BotBaseConte
 
         num_eggs = check_egg_party_column(env.program_info(), env.console, context).first;
         if (num_eggs > 0){
-            throw FatalProgramException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
+            throw_and_log<FatalProgramException>(
+                env.console, ErrorReport::SEND_ERROR_REPORT,
                 "Detected egg in party after hatching.",
-                true
+                env.console
             );
         }
 
@@ -173,7 +173,7 @@ void EggHatcher::hatch_one_box(SingleSwitchProgramEnvironment& env, BotBaseConte
     context.wait_for_all_requests();
 }
 
-void EggHatcher::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void EggHatcher::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
     EggHatcher_Descriptor::Stats& stats = env.current_stats<EggHatcher_Descriptor::Stats>();

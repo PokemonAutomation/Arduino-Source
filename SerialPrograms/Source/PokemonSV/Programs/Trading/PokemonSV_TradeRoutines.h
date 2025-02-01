@@ -7,9 +7,10 @@
 #ifndef PokemonAutomation_PokemonSV_TradeRoutines_H
 #define PokemonAutomation_PokemonSV_TradeRoutines_H
 
-#include "CommonFramework/Tools/StatsTracking.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
-#include "CommonFramework/Tools/MultiConsoleErrors.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
+#include "CommonFramework/Tools/VideoStream.h"
+#include "CommonTools/MultiConsoleErrors.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 #include "NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h"
 
 namespace PokemonAutomation{
@@ -28,7 +29,7 @@ struct TradeStats : public StatsTracker{
 
 
 void trade_current_pokemon(
-    ConsoleHandle& console, BotBaseContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     MultiConsoleErrorState& tracker,
     TradeStats& stats
 );

@@ -7,12 +7,10 @@
 #include <chrono>
 #include <iostream>
 #include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
-#include "CommonFramework/Tools/StatsTracking.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
-#include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.h"
@@ -35,7 +33,7 @@ MagikarpMoveGrinder_Descriptor::MagikarpMoveGrinder_Descriptor()
         "grind status moves with any style against a Magikarp to finish " + STRING_POKEDEX + " research tasks.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 class MagikarpMoveGrinder_Descriptor::Stats : public StatsTracker{
@@ -82,7 +80,7 @@ MagikarpMoveGrinder::MagikarpMoveGrinder()
 
 
 
-void MagikarpMoveGrinder::grind_mimic(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void MagikarpMoveGrinder::grind_mimic(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     MagikarpMoveGrinder_Descriptor::Stats& stats = env.current_stats<MagikarpMoveGrinder_Descriptor::Stats>();
     env.log("Special case: grinding Mimic...");
 
@@ -108,10 +106,10 @@ void MagikarpMoveGrinder::grind_mimic(SingleSwitchProgramEnvironment& env, BotBa
             env.console.log("Error: Failed to find battle menu after 2 minutes.");
 //            auto snapshot = env.console.video().snapshot();
 //            dump_image(env.logger(), env.program_info(), "BattleMenuNotFound", snapshot);
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
                 "Failed to find battle menu after 2 minutes.",
-                true
+                env.console
             );
         }
 
@@ -156,7 +154,7 @@ void MagikarpMoveGrinder::grind_mimic(SingleSwitchProgramEnvironment& env, BotBa
     }
 }
 
-void MagikarpMoveGrinder::battle_magikarp(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void MagikarpMoveGrinder::battle_magikarp(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     MagikarpMoveGrinder_Descriptor::Stats& stats = env.current_stats<MagikarpMoveGrinder_Descriptor::Stats>();
 
     // Which pokemon in the party is not fainted
@@ -179,10 +177,10 @@ void MagikarpMoveGrinder::battle_magikarp(SingleSwitchProgramEnvironment& env, B
             env.console.log("Error: Failed to find battle menu after 2 minutes.");
 //            auto snapshot = env.console.video().snapshot();
 //            dump_image(env.logger(), env.program_info(), "BattleMenuNotFound", snapshot);
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
                 "Failed to find battle menu after 2 minutes.",
-                true
+                env.console
             );
         }
 
@@ -233,7 +231,7 @@ void MagikarpMoveGrinder::battle_magikarp(SingleSwitchProgramEnvironment& env, B
 
 
 
-void MagikarpMoveGrinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void MagikarpMoveGrinder::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     MagikarpMoveGrinder_Descriptor::Stats& stats = env.current_stats<MagikarpMoveGrinder_Descriptor::Stats>();
 
     if (POKEMON_ACTIONS.num_pokemon() == 0){

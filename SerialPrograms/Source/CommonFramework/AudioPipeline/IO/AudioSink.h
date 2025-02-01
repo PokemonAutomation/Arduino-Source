@@ -12,6 +12,7 @@
 #define PokemonAutomation_AudioPipeline_AudioSink_H
 
 #include <memory>
+#include "Common/Cpp/LifetimeSanitizer.h"
 #include "CommonFramework/AudioPipeline/AudioInfo.h"
 #include "CommonFramework/AudioPipeline/AudioStream.h"
 
@@ -41,6 +42,8 @@ private:
     size_t m_multiplier;
 
     std::unique_ptr<AudioOutputDevice> m_writer;
+
+    LifetimeSanitizer m_sanitizer;
 };
 
 

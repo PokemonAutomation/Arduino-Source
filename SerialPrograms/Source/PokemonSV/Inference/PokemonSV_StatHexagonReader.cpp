@@ -7,13 +7,11 @@
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
-#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
-#include "CommonFramework/ImageTools/ImageFilter.h"
-#include "CommonFramework/ImageTools/ImageManip.h"
-#include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
-#include "CommonFramework/OCR/OCR_NumberReader.h"
+#include "CommonTools/Images/ImageFilter.h"
+#include "CommonTools/Images/BinaryImage_FilterRgb32.h"
+#include "CommonTools/OCR/OCR_NumberReader.h"
 #include "PokemonSV_StatHexagonReader.h"
 
 //#include <iostream>
@@ -139,9 +137,8 @@ NatureAdjustments StatHexagonReader::read_nature(Logger& logger, const ImageView
         return ret;
     }
     if (non_neutral.size() != 2){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT,
-            logger,
+        throw_and_log<OperationFailedException>(
+            logger, ErrorReport::SEND_ERROR_REPORT,
             "Unable to read nature."
         );
     }
@@ -167,9 +164,8 @@ NatureAdjustments StatHexagonReader::read_nature(Logger& logger, const ImageView
         return ret;
     }
 
-    throw OperationFailedException(
-        ErrorReport::SEND_ERROR_REPORT,
-        logger,
+    throw_and_log<OperationFailedException>(
+        logger, ErrorReport::SEND_ERROR_REPORT,
         "Unable to read nature."
     );
 }

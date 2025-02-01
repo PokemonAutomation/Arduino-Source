@@ -7,7 +7,8 @@
 #ifndef PokemonAutomation_PokemonLA_FlagNavigation_H
 #define PokemonAutomation_PokemonLA_FlagNavigation_H
 
-#include "CommonFramework/Tools/SuperControlSession.h"
+#include "CommonTools/Async/SuperControlSession.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_FlagTracker.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_ButtonDetector.h"
 #include "PokemonLA/Inference/PokemonLA_DialogDetector.h"
@@ -18,10 +19,11 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-class FlagNavigationAir : public SuperControlSession{
+class FlagNavigationAir : public SuperControlSession<SwitchController>{
 public:
     FlagNavigationAir(
-        ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+        ProgramEnvironment& env,
+        VideoStream& stream, SwitchControllerContext& context,
         uint16_t stop_radius,
         double flag_reached_delay,
         std::chrono::seconds navigate_timeout
@@ -31,10 +33,10 @@ public:
 
 
 private:
-    virtual bool run_state(AsyncCommandSession& commands, WallClock timestamp) override;
+    virtual bool run_state(AsyncCommandSession<SwitchController>& commands, WallClock timestamp) override;
 
-    bool run_flying(AsyncCommandSession& commands, WallClock timestamp);
-    bool run_climbing(AsyncCommandSession& commands, WallClock timestamp);
+    bool run_flying(AsyncCommandSession<SwitchController>& commands, WallClock timestamp);
+    bool run_climbing(AsyncCommandSession<SwitchController>& commands, WallClock timestamp);
 
 
 private:

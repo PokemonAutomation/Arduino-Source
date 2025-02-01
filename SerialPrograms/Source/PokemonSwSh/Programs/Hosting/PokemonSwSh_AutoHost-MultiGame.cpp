@@ -33,7 +33,7 @@ AutoHostMultiGame_Descriptor::AutoHostMultiGame_Descriptor()
         "Run AutoHost-Rolling across multiple game saves. (Up to 16 dens!)",
         FeedbackType::OPTIONAL_,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 std::unique_ptr<StatsTracker> AutoHostMultiGame_Descriptor::make_stats() const{
@@ -119,7 +119,7 @@ AutoHostMultiGame::AutoHostMultiGame()
 
 
 
-void AutoHostMultiGame::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void AutoHostMultiGame::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     uint16_t start_raid_delay = HOST_ONLINE
         ? OPEN_ONLINE_DEN_LOBBY_DELAY
         : GameSettings::instance().OPEN_LOCAL_DEN_LOBBY_DELAY;

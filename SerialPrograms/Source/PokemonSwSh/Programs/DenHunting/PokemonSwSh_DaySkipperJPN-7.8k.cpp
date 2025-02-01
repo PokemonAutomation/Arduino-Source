@@ -4,10 +4,10 @@
  *
  */
 
-#include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
-#include "NintendoSwitch/FixedInterval.h"
+#include "Controllers/SerialPABotBase/SerialPABotBase.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DaySkippers.h"
 #include "PokemonSwSh_DaySkipperStats.h"
@@ -27,7 +27,13 @@ DaySkipperJPN7p8k_Descriptor::DaySkipperJPN7p8k_Descriptor()
         "A faster, but less reliable Japanese date skipper. (7800 skips/hour)",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_31KB
+        {{
+            SerialPABotBase::NintendoSwitch_Basic, {
+                to_string(SerialPABotBase::Features::TickPrecise),
+                to_string(SerialPABotBase::Features::NintendoSwitch_Basic),
+                to_string(SerialPABotBase::Features::NintendoSwitch_DateSkip),
+            }
+        }}
     )
 {}
 std::unique_ptr<StatsTracker> DaySkipperJPN7p8k_Descriptor::make_stats() const{
@@ -100,7 +106,7 @@ typedef struct{
 bool is_start(const DateSmall* date){
     return date->year != 0 || date->month != 1 || date->day != 1;
 }
-bool date_increment_day(BotBaseContext& context, DateSmall* date, bool press){
+bool date_increment_day(SwitchControllerContext& context, DateSmall* date, bool press){
     uint8_t days = days_in_month(date->year, date->month);
     if (date->day != days){
         if (press){
@@ -138,7 +144,7 @@ bool date_increment_day(BotBaseContext& context, DateSmall* date, bool press){
     return false;
 }
 
-void DaySkipperJPN7p8k::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void DaySkipperJPN7p8k::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     SkipperStats& stats = env.current_stats<SkipperStats>();
     stats.total_skips = SKIPS;
     stats.runs++;

@@ -36,7 +36,7 @@ public:
 class ShinyHuntAutonomousSwordsOfJustice : public SingleSwitchProgramInstance{
 public:
     ShinyHuntAutonomousSwordsOfJustice();
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
     StartInGripOrGameOption START_LOCATION;

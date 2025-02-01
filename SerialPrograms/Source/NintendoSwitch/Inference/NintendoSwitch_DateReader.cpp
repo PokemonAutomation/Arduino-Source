@@ -10,25 +10,27 @@
 #include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
-#include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
-#include "CommonFramework/OCR/OCR_RawOCR.h"
-#include "CommonFramework/OCR/OCR_NumberReader.h"
-#include "CommonFramework/OCR/OCR_StringNormalization.h"
+#include "CommonTools/Images/ImageFilter.h"
+#include "CommonTools/Async/InferenceRoutines.h"
+#include "CommonTools/OCR/OCR_RawOCR.h"
+#include "CommonTools/OCR/OCR_NumberReader.h"
+#include "CommonTools/OCR/OCR_StringNormalization.h"
+#include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
+#include "NintendoSwitch/Inference/NintendoSwitch_DetectHome.h"
 #include "NintendoSwitch_DateReader.h"
+#include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
-
 
 DateReader::DateReader()
     : m_background_top(0.50, 0.02, 0.45, 0.08)
@@ -88,7 +90,10 @@ bool DateReader::detect(const ImageViewRGB32& screen) const{
 //        cout << "zxcv" << endl;
         return false;
     }
-    if (stats_background_top.average.sum() > stats_window_top.average.sum()){
+//    cout << "stats_background_top: " << stats_background_top.average.sum() << endl;
+//    cout << "stats_window_top: " << stats_window_top.average.sum() << endl;
+    if (std::abs(stats_background_top.average.sum() - stats_window_top.average.sum()) < 50){
+//        cout << "xcvb" << endl;
         return false;
     }
 
@@ -100,11 +105,13 @@ bool DateReader::detect(const ImageViewRGB32& screen) const{
 
     double stddev = stats_us_hours.stddev.sum();
     if (stddev < 80){
+//        cout << "sdfg" << endl;
         return false;
     }
 
     return true;
 }
+#if 0
 int8_t DateReader::read_hours(Logger& logger, const ImageViewRGB32& screen) const{
     if (!detect(screen)){
         return -1;
@@ -124,8 +131,7 @@ int8_t DateReader::read_hours(Logger& logger, const ImageViewRGB32& screen) cons
     double stddev = stats_us_hours.stddev.sum();
     bool format_us = stddev > 30;
     if (format_us){
-        ImageRGB32 us_hours_filtered = to_blackwhite_rgb32_range(us_hours, 0xff000000, 0xff7f7f7f, white_theme);
-        int hours = OCR::read_number(logger, us_hours_filtered);
+        int hours = read_box(logger, 1, 12, screen, m_us_hour, white_theme);
         if (hours < 1 || hours > 12){
             return -1;
         }
@@ -134,7 +140,7 @@ int8_t DateReader::read_hours(Logger& logger, const ImageViewRGB32& screen) cons
         }
 
         ImageViewRGB32 us_ampm = extract_box_reference(screen, m_us_ampm);
-        ImageRGB32 us_ampm_filtered = to_blackwhite_rgb32_range(us_ampm, 0xff000000, 0xff7f7f7f, white_theme);
+        ImageRGB32 us_ampm_filtered = filter_image(us_ampm, white_theme);
 
         std::string ampm = to_utf8(OCR::normalize_utf32(OCR::ocr_read(Language::English, us_ampm_filtered)));
         if (ampm == "am"){
@@ -146,29 +152,29 @@ int8_t DateReader::read_hours(Logger& logger, const ImageViewRGB32& screen) cons
         }
         return (int8_t)hours;
     }else{
-        ImageViewRGB32 h24_hours = extract_box_reference(screen, m_24_hour);
-        ImageRGB32 h24_hours_filtered = to_blackwhite_rgb32_range(h24_hours, 0xff000000, 0xff7f7f7f, white_theme);
-        int hours = OCR::read_number(logger, h24_hours_filtered);
+        int hours = read_box(logger, 0, 23, screen, m_24_hour, white_theme);
         if (hours < 0 || hours > 23){
             return -1;
         }
         return (int8_t)hours;
     }
+
 }
+#endif
 
 
 void DateReader::set_hours(
-    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context,
     uint8_t hour
 ) const{
     context.wait_for_all_requests();
     {
-        auto snapshot = console.video().snapshot();
+        auto snapshot = stream.video().snapshot();
         if (!detect(snapshot)){
-            throw FatalProgramException(
-                ErrorReport::SEND_ERROR_REPORT, console,
+            throw_and_log<FatalProgramException>(
+                stream.logger(), ErrorReport::SEND_ERROR_REPORT,
                 "Expected date change menu.",
-                true
+                stream
             );
         }
     }
@@ -182,13 +188,15 @@ void DateReader::set_hours(
         context.wait_for(std::chrono::milliseconds(250));
 
         //  Read the hour.
-        VideoSnapshot snapshot = console.video().snapshot();
-        int8_t current_hour = read_hours(console.logger(), snapshot);
+        VideoSnapshot snapshot = stream.video().snapshot();
+//        int8_t current_hour = read_hours(stream, snapshot);
+        int8_t current_hour = read_date(stream.logger(), snapshot).second.hour;
+
         if (current_hour < 0){
-            throw FatalProgramException(
-                ErrorReport::SEND_ERROR_REPORT, console,
+            throw_and_log<FatalProgramException>(
+                stream.logger(), ErrorReport::SEND_ERROR_REPORT,
                 "Unable to read the hour.",
-                true
+                stream
             );
         }
 
@@ -240,20 +248,20 @@ void DateReader::set_hours(
     }
 
 //    auto snapshot = console.video().snapshot();
-    throw FatalProgramException(
-        ErrorReport::SEND_ERROR_REPORT, console,
+    throw_and_log<FatalProgramException>(
+        stream.logger(), ErrorReport::SEND_ERROR_REPORT,
         "Failed to set the hour after 10 attempts.",
-        true
+        stream
     );
 }
 
 
 std::pair<DateFormat, DateTime> DateReader::read_date(Logger& logger, std::shared_ptr<const ImageRGB32> screen) const{
     if (!detect(*screen)){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT,
-            logger,
-            "Not on data change screen.",
+        throw_and_log<OperationFailedException>(
+            logger, ErrorReport::SEND_ERROR_REPORT,
+            "Not on date change screen.",
+            nullptr,
             std::move(screen)
         );
     }
@@ -261,10 +269,10 @@ std::pair<DateFormat, DateTime> DateReader::read_date(Logger& logger, std::share
     ImageStats stats_window_top = image_stats(extract_box_reference(*screen, m_window_top));
 //    cout << stats_window_top.average << stats_window_top.stddev << endl;
     if (stats_window_top.stddev.sum() > 10){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT,
-            logger,
-            "Not on data change screen.",
+        throw_and_log<OperationFailedException>(
+            logger, ErrorReport::SEND_ERROR_REPORT,
+            "Not on date change screen.",
+            nullptr,
             std::move(screen)
         );
     }
@@ -286,20 +294,35 @@ std::pair<DateFormat, DateTime> DateReader::read_date(Logger& logger, std::share
 
     return {DateFormat::EU, read_date_eu(logger, std::move(screen), white_theme)};
 }
+ImageRGB32 DateReader::filter_image(const ImageViewRGB32& image, bool white_theme){
+    ImageRGB32 filtered = to_blackwhite_rgb32_range(
+        image,
+        0xff000000, white_theme ? 0xffff7fff : 0xff7f7f7f,
+        white_theme
+    );
+    return filtered;
+}
 int DateReader::read_box(
     Logger& logger,
     int min, int max,
     const ImageViewRGB32& screen, const ImageFloatBox& box,
     bool white_theme
 ) const{
-    ImageRGB32 filtered = to_blackwhite_rgb32_range(
-        extract_box_reference(screen, box),
-        0xff000000, 0xff7f7fff,
-        white_theme
-    );
-//    extract_box_reference(*screen, m_us_month).save("test0.png");
-//    filtered.save("test1.png");
-    int value = OCR::read_number(logger, filtered);
+    ImageViewRGB32 cropped = extract_box_reference(screen, box);
+
+    int value;
+    if (white_theme){
+        value = OCR::read_number_waterfill(
+            logger, cropped,
+            0xff000000, 0xffff7fff, true
+        );
+    }else{
+        value = OCR::read_number_waterfill(
+            logger, cropped,
+            0xff000000, 0xff7f7f7f, false
+        );
+    }
+
     if (value < min || value > max){
         value = -1;
     }
@@ -318,27 +341,29 @@ DateTime DateReader::read_date_us(Logger& logger, std::shared_ptr<const ImageRGB
     //  Hour
     {
         int hour = read_box(logger, 1, 12, *screen, m_us_hour, white_theme);
-        ImageRGB32 hours_filtered = to_blackwhite_rgb32_range(
-            extract_box_reference(*screen, m_us_hour),
-            0xff000000, 0xff7f7fff,
-            white_theme
-        );
         if (hour == 12){
             hour = 0;
         }
 
-        ImageRGB32 us_ampm_filtered = to_blackwhite_rgb32_range(
+        ImageRGB32 us_ampm_filtered = filter_image(
             extract_box_reference(*screen, m_us_ampm),
-            0xff000000, 0xff7f7fff,
             white_theme
         );
 
-        std::string ampm = to_utf8(OCR::normalize_utf32(OCR::ocr_read(Language::English, us_ampm_filtered)));
+        std::string ampm_ocr = OCR::ocr_read(Language::English, us_ampm_filtered);
+        if (ampm_ocr.back() == '\n'){
+            ampm_ocr.pop_back();
+        }
+        std::string ampm = to_utf8(OCR::normalize_utf32(ampm_ocr));
+
         if (ampm == "am"){
             //  Do nothing.
+            logger.log("OCR Text: \"" + ampm_ocr + "\" -> \"" + ampm + "\" -> AM");
         }else if (ampm == "pm"){
+            logger.log("OCR Text: \"" + ampm_ocr + "\" -> \"" + ampm + "\" -> PM");
             hour += 12;
         }else{
+            logger.log("OCR Text: \"" + ampm_ocr + "\" -> \"" + ampm + "\" -> ??", COLOR_RED);
             hour = -1;
         }
 
@@ -375,7 +400,7 @@ DateTime DateReader::read_date_jp(Logger& logger, std::shared_ptr<const ImageRGB
 }
 
 
-void DateReader::move_cursor(BotBaseContext& context, int current, int desired){
+void DateReader::move_cursor(SwitchControllerContext& context, int current, int desired){
     while (current < desired){
         ssf_issue_scroll(context, SSF_SCROLL_UP, 3);
         current++;
@@ -385,7 +410,7 @@ void DateReader::move_cursor(BotBaseContext& context, int current, int desired){
         current--;
     }
 }
-void DateReader::adjust_year(BotBaseContext& context, int current, int desired){
+void DateReader::adjust_year(SwitchControllerContext& context, int current, int desired){
     while (current < desired){
         ssf_issue_scroll(context, SSF_SCROLL_UP, 3);
         current++;
@@ -395,7 +420,7 @@ void DateReader::adjust_year(BotBaseContext& context, int current, int desired){
         current--;
     }
 }
-void DateReader::adjust_month(BotBaseContext& context, int current, int desired){
+void DateReader::adjust_month(SwitchControllerContext& context, int current, int desired){
     int diff = desired - current;
     if ((diff >= 0 && diff <= 6) || (diff < 0 && diff < -6)){
         while (current != desired){
@@ -415,7 +440,7 @@ void DateReader::adjust_month(BotBaseContext& context, int current, int desired)
         }
     }
 }
-void DateReader::adjust_hour_24(BotBaseContext& context, int current, int desired){
+void DateReader::adjust_hour_24(SwitchControllerContext& context, int current, int desired){
     int diff = desired - current;
     if ((diff >= 0 && diff <= 12) || (diff < 0 && diff < -12)){
         while (current != desired){
@@ -435,7 +460,7 @@ void DateReader::adjust_hour_24(BotBaseContext& context, int current, int desire
         }
     }
 }
-void DateReader::adjust_minute(BotBaseContext& context, int current, int desired){
+void DateReader::adjust_minute(SwitchControllerContext& context, int current, int desired){
     int diff = desired - current;
     if ((diff >= 0 && diff <= 30) || (diff < 0 && diff < -30)){
         while (current != desired){
@@ -457,17 +482,18 @@ void DateReader::adjust_minute(BotBaseContext& context, int current, int desired
 }
 
 void DateReader::set_date(
-    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context,
     const DateTime& date
 ) const{
     context.wait_for_all_requests();
 
     {
-        auto snapshot = console.video().snapshot();
+        auto snapshot = stream.video().snapshot();
         if (!detect(snapshot)){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
+            throw_and_log<OperationFailedException>(
+                stream.logger(), ErrorReport::SEND_ERROR_REPORT,
                 "Expected date change menu.",
+                &stream,
                 snapshot
             );
         }
@@ -480,8 +506,8 @@ void DateReader::set_date(
         context.wait_for_all_requests();
         context.wait_for(std::chrono::milliseconds(250));
 
-        auto snapshot = console.video().snapshot();
-        std::pair<DateFormat, DateTime> current = read_date(console, snapshot);
+        auto snapshot = stream.video().snapshot();
+        std::pair<DateFormat, DateTime> current = read_date(stream.logger(), snapshot);
         if (current.second.year == date.year &&
             current.second.month == date.month &&
             current.second.day == date.day &&
@@ -561,11 +587,59 @@ void DateReader::set_date(
     }
 
     ssf_flush_pipeline(context);
-    throw FatalProgramException(
-        ErrorReport::SEND_ERROR_REPORT, console,
+    throw_and_log<FatalProgramException>(
+        stream.logger(), ErrorReport::SEND_ERROR_REPORT,
         "Failed to set the hour after 10 attempts.",
-        true
+        stream
     );
+}
+
+void change_date(
+    SingleSwitchProgramEnvironment& env, SwitchControllerContext& context,
+    const DateTime& date
+){
+    while (true){
+        context.wait_for_all_requests();
+
+        HomeWatcher home;
+        DateChangeWatcher date_reader;
+        int ret = wait_until(
+            env.console, context, std::chrono::seconds(10),
+            {
+                home,
+                date_reader
+            }
+        );
+        switch (ret){
+        case 0:
+            home_to_date_time(context, true, false);
+            pbf_press_button(context, BUTTON_A, 10, 30);
+            context.wait_for_all_requests();
+            continue;
+        case 1:{
+            env.log("Detected date change.");
+
+            // Set the date
+            VideoOverlaySet overlays(env.console.overlay());
+            date_reader.make_overlays(overlays);
+            date_reader.set_date(env.program_info(), env.console, context, date);
+
+            //  Commit the date.
+            pbf_press_button(context, BUTTON_A, 20, 30);
+
+            //  Re-enter the game.
+            pbf_press_button(context, BUTTON_HOME, 20, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
+
+            return;
+        }
+        default:
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "Failed to set date",
+                env.console
+            );
+        }
+    }
 }
 
 

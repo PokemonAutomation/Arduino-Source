@@ -7,7 +7,7 @@
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_ArcPhoneDetector.h"
@@ -30,7 +30,7 @@ SkipToFullMoon_Descriptor::SkipToFullMoon_Descriptor()
         "Skip nights until full moon.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 
@@ -45,7 +45,7 @@ SkipToFullMoon::SkipToFullMoon()
 }
 
 
-void SkipToFullMoon::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void SkipToFullMoon::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     //  Connect the controller.
     pbf_press_button(context, BUTTON_LCLICK, 5, 5);
 
@@ -57,10 +57,10 @@ void SkipToFullMoon::program(SingleSwitchProgramEnvironment& env, BotBaseContext
         const auto compatibility = detect_item_compatibility(env.console.video().snapshot());
 
         if (compatibility == ItemCompatibility::NONE){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
                 "Unable to detect item compatibility.",
-                true
+                env.console
             );
         }
 
@@ -105,9 +105,9 @@ void SkipToFullMoon::program(SingleSwitchProgramEnvironment& env, BotBaseContext
 
 
         ArcPhoneDetector arc_phone_detector(env.console, env.console, std::chrono::milliseconds(100), stop_on_detected);
-        run_until(
+        run_until<SwitchControllerContext>(
             env.console, context,
-            [](BotBaseContext& local_context){
+            [](SwitchControllerContext& local_context){
                 // pbf_mash_button(local_context, BUTTON_B, 7 * TICKS_PER_SECOND);
                 for(size_t i = 0; i < 15; i++){
                      pbf_press_button(local_context, BUTTON_B, 20, 80);

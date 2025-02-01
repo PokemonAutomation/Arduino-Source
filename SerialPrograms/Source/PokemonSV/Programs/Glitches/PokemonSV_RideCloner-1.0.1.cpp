@@ -7,11 +7,11 @@
 #include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
-#include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
-#include "CommonFramework/Tools/VideoResolutionCheck.h"
+#include "CommonTools/Async/InferenceRoutines.h"
+#include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
@@ -48,7 +48,7 @@ RideCloner101_Descriptor::RideCloner101_Descriptor()
         "Clone your ride legendary (and its item) using the add-to-party glitch.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 struct RideCloner101_Descriptor::Stats : public StatsTracker{
@@ -167,24 +167,24 @@ RideCloner101::RideCloner101()
 
 //  Start from the overworld with 5 (non-ride legendary) Pokemon in your
 //  party. Move your ride legendary into the 6th slot in your party.
-void RideCloner101::setup(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
-    console.log("Running setup...");
+void RideCloner101::setup(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+    stream.log("Running setup...");
 
     bool in_party = false;
     WallClock start = current_time();
     while (true){
         if (current_time() - start > std::chrono::minutes(5)){
-            dump_image_and_throw_recoverable_exception(info, console, "RideCloneSetupFailed", "Failed to setup after 5 minutes.");
+            dump_image_and_throw_recoverable_exception(info, stream, "RideCloneSetupFailed", "Failed to setup after 5 minutes.");
         }
 
-        OverworldWatcher overworld(console, COLOR_RED);
+        OverworldWatcher overworld(stream.logger(), COLOR_RED);
         MainMenuWatcher main_menu(COLOR_YELLOW);
         AdvanceDialogWatcher advance(COLOR_PURPLE);
         PromptDialogWatcher prompt(COLOR_GREEN, {0.500, 0.545, 0.400, 0.100});
 
         context.wait_for_all_requests();
         int ret = wait_until(
-            console, context,
+            stream, context,
             std::chrono::seconds(60),
             {
                 overworld,
@@ -194,11 +194,11 @@ void RideCloner101::setup(const ProgramInfo& info, ConsoleHandle& console, BotBa
             }
         );
         context.wait_for(std::chrono::milliseconds(100));
-        VideoSnapshot snapshot = console.video().snapshot();
+        VideoSnapshot snapshot = stream.video().snapshot();
 
         switch (ret){
         case 0:
-            console.log("Detected overworld.");
+            stream.log("Detected overworld.");
             if (in_party){
                 return;
             }
@@ -206,16 +206,16 @@ void RideCloner101::setup(const ProgramInfo& info, ConsoleHandle& console, BotBa
             pbf_press_button(context, BUTTON_X, 20, 105);
             continue;
         case 1:
-            console.log("Detected main menu.");
+            stream.log("Detected main menu.");
             if (advance.detect(snapshot)){
                 //  If we detect both the dialog and the main menu, it means we
                 //  are selecting who in the party to replace with the ride legendary.
-                main_menu.move_cursor(info, console, context, MenuSide::LEFT, 5, false);
+                main_menu.move_cursor(info, stream, context, MenuSide::LEFT, 5, false);
                 pbf_press_button(context, BUTTON_A, 20, 105);
                 in_party = true;
             }else{
                 //  Otherwise we try to move the ride legendary to the party.
-                if (main_menu.move_cursor(info, console, context, MenuSide::LEFT, 6, false)){
+                if (main_menu.move_cursor(info, stream, context, MenuSide::LEFT, 6, false)){
                     //  Success, continue.
                     pbf_press_button(context, BUTTON_A, 20, 105);
                 }else{
@@ -226,11 +226,11 @@ void RideCloner101::setup(const ProgramInfo& info, ConsoleHandle& console, BotBa
             }
             continue;
         case 2:
-            console.log("Detected dialog.");
+            stream.log("Detected dialog.");
             if (main_menu.detect(snapshot)){
                 //  If we detect both the dialog and the main menu, it means we
                 //  are selecting who in the party to replace with the ride legendary.
-                main_menu.move_cursor(info, console, context, MenuSide::LEFT, 5, false);
+                main_menu.move_cursor(info, stream, context, MenuSide::LEFT, 5, false);
                 pbf_press_button(context, BUTTON_A, 20, 105);
                 in_party = true;
             }else{
@@ -238,21 +238,21 @@ void RideCloner101::setup(const ProgramInfo& info, ConsoleHandle& console, BotBa
             }
             continue;
         case 3:
-            console.log("Detected prompt.");
+            stream.log("Detected prompt.");
             pbf_press_button(context, BUTTON_A, 20, 105);
             continue;
         default:
-            dump_image_and_throw_recoverable_exception(info, console, "RideCloneSetupFailed",
+            dump_image_and_throw_recoverable_exception(info, stream, "RideCloneSetupFailed",
                 "setup(): No recognized state after 60 seconds.");
         }
     }
 }
 bool RideCloner101::run_post_win(
     ProgramEnvironment& env,
-    ConsoleHandle& console,
-    BotBaseContext& context
+    VideoStream& stream,
+    SwitchControllerContext& context
 ){
-    console.log("Running post-win...");
+    stream.log("Running post-win...");
 
     RideCloner101_Descriptor::Stats& stats = env.current_stats<RideCloner101_Descriptor::Stats>();
 
@@ -262,7 +262,7 @@ bool RideCloner101::run_post_win(
         pbf_press_button(context, BUTTON_A, 20, 105);
         pbf_press_button(context, BUTTON_A, 20, 105);
         pbf_press_button(context, BUTTON_HOME, 20, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
-        resume_game_from_home(console, context);
+        resume_game_from_home(stream, context);
     }
 
     TeraResult result = TeraResult::NO_DETECTION;
@@ -273,7 +273,7 @@ bool RideCloner101::run_post_win(
     while (true){
         context.wait_for_all_requests();
         if (current_time() - start > std::chrono::minutes(5)){
-            dump_image_and_throw_recoverable_exception(env.program_info(), console, "RideCloneReturnToOverworldFailed",
+            dump_image_and_throw_recoverable_exception(env.program_info(), stream, "RideCloneReturnToOverworldFailed",
                 "Failed to return to overworld after 5 minutes.");
         }
 
@@ -290,10 +290,10 @@ bool RideCloner101::run_post_win(
         PromptDialogWatcher nickname(COLOR_GREEN, {0.500, 0.545, 0.400, 0.100});
         PokemonSummaryWatcher summary(COLOR_MAGENTA);
         MainMenuWatcher main_menu(COLOR_BLUE);
-        OverworldWatcher overworld(console, COLOR_RED);
+        OverworldWatcher overworld(stream.logger(), COLOR_RED);
         context.wait_for_all_requests();
         int ret = wait_until(
-            console, context,
+            stream, context,
             std::chrono::seconds(60),
             {
                 catch_menu,
@@ -309,34 +309,34 @@ bool RideCloner101::run_post_win(
         context.wait_for(std::chrono::milliseconds(100));
         switch (ret){
         case 0:{
-            console.log("Detected catch prompt.");
-            screenshot = console.video().snapshot();
+            stream.log("Detected catch prompt.");
+            screenshot = stream.video().snapshot();
 
             pbf_press_button(context, BUTTON_A, 20, 150);
             context.wait_for_all_requests();
 
-            BattleBallReader reader(console, LANGUAGE);
-            int quantity = move_to_ball(reader, console, context, BALL_SELECT.slug());
+            BattleBallReader reader(stream, LANGUAGE);
+            int quantity = move_to_ball(reader, stream, context, BALL_SELECT.slug());
             if (quantity == 0){
-                throw FatalProgramException(
-                    ErrorReport::NO_ERROR_REPORT, console,
+                throw_and_log<FatalProgramException>(
+                    stream.logger(), ErrorReport::NO_ERROR_REPORT,
                     "Unable to find appropriate ball. Did you run out?",
-                    true
+                    stream
                 );
             }
             if (quantity < 0){
-                console.log("Unable to read ball quantity.", COLOR_RED);
+                stream.log("Unable to read ball quantity.", COLOR_RED);
             }
             pbf_mash_button(context, BUTTON_A, 125);
 
             continue;
         }
         case 2:
-            console.log("Detected dialog.");
+            stream.log("Detected dialog.");
             pbf_press_button(context, BUTTON_B, 20, 105);
             continue;
         case 3:
-            console.log("Detected add-to-party prompt.");
+            stream.log("Detected add-to-party prompt.");
             add_to_party_menu = true;
             if (result == TeraResult::NO_DETECTION){
                 pbf_press_dpad(context, DPAD_DOWN, 20, 60);
@@ -344,7 +344,7 @@ bool RideCloner101::run_post_win(
             pbf_press_button(context, BUTTON_A, 20, 105);
             continue;
         case 4:
-            console.log("Detected prompt.");
+            stream.log("Detected prompt.");
             pbf_press_button(context, BUTTON_B, 20, 105);
             if (add_to_party_menu){
                 success = true;
@@ -353,19 +353,19 @@ bool RideCloner101::run_post_win(
         case 1:
             //  Next button detector is unreliable. Check if the summary is
             //  open. If so, fall-through to that.
-            if (!summary.detect(console.video().snapshot())){
-                console.log("Detected possible (A) Next button.");
+            if (!summary.detect(stream.video().snapshot())){
+                stream.log("Detected possible (A) Next button.");
                 pbf_press_button(context, BUTTON_A, 20, 105);
                 pbf_press_button(context, BUTTON_B, 20, 105);
                 continue;
             }
-            console.log("Detected false positive (A) Next button.", COLOR_RED);
+            stream.log("Detected false positive (A) Next button.", COLOR_RED);
         case 5:
-            console.log("Detected summary.");
+            stream.log("Detected summary.");
             if (result == TeraResult::NO_DETECTION){
                 context.wait_for(std::chrono::milliseconds(500));
                 result = run_tera_summary(
-                    env, console, context,
+                    env, stream, context,
                     NOTIFICATION_NONSHINY,
                     NOTIFICATION_SHINY,
                     MODE == Mode::SHINY_HUNT, screenshot,
@@ -375,10 +375,10 @@ bool RideCloner101::run_post_win(
             pbf_press_button(context, BUTTON_B, 20, 105);
             continue;
         case 6:
-            console.log("Detected party swap.");
+            stream.log("Detected party swap.");
 //            context.wait_for(std::chrono::milliseconds(150));
             try{
-                if (main_menu.move_cursor(env.program_info(), console, context, MenuSide::LEFT, 5, false)){
+                if (main_menu.move_cursor(env.program_info(), stream, context, MenuSide::LEFT, 5, false)){
                     ssf_press_button(context, BUTTON_A, A_TO_B_DELAY, 20);
                     pbf_press_button(context, BUTTON_B, 20, 230);
                 }
@@ -387,11 +387,11 @@ bool RideCloner101::run_post_win(
             }
             continue;
         case 7:
-            console.log("Detected overworld.");
+            stream.log("Detected overworld.");
             break;
         default:
             dump_image_and_throw_recoverable_exception(
-                env.program_info(), console, "FailedPostRaidWin",
+                env.program_info(), stream, "FailedPostRaidWin",
                 "run_post_win(): No recognized state after 60 seconds."
             );
         }
@@ -416,7 +416,7 @@ bool RideCloner101::run_post_win(
 
 
 
-void RideCloner101::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void RideCloner101::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
     RideCloner101_Descriptor::Stats& stats = env.current_stats<RideCloner101_Descriptor::Stats>();

@@ -42,15 +42,15 @@ Cancellable::~Cancellable(){
 //    cout << "Deleting: " << this << endl;
 }
 CancellableScope* Cancellable::scope() const{
-    m_sanitizer.check_usage();
+    auto scope_check = m_sanitizer.check_scope();
     return m_scope;
 }
 bool Cancellable::cancelled() const noexcept{
-    m_sanitizer.check_usage();
+    auto scope_check = m_sanitizer.check_scope();
     return m_impl->cancelled.load(std::memory_order_acquire);
 }
 bool Cancellable::cancel(std::exception_ptr exception) noexcept{
-    m_sanitizer.check_usage();
+    auto scope_check = m_sanitizer.check_scope();
     CancellableData& data(*m_impl);
     WriteSpinLock lg(data.lock);
     if (exception && !data.exception){
@@ -62,7 +62,7 @@ bool Cancellable::cancel(std::exception_ptr exception) noexcept{
     return data.cancelled.exchange(true, std::memory_order_relaxed);
 }
 void Cancellable::throw_if_cancelled() const{
-    m_sanitizer.check_usage();
+    auto scope_check = m_sanitizer.check_scope();
     const CancellableData& data(*m_impl);
     if (!data.cancelled.load(std::memory_order_acquire)){
         return;
@@ -75,7 +75,7 @@ void Cancellable::throw_if_cancelled() const{
     }
 }
 bool Cancellable::throw_if_cancelled_with_exception() const{
-    m_sanitizer.check_usage();
+    auto scope_check = m_sanitizer.check_scope();
     const CancellableData& data(*m_impl);
     if (!data.cancelled.load(std::memory_order_acquire)){
         return false;
@@ -87,12 +87,12 @@ bool Cancellable::throw_if_cancelled_with_exception() const{
     return true;
 }
 void Cancellable::attach(CancellableScope& scope){
-    m_sanitizer.check_usage();
+    auto scope_check = m_sanitizer.check_scope();
     m_scope = &scope;
     scope += *this;
 }
 void Cancellable::detach() noexcept{
-    m_sanitizer.check_usage();
+    auto scope_check = m_sanitizer.check_scope();
     if (m_scope){
         *m_scope -= *this;
     }
@@ -126,7 +126,7 @@ bool CancellableScope::cancel(std::exception_ptr exception) noexcept{
     for (Cancellable* child : data.children){
 //        cout << "Canceling: " << child << endl;
 //        cout << "Canceling: " << child->name() << endl;
-        child->m_sanitizer.check_usage();
+        auto scope_check = child->m_sanitizer.check_scope();
         child->cancel(exception);
     }
 //    cout << "Done Canceling" << endl;
@@ -135,11 +135,11 @@ bool CancellableScope::cancel(std::exception_ptr exception) noexcept{
     return false;
 }
 void CancellableScope::wait_for(std::chrono::milliseconds duration){
-    m_sanitizer.check_usage();
+    auto scope_check = m_sanitizer.check_scope();
     wait_until(current_time() + duration);
 }
 void CancellableScope::wait_until(WallClock stop){
-    m_sanitizer.check_usage();
+    auto scope_check = m_sanitizer.check_scope();
     throw_if_cancelled();
     CancellableScopeData& data(*m_impl);
     {
@@ -154,7 +154,7 @@ void CancellableScope::wait_until(WallClock stop){
     throw_if_cancelled();
 }
 void CancellableScope::wait_until_cancel(){
-    m_sanitizer.check_usage();
+    auto scope_check = m_sanitizer.check_scope();
     throw_if_cancelled();
     CancellableScopeData& data(*m_impl);
     {
@@ -170,7 +170,7 @@ void CancellableScope::wait_until_cancel(){
 }
 void CancellableScope::operator+=(Cancellable& cancellable){
 //    cout << "Attaching: " << &cancellable << endl;
-    m_sanitizer.check_usage();
+    auto scope_check = m_sanitizer.check_scope();
     CancellableScopeData& data(*m_impl);
     std::lock_guard<std::mutex> lg(data.lock);
     throw_if_cancelled();
@@ -178,7 +178,7 @@ void CancellableScope::operator+=(Cancellable& cancellable){
 }
 void CancellableScope::operator-=(Cancellable& cancellable){
 //    cout << "Detaching: " << &cancellable << endl;
-    m_sanitizer.check_usage();
+    auto scope_check = m_sanitizer.check_scope();
     CancellableScopeData& data(*m_impl);
     std::lock_guard<std::mutex> lg(data.lock);
     data.children.erase(&cancellable);

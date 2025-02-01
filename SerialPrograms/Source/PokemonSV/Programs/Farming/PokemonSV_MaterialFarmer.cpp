@@ -6,9 +6,9 @@
 
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
-#include "CommonFramework/Tools/StatsTracking.h"
-#include "CommonFramework/Tools/VideoResolutionCheck.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
+#include "CommonTools/Async/InferenceRoutines.h"
+#include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
@@ -32,7 +32,7 @@ MaterialFarmer_Descriptor::MaterialFarmer_Descriptor()
         "Farm materials - Happiny dust from Chanseys/Blisseys, for Item Printer.",
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 
@@ -44,7 +44,7 @@ std::unique_ptr<StatsTracker> MaterialFarmer_Descriptor::make_stats() const{
 MaterialFarmer::MaterialFarmer()
     : GO_HOME_WHEN_DONE(true)
     , MATERIAL_FARMER_OPTIONS(
-        false, true,
+        GroupOption::EnableMode::ALWAYS_ENABLED,
         nullptr,
         NOTIFICATION_STATUS_UPDATE,
         NOTIFICATION_PROGRAM_FINISH,
@@ -65,7 +65,7 @@ MaterialFarmer::MaterialFarmer()
 }
 
 
-void MaterialFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void MaterialFarmer::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
     //  Connect the controller.

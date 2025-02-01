@@ -4,21 +4,22 @@
  *
  */
 
-#include "ClientSource/Connection/BotBase.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/Tools/StatsTracking.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "Pokemon/Pokemon_Strings.h"
+#include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonLA/PokemonLA_Settings.h"
 #include "PokemonLA/Resources/PokemonLA_NameDatabase.h"
 #include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
 #include "PokemonLA/Inference/PokemonLA_OverworldDetector.h"
 #include "PokemonLA/Programs/PokemonLA_GameEntry.h"
+#include "PokemonLA/Programs/PokemonLA_LeapPokemonActions.h"
 #include "PokemonLA/Programs/Farming/PokemonLA_LeapGrinder.h"
 
 namespace PokemonAutomation{
@@ -35,7 +36,7 @@ LeapGrinder_Descriptor::LeapGrinder_Descriptor()
         "Shake trees and ores to grind tasks",
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 class LeapGrinder_Descriptor::Stats : public StatsTracker{
@@ -139,7 +140,7 @@ LeapGrinder::LeapGrinder()
 }
 
 
-bool LeapGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+bool LeapGrinder::run_iteration(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
 
     LeapGrinder_Descriptor::Stats& stats = env.current_stats<LeapGrinder_Descriptor::Stats>();
     stats.attempts++;
@@ -152,9 +153,10 @@ bool LeapGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
             break;
         }
         if (c >= 5){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
-                "Failed to switch to Pokemon selection after 5 attempts."
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "Failed to switch to Pokemon selection after 5 attempts.",
+                env.console
             );
         }
         env.console.log("Not on Pokemon selection. Attempting to switch to it...", COLOR_ORANGE);
@@ -169,9 +171,9 @@ bool LeapGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
         return on_shiny_callback(env, env.console, SHINY_DETECTED_ENROUTE, error_coefficient);
     });
 
-    int ret = run_until(
+    int ret = run_until<SwitchControllerContext>(
         env.console, context,
-        [&](BotBaseContext& context){
+        [&](SwitchControllerContext& context){
             route(env, env.console, context, (LeapPokemon)POKEMON.index());
         },
         {{shiny_detector}}
@@ -259,7 +261,7 @@ bool LeapGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
     return false;
 }
 
-void LeapGrinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void LeapGrinder::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     LeapGrinder_Descriptor::Stats& stats = env.current_stats<LeapGrinder_Descriptor::Stats>();
 
     //  Connect the controller.

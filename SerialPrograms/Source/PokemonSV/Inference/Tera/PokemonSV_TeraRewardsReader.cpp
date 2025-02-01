@@ -4,10 +4,10 @@
  *
  */
 
-#include "CommonFramework/ImageTools/ImageFilter.h"
-#include "CommonFramework/ImageMatch/ImageDiff.h"
+#include "CommonFramework/ImageTools/ImageDiff.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
+#include "CommonTools/Images/ImageFilter.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 #include "PokemonSV_TeraRewardsReader.h"
 
 namespace PokemonAutomation{
@@ -75,10 +75,10 @@ bool SparklyItemDetector::process_frame(const ImageViewRGB32& frame, WallClock t
 }
 
 
-size_t SparklyItemDetector::count_sparkly_items(ConsoleHandle& console, CancellableScope& scope){
+size_t SparklyItemDetector::count_sparkly_items(VideoStream& stream, CancellableScope& scope){
     SparklyItemDetector detector;
     wait_until(
-        console, scope, std::chrono::seconds(2),
+        stream, scope, std::chrono::seconds(2),
         {detector}
     );
 //    cout << detector.sparkly_items() << endl;

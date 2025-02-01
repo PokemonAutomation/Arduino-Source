@@ -5,8 +5,8 @@
  */
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
@@ -32,10 +32,10 @@ const EnumDatabase<ItemPrinterJobs>& ItemPrinterJobs_Database(){
 
 void item_printer_start_print(
     AsyncDispatcher& dispatcher,
-    ConsoleHandle& console, BotBaseContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     Language language, ItemPrinterJobs jobs
 ){
-    console.log("Starting print...");
+    stream.log("Starting print...");
 
     while (true){
         PromptDialogWatcher  prompt(COLOR_YELLOW);
@@ -44,7 +44,7 @@ void item_printer_start_print(
         context.wait_for_all_requests();
 
         int ret_print_start = wait_until(
-            console, context,
+            stream, context,
             std::chrono::seconds(120),
             { handle, prompt, material }
         );
@@ -54,32 +54,32 @@ void item_printer_start_print(
         case 0: // handle
             return;
         case 1: // prompt
-            console.log("Confirming material selection...");
+            stream.log("Confirming material selection...");
             pbf_press_button(context, BUTTON_A, 20, 105);
             continue;
         case 2:{    // material
             ItemPrinterJobsDetector detector(COLOR_RED);
-            VideoOverlaySet overlays(console.overlay());
+            VideoOverlaySet overlays(stream.overlay());
             detector.make_overlays(overlays);
-            detector.set_print_jobs(dispatcher, console, context, (uint8_t)jobs);
+            detector.set_print_jobs(dispatcher, stream, context, (uint8_t)jobs);
             pbf_press_button(context, BUTTON_X, 20, 230);
             continue;
         }
         default:
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
                 "start_print(): No recognized state after 120 seconds.",
-                true
+                stream
             );
         }
     }
 }
 ItemPrinterPrizeResult item_printer_finish_print(
     AsyncDispatcher& dispatcher,
-    ConsoleHandle& console, BotBaseContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     Language language
 ){
-    console.log("Finishing print...");
+    stream.log("Finishing print...");
     bool print_finished = false;
 
     ItemPrinterPrizeResult prize_result;
@@ -91,7 +91,7 @@ ItemPrinterPrizeResult item_printer_finish_print(
         context.wait_for_all_requests();
 
         int ret_print_end = wait_until(
-            console, context,
+            stream, context,
             std::chrono::seconds(120),
             { material, handle, dialog, result }
         );
@@ -99,25 +99,25 @@ ItemPrinterPrizeResult item_printer_finish_print(
 
         switch (ret_print_end){
         case 0: // material
-            console.log("Material selection screen detected.");
+            stream.log("Material selection screen detected.");
             return prize_result;
         case 1: // handle
         case 2: // dialog
             pbf_press_button(context, BUTTON_A, 20, 105);
             continue;
         case 3:{    // result
-            console.log("Result screen detected.");
+            stream.log("Result screen detected.");
             if (print_finished){
                 continue;
             }
 
             if (language != Language::None){
                 ItemPrinterPrizeReader reader(language);
-                VideoOverlaySet overlays(console.overlay());
+                VideoOverlaySet overlays(stream.overlay());
                 reader.make_overlays(overlays);
-                auto snapshot = console.video().snapshot();
-                std::array<std::string, 10> prizes = reader.read_prizes(console.logger(), dispatcher, snapshot);
-                std::array<int16_t, 10> quantities = reader.read_quantity(console.logger(), dispatcher, snapshot);
+                auto snapshot = stream.video().snapshot();
+                std::array<std::string, 10> prizes = reader.read_prizes(stream.logger(), dispatcher, snapshot);
+                std::array<int16_t, 10> quantities = reader.read_quantity(stream.logger(), dispatcher, snapshot);
                 prize_result = {prizes, quantities};
 //                static int c = 0;
 //                snapshot->save("test-" + std::to_string(c) + ".png");
@@ -128,10 +128,10 @@ ItemPrinterPrizeResult item_printer_finish_print(
             continue;
         }
         default:
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
                 "finish_print(): No recognized state after 120 seconds.",
-                true
+                stream
             );
         }
     }

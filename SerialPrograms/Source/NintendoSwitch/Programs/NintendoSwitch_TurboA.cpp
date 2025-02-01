@@ -5,6 +5,7 @@
  */
 
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_GameEntry.h"
 #include "NintendoSwitch_TurboA.h"
@@ -21,7 +22,7 @@ TurboA_Descriptor::TurboA_Descriptor()
         "Endlessly mash A.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 
@@ -30,14 +31,14 @@ TurboA_Descriptor::TurboA_Descriptor()
 TurboA::TurboA(){
     PA_ADD_OPTION(START_LOCATION);
 }
-void TurboA::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void TurboA::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
         PokemonSwSh::resume_game_back_out(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);
     }
 
     while (true){
-        pbf_press_button(context, BUTTON_A, 5, 5);
+        ssf_mash1_button(context, BUTTON_A, 10000ms);
     }
 }
 

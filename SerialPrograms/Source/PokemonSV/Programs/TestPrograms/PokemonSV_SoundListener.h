@@ -27,7 +27,7 @@ class SoundListener : public SingleSwitchProgramInstance{
 public:
     SoundListener();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
     enum class SoundType{

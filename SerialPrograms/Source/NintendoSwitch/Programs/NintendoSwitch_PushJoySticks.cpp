@@ -20,7 +20,7 @@ PushJoySticks_Descriptor::PushJoySticks_Descriptor()
         "Push Joy Sticks continously.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 
@@ -60,7 +60,7 @@ PushJoySticks::PushJoySticks()
     PA_ADD_OPTION(RIGHT_Y);
 }
 
-void PushJoySticks::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void PushJoySticks::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     while(true){
         pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE,
             LEFT_X, LEFT_Y, RIGHT_X, RIGHT_Y, TICKS_PER_SECOND);

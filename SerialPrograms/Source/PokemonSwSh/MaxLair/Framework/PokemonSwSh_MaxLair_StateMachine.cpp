@@ -4,16 +4,15 @@
  *
  */
 
-#include "Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h"
+#include "Common/Cpp/Containers/FixedLimitVector.tpp"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
-#include "CommonFramework/Tools/InterruptableCommands.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
-#include "CommonFramework/Inference/FrozenImageDetector.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
+#include "CommonTools/Async/InterruptableCommands.h"
+#include "CommonTools/Async/InferenceRoutines.h"
+#include "CommonTools/VisualDetectors/FrozenImageDetector.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/Inference/Dens/PokemonSwSh_RaidCatchDetector.h"
-#include "PokemonSwSh/Programs/PokemonSwSh_GameEntry.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonSelectMenu.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PathSelect.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_ItemSelectMenu.h"
@@ -38,15 +37,45 @@ namespace PokemonSwSh{
 namespace MaxLairInternal{
 
 
+
+AdventureRuntime::~AdventureRuntime() = default;
+AdventureRuntime::AdventureRuntime(
+    FixedLimitVector<ConsoleHandle>& consoles,
+    const size_t p_host_index,
+    const Consoles& p_console_settings,
+    const EndBattleDecider& p_actions,
+    const bool p_go_home_when_done,
+    HostingSettings& p_hosting_settings,
+    EventNotificationOption& p_notification_status,
+    EventNotificationOption& p_notification_shiny,
+    Stats& p_session_stats
+)
+    : host_index(p_host_index)
+    , console_settings(p_console_settings)
+    , actions(p_actions)
+    , go_home_when_done(p_go_home_when_done)
+    , hosting_settings(p_hosting_settings)
+    , notification_status(p_notification_status)
+    , notification_shiny(p_notification_shiny)
+    , ocr_watchdog(p_console_settings.active_consoles())
+    , session_stats(p_session_stats)
+{
+    for (size_t c = 0; c < p_console_settings.active_consoles(); c++){
+        ocr_watchdog.emplace_back(consoles[c].logger());
+    }
+}
+
+
 StateMachineAction run_state_iteration(
     AdventureRuntime& runtime, size_t console_index,
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ProgramEnvironment& env,
+    VideoStream& stream, SwitchControllerContext& context,
     bool save_path,
     GlobalStateTracker& global_state,
     const EndBattleDecider& decider,
     const ImageViewRGB32& entrance
 ){
-    GlobalState state = global_state.infer_actual_state(console.index());
+    GlobalState state = global_state.infer_actual_state(console_index);
 //    uint8_t wins = state.wins;
     bool starting = true;
     for (size_t c = 0; c < 4; c++){
@@ -60,15 +89,15 @@ StateMachineAction run_state_iteration(
     PokemonSwapMenuDetector pokemon_swap(false);
     PathSelectDetector path_select;
     ItemSelectDetector item_menu(false);
-    ProfessorSwapDetector professor_swap(console, !starting);
+    ProfessorSwapDetector professor_swap(stream.overlay(), !starting);
     BattleMenuDetector battle_menu;
-    RaidCatchDetector catch_select(console);
+    RaidCatchDetector catch_select(stream.overlay());
     PokemonCaughtMenuDetector caught_menu;
     EntranceDetector entrance_detector(entrance);
     FrozenImageDetector frozen_screen(COLOR_CYAN, {0, 0, 1, 0.5}, std::chrono::seconds(30), 10);
 
     int result = wait_until(
-        console, context,
+        stream, context,
         std::chrono::seconds(300),
         {
             {starting
@@ -90,64 +119,88 @@ StateMachineAction run_state_iteration(
     switch (result){
     case 0:
         if (starting){
-            console.log("Current State: " + STRING_POKEMON + " Select");
-            run_select_pokemon(console, context, global_state, runtime.console_settings[console_index]);
+            stream.log("Current State: " + STRING_POKEMON + " Select");
+            run_select_pokemon(
+                console_index,
+                stream, context,
+                global_state,
+                runtime.ocr_watchdog[console_index],
+                runtime.console_settings[console_index]
+            );
             return StateMachineAction::KEEP_GOING;
         }else{
-            console.log("Current State: " + STRING_POKEMON + " Swap");
-            run_swap_pokemon(runtime, console, context, global_state, runtime.console_settings[console_index]);
+            stream.log("Current State: " + STRING_POKEMON + " Swap");
+            run_swap_pokemon(
+                console_index,
+                runtime,
+                stream, context,
+                global_state,
+                runtime.console_settings[console_index]
+            );
             return StateMachineAction::KEEP_GOING;
         }
     case 1:
-        console.log("Current State: Path Select");
-        run_path_select(env, console, context, global_state);
+        stream.log("Current State: Path Select");
+        run_path_select(env, console_index, stream, context, global_state);
         return StateMachineAction::KEEP_GOING;
     case 2:
-        console.log("Current State: Item Select");
-        run_item_select(console, context, global_state);
+        stream.log("Current State: Item Select");
+        run_item_select(console_index, stream, context, global_state);
         return StateMachineAction::KEEP_GOING;
     case 3:
-        console.log("Current State: Professor Swap");
-        run_professor_swap(runtime, console, context, global_state);
+        stream.log("Current State: Professor Swap");
+        run_professor_swap(console_index, runtime, stream, context, global_state);
         return StateMachineAction::KEEP_GOING;
     case 4:
-        console.log("Current State: Move Select");
+        stream.log("Current State: Move Select");
         return run_move_select(
-            env, console, context, global_state,
+            env, console_index,
+            stream, context,
+            runtime.ocr_watchdog[console_index],
+            global_state,
             runtime.console_settings[console_index],
             battle_menu.dmaxed(),
             battle_menu.cheer()
         );
     case 5:
-        console.log("Current State: Catch Select");
+        stream.log("Current State: Catch Select");
         return throw_balls(
             runtime,
-            env, console, context,
+            env, console_index,
+            stream, context,
             runtime.console_settings[console_index].language,
+            runtime.ocr_watchdog[console_index],
             global_state,
             decider
         );
     case 6:
-        console.log("Current State: Caught Menu");
+        stream.log("Current State: Caught Menu");
         return run_caught_screen(
             runtime,
-            env, console, context,
+            env, console_index,
+            stream, context,
             global_state, decider,
             entrance
         );
     case 7:
-        console.log("Current State: Entrance");
-        run_entrance(runtime, env, console, context, save_path, global_state);
+        stream.log("Current State: Entrance");
+        run_entrance(
+            runtime,
+            env, console_index,
+            stream, context,
+            save_path,
+            global_state
+        );
         return StateMachineAction::DONE_WITH_ADVENTURE;
     case 8:
-        console.log("Current State: Frozen Screen", COLOR_RED);
+        stream.log("Current State: Frozen Screen", COLOR_RED);
 //        pbf_mash_button(context, BUTTON_B, TICKS_PER_SECOND);
 //        context.wait_for_all_requests();
 //        return StateMachineAction::KEEP_GOING;
         return StateMachineAction::RESET_RECOVER;
     default:
-        console.log("Program hang. No state detected after 5 minutes.", COLOR_RED);
-        dump_image(MODULE_NAME, console, "ProgramHang");
+        stream.log("Program hang. No state detected after 5 minutes.", COLOR_RED);
+        dump_image(stream.logger(), MODULE_NAME, stream.video(), "ProgramHang");
         global_state.mark_as_dead(console_index);
         return StateMachineAction::RESET_RECOVER;
     }

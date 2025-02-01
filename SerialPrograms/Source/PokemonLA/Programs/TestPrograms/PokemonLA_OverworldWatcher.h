@@ -25,7 +25,7 @@ class OverworldWatcher : public SingleSwitchProgramInstance{
 public:
     OverworldWatcher();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 
 };

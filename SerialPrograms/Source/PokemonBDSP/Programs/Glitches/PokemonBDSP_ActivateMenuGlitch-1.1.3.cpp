@@ -6,7 +6,7 @@
 
 #include <QtGlobal>
 #include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonBDSP/PokemonBDSP_Settings.h"
@@ -28,7 +28,7 @@ ActivateMenuGlitch113_Descriptor::ActivateMenuGlitch113_Descriptor()
         "<font color=\"red\">(This works on game versions 1.1.1 - 1.1.3. It has been patched out in later versions.)</font>",
         FeedbackType::OPTIONAL_,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 
@@ -46,8 +46,8 @@ ActivateMenuGlitch113::ActivateMenuGlitch113()
 
 
 
-void ActivateMenuGlitch113::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    ConsoleHandle& console = env.console;
+void ActivateMenuGlitch113::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+    VideoStream& stream = env.console;
 
     //  Enable Strength
     pbf_mash_button(context, BUTTON_ZL, 2 * TICKS_PER_SECOND);
@@ -60,17 +60,17 @@ void ActivateMenuGlitch113::program(SingleSwitchProgramEnvironment& env, BotBase
     context.wait_for_all_requests();
     MapWatcher detector;
     int ret = wait_until(
-        console, context, std::chrono::seconds(2),
+        stream, context, std::chrono::seconds(2),
         {{detector}}
     );
     if (ret < 0){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, console,
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
             "Map not detected after 2 seconds.",
-            true
+            stream
         );
     }else{
-        console.log("Detected map!", COLOR_BLUE);
+        stream.log("Detected map!", COLOR_BLUE);
     }
 
     context.wait_for(std::chrono::seconds(1));

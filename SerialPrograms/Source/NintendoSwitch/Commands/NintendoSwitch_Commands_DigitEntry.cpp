@@ -4,9 +4,8 @@
  * 
  */
 
-#include <cstring>
-#include <sstream>
-#include "ClientSource/Connection/BotBase.h"
+//#include <cstring>
+//#include <sstream>
 #include "ClientSource/Libraries/MessageConverter.h"
 #include "NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch_Commands_Superscalar.h"
@@ -38,12 +37,12 @@ namespace NintendoSwitch{
 const uint8_t XCORD[] = {1, 0, 1, 2, 0, 1, 2, 0, 1, 2};
 const uint8_t YCORD[] = {3, 0, 0, 0, 1, 1, 1, 2, 2, 2};
 
-void code_entry_scroll(BotBaseContext& context, ssf_ScrollDirection direction){
+void code_entry_scroll(SwitchControllerContext& context, DpadPosition direction){
     pbf_wait(context, CODE_DELAY);
     ssf_issue_scroll(context, direction, 0);
 }
 uint16_t scroll_to(
-    BotBaseContext& context,
+    SwitchControllerContext& context,
     uint8_t start_digit, uint8_t end_digit, bool actually_scroll
 ){
     //  Returns the # of ticks needed to scroll from "start_digit" to "end_digit".
@@ -143,7 +142,7 @@ uint16_t scroll_to(
 
 
 
-void enter_digits(BotBaseContext& context, uint8_t count, const uint8_t* digits){
+void enter_digits(SwitchControllerContext& context, uint8_t count, const uint8_t* digits){
 #if 0
     context.issue_request(DeviceRequest_enter_digits(count, digits));
 #else
@@ -230,7 +229,7 @@ void enter_digits(BotBaseContext& context, uint8_t count, const uint8_t* digits)
 }
 
 
-void enter_digits_str(BotBaseContext& context, uint8_t count, const char* digits){
+void enter_digits_str(SwitchControllerContext& context, uint8_t count, const char* digits){
     enter_digits(context, count, (const uint8_t*)digits);
 }
 uint8_t convert_digit(uint8_t digit){

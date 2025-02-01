@@ -5,28 +5,18 @@
  */
 
 #include <cmath>
-#include <set>
-#include <sstream>
-#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
-//#include "CommonFramework/GlobalSettingsPanel.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
-#include "CommonFramework/Inference/VisualDetector.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
-//#include "CommonFramework/Tools/DebugDumper.h"
-//#include "CommonFramework/Tools/ErrorDumper.h"
-#include "CommonFramework/Tools/StatsTracking.h"
-#include "CommonFramework/Tools/VideoResolutionCheck.h"
+#include "CommonTools/Async/InferenceRoutines.h"
+#include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Pokemon_Notification.h"
 #include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxShinyDetector.h"
-#include "PokemonSV/Inference/Tera/PokemonSV_TeraCardDetector.h"
-//#include "PokemonSV/Inference/Tera/PokemonSV_TeraSilhouetteReader.h"
-//#include "PokemonSV/Inference/Tera/PokemonSV_TeraTypeReader.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_SaveGame.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
@@ -52,7 +42,7 @@ TeraRoller_Descriptor::TeraRoller_Descriptor()
         "Roll Tera raids to find shiny " + STRING_POKEMON + ".",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 struct TeraRoller_Descriptor::Stats : public StatsTracker{
@@ -120,7 +110,7 @@ TeraRoller::TeraRoller()
 }
 
 
-void TeraRoller::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void TeraRoller::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
     TeraRoller_Descriptor::Stats& stats = env.current_stats<TeraRoller_Descriptor::Stats>();

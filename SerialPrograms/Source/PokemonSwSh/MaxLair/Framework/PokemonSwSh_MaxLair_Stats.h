@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_MaxLair_Stats_H
 #define PokemonAutomation_PokemonSwSh_MaxLair_Stats_H
 
-#include "CommonFramework/Tools/StatsTracking.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

@@ -6,14 +6,13 @@
 
 #include <cmath>
 #include <set>
-#include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
-#include "CommonFramework/ImageTools/WaterfillUtilities.h"
+#include "CommonTools/Images/WaterfillUtilities.h"
 #include "PokemonSwSh_SparkleDetectorRadial.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

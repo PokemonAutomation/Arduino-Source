@@ -4,8 +4,8 @@
  *
  */
 
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
-#include "CommonFramework/Inference/BlackScreenDetector.h"
+#include "CommonTools/Async/InferenceRoutines.h"
+#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonBDSP_RunFromBattle.h"
 
@@ -16,13 +16,13 @@ namespace PokemonBDSP{
 
 
 bool run_from_battle(
-    ConsoleHandle& console, BotBaseContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     uint16_t exit_battle_time
 ){
     BlackScreenOverWatcher black_screen_detector;
-    int ret = run_until(
-        console, context,
-        [exit_battle_time](BotBaseContext& context){
+    int ret = run_until<SwitchControllerContext>(
+        stream, context,
+        [exit_battle_time](SwitchControllerContext& context){
             pbf_mash_button(context, BUTTON_ZL, TICKS_PER_SECOND);
             if (exit_battle_time > TICKS_PER_SECOND){
                 pbf_mash_button(context, BUTTON_B, exit_battle_time - TICKS_PER_SECOND);
@@ -31,7 +31,7 @@ bool run_from_battle(
         {{black_screen_detector}}
     );
     if (ret < 0){
-        console.log("Timed out waiting for end of battle. Are you stuck in the battle?", COLOR_RED);
+        stream.log("Timed out waiting for end of battle. Are you stuck in the battle?", COLOR_RED);
         return false;
     }
     pbf_wait(context, TICKS_PER_SECOND);

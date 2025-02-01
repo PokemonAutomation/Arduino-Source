@@ -4,7 +4,8 @@
  *
  */
 
-#include "NintendoSwitch/FixedInterval.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
@@ -25,7 +26,7 @@ FriendSearchDisconnect_Descriptor::FriendSearchDisconnect_Descriptor()
         "Disconnect from the internet using the friend search method.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 
@@ -41,7 +42,7 @@ FriendSearchDisconnect::FriendSearchDisconnect()
     PA_ADD_OPTION(USER_SLOT);
 }
 
-void FriendSearchDisconnect::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void FriendSearchDisconnect::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     ssf_press_button2(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE, 10);
 
     home_to_add_friends(context, USER_SLOT - 1, 1, true);

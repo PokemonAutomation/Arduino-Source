@@ -21,6 +21,7 @@ namespace Kernels{
 class ImageFilter_RgbRange_arm64_NEON{
 public:
     static const size_t VECTOR_SIZE = 4;
+    using Mask = size_t;
 
 public:
     ImageFilter_RgbRange_arm64_NEON(uint32_t mins, uint32_t maxs, uint32_t replacement_color, 
@@ -107,6 +108,7 @@ void filter_rgb32_range_arm64_NEON(
 class ImageFilter_RgbEuclidean_arm64_NEON{
 public:
     static const size_t VECTOR_SIZE = 4;
+    using Mask = size_t;
 
 public:
     ImageFilter_RgbEuclidean_arm64_NEON(uint32_t expected_color, double max_euclidean_distance,
@@ -196,6 +198,7 @@ size_t filter_rgb32_euclidean_arm64_NEON(
 class ToBlackWhite_RgbRange_arm64_NEON{
 public:
     static const size_t VECTOR_SIZE = 4;
+    using Mask = size_t;
 
 public:
     ToBlackWhite_RgbRange_arm64_NEON(uint32_t mins, uint32_t maxs, bool in_range_black)

@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/ImageTools/SolidColorTest.h"
+#include "CommonTools/Images/SolidColorTest.h"
 #include "PokemonSV_DialogArrowDetector.h"
 #include "PokemonSV_GradientArrowDetector.h"
 #include "PokemonSV_DialogDetector.h"

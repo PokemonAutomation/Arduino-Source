@@ -9,18 +9,18 @@
 
 #include <atomic>
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/Tools/VideoStream.h"
 #include "PokemonSV/Options/PokemonSV_AutoHostOptions.h"
 
 namespace PokemonAutomation{
     class CancellableScope;
-    class ConsoleHandle;
 namespace NintendoSwitch{
 namespace PokemonSV{
 
 
 
 void send_host_announcement(
-    ProgramEnvironment& env, ConsoleHandle& host_console,
+    ProgramEnvironment& env, VideoStream& host_console,
     const std::string& lobby_code, bool show_raid_code,
     const std::string& description,
     EventNotificationOption& NOTIFICATION_RAID_POST

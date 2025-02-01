@@ -8,9 +8,8 @@
 #define PokemonAutomation_PokemonBDSP_EncounterTracker_H
 
 #include "CommonFramework/Language.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
-#include "Pokemon/Pokemon_EncounterStats.h"
-#include "PokemonSwSh/ShinyHuntTracker.h"
+#include "CommonFramework/Tools/VideoStream.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 #include "PokemonBDSP/Options/EncounterFilter/PokemonBDSP_EncounterFilterOption.h"
 #include "PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinyEncounterDetector.h"
 
@@ -29,7 +28,7 @@ struct PokemonDetection{
 class StandardEncounterDetection{
 public:
     StandardEncounterDetection(
-        ConsoleHandle& console, BotBaseContext& context,
+        VideoStream& stream, SwitchControllerContext& context,
         Language language,
         const EncounterFilterOption2& filter,
         const DoublesShinyDetection& shininess,
@@ -58,7 +57,7 @@ private:
     EncounterActionFull get_action_doubles();
 
 private:
-    ConsoleHandle& m_console;
+    VideoStream& m_stream;
 
     const Language m_language;
 

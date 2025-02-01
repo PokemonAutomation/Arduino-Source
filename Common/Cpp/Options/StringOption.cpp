@@ -17,6 +17,8 @@ struct StringCell::Data{
     const std::string m_default;
     const std::string m_placeholder_text;
 
+    std::atomic<bool> m_locked;
+
     mutable SpinLock m_lock;
     std::string m_current;
 
@@ -43,18 +45,6 @@ StringCell::StringCell(
     : ConfigOption(lock_while_program_is_running)
     , m_data(CONSTRUCT_TOKEN, is_password, std::move(default_value), std::move(placeholder_text))
 {}
-#if 0
-std::unique_ptr<ConfigOption> StringCell::clone() const{
-    std::unique_ptr<StringCell> ret(new StringCell(
-        m_is_password,
-        m_label,
-        m_default,
-        m_placeholder_text
-    ));
-    ret->m_current = m_current;
-    return ret;
-}
-#endif
 
 bool StringCell::is_password() const{
     return m_data->m_is_password;
@@ -66,11 +56,25 @@ const std::string StringCell::default_value() const{
     return m_data->m_default;
 }
 
+
+bool StringCell::is_locked() const{
+    return m_data->m_locked.load(std::memory_order_relaxed);
+}
+void StringCell::set_locked(bool locked){
+    if (locked == is_locked()){
+        return;
+    }
+    m_data->m_locked.store(locked, std::memory_order_relaxed);
+    report_visibility_changed();
+}
+
+
 StringCell::operator std::string() const{
     ReadSpinLock lg(m_data->m_lock);
     return m_data->m_current;
 }
 void StringCell::set(std::string x){
+    sanitize(x);
     {
         WriteSpinLock lg(m_data->m_lock);
         if (m_data->m_current == x){

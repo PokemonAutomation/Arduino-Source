@@ -7,9 +7,8 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
-//#include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh_ShinyEncounterDetector.h"
 
@@ -129,23 +128,23 @@ ShinyType determine_shiny_status(
 
 
 ShinyDetectionResult detect_shiny_battle(
-    ConsoleHandle& console, CancellableScope& scope,
+    VideoStream& stream, CancellableScope& scope,
     const ShinyDetectionBattle& battle_settings,
     std::chrono::seconds timeout
 ){
-    ShinyEncounterTracker tracker(console, console, battle_settings);
+    ShinyEncounterTracker tracker(stream.logger(), stream.overlay(), battle_settings);
     int result = wait_until(
-        console, scope, timeout,
+        stream, scope, timeout,
         {{tracker}}
     );
     if (result < 0){
-        console.log("ShinyDetector: Battle menu not found after timeout.", COLOR_RED);
+        stream.log("ShinyDetector: Battle menu not found after timeout.", COLOR_RED);
         return ShinyDetectionResult{ShinyType::UNKNOWN, 0, std::make_shared<ImageRGB32>()};
     }
     double alpha;
     ShinyType shiny_type = determine_shiny_status(
         alpha,
-        console,
+        stream.logger(),
         battle_settings,
         tracker.dialog_tracker(),
         tracker.sparkles_wild()

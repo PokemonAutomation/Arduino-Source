@@ -10,7 +10,8 @@
 #include "CommonFramework/Language.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
+#include "CommonTools/FailureWatchdog.h"
+#include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 #include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_State.h"
 
 namespace PokemonAutomation{
@@ -56,7 +57,11 @@ private:
 
 class BattleMenuReader{
 public:
-    BattleMenuReader(VideoOverlay& overlay, Language language);
+    BattleMenuReader(
+        VideoOverlay& overlay,
+        Language language,
+        OcrFailureWatchdog& ocr_watchdog
+    );
 
     std::set<std::string> read_opponent(
         Logger& logger, CancellableScope& scope,
@@ -74,6 +79,7 @@ public:
 
 private:
     Language m_language;
+    OcrFailureWatchdog& m_ocr_watchdog;
     OverlayBoxScope m_opponent_name;
     OverlayBoxScope m_summary_opponent_name;
     OverlayBoxScope m_summary_opponent_types;

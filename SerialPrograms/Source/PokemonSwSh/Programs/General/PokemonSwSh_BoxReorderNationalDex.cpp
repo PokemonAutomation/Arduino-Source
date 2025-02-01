@@ -4,6 +4,7 @@
  *
  */
 
+#include <algorithm>
 #include <sstream>
 #include <map>
 #include "CommonFramework/Language.h"
@@ -11,7 +12,6 @@
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "CommonFramework/OCR/OCR_TextMatcher.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Resources/Pokemon_PokemonSlugs.h"
@@ -28,7 +28,7 @@ namespace PokemonSwSh{
 
 namespace{
 
-constexpr uint16_t k_wait_after_move = TICKS_PER_SECOND / 1.5;
+constexpr uint16_t k_wait_after_move = (uint16_t)(TICKS_PER_SECOND / 1.5);
 constexpr std::chrono::milliseconds k_wait_after_read = std::chrono::milliseconds(200);
 
 // A location can be represented as a uint16_t, meaning the order of the location starting at the first box.
@@ -47,7 +47,7 @@ std::tuple<uint16_t, uint16_t, uint16_t> get_location(size_t index){
 // Move cursor from one location to another
 // The location is represented as a uint16_t, meaning the order of the location starting at the first box.
 // Decode this location into box ID and in-box 2D location by `get_location()`
-uint16_t move_to_location(Logger& logger, BotBaseContext& context, uint16_t from, uint16_t to){
+uint16_t move_to_location(Logger& logger, SwitchControllerContext& context, uint16_t from, uint16_t to){
     auto [from_box, from_row, from_column] = get_location(from);
     auto [to_box, to_row, to_column] = get_location(to);
 
@@ -90,19 +90,22 @@ uint16_t move_to_location(Logger& logger, BotBaseContext& context, uint16_t from
 // A slug is a unique name used in a program, different than the name that is displayed to user on UI.
 // In most cases, a pokemon slug is the lower-case version of the Pokemon name, but there are some cases
 // like the slug of the Pokemon Mr. Mime is "mr-mime".
-std::string read_selected_pokemon(ConsoleHandle& console, BotBaseContext& context, Language language){
+std::string read_selected_pokemon(
+    VideoStream& stream, SwitchControllerContext& context,
+    Language language
+){
     context.wait_for_all_requests();
-    OverlayBoxScope box(console, ImageFloatBox(0.76, 0.08, 0.15, 0.064));
+    OverlayBoxScope box(stream.overlay(), ImageFloatBox(0.76, 0.08, 0.15, 0.064));
     context.wait_for(k_wait_after_read);
 
-    VideoSnapshot screen = console.video().snapshot();
+    VideoSnapshot screen = stream.video().snapshot();
     ImageViewRGB32 frame = extract_box_reference(screen, box);
 
     OCR::StringMatchResult result = PokemonNameReader::instance().read_substring(
-        console, language, frame,
+        stream.logger(), language, frame,
         OCR::BLACK_TEXT_FILTERS()
     );
-    result.log(console, PokemonNameReader::MAX_LOG10P);
+    result.log(stream.logger(), PokemonNameReader::MAX_LOG10P);
 //        assert(result.results.size() == 1);
     if (result.results.size() != 1){
         return "";
@@ -112,12 +115,17 @@ std::string read_selected_pokemon(ConsoleHandle& console, BotBaseContext& contex
 
 // Move through some pokemon according to the box location order and read their names.
 // Return a list of pokemon slugs.
-std::vector<std::string> read_all_pokemon(Logger& logger, ConsoleHandle& console, BotBaseContext& context, uint16_t pokemon_count, Language language){
+std::vector<std::string> read_all_pokemon(
+    Logger& logger,
+    VideoStream& stream, SwitchControllerContext& context,
+    uint16_t pokemon_count,
+    Language language
+){
     std::vector<std::string> pokemons;
     uint16_t current_location = 0;
     for (uint16_t i = 0; i < pokemon_count; ++i){
         current_location = move_to_location(logger, context, current_location, i);
-        pokemons.push_back(read_selected_pokemon(console, context, language));
+        pokemons.push_back(read_selected_pokemon(stream, context, language));
     }
     return pokemons;
 }
@@ -132,7 +140,7 @@ BoxReorderNationalDex_Descriptor::BoxReorderNationalDex_Descriptor()
         "Order boxes of " + STRING_POKEMON + ".",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 
@@ -162,7 +170,7 @@ BoxReorderNationalDex::BoxReorderNationalDex()
     PA_ADD_OPTION(DODGE_SYSTEM_UPDATE_WINDOW);
 }
 
-void BoxReorderNationalDex::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void BoxReorderNationalDex::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
         resume_game_no_interact(env.console, context, DODGE_SYSTEM_UPDATE_WINDOW);
@@ -189,10 +197,10 @@ void BoxReorderNationalDex::program(SingleSwitchProgramEnvironment& env, BotBase
             const auto [box, row, col] = get_location(i);
             std::stringstream os;
             os << "Failed to read pokemon name at box " << box << " row " << row << " col " << col;
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
                 os.str(),
-                true
+                env.console
             );
         }
     }
@@ -215,7 +223,7 @@ void BoxReorderNationalDex::program(SingleSwitchProgramEnvironment& env, BotBase
 
         const auto it = std::find(current_order.begin() + index, current_order.end(), sorted_order[index]);
         // Where the pokemon should be moved from
-        const uint16_t unsorted_location = it - current_order.begin();
+        const uint16_t unsorted_location = (uint16_t)(it - current_order.begin());
         // Where the pokemon should be moved to
         const uint16_t sorted_location = index;
 

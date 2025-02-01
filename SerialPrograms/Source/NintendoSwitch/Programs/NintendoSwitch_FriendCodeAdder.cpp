@@ -4,10 +4,10 @@
  *
  */
 
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
-#include "NintendoSwitch/FixedInterval.h"
 #include "NintendoSwitch_FriendCodeAdder.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.h"
 
@@ -23,7 +23,7 @@ FriendCodeAdder_Descriptor::FriendCodeAdder_Descriptor()
         "Add a list of friend codes.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 
@@ -71,7 +71,7 @@ FriendCodeAdder::FriendCodeAdder()
     PA_ADD_OPTION(TOGGLE_BEST_STATUS_DELAY);
 }
 
-void FriendCodeAdder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void FriendCodeAdder::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     grip_menu_connect_go_home(context);
 
     bool first = true;

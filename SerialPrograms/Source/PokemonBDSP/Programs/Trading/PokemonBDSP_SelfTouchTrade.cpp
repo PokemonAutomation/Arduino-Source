@@ -5,6 +5,7 @@
  */
 
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "Controllers/SerialPABotBase/SerialPABotBase.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonBDSP/PokemonBDSP_Settings.h"
@@ -14,7 +15,8 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonBDSP{
-    using namespace Pokemon;
+
+using namespace Pokemon;
 
 
 SelfTouchTrade_Descriptor::SelfTouchTrade_Descriptor()
@@ -25,7 +27,7 @@ SelfTouchTrade_Descriptor::SelfTouchTrade_Descriptor()
         "Touch trade boxes of " + STRING_POKEMON + " between two local Switches.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB,
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS},
         2, 2, 2
     )
 {}
@@ -69,7 +71,7 @@ void SelfTouchTrade::program(MultiSwitchProgramEnvironment& env, CancellableScop
     env.update_stats();
 
     size_t host_index = HOSTING_SWITCH == HostingSwitch::Switch0 ? 0 : 1;
-    BotBaseContext host(scope, env.consoles[host_index].botbase());
+    SwitchControllerContext host(scope, env.consoles[host_index].controller());
 
     //  Swap trade all the boxes.
     for (uint8_t box = 0; box < BOXES_TO_TRADE; box++){

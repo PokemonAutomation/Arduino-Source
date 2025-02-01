@@ -4,11 +4,10 @@
  *
  */
 
-#include <cmath>
-#include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
+#include "CommonTools/Images/SolidColorTest.h"
 #include "Pokemon/Inference/Pokemon_ReadHpBar.h"
 #include "PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonReader.h"
@@ -240,13 +239,17 @@ void PathReader::read_hp(
 
 
 
-void PathReader::read_path(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, GlobalState& state){
+void PathReader::read_path(
+    ProgramEnvironment& env,
+    VideoStream& stream, SwitchControllerContext& context,
+    GlobalState& state
+){
     PathMap path;
-    if (MaxLairInternal::read_path(env, console, context, path, m_path)){
-        console.log("Path Detection:\n" + path.dump(), COLOR_BLUE);
+    if (MaxLairInternal::read_path(env, stream, context, path, m_path)){
+        stream.log("Path Detection:\n" + path.dump(), COLOR_BLUE);
         state.path = path;
     }else{
-        console.log("Path Detection: Failed", COLOR_RED);
+        stream.log("Path Detection: Failed", COLOR_RED);
     }
 }
 

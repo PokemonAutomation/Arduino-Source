@@ -15,6 +15,7 @@ namespace Kernels{
 class ImageFilter_Green_Default{
 public:
     static const size_t VECTOR_SIZE = 1;
+    using Mask = size_t;
 
 public:
     ImageFilter_Green_Default(uint32_t replacement_color, uint8_t rgb_gap)

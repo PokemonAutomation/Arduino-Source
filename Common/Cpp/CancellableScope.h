@@ -61,7 +61,7 @@ public:
 
     //  If object has not been cancelled, return false.
     //  If object has been cancelled with no exception, return true.
-    //  If object has been cancelled with exception, rethrow the exception.
+    //  If object has been cancelled with an exception, rethrow the exception.
     bool throw_if_cancelled_with_exception() const;
 
     //  Returns true if it was already cancelled.

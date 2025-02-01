@@ -6,10 +6,9 @@
 
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/ImageTools/SolidColorTest.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonTools/Images/SolidColorTest.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSV_BoxDetection.h"
 
@@ -222,7 +221,7 @@ bool BoxDetector::to_coordinates(int& x, int& y, BoxCursorLocation side, uint8_t
     }
     return true;
 }
-void BoxDetector::move_vertical(BotBaseContext& context, int current, int desired) const{
+void BoxDetector::move_vertical(SwitchControllerContext& context, int current, int desired) const{
     int diff = (current - desired + 7) % 7;
 //    cout << "diff = " << diff << endl;
     if (diff <= 3){
@@ -235,7 +234,7 @@ void BoxDetector::move_vertical(BotBaseContext& context, int current, int desire
         }
     }
 }
-void BoxDetector::move_horizontal(BotBaseContext& context, int current, int desired) const{
+void BoxDetector::move_horizontal(SwitchControllerContext& context, int current, int desired) const{
     int diff = (current - desired + 7) % 7;
     if (diff <= 3){
         for (int c = 0; c < diff; c++){
@@ -250,13 +249,13 @@ void BoxDetector::move_horizontal(BotBaseContext& context, int current, int desi
 
 
 void BoxDetector::move_cursor(
-    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context,
     BoxCursorLocation side, uint8_t row, uint8_t col
 ) const{
     int desired_x = 0, desired_y = 0;
     if (!to_coordinates(desired_x, desired_y, side, row, col)){
         throw InternalProgramError(
-            &console.logger(), PA_CURRENT_FUNCTION,
+            &stream.logger(), PA_CURRENT_FUNCTION,
             "BoxDetector::move_cursor() called with BoxCursorLocation::NONE."
         );
     }
@@ -267,20 +266,20 @@ void BoxDetector::move_cursor(
     while (true){
         if (current_time() - start > std::chrono::seconds(60)){
             dump_image_and_throw_recoverable_exception(
-                info, console, "BoxMoveCursor",
+                info, stream, "BoxMoveCursor",
                 "Failed to move cursor to desired location after 1 minute."
             );
         }
 
         context.wait_for_all_requests();
-        VideoSnapshot screen = console.video().snapshot();
+        VideoSnapshot screen = stream.video().snapshot();
         std::pair<BoxCursorLocation, BoxCursorCoordinates> current = this->detect_location(screen);
 
         int current_x = 0, current_y = 0;
         if (!to_coordinates(current_x, current_y, current.first, current.second.row, current.second.col)){
             consecutive_fails++;
             if (consecutive_fails > 100){
-                dump_image_and_throw_recoverable_exception(info, console, "BoxSystemNotDetected", "move_cursor(): Unable to detect box system.");
+                dump_image_and_throw_recoverable_exception(info, stream, "BoxSystemNotDetected", "move_cursor(): Unable to detect box system.");
             }
             context.wait_for(std::chrono::milliseconds(100));
             continue;

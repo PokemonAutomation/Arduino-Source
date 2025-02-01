@@ -28,7 +28,7 @@ ShinyHuntAutonomousRegi_Descriptor::ShinyHuntAutonomousRegi_Descriptor()
         "Automatically hunt for shiny Regi using video feedback.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 std::unique_ptr<StatsTracker> ShinyHuntAutonomousRegi_Descriptor::make_stats() const{
@@ -92,7 +92,7 @@ ShinyHuntAutonomousRegi::ShinyHuntAutonomousRegi()
 
 
 
-void ShinyHuntAutonomousRegi::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void ShinyHuntAutonomousRegi::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
         resume_game_back_out(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);

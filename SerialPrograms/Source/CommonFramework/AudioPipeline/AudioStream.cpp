@@ -41,12 +41,14 @@ size_t sample_size(AudioSampleFormat format){
 
 
 void AudioStreamToFloat::add_listener(AudioFloatStreamListener& listener){
-    if (listener.samples_per_frame != m_samples_per_frame){
+    auto scope_check = m_sanitizer.check_scope();
+    if (listener.expected_samples_per_frame != m_samples_per_frame){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Mismatching frame size.");
     }
     m_listeners.insert(&listener);
 }
 void AudioStreamToFloat::remove_listener(AudioFloatStreamListener& listener){
+    auto scope_check = m_sanitizer.check_scope();
     m_listeners.erase(&listener);
 }
 
@@ -81,11 +83,13 @@ AudioStreamToFloat::AudioStreamToFloat(
     MisalignedStreamConverter::add_listener(*this);
 }
 void AudioStreamToFloat::on_objects(const void* data, size_t objects){
+    auto scope_check = m_sanitizer.check_scope();
     for (AudioFloatStreamListener* listener : m_listeners){
         listener->on_samples((const float*)data, objects);
     }
 }
 void AudioStreamToFloat::convert(void* out, const void* in, size_t count){
+    auto scope_check = m_sanitizer.check_scope();
     switch (m_format){
     case AudioSampleFormat::UINT8:
         Kernels::AudioStreamConversion::convert_audio_uint8_to_float(
@@ -133,13 +137,15 @@ void AudioStreamToFloat::convert(void* out, const void* in, size_t count){
 
 
 void AudioFloatToStream::add_listener(StreamListener& listener){
+    auto scope_check = m_sanitizer.check_scope();
     if (listener.object_size != m_frame_size){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Mismatching frame size.");
     }
-    m_listeners.insert(&listener);
+    m_listeners.add(listener);
 }
 void AudioFloatToStream::remove_listener(StreamListener& listener){
-    m_listeners.erase(&listener);
+    auto scope_check = m_sanitizer.check_scope();
+    m_listeners.remove(listener);
 }
 
 AudioFloatToStream::AudioFloatToStream(AudioSampleFormat output_format, size_t samples_per_frame)
@@ -160,13 +166,15 @@ AudioFloatToStream::AudioFloatToStream(AudioSampleFormat output_format, size_t s
 }
 AudioFloatToStream::~AudioFloatToStream(){}
 void AudioFloatToStream::on_samples(const float* data, size_t frames){
+    auto scope_check = m_sanitizer.check_scope();
     if (m_format == AudioSampleFormat::INVALID){
         return;
     }
     if (m_format == AudioSampleFormat::FLOAT32){
-        for (StreamListener* listener : m_listeners){
-            listener->on_objects(data, frames);
-        }
+        m_listeners.run_method_unique(
+            &StreamListener::on_objects,
+            data, frames
+        );
         return;
     }
 
@@ -188,9 +196,10 @@ void AudioFloatToStream::on_samples(const float* data, size_t frames){
         default:
             return;
         }
-        for (StreamListener* listener : m_listeners){
-            listener->on_objects(m_buffer.data(), block);
-        }
+        m_listeners.run_method_unique(
+            &StreamListener::on_objects,
+            m_buffer.data(), block
+        );
         data = (const float*)((const char*)data + block * m_frame_size);
         frames -= block;
     }

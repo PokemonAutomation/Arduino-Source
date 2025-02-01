@@ -30,7 +30,7 @@ ShinyHuntAutonomousStrongSpawn_Descriptor::ShinyHuntAutonomousStrongSpawn_Descri
         "Automatically hunt for shiny strong spawns using video feedback.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 std::unique_ptr<StatsTracker> ShinyHuntAutonomousStrongSpawn_Descriptor::make_stats() const{
@@ -73,7 +73,7 @@ ShinyHuntAutonomousStrongSpawn::ShinyHuntAutonomousStrongSpawn()
 
 
 
-void ShinyHuntAutonomousStrongSpawn::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void ShinyHuntAutonomousStrongSpawn::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
     }else{
@@ -81,8 +81,10 @@ void ShinyHuntAutonomousStrongSpawn::program(SingleSwitchProgramEnvironment& env
         pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_FAST);
     }
 
-    const uint32_t PERIOD = (uint32_t)TIME_ROLLBACK_HOURS * 3600 * TICKS_PER_SECOND;
-    uint32_t last_touch = system_clock(context);
+    WallDuration PERIOD = std::chrono::hours(TIME_ROLLBACK_HOURS);
+    WallClock last_touch = current_time();
+//    const uint32_t PERIOD = (uint32_t)TIME_ROLLBACK_HOURS * 3600 * TICKS_PER_SECOND;
+//    uint32_t last_touch = system_clock(context);
 
     ShinyHuntTracker& stats = env.current_stats<ShinyHuntTracker>();
     env.update_stats();
@@ -95,7 +97,8 @@ void ShinyHuntAutonomousStrongSpawn::program(SingleSwitchProgramEnvironment& env
     );
 
     while (true){
-        uint32_t now = system_clock(context);
+        WallClock now = current_time();
+//        uint32_t now = system_clock(context);
         if (TIME_ROLLBACK_HOURS > 0 && now - last_touch >= PERIOD){
             rollback_hours_from_home(context, TIME_ROLLBACK_HOURS, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
             last_touch += PERIOD;

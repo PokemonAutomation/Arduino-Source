@@ -7,9 +7,10 @@
 #ifndef PokemonAutomation_PokemonSwSh_EncounterHandler_H
 #define PokemonAutomation_PokemonSwSh_EncounterHandler_H
 
-#include "CommonFramework/Tools/ConsoleHandle.h"
-//#include "Pokemon/Pokemon_Notification.h"
-//#include "Pokemon/Options/Pokemon_EncounterBotOptions.h"
+#include "CommonFramework/Tools/VideoStream.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
+#include "Pokemon/Pokemon_EncounterStats.h"
+#include "PokemonSwSh/ShinyHuntTracker.h"
 #include "PokemonSwSh/Options/PokemonSwSh_EncounterBotCommon.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_EncounterDetection.h"
 
@@ -21,7 +22,7 @@ namespace PokemonSwSh{
 class StandardEncounterHandler{
 public:
     StandardEncounterHandler(
-        ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+        ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context,
         Language language,
         EncounterBotCommonOptions& settings,
         ShinyHuntTracker& session_stats
@@ -43,8 +44,8 @@ private:
 
 private:
     ProgramEnvironment& m_env;
-    BotBaseContext& m_context;
-    ConsoleHandle& m_console;
+    SwitchControllerContext& m_context;
+    VideoStream& m_stream;
     const Language m_language;
     EncounterBotCommonOptions& m_settings;
 
@@ -56,9 +57,9 @@ private:
 };
 
 
-void take_video(BotBaseContext& context);
+void take_video(SwitchControllerContext& context);
 void run_away(
-    ConsoleHandle& console, BotBaseContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     uint16_t exit_battle_time
 );
 

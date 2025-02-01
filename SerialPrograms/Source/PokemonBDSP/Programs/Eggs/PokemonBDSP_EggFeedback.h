@@ -7,21 +7,21 @@
 #ifndef PokemonAutomation_PokemonBDSP_EggFeedback_H
 #define PokemonAutomation_PokemonBDSP_EggFeedback_H
 
-#include "CommonFramework/Tools/ConsoleHandle.h"
+#include "CommonFramework/Tools/VideoStream.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 
 namespace PokemonAutomation{
-    class BotBaseContext;
 namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 
-void hatch_egg(ConsoleHandle& console, BotBaseContext& context);
-void hatch_party(ConsoleHandle& console, BotBaseContext& context, size_t eggs = 5);
+void hatch_egg(VideoStream& stream, SwitchControllerContext& context);
+void hatch_party(VideoStream& stream, SwitchControllerContext& context, size_t eggs = 5);
 
-void withdraw_1st_column_from_overworld(ConsoleHandle& console, BotBaseContext& context);
+void withdraw_1st_column_from_overworld(VideoStream& stream, SwitchControllerContext& context);
 
 
-void release(ConsoleHandle& console, BotBaseContext& context);
+void release(VideoStream& stream, SwitchControllerContext& context);
 
 
 

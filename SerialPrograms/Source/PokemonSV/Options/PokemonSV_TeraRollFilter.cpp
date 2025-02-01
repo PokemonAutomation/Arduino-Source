@@ -4,11 +4,9 @@
  *
  */
 
-#include "Common/Cpp/Exceptions.h"
-#include "ClientSource/Connection/BotBase.h"
+//#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
+//#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 //#include "CommonFramework/Tools/DebugDumper.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "Pokemon/Pokemon_Strings.h"
@@ -75,7 +73,7 @@ std::string TeraRollFilter::check_validity() const{
 }
 
 TeraRollFilter::FilterResult TeraRollFilter::run_filter(
-    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context,
     TeraRaidData& data
 ) const{
     uint8_t min_stars = MIN_STARS;
@@ -91,17 +89,17 @@ TeraRollFilter::FilterResult TeraRollFilter::run_filter(
         // this makes sure that we only check sparkling raids
         // and that includes event & 6 star raids
         // a later star check will be performed to exclude 6 star raids
-        if (!is_sparkling_raid(console, context)){
-            console.log("No sparkling raid detected, skipping...", COLOR_ORANGE);
+        if (!is_sparkling_raid(stream, context)){
+            stream.log("No sparkling raid detected, skipping...", COLOR_ORANGE);
 //            data.event_type = TeraRaidData::EventType::NORMAL;
             return FilterResult::NO_RAID;
         }
         break;
     case EventCheckMode::CHECK_ONLY_NONEVENT:
-        if (is_sparkling_raid(console, context)){
+        if (is_sparkling_raid(stream, context)){
             // if the user excluded 6 star raids, skip sparkling raids
             if (min_stars > 6 || max_stars < 6){
-                console.log("Sparkling raid detected, skipping...", COLOR_ORANGE);
+                stream.log("Sparkling raid detected, skipping...", COLOR_ORANGE);
                 return FilterResult::FAILED;
             }
             // if the user included 6 star raids, defer skip decision
@@ -110,15 +108,15 @@ TeraRollFilter::FilterResult TeraRollFilter::run_filter(
         break;
     }
 
-    if (!open_raid(console, context)){
+    if (!open_raid(stream, context)){
         return FilterResult::NO_RAID;
     }
     context.wait_for(std::chrono::milliseconds(500));
 
-    VideoSnapshot screen = console.video().snapshot();
+    VideoSnapshot screen = stream.video().snapshot();
     TeraCardReader reader(COLOR_RED);
 
-    read_card(info, console, screen, reader, data);
+    read_card(info, stream, screen, reader, data);
 
     switch (event_check_mode){
     case EventCheckMode::CHECK_ALL:
@@ -127,32 +125,32 @@ TeraRollFilter::FilterResult TeraRollFilter::run_filter(
         // only sparkling raids at this point
         // skip 6 star raids
         if (data.stars == 6){
-            console.log("Detected non-event 6 star raid, skipping...", COLOR_ORANGE);
-            close_raid(info, console, context);
+            stream.log("Detected non-event 6 star raid, skipping...", COLOR_ORANGE);
+            close_raid(info, stream, context);
             return FilterResult::NO_RAID;
         }
         break;
     case EventCheckMode::CHECK_ONLY_NONEVENT:
         // skip sparkling raids unless 6 stars
         if (sparkling_raid && data.stars != 6){
-            console.log("Detected event raid, skipping...", COLOR_ORANGE);
-            close_raid(info, console, context);
+            stream.log("Detected event raid, skipping...", COLOR_ORANGE);
+            close_raid(info, stream, context);
             return FilterResult::NO_RAID;
         }
         break;
     }
 
     if (data.stars < min_stars || data.stars > max_stars){
-        console.log("Raid stars is out of range. Skipping...");
-        close_raid(info, console, context);
+        stream.log("Raid stars is out of range. Skipping...");
+        close_raid(info, stream, context);
         return FilterResult::FAILED;
     }
 
     // TODO: Add species filter
 
     if (!check_herba(data.species)){
-        console.log("Raid cannot have all herbas. Skipping...");
-        close_raid(info, console, context);
+        stream.log("Raid cannot have all herbas. Skipping...");
+        close_raid(info, stream, context);
         return FilterResult::FAILED;
     }
 
@@ -161,12 +159,12 @@ TeraRollFilter::FilterResult TeraRollFilter::run_filter(
 
 
 void TeraRollFilter::read_card(
-    const ProgramInfo& info, ConsoleHandle& console, const ImageViewRGB32& screen,
+    const ProgramInfo& info, VideoStream& stream, const ImageViewRGB32& screen,
     TeraCardReader& reader, TeraRaidData& data
 ) const{
-    data.stars = reader.stars(console, info, screen);
-    data.tera_type = reader.tera_type(console, info, screen);
-    data.species = reader.pokemon_slug(console, info, screen);
+    data.stars = reader.stars(stream.logger(), info, screen);
+    data.tera_type = reader.tera_type(stream.logger(), info, screen);
+    data.species = reader.pokemon_slug(stream.logger(), info, screen);
 
     std::string stars = data.stars == 0
         ? "?"
@@ -178,12 +176,12 @@ void TeraRollFilter::read_card(
         ? "? " + Pokemon::STRING_POKEMON
         : data.species;
 
-    console.overlay().add_log(
+    stream.overlay().add_log(
         stars + "* " + tera_type + " " + pokemon,
         COLOR_GREEN
     );
     std::string log = "Detected a " + stars + "* " + tera_type + " " + pokemon;
-    console.log(log);
+    stream.log(log);
 }
 bool TeraRollFilter::check_herba(const std::string& pokemon_slug) const{
     if (!SKIP_NON_HERBA){

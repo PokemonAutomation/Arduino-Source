@@ -7,20 +7,19 @@
 #ifndef PokemonAutomation_PokemonSwSh_StatsResetRegi_H
 #define PokemonAutomation_PokemonSwSh_StatsResetRegi_H
 
-#include "CommonFramework/Options/LanguageOCROption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
-#include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
+#include "CommonTools/Options/LanguageOCROption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "Pokemon/Options/Pokemon_IvJudgeOption.h"
 #include "PokemonSwSh/Options/PokemonSwSh_BallSelectOption.h"
-#include "PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h"
-#include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleBallReader.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
+
+using namespace Pokemon;
 
 
 class StatsResetRegi_Descriptor : public SingleSwitchProgramDescriptor{
@@ -36,7 +35,7 @@ public:
 class StatsResetRegi : public SingleSwitchProgramInstance{
 public:
     StatsResetRegi();
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
     StartInGripOrGameOption START_LOCATION;

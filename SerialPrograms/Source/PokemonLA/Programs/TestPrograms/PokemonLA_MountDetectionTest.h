@@ -26,7 +26,7 @@ class MountDetectionTest : public SingleSwitchProgramInstance{
 public:
     MountDetectionTest();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
     MountDetectorLoggingOption FAILED_ACTION;

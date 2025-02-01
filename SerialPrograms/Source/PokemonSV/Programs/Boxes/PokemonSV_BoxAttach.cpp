@@ -5,8 +5,8 @@
  */
 
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 //#include "Pokemon/Pokemon_Strings.h"
 //#include "PokemonSV_BoxRoutines.h"
@@ -23,7 +23,8 @@ namespace PokemonSV{
 //  With the cursor over the item you want to attach, attach to the current
 //  Pokemon, replacing if neccessary.
 void attach_item_from_bag(
-    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    const ProgramInfo& info,
+    VideoStream& stream, SwitchControllerContext& context,
     size_t& errors
 ){
 //    bool attach_attempted = false;
@@ -33,7 +34,7 @@ void attach_item_from_bag(
     while (true){
         if (current_time() - start > std::chrono::seconds(60)){
             dump_image_and_throw_recoverable_exception(
-                info, console, "AttachFailed",
+                info, stream, "AttachFailed",
                 "Failed to attach item after 1 minute."
             );
         }
@@ -46,7 +47,7 @@ void attach_item_from_bag(
 
         context.wait_for_all_requests();
         int ret = wait_until(
-            console, context,
+            stream, context,
             std::chrono::seconds(10),
             {
                 bag_detector,
@@ -59,7 +60,7 @@ void attach_item_from_bag(
         context.wait_for(std::chrono::milliseconds(50));
         if (ret == 4){
             //  Make sure we're not mistakening this for the other dialogs.
-            auto screenshot = console.video().snapshot();
+            auto screenshot = stream.video().snapshot();
             if (prompt.detect(screenshot)){
                 ret = 3;
             }
@@ -68,13 +69,13 @@ void attach_item_from_bag(
 
         switch (ret){
         case 0:
-            console.log("No longer in bag...");
+            stream.log("No longer in bag...");
             if (!attach_completed){
                 errors++;
             }
             return;
         case 1:
-            console.log("Detected bag neutral...");
+            stream.log("Detected bag neutral...");
             if (attach_completed){
                 pbf_press_button(context, BUTTON_B, 20, 30);
             }else{
@@ -82,16 +83,16 @@ void attach_item_from_bag(
             }
             break;
         case 2:
-            console.log("Detected selection...");
+            stream.log("Detected selection...");
             pbf_press_button(context, BUTTON_A, 20, 30);
 //            attach_completed = true;
             break;
         case 3:
-            console.log("Detected prompt...");
+            stream.log("Detected prompt...");
             pbf_press_button(context, BUTTON_A, 20, 30);
             break;
         case 4:
-            console.log("Detected dialog...");
+            stream.log("Detected dialog...");
             pbf_press_button(context, BUTTON_B, 20, 30);
             attach_completed = true;
             break;
@@ -102,7 +103,8 @@ void attach_item_from_bag(
 
 
 void attach_item_from_box(
-    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    const ProgramInfo& info,
+    VideoStream& stream, SwitchControllerContext& context,
     size_t category_index,
     size_t& errors
 ){
@@ -113,7 +115,7 @@ void attach_item_from_box(
     while (true){
         if (current_time() - start > std::chrono::seconds(60)){
             dump_image_and_throw_recoverable_exception(
-                info, console, "AttachFailed",
+                info, stream, "AttachFailed",
                 "Failed to attach item after 1 minute."
             );
         }
@@ -127,7 +129,7 @@ void attach_item_from_box(
 
         context.wait_for_all_requests();
         int ret = wait_until(
-            console, context,
+            stream, context,
             std::chrono::seconds(10),
             {
                 box_detector,
@@ -141,7 +143,7 @@ void attach_item_from_box(
 #if 0
         if (ret == 4){
             //  Make sure we're not mistakening this for the other dialogs.
-            auto screenshot = console.video().snapshot();
+            auto screenshot = stream.video().snapshot();
             if (selected_empty.detect(screenshot)){
                 ret = 1;
             }else if (selected_held.detect(screenshot)){
@@ -153,13 +155,13 @@ void attach_item_from_box(
         switch (ret){
         case 0:{
             if (ret == expected){
-                console.log("Detected box neutral.");
+                stream.log("Detected box neutral.");
             }else{
-                console.log("Detected box neutral. (unexpected)", COLOR_RED);
+                stream.log("Detected box neutral. (unexpected)", COLOR_RED);
                 errors++;
             }
 
-            auto screenshot = console.video().snapshot();
+            auto screenshot = stream.video().snapshot();
             if (exists.detect(screenshot)){
                 if (attach_attempted){
                     return;
@@ -169,15 +171,15 @@ void attach_item_from_box(
                 expected = 1;
                 continue;
             }else{
-                console.log("Slot is empty.");
+                stream.log("Slot is empty.");
                 return;
             }
         }
         case 1:
             if (ret == expected){
-                console.log("Detected empty selection. Attaching...");
+                stream.log("Detected empty selection. Attaching...");
             }else{
-                console.log("Detected empty selection. Attaching... (unexpected)", COLOR_RED);
+                stream.log("Detected empty selection. Attaching... (unexpected)", COLOR_RED);
                 errors++;
             }
 
@@ -188,9 +190,9 @@ void attach_item_from_box(
 
         case 2:
             if (1 == expected){
-                console.log("Detected held selection. Replacing...");
+                stream.log("Detected held selection. Replacing...");
             }else{
-                console.log("Detected held selection. Replacing... (unexpected)", COLOR_RED);
+                stream.log("Detected held selection. Replacing... (unexpected)", COLOR_RED);
                 errors++;
             }
 
@@ -202,9 +204,9 @@ void attach_item_from_box(
 
         case 3:
             if (ret == expected){
-                console.log("Detected bag.");
+                stream.log("Detected bag.");
             }else{
-                console.log("Detected bag.(unexpected)", COLOR_RED);
+                stream.log("Detected bag.(unexpected)", COLOR_RED);
                 errors++;
             }
 
@@ -219,7 +221,7 @@ void attach_item_from_box(
                 pbf_press_dpad(context, DPAD_RIGHT, 20, 105);
             }
 
-            attach_item_from_bag(info, console, context, errors);
+            attach_item_from_bag(info, stream, context, errors);
             attach_attempted = true;
 
             expected = 0;
@@ -227,7 +229,7 @@ void attach_item_from_box(
 
         default:
             dump_image_and_throw_recoverable_exception(
-                info, console, "NoStateAttachingItem", "No recognized state while attaching item after 10 seconds."
+                info, stream, "NoStateAttachingItem", "No recognized state while attaching item after 10 seconds."
             );
         }
     }

@@ -8,9 +8,9 @@
 #ifndef PokemonAutomation_PokemonLA_PokemonMapSpriteReader_H
 #define PokemonAutomation_PokemonLA_PokemonMapSpriteReader_H
 
-#include <map>
 #include <vector>
-#include "CommonFramework/ImageMatch/ExactImageDictionaryMatcher.h"
+#include <map>
+#include "CommonTools/ImageMatch/ExactImageDictionaryMatcher.h"
 #include "PokemonLA/PokemonLA_Locations.h"
 
 struct ImagePixelBox;

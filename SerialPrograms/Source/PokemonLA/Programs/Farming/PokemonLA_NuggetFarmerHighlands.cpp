@@ -4,11 +4,10 @@
  *
  */
 
-#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/Tools/StatsTracking.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
@@ -41,7 +40,7 @@ NuggetFarmerHighlands_Descriptor::NuggetFarmerHighlands_Descriptor()
         "Farm nuggets off the Miss Fortune sisters in the Coronet Highlands.",
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 class NuggetFarmerHighlands_Descriptor::Stats : public StatsTracker, public ShinyStatIncrementer{
@@ -92,7 +91,7 @@ NuggetFarmerHighlands::NuggetFarmerHighlands()
 
 
 
-bool NuggetFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+bool NuggetFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     NuggetFarmerHighlands_Descriptor::Stats& stats = env.current_stats<NuggetFarmerHighlands_Descriptor::Stats>();
 
     //  Go to Coronet Highlands Mountain camp.
@@ -118,9 +117,9 @@ bool NuggetFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env, B
             return on_shiny_callback(env, env.console, SHINY_DETECTED, error_coefficient);
         });
 
-        int ret = run_until(
+        int ret = run_until<SwitchControllerContext>(
             env.console, context,
-            [](BotBaseContext& context){
+            [](SwitchControllerContext& context){
                 pbf_move_left_joystick(context, 0, 212, 50, 0);
                 pbf_press_button(context, BUTTON_B, 495, 80);
 
@@ -186,8 +185,8 @@ bool NuggetFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env, B
             return on_shiny_callback(env, env.console, SHINY_DETECTED, error_coefficient);
         });
 
-        int ret = run_until(env.console, context,
-            [&env](BotBaseContext& context){
+        int ret = run_until<SwitchControllerContext>(env.console, context,
+            [&env](SwitchControllerContext& context){
                 goto_camp_from_overworld(env, env.console, context);
                 goto_professor(env.console, context, Camp::HIGHLANDS_HIGHLANDS);
             },
@@ -211,7 +210,7 @@ bool NuggetFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env, B
 
 
 
-void NuggetFarmerHighlands::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void NuggetFarmerHighlands::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     NuggetFarmerHighlands_Descriptor::Stats& stats = env.current_stats<NuggetFarmerHighlands_Descriptor::Stats>();
 
     //  Connect the controller.

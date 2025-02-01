@@ -10,18 +10,16 @@
 #include <deque>
 #include <atomic>
 #include "Common/Cpp/Time.h"
-//#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
-#include "CommonFramework/Options/LanguageOCROption.h"
-//#include "CommonFramework/Notifications/EventNotificationOption.h"
-#include "CommonFramework/InferenceInfra/InferenceSession.h"
-#include "CommonFramework/Tools/StatsTracking.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
+#include "CommonTools/Async/InferenceSession.h"
+#include "CommonTools/Options/LanguageOCROption.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 #include "Pokemon/Pokemon_EncounterStats.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_LetsGoKillDetector.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_EncounterWatcher.h"
 
 namespace PokemonAutomation{
     class CancellableScope;
-    class BotBaseContext;
     class ProgramEnvironment;
 namespace NintendoSwitch{
 namespace PokemonSV{
@@ -113,7 +111,8 @@ public:
 class LetsGoEncounterBotTracker{
 public:
     LetsGoEncounterBotTracker(
-        ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+        ProgramEnvironment& env,
+        VideoStream& stream, SwitchControllerContext& context,
         LetsGoEncounterBotStats& stats,
         OCR::LanguageOCROption& language
     );
@@ -152,8 +151,8 @@ public:
 
 private:
     ProgramEnvironment& m_env;
-    ConsoleHandle& m_console;
-    BotBaseContext& m_context;
+    VideoStream& m_stream;
+    SwitchControllerContext& m_context;
     LetsGoEncounterBotStats& m_stats;
 
     OCR::LanguageOCROption& m_language;
@@ -174,10 +173,10 @@ private:
 //  The function tracks kill chain by sound detection from `tracker`. The function
 //  does not handle any pokemon battle encounters (turn-based battles).
 bool use_lets_go_to_clear_in_front(
-    ConsoleHandle& console, BotBaseContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     LetsGoEncounterBotTracker& tracker,
     bool throw_ball_if_bubble,
-    std::function<void(BotBaseContext& context)>&& command
+    std::function<void(SwitchControllerContext& context)>&& command
 );
 
 

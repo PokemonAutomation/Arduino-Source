@@ -33,7 +33,7 @@ ApplyGrits_Descriptor::ApplyGrits_Descriptor()
         "Use Grits items on " + STRING_POKEMON,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 
@@ -61,7 +61,7 @@ ApplyGrits::ApplyGrits()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void ApplyGrits::ApplyGritsOnOnePokemon(SingleSwitchProgramEnvironment& env, BotBaseContext& context, size_t pokemon_index){
+void ApplyGrits::ApplyGritsOnOnePokemon(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, size_t pokemon_index){
     // Start the function when the game is in the item menu, with cursor hovering over Grit Dust
     // Grit Gravel, Grit Pebble and Grit Rock must be on the right side of Grit Dust, in the correct order.
 
@@ -112,7 +112,7 @@ void ApplyGrits::ApplyGritsOnOnePokemon(SingleSwitchProgramEnvironment& env, Bot
     context.wait_for_all_requests();
 }
 
-void ApplyGrits::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void ApplyGrits::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     //  Connect the controller.
     pbf_press_button(context, BUTTON_LCLICK, 5, 5);
 

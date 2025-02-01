@@ -10,7 +10,7 @@
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/TimeExpressionOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
-#include "CommonFramework/Options/LanguageOCROption.h"
+#include "CommonTools/Options/LanguageOCROption.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonSwSh/Options/PokemonSwSh_BallSelectOption.h"
@@ -38,14 +38,14 @@ public:
 class RideCloner101 : public SingleSwitchProgramInstance{
 public:
     RideCloner101();
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
-    void setup(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
+    void setup(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context);
     bool run_post_win(
         ProgramEnvironment& env,
-        ConsoleHandle& console,
-        BotBaseContext& context
+        VideoStream& stream,
+        SwitchControllerContext& context
     );
 
 private:

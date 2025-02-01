@@ -9,7 +9,7 @@
 
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
-#include "CommonFramework/Options/LanguageOCROption.h"
+#include "CommonTools/Options/LanguageOCROption.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
@@ -33,7 +33,7 @@ public:
 class AutoItemPrinter : public SingleSwitchProgramInstance{
 public:
     AutoItemPrinter();
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
     OCR::LanguageOCROption LANGUAGE;
@@ -44,7 +44,7 @@ private:
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;
 
-    void enter_printing_mode(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    void enter_printing_mode(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
 };
 
 

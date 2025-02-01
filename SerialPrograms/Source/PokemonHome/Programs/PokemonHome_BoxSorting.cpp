@@ -32,22 +32,16 @@ language
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
-#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/OCR/OCR_NumberReader.h"
-#include "CommonFramework/OCR/OCR_TextMatcher.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
-#include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/VideoPipeline/VideoOverlay.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
+#include "CommonTools/OCR/OCR_NumberReader.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonHome/Inference/PokemonHome_BoxGenderDetector.h"
 #include "PokemonHome/Inference/PokemonHome_BallReader.h"
-#include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
-#include "PokemonSwSh/Programs/ReleaseHelpers.h"
 #include "PokemonHome_BoxSorting.h"
 
 namespace PokemonAutomation{
@@ -68,7 +62,7 @@ BoxSorting_Descriptor::BoxSorting_Descriptor()
         "Order boxes of " + STRING_POKEMON + ".",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
         )
 {}
 struct BoxSorting_Descriptor::Stats : public StatsTracker{
@@ -255,7 +249,7 @@ std::ostream& operator<<(std::ostream& os, const std::optional<Pokemon>& pokemon
     return os;
 }
 
-bool go_to_first_slot(SingleSwitchProgramEnvironment& env, BotBaseContext& context, uint16_t VIDEO_DELAY){
+bool go_to_first_slot(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, uint16_t VIDEO_DELAY){
 
     ImageFloatBox cursor_check(0.07, 0.15, 0.01, 0.01); //cursor position of the first slot of the box
     VideoSnapshot screen = env.console.video().snapshot();
@@ -305,7 +299,7 @@ bool go_to_first_slot(SingleSwitchProgramEnvironment& env, BotBaseContext& conte
 }
 
 //Move the cursor to the given coordinates, knowing current pos via the cursor struct
-[[nodiscard]] Cursor move_cursor_to(SingleSwitchProgramEnvironment& env, BotBaseContext& context, const Cursor& cur_cursor, const Cursor& dest_cursor, uint16_t GAME_DELAY){
+[[nodiscard]] Cursor move_cursor_to(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, const Cursor& cur_cursor, const Cursor& dest_cursor, uint16_t GAME_DELAY){
 
     std::ostringstream ss;
     ss << "Moving cursor from " << cur_cursor << " to " << dest_cursor;
@@ -398,7 +392,7 @@ void output_boxes_data_json(const std::vector<std::optional<Pokemon>>& boxes_dat
 
 void do_sort(
     SingleSwitchProgramEnvironment& env,
-    BotBaseContext& context,
+    SwitchControllerContext& context,
     std::vector<std::optional<Pokemon>> boxes_data,
     std::vector<std::optional<Pokemon>> boxes_sorted,
     BoxSorting_Descriptor::Stats& stats,
@@ -452,7 +446,7 @@ void do_sort(
     }
 }
 
-void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void BoxSorting::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
 
     std::vector<BoxSortingSelection> sort_preferences = SORT_TABLE.preferences();
     if (sort_preferences.empty()){
@@ -554,7 +548,7 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
             for (size_t column = 0; column < MAX_COLUMNS; column++){
 
                 ImageFloatBox slot_box(0.06 + (0.072 * column), 0.2 + (0.1035 * row), 0.03, 0.057);
-                int current_box_value = image_stddev(extract_box_reference(screen, slot_box)).sum();
+                int current_box_value = (int)image_stddev(extract_box_reference(screen, slot_box)).sum();
 
                 ss << current_box_value;
 
@@ -615,21 +609,21 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
             for (size_t row = 0; row < MAX_ROWS; row++){
                 for (size_t column = 0; column < MAX_COLUMNS; column++){
 
-                    if(boxes_data[get_index(box_nb, row, column)].has_value()){
+                    if (boxes_data[get_index(box_nb, row, column)].has_value()){
                         screen = env.console.video().snapshot();
 
                         int national_dex_number = OCR::read_number_waterfill(env.console, extract_box_reference(screen, national_dex_number_box), 0xff808080, 0xffffffff);
                         if (national_dex_number < 0 || national_dex_number > 1025) {
                             dump_image(env.console, ProgramInfo(), "ReadSummary_national_dex_number", screen);
                         }
-                        boxes_data[get_index(box_nb, row, column)]->national_dex_number = national_dex_number;
+                        boxes_data[get_index(box_nb, row, column)]->national_dex_number = (uint16_t)national_dex_number;
 
-                        int shiny_stddev_value = image_stddev(extract_box_reference(screen, shiny_symbol_box)).sum();
+                        int shiny_stddev_value = (int)image_stddev(extract_box_reference(screen, shiny_symbol_box)).sum();
                         bool is_shiny = shiny_stddev_value > 30;
                         boxes_data[get_index(box_nb, row, column)]->shiny = is_shiny;
                         env.console.log("Shiny detection stddev:" + std::to_string(shiny_stddev_value) + " is shiny:" + std::to_string(is_shiny));
 
-                        int gmax_stddev_value = image_stddev(extract_box_reference(screen, gmax_symbol_box)).sum();
+                        int gmax_stddev_value = (int)image_stddev(extract_box_reference(screen, gmax_symbol_box)).sum();
                         bool is_gmax = gmax_stddev_value > 30;
                         boxes_data[get_index(box_nb, row, column)]->gmax = is_gmax;
                         env.console.log("Gmax detection stddev:" + std::to_string(gmax_stddev_value) + " is gmax:" + std::to_string(is_gmax));

@@ -7,12 +7,12 @@
 #ifndef PokemonAutomation_PokemonSwSh_MaxLair_Detect_PokemonSwapMenu_H
 #define PokemonAutomation_PokemonSwSh_MaxLair_Detect_PokemonSwapMenu_H
 
+#include "Common/Cpp/AbstractLogger.h"
 #include "CommonFramework/Language.h"
-#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
+#include "CommonTools/FailureWatchdog.h"
+#include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -59,7 +59,8 @@ public:
     PokemonSwapMenuReader(
         Logger& logger,
         VideoOverlay& overlay,
-        Language language
+        Language language,
+        OcrFailureWatchdog& ocr_watchdog
     );
 
     bool my_turn(const ImageViewRGB32& screen);
@@ -72,6 +73,7 @@ public:
 private:
     Logger& m_logger;
     Language m_language;
+    OcrFailureWatchdog& m_ocr_watchdog;
     OverlayBoxScope m_sprite0;
     OverlayBoxScope m_sprite1;
     OverlayBoxScope m_name0;

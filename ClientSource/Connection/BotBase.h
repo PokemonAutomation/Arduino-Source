@@ -15,11 +15,14 @@ namespace PokemonAutomation{
 class Logger;
 struct BotBaseMessage;
 class BotBaseRequest;
+class BotBaseControllerContext;
 
 
 
-class BotBase{
+class BotBaseController{
 public:
+    using ContextType = BotBaseControllerContext;
+
     enum class State{
         RUNNING,
         STOPPING,
@@ -28,7 +31,7 @@ public:
     };
 
 public:
-    virtual ~BotBase() = default;
+    virtual ~BotBaseController() = default;
 
     virtual Logger& logger() = 0;
     virtual State state() const = 0;
@@ -70,21 +73,40 @@ public:
 
 
 
-//  A wrapper for BotBase that allows for asynchronous cancelling.
-class BotBaseContext final : public CancellableScope{
+class ControllerContext0 : public CancellableScope{
 public:
-    BotBaseContext(BotBase& botbase);
-    BotBaseContext(CancellableScope& parent, BotBase& botbase);
-    virtual ~BotBaseContext();
+    virtual void wait_for_all_requests() const = 0;
+    virtual void cancel_now() = 0;
+    virtual void cancel_lazy() = 0;
+};
 
 
-    void wait_for_all_requests() const;
+//  A wrapper for BotBase that allows for asynchronous cancelling.
+class BotBaseControllerContext final : public ControllerContext0{
+public:
+    using ControllerType = BotBaseController;
 
-    //  Don't use this unless you really need to.
-    BotBase& botbase() const{ return m_botbase; }
+public:
+    BotBaseControllerContext(BotBaseController& botbase)
+        : m_controller(botbase)
+    {}
+    BotBaseControllerContext(CancellableScope& parent, BotBaseController& botbase)
+        : m_controller(botbase)
+    {
+        attach(parent);
+    }
+    virtual ~BotBaseControllerContext(){
+        detach();
+    }
+
+
+    virtual void wait_for_all_requests() const override;
+
+    operator BotBaseController&() const{ return m_controller; }
+    BotBaseController& controller() const{ return m_controller; }
 
     //  Stop all commands in this context now.
-    void cancel_now();
+    virtual void cancel_now() override;
 
     //  Stop the commands in this context, but do it lazily.
     //  Still will stop new commands from being issued to the device,
@@ -92,7 +114,7 @@ public:
     //  should replace the command queue.
     //  This cancel is used when you need continuity from an ongoing
     //  sequence.
-    void cancel_lazy();
+    virtual void cancel_lazy() override;
 
 
     virtual bool cancel(std::exception_ptr exception) noexcept override;
@@ -105,7 +127,7 @@ public:
 
 
 private:
-    BotBase& m_botbase;
+    BotBaseController& m_controller;
     LifetimeSanitizer m_lifetime_sanitizer;
 };
 

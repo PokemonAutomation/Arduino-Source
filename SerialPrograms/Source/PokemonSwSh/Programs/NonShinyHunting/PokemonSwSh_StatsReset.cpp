@@ -5,14 +5,16 @@
  */
 
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
-#include "CommonFramework/Inference/BlackScreenDetector.h"
-#include "CommonFramework/Tools/StatsTracking.h"
+#include "CommonTools/Async/InferenceRoutines.h"
+#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
-#include "NintendoSwitch/FixedInterval.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_GameEntry.h"
 #include "PokemonSwSh_StatsReset.h"
 
@@ -29,7 +31,7 @@ StatsReset_Descriptor::StatsReset_Descriptor()
         "Repeatedly receive gift " + STRING_POKEMON + " until you get the stats you want.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 struct StatsReset_Descriptor::Stats : public StatsTracker{
@@ -99,7 +101,7 @@ StatsReset::StatsReset()
 
 
 
-void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void StatsReset::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
         resume_game_back_out(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);
@@ -116,9 +118,9 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
         context.wait_for_all_requests();
         {
             BlackScreenOverWatcher detector;
-            int result = run_until(
+            int result = run_until<SwitchControllerContext>(
                 env.console, context,
-                [this](BotBaseContext& context){
+                [this](SwitchControllerContext& context){
                     if (POKEMON == GiftPokemon::TypeNull){
                         pbf_mash_button(context, BUTTON_A, 10 * TICKS_PER_SECOND);
                     }else{

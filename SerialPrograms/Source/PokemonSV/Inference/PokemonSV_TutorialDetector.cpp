@@ -4,17 +4,13 @@
  *
  */
 
-#include "Common/Cpp/Exceptions.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "CommonFramework/ImageTools/SolidColorTest.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
-#include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "CommonTools/Images/SolidColorTest.h"
 #include "PokemonSV_TutorialDetector.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

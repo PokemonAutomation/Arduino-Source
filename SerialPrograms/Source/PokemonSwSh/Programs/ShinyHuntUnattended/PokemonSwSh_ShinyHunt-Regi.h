@@ -16,12 +16,12 @@ namespace PokemonSwSh{
 
 
 void move_to_corner(
-    Logger& logger, BotBaseContext& context,
+    Logger& logger, SwitchControllerContext& context,
     bool correction, uint16_t TRANSITION_DELAY
 );
 
 void run_regi_light_puzzle(
-    Logger& logger, BotBaseContext& context,
+    Logger& logger, SwitchControllerContext& context,
     RegiGolem regi, uint64_t encounter
 );
 

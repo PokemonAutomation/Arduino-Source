@@ -25,7 +25,7 @@ FastCodeEntry_Descriptor::FastCodeEntry_Descriptor()
         "Force your way into raids by entering 8-digit codes in under 1 second.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 
@@ -48,12 +48,12 @@ FastCodeEntry::FastCodeEntry()
     PA_ADD_OPTION(INITIAL_DELAY);
 }
 
-void FastCodeEntry::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void FastCodeEntry::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     uint8_t code[8];
     RAID_CODE.to_str(code);
 
     if (INITIAL_DELAY != 0){
-        start_program_flash(context, INITIAL_DELAY);
+        pbf_wait(context, INITIAL_DELAY);
     }
 
     pbf_press_button(context, BUTTON_PLUS, 5, 5);

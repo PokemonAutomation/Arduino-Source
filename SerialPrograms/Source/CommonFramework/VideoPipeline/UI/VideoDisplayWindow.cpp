@@ -90,13 +90,15 @@ void VideoDisplayWindow::keyPressEvent(QKeyEvent* event){
         exit_full_screen();
         return;
     }
-    if (m_display_widget && m_display_widget->command_receiver().key_press(event)){
+    if (m_display_widget){
+        m_display_widget->command_receiver().key_press(event);
         return;
     }
     QWidget::keyPressEvent(event);
 }
 void VideoDisplayWindow::keyReleaseEvent(QKeyEvent* event){
-    if (m_display_widget && m_display_widget->command_receiver().key_release(event)){
+    if (m_display_widget){
+        m_display_widget->command_receiver().key_release(event);
         return;
     }
     QWidget::keyReleaseEvent(event);

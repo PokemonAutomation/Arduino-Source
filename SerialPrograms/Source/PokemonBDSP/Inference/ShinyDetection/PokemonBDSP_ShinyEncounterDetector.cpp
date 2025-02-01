@@ -4,17 +4,15 @@
  *
  */
 
-#include <sstream>
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
-#include "CommonFramework/Notifications/ProgramInfo.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
-#include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 #include "PokemonBDSP/PokemonBDSP_Settings.h"
 #include "PokemonBDSP/Inference/Sounds/PokemonBDSP_ShinySoundDetector.h"
 #include "PokemonBDSP_ShinyEncounterDetector.h"
@@ -191,8 +189,8 @@ void determine_shiny_status(
         }else if (dist_to_own < dist_to_wild){
             own_shiny_sound_detected = true;
         }else{
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.logger(),
+            throw_and_log<OperationFailedException>(
+                env.logger(), ErrorReport::SEND_ERROR_REPORT,
                 "Wrong shiny sound timing found."
             );
         }
@@ -259,7 +257,7 @@ void determine_shiny_status(
 
 void detect_shiny_battle(
     ProgramEnvironment& env,
-    ConsoleHandle& console, CancellableScope& scope,
+    VideoStream& stream, CancellableScope& scope,
     DoublesShinyDetection& wild_result,
     ShinyDetectionResult& your_result,
     EventNotificationOption& settings,
@@ -268,34 +266,35 @@ void detect_shiny_battle(
     bool use_shiny_sound
 ){
     BattleType battle_type = type.full_battle_menu ? BattleType::STANDARD : BattleType::STARTER;
-    ShinyEncounterTracker tracker(console, console, battle_type);
+    ShinyEncounterTracker tracker(stream.logger(), stream.overlay(), battle_type);
 
     std::unique_ptr<ShinySoundDetector> shiny_sound_detector;
     std::vector<WallClock> shiny_sound_timestamps; // the times where shiny sound is detected
     
     if (use_shiny_sound){
-        shiny_sound_detector = std::make_unique<ShinySoundDetector>(console, [&shiny_sound_timestamps](float error_coefficient) -> bool{
-            //  Warning: This callback will be run from a different thread than this function.
-            //  When this lambda function is called, a shiny sound is detected.
-            //  Mark this by `shiny_sound_timestamps`.
-            shiny_sound_timestamps.emplace_back(current_time());
-            //  This lambda function always returns false. It tells the shiny sound detector to always return false
-            //  in ShinySoundDetector::process_spectrums() when a shiny sound is found, so that it won't stop
-            //  ShinyEncounterTracker tracker from finish running.
-            
-            return false;
-        });
+        shiny_sound_detector = std::make_unique<ShinySoundDetector>(
+            stream.logger(),
+            [&shiny_sound_timestamps](float error_coefficient) -> bool{
+                //  Warning: This callback will be run from a different thread than this function.
+                //  When this lambda function is called, a shiny sound is detected.
+                //  Mark this by `shiny_sound_timestamps`.
+                shiny_sound_timestamps.emplace_back(current_time());
+                //  This lambda function always returns false. It tells the shiny sound detector to always return false
+                //  in ShinySoundDetector::process_spectrums() when a shiny sound is found, so that it won't stop
+                //  ShinyEncounterTracker tracker from finish running.
+
+                return false;
+            }
+        );
     }
 
     std::vector<PeriodicInferenceCallback> callbacks = {{tracker}};
     if (use_shiny_sound){
         callbacks.emplace_back(*shiny_sound_detector);
     }
-    int result = wait_until(
-        console, scope, timeout, callbacks
-    );
+    int result = wait_until(stream, scope, timeout, callbacks);
     if (result < 0){
-        console.log("ShinyDetector: Battle menu not found after timeout.", COLOR_RED);
+        stream.log("ShinyDetector: Battle menu not found after timeout.", COLOR_RED);
         return;
     }
     wild_result.best_screenshot = tracker.sparkles_wild_overall().best_image();

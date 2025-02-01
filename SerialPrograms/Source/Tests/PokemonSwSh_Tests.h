@@ -38,6 +38,8 @@ int test_pokemonSwSh_BoxShinySymbolDetector(const ImageViewRGB32& image, bool ta
 
 int test_pokemonSwSh_BoxGenderDetector(const ImageViewRGB32& image, int target);
 
+int test_pokemonSwSh_SelectionArrowFinder(const ImageViewRGB32& image, int target);
+
 }
 
 #endif

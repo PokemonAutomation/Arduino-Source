@@ -5,11 +5,9 @@
  */
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
-#include "CommonFramework/Tools/ProgramEnvironment.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_EndBattle.h"
 #include "PokemonSwSh_MaxLair_CatchScreenTracker.h"
@@ -20,13 +18,13 @@ namespace PokemonSwSh{
 namespace MaxLairInternal{
 
 
-CaughtPokemonScreen::CaughtPokemonScreen(ConsoleHandle& console, BotBaseContext& context)
-    : m_console(console)
+CaughtPokemonScreen::CaughtPokemonScreen(VideoStream& stream, SwitchControllerContext& context)
+    : m_stream(stream)
     , m_context(context)
-    , m_total(count_catches(console, console.video().snapshot()))
+    , m_total(count_catches(stream.overlay(), stream.video().snapshot()))
 {
     if (m_total == 0 || m_total > 4){
-        console.log("Detected " + std::to_string(m_total) + " catches. Something is wrong.", COLOR_RED);
+        stream.log("Detected " + std::to_string(m_total) + " catches. Something is wrong.", COLOR_RED);
     }
 }
 
@@ -44,10 +42,10 @@ bool CaughtPokemonScreen::is_summary() const{
 }
 
 void CaughtPokemonScreen::enter_summary(){
-    SummaryShinySymbolDetector detector(m_console, m_console);
+    SummaryShinySymbolDetector detector(m_stream.logger(), m_stream.overlay());
     if (m_in_summary){
         //  Make sure we're actually in the summary screen.
-        process_detection(detector.wait_for_detection(m_context, m_console));
+        process_detection(detector.wait_for_detection(m_context, m_stream.video()));
         return;
     }
 
@@ -56,7 +54,7 @@ void CaughtPokemonScreen::enter_summary(){
     pbf_press_button(m_context, BUTTON_A, 10, 0);
     m_context.wait_for_all_requests();
 
-    Detection detection = detector.wait_for_detection(m_context, m_console);
+    Detection detection = detector.wait_for_detection(m_context, m_stream.video());
     m_in_summary = true;
     process_detection(detection);
 }
@@ -66,15 +64,15 @@ void CaughtPokemonScreen::leave_summary(){
     }
 
     //  Make sure we're actually in the summary screen.
-    SummaryShinySymbolDetector detector(m_console, m_console);
-    process_detection(detector.wait_for_detection(m_context, m_console));
+    SummaryShinySymbolDetector detector(m_stream.logger(), m_stream.overlay());
+    process_detection(detector.wait_for_detection(m_context, m_stream.video()));
 
     pbf_press_button(m_context, BUTTON_B, 10, TICKS_PER_SECOND);
 
     PokemonCaughtMenuDetector caught_menu;
 
     int result = wait_until(
-        m_console, m_context,
+        m_stream, m_context,
         std::chrono::seconds(10),
         {{caught_menu}}
     );
@@ -85,12 +83,12 @@ void CaughtPokemonScreen::leave_summary(){
         m_context.wait_for_all_requests();
         break;
     default:
-//        auto snapshot = m_console.video().snapshot();
-//        dump_image(m_console, m_env.program_info(), "CaughtMenu", snapshot);
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, m_console,
+//        auto snapshot = m_stream.video().snapshot();
+//        dump_image(m_stream, m_env.program_info(), "CaughtMenu", snapshot);
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
             "Failed to detect caught menu.",
-            true
+            m_stream
         );
     }
 
@@ -104,8 +102,8 @@ void CaughtPokemonScreen::scroll_down(){
         m_current_position = 0;
     }
     if (m_in_summary){
-        SummaryShinySymbolDetector detector(m_console, m_console);
-        Detection detection = detector.wait_for_detection(m_context, m_console);
+        SummaryShinySymbolDetector detector(m_stream.logger(), m_stream.overlay());
+        Detection detection = detector.wait_for_detection(m_context, m_stream.video());
         process_detection(detection);
     }
 }
@@ -118,34 +116,34 @@ void CaughtPokemonScreen::process_detection(Detection detection){
     CaughtPokemon& mon = m_mons[m_current_position];
     switch (detection){
     case SummaryShinySymbolDetector::Detection::NO_DETECTION:
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, m_console,
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
             "Failed to detect summary screen.",
-            true
+            m_stream
         );
     case SummaryShinySymbolDetector::Detection::NOT_SHINY:
         if (!mon.read){
-            m_console.log("Not shiny.", COLOR_BLUE);
+            m_stream.log("Not shiny.", COLOR_BLUE);
             mon.shiny = false;
             mon.read = true;
         }else if (mon.shiny){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, m_console,
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
                 "Fatal Inconsistency: Expected to see a non-shiny.",
-                true
+                m_stream
             );
         }
         break;
     case SummaryShinySymbolDetector::Detection::SHINY:
         if (!mon.read){
-            m_console.log("Found shiny!", COLOR_BLUE);
+            m_stream.log("Found shiny!", COLOR_BLUE);
             mon.shiny = true;
             mon.read = true;
         }else if (!mon.shiny){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, m_console,
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
                 "Fatal Inconsistency: Expected to see a shiny.",
-                true
+                m_stream
             );
         }
         break;

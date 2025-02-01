@@ -27,7 +27,7 @@ public:
 class BBQSoloFarmer : public SingleSwitchProgramInstance{
 public:
     BBQSoloFarmer();
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
     BBQOption BBQ_OPTIONS;

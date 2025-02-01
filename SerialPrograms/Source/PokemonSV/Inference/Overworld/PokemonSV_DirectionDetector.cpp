@@ -4,25 +4,19 @@
  *
  */
 
-#include "CommonFramework/GlobalSettingsPanel.h"
-#include "Common/Cpp/Containers/FixedLimitVector.tpp"
-#include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/ImageMatch/WaterfillTemplateMatcher.h"
-#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
-#include "CommonFramework/ImageTools/WaterfillUtilities.h"
-#include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
-#include "CommonFramework/ImageTools/ImageManip.h"
-#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "CommonFramework/Logging/Logger.h"
-#include "CommonFramework/Tools/DebugDumper.h"
-#include "CommonFramework/Tools/VideoResolutionCheck.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
+#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
+#include "CommonFramework/Tools/DebugDumper.h"
+#include "CommonTools/Images/WaterfillUtilities.h"
+#include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
+#include "CommonTools/StartupChecks/VideoResolutionCheck.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV_DirectionDetector.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include <cmath>
-#include <iostream>
+
+//#include <iostream>
 //using std::cout;
 //using std::endl;
 
@@ -127,8 +121,8 @@ std::pair<double, double> DirectionDetector::locate_north(Logger& logger, const 
 }
 
 
-double DirectionDetector::get_current_direction(ConsoleHandle& console, const ImageViewRGB32& screen) const{
-    std::pair<double, double> north_location = locate_north(console, screen);
+double DirectionDetector::get_current_direction(VideoStream& stream, const ImageViewRGB32& screen) const{
+    std::pair<double, double> north_location = locate_north(stream.logger(), screen);
     if (north_location.first == 0 && north_location.second == 0){ // unable to locate north
         return -1;
     }
@@ -151,32 +145,35 @@ bool DirectionDetector::is_minimap_possibly_locked(double current_direction) con
 }
 
 // - push the joystick to change its position. if still pointing North, then we know it's locked.
-bool DirectionDetector::is_minimap_definitely_locked(ConsoleHandle& console, BotBaseContext& context, double current_direction) const {
+bool DirectionDetector::is_minimap_definitely_locked(VideoStream& stream, SwitchControllerContext& context, double current_direction) const {
     bool pointing_north = is_pointing_north(current_direction);
     if (!pointing_north){
         return false;
     }
     pbf_move_right_joystick(context, 0, 128, 100, 20);
     context.wait_for_all_requests();
-    double new_direction = get_current_direction(console, console.video().snapshot());
+    double new_direction = get_current_direction(stream, stream.video().snapshot());
 
     return is_pointing_north(new_direction);
 }
 
 void DirectionDetector::change_direction(
     const ProgramInfo& info,
-    ConsoleHandle& console, 
-    BotBaseContext& context,
+    VideoStream& stream,
+    SwitchControllerContext& context,
     double direction
 ) const{
     size_t i = 0;
-    size_t MAX_ATTEMPTS = 10;
+    size_t MAX_ATTEMPTS = 20;
     bool is_minimap_definitely_unlocked = false;
+    uint8_t scale_factor = 80;    
+    double push_magnitude_scale_factor = 1;
     while (i < MAX_ATTEMPTS){ // 10 attempts to move the direction to the target
         context.wait_for_all_requests();
-        VideoSnapshot screen = console.video().snapshot();
-        double current = get_current_direction(console, screen);
+        VideoSnapshot screen = stream.video().snapshot();
+        double current = get_current_direction(stream, screen);
         if (current < 0){ 
+            stream.log("Unable to detect current direction.");
             return;
         }
         double target = std::fmod(direction, (2 * PI));
@@ -190,20 +187,20 @@ void DirectionDetector::change_direction(
             diff += (2 * PI);
         }
         double abs_diff = std::abs(diff);
-        console.log("current direction: " +  std::to_string(current));
-        console.log("target: " +  std::to_string(target) + ", diff: " + std::to_string(diff));
+        stream.log("current direction: " +  std::to_string(current));
+        stream.log("target: " +  std::to_string(target) + ", diff: " + std::to_string(diff));
 
         if (!is_minimap_definitely_unlocked && is_minimap_possibly_locked(current)){
-            console.log("Minimap may be locked. Check if definitely locked.");
-            if (is_minimap_definitely_locked(console, context, current)){
-                console.log("Minimap locked. Try to unlock the minimap. Then try again.");
-                open_map_from_overworld(info, console, context);
+            stream.log("Minimap may be locked. Check if definitely locked.");
+            if (is_minimap_definitely_locked(stream, context, current)){
+                stream.log("Minimap locked. Try to unlock the minimap. Then try again.");
+                open_map_from_overworld(info, stream, context);
                 pbf_press_button(context, BUTTON_RCLICK, 20, 20);
                 pbf_press_button(context, BUTTON_RCLICK, 20, 20);
                 pbf_press_button(context, BUTTON_B, 20, 100);
-                press_Bs_to_back_to_overworld(info, console, context, 7);
+                press_Bs_to_back_to_overworld(info, stream, context, 7);
             }else{
-                console.log("Minimap not locked. Try again");
+                stream.log("Minimap not locked. Try again");
             }
             
             is_minimap_definitely_unlocked = true;
@@ -212,18 +209,25 @@ void DirectionDetector::change_direction(
         }
         is_minimap_definitely_unlocked = true;
 
-        if (abs_diff < 0.02){
+        if (abs_diff < 0.0105){
             // return when we're close enough to the target
             return;
         }        
 
-        uint8_t scale_factor = 80;
+        
+        if (scale_factor > 40 && abs_diff < 0.05){
+            scale_factor = 40;
+        }
+
+        if (abs_diff < 0.05){
+            push_magnitude_scale_factor = 0.5;
+        }
 
         uint16_t push_duration = std::max(uint16_t(std::abs(diff * scale_factor)), uint16_t(8));
         int16_t push_direction = (diff > 0) ? -1 : 1;
-        double push_magnitude = std::max(double(128 / (i + 1)), double(20)); // push less with each iteration/attempt
+        double push_magnitude = std::max(double((128 * push_magnitude_scale_factor) / (i + 1)), double(15)); // push less with each iteration/attempt
         uint8_t push_x = uint8_t(std::max(std::min(int(128 + (push_direction * push_magnitude)), 255), 0));
-        console.log("push magnitude: " + std::to_string(push_x) + ", push duration: " +  std::to_string(push_duration));
+        stream.log("push magnitude: " + std::to_string(push_x) + ", push duration: " +  std::to_string(push_duration));
         pbf_move_right_joystick(context, push_x, 128, push_duration, 100);
         i++;
     }

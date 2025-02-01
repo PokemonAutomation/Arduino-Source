@@ -15,18 +15,27 @@ namespace PokemonAutomation{
 
 class GroupOption : public BatchOption{
 public:
+    enum class EnableMode{
+        ALWAYS_ENABLED,
+        DEFAULT_DISABLED,
+        DEFAULT_ENABLED,
+    };
+
     ~GroupOption();
     GroupOption(
         std::string label,
         LockMode lock_while_program_is_running,
-        bool toggleable = false,
-        bool enabled = true
+        EnableMode enable_mode = EnableMode::ALWAYS_ENABLED,
+        bool show_restore_defaults_button = false
     );
 
     const std::string label() const;
+
     bool toggleable() const;
     bool enabled() const;
     void set_enabled(bool enabled);
+
+    bool restore_defaults_button_enabled() const;
 
     virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;

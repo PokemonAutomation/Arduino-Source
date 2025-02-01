@@ -6,12 +6,11 @@
 
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
-#include "CommonFramework/Inference/BlackScreenDetector.h"
-#include "CommonFramework/Inference/ImageMatchDetector.h"
+#include "CommonTools/Async/InferenceRoutines.h"
+#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
+#include "CommonTools/VisualDetectors/ImageMatchDetector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonBDSP/PokemonBDSP_Settings.h"
-#include "PokemonBDSP/Inference/PokemonBDSP_SelectionArrow.h"
 #include "PokemonBDSP_TradeRoutines.h"
 
 namespace PokemonAutomation{
@@ -31,99 +30,104 @@ TradeStats::TradeStats()
 
 
 void trade_current_pokemon(
-    ConsoleHandle& console, BotBaseContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     MultiConsoleErrorState& tracker,
     TradeStats& stats
 ){
-    tracker.check_unrecoverable_error(console);
+    tracker.check_unrecoverable_error(stream.logger());
 
     context.wait_for_all_requests();
-    VideoSnapshot box_image = console.video().snapshot();
+    VideoSnapshot box_image = stream.video().snapshot();
     ImageMatchWatcher box_detector(std::move(box_image.frame), {0.02, 0.10, 0.15, 0.80}, 50);
 
-    {
-        pbf_press_button(context, BUTTON_ZL, 20, 0);
+//    pbf_press_button(context, BUTTON_ZL, 20, 0);
+
+#if 0
+    while (true){
         context.wait_for_all_requests();
-        SelectionArrowFinder detector(console, {0.50, 0.58, 0.40, 0.10}, COLOR_RED);
-        int ret = wait_until(
-            console, context, std::chrono::seconds(120),
-            {{detector}}
+        SelectionArrowFinder detector0(stream, {0.50, 0.58, 0.40, 0.10}, COLOR_RED);
+        SelectionArrowFinder detector1(stream, {0.50, 0.52, 0.40, 0.10}, COLOR_RED);
+        int ret = run_until<SwitchControllerContext>(
+            stream, context,
+            [](SwitchControllerContext& context){
+                pbf_mash_button(context, BUTTON_ZL, 20 * TICKS_PER_SECOND);
+            },
+            {detector0, detector1}
         );
-        if (ret < 0){
+        switch (ret){
+        case 0:
+            stream.log("Detected trade prompt.");
+            context.wait_for(std::chrono::milliseconds(100));
+            tracker.check_unrecoverable_error(stream);
+            pbf_press_button(context, BUTTON_ZL, 20, 0);
+            continue;
+        case 1:
+            stream.log("Detected trade confirm prompt.");
+            context.wait_for(std::chrono::milliseconds(100));
+            tracker.check_unrecoverable_error(stream);
+            pbf_press_button(context, BUTTON_ZL, 20, 0);
+            break;
+        default:
             stats.m_errors++;
-            tracker.report_unrecoverable_error(console, "Failed to detect trade select prompt after 2 minutes.");
+            tracker.report_unrecoverable_error(stream, "Failed to detect a prompt after 20 seconds.");
         }
-        console.log("Detected trade prompt.");
-        context.wait_for(std::chrono::milliseconds(100));
-        tracker.check_unrecoverable_error(console);
+        break;
     }
-    {
-        pbf_press_button(context, BUTTON_ZL, 20, 0);
-        context.wait_for_all_requests();
-        SelectionArrowFinder detector(console, {0.50, 0.52, 0.40, 0.10}, COLOR_RED);
-        int ret = wait_until(
-            console, context, std::chrono::seconds(10),
-            {{detector}}
-        );
-        if (ret < 0){
-            stats.m_errors++;
-            tracker.report_unrecoverable_error(console, "Failed to detect trade confirm prompt after 10 seconds.");
-        }
-        console.log("Detected trade confirm prompt.");
-        context.wait_for(std::chrono::milliseconds(100));
-        tracker.check_unrecoverable_error(console);
-    }
+#endif
 
     //  Start trade.
-    pbf_press_button(context, BUTTON_ZL, 20, 0);
+//    pbf_press_button(context, BUTTON_ZL, 20, 0);
 
     //  Wait for black screen.
     {
         BlackScreenOverWatcher black_screen;
-        int ret = wait_until(
-            console, context, std::chrono::minutes(2),
+        int ret = run_until<SwitchControllerContext>(
+            stream, context,
+            [](SwitchControllerContext& context){
+                pbf_mash_button(context, BUTTON_ZL, 120 * TICKS_PER_SECOND);
+            },
             {{black_screen}}
         );
         if (ret < 0){
             stats.m_errors++;
-            tracker.report_unrecoverable_error(console, "Failed to detect start of trade after 2 minutes.");
+            tracker.report_unrecoverable_error(stream, "Failed to detect start of trade after 2 minutes.");
         }
-        console.log("Detected start of trade.");
+        stream.log("Detected start of trade.");
         context.wait_for(std::chrono::milliseconds(100));
-        tracker.check_unrecoverable_error(console);
+        tracker.check_unrecoverable_error(stream.logger());
     }
 
     //  Mash B until 2nd black screen.
     {
         BlackScreenWatcher black_screen;
-        int ret = run_until(
-            console, context,
-            [](BotBaseContext& context){
+        int ret = run_until<SwitchControllerContext>(
+            stream, context,
+            [](SwitchControllerContext& context){
                 pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
             },
             {{black_screen}}
         );
         if (ret < 0){
             stats.m_errors++;
-            tracker.report_unrecoverable_error(console, "Failed to detect end of trade after 2 minutes.");
+            tracker.report_unrecoverable_error(stream, "Failed to detect end of trade after 2 minutes.");
         }
-        console.log("Detected end of trade.");
+        stream.log("Detected end of trade.");
         context.wait_for(std::chrono::milliseconds(100));
-        tracker.check_unrecoverable_error(console);
+        tracker.check_unrecoverable_error(stream.logger());
     }
 
     //  Wait to return to box.
     {
         int ret = wait_until(
-            console, context, std::chrono::minutes(2),
+            stream, context, std::chrono::minutes(2),
             {{box_detector}}
         );
         if (ret < 0){
             stats.m_errors++;
-            tracker.report_unrecoverable_error(console, "Failed to return to box after 2 minutes after a trade.");
+            tracker.report_unrecoverable_error(stream, "Failed to return to box after 2 minutes after a trade.");
         }
-        console.log("Detected box. Trade completed.");
-        tracker.check_unrecoverable_error(console);
+        stream.log("Detected box. Trade completed.");
+        tracker.check_unrecoverable_error(stream.logger());
     }
 }
 
@@ -139,7 +143,7 @@ void trade_current_box(
             send_program_status_notification(env, notifications);
 
             MultiConsoleErrorState error_state;
-            env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
+            env.run_in_parallel(scope, [&](ConsoleHandle& console, SwitchControllerContext& context){
                 uint16_t box_scroll_delay = GameSettings::instance().BOX_SCROLL_DELAY_0;
                 for (size_t r = 0; r < row; r++){
                     pbf_move_right_joystick(context, 128, 255, 20, box_scroll_delay);

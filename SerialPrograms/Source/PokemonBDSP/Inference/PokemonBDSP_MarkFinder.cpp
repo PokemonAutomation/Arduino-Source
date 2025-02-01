@@ -6,15 +6,14 @@
 
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "CommonFramework/Globals.h"
-#include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
-//#include "CommonFramework/ImageMatch/ImageDiff.h"
-#include "CommonFramework/ImageMatch/ExactImageMatcher.h"
+#include "CommonTools/Images/BinaryImage_FilterRgb32.h"
+#include "CommonTools/ImageMatch/ExactImageMatcher.h"
 #include "PokemonBDSP_MarkFinder.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

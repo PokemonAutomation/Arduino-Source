@@ -4,18 +4,17 @@
  *
  */
 
-#include "Common/Compiler.h"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
-#include "CommonFramework/ImageMatch/ExactImageMatcher.h"
+#include "CommonTools/Images/BinaryImage_FilterRgb32.h"
+#include "CommonTools/ImageMatch/ExactImageMatcher.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "PokemonBDSP_SelectionArrow.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -83,13 +82,15 @@ SelectionArrowFinder::SelectionArrowFinder(
     , m_box(box)
 {}
 
-void SelectionArrowFinder::detect(const ImageViewRGB32& screen){
+bool SelectionArrowFinder::detect(const ImageViewRGB32& screen){
     std::vector<ImagePixelBox> arrows = find_selection_arrows(extract_box_reference(screen, m_box));
 
     m_arrow_boxes.clear();
     for (const ImagePixelBox& mark : arrows){
         m_arrow_boxes.emplace_back(m_overlay, translate_to_parent(screen, m_box, mark), COLOR_MAGENTA);
     }
+
+    return !m_arrow_boxes.empty();
 }
 void SelectionArrowFinder::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_box);

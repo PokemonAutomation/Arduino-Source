@@ -5,7 +5,7 @@
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Exceptions/UnexpectedBattleException.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
@@ -38,21 +38,21 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 
-void set_time_to_12am_from_home(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+void set_time_to_12am_from_home(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
     DateReader reader;
-    VideoOverlaySet overlays(console.overlay());
+    VideoOverlaySet overlays(stream.overlay());
     reader.make_overlays(overlays);
 
 //    pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
     home_to_date_time(context, true, false);
     pbf_press_button(context, BUTTON_A, 20, 50);
-    reader.set_hours(info, console, context, 0);
+    reader.set_hours(info, stream, context, 0);
     pbf_press_button(context, BUTTON_A, 20, 30);
     pbf_press_button(context, BUTTON_HOME, 20, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
-//    resume_game_from_home(console, context);
+//    resume_game_from_home(stream, context);
 }
 
-void day_skip_from_overworld(ConsoleHandle& console, BotBaseContext& context){
+void day_skip_from_overworld(VideoStream& stream, SwitchControllerContext& context){
     pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
     home_to_date_time(context, true, true);
     ssf_press_button(context, BUTTON_A, 20, 10);
@@ -66,16 +66,16 @@ void day_skip_from_overworld(ConsoleHandle& console, BotBaseContext& context){
     ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 0);
     ssf_press_button(context, BUTTON_A, 20, 10);
     pbf_press_button(context, BUTTON_HOME, 20, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
-    resume_game_from_home(console, context);
+    resume_game_from_home(stream, context);
 }
 
-void press_Bs_to_back_to_overworld(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, uint16_t seconds_between_b_presses){
+void press_Bs_to_back_to_overworld(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context, uint16_t seconds_between_b_presses){
     context.wait_for_all_requests();
-    OverworldWatcher overworld(console, COLOR_RED);
+    OverworldWatcher overworld(stream.logger(), COLOR_RED);
     NormalBattleMenuWatcher battle(COLOR_BLUE);
-    int ret = run_until(
-        console, context,
-        [seconds_between_b_presses](BotBaseContext& context){
+    int ret = run_until<SwitchControllerContext>(
+        stream, context,
+        [seconds_between_b_presses](SwitchControllerContext& context){
             pbf_wait(context, seconds_between_b_presses * TICKS_PER_SECOND); // avoiding pressing B if already in overworld
             for (size_t c = 0; c < 10; c++){
                 pbf_press_button(context, BUTTON_B, 20, seconds_between_b_presses * TICKS_PER_SECOND);
@@ -84,50 +84,50 @@ void press_Bs_to_back_to_overworld(const ProgramInfo& info, ConsoleHandle& conso
         {overworld, battle}
     );
     if (ret == 1){
-        throw UnexpectedBattleException(
-            ErrorReport::SEND_ERROR_REPORT, console,
+        throw_and_log<UnexpectedBattleException>(
+            stream.logger(), ErrorReport::SEND_ERROR_REPORT,
             "press_Bs_to_back_to_overworld(): Unexpectedly detected battle.",
-            false
+            stream
         );         
     }else if (ret < 0){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, console,
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
             "press_Bs_to_back_to_overworld(): Unable to detect overworld after 10 button B presses.",
-            true
+            stream
         );
     }
 }
 
 void open_map_from_overworld(
     const ProgramInfo& info,
-    ConsoleHandle& console, 
-    BotBaseContext& context,
+    VideoStream& stream,
+    SwitchControllerContext& context,
     bool clear_tutorial
 ){
     {
-        OverworldWatcher overworld(console, COLOR_CYAN);
+        OverworldWatcher overworld(stream.logger(), COLOR_CYAN);
         NormalBattleMenuWatcher battle(COLOR_RED);
         context.wait_for_all_requests();
         int ret = wait_until(
-            console, context,
+            stream, context,
             std::chrono::seconds(10),
             {overworld, battle}
         );
         context.wait_for(std::chrono::milliseconds(100));
         if (ret == 0){
-            console.log("Detected overworld.");
+            stream.log("Detected overworld.");
             pbf_press_button(context, BUTTON_Y, 20, 105); // open map
         }else if (ret == 1){
-            throw UnexpectedBattleException(
-                ErrorReport::SEND_ERROR_REPORT, console,
+            throw_and_log<UnexpectedBattleException>(
+                stream.logger(), ErrorReport::SEND_ERROR_REPORT,
                 "open_map_from_overworld(): Unexpectedly detected battle.",
-                false
+                stream
             );              
         }else{
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
                 "open_map_from_overworld(): No overworld state found after 10 seconds.",
-                true
+                stream
             );
         }
     }
@@ -135,14 +135,14 @@ void open_map_from_overworld(
     WallClock start = current_time();
     while (true){
         if (current_time() - start > std::chrono::minutes(2)){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
                 "open_map_from_overworld(): Failed to open map after 2 minutes.",
-                true
+                stream
             );
         }
 
-        OverworldWatcher overworld(console, COLOR_CYAN);
+        OverworldWatcher overworld(stream.logger(), COLOR_CYAN);
         AdvanceDialogWatcher advance_dialog(COLOR_YELLOW);
         PromptDialogWatcher prompt_dialog(COLOR_GREEN);
         MapWatcher map(COLOR_RED);
@@ -150,56 +150,56 @@ void open_map_from_overworld(
 
         context.wait_for_all_requests();
         int ret = wait_until(
-            console, context,
+            stream, context,
             std::chrono::seconds(30),
             {overworld, advance_dialog, prompt_dialog, map, battle}
         );
         context.wait_for(std::chrono::milliseconds(100));
         switch (ret){
         case 0:
-            console.log("Detected overworld.");
+            stream.log("Detected overworld.");
             pbf_press_button(context, BUTTON_Y, 20, 105); // open map
             continue;
         case 1:
-            console.log("Detected dialog. Did you fall down?", COLOR_RED);
+            stream.log("Detected dialog. Did you fall down?", COLOR_RED);
             pbf_press_button(context, BUTTON_B, 20, 105);
             continue;
         case 2:
-            console.log("Detected dialog. Did you fall down?", COLOR_RED);
+            stream.log("Detected dialog. Did you fall down?", COLOR_RED);
             pbf_press_button(context, BUTTON_A, 20, 105);
             continue;
         case 3:
-            console.log("Detected map.");
-            console.overlay().add_log("Map opened", COLOR_WHITE);
+            stream.log("Detected map.");
+            stream.overlay().add_log("Map opened", COLOR_WHITE);
             if (map.map_in_fixed_view()){
                 return;
             }else{ // click R joystick to change to fixed view
                 if (clear_tutorial){
                     pbf_press_button(context, BUTTON_A, 20, 105);
                 }
-                console.log("Map in rotate view, fix it");
-                console.overlay().add_log("Change map to fixed view", COLOR_WHITE);
+                stream.log("Map in rotate view, fix it");
+                stream.overlay().add_log("Change map to fixed view", COLOR_WHITE);
                 pbf_press_button(context, BUTTON_RCLICK, 20, 105);
                 continue;
             }
         case 4:
-            console.log("Detected battle.");
-            throw UnexpectedBattleException(
-                ErrorReport::SEND_ERROR_REPORT, console,
+            stream.log("Detected battle.");
+            throw_and_log<UnexpectedBattleException>(
+                stream.logger(), ErrorReport::SEND_ERROR_REPORT,
                 "open_map_from_overworld(): Unexpectedly detected battle.",
-                false
+                stream
             ); 
         default:
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
                 "open_map_from_overworld(): No recognized state after 30 seconds.",
-                true
+                stream
             );
         }
     }
 }
 
-bool fly_to_overworld_from_map(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context, bool check_fly_menuitem){
+bool fly_to_overworld_from_map(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context, bool check_fly_menuitem){
     context.wait_for_all_requests();
     // Press A to bring up the promp dialog on choosing "Fly here", "Set as destination", "Never mind".
     pbf_press_button(context, BUTTON_A, 20, 130);
@@ -207,15 +207,15 @@ bool fly_to_overworld_from_map(const ProgramInfo& info, ConsoleHandle& console, 
     WallClock start = current_time();
     while (true){
         if (current_time() - start > std::chrono::minutes(2)){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
                 "fly_to_overworld_from_map(): Failed to fly from map after 2 minutes.",
-                true
+                stream
             );
         }
 
         int ret = 0;
-        OverworldWatcher overworld(console, COLOR_CYAN);
+        OverworldWatcher overworld(stream.logger(), COLOR_CYAN);
         WhiteButtonWatcher map(COLOR_RED, WhiteButton::ButtonY, {0.800, 0.118, 0.030, 0.060});
         GradientArrowWatcher spot_dialog_watcher(COLOR_YELLOW, GradientArrowType::RIGHT, {0.469, 0.500, 0.215, 0.150});
         PromptDialogWatcher confirm_watcher(COLOR_BLUE, {0.686, 0.494, 0.171, 0.163});
@@ -230,61 +230,61 @@ bool fly_to_overworld_from_map(const ProgramInfo& info, ConsoleHandle& console, 
             callbacks.push_back(destinationMenuItemWatcher);
         }
 
-        ret = wait_until(console, context, std::chrono::minutes(2), callbacks);
+        ret = wait_until(stream, context, std::chrono::minutes(2), callbacks);
         context.wait_for(std::chrono::milliseconds(100));
         switch (ret){
         case 0:
-            console.log("Detected overworld. Fly successful.");
+            stream.log("Detected overworld. Fly successful.");
             return true;
         case 1:
-            console.log("Detected map. Pressing A to open map menu.");
+            stream.log("Detected map. Pressing A to open map menu.");
             // Press A to bring up the promp dialog on choosing "Fly here", "Set as destination", "Never mind".
             pbf_press_button(context, BUTTON_A, 20, 130);
             continue;
         case 2:
-            console.log("Detected fly here prompt dialog.");
-            console.overlay().add_log("Fly");
+            stream.log("Detected fly here prompt dialog.");
+            stream.overlay().add_log("Fly");
             pbf_press_button(context, BUTTON_A, 20, 130);
             continue;
         case 3:
-            console.log("Detected fly confirmation prompt.");
+            stream.log("Detected fly confirmation prompt.");
             pbf_press_button(context, BUTTON_A, 20, 130);
             continue;
         case 4:
-            console.log("Detected no fly spot here.");
-            console.overlay().add_log("No fly spot", COLOR_RED);
+            stream.log("Detected no fly spot here.");
+            stream.overlay().add_log("No fly spot", COLOR_RED);
             return false;
         default:
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
                 "fly_to_overworld_from_map(): No recognized state after 2 minutes.",
-                true
+                stream
             );
         }
     }
 }
 
 
-void picnic_from_overworld(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+void picnic_from_overworld(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
     context.wait_for_all_requests();
-    console.log("Start picnic from overworld...");
+    stream.log("Start picnic from overworld...");
     WallClock start = current_time();
     bool success = false;
     while (true){
         if (current_time() - start > std::chrono::minutes(3)){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
                 "picnic_from_overworld(): Failed to start picnic after 3 minutes.",
-                true
+                stream
             );
         }
 
-        OverworldWatcher overworld(console, COLOR_CYAN);
+        OverworldWatcher overworld(stream.logger(), COLOR_CYAN);
         MainMenuWatcher main_menu(COLOR_RED);
         PicnicWatcher picnic;
         context.wait_for_all_requests();
         int ret = wait_until(
-            console, context,
+            stream, context,
             std::chrono::seconds(30),
             {overworld, main_menu, picnic}
         );
@@ -292,64 +292,64 @@ void picnic_from_overworld(const ProgramInfo& info, ConsoleHandle& console, BotB
         const bool fast_mode = false;
         switch (ret){
         case 0:
-            console.log("Detected overworld.");
+            stream.log("Detected overworld.");
             pbf_press_button(context, BUTTON_X, 20, 105); // open menu 
             continue;
         case 1:
-            console.log("Detected main menu.");
-            success = main_menu.move_cursor(info, console, context, MenuSide::RIGHT, 2, fast_mode);
+            stream.log("Detected main menu.");
+            success = main_menu.move_cursor(info, stream, context, MenuSide::RIGHT, 2, fast_mode);
             if (success == false){
-                throw OperationFailedException(
-                    ErrorReport::SEND_ERROR_REPORT, console,
+                OperationFailedException::fire(
+                    ErrorReport::SEND_ERROR_REPORT,
                     "picnic_from_overworld(): Cannot move menu cursor to picnic.",
-                    true
+                    stream
                 );
             }
             pbf_mash_button(context, BUTTON_A, 125); // mash button A to enter picnic mode
             continue;
         case 2:
-            console.log("Detected picnic.");
-            console.overlay().add_log("Start picnic", COLOR_WHITE);
+            stream.log("Detected picnic.");
+            stream.overlay().add_log("Start picnic", COLOR_WHITE);
             // extra wait to make sure by the end the player can move.
             // the player throwing out pokeballs animation is long.
             pbf_wait(context, 1000);
             context.wait_for_all_requests();
             return;
         default:
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
                 "picnic_from_overworld(): No recognized state after 30 seconds.",
-                true
+                stream
             );
         }
     }
 }
 
-void leave_picnic(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+void leave_picnic(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
     context.wait_for_all_requests();
-    console.log("Leaving picnic...");
-    console.overlay().add_log("Leaving picnic", COLOR_WHITE);
+    stream.log("Leaving picnic...");
+    stream.overlay().add_log("Leaving picnic", COLOR_WHITE);
 
     pbf_press_button(context, BUTTON_Y, 30, 100);
     for(int i = 0; i < 5; i++){
         PromptDialogWatcher prompt(COLOR_RED, {0.595, 0.517, 0.273, 0.131});
         context.wait_for_all_requests();
         int ret = wait_until(
-            console, context,
+            stream, context,
             std::chrono::seconds(5),
             {prompt}
         );
 
         if (ret == 0){
-            console.log("Detected end picnic prompt");
+            stream.log("Detected end picnic prompt");
             break;
         }
 
         if (i == 4){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
                 "leave_picnic(): Failed to leave picnic after 5 tries.",
-                true
+                stream
             );
         }
 
@@ -363,17 +363,17 @@ void leave_picnic(const ProgramInfo& info, ConsoleHandle& console, BotBaseContex
     context.wait_for_all_requests();
     
     // Wait for overworld:
-    OverworldWatcher overworld(console, COLOR_CYAN);
+    OverworldWatcher overworld(stream.logger(), COLOR_CYAN);
     int ret = wait_until(
-        console, context,
+        stream, context,
         std::chrono::seconds(20),
         {overworld}
     );
     if (ret < 0){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, console,
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
             "leave_picnic(): Failed to detecxt overworld after 20 seconds.",
-            true
+            stream
         );
     }
     // Wait three more seconds to make sure the player character is free to operate:
@@ -381,26 +381,29 @@ void leave_picnic(const ProgramInfo& info, ConsoleHandle& console, BotBaseContex
 }
 
 
-void enter_box_system_from_overworld(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+void enter_box_system_from_overworld(
+    const ProgramInfo& info,
+    VideoStream& stream, SwitchControllerContext& context
+){
     context.wait_for_all_requests();
-    console.log("Enter box system from overworld...");
+    stream.log("Enter box system from overworld...");
     WallClock start = current_time();
     bool success = false;
     while (true){
         if (current_time() - start > std::chrono::minutes(3)){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
                 "enter_box_system_from_overworld(): Failed to enter box system after 3 minutes.",
-                true
+                stream
             );
         }
 
-        OverworldWatcher overworld(console, COLOR_CYAN);
+        OverworldWatcher overworld(stream.logger(), COLOR_CYAN);
         MainMenuWatcher main_menu(COLOR_RED);
         GradientArrowWatcher box_slot_one(COLOR_BLUE, GradientArrowType::DOWN, {0.24, 0.16, 0.05, 0.09});
         context.wait_for_all_requests();
         int ret = wait_until(
-            console, context,
+            stream, context,
             std::chrono::seconds(30),
             {overworld, main_menu, box_slot_one}
         );
@@ -408,62 +411,62 @@ void enter_box_system_from_overworld(const ProgramInfo& info, ConsoleHandle& con
         const bool fast_mode = false;
         switch (ret){
         case 0:
-            console.log("Detected overworld.");
+            stream.log("Detected overworld.");
             pbf_press_button(context, BUTTON_X, 20, 105); // open menu
             continue;
         case 1:
-            console.log("Detected main menu.");
-            console.overlay().add_log("Enter box", COLOR_WHITE);
-            success = main_menu.move_cursor(info, console, context, MenuSide::RIGHT, 1, fast_mode);
+            stream.log("Detected main menu.");
+            stream.overlay().add_log("Enter box", COLOR_WHITE);
+            success = main_menu.move_cursor(info, stream, context, MenuSide::RIGHT, 1, fast_mode);
             if (success == false){
-                throw OperationFailedException(
-                    ErrorReport::SEND_ERROR_REPORT, console,
+                OperationFailedException::fire(
+                    ErrorReport::SEND_ERROR_REPORT,
                     "enter_box_system_from_overworld(): Cannot move menu cursor to Boxes.",
-                    true
+                    stream
                 );
             }
             pbf_press_button(context, BUTTON_A, 20, 50);
             continue;
         case 2:
-            console.log("Detected box.");
+            stream.log("Detected box.");
             context.wait_for(std::chrono::milliseconds(200));
             return;
         default:
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
                 "enter_box_system_from_overworld(): No recognized state after 30 seconds.",
-                true
+                stream
             );
         }
     }
 }
 
 
-void leave_box_system_to_overworld(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+void leave_box_system_to_overworld(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
     context.wait_for_all_requests();
-    console.log("Leave box system to overworld...");
-    press_Bs_to_back_to_overworld(info, console, context);
+    stream.log("Leave box system to overworld...");
+    press_Bs_to_back_to_overworld(info, stream, context);
 }
 
 
-void open_pokedex_from_overworld(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
-    console.log("Opening Pokédex...");
+void open_pokedex_from_overworld(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+    stream.log("Opening Pokédex...");
     WallClock start = current_time();
     while (true){
         if (current_time() - start > std::chrono::seconds(30)){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
                 "open_pokedex_from_overworld(): Failed to open Pokédex after 30 seconds.",
-                true
+                stream
             );
         }
 
-        OverworldWatcher overworld(console, COLOR_CYAN);
+        OverworldWatcher overworld(stream.logger(), COLOR_CYAN);
         WhiteButtonWatcher pokedex(COLOR_RED, WhiteButton::ButtonY, {0.800, 0.118, 0.030, 0.060});
 
         context.wait_for_all_requests();
         int ret = wait_until(
-            console, context,
+            stream, context,
             std::chrono::seconds(30),
             {overworld, pokedex}
         );
@@ -474,27 +477,27 @@ void open_pokedex_from_overworld(const ProgramInfo& info, ConsoleHandle& console
             pbf_press_button(context, BUTTON_MINUS, 20, 100);
             continue;
         case 1:
-            console.log("Detected Pokédex.");
+            stream.log("Detected Pokédex.");
             return;
         default:
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
                 "open_pokedex_from_overworld(): No recognized state after 30 seconds.",
-                true
+                stream
             );
         }
     }
 }
 
 
-void open_recently_battled_from_pokedex(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
-    console.log("Opening recently battled...");
-    LetsGoKillWatcher menu(console.logger(), COLOR_RED, true, {0.23, 0.23, 0.04, 0.20});
+void open_recently_battled_from_pokedex(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+    stream.log("Opening recently battled...");
+    LetsGoKillWatcher menu(stream.logger(), COLOR_RED, true, {0.23, 0.23, 0.04, 0.20});
     context.wait_for_all_requests();
 
-    int ret = run_until(
-        console, context,
-        [](BotBaseContext& context){
+    int ret = run_until<SwitchControllerContext>(
+        stream, context,
+        [](SwitchControllerContext& context){
             for (size_t i = 0; i < 10; i++){
                 pbf_press_dpad(context, DPAD_DOWN, 20, 105);
             }
@@ -502,29 +505,29 @@ void open_recently_battled_from_pokedex(const ProgramInfo& info, ConsoleHandle& 
         {menu}
     );
     if (ret == 0){
-        console.log("Detected Recently Battled menu icon.");
+        stream.log("Detected Recently Battled menu icon.");
         pbf_mash_button(context, BUTTON_A, 150);
         pbf_wait(context, 200);
     }else{
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, console,
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
             "open_recently_battled_from_pokedex(): Unknown state after 10 dpad down presses.",
-            true
+            stream
         );
     }
 }
 
 
-void leave_phone_to_overworld(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
-    console.log("Exiting to overworld from Rotom Phone...");
-    OverworldWatcher overworld(console, COLOR_CYAN);
+void leave_phone_to_overworld(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+    stream.log("Exiting to overworld from Rotom Phone...");
+    OverworldWatcher overworld(stream.logger(), COLOR_CYAN);
     NormalBattleMenuWatcher battle(COLOR_BLUE);
     GradientArrowWatcher arrow(COLOR_RED, GradientArrowType::DOWN, {0.475, 0.465, 0.05, 0.085});
     context.wait_for_all_requests();
 
-    int ret = run_until(
-        console, context,
-        [](BotBaseContext& context){
+    int ret = run_until<SwitchControllerContext>(
+        stream, context,
+        [](SwitchControllerContext& context){
             for (size_t i = 0; i < 10; i++){
                 pbf_press_button(context, BUTTON_Y, 20, 1000);
             }
@@ -535,24 +538,24 @@ void leave_phone_to_overworld(const ProgramInfo& info, ConsoleHandle& console, B
     case 0:
         return;
     case 1:
-        throw UnexpectedBattleException(
-            ErrorReport::SEND_ERROR_REPORT, console,
+        throw_and_log<UnexpectedBattleException>(
+            stream.logger(), ErrorReport::SEND_ERROR_REPORT,
             "leave_phone_to_overworld(): Unexpectedly detected battle.",
-            false
+            stream
         );  
     case 2:
-        console.log("Stuck in battle status screen.");
+        stream.log("Stuck in battle status screen.");
         pbf_mash_button(context, BUTTON_B, 200);
-        throw UnexpectedBattleException(
-            ErrorReport::SEND_ERROR_REPORT, console,
+        throw_and_log<UnexpectedBattleException>(
+            stream.logger(), ErrorReport::SEND_ERROR_REPORT,
             "leave_phone_to_overworld(): Unexpectedly detected battle.",
-            false
+            stream
         ); 
     default:
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, console,
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
             "leave_phone_to_overworld(): Unknown state after 10 button Y presses.",
-            true
+            stream
         );
     }
 
@@ -562,12 +565,12 @@ void leave_phone_to_overworld(const ProgramInfo& info, ConsoleHandle& console, B
 // Return true if succeed. Return false if no visible pokcenter on map
 bool detect_closest_pokecenter_and_move_map_cursor_there(
     const ProgramInfo& info,
-    ConsoleHandle& console, 
-    BotBaseContext& context,
+    VideoStream& stream,
+    SwitchControllerContext& context,
     double push_scale
 ){
     context.wait_for_all_requests();
-    const auto snapshot_frame = console.video().snapshot().frame;
+    const auto snapshot_frame = stream.video().snapshot().frame;
     const size_t screen_width = snapshot_frame->width();
     const size_t screen_height = snapshot_frame->height();
 
@@ -575,11 +578,11 @@ bool detect_closest_pokecenter_and_move_map_cursor_there(
     double max_dist = DBL_MAX;
     const double center_x = 0.5 * screen_width, center_y = 0.5 * screen_height;
     {
-        MapPokeCenterIconWatcher pokecenter_watcher(COLOR_RED, console.overlay(), MAP_READABLE_AREA);
-        int ret = wait_until(console, context, std::chrono::seconds(2), {pokecenter_watcher});
+        MapPokeCenterIconWatcher pokecenter_watcher(COLOR_RED, stream.overlay(), MAP_READABLE_AREA);
+        int ret = wait_until(stream, context, std::chrono::seconds(2), {pokecenter_watcher});
         if (ret != 0){
-            console.log("No visible pokecetner found on map");
-            console.overlay().add_log("No whole PokeCenter icon");
+            stream.log("No visible pokecetner found on map");
+            stream.overlay().add_log("No whole PokeCenter icon");
             return false;
         }
         // Find the detected PokeCenter icon closest to the screen center (where player character is on the map).
@@ -591,15 +594,15 @@ bool detect_closest_pokecenter_and_move_map_cursor_there(
             std::ostringstream os;
             os << "Found pokecenter at box: x=" << box.x << ", y=" << box.y << ", width=" << box.width << ", height=" << box.height << 
                 ", dist to center " << std::sqrt(dist2) << " pixels";
-            console.log(os.str());
+            stream.log(os.str());
 
             if (dist2 < max_dist){
                 max_dist = dist2;
                 closest_icon_x = loc_x; closest_icon_y = loc_y;
             }
         }
-        console.log("Found closest pokecenter icon on map: (" + std::to_string(closest_icon_x) + ", " + std::to_string(closest_icon_y) + ").");
-        console.overlay().add_log("Detected PokeCenter icon");
+        stream.log("Found closest pokecenter icon on map: (" + std::to_string(closest_icon_x) + ", " + std::to_string(closest_icon_y) + ").");
+        stream.overlay().add_log("Detected PokeCenter icon");
     }
 
     // Convert the vector from center to the PokeCenter icon into a left joystick movement
@@ -614,7 +617,7 @@ bool detect_closest_pokecenter_and_move_map_cursor_there(
     const uint8_t move_x = uint8_t(std::max(std::min(int(round(push_x + 128) + 0.5), 255), 0));
     const uint8_t move_y = uint8_t(std::max(std::min(int(round(push_y + 128) + 0.5), 255), 0));
 
-    console.overlay().add_log("Move Cursor to PokeCenter", COLOR_WHITE);
+    stream.overlay().add_log("Move Cursor to PokeCenter", COLOR_WHITE);
     const uint16_t push_time = std::max(uint16_t(magnitude * scale + 0.5), uint16_t(3));
     pbf_move_left_joystick(context, move_x, move_y, push_time, 30);
     context.wait_for_all_requests();
@@ -626,30 +629,30 @@ bool detect_closest_pokecenter_and_move_map_cursor_there(
 // Throw Operation failed Exception if detected pokecenter, but failed to fly there.
 bool fly_to_visible_closest_pokecenter_cur_zoom_level(
     const ProgramInfo& info, 
-    ConsoleHandle& console, 
-    BotBaseContext& context, 
+    VideoStream& stream,
+    SwitchControllerContext& context, 
     double push_scale
 ){
-    if (!detect_closest_pokecenter_and_move_map_cursor_there(info, console, context, push_scale)){
+    if (!detect_closest_pokecenter_and_move_map_cursor_there(info, stream, context, push_scale)){
         return false;
     }
     bool check_fly_menuitem = true;
-    const bool success = fly_to_overworld_from_map(info, console, context, check_fly_menuitem);
+    const bool success = fly_to_overworld_from_map(info, stream, context, check_fly_menuitem);
     if (success){
         return true;
     }else{
         // detected pokecenter, but failed to fly there.
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, console,
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
             "fly_to_visible_closest_pokecenter_cur_zoom_level(): Detected pokecenter, but failed to fly there as no \"Fly\" menuitem.",
-            true
+            stream
         );
     }
 
 }
 
 
-void fly_to_closest_pokecenter_on_map(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+void fly_to_closest_pokecenter_on_map(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
     const int MAX_TRY_COUNT = 17;
     int try_count = 0;
     // Part 1: Tries to detect a pokecenter that is very close to the player
@@ -666,7 +669,7 @@ void fly_to_closest_pokecenter_on_map(const ProgramInfo& info, ConsoleHandle& co
             // try different magnitudes of cursor push with each failure.
             double push_scale = 0.29 * adjustment_table[try_count];
             // std::cout << "push_scale: " << std::to_string(push_scale) << std::endl;
-            if (fly_to_visible_closest_pokecenter_cur_zoom_level(info, console, context, push_scale)){
+            if (fly_to_visible_closest_pokecenter_cur_zoom_level(info, stream, context, push_scale)){
                 return; // success in finding the closest pokecenter. Return.
             }
 
@@ -675,33 +678,33 @@ void fly_to_closest_pokecenter_on_map(const ProgramInfo& info, ConsoleHandle& co
         }catch (OperationFailedException&){ // pokecenter was detected, but failed to fly there
             try_count++;
             if (try_count >= MAX_TRY_COUNT){
-                throw OperationFailedException(
-                    ErrorReport::SEND_ERROR_REPORT, console,
+                OperationFailedException::fire(
+                    ErrorReport::SEND_ERROR_REPORT,
                     "fly_to_closest_pokecenter_on_map(): At min warpable map level, pokecenter was detected, but failed to fly there.",
-                    true
+                    stream
                 );                
             }
-            console.log("Failed to find the fly menu item. Restart the closest Pokecenter travel process.");
-            press_Bs_to_back_to_overworld(info, console, context);
-            open_map_from_overworld(info, console, context);
+            stream.log("Failed to find the fly menu item. Restart the closest Pokecenter travel process.");
+            press_Bs_to_back_to_overworld(info, stream, context);
+            open_map_from_overworld(info, stream, context);
         }
     }
 
     // Part 2: Tries to detect any pokecenter that is overlapped with the player.
     // Zoom out to the max warpable level and try pressing on the player character.
-    console.log("Zoom to max map level to try searching for Pokecenter again.");
-    console.overlay().add_log("Pokecenter Icon occluded");
+    stream.log("Zoom to max map level to try searching for Pokecenter again.");
+    stream.overlay().add_log("Pokecenter Icon occluded");
     pbf_press_button(context, BUTTON_ZL, 40, 100);
     pbf_press_button(context, BUTTON_ZL, 40, 100);
 
     const bool check_fly_menuitem = true;
-    if (fly_to_overworld_from_map(info, console, context, check_fly_menuitem)){
+    if (fly_to_overworld_from_map(info, stream, context, check_fly_menuitem)){
         return; // success in flying to the pokecenter that overlaps with the player character at max warpable level.
     }
 
     // Failed to find pokecenter overlapping with player
-    console.log("No PokeCenter icon overlapping with the player character on the max warpable level");
-    console.overlay().add_log("No overlapping PokeCenter");
+    stream.log("No PokeCenter icon overlapping with the player character on the max warpable level");
+    stream.overlay().add_log("No overlapping PokeCenter");
     // press B to close the destination menu item
     pbf_press_button(context, BUTTON_B, 60, 100);
 
@@ -713,15 +716,15 @@ void fly_to_closest_pokecenter_on_map(const ProgramInfo& info, ConsoleHandle& co
             double push_scale = 0.29 * adjustment_table[try_count];
             // std::cout << "push_scale: " << std::to_string(push_scale) << std::endl;
             // Now try finding the closest pokecenter at the max warpable level
-            if (fly_to_visible_closest_pokecenter_cur_zoom_level(info, console, context, push_scale)){
+            if (fly_to_visible_closest_pokecenter_cur_zoom_level(info, stream, context, push_scale)){
                 return; // success in finding the closest pokecenter. Return.
             }else{
                 // Does not detect any pokecenter on map
-                console.overlay().add_log("Still no PokeCenter Found!", COLOR_RED);
-                throw OperationFailedException(
-                    ErrorReport::SEND_ERROR_REPORT, console,
+                stream.overlay().add_log("Still no PokeCenter Found!", COLOR_RED);
+                OperationFailedException::fire(
+                    ErrorReport::SEND_ERROR_REPORT,
                     "fly_to_closest_pokecenter_on_map(): At max warpable map level, still cannot find PokeCenter icon.",
-                    true
+                    stream
                 );
             }
         }catch (OperationFailedException& e){ 
@@ -732,9 +735,9 @@ void fly_to_closest_pokecenter_on_map(const ProgramInfo& info, ConsoleHandle& co
                 // - could not find pokecenter icon.
                 throw e;
             }
-            console.log("Failed to find the fly menuitem. Restart the closest Pokecenter travel process.");
-            press_Bs_to_back_to_overworld(info, console, context);
-            open_map_from_overworld(info, console, context);
+            stream.log("Failed to find the fly menuitem. Restart the closest Pokecenter travel process.");
+            press_Bs_to_back_to_overworld(info, stream, context);
+            open_map_from_overworld(info, stream, context);
             // zoom out to max warpable level
             pbf_press_button(context, BUTTON_ZL, 40, 100);
         }
@@ -747,61 +750,62 @@ void fly_to_closest_pokecenter_on_map(const ProgramInfo& info, ConsoleHandle& co
    
 }
 
-void jump_off_wall_until_map_open(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+void jump_off_wall_until_map_open(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
     for (auto i = 0; i < 3; i++){
         pbf_press_button(context, BUTTON_L, 50, 50);
         pbf_press_button(context, BUTTON_B, 50, 50);
         pbf_move_left_joystick(context, 128, 255, 100, 50);
         context.wait_for_all_requests();
         try{
-            open_map_from_overworld(info, console, context);
+            open_map_from_overworld(info, stream, context);
             break;
         }
         catch(...){
-            console.log("Failed to open map.");
+            stream.log("Failed to open map.");
         }
         if (i >= 3){
-            console.log("Could not escape wall.");
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
+            stream.log("Could not escape wall.");
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
                 "jump_off_wall_until_map_open(): Could not escape wall.",
-                true
+                stream
             );
         }
     }
 }
 
 // Open map and teleport back to town pokecenter to reset the hunting path.
-void reset_to_pokecenter(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+void reset_to_pokecenter(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
     while (true){
         try {
-            open_map_from_overworld(info, console, context);
-            fly_to_closest_pokecenter_on_map(info, console, context);
+            open_map_from_overworld(info, stream, context);
+            fly_to_closest_pokecenter_on_map(info, stream, context);
+            break;
         }catch (UnexpectedBattleException&){
-            run_battle_press_A(console, context, BattleStopCondition::STOP_OVERWORLD);            
+            run_battle_press_A(stream, context, BattleStopCondition::STOP_OVERWORLD);
         }
     }
 
 }
 
-void realign_player(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+void realign_player(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context,
     PlayerRealignMode realign_mode,
     uint8_t move_x, uint8_t move_y, uint16_t move_duration
 ){
-    console.log("Realigning player direction...");
+    stream.log("Realigning player direction...");
     switch (realign_mode){
     case PlayerRealignMode::REALIGN_NEW_MARKER:
-        console.log("Setting new map marker...");
-        open_map_from_overworld(info, console, context);
+        stream.log("Setting new map marker...");
+        open_map_from_overworld(info, stream, context);
         pbf_press_button(context, BUTTON_ZR, 20, 105);
         pbf_move_left_joystick(context, move_x, move_y, move_duration, 1 * TICKS_PER_SECOND);
         pbf_press_button(context, BUTTON_A, 20, 105);
         pbf_press_button(context, BUTTON_A, 20, 105);
-        leave_phone_to_overworld(info, console, context);
+        leave_phone_to_overworld(info, stream, context);
         return;     
     case PlayerRealignMode::REALIGN_OLD_MARKER:
-        open_map_from_overworld(info, console, context, false);
-        leave_phone_to_overworld(info, console, context);
+        open_map_from_overworld(info, stream, context, false);
+        leave_phone_to_overworld(info, stream, context);
         pbf_press_button(context, BUTTON_L, 20, 105);
         return;
     case PlayerRealignMode::REALIGN_NO_MARKER:
@@ -815,8 +819,8 @@ void realign_player(const ProgramInfo& info, ConsoleHandle& console, BotBaseCont
 
 void walk_forward_until_dialog(
     const ProgramInfo& info, 
-    ConsoleHandle& console, 
-    BotBaseContext& context,
+    VideoStream& stream,
+    SwitchControllerContext& context,
     NavigationMovementMode movement_mode,
     uint16_t seconds_timeout,
     uint8_t x,
@@ -825,16 +829,17 @@ void walk_forward_until_dialog(
 
     DialogBoxWatcher        dialog(COLOR_RED, true);
     context.wait_for_all_requests();
-    int ret = run_until(
-        console, context,
-        [&](BotBaseContext& context){
+    int ret = run_until<SwitchControllerContext>(
+        stream, context,
+        [&](SwitchControllerContext& context){
             ssf_press_left_joystick(context, 128, y, 0, seconds_timeout * TICKS_PER_SECOND);
             if (movement_mode == NavigationMovementMode::DIRECTIONAL_ONLY){
                 pbf_wait(context, seconds_timeout * TICKS_PER_SECOND);
             } else if (movement_mode == NavigationMovementMode::DIRECTIONAL_SPAM_A){
-                for (size_t j = 0; j < seconds_timeout; j++){
-                    pbf_press_button(context, BUTTON_A, 20, 105);
-                }
+                pbf_mash_button(context, BUTTON_A, seconds_timeout * TICKS_PER_SECOND);
+                // for (size_t j = 0; j < seconds_timeout; j++){
+                //     pbf_press_button(context, BUTTON_A, 20, 105);
+                // }
             }
         },
         {dialog}
@@ -843,21 +848,21 @@ void walk_forward_until_dialog(
 
     switch (ret){
     case 0: // dialog
-        console.log("walk_forward_until_dialog(): Detected dialog.");
+        stream.log("walk_forward_until_dialog(): Detected dialog.");
         return;
     default:
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, console,
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
             "walk_forward_until_dialog(): Timed out. Did not detect dialog.",
-            true
+            stream
         );
     }
 }
 
 void walk_forward_while_clear_front_path(
     const ProgramInfo& info, 
-    ConsoleHandle& console, 
-    BotBaseContext& context,
+    VideoStream& stream,
+    SwitchControllerContext& context,
     uint16_t forward_ticks,
     uint8_t y,
     uint16_t ticks_between_lets_go,
@@ -872,7 +877,7 @@ void walk_forward_while_clear_front_path(
         if (num_ticks_left < ticks_between_lets_go){
             pbf_move_left_joystick(context, 128, y, num_ticks_left, 20);
             context.wait_for_all_requests();
-            console.log("walk_forward_while_clear_front_path() ticks traveled: " + std::to_string(forward_ticks));
+            stream.log("walk_forward_while_clear_front_path() ticks traveled: " + std::to_string(forward_ticks));
             break;
         }
 
@@ -880,7 +885,7 @@ void walk_forward_while_clear_front_path(
         num_ticks_left -= ticks_between_lets_go;
 
         context.wait_for_all_requests();
-        console.log("walk_forward_while_clear_front_path() ticks traveled: " + std::to_string(forward_ticks - num_ticks_left));
+        stream.log("walk_forward_while_clear_front_path() ticks traveled: " + std::to_string(forward_ticks - num_ticks_left));
 
         pbf_press_button(context, BUTTON_R, 20, delay_after_lets_go);
         
@@ -889,30 +894,27 @@ void walk_forward_while_clear_front_path(
 }
 
 void mash_button_till_overworld(
-    ConsoleHandle& console, 
-    BotBaseContext& context, 
+    VideoStream& stream,
+    SwitchControllerContext& context, 
     uint16_t button, uint16_t seconds_run
 ){
-    OverworldWatcher overworld(console, COLOR_CYAN);
-    NormalBattleMenuWatcher battle(COLOR_BLUE);
+    OverworldWatcher overworld(stream.logger(), COLOR_CYAN);
     context.wait_for_all_requests();
 
-    int ret = run_until(
-        console, context,
-        [button, seconds_run](BotBaseContext& context){
+    int ret = run_until<SwitchControllerContext>(
+        stream, context,
+        [button, seconds_run](SwitchControllerContext& context){
             ssf_mash1_button(context, button, seconds_run * TICKS_PER_SECOND);
             pbf_wait(context, seconds_run * TICKS_PER_SECOND);
         },
-        {overworld, battle}
+        {overworld}
     );
 
-    if (ret == 1){
-        run_battle_press_A(console, context, BattleStopCondition::STOP_OVERWORLD);
-    }else if (ret < 0){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, console,
+    if (ret < 0){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
             "mash_button_till_overworld(): Timed out, no recognized state found.",
-            true
+            stream
         );
     }
 }
@@ -920,45 +922,45 @@ void mash_button_till_overworld(
 
 bool attempt_fly_to_overlapping_flypoint(
     const ProgramInfo& info, 
-    ConsoleHandle& console, 
-    BotBaseContext& context
+    VideoStream& stream,
+    SwitchControllerContext& context
 ){
     while (true){
         try {
-            open_map_from_overworld(info, console, context, false);
+            open_map_from_overworld(info, stream, context, false);
             context.wait_for_all_requests();
             pbf_press_button(context, BUTTON_ZL, 40, 100);
 
-            return fly_to_overworld_from_map(info, console, context, true);            
+            return fly_to_overworld_from_map(info, stream, context, true);
 
         }catch (UnexpectedBattleException&){
-            run_battle_press_A(console, context, BattleStopCondition::STOP_OVERWORLD);            
+            run_battle_press_A(stream, context, BattleStopCondition::STOP_OVERWORLD);
         }
     }
 
 }
 
-void fly_to_overlapping_flypoint(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
-    if (!attempt_fly_to_overlapping_flypoint(info, console, context)){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, console,
+void fly_to_overlapping_flypoint(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+    if (!attempt_fly_to_overlapping_flypoint(info, stream, context)){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
             "Failed to reset to overlapping Pokecenter.",
-            true
+            stream
         );
     }
 }
 
-void confirm_no_overlapping_flypoint(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
-    if (attempt_fly_to_overlapping_flypoint(info, console, context)){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, console,
+void confirm_no_overlapping_flypoint(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+    if (attempt_fly_to_overlapping_flypoint(info, stream, context)){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
             "Overlapping fly detected, when it wasn't expected.",
-            true
+            stream
         );
     }
 }
 
-void enter_menu_from_overworld(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+void enter_menu_from_overworld(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context,
     int menu_index,
     MenuSide side,
     bool has_minimap
@@ -972,21 +974,21 @@ void enter_menu_from_overworld(const ProgramInfo& info, ConsoleHandle& console, 
 
     while (true){
         if (current_time() - start > std::chrono::minutes(3)){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
                 "enter_menu_from_overworld(): Failed to enter specified menu after 3 minutes.",
-                true
+                stream
             );
         }
 
-        OverworldWatcher overworld(console, COLOR_CYAN);
+        OverworldWatcher overworld(stream.logger(), COLOR_CYAN);
         MainMenuWatcher main_menu(COLOR_RED);
         NormalBattleMenuWatcher battle(COLOR_RED);
         context.wait_for_all_requests();
 
-        int ret = run_until(
-            console, context,
-            [has_minimap](BotBaseContext& context){
+        int ret = run_until<SwitchControllerContext>(
+            stream, context,
+            [has_minimap](SwitchControllerContext& context){
                 for (int i = 0; i < 10; i++){
                     pbf_wait(context, 3 * TICKS_PER_SECOND);
                     if (!has_minimap){ 
@@ -1002,35 +1004,35 @@ void enter_menu_from_overworld(const ProgramInfo& info, ConsoleHandle& console, 
         const bool fast_mode = false;
         switch (ret){
         case 0:
-            console.log("Detected overworld.");
+            stream.log("Detected overworld.");
             pbf_press_button(context, BUTTON_X, 20, 105);
             continue;
         case 1:
-            console.log("Detected main menu.");
+            stream.log("Detected main menu.");
             if (menu_index == -1){
                 return;
             }
-            success = main_menu.move_cursor(info, console, context, side, menu_index, fast_mode);
+            success = main_menu.move_cursor(info, stream, context, side, menu_index, fast_mode);
             if (success == false){
-                throw OperationFailedException(
-                    ErrorReport::SEND_ERROR_REPORT, console,
+                OperationFailedException::fire(
+                    ErrorReport::SEND_ERROR_REPORT,
                     "enter_menu_from_overworld(): Cannot move menu cursor to specified menu.",
-                    true
+                    stream
                 );
             }
             pbf_press_button(context, BUTTON_A, 20, 105);
             return;
         case 2:
-            throw UnexpectedBattleException(
-                ErrorReport::SEND_ERROR_REPORT, console,
+            throw_and_log<UnexpectedBattleException>(
+                stream.logger(), ErrorReport::SEND_ERROR_REPORT,
                 "enter_menu_from_overworld(): Unexpectedly detected battle.",
-                false
+                stream
             );            
         default:
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
                 "enter_menu_from_overworld(): No recognized state after 30 seconds.",
-                true
+                stream
             );
         }
     }
@@ -1038,16 +1040,16 @@ void enter_menu_from_overworld(const ProgramInfo& info, ConsoleHandle& console, 
 
 void press_button_until_gradient_arrow(
     const ProgramInfo& info, 
-    ConsoleHandle& console, 
-    BotBaseContext& context,
+    VideoStream& stream,
+    SwitchControllerContext& context,
     ImageFloatBox box_area_to_check,
     uint16_t button,
     GradientArrowType arrow_type
 ){
     GradientArrowWatcher arrow(COLOR_RED, arrow_type, box_area_to_check);
-    int ret = run_until(
-        console, context,
-        [button](BotBaseContext& context){
+    int ret = run_until<SwitchControllerContext>(
+        stream, context,
+        [button](SwitchControllerContext& context){
             pbf_wait(context, 3 * TICKS_PER_SECOND); // avoid pressing button if arrow already detected
             for (size_t c = 0; c < 10; c++){
                 pbf_press_button(context, button, 20, 3 * TICKS_PER_SECOND);
@@ -1056,33 +1058,33 @@ void press_button_until_gradient_arrow(
         {arrow}
     );
     if (ret == 0){
-        console.log("Gradient arrow detected.");
+        stream.log("Gradient arrow detected.");
     }else{
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, console,
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
             "Failed to detect gradient arrow.",
-            true
+            stream
         );
     }     
 }
 
 void basic_menu_navigation(
     const ProgramInfo& info, 
-    ConsoleHandle& console, 
-    BotBaseContext& context,
+    VideoStream& stream,
+    SwitchControllerContext& context,
     ImageFloatBox arrow_box_start,
     ImageFloatBox arrow_box_end,
-    uint8_t dpad_button,
+    DpadPosition dpad_button,
     uint16_t num_button_presses
 ){
     GradientArrowWatcher arrow_start(COLOR_RED, GradientArrowType::RIGHT, arrow_box_start);
 
-    int ret = wait_until(console, context, Milliseconds(5000), { arrow_start });
+    int ret = wait_until(stream, context, Milliseconds(5000), { arrow_start });
     if (ret < 0){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, console,
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
             "basic_menu_navigation: Failed to detect gradient arrow at expected start position.",
-            true
+            stream
         );        
     }
 
@@ -1091,10 +1093,10 @@ void basic_menu_navigation(
     }
 
     GradientArrowWatcher arrow_end(COLOR_RED, GradientArrowType::RIGHT, arrow_box_end);
-    ret = run_until(
-        console,
+    ret = run_until<SwitchControllerContext>(
+        stream,
         context,
-        [dpad_button](BotBaseContext& context){
+        [dpad_button](SwitchControllerContext& context){
             for (int i = 0; i < 3; i++){
                 pbf_press_dpad(context, dpad_button, 20, 500);
             }
@@ -1103,12 +1105,12 @@ void basic_menu_navigation(
     );
 
     if (ret == 0){
-        console.log("basic_menu_navigation: Desired item selected.");
+        stream.log("basic_menu_navigation: Desired item selected.");
     }else{
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, console,
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
             "basic_menu_navigation: Failed to detect gradient arrow at expected end position.",
-            true
+            stream
         );        
     }
 }
@@ -1116,16 +1118,16 @@ void basic_menu_navigation(
 
 void heal_at_pokecenter(
     const ProgramInfo& info, 
-    ConsoleHandle& console, 
-    BotBaseContext& context
+    VideoStream& stream,
+    SwitchControllerContext& context
 ){
     context.wait_for_all_requests();
     
-    if (!attempt_fly_to_overlapping_flypoint(info, console, context)){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, console,
+    if (!attempt_fly_to_overlapping_flypoint(info, stream, context)){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
             "Failed to fly to pokecenter.",
-            true
+            stream
         );  
     }           
     uint16_t seconds_timeout = 60;
@@ -1140,7 +1142,7 @@ void heal_at_pokecenter(
     bool seen_prompt = false;
 
     while (true){
-        OverworldWatcher    overworld(console, COLOR_CYAN);
+        OverworldWatcher    overworld(stream.logger(), COLOR_CYAN);
         // TODO: test the Prompt watcher on all languages. Ensure FloatBox is sized correctly.
         PromptDialogWatcher prompt(COLOR_YELLOW, {0.50, 0.400, 0.400, 0.080}); // 0.630, 0.400, 0.100, 0.080 // {0.50, 0.40, 0.40, 0.50}
         AdvanceDialogWatcher    advance_dialog(COLOR_RED);
@@ -1148,7 +1150,7 @@ void heal_at_pokecenter(
         context.wait_for_all_requests();
 
         int ret = wait_until(
-            console, context,
+            stream, context,
             std::chrono::seconds(seconds_timeout),
             {overworld, prompt, advance_dialog, tutorial}
         );
@@ -1156,33 +1158,33 @@ void heal_at_pokecenter(
 
         switch (ret){
         case 0: // overworld
-            console.log("heal_at_pokecenter: Detected overworld.");
+            stream.log("heal_at_pokecenter: Detected overworld.");
             if (seen_prompt){ 
                 // if have seen the prompt dialog and are now in overworld, assume we have healed
-                console.log("heal_at_pokecenter: Done healing.");
+                stream.log("heal_at_pokecenter: Done healing.");
                 return;
             }
             pbf_press_button(context, BUTTON_A, 20, 105);
             break;
         case 1: // prompt
-            console.log("heal_at_pokecenter: Detected prompt.");
+            stream.log("heal_at_pokecenter: Detected prompt.");
             seen_prompt = true;
             pbf_press_button(context, BUTTON_A, 20, 105);
             break;
         case 2: // advance dialog
-            console.log("heal_at_pokecenter: Detected advance dialog.");
+            stream.log("heal_at_pokecenter: Detected advance dialog.");
             pbf_press_button(context, BUTTON_A, 20, 105);
             break;
         case 3: // tutorial
-            console.log("heal_at_pokecenter: Detected tutorial.");
+            stream.log("heal_at_pokecenter: Detected tutorial.");
             pbf_press_button(context, BUTTON_A, 20, 105);
             break;   
         default:
-            console.log("heal_at_pokecenter: Timed out.");
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
+            stream.log("heal_at_pokecenter: Timed out.");
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
                 "Failed to heal at pokecenter.",
-                true
+                stream
             );  
         }
     }

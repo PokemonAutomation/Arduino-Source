@@ -4,10 +4,9 @@
  *
  */
 
-#include "Common/Cpp/Concurrency/ParallelTaskRunner.h"
-#include "CommonFramework/Globals.h"
-#include "CommonFramework/OCR/OCR_TrainingTools.h"
+#include <thread>
 #include "CommonFramework/Tools/ProgramEnvironment.h"
+#include "CommonTools/OCR/OCR_TrainingTools.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon_IvJudgeReader.h"
 #include "Pokemon_TrainIVCheckerOCR.h"

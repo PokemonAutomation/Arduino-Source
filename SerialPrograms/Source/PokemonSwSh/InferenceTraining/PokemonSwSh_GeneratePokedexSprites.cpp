@@ -8,7 +8,7 @@
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
-#include "CommonFramework/ImageMatch/ImageDiff.h"
+#include "CommonFramework/ImageTools/ImageDiff.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
@@ -32,7 +32,7 @@ GeneratePokedexSprites_Descriptor::GeneratePokedexSprites_Descriptor()
         "Generate " + STRING_POKEMON + " Sprite data by iterating the " + STRING_POKEDEX + ".",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 
@@ -66,11 +66,11 @@ class GenerateDexModelSession{
 
 public:
     GenerateDexModelSession(
-        ConsoleHandle& console, BotBaseContext& context,
+        VideoStream& stream, SwitchControllerContext& context,
         size_t horizontal_frames = 10,
         size_t animation_frames = 2
     )
-        : m_console(console), m_context(context)
+        : m_stream(stream), m_context(context)
         , m_path("PokedexSprites/")
         , m_horizontal_frames(horizontal_frames)
         , m_vertical_frames(horizontal_frames * 40 / HORIZONTAL_360 + 1)
@@ -88,8 +88,8 @@ public:
     void iterate_dex();
 
 private:
-    ConsoleHandle& m_console;
-    BotBaseContext& m_context;
+    VideoStream& m_stream;
+    SwitchControllerContext& m_context;
 
     std::string m_path;
 
@@ -106,7 +106,7 @@ private:
 
 void GenerateDexModelSession::save_image(const std::string& slug, bool is_shiny, size_t form_index, size_t image_index){
     m_context.wait_for_all_requests();
-    VideoSnapshot screen = m_console.video().snapshot();
+    VideoSnapshot screen = m_stream.video().snapshot();
     ImageViewRGB32 cropped = extract_box_reference(screen, ImageFloatBox(0.20, 0.01, 0.60, 0.93));
 
     std::string filename = m_path + slug + "/" + slug;
@@ -155,7 +155,7 @@ void GenerateDexModelSession::iterate_species(){
     std::string slug;
     bool is_shiny;
     {
-        VideoSnapshot screen = m_console.video().snapshot();
+        VideoSnapshot screen = m_stream.video().snapshot();
         start_sprite = extract_box_reference(screen, SPRITE_BOX).copy();
         start_label = extract_box_reference(screen, LABEL_BOX).copy();
         start_shiny = extract_box_reference(screen, SHINY_BOX).copy();
@@ -164,12 +164,12 @@ void GenerateDexModelSession::iterate_species(){
         ImageFloatBox NAME_BOX(0.641, 0.134, 0.210, 0.080);
         PokemonNameReader reader(ALL_POKEMON_SLUGS());
         OCR::StringMatchResult result = reader.read_substring(
-            m_console, Language::English,
+            m_stream.logger(), Language::English,
             extract_box_reference(screen, NAME_BOX),
             OCR::WHITE_TEXT_FILTERS()
         );
         if (result.results.empty()){
-            m_console.log("Unable to read " + STRING_POKEMON + "name.", COLOR_RED);
+            m_stream.log("Unable to read " + STRING_POKEMON + "name.", COLOR_RED);
             return;
         }
         slug = result.results.begin()->second.token;
@@ -203,7 +203,7 @@ void GenerateDexModelSession::iterate_species(){
 
         index++;
 
-        VideoSnapshot screen = m_console.video().snapshot();
+        VideoSnapshot screen = m_stream.video().snapshot();
         ImageViewRGB32 current_sprite = extract_box_reference(screen, SPRITE_BOX);
         ImageViewRGB32 current_label = extract_box_reference(screen, LABEL_BOX);
         ImageViewRGB32 current_shiny = extract_box_reference(screen, SHINY_BOX);
@@ -228,7 +228,7 @@ void GenerateDexModelSession::iterate_dex(){
 
 
 
-void GeneratePokedexSprites::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void GeneratePokedexSprites::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     GenerateDexModelSession session(env.console, context);
     session.iterate_dex();
 }

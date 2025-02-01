@@ -19,7 +19,11 @@ class AudioDeviceInfo;
 class Logger;
 
 
-class AudioDisplayWidget : public QWidget, public AudioSpectrumHolder::Listener, public AudioSession::Listener{
+class AudioDisplayWidget
+    : public QWidget
+    , public AudioSpectrumHolder::Listener
+    , public AudioSession::StateListener
+{
 public:
     using AudioDisplayType = AudioOption::AudioDisplayType;
 
@@ -32,7 +36,9 @@ public:
 
 private:
     virtual void state_changed() override;
-    virtual void display_changed(AudioOption::AudioDisplayType display) override;
+
+//    virtual void pre_input_change() override;
+    virtual void post_display_change(AudioOption::AudioDisplayType display) override;
 
 
 private:

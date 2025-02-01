@@ -8,9 +8,9 @@
 #define PokemonAutomation_PokemonSwSh_DenMonReader_H
 
 #include <string>
-#include "CommonFramework/ImageMatch/ImageMatchResult.h"
-#include "CommonFramework/Options/StringSelectOption.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "CommonTools/Options/StringSelectOption.h"
+#include "CommonTools/ImageMatch/ImageMatchResult.h"
 
 namespace PokemonAutomation{
     namespace ImageMatch{

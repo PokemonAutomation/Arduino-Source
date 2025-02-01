@@ -4,8 +4,8 @@
  *
  */
 
-#include "CommonFramework/Tools/InterruptableCommands.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PathSelect.h"
@@ -20,26 +20,25 @@ namespace MaxLairInternal{
 
 
 void run_item_select(
-    ConsoleHandle& console, BotBaseContext& context,
+    size_t console_index,
+    VideoStream& stream, SwitchControllerContext& context,
     GlobalStateTracker& state_tracker
 ){
-    size_t console_index = console.index();
     GlobalState& state = state_tracker[console_index];
     size_t player_index = state.find_player_index(console_index);
 
-    PathReader reader(console, player_index);
+    PathReader reader(stream.overlay(), player_index);
     {
-        VideoSnapshot screen = console.video().snapshot();
-        reader.read_sprites(console, state, screen);
-        reader.read_hp(console, state, screen);
+        VideoSnapshot screen = stream.video().snapshot();
+        reader.read_sprites(stream.logger(), state, screen);
+        reader.read_hp(stream.logger(), state, screen);
     }
 
 
-    GlobalState inferred = state_tracker.synchronize(console, console_index);
+    GlobalState inferred = state_tracker.synchronize(stream.logger(), console_index);
 
-
-    int8_t item_index = select_item(console, inferred, player_index);
-    console.log("Choosing item " + std::to_string((int)item_index) + ".", COLOR_PURPLE);
+    int8_t item_index = select_item(stream.logger(), inferred, player_index);
+    stream.log("Choosing item " + std::to_string((int)item_index) + ".", COLOR_PURPLE);
 
     if (item_index < 0){
         pbf_press_button(context, BUTTON_B, 10, 50);
@@ -54,7 +53,7 @@ void run_item_select(
     //  Wait until we exit the window.
     ItemSelectDetector item_menu(true);
     wait_until(
-        console, context,
+        stream, context,
         std::chrono::seconds(480),
         {{item_menu}},
         INFERENCE_RATE

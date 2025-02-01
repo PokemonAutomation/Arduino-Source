@@ -7,7 +7,6 @@
 #ifndef PokemonAutomation_PokemonBDSP_MoneyFarmerRoute212_H
 #define PokemonAutomation_PokemonBDSP_MoneyFarmerRoute212_H
 
-#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
@@ -32,21 +31,21 @@ public:
 class MoneyFarmerRoute212 : public SingleSwitchProgramInstance{
 public:
     MoneyFarmerRoute212();
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
     // Run the battle loop. Return true if the program should stop.
-    bool battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context, uint8_t pp[4], bool man);
+    bool battle(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, uint8_t pp[4], bool man);
     // From the row above the old couple, heal Pokemon and return.
     // Return true if VS Seeker needs charging.
-    bool heal_after_battle_and_return(ConsoleHandle& console, BotBaseContext& context, uint8_t pp[4]);
+    bool heal_after_battle_and_return(VideoStream& stream, SwitchControllerContext& context, uint8_t pp[4]);
     // Starting in front of the Hearthome Pokecenter, heal and return
     // to the old couple.
-    void heal_at_center_and_return(ConsoleHandle& console, BotBaseContext& context, uint8_t pp[4]);
+    void heal_at_center_and_return(VideoStream& stream, SwitchControllerContext& context, uint8_t pp[4]);
     // Fly from the old couple to Hearthome Pokecenter, heal and return.
-    void fly_to_center_heal_and_return(ConsoleHandle& console, BotBaseContext& context, uint8_t pp[4]);
+    void fly_to_center_heal_and_return(VideoStream& stream, SwitchControllerContext& context, uint8_t pp[4]);
     // Move around to charge VS Seeker.
-    void charge_vs_seeker(BotBaseContext& context);
+    void charge_vs_seeker(SwitchControllerContext& context);
 
     static size_t total_pp(uint8_t pp[4]);
 

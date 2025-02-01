@@ -6,10 +6,10 @@
 
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonFramework/ImageMatch/ImageDiff.h"
+#include "CommonFramework/ImageTools/ImageDiff.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
+#include "CommonTools/Async/InferenceRoutines.h"
+#include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 #include "PokemonLA_SelectedRegionDetector.h"
 
 namespace PokemonAutomation{
@@ -89,18 +89,18 @@ private:
 };
 
 
-MapRegion detect_selected_region(ConsoleHandle& console, CancellableScope& scope){
+MapRegion detect_selected_region(VideoStream& stream, CancellableScope& scope){
     MapLocationDetector detector;
     int ret = wait_until(
-        console, scope,
+        stream, scope,
         std::chrono::seconds(2),
         {{detector}}
     );
     MapRegion region = detector.current_region();
     if (ret < 0){
-        console.log("Unable to detect active region on map.", COLOR_RED);
+        stream.log("Unable to detect active region on map.", COLOR_RED);
     }else{
-        console.log(std::string("Current Selection: ") + MAP_REGION_NAMES[(int)region]);
+        stream.log(std::string("Current Selection: ") + MAP_REGION_NAMES[(int)region]);
     }
     return region;
 }

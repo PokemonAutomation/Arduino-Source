@@ -5,10 +5,9 @@
  */
 
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSwSh/ShinyHuntTracker.h"
-#include "PokemonBDSP/PokemonBDSP_Settings.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_DialogDetector.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_MarkFinder.h"
 #include "PokemonBDSP/Inference/Battles/PokemonBDSP_StartBattleDetector.h"
@@ -30,7 +29,7 @@ ShinyHuntFishing_Descriptor::ShinyHuntFishing_Descriptor()
         "Shiny hunt fishing " + STRING_POKEMON + ".",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 struct ShinyHuntFishing_Descriptor::Stats : public PokemonSwSh::ShinyHuntTracker{
@@ -92,7 +91,7 @@ ShinyHuntFishing::ShinyHuntFishing()
 
 
 
-void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     ShinyHuntFishing_Descriptor::Stats& stats = env.current_stats<ShinyHuntFishing_Descriptor::Stats>();
 
     StandardEncounterHandler handler(
@@ -117,9 +116,9 @@ void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env, BotBaseConte
             MarkDetector mark_detector(env.console, {0.4, 0.2, 0.2, 0.5});
             StartBattleDetector battle(env.console);
             BattleMenuWatcher battle_menu(BattleType::STANDARD);
-            int ret = run_until(
+            int ret = run_until<SwitchControllerContext>(
                 env.console, context,
-                [this](BotBaseContext& context){
+                [this](SwitchControllerContext& context){
                     SHORTCUT.run(context, 30 * TICKS_PER_SECOND);
                 },
                 {

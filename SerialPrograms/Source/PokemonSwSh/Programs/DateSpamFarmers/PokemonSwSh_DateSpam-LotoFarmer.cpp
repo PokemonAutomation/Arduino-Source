@@ -26,7 +26,7 @@ LotoFarmer_Descriptor::LotoFarmer_Descriptor()
         "Farm the Loto ID.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 
@@ -50,7 +50,7 @@ LotoFarmer::LotoFarmer()
     PA_ADD_OPTION(MASH_B_DURATION);
 }
 
-void LotoFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void LotoFarmer::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
     }else{

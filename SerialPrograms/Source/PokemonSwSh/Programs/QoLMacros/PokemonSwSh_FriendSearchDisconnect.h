@@ -26,7 +26,7 @@ class FriendSearchDisconnect : public SingleSwitchProgramInstance{
 public:
     FriendSearchDisconnect();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
     SimpleIntegerOption<uint8_t> USER_SLOT;

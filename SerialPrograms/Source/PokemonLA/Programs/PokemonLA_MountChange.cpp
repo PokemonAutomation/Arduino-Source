@@ -5,14 +5,13 @@
  */
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonLA_MountChange.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -52,7 +51,7 @@ bool get_mount_coordinates(size_t& index, MountState mount){
     }
 }
 
-void change_mount(ConsoleHandle& console, BotBaseContext& context, MountState mount){
+void change_mount(VideoStream& stream, SwitchControllerContext& context, MountState mount){
     size_t desired_index;
     bool desired_on = get_mount_coordinates(desired_index, mount);
 
@@ -60,7 +59,7 @@ void change_mount(ConsoleHandle& console, BotBaseContext& context, MountState mo
     for (size_t c = 0; c < 20; c++){
         context.wait_for_all_requests();
 
-        MountState current = mount_detector.detect(console.video().snapshot());
+        MountState current = mount_detector.detect(stream.video().snapshot());
         if (mount == current){
             return;
         }
@@ -101,19 +100,19 @@ void change_mount(ConsoleHandle& console, BotBaseContext& context, MountState mo
         }
     }
 
-    throw OperationFailedException(
-        ErrorReport::SEND_ERROR_REPORT, console,
+    OperationFailedException::fire(
+        ErrorReport::SEND_ERROR_REPORT,
         std::string("Unable to find ") + MOUNT_STATE_STRINGS[(size_t)mount] + " after 10 attempts.",
-        true
+        stream
     );
 }
 
-void dismount(ConsoleHandle& console, BotBaseContext& context){
+void dismount(VideoStream& stream, SwitchControllerContext& context){
     MountDetector mount_detector;
     for (size_t c = 0; c < 10; c++){
         context.wait_for_all_requests();
 
-        MountState current = mount_detector.detect(console.video().snapshot());
+        MountState current = mount_detector.detect(stream.video().snapshot());
         switch (current){
         case MountState::WYRDEER_OFF:
         case MountState::URSALUNA_OFF:
@@ -135,10 +134,10 @@ void dismount(ConsoleHandle& console, BotBaseContext& context){
         pbf_press_button(context, BUTTON_PLUS, 20, 105);
     }
 
-    throw OperationFailedException(
-        ErrorReport::SEND_ERROR_REPORT, console,
+    OperationFailedException::fire(
+        ErrorReport::SEND_ERROR_REPORT,
         "Unable to dismount after 10 attempts.",
-        true
+        stream
     );
 }
 

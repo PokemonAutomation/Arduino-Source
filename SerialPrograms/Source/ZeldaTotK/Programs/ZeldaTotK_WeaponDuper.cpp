@@ -6,9 +6,8 @@
 
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/Tools/StatsTracking.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "ZeldaTotK_WeaponDuper.h"
 
 namespace PokemonAutomation{
@@ -23,7 +22,7 @@ WeaponDuper_Descriptor::WeaponDuper_Descriptor()
         "Use a glitch to duplicate your weapons (Bows, Shields and Swords)",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 
@@ -76,7 +75,7 @@ WeaponDuper::WeaponDuper()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void WeaponDuper::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void WeaponDuper::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     WeaponDuper_Descriptor::Stats& stats = env.current_stats<WeaponDuper_Descriptor::Stats>();
 
     uint32_t c = 0;

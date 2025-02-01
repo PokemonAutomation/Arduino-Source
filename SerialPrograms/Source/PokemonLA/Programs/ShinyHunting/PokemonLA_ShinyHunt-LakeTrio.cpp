@@ -9,8 +9,8 @@
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Notification.h"
@@ -36,7 +36,7 @@ ShinyHuntLakeTrio_Descriptor::ShinyHuntLakeTrio_Descriptor()
         "Shiny hunt the lake trio legendaries.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 std::unique_ptr<StatsTracker> ShinyHuntLakeTrio_Descriptor::make_stats() const{
@@ -112,7 +112,7 @@ std::set<std::string> read_name(
 
 
 
-void ShinyHuntLakeTrio::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void ShinyHuntLakeTrio::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     PokemonSwSh::ShinyHuntTracker& stats = env.current_stats<PokemonSwSh::ShinyHuntTracker>();
 
 
@@ -151,9 +151,9 @@ void ShinyHuntLakeTrio::program(SingleSwitchProgramEnvironment& env, BotBaseCont
                 {0, 0, 1, 1},
                 {{arcs, true}}
             );
-            int ret = run_until(
+            int ret = run_until<SwitchControllerContext>(
                 env.console, context,
-                [](BotBaseContext& context){
+                [](SwitchControllerContext& context){
                     pbf_mash_button(context, BUTTON_B, 60 * TICKS_PER_SECOND);
                 },
                 {{watcher}}
@@ -173,10 +173,10 @@ void ShinyHuntLakeTrio::program(SingleSwitchProgramEnvironment& env, BotBaseCont
                 );
                 consecutive_errors++;
                 if (consecutive_errors >= 3){
-                    throw OperationFailedException(
-                        ErrorReport::SEND_ERROR_REPORT, env.console,
+                    OperationFailedException::fire(
+                        ErrorReport::SEND_ERROR_REPORT,
                         "Failed to detect an encounter 3 times in the row.",
-                        true
+                        env.console
                     );
                 }
                 continue;
@@ -192,9 +192,9 @@ void ShinyHuntLakeTrio::program(SingleSwitchProgramEnvironment& env, BotBaseCont
                 {{arcs, false}}
             );
             ShinySymbolWaiter shiny_symbol(env.console, SHINY_SYMBOL_BOX_BOTTOM);
-            int ret = run_until(
+            int ret = run_until<SwitchControllerContext>(
                 env.console, context,
-                [](BotBaseContext& context){
+                [](SwitchControllerContext& context){
                     pbf_press_button(context, BUTTON_ZL, 3 * TICKS_PER_SECOND, 0);
                 },
                 {

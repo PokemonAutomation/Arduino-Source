@@ -24,7 +24,7 @@ PageSwap_Descriptor::PageSwap_Descriptor()
         "Swap 30 boxes (1 page) in " + STRING_POKEMON + " Home.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 
@@ -41,7 +41,7 @@ PageSwap::PageSwap()
     PA_ADD_OPTION(DODGE_SYSTEM_UPDATE_WINDOW);
 }
 
-void PageSwap::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void PageSwap::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
         PokemonSwSh::resume_game_no_interact(env.console, context, DODGE_SYSTEM_UPDATE_WINDOW);

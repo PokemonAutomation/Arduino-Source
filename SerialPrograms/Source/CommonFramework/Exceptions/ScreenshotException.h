@@ -15,9 +15,9 @@ namespace PokemonAutomation{
 class ImageViewRGB32;
 class ImageRGB32;
 class EventNotificationOption;
+class VideoStream;
 struct ProgramInfo;
 class ProgramEnvironment;
-class ConsoleHandle;
 
 
 enum class ErrorReport{
@@ -31,22 +31,51 @@ enum class ErrorReport{
 class ScreenshotException : public Exception{
 public:
     ScreenshotException() = default;
-    explicit ScreenshotException(ErrorReport error_report, std::string message);
-    explicit ScreenshotException(ErrorReport error_report, std::string message, std::shared_ptr<const ImageRGB32> screenshot);
-    explicit ScreenshotException(ErrorReport error_report, ConsoleHandle& console, std::string message, bool take_screenshot);
 
-    void attach_screenshot(std::shared_ptr<const ImageRGB32> screenshot);
+    //  Construct exception with a simple message.
+    explicit ScreenshotException(ErrorReport error_report, std::string message);
+
+    //  Construct exception with message and console information.
+    //  This will take a screenshot and store the console if the stream history if requested later.
+    explicit ScreenshotException(
+        ErrorReport error_report,
+        std::string message,
+        VideoStream& stream
+    );
+
+    //  Construct exception with message with screenshot and (optionally) console information.
+    //  Use the provided screenshot instead of taking one with the console.
+    //  Store the console information (if provided) for stream history if requested later.
+    explicit ScreenshotException(
+        ErrorReport error_report,
+        std::string message,
+        VideoStream* stream,
+        ImageRGB32 screenshot
+    );
+    explicit ScreenshotException(
+        ErrorReport error_report,
+        std::string message,
+        VideoStream* stream,
+        std::shared_ptr<const ImageRGB32> screenshot
+    );
+
+    //  Add console information if it isn't already requested.
+    //  This will provide screenshot and stream history if requested later.
+    void add_stream_if_needed(VideoStream& stream);
+
 
 public:
 //    virtual const char* name() const override{ return "ScreenshotException"; }
     virtual std::string message() const override{ return m_message; }
     ImageViewRGB32 screenshot() const;
 
-    virtual void send_notification(ProgramEnvironment& env, EventNotificationOption& notification) const = 0;
+    virtual Color color() const{ return COLOR_RED; }
+    virtual void send_notification(ProgramEnvironment& env, EventNotificationOption& notification) const;
 
 public:
     ErrorReport m_send_error_report;
     std::string m_message;
+    VideoStream* m_stream = nullptr;
     std::shared_ptr<const ImageRGB32> m_screenshot;
 };
 

@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_Pokemon_BerrySprites_H
 #define PokemonAutomation_Pokemon_BerrySprites_H
 
-#include "CommonFramework/Resources/SpriteDatabase.h"
+#include "CommonTools/Resources/SpriteDatabase.h"
 
 namespace PokemonAutomation{
 namespace Pokemon{

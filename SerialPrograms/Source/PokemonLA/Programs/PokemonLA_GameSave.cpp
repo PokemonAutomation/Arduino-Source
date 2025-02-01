@@ -5,15 +5,14 @@
  */
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
+#include "CommonTools/Images/ImageFilter.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_ArcPhoneDetector.h"
 #include "PokemonLA_GameSave.h"
@@ -59,16 +58,19 @@ bool save_tab_disabled(const ImageViewRGB32 &screen){
 }
 
 
-bool save_game_from_overworld(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){
-    OverlayBoxScope tab_box_scope(console, tab_box);
-    OverlayBoxScope icon_box_scope(console, save_icon_box);
-    console.log("Saving game...");
-    console.overlay().add_log("Saving game...", COLOR_WHITE);
+bool save_game_from_overworld(
+    ProgramEnvironment& env,
+    VideoStream& stream, SwitchControllerContext& context
+){
+    OverlayBoxScope tab_box_scope(stream.overlay(), tab_box);
+    OverlayBoxScope icon_box_scope(stream.overlay(), save_icon_box);
+    stream.log("Saving game...");
+    stream.overlay().add_log("Saving game...", COLOR_WHITE);
 
     // Press DPAD_UP to open menu
     pbf_press_dpad(context, DPAD_UP, 20, 120);
     context.wait_for_all_requests();
-    auto snapshot = console.video().snapshot();
+    auto snapshot = stream.video().snapshot();
     if (save_tab_disabled(snapshot)){
         return false;
     }
@@ -85,20 +87,20 @@ bool save_game_from_overworld(ProgramEnvironment& env, ConsoleHandle& console, B
         }
         pbf_press_button(context, BUTTON_ZR, 20, 80);
         context.wait_for_all_requests();
-        snapshot = console.video().snapshot();
+        snapshot = stream.video().snapshot();
     }
     if (!found){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, console,
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
             "Unable to find save menu.",
-            true
+            stream
         );
     }
 
-    ArcPhoneDetector detector(console, console, std::chrono::milliseconds(100), true);
-    int ret = run_until(
-        console, context,
-        [&](BotBaseContext& context){
+    ArcPhoneDetector detector(stream.logger(), stream.overlay(), std::chrono::milliseconds(100), true);
+    int ret = run_until<SwitchControllerContext>(
+        stream, context,
+        [&](SwitchControllerContext& context){
             for (size_t c = 0; c < 10; c++){
                 pbf_press_button(context, BUTTON_B, 20, 230);
             }
@@ -106,13 +108,13 @@ bool save_game_from_overworld(ProgramEnvironment& env, ConsoleHandle& console, B
         {detector}
     );
     if (ret < 0){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, console,
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
             "Unable to return to overworld.",
-            true
+            stream
         );
     }
-    console.log("Saving game... Done.");
+    stream.log("Saving game... Done.");
 
     return true;
 }

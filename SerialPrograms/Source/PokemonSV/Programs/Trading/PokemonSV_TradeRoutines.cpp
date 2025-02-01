@@ -5,13 +5,11 @@
  */
 
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
-#include "CommonFramework/Inference/BlackScreenDetector.h"
-//#include "CommonFramework/Inference/ImageMatchDetector.h"
+#include "CommonTools/Images/SolidColorTest.h"
+#include "CommonTools/Async/InferenceRoutines.h"
+#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-//#include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.h"
@@ -112,19 +110,19 @@ public:
 
 
 void trade_current_pokemon(
-    ConsoleHandle& console, BotBaseContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     MultiConsoleErrorState& tracker,
     TradeStats& stats
 ){
-    tracker.check_unrecoverable_error(console);
+    tracker.check_unrecoverable_error(stream.logger());
     context.wait_for_all_requests();
 
     //  Make sure there is something to trade.
     {
         SomethingInBoxSlotDetector detector(COLOR_CYAN, true);
-        if (!detector.detect(console.video().snapshot())){
+        if (!detector.detect(stream.video().snapshot())){
             stats.m_errors++;
-            tracker.report_unrecoverable_error(console, "Box slot is empty.");
+            tracker.report_unrecoverable_error(stream, "Box slot is empty.");
         }
     }
 
@@ -132,50 +130,50 @@ void trade_current_pokemon(
     //  Wait for black screen.
     {
         BlackScreenOverWatcher black_screen(COLOR_CYAN);
-        int ret = run_until(
-            console, context,
-            [](BotBaseContext& context){
+        int ret = run_until<SwitchControllerContext>(
+            stream, context,
+            [](SwitchControllerContext& context){
                 pbf_mash_button(context, BUTTON_A, 120 * TICKS_PER_SECOND);
             },
             {{black_screen}}
         );
         if (ret < 0){
             stats.m_errors++;
-            tracker.report_unrecoverable_error(console, "Failed to detect start of trade after 2 minutes.");
+            tracker.report_unrecoverable_error(stream, "Failed to detect start of trade after 2 minutes.");
         }
-        console.log("Detected start of trade.");
+        stream.log("Detected start of trade.");
         context.wait_for(std::chrono::milliseconds(100));
-        tracker.check_unrecoverable_error(console);
+        tracker.check_unrecoverable_error(stream.logger());
     }
 
 
-    TradeDoneHold trade_done(console);
+    TradeDoneHold trade_done(stream.overlay());
 
     while (true){
         AdvanceDialogWatcher dialog(COLOR_YELLOW, std::chrono::seconds(2));
         PromptDialogWatcher learn_move(COLOR_BLUE);
 
         int ret = wait_until(
-            console, context, std::chrono::minutes(2),
+            stream, context, std::chrono::minutes(2),
             {dialog, trade_done, learn_move}
         );
         switch (ret){
         case 0:
-            console.log("Detected dialog.");
+            stream.log("Detected dialog.");
             pbf_press_button(context, BUTTON_B, 20, 105);
             break;
         case 1:
-            console.log("Detected box. Trade completed.");
-            tracker.check_unrecoverable_error(console);
+            stream.log("Detected box. Trade completed.");
+            tracker.check_unrecoverable_error(stream.logger());
             context.wait_for(std::chrono::milliseconds(500));
             return;
         case 2:
-            console.log("Detected move learn.");
+            stream.log("Detected move learn.");
             pbf_press_button(context, BUTTON_B, 20, 105);
             break;
         default:
             stats.m_errors++;
-            tracker.report_unrecoverable_error(console, "Failed to return to box after 2 minutes after a trade.");
+            tracker.report_unrecoverable_error(stream, "Failed to return to box after 2 minutes after a trade.");
         }
     }
 }
@@ -193,7 +191,7 @@ void trade_current_box(
             send_program_status_notification(env, notifications);
 
             MultiConsoleErrorState error_state;
-            env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
+            env.run_in_parallel(scope, [&](ConsoleHandle& console, SwitchControllerContext& context){
                 VideoOverlaySet overlays(console.overlay());
 
                 move_box_cursor(env.program_info(), console, context, BoxCursorLocation::SLOTS, row, col);

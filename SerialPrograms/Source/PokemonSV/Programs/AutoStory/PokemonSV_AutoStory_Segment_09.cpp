@@ -4,33 +4,22 @@
  *
  */
 
-#include "CommonFramework/GlobalSettingsPanel.h"
-#include "CommonFramework/Exceptions/FatalProgramException.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
-#include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/Tools/StatsTracking.h"
-#include "CommonFramework/Tools/VideoResolutionCheck.h"
+#include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "Pokemon/Pokemon_Strings.h"
-#include "PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h"
+#include "PokemonSV/Inference/PokemonSV_TutorialDetector.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_SaveGame.h"
-#include "PokemonSV/Inference/PokemonSV_TutorialDetector.h"
+#include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSV_AutoStoryTools.h"
 #include "PokemonSV_AutoStory_Segment_09.h"
 
 //#include <iostream>
 //using std::cout;
 //using std::endl;
-//#include <unordered_map>
-//#include <algorithm>
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
-
-using namespace Pokemon;
 
 
 
@@ -47,7 +36,11 @@ std::string AutoStory_Segment_09::end_text() const{
     return "End: Finished tutorial. Acquired all 3 questlines. Got on ride for first time.";
 }
 
-void AutoStory_Segment_09::run_segment(SingleSwitchProgramEnvironment& env, BotBaseContext& context, AutoStoryOptions options) const{
+void AutoStory_Segment_09::run_segment(
+    SingleSwitchProgramEnvironment& env,
+    SwitchControllerContext& context,
+    AutoStoryOptions options
+) const{
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
 
     context.wait_for_all_requests();
@@ -71,7 +64,7 @@ void AutoStory_Segment_09::run_segment(SingleSwitchProgramEnvironment& env, BotB
 
 void checkpoint_16(
     SingleSwitchProgramEnvironment& env, 
-    BotBaseContext& context, 
+    SwitchControllerContext& context, 
     EventNotificationOption& notif_status_update
 ){
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
@@ -100,9 +93,9 @@ void checkpoint_16(
         context.wait_for_all_requests();
 
         // walk forward
-        pbf_move_left_joystick(context, 128, 0, 300, 100);
+        pbf_move_left_joystick(context, 128, 0, 600, 100);
         // turn left 
-        pbf_move_left_joystick(context, 0, 128, 50, 100);
+        pbf_move_left_joystick(context, 0, 128, 20, 100);
 
         // talk to Arven. stop at overworld. need prompt, overworld, white button A. and book?
         env.console.log("Talk with Arven. Receive Titan questline (Path of Legends).");
@@ -124,7 +117,7 @@ void checkpoint_16(
 
 void checkpoint_17(
     SingleSwitchProgramEnvironment& env, 
-    BotBaseContext& context, 
+    SwitchControllerContext& context, 
     EventNotificationOption& notif_status_update
 ){
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
@@ -138,7 +131,7 @@ void checkpoint_17(
         context.wait_for_all_requests();
 
         // walk backwards until dialog
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 20, 255);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 20, 128, 255);
         env.console.log("Talk with Cassiopeia.");
         mash_button_till_overworld(env.console, context, BUTTON_A, 360);
 
@@ -178,7 +171,7 @@ void checkpoint_17(
 
 void checkpoint_18(
     SingleSwitchProgramEnvironment& env, 
-    BotBaseContext& context, 
+    SwitchControllerContext& context, 
     EventNotificationOption& notif_status_update
 ){
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
@@ -224,7 +217,7 @@ void checkpoint_18(
 
 void checkpoint_19(
     SingleSwitchProgramEnvironment& env, 
-    BotBaseContext& context, 
+    SwitchControllerContext& context, 
     EventNotificationOption& notif_status_update
 ){
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
@@ -269,7 +262,7 @@ void checkpoint_19(
 
 void checkpoint_20(
     SingleSwitchProgramEnvironment& env, 
-    BotBaseContext& context, 
+    SwitchControllerContext& context, 
     EventNotificationOption& notif_status_update
 ){
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
@@ -290,7 +283,7 @@ void checkpoint_20(
         env.console.log("Leave dorm for schoolyard.");
         mash_button_till_overworld(env.console, context, BUTTON_A, 360);
 
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 60, 0);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 60, 128, 0);
 
         env.console.log("Talk to Nemona, Arven, Cassiopeia.");
         clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 16, 

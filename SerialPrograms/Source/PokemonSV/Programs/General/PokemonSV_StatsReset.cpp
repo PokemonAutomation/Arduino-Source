@@ -5,11 +5,11 @@
  */
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "CommonFramework/Options/LanguageOCROption.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
-#include "CommonFramework/Tools/StatsTracking.h"
-#include "CommonFramework/Tools/VideoResolutionCheck.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
+#include "CommonTools/Options/LanguageOCROption.h"
+#include "CommonTools/Async/InferenceRoutines.h"
+#include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/PokemonSV_Settings.h"
@@ -39,7 +39,7 @@ StatsReset_Descriptor::StatsReset_Descriptor()
         "Repeatedly catch static encounters until you get the stats you want.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 struct StatsReset_Descriptor::Stats : public StatsTracker{
@@ -139,7 +139,7 @@ StatsReset::StatsReset()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-bool StatsReset::enter_battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+bool StatsReset::enter_battle(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     StatsReset_Descriptor::Stats& stats = env.current_stats<StatsReset_Descriptor::Stats>();
 
     //Press A to talk to target
@@ -188,8 +188,8 @@ bool StatsReset::enter_battle(SingleSwitchProgramEnvironment& env, BotBaseContex
 
         return false;
         /*
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, env.console,
+        OperationFailedException::fire(
+            env.console, ErrorReport::SEND_ERROR_REPORT,
             "Failed to enter battle. Are you facing the Pokemon or in a menu?",
             true
         );
@@ -198,7 +198,7 @@ bool StatsReset::enter_battle(SingleSwitchProgramEnvironment& env, BotBaseContex
     return true;
 }
 
-void StatsReset::open_ball_menu(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void StatsReset::open_ball_menu(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     StatsReset_Descriptor::Stats& stats = env.current_stats<StatsReset_Descriptor::Stats>();
 
     BattleBallReader reader(env.console, LANGUAGE);
@@ -212,10 +212,10 @@ void StatsReset::open_ball_menu(SingleSwitchProgramEnvironment& env, BotBaseCont
             stats.errors++;
             env.update_stats();
             send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
                 "Timed out trying to read ball after 2 minutes.",
-                true
+                env.console
             );
         }
 
@@ -234,7 +234,7 @@ void StatsReset::open_ball_menu(SingleSwitchProgramEnvironment& env, BotBaseCont
 
 //Returns target_fainted. If overworld is detected then the target fainted.
 //Otherwise if AdvanceDialog is detected the Pokemon was caught or the player lost.
-bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     StatsReset_Descriptor::Stats& stats = env.current_stats<StatsReset_Descriptor::Stats>();
 
     AdvanceDialogWatcher advance_dialog(COLOR_MAGENTA);
@@ -249,9 +249,9 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext&
     bool out_of_balls = false;
     bool quickball_thrown = false;
 
-    int ret = run_until(
+    int ret = run_until<SwitchControllerContext>(
         env.console, context,
-        [&](BotBaseContext& context){
+        [&](SwitchControllerContext& context){
             while (true){
                 //Check that battle menu appears - this is in case of swapping pokemon
                 NormalBattleMenuWatcher menu_before_throw(COLOR_YELLOW);
@@ -264,10 +264,10 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext&
                     env.console.log("Unable to find menu_before_throw.");
                     stats.errors++;
                     env.update_stats();
-                    throw OperationFailedException(
-                        ErrorReport::SEND_ERROR_REPORT, env.console,
+                    OperationFailedException::fire(
+                        ErrorReport::SEND_ERROR_REPORT,
                         "Unable to find menu_before_throw.",
-                        true
+                        env.console
                     );
                 }
 
@@ -285,10 +285,10 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext&
                         env.console.log("Unable to find Quick Ball on turn 1.");
                         stats.errors++;
                         env.update_stats();
-                        throw OperationFailedException(
-                            ErrorReport::SEND_ERROR_REPORT, env.console,
+                        OperationFailedException::fire(
+                            ErrorReport::SEND_ERROR_REPORT,
                             "Unable to find Quick Ball on turn 1.",
-                            true
+                            env.console
                         );
                     }
                     if (quantity < 0){
@@ -335,9 +335,9 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext&
                     }
 
                     //Select and use move
-                    int ret_move_select = run_until(
+                    int ret_move_select = run_until<SwitchControllerContext>(
                     env.console, context,
-                    [&](BotBaseContext& context){
+                    [&](SwitchControllerContext& context){
                         pbf_press_button(context, BUTTON_A, 10, 50);
                         pbf_wait(context, 100);
                         context.wait_for_all_requests();
@@ -370,10 +370,10 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext&
                         env.console.log("Battle menu detected early. Out of PP, please check your setup.");
                         stats.errors++;
                         env.update_stats();
-                        throw OperationFailedException(
-                            ErrorReport::SEND_ERROR_REPORT, env.console,
+                        OperationFailedException::fire(
+                            ErrorReport::SEND_ERROR_REPORT,
                             "Battle menu detected early. Out of PP, please check your setup.",
-                            true
+                            env.console
                         );
                     }else{
                         env.log("Move successfully used.");
@@ -453,10 +453,10 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext&
                     env.console.log("Invalid state ret2 run_battle.");
                     stats.errors++;
                     env.update_stats();
-                    throw OperationFailedException(
-                        ErrorReport::SEND_ERROR_REPORT, env.console,
+                    OperationFailedException::fire(
+                        ErrorReport::SEND_ERROR_REPORT,
                         "Invalid state ret2 run_battle.",
-                        true
+                        env.console
                     );
                 }
 
@@ -495,17 +495,17 @@ bool StatsReset::run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext&
         env.console.log("Invalid state in run_battle().");
         stats.errors++;
         env.update_stats();
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, env.console,
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
             "Invalid state in run_battle().",
-            true
+            env.console
         );
     }
 
     return target_fainted;
 }
 
-bool StatsReset::check_stats(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+bool StatsReset::check_stats(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     StatsReset_Descriptor::Stats& stats = env.current_stats<StatsReset_Descriptor::Stats>();
     bool match = false;
 
@@ -553,10 +553,10 @@ bool StatsReset::check_stats(SingleSwitchProgramEnvironment& env, BotBaseContext
             env.console.log("Invalid state.");
             stats.errors++;
             env.update_stats();
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
                 "Invalid state.",
-                true
+                env.console
             );
         }
     }
@@ -564,7 +564,7 @@ bool StatsReset::check_stats(SingleSwitchProgramEnvironment& env, BotBaseContext
     return match;
 }
 
-void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void StatsReset::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     //This will only work for Pokemon that you press A to talk to.
     //Regular static spawns will have the same stats, resetting won't work.
     //Won't apply to the former titan pokemon or the box legends + ogrepon either, as their IVs are locked.
@@ -594,10 +594,10 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
 
             //Try to start battle 3 times.
             if (c > 2){
-                throw OperationFailedException(
-                    ErrorReport::SEND_ERROR_REPORT, env.console,
+                OperationFailedException::fire(
+                    ErrorReport::SEND_ERROR_REPORT,
                     "Failed to enter battle after 3 attempts.",
-                    true
+                    env.console
                 );
                 break;
             }
@@ -609,9 +609,9 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
             //Close all the dex entry and caught menus
             //If the player lost, this closes all dialog from Joy
             OverworldWatcher overworld(env.console);
-            int retOver = run_until(
+            int retOver = run_until<SwitchControllerContext>(
                 env.console, context,
-                [](BotBaseContext& context){
+                [](SwitchControllerContext& context){
                     pbf_mash_button(context, BUTTON_B, 10000);
                 },
                 { overworld }

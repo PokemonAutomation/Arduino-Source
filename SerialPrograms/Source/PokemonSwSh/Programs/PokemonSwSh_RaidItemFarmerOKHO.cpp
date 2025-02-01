@@ -5,10 +5,11 @@
  */
 
 #include "Common/Cpp/PrettyPrint.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
+//#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Routines.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
-#include "NintendoSwitch/FixedInterval.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
@@ -30,7 +31,7 @@ RaidItemFarmerOHKO_Descriptor::RaidItemFarmerOHKO_Descriptor()
         "Farm items from raids that can be OHKO'ed. (requires multiple Switches)",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB,
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS},
         2, 4, 2
     )
 {}
@@ -103,24 +104,28 @@ RaidItemFarmerOHKO::RaidItemFarmerOHKO()
 }
 
 void RaidItemFarmerOHKO::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
-    BotBaseContext host(scope, env.consoles[0].botbase());
+    SwitchControllerContext host(scope, env.consoles[0].controller());
     size_t switches = env.consoles.size();
+
+    WallDuration TOUCH_DATE_INTERVAL0 = std::chrono::milliseconds(TOUCH_DATE_INTERVAL * 1000 / TICKS_PER_SECOND);
 
     env.run_in_parallel(
         scope,
-        [](ConsoleHandle& console, BotBaseContext& context){
+        [](ConsoleHandle& console, SwitchControllerContext& context){
             grip_menu_connect_go_home(context);
         }
     );
 
-    uint32_t last_touch = 0;
+    WallClock last_touch = current_time();
+//    uint32_t last_touch = 0;
     if (TOUCH_DATE_INTERVAL > 0){
         touch_date_from_home(host, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
-        last_touch = system_clock(host);
+        last_touch = current_time();
+//        last_touch = system_clock(host);
     }
     env.run_in_parallel(
         scope,
-        [](ConsoleHandle& console, BotBaseContext& context){
+        [](ConsoleHandle& console, SwitchControllerContext& context){
             if (console.index() == 0){
                 resume_game_front_of_den_nowatts(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
             }else{
@@ -136,7 +141,7 @@ void RaidItemFarmerOHKO::program(MultiSwitchProgramEnvironment& env, Cancellable
         host.wait_for_all_requests();
         env.run_in_parallel(
             scope,
-            [&](ConsoleHandle& console, BotBaseContext& context){
+            [&](ConsoleHandle& console, SwitchControllerContext& context){
                 if (console.index() == 0){
                     enter_den(context, 0, false, false);
                 }else{
@@ -153,7 +158,7 @@ void RaidItemFarmerOHKO::program(MultiSwitchProgramEnvironment& env, Cancellable
         host.wait_for_all_requests();
         env.run_in_parallel(
             scope, 1, switches,
-            [&](ConsoleHandle& console, BotBaseContext& context){
+            [&](ConsoleHandle& console, SwitchControllerContext& context){
                 pbf_wait(context, WAIT_FOR_STAMP_DELAY);
                 pbf_press_button(context, BUTTON_X, 10, 10);
                 pbf_press_dpad(context, DPAD_RIGHT, 10, 10);
@@ -167,7 +172,7 @@ void RaidItemFarmerOHKO::program(MultiSwitchProgramEnvironment& env, Cancellable
         host.wait_for_all_requests();
         env.run_in_parallel(
             scope,
-            [&](ConsoleHandle& console, BotBaseContext& context){
+            [&](ConsoleHandle& console, SwitchControllerContext& context){
                 pbf_mash_button(context, BUTTON_A, RAID_START_MASH_DURATION);
                 pbf_wait(context, RAID_START_TO_ATTACK_DELAY);
                 pbf_mash_button(context, BUTTON_A, 5 * TICKS_PER_SECOND);
@@ -180,9 +185,11 @@ void RaidItemFarmerOHKO::program(MultiSwitchProgramEnvironment& env, Cancellable
                     close_game(console, context);
 
                     //  Touch the date.
-                    if (TOUCH_DATE_INTERVAL > 0 && system_clock(context) - last_touch >= TOUCH_DATE_INTERVAL){
+                    if (TOUCH_DATE_INTERVAL > 0 && current_time() - last_touch >= TOUCH_DATE_INTERVAL0){
+//                    if (TOUCH_DATE_INTERVAL > 0 && system_clock(context) - last_touch >= TOUCH_DATE_INTERVAL){
                         touch_date_from_home(context, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
-                        last_touch += TOUCH_DATE_INTERVAL;
+                        last_touch += TOUCH_DATE_INTERVAL0;
+//                        last_touch += TOUCH_DATE_INTERVAL;
                     }
                     start_game_from_home_with_inference(
                         console, context,

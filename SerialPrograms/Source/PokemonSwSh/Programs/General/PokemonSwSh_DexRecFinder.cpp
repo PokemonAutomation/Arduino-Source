@@ -6,9 +6,9 @@
 
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "CommonFramework/Tools/StatsTracking.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
@@ -22,6 +22,8 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
+using namespace Pokemon;
+
 
 
 DexRecFinder_Descriptor::DexRecFinder_Descriptor()
@@ -32,7 +34,7 @@ DexRecFinder_Descriptor::DexRecFinder_Descriptor()
         "Search for a " + STRING_POKEDEX + " recommendation by date-spamming.",
         FeedbackType::OPTIONAL_,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 struct DexRecFinder_Descriptor::Stats : public StatsTracker{
@@ -60,7 +62,11 @@ std::unique_ptr<StatsTracker> DexRecFinder_Descriptor::make_stats() const{
 
 
 DexRecFilters::DexRecFilters()
-    : GroupOption("Stop Automatically (requires video feedback)", LockMode::LOCK_WHILE_RUNNING, true, true)
+    : GroupOption(
+        "Stop Automatically (requires video feedback)",
+        LockMode::LOCK_WHILE_RUNNING,
+        GroupOption::EnableMode::DEFAULT_ENABLED
+    )
     , LANGUAGE(
         "<b>Game Language:</b><br>This needs to be set correctly for stop filters to work correctly.",
         PokemonNameReader::instance().languages(),
@@ -158,7 +164,7 @@ void DexRecFinder::read_line(
     }
 }
 
-void DexRecFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void DexRecFinder::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
     }else{

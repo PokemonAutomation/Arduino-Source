@@ -9,13 +9,13 @@
 
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
-#include "CommonFramework/Inference/VisualDetector.h"
+#include "CommonFramework/Tools/VideoStream.h"
+#include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
+#include "CommonTools/VisualDetector.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.h"
 
 namespace PokemonAutomation{
-    class ConsoleHandle;
-    class BotBaseContext;
     struct ProgramInfo;
 namespace NintendoSwitch{
 namespace PokemonSV{
@@ -47,7 +47,8 @@ public:
     //  If (fast = true) it will be faster, but may be unreliable. It may not
     //  actually land on the desired slot if the capture card is slow.
     bool move_cursor(
-        const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+        const ProgramInfo& info,
+        VideoStream& stream, SwitchControllerContext& context,
         MenuSide side, int row, bool fast = false
     ) const;
 

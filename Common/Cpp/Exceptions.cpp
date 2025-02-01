@@ -11,6 +11,9 @@ namespace PokemonAutomation{
 
 
 
+void Exception::log(Logger& logger) const{
+    logger.log(std::string(name()) + ": " + message(), COLOR_RED);
+}
 std::string Exception::message() const{
     return "";
 }

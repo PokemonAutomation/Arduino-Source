@@ -10,8 +10,8 @@
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/TimeExpressionOption.h"
-#include "CommonFramework/Options/LanguageOCROption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
+#include "CommonTools/Options/LanguageOCROption.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonBDSP/Options/PokemonBDSP_ShortcutDirection.h"
@@ -34,11 +34,11 @@ class EggAutonomous : public SingleSwitchProgramInstance{
 public:
     EggAutonomous();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
     bool run_batch(
-        SingleSwitchProgramEnvironment& env, BotBaseContext& context,
+        SingleSwitchProgramEnvironment& env, SwitchControllerContext& context,
         EggAutonomousState& saved_state,
         EggAutonomousState& current_state
     );

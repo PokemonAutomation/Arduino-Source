@@ -28,7 +28,7 @@ ShinyHuntUnattendedIoATrade_Descriptor::ShinyHuntUnattendedIoATrade_Descriptor()
         "Hunt for shiny Isle of Armor trade. Stop when a shiny is found.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 
@@ -73,7 +73,7 @@ ShinyHuntUnattendedIoATrade::ShinyHuntUnattendedIoATrade()
     PA_ADD_OPTION(MASH_TO_TRADE_DELAY);
 }
 
-void ShinyHuntUnattendedIoATrade::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void ShinyHuntUnattendedIoATrade::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
         resume_game_back_out(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 500);

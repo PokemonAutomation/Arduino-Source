@@ -7,19 +7,16 @@
 #ifndef PokemonAutomation_PokemonSV_SandwichIngredientDetector_H
 #define PokemonAutomation_PokemonSV_SandwichIngredientDetector_H
 
+#include <array>
 #include "Common/Cpp/Color.h"
-#include "CommonFramework/ImageMatch/CroppedImageDictionaryMatcher.h"
-#include "CommonFramework/ImageMatch/ImageMatchResult.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonFramework/Inference/VisualDetector.h"
-#include "CommonFramework/OCR/OCR_SmallDictionaryMatcher.h"
+#include "CommonTools/ImageMatch/ImageMatchResult.h"
+#include "CommonTools/ImageMatch/CroppedImageDictionaryMatcher.h"
+#include "CommonTools/OCR/OCR_SmallDictionaryMatcher.h"
+#include "CommonTools/VisualDetector.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.h"
 
-#include <array>
-
 namespace PokemonAutomation{
-    class ConsoleHandle;
-    class BotBaseContext;
     struct ProgramInfo;
 namespace NintendoSwitch{
 namespace PokemonSV{

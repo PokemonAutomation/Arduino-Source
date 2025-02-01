@@ -9,12 +9,10 @@
 
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/TimeExpressionOption.h"
-#include "CommonFramework/Options/LanguageOCROption.h"
-#include "CommonFramework/Options/ScreenshotFormatOption.h"
-#include "CommonFramework/Options/StringSelectTableOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "Pokemon/Inference/Pokemon_NameReader.h"
+#include "CommonTools/Options/StringSelectTableOption.h"
+#include "CommonTools/Options/LanguageOCROption.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
@@ -23,7 +21,6 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
-using namespace Pokemon;
 
 
 class DexRecFinder_Descriptor : public SingleSwitchProgramDescriptor{
@@ -49,7 +46,7 @@ public:
 class DexRecFinder : public SingleSwitchProgramInstance{
 public:
     DexRecFinder();
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
     void read_line(

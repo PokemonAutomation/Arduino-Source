@@ -6,7 +6,7 @@
 
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/Tools/StatsTracking.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "ZeldaTotK_ParaglideItemDuper.h"
@@ -23,7 +23,7 @@ ParaglideItemDuper_Descriptor::ParaglideItemDuper_Descriptor()
         "Use the Paraglide Menu Sort glitch to duplicate items.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 
@@ -66,7 +66,7 @@ ParaglideItemDuper::ParaglideItemDuper()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void ParaglideItemDuper::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void ParaglideItemDuper::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     ParaglideItemDuper_Descriptor::Stats& stats = env.current_stats<ParaglideItemDuper_Descriptor::Stats>();
 
     /*

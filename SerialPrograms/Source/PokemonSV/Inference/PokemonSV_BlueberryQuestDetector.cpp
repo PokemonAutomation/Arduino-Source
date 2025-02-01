@@ -4,16 +4,13 @@
  *
  */
 
-
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
-#include "PokemonSV/Inference/PokemonSV_BlueberryQuestReader.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "CommonFramework/ImageTools/ImageFilter.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonTools/Images/ImageFilter.h"
+#include "PokemonSV/Inference/PokemonSV_BlueberryQuestReader.h"
 #include "PokemonSV_BlueberryQuestDetector.h"
-
-#include <iostream>
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -77,8 +74,8 @@ std::string BlueberryQuestDetector::detect_quest(const ImageViewRGB32& screen) c
     }
 
     if (results.size() > 1){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, m_logger,
+        throw_and_log<OperationFailedException>(
+            m_logger, ErrorReport::SEND_ERROR_REPORT,
             "BlueberryQuestDetector::detect_quest(): Unable to read selected item. Ambiguous or multiple results."
         );
     }

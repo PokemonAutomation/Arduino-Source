@@ -25,7 +25,7 @@ BeamReset_Descriptor::BeamReset_Descriptor()
         "Reset a beam until you see a purple beam.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 
@@ -49,7 +49,7 @@ BeamReset::BeamReset()
     PA_ADD_OPTION(EXTRA_LINE);
 }
 
-void BeamReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void BeamReset::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
         resume_game_front_of_den_nowatts(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_SLOW);

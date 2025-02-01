@@ -4,16 +4,15 @@
  *
  */
 
-#include <array>
-#include <sstream>
 #include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/Tools/StatsTracking.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "Pokemon/Pokemon_Strings.h"
+#include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonLA/PokemonLA_Settings.h"
 #include "PokemonLA/PokemonLA_TravelLocations.h"
 #include "PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.h"
@@ -41,7 +40,7 @@ RamanasCombeeFinder_Descriptor::RamanasCombeeFinder_Descriptor()
         "Check Ramanas Island Tree until a Combee is found",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 class RamanasCombeeFinder_Descriptor::Stats : public StatsTracker{
@@ -110,17 +109,17 @@ RamanasCombeeFinder:: RamanasCombeeFinder()
 }
 
 
-void RamanasCombeeFinder::check_tree_no_stop(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void RamanasCombeeFinder::check_tree_no_stop(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     context.wait_for_all_requests();
     disable_shiny_sound(context);
     // Throw pokemon
-    pbf_press_button(context, BUTTON_ZR, (0.5 * TICKS_PER_SECOND), 1.5 * TICKS_PER_SECOND);
+    pbf_press_button(context, BUTTON_ZR, (uint16_t)(0.5 * TICKS_PER_SECOND), (uint16_t)(1.5 * TICKS_PER_SECOND));
     context.wait_for_all_requests();
     env.current_stats<RamanasCombeeFinder_Descriptor::Stats>().trees++;
     env.update_stats();
 }
 
-bool RamanasCombeeFinder::check_tree(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+bool RamanasCombeeFinder::check_tree(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     context.wait_for_all_requests();
 
     disable_shiny_sound(context);
@@ -141,16 +140,16 @@ bool RamanasCombeeFinder::check_tree(SingleSwitchProgramEnvironment& env, BotBas
 }
 
 
-void RamanasCombeeFinder::disable_shiny_sound(BotBaseContext& context){
+void RamanasCombeeFinder::disable_shiny_sound(SwitchControllerContext& context){
     context.wait_for_all_requests();
     m_enable_shiny_sound.store(false, std::memory_order_release);
 }
-void RamanasCombeeFinder::enable_shiny_sound(BotBaseContext& context){
+void RamanasCombeeFinder::enable_shiny_sound(SwitchControllerContext& context){
     context.wait_for_all_requests();
     m_enable_shiny_sound.store(true, std::memory_order_release);
 }
 
-bool RamanasCombeeFinder::handle_battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+bool RamanasCombeeFinder::handle_battle(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     RamanasCombeeFinder_Descriptor::Stats& stats = env.current_stats<RamanasCombeeFinder_Descriptor::Stats>();
 
     PokemonDetails pokemon = get_pokemon_details(env.console, context, LANGUAGE);
@@ -171,13 +170,13 @@ bool RamanasCombeeFinder::handle_battle(SingleSwitchProgramEnvironment& env, Bot
     return true;
 }
 
-void RamanasCombeeFinder::grouped_path(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void RamanasCombeeFinder::grouped_path(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
 
     BattleMenuDetector battle_menu_detector(env.console, env.console, true);
 
-    int ret = run_until(
+    int ret = run_until<SwitchControllerContext>(
         env.console, context,
-        [&](BotBaseContext& context){
+        [&](SwitchControllerContext& context){
 
             env.console.log("Checking Tree 1");
             change_mount(env.console,context,MountState::BRAVIARY_ON);
@@ -243,7 +242,7 @@ void RamanasCombeeFinder::grouped_path(SingleSwitchProgramEnvironment& env, BotB
 
 }
 
-void RamanasCombeeFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void RamanasCombeeFinder::run_iteration(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     RamanasCombeeFinder_Descriptor::Stats& stats = env.current_stats<RamanasCombeeFinder_Descriptor::Stats>();
     stats.attempts++;
     env.update_stats();
@@ -255,10 +254,10 @@ void RamanasCombeeFinder::run_iteration(SingleSwitchProgramEnvironment& env, Bot
             break;
         }
         if (c >= 5){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
                 "Failed to switch to Pokemon selection after 5 attempts.",
-                true
+                env.console
             );
         }
         env.console.log("Not on Pokemon selection. Attempting to switch to it...", COLOR_ORANGE);
@@ -281,9 +280,9 @@ void RamanasCombeeFinder::run_iteration(SingleSwitchProgramEnvironment& env, Bot
 
     goto_camp_from_jubilife(env, env.console, context, TravelLocations::instance().Fieldlands_Heights);
 
-    int ret = run_until(
+    int ret = run_until<SwitchControllerContext>(
         env.console, context,
-        [&](BotBaseContext& context){
+        [&](SwitchControllerContext& context){
             grouped_path(env, context);
             context.wait_for_all_requests();
             goto_camp_from_overworld(env, env.console, context);
@@ -304,17 +303,17 @@ void RamanasCombeeFinder::run_iteration(SingleSwitchProgramEnvironment& env, Bot
             pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
             context.wait_for_all_requests();
         }
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, env.console,
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
             "Black out.",
-            true
+            env.console
         );
     }
 
     from_professor_return_to_jubilife(env, env.console, context);
 }
 
-void RamanasCombeeFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void RamanasCombeeFinder::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     RamanasCombeeFinder_Descriptor::Stats& stats = env.current_stats<RamanasCombeeFinder_Descriptor::Stats>();
 
     //  Connect the controller.

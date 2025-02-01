@@ -55,8 +55,7 @@ CollapsibleGroupBox* make_panel_header(
     const std::string& display_name,
     const std::string& doc_link,
     const std::string& description,
-    FeedbackType feedback,
-    PABotBaseLevel serial_level
+    FeedbackType feedback
 ){
     CollapsibleGroupBox* header = make_panel_header(parent, display_name, doc_link, description);
     QLayout* layout = header->widget()->layout();
@@ -91,29 +90,6 @@ CollapsibleGroupBox* make_panel_header(
     text->setWordWrap(true);
     layout->addWidget(text);
 
-    switch (serial_level){
-    case PABotBaseLevel::NOT_PABOTBASE:
-        break;
-    case PABotBaseLevel::PABOTBASE_12KB:{
-#if 0
-        QLabel* text = new QLabel(
-            "<font color=\"blue\">(This program will run on both Arduino Uno R3 and Teensy 2.0.</font>)",
-            header
-        );
-        text->setWordWrap(true);
-        layout->addWidget(text);
-#endif
-        break;
-    }case PABotBaseLevel::PABOTBASE_31KB:{
-        QLabel* label = new QLabel(
-            "<font color=\"red\">(This program requires a Teensy or higher. PABotBase for Arduino Uno R3 does not have all the features required by this program.)</font>",
-            header
-        );
-        label->setWordWrap(true);
-        layout->addWidget(label);
-        break;
-    }
-    }
     return header;
 }
 

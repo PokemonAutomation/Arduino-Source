@@ -66,7 +66,7 @@ void send_status_notification(
 
 void send_raid_notification(
     ProgramEnvironment& env,
-    ConsoleHandle& console,
+    VideoStream& stream,
     AutoHostNotificationOption& settings,
     bool has_code, uint8_t code[8],
     const std::string& slug,
@@ -77,7 +77,7 @@ void send_raid_notification(
         return;
     }
 
-    VideoSnapshot screen = console.video().snapshot();
+    VideoSnapshot screen = stream.video().snapshot();
 
     std::vector<std::pair<std::string, std::string>> embeds;
 

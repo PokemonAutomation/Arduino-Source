@@ -8,18 +8,18 @@
 #define PokemonAutomation_PokemonSwSh_StatsResetCalyrex_H
 
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
-#include "CommonFramework/Options/LanguageOCROption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
+#include "CommonTools/Options/LanguageOCROption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
 #include "Pokemon/Options/Pokemon_IvJudgeOption.h"
 #include "PokemonSwSh/Options/PokemonSwSh_BallSelectOption.h"
-#include "PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
+
 using namespace Pokemon;
 
 
@@ -36,7 +36,7 @@ public:
 class StatsResetCalyrex : public SingleSwitchProgramInstance{
 public:
     StatsResetCalyrex();
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
     StartInGripOrGameOption START_LOCATION;

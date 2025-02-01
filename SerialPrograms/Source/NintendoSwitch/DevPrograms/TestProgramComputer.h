@@ -8,7 +8,7 @@
 #define PokemonAutomation_Computer_TestProgram_H
 
 #include "Common/Cpp/Options/StaticTextOption.h"
-#include "CommonFramework/Options/ScreenWatchOption.h"
+#include "CommonTools/Options/ScreenWatchOption.h"
 #include "ComputerPrograms/ComputerProgram.h"
 
 namespace PokemonAutomation{

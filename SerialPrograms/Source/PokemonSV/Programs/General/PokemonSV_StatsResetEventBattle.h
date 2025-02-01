@@ -9,7 +9,7 @@
 
 #include "Common/Cpp/Options/StringOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
-#include "CommonFramework/Options/LanguageOCROption.h"
+#include "CommonTools/Options/LanguageOCROption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "Pokemon/Options/Pokemon_StatsHuntFilter.h"
@@ -52,10 +52,10 @@ public:
 class StatsResetEventBattle : public SingleSwitchProgramInstance{
 public:
     StatsResetEventBattle();
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
-    bool check_stats_after_win(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    bool check_stats_after_win(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
 
 private:
     enum class Target{
@@ -77,10 +77,10 @@ private:
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;
 
-    void enter_battle_ursaluna(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-    void enter_battle_pecharunt(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-    bool run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-    bool check_stats(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    void enter_battle_ursaluna(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
+    void enter_battle_pecharunt(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
+    bool run_battle(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
+    bool check_stats(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
 };
 
 }

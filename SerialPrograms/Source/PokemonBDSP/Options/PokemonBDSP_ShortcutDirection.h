@@ -4,8 +4,8 @@
  *
  */
 
-#include "ClientSource/Connection/BotBase.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 
 #ifndef PokemonAutomation_PokemonBDSP_ShortcutDirection_H
 #define PokemonAutomation_PokemonBDSP_ShortcutDirection_H
@@ -32,7 +32,7 @@ class ShortcutDirectionOption : public EnumDropdownOption<ShortcutDirection>{
 public:
     ShortcutDirectionOption(std::string label);
 
-    void run(BotBaseContext& context, uint16_t delay);
+    void run(SwitchControllerContext& context, uint16_t delay);
 
 };
 

@@ -6,10 +6,9 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "CommonFramework/ImageTools/SolidColorTest.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonTools/Images/SolidColorTest.h"
 #include "PokemonSV_PokePortalDetector.h"
 
 namespace PokemonAutomation{
@@ -77,12 +76,12 @@ int PokePortalDetector::detect_location(const ImageViewRGB32& screen) const{
 
 
 bool PokePortalDetector::move_cursor(
-    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context,
     int row
 ) const{
     if (row < 0 || row >= 7){
         throw InternalProgramError(
-            &console.logger(), PA_CURRENT_FUNCTION,
+            &stream.logger(), PA_CURRENT_FUNCTION,
             "PokePortalDetector::move_cursor() called with invalid row."
         );
     }
@@ -92,7 +91,7 @@ bool PokePortalDetector::move_cursor(
     bool target_reached = false;
     while (true){
         context.wait_for_all_requests();
-        VideoSnapshot screen = console.video().snapshot();
+        VideoSnapshot screen = stream.video().snapshot();
         int current = this->detect_location(screen);
 
         //  Failed to detect menu.
@@ -100,7 +99,7 @@ bool PokePortalDetector::move_cursor(
             consecutive_detection_fails++;
             if (consecutive_detection_fails > 10){
                 dump_image_and_throw_recoverable_exception(
-                    info, console, "UnableToDetectPokePortal",
+                    info, stream, "UnableToDetectPokePortal",
                     "Unable to detect Poke Portal."
                 );
             }
@@ -110,7 +109,7 @@ bool PokePortalDetector::move_cursor(
         consecutive_detection_fails = 0;
 
         if (moves >= 10){
-            console.log("Unable to move to target after 10 moves.", COLOR_RED);
+            stream.log("Unable to move to target after 10 moves.", COLOR_RED);
             return false;
         }
 

@@ -33,11 +33,11 @@ public:
 class ShinyHuntFishing : public SingleSwitchProgramInstance{
 public:
     ShinyHuntFishing();
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 
 private:
-    void run_trigger(BotBaseContext& context) const;
+    void run_trigger(SwitchControllerContext& context) const;
     bool find_encounter(SingleSwitchProgramEnvironment& env) const;
 
 private:

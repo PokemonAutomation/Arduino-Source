@@ -6,12 +6,12 @@
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
-#include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
-#include "CommonFramework/Inference/ImageMatchDetector.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
+#include "CommonTools/Async/InferenceRoutines.h"
+#include "CommonTools/VisualDetectors/ImageMatchDetector.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Pokemon_Notification.h"
 #include "PokemonSwSh/ShinyHuntTracker.h"
 #include "PokemonBDSP/PokemonBDSP_Settings.h"
@@ -34,7 +34,7 @@ StarterReset_Descriptor::StarterReset_Descriptor()
         "Shiny hunt your starter " + STRING_POKEMON + ".",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 struct StarterReset_Descriptor::Stats : public PokemonSwSh::ShinyHuntTracker{
@@ -101,7 +101,7 @@ StarterReset::StarterReset()
 
 
 
-void StarterReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void StarterReset::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     StarterReset_Descriptor::Stats& stats = env.current_stats<StarterReset_Descriptor::Stats>();
 
     std::shared_ptr<const ImageRGB32> briefcase = std::make_shared<const ImageRGB32>(RESOURCE_PATH() + "PokemonBDSP/StarterBriefcase.png");
@@ -116,10 +116,10 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         env.update_stats();
 
         if (consecutive_failures >= 3){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
                 "Failed 3 times in the row.",
-                true
+                env.console
             );
         }
 
@@ -138,9 +138,9 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
 
         //  Mash B until we see the briefcase.
         ImageMatchWatcher detector(briefcase, {0.5, 0.1, 0.5, 0.7}, 100, true);
-        int ret = run_until(
+        int ret = run_until<SwitchControllerContext>(
             env.console, context,
-            [](BotBaseContext& context){
+            [](SwitchControllerContext& context){
                 pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
             },
             {{detector}}
@@ -151,7 +151,7 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
             env.log("Timed out waiting for briefcase.", COLOR_RED);
             stats.add_error();
             consecutive_failures++;
-            dump_image(env.program_info(), env.console, "Briefcase");
+            dump_image(env.console, env.program_info(), env.console, "Briefcase");
             continue;
         }
 
@@ -212,7 +212,7 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         if (result_own.shiny_type == ShinyType::UNKNOWN){
             stats.add_error();
             consecutive_failures++;
-            dump_image(env.program_info(), env.console, "UnknownShinyDetection");
+            dump_image(env.console, env.program_info(), env.console, "UnknownShinyDetection");
         }else{
             consecutive_failures = 0;
         }
@@ -227,18 +227,8 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
                 true, true, {{{"starly"}, ShinyType::UNKNOWN_SHINY}}, result_wild.alpha,
                 result_wild.get_best_screenshot()
             );
-        }else{
-#if 0
-            send_encounter_notification(
-                env.console,
-                NOTIFICATION_NONSHINY,
-                NOTIFICATION_SHINY,
-                env.program_info(),
-                true, false, {{{"starly"}, ShinyType::NOT_SHINY}}, result_wild.alpha,
-                result_wild.get_best_screenshot(),
-                &stats
-            );
-#endif
+            pbf_wait(context, 5 * TICKS_PER_SECOND);
+            pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
         }
 
         bool your_shiny = is_likely_shiny(result_own.shiny_type);
@@ -251,6 +241,8 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
                 true, true, {{{starter}, ShinyType::UNKNOWN_SHINY}}, result_own.alpha,
                 result_own.get_best_screenshot()
             );
+            pbf_wait(context, 5 * TICKS_PER_SECOND);
+            pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
             break;
         }else{
             stats.add_non_shiny();
@@ -262,12 +254,6 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
                 result_own.get_best_screenshot()
             );
         }
-
-        if ((wild_shiny || your_shiny) && VIDEO_ON_SHINY){
-            pbf_wait(context, 5 * TICKS_PER_SECOND);
-            pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
-        }
-
     }
 
     env.update_stats();

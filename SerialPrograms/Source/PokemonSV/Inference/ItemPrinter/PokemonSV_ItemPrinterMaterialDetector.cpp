@@ -7,18 +7,18 @@
 #include <map>
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Common/Cpp/Concurrency/AsyncDispatcher.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
-#include "CommonFramework/ImageTools/ImageFilter.h"
-#include "CommonFramework/OCR/OCR_NumberReader.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "CommonTools/Images/ImageFilter.h"
+#include "CommonTools/OCR/OCR_NumberReader.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSV_ItemPrinterMaterialDetector.h"
-#include <iostream>
+
+//#include <iostream>
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -115,15 +115,15 @@ int16_t ItemPrinterMaterialDetector::read_number(
 // check each row on the screen for Happiny Dust
 int8_t ItemPrinterMaterialDetector::find_happiny_dust_row_index(
     AsyncDispatcher& dispatcher,
-    ConsoleHandle& console, BotBaseContext& context
+    VideoStream& stream, SwitchControllerContext& context
 ) const{
     int8_t value_68_row_index;
     for (size_t c = 0; c < 30; c++){
         context.wait_for_all_requests();
-        std::vector<int8_t> value_68_row_index_list = find_material_value_row_index(dispatcher, console, context, 68);
+        std::vector<int8_t> value_68_row_index_list = find_material_value_row_index(dispatcher, stream, context, 68);
         for (size_t i = 0; i < value_68_row_index_list.size(); i++){
             value_68_row_index = value_68_row_index_list[i];
-            if (detect_material_name(console, context, value_68_row_index) == "happiny-dust"){  
+            if (detect_material_name(stream, context, value_68_row_index) == "happiny-dust"){
                 // found screen and row number with Happiny dust.
                 // std::cout << "Happiny dust found. Row number: " << std::to_string(value_68_row_index) << std::endl;
                 return value_68_row_index;
@@ -134,10 +134,10 @@ int8_t ItemPrinterMaterialDetector::find_happiny_dust_row_index(
         pbf_press_dpad(context, DPAD_RIGHT, 20, 30);
     }
 
-    throw OperationFailedException(
+    OperationFailedException::fire(
         ErrorReport::SEND_ERROR_REPORT,
-        console,
-        "Failed to find Happiny dust after 10 tries."
+        "Failed to find Happiny dust after 10 tries.",
+        stream
     );
 
 }
@@ -147,15 +147,15 @@ int8_t ItemPrinterMaterialDetector::find_happiny_dust_row_index(
 // so it can only reliably read the material names with 68% value
 // (i.e. Ditto Goo, Happiny Dust, Magby Hair, Beldum Claw)
 std::string ItemPrinterMaterialDetector::detect_material_name(
-    ConsoleHandle& console, 
-    BotBaseContext& context,
+    VideoStream& stream,
+    SwitchControllerContext& context,
     int8_t row_index
 ) const{
-    VideoSnapshot snapshot = console.video().snapshot();
+    VideoSnapshot snapshot = stream.video().snapshot();
     ImageFloatBox material_name_box = m_box_mat_name[row_index];
     ImageViewRGB32 material_name_image = extract_box_reference(snapshot, material_name_box);
     const auto ocr_result = MaterialNameReader::instance().read_substring(
-        console, m_language, 
+        stream.logger(), m_language,
         material_name_image, OCR::BLACK_OR_WHITE_TEXT_FILTERS()
     );
 
@@ -171,10 +171,10 @@ std::string ItemPrinterMaterialDetector::detect_material_name(
     }
 
     if (results.size() > 1){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, 
-            console,
-            "ItemPrinterMaterialDetector::detect_material_name(): Unable to read selected item. Ambiguous or multiple results."
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "ItemPrinterMaterialDetector::detect_material_name(): Unable to read selected item. Ambiguous or multiple results.",
+            stream
         );
     }
 
@@ -184,19 +184,19 @@ std::string ItemPrinterMaterialDetector::detect_material_name(
 // return vector of row index(es) that matches given material_value.
 std::vector<int8_t> ItemPrinterMaterialDetector::find_material_value_row_index(
     AsyncDispatcher& dispatcher,
-    ConsoleHandle& console, 
-    BotBaseContext& context,
+    VideoStream& stream,
+    SwitchControllerContext& context,
     int16_t material_value
 ) const{
     context.wait_for_all_requests();
-    VideoSnapshot snapshot = console.video().snapshot();
+    VideoSnapshot snapshot = stream.video().snapshot();
     int8_t total_rows = 10;
     std::vector<int8_t> row_indexes;
     SpinLock lock;
     std::vector<std::unique_ptr<AsyncTask>> tasks(total_rows);
     for (int8_t row_index = 0; row_index < total_rows; row_index++){
         tasks[row_index] = dispatcher.dispatch([&, row_index]{
-            int16_t value = read_number(console, dispatcher, snapshot, m_box_mat_value[row_index]);
+            int16_t value = read_number(stream.logger(), dispatcher, snapshot, m_box_mat_value[row_index]);
             if (value == material_value){
                 WriteSpinLock lg(lock);
                 row_indexes.push_back(row_index);
@@ -211,13 +211,13 @@ std::vector<int8_t> ItemPrinterMaterialDetector::find_material_value_row_index(
 // detect the quantity of material at the given row number
 int16_t ItemPrinterMaterialDetector::detect_material_quantity(
     AsyncDispatcher& dispatcher,
-    ConsoleHandle& console, 
-    BotBaseContext& context,
+    VideoStream& stream,
+    SwitchControllerContext& context,
     int8_t row_index
 ) const{
     context.wait_for_all_requests();
-    VideoSnapshot snapshot = console.video().snapshot();
-    int16_t value = read_number(console, dispatcher, snapshot, m_box_mat_quantity[row_index]);
+    VideoSnapshot snapshot = stream.video().snapshot();
+    int16_t value = read_number(stream.logger(), dispatcher, snapshot, m_box_mat_quantity[row_index]);
     return value;
 }
 

@@ -18,6 +18,12 @@
 #endif
 
 
+#ifdef __cplusplus
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+#endif
+
+
 #define PABB_MSG_COMMAND_DEBUG_I32              0xf0
 typedef struct{
     seqnum_t seqnum;
@@ -97,6 +103,12 @@ typedef struct{
     uint16_t hold;
     uint8_t cool;
 } PABB_PACK pabb_ssf_issue_scroll;
+
+
+#ifdef __cplusplus
+}
+}
+#endif
 
 
 #if _WIN32

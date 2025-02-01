@@ -6,7 +6,7 @@
 
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/Tools/StatsTracking.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "ZeldaTotK_BowItemDuper.h"
 
@@ -24,7 +24,7 @@ BowItemDuper_Descriptor::BowItemDuper_Descriptor()
         "Use the Bow Swap Glitch to farm any fusable items.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 
@@ -69,7 +69,7 @@ BowItemDuper::BowItemDuper()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void BowItemDuper::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void BowItemDuper::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     // assert_16_9_720p_min(env.logger(), env.console);
 
     // just do a forever loop where we have to do stuff

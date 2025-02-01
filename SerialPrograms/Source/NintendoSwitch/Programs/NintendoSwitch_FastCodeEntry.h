@@ -9,16 +9,15 @@
 
 #include <stdint.h>
 #include <string>
-#include <vector>
 #include "Common/Cpp/Options/GroupOption.h"
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/TimeExpressionOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 
 namespace PokemonAutomation{
     class Logger;
-    class BotBaseContext;
 namespace NintendoSwitch{
 
 
@@ -52,10 +51,10 @@ struct CodeboardPosition{
     uint8_t col;
 };
 struct CodeboardScroll{
-    uint8_t direction : 4;
-    uint8_t delay : 4;
+    DpadPosition direction;
+    uint8_t delay;
 };
-static_assert(sizeof(CodeboardScroll) == sizeof(uint8_t));
+//static_assert(sizeof(CodeboardScroll) == sizeof(uint8_t));
 struct DigitPath{
     uint8_t length = 0;
     bool left_cursor = false;
@@ -65,7 +64,7 @@ DigitPath get_codeboard_digit_path(
     CodeboardPosition source, CodeboardPosition destination,
     uint8_t scroll_delay, uint8_t wrap_delay, bool reordering
 );
-void move_codeboard(BotBaseContext& context, const DigitPath& path);
+void move_codeboard(SwitchControllerContext& context, const DigitPath& path);
 
 
 
@@ -83,7 +82,7 @@ struct FastCodeEntrySettings{
 };
 void enter_alphanumeric_code(
     Logger& logger,
-    BotBaseContext& context,
+    SwitchControllerContext& context,
     const FastCodeEntrySettings& settings,
     const std::string& code
 );

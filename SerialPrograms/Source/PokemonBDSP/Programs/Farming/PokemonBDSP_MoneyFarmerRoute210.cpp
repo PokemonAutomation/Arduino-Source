@@ -5,9 +5,9 @@
  */
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonBDSP/PokemonBDSP_Settings.h"
@@ -32,7 +32,7 @@ MoneyFarmerRoute210_Descriptor::MoneyFarmerRoute210_Descriptor()
         "Farm money by using VS Seeker to rebattle the Ace Trainer couple on Route 210.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 struct MoneyFarmerRoute210_Descriptor::Stats : public StatsTracker{
@@ -110,16 +110,16 @@ MoneyFarmerRoute210::MoneyFarmerRoute210()
 
 
 
-bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context, uint8_t pp0[4], uint8_t pp1[4]){
+bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, uint8_t pp0[4], uint8_t pp1[4]){
     MoneyFarmerRoute210_Descriptor::Stats& stats = env.current_stats<MoneyFarmerRoute210_Descriptor::Stats>();
 
     env.log("Starting battle!");
 
     {
         StartBattleDetector detector(env.console);
-        int ret = run_until(
+        int ret = run_until<SwitchControllerContext>(
             env.console, context,
-            [](BotBaseContext& context){
+            [](SwitchControllerContext& context){
                 pbf_press_button(context, BUTTON_ZL, 10, 10);
                 for (size_t c = 0; c < 17; c++){
                     pbf_press_dpad(context, DPAD_UP, 5, 10);
@@ -149,9 +149,9 @@ bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, BotBaseCon
         BattleMenuWatcher battle_menu(BattleType::TRAINER);
         EndBattleWatcher end_battle;
         SelectionArrowFinder learn_move(env.console, {0.50, 0.62, 0.40, 0.18}, COLOR_YELLOW);
-        int ret = run_until(
+        int ret = run_until<SwitchControllerContext>(
             env.console, context,
-            [](BotBaseContext& context){
+            [](SwitchControllerContext& context){
                 pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
             },
             {
@@ -174,10 +174,10 @@ bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, BotBaseCon
                     }
                 }
                 if (slot == 4){
-                    throw OperationFailedException(
-                        ErrorReport::SEND_ERROR_REPORT, env.console,
+                    OperationFailedException::fire(
+                        ErrorReport::SEND_ERROR_REPORT,
                         "Ran out of PP in a battle.",
-                        true
+                        env.console
                     );
                 }
 
@@ -198,10 +198,10 @@ bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, BotBaseCon
                     }
                 }
                 if (slot == 4){
-                    throw OperationFailedException(
-                        ErrorReport::SEND_ERROR_REPORT, env.console,
+                    OperationFailedException::fire(
+                        ErrorReport::SEND_ERROR_REPORT,
                         "Ran out of PP in a battle.",
-                        true
+                        env.console
                     );
                 }
 
@@ -228,22 +228,25 @@ bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, BotBaseCon
             return true;
         default:
             stats.m_errors++;
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
                 "Timed out after 2 minutes.",
-                true
+                env.console
             );
         }
     }
 
-    throw OperationFailedException(
-        ErrorReport::SEND_ERROR_REPORT, env.console,
+    OperationFailedException::fire(
+        ErrorReport::SEND_ERROR_REPORT,
         "No progress detected after 5 battle menus. Are you out of PP?",
-        true
+        env.console
     );
 }
 
-void MoneyFarmerRoute210::heal_at_center_and_return(Logger& logger, BotBaseContext& context, uint8_t pp0[4], uint8_t pp1[4]){
+void MoneyFarmerRoute210::heal_at_center_and_return(
+    Logger& logger, SwitchControllerContext& context,
+    uint8_t pp0[4], uint8_t pp1[4]
+){
     logger.log("Healing " + STRING_POKEMON + " Celestic Town " + STRING_POKEMON + " Center.");
     pbf_move_left_joystick(context, 125, 0, 6 * TICKS_PER_SECOND, 0);
     pbf_mash_button(context, BUTTON_ZL, 3 * TICKS_PER_SECOND);
@@ -281,7 +284,10 @@ void MoneyFarmerRoute210::heal_at_center_and_return(Logger& logger, BotBaseConte
     pp1[2] = MON1_MOVE3_PP;
     pp1[3] = MON1_MOVE4_PP;
 }
-void MoneyFarmerRoute210::fly_to_center_heal_and_return(Logger& logger, BotBaseContext& context, uint8_t pp0[4], uint8_t pp1[4]){
+void MoneyFarmerRoute210::fly_to_center_heal_and_return(
+    Logger& logger, SwitchControllerContext& context,
+    uint8_t pp0[4], uint8_t pp1[4]
+){
     logger.log("Flying back to Hearthome City to heal.");
     pbf_press_button(context, BUTTON_X, 10, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
     pbf_press_button(context, BUTTON_PLUS, 10, 240);
@@ -292,16 +298,17 @@ void MoneyFarmerRoute210::fly_to_center_heal_and_return(Logger& logger, BotBaseC
 }
 
 bool MoneyFarmerRoute210::heal_after_battle_and_return(
-    SingleSwitchProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    SingleSwitchProgramEnvironment& env,
+    VideoStream& stream, SwitchControllerContext& context,
     uint8_t pp0[4], uint8_t pp1[4])
 {
     if (HEALING_METHOD == HealMethod::CelesticTown){
         // Go to Celestic Town Pokecenter to heal the party.
-        fly_to_center_heal_and_return(console, context, pp0, pp1);
+        fly_to_center_heal_and_return(stream.logger(), context, pp0, pp1);
         return false;
     }else{
         // Use Global Room to heal the party.
-        heal_by_global_room(console, context);
+        heal_by_global_room(stream, context);
 
         pp0[0] = MON0_MOVE1_PP;
         pp0[1] = MON0_MOVE2_PP;
@@ -328,7 +335,7 @@ bool MoneyFarmerRoute210::has_pp(uint8_t pp0[4], uint8_t pp1[4]){
 
 
 
-void MoneyFarmerRoute210::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void MoneyFarmerRoute210::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     MoneyFarmerRoute210_Descriptor::Stats& stats = env.current_stats<MoneyFarmerRoute210_Descriptor::Stats>();
 
     uint8_t pp0[4] = {
@@ -380,9 +387,9 @@ void MoneyFarmerRoute210::program(SingleSwitchProgramEnvironment& env, BotBaseCo
         std::vector<ImagePixelBox> bubbles;
         {
             VSSeekerReactionTracker tracker(env.console, {0.20, 0.20, 0.60, 0.60});
-            run_until(
+            run_until<SwitchControllerContext>(
                 env.console, context,
-                [this](BotBaseContext& context){
+                [this](SwitchControllerContext& context){
                     SHORTCUT.run(context, TICKS_PER_SECOND);
                 },
                 {{tracker}}

@@ -6,11 +6,11 @@
 
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "CommonFramework/Inference/BlackScreenDetector.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/Tools/StatsTracking.h"
-#include "CommonFramework/Tools/VideoResolutionCheck.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
+#include "CommonTools/Async/InferenceRoutines.h"
+#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
+#include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
@@ -35,7 +35,7 @@ FlyingTrialFarmer_Descriptor::FlyingTrialFarmer_Descriptor()
         "Farm the flying trial for BP.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 struct FlyingTrialFarmer_Descriptor::Stats : public StatsTracker{
@@ -110,16 +110,16 @@ FlyingTrialFarmer::FlyingTrialFarmer()
 
 
 
-bool FlyingTrialFarmer::run_rewards(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+bool FlyingTrialFarmer::run_rewards(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     bool trial_failed = true;
     while (true){
         DialogBoxWatcher dialog(COLOR_GREEN, true, std::chrono::milliseconds(250), DialogType::DIALOG_BLACK);
         OverworldWatcher overworld(env.console, COLOR_CYAN);
         context.wait_for_all_requests();
 
-        int ret_finish = run_until(
+        int ret_finish = run_until<SwitchControllerContext>(
             env.console, context,
-            [](BotBaseContext& context){
+            [](SwitchControllerContext& context){
                 pbf_mash_button(context, BUTTON_B, 10000);
             },
             { dialog, overworld }
@@ -133,10 +133,10 @@ bool FlyingTrialFarmer::run_rewards(SingleSwitchProgramEnvironment& env, BotBase
         case 1: // overworld
             return trial_failed;
         default:
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
                 "No recognized state after 80 seconds.",
-                true
+                env.console
             );
         }
     }
@@ -150,7 +150,7 @@ uint8_t FlyingTrialFarmer::get_final_y_axis(int8_t delta_y){
     }
 }
 
-void FlyingTrialFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void FlyingTrialFarmer::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
     FlyingTrialFarmer_Descriptor::Stats& stats = env.current_stats<FlyingTrialFarmer_Descriptor::Stats>();
@@ -162,9 +162,9 @@ void FlyingTrialFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseCont
         BlackScreenOverWatcher black_screen(COLOR_RED, { 0.2, 0.2, 0.6, 0.6 });
         context.wait_for_all_requests();
 
-        int ret_entry = run_until(
+        int ret_entry = run_until<SwitchControllerContext>(
             env.console, context,
-            [](BotBaseContext& context){
+            [](SwitchControllerContext& context){
                 pbf_mash_button(context, BUTTON_A, 10000);
             },
             { black_screen }

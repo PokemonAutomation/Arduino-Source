@@ -9,8 +9,8 @@
 
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
-#include "CommonFramework/Inference/VisualDetector.h"
+#include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
+#include "CommonTools/VisualDetector.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -80,6 +80,7 @@ public:
 
 
 //  Detect dialog that prompts the player to make a choice.
+//  i.e. detects that Dialog box and Gradient arrow are present
 class PromptDialogDetector : public StaticScreenDetector{
 public:
     //  Will catch any prompt.

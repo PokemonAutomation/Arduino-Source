@@ -16,15 +16,15 @@ using NativeAudioSource = QAudioSource;
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Time.h"
-#include "Common/Cpp/StreamConverters.h"
+//#include "Common/Cpp/StreamConverters.h"
 #include "CommonFramework/AudioPipeline/AudioStream.h"
 #include "CommonFramework/AudioPipeline/Tools/AudioFormatUtils.h"
 #include "AudioFileLoader.h"
 #include "AudioSource.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 
@@ -40,9 +40,12 @@ public:
     {
         logger.log("AudioInputFile(): " + dumpAudioFormat(format));
         m_source = std::make_unique<AudioFileLoader>(nullptr, file, format);
-        connect(m_source.get(), &AudioFileLoader::bufferReady, this, [this](const char* data, size_t len){
-            m_reader.push_bytes(data, len);
-        });
+        connect(
+            m_source.get(), &AudioFileLoader::bufferReady,
+            this, [this](const char* data, size_t len){
+                m_reader.push_bytes(data, len);
+            }
+        );
         m_source->start();
     }
 
@@ -105,11 +108,10 @@ public:
 private:
     virtual void on_samples(const float* data, size_t objects) override{
 //        cout << "objects = " << objects << endl;
-        ReadSpinLock lg(m_parent.m_lock);
-        for (AudioFloatStreamListener* listener : m_parent.m_listeners){
-//            listener->on_samples(data, objects * m_parent.m_multiplier);
-            listener->on_samples(data, objects);
-        }
+        m_parent.m_listeners.run_method_unique(
+            &AudioFloatStreamListener::on_samples,
+            data, objects
+        );
     }
 
     AudioSource& m_parent;
@@ -119,12 +121,12 @@ private:
 
 
 void AudioSource::add_listener(AudioFloatStreamListener& listener){
-    WriteSpinLock lg(m_lock);
-    m_listeners.insert(&listener);
+    auto scope_check = m_sanitizer.check_scope();
+    m_listeners.add(listener);
 }
 void AudioSource::remove_listener(AudioFloatStreamListener& listener){
-    WriteSpinLock lg(m_lock);
-    m_listeners.erase(&listener);
+    auto scope_check = m_sanitizer.check_scope();
+    m_listeners.remove(listener);
 }
 
 
@@ -154,6 +156,7 @@ AudioSource::AudioSource(Logger& logger, const AudioDeviceInfo& device, AudioCha
 }
 
 void AudioSource::init(AudioChannelFormat format, AudioSampleFormat stream_format, float volume_multiplier){
+    auto scope_check = m_sanitizer.check_scope();
     switch (format){
     case AudioChannelFormat::MONO_48000:
         m_sample_rate = 48000;

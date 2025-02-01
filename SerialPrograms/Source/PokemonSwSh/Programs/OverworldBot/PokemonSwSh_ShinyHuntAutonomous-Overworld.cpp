@@ -7,7 +7,7 @@
 #include <cmath>
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
@@ -36,7 +36,7 @@ ShinyHuntAutonomousOverworld_Descriptor::ShinyHuntAutonomousOverworld_Descriptor
         "Automatically shiny hunt overworld " + STRING_POKEMON + " with video feedback.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 struct ShinyHuntAutonomousOverworld_Descriptor::Stats : public ShinyHuntTracker{
@@ -164,12 +164,12 @@ ShinyHuntAutonomousOverworld::ShinyHuntAutonomousOverworld()
 
 
 bool ShinyHuntAutonomousOverworld::find_encounter(
-    ConsoleHandle& console, BotBaseContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     ShinyHuntAutonomousOverworld_Descriptor::Stats& stats,
     WallClock expiration
 ) const{
     OverlayBoxScope self(
-        console,
+        stream.overlay(),
         {
             OverworldTargetTracker::OVERWORLD_CENTER_X - 0.02,
             OverworldTargetTracker::OVERWORLD_CENTER_Y - 0.05,
@@ -180,7 +180,7 @@ bool ShinyHuntAutonomousOverworld::find_encounter(
     );
 
     OverworldTargetTracker target_tracker(
-        console, console,
+        stream.logger(), stream.overlay(),
         std::chrono::milliseconds(1000),
         MARK_OFFSET,
         MARK_PRIORITY,
@@ -234,9 +234,9 @@ bool ShinyHuntAutonomousOverworld::find_encounter(
             StandardBattleMenuWatcher battle_menu_detector(false);
             StartBattleWatcher start_battle_detector;
 
-            int result = run_until(
-                console, context,
-                [&](BotBaseContext& context){
+            int result = run_until<SwitchControllerContext>(
+                stream, context,
+                [&](SwitchControllerContext& context){
                     trigger->run(context);
                 },
                 {
@@ -248,10 +248,10 @@ bool ShinyHuntAutonomousOverworld::find_encounter(
 
             switch (result){
             case 0:
-                console.log("Unexpected Battle.", COLOR_RED);
+                stream.log("Unexpected Battle.", COLOR_RED);
                 return false;
             case 1:
-                console.log("Battle started!");
+                stream.log("Battle started!");
                 return true;
             }
         }
@@ -262,11 +262,11 @@ bool ShinyHuntAutonomousOverworld::find_encounter(
 //        env.log("target: " + std::to_string(target.first));
 
         if (target.first < 0){
-            console.log("No targets found.", COLOR_ORANGE);
+            stream.log("No targets found.", COLOR_ORANGE);
             continue;
         }
         if (target.first > MAX_TARGET_ALPHA){
-            console.log(
+            stream.log(
                 std::string("Target too Weak: ") +
                 (target.second.mark == OverworldMark::EXCLAMATION_MARK ? "Exclamation" : "Question") +
                 " at [" +
@@ -278,7 +278,7 @@ bool ShinyHuntAutonomousOverworld::find_encounter(
             continue;
         }
 
-        if (charge_at_target(console, context, target)){
+        if (charge_at_target(stream, context, target)){
             return true;
         }
     }
@@ -286,11 +286,11 @@ bool ShinyHuntAutonomousOverworld::find_encounter(
 
 
 bool ShinyHuntAutonomousOverworld::charge_at_target(
-    ConsoleHandle& console, BotBaseContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     const std::pair<double, OverworldTarget>& target
 ) const{
-    OverlayBoxScope target_box(console, target.second.box, COLOR_YELLOW);
-    console.log(
+    OverlayBoxScope target_box(stream.overlay(), target.second.box, COLOR_YELLOW);
+    stream.log(
         std::string("Best Target: ") +
         (target.second.mark == OverworldMark::EXCLAMATION_MARK ? "Exclamation" : "Question") +
         " at [" +
@@ -305,7 +305,7 @@ bool ShinyHuntAutonomousOverworld::charge_at_target(
         (double)trajectory.joystick_y - 128,
         (double)trajectory.joystick_x - 128
     ) * 57.295779513082320877;
-    console.log(
+    stream.log(
         "Trajectory: Distance = " + std::to_string(trajectory.distance_in_ticks) +
         ", Direction = " + tostr_default(-angle) + " degrees"
     );
@@ -319,16 +319,16 @@ bool ShinyHuntAutonomousOverworld::charge_at_target(
     StandardBattleMenuWatcher battle_menu_detector(false);
     StartBattleWatcher start_battle_detector;
     OverworldTargetTracker target_tracker(
-        console, console,
+        stream.logger(), stream.overlay(),
         std::chrono::milliseconds(1000),
         MARK_OFFSET,
         MARK_PRIORITY,
         MAX_TARGET_ALPHA
     );
 
-    int result = run_until(
-        console, context,
-        [&](BotBaseContext& context){
+    int result = run_until<SwitchControllerContext>(
+        stream, context,
+        [&](SwitchControllerContext& context){
             //  Move to target.
             pbf_move_left_joystick(
                 context,
@@ -357,10 +357,10 @@ bool ShinyHuntAutonomousOverworld::charge_at_target(
 
     switch (result){
     case 0:
-        console.log("Unexpected Battle.", COLOR_RED);
+        stream.log("Unexpected Battle.", COLOR_RED);
         return true;
     case 1:
-        console.log("Battle started!");
+        stream.log("Battle started!");
         return true;
     default:
         return false;
@@ -372,7 +372,7 @@ bool ShinyHuntAutonomousOverworld::charge_at_target(
 
 
 
-void ShinyHuntAutonomousOverworld::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void ShinyHuntAutonomousOverworld::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     srand((unsigned)time(nullptr));
 
     if (START_LOCATION.start_in_grip_menu()){
@@ -383,9 +383,12 @@ void ShinyHuntAutonomousOverworld::program(SingleSwitchProgramEnvironment& env, 
     }
     pbf_move_right_joystick(context, 128, 255, TICKS_PER_SECOND, 0);
 
-    const std::chrono::milliseconds TIMEOUT((uint64_t)WATCHDOG_TIMER * 1000 / TICKS_PER_SECOND);
-    const uint32_t PERIOD = (uint32_t)TIME_ROLLBACK_HOURS * 3600 * TICKS_PER_SECOND;
-    uint32_t last_touch = system_clock(context);
+    WallDuration TIMEOUT = std::chrono::milliseconds((uint64_t)WATCHDOG_TIMER * 1000 / TICKS_PER_SECOND);
+    WallDuration PERIOD = std::chrono::hours(TIME_ROLLBACK_HOURS);
+    WallClock last_touch = current_time();
+//    const std::chrono::milliseconds TIMEOUT((uint64_t)WATCHDOG_TIMER * 1000 / TICKS_PER_SECOND);
+//    const uint32_t PERIOD = (uint32_t)TIME_ROLLBACK_HOURS * 3600 * TICKS_PER_SECOND;
+//    uint32_t last_touch = system_clock(context);
 
     ShinyHuntAutonomousOverworld_Descriptor::Stats& stats = env.current_stats<ShinyHuntAutonomousOverworld_Descriptor::Stats>();
     env.update_stats();
@@ -401,7 +404,8 @@ void ShinyHuntAutonomousOverworld::program(SingleSwitchProgramEnvironment& env, 
     auto last = current_time();
     while (true){
         //  Touch the date.
-        if (TIME_ROLLBACK_HOURS > 0 && system_clock(context) - last_touch >= PERIOD){
+        if (TIME_ROLLBACK_HOURS > 0 && current_time() - last_touch >= PERIOD){
+//        if (TIME_ROLLBACK_HOURS > 0 && system_clock(context) - last_touch >= PERIOD){
             pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
             rollback_hours_from_home(context, TIME_ROLLBACK_HOURS, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
             resume_game_no_interact(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);

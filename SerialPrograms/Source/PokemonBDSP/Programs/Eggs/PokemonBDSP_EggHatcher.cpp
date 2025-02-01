@@ -4,8 +4,8 @@
  *
  */
 
-#include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
@@ -29,7 +29,7 @@ EggHatcher_Descriptor::EggHatcher_Descriptor()
         "Hatch eggs from boxes.",
         FeedbackType::OPTIONAL_,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 struct EggHatcher_Descriptor::Stats : public StatsTracker{
@@ -93,7 +93,7 @@ EggHatcher::EggHatcher()
 
 
 
-void EggHatcher::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void EggHatcher::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     EggHatcher_Descriptor::Stats& stats = env.current_stats<EggHatcher_Descriptor::Stats>();
 
     uint16_t INCUBATION_TIME = (uint16_t)((1258.5 + 4.05 * STEPS_TO_HATCH) * 1.05);

@@ -5,10 +5,10 @@
  */
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/Tools/StatsTracking.h"
-#include "CommonFramework/Tools/VideoResolutionCheck.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
+#include "CommonTools/Async/InferenceRoutines.h"
+#include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h"
@@ -36,7 +36,7 @@ AutoItemPrinter_Descriptor::AutoItemPrinter_Descriptor()
         "Automate the Item Printer for rare items.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 struct AutoItemPrinter_Descriptor::Stats : public StatsTracker{
@@ -80,7 +80,7 @@ AutoItemPrinter::AutoItemPrinter()
 }
 
 
-void AutoItemPrinter::enter_printing_mode(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void AutoItemPrinter::enter_printing_mode(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     env.console.log("Entering printing mode...");
 
     while (true){
@@ -110,10 +110,10 @@ void AutoItemPrinter::enter_printing_mode(SingleSwitchProgramEnvironment& env, B
             pbf_press_button(context, BUTTON_A, 20, 105);
             continue;
         default:
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
                 "enter_printing_mode(): No recognized state after 120 seconds.",
-                true
+                env.console
             );
         }
     }
@@ -122,7 +122,7 @@ void AutoItemPrinter::enter_printing_mode(SingleSwitchProgramEnvironment& env, B
 
 
 
-void AutoItemPrinter::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void AutoItemPrinter::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
     AutoItemPrinter_Descriptor::Stats& stats = env.current_stats<AutoItemPrinter_Descriptor::Stats>();

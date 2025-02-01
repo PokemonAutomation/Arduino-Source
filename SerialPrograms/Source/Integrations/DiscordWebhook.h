@@ -25,6 +25,11 @@ namespace Integration{
 namespace DiscordWebhook{
 
 
+struct DiscordFileAttachment{
+    std::string name;
+    std::string filepath;
+};
+
 
 class DiscordWebhookSender : public QObject{
     Q_OBJECT
@@ -38,16 +43,19 @@ private:
 
 
 public:
-    void send_json(
+    void send(
         Logger& logger,
         const QUrl& url, std::chrono::milliseconds delay,
         const JsonObject& obj,
-        std::shared_ptr<PendingFileSend> file
+        std::shared_ptr<PendingFileSend> file,
+        std::function<void()> finish_callback = nullptr
     );
-    void send_file(
+    void send(
         Logger& logger,
         const QUrl& url, std::chrono::milliseconds delay,
-        std::shared_ptr<PendingFileSend> file
+        const JsonObject& obj,
+        std::vector<std::shared_ptr<PendingFileSend>> files,
+        std::function<void()> finish_callback = nullptr
     );
 
     static DiscordWebhookSender& instance();
@@ -59,18 +67,19 @@ private:
     void throttle();
 
     void process_reply(QNetworkReply* reply);
-    void internal_send_json(const QUrl& url, const QByteArray& data);
-    void internal_send_file(const QUrl& url, const std::string& filename);
-    void internal_send_image_embed(const QUrl& url, const QByteArray& data, const std::string& filepath, const std::string& filename);
-
-signals:
-    void stop_event_loop();
+    void internal_send(
+        const QUrl& url, const JsonValue& json,
+        const std::vector<DiscordFileAttachment>& files
+    );
 
 private:
     TaggedLogger m_logger;
-    bool m_stopping;
+    std::atomic<bool> m_stopping;
     std::mutex m_lock;
     std::condition_variable m_cv;
+
+    std::mutex m_send_lock;
+    std::unique_ptr<QEventLoop> m_event_loop;
 
     std::deque<WallClock> m_sent;
     AsyncDispatcher m_dispatcher;
@@ -86,6 +95,13 @@ void send_embed(
     const std::vector<std::string>& tags,
     const JsonArray& embeds,
     std::shared_ptr<PendingFileSend> file
+);
+void send_embed(
+    Logger& logger,
+    bool should_ping,
+    const std::vector<std::string>& tags,
+    const JsonArray& embeds,
+    const std::vector<std::shared_ptr<PendingFileSend>>& files
 );
 
 

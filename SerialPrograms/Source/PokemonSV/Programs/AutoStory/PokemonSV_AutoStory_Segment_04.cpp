@@ -4,19 +4,14 @@
  *
  */
 
-#include "CommonFramework/GlobalSettingsPanel.h"
-#include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
-#include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/Tools/StatsTracking.h"
-#include "CommonFramework/Tools/VideoResolutionCheck.h"
+#include "CommonFramework/VideoPipeline/VideoOverlay.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "Pokemon/Pokemon_Strings.h"
-#include "PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h"
+#include "PokemonSV/Inference/PokemonSV_TutorialDetector.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_SaveGame.h"
-#include "PokemonSV/Inference/PokemonSV_TutorialDetector.h"
+#include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSV_AutoStoryTools.h"
 #include "PokemonSV_AutoStory_Segment_04.h"
 
@@ -30,7 +25,6 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
 
-using namespace Pokemon;
 
 
 
@@ -47,7 +41,11 @@ std::string AutoStory_Segment_04::end_text() const{
     return "End: Saved the Legendary. Escaped from the Houndoom cave.";
 }
 
-void AutoStory_Segment_04::run_segment(SingleSwitchProgramEnvironment& env, BotBaseContext& context, AutoStoryOptions options) const{
+void AutoStory_Segment_04::run_segment(
+    SingleSwitchProgramEnvironment& env,
+    SwitchControllerContext& context,
+    AutoStoryOptions options
+) const{
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
 
     context.wait_for_all_requests();
@@ -66,7 +64,7 @@ void AutoStory_Segment_04::run_segment(SingleSwitchProgramEnvironment& env, BotB
 
 void checkpoint_08(
     SingleSwitchProgramEnvironment& env, 
-    BotBaseContext& context, 
+    SwitchControllerContext& context, 
     EventNotificationOption& notif_status_update
 ){
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
@@ -81,13 +79,16 @@ void checkpoint_08(
 
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 230, 70, 100);
         env.console.log("overworld_navigation: Go to cliff.");
-        overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 0, true, true);
+        overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 0, 30, 30, true, true);
 
-        env.console.log("clear_dialog: Look over the injured Miraidon/Koraidon on the beach. Fall down the cliff");
-        clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 30, {});
-        // long animation
-        env.console.log("overworld_navigation: Go to Legendary pokemon laying on the beach.");
-        overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 0, 30, true, true);
+        env.console.log("Look over the injured Miraidon/Koraidon on the beach.");
+        clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 5, {});
+        env.console.log("Fall down the cliff.");
+        pbf_wait(context, 20 * TICKS_PER_SECOND);  // long animation
+        context.wait_for_all_requests();
+        clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 10, {});
+        env.console.log("Go to Legendary pokemon laying on the beach.");
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 30);
 
         env.console.log("clear_dialog: Offer Miraidon/Koraidon a sandwich.");
         clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 10, {});
@@ -100,9 +101,9 @@ void checkpoint_08(
         GradientArrowWatcher arrow(COLOR_RED, GradientArrowType::RIGHT, {0.104, 0.312, 0.043, 0.08});
         context.wait_for_all_requests();
 
-        int ret = run_until(
+        int ret = run_until<SwitchControllerContext>(
             env.console, context,
-            [](BotBaseContext& context){
+            [](SwitchControllerContext& context){
                 for (int i = 0; i < 10; i++){
                     pbf_press_dpad(context, DPAD_UP, 20, 250);
                 }
@@ -110,78 +111,85 @@ void checkpoint_08(
             {arrow}
         );
         if (ret < 0){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
                 "Failed to feed mom's sandwich.",
-                true
+                env.console
             );  
         }
 
         // only press A when the sandwich is selected
         pbf_mash_button(context, BUTTON_A, 100);
 
-        env.console.log("clear_dialog: Miraidon/Koraidon gets up and walks to cave entrance.");
-        clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 35, {});
-        // long animation
+        env.console.log("Miraidon/Koraidon eats the sandwich.");
+        clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 25, {});
+        env.console.log("Miraidon/Koraidon gets up and walks to cave entrance."); // long animation
+        clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 10, {});
 
         // First Nemona cave conversation
         context.wait_for_all_requests();
         env.console.log("Enter cave");
         env.console.overlay().add_log("Enter cave", COLOR_WHITE);
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
-            [&](const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
-                pbf_move_left_joystick(context, 128, 20, 10 * TICKS_PER_SECOND, 20);
-                pbf_move_left_joystick(context, 150, 20, 1 * TICKS_PER_SECOND, 20);
-                pbf_move_left_joystick(context, 128, 20, 8 * TICKS_PER_SECOND, 20);
-                pbf_move_left_joystick(context, 150, 20, 2 * TICKS_PER_SECOND, 20);                
+            [&](const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+                pbf_move_left_joystick(context, 128, 0, 600, 50);
+                realign_player(env.program_info(), stream, context, PlayerRealignMode::REALIGN_NO_MARKER, 150, 20, 20);
+                pbf_move_left_joystick(context, 128, 0, 1000, 50);
+                realign_player(env.program_info(), stream, context, PlayerRealignMode::REALIGN_NO_MARKER, 160, 20, 20);
+                overworld_navigation(env.program_info(), env.console, context, 
+                    NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 
+                    128, 0, 20, 20, true, true);
             }
-        );
-        
-        env.console.log("overworld_navigation: Go to cave.");
-        overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 20, 10, true, true);
+        );  
 
         env.console.log("clear_dialog: Talk to Nemona yelling down, while you're down in the cave.");
         clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 10, {CallbackEnum::PROMPT_DIALOG});
 
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
-            [&](const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+            [&](const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
                 // Legendary rock break
                 context.wait_for_all_requests();
-                console.log("Rock break");
-                console.overlay().add_log("Rock break", COLOR_WHITE);
+                stream.log("Rock break");
+                stream.overlay().add_log("Rock break", COLOR_WHITE);
                 pbf_move_left_joystick(context, 128, 20, 3 * TICKS_PER_SECOND, 20);
-                realign_player(env.program_info(), console, context, PlayerRealignMode::REALIGN_NO_MARKER, 230, 25, 30);
+                realign_player(env.program_info(), stream, context, PlayerRealignMode::REALIGN_NO_MARKER, 230, 25, 30);
                 pbf_move_left_joystick(context, 128, 0, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
 
                 // Houndour wave
                 context.wait_for_all_requests();
-                console.log("Houndour wave");
-                console.overlay().add_log("Houndour wave", COLOR_WHITE);
-                pbf_move_left_joystick(context, 140, 20, 4 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
-                realign_player(env.program_info(), console, context, PlayerRealignMode::REALIGN_NO_MARKER, 220, 15, 30);
-                pbf_move_left_joystick(context, 128, 20, 5 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
+                stream.log("Houndour wave");
+                stream.overlay().add_log("Houndour wave", COLOR_WHITE);
+                // walk to room entrance
+                realign_player(env.program_info(), stream, context, PlayerRealignMode::REALIGN_NO_MARKER, 150, 15, 30);
+                pbf_move_left_joystick(context, 128, 20, 4 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
+
+                realign_player(env.program_info(), stream, context, PlayerRealignMode::REALIGN_NO_MARKER, 210, 15, 30);
+                pbf_move_left_joystick(context, 128, 20, 3 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
+                pbf_move_left_joystick(context, 128, 20, 2 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
                 pbf_move_left_joystick(context, 128, 20, 6 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
-                realign_player(env.program_info(), console, context, PlayerRealignMode::REALIGN_NO_MARKER, 220, 25, 20);
+
+                realign_player(env.program_info(), stream, context, PlayerRealignMode::REALIGN_NO_MARKER, 200, 25, 20);
                 pbf_move_left_joystick(context, 128, 20, 4 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
                 pbf_move_left_joystick(context, 128, 20, 4 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
-                realign_player(env.program_info(), console, context, PlayerRealignMode::REALIGN_NO_MARKER, 220, 25, 25);
+
+                realign_player(env.program_info(), stream, context, PlayerRealignMode::REALIGN_NO_MARKER, 210, 25, 25);
                 pbf_move_left_joystick(context, 128, 20, 6 * TICKS_PER_SECOND, 20 * TICKS_PER_SECOND);
 
                 // Houndoom encounter
                 context.wait_for_all_requests();
-                console.log("Houndoom encounter");
-                console.overlay().add_log("Houndoom encounter", COLOR_WHITE);
+                stream.log("Houndoom encounter");
+                stream.overlay().add_log("Houndoom encounter", COLOR_WHITE);
                 pbf_move_left_joystick(context, 128, 20, 4 * TICKS_PER_SECOND, 20);
-                realign_player(env.program_info(), console, context, PlayerRealignMode::REALIGN_NO_MARKER, 245, 20, 20);
+                realign_player(env.program_info(), stream, context, PlayerRealignMode::REALIGN_NO_MARKER, 245, 20, 20);
                 pbf_move_left_joystick(context, 128, 20, 2 * TICKS_PER_SECOND, 20);
-                realign_player(env.program_info(), console, context, PlayerRealignMode::REALIGN_NO_MARKER, 255, 90, 20);
+                realign_player(env.program_info(), stream, context, PlayerRealignMode::REALIGN_NO_MARKER, 255, 90, 20);
                 pbf_move_left_joystick(context, 128, 20, 8 * TICKS_PER_SECOND, 8 * TICKS_PER_SECOND);
                 pbf_press_button(context, BUTTON_L, 20, 20);
             }
         );
         
         env.console.log("overworld_navigation: Go to Houndoom.");
-        overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 20, 40, true, true);
+        overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 0, 20, 20, true, true);
         
         mash_button_till_overworld(env.console, context, BUTTON_A);
 

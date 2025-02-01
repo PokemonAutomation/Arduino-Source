@@ -8,8 +8,8 @@
 #define PokemonAutomation_PokemonSwSh_PokemonSpriteReader_H
 
 #include <set>
-#include "CommonFramework/ImageMatch/ExactImageDictionaryMatcher.h"
-#include "CommonFramework/ImageMatch/CroppedImageDictionaryMatcher.h"
+#include "CommonTools/ImageMatch/ExactImageDictionaryMatcher.h"
+#include "CommonTools/ImageMatch/CroppedImageDictionaryMatcher.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

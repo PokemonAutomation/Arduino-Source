@@ -4,12 +4,10 @@
  *
  */
 
-#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
-#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
-#include "CommonFramework/Tools/StatsTracking.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
@@ -34,7 +32,7 @@ DenRoller_Descriptor::DenRoller_Descriptor()
         "Roll den to the N'th day, SR and repeat.",
         FeedbackType::OPTIONAL_,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 struct DenRoller_Descriptor::Stats : public StatsTracker{
@@ -107,14 +105,14 @@ DenRoller::DenRoller()
 
 
 
-void DenRoller::ring_bell(BotBaseContext& context, int count) const{
+void DenRoller::ring_bell(SwitchControllerContext& context, int count) const{
     for (int c = 0; c < count; c++){
         pbf_press_button(context, BUTTON_LCLICK, 5, 10);
     }
     pbf_wait(context, 200);
 }
 
-void DenRoller::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void DenRoller::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     DenRoller_Descriptor::Stats& stats = env.current_stats<DenRoller_Descriptor::Stats>();
 
     if (START_LOCATION.start_in_grip_menu()){

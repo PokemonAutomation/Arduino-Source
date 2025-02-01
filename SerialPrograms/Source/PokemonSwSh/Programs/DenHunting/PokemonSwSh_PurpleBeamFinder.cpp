@@ -4,13 +4,11 @@
  *
  */
 
-#include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
-#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/Tools/StatsTracking.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "Pokemon/Pokemon_Strings.h"
@@ -35,7 +33,7 @@ PurpleBeamFinder_Descriptor::PurpleBeamFinder_Descriptor()
         "Automatically reset for a purple beam.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 struct PurpleBeamFinder_Descriptor::Stats : public StatsTracker{
@@ -134,13 +132,13 @@ PurpleBeamFinder::PurpleBeamFinder()
 
 
 
-bool PurpleBeamFinder::run(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+bool PurpleBeamFinder::run(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     PurpleBeamFinder_Descriptor::Stats& stats = env.current_stats<PurpleBeamFinder_Descriptor::Stats>();
 
     SelectionArrowFinder arrow_detector(env.console.overlay(), {0.5, 0.5, 0.3, 0.3});
-    int ret = run_until(
+    int ret = run_until<SwitchControllerContext>(
         env.console, context,
-        [](BotBaseContext& context){
+        [](SwitchControllerContext& context){
             pbf_mash_button(context, BUTTON_A, 1000);
         },
         { arrow_detector }
@@ -156,9 +154,9 @@ bool PurpleBeamFinder::run(SingleSwitchProgramEnvironment& env, BotBaseContext& 
     pbf_wait(context, 100);
     context.wait_for_all_requests();
 
-    ret = run_until(
+    ret = run_until<SwitchControllerContext>(
         env.console, context,
-        [](BotBaseContext& context){
+        [](SwitchControllerContext& context){
             pbf_press_button(context, BUTTON_A, 10, 300);
         },
         { arrow_detector }
@@ -204,7 +202,7 @@ bool PurpleBeamFinder::run(SingleSwitchProgramEnvironment& env, BotBaseContext& 
     return false;
 }
 
-void PurpleBeamFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void PurpleBeamFinder::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
         resume_game_front_of_den_nowatts(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);

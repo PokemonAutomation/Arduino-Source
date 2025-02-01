@@ -26,7 +26,7 @@ BerryFarmer_Descriptor::BerryFarmer_Descriptor()
         "Farm berries.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 
@@ -49,7 +49,7 @@ BerryFarmer::BerryFarmer()
     PA_ADD_OPTION(SAVE_ITERATIONS);
 }
 
-void BerryFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void BerryFarmer::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
     }else{

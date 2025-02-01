@@ -7,7 +7,7 @@
 #include "Common/Compiler.h"
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/Tools/VideoResolutionCheck.h"
+#include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
@@ -30,7 +30,7 @@ MaxLairBossFinder_Descriptor::MaxLairBossFinder_Descriptor()
         "Auto Max Lair 2.0 - Run adventures until you find the boss you want. Once you find your boss, switch to the other programs to shiny hunt it.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB,
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS},
         1, 4, 1
     )
 {}
@@ -184,7 +184,7 @@ void MaxLairBossFinder::program(MultiSwitchProgramEnvironment& env, CancellableS
         throw UserSetupError(env.logger(), "Invalid Host Switch");
     }
 
-    env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
+    env.run_in_parallel(scope, [&](ConsoleHandle& console, SwitchControllerContext& context){
         assert_16_9_720p_min(console, console);
         if (START_LOCATION.start_in_grip_menu()){
             grip_menu_connect_go_home(context);

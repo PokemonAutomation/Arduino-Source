@@ -9,15 +9,14 @@
 
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonFramework/Inference/VisualDetector.h"
-#include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
+#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 
-
+#if 0
 class EndBattleWatcher : public VisualInferenceCallback{
 public:
     EndBattleWatcher(
@@ -35,6 +34,21 @@ private:
     Color m_color;
     ImageFloatBox m_box;
     bool m_has_been_black = false;
+};
+#endif
+
+
+class EndBattleWatcher : public BlackScreenOverWatcher{
+public:
+    EndBattleWatcher(
+        const ImageFloatBox& box = {0.1, 0.1, 0.8, 0.8},
+        Color color = COLOR_RED
+    )
+        : BlackScreenOverWatcher(
+            color, box, 100, 10, std::chrono::milliseconds(1000)
+        )
+    {}
+
 };
 
 

@@ -15,6 +15,7 @@ namespace Kernels{
 class ImageFilter_RgbRange_Default{
 public:
     static const size_t VECTOR_SIZE = 1;
+    using Mask = size_t;
 
 public:
     ImageFilter_RgbRange_Default(uint32_t mins, uint32_t maxs, uint32_t replacement_color,
@@ -106,6 +107,7 @@ void filter_rgb32_range_Default(
 class ImageFilter_RgbEuclidean_Default{
 public:
     static const size_t VECTOR_SIZE = 1;
+    using Mask = size_t;
 
 public:
     ImageFilter_RgbEuclidean_Default(uint32_t expected_color, double max_euclidean_distance, uint32_t replacement_color, bool replace_color_within_range)
@@ -180,6 +182,7 @@ size_t filter_rgb32_euclidean_Default(
 class ToBlackWhite_RgbRange_Default{
 public:
     static const size_t VECTOR_SIZE = 1;
+    using Mask = size_t;
 
 public:
     ToBlackWhite_RgbRange_Default(uint32_t mins, uint32_t maxs, bool in_range_black)

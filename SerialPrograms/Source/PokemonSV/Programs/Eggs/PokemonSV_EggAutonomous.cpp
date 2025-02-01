@@ -9,10 +9,11 @@
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/Tools/StatsTracking.h"
-#include "CommonFramework/Tools/VideoResolutionCheck.h"
+#include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Pokemon_Notification.h"
@@ -43,7 +44,7 @@ EggAutonomous_Descriptor::EggAutonomous_Descriptor()
         "Automatically get meal power, fetch eggs from a picnic and hatch them.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 struct EggAutonomous_Descriptor::Stats : public StatsTracker{
@@ -179,7 +180,7 @@ EggAutonomous::EggAutonomous()
 }
 
 
-void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void EggAutonomous::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
     //  Connect the controller.
@@ -292,7 +293,7 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
 }
 
 // start at Area Zero flying spot, start picnic, make sandwich, then fetch eggs at basket.
-int EggAutonomous::fetch_eggs_full_routine(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+int EggAutonomous::fetch_eggs_full_routine(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     auto& stats = env.current_stats<EggAutonomous_Descriptor::Stats>();
 
     picnic_at_zero_gate(env.program_info(), env.console, context);
@@ -332,7 +333,7 @@ int EggAutonomous::fetch_eggs_full_routine(SingleSwitchProgramEnvironment& env, 
 // When immediately called after fetching routine finishes, assumes the party is already loaded with the first column of
 // eggs and the number of eggs is provided by `num_eggs_in_party`.
 // When called after an error recovery, assumes the party is loaded with some unknown number of eggs, and `num_eggs_in_party` is -1.
-void EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env, BotBaseContext& context, int num_eggs_in_party){
+void EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, int num_eggs_in_party){
     auto& stats = env.current_stats<EggAutonomous_Descriptor::Stats>();
 
     // index of the egg column in box to be loaded next, 0-indexed
@@ -427,8 +428,8 @@ void EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
         // Check each hatched baby whether they will be kept.
         // If yes, move them to the keep box.
         // Otherwise, release them or move them into box in case we will reset game later.
-        for(int i = 0; i < num_eggs_in_party; i++){
-            process_one_baby(env, context, i, num_eggs_in_party);
+        for(uint8_t i = 0; i < num_eggs_in_party; i++){
+            process_one_baby(env, context, i, (uint8_t)num_eggs_in_party);
         }
 
         // If the auto save mode is AfterStartAndKeep, which allows resetting the game in case no eggs in the box are kept,
@@ -505,11 +506,11 @@ void EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
 
 // While in box system and the current box is egg box, process one baby pokemon in party
 // Return true if the program finds a pokemon to keep
-void EggAutonomous::process_one_baby(SingleSwitchProgramEnvironment& env, BotBaseContext& context, int egg_index, int num_eggs_in_party){
+void EggAutonomous::process_one_baby(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, uint8_t egg_index, uint8_t num_eggs_in_party){
     auto& stats = env.current_stats<EggAutonomous_Descriptor::Stats>();
 
     // Check each pokemon from bottom to top. In this way we can reliably detect end of releasing the pokemon.
-    const int party_row = num_eggs_in_party - egg_index + (HAS_CLONE_RIDE_POKEMON ? 1 : 0);
+    uint8_t party_row = num_eggs_in_party - egg_index + (HAS_CLONE_RIDE_POKEMON ? 1 : 0);
     context.wait_for_all_requests();
     move_box_cursor(env.program_info(), env.console, context, BoxCursorLocation::PARTY, party_row, 0);
 
@@ -589,7 +590,7 @@ void EggAutonomous::process_one_baby(SingleSwitchProgramEnvironment& env, BotBas
 
 // From the egg box, move to the kept box, drop the pokemon to an empty spot in the box, move back to the egg box.
 // Return false if it does not find an empty spot.
-bool EggAutonomous::move_pokemon_to_keep(SingleSwitchProgramEnvironment& env, BotBaseContext& context, uint8_t pokemon_row_in_party){
+bool EggAutonomous::move_pokemon_to_keep(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, uint8_t pokemon_row_in_party){
     SomethingInBoxSlotDetector sth_in_box_detector(COLOR_RED);
     const size_t keep_box_location = KEEP_BOX_LOCATION.current_value();
     if (keep_box_location == 0){
@@ -627,7 +628,7 @@ bool EggAutonomous::move_pokemon_to_keep(SingleSwitchProgramEnvironment& env, Bo
     return false;
 }
 
-void EggAutonomous::reset_position_to_flying_spot(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void EggAutonomous::reset_position_to_flying_spot(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     // Use map to fly back to the flying spot
     open_map_from_overworld(env.program_info(), env.console, context);
     pbf_move_left_joystick(context, 128, 160, 20, 50);
@@ -637,7 +638,7 @@ void EggAutonomous::reset_position_to_flying_spot(SingleSwitchProgramEnvironment
 // From overworld, change pokemon party from the one used for getting eggs, to the one used for hatching
 // The new party will be one flame body pokemon as lead, and some eggs.
 // Function returns how many eggs are in the party
-int EggAutonomous::picnic_party_to_hatch_party(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+int EggAutonomous::picnic_party_to_hatch_party(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     env.console.overlay().add_log("Change to hatching", COLOR_WHITE);
     // change pokemon party from used for fetching eggs in picnic, to hatching on your ride.
 
@@ -671,7 +672,7 @@ int EggAutonomous::picnic_party_to_hatch_party(SingleSwitchProgramEnvironment& e
 }
 
 
-void EggAutonomous::save_game(SingleSwitchProgramEnvironment& env, BotBaseContext& context, bool from_overworld){
+void EggAutonomous::save_game(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, bool from_overworld){
     try{
         if (from_overworld){
             save_game_from_overworld(env.program_info(), env.console, context);
@@ -687,7 +688,7 @@ void EggAutonomous::save_game(SingleSwitchProgramEnvironment& env, BotBaseContex
 
 
 void EggAutonomous::handle_recoverable_error(
-    SingleSwitchProgramEnvironment& env, BotBaseContext& context,
+    SingleSwitchProgramEnvironment& env, SwitchControllerContext& context,
     EventNotificationOption& notification,
     OperationFailedException& e,
     size_t& consecutive_failures
@@ -719,10 +720,10 @@ void EggAutonomous::handle_recoverable_error(
 
     consecutive_failures++;
     if (consecutive_failures >= 3){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, env.console,
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
             "Failed 3 times in the row.",
-            true
+            env.console
         );
     }
 

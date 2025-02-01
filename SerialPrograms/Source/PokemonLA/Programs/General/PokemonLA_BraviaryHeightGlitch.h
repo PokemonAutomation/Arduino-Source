@@ -24,7 +24,7 @@ class BraviaryHeightGlitch : public SingleSwitchProgramInstance{
 public:
     BraviaryHeightGlitch();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 };
 
 

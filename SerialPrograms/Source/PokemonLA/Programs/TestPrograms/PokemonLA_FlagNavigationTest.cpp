@@ -23,7 +23,7 @@ FlagNavigationTest_Descriptor::FlagNavigationTest_Descriptor()
         "Navigate to the flag pin.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 
@@ -55,7 +55,7 @@ FlagNavigationTest::FlagNavigationTest()
 }
 
 
-void FlagNavigationTest::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void FlagNavigationTest::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
 
     FlagNavigationAir session(
         env, env.console, context,

@@ -7,21 +7,23 @@
 #ifndef PokemonAutomation_PokemonSwSh_MaxLair_Run_PokemonSelect_H
 #define PokemonAutomation_PokemonSwSh_MaxLair_Run_PokemonSelect_H
 
-#include "CommonFramework/Tools/ConsoleHandle.h"
-#include "PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options.h"
+#include "CommonFramework/Tools/VideoStream.h"
+#include "CommonTools/FailureWatchdog.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 #include "PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options_Consoles.h"
 #include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_StateTracker.h"
 
 namespace PokemonAutomation{
-    class BotBaseContext;
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 namespace MaxLairInternal{
 
 
 void run_select_pokemon(
-    ConsoleHandle& console, BotBaseContext& context,
+    size_t console_index,
+    VideoStream& stream, SwitchControllerContext& context,
     GlobalStateTracker& state_tracker,
+    OcrFailureWatchdog& ocr_watchdog,
     const ConsoleSpecificOptions& settings
 );
 

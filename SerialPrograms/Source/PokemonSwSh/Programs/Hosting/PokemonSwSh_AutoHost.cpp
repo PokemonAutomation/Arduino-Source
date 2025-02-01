@@ -4,11 +4,10 @@
  *
  */
 
-#include "CommonFramework/Globals.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
-#include "CommonFramework/Inference/BlackScreenDetector.h"
+#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.h"
@@ -29,19 +28,19 @@ namespace PokemonSwSh{
 
 
 bool connect_to_internet(
-    ConsoleHandle& console, BotBaseContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     bool host_online,
     uint16_t connect_to_internet_delay
 ){
     if (!host_online){
         return true;
     }
-    if (!console.video().snapshot()){
+    if (!stream.video().snapshot()){
         connect_to_internet(context, GameSettings::instance().OPEN_YCOMM_DELAY, connect_to_internet_delay);
         return true;
     }
     if (connect_to_internet_with_inference(
-        console, context,
+        stream, context,
         std::chrono::seconds(5), connect_to_internet_delay
     )){
         return true;
@@ -51,7 +50,7 @@ bool connect_to_internet(
 
 void send_raid_notification(
     ProgramEnvironment& env,
-    ConsoleHandle& console,
+    VideoStream& stream,
     AutoHostNotificationOption& settings,
     bool has_code, uint8_t code[8],
     const ImageViewRGB32& screenshot,
@@ -127,7 +126,7 @@ void send_raid_notification(
 
 
 void run_autohost(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context,
     Catchability catchability, uint8_t skips,
     const RandomCodeOption* raid_code, uint16_t lobby_wait_delay,
     bool host_online, uint8_t accept_FR_slot,
@@ -142,7 +141,7 @@ void run_autohost(
     AutoHostStats& stats = env.current_stats<AutoHostStats>();
 
     roll_den(
-        console, context,
+        stream, context,
         enter_online_den_delay,
         open_online_den_lobby_delay,
         skips,
@@ -151,7 +150,7 @@ void run_autohost(
     context.wait_for_all_requests();
 
     if (!connect_to_internet(
-        console, context,
+        stream, context,
         host_online,
         connect_to_internet_delay
     )){
@@ -161,12 +160,12 @@ void run_autohost(
     }
 
     {
-        DenMonReader reader(console, console);
+        DenMonReader reader(stream.logger(), stream.overlay());
         enter_den(context, enter_online_den_delay, skips != 0, host_online);
         context.wait_for_all_requests();
 
         //  Make sure we're actually in a den.
-        VideoSnapshot screen = console.video().snapshot();
+        VideoSnapshot screen = stream.video().snapshot();
         DenMonReadResults results;
         if (screen){
             results = reader.read(screen);
@@ -175,7 +174,7 @@ void run_autohost(
             case DenMonReadResults::PURPLE_BEAM:
                 break;
             default:
-                console.log("Failed to detect den lobby. Skipping raid.", COLOR_RED);
+                stream.log("Failed to detect den lobby. Skipping raid.", COLOR_RED);
                 return;
             }
         }
@@ -195,10 +194,10 @@ void run_autohost(
         }
         context.wait_for_all_requests();
 
-        screen = console.video().snapshot();
+        screen = stream.video().snapshot();
         send_raid_notification(
             env,
-            console,
+            stream,
             notifications,
             has_code, code,
             screen, results, stats
@@ -209,7 +208,7 @@ void run_autohost(
 
     //  Accept friend requests while we wait.
     RaidLobbyState raid_state = raid_lobby_wait(
-        console, context,
+        stream, context,
         host_online,
         accept_FR_slot,
         lobby_wait_delay
@@ -219,28 +218,54 @@ void run_autohost(
     pbf_press_dpad(context, DPAD_UP, 5, 45);
 
     //  Mash A until it's time to close the game.
-    {
+    if (stream.video().snapshot()){
+//        WallDuration raid_start_to_exit_delay0 = std::chrono::duration_cast<WallDuration>(
+//            std::chrono::milliseconds((uint64_t)raid_start_to_exit_delay * 1000 / TICKS_PER_SECOND)
+//        );
+
+        BlackScreenOverWatcher black_screen;
+        int ret = run_until<SwitchControllerContext>(
+            stream, context,
+            [&](SwitchControllerContext& context){
+                pbf_mash_button(context, BUTTON_A, raid_start_to_exit_delay);
+            },
+            {black_screen}
+        );
+        if (ret == 0){
+            env.log("Raid has Started!", COLOR_BLUE);
+            stats.add_raid(raid_state.raiders());
+        }else{
+            env.log("Timed out waiting for raid to start.", COLOR_RED);
+            stats.add_timeout();
+        }
+
+#if 0
         context.wait_for_all_requests();
-        uint32_t start = system_clock(context);
+        WallClock start = current_time();
+//        uint32_t start = system_clock(context);
         pbf_mash_button(context, BUTTON_A, 3 * TICKS_PER_SECOND);
         context.wait_for_all_requests();
 
-        BlackScreenOverWatcher black_screen;
-        uint32_t now = start;
+        WallClock now = start;
+//        uint32_t now = start;
         while (true){
-            if (black_screen.black_is_over(console.video().snapshot())){
+            if (black_screen.black_is_over(stream.video().snapshot())){
                 env.log("Raid has Started!", COLOR_BLUE);
                 stats.add_raid(raid_state.raiders());
                 break;
             }
-            if (now - start >= raid_start_to_exit_delay){
+            if (now - start >= raid_start_to_exit_delay0){
                 stats.add_timeout();
                 break;
             }
             pbf_mash_button(context, BUTTON_A, TICKS_PER_SECOND);
             context.wait_for_all_requests();
-            now = system_clock(context);
+            now = current_time();
+//            now = system_clock(context);
         }
+#endif
+    }else{
+        pbf_mash_button(context, BUTTON_A, raid_start_to_exit_delay);
     }
 
     //  Select a move.

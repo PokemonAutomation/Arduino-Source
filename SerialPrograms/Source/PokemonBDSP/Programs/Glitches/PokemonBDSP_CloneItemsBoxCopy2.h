@@ -32,7 +32,7 @@ class CloneItemsBoxCopy2 : public SingleSwitchProgramInstance{
 public:
     CloneItemsBoxCopy2();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;

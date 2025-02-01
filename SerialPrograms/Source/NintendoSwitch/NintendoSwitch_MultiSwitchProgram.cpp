@@ -7,9 +7,10 @@
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
 #include "Common/Cpp/Concurrency/AsyncDispatcher.h"
-#include "ClientSource/Connection/BotBase.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/VideoPipeline/Stats/ThreadUtilizationStats.h"
+#include "CommonTools/StartupChecks/StartProgramChecks.h"
+#include "Controllers/ControllerSession.h"
 #include "NintendoSwitch_MultiSwitchProgram.h"
 #include "Framework/NintendoSwitch_MultiSwitchProgramOption.h"
 
@@ -36,13 +37,13 @@ MultiSwitchProgramEnvironment::MultiSwitchProgramEnvironment(
 
 void MultiSwitchProgramEnvironment::run_in_parallel(
     CancellableScope& scope,
-    const std::function<void(ConsoleHandle& console, BotBaseContext& context)>& func
+    const std::function<void(ConsoleHandle& console, SwitchControllerContext& context)>& func
 ){
     run_in_parallel(scope, 0, consoles.size(), func);
 }
 void MultiSwitchProgramEnvironment::run_in_parallel(
     CancellableScope& scope, size_t s, size_t e,
-    const std::function<void(ConsoleHandle& console, BotBaseContext& context)>& func
+    const std::function<void(ConsoleHandle& console, SwitchControllerContext& context)>& func
 ){
     realtime_dispatcher().run_in_parallel(
         s, e,
@@ -51,7 +52,7 @@ void MultiSwitchProgramEnvironment::run_in_parallel(
             ThreadUtilizationStat stat(current_thread_handle(), "Program Thread " + std::to_string(index) + ":");
             console.overlay().add_stat(stat);
             try{
-                BotBaseContext context(scope, consoles[index].botbase());
+                SwitchControllerContext context(scope, consoles[index].controller());
                 func(console, context);
                 context.wait_for_all_requests();
                 console.overlay().remove_stat(stat);
@@ -72,20 +73,20 @@ MultiSwitchProgramDescriptor::MultiSwitchProgramDescriptor(
     std::string description,
     FeedbackType feedback,
     AllowCommandsWhenRunning allow_commands_while_running,
-    PABotBaseLevel min_pabotbase_level,
+    ControllerRequirements requirements,
     size_t min_switches,
     size_t max_switches,
     size_t default_switches
 )
     : ProgramDescriptor(
-        pick_color(feedback, min_pabotbase_level),
+        pick_color(feedback),
         std::move(identifier),
         std::move(category), std::move(display_name),
         std::move(doc_link),
         std::move(description)
     )
     , m_feedback(feedback)
-    , m_min_pabotbase_level(min_pabotbase_level)
+    , m_requirements(std::move(requirements))
     , m_allow_commands_while_running(allow_commands_while_running == AllowCommandsWhenRunning::ENABLE_COMMANDS)
     , m_min_switches(min_switches)
     , m_max_switches(max_switches)
@@ -122,6 +123,31 @@ MultiSwitchProgramInstance::MultiSwitchProgramInstance(
         error_notification_tags
     )
 {}
+
+
+void MultiSwitchProgramInstance::start_program_controller_check(
+    CancellableScope& scope,
+    ControllerSession& session, size_t console_index
+){
+    if (!session.ready()){
+        throw UserSetupError(session.logger(), "Cannot Start: Controller is not ready.");
+    }
+}
+void MultiSwitchProgramInstance::start_program_feedback_check(
+    CancellableScope& scope,
+    VideoStream& stream, size_t console_index,
+    FeedbackType feedback_type
+){
+    StartProgramChecks::check_feedback(stream, feedback_type);
+}
+void MultiSwitchProgramInstance::start_program_border_check(
+    CancellableScope& scope,
+    VideoStream& stream, size_t console_index
+){
+    StartProgramChecks::check_border(stream);
+}
+
+
 void MultiSwitchProgramInstance::add_option(ConfigOption& option, std::string serialization_string){
     m_options.add_option(option, std::move(serialization_string));
 }

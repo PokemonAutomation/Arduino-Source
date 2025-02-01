@@ -9,12 +9,12 @@
 
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonFramework/Inference/VisualDetector.h"
+#include "CommonFramework/Tools/VideoStream.h"
+#include "CommonTools/VisualDetector.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.h"
 
 namespace PokemonAutomation{
-    class ConsoleHandle;
-    class BotBaseContext;
     struct ProgramInfo;
 namespace NintendoSwitch{
 namespace PokemonSV{
@@ -34,7 +34,7 @@ public:
     //  While sitting on the menu, move the cursor to the desired slot.
     //  Returns true if success.
     bool move_cursor(
-        const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+        const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context,
         int row
     ) const;
 

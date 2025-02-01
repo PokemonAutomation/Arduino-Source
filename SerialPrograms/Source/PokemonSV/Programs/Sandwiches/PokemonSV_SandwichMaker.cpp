@@ -5,20 +5,14 @@
  */
 
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-//#include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "CommonFramework/Tools/VideoResolutionCheck.h"
-//#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-//#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
+#include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "Pokemon/Pokemon_Strings.h"
-//#include "Common/Cpp/Exceptions.h"
 #include "PokemonSV/Programs/Sandwiches/PokemonSV_SandwichRoutines.h"
 #include "PokemonSV_SandwichMaker.h"
 
 //#include <iostream>
 //using std::cout;
 //using std::endl;
-#include <unordered_map>
-#include <algorithm>
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -34,12 +28,18 @@ SandwichMaker_Descriptor::SandwichMaker_Descriptor()
         "Make a sandwich of your choice.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 
 SandwichMaker::SandwichMaker()
-    : SANDWICH_OPTIONS("Sandwich Options", nullptr, BaseRecipe::non_shiny, false, false, true)
+    : SANDWICH_OPTIONS(
+        "Sandwich Options",
+        nullptr,
+        BaseRecipe::non_shiny,
+        false,
+        GroupOption::EnableMode::ALWAYS_ENABLED
+    )
     , GO_HOME_WHEN_DONE(false)
     , NOTIFICATIONS({
         &NOTIFICATION_PROGRAM_FINISH,
@@ -51,7 +51,7 @@ SandwichMaker::SandwichMaker()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void SandwichMaker::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void SandwichMaker::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
     #if 0

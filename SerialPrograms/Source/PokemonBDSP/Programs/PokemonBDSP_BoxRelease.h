@@ -7,21 +7,21 @@
 #ifndef PokemonAutomation_PokemonBDSP_BoxReleaseTools_H
 #define PokemonAutomation_PokemonBDSP_BoxReleaseTools_H
 
-#include "ClientSource/Connection/BotBase.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 //  Detach items.
-void detach(BotBaseContext& context);
-void detach_box(BotBaseContext& context, uint16_t box_scroll_delay);
+void detach(SwitchControllerContext& context);
+void detach_box(SwitchControllerContext& context, uint16_t box_scroll_delay);
 
 //  Release Pokemon.
-void release(BotBaseContext& context);
-void release_box(BotBaseContext& context, uint16_t box_scroll_delay);
+void release(SwitchControllerContext& context);
+void release_box(SwitchControllerContext& context, uint16_t box_scroll_delay);
 void release_boxes(
-    BotBaseContext& context,
+    SwitchControllerContext& context,
     uint8_t boxes,
     uint16_t box_scroll_delay,
     uint16_t box_change_delay

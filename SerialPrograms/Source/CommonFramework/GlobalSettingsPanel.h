@@ -7,19 +7,15 @@
 #ifndef PokemonAutomation_GlobalSettingsPanel_H
 #define PokemonAutomation_GlobalSettingsPanel_H
 
+#include <vector>
+#include "Common/Cpp/Containers/Pimpl.h"
 #include "Common/Cpp/Options/ConfigOption.h"
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
-#include "Common/Cpp/Options/SimpleIntegerOption.h"
-#include "Common/Cpp/Options/FloatingPointOption.h"
+//#include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/StringOption.h"
-#include "CommonFramework/Options/Environment/ProcessPriorityOption.h"
-#include "CommonFramework/Options/Environment/ProcessorLevelOption.h"
-#include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
-#include "CommonFramework/VideoPipeline/Backends/CameraImplementations.h"
 #include "CommonFramework/Panels/SettingsPanel.h"
 #include "CommonFramework/Panels/PanelTools.h"
-#include "Integrations/DiscordSettingsOption.h"
 
 //#include <iostream>
 //using std::cout;
@@ -28,19 +24,30 @@
 namespace PokemonAutomation{
 
 
+class ThemeSelectorOption;
+class ResolutionOption;
+class StreamHistoryOption;
+class SleepSuppressOptions;
+namespace Integration{
+    class DiscordSettingsOption;
+}
+class PerformanceOptions;
+class AudioPipelineOptions;
+class VideoPipelineOptions;
+class ErrorReportOption;
 
 
-class ResolutionOption : public GroupOption{
+class FolderInputOption : public StringOption{
 public:
-    ResolutionOption(
-        std::string label, std::string description,
-        int default_width, int default_height
-    );
+    using StringOption::StringOption;
 
-    StaticTextOption DESCRIPTION;
-    SimpleIntegerOption<uint32_t> WIDTH;
-    SimpleIntegerOption<uint32_t> HEIGHT;
+    virtual void sanitize(std::string& str) override{
+        if (!str.empty() && str.back() != '/'){
+            str += '/';
+        }
+    }
 };
+
 
 
 
@@ -68,6 +75,7 @@ public:
 
 
 
+
 class GlobalSettings : public BatchOption, private ConfigOption::Listener{
     ~GlobalSettings();
     GlobalSettings();
@@ -81,45 +89,35 @@ private:
     virtual void value_changed(void* object) override;
 
 public:
-    BooleanCheckBoxOption SEND_ERROR_REPORTS;
-
-    StringOption STATS_FILE;
-    BooleanCheckBoxOption ALL_STATS;
     BooleanCheckBoxOption CHECK_FOR_UPDATES;
 
-    ResolutionOption WINDOW_SIZE;
-    ThemeSelectorOption THEME;
+    StringOption STATS_FILE;
+    FolderInputOption TEMP_FOLDER;
+
+    Pimpl<ThemeSelectorOption> THEME;
+    Pimpl<ResolutionOption> WINDOW_SIZE;
+
+    Pimpl<StreamHistoryOption> STREAM_HISTORY;
+    Pimpl<SleepSuppressOptions> SLEEP_SUPPRESS;
 
     SectionDividerOption m_discord_settings;
-    Integration::DiscordSettingsOption DISCORD;
+    BooleanCheckBoxOption ALL_STATS;
+    Pimpl<Integration::DiscordSettingsOption> DISCORD;
 
     SectionDividerOption m_advanced_options;
 
     BooleanCheckBoxOption LOG_EVERYTHING;
     BooleanCheckBoxOption SAVE_DEBUG_IMAGES;
 //    BooleanCheckBoxOption NAUGHTY_MODE_OPTION;
-
     BooleanCheckBoxOption HIDE_NOTIF_DISCORD_LINK;
 
-//    ProcessPriorityOption PROCESS_PRIORITY0;
-    ThreadPriorityOption REALTIME_THREAD_PRIORITY0;
-    ThreadPriorityOption INFERENCE_PRIORITY0;
-    ThreadPriorityOption COMPUTE_PRIORITY0;
+    Pimpl<PerformanceOptions> PERFORMANCE;
+    Pimpl<AudioPipelineOptions> AUDIO_PIPELINE;
+    Pimpl<VideoPipelineOptions> VIDEO_PIPELINE;
 
-    FloatingPointOption AUDIO_FILE_VOLUME_SCALE;
-    FloatingPointOption AUDIO_DEVICE_VOLUME_SCALE;
-    BooleanCheckBoxOption SHOW_ALL_AUDIO_DEVICES;
-    BooleanCheckBoxOption SHOW_RECORD_FREQUENCIES;
+    BooleanCheckBoxOption ENABLE_LIFETIME_SANITIZER0;
 
-    VideoBackendOption VIDEO_BACKEND;
-    BooleanCheckBoxOption ENABLE_FRAME_SCREENSHOTS;
-
-    SimpleIntegerOption<uint8_t> AUTO_RESET_AUDIO_SECONDS;
-    SimpleIntegerOption<uint8_t> AUTO_RESET_VIDEO_SECONDS;
-
-    BooleanCheckBoxOption ENABLE_LIFETIME_SANITIZER;
-
-    ProcessorLevelOption PROCESSOR_LEVEL0;
+    Pimpl<ErrorReportOption> ERROR_REPORTS;
 
     StringOption DEVELOPER_TOKEN;
 

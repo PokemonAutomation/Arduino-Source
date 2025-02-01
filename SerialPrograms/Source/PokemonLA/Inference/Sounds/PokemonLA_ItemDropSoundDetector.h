@@ -7,10 +7,8 @@
 #ifndef PokemonAutomation_PokemonLA_ItemDropSoundDetector_H
 #define PokemonAutomation_PokemonLA_ItemDropSoundDetector_H
 
-#include <functional>
-#include "CommonFramework/Inference/AudioPerSpectrumDetectorBase.h"
-
-#include <memory>
+#include "CommonFramework/Tools/VideoStream.h"
+#include "CommonTools/Audio/AudioPerSpectrumDetectorBase.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -20,7 +18,7 @@ namespace PokemonLA{
 class ItemDropSoundDetector : public AudioPerSpectrumDetectorBase{
 public:
     //  Warning: The callback will be called from the audio inference thread.
-    ItemDropSoundDetector(ConsoleHandle& console, DetectedCallback detected_callback);
+    ItemDropSoundDetector(VideoStream& stream, DetectedCallback detected_callback);
 
     // Implement AudioPerSpectrumDetectorBase::get_score_threshold()
     virtual float get_score_threshold() const override;

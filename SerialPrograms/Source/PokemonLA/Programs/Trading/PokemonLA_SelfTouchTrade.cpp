@@ -8,12 +8,12 @@
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
-#include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
+#include "CommonTools/Images/SolidColorTest.h"
+#include "Controllers/SerialPABotBase/SerialPABotBase.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
-#include "PokemonLA/Resources/PokemonLA_AvailablePokemon.h"
 #include "PokemonLA_TradeRoutines.h"
 #include "PokemonLA_SelfTouchTrade.h"
 
@@ -32,7 +32,7 @@ SelfTouchTrade_Descriptor::SelfTouchTrade_Descriptor()
         "Repeatedly trade " + STRING_POKEMON + " between two local Switches to fill up research.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB,
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS},
         2, 2, 2
     )
 {}
@@ -112,7 +112,7 @@ bool SelfTouchTrade::trade_one(
     host.log("\"" + slug + "\" - Trades Remaining: " + std::to_string(iter->second));
 #if 1
     MultiConsoleErrorState error_state;
-    env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
+    env.run_in_parallel(scope, [&](ConsoleHandle& console, SwitchControllerContext& context){
         trade_current_pokemon(console, context, error_state, stats);
     });
     stats.m_trades++;
@@ -125,7 +125,7 @@ bool SelfTouchTrade::trade_one(
 
     return true;
 }
-bool SelfTouchTrade::move_to_next(Logger& logger, BotBaseContext& host, uint8_t& row, uint8_t& col){
+bool SelfTouchTrade::move_to_next(Logger& logger, SwitchControllerContext& host, uint8_t& row, uint8_t& col){
     //  Returns true if moved to next box.
 
     logger.log("Moving to next slot.");
@@ -160,7 +160,7 @@ void SelfTouchTrade::program(MultiSwitchProgramEnvironment& env, CancellableScop
     }
 
     //  Connect both controllers.
-    env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
+    env.run_in_parallel(scope, [&](ConsoleHandle& console, SwitchControllerContext& context){
         pbf_press_button(context, BUTTON_LCLICK, 10, 0);
     });
 
@@ -168,7 +168,7 @@ void SelfTouchTrade::program(MultiSwitchProgramEnvironment& env, CancellableScop
     uint8_t col = 0;
 
     bool host0 = HOSTING_SWITCH == HostingSwitch::Switch0;
-    BotBaseContext host_context(scope, (host0 ? env.consoles[0] : env.consoles[1]).botbase());
+    SwitchControllerContext host_context(scope, (host0 ? env.consoles[0] : env.consoles[1]).controller());
     ConsoleHandle& host = host0 ? env.consoles[0] : env.consoles[1];
     ConsoleHandle& recv = host0 ? env.consoles[1] : env.consoles[0];
 
@@ -180,7 +180,7 @@ void SelfTouchTrade::program(MultiSwitchProgramEnvironment& env, CancellableScop
         bool host_ok, recv_ok;
         OverlayBoxScope box0(host, {0.925, 0.100, 0.014, 0.030});
         OverlayBoxScope box1(recv, {0.925, 0.100, 0.014, 0.030});
-        env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
+        env.run_in_parallel(scope, [&](ConsoleHandle& console, SwitchControllerContext& context){
             ImageStats stats = image_stats(extract_box_reference(console.video().snapshot(), box0));
             bool ok = is_white(stats);
             if (host.index() == console.index()){

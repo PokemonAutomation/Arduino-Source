@@ -7,17 +7,18 @@
 #ifndef PokemonAutomation_NintendoSwitch_SingleSwitchProgram_H
 #define PokemonAutomation_NintendoSwitch_SingleSwitchProgram_H
 
-#include "Common/Compiler.h"
 #include "Common/Cpp/Options/BatchOption.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Notifications/EventNotificationOption.h"
-#include "CommonFramework/ControllerDevices/SerialPortGlobals.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
 #include "CommonFramework/Panels/ProgramDescriptor.h"
+#include "Controllers/ControllerCapability.h"
+#include "Controllers/SerialPABotBase/SerialPABotBase.h"    //  REMOVE
+#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 
 namespace PokemonAutomation{
-    class BotBaseContext;
+    class ControllerSession;
 namespace NintendoSwitch{
 
 
@@ -57,11 +58,11 @@ public:
         std::string description,
         FeedbackType feedback,
         AllowCommandsWhenRunning allow_commands_while_running,
-        PABotBaseLevel min_pabotbase_level
+        ControllerRequirements requirements
     );
 
     FeedbackType feedback() const{ return m_feedback; }
-    PABotBaseLevel min_pabotbase_level() const{ return m_min_pabotbase_level; }
+    const ControllerRequirements& requirements() const{ return m_requirements; }
     bool allow_commands_while_running() const{ return m_allow_commands_while_running; }
 
     virtual std::unique_ptr<PanelInstance> make_panel() const override;
@@ -69,7 +70,7 @@ public:
 
 private:
     const FeedbackType m_feedback;
-    const PABotBaseLevel m_min_pabotbase_level;
+    const ControllerRequirements m_requirements;
     const bool m_allow_commands_while_running;
 };
 
@@ -109,7 +110,25 @@ public:
         const std::vector<std::string>& error_notification_tags = {"Notifs"}
     );
 
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) = 0;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) = 0;
+
+
+public:
+    //  Startup Checks: Feel free to override to change behavior.
+
+    virtual void start_program_controller_check(
+        CancellableScope& scope,
+        ControllerSession& session
+    );
+    virtual void start_program_feedback_check(
+        CancellableScope& scope,
+        VideoStream& stream,
+        FeedbackType feedback_type
+    );
+    virtual void start_program_border_check(
+        CancellableScope& scope,
+        VideoStream& stream
+    );
 
 
 public:

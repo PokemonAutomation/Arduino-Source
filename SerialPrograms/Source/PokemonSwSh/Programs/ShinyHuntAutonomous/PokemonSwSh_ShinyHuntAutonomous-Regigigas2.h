@@ -14,7 +14,7 @@
 #include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
-#include "Pokemon/Options/Pokemon_EncounterBotOptions.h"
+//#include "Pokemon/Options/Pokemon_EncounterBotOptions.h"
 #include "PokemonSwSh/Options/PokemonSwSh_DateToucher.h"
 #include "PokemonSwSh/Options/PokemonSwSh_EncounterBotCommon.h"
 
@@ -35,10 +35,10 @@ public:
 class ShinyHuntAutonomousRegigigas2 : public SingleSwitchProgramInstance{
 public:
     ShinyHuntAutonomousRegigigas2();
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
-    bool kill_and_return(ConsoleHandle& console, BotBaseContext& context) const;
+    bool kill_and_return(VideoStream& stream, SwitchControllerContext& context) const;
 
 private:
     StartInGripOrGameOption START_LOCATION;

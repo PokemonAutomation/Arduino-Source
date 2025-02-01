@@ -4,16 +4,16 @@
  *
  */
 
+#include <vector>
 #include "Common/Cpp/AbstractLogger.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/Tools/DebugDumper.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "PokemonLA_BattleSpriteWatcher.h"
 
-#include <vector>
 #include <iostream>
-#include <algorithm>
 using std::cout;
 using std::endl;
 

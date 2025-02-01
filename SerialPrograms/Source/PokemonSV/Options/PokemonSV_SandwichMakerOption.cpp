@@ -296,13 +296,12 @@ SandwichMakerOption::SandwichMakerOption(
     OCR::LanguageOCROption* language_option,
     BaseRecipe base_recipe,
     bool show_save_option,
-    bool toggleable,
-    bool enabled
+    GroupOption::EnableMode enable_mode
 )
     : GroupOption(
         std::move(label),
         LockMode::UNLOCK_WHILE_RUNNING,
-        toggleable, enabled
+        enable_mode
     )
     , m_language_owner(language_option == nullptr
         ? new OCR::LanguageOCROption(
@@ -324,12 +323,12 @@ SandwichMakerOption::SandwichMakerOption(
         "<b>Sandwich Recipe:</b><br>Select a recipe to make a sandwich with preset ingredients, or select Custom Sandwich to make a sandwich using the table below. "
         "Refer to the documentation for recipe ingredients and valid Herba Mystica combinations.",
         {
-            {BaseRecipe::non_shiny,  "non-shiny",    "Normal Encounter (non-shiny)"},
-            {BaseRecipe::shiny,     "shiny",    "Sparkling + Title + Encounter"},
-            {BaseRecipe::huge,      "huge",     "Sparkling + Title + Humungo"},
-            {BaseRecipe::tiny,      "tiny",     "Sparkling + Title + Teensy"},
-            {BaseRecipe::paradox,   "paradox",  "Title + Encounter + Humungo/Teensy: Paradox-specific"},
-            {BaseRecipe::custom,    "custom",   "Custom Sandwich"},
+            {BaseRecipe::non_shiny, "non-shiny", "Normal Encounter (non-shiny)"},
+            {BaseRecipe::shiny,     "shiny",     "Sparkling + Title + Encounter"},
+            {BaseRecipe::huge,      "huge",      "Sparkling + Title + Humungo"},
+            {BaseRecipe::tiny,      "tiny",      "Sparkling + Title + Teensy"},
+            {BaseRecipe::paradox,   "paradox",   "Title + Encounter + Humungo/Teensy: Paradox-specific"},
+            {BaseRecipe::custom,    "custom",    "Custom Sandwich"},
         },
         LockMode::LOCK_WHILE_RUNNING,
         base_recipe

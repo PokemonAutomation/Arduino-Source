@@ -28,7 +28,7 @@ ShinyHuntOverworld_Descriptor::ShinyHuntOverworld_Descriptor()
         "Shiny hunt overworld " + STRING_POKEMON + ".",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 struct ShinyHuntOverworld_Descriptor::Stats : public PokemonSwSh::ShinyHuntTracker{
@@ -96,7 +96,7 @@ ShinyHuntOverworld::ShinyHuntOverworld()
 
 
 
-void ShinyHuntOverworld::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void ShinyHuntOverworld::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     OverlayLogTextScope overlay_log_text_scope(env.console.overlay());
     ShinyHuntOverworld_Descriptor::Stats& stats = env.current_stats<ShinyHuntOverworld_Descriptor::Stats>();
     env.update_stats();

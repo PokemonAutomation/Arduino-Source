@@ -8,18 +8,14 @@
 #include <algorithm>
 #include <sstream>
 #include <map>
-//#include "Common/Compiler.h"
 #include "Common/Cpp/Color.h"
 #include "Common/Cpp/Time.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "Kernels/Algorithm/Kernels_Algorithm_DisjointSet.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
-#include "CommonFramework/ImageTools/WaterfillUtilities.h"
-//#include "CommonFramework/ImageTools/ImageFilter.h"
-//#include "CommonFramework/ImageTools/SolidColorTest.h"
-//#include "CommonFramework/VideoPipeline/VideoOverlay.h"
+#include "CommonTools/Images/BinaryImage_FilterRgb32.h"
+#include "CommonTools/Images/WaterfillUtilities.h"
 #include "PokemonLA_BerryTreeDetector.h"
 #include "PokemonLA/PokemonLA_Locations.h"
 

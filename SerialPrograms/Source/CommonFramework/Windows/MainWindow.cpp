@@ -9,22 +9,26 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QGroupBox>
+#include <QCheckBox>
 #include <QLabel>
 #include <QPushButton>
 #include <QMessageBox>
+#include "Common/Cpp/CpuId/CpuId.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Logging/FileWindowLogger.h"
-#include "CommonFramework/NewVersionCheck.h"
+#include "CommonFramework/Startup/NewVersionCheck.h"
+#include "CommonFramework/Options/ResolutionOption.h"
+#include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "PanelLists.h"
 #include "WindowTracker.h"
 #include "ButtonDiagram.h"
 #include "MainWindow.h"
 
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 
@@ -38,7 +42,10 @@ MainWindow::MainWindow(QWidget* parent)
     }
     this->setWindowIcon(QIcon(QString::fromStdString(RESOURCE_PATH() + "icon.png")));
 //    QSize window_size = PERSISTENT_SETTINGS().window_size;
-    resize(GlobalSettings::instance().WINDOW_SIZE.WIDTH, GlobalSettings::instance().WINDOW_SIZE.HEIGHT);
+    resize(
+        GlobalSettings::instance().WINDOW_SIZE->WIDTH,
+        GlobalSettings::instance().WINDOW_SIZE->HEIGHT
+    );
     centralwidget = new QWidget(this);
     centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
     setCentralWidget(centralwidget);
@@ -51,7 +58,6 @@ MainWindow::MainWindow(QWidget* parent)
     setWindowTitle(QString::fromStdString(PROGRAM_NAME + " Computer-Control Programs (" + PROGRAM_VERSION + ")"));
 
     QHBoxLayout* hbox = new QHBoxLayout(centralwidget);
-
     QVBoxLayout* left_layout = new QVBoxLayout();
     hbox->addLayout(left_layout, 0);
 
@@ -76,8 +82,45 @@ MainWindow::MainWindow(QWidget* parent)
         QString::fromStdString(PROGRAM_NAME + " " + PROGRAM_VERSION + " (" + PA_ARCH_STRING + ")"),
         centralwidget
     );
+
+
     left_layout->addWidget(support_box);
     QVBoxLayout* support_layout = new QVBoxLayout(support_box);
+
+    {
+        QHBoxLayout* layout = new QHBoxLayout();
+        support_layout->addLayout(layout);
+        layout->setAlignment(Qt::AlignHCenter);
+        layout->setContentsMargins(0, 0, 0, 0);
+        m_sleep_text = new QLabel(support_box);
+        layout->addWidget(m_sleep_text, 2);
+        m_sleep_box = new QCheckBox("Force On", support_box);
+        layout->addWidget(m_sleep_box, 1, Qt::AlignHCenter);
+        sleep_suppress_state_changed(SystemSleepController::instance().current_state());
+#if QT_VERSION < 0x060700
+        connect(
+            m_sleep_box, &QCheckBox::stateChanged,
+            this, [this](int){
+                if (m_sleep_box->isChecked()){
+                    m_sleep_scope.reset(new SleepSuppressScope(SleepSuppress::SCREEN_ON));
+                }else{
+                    m_sleep_scope.reset();
+                }
+            }
+        );
+#else
+        connect(
+            m_sleep_box, &QCheckBox::checkStateChanged,
+            this, [this](Qt::CheckState state){
+                if (state == Qt::CheckState::Checked){
+                    m_sleep_scope.reset(new SleepSuppressScope(SleepSuppress::SCREEN_ON));
+                }else{
+                    m_sleep_scope.reset();
+                }
+            }
+        );
+#endif
+    }
 
     QHBoxLayout* support = new QHBoxLayout();
     support_layout->addLayout(support);
@@ -85,7 +128,6 @@ MainWindow::MainWindow(QWidget* parent)
 
     QVBoxLayout* links = new QVBoxLayout();
     support->addLayout(links);
-
     {
         QLabel* github = new QLabel(support_box);
         links->addWidget(github);
@@ -119,59 +161,66 @@ MainWindow::MainWindow(QWidget* parent)
         connect(
             about, &QLabel::linkActivated,
             this, [](const QString&){
+                std::string str;
+                str += PROGRAM_NAME + " Computer-Control Programs<br>";
+                str += "Copyright: 2020 - 2025<br>";
+                str += "Version: " + PROGRAM_VERSION + "<br>";
+                str += "<br>";
+                str += "Framework: Qt " + std::to_string(QT_VERSION_MAJOR);
+                str += "." + std::to_string(QT_VERSION_MINOR);
+                str += "." + std::to_string(QT_VERSION_PATCH);
+                str += "<br>";
+                str += "Compiler: " + COMPILER_VERSION;
+                str += "<br><br>";
+                str += "Made by the " + PROGRAM_NAME + " Discord Server.<br>";
+                str += "<br>";
+                str += "This program uses Qt and dynamically links to unmodified Qt libraries under LGPL.<br>";
+
                 QMessageBox box;
-                box.information(
-                    nullptr,
-                    "About",
-                    QString::fromStdString(
-                        PROGRAM_NAME + " Computer-Control Programs (" + PROGRAM_VERSION + ")<br>" +
-                        "Copyright: 2020 - 2022<br>" +
-                        "<br>"
-                        "Made by the " + PROGRAM_NAME + " Discord Server.<br>"
-                        "<br>"
-                        "This program uses Qt and dynamically links to unmodified Qt libraries under LGPL.<br>"
-                    )
-                );
+                box.information(nullptr, "About", QString::fromStdString(str));
             }
         );
     }
 
     QVBoxLayout* buttons = new QVBoxLayout();
     support->addLayout(buttons);
-
-    QPushButton* keyboard = new QPushButton("Keyboard Layout", support_box);
-    buttons->addWidget(keyboard);
-    m_button_diagram.reset(new ButtonDiagram());
-    connect(
-        keyboard, &QPushButton::clicked,
-        this, [button = m_button_diagram.get()](bool){
-            button->show();
-        }
-    );
-
-    m_output_window.reset(new FileWindowLoggerWindow((FileWindowLogger&)global_logger_raw()));
-    QPushButton* output = new QPushButton("Output Window", support_box);
-    buttons->addWidget(output);
-    connect(
-        output, &QPushButton::clicked,
-        this, [this](bool){
-            m_output_window->show();
-            m_output_window->raise(); // bring the window to front on macOS
-            m_output_window->activateWindow(); // bring the window to front on Windows
-        }
-    );
-
-    QPushButton* settings = new QPushButton("Settings", support_box);
-    m_settings = settings;
-    buttons->addWidget(settings);
-    connect(
-        settings, &QPushButton::clicked,
-        this, [this](bool){
-            if (report_new_panel_intent(GlobalSettings_Descriptor::INSTANCE)){
-                load_panel(nullptr, GlobalSettings_Descriptor::INSTANCE.make_panel());
+    {
+        QPushButton* keyboard = new QPushButton("Keyboard Layout", support_box);
+        buttons->addWidget(keyboard);
+        m_button_diagram.reset(new ButtonDiagram());
+        connect(
+            keyboard, &QPushButton::clicked,
+            this, [button = m_button_diagram.get()](bool){
+                button->show();
             }
-        }
-    );
+        );
+    }
+    {
+        m_output_window.reset(new FileWindowLoggerWindow((FileWindowLogger&)global_logger_raw()));
+        QPushButton* output = new QPushButton("Output Window", support_box);
+        buttons->addWidget(output);
+        connect(
+            output, &QPushButton::clicked,
+            this, [this](bool){
+                m_output_window->show();
+                m_output_window->raise(); // bring the window to front on macOS
+                m_output_window->activateWindow(); // bring the window to front on Windows
+            }
+        );
+    }
+    {
+        QPushButton* settings = new QPushButton("Settings", support_box);
+        m_settings = settings;
+        buttons->addWidget(settings);
+        connect(
+            settings, &QPushButton::clicked,
+            this, [this](bool){
+                if (report_new_panel_intent(GlobalSettings_Descriptor::INSTANCE)){
+                    load_panel(nullptr, GlobalSettings_Descriptor::INSTANCE.make_panel());
+                }
+            }
+        );
+    }
 
     QVBoxLayout* right = new QVBoxLayout();
     m_right_panel_layout = right;
@@ -181,14 +230,16 @@ MainWindow::MainWindow(QWidget* parent)
     // Load the program panel specified in the persistent setting.
     m_program_list->load_persistent_panel();
 
-    GlobalSettings::instance().WINDOW_SIZE.WIDTH.add_listener(*this);
-    GlobalSettings::instance().WINDOW_SIZE.HEIGHT.add_listener(*this);
+    GlobalSettings::instance().WINDOW_SIZE->WIDTH.add_listener(*this);
+    GlobalSettings::instance().WINDOW_SIZE->HEIGHT.add_listener(*this);
+    SystemSleepController::instance().add_listener(*this);
 //    cout << "Done constructing" << endl;
 }
 MainWindow::~MainWindow(){
     close_panel();
-    GlobalSettings::instance().WINDOW_SIZE.WIDTH.remove_listener(*this);
-    GlobalSettings::instance().WINDOW_SIZE.HEIGHT.remove_listener(*this);
+    SystemSleepController::instance().remove_listener(*this);
+    GlobalSettings::instance().WINDOW_SIZE->WIDTH.remove_listener(*this);
+    GlobalSettings::instance().WINDOW_SIZE->HEIGHT.remove_listener(*this);
 }
 
 
@@ -198,31 +249,31 @@ void MainWindow::closeEvent(QCloseEvent* event){
 }
 void MainWindow::resizeEvent(QResizeEvent* event){
     m_pending_resize = true;
-    GlobalSettings::instance().WINDOW_SIZE.WIDTH.set(width());
-    GlobalSettings::instance().WINDOW_SIZE.HEIGHT.set(height());
+    GlobalSettings::instance().WINDOW_SIZE->WIDTH.set(width());
+    GlobalSettings::instance().WINDOW_SIZE->HEIGHT.set(height());
     m_pending_resize = false;
 }
 
-void MainWindow::close_panel(){
+void MainWindow::close_panel() noexcept{
+//    cout << "close_panel(): enter: " << m_current_panel_widget << endl;
     //  Must destroy the widget first since it references the instance.
     if (m_current_panel_widget != nullptr){
         m_right_panel_layout->removeWidget(m_current_panel_widget);
-        delete m_current_panel_widget;
+        QWidget* widget = m_current_panel_widget;
         m_current_panel_widget = nullptr;
+        delete widget;
     }
+
+//    cout << "close_panel(): mid: " << m_current_panel_widget << endl;
 
     //  Now it's safe to destroy the instance.
     if (m_current_panel == nullptr){
         return;
     }
 
-    m_current_panel->save_settings();
-#if 0
-    const std::string& identifier = m_current_panel->descriptor().identifier();
-    if (!identifier.empty()){
-        PERSISTENT_SETTINGS().panels[QString::fromStdString(identifier)] = m_current_panel->to_json();
-    }
-#endif
+    try{
+        m_current_panel->save_settings();
+    }catch (...){}
 
     m_current_panel.reset();
     m_current_panel_descriptor.reset();
@@ -246,14 +297,33 @@ void MainWindow::load_panel(
     std::shared_ptr<const PanelDescriptor> descriptor,
     std::unique_ptr<PanelInstance> panel
 ){
+    if (m_panel_transition){
+        global_logger_tagged().log(
+            "Ignoring attempted panel change while existing one is still in progress.",
+            COLOR_RED
+        );
+        return;
+    }
+
+    m_panel_transition = true;
     close_panel();
-    check_new_version();
 
     //  Make new widget.
-    m_current_panel_widget = panel->make_widget(*this, *this);
-    m_current_panel_descriptor = std::move(descriptor);
-    m_current_panel = std::move(panel);
-    m_right_panel_layout->addWidget(m_current_panel_widget);
+    try{
+        check_new_version();
+        m_current_panel_widget = panel->make_widget(*this, *this);
+//        cout << "load_panel() = " << m_current_panel_widget << endl;
+        m_current_panel_descriptor = std::move(descriptor);
+        m_current_panel = std::move(panel);
+        m_right_panel_layout->addWidget(m_current_panel_widget);
+    }catch (...){
+        if (m_current_panel_widget != nullptr){
+            delete m_current_panel_widget;
+        }
+        m_panel_transition = false;
+        throw;
+    }
+    m_panel_transition = false;
 }
 void MainWindow::on_busy(){
     if (m_program_list){
@@ -272,7 +342,27 @@ void MainWindow::on_idle(){
 void MainWindow::value_changed(void* object){
     QMetaObject::invokeMethod(this, [this]{
         if (!m_pending_resize){
-            resize(GlobalSettings::instance().WINDOW_SIZE.WIDTH, GlobalSettings::instance().WINDOW_SIZE.HEIGHT);
+            resize(
+                GlobalSettings::instance().WINDOW_SIZE->WIDTH,
+                GlobalSettings::instance().WINDOW_SIZE->HEIGHT
+            );
+        }
+    });
+}
+void MainWindow::sleep_suppress_state_changed(SleepSuppress new_state){
+    QMetaObject::invokeMethod(this, [=, this]{
+        switch (new_state){
+        case PokemonAutomation::SleepSuppress::NONE:
+            m_sleep_text->setText("Sleep Suppress: <font color=\"green\">None</font>");
+//            m_sleep_box->setEnabled();
+//            m_sleep_box->setCheckState(Qt::CheckState::Unchecked);
+            break;
+        case PokemonAutomation::SleepSuppress::NO_SLEEP:
+            m_sleep_text->setText("Sleep Suppress: <font color=\"orange\">No Sleep</font>");
+            break;
+        case PokemonAutomation::SleepSuppress::SCREEN_ON:
+            m_sleep_text->setText("Sleep Suppress: <font color=\"red\">Screen On</font>");
+            break;
         }
     });
 }

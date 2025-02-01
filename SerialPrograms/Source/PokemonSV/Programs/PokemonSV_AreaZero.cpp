@@ -5,8 +5,8 @@
  */
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
-#include "CommonFramework/Inference/BlackScreenDetector.h"
+#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "PokemonSV/Inference/PokemonSV_ZeroGateWarpPromptDetector.h"
@@ -22,24 +22,25 @@ namespace PokemonSV{
 
 
 void inside_zero_gate_to_station(
-    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    const ProgramInfo& info,
+    VideoStream& stream, SwitchControllerContext& context,
     int station,    //  1 - 4
     bool heal_at_station
 ){
     {
         AdvanceDialogWatcher dialog(COLOR_GREEN);
-        int ret = run_until(
-            console, context,
-            [](BotBaseContext& context){
+        int ret = run_until<SwitchControllerContext>(
+            stream, context,
+            [](SwitchControllerContext& context){
                 pbf_move_left_joystick(context, 128, 0, 10 * TICKS_PER_SECOND, 0);
             },
             {dialog}
         );
         if (ret < 0){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
                 "Unable to find warp circle.",
-                true
+                stream
             );
         }
     }
@@ -49,10 +50,10 @@ void inside_zero_gate_to_station(
     WallClock start = current_time();
     while (true){
         if (current_time() - start > std::chrono::seconds(60)){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
                 "Unable to warp to station after 60 seconds.",
-                true
+                stream
             );
         }
 
@@ -61,29 +62,29 @@ void inside_zero_gate_to_station(
         BlackScreenOverWatcher black_screen(COLOR_RED);
         context.wait_for_all_requests();
         int ret = wait_until(
-            console, context, std::chrono::seconds(5),
+            stream, context, std::chrono::seconds(5),
             {dialog, prompt, black_screen}
         );
         context.wait_for(std::chrono::milliseconds(100));
 
         switch (ret){
         case 0:
-            console.log("Detected dialog.");
+            stream.log("Detected dialog.");
             pbf_press_button(context, BUTTON_A, 20, 30);
             continue;
         case 1:
-            console.log("Detected prompt.");
-            prompt.move_cursor(info, console, context, station - 1);
+            stream.log("Detected prompt.");
+            prompt.move_cursor(info, stream, context, station - 1);
             pbf_mash_button(context, BUTTON_A, 3 * TICKS_PER_SECOND);
             continue;
         case 2:
-            console.log("Black screen is over. Arrive at station.");
+            stream.log("Black screen is over. Arrive at station.");
             break;
         default:
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
                 "Unable to find warp to station 2.",
-                true
+                stream
             );
         }
 
@@ -93,7 +94,7 @@ void inside_zero_gate_to_station(
     context.wait_for(std::chrono::seconds(3));
 
     if (heal_at_station){
-        console.log("Moving to bed to heal.");
+        stream.log("Moving to bed to heal.");
         pbf_move_left_joystick(context, 144, 0, 4 * TICKS_PER_SECOND, 0);
         ssf_press_left_joystick(context, 255, 128, 0, 125);
         bool healed = false;
@@ -101,28 +102,28 @@ void inside_zero_gate_to_station(
             AdvanceDialogWatcher dialog(COLOR_GREEN);
             PromptDialogWatcher confirm(COLOR_GREEN);
             BlackScreenOverWatcher black_screen(COLOR_RED);
-            OverworldWatcher overworld(console, COLOR_BLUE);
+            OverworldWatcher overworld(stream.logger(), COLOR_BLUE);
             context.wait_for_all_requests();
             int ret = wait_until(
-                console, context, std::chrono::seconds(30),
+                stream, context, std::chrono::seconds(30),
                 {dialog, confirm, black_screen, overworld}
             );
             context.wait_for(std::chrono::milliseconds(100));
             switch (ret){
             case 0:
-                console.log("Detected dialog.");
+                stream.log("Detected dialog.");
                 pbf_press_button(context, BUTTON_B, 20, 105);
                 continue;
             case 1:
-                console.log("Detected rest prompt.");
+                stream.log("Detected rest prompt.");
                 pbf_press_button(context, BUTTON_A, 20, 105);
                 continue;
             case 2:
-                console.log("Done healing!");
+                stream.log("Done healing!");
                 healed = true;
                 continue;
             case 3:
-                console.log("Detected overworld.");
+                stream.log("Detected overworld.");
                 if (healed){
                     break;
                 }else{
@@ -130,22 +131,22 @@ void inside_zero_gate_to_station(
                     continue;
                 }
             default:
-                throw OperationFailedException(
-                    ErrorReport::SEND_ERROR_REPORT, console,
+                OperationFailedException::fire(
+                    ErrorReport::SEND_ERROR_REPORT,
                     "Heal at station: No state detected after 30 seconds.",
-                    true
+                    stream
                 );
             }
             break;
         }
     }
 
-    console.log("Exiting station. Waiting for black screen...");
+    stream.log("Exiting station. Waiting for black screen...");
     {
         BlackScreenOverWatcher black_screen(COLOR_RED);
-        int ret = run_until(
-            console, context,
-            [=](BotBaseContext& context){
+        int ret = run_until<SwitchControllerContext>(
+            stream, context,
+            [=](SwitchControllerContext& context){
                 if (heal_at_station){
                     pbf_move_left_joystick(context, 96, 255, 60 * TICKS_PER_SECOND, 0);
                 }else{
@@ -155,43 +156,49 @@ void inside_zero_gate_to_station(
             {black_screen}
         );
         if (ret < 0){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
                 "Unable to exit station after 60 seconds.",
-                true
+                stream
             );
         }
     }
 
-    console.log("Exiting station. Waiting for overworld...");
+    stream.log("Exiting station. Waiting for overworld...");
     {
-        OverworldWatcher overworld(console, COLOR_BLUE);
+        OverworldWatcher overworld(stream.logger(), COLOR_BLUE);
         int ret = wait_until(
-            console, context, std::chrono::seconds(30),
+            stream, context, std::chrono::seconds(30),
             {overworld}
         );
         if (ret < 0){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
                 "Unable to load overworld after exiting station for 30 seconds.",
-                true
+                stream
             );
         }
     }
 }
 
-void return_to_outside_zero_gate(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
-    open_map_from_overworld(info, console, context);
+void return_to_outside_zero_gate(
+    const ProgramInfo& info,
+    VideoStream& stream, SwitchControllerContext& context
+){
+    open_map_from_overworld(info, stream, context);
     pbf_move_left_joystick(context, 0, 0, 5, 50);
-    fly_to_overworld_from_map(info, console, context);
+    fly_to_overworld_from_map(info, stream, context);
 }
-void return_to_inside_zero_gate(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
-    return_to_outside_zero_gate(info, console, context);
+void return_to_inside_zero_gate(
+    const ProgramInfo& info,
+    VideoStream& stream, SwitchControllerContext& context
+){
+    return_to_outside_zero_gate(info, stream, context);
 
     BlackScreenOverWatcher black_screen;
-    int ret = run_until(
-        console, context,
-        [](BotBaseContext& context){
+    int ret = run_until<SwitchControllerContext>(
+        stream, context,
+        [](SwitchControllerContext& context){
             pbf_move_left_joystick(context, 255, 32, 20, 105);
             pbf_mash_button(context, BUTTON_L, 60);
             pbf_move_left_joystick(context, 128, 0, 10 * TICKS_PER_SECOND, 0);
@@ -199,31 +206,34 @@ void return_to_inside_zero_gate(const ProgramInfo& info, ConsoleHandle& console,
         {black_screen}
     );
     if (ret < 0){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, console,
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
             "Unable to enter Zero Gate.",
-            true
+            stream
         );
     }
 
-    OverworldWatcher overworld(console);
+    OverworldWatcher overworld(stream.logger());
     ret = wait_until(
-        console, context, std::chrono::seconds(10),
+        stream, context, std::chrono::seconds(10),
         {overworld}
     );
     if (ret < 0){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, console,
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
             "Unable to detect overworld inside Zero Gate.",
-            true
+            stream
         );
     }
 }
-void return_to_inside_zero_gate_from_picnic(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
+void return_to_inside_zero_gate_from_picnic(
+    const ProgramInfo& info,
+    VideoStream& stream, SwitchControllerContext& context
+){
     BlackScreenOverWatcher black_screen;
-    int ret = run_until(
-        console, context,
-        [](BotBaseContext& context){
+    int ret = run_until<SwitchControllerContext>(
+        stream, context,
+        [](SwitchControllerContext& context){
             pbf_move_left_joystick(context, 128, 255, 100, 40);
             pbf_mash_button(context, BUTTON_L, 60);
             pbf_move_left_joystick(context, 128, 0, 10 * TICKS_PER_SECOND, 0);
@@ -231,23 +241,23 @@ void return_to_inside_zero_gate_from_picnic(const ProgramInfo& info, ConsoleHand
         {black_screen}
     );
     if (ret < 0){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, console,
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
             "Unable to enter Zero Gate.",
-            true
+            stream
         );
     }
 
-    OverworldWatcher overworld(console);
+    OverworldWatcher overworld(stream.logger());
     ret = wait_until(
-        console, context, std::chrono::seconds(10),
+        stream, context, std::chrono::seconds(10),
         {overworld}
     );
     if (ret < 0){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, console,
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
             "Unable to detect overworld inside Zero Gate.",
-            true
+            stream
         );
     }
 }
@@ -256,10 +266,10 @@ void return_to_inside_zero_gate_from_picnic(const ProgramInfo& info, ConsoleHand
 
 
 void inside_zero_gate_to_secret_cave_entrance(
-    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context,
     bool heal_at_station
 ){
-    inside_zero_gate_to_station(info, console, context, 1, heal_at_station);
+    inside_zero_gate_to_station(info, stream, context, 1, heal_at_station);
 
     context.wait_for(std::chrono::seconds(3));
 

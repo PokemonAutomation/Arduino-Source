@@ -14,18 +14,13 @@
 #include "Common/Cpp/Containers/AlignedVector.tpp"
 #include "CommonFramework/AudioPipeline/AudioFeed.h"
 #include "CommonFramework/AudioPipeline/AudioTemplate.h"
-#include "CommonFramework/InferenceInfra/InferenceSession.h"
-#include "CommonFramework/Inference/AudioTemplateCache.h"
-#include "CommonFramework/Inference/SpectrogramMatcher.h"
-#include "CommonFramework/Tools/StatsTracking.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "NintendoSwitch/NintendoSwitch_Settings.h"
+#include "CommonTools/Audio/AudioTemplateCache.h"
+#include "CommonTools/Audio/SpectrogramMatcher.h"
+#include "CommonTools/Async/InferenceSession.h"
 #include "Pokemon/Pokemon_Strings.h"
-#include "PokemonBDSP/PokemonBDSP_Settings.h"
 #include "PokemonBDSP/Inference/Sounds/PokemonBDSP_ShinySoundDetector.h"
 #include "PokemonBDSP_SoundListener.h"
 
-#include <QMessageBox>
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -40,7 +35,7 @@ SoundListener_Descriptor::SoundListener_Descriptor()
         "",
         "Test sound detectors listening to audio stream.",
         FeedbackType::REQUIRED, AllowCommandsWhenRunning::ENABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 
@@ -66,7 +61,7 @@ SoundListener::SoundListener()
 
 // void search_alpha_roar_from_audio_dump();
 
-void SoundListener::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void SoundListener::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     // search_alpha_roar_from_audio_dump();
     // return;
 

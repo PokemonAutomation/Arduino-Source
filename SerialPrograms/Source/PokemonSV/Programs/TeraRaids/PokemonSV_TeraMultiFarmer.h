@@ -14,7 +14,7 @@
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
-#include "CommonFramework/Options/LanguageOCROption.h"
+#include "CommonTools/Options/LanguageOCROption.h"
 #include "NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h"
 #include "PokemonSwSh/Options/PokemonSwSh_BallSelectOption.h"
 #include "PokemonSV/Options/PokemonSV_TeraAIOption.h"
@@ -84,13 +84,13 @@ public:
     virtual void value_changed(void* object) override;
 
 private:
-    void reset_host(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
-    void reset_joiner(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context);
+    void reset_host(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context);
+    void reset_joiner(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context);
 
-    bool run_raid_host(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context);
-    void run_raid_joiner(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context);
+    bool run_raid_host(ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context);
+    void run_raid_joiner(ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context);
     void join_lobby(
-        ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+        ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context,
         size_t host_index, const std::string& normalized_code
     );
 

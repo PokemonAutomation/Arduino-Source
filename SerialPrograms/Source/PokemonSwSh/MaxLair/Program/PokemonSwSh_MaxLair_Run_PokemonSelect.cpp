@@ -5,12 +5,9 @@
  */
 
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
-#include "CommonFramework/Tools/InterruptableCommands.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonSelectMenu.h"
-#include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PathSelect.h"
 #include "PokemonSwSh_MaxLair_Run_PokemonSelect.h"
 
 namespace PokemonAutomation{
@@ -20,25 +17,27 @@ namespace MaxLairInternal{
 
 
 void run_select_pokemon(
-    ConsoleHandle& console, BotBaseContext& context,
+    size_t console_index,
+    VideoStream& stream, SwitchControllerContext& context,
     GlobalStateTracker& state_tracker,
+    OcrFailureWatchdog& ocr_watchdog,
     const ConsoleSpecificOptions& settings
 ){
-    size_t console_index = console.index();
     GlobalState& state = state_tracker[console_index];
 
     state.adventure_started = true;
 
-    console.log("Switch " + std::to_string(console.index()) + "'s turn to select.");
+    stream.log("Switch " + std::to_string(console_index) + "'s turn to select.");
 
     //  Wait for the screen to finish loading.
     context.wait_for(std::chrono::milliseconds(500));
 
 
     PokemonSelectMenuReader reader(
-        console,
-        console.overlay(),
-        settings.language
+        stream.logger(),
+        stream.overlay(),
+        settings.language,
+        ocr_watchdog
     );
 
 
@@ -49,7 +48,7 @@ void run_select_pokemon(
 //    context.wait_for_all_requests();
 
     //  Read the bottom two options first.
-    VideoSnapshot screen = console.video().snapshot();
+    VideoSnapshot screen = stream.video().snapshot();
     options[1] = reader.read_option(screen, 1);
     options[2] = reader.read_option(screen, 2);
 
@@ -64,7 +63,7 @@ void run_select_pokemon(
     //  Scroll down one to move the arrow off the top row. Then we can read it.
     pbf_press_dpad(context, DPAD_DOWN, 10, 80);
     context.wait_for_all_requests();
-    screen = console.video().snapshot();
+    screen = stream.video().snapshot();
     options[0] = reader.read_option(screen, 0);
 
     state.add_seen(options[0]);
@@ -78,8 +77,8 @@ void run_select_pokemon(
 
 
     //  Make your selection.
-    int8_t selection = select_starter(console, inferred, player_index, options);
-    console.log("Choosing option " + std::to_string((int)selection) + ".", COLOR_PURPLE);
+    int8_t selection = select_starter(stream.logger(), inferred, player_index, options);
+    stream.log("Choosing option " + std::to_string((int)selection) + ".", COLOR_PURPLE);
     switch (selection){
     case 0:
         pbf_press_dpad(context, DPAD_UP, 10, 50);

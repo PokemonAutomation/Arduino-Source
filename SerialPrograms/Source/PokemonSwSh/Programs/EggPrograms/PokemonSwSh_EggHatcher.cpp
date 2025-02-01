@@ -6,7 +6,7 @@
 
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "Pokemon/Pokemon_Strings.h"
-#include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
+//#include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_EggRoutines.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_GameEntry.h"
 #include "PokemonSwSh_EggHelpers.h"
@@ -26,13 +26,13 @@ EggHatcher_Descriptor::EggHatcher_Descriptor()
         "Hatch eggs from boxes.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 
 
 
-void withdraw_column(BotBaseContext& context, uint8_t column){
+void withdraw_column(SwitchControllerContext& context, uint8_t column){
     menu_to_box(context, false);
     party_to_column(context, column);
     pickup_column(context, false);
@@ -40,14 +40,14 @@ void withdraw_column(BotBaseContext& context, uint8_t column){
     ssf_press_button1(context, BUTTON_A, GameSettings::instance().BOX_PICKUP_DROP_DELAY);
     box_to_menu(context);
 }
-void deposit_column(BotBaseContext& context, uint8_t column){
+void deposit_column(SwitchControllerContext& context, uint8_t column){
     menu_to_box(context, true);
     pickup_column(context, true);
     party_to_column(context, column);
     ssf_press_button1(context, BUTTON_A, GameSettings::instance().BOX_PICKUP_DROP_DELAY);
     box_to_menu(context);
 }
-uint8_t swap_party(BotBaseContext& context, uint8_t column){
+uint8_t swap_party(SwitchControllerContext& context, uint8_t column){
     menu_to_box(context, true);
     pickup_column(context, true);
 
@@ -112,7 +112,7 @@ EggHatcher::EggHatcher()
     PA_ADD_OPTION(SAFETY_TIME0);
     PA_ADD_OPTION(HATCH_DELAY);
 }
-void EggHatcher::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void EggHatcher::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     //  Calculate upper bounds for incubation time.
     uint16_t INCUBATION_DELAY_UPPER = (uint16_t)((uint32_t)STEPS_TO_HATCH * 2 * (uint32_t)103180 >> 16);
     uint16_t TOTAL_DELAY = INCUBATION_DELAY_UPPER + HATCH_DELAY + SAFETY_TIME0 - TRAVEL_RIGHT_DURATION;

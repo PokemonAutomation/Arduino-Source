@@ -5,11 +5,10 @@
  */
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/Inference/ImageMatchDetector.h"
-#include "CommonFramework/Tools/StatsTracking.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
+#include "CommonTools/VisualDetectors/ImageMatchDetector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonBDSP/PokemonBDSP_Settings.h"
@@ -32,7 +31,7 @@ CloneItemsBoxCopy2_Descriptor::CloneItemsBoxCopy2_Descriptor()
         "<font color=\"red\">(The menu glitch can only be activated on version 1.1.0 - 1.1.3.)</font>",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 struct CloneItemsBoxCopy2_Descriptor::Stats : public StatsTracker{
@@ -82,7 +81,7 @@ CloneItemsBoxCopy2::CloneItemsBoxCopy2()
 
 
 
-void CloneItemsBoxCopy2::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void CloneItemsBoxCopy2::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     CloneItemsBoxCopy2_Descriptor::Stats& stats = env.current_stats<CloneItemsBoxCopy2_Descriptor::Stats>();
 
 //    uint16_t MENU_TO_POKEMON_DELAY = GameSettings::instance().MENU_TO_POKEMON_DELAY;
@@ -175,10 +174,10 @@ void CloneItemsBoxCopy2::program(SingleSwitchProgramEnvironment& env, BotBaseCon
         context.wait_for(std::chrono::milliseconds(500));
         if (!matcher.detect(env.console.video().snapshot())){
             stats.m_errors++;
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
                 "Failed to return to starting position. Something is wrong.",
-                true
+                env.console
             );
         }
 

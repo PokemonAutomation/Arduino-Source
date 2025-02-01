@@ -4,15 +4,15 @@
  *
  */
 
-#include "CommonFramework/ImageTools/SolidColorTest.h"
+#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
+#include "CommonFramework/ImageTools/ImageDiff.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "PokemonLA_MMOSpriteStarSymbolDetector.h"
-#include "CommonFramework/ImageMatch/ImageDiff.h"
 
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

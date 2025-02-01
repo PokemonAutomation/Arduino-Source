@@ -4,12 +4,12 @@
  *
  */
 
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Routines.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
-#include "NintendoSwitch/FixedInterval.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
-#include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
+//#include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "PokemonSwSh_ShinyHuntTools.h"
 
@@ -18,13 +18,13 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-void run_away_with_lights(BotBaseContext& context){
-    set_leds(context, true);
+void run_away_with_lights(SwitchControllerContext& context){
+//    set_leds(context, true);
     pbf_press_dpad(context, DPAD_UP, 10, 0);
     pbf_press_button(context, BUTTON_A, 10, 3 * TICKS_PER_SECOND);
-    set_leds(context, false);
+//    set_leds(context, false);
 }
-void enter_summary(BotBaseContext& context, bool regi_move_right){
+void enter_summary(SwitchControllerContext& context, bool regi_move_right){
     pbf_press_dpad(context, DPAD_DOWN, 10, 0);
     pbf_press_button(context, BUTTON_A, 10, 2 * TICKS_PER_SECOND);
     pbf_press_button(context, BUTTON_A, 10, 200);
@@ -34,7 +34,11 @@ void enter_summary(BotBaseContext& context, bool regi_move_right){
     pbf_press_dpad(context, DPAD_DOWN, 10, 0);
     pbf_press_button(context, BUTTON_A, 10, 10);    //  For Regi, this clears the dialog after running.
 }
-void close_game_if_overworld(ConsoleHandle& console, BotBaseContext& context, bool touch_date, uint8_t rollback_hours){
+void close_game_if_overworld(
+    VideoStream& stream, SwitchControllerContext& context,
+    bool touch_date,
+    uint8_t rollback_hours
+){
     //  Enter Y-COMM.
     ssf_press_button2(context, BUTTON_Y, GameSettings::instance().OPEN_YCOMM_DELAY, 10);
 
@@ -67,7 +71,7 @@ void close_game_if_overworld(ConsoleHandle& console, BotBaseContext& context, bo
     pbf_press_dpad(context, DPAD_DOWN, 10, 10);
 
     //  Close and restart game.
-    close_game(console, context);
+    close_game(stream, context);
     pbf_press_button(context, BUTTON_HOME, 10, 190);
 }
 

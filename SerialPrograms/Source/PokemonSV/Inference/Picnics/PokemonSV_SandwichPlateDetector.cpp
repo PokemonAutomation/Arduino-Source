@@ -5,14 +5,13 @@
  */
 
 
-#include "PokemonSV/Inference/Picnics/PokemonSV_SandwichIngredientDetector.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "CommonFramework/ImageTools/ImageFilter.h"
+#include "CommonTools/Images/ImageFilter.h"
 #include "PokemonSV_SandwichPlateDetector.h"
-// #include "CommonFramework/Tools/DebugDumper.h"
+#include "PokemonSV/Inference/Picnics/PokemonSV_SandwichIngredientDetector.h"
 
-#include <iostream>
+//#include <iostream>
 //using std::cout;
 //using std::endl;
 

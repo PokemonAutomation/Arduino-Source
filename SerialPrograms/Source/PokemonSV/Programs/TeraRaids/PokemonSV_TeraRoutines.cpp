@@ -7,17 +7,17 @@
 #include <cmath>
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
-#include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
+#include "CommonTools/Async/InferenceRoutines.h"
+#include "CommonTools/VisualDetectors/FrozenImageDetector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Pokemon_Notification.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
-//#include "PokemonSV/Inference/PokemonSV_GradientArrowDetector.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_TeraBattleMenus.h"
 #include "PokemonSV/Inference/PokemonSV_PokemonSummaryReader.h"
 #include "PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
@@ -30,6 +30,10 @@
 #include "PokemonSV/Programs/Battles/PokemonSV_BasicCatcher.h"
 #include "PokemonSV_TeraRoutines.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
@@ -38,14 +42,14 @@ using namespace Pokemon;
 
 
 
-bool open_raid(ConsoleHandle& console, BotBaseContext& context){
-    console.log("Opening raid...");
+bool open_raid(VideoStream& stream, SwitchControllerContext& context){
+    stream.log("Opening raid...");
     while (true){
         TeraCardWatcher card_detector(COLOR_RED);
         AdvanceDialogWatcher dialog(COLOR_YELLOW);
-        int ret = run_until(
-            console, context,
-            [](BotBaseContext& context){
+        int ret = run_until<SwitchControllerContext>(
+            stream, context,
+            [](SwitchControllerContext& context){
                 //  Do 2 presses in quick succession in case one drops or is
                 //  needed to connect the controller.
                 pbf_press_button(context, BUTTON_A, 5, 5);
@@ -58,35 +62,35 @@ bool open_raid(ConsoleHandle& console, BotBaseContext& context){
         );
         switch (ret){
         case 0:
-            console.log("Tera raid found!", COLOR_BLUE);
+            stream.log("Tera raid found!", COLOR_BLUE);
             return true;
         case 1:
-            console.log("Detect possible uncatchable dialog...", COLOR_ORANGE);
+            stream.log("Detect possible uncatchable dialog...", COLOR_ORANGE);
             pbf_press_button(context, BUTTON_B, 20, 105);
             continue;
         default:
-            console.log("No Tera raid found.", COLOR_ORANGE);
+            stream.log("No Tera raid found.", COLOR_ORANGE);
             return false;
         }
     }
 }
-void close_raid(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
-    console.log("Closing raid...");
+void close_raid(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+    stream.log("Closing raid...");
 
     WallClock start = current_time();
     while (true){
         context.wait_for_all_requests();
         if (current_time() - start > std::chrono::minutes(5)){
             dump_image_and_throw_recoverable_exception(
-                info, console, "CloseRaidFailed",
+                info, stream, "CloseRaidFailed",
                 "Failed to return to overworld after 5 minutes."
             );
         }
 
         TeraCardWatcher card_detector(COLOR_RED);
-        OverworldWatcher overworld(console, COLOR_CYAN);
+        OverworldWatcher overworld(stream.logger(), COLOR_CYAN);
         int ret = wait_until(
-            console, context,
+            stream, context,
             std::chrono::seconds(60),
             {card_detector, overworld}
         );
@@ -96,10 +100,10 @@ void close_raid(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext&
             pbf_press_button(context, BUTTON_B, 20, 105);
             continue;
         case 1:
-            console.log("Detected overworld.");
+            stream.log("Detected overworld.");
             return;
         default:
-            dump_image_and_throw_recoverable_exception(info, console, "CloseRaidFailed",
+            dump_image_and_throw_recoverable_exception(info, stream, "CloseRaidFailed",
                 "close_raid(): No recognized state after 60 seconds.");
         }
     }
@@ -108,7 +112,7 @@ void close_raid(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext&
 
 
 void open_hosting_lobby(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context,
     HostingMode mode
 ){
     bool recovery_mode = false;
@@ -117,17 +121,17 @@ void open_hosting_lobby(
         context.wait_for_all_requests();
         if (current_time() - start > std::chrono::minutes(2)){
             dump_image_and_throw_recoverable_exception(
-                env.program_info(), console, "OpenLobbyFailed",
+                env.program_info(), stream, "OpenLobbyFailed",
                 "Unable to open Tera lobby after 2 minutes."
             );
         }
 
-        OverworldWatcher overworld(console, COLOR_RED);
+        OverworldWatcher overworld(stream.logger(), COLOR_RED);
         if (recovery_mode){
             context.wait_for_all_requests();
-            int ret = run_until(
-                console, context,
-                [](BotBaseContext& context){
+            int ret = run_until<SwitchControllerContext>(
+                stream, context,
+                [](SwitchControllerContext& context){
                     pbf_press_button(context, BUTTON_B, 20, 980);
                 },
                 {overworld}
@@ -135,18 +139,20 @@ void open_hosting_lobby(
             if (ret < 0){
                 continue;
             }
-            console.log("Detected overworld. Recovery finished.");
+            stream.log("Detected overworld. Recovery finished.");
             recovery_mode = true;
         }
 
+//        AdvanceDialogWatcher dialog(COLOR_GREEN);
         TeraCardWatcher card_detector(COLOR_YELLOW);
-        TeraLobbyWatcher lobby(console.logger(), env.realtime_dispatcher(), COLOR_BLUE);
+        TeraLobbyWatcher lobby(stream.logger(), env.realtime_dispatcher(), COLOR_BLUE);
         context.wait_for_all_requests();
         int ret = wait_until(
-            console, context,
+            stream, context,
             std::chrono::seconds(30),
             {
                 overworld,
+//                dialog,
                 card_detector,
                 {lobby, std::chrono::milliseconds(500)}
             }
@@ -154,18 +160,24 @@ void open_hosting_lobby(
         context.wait_for(std::chrono::milliseconds(100));
         switch (ret){
         case 0:
-            console.log("Detected overworld.");
+            stream.log("Detected overworld.");
             recovery_mode = false;
-            if (!open_raid(console, context)){
-                throw OperationFailedException(
-                    ErrorReport::SEND_ERROR_REPORT, console,
+            if (!open_raid(stream, context)){
+                OperationFailedException::fire(
+                    ErrorReport::SEND_ERROR_REPORT,
                     "No Tera raid found.",
-                    true
+                    stream
                 );
             }
             continue;
+#if 0
         case 1:
-            console.log("Detected Tera card.");
+            stream.log("Detect possible uncatchable dialog...", COLOR_ORANGE);
+            pbf_press_button(context, BUTTON_B, 20, 230);
+            continue;
+#endif
+        case 1:
+            stream.log("Detected Tera card.");
             if (mode != HostingMode::LOCAL){
                 pbf_press_button(context, BUTTON_A, 20, 230);
                 if (mode == HostingMode::ONLINE_EVERYONE){
@@ -175,10 +187,10 @@ void open_hosting_lobby(
             pbf_press_button(context, BUTTON_A, 20, 230);
             continue;
         case 2:
-            console.log("Detected Tera lobby.");
+            stream.log("Detected Tera lobby.");
             return;
         default:
-            console.log("No state detected after 30 seconds. Backing out...", COLOR_RED);
+            stream.log("No state detected after 30 seconds. Backing out...", COLOR_RED);
             pbf_press_button(context, BUTTON_B, 20, 230);
             recovery_mode = true;
         }
@@ -190,7 +202,7 @@ void open_hosting_lobby(
 
 
 void enter_tera_search(
-    const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context,
+    const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context,
     bool connect_to_internet
 ){
     WallClock start = current_time();
@@ -198,12 +210,12 @@ void enter_tera_search(
     while (true){
         if (current_time() - start > std::chrono::minutes(5)){
             dump_image_and_throw_recoverable_exception(
-                info, console, "EnterTeraSearchFailed",
+                info, stream, "EnterTeraSearchFailed",
                 "enter_tera_search(): Failed to enter Tera search."
             );
         }
 
-        OverworldWatcher overworld(console, COLOR_RED);
+        OverworldWatcher overworld(stream.logger(), COLOR_RED);
         MainMenuWatcher main_menu(COLOR_YELLOW);
         PokePortalWatcher poke_portal(COLOR_GREEN);
         TeraRaidSearchWatcher raid_search(COLOR_CYAN);
@@ -211,7 +223,7 @@ void enter_tera_search(
         AdvanceDialogWatcher dialog(COLOR_BLUE);
         context.wait_for_all_requests();
         int ret = wait_until(
-            console, context,
+            stream, context,
             std::chrono::seconds(30),
             {
                 overworld,
@@ -225,42 +237,42 @@ void enter_tera_search(
         context.wait_for(std::chrono::milliseconds(100));
         switch (ret){
         case 0:
-            console.log("Detected overworld.");
+            stream.log("Detected overworld.");
             pbf_press_button(context, BUTTON_X, 20, 105);
             continue;
         case 1:
-            console.log("Detected main menu.");
+            stream.log("Detected main menu.");
             if (connect_to_internet && !connected){
-                connect_to_internet_from_menu(info, console, context);
+                connect_to_internet_from_menu(info, stream, context);
                 connected = true;
                 continue;
             }
-            if (main_menu.move_cursor(info, console, context, MenuSide::RIGHT, 3)){
+            if (main_menu.move_cursor(info, stream, context, MenuSide::RIGHT, 3)){
                 pbf_press_button(context, BUTTON_A, 20, 230);
             }
             continue;
         case 2:
-            console.log("Detected Poke Portal.");
-            if (poke_portal.move_cursor(info, console, context, 1)){
+            stream.log("Detected Poke Portal.");
+            if (poke_portal.move_cursor(info, stream, context, 1)){
                 pbf_press_button(context, BUTTON_A, 20, 230);
             }
             continue;
         case 3:
-            console.log("Detected Tera Raid Search.");
-            if (raid_search.move_cursor_to_search(info, console, context)){
+            stream.log("Detected Tera Raid Search.");
+            if (raid_search.move_cursor_to_search(info, stream, context)){
                 pbf_press_button(context, BUTTON_A, 20, 105);
             }
             continue;
         case 4:
-            console.log("Detected Code Entry.");
+            stream.log("Detected Code Entry.");
             return;
         case 5:
-            console.log("Detected Dialog.");
+            stream.log("Detected Dialog.");
             pbf_press_button(context, BUTTON_B, 20, 105);
             continue;
         default:
             dump_image_and_throw_recoverable_exception(
-                info, console, "EnterTeraSearchFailed",
+                info, stream, "EnterTeraSearchFailed",
                 "enter_tera_search(): No recognized state after 30 seconds."
             );
         }
@@ -272,33 +284,37 @@ void enter_tera_search(
 
 
 void stop_if_enough_rare_items(
-    ConsoleHandle& console, BotBaseContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     size_t stop_on_sparkly_items
 ){
     if (stop_on_sparkly_items == 0){
         return;
     }
-    size_t sparkly_items = SparklyItemDetector::count_sparkly_items(console, context);
-    console.log("Sparkly Items Detected: " + std::to_string(sparkly_items), COLOR_BLUE);
+    size_t sparkly_items = SparklyItemDetector::count_sparkly_items(stream, context);
+    stream.log("Sparkly Items Detected: " + std::to_string(sparkly_items), COLOR_BLUE);
     if (sparkly_items >= stop_on_sparkly_items){
-        throw ProgramFinishedException(console, "Found a raid with " + std::to_string(sparkly_items) + " rare items!", true);
+        throw_and_log<ProgramFinishedException>(
+            stream.logger(),
+            "Found a raid with " + std::to_string(sparkly_items) + " rare items!",
+            stream
+        );
     }
 }
 
 
 void exit_tera_win_without_catching(
     const ProgramInfo& info,
-    ConsoleHandle& console, BotBaseContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     size_t stop_on_sparkly_items
 ){
-    console.log("Exiting raid without catching...");
+    stream.log("Exiting raid without catching...");
 
     WallClock start = current_time();
     while (true){
         context.wait_for_all_requests();
         if (current_time() - start > std::chrono::minutes(5)){
             dump_image_and_throw_recoverable_exception(
-                info, console, "ExitTeraWinFailed",
+                info, stream, "ExitTeraWinFailed",
                 "Failed to return to overworld after 5 minutes."
             );
         }
@@ -312,36 +328,36 @@ void exit_tera_win_without_catching(
             std::chrono::seconds(1)
         );
         AdvanceDialogWatcher dialog(COLOR_YELLOW);
-        OverworldWatcher overworld(console, COLOR_RED);
+        OverworldWatcher overworld(stream.logger(), COLOR_RED);
         int ret = wait_until(
-            console, context,
+            stream, context,
             std::chrono::seconds(60),
             {catch_menu, next_button, dialog, overworld}
         );
         context.wait_for(std::chrono::milliseconds(100));
         switch (ret){
         case 0:
-            console.log("Detected catch prompt.");
-            catch_menu.move_to_slot(console, context, 1);
+            stream.log("Detected catch prompt.");
+            catch_menu.move_to_slot(stream, context, 1);
 //            pbf_press_dpad(context, DPAD_DOWN, 20, 30);
             pbf_mash_button(context, BUTTON_A, 30);
             pbf_mash_button(context, BUTTON_B, 125);
             continue;
         case 1:
-            console.log("Detected possible (A) Next button.");
-            stop_if_enough_rare_items(console, context, stop_on_sparkly_items);
+            stream.log("Detected possible (A) Next button.");
+            stop_if_enough_rare_items(stream, context, stop_on_sparkly_items);
             pbf_press_button(context, BUTTON_A, 20, 105);
             continue;
         case 2:
-            console.log("Detected dialog.");
+            stream.log("Detected dialog.");
             pbf_press_button(context, BUTTON_B, 20, 105);
             break;
         case 3:
-            console.log("Detected overworld.");
+            stream.log("Detected overworld.");
             return;
         default:
             dump_image_and_throw_recoverable_exception(
-                info, console, "ExitTeraWinFailed",
+                info, stream, "ExitTeraWinFailed",
                 "exit_tera_win_without_catching(): No recognized state after 60 seconds."
             );
         }
@@ -351,12 +367,12 @@ void exit_tera_win_without_catching(
 
 void exit_tera_win_by_catching(
     ProgramEnvironment& env,
-    ConsoleHandle& console, BotBaseContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     Language language,
     const std::string& ball_slug,
     size_t stop_on_sparkly_items
 ){
-    console.log("Exiting raid with catching...");
+    stream.log("Exiting raid with catching...");
 
     VideoSnapshot screenshot;
     WallClock start = current_time();
@@ -364,7 +380,7 @@ void exit_tera_win_by_catching(
         context.wait_for_all_requests();
         if (current_time() - start > std::chrono::minutes(5)){
             dump_image_and_throw_recoverable_exception(
-                env.program_info(), console, "ExitTeraWinFailed",
+                env.program_info(), stream, "ExitTeraWinFailed",
                 "Failed to return to overworld after 5 minutes."
             );
         }
@@ -381,10 +397,10 @@ void exit_tera_win_by_catching(
         PromptDialogWatcher add_to_party(COLOR_PURPLE, {0.500, 0.395, 0.400, 0.100});
         PromptDialogWatcher nickname(COLOR_GREEN, {0.500, 0.545, 0.400, 0.100});
         MainMenuWatcher main_menu(COLOR_BLUE);
-        OverworldWatcher overworld(console, COLOR_RED);
+        OverworldWatcher overworld(stream.logger(), COLOR_RED);
         context.wait_for_all_requests();
         int ret = wait_until(
-            console, context,
+            stream, context,
             std::chrono::seconds(60),
             {
                 catch_menu,
@@ -399,57 +415,57 @@ void exit_tera_win_by_catching(
         context.wait_for(std::chrono::milliseconds(100));
         switch (ret){
         case 0:{
-            console.log("Detected catch prompt.");
-            screenshot = console.video().snapshot();
+            stream.log("Detected catch prompt.");
+            screenshot = stream.video().snapshot();
 
-            catch_menu.move_to_slot(console, context, 0);
+            catch_menu.move_to_slot(stream, context, 0);
             pbf_press_button(context, BUTTON_A, 20, 150);
             context.wait_for_all_requests();
 
-            BattleBallReader reader(console, language);
-            int quantity = move_to_ball(reader, console, context, ball_slug);
+            BattleBallReader reader(stream, language);
+            int quantity = move_to_ball(reader, stream, context, ball_slug);
             if (quantity == 0){
-                throw FatalProgramException(
-                    ErrorReport::NO_ERROR_REPORT, console,
+                throw_and_log<FatalProgramException>(
+                    stream.logger(), ErrorReport::NO_ERROR_REPORT,
                     "Unable to find appropriate ball. Did you run out?",
-                    true
+                    stream
                 );
             }
             if (quantity < 0){
-                console.log("Unable to read ball quantity.", COLOR_RED);
+                stream.log("Unable to read ball quantity.", COLOR_RED);
             }
             pbf_mash_button(context, BUTTON_A, 125);
 
             continue;
         }
         case 1:
-            console.log("Detected (A) Next button.");
-            stop_if_enough_rare_items(console, context, stop_on_sparkly_items);
+            stream.log("Detected (A) Next button.");
+            stop_if_enough_rare_items(stream, context, stop_on_sparkly_items);
             pbf_press_button(context, BUTTON_A, 20, 105);
             pbf_press_button(context, BUTTON_B, 20, 105);
             continue;
         case 2:
-            console.log("Detected dialog.");
+            stream.log("Detected dialog.");
             pbf_press_button(context, BUTTON_B, 20, 105);
             continue;
         case 3:
-            console.log("Detected add-to-party prompt.");
+            stream.log("Detected add-to-party prompt.");
             pbf_press_button(context, BUTTON_B, 20, 105);
             continue;
         case 4:
-            console.log("Detected nickname prompt.");
+            stream.log("Detected nickname prompt.");
             pbf_press_button(context, BUTTON_B, 20, 105);
             continue;
         case 5:
-            console.log("Detected unexpected main menu.", COLOR_RED);
+            stream.log("Detected unexpected main menu.", COLOR_RED);
             pbf_press_button(context, BUTTON_B, 20, 105);
             continue;
         case 6:
-            console.log("Detected overworld.");
+            stream.log("Detected overworld.");
             return;
         default:
             dump_image_and_throw_recoverable_exception(
-                env.program_info(), console, "ExitTeraWinFailed",
+                env.program_info(), stream, "ExitTeraWinFailed",
                 "exit_tera_win_by_catching(): No recognized state after 60 seconds."
             );
         }
@@ -459,7 +475,7 @@ void exit_tera_win_by_catching(
 
 TeraResult exit_tera_win_by_catching(
     ProgramEnvironment& env,
-    ConsoleHandle& console, BotBaseContext& context,
+    VideoStream& stream, SwitchControllerContext& context,
     Language language,
     const std::string& ball_slug,
     EventNotificationOption& notification_nonshiny,
@@ -467,7 +483,7 @@ TeraResult exit_tera_win_by_catching(
     bool stop_on_shiny, size_t stop_on_sparkly_items,
     std::atomic<uint64_t>* stat_shinies
 ){
-    console.log("Exiting raid with catching...");
+    stream.log("Exiting raid with catching...");
 
     TeraResult result = TeraResult::NO_DETECTION;
     VideoSnapshot screenshot;
@@ -476,7 +492,7 @@ TeraResult exit_tera_win_by_catching(
         context.wait_for_all_requests();
         if (current_time() - start > std::chrono::minutes(5)){
             dump_image_and_throw_recoverable_exception(
-                env.program_info(), console, "ExitTeraWinFailed",
+                env.program_info(), stream, "ExitTeraWinFailed",
                 "Failed to return to overworld after 5 minutes."
             );
         }
@@ -495,10 +511,10 @@ TeraResult exit_tera_win_by_catching(
         PromptDialogWatcher nickname(COLOR_GREEN, {0.500, 0.545, 0.400, 0.100});
         PokemonSummaryWatcher summary(COLOR_MAGENTA);
         MainMenuWatcher main_menu(COLOR_BLUE);
-        OverworldWatcher overworld(console, COLOR_RED);
+        OverworldWatcher overworld(stream.logger(), COLOR_RED);
         context.wait_for_all_requests();
         int ret = wait_until(
-            console, context,
+            stream, context,
             std::chrono::seconds(60),
             {
                 catch_menu,
@@ -515,35 +531,35 @@ TeraResult exit_tera_win_by_catching(
         context.wait_for(std::chrono::milliseconds(100));
         switch (ret){
         case 0:{
-            console.log("Detected catch prompt.");
-            screenshot = console.video().snapshot();
+            stream.log("Detected catch prompt.");
+            screenshot = stream.video().snapshot();
 
-            catch_menu.move_to_slot(console, context, 0);
+            catch_menu.move_to_slot(stream, context, 0);
             pbf_press_button(context, BUTTON_A, 20, 150);
             context.wait_for_all_requests();
 
-            BattleBallReader reader(console, language);
-            int quantity = move_to_ball(reader, console, context, ball_slug);
+            BattleBallReader reader(stream, language);
+            int quantity = move_to_ball(reader, stream, context, ball_slug);
             if (quantity == 0){
-                throw FatalProgramException(
-                    ErrorReport::NO_ERROR_REPORT, console,
+                throw_and_log<FatalProgramException>(
+                    stream.logger(), ErrorReport::NO_ERROR_REPORT,
                     "Unable to find appropriate ball. Did you run out?",
-                    true
+                    stream
                 );
             }
             if (quantity < 0){
-                console.log("Unable to read ball quantity.", COLOR_RED);
+                stream.log("Unable to read ball quantity.", COLOR_RED);
             }
             pbf_mash_button(context, BUTTON_A, 125);
 
             continue;
         }
         case 2:
-            console.log("Detected dialog.");
+            stream.log("Detected dialog.");
             pbf_press_button(context, BUTTON_B, 20, 105);
             continue;
         case 3:
-            console.log("Detected add-to-party prompt.");
+            stream.log("Detected add-to-party prompt.");
             if (result == TeraResult::NO_DETECTION){
                 pbf_press_dpad(context, DPAD_DOWN, 20, 60);
 //                pbf_press_button(context, BUTTON_A, 20, 105);
@@ -552,30 +568,30 @@ TeraResult exit_tera_win_by_catching(
             }
             continue;
         case 4:
-            console.log("Detected cursor over view summary.");
+            stream.log("Detected cursor over view summary.");
             pbf_press_button(context, BUTTON_A, 20, 105);
             continue;
         case 5:
-            console.log("Detected nickname prompt.");
+            stream.log("Detected nickname prompt.");
             pbf_press_button(context, BUTTON_B, 20, 105);
             continue;
         case 1:
             //  Next button detector is unreliable. Check if the summary is
             //  open. If so, fall-through to that.
-            if (!summary.detect(console.video().snapshot())){
-                console.log("Detected possible (A) Next button.");
-                stop_if_enough_rare_items(console, context, stop_on_sparkly_items);
+            if (!summary.detect(stream.video().snapshot())){
+                stream.log("Detected possible (A) Next button.");
+                stop_if_enough_rare_items(stream, context, stop_on_sparkly_items);
                 pbf_press_button(context, BUTTON_A, 20, 105);
                 pbf_press_button(context, BUTTON_B, 20, 105);
                 break;
             }
-            console.log("Detected false positive (A) Next button.", COLOR_RED);
+            stream.log("Detected false positive (A) Next button.", COLOR_RED);
         case 6:
-            console.log("Detected summary.");
+            stream.log("Detected summary.");
             if (result == TeraResult::NO_DETECTION){
                 context.wait_for(std::chrono::milliseconds(500));
                 result = run_tera_summary(
-                    env, console, context,
+                    env, stream, context,
                     notification_nonshiny,
                     notification_shiny,
                     stop_on_shiny, screenshot,
@@ -585,14 +601,14 @@ TeraResult exit_tera_win_by_catching(
             pbf_press_button(context, BUTTON_B, 20, 105);
             continue;
         case 7:
-            console.log("Detected unexpected main menu.", COLOR_RED);
+            stream.log("Detected unexpected main menu.", COLOR_RED);
             pbf_press_button(context, BUTTON_B, 20, 105);
             continue;
         case 8:
-            console.log("Detected overworld.");
+            stream.log("Detected overworld.");
             if (stop_on_shiny && result == TeraResult::NO_DETECTION){
                 throw UserSetupError(
-                    console,
+                    stream.logger(),
                     "Unable to find " + STRING_POKEMON + " summary to check for shininess. "
                     "Make sure your party is full and \"Send to Boxes\" is set to \"Manual\"."
                 );
@@ -600,7 +616,7 @@ TeraResult exit_tera_win_by_catching(
             return result;
         default:
             dump_image_and_throw_recoverable_exception(
-                env.program_info(), console, "ExitTeraWinFailed",
+                env.program_info(), stream, "ExitTeraWinFailed",
                 "exit_tera_win_by_catching(): No recognized state after 60 seconds."
             );
         }
@@ -612,16 +628,16 @@ TeraResult exit_tera_win_by_catching(
 
 TeraResult run_tera_summary(
     ProgramEnvironment& env,
-    ConsoleHandle& console,
-    BotBaseContext& context,
+    VideoStream& stream,
+    SwitchControllerContext& context,
     EventNotificationOption& notification_nonshiny,
     EventNotificationOption& notification_shiny,
     bool stop_on_shiny, const ImageViewRGB32& battle_screenshot,
     std::atomic<uint64_t>* stat_shinies
 ){
-    console.log("Reading summary...");
+    stream.log("Reading summary...");
 
-    VideoSnapshot screen = console.video().snapshot();
+    VideoSnapshot screen = stream.video().snapshot();
     PokemonSummaryDetector reader;
     if (reader.is_shiny(screen)){
         if (stat_shinies != nullptr){
@@ -654,26 +670,26 @@ TeraResult run_tera_summary(
 }
 
 
-void run_from_tera_battle(const ProgramInfo& info, ConsoleHandle& console, BotBaseContext& context){
-    console.log("Running away from tera raid battle...");
+void run_from_tera_battle(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+    stream.log("Running away from tera raid battle...");
 
     WallClock start = current_time();
     while (true){
         // Having a lot of Abilities activating can take a while, setting 3 minutes to be safe
         if (current_time() - start > std::chrono::minutes(3)){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
                 "run_from_tera_battle(): Failed to run away from tera raid battle after 3 minutes.",
-                true
+                stream
             );
         }
 
         TeraBattleMenuWatcher battle_menu(COLOR_GREEN);
-        OverworldWatcher overworld(console, COLOR_CYAN);
+        OverworldWatcher overworld(stream.logger(), COLOR_CYAN);
         context.wait_for_all_requests();
 
         int ret = wait_until(
-            console, context,
+            stream, context,
             std::chrono::minutes(1),
             {battle_menu, overworld}
         );
@@ -681,40 +697,49 @@ void run_from_tera_battle(const ProgramInfo& info, ConsoleHandle& console, BotBa
         context.wait_for(std::chrono::milliseconds(100));
         switch (ret){
         case 0:
-            console.log("Detected tera raid battle menu, running away...");
-            console.overlay().add_log("Running away...", COLOR_WHITE);
-            battle_menu.move_to_slot(console, context, 2);
+            stream.log("Detected tera raid battle menu, running away...");
+            stream.overlay().add_log("Running away...", COLOR_WHITE);
+            battle_menu.move_to_slot(stream, context, 2);
             pbf_mash_button(context, BUTTON_A, 800);
             continue;
         case 1:
-            console.log("Detected overworld.");
+            stream.log("Detected overworld.");
             return;
         default:
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, console,
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
                 "run_from_tera_battle(): No recognized state after 1 minutes.",
-                true
+                stream
             );
         }
     }
 }
 
 
-bool is_sparkling_raid(ConsoleHandle& console, BotBaseContext& context){
-    OverworldWatcher static_map(console, COLOR_CYAN, true);
+
+
+bool is_sparkling_raid(VideoStream& stream, SwitchControllerContext& context){
+//    cout << "is_sparkling_raid()" << endl;
+
+    FrozenImageDetector static_map(
+        COLOR_RED,
+        {0.890, 0.800, 0.030, 0.060},
+        std::chrono::seconds(1), 20
+    );
+
     context.wait_for_all_requests();
 
     int ret = wait_until(
-        console, context,
+        stream, context,
         std::chrono::seconds(2),
         {static_map}
     );
 
     if (ret == 0){
-        console.log("Did not detect sparkling raid", COLOR_ORANGE);
+        stream.log("Did not detect sparkling raid", COLOR_ORANGE);
         return false;
     }
-    console.log("Detected sparkling raid", COLOR_ORANGE);
+    stream.log("Detected sparkling raid", COLOR_ORANGE);
     return true;
 }
 

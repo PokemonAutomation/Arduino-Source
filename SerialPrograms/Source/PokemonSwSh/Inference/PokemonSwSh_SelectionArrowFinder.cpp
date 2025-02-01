@@ -9,14 +9,19 @@
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
-#include "CommonFramework/ImageMatch/ExactImageMatcher.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/DebugDumper.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
+#include "CommonTools/Images/BinaryImage_FilterRgb32.h"
+#include "CommonTools/ImageMatch/ExactImageMatcher.h"
 #include "PokemonSwSh_SelectionArrowFinder.h"
+
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -56,6 +61,8 @@ bool is_selection_arrow(const ImageViewRGB32& image, const WaterfillObject& obje
     }catch (InternalProgramError&){
         global_logger_tagged().log(
             "Mismatching matrix and image size.\n"
+            "    Image: " + std::to_string(image.width()) + "x" + std::to_string(image.height()) +
+            "    Cropped: " + std::to_string(cropped.width()) + "x" + std::to_string(cropped.height()) +
             "    Matrix: " + std::to_string(matrix_width) + "x" + std::to_string(matrix_height) +
             "    Object: " + std::to_string(object.width()) + "x" + std::to_string(object.height()) +
             "    Object X: " + std::to_string(object.min_x) + "-" + std::to_string(object.max_x) +
@@ -76,7 +83,8 @@ bool is_selection_arrow(const ImageViewRGB32& image, const WaterfillObject& obje
 }
 std::vector<ImagePixelBox> find_selection_arrows(const ImageViewRGB32& image, size_t min_area){
     if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
-        std::cout << "Match SwSh selection arrow by waterfill, size range (" << min_area << ", SIZE_MAX)" << std::endl;
+        std::cout << "Match SwSh selection arrow by waterfill, size range (" << min_area << ", SIZE_MAX) " 
+                  << "input image size " << image.width() << " x " << image.height() << std::endl;
     }
     PackedBinaryMatrix matrix = compress_rgb32_to_binary_max(image, 63, 63, 63);
     auto session = make_WaterfillSession(matrix);
@@ -84,6 +92,9 @@ std::vector<ImagePixelBox> find_selection_arrows(const ImageViewRGB32& image, si
     std::vector<ImagePixelBox> ret;
     WaterfillObject object;
     while (finder->find_next(object, true)){
+        if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
+            std::cout << "Found object: " << object.min_x << "-" << object.max_x << ", " << object.min_y << "-" << object.max_y << std::endl;
+        }
         if (is_selection_arrow(image, object)){
             ret.emplace_back(object);
         }
@@ -102,7 +113,7 @@ void SelectionArrowFinder::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_YELLOW, m_box);
 }
 bool SelectionArrowFinder::detect(const ImageViewRGB32& screen){
-    const float screen_scale = screen.height() / 1080.0;
+    const double screen_scale = screen.height() / 1080.0;
     // Smallest arrow takes at least 600 pixels on 1920x1080 screen.
     const size_t min_arrow_area = size_t(600.0 * screen_scale * screen_scale);
     std::vector<ImagePixelBox> arrows = find_selection_arrows(
@@ -187,7 +198,7 @@ RotomPhoneMenuArrowFinder::RotomPhoneMenuArrowFinder(VideoOverlay& overlay)
 }
 
 int RotomPhoneMenuArrowFinder::detect(const ImageViewRGB32& screen){
-    const float screen_scale = screen.height() / 1080.0;
+    const double screen_scale = screen.height() / 1080.0;
     const size_t min_arrow_area = size_t(1400 * screen_scale * screen_scale);
     for (size_t i_row = 0; i_row < 2; i_row++){
         for (size_t j_col = 0; j_col < 5; j_col++){

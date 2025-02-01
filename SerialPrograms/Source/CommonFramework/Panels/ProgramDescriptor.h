@@ -14,6 +14,13 @@ namespace PokemonAutomation{
 class StatsTracker;
 
 
+
+enum class AllowCommandsWhenRunning{
+    DISABLE_COMMANDS,
+    ENABLE_COMMANDS,
+};
+
+
 class ProgramDescriptor : public PanelDescriptor{
 public:
     using PanelDescriptor::PanelDescriptor;

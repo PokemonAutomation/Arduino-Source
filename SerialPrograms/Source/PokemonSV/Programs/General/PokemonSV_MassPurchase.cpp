@@ -7,10 +7,10 @@
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
-#include "CommonFramework/Tools/StatsTracking.h"
-#include "CommonFramework/Tools/VideoResolutionCheck.h"
+#include "CommonTools/Async/InferenceRoutines.h"
+#include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
@@ -30,7 +30,7 @@ MassPurchase_Descriptor::MassPurchase_Descriptor()
         "Purchase a specified amount of items from a shop.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 
@@ -83,14 +83,14 @@ MassPurchase::MassPurchase()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-bool MassPurchase::mass_purchase(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){
+bool MassPurchase::mass_purchase(ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context){
     MassPurchase_Descriptor::Stats& stats = env.current_stats<MassPurchase_Descriptor::Stats>();
 
-    OverworldWatcher overworld(console, COLOR_RED);
+    OverworldWatcher overworld(stream.logger(), COLOR_RED);
     AdvanceDialogWatcher dialog(COLOR_CYAN);
     context.wait_for_all_requests();
     int ret = wait_until(
-        console, context,
+        stream, context,
         std::chrono::seconds(2),
         {
             overworld,
@@ -103,10 +103,10 @@ bool MassPurchase::mass_purchase(ProgramEnvironment& env, ConsoleHandle& console
     case 0:
         env.log("Error - Stuck in Overworld");
         stats.errors++;
-        throw FatalProgramException(
-            ErrorReport::SEND_ERROR_REPORT, console,
+        throw_and_log<FatalProgramException>(
+            stream.logger(), ErrorReport::SEND_ERROR_REPORT,
             "Stuck in Overworld.",
-            true
+            stream
         );
 
     case 1:
@@ -120,14 +120,14 @@ bool MassPurchase::mass_purchase(ProgramEnvironment& env, ConsoleHandle& console
     }
 };
     
-bool MassPurchase::extra_items(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){
+bool MassPurchase::extra_items(ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context){
     MassPurchase_Descriptor::Stats& stats = env.current_stats<MassPurchase_Descriptor::Stats>();
 
-    OverworldWatcher overworld(console, COLOR_RED);
+    OverworldWatcher overworld(stream.logger(), COLOR_RED);
     AdvanceDialogWatcher dialog(COLOR_CYAN);
     context.wait_for_all_requests();
     int ret = wait_until(
-        console, context,
+        stream, context,
         std::chrono::seconds(2),
         {
             overworld,
@@ -140,10 +140,10 @@ bool MassPurchase::extra_items(ProgramEnvironment& env, ConsoleHandle& console, 
     case 0:
         env.log("Error - Stuck in Overworld");
         stats.errors++;
-        throw FatalProgramException(
-            ErrorReport::SEND_ERROR_REPORT, console,
+        throw_and_log<FatalProgramException>(
+            stream.logger(), ErrorReport::SEND_ERROR_REPORT,
             "Stuck in Overworld.",
-            true
+            stream
         );
 
     case 1:
@@ -155,7 +155,7 @@ bool MassPurchase::extra_items(ProgramEnvironment& env, ConsoleHandle& console, 
     }
 };
 
-void PokemonSV::MassPurchase::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void PokemonSV::MassPurchase::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
     MassPurchase_Descriptor::Stats& stats = env.current_stats<MassPurchase_Descriptor::Stats>();
 

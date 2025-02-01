@@ -25,7 +25,7 @@ class SnapshotDumper : public SingleSwitchProgramInstance{
 public:
     SnapshotDumper();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
     SimpleIntegerOption<uint32_t> PERIOD_MILLISECONDS;
@@ -38,7 +38,7 @@ private:
 };
 
 // takes a snapshot of the screen and saves it to the given folder_name
-void dump_snapshot(ConsoleHandle& console, std::string folder_name = "ScreenshotDumper");
+void dump_snapshot(VideoStream& stream, std::string folder_name = "ScreenshotDumper");
 
 }
 }

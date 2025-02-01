@@ -34,7 +34,7 @@ public:
 class TeraRoller : public SingleSwitchProgramInstance{
 public:
     TeraRoller();
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
     TeraRollFilter FILTER0;

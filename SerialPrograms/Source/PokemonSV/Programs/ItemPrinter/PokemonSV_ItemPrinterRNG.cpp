@@ -10,13 +10,12 @@
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/Tools/StatsTracking.h"
-#include "CommonFramework/Tools/VideoResolutionCheck.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
+#include "CommonTools/Async/InferenceRoutines.h"
+#include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-//#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_DateReader.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
@@ -27,7 +26,6 @@
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV/Inference/ItemPrinter/PokemonSV_ItemPrinterMaterialDetector.h"
-//#include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Programs/Farming/PokemonSV_MaterialFarmerTools.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSV_ItemPrinterSeedCalc.h"
@@ -52,7 +50,7 @@ ItemPrinterRNG_Descriptor::ItemPrinterRNG_Descriptor()
         "Farm the Item Printer using RNG Manipulation.",
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 
@@ -179,7 +177,7 @@ ItemPrinterRNG::ItemPrinterRNG()
         1, 999
     )
     , MATERIAL_FARMER_OPTIONS(
-        true, false,
+        GroupOption::EnableMode::DEFAULT_DISABLED,
         &LANGUAGE,
         NOTIFICATION_STATUS_UPDATE,
         NOTIFICATION_PROGRAM_FINISH,
@@ -311,7 +309,7 @@ bool ItemPrinterRNG::overlapping_bonus(){
 
 
 ItemPrinterPrizeResult ItemPrinterRNG::run_print_at_date(
-    SingleSwitchProgramEnvironment& env, BotBaseContext& context,
+    SingleSwitchProgramEnvironment& env, SwitchControllerContext& context,
     const DateTime& date, ItemPrinterJobs jobs
 ){
     ItemPrinterRNG_Descriptor::Stats& stats = env.current_stats<ItemPrinterRNG_Descriptor::Stats>();
@@ -434,10 +432,10 @@ ItemPrinterPrizeResult ItemPrinterRNG::run_print_at_date(
         default:
             stats.errors++;
             env.update_stats();
-            throw OperationFailedException(
+            OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                env.logger(),
-                ""
+                "No state detected after 2 minutes.",
+                env.console
             );
         }
     }
@@ -562,7 +560,7 @@ bool ItemPrinterRNG::results_approximately_match(
 }
 
 void ItemPrinterRNG::print_again(
-    SingleSwitchProgramEnvironment& env, BotBaseContext& context,
+    SingleSwitchProgramEnvironment& env, SwitchControllerContext& context,
     ItemPrinterJobs jobs
 ) const{
     ItemPrinterRNG_Descriptor::Stats& stats = env.current_stats<ItemPrinterRNG_Descriptor::Stats>();
@@ -609,10 +607,10 @@ void ItemPrinterRNG::print_again(
         default:
             stats.errors++;
             env.update_stats();
-            throw OperationFailedException(
+            OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                env.logger(),
-                ""
+                "No state detected after 2 minutes.",
+                env.console
             );
         }
     }
@@ -620,13 +618,13 @@ void ItemPrinterRNG::print_again(
 
 void ItemPrinterRNG::run_item_printer_rng_automode(
     SingleSwitchProgramEnvironment& env, 
-    BotBaseContext& context, 
+    SwitchControllerContext& context, 
     ItemPrinterRNG_Descriptor::Stats& stats
 ){
     const uint16_t min_happiny_dust = 400;
 
     MaterialFarmerOptions material_farmer_options(
-        true, true,
+        GroupOption::EnableMode::DEFAULT_ENABLED,
         &LANGUAGE,
         NOTIFICATION_STATUS_UPDATE,
         NOTIFICATION_PROGRAM_FINISH,
@@ -740,7 +738,7 @@ int16_t ItemPrinterRNG::check_obtained_quantity(std::map<std::string, uint16_t> 
 
 void ItemPrinterRNG::run_material_farming_then_return_to_item_printer(
     SingleSwitchProgramEnvironment& env, 
-    BotBaseContext& context, 
+    SwitchControllerContext& context, 
     ItemPrinterRNG_Descriptor::Stats& stats,
     MaterialFarmerOptions& material_farmer_options
 ){
@@ -807,7 +805,7 @@ ItemPrinter::PrebuiltOptions ItemPrinterRNG::get_bonus_type(ItemPrinter::Prebuil
 
 
 void ItemPrinterRNG::run_item_printer_rng(
-    SingleSwitchProgramEnvironment& env, BotBaseContext& context, 
+    SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, 
     ItemPrinterRNG_Descriptor::Stats& stats
 ){
     //  For each job that we print, we increment jobs_counter.
@@ -914,7 +912,7 @@ void ItemPrinterRNG::run_item_printer_rng(
 // and how low we allow the Happiny dust to go (min_happiny_dust)
 uint32_t ItemPrinterRNG::calc_num_jobs_using_happiny_dust(
     SingleSwitchProgramEnvironment& env, 
-    BotBaseContext& context,
+    SwitchControllerContext& context,
     uint16_t min_happiny_dust
 ){
     uint32_t num_happiny_dust = check_num_happiny_dust(env, context);
@@ -924,7 +922,7 @@ uint32_t ItemPrinterRNG::calc_num_jobs_using_happiny_dust(
     num_happiny_dust_can_use = num_happiny_dust_can_use < 0 ? 0 : num_happiny_dust_can_use;
 
     // assume 62% value for Happiny Dust to account for item printer wasteage.
-    uint32_t num_print_jobs = num_happiny_dust_can_use * 0.62; // truncate the float back to int
+    uint32_t num_print_jobs = (uint32_t)(num_happiny_dust_can_use * 0.62); // truncate the float back to int
     env.console.log("Number of Happiny Dust we have: " + std::to_string(num_happiny_dust));
     env.console.log("Number of Happiny Dust we can use (with some safety margins): " + std::to_string(num_happiny_dust_can_use));
     env.console.log("Number of print jobs we can do before material farming: " + std::to_string(num_print_jobs));
@@ -932,7 +930,7 @@ uint32_t ItemPrinterRNG::calc_num_jobs_using_happiny_dust(
 }
 
 uint32_t ItemPrinterRNG::check_num_happiny_dust(
-    SingleSwitchProgramEnvironment& env, BotBaseContext& context
+    SingleSwitchProgramEnvironment& env, SwitchControllerContext& context
 ){
     ItemPrinterRNG_Descriptor::Stats& stats = env.current_stats<ItemPrinterRNG_Descriptor::Stats>();
     env.log("Check how much Happiny Dust we have.");
@@ -983,10 +981,10 @@ uint32_t ItemPrinterRNG::check_num_happiny_dust(
         default:
             stats.errors++;
             env.update_stats();
-            throw OperationFailedException(
+            OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                env.logger(),
-                ""
+                "No state detected after 2 minutes.",
+                env.console
             );
         }
     }    
@@ -994,7 +992,7 @@ uint32_t ItemPrinterRNG::check_num_happiny_dust(
     return 0;
 }
 
-void ItemPrinterRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void ItemPrinterRNG::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
     ItemPrinterRNG_Descriptor::Stats& stats = env.current_stats<ItemPrinterRNG_Descriptor::Stats>();
     env.update_stats();

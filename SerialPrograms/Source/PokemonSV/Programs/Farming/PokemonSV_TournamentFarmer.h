@@ -10,8 +10,8 @@
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/ButtonOption.h"
-#include "CommonFramework/Options/LanguageOCROption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
+#include "CommonTools/Options/LanguageOCROption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "PokemonSV/Options/PokemonSV_TournamentPrizeTable.h"
@@ -21,10 +21,10 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 
-void return_to_academy_after_loss(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+void return_to_academy_after_loss(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
 
 // attempt to fly back to academy fly point from the West Mesogoza Pokecenter. Will attempt maxAttempts times.
-void go_to_academy_fly_point(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+void go_to_academy_fly_point(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
 
 class TournamentFarmer_Descriptor : public SingleSwitchProgramDescriptor{
 public:
@@ -37,7 +37,7 @@ class TournamentFarmer : public SingleSwitchProgramInstance, public ButtonListen
 public:
     ~TournamentFarmer();
     TournamentFarmer();
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
     virtual void on_press() override;
 
 private:
@@ -65,10 +65,10 @@ private:
 
     std::atomic<bool> m_stop_after_current;
 
-    void check_money(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-    void run_battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-    void check_prize(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-    void handle_end_of_tournament(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    void check_money(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
+    void run_battle(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
+    void check_prize(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
+    void handle_end_of_tournament(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
 };
 
 }

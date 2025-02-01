@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_Pokemon_PokemonNameReader_H
 #define PokemonAutomation_Pokemon_PokemonNameReader_H
 
-#include "CommonFramework/OCR/OCR_LargeDictionaryMatcher.h"
+#include "CommonTools/OCR/OCR_LargeDictionaryMatcher.h"
 
 namespace PokemonAutomation{
 namespace Pokemon{
@@ -31,7 +31,8 @@ public:
         Language language,
         const ImageViewRGB32& image,
         const std::vector<OCR::TextColorRange>& text_color_ranges,
-        double min_text_ratio = 0.01, double max_text_ratio = 0.50
+        double min_text_ratio = 0.01, double max_text_ratio = 0.50,
+        double max_log10p = MAX_LOG10P
     ) const;
 
 };

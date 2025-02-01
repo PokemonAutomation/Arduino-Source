@@ -6,9 +6,9 @@
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/Tools/StatsTracking.h"
-#include "CommonFramework/Tools/VideoResolutionCheck.h"
+#include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.h"
@@ -33,7 +33,7 @@ MassRelease_Descriptor::MassRelease_Descriptor()
         "Mass release boxes of " + STRING_POKEMON + ".",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 struct MassRelease_Descriptor::Stats : public StatsTracker{
@@ -95,7 +95,7 @@ MassRelease::MassRelease()
 
 
 
-void MassRelease::release_one(BoxDetector& box_detector, SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void MassRelease::release_one(BoxDetector& box_detector, SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     MassRelease_Descriptor::Stats& stats = env.current_stats<MassRelease_Descriptor::Stats>();
 
     env.log("Selecting " + STRING_POKEMON + "...");
@@ -151,7 +151,7 @@ void MassRelease::release_one(BoxDetector& box_detector, SingleSwitchProgramEnvi
         throw;
     }
 }
-void MassRelease::release_box(BoxDetector& box_detector, SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void MassRelease::release_box(BoxDetector& box_detector, SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     for (uint8_t row = 0; row < 5; row++){
         for (uint8_t j_col = 0; j_col < 6; j_col++){
             // Go through slots in a Z-shape pattern
@@ -165,7 +165,7 @@ void MassRelease::release_box(BoxDetector& box_detector, SingleSwitchProgramEnvi
 
 
 
-void MassRelease::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void MassRelease::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
     MassRelease_Descriptor::Stats& stats = env.current_stats<MassRelease_Descriptor::Stats>();

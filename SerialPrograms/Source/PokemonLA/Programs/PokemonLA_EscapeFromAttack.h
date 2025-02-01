@@ -7,7 +7,8 @@
 #ifndef PokemonAutomation_PokemonLA_EscapeFromAttack_H
 #define PokemonAutomation_PokemonLA_EscapeFromAttack_H
 
-#include "CommonFramework/Tools/SuperControlSession.h"
+#include "CommonTools/Async/SuperControlSession.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 #include "PokemonLA/Inference/PokemonLA_UnderAttackDetector.h"
 #include "PokemonLA/Inference/PokemonLA_MountDetector.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_ButtonDetector.h"
@@ -17,10 +18,11 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-class EscapeFromAttack : public SuperControlSession{
+class EscapeFromAttack : public SuperControlSession<SwitchController>{
 public:
     EscapeFromAttack(
-        ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+        ProgramEnvironment& env,
+        VideoStream& stream, SwitchControllerContext& context,
         std::chrono::seconds time_min,
         std::chrono::seconds time_limit
     );
@@ -51,10 +53,10 @@ private:
         return SuperControlSession::run_state_action((size_t)state);
     }
 
-    virtual bool run_state(AsyncCommandSession& commands, WallClock timestamp) override;
+    virtual bool run_state(AsyncCommandSession<SwitchController>& commands, WallClock timestamp) override;
 
-    bool run_flying(AsyncCommandSession& commands, WallClock timestamp);
-    bool run_climbing(AsyncCommandSession& commands, WallClock timestamp);
+    bool run_flying(AsyncCommandSession<SwitchController>& commands, WallClock timestamp);
+    bool run_climbing(AsyncCommandSession<SwitchController>& commands, WallClock timestamp);
 
 private:
     static const uint16_t GET_ON_MOUNT_TIME = 125;

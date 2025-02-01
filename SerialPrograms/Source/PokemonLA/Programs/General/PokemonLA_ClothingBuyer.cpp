@@ -22,7 +22,7 @@ ClothingBuyer_Descriptor::ClothingBuyer_Descriptor()
         "Buy out all the clothing in the store.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 
@@ -38,7 +38,7 @@ ClothingBuyer::ClothingBuyer()
 }
 
 
-void ClothingBuyer::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void ClothingBuyer::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     //  Connect the controller.
     pbf_press_button(context, BUTTON_LCLICK, 5, 5);
 

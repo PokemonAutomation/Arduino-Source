@@ -10,10 +10,10 @@
 #include <QScrollArea>
 #include "Common/Qt/CollapsibleGroupBox.h"
 #include "Common/Qt/Options/ConfigWidget.h"
-#include "CommonFramework/NewVersionCheck.h"
+#include "CommonFramework/Startup/NewVersionCheck.h"
 #include "CommonFramework/Panels/PanelTools.h"
 #include "CommonFramework/Panels/UI/PanelElements.h"
-#include "CommonFramework/Tools/StatsTracking.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgramOption.h"
 #include "NintendoSwitch_SingleSwitchProgramWidget.h"
 
@@ -52,8 +52,7 @@ SingleSwitchProgramWidget2::SingleSwitchProgramWidget2(
         descriptor.display_name(),
         descriptor.doc_link(),
         descriptor.description(),
-        descriptor.feedback(),
-        descriptor.min_pabotbase_level()
+        descriptor.feedback()
     );
     layout->addWidget(header);
 

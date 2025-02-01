@@ -13,13 +13,14 @@
 #include "Common/Cpp/Options/BatchOption.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Notifications/EventNotificationOption.h"
-#include "CommonFramework/ControllerDevices/SerialPortGlobals.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
 #include "CommonFramework/Panels/ProgramDescriptor.h"
+#include "Controllers/ControllerCapability.h"
+#include "Controllers/SerialPABotBase/SerialPABotBase.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 
 namespace PokemonAutomation{
-    class BotBaseContext;
+    class ControllerSession;
 namespace NintendoSwitch{
 
 
@@ -43,13 +44,13 @@ public:
     //  Run the specified lambda for all switches in parallel.
     void run_in_parallel(
         CancellableScope& scope,
-        const std::function<void(ConsoleHandle& console, BotBaseContext& context)>& func
+        const std::function<void(ConsoleHandle& console, SwitchControllerContext& context)>& func
     );
 
     //  Run the specified lambda for switch indices [s, e) in parallel.
     void run_in_parallel(
         CancellableScope& scope, size_t s, size_t e,
-        const std::function<void(ConsoleHandle& console, BotBaseContext& context)>& func
+        const std::function<void(ConsoleHandle& console, SwitchControllerContext& context)>& func
     );
 
 };
@@ -65,14 +66,14 @@ public:
         std::string description,
         FeedbackType feedback,
         AllowCommandsWhenRunning allow_commands_while_running,
-        PABotBaseLevel min_pabotbase_level,
+        ControllerRequirements m_requirements,
         size_t min_switches,
         size_t max_switches,
         size_t default_switches
     );
 
     FeedbackType feedback() const{ return m_feedback; }
-    PABotBaseLevel min_pabotbase_level() const{ return m_min_pabotbase_level; }
+    const ControllerRequirements& requirements() const{ return m_requirements; }
     bool allow_commands_while_running() const{ return m_allow_commands_while_running; }
 
     size_t min_switches() const{ return m_min_switches; }
@@ -84,7 +85,7 @@ public:
 
 private:
     const FeedbackType m_feedback;
-    const PABotBaseLevel m_min_pabotbase_level;
+    const ControllerRequirements m_requirements;
     const bool m_allow_commands_while_running;
 
     const size_t m_min_switches;
@@ -127,6 +128,24 @@ public:
     );
 
     virtual void program(MultiSwitchProgramEnvironment& env, CancellableScope& scope) = 0;
+
+
+public:
+    //  Startup Checks: Feel free to override to change behavior.
+
+    virtual void start_program_controller_check(
+        CancellableScope& scope,
+        ControllerSession& session, size_t console_index
+    );
+    virtual void start_program_feedback_check(
+        CancellableScope& scope,
+        VideoStream& stream, size_t console_index,
+        FeedbackType feedback_type
+    );
+    virtual void start_program_border_check(
+        CancellableScope& scope,
+        VideoStream& stream, size_t console_index
+    );
 
 
 public:

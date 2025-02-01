@@ -5,7 +5,7 @@
  */
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_SelectionArrow.h"
 #include "PokemonBDSP_GlobalRoomHeal.h"
@@ -16,8 +16,8 @@ namespace PokemonBDSP{
 
 
 
-bool heal_by_global_room(ConsoleHandle& console, BotBaseContext& context){
-    console.overlay().add_log("Heal by Global Room", COLOR_WHITE);
+bool heal_by_global_room(VideoStream& stream, SwitchControllerContext& context){
+    stream.overlay().add_log("Heal by Global Room", COLOR_WHITE);
     // Go to union room menu.
     const uint16_t overworld_to_room_delay = 125;
     pbf_press_button(context, BUTTON_Y, 10, overworld_to_room_delay);
@@ -27,10 +27,10 @@ bool heal_by_global_room(ConsoleHandle& console, BotBaseContext& context){
 
     // Press ZL until we are at:
     // - "Would you like to enter the Global Room?" To select: "Yes" and other options.
-    SelectionArrowFinder arrow(console, {0.50, 0.45, 0.20, 0.20}, COLOR_GREEN);
-    int ret = run_until(
-        console, context,
-        [](BotBaseContext& context){
+    SelectionArrowFinder arrow(stream.overlay(), {0.50, 0.45, 0.20, 0.20}, COLOR_GREEN);
+    int ret = run_until<SwitchControllerContext>(
+        stream, context,
+        [](SwitchControllerContext& context){
             for (int i = 0; i < 5; i++){
                 pbf_press_button(context, BUTTON_ZL, 10, 125);
             }
@@ -38,10 +38,10 @@ bool heal_by_global_room(ConsoleHandle& console, BotBaseContext& context){
         {{arrow}}
     );
     if (ret < 0){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, console,
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
             "No selection arrow detected when using Global Room.",
-            true
+            stream
         );
     }
 
@@ -52,7 +52,7 @@ bool heal_by_global_room(ConsoleHandle& console, BotBaseContext& context){
     pbf_mash_button(context, BUTTON_B, 400);
 
     context.wait_for_all_requests();
-    console.overlay().add_log("Heal complete", COLOR_WHITE);
+    stream.overlay().add_log("Heal complete", COLOR_WHITE);
     return true;
 }
 

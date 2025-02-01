@@ -30,7 +30,7 @@ class ShinyHuntUnattendedStrongSpawn : public SingleSwitchProgramInstance{
 public:
     ShinyHuntUnattendedStrongSpawn();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
     StartInGripOrClosedOption START_LOCATION;

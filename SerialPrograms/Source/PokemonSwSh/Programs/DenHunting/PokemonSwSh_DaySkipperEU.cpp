@@ -5,7 +5,9 @@
  */
 
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "NintendoSwitch/FixedInterval.h"
+#include "Controllers/SerialPABotBase/SerialPABotBase.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DaySkippers.h"
 #include "PokemonSwSh_DaySkipperStats.h"
@@ -25,7 +27,13 @@ DaySkipperEU_Descriptor::DaySkipperEU_Descriptor()
         "A day skipper for EU date format that.  (~7500 skips/hour)",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_31KB
+        {{
+            SerialPABotBase::NintendoSwitch_Basic, {
+                to_string(SerialPABotBase::Features::TickPrecise),
+                to_string(SerialPABotBase::Features::NintendoSwitch_Basic),
+                to_string(SerialPABotBase::Features::NintendoSwitch_DateSkip),
+            }
+        }}
     )
 {}
 std::unique_ptr<StatsTracker> DaySkipperEU_Descriptor::make_stats() const{
@@ -70,7 +78,7 @@ DaySkipperEU::DaySkipperEU()
 }
 
 
-void DaySkipperEU::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void DaySkipperEU::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     SkipperStats& stats = env.current_stats<SkipperStats>();
     stats.total_skips = SKIPS;
     stats.runs++;

@@ -5,14 +5,15 @@
  */
 
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
-#include "CommonFramework/Tools/StatsTracking.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleMenuDetector.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_BasicCatcher.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_GameEntry.h"
 #include "PokemonSwSh_StatsReset-Calyrex.h"
@@ -30,7 +31,7 @@ StatsResetCalyrex_Descriptor::StatsResetCalyrex_Descriptor()
         "Repeatedly catch calyrex (and its horse) until you get the stats you want.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 struct StatsResetCalyrex_Descriptor::Stats : public StatsTracker{
@@ -138,7 +139,7 @@ StatsResetCalyrex::StatsResetCalyrex()
 
 
 
-void StatsResetCalyrex::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void StatsResetCalyrex::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
         resume_game_back_out(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);
@@ -157,9 +158,9 @@ void StatsResetCalyrex::program(SingleSwitchProgramEnvironment& env, BotBaseCont
             context.wait_for_all_requests();
             {
                 StandardBattleMenuWatcher fight_detector(false);
-                int result = run_until(
+                int result = run_until<SwitchControllerContext>(
                     env.console, context,
-                    [](BotBaseContext& context){
+                    [](SwitchControllerContext& context){
                         while (true){
                             pbf_press_button(context, BUTTON_A, 10, 1 * TICKS_PER_SECOND);
                         }

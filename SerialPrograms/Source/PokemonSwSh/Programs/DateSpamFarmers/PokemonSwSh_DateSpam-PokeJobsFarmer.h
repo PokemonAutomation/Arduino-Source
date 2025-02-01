@@ -27,7 +27,7 @@ class PokeJobsFarmer : public SingleSwitchProgramInstance{
 public:
     PokeJobsFarmer();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
     StartInGripOrGameOption START_LOCATION;

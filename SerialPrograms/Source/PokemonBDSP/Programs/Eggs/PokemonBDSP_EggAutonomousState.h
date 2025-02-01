@@ -7,11 +7,11 @@
 #ifndef PokemonAutomation_PokemonBDSP_EggAutonomousState_H
 #define PokemonAutomation_PokemonBDSP_EggAutonomousState_H
 
-#include "Common/Compiler.h"
+//#include "Common/Compiler.h"
 #include "CommonFramework/Language.h"
 #include "CommonFramework/Notifications/EventNotificationOption.h"
-#include "CommonFramework/Tools/StatsTracking.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
+#include "CommonFramework/Tools/VideoStream.h"
 #include "Pokemon/Options/Pokemon_StatsHuntFilter.h"
 #include "PokemonBDSP/Options/PokemonBDSP_ShortcutDirection.h"
 
@@ -36,7 +36,7 @@ struct EggAutonomousStats : public StatsTracker{
 class EggAutonomousState{
 public:
     EggAutonomousState(
-        ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+        ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context,
         EggAutonomousStats& stats,
         EventNotificationOption& notification_nonshiny_keep,
         EventNotificationOption& notification_shiny,
@@ -79,8 +79,8 @@ private:
 
 private:
     ProgramEnvironment& m_env;
-    ConsoleHandle& m_console;
-    BotBaseContext& m_context;
+    VideoStream& m_stream;
+    SwitchControllerContext& m_context;
     EggAutonomousStats& m_stats;
     static EventNotificationOption m_notification_noop;
     EventNotificationOption& m_notification_nonshiny_keep;

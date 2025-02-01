@@ -5,14 +5,13 @@
  */
 
 #include <cmath>
-#include <fstream>
 #include <QFile>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Qt/StringToolsQt.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
-#include "CommonFramework/OCR/OCR_StringNormalization.h"
-#include "CommonFramework/OCR/OCR_TextMatcher.h"
+#include "CommonTools/OCR/OCR_StringNormalization.h"
+#include "CommonTools/OCR/OCR_TextMatcher.h"
 #include "PokemonSV_JoinTracker.h"
 
 //#include <iostream>
@@ -214,7 +213,11 @@ std::vector<std::string> JoinReportTable::make_header() const{
 
 
 RaidJoinReportOption::RaidJoinReportOption()
-    : GroupOption("Join Reports:", LockMode::UNLOCK_WHILE_RUNNING, true, true)
+    : GroupOption(
+        "Join Reports:",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        GroupOption::EnableMode::DEFAULT_ENABLED
+    )
     , text(
         "Track how many times each IGN has joined and generate a report. "
         "This can be used to help identify people who join too many times for "

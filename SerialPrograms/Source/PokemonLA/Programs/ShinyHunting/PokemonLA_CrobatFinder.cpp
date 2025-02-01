@@ -6,9 +6,9 @@
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
-#include "CommonFramework/Tools/StatsTracking.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
@@ -33,7 +33,7 @@ CrobatFinder_Descriptor::CrobatFinder_Descriptor()
         "Constantly reset the cave to find Shiny Alpha Crobat.",
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 class CrobatFinder_Descriptor::Stats : public StatsTracker, public ShinyStatIncrementer{
@@ -89,7 +89,7 @@ CrobatFinder::CrobatFinder()
 
 
 
-void CrobatFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void CrobatFinder::run_iteration(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     // NOTE: there's no "stunned by alpha" detection in case any of the close ones are alphas!
     CrobatFinder_Descriptor::Stats& stats = env.current_stats<CrobatFinder_Descriptor::Stats>();
 
@@ -120,10 +120,10 @@ void CrobatFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCon
         context.wait_for_all_requests();
     }
     if (error){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, env.console,
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
             "Unable to find Wyrdeer after 10 attempts.",
-            true
+            env.console
         );
     }
 
@@ -141,9 +141,9 @@ void CrobatFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCon
             return on_shiny_callback(env, env.console, *action, error_coefficient);
         });
 
-        int ret = run_until(
+        int ret = run_until<SwitchControllerContext>(
             env.console, context,
-            [&](BotBaseContext& context){
+            [&](SwitchControllerContext& context){
 
                 // FORWARD PORTION OF CAVE UNTIL LEDGE
                 pbf_press_button(context, BUTTON_B, (uint16_t)(2.2 * TICKS_PER_SECOND), 80); // wyrdeer sprint
@@ -183,7 +183,7 @@ void CrobatFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCon
 }
 
 
-void CrobatFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void CrobatFinder::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     CrobatFinder_Descriptor::Stats& stats = env.current_stats<CrobatFinder_Descriptor::Stats>();
 
     //  Connect the controller.

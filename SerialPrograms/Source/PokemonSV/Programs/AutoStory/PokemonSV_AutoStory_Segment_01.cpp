@@ -4,19 +4,17 @@
  *
  */
 
-#include "CommonFramework/GlobalSettingsPanel.h"
-#include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/Tools/StatsTracking.h"
-#include "CommonFramework/Tools/VideoResolutionCheck.h"
+#include "CommonFramework/VideoPipeline/VideoOverlay.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "Pokemon/Pokemon_Strings.h"
-#include "PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h"
+#include "PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
+#include "PokemonSV/Inference/PokemonSV_TutorialDetector.h"
+#include "PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_SaveGame.h"
-#include "PokemonSV/Inference/PokemonSV_TutorialDetector.h"
+#include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSV_AutoStoryTools.h"
 #include "PokemonSV_AutoStory_Segment_01.h"
 
@@ -30,7 +28,6 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
 
-using namespace Pokemon;
 
 
 
@@ -48,7 +45,11 @@ std::string AutoStory_Segment_01::end_text() const{
     return "End: Picked the starter.";
 }
 
-void AutoStory_Segment_01::run_segment(SingleSwitchProgramEnvironment& env, BotBaseContext& context, AutoStoryOptions options) const{
+void AutoStory_Segment_01::run_segment(
+    SingleSwitchProgramEnvironment& env,
+    SwitchControllerContext& context,
+    AutoStoryOptions options
+) const{
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
 
     context.wait_for_all_requests();
@@ -70,7 +71,7 @@ void AutoStory_Segment_01::run_segment(SingleSwitchProgramEnvironment& env, BotB
 
 void checkpoint_01(
     SingleSwitchProgramEnvironment& env, 
-    BotBaseContext& context, 
+    SwitchControllerContext& context, 
     EventNotificationOption& notif_status_update, 
     Language language
 ){
@@ -83,7 +84,6 @@ AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
             stats.m_checkpoint++;
             env.update_stats();
             send_program_status_notification(env, notif_status_update, "Saved at checkpoint.");     
-            first_attempt = false;
         }
         
         context.wait_for_all_requests();
@@ -91,6 +91,7 @@ AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
         enter_menu_from_overworld(env.program_info(), env.console, context, 0, MenuSide::RIGHT, false);
         change_settings(env, context, language, first_attempt);
         pbf_mash_button(context, BUTTON_B, 2 * TICKS_PER_SECOND);
+        context.wait_for_all_requests();
 
         break;  
     }catch(...){
@@ -107,14 +108,14 @@ AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
 
 void checkpoint_02(
     SingleSwitchProgramEnvironment& env, 
-    BotBaseContext& context, 
+    SwitchControllerContext& context, 
     EventNotificationOption& notif_status_update
 ){
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
     bool first_attempt = true;
     while (true){
     try{
-        if(!first_attempt){
+        if(first_attempt){
             save_game_tutorial(env.program_info(), env.console, context);
             stats.m_checkpoint++;
             env.update_stats();
@@ -180,13 +181,7 @@ void checkpoint_02(
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::OVERWORLD, CallbackEnum::WHITE_A_BUTTON});
 
         context.wait_for_all_requests();
-        env.console.log("Bump into power of science NPC");
-        // console.overlay().add_log("Bump into power of science NPC", COLOR_WHITE);
-        pbf_move_left_joystick(context, 128,   0, 33 * TICKS_PER_SECOND, 20);
-
-        context.wait_for_all_requests();
         env.console.log("Clear map tutorial");
-        // console.overlay().add_log("Clear map tutorial", COLOR_WHITE);
         open_map_from_overworld(env.program_info(), env.console, context, true);
         leave_phone_to_overworld(env.program_info(), env.console, context);
 
@@ -203,7 +198,7 @@ void checkpoint_02(
 
 void checkpoint_03(
     SingleSwitchProgramEnvironment& env, 
-    BotBaseContext& context, 
+    SwitchControllerContext& context, 
     EventNotificationOption& notif_status_update,
     Language language,
     StarterChoice starter_choice
@@ -218,11 +213,13 @@ void checkpoint_03(
         }
         
         context.wait_for_all_requests();
-        
-        pbf_move_left_joystick(context, 255, 0, 1 * TICKS_PER_SECOND, 20);
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 156, 1 * TICKS_PER_SECOND);
-        env.console.log("overworld_navigation(): Go to Nemona's house.");
-        overworld_navigation(env.program_info(), env.console, context, NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 128, 0);
+        DirectionDetector direction;
+        direction.change_direction(env.program_info(), env.console, context, 4.62);
+        pbf_move_left_joystick(context, 128, 0, 3600, 50);
+        pbf_move_left_joystick(context, 0, 128, 30, 50);
+
+        direction.change_direction(env.program_info(), env.console, context, 4.62);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 20);
         
         context.wait_for_all_requests();
         env.console.log("Entered Nemona's house");
@@ -259,9 +256,9 @@ void checkpoint_03(
         env.console.log("Clear auto heal tutorial.");
         // Press X until Auto heal tutorial shows up
         TutorialWatcher tutorial;
-        int ret = run_until(
+        int ret = run_until<SwitchControllerContext>(
             env.console, context,
-            [](BotBaseContext& context){
+            [](SwitchControllerContext& context){
                 for (int i = 0; i < 10; i++){
                     pbf_press_button(context, BUTTON_X, 20, 250);
                 }
@@ -269,10 +266,10 @@ void checkpoint_03(
             {tutorial}
         );
         if (ret < 0){
-            throw OperationFailedException(
-                ErrorReport::SEND_ERROR_REPORT, env.console,
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
                 "Stuck trying to clear auto heal tutorial.",
-                true
+                env.console
             );  
         }
         clear_tutorial(env.console, context);

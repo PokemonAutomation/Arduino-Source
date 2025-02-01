@@ -9,12 +9,11 @@
 #define PokemonAutomation_PokemonLA_WildPokemonFocusDetector_H
 
 #include "CommonFramework/Language.h"
-#include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 #include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/ImageTools/ImageBoxes.h"
+#include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "PokemonLA/Resources/PokemonLA_PokemonInfo.h"
-#include <utility>
 
 namespace PokemonAutomation{
 

@@ -14,9 +14,9 @@
 #include "ClientSource/Connection/BotBaseMessage.h"
 #include "CommonFramework/AudioPipeline/AudioFeed.h"
 #include "CommonFramework/Logging/Logger.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 
 #include <iostream>
 #include <string>
@@ -53,7 +53,7 @@ bool load_slug_list(const std::string& filepath, std::vector<std::string>& sprit
 
 // Implement the dummy interface of BotBase so that we can run the test code
 // that relies on a BotBase.
-class DummyBotBase: public BotBase{
+class DummyBotBase : public BotBaseController{
 public:
     DummyBotBase(Logger& logger) : m_logger(logger) {}
     
@@ -92,10 +92,14 @@ class DummyVideoFeed: public VideoFeed{
 public:
     DummyVideoFeed() {}
 
+    virtual void add_frame_listener(VideoFrameListener& listener) override{}
+    virtual void remove_frame_listener(VideoFrameListener& listener) override{}
+
     //  Can call from anywhere.
     virtual void reset() override{}
 
     virtual VideoSnapshot snapshot() override{ return VideoSnapshot(); }
+
     virtual double fps_source() override{ return 0; }
     virtual double fps_display() override{ return 0; }
 };

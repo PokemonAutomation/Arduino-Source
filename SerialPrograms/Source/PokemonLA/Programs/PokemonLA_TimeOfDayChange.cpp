@@ -5,9 +5,8 @@
  */
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_DialogueYellowArrowDetector.h"
 #include "PokemonLA_TimeOfDayChange.h"
@@ -21,8 +20,12 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-void change_time_of_day_at_tent(ConsoleHandle& console, BotBaseContext& context, TimeOfDay target_time, Camp camp){
-    console.overlay().add_log("Change time to " + std::string(TIME_OF_DAY_NAMES[int(target_time)]), COLOR_WHITE);
+void change_time_of_day_at_tent(
+    VideoStream& stream, SwitchControllerContext& context,
+    TimeOfDay target_time,
+    Camp camp
+){
+    stream.overlay().add_log("Change time to " + std::string(TIME_OF_DAY_NAMES[int(target_time)]), COLOR_WHITE);
     // Move to the tent
     switch (camp)
     {
@@ -76,25 +79,25 @@ void change_time_of_day_at_tent(ConsoleHandle& console, BotBaseContext& context,
     context.wait_for_all_requests();
 
     const bool stop_on_detected = true;
-    DialogueYellowArrowDetector yellow_arrow_detector(console, console, stop_on_detected);
+    DialogueYellowArrowDetector yellow_arrow_detector(stream.logger(), stream.overlay(), stop_on_detected);
 
     context.wait_for_all_requests();
     // Wait for the dialog box to show up
     int ret = wait_until(
-        console, context, std::chrono::seconds(5), {{yellow_arrow_detector}}
+        stream, context, std::chrono::seconds(5), {{yellow_arrow_detector}}
     );
     if (ret < 0){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, console,
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
             "Did not interact with a tent.",
-            true
+            stream
         );
     }
 
     // Press A to clear the dialog box, and show the time menu
     // pbf_wait(context, 40);
     pbf_press_button(context, BUTTON_A, 30, 80);
-    console.log("Change time of day to " + std::string(TIME_OF_DAY_NAMES[int(target_time)]));
+    stream.log("Change time of day to " + std::string(TIME_OF_DAY_NAMES[int(target_time)]));
 
     // Move down the menu to find the target time
 
@@ -114,13 +117,13 @@ void change_time_of_day_at_tent(ConsoleHandle& console, BotBaseContext& context,
 
     // Wait for the dialog box to show up
     ret = wait_until(
-        console, context, std::chrono::seconds(30), {{yellow_arrow_detector}}
+        stream, context, std::chrono::seconds(30), {{yellow_arrow_detector}}
     );
     if (ret < 0){
-        throw OperationFailedException(
-            ErrorReport::SEND_ERROR_REPORT, console,
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
             "Failed to stand up after resting in a tent.",
-            true
+            stream
         );
     }
 

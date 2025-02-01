@@ -28,7 +28,7 @@ ShinyHuntUnattendedRegigigas2_Descriptor::ShinyHuntUnattendedRegigigas2_Descript
         "A new version of the Regigigas program that is faster.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 
@@ -72,7 +72,7 @@ ShinyHuntUnattendedRegigigas2::ShinyHuntUnattendedRegigigas2()
     PA_ADD_OPTION(CATCH_TO_OVERWORLD_DELAY);
 }
 
-void ShinyHuntUnattendedRegigigas2::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void ShinyHuntUnattendedRegigigas2::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
         resume_game_back_out(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 500);
@@ -89,9 +89,9 @@ void ShinyHuntUnattendedRegigigas2::program(SingleSwitchProgramEnvironment& env,
             pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
             pbf_press_button(context, BUTTON_A, 10, START_TO_ATTACK_DELAY);
 
-            set_leds(context, true);
+//            set_leds(context, true);
             pbf_press_button(context, BUTTON_A, 10, 2 * TICKS_PER_SECOND);
-            set_leds(context, false);
+//            set_leds(context, false);
 
             //  Enter Pokemon menu if shiny.
             pbf_press_dpad(context, DPAD_DOWN, 10, 0);

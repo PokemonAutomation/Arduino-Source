@@ -7,30 +7,30 @@
 #ifndef PokemonAutomation_PokemonBDSP_GameNavigation_H
 #define PokemonAutomation_PokemonBDSP_GameNavigation_H
 
-#include "CommonFramework/Tools/ConsoleHandle.h"
+#include "CommonFramework/Tools/VideoStream.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 
 namespace PokemonAutomation{
-    class BotBaseContext;
 namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 
 //  Non-Feedback
 
-void save_game(BotBaseContext& context);
+void save_game(SwitchControllerContext& context);
 
-void menu_to_box(BotBaseContext& context);
-void overworld_to_box(BotBaseContext& context);
-void box_to_overworld(BotBaseContext& context);
+void menu_to_box(SwitchControllerContext& context);
+void overworld_to_box(SwitchControllerContext& context);
+void box_to_overworld(SwitchControllerContext& context);
 
 
 //  Feedback
 
-void overworld_to_menu(ConsoleHandle& console, BotBaseContext& context);
-void save_game(ConsoleHandle& console, BotBaseContext& context);
+void overworld_to_menu(VideoStream& stream, SwitchControllerContext& context);
+void save_game(VideoStream& stream, SwitchControllerContext& context);
 
-void overworld_to_box(ConsoleHandle& console, BotBaseContext& context);
-void box_to_overworld(ConsoleHandle& console, BotBaseContext& context);
+void overworld_to_box(VideoStream& stream, SwitchControllerContext& context);
+void box_to_overworld(VideoStream& stream, SwitchControllerContext& context);
 
 
 }

@@ -4,10 +4,10 @@
  *
  */
 
-#include <set>
+#include <atomic>
+#include "Common/Cpp/ListenerSet.h"
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Common/Cpp/Json/JsonValue.h"
-#include "Common/Cpp/Concurrency/SpinLock.h"
 #include "ConfigOption.h"
 
 //#include <iostream>
@@ -21,8 +21,7 @@ struct ConfigOption::Data{
     const LockMode lock_mode;
     std::atomic<ConfigOptionState> visibility;
 
-    mutable SpinLock listener_lock;
-    std::set<Listener*> listeners;
+    ListenerSet<Listener> listeners;
     
     Data(LockMode p_lock_mode, ConfigOptionState p_visibility)
         : lock_mode(p_lock_mode)
@@ -66,20 +65,17 @@ ConfigOption::ConfigOption(ConfigOptionState visibility)
 void ConfigOption::add_listener(Listener& listener){
     m_lifetime_sanitizer.check_usage();
     Data& data = *m_data;
-    WriteSpinLock lg(data.listener_lock);
-    data.listeners.insert(&listener);
+    data.listeners.add(listener);
 }
 void ConfigOption::remove_listener(Listener& listener){
     m_lifetime_sanitizer.check_usage();
     Data& data = *m_data;
-    WriteSpinLock lg(data.listener_lock);
-    data.listeners.erase(&listener);
+    data.listeners.remove(listener);
 }
 size_t ConfigOption::total_listeners() const{
     m_lifetime_sanitizer.check_usage();
     const Data& data = *m_data;
-    ReadSpinLock lg(data.listener_lock);
-    return data.listeners.size();
+    return data.listeners.count_unique();
 }
 
 
@@ -119,27 +115,17 @@ void ConfigOption::set_visibility(ConfigOptionState visibility){
 void ConfigOption::report_visibility_changed(){
     m_lifetime_sanitizer.check_usage();
     Data& data = *m_data;
-    ReadSpinLock lg(data.listener_lock);
-    for (Listener* listener : data.listeners){
-        listener->visibility_changed();
-    }
+    data.listeners.run_method_unique(&Listener::visibility_changed);
 }
 void ConfigOption::report_program_state(bool program_is_running){
     m_lifetime_sanitizer.check_usage();
     Data& data = *m_data;
-    ReadSpinLock lg(data.listener_lock);
-    for (Listener* listener : data.listeners){
-        listener->program_state_changed(program_is_running);
-    }
+    data.listeners.run_method_unique(&Listener::program_state_changed, program_is_running);
 }
 void ConfigOption::report_value_changed(void* object){
     m_lifetime_sanitizer.check_usage();
     Data& data = *m_data;
-    ReadSpinLock lg(data.listener_lock);
-//    cout << "listeners = " << data.listeners.size() << endl;
-    for (Listener* listener : data.listeners){
-        listener->value_changed(object);
-    }
+    data.listeners.run_method_unique(&Listener::value_changed, object);
 }
 
 

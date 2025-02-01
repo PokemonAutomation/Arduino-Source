@@ -4,13 +4,10 @@
  *
  */
 
-#include "CommonFramework/Tools/StatsTracking.h"
-#include "CommonFramework/Tools/InterruptableCommands.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonBDSP/Inference/Battles/PokemonBDSP_BattleMenuDetector.h"
 #include "PokemonBDSP/Programs/PokemonBDSP_BasicCatcher.h"
@@ -31,7 +28,7 @@ AutonomousBallThrower_Descriptor::AutonomousBallThrower_Descriptor()
         "Repeatedly throw a ball and reset until you catch the pokemon.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 struct AutonomousBallThrower_Descriptor::Stats : public StatsTracker{
@@ -105,7 +102,7 @@ AutonomousBallThrower::AutonomousBallThrower()
 
 
 
-void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     AutonomousBallThrower_Descriptor::Stats& stats = env.current_stats<AutonomousBallThrower_Descriptor::Stats>();
     env.update_stats();
 
@@ -118,9 +115,9 @@ void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, BotBase
         env.log("Wait for a pokemon to attack you.", COLOR_PURPLE);
         {
             BattleMenuWatcher fight_detector(BattleType::STANDARD);
-            int result = run_until(
+            int ret = run_until<SwitchControllerContext>(
                 env.console, context,
-                [](BotBaseContext& context){
+                [](SwitchControllerContext& context){
                     while (true){
                         //TODO edit here for what to do
                         //pbf_wait(context, 1 * TICKS_PER_SECOND);
@@ -130,7 +127,7 @@ void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, BotBase
                 },
                 {{fight_detector}}
             );
-            if (result == 0){
+            if (ret == 0){
                 env.log("New fight detected.", COLOR_PURPLE);
                 pbf_mash_button(context, BUTTON_B, 1 * TICKS_PER_SECOND);
             }

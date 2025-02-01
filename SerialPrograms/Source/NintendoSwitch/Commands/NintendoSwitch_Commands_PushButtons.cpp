@@ -16,21 +16,13 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-void pbf_wait(BotBaseContext& context, uint16_t ticks){
-#if 0
-    context.issue_request(
-        DeviceRequest_pbf_wait(ticks)
-    );
-#else
+void pbf_wait(SwitchControllerContext& context, uint16_t ticks){
     ssf_do_nothing(context, ticks);
-#endif
 }
-void pbf_press_button(BotBaseContext& context, Button button, uint16_t hold_ticks, uint16_t release_ticks){
-#if 0
-    context.issue_request(
-        DeviceRequest_pbf_press_button(button, hold_ticks, release_ticks)
-    );
-#else
+void pbf_wait(SwitchControllerContext& context, Milliseconds duration){
+    ssf_do_nothing(context, duration);
+}
+void pbf_press_button(SwitchControllerContext& context, Button button, uint16_t hold_ticks, uint16_t release_ticks){
     uint32_t delay = (uint32_t)hold_ticks + release_ticks;
     if ((uint16_t)delay == delay){
         ssf_press_button(context, button, (uint16_t)delay, hold_ticks, 0);
@@ -38,14 +30,11 @@ void pbf_press_button(BotBaseContext& context, Button button, uint16_t hold_tick
         ssf_press_button(context, button, hold_ticks, hold_ticks, 0);
         ssf_do_nothing(context, release_ticks);
     }
-#endif
 }
-void pbf_press_dpad(BotBaseContext& context, DpadPosition position, uint16_t hold_ticks, uint16_t release_ticks){
-#if 0
-    context.issue_request(
-        DeviceRequest_pbf_press_dpad(position, hold_ticks, release_ticks)
-    );
-#else
+void pbf_press_button(SwitchControllerContext& context, Button button, Milliseconds hold, Milliseconds release){
+    ssf_press_button(context, button, hold + release, hold, 0ms);
+}
+void pbf_press_dpad(SwitchControllerContext& context, DpadPosition position, uint16_t hold_ticks, uint16_t release_ticks){
     uint32_t delay = (uint32_t)hold_ticks + release_ticks;
     if ((uint16_t)delay == delay){
         ssf_press_dpad(context, position, (uint16_t)delay, hold_ticks, 0);
@@ -53,14 +42,11 @@ void pbf_press_dpad(BotBaseContext& context, DpadPosition position, uint16_t hol
         ssf_press_dpad(context, position, hold_ticks, hold_ticks, 0);
         ssf_do_nothing(context, release_ticks);
     }
-#endif
 }
-void pbf_move_left_joystick(BotBaseContext& context, uint8_t x, uint8_t y, uint16_t hold_ticks, uint16_t release_ticks){
-#if 0
-    context.issue_request(
-        DeviceRequest_pbf_move_left_joystick(x, y, hold_ticks, release_ticks)
-    );
-#else
+void pbf_press_dpad(SwitchControllerContext& context, DpadPosition position, Milliseconds hold, Milliseconds release){
+    ssf_press_dpad(context, position, hold + release, hold, 0ms);
+}
+void pbf_move_left_joystick(SwitchControllerContext& context, uint8_t x, uint8_t y, uint16_t hold_ticks, uint16_t release_ticks){
     uint32_t delay = (uint32_t)hold_ticks + release_ticks;
     if ((uint16_t)delay == delay){
         ssf_press_left_joystick(context, x, y, (uint16_t)delay, hold_ticks, 0);
@@ -68,14 +54,11 @@ void pbf_move_left_joystick(BotBaseContext& context, uint8_t x, uint8_t y, uint1
         ssf_press_left_joystick(context, x, y, hold_ticks, hold_ticks, 0);
         ssf_do_nothing(context, release_ticks);
     }
-#endif
 }
-void pbf_move_right_joystick(BotBaseContext& context, uint8_t x, uint8_t y, uint16_t hold_ticks, uint16_t release_ticks){
-#if 0
-    context.issue_request(
-        DeviceRequest_pbf_move_right_joystick(x, y, hold_ticks, release_ticks)
-    );
-#else
+void pbf_move_left_joystick (SwitchControllerContext& context, uint8_t x, uint8_t y, Milliseconds hold, Milliseconds release){
+    ssf_press_left_joystick(context, x, y, hold + release, hold, 0ms);
+}
+void pbf_move_right_joystick(SwitchControllerContext& context, uint8_t x, uint8_t y, uint16_t hold_ticks, uint16_t release_ticks){
     uint32_t delay = (uint32_t)hold_ticks + release_ticks;
     if ((uint16_t)delay == delay){
         ssf_press_right_joystick(context, x, y, (uint16_t)delay, hold_ticks, 0);
@@ -83,64 +66,58 @@ void pbf_move_right_joystick(BotBaseContext& context, uint8_t x, uint8_t y, uint
         ssf_press_right_joystick(context, x, y, hold_ticks, hold_ticks, 0);
         ssf_do_nothing(context, release_ticks);
     }
-#endif
 }
-void pbf_mash_button(BotBaseContext& context, Button button, uint16_t ticks){
-#if 0
-    context.issue_request(
-        DeviceRequest_pbf_mash_button(button, ticks)
-    );
-#else
+void pbf_move_right_joystick (SwitchControllerContext& context, uint8_t x, uint8_t y, Milliseconds hold, Milliseconds release){
+    ssf_press_right_joystick(context, x, y, hold + release, hold, 0ms);
+}
+void pbf_mash_button(SwitchControllerContext& context, Button button, uint16_t ticks){
     ssf_mash1_button(context, button, ticks);
-#endif
+}
+void pbf_mash_button(SwitchControllerContext& context, Button button, Milliseconds duration){
+    ssf_mash1_button(context, button, duration);
 }
 
-void start_program_flash(BotBaseContext& context, uint16_t ticks){
-    for (uint16_t c = 0; c < ticks; c += 50){
-        set_leds(context, true);
-        pbf_wait(context, 25);
-        set_leds(context, false);
-        pbf_wait(context, 25);
-    }
-}
-void grip_menu_connect_go_home(BotBaseContext& context){
+void grip_menu_connect_go_home(SwitchControllerContext& context){
     pbf_press_button(context, BUTTON_L | BUTTON_R, 10, 40);
     pbf_press_button(context, BUTTON_A, 10, 140);
     pbf_press_button(context, BUTTON_HOME, 10, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
 }
 
-// void pbf_controller_state(
-//     BotBaseContext& context,
-//     Button button,
-//     DpadPosition position,
-//     uint8_t left_x, uint8_t left_y,
-//     uint8_t right_x, uint8_t right_y,
-//     uint8_t ticks
-// ){
-//     context.issue_request(
-//         DeviceRequest_controller_state(button, position, left_x, left_y, right_x, right_y, ticks)
-//     );
-// }
-
 
 void pbf_controller_state(
-    BotBaseContext& context,
+    SwitchControllerContext& context,
     Button button,
     DpadPosition position,
     uint8_t left_x, uint8_t left_y,
     uint8_t right_x, uint8_t right_y,
     uint16_t ticks
 ){
-    // divide the controller state into smaller chunks of 255 ticks
-    while (ticks > 0){
-        uint16_t curr_ticks = std::min(ticks, (uint16_t)255);
-        context.issue_request(
-            DeviceRequest_controller_state(button, position, left_x, left_y, right_x, right_y, (uint8_t)curr_ticks)
-        );
-        ticks -= curr_ticks;
-    } // end while loop, and function 
+    context->issue_controller_state(
+        &context,
+        button, position,
+        left_x, left_y,
+        right_x, right_y,
+        ticks*8ms
+    );
+}
+void pbf_controller_state(
+    SwitchControllerContext& context,
+    Button button,
+    DpadPosition position,
+    uint8_t left_x, uint8_t left_y,
+    uint8_t right_x, uint8_t right_y,
+    Milliseconds duration
+){
+    context->issue_controller_state(
+        &context,
+        button, position,
+        left_x, left_y,
+        right_x, right_y,
+        duration
+    );
 }
 
+#if 0
 static std::string button_to_string(Button button){
     std::string str;
     if (button & BUTTON_Y) str += " BUTTON_Y ";
@@ -159,7 +136,6 @@ static std::string button_to_string(Button button){
     if (button & BUTTON_CAPTURE) str += " BUTTON_CAPTURE ";
     return str;
 }
-
 static std::string dpad_to_string(Button dpad){
     switch (dpad){
     case DPAD_UP            : return "DPAD_UP";
@@ -174,93 +150,9 @@ static std::string dpad_to_string(Button dpad){
     }
     return "UNKNOWN_DPAD";
 }
+#endif
 
 int register_message_converters_push_button_framework(){
-#if 0
-    register_message_converter(
-        PABB_MSG_COMMAND_PBF_WAIT,
-        [](const std::string& body){
-            std::ostringstream ss;
-            ss << "pbf_wait() - ";
-            if (body.size() != sizeof(pabb_pbf_wait)){ ss << "(invalid size)" << std::endl; return ss.str(); }
-            const auto* params = (const pabb_pbf_wait*)body.c_str();
-            ss << "seqnum = " << (uint64_t)params->seqnum;
-            ss << ", ticks = " << params->ticks;
-            return ss.str();
-        }
-    );
-    register_message_converter(
-        PABB_MSG_COMMAND_PBF_PRESS_BUTTON,
-        [](const std::string& body){
-            std::ostringstream ss;
-            ss << "pbf_press_button() - ";
-            if (body.size() != sizeof(pabb_pbf_press_button)){ ss << "(invalid size)" << std::endl; return ss.str(); }
-            const auto* params = (const pabb_pbf_press_button*)body.c_str();
-            ss << "seqnum = " << (uint64_t)params->seqnum;
-            ss << ", button = " << params->button << "(" << button_to_string(params->button) << ")";
-            ss << ", hold_ticks = " << params->hold_ticks;
-            ss << ", release_ticks = " << params->release_ticks;
-            return ss.str();
-        }
-    );
-    register_message_converter(
-        PABB_MSG_COMMAND_PBF_PRESS_DPAD,
-        [](const std::string& body){
-            std::ostringstream ss;
-            ss << "pbf_press_dpad() - ";
-            if (body.size() != sizeof(pabb_pbf_press_dpad)){ ss << "(invalid size)" << std::endl; return ss.str(); }
-            const auto* params = (const pabb_pbf_press_dpad*)body.c_str();
-            ss << "seqnum = " << (uint64_t)params->seqnum;
-            ss << ", dpad = " << (unsigned)params->dpad << "(" << dpad_to_string(params->dpad) << ")";
-            ss << ", hold_ticks = " << params->hold_ticks;
-            ss << ", release_ticks = " << params->release_ticks;
-            return ss.str();
-        }
-    );
-    register_message_converter(
-        PABB_MSG_COMMAND_PBF_MOVE_JOYSTICK_L,
-        [](const std::string& body){
-            std::ostringstream ss;
-            ss << "pbf_move_left_joystick() - ";
-            if (body.size() != sizeof(pabb_pbf_move_joystick)){ ss << "(invalid size)" << std::endl; return ss.str(); }
-            const auto* params = (const pabb_pbf_move_joystick*)body.c_str();
-            ss << "seqnum = " << (uint64_t)params->seqnum;
-            ss << ", x = " << (unsigned)params->x;
-            ss << ", y = " << (unsigned)params->y;
-            ss << ", hold_ticks = " << params->hold_ticks;
-            ss << ", release_ticks = " << params->release_ticks;
-            return ss.str();
-        }
-    );
-    register_message_converter(
-        PABB_MSG_COMMAND_PBF_MOVE_JOYSTICK_R,
-        [](const std::string& body){
-            std::ostringstream ss;
-            ss << "pbf_move_right_joystick() - ";
-            if (body.size() != sizeof(pabb_pbf_move_joystick)){ ss << "(invalid size)" << std::endl; return ss.str(); }
-            const auto* params = (const pabb_pbf_move_joystick*)body.c_str();
-            ss << "seqnum = " << (uint64_t)params->seqnum;
-            ss << ", x = " << (unsigned)params->x;
-            ss << ", y = " << (unsigned)params->y;
-            ss << ", hold_ticks = " << params->hold_ticks;
-            ss << ", release_ticks = " << params->release_ticks;
-            return ss.str();
-        }
-    );
-    register_message_converter(
-        PABB_MSG_COMMAND_MASH_BUTTON,
-        [](const std::string& body){
-            std::ostringstream ss;
-            ss << "pbf_mash_button() - ";
-            if (body.size() != sizeof(pabb_pbf_mash_button)){ ss << "(invalid size)" << std::endl; return ss.str(); }
-            const auto* params = (const pabb_pbf_mash_button*)body.c_str();
-            ss << "seqnum = " << (uint64_t)params->seqnum;
-            ss << ", button = " << params->button << "(" << button_to_string(params->button) << ")";
-            ss << ", ticks = " << params->ticks;
-            return ss.str();
-        }
-    );
-#endif
     register_message_converter(
         PABB_MSG_CONTROLLER_STATE,
         [](const std::string& body){
@@ -270,7 +162,7 @@ int register_message_converters_push_button_framework(){
             const auto* params = (const pabb_controller_state*)body.c_str();
             ss << "seqnum = " << (uint64_t)params->seqnum;
             ss << ", button = " << params->button << "(" << button_to_string(params->button) << ")";
-            ss << ", dpad = " << (int)params->dpad;
+            ss << ", dpad = " << dpad_to_string(params->dpad);
             ss << ", LJ = (" << (int)params->left_joystick_x << "," << (int)params->left_joystick_y << ")";
             ss << ", RJ = (" << (int)params->right_joystick_x << "," << (int)params->right_joystick_y << ")";
             ss << ", ticks = " << (int)params->ticks;

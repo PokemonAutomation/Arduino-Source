@@ -31,7 +31,7 @@ public:
 class CurryHunter : public SingleSwitchProgramInstance{
 public:
     CurryHunter();
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
     StartInGripOrGameOption START_LOCATION;

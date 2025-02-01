@@ -7,19 +7,16 @@
 #ifndef PokemonAutomation_PokemonSV_MenuOption_H
 #define PokemonAutomation_PokemonSV_MenuOption_H
 
-#include <map>
 #include <array>
-#include "Common/Cpp/Containers/FixedLimitVector.h"
 #include "CommonFramework/Language.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "CommonFramework/OCR/OCR_SmallDictionaryMatcher.h"
+#include "CommonFramework/Tools/VideoStream.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.h"
 #include "PokemonSV_MenuOptionDatabase.h"
 
 namespace PokemonAutomation{
     class AsyncDispatcher;
-    class ConsoleHandle;
-    class BotBaseContext;
 namespace NintendoSwitch{
 namespace PokemonSV{
 
@@ -29,7 +26,7 @@ class MenuOption{
 public:
     ~MenuOption();
     MenuOption(
-        ConsoleHandle& console, BotBaseContext& context,
+        VideoStream& stream, SwitchControllerContext& context,
         Language language
     );
 
@@ -67,8 +64,8 @@ private:
     
 
 private:
-    ConsoleHandle& m_console;
-    BotBaseContext& m_context;
+    VideoStream& m_stream;
+    SwitchControllerContext& m_context;
     Language m_language;
     VideoOverlaySet m_overlays;
     GradientArrowDetector m_arrow;

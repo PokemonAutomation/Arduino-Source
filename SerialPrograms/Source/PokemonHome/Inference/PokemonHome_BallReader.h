@@ -9,8 +9,8 @@
 
 #include <string>
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
-#include "CommonFramework/ImageMatch/CroppedImageDictionaryMatcher.h"
+#include "CommonFramework/Tools/VideoStream.h"
+#include "CommonTools/ImageMatch/CroppedImageDictionaryMatcher.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -22,14 +22,14 @@ class BallReader{
     static const double ALPHA_SPREAD;
 
 public:
-    BallReader(ConsoleHandle& console);
+    BallReader(VideoStream& stream);
 
 public:
     std::string read_ball(const ImageViewRGB32& screen) const;
 
 private:
     const ImageMatch::CroppedImageDictionaryMatcher& m_matcher;
-    ConsoleHandle& m_console;
+    VideoStream& m_stream;
     OverlayBoxScope m_box_sprite;
 };
 

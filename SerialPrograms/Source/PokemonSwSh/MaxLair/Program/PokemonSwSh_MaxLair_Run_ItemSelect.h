@@ -7,10 +7,8 @@
 #ifndef PokemonAutomation_PokemonSwSh_MaxLair_Run_ItemSelect_H
 #define PokemonAutomation_PokemonSwSh_MaxLair_Run_ItemSelect_H
 
-#include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
-#include "NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h"
+#include "CommonFramework/Tools/VideoStream.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 #include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_StateTracker.h"
 
 namespace PokemonAutomation{
@@ -20,7 +18,8 @@ namespace MaxLairInternal{
 
 
 void run_item_select(
-    ConsoleHandle& console, BotBaseContext& context,
+    size_t console_index,
+    VideoStream& stream, SwitchControllerContext& context,
     GlobalStateTracker& state_tracker
 );
 

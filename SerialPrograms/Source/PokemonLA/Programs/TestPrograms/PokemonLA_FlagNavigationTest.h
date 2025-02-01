@@ -28,7 +28,7 @@ class FlagNavigationTest : public SingleSwitchProgramInstance{
 public:
     FlagNavigationTest();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
     SimpleIntegerOption<uint16_t> STOP_DISTANCE;

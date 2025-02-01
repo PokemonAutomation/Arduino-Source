@@ -17,9 +17,11 @@ namespace PokemonAutomation{
 void VideoOverlaySession::add_listener(Listener& listener){
     WriteSpinLock lg(m_lock);
     m_listeners.insert(&listener);
+    listener.update_stats(&m_stats_order);
 }
 void VideoOverlaySession::remove_listener(Listener& listener){
     WriteSpinLock lg(m_lock);
+//    listener.update_stats(nullptr);
     m_listeners.erase(&listener);
 }
 
@@ -111,7 +113,8 @@ void VideoOverlaySession::push_box_update(){
         return;
     }
     
-    // We create a newly allocated Box vector to avoid listeners accessing `m_boxes` asynchronously.
+    //  We create a newly allocated Box vector to avoid listeners accessing
+    //  `m_boxes` asynchronously.
     std::shared_ptr<std::vector<OverlayBox>> ptr = std::make_shared<std::vector<OverlayBox>>();
     for (const auto& item : m_boxes){
         ptr->emplace_back(*item);
@@ -146,7 +149,8 @@ void VideoOverlaySession::push_text_update(){
         return;
     }
 
-    // We create a newly allocated Box vector to avoid listeners accessing `m_texts` asynchronously.
+    //  We create a newly allocated Box vector to avoid listeners accessing
+    //  `m_texts` asynchronously.
     std::shared_ptr<std::vector<OverlayText>> ptr = std::make_shared<std::vector<OverlayText>>();
     for (const auto& item : m_texts){
         ptr->emplace_back(*item);
@@ -187,7 +191,8 @@ void VideoOverlaySession::push_log_text_update(){
         return;
     }
     
-    // We create a newly allocated Box vector to avoid listeners accessing `m_log_texts` asynchronously.
+    //  We create a newly allocated Box vector to avoid listeners accessing
+    //  `m_log_texts` asynchronously.
     std::shared_ptr<std::vector<OverlayLogLine>> ptr = std::make_shared<std::vector<OverlayLogLine>>();
     for(const auto& item : m_log_texts){
         ptr->emplace_back(item);

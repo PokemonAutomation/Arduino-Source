@@ -4,9 +4,7 @@
  *
  */
 
-#include "ClientSource/Connection/BotBase.h"
-//#include "CommonFramework/InferenceInfra/VisualInferenceRoutines.h"
-#include "CommonFramework/InferenceInfra/InferenceSession.h"
+#include "CommonTools/Async/InferenceSession.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_BubbleDetector.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_ArcDetector.h"
@@ -28,7 +26,7 @@ OverworldWatcher_Descriptor::OverworldWatcher_Descriptor()
         "This is a test program that simply observes the game and labels things of interest. "
         "This program doesn't really do anything.",
         FeedbackType::REQUIRED, AllowCommandsWhenRunning::ENABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 
@@ -36,7 +34,7 @@ OverworldWatcher_Descriptor::OverworldWatcher_Descriptor()
 OverworldWatcher::OverworldWatcher(){}
 
 
-void OverworldWatcher::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void OverworldWatcher::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     BubbleDetector bubbles;
     ArcDetector arcs;
     QuestMarkDetector quest_marks;

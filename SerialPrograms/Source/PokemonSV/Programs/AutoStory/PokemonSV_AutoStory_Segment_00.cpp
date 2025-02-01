@@ -4,19 +4,8 @@
  *
  */
 
-#include "CommonFramework/GlobalSettingsPanel.h"
-#include "CommonFramework/Exceptions/FatalProgramException.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
-#include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/Tools/StatsTracking.h"
-#include "CommonFramework/Tools/VideoResolutionCheck.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "Pokemon/Pokemon_Strings.h"
-#include "PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h"
-#include "PokemonSV/Programs/PokemonSV_GameEntry.h"
-#include "PokemonSV/Programs/PokemonSV_SaveGame.h"
-#include "PokemonSV/Inference/PokemonSV_TutorialDetector.h"
 #include "PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h"
 #include "PokemonSV_AutoStoryTools.h"
 #include "PokemonSV_AutoStory_Segment_00.h"
@@ -30,8 +19,6 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
-
-using namespace Pokemon;
 
 
 std::string AutoStory_Segment_00::name() const{
@@ -47,7 +34,11 @@ std::string AutoStory_Segment_00::end_text() const{
     return "End: Finished cutscene.";
 }
 
-void AutoStory_Segment_00::run_segment(SingleSwitchProgramEnvironment& env, BotBaseContext& context, AutoStoryOptions options) const{
+void AutoStory_Segment_00::run_segment(
+    SingleSwitchProgramEnvironment& env,
+    SwitchControllerContext& context,
+    AutoStoryOptions options
+) const{
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
 
     context.wait_for_all_requests();
@@ -64,15 +55,15 @@ void AutoStory_Segment_00::run_segment(SingleSwitchProgramEnvironment& env, BotB
 }
 
 
-void checkpoint_00(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void checkpoint_00(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
 
 
     // Mash A through intro cutscene, until the L stick button is detected
     WhiteButtonWatcher leftstick(COLOR_GREEN, WhiteButton::ButtonLStick, {0.435, 0.912, 0.046, 0.047});
     context.wait_for_all_requests();
-    run_until(
+    run_until<SwitchControllerContext>(
         env.console, context,
-        [](BotBaseContext& context){
+        [](SwitchControllerContext& context){
             pbf_mash_button(context, BUTTON_A, 240 * TICKS_PER_SECOND);
         },
         {leftstick}

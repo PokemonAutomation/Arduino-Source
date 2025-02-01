@@ -9,8 +9,8 @@
 
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
-#include "CommonFramework/Options/LanguageOCROption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
+#include "CommonTools/Options/LanguageOCROption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "PokemonSV/Programs/Farming/PokemonSV_MaterialFarmerTools.h"
@@ -34,7 +34,7 @@ public:
     ~ItemPrinterRNG();
     ItemPrinterRNG();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 
 private:
@@ -44,17 +44,17 @@ private:
     };
 
     enum class ItemPrinterMode{
+        STANDARD_MODE,
         AUTO_MODE,
-        STANDARD_MODE
     };
 
     virtual void value_changed(void* object) override;
 
     bool overlapping_bonus();
 
-    void run_item_printer_rng_automode(SingleSwitchProgramEnvironment& env, BotBaseContext& context, ItemPrinterRNG_Descriptor::Stats& stats);
+    void run_item_printer_rng_automode(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, ItemPrinterRNG_Descriptor::Stats& stats);
 
-    void run_item_printer_rng(SingleSwitchProgramEnvironment& env, BotBaseContext& context, ItemPrinterRNG_Descriptor::Stats& stats);
+    void run_item_printer_rng(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, ItemPrinterRNG_Descriptor::Stats& stats);
 
     std::vector<ItemPrinterRngRowSnapshot> desired_print_table(
         ItemPrinter::PrebuiltOptions desired_item,
@@ -71,18 +71,18 @@ private:
     // return to item printer
     void run_material_farming_then_return_to_item_printer(
         SingleSwitchProgramEnvironment& env, 
-        BotBaseContext& context, 
+        SwitchControllerContext& context, 
         ItemPrinterRNG_Descriptor::Stats& stats,
         MaterialFarmerOptions& material_farmer_options
     );
 
     ItemPrinterPrizeResult run_print_at_date(
-        SingleSwitchProgramEnvironment& env, BotBaseContext& context,
+        SingleSwitchProgramEnvironment& env, SwitchControllerContext& context,
         const DateTime& date, ItemPrinterJobs jobs
     );
 
     void print_again(
-        SingleSwitchProgramEnvironment& env, BotBaseContext& context,
+        SingleSwitchProgramEnvironment& env, SwitchControllerContext& context,
         ItemPrinterJobs jobs
     ) const;
 
@@ -107,12 +107,12 @@ private:
 
     uint32_t calc_num_jobs_using_happiny_dust(
         SingleSwitchProgramEnvironment& env, 
-        BotBaseContext& context,
+        SwitchControllerContext& context,
         uint16_t min_happiny_dust
     );
 
     uint32_t check_num_happiny_dust(
-        SingleSwitchProgramEnvironment& env, BotBaseContext& context
+        SingleSwitchProgramEnvironment& env, SwitchControllerContext& context
     );
 
 private:

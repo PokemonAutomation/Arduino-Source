@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_GeneratePokedexSprites_H
 
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
-#include "CommonFramework/Options/LanguageOCROption.h"
+#include "CommonTools/Options/LanguageOCROption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
@@ -27,7 +27,7 @@ class GeneratePokedexSprites : public SingleSwitchProgramInstance{
 public:
     GeneratePokedexSprites();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 
 private:

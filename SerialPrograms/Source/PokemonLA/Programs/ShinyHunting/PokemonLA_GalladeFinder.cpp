@@ -6,8 +6,8 @@
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/Tools/StatsTracking.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
@@ -31,7 +31,7 @@ GalladeFinder_Descriptor::GalladeFinder_Descriptor()
         "Constantly reset the Snowpoint Temple to find Shiny Alpha Gallade.",
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
     )
 {}
 class GalladeFinder_Descriptor::Stats : public StatsTracker, public ShinyStatIncrementer{
@@ -87,7 +87,7 @@ GalladeFinder::GalladeFinder()
 
 
 
-void GalladeFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void GalladeFinder::run_iteration(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     // NOTE: there's no "stunned by alpha" detection in case the first spawn is an alpha!
     // NOTE: there is also no mitigation for if you get attacked by a Kirlia if it hates you
     GalladeFinder_Descriptor::Stats& stats = env.current_stats<GalladeFinder_Descriptor::Stats>();
@@ -114,9 +114,9 @@ void GalladeFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCo
             return on_shiny_callback(env, env.console, *action, error_coefficient);
         });
 
-        int ret = run_until(
+        int ret = run_until<SwitchControllerContext>(
             env.console, context,
-            [&](BotBaseContext& context){
+            [&](SwitchControllerContext& context){
                 // forward portion
                 pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE, 128, 0, 128, 128, (uint16_t)(6.8 * TICKS_PER_SECOND)); // forward while running until stairs, mash y a few times down the stairs
                 pbf_mash_button(context, BUTTON_Y,(uint16_t)(2.8 * TICKS_PER_SECOND)); // roll down the stairs, recover stamina
@@ -168,7 +168,7 @@ void GalladeFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCo
 }
 
 
-void GalladeFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void GalladeFinder::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     GalladeFinder_Descriptor::Stats& stats = env.current_stats<GalladeFinder_Descriptor::Stats>();
 
     //  Connect the controller.

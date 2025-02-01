@@ -5,20 +5,17 @@
  */
 
 #include <stdint.h>
-
 #include "Common/Cpp/Color.h"
 #include "Common/Cpp/AbstractLogger.h"
-#include "CommonFramework/ImageMatch/WaterfillTemplateMatcher.h"
-#include "CommonFramework/ImageTools/WaterfillUtilities.h"
-#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
+#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "CommonTools/Images/WaterfillUtilities.h"
+#include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "PokemonSwSh_DialogTriangleDetector.h"
 
-#include <utility>
-#include <vector>
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

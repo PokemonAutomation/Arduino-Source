@@ -28,19 +28,20 @@ namespace FileDownloader{
 std::string download_file(Logger& logger, const std::string& url){
     QNetworkAccessManager network_access_manager;
     QByteArray downloaded_data;
+    std::unique_ptr<QNetworkReply> reply;
     QEventLoop loop;
 
     QObject::connect(
         &network_access_manager, &QNetworkAccessManager::finished,
         &loop, [&downloaded_data, &loop](QNetworkReply* reply){
             downloaded_data = reply->readAll();
-            reply->deleteLater();
+//            reply->deleteLater();
             loop.exit();
         }
     );
 
     QNetworkRequest request(QUrl(QString::fromStdString(url)));
-    std::unique_ptr<QNetworkReply> reply(network_access_manager.get(request));
+    reply.reset(network_access_manager.get(request));
 
 #if 0
     QTimer timer;
@@ -59,7 +60,7 @@ std::string download_file(Logger& logger, const std::string& url){
     if (!reply){
         std::string str = "QNetworkReply is null.";
 //        logger.log(str, COLOR_RED);
-        throw OperationFailedException(ErrorReport::NO_ERROR_REPORT, logger, str);
+        throw_and_log<OperationFailedException>(logger, ErrorReport::NO_ERROR_REPORT, str);
     }else if (reply->error() == QNetworkReply::NoError){
 //        QString contents = QString::fromUtf8(reply->readAll());
 //        qDebug() << contents;
@@ -67,7 +68,7 @@ std::string download_file(Logger& logger, const std::string& url){
         QString error_string = reply->errorString();
         std::string str = "Network Error: " + error_string.toStdString();
 //        logger.log(str, COLOR_RED);
-        throw OperationFailedException(ErrorReport::NO_ERROR_REPORT, logger, str);
+        throw_and_log<OperationFailedException>(logger, ErrorReport::NO_ERROR_REPORT, str);
 //        QString err = reply->errorString();
 //        qDebug() << err;
     }
