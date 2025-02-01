@@ -32,11 +32,10 @@ const char* to_string(Features feature){
 const std::pair<std::string, std::set<std::string>> OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS{
     NintendoSwitch_Basic,
     {
-        to_string(SerialPABotBase::Features::TickPrecise),
-        to_string(SerialPABotBase::Features::NintendoSwitch_Basic),
-//        to_string(SerialPABotBase::Features::NintendoSwitch_SSF),
-//        to_string(SerialPABotBase::Features::NintendoSwitch_Macros),
-        to_string(SerialPABotBase::Features::NintendoSwitch_DateSkip),
+        to_string(Features::TickPrecise),
+        to_string(Features::NintendoSwitch_Basic),
+//        to_string(Features::NintendoSwitch_SSF),
+//        to_string(Features::NintendoSwitch_Macros),
     }
 };
 
