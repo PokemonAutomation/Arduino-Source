@@ -25,7 +25,7 @@ public:
     virtual bool send_to_controller(ControllerSession& controller) const override;
 
 public:
-    Button buttons = 0;
+    Button buttons = BUTTON_NONE;
     DpadPosition dpad = DPAD_NONE;
     uint8_t left_x = 128;
     uint8_t left_y = 128;
@@ -35,7 +35,7 @@ public:
 
 
 struct ControllerDeltas{
-    Button buttons = 0;
+    Button buttons = BUTTON_NONE;
     int dpad_x = 0;
     int dpad_y = 0;
     int left_x = 0;

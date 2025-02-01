@@ -127,13 +127,9 @@ void do_egg_cycle_motion(
             // hatch circle:
             // Left joystick forward, right joystick right
             // click left joystick
-            pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE,
-                128, 0, 255, 128, 20);
-            pbf_controller_state(context, 0, DPAD_NONE, 128, 0, 255, 128, 20);
-            for(int j = 0; j < 600; j++){
-                pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE,
-                    128, 0, 255, 128, TICKS_PER_SECOND);
-            }
+            ssf_press_left_joystick(context, 128, 0, 0ms, std::chrono::minutes(10));
+            ssf_press_right_joystick(context, 255, 128, 0ms, std::chrono::minutes(10));
+            pbf_press_button(context, BUTTON_LCLICK, std::chrono::minutes(10), 0ms);
         },
         {dialog}
     );
@@ -410,7 +406,7 @@ void check_basket_to_collect_eggs(
 ){
     bool checked = false;
     size_t consecutive_nothing = 0;
-    Button last_prompt = 0;
+    Button last_prompt = BUTTON_NONE;
     bool pending_refuse = false;
 
     WallClock start = current_time();
@@ -446,7 +442,7 @@ void check_basket_to_collect_eggs(
         case 0:
             stream.log("Detected no dialog.");
             consecutive_nothing++;
-            last_prompt = 0;
+            last_prompt = BUTTON_NONE;
             if (consecutive_nothing >= 10){
                 dump_image_and_throw_recoverable_exception(
                     info, stream, "BasketNotFound",
@@ -463,7 +459,7 @@ void check_basket_to_collect_eggs(
 
         case 1:
             stream.log("Detected advanced dialog.");
-            last_prompt = 0;
+            last_prompt = BUTTON_NONE;
             pbf_press_button(context, BUTTON_B, 20, 30);
             checked = true;
             continue;

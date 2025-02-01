@@ -75,7 +75,7 @@ std::unique_ptr<EditableTableRow> KeyMapTableRow::clone() const{
 }
 ControllerDeltas KeyMapTableRow::snapshot() const{
     return {
-        .buttons = buttons,
+        .buttons = (Button)buttons.current_value(),
         .dpad_x = dpad_x,
         .dpad_y = dpad_y,
         .left_x = left_stick_x,

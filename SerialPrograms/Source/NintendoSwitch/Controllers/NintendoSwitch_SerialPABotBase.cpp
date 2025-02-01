@@ -180,9 +180,11 @@ SwitchController_SerialPABotBase::SwitchController_SerialPABotBase(
 }
 
 void SwitchController_SerialPABotBase::push_state(const Cancellable* cancellable, WallDuration duration){
-    uint16_t buttons = 0;
+    Button buttons = BUTTON_NONE;
     for (size_t c = 0; c < 14; c++){
-        buttons |= m_buttons[c].is_busy() ? ((uint16_t)1 << c) : 0;
+        buttons |= m_buttons[c].is_busy()
+            ? (Button)((uint16_t)1 << c)
+            : BUTTON_NONE;
     }
 
     uint8_t left_x = 128;

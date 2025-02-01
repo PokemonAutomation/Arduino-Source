@@ -145,8 +145,9 @@ void walk_forward_while_clear_front_path(
 // mashes A button by default
 void mash_button_till_overworld(
     VideoStream& stream,
-    SwitchControllerContext& context, 
-    uint16_t button = BUTTON_A, uint16_t seconds_run = 360
+    SwitchControllerContext& context,
+    Button button = BUTTON_A,
+    uint16_t seconds_run = 360
 );
 
 // fly to the pokecenter that overlaps with the player on the map, and return true.
@@ -178,7 +179,7 @@ void press_button_until_gradient_arrow(
     VideoStream& stream,
     SwitchControllerContext& context,
     ImageFloatBox box_area_to_check,
-    uint16_t button = BUTTON_A,
+    Button button = BUTTON_A,
     GradientArrowType arrow_type = GradientArrowType::RIGHT
 );
 

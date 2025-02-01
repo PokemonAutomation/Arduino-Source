@@ -895,8 +895,8 @@ void walk_forward_while_clear_front_path(
 
 void mash_button_till_overworld(
     VideoStream& stream,
-    SwitchControllerContext& context, 
-    uint16_t button, uint16_t seconds_run
+    SwitchControllerContext& context,
+    Button button, uint16_t seconds_run
 ){
     OverworldWatcher overworld(stream.logger(), COLOR_CYAN);
     context.wait_for_all_requests();
@@ -1043,7 +1043,7 @@ void press_button_until_gradient_arrow(
     VideoStream& stream,
     SwitchControllerContext& context,
     ImageFloatBox box_area_to_check,
-    uint16_t button,
+    Button button,
     GradientArrowType arrow_type
 ){
     GradientArrowWatcher arrow(COLOR_RED, arrow_type, box_area_to_check);

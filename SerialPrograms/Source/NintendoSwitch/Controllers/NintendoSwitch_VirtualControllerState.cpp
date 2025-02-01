@@ -22,7 +22,7 @@ using namespace std::chrono_literals;
 
 
 void SwitchControllerState::clear(){
-    buttons = 0;
+    buttons = BUTTON_NONE;
     dpad = DPAD_NONE;
     left_x = 128;
     left_y = 128;

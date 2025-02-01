@@ -575,7 +575,7 @@ void repeat_press_until(
 void repeat_button_press_until(
     const ProgramInfo& info,
     VideoStream& stream, SwitchControllerContext& context,
-    uint16_t button, uint16_t hold_ticks, uint16_t release_ticks,
+    Button button, uint16_t hold_ticks, uint16_t release_ticks,
     const std::vector<PeriodicInferenceCallback>& callbacks,
     const std::string &error_name, const std::string &error_message,
     std::chrono::milliseconds iteration_length = std::chrono::seconds(5),
@@ -586,7 +586,9 @@ void repeat_button_press_until(
     const std::chrono::milliseconds button_time = std::chrono::milliseconds((hold_ticks + release_ticks) * (1000 / TICKS_PER_SECOND));
     repeat_press_until(
         info, stream, context,
-        [&](){ pbf_press_button(context, button, hold_ticks, release_ticks); },
+        [&](){
+            pbf_press_button(context, button, hold_ticks, release_ticks);
+        },
         callbacks, error_name, error_message, iteration_length - button_time, max_presses,
         default_video_period, default_audio_period
     );
