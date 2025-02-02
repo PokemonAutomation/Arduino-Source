@@ -19,6 +19,30 @@ namespace NintendoSwitch{
 constexpr uint16_t TICKS_PER_SECOND = 125;
 
 //  Buttons
+enum Button : uint16_t{
+    BUTTON_NONE     =   0,
+    BUTTON_Y        =   ((uint16_t)1 <<  0),
+    BUTTON_B        =   ((uint16_t)1 <<  1),
+    BUTTON_A        =   ((uint16_t)1 <<  2),
+    BUTTON_X        =   ((uint16_t)1 <<  3),
+    BUTTON_L        =   ((uint16_t)1 <<  4),
+    BUTTON_R        =   ((uint16_t)1 <<  5),
+    BUTTON_ZL       =   ((uint16_t)1 <<  6),
+    BUTTON_ZR       =   ((uint16_t)1 <<  7),
+    BUTTON_MINUS    =   ((uint16_t)1 <<  8),
+    BUTTON_PLUS     =   ((uint16_t)1 <<  9),
+    BUTTON_LCLICK   =   ((uint16_t)1 << 10),
+    BUTTON_RCLICK   =   ((uint16_t)1 << 11),
+    BUTTON_HOME     =   ((uint16_t)1 << 12),
+    BUTTON_CAPTURE  =   ((uint16_t)1 << 13),
+};
+inline Button operator|(Button x, Button y){
+    return (Button)((uint16_t)x | (uint16_t)y);
+}
+inline void operator|=(Button& x, Button y){
+    x = (Button)((uint16_t)x | (uint16_t)y);
+}
+#if 0
 using Button = uint16_t;
 constexpr Button BUTTON_Y       =   ((uint16_t)1 <<  0);
 constexpr Button BUTTON_B       =   ((uint16_t)1 <<  1);
@@ -34,6 +58,7 @@ constexpr Button BUTTON_LCLICK  =   ((uint16_t)1 << 10);
 constexpr Button BUTTON_RCLICK  =   ((uint16_t)1 << 11);
 constexpr Button BUTTON_HOME    =   ((uint16_t)1 << 12);
 constexpr Button BUTTON_CAPTURE =   ((uint16_t)1 << 13);
+#endif
 
 //  Dpad
 enum DpadPosition : uint8_t{
