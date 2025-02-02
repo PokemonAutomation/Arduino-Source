@@ -275,11 +275,9 @@ void CameraSession::connect_video_sink(QVideoSink* sink){
                 WriteSpinLock lg(m_frame_lock);
 
                 //  Skip duplicate frames.
-                #ifndef __APPLE__
-                if (frame.startTime() <= m_last_frame.startTime()){
+                if (frame.startTime() != -1 && frame.startTime() <= m_last_frame.startTime()){
                     return;
                 }
-                #endif
 
                 m_last_frame = frame;
                 m_last_frame_timestamp = now;
