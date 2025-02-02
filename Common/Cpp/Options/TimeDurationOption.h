@@ -102,14 +102,14 @@ class MillisecondsCell : public TimeDurationCell<std::chrono::milliseconds>{
 public:
     template <class... Args>
     MillisecondsCell(Args&&... args)
-        : TimeDurationCell<std::chrono::milliseconds>("ms", std::forward<Args>(args)...)
+        : TimeDurationCell<std::chrono::milliseconds>("milliseconds", std::forward<Args>(args)...)
     {}
 };
 class MillisecondsOption : public TimeDurationOption<std::chrono::milliseconds>{
 public:
     template <class... Args>
     MillisecondsOption(std::string label, Args&&... args)
-        : TimeDurationOption<std::chrono::milliseconds>(std::move(label), "ms", std::forward<Args>(args)...)
+        : TimeDurationOption<std::chrono::milliseconds>(std::move(label), "milliseconds", std::forward<Args>(args)...)
     {}
 };
 

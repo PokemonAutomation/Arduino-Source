@@ -27,6 +27,17 @@ TimeDurationCellWidget<Type>::TimeDurationCellWidget(QWidget& parent, TimeDurati
     , ConfigWidget(value, *this)
     , m_value(value)
 {
+    this->setToolTip(QString::fromStdString(
+        "Time duration in " + value.units() +
+        "<br><br>"
+        "For controller timings, this will be rounded "
+        "up to the tick size of the controller."
+        "<br><br>"
+        "The tick size for wired controllers is usually 8ms and are very precise."
+        "<br><br>"
+        "Wireless controllers have larger tick sizes and are imprecise due to wireless communication latency."
+    ));
+
     connect(
         this, &QLineEdit::textChanged,
         this, [this](const QString& text){
@@ -61,6 +72,17 @@ TimeDurationOptionWidget<Type>::TimeDurationOptionWidget(QWidget& parent, TimeDu
     , ConfigWidget(value, *this)
     , m_value(value)
 {
+    this->setToolTip(QString::fromStdString(
+        "Time duration in " + value.units() +
+        "<br><br>"
+        "For controller timings, this will be rounded "
+        "up to the tick size of the controller."
+        "<br><br>"
+        "The tick size for wired controllers is usually 8ms and are very precise."
+        "<br><br>"
+        "Wireless controllers have larger tick sizes and are imprecise due to wireless communication latency."
+    ));
+
     QHBoxLayout* layout = new QHBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     QLabel* text = new QLabel(QString::fromStdString(m_value.label()), this);
