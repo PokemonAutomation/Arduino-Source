@@ -93,6 +93,7 @@ SOURCES += \
     ../Common/Cpp/CpuId/CpuId.cpp \
     ../Common/Cpp/EnumDatabase.cpp \
     ../Common/Cpp/Exceptions.cpp \
+    ../Common/Cpp/ExpressionEvaluator.cpp \
     ../Common/Cpp/ImageResolution.cpp \
     ../Common/Cpp/Json/JsonArray.cpp \
     ../Common/Cpp/Json/JsonObject.cpp \
@@ -117,6 +118,7 @@ SOURCES += \
     ../Common/Cpp/Options/StaticTextOption.cpp \
     ../Common/Cpp/Options/StringOption.cpp \
     ../Common/Cpp/Options/TextEditOption.cpp \
+    ../Common/Cpp/Options/TimeDurationOption.cpp \
     ../Common/Cpp/Options/TimeExpressionOption.cpp \
     ../Common/Cpp/PanicDump.cpp \
     ../Common/Cpp/PrettyPrint.cpp \
@@ -130,7 +132,6 @@ SOURCES += \
     ../Common/Qt/AutoWidthLineEdit.cpp \
     ../Common/Qt/CodeValidator.cpp \
     ../Common/Qt/CollapsibleGroupBox.cpp \
-    ../Common/Qt/ExpressionEvaluator.cpp \
     ../Common/Qt/Options/BatchWidget.cpp \
     ../Common/Qt/Options/BooleanCheckBoxWidget.cpp \
     ../Common/Qt/Options/ButtonWidget.cpp \
@@ -149,6 +150,7 @@ SOURCES += \
     ../Common/Qt/Options/StaticTextWidget.cpp \
     ../Common/Qt/Options/StringWidget.cpp \
     ../Common/Qt/Options/TextEditWidget.cpp \
+    ../Common/Qt/Options/TimeDurationWidget.cpp \
     ../Common/Qt/Options/TimeExpressionWidget.cpp \
     ../Common/Qt/Redispatch.cpp \
     ../Common/Qt/StringToolsQt.cpp \
@@ -1161,6 +1163,7 @@ HEADERS += \
     ../Common/Cpp/EnumDatabase.h \
     ../Common/Cpp/EventRateTracker.h \
     ../Common/Cpp/Exceptions.h \
+    ../Common/Cpp/ExpressionEvaluator.h \
     ../Common/Cpp/ImageResolution.h \
     ../Common/Cpp/Json/JsonArray.h \
     ../Common/Cpp/Json/JsonObject.h \
@@ -1186,6 +1189,7 @@ HEADERS += \
     ../Common/Cpp/Options/StaticTextOption.h \
     ../Common/Cpp/Options/StringOption.h \
     ../Common/Cpp/Options/TextEditOption.h \
+    ../Common/Cpp/Options/TimeDurationOption.h \
     ../Common/Cpp/Options/TimeExpressionOption.h \
     ../Common/Cpp/PanicDump.h \
     ../Common/Cpp/PrettyPrint.h \
@@ -1211,7 +1215,6 @@ HEADERS += \
     ../Common/Qt/AutoWidthLineEdit.h \
     ../Common/Qt/CodeValidator.h \
     ../Common/Qt/CollapsibleGroupBox.h \
-    ../Common/Qt/ExpressionEvaluator.h \
     ../Common/Qt/NoWheelComboBox.h \
     ../Common/Qt/Options/BatchWidget.h \
     ../Common/Qt/Options/BooleanCheckBoxWidget.h \
@@ -1231,6 +1234,7 @@ HEADERS += \
     ../Common/Qt/Options/StaticTextWidget.h \
     ../Common/Qt/Options/StringWidget.h \
     ../Common/Qt/Options/TextEditWidget.h \
+    ../Common/Qt/Options/TimeDurationWidget.h \
     ../Common/Qt/Options/TimeExpressionWidget.h \
     ../Common/Qt/Redispatch.h \
     ../Common/Qt/StringToolsQt.h \

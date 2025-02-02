@@ -103,6 +103,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/EventRateTracker.h
     ../Common/Cpp/Exceptions.cpp
     ../Common/Cpp/Exceptions.h
+    ../Common/Cpp/ExpressionEvaluator.cpp
+    ../Common/Cpp/ExpressionEvaluator.h
     ../Common/Cpp/ImageResolution.cpp
     ../Common/Cpp/ImageResolution.h
     ../Common/Cpp/Json/JsonArray.cpp
@@ -152,6 +154,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/Options/StringOption.h
     ../Common/Cpp/Options/TextEditOption.cpp
     ../Common/Cpp/Options/TextEditOption.h
+    ../Common/Cpp/Options/TimeDurationOption.cpp
+    ../Common/Cpp/Options/TimeDurationOption.h
     ../Common/Cpp/Options/TimeExpressionOption.cpp
     ../Common/Cpp/Options/TimeExpressionOption.h
     ../Common/Cpp/PanicDump.cpp
@@ -191,8 +195,6 @@ file(GLOB MAIN_SOURCES
     ../Common/Qt/CodeValidator.h
     ../Common/Qt/CollapsibleGroupBox.cpp
     ../Common/Qt/CollapsibleGroupBox.h
-    ../Common/Qt/ExpressionEvaluator.cpp
-    ../Common/Qt/ExpressionEvaluator.h
     ../Common/Qt/NoWheelComboBox.h
     ../Common/Qt/Options/BatchWidget.cpp
     ../Common/Qt/Options/BatchWidget.h
@@ -232,6 +234,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Qt/Options/TextEditWidget.h
     ../Common/Qt/Options/TimeExpressionWidget.cpp
     ../Common/Qt/Options/TimeExpressionWidget.h
+    ../Common/Qt/Options/TimeDurationWidget.cpp
+    ../Common/Qt/Options/TimeDurationWidget.h
     ../Common/Qt/Redispatch.cpp
     ../Common/Qt/Redispatch.h
     ../Common/Qt/StringToolsQt.cpp

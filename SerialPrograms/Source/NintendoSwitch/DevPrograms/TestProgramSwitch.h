@@ -12,6 +12,7 @@
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/ButtonOption.h"
 #include "Common/Cpp/Options/DateOption.h"
+#include "Common/Cpp/Options/TimeDurationOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonTools/Options/LanguageOCROption.h"
@@ -72,6 +73,8 @@ private:
 //    PokemonSV::PlayerListTable PLAYER_LIST;
     DateTimeOption DATE0;
     DateTimeOption DATE1;
+
+    MillisecondsOption DURATION;
 
 
 //    PokemonSV::SinglesAIOption battle_AI;

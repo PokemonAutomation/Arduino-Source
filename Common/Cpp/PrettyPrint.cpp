@@ -121,6 +121,9 @@ std::string duration_to_string(std::chrono::milliseconds milliseconds){
     const uint64_t MINUTE = SECOND * 60;
     const uint64_t HOUR = MINUTE * 60;
     const uint64_t DAY = HOUR * 24;
+    const uint64_t WEEK = DAY * 7;
+    const uint64_t YEARS = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::years(1)).count();
+    const uint64_t MILLION_YEARS = YEARS * 1000000;
 
     uint64_t ticks = milliseconds.count();
 
@@ -134,9 +137,18 @@ std::string duration_to_string(std::chrono::milliseconds milliseconds){
     }else if (ticks < DAY * 2){
         str += tostr_fixed((double)ticks / HOUR, 3);
         str += " hours";
-    }else{
+    }else if (ticks < WEEK * 2){
         str += tostr_fixed((double)ticks / DAY, 3);
         str += " days";
+    }else if (ticks < YEARS * 2){
+        str += tostr_fixed((double)ticks / WEEK, 3);
+        str += " weeks";
+    }else if (ticks < MILLION_YEARS){
+        str += tostr_fixed((double)ticks / YEARS, 3);
+        str += " years";
+    }else{
+        str += tostr_fixed((double)ticks / MILLION_YEARS, 3);
+        str += " million years";
     }
     return str;
 }

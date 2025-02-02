@@ -205,6 +205,11 @@ TestProgram::TestProgram()
         DateTime{2060, 12, 31, 23, 59, 59},
         DateTime{2048, 1, 13, 20, 48}
     )
+    , DURATION(
+        "Duration",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        "100"
+    )
     , NOTIFICATION_TEST("Test", true, true, ImageAttachmentMode::JPG)
     , NOTIFICATIONS({
         &NOTIFICATION_TEST,
@@ -221,6 +226,7 @@ TestProgram::TestProgram()
 //    PA_ADD_OPTION(battle_AI);
     PA_ADD_OPTION(DATE0);
     PA_ADD_OPTION(DATE1);
+    PA_ADD_OPTION(DURATION);
     PA_ADD_OPTION(NOTIFICATIONS);
     BUTTON0.add_listener(*this);
     BUTTON1.add_listener(*this);
