@@ -44,18 +44,18 @@ void navigate_to_menu_app(
     const int target_row = (int)target_app_index / 5;
     const int target_col = (int)target_app_index % 5;
     
-    const uint16_t BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY;
+    const Milliseconds BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY0;
 
     const DpadPosition dir = (cur_col < target_col ? DPAD_RIGHT : DPAD_LEFT);
     const int steps = std::abs(cur_col - target_col);
     for(int i = 0; i < steps; i++){
-        ssf_press_dpad2(context, dir, BOX_SCROLL_DELAY, 10);
+        ssf_press_dpad(context, dir, BOX_SCROLL_DELAY, 80ms);
     }
 
     if (cur_row < target_row){
-        ssf_press_dpad2(context, DPAD_DOWN, BOX_SCROLL_DELAY, 10);
+        ssf_press_dpad(context, DPAD_DOWN, BOX_SCROLL_DELAY, 80ms);
     }else if (cur_row > target_row){
-        ssf_press_dpad2(context, DPAD_UP, BOX_SCROLL_DELAY, 10);
+        ssf_press_dpad(context, DPAD_UP, BOX_SCROLL_DELAY, 80ms);
     }
 
     context.wait_for_all_requests();

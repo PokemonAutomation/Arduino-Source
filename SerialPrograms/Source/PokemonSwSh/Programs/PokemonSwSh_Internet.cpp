@@ -19,8 +19,8 @@ namespace PokemonSwSh{
 
 bool connect_to_internet_with_inference(
     VideoStream& stream, SwitchControllerContext& context,
-    std::chrono::milliseconds post_wait_time,
-    uint16_t timeout_ticks
+    Milliseconds post_wait_time,
+    Milliseconds timeout_ticks
 ){
     stream.log("Connecting to internet...");
     //  Enter Y-COMM.

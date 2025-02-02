@@ -5,10 +5,12 @@
  */
 
 #include "Common/Cpp/PrettyPrint.h"
+#include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_EggRoutines.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_GameEntry.h"
+#include "PokemonSwSh_EggHelpers.h"
 #include "PokemonSwSh_EggFetcherMultiple.h"
 
 namespace PokemonAutomation{
@@ -53,10 +55,14 @@ EggFetcherMultiple::EggFetcherMultiple()
         LockMode::LOCK_WHILE_RUNNING,
         10
     )
+    , NOTIFICATIONS({
+        &NOTIFICATION_PROGRAM_FINISH,
+    })
 {
     PA_ADD_OPTION(START_LOCATION);
     PA_ADD_OPTION(POKEMON_SPECIES_COUNT);
     PA_ADD_OPTION(MAX_FETCH_ATTEMPTS_PER_SPECIES);
+    PA_ADD_OPTION(NOTIFICATIONS);
 }
 
 
@@ -141,7 +147,9 @@ void EggFetcherMultiple::program(SingleSwitchProgramEnvironment& env, SwitchCont
         run_eggfetcher(env.console, context, GameSettings::instance().AUTO_DEPOSIT, MAX_FETCH_ATTEMPTS_PER_SPECIES);
     }
 
-    pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
+    pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
+
+    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 }
 
 

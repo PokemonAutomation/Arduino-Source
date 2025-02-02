@@ -11,6 +11,7 @@
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/FloatingPointOption.h"
 #include "Common/Cpp/Options/TimeExpressionOption.h"
+#include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonSwSh/Options/PokemonSwSh_DateToucher.h"
@@ -42,6 +43,9 @@ private:
     SimpleIntegerOption<uint8_t> BOXES_TO_HATCH;
     EggStepCountOption STEPS_TO_HATCH;
     FloatingPointOption FETCHES_PER_BATCH;
+
+    EventNotificationsOption NOTIFICATIONS;
+
     SectionDividerOption m_advanced_options;
     TimeExpressionOption<uint16_t> SAFETY_TIME;
     TimeExpressionOption<uint16_t> EARLY_HATCH_SAFETY;

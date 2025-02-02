@@ -114,6 +114,7 @@
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_BattleMenu.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonSwapMenu.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_SelectionArrow.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.h"
 
 
 #include <QPixmap>
@@ -132,6 +133,11 @@ using namespace PokemonAutomation::Kernels::Waterfill;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
+
+uint16_t scroll_to(
+    SwitchControllerContext& context,
+    uint8_t start_digit, uint8_t end_digit, bool actually_scroll
+);
 
 
 namespace PokemonSwSh{
@@ -272,11 +278,36 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
+    ssf_press_button(context, BUTTON_A, 0);
+    ssf_do_nothing(context, 4);
+    ssf_press_button(context, BUTTON_A, 0);
+    ssf_do_nothing(context, 4);
+    ssf_press_button(context, BUTTON_A, 0);
+    ssf_do_nothing(context, 4);
+    ssf_press_button(context, BUTTON_A, 0);
+    ssf_do_nothing(context, 4);
 
+
+
+
+//    enter_digits(context, 8, (const uint8_t*)"56685459");
+
+#if 0
+    for (int c = 0; c < 10; c++){
+        scroll_to(context, 1, 9, true);
+        scroll_to(context, 9, 1, true);
+    }
+//    pbf_wait(context, 100);
+#endif
+
+
+#if 0
     ImageRGB32 image("20250131-170450792229.png");
 
     PokemonSwSh::BattleBallReader reader(console, Language::Korean);
     reader.read_ball(image);
+#endif
+
 
 
 #if 0

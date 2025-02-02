@@ -301,7 +301,7 @@ void CurryHunter::program(SingleSwitchProgramEnvironment& env, SwitchControllerC
 
     //  Not really relevant here, but for programs that finish, go to
     //  Switch home to idle.
-    pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
+    pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
 }
 
 

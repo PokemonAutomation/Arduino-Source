@@ -25,7 +25,7 @@ static void release(SwitchControllerContext& context){
 //    ssf_press_button(context, BUTTON_A, 40);
     ssf_mash_AZs(context, 180);
 }
-static void release_box(SwitchControllerContext& context, uint16_t box_scroll_delay){
+static void release_box(SwitchControllerContext& context, Milliseconds box_scroll_delay){
     for (uint8_t row = 0; row < 5; row++){
         if (row != 0){
             ssf_press_dpad(context, DPAD_DOWN, box_scroll_delay);
@@ -43,8 +43,8 @@ static void release_box(SwitchControllerContext& context, uint16_t box_scroll_de
 static void release_boxes(
     SwitchControllerContext& context,
     uint8_t boxes,
-    uint16_t box_scroll_delay,
-    uint16_t box_change_delay
+    Milliseconds box_scroll_delay,
+    Milliseconds box_change_delay
 ){
     if (boxes == 0){
         return;

@@ -5,8 +5,7 @@
  */
 
 #include "Common/Cpp/PrettyPrint.h"
-#include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
+#include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
@@ -41,6 +40,12 @@ WattFarmer::WattFarmer()
         TICKS_PER_SECOND,
         "5 * TICKS_PER_SECOND"
     )
+    , EXIT_DEN_WAIT(
+        "<b>Exit Den Wait Time:</b> "
+        "Wait this long after backing out of the den before date skipping.",
+        LockMode::LOCK_WHILE_RUNNING,
+        "1720ms"
+    )
     , SKIPS(
         "<b>Number of Fetch Attempts:</b>",
         LockMode::LOCK_WHILE_RUNNING,
@@ -51,10 +56,15 @@ WattFarmer::WattFarmer()
         LockMode::LOCK_WHILE_RUNNING,
         0, 0
     )
+    , NOTIFICATIONS({
+        &NOTIFICATION_PROGRAM_FINISH,
+    })
 {
     PA_ADD_OPTION(START_LOCATION);
+    PA_ADD_OPTION(EXIT_DEN_WAIT);
     PA_ADD_OPTION(SKIPS);
     PA_ADD_OPTION(SAVE_ITERATIONS);
+    PA_ADD_OPTION(NOTIFICATIONS);
 }
 
 void WattFarmer::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
@@ -63,7 +73,7 @@ void WattFarmer::program(SingleSwitchProgramEnvironment& env, SwitchControllerCo
         pbf_wait(context, GRIP_MENU_WAIT);
     }else{
         pbf_press_button(context, BUTTON_B, 5, 5);
-        pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_FAST);
+        pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY_FAST0);
     }
 
     uint8_t year = MAX_YEAR;
@@ -75,14 +85,14 @@ void WattFarmer::program(SingleSwitchProgramEnvironment& env, SwitchControllerCo
         pbf_mash_button(context, BUTTON_B, 90);
 
         pbf_press_button(context, BUTTON_A, 5, 5);
-        pbf_mash_button(context, BUTTON_B, 215);
+        pbf_mash_button(context, BUTTON_B, EXIT_DEN_WAIT);
 
         if (SAVE_ITERATIONS != 0){
             save_count++;
             if (save_count >= SAVE_ITERATIONS){
                 save_count = 0;
                 pbf_mash_button(context, BUTTON_B, 2 * TICKS_PER_SECOND);
-                pbf_press_button(context, BUTTON_X, 20, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
+                pbf_press_button(context, BUTTON_X, 160ms, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);
                 pbf_press_button(context, BUTTON_R, 20, 2 * TICKS_PER_SECOND);
                 pbf_press_button(context, BUTTON_ZL, 20, 3 * TICKS_PER_SECOND);
             }
@@ -91,8 +101,10 @@ void WattFarmer::program(SingleSwitchProgramEnvironment& env, SwitchControllerCo
         //  Tap HOME and quickly spam B. The B spamming ensures that we don't
         //  accidentally update the system if the system update window pops up.
         pbf_press_button(context, BUTTON_HOME, 10, 5);
-        pbf_mash_button(context, BUTTON_B, GameSettings::instance().GAME_TO_HOME_DELAY_FAST - 15);
+        pbf_mash_button(context, BUTTON_B, GameSettings::instance().GAME_TO_HOME_DELAY_FAST0.get() - 120ms);
     }
+
+    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 }
 
 

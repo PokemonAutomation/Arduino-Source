@@ -13,8 +13,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-//void mash_A         (SwitchControllerContext& context, uint16_t ticks);
-void IoA_backout    (SwitchControllerContext& context, uint16_t pokemon_to_menu_delay);
+void IoA_backout    (SwitchControllerContext& context, Milliseconds pokemon_to_menu_delay);
 
 
 

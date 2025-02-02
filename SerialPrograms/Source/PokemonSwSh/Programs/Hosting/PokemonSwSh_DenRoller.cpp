@@ -9,6 +9,7 @@
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
@@ -119,7 +120,7 @@ void DenRoller::program(SingleSwitchProgramEnvironment& env, SwitchControllerCon
         grip_menu_connect_go_home(context);
     }else{
         pbf_press_button(context, BUTTON_B, 5, 5);
-        pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_FAST);
+        pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY_FAST0);
     }
 
     rollback_date_from_home(context, SKIPS);
@@ -132,7 +133,7 @@ void DenRoller::program(SingleSwitchProgramEnvironment& env, SwitchControllerCon
 
     VideoSnapshot screen;
     while (true){
-        roll_den(env.console, context, 0, 0, SKIPS, CATCHABILITY);
+        roll_den(env.console, context, 0, 0ms, SKIPS, CATCHABILITY);
 
         size_t desired_index = FILTER.index();
         std::string desired_slug = FILTER.slug();
@@ -180,7 +181,7 @@ void DenRoller::program(SingleSwitchProgramEnvironment& env, SwitchControllerCon
         env.update_stats();
 
         //  Add a little extra wait time since correctness matters here.
-        pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE - 10);
+        ssf_press_button(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0, 80ms);
 
         rollback_date_from_home(context, SKIPS);
 //        reset_game_from_home(TOLERATE_SYSTEM_UPDATE_MENU_SLOW);

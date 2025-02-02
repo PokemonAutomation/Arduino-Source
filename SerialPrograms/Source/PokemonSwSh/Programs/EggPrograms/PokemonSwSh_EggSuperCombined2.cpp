@@ -4,8 +4,9 @@
  *
  */
 
+#include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "Pokemon/Pokemon_Strings.h"
-#include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
+//#include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_GameEntry.h"
 #include "PokemonSwSh/Programs/ReleaseHelpers.h"
 #include "PokemonSwSh_EggCombinedShared.h"
@@ -52,6 +53,9 @@ EggSuperCombined2::EggSuperCombined2()
         LockMode::LOCK_WHILE_RUNNING,
         6.0, 0, 7
     )
+    , NOTIFICATIONS({
+        &NOTIFICATION_PROGRAM_FINISH,
+    })
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
@@ -82,6 +86,8 @@ EggSuperCombined2::EggSuperCombined2()
     PA_ADD_OPTION(BOXES_TO_HATCH);
     PA_ADD_OPTION(STEPS_TO_HATCH);
     PA_ADD_OPTION(FETCHES_PER_BATCH);
+    PA_ADD_OPTION(NOTIFICATIONS);
+
     PA_ADD_STATIC(m_advanced_options);
     PA_ADD_OPTION(SAFETY_TIME);
     PA_ADD_OPTION(EARLY_HATCH_SAFETY);
@@ -107,10 +113,15 @@ void EggSuperCombined2::program(SingleSwitchProgramEnvironment& env, SwitchContr
     }
 
     //  Mass Release
-    ssf_press_button2(context, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY, 20);
+    ssf_press_button(context, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0, 160ms);
     ssf_press_button1(context, BUTTON_A, 200);
     ssf_press_button1(context, BUTTON_R, 250);
-    release_boxes(context, BOXES_TO_RELEASE, GameSettings::instance().BOX_SCROLL_DELAY, GameSettings::instance().BOX_CHANGE_DELAY);
+    release_boxes(
+        context,
+        BOXES_TO_RELEASE,
+        GameSettings::instance().BOX_SCROLL_DELAY0,
+        GameSettings::instance().BOX_CHANGE_DELAY0
+    );
 
     //  Skip Boxes
     for (uint8_t c = 0; c <= BOXES_TO_SKIP; c++){
@@ -119,6 +130,8 @@ void EggSuperCombined2::program(SingleSwitchProgramEnvironment& env, SwitchContr
     pbf_mash_button(context, BUTTON_B, 600);
 
     session.eggcombined2_body(env.console, context);
+
+    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 }
 
 

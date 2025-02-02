@@ -25,7 +25,7 @@ namespace PokemonSwSh{
 bool connect_to_internet(
     VideoStream& stream, SwitchControllerContext& context,
     bool host_online,
-    uint16_t connect_to_internet_delay
+    Milliseconds connect_to_internet_delay
 );
 
 void send_raid_notification(
@@ -42,13 +42,13 @@ void send_raid_notification(
 void run_autohost(
     ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context,
     Catchability catchability, uint8_t skips,
-    const RandomCodeOption* raid_code, uint16_t lobby_wait_delay,
+    const RandomCodeOption* raid_code, Milliseconds lobby_wait_delay,
     bool host_online, uint8_t accept_FR_slot,
     uint8_t move_slot, bool dynamax, uint8_t troll_hosting,
     AutoHostNotificationOption& notifications,
-    uint16_t connect_to_internet_delay,
+    Milliseconds connect_to_internet_delay,
     uint16_t enter_online_den_delay,
-    uint16_t open_online_den_lobby_delay,
+    Milliseconds open_online_den_lobby_delay,
     uint16_t raid_start_to_exit_delay,
     uint16_t delay_to_select_move
 );

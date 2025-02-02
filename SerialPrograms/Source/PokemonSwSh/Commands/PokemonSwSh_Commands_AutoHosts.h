@@ -17,8 +17,8 @@ namespace PokemonSwSh{
 
 void connect_to_internet(
     SwitchControllerContext& context,
-    uint16_t open_ycomm_delay,
-    uint16_t connect_to_internet_delay
+    Milliseconds open_ycomm_delay,
+    Milliseconds connect_to_internet_delay
 );
 void home_to_add_friends(
     SwitchControllerContext& context,
@@ -29,8 +29,8 @@ void home_to_add_friends(
 void accept_FRs(
     VideoStream& stream, SwitchControllerContext& context,
     uint8_t slot, bool fix_cursor,
-    uint16_t game_to_home_delay_safe,
-    uint16_t auto_fr_duration,
+    Milliseconds game_to_home_delay_safe,
+    Milliseconds auto_fr_duration,
     bool tolerate_system_update_window_slow
 );
 

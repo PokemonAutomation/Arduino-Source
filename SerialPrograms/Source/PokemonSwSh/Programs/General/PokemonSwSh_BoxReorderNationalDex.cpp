@@ -243,7 +243,7 @@ void BoxReorderNationalDex::program(SingleSwitchProgramEnvironment& env, SwitchC
     }
 
     // Go to Switch home menu
-    pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().HOME_TO_GAME_DELAY);
+    pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().HOME_TO_GAME_DELAY0);
 }
 
 

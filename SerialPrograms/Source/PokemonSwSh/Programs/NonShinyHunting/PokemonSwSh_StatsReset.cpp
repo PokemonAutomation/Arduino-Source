@@ -140,10 +140,10 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, SwitchControllerCo
 
         pbf_mash_button(context, BUTTON_B, 1 * TICKS_PER_SECOND);
 
-        pbf_press_button(context, BUTTON_X, 10, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
-        ssf_press_dpad2(context, DPAD_RIGHT, GameSettings::instance().BOX_SCROLL_DELAY, 10);
-        ssf_press_button2(context, BUTTON_A, GameSettings::instance().MENU_TO_POKEMON_DELAY, 10);
-        ssf_press_button2(context, BUTTON_R, GameSettings::instance().POKEMON_TO_BOX_DELAY, 10);
+        pbf_press_button(context, BUTTON_X, 80ms, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);
+        ssf_press_dpad(context, DPAD_RIGHT, GameSettings::instance().BOX_SCROLL_DELAY0, 80ms);
+        ssf_press_button(context, BUTTON_A, GameSettings::instance().MENU_TO_POKEMON_DELAY0, 80ms);
+        ssf_press_button(context, BUTTON_R, GameSettings::instance().POKEMON_TO_BOX_DELAY0, 80ms);
         context.wait_for_all_requests();
 
         {
@@ -163,7 +163,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, SwitchControllerCo
         }
 
         //  Add a little extra wait time since correctness matters here.
-        pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
+        pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
 
         reset_game_from_home_with_inference(
             env.console, context,

@@ -67,7 +67,7 @@ void BeamReset::program(SingleSwitchProgramEnvironment& env, SwitchControllerCon
 
         //  Drop wishing piece.
         pbf_press_button(context, BUTTON_A, 10, 70);
-        pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_FAST);
+        pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY_FAST0);
 
         for (uint16_t c = 0; c < 4; c++){
             pbf_press_button(context, BUTTON_HOME, 10, 10);

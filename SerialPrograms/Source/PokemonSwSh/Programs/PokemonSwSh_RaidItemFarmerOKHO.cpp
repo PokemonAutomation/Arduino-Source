@@ -145,7 +145,7 @@ void RaidItemFarmerOHKO::program(MultiSwitchProgramEnvironment& env, Cancellable
                 if (console.index() == 0){
                     enter_den(context, 0, false, false);
                 }else{
-                    pbf_press_button(context, BUTTON_Y, 10, GameSettings::instance().OPEN_YCOMM_DELAY);
+                    pbf_press_button(context, BUTTON_Y, 80ms, GameSettings::instance().OPEN_YCOMM_DELAY0);
                     pbf_press_dpad(context, DPAD_UP, 5, 0);
                     pbf_move_right_joystick(context, 128, 0, 5, 0);
                     pbf_press_button(context, BUTTON_X, 10, 10);
@@ -153,7 +153,7 @@ void RaidItemFarmerOHKO::program(MultiSwitchProgramEnvironment& env, Cancellable
             }
         );
 
-        enter_lobby(host, 0, false, Catchability::ALWAYS_CATCHABLE);
+        enter_lobby(host, 0ms, false, Catchability::ALWAYS_CATCHABLE);
 
         host.wait_for_all_requests();
         env.run_in_parallel(
@@ -180,7 +180,7 @@ void RaidItemFarmerOHKO::program(MultiSwitchProgramEnvironment& env, Cancellable
 
                 if (console.index() == 0){
                     //  Add a little extra wait time since correctness matters here.
-                    ssf_press_button2(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE, 10);
+                    ssf_press_button(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0, 80ms);
 
                     close_game(console, context);
 

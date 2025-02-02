@@ -22,8 +22,8 @@ void settings_to_enter_game             (SwitchControllerContext& device, bool f
 void settings_to_enter_game_den_lobby(
     SwitchControllerContext& device,
     bool tolerate_update_menu, bool fast,
-    uint16_t enter_switch_pokemon_delay,
-    uint16_t exit_switch_pokemon_delay
+    Milliseconds enter_switch_pokemon_delay,
+    Milliseconds exit_switch_pokemon_delay
 );
 void enter_game(
     SwitchControllerContext& device,

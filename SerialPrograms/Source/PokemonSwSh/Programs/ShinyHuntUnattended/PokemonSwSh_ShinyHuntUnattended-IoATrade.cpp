@@ -88,15 +88,15 @@ void ShinyHuntUnattendedIoATrade::program(SingleSwitchProgramEnvironment& env, S
         pbf_press_button(context, BUTTON_A, 10, 60);
         pbf_press_button(context, BUTTON_A, 10, 100);
         pbf_press_button(context, BUTTON_A, 10, 50);
-        pbf_press_button(context, BUTTON_A, 10, GameSettings::instance().POKEMON_TO_BOX_DELAY);
+        pbf_press_button(context, BUTTON_A, 80ms, GameSettings::instance().POKEMON_TO_BOX_DELAY0);
         pbf_press_dpad(context, DPAD_LEFT, 10, 10);
         pbf_mash_button(context, BUTTON_A, MASH_TO_TRADE_DELAY);
 
         if (true){
             //  Enter box system.
-            pbf_press_button(context, BUTTON_X, 10, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
+            pbf_press_button(context, BUTTON_X, 80ms, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);
             pbf_press_dpad(context, DPAD_RIGHT, 10, 10);
-            pbf_press_button(context, BUTTON_A, 10, GameSettings::instance().MENU_TO_POKEMON_DELAY);
+            pbf_press_button(context, BUTTON_A, 80ms, GameSettings::instance().MENU_TO_POKEMON_DELAY0);
 
             //  Move item from 2nd party member to 1st.
             pbf_press_button(context, BUTTON_X, 10, 50);
@@ -108,7 +108,7 @@ void ShinyHuntUnattendedIoATrade::program(SingleSwitchProgramEnvironment& env, S
             //  Back out to menu.
             //  Prepend each B press by a DOWN press so that the B gets
             //  swallowed while in the summary.
-            IoA_backout(context, GameSettings::instance().POKEMON_TO_MENU_DELAY);
+            IoA_backout(context, GameSettings::instance().POKEMON_TO_MENU_DELAY0);
 
             //  Enter map.
             pbf_press_dpad(context, DPAD_LEFT, 10, 0);

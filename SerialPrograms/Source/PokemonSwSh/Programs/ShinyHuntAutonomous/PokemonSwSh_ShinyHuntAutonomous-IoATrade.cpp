@@ -110,14 +110,14 @@ void ShinyHuntAutonomousIoATrade::program(SingleSwitchProgramEnvironment& env, S
         pbf_press_button(context, BUTTON_A, 10, 60);
         pbf_press_button(context, BUTTON_A, 10, 100);
         pbf_press_button(context, BUTTON_A, 10, 50);
-        pbf_press_button(context, BUTTON_A, 10, GameSettings::instance().POKEMON_TO_BOX_DELAY);
+        pbf_press_button(context, BUTTON_A, 80ms, GameSettings::instance().POKEMON_TO_BOX_DELAY0);
         pbf_press_dpad(context, DPAD_LEFT, 10, 10);
         pbf_mash_button(context, BUTTON_A, MASH_TO_TRADE_DELAY);
 
         //  Enter box system.
-        pbf_press_button(context, BUTTON_X, 10, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
+        pbf_press_button(context, BUTTON_X, 80ms, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);
         pbf_press_dpad(context, DPAD_RIGHT, 10, 10);
-        pbf_press_button(context, BUTTON_A, 10, GameSettings::instance().MENU_TO_POKEMON_DELAY);
+        pbf_press_button(context, BUTTON_A, 80ms, GameSettings::instance().MENU_TO_POKEMON_DELAY0);
 
         //  View summary.
         pbf_press_button(context, BUTTON_A, 10, 100);
@@ -162,7 +162,7 @@ void ShinyHuntAutonomousIoATrade::program(SingleSwitchProgramEnvironment& env, S
             }
         }
 
-        pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
+        pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
         TOUCH_DATE_INTERVAL.touch_now_from_home_if_needed(context);
         reset_game_from_home_with_inference(
             env.console, context,

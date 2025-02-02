@@ -129,12 +129,12 @@ void run_fossil_batch(
     }
 
     //  Save game.
-    ssf_press_button2(context, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY, 20);
+    ssf_press_button(context, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0, 160ms);
     ssf_press_button2(context, BUTTON_R, 150, 20);
     ssf_press_button2(context, BUTTON_A, 500, 10);
 
     //  Exit game.
-    ssf_press_button2(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE, 10);
+    ssf_press_button(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0, 80ms);
     close_game(stream, context);
 }
 
@@ -144,7 +144,7 @@ void MultiGameFossil::program(SingleSwitchProgramEnvironment& env, SwitchControl
         grip_menu_connect_go_home(context);
     }else{
         pbf_press_button(context, BUTTON_B, 5, 5);
-        pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_FAST);
+        pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY_FAST0);
     }
 
     std::vector<std::unique_ptr<FossilGame>> list = GAME_LIST.copy_snapshot();
@@ -159,7 +159,7 @@ void MultiGameFossil::program(SingleSwitchProgramEnvironment& env, SwitchControl
         run_fossil_batch(env.console, env.logger(), context, *list[c], &game_slot_flipped, c + 1 < games);
     }
 
-    ssf_press_button2(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE, 10);
+    ssf_press_button(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0, 80ms);
 }
 
 

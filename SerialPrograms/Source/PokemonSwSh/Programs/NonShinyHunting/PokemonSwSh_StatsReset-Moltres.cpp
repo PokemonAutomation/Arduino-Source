@@ -142,13 +142,13 @@ void StatsResetMoltres::program(SingleSwitchProgramEnvironment& env, SwitchContr
 
         context.wait_for_all_requests();
         env.log("Check the stats.", COLOR_PURPLE);
-        pbf_press_button(context, BUTTON_X , 10, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
-        pbf_press_dpad  (context, DPAD_UP  , 10, (uint16_t)(0.5 * TICKS_PER_SECOND));
-        pbf_press_button(context, BUTTON_A , 10, 2   * TICKS_PER_SECOND);
-        pbf_press_button(context, BUTTON_R , 10, 3   * TICKS_PER_SECOND);
-        pbf_press_dpad  (context, DPAD_LEFT, 10, 1   * TICKS_PER_SECOND);
-        pbf_press_dpad  (context, DPAD_UP  , 10, 1   * TICKS_PER_SECOND);
-        pbf_press_dpad  (context, DPAD_UP  , 10, 1   * TICKS_PER_SECOND);
+        pbf_press_button(context, BUTTON_X , 80ms, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);
+        pbf_press_dpad  (context, DPAD_UP  , 80ms, 500ms);
+        pbf_press_button(context, BUTTON_A , 80ms, 2000ms);
+        pbf_press_button(context, BUTTON_R , 80ms, 3000ms);
+        pbf_press_dpad  (context, DPAD_LEFT, 80ms, 1000ms);
+        pbf_press_dpad  (context, DPAD_UP  , 80ms, 1000ms);
+        pbf_press_dpad  (context, DPAD_UP  , 80ms, 1000ms);
 
         context.wait_for_all_requests();
         IvJudgeReaderScope reader(env.console, LANGUAGE);
@@ -166,7 +166,7 @@ void StatsResetMoltres::program(SingleSwitchProgramEnvironment& env, SwitchContr
         }else{
             stats.resets++;
             env.update_stats();
-            pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
+            pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
             reset_game_from_home_with_inference(
                 env.console, context,
                 ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST
@@ -198,7 +198,7 @@ void StatsResetMoltres::program(SingleSwitchProgramEnvironment& env, SwitchContr
 
             context.wait_for_all_requests();
             env.log("Let's camp.", COLOR_PURPLE);
-            pbf_press_button(context, BUTTON_X  , 10, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
+            pbf_press_button(context, BUTTON_X  , 80ms, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);
             pbf_press_dpad  (context, DPAD_RIGHT, 10, 1 * TICKS_PER_SECOND);
             pbf_press_dpad  (context, DPAD_DOWN , 10, 1 * TICKS_PER_SECOND);
             pbf_press_button(context, BUTTON_A  , 10, 8 * TICKS_PER_SECOND);
@@ -208,7 +208,7 @@ void StatsResetMoltres::program(SingleSwitchProgramEnvironment& env, SwitchContr
 
             context.wait_for_all_requests();
             env.log("Let's save.", COLOR_PURPLE);
-            pbf_press_button(context, BUTTON_X , 10, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
+            pbf_press_button(context, BUTTON_X , 80ms, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);
             pbf_press_button(context, BUTTON_R , 10, 1 * TICKS_PER_SECOND);
             pbf_press_button(context, BUTTON_A , 10, 1 * TICKS_PER_SECOND);
             pbf_press_button(context, BUTTON_A , 10, 1 * TICKS_PER_SECOND);

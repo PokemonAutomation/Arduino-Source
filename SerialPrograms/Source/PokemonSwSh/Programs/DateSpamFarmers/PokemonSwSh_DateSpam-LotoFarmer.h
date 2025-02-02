@@ -9,6 +9,7 @@
 
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/TimeExpressionOption.h"
+#include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
@@ -35,6 +36,8 @@ private:
 
     SimpleIntegerOption<uint32_t> SKIPS;
     TimeExpressionOption<uint16_t> MASH_B_DURATION;
+
+    EventNotificationsOption NOTIFICATIONS;
 };
 
 

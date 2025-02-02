@@ -170,7 +170,7 @@ StateMachineAction run_caught_screen(
             if (state == StateMachineAction::RESET_RECOVER){
                 throw_and_log<FatalProgramException>(
                     stream.logger(),
-                    ErrorReport::SEND_ERROR_REPORT,
+                    ErrorReport::NO_ERROR_REPORT,
                     "Unable to take " + Pokemon::STRING_POKEMON + ". Did you forget to disable nicknames?",
                     stream
                );
@@ -181,7 +181,7 @@ StateMachineAction run_caught_screen(
     case CaughtScreenAction::RESET:
         stream.log("Resetting game...", COLOR_BLUE);
         synchronize_caught_screen(console_index, stream, context, state_tracker);
-        pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
+        pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
         reset_game_from_home_with_inference(
             stream, context,
             ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST

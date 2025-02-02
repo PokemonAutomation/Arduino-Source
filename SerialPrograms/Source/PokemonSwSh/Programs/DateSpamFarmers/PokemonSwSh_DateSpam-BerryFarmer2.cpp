@@ -289,7 +289,7 @@ void BerryFarmer2::program(SingleSwitchProgramEnvironment& env, SwitchController
         grip_menu_connect_go_home(context);
     }else{
         pbf_press_button(context, BUTTON_B, 5, 5);
-        pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_FAST);
+        pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY_FAST0);
     }
 
     BerryFarmer2_Descriptor::Stats& stats = env.current_stats<BerryFarmer2_Descriptor::Stats>();
@@ -337,7 +337,7 @@ void BerryFarmer2::program(SingleSwitchProgramEnvironment& env, SwitchController
             if (save_count >= save_iterations){
                 save_count = 0;
                 pbf_mash_button(context, BUTTON_B, 2 * TICKS_PER_SECOND);
-                pbf_press_button(context, BUTTON_X, 20, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
+                pbf_press_button(context, BUTTON_X, 160ms, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);
                 pbf_press_button(context, BUTTON_R, 20, 2 * TICKS_PER_SECOND);
                 pbf_press_button(context, BUTTON_ZL, 20, 3 * TICKS_PER_SECOND);
             }
@@ -346,7 +346,7 @@ void BerryFarmer2::program(SingleSwitchProgramEnvironment& env, SwitchController
         // Tap HOME and quickly spam B. The B spamming ensures that we don't
         // accidentally update the system if the system update window pops up.
         pbf_press_button(context, BUTTON_HOME, 10, 5);
-        pbf_mash_button(context, BUTTON_B, GameSettings::instance().GAME_TO_HOME_DELAY_FAST - 15);
+        pbf_mash_button(context, BUTTON_B, GameSettings::instance().GAME_TO_HOME_DELAY_FAST0.get() - 120ms);
     }
     VideoSnapshot screen = env.console.video().snapshot();
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH, "", screen);

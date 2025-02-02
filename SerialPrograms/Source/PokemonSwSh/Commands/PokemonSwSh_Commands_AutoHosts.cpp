@@ -21,10 +21,10 @@ namespace PokemonSwSh{
 
 void connect_to_internet(
     SwitchControllerContext& context,
-    uint16_t open_ycomm_delay,
-    uint16_t connect_to_internet_delay
+    Milliseconds open_ycomm_delay,
+    Milliseconds connect_to_internet_delay
 ){
-    ssf_press_button(context, BUTTON_Y, open_ycomm_delay, 10);
+    ssf_press_button(context, BUTTON_Y, open_ycomm_delay, 80ms);
 
     //  Move the cursor as far away from Link Trade and Surprise Trade as possible.
     //  This is added safety in case connect to internet takes too long.
@@ -75,8 +75,8 @@ void home_to_add_friends(
 void accept_FRs(
     VideoStream& stream, SwitchControllerContext& context,
     uint8_t slot, bool fix_cursor,
-    uint16_t game_to_home_delay_safe,
-    uint16_t auto_fr_duration,
+    Milliseconds game_to_home_delay_safe,
+    Milliseconds auto_fr_duration,
     bool tolerate_system_update_window_slow
 ){
     if (slot > 7){
@@ -84,7 +84,7 @@ void accept_FRs(
     }
 
     //  Go to Switch Home menu.
-    pbf_press_button(context, BUTTON_HOME, 10, game_to_home_delay_safe);
+    pbf_press_button(context, BUTTON_HOME, 80ms, game_to_home_delay_safe);
 
     home_to_add_friends(context, slot, 0, fix_cursor);
 
@@ -101,7 +101,8 @@ void accept_FRs(
         settings_to_enter_game_den_lobby(
             context,
             tolerate_system_update_window_slow, false,
-            GameSettings::instance().ENTER_SWITCH_POKEMON, GameSettings::instance().EXIT_SWITCH_POKEMON
+            GameSettings::instance().ENTER_SWITCH_POKEMON0,
+            GameSettings::instance().EXIT_SWITCH_POKEMON0
         );
     }
     pbf_wait(context, 300);

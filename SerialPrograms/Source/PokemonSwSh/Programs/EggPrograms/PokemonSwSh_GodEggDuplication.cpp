@@ -5,6 +5,7 @@
  */
 
 #include "Common/Cpp/PrettyPrint.h"
+#include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_EggRoutines.h"
@@ -42,10 +43,14 @@ GodEggDuplication::GodEggDuplication()
         LockMode::LOCK_WHILE_RUNNING,
         6, 1, 6
     )
+    , NOTIFICATIONS({
+        &NOTIFICATION_PROGRAM_FINISH,
+    })
 {
     PA_ADD_OPTION(START_LOCATION);
     PA_ADD_OPTION(MAX_FETCH_ATTEMPTS);
     PA_ADD_OPTION(PARTY_ROUND_ROBIN);
+    PA_ADD_OPTION(NOTIFICATIONS);
 }
 
 
@@ -65,7 +70,7 @@ void GodEggDuplication::collect_godegg(SwitchControllerContext& context, uint8_t
     ssf_press_button1(context, BUTTON_B, 100);
 
     //  "Please select a Pokemon to swap from your party."
-    ssf_press_button1(context, BUTTON_B, GameSettings::instance().MENU_TO_POKEMON_DELAY);
+    ssf_press_button(context, BUTTON_B, GameSettings::instance().MENU_TO_POKEMON_DELAY0);
 
     //  Select the party member.
     for (uint8_t c = 0; c < party_slot; c++){
@@ -120,7 +125,9 @@ void GodEggDuplication::program(SingleSwitchProgramEnvironment& env, SwitchContr
     }
 
     run_program(env.console, context, MAX_FETCH_ATTEMPTS);
-    ssf_press_button2(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE, 10);
+    ssf_press_button(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0, 80ms);
+
+    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 }
 
 

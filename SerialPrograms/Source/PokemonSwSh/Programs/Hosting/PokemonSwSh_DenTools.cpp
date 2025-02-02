@@ -21,17 +21,17 @@ namespace PokemonSwSh{
 void enter_den(SwitchControllerContext& context, uint16_t ENTER_ONLINE_DEN_DELAY, bool watts, bool online){
     if (!online){
         if (!watts){
-            ssf_press_button2(context, BUTTON_A, GameSettings::instance().ENTER_OFFLINE_DEN_DELAY, 10);
+            ssf_press_button(context, BUTTON_A, GameSettings::instance().ENTER_OFFLINE_DEN_DELAY0, 80ms);
         }else{
             //  This is the critical den-rolling path. It needs to be fast.
-            ssf_mash_AZs(context, GameSettings::instance().COLLECT_WATTS_OFFLINE_DELAY);
-            pbf_wait(context, GameSettings::instance().ENTER_OFFLINE_DEN_DELAY);
+            ssf_mash_AZs(context, GameSettings::instance().COLLECT_WATTS_OFFLINE_DELAY0);
+            pbf_wait(context, GameSettings::instance().ENTER_OFFLINE_DEN_DELAY0);
         }
     }else{
         if (!watts){
             ssf_press_button2(context, BUTTON_A, ENTER_ONLINE_DEN_DELAY, 50);
         }else{
-            ssf_press_button2(context, BUTTON_A, GameSettings::instance().COLLECT_WATTS_ONLINE_DELAY, 50);
+            ssf_press_button(context, BUTTON_A, GameSettings::instance().COLLECT_WATTS_ONLINE_DELAY0, 400ms);
             ssf_press_button2(context, BUTTON_B, 100, 50);
             ssf_press_button2(context, BUTTON_B, ENTER_ONLINE_DEN_DELAY, 50);
         }
@@ -39,44 +39,49 @@ void enter_den(SwitchControllerContext& context, uint16_t ENTER_ONLINE_DEN_DELAY
 }
 
 
-void enter_lobby(SwitchControllerContext& context, uint16_t OPEN_ONLINE_DEN_LOBBY_DELAY, bool online, Catchability catchability){
+void enter_lobby(
+    SwitchControllerContext& context,
+    Milliseconds OPEN_ONLINE_DEN_LOBBY_DELAY,
+    bool online,
+    Catchability catchability
+){
     if (online){
         switch (catchability){
         case Catchability::ALWAYS_CATCHABLE:
-            ssf_press_button1(context, BUTTON_A, OPEN_ONLINE_DEN_LOBBY_DELAY);
+            ssf_press_button(context, BUTTON_A, OPEN_ONLINE_DEN_LOBBY_DELAY);
             return;
         case Catchability::MAYBE_UNCATCHABLE:
         case Catchability::ALWAYS_UNCATCHABLE:
-            ssf_press_button1(context, BUTTON_A, GameSettings::instance().UNCATCHABLE_PROMPT_DELAY);
-            ssf_press_button1(context, BUTTON_A, OPEN_ONLINE_DEN_LOBBY_DELAY);
+            ssf_press_button(context, BUTTON_A, GameSettings::instance().UNCATCHABLE_PROMPT_DELAY0);
+            ssf_press_button(context, BUTTON_A, OPEN_ONLINE_DEN_LOBBY_DELAY);
             return;
         }
     }
 
     switch (catchability){
     case Catchability::ALWAYS_CATCHABLE:
-        ssf_press_button1(context, BUTTON_A, GameSettings::instance().OPEN_LOCAL_DEN_LOBBY_DELAY);
+        ssf_press_button(context, BUTTON_A, GameSettings::instance().OPEN_LOCAL_DEN_LOBBY_DELAY0);
         return;
     case Catchability::MAYBE_UNCATCHABLE:
-        ssf_press_button1(context, BUTTON_A, GameSettings::instance().UNCATCHABLE_PROMPT_DELAY);
-        ssf_press_button1(context, BUTTON_A, GameSettings::instance().OPEN_LOCAL_DEN_LOBBY_DELAY);
+        ssf_press_button(context, BUTTON_A, GameSettings::instance().UNCATCHABLE_PROMPT_DELAY0);
+        ssf_press_button(context, BUTTON_A, GameSettings::instance().OPEN_LOCAL_DEN_LOBBY_DELAY0);
 
         if (!GameSettings::instance().DODGE_UNCATCHABLE_PROMPT_FAST){
             //  lobby-switch        switch-box
             ssf_press_dpad1(context, DPAD_LEFT, 10);
             //  lobby-switch        switch-party-red
-            ssf_press_button1(context, BUTTON_A, GameSettings::instance().ENTER_SWITCH_POKEMON);
+            ssf_press_button(context, BUTTON_A, GameSettings::instance().ENTER_SWITCH_POKEMON0);
             //  switch-box          switch-confirm
             ssf_press_button1(context, BUTTON_Y, 10);
             ssf_press_dpad1(context, DPAD_LEFT, 10);
             //  switch-party-blue   switch-confirm
-            ssf_press_button1(context, BUTTON_A, GameSettings::instance().EXIT_SWITCH_POKEMON);
+            ssf_press_button(context, BUTTON_A, GameSettings::instance().EXIT_SWITCH_POKEMON0);
             //  lobby-switch        lobby-switch
         }
         return;
     case Catchability::ALWAYS_UNCATCHABLE:
-        ssf_press_button1(context, BUTTON_A, GameSettings::instance().UNCATCHABLE_PROMPT_DELAY);
-        ssf_press_button1(context, BUTTON_A, GameSettings::instance().OPEN_LOCAL_DEN_LOBBY_DELAY);
+        ssf_press_button(context, BUTTON_A, GameSettings::instance().UNCATCHABLE_PROMPT_DELAY0);
+        ssf_press_button(context, BUTTON_A, GameSettings::instance().OPEN_LOCAL_DEN_LOBBY_DELAY0);
         return;
     }
 }
@@ -85,7 +90,7 @@ void enter_lobby(SwitchControllerContext& context, uint16_t OPEN_ONLINE_DEN_LOBB
 void roll_den(
     VideoStream& stream, SwitchControllerContext& context,
     uint16_t ENTER_ONLINE_DEN_DELAY,
-    uint16_t OPEN_ONLINE_DEN_LOBBY_DELAY,
+    Milliseconds OPEN_ONLINE_DEN_LOBBY_DELAY,
     uint8_t skips, Catchability catchability
 ){
     if (skips > 60){
@@ -96,7 +101,7 @@ void roll_den(
         enter_lobby(context, OPEN_ONLINE_DEN_LOBBY_DELAY, false, catchability);
 
         //  Skip forward.
-        ssf_press_button2(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_FAST, 10);
+        ssf_press_button(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_FAST0, 80ms);
         home_to_date_time(context, true, false);
         roll_date_forward_1(context, false);
 
@@ -110,13 +115,14 @@ void roll_den(
             settings_to_enter_game_den_lobby(
                 context,
                 ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_SLOW, true,
-                GameSettings::instance().ENTER_SWITCH_POKEMON, GameSettings::instance().EXIT_SWITCH_POKEMON
+                GameSettings::instance().ENTER_SWITCH_POKEMON0,
+                GameSettings::instance().EXIT_SWITCH_POKEMON0
             );
         }
 
         //  Exit Raid
         ssf_press_button2(context, BUTTON_B, 120, 50);
-        ssf_press_button2(context, BUTTON_A, GameSettings::instance().REENTER_DEN_DELAY, 50);
+        ssf_press_button(context, BUTTON_A, GameSettings::instance().REENTER_DEN_DELAY0, 400ms);
     }
 }
 void rollback_date_from_home(SwitchControllerContext& context, uint8_t skips){

@@ -40,7 +40,7 @@ void close_game_if_overworld(
     uint8_t rollback_hours
 ){
     //  Enter Y-COMM.
-    ssf_press_button2(context, BUTTON_Y, GameSettings::instance().OPEN_YCOMM_DELAY, 10);
+    ssf_press_button(context, BUTTON_Y, GameSettings::instance().OPEN_YCOMM_DELAY0, 80ms);
 
     //  Move the cursor as far away from Link Trade and Surprise Trade as possible.
     //  This is added safety in case connect to internet takes too long.
@@ -52,7 +52,7 @@ void close_game_if_overworld(
     pbf_press_button(context, BUTTON_PLUS, 10, TICKS_PER_SECOND);
 
     //  Enter Switch Home.
-    pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
+    pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
 
     if (touch_date){
         touch_date_from_home(context, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
@@ -63,7 +63,7 @@ void close_game_if_overworld(
 
     //  Enter profile.
     pbf_press_dpad(context, DPAD_UP, 10, 10);
-    pbf_press_button(context, BUTTON_A, 10, GameSettings::instance().ENTER_PROFILE_DELAY);
+    pbf_press_button(context, BUTTON_A, 80ms, GameSettings::instance().ENTER_PROFILE_DELAY0);
 
     //  Back out.
     pbf_press_dpad(context, DPAD_LEFT, 10, 10);

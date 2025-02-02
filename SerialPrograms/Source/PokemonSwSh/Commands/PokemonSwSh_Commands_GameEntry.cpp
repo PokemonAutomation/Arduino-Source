@@ -20,26 +20,26 @@ namespace PokemonSwSh{
 
 
 void resume_game_no_interact_old(SwitchControllerContext& context, bool tolerate_update_menu){
-    uint16_t HOME_TO_GAME_DELAY = GameSettings::instance().HOME_TO_GAME_DELAY;
+    Milliseconds HOME_TO_GAME_DELAY = GameSettings::instance().HOME_TO_GAME_DELAY0;
     if (tolerate_update_menu){
-        pbf_press_button(context, BUTTON_HOME, 10, HOME_TO_GAME_DELAY);
+        pbf_press_button(context, BUTTON_HOME, 80ms, HOME_TO_GAME_DELAY);
         pbf_press_dpad(context, DPAD_DOWN, 10, 10);
         pbf_press_dpad(context, DPAD_UP, 10, 10);
-        pbf_press_button(context, BUTTON_A, 10, HOME_TO_GAME_DELAY);
+        pbf_press_button(context, BUTTON_A, 80ms, HOME_TO_GAME_DELAY);
     }else{
-        pbf_press_button(context, BUTTON_HOME, 10, HOME_TO_GAME_DELAY);
+        pbf_press_button(context, BUTTON_HOME, 80ms, HOME_TO_GAME_DELAY);
     }
 }
 void resume_game_back_out_old(SwitchControllerContext& context, bool tolerate_update_menu, uint16_t mash_B_time){
-    uint16_t HOME_TO_GAME_DELAY = GameSettings::instance().HOME_TO_GAME_DELAY;
+    Milliseconds HOME_TO_GAME_DELAY = GameSettings::instance().HOME_TO_GAME_DELAY0;
     if (tolerate_update_menu){
-        pbf_press_button(context, BUTTON_HOME, 10, HOME_TO_GAME_DELAY);
+        pbf_press_button(context, BUTTON_HOME, 80ms, HOME_TO_GAME_DELAY);
         pbf_press_dpad(context, DPAD_DOWN, 10, 10);
         pbf_press_dpad(context, DPAD_UP, 10, 10);
-        pbf_press_button(context, BUTTON_A, 10, HOME_TO_GAME_DELAY);
+        pbf_press_button(context, BUTTON_A, 80ms, HOME_TO_GAME_DELAY);
         pbf_mash_button(context, BUTTON_B, mash_B_time);
     }else{
-        pbf_press_button(context, BUTTON_HOME, 10, HOME_TO_GAME_DELAY);
+        pbf_press_button(context, BUTTON_HOME, 80ms, HOME_TO_GAME_DELAY);
     }
 }
 void resume_game_front_of_den_nowatts(SwitchControllerContext& context, bool tolerate_update_menu){
@@ -96,8 +96,8 @@ void settings_to_enter_game(SwitchControllerContext& context, bool fast){
 void settings_to_enter_game_den_lobby(
     SwitchControllerContext& context,
     bool tolerate_update_menu, bool fast,
-    uint16_t enter_switch_pokemon_delay,
-    uint16_t exit_switch_pokemon_delay
+    Milliseconds enter_switch_pokemon_delay,
+    Milliseconds exit_switch_pokemon_delay
 ){
     settings_to_enter_game(context, fast);
     pbf_wait(context, 90);
@@ -108,7 +108,7 @@ void settings_to_enter_game_den_lobby(
         ssf_press_dpad(context, DPAD_DOWN, 10);
         ssf_press_dpad(context, DPAD_UP, 10);
         //  lobby-switch        update-start
-        ssf_press_button(context, BUTTON_A, enter_switch_pokemon_delay, 10);
+        ssf_press_button(context, BUTTON_A, enter_switch_pokemon_delay, 80ms);
         //  lobby-select        lobby-switch
         ssf_press_dpad(context, DPAD_LEFT, 10);
         //  lobby-select        lobby-switch

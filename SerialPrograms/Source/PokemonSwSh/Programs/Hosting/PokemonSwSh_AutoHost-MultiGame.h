@@ -11,6 +11,7 @@
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/RandomCodeOption.h"
+#include "Common/Cpp/Options/TimeDurationOption.h"
 #include "Common/Cpp/Options/TimeExpressionOption.h"
 #include "Common/PokemonSwSh/PokemonSwSh_MultiHostTable.h"
 #include "CommonFramework/Options/ScreenshotFormatOption.h"
@@ -46,7 +47,7 @@ private:
 
     RandomCodeOption RAID_CODE;
     BooleanCheckBoxOption HOST_ONLINE;
-    TimeExpressionOption<uint16_t> LOBBY_WAIT_DELAY;
+    MillisecondsOption LOBBY_WAIT_DELAY0;
     MultiHostTable GAME_LIST;
     SimpleIntegerOption<uint8_t> FR_FORWARD_ACCEPT;
 
@@ -54,9 +55,9 @@ private:
     EventNotificationsOption NOTIFICATIONS;
 
     SectionDividerOption m_internet_settings;
-    TimeExpressionOption<uint16_t> CONNECT_TO_INTERNET_DELAY;
+    MillisecondsOption CONNECT_TO_INTERNET_DELAY0;
     TimeExpressionOption<uint16_t> ENTER_ONLINE_DEN_DELAY;
-    TimeExpressionOption<uint16_t> OPEN_ONLINE_DEN_LOBBY_DELAY;
+    MillisecondsOption OPEN_ONLINE_DEN_LOBBY_DELAY0;
     TimeExpressionOption<uint16_t> RAID_START_TO_EXIT_DELAY;
     TimeExpressionOption<uint16_t> DELAY_TO_SELECT_MOVE;
 };

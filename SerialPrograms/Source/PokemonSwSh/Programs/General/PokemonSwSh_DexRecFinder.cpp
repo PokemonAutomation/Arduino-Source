@@ -10,6 +10,7 @@
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
@@ -169,7 +170,7 @@ void DexRecFinder::program(SingleSwitchProgramEnvironment& env, SwitchController
         grip_menu_connect_go_home(context);
     }else{
         pbf_press_button(context, BUTTON_B, 5, 5);
-        pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
+        pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
     }
 
     std::set<std::string> desired;
@@ -187,7 +188,7 @@ void DexRecFinder::program(SingleSwitchProgramEnvironment& env, SwitchController
         neutral_date_skip(context);
         settings_to_enter_game(context, true);
         pbf_mash_button(context, BUTTON_B, 90);
-        pbf_press_button(context, BUTTON_X, 20, GameSettings::instance().OVERWORLD_TO_MENU_DELAY - 20);
+        ssf_press_button(context, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);
 
         if (FILTERS.enabled()){
             context.wait_for_all_requests();
@@ -236,7 +237,7 @@ void DexRecFinder::program(SingleSwitchProgramEnvironment& env, SwitchController
         env.update_stats();
 
         pbf_mash_button(context, BUTTON_B, BACK_OUT_TIME);
-        pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
+        pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
     }
 
     env.update_stats();

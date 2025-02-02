@@ -59,10 +59,10 @@ void MassRelease::program(SingleSwitchProgramEnvironment& env, SwitchControllerC
     release_boxes(
         context,
         BOXES_TO_RELEASE,
-        GameSettings::instance().BOX_SCROLL_DELAY,
-        GameSettings::instance().BOX_CHANGE_DELAY
+        GameSettings::instance().BOX_SCROLL_DELAY0,
+        GameSettings::instance().BOX_CHANGE_DELAY0
     );
-    pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().HOME_TO_GAME_DELAY);
+    pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().HOME_TO_GAME_DELAY0);
 }
 
 

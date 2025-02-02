@@ -8,9 +8,10 @@
 #define PokemonAutomation_PokemonSwSh_EggFetcher2_H
 
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
+#include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
-#include "PokemonSwSh_EggHelpers.h"
+//#include "PokemonSwSh_EggHelpers.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -34,6 +35,8 @@ public:
 private:
     StartInGripOrGameOption START_LOCATION;
     SimpleIntegerOption<uint16_t> MAX_FETCH_ATTEMPTS;
+
+    EventNotificationsOption NOTIFICATIONS;
 };
 
 

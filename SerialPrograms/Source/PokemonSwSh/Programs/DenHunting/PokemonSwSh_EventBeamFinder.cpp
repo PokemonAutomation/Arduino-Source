@@ -83,7 +83,7 @@ void EventBeamFinder::program(SingleSwitchProgramEnvironment& env, SwitchControl
     bool parity = false;
     while (true){
         //  Fly back to daycare.
-        ssf_press_button2(context, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY, 20);
+        ssf_press_button(context, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0, 160ms);
         pbf_mash_button(context, BUTTON_A, 700);
 
         //  Goto den.

@@ -46,11 +46,10 @@ AutoHostMultiGame::AutoHostMultiGame()
     : SingleSwitchProgramInstance({"Notifs", "LiveHost"})
     , RAID_CODE(8)
     , HOST_ONLINE("<b>Host Online:</b>", LockMode::LOCK_WHILE_RUNNING, true)
-    , LOBBY_WAIT_DELAY(
+    , LOBBY_WAIT_DELAY0(
         "<b>Lobby Wait Delay:</b><br>Wait this long before starting raid. Start time is 3 minutes minus this number.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "60 * TICKS_PER_SECOND"
+        "60s"
     )
     , GAME_LIST(true)
     , FR_FORWARD_ACCEPT(
@@ -66,11 +65,10 @@ AutoHostMultiGame::AutoHostMultiGame()
     , m_internet_settings(
         "<font size=4><b>Internet Settings:</b> Increase these if your internet is slow.</font>"
     )
-    , CONNECT_TO_INTERNET_DELAY(
+    , CONNECT_TO_INTERNET_DELAY0(
         "<b>Connect to Internet Delay:</b><br>Time from \"Connect to Internet\" to when you're ready to enter den.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "20 * TICKS_PER_SECOND"
+        "20000ms"
     )
     , ENTER_ONLINE_DEN_DELAY(
         "<b>Enter Online Den Delay:</b><br>\"Communicating\" when entering den while online.",
@@ -78,11 +76,10 @@ AutoHostMultiGame::AutoHostMultiGame()
         TICKS_PER_SECOND,
         "8 * TICKS_PER_SECOND"
     )
-    , OPEN_ONLINE_DEN_LOBBY_DELAY(
+    , OPEN_ONLINE_DEN_LOBBY_DELAY0(
         "<b>Open Online Den Delay:</b><br>Delay from \"Invite Others\" to when the clock starts ticking.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "8 * TICKS_PER_SECOND"
+        "8000ms"
     )
     , RAID_START_TO_EXIT_DELAY(
         "<b>Raid Start to Exit Delay:</b><br>Time from start raid to reset. (when not selecting move)",
@@ -102,16 +99,16 @@ AutoHostMultiGame::AutoHostMultiGame()
 
     PA_ADD_OPTION(RAID_CODE);
     PA_ADD_OPTION(HOST_ONLINE);
-    PA_ADD_OPTION(LOBBY_WAIT_DELAY);
+    PA_ADD_OPTION(LOBBY_WAIT_DELAY0);
     PA_ADD_OPTION(GAME_LIST);
     PA_ADD_OPTION(FR_FORWARD_ACCEPT);
     PA_ADD_OPTION(HOSTING_NOTIFICATIONS);
     PA_ADD_OPTION(NOTIFICATIONS);
 
     PA_ADD_OPTION(m_internet_settings);
-    PA_ADD_OPTION(CONNECT_TO_INTERNET_DELAY);
+    PA_ADD_OPTION(CONNECT_TO_INTERNET_DELAY0);
     PA_ADD_OPTION(ENTER_ONLINE_DEN_DELAY);
-    PA_ADD_OPTION(OPEN_ONLINE_DEN_LOBBY_DELAY);
+    PA_ADD_OPTION(OPEN_ONLINE_DEN_LOBBY_DELAY0);
     PA_ADD_OPTION(RAID_START_TO_EXIT_DELAY);
     PA_ADD_OPTION(DELAY_TO_SELECT_MOVE);
 }
@@ -120,12 +117,12 @@ AutoHostMultiGame::AutoHostMultiGame()
 
 
 void AutoHostMultiGame::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
-    uint16_t start_raid_delay = HOST_ONLINE
-        ? OPEN_ONLINE_DEN_LOBBY_DELAY
-        : GameSettings::instance().OPEN_LOCAL_DEN_LOBBY_DELAY;
-    const uint16_t lobby_wait_delay = LOBBY_WAIT_DELAY < start_raid_delay
-        ? 0
-        : LOBBY_WAIT_DELAY - start_raid_delay;
+    Milliseconds start_raid_delay = HOST_ONLINE
+        ? OPEN_ONLINE_DEN_LOBBY_DELAY0
+        : GameSettings::instance().OPEN_LOCAL_DEN_LOBBY_DELAY0;
+    const Milliseconds lobby_wait_delay = LOBBY_WAIT_DELAY0.get() < start_raid_delay
+        ? 0ms
+        : LOBBY_WAIT_DELAY0.get() - start_raid_delay;
 
     std::vector<std::unique_ptr<MultiHostSlot>> list = GAME_LIST.copy_snapshot();
 
@@ -146,7 +143,7 @@ void AutoHostMultiGame::program(SingleSwitchProgramEnvironment& env, SwitchContr
         grip_menu_connect_go_home(context);
     }else{
         pbf_press_button(context, BUTTON_B, 5, 5);
-        pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_FAST);
+        pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY_FAST0);
     }
 
     if (enable_touch){
@@ -219,15 +216,15 @@ void AutoHostMultiGame::program(SingleSwitchProgramEnvironment& env, SwitchContr
                 HOST_ONLINE, fr_game.accept_FRs ? (uint8_t)fr_game.user_slot.current_value() : 0,
                 game.move_slot, game.dynamax, 0,
                 HOSTING_NOTIFICATIONS,
-                CONNECT_TO_INTERNET_DELAY,
+                CONNECT_TO_INTERNET_DELAY0,
                 ENTER_ONLINE_DEN_DELAY,
-                OPEN_ONLINE_DEN_LOBBY_DELAY,
+                OPEN_ONLINE_DEN_LOBBY_DELAY0,
                 RAID_START_TO_EXIT_DELAY,
                 DELAY_TO_SELECT_MOVE
             );
 
             //  Exit game.
-            pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
+            pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
             close_game(env.console, context);
 
             //  Post-raid delay.

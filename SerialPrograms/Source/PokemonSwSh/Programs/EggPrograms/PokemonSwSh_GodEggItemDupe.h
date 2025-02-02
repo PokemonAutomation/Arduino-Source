@@ -9,6 +9,7 @@
 
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
+#include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonSwSh_EggHelpers.h"
@@ -38,6 +39,8 @@ private:
     SimpleIntegerOption<uint16_t> MAX_FETCH_ATTEMPTS;
     SimpleIntegerOption<uint8_t> PARTY_ROUND_ROBIN;
     BooleanCheckBoxOption DETACH_BEFORE_RELEASE;
+
+    EventNotificationsOption NOTIFICATIONS;
 };
 
 

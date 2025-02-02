@@ -12,10 +12,10 @@
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/RandomCodeOption.h"
 #include "Common/Cpp/Options/TimeExpressionOption.h"
-#include "CommonFramework/Options/ScreenshotFormatOption.h"
+//#include "CommonFramework/Options/ScreenshotFormatOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
-#include "NintendoSwitch/Options/NintendoSwitch_FriendCodeListOption.h"
+//#include "NintendoSwitch/Options/NintendoSwitch_FriendCodeListOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonSwSh/Options/PokemonSwSh_DateToucher.h"
 #include "PokemonSwSh/Options/PokemonSwSh_Catchability.h"
@@ -48,7 +48,7 @@ private:
     SimpleIntegerOption<uint8_t> SKIPS;
     BooleanCheckBoxOption BACKUP_SAVE;
     BooleanCheckBoxOption HOST_ONLINE;
-    TimeExpressionOption<uint16_t> LOBBY_WAIT_DELAY;
+    MillisecondsOption LOBBY_WAIT_DELAY0;
     CatchabilitySelectorOption CATCHABILITY;
     SimpleIntegerOption<uint8_t> FRIEND_ACCEPT_USER_SLOT;
     TimeExpressionOption<uint16_t> EXTRA_DELAY_BETWEEN_RAIDS;
@@ -63,9 +63,9 @@ private:
     EventNotificationsOption NOTIFICATIONS;
 
     SectionDividerOption m_internet_settings;
-    TimeExpressionOption<uint16_t> CONNECT_TO_INTERNET_DELAY;
+    MillisecondsOption CONNECT_TO_INTERNET_DELAY0;
     TimeExpressionOption<uint16_t> ENTER_ONLINE_DEN_DELAY;
-    TimeExpressionOption<uint16_t> OPEN_ONLINE_DEN_LOBBY_DELAY;
+    MillisecondsOption OPEN_ONLINE_DEN_LOBBY_DELAY0;
     TimeExpressionOption<uint16_t> RAID_START_TO_EXIT_DELAY;
     TimeExpressionOption<uint16_t> DELAY_TO_SELECT_MOVE;
 };

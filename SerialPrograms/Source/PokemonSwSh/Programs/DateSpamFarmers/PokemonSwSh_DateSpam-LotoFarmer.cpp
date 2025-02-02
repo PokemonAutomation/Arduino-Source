@@ -5,7 +5,8 @@
  */
 
 #include "Common/Cpp/PrettyPrint.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
+#include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
@@ -44,10 +45,14 @@ LotoFarmer::LotoFarmer()
         TICKS_PER_SECOND,
         "9 * TICKS_PER_SECOND"
     )
+    , NOTIFICATIONS({
+        &NOTIFICATION_PROGRAM_FINISH,
+    })
 {
     PA_ADD_OPTION(START_LOCATION);
     PA_ADD_OPTION(SKIPS);
     PA_ADD_OPTION(MASH_B_DURATION);
+    PA_ADD_OPTION(NOTIFICATIONS);
 }
 
 void LotoFarmer::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
@@ -55,7 +60,7 @@ void LotoFarmer::program(SingleSwitchProgramEnvironment& env, SwitchControllerCo
         grip_menu_connect_go_home(context);
     }else{
         pbf_press_button(context, BUTTON_B, 5, 5);
-        pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_FAST);
+        pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY_FAST0);
     }
 
     uint8_t year = MAX_YEAR;
@@ -64,7 +69,7 @@ void LotoFarmer::program(SingleSwitchProgramEnvironment& env, SwitchControllerCo
         home_roll_date_enter_game_autorollback(env.console, context, year);
         pbf_mash_button(context, BUTTON_B, 90);
 
-        pbf_press_button(context, BUTTON_A, 10, 70);
+        pbf_press_button(context, BUTTON_A, 10, 90);
         pbf_press_button(context, BUTTON_B, 10, 70);
         pbf_press_dpad(context, DPAD_DOWN, 10, 5);
         pbf_mash_button(context, BUTTON_ZL, 490);
@@ -73,8 +78,10 @@ void LotoFarmer::program(SingleSwitchProgramEnvironment& env, SwitchControllerCo
         //  Tap HOME and quickly spam B. The B spamming ensures that we don't
         //  accidentally update the system if the system update window pops up.
         pbf_press_button(context, BUTTON_HOME, 10, 5);
-        pbf_mash_button(context, BUTTON_B, GameSettings::instance().GAME_TO_HOME_DELAY_FAST - 15);
+        pbf_mash_button(context, BUTTON_B, GameSettings::instance().GAME_TO_HOME_DELAY_FAST0.get() - 120ms);
     }
+
+    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 }
 
 

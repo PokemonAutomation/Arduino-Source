@@ -229,7 +229,7 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, SwitchControlle
             if (TOUCH_DATE_INTERVAL.ok_to_touch_now()){
                 env.log("Touching date to prevent rollover.");
                 env.console.overlay().add_log("Touching date", COLOR_WHITE);
-                pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
+                pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
                 touch_date_from_home(context, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
                 resume_game_no_interact(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
             }
@@ -266,7 +266,7 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, SwitchControlle
                     env.console
                 );
             }
-            pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
+            pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
             env.console.overlay().add_log("Reset game", COLOR_WHITE);
             reset_game_from_home_with_inference(
                 env.console, context,
@@ -288,7 +288,11 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, SwitchControlle
 // - Check if pokemon needs to be kept. Keep them if needed.
 // - Put five eggs from storage to party. Save game if needed.
 // Return true if the egg loop should stop.
-bool EggAutonomous::run_batch(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, EggAutonomous_Descriptor::Stats& stats){
+bool EggAutonomous::run_batch(
+    SingleSwitchProgramEnvironment& env,
+    SwitchControllerContext& context,
+    EggAutonomous_Descriptor::Stats& stats
+){
     env.update_stats();
     send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
 
@@ -380,11 +384,11 @@ bool EggAutonomous::run_batch(SingleSwitchProgramEnvironment& env, SwitchControl
             env.log("Take a screenshot of party to debug.");
             // Now take a photo at the player's party for dumping debug info:
             // Enter Rotom Phone menu
-            pbf_press_button(context, BUTTON_X, 10, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
+            pbf_press_button(context, BUTTON_X, 80ms, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);
             // Select Pokemon App
             navigate_to_menu_app(env, env.console, context, POKEMON_APP_INDEX, NOTIFICATION_ERROR_RECOVERABLE);
             // From menu enter Pokemon App
-            ssf_press_button2(context, BUTTON_A, GameSettings::instance().MENU_TO_POKEMON_DELAY, EGG_BUTTON_HOLD_DELAY);
+            ssf_press_button(context, BUTTON_A, GameSettings::instance().MENU_TO_POKEMON_DELAY0, EGG_BUTTON_HOLD_DELAY);
             context.wait_for_all_requests();
 
             OperationFailedException::fire(
@@ -446,19 +450,23 @@ void EggAutonomous::save_game(SingleSwitchProgramEnvironment& env, SwitchControl
     context.wait_for_all_requests();
     env.log("Save game.");
     env.console.overlay().add_log("Save game", COLOR_WHITE);
-    pbf_press_button(context, BUTTON_X, 10, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
+    pbf_press_button(context, BUTTON_X, 80ms, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);
     pbf_press_button(context, BUTTON_R, 10, 2 * TICKS_PER_SECOND);
     pbf_press_button(context, BUTTON_A, 10, 5 * TICKS_PER_SECOND);
     wait_for_y_comm_icon(env, context, "Cannot detect end of saving game.");
 }
 
-void EggAutonomous::call_flying_taxi(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, bool fly_from_overworld){
+void EggAutonomous::call_flying_taxi(
+    SingleSwitchProgramEnvironment& env,
+    SwitchControllerContext& context,
+    bool fly_from_overworld
+){
     context.wait_for_all_requests();
     env.log("Fly to reset position");
     env.console.overlay().add_log("Call Flying Taxi", COLOR_WHITE);
     if (fly_from_overworld){
         // Open menu
-        ssf_press_button2(context, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY, 20);
+        ssf_press_button(context, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0, 160ms);
     }
 
     navigate_to_menu_app(env, env.console, context, TOWN_MAP_APP_INDEX, NOTIFICATION_ERROR_RECOVERABLE);
@@ -467,7 +475,12 @@ void EggAutonomous::call_flying_taxi(SingleSwitchProgramEnvironment& env, Switch
     wait_for_y_comm_icon(env, context, "Cannot detect end of flying taxi animation.");
 }
 
-void EggAutonomous::wait_for_egg_hatched(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, EggAutonomous_Descriptor::Stats& stats, size_t num_hatched_eggs){
+void EggAutonomous::wait_for_egg_hatched(
+    SingleSwitchProgramEnvironment& env,
+    SwitchControllerContext& context,
+    EggAutonomous_Descriptor::Stats& stats,
+    size_t num_hatched_eggs
+){
     env.console.overlay().add_log("Egg hatching " + std::to_string(num_hatched_eggs) + "/5", COLOR_GREEN);
     const bool y_comm_visible_at_end_of_egg_hatching = true;
     YCommIconDetector end_egg_hatching_detector(y_comm_visible_at_end_of_egg_hatching);
@@ -568,26 +581,31 @@ size_t EggAutonomous::talk_to_lady_to_fetch_egg(
 // - Retrieve the stored egg column to the party.
 // - Call flying taxi to reset player location if needed
 // Return true if the program should stop
-bool EggAutonomous::process_hatched_pokemon(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, EggAutonomous_Descriptor::Stats& stats, bool need_taxi){
+bool EggAutonomous::process_hatched_pokemon(
+    SingleSwitchProgramEnvironment& env,
+    SwitchControllerContext& context,
+    EggAutonomous_Descriptor::Stats& stats,
+    bool need_taxi
+){
     env.log("Checking hatched pokemon.");
     env.console.overlay().add_log("Checking hatched pokemon", COLOR_WHITE);
 
     // Press X to open menu
-    ssf_press_button2(context, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY, 20);
+    ssf_press_button(context, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0, 160ms);
 
     navigate_to_menu_app(env, env.console, context, POKEMON_APP_INDEX, NOTIFICATION_ERROR_RECOVERABLE);
 
-    const uint16_t BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY;
-    const uint16_t BOX_CHANGE_DELAY = GameSettings::instance().BOX_CHANGE_DELAY;
-    const uint16_t BOX_PICKUP_DROP_DELAY = GameSettings::instance().BOX_PICKUP_DROP_DELAY;
+    const Milliseconds BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY0;
+    const Milliseconds BOX_CHANGE_DELAY = GameSettings::instance().BOX_CHANGE_DELAY0;
+    const Milliseconds BOX_PICKUP_DROP_DELAY = GameSettings::instance().BOX_PICKUP_DROP_DELAY0;
 
     // From menu enter Pokemon App
-    ssf_press_button2(context, BUTTON_A, GameSettings::instance().MENU_TO_POKEMON_DELAY, EGG_BUTTON_HOLD_DELAY);
+    ssf_press_button(context, BUTTON_A, GameSettings::instance().MENU_TO_POKEMON_DELAY0, EGG_BUTTON_HOLD_DELAY);
     // From Pokemon App to storage box
-    ssf_press_button2(context, BUTTON_R, GameSettings::instance().POKEMON_TO_BOX_DELAY, EGG_BUTTON_HOLD_DELAY);
+    ssf_press_button(context, BUTTON_R, GameSettings::instance().POKEMON_TO_BOX_DELAY0, EGG_BUTTON_HOLD_DELAY);
     // Move left down to the first hatched pokemon in the party
-    ssf_press_dpad2(context, DPAD_LEFT, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
-    ssf_press_dpad2(context, DPAD_DOWN, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
+    ssf_press_dpad(context, DPAD_LEFT, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
+    ssf_press_dpad(context, DPAD_DOWN, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
 
     context.wait_for_all_requests();
     {
@@ -656,37 +674,37 @@ bool EggAutonomous::process_hatched_pokemon(SingleSwitchProgramEnvironment& env,
                 send_keep_notification();
 
                 // Press A twice to pick the pokemon
-                ssf_press_button2(context, BUTTON_A, 60, EGG_BUTTON_HOLD_DELAY);
-                ssf_press_button2(context, BUTTON_A, BOX_PICKUP_DROP_DELAY, EGG_BUTTON_HOLD_DELAY);
+                ssf_press_button(context, BUTTON_A, 480ms, EGG_BUTTON_HOLD_DELAY);
+                ssf_press_button(context, BUTTON_A, BOX_PICKUP_DROP_DELAY, EGG_BUTTON_HOLD_DELAY);
 
                 // Move it rightward, so that it stays on top of the box area
-                ssf_press_dpad2(context, DPAD_RIGHT, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
+                ssf_press_dpad(context, DPAD_RIGHT, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
                 // Press Button L to change to the box on the left
-                ssf_press_button2(context, BUTTON_L, BOX_CHANGE_DELAY, EGG_BUTTON_HOLD_DELAY);
+                ssf_press_button(context, BUTTON_L, BOX_CHANGE_DELAY, EGG_BUTTON_HOLD_DELAY);
 
                 // Because we don't know which place in the box to place the pokemon, we will
                 // throw the pokemon in the all-box view. So it automatically sit in the first empty slot
                 // in the box:
                 
                 // Move it three times upward, so that it stays on top of the "Box List" button
-                ssf_press_dpad2(context, DPAD_UP, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
-                ssf_press_dpad2(context, DPAD_UP, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
-                ssf_press_dpad2(context, DPAD_UP, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
+                ssf_press_dpad(context, DPAD_UP, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
+                ssf_press_dpad(context, DPAD_UP, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
+                ssf_press_dpad(context, DPAD_UP, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
                 
                 // Press the button to go to box list view
-                ssf_press_button2(context, BUTTON_A, BOX_CHANGE_DELAY, EGG_BUTTON_HOLD_DELAY);
+                ssf_press_button(context, BUTTON_A, BOX_CHANGE_DELAY, EGG_BUTTON_HOLD_DELAY);
                 // Press button A to drop the pokemon into the box
-                ssf_press_button2(context, BUTTON_A, BOX_PICKUP_DROP_DELAY, EGG_BUTTON_HOLD_DELAY);
+                ssf_press_button(context, BUTTON_A, BOX_PICKUP_DROP_DELAY, EGG_BUTTON_HOLD_DELAY);
                 // Press button B to go back to the last box
-                ssf_press_button2(context, BUTTON_B, BOX_CHANGE_DELAY, EGG_BUTTON_HOLD_DELAY);
+                ssf_press_button(context, BUTTON_B, BOX_CHANGE_DELAY, EGG_BUTTON_HOLD_DELAY);
                 // Press button R to change to the box on the right, the box with the next batch of eggs
-                ssf_press_button2(context, BUTTON_R, BOX_CHANGE_DELAY, EGG_BUTTON_HOLD_DELAY);
+                ssf_press_button(context, BUTTON_R, BOX_CHANGE_DELAY, EGG_BUTTON_HOLD_DELAY);
                 // Move cursor left to point to the last slot in the party
-                ssf_press_dpad2(context, DPAD_LEFT, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
+                ssf_press_dpad(context, DPAD_LEFT, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
                 // Move cursor downward three times so that it goes to the original place (second slot in the party)
-                ssf_press_dpad2(context, DPAD_DOWN, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
-                ssf_press_dpad2(context, DPAD_DOWN, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
-                ssf_press_dpad2(context, DPAD_DOWN, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
+                ssf_press_dpad(context, DPAD_DOWN, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
+                ssf_press_dpad(context, DPAD_DOWN, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
+                ssf_press_dpad(context, DPAD_DOWN, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
                 
                 if (m_num_pokemon_kept >= MAX_KEEPERS){
                     env.log("Max keepers reached. Stopping program...");
@@ -775,33 +793,33 @@ bool EggAutonomous::process_hatched_pokemon(SingleSwitchProgramEnvironment& env,
     // Get eggs to party:
 
     // Move cursor to the first slot in the box
-    ssf_press_dpad2(context, DPAD_UP, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
-    ssf_press_dpad2(context, DPAD_RIGHT, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
+    ssf_press_dpad(context, DPAD_UP, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
+    ssf_press_dpad(context, DPAD_RIGHT, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
 
     // Press Y twice to change selection method to group selection
-    pbf_press_button(context, BUTTON_Y, EGG_BUTTON_HOLD_DELAY, 50);
-    pbf_press_button(context, BUTTON_Y, EGG_BUTTON_HOLD_DELAY, 50);
+    pbf_press_button(context, BUTTON_Y, EGG_BUTTON_HOLD_DELAY, 400ms);
+    pbf_press_button(context, BUTTON_Y, EGG_BUTTON_HOLD_DELAY, 400ms);
 
     // Press A to start selection
-    pbf_press_button(context, BUTTON_A, EGG_BUTTON_HOLD_DELAY, 50);
+    pbf_press_button(context, BUTTON_A, EGG_BUTTON_HOLD_DELAY, 400ms);
     // Move down to selection the entire column
     for (size_t c = 0; c < 4; c++){
-        ssf_press_dpad2(context, DPAD_DOWN, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
+        ssf_press_dpad(context, DPAD_DOWN, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
     }
     // Press A to finish the selection
-    ssf_press_button2(context, BUTTON_A, BOX_PICKUP_DROP_DELAY, EGG_BUTTON_HOLD_DELAY);
+    ssf_press_button(context, BUTTON_A, BOX_PICKUP_DROP_DELAY, EGG_BUTTON_HOLD_DELAY);
     
     // Move cursor to the second slot in the party
-    ssf_press_dpad2(context, DPAD_LEFT, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
-    ssf_press_dpad2(context, DPAD_DOWN, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
+    ssf_press_dpad(context, DPAD_LEFT, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
+    ssf_press_dpad(context, DPAD_DOWN, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
 
     // Press A to finish dropping the egg column 
-    ssf_press_button2(context, BUTTON_A, BOX_PICKUP_DROP_DELAY, EGG_BUTTON_HOLD_DELAY);
+    ssf_press_button(context, BUTTON_A, BOX_PICKUP_DROP_DELAY, EGG_BUTTON_HOLD_DELAY);
 
     // leave pokemon box, back to pokemon app
-    ssf_press_button2(context, BUTTON_B, GameSettings::instance().BOX_TO_POKEMON_DELAY, EGG_BUTTON_HOLD_DELAY);
+    ssf_press_button(context, BUTTON_B, GameSettings::instance().BOX_TO_POKEMON_DELAY0, EGG_BUTTON_HOLD_DELAY);
     //  Back out to menu.
-    ssf_press_button2(context, BUTTON_B, GameSettings::instance().POKEMON_TO_MENU_DELAY, EGG_BUTTON_HOLD_DELAY);
+    ssf_press_button(context, BUTTON_B, GameSettings::instance().POKEMON_TO_MENU_DELAY0, EGG_BUTTON_HOLD_DELAY);
 
     if (need_taxi){
         bool fly_from_overworld = false; // fly from menu
@@ -829,7 +847,11 @@ bool EggAutonomous::process_hatched_pokemon(SingleSwitchProgramEnvironment& env,
     return false;
 }
 
-void EggAutonomous::wait_for_y_comm_icon(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, const std::string& error_msg){
+void EggAutonomous::wait_for_y_comm_icon(
+    SingleSwitchProgramEnvironment& env,
+    SwitchControllerContext& context,
+    const std::string& error_msg
+){
     context.wait_for_all_requests();
     const bool y_comm_visible = true;
     YCommIconDetector y_comm_detector(y_comm_visible);
