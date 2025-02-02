@@ -15,6 +15,7 @@
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_DetectHome.h"
 #include "NintendoSwitch_GameEntry.h"
 
@@ -93,7 +94,7 @@ void start_game_from_home_with_inference(
     VideoStream& stream, SwitchControllerContext& context,
     uint8_t game_slot,
     uint8_t user_slot,
-    uint16_t start_game_wait
+    Milliseconds start_game_wait
 ){
     context.wait_for_all_requests();
     {
@@ -118,7 +119,7 @@ void start_game_from_home_with_inference(
     }
 
     if (game_slot != 0){
-        pbf_press_button(context, BUTTON_HOME, 10, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY - 10);
+        ssf_press_button(context, BUTTON_HOME, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0, 80ms);
         for (uint8_t c = 1; c < game_slot; c++){
             pbf_press_dpad(context, DPAD_RIGHT, 5, 5);
         }
@@ -157,7 +158,7 @@ void start_game_from_home_with_inference(
         case 1:
             stream.log("Detected user-select screen.");
             move_to_user(context, user_slot);
-            pbf_press_button(context, BUTTON_A, 10, start_game_wait);
+            pbf_press_button(context, BUTTON_A, 80ms, start_game_wait);
             break;
         case 2:
             stream.log("Detected update menu.", COLOR_RED);
@@ -187,7 +188,7 @@ void start_game_from_home(
     bool tolerate_update_menu,
     uint8_t game_slot,
     uint8_t user_slot,
-    uint16_t start_game_mash
+    Milliseconds start_game_mash
 ){
     context.wait_for_all_requests();
     if (stream.video().snapshot()){
@@ -199,7 +200,7 @@ void start_game_from_home(
     }
 
     if (game_slot != 0){
-        pbf_press_button(context, BUTTON_HOME, 10, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY - 10);
+        ssf_press_button(context, BUTTON_HOME, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0, 80ms);
         for (uint8_t c = 1; c < game_slot; c++){
             pbf_press_dpad(context, DPAD_RIGHT, 5, 5);
         }
@@ -231,10 +232,10 @@ void start_game_from_home(
 
         //  Switch to mashing ZL instead of A to get into the game.
         //  Mash your way into the game.
-        uint16_t duration = start_game_mash;
+        Milliseconds duration = start_game_mash;
         if (ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET){
             //  Need to wait a bit longer for the internet check.
-            duration += ConsoleSettings::instance().START_GAME_INTERNET_CHECK_DELAY;
+            duration += ConsoleSettings::instance().START_GAME_INTERNET_CHECK_DELAY0;
         }
 //        pbf_mash_button(context, BUTTON_ZL, duration);
         pbf_wait(context, duration);
@@ -277,14 +278,14 @@ private:
 
 bool openedgame_to_gamemenu(
     VideoStream& stream, SwitchControllerContext& context,
-    uint16_t timeout
+    Milliseconds timeout
 ){
     {
         stream.log("Waiting to load game...");
         GameLoadingDetector detector(false);
         int ret = wait_until(
             stream, context,
-            std::chrono::milliseconds(timeout * (1000 / TICKS_PER_SECOND)),
+            timeout,
             {{detector}}
         );
         if (ret < 0){
@@ -297,7 +298,7 @@ bool openedgame_to_gamemenu(
         GameLoadingDetector detector(true);
         int ret = wait_until(
             stream, context,
-            std::chrono::milliseconds(timeout * (1000 / TICKS_PER_SECOND)),
+            timeout,
             {{detector}}
         );
         if (ret < 0){

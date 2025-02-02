@@ -53,15 +53,15 @@ void enter_loading_game(
     bool backup_save,
     uint16_t post_wait_time
 ){
-    openedgame_to_gamemenu(stream, context, GameSettings::instance().START_GAME_WAIT);
+    openedgame_to_gamemenu(stream, context, GameSettings::instance().START_GAME_WAIT0);
 
     stream.log("enter_loading_game(): Game Loaded. Entering game...", COLOR_PURPLE);
-    enter_game(context, backup_save, GameSettings::instance().ENTER_GAME_MASH, 0);
+    enter_game(context, backup_save, GameSettings::instance().ENTER_GAME_MASH0, 0ms);
     context.wait_for_all_requests();
 
     //  Wait to enter game.
     {
-        std::chrono::milliseconds timeout(GameSettings::instance().ENTER_GAME_WAIT * (1000 / TICKS_PER_SECOND));
+        Milliseconds timeout = GameSettings::instance().ENTER_GAME_WAIT0;
 
         OverlayBoxScope box(stream.overlay(), {0.2, 0.2, 0.6, 0.6});
 
@@ -114,7 +114,7 @@ void start_game_from_home_with_inference(
         tolerate_update_menu,
         game_slot,
         user_slot,
-        GameSettings::instance().START_GAME_MASH
+        GameSettings::instance().START_GAME_MASH0
     );
 
     //  Wait for game to load.
@@ -139,7 +139,7 @@ void reset_game_from_home_with_inference(
         return;
     }
 
-    fast_reset_game(context, GameSettings::instance().START_GAME_MASH, 0, 0, 0);
+    fast_reset_game(context, GameSettings::instance().START_GAME_MASH0, 0ms, 0ms, 0ms);
     context.wait_for_all_requests();
 
     //  Wait for game to load.

@@ -76,14 +76,14 @@ void SelfTouchTrade::program(MultiSwitchProgramEnvironment& env, CancellableScop
     //  Swap trade all the boxes.
     for (uint8_t box = 0; box < BOXES_TO_TRADE; box++){
         if (box != 0){
-            pbf_press_button(host, BUTTON_R, 20, GameSettings::instance().BOX_CHANGE_DELAY_0);
+            pbf_press_button(host, BUTTON_R, 160ms, GameSettings::instance().BOX_CHANGE_DELAY0);
         }
         trade_current_box(env, scope, NOTIFICATION_STATUS_UPDATE, stats);
     }
 
     //  Trade back the last box.
     for (uint8_t box = 1; box < BOXES_TO_TRADE; box++){
-        pbf_press_button(host, BUTTON_L, 20, GameSettings::instance().BOX_CHANGE_DELAY_0);
+        pbf_press_button(host, BUTTON_L, 160ms, GameSettings::instance().BOX_CHANGE_DELAY0);
     }
     trade_current_box(env, scope, NOTIFICATION_STATUS_UPDATE, stats);
 

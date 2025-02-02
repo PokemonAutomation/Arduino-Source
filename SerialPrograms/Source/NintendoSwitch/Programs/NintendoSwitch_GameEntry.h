@@ -25,12 +25,12 @@ void start_game_from_home(
     bool tolerate_update_menu,
     uint8_t game_slot,
     uint8_t user_slot,
-    uint16_t start_game_mash
+    Milliseconds start_game_mash
 );
 
 bool openedgame_to_gamemenu(
     VideoStream& stream, SwitchControllerContext& context,
-    uint16_t timeout
+    Milliseconds timeout
 );
 
 

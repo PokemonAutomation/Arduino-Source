@@ -23,6 +23,10 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
+
+using namespace std::chrono_literals;
+
+
 //  Wait for this many ticks on the Switch.
 void pbf_wait           (SwitchControllerContext& context, uint16_t ticks);
 void pbf_wait           (SwitchControllerContext& context, Milliseconds duration);

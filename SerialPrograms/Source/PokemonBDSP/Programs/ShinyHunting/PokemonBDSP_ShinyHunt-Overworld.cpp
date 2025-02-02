@@ -154,8 +154,11 @@ void ShinyHuntOverworld::program(SingleSwitchProgramEnvironment& env, SwitchCont
             e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
 
             stats.add_error();
-            pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
-            if (!reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST)){
+            pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
+            if (!reset_game_from_home(
+                env, env.console, context,
+                ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST
+            )){
                 stats.add_error();
                 continue;
             }

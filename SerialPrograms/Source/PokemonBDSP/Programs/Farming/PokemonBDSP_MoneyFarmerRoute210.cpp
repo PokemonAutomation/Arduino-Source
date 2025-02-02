@@ -289,7 +289,7 @@ void MoneyFarmerRoute210::fly_to_center_heal_and_return(
     uint8_t pp0[4], uint8_t pp1[4]
 ){
     logger.log("Flying back to Hearthome City to heal.");
-    pbf_press_button(context, BUTTON_X, 10, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
+    pbf_press_button(context, BUTTON_X, 80ms, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);
     pbf_press_button(context, BUTTON_PLUS, 10, 240);
     pbf_press_dpad(context, DPAD_LEFT, 10, 60);
     pbf_press_dpad(context, DPAD_LEFT, 10, 60);

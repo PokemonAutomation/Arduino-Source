@@ -170,7 +170,7 @@ void GiftBerryReset::program(SingleSwitchProgramEnvironment& env, SwitchControll
         }
 
         // Reset game:
-        pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
+        pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
         if (!reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST)){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,

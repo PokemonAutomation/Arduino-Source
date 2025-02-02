@@ -266,7 +266,7 @@ void GimmighoulChestFarmer::program(SingleSwitchProgramEnvironment& env, SwitchC
         ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
         ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
         ssf_press_button(context, BUTTON_A, 20, 10);
-        pbf_press_button(context, BUTTON_HOME, 20, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
+        pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
 
         stats.resets++;
         env.update_stats();
@@ -279,7 +279,7 @@ void GimmighoulChestFarmer::program(SingleSwitchProgramEnvironment& env, SwitchC
         home_to_date_time(context, false, false);
         pbf_press_button(context, BUTTON_A, 20, 105);
         pbf_press_button(context, BUTTON_A, 20, 105);
-        pbf_press_button(context, BUTTON_HOME, 20, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
+        pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
         resume_game_from_home(env.console, context);
     }
     GO_HOME_WHEN_DONE.run_end_of_program(context);

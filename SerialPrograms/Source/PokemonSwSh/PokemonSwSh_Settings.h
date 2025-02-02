@@ -10,6 +10,7 @@
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/FloatingPointOption.h"
+#include "Common/Cpp/Options/TimeDurationOption.h"
 #include "Common/Cpp/Options/TimeExpressionOption.h"
 #include "CommonFramework/Panels/SettingsPanel.h"
 
@@ -46,10 +47,10 @@ public:
     TimeExpressionOption<uint16_t> ENTER_PROFILE_DELAY;
 
     SectionDividerOption m_start_game_timings;
-    TimeExpressionOption<uint16_t> START_GAME_MASH;
-    TimeExpressionOption<uint16_t> START_GAME_WAIT;
-    TimeExpressionOption<uint16_t> ENTER_GAME_MASH;
-    TimeExpressionOption<uint16_t> ENTER_GAME_WAIT;
+    MillisecondsOption START_GAME_MASH0;
+    MillisecondsOption START_GAME_WAIT0;
+    MillisecondsOption ENTER_GAME_MASH0;
+    MillisecondsOption ENTER_GAME_WAIT0;
 
     SectionDividerOption m_den_timings;
     TimeExpressionOption<uint16_t> ENTER_OFFLINE_DEN_DELAY;

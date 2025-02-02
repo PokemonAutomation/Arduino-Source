@@ -26,8 +26,12 @@ void roll_date_forward_1                    (SwitchControllerContext& context, b
 void roll_date_backward_N                   (SwitchControllerContext& context, uint8_t skips, bool fast);
 void home_roll_date_enter_game              (VideoStream& stream, SwitchControllerContext& context, bool rollback_year);
 void home_roll_date_enter_game_autorollback (VideoStream& stream, SwitchControllerContext& context, uint8_t& year);
-void touch_date_from_home                   (SwitchControllerContext& context, uint16_t settings_to_home_delay);
-void rollback_hours_from_home               (SwitchControllerContext& context, uint8_t hours, uint16_t settings_to_home_delay);
+void touch_date_from_home                   (SwitchControllerContext& context, Milliseconds settings_to_home_delay);
+void rollback_hours_from_home(
+    SwitchControllerContext& context,
+    uint8_t hours,
+    Milliseconds settings_to_home_delay
+);
 
 }
 

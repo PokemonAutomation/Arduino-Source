@@ -385,7 +385,7 @@ ItemPrinterPrizeResult ItemPrinterRNG::run_print_at_date(
             env.log("Will commit in " + tostr_u_commas(trigger_delay.count()) + " milliseconds.");
 
             //  Re-enter the game.
-            pbf_press_button(context, BUTTON_HOME, 20, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
+            pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
             resume_game_from_home(env.console, context, false);
 
             if (!prompt.detect(env.console.video().snapshot())){
@@ -1054,7 +1054,7 @@ void ItemPrinterRNG::program(SingleSwitchProgramEnvironment& env, SwitchControll
         home_to_date_time(context, false, false);
         pbf_press_button(context, BUTTON_A, 20, 105);
         pbf_press_button(context, BUTTON_A, 20, 105);
-        pbf_press_button(context, BUTTON_HOME, 20, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
+        pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
         resume_game_from_home(env.console, context);
     }
     GO_HOME_WHEN_DONE.run_end_of_program(context);

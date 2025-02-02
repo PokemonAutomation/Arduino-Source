@@ -120,15 +120,15 @@ void hatch_party(VideoStream& stream, SwitchControllerContext& context, size_t e
 }
 
 void withdraw_1st_column_from_overworld(VideoStream& stream, SwitchControllerContext& context){
-    const uint16_t BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY_0;
-    const uint16_t BOX_PICKUP_DROP_DELAY = GameSettings::instance().BOX_PICKUP_DROP_DELAY;
+    const Milliseconds BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY0;
+    const Milliseconds BOX_PICKUP_DROP_DELAY = GameSettings::instance().BOX_PICKUP_DROP_DELAY0;
     overworld_to_box(stream, context);
     pbf_press_button(context, BUTTON_Y, 20, 50);
     pbf_press_button(context, BUTTON_Y, 20, 50);
     pickup_column(context);
-    pbf_move_right_joystick(context, 0, 128, 20, BOX_SCROLL_DELAY);
-    pbf_move_right_joystick(context, 128, 255, 20, BOX_SCROLL_DELAY);
-    pbf_press_button(context, BUTTON_ZL, 20, BOX_PICKUP_DROP_DELAY);
+    pbf_move_right_joystick(context, 0, 128, 160ms, BOX_SCROLL_DELAY);
+    pbf_move_right_joystick(context, 128, 255, 160ms, BOX_SCROLL_DELAY);
+    pbf_press_button(context, BUTTON_ZL, 160ms, BOX_PICKUP_DROP_DELAY);
     box_to_overworld(stream, context);
 }
 

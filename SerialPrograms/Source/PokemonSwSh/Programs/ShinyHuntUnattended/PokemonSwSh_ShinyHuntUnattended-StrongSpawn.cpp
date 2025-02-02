@@ -82,10 +82,10 @@ void ShinyHuntUnattendedStrongSpawn::program(SingleSwitchProgramEnvironment& env
 
         //  Switch to mashing ZR instead of A to get into the game.
         //  Mash your way into the game.
-        uint16_t duration = GameSettings::instance().START_GAME_MASH;
+        Milliseconds duration = GameSettings::instance().START_GAME_MASH0;
         if (ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET){
             //  Need to wait a bit longer for the internet check.
-            duration += ConsoleSettings::instance().START_GAME_INTERNET_CHECK_DELAY;
+            duration += ConsoleSettings::instance().START_GAME_INTERNET_CHECK_DELAY0;
         }
         pbf_mash_button(context, BUTTON_ZR, duration);
 

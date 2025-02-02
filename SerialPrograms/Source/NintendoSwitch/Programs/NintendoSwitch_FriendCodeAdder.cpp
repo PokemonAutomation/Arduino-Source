@@ -90,7 +90,7 @@ void FriendCodeAdder::program(SingleSwitchProgramEnvironment& env, SwitchControl
         pbf_wait(context, SEARCH_TIME);
         ssf_press_button1(context, BUTTON_A, TOGGLE_BEST_STATUS_DELAY);
         ssf_press_button1(context, BUTTON_A, TOGGLE_BEST_STATUS_DELAY);
-        pbf_press_button(context, BUTTON_HOME, 10, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
+        pbf_press_button(context, BUTTON_HOME, 80ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
     }
 }
 

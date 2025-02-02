@@ -4,7 +4,6 @@
  *
  */
 
-#include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
 #include "NintendoSwitch_Settings.h"
 
 #include <iostream>
@@ -24,17 +23,10 @@ ConsoleSettings& ConsoleSettings::instance(){
 }
 ConsoleSettings::ConsoleSettings()
     : BatchOption(LockMode::LOCK_WHILE_RUNNING)
-    , CONNECT_CONTROLLER_DELAY(
-        "<b>Connection Controller Delay:</b><br>Wait this long before starting the program. The LEDs normally flash during this time.",
-        LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "5 * TICKS_PER_SECOND"
-    )
-    , SETTINGS_TO_HOME_DELAY(
+    , SETTINGS_TO_HOME_DELAY0(
         "<b>Settings to Home Delay:</b><br>Delay from pressing home anywhere in the settings to return to the home menu.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "120"
+        "960ms"
     )
     , START_GAME_REQUIRES_INTERNET(
         "<b>Start Game Requires Internet:</b><br>"
@@ -43,12 +35,11 @@ ConsoleSettings::ConsoleSettings()
         LockMode::LOCK_WHILE_RUNNING,
         false
     )
-    , START_GAME_INTERNET_CHECK_DELAY(
+    , START_GAME_INTERNET_CHECK_DELAY0(
         "<b>Start Game Internet Check Delay:</b><br>"
         "If starting the game requires checking the internet, wait this long for it.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "3 * TICKS_PER_SECOND"
+        "3000ms"
     )
     , TOLERATE_SYSTEM_UPDATE_MENU_FAST(
         "<b>Tolerate System Update Menu (fast):</b><br>"
@@ -65,10 +56,9 @@ ConsoleSettings::ConsoleSettings()
     )
     , KEYBOARD_SECTION("<font size=4><b>Keyboard to Controller Mappings:</b></font>")
 {
-    PA_ADD_OPTION(CONNECT_CONTROLLER_DELAY);
-    PA_ADD_OPTION(SETTINGS_TO_HOME_DELAY);
+    PA_ADD_OPTION(SETTINGS_TO_HOME_DELAY0);
     PA_ADD_OPTION(START_GAME_REQUIRES_INTERNET);
-    PA_ADD_OPTION(START_GAME_INTERNET_CHECK_DELAY);
+    PA_ADD_OPTION(START_GAME_INTERNET_CHECK_DELAY0);
     PA_ADD_OPTION(TOLERATE_SYSTEM_UPDATE_MENU_FAST);
     PA_ADD_OPTION(TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
     PA_ADD_STATIC(KEYBOARD_SECTION);

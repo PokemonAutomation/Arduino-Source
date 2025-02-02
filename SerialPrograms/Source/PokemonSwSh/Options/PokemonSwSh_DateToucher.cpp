@@ -75,7 +75,7 @@ void TouchDateIntervalOption::touch_now_from_home_if_needed(SwitchControllerCont
     if (!ok_to_touch_now()){
         return;
     }
-    touch_date_from_home(context, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
+    touch_date_from_home(context, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
 }
 
 

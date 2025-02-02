@@ -99,29 +99,25 @@ GameSettings::GameSettings()
         "2 * TICKS_PER_SECOND"
     )
     , m_start_game_timings("<font size=4><b>Start Game Timings:</b></font>")
-    , START_GAME_MASH(
+    , START_GAME_MASH0(
         "<b>1. Start Game Mash:</b><br>Mash A for this long to start the game.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "2 * TICKS_PER_SECOND"
+        "2000ms"
     )
-    , START_GAME_WAIT(
+    , START_GAME_WAIT0(
         "<b>2. Start Game Wait:</b><br>Wait this long for the game to load.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "20 * TICKS_PER_SECOND"
+        "20000ms"
     )
-    , ENTER_GAME_MASH(
+    , ENTER_GAME_MASH0(
         "<b>3. Enter Game Mash:</b><br>Mash A for this long to enter the game.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "3 * TICKS_PER_SECOND"
+        "3000ms"
     )
-    , ENTER_GAME_WAIT(
+    , ENTER_GAME_WAIT0(
         "<b>4. Enter Game Wait:</b><br>Wait this long for the game to enter the overworld.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "11 * TICKS_PER_SECOND"
+        "11000ms"
     )
     , m_den_timings("<font size=4><b>Den Timings:</b></font>")
     , ENTER_OFFLINE_DEN_DELAY(
@@ -277,10 +273,10 @@ GameSettings::GameSettings()
     PA_ADD_OPTION(ENTER_PROFILE_DELAY);
 
     PA_ADD_STATIC(m_start_game_timings);
-    PA_ADD_OPTION(START_GAME_MASH);
-    PA_ADD_OPTION(START_GAME_WAIT);
-    PA_ADD_OPTION(ENTER_GAME_MASH);
-    PA_ADD_OPTION(ENTER_GAME_WAIT);
+    PA_ADD_OPTION(START_GAME_MASH0);
+    PA_ADD_OPTION(START_GAME_WAIT0);
+    PA_ADD_OPTION(ENTER_GAME_MASH0);
+    PA_ADD_OPTION(ENTER_GAME_WAIT0);
 
     PA_ADD_STATIC(m_den_timings);
     PA_ADD_OPTION(ENTER_OFFLINE_DEN_DELAY);

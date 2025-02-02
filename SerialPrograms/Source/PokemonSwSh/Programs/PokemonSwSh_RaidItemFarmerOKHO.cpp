@@ -119,7 +119,7 @@ void RaidItemFarmerOHKO::program(MultiSwitchProgramEnvironment& env, Cancellable
     WallClock last_touch = current_time();
 //    uint32_t last_touch = 0;
     if (TOUCH_DATE_INTERVAL > 0){
-        touch_date_from_home(host, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
+        touch_date_from_home(host, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
         last_touch = current_time();
 //        last_touch = system_clock(host);
     }
@@ -187,7 +187,7 @@ void RaidItemFarmerOHKO::program(MultiSwitchProgramEnvironment& env, Cancellable
                     //  Touch the date.
                     if (TOUCH_DATE_INTERVAL > 0 && current_time() - last_touch >= TOUCH_DATE_INTERVAL0){
 //                    if (TOUCH_DATE_INTERVAL > 0 && system_clock(context) - last_touch >= TOUCH_DATE_INTERVAL){
-                        touch_date_from_home(context, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
+                        touch_date_from_home(context, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
                         last_touch += TOUCH_DATE_INTERVAL0;
 //                        last_touch += TOUCH_DATE_INTERVAL;
                     }

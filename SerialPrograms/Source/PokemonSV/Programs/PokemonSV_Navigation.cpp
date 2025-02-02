@@ -48,7 +48,7 @@ void set_time_to_12am_from_home(const ProgramInfo& info, VideoStream& stream, Sw
     pbf_press_button(context, BUTTON_A, 20, 50);
     reader.set_hours(info, stream, context, 0);
     pbf_press_button(context, BUTTON_A, 20, 30);
-    pbf_press_button(context, BUTTON_HOME, 20, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
+    pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
 //    resume_game_from_home(stream, context);
 }
 
@@ -65,7 +65,7 @@ void day_skip_from_overworld(VideoStream& stream, SwitchControllerContext& conte
     ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
     ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 0);
     ssf_press_button(context, BUTTON_A, 20, 10);
-    pbf_press_button(context, BUTTON_HOME, 20, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
+    pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
     resume_game_from_home(stream, context);
 }
 

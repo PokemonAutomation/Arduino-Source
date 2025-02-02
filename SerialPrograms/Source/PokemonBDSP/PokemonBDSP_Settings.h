@@ -8,9 +8,8 @@
 #define PokemonAutomation_PokemonBDSP_Settings_H
 
 #include "Common/Cpp/Options/StaticTextOption.h"
-#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/FloatingPointOption.h"
-#include "Common/Cpp/Options/TimeExpressionOption.h"
+#include "Common/Cpp/Options/TimeDurationOption.h"
 #include "CommonFramework/Panels/SettingsPanel.h"
 
 namespace PokemonAutomation{
@@ -24,24 +23,24 @@ public:
     static GameSettings& instance();
 
     SectionDividerOption m_menu_navigation;
-    TimeExpressionOption<uint16_t> OVERWORLD_TO_MENU_DELAY;
-    TimeExpressionOption<uint16_t> MENU_TO_OVERWORLD_DELAY;
-    TimeExpressionOption<uint16_t> GAME_TO_HOME_DELAY;
+    MillisecondsOption OVERWORLD_TO_MENU_DELAY0;
+    MillisecondsOption MENU_TO_OVERWORLD_DELAY0;
+    MillisecondsOption GAME_TO_HOME_DELAY0;
 
     SectionDividerOption m_start_game_timings;
-    TimeExpressionOption<uint16_t> START_GAME_MASH;
-    TimeExpressionOption<uint16_t> START_GAME_WAIT;
-    TimeExpressionOption<uint16_t> ENTER_GAME_MASH;
-    TimeExpressionOption<uint16_t> ENTER_GAME_WAIT;
+    MillisecondsOption START_GAME_MASH0;
+    MillisecondsOption START_GAME_WAIT0;
+    MillisecondsOption ENTER_GAME_MASH0;
+    MillisecondsOption ENTER_GAME_WAIT0;
 
     SectionDividerOption m_box_timings;
-    TimeExpressionOption<uint16_t> BOX_SCROLL_DELAY_0;      //  Renamed to force defaults on version upgrade.
-    TimeExpressionOption<uint16_t> BOX_CHANGE_DELAY_0;      //  Renamed to force defaults on version upgrade.
-    TimeExpressionOption<uint16_t> BOX_PICKUP_DROP_DELAY;
-    TimeExpressionOption<uint16_t> MENU_TO_POKEMON_DELAY;
-    TimeExpressionOption<uint16_t> POKEMON_TO_BOX_DELAY0;
-    TimeExpressionOption<uint16_t> BOX_TO_POKEMON_DELAY;
-    TimeExpressionOption<uint16_t> POKEMON_TO_MENU_DELAY;
+    MillisecondsOption BOX_SCROLL_DELAY0;
+    MillisecondsOption BOX_CHANGE_DELAY0;
+    MillisecondsOption BOX_PICKUP_DROP_DELAY0;
+    MillisecondsOption MENU_TO_POKEMON_DELAY0;
+    MillisecondsOption POKEMON_TO_BOX_DELAY1;
+    MillisecondsOption BOX_TO_POKEMON_DELAY0;
+    MillisecondsOption POKEMON_TO_MENU_DELAY0;
 
     SectionDividerOption m_advanced_options;
     FloatingPointOption SHINY_ALPHA_OVERALL_THRESHOLD;

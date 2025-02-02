@@ -31,11 +31,10 @@ GameSettings::GameSettings()
         "125"
     )
     , m_start_game_timings("<font size=4><b>Start Game Timings:</b></font>")
-    , START_GAME_MASH(
+    , START_GAME_MASH0(
         "<b>1. Start Game Mash:</b><br>Mash A for this long to start the game.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "2 * TICKS_PER_SECOND"
+        "2000ms"
     )
     , START_GAME_WAIT(
         "<b>2. Start Game Wait:</b><br>Wait this long for the game to load.",
@@ -86,7 +85,7 @@ GameSettings::GameSettings()
     )
 {
     PA_ADD_STATIC(m_start_game_timings);
-    PA_ADD_OPTION(START_GAME_MASH);
+    PA_ADD_OPTION(START_GAME_MASH0);
     PA_ADD_OPTION(START_GAME_WAIT);
     PA_ADD_OPTION(ENTER_GAME_MASH);
     PA_ADD_OPTION(ENTER_GAME_WAIT);

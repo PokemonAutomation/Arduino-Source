@@ -161,15 +161,15 @@ void EggAutonomousState::process_shiny(const ImageViewRGB32& screen){
 void EggAutonomousState::withdraw_egg_column(){
     m_stream.log("Withdrawing column from box to your party...");
 
-    const uint16_t BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY_0;
-    const uint16_t BOX_PICKUP_DROP_DELAY = GameSettings::instance().BOX_PICKUP_DROP_DELAY;
+    const Milliseconds BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY0;
+    const Milliseconds BOX_PICKUP_DROP_DELAY = GameSettings::instance().BOX_PICKUP_DROP_DELAY0;
 
     pbf_press_button(m_context, BUTTON_Y, 20, 50);
     pbf_press_button(m_context, BUTTON_Y, 20, 50);
     pickup_column(m_context);
-    pbf_move_right_joystick(m_context, 0, 128, 20, BOX_SCROLL_DELAY);
-    pbf_move_right_joystick(m_context, 128, 255, 20, BOX_SCROLL_DELAY);
-    pbf_press_button(m_context, BUTTON_ZL, 20, BOX_PICKUP_DROP_DELAY);
+    pbf_move_right_joystick(m_context, 0, 128, 160ms, BOX_SCROLL_DELAY);
+    pbf_move_right_joystick(m_context, 128, 255, 160ms, BOX_SCROLL_DELAY);
+    pbf_press_button(m_context, BUTTON_ZL, 160ms, BOX_PICKUP_DROP_DELAY);
 
     m_eggs_in_column = 0;
     m_eggs_in_party = 5;
@@ -177,11 +177,10 @@ void EggAutonomousState::withdraw_egg_column(){
 bool EggAutonomousState::process_party(){
     m_stream.log("Processing party...");
 
-    const uint16_t BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY_0;
-//    std::chrono::milliseconds SCROLL_TO_READ_DELAY((uint64_t)m_scroll_to_read_delay * 1000 / TICKS_PER_SECOND);
+    const Milliseconds BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY0;
 
-    pbf_move_right_joystick(m_context, 0, 128, 20, BOX_SCROLL_DELAY);
-    pbf_move_right_joystick(m_context, 128, 255, 20, BOX_SCROLL_DELAY);
+    pbf_move_right_joystick(m_context, 0, 128, 160ms, BOX_SCROLL_DELAY);
+    pbf_move_right_joystick(m_context, 128, 255, 160ms, BOX_SCROLL_DELAY);
     pbf_wait(m_context, m_scroll_to_read_delay);
     m_context.wait_for_all_requests();
 //    m_env.wait_for(SCROLL_TO_READ_DELAY);
@@ -202,8 +201,8 @@ bool EggAutonomousState::process_party(){
     //  Run through the 5 hatchlings and release all the non-shinies.
     for (size_t c = 0; c < 5; c++){
         if (c != 0){
-            pbf_move_right_joystick(m_context, 128, 0, 20, BOX_SCROLL_DELAY);
-            pbf_move_right_joystick(m_context, 128, 255, 20, BOX_SCROLL_DELAY);
+            pbf_move_right_joystick(m_context, 128, 0, 160ms, BOX_SCROLL_DELAY);
+            pbf_move_right_joystick(m_context, 128, 255, 160ms, BOX_SCROLL_DELAY);
             pbf_wait(m_context, m_scroll_to_read_delay);
             m_context.wait_for_all_requests();
 //            m_env.wait_for(SCROLL_TO_READ_DELAY);
@@ -264,7 +263,7 @@ bool EggAutonomousState::process_party(){
             pbf_move_right_joystick(m_context, 128, 0, 20, 105);
             pbf_press_button(m_context, BUTTON_ZL, 20, 105);
             pbf_press_button(m_context, BUTTON_B, 20, 230);
-            pbf_press_button(m_context, BUTTON_R, 20, GameSettings::instance().BOX_CHANGE_DELAY_0);
+            pbf_press_button(m_context, BUTTON_R, 160ms, GameSettings::instance().BOX_CHANGE_DELAY0);
             pbf_move_right_joystick(m_context, 0, 128, 20, 105);
             pbf_move_right_joystick(m_context, 128, 255, 20, 105);
             pbf_move_right_joystick(m_context, 128, 255, 20, 105);
@@ -281,8 +280,8 @@ bool EggAutonomousState::process_party(){
         }
     }
 
-    pbf_move_right_joystick(m_context, 128, 0, 20, BOX_SCROLL_DELAY);
-    pbf_move_right_joystick(m_context, 255, 128, 20, BOX_SCROLL_DELAY);
+    pbf_move_right_joystick(m_context, 128, 0, 160ms, BOX_SCROLL_DELAY);
+    pbf_move_right_joystick(m_context, 255, 128, 160ms, BOX_SCROLL_DELAY);
     return false;
 }
 bool EggAutonomousState::process_batch(){

@@ -21,7 +21,8 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonBDSP{
-    using namespace Pokemon;
+
+using namespace Pokemon;
 
 
 MoneyFarmerRoute212_Descriptor::MoneyFarmerRoute212_Descriptor()
@@ -249,7 +250,7 @@ void MoneyFarmerRoute212::heal_at_center_and_return(VideoStream& stream, SwitchC
 void MoneyFarmerRoute212::fly_to_center_heal_and_return(VideoStream& stream, SwitchControllerContext& context, uint8_t pp[4]){
     stream.log("Flying back to Hearthome City to heal.");
     stream.overlay().add_log("Fly to Hearthome City", COLOR_WHITE);
-    pbf_press_button(context, BUTTON_X, 10, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
+    pbf_press_button(context, BUTTON_X, 80ms, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);
     pbf_press_button(context, BUTTON_PLUS, 10, 240);
     pbf_press_dpad(context, DPAD_UP, 10, 60);
     pbf_press_dpad(context, DPAD_UP, 10, 60);

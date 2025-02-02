@@ -80,7 +80,7 @@ void pbf_mash_button(SwitchControllerContext& context, Button button, Millisecon
 void grip_menu_connect_go_home(SwitchControllerContext& context){
     pbf_press_button(context, BUTTON_L | BUTTON_R, 10, 40);
     pbf_press_button(context, BUTTON_A, 10, 140);
-    pbf_press_button(context, BUTTON_HOME, 10, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
+    pbf_press_button(context, BUTTON_HOME, 80ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
 }
 
 

@@ -118,10 +118,10 @@ void EggHatcher::program(SingleSwitchProgramEnvironment& env, SwitchControllerCo
             }
         }else{
             deposit_party_to_column(context, 5);
-            pbf_press_button(context, BUTTON_R, 20, GameSettings::instance().BOX_CHANGE_DELAY_0);
+            pbf_press_button(context, BUTTON_R, 160ms, GameSettings::instance().BOX_CHANGE_DELAY0);
             box_to_overworld(context);
             save_game(context);
-            pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+            pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
             reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
             withdraw_1st_column_from_overworld(context);
             column = 0;

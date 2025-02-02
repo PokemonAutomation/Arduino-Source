@@ -16,7 +16,9 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonBDSP{
-    using namespace Pokemon;
+
+using namespace Pokemon;
+
 
 
 ActivateMenuGlitch113_Descriptor::ActivateMenuGlitch113_Descriptor()
@@ -80,7 +82,7 @@ void ActivateMenuGlitch113::program(SingleSwitchProgramEnvironment& env, SwitchC
 
     //  Bring up menu
     pbf_press_button(context, BUTTON_ZL, 20, FLY_A_TO_X_DELAY - 20);
-    pbf_press_button(context, BUTTON_X, 20, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
+    pbf_press_button(context, BUTTON_X, 160ms, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);
 
     //  Fly
     pbf_press_button(context, BUTTON_ZL, 20, 10 * TICKS_PER_SECOND);

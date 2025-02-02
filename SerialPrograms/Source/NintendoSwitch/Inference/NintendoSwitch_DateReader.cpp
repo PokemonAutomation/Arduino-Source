@@ -628,7 +628,7 @@ void change_date(
             pbf_press_button(context, BUTTON_A, 20, 30);
 
             //  Re-enter the game.
-            pbf_press_button(context, BUTTON_HOME, 20, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
+            pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
 
             return;
         }

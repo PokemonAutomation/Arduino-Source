@@ -55,10 +55,10 @@ void close_game_if_overworld(
     pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
 
     if (touch_date){
-        touch_date_from_home(context, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
+        touch_date_from_home(context, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
     }
     if (rollback_hours > 0){
-        rollback_hours_from_home(context, rollback_hours, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
+        rollback_hours_from_home(context, rollback_hours, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
     }
 
     //  Enter profile.

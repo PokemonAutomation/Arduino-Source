@@ -48,15 +48,15 @@ void resume_game_front_of_den_nowatts(SwitchControllerContext& context, bool tol
 
 void fast_reset_game(
     SwitchControllerContext& context,
-    uint16_t start_game_mash, uint16_t start_game_wait,
-    uint16_t enter_game_mash, uint16_t enter_game_wait
+    Milliseconds start_game_mash, Milliseconds start_game_wait,
+    Milliseconds enter_game_mash, Milliseconds enter_game_wait
 ){
     //  Fastest setting. No internet needed and no update menu.
     ssf_mash1_button(context, BUTTON_X, 50);
 
     //  Use mashing to ensure that the X press succeeds. If it fails, the SR
     //  will fail and can kill a den for the autohosts.
-    ssf_mash2_button(context, BUTTON_X, BUTTON_A, 3 * TICKS_PER_SECOND + start_game_mash);
+    ssf_mash2_button(context, BUTTON_X, BUTTON_A, 3s + start_game_mash);
     ssf_mash1_button(context, BUTTON_X, start_game_wait);
 
     ssf_mash_AZs(context, enter_game_mash);
@@ -70,8 +70,10 @@ void reset_game_from_home(
     if (!ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET && !tolerate_update_menu){
         fast_reset_game(
             context,
-            GameSettings::instance().START_GAME_MASH, GameSettings::instance().START_GAME_WAIT,
-            GameSettings::instance().ENTER_GAME_MASH, GameSettings::instance().ENTER_GAME_WAIT
+            GameSettings::instance().START_GAME_MASH0,
+            GameSettings::instance().START_GAME_WAIT0,
+            GameSettings::instance().ENTER_GAME_MASH0,
+            GameSettings::instance().ENTER_GAME_WAIT0
         );
         return;
     }
@@ -121,13 +123,19 @@ void settings_to_enter_game_den_lobby(
         pbf_wait(context, 50);
     }
 }
-void start_game_from_home(SwitchControllerContext& context, bool tolerate_update_menu, uint8_t game_slot, uint8_t user_slot, bool backup_save){
+void start_game_from_home(
+    SwitchControllerContext& context,
+    bool tolerate_update_menu,
+    uint8_t game_slot,
+    uint8_t user_slot,
+    bool backup_save
+){
     //  Start the game with the specified "game_slot" and "user_slot".
     //  If "game_slot" is zero, it uses whatever the cursor is on.
     //  If "user_slot" is zero, it uses whatever the cursor is on.
 
     if (game_slot != 0){
-        pbf_press_button(context, BUTTON_HOME, 10, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY - 10);
+        ssf_press_button(context, BUTTON_HOME, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0, 80ms);
         for (uint8_t c = 1; c < game_slot; c++){
             pbf_press_dpad(context, DPAD_RIGHT, 5, 5);
         }
@@ -141,7 +149,7 @@ void start_game_from_home(SwitchControllerContext& context, bool tolerate_update
     }
 
     bool START_GAME_REQUIRES_INTERNET = ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET;
-    uint16_t START_GAME_MASH = GameSettings::instance().START_GAME_MASH;
+    Milliseconds START_GAME_MASH = GameSettings::instance().START_GAME_MASH0;
 
     if (!START_GAME_REQUIRES_INTERNET && user_slot == 0){
         //  Mash your way into the game.
@@ -162,26 +170,36 @@ void start_game_from_home(SwitchControllerContext& context, bool tolerate_update
 
         //  Switch to mashing ZR instead of A to get into the game.
         //  Mash your way into the game.
-        uint16_t duration = START_GAME_MASH;
+        Milliseconds duration = START_GAME_MASH;
         if (START_GAME_REQUIRES_INTERNET){
             //  Need to wait a bit longer for the internet check.
-            duration += ConsoleSettings::instance().START_GAME_INTERNET_CHECK_DELAY;
+            duration += ConsoleSettings::instance().START_GAME_INTERNET_CHECK_DELAY0;
         }
         pbf_mash_button(context, BUTTON_ZR, duration);
     }
 
-    pbf_wait(context, GameSettings::instance().START_GAME_WAIT);
-    enter_game(context, backup_save, GameSettings::instance().ENTER_GAME_MASH, GameSettings::instance().ENTER_GAME_WAIT);
+    pbf_wait(context, GameSettings::instance().START_GAME_WAIT0);
+    enter_game(
+        context,
+        backup_save,
+        GameSettings::instance().ENTER_GAME_MASH0,
+        GameSettings::instance().ENTER_GAME_WAIT0
+    );
 }
 
-void enter_game(SwitchControllerContext& context, bool backup_save, uint16_t enter_game_mash, uint16_t enter_game_wait){
+void enter_game(
+    SwitchControllerContext& context,
+    bool backup_save,
+    Milliseconds enter_game_mash,
+    Milliseconds enter_game_wait
+){
     if (backup_save){
         pbf_wait(context, enter_game_mash);
         ssf_press_dpad(context, DPAD_UP, 0, 10);
         ssf_press_button(context, BUTTON_B | BUTTON_X, 1 * TICKS_PER_SECOND, 10);
         ssf_mash_AZs(context, 5 * TICKS_PER_SECOND);
-        if (enter_game_wait > 4 * TICKS_PER_SECOND){
-            pbf_wait(context, enter_game_wait - 4 * TICKS_PER_SECOND);
+        if (enter_game_wait > 4s){
+            pbf_wait(context, enter_game_wait - 4s);
         }
     }else{
         ssf_mash_AZs(context, enter_game_mash);

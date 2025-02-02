@@ -40,15 +40,15 @@ bool reset_game_to_gamemenu(
             context,
             tolerate_update_menu,
             0, 0,
-            GameSettings::instance().START_GAME_MASH
+            GameSettings::instance().START_GAME_MASH0
         );
     }else{
         pbf_press_button(context, BUTTON_X, 50, 0);
-        pbf_mash_button(context, BUTTON_A, GameSettings::instance().START_GAME_MASH);
+        pbf_mash_button(context, BUTTON_A, GameSettings::instance().START_GAME_MASH0);
     }
 
     // Now the game has opened:
-    return openedgame_to_gamemenu(stream, context, GameSettings::instance().START_GAME_WAIT0);
+    return openedgame_to_gamemenu(stream, context, GameSettings::instance().START_GAME_WAIT1);
 }
 
 bool gamemenu_to_ingame(

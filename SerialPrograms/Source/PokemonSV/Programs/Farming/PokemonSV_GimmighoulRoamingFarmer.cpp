@@ -80,7 +80,7 @@ void GimmighoulRoamingFarmer::program(SingleSwitchProgramEnvironment& env, Switc
         }
         PokemonSwSh::roll_date_forward_1(context, true);
         year++;
-        pbf_press_button(context, BUTTON_HOME, 20, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
+        pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
 
         //  Reset game
         reset_game_from_home(env.program_info(), env.console, context, 5 * TICKS_PER_SECOND);
@@ -91,7 +91,7 @@ void GimmighoulRoamingFarmer::program(SingleSwitchProgramEnvironment& env, Switc
         home_to_date_time(context, false, false);
         pbf_press_button(context, BUTTON_A, 20, 105);
         pbf_press_button(context, BUTTON_A, 20, 105);
-        pbf_press_button(context, BUTTON_HOME, 20, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
+        pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
         resume_game_from_home(env.console, context);
     }
     GO_HOME_WHEN_DONE.run_end_of_program(context);

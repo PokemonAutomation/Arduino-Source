@@ -17,25 +17,26 @@ namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 
+
 //  Non-Feedback
 
 void save_game(SwitchControllerContext& context){
-    pbf_press_button(context, BUTTON_X, 10, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
-    pbf_press_button(context, BUTTON_R, 10, 2 * TICKS_PER_SECOND);
-    pbf_press_button(context, BUTTON_ZL, 10, 5 * TICKS_PER_SECOND);
+    pbf_press_button(context, BUTTON_X, 80ms, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);
+    pbf_press_button(context, BUTTON_R, 80ms, 2000ms);
+    pbf_press_button(context, BUTTON_ZL, 80ms, 5000ms);
 }
 void menu_to_box(SwitchControllerContext& context){
-    uint16_t MENU_TO_POKEMON_DELAY = GameSettings::instance().MENU_TO_POKEMON_DELAY;
+    Milliseconds MENU_TO_POKEMON_DELAY = GameSettings::instance().MENU_TO_POKEMON_DELAY0;
     pbf_mash_button(context, BUTTON_ZL, 30);
-    if (MENU_TO_POKEMON_DELAY > 30){
-        pbf_wait(context, MENU_TO_POKEMON_DELAY - 30);
+    if (MENU_TO_POKEMON_DELAY > 240ms){
+        pbf_wait(context, MENU_TO_POKEMON_DELAY - 240ms);
     }
 
-    pbf_press_button(context, BUTTON_R, 20, GameSettings::instance().POKEMON_TO_BOX_DELAY0);
+    pbf_press_button(context, BUTTON_R, 160ms, GameSettings::instance().POKEMON_TO_BOX_DELAY1);
 }
 void overworld_to_box(SwitchControllerContext& context){
-    pbf_press_button(context, BUTTON_X, 20, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
-//    pbf_press_button(context, BUTTON_ZL, 20, GameSettings::instance().MENU_TO_POKEMON_DELAY);
+    pbf_press_button(context, BUTTON_X, 160ms, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);
+//    pbf_press_button(context, BUTTON_ZL, 160ms, GameSettings::instance().MENU_TO_POKEMON_DELAY);
 
     menu_to_box(context);
 }
@@ -53,10 +54,10 @@ void box_to_overworld(SwitchControllerContext& context){
     //                  back out of the box.
 
     pbf_press_button(context, BUTTON_B, 20, 30);
-    pbf_press_button(context, BUTTON_B, 20, GameSettings::instance().BOX_TO_POKEMON_DELAY);
+    pbf_press_button(context, BUTTON_B, 160ms, GameSettings::instance().BOX_TO_POKEMON_DELAY0);
 
-    pbf_press_button(context, BUTTON_B, 20, GameSettings::instance().POKEMON_TO_MENU_DELAY);
-    pbf_press_button(context, BUTTON_X, 20, GameSettings::instance().MENU_TO_OVERWORLD_DELAY);
+    pbf_press_button(context, BUTTON_B, 160ms, GameSettings::instance().POKEMON_TO_MENU_DELAY0);
+    pbf_press_button(context, BUTTON_X, 160ms, GameSettings::instance().MENU_TO_OVERWORLD_DELAY0);
 }
 
 
@@ -95,15 +96,8 @@ void overworld_to_box(VideoStream& stream, SwitchControllerContext& context){
     overworld_to_menu(stream, context);
 
     //  Enter Pokemon
-    uint16_t MENU_TO_POKEMON_DELAY = GameSettings::instance().MENU_TO_POKEMON_DELAY;
-#if 0
-//    pbf_mash_button(context, BUTTON_ZL, 30);
-    if (MENU_TO_POKEMON_DELAY > 30){
-        pbf_wait(context, MENU_TO_POKEMON_DELAY - 30);
-    }
-#else
-    pbf_press_button(context, BUTTON_ZL, 20, MENU_TO_POKEMON_DELAY);
-#endif
+    Milliseconds MENU_TO_POKEMON_DELAY = GameSettings::instance().MENU_TO_POKEMON_DELAY0;
+    pbf_press_button(context, BUTTON_ZL, 160ms, MENU_TO_POKEMON_DELAY);
 
     //  Enter box system.
     pbf_press_button(context, BUTTON_R, 20, 105);
@@ -138,7 +132,7 @@ void box_to_overworld(VideoStream& stream, SwitchControllerContext& context){
     //  In state (2):   The 1st B will drop the party pokemon. The 2nd B will
     //                  back out of the box.
     pbf_press_button(context, BUTTON_B, 20, 30);
-    pbf_press_button(context, BUTTON_B, 20, GameSettings::instance().BOX_TO_POKEMON_DELAY);
+    pbf_press_button(context, BUTTON_B, 160ms, GameSettings::instance().BOX_TO_POKEMON_DELAY0);
 
     //  To menu.
     pbf_press_button(context, BUTTON_B, 20, 105);
@@ -160,7 +154,7 @@ void box_to_overworld(VideoStream& stream, SwitchControllerContext& context){
     }
 
     //  To overworld.
-    pbf_press_button(context, BUTTON_X, 20, GameSettings::instance().MENU_TO_OVERWORLD_DELAY);
+    pbf_press_button(context, BUTTON_X, 160ms, GameSettings::instance().MENU_TO_OVERWORLD_DELAY0);
 }
 
 

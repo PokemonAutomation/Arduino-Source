@@ -122,8 +122,8 @@ bool OverworldTrigger::find_encounter(VideoStream& stream, SwitchControllerConte
         overworld_to_menu(stream, context);
 
         //  Go to pokemon page
-        const uint16_t MENU_TO_POKEMON_DELAY = GameSettings::instance().MENU_TO_POKEMON_DELAY;
-        pbf_press_button(context, BUTTON_ZL, 20, MENU_TO_POKEMON_DELAY);
+        const Milliseconds MENU_TO_POKEMON_DELAY = GameSettings::instance().MENU_TO_POKEMON_DELAY0;
+        pbf_press_button(context, BUTTON_ZL, 160ms, MENU_TO_POKEMON_DELAY);
 
         //  Go to the pokemon that knows Sweet Scent
         const size_t location = SWEET_SCENT_POKEMON_LOCATION.current_value();

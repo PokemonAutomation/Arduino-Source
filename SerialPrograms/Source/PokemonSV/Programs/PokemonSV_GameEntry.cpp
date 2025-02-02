@@ -67,7 +67,7 @@ bool reset_game_to_gamemenu(VideoStream& stream, SwitchControllerContext& contex
         stream, context,
         true,
         0, 0,
-        GameSettings::instance().START_GAME_MASH
+        GameSettings::instance().START_GAME_MASH0
     );
 
     uint16_t timeout = GameSettings::instance().START_GAME_WAIT;

@@ -176,7 +176,7 @@ void home_roll_date_enter_game(
 
     resume_game_from_home(stream, context, true);
 }
-void touch_date_from_home(SwitchControllerContext& context, uint16_t settings_to_home_delay){
+void touch_date_from_home(SwitchControllerContext& context, Milliseconds settings_to_home_delay){
     //  Touch the date without changing it. This prevents unintentional rollovers.
 
     home_to_date_time(context, true, true);
@@ -197,9 +197,13 @@ void touch_date_from_home(SwitchControllerContext& context, uint16_t settings_to
     ssf_press_button(context, BUTTON_A, 20, 10);
     ssf_issue_scroll(context, SSF_SCROLL_LEFT, 3);
     ssf_issue_scroll(context, SSF_SCROLL_DOWN, 2);
-    ssf_press_button(context, BUTTON_HOME, settings_to_home_delay, 10);
+    ssf_press_button(context, BUTTON_HOME, settings_to_home_delay, 80ms);
 }
-void rollback_hours_from_home(SwitchControllerContext& context, uint8_t hours, uint16_t settings_to_home_delay){
+void rollback_hours_from_home(
+    SwitchControllerContext& context,
+    uint8_t hours,
+    Milliseconds settings_to_home_delay
+){
     home_to_date_time(context, true, false);
     ssf_press_button(context, BUTTON_A, 20, 10);
 
@@ -214,7 +218,7 @@ void rollback_hours_from_home(SwitchControllerContext& context, uint8_t hours, u
     ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
 
     ssf_press_button(context, BUTTON_A, 20, 10);
-    ssf_press_button(context, BUTTON_HOME, settings_to_home_delay, 10);
+    ssf_press_button(context, BUTTON_HOME, settings_to_home_delay, 80ms);
 }
 
 

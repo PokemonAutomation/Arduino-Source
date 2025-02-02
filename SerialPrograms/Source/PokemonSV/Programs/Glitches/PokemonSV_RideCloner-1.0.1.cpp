@@ -261,7 +261,7 @@ bool RideCloner101::run_post_win(
         home_to_date_time(context, false, false);
         pbf_press_button(context, BUTTON_A, 20, 105);
         pbf_press_button(context, BUTTON_A, 20, 105);
-        pbf_press_button(context, BUTTON_HOME, 20, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
+        pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
         resume_game_from_home(stream, context);
     }
 
@@ -273,8 +273,12 @@ bool RideCloner101::run_post_win(
     while (true){
         context.wait_for_all_requests();
         if (current_time() - start > std::chrono::minutes(5)){
-            dump_image_and_throw_recoverable_exception(env.program_info(), stream, "RideCloneReturnToOverworldFailed",
-                "Failed to return to overworld after 5 minutes.");
+            dump_image_and_throw_recoverable_exception(
+                env.program_info(),
+                stream,
+                "RideCloneReturnToOverworldFailed",
+                "Failed to return to overworld after 5 minutes."
+            );
         }
 
         TeraCatchWatcher catch_menu(COLOR_BLUE);
