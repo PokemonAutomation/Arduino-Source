@@ -57,6 +57,7 @@ bool SuperscalarScheduler::iterate_schedule(const Cancellable* cancellable){
     }
 
     if (m_state_changes.empty()){
+//        cout << "State is empty." << endl;
         m_device_sent_time = m_device_issue_time;
         return false;
     }
@@ -149,7 +150,7 @@ void SuperscalarScheduler::issue_wait_for_all(const Cancellable* cancellable){
     process_schedule(cancellable);
 }
 void SuperscalarScheduler::issue_nop(const Cancellable* cancellable, WallDuration delay){
-    if (delay == WallDuration::zero()){
+    if (delay <= WallDuration::zero()){
         return;
     }
     if (m_pending_clear.load(std::memory_order_acquire)){
@@ -160,8 +161,9 @@ void SuperscalarScheduler::issue_nop(const Cancellable* cancellable, WallDuratio
 //         << ", sent_time = " << std::chrono::duration_cast<Milliseconds>((m_device_sent_time - m_local_start)).count()
 //         << ", max_free_time = " << std::chrono::duration_cast<Milliseconds>((m_max_free_time - m_local_start)).count()
 //         << endl;
-    m_state_changes.insert(m_device_issue_time);
-    m_device_issue_time += delay;
+    WallClock next_issue_time = m_device_issue_time + delay;
+    m_state_changes.insert(next_issue_time);
+    m_device_issue_time = next_issue_time;
     m_max_free_time = std::max(m_max_free_time, m_device_issue_time);
     m_local_last_activity = current_time();
     process_schedule(cancellable);
@@ -199,6 +201,10 @@ void SuperscalarScheduler::issue_to_resource(
             "Attempted to issue resource that isn't ready."
         );
     }
+
+    delay    = std::max(delay, WallDuration::zero());
+    hold     = std::max(hold, WallDuration::zero());
+    cooldown = std::max(cooldown, WallDuration::zero());
 
 //    cout << "issue_to_resource(): delay = " << std::chrono::duration_cast<Milliseconds>(delay).count()
 //         << ", hold = " << std::chrono::duration_cast<Milliseconds>(hold).count()
