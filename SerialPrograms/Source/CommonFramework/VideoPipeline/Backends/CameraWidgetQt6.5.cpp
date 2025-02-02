@@ -275,7 +275,7 @@ void CameraSession::connect_video_sink(QVideoSink* sink){
                 WriteSpinLock lg(m_frame_lock);
 
                 //  Skip duplicate frames.
-                if (frame.startTime() <= m_last_frame.startTime()){
+                if (frame.startTime() != -1 && frame.startTime() <= m_last_frame.startTime()){
                     return;
                 }
 
