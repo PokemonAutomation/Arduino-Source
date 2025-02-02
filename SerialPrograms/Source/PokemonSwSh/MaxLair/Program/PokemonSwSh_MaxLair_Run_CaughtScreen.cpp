@@ -170,7 +170,7 @@ StateMachineAction run_caught_screen(
             if (state == StateMachineAction::RESET_RECOVER){
                 throw_and_log<FatalProgramException>(
                     stream.logger(),
-                    ErrorReport::SEND_ERROR_REPORT,
+                    ErrorReport::NO_ERROR_REPORT,
                     "Unable to take " + Pokemon::STRING_POKEMON + ". Did you forget to disable nicknames?",
                     stream
                );

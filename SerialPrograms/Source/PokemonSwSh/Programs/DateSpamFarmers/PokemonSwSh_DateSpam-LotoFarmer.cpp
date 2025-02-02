@@ -64,7 +64,7 @@ void LotoFarmer::program(SingleSwitchProgramEnvironment& env, SwitchControllerCo
         home_roll_date_enter_game_autorollback(env.console, context, year);
         pbf_mash_button(context, BUTTON_B, 90);
 
-        pbf_press_button(context, BUTTON_A, 10, 70);
+        pbf_press_button(context, BUTTON_A, 10, 90);
         pbf_press_button(context, BUTTON_B, 10, 70);
         pbf_press_dpad(context, DPAD_DOWN, 10, 5);
         pbf_mash_button(context, BUTTON_ZL, 490);
