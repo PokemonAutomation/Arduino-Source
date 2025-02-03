@@ -53,7 +53,7 @@ void set_time_to_12am_from_home(const ProgramInfo& info, VideoStream& stream, Sw
 }
 
 void day_skip_from_overworld(VideoStream& stream, SwitchControllerContext& context){
-    pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
+    pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
     home_to_date_time(context, true, true);
     ssf_press_button(context, BUTTON_A, 20, 10);
     ssf_issue_scroll(context, DPAD_RIGHT, 0);

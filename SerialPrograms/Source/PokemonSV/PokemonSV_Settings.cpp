@@ -24,11 +24,10 @@ GameSettings& GameSettings::instance(){
 GameSettings::GameSettings()
     : BatchOption(LockMode::LOCK_WHILE_RUNNING)
     , m_menu_navigation("<font size=4><b>Menu Navigation Timings:</b></font>")
-    , GAME_TO_HOME_DELAY(
+    , GAME_TO_HOME_DELAY0(
         "<b>Game to Home Delay:</b><br>Delay from pressing home to entering the the Switch home menu.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "125"
+        "100ms"
     )
     , m_start_game_timings("<font size=4><b>Start Game Timings:</b></font>")
     , START_GAME_MASH0(
@@ -36,32 +35,28 @@ GameSettings::GameSettings()
         LockMode::LOCK_WHILE_RUNNING,
         "2000ms"
     )
-    , START_GAME_WAIT(
+    , START_GAME_WAIT0(
         "<b>2. Start Game Wait:</b><br>Wait this long for the game to load.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "60 * TICKS_PER_SECOND"
+        "60s"
     )
-    , ENTER_GAME_MASH(
+    , ENTER_GAME_MASH0(
         "<b>3. Enter Game Mash:</b><br>Mash A for this long to enter the game.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "5 * TICKS_PER_SECOND"
+        "5000ms"
     )
-    , ENTER_GAME_WAIT(
+    , ENTER_GAME_WAIT0(
         "<b>4. Enter Game Wait:</b><br>Wait this long for the game to enter the overworld.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "60 * TICKS_PER_SECOND"
+        "60s"
     )
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
-    , RAID_SPAWN_DELAY(
+    , RAID_SPAWN_DELAY0(
         "<b>Raid Spawn Delay</b>",
         LockMode::UNLOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "3 * TICKS_PER_SECOND"
+        "3000ms"
     )
     , SHINY_SOUND_THRESHOLD2(
         "<b>Shiny Sound Threshold:</b><br>Maximum error coefficient to trigger a shiny detection.",
@@ -84,13 +79,14 @@ GameSettings::GameSettings()
         1000, 0, 48000
     )
 {
+    PA_ADD_OPTION(GAME_TO_HOME_DELAY0);
     PA_ADD_STATIC(m_start_game_timings);
     PA_ADD_OPTION(START_GAME_MASH0);
-    PA_ADD_OPTION(START_GAME_WAIT);
-    PA_ADD_OPTION(ENTER_GAME_MASH);
-    PA_ADD_OPTION(ENTER_GAME_WAIT);
+    PA_ADD_OPTION(START_GAME_WAIT0);
+    PA_ADD_OPTION(ENTER_GAME_MASH0);
+    PA_ADD_OPTION(ENTER_GAME_WAIT0);
     PA_ADD_OPTION(m_advanced_options);
-    PA_ADD_OPTION(RAID_SPAWN_DELAY);
+    PA_ADD_OPTION(RAID_SPAWN_DELAY0);
     PA_ADD_OPTION(SHINY_SOUND_THRESHOLD2);
     PA_ADD_OPTION(SHINY_SOUND_LOW_FREQUENCY);
     PA_ADD_OPTION(LETS_GO_KILL_SOUND_THRESHOLD);
@@ -105,9 +101,9 @@ GameSettings_Descriptor::GameSettings_Descriptor()
     : PanelDescriptor(
         Color(),
         "PokemonSV:GlobalSettings",
-        STRING_POKEMON + " SV", STRING_POKEMON + " Settings",
+        STRING_POKEMON + " SV", "Game Settings",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSV/PokemonSettings.md",
-        "Global " + STRING_POKEMON + " Settings"
+        "Global " + STRING_POKEMON + " Scarlet and Violet Settings"
     )
 {}
 

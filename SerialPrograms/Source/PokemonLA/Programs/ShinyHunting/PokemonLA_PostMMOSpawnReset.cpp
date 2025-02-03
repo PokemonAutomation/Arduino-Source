@@ -101,7 +101,7 @@ void PostMMOSpawnReset::run_iteration(SingleSwitchProgramEnvironment& env, Switc
     PostMMOSpawnReset_Descriptor::Stats& stats = env.current_stats<PostMMOSpawnReset_Descriptor::Stats>();
 
     // From game to Switch Home
-    pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+    pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
     {
         float shiny_coefficient = 1.0;
         ShinySoundDetector shiny_detector(env.console, [&](float error_coefficient) -> bool{

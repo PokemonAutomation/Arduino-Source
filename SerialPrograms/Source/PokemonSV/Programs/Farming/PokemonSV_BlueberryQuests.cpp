@@ -582,7 +582,7 @@ void quest_tera_self_defeat(
     return_to_plaza(info, stream, context);
 
     //Day skip and attempt to respawn fixed encounters
-    pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+    pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
     home_to_date_time(context, true, true);
     PokemonSwSh::roll_date_forward_1(context, true);
     resume_game_from_home(stream, context);
@@ -717,7 +717,7 @@ void quest_sneak_up(
     return_to_plaza(info, stream, context);
 
     //Day skip and attempt to respawn fixed encounters - in case quest failed
-    pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+    pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
     home_to_date_time(context, true, true);
     PokemonSwSh::roll_date_forward_1(context, true);
     resume_game_from_home(stream, context);
@@ -790,7 +790,7 @@ void quest_wild_tera(
     return_to_plaza(info, stream, context);
 
     //Day skip and attempt to respawn fixed encounters
-    pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+    pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
     home_to_date_time(context, true, true);
     PokemonSwSh::roll_date_forward_1(context, true);
     resume_game_from_home(stream, context);
@@ -928,7 +928,7 @@ void quest_hatch_egg(
 
     //Fix time before hatching
     if (BBQ_OPTIONS.FIX_TIME_FOR_HATCH){
-        pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
+        pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
         home_to_date_time(context, false, false);
         pbf_press_button(context, BUTTON_A, 20, 105);
         pbf_press_button(context, BUTTON_A, 20, 105);
@@ -1100,7 +1100,7 @@ void quest_tera_raid(
                 while (!open_raid(stream, context) && rerolls < 150){
                     env.log("No Tera raid found.", COLOR_ORANGE);
                     day_skip_from_overworld(stream, context);
-                    pbf_wait(context, GameSettings::instance().RAID_SPAWN_DELAY);
+                    pbf_wait(context, GameSettings::instance().RAID_SPAWN_DELAY0);
                     rerolls++;
                 }
                 started_tera_raid = true;
@@ -1158,7 +1158,7 @@ void quest_tera_raid(
             exit_tera_win_without_catching(env.program_info(), stream, context, 0);
         }else{
             if (BBQ_OPTIONS.CATCH_ON_WIN.FIX_TIME_ON_CATCH){
-                pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
+                pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
                 home_to_date_time(context, false, false);
                 pbf_press_button(context, BUTTON_A, 20, 105);
                 pbf_press_button(context, BUTTON_A, 20, 105);

@@ -8,10 +8,8 @@
 #define PokemonAutomation_PokemonLA_Settings_H
 
 #include "Common/Cpp/Options/StaticTextOption.h"
-#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/FloatingPointOption.h"
 #include "Common/Cpp/Options/TimeDurationOption.h"
-#include "Common/Cpp/Options/TimeExpressionOption.h"
 #include "CommonFramework/Panels/SettingsPanel.h"
 
 namespace PokemonAutomation{
@@ -28,16 +26,14 @@ public:
     FloatingPointOption POST_WARP_DELAY;
 
     SectionDividerOption m_menu_navigation;
-//    TimeExpressionOption<uint16_t> OVERWORLD_TO_MENU_DELAY;
-//    TimeExpressionOption<uint16_t> MENU_TO_OVERWORLD_DELAY;
-    TimeExpressionOption<uint16_t> GAME_TO_HOME_DELAY;
-    TimeExpressionOption<uint16_t> LOAD_REGION_TIMEOUT;
+    MillisecondsOption GAME_TO_HOME_DELAY0;
+    MillisecondsOption LOAD_REGION_TIMEOUT0;
 
     SectionDividerOption m_start_game_timings;
     MillisecondsOption START_GAME_MASH0;
     MillisecondsOption START_GAME_WAIT1;
-    TimeExpressionOption<uint16_t> ENTER_GAME_MASH;
-    TimeExpressionOption<uint16_t> ENTER_GAME_WAIT;
+    MillisecondsOption ENTER_GAME_MASH0;
+    MillisecondsOption ENTER_GAME_WAIT0;
 
     SectionDividerOption m_advanced_options;
     FloatingPointOption SHINY_SOUND_THRESHOLD;

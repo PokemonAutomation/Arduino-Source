@@ -4,15 +4,14 @@
  *
  */
 
-#include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
-#include "CommonFramework/Globals.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonBDSP_Settings.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonBDSP{
-    using namespace Pokemon;
+
+using namespace Pokemon;
 
 
 
@@ -181,9 +180,9 @@ GameSettings_Descriptor::GameSettings_Descriptor()
     : PanelDescriptor(
         Color(),
         "PokemonBDSP:GlobalSettings",
-        STRING_POKEMON + " BDSP", STRING_POKEMON + " Settings",
+        STRING_POKEMON + " BDSP", "Game Settings",
         "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/PokemonSettings.md",
-        "Global " + STRING_POKEMON + " Settings"
+        "Global " + STRING_POKEMON + " Brilliant Diamond and Shing Pearl Settings"
     )
 {}
 

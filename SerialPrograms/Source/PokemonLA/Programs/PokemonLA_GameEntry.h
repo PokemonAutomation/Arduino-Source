@@ -29,7 +29,7 @@ bool reset_game_to_gamemenu(
 // mash A to enter the game and wait until the black screen is gone.
 bool gamemenu_to_ingame(
     VideoStream& stream, SwitchControllerContext& context,
-    uint16_t mash_duration, uint16_t enter_game_timeout
+    Milliseconds mash_duration, Milliseconds enter_game_timeout
 );
 
 // From Switch Home menu, start game and wait until the player character appears in game.

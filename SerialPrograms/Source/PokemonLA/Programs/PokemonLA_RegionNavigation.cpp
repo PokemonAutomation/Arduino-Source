@@ -180,7 +180,7 @@ void mash_A_to_change_region(
         int ret = run_until<SwitchControllerContext>(
             stream, context,
             [](SwitchControllerContext& context){
-                pbf_mash_button(context, BUTTON_A, GameSettings::instance().LOAD_REGION_TIMEOUT);
+                pbf_mash_button(context, BUTTON_A, GameSettings::instance().LOAD_REGION_TIMEOUT0);
             },
             {
                 {black_screen1a},
@@ -200,7 +200,7 @@ void mash_A_to_change_region(
         ArcPhoneDetector phone(stream.logger(), stream.overlay(), std::chrono::milliseconds(250), true);
         int ret = wait_until(
             stream, context,
-            Milliseconds(GameSettings::instance().LOAD_REGION_TIMEOUT * 1000 /  TICKS_PER_SECOND),
+            GameSettings::instance().LOAD_REGION_TIMEOUT0,
             {phone}
         );
         if (ret < 0){

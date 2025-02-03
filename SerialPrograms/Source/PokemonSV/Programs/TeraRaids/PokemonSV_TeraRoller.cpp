@@ -127,7 +127,7 @@ void TeraRoller::program(SingleSwitchProgramEnvironment& env, SwitchControllerCo
 
         if (!first){
             day_skip_from_overworld(env.console, context);
-            pbf_wait(context, GameSettings::instance().RAID_SPAWN_DELAY);
+            pbf_wait(context, GameSettings::instance().RAID_SPAWN_DELAY0);
             context.wait_for_all_requests();
             stats.m_skips++;
             skip_counter++;

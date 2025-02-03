@@ -147,7 +147,7 @@ void DistortionWaiter::program(SingleSwitchProgramEnvironment& env, SwitchContro
         {}, "",
         env.console.video().snapshot()
     );
-    pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+    pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
 }
 
 

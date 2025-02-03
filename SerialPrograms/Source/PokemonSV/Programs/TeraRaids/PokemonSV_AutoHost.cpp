@@ -294,7 +294,7 @@ void AutoHost::program(SingleSwitchProgramEnvironment& env, SwitchControllerCont
         fail_tracker.on_raid_start();
 
         if (!skip_reset){
-            pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+            pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
             if (ROLLOVER_PREVENTION){
                 WallClock now = current_time();
                 if (last_time_fix == WallClock::min() || now - last_time_fix > std::chrono::hours(4)){

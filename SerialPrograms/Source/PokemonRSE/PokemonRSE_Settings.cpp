@@ -5,13 +5,15 @@
  */
 
 #include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
-#include "CommonFramework/Globals.h"
+#include "Pokemon/Pokemon_Strings.h"
 
 #include "PokemonRSE_Settings.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonRSE{
+
+using namespace Pokemon;
 
 
 
@@ -62,9 +64,9 @@ GameSettings_Descriptor::GameSettings_Descriptor()
     : PanelDescriptor(
         Color(),
         "PokemonRSE:GlobalSettings",
-        "Pokemon RSE", "Pokemon Settings",
+        STRING_POKEMON + " RSE", "Game Settings",
         "ComputerControl/blob/master/Wiki/Programs/PokemonRSE/RSESettings.md",
-        "Global Pokemon RSE Settings"
+        "Global " + STRING_POKEMON + " Ruby, Sapphire, and Emerald Settings"
     )
 {}
 

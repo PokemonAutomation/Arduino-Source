@@ -278,7 +278,7 @@ void LeapGrinder::program(SingleSwitchProgramEnvironment& env, SwitchControllerC
             stats.errors++;
             e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
 
-            pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+            pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
             reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
             // Switch from items to pokemons
             pbf_press_button(context, BUTTON_X, 20, 30);
@@ -286,7 +286,7 @@ void LeapGrinder::program(SingleSwitchProgramEnvironment& env, SwitchControllerC
     }
 
     env.update_stats();
-    pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+    pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 }
 

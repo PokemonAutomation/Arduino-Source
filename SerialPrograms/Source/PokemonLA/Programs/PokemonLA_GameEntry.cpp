@@ -53,7 +53,7 @@ bool reset_game_to_gamemenu(
 
 bool gamemenu_to_ingame(
     VideoStream& stream, SwitchControllerContext& context,
-    uint16_t mash_duration, uint16_t enter_game_timeout
+    Milliseconds mash_duration, Milliseconds enter_game_timeout
 ){
     stream.log("Mashing A to enter game...");
     BlackScreenOverWatcher detector(COLOR_RED, {0.2, 0.2, 0.6, 0.6});
@@ -81,7 +81,11 @@ bool reset_game_from_home(
 ){
     bool ok = true;
     ok &= reset_game_to_gamemenu(stream, context, tolerate_update_menu);
-    ok &= gamemenu_to_ingame(stream, context, GameSettings::instance().ENTER_GAME_MASH, GameSettings::instance().ENTER_GAME_WAIT);
+    ok &= gamemenu_to_ingame(
+        stream, context,
+        GameSettings::instance().ENTER_GAME_MASH0,
+        GameSettings::instance().ENTER_GAME_WAIT0
+    );
     if (!ok){
         dump_image(stream.logger(), env.program_info(), stream.video(), "StartGame");
     }

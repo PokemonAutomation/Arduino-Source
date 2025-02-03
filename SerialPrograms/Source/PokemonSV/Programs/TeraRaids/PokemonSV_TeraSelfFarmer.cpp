@@ -187,7 +187,7 @@ bool TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, SwitchControl
 
 
     if (CATCH_ON_WIN.FIX_TIME_ON_CATCH){
-        pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
+        pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
         home_to_date_time(context, false, false);
         pbf_press_button(context, BUTTON_A, 20, 105);
         pbf_press_button(context, BUTTON_A, 20, 105);
@@ -243,7 +243,7 @@ void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, SwitchControll
 
         if (!first){
             day_skip_from_overworld(env.console, context);
-            pbf_wait(context, GameSettings::instance().RAID_SPAWN_DELAY);
+            pbf_wait(context, GameSettings::instance().RAID_SPAWN_DELAY0);
             context.wait_for_all_requests();
             stats.m_skips++;
             skip_counter++;

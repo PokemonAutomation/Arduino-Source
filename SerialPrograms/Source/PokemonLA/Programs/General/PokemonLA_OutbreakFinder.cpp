@@ -735,7 +735,7 @@ bool OutbreakFinder::run_iteration(
             }
 
             env.log("No target MMO sprite found. Reset game...");
-            pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+            pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
             reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
         }
     }

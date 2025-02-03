@@ -588,7 +588,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, SwitchControllerCo
                 env.log("Did not detect battle. Resetting.");
                 stats.resets++;
                 env.update_stats();
-                pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+                pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
                 reset_game_from_home(env.program_info(), env.console, context, 5 * TICKS_PER_SECOND);
             }
 
@@ -634,7 +634,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, SwitchControllerCo
             );
             stats.resets++;
             env.update_stats();
-            pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+            pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
             reset_game_from_home(env.program_info(), env.console, context, 5 * TICKS_PER_SECOND);
         }
     }

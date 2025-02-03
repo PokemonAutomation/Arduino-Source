@@ -292,9 +292,9 @@ GameSettings_Descriptor::GameSettings_Descriptor()
     : PanelDescriptor(
         Color(),
         "PokemonSwSh:GlobalSettings",
-        STRING_POKEMON + " SwSh", STRING_POKEMON + " Settings",
+        STRING_POKEMON + " SwSh", "Game Settings",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/PokemonSettings.md",
-        "Global " + STRING_POKEMON + " Settings"
+        "Global " + STRING_POKEMON + " Sword and Shield Settings"
     )
 {}
 

@@ -301,7 +301,7 @@ void ShinyHuntCustomPath::program(SingleSwitchProgramEnvironment& env, SwitchCon
 
             if(RESET_METHOD == ResetMethod::SoftReset){
                 env.console.log("Resetting by closing the game.");
-                pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+                pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
                 reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
             }else{
                 env.console.log("Resetting by going to village.");
@@ -326,7 +326,7 @@ void ShinyHuntCustomPath::program(SingleSwitchProgramEnvironment& env, SwitchCon
             e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
 
             time_reset_run_count = 0;
-            pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+            pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
             reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
         }
 

@@ -143,7 +143,7 @@ void on_shiny_sound(
         pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 0);
     }
 
-    pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+    pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
     context.wait_for_all_requests();
     throw ProgramFinishedException();
 }
