@@ -176,7 +176,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<EggSuperCombined2_Descriptor, EggSuperCombined2>());
     ret.emplace_back(make_single_switch_program<EggAutonomous_Descriptor, EggAutonomous>());
     ret.emplace_back(make_single_switch_program<GodEggItemDupe_Descriptor, GodEggItemDupe>());
-    if (PreloadSettings::instance().NAUGHTY_MODE){
+    if (PreloadSettings::instance().NAUGHTY_MODE || PreloadSettings::instance().DEVELOPER_MODE){
         ret.emplace_back(make_single_switch_program<GodEggDuplication_Descriptor, GodEggDuplication>());
     }
 
